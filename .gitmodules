@@ -1,0 +1,4 @@
+[submodule "src/ape/scaffolds/codex/codexbridge"]
+	path = src/ape/scaffolds/codex/codexbridge
+	url = https://github.com/begonia599/CodexBridge
+	commit = dea9bd729a379882119754a6d50a2c02951b582b

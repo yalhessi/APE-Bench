@@ -1,0 +1,46 @@
+psutil
+# Core MCP framework
+fastmcp
+
+# Data modeling and validation
+pydantic
+
+# Vector search and embeddings  
+chromadb
+sentence-transformers
+
+# Async support and utilities
+asyncio
+aiofiles
+tqdm
+tenacity
+
+# HTTP client and server
+httpx  # Async HTTP client (replaced aiohttp client)
+fastapi  # Modern async web framework (replaced aiohttp server)
+uvicorn  # ASGI server for FastAPI
+
+# TOML configuration (for Codex scaffold)
+tomli
+tomli_w
+
+# UI and CLI
+click
+rich
+prompt_toolkit
+
+# Git operations
+GitPython
+
+# Docker support
+docker
+
+claude_agent_sdk
+
+rapidfuzz
+
+datasets
+
+leanclient
+lean_lsp_mcp
+pylspclient
