@@ -5,6 +5,7 @@ All Lean task implementations are organized into:
   - theorem_proving/
   - proof_engineering/
   - judgment/
+  - pr_review/
 - utils.py: Utility functions for Lean tasks
 - base.py: BaseLeanTask and BaseLeanTaskData base classes
 """
@@ -28,6 +29,13 @@ from .formal_math.judgment import (
     LeanJudgmentConfig,
     LeanJudgmentResult,
 )
+from .formal_math.pr_review import (
+    ReviewPRTask,
+    ReviewPRData,
+    ReviewPRConfig,
+    ReviewPRResult,
+    PRReviewGroundTruth,
+)
 
 __all__ = [
     'BaseLeanTask',
@@ -44,4 +52,9 @@ __all__ = [
     'LeanJudgmentData',
     'LeanJudgmentConfig',
     'LeanJudgmentResult',
+    'ReviewPRTask',
+    'ReviewPRData',
+    'ReviewPRConfig',
+    'ReviewPRResult',
+    'PRReviewGroundTruth',
 ]

@@ -221,6 +221,13 @@ python -m ape.scaffolds.claude_code.main \
   llm_config.model_name=claude_3_opus \
   execution.sample_max_cost=3.0 \
   --orchestrator_id claude_code_ape_bench_opus
+
+# Run PR-review benchmark (Mathlib merge-readiness task)
+python -m ape.scaffolds.ape_agent.main \
+  inputs/proof_pr_review/mathlib_pr_review_benchmark.jsonl \
+  llm_config.model_name=gpt_5.2 \
+  execution.sample_count=1 \
+  --orchestrator_id ape_agent_pr_review
 ```
 
 #### Configuration via CLI
@@ -347,6 +354,10 @@ python -m src.datasets.ape_bench.main \
 │       │   ├── main.py            # Pipeline entry point
 │       │   ├── collector.py       # Commit filtering
 │       │   └── task.py            # Instruction synthesis
+│       ├── pr_review/             # PR review benchmark pipeline
+│       │   ├── main.py            # GitHub extraction entry point
+│       │   ├── collector.py       # PR + maintainer feedback collection
+│       │   └── config.py          # Hyperparameter config
 │       └── taxonomy/               # Task taxonomy
 ├── setup.py
 ├── requirements.txt
@@ -455,6 +466,50 @@ Default paths:
 - **Path**: `inputs/ape_judge_benchmark/ape_judge_benchmark.jsonl`
 - **Size**: 64 expert-annotated tasks
 - **Purpose**: Validate LLM-as-Judge reliability for semantic equivalence
+
+### Mathlib PR Review Benchmark
+
+- **Path**: `inputs/proof_pr_review/mathlib_pr_review_*.jsonl` (generated)
+- **Task Type**: `lean_pr_review`
+- **Source**: Real pull requests from `leanprover-community/mathlib4` via GitHub API
+- **Goal**: Decide if a PR is merge-ready and identify blocking/advisory issues
+- **Temporal Snapshots**: One data point = one maintainer review round (PRs can contribute multiple rounds)
+- **Round Feedback**: Each round record groups that reviewer’s review body + inline review comments + same-round high-level issue comments
+- **Conversation Context**: `review_round_conversation` includes both maintainer and PR-author comments for that round
+- **Comment-Only Support**: Maintainer comments without formal review states can still become extracted rounds
+- **Ground Truth**: Derived from feedback in that review round (not the final PR state)
+- **Extraction Order**: Configure `pr_order=newest` or `pr_order=oldest` when collecting candidates
+- **Primary Metric**: `review_quality_score` in `[0,1]`
+  - `0.65 * decision_accuracy`
+  - `0.25 * blocking_issue_f1`
+  - `0.10 * advisory_issue_f1`
+  - plus false-approve penalty for approving PRs that experts rejected
+
+Build/rebuild this benchmark (new pipeline under `src/datasets/pr_review/`):
+```bash
+python -m src.datasets.pr_review.main \
+  start_date=2025-01-01 \
+  end_date=2025-03-31 \
+  date_field=closed \
+  decision_review_states='["APPROVED","CHANGES_REQUESTED","COMMENTED"]' \
+  include_comment_only_rounds=True \
+  max_review_events_per_pr=0 \
+  max_prs=200 \
+  pr_order=newest \
+  output_file=inputs/proof_pr_review/mathlib_pr_review_benchmark.jsonl \
+  require_maintainer_feedback=True
+```
+
+Or with YAML config:
+```bash
+python -m src.datasets.pr_review.main --config configs/pr_review_config.yaml
+```
+
+Optional legacy wrapper (same pipeline):
+```bash
+python3 src/datasets/external_benchmarks/build_mathlib_pr_review.py \
+  start_date=2025-01-01 end_date=2025-03-31
+```
 
 ### MiniCtx v2
 

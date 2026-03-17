@@ -1,0 +1,5 @@
+## Known Issues
+
+- [ ] (#31220)[https://github.com/leanprover-community/mathlib4/pull/31220] - The first attempt to merge the PR failed due to a post-build step. The issue was resolved without any new commits, but it results in two separate reviews in our current design. 
+
+- [ ] (#33300)[https://github.com/leanprover-community/mathlib4/pull/33300] - The expert reviewer here seems to have made a mistake. They believed a fact was formalized as an instance, but it was actually formalized as a theorem. This led to a short back-and-forth that ultimately led to approving the PR without modifications.

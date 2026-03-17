@@ -121,6 +121,22 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
             }
         )
 
+    elif task_type == "lean_pr_review":
+        ground_truth = record.get("ground_truth") or {}
+        blocking_tags = ground_truth.get("blocking_issue_tags") or []
+        advisory_tags = ground_truth.get("advisory_issue_tags") or []
+        taxonomy.update(
+            {
+                "task_family": "pr_review",
+                "edit_regime": "pr_review",
+                "primary_archetype": "merge_readiness_judgment",
+                "has_ground_truth": bool(ground_truth),
+                "merge_ready_ground_truth": ground_truth.get("merge_ready"),
+                "blocking_issue_count": len(blocking_tags),
+                "advisory_issue_count": len(advisory_tags),
+            }
+        )
+
     elif task_type in {"lean_code_generation", "lean_spec_generation"}:
         taxonomy.update(
             {

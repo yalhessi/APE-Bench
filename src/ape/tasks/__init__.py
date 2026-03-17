@@ -11,6 +11,7 @@ Architecture:
     - theorem_proving/: Theorem proving tasks
     - proof_engineering/: Proof engineering tasks
     - judgment/: Code judgment tasks
+    - pr_review/: Pull request review tasks
   - utils.py: Utility functions for Lean tasks
 """
 
@@ -30,6 +31,11 @@ from .lean_tasks import (
     LeanJudgmentData,
     LeanJudgmentConfig,
     LeanJudgmentResult,
+    ReviewPRTask,
+    ReviewPRData,
+    ReviewPRConfig,
+    ReviewPRResult,
+    PRReviewGroundTruth,
 )
 
 __all__ = [
@@ -50,4 +56,9 @@ __all__ = [
     'LeanJudgmentData',
     'LeanJudgmentConfig',
     'LeanJudgmentResult',
+    'ReviewPRTask',
+    'ReviewPRData',
+    'ReviewPRConfig',
+    'ReviewPRResult',
+    'PRReviewGroundTruth',
 ]
