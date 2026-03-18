@@ -124,11 +124,14 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
     elif task_type in {"lean_code_generation", "lean_spec_generation"}:
         taxonomy.update(
             {
-                "task_family": "program_synthesis" if task_type == "lean_code_generation" else "specification",
+                "task_family": "program_synthesis",
                 "edit_regime": task_type,
                 "primary_archetype": task_type,
             }
         )
+        source_language = record.get("source_language") or metadata.get("source_language")
+        if source_language:
+            taxonomy["source_language"] = source_language
 
     else:
         taxonomy.update({"task_family": "other", "edit_regime": "unknown", "primary_archetype": "unknown"})

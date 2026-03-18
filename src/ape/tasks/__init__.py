@@ -11,6 +11,9 @@ Architecture:
     - theorem_proving/: Theorem proving tasks
     - proof_engineering/: Proof engineering tasks
     - judgment/: Code judgment tasks
+  - program_synthesis/: Executable synthesis and translation tasks
+    - code_generation/: Python-to-Lean translation tasks
+    - spec_generation/: Prompt-only HumanEval-to-Lean formalization tasks
   - utils.py: Utility functions for Lean tasks
 """
 
@@ -30,6 +33,14 @@ from .lean_tasks import (
     LeanJudgmentData,
     LeanJudgmentConfig,
     LeanJudgmentResult,
+    LeanCodeGenerationTask,
+    LeanCodeGenerationData,
+    LeanCodeGenerationConfig,
+    LeanCodeGenerationResult,
+    LeanSpecGenerationTask,
+    LeanSpecGenerationData,
+    LeanSpecGenerationConfig,
+    LeanSpecGenerationResult,
 )
 
 __all__ = [
@@ -50,4 +61,12 @@ __all__ = [
     'LeanJudgmentData',
     'LeanJudgmentConfig',
     'LeanJudgmentResult',
+    'LeanCodeGenerationTask',
+    'LeanCodeGenerationData',
+    'LeanCodeGenerationConfig',
+    'LeanCodeGenerationResult',
+    'LeanSpecGenerationTask',
+    'LeanSpecGenerationData',
+    'LeanSpecGenerationConfig',
+    'LeanSpecGenerationResult',
 ]

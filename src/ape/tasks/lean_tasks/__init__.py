@@ -5,6 +5,9 @@ All Lean task implementations are organized into:
   - theorem_proving/
   - proof_engineering/
   - judgment/
+- program_synthesis/: Executable Lean synthesis and translation
+  - code_generation/
+  - spec_generation/
 - utils.py: Utility functions for Lean tasks
 - base.py: BaseLeanTask and BaseLeanTaskData base classes
 """
@@ -28,6 +31,18 @@ from .formal_math.judgment import (
     LeanJudgmentConfig,
     LeanJudgmentResult,
 )
+from .program_synthesis.code_generation import (
+    LeanCodeGenerationTask,
+    LeanCodeGenerationData,
+    LeanCodeGenerationConfig,
+    LeanCodeGenerationResult,
+)
+from .program_synthesis.spec_generation import (
+    LeanSpecGenerationTask,
+    LeanSpecGenerationData,
+    LeanSpecGenerationConfig,
+    LeanSpecGenerationResult,
+)
 
 __all__ = [
     'BaseLeanTask',
@@ -44,4 +59,12 @@ __all__ = [
     'LeanJudgmentData',
     'LeanJudgmentConfig',
     'LeanJudgmentResult',
+    'LeanCodeGenerationTask',
+    'LeanCodeGenerationData',
+    'LeanCodeGenerationConfig',
+    'LeanCodeGenerationResult',
+    'LeanSpecGenerationTask',
+    'LeanSpecGenerationData',
+    'LeanSpecGenerationConfig',
+    'LeanSpecGenerationResult',
 ]

@@ -53,6 +53,8 @@
 | **Proof Engineering** | `src/ape/tasks/lean_tasks/formal_math/proof_engineering/` | `LeanProofEngineeringTask` |
 | **Theorem Proving** | `src/ape/tasks/lean_tasks/formal_math/theorem_proving/` | `LeanTheoremProvingTask` |
 | **Judgment** | `src/ape/tasks/lean_tasks/formal_math/judgment/` | `LeanJudgmentTask` |
+| **Program Translation** | `src/ape/tasks/lean_tasks/program_synthesis/code_generation/` | `LeanCodeGenerationTask` |
+| **Prompt Formalization** | `src/ape/tasks/lean_tasks/program_synthesis/spec_generation/` | `LeanSpecGenerationTask` |
 | **Instruction Synthesis** | `src/datasets/ape_bench/task.py` | `InstructionGenerationTask` |
 | **Library Annotation** | `src/ape/toolkits/retrieve/lean/semantic_annotation/task.py` | `AnnotationTask` |
 
@@ -196,6 +198,26 @@ python -m ape.toolkits.retrieve.lean.build \
 **Output**:
 - Embeddings database: `data/lean_retrieve/`
 - Annotated declarations: `data/lean_retrieve/repos/{repo_name}/storage/annotated_ids.txt`
+
+### HumanEval Program-Synthesis Tasks
+
+The HumanEval converter supports two Lean task variants:
+
+* `lean_code_generation`: expose the full canonical Python program and ask the agent to translate it into Lean
+* `lean_spec_generation`: expose only the HumanEval prompt/docstring/signature and ask the agent to formalize it into Lean while keeping the canonical Python solution hidden
+
+Both modes derive hidden behavior checks from the benchmark tests and use the canonical solution only for evaluation-time example extraction.
+
+```bash
+python -m src.datasets.external_benchmarks.convert_humaneval_to_lean \
+  --output-file inputs/humaneval/humaneval_lean_code_generation.jsonl
+```
+
+```bash
+python -m src.datasets.external_benchmarks.convert_humaneval_to_lean \
+  --task-type lean_spec_generation \
+  --output-file inputs/humaneval/humaneval_lean_spec_generation.jsonl
+```
 
 ### 3. Running Evaluation
 
@@ -544,6 +566,8 @@ If you use APE-Bench in your research, please cite:
 | **Proof Engineering** | `src/ape/tasks/lean_tasks/formal_math/proof_engineering/` | `LeanProofEngineeringTask` |
 | **Theorem Proving** | `src/ape/tasks/lean_tasks/formal_math/theorem_proving/` | `LeanTheoremProvingTask` |
 | **Judgment** | `src/ape/tasks/lean_tasks/formal_math/judgment/` | `LeanJudgmentTask` |
+| **Program Translation** | `src/ape/tasks/lean_tasks/program_synthesis/code_generation/` | `LeanCodeGenerationTask` |
+| **Prompt Formalization** | `src/ape/tasks/lean_tasks/program_synthesis/spec_generation/` | `LeanSpecGenerationTask` |
 | **Instruction Synthesis** | `src/datasets/ape_bench/task.py` | `InstructionGenerationTask` |
 | **Library Annotation** | `src/ape/toolkits/retrieve/lean/semantic_annotation/task.py` | `AnnotationTask` |
 
@@ -687,6 +711,26 @@ python -m ape.toolkits.retrieve.lean.build \
 **输出**:
 - 嵌入数据库: `data/lean_retrieve/`
 - 已标注声明: `data/lean_retrieve/repos/{repo_name}/storage/annotated_ids.txt`
+
+### HumanEval 程序综合任务
+
+HumanEval 转换器支持两种 Lean 任务：
+
+* `lean_code_generation`：向 agent 提供完整的 canonical Python 程序，并要求将其翻译成 Lean
+* `lean_spec_generation`：只向 agent 提供 HumanEval 的 prompt、docstring 和签名，在隐藏 canonical Python 解答的前提下将题目形式化为 Lean
+
+这两种模式都会从基准测试中提取隐藏行为检查；canonical solution 只用于评测阶段的样例抽取。
+
+```bash
+python -m src.datasets.external_benchmarks.convert_humaneval_to_lean \
+  --output-file inputs/humaneval/humaneval_lean_code_generation.jsonl
+```
+
+```bash
+python -m src.datasets.external_benchmarks.convert_humaneval_to_lean \
+  --task-type lean_spec_generation \
+  --output-file inputs/humaneval/humaneval_lean_spec_generation.jsonl
+```
 
 ### 3. 运行评估
 
