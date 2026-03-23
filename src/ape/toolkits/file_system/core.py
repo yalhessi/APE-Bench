@@ -474,7 +474,7 @@ class FileSystemProvider:
                         execute: bool = True,
                         show_content: bool = True,
                         context_lines: int = 10,
-                        max_messages: Optional[int] = 20) -> Dict[str, Any]:
+                        max_messages: Optional[int] = None) -> Dict[str, Any]:
         """
         Write full file content (create or overwrite)
 
@@ -535,7 +535,11 @@ class FileSystemProvider:
             if execute:
                 executor = self._get_executor(resolved_path)
                 if executor:
-                    execution_result = await executor.execute(code=content, max_messages=max_messages)
+                    execution_result = await executor.execute(
+                        code=content,
+                        file_path=file_path,
+                        max_messages=max_messages,
+                    )
                     result["execution_result"] = execution_result
 
             # Optional: show content (CPU intensive text formatting, moved to thread pool)
@@ -582,7 +586,7 @@ class FileSystemProvider:
                        context_lines_before: int = 1,
                        context_lines_after: int = 1,
                        max_context_lines: Optional[int] = 10,
-                       max_messages: Optional[int] = 20,
+                       max_messages: Optional[int] = None,
                        fuzzy_match_threshold: float = 0.85,
                        fuzzy_match_ambiguity_margin: float = 0.05) -> Dict[str, Any]:
         """
@@ -769,7 +773,11 @@ class FileSystemProvider:
             if execute:
                 executor = self._get_executor(target_resolved_path)
                 if executor:
-                    execution_result = await executor.execute(code=current_content, max_messages=max_messages)
+                    execution_result = await executor.execute(
+                        code=current_content,
+                        file_path=target_file_path,
+                        max_messages=max_messages,
+                    )
                     result["execution_result"] = execution_result
 
             # If need to show modified content, generate content display with context (CPU-intensive text formatting, moved to thread pool)
@@ -834,7 +842,7 @@ class FileSystemProvider:
                        context_lines_before: int = 1,
                        context_lines_after: int = 1,
                        max_context_lines: Optional[int] = 10,
-                       max_messages: Optional[int] = 20,
+                       max_messages: Optional[int] = None,
                        fuzzy_match_threshold: float = 0.85,
                        fuzzy_match_ambiguity_margin: float = 0.05) -> Dict[str, Any]:
         """

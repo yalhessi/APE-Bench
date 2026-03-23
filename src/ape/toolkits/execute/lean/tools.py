@@ -166,11 +166,17 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                         "error": traceback.format_exc()
                     }
 
-    async def execute(self, code: str, max_messages: Optional[int] = 20) -> Dict[str, Any]:
+    async def execute(
+        self,
+        code: str,
+        file_path: Optional[str | Path] = None,
+        max_messages: Optional[int] = 20,
+    ) -> Dict[str, Any]:
         """Execute service layer: core verification interface
 
         Args:
             code: Lean code string to verify (already passed through tool layer validation and processing)
+            file_path: Optional file path, accepted for executor compatibility
             max_messages: Maximum message number limit (None means no limit)
 
         Returns:
@@ -180,6 +186,8 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
             This is internal service interface, tool layer is responsible for all input validation, file reading, etc.
             This method only responsible for core verification logic.
         """
+        del file_path  # Lean verification remains code-based.
+
         # Security check: verify code doesn't depend on blocked paths
         from ape.runtime.utils import collect_blocked_paths
         from ape.toolkits.code.lean.lean_parser import check_dependencies_against_blocked_paths

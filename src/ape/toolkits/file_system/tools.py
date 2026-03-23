@@ -49,7 +49,6 @@ class FileSystemToolsProvider(BaseToolsProvider):
             self.logger = create_logger()
 
         self.scaffold_config = config
-        self.verify_config = config.tools_config.lean_verify
 
         # Create FileSystemProvider with full scaffold config
         self.file_system = FileSystemProvider(
@@ -204,7 +203,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
             if has_confirmation:
                 write_desc = """Write complete file content (create or overwrite). Use file_edit for modifying existing files.
 
-**EXECUTION**: When execute=True (default), the tool automatically verifies Lean proofs and returns the verification results.
+**EXECUTION**: When execute=True (default), the tool automatically runs the registered verifier or executor for that file type.
 
 **USER CONFIRMATION**: Writing to target workspace will automatically prompt for user confirmation before applying changes.
 
@@ -212,7 +211,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
             else:
                 write_desc = """Write complete file content (create or overwrite). Use file_edit for modifying existing files.
 
-**EXECUTION**: When execute=True (default), the tool automatically verifies Lean proofs and returns the verification results.
+**EXECUTION**: When execute=True (default), the tool automatically runs the registered verifier or executor for that file type.
 
 **IMPORTANT**: Write actual code only - no line numbers or display markers."""
 
@@ -225,7 +224,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     description="Complete file content as plain text (actual code only, no line numbers or markers)"
                 )],
                 execute: Annotated[bool, Field(
-                    description="Auto-verify after writing (Lean: proof check, Python: syntax check)"
+                    description="Auto-run the registered verifier or executor after writing (for example Lean verification, Isabelle theory checking, or Bash execution)"
                 )] = True,
                 show_content: Annotated[bool, Field(
                     description="Include file content in return"
@@ -242,7 +241,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     execute=execute,
                     show_content=show_content,
                     context_lines=context_lines,
-                    max_messages=self.verify_config.max_messages
+                    max_messages=None
                 )
                 self.logger.info(f"Tool file_write: execution completed")
                 return result
@@ -306,7 +305,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
 - Without edits (empty or omitted): copies file_path to target_path without modification
 - When omitted: modifies file_path in-place for writable workspaces, or creates versioned file like "file_v1.lean" for read-only workspaces
 
-**EXECUTION**: When execute=True (default), the tool automatically verifies Lean proofs and returns the verification results.
+**EXECUTION**: When execute=True (default), the tool automatically runs the registered verifier or executor for that file type.
 
 **USER CONFIRMATION**: Writing or editing files in target workspace will automatically prompt for user confirmation before applying changes.
 
@@ -330,7 +329,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
 - Without edits (empty or omitted): copies file_path to target_path without modification
 - When omitted: modifies file_path in-place for writable workspaces, or creates versioned file like "file_v1.lean" for read-only workspaces
 
-**EXECUTION**: When execute=True (default), the tool automatically verifies Lean proofs and returns the verification results.
+**EXECUTION**: When execute=True (default), the tool automatically runs the registered verifier or executor for that file type.
 
 **IMPORTANT**:
 - Write actual code only - no line numbers or display markers
@@ -372,7 +371,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     context_lines_before=context_before,
                     context_lines_after=context_after,
                     max_context_lines=self.file_system.fs_config.performance.max_context_lines,
-                    max_messages=self.verify_config.max_messages,
+                    max_messages=None,
                     fuzzy_match_threshold=self.file_system.fs_config.performance.fuzzy_match_threshold,
                     fuzzy_match_ambiguity_margin=self.file_system.fs_config.performance.fuzzy_match_ambiguity_margin
                 )
@@ -388,7 +387,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
 - `old_str` only: Find and replace text
 - Both: Find old_str within line range (avoids ambiguity)
 
-**EXECUTION**: When execute=True (default), the tool automatically verifies Lean proofs and returns the verification results.
+**EXECUTION**: When execute=True (default), the tool automatically runs the registered verifier or executor for that file type.
 
 **USER CONFIRMATION**: Editing files in target workspace will automatically prompt for user confirmation before applying changes.
 
@@ -401,7 +400,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
 - `old_str` only: Find and replace text
 - Both: Find old_str within line range (avoids ambiguity)
 
-**EXECUTION**: When execute=True (default), the tool automatically verifies Lean proofs and returns the verification results.
+**EXECUTION**: When execute=True (default), the tool automatically runs the registered verifier or executor for that file type.
 
 **IMPORTANT**: Write actual code only - no line numbers or display markers."""
 
@@ -452,7 +451,7 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     context_lines_before=context_before,
                     context_lines_after=context_after,
                     max_context_lines=self.file_system.fs_config.performance.max_context_lines,
-                    max_messages=self.verify_config.max_messages,
+                    max_messages=None,
                     fuzzy_match_threshold=self.file_system.fs_config.performance.fuzzy_match_threshold,
                     fuzzy_match_ambiguity_margin=self.file_system.fs_config.performance.fuzzy_match_ambiguity_margin
                 )

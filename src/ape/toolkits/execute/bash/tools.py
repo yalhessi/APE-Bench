@@ -163,16 +163,24 @@ class BashExecuteToolsProvider(BaseExecuteToolsProvider):
                         "error": traceback.format_exc()
                     }
 
-    async def execute(self, code: str, max_output_chars: Optional[int] = None) -> Dict[str, Any]:
+    async def execute(
+        self,
+        code: str,
+        file_path: Optional[str | Path] = None,
+        max_output_chars: Optional[int] = None,
+    ) -> Dict[str, Any]:
         """Execute Bash script in subprocess and return result.
 
         Args:
             code: Bash script to execute
+            file_path: Optional file path, accepted for executor compatibility
             max_output_chars: Maximum output characters to return (None uses config default)
 
         Returns:
             Dict with 'success', 'stdout', 'stderr', 'exit_code'
         """
+        del file_path  # Bash execution remains code-based.
+
         # Use provided max_output_chars or fall back to config default
         if max_output_chars is None:
             max_output_chars = self.tool_config.max_output_chars

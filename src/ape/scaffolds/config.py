@@ -11,6 +11,7 @@ from ape.orchestration.config import ExecutionConfig
 from ape.tasks.base import BaseTaskConfig
 from ape.llm_clients.config import LLMConfig
 from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+from ape.toolkits.execute.isabelle.config import IsabelleVerifyToolConfig
 from ape.toolkits.execute.bash.config import BashExecuteToolConfig
 from ape.toolkits.retrieve.lean.config import LeanRetrieveToolConfig
 from ape.toolkits.file_system.config import FileSystemToolConfig
@@ -24,6 +25,7 @@ class BaseToolsConfig(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
     lean_verify: LeanVerifyToolConfig = Field(default_factory=LeanVerifyToolConfig)
+    isabelle_verify: IsabelleVerifyToolConfig = Field(default_factory=IsabelleVerifyToolConfig)
     lean_retrieve: LeanRetrieveToolConfig = Field(default_factory=LeanRetrieveToolConfig)
     bash_execute: BashExecuteToolConfig = Field(default_factory=BashExecuteToolConfig)
     file_system: FileSystemToolConfig = Field(default_factory=FileSystemToolConfig)
