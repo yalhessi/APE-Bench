@@ -261,9 +261,6 @@ class IsolatedLocalRuntime(BaseRuntime):
         scratch_workspace = WorkspaceInfo(
             name="scratch",
             path=scratch_path,
-            commit_hash=None,
-            repo_url=None,
-            default_target=None
         )
 
         # Setup target workspace with FULL COPY
@@ -307,35 +304,46 @@ class IsolatedLocalRuntime(BaseRuntime):
         config: 'BaseScaffoldConfig'
     ) -> 'WorkspaceInfo':
         """Setup a workspace by copying the entire directory (no symlinks, no hardlinks)."""
-        from ape.toolkits.execute.lean.core.restore_manager import RestoreManager
-        from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+        if workspace_spec.is_local_source:
+            data_workspace_path = workspace_spec.resolved_source_path
+            self.logger.info(
+                f"[IsolatedLocalRuntime] Setting up isolated workspace {workspace_name} "
+                f"from local source: {data_workspace_path}"
+            )
+            if not data_workspace_path.exists():
+                raise RuntimeError(
+                    f"Local workspace source does not exist: {data_workspace_path}"
+                )
+        else:
+            from ape.toolkits.execute.lean.core.restore_manager import RestoreManager
+            from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
 
-        if not workspace_spec.commit_hash:
-            raise ValueError(
-                f"Workspace '{workspace_spec.name}' must have commit_hash. "
-                f"Got: {workspace_spec.model_dump()}"
+            if not workspace_spec.commit_hash:
+                raise ValueError(
+                    f"Workspace '{workspace_spec.name}' must have commit_hash. "
+                    f"Got: {workspace_spec.model_dump()}"
+                )
+
+            commit_hash = workspace_spec.commit_hash
+            repo_url = workspace_spec.repo_url
+
+            self.logger.info(
+                f"[IsolatedLocalRuntime] Setting up isolated workspace {workspace_name}: "
+                f"{commit_hash}"
             )
 
-        commit_hash = workspace_spec.commit_hash
-        repo_url = workspace_spec.repo_url
+            # Get config and resolve repo
+            verify_config = LeanVerifyToolConfig()
+            repo_name, resolved_url = verify_config.resolve_repo(repo_url)
 
-        self.logger.info(
-            f"[IsolatedLocalRuntime] Setting up isolated workspace {workspace_name}: "
-            f"{commit_hash}"
-        )
+            # Get the data workspace path via RestoreManager
+            restore_manager = RestoreManager(verify_config, self.logger, resolved_url)
+            data_workspace_path = await restore_manager.get_workspace(commit_hash)
 
-        # Get config and resolve repo
-        verify_config = LeanVerifyToolConfig()
-        repo_name, resolved_url = verify_config.resolve_repo(repo_url)
-
-        # Get the data workspace path via RestoreManager
-        restore_manager = RestoreManager(verify_config, self.logger, resolved_url)
-        data_workspace_path = await restore_manager.get_workspace(commit_hash)
-
-        if not data_workspace_path or not data_workspace_path.exists():
-            raise RuntimeError(
-                f"Failed to get data workspace for {repo_name}@{commit_hash}"
-            )
+            if not data_workspace_path or not data_workspace_path.exists():
+                raise RuntimeError(
+                    f"Failed to get data workspace for {repo_name}@{commit_hash}"
+                )
 
         # Track this workspace for cleanup
         record = WorkspaceCopyRecord(

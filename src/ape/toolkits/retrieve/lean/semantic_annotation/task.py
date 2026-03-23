@@ -103,8 +103,14 @@ class AnnotationTask(BaseLeanTask):
         """Create task data from data dictionary."""
         # Generate task ID if not provided
         if 'task_id' not in data:
+            from ape.tasks.models import parse_workspace_info
+
             workspace_spec = data.get('target_workspace') or {}
-            commit_hash = workspace_spec.get('commit_hash') or data.get('commit_hash') or 'unknown'
+            commit_hash = (
+                parse_workspace_info(workspace_spec).commit_hash
+                or data.get('commit_hash')
+                or 'unknown'
+            )
             filename = data.get('filename', 'unknown')
             data['task_id'] = generate_task_id(commit_hash, filename)
         

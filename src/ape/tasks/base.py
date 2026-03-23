@@ -319,10 +319,6 @@ class BaseTask:
         scratch_workspace = WorkspaceInfo(
             name="scratch",
             path=scratch_path,
-            target_path=scratch_path,
-            commit_hash=None,
-            repo_url=None,
-            default_target=None
         )
 
         return attempt_path, scratch_workspace, None, None

@@ -10,12 +10,12 @@ Key Design:
 """
 
 import traceback
-from typing import Optional, List, TYPE_CHECKING
+from typing import Any, Optional, List, TYPE_CHECKING
 from pathlib import Path
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from ..base import BaseTask, BaseTaskData
-from ..models import WorkspaceInfo
+from ..models import WorkspaceInfo, LeanWorkspaceInfo, parse_workspace_info, parse_workspace_info_list
 
 if TYPE_CHECKING:
     from ape.scaffolds.config import BaseScaffoldConfig
@@ -29,15 +29,38 @@ class BaseLeanTaskData(BaseTaskData):
     Workspaces are specified by commit_hash + repo_url, not by local paths.
     """
 
-    target_workspace: WorkspaceInfo = Field(
+    target_workspace: LeanWorkspaceInfo = Field(
         ...,
         description="Target workspace specification (commit_hash, repo_url, default_target, toolchain)"
     )
 
-    reference_workspaces: Optional[List[WorkspaceInfo]] = Field(
+    reference_workspaces: Optional[List[LeanWorkspaceInfo]] = Field(
         default=None,
         description="Optional reference workspaces for semantic retrieval"
     )
+
+    @field_validator("target_workspace", mode="before")
+    @classmethod
+    def validate_target_workspace(cls, value: Any) -> LeanWorkspaceInfo:
+        """Preserve explicit Lean workspace metadata during parsing."""
+        workspace = parse_workspace_info(value)
+        if isinstance(workspace, LeanWorkspaceInfo):
+            return workspace
+        return LeanWorkspaceInfo.model_validate(workspace.model_dump())
+
+    @field_validator("reference_workspaces", mode="before")
+    @classmethod
+    def validate_reference_workspaces(cls, value: Any) -> Optional[List[LeanWorkspaceInfo]]:
+        """Preserve explicit Lean workspace metadata during parsing."""
+        workspaces = parse_workspace_info_list(value)
+        if workspaces is None:
+            return None
+        return [
+            workspace
+            if isinstance(workspace, LeanWorkspaceInfo)
+            else LeanWorkspaceInfo.model_validate(workspace.model_dump())
+            for workspace in workspaces
+        ]
 
 
 class BaseLeanTask(BaseTask):
@@ -58,8 +81,8 @@ class BaseLeanTask(BaseTask):
     """
 
     # Workspace info after setup (with resolved paths and symlinks)
-    target_workspace: Optional[WorkspaceInfo] = None
-    reference_workspaces: Optional[List[WorkspaceInfo]] = None
+    target_workspace: Optional[LeanWorkspaceInfo] = None
+    reference_workspaces: Optional[List[LeanWorkspaceInfo]] = None
 
     @classmethod
     async def setup_attempt(
@@ -69,7 +92,7 @@ class BaseLeanTask(BaseTask):
         orchestrator_id: str,
         attempt_path: Optional[Path] = None,
         logger: Optional['logging.LoggerAdapter'] = None
-    ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
+    ) -> tuple[Path, WorkspaceInfo, Optional[LeanWorkspaceInfo], Optional[List[LeanWorkspaceInfo]]]:
         """Setup attempt with Lean workspaces (class method).
 
         Overrides BaseTask.setup_attempt to add Lean workspace setup:
@@ -124,11 +147,11 @@ class BaseLeanTask(BaseTask):
     @classmethod
     async def _setup_workspace_symlink(
         cls,
-        workspace_spec: WorkspaceInfo,
+        workspace_spec: LeanWorkspaceInfo,
         link_path: Path,
         config: 'BaseScaffoldConfig',
         logger: Optional['logging.LoggerAdapter'] = None
-    ) -> WorkspaceInfo:
+    ) -> LeanWorkspaceInfo:
         """Setup a workspace symlink (class method).
 
         Args:

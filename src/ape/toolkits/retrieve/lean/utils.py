@@ -365,7 +365,7 @@ def create_lean_retrieve_tools(
         >>> provider = create_lean_retrieve_tools(workspaces)
     """
     from ape.utils.logging import create_logger
-    from ape.tasks.models import WorkspaceInfo
+    from ape.tasks.models import WorkspaceInfo, GitWorkspaceSource
     from .tools import LeanRetrieveToolsProvider
 
     if not workspaces:
@@ -400,8 +400,10 @@ def create_lean_retrieve_tools(
         return WorkspaceInfo(
             name=name,
             path=path,
-            commit_hash=commit_hash,
-            repo_url=repo_url,
+            source=GitWorkspaceSource(
+                commit_hash=commit_hash,
+                repo_url=repo_url,
+            ),
             default_target=ws_config.get("default_target"),
             toolchain=ws_config.get("toolchain"),
             blocked_path_patterns=ws_config.get("blocked_path_patterns", []),

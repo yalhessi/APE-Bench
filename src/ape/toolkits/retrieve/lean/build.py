@@ -19,6 +19,7 @@ from ape.utils.logging import create_logger
 from ape.utils import load_yaml, parse_cli_args, deep_merge
 from ape.scaffolds.factory import create_scaffold_config_for_type
 from ape.tasks.base import create_task_config_for_type
+from ape.tasks.models import parse_workspace_info
 from ape.scaffolds.config import BaseScaffoldConfig
 from ape.orchestration.config import ExecutionConfig
 from ape.orchestration.orchestrator import TaskOrchestrator, OrchestratorResults
@@ -232,12 +233,13 @@ class SemanticAnnotationPipeline:
                 if not isinstance(target_workspace, dict):
                     raise ValueError("Each record must include target_workspace")
 
-                commit = target_workspace.get('commit_hash')
-                repo_url = self._effective_repo_url(target_workspace.get('repo_url'))
+                target_workspace_info = parse_workspace_info(target_workspace)
+                commit = target_workspace_info.commit_hash
+                repo_url = self._effective_repo_url(target_workspace_info.repo_url)
                 if commit:
                     repos_commits[repo_url].add(commit)
                     if repo_url not in repos_default_target:
-                        default_target = target_workspace.get('default_target')
+                        default_target = target_workspace_info.default_target
                         repos_default_target[repo_url] = default_target if default_target else None
 
                 ref_workspaces = record.get('reference_workspaces', [])
@@ -249,12 +251,13 @@ class SemanticAnnotationPipeline:
                 if isinstance(ref_workspaces, list):
                     for ref_ws in ref_workspaces:
                         if isinstance(ref_ws, dict):
-                            ref_commit = ref_ws.get('commit_hash')
-                            ref_url = self._effective_repo_url(ref_ws.get('repo_url'))
+                            ref_workspace_info = parse_workspace_info(ref_ws)
+                            ref_commit = ref_workspace_info.commit_hash
+                            ref_url = self._effective_repo_url(ref_workspace_info.repo_url)
                             if ref_commit:
                                 repos_commits[ref_url].add(ref_commit)
                                 if ref_url not in repos_default_target:
-                                    ref_default_target = ref_ws.get('default_target')
+                                    ref_default_target = ref_workspace_info.default_target
                                     repos_default_target[ref_url] = ref_default_target if ref_default_target else None
 
         return {k: list(v) for k, v in repos_commits.items()}, repos_default_target, target_references
@@ -396,12 +399,14 @@ class SemanticAnnotationPipeline:
                 )
 
                 # Build target_workspace for annotation task
-                from ape.tasks.models import WorkspaceInfo
+                from ape.tasks.models import WorkspaceInfo, GitWorkspaceSource
 
                 target_workspace = WorkspaceInfo(
                     name='target',
-                    commit_hash=commit_hash,
-                    repo_url=repo_url,
+                    source=GitWorkspaceSource(
+                        commit_hash=commit_hash,
+                        repo_url=repo_url,
+                    ),
                     default_target=default_target
                 )
 
@@ -414,16 +419,19 @@ class SemanticAnnotationPipeline:
                     # This is a target workspace - attach references for agent to search
                     reference_workspaces = []
                     for ref_ws_dict in target_references[target_key]:
-                        ref_url = ref_ws_dict.get('repo_url')
-                        ref_commit = ref_ws_dict.get('commit_hash')
-                        ref_default = ref_ws_dict.get('default_target')
+                        ref_workspace_info = parse_workspace_info(ref_ws_dict)
+                        ref_url = ref_workspace_info.repo_url
+                        ref_commit = ref_workspace_info.commit_hash
+                        ref_default = ref_workspace_info.default_target
                         if ref_url and ref_commit:
                             # Generate unique name for reference workspace
                             ref_name = ref_url.split('/')[-1].replace('.git', '').lower()
                             reference_workspaces.append(WorkspaceInfo(
                                 name=ref_name,
-                                commit_hash=ref_commit,
-                                repo_url=ref_url,
+                                source=GitWorkspaceSource(
+                                    commit_hash=ref_commit,
+                                    repo_url=ref_url,
+                                ),
                                 default_target=ref_default
                             ))
                     self.logger.info(

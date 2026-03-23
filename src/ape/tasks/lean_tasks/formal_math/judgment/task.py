@@ -13,7 +13,7 @@ from pathlib import Path
 from datetime import datetime
 from pydantic import Field, BaseModel, ConfigDict, field_validator
 from ape.tasks.base import BaseTaskConfig, register_task, BaseTaskData, BaseTaskResult, EvaluationResult
-from ape.tasks.models import WorkspaceInfo
+from ape.tasks.models import WorkspaceInfo, LeanWorkspaceInfo, parse_workspace_info, parse_workspace_info_list
 from ape.tasks.lean_tasks.base import BaseLeanTask
 from ape.tasks.lean_tasks.formal_math.proof_engineering.task import SemanticValidationConfig
 from ape.utils.logging import create_logger
@@ -106,16 +106,39 @@ class LeanJudgmentData(BaseTaskData):
     gold_diff: Optional[str] = Field(default=None, description="Reference diff")
     filename: Optional[Path] = Field(default=None, description="Filename")
 
-    target_workspace: WorkspaceInfo = Field(
+    target_workspace: LeanWorkspaceInfo = Field(
         ...,
         description="Target workspace specification"
     )
-    reference_workspaces: Optional[List[WorkspaceInfo]] = Field(
+    reference_workspaces: Optional[List[LeanWorkspaceInfo]] = Field(
         default=None,
         description="Optional reference workspaces"
     )
 
     judgement_ground_truth: Optional[bool] = Field(default=None, description="Ground truth for accuracy evaluation")
+
+    @field_validator("target_workspace", mode="before")
+    @classmethod
+    def validate_target_workspace(cls, value: Any) -> LeanWorkspaceInfo:
+        """Preserve explicit Lean workspace metadata during parsing."""
+        workspace = parse_workspace_info(value)
+        if isinstance(workspace, LeanWorkspaceInfo):
+            return workspace
+        return LeanWorkspaceInfo.model_validate(workspace.model_dump())
+
+    @field_validator("reference_workspaces", mode="before")
+    @classmethod
+    def validate_reference_workspaces(cls, value: Any) -> Optional[List[LeanWorkspaceInfo]]:
+        """Preserve explicit Lean workspace metadata during parsing."""
+        workspaces = parse_workspace_info_list(value)
+        if workspaces is None:
+            return None
+        return [
+            workspace
+            if isinstance(workspace, LeanWorkspaceInfo)
+            else LeanWorkspaceInfo.model_validate(workspace.model_dump())
+            for workspace in workspaces
+        ]
 
 
 class LeanJudgmentResult(BaseTaskResult):

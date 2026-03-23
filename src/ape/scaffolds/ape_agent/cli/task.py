@@ -117,7 +117,7 @@ class CLITask(BaseTask):
         - Priority 1: verify configuration (Git repository)
         - Priority 2: local_workspace_path (local path, main.py ensures non-None)
         """
-        from ape.tasks.models import WorkspaceInfo
+        from ape.tasks.models import WorkspaceInfo, GitWorkspaceSource, LocalWorkspaceSource
 
         # Priority 1: verify configuration (Git repository)
         if self.data.verify_commit_hash:
@@ -130,8 +130,10 @@ class CLITask(BaseTask):
             return WorkspaceInfo(
                 name="target",
                 path=target_workspace_path,
-                commit_hash=self.data.verify_commit_hash,
-                repo_url=self.data.verify_repo_url,
+                source=GitWorkspaceSource(
+                    commit_hash=self.data.verify_commit_hash,
+                    repo_url=self.data.verify_repo_url,
+                ),
                 default_target=self.data.verify_default_target,
                 read_only_path_patterns=[]  # CLI mode writable
             )
@@ -146,8 +148,7 @@ class CLITask(BaseTask):
             return WorkspaceInfo(
                 name="target",
                 path=target_workspace_path,
-                commit_hash=None,  # local workspace has no Git information
-                repo_url=None,
+                source=LocalWorkspaceSource(path=target_workspace_path),
                 default_target=None,
                 read_only_path_patterns=[]  # CLI mode writable
             )
@@ -161,7 +162,7 @@ class CLITask(BaseTask):
         CLI mode:
         - Create single reference workspace from retrieve_* parameters
         """
-        from ape.tasks.models import WorkspaceInfo
+        from ape.tasks.models import WorkspaceInfo, GitWorkspaceSource
         from ape.utils.file_ops import normalize_repo_url
 
         if self.data.retrieve_commit_hash:
@@ -177,8 +178,10 @@ class CLITask(BaseTask):
             ref_ws_info = WorkspaceInfo(
                 name=ref_workspace_name,  # use repo name (e.g. 'mathlib4')
                 path=ref_workspace_path,
-                commit_hash=self.data.retrieve_commit_hash,
-                repo_url=self.data.retrieve_repo_url,
+                source=GitWorkspaceSource(
+                    commit_hash=self.data.retrieve_commit_hash,
+                    repo_url=self.data.retrieve_repo_url,
+                ),
                 default_target=self.data.retrieve_default_target,
                 read_only_path_patterns=["**/*"]  # Reference workspace is completely read-only
             )
