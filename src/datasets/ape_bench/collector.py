@@ -20,6 +20,7 @@ from tqdm import tqdm
 from ape.utils.logging import create_logger
 from ape.utils.file_ops import normalize_repo_url
 from ape.toolkits.code.base_provider import LANGUAGE_PROVIDER_REGISTRY
+from ape.tasks.models import GitWorkspaceSource, IsabelleWorkspaceInfo
 from ..external_benchmarks.github_utils import get_default_target_from_repo
 
 from .config import ApeBenchConfig
@@ -65,6 +66,14 @@ def remove_comments_for_language(content: Optional[str], language: str) -> Optio
     return provider_class.remove_comments(content)
 
 
+def _parse_isabelle_session_name(root_content: str) -> Optional[str]:
+    """Extract the first Isabelle session name from a ROOT file."""
+    match = re.search(r'^\s*session\s+"?([^"\s=]+)"?\s*=', root_content, re.MULTILINE)
+    if match:
+        return match.group(1)
+    return None
+
+
 def collect_commits(repo_path: Path, config: ApeBenchConfig) -> List[str]:
     """Collect commit hashes with date filtering."""
     repo = git.Repo(repo_path)
@@ -98,6 +107,8 @@ def process_commit_batch(args: Tuple) -> List[Dict[str, Any]]:
     repo_url = config_dict.get('repo_url', '')
     default_target = config_dict.get('default_target')
     language = config_dict.get('language', 'lean')
+    session_name = config_dict.get('session_name')
+    working_directory = config_dict.get('working_directory')
     results = []
 
     for commit_hash in commit_hashes:
@@ -168,6 +179,8 @@ def process_commit_batch(args: Tuple) -> List[Dict[str, Any]]:
                         'parent_commit_hash': parent.hexsha,
                         'repo_url': repo_url,
                         'default_target': default_target,
+                        'session_name': session_name,
+                        'working_directory': working_directory,
                         'language': language,
                         'author': f"{commit.author.name} <{commit.author.email}>",
                         'message': commit.message.strip(),
@@ -423,6 +436,8 @@ class DataCollector:
         self.config = config
         self.config_hash = config_hash
         self.default_target: Optional[str] = None
+        self.isabelle_session_name: Optional[str] = config.isabelle_session_name
+        self.isabelle_working_directory: Optional[Path] = config.isabelle_working_directory
         if logger is None:
             logger = create_logger()
         self.logger = logger
@@ -430,6 +445,35 @@ class DataCollector:
         # Initialize cache system
         self.cache_dir = config.dataset_dir / "cache"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    async def _prepare_isabelle_metadata(self, repo_path: Path) -> None:
+        """Resolve Isabelle session metadata needed for theory verification."""
+        if self.isabelle_working_directory and self.isabelle_working_directory.is_absolute():
+            raise ValueError("isabelle_working_directory must be relative to the repository root")
+
+        session_dir = repo_path / self.isabelle_working_directory if self.isabelle_working_directory else repo_path
+        if not session_dir.exists():
+            raise ValueError(f"Isabelle working directory does not exist: {session_dir}")
+
+        if self.isabelle_session_name is None:
+            root_file = session_dir / "ROOT"
+            if not root_file.exists():
+                raise ValueError(
+                    "Isabelle session_name is required and could not be inferred because ROOT is missing. "
+                    "Provide isabelle_session_name in the configuration."
+                )
+            root_content = root_file.read_text(encoding='utf-8', errors='replace')
+            self.isabelle_session_name = _parse_isabelle_session_name(root_content)
+
+        if not self.isabelle_session_name:
+            raise ValueError(
+                "Isabelle session_name is required for verification and could not be inferred from ROOT."
+            )
+
+        self.logger.info(
+            f"Resolved Isabelle session metadata: session_name={self.isabelle_session_name}, "
+            f"working_directory={self.isabelle_working_directory or Path('.')}"
+        )
 
     def get_repo_path(self) -> Path:
         """Get local repository path using workspace_config standard structure"""
@@ -498,6 +542,8 @@ class DataCollector:
         """Collect and process commit data with caching support."""
         self.logger.info(f"Starting data collection with config hash: {self.config_hash}")
 
+        repo_path: Optional[Path] = None
+
         if self.config.language == "lean" and self.default_target is None:
             repo_path = await self.ensure_repo_cloned()
             default_target = get_default_target_from_repo(repo_path)
@@ -508,6 +554,9 @@ class DataCollector:
                 )
             self.default_target = default_target
             self.logger.info(f"Detected default_target: {self.default_target}")
+        elif self.config.language == "isabelle":
+            repo_path = repo_path or await self.ensure_repo_cloned()
+            await self._prepare_isabelle_metadata(repo_path)
 
         # Check cache sequence from latest to earliest
         cached_data, cache_stage = self._check_cache_sequence()
@@ -567,6 +616,12 @@ class DataCollector:
         """Collect raw commit data."""
         repo_path = await self.ensure_repo_cloned()
         default_target = self.default_target if self.config.language == "lean" else None
+        session_name = self.isabelle_session_name if self.config.language == "isabelle" else None
+        working_directory = (
+            str(self.isabelle_working_directory)
+            if self.config.language == "isabelle" and self.isabelle_working_directory is not None
+            else None
+        )
 
         self.logger.info("Collecting commits...")
         commit_hashes = collect_commits(repo_path, self.config)
@@ -593,6 +648,8 @@ class DataCollector:
             'max_diff': self.config.max_diff_lines,
             'repo_url': self.config.repo_url,
             'default_target': default_target,
+            'session_name': session_name,
+            'working_directory': working_directory,
             'file_extension': self.config.file_extension,
             'language': self.config.language
         }
@@ -715,6 +772,8 @@ class DataCollector:
 
         if self.config.language == 'lean':
             return await self._verify_lean_commits(df)
+        if self.config.language == 'isabelle':
+            return await self._verify_isabelle_commits(df)
         else:
             self.logger.info(f"Verification not implemented for {self.config.language}, skipping")
             return df
@@ -763,6 +822,112 @@ class DataCollector:
 
         except ImportError as e:
             self.logger.warning(f"Lean verification not available: {e}")
+            return df
+
+    async def _verify_isabelle_commits(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Verify Isabelle commits by processing changed theories."""
+        try:
+            from ape.toolkits.execute.base_source_manager import BaseSourceManager
+            from ape.toolkits.execute.isabelle.config import IsabelleVerifyToolConfig
+            from ape.toolkits.execute.isabelle.core import IsabelleVerificationEngine
+
+            unique_commits = df['commit_hash'].unique().tolist()
+            changed_files_by_commit: Dict[str, List[str]] = {}
+            workspace_metadata_by_commit: Dict[str, Tuple[str, Optional[Path]]] = {}
+            for commit_hash, group in df.groupby('commit_hash'):
+                session_name = next(
+                    (value for value in group.get('session_name', pd.Series(dtype=object)).dropna().unique() if value),
+                    None
+                )
+                if not session_name:
+                    raise ValueError(
+                        f"Isabelle verification requires session_name metadata on workspace for commit {commit_hash}"
+                    )
+
+                working_directory_raw = next(
+                    (value for value in group.get('working_directory', pd.Series(dtype=object)).dropna().unique() if value),
+                    None
+                )
+                working_directory = Path(working_directory_raw) if working_directory_raw else None
+                workspace_metadata_by_commit[commit_hash] = (session_name, working_directory)
+
+                changed_files = sorted({
+                    path for path in (
+                        (row.file_path_after or row.file_path_before) for row in group.itertuples()
+                    )
+                    if isinstance(path, str) and path.endswith(self.config.file_extension)
+                })
+                changed_files_by_commit[commit_hash] = changed_files
+
+            self.logger.info(
+                f"Verifying {len(unique_commits)} unique Isabelle commits with process-based theory checks..."
+            )
+
+            verify_config = IsabelleVerifyToolConfig()
+            source_manager = BaseSourceManager(
+                config=verify_config,
+                logger=self.logger,
+                repo_url=self.config.repo_url
+            )
+            verification_engine = IsabelleVerificationEngine(verify_config, self.logger)
+
+            successful_commits = set()
+            for commit_hash in unique_commits:
+                session_name, working_directory = workspace_metadata_by_commit[commit_hash]
+                workspace_path = await source_manager.get_workspace(commit_hash)
+
+                workspace_info = IsabelleWorkspaceInfo(
+                    name="target",
+                    path=workspace_path,
+                    source=GitWorkspaceSource(
+                        commit_hash=commit_hash,
+                        repo_url=self.config.repo_url,
+                    ),
+                    session_name=session_name,
+                    working_directory=working_directory,
+                )
+
+                commit_success = True
+                for relative_file in changed_files_by_commit.get(commit_hash, []):
+                    theory_path = workspace_path / relative_file
+                    if not theory_path.exists():
+                        self.logger.warning(
+                            f"Skipping commit {commit_hash[:8]}: theory not found after checkout: {relative_file}"
+                        )
+                        commit_success = False
+                        break
+
+                    result = await verification_engine.verify_file(
+                        file_path=theory_path,
+                        workspace=workspace_info,
+                        max_messages=verify_config.max_messages,
+                    )
+                    if not result.get('success', False):
+                        commit_success = False
+                        self.logger.info(
+                            f"Isabelle verification failed for {commit_hash[:8]} at {relative_file}: "
+                            f"{result.get('message', 'unknown error')}"
+                        )
+                        break
+
+                if commit_success:
+                    successful_commits.add(commit_hash)
+
+            self.logger.info(
+                f"Isabelle verification successful: {len(successful_commits)}/{len(unique_commits)} commits"
+            )
+
+            verified_df = df[df['commit_hash'].isin(successful_commits)]
+
+            if verified_df.empty:
+                self.logger.warning("No commits passed Isabelle verification")
+            else:
+                self.logger.info(f"Final dataset: {len(verified_df)} records from verified commits")
+
+            return verified_df
+
+        except ImportError as e:
+            self.logger.warning(f"Isabelle verification not available: {e}")
             return df
 
     async def _apply_edit_distance_filter(self, df: pd.DataFrame) -> pd.DataFrame:

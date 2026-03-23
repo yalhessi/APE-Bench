@@ -30,6 +30,14 @@ class ApeBenchConfig(BaseModel):
         default=".lean",
         description="File extension for the language"
     )
+    isabelle_session_name: Optional[str] = Field(
+        default=None,
+        description="Isabelle session name required for theory verification"
+    )
+    isabelle_working_directory: Optional[Path] = Field(
+        default=None,
+        description="Optional Isabelle session directory relative to repo root"
+    )
 
     # Data collection settings
     dataset_dir: Path = Field(

@@ -2,17 +2,18 @@
 APE Bench Instruction Generation Task
 
 Generalized for any formal language project.
-Uses plain git worktrees (BaseSourceManager) instead of compiled workspaces.
+Uses plain source workspaces instead of compiled workspaces.
 """
 
 from pathlib import Path, PurePosixPath
 from typing import Dict, Any, Optional, TYPE_CHECKING, List, Tuple, Union, Literal
 import traceback
 import asyncio
-from pydantic import Field, ValidationError
+from pydantic import Field, ValidationError, field_validator
 
 from ape.tasks.base import BaseTask, BaseTaskData, BaseTaskConfig, register_task, BaseTaskResult, EvaluationResult, SemanticValidationConfig
-from ape.tasks.models import WorkspaceInfo
+from ape.tasks.models import WorkspaceInfo, parse_workspace_info
+from ape.tasks.workspace_sources import resolve_plain_source_workspace
 from .models import Exercise
 
 if TYPE_CHECKING:
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 class InstructionGenerationData(BaseTaskData):
     """Task data for instruction generation.
 
-    Does NOT inherit from BaseLeanTaskData - uses plain git worktrees.
+    Does NOT inherit from BaseLeanTaskData - uses plain source workspaces.
     """
     task_type: Literal["instruction_generation"] = Field(
         default="instruction_generation",
@@ -33,7 +34,7 @@ class InstructionGenerationData(BaseTaskData):
     # Workspace specification (for plain git worktree, not compiled)
     target_workspace: WorkspaceInfo = Field(
         ...,
-        description="Target workspace specification (commit_hash, repo_url)"
+        description="Target workspace specification"
     )
 
     # File information
@@ -56,6 +57,12 @@ class InstructionGenerationData(BaseTaskData):
     diff_lines: int = 0
     change_type: str = "modified"
 
+    @field_validator("target_workspace", mode="before")
+    @classmethod
+    def validate_target_workspace(cls, value: Any) -> WorkspaceInfo:
+        """Preserve language-specific workspace metadata during parsing."""
+        return parse_workspace_info(value)
+
 
 class InstructionGenerationConfig(BaseTaskConfig):
     """Task configuration with read-only tools only."""
@@ -69,7 +76,7 @@ class InstructionGenerationConfig(BaseTaskConfig):
     # Tool configuration - only read-only tools
     disabled_tools: list[str] = [
         "file_write", "file_edit", "file_multi_edit",
-        "python_run_code", "lean_verify",
+        "python_run_code", "lean_verify", "isabelle_verify",
         "lean_retrieve"
     ]
 
@@ -137,7 +144,7 @@ class InstructionGenerationTask(BaseTask):
         attempt_path: Optional[Path] = None,
         logger: Optional['logging.LoggerAdapter'] = None
     ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
-        """Setup attempt with plain git worktree (no compilation).
+        """Setup attempt with a plain source workspace (no compilation).
 
         Uses BaseSourceManager.get_workspace() instead of RestoreManager.
         """
@@ -166,19 +173,23 @@ class InstructionGenerationTask(BaseTask):
         config: 'BaseScaffoldConfig',
         logger: Optional['logging.LoggerAdapter'] = None
     ) -> WorkspaceInfo:
-        """Setup workspace symlink using BaseSourceManager (plain git worktree)."""
-        if not workspace_spec.commit_hash:
-            raise ValueError(
-                f"Workspace '{workspace_spec.name}' must have commit_hash. "
-                f"Got: {workspace_spec.model_dump()}"
-            )
+        """Setup workspace symlink using a plain source workspace."""
+        if link_path.exists() and link_path.is_dir() and not link_path.is_symlink():
+            if logger:
+                logger.info(
+                    f"Workspace {workspace_spec.name} already exists as directory at {link_path}, "
+                    f"using existing (IsolatedLocalRuntime mode)"
+                )
+            read_only_patterns = workspace_spec.read_only_path_patterns or ["**/*"]
+            return workspace_spec.model_copy(update={
+                "path": link_path,
+                "read_only_path_patterns": read_only_patterns
+            })
 
-        # Get plain workspace path using BaseSourceManager
-        actual_workspace_path = await cls._get_plain_workspace(
-            commit_hash=workspace_spec.commit_hash,
-            repo_url=workspace_spec.repo_url,
-            config=config,
-            logger=logger
+        del config  # Plain source resolution only depends on workspace source spec.
+        actual_workspace_path = await resolve_plain_source_workspace(
+            workspace_spec=workspace_spec,
+            logger=logger,
         )
 
         # Create symlink
@@ -193,42 +204,6 @@ class InstructionGenerationTask(BaseTask):
             "path": link_path,
             "read_only_path_patterns": read_only_patterns
         })
-
-    @classmethod
-    async def _get_plain_workspace(
-        cls,
-        commit_hash: str,
-        repo_url: Optional[str],
-        config: 'BaseScaffoldConfig',
-        logger: Optional['logging.LoggerAdapter'] = None
-    ) -> Path:
-        """Get plain git worktree using BaseSourceManager."""
-        try:
-            from ape.toolkits.execute.base_source_manager import BaseSourceManager
-            from ape.toolkits.execute.config import CodeExecuteToolConfig
-
-            source_config = CodeExecuteToolConfig()
-
-            if logger:
-                logger.info(f"Getting plain workspace for {commit_hash[:8]}")
-
-            source_manager = BaseSourceManager(
-                config=source_config,
-                logger=logger,
-                repo_url=repo_url
-            )
-
-            workspace_path = await source_manager.get_workspace(commit_hash)
-
-            if not workspace_path:
-                raise RuntimeError(f"Failed to get workspace for {commit_hash}")
-
-            return workspace_path
-
-        except Exception as e:
-            if logger:
-                logger.error(f"Failed to get workspace for {commit_hash}: {traceback.format_exc()}")
-            raise RuntimeError(f"Cannot get workspace for commit {commit_hash}: {e}") from e
 
     def _convert_diff_to_line_spans(self, diff_text: str) -> List[Tuple[int, int]]:
         """Convert git diff to line spans."""
@@ -273,9 +248,9 @@ class InstructionGenerationTask(BaseTask):
 
         if 'task_id' not in data:
             workspace_spec = data['target_workspace']
-            commit_hash = workspace_spec.get('commit_hash')
+            commit_hash = parse_workspace_info(workspace_spec).commit_hash
             if not commit_hash:
-                raise ValueError("target_workspace.commit_hash is required for task_id generation")
+                raise ValueError("A git-backed target_workspace source is required for task_id generation")
             file_path = data.get('file_path_after') or data.get('file_path_before', 'unknown')
             data['task_id'] = f"instruction_{commit_hash[:8]}_{Path(file_path).stem if isinstance(file_path, (Path, str)) else 'unknown'}"
 
@@ -446,6 +421,14 @@ For rejected tasks (very easy + superficial):
                 file_path = self.data.file_path_after or self.data.file_path_before
                 file_path_str = str(file_path) if file_path else None
 
+                target_workspace_data = (
+                    self.data.target_workspace.model_dump(mode="json", exclude={"path"})
+                    if self.data.target_workspace
+                    else {"name": "target"}
+                )
+                if not target_workspace_data.get("read_only_path_patterns"):
+                    target_workspace_data["read_only_path_patterns"] = ["**/*"]
+
                 exercise_data = {
                     "title": exercise.title,
                     "task_category": exercise.task_category,
@@ -462,18 +445,7 @@ For rejected tasks (very easy + superficial):
                     "original_code": self.data.content_before,
                     "modified_code": self.data.content_after,
                     "gold_diff": self.data.gold_diff,
-                    "target_workspace": {
-                        "name": self.data.target_workspace.name if self.data.target_workspace else "target",
-                        "commit_hash": self.data.target_workspace.commit_hash if self.data.target_workspace else None,
-                        "repo_url": self.data.target_workspace.repo_url if self.data.target_workspace else None,
-                        "default_target": self.data.target_workspace.default_target if self.data.target_workspace else None,
-                        "toolchain": self.data.target_workspace.toolchain if self.data.target_workspace else None,
-                        "read_only_path_patterns": (
-                            self.data.target_workspace.read_only_path_patterns
-                            if self.data.target_workspace and self.data.target_workspace.read_only_path_patterns
-                            else ["**/*"]
-                        ),
-                    },
+                    "target_workspace": target_workspace_data,
                     "language": self.data.language,
                     "commit_message": self.data.message,
                     "commit_author": self.data.author,

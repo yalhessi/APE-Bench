@@ -22,6 +22,7 @@ from .task import InstructionGenerationTask, InstructionGenerationTaskResult
 from ape.utils.logging import create_logger
 from ape.utils import parse_cli_args
 from ape.orchestration.orchestrator import TaskOrchestrator, OrchestratorResults
+from ape.tasks.models import parse_workspace_info
 from ..taxonomy.lean_task_taxonomy import annotate_record_metadata
 
 if TYPE_CHECKING:
@@ -157,15 +158,31 @@ class ApeBenchPipeline:
             def _clean_value(value: Any) -> Any:
                 return None if pd.isna(value) else value
 
+            commit_hash = _clean_value(row.get("commit_hash"))
+            repo_url = _clean_value(row.get("repo_url"))
+            target_workspace = {
+                "name": "target",
+                "default_target": _clean_value(row.get("default_target")),
+                "toolchain": _clean_value(row.get("toolchain")),
+                "read_only_path_patterns": ["**/*"],
+            }
+            if commit_hash is not None or repo_url is not None:
+                target_workspace["source"] = {
+                    "kind": "git",
+                    "commit_hash": commit_hash,
+                    "repo_url": repo_url,
+                }
+
+            session_name = _clean_value(row.get("session_name"))
+            if session_name is not None:
+                target_workspace["session_name"] = session_name
+
+            working_directory = _clean_value(row.get("working_directory"))
+            if working_directory is not None:
+                target_workspace["working_directory"] = working_directory
+
             task_data = {
-                "target_workspace": {
-                    "name": "target",
-                    "commit_hash": _clean_value(row.get("commit_hash")),
-                    "repo_url": _clean_value(row.get("repo_url")),
-                    "default_target": _clean_value(row.get("default_target")),
-                    "toolchain": _clean_value(row.get("toolchain")),
-                    "read_only_path_patterns": ["**/*"],
-                },
+                "target_workspace": target_workspace,
                 "file_path_before": _clean_value(row.get("file_path_before")),
                 "file_path_after": _clean_value(row.get("file_path_after")),
                 "content_before": _clean_value(row.get("content_before")),
@@ -236,7 +253,7 @@ class ApeBenchPipeline:
 
                 target_workspace = data.get('target_workspace') or {}
                 # Generate task_id from commit_hash and file_path
-                commit_hash = target_workspace.get('commit_hash', 'unknown')
+                commit_hash = parse_workspace_info(target_workspace).commit_hash or 'unknown'
                 file_path = data.get('file_path', 'unknown')
                 task_id = f"pe_{commit_hash[:8]}_{Path(file_path).stem if file_path != 'unknown' else 'unknown'}"
 
@@ -266,11 +283,7 @@ class ApeBenchPipeline:
                     'gold_diff': data.get('gold_diff'),
                     'filename': filename,
                     'target_workspace': {
-                        'name': target_workspace.get('name', 'target'),
-                        'commit_hash': target_workspace.get('commit_hash'),
-                        'repo_url': target_workspace.get('repo_url'),
-                        'default_target': target_workspace.get('default_target'),
-                        'toolchain': target_workspace.get('toolchain'),
+                        **target_workspace,
                         'read_only_path_patterns': (
                             target_workspace.get('read_only_path_patterns') or ['**/*']
                         ),
