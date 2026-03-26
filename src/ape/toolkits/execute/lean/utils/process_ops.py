@@ -255,6 +255,11 @@ async def run_command(
             env=process_env,
             preexec_fn=preexec_fn if max_memory_gb else None
         )
+
+        if input_text and process.stdin is not None:
+            process.stdin.write(input_text.encode("utf-8"))
+            await process.stdin.drain()
+            process.stdin.close()
         
         # Unified streaming read mode (use same logic whether print output or not)
         stdout_lines = []

@@ -53,6 +53,27 @@ class RestoreManager:
         self.content_store = ContentStore(self.config, self.logger)
         self.snapshot_manager = SnapshotManager(self.config, self.logger, self.repo_name)
         self.logger.info(f"Restore manager initialized [{self.repo_name}]: {self.workspace_dir}")
+
+    async def _requires_build_first(self, commit_hash: str) -> bool:
+        """Return True when no built state exists for the requested commit.
+
+        Restore can only operate on an already-built snapshot or an existing
+        ready workspace. When neither exists, callers need to run the build
+        pipeline first.
+        """
+        state = await self.state_manager.read_state(commit_hash)
+        if state:
+            return False
+
+        workspace_path = self.workspace_dir / commit_hash
+        if await aiofiles.os.path.exists(workspace_path) and await aiofiles.os.path.isdir(workspace_path):
+            return False
+
+        snapshot_path = self.snapshot_manager.snapshot_dir / f"{commit_hash}.snap"
+        if await aiofiles.os.path.exists(snapshot_path):
+            return False
+
+        return True
     
     async def get_workspace(self, commit_hash: str, timeout: Optional[float] = None) -> Path:
         """Get an available workspace path - main external interface.
@@ -114,6 +135,10 @@ class RestoreManager:
             # Wait for other processes to complete restore operation
             return await self._wait_for_restore_completion(commit_hash, timeout)
         except TimeoutError as e:
+            if await self._requires_build_first(commit_hash):
+                raise FileNotFoundError(
+                    f"[{commit_hash}] No state or snapshot found after lock timeout, need to build first"
+                ) from e
             self.logger.warning(
                 f"Get state lock timeout, wait for existing restore to end: {commit_hash} ({e})"
             )
@@ -165,6 +190,10 @@ class RestoreManager:
             state = await self.state_manager.read_state(commit_hash)
             
             if not state:
+                if await self._requires_build_first(commit_hash):
+                    raise FileNotFoundError(
+                        f"[{commit_hash}] No state or snapshot found while waiting, need to build first"
+                    )
                 raise RuntimeError(f"[{commit_hash}] State file disappeared during wait")
             
             if state.status == WorkspaceStatus.READY:

@@ -11,7 +11,7 @@ Your review must be precise, evidence-based, and focused on merge readiness.
 
 <submission_strategy>
 1. Inspect the PR metadata and diff.
-2. Use tools to inspect changed files and relevant surrounding code in the target workspace.
+2. Use tools to inspect changed files and relevant surrounding code in the target workspace. The target workspace already has the PR patch applied at the review snapshot.
 3. Identify blocking issues vs advisory suggestions.
 4. Submit your final decision via `{submit_tool_name}`.
 
@@ -41,7 +41,7 @@ Changed files ({changed_files_count}):
 </pr_description>
 
 <pr_diff_summary>
-Full diff is available at `scratch/pr.diff` (read-only).
+Full diff is available at `scratch/pr.diff` (read-only) for review context.
 Preview:
 {pr_diff_preview}
 </pr_diff_summary>

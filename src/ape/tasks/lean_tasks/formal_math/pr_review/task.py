@@ -6,13 +6,20 @@ including merge readiness and issue identification.
 """
 
 from typing import Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple
+import asyncio
+import hashlib
+import json
+import os
 import re
+import shutil
 import traceback
 from pathlib import Path
 from pydantic import Field, BaseModel, ConfigDict
 
 from ape.tasks.base import BaseTaskConfig, register_task, BaseTaskResult, EvaluationResult
 from ape.tasks.lean_tasks.base import BaseLeanTask, BaseLeanTaskData
+from ape.tasks.models import WorkspaceInfo
+from ape.toolkits.execute.lean.utils.process_ops import run_command
 
 if TYPE_CHECKING:
     from ape.scaffolds.config import BaseScaffoldConfig
@@ -116,6 +123,229 @@ class ReviewPRTask(BaseLeanTask):
     data_class = ReviewPRData
     task_config_class = ReviewPRConfig
     task_result_class = ReviewPRResult
+    patch_marker_filename = ".ape_pr_review_patch.json"
+
+    @classmethod
+    def _patch_fingerprint(cls, data: ReviewPRData) -> str:
+        digest = hashlib.sha256()
+        digest.update((data.target_workspace.commit_hash or "").encode("utf-8"))
+        digest.update(b"\0")
+        digest.update((data.pr_diff or "").encode("utf-8"))
+        return digest.hexdigest()
+
+    @classmethod
+    async def _clone_workspace_with_hardlinks(
+        cls,
+        source_path: Path,
+        output_path: Path,
+    ) -> None:
+        await asyncio.to_thread(
+            shutil.copytree,
+            source_path,
+            output_path,
+            symlinks=True,
+            copy_function=os.link,
+        )
+
+    @classmethod
+    async def _break_link_for_changed_files(
+        cls,
+        workspace_path: Path,
+        changed_files: List[str],
+    ) -> None:
+        for rel_path in changed_files:
+            candidate = workspace_path / rel_path
+            await cls._ensure_patch_path_writable(workspace_path, candidate)
+            await asyncio.to_thread(candidate.parent.mkdir, parents=True, exist_ok=True)
+            if not candidate.exists():
+                continue
+            if candidate.is_dir():
+                continue
+
+            temp_path = candidate.parent / f".{candidate.name}.pr_review_copy"
+            await asyncio.to_thread(shutil.copy2, candidate, temp_path, follow_symlinks=True)
+            await asyncio.to_thread(os.replace, temp_path, candidate)
+
+    @classmethod
+    async def _ensure_patch_path_writable(
+        cls,
+        workspace_path: Path,
+        candidate: Path,
+    ) -> None:
+        current = candidate.parent
+        while True:
+            if current.exists():
+                await asyncio.to_thread(cls._make_path_user_writable, current)
+            if current == workspace_path:
+                break
+            if current.parent == current:
+                break
+            current = current.parent
+
+        if candidate.exists():
+            await asyncio.to_thread(cls._make_path_user_writable, candidate)
+
+    @staticmethod
+    def _make_path_user_writable(path: Path) -> None:
+        mode = path.stat().st_mode
+        if path.is_dir():
+            os.chmod(path, mode | 0o700)
+        else:
+            os.chmod(path, mode | 0o600)
+
+    @classmethod
+    async def _read_patch_marker(cls, marker_path: Path) -> Optional[str]:
+        if not marker_path.exists():
+            return None
+        try:
+            marker_data = await asyncio.to_thread(json.loads, marker_path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+        return marker_data.get("patch_fingerprint")
+
+    @classmethod
+    async def _write_patch_marker(
+        cls,
+        marker_path: Path,
+        *,
+        patch_fingerprint: str,
+        data: ReviewPRData,
+    ) -> None:
+        marker_payload = {
+            "patch_fingerprint": patch_fingerprint,
+            "task_id": data.task_id,
+            "pr_number": data.pr_number,
+            "snapshot_base_sha": data.snapshot_base_sha,
+            "snapshot_head_sha": data.snapshot_head_sha,
+        }
+        await asyncio.to_thread(
+            marker_path.write_text,
+            json.dumps(marker_payload, indent=2, ensure_ascii=False),
+            "utf-8",
+        )
+
+    @classmethod
+    async def _apply_pr_diff(
+        cls,
+        workspace_path: Path,
+        pr_diff: str,
+        logger: Optional["logging.LoggerAdapter"] = None,
+    ) -> None:
+        if not pr_diff.strip():
+            return
+
+        # `git apply` can silently no-op when the attempt workspace lives under the
+        # outer APE git repo (for example `.ape/runs/...`). `patch` applies hunks
+        # relative to `cwd`, which makes it reliable for these materialized review
+        # workspaces.
+        check_stdout, check_stderr, check_code = await run_command(
+            ["patch", "--dry-run", "-p1", "--batch"],
+            cwd=workspace_path,
+            input_text=pr_diff,
+            logger=logger,
+        )
+        if check_code != 0:
+            raise RuntimeError(
+                "PR diff failed `patch --dry-run` in review workspace:\n"
+                f"stdout:\n{check_stdout}\n\nstderr:\n{check_stderr}"
+            )
+
+        apply_stdout, apply_stderr, apply_code = await run_command(
+            ["patch", "-p1", "--batch"],
+            cwd=workspace_path,
+            input_text=pr_diff,
+            logger=logger,
+        )
+        if apply_code != 0:
+            raise RuntimeError(
+                "PR diff failed `patch` in review workspace:\n"
+                f"stdout:\n{apply_stdout}\n\nstderr:\n{apply_stderr}"
+            )
+
+    @classmethod
+    async def _ensure_patched_target_workspace(
+        cls,
+        data: ReviewPRData,
+        target_workspace: WorkspaceInfo,
+        logger: Optional["logging.LoggerAdapter"] = None,
+    ) -> WorkspaceInfo:
+        target_path = target_workspace.path
+        if target_path is None:
+            raise RuntimeError("Target workspace path is missing for PR review task")
+
+        patch_fingerprint = cls._patch_fingerprint(data)
+        marker_path = target_path / cls.patch_marker_filename
+        existing_fingerprint = await cls._read_patch_marker(marker_path)
+        if existing_fingerprint == patch_fingerprint:
+            if logger:
+                logger.info("Using existing patched PR review workspace: %s", target_path)
+            return target_workspace
+
+        if target_path.is_symlink():
+            base_workspace_path = target_path.resolve()
+            target_path.unlink()
+            if logger:
+                logger.info(
+                    "Materializing patched PR review workspace from base snapshot: %s -> %s",
+                    base_workspace_path,
+                    target_path,
+                )
+            await cls._clone_workspace_with_hardlinks(base_workspace_path, target_path)
+        elif existing_fingerprint and existing_fingerprint != patch_fingerprint:
+            raise RuntimeError(
+                "PR review workspace already contains a different applied patch. "
+                f"workspace={target_path}"
+            )
+
+        await asyncio.to_thread(cls._make_path_user_writable, target_path)
+        await cls._break_link_for_changed_files(target_path, data.changed_files)
+        await cls._apply_pr_diff(target_path, data.pr_diff, logger=logger)
+        await cls._write_patch_marker(
+            marker_path,
+            patch_fingerprint=patch_fingerprint,
+            data=data,
+        )
+
+        return target_workspace.model_copy(
+            update={
+                "path": target_path,
+                "read_only_path_patterns": target_workspace.read_only_path_patterns or ["**/*"],
+            }
+        )
+
+    @classmethod
+    async def setup_attempt(
+        cls,
+        data: "ReviewPRData",
+        config: "BaseScaffoldConfig",
+        orchestrator_id: str,
+        attempt_path: Optional[Path] = None,
+        logger: Optional["logging.LoggerAdapter"] = None,
+    ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
+        attempt_path, scratch_workspace, target_workspace, reference_workspaces = await super().setup_attempt(
+            data=data,
+            config=config,
+            orchestrator_id=orchestrator_id,
+            attempt_path=attempt_path,
+            logger=logger,
+        )
+
+        if target_workspace:
+            try:
+                target_workspace = await cls._ensure_patched_target_workspace(
+                    data=data,
+                    target_workspace=target_workspace,
+                    logger=logger,
+                )
+            except Exception:
+                if logger:
+                    logger.error(
+                        "Failed to prepare patched PR review workspace: %s",
+                        traceback.format_exc(),
+                    )
+                raise
+
+        return attempt_path, scratch_workspace, target_workspace, reference_workspaces
 
     def __init__(self, data: ReviewPRData, config: "BaseScaffoldConfig"):
         super().__init__(data, config)
@@ -196,6 +426,7 @@ class ReviewPRTask(BaseLeanTask):
             f"- Snapshot base SHA: {self.data.snapshot_base_sha or 'N/A'}",
             f"- Snapshot head SHA: {self.data.snapshot_head_sha or 'N/A'}",
             f"- Review state at snapshot: {self.data.review_state or 'N/A'}",
+            f"- Target workspace contents: PR patch already applied at this snapshot",
             f"",
             "## PR dependencies",
         ]
