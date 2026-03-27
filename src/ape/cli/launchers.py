@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import numbers
 import signal
 import sys
 from typing import Optional, Type
@@ -11,6 +12,7 @@ from typing import Optional, Type
 from rich.console import Console
 
 from ape.cli.task_session import is_internal_cli_task, merge_task_prompt
+from ape.llm_clients.models import TokenUsage
 from ape.scaffolds.base import BaseScaffold
 
 
@@ -31,6 +33,94 @@ def stderr_signal_handler(_signum, _frame) -> None:
     """Handle interactive signals using stderr output."""
     print("\nShutting down gracefully...", file=sys.stderr)
     sys.exit(0)
+
+
+def _coerce_int(value: object) -> int:
+    """Normalize integer-like values used in session reports."""
+    if isinstance(value, numbers.Integral):
+        return int(value)
+    return 0
+
+
+def _coerce_float(value: object) -> float:
+    """Normalize numeric values used in session reports."""
+    if isinstance(value, numbers.Real):
+        return float(value)
+    return 0.0
+
+
+def _get_session_token_usage(scaffold: object) -> Optional[TokenUsage]:
+    """Fetch token usage from a scaffold when available."""
+    usage_getter = getattr(scaffold, "_get_token_usage", None)
+    if not callable(usage_getter):
+        return None
+
+    try:
+        token_usage = usage_getter()
+    except Exception:
+        return None
+
+    if token_usage is None:
+        return None
+
+    return token_usage
+
+
+def _build_session_report_lines(token_usage: Optional[TokenUsage]) -> Optional[list[str]]:
+    """Build minimal session summary lines for CLI users."""
+    if token_usage is None:
+        return None
+
+    total_tokens = _coerce_int(getattr(token_usage, "total_tokens", None))
+    total_cost = _coerce_float(getattr(token_usage, "total_cost", None))
+    cached_total_cost = _coerce_float(getattr(token_usage, "cached_total_cost", None))
+
+    return [
+        f"Tokens: {total_tokens:,}",
+        f"Cost: ${total_cost:.4f}",
+        f"Cached Cost: ${cached_total_cost:.4f}",
+    ]
+
+
+def _print_external_session_report(token_usage: Optional[TokenUsage]) -> None:
+    """Print a compact session summary for external scaffold sessions."""
+    report_lines = _build_session_report_lines(token_usage)
+    if not report_lines:
+        return
+
+    print("\nSession Report:", file=sys.stderr)
+    for line in report_lines:
+        print(f"  {line}", file=sys.stderr)
+
+
+async def _finalize_scaffold_session(
+    scaffold: object,
+    existing_termination_result: Optional[object] = None,
+    already_terminated: bool = False,
+) -> Optional[TokenUsage]:
+    """Terminate and clean up an interactive scaffold, then return token usage."""
+    termination_result = existing_termination_result
+
+    if not already_terminated and termination_result is None and getattr(scaffold, "task", None) is not None:
+        terminate = getattr(scaffold, "terminate", None)
+        if callable(terminate):
+            try:
+                termination_result = await terminate()
+            except Exception:
+                termination_result = None
+
+    token_usage = getattr(termination_result, "token_usage", None)
+    if token_usage is None:
+        token_usage = _get_session_token_usage(scaffold)
+
+    cleanup = getattr(scaffold, "_cleanup", None)
+    if callable(cleanup):
+        try:
+            await cleanup()
+        except Exception:
+            pass
+
+    return token_usage
 
 
 async def run_ape_agent_cli_session(
@@ -97,11 +187,21 @@ async def run_ape_agent_cli_session(
     cli_task._cli_force_tool_use = not is_internal_cli_task(cli_task)
     scaffold = ApeAgentScaffold()
     scaffold.progress_callback = display.show_status
-    await scaffold.run_interactive_session(
-        task=cli_task,
-        initial_prompt=initial_prompt,
-        oneshot_mode=oneshot_mode,
-    )
+    try:
+        await scaffold.run_interactive_session(
+            task=cli_task,
+            initial_prompt=initial_prompt,
+            oneshot_mode=oneshot_mode,
+        )
+    finally:
+        token_usage = await _finalize_scaffold_session(scaffold)
+        report_lines = _build_session_report_lines(token_usage)
+        if report_lines:
+            display.show_tree_section(
+                "Session Report",
+                report_lines,
+                accent_color=colors.accent_green,
+            )
 
 
 def launch_ape_agent(config, cli_task, args) -> int:
@@ -145,20 +245,32 @@ async def run_external_scaffold_cli_session(
     scaffold = scaffold_cls()
     scaffold.progress_callback = lambda message: print(f"[setup] {message}", file=sys.stderr)
     termination_requested = False
+    termination_completed = False
+    termination_result = None
 
     async def termination_callback(_result) -> None:
-        nonlocal termination_requested
+        nonlocal termination_requested, termination_completed, termination_result
         if termination_requested:
             return
         termination_requested = True
-        await scaffold.terminate()
+        termination_result = await scaffold.terminate()
+        termination_completed = True
 
-    await scaffold.solve(
-        task=cli_task,
-        termination_callback=termination_callback,
-        orchestrator_id="cli",
-        attempt_path=None,
-    )
+    try:
+        await scaffold.solve(
+            task=cli_task,
+            termination_callback=termination_callback,
+            orchestrator_id="cli",
+            attempt_path=None,
+        )
+    finally:
+        token_usage = await _finalize_scaffold_session(
+            scaffold,
+            existing_termination_result=termination_result,
+            already_terminated=termination_completed,
+        )
+
+    _print_external_session_report(token_usage)
     return 0
 
 

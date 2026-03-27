@@ -48,6 +48,11 @@ class OpenAIProvider(BaseProvider):
             "stream": stream,
         }
 
+        if stream:
+            # OpenAI only includes token usage in streamed chat-completions responses
+            # when stream_options.include_usage is explicitly requested.
+            payload["stream_options"] = {"include_usage": True}
+
         if tools:
             payload["tools"] = tools
 
