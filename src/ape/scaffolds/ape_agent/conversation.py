@@ -536,6 +536,7 @@ class ApeAgentConversationManager:
         """Create a new conversation session."""
         from ape.llm_clients.models import ConversationSession
         from ape.scaffolds.prompts import build_system_prompt
+        from ape.scaffolds.skills import get_task_managed_skills
 
         if max_turns is None:
             max_turns = self.config.execution.max_turns
@@ -553,12 +554,14 @@ class ApeAgentConversationManager:
 
         # Only attach a system prompt when a task exists with workspace info
         if self.task and self.task.scratch_workspace:
+            managed_skills = get_task_managed_skills(self.task)
             # Use environment-style variables so MCP tools can parse them
             system_prompt = await build_system_prompt(
                 scratch_workspace=self.task.scratch_workspace,
                 target_workspace=self.task.target_workspace,
                 reference_workspaces=self.task.reference_workspaces,
                 is_cli_mode=self.is_cli_mode,
+                managed_skills=None if managed_skills is None else managed_skills.skills,
                 logger=self.logger
             )
             session.add_system_message(

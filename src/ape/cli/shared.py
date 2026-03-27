@@ -13,6 +13,7 @@ from typing import Any, Callable, Optional, Sequence
 from ape.cli.registry import AgentCliSpec, get_agent_cli_spec
 from ape.cli.task_input import create_ape_agent_task_input_ui, prompt_for_task_data
 from ape.cli.task_session import INTERNAL_CLI_TASK_TYPES
+from ape.scaffolds.skills import normalize_skills_config_paths
 from ape.tasks.base import create_task_from_data, list_task_types
 from ape.utils import deep_merge, load_yaml, parse_cli_args
 
@@ -246,7 +247,14 @@ def _prepare_config_dict(
     _validate_remaining_overrides(remaining_args)
 
     config_dict = load_yaml(args.config) if getattr(args, "config", None) else {}
+    if getattr(args, "config", None):
+        normalize_skills_config_paths(
+            config_dict,
+            base_dir=Path(args.config).expanduser().resolve().parent,
+        )
+
     cli_overrides = parse_cli_args(list(remaining_args)) or {}
+    normalize_skills_config_paths(cli_overrides, base_dir=Path.cwd())
     if cli_overrides:
         config_dict = deep_merge(config_dict, cli_overrides)
 

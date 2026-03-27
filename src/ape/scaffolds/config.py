@@ -17,6 +17,7 @@ from ape.toolkits.file_system.config import FileSystemToolConfig
 from ape.runtime.local.runtime import LocalRuntimeConfig
 from ape.runtime.base import RuntimeConfig
 from ape.utils.project import PROJECT_ROOT
+from ape.scaffolds.skills import SkillsConfig
 
 
 class BaseToolsConfig(BaseModel):
@@ -66,6 +67,9 @@ class BaseScaffoldConfig(BaseModel):
     task_config: Optional[BaseTaskConfig] = None
     # Task config overrides passed from CLI/YAML (persisted for runtime task rebuild)
     task_config_overrides: Optional[Dict[str, Any]] = None
+
+    # Managed agent skills
+    skills: SkillsConfig = Field(default_factory=SkillsConfig)
 
     # LLM configuration
     llm_config: LLMConfig = Field(default_factory=LLMConfig)

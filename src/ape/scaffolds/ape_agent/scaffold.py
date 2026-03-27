@@ -12,11 +12,17 @@ from pathlib import Path
 import uuid
 
 from ape.scaffolds.base import BaseScaffold
+from ape.scaffolds.skills import (
+    APE_AGENT_REPO_SKILL_DIRS,
+    SKILL_TOOL_NAMES,
+    materialize_task_skills,
+)
 from rich.console import Console
 
 from .conversation import ApeAgentConversationManager
 from ape.toolkits.mcp_manager import MCPManager
 from ape.toolkits.registry import get_all_tool_names
+import ape.toolkits.skills  # noqa: F401
 from .config import ApeAgentConfig
 
 if TYPE_CHECKING:
@@ -45,6 +51,7 @@ class ApeAgentScaffold(BaseScaffold):
         self.conversation_manager: Optional[ApeAgentConversationManager] = None
         self.mcp_manager: Optional[MCPManager] = None
         self.conversation_session = None
+        self.managed_skills = None
     
     async def run_interactive_session(
         self,
@@ -78,6 +85,12 @@ class ApeAgentScaffold(BaseScaffold):
             self.console = Console()
             self.confirmation_bridge = UserConfirmationBridge(self.console)
             self.logger.debug("CLI mode: initialized console and UserConfirmationBridge")
+
+        self.managed_skills = materialize_task_skills(
+            self.task,
+            self.logger,
+            repo_skill_dirs=APE_AGENT_REPO_SKILL_DIRS,
+        )
 
         self.conversation_manager = ApeAgentConversationManager(
             config=self.task.config,
@@ -117,11 +130,18 @@ class ApeAgentScaffold(BaseScaffold):
         config = self.task.config
         task_config = config.task_config
         all_available_tools = set(get_all_tool_names())
+        has_managed_skills = bool(self.managed_skills and self.managed_skills.skills)
+        if not has_managed_skills:
+            all_available_tools -= SKILL_TOOL_NAMES
         
         if task_config.enabled_tools is not None:
             base_enabled = set(task_config.enabled_tools) & all_available_tools
         else:
             base_enabled = all_available_tools - set(task_config.disabled_tools or [])
+
+        if has_managed_skills:
+            disabled_tools = set(task_config.disabled_tools or [])
+            base_enabled |= (SKILL_TOOL_NAMES - disabled_tools) & all_available_tools
         
         return base_enabled
 

@@ -21,9 +21,11 @@ from typing import Optional, Dict, Any, Set, TYPE_CHECKING
 from fastmcp import FastMCP, Client
 
 from ape.scaffolds.base import ComponentSetupError
+from ape.scaffolds.skills import SKILL_TOOL_NAMES, get_task_managed_skills
 from ape.toolkits.registry import get_all_tool_names, list_registered_tools
 from ape.toolkits.file_system import FileSystemToolsProvider
 from ape.toolkits.execute.bash import BashExecuteToolsProvider
+from ape.toolkits.skills import SkillToolsProvider
 from ape.utils.logging import create_mcp_log_handler
 
 if TYPE_CHECKING:
@@ -124,6 +126,11 @@ class MCPManager:
 		"""
 		all_available_tools = set(get_all_tool_names())
 
+		managed_skills = get_task_managed_skills(self.task)
+		has_managed_skills = bool(managed_skills and managed_skills.skills)
+		if self.config.scaffold_type != "ape_agent" or not has_managed_skills:
+			all_available_tools = all_available_tools - SKILL_TOOL_NAMES
+
 		# If not using native tools, remove file system and bash execution tools from MCP layer
 		# to avoid duplication with SDK builtin tools
 		if not self.use_native_tools:
@@ -131,7 +138,7 @@ class MCPManager:
 			native_tools_to_disable = {
 				tool_name
 				for tool_name, provider_class in registered_tools.items()
-				if provider_class in (FileSystemToolsProvider, BashExecuteToolsProvider)
+				if provider_class in (FileSystemToolsProvider, BashExecuteToolsProvider, SkillToolsProvider)
 			}
 			all_available_tools = all_available_tools - native_tools_to_disable
 			self.logger.info(

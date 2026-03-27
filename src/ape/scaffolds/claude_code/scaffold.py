@@ -17,6 +17,11 @@ from typing import Optional, TYPE_CHECKING, List, Dict, Any
 from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
 from ape.cli.task_session import is_internal_cli_task, merge_task_prompt
 from ape.scaffolds.base import BaseScaffold
+from ape.scaffolds.skills import (
+    CLAUDE_REPO_SKILL_DIR,
+    materialize_task_skills,
+    mirror_materialized_skills,
+)
 from ape.toolkits.mcp_manager import MCPManager
 from ape.utils.project import PROJECT_ROOT
 from .config import ClaudeCodeConfig
@@ -36,6 +41,8 @@ class ClaudeCodeScaffold(BaseScaffold):
         super().__init__()
         self.conversation_manager: Optional[ClaudeCodeConversationManager] = None
         self.mcp_manager: Optional[MCPManager] = None
+        self.managed_skills = None
+        self.skill_overlay_root: Optional[Path] = None
 
     def _setup_asyncio_exception_handler(self) -> None:
         """Configure asyncio exception handler"""
@@ -47,6 +54,13 @@ class ClaudeCodeScaffold(BaseScaffold):
     async def _setup_components(self) -> None:
         """Setup components using shared utilities"""
         self._setup_asyncio_exception_handler()
+
+        self.managed_skills = materialize_task_skills(
+            self.task,
+            self.logger,
+            repo_skill_dirs=(CLAUDE_REPO_SKILL_DIR,),
+        )
+        self.skill_overlay_root = self._prepare_skill_overlay()
 
         # Validate bash configuration with runtime type
         config = self.task.config
@@ -80,6 +94,31 @@ class ClaudeCodeScaffold(BaseScaffold):
         await self.mcp_manager.setup_http_mode()
         self.logger.info(f"[ClaudeCodeScaffold] MCP HTTP server started: {self.mcp_manager.get_server_url()}")
 
+    def _prepare_skill_overlay(self) -> Optional[Path]:
+        """Build an attempt-local add-dir overlay for managed Claude skills."""
+        if not self.managed_skills or not self.managed_skills.skills:
+            return None
+        if not self.task.attempt_path:
+            raise RuntimeError("Task attempt path must exist before preparing Claude skill overlay")
+
+        source_kinds = {"extra_root"} if (self.is_cli_mode and is_internal_cli_task(self.task)) else None
+        selected_skills = self.managed_skills.select(source_kinds=source_kinds)
+        if not selected_skills:
+            return None
+
+        overlay_root = self.task.attempt_path / "claude_skills_overlay"
+        mirror_materialized_skills(
+            self.managed_skills,
+            overlay_root / ".claude" / "skills",
+            source_kinds=source_kinds,
+        )
+        self.logger.info(
+            "[ClaudeCodeScaffold] Prepared Claude skills overlay with %s skills at %s",
+            len(selected_skills),
+            overlay_root,
+        )
+        return overlay_root
+
     def _get_resume_session_id(self) -> Optional[str]:
         """Get resume session ID from latest hardlink"""
         return ClaudeCodeConversationManager.find_latest_hardlink(
@@ -108,6 +147,8 @@ class ClaudeCodeScaffold(BaseScaffold):
 
         # No need for add_dirs since cwd is the workspaces directory
         add_dirs = []
+        if self.skill_overlay_root is not None:
+            add_dirs.append(str(self.skill_overlay_root.resolve()))
 
         # Build disallowed_tools based on configuration
         disallowed_tools = ["Explore"]
@@ -223,6 +264,8 @@ class ClaudeCodeScaffold(BaseScaffold):
                 "claude",
                 "--permission-mode", config.permission_mode
             ]
+            if self.skill_overlay_root is not None:
+                claude_args.extend(["--add-dir", str(self.skill_overlay_root.resolve())])
 
             # If there is an initial prompt, use print mode
             if initial_prompt:

@@ -11,10 +11,11 @@ Design Principles:
 3. File tools work with relative paths from workspaces/ directory
 """
 
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List, Sequence, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ape.tasks.models import WorkspaceInfo
+    from ape.scaffolds.skills import MaterializedSkill
     import logging
 
 
@@ -256,6 +257,31 @@ async def build_workspace_content_section(
     return workspace_section
 
 
+def build_skills_section(
+    managed_skills: Optional[Sequence["MaterializedSkill"]],
+) -> str:
+    """Build a concise managed-skills index for native APE-Agent sessions."""
+    if not managed_skills:
+        return ""
+
+    lines = [
+        "<AVAILABLE_SKILLS>",
+        "Managed skills are available for this task. Review the index first, then call `read_skill` only when a skill looks relevant.",
+        "",
+    ]
+
+    for skill in managed_skills:
+        lines.append(
+            f"- `{skill.skill_id}`: {skill.name} - {skill.description}"
+        )
+
+    lines.extend([
+        "",
+        "</AVAILABLE_SKILLS>",
+    ])
+    return "\n".join(lines)
+
+
 # =============================================================================
 # Main System Prompt Builder
 # =============================================================================
@@ -266,6 +292,7 @@ async def build_system_prompt(
     reference_workspaces: Optional[List['WorkspaceInfo']],
     is_cli_mode: bool = False,
     use_absolute_paths: bool = False,
+    managed_skills: Optional[Sequence["MaterializedSkill"]] = None,
     logger: Optional['logging.LoggerAdapter'] = None
 ) -> str:
     """
@@ -307,5 +334,9 @@ async def build_system_prompt(
 
     if content_section:
         prompt_parts.append(content_section)
+
+    skills_section = build_skills_section(managed_skills)
+    if skills_section:
+        prompt_parts.append(skills_section)
 
     return "\n\n".join(prompt_parts)

@@ -138,6 +138,34 @@ When you run `ape chat ...` or `ape task ...`, `--config` follows the same prece
 scaffold entrypoints: explicit CLI flags and trailing `key=value` overrides win over YAML, which
 wins over Pydantic defaults.
 
+Managed agent skills are opt-in through the scaffold-level `skills` block. When `repo_discovery`
+is enabled, the active workspace is checked for native repo skill directories (`.agents/skills`
+for Codex, `.claude/skills` for Claude Code, and both for APE-Agent). `extra_roots` may point to
+either a single skill directory or a directory that contains multiple skills.
+
+```yaml
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/code-review
+```
+
+Relative `extra_roots` from YAML are resolved against the YAML file location. Relative trailing
+CLI overrides are resolved against the current working directory:
+
+```bash
+ape chat codex --config configs/cli.yaml --workspace . 'skills.extra_roots=["./local-skills"]'
+ape task claude-code --task-module examples.arithmetic.task arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}' \
+  'skills.enabled=True' \
+  'skills.extra_roots=["./team-skills"]'
+python -m ape.scaffolds.ape_agent.main inputs/ape_bench/ape_bench.jsonl \
+  --config configs/ape_agent.yaml \
+  'skills.extra_roots=["./benchmark-skills"]'
+```
+
 When you run `ape task ... <registered_task>` without `--task-file` or `--task-data-json`, the CLI
 inspects that task's Pydantic schema and prompts for each input field directly in the terminal. For
 nested task data such as `target_workspace`, the CLI walks the nested fields as well.
@@ -509,6 +537,13 @@ task_config:
   semantic_validation:
     enabled: true
     num_judges: 3
+
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/reviewer
 ```
 
 ### Multi-Version Infrastructure
@@ -753,6 +788,34 @@ ape task ape-agent \
 
 当你运行 `ape chat ...` 或 `ape task ...` 时，`--config` 与批量 scaffold 入口遵循相同的
 优先级：显式 CLI 参数和尾随 `key=value` 覆盖优先于 YAML，YAML 又优先于 Pydantic 默认值。
+
+Agent skill 通过 scaffold 级别的 `skills` 配置块按需启用。打开 `repo_discovery` 后，
+系统会检查当前活动工作空间中的原生仓库技能目录：Codex 使用 `.agents/skills`，
+Claude Code 使用 `.claude/skills`，APE-Agent 同时读取两者。`extra_roots` 既可以指向
+单个 skill 目录，也可以指向一个包含多个 skill 的目录。
+
+```yaml
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/code-review
+```
+
+YAML 中的相对 `extra_roots` 会相对于 YAML 文件所在目录解析；尾随 CLI 覆盖中的相对路径
+会相对于当前工作目录解析：
+
+```bash
+ape chat codex --config configs/cli.yaml --workspace . 'skills.extra_roots=["./local-skills"]'
+ape task claude-code --task-module examples.arithmetic.task arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}' \
+  'skills.enabled=True' \
+  'skills.extra_roots=["./team-skills"]'
+python -m ape.scaffolds.ape_agent.main inputs/ape_bench/ape_bench.jsonl \
+  --config configs/ape_agent.yaml \
+  'skills.extra_roots=["./benchmark-skills"]'
+```
 
 当你运行 `ape task ... <registered_task>` 且不提供 `--task-file` 或 `--task-data-json`
 时，CLI 会读取该任务的 Pydantic schema，并在终端中逐项提示你填写输入字段。像
@@ -1113,6 +1176,13 @@ task_config:
   semantic_validation:
     enabled: true
     num_judges: 3
+
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/reviewer
 ```
 
 ### 多版本基础设施
