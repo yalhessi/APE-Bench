@@ -1,28 +1,21 @@
-"""
-Codex CLI - Command line interface module
+"""Codex CLI package."""
 
-Provides a convenient command line entry, encapsulating:
-- Relay mode and conversation tracking
-- MCP server automatic configuration
-- TOML configuration (model provider + MCP server)
-- Integration with external `codex` command
+from __future__ import annotations
 
-Main components:
-- main.py: Command line entry and parameter parsing
-- task.py: CLI dedicated task class
-- config.py: CLI configuration model
+__all__ = ["cli_main", "CodexCLITask", "CodexCLITaskConfig", "CodexCLIConfig"]
 
-Usage:
-    python -m ape.scaffolds.codex.cli.main --help
-"""
 
-from .main import cli_main
-from .task import CodexCLITask, CodexCLITaskConfig
-from .config import CodexCLIConfig
+def __getattr__(name: str):
+    if name == "cli_main":
+        from .main import cli_main
 
-__all__ = [
-    'cli_main',
-    'CodexCLITask',
-    'CodexCLITaskConfig',
-    'CodexCLIConfig',
-]
+        return cli_main
+    if name in {"CodexCLITask", "CodexCLITaskConfig"}:
+        from .task import CodexCLITask, CodexCLITaskConfig
+
+        return {"CodexCLITask": CodexCLITask, "CodexCLITaskConfig": CodexCLITaskConfig}[name]
+    if name == "CodexCLIConfig":
+        from .config import CodexCLIConfig
+
+        return CodexCLIConfig
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

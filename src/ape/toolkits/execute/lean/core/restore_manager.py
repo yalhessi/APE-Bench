@@ -4,10 +4,11 @@ Use standard exceptions and a small set of business exceptions to fully solve er
 """
 
 import asyncio
+import inspect
 import os
 import stat
 from pathlib import Path
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Callable, Any
 from datetime import datetime
 
 import aiofiles.os
@@ -36,7 +37,8 @@ class RestoreManager:
         self,
         config: Optional[LeanVerifyToolConfig] = None,
         logger: Optional['logging.LoggerAdapter'] = None,
-        repo_url: Optional[str] = None
+        repo_url: Optional[str] = None,
+        progress_callback: Optional[Callable[[str], Any]] = None,
     ):
         """Initialize restore manager
 
@@ -52,7 +54,17 @@ class RestoreManager:
         self.state_manager = WorkspaceStateManager(self.config, self.logger, self.repo_name)
         self.content_store = ContentStore(self.config, self.logger)
         self.snapshot_manager = SnapshotManager(self.config, self.logger, self.repo_name)
+        self.progress_callback = progress_callback
         self.logger.info(f"Restore manager initialized [{self.repo_name}]: {self.workspace_dir}")
+
+    async def _emit_progress(self, message: str) -> None:
+        """Emit a user-facing progress update when configured."""
+        if not self.progress_callback:
+            return
+
+        result = self.progress_callback(message)
+        if inspect.isawaitable(result):
+            await result
 
     async def _requires_build_first(self, commit_hash: str) -> bool:
         """Return True when no built state exists for the requested commit.
@@ -87,6 +99,9 @@ class RestoreManager:
             state = await self.state_manager.read_state(commit_hash)
             if state and state.status == WorkspaceStatus.READY:
                 self.logger.info(f"Workspace is ready: {commit_hash}")
+                await self._emit_progress(
+                    f"Using cached Lean workspace {self.repo_name}@{commit_hash[:8]}."
+                )
                 return workspace_path
         
         # 2. Need to restore workspace
@@ -107,6 +122,9 @@ class RestoreManager:
         """
         start_time = datetime.now()
         self.logger.info(f"Start trying to restore workspace: {commit_hash}")
+        await self._emit_progress(
+            f"Restoring Lean workspace {self.repo_name}@{commit_hash[:8]} from cached snapshot..."
+        )
         
         try:
             # 1. Atomic attempt to get restore permission
@@ -133,6 +151,9 @@ class RestoreManager:
                     
         except AlreadyRestoringError as e:
             # Wait for other processes to complete restore operation
+            await self._emit_progress(
+                f"Another process is already restoring {self.repo_name}@{commit_hash[:8]}; waiting for it to finish..."
+            )
             return await self._wait_for_restore_completion(commit_hash, timeout)
         except TimeoutError as e:
             if await self._requires_build_first(commit_hash):
@@ -142,10 +163,16 @@ class RestoreManager:
             self.logger.warning(
                 f"Get state lock timeout, wait for existing restore to end: {commit_hash} ({e})"
             )
+            await self._emit_progress(
+                f"Waiting for an in-progress restore of {self.repo_name}@{commit_hash[:8]} to complete..."
+            )
             return await self._wait_for_restore_completion(commit_hash, timeout)
 
         except AlreadyBuildingError as e:
             # Wait for build completion, then retry restore
+            await self._emit_progress(
+                f"{self.repo_name}@{commit_hash[:8]} is being built by another process; waiting for the build to finish..."
+            )
             await self._wait_for_build_completion(commit_hash, timeout)
             # Recursive retry restore
             return await self.try_restore(commit_hash, timeout)
@@ -184,6 +211,10 @@ class RestoreManager:
         start_time = datetime.now()
         
         self.logger.info(f"Wait for other processes to complete restore: {commit_hash}")
+        await self._emit_progress(
+            f"Waiting for workspace restore to finish for {self.repo_name}@{commit_hash[:8]}..."
+        )
+        last_progress_report = start_time
         
         while (datetime.now() - start_time).total_seconds() < actual_timeout:
             # Use lock-free read to avoid deadlocks
@@ -219,6 +250,13 @@ class RestoreManager:
             # Additional check: restore process is still alive
             if state.restore_pid and not is_process_alive(state.restore_pid):
                 raise RuntimeError(f"[{commit_hash}] Waiting for restore process to die (pid={state.restore_pid})")
+
+            now = datetime.now()
+            if (now - last_progress_report).total_seconds() >= 15:
+                await self._emit_progress(
+                    f"Still waiting for workspace restore for {self.repo_name}@{commit_hash[:8]}..."
+                )
+                last_progress_report = now
             
             # Continue waiting
             await asyncio.sleep(poll_interval)
@@ -238,6 +276,10 @@ class RestoreManager:
         start_time = datetime.now()
         
         self.logger.info(f"Wait for build completion: {commit_hash}")
+        await self._emit_progress(
+            f"Waiting for workspace build to finish for {self.repo_name}@{commit_hash[:8]}..."
+        )
+        last_progress_report = start_time
         
         while (datetime.now() - start_time).total_seconds() < actual_timeout:
             state = await self.state_manager.read_state(commit_hash)
@@ -258,6 +300,13 @@ class RestoreManager:
             # Check if the build process is still alive
             if state.build_pid and not is_process_alive(state.build_pid):
                 raise RuntimeError(f"[{commit_hash}] Waiting for build process to die (pid={state.build_pid})")
+
+            now = datetime.now()
+            if (now - last_progress_report).total_seconds() >= 15:
+                await self._emit_progress(
+                    f"Still waiting for workspace build for {self.repo_name}@{commit_hash[:8]}..."
+                )
+                last_progress_report = now
             
             await asyncio.sleep(poll_interval)
         
@@ -288,6 +337,9 @@ class RestoreManager:
             raise FileNotFoundError(f"[{commit_hash}] Snapshot file not found: {snapshot_path}")
         
         # 2. Load snapshot
+        await self._emit_progress(
+            f"Loading workspace snapshot metadata for {self.repo_name}@{commit_hash[:8]}..."
+        )
         try:
             file_mappings = await self.snapshot_manager.load_snapshot(commit_hash)
             if not file_mappings:
@@ -299,6 +351,9 @@ class RestoreManager:
         workspace_path = await self._ensure_workspace_directory(commit_hash)
         
         # 4. Batch restore files
+        await self._emit_progress(
+            f"Restoring files into the workspace for {self.repo_name}@{commit_hash[:8]}..."
+        )
         try:
             await self.content_store.batch_retrieve_files(
                 file_mappings,
@@ -322,6 +377,9 @@ class RestoreManager:
 
         # 5. Set entire workspace to readonly (exclude .lake/ directory)
         try:
+            await self._emit_progress(
+                f"Finalizing restored workspace permissions for {self.repo_name}@{commit_hash[:8]}..."
+            )
             await self._set_workspace_readonly(workspace_path)
             self.logger.info(f"Workspace set to readonly: {commit_hash}")
         except Exception as e:
@@ -435,6 +493,10 @@ class RestoreManager:
                     f"Readonly permission setting progress: {completed_count}/{total_items} ({progress*100:.1f}%) | "
                     f"Elapsed time: {int(total_elapsed)}s | ETA: {eta_str}"
                 )
+                await self._emit_progress(
+                    f"Finalizing workspace permissions for {self.repo_name}@{workspace_path.name[:8]} "
+                    f"({progress*100:.0f}% complete, ETA {eta_str})..."
+                )
                 last_report_time = current_time
         
         # 4. Process all directories (from deep to shallow, to avoid permission issues)
@@ -465,6 +527,10 @@ class RestoreManager:
                 self.logger.info(
                     f"Readonly permission setting progress: {completed_count}/{total_items} ({progress*100:.1f}%) | "
                     f"Elapsed time: {int(total_elapsed)}s | ETA: {eta_str}"
+                )
+                await self._emit_progress(
+                    f"Finalizing workspace permissions for {self.repo_name}@{workspace_path.name[:8]} "
+                    f"({progress*100:.0f}% complete, ETA {eta_str})..."
                 )
                 last_report_time = current_time
         

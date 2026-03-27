@@ -8,6 +8,7 @@ including merge readiness and issue identification.
 from typing import Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple
 import asyncio
 import hashlib
+import inspect
 import json
 import os
 import re
@@ -268,6 +269,7 @@ class ReviewPRTask(BaseLeanTask):
         data: ReviewPRData,
         target_workspace: WorkspaceInfo,
         logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
     ) -> WorkspaceInfo:
         target_path = target_workspace.path
         if target_path is None:
@@ -279,6 +281,10 @@ class ReviewPRTask(BaseLeanTask):
         if existing_fingerprint == patch_fingerprint:
             if logger:
                 logger.info("Using existing patched PR review workspace: %s", target_path)
+            await cls._emit_progress(
+                progress_callback,
+                f"Reusing existing patched PR review workspace for commit {data.target_workspace.commit_hash[:8]}...",
+            )
             return target_workspace
 
         if target_path.is_symlink():
@@ -290,6 +296,10 @@ class ReviewPRTask(BaseLeanTask):
                     base_workspace_path,
                     target_path,
                 )
+            await cls._emit_progress(
+                progress_callback,
+                "Creating a writable PR review workspace from the cached Lean snapshot...",
+            )
             await cls._clone_workspace_with_hardlinks(base_workspace_path, target_path)
         elif existing_fingerprint and existing_fingerprint != patch_fingerprint:
             raise RuntimeError(
@@ -298,7 +308,15 @@ class ReviewPRTask(BaseLeanTask):
             )
 
         await asyncio.to_thread(cls._make_path_user_writable, target_path)
+        await cls._emit_progress(
+            progress_callback,
+            "Preparing changed files so the PR patch can be applied cleanly...",
+        )
         await cls._break_link_for_changed_files(target_path, data.changed_files)
+        await cls._emit_progress(
+            progress_callback,
+            "Applying the PR diff to the review workspace...",
+        )
         await cls._apply_pr_diff(target_path, data.pr_diff, logger=logger)
         await cls._write_patch_marker(
             marker_path,
@@ -321,6 +339,7 @@ class ReviewPRTask(BaseLeanTask):
         orchestrator_id: str,
         attempt_path: Optional[Path] = None,
         logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
     ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
         attempt_path, scratch_workspace, target_workspace, reference_workspaces = await super().setup_attempt(
             data=data,
@@ -328,6 +347,7 @@ class ReviewPRTask(BaseLeanTask):
             orchestrator_id=orchestrator_id,
             attempt_path=attempt_path,
             logger=logger,
+            progress_callback=progress_callback,
         )
 
         if target_workspace:
@@ -336,6 +356,7 @@ class ReviewPRTask(BaseLeanTask):
                     data=data,
                     target_workspace=target_workspace,
                     logger=logger,
+                    progress_callback=progress_callback,
                 )
             except Exception:
                 if logger:
@@ -446,6 +467,7 @@ class ReviewPRTask(BaseLeanTask):
 
         import aiofiles
 
+        await self.emit_progress("Writing PR review context files into the scratch workspace...")
         async with aiofiles.open(self.scratch_pr_diff_path, "w", encoding="utf-8") as f:
             await f.write(self.data.pr_diff or "")
         async with aiofiles.open(self.scratch_pr_context_path, "w", encoding="utf-8") as f:
@@ -456,6 +478,16 @@ class ReviewPRTask(BaseLeanTask):
             str(self.scratch_pr_context_path.resolve()),
         ]
         return logger
+
+    @staticmethod
+    async def _emit_progress(progress_callback, message: str) -> None:
+        """Emit a user-facing setup progress update when configured."""
+        if not progress_callback:
+            return
+
+        result = progress_callback(message)
+        if inspect.isawaitable(result):
+            await result
 
     async def create_user_prompt(self) -> str:
         """Create user prompt for PR review."""

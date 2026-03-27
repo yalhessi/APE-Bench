@@ -86,6 +86,77 @@ pip install -e .
 
 ## Quick Start
 
+### Interactive CLI
+
+Use the unified `ape` CLI for live interactive agent sessions in a local workspace:
+
+```bash
+# APE-Agent
+ape chat ape-agent --workspace .
+
+# Claude Code-backed session
+ape chat claude-code --workspace . --prompt "Inspect this Lean project"
+
+# Codex-backed session
+ape chat codex --workspace . --model gpt_5
+
+# Load interactive scaffold settings from YAML, then override selectively
+ape chat ape-agent --config configs/cli.yaml --workspace . llm_config.temperature=0.7
+```
+
+Use `ape task ...` when you want to run a registered task instead of a free-form workspace session:
+
+```bash
+# Show the registered tasks visible to the CLI
+ape task ape-agent
+
+# Run a built-in task and fill its fields interactively
+ape task ape-agent lean_pr_review
+
+# Load task-mode scaffold settings from YAML
+ape task ape-agent --config configs/cli.yaml lean_pr_review
+
+# Import a custom task module; its registered tasks become valid task names
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic
+
+# Run a specific benchmark task record
+ape task ape-agent \
+  --task-file inputs/proof_pr_review/mathlib_pr_review_10tasks.jsonl \
+  --task-index 0 \
+  lean_pr_review
+
+# Import a custom task module and run it from inline JSON
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}'
+```
+
+When you run `ape chat ...` or `ape task ...`, `--config` follows the same precedence as the batch
+scaffold entrypoints: explicit CLI flags and trailing `key=value` overrides win over YAML, which
+wins over Pydantic defaults.
+
+When you run `ape task ... <registered_task>` without `--task-file` or `--task-data-json`, the CLI
+inspects that task's Pydantic schema and prompts for each input field directly in the terminal. For
+nested task data such as `target_workspace`, the CLI walks the nested fields as well.
+
+`lean_pr_review` uses a friendlier interactive flow: the CLI only asks for the GitHub `pr_url` and
+the PR branch `commit`, then fills the remaining review task fields automatically from GitHub using
+the same retrieval logic as the PR review dataset builder.
+
+The scaffold-specific aliases remain available for compatibility:
+
+```bash
+apea --workspace .
+ape-claude --workspace .
+ape-codex --workspace .
+```
+
+These interactive commands are separate from the existing batch evaluation entrypoints such as
+`python -m ape.scaffolds.ape_agent.main ...`, which continue to work unchanged.
+
 Creating a custom task requires three components: **TaskData** (input), **Task** (logic), and **register_task** (registration).
 
 See `examples/arithmetic/task.py` for a complete minimal example.
@@ -631,6 +702,75 @@ pip install -e .
 ```
 
 ## 快速开始
+
+### 交互式 CLI
+
+使用统一的 `ape` CLI 在本地工作空间中启动交互式 agent 会话：
+
+```bash
+# APE-Agent
+ape chat ape-agent --workspace .
+
+# Claude Code 会话
+ape chat claude-code --workspace . --prompt "Inspect this Lean project"
+
+# Codex 会话
+ape chat codex --workspace . --model gpt_5
+
+# 从 YAML 加载交互式 scaffold 配置，并按需用命令行覆盖
+ape chat ape-agent --config configs/cli.yaml --workspace . llm_config.temperature=0.7
+```
+
+当你想运行一个已注册任务，而不是自由交互式工作空间会话时，可以使用 `ape task ...`：
+
+```bash
+# 显示当前 CLI 可见的已注册任务
+ape task ape-agent
+
+# 运行一个内置任务，并交互式填写字段
+ape task ape-agent lean_pr_review
+
+# 从 YAML 加载 task 模式下的 scaffold 配置
+ape task ape-agent --config configs/cli.yaml lean_pr_review
+
+# 导入自定义任务模块；其中注册的任务会成为可用任务名
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic
+
+# 运行一个基准任务记录
+ape task ape-agent \
+  --task-file inputs/proof_pr_review/mathlib_pr_review_10tasks.jsonl \
+  --task-index 0 \
+  lean_pr_review
+
+# 导入自定义任务模块并通过内联 JSON 运行
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}'
+```
+
+当你运行 `ape chat ...` 或 `ape task ...` 时，`--config` 与批量 scaffold 入口遵循相同的
+优先级：显式 CLI 参数和尾随 `key=value` 覆盖优先于 YAML，YAML 又优先于 Pydantic 默认值。
+
+当你运行 `ape task ... <registered_task>` 且不提供 `--task-file` 或 `--task-data-json`
+时，CLI 会读取该任务的 Pydantic schema，并在终端中逐项提示你填写输入字段。像
+`target_workspace` 这样的嵌套字段也会继续展开并逐项收集。
+
+`lean_pr_review` 提供了更友好的交互流程：CLI 只会询问 GitHub `pr_url` 和该 PR 分支上的
+`commit`，然后使用与 PR review 数据集构建相同的 GitHub 检索逻辑自动补全其余任务字段。
+
+兼容性别名仍然可用：
+
+```bash
+apea --workspace .
+ape-claude --workspace .
+ape-codex --workspace .
+```
+
+这些交互式命令与现有批量评测入口分离，例如
+`python -m ape.scaffolds.ape_agent.main ...`，后者保持不变。
 
 创建自定义任务需要三个组件：**TaskData**（输入）、**Task**（逻辑）、**register_task**（注册）。
 

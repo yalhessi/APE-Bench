@@ -60,7 +60,7 @@ class BaseScaffoldConfig(BaseModel):
     mcp_server_name: str = ""  # MCP server name prefix for tool name generation (e.g., "mcp__core__", "lean-research__"), empty means no prefix
 
     # Execution configuration
-    execution: ExecutionConfig = ExecutionConfig()
+    execution: ExecutionConfig = Field(default_factory=ExecutionConfig)
 
     # Task configuration
     task_config: Optional[BaseTaskConfig] = None
@@ -68,10 +68,10 @@ class BaseScaffoldConfig(BaseModel):
     task_config_overrides: Optional[Dict[str, Any]] = None
 
     # LLM configuration
-    llm_config: LLMConfig = LLMConfig()
+    llm_config: LLMConfig = Field(default_factory=LLMConfig)
 
     # Tools configuration
-    tools_config: BaseToolsConfig = BaseToolsConfig()
+    tools_config: BaseToolsConfig = Field(default_factory=BaseToolsConfig)
 
     # Runtime configuration (supports any RuntimeConfig subclass)
     # Uses Any to preserve actual type during serialization/deserialization

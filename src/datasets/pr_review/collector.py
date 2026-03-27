@@ -1354,6 +1354,234 @@ class PRReviewDataCollector:
         cache[key] = snapshot
         return snapshot
 
+    def build_record_for_pr_commit(
+        self,
+        pr_number: int,
+        snapshot_head_sha: str,
+        *,
+        pr_url: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Build a single PR review task record for a chosen PR head commit.
+
+        This reuses the same GitHub retrieval and review-round helpers as dataset
+        construction. If the requested commit matches one of the dataset-style
+        review rounds, that round record is returned. Otherwise, a best-effort
+        manual snapshot record is produced from the PR metadata and compare diff,
+        with `ground_truth=None`.
+        """
+        normalized_head_sha = str(snapshot_head_sha or "").strip()
+        if not normalized_head_sha:
+            raise ValueError("snapshot_head_sha must be non-empty")
+
+        pr = self.github_client.get_json(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/pulls/{pr_number}"
+        )
+        changed_files = self.github_client.paginate_json(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/pulls/{pr_number}/files"
+        )
+        changed_paths = [str(f.get("filename")) for f in changed_files if f.get("filename")]
+
+        reviews = self.github_client.paginate_json(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/pulls/{pr_number}/reviews"
+        )
+        issue_comments = self.github_client.paginate_json(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/issues/{pr_number}/comments"
+        )
+        review_comments = self.github_client.paginate_json(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/pulls/{pr_number}/comments"
+        )
+
+        pr_author = (pr.get("user") or {}).get("login")
+        maintainer_feedback = _collect_maintainer_feedback(
+            reviews=reviews,
+            issue_comments=issue_comments,
+            review_comments=review_comments,
+            explicit_maintainers=self.maintainers,
+            pr_author_login=pr_author,
+        )
+        author_feedback = _collect_author_feedback(
+            reviews=reviews,
+            issue_comments=issue_comments,
+            review_comments=review_comments,
+            pr_author_login=pr_author,
+        )
+
+        base_sha = (pr.get("base") or {}).get("sha")
+        if not base_sha:
+            raise ValueError(f"PR {pr_number} is missing base SHA")
+
+        final_pr_diff = self.github_client.get_text(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/pulls/{pr_number}",
+            accept="application/vnd.github.v3.diff",
+        )
+        final_head_sha = (pr.get("head") or {}).get("sha")
+        commit_payload = self.github_client.paginate_json(
+            f"/repos/{self.config.repo_owner}/{self.config.repo_name}/pulls/{pr_number}/commits"
+        )
+        pr_commits = _extract_pr_commits(commit_payload)
+
+        commit_lookup = {
+            str(commit.get("sha")).lower(): str(commit.get("sha"))
+            for commit in pr_commits
+            if commit.get("sha")
+        }
+        resolved_head_sha = commit_lookup.get(normalized_head_sha.lower())
+        if resolved_head_sha is None and final_head_sha and str(final_head_sha).lower() == normalized_head_sha.lower():
+            resolved_head_sha = str(final_head_sha)
+        if resolved_head_sha is None:
+            raise ValueError(f"Commit {normalized_head_sha} does not belong to PR {pr_number}")
+
+        snapshot_context = self._fetch_snapshot_context(
+            base_sha=str(base_sha),
+            head_sha=resolved_head_sha,
+            final_changed_paths=changed_paths,
+            final_pr_diff=final_pr_diff,
+            cache={},
+        )
+        ws_meta = _extract_workspace_metadata(
+            repo_url=self.config.repo_url,
+            base_sha=snapshot_context["base_sha"],
+            cache=self.workspace_cache,
+        )
+
+        review_events = _collect_review_events(
+            maintainer_feedback["reviews"],
+            decision_review_states=self.config.decision_review_states,
+            max_review_events_per_pr=self.config.max_review_events_per_pr,
+        )
+        issue_comment_anchor_events = _collect_comment_fallback_events(
+            maintainer_feedback,
+            max_review_events_per_pr=0,
+            include_issue_comments=True,
+            include_review_comments=False,
+        )
+        events = _merge_round_anchor_events(
+            review_events,
+            issue_comment_anchor_events,
+            max_review_events_per_pr=self.config.max_review_events_per_pr,
+        )
+
+        if not events and self.config.include_comment_only_rounds:
+            events = _collect_comment_fallback_events(
+                maintainer_feedback,
+                max_review_events_per_pr=self.config.max_review_events_per_pr,
+                include_issue_comments=False,
+                include_review_comments=True,
+            )
+
+        matching_records: List[Dict[str, Any]] = []
+        event_groups = _group_review_events(events) if events else []
+
+        def group_end_time(group: List[Dict[str, Any]]) -> Optional[str]:
+            times = [event.get("submitted_at") for event in group if event.get("submitted_at")]
+            return max(times) if times else None
+
+        def group_start_time(group: List[Dict[str, Any]]) -> Optional[str]:
+            times = [event.get("submitted_at") for event in group if event.get("submitted_at")]
+            return min(times) if times else None
+
+        for event_idx, event_group in enumerate(event_groups, 1):
+            event = event_group[-1]
+            event_cutoff_at = group_end_time(event_group)
+            previous_event_cutoff = group_end_time(event_groups[event_idx - 2]) if event_idx > 1 else None
+            next_group_start = group_start_time(event_groups[event_idx]) if event_idx < len(event_groups) else None
+            event_cutoff_at = _extend_round_end_with_followups(
+                maintainer_feedback,
+                review_events=event_group,
+                round_end_inclusive=event_cutoff_at,
+                next_group_start=next_group_start,
+            )
+
+            candidate_head_sha, candidate_head_sha_source = _select_snapshot_head_sha(
+                pr_commits,
+                review_commit_id=event.get("commit_id"),
+                cutoff_at=event_cutoff_at,
+                default_head_sha=final_head_sha,
+            )
+            if not candidate_head_sha or str(candidate_head_sha).lower() != resolved_head_sha.lower():
+                continue
+
+            feedback_snapshot = _build_round_feedback(
+                maintainer_feedback,
+                review_events=event_group,
+                round_start_exclusive=previous_event_cutoff,
+                round_end_inclusive=event_cutoff_at,
+            )
+            feedback_history_before_round = (
+                _slice_feedback_until(maintainer_feedback, previous_event_cutoff)
+                if previous_event_cutoff
+                else {"reviews": [], "issue_comments": [], "review_comments": []}
+            )
+            round_conversation = _build_round_conversation(
+                feedback_snapshot,
+                author_feedback=author_feedback,
+                review_events=event_group,
+                round_start_exclusive=previous_event_cutoff,
+                round_end_inclusive=event_cutoff_at,
+            )
+            round_window = {
+                "start_exclusive": previous_event_cutoff,
+                "end_inclusive": event_cutoff_at,
+            }
+            event_payload = {
+                **event,
+                "group_size": len(event_group),
+                "events": event_group,
+            }
+
+            matching_records.append(
+                _pr_to_task_record(
+                    config=self.config,
+                    pr=pr,
+                    changed_paths=snapshot_context["changed_paths"],
+                    pr_diff=snapshot_context["pr_diff"],
+                    maintainer_feedback=feedback_snapshot,
+                    workspace_metadata=ws_meta,
+                    snapshot_type="review_event",
+                    snapshot_at=event_cutoff_at,
+                    snapshot_base_sha=snapshot_context["base_sha"],
+                    snapshot_head_sha=resolved_head_sha,
+                    snapshot_head_sha_source=candidate_head_sha_source,
+                    snapshot_diff_source=snapshot_context["snapshot_diff_source"],
+                    review_event=event_payload,
+                    allow_merge_outcome_fallback=False,
+                    round_index=event_idx,
+                    round_window=round_window,
+                    feedback_history_before_round=feedback_history_before_round,
+                    round_conversation=round_conversation,
+                )
+            )
+
+        if matching_records:
+            return matching_records[-1]
+
+        empty_feedback = {
+            "reviews": [],
+            "issue_comments": [],
+            "review_comments": [],
+        }
+        manual_record = _pr_to_task_record(
+            config=self.config,
+            pr=pr,
+            changed_paths=snapshot_context["changed_paths"],
+            pr_diff=snapshot_context["pr_diff"],
+            maintainer_feedback=empty_feedback,
+            workspace_metadata=ws_meta,
+            snapshot_type="manual_commit",
+            snapshot_at=None,
+            snapshot_base_sha=snapshot_context["base_sha"],
+            snapshot_head_sha=resolved_head_sha,
+            snapshot_head_sha_source="manual_input",
+            snapshot_diff_source=snapshot_context["snapshot_diff_source"],
+            review_event=None,
+            allow_merge_outcome_fallback=False,
+            round_conversation=[],
+        )
+        manual_record["task_id"] = f"mathlib_pr_review_{pr_number}_{resolved_head_sha[:12]}"
+        manual_record["ground_truth"] = None
+        manual_record["pr_url"] = pr_url or pr.get("html_url")
+        return manual_record
+
     def collect_records(self) -> List[Dict[str, Any]]:
         records: List[Dict[str, Any]] = []
         pr_numbers = self._collect_pr_numbers()

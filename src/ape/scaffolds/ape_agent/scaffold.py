@@ -53,11 +53,18 @@ class ApeAgentScaffold(BaseScaffold):
         oneshot_mode: bool = False
     ) -> None:
         """Convenience entry point for CLI mode."""
+        async def termination_callback(_result) -> None:
+            """Stop the interactive conversation when a task submits a final result."""
+            if self.conversation_manager is not None:
+                self.conversation_manager.request_stop()
+                if self.logger:
+                    self.logger.info("[ApeAgentScaffold] Interactive task submitted a result; stopping session")
+
         task._cli_initial_prompt = initial_prompt
         task._cli_oneshot_mode = oneshot_mode
         await self.solve(
             task=task,
-            termination_callback=lambda x: None,
+            termination_callback=termination_callback,
             orchestrator_id="cli",
             attempt_path=None,
             cost_limit=None
@@ -65,6 +72,7 @@ class ApeAgentScaffold(BaseScaffold):
 
     async def _setup_components(self) -> None:
         """Set up ApeAgent-specific components."""
+        await self._emit_progress("Initializing APE Agent conversation manager...")
         if self.is_cli_mode:
             from .cli.ui.confirmation import UserConfirmationBridge
             self.console = Console()
@@ -81,6 +89,7 @@ class ApeAgentScaffold(BaseScaffold):
         )
         await self.conversation_manager.initialize()
 
+        await self._emit_progress("Registering tools and starting the in-process MCP server...")
         await self._setup_tools()
         self.conversation_session = None
 
@@ -246,7 +255,7 @@ class ApeAgentScaffold(BaseScaffold):
             await self.conversation_manager.run_conversation(
                 prompt=initial_prompt,
                 mcp_instance=self.mcp_manager.get_client(),
-                force_tool_use=False,
+                force_tool_use=getattr(self.task, "_cli_force_tool_use", False),
                 streaming=True,
                 streaming_callback=streaming_callback,
                 user_input_callback=user_input_callback if not oneshot_mode else None

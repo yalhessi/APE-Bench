@@ -9,8 +9,9 @@ Key Design:
 - Symlinks allow uniform path access (e.g., 'target/', 'reference/<name>/') regardless of where repos are stored
 """
 
+import inspect
 import traceback
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING, Callable, Any
 from pathlib import Path
 from pydantic import Field
 
@@ -68,7 +69,8 @@ class BaseLeanTask(BaseTask):
         config: 'BaseScaffoldConfig',
         orchestrator_id: str,
         attempt_path: Optional[Path] = None,
-        logger: Optional['logging.LoggerAdapter'] = None
+        logger: Optional['logging.LoggerAdapter'] = None,
+        progress_callback: Optional[Callable[[str], Any]] = None,
     ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
         """Setup attempt with Lean workspaces (class method).
 
@@ -89,18 +91,28 @@ class BaseLeanTask(BaseTask):
         """
         # Call parent setup to create basic structure (logs/, conversations/, workspaces/scratch/)
         attempt_path, scratch_workspace, _, _ = await super().setup_attempt(
-            data, config, orchestrator_id, attempt_path, logger
+            data,
+            config,
+            orchestrator_id,
+            attempt_path,
+            logger,
+            progress_callback,
         )
 
         # Calculate workspaces_dir (classmethod cannot access self)
         workspaces_dir = attempt_path / config.workspaces_dir_name
 
         # Setup target workspace symlink (required for Lean tasks)
+        await cls._emit_progress(
+            progress_callback,
+            f"Resolving target Lean workspace {data.target_workspace.name}@{data.target_workspace.commit_hash[:8]}...",
+        )
         target_workspace = await cls._setup_workspace_symlink(
             workspace_spec=data.target_workspace,
             link_path=workspaces_dir / "target",
             config=config,
-            logger=logger
+            logger=logger,
+            progress_callback=progress_callback,
         )
 
         # Setup reference workspace symlinks (optional)
@@ -111,11 +123,16 @@ class BaseLeanTask(BaseTask):
             ref_base_dir.mkdir(parents=True, exist_ok=True)
 
             for ref_ws in data.reference_workspaces:
+                await cls._emit_progress(
+                    progress_callback,
+                    f"Resolving reference Lean workspace {ref_ws.name}@{ref_ws.commit_hash[:8]}...",
+                )
                 linked_ref = await cls._setup_workspace_symlink(
                     workspace_spec=ref_ws,
                     link_path=ref_base_dir / ref_ws.name,
                     config=config,
-                    logger=logger
+                    logger=logger,
+                    progress_callback=progress_callback,
                 )
                 reference_workspaces.append(linked_ref)
 
@@ -127,7 +144,8 @@ class BaseLeanTask(BaseTask):
         workspace_spec: WorkspaceInfo,
         link_path: Path,
         config: 'BaseScaffoldConfig',
-        logger: Optional['logging.LoggerAdapter'] = None
+        logger: Optional['logging.LoggerAdapter'] = None,
+        progress_callback: Optional[Callable[[str], Any]] = None,
     ) -> WorkspaceInfo:
         """Setup a workspace symlink (class method).
 
@@ -171,7 +189,8 @@ class BaseLeanTask(BaseTask):
             commit_hash=workspace_spec.commit_hash,
             repo_url=workspace_spec.repo_url,
             config=config,
-            logger=logger
+            logger=logger,
+            progress_callback=progress_callback,
         )
 
         # Create symlink (remove existing symlink or file if present)
@@ -194,7 +213,8 @@ class BaseLeanTask(BaseTask):
         commit_hash: str,
         repo_url: Optional[str] = None,
         config: Optional['BaseScaffoldConfig'] = None,
-        logger: Optional['logging.LoggerAdapter'] = None
+        logger: Optional['logging.LoggerAdapter'] = None,
+        progress_callback: Optional[Callable[[str], Any]] = None,
     ) -> Path:
         """Resolve commit_hash to actual Lean workspace path via RestoreManager (class method).
 
@@ -220,7 +240,17 @@ class BaseLeanTask(BaseTask):
             if logger:
                 logger.info(f"Resolving Lean workspace: {repo_name}@{commit_hash}")
 
-            restore_manager = RestoreManager(verify_config, logger, resolved_url)
+            await cls._emit_progress(
+                progress_callback,
+                f"Checking cached Lean workspace for {repo_name}@{commit_hash[:8]}...",
+            )
+
+            restore_manager = RestoreManager(
+                verify_config,
+                logger,
+                resolved_url,
+                progress_callback=progress_callback,
+            )
             workspace_path = await restore_manager.get_workspace(commit_hash)
 
             if not workspace_path:
@@ -238,3 +268,16 @@ class BaseLeanTask(BaseTask):
             raise RuntimeError(
                 f"Cannot resolve Lean workspace for commit {commit_hash}: {e}"
             ) from e
+
+    @staticmethod
+    async def _emit_progress(
+        progress_callback: Optional[Callable[[str], Any]],
+        message: str,
+    ) -> None:
+        """Emit a user-facing progress update when configured."""
+        if not progress_callback:
+            return
+
+        result = progress_callback(message)
+        if inspect.isawaitable(result):
+            await result

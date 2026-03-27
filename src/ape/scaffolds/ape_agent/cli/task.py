@@ -7,6 +7,7 @@ Remove outdated Evaluator design, inline evaluation logic into submit_result too
 
 from typing import Dict, Any, Optional, TYPE_CHECKING, Literal
 from pathlib import Path
+from pydantic import Field
 
 # import task base class
 from ape.tasks.base import BaseTask, BaseTaskData, BaseTaskConfig, register_task, BaseTaskResult, EvaluationResult

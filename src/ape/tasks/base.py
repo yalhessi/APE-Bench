@@ -14,6 +14,7 @@ The task system supports automatic attempt path management, environment setup,
 and result aggregation for batch execution scenarios.
 """
 
+import inspect
 from typing import Dict, Any, List, TYPE_CHECKING, Optional, Callable, Awaitable
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
@@ -201,11 +202,21 @@ class BaseTask:
         self.reference_workspaces: Optional[List[WorkspaceInfo]] = None
         self.logger: Optional['logging.LoggerAdapter'] = None
         self.termination_callback: Optional[Callable[['BaseTaskResult'], Awaitable[None]]] = None
+        self.progress_callback: Optional[Callable[[str], Any]] = None
 
         if self.data.task_type != self.task_type:
             raise ValueError(
                 f"Task data type '{self.data.task_type}' does not match task class type '{self.task_type}'"
             )
+
+    async def emit_progress(self, message: str) -> None:
+        """Emit a user-facing progress message when a callback is available."""
+        if not self.progress_callback:
+            return
+
+        result = self.progress_callback(message)
+        if inspect.isawaitable(result):
+            await result
 
     async def setup(
         self,
@@ -225,6 +236,7 @@ class BaseTask:
         """
         try:
             self.is_cli_mode = (orchestrator_id == "cli")
+            await self.emit_progress(f"Preparing task workspace for {self.task_type}...")
 
             # Ensure attempt_path exists (unified handling for both orchestrator and CLI modes)
             attempt_path = await self.__class__._ensure_attempt_path(
@@ -249,7 +261,8 @@ class BaseTask:
                 config=self.config,
                 orchestrator_id=orchestrator_id,
                 attempt_path=attempt_path,
-                logger=self.logger
+                logger=self.logger,
+                progress_callback=self.progress_callback,
             )
 
             # Set instance variables
@@ -279,7 +292,8 @@ class BaseTask:
         config: 'BaseScaffoldConfig',
         orchestrator_id: str,
         attempt_path: Optional[Path] = None,
-        logger: Optional['logging.LoggerAdapter'] = None
+        logger: Optional['logging.LoggerAdapter'] = None,
+        progress_callback: Optional[Callable[[str], Any]] = None,
     ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
         """Setup attempt directory structure (class method).
 
@@ -618,3 +632,8 @@ def create_task_config_for_type(task_type: str, **overrides) -> 'BaseTaskConfig'
     """
     task_class = get_task_class(task_type)
     return task_class.task_config_class.model_validate(overrides)
+
+
+def list_task_types() -> List[str]:
+    """Return registered task types in sorted order."""
+    return sorted(_tasks.keys())

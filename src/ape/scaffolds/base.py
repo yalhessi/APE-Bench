@@ -6,6 +6,7 @@ common setup, execution, and cleanup workflows.
 """
 
 import asyncio
+import inspect
 import traceback
 from abc import ABC, abstractmethod
 from typing import Dict, Any, TYPE_CHECKING, Optional, Callable, Type
@@ -78,6 +79,16 @@ class BaseScaffold(ABC):
         self.is_cli_mode: bool = False
         self.cost_limit: Optional[float] = None
         self._termination_reason: Optional[ScaffoldTerminationReason] = None
+        self.progress_callback: Optional[Callable[[str], Any]] = None
+
+    async def _emit_progress(self, message: str) -> None:
+        """Emit a user-facing setup progress message when configured."""
+        if not self.progress_callback:
+            return
+
+        result = self.progress_callback(message)
+        if inspect.isawaitable(result):
+            await result
         
     
     async def solve(
@@ -159,7 +170,11 @@ class BaseScaffold(ABC):
             attempt_path: Preset workspace path for attempt.
         """
         try:
+            if self.task is not None:
+                self.task.progress_callback = self.progress_callback
+
             # 1. Task setup (creates workspaces and logging)
+            await self._emit_progress("Starting session setup...")
             self.logger = await self.task.setup(
                 termination_callback,
                 orchestrator_id,
@@ -176,7 +191,9 @@ class BaseScaffold(ABC):
             )
 
             # 2. Scaffold components setup
+            await self._emit_progress("Initializing agent runtime...")
             await self._setup_components()
+            await self._emit_progress("Setup complete. Starting session...")
             self.logger.debug(f"{self.__class__.__name__} components setup completed")
 
         except Exception as e:
