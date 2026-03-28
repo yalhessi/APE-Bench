@@ -266,7 +266,8 @@ def build_skills_section(
 
     lines = [
         "<AVAILABLE_SKILLS>",
-        "Managed skills are available for this task. Review the index first, then call `read_skill` only when a skill looks relevant.",
+        "Managed skills are available for this task. If a skill name or description directly matches the task, consult it before making domain-specific judgments.",
+        "Review the index first, then call `read_skill` for the relevant skill when you need its instructions or references.",
         "",
     ]
 

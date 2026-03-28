@@ -40,6 +40,61 @@ DEFAULT_REVIEW_ISSUE_TAGS = [
     "style_or_readability",
 ]
 
+GUIDE_TOPIC_FILE_MAP: dict[str, tuple[str, ...]] = {
+    "review_norms": (
+        "references/pr-review-guide-reviewer.md",
+        "references/pr-review-guide-official.md",
+    ),
+    "naming": (
+        "references/naming-conventions-reviewer.md",
+        "references/naming-conventions-official.md",
+    ),
+    "documentation": (
+        "references/documentation-style-reviewer.md",
+        "references/documentation-style-official.md",
+    ),
+    "style": (
+        "references/style-guidelines-reviewer.md",
+        "references/style-guidelines-official.md",
+    ),
+    "pr_metadata": (
+        "references/commit-conventions-reviewer.md",
+        "references/commit-conventions-official.md",
+    ),
+    "git_workflow": (
+        "references/git-guide-reviewer.md",
+        "references/git-guide-official.md",
+    ),
+    "branches_ci": (
+        "references/tags-and-branches-reviewer.md",
+        "references/tags-and-branches-official.md",
+    ),
+}
+
+GUIDE_TOPIC_DESCRIPTIONS: dict[str, str] = {
+    "review_norms": "merge readiness, blocking vs advisory, and general PR review posture",
+    "naming": "declaration naming, theorem statement shape, dot notation, and namespace choices",
+    "documentation": "docstrings, module headers, comments, citations, and proof explanations",
+    "style": "imports, API design, attributes, deprecations, formatting, and library integration style",
+    "pr_metadata": "PR title, PR description, and history-facing metadata conventions",
+    "git_workflow": "fork/remote/rebase workflow and contributor git process",
+    "branches_ci": "toolchains, CI branches, bors, and nightly-testing branch conventions",
+}
+
+DEFAULT_SKILLED_REVIEW_REQUIRED_TOPICS: tuple[str, ...] = (
+    "review_norms",
+    "naming",
+    "documentation",
+    "style",
+)
+
+DEFAULT_SKILLED_REVIEW_BOOTSTRAP_PATHS: tuple[str, ...] = (
+    "references/pr-review-guide-reviewer.md",
+    "references/naming-conventions-reviewer.md",
+    "references/documentation-style-reviewer.md",
+    "references/style-guidelines-reviewer.md",
+)
+
 
 class ReviewPRConfig(BaseTaskConfig):
     """Configuration for Lean PR review tasks."""
@@ -105,6 +160,15 @@ class ReviewPRData(BaseLeanTaskData):
     )
 
 
+class SkilledReviewPRData(ReviewPRData):
+    """Data model for skill-targeted Lean PR review tasks."""
+
+    task_type: Literal["skilled_pr_review"] = Field(
+        default="skilled_pr_review",
+        description="Task type identifier",
+    )
+
+
 class ReviewPRResult(BaseTaskResult):
     """Result model for Lean PR review tasks."""
 
@@ -113,6 +177,10 @@ class ReviewPRResult(BaseTaskResult):
     merge_ready: bool = Field(..., description="Predicted merge readiness")
     blocking_issue_tags: List[str] = Field(default_factory=list, description="Predicted blocking issue tags")
     advisory_issue_tags: List[str] = Field(default_factory=list, description="Predicted advisory issue tags")
+    guide_evidence_topics: List[str] = Field(
+        default_factory=list,
+        description="Guide-topic evidence declared with the submission",
+    )
     feedback: str = Field(..., description="Submitted review feedback")
     review_data: Dict[str, Any] = Field(default_factory=dict, description="Detailed review/evaluation data")
 
@@ -125,6 +193,262 @@ class ReviewPRTask(BaseLeanTask):
     task_config_class = ReviewPRConfig
     task_result_class = ReviewPRResult
     patch_marker_filename = ".ape_pr_review_patch.json"
+
+    def _get_required_skill_name(self) -> str:
+        """Return the preferred managed skill name for this task, if configured."""
+        task_config = getattr(self.config, "task_config", None)
+        required_skill_name = getattr(task_config, "required_skill_name", None)
+        if isinstance(required_skill_name, str) and required_skill_name.strip():
+            return required_skill_name.strip()
+        return "mathlib-pr-review"
+
+    def _get_relevant_managed_skills(self) -> tuple[Any, ...]:
+        """Return managed skills that look relevant to Mathlib PR review."""
+        from ape.scaffolds.skills import get_task_managed_skills
+
+        managed_skills = get_task_managed_skills(self)
+        if not managed_skills or not managed_skills.skills:
+            return ()
+
+        required_skill_name = self._get_required_skill_name().lower()
+        required_skill_slug = required_skill_name.replace(" ", "-")
+        return tuple(
+            skill
+            for skill in managed_skills.skills
+            if skill.name.strip().lower() == required_skill_name
+            or skill.skill_id.startswith(f"{required_skill_slug}-")
+            or "mathlib" in skill.name.lower()
+            or "mathlib" in skill.description.lower()
+            or ("pull request" in skill.description.lower() and "review" in skill.description.lower())
+        )
+
+    def _build_managed_skill_guidance(self) -> str:
+        """Return task-specific prompt guidance about managed skills."""
+        return ""
+
+    def _build_submit_tool_description(self) -> str:
+        """Return the task-specific description for `submit_result`."""
+        return (
+            "Submit your final PR review decision.\n\n"
+            "Provide:\n"
+            "- merge_ready: whether the PR is ready to merge\n"
+            "- blocking_issue_tags: blocking issues preventing merge\n"
+            "- advisory_issue_tags: non-blocking suggestions\n"
+            "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
+            "- feedback: concise, evidence-based reviewer feedback\n\n"
+            "You must call this tool to finish the task."
+        )
+
+    def _get_skill_tool_usage(self) -> dict[str, int]:
+        """Return tracked managed-skill tool usage counts for this task."""
+        usage = getattr(self, "_managed_skill_tool_usage", None)
+        if not isinstance(usage, dict):
+            return {"list_skills": 0, "read_skill": 0}
+        return {
+            "list_skills": int(usage.get("list_skills", 0) or 0),
+            "read_skill": int(usage.get("read_skill", 0) or 0),
+        }
+
+    def _get_skill_read_records(self) -> tuple[tuple[str, str], ...]:
+        """Return ordered `(skill_id, relative_path)` pairs read via `read_skill`."""
+        usage = getattr(self, "_managed_skill_tool_usage", None)
+        if not isinstance(usage, dict):
+            return ()
+
+        records = usage.get("read_skill_records", [])
+        if not isinstance(records, list):
+            return ()
+
+        normalized_records: list[tuple[str, str]] = []
+        for record in records:
+            if not isinstance(record, dict):
+                continue
+            skill_id = str(record.get("skill_id") or "").strip()
+            relative_path = str(record.get("relative_path") or "SKILL.md").strip() or "SKILL.md"
+            if not skill_id:
+                continue
+            normalized_records.append((skill_id, relative_path))
+        return tuple(normalized_records)
+
+    def _get_skill_read_relative_paths(self) -> tuple[str, ...]:
+        """Return ordered unique relative paths read from managed skills."""
+        ordered_paths: list[str] = []
+        seen: set[str] = set()
+        for _skill_id, relative_path in self._get_skill_read_records():
+            if relative_path in seen:
+                continue
+            seen.add(relative_path)
+            ordered_paths.append(relative_path)
+        return tuple(ordered_paths)
+
+    @staticmethod
+    def _normalize_guide_topic(topic: str) -> str:
+        normalized = topic.strip().lower()
+        normalized = re.sub(r"[\s\-]+", "_", normalized)
+        normalized = re.sub(r"[^a-z0-9_]", "", normalized)
+        return normalized
+
+    def _normalize_guide_topics(self, topics: Optional[List[str]]) -> List[str]:
+        if not topics:
+            return []
+        normalized: List[str] = []
+        seen: Set[str] = set()
+        for topic in topics:
+            n = self._normalize_guide_topic(topic)
+            if not n or n in seen:
+                continue
+            seen.add(n)
+            normalized.append(n)
+        return normalized
+
+    def _get_required_guide_evidence_topics(self) -> tuple[str, ...]:
+        """Return guide topics that every skilled review submission must declare."""
+        task_config = getattr(self.config, "task_config", None)
+        configured_topics = getattr(task_config, "required_guide_evidence_topics", None)
+        if not configured_topics:
+            return ()
+
+        return tuple(self._normalize_guide_topics(list(configured_topics)))
+
+    def _get_required_guide_bootstrap_paths(self) -> tuple[str, ...]:
+        """Return guide reference files that must be read before final submission."""
+        task_config = getattr(self.config, "task_config", None)
+        configured_paths = getattr(task_config, "required_guide_bootstrap_paths", None)
+        if not configured_paths:
+            return ()
+
+        normalized_paths: list[str] = []
+        seen: set[str] = set()
+        for path in configured_paths:
+            normalized_path = str(path or "").strip()
+            if not normalized_path or normalized_path in seen:
+                continue
+            seen.add(normalized_path)
+            normalized_paths.append(normalized_path)
+        return tuple(normalized_paths)
+
+    def _infer_guide_topics_from_submission(
+        self,
+        *,
+        blocking_issue_tags: Optional[List[str]] = None,
+        advisory_issue_tags: Optional[List[str]] = None,
+        feedback: str = "",
+    ) -> Set[str]:
+        """Infer guide topics that the submission appears to rely on."""
+        inferred: Set[str] = set()
+        normalized_tags = set(self._normalize_tag_list((blocking_issue_tags or []) + (advisory_issue_tags or [])))
+        feedback_lower = (feedback or "").lower()
+
+        if "insufficient_documentation" in normalized_tags:
+            inferred.add("documentation")
+        if normalized_tags & {"library_integration_issue", "deprecated_api_usage", "performance_regression"}:
+            inferred.add("style")
+
+        if any(
+            needle in feedback_lower
+            for needle in (
+                "docstring",
+                "docstrings",
+                "documentation",
+                "module header",
+                "proof sketch",
+                "citation",
+                "citations",
+                "comment this proof",
+                "comment explaining",
+            )
+        ):
+            inferred.add("documentation")
+
+        if any(
+            needle in feedback_lower
+            for needle in (
+                "naming",
+                "rename",
+                "renaming",
+                "theorem name",
+                "declaration name",
+                "namespace",
+                "dot notation",
+                "camelcase",
+                "snake_case",
+            )
+        ):
+            inferred.add("naming")
+
+        if any(
+            needle in feedback_lower
+            for needle in (
+                "style",
+                "readability",
+                "import",
+                "api",
+                "attribute",
+                "attributes",
+                "deprecated",
+                "deprecation",
+                "nonrec",
+                "@[simp]",
+                "@[ext]",
+                "formatter",
+                "tactic",
+                "library integration",
+            )
+        ):
+            inferred.add("style")
+
+        if any(
+            needle in feedback_lower
+            for needle in (
+                "pr title",
+                "pr description",
+                "title and description",
+                "permanent git history",
+                "commit message",
+                "metadata",
+            )
+        ):
+            inferred.add("pr_metadata")
+
+        if any(
+            needle in feedback_lower
+            for needle in (
+                "upstream remote",
+                "fork workflow",
+                "git checkout",
+                "git fetch",
+                "rebase onto",
+                "local remote",
+            )
+        ):
+            inferred.add("git_workflow")
+
+        if any(
+            needle in feedback_lower
+            for needle in (
+                "bors",
+                "toolchain",
+                "nightly-with-mathlib",
+                "nightly-testing",
+                "lean-pr-testing",
+                "ci branch",
+            )
+        ):
+            inferred.add("branches_ci")
+
+        return inferred
+
+    def _validate_submission_prerequisites(
+        self,
+        *,
+        merge_ready: bool,
+        blocking_issue_tags: List[str],
+        advisory_issue_tags: List[str],
+        feedback: str,
+        guide_evidence_topics: Optional[List[str]] = None,
+    ) -> Optional[str]:
+        """Return an error message when submit_result should be rejected."""
+        return None
 
     @classmethod
     def _patch_fingerprint(cls, data: ReviewPRData) -> str:
@@ -526,6 +850,7 @@ class ReviewPRTask(BaseLeanTask):
 
         return LEAN_PR_REVIEW_USER_PROMPT.format(
             submit_tool_name=submit_tool_name,
+            managed_skill_guidance=self._build_managed_skill_guidance(),
             pr_display=pr_display,
             pr_title=self.data.pr_title,
             pr_author=self.data.pr_author or "unknown",
@@ -545,15 +870,7 @@ class ReviewPRTask(BaseLeanTask):
         from pydantic import Field
 
         @mcp.tool(
-            description=(
-                "Submit your final PR review decision.\n\n"
-                "Provide:\n"
-                "- merge_ready: whether the PR is ready to merge\n"
-                "- blocking_issue_tags: blocking issues preventing merge\n"
-                "- advisory_issue_tags: non-blocking suggestions\n"
-                "- feedback: concise, evidence-based reviewer feedback\n\n"
-                "You must call this tool to finish the task."
-            )
+            description=self._build_submit_tool_description()
         )
         async def submit_result(
             merge_ready: Annotated[bool, Field(description="True if PR is ready to merge, else False")],
@@ -564,6 +881,14 @@ class ReviewPRTask(BaseLeanTask):
                 description="Advisory issue tags (non-blocking).",
                 default=None,
             )] = None,
+            guide_evidence_topics: Annotated[Optional[List[str]], Field(
+                description=(
+                    "Guide-topic evidence used in the review. "
+                    "Use keys such as `review_norms`, `naming`, `documentation`, `style`, "
+                    "`pr_metadata`, `git_workflow`, and `branches_ci`."
+                ),
+                default=None,
+            )] = None,
             feedback: Annotated[str, Field(
                 description="Final reviewer feedback with key evidence.",
             )] = "",
@@ -571,10 +896,29 @@ class ReviewPRTask(BaseLeanTask):
             """Submit PR review for evaluation and termination."""
             self.logger.info("Tool submit_result: execution started")
             try:
+                blocked_reason = self._validate_submission_prerequisites(
+                    merge_ready=merge_ready,
+                    blocking_issue_tags=blocking_issue_tags,
+                    advisory_issue_tags=advisory_issue_tags or [],
+                    feedback=feedback,
+                    guide_evidence_topics=guide_evidence_topics or [],
+                )
+                if blocked_reason:
+                    self.logger.info("Tool submit_result: rejected by task prerequisites")
+                    return {
+                        "evaluation_result": EvaluationResult(
+                            success=False,
+                            score=0.0,
+                            message=blocked_reason,
+                        ),
+                        "message": blocked_reason,
+                    }
+
                 evaluation_result, review_data, custom_metrics = self._evaluate_review(
                     merge_ready=merge_ready,
                     blocking_issue_tags=blocking_issue_tags,
                     advisory_issue_tags=advisory_issue_tags or [],
+                    guide_evidence_topics=guide_evidence_topics or [],
                     feedback=feedback,
                 )
 
@@ -585,6 +929,7 @@ class ReviewPRTask(BaseLeanTask):
                         merge_ready=merge_ready,
                         blocking_issue_tags=review_data.get("predicted", {}).get("blocking_issue_tags", []),
                         advisory_issue_tags=review_data.get("predicted", {}).get("advisory_issue_tags", []),
+                        guide_evidence_topics=review_data.get("predicted", {}).get("guide_evidence_topics", []),
                         feedback=feedback,
                         review_data=review_data,
                         custom_metrics=custom_metrics,
@@ -617,12 +962,14 @@ class ReviewPRTask(BaseLeanTask):
         merge_ready: bool,
         blocking_issue_tags: List[str],
         advisory_issue_tags: List[str],
+        guide_evidence_topics: List[str],
         feedback: str,
     ) -> Tuple[EvaluationResult, Dict[str, Any], Optional[Dict[str, float]]]:
         task_config: ReviewPRConfig = self.config.task_config
 
         normalized_blocking = self._normalize_tag_list(blocking_issue_tags)
         normalized_advisory = self._normalize_tag_list(advisory_issue_tags)
+        normalized_guide_topics = self._normalize_guide_topics(guide_evidence_topics)
         allowed_tags = {self._normalize_issue_tag(tag) for tag in task_config.allowed_issue_tags}
 
         unknown_tags = sorted(
@@ -646,6 +993,8 @@ class ReviewPRTask(BaseLeanTask):
             "merge_ready": merge_ready,
             "blocking_issue_tags": normalized_blocking,
             "advisory_issue_tags": normalized_advisory,
+            "guide_evidence_topics": normalized_guide_topics,
+            "read_skill_relative_paths": list(self._get_skill_read_relative_paths()),
             "unknown_tags": unknown_tags,
             "feedback_length": len(feedback or ""),
         }
@@ -771,6 +1120,7 @@ class ReviewPRTask(BaseLeanTask):
         merge_ready: bool,
         blocking_issue_tags: List[str],
         advisory_issue_tags: List[str],
+        guide_evidence_topics: List[str],
         feedback: str,
         review_data: Dict[str, Any],
         **kwargs,
@@ -784,6 +1134,7 @@ class ReviewPRTask(BaseLeanTask):
             merge_ready=merge_ready,
             blocking_issue_tags=blocking_issue_tags,
             advisory_issue_tags=advisory_issue_tags,
+            guide_evidence_topics=guide_evidence_topics,
             feedback=feedback,
             review_data=review_data,
             **kwargs,
@@ -794,4 +1145,212 @@ class ReviewPRTask(BaseLeanTask):
         return bool(evaluation_result and evaluation_result.success)
 
 
+class SkilledReviewPRConfig(ReviewPRConfig):
+    """Configuration for skill-targeted Lean PR review tasks."""
+
+    required_skill_name: str = "mathlib-pr-review"
+    require_read_skill_before_submit: bool = True
+    required_guide_evidence_topics: List[str] = Field(
+        default_factory=lambda: list(DEFAULT_SKILLED_REVIEW_REQUIRED_TOPICS)
+    )
+    required_guide_bootstrap_paths: List[str] = Field(
+        default_factory=lambda: list(DEFAULT_SKILLED_REVIEW_BOOTSTRAP_PATHS)
+    )
+
+
+class SkilledReviewPRTask(ReviewPRTask):
+    """Skill-targeted Lean PR review task implementation."""
+
+    task_type = "skilled_pr_review"
+    data_class = SkilledReviewPRData
+    task_config_class = SkilledReviewPRConfig
+    task_result_class = ReviewPRResult
+
+    def _build_submit_tool_description(self) -> str:
+        bootstrap_paths = self._get_required_guide_bootstrap_paths()
+        required_topics = self._get_required_guide_evidence_topics()
+        bootstrap_lines = "\n".join(f"  - `{path}`" for path in bootstrap_paths)
+        required_topic_text = ", ".join(f"`{topic}`" for topic in required_topics)
+        return (
+            "Submit your final PR review decision.\n\n"
+            "FINAL-ONLY TOOL: do not call this tool to discover missing prerequisites.\n"
+            "Call it once, at the end, after you have:\n"
+            "1. Read the required guide bootstrap files via `read_skill`\n"
+            f"{bootstrap_lines}\n"
+            "2. Inspected the PR and surrounding code.\n"
+            f"3. Prepared `guide_evidence_topics` covering at least {required_topic_text}.\n\n"
+            "Provide:\n"
+            "- merge_ready: whether the PR is ready to merge\n"
+            "- blocking_issue_tags: blocking issues preventing merge\n"
+            "- advisory_issue_tags: non-blocking suggestions\n"
+            "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
+            "- feedback: concise, evidence-based reviewer feedback grounded in the guides you read\n\n"
+            "If the guide bootstrap is incomplete, continue reviewing instead of calling this tool."
+        )
+
+    def _build_managed_skill_guidance(self) -> str:
+        required_skill_name = self._get_required_skill_name()
+        relevant_skills = self._get_relevant_managed_skills()
+        bootstrap_paths = self._get_required_guide_bootstrap_paths()
+        required_topics = self._get_required_guide_evidence_topics()
+        required_topic_lines = "\n".join(f"- `{topic}`" for topic in required_topics)
+        topic_lines = "\n".join(
+            f"- `{topic}`: read one of {', '.join(f'`{path}`' for path in GUIDE_TOPIC_FILE_MAP[topic])}"
+            for topic in GUIDE_TOPIC_FILE_MAP
+        )
+        bootstrap_lines = "\n".join(
+            f"{index}. `read_skill(..., relative_path=\"{path}\")`"
+            for index, path in enumerate(bootstrap_paths, start=1)
+        )
+        if not relevant_skills:
+            return (
+                "<managed_skill_guidance>\n"
+                f"This task variant is designed to use the managed `{required_skill_name}` skill.\n"
+                "If no relevant managed skill is available, the run configuration is invalid.\n"
+                "</managed_skill_guidance>\n"
+            )
+
+        skill_list = "\n".join(
+            f"- `{skill.name}` (`{skill.skill_id}`): {skill.description}"
+            for skill in relevant_skills
+        )
+        return (
+            "<managed_skill_guidance>\n"
+            "This is the skill-targeted PR review task variant.\n"
+            "Complete this workflow in order. Do not form a final judgment or call `submit_result` "
+            "until the guide bootstrap is complete.\n"
+            "Guide bootstrap for every `skilled_pr_review` run:\n"
+            f"{bootstrap_lines}\n"
+            "After the bootstrap, inspect the PR code and use the guides as the only source for quality "
+            "judgments such as merge-readiness posture, naming, documentation quality, and style policy. "
+            "Code inspection tells you what the PR does; the guides tell you how to judge it.\n"
+            "In `submit_result`, include `guide_evidence_topics` listing the guide topics that support "
+            "your review. The submission will be rejected if the bootstrap files were not read, if a "
+            "declared topic has no matching guide read, or if the feedback makes guide-backed claims "
+            "without the corresponding topic evidence.\n"
+            "Treat `submit_result` as a final-only tool. Do not use it to probe for missing guide files.\n"
+            "Required guide evidence topics for every run:\n"
+            f"{required_topic_lines}\n"
+            "Guide topics:\n"
+            f"{topic_lines}\n"
+            "Relevant skill(s):\n"
+            f"{skill_list}\n"
+            "</managed_skill_guidance>\n"
+        )
+
+    def _validate_submission_prerequisites(
+        self,
+        *,
+        merge_ready: bool,
+        blocking_issue_tags: List[str],
+        advisory_issue_tags: List[str],
+        feedback: str,
+        guide_evidence_topics: Optional[List[str]] = None,
+    ) -> Optional[str]:
+        task_config: SkilledReviewPRConfig = self.config.task_config
+        required_skill_name = self._get_required_skill_name()
+        relevant_skills = self._get_relevant_managed_skills()
+        if not relevant_skills:
+            return (
+                f"This `skilled_pr_review` run requires the managed `{required_skill_name}` skill, "
+                "but no relevant skill was materialized. Re-run with skills enabled and the "
+                "Mathlib review skill available in `skills.extra_roots`."
+            )
+
+        usage = self._get_skill_tool_usage()
+        if task_config.require_read_skill_before_submit and usage["read_skill"] < 1:
+            return (
+                "This `skilled_pr_review` variant requires consulting the managed Mathlib review "
+                f"skill before submission. Call `list_skills`, then `read_skill` on `{required_skill_name}` "
+                "review skill, and continue the review."
+            )
+
+        declared_topics = self._normalize_guide_topics(guide_evidence_topics or [])
+        required_topics = set(self._get_required_guide_evidence_topics())
+        required_bootstrap_paths = self._get_required_guide_bootstrap_paths()
+        read_paths = set(self._get_skill_read_relative_paths())
+        read_paths.discard("SKILL.md")
+
+        missing_bootstrap_paths = [
+            path
+            for path in required_bootstrap_paths
+            if path not in read_paths
+        ]
+        if missing_bootstrap_paths:
+            return (
+                "`submit_result` is final-only for `skilled_pr_review`. "
+                "Finish the guide bootstrap first by reading these required files with `read_skill`: "
+                + ", ".join(f"`{path}`" for path in missing_bootstrap_paths)
+                + ". Then inspect the PR and submit once at the end."
+            )
+
+        missing_required_topics = sorted(required_topics - set(declared_topics))
+        if missing_required_topics:
+            return (
+                "This `skilled_pr_review` variant requires explicit guide-topic evidence in "
+                "`guide_evidence_topics`. Missing required topics: "
+                + ", ".join(f"`{topic}`" for topic in missing_required_topics)
+                + ". Read the corresponding guide file(s) and include those topic keys in the submission."
+            )
+
+        unsupported_topics = [
+            topic
+            for topic in declared_topics
+            if topic not in GUIDE_TOPIC_FILE_MAP
+        ]
+        if unsupported_topics:
+            supported_topics = ", ".join(f"`{topic}`" for topic in GUIDE_TOPIC_FILE_MAP)
+            return (
+                "Unknown guide evidence topic(s): "
+                + ", ".join(f"`{topic}`" for topic in unsupported_topics)
+                + f". Supported topics are: {supported_topics}."
+            )
+
+        missing_topic_reads = [
+            topic
+            for topic in declared_topics
+            if not any(path in read_paths for path in GUIDE_TOPIC_FILE_MAP[topic])
+        ]
+        if missing_topic_reads:
+            first_missing = missing_topic_reads[0]
+            required_paths = ", ".join(f"`{path}`" for path in GUIDE_TOPIC_FILE_MAP[first_missing])
+            return (
+                "Guide-backed evidence must come from the matching reference file. "
+                f"You declared `{first_missing}` in `guide_evidence_topics`, but did not read any of: "
+                f"{required_paths}."
+            )
+
+        inferred_topics = self._infer_guide_topics_from_submission(
+            blocking_issue_tags=blocking_issue_tags,
+            advisory_issue_tags=advisory_issue_tags,
+            feedback=feedback,
+        )
+        undeclared_inferred_topics = sorted(inferred_topics - set(declared_topics))
+        if undeclared_inferred_topics:
+            first_topic = undeclared_inferred_topics[0]
+            topic_description = GUIDE_TOPIC_DESCRIPTIONS.get(first_topic, first_topic.replace("_", " "))
+            required_paths = ", ".join(f"`{path}`" for path in GUIDE_TOPIC_FILE_MAP[first_topic])
+            return (
+                "Your submission appears to rely on guide-backed evidence for "
+                f"{topic_description}, but `guide_evidence_topics` does not include `{first_topic}`. "
+                f"Read one of {required_paths} and add `{first_topic}` to `guide_evidence_topics`."
+            )
+
+        style_issue_tags = {
+            self._normalize_issue_tag(tag)
+            for tag in (blocking_issue_tags or []) + (advisory_issue_tags or [])
+        }
+        if "style_or_readability" in style_issue_tags and not (
+            {"naming", "documentation", "style", "pr_metadata"} & set(declared_topics)
+        ):
+            return (
+                "If you submit a `style_or_readability` issue, declare which guide topic supports it "
+                "in `guide_evidence_topics` (for example `naming`, `documentation`, `style`, or "
+                "`pr_metadata`) and read the matching reference file first."
+            )
+
+        return None
+
+
 register_task("lean_pr_review", ReviewPRTask)
+register_task("skilled_pr_review", SkilledReviewPRTask)

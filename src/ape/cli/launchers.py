@@ -82,6 +82,60 @@ def _build_session_report_lines(token_usage: Optional[TokenUsage]) -> Optional[l
     ]
 
 
+def _build_managed_skill_report_lines(scaffold: object) -> Optional[list[str]]:
+    """Summarize managed-skill availability and observed skill-tool usage."""
+    managed_skills = getattr(scaffold, "managed_skills", None)
+    skills = tuple(getattr(managed_skills, "skills", ()) or ())
+    if not skills:
+        return None
+
+    session = None
+    conversation_manager = getattr(scaffold, "conversation_manager", None)
+    if conversation_manager is not None:
+        session = getattr(conversation_manager, "conversation_session", None)
+    if session is None:
+        session = getattr(scaffold, "conversation_session", None)
+
+    read_skill_calls = 0
+    list_skills_calls = 0
+    read_skill_paths: list[str] = []
+    seen_paths: set[str] = set()
+    if session is not None:
+        for node in getattr(session, "nodes", []) or []:
+            if getattr(node, "type", None) != "assistant":
+                continue
+            message = getattr(node, "message", None)
+            for block in getattr(message, "content", []) or []:
+                if getattr(block, "type", None) != "tool_use":
+                    continue
+                tool_name = getattr(block, "name", "") or ""
+                if tool_name == "read_skill":
+                    read_skill_calls += 1
+                    block_input = getattr(block, "input", None) or {}
+                    relative_path = "SKILL.md"
+                    if isinstance(block_input, dict):
+                        raw_relative_path = block_input.get("relative_path")
+                        if isinstance(raw_relative_path, str) and raw_relative_path.strip():
+                            relative_path = raw_relative_path.strip()
+                    if relative_path not in seen_paths:
+                        seen_paths.add(relative_path)
+                        read_skill_paths.append(relative_path)
+                elif tool_name == "list_skills":
+                    list_skills_calls += 1
+
+    total_skill_tool_calls = read_skill_calls + list_skills_calls
+    skill_names = ", ".join(skill.name for skill in skills)
+
+    report_lines = [
+        f"Managed Skills: {skill_names}",
+        f"Skill Tool Calls: {total_skill_tool_calls} (read_skill: {read_skill_calls}, list_skills: {list_skills_calls})",
+    ]
+    if read_skill_paths:
+        report_lines.append(f"Skill References: {', '.join(read_skill_paths)}")
+
+    return report_lines
+
+
 def _print_external_session_report(token_usage: Optional[TokenUsage]) -> None:
     """Print a compact session summary for external scaffold sessions."""
     report_lines = _build_session_report_lines(token_usage)
@@ -194,8 +248,11 @@ async def run_ape_agent_cli_session(
             oneshot_mode=oneshot_mode,
         )
     finally:
+        managed_skill_report_lines = _build_managed_skill_report_lines(scaffold)
         token_usage = await _finalize_scaffold_session(scaffold)
-        report_lines = _build_session_report_lines(token_usage)
+        report_lines = _build_session_report_lines(token_usage) or []
+        if managed_skill_report_lines:
+            report_lines.extend(managed_skill_report_lines)
         if report_lines:
             display.show_tree_section(
                 "Session Report",

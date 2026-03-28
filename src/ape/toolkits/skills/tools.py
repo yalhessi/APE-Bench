@@ -43,6 +43,38 @@ class SkillToolsProvider(BaseToolsProvider):
         if not self.logger:
             self.logger = create_logger()
 
+    def _record_skill_tool_usage(
+        self,
+        tool_name: str,
+        *,
+        skill_id: Optional[str] = None,
+        relative_path: Optional[str] = None,
+    ) -> None:
+        """Track managed-skill tool usage on the current task for evaluation/reporting."""
+        if self.task is None:
+            return
+
+        usage = getattr(self.task, "_managed_skill_tool_usage", None)
+        if not isinstance(usage, dict):
+            usage = {"list_skills": 0, "read_skill": 0, "read_skill_records": []}
+
+        usage[tool_name] = int(usage.get(tool_name, 0) or 0) + 1
+        if skill_id is not None:
+            usage["last_skill_id"] = skill_id
+        if tool_name == "read_skill" and skill_id is not None:
+            records = usage.get("read_skill_records")
+            if not isinstance(records, list):
+                records = []
+            records.append(
+                {
+                    "skill_id": skill_id,
+                    "relative_path": relative_path or "SKILL.md",
+                }
+            )
+            usage["read_skill_records"] = records
+
+        setattr(self.task, "_managed_skill_tool_usage", usage)
+
     def register_tools(self, mcp: FastMCP, enabled_tools: set[str]) -> None:
         if "list_skills" in enabled_tools:
             @mcp.tool(
@@ -61,6 +93,7 @@ class SkillToolsProvider(BaseToolsProvider):
                     }
                     for skill in skill_set.skills
                 ]
+                self._record_skill_tool_usage("list_skills")
                 self.logger.info("Tool list_skills: returned %s skills", len(skills))
                 return {"skills": skills}
 
@@ -87,6 +120,11 @@ class SkillToolsProvider(BaseToolsProvider):
 
                 content = read_materialized_skill_file(skill, relative_path=relative_path)
                 files = list_skill_relative_files(skill)
+                self._record_skill_tool_usage(
+                    "read_skill",
+                    skill_id=skill_id,
+                    relative_path=relative_path,
+                )
                 self.logger.info(
                     "Tool read_skill: read %s from %s",
                     relative_path,

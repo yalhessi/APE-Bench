@@ -91,6 +91,12 @@ class ApeAgentScaffold(BaseScaffold):
             self.logger,
             repo_skill_dirs=APE_AGENT_REPO_SKILL_DIRS,
         )
+        if self.managed_skills and self.managed_skills.skills:
+            skill_names = ", ".join(skill.name for skill in self.managed_skills.skills)
+            await self._emit_progress(f"Managed skills available: {skill_names}")
+            self.logger.info("[ApeAgentScaffold] Managed skills available: %s", skill_names)
+        else:
+            self.logger.info("[ApeAgentScaffold] No managed skills resolved for this task")
 
         self.conversation_manager = ApeAgentConversationManager(
             config=self.task.config,

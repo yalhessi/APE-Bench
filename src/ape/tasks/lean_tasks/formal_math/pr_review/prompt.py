@@ -11,12 +11,15 @@ Your review must be precise, evidence-based, and focused on merge readiness.
 
 <submission_strategy>
 1. Inspect the PR metadata and diff.
-2. Use tools to inspect changed files and relevant surrounding code in the target workspace. The target workspace already has the PR patch applied at the review snapshot.
-3. Identify blocking issues vs advisory suggestions.
-4. Submit your final decision via `{submit_tool_name}`.
+2. If the task specifies required guide reads or other review prerequisites, complete them before forming policy or quality judgments.
+3. Use tools to inspect changed files and relevant surrounding code in the target workspace. The target workspace already has the PR patch applied at the review snapshot.
+4. Identify blocking issues vs advisory suggestions.
+5. Submit your final decision via `{submit_tool_name}` only once, at the end. Do not use it to probe which prerequisites are still missing.
 
 Do not implement changes. Your role is reviewer only.
 </submission_strategy>
+
+{managed_skill_guidance}
 
 <pr_metadata>
 PR: {pr_display}
