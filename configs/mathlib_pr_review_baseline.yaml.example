@@ -1,0 +1,5 @@
+skills:
+  enabled: false
+
+task_config:
+  strict_tag_validation: true
