@@ -130,7 +130,8 @@ class CLIDisplay:
 
     def show_status(self, message: str) -> None:
         """Show a status message."""
-        self._show_prefixed_message("● ", message, colors.gray, margin_top=True)
+        is_progress_update = message.startswith("Lean retrieval indexing ")
+        self._show_prefixed_message("● ", message, colors.gray, margin_top=not is_progress_update)
 
     def show_success(self, message: str) -> None:
         """Show a success message."""

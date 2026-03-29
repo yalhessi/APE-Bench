@@ -186,10 +186,16 @@ class DataCollector:
         
         content_to_declarations = {}
         batch_args = [(batch, str(repo_path), existing_ids) for batch in batches]
-        
+
+        if num_processes <= 0:
+            for args in tqdm(batch_args, total=len(batches), desc="Parsing"):
+                batch_results = _parse_contents_batch(args)
+                content_to_declarations.update(batch_results)
+            return content_to_declarations
+
         with ProcessPoolExecutor(max_workers=num_processes) as executor:
             futures = {executor.submit(_parse_contents_batch, args): i for i, args in enumerate(batch_args)}
-            
+
             for future in tqdm(as_completed(futures), total=len(batches), desc="Parsing"):
                 batch_results = future.result()
                 content_to_declarations.update(batch_results)
