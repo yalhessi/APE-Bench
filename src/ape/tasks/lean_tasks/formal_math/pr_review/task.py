@@ -111,8 +111,8 @@ class ReviewPRConfig(BaseTaskConfig):
     enabled_tools: Optional[List[str]] = [
         "bash_execute",
         "file_read",
-        "lean_retrieve",
-        "get_lean_goal",
+        # "lean_retrieve",
+        # "get_lean_goal",
         "code_hover",
         "code_goto",
         "code_references",
