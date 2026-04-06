@@ -14,7 +14,7 @@ import os
 import re
 import shutil
 import traceback
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from pydantic import Field, BaseModel, ConfigDict
 
 from ape.tasks.base import BaseTaskConfig, register_task, BaseTaskResult, EvaluationResult
@@ -459,59 +459,260 @@ class ReviewPRTask(BaseLeanTask):
         return digest.hexdigest()
 
     @classmethod
-    async def _clone_workspace_with_hardlinks(
-        cls,
-        source_path: Path,
-        output_path: Path,
-    ) -> None:
-        await asyncio.to_thread(
-            shutil.copytree,
-            source_path,
-            output_path,
-            symlinks=True,
-            copy_function=os.link,
-        )
+    def _safe_overlay_path_parts(cls, rel_path: str) -> Tuple[str, ...]:
+        normalized = rel_path.strip()
+        if not normalized:
+            return ()
+
+        pure_path = PurePosixPath(normalized)
+        if pure_path.is_absolute():
+            raise RuntimeError(f"Refusing to materialize absolute patch path: {rel_path}")
+
+        parts = pure_path.parts
+        if any(part in ("", ".", "..") for part in parts):
+            raise RuntimeError(f"Refusing to materialize unsafe patch path: {rel_path}")
+
+        return tuple(parts)
+
+    @staticmethod
+    def _path_lexists(path: Path) -> bool:
+        return os.path.lexists(path)
 
     @classmethod
-    async def _break_link_for_changed_files(
-        cls,
-        workspace_path: Path,
-        changed_files: List[str],
-    ) -> None:
+    def _next_overlay_temp_path(cls, parent: Path, stem: str) -> Path:
+        temp_path = parent / f".{stem}.pr_review_overlay"
+        counter = 0
+        while cls._path_lexists(temp_path):
+            counter += 1
+            temp_path = parent / f".{stem}.pr_review_overlay.{counter}"
+        return temp_path
+
+    @classmethod
+    def _symlink_overlay_children(cls, base_root: Path, overlay_root: Path) -> None:
+        for child in base_root.iterdir():
+            (overlay_root / child.name).symlink_to(child)
+
+    @classmethod
+    def _collect_patch_touched_paths(cls, pr_diff: str, changed_files: List[str]) -> List[str]:
+        touched_paths: List[str] = []
+        seen: Set[str] = set()
+
+        def add_path(candidate: str) -> None:
+            normalized = candidate.strip()
+            if not normalized or normalized == "/dev/null" or normalized in seen:
+                return
+            seen.add(normalized)
+            touched_paths.append(normalized)
+
         for rel_path in changed_files:
-            candidate = workspace_path / rel_path
-            await cls._ensure_patch_path_writable(workspace_path, candidate)
-            await asyncio.to_thread(candidate.parent.mkdir, parents=True, exist_ok=True)
-            if not candidate.exists():
-                continue
-            if candidate.is_dir():
+            add_path(rel_path)
+
+        for line in pr_diff.splitlines():
+            if line.startswith("diff --git "):
+                match = re.match(r"^diff --git a/(.+) b/(.+)$", line)
+                if match:
+                    add_path(match.group(1))
+                    add_path(match.group(2))
                 continue
 
-            temp_path = candidate.parent / f".{candidate.name}.pr_review_copy"
-            await asyncio.to_thread(shutil.copy2, candidate, temp_path, follow_symlinks=True)
-            await asyncio.to_thread(os.replace, temp_path, candidate)
+            if line.startswith("--- ") or line.startswith("+++ "):
+                header_path = line[4:].strip()
+                if header_path.startswith(("a/", "b/")):
+                    header_path = header_path[2:]
+                add_path(header_path)
+
+        return touched_paths
 
     @classmethod
-    async def _ensure_patch_path_writable(
+    def _collect_patch_file_operations(cls, pr_diff: str) -> Tuple[List[str], List[Tuple[str, str]]]:
+        deleted_paths: List[str] = []
+        renamed_paths: List[Tuple[str, str]] = []
+        seen_deleted: Set[str] = set()
+        seen_renamed: Set[Tuple[str, str]] = set()
+
+        current_old_path: Optional[str] = None
+        rename_from: Optional[str] = None
+        rename_to: Optional[str] = None
+        deleted = False
+
+        def finalize_current_file() -> None:
+            if deleted and current_old_path and current_old_path != "/dev/null" and current_old_path not in seen_deleted:
+                seen_deleted.add(current_old_path)
+                deleted_paths.append(current_old_path)
+
+            if rename_from and rename_to and rename_from != rename_to:
+                rename_pair = (rename_from, rename_to)
+                if rename_pair not in seen_renamed:
+                    seen_renamed.add(rename_pair)
+                    renamed_paths.append(rename_pair)
+
+        for line in pr_diff.splitlines():
+            if line.startswith("diff --git "):
+                finalize_current_file()
+                current_old_path = None
+                rename_from = None
+                rename_to = None
+                deleted = False
+
+                match = re.match(r"^diff --git a/(.+) b/(.+)$", line)
+                if match:
+                    current_old_path = match.group(1)
+                continue
+
+            if line.startswith("deleted file mode "):
+                deleted = True
+                continue
+
+            if line.startswith("rename from "):
+                rename_from = line[len("rename from ") :].strip()
+                continue
+
+            if line.startswith("rename to "):
+                rename_to = line[len("rename to ") :].strip()
+                continue
+
+            if line.startswith("--- "):
+                header_path = line[4:].strip()
+                if header_path.startswith("a/"):
+                    current_old_path = header_path[2:]
+                elif header_path != "/dev/null":
+                    current_old_path = header_path
+                continue
+
+            if line.startswith("+++ "):
+                header_path = line[4:].strip()
+                if header_path.startswith("b/") or header_path == "/dev/null":
+                    continue
+
+        finalize_current_file()
+        return deleted_paths, renamed_paths
+
+    @classmethod
+    def _create_snapshot_overlay(cls, base_root: Path, overlay_root: Path) -> None:
+        overlay_root.mkdir(parents=True, exist_ok=False)
+        cls._make_path_user_writable(overlay_root)
+        cls._symlink_overlay_children(base_root, overlay_root)
+
+    @classmethod
+    def _expand_overlay_directory(cls, base_dir: Path, overlay_dir: Path) -> None:
+        if not base_dir.exists() or not base_dir.is_dir():
+            raise RuntimeError(f"Cannot expand non-directory base path for overlay: {base_dir}")
+
+        temp_dir = cls._next_overlay_temp_path(overlay_dir.parent, overlay_dir.name)
+        temp_dir.mkdir()
+        cls._make_path_user_writable(temp_dir)
+        cls._symlink_overlay_children(base_dir, temp_dir)
+
+        overlay_dir.unlink()
+        os.replace(temp_dir, overlay_dir)
+        cls._make_path_user_writable(overlay_dir)
+
+    @classmethod
+    def _materialize_overlay_path(
+        cls,
+        base_root: Path,
+        overlay_root: Path,
+        rel_path: str,
+    ) -> None:
+        parts = cls._safe_overlay_path_parts(rel_path)
+        if not parts:
+            return
+
+        current_base = base_root
+        current_overlay = overlay_root
+
+        for part in parts[:-1]:
+            next_base = current_base / part
+            next_overlay = current_overlay / part
+
+            if next_overlay.is_symlink():
+                cls._expand_overlay_directory(next_base, next_overlay)
+            elif cls._path_lexists(next_overlay):
+                if not next_overlay.is_dir():
+                    raise RuntimeError(
+                        "PR patch path requires a directory, but overlay contains a non-directory: "
+                        f"{next_overlay}"
+                    )
+                cls._make_path_user_writable(next_overlay)
+            else:
+                next_overlay.mkdir()
+                cls._make_path_user_writable(next_overlay)
+
+            current_base = next_base
+            current_overlay = next_overlay
+
+        leaf_name = parts[-1]
+        leaf_base = current_base / leaf_name
+        leaf_overlay = current_overlay / leaf_name
+
+        cls._make_path_user_writable(current_overlay)
+
+        if leaf_overlay.is_symlink():
+            if leaf_base.is_dir():
+                cls._expand_overlay_directory(leaf_base, leaf_overlay)
+                return
+
+            temp_path = cls._next_overlay_temp_path(leaf_overlay.parent, leaf_overlay.name)
+            shutil.copy2(leaf_base, temp_path, follow_symlinks=True)
+            leaf_overlay.unlink()
+            os.replace(temp_path, leaf_overlay)
+            cls._make_path_user_writable(leaf_overlay)
+            return
+
+        if cls._path_lexists(leaf_overlay):
+            cls._make_path_user_writable(leaf_overlay)
+
+    @classmethod
+    def _apply_patch_file_operations(
         cls,
         workspace_path: Path,
-        candidate: Path,
+        deleted_paths: List[str],
+        renamed_paths: List[Tuple[str, str]],
     ) -> None:
-        current = candidate.parent
-        while True:
-            if current.exists():
-                await asyncio.to_thread(cls._make_path_user_writable, current)
-            if current == workspace_path:
-                break
-            if current.parent == current:
-                break
-            current = current.parent
+        for rel_path in deleted_paths:
+            parts = cls._safe_overlay_path_parts(rel_path)
+            if not parts:
+                continue
 
-        if candidate.exists():
-            await asyncio.to_thread(cls._make_path_user_writable, candidate)
+            delete_path = workspace_path.joinpath(*parts)
+            if not cls._path_lexists(delete_path):
+                continue
+
+            cls._make_path_user_writable(delete_path.parent)
+            if delete_path.is_dir() and not delete_path.is_symlink():
+                shutil.rmtree(delete_path)
+                continue
+
+            cls._make_path_user_writable(delete_path)
+            delete_path.unlink()
+
+        for old_rel_path, new_rel_path in renamed_paths:
+            old_parts = cls._safe_overlay_path_parts(old_rel_path)
+            new_parts = cls._safe_overlay_path_parts(new_rel_path)
+            if not old_parts or not new_parts:
+                continue
+
+            old_path = workspace_path.joinpath(*old_parts)
+            new_path = workspace_path.joinpath(*new_parts)
+            if not cls._path_lexists(old_path):
+                continue
+
+            new_path.parent.mkdir(parents=True, exist_ok=True)
+            cls._make_path_user_writable(new_path.parent)
+
+            if cls._path_lexists(new_path):
+                if new_path.is_dir() and not new_path.is_symlink():
+                    shutil.rmtree(new_path)
+                else:
+                    new_path.unlink()
+
+            os.replace(old_path, new_path)
+            cls._make_path_user_writable(new_path)
 
     @staticmethod
     def _make_path_user_writable(path: Path) -> None:
+        if path.is_symlink():
+            return
         mode = path.stat().st_mode
         if path.is_dir():
             os.chmod(path, mode | 0o700)
@@ -587,6 +788,15 @@ class ReviewPRTask(BaseLeanTask):
                 f"stdout:\n{apply_stdout}\n\nstderr:\n{apply_stderr}"
             )
 
+        deleted_paths, renamed_paths = cls._collect_patch_file_operations(pr_diff)
+        if deleted_paths or renamed_paths:
+            await asyncio.to_thread(
+                cls._apply_patch_file_operations,
+                workspace_path,
+                deleted_paths,
+                renamed_paths,
+            )
+
     @classmethod
     async def _ensure_patched_target_workspace(
         cls,
@@ -602,6 +812,7 @@ class ReviewPRTask(BaseLeanTask):
         patch_fingerprint = cls._patch_fingerprint(data)
         marker_path = target_path / cls.patch_marker_filename
         existing_fingerprint = await cls._read_patch_marker(marker_path)
+        base_workspace_path: Optional[Path] = None
         if existing_fingerprint == patch_fingerprint:
             if logger:
                 logger.info("Using existing patched PR review workspace: %s", target_path)
@@ -616,15 +827,19 @@ class ReviewPRTask(BaseLeanTask):
             target_path.unlink()
             if logger:
                 logger.info(
-                    "Materializing patched PR review workspace from base snapshot: %s -> %s",
+                    "Creating lazy overlay PR review workspace from base snapshot: %s -> %s",
                     base_workspace_path,
                     target_path,
                 )
             await cls._emit_progress(
                 progress_callback,
-                "Creating a writable PR review workspace from the cached Lean snapshot...",
+                "Creating a lazy overlay PR review workspace from the cached Lean snapshot...",
             )
-            await cls._clone_workspace_with_hardlinks(base_workspace_path, target_path)
+            await asyncio.to_thread(
+                cls._create_snapshot_overlay,
+                base_workspace_path,
+                target_path,
+            )
         elif existing_fingerprint and existing_fingerprint != patch_fingerprint:
             raise RuntimeError(
                 "PR review workspace already contains a different applied patch. "
@@ -632,11 +847,24 @@ class ReviewPRTask(BaseLeanTask):
             )
 
         await asyncio.to_thread(cls._make_path_user_writable, target_path)
+        touched_paths = cls._collect_patch_touched_paths(data.pr_diff, data.changed_files)
         await cls._emit_progress(
             progress_callback,
-            "Preparing changed files so the PR patch can be applied cleanly...",
+            "Materializing only the changed paths so the PR patch can be applied cleanly...",
         )
-        await cls._break_link_for_changed_files(target_path, data.changed_files)
+        if touched_paths:
+            if base_workspace_path is None:
+                raise RuntimeError(
+                    "Unable to determine the immutable base snapshot for the PR review overlay. "
+                    f"workspace={target_path}"
+                )
+            for rel_path in touched_paths:
+                await asyncio.to_thread(
+                    cls._materialize_overlay_path,
+                    base_workspace_path,
+                    target_path,
+                    rel_path,
+                )
         await cls._emit_progress(
             progress_callback,
             "Applying the PR diff to the review workspace...",
