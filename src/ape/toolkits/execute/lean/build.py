@@ -79,7 +79,18 @@ def build_single_commit_worker(entry: Dict[str, Any], config_dict: Dict[str, Any
             process_logger,
             repo_url=repo_url
         )
-        
+
+        fetch_repo_url = entry.get("fetch_repo_url")
+        fetch_ref = entry.get("fetch_ref")
+        cache_repo_full_name = entry.get("cache_repo_full_name")
+        if fetch_repo_url or fetch_ref:
+            return await build_manager.build_workspace_from_ref(
+                commit_hash,
+                fetch_repo_url=fetch_repo_url,
+                fetch_ref=fetch_ref,
+                cache_repo_full_name=cache_repo_full_name,
+            )
+
         return await build_manager.build_workspace(commit_hash)
     
     # Execute asynchronous build
@@ -289,20 +300,30 @@ class BatchBuilder:
         self.logger.info(f"Repository check completed: {success_count}/{len(unique_repos)} ready")
         return success_count == len(unique_repos)
     
-    def _load_entries_from_file(self, file_path: Path, commit_id_key: str = 'commit_hash') -> Tuple[List[Dict[str, Any]], List[str]]:
+    def _load_entries_from_file(
+        self,
+        file_path: Path,
+        commit_id_key: str = 'commit_hash',
+        use_pr_head_refs: bool = False,
+    ) -> Tuple[List[Dict[str, Any]], List[str]]:
         """Load commit information (including repository metadata) and toolchains from input file"""
         
         if not file_path.exists():
             raise FileNotFoundError(f"Input file not found: {file_path}")
         
         if file_path.suffix.lower() == '.jsonl':
-            return self._load_from_jsonl(file_path, commit_id_key)
+            return self._load_from_jsonl(file_path, commit_id_key, use_pr_head_refs)
         elif file_path.suffix.lower() == '.parquet':
-            return self._load_from_parquet(file_path, commit_id_key)
+            return self._load_from_parquet(file_path, commit_id_key, use_pr_head_refs)
         else:
             raise ValueError(f"Unsupported file format: {file_path.suffix}")
-    
-    def _load_from_jsonl(self, file_path: Path, commit_id_key: str) -> Tuple[List[Dict[str, Any]], List[str]]:
+
+    def _load_from_jsonl(
+        self,
+        file_path: Path,
+        commit_id_key: str,
+        use_pr_head_refs: bool,
+    ) -> Tuple[List[Dict[str, Any]], List[str]]:
         """Load from JSONL file"""
         records = []
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -317,23 +338,36 @@ class BatchBuilder:
                 except json.JSONDecodeError as e:
                     self.logger.warning(f"Invalid JSON on line {line_num}: {e}")
         
-        return self._extract_entries_and_toolchains(records, commit_id_key)
-    
-    def _load_from_parquet(self, file_path: Path, commit_id_key: str) -> Tuple[List[Dict[str, Any]], List[str]]:
+        return self._extract_entries_and_toolchains(records, commit_id_key, use_pr_head_refs)
+
+    def _load_from_parquet(
+        self,
+        file_path: Path,
+        commit_id_key: str,
+        use_pr_head_refs: bool,
+    ) -> Tuple[List[Dict[str, Any]], List[str]]:
         """Load from Parquet file"""
         try:
             df = pd.read_parquet(file_path)
             records = df.to_dict('records')
-            return self._extract_entries_and_toolchains(records, commit_id_key)
+            return self._extract_entries_and_toolchains(records, commit_id_key, use_pr_head_refs)
         except Exception as e:
             raise ValueError(f"Failed to read Parquet file: {e}")
-    
-    def _extract_entries_and_toolchains(self, records: List[Dict], commit_id_key: str) -> Tuple[List[Dict[str, Any]], List[str]]:
+
+    def _extract_entries_and_toolchains(
+        self,
+        records: List[Dict],
+        commit_id_key: str,
+        use_pr_head_refs: bool = False,
+    ) -> Tuple[List[Dict[str, Any]], List[str]]:
         """Extract commit metadata and toolchains from records using Pydantic models.
 
         Uses BaseLeanTaskData to parse and validate records, ensuring consistency
         with the main task execution pipeline.
         """
+        if use_pr_head_refs:
+            return self._extract_pr_head_entries_and_toolchains(records)
+
         from ape.tasks.lean_tasks.base import BaseLeanTaskData
         from pydantic import ValidationError
 
@@ -385,6 +419,62 @@ class BatchBuilder:
                 continue
 
         return entries, toolchains
+
+    def _extract_pr_head_entries_and_toolchains(self, records: List[Dict]) -> Tuple[List[Dict[str, Any]], List[str]]:
+        """Extract PR-head build entries from PR review task records."""
+        entries: List[Dict[str, Any]] = []
+        toolchains: List[str] = []
+
+        for idx, record in enumerate(records):
+            try:
+                snapshot = record.get("snapshot") or {}
+                if not isinstance(snapshot, dict):
+                    snapshot = {}
+                snapshot_head_sha = str(
+                    snapshot.get("snapshot_head_sha") or record.get("snapshot_head_sha") or ""
+                ).strip()
+                metadata = record.get("metadata") or {}
+                if not isinstance(metadata, dict):
+                    metadata = {}
+                pr_head = snapshot.get("pr_head") or metadata.get("pr_head") or {}
+                if not isinstance(pr_head, dict):
+                    pr_head = {}
+
+                fetch_repo_url = str(pr_head.get("clone_url") or "").strip()
+                fetch_ref = str(pr_head.get("ref") or "").strip()
+                cache_repo_full_name = str(pr_head.get("repo_full_name") or "").strip()
+
+                target_workspace = record.get("target_workspace") or {}
+                if not isinstance(target_workspace, dict):
+                    target_workspace = {}
+                repo_url = str(target_workspace.get("repo_url") or self.config.default_repo_url).strip()
+
+                if not snapshot_head_sha or not fetch_repo_url or not fetch_ref:
+                    self.logger.warning(
+                        "Skipping record %s for PR-head prewarm because snapshot_head_sha/clone_url/ref is missing",
+                        idx,
+                    )
+                    continue
+
+                entries.append(
+                    {
+                        "commit_hash": snapshot_head_sha,
+                        "repo_url": repo_url,
+                        "fetch_repo_url": fetch_repo_url,
+                        "fetch_ref": fetch_ref,
+                        "cache_repo_full_name": cache_repo_full_name or None,
+                    }
+                )
+
+                toolchain = str(pr_head.get("toolchain") or target_workspace.get("toolchain") or "").strip()
+                if toolchain and toolchain.lower() != "none":
+                    toolchains.append(toolchain)
+
+            except Exception as e:
+                self.logger.warning(f"Unexpected error parsing PR-head record {idx}: {e}")
+                continue
+
+        return entries, toolchains
     
     def _print_progress(self, shared_stats: Dict[str, Any], total_tasks: int, start_time: datetime) -> None:
         """Print progress"""
@@ -425,7 +515,8 @@ class BatchBuilder:
         input_files: Optional[List[str]] = None,
         commit_hash: Optional[str] = None,
         repo_url: Optional[str] = None,
-        commit_id_key: str = 'commit_hash'
+        commit_id_key: str = 'commit_hash',
+        use_pr_head_refs: bool = False,
     ) -> Dict[str, Any]:
         """Build all commits from input file"""
         start_time = datetime.now()
@@ -451,7 +542,9 @@ class BatchBuilder:
                 for input_file in input_files:
                     self.logger.info(f"Loading file: {input_file}")
                     file_entries, file_toolchains = self._load_entries_from_file(
-                        Path(input_file), commit_id_key
+                        Path(input_file),
+                        commit_id_key,
+                        use_pr_head_refs,
                     )
                     all_entries.extend(file_entries)
                     all_toolchains.extend(file_toolchains)
@@ -515,11 +608,13 @@ class BatchBuilder:
             if not commit_hash:
                 continue
             repo_name, repo_url = self.config.resolve_repo(entry.get("repo_url"))
-            normalized_entries.append({
+            normalized_entry = dict(entry)
+            normalized_entry.update({
                 "commit_hash": commit_hash,
                 "repo_name": repo_name,
                 "repo_url": repo_url
             })
+            normalized_entries.append(normalized_entry)
 
         if not normalized_entries:
             return {
@@ -691,6 +786,10 @@ Examples:
   # Custom settings
   python -m ape.toolkits.execute.lean.build \\
       --input_file commits.jsonl --num_processes 4
+
+  # Prewarm PR-head workspaces from PR review task files
+  python -m ape.toolkits.execute.lean.build \\
+      --input_file inputs/proof_pr_review/*.jsonl --prewarm_pr_heads
         """
     )
     
@@ -726,6 +825,12 @@ Examples:
         "--build_timeout",
         type=float,
         help="Build timeout (seconds)"
+    )
+
+    parser.add_argument(
+        "--prewarm_pr_heads",
+        action="store_true",
+        help="Extract PR-head refs from PR review task files and build those heads explicitly",
     )
     
     return parser
@@ -764,7 +869,8 @@ async def run_batch_build(args: argparse.Namespace) -> int:
             input_files=args.input_file,
             commit_hash=commit_hash,
             repo_url=repo_url,
-            commit_id_key=args.commit_id_key
+            commit_id_key=args.commit_id_key,
+            use_pr_head_refs=args.prewarm_pr_heads,
         )
         
         # Print results

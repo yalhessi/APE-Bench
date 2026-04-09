@@ -88,6 +88,18 @@ class PRReviewDatasetConfig(BaseModel):
         ),
         description="Review focus text inserted into task records",
     )
+    materialize_slice_outputs: bool = Field(
+        default=True,
+        description="Write per-slice JSONLs next to the aggregate output",
+    )
+    create_variant_outputs: bool = Field(
+        default=True,
+        description="Create paired baseline/skill variants for aggregate and slice outputs",
+    )
+    variant_skill_bundle: str = Field(
+        default="mathlib-pr-review",
+        description="Skill bundle label written into paired benchmark variants",
+    )
 
     @property
     def repo_url(self) -> str:

@@ -1,0 +1,7 @@
+[shell_environment_policy]
+inherit = "all"
+
+[shell_environment_policy.set]
+CONDA_DEFAULT_ENV = "ape"
+CONDA_PREFIX = "/Users/yousef/miniconda3/envs/ape"
+PATH = "/Users/yousef/miniconda3/envs/ape/bin:/Users/yousef/miniconda3/condabin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Codex.app/Contents/Resources"

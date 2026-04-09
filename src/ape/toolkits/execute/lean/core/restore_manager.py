@@ -74,7 +74,11 @@ class RestoreManager:
         pipeline first.
         """
         state = await self.state_manager.read_state(commit_hash)
-        if state:
+        if state and state.status in (
+            WorkspaceStatus.BUILT,
+            WorkspaceStatus.RESTORING,
+            WorkspaceStatus.READY,
+        ):
             return False
 
         workspace_path = self.workspace_dir / commit_hash

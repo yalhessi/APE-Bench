@@ -19,6 +19,7 @@ from ape.utils import parse_cli_args, load_yaml, deep_merge
 
 from .collector import PRReviewDataCollector
 from .config import PRReviewDatasetConfig
+from .materialize_outputs import materialize_hybrid_outputs
 
 if TYPE_CHECKING:
     import logging
@@ -69,7 +70,15 @@ class PRReviewDatasetPipeline:
 
         try:
             records = collector.collect_records()
-            collector.save_records(records, self.output_file)
+            materialized_outputs = materialize_hybrid_outputs(
+                records,
+                self.output_file,
+                skill_bundle=self.config.variant_skill_bundle,
+                write_aggregate=True,
+                create_variants=self.config.create_variant_outputs,
+            ) if self.config.materialize_slice_outputs else {"aggregate": self.output_file}
+            if not self.config.materialize_slice_outputs:
+                collector.save_records(records, self.output_file)
             summary = collector.build_summary(records)
 
             elapsed = time.time() - start_time
@@ -83,6 +92,7 @@ class PRReviewDatasetPipeline:
             )
             if summary["skip_reasons"]:
                 self.logger.info(f"Skip reasons: {summary['skip_reasons']}")
+            self.logger.info("Materialized outputs: %s", {key: str(path) for key, path in materialized_outputs.items()})
 
             return self.output_file
         finally:

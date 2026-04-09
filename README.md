@@ -171,8 +171,9 @@ inspects that task's Pydantic schema and prompts for each input field directly i
 nested task data such as `target_workspace`, the CLI walks the nested fields as well.
 
 `lean_pr_review` uses a friendlier interactive flow: the CLI only asks for the GitHub `pr_url` and
-the PR branch `commit`, then fills the remaining review task fields automatically from GitHub using
-the same retrieval logic as the PR review dataset builder.
+the PR branch `commit`, then builds a live review snapshot automatically from GitHub. That live CLI
+entrypoint always produces the shared PR review envelope with `evaluation: null`; benchmark records
+use the same `snapshot` shape and attach `evaluation` plus `benchmark_context`.
 
 The scaffold-specific aliases remain available for compatibility:
 
@@ -576,14 +577,17 @@ Default paths:
 ### Mathlib PR Review Benchmark
 
 - **Path**: `inputs/proof_pr_review/mathlib_pr_review_*.jsonl` (generated)
-- **Task Type**: `lean_pr_review`
+- **Task Types**: `lean_pr_review` and `skilled_pr_review`
 - **Source**: Real pull requests from `leanprover-community/mathlib4` via GitHub API
 - **Goal**: Decide if a PR is merge-ready and identify blocking/advisory issues
+- **Task Envelope**: Shared snapshot-driven schema with top-level `snapshot`, optional `evaluation`, optional `benchmark_context`, plus `target_workspace`
 - **Temporal Snapshots**: One data point = one maintainer review round (PRs can contribute multiple rounds)
 - **Round Feedback**: Each round record groups that reviewer’s review body + inline review comments + same-round high-level issue comments
-- **Conversation Context**: `review_round_conversation` includes both maintainer and PR-author comments for that round
+- **Conversation Context**: `snapshot.conversation` includes both maintainer and PR-author comments for that round
+- **PR-Head Hints**: `snapshot.pr_head` carries fork/head checkout hints for live head-workspace setup
 - **Comment-Only Support**: Maintainer comments without formal review states can still become extracted rounds
-- **Ground Truth**: Derived from feedback in that review round (not the final PR state)
+- **Ground Truth**: Benchmark labels live under `evaluation.ground_truth`, derived from feedback in that review round rather than the final PR state
+- **Live CLI Mode**: Uses the same snapshot builder but leaves `evaluation=null`, so interactive live reviews are intentionally unscored
 - **Extraction Order**: Configure `pr_order=newest` or `pr_order=oldest` when collecting candidates
 - **Primary Metric**: `review_quality_score` in `[0,1]`
   - `0.65 * decision_accuracy`
@@ -822,7 +826,9 @@ python -m ape.scaffolds.ape_agent.main inputs/ape_bench/ape_bench.jsonl \
 `target_workspace` 这样的嵌套字段也会继续展开并逐项收集。
 
 `lean_pr_review` 提供了更友好的交互流程：CLI 只会询问 GitHub `pr_url` 和该 PR 分支上的
-`commit`，然后使用与 PR review 数据集构建相同的 GitHub 检索逻辑自动补全其余任务字段。
+`commit`，然后自动构建一个 live review snapshot。这个 CLI 入口始终生成共享的 PR review
+封装结构，并令 `evaluation: null`；基准数据则复用同样的 `snapshot` 结构，再附加
+`evaluation` 和 `benchmark_context`。
 
 兼容性别名仍然可用：
 

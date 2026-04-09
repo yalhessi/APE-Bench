@@ -12,6 +12,11 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from ape.tasks.lean_tasks.formal_math.pr_review.findings import (
+    legacy_issue_tags_to_review_findings,
+    review_findings_to_json,
+)
+
 try:
     from ..taxonomy.lean_task_taxonomy import annotate_record_metadata
 except Exception:  # pragma: no cover - direct script execution fallback
@@ -26,9 +31,14 @@ except Exception:  # pragma: no cover - direct script execution fallback
             metadata = record.get("metadata") or {}
             if not isinstance(metadata, dict):
                 metadata = {}
-            ground_truth = record.get("ground_truth") or {}
-            blocking_tags = ground_truth.get("blocking_issue_tags") or []
-            advisory_tags = ground_truth.get("advisory_issue_tags") or []
+            evaluation = record.get("evaluation") or {}
+            ground_truth = evaluation.get("ground_truth") or {}
+            blocking_items = ground_truth.get("blocking_findings")
+            advisory_items = ground_truth.get("advisory_findings")
+            if blocking_items is None:
+                blocking_items = ground_truth.get("blocking_issue_tags") or []
+            if advisory_items is None:
+                advisory_items = ground_truth.get("advisory_issue_tags") or []
             metadata["taxonomy"] = {
                 "task_type": "lean_pr_review",
                 "dataset": metadata.get("dataset"),
@@ -37,8 +47,8 @@ except Exception:  # pragma: no cover - direct script execution fallback
                 "primary_archetype": "merge_readiness_judgment",
                 "has_ground_truth": bool(ground_truth),
                 "merge_ready_ground_truth": ground_truth.get("merge_ready"),
-                "blocking_issue_count": len(blocking_tags),
-                "advisory_issue_count": len(advisory_tags),
+                "blocking_issue_count": len(blocking_items),
+                "advisory_issue_count": len(advisory_items),
             }
             record["metadata"] = metadata
             return record
@@ -122,23 +132,40 @@ def convert_record(record: Dict[str, Any], index: int) -> Dict[str, Any]:
     pr_review_record = {
         "task_type": "lean_pr_review",
         "task_id": f"pr_review_{index:04d}_{re.sub(r'[^a-zA-Z0-9_]+', '_', str(original_task_id))}",
-        "pr_number": None,
-        "pr_url": None,
-        "pr_title": build_pr_title(record),
-        "pr_author": None,
-        "pr_description": record.get("task_description") or "",
-        "pr_diff": record.get("gold_diff") or "",
-        "changed_files": changed_files,
-        "review_focus": (
-            "Assess merge readiness under Mathlib standards. "
-            "Prioritize semantic correctness, requirement alignment, and scope control."
-        ),
-        "ground_truth": {
-            "merge_ready": merge_ready,
-            "blocking_issue_tags": blocking_tags,
-            "advisory_issue_tags": advisory_tags,
-            "rationale": (source_metadata.get("human_evaluation") or {}).get("comment"),
+        "snapshot": {
+            "pr_number": None,
+            "pr_url": None,
+            "pr_title": build_pr_title(record),
+            "pr_author": None,
+            "pr_description": record.get("task_description") or "",
+            "pr_dependencies": [],
+            "pr_diff": record.get("gold_diff") or "",
+            "changed_files": changed_files,
+            "snapshot_type": "converted_judgment",
+            "snapshot_at": None,
+            "snapshot_base_sha": target_workspace.get("commit_hash"),
+            "snapshot_head_sha": None,
+            "review_state": None,
+            "review_focus": (
+                "Assess merge readiness under Mathlib standards. "
+                "Prioritize semantic correctness, requirement alignment, and scope control."
+            ),
+            "pr_head": None,
+            "conversation": {
+                "author_input": [],
+                "reviewer_feedback": [],
+            },
         },
+        "evaluation": {
+            "ground_truth": {
+                "merge_ready": merge_ready,
+                "blocking_findings": review_findings_to_json(legacy_issue_tags_to_review_findings(blocking_tags)),
+                "advisory_findings": review_findings_to_json(legacy_issue_tags_to_review_findings(advisory_tags)),
+                "rationale": (source_metadata.get("human_evaluation") or {}).get("comment"),
+            },
+            "label_source": "converted_from_judgment_annotation",
+        },
+        "benchmark_context": None,
         "target_workspace": target_workspace,
         "metadata": {
             "dataset": "ape_pr_review",

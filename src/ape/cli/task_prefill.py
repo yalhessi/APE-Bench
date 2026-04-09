@@ -25,7 +25,7 @@ def build_pr_review_task_data(pr_url: str, commit: str) -> dict[str, Any]:
         logger=create_logger(to_console=False),
     )
     try:
-        return collector.build_record_for_pr_commit(
+        return collector.build_live_pr_review_task_data(
             pr_number=pr_number,
             snapshot_head_sha=normalized_commit,
             pr_url=normalized_pr_url,

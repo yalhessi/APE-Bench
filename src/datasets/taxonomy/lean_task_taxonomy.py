@@ -122,9 +122,12 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
         )
 
     elif task_type == "lean_pr_review":
-        ground_truth = record.get("ground_truth") or {}
-        blocking_tags = ground_truth.get("blocking_issue_tags") or []
-        advisory_tags = ground_truth.get("advisory_issue_tags") or []
+        evaluation = record.get("evaluation") or {}
+        ground_truth = evaluation.get("ground_truth") or {}
+        blocking_findings = ground_truth.get("blocking_findings")
+        advisory_findings = ground_truth.get("advisory_findings")
+        blocking_items = blocking_findings if blocking_findings is not None else (ground_truth.get("blocking_issue_tags") or [])
+        advisory_items = advisory_findings if advisory_findings is not None else (ground_truth.get("advisory_issue_tags") or [])
         taxonomy.update(
             {
                 "task_family": "pr_review",
@@ -132,8 +135,8 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
                 "primary_archetype": "merge_readiness_judgment",
                 "has_ground_truth": bool(ground_truth),
                 "merge_ready_ground_truth": ground_truth.get("merge_ready"),
-                "blocking_issue_count": len(blocking_tags),
-                "advisory_issue_count": len(advisory_tags),
+                "blocking_issue_count": len(blocking_items),
+                "advisory_issue_count": len(advisory_items),
             }
         )
 

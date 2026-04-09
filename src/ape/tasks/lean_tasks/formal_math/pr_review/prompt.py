@@ -49,10 +49,10 @@ Preview:
 {pr_diff_preview}
 </pr_diff_summary>
 
-<issue_tag_taxonomy>
-Use these tags when reporting issues:
-{issue_tags}
-</issue_tag_taxonomy>
+<finding_taxonomy>
+Use these finding categories when reporting issues:
+{finding_categories}
+</finding_taxonomy>
 
 <evaluation_policy>
 - "Merge ready" means no blocking correctness/scope/library-integration issues remain.

@@ -5,7 +5,7 @@ Evaluates whether an agent can provide Mathlib-quality pull request review feedb
 including merge readiness and issue identification.
 """
 
-from typing import Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple
+from typing import Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast
 import asyncio
 import hashlib
 import inspect
@@ -15,30 +15,37 @@ import re
 import shutil
 import traceback
 from pathlib import Path, PurePosixPath
-from pydantic import Field, BaseModel, ConfigDict
+from pydantic import Field, model_validator
 
-from ape.tasks.base import BaseTaskConfig, register_task, BaseTaskResult, EvaluationResult
-from ape.tasks.lean_tasks.base import BaseLeanTask, BaseLeanTaskData
+from ape.tasks.base import BaseTaskConfig, register_task, EvaluationResult
+from ape.tasks.lean_tasks.base import BaseLeanTask
 from ape.tasks.models import WorkspaceInfo
 from ape.toolkits.execute.lean.utils.process_ops import run_command
+from .findings import (
+    LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY,
+    REVIEW_FINDING_CATEGORIES,
+    ReviewFinding,
+    coerce_review_findings,
+    extract_review_categories,
+    legacy_issue_tags_to_review_findings,
+    normalize_issue_tag,
+    normalize_review_categories,
+    normalize_review_category,
+)
+from .models import (
+    PRReviewGroundTruth,
+    PRReviewSnapshot,
+    PRReviewSubmission,
+    ReviewPRData,
+    ReviewPRResult,
+    SkilledReviewPRData,
+)
+from .scoring import evaluate_review_submission
 
 if TYPE_CHECKING:
     from ape.scaffolds.config import BaseScaffoldConfig
     import logging
 
-
-DEFAULT_REVIEW_ISSUE_TAGS = [
-    "semantic_incorrectness",
-    "requirement_mismatch",
-    "scope_control_violation",
-    "proof_fragility",
-    "insufficient_documentation",
-    "insufficient_tests",
-    "library_integration_issue",
-    "deprecated_api_usage",
-    "performance_regression",
-    "style_or_readability",
-]
 
 GUIDE_TOPIC_FILE_MAP: dict[str, tuple[str, ...]] = {
     "review_norms": (
@@ -81,6 +88,16 @@ GUIDE_TOPIC_DESCRIPTIONS: dict[str, str] = {
     "branches_ci": "toolchains, CI branches, bors, and nightly-testing branch conventions",
 }
 
+FINDING_CATEGORY_GUIDE_TOPICS: dict[str, tuple[str, ...]] = {
+    "correctness": ("review_norms",),
+    "requirements_scope": ("review_norms",),
+    "integration_compatibility": ("style",),
+    "robustness_performance": ("review_norms",),
+    "tests_ci": ("style", "branches_ci"),
+    "documentation_metadata": ("documentation", "pr_metadata"),
+    "readability_maintainability": ("naming", "style"),
+}
+
 DEFAULT_SKILLED_REVIEW_REQUIRED_TOPICS: tuple[str, ...] = (
     "review_norms",
     "naming",
@@ -95,6 +112,8 @@ DEFAULT_SKILLED_REVIEW_BOOTSTRAP_PATHS: tuple[str, ...] = (
     "references/style-guidelines-reviewer.md",
 )
 
+HeadWorkspaceFastPathMode = Literal["off", "reuse_only", "cache_probe", "full_build"]
+
 
 class ReviewPRConfig(BaseTaskConfig):
     """Configuration for Lean PR review tasks."""
@@ -104,9 +123,14 @@ class ReviewPRConfig(BaseTaskConfig):
     advisory_issue_weight: float = 0.10
     severe_false_approve_max_score: float = 0.20
 
-    strict_tag_validation: bool = False
-    allowed_issue_tags: List[str] = Field(default_factory=lambda: list(DEFAULT_REVIEW_ISSUE_TAGS))
+    strict_category_validation: bool = False
+    allowed_finding_categories: List[str] = Field(default_factory=lambda: list(REVIEW_FINDING_CATEGORIES))
+    # Deprecated compatibility fields.
+    strict_tag_validation: Optional[bool] = None
+    allowed_issue_tags: Optional[List[str]] = None
     diff_preview_char_limit: int = 12000
+    enable_head_cache_fast_path: Optional[bool] = None
+    head_workspace_fast_path_mode: HeadWorkspaceFastPathMode = "cache_probe"
 
     enabled_tools: Optional[List[str]] = [
         "bash_execute",
@@ -118,71 +142,22 @@ class ReviewPRConfig(BaseTaskConfig):
         "code_references",
     ]
 
+    @model_validator(mode="after")
+    def _normalize_category_config(self) -> "ReviewPRConfig":
+        if self.strict_tag_validation is not None:
+            self.strict_category_validation = bool(self.strict_tag_validation)
 
-class PRReviewGroundTruth(BaseModel):
-    """Ground-truth labels for PR review evaluation."""
+        allowed_categories = list(self.allowed_finding_categories or [])
+        if self.allowed_issue_tags:
+            allowed_categories.extend(
+                LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY.get(normalize_issue_tag(tag), tag)
+                for tag in self.allowed_issue_tags
+            )
 
-    merge_ready: bool = Field(..., description="Whether maintainers judged this PR as merge-ready")
-    blocking_issue_tags: List[str] = Field(default_factory=list, description="Blocking issue tags")
-    advisory_issue_tags: List[str] = Field(default_factory=list, description="Non-blocking issue tags")
-    rationale: Optional[str] = Field(default=None, description="Optional rationale from expert reviewers")
-
-
-class ReviewPRData(BaseLeanTaskData):
-    """Data model for Lean PR review tasks."""
-
-    task_type: Literal["lean_pr_review"] = Field(
-        default="lean_pr_review",
-        description="Task type identifier",
-    )
-
-    pr_number: Optional[int] = Field(default=None, description="Pull request number")
-    pr_url: Optional[str] = Field(default=None, description="Pull request URL")
-    pr_title: str = Field(..., description="Pull request title")
-    pr_author: Optional[str] = Field(default=None, description="Pull request author")
-    pr_description: str = Field(default="", description="Pull request description/body")
-    pr_dependencies: List[str] = Field(default_factory=list, description="Declared PR dependencies, if any")
-    pr_diff: str = Field(..., description="Unified diff patch of the PR")
-    changed_files: List[str] = Field(default_factory=list, description="Changed file paths")
-    snapshot_type: Optional[str] = Field(default=None, description="Snapshot type for this review record")
-    snapshot_at: Optional[str] = Field(default=None, description="Snapshot cutoff timestamp (UTC ISO-8601)")
-    snapshot_base_sha: Optional[str] = Field(default=None, description="Base commit used for snapshot context")
-    snapshot_head_sha: Optional[str] = Field(default=None, description="Head commit used for snapshot diff context")
-    review_state: Optional[str] = Field(default=None, description="Maintainer review state at snapshot time")
-    review_focus: Optional[str] = Field(
-        default=None,
-        description="Optional focus hints for what maintainers care about for this PR",
-    )
-
-    ground_truth: Optional[PRReviewGroundTruth] = Field(
-        default=None,
-        description="Optional ground truth labels for automatic evaluation",
-    )
-
-
-class SkilledReviewPRData(ReviewPRData):
-    """Data model for skill-targeted Lean PR review tasks."""
-
-    task_type: Literal["skilled_pr_review"] = Field(
-        default="skilled_pr_review",
-        description="Task type identifier",
-    )
-
-
-class ReviewPRResult(BaseTaskResult):
-    """Result model for Lean PR review tasks."""
-
-    model_config = ConfigDict()
-
-    merge_ready: bool = Field(..., description="Predicted merge readiness")
-    blocking_issue_tags: List[str] = Field(default_factory=list, description="Predicted blocking issue tags")
-    advisory_issue_tags: List[str] = Field(default_factory=list, description="Predicted advisory issue tags")
-    guide_evidence_topics: List[str] = Field(
-        default_factory=list,
-        description="Guide-topic evidence declared with the submission",
-    )
-    feedback: str = Field(..., description="Submitted review feedback")
-    review_data: Dict[str, Any] = Field(default_factory=dict, description="Detailed review/evaluation data")
+        self.allowed_finding_categories = normalize_review_categories(allowed_categories)
+        if not self.allowed_finding_categories:
+            self.allowed_finding_categories = list(REVIEW_FINDING_CATEGORIES)
+        return self
 
 
 class ReviewPRTask(BaseLeanTask):
@@ -232,8 +207,8 @@ class ReviewPRTask(BaseLeanTask):
             "Submit your final PR review decision.\n\n"
             "Provide:\n"
             "- merge_ready: whether the PR is ready to merge\n"
-            "- blocking_issue_tags: blocking issues preventing merge\n"
-            "- advisory_issue_tags: non-blocking suggestions\n"
+            "- blocking_findings: blocking findings preventing merge\n"
+            "- advisory_findings: non-blocking findings\n"
             "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
             "- feedback: concise, evidence-based reviewer feedback\n\n"
             "You must call this tool to finish the task."
@@ -330,19 +305,63 @@ class ReviewPRTask(BaseLeanTask):
     def _infer_guide_topics_from_submission(
         self,
         *,
-        blocking_issue_tags: Optional[List[str]] = None,
-        advisory_issue_tags: Optional[List[str]] = None,
+        blocking_findings: Optional[List[ReviewFinding]] = None,
+        advisory_findings: Optional[List[ReviewFinding]] = None,
         feedback: str = "",
     ) -> Set[str]:
         """Infer guide topics that the submission appears to rely on."""
         inferred: Set[str] = set()
-        normalized_tags = set(self._normalize_tag_list((blocking_issue_tags or []) + (advisory_issue_tags or [])))
+        normalized_categories = set(
+            self._extract_finding_categories((blocking_findings or []) + (advisory_findings or []))
+        )
         feedback_lower = (feedback or "").lower()
 
-        if "insufficient_documentation" in normalized_tags:
-            inferred.add("documentation")
-        if normalized_tags & {"library_integration_issue", "deprecated_api_usage", "performance_regression"}:
+        if normalized_categories & {"correctness", "requirements_scope", "robustness_performance"}:
+            inferred.add("review_norms")
+
+        if "documentation_metadata" in normalized_categories:
+            if any(
+                needle in feedback_lower
+                for needle in ("pr title", "pr description", "commit message", "metadata", "history-facing")
+            ):
+                inferred.add("pr_metadata")
+            else:
+                inferred.add("documentation")
+
+        if "readability_maintainability" in normalized_categories:
+            if any(
+                needle in feedback_lower
+                for needle in (
+                    "naming",
+                    "rename",
+                    "renaming",
+                    "theorem name",
+                    "declaration name",
+                    "namespace",
+                    "dot notation",
+                    "camelcase",
+                    "snake_case",
+                )
+            ):
+                inferred.add("naming")
+            else:
+                inferred.add("style")
+
+        if normalized_categories & {"integration_compatibility", "tests_ci"}:
             inferred.add("style")
+        if "tests_ci" in normalized_categories and any(
+            needle in feedback_lower
+            for needle in (
+                "bors",
+                "toolchain",
+                "ci",
+                "nightly-with-mathlib",
+                "nightly-testing",
+                "lean-pr-testing",
+                "ci branch",
+            )
+        ):
+            inferred.add("branches_ci")
 
         if any(
             needle in feedback_lower
@@ -393,6 +412,9 @@ class ReviewPRTask(BaseLeanTask):
                 "formatter",
                 "tactic",
                 "library integration",
+                "regression test",
+                "coverage",
+                "test",
             )
         ):
             inferred.add("style")
@@ -442,8 +464,8 @@ class ReviewPRTask(BaseLeanTask):
         self,
         *,
         merge_ready: bool,
-        blocking_issue_tags: List[str],
-        advisory_issue_tags: List[str],
+        blocking_findings: List[ReviewFinding],
+        advisory_findings: List[ReviewFinding],
         feedback: str,
         guide_evidence_topics: Optional[List[str]] = None,
     ) -> Optional[str]:
@@ -751,6 +773,331 @@ class ReviewPRTask(BaseLeanTask):
         )
 
     @classmethod
+    def _head_workspace_fast_path_mode(cls, config: "BaseScaffoldConfig") -> HeadWorkspaceFastPathMode:
+        task_config = getattr(config, "task_config", None)
+        raw_mode = getattr(task_config, "head_workspace_fast_path_mode", None)
+        if isinstance(raw_mode, str):
+            normalized_mode = raw_mode.strip().lower()
+            if normalized_mode in {"off", "reuse_only", "cache_probe", "full_build"}:
+                return cast(HeadWorkspaceFastPathMode, normalized_mode)
+
+        legacy_enabled = getattr(task_config, "enable_head_cache_fast_path", None)
+        if legacy_enabled is not None:
+            return "cache_probe" if bool(legacy_enabled) else "off"
+
+        return "cache_probe"
+
+    @classmethod
+    def _get_pr_head_metadata(cls, data: ReviewPRData) -> Optional[Dict[str, Any]]:
+        pr_head = data.pr_head
+        if pr_head is None:
+            return None
+        return pr_head.model_dump(mode="json")
+
+    @classmethod
+    def _build_head_workspace_spec(cls, data: ReviewPRData) -> Optional[WorkspaceInfo]:
+        head_commit_hash = str(data.snapshot_head_sha or "").strip()
+        if not head_commit_hash:
+            return None
+
+        head_metadata = cls._get_pr_head_metadata(data) or {}
+        default_target = head_metadata.get("default_target") or data.target_workspace.default_target
+        toolchain = head_metadata.get("toolchain") or data.target_workspace.toolchain
+
+        return data.target_workspace.model_copy(
+            update={
+                "commit_hash": head_commit_hash,
+                "default_target": default_target,
+                "toolchain": toolchain,
+            }
+        )
+
+    @staticmethod
+    def _lean_file_path_to_module_name(file_path: str) -> Optional[str]:
+        if not file_path.endswith(".lean"):
+            return None
+
+        module_path = PurePosixPath(file_path)
+        if not module_path.parts:
+            return None
+
+        return ".".join(module_path.with_suffix("").parts)
+
+    @classmethod
+    def _head_workspace_verify_targets(cls, data: ReviewPRData, default_target: str) -> List[str]:
+        seen: set[str] = set()
+        verify_targets: List[str] = []
+        for rel_path in data.changed_files:
+            module_name = cls._lean_file_path_to_module_name(rel_path)
+            if not module_name or module_name in seen:
+                continue
+            seen.add(module_name)
+            verify_targets.append(module_name)
+
+        if verify_targets:
+            return verify_targets
+
+        fallback_target = str(default_target or "Mathlib").strip() or "Mathlib"
+        return [fallback_target]
+
+    @classmethod
+    def _format_head_fast_path_reason(cls, reason: object) -> str:
+        text = str(reason).strip()
+        if not text and isinstance(reason, BaseException):
+            text = reason.__class__.__name__
+        text = re.sub(r"\s+", " ", text)
+        if len(text) > 220:
+            text = f"{text[:217].rstrip()}..."
+        return text or "unknown reason"
+
+    @classmethod
+    async def _emit_head_fast_path_fallback(
+        cls,
+        data: ReviewPRData,
+        reason: object,
+        *,
+        logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
+    ) -> None:
+        formatted_reason = cls._format_head_fast_path_reason(reason)
+        if logger:
+            logger.info(
+                "PR-head workspace fast path fell back to base patching for %s: %s",
+                data.task_id,
+                formatted_reason,
+            )
+        await cls._emit_progress(
+            progress_callback,
+            f"PR-head fast path fell back to base snapshot patching: {formatted_reason}",
+        )
+
+    @classmethod
+    async def _link_resolved_workspace(
+        cls,
+        workspace_spec: WorkspaceInfo,
+        actual_workspace_path: Path,
+        link_path: Path,
+        logger: Optional["logging.LoggerAdapter"] = None,
+    ) -> WorkspaceInfo:
+        if link_path.exists() and link_path.is_dir() and not link_path.is_symlink():
+            if logger:
+                logger.info(
+                    "Workspace %s already exists as directory at %s, using existing",
+                    workspace_spec.name,
+                    link_path,
+                )
+            read_only_patterns = workspace_spec.read_only_path_patterns or ["**/*"]
+            return workspace_spec.model_copy(
+                update={
+                    "path": link_path,
+                    "read_only_path_patterns": read_only_patterns,
+                }
+            )
+
+        if link_path.is_symlink():
+            link_path.unlink()
+        elif link_path.exists():
+            link_path.unlink()
+
+        link_path.symlink_to(actual_workspace_path, target_is_directory=True)
+        read_only_patterns = workspace_spec.read_only_path_patterns or ["**/*"]
+        return workspace_spec.model_copy(
+            update={
+                "path": link_path,
+                "read_only_path_patterns": read_only_patterns,
+            }
+        )
+
+    @classmethod
+    async def _maybe_resolve_cached_workspace(
+        cls,
+        workspace_spec: WorkspaceInfo,
+        *,
+        logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
+    ) -> Optional[Path]:
+        if not workspace_spec.commit_hash:
+            return None
+
+        try:
+            from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+            from ape.toolkits.execute.lean.core.restore_manager import RestoreManager
+
+            verify_config = LeanVerifyToolConfig()
+            repo_name, resolved_url = verify_config.resolve_repo(workspace_spec.repo_url)
+            restore_manager = RestoreManager(
+                verify_config,
+                logger,
+                resolved_url,
+                progress_callback=progress_callback,
+            )
+
+            if await restore_manager._requires_build_first(workspace_spec.commit_hash):
+                if logger:
+                    logger.info(
+                        "No local compiled workspace is available yet for %s@%s",
+                        repo_name,
+                        workspace_spec.commit_hash,
+                    )
+                return None
+
+            if logger:
+                logger.info(
+                    "Attempting to reuse compiled workspace for %s@%s",
+                    repo_name,
+                    workspace_spec.commit_hash,
+                )
+            return await restore_manager.get_workspace(workspace_spec.commit_hash)
+
+        except Exception as exc:
+            if logger:
+                logger.info(
+                    "Unable to reuse compiled workspace for %s@%s: %s",
+                    workspace_spec.name,
+                    workspace_spec.commit_hash,
+                    exc,
+                )
+            return None
+
+    @classmethod
+    async def _maybe_setup_head_target_workspace(
+        cls,
+        data: ReviewPRData,
+        config: "BaseScaffoldConfig",
+        target_link_path: Path,
+        *,
+        logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
+    ) -> Optional[WorkspaceInfo]:
+        fast_path_mode = cls._head_workspace_fast_path_mode(config)
+        if fast_path_mode == "off":
+            return None
+
+        head_workspace_spec = cls._build_head_workspace_spec(data)
+        if head_workspace_spec is None or not head_workspace_spec.commit_hash:
+            return None
+
+        await cls._emit_progress(
+            progress_callback,
+            f"Trying a PR-head workspace fast path for {head_workspace_spec.name}@{head_workspace_spec.commit_hash[:8]}...",
+        )
+
+        cached_workspace_path = await cls._maybe_resolve_cached_workspace(
+            head_workspace_spec,
+            logger=logger,
+            progress_callback=progress_callback,
+        )
+        if cached_workspace_path is not None:
+            if logger:
+                logger.info(
+                    "Using existing compiled PR-head workspace for %s@%s",
+                    head_workspace_spec.name,
+                    head_workspace_spec.commit_hash,
+                )
+            await cls._emit_progress(
+                progress_callback,
+                f"Using a compiled PR-head workspace for commit {head_workspace_spec.commit_hash[:8]}...",
+            )
+            return await cls._link_resolved_workspace(
+                head_workspace_spec,
+                cached_workspace_path,
+                target_link_path,
+                logger=logger,
+            )
+
+        if fast_path_mode == "reuse_only":
+            await cls._emit_head_fast_path_fallback(
+                data,
+                "local reuse is enabled, but no compiled PR-head workspace is available yet",
+                logger=logger,
+                progress_callback=progress_callback,
+            )
+            return None
+
+        head_metadata = cls._get_pr_head_metadata(data)
+        if not head_metadata:
+            await cls._emit_head_fast_path_fallback(
+                data,
+                "PR-head metadata is unavailable",
+                logger=logger,
+                progress_callback=progress_callback,
+            )
+            return None
+
+        fetch_repo_url = str(head_metadata.get("clone_url") or "").strip()
+        fetch_ref = str(head_metadata.get("ref") or "").strip()
+        if not fetch_repo_url or not fetch_ref:
+            await cls._emit_head_fast_path_fallback(
+                data,
+                "PR-head clone_url/ref metadata is incomplete",
+                logger=logger,
+                progress_callback=progress_callback,
+            )
+            return None
+
+        try:
+            from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+            from ape.toolkits.execute.lean.core.build_manager import BuildManager
+
+            verify_targets = cls._head_workspace_verify_targets(data, head_workspace_spec.default_target)
+            verify_config = LeanVerifyToolConfig()
+            build_manager = BuildManager(
+                verify_config,
+                logger,
+                head_workspace_spec.repo_url,
+            )
+            cache_repo_full_name = str(head_metadata.get("repo_full_name") or "").strip() or None
+            if fast_path_mode == "full_build":
+                await cls._emit_progress(
+                    progress_callback,
+                    "Attempting a full PR-head workspace build from cache metadata...",
+                )
+                await build_manager.build_workspace_from_ref(
+                    head_workspace_spec.commit_hash,
+                    fetch_repo_url=fetch_repo_url,
+                    fetch_ref=fetch_ref,
+                    cache_repo_full_name=cache_repo_full_name,
+                )
+            else:
+                await cls._emit_progress(
+                    progress_callback,
+                    "Attempting a bounded cache-only PR-head workspace probe...",
+                )
+                await build_manager.prepare_workspace_from_ref_with_cache_probe(
+                    head_workspace_spec.commit_hash,
+                    fetch_repo_url=fetch_repo_url,
+                    fetch_ref=fetch_ref,
+                    cache_repo_full_name=cache_repo_full_name,
+                    verify_targets=verify_targets,
+                    progress_callback=progress_callback,
+                )
+            resolved_head_workspace_path = await cls._resolve_lean_workspace(
+                commit_hash=head_workspace_spec.commit_hash,
+                repo_url=head_workspace_spec.repo_url,
+                config=config,
+                logger=logger,
+                progress_callback=progress_callback,
+            )
+            await cls._emit_progress(
+                progress_callback,
+                f"Prepared a compiled PR-head workspace for commit {head_workspace_spec.commit_hash[:8]}...",
+            )
+            return await cls._link_resolved_workspace(
+                head_workspace_spec,
+                resolved_head_workspace_path,
+                target_link_path,
+                logger=logger,
+            )
+        except Exception as exc:
+            await cls._emit_head_fast_path_fallback(
+                data,
+                exc,
+                logger=logger,
+                progress_callback=progress_callback,
+            )
+            return None
+
+    @classmethod
     async def _apply_pr_diff(
         cls,
         workspace_path: Path,
@@ -893,7 +1240,7 @@ class ReviewPRTask(BaseLeanTask):
         logger: Optional["logging.LoggerAdapter"] = None,
         progress_callback=None,
     ) -> tuple[Path, WorkspaceInfo, Optional[WorkspaceInfo], Optional[List[WorkspaceInfo]]]:
-        attempt_path, scratch_workspace, target_workspace, reference_workspaces = await super().setup_attempt(
+        attempt_path, scratch_workspace, _, _ = await super(BaseLeanTask, cls).setup_attempt(
             data=data,
             config=config,
             orchestrator_id=orchestrator_id,
@@ -902,21 +1249,73 @@ class ReviewPRTask(BaseLeanTask):
             progress_callback=progress_callback,
         )
 
-        if target_workspace:
+        workspaces_dir = attempt_path / config.workspaces_dir_name
+        target_workspace: Optional[WorkspaceInfo] = None
+
+        if data.target_workspace:
             try:
-                target_workspace = await cls._ensure_patched_target_workspace(
+                target_workspace = await cls._maybe_setup_head_target_workspace(
                     data=data,
-                    target_workspace=target_workspace,
+                    config=config,
+                    target_link_path=workspaces_dir / "target",
                     logger=logger,
                     progress_callback=progress_callback,
                 )
             except Exception:
                 if logger:
                     logger.error(
-                        "Failed to prepare patched PR review workspace: %s",
+                        "Failed during PR-head workspace fast path: %s",
                         traceback.format_exc(),
                     )
-                raise
+                target_workspace = None
+
+            if target_workspace is None:
+                await cls._emit_progress(
+                    progress_callback,
+                    f"Resolving target Lean workspace {data.target_workspace.name}@{data.target_workspace.commit_hash[:8]}...",
+                )
+                target_workspace = await cls._setup_workspace_symlink(
+                    workspace_spec=data.target_workspace,
+                    link_path=workspaces_dir / "target",
+                    config=config,
+                    logger=logger,
+                    progress_callback=progress_callback,
+                )
+
+                try:
+                    target_workspace = await cls._ensure_patched_target_workspace(
+                        data=data,
+                        target_workspace=target_workspace,
+                        logger=logger,
+                        progress_callback=progress_callback,
+                    )
+                except Exception:
+                    if logger:
+                        logger.error(
+                            "Failed to prepare patched PR review workspace: %s",
+                            traceback.format_exc(),
+                        )
+                    raise
+
+        reference_workspaces = None
+        if data.reference_workspaces:
+            reference_workspaces = []
+            ref_base_dir = workspaces_dir / "reference"
+            ref_base_dir.mkdir(parents=True, exist_ok=True)
+
+            for ref_ws in data.reference_workspaces:
+                await cls._emit_progress(
+                    progress_callback,
+                    f"Resolving reference Lean workspace {ref_ws.name}@{ref_ws.commit_hash[:8]}...",
+                )
+                linked_ref = await cls._setup_workspace_symlink(
+                    workspace_spec=ref_ws,
+                    link_path=ref_base_dir / ref_ws.name,
+                    config=config,
+                    logger=logger,
+                    progress_callback=progress_callback,
+                )
+                reference_workspaces.append(linked_ref)
 
         return attempt_path, scratch_workspace, target_workspace, reference_workspaces
 
@@ -927,39 +1326,17 @@ class ReviewPRTask(BaseLeanTask):
 
     @staticmethod
     def _normalize_issue_tag(tag: str) -> str:
-        normalized = tag.strip().lower()
-        normalized = re.sub(r"[\s\-]+", "_", normalized)
-        normalized = re.sub(r"[^a-z0-9_]", "", normalized)
-        return normalized
-
-    def _normalize_tag_list(self, tags: Optional[List[str]]) -> List[str]:
-        if not tags:
-            return []
-        normalized: List[str] = []
-        seen: Set[str] = set()
-        for tag in tags:
-            n = self._normalize_issue_tag(tag)
-            if not n or n in seen:
-                continue
-            seen.add(n)
-            normalized.append(n)
-        return normalized
+        return normalize_issue_tag(tag)
 
     @staticmethod
-    def _set_metrics(predicted: Set[str], gold: Set[str]) -> Tuple[float, float, float]:
-        if not predicted and not gold:
-            return 1.0, 1.0, 1.0
-        if not predicted:
-            return 0.0, 0.0, 0.0
+    def _normalize_finding_category(category: str) -> str:
+        return normalize_review_category(category)
 
-        intersection_size = len(predicted & gold)
-        precision = intersection_size / len(predicted) if predicted else 0.0
-        recall = 1.0 if not gold else intersection_size / len(gold)
-        if precision + recall == 0.0:
-            f1 = 0.0
-        else:
-            f1 = (2.0 * precision * recall) / (precision + recall)
-        return precision, recall, f1
+    def _normalize_findings(self, findings: Optional[List[ReviewFinding]]) -> List[ReviewFinding]:
+        return coerce_review_findings(findings or [])
+
+    def _extract_finding_categories(self, findings: Optional[List[ReviewFinding]]) -> List[str]:
+        return extract_review_categories(findings or [])
 
     def _build_diff_preview(self, limit: int) -> str:
         if limit <= 0:
@@ -984,27 +1361,28 @@ class ReviewPRTask(BaseLeanTask):
         if not self.scratch_workspace:
             raise RuntimeError("Scratch workspace not initialized for PR review task")
 
+        snapshot = self.data.snapshot
         self.scratch_pr_diff_path = self.scratch_workspace.path / "pr.diff"
         self.scratch_pr_context_path = self.scratch_workspace.path / "pr_context.md"
 
         context_lines = [
             f"# PR Review Context",
             f"",
-            f"- PR number: {self.data.pr_number if self.data.pr_number is not None else 'N/A'}",
-            f"- PR URL: {self.data.pr_url or 'N/A'}",
-            f"- Title: {self.data.pr_title}",
-            f"- Author: {self.data.pr_author or 'unknown'}",
-            f"- Snapshot type: {self.data.snapshot_type or 'unknown'}",
-            f"- Snapshot cutoff: {self.data.snapshot_at or 'N/A'}",
-            f"- Snapshot base SHA: {self.data.snapshot_base_sha or 'N/A'}",
-            f"- Snapshot head SHA: {self.data.snapshot_head_sha or 'N/A'}",
-            f"- Review state at snapshot: {self.data.review_state or 'N/A'}",
+            f"- PR number: {snapshot.pr_number if snapshot.pr_number is not None else 'N/A'}",
+            f"- PR URL: {snapshot.pr_url or 'N/A'}",
+            f"- Title: {snapshot.pr_title}",
+            f"- Author: {snapshot.pr_author or 'unknown'}",
+            f"- Snapshot type: {snapshot.snapshot_type or 'unknown'}",
+            f"- Snapshot cutoff: {snapshot.snapshot_at or 'N/A'}",
+            f"- Snapshot base SHA: {snapshot.snapshot_base_sha or 'N/A'}",
+            f"- Snapshot head SHA: {snapshot.snapshot_head_sha or 'N/A'}",
+            f"- Review state at snapshot: {snapshot.review_state or 'N/A'}",
             f"- Target workspace contents: PR patch already applied at this snapshot",
             f"",
             "## PR dependencies",
         ]
-        if self.data.pr_dependencies:
-            context_lines.extend([f"- {dependency}" for dependency in self.data.pr_dependencies])
+        if snapshot.pr_dependencies:
+            context_lines.extend([f"- {dependency}" for dependency in snapshot.pr_dependencies])
         else:
             context_lines.append("- (none provided)")
 
@@ -1012,8 +1390,8 @@ class ReviewPRTask(BaseLeanTask):
             "",
             "## Changed files",
         ])
-        if self.data.changed_files:
-            context_lines.extend([f"- {path}" for path in self.data.changed_files])
+        if snapshot.changed_files:
+            context_lines.extend([f"- {path}" for path in snapshot.changed_files])
         else:
             context_lines.append("- (not provided)")
 
@@ -1021,7 +1399,7 @@ class ReviewPRTask(BaseLeanTask):
 
         await self.emit_progress("Writing PR review context files into the scratch workspace...")
         async with aiofiles.open(self.scratch_pr_diff_path, "w", encoding="utf-8") as f:
-            await f.write(self.data.pr_diff or "")
+            await f.write(snapshot.pr_diff or "")
         async with aiofiles.open(self.scratch_pr_context_path, "w", encoding="utf-8") as f:
             await f.write("\n".join(context_lines))
 
@@ -1046,31 +1424,32 @@ class ReviewPRTask(BaseLeanTask):
         from .prompt import LEAN_PR_REVIEW_USER_PROMPT
 
         task_config: ReviewPRConfig = self.config.task_config
+        snapshot = self.data.snapshot
 
-        pr_display = f"#{self.data.pr_number}" if self.data.pr_number is not None else "N/A"
-        if self.data.pr_url:
-            pr_display = f"{pr_display} ({self.data.pr_url})"
+        pr_display = f"#{snapshot.pr_number}" if snapshot.pr_number is not None else "N/A"
+        if snapshot.pr_url:
+            pr_display = f"{pr_display} ({snapshot.pr_url})"
 
         changed_files_list = (
-            "\n".join(f"- `{file_path}`" for file_path in self.data.changed_files)
-            if self.data.changed_files
+            "\n".join(f"- `{file_path}`" for file_path in snapshot.changed_files)
+            if snapshot.changed_files
             else "- (no file list provided)"
         )
-        review_focus = self.data.review_focus or "No extra focus hints provided."
-        issue_tags = "\n".join(
-            f"- `{self._normalize_issue_tag(tag)}`" for tag in task_config.allowed_issue_tags
+        review_focus = snapshot.review_focus or "No extra focus hints provided."
+        finding_categories = "\n".join(
+            f"- `{self._normalize_finding_category(category)}`" for category in task_config.allowed_finding_categories
         )
         pr_dependencies = (
-            "\n".join(f"- `{dependency}`" for dependency in self.data.pr_dependencies)
-            if self.data.pr_dependencies
+            "\n".join(f"- `{dependency}`" for dependency in snapshot.pr_dependencies)
+            if snapshot.pr_dependencies
             else "- (none provided)"
         )
         snapshot_lines = [
-            f"- Snapshot type: {self.data.snapshot_type or 'unknown'}",
-            f"- Snapshot cutoff: {self.data.snapshot_at or 'N/A'}",
-            f"- Snapshot base SHA: {self.data.snapshot_base_sha or 'N/A'}",
-            f"- Snapshot head SHA: {self.data.snapshot_head_sha or 'N/A'}",
-            f"- Maintainer review state: {self.data.review_state or 'N/A'}",
+            f"- Snapshot type: {snapshot.snapshot_type or 'unknown'}",
+            f"- Snapshot cutoff: {snapshot.snapshot_at or 'N/A'}",
+            f"- Snapshot base SHA: {snapshot.snapshot_base_sha or 'N/A'}",
+            f"- Snapshot head SHA: {snapshot.snapshot_head_sha or 'N/A'}",
+            f"- Maintainer review state: {snapshot.review_state or 'N/A'}",
         ]
         snapshot_context = "\n".join(snapshot_lines)
 
@@ -1080,16 +1459,16 @@ class ReviewPRTask(BaseLeanTask):
             submit_tool_name=submit_tool_name,
             managed_skill_guidance=self._build_managed_skill_guidance(),
             pr_display=pr_display,
-            pr_title=self.data.pr_title,
-            pr_author=self.data.pr_author or "unknown",
-            changed_files_count=len(self.data.changed_files),
+            pr_title=snapshot.pr_title,
+            pr_author=snapshot.pr_author or "unknown",
+            changed_files_count=len(snapshot.changed_files),
             changed_files_list=changed_files_list,
             pr_dependencies=pr_dependencies,
             snapshot_context=snapshot_context,
             review_focus=review_focus,
-            pr_description=self.data.pr_description or "(empty PR description)",
+            pr_description=snapshot.pr_description or "(empty PR description)",
             pr_diff_preview=self._build_diff_preview(task_config.diff_preview_char_limit),
-            issue_tags=issue_tags,
+            finding_categories=finding_categories,
         )
 
     async def register_task_tools(self, mcp) -> None:
@@ -1102,11 +1481,11 @@ class ReviewPRTask(BaseLeanTask):
         )
         async def submit_result(
             merge_ready: Annotated[bool, Field(description="True if PR is ready to merge, else False")],
-            blocking_issue_tags: Annotated[List[str], Field(
-                description="Blocking issue tags. Use canonical tags from prompt."
+            blocking_findings: Annotated[List[ReviewFinding], Field(
+                description="Blocking findings. Use canonical categories from the prompt."
             )],
-            advisory_issue_tags: Annotated[Optional[List[str]], Field(
-                description="Advisory issue tags (non-blocking).",
+            advisory_findings: Annotated[Optional[List[ReviewFinding]], Field(
+                description="Advisory findings (non-blocking).",
                 default=None,
             )] = None,
             guide_evidence_topics: Annotated[Optional[List[str]], Field(
@@ -1124,12 +1503,19 @@ class ReviewPRTask(BaseLeanTask):
             """Submit PR review for evaluation and termination."""
             self.logger.info("Tool submit_result: execution started")
             try:
-                blocked_reason = self._validate_submission_prerequisites(
+                submission = PRReviewSubmission(
                     merge_ready=merge_ready,
-                    blocking_issue_tags=blocking_issue_tags,
-                    advisory_issue_tags=advisory_issue_tags or [],
+                    blocking_findings=self._normalize_findings(blocking_findings),
+                    advisory_findings=self._normalize_findings(advisory_findings or []),
+                    guide_evidence_topics=self._normalize_guide_topics(guide_evidence_topics or []),
                     feedback=feedback,
-                    guide_evidence_topics=guide_evidence_topics or [],
+                )
+                blocked_reason = self._validate_submission_prerequisites(
+                    merge_ready=submission.merge_ready,
+                    blocking_findings=submission.blocking_findings,
+                    advisory_findings=submission.advisory_findings,
+                    feedback=submission.feedback,
+                    guide_evidence_topics=submission.guide_evidence_topics,
                 )
                 if blocked_reason:
                     self.logger.info("Tool submit_result: rejected by task prerequisites")
@@ -1142,23 +1528,17 @@ class ReviewPRTask(BaseLeanTask):
                         "message": blocked_reason,
                     }
 
-                evaluation_result, review_data, custom_metrics = self._evaluate_review(
-                    merge_ready=merge_ready,
-                    blocking_issue_tags=blocking_issue_tags,
-                    advisory_issue_tags=advisory_issue_tags or [],
-                    guide_evidence_topics=guide_evidence_topics or [],
-                    feedback=feedback,
-                )
+                evaluation_result, review_data, custom_metrics = self._evaluate_review(submission)
 
                 if self.should_terminate(evaluation_result) and self.termination_callback:
                     task_result = self.create_result(
                         success=True,
                         score=evaluation_result.score,
-                        merge_ready=merge_ready,
-                        blocking_issue_tags=review_data.get("predicted", {}).get("blocking_issue_tags", []),
-                        advisory_issue_tags=review_data.get("predicted", {}).get("advisory_issue_tags", []),
-                        guide_evidence_topics=review_data.get("predicted", {}).get("guide_evidence_topics", []),
-                        feedback=feedback,
+                        merge_ready=submission.merge_ready,
+                        blocking_findings=submission.blocking_findings,
+                        advisory_findings=submission.advisory_findings,
+                        guide_evidence_topics=submission.guide_evidence_topics,
+                        feedback=submission.feedback,
                         review_data=review_data,
                         custom_metrics=custom_metrics,
                     )
@@ -1187,158 +1567,13 @@ class ReviewPRTask(BaseLeanTask):
 
     def _evaluate_review(
         self,
-        merge_ready: bool,
-        blocking_issue_tags: List[str],
-        advisory_issue_tags: List[str],
-        guide_evidence_topics: List[str],
-        feedback: str,
+        submission: PRReviewSubmission,
     ) -> Tuple[EvaluationResult, Dict[str, Any], Optional[Dict[str, float]]]:
-        task_config: ReviewPRConfig = self.config.task_config
-
-        normalized_blocking = self._normalize_tag_list(blocking_issue_tags)
-        normalized_advisory = self._normalize_tag_list(advisory_issue_tags)
-        normalized_guide_topics = self._normalize_guide_topics(guide_evidence_topics)
-        allowed_tags = {self._normalize_issue_tag(tag) for tag in task_config.allowed_issue_tags}
-
-        unknown_tags = sorted(
-            set(normalized_blocking + normalized_advisory) - allowed_tags
-        )
-        if unknown_tags and task_config.strict_tag_validation:
-            return (
-                EvaluationResult(
-                    success=False,
-                    score=0.0,
-                    message=(
-                        "Unknown issue tags under strict_tag_validation: "
-                        + ", ".join(f"`{tag}`" for tag in unknown_tags)
-                    ),
-                ),
-                {},
-                None,
-            )
-
-        predicted = {
-            "merge_ready": merge_ready,
-            "blocking_issue_tags": normalized_blocking,
-            "advisory_issue_tags": normalized_advisory,
-            "guide_evidence_topics": normalized_guide_topics,
-            "read_skill_relative_paths": list(self._get_skill_read_relative_paths()),
-            "unknown_tags": unknown_tags,
-            "feedback_length": len(feedback or ""),
-        }
-
-        ground_truth = self.data.ground_truth
-        if not ground_truth:
-            review_data = {
-                "predicted": predicted,
-                "ground_truth": None,
-                "metrics": None,
-                "notes": "No ground truth provided; score defaults to 1.0 on valid submission.",
-            }
-            return (
-                EvaluationResult(
-                    success=True,
-                    score=1.0,
-                    message="Review submitted (no ground truth available for scoring).",
-                    metrics=review_data,
-                ),
-                review_data,
-                None,
-            )
-
-        gold_blocking = set(self._normalize_tag_list(ground_truth.blocking_issue_tags))
-        gold_advisory = set(self._normalize_tag_list(ground_truth.advisory_issue_tags))
-
-        blocking_precision, blocking_recall, blocking_f1 = self._set_metrics(
-            set(normalized_blocking),
-            gold_blocking,
-        )
-        advisory_precision, advisory_recall, advisory_f1 = self._set_metrics(
-            set(normalized_advisory),
-            gold_advisory,
-        )
-
-        decision_accuracy = 1.0 if merge_ready == ground_truth.merge_ready else 0.0
-        weighted_score = (
-            task_config.decision_weight * decision_accuracy
-            + task_config.blocking_issue_weight * blocking_f1
-            + task_config.advisory_issue_weight * advisory_f1
-        )
-
-        false_approve = bool(not ground_truth.merge_ready and merge_ready)
-        if false_approve:
-            weighted_score = min(weighted_score, task_config.severe_false_approve_max_score)
-        weighted_score = max(0.0, min(1.0, weighted_score))
-
-        tp = 1.0 if merge_ready and ground_truth.merge_ready else 0.0
-        tn = 1.0 if (not merge_ready) and (not ground_truth.merge_ready) else 0.0
-        fp = 1.0 if merge_ready and (not ground_truth.merge_ready) else 0.0
-        fn = 1.0 if (not merge_ready) and ground_truth.merge_ready else 0.0
-
-        custom_metrics = {
-            "decision_accuracy": decision_accuracy,
-            "blocking_issue_precision": blocking_precision,
-            "blocking_issue_recall": blocking_recall,
-            "blocking_issue_f1": blocking_f1,
-            "advisory_issue_precision": advisory_precision,
-            "advisory_issue_recall": advisory_recall,
-            "advisory_issue_f1": advisory_f1,
-            "review_quality_score": weighted_score,
-            "tp": tp,
-            "tn": tn,
-            "fp": fp,
-            "fn": fn,
-        }
-
-        review_metrics = {
-            "decision_accuracy": decision_accuracy,
-            "blocking_issue": {
-                "precision": blocking_precision,
-                "recall": blocking_recall,
-                "f1": blocking_f1,
-            },
-            "advisory_issue": {
-                "precision": advisory_precision,
-                "recall": advisory_recall,
-                "f1": advisory_f1,
-            },
-            "false_approve": false_approve,
-            "weights": {
-                "decision_weight": task_config.decision_weight,
-                "blocking_issue_weight": task_config.blocking_issue_weight,
-                "advisory_issue_weight": task_config.advisory_issue_weight,
-            },
-            "review_quality_score": weighted_score,
-        }
-
-        review_data = {
-            "predicted": predicted,
-            "ground_truth": {
-                "merge_ready": ground_truth.merge_ready,
-                "blocking_issue_tags": sorted(gold_blocking),
-                "advisory_issue_tags": sorted(gold_advisory),
-                "rationale": ground_truth.rationale,
-            },
-            "metrics": review_metrics,
-        }
-
-        summary = (
-            f"Decision match={bool(decision_accuracy)}; "
-            f"blocking F1={blocking_f1:.3f}; advisory F1={advisory_f1:.3f}; "
-            f"score={weighted_score:.3f}"
-        )
-        if false_approve:
-            summary += " (false-approve penalty applied)"
-
-        return (
-            EvaluationResult(
-                success=True,
-                score=weighted_score,
-                message=summary,
-                metrics=review_data,
-            ),
-            review_data,
-            custom_metrics,
+        return evaluate_review_submission(
+            submission=submission,
+            evaluation=self.data.evaluation,
+            task_config=self.config.task_config,
+            read_skill_relative_paths=self._get_skill_read_relative_paths(),
         )
 
     def create_result(
@@ -1346,8 +1581,8 @@ class ReviewPRTask(BaseLeanTask):
         success: bool,
         score: float,
         merge_ready: bool,
-        blocking_issue_tags: List[str],
-        advisory_issue_tags: List[str],
+        blocking_findings: List[ReviewFinding],
+        advisory_findings: List[ReviewFinding],
         guide_evidence_topics: List[str],
         feedback: str,
         review_data: Dict[str, Any],
@@ -1360,8 +1595,8 @@ class ReviewPRTask(BaseLeanTask):
             success=success,
             score=score,
             merge_ready=merge_ready,
-            blocking_issue_tags=blocking_issue_tags,
-            advisory_issue_tags=advisory_issue_tags,
+            blocking_findings=blocking_findings,
+            advisory_findings=advisory_findings,
             guide_evidence_topics=guide_evidence_topics,
             feedback=feedback,
             review_data=review_data,
@@ -1409,8 +1644,8 @@ class SkilledReviewPRTask(ReviewPRTask):
             f"3. Prepared `guide_evidence_topics` covering at least {required_topic_text}.\n\n"
             "Provide:\n"
             "- merge_ready: whether the PR is ready to merge\n"
-            "- blocking_issue_tags: blocking issues preventing merge\n"
-            "- advisory_issue_tags: non-blocking suggestions\n"
+            "- blocking_findings: blocking findings preventing merge\n"
+            "- advisory_findings: non-blocking findings\n"
             "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
             "- feedback: concise, evidence-based reviewer feedback grounded in the guides you read\n\n"
             "If the guide bootstrap is incomplete, continue reviewing instead of calling this tool."
@@ -1470,8 +1705,8 @@ class SkilledReviewPRTask(ReviewPRTask):
         self,
         *,
         merge_ready: bool,
-        blocking_issue_tags: List[str],
-        advisory_issue_tags: List[str],
+        blocking_findings: List[ReviewFinding],
+        advisory_findings: List[ReviewFinding],
         feedback: str,
         guide_evidence_topics: Optional[List[str]] = None,
     ) -> Optional[str]:
@@ -1549,8 +1784,8 @@ class SkilledReviewPRTask(ReviewPRTask):
             )
 
         inferred_topics = self._infer_guide_topics_from_submission(
-            blocking_issue_tags=blocking_issue_tags,
-            advisory_issue_tags=advisory_issue_tags,
+            blocking_findings=blocking_findings,
+            advisory_findings=advisory_findings,
             feedback=feedback,
         )
         undeclared_inferred_topics = sorted(inferred_topics - set(declared_topics))
@@ -1564,17 +1799,17 @@ class SkilledReviewPRTask(ReviewPRTask):
                 f"Read one of {required_paths} and add `{first_topic}` to `guide_evidence_topics`."
             )
 
-        style_issue_tags = {
-            self._normalize_issue_tag(tag)
-            for tag in (blocking_issue_tags or []) + (advisory_issue_tags or [])
-        }
-        if "style_or_readability" in style_issue_tags and not (
-            {"naming", "documentation", "style", "pr_metadata"} & set(declared_topics)
-        ):
+        submitted_categories = self._extract_finding_categories((blocking_findings or []) + (advisory_findings or []))
+        for category in submitted_categories:
+            valid_topics = set(FINDING_CATEGORY_GUIDE_TOPICS.get(category, ()))
+            if not valid_topics:
+                continue
+            if valid_topics & set(declared_topics):
+                continue
+            topic_list = ", ".join(f"`{topic}`" for topic in sorted(valid_topics))
             return (
-                "If you submit a `style_or_readability` issue, declare which guide topic supports it "
-                "in `guide_evidence_topics` (for example `naming`, `documentation`, `style`, or "
-                "`pr_metadata`) and read the matching reference file first."
+                f"If you submit a `{category}` finding, declare a supporting guide topic in "
+                f"`guide_evidence_topics` from: {topic_list}."
             )
 
         return None
