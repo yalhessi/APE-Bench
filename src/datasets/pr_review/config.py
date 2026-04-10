@@ -34,7 +34,14 @@ class PRReviewDatasetConfig(BaseModel):
     end_date: Optional[str] = Field(default=None, description="End date (YYYY-MM-DD), inclusive")
 
     include_merged: bool = Field(default=True, description="Include merged PRs")
-    include_closed_unmerged: bool = Field(default=True, description="Include closed-but-unmerged PRs")
+    include_unmerged: bool = Field(
+        default=True,
+        description="Include unmerged PRs, whether they are closed or still open",
+    )
+    only_llm_generated_prs: bool = Field(
+        default=False,
+        description="Keep only PRs tagged as LLM-generated",
+    )
     exclude_draft: bool = Field(default=True, description="Exclude draft PRs")
 
     decision_review_states: List[str] = Field(
@@ -105,10 +112,21 @@ class PRReviewDatasetConfig(BaseModel):
     def repo_url(self) -> str:
         return f"https://github.com/{self.repo_owner}/{self.repo_name}.git"
 
+    @model_validator(mode="before")
+    @classmethod
+    def _migrate_legacy_include_closed_unmerged(cls, data):
+        if not isinstance(data, dict):
+            return data
+        if "include_unmerged" not in data and "include_closed_unmerged" in data:
+            migrated = dict(data)
+            migrated["include_unmerged"] = migrated["include_closed_unmerged"]
+            return migrated
+        return data
+
     @model_validator(mode="after")
     def validate_constraints(self):
-        if not self.include_merged and not self.include_closed_unmerged:
-            raise ValueError("At least one of include_merged/include_closed_unmerged must be True")
+        if not self.include_merged and not self.include_unmerged:
+            raise ValueError("At least one of include_merged/include_unmerged must be True")
 
         if self.start_date:
             datetime.strptime(self.start_date, "%Y-%m-%d")

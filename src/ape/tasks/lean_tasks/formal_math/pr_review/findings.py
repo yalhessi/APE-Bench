@@ -32,6 +32,7 @@ LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY: dict[str, str] = {
 }
 
 AI_GENERATED_PR_LABEL = "llm_generated"
+AI_GENERATED_PR_GITHUB_LABEL = "llm-generated"
 
 
 def normalize_issue_tag(tag: str) -> str:

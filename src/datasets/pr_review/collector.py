@@ -22,6 +22,7 @@ from ..external_benchmarks.github_utils import fetch_file_from_github, get_defau
 from .config import PRReviewDatasetConfig
 from ape.tasks.lean_tasks.formal_math.pr_review.findings import (
     AI_GENERATED_PR_LABEL,
+    AI_GENERATED_PR_GITHUB_LABEL,
     legacy_issue_tags_to_review_findings,
     normalize_issue_tag as shared_normalize_issue_tag,
     review_findings_to_json,
@@ -128,6 +129,8 @@ TRIVIAL_FEEDBACK_PATTERNS = [
 LOW_FEEDBACK_MAINTAINER_ITEMS_MAX = 3
 HIGH_FEEDBACK_MAINTAINER_ITEMS_MIN = 4
 
+BORS_MERGED_TITLE_RE = re.compile(r"^\s*\[merged by bors\](?:\s|$)", re.IGNORECASE)
+
 DEPENDENCY_LINE_PATTERN = re.compile(r"^\s*-\s*\[[ xX]?\]\s*depends on:\s*.+$", re.IGNORECASE)
 DEPENDENCY_PLACEHOLDER_PATTERN = re.compile(
     r"^\s*-\s*\[[ xX]?\]\s*depends on:\s*#(?:abc|xyz)\s*\[optional extra text\]\s*$",
@@ -193,8 +196,15 @@ def _changes_requested_count(reviews: Sequence[Dict[str, Any]]) -> int:
     return sum(1 for review in reviews if str(review.get("state") or "").upper() == "CHANGES_REQUESTED")
 
 
-def _final_pr_outcome(pr: Dict[str, Any]) -> str:
+def _is_effectively_merged(pr: Dict[str, Any]) -> bool:
     if pr.get("merged_at") or pr.get("merged") is True:
+        return True
+    title = str(pr.get("title") or "")
+    return bool(BORS_MERGED_TITLE_RE.match(title))
+
+
+def _final_pr_outcome(pr: Dict[str, Any]) -> str:
+    if _is_effectively_merged(pr):
         return "merged"
     if str(pr.get("state") or "").lower() == "closed":
         return "closed_unmerged"
@@ -219,6 +229,8 @@ def _classify_primary_case(
 ) -> str:
     if final_pr_outcome == "closed_unmerged":
         return "abandoned"
+    if final_pr_outcome == "open":
+        return "active_review"
     if (
         final_pr_outcome == "merged"
         and maintainer_round_count <= 1
@@ -237,8 +249,12 @@ def _derive_case_flags(
     authoring_mode: str,
 ) -> List[str]:
     flags: list[str] = []
+    if final_pr_outcome != "merged":
+        flags.append("unmerged")
     if final_pr_outcome == "closed_unmerged":
         flags.append("closed_unmerged")
+    if final_pr_outcome == "open":
+        flags.append("open_unmerged")
     if changes_requested_count > 0:
         flags.append("changes_requested")
     if maintainer_feedback_count <= LOW_FEEDBACK_MAINTAINER_ITEMS_MAX:
@@ -403,7 +419,7 @@ def _derive_merge_ready(
             return True, "maintainer_reviews_final_state", latest_state_by_user
 
     if allow_merge_outcome_fallback:
-        if pr.get("merged_at"):
+        if _is_effectively_merged(pr):
             return True, "merge_outcome_fallback", latest_state_by_user
         return False, "merge_outcome_fallback", latest_state_by_user
 
@@ -1216,15 +1232,23 @@ def _collect_maintainer_feedback(
 
 def _build_search_query(config: PRReviewDatasetConfig) -> str:
     parts = [f"repo:{config.repo_owner}/{config.repo_name}", "is:pr"]
-    if config.include_merged and config.include_closed_unmerged:
-        parts.append("is:closed")
+    if config.include_merged and config.include_unmerged:
+        # Search all PRs so unmerged selection can include both open and closed PRs.
+        pass
     elif config.include_merged:
-        parts.append("is:merged")
-    elif config.include_closed_unmerged:
-        parts.extend(["is:closed", "is:unmerged"])
+        # Mathlib's Bors flow can produce effectively merged PRs that GitHub
+        # still marks as closed-unmerged, so we search closed PRs and classify
+        # locally instead of relying on `is:merged`.
+        parts.append("is:closed")
+    elif config.include_unmerged:
+        # Search all PRs so we can include both open and closed unmerged PRs.
+        # We filter out effectively merged PRs locally.
+        pass
 
     if config.exclude_draft:
         parts.append("draft:false")
+    if config.only_llm_generated_prs:
+        parts.append(f'label:"{AI_GENERATED_PR_GITHUB_LABEL}"')
 
     date_qualifier = _build_date_qualifier(config.date_field, config.start_date, config.end_date)
     if date_qualifier:
@@ -1696,14 +1720,19 @@ class PRReviewDataCollector:
         changed_paths: List[str],
     ) -> bool:
         config = self.config
-        if not config.include_merged and pr.get("merged_at"):
+        is_effectively_merged = _is_effectively_merged(pr)
+        authoring_mode = _classify_authoring_mode(pr)
+        if not config.include_merged and is_effectively_merged:
             self.skip_reasons["excluded_merged"] += 1
             return False
-        if not config.include_closed_unmerged and not pr.get("merged_at"):
-            self.skip_reasons["excluded_closed_unmerged"] += 1
+        if not config.include_unmerged and not is_effectively_merged:
+            self.skip_reasons["excluded_unmerged"] += 1
             return False
         if config.exclude_draft and pr.get("draft"):
             self.skip_reasons["draft"] += 1
+            return False
+        if config.only_llm_generated_prs and authoring_mode != "ai_authored":
+            self.skip_reasons["excluded_non_llm_generated"] += 1
             return False
 
         date_value = pr.get(f"{config.date_field}_at")

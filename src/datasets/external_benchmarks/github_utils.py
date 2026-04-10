@@ -3,12 +3,14 @@
 Utilities for fetching Lean project metadata from GitHub.
 """
 
+import base64
+import os
 import re
-import urllib.error
-import urllib.request
 from functools import lru_cache
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
+import httpx
 
 try:  # Python 3.11+
     import tomllib  # type: ignore
@@ -19,26 +21,60 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for older Python
         tomllib = None  # type: ignore
 
 
+def _extract_owner_repo(repo_url: str) -> Optional[str]:
+    repo_url_clean = re.sub(r"\.git$", "", repo_url.strip())
+    parts = repo_url_clean.split("github.com/")
+    if len(parts) < 2:
+        print(f"  Warning: Invalid GitHub URL: {repo_url}")
+        return None
+    owner_repo = parts[1].strip("/")
+    return owner_repo or None
+
+
 def fetch_file_from_github(repo_url: str, commit_hash: str, file_path: str, timeout: int = 30) -> Optional[str]:
-    """Fetch a file from GitHub repository at a specific commit."""
+    """Fetch a file from a GitHub repository at a specific commit via the Contents API."""
+    owner_repo = _extract_owner_repo(repo_url)
+    if not owner_repo:
+        return None
+
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "ape-bench-github-utils",
+    }
+    token = os.getenv("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    url = f"https://api.github.com/repos/{owner_repo}/contents/{file_path}"
     try:
-        repo_url_clean = repo_url.rstrip('.git')
-        parts = repo_url_clean.split('github.com/')
-        if len(parts) < 2:
-            print(f"  Warning: Invalid GitHub URL: {repo_url}")
+        with httpx.Client(headers=headers, timeout=timeout) as client:
+            response = client.get(url, params={"ref": commit_hash})
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+
+        payload = response.json()
+        if not isinstance(payload, dict):
+            print(f"  Warning: Unexpected GitHub API payload for {file_path}: {type(payload).__name__}")
             return None
 
-        owner_repo = parts[1].strip('/')
-        raw_url = f"https://raw.githubusercontent.com/{owner_repo}/{commit_hash}/{file_path}"
+        encoding = str(payload.get("encoding") or "").lower()
+        content = payload.get("content")
+        if isinstance(content, str) and encoding == "base64":
+            return base64.b64decode(content).decode("utf-8")
+        if isinstance(content, str):
+            return content
 
-        req = urllib.request.Request(raw_url)
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            return response.read().decode('utf-8')
-
-    except urllib.error.HTTPError as e:
+        print(f"  Warning: Missing file content for {file_path} from GitHub API")
         return None
-    except Exception as e:
-        print(f"  Warning: Failed to fetch {file_path}: {e}")
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code == 404:
+            return None
+        print(f"  Warning: Failed to fetch {file_path} via GitHub API: {exc}")
+        return None
+    except Exception as exc:
+        print(f"  Warning: Failed to fetch {file_path} via GitHub API: {exc}")
         return None
 
 
