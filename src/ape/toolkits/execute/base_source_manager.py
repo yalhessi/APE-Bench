@@ -15,7 +15,7 @@ import git
 import aiofiles.os
 
 from .config import CodeExecuteToolConfig
-from ape.utils.file_ops import safe_remove_directory, normalize_repo_url
+from ape.utils.file_ops import file_lock, safe_remove_directory, normalize_repo_url
 from ape.utils.logging import create_logger
 
 if TYPE_CHECKING:
@@ -66,6 +66,13 @@ class BaseSourceManager:
             raise ValueError("Repository name not set")
         return self.config.get_repo_source_path(self.repo_name)
 
+    @property
+    def repo_lock_path(self) -> Path:
+        """Get the lock path for Git operations that mutate the shared source repo."""
+        if not self.repo_name:
+            raise ValueError("Repository name not set")
+        return self.config.get_repo_base_dir(self.repo_name) / "locks" / "source.lock"
+
     def _get_git_repo(self) -> git.Repo:
         """Get or create Git repository instance.
 
@@ -81,12 +88,17 @@ class BaseSourceManager:
             self._git_repo = git.Repo(self.repo_path)
         return self._git_repo
 
-    async def ensure_repository_cloned(self) -> bool:
-        """Ensure repository is cloned to source directory.
+    async def _ref_exists_locally(self, git_ref: str) -> bool:
+        """Return True when the requested ref/commit already exists locally."""
+        try:
+            repo = self._get_git_repo()
+            await asyncio.to_thread(repo.git.rev_parse, "--verify", f"{git_ref}^{{commit}}")
+            return True
+        except Exception:
+            return False
 
-        Returns:
-            True if successful, False otherwise.
-        """
+    async def _ensure_repository_cloned_unlocked(self) -> bool:
+        """Ensure repository is cloned without acquiring the repo mutation lock."""
         if await aiofiles.os.path.exists(self.repo_path):
             self.logger.info(f"Repository already exists: {self.repo_name}")
             return True
@@ -123,12 +135,17 @@ class BaseSourceManager:
         self.logger.error(f"Failed to clone after {self.config.max_retries} attempts")
         return False
 
-    async def fetch_updates(self) -> bool:
-        """Fetch updates from remote repository.
+    async def ensure_repository_cloned(self) -> bool:
+        """Ensure repository is cloned to source directory.
 
         Returns:
             True if successful, False otherwise.
         """
+        async with file_lock(self.repo_lock_path, timeout=self.config.git_operation_timeout):
+            return await self._ensure_repository_cloned_unlocked()
+
+    async def _fetch_updates_unlocked(self) -> bool:
+        """Fetch updates from the remote repository without acquiring the repo lock."""
         try:
             repo = self._get_git_repo()
             await asyncio.to_thread(repo.remotes.origin.fetch)
@@ -137,6 +154,18 @@ class BaseSourceManager:
         except Exception as e:
             self.logger.warning(f"Failed to fetch updates: {e}")
             return False
+
+    async def fetch_updates(self) -> bool:
+        """Fetch updates from remote repository.
+
+        Returns:
+            True if successful, False otherwise.
+        """
+        async with file_lock(self.repo_lock_path, timeout=self.config.git_operation_timeout):
+            clone_success = await self._ensure_repository_cloned_unlocked()
+            if not clone_success:
+                return False
+            return await self._fetch_updates_unlocked()
 
     async def create_worktree(
         self,
@@ -157,35 +186,38 @@ class BaseSourceManager:
         Raises:
             RuntimeError: If worktree creation fails.
         """
-        # Ensure repository exists
-        await self.ensure_repository_cloned()
-
-        # Fetch to ensure commit is available
-        await self.fetch_updates()
-
         worktree_path = target_dir / f"{commit_hash}_{os.getpid()}_{uuid.uuid4().hex[:8]}"
 
         try:
             await aiofiles.os.makedirs(target_dir, exist_ok=True)
+            async with file_lock(self.repo_lock_path, timeout=self.config.git_operation_timeout):
+                clone_success = await self._ensure_repository_cloned_unlocked()
+                if not clone_success:
+                    raise RuntimeError(f"Failed to clone repository for {self.repo_name}")
 
-            repo = self._get_git_repo()
+                # Only fetch when the requested revision is not already available locally.
+                if not await self._ref_exists_locally(commit_hash):
+                    await self._fetch_updates_unlocked()
 
-            # Create worktree
-            force_flag = '-f' if force else ''
-            if force_flag:
-                await asyncio.to_thread(
-                    repo.git.worktree,
-                    'add', force_flag,
-                    str(worktree_path),
-                    commit_hash
-                )
-            else:
-                await asyncio.to_thread(
-                    repo.git.worktree,
-                    'add',
-                    str(worktree_path),
-                    commit_hash
-                )
+                repo = self._get_git_repo()
+
+                # Create worktree while holding the repo mutation lock so
+                # concurrent workers do not race on shared Git metadata.
+                force_flag = '-f' if force else ''
+                if force_flag:
+                    await asyncio.to_thread(
+                        repo.git.worktree,
+                        'add', force_flag,
+                        str(worktree_path),
+                        commit_hash
+                    )
+                else:
+                    await asyncio.to_thread(
+                        repo.git.worktree,
+                        'add',
+                        str(worktree_path),
+                        commit_hash
+                    )
 
             self.logger.info(f"Created worktree: {worktree_path}")
             return worktree_path
@@ -254,12 +286,14 @@ class BaseSourceManager:
 
             # Remove git reference
             try:
-                repo = self._get_git_repo()
-                await asyncio.to_thread(
-                    repo.git.worktree,
-                    'remove', '--force',
-                    str(worktree_path)
-                )
+                if await aiofiles.os.path.exists(self.repo_path):
+                    async with file_lock(self.repo_lock_path, timeout=self.config.git_operation_timeout):
+                        repo = self._get_git_repo()
+                        await asyncio.to_thread(
+                            repo.git.worktree,
+                            'remove', '--force',
+                            str(worktree_path)
+                        )
             except git.GitCommandError:
                 pass  # Already removed or doesn't exist
 

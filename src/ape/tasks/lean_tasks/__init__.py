@@ -35,6 +35,10 @@ from .formal_math.pr_review import (
     ReviewPRConfig,
     ReviewPRResult,
     PRReviewGroundTruth,
+    ReviewDiffLocation,
+    ReviewDeclarationReference,
+    ReviewGuideCitation,
+    ReviewFindingEvidence,
 )
 
 __all__ = [
@@ -57,4 +61,8 @@ __all__ = [
     'ReviewPRConfig',
     'ReviewPRResult',
     'PRReviewGroundTruth',
+    'ReviewDiffLocation',
+    'ReviewDeclarationReference',
+    'ReviewGuideCitation',
+    'ReviewFindingEvidence',
 ]

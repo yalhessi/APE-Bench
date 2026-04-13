@@ -5,6 +5,7 @@ Adds Lean-specific build functionality (lake build, cache management).
 """
 
 import os
+import re
 import asyncio
 import inspect
 from pathlib import Path
@@ -20,8 +21,8 @@ from ..models import BuildResult, WorkspaceStatus
 from ..core.workspace_state import WorkspaceStateManager
 from ..core.storage import ContentStore
 from ..core.snapshot import SnapshotManager
-from ..utils.process_ops import run_command
-from ape.utils.file_ops import safe_remove_directory, list_files_recursive
+from ..utils.process_ops import is_process_alive, run_command
+from ape.utils.file_ops import safe_remove_directory, list_files_recursive, safe_unlink, file_lock
 from ..utils.exceptions import AlreadyBuildingError, AlreadyRestoringError
 from ape.utils.logging import create_logger
 
@@ -75,6 +76,88 @@ class BuildManager(BaseSourceManager):
         result = progress_callback(message)
         if inspect.isawaitable(result):
             await result
+
+    @staticmethod
+    def _cache_namespace(cache_repo_full_name: Optional[str], fallback_repo_name: str) -> str:
+        """Build a filesystem-safe namespace for shared Lean cache downloads."""
+        raw_namespace = str(cache_repo_full_name or fallback_repo_name or "default").strip()
+        normalized = re.sub(r"[^A-Za-z0-9._-]+", "__", raw_namespace)
+        normalized = normalized.strip("._-")
+        return normalized or "default"
+
+    async def _cleanup_partial_cache_files(self, cache_dir: Path) -> int:
+        """Remove stale partial downloads before reusing a shared cache directory."""
+        try:
+            partial_files = await asyncio.to_thread(
+                lambda: [path for path in cache_dir.rglob("*.part") if path.is_file()]
+            )
+        except FileNotFoundError:
+            return 0
+        except Exception as exc:
+            self.logger.debug("Unable to enumerate partial cache files in %s: %s", cache_dir, exc)
+            return 0
+
+        removed_count = 0
+        for partial_file in partial_files:
+            try:
+                await safe_unlink(partial_file)
+                removed_count += 1
+            except Exception as exc:
+                self.logger.debug("Failed to remove partial cache file %s: %s", partial_file, exc)
+
+        return removed_count
+
+    async def _wait_for_build_completion(self, commit_hash: str) -> BuildResult:
+        """Wait for another process to finish building the same workspace."""
+        actual_timeout = self.config.restore_queue_timeout
+        poll_interval = self.config.workspace_restore_poll_interval
+        start_time = datetime.now()
+        last_progress_report = start_time
+
+        self.logger.info(f"Wait for build completion: {commit_hash}")
+
+        while (datetime.now() - start_time).total_seconds() < actual_timeout:
+            state = await self.state_manager.read_state(commit_hash)
+
+            if not state:
+                raise RuntimeError(f"[{commit_hash}] State file disappeared during wait")
+
+            if state.status in (
+                WorkspaceStatus.BUILT,
+                WorkspaceStatus.READY,
+                WorkspaceStatus.RESTORING,
+            ):
+                self.logger.info(f"Build completed in another process: {commit_hash}")
+                return BuildResult(
+                    success=True,
+                    commit_hash=commit_hash,
+                    build_duration=0.0,
+                    file_count=state.file_count,
+                )
+
+            if state.status == WorkspaceStatus.FAILED:
+                raise RuntimeError(f"[{commit_hash}] Build failed: {state.error_message}")
+
+            if state.status != WorkspaceStatus.BUILDING:
+                raise RuntimeError(f"[{commit_hash}] State abnormal during wait: {state.status}")
+
+            if state.build_pid and not is_process_alive(state.build_pid):
+                raise RuntimeError(
+                    f"[{commit_hash}] Waiting for build process to die (pid={state.build_pid})"
+                )
+
+            now = datetime.now()
+            if (now - last_progress_report).total_seconds() >= 15:
+                self.logger.info(
+                    "Still waiting for workspace build to finish for %s@%s...",
+                    self.repo_name,
+                    commit_hash[:8],
+                )
+                last_progress_report = now
+
+            await asyncio.sleep(poll_interval)
+
+        raise TimeoutError(f"[{commit_hash}] Waiting for build completion timed out ({actual_timeout}s)")
     
     async def build_workspace(self, commit_hash: str, force_rebuild: bool = False) -> BuildResult:
         """Build workspace
@@ -99,7 +182,11 @@ class BuildManager(BaseSourceManager):
             current_state = await self.state_manager.try_start_build(commit_hash, force_rebuild)
             
             # If already built, return directly
-            if current_state.status in (WorkspaceStatus.BUILT, WorkspaceStatus.READY):
+            if current_state.status in (
+                WorkspaceStatus.BUILT,
+                WorkspaceStatus.READY,
+                WorkspaceStatus.RESTORING,
+            ):
                 self.logger.info(f"Workspace already built: {commit_hash}")
                 return BuildResult(
                     success=True,
@@ -126,9 +213,19 @@ class BuildManager(BaseSourceManager):
                 file_count=file_count
             )
                 
-        except (AlreadyBuildingError, AlreadyRestoringError):
-            # These exceptions are directly rethrown, allowing the caller to decide how to handle them
-            raise
+        except AlreadyBuildingError:
+            self.logger.info(
+                "Another process is already building %s; waiting for it to finish",
+                commit_hash,
+            )
+            return await self._wait_for_build_completion(commit_hash)
+
+        except AlreadyRestoringError:
+            self.logger.info(
+                "Workspace %s is already being restored; waiting for the compiled snapshot to be ready",
+                commit_hash,
+            )
+            return await self._wait_for_build_completion(commit_hash)
             
         except Exception as e:
             # Other exceptions: try to update failed status and rethrow
@@ -173,7 +270,11 @@ class BuildManager(BaseSourceManager):
         try:
             current_state = await self.state_manager.try_start_build(commit_hash, force_rebuild)
 
-            if current_state.status in (WorkspaceStatus.BUILT, WorkspaceStatus.READY):
+            if current_state.status in (
+                WorkspaceStatus.BUILT,
+                WorkspaceStatus.READY,
+                WorkspaceStatus.RESTORING,
+            ):
                 self.logger.info(f"Workspace already built: {commit_hash}")
                 return BuildResult(
                     success=True,
@@ -203,8 +304,19 @@ class BuildManager(BaseSourceManager):
                 file_count=file_count,
             )
 
-        except (AlreadyBuildingError, AlreadyRestoringError):
-            raise
+        except AlreadyBuildingError:
+            self.logger.info(
+                "Another process is already building %s; waiting for it to finish",
+                commit_hash,
+            )
+            return await self._wait_for_build_completion(commit_hash)
+
+        except AlreadyRestoringError:
+            self.logger.info(
+                "Workspace %s is already being restored; waiting for the compiled snapshot to be ready",
+                commit_hash,
+            )
+            return await self._wait_for_build_completion(commit_hash)
 
         except Exception as e:
             build_duration = (datetime.now() - start_time).total_seconds()
@@ -244,7 +356,11 @@ class BuildManager(BaseSourceManager):
         try:
             current_state = await self.state_manager.try_start_build(commit_hash, force_rebuild)
 
-            if current_state.status in (WorkspaceStatus.BUILT, WorkspaceStatus.READY):
+            if current_state.status in (
+                WorkspaceStatus.BUILT,
+                WorkspaceStatus.READY,
+                WorkspaceStatus.RESTORING,
+            ):
                 self.logger.info(f"Workspace already built: {commit_hash}")
                 return BuildResult(
                     success=True,
@@ -280,8 +396,19 @@ class BuildManager(BaseSourceManager):
                 file_count=file_count,
             )
 
-        except (AlreadyBuildingError, AlreadyRestoringError):
-            raise
+        except AlreadyBuildingError:
+            self.logger.info(
+                "Another process is already building %s; waiting for it to finish",
+                commit_hash,
+            )
+            return await self._wait_for_build_completion(commit_hash)
+
+        except AlreadyRestoringError:
+            self.logger.info(
+                "Workspace %s is already being restored; waiting for the compiled snapshot to be ready",
+                commit_hash,
+            )
+            return await self._wait_for_build_completion(commit_hash)
 
         except Exception as e:
             build_duration = (datetime.now() - start_time).total_seconds()
@@ -315,75 +442,83 @@ class BuildManager(BaseSourceManager):
         fetch_ref: Optional[str] = None,
     ) -> Optional[str]:
         """Ensure the requested commit is available locally and return a temp ref if created."""
-        await self.ensure_repository_cloned()
-        await self.fetch_updates()
+        async with file_lock(self.repo_lock_path, timeout=self.config.git_operation_timeout):
+            clone_success = await self._ensure_repository_cloned_unlocked()
+            if not clone_success:
+                raise RuntimeError(f"Failed to clone repository for {self.repo_name}")
 
-        if await self._commit_exists_locally(commit_hash):
-            return None
+            if await self._commit_exists_locally(commit_hash):
+                return None
 
-        normalized_fetch_repo_url = str(fetch_repo_url or "").strip()
-        normalized_fetch_ref = str(fetch_ref or "").strip()
-        if not normalized_fetch_repo_url or not normalized_fetch_ref:
+            await self._fetch_updates_unlocked()
+
+            if await self._commit_exists_locally(commit_hash):
+                return None
+
+            normalized_fetch_repo_url = str(fetch_repo_url or "").strip()
+            normalized_fetch_ref = str(fetch_ref or "").strip()
+            if not normalized_fetch_repo_url or not normalized_fetch_ref:
+                raise RuntimeError(
+                    f"Commit {commit_hash} is not available locally and no fetch repo/ref were provided"
+                )
+
+            repo = self._get_git_repo()
+            local_ref = f"refs/ape/pr-review/{commit_hash}"
+            fetch_specs: list[str] = []
+            if normalized_fetch_ref.startswith("refs/"):
+                fetch_specs.append(f"+{normalized_fetch_ref}:{local_ref}")
+            else:
+                fetch_specs.append(f"+refs/heads/{normalized_fetch_ref}:{local_ref}")
+                fetch_specs.append(f"+{normalized_fetch_ref}:{local_ref}")
+            fetch_specs.append(f"+{commit_hash}:{local_ref}")
+
+            seen_specs: set[str] = set()
+            deduped_fetch_specs: list[str] = []
+            for spec in fetch_specs:
+                if spec in seen_specs:
+                    continue
+                seen_specs.add(spec)
+                deduped_fetch_specs.append(spec)
+
+            last_error: Optional[Exception] = None
+            for fetch_spec in deduped_fetch_specs:
+                try:
+                    self.logger.info(
+                        "Fetching commit %s from %s via %s",
+                        commit_hash,
+                        normalized_fetch_repo_url,
+                        fetch_spec,
+                    )
+                    await asyncio.to_thread(
+                        repo.git.fetch,
+                        normalized_fetch_repo_url,
+                        fetch_spec,
+                    )
+                    if await self._commit_exists_locally(commit_hash):
+                        return local_ref
+                except Exception as exc:
+                    last_error = exc
+                    self.logger.warning(
+                        "Failed to fetch %s from %s via %s: %s",
+                        commit_hash,
+                        normalized_fetch_repo_url,
+                        fetch_spec,
+                        exc,
+                    )
+
+            if await self._commit_exists_locally(commit_hash):
+                return local_ref
+
             raise RuntimeError(
-                f"Commit {commit_hash} is not available locally and no fetch repo/ref were provided"
-            )
-
-        repo = self._get_git_repo()
-        local_ref = f"refs/ape/pr-review/{commit_hash}"
-        fetch_specs: list[str] = []
-        if normalized_fetch_ref.startswith("refs/"):
-            fetch_specs.append(f"+{normalized_fetch_ref}:{local_ref}")
-        else:
-            fetch_specs.append(f"+refs/heads/{normalized_fetch_ref}:{local_ref}")
-            fetch_specs.append(f"+{normalized_fetch_ref}:{local_ref}")
-        fetch_specs.append(f"+{commit_hash}:{local_ref}")
-
-        seen_specs: set[str] = set()
-        deduped_fetch_specs: list[str] = []
-        for spec in fetch_specs:
-            if spec in seen_specs:
-                continue
-            seen_specs.add(spec)
-            deduped_fetch_specs.append(spec)
-
-        last_error: Optional[Exception] = None
-        for fetch_spec in deduped_fetch_specs:
-            try:
-                self.logger.info(
-                    "Fetching commit %s from %s via %s",
-                    commit_hash,
-                    normalized_fetch_repo_url,
-                    fetch_spec,
-                )
-                await asyncio.to_thread(
-                    repo.git.fetch,
-                    normalized_fetch_repo_url,
-                    fetch_spec,
-                )
-                if await self._commit_exists_locally(commit_hash):
-                    return local_ref
-            except Exception as exc:
-                last_error = exc
-                self.logger.warning(
-                    "Failed to fetch %s from %s via %s: %s",
-                    commit_hash,
-                    normalized_fetch_repo_url,
-                    fetch_spec,
-                    exc,
-                )
-
-        if await self._commit_exists_locally(commit_hash):
-            return local_ref
-
-        raise RuntimeError(
-            f"Unable to fetch commit {commit_hash} from {normalized_fetch_repo_url} (ref={normalized_fetch_ref})"
-        ) from last_error
+                f"Unable to fetch commit {commit_hash} from {normalized_fetch_repo_url} (ref={normalized_fetch_ref})"
+            ) from last_error
 
     async def _delete_local_ref(self, local_ref: str) -> None:
         """Delete a temporary local ref created for a PR-head build."""
         try:
-            repo = self._get_git_repo()
-            await asyncio.to_thread(repo.git.update_ref, "-d", local_ref)
+            async with file_lock(self.repo_lock_path, timeout=self.config.git_operation_timeout):
+                repo = self._get_git_repo()
+                await asyncio.to_thread(repo.git.update_ref, "-d", local_ref)
         except Exception as exc:
             self.logger.debug(f"Failed to delete temporary ref {local_ref}: {exc}")
 
@@ -682,36 +817,49 @@ class BuildManager(BaseSourceManager):
                 await asyncio.sleep(10)
             
             try:
-                # Set cache directory environment - use repo-specific cache directory
-                import uuid
-                import time
+                # Use a stable per-repo namespace so remote-cache downloads can be
+                # reused across repeated builds instead of being discarded each time.
                 cache_base = self.config.get_cache_dir(self.repo_name)
-                cache_dir = cache_base / commit_hash / f"attempt_{os.getpid()}_{int(time.time()*1000)}_{uuid.uuid4().hex[:8]}"
+                cache_namespace = self._cache_namespace(cache_repo_full_name, self.repo_name)
+                cache_dir = cache_base / "xdg" / cache_namespace
                 cache_dir.mkdir(parents=True, exist_ok=True)
-                
-                env = os.environ.copy()
-                env["XDG_CACHE_HOME"] = str(cache_dir)
-                
-                cache_command = ["lake", "exe", "cache"]
-                if cache_repo_full_name:
-                    cache_command.append(f"--repo={cache_repo_full_name}")
-                cache_command.append("get")
-                normalized_cache_args = [str(arg).strip() for arg in (cache_args or []) if str(arg).strip()]
-                cache_command.extend(normalized_cache_args)
 
-                stdout, stderr, return_code = await run_command(
-                    cache_command,
-                    cwd=build_workspace_path,
-                    timeout=timeout if timeout is not None else self.config.cache_operation_timeout,
-                    env=env,
-                    print_output=True,
-                    logger=self.logger,
-                    operation_name=f"lake cache get {commit_hash}"
+                lock_path = cache_base / "locks" / f"{cache_namespace}.lock"
+                command_timeout = timeout if timeout is not None else self.config.cache_operation_timeout
+                self.logger.info(
+                    "Waiting for shared Lean cache lock %s for %s",
+                    cache_namespace,
+                    commit_hash,
                 )
-                
-                # Clean up cache directory
-                await safe_remove_directory(cache_dir)
-                
+                async with file_lock(lock_path, timeout=command_timeout):
+                    removed_partial_count = await self._cleanup_partial_cache_files(cache_dir)
+                    if removed_partial_count:
+                        self.logger.info(
+                            "Removed %s stale partial cache files from %s before cache fetch",
+                            removed_partial_count,
+                            cache_dir,
+                        )
+
+                    env = os.environ.copy()
+                    env["XDG_CACHE_HOME"] = str(cache_dir)
+
+                    cache_command = ["lake", "exe", "cache"]
+                    if cache_repo_full_name:
+                        cache_command.append(f"--repo={cache_repo_full_name}")
+                    cache_command.append("get")
+                    normalized_cache_args = [str(arg).strip() for arg in (cache_args or []) if str(arg).strip()]
+                    cache_command.extend(normalized_cache_args)
+
+                    stdout, stderr, return_code = await run_command(
+                        cache_command,
+                        cwd=build_workspace_path,
+                        timeout=command_timeout,
+                        env=env,
+                        print_output=True,
+                        logger=self.logger,
+                        operation_name=f"lake cache get {commit_hash}"
+                    )
+
                 if return_code == 0:
                     self.logger.debug("Cache get successful")
                     return True

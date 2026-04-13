@@ -22,13 +22,14 @@ from ape.tasks.lean_tasks.base import BaseLeanTask
 from ape.tasks.models import WorkspaceInfo
 from ape.toolkits.execute.lean.utils.process_ops import run_command
 from .findings import (
-    LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY,
     REVIEW_FINDING_CATEGORIES,
+    ReviewDeclarationReference,
+    ReviewDiffLocation,
     ReviewFinding,
+    ReviewFindingEvidence,
+    ReviewGuideCitation,
     coerce_review_findings,
     extract_review_categories,
-    legacy_issue_tags_to_review_findings,
-    normalize_issue_tag,
     normalize_review_categories,
     normalize_review_category,
 )
@@ -125,9 +126,6 @@ class ReviewPRConfig(BaseTaskConfig):
 
     strict_category_validation: bool = False
     allowed_finding_categories: List[str] = Field(default_factory=lambda: list(REVIEW_FINDING_CATEGORIES))
-    # Deprecated compatibility fields.
-    strict_tag_validation: Optional[bool] = None
-    allowed_issue_tags: Optional[List[str]] = None
     diff_preview_char_limit: int = 12000
     enable_head_cache_fast_path: Optional[bool] = None
     head_workspace_fast_path_mode: HeadWorkspaceFastPathMode = "cache_probe"
@@ -144,17 +142,9 @@ class ReviewPRConfig(BaseTaskConfig):
 
     @model_validator(mode="after")
     def _normalize_category_config(self) -> "ReviewPRConfig":
-        if self.strict_tag_validation is not None:
-            self.strict_category_validation = bool(self.strict_tag_validation)
-
-        allowed_categories = list(self.allowed_finding_categories or [])
-        if self.allowed_issue_tags:
-            allowed_categories.extend(
-                LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY.get(normalize_issue_tag(tag), tag)
-                for tag in self.allowed_issue_tags
-            )
-
-        self.allowed_finding_categories = normalize_review_categories(allowed_categories)
+        self.allowed_finding_categories = normalize_review_categories(
+            list(self.allowed_finding_categories or [])
+        )
         if not self.allowed_finding_categories:
             self.allowed_finding_categories = list(REVIEW_FINDING_CATEGORIES)
         return self
@@ -168,6 +158,16 @@ class ReviewPRTask(BaseLeanTask):
     task_config_class = ReviewPRConfig
     task_result_class = ReviewPRResult
     patch_marker_filename = ".ape_pr_review_patch.json"
+    review_submission_schema_filename = "review_submission_schema.json"
+    review_submission_example_filename = "review_submission_example.json"
+
+    @classmethod
+    def _review_submission_schema_relpath(cls) -> str:
+        return f"scratch/{cls.review_submission_schema_filename}"
+
+    @classmethod
+    def _review_submission_example_relpath(cls) -> str:
+        return f"scratch/{cls.review_submission_example_filename}"
 
     def _get_required_skill_name(self) -> str:
         """Return the preferred managed skill name for this task, if configured."""
@@ -201,14 +201,31 @@ class ReviewPRTask(BaseLeanTask):
         """Return task-specific prompt guidance about managed skills."""
         return ""
 
+    def _build_submission_contract_guidance(self) -> str:
+        schema_path = self._review_submission_schema_relpath()
+        example_path = self._review_submission_example_relpath()
+        return (
+            f"Mirror the exact field names and nesting from `{schema_path}`.\n"
+            f"A filled example lives at `{example_path}`.\n"
+            "Use repo-root paths in `diff_locations.file_path`; never use `scratch/pr.diff` there.\n"
+            "`diff_side` must be `old` or `new`.\n"
+            "`referenced_declarations` entries must be objects with `name`, not raw strings.\n"
+            "`guide_citations` entries must use `topic` and `relative_path`.\n"
+            "Do not invent alternate keys like `path`, `file`, `declaration`, `title`, `quote`, or `comment`.\n"
+        )
+
     def _build_submit_tool_description(self) -> str:
         """Return the task-specific description for `submit_result`."""
         return (
             "Submit your final PR review decision.\n\n"
+            f"{self._build_submission_contract_guidance()}\n"
             "Provide:\n"
             "- merge_ready: whether the PR is ready to merge\n"
+            "- needs_human_review: whether the PR should be escalated or handed off for human review\n"
+            "- decision_confidence: optional calibrated confidence in the overall decision (0.0-1.0)\n"
             "- blocking_findings: blocking findings preventing merge\n"
             "- advisory_findings: non-blocking findings\n"
+            "- evidence on every finding: diff_locations, referenced_files, referenced_declarations, and guide_citations\n"
             "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
             "- feedback: concise, evidence-based reviewer feedback\n\n"
             "You must call this tool to finish the task."
@@ -467,6 +484,8 @@ class ReviewPRTask(BaseLeanTask):
         blocking_findings: List[ReviewFinding],
         advisory_findings: List[ReviewFinding],
         feedback: str,
+        needs_human_review: bool = False,
+        decision_confidence: Optional[float] = None,
         guide_evidence_topics: Optional[List[str]] = None,
     ) -> Optional[str]:
         """Return an error message when submit_result should be rejected."""
@@ -1323,10 +1342,8 @@ class ReviewPRTask(BaseLeanTask):
         super().__init__(data, config)
         self.scratch_pr_diff_path: Optional[Path] = None
         self.scratch_pr_context_path: Optional[Path] = None
-
-    @staticmethod
-    def _normalize_issue_tag(tag: str) -> str:
-        return normalize_issue_tag(tag)
+        self.scratch_review_submission_schema_path: Optional[Path] = None
+        self.scratch_review_submission_example_path: Optional[Path] = None
 
     @staticmethod
     def _normalize_finding_category(category: str) -> str:
@@ -1350,6 +1367,98 @@ class ReviewPRTask(BaseLeanTask):
             f"... [truncated preview: showing first {limit} characters; inspect `scratch/pr.diff` for full diff]"
         )
 
+    @staticmethod
+    def _example_declaration_name(file_path: str) -> str:
+        normalized_path = str(file_path or "").strip()
+        if normalized_path.endswith(".lean"):
+            module_name = ".".join(PurePosixPath(normalized_path).with_suffix("").parts)
+            if module_name:
+                return f"{module_name}.example"
+        return "Example.declaration"
+
+    def _build_submission_schema_payload(self) -> dict[str, Any]:
+        template = PRReviewSubmission(
+            merge_ready=False,
+            needs_human_review=False,
+            decision_confidence=None,
+            blocking_findings=[],
+            advisory_findings=[],
+            guide_evidence_topics=[],
+            feedback="Replace this placeholder with concise, evidence-based reviewer feedback.",
+        )
+        return template.model_dump(mode="json")
+
+    def _build_submission_example_payload(self) -> dict[str, Any]:
+        changed_files = list(self.data.snapshot.changed_files or [])
+        example_file_path = next(
+            (str(path).strip() for path in changed_files if str(path).strip()),
+            "Mathlib/Example.lean",
+        )
+        example_declaration_name = self._example_declaration_name(example_file_path)
+
+        example = PRReviewSubmission(
+            merge_ready=False,
+            needs_human_review=False,
+            decision_confidence=0.78,
+            blocking_findings=[
+                ReviewFinding(
+                    category="integration_compatibility",
+                    summary=(
+                        "This change introduces a new dependency pattern that should be checked "
+                        "against Mathlib library-integration expectations before merging."
+                    ),
+                    evidence=ReviewFindingEvidence(
+                        diff_locations=[
+                            ReviewDiffLocation(
+                                file_path=example_file_path,
+                                line_start=1,
+                                line_end=8,
+                                diff_side="new",
+                            )
+                        ],
+                        referenced_files=[example_file_path],
+                        referenced_declarations=[
+                            ReviewDeclarationReference(
+                                name=example_declaration_name,
+                                file_path=example_file_path,
+                                line_start=1,
+                                line_end=12,
+                            )
+                        ],
+                        guide_citations=[
+                            ReviewGuideCitation(
+                                topic="style",
+                                relative_path="references/style-guidelines-reviewer.md",
+                            )
+                        ],
+                    ),
+                )
+            ],
+            advisory_findings=[
+                ReviewFinding(
+                    category="documentation_metadata",
+                    summary="The PR description should explain the motivation and tradeoffs more clearly.",
+                    evidence=ReviewFindingEvidence(
+                        diff_locations=[],
+                        referenced_files=[],
+                        referenced_declarations=[],
+                        guide_citations=[
+                            ReviewGuideCitation(
+                                topic="pr_metadata",
+                                relative_path="references/commit-conventions-reviewer.md",
+                            )
+                        ],
+                    ),
+                )
+            ],
+            guide_evidence_topics=["style", "pr_metadata"],
+            feedback=(
+                "Not merge ready yet. The change needs a clearer library-integration justification, "
+                "and the PR metadata should explain the intent more explicitly."
+            ),
+        )
+        return example.model_dump(mode="json")
+
     async def setup(
         self,
         termination_callback,
@@ -1364,6 +1473,12 @@ class ReviewPRTask(BaseLeanTask):
         snapshot = self.data.snapshot
         self.scratch_pr_diff_path = self.scratch_workspace.path / "pr.diff"
         self.scratch_pr_context_path = self.scratch_workspace.path / "pr_context.md"
+        self.scratch_review_submission_schema_path = (
+            self.scratch_workspace.path / self.review_submission_schema_filename
+        )
+        self.scratch_review_submission_example_path = (
+            self.scratch_workspace.path / self.review_submission_example_filename
+        )
 
         context_lines = [
             f"# PR Review Context",
@@ -1402,10 +1517,18 @@ class ReviewPRTask(BaseLeanTask):
             await f.write(snapshot.pr_diff or "")
         async with aiofiles.open(self.scratch_pr_context_path, "w", encoding="utf-8") as f:
             await f.write("\n".join(context_lines))
+        async with aiofiles.open(self.scratch_review_submission_schema_path, "w", encoding="utf-8") as f:
+            await f.write(json.dumps(self._build_submission_schema_payload(), indent=2, ensure_ascii=False))
+            await f.write("\n")
+        async with aiofiles.open(self.scratch_review_submission_example_path, "w", encoding="utf-8") as f:
+            await f.write(json.dumps(self._build_submission_example_payload(), indent=2, ensure_ascii=False))
+            await f.write("\n")
 
         self.scratch_workspace.read_only_path_patterns = [
             str(self.scratch_pr_diff_path.resolve()),
             str(self.scratch_pr_context_path.resolve()),
+            str(self.scratch_review_submission_schema_path.resolve()),
+            str(self.scratch_review_submission_example_path.resolve()),
         ]
         return logger
 
@@ -1458,6 +1581,8 @@ class ReviewPRTask(BaseLeanTask):
         return LEAN_PR_REVIEW_USER_PROMPT.format(
             submit_tool_name=submit_tool_name,
             managed_skill_guidance=self._build_managed_skill_guidance(),
+            submission_schema_path=self._review_submission_schema_relpath(),
+            submission_example_path=self._review_submission_example_relpath(),
             pr_display=pr_display,
             pr_title=snapshot.pr_title,
             pr_author=snapshot.pr_author or "unknown",
@@ -1482,10 +1607,13 @@ class ReviewPRTask(BaseLeanTask):
         async def submit_result(
             merge_ready: Annotated[bool, Field(description="True if PR is ready to merge, else False")],
             blocking_findings: Annotated[List[ReviewFinding], Field(
-                description="Blocking findings. Use canonical categories from the prompt."
+                description=(
+                    "Blocking findings. Use canonical categories from the prompt and include structured evidence "
+                    "on each finding."
+                )
             )],
             advisory_findings: Annotated[Optional[List[ReviewFinding]], Field(
-                description="Advisory findings (non-blocking).",
+                description="Advisory findings (non-blocking), each with structured evidence.",
                 default=None,
             )] = None,
             guide_evidence_topics: Annotated[Optional[List[str]], Field(
@@ -1494,6 +1622,15 @@ class ReviewPRTask(BaseLeanTask):
                     "Use keys such as `review_norms`, `naming`, `documentation`, `style`, "
                     "`pr_metadata`, `git_workflow`, and `branches_ci`."
                 ),
+                default=None,
+            )] = None,
+            needs_human_review: Annotated[bool, Field(
+                description="True if the review should be escalated or handed off to a human maintainer.",
+            )] = False,
+            decision_confidence: Annotated[Optional[float], Field(
+                description="Optional calibrated confidence in the overall merge-readiness decision.",
+                ge=0.0,
+                le=1.0,
                 default=None,
             )] = None,
             feedback: Annotated[str, Field(
@@ -1505,6 +1642,8 @@ class ReviewPRTask(BaseLeanTask):
             try:
                 submission = PRReviewSubmission(
                     merge_ready=merge_ready,
+                    needs_human_review=needs_human_review,
+                    decision_confidence=decision_confidence,
                     blocking_findings=self._normalize_findings(blocking_findings),
                     advisory_findings=self._normalize_findings(advisory_findings or []),
                     guide_evidence_topics=self._normalize_guide_topics(guide_evidence_topics or []),
@@ -1512,6 +1651,8 @@ class ReviewPRTask(BaseLeanTask):
                 )
                 blocked_reason = self._validate_submission_prerequisites(
                     merge_ready=submission.merge_ready,
+                    needs_human_review=submission.needs_human_review,
+                    decision_confidence=submission.decision_confidence,
                     blocking_findings=submission.blocking_findings,
                     advisory_findings=submission.advisory_findings,
                     feedback=submission.feedback,
@@ -1535,6 +1676,8 @@ class ReviewPRTask(BaseLeanTask):
                         success=True,
                         score=evaluation_result.score,
                         merge_ready=submission.merge_ready,
+                        needs_human_review=submission.needs_human_review,
+                        decision_confidence=submission.decision_confidence,
                         blocking_findings=submission.blocking_findings,
                         advisory_findings=submission.advisory_findings,
                         guide_evidence_topics=submission.guide_evidence_topics,
@@ -1581,6 +1724,8 @@ class ReviewPRTask(BaseLeanTask):
         success: bool,
         score: float,
         merge_ready: bool,
+        needs_human_review: bool,
+        decision_confidence: Optional[float],
         blocking_findings: List[ReviewFinding],
         advisory_findings: List[ReviewFinding],
         guide_evidence_topics: List[str],
@@ -1595,6 +1740,8 @@ class ReviewPRTask(BaseLeanTask):
             success=success,
             score=score,
             merge_ready=merge_ready,
+            needs_human_review=needs_human_review,
+            decision_confidence=decision_confidence,
             blocking_findings=blocking_findings,
             advisory_findings=advisory_findings,
             guide_evidence_topics=guide_evidence_topics,
@@ -1642,10 +1789,14 @@ class SkilledReviewPRTask(ReviewPRTask):
             f"{bootstrap_lines}\n"
             "2. Inspected the PR and surrounding code.\n"
             f"3. Prepared `guide_evidence_topics` covering at least {required_topic_text}.\n\n"
+            f"{self._build_submission_contract_guidance()}\n"
             "Provide:\n"
             "- merge_ready: whether the PR is ready to merge\n"
+            "- needs_human_review: whether the PR should be escalated or handed off for human review\n"
+            "- decision_confidence: optional calibrated confidence in the overall decision (0.0-1.0)\n"
             "- blocking_findings: blocking findings preventing merge\n"
             "- advisory_findings: non-blocking findings\n"
+            "- evidence on every finding: diff_locations, referenced_files, referenced_declarations, and guide_citations\n"
             "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
             "- feedback: concise, evidence-based reviewer feedback grounded in the guides you read\n\n"
             "If the guide bootstrap is incomplete, continue reviewing instead of calling this tool."
@@ -1708,6 +1859,8 @@ class SkilledReviewPRTask(ReviewPRTask):
         blocking_findings: List[ReviewFinding],
         advisory_findings: List[ReviewFinding],
         feedback: str,
+        needs_human_review: bool = False,
+        decision_confidence: Optional[float] = None,
         guide_evidence_topics: Optional[List[str]] = None,
     ) -> Optional[str]:
         task_config: SkilledReviewPRConfig = self.config.task_config

@@ -28,7 +28,6 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ape.tasks.lean_tasks.formal_math.pr_review.findings import (
     ReviewFinding,
-    legacy_issue_tags_to_review_findings,
     normalize_review_category,
 )
 from ape.utils.config_loader import deep_merge
@@ -100,28 +99,11 @@ class ExpertGroundTruth(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     merge_ready: bool
+    needs_human_review: bool = False
+    decision_confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     blocking_findings: list[ReviewFinding] = Field(default_factory=list)
     advisory_findings: list[ReviewFinding] = Field(default_factory=list)
     rationale: Optional[str] = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def _normalize_finding_fields(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-        normalized = dict(data)
-        legacy_blocking = normalized.pop("blocking_issue_tags", None)
-        legacy_advisory = normalized.pop("advisory_issue_tags", None)
-        if normalized.get("blocking_findings") is None and legacy_blocking is not None:
-            normalized["blocking_findings"] = legacy_issue_tags_to_review_findings(
-                _normalize_string_list(legacy_blocking)
-            )
-        if normalized.get("advisory_findings") is None and legacy_advisory is not None:
-            normalized["advisory_findings"] = legacy_issue_tags_to_review_findings(
-                _normalize_string_list(legacy_advisory)
-            )
-        return normalized
-
 
 class ExpertJudgmentAnnotation(BaseModel):
     """Annotation input for one expert-labeled PR snapshot."""
@@ -135,6 +117,8 @@ class ExpertJudgmentAnnotation(BaseModel):
     snapshot_head_sha: Optional[str] = None
 
     merge_ready: Optional[bool] = None
+    needs_human_review: bool = False
+    decision_confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     blocking_findings: list[ReviewFinding] = Field(default_factory=list)
     advisory_findings: list[ReviewFinding] = Field(default_factory=list)
     rationale: Optional[str] = None
@@ -171,30 +155,18 @@ class ExpertJudgmentAnnotation(BaseModel):
         for alias in ("commit", "head_sha", "snapshot_commit"):
             normalized.pop(alias, None)
 
-        legacy_blocking = normalized.pop("blocking_issue_tags", None)
-        legacy_advisory = normalized.pop("advisory_issue_tags", None)
-        if normalized.get("blocking_findings") is None and legacy_blocking is not None:
-            normalized["blocking_findings"] = legacy_issue_tags_to_review_findings(
-                _normalize_string_list(legacy_blocking)
-            )
-        if normalized.get("advisory_findings") is None and legacy_advisory is not None:
-            normalized["advisory_findings"] = legacy_issue_tags_to_review_findings(
-                _normalize_string_list(legacy_advisory)
-            )
-
         ground_truth = normalized.get("ground_truth")
         if isinstance(ground_truth, dict):
-            for field_name in ("merge_ready", "blocking_findings", "advisory_findings", "rationale"):
+            for field_name in (
+                "merge_ready",
+                "needs_human_review",
+                "decision_confidence",
+                "blocking_findings",
+                "advisory_findings",
+                "rationale",
+            ):
                 if normalized.get(field_name) is None and ground_truth.get(field_name) is not None:
                     normalized[field_name] = ground_truth.get(field_name)
-            if normalized.get("blocking_findings") is None and ground_truth.get("blocking_issue_tags") is not None:
-                normalized["blocking_findings"] = legacy_issue_tags_to_review_findings(
-                    _normalize_string_list(ground_truth.get("blocking_issue_tags"))
-                )
-            if normalized.get("advisory_findings") is None and ground_truth.get("advisory_issue_tags") is not None:
-                normalized["advisory_findings"] = legacy_issue_tags_to_review_findings(
-                    _normalize_string_list(ground_truth.get("advisory_issue_tags"))
-                )
 
         normalized["annotators"] = _normalize_string_list(normalized.get("annotators"))
         normalized["case_flags"] = [normalize_review_category(item) for item in _normalize_string_list(normalized.get("case_flags"))]
@@ -238,6 +210,8 @@ class ExpertJudgmentAnnotation(BaseModel):
                 raise ValueError("Missing required annotation field: merge_ready")
             self.ground_truth = ExpertGroundTruth(
                 merge_ready=self.merge_ready,
+                needs_human_review=self.needs_human_review,
+                decision_confidence=self.decision_confidence,
                 blocking_findings=self.blocking_findings,
                 advisory_findings=self.advisory_findings,
                 rationale=self.rationale,

@@ -9,35 +9,28 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from ape.tasks.base import BaseTaskResult
 from ape.tasks.lean_tasks.base import BaseLeanTaskData
 
-from .findings import ReviewFinding, legacy_issue_tags_to_review_findings
+from .findings import ReviewFinding
 
 
 class PRReviewGroundTruth(BaseModel):
     """Ground-truth labels for PR review evaluation."""
 
+    model_config = ConfigDict(extra="forbid")
+
     merge_ready: bool = Field(..., description="Whether maintainers judged this PR as merge-ready")
+    needs_human_review: bool = Field(
+        default=False,
+        description="Whether maintainers would want a human handoff before merge",
+    )
+    decision_confidence: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Optional confidence attached to the merge-readiness judgment",
+    )
     blocking_findings: List[ReviewFinding] = Field(default_factory=list, description="Blocking review findings")
     advisory_findings: List[ReviewFinding] = Field(default_factory=list, description="Non-blocking review findings")
     rationale: Optional[str] = Field(default=None, description="Optional rationale from expert reviewers")
-
-    @model_validator(mode="before")
-    @classmethod
-    def _lift_legacy_issue_tags(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-
-        normalized = dict(data)
-        legacy_blocking = normalized.pop("blocking_issue_tags", None)
-        legacy_advisory = normalized.pop("advisory_issue_tags", None)
-        if normalized.get("blocking_findings") is None and legacy_blocking is not None:
-            normalized["blocking_findings"] = legacy_issue_tags_to_review_findings(
-                legacy_blocking or []
-            )
-        if normalized.get("advisory_findings") is None and legacy_advisory is not None:
-            normalized["advisory_findings"] = legacy_issue_tags_to_review_findings(
-                legacy_advisory or []
-            )
-        return normalized
 
 
 class PRReviewHeadMetadata(BaseModel):
@@ -127,7 +120,19 @@ class PRReviewBenchmarkContext(BaseModel):
 class PRReviewSubmission(BaseModel):
     """Normalized `submit_result` payload for review scoring."""
 
+    model_config = ConfigDict(extra="forbid")
+
     merge_ready: bool = Field(..., description="Whether the PR is predicted to be merge-ready")
+    needs_human_review: bool = Field(
+        default=False,
+        description="Whether the reviewer recommends escalation or human handoff",
+    )
+    decision_confidence: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Calibrated confidence in the overall merge-readiness decision",
+    )
     blocking_findings: List[ReviewFinding] = Field(default_factory=list, description="Predicted blocking findings")
     advisory_findings: List[ReviewFinding] = Field(default_factory=list, description="Predicted advisory findings")
     guide_evidence_topics: List[str] = Field(
@@ -278,6 +283,16 @@ class ReviewPRResult(BaseTaskResult):
     model_config = ConfigDict()
 
     merge_ready: bool = Field(..., description="Predicted merge readiness")
+    needs_human_review: bool = Field(
+        default=False,
+        description="Whether the reviewer requested escalation or human handoff",
+    )
+    decision_confidence: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Calibrated confidence in the overall merge-readiness decision",
+    )
     blocking_findings: List[ReviewFinding] = Field(default_factory=list, description="Predicted blocking findings")
     advisory_findings: List[ReviewFinding] = Field(default_factory=list, description="Predicted advisory findings")
     guide_evidence_topics: List[str] = Field(

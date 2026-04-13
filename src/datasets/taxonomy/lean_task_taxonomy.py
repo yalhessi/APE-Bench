@@ -124,10 +124,8 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
     elif task_type == "lean_pr_review":
         evaluation = record.get("evaluation") or {}
         ground_truth = evaluation.get("ground_truth") or {}
-        blocking_findings = ground_truth.get("blocking_findings")
-        advisory_findings = ground_truth.get("advisory_findings")
-        blocking_items = blocking_findings if blocking_findings is not None else (ground_truth.get("blocking_issue_tags") or [])
-        advisory_items = advisory_findings if advisory_findings is not None else (ground_truth.get("advisory_issue_tags") or [])
+        blocking_items = ground_truth.get("blocking_findings") or []
+        advisory_items = ground_truth.get("advisory_findings") or []
         taxonomy.update(
             {
                 "task_family": "pr_review",

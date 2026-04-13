@@ -23,8 +23,7 @@ from .config import PRReviewDatasetConfig
 from ape.tasks.lean_tasks.formal_math.pr_review.findings import (
     AI_GENERATED_PR_LABEL,
     AI_GENERATED_PR_GITHUB_LABEL,
-    legacy_issue_tags_to_review_findings,
-    normalize_issue_tag as shared_normalize_issue_tag,
+    categories_to_review_findings,
     review_findings_to_json,
 )
 from ape.utils.logging import create_logger
@@ -36,21 +35,8 @@ if TYPE_CHECKING:
 MAINTAINER_ASSOCIATIONS = {"MEMBER", "OWNER", "COLLABORATOR"}
 ACTIONABLE_REVIEW_STATES = {"APPROVED", "CHANGES_REQUESTED", "COMMENTED", "DISMISSED"}
 
-DEFAULT_ISSUE_TAGS = [
-    "semantic_incorrectness",
-    "requirement_mismatch",
-    "scope_control_violation",
-    "proof_fragility",
-    "insufficient_documentation",
-    "insufficient_tests",
-    "library_integration_issue",
-    "deprecated_api_usage",
-    "performance_regression",
-    "style_or_readability",
-]
-
-ISSUE_TAG_PATTERNS = {
-    "semantic_incorrectness": [
+FINDING_CATEGORY_PATTERNS = {
+    "correctness": [
         r"\bwrong\b",
         r"\bincorrect\b",
         r"\bunsound\b",
@@ -58,51 +44,45 @@ ISSUE_TAG_PATTERNS = {
         r"\bbug\b",
         r"\bdoesn['’]t compile\b",
     ],
-    "requirement_mismatch": [
+    "requirements_scope": [
         r"\bmissing\b",
         r"\bnot enough\b",
         r"\bdoesn['’]t implement\b",
         r"\bneeds? to\b",
         r"\bshould also\b",
-    ],
-    "scope_control_violation": [
         r"\bout of scope\b",
         r"\bunrelated\b",
         r"\btoo (?:broad|large|many)\b",
         r"\bunnecessary refactor\b",
     ],
-    "proof_fragility": [
+    "robustness_performance": [
         r"\bfragile\b",
         r"\bbrittle\b",
         r"\bunstable\b",
-    ],
-    "insufficient_documentation": [
-        r"\bdoc(?:s|umentation)?\b",
-        r"\bplease document\b",
-        r"\badd (?:a )?comment\b",
-    ],
-    "insufficient_tests": [
-        r"\btest(?:s|ing)?\b",
-        r"\bregression test\b",
-        r"\bcoverage\b",
-    ],
-    "library_integration_issue": [
-        r"\bimport\b",
-        r"\bnamespace\b",
-        r"\bAPI\b",
-        r"\bbackward compatible\b",
-    ],
-    "deprecated_api_usage": [
-        r"\bdeprecated\b",
-        r"\bobsolete\b",
-        r"\blegacy\b",
-    ],
-    "performance_regression": [
         r"\bperformance\b",
         r"\bslow\b",
         r"\btimeout\b",
     ],
-    "style_or_readability": [
+    "documentation_metadata": [
+        r"\bdoc(?:s|umentation)?\b",
+        r"\bplease document\b",
+        r"\badd (?:a )?comment\b",
+    ],
+    "tests_ci": [
+        r"\btest(?:s|ing)?\b",
+        r"\bregression test\b",
+        r"\bcoverage\b",
+    ],
+    "integration_compatibility": [
+        r"\bimport\b",
+        r"\bnamespace\b",
+        r"\bapi\b",
+        r"\bbackward compatible\b",
+        r"\bdeprecated\b",
+        r"\bobsolete\b",
+        r"\blegacy\b",
+    ],
+    "readability_maintainability": [
         r"\bstyle\b",
         r"\breadability\b",
         r"\bnaming\b",
@@ -141,17 +121,11 @@ BUTTON_LINE_PATTERNS = [
     re.compile(r"^\s*build with ona\b.*$", re.IGNORECASE),
     re.compile(r"^\s*open in gitpod\b.*$", re.IGNORECASE),
 ]
-
-
-def _normalize_issue_tag(tag: str) -> str:
-    return shared_normalize_issue_tag(tag)
-
-
 def _dedupe_preserve_order(items: Iterable[str]) -> List[str]:
     seen: Set[str] = set()
     out: List[str] = []
     for item in items:
-        normalized = _normalize_issue_tag(item)
+        normalized = _normalize_record_label(item)
         if not normalized or normalized in seen:
             continue
         seen.add(normalized)
@@ -215,7 +189,7 @@ def _classify_authoring_mode(pr: Dict[str, Any]) -> str:
     labels = pr.get("labels") or []
     for label in labels:
         name = label.get("name") if isinstance(label, dict) else label
-        if _normalize_issue_tag(str(name or "")) == AI_GENERATED_PR_LABEL:
+        if _normalize_record_label(str(name or "")) == AI_GENERATED_PR_LABEL:
             return "ai_authored"
     return "human"
 
@@ -330,17 +304,17 @@ def _build_review_rationale(feedback_items: List[Dict[str, Any]], max_chars: int
     return "\n".join(snippets)[:max_chars].rstrip()
 
 
-def _infer_issue_tags_from_feedback(feedback_texts: Sequence[str]) -> List[str]:
+def _infer_finding_categories_from_feedback(feedback_texts: Sequence[str]) -> List[str]:
     if not feedback_texts:
         return []
     merged = "\n".join(feedback_texts).lower()
-    tags: List[str] = []
-    for tag, patterns in ISSUE_TAG_PATTERNS.items():
+    categories: List[str] = []
+    for category, patterns in FINDING_CATEGORY_PATTERNS.items():
         for pattern in patterns:
             if re.search(pattern, merged):
-                tags.append(tag)
+                categories.append(category)
                 break
-    return _dedupe_preserve_order(tags)
+    return _dedupe_preserve_order(categories)
 
 
 def _has_approval_signal(feedback_items: Sequence[Dict[str, Any]]) -> bool:
@@ -1424,19 +1398,19 @@ def _pr_to_task_record(
     feedback_items = maintainer_reviews + maintainer_issue_comments + maintainer_review_comments
     feedback_items.sort(key=lambda x: (x.get("submitted_at") or "", x.get("id") or 0))
     feedback_texts = [f.get("body", "") for f in feedback_items if (f.get("body") or "").strip()]
-    inferred_tags = _infer_issue_tags_from_feedback(feedback_texts)
+    inferred_categories = _infer_finding_categories_from_feedback(feedback_texts)
 
     if merge_ready:
-        blocking_issue_tags = []
-        advisory_issue_tags = inferred_tags
+        blocking_categories: List[str] = []
+        advisory_categories = inferred_categories
     else:
-        blocking_issue_tags = inferred_tags or ["requirement_mismatch"]
-        advisory_issue_tags = []
-    blocking_findings = legacy_issue_tags_to_review_findings(blocking_issue_tags)
-    advisory_findings = legacy_issue_tags_to_review_findings(advisory_issue_tags)
-    legacy_builder_labels = {
-        "blocking_issue_tags": _dedupe_preserve_order(blocking_issue_tags),
-        "advisory_issue_tags": _dedupe_preserve_order(advisory_issue_tags),
+        blocking_categories = inferred_categories or ["requirements_scope"]
+        advisory_categories = []
+    blocking_findings = categories_to_review_findings(blocking_categories)
+    advisory_findings = categories_to_review_findings(advisory_categories)
+    heuristic_builder_labels = {
+        "blocking_finding_categories": _dedupe_preserve_order(blocking_categories),
+        "advisory_finding_categories": _dedupe_preserve_order(advisory_categories),
         "merge_ready_source": merge_ready_source,
     }
 
@@ -1468,7 +1442,7 @@ def _pr_to_task_record(
         "maintainer_feedback_count": maintainer_feedback_count,
         "changes_requested_count": changes_requested_count,
         "selected_snapshot_kind": _normalize_record_label(selected_snapshot_kind),
-        "source_labels": legacy_builder_labels,
+        "source_labels": heuristic_builder_labels,
         "round_index": round_index,
         "round_window": round_window,
     }
@@ -1500,6 +1474,8 @@ def _pr_to_task_record(
         "evaluation": {
             "ground_truth": {
                 "merge_ready": merge_ready,
+                "needs_human_review": False,
+                "decision_confidence": None,
                 "blocking_findings": review_findings_to_json(blocking_findings),
                 "advisory_findings": review_findings_to_json(advisory_findings),
                 "rationale": rationale or None,

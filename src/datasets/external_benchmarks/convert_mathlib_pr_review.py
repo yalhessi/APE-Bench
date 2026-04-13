@@ -13,7 +13,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ape.tasks.lean_tasks.formal_math.pr_review.findings import (
-    legacy_issue_tags_to_review_findings,
+    categories_to_review_findings,
+    normalize_review_category,
     review_findings_to_json,
 )
 
@@ -33,12 +34,8 @@ except Exception:  # pragma: no cover - direct script execution fallback
                 metadata = {}
             evaluation = record.get("evaluation") or {}
             ground_truth = evaluation.get("ground_truth") or {}
-            blocking_items = ground_truth.get("blocking_findings")
-            advisory_items = ground_truth.get("advisory_findings")
-            if blocking_items is None:
-                blocking_items = ground_truth.get("blocking_issue_tags") or []
-            if advisory_items is None:
-                advisory_items = ground_truth.get("advisory_issue_tags") or []
+            blocking_items = ground_truth.get("blocking_findings") or []
+            advisory_items = ground_truth.get("advisory_findings") or []
             metadata["taxonomy"] = {
                 "task_type": "lean_pr_review",
                 "dataset": metadata.get("dataset"),
@@ -54,41 +51,33 @@ except Exception:  # pragma: no cover - direct script execution fallback
             return record
 
 
-BLOCKING_TAG_BY_DIMENSION = {
-    "semantic_correctness": "semantic_incorrectness",
-    "requirement_alignment": "requirement_mismatch",
-    "scope_control": "scope_control_violation",
+BLOCKING_CATEGORY_BY_DIMENSION = {
+    "semantic_correctness": "correctness",
+    "requirement_alignment": "requirements_scope",
+    "scope_control": "requirements_scope",
 }
 
-ADVISORY_TAG_BY_DIMENSION = {
-    "semantic_correctness": "proof_fragility",
-    "requirement_alignment": "insufficient_documentation",
-    "scope_control": "style_or_readability",
+ADVISORY_CATEGORY_BY_DIMENSION = {
+    "semantic_correctness": "robustness_performance",
+    "requirement_alignment": "documentation_metadata",
+    "scope_control": "readability_maintainability",
 }
 
 
-def normalize_issue_tag(tag: str) -> str:
-    """Normalize issue tags for deterministic scoring."""
-    normalized = (tag or "").strip().lower()
-    normalized = re.sub(r"[\s\-]+", "_", normalized)
-    normalized = re.sub(r"[^a-z0-9_]", "", normalized)
-    return normalized
-
-
-def dedupe_tags(tags: List[str]) -> List[str]:
+def dedupe_categories(categories: List[str]) -> List[str]:
     seen = set()
     out: List[str] = []
-    for tag in tags:
-        n = normalize_issue_tag(tag)
-        if not n or n in seen:
+    for category in categories:
+        normalized = normalize_review_category(category)
+        if not normalized or normalized in seen:
             continue
-        seen.add(n)
-        out.append(n)
+        seen.add(normalized)
+        out.append(normalized)
     return out
 
 
-def derive_issue_tags(record: Dict[str, Any]) -> tuple[List[str], List[str]]:
-    """Map human annotation ratings into blocking/advisory issue tags."""
+def derive_finding_categories(record: Dict[str, Any]) -> tuple[List[str], List[str]]:
+    """Map human annotation ratings into blocking/advisory finding categories."""
     human = (record.get("metadata") or {}).get("human_evaluation") or {}
 
     blocking: List[str] = []
@@ -96,11 +85,11 @@ def derive_issue_tags(record: Dict[str, Any]) -> tuple[List[str], List[str]]:
     for dimension in ("semantic_correctness", "requirement_alignment", "scope_control"):
         rating = (human.get(dimension) or "").strip().lower()
         if rating == "unacceptable":
-            blocking.append(BLOCKING_TAG_BY_DIMENSION[dimension])
+            blocking.append(BLOCKING_CATEGORY_BY_DIMENSION[dimension])
         elif rating == "good":
-            advisory.append(ADVISORY_TAG_BY_DIMENSION[dimension])
+            advisory.append(ADVISORY_CATEGORY_BY_DIMENSION[dimension])
 
-    return dedupe_tags(blocking), dedupe_tags(advisory)
+    return dedupe_categories(blocking), dedupe_categories(advisory)
 
 
 def build_pr_title(record: Dict[str, Any]) -> str:
@@ -120,7 +109,7 @@ def convert_record(record: Dict[str, Any], index: int) -> Dict[str, Any]:
     if not isinstance(target_workspace, dict) or not target_workspace.get("commit_hash"):
         raise ValueError("Missing target_workspace.commit_hash in source record")
 
-    blocking_tags, advisory_tags = derive_issue_tags(record)
+    blocking_categories, advisory_categories = derive_finding_categories(record)
     merge_ready = bool(record.get("judgement_ground_truth"))
 
     filename = record.get("filename")
@@ -159,8 +148,10 @@ def convert_record(record: Dict[str, Any], index: int) -> Dict[str, Any]:
         "evaluation": {
             "ground_truth": {
                 "merge_ready": merge_ready,
-                "blocking_findings": review_findings_to_json(legacy_issue_tags_to_review_findings(blocking_tags)),
-                "advisory_findings": review_findings_to_json(legacy_issue_tags_to_review_findings(advisory_tags)),
+                "needs_human_review": False,
+                "decision_confidence": None,
+                "blocking_findings": review_findings_to_json(categories_to_review_findings(blocking_categories)),
+                "advisory_findings": review_findings_to_json(categories_to_review_findings(advisory_categories)),
                 "rationale": (source_metadata.get("human_evaluation") or {}).get("comment"),
             },
             "label_source": "converted_from_judgment_annotation",

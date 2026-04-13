@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Literal, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -18,26 +18,13 @@ REVIEW_FINDING_CATEGORIES: tuple[str, ...] = (
     "readability_maintainability",
 )
 
-LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY: dict[str, str] = {
-    "semantic_incorrectness": "correctness",
-    "requirement_mismatch": "requirements_scope",
-    "scope_control_violation": "requirements_scope",
-    "library_integration_issue": "integration_compatibility",
-    "deprecated_api_usage": "integration_compatibility",
-    "proof_fragility": "robustness_performance",
-    "performance_regression": "robustness_performance",
-    "insufficient_tests": "tests_ci",
-    "insufficient_documentation": "documentation_metadata",
-    "style_or_readability": "readability_maintainability",
-}
-
 AI_GENERATED_PR_LABEL = "llm_generated"
 AI_GENERATED_PR_GITHUB_LABEL = "llm-generated"
 
 
-def normalize_issue_tag(tag: str) -> str:
-    """Normalize legacy issue tags for deterministic compatibility handling."""
-    normalized = str(tag or "").strip().lower()
+def normalize_review_key(value: str) -> str:
+    """Normalize review-related keys such as categories or topic identifiers."""
+    normalized = str(value or "").strip().lower()
     normalized = re.sub(r"[\s\-]+", "_", normalized)
     normalized = re.sub(r"[^a-z0-9_]", "", normalized)
     return normalized
@@ -45,10 +32,7 @@ def normalize_issue_tag(tag: str) -> str:
 
 def normalize_review_category(category: str) -> str:
     """Normalize finding categories for deterministic scoring."""
-    normalized = str(category or "").strip().lower()
-    normalized = re.sub(r"[\s\-]+", "_", normalized)
-    normalized = re.sub(r"[^a-z0-9_]", "", normalized)
-    return normalized
+    return normalize_review_key(category)
 
 
 def dedupe_preserve_order(items: Iterable[str]) -> list[str]:
@@ -63,6 +47,88 @@ def dedupe_preserve_order(items: Iterable[str]) -> list[str]:
     return out
 
 
+class ReviewDiffLocation(BaseModel):
+    """Location in the diff that supports a review finding."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    file_path: str = Field(..., description="Repo-root relative file path in the diff")
+    line_start: int = Field(..., ge=1, description="1-based starting line number on the chosen diff side")
+    line_end: int = Field(..., ge=1, description="1-based ending line number on the chosen diff side")
+    diff_side: Literal["old", "new"] = Field(..., description="Which side of the diff the line span refers to")
+
+    @model_validator(mode="after")
+    def _normalize_fields(self) -> "ReviewDiffLocation":
+        self.file_path = str(self.file_path or "").strip()
+        if self.line_end < self.line_start:
+            raise ValueError("line_end must be greater than or equal to line_start")
+        return self
+
+
+class ReviewDeclarationReference(BaseModel):
+    """Declaration reference used as structured evidence for a review finding."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(..., description="Declaration name referenced by the finding")
+    file_path: str | None = Field(default=None, description="Optional repo-root relative file path")
+    line_start: int | None = Field(default=None, ge=1, description="Optional 1-based starting line number")
+    line_end: int | None = Field(default=None, ge=1, description="Optional 1-based ending line number")
+
+    @model_validator(mode="after")
+    def _normalize_fields(self) -> "ReviewDeclarationReference":
+        self.name = str(self.name or "").strip()
+        self.file_path = str(self.file_path or "").strip() or None
+        if self.line_end is not None and self.line_start is None:
+            raise ValueError("line_start must be provided when line_end is provided")
+        if self.line_start is not None and self.line_end is not None and self.line_end < self.line_start:
+            raise ValueError("line_end must be greater than or equal to line_start")
+        return self
+
+
+class ReviewGuideCitation(BaseModel):
+    """Guide citation used as structured evidence for a review finding."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    topic: str = Field(..., description="Normalized guide topic key supporting the finding")
+    relative_path: str = Field(..., description="Relative path within the managed review skill bundle")
+
+    @model_validator(mode="after")
+    def _normalize_fields(self) -> "ReviewGuideCitation":
+        self.topic = normalize_review_key(self.topic)
+        self.relative_path = str(self.relative_path or "").strip()
+        return self
+
+
+class ReviewFindingEvidence(BaseModel):
+    """Structured evidence bundle attached to one review finding."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    diff_locations: list[ReviewDiffLocation] = Field(
+        default_factory=list,
+        description="Diff locations that directly support the finding",
+    )
+    referenced_files: list[str] = Field(
+        default_factory=list,
+        description="Additional repo-root relative files inspected for the finding",
+    )
+    referenced_declarations: list[ReviewDeclarationReference] = Field(
+        default_factory=list,
+        description="Declarations inspected to support the finding",
+    )
+    guide_citations: list[ReviewGuideCitation] = Field(
+        default_factory=list,
+        description="Managed-guide citations used to support policy or style judgments",
+    )
+
+    @model_validator(mode="after")
+    def _normalize_fields(self) -> "ReviewFindingEvidence":
+        self.referenced_files = dedupe_preserve_order(self.referenced_files)
+        return self
+
+
 class ReviewFinding(BaseModel):
     """Structured review finding used by PR review tasks and datasets."""
 
@@ -70,6 +136,7 @@ class ReviewFinding(BaseModel):
 
     category: str = Field(..., description="Canonical review finding category")
     summary: str = Field(default="", description="Short human-readable summary of the finding")
+    evidence: ReviewFindingEvidence = Field(..., description="Structured evidence supporting the finding")
 
     @model_validator(mode="before")
     @classmethod
@@ -77,7 +144,7 @@ class ReviewFinding(BaseModel):
         if isinstance(data, ReviewFinding):
             return data.model_dump(mode="json")
         if isinstance(data, str):
-            return {"category": data, "summary": ""}
+            return {"category": data, "summary": "", "evidence": {}}
         return data
 
     @model_validator(mode="after")
@@ -122,18 +189,22 @@ def extract_review_categories(findings: Sequence[ReviewFinding | dict[str, Any] 
     )
 
 
-def legacy_issue_tags_to_review_findings(tags: Sequence[str]) -> list[ReviewFinding]:
-    """Map legacy issue tags into the new review finding categories."""
+def categories_to_review_findings(categories: Sequence[str]) -> list[ReviewFinding]:
+    """Build minimal findings from category names."""
     findings: list[ReviewFinding] = []
-    for tag in tags:
-        legacy_tag = normalize_issue_tag(tag)
-        category = LEGACY_ISSUE_TAG_TO_FINDING_CATEGORY.get(legacy_tag)
-        if not category:
+    for category in categories:
+        normalized_category = normalize_review_category(category)
+        if not normalized_category:
             continue
-        findings.append(ReviewFinding(category=category))
+        findings.append(
+            ReviewFinding(
+                category=normalized_category,
+                evidence=ReviewFindingEvidence(),
+            )
+        )
     return findings
 
 
-def review_findings_to_json(findings: Sequence[ReviewFinding | dict[str, Any] | str]) -> list[dict[str, str]]:
+def review_findings_to_json(findings: Sequence[ReviewFinding | dict[str, Any] | str]) -> list[dict[str, Any]]:
     """Serialize findings into stable JSON-compatible dicts."""
     return [finding.model_dump(mode="json") for finding in coerce_review_findings(list(findings))]

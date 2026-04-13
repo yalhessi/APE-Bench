@@ -1,6 +1,12 @@
 """Lean PR review task module."""
 
-from .findings import ReviewFinding
+from .findings import (
+    ReviewDeclarationReference,
+    ReviewDiffLocation,
+    ReviewFinding,
+    ReviewFindingEvidence,
+    ReviewGuideCitation,
+)
 from .models import (
     PRReviewBenchmarkContext,
     PRReviewConversation,
@@ -20,6 +26,10 @@ from .task import (
 )
 
 __all__ = [
+    "ReviewDiffLocation",
+    "ReviewDeclarationReference",
+    "ReviewGuideCitation",
+    "ReviewFindingEvidence",
     "ReviewFinding",
     "PRReviewBenchmarkContext",
     "PRReviewConversation",

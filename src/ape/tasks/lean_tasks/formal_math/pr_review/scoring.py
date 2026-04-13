@@ -70,6 +70,8 @@ def evaluate_review_submission(
 
     predicted = {
         "merge_ready": submission.merge_ready,
+        "needs_human_review": submission.needs_human_review,
+        "decision_confidence": submission.decision_confidence,
         "blocking_findings": review_findings_to_json(normalized_blocking),
         "advisory_findings": review_findings_to_json(normalized_advisory),
         "blocking_categories": blocking_categories,
@@ -176,6 +178,8 @@ def evaluate_review_submission(
         "predicted": predicted,
         "ground_truth": {
             "merge_ready": ground_truth.merge_ready,
+            "needs_human_review": ground_truth.needs_human_review,
+            "decision_confidence": ground_truth.decision_confidence,
             "blocking_findings": review_findings_to_json(gold_blocking_findings),
             "advisory_findings": review_findings_to_json(gold_advisory_findings),
             "blocking_categories": sorted(gold_blocking),
