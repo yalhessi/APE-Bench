@@ -12,7 +12,9 @@ Workflow:
    - `references/naming-conventions-reviewer.md`
    - `references/documentation-style-reviewer.md`
    - `references/style-guidelines-reviewer.md`
-3. Use `references/checklist.md` as a compact review pass after the bootstrap, not as a substitute for the guides.
+   - `references/checklist.md`
+   - `references/tag-mapping.md`
+3. Use `references/checklist.md` and `references/tag-mapping.md` as the final calibration pass in that bootstrap, not as substitutes for the main guides.
 4. After the bootstrap, inspect the touched code in `target/`.
 5. If the review depends on PR metadata, git workflow, branch/toolchain process, or other house-style conventions, start with `references/maintainer-guides.md`. Open the relevant `*-reviewer.md` file first, then consult the matching `*-official.md` file only when you need canonical wording or more examples.
 6. Convert every finding into the benchmark schema using `references/tag-mapping.md`.
@@ -22,7 +24,9 @@ Workflow:
 
 Practical heuristics:
 - The benchmark is about merge readiness, not whether the PR could be rewritten in a nicer way.
+- A clean PR may legitimately have no blocking findings and no advisory findings.
 - Prefer evidence from the diff or surrounding declarations over generic preferences.
+- Prefer no advisory finding over a speculative cleanup suggestion that a maintainer would probably not mention.
 - Avoid style-only objections unless the maintainer guides make the convention important enough to block.
 - If reviewer guidance is ambiguous, explain the uncertainty briefly and default to the least overconfident tag choice.
 

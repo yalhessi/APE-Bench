@@ -76,6 +76,9 @@ Use these finding categories when reporting issues:
 <evaluation_policy>
 - "Merge ready" means no blocking correctness/scope/library-integration issues remain.
 - Advisory suggestions should not block merge.
+- It is acceptable for `advisory_findings` to be empty when the PR looks clean.
+- Do not invent speculative polish suggestions just to avoid an empty advisory list.
+- Prefer no finding over a weak preference or hypothetical cleanup idea.
 - Prioritize mathematical correctness, requirement alignment, and scope control.
 - Avoid style-only nitpicks unless they reflect real Mathlib policy violations.
 </evaluation_policy>

@@ -17,7 +17,7 @@ import traceback
 from pathlib import Path, PurePosixPath
 from pydantic import Field, model_validator
 
-from ape.tasks.base import BaseTaskConfig, register_task, EvaluationResult
+from ape.tasks.base import BaseTaskConfig, BaseTaskResult, register_task, EvaluationResult
 from ape.tasks.lean_tasks.base import BaseLeanTask
 from ape.tasks.models import WorkspaceInfo
 from ape.toolkits.execute.lean.utils.process_ops import run_command
@@ -111,6 +111,8 @@ DEFAULT_SKILLED_REVIEW_BOOTSTRAP_PATHS: tuple[str, ...] = (
     "references/naming-conventions-reviewer.md",
     "references/documentation-style-reviewer.md",
     "references/style-guidelines-reviewer.md",
+    "references/checklist.md",
+    "references/tag-mapping.md",
 )
 
 HeadWorkspaceFastPathMode = Literal["off", "reuse_only", "cache_probe", "full_build"]
@@ -242,10 +244,10 @@ class ReviewPRTask(BaseLeanTask):
             "- needs_human_review: whether the PR should be escalated or handed off for human review\n"
             "- decision_confidence: optional calibrated confidence in the overall decision (0.0-1.0)\n"
             "- blocking_findings: blocking findings preventing merge\n"
-            "- advisory_findings: non-blocking findings\n"
+            "- advisory_findings: non-blocking findings; use `[]` if you do not have a concrete advisory issue worth raising\n"
             "- evidence on every finding: diff_locations, referenced_files, referenced_declarations, and guide_citations\n"
             "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
-            "- feedback: concise, evidence-based reviewer feedback\n\n"
+            "- feedback: concise, evidence-based reviewer feedback; a clean PR can legitimately have no extra suggestions\n\n"
             "You must call this tool to finish the task."
         )
 
@@ -2146,6 +2148,23 @@ class ReviewPRTask(BaseLeanTask):
         """Terminate once a valid review is submitted."""
         return bool(evaluation_result and evaluation_result.success)
 
+    @classmethod
+    def is_best_result(cls, result: BaseTaskResult) -> bool:
+        """Treat decision correctness as the optimal outcome when it is available."""
+        if not result.success:
+            return False
+
+        decision_accuracy = None
+        if isinstance(result.custom_metrics, dict):
+            raw_decision_accuracy = result.custom_metrics.get("decision_accuracy")
+            if isinstance(raw_decision_accuracy, (int, float)):
+                decision_accuracy = float(raw_decision_accuracy)
+
+        if decision_accuracy is not None:
+            return decision_accuracy == 1.0
+
+        return super().is_best_result(result)
+
 
 class SkilledReviewPRConfig(ReviewPRConfig):
     """Configuration for skill-targeted Lean PR review tasks."""
@@ -2187,10 +2206,10 @@ class SkilledReviewPRTask(ReviewPRTask):
             "- needs_human_review: whether the PR should be escalated or handed off for human review\n"
             "- decision_confidence: optional calibrated confidence in the overall decision (0.0-1.0)\n"
             "- blocking_findings: blocking findings preventing merge\n"
-            "- advisory_findings: non-blocking findings\n"
+            "- advisory_findings: non-blocking findings; use `[]` if you do not have a concrete advisory issue worth raising\n"
             "- evidence on every finding: diff_locations, referenced_files, referenced_declarations, and guide_citations\n"
             "- guide_evidence_topics: guide topics consulted to support policy/style judgments\n"
-            "- feedback: concise, evidence-based reviewer feedback grounded in the guides you read\n\n"
+            "- feedback: concise, evidence-based reviewer feedback grounded in the guides you read; a clean PR can be merge-ready with no extra suggestions\n\n"
             "If the guide bootstrap is incomplete, continue reviewing instead of calling this tool."
         )
 
@@ -2230,6 +2249,11 @@ class SkilledReviewPRTask(ReviewPRTask):
             "After the bootstrap, inspect the PR code and use the guides as the only source for quality "
             "judgments such as merge-readiness posture, naming, documentation quality, and style policy. "
             "Code inspection tells you what the PR does; the guides tell you how to judge it.\n"
+            "A clean PR may legitimately have zero blocking findings and zero advisory findings. "
+            "Do not invent speculative polish comments just to avoid an empty `advisory_findings` list; "
+            "prefer no finding over a weak preference or hypothetical cleanup idea.\n"
+            "Use `references/checklist.md` and `references/tag-mapping.md` to calibrate whether a point "
+            "is truly blocking, merely advisory, or not worth surfacing at all.\n"
             "In `submit_result`, include `guide_evidence_topics` listing the guide topics that support "
             "your review. The submission will be rejected if the bootstrap files were not read, if a "
             "declared topic has no matching guide read, or if the feedback makes guide-backed claims "

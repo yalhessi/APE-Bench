@@ -92,13 +92,16 @@ FINDING_CATEGORY_PATTERNS = {
 }
 
 APPROVAL_COMMENT_PATTERNS = [
+    r"\bbors\s+merge\b",
     r"\bbors\s+r\+",
     r"\bbors\s+d\+",
+    r"\bmaintainer\s+merge\b",
     r"\blgtm\b",
     r"\blooks good\b",
     r"\bapproved?\b",
 ]
 TRIVIAL_FEEDBACK_PATTERNS = [
+    r"\bmaintainer\s+merge\b",
     r"\bbors\s+(?:merge|r\+|d\+)\b",
     r"\blgtm\b",
     r"\blooks good\b",
