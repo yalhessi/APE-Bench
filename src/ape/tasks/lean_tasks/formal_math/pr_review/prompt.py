@@ -25,7 +25,9 @@ Do not implement changes. Your role is reviewer only.
 <submission_contract>
 - Mirror the field names and nesting from `{submission_schema_path}` exactly.
 - Use `{submission_example_path}` only as a structural example; do not copy its substantive claims.
+- Each finding must include at least one code-local anchor in `diff_locations`, `referenced_files`, or `referenced_declarations`; guide citations alone do not satisfy the evidence requirement.
 - `diff_locations.file_path` must be a repo-root file path from the PR, not `scratch/pr.diff`.
+- Every `diff_locations.file_path` must point to a changed file from this PR.
 - `diff_side` must be `old` or `new`.
 - `referenced_declarations` entries must be objects with `name`.
 - `guide_citations` entries must use `topic` and `relative_path`.

@@ -111,6 +111,12 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     line_range=line_range,
                     omit_details=omit_details
                 )
+                self._record_task_tool_trace(
+                    "file_read",
+                    file_path=file_path,
+                    line_range=line_range,
+                    omit_details=omit_details,
+                )
                 self.logger.info(f"Tool file_read: execution completed")
                 return result
         
@@ -167,6 +173,12 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     B=B,
                     C=C
                 )
+                self._record_task_tool_trace(
+                    "content_search",
+                    path=path,
+                    recursive=recursive,
+                    limit=limit,
+                )
                 self.logger.info(f"Tool content_search: execution completed")
                 return result
         
@@ -196,6 +208,12 @@ class FileSystemToolsProvider(BaseToolsProvider):
                     directory_path=Path(directory_path),
                     recursive=recursive,
                     max_results=limit
+                )
+                self._record_task_tool_trace(
+                    "file_search",
+                    directory_path=directory_path,
+                    recursive=recursive,
+                    limit=limit,
                 )
                 self.logger.info(f"Tool file_search: execution completed")
                 return result

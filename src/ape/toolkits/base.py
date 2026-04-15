@@ -50,6 +50,46 @@ class BaseToolsProvider:
         """
         self.tool_instances = tool_instances
 
+    @staticmethod
+    def _normalize_trace_value(value: Any) -> Any:
+        """Normalize lightweight tool-trace metadata for task-side reporting."""
+        if value is None:
+            return None
+        if isinstance(value, Path):
+            return str(value)
+        if isinstance(value, (bool, int, float)):
+            return value
+        if isinstance(value, str):
+            normalized = " ".join(value.split())
+            if len(normalized) > 200:
+                return f"{normalized[:197]}..."
+            return normalized
+        if isinstance(value, list):
+            normalized_items = []
+            for item in value[:8]:
+                normalized_item = BaseToolsProvider._normalize_trace_value(item)
+                if isinstance(normalized_item, (str, int, float, bool)):
+                    normalized_items.append(normalized_item)
+            return normalized_items
+        return None
+
+    def _record_task_tool_trace(self, tool_name: str, **metadata: Any) -> None:
+        """Forward compact tool-call metadata to the active task when supported."""
+        if self.task is None:
+            return
+
+        recorder = getattr(self.task, "_record_tool_usage_trace", None)
+        if not callable(recorder):
+            return
+
+        normalized_metadata = {}
+        for key, value in metadata.items():
+            normalized_value = self._normalize_trace_value(value)
+            if normalized_value is not None:
+                normalized_metadata[key] = normalized_value
+
+        recorder(tool_name=tool_name, **normalized_metadata)
+
     def register_tools(self, mcp: 'FastMCP', enabled_tools: set[str]) -> None:
         """Register tools to MCP server."""
         raise NotImplementedError("Subclasses must implement register_tools")

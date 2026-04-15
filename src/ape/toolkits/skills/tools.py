@@ -94,6 +94,7 @@ class SkillToolsProvider(BaseToolsProvider):
                     for skill in skill_set.skills
                 ]
                 self._record_skill_tool_usage("list_skills")
+                self._record_task_tool_trace("list_skills")
                 self.logger.info("Tool list_skills: returned %s skills", len(skills))
                 return {"skills": skills}
 
@@ -121,6 +122,11 @@ class SkillToolsProvider(BaseToolsProvider):
                 content = read_materialized_skill_file(skill, relative_path=relative_path)
                 files = list_skill_relative_files(skill)
                 self._record_skill_tool_usage(
+                    "read_skill",
+                    skill_id=skill_id,
+                    relative_path=relative_path,
+                )
+                self._record_task_tool_trace(
                     "read_skill",
                     skill_id=skill_id,
                     relative_path=relative_path,

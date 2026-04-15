@@ -207,7 +207,10 @@ class ReviewPRTask(BaseLeanTask):
         return (
             f"Mirror the exact field names and nesting from `{schema_path}`.\n"
             f"A filled example lives at `{example_path}`.\n"
+            "Each finding must include at least one code-local evidence anchor via "
+            "`diff_locations`, `referenced_files`, or `referenced_declarations`; guide citations alone are not enough.\n"
             "Use repo-root paths in `diff_locations.file_path`; never use `scratch/pr.diff` there.\n"
+            "Every `diff_locations.file_path` must point to a changed file from this PR.\n"
             "`diff_side` must be `old` or `new`.\n"
             "`referenced_declarations` entries must be objects with `name`, not raw strings.\n"
             "`guide_citations` entries must use `topic` and `relative_path`.\n"
@@ -272,6 +275,175 @@ class ReviewPRTask(BaseLeanTask):
             seen.add(relative_path)
             ordered_paths.append(relative_path)
         return tuple(ordered_paths)
+
+    @staticmethod
+    def _normalize_tool_trace_value(value: Any) -> Any:
+        if value is None:
+            return None
+        if isinstance(value, Path):
+            return str(value)
+        if isinstance(value, (bool, int, float)):
+            return value
+        if isinstance(value, str):
+            normalized = re.sub(r"\s+", " ", value).strip()
+            if len(normalized) > 200:
+                return f"{normalized[:197]}..."
+            return normalized
+        if isinstance(value, list):
+            normalized_items: list[Any] = []
+            for item in value[:8]:
+                normalized_item = ReviewPRTask._normalize_tool_trace_value(item)
+                if isinstance(normalized_item, (str, int, float, bool)):
+                    normalized_items.append(normalized_item)
+            return normalized_items
+        return None
+
+    def _record_tool_usage_trace(self, *, tool_name: str, **details: Any) -> None:
+        usage = getattr(self, "_review_tool_usage_trace", None)
+        if not isinstance(usage, dict):
+            usage = {"counts": {}, "records": []}
+
+        counts = usage.get("counts")
+        if not isinstance(counts, dict):
+            counts = {}
+        counts[tool_name] = int(counts.get(tool_name, 0) or 0) + 1
+        usage["counts"] = counts
+
+        normalized_record = {"tool_name": tool_name}
+        for key, value in details.items():
+            normalized_value = self._normalize_tool_trace_value(value)
+            if normalized_value is not None:
+                normalized_record[key] = normalized_value
+
+        records = usage.get("records")
+        if not isinstance(records, list):
+            records = []
+        records.append(normalized_record)
+        usage["records"] = records[-200:]
+
+        setattr(self, "_review_tool_usage_trace", usage)
+
+    @staticmethod
+    def _normalize_repo_relative_path(path: str) -> Optional[str]:
+        normalized = str(path or "").strip().replace("\\", "/")
+        if not normalized:
+            return None
+
+        pure_path = PurePosixPath(normalized)
+        if pure_path.is_absolute():
+            return None
+
+        parts = pure_path.parts
+        if not parts:
+            return None
+
+        if parts[0] == "scratch":
+            return None
+        if parts[0] == "target":
+            if len(parts) <= 1:
+                return None
+            return "/".join(parts[1:])
+        if parts[0] == "reference":
+            if len(parts) <= 2:
+                return None
+            return "/".join(parts[2:])
+
+        if any(part in ("", ".", "..") for part in parts):
+            return None
+        return normalized
+
+    @classmethod
+    def _invalid_repo_relative_path_reason(cls, path: str) -> Optional[str]:
+        normalized = str(path or "").strip()
+        if not normalized:
+            return "path is empty"
+        if normalized == "scratch/pr.diff":
+            return "use the changed repo file path, not `scratch/pr.diff`"
+        pure_path = PurePosixPath(normalized.replace("\\", "/"))
+        if pure_path.is_absolute():
+            return "path must be repo-root relative, not absolute"
+        if pure_path.parts and pure_path.parts[0] in {"scratch", "target", "reference"}:
+            return "path must be repo-root relative without a workspace prefix"
+        if any(part in ("", ".", "..") for part in pure_path.parts):
+            return "path contains unsafe segments"
+        return None
+
+    @classmethod
+    def _finding_repo_evidence_paths(cls, finding: ReviewFinding) -> tuple[str, ...]:
+        paths: list[str] = []
+        seen: set[str] = set()
+
+        def add_path(raw_path: Optional[str]) -> None:
+            normalized_path = cls._normalize_repo_relative_path(raw_path or "")
+            if not normalized_path or normalized_path in seen:
+                return
+            seen.add(normalized_path)
+            paths.append(normalized_path)
+
+        for diff_location in finding.evidence.diff_locations:
+            add_path(diff_location.file_path)
+        for file_path in finding.evidence.referenced_files:
+            add_path(file_path)
+        for declaration in finding.evidence.referenced_declarations:
+            add_path(declaration.file_path)
+        return tuple(paths)
+
+    def _get_review_tool_trace_payload(self) -> Dict[str, Any]:
+        usage = getattr(self, "_review_tool_usage_trace", None)
+        if not isinstance(usage, dict):
+            usage = {}
+
+        raw_counts = usage.get("counts")
+        counts = {
+            str(tool_name): int(count or 0)
+            for tool_name, count in (raw_counts.items() if isinstance(raw_counts, dict) else [])
+        }
+
+        raw_records = usage.get("records")
+        records = list(raw_records) if isinstance(raw_records, list) else []
+
+        inspected_workspace_paths: list[str] = []
+        inspected_repo_paths: list[str] = []
+        seen_workspace_paths: set[str] = set()
+        seen_repo_paths: set[str] = set()
+        for record in records:
+            if not isinstance(record, dict):
+                continue
+            for field_name in ("file_path", "path", "directory_path"):
+                raw_path = record.get(field_name)
+                if not isinstance(raw_path, str):
+                    continue
+                normalized_workspace_path = raw_path.strip()
+                if normalized_workspace_path and normalized_workspace_path not in seen_workspace_paths:
+                    seen_workspace_paths.add(normalized_workspace_path)
+                    inspected_workspace_paths.append(normalized_workspace_path)
+                normalized_repo_path = self._normalize_repo_relative_path(normalized_workspace_path)
+                if normalized_repo_path and normalized_repo_path not in seen_repo_paths:
+                    seen_repo_paths.add(normalized_repo_path)
+                    inspected_repo_paths.append(normalized_repo_path)
+
+        tool_trace_summary = {
+            "tool_call_counts": counts,
+            "tool_call_total": sum(counts.values()),
+            "records_captured": len(records),
+            "inspected_workspace_paths": inspected_workspace_paths,
+            "inspected_repo_paths": inspected_repo_paths,
+            "used_file_inspection": any(
+                counts.get(tool_name, 0) > 0 for tool_name in ("file_read", "content_search", "file_search")
+            ),
+            "used_code_navigation": any(
+                counts.get(tool_name, 0) > 0 for tool_name in ("code_hover", "code_goto", "code_references")
+            ),
+            "used_bash_execute": counts.get("bash_execute", 0) > 0,
+            "used_skill_tools": any(
+                counts.get(tool_name, 0) > 0 for tool_name in ("list_skills", "read_skill")
+            ),
+            "read_scratch_diff": "scratch/pr.diff" in inspected_workspace_paths,
+        }
+        return {
+            "summary": tool_trace_summary,
+            "records": records,
+        }
 
     @staticmethod
     def _normalize_guide_topic(topic: str) -> str:
@@ -489,6 +661,63 @@ class ReviewPRTask(BaseLeanTask):
         guide_evidence_topics: Optional[List[str]] = None,
     ) -> Optional[str]:
         """Return an error message when submit_result should be rejected."""
+        changed_files = list(self.data.changed_files or [])
+        changed_file_set = set(changed_files)
+
+        for finding_kind, findings in (
+            ("Blocking", blocking_findings or []),
+            ("Advisory", advisory_findings or []),
+        ):
+            for index, finding in enumerate(findings, start=1):
+                finding_label = f"{finding_kind} finding {index} (`{finding.category}`)"
+                if not finding.summary:
+                    return f"{finding_label} must include a short summary."
+
+                evidence = finding.evidence
+                has_code_anchor = bool(
+                    evidence.diff_locations
+                    or evidence.referenced_files
+                    or evidence.referenced_declarations
+                )
+                if not has_code_anchor:
+                    return (
+                        f"{finding_label} must include at least one code-local evidence anchor via "
+                        "`diff_locations`, `referenced_files`, or `referenced_declarations`. "
+                        "Guide citations alone are not enough."
+                    )
+
+                for diff_location in evidence.diff_locations:
+                    invalid_reason = self._invalid_repo_relative_path_reason(diff_location.file_path)
+                    if invalid_reason:
+                        return (
+                            f"{finding_label} has invalid `diff_locations.file_path` "
+                            f"`{diff_location.file_path}`: {invalid_reason}."
+                        )
+                    if changed_file_set and diff_location.file_path not in changed_file_set:
+                        changed_file_examples = ", ".join(f"`{path}`" for path in changed_files[:5])
+                        return (
+                            f"{finding_label} must use changed files for `diff_locations.file_path`. "
+                            f"Got `{diff_location.file_path}`; changed files include {changed_file_examples}."
+                        )
+
+                for referenced_file in evidence.referenced_files:
+                    invalid_reason = self._invalid_repo_relative_path_reason(referenced_file)
+                    if invalid_reason:
+                        return (
+                            f"{finding_label} has invalid `referenced_files` entry "
+                            f"`{referenced_file}`: {invalid_reason}."
+                        )
+
+                for declaration in evidence.referenced_declarations:
+                    if declaration.file_path is None:
+                        continue
+                    invalid_reason = self._invalid_repo_relative_path_reason(declaration.file_path)
+                    if invalid_reason:
+                        return (
+                            f"{finding_label} has invalid `referenced_declarations.file_path` "
+                            f"`{declaration.file_path}`: {invalid_reason}."
+                        )
+
         return None
 
     @classmethod
@@ -1344,6 +1573,7 @@ class ReviewPRTask(BaseLeanTask):
         self.scratch_pr_context_path: Optional[Path] = None
         self.scratch_review_submission_schema_path: Optional[Path] = None
         self.scratch_review_submission_example_path: Optional[Path] = None
+        self._review_tool_usage_trace: Dict[str, Any] = {"counts": {}, "records": []}
 
     @staticmethod
     def _normalize_finding_category(category: str) -> str:
@@ -1717,6 +1947,7 @@ class ReviewPRTask(BaseLeanTask):
             evaluation=self.data.evaluation,
             task_config=self.config.task_config,
             read_skill_relative_paths=self._get_skill_read_relative_paths(),
+            tool_trace_payload=self._get_review_tool_trace_payload(),
         )
 
     def create_result(
@@ -1965,7 +2196,15 @@ class SkilledReviewPRTask(ReviewPRTask):
                 f"`guide_evidence_topics` from: {topic_list}."
             )
 
-        return None
+        return super()._validate_submission_prerequisites(
+            merge_ready=merge_ready,
+            blocking_findings=blocking_findings,
+            advisory_findings=advisory_findings,
+            feedback=feedback,
+            needs_human_review=needs_human_review,
+            decision_confidence=decision_confidence,
+            guide_evidence_topics=guide_evidence_topics,
+        )
 
 
 register_task("lean_pr_review", ReviewPRTask)
