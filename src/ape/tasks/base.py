@@ -573,6 +573,12 @@ def get_task_class(task_type: str) -> type['BaseTask']:
     return _tasks[task_type]
 
 
+def result_counts_as_pass(result: BaseTaskResult) -> bool:
+    """Check whether a task result counts as a pass in orchestration summaries."""
+    task_class = get_task_class(result.task_type)
+    return task_class.is_best_result(result)
+
+
 def create_task_from_data(
     data: Dict[str, Any],
     config: 'BaseScaffoldConfig',
