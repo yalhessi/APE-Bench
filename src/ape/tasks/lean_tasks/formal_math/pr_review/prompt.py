@@ -22,6 +22,12 @@ Do not implement changes. Your role is reviewer only.
 
 {managed_skill_guidance}
 
+<workspace_outputs>
+- After a successful `{submit_tool_name}` call, the task writes your final review to `{submitted_review_path}`.
+- The task also writes grading details to `{review_grading_path}`.
+- When benchmark ground truth is attached, `{review_grading_path}` explains how the review was graded. Otherwise it records the rubric and notes that the run was unscored.
+</workspace_outputs>
+
 <submission_contract>
 - Mirror the field names and nesting from `{submission_schema_path}` exactly.
 - Use `{submission_example_path}` only as a structural example; do not copy its substantive claims.

@@ -301,6 +301,10 @@ class ReviewPRResult(BaseTaskResult):
     )
     feedback: str = Field(..., description="Submitted review feedback")
     review_data: Dict[str, Any] = Field(default_factory=dict, description="Detailed review/evaluation data")
+    workspace_artifacts: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Scratch-local artifact paths written for the submitted review and grading output",
+    )
 
 
 # Backward-compatible alias for modules that have not been updated yet.

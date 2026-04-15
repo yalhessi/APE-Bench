@@ -160,6 +160,8 @@ class ReviewPRTask(BaseLeanTask):
     patch_marker_filename = ".ape_pr_review_patch.json"
     review_submission_schema_filename = "review_submission_schema.json"
     review_submission_example_filename = "review_submission_example.json"
+    submitted_review_filename = "submitted_review.json"
+    review_grading_filename = "review_grading.json"
 
     @classmethod
     def _review_submission_schema_relpath(cls) -> str:
@@ -168,6 +170,14 @@ class ReviewPRTask(BaseLeanTask):
     @classmethod
     def _review_submission_example_relpath(cls) -> str:
         return f"scratch/{cls.review_submission_example_filename}"
+
+    @classmethod
+    def _submitted_review_relpath(cls) -> str:
+        return f"scratch/{cls.submitted_review_filename}"
+
+    @classmethod
+    def _review_grading_relpath(cls) -> str:
+        return f"scratch/{cls.review_grading_filename}"
 
     def _get_required_skill_name(self) -> str:
         """Return the preferred managed skill name for this task, if configured."""
@@ -204,6 +214,8 @@ class ReviewPRTask(BaseLeanTask):
     def _build_submission_contract_guidance(self) -> str:
         schema_path = self._review_submission_schema_relpath()
         example_path = self._review_submission_example_relpath()
+        submitted_review_path = self._submitted_review_relpath()
+        review_grading_path = self._review_grading_relpath()
         return (
             f"Mirror the exact field names and nesting from `{schema_path}`.\n"
             f"A filled example lives at `{example_path}`.\n"
@@ -215,6 +227,9 @@ class ReviewPRTask(BaseLeanTask):
             "`referenced_declarations` entries must be objects with `name`, not raw strings.\n"
             "`guide_citations` entries must use `topic` and `relative_path`.\n"
             "Do not invent alternate keys like `path`, `file`, `declaration`, `title`, `quote`, or `comment`.\n"
+            f"After a successful `submit_result`, the task writes your final review to `{submitted_review_path}`.\n"
+            f"It also writes grading details to `{review_grading_path}`; if ground truth is attached, "
+            "that file explains how the review was graded.\n"
         )
 
     def _build_submit_tool_description(self) -> str:
@@ -1573,6 +1588,8 @@ class ReviewPRTask(BaseLeanTask):
         self.scratch_pr_context_path: Optional[Path] = None
         self.scratch_review_submission_schema_path: Optional[Path] = None
         self.scratch_review_submission_example_path: Optional[Path] = None
+        self.scratch_submitted_review_path: Optional[Path] = None
+        self.scratch_review_grading_path: Optional[Path] = None
         self._review_tool_usage_trace: Dict[str, Any] = {"counts": {}, "records": []}
 
     @staticmethod
@@ -1689,6 +1706,122 @@ class ReviewPRTask(BaseLeanTask):
         )
         return example.model_dump(mode="json")
 
+    def _initialize_workspace_artifact_paths(self) -> None:
+        if not self.scratch_workspace or not self.scratch_workspace.path:
+            return
+
+        self.scratch_submitted_review_path = self.scratch_workspace.path / self.submitted_review_filename
+        self.scratch_review_grading_path = self.scratch_workspace.path / self.review_grading_filename
+
+    def _workspace_artifact_relpaths(self) -> Dict[str, str]:
+        return {
+            "submitted_review": self._submitted_review_relpath(),
+            "review_grading": self._review_grading_relpath(),
+        }
+
+    def _build_grading_rubric_payload(self) -> dict[str, Any]:
+        task_config = self.config.task_config
+        return {
+            "primary_metric": "review_quality_score",
+            "components": [
+                {
+                    "metric": "decision_accuracy",
+                    "weight": float(getattr(task_config, "decision_weight", 0.65)),
+                    "description": "1.0 when `merge_ready` matches ground truth; otherwise 0.0.",
+                },
+                {
+                    "metric": "blocking_issue_f1",
+                    "weight": float(getattr(task_config, "blocking_issue_weight", 0.25)),
+                    "description": "F1 over predicted vs ground-truth blocking finding categories.",
+                },
+                {
+                    "metric": "advisory_issue_f1",
+                    "weight": float(getattr(task_config, "advisory_issue_weight", 0.10)),
+                    "description": "F1 over predicted vs ground-truth advisory finding categories.",
+                },
+            ],
+            "weights": {
+                "decision_accuracy": float(getattr(task_config, "decision_weight", 0.65)),
+                "blocking_issue_f1": float(getattr(task_config, "blocking_issue_weight", 0.25)),
+                "advisory_issue_f1": float(getattr(task_config, "advisory_issue_weight", 0.10)),
+            },
+            "false_approve_penalty": {
+                "max_score": float(getattr(task_config, "severe_false_approve_max_score", 0.20)),
+                "description": (
+                    "If the review approves a PR that ground truth rejects, cap the final score at this value."
+                ),
+            },
+            "supplementary_metrics": [
+                "handoff_accuracy",
+                "location_file_precision",
+                "location_file_recall",
+                "location_file_f1",
+                "evidence_code_anchor_rate",
+                "evidence_path_anchor_rate",
+                "guide_citation_rate",
+                "evidence_trace_coverage_rate",
+                "decision_confidence_provided",
+                "decision_brier_score",
+                "decision_calibration_error",
+                "selective_coverage",
+                "selective_decision_risk",
+            ],
+        }
+
+    def _build_review_grading_payload(
+        self,
+        *,
+        evaluation_result: EvaluationResult,
+        review_data: Dict[str, Any],
+        custom_metrics: Optional[Dict[str, float]],
+    ) -> dict[str, Any]:
+        return {
+            "ground_truth_available": self.data.evaluation is not None,
+            "label_source": self.data.label_source,
+            "rubric": self._build_grading_rubric_payload(),
+            "grading": {
+                "status": "graded" if self.data.evaluation is not None else "unscored",
+                "score": evaluation_result.score,
+                "summary": evaluation_result.message,
+                "custom_metrics": custom_metrics,
+                "review_data": review_data,
+            },
+        }
+
+    @staticmethod
+    async def _write_json_artifact(path: Path, payload: Dict[str, Any]) -> None:
+        import aiofiles
+
+        async with aiofiles.open(path, "w", encoding="utf-8") as f:
+            await f.write(json.dumps(payload, indent=2, ensure_ascii=False))
+            await f.write("\n")
+
+    async def _write_workspace_artifacts(
+        self,
+        *,
+        submission: PRReviewSubmission,
+        evaluation_result: EvaluationResult,
+        review_data: Dict[str, Any],
+        custom_metrics: Optional[Dict[str, float]],
+    ) -> Dict[str, str]:
+        self._initialize_workspace_artifact_paths()
+        if not self.scratch_submitted_review_path or not self.scratch_review_grading_path:
+            return {}
+
+        await self._write_json_artifact(
+            self.scratch_submitted_review_path,
+            submission.model_dump(mode="json"),
+        )
+        await self._write_json_artifact(
+            self.scratch_review_grading_path,
+            self._build_review_grading_payload(
+                evaluation_result=evaluation_result,
+                review_data=review_data,
+                custom_metrics=custom_metrics,
+            ),
+        )
+        return self._workspace_artifact_relpaths()
+
     async def setup(
         self,
         termination_callback,
@@ -1709,6 +1842,7 @@ class ReviewPRTask(BaseLeanTask):
         self.scratch_review_submission_example_path = (
             self.scratch_workspace.path / self.review_submission_example_filename
         )
+        self._initialize_workspace_artifact_paths()
 
         context_lines = [
             f"# PR Review Context",
@@ -1760,6 +1894,14 @@ class ReviewPRTask(BaseLeanTask):
             str(self.scratch_review_submission_schema_path.resolve()),
             str(self.scratch_review_submission_example_path.resolve()),
         ]
+        if self.scratch_submitted_review_path:
+            self.scratch_workspace.read_only_path_patterns.append(
+                str(self.scratch_submitted_review_path.resolve())
+            )
+        if self.scratch_review_grading_path:
+            self.scratch_workspace.read_only_path_patterns.append(
+                str(self.scratch_review_grading_path.resolve())
+            )
         return logger
 
     @staticmethod
@@ -1813,6 +1955,8 @@ class ReviewPRTask(BaseLeanTask):
             managed_skill_guidance=self._build_managed_skill_guidance(),
             submission_schema_path=self._review_submission_schema_relpath(),
             submission_example_path=self._review_submission_example_relpath(),
+            submitted_review_path=self._submitted_review_relpath(),
+            review_grading_path=self._review_grading_relpath(),
             pr_display=pr_display,
             pr_title=snapshot.pr_title,
             pr_author=snapshot.pr_author or "unknown",
@@ -1900,6 +2044,19 @@ class ReviewPRTask(BaseLeanTask):
                     }
 
                 evaluation_result, review_data, custom_metrics = self._evaluate_review(submission)
+                workspace_artifacts: Dict[str, str] = {}
+                try:
+                    workspace_artifacts = await self._write_workspace_artifacts(
+                        submission=submission,
+                        evaluation_result=evaluation_result,
+                        review_data=review_data,
+                        custom_metrics=custom_metrics,
+                    )
+                except Exception:
+                    self.logger.error(
+                        "Failed to write PR review workspace artifacts: %s",
+                        traceback.format_exc(),
+                    )
 
                 if self.should_terminate(evaluation_result) and self.termination_callback:
                     task_result = self.create_result(
@@ -1913,6 +2070,7 @@ class ReviewPRTask(BaseLeanTask):
                         guide_evidence_topics=submission.guide_evidence_topics,
                         feedback=submission.feedback,
                         review_data=review_data,
+                        workspace_artifacts=workspace_artifacts,
                         custom_metrics=custom_metrics,
                     )
                     await self.termination_callback(task_result)
@@ -1925,6 +2083,7 @@ class ReviewPRTask(BaseLeanTask):
                 return {
                     "evaluation_result": evaluation_result,
                     "review_data": review_data,
+                    "workspace_artifacts": workspace_artifacts,
                     "message": "PR review submitted and evaluated",
                 }
             except Exception:
@@ -1962,6 +2121,7 @@ class ReviewPRTask(BaseLeanTask):
         guide_evidence_topics: List[str],
         feedback: str,
         review_data: Dict[str, Any],
+        workspace_artifacts: Optional[Dict[str, str]] = None,
         **kwargs,
     ) -> ReviewPRResult:
         return ReviewPRResult(
@@ -1978,6 +2138,7 @@ class ReviewPRTask(BaseLeanTask):
             guide_evidence_topics=guide_evidence_topics,
             feedback=feedback,
             review_data=review_data,
+            workspace_artifacts=workspace_artifacts or {},
             **kwargs,
         )
 
