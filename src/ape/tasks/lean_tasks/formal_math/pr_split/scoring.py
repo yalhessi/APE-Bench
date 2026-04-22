@@ -56,7 +56,6 @@ def evaluate_split_submission(
         "coverage_rate": _safe_rate(len(selected_unit_set & all_unit_set), len(all_unit_set)),
         "overlap_rate": _safe_rate(overlap_count, len(selected_units)) if selected_units else 0.0,
         "dependency_acyclic": 1.0 if dependency_acyclic else 0.0,
-        "chunk_review_valid_rate": 1.0,
     }
 
     split_data: Dict[str, object] = {

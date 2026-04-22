@@ -4,23 +4,15 @@ from __future__ import annotations
 
 import inspect
 import json
-import re
 import traceback
-from pathlib import Path, PurePosixPath
-from typing import Annotated, Any, Dict, List, Optional, Set, TYPE_CHECKING
+from pathlib import Path
+from typing import Annotated, Any, Dict, List, Optional, TYPE_CHECKING
 
 from pydantic import Field
 
 from ape.tasks.base import BaseTaskConfig, BaseTaskResult, EvaluationResult, register_task
 from ape.tasks.lean_tasks.base import BaseLeanTask
 
-from ..pr_review.findings import (
-    REVIEW_FINDING_CATEGORIES,
-    ReviewFinding,
-    coerce_review_findings,
-    normalize_review_categories,
-    normalize_review_category,
-)
 from ..pr_shared.change_units import PRChangeUnit, build_chunk_diff, parse_pr_change_units
 from .models import (
     PRSplitChunk,
@@ -163,46 +155,6 @@ class PRSplitTask(BaseLeanTask):
     def _build_managed_skill_guidance(self) -> str:
         return ""
 
-    @staticmethod
-    def _normalize_repo_relative_path(path: str) -> Optional[str]:
-        normalized = str(path or "").strip().replace("\\", "/")
-        if not normalized:
-            return None
-        pure_path = PurePosixPath(normalized)
-        if pure_path.is_absolute():
-            return None
-        parts = pure_path.parts
-        if not parts:
-            return None
-        if parts[0] in {"scratch", "target", "reference"}:
-            return None
-        if any(part in ("", ".", "..") for part in parts):
-            return None
-        return normalized
-
-    @classmethod
-    def _invalid_repo_relative_path_reason(cls, path: str) -> Optional[str]:
-        normalized = str(path or "").strip()
-        if not normalized:
-            return "path is empty"
-        if normalized == "scratch/pr.diff":
-            return "use the repo-root file path, not `scratch/pr.diff`"
-        pure_path = PurePosixPath(normalized.replace("\\", "/"))
-        if pure_path.is_absolute():
-            return "path must be repo-root relative, not absolute"
-        if pure_path.parts and pure_path.parts[0] in {"scratch", "target", "reference"}:
-            return "path must be repo-root relative without a workspace prefix"
-        if any(part in ("", ".", "..") for part in pure_path.parts):
-            return "path contains unsafe segments"
-        return None
-
-    @staticmethod
-    def _normalize_finding_category(category: str) -> str:
-        return normalize_review_category(category)
-
-    def _normalize_findings(self, findings: Optional[List[ReviewFinding]]) -> List[ReviewFinding]:
-        return coerce_review_findings(findings or [])
-
     def _build_diff_preview(self, limit: int) -> str:
         if limit <= 0:
             return "# Diff preview disabled by configuration."
@@ -255,7 +207,7 @@ class PRSplitTask(BaseLeanTask):
         example = PRSplitSubmission(
             should_split=True,
             rationale=(
-                "Split out the prerequisite mechanical refactor first, then review the feature work on top "
+                "Split out the prerequisite mechanical refactor first, then land the feature work on top "
                 "of that smaller foundation."
             ),
             chunks=[
@@ -265,14 +217,6 @@ class PRSplitTask(BaseLeanTask):
                     summary="Small mechanical changes that unblock the main feature without mixing semantics.",
                     selected_unit_ids=[first_unit.unit_id],
                     depends_on=[],
-                    review={
-                        "merge_ready": True,
-                        "needs_human_review": False,
-                        "decision_confidence": 0.82,
-                        "blocking_findings": [],
-                        "advisory_findings": [],
-                        "feedback": "This prerequisite cleanup looks mergeable as an isolated preparatory PR.",
-                    },
                 ),
                 PRSplitChunk(
                     chunk_id="main_feature",
@@ -280,35 +224,6 @@ class PRSplitTask(BaseLeanTask):
                     summary="Feature-facing changes that become easier to review once the prerequisite cleanup lands.",
                     selected_unit_ids=second_chunk_units,
                     depends_on=["prep_refactor"],
-                    review={
-                        "merge_ready": False,
-                        "needs_human_review": True,
-                        "decision_confidence": 0.63,
-                        "blocking_findings": [
-                            {
-                                "category": "integration_compatibility",
-                                "summary": "Check that the public API boundary is still the intended one after splitting.",
-                                "evidence": {
-                                    "diff_locations": [
-                                        {
-                                            "file_path": remaining_units[0].file_path,
-                                            "line_start": max(remaining_units[0].new_start or 1, 1),
-                                            "line_end": max(
-                                                remaining_units[0].new_start or 1,
-                                                1,
-                                            ),
-                                            "diff_side": "new",
-                                        }
-                                    ],
-                                    "referenced_files": [remaining_units[0].file_path],
-                                    "referenced_declarations": [],
-                                    "guide_citations": [],
-                                },
-                            }
-                        ],
-                        "advisory_findings": [],
-                        "feedback": "The main feature chunk is reviewable, but it still needs a closer integration check.",
-                    },
                 ),
             ],
         )
@@ -452,9 +367,6 @@ class PRSplitTask(BaseLeanTask):
             f"- Snapshot head SHA: {snapshot.snapshot_head_sha or 'N/A'}",
             f"- Maintainer review state: {snapshot.review_state or 'N/A'}",
         ]
-        finding_categories = "\n".join(
-            f"- `{self._normalize_finding_category(category)}`" for category in REVIEW_FINDING_CATEGORIES
-        )
         submit_tool_name = f"{self.config.mcp_server_name}submit_result"
         return LEAN_PR_SPLIT_USER_PROMPT.format(
             submit_tool_name=submit_tool_name,
@@ -469,23 +381,10 @@ class PRSplitTask(BaseLeanTask):
             change_unit_summary=self._build_change_unit_summary(),
             pr_description=snapshot.pr_description or "(empty PR description)",
             pr_diff_preview=self._build_diff_preview(task_config.diff_preview_char_limit),
-            finding_categories=finding_categories,
         )
 
     async def create_user_prompt(self) -> str:
         return self._build_prompt(managed_skill_guidance=self._build_managed_skill_guidance())
-
-    @staticmethod
-    def _finding_has_code_anchor(finding: ReviewFinding) -> bool:
-        evidence = finding.evidence
-        return bool(evidence.diff_locations or evidence.referenced_files or evidence.referenced_declarations)
-
-    @classmethod
-    def _finding_touched_chunk_diff(cls, finding: ReviewFinding, chunk_file_paths: Set[str]) -> bool:
-        for diff_location in finding.evidence.diff_locations:
-            if diff_location.file_path in chunk_file_paths:
-                return True
-        return False
 
     @staticmethod
     def _dependency_cycle(chunk_map: Dict[str, PRSplitChunk]) -> Optional[List[str]]:
@@ -511,59 +410,6 @@ class PRSplitTask(BaseLeanTask):
             cycle = dfs(chunk_id)
             if cycle:
                 return cycle
-        return None
-
-    def _validate_chunk_review(
-        self,
-        *,
-        chunk: PRSplitChunk,
-        chunk_file_paths: Set[str],
-    ) -> Optional[str]:
-        if not chunk.review.feedback:
-            return f"Chunk `{chunk.chunk_id}` must include non-empty `review.feedback`."
-
-        for finding_kind, findings in (
-            ("Blocking", chunk.review.blocking_findings),
-            ("Advisory", chunk.review.advisory_findings),
-        ):
-            for index, finding in enumerate(findings, start=1):
-                finding_label = f"{finding_kind} finding {index} in chunk `{chunk.chunk_id}` (`{finding.category}`)"
-                if not finding.summary:
-                    return f"{finding_label} must include a short summary."
-                if not self._finding_has_code_anchor(finding):
-                    return (
-                        f"{finding_label} must include at least one code-local evidence anchor via "
-                        "`diff_locations`, `referenced_files`, or `referenced_declarations`."
-                    )
-                for diff_location in finding.evidence.diff_locations:
-                    invalid_reason = self._invalid_repo_relative_path_reason(diff_location.file_path)
-                    if invalid_reason:
-                        return (
-                            f"{finding_label} has invalid `diff_locations.file_path` "
-                            f"`{diff_location.file_path}`: {invalid_reason}."
-                        )
-                    if diff_location.file_path not in chunk_file_paths:
-                        chunk_examples = ", ".join(f"`{path}`" for path in sorted(chunk_file_paths)[:5]) or "(none)"
-                        return (
-                            f"{finding_label} must use files touched by chunk `{chunk.chunk_id}` for "
-                            f"`diff_locations.file_path`. Got `{diff_location.file_path}`; chunk files include {chunk_examples}."
-                        )
-                for referenced_file in finding.evidence.referenced_files:
-                    invalid_reason = self._invalid_repo_relative_path_reason(referenced_file)
-                    if invalid_reason:
-                        return (
-                            f"{finding_label} has invalid `referenced_files` entry `{referenced_file}`: "
-                            f"{invalid_reason}."
-                        )
-                for declaration in finding.evidence.referenced_declarations:
-                    if declaration.file_path is None:
-                        continue
-                    invalid_reason = self._invalid_repo_relative_path_reason(declaration.file_path)
-                    if invalid_reason:
-                        return (
-                            f"{finding_label} has invalid `referenced_declarations.file_path` "
-                            f"`{declaration.file_path}`: {invalid_reason}."
-                        )
         return None
 
     def _validate_submission_prerequisites(
@@ -628,17 +474,6 @@ class PRSplitTask(BaseLeanTask):
         if missing_units:
             missing_preview = ", ".join(f"`{unit_id}`" for unit_id in missing_units[:5])
             return f"Every diff unit must be covered exactly once. Missing units include {missing_preview}."
-
-        unit_map = {unit.unit_id: unit for unit in self.change_units}
-        for chunk in submission.chunks:
-            chunk_file_paths = {
-                unit_map[unit_id].file_path
-                for unit_id in chunk.selected_unit_ids
-                if unit_id in unit_map
-            }
-            review_error = self._validate_chunk_review(chunk=chunk, chunk_file_paths=chunk_file_paths)
-            if review_error:
-                return review_error
         return None
 
     def _build_split_grading_payload(
@@ -656,7 +491,6 @@ class PRSplitTask(BaseLeanTask):
                     "coverage_rate",
                     "overlap_rate",
                     "dependency_acyclic",
-                    "chunk_review_valid_rate",
                 ],
             },
             "grading": {
@@ -712,7 +546,6 @@ class PRSplitTask(BaseLeanTask):
                 "If `should_split` is `false`, provide a non-empty rationale and `chunks=[]`.\n"
                 "If `should_split` is `true`, provide 2-6 chunks that cover every diff unit exactly once.\n"
                 f"Use only unit IDs from `{self._pr_change_units_relpath()}`.\n"
-                "Every chunk must include a standalone review with structured evidence-backed findings.\n"
                 f"After a successful `submit_result`, the task writes the final split plan to `{self._submitted_split_relpath()}`.\n"
                 f"It also writes structural grading details to `{self._split_grading_relpath()}` and chunk diffs to `{self._split_dir_relpath()}`.\n"
             )
@@ -721,7 +554,7 @@ class PRSplitTask(BaseLeanTask):
             should_split: Annotated[bool, Field(description="Whether the PR should be split into smaller sub-PRs")],
             rationale: Annotated[str, Field(description="High-level rationale for the split or no-split decision")],
             chunks: Annotated[List[PRSplitChunk], Field(
-                description="Proposed sub-PRs with chunk IDs, selected unit IDs, dependencies, and standalone reviews."
+                description="Proposed sub-PRs with chunk IDs, selected unit IDs, and dependencies."
             )],
         ) -> Dict[str, Any]:
             self.logger.info("Tool submit_result: execution started")

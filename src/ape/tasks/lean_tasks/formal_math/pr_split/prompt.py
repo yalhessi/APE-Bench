@@ -9,8 +9,8 @@ Decide whether this PR should be split into smaller sub-PRs. If it should, propo
 2. Inspect surrounding code in the base snapshot under `target/` when needed.
 3. Use `scratch/split_submission_schema.json` and `scratch/split_submission_example.json` as the exact structural contract for `{submit_tool_name}`.
 4. If the PR is already coherent and manageable as-is, submit `should_split=false` with a clear rationale and `chunks=[]`.
-5. If the PR should be split, propose 2-6 chunks with explicit dependency order and a standalone review for each chunk.
-6. Do not implement changes. Your role is planning and reviewing the split only.
+5. If the PR should be split, propose 2-6 chunks with explicit dependency order.
+6. Do not implement changes. Your role is planning the split only.
 </submission_strategy>
 
 {managed_skill_guidance}
@@ -30,10 +30,7 @@ Decide whether this PR should be split into smaller sub-PRs. If it should, propo
 - Every diff unit from `scratch/pr_change_units.json` must be assigned to exactly one chunk.
 - `selected_unit_ids` must come from `scratch/pr_change_units.json`; do not invent IDs.
 - `depends_on` must reference other chunk IDs from the same submission and must be acyclic.
-- Every chunk must have a non-empty `chunk_id`, `title`, `summary`, and `review.feedback`.
-- Every chunk review finding must have structured evidence.
-- `diff_locations.file_path` inside a chunk review must point to a changed file touched by that chunk.
-- `referenced_files` and `referenced_declarations.file_path` may point to repo-context files you inspected outside the diff, but they must still be repo-root relative.
+- Every chunk must have a non-empty `chunk_id`, `title`, and `summary`.
 </submission_contract>
 
 <pr_metadata>
@@ -65,11 +62,6 @@ Full diff is available at `scratch/pr.diff` (read-only) for decomposition contex
 Preview:
 {pr_diff_preview}
 </pr_diff_summary>
-
-<finding_taxonomy>
-Use these finding categories inside each chunk review:
-{finding_categories}
-</finding_taxonomy>
 
 <split_policy>
 - Prefer semantic cohesion over superficial file-count balancing.

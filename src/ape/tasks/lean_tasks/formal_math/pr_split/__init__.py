@@ -1,7 +1,6 @@
 """Lean PR split task module."""
 
 from .models import (
-    ChunkReview,
     PRSplitChunk,
     PRSplitData,
     PRSplitResult,
@@ -16,7 +15,6 @@ from .task import (
 )
 
 __all__ = [
-    "ChunkReview",
     "PRSplitChunk",
     "PRSplitConfig",
     "PRSplitData",

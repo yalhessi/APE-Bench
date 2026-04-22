@@ -41,7 +41,6 @@ from .formal_math.pr_review import (
     ReviewFindingEvidence,
 )
 from .formal_math.pr_split import (
-    ChunkReview,
     PRSplitChunk,
     PRSplitConfig,
     PRSplitData,
@@ -77,7 +76,6 @@ __all__ = [
     'ReviewDeclarationReference',
     'ReviewGuideCitation',
     'ReviewFindingEvidence',
-    'ChunkReview',
     'PRSplitChunk',
     'PRSplitConfig',
     'PRSplitData',
