@@ -121,7 +121,7 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
             }
         )
 
-    elif task_type == "lean_pr_review":
+    elif task_type in {"lean_pr_review", "skilled_pr_review"}:
         evaluation = record.get("evaluation") or {}
         ground_truth = evaluation.get("ground_truth") or {}
         blocking_items = ground_truth.get("blocking_findings") or []
@@ -135,6 +135,19 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
                 "merge_ready_ground_truth": ground_truth.get("merge_ready"),
                 "blocking_issue_count": len(blocking_items),
                 "advisory_issue_count": len(advisory_items),
+            }
+        )
+
+    elif task_type in {"lean_pr_split", "skilled_pr_split"}:
+        benchmark_context = record.get("benchmark_context") or {}
+        taxonomy.update(
+            {
+                "task_family": "pr_split",
+                "edit_regime": "pr_split",
+                "primary_archetype": "pr_decomposition",
+                "has_ground_truth": False,
+                "split_candidate": bool(benchmark_context.get("split_candidate")),
+                "maintainer_requested_split": bool(benchmark_context.get("maintainer_requested_split")),
             }
         )
 

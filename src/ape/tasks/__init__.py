@@ -40,6 +40,16 @@ from .lean_tasks import (
     ReviewDeclarationReference,
     ReviewGuideCitation,
     ReviewFindingEvidence,
+    ChunkReview,
+    PRSplitChunk,
+    PRSplitConfig,
+    PRSplitData,
+    PRSplitResult,
+    PRSplitSubmission,
+    PRSplitTask,
+    SkilledPRSplitConfig,
+    SkilledPRSplitData,
+    SkilledPRSplitTask,
 )
 
 __all__ = [
@@ -70,4 +80,14 @@ __all__ = [
     'ReviewDeclarationReference',
     'ReviewGuideCitation',
     'ReviewFindingEvidence',
+    'ChunkReview',
+    'PRSplitChunk',
+    'PRSplitConfig',
+    'PRSplitData',
+    'PRSplitResult',
+    'PRSplitSubmission',
+    'PRSplitTask',
+    'SkilledPRSplitConfig',
+    'SkilledPRSplitData',
+    'SkilledPRSplitTask',
 ]

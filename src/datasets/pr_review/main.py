@@ -19,7 +19,7 @@ from ape.utils import parse_cli_args, load_yaml, deep_merge
 
 from .collector import PRReviewDataCollector
 from .config import PRReviewDatasetConfig
-from .materialize_outputs import materialize_hybrid_outputs
+from .materialize_outputs import build_split_task_records, materialize_hybrid_outputs, materialize_split_outputs
 
 if TYPE_CHECKING:
     import logging
@@ -70,15 +70,30 @@ class PRReviewDatasetPipeline:
 
         try:
             records = collector.collect_records()
-            materialized_outputs = materialize_hybrid_outputs(
-                records,
-                self.output_file,
-                skill_bundle=self.config.variant_skill_bundle,
-                write_aggregate=True,
-                create_variants=self.config.create_variant_outputs,
-            ) if self.config.materialize_slice_outputs else {"aggregate": self.output_file}
-            if not self.config.materialize_slice_outputs:
+            if self.config.materialize_slice_outputs:
+                materialized_outputs = materialize_hybrid_outputs(
+                    records,
+                    self.output_file,
+                    skill_bundle=self.config.variant_skill_bundle,
+                    write_aggregate=True,
+                    create_variants=self.config.create_variant_outputs,
+                )
+            else:
+                materialized_outputs = {"aggregate": self.output_file}
                 collector.save_records(records, self.output_file)
+
+            if self.config.materialize_split_task_outputs:
+                split_output = self.output_file.with_name(f"{self.output_file.stem}_split{self.output_file.suffix}")
+                split_records = build_split_task_records(records)
+                split_outputs = materialize_split_outputs(
+                    split_records,
+                    split_output,
+                    skill_bundle=self.config.split_variant_skill_bundle,
+                    write_aggregate=True,
+                    create_variants=self.config.create_variant_outputs,
+                )
+                materialized_outputs.update({f"split_{key}": path for key, path in split_outputs.items()})
+
             summary = collector.build_summary(records)
 
             elapsed = time.time() - start_time

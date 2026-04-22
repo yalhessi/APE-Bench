@@ -9,7 +9,7 @@ from typing import Any, Literal, Optional, Union, get_args, get_origin
 
 from pydantic import BaseModel
 
-from ape.cli.task_prefill import build_pr_review_task_data
+from ape.cli.task_prefill import PR_LIVE_TASK_TYPES, build_pr_task_data
 from ape.tasks.base import get_task_class
 from ape.tasks.models import WorkspaceInfo
 
@@ -159,13 +159,13 @@ def prompt_for_task_data(task_type: str, ui: Optional[TaskInputUI] = None) -> di
 
 def _prompt_special_task_data(task_type: str, ui: TaskInputUI) -> Optional[dict[str, Any]]:
     """Handle task-specific interactive flows."""
-    if task_type != "lean_pr_review":
+    if task_type not in PR_LIVE_TASK_TYPES:
         return None
 
     ui.show_collection_intro(
         task_type,
         [
-            "The remaining PR review fields will be fetched automatically from GitHub.",
+            "The remaining PR task fields will be fetched automatically from GitHub.",
             "You only need the PR URL and the commit SHA from the PR branch.",
         ],
     )
@@ -180,7 +180,7 @@ def _prompt_special_task_data(task_type: str, ui: TaskInputUI) -> Optional[dict[
         "commit",
         "Commit SHA from the pull request branch",
     )
-    return build_pr_review_task_data(pr_url=pr_url, commit=commit)
+    return build_pr_task_data(task_type=task_type, pr_url=pr_url, commit=commit)
 
 
 def _prompt_required_text(ui: TaskInputUI, field_name: str, description: str) -> str:

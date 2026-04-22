@@ -124,6 +124,16 @@ BUTTON_LINE_PATTERNS = [
     re.compile(r"^\s*build with ona\b.*$", re.IGNORECASE),
     re.compile(r"^\s*open in gitpod\b.*$", re.IGNORECASE),
 ]
+
+MAINTAINER_SPLIT_PATTERNS = [
+    re.compile(r"\bsplice-bot\b", re.IGNORECASE),
+    re.compile(r"\bsmaller prs?\b", re.IGNORECASE),
+    re.compile(r"\bsplit(?:ting)? (?:this|the|it|these changes|the pr)?(?:\s+up)?\b", re.IGNORECASE),
+    re.compile(r"\bits own pr\b", re.IGNORECASE),
+    re.compile(r"\bseparate pr\b", re.IGNORECASE),
+]
+
+
 def _dedupe_preserve_order(items: Iterable[str]) -> List[str]:
     seen: Set[str] = set()
     out: List[str] = []
@@ -171,6 +181,34 @@ def _is_substantive_round(feedback: Dict[str, List[Dict[str, Any]]]) -> bool:
 
 def _changes_requested_count(reviews: Sequence[Dict[str, Any]]) -> int:
     return sum(1 for review in reviews if str(review.get("state") or "").upper() == "CHANGES_REQUESTED")
+
+
+def _maintainer_requested_split(feedback_items: Sequence[Dict[str, Any]]) -> bool:
+    for item in feedback_items:
+        body = str(item.get("body") or "")
+        if not body.strip():
+            continue
+        if any(pattern.search(body) for pattern in MAINTAINER_SPLIT_PATTERNS):
+            return True
+    return False
+
+
+def _is_split_candidate(
+    *,
+    pr: Dict[str, Any],
+    changed_paths: Sequence[str],
+    pr_diff: str,
+    maintainer_requested_split: bool,
+) -> bool:
+    changed_file_count = len([path for path in changed_paths if path])
+    diff_lines = int(pr.get("additions") or 0) + int(pr.get("deletions") or 0)
+    hunk_count = sum(1 for line in (pr_diff or "").splitlines() if line.startswith("@@ "))
+    return bool(
+        maintainer_requested_split
+        or diff_lines >= 250
+        or changed_file_count >= 8
+        or hunk_count >= 10
+    )
 
 
 def _is_effectively_merged(pr: Dict[str, Any]) -> bool:
@@ -1402,6 +1440,13 @@ def _pr_to_task_record(
     feedback_items.sort(key=lambda x: (x.get("submitted_at") or "", x.get("id") or 0))
     feedback_texts = [f.get("body", "") for f in feedback_items if (f.get("body") or "").strip()]
     inferred_categories = _infer_finding_categories_from_feedback(feedback_texts)
+    maintainer_requested_split = _maintainer_requested_split(feedback_items)
+    split_candidate = _is_split_candidate(
+        pr=pr,
+        changed_paths=changed_paths,
+        pr_diff=pr_diff,
+        maintainer_requested_split=maintainer_requested_split,
+    )
 
     if merge_ready:
         blocking_categories: List[str] = []
@@ -1448,6 +1493,8 @@ def _pr_to_task_record(
         "source_labels": heuristic_builder_labels,
         "round_index": round_index,
         "round_window": round_window,
+        "split_candidate": split_candidate,
+        "maintainer_requested_split": maintainer_requested_split,
     }
     metadata: Dict[str, Any] = {
         "snapshot_assembly": {
@@ -1497,6 +1544,7 @@ def _pr_to_task_record(
 
 def _build_live_task_record(
     *,
+    task_type: str,
     config: PRReviewDatasetConfig,
     pr: Dict[str, Any],
     changed_paths: List[str],
@@ -1516,9 +1564,10 @@ def _build_live_task_record(
         snapshot_head_sha=snapshot_head_sha,
         workspace_cache=workspace_cache,
     )
-    task_id = f"mathlib_pr_review_{pr.get('number')}_{snapshot_head_sha[:12]}"
+    task_prefix = "mathlib_pr_split" if "pr_split" in task_type else "mathlib_pr_review"
+    task_id = f"{task_prefix}_{pr.get('number')}_{snapshot_head_sha[:12]}"
     return {
-        "task_type": "lean_pr_review",
+        "task_type": task_type,
         "task_id": task_id,
         "snapshot": _build_snapshot_payload(
             config=config,
@@ -1569,6 +1618,16 @@ class PRReviewDataCollector:
 
     def close(self) -> None:
         self.github_client.close()
+
+    @staticmethod
+    def _validate_live_pr_task_type(task_type: str) -> str:
+        normalized = str(task_type or "").strip()
+        if normalized not in {"lean_pr_review", "skilled_pr_review", "lean_pr_split", "skilled_pr_split"}:
+            raise ValueError(
+                f"Unsupported live PR task type `{normalized}`. "
+                "Expected one of: lean_pr_review, skilled_pr_review, lean_pr_split, skilled_pr_split."
+            )
+        return normalized
 
     def _load_pr_review_source_context(self, pr_number: int) -> Dict[str, Any]:
         pr = self.github_client.get_json(
@@ -1819,6 +1878,38 @@ class PRReviewDataCollector:
         pr_url: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Build an unscored live PR review task for the requested PR head commit."""
+        return self.build_live_pr_task_data(
+            task_type="lean_pr_review",
+            pr_number=pr_number,
+            snapshot_head_sha=snapshot_head_sha,
+            pr_url=pr_url,
+        )
+
+    def build_live_pr_split_task_data(
+        self,
+        pr_number: int,
+        snapshot_head_sha: str,
+        *,
+        pr_url: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Build an unscored live PR split task for the requested PR head commit."""
+        return self.build_live_pr_task_data(
+            task_type="lean_pr_split",
+            pr_number=pr_number,
+            snapshot_head_sha=snapshot_head_sha,
+            pr_url=pr_url,
+        )
+
+    def build_live_pr_task_data(
+        self,
+        *,
+        task_type: str,
+        pr_number: int,
+        snapshot_head_sha: str,
+        pr_url: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Build an unscored live PR review or split task for the requested PR head commit."""
+        normalized_task_type = self._validate_live_pr_task_type(task_type)
         context = self._load_pr_review_source_context(pr_number)
         resolved_head_sha = self._resolve_snapshot_head_sha(
             requested_head_sha=snapshot_head_sha,
@@ -1839,6 +1930,7 @@ class PRReviewDataCollector:
             cache=self.workspace_cache,
         )
         return _build_live_task_record(
+            task_type=normalized_task_type,
             config=self.config,
             pr=context["pr"],
             changed_paths=snapshot_context["changed_paths"],

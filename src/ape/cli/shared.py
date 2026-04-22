@@ -221,6 +221,7 @@ def _build_registered_task_epilog(spec: AgentCliSpec) -> str:
     return f"""
 Registered Task Examples:
   ape task {spec.command_name} lean_pr_review
+  ape task {spec.command_name} lean_pr_split
   ape task {spec.command_name} --task-module examples.arithmetic.task arithmetic
   ape task {spec.command_name} --task-file inputs/proof_pr_review/mathlib_pr_review_10tasks.jsonl --task-index 0 lean_pr_review
   ape task {spec.command_name} --task-module examples.arithmetic.task arithmetic --task-data-json '{{"expression":"2 + 2","expected_result":4.0}}'

@@ -107,6 +107,14 @@ class PRReviewDatasetConfig(BaseModel):
         default="mathlib-pr-review",
         description="Skill bundle label written into paired benchmark variants",
     )
+    materialize_split_task_outputs: bool = Field(
+        default=True,
+        description="Write separate standalone PR split JSONLs derived from the collected review snapshots",
+    )
+    split_variant_skill_bundle: str = Field(
+        default="mathlib-pr-split",
+        description="Skill bundle label written into paired split-task variants",
+    )
 
     @property
     def repo_url(self) -> str:

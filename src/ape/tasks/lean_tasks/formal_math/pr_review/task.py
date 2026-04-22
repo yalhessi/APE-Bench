@@ -5,7 +5,7 @@ Evaluates whether an agent can provide Mathlib-quality pull request review feedb
 including merge readiness and issue identification.
 """
 
-from typing import Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast
+from typing import Annotated, Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast
 import asyncio
 import hashlib
 import inspect
@@ -1974,7 +1974,6 @@ class ReviewPRTask(BaseLeanTask):
 
     async def register_task_tools(self, mcp) -> None:
         """Register task-specific submission tool."""
-        from typing import Annotated
         from pydantic import Field
 
         @mcp.tool(

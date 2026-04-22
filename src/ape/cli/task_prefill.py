@@ -11,8 +11,21 @@ from urllib.parse import urlparse
 from ape.utils.logging import create_logger
 
 
-def build_pr_review_task_data(pr_url: str, commit: str) -> dict[str, Any]:
-    """Build a lean_pr_review task record from a PR URL and commit SHA."""
+PR_LIVE_TASK_TYPES = {
+    "lean_pr_review",
+    "skilled_pr_review",
+    "lean_pr_split",
+    "skilled_pr_split",
+}
+
+
+def build_pr_task_data(task_type: str, pr_url: str, commit: str) -> dict[str, Any]:
+    """Build a live PR-shaped task record from a PR URL and commit SHA."""
+    normalized_task_type = str(task_type or "").strip()
+    if normalized_task_type not in PR_LIVE_TASK_TYPES:
+        supported = ", ".join(sorted(PR_LIVE_TASK_TYPES))
+        raise ValueError(f"Unsupported PR live task type `{normalized_task_type}`. Expected one of: {supported}")
+
     normalized_pr_url = str(pr_url or "").strip()
     repo_owner, repo_name, pr_number = _parse_github_pr_url(normalized_pr_url)
     normalized_commit = str(commit or "").strip()
@@ -25,13 +38,24 @@ def build_pr_review_task_data(pr_url: str, commit: str) -> dict[str, Any]:
         logger=create_logger(to_console=False),
     )
     try:
-        return collector.build_live_pr_review_task_data(
+        return collector.build_live_pr_task_data(
+            task_type=normalized_task_type,
             pr_number=pr_number,
             snapshot_head_sha=normalized_commit,
             pr_url=normalized_pr_url,
         )
     finally:
         collector.close()
+
+
+def build_pr_review_task_data(pr_url: str, commit: str) -> dict[str, Any]:
+    """Build a lean_pr_review task record from a PR URL and commit SHA."""
+    return build_pr_task_data(task_type="lean_pr_review", pr_url=pr_url, commit=commit)
+
+
+def build_pr_split_task_data(pr_url: str, commit: str) -> dict[str, Any]:
+    """Build a lean_pr_split task record from a PR URL and commit SHA."""
+    return build_pr_task_data(task_type="lean_pr_split", pr_url=pr_url, commit=commit)
 
 
 def _get_pr_review_dataset_helpers():

@@ -28,6 +28,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ape.tasks.lean_tasks.formal_math.pr_review.findings import (
     ReviewFinding,
+    categories_to_review_findings,
     normalize_review_category,
 )
 from ape.utils.config_loader import deep_merge
@@ -40,6 +41,18 @@ from .materialize_outputs import PRIMARY_CASES, OVERLAY_CASES, materialize_hybri
 
 DEFAULT_TASK_ID_PREFIX = "codex-pr-review"
 DEFAULT_METADATA_SOURCE = "expert_judgment_import"
+LEGACY_ISSUE_TAG_TO_CATEGORY = {
+    "semantic_incorrectness": "correctness",
+    "requirement_mismatch": "requirements_scope",
+    "scope_control_violation": "requirements_scope",
+    "proof_fragility": "robustness_performance",
+    "library_integration_issue": "integration_compatibility",
+    "deprecated_api_usage": "integration_compatibility",
+    "insufficient_documentation": "documentation_metadata",
+    "insufficient_tests": "tests_ci",
+    "performance_regression": "robustness_performance",
+    "style_or_readability": "readability_maintainability",
+}
 
 
 def _parse_github_pr_url(pr_url: str) -> tuple[str, str, int]:
@@ -93,6 +106,23 @@ def _default_task_id(prefix: str, pr_number: int, snapshot_head_sha: str) -> str
     return f"{safe_prefix}_{pr_number}_{short_sha}"
 
 
+def _legacy_issue_tags_to_findings(value: Any) -> list[dict[str, Any]]:
+    tags = [normalize_review_category(item) for item in _normalize_string_list(value)]
+    categories = [LEGACY_ISSUE_TAG_TO_CATEGORY.get(tag, tag) for tag in tags]
+    return [finding.model_dump(mode="json") for finding in categories_to_review_findings(categories)]
+
+
+def _apply_legacy_issue_tag_aliases(payload: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(payload)
+    blocking_tags = normalized.pop("blocking_issue_tags", None)
+    advisory_tags = normalized.pop("advisory_issue_tags", None)
+    if blocking_tags is not None and not normalized.get("blocking_findings"):
+        normalized["blocking_findings"] = _legacy_issue_tags_to_findings(blocking_tags)
+    if advisory_tags is not None and not normalized.get("advisory_findings"):
+        normalized["advisory_findings"] = _legacy_issue_tags_to_findings(advisory_tags)
+    return normalized
+
+
 class ExpertGroundTruth(BaseModel):
     """Expert-provided review labels."""
 
@@ -144,7 +174,7 @@ class ExpertJudgmentAnnotation(BaseModel):
         if not isinstance(data, dict):
             return data
 
-        normalized = dict(data)
+        normalized = _apply_legacy_issue_tag_aliases(dict(data))
 
         if not normalized.get("snapshot_head_sha"):
             for alias in ("commit", "head_sha", "snapshot_commit"):
@@ -157,6 +187,8 @@ class ExpertJudgmentAnnotation(BaseModel):
 
         ground_truth = normalized.get("ground_truth")
         if isinstance(ground_truth, dict):
+            normalized["ground_truth"] = _apply_legacy_issue_tag_aliases(ground_truth)
+            ground_truth = normalized["ground_truth"]
             for field_name in (
                 "merge_ready",
                 "needs_human_review",

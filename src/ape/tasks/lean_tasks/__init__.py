@@ -40,6 +40,18 @@ from .formal_math.pr_review import (
     ReviewGuideCitation,
     ReviewFindingEvidence,
 )
+from .formal_math.pr_split import (
+    ChunkReview,
+    PRSplitChunk,
+    PRSplitConfig,
+    PRSplitData,
+    PRSplitResult,
+    PRSplitSubmission,
+    PRSplitTask,
+    SkilledPRSplitConfig,
+    SkilledPRSplitData,
+    SkilledPRSplitTask,
+)
 
 __all__ = [
     'BaseLeanTask',
@@ -65,4 +77,14 @@ __all__ = [
     'ReviewDeclarationReference',
     'ReviewGuideCitation',
     'ReviewFindingEvidence',
+    'ChunkReview',
+    'PRSplitChunk',
+    'PRSplitConfig',
+    'PRSplitData',
+    'PRSplitResult',
+    'PRSplitSubmission',
+    'PRSplitTask',
+    'SkilledPRSplitConfig',
+    'SkilledPRSplitData',
+    'SkilledPRSplitTask',
 ]
