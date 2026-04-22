@@ -70,12 +70,18 @@ class PRReviewDatasetPipeline:
 
         try:
             records = collector.collect_records()
-            if self.config.materialize_slice_outputs:
+            if (
+                self.config.materialize_slice_outputs
+                or self.config.materialize_variant_manifests
+                or self.config.create_variant_outputs
+            ):
                 materialized_outputs = materialize_hybrid_outputs(
                     records,
                     self.output_file,
                     skill_bundle=self.config.variant_skill_bundle,
                     write_aggregate=True,
+                    write_slices=self.config.materialize_slice_outputs,
+                    create_variant_manifests=self.config.materialize_variant_manifests,
                     create_variants=self.config.create_variant_outputs,
                 )
             else:
@@ -90,6 +96,8 @@ class PRReviewDatasetPipeline:
                     split_output,
                     skill_bundle=self.config.split_variant_skill_bundle,
                     write_aggregate=True,
+                    write_slices=self.config.materialize_slice_outputs,
+                    create_variant_manifests=self.config.materialize_variant_manifests,
                     create_variants=self.config.create_variant_outputs,
                 )
                 materialized_outputs.update({f"split_{key}": path for key, path in split_outputs.items()})

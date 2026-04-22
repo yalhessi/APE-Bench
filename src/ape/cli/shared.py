@@ -15,6 +15,7 @@ from ape.cli.task_input import create_ape_agent_task_input_ui, prompt_for_task_d
 from ape.cli.task_session import INTERNAL_CLI_TASK_TYPES
 from ape.scaffolds.skills import normalize_skills_config_paths
 from ape.tasks.base import create_task_from_data, list_task_types
+from ape.tasks.task_variants import load_task_records_from_path, resolve_task_record_for_registered_task
 from ape.utils import deep_merge, load_yaml, parse_cli_args
 
 
@@ -271,31 +272,8 @@ def _prepare_config_dict(
 
 
 def _load_task_records_from_file(task_file: Path) -> list[dict[str, Any]]:
-    """Load task records from JSON or JSONL."""
-    if not task_file.exists():
-        raise FileNotFoundError(f"Task file not found: {task_file}")
-
-    if task_file.suffix == ".jsonl":
-        records: list[dict[str, Any]] = []
-        with task_file.open("r", encoding="utf-8") as handle:
-            for line_number, line in enumerate(handle, 1):
-                stripped = line.strip()
-                if not stripped:
-                    continue
-                record = json.loads(stripped)
-                if not isinstance(record, dict):
-                    raise TypeError(
-                        f"Line {line_number} in {task_file} must be a JSON object, got {type(record).__name__}"
-                    )
-                records.append(record)
-        return records
-
-    data = json.loads(task_file.read_text(encoding="utf-8"))
-    if isinstance(data, dict):
-        return [data]
-    if isinstance(data, list) and all(isinstance(item, dict) for item in data):
-        return list(data)
-    raise TypeError(f"{task_file} must contain a JSON object or a list of JSON objects")
+    """Load task records from JSONL, plain JSON, or a task-variant manifest."""
+    return load_task_records_from_path(task_file)
 
 
 def _select_task_record(
@@ -346,13 +324,6 @@ def _normalize_task_data(
     """Normalize selected task data before task construction."""
     task_data = dict(raw_task_data)
 
-    existing_task_type = task_data.get("task_type")
-    if existing_task_type and existing_task_type != registered_task:
-        raise ValueError(
-            f"Selected task data has task_type={existing_task_type!r}, which does not match the requested task {registered_task!r}"
-        )
-    task_data["task_type"] = registered_task
-
     if not task_data.get("task_id"):
         if args.task_id:
             task_data["task_id"] = args.task_id
@@ -361,7 +332,10 @@ def _normalize_task_data(
         else:
             task_data["task_id"] = f"cli-task-{uuid.uuid4().hex[:8]}"
 
-    return task_data
+    return resolve_task_record_for_registered_task(
+        task_data,
+        requested_task_type=registered_task,
+    )
 
 
 def _load_selected_task_data(

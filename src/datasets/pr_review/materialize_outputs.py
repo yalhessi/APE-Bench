@@ -5,9 +5,16 @@ from __future__ import annotations
 import copy
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable
+from typing import Any, Callable, Dict, Iterable, Sequence
 
 from ape.tasks.lean_tasks.formal_math.pr_review.findings import normalize_review_category
+from ape.tasks.task_variants import (
+    TaskVariantDefinition,
+    build_default_pr_review_variants,
+    build_default_pr_split_variants,
+    create_task_variant_manifest,
+    default_variant_manifest_output_path,
+)
 
 from .create_skill_variants import create_skill_variants
 
@@ -55,27 +62,48 @@ def _materialize_task_outputs(
     records: list[Dict[str, Any]],
     aggregate_output: Path,
     *,
-    skill_bundle: str,
     baseline_task_type: str,
     skill_task_type: str,
+    variant_definitions: Sequence[TaskVariantDefinition],
     write_aggregate: bool = True,
-    create_variants: bool = True,
+    write_slices: bool = True,
+    create_variant_manifests: bool = True,
+    create_variants: bool = False,
     extra_slice_predicates: Dict[str, Callable[[Dict[str, Any]], bool]] | None = None,
 ) -> dict[str, Path]:
     outputs: dict[str, Path] = {"aggregate": aggregate_output}
     if write_aggregate:
         _write_jsonl(aggregate_output, records)
 
-    slice_records = _build_slice_records(records, extra_slice_predicates=extra_slice_predicates)
-    for slice_name, slice_rows in slice_records.items():
-        slice_output = _slice_output_path(aggregate_output, slice_name)
-        _write_jsonl(slice_output, slice_rows)
-        outputs[slice_name] = slice_output
+    slice_records: dict[str, list[Dict[str, Any]]] = {}
+    if write_slices:
+        slice_records = _build_slice_records(records, extra_slice_predicates=extra_slice_predicates)
+        for slice_name, slice_rows in slice_records.items():
+            slice_output = _slice_output_path(aggregate_output, slice_name)
+            _write_jsonl(slice_output, slice_rows)
+            outputs[slice_name] = slice_output
+
+    if create_variant_manifests:
+        aggregate_manifest = create_task_variant_manifest(
+            base_task_file=aggregate_output,
+            manifest_output=default_variant_manifest_output_path(aggregate_output),
+            variants=variant_definitions,
+        )
+        outputs["aggregate_variant_manifest"] = aggregate_manifest
+
+        for slice_name in slice_records:
+            slice_output = outputs[slice_name]
+            slice_manifest = create_task_variant_manifest(
+                base_task_file=slice_output,
+                manifest_output=default_variant_manifest_output_path(slice_output),
+                variants=variant_definitions,
+            )
+            outputs[f"{slice_name}_variant_manifest"] = slice_manifest
 
     if create_variants:
         baseline_output, skill_output = create_skill_variants(
             aggregate_output,
-            skill_bundle=skill_bundle,
+            skill_bundle=str(variant_definitions[0].metadata_updates.get("skill_bundle") or ""),
             baseline_task_type=baseline_task_type,
             skill_task_type=skill_task_type,
         )
@@ -85,7 +113,7 @@ def _materialize_task_outputs(
         for slice_name in slice_records:
             baseline_output, skill_output = create_skill_variants(
                 outputs[slice_name],
-                skill_bundle=skill_bundle,
+                skill_bundle=str(variant_definitions[0].metadata_updates.get("skill_bundle") or ""),
                 baseline_task_type=baseline_task_type,
                 skill_task_type=skill_task_type,
             )
@@ -101,15 +129,19 @@ def materialize_hybrid_outputs(
     *,
     skill_bundle: str,
     write_aggregate: bool = True,
-    create_variants: bool = True,
+    write_slices: bool = True,
+    create_variant_manifests: bool = True,
+    create_variants: bool = False,
 ) -> dict[str, Path]:
     return _materialize_task_outputs(
         records,
         aggregate_output,
-        skill_bundle=skill_bundle,
         baseline_task_type="lean_pr_review",
         skill_task_type="skilled_pr_review",
+        variant_definitions=build_default_pr_review_variants(skill_bundle=skill_bundle),
         write_aggregate=write_aggregate,
+        write_slices=write_slices,
+        create_variant_manifests=create_variant_manifests,
         create_variants=create_variants,
     )
 
@@ -147,15 +179,19 @@ def materialize_split_outputs(
     *,
     skill_bundle: str,
     write_aggregate: bool = True,
-    create_variants: bool = True,
+    write_slices: bool = True,
+    create_variant_manifests: bool = True,
+    create_variants: bool = False,
 ) -> dict[str, Path]:
     return _materialize_task_outputs(
         records,
         aggregate_output,
-        skill_bundle=skill_bundle,
         baseline_task_type="lean_pr_split",
         skill_task_type="skilled_pr_split",
+        variant_definitions=build_default_pr_split_variants(skill_bundle=skill_bundle),
         write_aggregate=write_aggregate,
+        write_slices=write_slices,
+        create_variant_manifests=create_variant_manifests,
         create_variants=create_variants,
         extra_slice_predicates={
             "split_candidate": lambda record: bool((record.get("benchmark_context") or {}).get("split_candidate")),

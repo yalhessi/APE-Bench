@@ -99,13 +99,17 @@ class PRReviewDatasetConfig(BaseModel):
         default=True,
         description="Write per-slice JSONLs next to the aggregate output",
     )
-    create_variant_outputs: bool = Field(
+    materialize_variant_manifests: bool = Field(
         default=True,
-        description="Create paired baseline/skill variants for aggregate and slice outputs",
+        description="Write sidecar variant manifests that expand the canonical JSONLs into runtime variants",
+    )
+    create_variant_outputs: bool = Field(
+        default=False,
+        description="Legacy mode: also create paired baseline/skill JSONL copies for aggregate and slice outputs",
     )
     variant_skill_bundle: str = Field(
         default="mathlib-pr-review",
-        description="Skill bundle label written into paired benchmark variants",
+        description="Skill bundle label written into PR review variant manifests and any legacy paired outputs",
     )
     materialize_split_task_outputs: bool = Field(
         default=True,
@@ -113,7 +117,7 @@ class PRReviewDatasetConfig(BaseModel):
     )
     split_variant_skill_bundle: str = Field(
         default="mathlib-pr-split",
-        description="Skill bundle label written into paired split-task variants",
+        description="Skill bundle label written into PR split variant manifests and any legacy paired outputs",
     )
 
     @property
