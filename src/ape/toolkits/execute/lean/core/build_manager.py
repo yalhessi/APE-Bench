@@ -18,6 +18,7 @@ import aiofiles.os
 from ape.toolkits.execute.base_source_manager import BaseSourceManager
 from ..config import LeanVerifyToolConfig
 from ..models import BuildResult, WorkspaceStatus
+from .blob_store import create_blob_store
 from ..core.workspace_state import WorkspaceStateManager
 from ..core.storage import ContentStore
 from ..core.snapshot import SnapshotManager
@@ -59,9 +60,15 @@ class BuildManager(BaseSourceManager):
         self.config: LeanVerifyToolConfig = actual_config
 
         # Lean-specific components
+        self.blob_store = create_blob_store(self.config, self.logger)
         self.state_manager = WorkspaceStateManager(self.config, self.logger, self.repo_name)
-        self.content_store = ContentStore(self.config, self.logger)
-        self.snapshot_manager = SnapshotManager(self.config, self.logger, self.repo_name)
+        self.content_store = ContentStore(self.config, self.logger, blob_store=self.blob_store)
+        self.snapshot_manager = SnapshotManager(
+            self.config,
+            self.logger,
+            self.repo_name,
+            blob_store=self.blob_store,
+        )
 
         # Build workspace directory
         self.build_workspace_dir = self.config.get_build_workspace_dir(self.repo_name)

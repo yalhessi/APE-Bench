@@ -13,6 +13,7 @@ from datetime import datetime
 import aiofiles
 import aiofiles.os
 from ..config import LeanVerifyToolConfig
+from .blob_store import BlobStore, create_blob_store
 from ape.utils.file_ops import copy_file_with_metadata, atomic_write
 from ape.utils.logging import create_logger
 
@@ -22,12 +23,18 @@ if TYPE_CHECKING:
 class ContentStore:
     """Simplified content-addressable storage manager"""
     
-    def __init__(self, config: Optional[LeanVerifyToolConfig] = None, logger: Optional['logging.LoggerAdapter'] = None):
+    def __init__(
+        self,
+        config: Optional[LeanVerifyToolConfig] = None,
+        logger: Optional['logging.LoggerAdapter'] = None,
+        blob_store: Optional[BlobStore] = None,
+    ):
         """Initialize content storage"""
         self.config = config or LeanVerifyToolConfig()
         self.logger = logger or create_logger()
         
         self.storage_dir = self.config.storage_dir
+        self.blob_store = blob_store or create_blob_store(self.config, self.logger)
         # Note: Do not create directory during initialization, create asynchronously when needed
         
         self.logger.info(f"Content storage initialized: {self.storage_dir}")
@@ -42,6 +49,84 @@ class ContentStore:
         object_dir = self.storage_dir / level1 / level2
         
         return object_dir / content_hash
+
+    def _blob_key(self, content_hash: str) -> str:
+        """Build the remote blob-store key for a CAS object."""
+        return f"storage/{content_hash[:2]}/{content_hash[2:4]}/{content_hash}"
+
+    async def _mirror_object_if_configured(self, content_hash: str, object_path: Path) -> None:
+        """Best-effort upload of a local CAS object to the configured blob store."""
+        if not self.blob_store.enabled:
+            return
+
+        try:
+            await self.blob_store.upload_file_if_missing(
+                object_path,
+                self._blob_key(content_hash),
+            )
+        except Exception as exc:
+            self.logger.warning(
+                "Failed to mirror content object %s to the remote blob store: %s",
+                content_hash[:12],
+                exc,
+            )
+
+    async def _ensure_object_available_locally(self, content_hash: str) -> bool:
+        """Return True when the requested object exists locally, hydrating it remotely if needed."""
+        object_path = self._get_object_path(content_hash)
+        if await aiofiles.os.path.exists(object_path):
+            return True
+
+        if not self.blob_store.enabled:
+            return False
+
+        try:
+            restored = await self.blob_store.download_file_if_present(
+                self._blob_key(content_hash),
+                object_path,
+                readonly_mode=0o444,
+            )
+        except Exception as exc:
+            self.logger.warning(
+                "Failed to restore content object %s from the remote blob store: %s",
+                content_hash[:12],
+                exc,
+            )
+            return False
+
+        return restored or await aiofiles.os.path.exists(object_path)
+
+    async def _hydrate_missing_objects_from_blob_store(
+        self,
+        content_hashes: List[str],
+        *,
+        max_workers: int,
+    ) -> None:
+        """Best-effort download of missing CAS objects from the remote blob store."""
+        if not self.blob_store.enabled:
+            return
+
+        unique_hashes: list[str] = []
+        seen_hashes: set[str] = set()
+        for content_hash in content_hashes:
+            if content_hash in seen_hashes:
+                continue
+            seen_hashes.add(content_hash)
+            object_path = self._get_object_path(content_hash)
+            if await aiofiles.os.path.exists(object_path):
+                continue
+            unique_hashes.append(content_hash)
+
+        if not unique_hashes:
+            return
+
+        semaphore = asyncio.Semaphore(max(1, min(max_workers, 16)))
+
+        async def hydrate_one(content_hash: str) -> None:
+            async with semaphore:
+                await self._ensure_object_available_locally(content_hash)
+
+        await asyncio.gather(*(hydrate_one(content_hash) for content_hash in unique_hashes))
     
     async def store_file(self, file_path: Path, file_type: str = "regular") -> str:
         """Asynchronously store file to content storage
@@ -63,6 +148,7 @@ class ContentStore:
         
         # If object exists, return directly
         if await aiofiles.os.path.exists(object_path):
+            await self._mirror_object_if_configured(content_hash, object_path)
             return content_hash
         
         # Store file
@@ -89,6 +175,7 @@ class ContentStore:
                 if await aiofiles.os.path.exists(temp_path):
                     await aiofiles.os.unlink(temp_path)
         
+        await self._mirror_object_if_configured(content_hash, object_path)
         return content_hash
     
     async def retrieve_file(self, content_hash: str, output_path: Path, file_type: str = "regular") -> None:
@@ -101,7 +188,7 @@ class ContentStore:
         """
         object_path = self._get_object_path(content_hash)
         
-        if not await aiofiles.os.path.exists(object_path):
+        if not await self._ensure_object_available_locally(content_hash):
             raise FileNotFoundError(f"Object not found: {content_hash}")
         
         # Delete existing file (if exists)
@@ -163,6 +250,22 @@ class ContentStore:
             if not exists:
                 missing_objects.append((relative_path, file_info["hash"]))
             else:
+                file_path = workspace_path / relative_path
+                restore_tasks.append((relative_path, file_info, file_path, object_path))
+
+        if missing_objects and self.blob_store.enabled:
+            await self._hydrate_missing_objects_from_blob_store(
+                [content_hash for _, content_hash in missing_objects],
+                max_workers=max_workers,
+            )
+
+            missing_objects = []
+            restore_tasks = []
+            for relative_path, file_info in file_items:
+                object_path = self._get_object_path(file_info["hash"])
+                if not await aiofiles.os.path.exists(object_path):
+                    missing_objects.append((relative_path, file_info["hash"]))
+                    continue
                 file_path = workspace_path / relative_path
                 restore_tasks.append((relative_path, file_info, file_path, object_path))
         

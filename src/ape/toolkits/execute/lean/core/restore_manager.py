@@ -15,6 +15,7 @@ import aiofiles.os
 
 from ..config import LeanVerifyToolConfig
 from ..models import RestoreResult, WorkspaceStatus
+from .blob_store import create_blob_store
 from ..core.workspace_state import WorkspaceStateManager
 from ..core.storage import ContentStore
 from ..core.snapshot import SnapshotManager
@@ -51,9 +52,15 @@ class RestoreManager:
         self.logger = logger or create_logger()
         self.repo_name, self.repo_url = self.config.resolve_repo(repo_url)
         self.workspace_dir = self.config.get_workspace_dir(self.repo_name)
+        self.blob_store = create_blob_store(self.config, self.logger)
         self.state_manager = WorkspaceStateManager(self.config, self.logger, self.repo_name)
-        self.content_store = ContentStore(self.config, self.logger)
-        self.snapshot_manager = SnapshotManager(self.config, self.logger, self.repo_name)
+        self.content_store = ContentStore(self.config, self.logger, blob_store=self.blob_store)
+        self.snapshot_manager = SnapshotManager(
+            self.config,
+            self.logger,
+            self.repo_name,
+            blob_store=self.blob_store,
+        )
         self.progress_callback = progress_callback
         self.logger.info(f"Restore manager initialized [{self.repo_name}]: {self.workspace_dir}")
 
@@ -335,26 +342,29 @@ class RestoreManager:
                 self.logger.info(f"Workspace already exists, using directly: {commit_hash}")
                 return workspace_path
 
-        # 1. Check if the snapshot exists
-        snapshot_path = self.snapshot_manager.snapshot_dir / f"{commit_hash}.snap"
-        if not await aiofiles.os.path.exists(snapshot_path):
-            raise FileNotFoundError(f"[{commit_hash}] Snapshot file not found: {snapshot_path}")
-        
-        # 2. Load snapshot
+        # 1. Load snapshot metadata. SnapshotManager will hydrate the manifest
+        # from the remote blob store when local S3-backed deployments start cold.
         await self._emit_progress(
             f"Loading workspace snapshot metadata for {self.repo_name}@{commit_hash[:8]}..."
         )
         try:
             file_mappings = await self.snapshot_manager.load_snapshot(commit_hash)
+            if file_mappings is None:
+                snapshot_path = self.snapshot_manager.snapshot_dir / f"{commit_hash}.snap"
+                raise FileNotFoundError(
+                    f"[{commit_hash}] Snapshot file not found locally or in the remote blob store: {snapshot_path}"
+                )
             if not file_mappings:
                 raise ValueError(f"[{commit_hash}] Snapshot is empty or invalid")
+        except FileNotFoundError:
+            raise
         except Exception as e:
             raise ValueError(f"[{commit_hash}] Snapshot file corrupted") from e
         
-        # 3. Check disk space and create workspace directory  
+        # 2. Check disk space and create workspace directory  
         workspace_path = await self._ensure_workspace_directory(commit_hash)
         
-        # 4. Batch restore files
+        # 3. Batch restore files
         await self._emit_progress(
             f"Restoring files into the workspace for {self.repo_name}@{commit_hash[:8]}..."
         )

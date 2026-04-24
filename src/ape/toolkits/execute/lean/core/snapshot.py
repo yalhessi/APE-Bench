@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, TYPE_CHECKING
 import aiofiles
 import aiofiles.os
 from ..config import LeanVerifyToolConfig
+from .blob_store import BlobStore, create_blob_store
 from ape.utils.file_ops import atomic_write
 from ape.utils.logging import create_logger
 
@@ -19,7 +20,13 @@ if TYPE_CHECKING:
 class SnapshotManager:
     """Simplified snapshot manager"""
 
-    def __init__(self, config: Optional[LeanVerifyToolConfig] = None, logger: Optional['logging.LoggerAdapter'] = None, repo_name: str = "mathlib4"):
+    def __init__(
+        self,
+        config: Optional[LeanVerifyToolConfig] = None,
+        logger: Optional['logging.LoggerAdapter'] = None,
+        repo_name: str = "mathlib4",
+        blob_store: Optional[BlobStore] = None,
+    ):
         """Initialize snapshot manager
 
         Args:
@@ -32,9 +39,32 @@ class SnapshotManager:
         self.repo_name = repo_name
 
         self.snapshot_dir = self.config.get_snapshot_dir(repo_name)
+        self.blob_store = blob_store or create_blob_store(self.config, self.logger)
         # Note: Do not create directory during initialization, create it asynchronously when needed
 
         self.logger.info(f"Snapshot manager initialized [{repo_name}]: {self.snapshot_dir}")
+
+    def _blob_key(self, workspace_id: str) -> str:
+        """Build the remote blob-store key for a snapshot manifest."""
+        return f"repos/{self.repo_name}/snapshots/{workspace_id}.snap"
+
+    async def _mirror_snapshot_if_configured(self, workspace_id: str, snapshot_path: Path) -> None:
+        """Best-effort upload of a local snapshot manifest to the remote blob store."""
+        if not self.blob_store.enabled:
+            return
+
+        try:
+            await self.blob_store.upload_file_if_missing(
+                snapshot_path,
+                self._blob_key(workspace_id),
+            )
+        except Exception as exc:
+            self.logger.warning(
+                "Failed to mirror snapshot %s for %s to the remote blob store: %s",
+                workspace_id,
+                self.repo_name,
+                exc,
+            )
     
     async def store_snapshot(self, workspace_id: str, file_mappings: Dict[str, Dict[str, str]]) -> None:
         """Asynchronously store workspace snapshot - using binary format
@@ -85,6 +115,7 @@ class SnapshotManager:
             
             # Atomic write
             await atomic_write(snapshot_path, buffer.getvalue(), encoding=None)
+            await self._mirror_snapshot_if_configured(workspace_id, snapshot_path)
             
             self.logger.info(f"Store snapshot {workspace_id}: {len(valid_records)} files")
             
@@ -103,8 +134,17 @@ class SnapshotManager:
         snapshot_path = self.snapshot_dir / f"{workspace_id}.snap"
         
         if not await aiofiles.os.path.exists(snapshot_path):
-            self.logger.debug(f"Snapshot does not exist: {workspace_id}")
-            return None
+            if self.blob_store.enabled:
+                restored = await self.blob_store.download_file_if_present(
+                    self._blob_key(workspace_id),
+                    snapshot_path,
+                )
+                if not restored and not await aiofiles.os.path.exists(snapshot_path):
+                    self.logger.debug(f"Snapshot does not exist: {workspace_id}")
+                    return None
+            else:
+                self.logger.debug(f"Snapshot does not exist: {workspace_id}")
+                return None
         
         try:
             # Read entire snapshot file into memory at once
