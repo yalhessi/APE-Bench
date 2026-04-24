@@ -120,13 +120,40 @@ class ContentStore:
         if not unique_hashes:
             return
 
-        semaphore = asyncio.Semaphore(max(1, min(max_workers, 16)))
+        hydrate_workers = max(
+            1,
+            min(max_workers, self.blob_store.max_concurrent_transfers),
+        )
+        self.logger.info(
+            "Hydrating %s missing storage objects from the remote blob store with %s workers",
+            len(unique_hashes),
+            hydrate_workers,
+        )
 
-        async def hydrate_one(content_hash: str) -> None:
-            async with semaphore:
-                await self._ensure_object_available_locally(content_hash)
+        queue: asyncio.Queue[str] = asyncio.Queue()
+        for content_hash in unique_hashes:
+            queue.put_nowait(content_hash)
 
-        await asyncio.gather(*(hydrate_one(content_hash) for content_hash in unique_hashes))
+        async def hydrate_worker() -> None:
+            while True:
+                try:
+                    content_hash = queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    return
+
+                try:
+                    await self._ensure_object_available_locally(content_hash)
+                finally:
+                    queue.task_done()
+
+        workers = [
+            asyncio.create_task(hydrate_worker())
+            for _ in range(hydrate_workers)
+        ]
+        try:
+            await queue.join()
+        finally:
+            await asyncio.gather(*workers, return_exceptions=True)
     
     async def store_file(self, file_path: Path, file_type: str = "regular") -> str:
         """Asynchronously store file to content storage

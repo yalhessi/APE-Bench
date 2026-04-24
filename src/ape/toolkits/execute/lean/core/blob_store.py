@@ -30,6 +30,10 @@ class BlobStore(Protocol):
     def enabled(self) -> bool:
         """Return True when the blob store can service remote operations."""
 
+    @property
+    def max_concurrent_transfers(self) -> int:
+        """Return the recommended maximum number of concurrent remote transfers."""
+
     async def upload_file_if_missing(self, local_path: Path, key: str) -> bool:
         """Upload a local file to the remote store only when the blob is absent."""
 
@@ -49,6 +53,10 @@ class NoopBlobStore:
     @property
     def enabled(self) -> bool:
         return False
+
+    @property
+    def max_concurrent_transfers(self) -> int:
+        return 1
 
     async def upload_file_if_missing(self, local_path: Path, key: str) -> bool:
         return False
@@ -85,11 +93,28 @@ class S3BlobStore:
         self.response_checksum_validation = (
             str(remote_store.response_checksum_validation or "").strip() or None
         )
+        self.max_pool_connections = self._derive_max_pool_connections()
         self._client = None
 
     @property
     def enabled(self) -> bool:
         return bool(self.bucket)
+
+    @property
+    def max_concurrent_transfers(self) -> int:
+        return max(1, self.max_pool_connections)
+
+    def _derive_max_pool_connections(self) -> int:
+        candidates = [10]
+        for attr_name in ("max_concurrent_operations", "max_concurrent_restores"):
+            raw_value = getattr(self.config, attr_name, None)
+            if raw_value is None:
+                continue
+            try:
+                candidates.append(int(raw_value))
+            except (TypeError, ValueError):
+                continue
+        return max(candidates)
 
     def _build_key(self, suffix: str) -> str:
         normalized_suffix = str(suffix).lstrip("/")
@@ -131,6 +156,7 @@ class S3BlobStore:
                 config_kwargs["response_checksum_validation"] = (
                     self.response_checksum_validation
                 )
+            config_kwargs["max_pool_connections"] = self.max_pool_connections
             if config_kwargs:
                 client_kwargs["config"] = BotoConfig(**config_kwargs)
 
