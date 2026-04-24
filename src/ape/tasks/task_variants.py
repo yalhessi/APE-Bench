@@ -60,8 +60,8 @@ class TaskVariantManifest(BaseModel):
 def build_default_pr_review_variants(
     *,
     skill_bundle: str = "mathlib-pr-review",
-) -> tuple[TaskVariantDefinition, TaskVariantDefinition]:
-    """Return the standard baseline and skill-guided PR review variants."""
+) -> tuple[TaskVariantDefinition, TaskVariantDefinition, TaskVariantDefinition]:
+    """Return the standard PR review variants."""
     source_task_type = "lean_pr_review"
     return (
         TaskVariantDefinition(
@@ -84,14 +84,24 @@ def build_default_pr_review_variants(
                 "skill_bundle": skill_bundle,
             },
         ),
+        TaskVariantDefinition(
+            variant_id="with_skill_policy",
+            runtime_task_type="skilled_policy_pr_review",
+            accepted_source_task_types=[source_task_type],
+            task_id_suffix="__with_skill_policy",
+            metadata_updates={
+                "paired_variant": "with_skill_policy",
+                "skill_bundle": skill_bundle,
+            },
+        ),
     )
 
 
 def build_default_pr_split_variants(
     *,
     skill_bundle: str = "mathlib-pr-split",
-) -> tuple[TaskVariantDefinition, TaskVariantDefinition]:
-    """Return the standard baseline and skill-guided PR split variants."""
+) -> tuple[TaskVariantDefinition, TaskVariantDefinition, TaskVariantDefinition]:
+    """Return the standard PR split variants."""
     source_task_type = "lean_pr_split"
     return (
         TaskVariantDefinition(
@@ -114,6 +124,16 @@ def build_default_pr_split_variants(
                 "skill_bundle": skill_bundle,
             },
         ),
+        TaskVariantDefinition(
+            variant_id="with_skill_policy",
+            runtime_task_type="skilled_policy_pr_split",
+            accepted_source_task_types=[source_task_type],
+            task_id_suffix="__with_skill_policy",
+            metadata_updates={
+                "paired_variant": "with_skill_policy",
+                "skill_bundle": skill_bundle,
+            },
+        ),
     )
 
 
@@ -130,8 +150,12 @@ def get_registered_task_variant_definition(
 
     if normalized_requested == "skilled_pr_review" and normalized_source == "lean_pr_review":
         return build_default_pr_review_variants()[1]
+    if normalized_requested == "skilled_policy_pr_review" and normalized_source == "lean_pr_review":
+        return build_default_pr_review_variants()[2]
     if normalized_requested == "skilled_pr_split" and normalized_source == "lean_pr_split":
         return build_default_pr_split_variants()[1]
+    if normalized_requested == "skilled_policy_pr_split" and normalized_source == "lean_pr_split":
+        return build_default_pr_split_variants()[2]
     return None
 
 

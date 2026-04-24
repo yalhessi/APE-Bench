@@ -1,5 +1,5 @@
 """
-Create paired baseline/skill variants for Mathlib PR review JSONL files.
+Create baseline, thin-skill, and policy-heavy skill variants for PR JSONL files.
 
 Usage examples:
   python src/datasets/pr_review/create_skill_variants.py \
@@ -59,16 +59,20 @@ def create_skill_variants(
     *,
     baseline_output: Path | None = None,
     skill_output: Path | None = None,
+    skill_policy_output: Path | None = None,
     skill_bundle: str = "mathlib-pr-review",
     baseline_task_type: str | None = "lean_pr_review",
     skill_task_type: str | None = "skilled_pr_review",
-) -> tuple[Path, Path]:
+    skill_policy_task_type: str | None = "skilled_policy_pr_review",
+) -> tuple[Path, Path, Path]:
     records = _read_jsonl(input_path)
 
     if baseline_output is None:
         baseline_output = input_path.with_name(f"{input_path.stem}_baseline{input_path.suffix}")
     if skill_output is None:
         skill_output = input_path.with_name(f"{input_path.stem}_with_skills{input_path.suffix}")
+    if skill_policy_output is None:
+        skill_policy_output = input_path.with_name(f"{input_path.stem}_with_skill_policy{input_path.suffix}")
 
     baseline_records = [
         _build_variant_record(
@@ -88,19 +92,35 @@ def create_skill_variants(
         )
         for record in records
     ]
+    skill_policy_records = [
+        _build_variant_record(
+            record,
+            variant="with_skill_policy",
+            skill_bundle=skill_bundle,
+            task_type=skill_policy_task_type,
+        )
+        for record in records
+    ]
 
     _write_jsonl(baseline_output, baseline_records)
     _write_jsonl(skill_output, skill_records)
-    return baseline_output, skill_output
+    _write_jsonl(skill_policy_output, skill_policy_records)
+    return baseline_output, skill_output, skill_policy_output
 
 
 def create_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Create paired baseline/skill variants for PR review JSONL inputs.",
+        description="Create baseline, thin-skill, and policy-heavy skill variants for PR review JSONL inputs.",
     )
     parser.add_argument("--input", type=Path, required=True, help="Source PR review JSONL file")
     parser.add_argument("--baseline-output", type=Path, default=None, help="Optional output path for baseline variant")
     parser.add_argument("--skill-output", type=Path, default=None, help="Optional output path for skill variant")
+    parser.add_argument(
+        "--skill-policy-output",
+        type=Path,
+        default=None,
+        help="Optional output path for the policy-heavy skill variant",
+    )
     parser.add_argument(
         "--skill-bundle",
         type=str,
@@ -119,22 +139,31 @@ def create_argument_parser() -> argparse.ArgumentParser:
         default="skilled_pr_review",
         help="Task type to write into the skill-targeted records",
     )
+    parser.add_argument(
+        "--skill-policy-task-type",
+        type=str,
+        default="skilled_policy_pr_review",
+        help="Task type to write into the policy-heavy skill-targeted records",
+    )
     return parser
 
 
 def main() -> None:
     parser = create_argument_parser()
     args = parser.parse_args()
-    baseline_output, skill_output = create_skill_variants(
+    baseline_output, skill_output, skill_policy_output = create_skill_variants(
         args.input,
         baseline_output=args.baseline_output,
         skill_output=args.skill_output,
+        skill_policy_output=args.skill_policy_output,
         skill_bundle=args.skill_bundle,
         baseline_task_type=args.baseline_task_type,
         skill_task_type=args.skill_task_type,
+        skill_policy_task_type=args.skill_policy_task_type,
     )
     print(baseline_output)
     print(skill_output)
+    print(skill_policy_output)
 
 
 if __name__ == "__main__":

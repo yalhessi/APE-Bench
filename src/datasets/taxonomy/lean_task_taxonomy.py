@@ -121,7 +121,7 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
             }
         )
 
-    elif task_type in {"lean_pr_review", "skilled_pr_review"}:
+    elif task_type in {"lean_pr_review", "skilled_pr_review", "skilled_policy_pr_review"}:
         evaluation = record.get("evaluation") or {}
         ground_truth = evaluation.get("ground_truth") or {}
         blocking_items = ground_truth.get("blocking_findings") or []
@@ -138,7 +138,7 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
             }
         )
 
-    elif task_type in {"lean_pr_split", "skilled_pr_split"}:
+    elif task_type in {"lean_pr_split", "skilled_pr_split", "skilled_policy_pr_split"}:
         benchmark_context = record.get("benchmark_context") or {}
         taxonomy.update(
             {

@@ -64,6 +64,7 @@ def _materialize_task_outputs(
     *,
     baseline_task_type: str,
     skill_task_type: str,
+    skill_policy_task_type: str,
     variant_definitions: Sequence[TaskVariantDefinition],
     write_aggregate: bool = True,
     write_slices: bool = True,
@@ -101,24 +102,28 @@ def _materialize_task_outputs(
             outputs[f"{slice_name}_variant_manifest"] = slice_manifest
 
     if create_variants:
-        baseline_output, skill_output = create_skill_variants(
+        baseline_output, skill_output, skill_policy_output = create_skill_variants(
             aggregate_output,
             skill_bundle=str(variant_definitions[0].metadata_updates.get("skill_bundle") or ""),
             baseline_task_type=baseline_task_type,
             skill_task_type=skill_task_type,
+            skill_policy_task_type=skill_policy_task_type,
         )
         outputs["aggregate_baseline"] = baseline_output
         outputs["aggregate_with_skills"] = skill_output
+        outputs["aggregate_with_skill_policy"] = skill_policy_output
 
         for slice_name in slice_records:
-            baseline_output, skill_output = create_skill_variants(
+            baseline_output, skill_output, skill_policy_output = create_skill_variants(
                 outputs[slice_name],
                 skill_bundle=str(variant_definitions[0].metadata_updates.get("skill_bundle") or ""),
                 baseline_task_type=baseline_task_type,
                 skill_task_type=skill_task_type,
+                skill_policy_task_type=skill_policy_task_type,
             )
             outputs[f"{slice_name}_baseline"] = baseline_output
             outputs[f"{slice_name}_with_skills"] = skill_output
+            outputs[f"{slice_name}_with_skill_policy"] = skill_policy_output
 
     return outputs
 
@@ -138,6 +143,7 @@ def materialize_hybrid_outputs(
         aggregate_output,
         baseline_task_type="lean_pr_review",
         skill_task_type="skilled_pr_review",
+        skill_policy_task_type="skilled_policy_pr_review",
         variant_definitions=build_default_pr_review_variants(skill_bundle=skill_bundle),
         write_aggregate=write_aggregate,
         write_slices=write_slices,
@@ -188,6 +194,7 @@ def materialize_split_outputs(
         aggregate_output,
         baseline_task_type="lean_pr_split",
         skill_task_type="skilled_pr_split",
+        skill_policy_task_type="skilled_policy_pr_split",
         variant_definitions=build_default_pr_split_variants(skill_bundle=skill_bundle),
         write_aggregate=write_aggregate,
         write_slices=write_slices,

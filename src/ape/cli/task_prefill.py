@@ -14,8 +14,10 @@ from ape.utils.logging import create_logger
 PR_LIVE_TASK_TYPES = {
     "lean_pr_review",
     "skilled_pr_review",
+    "skilled_policy_pr_review",
     "lean_pr_split",
     "skilled_pr_split",
+    "skilled_policy_pr_split",
 }
 
 

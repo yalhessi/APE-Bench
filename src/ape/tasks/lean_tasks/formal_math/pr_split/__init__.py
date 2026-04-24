@@ -5,11 +5,14 @@ from .models import (
     PRSplitData,
     PRSplitResult,
     PRSplitSubmission,
+    SkilledPolicyPRSplitData,
     SkilledPRSplitData,
 )
 from .task import (
     PRSplitConfig,
     PRSplitTask,
+    SkilledPolicyPRSplitConfig,
+    SkilledPolicyPRSplitTask,
     SkilledPRSplitConfig,
     SkilledPRSplitTask,
 )
@@ -22,6 +25,9 @@ __all__ = [
     "PRSplitSubmission",
     "PRSplitTask",
     "SkilledPRSplitConfig",
+    "SkilledPolicyPRSplitConfig",
     "SkilledPRSplitData",
+    "SkilledPolicyPRSplitData",
     "SkilledPRSplitTask",
+    "SkilledPolicyPRSplitTask",
 ]

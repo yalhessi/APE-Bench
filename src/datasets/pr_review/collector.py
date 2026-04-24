@@ -1622,10 +1622,18 @@ class PRReviewDataCollector:
     @staticmethod
     def _validate_live_pr_task_type(task_type: str) -> str:
         normalized = str(task_type or "").strip()
-        if normalized not in {"lean_pr_review", "skilled_pr_review", "lean_pr_split", "skilled_pr_split"}:
+        if normalized not in {
+            "lean_pr_review",
+            "skilled_pr_review",
+            "skilled_policy_pr_review",
+            "lean_pr_split",
+            "skilled_pr_split",
+            "skilled_policy_pr_split",
+        }:
             raise ValueError(
                 f"Unsupported live PR task type `{normalized}`. "
-                "Expected one of: lean_pr_review, skilled_pr_review, lean_pr_split, skilled_pr_split."
+                "Expected one of: lean_pr_review, skilled_pr_review, skilled_policy_pr_review, "
+                "lean_pr_split, skilled_pr_split, skilled_policy_pr_split."
             )
         return normalized
 

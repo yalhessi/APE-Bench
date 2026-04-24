@@ -89,6 +89,15 @@ class SkilledPRSplitData(PRSplitData):
     )
 
 
+class SkilledPolicyPRSplitData(PRSplitData):
+    """Data model for policy-heavy skill-targeted Lean PR split tasks."""
+
+    task_type: Literal["skilled_policy_pr_split"] = Field(
+        default="skilled_policy_pr_split",
+        description="Task type identifier",
+    )
+
+
 class PRSplitResult(BaseTaskResult):
     """Result model for standalone PR split tasks."""
 

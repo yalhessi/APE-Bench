@@ -142,6 +142,15 @@ class SkilledReviewPRData(ReviewPRData):
     )
 
 
+class SkilledPolicyReviewPRData(ReviewPRData):
+    """Data model for policy-heavy skill-targeted Lean PR review tasks."""
+
+    task_type: Literal["skilled_policy_pr_review"] = Field(
+        default="skilled_policy_pr_review",
+        description="Task type identifier",
+    )
+
+
 class ReviewPRResult(BaseTaskResult):
     """Result model for Lean PR review tasks."""
 
