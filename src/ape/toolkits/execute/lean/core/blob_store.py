@@ -148,7 +148,7 @@ class S3BlobStore:
         status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
         return code in {"404", "NoSuchKey", "NotFound"} or status == 404
 
-    async def object_exists(self, key: str) -> bool:
+    async def _object_exists(self, key: str) -> bool:
         if not self.enabled:
             return False
 
@@ -170,7 +170,7 @@ class S3BlobStore:
         if not self.enabled:
             return False
 
-        if await self.object_exists(key):
+        if await self._object_exists(key):
             return False
 
         client = self._get_client()
