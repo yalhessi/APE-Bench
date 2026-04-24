@@ -343,7 +343,7 @@ class RestoreManager:
                 return workspace_path
 
         # 1. Load snapshot metadata. SnapshotManager will hydrate the manifest
-        # from the remote blob store when local S3-backed deployments start cold.
+        # from the remote blob store when a remote-backed deployment starts cold.
         await self._emit_progress(
             f"Loading workspace snapshot metadata for {self.repo_name}@{commit_hash[:8]}..."
         )
