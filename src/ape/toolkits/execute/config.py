@@ -68,6 +68,64 @@ def _load_aws_profile_settings(profile_name: Optional[str] = None) -> dict[str, 
     merged_settings.update(config_settings)
     return merged_settings
 
+class RemoteArtifactStoreConfig(BaseModel):
+    """Configuration for the optional remote immutable-artifact backing store."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: str = Field(
+        default="s3",
+        description="Remote artifact-store backend kind. Currently only 's3' is supported.",
+    )
+    bucket: Optional[str] = Field(
+        default_factory=lambda: _optional_env("APE_CODE_EXECUTE_S3_BUCKET"),
+        description="Optional bucket used as a backing store for immutable execute artifacts",
+    )
+    prefix: str = Field(
+        default_factory=lambda: os.environ.get("APE_CODE_EXECUTE_S3_PREFIX", "").strip(),
+        description="Optional key prefix under the remote artifact-store bucket",
+    )
+    endpoint_url: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_ENDPOINT_URL",
+            "AWS_ENDPOINT_URL",
+        ),
+        description="Optional custom endpoint URL for the remote artifact store",
+    )
+    region: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_REGION",
+            "AWS_REGION",
+            "AWS_DEFAULT_REGION",
+        ),
+        description="Optional region name for the remote artifact store",
+    )
+    profile: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_PROFILE",
+            "AWS_PROFILE",
+        ),
+        description="Optional AWS profile name for the remote artifact store client",
+    )
+    request_checksum_calculation: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_REQUEST_CHECKSUM_CALCULATION",
+            "AWS_REQUEST_CHECKSUM_CALCULATION",
+        ),
+        description="Optional botocore request checksum calculation policy",
+    )
+    response_checksum_validation: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_RESPONSE_CHECKSUM_VALIDATION",
+            "AWS_RESPONSE_CHECKSUM_VALIDATION",
+        ),
+        description="Optional botocore response checksum validation policy",
+    )
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.bucket)
+
 
 class CodeExecuteToolConfig(BaseModel):
     """Base configuration for code execution tools.
@@ -97,49 +155,9 @@ class CodeExecuteToolConfig(BaseModel):
     )
 
     # Optional remote backing store for immutable artifacts and snapshots.
-    s3_bucket: Optional[str] = Field(
-        default_factory=lambda: _optional_env("APE_CODE_EXECUTE_S3_BUCKET"),
-        description="Optional S3 bucket used as a backing store for immutable execute artifacts"
-    )
-    s3_prefix: str = Field(
-        default_factory=lambda: os.environ.get("APE_CODE_EXECUTE_S3_PREFIX", "").strip(),
-        description="Optional S3 key prefix under the backing-store bucket"
-    )
-    s3_endpoint_url: Optional[str] = Field(
-        default_factory=lambda: _optional_env(
-            "APE_CODE_EXECUTE_S3_ENDPOINT_URL",
-            "AWS_ENDPOINT_URL",
-        ),
-        description="Optional custom S3 endpoint URL"
-    )
-    s3_region: Optional[str] = Field(
-        default_factory=lambda: _optional_env(
-            "APE_CODE_EXECUTE_S3_REGION",
-            "AWS_REGION",
-            "AWS_DEFAULT_REGION",
-        ),
-        description="Optional S3 region name"
-    )
-    s3_profile: Optional[str] = Field(
-        default_factory=lambda: _optional_env(
-            "APE_CODE_EXECUTE_S3_PROFILE",
-            "AWS_PROFILE",
-        ),
-        description="Optional AWS profile name for the S3 client"
-    )
-    s3_request_checksum_calculation: Optional[str] = Field(
-        default_factory=lambda: _optional_env(
-            "APE_CODE_EXECUTE_S3_REQUEST_CHECKSUM_CALCULATION",
-            "AWS_REQUEST_CHECKSUM_CALCULATION",
-        ),
-        description="Optional botocore request checksum calculation policy"
-    )
-    s3_response_checksum_validation: Optional[str] = Field(
-        default_factory=lambda: _optional_env(
-            "APE_CODE_EXECUTE_S3_RESPONSE_CHECKSUM_VALIDATION",
-            "AWS_RESPONSE_CHECKSUM_VALIDATION",
-        ),
-        description="Optional botocore response checksum validation policy"
+    remote_artifact_store: RemoteArtifactStoreConfig = Field(
+        default_factory=RemoteArtifactStoreConfig,
+        description="Optional remote backing store for immutable execute artifacts and snapshots",
     )
 
     # ==================== Default Repository ====================
@@ -227,29 +245,26 @@ class CodeExecuteToolConfig(BaseModel):
     @model_validator(mode='after')
     def validate_and_create_directories(self):
         """Convert to absolute paths, hydrate optional AWS settings, and create base directories."""
-        aws_profile_settings = _load_aws_profile_settings(self.s3_profile)
+        remote_store = self.remote_artifact_store
+        aws_profile_settings = _load_aws_profile_settings(remote_store.profile)
 
-        if self.s3_bucket is None:
-            self.s3_bucket = (
-                aws_profile_settings.get("ape_code_execute_s3_bucket")
-                or aws_profile_settings.get("s3_bucket")
-            )
-        if not self.s3_prefix:
-            self.s3_prefix = (
+        if remote_store.bucket is None:
+            remote_store.bucket = aws_profile_settings.get("ape_code_execute_s3_bucket")
+        if not remote_store.prefix:
+            remote_store.prefix = (
                 aws_profile_settings.get("ape_code_execute_s3_prefix")
-                or aws_profile_settings.get("s3_prefix")
-                or self.s3_prefix
+                or remote_store.prefix
             )
-        if self.s3_endpoint_url is None:
-            self.s3_endpoint_url = aws_profile_settings.get("endpoint_url")
-        if self.s3_region is None:
-            self.s3_region = aws_profile_settings.get("region")
-        if self.s3_request_checksum_calculation is None:
-            self.s3_request_checksum_calculation = aws_profile_settings.get(
+        if remote_store.endpoint_url is None:
+            remote_store.endpoint_url = aws_profile_settings.get("endpoint_url")
+        if remote_store.region is None:
+            remote_store.region = aws_profile_settings.get("region")
+        if remote_store.request_checksum_calculation is None:
+            remote_store.request_checksum_calculation = aws_profile_settings.get(
                 "request_checksum_calculation"
             )
-        if self.s3_response_checksum_validation is None:
-            self.s3_response_checksum_validation = aws_profile_settings.get(
+        if remote_store.response_checksum_validation is None:
+            remote_store.response_checksum_validation = aws_profile_settings.get(
                 "response_checksum_validation"
             )
 

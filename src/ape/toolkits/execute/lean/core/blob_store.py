@@ -73,16 +73,17 @@ class S3BlobStore:
     ):
         self.config = config or LeanVerifyToolConfig()
         self.logger = logger or create_logger()
-        self.bucket = str(self.config.s3_bucket or "").strip()
-        self.prefix = str(self.config.s3_prefix or "").strip().strip("/")
-        self.endpoint_url = str(self.config.s3_endpoint_url or "").strip() or None
-        self.region = str(self.config.s3_region or "").strip() or None
-        self.profile = str(self.config.s3_profile or "").strip() or None
+        remote_store = self.config.remote_artifact_store
+        self.bucket = str(remote_store.bucket or "").strip()
+        self.prefix = str(remote_store.prefix or "").strip().strip("/")
+        self.endpoint_url = str(remote_store.endpoint_url or "").strip() or None
+        self.region = str(remote_store.region or "").strip() or None
+        self.profile = str(remote_store.profile or "").strip() or None
         self.request_checksum_calculation = (
-            str(self.config.s3_request_checksum_calculation or "").strip() or None
+            str(remote_store.request_checksum_calculation or "").strip() or None
         )
         self.response_checksum_validation = (
-            str(self.config.s3_response_checksum_validation or "").strip() or None
+            str(remote_store.response_checksum_validation or "").strip() or None
         )
         self._client = None
 
@@ -241,6 +242,11 @@ def create_blob_store(
 ) -> BlobStore:
     """Build the remote blob-store backend for the current configuration."""
     actual_config = config or LeanVerifyToolConfig()
-    if str(actual_config.s3_bucket or "").strip():
+    remote_store = actual_config.remote_artifact_store
+    if remote_store.enabled:
+        if remote_store.kind != "s3":
+            raise ValueError(
+                f"Unsupported remote artifact-store kind: {remote_store.kind!r}"
+            )
         return S3BlobStore(actual_config, logger)
     return NoopBlobStore()
