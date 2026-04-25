@@ -68,6 +68,37 @@ def _load_aws_profile_settings(profile_name: Optional[str] = None) -> dict[str, 
     merged_settings.update(config_settings)
     return merged_settings
 
+
+class BundleAccelerationConfig(BaseModel):
+    """Configuration for snapshot-scoped remote bundle acceleration."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = Field(
+        default=False,
+        description="Whether to build and use snapshot-scoped remote bundles during cold restore",
+    )
+    max_object_size_bytes: int = Field(
+        default=1024 * 1024,
+        ge=1,
+        description="Only regular-file CAS objects at or below this size are included in bundles",
+    )
+    target_bundle_size_bytes: int = Field(
+        default=128 * 1024 * 1024,
+        ge=1,
+        description="Target uncompressed size for each snapshot-scoped bundle pack",
+    )
+    min_missing_objects_for_bundle_restore: int = Field(
+        default=512,
+        ge=1,
+        description="Minimum bundled-object misses required before restore downloads packs",
+    )
+    max_concurrent_bundle_downloads: int = Field(
+        default=4,
+        ge=1,
+        description="Maximum concurrent snapshot bundle downloads during restore",
+    )
+
 class RemoteArtifactStoreConfig(BaseModel):
     """Configuration for the optional remote immutable-artifact backing store."""
 
@@ -120,6 +151,10 @@ class RemoteArtifactStoreConfig(BaseModel):
             "AWS_RESPONSE_CHECKSUM_VALIDATION",
         ),
         description="Optional botocore response checksum validation policy",
+    )
+    bundle_acceleration: BundleAccelerationConfig = Field(
+        default_factory=BundleAccelerationConfig,
+        description="Optional snapshot-scoped remote bundle acceleration settings",
     )
 
     @property

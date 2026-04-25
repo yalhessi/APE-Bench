@@ -16,6 +16,7 @@ import aiofiles.os
 from ..config import LeanVerifyToolConfig
 from ..models import RestoreResult, WorkspaceStatus
 from .blob_store import create_blob_store
+from .bundle_manager import SnapshotBundleManager
 from ..core.workspace_state import WorkspaceStateManager
 from ..core.storage import ContentStore
 from ..core.snapshot import SnapshotManager
@@ -56,6 +57,12 @@ class RestoreManager:
         self.state_manager = WorkspaceStateManager(self.config, self.logger, self.repo_name)
         self.content_store = ContentStore(self.config, self.logger, blob_store=self.blob_store)
         self.snapshot_manager = SnapshotManager(
+            self.config,
+            self.logger,
+            self.repo_name,
+            blob_store=self.blob_store,
+        )
+        self.bundle_manager = SnapshotBundleManager(
             self.config,
             self.logger,
             self.repo_name,
@@ -372,7 +379,9 @@ class RestoreManager:
             await self.content_store.batch_retrieve_files(
                 file_mappings,
                 workspace_path,
-                max_workers=self.config.max_concurrent_restores
+                max_workers=self.config.max_concurrent_restores,
+                workspace_id=commit_hash,
+                bundle_manager=self.bundle_manager,
             )
         except Exception as e:
             raise RuntimeError(f"[{commit_hash}] Restore file failed") from e

@@ -19,6 +19,7 @@ from ape.toolkits.execute.base_source_manager import BaseSourceManager
 from ..config import LeanVerifyToolConfig
 from ..models import BuildResult, WorkspaceStatus
 from .blob_store import create_blob_store
+from .bundle_manager import SnapshotBundleManager
 from ..core.workspace_state import WorkspaceStateManager
 from ..core.storage import ContentStore
 from ..core.snapshot import SnapshotManager
@@ -64,6 +65,12 @@ class BuildManager(BaseSourceManager):
         self.state_manager = WorkspaceStateManager(self.config, self.logger, self.repo_name)
         self.content_store = ContentStore(self.config, self.logger, blob_store=self.blob_store)
         self.snapshot_manager = SnapshotManager(
+            self.config,
+            self.logger,
+            self.repo_name,
+            blob_store=self.blob_store,
+        )
+        self.bundle_manager = SnapshotBundleManager(
             self.config,
             self.logger,
             self.repo_name,
@@ -932,6 +939,14 @@ class BuildManager(BaseSourceManager):
             
             # 3. Store snapshot metadata
             await self.snapshot_manager.store_snapshot(commit_hash, file_mappings)
+            try:
+                await self.bundle_manager.store_snapshot_bundles(commit_hash, file_mappings)
+            except Exception as exc:
+                self.logger.warning(
+                    "Failed to build snapshot bundle acceleration for %s: %s",
+                    commit_hash,
+                    exc,
+                )
             self.logger.info(f"Create snapshot completed: {commit_hash}, file count: {file_count}")
             
             return file_count

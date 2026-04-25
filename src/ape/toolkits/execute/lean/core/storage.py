@@ -19,6 +19,7 @@ from ape.utils.logging import create_logger
 
 if TYPE_CHECKING:
     import logging
+    from .bundle_manager import SnapshotBundleManager
 
 class ContentStore:
     """Simplified content-addressable storage manager"""
@@ -238,14 +239,22 @@ class ContentStore:
                 self.logger.info('Hard link failed, use file copy')
                 await copy_file_with_metadata(object_path, output_path)
     
-    async def batch_retrieve_files(self, file_mappings: Dict[str, Dict[str, str]], 
-                                  workspace_path: Path, max_workers: int = 64) -> None:
+    async def batch_retrieve_files(
+        self,
+        file_mappings: Dict[str, Dict[str, str]],
+        workspace_path: Path,
+        max_workers: int = 64,
+        workspace_id: Optional[str] = None,
+        bundle_manager: Optional["SnapshotBundleManager"] = None,
+    ) -> None:
         """High-performance batch file recovery
         
         Args:
             file_mappings: File mapping {relative path: {"hash": hash, "type": type}}
             workspace_path: Workspace path
             max_workers: Maximum number of concurrent workers
+            workspace_id: Optional snapshot/workspace identifier for bundle lookup
+            bundle_manager: Optional bundle-acceleration manager
         """
         start_time = datetime.now()
         self.logger.info(f"Start batch recovery {len(file_mappings)} files")
@@ -275,14 +284,33 @@ class ContentStore:
         
         for relative_path, file_info, object_path, exists in check_results:
             if not exists:
-                missing_objects.append((relative_path, file_info["hash"]))
+                missing_objects.append(
+                    (relative_path, file_info["hash"], file_info["type"])
+                )
             else:
                 file_path = workspace_path / relative_path
                 restore_tasks.append((relative_path, file_info, file_path, object_path))
 
+        if missing_objects and workspace_id and bundle_manager is not None:
+            try:
+                await bundle_manager.hydrate_snapshot_objects(
+                    workspace_id,
+                    [
+                        content_hash
+                        for _, content_hash, file_type in missing_objects
+                        if file_type == "regular"
+                    ],
+                )
+            except Exception as exc:
+                self.logger.warning(
+                    "Failed to hydrate snapshot bundles for %s: %s",
+                    workspace_id,
+                    exc,
+                )
+
         if missing_objects and self.blob_store.enabled:
             await self._hydrate_missing_objects_from_blob_store(
-                [content_hash for _, content_hash in missing_objects],
+                [content_hash for _, content_hash, _ in missing_objects],
                 max_workers=max_workers,
             )
 
@@ -291,13 +319,18 @@ class ContentStore:
             for relative_path, file_info in file_items:
                 object_path = self._get_object_path(file_info["hash"])
                 if not await aiofiles.os.path.exists(object_path):
-                    missing_objects.append((relative_path, file_info["hash"]))
+                    missing_objects.append(
+                        (relative_path, file_info["hash"], file_info["type"])
+                    )
                     continue
                 file_path = workspace_path / relative_path
                 restore_tasks.append((relative_path, file_info, file_path, object_path))
         
         if missing_objects:
-            missing_files = [f"{path} (hash: {hash_val})" for path, hash_val in missing_objects[:5]]
+            missing_files = [
+                f"{path} (hash: {hash_val})"
+                for path, hash_val, _ in missing_objects[:5]
+            ]
             if len(missing_objects) > 5:
                 missing_files.append(f"... and {len(missing_objects) - 5} other files")
             error_msg = f"Missing {len(missing_objects)} storage objects:\n" + "\n".join(missing_files)
