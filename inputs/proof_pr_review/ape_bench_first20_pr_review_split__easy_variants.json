@@ -1,0 +1,46 @@
+{
+  "manifest_type": "task_variant_manifest",
+  "version": 1,
+  "base_task_file": "ape_bench_first20_pr_review_split__easy.jsonl",
+  "variants": [
+    {
+      "variant_id": "baseline",
+      "runtime_task_type": "lean_pr_split",
+      "accepted_source_task_types": [
+        "lean_pr_split"
+      ],
+      "task_id_suffix": "__baseline",
+      "metadata_updates": {
+        "paired_variant": "baseline",
+        "skill_bundle": "mathlib-pr-split"
+      },
+      "task_config_overrides": {}
+    },
+    {
+      "variant_id": "with_skills",
+      "runtime_task_type": "skilled_pr_split",
+      "accepted_source_task_types": [
+        "lean_pr_split"
+      ],
+      "task_id_suffix": "__with_skills",
+      "metadata_updates": {
+        "paired_variant": "with_skills",
+        "skill_bundle": "mathlib-pr-split"
+      },
+      "task_config_overrides": {}
+    },
+    {
+      "variant_id": "with_skill_policy",
+      "runtime_task_type": "skilled_policy_pr_split",
+      "accepted_source_task_types": [
+        "lean_pr_split"
+      ],
+      "task_id_suffix": "__with_skill_policy",
+      "metadata_updates": {
+        "paired_variant": "with_skill_policy",
+        "skill_bundle": "mathlib-pr-split"
+      },
+      "task_config_overrides": {}
+    }
+  ]
+}
