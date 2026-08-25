@@ -308,7 +308,7 @@ def test_the_per_pr_cost_cap_is_actually_enforced(lead):
     task, tools = lead
     state = task._state()
     state["floor_done"] = True
-    state["spend"] = task._task_config().per_pr_cost_cap + 0.01
+    state["delegated_spend"] = task._task_config().per_pr_cost_cap + 0.01
     result = asyncio.run(tools["delegate"](jobs=[
         {"proposal_id": "wu:1#proof_golf", "budget_tier": "standard"}]))
     assert result["success"] is False
@@ -323,3 +323,31 @@ def test_remaining_budget_is_reported_back(lead):
     from ape.tasks.lean_tasks.formal_math.pr_review_v5 import lead as lead_module
 
     assert "spend_remaining" in inspect.getsource(lead_module)
+
+
+def test_the_floor_does_not_consume_the_per_pr_cost_cap(lead):
+    """The mirror of `test_the_floor_does_not_spend_the_delegation_budget`, and the defect
+    that made the held-out run uninterpretable: PR 33149 had 108 work units, so its floor
+    cost $10.05 against a $1.50 cap and every specialist request was refused. The cap bound
+    hardest on the largest PR — the one where routing mattered most."""
+
+    task, tools = lead
+    state = task._state()
+    state["floor_done"] = True
+    state["spend"] = 10.05          # a large floor
+    state["delegated_spend"] = 0.0  # but nothing the lead chose
+    # Stub the executor: what is under test is the admission decision, not the spawn.
+    import ape.tasks.lean_tasks.formal_math.pr_review_v5.lead as lead_module
+
+    async def _no_jobs(*_a, **_k):
+        return []
+
+    original = lead_module.run_jobs
+    lead_module.run_jobs = _no_jobs
+    try:
+        result = asyncio.run(tools["delegate"](jobs=[
+            {"proposal_id": "wu:1#proof_golf", "budget_tier": "standard"}]))
+    finally:
+        lead_module.run_jobs = original
+    # Not refused on cost grounds: the floor is not a routing decision.
+    assert not any("cost cap" in r["reason"] for r in result.get("rejected", []))

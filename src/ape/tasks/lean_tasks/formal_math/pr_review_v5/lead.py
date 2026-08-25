@@ -244,6 +244,12 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
         if not hasattr(self, "_delegation_state"):
             self._delegation_state = {
                 "wave": 0, "outcomes": {}, "requested": set(), "spend": 0.0,
+                # Spend the lead actually chose to incur. Tracked apart from `spend` because
+                # the coverage floor is not a routing decision: charging it to the routing
+                # budget means the cap binds hardest on the largest PRs, which are exactly
+                # the ones where routing matters. PR 33149 had 108 work units, a $10.05
+                # floor against a $1.50 cap, and therefore zero specialists.
+                "delegated_spend": 0.0,
                 # The coverage floor runs *through* the lead, as its first wave, but is not
                 # the lead's to skip. Tracking it here is what lets `delegate` inject it and
                 # `submit_routing` refuse to close without it.
@@ -424,9 +430,9 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                     rejected.append({"job": invocation_id, "reason": (
                         f"delegation budget exhausted ({budget} jobs)")})
                     continue
-                if state["spend"] >= self._task_config().per_pr_cost_cap:
+                if state["delegated_spend"] >= self._task_config().per_pr_cost_cap:
                     rejected.append({"job": invocation_id, "reason": (
-                        f"per-PR cost cap reached (${state['spend']:.2f} of "
+                        f"per-PR cost cap reached (${state['delegated_spend']:.2f} of "
                         f"${self._task_config().per_pr_cost_cap:.2f} spent on delegated work)")})
                     continue
 
@@ -499,8 +505,11 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                     wave=state["wave"], logger=self.logger,
                 )
             except Exception as exc:  # noqa: BLE001
-                self.logger.error("delegation wave %d failed: %s",
-                                  state["wave"], traceback.format_exc())
+                # `self.logger` is bound during setup; a task exercised without it must still
+                # report the failure through its return value rather than dying on the log.
+                if self.logger is not None:
+                    self.logger.error("delegation wave %d failed: %s",
+                                      state["wave"], traceback.format_exc())
                 for spec in specs:
                     state["requested"].discard(spec.invocation_id)
                 return {"success": False, "ran": 0, "rejected": rejected,
@@ -511,6 +520,8 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 spec = spec_by_id[outcome.invocation_id]
                 state["outcomes"][outcome.invocation_id] = (outcome, spec)
                 state["spend"] += outcome.cost
+                if spec.disposition != "mandatory":
+                    state["delegated_spend"] += outcome.cost
 
             return {
                 "success": True,
@@ -518,8 +529,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 "ran": len(outcomes),
                 "rejected": rejected,
                 "spend_so_far": round(state["spend"], 4),
+                "delegated_spend": round(state["delegated_spend"], 4),
                 "spend_remaining": round(
-                    max(0.0, self._task_config().per_pr_cost_cap - state["spend"]), 4),
+                    max(0.0, self._task_config().per_pr_cost_cap
+                        - state["delegated_spend"]), 4),
                 "delegations_used": self._specialist_count(state),
                 "delegations_remaining": max(0, budget - self._specialist_count(state)),
                 "floor_jobs_run": len(floor_specs),
