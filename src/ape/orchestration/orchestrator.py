@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Set
 from pydantic import ValidationError
 
 from ape.scaffolds.config import BaseScaffoldConfig
-from ape.tasks.base import BaseTaskResult, BaseTask, get_task_class
+from ape.tasks.base import BaseTaskResult, BaseTask, get_task_class, result_counts_as_pass
 from ape.utils.logging import create_logger
 from ape.llm_clients import TokenUsage
 
@@ -172,7 +172,8 @@ class TaskOrchestrator:
                     progress.completed_tasks += 1
                     if task_result.get("success"):
                         progress.successful_tasks += 1
-                        if task_result.get("score") == 1.0:
+                        existing_result = task.task_result_class.model_validate(task_result)
+                        if result_counts_as_pass(existing_result):
                             progress.passed_tasks += 1
                     progress.completed_task_indices.append(task_id)
                     if task_result.get("custom_metrics"):
@@ -475,7 +476,7 @@ class TaskOrchestrator:
         # Compute statistics
         completed = len(task_results)
         successful = sum(1 for r in task_results if r.success)
-        passed = sum(1 for r in task_results if r.success and r.score == 1.0)
+        passed = sum(1 for r in task_results if result_counts_as_pass(r))
 
         completion_rate = completed / len(tasks) if tasks else 0.0
         success_rate = successful / completed if completed else 0.0

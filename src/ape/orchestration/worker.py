@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional, Union, Tuple
 
 from ape.scaffolds.base import ScaffoldTerminationReason, ScaffoldTerminationResult
 from ape.scaffolds.config import BaseScaffoldConfig
-from ape.tasks.base import BaseTaskResult, get_task_class
+from ape.tasks.base import BaseTaskResult, get_task_class, result_counts_as_pass
 from ape.utils.logging import create_logger
 
 from .config import EarlyStopMode
@@ -615,7 +615,7 @@ class SampleWorker:
                 progress.completed_tasks += 1
                 if task_result.success:
                     progress.successful_tasks += 1
-                    if task_result.score == 1.0:
+                    if result_counts_as_pass(task_result):
                         progress.passed_tasks += 1
                 progress.completed_task_indices.append(task_result.global_index)
                 if task_result.custom_metrics:
