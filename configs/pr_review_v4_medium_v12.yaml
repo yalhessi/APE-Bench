@@ -1,0 +1,34 @@
+# Full medium set at renderer candidate-prompt/12, release dev-medium-0.3.0.
+# Arm: the per-site generalist (control). 225 work units over 16 PRs.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 32000
+  thinking_budget_tokens: 30000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  max_concurrency: 8
+  sample_max_cost: 2.0
+
+task_config:
+  enabled_tools:
+    - file_read
+    - content_search
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  output_file: results/pr_review_v4/runs/dev-medium-v12-rep1/candidate_responses.jsonl
+  run_name: pr_review_v4_medium_v12_rep1
+  pr_numbers: []
+  work_unit_ids: []
+  work_unit_limit: 0
+  dry_run: false
+  require_prebuilt_workspaces: true
