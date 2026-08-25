@@ -1,0 +1,45 @@
+{
+  "after_merge": 42,
+  "by_admission": {
+    "diagnostic": 8,
+    "published": 34
+  },
+  "by_arm": {
+    "deterministic": 42,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 20,
+    "model_assertion": 0,
+    "repository_measurement": 8,
+    "verified_compile": 14
+  },
+  "candidates": null,
+  "condition": "checker_only",
+  "conflicts": 3,
+  "execution_release": "inputs/pr_review_v4/releases/dev-medium-0.2.1-systematic",
+  "findings_sha256": "0c846ee89687068b697626886cb1a18caca2227c91d59976a889168932bc1b33",
+  "inputs": 42,
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": 20,
+  "published_after_limit": 34,
+  "published_before_limit": 34,
+  "published_by_concern": {
+    "correctness": 31,
+    "naming": 2,
+    "style": 1
+  },
+  "published_prs": [
+    33057,
+    33066,
+    33145,
+    33149,
+    33294,
+    33305,
+    33321,
+    33337,
+    33421
+  ],
+  "suppressed_by_limit": 0
+}
