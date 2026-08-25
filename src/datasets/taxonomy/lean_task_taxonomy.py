@@ -121,6 +121,36 @@ def annotate_record_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
             }
         )
 
+    elif task_type in {"lean_pr_review", "skilled_pr_review", "skilled_policy_pr_review"}:
+        evaluation = record.get("evaluation") or {}
+        ground_truth = evaluation.get("ground_truth") or {}
+        blocking_items = ground_truth.get("blocking_findings") or []
+        advisory_items = ground_truth.get("advisory_findings") or []
+        taxonomy.update(
+            {
+                "task_family": "pr_review",
+                "edit_regime": "pr_review",
+                "primary_archetype": "merge_readiness_judgment",
+                "has_ground_truth": bool(ground_truth),
+                "merge_ready_ground_truth": ground_truth.get("merge_ready"),
+                "blocking_issue_count": len(blocking_items),
+                "advisory_issue_count": len(advisory_items),
+            }
+        )
+
+    elif task_type in {"lean_pr_split", "skilled_pr_split", "skilled_policy_pr_split"}:
+        benchmark_context = record.get("benchmark_context") or {}
+        taxonomy.update(
+            {
+                "task_family": "pr_split",
+                "edit_regime": "pr_split",
+                "primary_archetype": "pr_decomposition",
+                "has_ground_truth": False,
+                "split_candidate": bool(benchmark_context.get("split_candidate")),
+                "maintainer_requested_split": bool(benchmark_context.get("maintainer_requested_split")),
+            }
+        )
+
     elif task_type in {"lean_code_generation", "lean_spec_generation"}:
         taxonomy.update(
             {

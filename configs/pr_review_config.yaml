@@ -1,0 +1,34 @@
+repo_owner: leanprover-community
+repo_name: mathlib4
+
+date_field: closed
+start_date: "2026-01-01"
+end_date: "2026-03-31"
+
+include_merged: true
+include_closed_unmerged: true
+exclude_draft: true
+
+decision_review_states:
+  - APPROVED
+  - CHANGES_REQUESTED
+  - COMMENTED
+include_comment_only_rounds: true
+max_review_events_per_pr: 0
+
+max_search_pages: 10
+max_prs: 20
+pr_order: oldest
+
+min_changed_files: 1
+max_changed_files: 100
+min_diff_lines: 0
+max_diff_lines: 10000
+
+require_lean_files: true
+require_maintainer_feedback: true
+
+# Optional:
+# maintainers_file: inputs/proof_pr_review/mathlib_maintainers.txt
+# github_token: null   # or export GITHUB_TOKEN in your shell
+# output_file: inputs/proof_pr_review/mathlib_pr_review_benchmark.jsonl
