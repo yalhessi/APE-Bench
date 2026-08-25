@@ -1,0 +1,204 @@
+{"pr_number": 33421, "comment_id": "rc_2655220116", "stratum": "V3", "severity": "blocking", "note": "naming convention (round_eq_div)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33421, "comment_id": "rc_2655228140", "stratum": "V2", "severity": "blocking", "note": "generalization: should exist as general lemma", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33421, "comment_id": "review_3620701050", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33421, "comment_id": "rc_2655251344", "stratum": "V2", "severity": "blocking", "note": "supplied alternative statement+proof", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33419, "comment_id": "rc_2655775120", "stratum": "V3", "severity": "blocking", "note": "naming fix suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33418, "comment_id": "review_3621371812", "stratum": "P", "severity": null, "note": "bors merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33413, "comment_id": "ic_3701744289", "stratum": "V2", "severity": "advisory", "note": "to_dual attribute could generate aliases", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33413, "comment_id": "ic_3701815079", "stratum": "Q", "severity": null, "note": "tooling capability discussion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33401, "comment_id": "rc_2652840555", "stratum": "V2", "severity": "blocking", "note": "golf suggestion (simp_all)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33401, "comment_id": "rc_2652842017", "stratum": "V2", "severity": "blocking", "note": "golf suggestion (grw vs calc)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33400, "comment_id": "rc_2652557032", "stratum": "V3", "severity": "advisory", "note": "pre-existing naming note (contDiff)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33400, "comment_id": "review_3617635402", "stratum": "P", "severity": null, "note": "status/praise", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33400, "comment_id": "ic_3698812612", "stratum": "Q", "severity": null, "note": "fun_prop behavior question", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33395, "comment_id": "rc_2654320221", "stratum": "V4", "severity": "blocking", "note": "naming choice among options, taste", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33376, "comment_id": "rc_2650978199", "stratum": "V2", "severity": "advisory", "note": "unused-in-PR lemma", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33376, "comment_id": "review_3615880937", "stratum": "P", "severity": null, "note": "maintainer merge? second opinion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33373, "comment_id": "rc_2653570064", "stratum": "V2", "severity": "blocking", "note": "golf suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33373, "comment_id": "rc_2653584655", "stratum": "V2", "severity": "blocking", "note": "reuse existing theorem (simpa using)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33373, "comment_id": "review_3618943211", "stratum": "V2", "severity": "blocking", "note": "use existing theorems", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33362, "comment_id": "rc_2649972806", "stratum": "V3", "severity": "blocking", "note": "namespace placement", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33357, "comment_id": "ic_3695110743", "stratum": "V3", "severity": "advisory", "note": "PR description typo", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33356, "comment_id": "rc_2651927401", "stratum": "V2", "severity": "blocking", "note": "golf suggestion (refine)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33349, "comment_id": "rc_2649538001", "stratum": "V4", "severity": "blocking", "note": "questions claimed consensus", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33349, "comment_id": "rc_2649538453", "stratum": "V2", "severity": "blocking", "note": "supplied lemma variants (of_ne_top)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33349, "comment_id": "rc_2649538538", "stratum": "V2", "severity": "blocking", "note": "same as previous", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33345, "comment_id": "rc_2649882451", "stratum": "V3", "severity": "blocking", "note": "docstring fix", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33345, "comment_id": "review_3614802456", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33343, "comment_id": "rc_2649442011", "stratum": "V3", "severity": "blocking", "note": "explicitness idiom (exact h)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33340, "comment_id": "ic_3694077353", "stratum": "P", "severity": null, "note": "bors merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33337, "comment_id": "rc_2655654161", "stratum": "V3", "severity": "blocking", "note": "rename suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33337, "comment_id": "rc_2655654382", "stratum": "V3", "severity": "blocking", "note": "rename suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33334, "comment_id": "review_3614266577", "stratum": "P", "severity": null, "note": "bors merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33333, "comment_id": "rc_2649052012", "stratum": "V4", "severity": "advisory", "note": "preference unclear, awaiting opinion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33333, "comment_id": "ic_3693860378", "stratum": "P", "severity": null, "note": "maintainer merge for second opinion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33333, "comment_id": "rc_2649058190", "stratum": "V4", "severity": "advisory", "note": "middle-ground proposal, no strong pref", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33333, "comment_id": "ic_3694238757", "stratum": "V2", "severity": "advisory", "note": "existing bounds pointer", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33333, "comment_id": "ic_3701544677", "stratum": "P", "severity": null, "note": "coordination: pick one and ping", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33332, "comment_id": "rc_2649044296", "stratum": "V1", "severity": "blocking", "note": "unused binder names", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33328, "comment_id": "rc_2649571438", "stratum": "V4", "severity": "advisory", "note": "style-change scope question, neutral", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33328, "comment_id": "review_3614587243", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33322, "comment_id": "ic_3693438737", "stratum": "P", "severity": null, "note": "bors merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33321, "comment_id": "rc_2652494684", "stratum": "V3", "severity": "blocking", "note": "docstring wording", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33321, "comment_id": "rc_2652497490", "stratum": "V3", "severity": "blocking", "note": "defeq-abuse idiom", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33321, "comment_id": "rc_2652501119", "stratum": "V3", "severity": "blocking", "note": "docstring wording", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33316, "comment_id": "rc_2648533118", "stratum": "V3", "severity": "advisory", "note": "non-ASCII identifier convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33310, "comment_id": "rc_2648346479", "stratum": "V2", "severity": "blocking", "note": "supplied auxiliary lemmas", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33310, "comment_id": "rc_2648451493", "stratum": "V3", "severity": "blocking", "note": "simp-normal-form orientation", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33305, "comment_id": "ic_3693445739", "stratum": "V1", "severity": "blocking", "note": "CI long line", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33302, "comment_id": "ic_3692618463", "stratum": "V2", "severity": "blocking", "note": "abbrev vs def, reviewer tested it", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33296, "comment_id": "ic_3691876755", "stratum": "V2", "severity": "blocking", "note": "cleaner proof + generalization supplied", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33296, "comment_id": "ic_3692373987", "stratum": "P", "severity": null, "note": "bare PR link", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33294, "comment_id": "rc_2647717023", "stratum": "V3", "severity": "blocking", "note": "naming convention (of_isNormal)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33294, "comment_id": "rc_2647724400", "stratum": "V2", "severity": "blocking", "note": "golf suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33294, "comment_id": "ic_3692365036", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33287, "comment_id": "rc_2647972890", "stratum": "V2", "severity": "blocking", "note": "golf suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33287, "comment_id": "rc_2647996753", "stratum": "V2", "severity": "blocking", "note": "statement form suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33287, "comment_id": "review_3613216622", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33285, "comment_id": "rc_2647297566", "stratum": "V2", "severity": "blocking", "note": "golf suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33285, "comment_id": "rc_2647299607", "stratum": "V2", "severity": "blocking", "note": "golf alternatives", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33285, "comment_id": "review_3613480278", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33283, "comment_id": "rc_2649285591", "stratum": "V3", "severity": "advisory", "note": "line-break style, explicitly non-blocking", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33283, "comment_id": "rc_2649285655", "stratum": "V3", "severity": "advisory", "note": "continuation of style note", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33283, "comment_id": "review_3614410355", "stratum": "P", "severity": null, "note": "delegate, repeats style note", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33268, "comment_id": "rc_2647218688", "stratum": "V3", "severity": "blocking", "note": "declaration ordering", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33268, "comment_id": "rc_2647220140", "stratum": "P", "severity": null, "note": "praise", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33267, "comment_id": "rc_2649642359", "stratum": "V2", "severity": "advisory", "note": "use toDual_symm, out of scope", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33267, "comment_id": "rc_2649642918", "stratum": "V3", "severity": "advisory", "note": "naming (toDual_bot), same scope note", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33267, "comment_id": "rc_2649848345", "stratum": "V3", "severity": "blocking", "note": "namespace prefix redundant", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33267, "comment_id": "rc_2649882324", "stratum": "V3", "severity": "blocking", "note": "indentation convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33267, "comment_id": "rc_2649929848", "stratum": "V2", "severity": "blocking", "note": "stale renamed reference, docs link", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33267, "comment_id": "review_3614835656", "stratum": "P", "severity": null, "note": "LGTM bors d+", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33266, "comment_id": "ic_3691224328", "stratum": "Q", "severity": null, "note": "future need speculation", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33266, "comment_id": "ic_3692789832", "stratum": "P", "severity": null, "note": "!bench", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33245, "comment_id": "ic_3689245812", "stratum": "P", "severity": null, "note": "bors merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33232, "comment_id": "rc_2643418915", "stratum": "V3", "severity": "advisory", "note": "self-labeled style nit", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33232, "comment_id": "rc_2643421492", "stratum": "V3", "severity": "blocking", "note": "docstring + rename suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33208, "comment_id": "rc_2643382018", "stratum": "V2", "severity": "blocking", "note": "statement form (Subsingleton hyp)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33208, "comment_id": "rc_2643407825", "stratum": "V3", "severity": "blocking", "note": "docstring informativeness", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33207, "comment_id": "rc_2641557219", "stratum": "V4", "severity": "advisory", "note": "definition choice + API integration", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33203, "comment_id": "rc_2640889878", "stratum": "V3", "severity": "blocking", "note": "misleading name vs content", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33201, "comment_id": "rc_2647931259", "stratum": "V2", "severity": "blocking", "note": "too specialized; general instances exist", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33201, "comment_id": "rc_2647944010", "stratum": "V2", "severity": "blocking", "note": "duplicate of existing lemma", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33201, "comment_id": "rc_2647950542", "stratum": "V2", "severity": "blocking", "note": "less-general duplicate (whiskeringLeft)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33201, "comment_id": "rc_2647952517", "stratum": "V3", "severity": "blocking", "note": "API completeness (Full/Faithful)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33201, "comment_id": "rc_2647953512", "stratum": "V3", "severity": "blocking", "note": "API completeness (Full/Faithful)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33200, "comment_id": "ic_3682386965", "stratum": "P", "severity": null, "note": "moderation", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33200, "comment_id": "ic_3682527178", "stratum": "V1", "severity": "blocking", "note": "axioms+sorries+size, mechanical", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33200, "comment_id": "ic_3682573077", "stratum": "P", "severity": null, "note": "guidelines quote", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33200, "comment_id": "ic_3682606069", "stratum": "V1", "severity": "blocking", "note": "axiom count, grep-checkable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33200, "comment_id": "ic_3702744450", "stratum": "P", "severity": null, "note": "moderation/apology", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33198, "comment_id": "ic_3682340203", "stratum": "V4", "severity": "blocking", "note": "naming consensus (omega_zero), poll", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33198, "comment_id": "ic_3682353201", "stratum": "V4", "severity": "advisory", "note": "asymmetry meaningful, design insight", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33198, "comment_id": "ic_3682744010", "stratum": "V1", "severity": "blocking", "note": "build failing, CI link", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33190, "comment_id": "rc_2640663676", "stratum": "V3", "severity": "blocking", "note": "explicit-arg clarity", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33183, "comment_id": "rc_2641454422", "stratum": "V3", "severity": "blocking", "note": "monoidal notation idiom", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33183, "comment_id": "rc_2641456327", "stratum": "V3", "severity": "blocking", "note": "docstring wording", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33183, "comment_id": "rc_2641457654", "stratum": "V3", "severity": "blocking", "note": "structure-field formatting", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33183, "comment_id": "review_3606000017", "stratum": "P", "severity": null, "note": "maintainer delegate", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33169, "comment_id": "rc_2639782328", "stratum": "V4", "severity": "blocking", "note": "revert, not convinced better", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33169, "comment_id": "rc_2640382080", "stratum": "V2", "severity": "blocking", "note": "golf suggestion (simpa only)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33158, "comment_id": "review_3604993872", "stratum": "P", "severity": null, "note": "assignment etiquette", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33158, "comment_id": "ic_3691772343", "stratum": "V4", "severity": "advisory", "note": "mild scope doubt, approved anyway", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33156, "comment_id": "review_3601855456", "stratum": "P", "severity": null, "note": "maintainer merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33156, "comment_id": "ic_3679172013", "stratum": "V3", "severity": "blocking", "note": "missing docstring", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33154, "comment_id": "rc_2637818883", "stratum": "V3", "severity": "advisory", "note": "pre-existing doc consistency", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33154, "comment_id": "rc_2637821303", "stratum": "Q", "severity": null, "note": "isBinder semantics question", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33154, "comment_id": "review_3601702101", "stratum": "P", "severity": null, "note": "delegate + wants more eyes", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33153, "comment_id": "rc_2649325225", "stratum": "V2", "severity": "advisory", "note": "no-op change, diff-checkable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33152, "comment_id": "ic_3678646855", "stratum": "V2", "severity": "blocking", "note": "redundant decl; existing suffices", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33151, "comment_id": "ic_3691203928", "stratum": "V2", "severity": "blocking", "note": "alternative via fixAbbreviations, checkable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33151, "comment_id": "ic_3692349817", "stratum": "V2", "severity": "blocking", "note": "concrete dict entry instruction", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33150, "comment_id": "rc_2637749858", "stratum": "V2", "severity": "blocking", "note": "wrong generated dual name, runnable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33149, "comment_id": "rc_2637723625", "stratum": "V1", "severity": "blocking", "note": "no-axioms policy, detectable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33149, "comment_id": "rc_2637724938", "stratum": "V2", "severity": "blocking", "note": "duplicate of Parseval", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33149, "comment_id": "review_3601631720", "stratum": "V3", "severity": "blocking", "note": "AI-disclosure policy in description", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33149, "comment_id": "ic_3678766413", "stratum": "V4", "severity": "blocking", "note": "needs complete rewrite, acceptability call", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33149, "comment_id": "ic_3678926733", "stratum": "V4", "severity": "advisory", "note": "standards guidance", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33146, "comment_id": "rc_2640214901", "stratum": "Q", "severity": null, "note": "dualization intent check", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33146, "comment_id": "rc_2640216088", "stratum": "V3", "severity": "blocking", "note": "doc capitalization", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33146, "comment_id": "review_3604480361", "stratum": "P", "severity": null, "note": "praise", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641264284", "stratum": "V2", "severity": "blocking", "note": "signature generalization suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641265463", "stratum": "V2", "severity": "blocking", "note": "signature generalization suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641267951", "stratum": "V2", "severity": "blocking", "note": "OrderDual trick", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641269012", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641269877", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641270866", "stratum": "V2", "severity": "blocking", "note": "OrderDual proof", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641272058", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641278733", "stratum": "V2", "severity": "blocking", "note": "case-split proof supplied", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641279895", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "rc_2641280942", "stratum": "V2", "severity": "blocking", "note": "OrderDual proof", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33145, "comment_id": "review_3601509274", "stratum": "V3", "severity": "blocking", "note": "statement orientation convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33144, "comment_id": "ic_3678655486", "stratum": "P", "severity": null, "note": "ping original author", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33144, "comment_id": "ic_3678655679", "stratum": "V4", "severity": "advisory", "note": "is this wanted at all", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33144, "comment_id": "ic_3678747154", "stratum": "Q", "severity": null, "note": "history/motivation discussion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33144, "comment_id": "ic_3678761256", "stratum": "V2", "severity": "blocking", "note": "remove unused lemmas, checkable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33141, "comment_id": "rc_2637456637", "stratum": "V2", "severity": "blocking", "note": "relevant_arg needed, behavior-checkable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33140, "comment_id": "review_3601449191", "stratum": "P", "severity": null, "note": "spurious linter, restart build", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33137, "comment_id": "rc_2654897512", "stratum": "V2", "severity": "blocking", "note": "use existing (mapDomain_mul)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33135, "comment_id": "ic_3684017551", "stratum": "P", "severity": null, "note": "!bench", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33127, "comment_id": "rc_2653183904", "stratum": "V2", "severity": "blocking", "note": "leftover test code removal", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33127, "comment_id": "rc_2653224746", "stratum": "Q", "severity": null, "note": "alternatives weighed, agrees with author", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33127, "comment_id": "rc_2653225933", "stratum": "V3", "severity": "advisory", "note": "may be worth a section comment", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33127, "comment_id": "review_3618493119", "stratum": "P", "severity": null, "note": "bors d+", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33117, "comment_id": "rc_2636917003", "stratum": "V2", "severity": "blocking", "note": "to_fun attribute, generates lemmas", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33111, "comment_id": "rc_2636533864", "stratum": "V3", "severity": "blocking", "note": "naming consistency question", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33111, "comment_id": "rc_2636536127", "stratum": "V2", "severity": "advisory", "note": "conditional golf if reordered", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33111, "comment_id": "ic_3676973081", "stratum": "V4", "severity": "advisory", "note": "PR title clarity", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33111, "comment_id": "ic_3677033162", "stratum": "V3", "severity": "advisory", "note": "deprecation convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33111, "comment_id": "rc_2636606233", "stratum": "V3", "severity": "blocking", "note": "naming consistency, rename others", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33107, "comment_id": "ic_3676892310", "stratum": "V4", "severity": "blocking", "note": "definition refactor, Zulip escalation", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33107, "comment_id": "ic_3686882783", "stratum": "V4", "severity": "advisory", "note": "library flaw context", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33104, "comment_id": "rc_2636627876", "stratum": "V3", "severity": "blocking", "note": "protected abbrev convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33104, "comment_id": "rc_2636628527", "stratum": "V3", "severity": "blocking", "note": "protected abbrev convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33101, "comment_id": "rc_2648062591", "stratum": "V3", "severity": "blocking", "note": "variable duplication, section hygiene", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643221269", "stratum": "V2", "severity": "blocking", "note": "grind golf supplied", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643244217", "stratum": "V2", "severity": "blocking", "note": "grind golf supplied", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643336772", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643337745", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643338205", "stratum": "V2", "severity": "blocking", "note": "signature suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643348191", "stratum": "V2", "severity": "blocking", "note": "golf via existing lemma", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643367254", "stratum": "V2", "severity": "blocking", "note": "by_cases! + existing lemma", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643369129", "stratum": "V2", "severity": "blocking", "note": "rcases golf", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "rc_2643374662", "stratum": "V3", "severity": "blocking", "note": "calc indent per style guide", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33098, "comment_id": "review_3608060555", "stratum": "P", "severity": null, "note": "summary of round", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33095, "comment_id": "ic_3675730565", "stratum": "P", "severity": null, "note": "bors d+ instructions", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33093, "comment_id": "ic_3678252243", "stratum": "P", "severity": null, "note": "maintainer merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33092, "comment_id": "rc_2635443799", "stratum": "V3", "severity": "blocking", "note": "private def needs explanatory docstring", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33090, "comment_id": "rc_2635327261", "stratum": "V3", "severity": "blocking", "note": "iff form for simp", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33086, "comment_id": "rc_2648149879", "stratum": "V3", "severity": "blocking", "note": "API intent documentation", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33086, "comment_id": "rc_2648158155", "stratum": "V3", "severity": "blocking", "note": "API symmetry, missing lemma", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33081, "comment_id": "rc_2635056932", "stratum": "P", "severity": null, "note": "praise", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33081, "comment_id": "review_3598567352", "stratum": "P", "severity": null, "note": "bors merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33081, "comment_id": "rc_2635162292", "stratum": "Q", "severity": null, "note": "is rfl slow/abusive here", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33081, "comment_id": "rc_2635162610", "stratum": "Q", "severity": null, "note": "continuation", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33081, "comment_id": "rc_2635164589", "stratum": "V2", "severity": "advisory", "note": "golf suggestion", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33081, "comment_id": "rc_2635219955", "stratum": "Q", "severity": null, "note": "defers to another reviewer", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33079, "comment_id": "rc_2634998687", "stratum": "V3", "severity": "blocking", "note": "dot-notation naming (Fin.neZero)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33079, "comment_id": "review_3598502466", "stratum": "P", "severity": null, "note": "overall assessment", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33078, "comment_id": "rc_2635538663", "stratum": "V2", "severity": "blocking", "note": "NeZero typeclass inference suffices", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33078, "comment_id": "rc_2635576788", "stratum": "V2", "severity": "blocking", "note": "full proof rewrite supplied", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33070, "comment_id": "rc_2634058759", "stratum": "V2", "severity": "blocking", "note": "equivalent simpler metacode", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33067, "comment_id": "rc_2635063225", "stratum": "V2", "severity": "blocking", "note": "isBinder semantics, testable", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33067, "comment_id": "review_3598575021", "stratum": "V2", "severity": "blocking", "note": "apply same fix to alias_in", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33067, "comment_id": "ic_3675053999", "stratum": "P", "severity": null, "note": "commit message edit note", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "rc_2653753542", "stratum": "V3", "severity": "blocking", "note": "docstring wording", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "rc_2653771927", "stratum": "V2", "severity": "blocking", "note": "duplicate of existing constructor", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "rc_2653798267", "stratum": "V2", "severity": "blocking", "note": "simpler phrasing, Lean infers _", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "rc_2653801643", "stratum": "V3", "severity": "advisory", "note": "intersperse comments", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "rc_2653806370", "stratum": "V3", "severity": "blocking", "note": "section organization", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "rc_2653809326", "stratum": "V3", "severity": "blocking", "note": "have-name readability", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33066, "comment_id": "ic_3700401147", "stratum": "Q", "severity": null, "note": "import increase rationale", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33065, "comment_id": "rc_2636727773", "stratum": "V3", "severity": "blocking", "note": "docstring wording", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33065, "comment_id": "rc_2636733095", "stratum": "V3", "severity": "blocking", "note": "naming consistency (of_not_accPt)", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33065, "comment_id": "rc_2636735027", "stratum": "V4", "severity": "advisory", "note": "equivalent forms, asks opinions", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33057, "comment_id": "ic_3671887834", "stratum": "V1", "severity": "blocking", "note": "fix CI error before merge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33056, "comment_id": "ic_3675849580", "stratum": "V4", "severity": "blocking", "note": "naming convention vote needed", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33053, "comment_id": "ic_3673984989", "stratum": "P", "severity": null, "note": "bors merge praise", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33048, "comment_id": "rc_2644368398", "stratum": "V3", "severity": "blocking", "note": "missing companion simp lemma pattern", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33048, "comment_id": "rc_2644368778", "stratum": "V2", "severity": "blocking", "note": "statement hypothesis form", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33048, "comment_id": "rc_2644369161", "stratum": "V3", "severity": "blocking", "note": "_iff suffix convention", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33048, "comment_id": "rc_2644369663", "stratum": "V3", "severity": "blocking", "note": "explicit args for backwards rw", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33048, "comment_id": "rc_2644370367", "stratum": "V3", "severity": "blocking", "note": "instance declaration form", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 33047, "comment_id": "ic_3671058538", "stratum": "V4", "severity": "advisory", "note": "spelling preference challenge", "annotator": "claude-fable-5/first-pass"}
+{"pr_number": 31342, "comment_id": "ic_3544829036", "stratum": "V3", "severity": "blocking", "note": "PR description required", "annotator": "claude-fable-5/first-pass"}
