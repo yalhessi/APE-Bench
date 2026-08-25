@@ -122,11 +122,32 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                             "error": f"File path outside workspaces directory: {file_path}"
                         }
 
-                    # 3. Verify file is in scratch workspace
-                    if not full_file_path.is_relative_to(self.scratch_workspace.resolve()):
+                    # 3. Verify the file is somewhere this task allows reading from.
+                    #
+                    # Scratch is always allowed. Some tasks — notably PR review — have no
+                    # scratch file at all: the thing worth compiling is the reviewed file in
+                    # `target/`, which is read-only but not blocked. Those tasks opt in via
+                    # `lean_verify_allows_target`, so proof_engineering's rule that a
+                    # submission must be self-contained is untouched.
+                    #
+                    # This was not a hypothetical. Every `lean_verify(file_path=...)` call in
+                    # the rep3 and rep4 review runs passed `target/Mathlib/...` and every one
+                    # was refused, in a task whose entire premise is compiling things.
+                    allowed_roots = [self.scratch_workspace.resolve()]
+                    if getattr(self.task, "lean_verify_allows_target", False) and self.target_workspace:
+                        allowed_roots.append(Path(self.target_workspace).resolve())
+                    if not any(full_file_path.is_relative_to(root) for root in allowed_roots):
+                        hint = ""
+                        if getattr(self.task, "lean_verify_allows_target", False):
+                            hint = (" Reviewed files live under `target/`; to test a change to "
+                                    "one, use lean_verify_edit.")
                         return {
                             "success": False,
-                            "error": f"lean_verify only supports files in scratch workspace, got: {file_path}"
+                            "error": (
+                                f"lean_verify can only read files under "
+                                f"{', '.join(root.name for root in allowed_roots)}; got: {file_path}."
+                                + hint
+                            ),
                         }
 
                     # 4. Check file existence
