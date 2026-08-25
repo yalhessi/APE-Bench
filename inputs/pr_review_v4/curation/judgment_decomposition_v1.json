@@ -1,0 +1,249 @@
+[
+  {
+    "source_intervention_id": "pr33310_i01",
+    "decision": "accept_atomic",
+    "obligations": [
+      {
+        "obligation_key": "quotient-pequiv-refactor",
+        "claim": "Refactor `quotientPEquiv` around `constantCoeff`: add kernel and surjectivity lemmas, define the equivalence by composing the standard quotient equivalences, and add the corresponding simp lemma.",
+        "resolution_criteria": "The implementation provides the requested `ker_constantCoeff` and `constantCoeff_surjective` lemmas, uses them to define `quotientPEquiv` through the standard quotient equivalences, and includes a simp lemma for its action on quotient representatives.",
+        "change_ids": ["change:f42043073f4a3d915958eb7ce45cb1fdd4ade22cb0401726dfdc76a51e5ef487"],
+        "source_event_ids": ["event:a52466123fb5778beb851306", "event:f9342a9ae46dcefca168fe15"]
+      }
+    ],
+    "rationale": "The four requested edits form one API refactor whose parts are mutually dependent and were presented as one replacement implementation.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33296_i01",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "generalize-center-api",
+        "claim": "Replace `Module.End.exists_apply_eq_smul` with a general `Set.center` membership characterization and derive the requested specialized center iff lemmas.",
+        "resolution_criteria": "The final code exposes a general `Set.center (End R M)` characterization and specialized iff lemmas for the requested center structures instead of retaining only the original specialized existence lemma.",
+        "change_ids": ["change:aa1c85317e13692918f1e48f1e4e85533bd2bc848fed4624f6f3fe254a6447c3"],
+        "source_event_ids": ["event:6686ee8e3255aaf9ef0ce9d5"]
+      },
+      {
+        "obligation_key": "central-basic-import",
+        "claim": "Add `Mathlib.Algebra.Central.Basic` to the imports of `Mathlib/Algebra/Central/End.lean`.",
+        "resolution_criteria": "The file explicitly imports `Mathlib.Algebra.Central.Basic`.",
+        "change_ids": ["change:50b189780d91e49594a475810f0461c1fa9f1654193729bfd68799433429a2f7"],
+        "source_event_ids": ["event:6686ee8e3255aaf9ef0ce9d5"]
+      }
+    ],
+    "rationale": "The API generalization and import change are independently reviewable and independently satisfiable.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33287_i01",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "over-map-presieve-statement",
+        "claim": "State the over-category sheafness result using `Presieve.ofArrows` applied to the mapped arrows.",
+        "resolution_criteria": "The theorem statement explicitly constructs the presieve with `Presieve.ofArrows _ (fun i => (Over.map p).map (f i))` or a semantically equivalent formulation.",
+        "change_ids": ["change:a7c9e97e9678021f3e5e4008f99c6ff1d0a7e3803cdc4e126f849eddc7c68fc3"],
+        "source_event_ids": ["event:97719781b8265a1794ff89a3"]
+      },
+      {
+        "obligation_key": "to-compatible-simp",
+        "claim": "Simplify the `Arrows.toCompatible` property proof to a direct `simp` invocation with the requested rewrite lemmas.",
+        "resolution_criteria": "The property proof uses a direct `simp` proof with `FunctorToTypes.map_comp_apply`, `op_comp`, and the compatibility hypothesis, without the preceding `dsimp` workaround.",
+        "change_ids": ["change:d6170929348d86ff9526ab12d60bb602426c57410502c4a64861685d13f37776"],
+        "source_event_ids": ["event:f89e0f5ef6e54f97b0d526da"]
+      }
+    ],
+    "rationale": "The intervention combines two separate inline comments on different declarations.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33208_i01",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "implicit-indecomposable-argument",
+        "claim": "Make `x` implicit in `IsMulIndecomposable_id_univ` and express the nonidentity hypothesis against that implicit argument.",
+        "resolution_criteria": "The theorem binds `{x : M}` implicitly and retains the corresponding `x != 1` hypothesis and behavior.",
+        "change_ids": ["change:d5761f45d6d2dbca7deaba4cfcf744018a4ebde9737c842952bb86e717a23ff1"],
+        "source_event_ids": ["event:70919fb39eaaf0326887b968"]
+      },
+      {
+        "obligation_key": "closure-image-docstring",
+        "claim": "Replace the docstring of `Submonoid.closure_image_one_lt_and_isMulIndecomposable` with a clear explanation of the statement.",
+        "resolution_criteria": "The declaration has a substantive docstring that explains the mathematical content of its conclusion rather than merely restating its name.",
+        "change_ids": ["change:3659dd120059c114a6e27ccdfc44126a1d7753c8a891930c09caf2d4caafc8c9"],
+        "source_event_ids": ["event:9de633c2e9358561aadd8f0f"]
+      },
+      {
+        "obligation_key": "additive-docstring",
+        "claim": "Add documentation for the additive declaration generated alongside the multiplicative closure result.",
+        "resolution_criteria": "The `to_additive` declaration receives an explicit additive docstring rather than inheriting no documentation.",
+        "change_ids": ["change:eaf9f8314cd3b9c0b4dcc28b1943d7c5952f51f1534804368088b321798b947d"],
+        "source_event_ids": ["event:9de633c2e9358561aadd8f0f"]
+      }
+    ],
+    "rationale": "The binder change and the two documentation requests have distinct targets and acceptance criteria.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33201_i01",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "standard-subsingleton-hom",
+        "claim": "Derive subsingleton homs for `X.HomotopyCategory` through the standard `OneTruncation2` and quotient instances.",
+        "resolution_criteria": "The proof sets up the needed `Unique` and `Subsingleton` instances on the truncation and obtains quotient hom subsingleton via the standard quotient instance rather than the prior specialized argument.",
+        "change_ids": ["change:307bf00f4751afc6b482b301583d322f9fc4ced1b86cc1500a5cd44982458bb7"],
+        "source_event_ids": ["event:875cf54be16fc59f3bf742c6"]
+      },
+      {
+        "obligation_key": "standard-terminal-instance",
+        "claim": "Derive `Unique X.HomotopyCategory` and its terminality through the standard quotient, discreteness, and `Cat.isTerminalOfUniqueOfIsDiscrete` instances.",
+        "resolution_criteria": "The final code uses the standard quotient `Unique` instance, establishes discreteness, and derives terminality with `Cat.isTerminalOfUniqueOfIsDiscrete` rather than an ad hoc unique-hom proof.",
+        "change_ids": ["change:3ea96df78aa26a0f2be4d4d06cc7ccd1651b7b39e45317dfe3370b29b4bb3afd"],
+        "source_event_ids": ["event:7b2c07ff5a386213837d4218"]
+      }
+    ],
+    "rationale": "The hom-subsingleton and terminal-instance requests concern separate declarations and can succeed independently.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33145_i03",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "dense-cisup-generalization",
+        "claim": "Generalize the dense-set supremum result into a `Dense.ciSup'` lemma with the requested typeclass-polymorphic statement.",
+        "resolution_criteria": "The bespoke continuous supremum result is replaced or subsumed by a `Dense.ciSup'` lemma with the requested generality.",
+        "change_ids": ["change:026d50893ce6c7e3d003a7f76523fd7517e5c8524765c393ada02f72dd58eae3"],
+        "source_event_ids": ["event:5be390610816dd34b8e38cc1"]
+      },
+      {
+        "obligation_key": "dense-ciinf-by-duality",
+        "claim": "Provide the corresponding `Dense.ciInf'` lemma and prove it by applying `ciSup'` in the order dual.",
+        "resolution_criteria": "A `Dense.ciInf'` result is present and its proof is reduced to `ciSup'` over `OrderDual` rather than duplicating the supremum argument.",
+        "change_ids": ["change:d060e494ca7a39fb99bfad4fb43ded7c411b933bbbced7dd98a6bd57965b359a"],
+        "source_event_ids": ["event:972f8643d9f501e4f6482cdf", "event:e2ba88c73bb9f52537df2fc4"]
+      }
+    ],
+    "rationale": "The supremum generalization and dual infimum proof are distinct obligations, while the two infimum comments provide context for the same obligation.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33098_i01",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "grind-minimal-cover-subset",
+        "claim": "Replace the case-split proof of `minimalCover_subset` with the requested `grind [minimalCover]` proof.",
+        "resolution_criteria": "`minimalCover_subset` is proved directly using `grind [minimalCover]` or an equivalently concise grind proof.",
+        "change_ids": ["change:390f4748ccfdedd20b9952b48ba363f7a6aed223eceabdb507c44c21d87d03e1"],
+        "source_event_ids": ["event:5fb3d69626fe466c600cb088"]
+      },
+      {
+        "obligation_key": "grind-finite-minimal-cover",
+        "claim": "Simplify `finite_minimalCover` using the requested grind setup, including `finite_empty` support.",
+        "resolution_criteria": "The theorem is closed by the shared grind-based formulation and the needed empty-set finiteness fact is available to grind.",
+        "change_ids": ["change:43382beac97d752cac2d9e4c86dbf1a4bf64555baa61892a203f0c5e57ce337b"],
+        "source_event_ids": ["event:5fb3d69626fe466c600cb088"]
+      },
+      {
+        "obligation_key": "grind-is-cover-minimal-cover",
+        "claim": "Simplify `isCover_minimalCover` with the same requested grind-based treatment.",
+        "resolution_criteria": "The theorem uses the shared concise grind formulation rather than the original explicit case analysis.",
+        "change_ids": ["change:b9df03219696a0d73c2b319bf3b1ff1a5aac2a7dc08146dd4a74d82959c30f57"],
+        "source_event_ids": ["event:5fb3d69626fe466c600cb088"]
+      },
+      {
+        "obligation_key": "grind-card-minimal-cover",
+        "claim": "Simplify the minimal-cover cardinality proof with the requested grind-based treatment.",
+        "resolution_criteria": "The minimal-cover cardinality theorem uses the shared concise grind formulation rather than the original explicit case analysis.",
+        "change_ids": ["change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69"],
+        "source_event_ids": ["event:5fb3d69626fe466c600cb088"]
+      },
+      {
+        "obligation_key": "grind-maximal-separated-subset",
+        "claim": "Simplify `maximalSeparatedSet_subset` using grind and the requested `IsSeparated.empty` support.",
+        "resolution_criteria": "The theorem is closed by the shared grind-based formulation and the empty-set separation fact is available to grind.",
+        "change_ids": ["change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0"],
+        "source_event_ids": ["event:aeda75a9b9e4d59f7fe0b77f"]
+      },
+      {
+        "obligation_key": "grind-is-separated-maximal-set",
+        "claim": "Simplify `isSeparated_maximalSeparatedSet` with the requested grind-based treatment.",
+        "resolution_criteria": "The theorem uses the shared concise grind formulation rather than the original explicit case analysis.",
+        "change_ids": ["change:e4abffbd5298e527521a1b47619698cae670b602ff1476007674eff13f6e5db6"],
+        "source_event_ids": ["event:aeda75a9b9e4d59f7fe0b77f"]
+      },
+      {
+        "obligation_key": "grind-card-maximal-separated-set",
+        "claim": "Simplify the maximal-separated-set cardinality proof with the requested grind-based treatment.",
+        "resolution_criteria": "The maximal-separated-set cardinality theorem uses the shared concise grind formulation rather than the original explicit case analysis.",
+        "change_ids": ["change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f"],
+        "source_event_ids": ["event:aeda75a9b9e4d59f7fe0b77f"]
+      },
+      {
+        "obligation_key": "rename-encard-minimal-cover",
+        "claim": "Rename the minimal-cover cardinality lemma with an `encard_` prefix.",
+        "resolution_criteria": "The public lemma is named `encard_minimalCover` or follows the requested `encard_` naming convention.",
+        "change_ids": ["change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69"],
+        "source_event_ids": ["event:4bc6e19c39528a0fd514185c"]
+      },
+      {
+        "obligation_key": "rename-encard-maximal-separated-set",
+        "claim": "Rename the maximal-separated-set cardinality lemma with an `encard_` prefix.",
+        "resolution_criteria": "The public lemma is named `encard_maximalSeparatedSet` or follows the requested `encard_` naming convention.",
+        "change_ids": ["change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f"],
+        "source_event_ids": ["event:2adc4718a9fe077165492ccc"]
+      },
+      {
+        "obligation_key": "rename-encard-le-is-separated",
+        "claim": "Rename `card_le_of_isSeparated` with the requested `encard_` prefix.",
+        "resolution_criteria": "The public lemma is named `encard_le_of_isSeparated` or follows the requested `encard_` naming convention.",
+        "change_ids": ["change:f36711f88985da8ca9fdecb17a4bbca6b2ce641c8a72161c6dd4d4495209c825"],
+        "source_event_ids": ["event:4ac70722c18bd6c73d3452a2"]
+      }
+    ],
+    "rationale": "The broad shorthand comments cover seven proof rewrites and three independent public-name changes; each has a separately observable resolution.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33078_i01",
+    "decision": "accept_atomic",
+    "obligations": [
+      {
+        "obligation_key": "cyclotomic-mahler-proof-rewrite",
+        "claim": "Rewrite `cyclotomic_mahlerMeasure_eq_one` using a `NeZero n` instance, reduction to the primitive-root product, and a pointwise norm bound followed by `Multiset.prod_eq_one`.",
+        "resolution_criteria": "The proof follows the requested primitive-root product argument, including a local `NeZero n` instance and the norm-one bound, instead of the original direct simp proof.",
+        "change_ids": ["change:2dfdb214f28fd7c7f787b1ec4df7b77f6c2ccf668a5192de6d10730bfbc3e21b"],
+        "source_event_ids": ["event:b669959d341b94a3c3715193", "event:f3380041823d15e98bb937f7"]
+      }
+    ],
+    "rationale": "The follow-up comment refines one coherent replacement proof rather than requesting an independently adoptable change.",
+    "curator": "codex-assisted-curation/1"
+  },
+  {
+    "source_intervention_id": "pr33067_i01",
+    "decision": "split",
+    "obligations": [
+      {
+        "obligation_key": "recall-binder-info",
+        "claim": "Do not mark the `recall` identifier as a binder unless the command actually creates an environment declaration.",
+        "resolution_criteria": "The `recall` elaborator reports identifier information without incorrectly setting `isBinder := true` for a nondeclaration.",
+        "change_ids": ["change:c16d184071d368126cedb4680a0b8b24168f4f2f640567e8d09395f59c213d5c"],
+        "source_event_ids": ["event:49dacc883c2ee88ca1acf476"]
+      },
+      {
+        "obligation_key": "alias-in-info-consistency",
+        "claim": "Apply the same corrected identifier information reporting behavior to the `alias_in` command.",
+        "resolution_criteria": "`alias_in` uses the corrected nonbinder information-reporting behavior consistently with `recall`.",
+        "change_ids": ["change:c16d184071d368126cedb4680a0b8b24168f4f2f640567e8d09395f59c213d5c"],
+        "source_event_ids": ["event:19a36bd186826dbfe70b5dc5"]
+      }
+    ],
+    "rationale": "The follow-up asks for the same fix in another command, which is a distinct coverage obligation even though the reviewed patch exposes only the primary command location.",
+    "curator": "codex-assisted-curation/1"
+  }
+]

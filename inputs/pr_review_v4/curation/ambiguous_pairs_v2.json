@@ -1,0 +1,40 @@
+{
+  "schema_version": "pr4-ambiguous-pairs2",
+  "registry_version": "ambiguous-pairs/2",
+  "created": "2026-08-06",
+  "supersedes": "inputs/pr_review_v4/curation/ambiguous_pairs_v1.json",
+  "note": "Human rulings that a specific comparison is undecidable under the current rubric. A ruled comparison is neither a match nor a miss: it is reported as its own category so a genuinely undecidable case is never silently counted as either. Rulings are frozen; add entries, do not edit them.",
+  "changes_from_v1": [
+    "Rulings are keyed by (obligation_id, candidate_id, level) rather than obligation_id alone. The documented ambiguity is a property of a *relationship* — a candidate asking for a prerequisite of the maintainer's change — not of the obligation, so an obligation-wide key over-applied it to every other candidate that happened to reach the same obligation.",
+    "`level` distinguishes issue-level from resolution-level ambiguity. v1 applied its ruling to issue recall only; resolution recall ignored the registry entirely, which made `resolution_recall > issue_recall` reachable even though the two-level design says it is impossible.",
+    "`candidate_id: \"*\"` preserves an obligation-wide ruling where that is genuinely what was meant. The migrated v1 entry uses it, because its rationale names a class of candidates rather than one.",
+    "Rubric v9 adds a judge-emitted `abstain` verdict. That does not retire this registry: an abstention is the judge declining, while a ruling is a human deciding the rubric cannot settle the case. They are reported separately."
+  ],
+  "policy": {
+    "denominator": "Ambiguous comparisons stay in the obligation denominator and are reported separately. They are NOT excluded, because excluding them would inflate recall by removing the hardest cases.",
+    "obligation_status": "An obligation is `hit` if it issue-matches through at least one comparison that is not ruled ambiguous; `ambiguous` if its only issue-matching comparisons are ruled; `miss` otherwise. A ruled obligation with no issue-match is still a miss — the ruling governs how a match is counted, not whether one occurred.",
+    "levels": "A resolution-level ruling applies only to resolution scoring. An issue-level ruling propagates to resolution, because resolution is defined as conditional on issue: if it is undecidable whether the candidate names the same issue, it cannot be decidable whether its fix resolves it."
+  },
+  "rulings": [
+    {
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "candidate_id": "*",
+      "level": "issue",
+      "ruling": "ambiguous",
+      "ruled_by": "human",
+      "ruled_at": "2026-08-05",
+      "migrated_from": "ambiguous-pairs/1",
+      "gold_claim": "In `coveringNumber_le_packingNumber`, replace the manual `by_cases` proof with the `by_cases!` pattern and use `encard_maximalSeparatedSet` together with `IsCover.coveringNumber_le_encard`.",
+      "rationale": "Candidates ask to rename `card_maximalSeparatedSet` to `encard_maximalSeparatedSet` and update downstream uses. Because the gold ask's own text names the renamed form, the requested proof rewrite presupposes the rename — the candidate requests a prerequisite of the maintainer's change rather than the change itself. Whether a prerequisite counts as the same issue is not settled by the rubric: 'a different fix may still issue-match' points one way, 'a rename when the ask is a proof change is false' points the other. Both v7.1 and v8 returned issue=True 3/3 on this pair, with reasoning that is defensible either way, so it is not judge noise.",
+      "scope_note": "Kept obligation-wide (`candidate_id: \"*\"`) because the rationale names a class of candidates — all of those asking for the prerequisite rename — rather than one specific candidate. New rulings should name the candidate.",
+      "evidence": "results/pr_review_v4/audits/judge-v8/VERDICT.md"
+    }
+  ],
+  "candidates_for_ruling": [
+    {
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "gold_claim": "In `coveringNumber_two_mul_le_externalCoveringNumber`, replace the `rcases Set.eq_empty_or_nonempty A` split with `(rfl | h_nonempty)` and discharge the empty case by `simp`.",
+      "why": "Candidates argue the split is dead code because `h_nonempty` is unused and propose removing it. Same rubric tension as the ruled entry, and the judge split its own samples 2-of-3 on it under v7.1 — the empirical signature of ambiguity. It is also one of the two pairs that carried v8's resolution-level splits, so a ruling here directly affects whether resolution recall is quotable. Not ruled: awaiting a human decision."
+    }
+  ]
+}

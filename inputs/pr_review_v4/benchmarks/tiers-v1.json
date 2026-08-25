@@ -1,0 +1,44 @@
+{
+  "schema_version": "benchmark-tiers1",
+  "created": "2026-07-17",
+  "spec": "docs/research/pr-review-v4-benchmark-tiers.md",
+  "note": "Tiers are development-contaminated to different degrees; none replaces the frozen temporal holdout. Large-tier reporting must include the unseen slice (large minus dev/medium gold PRs).",
+  "tiers": {
+    "small": {
+      "role": "dev smoke; unlimited iteration",
+      "gold_prs": [33057, 33098],
+      "control_prs": [33438]
+    },
+    "medium": {
+      "role": "pre-registered treatment comparisons; method census",
+      "look_budget": "pre-registered runs only",
+      "gold_prs": [33057, 33066, 33098, 33117, 33305, 33421, 33145, 33149, 33285, 33294, 33321, 33337, 33362],
+      "control_prs": [33304, 33315, 33438],
+      "additions_beyond_pilot9": {
+        "33149": "correctness x2 (no-axioms policy, Parseval dup); only correctness-rich PR",
+        "33362": "scope: namespace placement, adopted",
+        "33145": "dualization multi-anchor family; synthesis/propagation test",
+        "33337": "naming x2 adopted; naming_contrast non-motivating case",
+        "33321": "docs x2 + dropped-heavy; worthiness calibration",
+        "33294": "51 sites; size/batching stress",
+        "33285": "proof-golf x2; historical-store non-motivating case"
+      },
+      "release": "inputs/pr_review_v4/releases/dev-medium-0.1.0",
+      "run_config": "configs/pr_review_v4_medium.yaml",
+      "prerequisites": "BUILT 2026-07-17 from dev-judgment-stable-0.9.0 (pilot.py --cases medium); remaining: lean builds for 7 new base commits (data/pr_review_v4/medium_base_commits.jsonl) + optional curation sitting (inputs/pr_review_v4/curation/medium_additions_digest.md)"
+    },
+    "large": {
+      "role": "confirmation at scale; <=3 uses over project lifetime; requires passed medium gate",
+      "gold_prs": [
+        33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+        33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145,
+        33146, 33149, 33150, 33153, 33154, 33169, 33183, 33190, 33201, 33203,
+        33207, 33208, 33232, 33267, 33268, 33283, 33285, 33287, 33294, 33310,
+        33316, 33321, 33332, 33333, 33337, 33343, 33345, 33349, 33356, 33362,
+        33373, 33376, 33395, 33400, 33401, 33419, 33421
+      ],
+      "control_prs": "reuse medium controls; extend before first large use",
+      "unseen_slice_definition": "large gold_prs minus (small.gold_prs union medium.gold_prs)"
+    }
+  }
+}
