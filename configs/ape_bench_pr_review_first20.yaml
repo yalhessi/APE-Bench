@@ -1,0 +1,45 @@
+repo_owner: leanprover-community
+repo_name: mathlib4
+
+output_file: inputs/proof_pr_review/ape_bench_first20_pr_review.jsonl
+
+pr_numbers:
+  - 33777
+  - 33113
+  - 33871
+  - 33771
+  - 33772
+  - 33447
+  - 33837
+  - 32764
+  - 33614
+  - 27706
+  - 30736
+  - 33779
+  - 33704
+  - 27542
+
+include_merged: true
+include_unmerged: true
+exclude_draft: false
+
+decision_review_states:
+  - APPROVED
+  - CHANGES_REQUESTED
+  - COMMENTED
+include_comment_only_rounds: true
+max_review_events_per_pr: 0
+
+min_changed_files: 1
+max_changed_files: 500
+min_diff_lines: 0
+max_diff_lines: 1000000
+
+require_lean_files: true
+require_maintainer_feedback: true
+
+materialize_slice_outputs: true
+materialize_variant_manifests: true
+materialize_split_task_outputs: true
+
+request_interval_seconds: 0.0

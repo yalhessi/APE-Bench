@@ -1,0 +1,38 @@
+# Score a v5 run against gold: issue_match and resolution_match, rubric v8.
+#
+# `input_kind: finding` judges the text the system actually publishes, not pre-merge
+# candidate wording — a verdict on wording the merge discarded credits nothing real.
+#
+# Aggregation is `majority_issue_then_resolution_among_issue_matching`: resolution is only
+# scored among pairs whose issue already matched, which is exactly the two-level question
+# ("did it raise the same issue" / "and did it propose the same fix").
+scaffold_type: ape_agent
+
+llm_config:
+  # Must stay gpt_5_mini: judge_version and model are both in the cache key and in the task
+  # record hash, so changing either forks the cache and forfeits every cached verdict.
+  model_name: gpt_5_mini
+  max_tokens: 4000
+  thinking_budget_tokens: 3000
+
+execution:
+  max_turns: 4
+  max_concurrency: 4
+  sample_count: 3        # majority vote, and it measures its own verdict flips
+  sample_max_cost: 0.10
+
+task_config:
+  enabled_tools: []      # the judge reads its pair from the prompt
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  input_kind: finding
+  candidates: results/pr_review_v5/runs/pr_review_v5_lead_medium_heldout_rep1/findings.jsonl
+  out_dir: results/pr_review_v5/audits/medium-heldout-rep1
+  run_name: pr_review_v5_judge_medium_heldout_rep1
+  pr_numbers: [33117, 33145, 33149, 33285, 33294, 33305, 33321, 33337, 33362, 33421]
+  # 33438 has no gold: maintainers asked for nothing. Anything emitted there is a false
+  # positive, and this is what counts it.
+  control_pr_numbers: [33304, 33315]
+  pairing_tiers: [anchor]
+  dry_run: true
