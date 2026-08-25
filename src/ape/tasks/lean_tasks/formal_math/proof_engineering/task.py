@@ -421,134 +421,20 @@ class LeanProofEngineeringTask(BaseLeanTask):
                 }
     
     async def _evaluate_proof_engineering(self, final_code: str) -> EvaluationResult:
-        """Evaluate proof engineering submission."""
-        from ape.tasks.lean_tasks.formal_math.judgment.task import lean_semantic_evaluation
-        import time
+        """Evaluate proof engineering submission.
 
+        Runs the two verification stages in order: syntax (Lean compilation) then
+        semantic (LLM judge). The stages are factored into helper methods so that
+        subclasses can interpose additional gates (e.g. a maintainer-reviewer) between
+        them without duplicating verification logic.
+        """
         try:
-            pe_config: LeanProofEngineeringConfig = self.config.task_config
-            syntax_result = None
+            syntax_failure = await self._run_syntax_validation(final_code)
+            if syntax_failure is not None:
+                return syntax_failure
 
-            # Syntax validation (optional based on config)
-            if not pe_config.skip_syntax_validation:
-                from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
-                if not self.target_workspace or not self.scratch_workspace:
-                    raise RuntimeError("Workspaces not initialized for Lean verification")
-                lean_tool = LeanVerifyToolsProvider(
-                    task=self,
-                    config=self.config,
-                    logger=self.logger
-                )
+            return await self._run_semantic_validation(final_code)
 
-                syntax_result = await lean_tool.execute(code=final_code)
-
-                if not syntax_result["success"]:
-                    error_messages = []
-                    for err in syntax_result.get("errors", []):
-                        error_messages.append(err["data"])
-
-                    warning_messages = []
-                    for warn in syntax_result.get("warnings", []):
-                        warning_messages.append(warn["data"])
-
-                    message_parts = ["Lean verification failed."]
-                    if error_messages:
-                        message_parts.append(f"\nErrors:\n" + "\n".join(f"- {msg}" for msg in error_messages))
-                    if warning_messages:
-                        message_parts.append(f"\nWarnings:\n" + "\n".join(f"- {msg}" for msg in warning_messages))
-
-                    return EvaluationResult(
-                        success=False,
-                        score=0.0,
-                        message="\n".join(message_parts),
-                        metrics=None
-                    )
-            else:
-                syntax_result = {"success": True, "message": "Syntax validation skipped"}
-
-            # Semantic validation (if enabled)
-            semantic_result = None
-            if pe_config.semantic_validation.enabled:
-                
-                from ape.tasks.lean_tasks.formal_math.judgment.task import lean_semantic_evaluation
-                semantic_result = await lean_semantic_evaluation(
-                    final_code=final_code,
-                    original_code=self.data.original_code,
-                    task_description=self.data.task_description,
-                    semantic_config=pe_config.semantic_validation,
-                    base_config=self.config,
-                    reference_implementation=self.data.reference_implementation,
-                    filename=self.data.filename,
-                    target_workspace=self.data.target_workspace,
-                    gold_diff=self.data.gold_diff,
-                    logger=self.logger,
-                    parent_attempt_path=self.attempt_path
-                )
-
-            # Compute final result
-            if semantic_result:
-                if not semantic_result['success']:
-                    return EvaluationResult(
-                        success=False,
-                        score=0.0,
-                        message=f"Semantic validation system failed: {semantic_result['message']}"
-                    )
-
-                judgment_conclusion = semantic_result['judgment_conclusion']
-                semantic_positive = judgment_conclusion == "positive"
-
-                if not semantic_positive:
-                    # Extract negative assessments (poor/unacceptable dimensions)
-                    aggregated_evals = semantic_result.get('aggregated_evaluations', {})
-                    judge_results = aggregated_evals.get('judge_results', [])
-                    negative_feedback = []
-
-                    for judge_result in judge_results:
-                        if not judge_result.success:
-                            continue
-
-                        judgment_data = judge_result.judgment_data
-                        dimensions = [
-                            ('semantic_correctness', 'Semantic Correctness'),
-                            ('requirement_alignment', 'Requirement Alignment'),
-                            ('scope_control', 'Scope Control')
-                        ]
-
-                        for dim_key, dim_name in dimensions:
-                            rating = judgment_data.get(f'{dim_key}_rating', '')
-                            if rating in ['poor', 'unacceptable']:
-                                assessment = judgment_data.get(f'{dim_key}_assessment', '')
-                                negative_feedback.append(f"**{dim_name}** ({rating}):\n{assessment}")
-
-                    if negative_feedback:
-                        unique_feedback = list(dict.fromkeys(negative_feedback))
-                        message = "Semantic validation failed. Issues identified:\n\n" + "\n\n".join(unique_feedback)
-                    else:
-                        message = f"Semantic validation failed: judgment was '{judgment_conclusion}' but no critical issues (poor/unacceptable) were identified."
-
-                    return EvaluationResult(
-                        success=True,
-                        score=0.0,
-                        message=message,
-                        metrics=None,
-                        nested_token_usage=semantic_result.get('nested_token_usage')
-                    )
-                else:
-                    return EvaluationResult(
-                        success=True,
-                        score=1.0,
-                        message="Proof engineering evaluation completed successfully",
-                        metrics=None,
-                        nested_token_usage=semantic_result.get('nested_token_usage')
-                    )
-            else:
-                return EvaluationResult(
-                    success=True,
-                    score=1.0,
-                    message="Proof engineering evaluation completed successfully (syntax only)" if not pe_config.skip_syntax_validation else "Proof engineering evaluation completed successfully (no validation)",
-                    metrics=None
-                )
-            
         except Exception:
             if self.logger:
                 self.logger.error(f"Lean proof engineering execution failed: {traceback.format_exc()}")
@@ -556,6 +442,139 @@ class LeanProofEngineeringTask(BaseLeanTask):
                 success=False,
                 score=0.0,
                 message=traceback.format_exc()
+            )
+
+    async def _run_syntax_validation(self, final_code: str) -> Optional[EvaluationResult]:
+        """Run Lean syntax/compilation validation.
+
+        Returns ``None`` when validation passes (or is skipped); returns a failing
+        ``EvaluationResult`` that callers should short-circuit on when it fails.
+        """
+        pe_config: LeanProofEngineeringConfig = self.config.task_config
+
+        if pe_config.skip_syntax_validation:
+            return None
+
+        from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
+        if not self.target_workspace or not self.scratch_workspace:
+            raise RuntimeError("Workspaces not initialized for Lean verification")
+        lean_tool = LeanVerifyToolsProvider(
+            task=self,
+            config=self.config,
+            logger=self.logger
+        )
+
+        syntax_result = await lean_tool.execute(code=final_code)
+
+        if not syntax_result["success"]:
+            error_messages = []
+            for err in syntax_result.get("errors", []):
+                error_messages.append(err["data"])
+
+            warning_messages = []
+            for warn in syntax_result.get("warnings", []):
+                warning_messages.append(warn["data"])
+
+            message_parts = ["Lean verification failed."]
+            if error_messages:
+                message_parts.append(f"\nErrors:\n" + "\n".join(f"- {msg}" for msg in error_messages))
+            if warning_messages:
+                message_parts.append(f"\nWarnings:\n" + "\n".join(f"- {msg}" for msg in warning_messages))
+
+            return EvaluationResult(
+                success=False,
+                score=0.0,
+                message="\n".join(message_parts),
+                metrics=None
+            )
+
+        return None
+
+    async def _run_semantic_validation(self, final_code: str) -> EvaluationResult:
+        """Run semantic (LLM-judge) validation and compute the final result."""
+        from ape.tasks.lean_tasks.formal_math.judgment.task import lean_semantic_evaluation
+
+        pe_config: LeanProofEngineeringConfig = self.config.task_config
+
+        # Semantic validation (if enabled)
+        semantic_result = None
+        if pe_config.semantic_validation.enabled:
+            semantic_result = await lean_semantic_evaluation(
+                final_code=final_code,
+                original_code=self.data.original_code,
+                task_description=self.data.task_description,
+                semantic_config=pe_config.semantic_validation,
+                base_config=self.config,
+                reference_implementation=self.data.reference_implementation,
+                filename=self.data.filename,
+                target_workspace=self.data.target_workspace,
+                gold_diff=self.data.gold_diff,
+                logger=self.logger,
+                parent_attempt_path=self.attempt_path
+            )
+
+        # Compute final result
+        if semantic_result:
+            if not semantic_result['success']:
+                return EvaluationResult(
+                    success=False,
+                    score=0.0,
+                    message=f"Semantic validation system failed: {semantic_result['message']}"
+                )
+
+            judgment_conclusion = semantic_result['judgment_conclusion']
+            semantic_positive = judgment_conclusion == "positive"
+
+            if not semantic_positive:
+                # Extract negative assessments (poor/unacceptable dimensions)
+                aggregated_evals = semantic_result.get('aggregated_evaluations', {})
+                judge_results = aggregated_evals.get('judge_results', [])
+                negative_feedback = []
+
+                for judge_result in judge_results:
+                    if not judge_result.success:
+                        continue
+
+                    judgment_data = judge_result.judgment_data
+                    dimensions = [
+                        ('semantic_correctness', 'Semantic Correctness'),
+                        ('requirement_alignment', 'Requirement Alignment'),
+                        ('scope_control', 'Scope Control')
+                    ]
+
+                    for dim_key, dim_name in dimensions:
+                        rating = judgment_data.get(f'{dim_key}_rating', '')
+                        if rating in ['poor', 'unacceptable']:
+                            assessment = judgment_data.get(f'{dim_key}_assessment', '')
+                            negative_feedback.append(f"**{dim_name}** ({rating}):\n{assessment}")
+
+                if negative_feedback:
+                    unique_feedback = list(dict.fromkeys(negative_feedback))
+                    message = "Semantic validation failed. Issues identified:\n\n" + "\n\n".join(unique_feedback)
+                else:
+                    message = f"Semantic validation failed: judgment was '{judgment_conclusion}' but no critical issues (poor/unacceptable) were identified."
+
+                return EvaluationResult(
+                    success=True,
+                    score=0.0,
+                    message=message,
+                    metrics=None,
+                    nested_token_usage=semantic_result.get('nested_token_usage')
+                )
+            else:
+                return EvaluationResult(
+                    success=True,
+                    score=1.0,
+                    message="Proof engineering evaluation completed successfully",
+                    metrics=None,
+                    nested_token_usage=semantic_result.get('nested_token_usage')
+                )
+        else:
+            return EvaluationResult(
+                success=True,
+                score=1.0,
+                message="Proof engineering evaluation completed successfully (syntax only)" if not pe_config.skip_syntax_validation else "Proof engineering evaluation completed successfully (no validation)",
+                metrics=None
             )
 
     def create_result(
