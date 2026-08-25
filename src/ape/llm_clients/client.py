@@ -15,8 +15,8 @@ from ape.utils.logging import create_logger
 
 from .config import LLMConfig, LLMProvider, ProviderError, ContextLengthExceededError, MalformedResponseError
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
-from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter
-from .providers import BaseProvider
+from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
+from .providers import BaseProvider, OpenAIProvider
 from .logger import LLMLogger
 
 if TYPE_CHECKING:
@@ -34,11 +34,19 @@ class LLMClient:
 
         self.response_processor = ResponseProcessor(logger=self.logger)
         self.streaming_processor = StreamingProcessor(logger=self.logger, llm_logger=self.llm_logger)
-        self.message_formatter = MessageFormatter()
+        self.message_formatter = self._create_message_formatter()
 
     def _create_provider(self):
         """Create provider instance based on configuration."""
+        if self.config.provider_type == LLMProvider.OPENAI:
+            return OpenAIProvider(self.config, self.logger, self.llm_logger)
         return BaseProvider(self.config, self.logger, self.llm_logger)
+
+    def _create_message_formatter(self):
+        """Create message formatter instance based on configuration."""
+        if self.config.provider_type == LLMProvider.OPENAI:
+            return OpenAIMessageFormatter()
+        return MessageFormatter()
 
     async def __aenter__(self):
         """Enter async context manager."""

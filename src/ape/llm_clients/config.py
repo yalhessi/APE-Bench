@@ -2,6 +2,7 @@
 LLM Clients Configuration System.
 """
 
+import os
 from typing import Optional, Dict, Any
 from enum import Enum
 from pydantic import BaseModel, Field
@@ -59,6 +60,18 @@ MODEL_MAPPINGS = {
         "output_per_1M": 2.50,
         "cached_input_per_1M_usd": 0.075,
         "cache_creation_per_1M_usd": 0.03
+    },
+    "gpt_5.4": {
+        # Bare alias resolves to the latest gpt-5.4 snapshot; swap to a dated id
+        # (e.g. "gpt-5.4-YYYY-MM-DD") if the endpoint requires a pinned snapshot.
+        "model_name": "gpt-5.4",
+        "provider": LLMProvider.OPENAI,
+        # PLACEHOLDER pricing copied from gpt-5.2 — update with real gpt-5.4 rates;
+        # only affects cost_usd reporting, not model behavior.
+        "input_per_1M": 1.75,
+        "output_per_1M": 14.00,
+        "cached_input_per_1M_usd": 0.125,
+        "cache_creation_per_1M_usd": 1.25
     },
     "gpt_5.2": {
         "model_name": "gpt-5.2-2025-12-11",
@@ -141,6 +154,8 @@ class LLMConfig(BaseModel):
         # Compute the formal model name
         self.formal_model_name = self.normalize_model_name(self.model_name)
         self.provider_type = self.detect_provider_type(self.model_name)
+        if not self.api_key:
+            self.api_key = self._resolve_api_key_from_environment(self.provider_type)
     
     @staticmethod
     def detect_provider_type(model_name: str) -> LLMProvider:
@@ -174,6 +189,15 @@ class LLMConfig(BaseModel):
             f"Unknown model name: {model_name}. "
             f"Supported models: {', '.join(MODEL_MAPPINGS.keys())}"
         )
+
+    @staticmethod
+    def _resolve_api_key_from_environment(provider_type: Optional[LLMProvider]) -> Optional[str]:
+        """Resolve provider API key from standard environment variables."""
+        if provider_type == LLMProvider.OPENAI:
+            return os.getenv("OPENAI_API_KEY")
+        if provider_type == LLMProvider.GEMINI:
+            return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        return None
 
 # Exception classes
 class LLMError(Exception):
