@@ -1,0 +1,98 @@
+{
+ "dev-pilot-0.9.1-canonical-smoke|opportunity:1640a7a03e63bcbe1e62c110": [
+  "canonical_api_search.v1",
+  "canonical-api",
+  "no_request",
+  "invalid",
+  "contradicted",
+  null
+ ],
+ "dev-pilot-0.9.1-canonical-smoke|opportunity:d647742eb3b2dd76d880300c": [
+  "canonical_api_search.v1",
+  "canonical-api",
+  "defer",
+  "uncertain",
+  "applicable",
+  null
+ ],
+ "dev-pilot-0.9.2-naming-smoke|opportunity:01abe7fb78ddd0709d6f5a63": [
+  "naming_contrast.v1",
+  "strong-naming",
+  "no_request",
+  "invalid",
+  "contradicted",
+  null
+ ],
+ "dev-pilot-0.9.2-naming-smoke|opportunity:7c9c3d27f35bc3aebbb109da": [
+  "naming_contrast.v1",
+  "strong-naming",
+  "request",
+  "valid",
+  "applicable",
+  "advisory"
+ ],
+ "dev-pilot-0.9.3-wrapper-smoke|opportunity:22049f958b613a5c6fb42331": [
+  "wrapper_composition.v1",
+  "wrapper-composition",
+  "defer",
+  "uncertain",
+  "applicable",
+  null
+ ],
+ "dev-pilot-0.9.3-wrapper-smoke|opportunity:3155b971f2f221f36d42704f": [
+  "wrapper_composition.v1",
+  "wrapper-composition",
+  "no_request",
+  "invalid",
+  "contradicted",
+  null
+ ],
+ "dev-pilot-0.9.4-fixed-smoke|opportunity:01abe7fb78ddd0709d6f5a63": [
+  "naming_contrast.v1",
+  "strong-naming",
+  "no_request",
+  "invalid",
+  "contradicted",
+  null
+ ],
+ "dev-pilot-0.9.4-fixed-smoke|opportunity:1640a7a03e63bcbe1e62c110": [
+  "canonical_api_search.v1",
+  "canonical-api",
+  "no_request",
+  "invalid",
+  "contradicted",
+  null
+ ],
+ "dev-pilot-0.9.4-fixed-smoke|opportunity:22049f958b613a5c6fb42331": [
+  "wrapper_composition.v1",
+  "wrapper-composition",
+  "defer",
+  "uncertain",
+  "applicable",
+  null
+ ],
+ "dev-pilot-0.9.4-fixed-smoke|opportunity:3155b971f2f221f36d42704f": [
+  "wrapper_composition.v1",
+  "wrapper-composition",
+  "no_request",
+  "invalid",
+  "contradicted",
+  null
+ ],
+ "dev-pilot-0.9.4-fixed-smoke|opportunity:7c9c3d27f35bc3aebbb109da": [
+  "naming_contrast.v1",
+  "strong-naming",
+  "request",
+  "valid",
+  "applicable",
+  "advisory"
+ ],
+ "dev-pilot-0.9.4-fixed-smoke|opportunity:d647742eb3b2dd76d880300c": [
+  "canonical_api_search.v1",
+  "canonical-api",
+  "defer",
+  "uncertain",
+  "applicable",
+  null
+ ]
+}

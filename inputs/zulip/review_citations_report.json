@@ -1,0 +1,17 @@
+{
+  "by_maintainer": 147,
+  "citations": 147,
+  "resolved": 80,
+  "resolved_predating_comment": 75,
+  "unique_prs": 132,
+  "unique_urls": 143,
+  "unresolved_reasons": {
+    "outside_build_window": 45,
+    "stream_not_ingested:113489": 4,
+    "stream_not_ingested:116395": 12,
+    "stream_not_ingested:252551": 3,
+    "stream_not_ingested:335062": 1,
+    "stream_not_ingested:345428": 2
+  },
+  "with_message_anchor": 85
+}

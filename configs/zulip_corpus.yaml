@@ -1,0 +1,32 @@
+# Zulip discussion store: what to ingest.
+#
+#   python -m src.datasets.zulip.sync
+#   python -m src.datasets.zulip.build --config configs/zulip_corpus.yaml
+#
+# The window bounds what is *stored*. It is not a safety property: leak-freedom is
+# enforced per read by store.as_of, which drops messages at or after a given instant
+# and messages referencing the PR under review.
+
+# A year of discussion ending after the Dec-2025 review window used by the PR-review
+# benchmarks (review starts run 2025-11-18 .. 2025-12-31).
+#
+# NOTE: this is enough to browse and to ask "is this discussed". It is NOT enough to
+# measure a *trend*, and the `emerging` maturity level in the v5 norm-store design is
+# defined by a rising trend. Norm-maturity work should rebuild with since: "2018-01-01"
+# — same code path, ~4x the disk.
+since: "2024-11-01"
+until: null
+
+# Archive directory names under zulip_json/. A stream whose Zulip name contains "/"
+# is nested one level deeper in the archive; the builder descends automatically, so
+# the top-level name is what belongs here.
+streams:
+  - 287929-mathlib4                 # design and convention discussion
+  - 144837-PR-reviews               # per-PR review threads (topics encode !4#NNNNN)
+  - 217875-Is-there-code-for-X%3F   # library-inventory questions answered by maintainers
+  - 113488-general
+  - 270676-lean4
+  - 239415-metaprogramming-         # resolves to 239415-metaprogramming-/-tactics
+  - 263328-triage
+  - 113538-CI
+  - 428973-nightly-testing

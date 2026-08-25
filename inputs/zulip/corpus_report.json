@@ -1,0 +1,163 @@
+{
+  "archive_commit": "317d0b019cddc3ada59e929662747b7d10ee740c",
+  "first_ts": "2018-05-28T07:34:11Z",
+  "last_ts": "2026-07-30T01:24:28Z",
+  "messages": 180162,
+  "messages_from_bots": 12315,
+  "messages_from_roster": 85341,
+  "messages_in_window": 153023,
+  "normalize_version": "zulip-normalize/1",
+  "senders_distinct": 2163,
+  "senders_on_roster": 56,
+  "since": "2024-11-01",
+  "streams": [
+    {
+      "first_ts": "2022-02-03T17:32:23Z",
+      "last_ts": "2026-07-30T00:59:05Z",
+      "messages_in_window": 55663,
+      "messages_total": 139699,
+      "stream": "mathlib4",
+      "topics_dropped": {
+        "outside_window": 4062
+      },
+      "topics_kept": 3312,
+      "topics_scanned": 7374
+    },
+    {
+      "first_ts": "2022-11-20T11:40:57Z",
+      "last_ts": "2026-07-29T01:15:55Z",
+      "messages_in_window": 7885,
+      "messages_total": 32969,
+      "stream": "PR-reviews",
+      "topics_dropped": {
+        "outside_window": 2172
+      },
+      "topics_kept": 784,
+      "topics_scanned": 2956
+    },
+    {
+      "first_ts": "2020-01-17T02:16:32Z",
+      "last_ts": "2026-07-30T00:33:02Z",
+      "messages_in_window": 19682,
+      "messages_total": 73974,
+      "stream": "Is-there-code-for-X?",
+      "topics_dropped": {
+        "outside_window": 3993
+      },
+      "topics_kept": 1733,
+      "topics_scanned": 5726
+    },
+    {
+      "first_ts": "2018-05-28T07:34:11Z",
+      "last_ts": "2026-07-30T00:01:54Z",
+      "messages_in_window": 33386,
+      "messages_total": 209115,
+      "stream": "general",
+      "topics_dropped": {
+        "outside_window": 8196
+      },
+      "topics_kept": 2126,
+      "topics_scanned": 10322
+    },
+    {
+      "first_ts": "2021-01-05T11:51:55Z",
+      "last_ts": "2026-07-30T01:24:28Z",
+      "messages_in_window": 21175,
+      "messages_total": 100936,
+      "stream": "lean4",
+      "topics_dropped": {
+        "outside_window": 5851
+      },
+      "topics_kept": 2080,
+      "topics_scanned": 7931
+    },
+    {
+      "first_ts": "2024-03-21T19:29:34Z",
+      "last_ts": "2026-07-29T22:00:03Z",
+      "messages_in_window": 3075,
+      "messages_total": 8012,
+      "stream": "metaprogramming-/-tactics",
+      "topics_dropped": {
+        "outside_window": 344
+      },
+      "topics_kept": 311,
+      "topics_scanned": 655
+    },
+    {
+      "first_ts": "2023-09-08T14:04:19Z",
+      "last_ts": "2026-07-30T00:54:29Z",
+      "messages_in_window": 1562,
+      "messages_total": 4818,
+      "stream": "triage",
+      "topics_dropped": {
+        "outside_window": 883
+      },
+      "topics_kept": 770,
+      "topics_scanned": 1653
+    },
+    {
+      "first_ts": null,
+      "last_ts": null,
+      "messages_in_window": 0,
+      "messages_total": 11520,
+      "stream": "CI",
+      "topics_dropped": {
+        "outside_window": 15
+      },
+      "topics_kept": 0,
+      "topics_scanned": 15
+    },
+    {
+      "first_ts": "2024-03-13T07:43:43Z",
+      "last_ts": "2026-07-08T11:48:53Z",
+      "messages_in_window": 10595,
+      "messages_total": 14968,
+      "stream": "nightly-testing",
+      "topics_dropped": {
+        "outside_window": 28
+      },
+      "topics_kept": 917,
+      "topics_scanned": 945
+    }
+  ],
+  "tag_counts": {
+    "decl_refs": 17910,
+    "file_refs": 968,
+    "has_lean_code": 18266,
+    "is_poll": 128,
+    "is_reply_quote": 18268,
+    "issue_refs": 1387,
+    "mentions": 29894,
+    "pr_refs": 11762
+  },
+  "tags_version": "zulip-tags/1",
+  "threads": 12033,
+  "top_unrostered_senders": [
+    "Kenny Lau",
+    "Violeta Hernández",
+    "Edward van de Meent",
+    "Shreyas Srinivas",
+    "Snir Broshi",
+    "Robin Arnez",
+    "Wrenna Robson",
+    "Henrik Böving",
+    "Thomas Murrills",
+    "Jz Pan",
+    "Julian Berman",
+    "Joachim Breitner",
+    "Artie Khovanov",
+    "Asei Inoue",
+    "Matthew Ballard",
+    "Antoine Chambert-Loir",
+    "Weiyi Wang",
+    "Martin Dvořák",
+    "Jeremy Tan",
+    "Alex Meiburg",
+    "Chris Henson",
+    "Jakub Nowak",
+    "Jason Rute",
+    "Niels Voss",
+    "Frederick Pu"
+  ],
+  "until": null
+}
