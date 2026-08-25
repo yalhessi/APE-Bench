@@ -1,0 +1,44 @@
+# Semantic judgment as registered tasks (R0 equivalence arm).
+#
+# Judges the same (candidate, obligation) pairs the script form judges, so the two arms
+# can be compared verdict-for-verdict. The pairs below are the 0.9.0 stable smoke's, whose
+# script verdicts are already cached under data/pr_review_v4/cache/semantic_judge — so R0
+# spends model calls only on the new arm.
+#
+# sample_count: 3 is the point of the migration: it measures the known 2-of-3 verdict flip
+# on byte-identical inputs instead of letting it sit inside the headline as noise.
+
+scaffold_type: ape_agent
+
+llm_config:
+  # Must match the model whose verdicts are cached, or R0 compares two different judges.
+  model_name: gpt_5_mini
+  # Budgeted for THIS arm's submission protocol, not copied from the script's.
+  #
+  # The script returns its verdict as plain-text JSON; this task must emit a structured
+  # `submit_result` tool call, which costs extra tokens on top of the same reasoning. R0
+  # round 2 pinned the script's 1200/512 and 4 of 18 pairs then failed outright with
+  # `failed_model` — never reaching the tool call — and they were the borderline pairs the
+  # arms disagreed about, so the surviving agreement was a selection effect.
+  #
+  # Round 1 measured actual usage at 832-2752 reasoning tokens (median 1728). These values
+  # clear that ceiling with headroom while staying far below the framework defaults
+  # (32000/30000). See audits/r0-judge-equivalence/VERDICT-round2.md.
+  max_tokens: 4000
+  thinking_budget_tokens: 3000
+
+execution:
+  max_turns: 4          # one prompt, one submit_result call; 4 leaves room for a retry
+  max_concurrency: 4
+  sample_count: 3       # majority vote + disagreement measurement
+  sample_max_cost: 0.10
+
+task_config:
+  enabled_tools: []     # the judge reads its pair from the prompt; it needs no tools
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-pilot-0.9.0
+  candidates: results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3/candidates.jsonl
+  out_dir: results/pr_review_v4/audits/judge-v8/v8-rep1
+  run_name: pr_review_v4_judge_v8_rep1
+  dry_run: true
