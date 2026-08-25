@@ -45,6 +45,20 @@ from .formal_math.pr_review import (
     SkilledPolicyReviewPRData,
     SkilledPolicyReviewPRTask,
 )
+from .formal_math.pr_split import (
+    PRSplitChunk,
+    PRSplitConfig,
+    PRSplitData,
+    PRSplitResult,
+    PRSplitSubmission,
+    PRSplitTask,
+    SkilledPolicyPRSplitConfig,
+    SkilledPolicyPRSplitData,
+    SkilledPolicyPRSplitTask,
+    SkilledPRSplitConfig,
+    SkilledPRSplitData,
+    SkilledPRSplitTask,
+)
 
 __all__ = [
     'BaseLeanTask',
@@ -76,4 +90,16 @@ __all__ = [
     'SkilledPolicyReviewPRConfig',
     'SkilledPolicyReviewPRData',
     'SkilledPolicyReviewPRTask',
+    'PRSplitChunk',
+    'PRSplitConfig',
+    'PRSplitData',
+    'PRSplitResult',
+    'PRSplitSubmission',
+    'PRSplitTask',
+    'SkilledPolicyPRSplitConfig',
+    'SkilledPolicyPRSplitData',
+    'SkilledPolicyPRSplitTask',
+    'SkilledPRSplitConfig',
+    'SkilledPRSplitData',
+    'SkilledPRSplitTask',
 ]
