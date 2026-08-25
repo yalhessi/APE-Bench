@@ -5,9 +5,11 @@ Adds Lean-specific build functionality (lake build, cache management).
 """
 
 import os
+import re
 import asyncio
+import inspect
 from pathlib import Path
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Callable, Any, Iterable
 from datetime import datetime
 
 import aiofiles.os
@@ -16,11 +18,13 @@ import aiofiles.os
 from ape.toolkits.execute.base_source_manager import BaseSourceManager
 from ..config import LeanVerifyToolConfig
 from ..models import BuildResult, WorkspaceStatus
+from .blob_store import create_blob_store
+from .bundle_manager import SnapshotBundleManager
 from ..core.workspace_state import WorkspaceStateManager
 from ..core.storage import ContentStore
 from ..core.snapshot import SnapshotManager
-from ..utils.process_ops import run_command
-from ape.utils.file_ops import safe_remove_directory, list_files_recursive
+from ..utils.process_ops import is_process_alive, run_command
+from ape.utils.file_ops import safe_remove_directory, list_files_recursive, safe_unlink, file_lock
 from ..utils.exceptions import AlreadyBuildingError, AlreadyRestoringError
 from ape.utils.logging import create_logger
 
@@ -57,14 +61,117 @@ class BuildManager(BaseSourceManager):
         self.config: LeanVerifyToolConfig = actual_config
 
         # Lean-specific components
+        self.blob_store = create_blob_store(self.config, self.logger)
         self.state_manager = WorkspaceStateManager(self.config, self.logger, self.repo_name)
-        self.content_store = ContentStore(self.config, self.logger)
-        self.snapshot_manager = SnapshotManager(self.config, self.logger, self.repo_name)
+        self.content_store = ContentStore(self.config, self.logger, blob_store=self.blob_store)
+        self.snapshot_manager = SnapshotManager(
+            self.config,
+            self.logger,
+            self.repo_name,
+            blob_store=self.blob_store,
+        )
+        self.bundle_manager = SnapshotBundleManager(
+            self.config,
+            self.logger,
+            self.repo_name,
+            blob_store=self.blob_store,
+        )
 
         # Build workspace directory
         self.build_workspace_dir = self.config.get_build_workspace_dir(self.repo_name)
 
         self.logger.info(f"Lean BuildManager initialized [{self.repo_name}]")
+
+    @staticmethod
+    async def _emit_progress(progress_callback: Optional[Callable[[str], Any]], message: str) -> None:
+        if progress_callback is None:
+            return
+
+        result = progress_callback(message)
+        if inspect.isawaitable(result):
+            await result
+
+    @staticmethod
+    def _cache_namespace(cache_repo_full_name: Optional[str], fallback_repo_name: str) -> str:
+        """Build a filesystem-safe namespace for shared Lean cache downloads."""
+        raw_namespace = str(cache_repo_full_name or fallback_repo_name or "default").strip()
+        normalized = re.sub(r"[^A-Za-z0-9._-]+", "__", raw_namespace)
+        normalized = normalized.strip("._-")
+        return normalized or "default"
+
+    async def _cleanup_partial_cache_files(self, cache_dir: Path) -> int:
+        """Remove stale partial downloads before reusing a shared cache directory."""
+        try:
+            partial_files = await asyncio.to_thread(
+                lambda: [path for path in cache_dir.rglob("*.part") if path.is_file()]
+            )
+        except FileNotFoundError:
+            return 0
+        except Exception as exc:
+            self.logger.debug("Unable to enumerate partial cache files in %s: %s", cache_dir, exc)
+            return 0
+
+        removed_count = 0
+        for partial_file in partial_files:
+            try:
+                await safe_unlink(partial_file)
+                removed_count += 1
+            except Exception as exc:
+                self.logger.debug("Failed to remove partial cache file %s: %s", partial_file, exc)
+
+        return removed_count
+
+    async def _wait_for_build_completion(self, commit_hash: str) -> BuildResult:
+        """Wait for another process to finish building the same workspace."""
+        actual_timeout = self.config.restore_queue_timeout
+        poll_interval = self.config.workspace_restore_poll_interval
+        start_time = datetime.now()
+        last_progress_report = start_time
+
+        self.logger.info(f"Wait for build completion: {commit_hash}")
+
+        while (datetime.now() - start_time).total_seconds() < actual_timeout:
+            state = await self.state_manager.read_state(commit_hash)
+
+            if not state:
+                raise RuntimeError(f"[{commit_hash}] State file disappeared during wait")
+
+            if state.status in (
+                WorkspaceStatus.BUILT,
+                WorkspaceStatus.READY,
+                WorkspaceStatus.RESTORING,
+            ):
+                self.logger.info(f"Build completed in another process: {commit_hash}")
+                return BuildResult(
+                    success=True,
+                    commit_hash=commit_hash,
+                    build_duration=0.0,
+                    file_count=state.file_count,
+                )
+
+            if state.status == WorkspaceStatus.FAILED:
+                raise RuntimeError(f"[{commit_hash}] Build failed: {state.error_message}")
+
+            if state.status != WorkspaceStatus.BUILDING:
+                raise RuntimeError(f"[{commit_hash}] State abnormal during wait: {state.status}")
+
+            if state.build_pid and not is_process_alive(state.build_pid):
+                raise RuntimeError(
+                    f"[{commit_hash}] Waiting for build process to die (pid={state.build_pid})"
+                )
+
+            now = datetime.now()
+            if (now - last_progress_report).total_seconds() >= 15:
+                self.logger.info(
+                    "Still waiting for workspace build to finish for %s@%s...",
+                    self.repo_name,
+                    commit_hash[:8],
+                )
+                last_progress_report = now
+
+            await asyncio.sleep(poll_interval)
+
+        raise TimeoutError(f"[{commit_hash}] Waiting for build completion timed out ({actual_timeout}s)")
     
     async def build_workspace(self, commit_hash: str, force_rebuild: bool = False) -> BuildResult:
         """Build workspace
@@ -320,6 +427,14 @@ class BuildManager(BaseSourceManager):
             
             # 3. Store snapshot metadata
             await self.snapshot_manager.store_snapshot(commit_hash, file_mappings)
+            try:
+                await self.bundle_manager.store_snapshot_bundles(commit_hash, file_mappings)
+            except Exception as exc:
+                self.logger.warning(
+                    "Failed to build snapshot bundle acceleration for %s: %s",
+                    commit_hash,
+                    exc,
+                )
             self.logger.info(f"Create snapshot completed: {commit_hash}, file count: {file_count}")
             
             return file_count

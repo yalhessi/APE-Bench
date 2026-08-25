@@ -5,10 +5,161 @@ Provides common path configuration and operational parameters for all
 code execution toolkits (Lean, Isabelle, Coq, etc.)
 """
 
+import os
+import configparser
 from pathlib import Path
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict, model_validator
 from ape.utils.project import PROJECT_ROOT
+
+
+def _optional_env(*names: str) -> Optional[str]:
+    """Read environment variables in priority order and normalize empty strings to None."""
+    for name in names:
+        value = os.environ.get(name)
+        if value is None:
+            continue
+        value = value.strip()
+        if value:
+            return value
+    return None
+
+
+def _read_aws_ini_section(path: Path, section: str) -> dict[str, str]:
+    """Read a single AWS shared-config/credentials section if present."""
+    expanded_path = path.expanduser()
+    if not expanded_path.exists():
+        return {}
+
+    parser = configparser.RawConfigParser()
+    try:
+        parser.read(expanded_path, encoding="utf-8")
+    except Exception:
+        return {}
+
+    if not parser.has_section(section):
+        return {}
+
+    return {
+        key.strip(): value.strip()
+        for key, value in parser.items(section)
+        if value is not None and value.strip()
+    }
+
+
+def _load_aws_profile_settings(profile_name: Optional[str] = None) -> dict[str, str]:
+    """Load AWS shared profile settings from ~/.aws/config and ~/.aws/credentials.
+
+    Credentials files are traditionally for secrets only, but some S3-compatible
+    providers document extra profile keys there as well. We support both files so
+    users can rely on the conventions already present on their machines.
+    """
+    profile = (profile_name or _optional_env("AWS_PROFILE") or "default").strip() or "default"
+    config_path = Path(_optional_env("AWS_CONFIG_FILE") or "~/.aws/config")
+    credentials_path = Path(
+        _optional_env("AWS_SHARED_CREDENTIALS_FILE") or "~/.aws/credentials"
+    )
+
+    credentials_settings = _read_aws_ini_section(credentials_path, profile)
+    config_section = "default" if profile == "default" else f"profile {profile}"
+    config_settings = _read_aws_ini_section(config_path, config_section)
+
+    merged_settings = dict(credentials_settings)
+    merged_settings.update(config_settings)
+    return merged_settings
+
+
+class BundleAccelerationConfig(BaseModel):
+    """Configuration for snapshot-scoped remote bundle acceleration."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = Field(
+        default=False,
+        description="Whether to build and use snapshot-scoped remote bundles during cold restore",
+    )
+    max_object_size_bytes: int = Field(
+        default=1024 * 1024,
+        ge=1,
+        description="Only regular-file CAS objects at or below this size are included in bundles",
+    )
+    target_bundle_size_bytes: int = Field(
+        default=128 * 1024 * 1024,
+        ge=1,
+        description="Target uncompressed size for each snapshot-scoped bundle pack",
+    )
+    min_missing_objects_for_bundle_restore: int = Field(
+        default=512,
+        ge=1,
+        description="Minimum bundled-object misses required before restore downloads packs",
+    )
+    max_concurrent_bundle_downloads: int = Field(
+        default=4,
+        ge=1,
+        description="Maximum concurrent snapshot bundle downloads during restore",
+    )
+
+class RemoteArtifactStoreConfig(BaseModel):
+    """Configuration for the optional remote immutable-artifact backing store."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: str = Field(
+        default="s3",
+        description="Remote artifact-store backend kind. Currently only 's3' is supported.",
+    )
+    bucket: Optional[str] = Field(
+        default_factory=lambda: _optional_env("APE_CODE_EXECUTE_S3_BUCKET"),
+        description="Optional bucket used as a backing store for immutable execute artifacts",
+    )
+    prefix: str = Field(
+        default_factory=lambda: os.environ.get("APE_CODE_EXECUTE_S3_PREFIX", "").strip(),
+        description="Optional key prefix under the remote artifact-store bucket",
+    )
+    endpoint_url: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_ENDPOINT_URL",
+            "AWS_ENDPOINT_URL",
+        ),
+        description="Optional custom endpoint URL for the remote artifact store",
+    )
+    region: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_REGION",
+            "AWS_REGION",
+            "AWS_DEFAULT_REGION",
+        ),
+        description="Optional region name for the remote artifact store",
+    )
+    profile: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_PROFILE",
+            "AWS_PROFILE",
+        ),
+        description="Optional AWS profile name for the remote artifact store client",
+    )
+    request_checksum_calculation: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_REQUEST_CHECKSUM_CALCULATION",
+            "AWS_REQUEST_CHECKSUM_CALCULATION",
+        ),
+        description="Optional botocore request checksum calculation policy",
+    )
+    response_checksum_validation: Optional[str] = Field(
+        default_factory=lambda: _optional_env(
+            "APE_CODE_EXECUTE_S3_RESPONSE_CHECKSUM_VALIDATION",
+            "AWS_RESPONSE_CHECKSUM_VALIDATION",
+        ),
+        description="Optional botocore response checksum validation policy",
+    )
+    bundle_acceleration: BundleAccelerationConfig = Field(
+        default_factory=BundleAccelerationConfig,
+        description="Optional snapshot-scoped remote bundle acceleration settings",
+    )
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.bucket)
 
 
 class CodeExecuteToolConfig(BaseModel):
@@ -36,6 +187,12 @@ class CodeExecuteToolConfig(BaseModel):
     repos_dir: Path = Field(
         default=PROJECT_ROOT / "data/code_execute/repos",
         description="Base directory for all repository-specific data"
+    )
+
+    # Optional remote backing store for immutable artifacts and snapshots.
+    remote_artifact_store: RemoteArtifactStoreConfig = Field(
+        default_factory=RemoteArtifactStoreConfig,
+        description="Optional remote backing store for immutable execute artifacts and snapshots",
     )
 
     # ==================== Default Repository ====================
@@ -122,7 +279,30 @@ class CodeExecuteToolConfig(BaseModel):
 
     @model_validator(mode='after')
     def validate_and_create_directories(self):
-        """Convert to absolute paths and create base directories."""
+        """Convert to absolute paths, hydrate optional AWS settings, and create base directories."""
+        remote_store = self.remote_artifact_store
+        aws_profile_settings = _load_aws_profile_settings(remote_store.profile)
+
+        if remote_store.bucket is None:
+            remote_store.bucket = aws_profile_settings.get("ape_code_execute_s3_bucket")
+        if not remote_store.prefix:
+            remote_store.prefix = (
+                aws_profile_settings.get("ape_code_execute_s3_prefix")
+                or remote_store.prefix
+            )
+        if remote_store.endpoint_url is None:
+            remote_store.endpoint_url = aws_profile_settings.get("endpoint_url")
+        if remote_store.region is None:
+            remote_store.region = aws_profile_settings.get("region")
+        if remote_store.request_checksum_calculation is None:
+            remote_store.request_checksum_calculation = aws_profile_settings.get(
+                "request_checksum_calculation"
+            )
+        if remote_store.response_checksum_validation is None:
+            remote_store.response_checksum_validation = aws_profile_settings.get(
+                "response_checksum_validation"
+            )
+
         self.base_dir = self.base_dir.resolve()
         self.storage_dir = self.storage_dir.resolve()
         self.repos_dir = self.repos_dir.resolve()
