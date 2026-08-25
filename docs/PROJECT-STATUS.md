@@ -1,6 +1,6 @@
 # Project status — Mathlib PR review on top of APE-Bench
 
-*Branch `advisor-share`, cut 2026-08-25 against the APE-Bench drop at `main` (`2001734`).*
+*Branch `august-checkpoint`, cut 2026-08-25 against the APE-Bench drop at `main` (`2001734`).*
 
 This branch restages roughly nine months of work as 43 commits, each one thing, ordered so
 the design evolution reads forward. It is the same tree as the working repository, not a
@@ -38,7 +38,7 @@ Commit bodies carry the reasoning and the measurements. They are the primary doc
 file is the index and the honest ledger of what is unfinished.
 
 ```
-git log --reverse --stat main..advisor-share
+git log --reverse --stat main..august-checkpoint
 ```
 
 ---
