@@ -33,3 +33,7 @@ inputs/pr_review_v2/precedent_bench/*.jsonl
 # the rendered blueprint bundles.
 results/*/runs/*/arm_pool.jsonl
 results/blueprints/
+
+# The publishing clone used to restage this history. Redundant now that development
+# happens on this branch directly; kept out of the tree if it is ever recreated.
+share/
