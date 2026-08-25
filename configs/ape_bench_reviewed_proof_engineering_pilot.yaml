@@ -1,0 +1,35 @@
+# Pilot run for the reviewed proof-engineering task (proof engineering + maintainer
+# review gate before semantic judgment). Mirrors ape_bench_proof_engineering_pilot.yaml.
+# Use inputs/ape_bench/ape_bench_reviewed_first5.jsonl (task_type: lean_reviewed_proof_engineering).
+
+llm_config:
+  # Generator model. Requires OPENAI_API_KEY.
+  model_name: gpt_5.2
+
+execution:
+  max_turns: 100
+  sample_count: 1
+  sample_max_cost: 3.0
+  max_concurrency: 2
+
+task_config:
+  semantic_validation:
+    enabled: true
+  # Maintainer-reviewer gate: must pass (merge-ready) before semantic judgment runs.
+  review_gate:
+    enabled: true
+    num_reviewers: 1          # raise for majority-vote over multiple reviewers
+    model: gpt_5.2            # reviewer model (can differ from the generator)
+    judge_mode: generated_only  # set to with_ground_truth to show the reviewer the gold diff
+    fail_open: true           # on reviewer subsystem error, proceed to semantic instead of looping
+  enabled_tools:
+    - bash_execute
+    - file_read
+    - file_write
+    - file_edit
+    - file_multi_edit
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references

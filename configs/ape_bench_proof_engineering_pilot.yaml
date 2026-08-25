@@ -1,0 +1,29 @@
+# Pilot run for inputs/ape_bench/ape_bench.jsonl.
+# Use --max_tasks on the CLI to keep pilot runs small.
+
+llm_config:
+  # Requires OPENAI_API_KEY.
+  model_name: gpt_5.2
+
+execution:
+  max_turns: 100
+  sample_count: 1
+  sample_max_cost: 3.0
+  # num_processes: 0
+  max_concurrency: 2
+  # shuffle_seed: 42
+
+task_config:
+  semantic_validation:
+    enabled: true
+  enabled_tools:
+    - bash_execute
+    - file_read
+    - file_write
+    - file_edit
+    - file_multi_edit
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references

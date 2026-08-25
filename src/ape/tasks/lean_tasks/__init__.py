@@ -59,6 +59,16 @@ from .formal_math.pr_split import (
     SkilledPRSplitData,
     SkilledPRSplitTask,
 )
+from .formal_math.reviewed_proof_engineering import (
+    LeanReviewedProofEngineeringTask,
+    LeanReviewedProofEngineeringData,
+    LeanReviewedProofEngineeringConfig,
+    ReviewGateConfig,
+    LeanReviewGateTask,
+    LeanReviewGateData,
+    LeanReviewGateConfig,
+    lean_review_gate,
+)
 
 __all__ = [
     'BaseLeanTask',
@@ -102,4 +112,12 @@ __all__ = [
     'SkilledPRSplitConfig',
     'SkilledPRSplitData',
     'SkilledPRSplitTask',
+    'LeanReviewedProofEngineeringTask',
+    'LeanReviewedProofEngineeringData',
+    'LeanReviewedProofEngineeringConfig',
+    'ReviewGateConfig',
+    'LeanReviewGateTask',
+    'LeanReviewGateData',
+    'LeanReviewGateConfig',
+    'lean_review_gate',
 ]
