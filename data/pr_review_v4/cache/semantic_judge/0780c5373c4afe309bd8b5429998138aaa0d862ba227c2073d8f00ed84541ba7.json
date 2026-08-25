@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "1b24cee1a9608e6772ab7570a146b215c256c5374293b64b8cfd64ce31f45733",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+  "reason": "Both refer specifically to Metric.maximalSeparatedSet_subset and the redundant case-split on packingNumber, so the issue matches, but the candidate proposes a by_cases + simp/simpa refactor rather than the maintainer's requested grind-based formulation with IsSeparated.empty support, so it does not satisfy the exact requested resolution.",
+  "resolution_match": false
+}

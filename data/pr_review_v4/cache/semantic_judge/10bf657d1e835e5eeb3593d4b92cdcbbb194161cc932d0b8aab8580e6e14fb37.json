@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "9dd33ce87abf67422a7e0918c6db9889530bb28f7442e2a478aa8cb6b5087ae9",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The candidate identifies the same low-level iInf-based reconstruction in the h_top branch and proposes using IsCover.coveringNumber_le_encard with maximalSeparatedSet_subset (so the issue matches), but their concrete change uses card_maximalSeparatedSet instead of the requested encard_maximalSeparatedSet and does not adopt the by_cases! pattern, so it does not fully implement the maintainer's requested transformation.",
+  "resolution_match": false
+}

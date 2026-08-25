@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "0ca0c3f4fc13c9bd325cadb88572e174dd369867872b98f4972237935cc64378",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+  "reason": "The candidate requests a proof-style change for Metric.card_maximalSeparatedSet (using simpa), but the gold obligation specifically requires renaming the lemma to use an encard_ prefix (e.g. encard_maximalSeparatedSet), which the candidate does not address.",
+  "resolution_match": false
+}

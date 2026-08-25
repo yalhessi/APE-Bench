@@ -19,6 +19,7 @@ __pycache__/
 /data/pr_review_v2/cache/*
 !/data/pr_review_v2/cache/bundles/
 !/data/pr_review_v2/cache/compares/
+!/data/pr_review_v4/
 
 # Bulk derived artifacts: raw GitHub fetches and retrieval sweeps that are large,
 # regenerable from the code here, and not read by anything in this repo.

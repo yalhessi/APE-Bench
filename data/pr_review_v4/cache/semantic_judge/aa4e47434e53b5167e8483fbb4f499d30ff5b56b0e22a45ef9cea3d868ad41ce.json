@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "b5a875c238589a712facfafea3986c6b5a5d85d6819c353ce6611f3cd050ae28",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "The candidate pinpoints the same manual proof in Metric.isCover_maximalSeparatedSet and proposes replacing it by building C := {x} ∪ maximalSeparatedSet ε A and applying Metric.isSeparated_insert_of_notMem hx_not_mem (using isSeparated_maximalSeparatedSet and h_dist), which matches the maintainer's requested refactor and removes the verbose case analysis.",
+  "resolution_match": true
+}

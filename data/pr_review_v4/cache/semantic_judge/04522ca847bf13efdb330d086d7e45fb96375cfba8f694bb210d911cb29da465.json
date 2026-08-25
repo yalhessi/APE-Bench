@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "5c64e87e051f98cbab010f6f0cb2f6664e47f1ac88d05e735d4d15ccb907f569",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The candidate targets the same lemma and asks to replace the low-level iInf/cardinality proof with IsCover.coveringNumber_le_encard on the maximalSeparatedSet (issue_match), but it uses card_maximalSeparatedSet and by_cases rather than the requested encard_maximalSeparatedSet and by_cases! pattern, so it does not perform the exact transformation asked (resolution_match false).",
+  "resolution_match": false
+}

@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "c2b300b8ea256aa54308ef6f36237fa6efe13c6ce3b4463d9c8d13a9cbb5d0ca",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "The maintainer asked to avoid naming the empty-set branch (use (rfl | h_nonempty)), while the candidate targets the opposite binder (claims h_nonempty is unused and proposes by_cases or naming h_empty/using ‘-’), so they address different specific binders and propose different fixes.",
+  "resolution_match": false
+}

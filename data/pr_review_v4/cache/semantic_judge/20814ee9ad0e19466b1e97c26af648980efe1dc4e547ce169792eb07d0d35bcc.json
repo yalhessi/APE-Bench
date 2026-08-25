@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "c80deff03228e6e38ddfacc8821f8118d5097c4cde3740589b0e5c77400e6088",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+  "reason": "The candidate requests a rename (fixing a misleading 'card' name to 'encard'), whereas the maintainer requires simplifying the proof to use the shared concise grind formulation—these are different changes.",
+  "resolution_match": false
+}

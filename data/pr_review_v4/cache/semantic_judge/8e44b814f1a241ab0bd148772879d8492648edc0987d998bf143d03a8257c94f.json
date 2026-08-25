@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "61b4bfa22082c8b2bb7d05010f927c94f743be3225b386516b7f0e36b9c16dac",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "The candidate proposes removing the unused h_nonempty binder (using `h_empty | _` or dropping the split), whereas the maintainer specifically requested using `(rfl | h_nonempty)` and discharging the empty case with `simp`, so the proposed change targets a different binder and does not implement the maintainer's transformation.",
+  "resolution_match": false
+}

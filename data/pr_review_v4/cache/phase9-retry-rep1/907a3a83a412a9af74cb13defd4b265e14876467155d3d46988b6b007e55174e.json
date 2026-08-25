@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "b4ba5385e66342ac82017067a0afac93a179b8b01a2ad47d17468ffbde006dc2",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "The candidate identifies the exact duplication in Metric.isCover_maximalSeparatedSet and proposes replacing the manual case-split proof of IsSeparated for C := {x} ∪ maximalSeparatedSet ε A with Metric.isSeparated_insert_of_notMem hx_not_mem (using isSeparated_maximalSeparatedSet and h_dist), which implements the maintainer's requested refactor.",
+  "resolution_match": true
+}

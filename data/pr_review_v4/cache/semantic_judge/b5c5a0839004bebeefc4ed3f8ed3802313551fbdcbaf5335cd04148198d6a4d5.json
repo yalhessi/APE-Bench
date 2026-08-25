@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "b56a2b6ddce56d412724fe9d32aac71df35f6cf5b4485e15817b215c48e8ba53",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "The maintainer asks to avoid naming the empty-case binder (use rcases ... with (rfl | h_nonempty)), but the candidate claims the nonempty binder is unused and proposes by_cases or unnamed branches—so it targets a different binder and a different transformation.",
+  "resolution_match": false
+}

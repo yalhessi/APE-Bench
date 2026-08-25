@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "291af5ae990df7f6a2c1ffed776202ee4877088a8e78ad25d58b8cc76e09ea6d",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The candidate targets Metric.card_maximalSeparatedSet and proposes adding maximalSeparatedSet_eq_choose/simpa, while the maintainer obligation requires changing coveringNumber_le_packingNumber to use by_cases!, encard_maximalSeparatedSet, and IsCover.coveringNumber_le_encard, so they do not match.",
+  "resolution_match": false
+}

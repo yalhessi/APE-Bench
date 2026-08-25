@@ -346,13 +346,16 @@ fanout $7.43, rules $4.58.
 
 ```bash
 pip install -e .
-python -m pytest tests -q          # 767 pass, 11 fail, 4 skip on a fresh clone
+python -m pytest tests -q          # 768 pass, 10 fail, 4 skip on a fresh clone
 ```
 
-The 11 failures all require a built Lean workspace under `data/code_execute/` — the
+The 10 failures all require a built Lean workspace under `data/code_execute/` — the
 wrapper-composition, canonical-API and blueprint tests read the reviewed file at its base
 commit. Build one and they pass; there is no way to version tens of gigabytes of compiled
 Mathlib.
+
+`verify_frozen verify` returns `ok` on a fresh clone: 551 manifest references and 1130
+locked files, no drift.
 
 ```bash
 ape/bin/python -m src.datasets.pr_review_v4.verify_frozen verify

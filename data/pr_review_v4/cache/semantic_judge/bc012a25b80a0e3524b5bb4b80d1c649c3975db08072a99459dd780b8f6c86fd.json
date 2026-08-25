@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "912df36352ec0ff54af328fb3b51a98581d6d58730337daa765c3efc59046fcd",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "Both the candidate and the gold obligation target the same lemma Metric.isCover_maximalSeparatedSet and propose introducing C := insert x (maximalSeparatedSet ε A) to simplify the membership/contradiction argument, but the candidate's suggestion (by_cases/rcases and simp [C]) does not commit to using Metric.isSeparated_insert_of_notMem and the encard/ENat-based contradiction sequence the maintainer required.",
+  "resolution_match": false
+}

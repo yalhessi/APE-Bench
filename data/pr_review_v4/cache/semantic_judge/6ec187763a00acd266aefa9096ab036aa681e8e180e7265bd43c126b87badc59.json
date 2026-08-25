@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "302c3bc18b1b030f729524a5ad689b5836bf576f0c05d8b0c49d60eb567b757f",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "Both identify the same unnecessary Set.eq_empty_or_nonempty split on A, but the candidate proposes removing the split or using by_cases/simp rather than the maintainer's specific change to rcases ... with (rfl | h_nonempty) and discharge the empty case by simp.",
+  "resolution_match": false
+}

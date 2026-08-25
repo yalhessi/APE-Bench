@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "e9a80721ac5ad2c78d67eca3553e23ccd9dced4c2202e8e022e780217617a1ea",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+  "reason": "The request explicitly targets Metric.card_maximalSeparatedSet and asks to rename it to Metric.encard_maximalSeparatedSet (and update references), which exactly matches the maintainer's style obligation to use the encard_ prefix.",
+  "resolution_match": true
+}

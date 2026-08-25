@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "c80deff03228e6e38ddfacc8821f8118d5097c4cde3740589b0e5c77400e6088",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The maintainer asked for a specific proof-style change in coveringNumber_le_packingNumber (use by_cases! and encard_maximalSeparatedSet), while the candidate only requests renaming Metric.card_maximalSeparatedSet and updating uses, not the exact proof/tactic transformation required.",
+  "resolution_match": false
+}

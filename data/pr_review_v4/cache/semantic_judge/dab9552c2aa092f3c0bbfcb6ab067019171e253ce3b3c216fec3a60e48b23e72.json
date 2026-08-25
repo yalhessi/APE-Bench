@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "c3cb51be51d11c4fdb2a963a4326b639eeeea7ccf3e371678953ef84ec580c72",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "The candidate proposes removing the rcases split and proving by transitivity instead, but the maintainer specifically requested keeping the split and using (rfl | h_nonempty) to discharge the empty case with simp; these are different changes.",
+  "resolution_match": false
+}

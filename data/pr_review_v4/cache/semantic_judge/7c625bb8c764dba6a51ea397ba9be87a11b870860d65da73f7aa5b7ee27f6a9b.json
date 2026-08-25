@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "6bfe54484ec75c9df18d749824ade328a46170907df401d7f64dd32d6c8b59f9",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "The candidate specifically targets Metric.isCover_maximalSeparatedSet and replaces the manual case analysis proving IsSeparated ε ({x} ∪ maximalSeparatedSet ε A) with a call to Metric.isSeparated_insert_of_notMem (exactly as the maintainer requested), providing a concrete, compiling snippet to remove the verbose form.",
+  "resolution_match": true
+}

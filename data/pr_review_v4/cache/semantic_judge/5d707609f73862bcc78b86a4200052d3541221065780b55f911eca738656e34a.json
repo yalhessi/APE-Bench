@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "122580a6f591390d0fb022b758aee9e5e41eb7346920fb9692e14ba05eecd97b",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "The candidate claims the nonempty branch binder h_nonempty is unused and proposes removing that case, whereas the maintainer specifically asked to replace the empty-branch binder with rfl (keeping the nonempty binder), so the reported problem and requested transformation do not match.",
+  "resolution_match": false
+}

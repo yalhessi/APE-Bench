@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "eeb3abc0f23bdfcce4d4b96b2bb496d7b37f791378df35bdbbee03dc0b46a2a2",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "The candidate targets the same declaration and subproof (hC_separated in Metric.isCover_maximalSeparatedSet) and requests replacing the manual case analysis by using Metric.isSeparated_insert_of_notMem with C := {x} ∪ maximalSeparatedSet ε A, matching the maintainer's requested refactor.",
+  "resolution_match": true
+}

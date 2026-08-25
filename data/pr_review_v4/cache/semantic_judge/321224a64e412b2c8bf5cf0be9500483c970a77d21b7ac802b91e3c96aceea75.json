@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "738ba23c4ba3ece4ab1d425f42b16b1e79e1a58d092a52fd9f1e2bc9874f15b3",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+  "reason": "The maintainer asked to use (rfl | ...) and discharge the empty-set case (removing the empty-case binder), but the candidate proposes removing or anonymizing the nonempty-case binder (e.g. (h_empty | -) or by_cases), which targets a different binder and does not perform the requested rfl/simp transformation.",
+  "resolution_match": false
+}

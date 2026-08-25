@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "573697eff28fcca85d0c800b364775ceff768b81e3f4064c205d03b458b848ee",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+  "reason": "The candidate proposes a simp/simpa refactor that avoids ↓reduceDIte and uses choose_spec, whereas the maintainer specifically requested a grind-based formulation and use of IsSeparated.empty, so the candidate addresses a different precise fix.",
+  "resolution_match": false
+}

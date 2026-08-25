@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "d343698d65f7ee84ebc150016345099cf7dea7856c44a2bd3e69bf9b41f55f11",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "The request precisely targets Metric.isCover_maximalSeparatedSet's manual proof of hC_separated and asks to replace it with Metric.isSeparated_insert_of_notMem hx_not_mem (using isSeparated_maximalSeparatedSet and h_dist), which matches the maintainer's refactor instruction and yields the intended downstream contradiction via the existing encard lemmas.",
+  "resolution_match": true
+}

@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "5130de6e943dd88480e97486f800d0fc7c26416923706c14846656cc27572ab5",
+  "issue_match": true,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The candidate targets the same iInf-based proof and suggests replacing it with a direct use of IsCover.coveringNumber_le_encard, but proposes rw [← card_maximalSeparatedSet ...] and omits the by_cases!/encard_maximalSeparatedSet/⊤-branch change required by the maintainer, so it does not perform the requested transformation.",
+  "resolution_match": false
+}

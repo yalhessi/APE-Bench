@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "a872307d53f5151e5f3813f43ede66773e609feaec56759c5a187ba901470b78",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+  "reason": "The candidate requests a docstring tweak about the finiteness hypothesis for Metric.isCover_maximalSeparatedSet, whereas the maintainer obligation requires a proof refactor using an inserted set C and specific lemmas to shorten the argument, so they address different changes.",
+  "resolution_match": false
+}

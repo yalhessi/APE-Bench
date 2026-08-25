@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "95a84e2674f5f0283c689fcffb6bf31f00f16767fe4133ddda832461bcb57a08",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The maintainer asks to refactor coveringNumber_le_packingNumber to use by_cases! and encard_maximalSeparatedSet/IsCover.coveringNumber_le_encard (removing the existing card_maximalSeparatedSet-based proof), whereas the candidate requests simply adding a [simp] attribute to Metric.card_maximalSeparatedSet — a different change.",
+  "resolution_match": false
+}

@@ -1,0 +1,9 @@
+{
+  "candidate_source_sha256": "65c7fff4f5b238a4c6f2319889dfc301b79bae163a9a99a5232c704d2c2a77c2",
+  "issue_match": false,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "obligation_source_sha256": "a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+  "reason": "The maintainer requires changing the proof of coveringNumber_le_packingNumber to use encard_maximalSeparatedSet and by_cases!, whereas the candidate only asks to mark Metric.card_maximalSeparatedSet as @[simp], which addresses a different lemma and does not implement the requested proof transformation.",
+  "resolution_match": false
+}
