@@ -105,6 +105,20 @@ class Sample(BaseModel):
         return self.attempts[-1] if self.attempts else None
 
     @property
+    def successful_attempt(self) -> Optional[Attempt]:
+        """Most recent attempt that succeeded, if any.
+
+        Consumers that need the artifacts a sample produced (its workspace, logs, or
+        conversation) want this rather than `current_attempt`, which may be a later
+        failed retry. Exposed so callers locate attempt directories through the model
+        instead of globbing the run tree's layout.
+        """
+        for attempt in reversed(self.attempts):
+            if attempt.status == ExecutionStatus.SUCCESS:
+                return attempt
+        return None
+
+    @property
     def status(self) -> ExecutionStatus:
         """Sample status = current attempt's status."""
         return self.current_attempt.status if self.current_attempt else ExecutionStatus.PENDING
@@ -113,10 +127,18 @@ class Sample(BaseModel):
         """Effective cost: cost of last non-system-error attempt.
 
         Purpose: Determine if cost_limit is exceeded (resource control).
+
+        Reads `cached_cost` — what was actually billed — rather than `cost`, which is the
+        no-cache counterfactual. The resource being controlled is money, and prompt caching
+        means the two differ by a lot: one lead was terminated at a $1.00 cap on a counted
+        $1.164 having actually spent $0.200, so it lost four fifths of its budget to an
+        accounting convention. Falls back to `cost` when no cached figure was recorded, which
+        is also the case where the two are equal.
         """
         for attempt in reversed(self.attempts):
             if not attempt.status.is_system_error():
-                return attempt.cost
+                cached = getattr(attempt, "cached_cost", None)
+                return float(cached) if cached else attempt.cost
         return 0.0
 
     def get_accumulated_cost(self) -> float:
