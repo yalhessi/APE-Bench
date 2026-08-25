@@ -5,7 +5,8 @@ This example demonstrates how to create a custom task using the APE task contrac
 The task asks the model to compute a simple arithmetic expression and verify the result.
 """
 
-from typing import Optional
+import traceback
+from typing import Optional, Dict, Any
 from pydantic import Field
 
 from ape.tasks.base import BaseTask, BaseTaskData, BaseTaskConfig, BaseTaskResult, EvaluationResult, register_task
@@ -48,7 +49,42 @@ Example:
 - If the expression is "100 / 4", you should submit 25.0
 """
 
-    async def evaluate(self, submission: str) -> Optional[EvaluationResult]:
+    async def register_task_tools(self, mcp) -> None:
+        """Register arithmetic task submission tool."""
+        from typing import Annotated
+
+        @mcp.tool(
+            description=(
+                "Submit your final numeric answer for arithmetic evaluation. "
+                "This tool runs evaluation and may terminate the task when correct."
+            )
+        )
+        async def submit_result(
+            answer: Annotated[str, Field(
+                description="Final numeric answer as string or number-like text (e.g., '6912.0')"
+            )]
+        ) -> Dict[str, Any]:
+            """Submit arithmetic result for evaluation and potential termination."""
+            self.logger.info(f"Received submission via tool: '{answer}'")
+
+            evaluation_result = self.evaluate(answer)
+            should_terminate = self.should_terminate(evaluation_result)
+
+            if should_terminate and self.termination_callback:
+                task_result = self.create_result(
+                    success=evaluation_result.success,
+                    score=evaluation_result.score,
+                    metadata={"message": evaluation_result.message}
+                )
+                await self.termination_callback(task_result)
+
+            return {
+                "evaluation_result": evaluation_result,
+                "message": "Result submitted and evaluated"
+            }
+
+
+    def evaluate(self, submission: str) -> Optional[EvaluationResult]:
         """Evaluate the submitted result.
 
         Args:
