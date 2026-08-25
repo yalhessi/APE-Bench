@@ -3,7 +3,7 @@ LLM Clients Configuration System.
 """
 
 import os
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Literal
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -107,6 +107,32 @@ MODEL_MAPPINGS = {
     }
 }
 
+#: How to read a provider's token accounting when pricing a call.
+#:
+#: The two models disagree about exactly one thing: whether `cache_read_input_tokens` is a
+#: **subset of** `prompt_tokens` or **disjoint from** it. Every other difference follows.
+#:
+#: * ``prompt_inclusive`` — cached tokens are part of the reported prompt. This is OpenAI's
+#:   documented behaviour (`prompt_tokens_details.cached_tokens` counts a portion of
+#:   `prompt_tokens`, and `total_tokens = prompt_tokens + completion_tokens`), and it is what
+#:   this repo's own logs show: for one 9-turn conversation, `sum(total_tokens)` was 334,970
+#:   and `sum(input) + sum(output)` was 334,970 exactly, while `input + cached + output`
+#:   would have been 620,794. Reported prompt sizes also grow monotonically across turns,
+#:   which only makes sense if they are cumulative totals rather than per-turn new tokens.
+#:
+#: * ``prompt_exclusive`` — the original APE assumption: the prompt count excludes cached
+#:   tokens, so the two are added. Retained because the evidence above is this project's own
+#:   measurement rather than a vendor invoice; if a bill says otherwise, switch back with
+#:   `llm_config.cost_model=prompt_exclusive` and every historical figure reproduces.
+#:
+#: Under `prompt_exclusive`, cached tokens are counted twice — once at full price inside
+#: `prompt_tokens` and once more at the cache rate — inflating both the nominal and the
+#: discounted figure. Measured on the conversation above: $1.164 nominal and $0.700
+#: "discounted" against a true cost of $0.200.
+COST_MODELS = ("prompt_inclusive", "prompt_exclusive")
+DEFAULT_COST_MODEL = "prompt_inclusive"
+
+
 class LLMConfig(BaseModel):
     """LLM configuration class with a consistent model naming scheme.
 
@@ -141,6 +167,9 @@ class LLMConfig(BaseModel):
     # Internal fields automatically populated by model_post_init
     formal_model_name: str = Field(default="", description="Formal model name required by the provider API")
     provider_type: Optional[LLMProvider] = Field(default=None, description="Provider type")
+
+    #: Which token-accounting model to price this call under. See `COST_MODELS`.
+    cost_model: Literal["prompt_inclusive", "prompt_exclusive"] = DEFAULT_COST_MODEL
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-configure immediately after initialization."""
