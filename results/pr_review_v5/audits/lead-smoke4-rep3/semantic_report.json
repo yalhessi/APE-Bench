@@ -1,0 +1,314 @@
+{
+  "ambiguity_registry_sha256": "efaf8341b05d213e29298f5ae456860e5038692cbcb6bb0e74d0ad81719661a2",
+  "ambiguous_rate": 0.0,
+  "arm": "registered_task",
+  "by_pairing_tier": {
+    "anchor": {
+      "issue_matches": 4,
+      "pairs": 9
+    },
+    "file": {
+      "issue_matches": 0,
+      "pairs": 0
+    },
+    "relation": {
+      "issue_matches": 0,
+      "pairs": 0
+    }
+  },
+  "counts": {
+    "candidates": 30,
+    "null_pairs": 0,
+    "obligations": 40,
+    "observed_pairs": 9,
+    "paired_candidates": 7
+  },
+  "coverage": {
+    "complete": true,
+    "pairs_planned": 9,
+    "verdicts_returned": 9
+  },
+  "gold_alignment_rate": 0.13333333333333333,
+  "gold_alignment_within_paired": 0.5714285714285714,
+  "issue_recall": 0.1,
+  "issue_recall_including_ambiguous": 0.1,
+  "judge_identity": "0711a6c01265b3e2a48a698ede6588157d41ad6c6e9d8c07c0c9fe56450d8a2d",
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v3-v9-rubric",
+  "location_recall": 0.225,
+  "manual_audit_required": true,
+  "null_pair_diagnostics": {
+    "candidate_negative_issue_match_rate": null,
+    "coverage": null,
+    "pairs": 0,
+    "requested": 0
+  },
+  "obligation_status_counts": {
+    "issue": {
+      "ambiguous": 0,
+      "hit": 4,
+      "miss": 36
+    },
+    "resolution": {
+      "ambiguous": 0,
+      "hit": 2,
+      "miss": 38
+    }
+  },
+  "pairing_tiers": [
+    "anchor"
+  ],
+  "per_obligation": [
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:6b02b6118fcd24d676894ab9eb795826ae036cf3de57f6a1648aff81bf55a336",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:38e72250fc9d46238bf32c7595cbf8ddfb2c3650e5589e1a917b96d44425458e",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:55f6530478b34726b67e26f586cddf80293284f7d3f3852ef7a23dd40b34f783",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:695ae9fd914c2b49a805727bfcd727e2453fb8a89330151638a019f73d6b3cef",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:ce7b5d2e038d3f00f9b05b3263b85b55bf6e4fa9740dc0c8f8d07269c8ad0e9b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:64e1164fcb5870d06d72a33db4048b7093987aa6cc295801360256f59d9ed5ad",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:c9739efcd0a6d1b38d5b22e641ed9eb123b16d704665c291702073b2a3a1c580",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:5ffba48eb1e192a917fad1afd713ae1edb2b1d30379624add3e25bfd4bcb3e14",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:0bb42bd28332beb5c9981a746053cf175213a08300871b86f8bf57e1c259d559",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:cc44bb996114d36d12489bf3048af88ad5a5759c56e44dd2d482f312afe3dc97",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:7f098f6a74373b691cbaff80da5ea5e31244f1542a09f5555f2842a1a3948b63",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:8e276803d0f48113c3271b14f2edb3162d5d97df696c97560ced95eb6cac0fc0",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:073625ede35eb3fd7602cf4c7e12b0c5e4fc060461af1bfb5a228253727ee057",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:585e5e0b5b8bee98bf6d0805477344b5eaf9b8b48ace92fb0784b12613af1b38",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:3dacf72e309ff96827a7b6b3b1920093ec8bab44db9e88ec35dfc11d91d8a088",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:61f68eedbddd3f1100616d64f47aa430f42fbf49f8ecf5f11623168d80d11d79",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:f54010d8cfb95027b2faf27d3134ce3b24d47ef11fc755abf388bf72d9366523",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:e83e6544d51cc95d5ea5a8112b56f10f4de3305544784a69f6b20813679a96d4",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:bd8a8d8cf88c380c2a29938017609533da9c6dd1da359b4da6391c71d01c03a4",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:8d887ce4bdd9c3c119a2c189f09224b7f434b73d7329d17b2185d412439e70f7",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:7fef913e96518575c701cc1c6f79f645adbe4be8fb921f99e09a63fdc033749f",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:e8e028215fa3d531850a058f48103837e08c33a9613be3e1c732ec6b1463cc18",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:57bcc9fd38464c7dbf7446b486324b3d7edbd101f1357b81f3f2001f479b11a4",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:14f5e6d6016342115f689daf4e49be91088a694d3effbe2b2c42d3374b809d56",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:6c1da5ab47fedf5bdd05b898bf03cc177e55be0d012f63f913843cbebe5b34c7",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:488d7b571fea19dbde9a635878e92b1bc4f8acb1e489ac3778a0066ab313885d",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:d779f40f12ca1db3eada2a7dde894c02080a57643258a12aa3152705ede59a76",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:ee282f05e9c27fe206e674624bd6a0363507863fb7d7af99398d4ca7f36560a3",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+      "resolution_status": "hit"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:64630362c31527fa23461b4551591f5a436d13f14693aa9c2bafaa15924601f6",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:c7e1405471a20c04795b5cac2028c210dc8525c2625f96cdd9a25eac0617eb76",
+      "resolution_status": "hit"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:6db24d1d232819b1261f658fb6ec36d9e14b41ebd97ef8b08c54c7c683effa6c",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:d4cc70e10c26e51edf54156464b475700c37268d7dcffdcfd65159a2e4d9bc58",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:9c96e853db76360f1fa330338b1db0ed3f889b91107267ff98efa1b03151ad1b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:3ad30059e6e673738c6590c2cabc0d6111376018c5fc7b8c3bda44f30512121b",
+      "resolution_status": "miss"
+    }
+  ],
+  "resolution_recall": 0.05,
+  "resolution_recall_including_ambiguous": 0.05,
+  "schema_version": "v4-semantic-report3",
+  "scored": true,
+  "silent_pr_emission": {
+    "candidates": 4,
+    "candidates_per_control_pr": 4.0,
+    "control_pr_numbers": [
+      33438
+    ]
+  }
+}

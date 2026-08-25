@@ -1,0 +1,17 @@
+{
+  "definition": "pre_publication judges every merged ReviewFinding in its final serialized wording; post_publication is the admission=published subset of those same findings and verdicts",
+  "findings": {
+    "post_publication": 9,
+    "pre_publication": 51
+  },
+  "obligations": 40,
+  "post_publication": {
+    "issue_hits": 1,
+    "resolution_hits": 1
+  },
+  "pre_publication": {
+    "issue_hits": 2,
+    "resolution_hits": 1
+  },
+  "schema_version": "v4-publication-report1"
+}

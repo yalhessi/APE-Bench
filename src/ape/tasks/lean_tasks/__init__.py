@@ -5,6 +5,7 @@ All Lean task implementations are organized into:
   - theorem_proving/
   - proof_engineering/
   - judgment/
+  - pr_review/
 - utils.py: Utility functions for Lean tasks
 - base.py: BaseLeanTask and BaseLeanTaskData base classes
 """
@@ -28,6 +29,16 @@ from .formal_math.judgment import (
     LeanJudgmentConfig,
     LeanJudgmentResult,
 )
+from .formal_math.reviewed_proof_engineering import (
+    LeanReviewedProofEngineeringTask,
+    LeanReviewedProofEngineeringData,
+    LeanReviewedProofEngineeringConfig,
+    ReviewGateConfig,
+    LeanReviewGateTask,
+    LeanReviewGateData,
+    LeanReviewGateConfig,
+    lean_review_gate,
+)
 from .formal_math.pr_review import (
     ReviewPRTask,
     ReviewPRData,
@@ -44,30 +55,6 @@ from .formal_math.pr_review import (
     SkilledPolicyReviewPRConfig,
     SkilledPolicyReviewPRData,
     SkilledPolicyReviewPRTask,
-)
-from .formal_math.pr_split import (
-    PRSplitChunk,
-    PRSplitConfig,
-    PRSplitData,
-    PRSplitResult,
-    PRSplitSubmission,
-    PRSplitTask,
-    SkilledPolicyPRSplitConfig,
-    SkilledPolicyPRSplitData,
-    SkilledPolicyPRSplitTask,
-    SkilledPRSplitConfig,
-    SkilledPRSplitData,
-    SkilledPRSplitTask,
-)
-from .formal_math.reviewed_proof_engineering import (
-    LeanReviewedProofEngineeringTask,
-    LeanReviewedProofEngineeringData,
-    LeanReviewedProofEngineeringConfig,
-    ReviewGateConfig,
-    LeanReviewGateTask,
-    LeanReviewGateData,
-    LeanReviewGateConfig,
-    lean_review_gate,
 )
 from .formal_math.pr_review_v2 import (
     LeanPRReviewV2Config,
@@ -107,6 +94,30 @@ from .formal_math.pr_review_v4 import (
     LeanPRReviewV4JudgmentResult,
     LeanPRReviewV4JudgmentTask,
 )
+from .formal_math.pr_review_v5 import (
+    LeanPRReviewV5ArmConfig,
+    LeanPRReviewV5ArmData,
+    LeanPRReviewV5ArmResult,
+    LeanPRReviewV5ArmTask,
+    LeanPRReviewV5LeadConfig,
+    LeanPRReviewV5LeadData,
+    LeanPRReviewV5LeadResult,
+    LeanPRReviewV5LeadTask,
+)
+from .formal_math.pr_split import (
+    PRSplitChunk,
+    PRSplitConfig,
+    PRSplitData,
+    PRSplitResult,
+    PRSplitSubmission,
+    PRSplitTask,
+    SkilledPolicyPRSplitConfig,
+    SkilledPolicyPRSplitData,
+    SkilledPolicyPRSplitTask,
+    SkilledPRSplitConfig,
+    SkilledPRSplitData,
+    SkilledPRSplitTask,
+)
 
 __all__ = [
     'BaseLeanTask',
@@ -123,6 +134,14 @@ __all__ = [
     'LeanJudgmentData',
     'LeanJudgmentConfig',
     'LeanJudgmentResult',
+    'LeanReviewedProofEngineeringTask',
+    'LeanReviewedProofEngineeringData',
+    'LeanReviewedProofEngineeringConfig',
+    'ReviewGateConfig',
+    'LeanReviewGateTask',
+    'LeanReviewGateData',
+    'LeanReviewGateConfig',
+    'lean_review_gate',
     'ReviewPRTask',
     'ReviewPRData',
     'ReviewPRConfig',
@@ -138,26 +157,6 @@ __all__ = [
     'SkilledPolicyReviewPRConfig',
     'SkilledPolicyReviewPRData',
     'SkilledPolicyReviewPRTask',
-    'PRSplitChunk',
-    'PRSplitConfig',
-    'PRSplitData',
-    'PRSplitResult',
-    'PRSplitSubmission',
-    'PRSplitTask',
-    'SkilledPolicyPRSplitConfig',
-    'SkilledPolicyPRSplitData',
-    'SkilledPolicyPRSplitTask',
-    'SkilledPRSplitConfig',
-    'SkilledPRSplitData',
-    'SkilledPRSplitTask',
-    'LeanReviewedProofEngineeringTask',
-    'LeanReviewedProofEngineeringData',
-    'LeanReviewedProofEngineeringConfig',
-    'ReviewGateConfig',
-    'LeanReviewGateTask',
-    'LeanReviewGateData',
-    'LeanReviewGateConfig',
-    'lean_review_gate',
     'LeanPRReviewV2Config',
     'LeanPRReviewV2Data',
     'LeanPRReviewV2Result',
@@ -179,7 +178,6 @@ __all__ = [
     'LeanPRReviewV4CandidateConfig',
     'LeanPRReviewV4CandidateData',
     'LeanPRReviewV4CandidateResult',
-    'LeanPRReviewV4CandidateTask',
     'LeanPRReviewV4FileConfig',
     'LeanPRReviewV4FileData',
     'LeanPRReviewV4FileResult',
@@ -188,8 +186,25 @@ __all__ = [
     'LeanPRReviewV4FocusedData',
     'LeanPRReviewV4FocusedResult',
     'LeanPRReviewV4FocusedTask',
-    'LeanPRReviewV4JudgmentConfig',
-    'LeanPRReviewV4JudgmentData',
-    'LeanPRReviewV4JudgmentResult',
-    'LeanPRReviewV4JudgmentTask',
+    'LeanPRReviewV4CandidateTask',
+    'LeanPRReviewV5ArmConfig',
+    'LeanPRReviewV5ArmData',
+    'LeanPRReviewV5ArmResult',
+    'LeanPRReviewV5ArmTask',
+    'LeanPRReviewV5LeadConfig',
+    'LeanPRReviewV5LeadData',
+    'LeanPRReviewV5LeadResult',
+    'LeanPRReviewV5LeadTask',
+    'PRSplitChunk',
+    'PRSplitConfig',
+    'PRSplitData',
+    'PRSplitResult',
+    'PRSplitSubmission',
+    'PRSplitTask',
+    'SkilledPolicyPRSplitConfig',
+    'SkilledPolicyPRSplitData',
+    'SkilledPolicyPRSplitTask',
+    'SkilledPRSplitConfig',
+    'SkilledPRSplitData',
+    'SkilledPRSplitTask',
 ]

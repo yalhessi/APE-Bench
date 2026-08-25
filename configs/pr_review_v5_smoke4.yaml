@@ -1,0 +1,55 @@
+# Calibration run: the delegating reviewer on the 4-PR smoke set.
+#
+# 33057 / 33066 / 33098 carry gold (1 + 3 + 14 = 18 obligations); 33438 is the CONTROL —
+# maintainers asked for nothing there, so anything the agent emits on it is a false positive.
+# This is the same set as results/pr_review_v4/runs/dev-medium-smoke4-rep1.
+#
+# Sized for a look, not for an effect size: at 18 obligations one flipped verdict is 5.6pp.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 32000
+  thinking_budget_tokens: 30000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  max_concurrency: 4
+
+task_config:
+  enabled_tools:
+    - file_read
+    - content_search
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references
+
+dataset:
+  routing_mode: lead
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
+  run_name: pr_review_v5_lead_smoke4_rep7
+  pr_numbers: [33057, 33066, 33098, 33438]
+  require_prebuilt_workspaces: true
+
+  # The deterministic arm is deliberately OMITTED (no execution_release): this run is about
+  # calibrating the agent, so every finding scored should be one the agent produced.
+
+  # Cost policy, retuned for the `prompt_inclusive` cost model. Caps are now enforced on
+  # what was actually billed rather than a no-cache counterfactual, so the old numbers were
+  # roughly 5x tighter than they read. Measured billed on rep5: specialists median $0.039,
+  # max $0.117. 0.30 gives cheap=$0.15, standard=$0.30, deep=$0.60 — about 2.5x headroom
+  # over the observed maximum at the default tier.
+  standard_budget_cap: 0.30
+  # Leads billed a median $0.094 and a max $0.200 on rep5 — and that maximum is the lead
+  # that died, so it is a floor on what a full one costs. 1.00 is ~5x it, which covers a
+  # 184-proposal agenda read properly plus a second wave.
+  lead_cost_cap: 1.00
+  per_pr_cost_cap: 2.00
+  # 9 specialist arms x 22 work units = 180 eligible jobs. 30 would let the lead touch a
+  # sixth of them, which makes the run a test of its triage rather than of whether the
+  # arms can find the gold at all. Discovery first.
+  max_delegations: 60

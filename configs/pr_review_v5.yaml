@@ -1,0 +1,42 @@
+# The delegating reviewer on the 4-PR smoke set, release dev-medium-0.3.0.
+#
+# Flip `dataset.routing_mode` between fanout | rules | lead to run the three-way comparison.
+# Everything else stays fixed, so a difference between runs is a difference in routing.
+# Use a distinct run_name per mode and per rep: run_name is the resume key, and reusing one
+# across a prompt or tool change silently resumes into an incompatible run.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 32000
+  thinking_budget_tokens: 30000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  max_concurrency: 8
+
+task_config:
+  enabled_tools:
+    - file_read
+    - content_search
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references
+
+dataset:
+  routing_mode: lead
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
+  run_name: pr_review_v5_lead_smoke4_rep1
+  pr_numbers: [33057, 33066, 33098, 33438]
+  require_prebuilt_workspaces: true
+
+  # Cost policy. `standard_budget_cap` is the per-arm-job cap; cheap = 0.5x, deep = 2x.
+  # `lead_cost_cap` bounds the lead's own reasoning, separately from what it delegates.
+  standard_budget_cap: 0.25
+  lead_cost_cap: 2.0
+  per_pr_cost_cap: 8.0
+  max_delegations: 60
