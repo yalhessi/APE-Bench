@@ -14,7 +14,7 @@ Architecture:
   - utils.py: Utility functions for Lean tasks
 """
 
-from .base import BaseTask, register_task, create_task_from_data
+from .base import BaseTask, register_task, create_task_from_data, list_task_types
 from .lean_tasks import (
     BaseLeanTask,
     BaseLeanTaskData,

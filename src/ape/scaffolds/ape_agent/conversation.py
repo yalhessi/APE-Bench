@@ -1099,6 +1099,10 @@ class ApeAgentConversationManager:
         # Execute sequentially; some tools depend on previous ones
         results = []
         for tool_call in tool_calls:
+            if self._stop_event.is_set():
+                self.logger.info("Stopping remaining tool execution after submit_result signaled termination")
+                break
+
             # Allow user interrupts between calls
             if self.interrupt_event and self.interrupt_event.is_set():
                 self.logger.info("Tool execution interrupted by user (ESC key)")

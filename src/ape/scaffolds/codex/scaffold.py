@@ -295,9 +295,43 @@ class CodexScaffold(BaseScaffold):
         extra_args = getattr(self.task, '_cli_extra_args', [])
 
         try:
-            # In CLI mode, use the workspace path directly (from --workspace or current directory)
-            # No need to create scratch_workspace, use task.data.local_workspace_path
-            cwd = self.task.data.local_workspace_path
+            if is_internal_cli_task(self.task):
+                cwd_path = self.task.data.local_workspace_path
+                initial_prompt = prompt
+            else:
+                if not self.task.workspaces_dir:
+                    raise RuntimeError("Task workspaces are not initialized for Codex CLI mode")
+
+                cwd_path = self.task.workspaces_dir
+                cwd = str(cwd_path)
+
+                from ape.scaffolds.prompts import build_system_prompt
+
+                system_prompt = await build_system_prompt(
+                    scratch_workspace=self.task.scratch_workspace,
+                    target_workspace=self.task.target_workspace,
+                    reference_workspaces=self.task.reference_workspaces,
+                    use_absolute_paths=True,
+                    logger=self.logger
+                )
+                system_prompt += (
+                    f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
+                    f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
+                    f"\n"
+                    f"CRITICAL - Shell Command Requirements:\n"
+                    f"When using shell/bash tools, you MUST use absolute paths for ALL commands:\n"
+                    f"  - Correct: /bin/ls, /bin/cat, /bin/grep, /usr/bin/git, /bin/sh\n"
+                    f"  - Wrong: ls, cat, grep, git, sh\n"
+                    f"Common command paths:\n"
+                    f"  - /bin/ls, /bin/cat, /bin/grep, /bin/sed, /bin/awk, /bin/rm, /bin/cp, /bin/mv\n"
+                    f"  - /bin/bash, /bin/sh, /usr/bin/find, /usr/bin/git, /usr/bin/python\n"
+                    f"This is required because PATH environment variable is not available in the shell environment.\n"
+                )
+                task_user_prompt = await self.task.create_user_prompt()
+                task_prompt = f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+                initial_prompt = merge_task_prompt(task_prompt, prompt)
+
+            cwd = str(cwd_path)
 
             # Build codex command with correct parameters
             codex_args = ["codex"]
@@ -313,8 +347,8 @@ class CodexScaffold(BaseScaffold):
                 codex_args.append("--search")
 
             # Add prompt as positional argument if provided
-            if prompt:
-                codex_args.append(prompt)
+            if initial_prompt:
+                codex_args.append(initial_prompt)
 
             # Add extra arguments
             if extra_args:

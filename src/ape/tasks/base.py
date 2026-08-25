@@ -643,3 +643,8 @@ def create_task_config_for_type(task_type: str, **overrides) -> 'BaseTaskConfig'
     """
     task_class = get_task_class(task_type)
     return task_class.task_config_class.model_validate(overrides)
+
+
+def list_task_types() -> List[str]:
+    """Return registered task types in sorted order."""
+    return sorted(_tasks.keys())

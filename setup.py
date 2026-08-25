@@ -22,8 +22,10 @@ if __name__ == "__main__":
         install_requires=install_requires,
         entry_points={
             "console_scripts": [
+                "ape=ape.cli.main:cli_main",
                 "apea=ape.scaffolds.ape_agent.cli.main:cli_main",
                 "ape-claude=ape.scaffolds.claude_code.cli.main:cli_main",
+                "ape-codex=ape.scaffolds.codex.cli.main:cli_main",
             ],
         },
     )

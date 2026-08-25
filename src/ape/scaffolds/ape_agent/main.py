@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Optional, Dict, Any, TYPE_CHECKING
 
 from .config import ApeAgentConfig
+from ape.scaffolds.skills import normalize_skills_config_paths
 from ape.utils import load_yaml, parse_cli_args, deep_merge, create_logger
 from ape.orchestration.orchestrator import run_orchestrator_from_file
 
@@ -89,7 +90,13 @@ def main(
 
     # Build configuration: YAML + CLI overrides
     config_dict = load_yaml(config_path) if config_path else {}
+    if config_path:
+        normalize_skills_config_paths(
+            config_dict,
+            base_dir=config_path.expanduser().resolve().parent,
+        )
     if cli_overrides:
+        normalize_skills_config_paths(cli_overrides, base_dir=Path.cwd())
         config_dict = deep_merge(config_dict, cli_overrides)
 
     # Extract task_config overrides

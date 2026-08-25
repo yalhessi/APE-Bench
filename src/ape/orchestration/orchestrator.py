@@ -2,6 +2,7 @@
 
 import asyncio
 import hashlib
+import inspect
 import json
 import multiprocessing as mp
 import random
@@ -42,10 +43,12 @@ class TaskOrchestrator:
         orchestrator_id: Optional[str] = None,
         logger=None,
         input_file: Optional[Path] = None,
+        progress_callback=None,
     ):
         self.config = config
         self.logger = logger or create_logger()
         self.input_file = input_file
+        self.progress_callback = progress_callback
 
         # Generate or use provided orchestrator_id
         if orchestrator_id:
@@ -84,6 +87,15 @@ class TaskOrchestrator:
 
         self.start_time: Optional[datetime] = None
         self.end_time: Optional[datetime] = None
+
+    async def _emit_progress(self, progress: OrchestratorProgress) -> None:
+        """Forward progress snapshots to an optional callback."""
+        if not self.progress_callback:
+            return
+
+        result = self.progress_callback(progress)
+        if inspect.isawaitable(result):
+            await result
 
     async def run(self, tasks: List[BaseTask]) -> OrchestratorResults:
         """Execute all tasks"""
@@ -125,10 +137,12 @@ class TaskOrchestrator:
         # Execute sample jobs
         if sample_jobs:
             await print_progress(progress_snapshot, self.execution_mode, self.start_time, self.logger)
+            await self._emit_progress(progress_snapshot)
             await self._execute_jobs(sample_jobs, tasks, early_stop_ready)
         else:
             self.logger.info("No pending samples to execute")
             await print_progress(progress_snapshot, self.execution_mode, self.start_time, self.logger)
+            await self._emit_progress(progress_snapshot)
 
         # Aggregate final results
         self.end_time = datetime.now()
@@ -328,6 +342,7 @@ class TaskOrchestrator:
             orchestrator_start_time=self.start_time,
             sample_queue=queue,
             logger=self.logger,
+            progress_callback=self._emit_progress,
         )
 
         # Run worker

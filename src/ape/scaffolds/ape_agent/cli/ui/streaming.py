@@ -437,9 +437,10 @@ class StreamingOutputHandler:
             # if regular content has been displayed, first newline
             if self.has_shown_prefix and self.accumulated_content:
                 self.console.print()  # newline to separate
+            self._show_role_prefix("◌ ", "Thinking", colors.accent_cyan)
             self.has_shown_reasoning_prefix = True
 
-        # add reasoning content block, display in light cyan (no prefix)
+        # add reasoning content block
         text.append(reasoning_chunk, style=colors.accent_cyan)
 
         # display reasoning content in real-time
@@ -458,9 +459,10 @@ class StreamingOutputHandler:
 
         # mark as displayed prefix
         if not self.has_shown_prefix:
+            self._show_role_prefix("● ", "Ape Agent", colors.accent_purple)
             self.has_shown_prefix = True
 
-        # add content block (no prefix), use default color
+        # add content block, use default color
         text.append(content_chunk)
 
         # display new content in real-time (no newline, keep streaming effect)
@@ -484,4 +486,12 @@ class StreamingOutputHandler:
         self.has_shown_reasoning_prefix = False
         self.accumulated_content = ""
         self.accumulated_reasoning = ""
+
+    def _show_role_prefix(self, symbol: str, label: str, color: str) -> None:
+        """Print a streaming role prefix before assistant/reasoning text."""
+        prefix = Text()
+        prefix.append(symbol, style=color)
+        prefix.append(label, style="bold")
+        prefix.append(" ", style=color)
+        self.console.print(prefix, end="")
     

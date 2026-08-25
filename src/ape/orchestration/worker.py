@@ -2,6 +2,7 @@
 
 import asyncio
 import contextvars
+import inspect
 import multiprocessing as mp
 import random
 import threading
@@ -36,6 +37,7 @@ class SampleWorker:
         orchestrator_start_time: datetime,
         sample_queue: Optional[Union[mp.Queue, asyncio.Queue]] = None,
         logger=None,
+        progress_callback=None,
     ):
         self.config = config
         self.scaffold_type = scaffold_type
@@ -47,6 +49,7 @@ class SampleWorker:
         self.orchestrator_start_time = orchestrator_start_time
         self.sample_queue = sample_queue
         self.logger = logger or create_logger()
+        self.progress_callback = progress_callback
 
         self.progress_manager = ProgressManager(config.execution.get_progress_path(orchestrator_dir))
         self.tasks_dir = config.execution.get_tasks_path(orchestrator_dir)
@@ -636,6 +639,10 @@ class SampleWorker:
         progress = await self.progress_manager.read()
         if progress:
             await print_progress(progress, self.execution_mode_name, self.orchestrator_start_time, self.logger)
+            if self.progress_callback:
+                result = self.progress_callback(progress)
+                if inspect.isawaitable(result):
+                    await result
 
 
 # ============================================================================
