@@ -32,6 +32,8 @@ from .review_overlay import STATE_LABEL, STATES
 PALETTE = {
     # Nothing was scheduled here: as close to empty as still leaves a grid.
     "unscheduled":  ("#fafbfc", "#ebedf1", "#9aa1ac", "#14171b", "#21262d", "#4d545e"),
+    # Declined: visible enough to read as a decision, quiet enough not to compete with work.
+    "pruned":       ("#eceef3", "#dadfe8", "#79808d", "#1d2027", "#2e333d", "#6d7583"),
     # Present but dead: solid, uncoloured, obviously inert.
     "unsupported":  ("#d7dae1", "#c1c7d1", "#4d5461", "#2a2f37", "#3b4250", "#98a1af"),
     "unavailable":  ("#e7cdb9", "#d0a480", "#7d4a29", "#3d2a1e", "#6d4830", "#e0a878"),
@@ -166,10 +168,10 @@ body.gold-on th.goldhead,body.gold-on td.goldcell{display:table-cell}
 tr.site.goldrow td.label{box-shadow:inset 3px 0 0 var(--gold)}
 body:not(.gold-on) tr.site.goldrow td.label{box-shadow:none}
 
-/* explain mode: keep only what a reader needs to see the shape of the result */
-body.explain td.cell[data-rank="0"] i,body.explain td.cell[data-rank="1"] i{opacity:.1}
-body.explain tr.site[data-rank="0"],body.explain tr.site[data-rank="1"]{display:none}
-body.explain .onlydebug{display:none}
+/* Debug is opt-in: the clean page is what a reader gets, not what they must ask for.
+   IDs, hashes and pipeline internals stay hidden until the toggle is on. */
+.onlydebug{display:none}
+body.debug .onlydebug{display:revert}
 
 /* --- view tabs: diff is the default spine, matrix a sibling view --- */
 .viewwrap{display:flex;flex:1;min-width:0;min-height:0}
@@ -256,6 +258,102 @@ body.matrixview #diffpane,body.matrixview #rail{display:none}
 .rt.no i{background:transparent;border:1px solid var(--line)}
 .rt .why{color:var(--faint);font-size:10.5px;margin-left:auto;text-align:right}
 .rt.no .nm{color:var(--soft)}
+
+/* --- lead + timeline panes --- */
+body:not(.leadview) #leadpane{display:none}
+body.leadview #diffpane,body.leadview #rail,body.leadview #matrixpane{display:none}
+body.leadview.matrixview #leadpane{display:none}
+#leadpane{flex:1;min-width:0;overflow:auto;padding:16px 20px 40vh}
+.lsec{margin:0 0 22px}
+.lsec>h2{margin:0 0 3px;font-size:13px;font-weight:600}
+.lsec>p.n{margin:0 0 10px;color:var(--soft);font-size:12px;max-width:74ch}
+.cards{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.card{border:1px solid var(--line);border-radius:7px;padding:8px 12px;background:var(--panel);
+      min-width:116px}
+.card b{display:block;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;
+        line-height:1.2}
+.card em{display:block;font-style:normal;font-size:10px;letter-spacing:.09em;
+         text-transform:uppercase;color:var(--faint);margin-top:1px}
+.card i{display:block;font-style:normal;font-size:10.5px;color:var(--faint);margin-top:3px}
+.card.warn{border-color:var(--del)}
+.card.warn b{color:var(--del)}
+
+/* gantt */
+.gantt{border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+.grow{display:flex;align-items:center;gap:8px;padding:1px 10px;font-size:11px}
+.grow.head{background:var(--sunk);border-bottom:1px solid var(--line);padding:5px 10px;
+           font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.grow .gl{flex:none;width:190px;font-family:var(--mono);font-size:10.5px;
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grow .gt{position:relative;flex:1;height:15px;min-width:120px}
+.grow .gt span{position:absolute;top:2px;height:11px;border-radius:3px;min-width:2px;
+               background:var(--accent);opacity:.85;cursor:pointer}
+.grow .gt span.mandatory{background:var(--soft);opacity:.55}
+.grow .gt span.failed{background:var(--del)}
+.grow .gm{flex:none;width:150px;text-align:right;color:var(--faint);font-size:10.5px;
+          font-variant-numeric:tabular-nums}
+.grow.lead .gt span{background:var(--gold);height:15px;top:0;border-radius:2px}
+.wband{background:var(--sunk);border-top:1px solid var(--line);
+       border-bottom:1px solid var(--line);padding:3px 10px;font-size:10.5px;color:var(--soft)}
+.wband b{color:var(--ink);font-weight:600}
+
+/* ladder */
+.ladder{border-left:2px solid var(--line);margin:6px 0 0 8px;padding-left:14px}
+.lturn{position:relative;padding:7px 0}
+.lturn::before{content:"";position:absolute;left:-21px;top:12px;width:9px;height:9px;
+               border-radius:50%;background:var(--panel);border:2px solid var(--line)}
+.lturn.act::before{border-color:var(--gold);background:var(--gold)}
+.lturn .tno{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.lturn .say{margin:2px 0;font-size:12px;color:var(--ink);max-width:76ch}
+.jobs{margin:5px 0 0;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.job{display:flex;align-items:center;gap:8px;padding:4px 9px;font-size:11.5px;
+     border-top:1px solid var(--line);cursor:pointer}
+.job:first-child{border-top:0}
+.job:hover{background:var(--sunk)}
+.job .ja{flex:none;width:118px;font-weight:600}
+.job .jw{flex:1;min-width:0;color:var(--faint);font-family:var(--mono);font-size:10.5px;
+         white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.job .jm{flex:none;color:var(--soft);font-size:10.5px;font-variant-numeric:tabular-nums}
+.job.declined{opacity:.5}
+.brief{border-left:2px solid var(--gold);padding:5px 0 5px 10px;margin:5px 0;
+       background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.brief h4{margin:0 0 3px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+          color:var(--gold);font-weight:600}
+.brief p{margin:2px 0;font-size:11.5px;color:var(--soft)}
+.brief p.claim{color:var(--ink)}
+a.convlink{color:var(--accent);font-size:11px}
+
+/* the declined table */
+table.decl{width:100%;border-collapse:collapse;font-size:11.5px}
+.decl th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+         color:var(--faint);font-weight:500;padding:0 8px 5px;border-bottom:1px solid var(--line)}
+.decl td{padding:4px 8px;border-bottom:1px solid var(--line);
+         font-variant-numeric:tabular-nums}
+.decl td.n{text-align:right}
+.decl tr.mand td{color:var(--soft)}
+.bar{display:inline-block;height:8px;border-radius:2px;background:var(--accent);
+     vertical-align:middle;opacity:.7}
+.bar.d{background:var(--faint);opacity:.45}
+
+/* conversation page */
+.cpage{max-width:1000px;margin:0 auto;padding:22px 20px 70px}
+.cturn{border:1px solid var(--line);border-radius:7px;margin:9px 0;overflow:hidden;
+       background:var(--panel)}
+.cturn>.ch{display:flex;gap:9px;align-items:baseline;padding:5px 11px;background:var(--sunk);
+           border-bottom:1px solid var(--line);font-size:10.5px;color:var(--faint)}
+.cturn>.ch b{color:var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.cturn .body{padding:9px 11px}
+.cturn p{margin:0 0 8px;font-size:12.5px;line-height:1.55;white-space:pre-wrap}
+.cturn p:last-child{margin-bottom:0}
+.tcall{border:1px solid var(--line);border-radius:5px;margin:7px 0;background:var(--bg)}
+.tcall .th2{display:flex;gap:8px;align-items:baseline;padding:4px 9px;font-size:11px;
+            border-bottom:1px solid var(--line)}
+.tcall .th2 b{font-family:var(--mono);font-weight:600}
+.tcall pre{margin:0;padding:7px 9px;font-family:var(--mono);font-size:10.5px;
+           white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto;
+           color:var(--soft)}
+.tcall.res{background:var(--sunk)}
+.trunc{padding:3px 9px;font-size:10px;color:var(--faint);border-top:1px dashed var(--line)}
 
 /* --- aside --- */
 aside h2{margin:0 0 2px;font-size:13.5px;font-weight:600;font-family:var(--mono);
@@ -479,47 +577,75 @@ function transcriptBlock(b){
   const quiet=RANK[st]<RANK['opportunity'];
   let h='<div class="blk'+(quiet?' q':'')+'"><h3>'+esc(COL[b.component]?COL[b.component].label:b.component)
     +' '+pill(st)+'<span class="chip">'+esc(ARMS[b.arm]||b.arm)+'</span></h3>';
+  /* v5 delegations: what the lead asked this arm to do here, and what it cost. */
+  (b.delegations||[]).forEach(d=>{
+    if(d.disposition==='pruned'){
+      h+='<p>Declined'+(d.reason?': '+esc(d.reason):'.')+'</p>';
+      return;
+    }
+    h+='<div class="chips"><span class="chip">'+esc(d.disposition)+'</span>'
+      +(d.tier?'<span class="chip">'+esc(d.tier)+'</span>':'')
+      +(d.cost!=null?'<span class="chip">$'+d.cost.toFixed(4)+'</span>':'')
+      +(d.execution_time!=null?'<span class="chip">'+Math.round(d.execution_time)+'s</span>':'')
+      +(d.turns?'<span class="chip">'+d.turns+' turns</span>':'')+'</div>';
+    if(d.brief)h+=briefHtml(d.brief);
+    (d.claims||[]).forEach(c=>{
+      h+='<p class="claim">'+esc(c.claim)+'</p>';
+      if(c.requested_change)h+='<p>&rarr; '+esc(c.requested_change)+'</p>';
+    });
+    if(d.has_transcript)h+='<p>'+convLink(d.invocation_id,'read the conversation')
+      +'</p>';
+  });
+  /* v4 investigations: only the outcome and its basis. The capability assessments,
+     per-operator run rows and terminal reason codes were executor vocabulary -- unreadable
+     without having read the executor, and never actionable. */
   b.investigations.forEach(iv=>{
-    h+='<div class="onlydebug">';
-    h+='<p>'+esc(iv.terminal_stage||iv.disposition||'no execution record')
-      +(iv.terminal_reason?' — '+esc(iv.terminal_reason):'')+'</p>';
     if(iv.basis)h+='<p>'+esc(iv.basis)+'</p>';
-    iv.assessments.forEach(a=>{h+='<div class="kv">'+esc(a.implementation_id)+' → '
-      +esc(a.status)+' ('+esc(a.reason_code)+')</div>';});
-    iv.operator_runs.forEach(r=>{h+='<div class="kv">'+esc(r.operator)+' → '+esc(r.status)
-      +' · '+r.result_count+' result(s)'+(r.failure_reason?' · '+esc(r.failure_reason):'')
-      +'</div>';});
-    h+='</div>';
     iv.opportunities.forEach(o=>{
       h+='<p class="claim">'+esc(o.observed_pattern)+'</p>';
-      if(o.transformation)h+='<p>→ '+esc(o.transformation.kind)+': '
+      if(o.transformation)h+='<p>&rarr; '+esc(o.transformation.kind)+': '
         +esc(o.transformation.description)+'</p>';
     });
+    h+='<div class="kv onlydebug">'+esc(iv.investigation_id||'')+'</div>';
   });
   b.candidates.forEach(c=>{
     h+='<p class="claim">'+esc(c.claim)+'</p>';
-    if(c.requested_change)h+='<p>→ '+esc(c.requested_change)+'</p>';
+    if(c.requested_change)h+='<p>&rarr; '+esc(c.requested_change)+'</p>';
     h+='<div class="chips"><span class="chip">'+esc(c.concern_family)+'</span>'
       +'<span class="chip">'+esc(c.severity)+'</span>'
       +(c.issue_kind?'<span class="chip">'+esc(c.issue_kind)+'</span>':'')
+      /* The packet verdict stays; the collector/kind/polarity/source_ref lines and raw
+         artifact excerpts do not -- they describe how evidence was gathered, not what it says. */
       +(c.packet?'<span class="chip">evidence '+esc(c.packet.status)+'</span>':'')
       +(c.primary?'':'<span class="chip">anchored elsewhere</span>')+'</div>';
-    if(c.artifacts&&c.artifacts.length)h+='<div class="onlydebug">'+c.artifacts.map(a=>
-      '<div class="kv">'+esc(a.collector)+'/'+esc(a.kind)+' ['+esc(a.polarity)+'] '
-      +esc(a.source_ref)+'</div>').join('')+'</div>';
   });
   b.findings.forEach(f=>{
     h+='<p class="claim">'+esc(f.claim)+'</p>';
-    h+='<p>→ '+esc(f.requested_change)+'</p>';
+    h+='<p>&rarr; '+esc(f.requested_change)+'</p>';
     h+='<div class="chips"><span class="chip">'+esc(f.admission)+'</span>'
       +'<span class="chip">'+esc(f.evidence_tier)+'</span>'
       +'<span class="chip">'+esc(f.concern_family)+'</span>'
       +(f.site_count>1?'<span class="chip">spans '+f.site_count+' sites</span>':'')
       +(f.primary?'':'<span class="chip">anchored elsewhere</span>')+'</div>';
-    h+='<div class="kv onlydebug">'+esc(f.finding_id)+(f.issue_id?' · '+esc(f.issue_id):'')
+    h+='<div class="kv onlydebug">'+esc(f.finding_id)+(f.issue_id?' \u00b7 '+esc(f.issue_id):'')
       +'</div>';
   });
   return h+'</div>';
+}
+
+function briefHtml(b){
+  if(!b)return '';
+  let h='<div class="brief"><h4>the lead asked</h4><p class="claim">'+esc(b.question)+'</p>';
+  if(b.because)h+='<p><b>because</b> '+esc(b.because)+'</p>';
+  if(b.look_at&&b.look_at.length)h+='<p><b>look at</b> '+esc(b.look_at.join('; '))+'</p>';
+  if(b.already_checked)h+='<p><b>already checked</b> '+esc(b.already_checked)+'</p>';
+  if(b.abstain_if)h+='<p><b>abstain if</b> '+esc(b.abstain_if)+'</p>';
+  return h+'</div>';
+}
+
+function convLink(conversationId,label){
+  const slug=String(conversationId).replace(/[^A-Za-z0-9]+/g,'-');
+  return '<a class="convlink" href="conv/'+slug+'.html">'+esc(label)+'</a>';
 }
 
 function cellState(changeId,col){
@@ -575,13 +701,22 @@ function unanchoredHtml(){
 function intro(){
   let h=unanchoredHtml()
     +'<div class="sect" style="border-top:0;padding-top:0">how to read this</div>'
-    +'<p style="color:var(--soft)">Rows are <b>change targets</b> — the review sites this '
-    +'PR’s diff decomposes into, in diff order. Columns are the components that can speak '
-    +'about a site. A cell’s colour is how far that component got.</p>'
-    +'<p style="color:var(--soft)">Click any cell or row for the diff at that site and what '
-    +'every component said about it, including the ones that checked and found nothing.</p>'
+    +'<p style="color:var(--soft)">The page opens on the <b>diff</b>. Each bracketed block '
+    +'is a <b>change target</b> — one changed declaration — and the swatches beside it '
+    +'are what each reviewer did there. Click one for the detail.</p>'
+    +(PR.lead
+      ? '<p style="color:var(--soft)">The <b>lead</b> tab retraces the routing: what the '
+        +'agenda offered, which specialists ran and which the lead declined, in what order, '
+        +'and what each conversation cost. Every conversation is readable in full.</p>'
+      : '<p style="color:var(--soft)">The <b>matrix</b> tab puts every site against every '
+        +'component at once, which is the better view on a large PR.</p>')
     +'<div class="sect">states</div>';
-  STATES.forEach(s=>{h+='<div style="display:flex;gap:8px;align-items:center;margin:4px 0">'
+  // Only the states this page can actually produce. On a v5 page five of the v4 executor's
+  // states are structurally impossible and listing them at zero is noise.
+  const present=new Set();
+  PR.sites.forEach(s=>Object.values(s.cells||{}).forEach(c=>present.add(c.state)));
+  STATES.filter(s=>present.has(s)).forEach(s=>{
+    h+='<div style="display:flex;gap:8px;align-items:center;margin:4px 0">'
     +'<i class="s-'+s+'" style="width:16px;height:16px;border-radius:4px;border:1px solid;'
     +'display:block;flex:none"></i><span style="font-size:11.5px;color:var(--soft)">'
     +esc(LABEL[s])+'</span></div>';});
@@ -704,6 +839,7 @@ function relatedHtml(site){
 }
 
 function budgetHtml(){
+  if(PR.lead)return leadCostHtml();
   if(!BUDGET.measured)return '';
   return '<div class="sect">what the scheduling cost</div>'
     +'<p style="color:var(--soft)">'+BUDGET.calls+' calls, '+fmt(BUDGET.total_chars)
@@ -714,6 +850,27 @@ function budgetHtml(){
     +BUDGET.overhead_ratio+'×</b> more, because each call repeats its file’s diff '
     +'and code. What it buys is per-target attribution, not cost and not context room: '
     +'this PR fits in one call either way.</p>';
+}
+
+function leadCostHtml(){
+  const c=PR.lead.cost||{},run=RUNCOST||{};
+  const usd=v=>'$'+(v==null?0:v).toFixed(4);
+  let h='<div class="sect">what this review cost</div>'
+    +'<p style="color:var(--soft)">'+usd(c.total)
+    +' for this PR: the lead\u2019s own turns '+usd(c.lead)+', the mandatory floor '
+    +usd(c.mandatory)+', the specialists it chose '+usd(c.proposed)+'.</p>';
+  if(run.actual_total!=null){
+    h+='<p style="color:var(--soft)">Across the run: <b>$'+run.actual_total.toFixed(2)
+      +'</b>, of which the floor is $'+(run.mandatory||0).toFixed(2)+' \u2014 '
+      +Math.round(100*(run.mandatory||0)/run.actual_total)+'% of the bill for work the lead '
+      +'did not choose.</p>';
+    if(run.manifest_understates_by>0.005){
+      h+='<p style="color:var(--del)">The run manifest reports $'
+        +run.manifest_total.toFixed(2)+'. It omits the mandatory floor, so it understates '
+        +'the run by $'+run.manifest_understates_by.toFixed(2)+'.</p>';
+    }
+  }
+  return h;
 }
 
 /* --- wiring --- */
@@ -769,6 +926,25 @@ document.querySelectorAll('.th').forEach(h=>{
     select(h.dataset.id,swatch?swatch.dataset.col:null);
   });
 });
+const lb=$('#leadbtn');
+if(lb)lb.addEventListener('click',()=>{
+  document.body.classList.toggle('leadview');
+  lb.classList.toggle('on');
+  // The fan is positioned from live geometry; hiding its pane must clear it.
+  drawFan(cur.site);
+});
+// A Gantt bar or a ladder row selects the site its job was scheduled on, so the timeline
+// and the diff stay two views of one thing.
+document.querySelectorAll('[data-inv]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const job=(PR.lead&&PR.lead.delegations||[]).find(j=>j.invocation_id===el.dataset.inv);
+    if(job&&job.site_change_ids&&job.site_change_ids.length){
+      document.body.classList.remove('leadview');
+      if(lb)lb.classList.remove('on');
+      select(job.site_change_ids[0],job.arm_id);
+    }
+  });
+});
 const vb=$('#viewbtn');
 vb.addEventListener('click',()=>{
   document.body.classList.toggle('matrixview');
@@ -781,9 +957,10 @@ vb.addEventListener('click',()=>{
 const dp=$('#diffpane');
 if(dp)dp.addEventListener('scroll',()=>{if(cur.site)drawFan(cur.site);},{passive:true});
 addEventListener('resize',()=>{if(cur.site)drawFan(cur.site);});
-const eb=$('#explainbtn');
+const eb=$('#debugbtn');
 eb.addEventListener('click',()=>{
-  document.body.classList.toggle('explain');eb.classList.toggle('on');
+  document.body.classList.toggle('debug');eb.classList.toggle('on');
+  if(cur.site)renderPanel(cur.site,cur.col);
 });
 // Background click deselects, in whichever pane is showing.
 ['#matrixpane','#diffpane'].forEach(sel=>{
@@ -1112,6 +1289,358 @@ def _rail(bundle) -> str:
     )
     return f'<div id="rail">{head}{"".join(rows)}</div>'
 
+def _fmt_money(value) -> str:
+    return "—" if value is None else f"${value:,.4f}"
+
+
+def _lead_pane(bundle) -> str:
+    """The lead's work: what it was given, what it decided, and what that cost.
+
+    Rendered server-side rather than from the payload because it is a document, not an
+    interactive surface -- and because the Gantt's geometry is arithmetic over timestamps
+    that is easier to get right, and to test, in Python.
+    """
+
+    lead = bundle.lead
+    if not lead:
+        return '<div id="leadpane"></div>'
+
+    ran = [job for job in lead["delegations"]
+           if job["disposition"] in ("mandatory", "proposed", "agent_added")]
+    declined = [job for job in lead["delegations"] if job["disposition"] == "pruned"]
+    cost = lead.get("cost") or {}
+    coverage = lead.get("coverage") or {}
+    briefed = [job for job in ran if job.get("brief")]
+
+    cards = [
+        ("Proposed", len(lead["delegations"]), "(arm × site) jobs enumerated"),
+        ("Delegated", len(ran),
+         f"{sum(1 for j in ran if j['disposition'] == 'mandatory')} floor, "
+         f"{sum(1 for j in ran if j['disposition'] != 'mandatory')} chosen"),
+        ("Declined", len(declined), "the lead said no"),
+        ("Briefed", len(briefed), "carried an instruction"),
+        ("Cost", _fmt_money(cost.get("total")),
+         f"lead {_fmt_money(cost.get('lead'))}, floor {_fmt_money(cost.get('mandatory'))}"),
+    ]
+    card_html = "".join(
+        f'<div class="card"><em>{_esc(label)}</em><b>{_esc(value)}</b>'
+        f'<i>{_esc(note)}</i></div>'
+        for label, value, note in cards
+    )
+
+    caps = lead.get("caps") or {}
+    given = (
+        '<div class="lsec"><h2>What the lead was given</h2>'
+        f'<p class="n">One lead runs per PR. It may route, and only route — it has '
+        f'<code>delegate</code>, <code>read_agenda</code> and <code>submit_routing</code>, '
+        f'and no way to emit a finding itself. Its budget: '
+        f'{_fmt_money(caps.get("lead_cost_cap"))} for its own turns, '
+        f'{_fmt_money(caps.get("per_pr_cost_cap"))} for this PR in total.</p>'
+        f'<div class="cards">{card_html}</div>'
+        f"{_arms_table(lead)}</div>"
+    )
+
+    return (
+        '<div id="leadpane">'
+        f"{given}"
+        f"{_gantt(bundle, lead, ran)}"
+        f"{_ladder(bundle, lead, ran)}"
+        f"{_declined_table(declined)}"
+        f"{_assessments(lead)}"
+        "</div>"
+    )
+
+
+def _arms_table(lead) -> str:
+    rows = lead.get("arms") or []
+    if not rows:
+        return ""
+    widest = max((row["enumerated"] for row in rows), default=1) or 1
+    body = []
+    for row in rows:
+        ran_w = 100.0 * row["ran"] / widest
+        dec_w = 100.0 * row["declined"] / widest
+        body.append(
+            f'<tr class="{"mand" if row["mandatory"] else ""}">'
+            f'<td>{_esc(row["arm_id"].replace("_", " "))}</td>'
+            f'<td>{"floor" if row["mandatory"] else _esc(row.get("kind") or "")}</td>'
+            f'<td style="width:36%"><span class="bar" style="width:{ran_w:.1f}%"></span>'
+            f'<span class="bar d" style="width:{dec_w:.1f}%"></span></td>'
+            f'<td class="n">{row["ran"]}</td><td class="n">{row["declined"]}</td>'
+            f'<td class="n">{row["candidates"]}</td>'
+            f'<td class="n">{_fmt_money(row["cost"])}</td></tr>'
+        )
+    return (
+        '<table class="decl"><thead><tr><th>arm</th><th></th><th>ran / declined</th>'
+        '<th class="n">ran</th><th class="n">declined</th><th class="n">claims</th>'
+        f'<th class="n">cost</th></tr></thead><tbody>{"".join(body)}</tbody></table>'
+    )
+
+
+def _epoch(stamp) -> Optional[float]:
+    """Parse an ISO stamp to seconds. Returns None rather than raising on a partial run."""
+
+    if not stamp:
+        return None
+    from datetime import datetime
+
+    try:
+        return datetime.fromisoformat(stamp.replace("Z", "+00:00")).timestamp()
+    except (ValueError, TypeError):
+        return None
+
+
+def _gantt(bundle, lead, ran) -> str:
+    """Wall-clock bars, from the sidecar's per-invocation timestamps.
+
+    Never from `delegations.jsonl::wall_seconds`, which is the tier's duration copied onto
+    every job in it — on the held-out run 239 rows share 29 values, one repeated 108 times,
+    so bars drawn from it would all be the same length and all wrong.
+    """
+
+    spans = [(job, _epoch(job.get("started_at")), _epoch(job.get("completed_at")))
+             for job in ran]
+    spans = [(job, start, end) for job, start, end in spans if start and end]
+    if not spans:
+        return (
+            '<div class="lsec"><h2>Timeline</h2>'
+            '<p class="n">No per-invocation timings — the trajectory sidecar was not '
+            'extracted for this run, so only the logical sequence below is available. Run '
+            '<code>-m src.datasets.pr_review_v5.trajectory --run &lt;run&gt;</code> to add it.'
+            "</p></div>"
+        )
+
+    lead_start, lead_end = _epoch(lead.get("started_at")), _epoch(lead.get("completed_at"))
+    origin = min([start for _job, start, _end in spans] + ([lead_start] if lead_start else []))
+    finish = max([end for _job, _start, end in spans] + ([lead_end] if lead_end else []))
+    total = max(finish - origin, 1e-6)
+
+    def bar(start, end, klass, title):
+        left = 100.0 * (start - origin) / total
+        width = max(100.0 * (end - start) / total, 0.4)
+        return (f'<span class="{klass}" style="left:{left:.2f}%;width:{width:.2f}%" '
+                f'title="{_esc(title)}"></span>')
+
+    rows = ['<div class="grow head"><span class="gl">who</span>'
+            '<span class="gt"></span><span class="gm">time · cost</span></div>']
+    if lead_start and lead_end:
+        rows.append(
+            '<div class="grow lead"><span class="gl">lead</span><span class="gt">'
+            + bar(lead_start, lead_end, "", "lead")
+            + f'</span><span class="gm">{lead_end - lead_start:.0f}s · '
+              f'{_fmt_money(lead.get("lead_cost"))}</span></div>'
+        )
+
+    # Group by wave, in start order, so the bands read as the lead's successive decisions.
+    waves: Dict[str, list] = {}
+    for job, start, end in spans:
+        waves.setdefault(job.get("wave") or "—", []).append((job, start, end))
+    for wave in sorted(waves, key=lambda key: min(s for _j, s, _e in waves[key])):
+        group = sorted(waves[wave], key=lambda item: item[1])
+        floor = sum(1 for job, _s, _e in group if job["disposition"] == "mandatory")
+        tiers = sorted({job.get("tier") or "?" for job, _s, _e in group})
+        cost = sum(job.get("cost") or 0 for job, _s, _e in group)
+        rows.append(
+            f'<div class="wband"><b>{_esc(wave)}</b> · {len(group)} job(s) · '
+            f'{floor} floor, {len(group) - floor} chosen · {_esc(", ".join(tiers))} · '
+            f"{_fmt_money(cost)}</div>"
+        )
+        for job, start, end in group:
+            klass = "mandatory" if job["disposition"] == "mandatory" else ""
+            if job.get("status") and job["status"] != "success":
+                klass = "failed"
+            rows.append(
+                f'<div class="grow" data-inv="{_esc(job["invocation_id"])}">'
+                f'<span class="gl">{_esc(job["arm_id"].replace("_", " "))}</span>'
+                f'<span class="gt">'
+                + bar(start, end, klass,
+                      f"{job['arm_id']} · {end - start:.0f}s · {_fmt_money(job.get('cost'))}")
+                + f'</span><span class="gm">{end - start:.0f}s · '
+                  f'{_fmt_money(job.get("cost"))}</span></div>'
+            )
+
+    concurrency = sum(end - start for _job, start, end in spans) / total
+    return (
+        '<div class="lsec"><h2>Timeline</h2>'
+        f'<p class="n">{finish - origin:.0f} s wall for '
+        f"{sum(end - start for _j, start, end in spans):.0f} s of agent time — "
+        f"about {concurrency:.1f}× concurrent. Grey bars are the mandatory floor, which runs "
+        f"whatever the lead asks; coloured bars are its own choices.</p>"
+        f'<div class="gantt">{"".join(rows)}</div></div>'
+    )
+
+
+def _ladder(bundle, lead, ran) -> str:
+    """The lead's turns, with each `delegate` batch expanded into the jobs it launched.
+
+    This is where the reasoning is, and unlike the Gantt it survives without the sidecar:
+    the ledger alone gives the jobs and their briefs.
+    """
+
+    conversation = (bundle.conversations or {}).get(lead.get("conversation_id") or "", [])
+    names = {site.change_id: site.declaration_name for site in bundle.sites}
+    by_wave: Dict[str, list] = {}
+    for job in ran:
+        by_wave.setdefault(job.get("wave") or "—", []).append(job)
+    wave_order = sorted(by_wave, key=lambda key: min(
+        (job.get("started_at") or "") for job in by_wave[key]))
+
+    turns, batch = [], 0
+    for turn in conversation:
+        if turn.get("role") != "assistant":
+            continue
+        says = [item["v"] for item in turn.get("items", []) if item["t"] == "text"]
+        uses = [item for item in turn.get("items", []) if item["t"] == "use"]
+        if not says and not uses:
+            continue
+        tools = ", ".join(sorted({item.get("name") or "?" for item in uses}))
+        block = [
+            f'<div class="lturn{" act" if any(u.get("name") == "delegate" for u in uses) else ""}">'
+            f'<div class="tno">turn {len(turns) + 1}'
+            + (f" · {_esc(tools)}" if tools else "")
+            + "</div>"
+        ]
+        for text in says:
+            block.append(f'<div class="say">{_esc(text[:1200])}</div>')
+        if any(item.get("name") == "delegate" for item in uses):
+            wave = wave_order[batch] if batch < len(wave_order) else None
+            batch += 1
+            if wave is not None:
+                block.append(_job_rows(by_wave[wave], wave, names))
+        block.append("</div>")
+        turns.append("".join(block))
+
+    if not turns:
+        # No transcript: fall back to the waves themselves, which the ledger always gives.
+        for wave in wave_order:
+            turns.append(
+                f'<div class="lturn act"><div class="tno">{_esc(wave)}</div>'
+                + _job_rows(by_wave[wave], wave, names) + "</div>"
+            )
+
+    note = (
+        "Each <code>delegate</code> call launches a wave. The floor is prepended to wave 1 "
+        "whatever the lead asks for, so an empty first <code>delegate</code> is the "
+        "idiomatic opening move."
+    )
+    return (
+        '<div class="lsec"><h2>What the lead did, in order</h2>'
+        f'<p class="n">{note}</p><div class="ladder">{"".join(turns)}</div></div>'
+    )
+
+
+def _job_rows(jobs, wave, names=None) -> str:
+    """One row per job. The work unit is identified by what it contains, not by its hash.
+
+    A row used to read `wu:28601c8d1538799b6c5d4edc`, which tells a reader nothing; the
+    declarations the unit covers tell them what the specialist was pointed at.
+    """
+
+    names = names or {}
+    rows = []
+    for job in sorted(jobs, key=lambda item: (item.get("started_at") or "", item["arm_id"])):
+        sites = [names.get(change_id) for change_id in job.get("site_change_ids", [])]
+        sites = [name for name in sites if name]
+        if sites:
+            label = ", ".join(sites[:2])
+            if len(sites) > 2:
+                label += f" +{len(sites) - 2} more"
+        else:
+            label = f'{len(job.get("site_change_ids", []))} site(s)'
+        meta = " · ".join(filter(None, [
+            job.get("tier"),
+            f"{job['candidate_count']} claim(s)" if job.get("candidate_count") else "no claim",
+            _fmt_money(job.get("cost")) if job.get("cost") is not None else None,
+            f"{job['turns']} turns" if job.get("turns") else None,
+        ]))
+        link = (_conv_link(job["invocation_id"], "read") if job.get("has_transcript") else "")
+        rows.append(
+            f'<div class="job" data-inv="{_esc(job["invocation_id"])}">'
+            f'<span class="ja">{_esc(job["arm_id"].replace("_", " "))}</span>'
+            f'<span class="jw">{_esc(label)}'
+            f'<span class="onlydebug"> {_esc(job["work_unit_id"])}</span></span>'
+            f'<span class="jm">{_esc(meta)} {link}</span></div>'
+            + (_brief_html(job["brief"]) if job.get("brief") else "")
+        )
+    return f'<div class="jobs">{"".join(rows)}</div>'
+
+
+def _brief_html(brief) -> str:
+    if not brief:
+        return ""
+    parts = [f'<div class="brief"><h4>the lead asked</h4>'
+             f'<p class="claim">{_esc(brief.get("question"))}</p>']
+    for key, label in (("because", "because"), ("already_checked", "already checked"),
+                       ("abstain_if", "abstain if")):
+        if brief.get(key):
+            parts.append(f"<p><b>{label}</b> {_esc(brief[key])}</p>")
+    if brief.get("look_at"):
+        parts.append(f'<p><b>look at</b> {_esc("; ".join(brief["look_at"]))}</p>')
+    return "".join(parts) + "</div>"
+
+
+def _conv_link(conversation_id: str, label: str) -> str:
+    return f'<a class="convlink" href="conv/{_conv_slug(conversation_id)}.html">{_esc(label)}</a>'
+
+
+def _conv_slug(conversation_id: str) -> str:
+    return "".join(
+        char if char.isalnum() else "-" for char in str(conversation_id)
+    ).strip("-")
+
+
+def _declined_table(declined) -> str:
+    """What the lead chose not to do. The larger half of the routing decision."""
+
+    if not declined:
+        return ""
+    by_arm: Dict[str, int] = {}
+    for job in declined:
+        by_arm[job["arm_id"]] = by_arm.get(job["arm_id"], 0) + 1
+    reasons = {job.get("reason") for job in declined if job.get("reason")}
+    chips = "".join(
+        f'<span class="chip">{_esc(arm.replace("_", " "))} {count}</span>'
+        for arm, count in sorted(by_arm.items(), key=lambda item: -item[1])
+    )
+    return (
+        '<div class="lsec"><h2>What the lead declined</h2>'
+        f'<p class="n">{len(declined)} of the enumerated jobs were never run. The mandatory '
+        "floor means no site goes unlooked-at, so what is declined here is always "
+        "<em>specialist</em> coverage at a site the generalist already saw.</p>"
+        f'<div class="chips">{chips}</div>'
+        + (f'<p class="n">Stated reason: {_esc("; ".join(sorted(reasons))[:300])}</p>'
+           if reasons else "")
+        + "</div>"
+    )
+
+
+def _assessments(lead) -> str:
+    """The lead's verdicts on what came back — recorded by design, and never applied."""
+
+    rows = lead.get("assessments") or []
+    if not rows:
+        return ""
+    counts: Dict[str, int] = {}
+    for row in rows:
+        counts[row.get("verdict") or "?"] = counts.get(row.get("verdict") or "?", 0) + 1
+    chips = "".join(f'<span class="chip">{_esc(key)} {value}</span>'
+                    for key, value in sorted(counts.items()))
+    body = "".join(
+        f'<tr><td>{_esc(row.get("verdict"))}</td>'
+        f'<td>{_esc((row.get("reason") or "")[:180])}</td></tr>'
+        for row in rows[:20]
+    )
+    return (
+        '<div class="lsec"><h2>What the lead thought of the results</h2>'
+        f'<p class="n">v1 gives the lead authority over routing only. These verdicts are '
+        "recorded because they are the evidence for whether arbitration is worth building "
+        "next — the finalization chain never reads them, so nothing here changed what was "
+        "published.</p>"
+        f'<div class="chips">{chips}</div>'
+        f'<table class="decl"><thead><tr><th>verdict</th><th>reason</th></tr></thead>'
+        f"<tbody>{body}</tbody></table></div>"
+    )
+
 def _ribbon(bundle) -> str:
     parts = []
     for stage in bundle.stages:
@@ -1129,9 +1658,11 @@ def _legend(bundle) -> str:
             counts[cell.state] = counts.get(cell.state, 0) + 1
     parts = []
     for state in STATES:
+        if not counts.get(state):
+            continue
         parts.append(
             f'<button class="key s-{state}" data-state="{state}"><i></i>'
-            f'{_esc(STATE_LABEL[state])} <b>{counts.get(state, 0)}</b></button>'
+            f'{_esc(STATE_LABEL[state])} <b>{counts[state]}</b></button>'
         )
     return '<div class="keys">' + "".join(parts) + "</div>"
 
@@ -1215,6 +1746,25 @@ def to_html(
         "work_units": bundle.work_units,
         "call_budget": bundle.call_budget,
         "totals": bundle.totals,
+        # Slim: the browser needs the cost split and a click index from invocation to sites.
+        # The delegation detail is rendered server-side, and re-shipping it would duplicate
+        # ~1,000 rows into PR 33149's page for nothing.
+        "lead": (
+            {
+                "cost": bundle.lead["cost"],
+                "lead_cost": bundle.lead.get("lead_cost"),
+                "coverage": bundle.lead.get("coverage"),
+                "delegations": [
+                    {
+                        "invocation_id": job["invocation_id"],
+                        "arm_id": job["arm_id"],
+                        "site_change_ids": job["site_change_ids"],
+                    }
+                    for job in bundle.lead["delegations"]
+                ],
+            }
+            if bundle.lead else None
+        ),
         "sites": [
             {
                 "change_id": site.change_id,
@@ -1278,10 +1828,12 @@ def to_html(
         f'<p class="sub" id="sub">{_esc(subtitle)}</p>'
         "</div><div class=\"toggles\">"
         f"{gold_button}"
-        '<button class="tg" id="viewbtn" title="switch between the diff and the matrix">'
+        + ('<button class="tg" id="leadbtn" title="what the lead routed and what it cost">'
+           "lead</button>" if bundle.lead else "")
+        + '<button class="tg" id="viewbtn" title="switch between the diff and the matrix">'
         "matrix view</button>"
-        '<button class="tg" id="explainbtn" title="hide unscheduled and unsupported detail">'
-        "explain mode</button>"
+        '<button class="tg" id="debugbtn" title="show ids, hashes and pipeline internals">'
+        "debug</button>"
         + ("" if standalone else '<button class="tg"><a href="index.html">all PRs</a></button>')
         + "</div></header>"
         f"{_ribbon(bundle)}{_legend(bundle)}"
@@ -1290,13 +1842,16 @@ def to_html(
         f"{_diff_pane(bundle, columns, groups)}"
         '<div class="canvas" id="matrixpane">'
         f"{_matrix(bundle, gold)}"
-        "</div></div>"
+        "</div>"
+        f"{_lead_pane(bundle)}"
+        "</div>"
         '<aside id="panel"></aside></div></div>'
         '<div id="tip"></div>'
         "<script>"
         f"{_blob('PR', payload, standalone)}"
         f"{_blob('GOLD', pr_gold, standalone)}"
         f"{_blob('SRC', sources, standalone)}"
+        f"{_blob('RUNCOST', (sources or {}).get('run_cost'), standalone)}"
         f"{_blob('STATES', list(STATES), standalone)}"
         f"{_blob('LABEL', STATE_LABEL, standalone)}"
         f"{_blob('ARMS', ARM_LABEL, standalone)}"
@@ -1311,6 +1866,132 @@ def to_html(
         page = _ascii_markup(head) + "<script>" + _ascii_js(script)
     return page
 
+
+def conversation_page(conversation_id: str, turns: Sequence[dict], meta: dict) -> str:
+    """One conversation, as a document.
+
+    A separate file rather than a section of the overlay page. The held-out run's PR 33149
+    draws a mandatory generalist on each of its 108 work units, and its transcripts alone are
+    3.9 MB; embedding them would make every page pay for the worst one, and an "embed when
+    small" rule would give the same click two different behaviours.
+
+    Assistant text is verbatim. Tool results are capped by the extractor and the true byte
+    count is shown, because a truncated result that does not say it was truncated is a lie
+    about what the agent saw.
+    """
+
+    head = []
+    for label, value in meta.get("facts", []):
+        if value not in (None, "", []):
+            head.append(f'<div class="card"><em>{_esc(label)}</em>'
+                        f'<b>{_esc(value)}</b></div>')
+
+    blocks = []
+    for index, turn in enumerate(turns):
+        items = []
+        for item in turn.get("items", []):
+            kind = item.get("t")
+            if kind in ("text", "think"):
+                label = "" if kind == "text" else '<div class="tno">reasoning</div>'
+                items.append(f"{label}<p>{_esc(item.get('v'))}</p>")
+            elif kind == "use":
+                items.append(
+                    '<div class="tcall"><div class="th2">'
+                    f'<b>{_esc(item.get("name"))}</b><span>called</span></div>'
+                    f'<pre>{_esc(item.get("v"))}</pre>'
+                    + _truncation_note(item)
+                    + "</div>"
+                )
+            elif kind == "res":
+                items.append(
+                    '<div class="tcall res"><div class="th2">'
+                    f'<b>{_esc(item.get("name"))}</b><span>returned</span></div>'
+                    f'<pre>{_esc(item.get("v"))}</pre>'
+                    + _truncation_note(item)
+                    + "</div>"
+                )
+        if not items:
+            continue
+        stamp = (turn.get("ts") or "")[11:23]
+        blocks.append(
+            f'<div class="cturn"><div class="ch"><b>{_esc(turn.get("role"))}</b>'
+            f'<span>turn {index + 1}</span><span>{_esc(stamp)}</span></div>'
+            f'<div class="body">{"".join(items)}</div></div>'
+        )
+
+    back = meta.get("back")
+    return (
+        '<meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        f"<title>{_esc(meta.get('title') or conversation_id)}</title>"
+        f"<style>{_CSS}\n{_state_css()}</style>"
+        '<div class="cpage">'
+        f'<div class="eyebrow">conversation · {_esc(meta.get("eyebrow") or "")}</div>'
+        f"<h1>{_esc(meta.get('title') or conversation_id)}</h1>"
+        + (f'<p class="sub"><a class="convlink" href="{_esc(back)}">'
+           f"&larr; back to the overlay</a></p>" if back else "")
+        + (f'<div class="cards">{"".join(head)}</div>' if head else "")
+        + (_brief_html(meta["brief"]) if meta.get("brief") else "")
+        + (f'<div class="kv onlydebug" style="display:revert">{_esc(conversation_id)}</div>')
+        + "".join(blocks)
+        + (f'<p class="empty">No transcript was recorded for this conversation.</p>'
+           if not blocks else "")
+        + "</div>"
+    )
+
+
+def _truncation_note(item: dict) -> str:
+    shown, total = len(item.get("v") or ""), item.get("bytes")
+    if not total or total <= shown:
+        return ""
+    return (f'<div class="trunc">showing {shown:,} of {total:,} bytes'
+            f" — truncated by the extractor</div>")
+
+
+def conversation_pages(bundle) -> Dict[str, str]:
+    """Every conversation this PR produced, keyed by output filename."""
+
+    lead = bundle.lead
+    if not lead or not bundle.conversations:
+        return {}
+    jobs = {job["invocation_id"]: job for job in lead["delegations"]}
+    pages: Dict[str, str] = {}
+    for conversation_id, turns in bundle.conversations.items():
+        job = jobs.get(conversation_id)
+        if job is not None:
+            facts = [
+                ("arm", job["arm_id"].replace("_", " ")),
+                ("disposition", job["disposition"]),
+                ("tier", job.get("tier")),
+                ("turns", job.get("turns")),
+                ("cost", _fmt_money(job.get("cost"))),
+                ("time", f"{job['execution_time']:.0f}s" if job.get("execution_time") else None),
+                ("claims", job.get("candidate_count")),
+            ]
+            meta = {
+                "title": f"{job['arm_id'].replace('_', ' ')} · PR {bundle.pr_number}",
+                "eyebrow": f"PR {bundle.pr_number} · {job['work_unit_id']}",
+                "facts": facts, "brief": job.get("brief"),
+                "back": f"../pr-{bundle.pr_number}.html",
+            }
+        else:
+            meta = {
+                "title": f"lead · PR {bundle.pr_number}",
+                "eyebrow": f"PR {bundle.pr_number} · routing",
+                "facts": [
+                    ("turns", lead.get("turns")),
+                    ("cost", _fmt_money(lead.get("lead_cost"))),
+                    ("time", f"{lead['execution_time']:.0f}s"
+                     if lead.get("execution_time") else None),
+                    ("delegated", len([j for j in lead["delegations"]
+                                       if j["disposition"] != "pruned"])),
+                ],
+                "back": f"../pr-{bundle.pr_number}.html",
+            }
+        pages[f"{_conv_slug(conversation_id)}.html"] = conversation_page(
+            conversation_id, turns, meta
+        )
+    return pages
 
 def write_index(bundles: Sequence, gold: Optional[dict], sources: Optional[dict] = None) -> str:
     sources = sources or {}

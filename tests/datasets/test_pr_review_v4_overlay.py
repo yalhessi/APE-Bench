@@ -19,6 +19,7 @@ while looking correct.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -477,3 +478,109 @@ def test_method_applicability_ships_once_not_per_site():
     for site in bundle.sites:
         for row in site.routing:
             assert "wants_components" not in row
+
+
+# --- the v5 lead path -----------------------------------------------------------------
+
+V5_RUN = Path("results/pr_review_v5/runs/pr_review_v5_lead_medium_heldout_rep1")
+requires_v5 = pytest.mark.skipif(
+    not (V5_RUN / "delegations.jsonl").is_file(), reason="held-out v5 run not present"
+)
+
+
+@pytest.fixture(scope="module")
+def v5():
+    return review_overlay.build_overlay(
+        RELEASE, treatment=TREATMENT, executor=EXECUTOR,
+        conditions=[V5_RUN], include_gold=False, pr_numbers=[33145],
+    )
+
+
+@requires_v5
+def test_v5_run_drops_v4_furniture(v5):
+    """A v5 page must not describe the deterministic executor, which took no part in it."""
+
+    bundle = v5.prs[0]
+    ids = {column["id"] for column in bundle.columns}
+    assert not [item for item in ids if item.endswith(".v1")], ids
+    assert "generalist" in ids and "proof_golf" in ids
+    # The funnel is v5's, not `capability_assessed` / `operator_unavailable`.
+    labels = [stage["label"] for stage in bundle.stages]
+    assert labels[:3] == ["Review sites", "Proposed", "Delegated"]
+    markup = review_overlay_html.to_html(bundle, None, v5.sources).split("<script>")[0]
+    for banned in ("capability_assessed", "reason_code", "unsupported_shape",
+                   "operator_completed", "terminal_reason"):
+        assert banned not in markup, banned
+
+
+@requires_v5
+def test_pruned_proposals_are_visible_as_a_decision(v5):
+    """`unscheduled` and `declined` must not look alike: one is nobody's decision."""
+
+    bundle = v5.prs[0]
+    states = [cell.state for site in bundle.sites for cell in site.cells.values()]
+    assert states.count("pruned") > 0
+    assert STATE_RANK["pruned"] > STATE_RANK["unscheduled"]
+    declined = [job for job in bundle.lead["delegations"] if job["disposition"] == "pruned"]
+    ran = [job for job in bundle.lead["delegations"] if job["disposition"] != "pruned"]
+    assert len(declined) + len(ran) == len(bundle.lead["delegations"])
+    assert declined and all(job["site_change_ids"] for job in declined)
+
+
+@requires_v5
+def test_lead_pane_reports_the_corrected_cost(v5):
+    page = review_overlay_html.to_html(v5.prs[0], None, v5.sources)
+    assert "What the lead was given" in page
+    assert "What the lead declined" in page
+    # The lead's own cost is a scalar, not the bucket dict. Passing the dict raised
+    # "unsupported format string passed to dict.__format__" once, so pin the rendered shape.
+    assert "{'lead'" not in page and "__format__" not in page
+    assert re.search(r"lead \$\d+\.\d{4}, floor \$\d+\.\d{4}", page)
+    cost = v5.sources["run_cost"]
+    assert round(cost["actual_total"], 2) == 21.06
+    assert round(cost["manifest_total"], 2) == 6.54
+
+
+@requires_v5
+def test_conversations_are_sibling_pages_not_embedded(v5):
+    """PR 33149's transcripts alone are 3.9 MB; embedding would make every page pay."""
+
+    bundle = v5.prs[0]
+    pages = review_overlay_html.conversation_pages(bundle)
+    assert pages, "expected transcripts for a run with an extracted sidecar"
+    page = review_overlay_html.to_html(bundle, None, v5.sources)
+    assert 'href="conv/' in page
+    # The turn bodies must not be in the overlay payload.
+    assert '"conversations"' not in page
+    one = next(iter(pages.values()))
+    assert "back to the overlay" in one and "<title>" in one
+
+
+@requires_v5
+def test_ids_are_behind_the_debug_toggle(v5):
+    page = review_overlay_html.to_html(v5.prs[0], None, v5.sources)
+    markup = page.split("<script>")[0]
+    assert ".onlydebug{display:none}" in page
+    assert "body.debug .onlydebug{display:revert}" in page
+    assert 'id="debugbtn"' in page and "explain mode" not in page
+    # `data-id` attributes carry ids because selection needs them, and are never shown. What
+    # must stay behind the toggle is id *text*, so strip attributes before looking.
+    # `class` is deliberately kept: it carries the `onlydebug` marker this looks for.
+    text_only = re.sub(r'\s(?:data-[\w-]+|title|href|id)="[^"]*"', "", markup)
+    for token in re.findall(r"(?:change|wu):[0-9a-f]{8}", text_only):
+        index = text_only.index(token)
+        assert "onlydebug" in text_only[max(0, index - 300):index], token
+
+
+@requires_v5
+def test_v4_page_is_unaffected_by_the_v5_path():
+    built = review_overlay.build_overlay(
+        RELEASE, treatment=TREATMENT, executor=EXECUTOR, include_gold=False,
+        pr_numbers=[33098],
+    )
+    bundle = built.prs[0]
+    assert bundle.lead is None
+    assert built.cost is None
+    ids = {column["id"] for column in bundle.columns}
+    assert "baseline_failure.v1" in ids
+    assert [stage["label"] for stage in bundle.stages][:2] == ["Review sites", "Scheduled"]

@@ -32,6 +32,13 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
+from src.datasets.pr_review_v5.delegation_view import (
+    is_v5_run,
+    load_lead_views,
+    load_turns,
+    run_cost,
+)
+
 from . import paths
 from .digest import digest_findings
 from .io import display_path, load_jsonl, load_jsonl_optional
@@ -111,6 +118,26 @@ GENERALIST_COLUMN = "generalist"
 ARM_ORDER = ("checker", "generalist", "focused", "file_scoped")
 
 
+def v5_columns(lead_views) -> List[Column]:
+    """The arms this run actually enumerated, in agenda order.
+
+    A v5 page used to show v4's seven deterministic method columns and their funnel stages
+    as "context" for a run they had no part in. The arms are the components that spoke here,
+    so they are the axis; `generalist` leads because the mandatory floor makes it the one
+    column that is populated at every site.
+    """
+
+    seen: Dict[str, str] = {}
+    for view in lead_views.values():
+        for row in view.arms:
+            seen.setdefault(row["arm_id"], "generalist" if row["mandatory"] else "focused")
+    ordered = sorted(seen.items(), key=lambda item: (item[1] != "generalist", item[0]))
+    return [
+        Column(arm_id, arm, arm_id.replace("_", " "))
+        for arm_id, arm in ordered
+    ]
+
+
 def base_columns() -> List[Column]:
     columns = [Column(mid, "checker", label) for mid, label in CHECKER_METHODS]
     columns.append(Column(GENERALIST_COLUMN, "generalist", "generalist"))
@@ -132,12 +159,18 @@ _FIXED_IDS = frozenset(column.id for column in base_columns())
 #: evidence about the reviewer. `contradicted` sits below `opportunity` so that one
 #: surviving candidate at a site is not masked by a refuted sibling.
 #:
+#: `pruned` is v5's: the agenda enumerated this (arm, site) pair and the lead declined it.
+#: It outranks `unscheduled` because a decision not to look is a result, and it is the only
+#: honest way to show what the lead left alone — 927 of the held-out run's 1,166 proposals,
+#: and every specialist at 323 of its 432 sites.
+#:
 #: `touched` exists because findings are multi-site: PR 33294's five findings name 72
 #: further targets between them. Colouring those as `candidate` made a PR with zero
 #: candidates report "claim emitted 72" — the same colour for "a reviewer said something
 #: here" and "something said elsewhere lists this line".
 STATES = (
     "unscheduled",
+    "pruned",
     "unsupported",
     "unavailable",
     "silent",
@@ -151,6 +184,7 @@ STATE_RANK = {state: index for index, state in enumerate(STATES)}
 
 STATE_LABEL = {
     "unscheduled": "not scheduled here",
+    "pruned": "proposed, declined by the lead",
     "unsupported": "scheduled, no implementation",
     "unavailable": "operator could not run",
     "silent": "checked, found nothing",
@@ -262,6 +296,11 @@ class PRBundle:
     work_units: List[dict] = field(default_factory=list)
     #: Scheduled-vs-single-call size comparison. Bounded, not cheaper -- see `_call_sizes`.
     call_budget: Dict[str, object] = field(default_factory=dict)
+    #: The v5 lead's routing for this PR, when the run is a v5 one. `None` for v4.
+    lead: Optional[dict] = None
+    #: Transcripts for this PR, keyed by conversation id. Rendered to sibling pages, never
+    #: embedded: the held-out run's PR 33149 shard alone is 3.9 MB.
+    conversations: Dict[str, List[dict]] = field(default_factory=dict)
 
 
 @dataclass
@@ -270,6 +309,8 @@ class Overlay:
     sources: Dict[str, object]
     prs: List[PRBundle]
     gold: Optional[Dict[str, dict]]
+    #: Whole-run spend by bucket, against what the manifest claims. v5 runs only.
+    cost: Optional[Dict[str, object]] = None
 
 
 # --- Loading -------------------------------------------------------------------------
@@ -705,6 +746,18 @@ def build_overlay(
 ) -> Overlay:
     wanted = set(pr_numbers) if pr_numbers else None
 
+    # v5 first: its arms, funnel and ledger describe a different pipeline, and loading v4's
+    # treatment would add seven deterministic method columns and their `capability_assessed`
+    # stages to a page about a run they took no part in.
+    lead_views: Dict[int, object] = {}
+    v5_dir: Optional[Path] = None
+    for condition in conditions:
+        if is_v5_run(condition):
+            v5_dir = condition
+            lead_views.update(load_lead_views(condition))
+    if v5_dir is not None:
+        treatment = executor = None
+
     episodes = load_jsonl(release / "input" / "episodes.jsonl", ReviewEpisodeInput)
     graphs = load_jsonl(release / "derived" / "change_graphs.jsonl", ChangeGraph)
     work_units = load_jsonl_optional(release / "derived" / "work_units.jsonl", ReviewWorkUnit)
@@ -812,10 +865,13 @@ def build_overlay(
     # added to the registry must not vanish from the matrix. They join their own arm group
     # rather than being appended at the end, or the header's colspans fragment and a checker
     # method ends up sitting past the model arms.
-    columns = base_columns()
+    if lead_views:
+        columns = v5_columns(lead_views)
+    else:
+        columns = base_columns()
     known = {column.id for column in columns}
     extras: List[Column] = []
-    for task in tasks:
+    for task in (() if lead_views else tasks):
         if task.method_id not in known:
             extras.append(Column(task.method_id, "checker", task.method_id))
             known.add(task.method_id)
@@ -864,6 +920,8 @@ def build_overlay(
                 system_chars=system_chars,
                 relations=relations_by_pr.get(graph.pr_number, []),
                 evidence_by_id=evidence_by_id,
+                lead_view=lead_views.get(graph.pr_number),
+                v5_dir=v5_dir,
             )
         )
 
@@ -880,8 +938,12 @@ def build_overlay(
         "judge": display_path(judge) if judge else None,
         "gold": bool(include_gold),
         "unresolved_run_coverage": [arm.name for arm in arms if arm.unresolved_coverage],
+        "run_cost": run_cost(v5_dir, lead_views) if v5_dir else None,
     }
-    return Overlay(version=OVERLAY_VERSION, sources=sources, prs=bundles, gold=gold)
+    return Overlay(
+        version=OVERLAY_VERSION, sources=sources, prs=bundles, gold=gold,
+        cost=run_cost(v5_dir, lead_views) if v5_dir else None,
+    )
 
 
 def _build_pr(
@@ -911,6 +973,8 @@ def _build_pr(
     system_chars: int = 0,
     relations: Sequence[PRRelation] = (),
     evidence_by_id: Optional[Dict[str, object]] = None,
+    lead_view=None,
+    v5_dir: Optional[Path] = None,
 ) -> PRBundle:
     episode_sources = episode_sources or {}
     call_chars = call_chars or {}
@@ -975,6 +1039,7 @@ def _build_pr(
                 "component": column_id,
                 "arm": cell.arm,
                 "investigations": [],
+                "delegations": [],
                 "candidates": [],
                 "findings": [],
             }
@@ -1054,6 +1119,52 @@ def _build_pr(
                 for item in found
             ],
         })
+
+    # --- v5 delegations ---------------------------------------------------------------
+    # Every enumerated (arm, site) pair gets a cell, including the declined ones. A pruned
+    # proposal is the lead's decision and has to be visible; leaving it `unscheduled` would
+    # make "the agenda offered this and the lead said no" indistinguishable from "nobody ever
+    # considered it".
+    if lead_view is not None:
+        for job in lead_view.delegations:
+            ran = job.disposition in ("mandatory", "proposed", "agent_added")
+            if ran:
+                state = "silent" if not job.candidate_count else "candidate"
+                reason = (
+                    f"{job.disposition} · {job.tier or 'tier?'} · "
+                    f"{job.candidate_count or 0} claim(s)"
+                )
+            else:
+                state = "pruned"
+                reason = job.reason or "not selected by the lead"
+            for change_id in job.site_change_ids:
+                site = sites.get(change_id)
+                if site is None:
+                    continue
+                cell = site.cells.setdefault(
+                    job.arm_id, Cell(component=job.arm_id, arm="generalist")
+                )
+                cell.raise_to(state, reason)
+                if ran:
+                    cell.investigation_ids.append(job.invocation_id)
+                entry = block(change_id, job.arm_id)
+                entry["delegations"].append({
+                    "invocation_id": job.invocation_id,
+                    "arm_id": job.arm_id,
+                    "disposition": job.disposition,
+                    "reason": job.reason,
+                    "brief": job.brief,
+                    "tier": job.tier,
+                    "budget_cap": job.budget_cap,
+                    "status": job.status,
+                    "cost": job.cost,
+                    "execution_time": job.execution_time,
+                    "turns": job.turns,
+                    "tool_calls": job.tool_calls,
+                    "candidate_count": job.candidate_count,
+                    "has_transcript": job.has_transcript,
+                    "claims": job.claims,
+                })
 
     # --- model arms ------------------------------------------------------------------
     invoked_columns: Dict[str, set] = defaultdict(set)
@@ -1317,7 +1428,12 @@ def _build_pr(
                 unique.append(row)
         site.related = unique
 
-    stages = _build_stages(ordered, tasks, ledger, arms, pr_findings, issue_by_id, issue_of_finding)
+    stages = (
+        _v5_stages(ordered, lead_view, pr_findings, issue_by_id, issue_of_finding)
+        if lead_view is not None
+        else _build_stages(ordered, tasks, ledger, arms, pr_findings, issue_by_id,
+                           issue_of_finding)
+    )
     totals = {
         "sites": len(ordered),
         "investigations": len(tasks),
@@ -1356,6 +1472,10 @@ def _build_pr(
         relations=relation_rows,
         work_units=unit_rows,
         call_budget=_call_budget(unit_rows, graph, episode, system_chars),
+        lead=_lead_payload(lead_view) if lead_view is not None else None,
+        conversations=(
+            load_turns(v5_dir, graph.pr_number) if (v5_dir and lead_view is not None) else {}
+        ),
     )
 
 
@@ -1403,6 +1523,76 @@ def _call_budget(unit_rows, graph, episode, system_chars: int = 0) -> Dict[str, 
                 for target in graph.targets)) else 0.0
         ),
     }
+
+def _lead_payload(view) -> dict:
+    """The lead view, flattened for the browser.
+
+    Delegations are shipped whole because the lead pane lists all of them, declined
+    included; on the busiest PR that is 40 rows, and on the run's largest, 109.
+    """
+
+    return {
+        "pr_number": view.pr_number,
+        "caps": view.caps,
+        "arms": view.arms,
+        "waves": view.waves,
+        "coverage": view.coverage,
+        # `cost` is the per-bucket split; `lead_cost` is the lead's own turns alone. Both
+        # are needed and they are not the same number.
+        "cost": view.cost,
+        "lead_cost": view.lead_cost,
+        "conversation_id": view.conversation_id,
+        "started_at": view.started_at,
+        "completed_at": view.completed_at,
+        "execution_time": view.execution_time,
+        "turns": view.lead_turns,
+        "tool_calls": view.lead_tool_calls,
+        "token_usage": view.lead_token_usage,
+        "assessments": view.assessments,
+        "has_transcript": view.has_transcript,
+        "delegations": [asdict(job) for job in view.delegations],
+    }
+
+def _v5_stages(sites, view, pr_findings, issue_by_id, issue_of_finding) -> List[dict]:
+    """v5's funnel: what the agenda offered, what the lead ran, what came back.
+
+    Deliberately not v4's. `capability_assessed` and `operator_unavailable` are stages of a
+    deterministic executor that took no part in a v5 run, and showing them made the page
+    describe machinery that was not there.
+    """
+
+    ran = [job for job in view.delegations
+           if job.disposition in ("mandatory", "proposed", "agent_added")]
+    floor = sum(1 for job in ran if job.disposition == "mandatory")
+    chosen = len(ran) - floor
+    spoke = sum(1 for job in ran if job.candidate_count)
+    claims = sum(job.candidate_count or 0 for job in ran)
+    published = sum(
+        1 for issue_id in {issue_of_finding.get(f.finding_id) for f in pr_findings}
+        if issue_id and issue_by_id[issue_id].admission == "published"
+    )
+    coverage = view.coverage
+    return [
+        {"id": "sites", "label": "Review sites", "count": len(sites), "min_state": None,
+         "note": "change targets in this PR's diff"},
+        {"id": "proposed", "label": "Proposed", "count": len(view.delegations),
+         "min_state": "pruned",
+         "note": f"(arm x site) jobs the agenda enumerated"},
+        {"id": "delegated", "label": "Delegated", "count": len(ran), "min_state": "silent",
+         "note": f"{floor} mandatory floor, {chosen} chosen by the lead"},
+        {"id": "spoke", "label": "Arms that spoke", "count": spoke, "min_state": "candidate",
+         "note": f"{claims} claim(s) returned"},
+        {"id": "finding", "label": "Findings", "count": len(pr_findings),
+         "min_state": "finding", "note": "survived merge and adjudication"},
+        {"id": "published", "label": "Published", "count": published, "min_state": "finding",
+         "note": "issues a maintainer would be shown",
+         "coverage": coverage,
+         "top_reasons": [
+             ("every specialist declined here",
+              coverage.get("all_specialists_declined", 0)),
+             ("declined (arm, site) pairs", coverage.get("declined_pairs", 0)),
+         ]},
+    ]
 
 def _build_stages(sites, tasks, ledger, arms, pr_findings, issue_by_id, issue_of_finding):
     """The funnel ribbon: counts, attrition, and the floor each stage dims below.
@@ -1566,6 +1756,7 @@ def bundle_json(overlay: Overlay) -> dict:
     return {
         "version": overlay.version,
         "sources": overlay.sources,
+        "cost": overlay.cost,
         "prs": [asdict(bundle) for bundle in overlay.prs],
         "gold": overlay.gold,
     }
@@ -1609,6 +1800,7 @@ def write_overlay(overlay: Overlay, out: Path) -> dict:
     )
 
     written, failed = [], {}
+    conversations = 0
     for bundle in overlay.prs:
         page = out / f"pr-{bundle.pr_number}.html"
         try:
@@ -1617,6 +1809,13 @@ def write_overlay(overlay: Overlay, out: Path) -> dict:
                 encoding="utf-8",
             )
             written.append(page.name)
+            # Transcripts are siblings, not sections: PR 33149's alone are 3.9 MB.
+            pages = review_overlay_html.conversation_pages(bundle)
+            if pages:
+                (out / "conv").mkdir(exist_ok=True)
+                for name, html in pages.items():
+                    (out / "conv" / name).write_text(html, encoding="utf-8")
+                conversations += len(pages)
         except Exception as error:  # noqa: BLE001 - one bad page must not lose the rest
             failed[bundle.pr_number] = f"{type(error).__name__}: {error}"
 
@@ -1630,6 +1829,7 @@ def write_overlay(overlay: Overlay, out: Path) -> dict:
         "pages": len(written),
         "index": display_path(index),
         "bundle": display_path(out / "bundle.json"),
+        "conversations": conversations,
         "failed": failed,
     }
 

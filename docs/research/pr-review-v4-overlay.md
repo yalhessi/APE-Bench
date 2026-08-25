@@ -195,6 +195,87 @@ the right thing. `issue_match` from the semantic judge (`--judge`) is the real v
 Obligations whose targets are not in the change graph appear under "asks with no site in the
 change graph" rather than silently leaving the denominator.
 
+## The lead's work (v5 runs)
+
+A v5 run is a lead that routes and specialists that speak: one lead per PR, holding
+`delegate`, `read_agenda` and `submit_routing`, with no way to emit a finding itself. Point
+the overlay at a v5 run directory and it renders that instead of v4's furniture:
+
+```
+./ape/bin/python -m src.datasets.pr_review_v5.trajectory --run <run>   # once
+./ape/bin/python -m src.datasets.pr_review_v5.report overlay --run <run>
+```
+
+Detection is structural — a condition directory containing `agenda.json` and
+`delegations.jsonl` is a v5 run — and when one is found, v4's seven deterministic method
+columns and their `capability_assessed` funnel stages are suppressed. They described an
+executor that took no part in the run.
+
+### The trajectory sidecar
+
+The routing ledger lives in `results/`, but the *work* lives in `.ape/runs/<run>/`: 147 MB
+per run, gitignored, and the first thing deleted when a disk fills. So it is extracted once
+into `results/pr_review_v5/runs/<run>/trajectory/` — `invocations.jsonl`, `leads.jsonl`,
+per-PR `turns/pr-<n>.jsonl` shards, and a `report.json` — after which the overlay reads only
+`results/`. On the held-out run that is 7.6 MB for 232 invocations, 12 leads and 2,607 turns.
+
+Without it the page still builds: the ladder, the briefs and the per-job costs all come from
+`delegations.jsonl`. What is lost is the Gantt and the transcripts, and the page says so
+rather than quietly dropping them.
+
+### Three numbers the run gets wrong
+
+The overlay recomputes all three rather than rendering what the artifacts say.
+
+| artifact field | what it actually is |
+|---|---|
+| `delegations.jsonl::token_usage` | the **tier's** aggregate, copied onto every job in it. Summing it over the held-out run gives **$1,141.84** against a real **$19.17**. The sibling `cost` is per-job and correct. |
+| `delegations.jsonl::wall_seconds` | also per-tier — 239 rows carry 29 distinct values, one repeated 108 times. The Gantt uses the sidecar's `started_at`/`completed_at` instead. |
+| `run_manifest.json::total_cost` | reports **$6.54** against an actual **$21.06**. `trace.reconcile` sums leads plus `proposed`, and the 203 mandatory-floor generalists run inside the lead's own orchestrator, landing in neither term. |
+
+The page states the split rather than a corrected single number, because the floor being
+**69% of the bill for work the lead did not choose** is the most interesting fact about the
+run. A test pins the $21.06 / $6.54 pair so an upstream fix fails loudly instead of silently
+changing the page.
+
+### What the lead declined
+
+The mandatory floor is prepended to wave 1 whatever the lead asks for, so **no site goes
+unlooked-at** — all 432 of the held-out run's sites got a generalist. What the lead actually
+declines is *specialist* coverage: 927 of 1,166 enumerated jobs, and every specialist at
+**323 of 432 sites**, a mean of 4.6 declined per site.
+
+That is a fact about (site, arm) pairs, never about sites, so it is drawn as a cell state —
+`proposed, declined by the lead` — ranked above `not scheduled here`. The distinction is the
+point: one is a decision, the other is nobody's.
+
+### The timeline
+
+A wall-clock Gantt over the sidecar's per-invocation timestamps, banded by wave and tier,
+with the lead's own span on a top lane; then a ladder of the lead's turns, each `delegate`
+call expanded into the jobs it launched with their briefs in full. The Gantt answers "how
+long, how concurrent, what did it cost"; the ladder answers "what did it decide, and why".
+
+### Conversations
+
+One HTML file per conversation under `conv/`, linked from the timeline and the lead pane.
+Not embedded: PR 33149 draws a mandatory generalist on each of its 108 work units and its
+transcripts alone are 3.9 MB, and an "embed when small" rule would give the same click two
+different behaviours. Assistant text is verbatim; tool results are capped at 2 KB with their
+true byte count shown, because a truncated result that does not say so is a lie about what
+the agent saw.
+
+## Debug is opt-in
+
+The page opens clean. The `debug` toggle reveals IDs, hashes and pipeline internals; without
+it they are not shown. Dropped entirely rather than hidden: capability assessments, operator
+run rows, `terminal_reason` codes, and evidence artifact `collector/kind [polarity]
+source_ref` lines — executor vocabulary, unreadable to anyone who has not read the executor,
+and never actionable. The evidence *tier* and the packet verdict stay.
+
+The legend lists only states the page can actually produce; five of v4's are structurally
+impossible on a v5 page and listing them at zero was noise.
+
 ## Cross-checking a build
 
 The join is the part that can be wrong. Every headline number on the page has a source of
@@ -207,6 +288,8 @@ truth to check it against:
 | 39 findings, 37 published | `conditions/medium-checker-only-v2/condition_report.json` |
 | 19 published issues | `digest_findings` over those findings (39 findings → 21 issues; one aggregates `per_pattern`) |
 | 43 obligations / 40 included | `releases/dev-medium-0.3.0/gold/` |
+| v5: 1,166 proposals, 239 ran, 927 declined | `delegations.jsonl` |
+| v5: $21.06 actual spend | sum of per-invocation `cost`; **not** `run_manifest.json` |
 
 A mismatch is a join bug, not a display bug.
 
@@ -218,8 +301,13 @@ A mismatch is a join bug, not a display bug.
 - `src/datasets/pr_review_v4/review_overlay_html.py` — the page. `PALETTE` is the single source of
   colour and every per-state rule is generated from it. The matrix is an HTML table, not SVG:
   no graphviz dependency, text stays selectable and ctrl-F works.
+- `src/datasets/pr_review_v5/trajectory.py` — the `.ape` walk and sidecar writer.
+- `src/datasets/pr_review_v5/delegation_view.py` — joins the routing ledger, agenda, arm
+  responses and sidecar into one `LeadView` per PR; owns the cost correction.
 - `tests/datasets/test_pr_review_v4_overlay.py` — ladder monotonicity, multi-site
-  attribution, the gold barrier, and degradation.
+  attribution, the gold barrier, the v5 declutter, and degradation.
+- `tests/datasets/test_pr_review_v5_trajectory.py` — pins the three numbers a v5 run gets
+  wrong, so a fix upstream fails loudly rather than silently moving the page.
 
 Page weight runs 62 KB (PR 33438, 2 sites) to 1.24 MB (PR 33149, 108 sites). A page that
 fails to render is caught and reported in `failed`; it never takes the rest of the build with
