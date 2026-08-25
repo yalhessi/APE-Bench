@@ -223,7 +223,10 @@ discipline: data never moves, only code moves; `io.write_once` raises on content
 `verify_frozen` re-hashes 1130 files against `inputs/pr_review_v4/FROZEN.lock`. Two sealing
 conventions (`sealed_from_payload` vs `sealed_model`) are deliberately not interchangeable,
 with a guard test keeping them apart. `judge_version` is in both the cache key and the task
-record hash, so two rubrics can never join or resume into each other.
+record hash, so two rubrics can never join or resume into each other. The active rubric is
+**v9** (`v4-semantic-v3-v9-rubric`), defined once in `judge_protocol.JUDGE_VERSION` and
+imported by both the script judge and the registered task; the retired v7.1 rubric lives in
+`legacy/judge_v71.py` for provenance, and everything measured under it is not re-scored.
 
 **The two arms are complementary, not competing.** On the development PR the fixed
 deterministic pipeline and the call-matched holistic reviewer tie on mean issue recall (33.3%
@@ -292,7 +295,7 @@ gates R6.
 
 ## 9. The v5 delegating agent — commit 39
 
-**Status: built 2026-08-24. 77 new tests. `verify_frozen` clean over 1130 files. NOTHING PAID HAS BEEN RUN.**
+**Status: built 2026-08-24; seven smoke repetitions run 2026-08-24/25; a medium held-out run was in flight when this branch was cut. Early, and not yet interpretable as a routing result — see the caveats below.**
 
 One lead agent per review episode, routing specialist arms over work units. Hybrid routing:
 deterministic rules propose, the lead prunes, adds and budgets. The lead's authority is
@@ -307,6 +310,28 @@ conservative on all 16 medium episodes: 0 leaks, median 6.8 hours before review 
 
 Smoke set 33057 / 33066 / 33098 / 33438 plans at 94 proposals / 58 eligible; floor $1.74,
 fanout $7.43, rules $4.58.
+
+**What the seven smoke repetitions produced.** Scored under judge v9 against 40 obligations,
+`results/pr_review_v5/audits/lead-smoke4-rep*`:
+
+| rep | findings pre-pub | published | pre-pub issue hits | published issue hits | issue recall | location recall |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 38 | 0 | 4 | 0 | 0.100 | 0.300 |
+| 2 | 30 | 0 | 1 | 0 | 0.025 | 0.100 |
+| 3 | 30 | 2 | 4 | 0 | 0.100 | 0.225 |
+| 4 | 51 | 9 | 2 | 1 | 0.050 | 0.325 |
+| 6 | 56 | 7 | 6 | 1 | 0.150 | 0.375 |
+| 7 | 62 | 11 | 7 | 3 | 0.175 | 0.375 |
+
+(rep5 has no audit.) The trend across reps is real but confounded: the reps are not
+repetitions of one configuration, they are successive fixes to the pipeline, so the rise from
+rep1 to rep7 mixes variance with the changes made between them. **Do not read this table as
+a v5 result.** It is evidence that the pipeline runs end to end and produces scorable output.
+
+The gap between `pre_publication` and `published` is the evidence gate doing its job — rep7
+merged 62 findings and published 11 — and it is also why the published-column numbers are so
+small. Until the gate is finished (below), published recall is a measurement of the gate, not
+of the reviewer.
 
 **Outstanding, and read these before any v5 number**
 
@@ -336,6 +361,10 @@ fanout $7.43, rules $4.58.
   bracket the maintainer and neither is calibrated.
 - **The thesis experiment itself.** `lean_reviewed_proof_engineering` (commit 24) is built
   and has pilot configs; the comparison against compile-only feedback has not been run.
+- **A clean v5 comparison.** The seven smoke reps are successive pipeline fixes, not
+  repetitions of one configuration. The actual experiment — `fanout` vs `rules` vs `lead` on
+  a fixed pipeline, three repetitions each — has not been run. The medium held-out run
+  started 2026-08-25 03:16 is the first attempt at scale.
 - **Replication.** Multi-seed, more models, error bars on everything in §4.
 - **Deferred by choice:** recruited Mathlib annotators and the inter-annotator ceiling — not
   until the agent is mature enough to be worth their time.
