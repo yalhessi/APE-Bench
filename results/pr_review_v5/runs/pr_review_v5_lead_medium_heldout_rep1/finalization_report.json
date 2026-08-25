@@ -1,0 +1,89 @@
+{
+  "after_merge": 319,
+  "alternatives_not_selected": 0,
+  "by_admission": {
+    "diagnostic": 317,
+    "published": 2
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 2,
+    "generalist": 317,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 317,
+    "repository_measurement": 0,
+    "verified_compile": 2
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 8,
+  "candidates_generalist": 309,
+  "candidates_specialist": 2,
+  "candidates_specialist_dropped_unverified": 0,
+  "conflicts": 35,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 319
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 2,
+      "generalist": 317,
+      "holistic": 0,
+      "merged": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 319,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 319,
+    "largest_issue_sites": 9,
+    "pr_finding_limit": 20,
+    "published_after_limit": 2,
+    "published_before_limit": 2,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "execution_release": null,
+  "findings_sha256": "77180eb3131d71a2bbcc438b0b771a969095c188695530aea6133b0d20035f94",
+  "generalist_evidence_gate": "closed",
+  "inputs": 319,
+  "issues_published": 2,
+  "issues_sha256": "04707d2ab0f3ea158816d187539d6248e3bc58b8be7ae1fc90d324d51e2a60fa",
+  "issues_total": 319,
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 2,
+  "published_before_limit": 2,
+  "published_by_concern": {
+    "correctness": 1,
+    "proof-golf": 1
+  },
+  "published_prs": [
+    33117,
+    33294
+  ],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33117,
+    33145,
+    33149,
+    33285,
+    33294,
+    33304,
+    33305,
+    33315,
+    33321,
+    33337,
+    33362,
+    33421
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 20
+}
