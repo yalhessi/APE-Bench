@@ -1,0 +1,14 @@
+{
+  "candidates": 8,
+  "complete": true,
+  "control_model_calls": 1,
+  "control_work_unit_ids": [
+    "wu:20910b2d076223021ce8926e"
+  ],
+  "positive_model_calls": 2,
+  "schema_version": "phase9-baseline-union-report1",
+  "source_work_unit_ids": [
+    "wu:9354e29b0912d17d60b1d3e1",
+    "wu:b017b7314c4bea62d8f968c3"
+  ]
+}

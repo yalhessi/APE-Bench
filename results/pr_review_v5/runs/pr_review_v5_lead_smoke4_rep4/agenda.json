@@ -1,0 +1,1982 @@
+{
+  "agenda_id": "agenda:pr_review_v5_lead_smoke4_rep4",
+  "arms": [
+    {
+      "arm_id": "generalist",
+      "concern_family": "other",
+      "context_tools": [
+        "zulip_search",
+        "precedent_search",
+        "declaration_search",
+        "lean_verify_edit"
+      ],
+      "cost_hint": 0.079,
+      "issue_kind": null,
+      "kind": "generalist",
+      "mandatory": true,
+      "prompt_sha256": "9ab1904cfc01ef37f65547bc3681b83ed1de36353cf3523727b17ad967343507",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-arm1",
+      "source_sha256": "966d183c7838e8a03501bdabf4c57970e498ed0e4e112f422b63022e54ce6e6f",
+      "spec_id": null,
+      "task_type": "lean_pr_review_v5_arm",
+      "tools_sha256": "c44878889d819d4912c32d0099cb65b33242dd414b8bd370bb90b544493cb78a"
+    },
+    {
+      "arm_id": "duplication",
+      "concern_family": "duplication",
+      "context_tools": [
+        "zulip_search",
+        "precedent_search",
+        "declaration_search",
+        "lean_verify_edit"
+      ],
+      "cost_hint": 0.079,
+      "issue_kind": "duplicate_implementation",
+      "kind": "specialist",
+      "mandatory": false,
+      "prompt_sha256": "9a0888c5e9858fadbf5ad34bdf71bf81cbbaa289eafa962a28afc5612e70cf0b",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-arm1",
+      "source_sha256": "e0639821bf30d7772f2fd3b91de742887635acf0539e88669c630a064e4b64d0",
+      "spec_id": "duplication",
+      "task_type": "lean_pr_review_v5_arm",
+      "tools_sha256": "0c5940d7be0616ae7f8b5a93d2cb36ad35323a1df284211078da35aafe4aae4e"
+    },
+    {
+      "arm_id": "generality",
+      "concern_family": "generalization",
+      "context_tools": [
+        "zulip_search",
+        "precedent_search",
+        "declaration_search",
+        "lean_verify_edit"
+      ],
+      "cost_hint": 0.079,
+      "issue_kind": "generalization_available",
+      "kind": "specialist",
+      "mandatory": false,
+      "prompt_sha256": "d28aefde2c38bd9f0fc1254584dbe0a3d67b26677bb0276cf209fb7afebed77c",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-arm1",
+      "source_sha256": "1bc41d1d616a150f76f59b379d3d8c0e58c2531ffe9f9413dcaba82535808e05",
+      "spec_id": "generality",
+      "task_type": "lean_pr_review_v5_arm",
+      "tools_sha256": "0c5940d7be0616ae7f8b5a93d2cb36ad35323a1df284211078da35aafe4aae4e"
+    },
+    {
+      "arm_id": "proof_golf",
+      "concern_family": "proof-golf",
+      "context_tools": [
+        "zulip_search",
+        "precedent_search",
+        "declaration_search",
+        "lean_verify_edit"
+      ],
+      "cost_hint": 0.079,
+      "issue_kind": "proof_simplification",
+      "kind": "specialist",
+      "mandatory": false,
+      "prompt_sha256": "92b5705d9336cda8fc142c0ccab87298d053b93a5bcfddcc6b1b587deed06357",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-arm1",
+      "source_sha256": "2e07cbb1264819a10757ed8b58524fd3679732a114a78f26c68aba0d6f7cf1c0",
+      "spec_id": "proof_golf",
+      "task_type": "lean_pr_review_v5_arm",
+      "tools_sha256": "0c5940d7be0616ae7f8b5a93d2cb36ad35323a1df284211078da35aafe4aae4e"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "concern_family": "proof-golf",
+      "context_tools": [
+        "zulip_search",
+        "precedent_search",
+        "declaration_search",
+        "lean_verify_edit"
+      ],
+      "cost_hint": 0.079,
+      "issue_kind": "proof_simplification",
+      "kind": "specialist",
+      "mandatory": false,
+      "prompt_sha256": "bde99811c04a38b81ef80452abc35bae9c3f415ca54701573a611f8a0c635ccf",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-arm1",
+      "source_sha256": "a38e674da1a7831fb145061831fe1394ae5f1b060674b9ed5e8078517481e610",
+      "spec_id": "proof_idiom",
+      "task_type": "lean_pr_review_v5_arm",
+      "tools_sha256": "0c5940d7be0616ae7f8b5a93d2cb36ad35323a1df284211078da35aafe4aae4e"
+    }
+  ],
+  "modification_inventory": "inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl",
+  "proposals": [
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:026100f80707c02fbd00cebe#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "ca9ef9ebcfeccd89990539b19fa246a0b123035220a33aa276eea53314cec945",
+      "proposal_id": "wu:026100f80707c02fbd00cebe#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:fc293f3f7cd775ca0e20b82cb60af5bab4b5d5bbc2b22d9807c6dee276ff0dbd"
+      ],
+      "source_sha256": "324629280f0bc54c17dacc80c681b2ee4fd16e66fccc79164d410471d8809866",
+      "work_unit_id": "wu:026100f80707c02fbd00cebe"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "fb3cfd76898730e7dbab01a9906b085ea444f6374b6478dd350536196abdced8",
+      "proposal_id": "wu:0b643957d56818f60a614ed5#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:2313fe513a88dcbb37759faa7cc82f705fa8d9206c5f753312a4b701e943306f",
+        "change:2f8e8d3ec4728cc5aa2cfdcb5700b7e90b3f77410bebc50ea3faac5f0d694712"
+      ],
+      "source_sha256": "da5e37abd668c89a94acd1c20358e05908f0fcaf07b76fc6ab05e0cf0f863c85",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "697bbdf7120c94419efb4e4c716a47986aa28a656cf4674be6dd736092f57f9c",
+      "proposal_id": "wu:0b643957d56818f60a614ed5#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:2313fe513a88dcbb37759faa7cc82f705fa8d9206c5f753312a4b701e943306f",
+        "change:29e91d1e54b7636c2f7a23d753df12d7b678a17c7eae2caf2e52ac99a27be68d",
+        "change:2f8e8d3ec4728cc5aa2cfdcb5700b7e90b3f77410bebc50ea3faac5f0d694712"
+      ],
+      "source_sha256": "796bcaefc66f3d4a27061e8f676e28d9e4cf6fdcbaaf6df5a9c89cd81d763852",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "35b3b577b7411d46c7336cbda8907b1db9ba7bcbe7e7356a7ba1f50d9b1a1bac",
+      "proposal_id": "wu:0b643957d56818f60a614ed5#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:2313fe513a88dcbb37759faa7cc82f705fa8d9206c5f753312a4b701e943306f",
+        "change:2f8e8d3ec4728cc5aa2cfdcb5700b7e90b3f77410bebc50ea3faac5f0d694712"
+      ],
+      "source_sha256": "dd4720d41da25d25c00d9880a374d366ed5207a59cbe2c7b11d4b4f439c430e4",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "7e962bd1119bb3258e9e4ccd5f8363bab7d92d5b5e062a7d534b444afac1273e",
+      "proposal_id": "wu:0b643957d56818f60a614ed5#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:2313fe513a88dcbb37759faa7cc82f705fa8d9206c5f753312a4b701e943306f",
+        "change:2f8e8d3ec4728cc5aa2cfdcb5700b7e90b3f77410bebc50ea3faac5f0d694712"
+      ],
+      "source_sha256": "e2ccbb30263fdd8a0dfc796c63531622cfa4c579ddc7265cf97609015aa5cdb3",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "8d2fbb94da9337db686bd666311fea7db509b1e80713baae29bf746b3f5c2911",
+      "proposal_id": "wu:0b643957d56818f60a614ed5#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:2313fe513a88dcbb37759faa7cc82f705fa8d9206c5f753312a4b701e943306f",
+        "change:2f8e8d3ec4728cc5aa2cfdcb5700b7e90b3f77410bebc50ea3faac5f0d694712"
+      ],
+      "source_sha256": "3cad66e992f7ee3023e22fd79b82f216ca6f9f712b1284d0c30a32e1a28b8e80",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14009c2826c39049c91bc590#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "e3c35166f2dfa809039bf9d8912701235b4355d935d539cfb195fae7b85d1f4f",
+      "proposal_id": "wu:14009c2826c39049c91bc590#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+        "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335",
+        "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+        "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+      ],
+      "source_sha256": "c91bb764c3fd7b8d7c07e7b9037d182796b865e34c53eb2eec3f5259ccb69b33",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14009c2826c39049c91bc590#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "4190aadc8e3f7bdc860b180c7645c53914647cebc0b58208519e0f6373439d17",
+      "proposal_id": "wu:14009c2826c39049c91bc590#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+        "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335",
+        "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+        "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+      ],
+      "source_sha256": "b70179b10d8e5a6e30a5cf7218e9888441c27c5e8e791d9bd302b8cbfad4614c",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14009c2826c39049c91bc590#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "d7f9a3ee75cb19a4d7a8ae727327c2eace5d4f5a16651b27aeb8a611ad048d6c",
+      "proposal_id": "wu:14009c2826c39049c91bc590#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+        "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335",
+        "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+        "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+      ],
+      "source_sha256": "bd42dd7759e06c9b1ef155a33b0a40b59c4f0acf38800d9e5cecfe979ba46d15",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14009c2826c39049c91bc590#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "c535a0beb3a5671c00b19c834446fe07e1a2962eaca231950c5e6254d0301190",
+      "proposal_id": "wu:14009c2826c39049c91bc590#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+        "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335",
+        "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+        "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+      ],
+      "source_sha256": "67e04c7ff07ad3ea793ca57bb232983ef2135a9482dbb017c5bce561fc925fff",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14009c2826c39049c91bc590#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "264949bc617b27801a2b474f5e2fd9d3ded40f778de9a931dfc2f44247b62ea5",
+      "proposal_id": "wu:14009c2826c39049c91bc590#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+        "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335",
+        "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+        "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+      ],
+      "source_sha256": "0fc1891d769c875908f134aa0a5cd756d1c8405aeed39e9afc5be72f74bbea27",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "7051b1d1155fce3e9676438ec3b58dfe02313fcdea834055039d3d07b0a69b51",
+      "proposal_id": "wu:14dc4a0f720d69a4650c637d#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69",
+        "change:e4abffbd5298e527521a1b47619698cae670b602ff1476007674eff13f6e5db6"
+      ],
+      "source_sha256": "7da3682b0d51ef5b934378da294a97ad98346d56435e506d83b0f8901bd14b58",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "9941f2accec9e1070ec443230544d027dbb39ac5023ec7d5d5d63d830baf3cd5",
+      "proposal_id": "wu:14dc4a0f720d69a4650c637d#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:d7faddf74f92faffadaac1bc6caca930387eb6b10a3b411838eee38230e641ca",
+        "change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69",
+        "change:e4abffbd5298e527521a1b47619698cae670b602ff1476007674eff13f6e5db6"
+      ],
+      "source_sha256": "66eaf47a1ba3f27cefb0a9ee7bc65c723d13682119bc235617aa7ee745e7fc98",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "e38c0e90abdfff84ce33ac81364bd5fbf23f9f353e8a9c05ed82ed1291656f3c",
+      "proposal_id": "wu:14dc4a0f720d69a4650c637d#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69",
+        "change:e4abffbd5298e527521a1b47619698cae670b602ff1476007674eff13f6e5db6"
+      ],
+      "source_sha256": "32f3c28fa7777c200562ab97063b1f6d83e1a83853f2af3b8dd7e0f35b279b8f",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "56e32a4e753e345686f3ba24cc24bf2e2aac103258e07d7ebeea359a47ff3f52",
+      "proposal_id": "wu:14dc4a0f720d69a4650c637d#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69",
+        "change:e4abffbd5298e527521a1b47619698cae670b602ff1476007674eff13f6e5db6"
+      ],
+      "source_sha256": "7043d1cf285e3bc8a680f9f960cce84e9d865fb68ebbcfc90eaf46fce127c156",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "7d1401939174f9bebed2c1fa8d447ae3271db5e3928ce7a244b95af98e6a58ab",
+      "proposal_id": "wu:14dc4a0f720d69a4650c637d#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:dcb9537a719f49117887583fbaf00dbaec1c34855e0f6f1f5061814e5a699b69",
+        "change:e4abffbd5298e527521a1b47619698cae670b602ff1476007674eff13f6e5db6"
+      ],
+      "source_sha256": "ed052f5717150f3506884943e3cb5a21e9638284c87cefb065a103f97cfa169c",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33057:round1:d5908adf82f959feb01db3b141835a3307ac4c7d",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#duplication",
+      "mandatory": false,
+      "pr_number": 33057,
+      "prompt_sha256": "c05ffee40158fd285f251461c33faf0cbdcd1394598b9b765a0059a392ba8471",
+      "proposal_id": "wu:1ad3109ca1ef9396b2bee8b5#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:02556c2f8f62a899a1ba301ecb2ab72a40dfc88ebfbe6d5e291dc9b14461c00c",
+        "change:077fe4217e89882ce30ce0d82cd136a40815ef247c9c8a5eaa904771f01ff9e3",
+        "change:0978d2da45059881e7b1ea7df90eb7738cd5bc35b8c8a24002867e0d3eec0b11",
+        "change:3b02246a521a20d05c043d52ceb392ac5cc109fc0d8d7a4509c5dc406b274f08",
+        "change:51c3beefa71ba41cab7151346382a1b99727a834f236c811389183893aa96848",
+        "change:529aecebaa01829aca0925ecbd74a3341bc010c81a327e5ba0e9009de141e2ea",
+        "change:9ce69ee8550f6c04c2e16fa47177916b0cd21f443a057f83da873dc03bb03cee",
+        "change:c7d4a9defe0573e3b93e2b11b1ae867843ebabaa43bfaf6e80fc897d4b9586c2"
+      ],
+      "source_sha256": "5af2a7579441b9f75966d5c7e70fec89c75751dd22b6200650804644f3f4a23e",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33057:round1:d5908adf82f959feb01db3b141835a3307ac4c7d",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#generalist",
+      "mandatory": true,
+      "pr_number": 33057,
+      "prompt_sha256": "5b167c20560ea1f44609eaf85045f732a04f1be36f3ab73e579bf269259afdd8",
+      "proposal_id": "wu:1ad3109ca1ef9396b2bee8b5#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:02556c2f8f62a899a1ba301ecb2ab72a40dfc88ebfbe6d5e291dc9b14461c00c",
+        "change:077fe4217e89882ce30ce0d82cd136a40815ef247c9c8a5eaa904771f01ff9e3",
+        "change:0978d2da45059881e7b1ea7df90eb7738cd5bc35b8c8a24002867e0d3eec0b11",
+        "change:3b02246a521a20d05c043d52ceb392ac5cc109fc0d8d7a4509c5dc406b274f08",
+        "change:51c3beefa71ba41cab7151346382a1b99727a834f236c811389183893aa96848",
+        "change:529aecebaa01829aca0925ecbd74a3341bc010c81a327e5ba0e9009de141e2ea",
+        "change:9ce69ee8550f6c04c2e16fa47177916b0cd21f443a057f83da873dc03bb03cee",
+        "change:c7d4a9defe0573e3b93e2b11b1ae867843ebabaa43bfaf6e80fc897d4b9586c2"
+      ],
+      "source_sha256": "50dc7b2dfa716b49500aadef9d4e2b5bdbda3a5616e34cca87859f62de8d935a",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33057:round1:d5908adf82f959feb01db3b141835a3307ac4c7d",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#generality",
+      "mandatory": false,
+      "pr_number": 33057,
+      "prompt_sha256": "f4ff83bd2452c29b336e47d54db8cdafe6bb889a9199aedda4ddfe481dfa1a2f",
+      "proposal_id": "wu:1ad3109ca1ef9396b2bee8b5#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:02556c2f8f62a899a1ba301ecb2ab72a40dfc88ebfbe6d5e291dc9b14461c00c",
+        "change:077fe4217e89882ce30ce0d82cd136a40815ef247c9c8a5eaa904771f01ff9e3",
+        "change:0978d2da45059881e7b1ea7df90eb7738cd5bc35b8c8a24002867e0d3eec0b11",
+        "change:3b02246a521a20d05c043d52ceb392ac5cc109fc0d8d7a4509c5dc406b274f08",
+        "change:51c3beefa71ba41cab7151346382a1b99727a834f236c811389183893aa96848",
+        "change:529aecebaa01829aca0925ecbd74a3341bc010c81a327e5ba0e9009de141e2ea",
+        "change:9ce69ee8550f6c04c2e16fa47177916b0cd21f443a057f83da873dc03bb03cee",
+        "change:c7d4a9defe0573e3b93e2b11b1ae867843ebabaa43bfaf6e80fc897d4b9586c2"
+      ],
+      "source_sha256": "5925e3f3f088cc9faf8edbeac5f160718d8617b86988d4e817be3a48235472fd",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33057:round1:d5908adf82f959feb01db3b141835a3307ac4c7d",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#proof_golf",
+      "mandatory": false,
+      "pr_number": 33057,
+      "prompt_sha256": "bb328edfba2e4521fe6ed90fda8735c34635d7fd422b222135dc7da70eb80ae9",
+      "proposal_id": "wu:1ad3109ca1ef9396b2bee8b5#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:02556c2f8f62a899a1ba301ecb2ab72a40dfc88ebfbe6d5e291dc9b14461c00c",
+        "change:077fe4217e89882ce30ce0d82cd136a40815ef247c9c8a5eaa904771f01ff9e3",
+        "change:0978d2da45059881e7b1ea7df90eb7738cd5bc35b8c8a24002867e0d3eec0b11",
+        "change:3b02246a521a20d05c043d52ceb392ac5cc109fc0d8d7a4509c5dc406b274f08",
+        "change:51c3beefa71ba41cab7151346382a1b99727a834f236c811389183893aa96848",
+        "change:529aecebaa01829aca0925ecbd74a3341bc010c81a327e5ba0e9009de141e2ea",
+        "change:9ce69ee8550f6c04c2e16fa47177916b0cd21f443a057f83da873dc03bb03cee",
+        "change:c7d4a9defe0573e3b93e2b11b1ae867843ebabaa43bfaf6e80fc897d4b9586c2"
+      ],
+      "source_sha256": "41388360557d3062b858904951a1af3737126d99dd72ad82c0a6a52df65385b2",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33057:round1:d5908adf82f959feb01db3b141835a3307ac4c7d",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33057,
+      "prompt_sha256": "274a39c55b20757f8b1c0e9b12a9ad59bc1b613b0e2b5800bdbaaaafea9f7394",
+      "proposal_id": "wu:1ad3109ca1ef9396b2bee8b5#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:02556c2f8f62a899a1ba301ecb2ab72a40dfc88ebfbe6d5e291dc9b14461c00c",
+        "change:077fe4217e89882ce30ce0d82cd136a40815ef247c9c8a5eaa904771f01ff9e3",
+        "change:0978d2da45059881e7b1ea7df90eb7738cd5bc35b8c8a24002867e0d3eec0b11",
+        "change:3b02246a521a20d05c043d52ceb392ac5cc109fc0d8d7a4509c5dc406b274f08",
+        "change:51c3beefa71ba41cab7151346382a1b99727a834f236c811389183893aa96848",
+        "change:529aecebaa01829aca0925ecbd74a3341bc010c81a327e5ba0e9009de141e2ea",
+        "change:9ce69ee8550f6c04c2e16fa47177916b0cd21f443a057f83da873dc03bb03cee",
+        "change:c7d4a9defe0573e3b93e2b11b1ae867843ebabaa43bfaf6e80fc897d4b9586c2"
+      ],
+      "source_sha256": "3441a93076f908af9839e7334de78a71f05ea82fb01fb59df64bca10a7723478",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33438:round1:efd699aaeb775ccf225cfa42ec289e16ce36c0a9",
+      "invocation_id": "wu:230e4c75daf818c75b024525#duplication",
+      "mandatory": false,
+      "pr_number": 33438,
+      "prompt_sha256": "d4af63d8a8b8689e70b74f0bc7934aeb1881b700c7304bfe209b745676fa4135",
+      "proposal_id": "wu:230e4c75daf818c75b024525#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+        "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303"
+      ],
+      "source_sha256": "b0c08352da7a18986fa2fb820ef269e729a66d6a0605dbdf086d3a553e7a8efd",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33438:round1:efd699aaeb775ccf225cfa42ec289e16ce36c0a9",
+      "invocation_id": "wu:230e4c75daf818c75b024525#generalist",
+      "mandatory": true,
+      "pr_number": 33438,
+      "prompt_sha256": "ee5f1255d7d76e4e5f932b4b7ba2b1ed2f625ebaacc6d8828227368f0dce44f5",
+      "proposal_id": "wu:230e4c75daf818c75b024525#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+        "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303"
+      ],
+      "source_sha256": "4a8673579a08fc1396af21e61325182f7a4d199e57c5a577bc09bc73f060b294",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33438:round1:efd699aaeb775ccf225cfa42ec289e16ce36c0a9",
+      "invocation_id": "wu:230e4c75daf818c75b024525#generality",
+      "mandatory": false,
+      "pr_number": 33438,
+      "prompt_sha256": "7bc9fedf4617c6c23d15d95d323d7eb289430bd6e8b0eeac7a3e5cfe1e05c8ba",
+      "proposal_id": "wu:230e4c75daf818c75b024525#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+        "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303"
+      ],
+      "source_sha256": "c5e906396290091cdad0f793144f276f85b643602149702743debd71f9b3f7e7",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33438:round1:efd699aaeb775ccf225cfa42ec289e16ce36c0a9",
+      "invocation_id": "wu:230e4c75daf818c75b024525#proof_golf",
+      "mandatory": false,
+      "pr_number": 33438,
+      "prompt_sha256": "f670167fbd37e7fa7a119b9c261627abc57f47bd568effa93882eba37c1b3d8d",
+      "proposal_id": "wu:230e4c75daf818c75b024525#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+        "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303"
+      ],
+      "source_sha256": "dcc117abd7b04afa3a4a8430671cb4da174d31b47ed52b8a9d87bbe9f8c8e6d6",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33438:round1:efd699aaeb775ccf225cfa42ec289e16ce36c0a9",
+      "invocation_id": "wu:230e4c75daf818c75b024525#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33438,
+      "prompt_sha256": "7b3f9fa9baaf05e0bad6d79eb1f3fec8398c2826a196f8e5088f787728475ca1",
+      "proposal_id": "wu:230e4c75daf818c75b024525#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+        "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303"
+      ],
+      "source_sha256": "56545c02d994509d38fc0deaa37645e90d46a62aec502588476dd32283275cda",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "153e5c877a61cc574f99bbfda82a8f14a490d88422750b3815b33df0e4682e93",
+      "proposal_id": "wu:2aa1c518a2deec84fbbaa244#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:390f4748ccfdedd20b9952b48ba363f7a6aed223eceabdb507c44c21d87d03e1"
+      ],
+      "source_sha256": "c76f97c1af5790e4f9ffd78ce20fbfe4a71e2ee24b63cc5ade5645e15ad2f9b5",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "349ef3fd6fd06d3cbfdbe5b170199c15bc7906333df705e8cd072a07231ae7f6",
+      "proposal_id": "wu:2aa1c518a2deec84fbbaa244#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:2dd14830a6770e97271004fb51eac1973e37603b71e35eb97402746995eb7b17",
+        "change:372017cde9f66fca878bdf689e3480cc36a07d6e6ced4e66e602bf9223187b89",
+        "change:390f4748ccfdedd20b9952b48ba363f7a6aed223eceabdb507c44c21d87d03e1"
+      ],
+      "source_sha256": "0efd67993cbc9925bcc1f779f76d2d41474712195670b8a1bb2d7933cbc69600",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "3536040f9e333020ff39fd8f1e6d92a85a3ca23a7da30eec61128341620b3e45",
+      "proposal_id": "wu:2aa1c518a2deec84fbbaa244#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:390f4748ccfdedd20b9952b48ba363f7a6aed223eceabdb507c44c21d87d03e1"
+      ],
+      "source_sha256": "a3e82c78f05137367f7a82cb693821f83fd6bc5c1639d75d558a221f61ca1200",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "45bb3ba9f65ee2ed63034678ed1e16b9a339b6c17ec3cfe7d992bd82abefd97b",
+      "proposal_id": "wu:2aa1c518a2deec84fbbaa244#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:390f4748ccfdedd20b9952b48ba363f7a6aed223eceabdb507c44c21d87d03e1"
+      ],
+      "source_sha256": "94ed2eba9050bc3f81c6060aa5dfc6c5206536ff9c29af5c55310b415eb5cb7c",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "01e19e630ec9b02f4ce9cacb9e4d75caa2d44a683e014832760e8b033932a3a5",
+      "proposal_id": "wu:2aa1c518a2deec84fbbaa244#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:390f4748ccfdedd20b9952b48ba363f7a6aed223eceabdb507c44c21d87d03e1"
+      ],
+      "source_sha256": "b8cc0e770d354e9aa001cb5763366e7b5f32680bdb43e451cd2b1860ee516822",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2d98984730649af8d3134f67#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "01a3245f69feabe1f262c13f6863a6b9b35c88c10108dc141f304c90a190269b",
+      "proposal_id": "wu:2d98984730649af8d3134f67#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:43382beac97d752cac2d9e4c86dbf1a4bf64555baa61892a203f0c5e57ce337b",
+        "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+        "change:74954e45a6ca907686e441fdf897693fe37a72186cc7154b9fd5375e8437358f",
+        "change:8238b5e18737441c64bde7be13dc5249a81a502ede839996204734d10b073080"
+      ],
+      "source_sha256": "7018c6855cb849816e17a35769056e255cdb7ad3ad5cfb9ead3b2e18641b82c3",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2d98984730649af8d3134f67#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "f8a5d5c7acdd5a3b259c5f97a1775bc9b73acefcc4f23a2dc4f6b7d75cb566e7",
+      "proposal_id": "wu:2d98984730649af8d3134f67#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:3cd3c7d2790427cac609123bb2236bd25a4efee0940fc80e9e71ce0d62276ab8",
+        "change:43382beac97d752cac2d9e4c86dbf1a4bf64555baa61892a203f0c5e57ce337b",
+        "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+        "change:74954e45a6ca907686e441fdf897693fe37a72186cc7154b9fd5375e8437358f",
+        "change:8238b5e18737441c64bde7be13dc5249a81a502ede839996204734d10b073080"
+      ],
+      "source_sha256": "3425ef1482e9e30eae1a23adfa4c53a2f806c9e5bd9eda3978f1fc11c5606e1c",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2d98984730649af8d3134f67#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "4951dee038d0f7efba3f737244f00bc79711420d886c4ca6fa79fe43da95ec3f",
+      "proposal_id": "wu:2d98984730649af8d3134f67#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:43382beac97d752cac2d9e4c86dbf1a4bf64555baa61892a203f0c5e57ce337b",
+        "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+        "change:74954e45a6ca907686e441fdf897693fe37a72186cc7154b9fd5375e8437358f",
+        "change:8238b5e18737441c64bde7be13dc5249a81a502ede839996204734d10b073080"
+      ],
+      "source_sha256": "0f60d07d6fabebf99a527a9ab4578721af5cfde0e649f01caabea69fbf8abfe9",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2d98984730649af8d3134f67#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "5181795af95e0eac3ea3b2942ec28edd4adc86404957fd3e607c8b7d108a1563",
+      "proposal_id": "wu:2d98984730649af8d3134f67#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:43382beac97d752cac2d9e4c86dbf1a4bf64555baa61892a203f0c5e57ce337b",
+        "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+        "change:74954e45a6ca907686e441fdf897693fe37a72186cc7154b9fd5375e8437358f",
+        "change:8238b5e18737441c64bde7be13dc5249a81a502ede839996204734d10b073080"
+      ],
+      "source_sha256": "5b0f4ef0b6fa5b8c758f73608f9e29e3697d2955cbd159eab8cab405f92199e7",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:2d98984730649af8d3134f67#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "490c93acc2331a74af0861f7cbaff71e05054a05e8532db7baa2cc9fc285db92",
+      "proposal_id": "wu:2d98984730649af8d3134f67#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:43382beac97d752cac2d9e4c86dbf1a4bf64555baa61892a203f0c5e57ce337b",
+        "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+        "change:74954e45a6ca907686e441fdf897693fe37a72186cc7154b9fd5375e8437358f",
+        "change:8238b5e18737441c64bde7be13dc5249a81a502ede839996204734d10b073080"
+      ],
+      "source_sha256": "d37e55721c3c454d3c792732c4737ad0726ed1f21488b3aca0e1d9fba40a0251",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "7356b131af1452f2b31b1bf1bced5d710acab95cc945db2b60a20cd177176cb5",
+      "proposal_id": "wu:31b643a1ad1031684bf2a6f1#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:23c93cea30e81e541dbddf0f7a0259583b2a9494cf9927bbb73867e051b064ba",
+        "change:469008037d35e0a1e8cf7decdd8b63df1212996a0008c9a4a275ca7de7fa1524",
+        "change:58e02a18ba545fc3f38903950fc39f14be90b550c996c1832386d2acc57b25e8",
+        "change:5c4cdf3bbde8a4ed5339bf2575bc6a5984d4f21c8013e6dd04f2c18bae7aebd9",
+        "change:d9f14a95fbe389a30a1d5040d6b201eb5a721d4dbf973f71311737c8fd107fb9",
+        "change:e9def9763ba9bffd9595cd2875cf779f4ca27538fa2b95384500b269ebf19cf3"
+      ],
+      "source_sha256": "253a9aec7319fa96a5162ec6fee73e2653a4e2ef91bb45b4ea0dac492bb22778",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "e8a8ee5eae4d2e3fe4b621bf6bcc23f590dbf9c23a6c0dd3ce5f16be8c1c2015",
+      "proposal_id": "wu:31b643a1ad1031684bf2a6f1#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:23c93cea30e81e541dbddf0f7a0259583b2a9494cf9927bbb73867e051b064ba",
+        "change:2d681d88de2cb39608dca559cbdc9e6aee778793b53a68110888a242960d18de",
+        "change:3211e9803880f3f6639f247839b1a58e075e9c4521883557217759ddf117e1a7",
+        "change:469008037d35e0a1e8cf7decdd8b63df1212996a0008c9a4a275ca7de7fa1524",
+        "change:4c9eedf07b5604aac7c6630502a492c68a7de44f742d14214977beac2124d3f5",
+        "change:58e02a18ba545fc3f38903950fc39f14be90b550c996c1832386d2acc57b25e8",
+        "change:5c4cdf3bbde8a4ed5339bf2575bc6a5984d4f21c8013e6dd04f2c18bae7aebd9",
+        "change:a84d81f049f4fdecfefc7e898dbc434ec22712a535e7b2b052fe1ac993c2628c",
+        "change:d9f14a95fbe389a30a1d5040d6b201eb5a721d4dbf973f71311737c8fd107fb9",
+        "change:e13ec88882175809106c31c0206b7feab85e9705372aed6d2da92c4cb12bd113",
+        "change:e9c65dfafb03ad94452b5d296fe3a9ab36322b3cb026004b1f0e05a253cf9016",
+        "change:e9def9763ba9bffd9595cd2875cf779f4ca27538fa2b95384500b269ebf19cf3"
+      ],
+      "source_sha256": "2cdf49e9b25ef57fc8bb5afce44fe429279604cd135945f7c56a8d6d28c5ba97",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "ef62a1ae2608a962b7de01c25bde708bc9d1f4c4d41d3634e1274ff62ac59993",
+      "proposal_id": "wu:31b643a1ad1031684bf2a6f1#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:23c93cea30e81e541dbddf0f7a0259583b2a9494cf9927bbb73867e051b064ba",
+        "change:469008037d35e0a1e8cf7decdd8b63df1212996a0008c9a4a275ca7de7fa1524",
+        "change:58e02a18ba545fc3f38903950fc39f14be90b550c996c1832386d2acc57b25e8",
+        "change:5c4cdf3bbde8a4ed5339bf2575bc6a5984d4f21c8013e6dd04f2c18bae7aebd9",
+        "change:d9f14a95fbe389a30a1d5040d6b201eb5a721d4dbf973f71311737c8fd107fb9",
+        "change:e9def9763ba9bffd9595cd2875cf779f4ca27538fa2b95384500b269ebf19cf3"
+      ],
+      "source_sha256": "eccc2e99b347b0263ed2404a03850d9b4b07e5f72c62937a7dd309fa8fef06f6",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "6fd3a18b47b945e34958a4f4eb20e0fd496ea1836a9b4b87fafe2b0b2e3598f7",
+      "proposal_id": "wu:31b643a1ad1031684bf2a6f1#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:23c93cea30e81e541dbddf0f7a0259583b2a9494cf9927bbb73867e051b064ba",
+        "change:469008037d35e0a1e8cf7decdd8b63df1212996a0008c9a4a275ca7de7fa1524",
+        "change:58e02a18ba545fc3f38903950fc39f14be90b550c996c1832386d2acc57b25e8",
+        "change:5c4cdf3bbde8a4ed5339bf2575bc6a5984d4f21c8013e6dd04f2c18bae7aebd9",
+        "change:d9f14a95fbe389a30a1d5040d6b201eb5a721d4dbf973f71311737c8fd107fb9",
+        "change:e9def9763ba9bffd9595cd2875cf779f4ca27538fa2b95384500b269ebf19cf3"
+      ],
+      "source_sha256": "5c8b5e84373f9ffd207c72a6ebf32ba64bfda761b84d0236061d7a7f456f55b5",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "5699e86a4c76e2579ebd39c0d64f6d76c301f3fe505e09e6e846b4fc617ad697",
+      "proposal_id": "wu:31b643a1ad1031684bf2a6f1#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:23c93cea30e81e541dbddf0f7a0259583b2a9494cf9927bbb73867e051b064ba",
+        "change:469008037d35e0a1e8cf7decdd8b63df1212996a0008c9a4a275ca7de7fa1524",
+        "change:58e02a18ba545fc3f38903950fc39f14be90b550c996c1832386d2acc57b25e8",
+        "change:5c4cdf3bbde8a4ed5339bf2575bc6a5984d4f21c8013e6dd04f2c18bae7aebd9",
+        "change:d9f14a95fbe389a30a1d5040d6b201eb5a721d4dbf973f71311737c8fd107fb9",
+        "change:e9def9763ba9bffd9595cd2875cf779f4ca27538fa2b95384500b269ebf19cf3"
+      ],
+      "source_sha256": "39f351d7ee4ecc8034c5aa920d96a8c0d6f7308d9d38602a35c886ab0c1237d2",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:3ac5204bd333a3f3d66a797a#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "fb0f6adf2023993c95aaaff9a4e00233be0d793ccff5ac07acdd9fe97c3a4b47",
+      "proposal_id": "wu:3ac5204bd333a3f3d66a797a#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:317781a525d5de4ce4176430450c21b9b3a93cbc7665158bff1a98d5f18bb335",
+        "change:38c7bd91de9b2a16724fb55c65438dd5fa6e1bfdeec8df38894a848593a5c559"
+      ],
+      "source_sha256": "153baab5e78ffb21e0371e7768b4278845b1548c1dbe0616c1bc928c00a013d9",
+      "work_unit_id": "wu:3ac5204bd333a3f3d66a797a"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:595be49cb83e80dbe4638d1e#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "2913a67e1d3f920f7261e9d17ead873f2c6e1e50617531b6ecaa3fbef1db6939",
+      "proposal_id": "wu:595be49cb83e80dbe4638d1e#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:037e6736efec30163ab7a3b457637d72b198324423a0781929a0c8c9028d1ce5",
+        "change:14e57552db51c3c9e2f1e98e30dca2b8f4367b8196ebd7aff34fa8d8331bbd84"
+      ],
+      "source_sha256": "6c5b0cdb8ed1fe0282e19eb1818f6a149fcf1bbd8b80438d58a307142cfc4ba2",
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:595be49cb83e80dbe4638d1e#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "36c3fe4e216cf92035a53bbe9db3879aebdcbd05d3d498bd87f396eeb48f03ec",
+      "proposal_id": "wu:595be49cb83e80dbe4638d1e#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:037e6736efec30163ab7a3b457637d72b198324423a0781929a0c8c9028d1ce5",
+        "change:14e57552db51c3c9e2f1e98e30dca2b8f4367b8196ebd7aff34fa8d8331bbd84",
+        "change:194a03c2416e13a4c96fe2b0e5ac0c258e0707fe7e80938b8fba532bbc800330"
+      ],
+      "source_sha256": "53c5a8a4f5457980bf18183c3d1685090395eac0a7470e7c25c0fb71cbc80a7c",
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:595be49cb83e80dbe4638d1e#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "0e416698957b77618ccec002f40064cba5289548970f7f9b5ce421c37f3d0636",
+      "proposal_id": "wu:595be49cb83e80dbe4638d1e#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:037e6736efec30163ab7a3b457637d72b198324423a0781929a0c8c9028d1ce5",
+        "change:14e57552db51c3c9e2f1e98e30dca2b8f4367b8196ebd7aff34fa8d8331bbd84"
+      ],
+      "source_sha256": "f82dadf7b4454fddf4eb59567ece74dceb1b220990387b6443a33ad7627efc5f",
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:595be49cb83e80dbe4638d1e#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "c95a3861ad0affd4c1337e4948d7d7342a4bc7e72763b49358dfeaaf9d39caa1",
+      "proposal_id": "wu:595be49cb83e80dbe4638d1e#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:037e6736efec30163ab7a3b457637d72b198324423a0781929a0c8c9028d1ce5",
+        "change:14e57552db51c3c9e2f1e98e30dca2b8f4367b8196ebd7aff34fa8d8331bbd84"
+      ],
+      "source_sha256": "85364493090259d30494dc5df1075718b399ec626930c514e94fd30dc2c48c5f",
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:595be49cb83e80dbe4638d1e#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "f8431a1a7b1c23ad1e9bf818bab9f6f4acddc2ff061d879fb55e496e5d42b30f",
+      "proposal_id": "wu:595be49cb83e80dbe4638d1e#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:037e6736efec30163ab7a3b457637d72b198324423a0781929a0c8c9028d1ce5",
+        "change:14e57552db51c3c9e2f1e98e30dca2b8f4367b8196ebd7aff34fa8d8331bbd84"
+      ],
+      "source_sha256": "146dcb259c5d4c8bd2c97a28161ff69f686c401316004e616f826320fd6c455d",
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:70a6b15c439dca0fbd8ff70f#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "776d143fed0836d55362d8b1c6d686a82d5c0b15c59933ffd358fa6b46f10885",
+      "proposal_id": "wu:70a6b15c439dca0fbd8ff70f#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:edaddf30305fd8c5a7ff9f48ec38a8cebecfcdc5e45fe550d59ac4560e8965fc"
+      ],
+      "source_sha256": "43f5022389f74528b42b3309b336e63f799783929a0efd7de7a7bf7b4375ca0f",
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:70a6b15c439dca0fbd8ff70f#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "1d2b2b5207b95a72dee72b338d14f073988eb86f5c0a049b40b6b3f35e247eb9",
+      "proposal_id": "wu:70a6b15c439dca0fbd8ff70f#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:e65283c63a0f14f71fb8fe253e6710fcb6bf6e1744aa006a7398e39279bbbd3f",
+        "change:edaddf30305fd8c5a7ff9f48ec38a8cebecfcdc5e45fe550d59ac4560e8965fc"
+      ],
+      "source_sha256": "30cd51a1bfd98602d4e4f2007bd6610671c45b9f3c9b21c5ee1a6537b5f39b88",
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:70a6b15c439dca0fbd8ff70f#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "e994f6ec7cbdb0ed3a97048ecfbf3c895c19ec9617d1c2f40633822dafdb58cc",
+      "proposal_id": "wu:70a6b15c439dca0fbd8ff70f#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:edaddf30305fd8c5a7ff9f48ec38a8cebecfcdc5e45fe550d59ac4560e8965fc"
+      ],
+      "source_sha256": "ce5fdfadb7eddcabf1feeb1839ef79469dcf3827b6ba2e008f341015f0ce257b",
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:70a6b15c439dca0fbd8ff70f#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "e16ff93d04ecf7aaa29362ee06b7c31e1c81dab6e72a2f008ced929ec52cb2d7",
+      "proposal_id": "wu:70a6b15c439dca0fbd8ff70f#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:edaddf30305fd8c5a7ff9f48ec38a8cebecfcdc5e45fe550d59ac4560e8965fc"
+      ],
+      "source_sha256": "68c5dc417b13a2ea0cbb2cab4993d62b123aa5c7ba6663d9a8db43e4131032a9",
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:70a6b15c439dca0fbd8ff70f#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "ac5047a27ae0c8929359f0cf0ab458041a5408c271e1f9c55204da65bff3510d",
+      "proposal_id": "wu:70a6b15c439dca0fbd8ff70f#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:edaddf30305fd8c5a7ff9f48ec38a8cebecfcdc5e45fe550d59ac4560e8965fc"
+      ],
+      "source_sha256": "3593dc916191586d2d18a7bfc3b070351ccfa545759e85ca71a9ea2997543f97",
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7a8e82f6a8770545ad29461f#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "a77a82ff228306ef1b9c95d7ecb6482483d29dadaa7d0c8610e39d482069bbcf",
+      "proposal_id": "wu:7a8e82f6a8770545ad29461f#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:72959f6fd2e4d0ab6a4ed775a4202309b27323a19990795a7b275d1ef1e85b49"
+      ],
+      "source_sha256": "fb9750c26a8940dfcbee77db3928d77fddea7c7907acb1347b14e9a0199218dd",
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7a8e82f6a8770545ad29461f#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "fcf198d6f0fd830e4c2d5affa10c948cbf94f20975ffca0ee53acf7b6364672b",
+      "proposal_id": "wu:7a8e82f6a8770545ad29461f#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:72959f6fd2e4d0ab6a4ed775a4202309b27323a19990795a7b275d1ef1e85b49",
+        "change:883321af9ba3239709af61dcdb98faa719b5069082320e90c0037b4ea09c2e74"
+      ],
+      "source_sha256": "cecb84ce33a1591191cebd3a860dfc1eae26dda4b6331f00bd6b5707852ad24b",
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7a8e82f6a8770545ad29461f#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "138b31eb2d88809bdfb94378dcad8de1166dbb34bae2c80ffc04d61069b20245",
+      "proposal_id": "wu:7a8e82f6a8770545ad29461f#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:72959f6fd2e4d0ab6a4ed775a4202309b27323a19990795a7b275d1ef1e85b49"
+      ],
+      "source_sha256": "4a517ffac2d8153ad247629e83b749d95398cee110ef8054cd548397e7a159c8",
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7a8e82f6a8770545ad29461f#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "51be761df21695f91f0bd68c8e55e6a304db2877189710e7751ea26975196f4e",
+      "proposal_id": "wu:7a8e82f6a8770545ad29461f#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:72959f6fd2e4d0ab6a4ed775a4202309b27323a19990795a7b275d1ef1e85b49"
+      ],
+      "source_sha256": "1cd19d2391659090d74d66a526f9b7a2e339ff2cc52354bab2d1016b30594701",
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7a8e82f6a8770545ad29461f#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "4f4656846ceb541aeb9234316501a40ca97c7ad6d70da6e87aeab66cf4ca1590",
+      "proposal_id": "wu:7a8e82f6a8770545ad29461f#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:72959f6fd2e4d0ab6a4ed775a4202309b27323a19990795a7b275d1ef1e85b49"
+      ],
+      "source_sha256": "de16df87fa9c9372fcc41b887dd2451f18bbb2654eaa24e10622595ed336c8bd",
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7e4faa2ad4a071673041e18e#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "4eccdcecae33d4fc13bc792c80fd214b747a35cb5dc07c4b5c1909bcf05bbc6f",
+      "proposal_id": "wu:7e4faa2ad4a071673041e18e#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:5b6f14fda1db46a7f5a8f538b59b18c30aff61e17987ff4eee0d219e33678363"
+      ],
+      "source_sha256": "446449e8f822c1ee60b547cf320c9095a70fef7c38f7565df4bf1deb228e368a",
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7e4faa2ad4a071673041e18e#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "2e3bb29163d147af7f3b972ea4f3a5b9bd5d30edaab44ea47736d794db611511",
+      "proposal_id": "wu:7e4faa2ad4a071673041e18e#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:5b6f14fda1db46a7f5a8f538b59b18c30aff61e17987ff4eee0d219e33678363",
+        "change:728e654d3dc64600681493c498ee439859d0c07866e6db52b8dcd785723920aa"
+      ],
+      "source_sha256": "d214280f049e500898f76b64af0f6e6de43a81936e0758c24f176babf2a51fdd",
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7e4faa2ad4a071673041e18e#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "4175b9655d62e1bcd238a9249ce5f6f04103fc9d0ab8cdaee2881a15496f60b8",
+      "proposal_id": "wu:7e4faa2ad4a071673041e18e#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:5b6f14fda1db46a7f5a8f538b59b18c30aff61e17987ff4eee0d219e33678363"
+      ],
+      "source_sha256": "baa34863ece7ab6df69a4ff5f98cf6c3570902e15a5abd0a1fa3972afdbbea48",
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7e4faa2ad4a071673041e18e#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "c32eb650958833dad439134c4d90a617dcc820a57e54fd97adcdd61aee4b2844",
+      "proposal_id": "wu:7e4faa2ad4a071673041e18e#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:5b6f14fda1db46a7f5a8f538b59b18c30aff61e17987ff4eee0d219e33678363"
+      ],
+      "source_sha256": "bc11b91da01fcb0b9567547447a84c38fa9b38f38ab927d369688418053fee43",
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:7e4faa2ad4a071673041e18e#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "85d30062425f46c4cb68788f758ced6e07b15bb638a9b6dfe421538df51e725c",
+      "proposal_id": "wu:7e4faa2ad4a071673041e18e#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:5b6f14fda1db46a7f5a8f538b59b18c30aff61e17987ff4eee0d219e33678363"
+      ],
+      "source_sha256": "cee6d0e5f0eb303268d921cccad43a0ac28d0fe24e985048474415d3ccfc4ff6",
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:81f3b33972ab0980c071ed20#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "9ffb653ff396a017cb10cecbab705bf9b94949bc8b92f7b022a0d239b5068b2d",
+      "proposal_id": "wu:81f3b33972ab0980c071ed20#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:21ec312bd694da3085c45bd3379be03f5d1b031341ddadbcc206c9010dceed4c",
+        "change:600f9856d9fa0e09b0d4f491d7f8cd25590ac53ee9891839873f8d2f255acfb6",
+        "change:781597936a627b55b7d392fb83c082bc5a8714ebf6bc50c470b0795c3b498972",
+        "change:798036c2adf37d43de9b3f6b81080294143f8fed64ae361eb1d5f1c695ac19fa",
+        "change:85656f22265b975c5373966f3dfa03443a6b6bc2783129466833b44fb4a09891",
+        "change:8f715d2513f472bb8c7c671144fa20996519f8407c9e401d1f39109df7a45f48"
+      ],
+      "source_sha256": "edb3e349a634c14cb3db92289ad6dade7c0178cf64fc7f293e0ba45dcf71af5b",
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:81f3b33972ab0980c071ed20#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "4ea8baef65b785c9d9b8b2d374cd4d7c776e7b3dfe60673b08828e313b4a4c1e",
+      "proposal_id": "wu:81f3b33972ab0980c071ed20#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:0d96f0973e5e0d9e9364e627f2b8beaac8b9d70c9be0c2cde0e12c866458ab95",
+        "change:21ec312bd694da3085c45bd3379be03f5d1b031341ddadbcc206c9010dceed4c",
+        "change:600f9856d9fa0e09b0d4f491d7f8cd25590ac53ee9891839873f8d2f255acfb6",
+        "change:781597936a627b55b7d392fb83c082bc5a8714ebf6bc50c470b0795c3b498972",
+        "change:798036c2adf37d43de9b3f6b81080294143f8fed64ae361eb1d5f1c695ac19fa",
+        "change:85656f22265b975c5373966f3dfa03443a6b6bc2783129466833b44fb4a09891",
+        "change:8f715d2513f472bb8c7c671144fa20996519f8407c9e401d1f39109df7a45f48"
+      ],
+      "source_sha256": "40ae48bda92d48d53d8fce9cb5e5ffe92c776507c72a574b45a3ddcf32de39ec",
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:81f3b33972ab0980c071ed20#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "6b15810489c0c684e2466630099aea0dc33ceab94ab3c2c5a4389b080a972282",
+      "proposal_id": "wu:81f3b33972ab0980c071ed20#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:21ec312bd694da3085c45bd3379be03f5d1b031341ddadbcc206c9010dceed4c",
+        "change:600f9856d9fa0e09b0d4f491d7f8cd25590ac53ee9891839873f8d2f255acfb6",
+        "change:781597936a627b55b7d392fb83c082bc5a8714ebf6bc50c470b0795c3b498972",
+        "change:798036c2adf37d43de9b3f6b81080294143f8fed64ae361eb1d5f1c695ac19fa",
+        "change:85656f22265b975c5373966f3dfa03443a6b6bc2783129466833b44fb4a09891",
+        "change:8f715d2513f472bb8c7c671144fa20996519f8407c9e401d1f39109df7a45f48"
+      ],
+      "source_sha256": "3ddf82535a667ee81d57586299e494a90fd13b84f33bbf86dcffcd1186c09bda",
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:81f3b33972ab0980c071ed20#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "38cadea8a3b103401ae8ae086e29e77cbe15a59fb86eed6f921639ca499eb8a3",
+      "proposal_id": "wu:81f3b33972ab0980c071ed20#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:21ec312bd694da3085c45bd3379be03f5d1b031341ddadbcc206c9010dceed4c",
+        "change:600f9856d9fa0e09b0d4f491d7f8cd25590ac53ee9891839873f8d2f255acfb6",
+        "change:781597936a627b55b7d392fb83c082bc5a8714ebf6bc50c470b0795c3b498972",
+        "change:798036c2adf37d43de9b3f6b81080294143f8fed64ae361eb1d5f1c695ac19fa",
+        "change:85656f22265b975c5373966f3dfa03443a6b6bc2783129466833b44fb4a09891",
+        "change:8f715d2513f472bb8c7c671144fa20996519f8407c9e401d1f39109df7a45f48"
+      ],
+      "source_sha256": "e0a211ccbba7a20ea6871bc9a60fc35bf6d23519d4a52fd3e8f26fa932e5aeb6",
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:81f3b33972ab0980c071ed20#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "3579fac7c68535a4c3ea478c75adec6b77bba8a9798a90bdf84362dbb6aec7fb",
+      "proposal_id": "wu:81f3b33972ab0980c071ed20#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:21ec312bd694da3085c45bd3379be03f5d1b031341ddadbcc206c9010dceed4c",
+        "change:600f9856d9fa0e09b0d4f491d7f8cd25590ac53ee9891839873f8d2f255acfb6",
+        "change:781597936a627b55b7d392fb83c082bc5a8714ebf6bc50c470b0795c3b498972",
+        "change:798036c2adf37d43de9b3f6b81080294143f8fed64ae361eb1d5f1c695ac19fa",
+        "change:85656f22265b975c5373966f3dfa03443a6b6bc2783129466833b44fb4a09891",
+        "change:8f715d2513f472bb8c7c671144fa20996519f8407c9e401d1f39109df7a45f48"
+      ],
+      "source_sha256": "9c504124333f64349514b7f898fde09ee192f6faa5734ad154fe686a3d2a9429",
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:84d1055b04abab6d285805e7#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "2a2f8c078c6b02d476517c52f0d1b4475d7f2d0e95b5f93638dde506a78113c0",
+      "proposal_id": "wu:84d1055b04abab6d285805e7#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:0adc9a11d9ba3185dacd4e3ad92e958987fa124b1f9cbbd0ded5be2e6a89b79a",
+        "change:1fb113759e6725f85c7cfb4533f6c6f4774df50b67fad5c755161b1d1f121f9e"
+      ],
+      "source_sha256": "bbbb6f845f2f13913ca83bdd5a8d80d0b9f659315558127a95c94420e54bf911",
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:84d1055b04abab6d285805e7#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "acefaae6facc6d29b82bd59fdb90df7eb8bbaf81e94a7172ad0d5668bdb0e2e6",
+      "proposal_id": "wu:84d1055b04abab6d285805e7#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:0adc9a11d9ba3185dacd4e3ad92e958987fa124b1f9cbbd0ded5be2e6a89b79a",
+        "change:193ff3d1c1df9751588413386b0e6833cdadf269b76bc4f6a192654ac934af1c",
+        "change:1fb113759e6725f85c7cfb4533f6c6f4774df50b67fad5c755161b1d1f121f9e"
+      ],
+      "source_sha256": "9409acac68065f63ea2305154ea4fb2359f88bf25cad7827390f056047c80300",
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:84d1055b04abab6d285805e7#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "1072baf9fc978c6125e4907086e543913bb3f836c16f80b8a55f459208162f14",
+      "proposal_id": "wu:84d1055b04abab6d285805e7#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:0adc9a11d9ba3185dacd4e3ad92e958987fa124b1f9cbbd0ded5be2e6a89b79a",
+        "change:1fb113759e6725f85c7cfb4533f6c6f4774df50b67fad5c755161b1d1f121f9e"
+      ],
+      "source_sha256": "b1afb4642d28f490de2a826e94510f7cdc7f811d23dcfebcad97ea19d3872bd5",
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:84d1055b04abab6d285805e7#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "fa11c4655565e9dee1f983d572a0ece563fb7125f3a1f36ae551a85dc39853bf",
+      "proposal_id": "wu:84d1055b04abab6d285805e7#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:0adc9a11d9ba3185dacd4e3ad92e958987fa124b1f9cbbd0ded5be2e6a89b79a",
+        "change:1fb113759e6725f85c7cfb4533f6c6f4774df50b67fad5c755161b1d1f121f9e"
+      ],
+      "source_sha256": "f0726118155930659e0a857421a42e6f3a0f2ed14568c5316c0b5a3e7f23e283",
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:84d1055b04abab6d285805e7#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "0096379b637934d1e9357ba1a88a8599411c710211b5165919b56c591089fc91",
+      "proposal_id": "wu:84d1055b04abab6d285805e7#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:0adc9a11d9ba3185dacd4e3ad92e958987fa124b1f9cbbd0ded5be2e6a89b79a",
+        "change:1fb113759e6725f85c7cfb4533f6c6f4774df50b67fad5c755161b1d1f121f9e"
+      ],
+      "source_sha256": "15c8a28a009de328359f2ab6a402a1dd120ff08b0a23f1853d734b2403ab1369",
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:a7b48444ccce05f011bcc227#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "689b691e02b38cb432958af561fe726bbfb75cdc30a8e03a3740a1e2a2bed753",
+      "proposal_id": "wu:a7b48444ccce05f011bcc227#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:9cc3c5d48b232b5d85e28389b47a8dd593d1dbb5b2445de333a6517b1e81d1e9"
+      ],
+      "source_sha256": "8a6e4755d8a9d4a4ffd5142817549f6625e01408e03ab1ae7d6e4cce832be350",
+      "work_unit_id": "wu:a7b48444ccce05f011bcc227"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:adcb2a53e6bcaab585873def#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "3c3c875c5df2ce6956aaa745f2dd1bd9105ed0d99c61ee08e0bb88d2ad12c421",
+      "proposal_id": "wu:adcb2a53e6bcaab585873def#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f3b8394e85ee922f3eb0a941524982708ba13fd971400d5451e3648c34aa32eb"
+      ],
+      "source_sha256": "426754658af13e7010b9e85b09057523b0ff0490cf7198b0284468ecc424b189",
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:adcb2a53e6bcaab585873def#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "265e59a766b6faf0afe0f11812f9069657ff16f8e30ca1e589c5d1a3e0b07112",
+      "proposal_id": "wu:adcb2a53e6bcaab585873def#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f3b8394e85ee922f3eb0a941524982708ba13fd971400d5451e3648c34aa32eb",
+        "change:fcbd8b133bf39b10ad8f65627952ef1680750b1a510c4af415bb172b299a2381"
+      ],
+      "source_sha256": "127d5b04bc89905fc6ffbae77f2f1dc248fe3125bece31e47194cfa9ec692f20",
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:adcb2a53e6bcaab585873def#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "f3b46b55405100eac7e0b8479cb4a1d77ad23943955dadd3f039e7f9363f20aa",
+      "proposal_id": "wu:adcb2a53e6bcaab585873def#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f3b8394e85ee922f3eb0a941524982708ba13fd971400d5451e3648c34aa32eb"
+      ],
+      "source_sha256": "dd433d5c7285e7d026c72059e3c744bca0d4cd927584ba98e8bf8b241764c9e3",
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:adcb2a53e6bcaab585873def#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "bf067b8bc701e044669e880ed873ca46e70cf2e6ff50cc88c9e206d98cef3eb7",
+      "proposal_id": "wu:adcb2a53e6bcaab585873def#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f3b8394e85ee922f3eb0a941524982708ba13fd971400d5451e3648c34aa32eb"
+      ],
+      "source_sha256": "83cbbafcdd7d6a0347ad325be6e0583401735c2eb250279990f978b178680f63",
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:adcb2a53e6bcaab585873def#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "cf41bb3f63cd701dc3b3ae4dd7d23471fd73d981f65e6c3781c6c0f640be2fb6",
+      "proposal_id": "wu:adcb2a53e6bcaab585873def#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f3b8394e85ee922f3eb0a941524982708ba13fd971400d5451e3648c34aa32eb"
+      ],
+      "source_sha256": "670aa5ae7723fc37af66a7dffa63a0cb36c4dff00644043ba4870509334957d5",
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:b970c47dd9b1f7a30b2ea733#duplication",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "45872df1e6195c54be58d757e9a5f01446a3ba5b7df0ab0a166963807b833c8f",
+      "proposal_id": "wu:b970c47dd9b1f7a30b2ea733#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:b32ffcc769b8e026beee95e4af6142555d69352e78bf226532e22a404c0de3b7"
+      ],
+      "source_sha256": "b1e8ff615ef53a78113b4cbd4761b745b84f796e98691dd1a494b83cbbd311f4",
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:b970c47dd9b1f7a30b2ea733#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "8cafb25786f93b84c20eb28d2040e5174f17e83a2b71b396bb6300a2b5cb2c02",
+      "proposal_id": "wu:b970c47dd9b1f7a30b2ea733#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:b32ffcc769b8e026beee95e4af6142555d69352e78bf226532e22a404c0de3b7",
+        "change:cae67aad8fda356b5ecade85faaf4b59c5f76bd665236fa46f803dc4c9ed5afb"
+      ],
+      "source_sha256": "528472c89cd860098f9510d7bb5f9164b2a5b87b967f7c0e38582e97f889f327",
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:b970c47dd9b1f7a30b2ea733#generality",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "9c78b3f26578184f84e3f8b96cd78b7f6b502b04d50872740282d01de6ec60b4",
+      "proposal_id": "wu:b970c47dd9b1f7a30b2ea733#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:b32ffcc769b8e026beee95e4af6142555d69352e78bf226532e22a404c0de3b7"
+      ],
+      "source_sha256": "80e9ca51f70d5ca7001fa985856a7ccfcbb1fdeb219b9feee05761797092eb69",
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:b970c47dd9b1f7a30b2ea733#proof_golf",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "6ecb9aae9cc88c99a52ddf9c790e9c32fe4f45062c661c404120a6e0d5fc7a44",
+      "proposal_id": "wu:b970c47dd9b1f7a30b2ea733#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:b32ffcc769b8e026beee95e4af6142555d69352e78bf226532e22a404c0de3b7"
+      ],
+      "source_sha256": "dc7deec2f7f731229c38997fcdb5278a16fd2659e5ae9491c7b155d09d1da8b5",
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:b970c47dd9b1f7a30b2ea733#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33066,
+      "prompt_sha256": "4cc7bc0ed9bede75c3dc2b424ebc06d682788bd1d6ba3cf80f1ce49ece06e05c",
+      "proposal_id": "wu:b970c47dd9b1f7a30b2ea733#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:b32ffcc769b8e026beee95e4af6142555d69352e78bf226532e22a404c0de3b7"
+      ],
+      "source_sha256": "8334099bfd1392f1256f5c71db2c7653ab0d1604584732dd70d77ef63e1aae81",
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:c656fe9ace1ddb9d9bd84e0b#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "0d0107acd41447834e9655cf3be0ccb611f2285ff17575b9a62cc0356739e326",
+      "proposal_id": "wu:c656fe9ace1ddb9d9bd84e0b#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:834d7f62bde0b80dccc1e43a948d0da80fefb9942e316b048b76a063c7f9d9e5",
+        "change:b9df03219696a0d73c2b319bf3b1ff1a5aac2a7dc08146dd4a74d82959c30f57"
+      ],
+      "source_sha256": "fd48bc1bfcc826d36e10b645e12e22eca064d723b10b717130e6505cd90adf47",
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:c656fe9ace1ddb9d9bd84e0b#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "2802350eef27501c0e4cdeb0ff5f05a1a70219935adb62b18044f8dec00139e7",
+      "proposal_id": "wu:c656fe9ace1ddb9d9bd84e0b#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:834d7f62bde0b80dccc1e43a948d0da80fefb9942e316b048b76a063c7f9d9e5",
+        "change:b9df03219696a0d73c2b319bf3b1ff1a5aac2a7dc08146dd4a74d82959c30f57",
+        "change:c24e2f5b5003bc48d6ebd462ce89c36f98e02166f2a3c3dd67ebf7a1439dc7f7"
+      ],
+      "source_sha256": "65ef3e4550f2346aa910d6806cf63f4a74c2804c2650f038e077d191169203b6",
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:c656fe9ace1ddb9d9bd84e0b#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "05eae6aebf3e4175ea419f202f80fecfb24a3102bd7daf2ea7d5f88eaf4a0d58",
+      "proposal_id": "wu:c656fe9ace1ddb9d9bd84e0b#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:834d7f62bde0b80dccc1e43a948d0da80fefb9942e316b048b76a063c7f9d9e5",
+        "change:b9df03219696a0d73c2b319bf3b1ff1a5aac2a7dc08146dd4a74d82959c30f57"
+      ],
+      "source_sha256": "753a1e414832ea9cb3521abd9c93b545d54e664ba4964edc6013ea2199edd771",
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:c656fe9ace1ddb9d9bd84e0b#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "85ae9d10f9b1103f2f43aac1c419f21e2d33091d0c3e478e5cb17122908186c0",
+      "proposal_id": "wu:c656fe9ace1ddb9d9bd84e0b#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:834d7f62bde0b80dccc1e43a948d0da80fefb9942e316b048b76a063c7f9d9e5",
+        "change:b9df03219696a0d73c2b319bf3b1ff1a5aac2a7dc08146dd4a74d82959c30f57"
+      ],
+      "source_sha256": "dcbaec24fc34c5009cb5842c35d3aeca7e460d6508c831128580bd552ae94e40",
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:c656fe9ace1ddb9d9bd84e0b#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "3a71575ebe1f8abbdd907a98b56a5e846ee1a17e53d974d6acdc59338b679f90",
+      "proposal_id": "wu:c656fe9ace1ddb9d9bd84e0b#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:834d7f62bde0b80dccc1e43a948d0da80fefb9942e316b048b76a063c7f9d9e5",
+        "change:b9df03219696a0d73c2b319bf3b1ff1a5aac2a7dc08146dd4a74d82959c30f57"
+      ],
+      "source_sha256": "c3f547aa6fac3af21fa0493cd50bb66355cefe59b4454be73c7675153b4f80ff",
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "arm_id": "duplication",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:d15524ece84b2ffed54c9ef1#duplication",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "703aca56fecba1410ee3eb019da34761713319588e7715a99fb1a29f847de7cc",
+      "proposal_id": "wu:d15524ece84b2ffed54c9ef1#duplication",
+      "rationale": "Does a new declaration restate something Mathlib already has? Verified by closing the new declaration with the existing one.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f36711f88985da8ca9fdecb17a4bbca6b2ce641c8a72161c6dd4d4495209c825"
+      ],
+      "source_sha256": "a1318717b001e888f20c3aa810bc3bc926d3cf64f11b26e60ebba836576af25d",
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:d15524ece84b2ffed54c9ef1#generalist",
+      "mandatory": true,
+      "pr_number": 33098,
+      "prompt_sha256": "9b9b891fa55a54630c59db7aa3a166993558ad40ab689587a755d4acdb1b05c5",
+      "proposal_id": "wu:d15524ece84b2ffed54c9ef1#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:efe8e9b10daf7f0b7691e126427b524a95b21671e1b6bfdfa7d88b2ca43009fb",
+        "change:f36711f88985da8ca9fdecb17a4bbca6b2ce641c8a72161c6dd4d4495209c825",
+        "change:f9509dc083d17a8a93c72b0de547e051ed20d78a323cf9249082d97cb71069ae",
+        "change:fb967ebf6aec89e44fa8e13c4bb2dc5d57071d038a1c5f7caeeb601dcfe97d93"
+      ],
+      "source_sha256": "c2f6d8a253e9b75776be02739511540bd1f80df32cef1d8766ceeeca2379a83e",
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    },
+    {
+      "arm_id": "generality",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:d15524ece84b2ffed54c9ef1#generality",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "e95ab038b5e66742bfd8c338077d0f64ab1b773d7a3ff8d9862056b35c75e6ce",
+      "proposal_id": "wu:d15524ece84b2ffed54c9ef1#generality",
+      "rationale": "Is a new declaration stated less generally than it should be? The statement must move, which is the gate that separates it from a golf finding.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f36711f88985da8ca9fdecb17a4bbca6b2ce641c8a72161c6dd4d4495209c825"
+      ],
+      "source_sha256": "8957fca7fea04eb07be73dea0a46ea105c269a36b47a4470e97bad940271aa93",
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    },
+    {
+      "arm_id": "proof_golf",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:d15524ece84b2ffed54c9ef1#proof_golf",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "458b99fa6fb3cf3c24197d0bd1dfa21ff33f06b894302d19b85ee47d77306b28",
+      "proposal_id": "wu:d15524ece84b2ffed54c9ef1#proof_golf",
+      "rationale": "Can a proof this PR changed be written shorter? Verified by recompiling.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f36711f88985da8ca9fdecb17a4bbca6b2ce641c8a72161c6dd4d4495209c825"
+      ],
+      "source_sha256": "dd75287d99cc539266b0a4d8c50c90c40ca5beb6469b353dcc437462463b94aa",
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "cost_hint": 0.079,
+      "eligible": false,
+      "episode_id": "leanprover-community/mathlib4:33098:round1:2971e5804886ab23f5e15c1fae4b1ae10ba3dd06",
+      "invocation_id": "wu:d15524ece84b2ffed54c9ef1#proof_idiom",
+      "mandatory": false,
+      "pr_number": 33098,
+      "prompt_sha256": "c6edd25357ed6bff872a7a91a8b26de175b7a7f6e8a5c913b12db57a13715183",
+      "proposal_id": "wu:d15524ece84b2ffed54c9ef1#proof_idiom",
+      "rationale": "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, `omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which is why it needs its own warrant.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f36711f88985da8ca9fdecb17a4bbca6b2ce641c8a72161c6dd4d4495209c825"
+      ],
+      "source_sha256": "33723dc1b76aaa7ffbcf3d101eb0db8edfa7256bd6d0585fb51f8a526196849e",
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    },
+    {
+      "arm_id": "generalist",
+      "cost_hint": 0.079,
+      "eligible": true,
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "invocation_id": "wu:da095276e0b8a0c7f6d4e0b4#generalist",
+      "mandatory": true,
+      "pr_number": 33066,
+      "prompt_sha256": "c9c8f2d5a2cf5660c39ede2cd00715d784b5bb03327addb67ed747b380320059",
+      "proposal_id": "wu:da095276e0b8a0c7f6d4e0b4#generalist",
+      "rationale": "One invocation per work unit with no concern filter. The coverage floor: it runs in every routing mode and cannot be pruned.",
+      "schema_version": "v5-proposal1",
+      "site_change_ids": [
+        "change:f1f6e3e86573c981dad8bd257fbd08bd91aff0f71c6c291b8926822ace37343b",
+        "change:fa74711ad673040f159f9123eb7a950061cbcdf0566acb412852856223b3c0b8"
+      ],
+      "source_sha256": "4119432b82748a2e7206ac292f4b88c2b51a1d40462f91715f16c847cf689891",
+      "work_unit_id": "wu:da095276e0b8a0c7f6d4e0b4"
+    }
+  ],
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "renderer_version": "candidate-prompt/12+focused-prompt/1",
+  "routing_mode": "lead",
+  "run_name": "pr_review_v5_lead_smoke4_rep4",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "schema_version": "v5-agenda1",
+  "source_sha256": "b36fd5002af3ccb10aac22d12fd441e8e574044dd48b4006f8e0d586f4214845"
+}

@@ -1,0 +1,82 @@
+{
+  "after_merge": 56,
+  "alternatives_not_selected": 2,
+  "by_admission": {
+    "diagnostic": 49,
+    "published": 7
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 9,
+    "generalist": 47,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 47,
+    "repository_measurement": 0,
+    "verified_compile": 9
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 14,
+  "candidates_generalist": 33,
+  "candidates_specialist": 9,
+  "candidates_specialist_dropped_unverified": 0,
+  "conflicts": 3,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 56
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 9,
+      "generalist": 47,
+      "holistic": 0,
+      "merged": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 56,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 56,
+    "largest_issue_sites": 2,
+    "pr_finding_limit": 20,
+    "published_after_limit": 7,
+    "published_before_limit": 7,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "execution_release": null,
+  "findings_sha256": "b3c390f26a081bd467497b107dccfe59c2e1b1b464a889c32b2365262ccc6389",
+  "generalist_evidence_gate": "closed",
+  "inputs": 56,
+  "issues_published": 7,
+  "issues_sha256": "df14ad6e63da0f899c92f7f17ef30955b124245fb8c982db54909f6a008314a0",
+  "issues_total": 56,
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 7,
+  "published_before_limit": 7,
+  "published_by_concern": {
+    "correctness": 1,
+    "proof-golf": 6
+  },
+  "published_prs": [
+    33057,
+    33098,
+    33438
+  ],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33057,
+    33066,
+    33098,
+    33438
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 34
+}

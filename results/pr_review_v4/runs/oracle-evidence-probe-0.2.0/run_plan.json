@@ -1,0 +1,24 @@
+{
+  "created_at": "2026-07-17T11:29:59.611610+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/treatments/oracle-evidence-probe-0.2.0/manifest.json",
+  "dataset_manifest_sha256": "c2cb40f3a29055d778813e6a3122daab8854fefbafdc8fce1289b79f79449606",
+  "expected_pr_numbers": [
+    33098,
+    33438
+  ],
+  "expected_work_unit_ids": [
+    "wu:oracle-evidence:8df666b9fb141d606cb0",
+    "wu:oracle-evidence:31e8ae1ffd989229d385"
+  ],
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:oracle-evidence:31e8ae1ffd989229d385": "cbcb043aaf353fca2b5d26eb2b7c56a6f09c4050ea57b4a1357fd34e9d18b014",
+    "wu:oracle-evidence:8df666b9fb141d606cb0": "6c93750775e63cce8b48121f7b61e9bab29a6010e60d5fa61ed2ae76eb2c55e3"
+  },
+  "renderer_versions": [
+    "oracle-evidence-sufficiency/1"
+  ],
+  "run_id": "pr_review_v4_oracle_evidence_probe_020",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "39dec16a7a180cd769c348f15b275152945551a37f86fa0d07c6cb9a80590bba"
+}

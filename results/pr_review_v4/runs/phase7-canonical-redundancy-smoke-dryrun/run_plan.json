@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-07-17T15:40:40.398932+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/releases/dev-pilot-0.9.1-canonical-smoke/manifest.json",
+  "dataset_manifest_sha256": "f2f9b91c90dcc3333701d91f40fce152f8a9cc7e2419c26ac54535eb934e26ac",
+  "expected_investigation_ids": [
+    "investigation:canonical-smoke:9c401350b768b2790f1e"
+  ],
+  "expected_pr_numbers": [
+    33098
+  ],
+  "expected_work_unit_ids": [
+    "wu:canonical-smoke:3b0c794370968125d9be"
+  ],
+  "method_registry_sha256": "88b7334f9e73ecd68d5d4911100c3ab0edc216988a914e235630c79d9cfec8c1",
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:canonical-smoke:3b0c794370968125d9be": "600298a963f95165b6513e06aa24842f5cfa7da7efbba626be17b87a1ca5fcaa"
+  },
+  "renderer_versions": [
+    "canonical-api-smoke/1"
+  ],
+  "run_id": "pr_review_v4_phase7_canonical_redundancy_smoke_dryrun",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "d746ee38313c581b8b5e6f219f92f32d3326d2fc534e00cae3b8b416f02e31dc"
+}

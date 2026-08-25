@@ -1,0 +1,41 @@
+{
+  "counts": {
+    "candidate_obligation_pairs": 3,
+    "candidates": 5,
+    "obligations": 3,
+    "paired_candidates": 3
+  },
+  "issue_recall": 0.3333333333333333,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "location_recall": 1.0,
+  "manual_audit_required": true,
+  "paired_candidate_issue_precision": 0.3333333333333333,
+  "per_obligation": [
+    {
+      "issue_hit": true,
+      "location_hit": true,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_hit": false
+    }
+  ],
+  "resolution_recall": 0.0,
+  "schema_version": "v4-semantic-report1",
+  "scoped_work_unit_ids": [
+    "wu:2b90f62f628fe3c4b85f80e6",
+    "wu:a0ca0f4fe2020cb90e566181",
+    "wu:a760602702a7288361685f67"
+  ]
+}

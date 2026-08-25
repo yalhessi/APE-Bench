@@ -1,0 +1,11 @@
+{
+  "executor_version": "generic-opportunity-executor/1",
+  "operator_runs": 14,
+  "opportunities": 5,
+  "records": 5,
+  "schema_version": "generic-opportunity-executor-report1",
+  "tasks": 5,
+  "terminal_stages": {
+    "transformation_constructed": 5
+  }
+}

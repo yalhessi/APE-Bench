@@ -1,0 +1,16 @@
+{
+  "complete": true,
+  "counts": {
+    "adjudications": 2,
+    "candidates": 3,
+    "deterministic_candidates": 1,
+    "model_candidates": 2,
+    "model_units": 2,
+    "verification_artifacts": 2
+  },
+  "dispositions": {
+    "opportunity:22049f958b613a5c6fb42331": "request",
+    "opportunity:d647742eb3b2dd76d880300c": "request"
+  },
+  "schema_version": "phase9-repetition-ingest-report1"
+}

@@ -1,0 +1,85 @@
+{
+  "abstention": {
+    "control_prs": 1.0,
+    "intervention_prs": 0.5
+  },
+  "control_false_finding_rate": 0.0,
+  "counts": {
+    "candidates": 5,
+    "control_prs": 1,
+    "eligible_interventions": 4,
+    "intervention_prs": 2,
+    "obligations": 4,
+    "selected_findings": 1
+  },
+  "evaluated_pr_numbers": [
+    33057,
+    33098,
+    33438
+  ],
+  "evidence": {
+    "assertion_polarity": {
+      "inconclusive": 13,
+      "supports": 1
+    },
+    "assertions": 14,
+    "complete_packet_rate": 1.0,
+    "packet_status": {
+      "inconclusive": 4,
+      "supported": 1
+    },
+    "packets": 5,
+    "support_precision_status": "human_audit_required"
+  },
+  "evidence_support_precision_status": "human_audit_required",
+  "findings_per_control_pr": 0.0,
+  "full_intervention_candidate_recall": 0.25,
+  "full_intervention_selected_recall": 0.0,
+  "location_candidate_recall": 0.25,
+  "location_selected_recall": 0.0,
+  "schema_version": "v4-evaluation1",
+  "selected_paired_issue_precision": null,
+  "semantic": {
+    "counts": {
+      "candidate_obligation_pairs": 1,
+      "candidates": 5,
+      "obligations": 4,
+      "paired_candidates": 1
+    },
+    "issue_recall": 0.0,
+    "judge_version": "v4-semantic-v1-v7.1-rubric",
+    "location_recall": 0.25,
+    "manual_audit_required": true,
+    "paired_candidate_issue_precision": 0.0,
+    "per_obligation": [
+      {
+        "issue_hit": false,
+        "location_hit": false,
+        "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+        "resolution_hit": false
+      },
+      {
+        "issue_hit": false,
+        "location_hit": false,
+        "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+        "resolution_hit": false
+      },
+      {
+        "issue_hit": false,
+        "location_hit": true,
+        "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+        "resolution_hit": false
+      },
+      {
+        "issue_hit": false,
+        "location_hit": false,
+        "obligation_id": "obligation:6db24d1d232819b1261f658fb6ec36d9e14b41ebd97ef8b08c54c7c683effa6c",
+        "resolution_hit": false
+      }
+    ],
+    "resolution_recall": 0.0,
+    "schema_version": "v4-semantic-report1"
+  },
+  "semantic_scoring_status": "attached",
+  "warning": "Change-scope hits measure location recall, not semantic issue/resolution correctness."
+}

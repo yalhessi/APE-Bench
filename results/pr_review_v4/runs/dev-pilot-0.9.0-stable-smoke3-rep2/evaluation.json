@@ -1,0 +1,114 @@
+{
+  "abstention": {
+    "control_prs": 0.0,
+    "intervention_prs": 0.0
+  },
+  "control_false_finding_rate": 1.0,
+  "counts": {
+    "candidates": 9,
+    "control_prs": 1,
+    "eligible_interventions": 4,
+    "intervention_prs": 2,
+    "obligations": 6,
+    "selected_findings": 4
+  },
+  "evaluated_pr_numbers": [
+    33057,
+    33098,
+    33438
+  ],
+  "evidence": {
+    "assertion_polarity": {
+      "contradicts": 1,
+      "inconclusive": 19,
+      "supports": 4
+    },
+    "assertions": 24,
+    "complete_packet_rate": 1.0,
+    "packet_status": {
+      "inconclusive": 5,
+      "supported": 4
+    },
+    "packets": 9,
+    "support_precision_status": "human_audit_required"
+  },
+  "evidence_support_precision_status": "human_audit_required",
+  "findings_per_control_pr": 1.0,
+  "full_intervention_candidate_recall": 1.0,
+  "full_intervention_selected_recall": 0.25,
+  "location_candidate_recall": 1.0,
+  "location_selected_recall": 0.5,
+  "schema_version": "v4-evaluation1",
+  "scoped_change_ids": [
+    "change:02556c2f8f62a899a1ba301ecb2ab72a40dfc88ebfbe6d5e291dc9b14461c00c",
+    "change:077fe4217e89882ce30ce0d82cd136a40815ef247c9c8a5eaa904771f01ff9e3",
+    "change:0978d2da45059881e7b1ea7df90eb7738cd5bc35b8c8a24002867e0d3eec0b11",
+    "change:3b02246a521a20d05c043d52ceb392ac5cc109fc0d8d7a4509c5dc406b274f08",
+    "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+    "change:51c3beefa71ba41cab7151346382a1b99727a834f236c811389183893aa96848",
+    "change:529aecebaa01829aca0925ecbd74a3341bc010c81a327e5ba0e9009de141e2ea",
+    "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303",
+    "change:9ce69ee8550f6c04c2e16fa47177916b0cd21f443a057f83da873dc03bb03cee",
+    "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+    "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335",
+    "change:c7d4a9defe0573e3b93e2b11b1ae867843ebabaa43bfaf6e80fc897d4b9586c2",
+    "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+    "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+  ],
+  "selected_paired_issue_precision": 1.0,
+  "semantic": {
+    "counts": {
+      "candidate_obligation_pairs": 6,
+      "candidates": 9,
+      "obligations": 6,
+      "paired_candidates": 4
+    },
+    "issue_recall": 0.3333333333333333,
+    "judge_version": "v4-semantic-v1-v7.1-rubric",
+    "location_recall": 1.0,
+    "manual_audit_required": true,
+    "paired_candidate_issue_precision": 0.5,
+    "per_obligation": [
+      {
+        "issue_hit": true,
+        "location_hit": true,
+        "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+        "resolution_hit": true
+      },
+      {
+        "issue_hit": false,
+        "location_hit": true,
+        "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+        "resolution_hit": false
+      },
+      {
+        "issue_hit": true,
+        "location_hit": true,
+        "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+        "resolution_hit": true
+      },
+      {
+        "issue_hit": false,
+        "location_hit": true,
+        "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+        "resolution_hit": false
+      },
+      {
+        "issue_hit": false,
+        "location_hit": true,
+        "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+        "resolution_hit": false
+      },
+      {
+        "issue_hit": false,
+        "location_hit": true,
+        "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+        "resolution_hit": false
+      }
+    ],
+    "resolution_recall": 0.3333333333333333,
+    "schema_version": "v4-semantic-report1"
+  },
+  "semantic_scoring_status": "attached",
+  "warning": "Change-scope hits measure location recall, not semantic issue/resolution correctness."
+}

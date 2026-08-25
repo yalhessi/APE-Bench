@@ -1,0 +1,17 @@
+{
+  "complete": true,
+  "counts": {
+    "consensuses": 1,
+    "repaired_legacy_aliases": 1,
+    "requests": 1,
+    "verification_artifacts": 2,
+    "votes": 2
+  },
+  "outcomes": {
+    "opportunity:d647742eb3b2dd76d880300c": {
+      "final_worthiness": "request",
+      "status": "agreement"
+    }
+  },
+  "schema_version": "phase7-redundancy-ingest-report1"
+}

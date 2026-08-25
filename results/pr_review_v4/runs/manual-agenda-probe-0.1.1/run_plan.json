@@ -1,0 +1,32 @@
+{
+  "created_at": "2026-07-17T10:26:12.513339+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/treatments/manual-agenda-probe-0.1.1/manifest.json",
+  "dataset_manifest_sha256": "9017fda5b98436f57b94ccb92fe6eeb617c74a18bfd13122f6353834d6cdaf9d",
+  "expected_pr_numbers": [
+    33098,
+    33438
+  ],
+  "expected_work_unit_ids": [
+    "wu:agenda-probe:84a591e0837117115f3f",
+    "wu:agenda-probe:9e3b7914f12c955fce1f",
+    "wu:agenda-probe:582fa3d5f12a7b48f980",
+    "wu:agenda-probe:8aa21383d2230a2f6ac2",
+    "wu:agenda-probe:b037429b24ffa91bdc9f",
+    "wu:agenda-probe:21bb73baeab56cbf1829"
+  ],
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:agenda-probe:21bb73baeab56cbf1829": "57d854a2572c4104b6347edcb625424ca03be75a70cea123fa9d26b7701ef03a",
+    "wu:agenda-probe:582fa3d5f12a7b48f980": "43b0c5727a94dc468eba24710a4eefe10293d1cad67950687f6cf612cce0b365",
+    "wu:agenda-probe:84a591e0837117115f3f": "0a2a50a5061d7b5a64b673891828ab67e1b44469633e6409d1cd62b16a340f36",
+    "wu:agenda-probe:8aa21383d2230a2f6ac2": "d30ee379108ec7386255645292b256214722de91cd7b8b4e9e196438f38bd9ef",
+    "wu:agenda-probe:9e3b7914f12c955fce1f": "c2b7aadffe86758cdba8e44efd075b6d7566f884879cda4e60f48bf793a9facd",
+    "wu:agenda-probe:b037429b24ffa91bdc9f": "5c9a604967b217648c480fd192b97549f4f08392e0e6658299317886a02cd931"
+  },
+  "renderer_versions": [
+    "manual-agenda-probe/1"
+  ],
+  "run_id": "pr_review_v4_manual_agenda_probe_011",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "43bda63edb0e451aeac63cedf396004c43693f1d5521bd7d4f21153d285f3c2f"
+}

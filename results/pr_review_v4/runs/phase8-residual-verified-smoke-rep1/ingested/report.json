@@ -1,0 +1,14 @@
+{
+  "candidates_by_pr": {
+    "33098": 0,
+    "33438": 0
+  },
+  "complete": true,
+  "counts": {
+    "candidates": 0,
+    "pr_units": 2,
+    "terminal_passes": 2,
+    "verification_artifacts": 0
+  },
+  "schema_version": "phase8-residual-ingest-report1"
+}

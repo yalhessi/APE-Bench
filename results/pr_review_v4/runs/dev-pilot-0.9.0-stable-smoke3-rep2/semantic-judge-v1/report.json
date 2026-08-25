@@ -1,0 +1,59 @@
+{
+  "counts": {
+    "candidate_obligation_pairs": 6,
+    "candidates": 9,
+    "obligations": 6,
+    "paired_candidates": 4
+  },
+  "issue_recall": 0.3333333333333333,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "location_recall": 1.0,
+  "manual_audit_required": true,
+  "paired_candidate_issue_precision": 0.5,
+  "per_obligation": [
+    {
+      "issue_hit": true,
+      "location_hit": true,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_hit": true
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": true,
+      "location_hit": true,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+      "resolution_hit": true
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_hit": false
+    }
+  ],
+  "resolution_recall": 0.3333333333333333,
+  "schema_version": "v4-semantic-report1",
+  "scoped_work_unit_ids": [
+    "wu:20910b2d076223021ce8926e",
+    "wu:4c8e8d9471d9110b64a05169",
+    "wu:b017b7314c4bea62d8f968c3"
+  ]
+}

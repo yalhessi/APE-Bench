@@ -1,0 +1,24 @@
+{
+  "created_at": "2026-07-17T11:14:56.185493+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/treatments/oracle-opportunity-probe-0.1.0/manifest.json",
+  "dataset_manifest_sha256": "3732a0f2b22b9454554f718adedec160641f752b19c33e76f262b31d1936b315",
+  "expected_pr_numbers": [
+    33098,
+    33438
+  ],
+  "expected_work_unit_ids": [
+    "wu:oracle-opportunity:880ddc477e24b3fa19ef",
+    "wu:oracle-opportunity:e0f4619cc95bec34ac77"
+  ],
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:oracle-opportunity:880ddc477e24b3fa19ef": "0c3df58f18717a73a1da68e4684f34e72dfb30eee2b401d98ed54bbe18664332",
+    "wu:oracle-opportunity:e0f4619cc95bec34ac77": "6111b2e8080db7852d84e25cd5027a45d49c52f26597a4e5e4d17c1f5f577919"
+  },
+  "renderer_versions": [
+    "oracle-opportunity-adjudication/1"
+  ],
+  "run_id": "pr_review_v4_oracle_opportunity_probe_010_manual",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "d31403258fac82865a8fe07ab22c421010872b5d4a02e6a08a6f7c8008d04796"
+}

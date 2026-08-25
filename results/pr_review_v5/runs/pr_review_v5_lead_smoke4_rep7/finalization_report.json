@@ -1,0 +1,84 @@
+{
+  "after_merge": 62,
+  "alternatives_not_selected": 2,
+  "by_admission": {
+    "diagnostic": 51,
+    "published": 11
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 13,
+    "generalist": 49,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 49,
+    "repository_measurement": 0,
+    "verified_compile": 13
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 5,
+  "candidates_generalist": 44,
+  "candidates_specialist": 13,
+  "candidates_specialist_dropped_unverified": 0,
+  "conflicts": 0,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 62
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 13,
+      "generalist": 49,
+      "holistic": 0,
+      "merged": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 62,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 62,
+    "largest_issue_sites": 6,
+    "pr_finding_limit": 20,
+    "published_after_limit": 11,
+    "published_before_limit": 11,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "execution_release": null,
+  "findings_sha256": "b305bb173c363ec5df797febd4cc2d4e23f9e8bf83e96187ea1aaa092989610a",
+  "generalist_evidence_gate": "closed",
+  "inputs": 62,
+  "issues_published": 11,
+  "issues_sha256": "9d3dad57b823c9881f085a9be8fd503526ad45a08ccb1af306e2ac3cafef651d",
+  "issues_total": 62,
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 11,
+  "published_before_limit": 11,
+  "published_by_concern": {
+    "correctness": 1,
+    "duplication": 2,
+    "generalization": 2,
+    "proof-golf": 6
+  },
+  "published_prs": [
+    33057,
+    33098,
+    33438
+  ],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33057,
+    33066,
+    33098,
+    33438
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 34
+}

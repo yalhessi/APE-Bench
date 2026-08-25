@@ -1,0 +1,90 @@
+{
+  "artifacts": [
+    {
+      "path": "candidate_responses.jsonl",
+      "records": 3,
+      "role": "terminal_candidate_responses",
+      "schema_version": null,
+      "sha256": "7cfd1e2106769d740960dd3a355588d95a12eec4615bb35f32c5de8cee8a70d8"
+    },
+    {
+      "path": "candidates.jsonl",
+      "records": 9,
+      "role": "candidate_claims",
+      "schema_version": "c1",
+      "sha256": "99c0e6d27ac262ffb22e860a2b9d104f31408e9aef3952949ca497a5c66443bd"
+    },
+    {
+      "path": "evidence/packets.jsonl",
+      "records": 9,
+      "role": "evidence_packets",
+      "schema_version": "evidence-packet1",
+      "sha256": "8bdef69e8983c5590d27e7799ef72770994a63bbb3fb5875c8b492473e84e70f"
+    },
+    {
+      "path": "findings.jsonl",
+      "records": 4,
+      "role": "selected_findings",
+      "schema_version": "finding1",
+      "sha256": "706999a5ecf3f75dc0d4302f89efac04aae6989abaf3f3a0fdf7acbbb4250138"
+    },
+    {
+      "path": "evidence/artifacts.jsonl",
+      "records": 24,
+      "role": "evidence_artifacts",
+      "schema_version": "evidence-artifact1",
+      "sha256": "ce0b45b5ac08f9111d35823bc16b2d4949bce63afc8633763b5196f04358a0a4"
+    },
+    {
+      "path": "evidence/assertions.jsonl",
+      "records": 24,
+      "role": "evidence_assertions",
+      "schema_version": "evidence-assertion1",
+      "sha256": "563100ad3ddb15ca4009dc4c4cee796ebde63515ed98da638f84197e46d0654b"
+    },
+    {
+      "path": "evaluation.json",
+      "records": 1,
+      "role": "funnel_evaluation",
+      "schema_version": "v4-evaluation1",
+      "sha256": "db70b70e927f4d9346c410f06db5ce67fd17124a9447f4a5cb8d370b384b20ba"
+    },
+    {
+      "path": "semantic-judge-v1/matches.jsonl",
+      "records": 6,
+      "role": "semantic_matches",
+      "schema_version": "semantic-match1",
+      "sha256": "de2c5cbe4e46e6f259dbc8d366d50c1e52c47a8777ba3061ec4a9dc03d840b8b"
+    },
+    {
+      "path": "semantic-judge-v1/report.json",
+      "records": 1,
+      "role": "semantic_evaluation",
+      "schema_version": "v4-semantic-report1",
+      "sha256": "39d482d351f77e27a2714ab4a1cdec901508836b2d31ab01e39e95d69e92fb4c"
+    }
+  ],
+  "candidates": 9,
+  "completion_status": "complete",
+  "created_at": "2026-07-14T15:12:33.087083+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+  "dataset_manifest_sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3",
+  "evidence_packets": 9,
+  "expected_work_unit_ids": [
+    "wu:4c8e8d9471d9110b64a05169",
+    "wu:b017b7314c4bea62d8f968c3",
+    "wu:20910b2d076223021ce8926e"
+  ],
+  "failed_work_unit_ids": [],
+  "findings": 4,
+  "run_id": "pr_review_v4_090_stable_smoke3_rep2",
+  "run_plan_path": "run_plan.json",
+  "run_plan_sha256": "67d230f2cbc9a5b0b58cbfdada55b1d5d1e5c66a2ff3be7dde4fdb2adf2b91b4",
+  "schema_version": "pr4-run-1",
+  "source_sha256": "8ad59df4216add2ac8440fab4cb91a65e95b8a679174ba0ed2fd09c04ba831c0",
+  "successful_work_unit_ids": [
+    "wu:20910b2d076223021ce8926e",
+    "wu:4c8e8d9471d9110b64a05169",
+    "wu:b017b7314c4bea62d8f968c3"
+  ]
+}

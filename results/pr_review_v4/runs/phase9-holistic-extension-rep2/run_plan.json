@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-07-18T11:03:54.611516+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+  "dataset_manifest_sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3",
+  "expected_investigation_ids": [],
+  "expected_pr_numbers": [
+    33098
+  ],
+  "expected_work_unit_ids": [
+    "wu:9354e29b0912d17d60b1d3e1"
+  ],
+  "method_registry_sha256": null,
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:9354e29b0912d17d60b1d3e1": "d5a7df609f48542640a0784a8f5223290d636cf465ba483591f2465fe0d926b9"
+  },
+  "renderer_versions": [
+    "candidate-prompt/11"
+  ],
+  "run_id": "pr_review_v4_phase9_holistic_extension_rep2",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "9a0482507be52c3ca207f8e3ba607aa7bceb4516d028f74ffebdaa1a6c110108"
+}

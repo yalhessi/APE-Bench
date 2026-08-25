@@ -1,0 +1,27 @@
+{
+  "abstention": {
+    "control_prs": 1.0,
+    "intervention_prs": 0.8333333333333334
+  },
+  "control_false_finding_rate": 0.0,
+  "counts": {
+    "candidates": 20,
+    "control_prs": 3,
+    "eligible_interventions": 12,
+    "intervention_prs": 6,
+    "obligations": 12,
+    "selected_findings": 1
+  },
+  "findings_per_control_pr": 0.0,
+  "full_intervention_candidate_recall": 0.16666666666666666,
+  "full_intervention_selected_recall": 0.0,
+  "location_candidate_recall": 0.16666666666666666,
+  "location_selected_recall": 0.0,
+  "manual_gates_pending": [
+    "candidate issue match",
+    "resolution match",
+    "evidence support precision"
+  ],
+  "schema_version": "v4-evaluation1",
+  "warning": "Change-scope hits measure location recall, not semantic issue/resolution correctness."
+}

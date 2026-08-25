@@ -1,0 +1,26 @@
+{
+  "created_at": "2026-07-17T16:12:00.583543+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/treatments/phase8-residual-smoke-0.1.0/manifest.json",
+  "dataset_manifest_sha256": "91eb13c8ef2877c01f75c0575b616028fd3e6a05f778e09d2108d37a84cc592b",
+  "expected_investigation_ids": [],
+  "expected_pr_numbers": [
+    33098,
+    33438
+  ],
+  "expected_work_unit_ids": [
+    "wu:phase8-residual:deceb19b100f20739013",
+    "wu:phase8-residual:a784cce404fdf49ef409"
+  ],
+  "method_registry_sha256": null,
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:phase8-residual:a784cce404fdf49ef409": "b2253199f944e72002ea5f21b0ebf1df807017143160c58cfe79e3f7920417c1",
+    "wu:phase8-residual:deceb19b100f20739013": "9c23de3faf5309f5ddda5d55e8c605f1dbaee278af5795c9ae764372a38cf1fd"
+  },
+  "renderer_versions": [
+    "phase8-residual-review/1"
+  ],
+  "run_id": "pr_review_v4_phase8_residual_smoke_rep1",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "c2f605ed6ceafdb122f8efb8748552be090dadd52b9a4cf93efdeedbaebdfe07"
+}

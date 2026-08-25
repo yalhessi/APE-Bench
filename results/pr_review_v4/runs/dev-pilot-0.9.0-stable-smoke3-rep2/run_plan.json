@@ -1,0 +1,27 @@
+{
+  "created_at": "2026-07-14T15:11:01.548772+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+  "dataset_manifest_sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3",
+  "expected_pr_numbers": [
+    33057,
+    33098,
+    33438
+  ],
+  "expected_work_unit_ids": [
+    "wu:4c8e8d9471d9110b64a05169",
+    "wu:b017b7314c4bea62d8f968c3",
+    "wu:20910b2d076223021ce8926e"
+  ],
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:20910b2d076223021ce8926e": "4b37ce9e6da974ab5fbacc084e5a87382c8e1c014c3a0f0cbb9630ccd55d57a3",
+    "wu:4c8e8d9471d9110b64a05169": "f4a90b992efb94500839fa4079db022acaeec830453c9f41f30ca91fe2a006d2",
+    "wu:b017b7314c4bea62d8f968c3": "23fa953726279d421469ce1aa7c37df36ced3ec7f08d9319a515666e39f3dd09"
+  },
+  "renderer_versions": [
+    "candidate-prompt/11"
+  ],
+  "run_id": "pr_review_v4_090_stable_smoke3_rep2",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "1a4aaac3ecb8d4841de70cecc551cb068a73a658412e1a8fa9d5cb38fd016609"
+}

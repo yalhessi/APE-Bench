@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-07-17T13:41:56.828033+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/releases/dev-pilot-0.9.2-naming-smoke/manifest.json",
+  "dataset_manifest_sha256": "21c5ed0de993642fd11714967313f17bb46526f5a23c2318571ef1f79fe2e4d5",
+  "expected_investigation_ids": [
+    "investigation:naming-smoke:6a0f33c8c3ef82a7615e",
+    "investigation:naming-smoke:b5a1a44f65237d561e7e"
+  ],
+  "expected_pr_numbers": [
+    33098
+  ],
+  "expected_work_unit_ids": [
+    "wu:naming-smoke:f92805bdf8cc092588cd",
+    "wu:naming-smoke:37a48404f86da71520a5"
+  ],
+  "method_registry_sha256": "88b7334f9e73ecd68d5d4911100c3ab0edc216988a914e235630c79d9cfec8c1",
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:naming-smoke:37a48404f86da71520a5": "0c6fe80d379bf61a224590520ba407e15f329e380c19e4f5dd052e2783f27b67",
+    "wu:naming-smoke:f92805bdf8cc092588cd": "48d12ca3cdff00ea2235e77de77f99c70109451801cce95645b80b786f28168a"
+  },
+  "renderer_versions": [
+    "semantic-naming-smoke/1"
+  ],
+  "run_id": "pr_review_v4_naming_smoke_rep3",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "ddce74ef43ba55968c2482c198c8fe81e0be705b3585275ea5c3b8de107db334"
+}

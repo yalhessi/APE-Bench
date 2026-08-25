@@ -1,0 +1,18 @@
+{
+  "complete": true,
+  "counts": {
+    "adjudications": 10,
+    "candidates": 2,
+    "opportunities": 10
+  },
+  "dispositions_by_arm": {
+    "matched_control": {
+      "no_request": 5
+    },
+    "oracle_gold_targeted": {
+      "no_request": 3,
+      "request": 2
+    }
+  },
+  "schema_version": "oracle-opportunity-ingest-report1"
+}

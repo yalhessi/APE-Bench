@@ -1,0 +1,1 @@
+{"artifact_ids":[],"failure_reason":"lake is unavailable","investigation_id":"investigation:e4f69d835e3659be7700496c","operator":"target_compile","operator_run_id":"operator_run:72b8cc95936d37094bddccf4","query_sha256":null,"result_count":0,"schema_version":"operator-run1","source_sha256":"72b8cc95936d37094bddccf473eae633a41b9d96d75ea85fa16885b695632fe4","status":"unavailable"}

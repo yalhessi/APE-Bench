@@ -1,0 +1,50 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "duplication": {
+      "cost_hint": 1.4219999999999997,
+      "eligible": 17,
+      "enumerated": 18,
+      "sites": 47
+    },
+    "generalist": {
+      "cost_hint": 1.7379999999999995,
+      "eligible": 22,
+      "enumerated": 22,
+      "sites": 76
+    },
+    "generality": {
+      "cost_hint": 1.4219999999999997,
+      "eligible": 17,
+      "enumerated": 18,
+      "sites": 47
+    },
+    "proof_golf": {
+      "cost_hint": 1.4219999999999997,
+      "eligible": 1,
+      "enumerated": 18,
+      "sites": 47
+    },
+    "proof_idiom": {
+      "cost_hint": 1.4219999999999997,
+      "eligible": 1,
+      "enumerated": 18,
+      "sites": 47
+    }
+  },
+  "mandatory_floor_cost": 1.738,
+  "pr_numbers": [
+    33057,
+    33066,
+    33098,
+    33438
+  ],
+  "projected_cost_fanout": 7.426,
+  "projected_cost_rules": 4.582,
+  "proposals_eligible": 58,
+  "proposals_enumerated": 94,
+  "renderer_version": "candidate-prompt/12+focused-prompt/1",
+  "routing_mode": "lead",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "work_units": 22
+}

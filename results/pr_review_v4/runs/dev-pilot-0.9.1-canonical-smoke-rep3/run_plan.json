@@ -1,0 +1,29 @@
+{
+  "created_at": "2026-07-17T13:14:30.786637+00:00",
+  "dataset_manifest_path": "inputs/pr_review_v4/releases/dev-pilot-0.9.1-canonical-smoke/manifest.json",
+  "dataset_manifest_sha256": "f2f9b91c90dcc3333701d91f40fce152f8a9cc7e2419c26ac54535eb934e26ac",
+  "expected_investigation_ids": [
+    "investigation:canonical-smoke:9c401350b768b2790f1e",
+    "investigation:canonical-smoke:404b2d8e3024650577f8"
+  ],
+  "expected_pr_numbers": [
+    33098,
+    33438
+  ],
+  "expected_work_unit_ids": [
+    "wu:canonical-smoke:3b0c794370968125d9be",
+    "wu:canonical-smoke:569549a94e5c938561e5"
+  ],
+  "method_registry_sha256": "88b7334f9e73ecd68d5d4911100c3ab0edc216988a914e235630c79d9cfec8c1",
+  "model_name": "gpt_5.2",
+  "prompt_sha256_by_work_unit": {
+    "wu:canonical-smoke:3b0c794370968125d9be": "600298a963f95165b6513e06aa24842f5cfa7da7efbba626be17b87a1ca5fcaa",
+    "wu:canonical-smoke:569549a94e5c938561e5": "6930ae061953d3b4faae8c6eb481bf32c5b27cc5643d2950783c8250a5c4a552"
+  },
+  "renderer_versions": [
+    "canonical-api-smoke/1"
+  ],
+  "run_id": "pr_review_v4_canonical_smoke_rep3",
+  "schema_version": "pr4-run-plan-1",
+  "source_sha256": "96bce7fbae82945a3d6ae1ef9f080709ea8b151683adeabdd7ef0d670af88dca"
+}
