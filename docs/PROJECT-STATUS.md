@@ -295,7 +295,7 @@ gates R6.
 
 ## 9. The v5 delegating agent — commit 39
 
-**Status: built 2026-08-24; seven smoke repetitions run 2026-08-24/25; a medium held-out run was in flight when this branch was cut. Early, and not yet interpretable as a routing result — see the caveats below.**
+**Status: built 2026-08-24; seven smoke repetitions and one medium held-out run, 2026-08-24/25. The held-out run is not interpretable as a routing result — two defects decided it before the router had a say. Both are now fixed or scoped; the re-run is the first one worth reading.**
 
 One lead agent per review episode, routing specialist arms over work units. Hybrid routing:
 deterministic rules propose, the lead prunes, adds and budgets. The lead's authority is
@@ -333,6 +333,34 @@ merged 62 findings and published 11 — and it is also why the published-column 
 small. Until the gate is finished (below), published recall is a measurement of the gate, not
 of the reviewer.
 
+**The medium held-out run** (`lead`, $6.54, 2026-08-25): 1166 proposals, 927 pruned, 239
+delegated — of which **203 were mandatory floor and 0 were agent-added**. 319 findings merged,
+**2 published**. Issue recall 0.075, location recall 0.325 over 40 obligations.
+`completion_status: failed`, 7 failed jobs.
+
+Two defects decided that before routing could:
+
+1. **The per-PR cap counted the coverage floor as routing spend.** On PR 33149 — 108 work
+   units, a $10.05 floor against a $1.50 cap — every specialist request after the floor was
+   refused, so the cap bound hardest on the largest episode. `agent_added: 0` across the whole
+   run is that defect's signature, not a fact about lead behaviour. Fixed: `delegated_spend`
+   now accrues only for non-mandatory dispositions.
+2. **The generalist evidence gate is still closed.** 317 of 319 candidates are
+   `generalist` / `model_assertion`, admitted as `diagnostic`; the 2 published are
+   `focused_agent` / `verified_compile`. Published recall measures the gate, not the reviewer.
+
+What it does establish: the pipeline runs end to end at medium scale for $6.54, seals its
+agenda, reconciles 1166 dispositions, and produces scorable output over 390 context calls.
+
+**A competence question the smoke numbers cannot answer.** `obligation_scope.py` splits
+obligations by whether answering them needs a *local* edit (rename, shorter proof, docstring,
+call spelling) or a *design* decision (introduce a lemma, factor a family into a mechanism,
+generalize a typeclass, change a representation). Of 43 labelled: 27 local, 13 design, 3
+borderline. If recall concentrates in `local`, the headline is measuring the easier half —
+which is the suspicion the module was written to test. Its labels are hand-assigned and
+explicitly *not* blind; `scope_report` returns a `design_recall_band` so the borderline calls
+cannot silently carry a conclusion.
+
 **Outstanding, and read these before any v5 number**
 
 - The **generalist evidence gate is closed** — it admits `diagnostic` — until the evidence
@@ -362,9 +390,12 @@ of the reviewer.
 - **The thesis experiment itself.** `lean_reviewed_proof_engineering` (commit 24) is built
   and has pilot configs; the comparison against compile-only feedback has not been run.
 - **A clean v5 comparison.** The seven smoke reps are successive pipeline fixes, not
-  repetitions of one configuration. The actual experiment — `fanout` vs `rules` vs `lead` on
-  a fixed pipeline, three repetitions each — has not been run. The medium held-out run
-  started 2026-08-25 03:16 is the first attempt at scale.
+  repetitions of one configuration, and the medium held-out run was decided by a budget
+  defect. The actual experiment — `fanout` vs `rules` vs `lead` on a fixed pipeline, three
+  repetitions each — has not been run. The medium re-run after the `delegated_spend` fix is
+  the first attempt that could answer it.
+- **Finish the generalist evidence chain** so the gate stops admitting everything as
+  `diagnostic`. Until then published recall is a measurement of the gate.
 - **Replication.** Multi-seed, more models, error bars on everything in §4.
 - **Deferred by choice:** recruited Mathlib annotators and the inter-annotator ceiling — not
   until the agent is mature enough to be worth their time.
