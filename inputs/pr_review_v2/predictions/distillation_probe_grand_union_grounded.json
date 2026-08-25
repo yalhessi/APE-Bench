@@ -1,0 +1,19 @@
+{
+  "pool": "grand_union",
+  "source": "grounded:distillations_grand_union_gpt_5.2.jsonl",
+  "selector_model": "gpt_5.4",
+  "prs_distilled": 56,
+  "decls": 553,
+  "findings_matched": 419,
+  "legibility": "min 30 median 90 mean 84.0",
+  "v2_auc": {
+    "sel": 0.586,
+    "legib": 0.606,
+    "combo": 0.599
+  },
+  "v2_within_pr_auc": {
+    "sel": 0.583,
+    "legib": 0.448,
+    "combo": 0.616
+  }
+}

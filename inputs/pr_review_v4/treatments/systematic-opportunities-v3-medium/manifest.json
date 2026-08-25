@@ -1,0 +1,100 @@
+{
+  "derived_artifacts": [
+    {
+      "path": "derived/modification_inventory.jsonl",
+      "records": 508,
+      "role": "modification_inventory",
+      "schema_version": "modification1",
+      "sha256": "0e655c36198516a45f8f223cda864544dd701f3c8b53fc01e705bf9f85dffbe6"
+    },
+    {
+      "path": "derived/pr_relations.jsonl",
+      "records": 1005,
+      "role": "pr_relations",
+      "schema_version": "pr-relation1",
+      "sha256": "ee975b5d6803706dadd5642bdb364ea770f82a256e3a5fced228cf7b1b7e0dc1"
+    },
+    {
+      "path": "derived/relation_evidence.jsonl",
+      "records": 1005,
+      "role": "relation_evidence",
+      "schema_version": "relation-evidence1",
+      "sha256": "8b4bc4a3bc43d9ace4b7f80dcc405349ce5f00da7f1e7f88121b6bc539d66ea1"
+    },
+    {
+      "path": "derived/investigation_tasks.jsonl",
+      "records": 2253,
+      "role": "investigation_tasks",
+      "schema_version": "investigation-task1",
+      "sha256": "cfbac0131c54fb871f2cd94349e8e17a7fbc8ebe1b87efac10b04d9a59d7a6b2"
+    },
+    {
+      "path": "derived/capability_assessments.jsonl",
+      "records": 2253,
+      "role": "capability_assessments",
+      "schema_version": "capability-assessment1",
+      "sha256": "cac579fc9230de96febe36cf550044a32138563b280955aa9c911441a1d1d12e"
+    },
+    {
+      "path": "derived/inventory_report.json",
+      "records": 1,
+      "role": "inventory_report",
+      "schema_version": "modification-inventory-report1",
+      "sha256": "02f844bb7c4e98e853f0a2e85f9b3c97cb4605f2fd07e4500d3d053d4bc0b130"
+    },
+    {
+      "path": "derived/relation_report.json",
+      "records": 1,
+      "role": "relation_report",
+      "schema_version": "pr-relation-report1",
+      "sha256": "aefcb72fcab8382403437c2692a117222a79b9851a6575d2ea299e5ccc3f02ac"
+    },
+    {
+      "path": "derived/schedule_report.json",
+      "records": 1,
+      "role": "schedule_report",
+      "schema_version": "investigation-schedule-report1",
+      "sha256": "703d1520f82d23535c4596844c612fe4de1d1bc75351ea5de1147bb8c920b5c2"
+    },
+    {
+      "path": "implementations.jsonl",
+      "records": 7,
+      "role": "implementation_capability_registry",
+      "schema_version": "implementation-capability1",
+      "sha256": "52d6be435adf98657ab2acd138527e0447aeb800725bd75a29ad2af7facd769f"
+    },
+    {
+      "path": "method_expression_contracts.jsonl",
+      "records": 7,
+      "role": "method_expression_contracts",
+      "schema_version": "method-expression-contract1",
+      "sha256": "8ddd991c1c1bd804e2613e3853675780a3c921ad4c722ca24843d2c206542458"
+    }
+  ],
+  "generator_versions": {
+    "capability_assessor": "capability-assessor/1",
+    "contracts": "method-expression-contracts/3",
+    "implementation_registry": "implementation-capability-registry/3",
+    "inventory": "modification-inventory/1",
+    "phase10": "phase10-medium-static/1",
+    "relations": "pr-relations/1",
+    "scheduler": "systematic-investigation-scheduler/1"
+  },
+  "method_registry": {
+    "path": "methods.jsonl",
+    "records": 7,
+    "role": "investigation_method_registry",
+    "schema_version": "investigation-method1",
+    "sha256": "c864ddbe148f7daef224074580a491e71e44e55157e622683a18596f94c57fc4"
+  },
+  "parent_dataset_manifest": {
+    "path": "inputs/pr_review_v4/releases/dev-medium-0.1.0/manifest.json",
+    "records": 1,
+    "role": "parent_dataset_manifest",
+    "schema_version": "pr4-manifest-1",
+    "sha256": "7c45fd1d96bd0f74c588b97e138fcbc6bfe4db8d36226ee8f0119c493af37a70"
+  },
+  "schema_version": "systematic-opportunity-treatment1",
+  "source_sha256": "cf15660ea84401c7d828cb4df755d7c96dc108e00c5179c2db790a6a77b8cc0e",
+  "treatment_id": "systematic-opportunities-v1-medium-phase2"
+}

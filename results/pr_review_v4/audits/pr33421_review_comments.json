@@ -1,0 +1,349 @@
+{
+  "warning": "AUDIT ONLY: source events contain hidden maintainer feedback",
+  "episode_input": {
+    "schema_version": "episode1",
+    "episode_id": "leanprover-community/mathlib4:33421:round1:02adb3757d729e929c52452fee14158f61c95f3a",
+    "repo": "leanprover-community/mathlib4",
+    "pr_number": 33421,
+    "round_index": 1,
+    "title": {
+      "text": "chore(Algebra/Order/Floor): review API about `round`",
+      "provenance": "legacy_unverified",
+      "omission_reason": null
+    },
+    "description": {
+      "text": "",
+      "provenance": "absent",
+      "omission_reason": null
+    },
+    "base_sha": "473b57441bc20a2e6d10ff18d4f10afdb025a57e",
+    "reviewed_head_sha": "02adb3757d729e929c52452fee14158f61c95f3a",
+    "diff": "diff --git a/Mathlib/Algebra/AddConstMap/Basic.lean b/Mathlib/Algebra/AddConstMap/Basic.lean\n--- a/Mathlib/Algebra/AddConstMap/Basic.lean\n+++ b/Mathlib/Algebra/AddConstMap/Basic.lean\n@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Group.Action.Pi\n public import Mathlib.Algebra.Group.End\n public import Mathlib.Algebra.Module.NatInt\n public import Mathlib.Algebra.Order.Archimedean.Basic\n+import Mathlib.Algebra.Order.Group.Basic\n \n /-!\n # Maps (semi)conjugating a shift to a shift\ndiff --git a/Mathlib/Algebra/Order/Archimedean/Basic.lean b/Mathlib/Algebra/Order/Archimedean/Basic.lean\n--- a/Mathlib/Algebra/Order/Archimedean/Basic.lean\n+++ b/Mathlib/Algebra/Order/Archimedean/Basic.lean\n@@ -10,6 +10,7 @@ public import Mathlib.Algebra.Order.Monoid.Units\n public import Mathlib.Algebra.Order.Ring.Pow\n public import Mathlib.Data.Int.LeastGreatest\n public import Mathlib.Data.Rat.Floor\n+import Mathlib.Algebra.Order.Group.Basic\n \n /-!\n # Archimedean groups and fields.\ndiff --git a/Mathlib/Algebra/Order/Floor/Ring.lean b/Mathlib/Algebra/Order/Floor/Ring.lean\n--- a/Mathlib/Algebra/Order/Floor/Ring.lean\n+++ b/Mathlib/Algebra/Order/Floor/Ring.lean\n@@ -267,6 +267,15 @@ theorem mul_cast_floor_div_cancel_of_pos {n : ℤ} (hn : 0 < n) (a : R) : ⌊a *\n theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by\n   simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n \n+theorem two_mul_fract_eq_one_iff_exists_int {x : R} :\n+    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by\n+  rw [fract, mul_sub, sub_eq_iff_eq_add']\n+  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\n+  rintro ⟨n, hn⟩\n+  convert hn\n+  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn]\n+  simp [mul_add]\n+\n end LinearOrderedRing\n \n section LinearOrderedCommRing\n@@ -627,19 +636,36 @@ theorem ceil_ofNat (n : ℕ) [n.AtLeastTwo] : ⌈(ofNat(n) : R)⌉ = ofNat(n) :=\n theorem ceil_add_intCast (a : R) (z : ℤ) : ⌈a + z⌉ = ⌈a⌉ + z := by\n   rw [← neg_inj, neg_add', ← floor_neg, ← floor_neg, neg_add', floor_sub_intCast]\n \n+@[simp]\n+theorem ceil_intCast_add (z : ℤ) (a : R) : ⌈z + a⌉ = z + ⌈a⌉ := by\n+  rw [add_comm, ceil_add_intCast, add_comm]\n+\n @[simp]\n theorem ceil_add_natCast (a : R) (n : ℕ) : ⌈a + n⌉ = ⌈a⌉ + n := by\n   rw [← Int.cast_natCast, ceil_add_intCast]\n \n+@[simp]\n+theorem ceil_natCast_add (n : ℕ) (a : R) : ⌈n + a⌉ = n + ⌈a⌉ :=\n+  mod_cast ceil_intCast_add n a\n+\n @[simp]\n theorem ceil_add_one (a : R) : ⌈a + 1⌉ = ⌈a⌉ + 1 := by\n   rw [← ceil_add_intCast a (1 : ℤ), cast_one]\n \n+@[simp]\n+theorem ceil_one_add (a : R) : ⌈1 + a⌉ = 1 + ⌈a⌉ :=\n+  mod_cast ceil_natCast_add 1 a\n+\n @[simp]\n theorem ceil_add_ofNat (a : R) (n : ℕ) [n.AtLeastTwo] :\n     ⌈a + ofNat(n)⌉ = ⌈a⌉ + ofNat(n) :=\n   ceil_add_natCast a n\n \n+@[simp]\n+theorem ceil_ofNat_add (n : ℕ) [n.AtLeastTwo] (a : R) :\n+    ⌈ofNat(n) + a⌉ = ofNat(n) + ⌈a⌉ :=\n+  ceil_natCast_add n a\n+\n @[simp]\n theorem ceil_sub_intCast (a : R) (z : ℤ) : ⌈a - z⌉ = ⌈a⌉ - z :=\n   Eq.trans (by rw [Int.cast_neg, sub_eq_add_neg]) (ceil_add_intCast _ _)\ndiff --git a/Mathlib/Algebra/Order/Round.lean b/Mathlib/Algebra/Order/Round.lean\n--- a/Mathlib/Algebra/Order/Round.lean\n+++ b/Mathlib/Algebra/Order/Round.lean\n@@ -6,7 +6,7 @@ Authors: Mario Carneiro, Kevin Kappelmann\n module\n \n public import Mathlib.Algebra.Order.Floor.Ring\n-public import Mathlib.Algebra.Order.Interval.Set.Group\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # Rounding\n@@ -45,6 +45,26 @@ variable [Ring α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]\n def round (x : α) : ℤ :=\n   if 2 * fract x < 1 then ⌊x⌋ else ⌈x⌉\n \n+/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring.\n+\n+TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`. -/\n+theorem round_eq' (x : α) : round x = (⌊2 * x⌋ + 1) / 2 := by\n+  rw [← floor_add_fract x, round, fract_intCast_add, fract_fract, floor_intCast_add, mul_add,\n+    ← Int.cast_ofNat, ← Int.cast_mul, floor_intCast_add, ceil_intCast_add, add_assoc,\n+    Int.mul_add_ediv_left _ _ two_ne_zero, Int.cast_ofNat]\n+  split_ifs with h <;> congr 1\n+  · rw [Int.floor_eq_zero_iff.mpr, Int.floor_eq_zero_iff.mpr]\n+    · simp\n+    · simp [h]\n+    · suffices fract x < 1 by simpa\n+      refine lt_of_le_of_lt ?_ h\n+      apply le_mul_of_one_le_left <;> simp\n+  · have H : ⌊2 * fract x⌋ = 1 := by simpa [floor_eq_iff, ← two_mul, fract_lt_one] using h\n+    suffices 0 < fract x by simp [this, H, ceil_eq_iff, (fract_lt_one _).le]\n+    contrapose! h\n+    grw [h]\n+    simp\n+\n @[simp]\n theorem round_zero : round (0 : α) = 0 := by simp [round]\n \n@@ -61,6 +81,17 @@ theorem round_ofNat (n : ℕ) [n.AtLeastTwo] : round (ofNat(n) : α) = ofNat(n)\n @[simp]\n theorem round_intCast (n : ℤ) : round (n : α) = n := by simp [round]\n \n+/-- Away from the points with fractional part `1 / 2`, `round x = ⌈2 * x⌉ / 2`. -/\n+theorem round_eq_half_ceil_two_mul {x : α} (hx : 2 * fract x ≠ 1) : round x = ⌈2 * x⌉ / 2 := by\n+  rcases em (2 * x ∈ range Int.cast) with ⟨m, hm⟩ | hx'\n+  · rw [← hm, ceil_intCast]\n+    rcases m.even_or_odd with ⟨m, rfl⟩ | ⟨m, rfl⟩\n+    · obtain rfl : m = x := mul_left_cancel₀ two_ne_zero <| by simp [← hm, ← two_mul]\n+      rw [round_intCast, ← two_mul, Int.mul_ediv_cancel_left _ two_ne_zero]\n+    · refine absurd ?_ hx\n+      exact two_mul_fract_eq_one_iff_exists_int.mpr ⟨m, mod_cast hm.symm⟩\n+  · rw [round_eq', (ceil_eq_floor_add_one_iff_notMem _).mpr hx']\n+\n @[simp]\n theorem round_add_intCast (x : α) (y : ℤ) : round (x + y) = round x + y := by\n   rw [round, round, Int.fract_add_intCast, Int.floor_add_intCast, Int.ceil_add_intCast,\n@@ -140,38 +171,21 @@ section LinearOrderedField\n variable [Field α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]\n \n theorem round_eq (x : α) : round x = ⌊x + 1 / 2⌋ := by\n-  simp_rw [round, (by simp only [lt_div_iff₀', two_pos] : 2 * fract x < 1 ↔ fract x < 1 / 2)]\n-  rcases lt_or_ge (fract x) (1 / 2) with hx | hx\n-  · conv_rhs => rw [← fract_add_floor x, add_assoc, add_left_comm, floor_intCast_add]\n-    rw [if_pos hx, left_eq_add, floor_eq_iff, cast_zero, zero_add]\n-    constructor\n-    · linarith [fract_nonneg x]\n-    · linarith\n-  · have : ⌊fract x + 1 / 2⌋ = 1 := by\n-      rw [floor_eq_iff]\n-      constructor\n-      · norm_num\n-        linarith\n-      · norm_num\n-        linarith [fract_lt_one x]\n-    rw [if_neg (not_lt.mpr hx), ← fract_add_floor x, add_assoc, add_left_comm, floor_intCast_add,\n-      ceil_add_intCast, add_comm _ ⌊x⌋, add_right_inj, ceil_eq_iff, this, cast_one, sub_self]\n-    constructor\n-    · linarith\n-    · linarith [fract_lt_one x]\n-\n-@[simp]\n-theorem round_two_inv : round (2⁻¹ : α) = 1 := by\n-  simp only [round_eq, ← one_div, add_halves, floor_one]\n-\n-@[simp]\n-theorem round_neg_two_inv : round (-2⁻¹ : α) = 0 := by\n-  simp only [round_eq, ← one_div, neg_add_cancel, floor_zero]\n+  rw [← cast_mul_floor_div_cancel_of_pos two_pos, round_eq']\n+  simp [mul_add]\n+\n+theorem round_eq_iff {x : α} {n : ℤ} : round x = n ↔ x ∈ Ico (n - 1 / 2 : α) (n + 1 / 2) := by\n+  norm_num [round_eq, floor_eq_iff, ← lt_sub_iff_add_lt, add_sub_assoc]\n+\n+@[simp]\n+theorem round_two_inv : round (2⁻¹ : α) = 1 := by norm_num [round_eq_iff]\n+\n+@[simp]\n+theorem round_neg_two_inv : round (-2⁻¹ : α) = 0 := by norm_num [round_eq_iff]\n \n @[simp]\n theorem round_eq_zero_iff {x : α} : round x = 0 ↔ x ∈ Ico (-(1 / 2)) ((1 : α) / 2) := by\n-  rw [round_eq, floor_eq_zero_iff, add_mem_Ico_iff_left]\n-  norm_num\n+  simp [round_eq_iff]\n \n theorem abs_sub_round (x : α) : |x - round x| ≤ 1 / 2 := by\n   rw [round_eq, abs_sub_le_iff]\ndiff --git a/Mathlib/Algebra/Order/ToIntervalMod.lean b/Mathlib/Algebra/Order/ToIntervalMod.lean\n--- a/Mathlib/Algebra/Order/ToIntervalMod.lean\n+++ b/Mathlib/Algebra/Order/ToIntervalMod.lean\n@@ -10,6 +10,7 @@ public import Mathlib.Algebra.Order.Archimedean.Basic\n public import Mathlib.Algebra.Ring.Periodic\n public import Mathlib.Data.Int.SuccPred\n public import Mathlib.Order.Circular\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # Reducing to an interval modulo its length\ndiff --git a/Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean b/Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean\n--- a/Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean\n+++ b/Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean\n@@ -9,6 +9,7 @@ public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order\n public import Mathlib.Analysis.CStarAlgebra.SpecialFunctions.PosPart\n public import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow.Basic\n public import Mathlib.Topology.ApproximateUnit\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-! # Nonnegative contractions in a C⋆-algebra form an approximate unit\n \ndiff --git a/Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean b/Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean\n--- a/Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean\n+++ b/Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean\n@@ -6,6 +6,7 @@ Authors: Jeremy Tan\n module\n \n public import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # Complex arctangent\ndiff --git a/Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean b/Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean\n--- a/Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean\n+++ b/Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean\n@@ -9,6 +9,7 @@ public import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent\n public import Mathlib.Analysis.SpecialFunctions.Pow.Real\n public import Mathlib.Algebra.Order.ToIntervalMod\n public import Mathlib.Analysis.SpecialFunctions.Log.Base\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # Akra-Bazzi theorem: the polynomial growth condition\ndiff --git a/Mathlib/GroupTheory/Archimedean.lean b/Mathlib/GroupTheory/Archimedean.lean\n--- a/Mathlib/GroupTheory/Archimedean.lean\n+++ b/Mathlib/GroupTheory/Archimedean.lean\n@@ -7,6 +7,7 @@ module\n \n public import Mathlib.Algebra.Group.Subgroup.Order\n public import Mathlib.Algebra.Order.Archimedean.Basic\n+import Mathlib.Algebra.Order.Group.Basic\n \n /-!\n # Archimedean groups\ndiff --git a/Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean b/Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean\n--- a/Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean\n+++ b/Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean\n@@ -8,6 +8,7 @@ module\n public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap\n public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic\n public import Mathlib.MeasureTheory.Topology\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # Integral over an interval\ndiff --git a/Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean b/Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean\n--- a/Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean\n+++ b/Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean\n@@ -8,6 +8,7 @@ module\n public import Mathlib.Analysis.BoundedVariation\n public import Mathlib.MeasureTheory.Function.AbsolutelyContinuous\n public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Slope\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # `f'` is interval integrable for certain classes of functions `f`\ndiff --git a/Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean b/Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean\n--- a/Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean\n+++ b/Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean\n@@ -10,6 +10,7 @@ public import Mathlib.Analysis.Calculus.MeanValue\n public import Mathlib.Analysis.Calculus.Deriv.Polynomial\n public import Mathlib.NumberTheory.Real.Irrational\n public import Mathlib.Topology.Algebra.Polynomial\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n \ndiff --git a/Mathlib/Order/Filter/AtTopBot/Archimedean.lean b/Mathlib/Order/Filter/AtTopBot/Archimedean.lean\n--- a/Mathlib/Order/Filter/AtTopBot/Archimedean.lean\n+++ b/Mathlib/Order/Filter/AtTopBot/Archimedean.lean\n@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Order.Archimedean.Basic\n public import Mathlib.Order.Filter.AtTopBot.Group\n public import Mathlib.Order.Filter.CountablyGenerated\n public import Mathlib.Tactic.GCongr\n+import Mathlib.Algebra.Order.Group.Basic\n \n /-!\n # `Filter.atTop` filter and archimedean (semi)rings/fields\ndiff --git a/Mathlib/Topology/Algebra/Order/Floor.lean b/Mathlib/Topology/Algebra/Order/Floor.lean\n--- a/Mathlib/Topology/Algebra/Order/Floor.lean\n+++ b/Mathlib/Topology/Algebra/Order/Floor.lean\n@@ -6,6 +6,7 @@ Authors: Anatole Dedecker\n module\n \n public import Mathlib.Algebra.Order.Floor.Ring\n+public import Mathlib.Algebra.Order.Round\n public import Mathlib.Order.Filter.AtTopBot.Floor\n public import Mathlib.Topology.Algebra.Order.Group\n \n@@ -58,6 +59,8 @@ theorem tendsto_pow_div_factorial_atTop (c : K) :\n \n end FloorSemiring\n \n+section Ring\n+\n variable {α β γ : Type*} [Ring α] [LinearOrder α] [FloorRing α]\n \n section\n@@ -83,22 +86,45 @@ end\n variable [TopologicalSpace α]\n \n theorem continuousOn_floor (n : ℤ) :\n-    ContinuousOn (fun x => floor x : α → α) (Ico n (n + 1) : Set α) :=\n-  (continuousOn_congr <| floor_eq_on_Ico' n).mpr continuousOn_const\n+    ContinuousOn (fun x => floor x : α → ℤ) (Ico n (n + 1) : Set α) :=\n+  (continuousOn_congr <| floor_eq_on_Ico n).mpr continuousOn_const\n \n-theorem continuousOn_ceil [IsStrictOrderedRing α] (n : ℤ) :\n-    ContinuousOn (fun x => ceil x : α → α) (Ioc (n - 1) n : Set α) :=\n-  (continuousOn_congr <| ceil_eq_on_Ioc' n).mpr continuousOn_const\n+theorem continuousOn_ceil (n : ℤ) :\n+    ContinuousOn (fun x => ceil x : α → ℤ) (Ioc (n - 1) n : Set α) :=\n+  (continuousOn_congr <| ceil_eq_on_Ioc n).mpr continuousOn_const\n \n section OrderClosedTopology\n \n-variable [IsStrictOrderedRing α] [OrderClosedTopology α]\n+variable [OrderClosedTopology α]\n+\n+@[fun_prop]\n+theorem continuousAt_floor {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt floor x :=\n+  (continuousOn_floor ⌊x⌋).continuousAt <|\n+    Ico_mem_nhds ((floor_le x).lt_of_ne hx.symm) (lt_floor_add_one x)\n+\n+@[fun_prop]\n+theorem continuousOn_floor_compl_range : ContinuousOn (floor : α → ℤ) (range Int.cast)ᶜ := by\n+  intro x hx\n+  refine (continuousAt_floor ?_).continuousWithinAt\n+  simp_all [eq_comm]\n \n-omit [IsStrictOrderedRing α] in\n theorem tendsto_floor_right_pure_floor (x : α) : Tendsto (floor : α → ℤ) (𝓝[≥] x) (pure ⌊x⌋) :=\n   tendsto_pure.2 <| mem_of_superset (Ico_mem_nhdsGE <| lt_floor_add_one x) fun _y hy =>\n     floor_eq_on_Ico _ _ ⟨(floor_le x).trans hy.1, hy.2⟩\n \n+variable [IsStrictOrderedRing α]\n+\n+theorem continuousAt_ceil {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt ceil x :=\n+  (continuousOn_ceil ⌈x⌉).continuousAt <|\n+    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) <| (le_ceil x).lt_of_ne fun h ↦\n+      hx <| by rw [h, floor_intCast]\n+\n+@[fun_prop]\n+theorem continuousOn_ceil_compl_range : ContinuousOn (ceil : α → ℤ) (range Int.cast)ᶜ := by\n+  intro x hx\n+  refine (continuousAt_ceil ?_).continuousWithinAt\n+  simp_all [eq_comm]\n+\n theorem tendsto_floor_right_pure (n : ℤ) : Tendsto (floor : α → ℤ) (𝓝[≥] n) (pure n) := by\n   simpa only [floor_intCast] using tendsto_floor_right_pure_floor (n : α)\n \n@@ -169,12 +195,45 @@ end OrderClosedTopology\n \n theorem continuousOn_fract [IsTopologicalAddGroup α] (n : ℤ) :\n     ContinuousOn (fract : α → α) (Ico n (n + 1) : Set α) :=\n-  continuousOn_id.sub (continuousOn_floor n)\n+  continuousOn_id.sub (continuous_of_discreteTopology.comp_continuousOn (continuousOn_floor n))\n \n theorem continuousAt_fract [OrderClosedTopology α] [IsTopologicalAddGroup α]\n     {x : α} (h : x ≠ ⌊x⌋) : ContinuousAt fract x :=\n-  (continuousOn_fract ⌊x⌋).continuousAt <|\n-    Ico_mem_nhds ((floor_le _).lt_of_ne h.symm) (lt_floor_add_one _)\n+  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <|\n+    continuousAt_floor h\n+\n+theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n+  rw [funext round_eq']\n+  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_le_add ha ha\n+  exact (tendsto_pure_pure (fun n ↦ (n + 1) / 2) _).comp <|\n+    (tendsto_floor_right_pure_floor (2 * x)).comp this\n+\n+theorem tendsto_round_nhdsLT_pure_half_ceil [IsStrictOrderedRing α] [OrderClosedTopology α]\n+    [ContinuousAdd α] (x : α) : Tendsto round (𝓝[<] x) (pure (⌈2 * x⌉ / 2)) := by\n+  rw [funext round_eq', tendsto_pure]\n+  have : Tendsto (2 * ·) (𝓝[<] x) (𝓝[<] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_lt_add ha ha\n+  filter_upwards [tendsto_pure.mp ((tendsto_floor_left_pure_ceil_sub_one (2 * x)).comp this)]\n+    using by simp +contextual\n+\n+theorem continuousAt_round [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    {x : α} (hx : 2 * fract x ≠ 1) : ContinuousAt round x := by\n+  rw [continuousAt_iff_continuous_left'_right']\n+  refine ⟨(tendsto_round_nhdsLT_pure_half_ceil x).mono_right (pure_le_nhds_iff.mpr ?_),\n+    (tendsto_round_nhdsGE_pure x).mono_left ?_ |>.mono_right (pure_le_nhds _)⟩\n+  · rw [round_eq_half_ceil_two_mul hx]\n+  · gcongr\n+    apply Ioi_subset_Ici_self\n+\n+theorem continuousOn_round [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α] :\n+    ContinuousOn round {x : α | 2 * fract x ≠ 1} :=\n+  fun _x hx ↦ (continuousAt_round hx).continuousWithinAt\n \n variable [IsStrictOrderedRing α]\n \n@@ -233,3 +292,5 @@ theorem ContinuousOn.comp_fract'' {f : α → β} (h : ContinuousOn f I) (hf : f\n     Continuous (f ∘ fract) :=\n   ContinuousOn.comp_fract (h.comp continuousOn_snd fun _x hx => (mem_prod.mp hx).2) continuous_id\n     fun _ => hf\n+\n+end Ring\ndiff --git a/Mathlib/Topology/Instances/AddCircle/Defs.lean b/Mathlib/Topology/Instances/AddCircle/Defs.lean\n--- a/Mathlib/Topology/Instances/AddCircle/Defs.lean\n+++ b/Mathlib/Topology/Instances/AddCircle/Defs.lean\n@@ -13,6 +13,7 @@ public import Mathlib.Topology.Algebra.IsUniformGroup.Basic\n public import Mathlib.Topology.Algebra.Order.Field\n public import Mathlib.Topology.OpenPartialHomeomorph.Constructions\n public import Mathlib.Topology.Order.T5\n+import Mathlib.Algebra.Order.Interval.Set.Group\n \n /-!\n # The additive circle\n",
+    "changed_files": [
+      "Mathlib/Algebra/AddConstMap/Basic.lean",
+      "Mathlib/Algebra/Order/Archimedean/Basic.lean",
+      "Mathlib/Algebra/Order/Floor/Ring.lean",
+      "Mathlib/Algebra/Order/Round.lean",
+      "Mathlib/Algebra/Order/ToIntervalMod.lean",
+      "Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean",
+      "Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean",
+      "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean",
+      "Mathlib/GroupTheory/Archimedean.lean",
+      "Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean",
+      "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean",
+      "Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean",
+      "Mathlib/Order/Filter/AtTopBot/Archimedean.lean",
+      "Mathlib/Topology/Algebra/Order/Floor.lean",
+      "Mathlib/Topology/Instances/AddCircle/Defs.lean"
+    ],
+    "patch_sha256": "e7c8814484ee037c064ebca39f92bdd944f1da148f60e940159b09c3340cd348",
+    "source_projection_sha256": "22a64c5d4dd0aeb22891fe9d3acf07188e75f866bf07b20c99810216110bceff"
+  },
+  "source_events": [
+    {
+      "event_id": "event:960f0d7f6ed320d51ec9e45a",
+      "event_type": "review_comment",
+      "occurred_at": "2025-12-31T11:04:43Z",
+      "actor": "Ruben-VandeVelde",
+      "source": "data/pr_review_v2/cache/bundles/pr_33421.json/review_comments/0",
+      "payload": {
+        "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655220116",
+        "pull_request_review_id": 3620701050,
+        "id": 2655220116,
+        "node_id": "PRRC_kwDOFcwZ1c6eQ3GU",
+        "diff_hunk": "@@ -45,6 +45,26 @@ variable [Ring α] [LinearOrder α] [IsStrictOrderedRing α] [FloorRing α]\n def round (x : α) : ℤ :=\n   if 2 * fract x < 1 then ⌊x⌋ else ⌈x⌉\n \n+/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring.\n+\n+TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`. -/\n+theorem round_eq' (x : α) : round x = (⌊2 * x⌋ + 1) / 2 := by",
+        "path": "Mathlib/Algebra/Order/Round.lean",
+        "commit_id": "c8f41e7419e0f5e3a1a35f2c0d754985cb82eb75",
+        "original_commit_id": "02adb3757d729e929c52452fee14158f61c95f3a",
+        "user": {
+          "login": "Ruben-VandeVelde",
+          "id": 65514131,
+          "node_id": "MDQ6VXNlcjY1NTE0MTMx",
+          "avatar_url": "https://avatars.githubusercontent.com/u/65514131?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/Ruben-VandeVelde",
+          "html_url": "https://github.com/Ruben-VandeVelde",
+          "followers_url": "https://api.github.com/users/Ruben-VandeVelde/followers",
+          "following_url": "https://api.github.com/users/Ruben-VandeVelde/following{/other_user}",
+          "gists_url": "https://api.github.com/users/Ruben-VandeVelde/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/Ruben-VandeVelde/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/Ruben-VandeVelde/subscriptions",
+          "organizations_url": "https://api.github.com/users/Ruben-VandeVelde/orgs",
+          "repos_url": "https://api.github.com/users/Ruben-VandeVelde/repos",
+          "events_url": "https://api.github.com/users/Ruben-VandeVelde/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/Ruben-VandeVelde/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "How about `round_eq_div`?",
+        "created_at": "2025-12-31T11:04:43Z",
+        "updated_at": "2025-12-31T11:11:43Z",
+        "html_url": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655220116",
+        "pull_request_url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421",
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655220116"
+          },
+          "html": {
+            "href": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655220116"
+          },
+          "pull_request": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421"
+          }
+        },
+        "reactions": {
+          "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655220116/reactions",
+          "total_count": 1,
+          "+1": 1,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 51,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 16,
+        "position": 1,
+        "subject_type": "line"
+      }
+    },
+    {
+      "event_id": "event:ec24b8f273df25f5c57bbe8a",
+      "event_type": "review_comment",
+      "occurred_at": "2025-12-31T11:11:19Z",
+      "actor": "Ruben-VandeVelde",
+      "source": "data/pr_review_v2/cache/bundles/pr_33421.json/review_comments/1",
+      "payload": {
+        "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655228140",
+        "pull_request_review_id": 3620701050,
+        "id": 2655228140,
+        "node_id": "PRRC_kwDOFcwZ1c6eQ5Ds",
+        "diff_hunk": "@@ -169,12 +195,45 @@ end OrderClosedTopology\n \n theorem continuousOn_fract [IsTopologicalAddGroup α] (n : ℤ) :\n     ContinuousOn (fract : α → α) (Ico n (n + 1) : Set α) :=\n-  continuousOn_id.sub (continuousOn_floor n)\n+  continuousOn_id.sub (continuous_of_discreteTopology.comp_continuousOn (continuousOn_floor n))\n \n theorem continuousAt_fract [OrderClosedTopology α] [IsTopologicalAddGroup α]\n     {x : α} (h : x ≠ ⌊x⌋) : ContinuousAt fract x :=\n-  (continuousOn_fract ⌊x⌋).continuousAt <|\n-    Ico_mem_nhds ((floor_le _).lt_of_ne h.symm) (lt_floor_add_one _)\n+  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <|\n+    continuousAt_floor h\n+\n+theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n+  rw [funext round_eq']\n+  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_le_add ha ha",
+        "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "commit_id": "7cadd482022fe562afc3a363a7ef874a7f77faf0",
+        "original_commit_id": "02adb3757d729e929c52452fee14158f61c95f3a",
+        "user": {
+          "login": "Ruben-VandeVelde",
+          "id": 65514131,
+          "node_id": "MDQ6VXNlcjY1NTE0MTMx",
+          "avatar_url": "https://avatars.githubusercontent.com/u/65514131?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/Ruben-VandeVelde",
+          "html_url": "https://github.com/Ruben-VandeVelde",
+          "followers_url": "https://api.github.com/users/Ruben-VandeVelde/followers",
+          "following_url": "https://api.github.com/users/Ruben-VandeVelde/following{/other_user}",
+          "gists_url": "https://api.github.com/users/Ruben-VandeVelde/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/Ruben-VandeVelde/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/Ruben-VandeVelde/subscriptions",
+          "organizations_url": "https://api.github.com/users/Ruben-VandeVelde/orgs",
+          "repos_url": "https://api.github.com/users/Ruben-VandeVelde/repos",
+          "events_url": "https://api.github.com/users/Ruben-VandeVelde/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/Ruben-VandeVelde/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+        "created_at": "2025-12-31T11:11:19Z",
+        "updated_at": "2025-12-31T11:11:43Z",
+        "html_url": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655228140",
+        "pull_request_url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421",
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655228140"
+          },
+          "html": {
+            "href": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655228140"
+          },
+          "pull_request": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421"
+          }
+        },
+        "reactions": {
+          "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655228140/reactions",
+          "total_count": 0,
+          "+1": 0,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 208,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 211,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 90,
+        "position": 1,
+        "subject_type": "line"
+      }
+    },
+    {
+      "event_id": "event:61ca0e1f73a537eb8f867a20",
+      "event_type": "review_comment",
+      "occurred_at": "2025-12-31T11:30:15Z",
+      "actor": "eric-wieser",
+      "source": "data/pr_review_v2/cache/bundles/pr_33421.json/review_comments/2",
+      "payload": {
+        "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655251344",
+        "pull_request_review_id": 3620730886,
+        "id": 2655251344,
+        "node_id": "PRRC_kwDOFcwZ1c6eQ-uQ",
+        "diff_hunk": "@@ -267,6 +267,15 @@ theorem mul_cast_floor_div_cancel_of_pos {n : ℤ} (hn : 0 < n) (a : R) : ⌊a *\n theorem mul_natCast_floor_div_cancel {n : ℕ} (hn : n ≠ 0) (a : R) : ⌊a * n⌋ / n = ⌊a⌋ := by\n   simpa using mul_cast_floor_div_cancel_of_pos (n := n) (by positivity) a\n \n+theorem two_mul_fract_eq_one_iff_exists_int {x : R} :\n+    2 * fract x = 1 ↔ ∃ n : ℤ, 2 * x = 2 * n + 1 := by\n+  rw [fract, mul_sub, sub_eq_iff_eq_add']\n+  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\n+  rintro ⟨n, hn⟩\n+  convert hn\n+  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ two_pos, ← mul_lt_mul_iff_right₀ two_pos, hn]\n+  simp [mul_add]",
+        "path": "Mathlib/Algebra/Order/Floor/Ring.lean",
+        "commit_id": "02adb3757d729e929c52452fee14158f61c95f3a",
+        "original_commit_id": "02adb3757d729e929c52452fee14158f61c95f3a",
+        "user": {
+          "login": "eric-wieser",
+          "id": 425260,
+          "node_id": "MDQ6VXNlcjQyNTI2MA==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/425260?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/eric-wieser",
+          "html_url": "https://github.com/eric-wieser",
+          "followers_url": "https://api.github.com/users/eric-wieser/followers",
+          "following_url": "https://api.github.com/users/eric-wieser/following{/other_user}",
+          "gists_url": "https://api.github.com/users/eric-wieser/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/eric-wieser/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/eric-wieser/subscriptions",
+          "organizations_url": "https://api.github.com/users/eric-wieser/orgs",
+          "repos_url": "https://api.github.com/users/eric-wieser/repos",
+          "events_url": "https://api.github.com/users/eric-wieser/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/eric-wieser/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by\r\n  rw [fract, mul_sub, sub_eq_iff_eq_add']\r\n  refine ⟨fun hx ↦ ⟨⌊x⌋, hx⟩, ?_⟩\r\n  rintro ⟨n, hn⟩\r\n  convert hn\r\n  have hk0 : 0 < (k : R) := zero_le_one.trans_lt hk\r\n  rw [floor_eq_iff, ← mul_le_mul_iff_right₀ hk0, ← mul_lt_mul_iff_right₀ hk0, hn]\r\n  simp [mul_add, hk]\r\n```",
+        "created_at": "2025-12-31T11:30:15Z",
+        "updated_at": "2025-12-31T11:31:25Z",
+        "html_url": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655251344",
+        "pull_request_url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421",
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655251344"
+          },
+          "html": {
+            "href": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655251344"
+          },
+          "pull_request": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421"
+          }
+        },
+        "reactions": {
+          "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655251344/reactions",
+          "total_count": 0,
+          "+1": 0,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 270,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 277,
+        "side": "RIGHT",
+        "author_association": "MEMBER",
+        "original_position": 11,
+        "position": 1,
+        "subject_type": "line"
+      }
+    },
+    {
+      "event_id": "event:9f6060fb39af9d820eee4b07",
+      "event_type": "review_comment",
+      "occurred_at": "2025-12-31T16:38:00Z",
+      "actor": "urkud",
+      "source": "data/pr_review_v2/cache/bundles/pr_33421.json/review_comments/3",
+      "payload": {
+        "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655632863",
+        "pull_request_review_id": 3621135194,
+        "id": 2655632863,
+        "node_id": "PRRC_kwDOFcwZ1c6eSb3f",
+        "diff_hunk": "@@ -169,12 +195,45 @@ end OrderClosedTopology\n \n theorem continuousOn_fract [IsTopologicalAddGroup α] (n : ℤ) :\n     ContinuousOn (fract : α → α) (Ico n (n + 1) : Set α) :=\n-  continuousOn_id.sub (continuousOn_floor n)\n+  continuousOn_id.sub (continuous_of_discreteTopology.comp_continuousOn (continuousOn_floor n))\n \n theorem continuousAt_fract [OrderClosedTopology α] [IsTopologicalAddGroup α]\n     {x : α} (h : x ≠ ⌊x⌋) : ContinuousAt fract x :=\n-  (continuousOn_fract ⌊x⌋).continuousAt <|\n-    Ico_mem_nhds ((floor_le _).lt_of_ne h.symm) (lt_floor_add_one _)\n+  continuousAt_id.sub <| continuous_of_discreteTopology.continuousAt.comp <|\n+    continuousAt_floor h\n+\n+theorem tendsto_round_nhdsGE_pure [IsStrictOrderedRing α] [OrderClosedTopology α] [ContinuousAdd α]\n+    (x : α) : Tendsto round (𝓝[≥] x) (pure (round x)) := by\n+  rw [funext round_eq']\n+  have : Tendsto (2 * ·) (𝓝[≥] x) (𝓝[≥] (2 * x)) := by\n+    simp only [two_mul]\n+    refine (tendsto_id.add tendsto_id).inf (tendsto_principal_principal.2 ?_)\n+    exact fun a ha ↦ add_le_add ha ha",
+        "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "commit_id": "7cadd482022fe562afc3a363a7ef874a7f77faf0",
+        "original_commit_id": "02adb3757d729e929c52452fee14158f61c95f3a",
+        "user": {
+          "login": "urkud",
+          "id": 188813,
+          "node_id": "MDQ6VXNlcjE4ODgxMw==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/188813?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/urkud",
+          "html_url": "https://github.com/urkud",
+          "followers_url": "https://api.github.com/users/urkud/followers",
+          "following_url": "https://api.github.com/users/urkud/following{/other_user}",
+          "gists_url": "https://api.github.com/users/urkud/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/urkud/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/urkud/subscriptions",
+          "organizations_url": "https://api.github.com/users/urkud/orgs",
+          "repos_url": "https://api.github.com/users/urkud/repos",
+          "events_url": "https://api.github.com/users/urkud/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/urkud/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "Let me move the continuity part to a new PR.",
+        "created_at": "2025-12-31T16:38:00Z",
+        "updated_at": "2025-12-31T16:38:00Z",
+        "html_url": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655632863",
+        "pull_request_url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421",
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655632863"
+          },
+          "html": {
+            "href": "https://github.com/leanprover-community/mathlib4/pull/33421#discussion_r2655632863"
+          },
+          "pull_request": {
+            "href": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/33421"
+          }
+        },
+        "reactions": {
+          "url": "https://api.github.com/repos/leanprover-community/mathlib4/pulls/comments/2655632863/reactions",
+          "total_count": 0,
+          "+1": 0,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 208,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 211,
+        "side": "RIGHT",
+        "in_reply_to_id": 2655228140,
+        "author_association": "MEMBER",
+        "original_position": 90,
+        "position": 1,
+        "subject_type": "line"
+      }
+    }
+  ]
+}

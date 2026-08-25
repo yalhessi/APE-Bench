@@ -1,0 +1,16 @@
+{
+  "kept": 1,
+  "skipped": 0,
+  "skip_reasons": {},
+  "verdicts": {
+    "APPROVED": 1
+  },
+  "slices": {
+    "merged": 1,
+    "author_is_maintainer": 1
+  },
+  "comments_total": 1,
+  "linked_comments": 0,
+  "hydration_errors": 0,
+  "skips_detail": []
+}

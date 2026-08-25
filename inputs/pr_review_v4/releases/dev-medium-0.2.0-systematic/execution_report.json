@@ -1,0 +1,15 @@
+{
+  "counts": {
+    "derived/investigation_records.jsonl": 2253,
+    "derived/operator_runs.jsonl": 674,
+    "derived/opportunities.jsonl": 158,
+    "derived/opportunity_evidence.jsonl": 593
+  },
+  "executor_version": "generic-opportunity-executor/3",
+  "manifest_sha256": "a542de65c8ce3b3101921eeec9b2f3893705dd5804acd304bd9a4a79608fcd2f",
+  "parent": "inputs/pr_review_v4/releases/dev-medium-0.1.0",
+  "run": "results/pr_review_v4/audits/phase10-medium-executor-v4",
+  "schema_version": "medium-execution-release-report1",
+  "treatment": "inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium",
+  "version": "medium-execution-release/1"
+}

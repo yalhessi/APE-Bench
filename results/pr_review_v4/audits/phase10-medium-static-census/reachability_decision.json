@@ -1,0 +1,21 @@
+{
+  "census_sha256": "b8bc7b5356dbf0c6d82785e04441e8580d0b6d86c64bdea568c02928aa216c49",
+  "conditions": {
+    "c2_supported_obligations_outside_dev": {
+      "observed": 0,
+      "pass": false,
+      "required": 3
+    },
+    "distinct_implementations_outside_dev": {
+      "observed": 0,
+      "pass": false,
+      "required": 2
+    },
+    "distinct_prs_outside_dev": {
+      "observed": 0,
+      "pass": false,
+      "required": 2
+    }
+  },
+  "decision": "static_reachability_rejected"
+}

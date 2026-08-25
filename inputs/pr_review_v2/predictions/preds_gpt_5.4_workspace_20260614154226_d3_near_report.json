@@ -1,0 +1,599 @@
+{
+  "target": "near",
+  "coordinate_basis": "predicted anchors (h0) vs removed_in_revision spans (h0)",
+  "all": {
+    "slice": "all",
+    "prs": 30,
+    "gold_removed_spans": 31,
+    "recall": 0.097,
+    "line_anchored_predictions": 10,
+    "precision": 0.3,
+    "control_fp_rate": 0.5,
+    "off_diff_rate": 0.2,
+    "unlocalized": {
+      "pr_level": 0,
+      "file_only": 0
+    },
+    "approval_control_prs": {
+      "n": 15,
+      "findings_per_pr": 0.07
+    }
+  },
+  "review_commit_id_primary": {
+    "slice": "review_commit_id",
+    "prs": 23,
+    "gold_removed_spans": 31,
+    "recall": 0.097,
+    "line_anchored_predictions": 10,
+    "precision": 0.3,
+    "control_fp_rate": 0.5,
+    "off_diff_rate": 0.2,
+    "unlocalized": {
+      "pr_level": 0,
+      "file_only": 0
+    },
+    "approval_control_prs": {
+      "n": 8,
+      "findings_per_pr": 0.12
+    }
+  },
+  "per_pr": [
+    {
+      "pr_number": 33321,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 3,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33322,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33328,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 2,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            84,
+            84
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`self_notMem_Ioi` duplicates an existing theorem in the same file: `notMem_Ioi_self` is already present later (`Order/Interval/Set/Basic.lean:576`). Adding a se"
+        },
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            102,
+            102
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`self_notMem_Iio` is also a duplicate: the file already has `notMem_Iio_self` later (`Order/Interval/Set/Basic.lean:580`). As above, this introduces two names f"
+        },
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            87,
+            106
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "The rename/deprecation story is incomplete for the new `self_mem_Ici` / `self_mem_Iic` names. This file adds deprecated aliases from `left_mem_Ici` and `right_m"
+        }
+      ]
+    },
+    {
+      "pr_number": 33332,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 2,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33333,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33334,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33337,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 3,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33340,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33343,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33345,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33349,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 2,
+      "gold_covered": 0,
+      "line_anchored": 1,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 1,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "target/Mathlib/Algebra/Order/AddGroupWithTop.lean",
+          "span": [
+            205,
+            214
+          ],
+          "severity": "advisory",
+          "class": "off_diff",
+          "claim": "This extends the `sub` API only on the left: you add `sub_right_injective_of_ne_top` and `sub_right_inj_of_ne_top`, but there is no matching `sub_right_strictMo"
+        }
+      ]
+    },
+    {
+      "pr_number": 33356,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33357,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33362,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 3,
+      "gold_covered": 1,
+      "line_anchored": 2,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 1,
+      "control_fp": 1,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+          "span": [
+            153,
+            165
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "`norm_deriv_le_one_of_mapsTo_ball` and `dist_le_dist_of_mapsTo_ball_self` no longer match their names or docstrings: the hypotheses have been weakened to `close"
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+          "span": [
+            14,
+            34
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The module header now lists `Complex.abs_deriv_le_div_of_mapsTo_ball` and `Complex.abs_deriv_le_one_of_mapsTo_ball`, but there are no such declarations in the f"
+        }
+      ]
+    },
+    {
+      "pr_number": 33367,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33370,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33373,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 1,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 1,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "target/Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean",
+          "span": [
+            246,
+            253
+          ],
+          "severity": "blocking",
+          "class": "off_diff",
+          "claim": "`iteratedDeriv_comp_const_sub` duplicates the existing lemma `iteratedDeriv_comp_neg` up to the trivial translation rewrite `fun z ↦ f (s - z) = fun z ↦ (fun y "
+        }
+      ]
+    },
+    {
+      "pr_number": 33376,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33385,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33395,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33399,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33400,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 1,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 1,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/Distribution/SchwartzSpace.lean",
+          "span": [
+            107,
+            131
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The new `@[fun_prop]` tags do not appear to provide the intended automation for Schwartz functions. In a verification snippet importing this file, `fun_prop` st"
+        }
+      ]
+    },
+    {
+      "pr_number": 33401,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 1,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 1,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+          "span": [
+            226,
+            242
+          ],
+          "severity": "advisory",
+          "class": "hit",
+          "claim": "This file explicitly notes that its pointwise section should be kept in sync with `Mathlib/Algebra/Group/Submonoid/Pointwise.lean`, but the analogous `Submonoid"
+        }
+      ]
+    },
+    {
+      "pr_number": 33413,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33418,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33419,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 1,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 1,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Data/Finset/Card.lean",
+          "span": [
+            577,
+            581
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new lemma is an awkwardly named reformulation of facts that are already present a few lines later (`card_sdiff_le_card_sdiff_iff`, `card_sdiff_lt_card_sdiff"
+        }
+      ]
+    },
+    {
+      "pr_number": 33421,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 8,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33432,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33438,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33440,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    }
+  ]
+}

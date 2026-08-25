@@ -1,0 +1,81 @@
+{
+  "active_method_coverage": {
+    "covered": 3,
+    "total": 3
+  },
+  "gate_status": "pass",
+  "overall_accounted": 6,
+  "planned_method_gaps": 3,
+  "rows": [
+    {
+      "audit_status": "scheduled",
+      "change_ids": [
+        "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+      ],
+      "expected_method_id": "canonical_api_search.v1",
+      "implementation_status": "active",
+      "matching_investigation_ids": [
+        "investigation:7f5ffda28a97b903d1c28d88"
+      ],
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118"
+    },
+    {
+      "audit_status": "scheduled",
+      "change_ids": [
+        "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f"
+      ],
+      "expected_method_id": "wrapper_composition.v1",
+      "implementation_status": "active",
+      "matching_investigation_ids": [
+        "investigation:0f29797d9de1b5f4b8fad445",
+        "investigation:177113d6fba366e03fdde2af"
+      ],
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b"
+    },
+    {
+      "audit_status": "scheduled",
+      "change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f"
+      ],
+      "expected_method_id": "naming_contrast.v1",
+      "implementation_status": "active",
+      "matching_investigation_ids": [
+        "investigation:e11cf587ca1b1f221dd201a7"
+      ],
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad"
+    },
+    {
+      "audit_status": "method_gap",
+      "change_ids": [
+        "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0"
+      ],
+      "expected_method_id": "proof_compression.v1",
+      "implementation_status": "planned_method_gap",
+      "matching_investigation_ids": [],
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6"
+    },
+    {
+      "audit_status": "method_gap",
+      "change_ids": [
+        "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f"
+      ],
+      "expected_method_id": "proof_compression.v1",
+      "implementation_status": "planned_method_gap",
+      "matching_investigation_ids": [],
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5"
+    },
+    {
+      "audit_status": "method_gap",
+      "change_ids": [
+        "change:c79e40846a8ccb396fbed4bb8a4aeb834a0eea561d9136e95e2a36763d603335"
+      ],
+      "expected_method_id": "structural_rewrite.v1",
+      "implementation_status": "planned_method_gap",
+      "matching_investigation_ids": [],
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443"
+    }
+  ],
+  "schema_version": "phase2-schedule-opportunity-audit1",
+  "source_sha256": "b8c97e64cfc2c7db859ea8e239e1c418c46aa87a85b1c0f067b887378b5f760a"
+}

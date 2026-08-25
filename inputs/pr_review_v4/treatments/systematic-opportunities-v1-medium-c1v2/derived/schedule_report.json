@@ -1,0 +1,16 @@
+{
+  "by_method": {
+    "baseline_failure.v1": 442,
+    "canonical_api_search.v1": 250,
+    "naming_contrast.v1": 212,
+    "wrapper_composition.v1": 273
+  },
+  "cross_work_unit_tasks": 516,
+  "max_related_changes": 26,
+  "prs": 16,
+  "scheduler_version": "systematic-investigation-scheduler/1",
+  "schema_version": "investigation-schedule-report1",
+  "source_sha256": "2c723353ae5d4b35f5c24ee5f33d367392bc00051b10d8809e437023c3fc2660",
+  "tasks": 1177,
+  "tasks_with_related_changes": 609
+}

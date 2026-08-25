@@ -1,0 +1,160 @@
+{
+  "corpus_cutoff_policy": "Naming statistics use only theorem and lemma declarations in the frozen review-base Mathlib source tree. Generation excludes the target PR, gold, comments, and outcomes.",
+  "created_at": "2026-07-17T00:00:00-05:00",
+  "dataset_id": "mathlib-pr-review-v4-naming-contrast-smoke",
+  "derived_artifacts": [
+    {
+      "path": "methods.jsonl",
+      "records": 4,
+      "role": "investigation_method_registry",
+      "schema_version": "investigation-method1",
+      "sha256": "88b7334f9e73ecd68d5d4911100c3ab0edc216988a914e235630c79d9cfec8c1"
+    },
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 1,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "c126d427dbdbf56c6ed483f642a8f3920949fb634c0b433777ce3012ce76bc2b"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 2,
+      "role": "naming_smoke_units",
+      "schema_version": "work-unit1",
+      "sha256": "76db0d84280b077b80347b6e13ee849b6ddb75ab174630b4fc939865cce00dd8"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 2,
+      "role": "naming_opportunity_prompts",
+      "schema_version": "rendered-prompt1",
+      "sha256": "d39055648b4fe6d71869bd8a9b50be0af76980d3127e60588675603deec95a8c"
+    },
+    {
+      "path": "derived/investigation_tasks.jsonl",
+      "records": 2,
+      "role": "naming_investigation_tasks",
+      "schema_version": "investigation-task1",
+      "sha256": "6809e027acdbf554d83ba86739c92c5f31520a5d41c7c29144d38f4a1228d96a"
+    },
+    {
+      "path": "derived/semantic_subjects.jsonl",
+      "records": 2,
+      "role": "semantic_subject_inferences",
+      "schema_version": "semantic-subject-inference1",
+      "sha256": "db1bf03e480280d3423afff12c4a2e6ff702c14d61390818db0a9b71331f9050"
+    },
+    {
+      "path": "derived/naming_population.jsonl",
+      "records": 91,
+      "role": "scoped_naming_population",
+      "schema_version": "naming-population-member1",
+      "sha256": "3a974e18c12349e786816301c5cf7ede39d3e971cea34ac244bdd9ff4c759fa0"
+    },
+    {
+      "path": "derived/name_collisions.jsonl",
+      "records": 2,
+      "role": "name_collision_checks",
+      "schema_version": "name-collision-result1",
+      "sha256": "a478491524eb71684a54401b1680c5d3410d45a01f888121388260339df34144"
+    },
+    {
+      "path": "derived/norm_records.jsonl",
+      "records": 1,
+      "role": "naming_norm_records",
+      "schema_version": "norm-record1",
+      "sha256": "9d2bd6364c79a90f916564bca007e0e38c68c5974476afd1d223e44433223302"
+    },
+    {
+      "path": "derived/opportunity_evidence.jsonl",
+      "records": 8,
+      "role": "opportunity_evidence",
+      "schema_version": "opportunity-evidence-artifact1",
+      "sha256": "dee17969eef6e1ebacb54fe489a7d9eb06f9267b1dfb3bc9ff8ff9b07990159f"
+    },
+    {
+      "path": "derived/operator_runs.jsonl",
+      "records": 6,
+      "role": "operator_runs",
+      "schema_version": "operator-run1",
+      "sha256": "6e73db489ae231fdb79fefba5f1d356aea804ffbc6d05bc1c7f7c6b5118db4cc"
+    },
+    {
+      "path": "derived/investigation_records.jsonl",
+      "records": 2,
+      "role": "investigation_records",
+      "schema_version": "investigation-record1",
+      "sha256": "a2865d02543982d5f4dd8d465711236a353632b416e65c5ee7e33c04871e3f79"
+    },
+    {
+      "path": "derived/opportunities.jsonl",
+      "records": 2,
+      "role": "automatic_review_opportunities",
+      "schema_version": "review-opportunity1",
+      "sha256": "83961c021b8aa15178ae3dc2ce32e5525909102b491895642f7f641bd99233b1"
+    },
+    {
+      "path": "derived/naming_contrast_report.json",
+      "records": 1,
+      "role": "naming_contrast_report",
+      "schema_version": "naming-contrast-report1",
+      "sha256": "528a5ceaa1faf89289c7912a767608e65dfafc22c0f09c734a5ede1b228095da"
+    }
+  ],
+  "generator_git_commit": null,
+  "generator_tree_state": "unknown",
+  "generator_versions": {
+    "candidate_contract": "grounded-ask/1",
+    "change_graph": "cg1_builder_v2",
+    "deterministic_discovery": "compile-style/1",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "evidence": "evidence-collectors/2",
+    "funnel": "raw_first_round_v1",
+    "generation_prior": "none",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "judgment_stabilizer": "judgment-decomposition/1",
+    "naming_population": "snapshot-direct-subject-names/1",
+    "naming_smoke": "semantic-naming-smoke/1",
+    "pilot": "pilot/2",
+    "renderer": "candidate-prompt/11",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "semantic_subject": "lean-conclusion-subject/1",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 1,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "18fa64f08cd9f21085a9ad2c62e88c70f5b36cae2a538487f2ca60a71c92d0ac"
+    }
+  ],
+  "pr_numbers": [
+    33098
+  ],
+  "release": "0.9.2-naming-contrast-smoke",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+      "records": 1,
+      "role": "parent_stable_release",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3"
+    },
+    {
+      "path": "inputs/pr_review_v4/treatments/systematic-opportunities-v1/manifest.json",
+      "records": 1,
+      "role": "parent_opportunity_treatment",
+      "schema_version": "systematic-opportunity-treatment1",
+      "sha256": "db0fb0d6f0a3fafb4f3c54f5399b5eb168f281d31b310e718479e16a977f7268"
+    }
+  ],
+  "split": "development"
+}

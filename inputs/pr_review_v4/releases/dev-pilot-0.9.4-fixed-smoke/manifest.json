@@ -1,0 +1,201 @@
+{
+  "corpus_cutoff_policy": "Fixed composition of accepted review-time production operators. The release contains only source work-unit scope; obligation IDs are derived separately during evaluation.",
+  "created_at": "2026-07-17T13:00:00-05:00",
+  "dataset_id": "mathlib-pr-review-v4-phase9-fixed-smoke",
+  "derived_artifacts": [
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 2,
+      "role": "change_graphs",
+      "schema_version": "cg1",
+      "sha256": "c13d636f726cd670af8000d34dc0168dc1340b690906c9fab352f1218aaf5d78"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 2,
+      "role": "model_adjudication_units",
+      "schema_version": "work-unit1",
+      "sha256": "f16fbd74dc3594692519b5674ed89705b0bfa195288acf089342c362282572d3"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 2,
+      "role": "model_adjudication_prompts",
+      "schema_version": "rendered-prompt1",
+      "sha256": "e139dae46c3f3e6b7e54ab9b51f1486239a8f241ff89cc01b1f01d5ca8f98939"
+    },
+    {
+      "path": "derived/investigation_tasks.jsonl",
+      "records": 6,
+      "role": "all_method_tasks",
+      "schema_version": "investigation-task1",
+      "sha256": "742638a537fc38537b83a7a9ad1a04ba804ede4ea36108cf8a60fa23ac483341"
+    },
+    {
+      "path": "derived/operator_runs.jsonl",
+      "records": 18,
+      "role": "operator_runs",
+      "schema_version": "operator-run1",
+      "sha256": "2aaeff54ef725075dc100e49d6340ff683c9dc73aa0572727d6948c244d10448"
+    },
+    {
+      "path": "derived/investigation_records.jsonl",
+      "records": 6,
+      "role": "terminal_investigations",
+      "schema_version": "investigation-record1",
+      "sha256": "2d1d3bb5f5cfda825d65a917075a8971f7083e46603e42aca60e518f77b255c1"
+    },
+    {
+      "path": "derived/opportunities.jsonl",
+      "records": 6,
+      "role": "all_opportunities",
+      "schema_version": "review-opportunity1",
+      "sha256": "1071b7adaa4e4529e50053797b6d4ee7da784b132d84e1c82f54744f0967adbc"
+    },
+    {
+      "path": "derived/opportunity_evidence.jsonl",
+      "records": 28,
+      "role": "opportunity_evidence",
+      "schema_version": "opportunity-evidence1",
+      "sha256": "3656e7de442cfea753be4106b8b635ce5f59a055e844a494b2ef5d6b5ed2961b"
+    },
+    {
+      "path": "derived/technical_assessments.jsonl",
+      "records": 6,
+      "role": "initial_technical_assessments",
+      "schema_version": "technical-assessment1",
+      "sha256": "d65420c8a148fbe05dfe40284a72e9bcad884014bc7ccea8ab364e2fd6a418b8"
+    },
+    {
+      "path": "derived/norm_records.jsonl",
+      "records": 3,
+      "role": "initial_norm_records",
+      "schema_version": "norm-record1",
+      "sha256": "514fb445aa7e8b424c801ee0b095ef438b89d41641d532e7e355e12f839e94e2"
+    },
+    {
+      "path": "derived/norm_assessments.jsonl",
+      "records": 6,
+      "role": "initial_norm_assessments",
+      "schema_version": "norm-assessment1",
+      "sha256": "93da925f0c122e8b494f26af84ab1f0e0de049eba4fec6fa7440baffc65fb429"
+    },
+    {
+      "path": "derived/worthiness_decisions.jsonl",
+      "records": 6,
+      "role": "initial_worthiness",
+      "schema_version": "worthiness-decision1",
+      "sha256": "6647b62cef2d4cdc424843ea08dcd34198457372e7c9a83c249e9824d9bd09a5"
+    },
+    {
+      "path": "derived/cited_claims.jsonl",
+      "records": 12,
+      "role": "adjudication_claims",
+      "schema_version": "cited-adjudication-claim1",
+      "sha256": "47e3a0aac3d8020841760030381141ea6680cfc7048f0b5a6a69283c81ba498b"
+    },
+    {
+      "path": "derived/adjudication_bundles.jsonl",
+      "records": 6,
+      "role": "adjudication_routes",
+      "schema_version": "adjudication-bundle1",
+      "sha256": "288c9a1f97fdae7f18cba260286021ea2795b8354d35fea912878c65e6ac216e"
+    },
+    {
+      "path": "derived/redundancy_requests.jsonl",
+      "records": 2,
+      "role": "model_adjudication_requests",
+      "schema_version": "redundancy-request1",
+      "sha256": "b82b210ad1860ceb8ea3fe233325e9e852f29f65c91b9b9cfadd08daa118c435"
+    },
+    {
+      "path": "derived/deterministic_candidates.jsonl",
+      "records": 1,
+      "role": "deterministic_requests",
+      "schema_version": "c1",
+      "sha256": "90f2f30eba25d95ee518bf21480cd7ba0406657a16dac14c38d96df6adcc585d"
+    },
+    {
+      "path": "derived/pipeline_ledger.jsonl",
+      "records": 6,
+      "role": "fixed_routes",
+      "schema_version": "fixed-pipeline-opportunity1",
+      "sha256": "a36b064a661a58d71e770a22e5b5f3d4158070500a61e8772050bf03e9b4ecb1"
+    },
+    {
+      "path": "methods.jsonl",
+      "records": 4,
+      "role": "method_registry",
+      "schema_version": "investigation-method1",
+      "sha256": "88b7334f9e73ecd68d5d4911100c3ab0edc216988a914e235630c79d9cfec8c1"
+    },
+    {
+      "path": "evaluation_source_scope.json",
+      "records": 1,
+      "role": "gold_free_evaluation_source_scope",
+      "schema_version": "phase9-evaluation-source-scope1",
+      "sha256": "0d7272cccbef2e2ecfdcd6253f788b1f8ff0d98cca15e57a4664c43c25eddac3"
+    }
+  ],
+  "generator_git_commit": null,
+  "generator_tree_state": "unknown",
+  "generator_versions": {
+    "candidate_contract": "grounded-ask/1",
+    "change_graph": "cg1_builder_v2",
+    "deterministic_discovery": "compile-style/1",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "evidence": "evidence-collectors/2",
+    "funnel": "raw_first_round_v1",
+    "generation_prior": "none",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "judgment_stabilizer": "judgment-decomposition/1",
+    "phase9_fixed_orchestration": "phase9-fixed-orchestration/1",
+    "pilot": "pilot/2",
+    "renderer": "candidate-prompt/11",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 2,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "867695174da1ff222d06ff398dfaf10eb17ab5225a847b5f5e56658a9e24b249"
+    }
+  ],
+  "pr_numbers": [
+    33098,
+    33438
+  ],
+  "release": "0.9.4-phase9-fixed-smoke",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.1-canonical-smoke/manifest.json",
+      "records": 1,
+      "role": "accepted_method_smoke",
+      "schema_version": "dataset-manifest1",
+      "sha256": "f2f9b91c90dcc3333701d91f40fce152f8a9cc7e2419c26ac54535eb934e26ac"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.2-naming-smoke/manifest.json",
+      "records": 1,
+      "role": "accepted_method_smoke",
+      "schema_version": "dataset-manifest1",
+      "sha256": "21c5ed0de993642fd11714967313f17bb46526f5a23c2318571ef1f79fe2e4d5"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.3-wrapper-smoke/manifest.json",
+      "records": 1,
+      "role": "accepted_method_smoke",
+      "schema_version": "dataset-manifest1",
+      "sha256": "ba310166da1be811b8bd3f886e1fca3e669fe5209179d89041ebb2de3a11c9cc"
+    }
+  ],
+  "split": "development"
+}

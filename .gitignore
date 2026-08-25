@@ -1,5 +1,4 @@
 .ape/
-data/
 .claude
 *egg-info
 .vscode
@@ -7,14 +6,27 @@ data/
 
 __pycache__/
 
-# Bulk research artifacts. These are reproducible from the code in this repo and
-# are far too large to version; see docs/PROJECT-STATUS.md for how to regenerate
-# each one. Everything small enough to read — manifests, lockfiles, reports,
-# benchmark definitions, audit verdicts — is tracked.
+# The machine-local scratch tree: built Lean workspaces, toolchains, retrieval
+# indices, LLM logs. Regenerated on any machine, tens of gigabytes, never shared.
+/data/*
+
+# ...except the cached GitHub PR bundles. Those are immutable inputs that frozen v4
+# manifests reference by exact path, so the pipeline is only reproducible with them.
+!/data/pr_review_v2/
+/data/pr_review_v2/*
+!/data/pr_review_v2/base_commits.jsonl
+!/data/pr_review_v2/cache/
+/data/pr_review_v2/cache/*
+!/data/pr_review_v2/cache/bundles/
+!/data/pr_review_v2/cache/compares/
+
+# Bulk derived artifacts: raw GitHub fetches and retrieval sweeps that are large,
+# regenerable from the code here, and not read by anything in this repo.
+# docs/PROJECT-STATUS.md gives the command that rebuilds each.
 inputs/pr_review_v2/corpus/
 inputs/pr_review_v2/precedent_bench/*.jsonl
-inputs/pr_review_v2/predictions/
-inputs/pr_review_v4/releases/
-inputs/pr_review_v4/treatments/
+
+# Per-run agent workspaces and rendered blueprint bundles. The summaries, audit
+# verdicts, and condition outputs derived from them are tracked; the raw trees are not.
 results/*/runs/
 results/blueprints/

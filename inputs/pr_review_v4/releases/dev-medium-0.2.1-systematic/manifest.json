@@ -1,0 +1,103 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-08-06T12:47:43Z",
+  "dataset_id": "mathlib-pr-review-v4-dev-medium",
+  "derived_artifacts": [
+    {
+      "path": "derived/opportunities.jsonl",
+      "records": 42,
+      "role": "automatic_review_opportunities",
+      "schema_version": "review-opportunity1",
+      "sha256": "e5d172facbb677372740deb5f719cfd8f44a584e69e9eaf1421440a6939c6b69"
+    },
+    {
+      "path": "derived/opportunity_evidence.jsonl",
+      "records": 593,
+      "role": "opportunity_evidence",
+      "schema_version": "opportunity-evidence-artifact1",
+      "sha256": "b8cadc23523719b7b3ca5d5384d626f4aabc298b45c450ce5baefbdeea341c40"
+    },
+    {
+      "path": "derived/operator_runs.jsonl",
+      "records": 674,
+      "role": "operator_runs",
+      "schema_version": "operator-run1",
+      "sha256": "bbca8b0c8b99712f2a865b766dfb11aa9a630ae32089d2e9e600a41503c51f60"
+    },
+    {
+      "path": "derived/investigation_records.jsonl",
+      "records": 2253,
+      "role": "investigation_records",
+      "schema_version": "investigation-record1",
+      "sha256": "9c15bb5fac18e3ee9d361777741536d799d60e8fb74436a5d90b25d4b10d4842"
+    }
+  ],
+  "generator_git_commit": "f5626b238a91d8682607b4d081e86b825f3c8327",
+  "generator_tree_state": "dirty",
+  "generator_versions": {
+    "candidate_contract": "grounded-ask/1",
+    "change_graph": "cg1_builder_v2",
+    "deterministic_discovery": "compile-style/1",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "evidence": "evidence-collectors/2",
+    "execution_release": "medium-execution-release/1",
+    "funnel": "raw_first_round_v1",
+    "generation_prior": "none",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "judgment_stabilizer": "judgment-decomposition/1",
+    "pilot": "pilot/2",
+    "renderer": "candidate-prompt/11",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "systematic_execution": "generic-opportunity-executor/4",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [],
+  "input_artifacts": [],
+  "pr_numbers": [
+    33057,
+    33066,
+    33098,
+    33117,
+    33145,
+    33149,
+    33285,
+    33294,
+    33304,
+    33305,
+    33315,
+    33321,
+    33337,
+    33362,
+    33421,
+    33438
+  ],
+  "release": "0.2.1-medium-systematic",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-medium-0.1.0",
+      "records": 0,
+      "role": "parent_release",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "7c45fd1d96bd0f74c588b97e138fcbc6bfe4db8d36226ee8f0119c493af37a70"
+    },
+    {
+      "path": "inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium",
+      "records": 0,
+      "role": "treatment",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "8bec06b75bdb08298520b82b817e60fd13c5715af3a05f0e57e130bd65fd5deb"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-medium-0.2.0-systematic",
+      "records": 0,
+      "role": "supersedes",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "a542de65c8ce3b3101921eeec9b2f3893705dd5804acd304bd9a4a79608fcd2f"
+    }
+  ],
+  "split": "development"
+}

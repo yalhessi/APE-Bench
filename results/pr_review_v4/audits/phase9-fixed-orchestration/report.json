@@ -1,0 +1,40 @@
+{
+  "cost_matched_baseline_union": {
+    "mean_issue_recall": 0.3333333333333333,
+    "mean_paired_precision": 0.6166666666666667,
+    "mean_resolution_recall": 0.16666666666666666
+  },
+  "decision": "implementation_ready_for_broader_pilot",
+  "descriptive_deltas": {
+    "issue_recall": 0.0,
+    "resolution_recall": 0.08333333333333334
+  },
+  "fixed": {
+    "mean_issue_recall": 0.3333333333333333,
+    "mean_paired_precision": 0.8888888888888888,
+    "mean_resolution_recall": 0.25
+  },
+  "implementation_ready": true,
+  "repetitions": 3,
+  "schema_version": "phase9-fixed-orchestration-report1",
+  "stage_counts_by_repetition": [
+    {
+      "candidate_construction": 1,
+      "candidate_semantics": 2,
+      "recovered": 2,
+      "source_retrieval": 9
+    },
+    {
+      "candidate_construction": 1,
+      "candidate_semantics": 1,
+      "recovered": 3,
+      "source_retrieval": 9
+    },
+    {
+      "candidate_construction": 1,
+      "candidate_semantics": 1,
+      "recovered": 3,
+      "source_retrieval": 9
+    }
+  ]
+}

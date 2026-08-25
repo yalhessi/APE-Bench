@@ -1,0 +1,341 @@
+{
+  "kept": 138,
+  "skipped": 63,
+  "skip_reasons": {
+    "size:diff_lines": 39,
+    "content:no_mathlib_lean_file": 6,
+    "review_signal:no_reviewer_events": 9,
+    "size:changed_files": 4,
+    "authorship:bot_author": 2,
+    "h0:no_commit_before_t1": 3
+  },
+  "verdicts": {
+    "APPROVED": 100,
+    "COMMENT_ONLY": 38
+  },
+  "slices": {
+    "merged": 132,
+    "author_is_maintainer": 102,
+    "multi_reviewer": 12
+  },
+  "comments_total": 204,
+  "linked_comments": 109,
+  "hydration_errors": 0,
+  "skips_detail": [
+    {
+      "pr_number": 33430,
+      "stage": "size",
+      "reason": "diff_lines=6"
+    },
+    {
+      "pr_number": 33428,
+      "stage": "size",
+      "reason": "diff_lines=8"
+    },
+    {
+      "pr_number": 33427,
+      "stage": "content",
+      "reason": "no_mathlib_lean_file"
+    },
+    {
+      "pr_number": 33410,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33408,
+      "stage": "size",
+      "reason": "diff_lines=9"
+    },
+    {
+      "pr_number": 33407,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33396,
+      "stage": "size",
+      "reason": "diff_lines=3"
+    },
+    {
+      "pr_number": 33391,
+      "stage": "size",
+      "reason": "diff_lines=2"
+    },
+    {
+      "pr_number": 33382,
+      "stage": "size",
+      "reason": "diff_lines=9"
+    },
+    {
+      "pr_number": 33378,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33366,
+      "stage": "size",
+      "reason": "diff_lines=2"
+    },
+    {
+      "pr_number": 33350,
+      "stage": "content",
+      "reason": "no_mathlib_lean_file"
+    },
+    {
+      "pr_number": 33346,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33344,
+      "stage": "size",
+      "reason": "diff_lines=6"
+    },
+    {
+      "pr_number": 33342,
+      "stage": "size",
+      "reason": "changed_files=66"
+    },
+    {
+      "pr_number": 33338,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33331,
+      "stage": "authorship",
+      "reason": "bot_author"
+    },
+    {
+      "pr_number": 33327,
+      "stage": "size",
+      "reason": "diff_lines=8"
+    },
+    {
+      "pr_number": 33317,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33309,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33293,
+      "stage": "content",
+      "reason": "no_mathlib_lean_file"
+    },
+    {
+      "pr_number": 33273,
+      "stage": "size",
+      "reason": "diff_lines=7"
+    },
+    {
+      "pr_number": 33265,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33264,
+      "stage": "size",
+      "reason": "diff_lines=8"
+    },
+    {
+      "pr_number": 33262,
+      "stage": "size",
+      "reason": "diff_lines=4"
+    },
+    {
+      "pr_number": 33261,
+      "stage": "size",
+      "reason": "diff_lines=6"
+    },
+    {
+      "pr_number": 33260,
+      "stage": "size",
+      "reason": "diff_lines=6"
+    },
+    {
+      "pr_number": 33250,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33246,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33243,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33241,
+      "stage": "size",
+      "reason": "changed_files=86"
+    },
+    {
+      "pr_number": 33235,
+      "stage": "size",
+      "reason": "diff_lines=3"
+    },
+    {
+      "pr_number": 33229,
+      "stage": "size",
+      "reason": "diff_lines=9"
+    },
+    {
+      "pr_number": 33215,
+      "stage": "size",
+      "reason": "diff_lines=2"
+    },
+    {
+      "pr_number": 33213,
+      "stage": "size",
+      "reason": "diff_lines=7"
+    },
+    {
+      "pr_number": 33212,
+      "stage": "content",
+      "reason": "no_mathlib_lean_file"
+    },
+    {
+      "pr_number": 33199,
+      "stage": "size",
+      "reason": "diff_lines=3"
+    },
+    {
+      "pr_number": 33187,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33184,
+      "stage": "authorship",
+      "reason": "bot_author"
+    },
+    {
+      "pr_number": 33182,
+      "stage": "size",
+      "reason": "changed_files=32"
+    },
+    {
+      "pr_number": 33181,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33175,
+      "stage": "size",
+      "reason": "diff_lines=2"
+    },
+    {
+      "pr_number": 33170,
+      "stage": "size",
+      "reason": "diff_lines=6"
+    },
+    {
+      "pr_number": 33167,
+      "stage": "size",
+      "reason": "diff_lines=9"
+    },
+    {
+      "pr_number": 33166,
+      "stage": "size",
+      "reason": "diff_lines=8"
+    },
+    {
+      "pr_number": 33162,
+      "stage": "size",
+      "reason": "diff_lines=9"
+    },
+    {
+      "pr_number": 33155,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33139,
+      "stage": "h0",
+      "reason": "no_commit_before_t1"
+    },
+    {
+      "pr_number": 33136,
+      "stage": "size",
+      "reason": "diff_lines=9"
+    },
+    {
+      "pr_number": 33131,
+      "stage": "size",
+      "reason": "changed_files=52"
+    },
+    {
+      "pr_number": 33130,
+      "stage": "size",
+      "reason": "diff_lines=1580"
+    },
+    {
+      "pr_number": 33122,
+      "stage": "size",
+      "reason": "diff_lines=7"
+    },
+    {
+      "pr_number": 33106,
+      "stage": "size",
+      "reason": "diff_lines=2"
+    },
+    {
+      "pr_number": 33097,
+      "stage": "size",
+      "reason": "diff_lines=5"
+    },
+    {
+      "pr_number": 33096,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33094,
+      "stage": "size",
+      "reason": "diff_lines=2"
+    },
+    {
+      "pr_number": 33075,
+      "stage": "h0",
+      "reason": "no_commit_before_t1"
+    },
+    {
+      "pr_number": 33073,
+      "stage": "h0",
+      "reason": "no_commit_before_t1"
+    },
+    {
+      "pr_number": 33071,
+      "stage": "content",
+      "reason": "no_mathlib_lean_file"
+    },
+    {
+      "pr_number": 33069,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33058,
+      "stage": "size",
+      "reason": "diff_lines=7"
+    },
+    {
+      "pr_number": 33055,
+      "stage": "review_signal",
+      "reason": "no_reviewer_events"
+    },
+    {
+      "pr_number": 33046,
+      "stage": "content",
+      "reason": "no_mathlib_lean_file"
+    }
+  ]
+}

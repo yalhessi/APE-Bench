@@ -1,0 +1,32 @@
+{
+  "counts": {
+    "declarations": 507,
+    "opportunities": 2,
+    "retrieval_hits": 40,
+    "targets": 2
+  },
+  "index_version": "canonical-dependency-neighborhood/1",
+  "retrieval_version": "canonical-api-lexical-shape/1",
+  "schema_version": "canonical-retrieval-report1",
+  "source_retrieval_gate": "pass",
+  "targets": [
+    {
+      "applicability_status": "unavailable",
+      "high_confidence_opportunity": true,
+      "pr_number": 33098,
+      "primary_change_id": "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768",
+      "top_already_used": false,
+      "top_declaration": "Metric.isSeparated_insert_of_notMem",
+      "top_score": 28.0
+    },
+    {
+      "applicability_status": "completed",
+      "high_confidence_opportunity": false,
+      "pr_number": 33438,
+      "primary_change_id": "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+      "top_already_used": true,
+      "top_declaration": "Real.arctan_tan",
+      "top_score": 19.0
+    }
+  ]
+}

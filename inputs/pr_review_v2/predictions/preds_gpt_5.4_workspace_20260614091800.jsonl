@@ -1,0 +1,1 @@
+{"schema_version": "pr_review_v2_pred/0.1", "pr_number": 33440, "model": "gpt_5.4", "mode": "workspace", "created_at": "2026-06-14T13:18:01.163121+00:00", "merge_ready_as_is": null, "confidence": null, "findings": [], "parse_ok": false, "parse_error": "no_submission", "raw_text": "", "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "latency_s": 0.0, "retried_parse": false}

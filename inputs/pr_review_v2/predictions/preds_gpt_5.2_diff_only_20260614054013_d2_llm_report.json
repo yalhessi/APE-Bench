@@ -1,0 +1,279 @@
+{
+  "mode": "llm",
+  "prs_evaluated": 30,
+  "gold_findings": 31,
+  "predicted_findings": 118,
+  "matched": 15,
+  "precision": 0.127,
+  "recall": 0.484,
+  "blocking_recall": 0.565,
+  "recall_by_stratum": {
+    "V1": {
+      "gold": 1,
+      "matched": 0,
+      "recall": 0.0
+    },
+    "V2": {
+      "gold": 13,
+      "matched": 8,
+      "recall": 0.615
+    },
+    "V3": {
+      "gold": 12,
+      "matched": 5,
+      "recall": 0.417
+    },
+    "V4": {
+      "gold": 5,
+      "matched": 2,
+      "recall": 0.4
+    }
+  },
+  "control_prs": {
+    "n": 11,
+    "findings_per_control_pr": 2.91
+  },
+  "d1_verdict_accuracy": 0.333,
+  "per_pr": [
+    {
+      "pr_number": 33334,
+      "gold": 0,
+      "pred": 2,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33399,
+      "gold": 0,
+      "pred": 0,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": true
+    },
+    {
+      "pr_number": 33349,
+      "gold": 3,
+      "pred": 4,
+      "matched": 1,
+      "verdict": "COMMENT_ONLY",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33419,
+      "gold": 1,
+      "pred": 3,
+      "matched": 1,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33345,
+      "gold": 1,
+      "pred": 2,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": true
+    },
+    {
+      "pr_number": 33333,
+      "gold": 3,
+      "pred": 4,
+      "matched": 1,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33370,
+      "gold": 0,
+      "pred": 7,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33367,
+      "gold": 0,
+      "pred": 2,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33321,
+      "gold": 3,
+      "pred": 9,
+      "matched": 1,
+      "verdict": "COMMENT_ONLY",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33440,
+      "gold": 0,
+      "pred": 5,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33395,
+      "gold": 1,
+      "pred": 6,
+      "matched": 1,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33332,
+      "gold": 1,
+      "pred": 6,
+      "matched": 0,
+      "verdict": "COMMENT_ONLY",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33385,
+      "gold": 0,
+      "pred": 0,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": true
+    },
+    {
+      "pr_number": 33418,
+      "gold": 0,
+      "pred": 6,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33343,
+      "gold": 1,
+      "pred": 3,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33362,
+      "gold": 1,
+      "pred": 5,
+      "matched": 1,
+      "verdict": "COMMENT_ONLY",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33438,
+      "gold": 0,
+      "pred": 4,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33340,
+      "gold": 0,
+      "pred": 0,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": true
+    },
+    {
+      "pr_number": 33413,
+      "gold": 1,
+      "pred": 4,
+      "matched": 1,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33357,
+      "gold": 1,
+      "pred": 3,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33401,
+      "gold": 2,
+      "pred": 3,
+      "matched": 2,
+      "verdict": "COMMENT_ONLY",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33328,
+      "gold": 1,
+      "pred": 5,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33376,
+      "gold": 1,
+      "pred": 4,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33322,
+      "gold": 0,
+      "pred": 2,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33432,
+      "gold": 0,
+      "pred": 4,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33337,
+      "gold": 2,
+      "pred": 3,
+      "matched": 1,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33400,
+      "gold": 1,
+      "pred": 3,
+      "matched": 0,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33356,
+      "gold": 1,
+      "pred": 5,
+      "matched": 1,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33373,
+      "gold": 3,
+      "pred": 5,
+      "matched": 2,
+      "verdict": "COMMENT_ONLY",
+      "merge_ready_pred": false
+    },
+    {
+      "pr_number": 33421,
+      "gold": 3,
+      "pred": 9,
+      "matched": 2,
+      "verdict": "APPROVED",
+      "merge_ready_pred": false
+    }
+  ]
+}

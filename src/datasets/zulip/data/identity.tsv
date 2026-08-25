@@ -1,0 +1,77 @@
+# Zulip display name -> GitHub login -> maintainer flag (zulip-identity/1).
+# Built by src/datasets/zulip/identity.py from the leanprover-community website
+# data (teams.yaml + people.yaml). Pinned in-package because roster drift would
+# otherwise silently change what a rebuild considers a maintainer opinion.
+# 71 people; 63 on a roster team.
+display_name	github	is_maintainer
+Aaron Anderson	awainverse	1
+Aaron Liu	plp127	1
+Adam Topaz	adamtopaz	1
+Alex J. Best	alexjbest	1
+Alexandre Rademaker	arademaker	0
+Anatole Dedecker	adedecker	1
+Andrew Yang	erdone	1
+Anne Baanen	vierkantor	1
+Bhavik Mehta	b-mehta	1
+Bryan Gin-ge Chen	bryangingechen	1
+Chris Henson	chenson2018	0
+Chris Hughes	chrishughes24	0
+Christian Merten	chrisflav	1
+Clark Barrett	barrettcw	0
+Dagur Asgeirsson	dagurtomas	1
+Damiano Testa	adomani	1
+David Loeffler	loefflerd	1
+David Renshaw	dwrensha	1
+Eric Rodriguez Boidi	ericrbg	1
+Eric Wieser	eric-wieser	1
+Etienne Marion	etiennec30	1
+Fabrizio Montesi	fmontesi	0
+Filippo A. E. Nuccio	faenuccio	1
+Floris van Doorn	fpvandoorn	1
+Frédéric Dupuis	dupuisf	1
+Gabriel Ebner	gebner	1
+Hannah Scholz	scholzhannah	1
+Heather Macbeth	hrmacbeth	1
+Jeremy Avigad	avigad	1
+Jiedong Jiang	jjdishere	1
+Jireh Loreaux	j-loreaux	1
+Johan Commelin	jcommelin	1
+Jon Eugster	joneugster	1
+Joseph Myers	jsm28	1
+Jovan Gerbscheid	jovangerb	1
+Joël Riou	joelriou	1
+Julia Markus Himmel	twofx	1
+Junyan Xu	alreadydone	1
+Kevin Buzzard	kbuzzard	1
+Kexing Ying	kex-y	1
+Kim Morrison	kim-em	1
+Kyle Miller	kmill	1
+Leonardo de Moura	leodemoura	1
+Marcelo Lynch	marcelolynch	0
+Mario Carneiro	digama0	1
+María Inés de Frutos-Fernández	mariainesdff	1
+Matthew Robert Ballard	mattrobball	1
+Michael Rothgang	grunweg	1
+Michael Stoll	michaelstollbayreuth	1
+Miyahara Kō	komyyy	1
+Monica Omar	themathqueen	1
+Moritz Doll	mcdoll	1
+Oliver Nash	ocfnash	1
+Patrick Massot	patrickmassot	1
+Reid Barton	rwbarton	1
+Riccardo Brasca	riccardobrasca	1
+Robert Y. Lewis	robertylewis	1
+Robin Carlier	robin-carlier	1
+Ruben Van de Velde	ruben-vandevelde	1
+Rémy Degenne	remydegenne	1
+Sebastian Ullrich	kha	1
+Simon Hudon	cipher1024	1
+Sorrachai Yingchareonthawornchai	sorrachai	0
+Sébastien Gouëzel	sgouezel	1
+Thomas Browning	tb65536	1
+Thomas R. Murrills	thorimur	1
+Wojciech Nawrocki	vtec234	0
+Yakov Pechersky	pechersky	1
+Yaël Dillies	yaeldillies	1
+Yongxi Lin	coolrmal	1
+Yury G. Kudryashov	urkud	1

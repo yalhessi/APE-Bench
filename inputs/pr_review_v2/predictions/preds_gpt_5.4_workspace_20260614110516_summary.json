@@ -1,0 +1,12 @@
+{
+  "predictions": 2,
+  "parse_failures": 0,
+  "merge_ready_true": 2,
+  "merge_ready_false": 0,
+  "findings_total": 0,
+  "findings_blocking": 0,
+  "anchored_findings": 0,
+  "input_tokens": 36015,
+  "output_tokens": 1263,
+  "cost_usd": 0.1246
+}

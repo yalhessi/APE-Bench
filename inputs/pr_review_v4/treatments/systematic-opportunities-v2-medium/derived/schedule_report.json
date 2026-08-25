@@ -1,0 +1,18 @@
+{
+  "by_method": {
+    "baseline_failure.v1": 442,
+    "canonical_api_search.v1": 250,
+    "lint_norm.v1": 489,
+    "naming_contrast.v1": 212,
+    "repository_policy.v1": 375,
+    "wrapper_composition.v1": 273
+  },
+  "cross_work_unit_tasks": 516,
+  "max_related_changes": 26,
+  "prs": 16,
+  "scheduler_version": "systematic-investigation-scheduler/1",
+  "schema_version": "investigation-schedule-report1",
+  "source_sha256": "2d0279d1e46dba3ec9757fe4ec160d04c0c992b995995c589e260ba12a1dd187",
+  "tasks": 2041,
+  "tasks_with_related_changes": 609
+}

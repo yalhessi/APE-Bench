@@ -1,0 +1,1697 @@
+{
+  "gold_file": "inputs/pr_review_v2/mathlib_pr_review_v2_actionable_20260618.jsonl",
+  "line_slack": 10,
+  "matcher_model": "gpt_5_mini",
+  "definitions": {
+    "covered": "located prediction passes topical gate (recall hit)",
+    "located_miss": "prediction at the gold location but topical gate rejects all (SELECTION gap: generator reached the spot, wrong concern)",
+    "untouched": "no prediction near the gold location (COVERAGE gap)"
+  },
+  "pools": {
+    "gpt_5.4 holistic": {
+      "anchored_gold": 115,
+      "covered": 12,
+      "located_miss": 13,
+      "untouched": 90,
+      "recall": 0.104,
+      "located_miss_rate": 0.113,
+      "untouched_rate": 0.783,
+      "miss_total": 103,
+      "selection_share_of_miss": 0.126,
+      "coverage_share_of_miss": 0.874,
+      "by_stratum": {
+        "V1": {
+          "covered": 1,
+          "located_miss": 0,
+          "untouched": 1,
+          "gold": 2,
+          "located_miss_rate": 0.0,
+          "untouched_rate": 0.5
+        },
+        "V2": {
+          "covered": 2,
+          "located_miss": 11,
+          "untouched": 43,
+          "gold": 56,
+          "located_miss_rate": 0.196,
+          "untouched_rate": 0.768
+        },
+        "V3": {
+          "covered": 8,
+          "located_miss": 2,
+          "untouched": 43,
+          "gold": 53,
+          "located_miss_rate": 0.038,
+          "untouched_rate": 0.811
+        },
+        "V4": {
+          "covered": 1,
+          "located_miss": 0,
+          "untouched": 3,
+          "gold": 4,
+          "located_miss_rate": 0.0,
+          "untouched_rate": 0.75
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33373,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean:244",
+            "gold": "```suggestion\n  simp [sub_eq_add_neg, iteratedDeriv_comp_add_const]\n```",
+            "nearby_preds": [
+              "The two new lemmas are missing docstrings, which makes this section inconsistent with the adjacent `iteratedDeriv_comp_c"
+            ]
+          },
+          {
+            "pr": 33373,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean:253",
+            "gold": "```suggestion\n  simpa [funext_iff, neg_add_eq_sub, iteratedDeriv_comp_add_const] using\n    iteratedDeriv_comp_neg n (fun z => f (z + s))\n```",
+            "nearby_preds": [
+              "The two new lemmas are missing docstrings, which makes this section inconsistent with the adjacent `iteratedDeriv_comp_c"
+            ]
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r",
+            "nearby_preds": [
+              "The new subtraction API is only half-complete: you add `sub_right_injective_of_ne_top` / `sub_right_inj_of_ne_top`, but "
+            ]
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:50",
+            "gold": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsM",
+            "nearby_preds": [
+              "The additive docstring for `IsMulIndecomposable.baseOf` has a typo: 'crystallogrphic' should be 'crystallographic'."
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:811",
+            "gold": "```suggestion\r\n  property i j Z gi gj h := by\r\n    simp [← FunctorToTypes.map_comp_apply, ← op_comp, h]\r\n```",
+            "nearby_preds": [
+              "The new public theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` has a typo (`Compabible`), and it is alread"
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:856",
+            "gold": "```suggestion\r\n      IsSheafFor P (Presieve.ofArrows _ (fun i ↦ (Over.map p).map (f i))) := by\r\n```",
+            "nearby_preds": [
+              "The new public theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` has a typo (`Compabible`), and it is alread"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:171",
+            "gold": "```suggestion\ntheorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` duplicate existing closure/order API instead of reusin"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:183",
+            "gold": "```suggestion\ntheorem Dense.lowerBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` duplicate existing closure/order API instead of reusin"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:195",
+            "gold": "```suggestion\ntheorem Dense.ciSup {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` duplicate existing closure/order API instead of reusin"
+            ]
+          },
+          {
+            "pr": 33117,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/Meromorphic/Basic.lean:730",
+            "gold": "There is some new metaprogramming that can help here: the `to_fun` attribute.\nTo get access, you need to add `import Mathlib.Tactic.ToFun` to the imports (doesn",
+            "nearby_preds": [
+              "After introducing `Meromorphic` as the global shorthand, the file still leaves the two main global consequences (`counta"
+            ]
+          },
+          {
+            "pr": 33111,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/Monotone/Defs.lean:329",
+            "gold": "why not call it `injective_of_eq_imp_le`?",
+            "nearby_preds": [
+              "The PR description says `injective_of_lt_imp_ne` should be renamed to `Function.Injective.of_lt_imp_ne` for dot notation"
+            ]
+          },
+          {
+            "pr": 33111,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/Monotone/Defs.lean:323",
+            "gold": "if you move the new lemma before this one, you could do\r\n```suggestion\r\n  exact injective_of_eq_imp_le f fun {x y} ↦\r\n    not_lt (α := α) |>.eq ▸ imp_not_comm.m",
+            "nearby_preds": [
+              "The PR description says `injective_of_lt_imp_ne` should be renamed to `Function.Injective.of_lt_imp_ne` for dot notation"
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Algebra/Order/Floor.lean:211",
+            "gold": "Is this not something very general that should exist as a lemma? Same in the next theorem"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/Floor/Ring.lean:277",
+            "gold": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by"
+          },
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:231",
+            "gold": "```suggestion\r\n  | 0 => by simp_all\r\n```"
+          },
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`"
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`"
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33356,
+            "stratum": "V2",
+            "loc": "Mathlib/NumberTheory/ModularForms/ArithmeticSubgroups.lean:48",
+            "gold": "```suggestion\r\n  refine ⟨fun h {g} hg ↦ h.abs_det hg, fun h ↦ ⟨?_⟩⟩\r\n```"
+          },
+          {
+            "pr": 33343,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/StandardPart.lean:409",
+            "gold": "```suggestion\n    exact h\n```\nI think it is better to be explicit here, especially when it is not syntactically eq"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+            "gold": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```"
+          }
+        ]
+      }
+    },
+    "gpt_5.2 holistic": {
+      "anchored_gold": 115,
+      "covered": 36,
+      "located_miss": 40,
+      "untouched": 39,
+      "recall": 0.313,
+      "located_miss_rate": 0.348,
+      "untouched_rate": 0.339,
+      "miss_total": 79,
+      "selection_share_of_miss": 0.506,
+      "coverage_share_of_miss": 0.494,
+      "by_stratum": {
+        "V1": {
+          "covered": 1,
+          "located_miss": 1,
+          "untouched": 0,
+          "gold": 2,
+          "located_miss_rate": 0.5,
+          "untouched_rate": 0.0
+        },
+        "V2": {
+          "covered": 15,
+          "located_miss": 19,
+          "untouched": 22,
+          "gold": 56,
+          "located_miss_rate": 0.339,
+          "untouched_rate": 0.393
+        },
+        "V3": {
+          "covered": 18,
+          "located_miss": 19,
+          "untouched": 16,
+          "gold": 53,
+          "located_miss_rate": 0.358,
+          "untouched_rate": 0.302
+        },
+        "V4": {
+          "covered": 2,
+          "located_miss": 1,
+          "untouched": 1,
+          "gold": 4,
+          "located_miss_rate": 0.25,
+          "untouched_rate": 0.25
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Algebra/Order/Floor.lean:211",
+            "gold": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+            "nearby_preds": [
+              "`tendsto_round_nhdsGE_pure` / `tendsto_round_nhdsLT_pure_half_ceil` / `continuousAt_round` / `continuousOn_round` rewrit"
+            ]
+          },
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`",
+            "nearby_preds": [
+              "The new `n = 0` case proof has an unfinished hole `?_` (in `Subgroup.closure_eq_bot_iff.mpr ?_`), and even if filled it "
+            ]
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`",
+            "nearby_preds": [
+              "The new lemma is named `contDiffAt` but is not marked `protected`, unlike the nearby API (`continuous`, `differentiable`"
+            ]
+          },
+          {
+            "pr": 33395,
+            "stratum": "V4",
+            "loc": "Mathlib/Algebra/Star/LinearMap.lean:132",
+            "gold": "I like this the best. It's verbose, but I would have trouble guessing what you were going to write on the other side of `eq` without this.\n```suggestion\ntheorem",
+            "nearby_preds": [
+              "The new lemmas `intrinsicStar_toSpanSingleton` and `intrinsicStar_smulRight` are not under `open scoped IntrinsicStar`, ",
+              "`section starAddMonoidSemiring` introduces `S` with `[Semiring S] [StarAddMonoid S] [StarModule S S]` etc., but it does ",
+              "The section is renamed from `TensorProduct` to `CommSemiring`, but it still only contains tensor-product-related lemmas "
+            ]
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?",
+            "nearby_preds": [
+              "`rayleighQuotient_add` is a useful lemma, but please consider whether it already exists (possibly under a different name",
+              "The change `let c : 𝕜 := ‖x‖⁻¹ * r` relies on coercions from `ℝ` to `𝕜`. This is fine, but it’s slightly less explicit t"
+            ]
+          },
+          {
+            "pr": 33343,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/StandardPart.lean:409",
+            "gold": "```suggestion\n    exact h\n```\nI think it is better to be explicit here, especially when it is not syntactically eq",
+            "nearby_preds": [
+              "`stdPart_nonpos` has the wrong statement: it proves `0 ≤ stdPart (-x)` (via `stdPart_nonneg` on `-x`) rather than `stdPa"
+            ]
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```",
+            "nearby_preds": [
+              "The deprecation timeline is a bit unusual: `orthogonalProjection_eq_linear_proj` is deprecated since 2025-07-11, while t"
+            ]
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+            "gold": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```",
+            "nearby_preds": [
+              "The deprecation timeline is a bit unusual: `orthogonalProjection_eq_linear_proj` is deprecated since 2025-07-11, while t"
+            ]
+          },
+          {
+            "pr": 33332,
+            "stratum": "V1",
+            "loc": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean:254",
+            "gold": "The names aren't used anymore\r\n```suggestion\r\n  | cons h p ih =>\r\n```",
+            "nearby_preds": [
+              "`adj_of_mem_walk_support` is now a single `grind` call, but the PR description shows a trace-profile regression (33ms → "
+            ]
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:50",
+            "gold": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsM",
+            "nearby_preds": [
+              "Spelling/typos in docstring: “crystallogrphic” should be “crystallographic”."
+            ]
+          },
+          {
+            "pr": 33310,
+            "stratum": "V3",
+            "loc": "Mathlib/RingTheory/WittVector/Complete.lean:101",
+            "gold": "It seems more logical to me to keep `ker` in the LHS, as arguably the RHS is a \"more basic term\" as compared to the LHS.",
+            "nearby_preds": [
+              "`quotientPEquiv` is a nonstandard name and the statement uses the low-level quotient `⧸ Ideal.span {(p : 𝕎 k)}`; this wi",
+              "The definition provides no API: there are no simp lemmas identifying the forward map as `Ideal.Quotient.lift _ constantC",
+              "The kernel computation can be shorter and more robust if written using existing lemmas about `RingHom.ker_eq_comap_bot`/"
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:811",
+            "gold": "```suggestion\r\n  property i j Z gi gj h := by\r\n    simp [← FunctorToTypes.map_comp_apply, ← op_comp, h]\r\n```",
+            "nearby_preds": [
+              "There is a spelling error in the theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` (\"Compabible\"). This will",
+              "`Arrows.toCompatible` is declared as `def ... (s : P.obj (op B)) : Subtype (Arrows.Compatible P π)`, i.e. as a function "
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r"
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+            "gold": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```"
+          },
+          {
+            "pr": 33294,
+            "stratum": "V2",
+            "loc": "Mathlib/SetTheory/Ordinal/Topology.lean:186",
+            "gold": "```suggestion\r\n    rw [h.map_iSup (bddAbove_of_small _)]\r\n```\r\nno?\r\n"
+          },
+          {
+            "pr": 33285,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Module/Submodule/Map.lean:597",
+            "gold": "here's an even better golf\r\n```suggestion\r\n    comap f₁ q ⊓ comap f₂ q ≤ comap (f₁ + f₂) q :=\r\n  fun _ h ↦ mem_comap.mpr <| add_mem h.1 h.2\r\n```"
+          },
+          {
+            "pr": 33285,
+            "stratum": "V2",
+            "loc": "Mathlib/RingTheory/Ideal/Cotangent.lean:158",
+            "gold": "or\r\n```lean\r\n  simp [I.cotangentEquivIdeal.symm_apply_eq, Subtype.ext_iff]\r\n```\r\nor\r\n```lean\r\n  exact I.cotangentEquivIdeal.injective (I.cotangentEquivIdeal.app"
+          },
+          {
+            "pr": 33267,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/WithBot.lean:899",
+            "gold": "I feel like this theorem should not be applied; it can just be `toDual_symm`. But that is outside the scope of this PR."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:905",
+            "gold": "And this could just be called `toDual_bot`."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:902",
+            "gold": "Since the WithBot namespace is open, you can avoid the `WithBot.`"
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:950",
+            "gold": "I think the indentation where the whole statement fits one  one line is actually preferred."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/WithBot.lean:882",
+            "gold": "```suggestion\nSee `WithBot.toDualTopEquiv` for the related order-iso. -/\n```\nLooks like this was renamed at some point: https://leanprover-community.github.io/m"
+          }
+        ]
+      }
+    },
+    "gpt_5.4 composed": {
+      "anchored_gold": 115,
+      "covered": 13,
+      "located_miss": 25,
+      "untouched": 77,
+      "recall": 0.113,
+      "located_miss_rate": 0.217,
+      "untouched_rate": 0.67,
+      "miss_total": 102,
+      "selection_share_of_miss": 0.245,
+      "coverage_share_of_miss": 0.755,
+      "by_stratum": {
+        "V1": {
+          "covered": 0,
+          "located_miss": 1,
+          "untouched": 1,
+          "gold": 2,
+          "located_miss_rate": 0.5,
+          "untouched_rate": 0.5
+        },
+        "V2": {
+          "covered": 8,
+          "located_miss": 14,
+          "untouched": 34,
+          "gold": 56,
+          "located_miss_rate": 0.25,
+          "untouched_rate": 0.607
+        },
+        "V3": {
+          "covered": 4,
+          "located_miss": 9,
+          "untouched": 40,
+          "gold": 53,
+          "located_miss_rate": 0.17,
+          "untouched_rate": 0.755
+        },
+        "V4": {
+          "covered": 1,
+          "located_miss": 1,
+          "untouched": 2,
+          "gold": 4,
+          "located_miss_rate": 0.25,
+          "untouched_rate": 0.5
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`",
+            "nearby_preds": [
+              "The `n = 0` branch of `closure_pow_le` can be shortened substantially: since `s ^ 0 = ∅`, the goal is just `⊥ ≤ closure "
+            ]
+          },
+          {
+            "pr": 33395,
+            "stratum": "V4",
+            "loc": "Mathlib/Algebra/Star/LinearMap.lean:132",
+            "gold": "I like this the best. It's verbose, but I would have trouble guessing what you were going to write on the other side of `eq` without this.\n```suggestion\ntheorem",
+            "nearby_preds": [
+              "`intrinsicStar_toSpanSingleton` is under-general in its binder list: the theorem quantifies over `a : E` and uses `toSpa"
+            ]
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?",
+            "nearby_preds": [
+              "`rayleighQuotient_add` is already very short, but its proof can be collapsed to a one-line `by simp` proof exactly as wr"
+            ]
+          },
+          {
+            "pr": 33373,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean:253",
+            "gold": "```suggestion\n  simpa [funext_iff, neg_add_eq_sub, iteratedDeriv_comp_add_const] using\n    iteratedDeriv_comp_neg n (fun z => f (z + s))\n```",
+            "nearby_preds": [
+              "`iteratedDeriv_comp_sub_const` can be shortened by using `deriv_comp_sub_const` directly under `funext`, just like the a",
+              "`iteratedDeriv_comp_sub_const` is an exact duplicate of the existing `iteratedDeriv_comp_add_const` after rewriting subt"
+            ]
+          },
+          {
+            "pr": 33332,
+            "stratum": "V1",
+            "loc": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean:254",
+            "gold": "The names aren't used anymore\r\n```suggestion\r\n  | cons h p ih =>\r\n```",
+            "nearby_preds": [
+              "`adj_of_mem_walk_support` can be kept as a direct structured proof but shortened noticeably versus the pre-PR version, w"
+            ]
+          },
+          {
+            "pr": 33208,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:36",
+            "gold": "I found the statement a bit hard to parse, so I found myself wanting a more informative docstring. Please check that my interpretation is correct, or otherwise ",
+            "nearby_preds": [
+              "`IsMulIndecomposable_id_univ` can be shortened to a one-line `simp` proof by unfolding `IsMulIndecomposable` and `irredu",
+              "`IsMulIndecomposable_id_univ` is slightly under-general: the `hx : x ≠ 1` parameter can be removed if the set argument i"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:171",
+            "gold": "```suggestion\ntheorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` can be shortened by dropping the intermediate `subset_trans` wrapper and proving the forw"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:183",
+            "gold": "```suggestion\ntheorem Dense.lowerBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` can be shortened by dropping the intermediate `subset_trans` wrapper and proving the forw",
+              "`Dense.continuous_lowerBounds` admits the same minor golf as the upper-bound version: the proof can be written directly "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:195",
+            "gold": "```suggestion\ntheorem Dense.ciSup {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_lowerBounds` admits the same minor golf as the upper-bound version: the proof can be written directly ",
+              "`Dense.continuous_sup` is under-general: the hypothesis `BddAbove (range f)` can be weakened to `BddAbove (f '' S)`. By "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:208",
+            "gold": "```suggestion\ntheorem Dense.ciInf {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_sup` is under-general: the hypothesis `BddAbove (range f)` can be weakened to `BddAbove (f '' S)`. By ",
+              "`Dense.continuous_inf` is under-general: the hypothesis `BddBelow (range f)` can be weakened to `BddBelow (f '' S)`. By "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:217",
+            "gold": "```suggestion\n    ⨅ i, f i = ⨅ s : S, f s :=\n  hS.ciSup (α := αᵒᵈ) hf h\n```",
+            "nearby_preds": [
+              "`Dense.continuous_inf` is under-general: the hypothesis `BddBelow (range f)` can be weakened to `BddBelow (f '' S)`. By "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:221",
+            "gold": "```suggestion\ntheorem Dense.ciSup' {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_inf` is under-general: the hypothesis `BddBelow (range f)` can be weakened to `BddBelow (f '' S)`. By "
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Algebra/Order/Floor.lean:211",
+            "gold": "Is this not something very general that should exist as a lemma? Same in the next theorem"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/Floor/Ring.lean:277",
+            "gold": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by"
+          },
+          {
+            "pr": 33419,
+            "stratum": "V3",
+            "loc": "Mathlib/Data/Finset/Card.lean:577",
+            "gold": "I couldn't parse the name you proposed.\n```suggestion\nlemma card_sub_card_eq (s t : Finset α) : #t - #s = #(t \\ s) - #(s \\ t) :=\n```"
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r"
+          },
+          {
+            "pr": 33345,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/Archimedean.lean:75",
+            "gold": "Probabily a good idea to fix that simultaneousily\r\n```suggestion\r\n/-- Multiplication in `R` transfers to Addition in `ArchimedeanClass R`. -/\r\n```"
+          },
+          {
+            "pr": 33343,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/StandardPart.lean:409",
+            "gold": "```suggestion\n    exact h\n```\nI think it is better to be explicit here, especially when it is not syntactically eq"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+            "gold": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:47",
+            "gold": "```suggestion\nIn the case that `v` is the set of roots of a crystallographic root system, and `S = ℚ`, this is the\n```"
+          }
+        ]
+      }
+    },
+    "gpt_5.2 composed": {
+      "anchored_gold": 115,
+      "covered": 14,
+      "located_miss": 21,
+      "untouched": 80,
+      "recall": 0.122,
+      "located_miss_rate": 0.183,
+      "untouched_rate": 0.696,
+      "miss_total": 101,
+      "selection_share_of_miss": 0.208,
+      "coverage_share_of_miss": 0.792,
+      "by_stratum": {
+        "V1": {
+          "covered": 0,
+          "located_miss": 0,
+          "untouched": 2,
+          "gold": 2,
+          "located_miss_rate": 0.0,
+          "untouched_rate": 1.0
+        },
+        "V2": {
+          "covered": 9,
+          "located_miss": 14,
+          "untouched": 33,
+          "gold": 56,
+          "located_miss_rate": 0.25,
+          "untouched_rate": 0.589
+        },
+        "V3": {
+          "covered": 4,
+          "located_miss": 7,
+          "untouched": 42,
+          "gold": 53,
+          "located_miss_rate": 0.132,
+          "untouched_rate": 0.792
+        },
+        "V4": {
+          "covered": 1,
+          "located_miss": 0,
+          "untouched": 3,
+          "gold": 4,
+          "located_miss_rate": 0.0,
+          "untouched_rate": 0.75
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33419,
+            "stratum": "V3",
+            "loc": "Mathlib/Data/Finset/Card.lean:577",
+            "gold": "I couldn't parse the name you proposed.\n```suggestion\nlemma card_sub_card_eq (s t : Finset α) : #t - #s = #(t \\ s) - #(s \\ t) :=\n```",
+            "nearby_preds": [
+              "`eq_card_diff_of_sdiff` can be shortened: the whole `calc` chain is solved by `grind` directly."
+            ]
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`",
+            "nearby_preds": [
+              "`contDiffAt` can be shortened to a one-liner `by simpa` proof.",
+              "`SchwartzMap.contDiffAt` is a duplicate: it is an immediate consequence of the existing lemma `SchwartzMap.smooth` via `"
+            ]
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?",
+            "nearby_preds": [
+              "`rayleighQuotient_add` can be proved by a single `simp` without expanding `reApplyInnerSelf_apply` etc. Explicit `inner_"
+            ]
+          },
+          {
+            "pr": 33345,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/Archimedean.lean:75",
+            "gold": "Probabily a good idea to fix that simultaneousily\r\n```suggestion\r\n/-- Multiplication in `R` transfers to Addition in `ArchimedeanClass R`. -/\r\n```",
+            "nearby_preds": [
+              "In the `Add` instance, the `by exact` wrapper is unnecessary; the proof term can be given directly."
+            ]
+          },
+          {
+            "pr": 33208,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:31",
+            "gold": "```suggestion\nlemma isMulIndecomposable_id_univ [Subsingleton Mˣ] {x : M} (hx : x ≠ 1) :\n```",
+            "nearby_preds": [
+              "`IsMulIndecomposable_id_univ` can be rewritten in a more direct structured way by unfolding `IsMulIndecomposable` once a"
+            ]
+          },
+          {
+            "pr": 33208,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:36",
+            "gold": "I found the statement a bit hard to parse, so I found myself wanting a more informative docstring. Please check that my interpretation is correct, or otherwise ",
+            "nearby_preds": [
+              "`IsMulIndecomposable_id_univ` can be rewritten in a more direct structured way by unfolding `IsMulIndecomposable` once a"
+            ]
+          },
+          {
+            "pr": 33146,
+            "stratum": "V3",
+            "loc": "Mathlib/CategoryTheory/Category/Basic.lean:232",
+            "gold": "Might as well fix some capitalization.\r\n```suggestion\r\n/-- Precompose an equation between morphisms by another morphism -/]\r\n```",
+            "nearby_preds": [
+              "`Category.assoc'` can be a one-liner using `by simp` (or `by simpa`) rather than an explicit term."
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:171",
+            "gold": "```suggestion\ntheorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` can be stated with the weaker assumption `[OrderClosedTopology α]` instead of `[ClosedIic",
+              "`Dense.continuous_lowerBounds` can be stated with the weaker assumption `[OrderClosedTopology α]` instead of `[ClosedIci"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:191",
+            "gold": "There's a trick you can use for this kind of thing by using the `OrderDual`.\n```suggestion\n    lowerBounds (f '' S) = lowerBounds (range f) :=\n  hS.continuous_u",
+            "nearby_preds": [
+              "`Dense.continuous_lowerBounds` can be stated with the weaker assumption `[OrderClosedTopology α]` instead of `[ClosedIci",
+              "`Dense.continuous_sup` can weaken `[ClosedIicTopology α]` to `[OrderClosedTopology α]`. The proof only needs that `Iic` "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:195",
+            "gold": "```suggestion\ntheorem Dense.ciSup {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_lowerBounds` can be stated with the weaker assumption `[OrderClosedTopology α]` instead of `[ClosedIci",
+              "`Dense.continuous_sup` can weaken `[ClosedIicTopology α]` to `[OrderClosedTopology α]`. The proof only needs that `Iic` "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:208",
+            "gold": "```suggestion\ntheorem Dense.ciInf {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_sup` can weaken `[ClosedIicTopology α]` to `[OrderClosedTopology α]`. The proof only needs that `Iic` ",
+              "`Dense.continuous_inf` can weaken `[ClosedIciTopology α]` to `[OrderClosedTopology α]`, by the same reasoning as for `De"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:217",
+            "gold": "```suggestion\n    ⨅ i, f i = ⨅ s : S, f s :=\n  hS.ciSup (α := αᵒᵈ) hf h\n```",
+            "nearby_preds": [
+              "`Dense.continuous_inf` can weaken `[ClosedIciTopology α]` to `[OrderClosedTopology α]`, by the same reasoning as for `De"
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Algebra/Order/Floor.lean:211",
+            "gold": "Is this not something very general that should exist as a lemma? Same in the next theorem"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/Floor/Ring.lean:277",
+            "gold": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by"
+          },
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:231",
+            "gold": "```suggestion\r\n  | 0 => by simp_all\r\n```"
+          },
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`"
+          },
+          {
+            "pr": 33395,
+            "stratum": "V4",
+            "loc": "Mathlib/Algebra/Star/LinearMap.lean:132",
+            "gold": "I like this the best. It's verbose, but I would have trouble guessing what you were going to write on the other side of `eq` without this.\n```suggestion\ntheorem"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r"
+          },
+          {
+            "pr": 33343,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/StandardPart.lean:409",
+            "gold": "```suggestion\n    exact h\n```\nI think it is better to be explicit here, especially when it is not syntactically eq"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+            "gold": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33332,
+            "stratum": "V1",
+            "loc": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean:254",
+            "gold": "The names aren't used anymore\r\n```suggestion\r\n  | cons h p ih =>\r\n```"
+          }
+        ]
+      }
+    },
+    "gpt_5.4 union (hol+comp)": {
+      "anchored_gold": 115,
+      "covered": 23,
+      "located_miss": 28,
+      "untouched": 64,
+      "recall": 0.2,
+      "located_miss_rate": 0.243,
+      "untouched_rate": 0.557,
+      "miss_total": 92,
+      "selection_share_of_miss": 0.304,
+      "coverage_share_of_miss": 0.696,
+      "by_stratum": {
+        "V1": {
+          "covered": 1,
+          "located_miss": 1,
+          "untouched": 0,
+          "gold": 2,
+          "located_miss_rate": 0.5,
+          "untouched_rate": 0.0
+        },
+        "V2": {
+          "covered": 8,
+          "located_miss": 19,
+          "untouched": 29,
+          "gold": 56,
+          "located_miss_rate": 0.339,
+          "untouched_rate": 0.518
+        },
+        "V3": {
+          "covered": 12,
+          "located_miss": 8,
+          "untouched": 33,
+          "gold": 53,
+          "located_miss_rate": 0.151,
+          "untouched_rate": 0.623
+        },
+        "V4": {
+          "covered": 2,
+          "located_miss": 0,
+          "untouched": 2,
+          "gold": 4,
+          "located_miss_rate": 0.0,
+          "untouched_rate": 0.5
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`",
+            "nearby_preds": [
+              "The `n = 0` branch of `closure_pow_le` can be shortened substantially: since `s ^ 0 = ∅`, the goal is just `⊥ ≤ closure "
+            ]
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?",
+            "nearby_preds": [
+              "`rayleighQuotient_add` is already very short, but its proof can be collapsed to a one-line `by simp` proof exactly as wr"
+            ]
+          },
+          {
+            "pr": 33373,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean:253",
+            "gold": "```suggestion\n  simpa [funext_iff, neg_add_eq_sub, iteratedDeriv_comp_add_const] using\n    iteratedDeriv_comp_neg n (fun z => f (z + s))\n```",
+            "nearby_preds": [
+              "The two new lemmas are missing docstrings, which makes this section inconsistent with the adjacent `iteratedDeriv_comp_c",
+              "`iteratedDeriv_comp_sub_const` can be shortened by using `deriv_comp_sub_const` directly under `funext`, just like the a",
+              "`iteratedDeriv_comp_sub_const` is an exact duplicate of the existing `iteratedDeriv_comp_add_const` after rewriting subt"
+            ]
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r",
+            "nearby_preds": [
+              "The new subtraction API is only half-complete: you add `sub_right_injective_of_ne_top` / `sub_right_inj_of_ne_top`, but "
+            ]
+          },
+          {
+            "pr": 33332,
+            "stratum": "V1",
+            "loc": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean:254",
+            "gold": "The names aren't used anymore\r\n```suggestion\r\n  | cons h p ih =>\r\n```",
+            "nearby_preds": [
+              "`adj_of_mem_walk_support` can be kept as a direct structured proof but shortened noticeably versus the pre-PR version, w"
+            ]
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:50",
+            "gold": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsM",
+            "nearby_preds": [
+              "The additive docstring for `IsMulIndecomposable.baseOf` has a typo: 'crystallogrphic' should be 'crystallographic'."
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:811",
+            "gold": "```suggestion\r\n  property i j Z gi gj h := by\r\n    simp [← FunctorToTypes.map_comp_apply, ← op_comp, h]\r\n```",
+            "nearby_preds": [
+              "The new public theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` has a typo (`Compabible`), and it is alread"
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:856",
+            "gold": "```suggestion\r\n      IsSheafFor P (Presieve.ofArrows _ (fun i ↦ (Over.map p).map (f i))) := by\r\n```",
+            "nearby_preds": [
+              "The new public theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` has a typo (`Compabible`), and it is alread"
+            ]
+          },
+          {
+            "pr": 33208,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:36",
+            "gold": "I found the statement a bit hard to parse, so I found myself wanting a more informative docstring. Please check that my interpretation is correct, or otherwise ",
+            "nearby_preds": [
+              "`IsMulIndecomposable_id_univ` can be shortened to a one-line `simp` proof by unfolding `IsMulIndecomposable` and `irredu",
+              "`IsMulIndecomposable_id_univ` is slightly under-general: the `hx : x ≠ 1` parameter can be removed if the set argument i"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:171",
+            "gold": "```suggestion\ntheorem Dense.upperBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` duplicate existing closure/order API instead of reusin",
+              "`Dense.continuous_upperBounds` can be shortened by dropping the intermediate `subset_trans` wrapper and proving the forw"
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:183",
+            "gold": "```suggestion\ntheorem Dense.lowerBounds_image {α : Type*} [TopologicalSpace α] [Preorder α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` duplicate existing closure/order API instead of reusin",
+              "`Dense.continuous_upperBounds` can be shortened by dropping the intermediate `subset_trans` wrapper and proving the forw",
+              "`Dense.continuous_lowerBounds` admits the same minor golf as the upper-bound version: the proof can be written directly "
+            ]
+          },
+          {
+            "pr": 33145,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Order/IsLUB.lean:195",
+            "gold": "```suggestion\ntheorem Dense.ciSup {α : Type*} [TopologicalSpace α]\n```",
+            "nearby_preds": [
+              "`Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` duplicate existing closure/order API instead of reusin",
+              "`Dense.continuous_lowerBounds` admits the same minor golf as the upper-bound version: the proof can be written directly ",
+              "`Dense.continuous_sup` is under-general: the hypothesis `BddAbove (range f)` can be weakened to `BddAbove (f '' S)`. By "
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Algebra/Order/Floor.lean:211",
+            "gold": "Is this not something very general that should exist as a lemma? Same in the next theorem"
+          },
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/Floor/Ring.lean:277",
+            "gold": "Better I think as\r\n```suggestion\r\ntheorem mul_fract_eq_one_iff_exists_int {x : R} {k : R} (hk : 1 < k) :\r\n    k * fract x = 1 ↔ ∃ n : ℤ, k * x = k * n + 1 := by"
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33343,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/StandardPart.lean:409",
+            "gold": "```suggestion\n    exact h\n```\nI think it is better to be explicit here, especially when it is not syntactically eq"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+            "gold": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```"
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+            "gold": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```"
+          },
+          {
+            "pr": 33316,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Basic.lean:129",
+            "gold": "Getting rid of the duplication is fine, but the other name comes off as more readable to me. I thought using non-ASCII characters in declarations was generally "
+          },
+          {
+            "pr": 33294,
+            "stratum": "V3",
+            "loc": "Mathlib/SetTheory/Cardinal/Cofinality.lean:535",
+            "gold": "```suggestion\r\ntheorem isFundamentalSequence.of_isNormal {f : Ordinal.{u} → Ordinal.{u}} (hf : IsNormal f)\r\n```"
+          },
+          {
+            "pr": 33294,
+            "stratum": "V2",
+            "loc": "Mathlib/SetTheory/Ordinal/Topology.lean:186",
+            "gold": "```suggestion\r\n    rw [h.map_iSup (bddAbove_of_small _)]\r\n```\r\nno?\r\n"
+          }
+        ]
+      }
+    },
+    "gpt_5.2 union (hol+comp)": {
+      "anchored_gold": 115,
+      "covered": 42,
+      "located_miss": 42,
+      "untouched": 31,
+      "recall": 0.365,
+      "located_miss_rate": 0.365,
+      "untouched_rate": 0.27,
+      "miss_total": 73,
+      "selection_share_of_miss": 0.575,
+      "coverage_share_of_miss": 0.425,
+      "by_stratum": {
+        "V1": {
+          "covered": 1,
+          "located_miss": 1,
+          "untouched": 0,
+          "gold": 2,
+          "located_miss_rate": 0.5,
+          "untouched_rate": 0.0
+        },
+        "V2": {
+          "covered": 19,
+          "located_miss": 23,
+          "untouched": 14,
+          "gold": 56,
+          "located_miss_rate": 0.411,
+          "untouched_rate": 0.25
+        },
+        "V3": {
+          "covered": 20,
+          "located_miss": 17,
+          "untouched": 16,
+          "gold": 53,
+          "located_miss_rate": 0.321,
+          "untouched_rate": 0.302
+        },
+        "V4": {
+          "covered": 2,
+          "located_miss": 1,
+          "untouched": 1,
+          "gold": 4,
+          "located_miss_rate": 0.25,
+          "untouched_rate": 0.25
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33421,
+            "stratum": "V2",
+            "loc": "Mathlib/Topology/Algebra/Order/Floor.lean:211",
+            "gold": "Is this not something very general that should exist as a lemma? Same in the next theorem",
+            "nearby_preds": [
+              "`tendsto_round_nhdsGE_pure` / `tendsto_round_nhdsLT_pure_half_ceil` / `continuousAt_round` / `continuousOn_round` rewrit"
+            ]
+          },
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`",
+            "nearby_preds": [
+              "The new `n = 0` case proof has an unfinished hole `?_` (in `Subgroup.closure_eq_bot_iff.mpr ?_`), and even if filled it "
+            ]
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`",
+            "nearby_preds": [
+              "The new lemma is named `contDiffAt` but is not marked `protected`, unlike the nearby API (`continuous`, `differentiable`",
+              "`contDiffAt` can be shortened to a one-liner `by simpa` proof.",
+              "`SchwartzMap.contDiffAt` is a duplicate: it is an immediate consequence of the existing lemma `SchwartzMap.smooth` via `"
+            ]
+          },
+          {
+            "pr": 33395,
+            "stratum": "V4",
+            "loc": "Mathlib/Algebra/Star/LinearMap.lean:132",
+            "gold": "I like this the best. It's verbose, but I would have trouble guessing what you were going to write on the other side of `eq` without this.\n```suggestion\ntheorem",
+            "nearby_preds": [
+              "The new lemmas `intrinsicStar_toSpanSingleton` and `intrinsicStar_smulRight` are not under `open scoped IntrinsicStar`, ",
+              "`section starAddMonoidSemiring` introduces `S` with `[Semiring S] [StarAddMonoid S] [StarModule S S]` etc., but it does ",
+              "The section is renamed from `TensorProduct` to `CommSemiring`, but it still only contains tensor-product-related lemmas "
+            ]
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?",
+            "nearby_preds": [
+              "`rayleighQuotient_add` is a useful lemma, but please consider whether it already exists (possibly under a different name",
+              "The change `let c : 𝕜 := ‖x‖⁻¹ * r` relies on coercions from `ℝ` to `𝕜`. This is fine, but it’s slightly less explicit t",
+              "`rayleighQuotient_add` can be proved by a single `simp` without expanding `reApplyInnerSelf_apply` etc. Explicit `inner_"
+            ]
+          },
+          {
+            "pr": 33343,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Ring/StandardPart.lean:409",
+            "gold": "```suggestion\n    exact h\n```\nI think it is better to be explicit here, especially when it is not syntactically eq",
+            "nearby_preds": [
+              "`stdPart_nonpos` has the wrong statement: it proves `0 ≤ stdPart (-x)` (via `stdPart_nonneg` on `-x`) rather than `stdPa"
+            ]
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```",
+            "nearby_preds": [
+              "The deprecation timeline is a bit unusual: `orthogonalProjection_eq_linear_proj` is deprecated since 2025-07-11, while t"
+            ]
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:209",
+            "gold": "```suggestion\ntheorem toLinearMap_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n```",
+            "nearby_preds": [
+              "The deprecation timeline is a bit unusual: `orthogonalProjection_eq_linear_proj` is deprecated since 2025-07-11, while t"
+            ]
+          },
+          {
+            "pr": 33332,
+            "stratum": "V1",
+            "loc": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean:254",
+            "gold": "The names aren't used anymore\r\n```suggestion\r\n  | cons h p ih =>\r\n```",
+            "nearby_preds": [
+              "`adj_of_mem_walk_support` is now a single `grind` call, but the PR description shows a trace-profile regression (33ms → "
+            ]
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:50",
+            "gold": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsM",
+            "nearby_preds": [
+              "Spelling/typos in docstring: “crystallogrphic” should be “crystallographic”."
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:811",
+            "gold": "```suggestion\r\n  property i j Z gi gj h := by\r\n    simp [← FunctorToTypes.map_comp_apply, ← op_comp, h]\r\n```",
+            "nearby_preds": [
+              "There is a spelling error in the theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` (\"Compabible\"). This will",
+              "`Arrows.toCompatible` is declared as `def ... (s : P.obj (op B)) : Subtype (Arrows.Compatible P π)`, i.e. as a function "
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:856",
+            "gold": "```suggestion\r\n      IsSheafFor P (Presieve.ofArrows _ (fun i ↦ (Over.map p).map (f i))) := by\r\n```",
+            "nearby_preds": [
+              "`isSheafFor_pullback_iff` is marked `[simp]` but has an `IsIso f` assumption; simp-lemmas with typeclass assumptions can"
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r"
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+            "gold": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```"
+          },
+          {
+            "pr": 33294,
+            "stratum": "V2",
+            "loc": "Mathlib/SetTheory/Ordinal/Topology.lean:186",
+            "gold": "```suggestion\r\n    rw [h.map_iSup (bddAbove_of_small _)]\r\n```\r\nno?\r\n"
+          },
+          {
+            "pr": 33285,
+            "stratum": "V2",
+            "loc": "Mathlib/RingTheory/Ideal/Cotangent.lean:158",
+            "gold": "or\r\n```lean\r\n  simp [I.cotangentEquivIdeal.symm_apply_eq, Subtype.ext_iff]\r\n```\r\nor\r\n```lean\r\n  exact I.cotangentEquivIdeal.injective (I.cotangentEquivIdeal.app"
+          },
+          {
+            "pr": 33267,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/WithBot.lean:899",
+            "gold": "I feel like this theorem should not be applied; it can just be `toDual_symm`. But that is outside the scope of this PR."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:905",
+            "gold": "And this could just be called `toDual_bot`."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:902",
+            "gold": "Since the WithBot namespace is open, you can avoid the `WithBot.`"
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:950",
+            "gold": "I think the indentation where the whole statement fits one  one line is actually preferred."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/WithBot.lean:882",
+            "gold": "```suggestion\nSee `WithBot.toDualTopEquiv` for the related order-iso. -/\n```\nLooks like this was renamed at some point: https://leanprover-community.github.io/m"
+          },
+          {
+            "pr": 33201,
+            "stratum": "V2",
+            "loc": "Mathlib/AlgebraicTopology/SimplicialSet/HomotopyCat.lean:500",
+            "gold": "Same here: we already have `Cat.isTerminalOfUniqueOfIsDiscrete`:\r\n```suggestion\r\ninstance (X : Truncated.{u} 2) [Unique (X _⦋0⦌₂)] : Unique X.HomotopyCategory :"
+          }
+        ]
+      }
+    },
+    "grand union (all runs)": {
+      "anchored_gold": 115,
+      "covered": 54,
+      "located_miss": 39,
+      "untouched": 22,
+      "recall": 0.47,
+      "located_miss_rate": 0.339,
+      "untouched_rate": 0.191,
+      "miss_total": 61,
+      "selection_share_of_miss": 0.639,
+      "coverage_share_of_miss": 0.361,
+      "by_stratum": {
+        "V1": {
+          "covered": 1,
+          "located_miss": 1,
+          "untouched": 0,
+          "gold": 2,
+          "located_miss_rate": 0.5,
+          "untouched_rate": 0.0
+        },
+        "V2": {
+          "covered": 23,
+          "located_miss": 24,
+          "untouched": 9,
+          "gold": 56,
+          "located_miss_rate": 0.429,
+          "untouched_rate": 0.161
+        },
+        "V3": {
+          "covered": 27,
+          "located_miss": 14,
+          "untouched": 12,
+          "gold": 53,
+          "located_miss_rate": 0.264,
+          "untouched_rate": 0.226
+        },
+        "V4": {
+          "covered": 3,
+          "located_miss": 0,
+          "untouched": 1,
+          "gold": 4,
+          "located_miss_rate": 0.0,
+          "untouched_rate": 0.25
+        }
+      },
+      "uncached_pairs": 0,
+      "examples": {
+        "located_miss": [
+          {
+            "pr": 33401,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean:232",
+            "gold": "```suggestion\r\n  | n + 1 => by grw [pow_succ, closure_mul_le, closure_pow_le, sup_idem]\r\n```\r\ninstead of the `calc ...`",
+            "nearby_preds": [
+              "The `n = 0` branch of `closure_pow_le` can be shortened substantially: since `s ^ 0 = ∅`, the goal is just `⊥ ≤ closure ",
+              "The new `n = 0` case proof has an unfinished hole `?_` (in `Subgroup.closure_eq_bot_iff.mpr ?_`), and even if filled it ",
+              "`closure_pow_le` now handles `n = 0` but the proof is unnecessarily complex and hard to read; the `n=0` case should be a"
+            ]
+          },
+          {
+            "pr": 33400,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/SchwartzSpace.lean:108",
+            "gold": "pre-existing: I think we should also rename this to `contDiff`",
+            "nearby_preds": [
+              "The new lemma is named `contDiffAt` but is not marked `protected`, unlike the nearby API (`continuous`, `differentiable`",
+              "The new lemma `contDiffAt` is just a one-line corollary of `smooth`; consider whether it is needed as a separate API lem",
+              "`contDiffAt` can be shortened to a one-liner `by simpa` proof."
+            ]
+          },
+          {
+            "pr": 33376,
+            "stratum": "V2",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean:66",
+            "gold": "This is a reasonable lemma, but you're not using it for this PR, right?",
+            "nearby_preds": [
+              "`rayleighQuotient_add` is already very short, but its proof can be collapsed to a one-line `by simp` proof exactly as wr",
+              "`rayleighQuotient_add` is a useful lemma, but please consider whether it already exists (possibly under a different name",
+              "The change `let c : 𝕜 := ‖x‖⁻¹ * r` relies on coercions from `ℝ` to `𝕜`. This is fine, but it’s slightly less explicit t"
+            ]
+          },
+          {
+            "pr": 33349,
+            "stratum": "V2",
+            "loc": "Mathlib/Algebra/Order/AddGroupWithTop.lean:203",
+            "gold": "```suggestion\r\n@[simp]\r\nlemma add_le_add_iff_left_of_ne_top {a b c : α} (h : a ≠ ⊤) : b + a ≤ c + a ↔ b ≤ c :=\r\n  (add_left_strictMono_of_ne_top _ h).le_iff_le\r",
+            "nearby_preds": [
+              "The new subtraction API is only half-complete: you add `sub_right_injective_of_ne_top` / `sub_right_inj_of_ne_top`, but ",
+              "This API is a bit one-sided: you add both left and right injectivity lemmas for `sub`, but only the left strict-monotoni",
+              "The new lemmas are not accessible after importing `Mathlib.Algebra.Order.AddGroupWithTop`; they are defined inside `name"
+            ]
+          },
+          {
+            "pr": 33337,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean:198",
+            "gold": "```suggestion\ntheorem toLinearMap_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :\n```",
+            "nearby_preds": [
+              "The deprecation timeline is a bit unusual: `orthogonalProjection_eq_linear_proj` is deprecated since 2025-07-11, while t",
+              "The rename to `orthogonalProjection_apply_eq_linearProjOfIsCompl` is good, but the deprecation timeline looks inconsiste",
+              "Similarly, the deprecation date for `orthogonalProjection_coe_eq_linearProjOfIsCompl` is set to 2025-12-26 while the ren"
+            ]
+          },
+          {
+            "pr": 33332,
+            "stratum": "V1",
+            "loc": "Mathlib/Combinatorics/SimpleGraph/Connectivity/Connected.lean:254",
+            "gold": "The names aren't used anymore\r\n```suggestion\r\n  | cons h p ih =>\r\n```",
+            "nearby_preds": [
+              "`adj_of_mem_walk_support` can be kept as a direct structured proof but shortened noticeably versus the pre-PR version, w",
+              "`adj_of_mem_walk_support` is now a single `grind` call, but the PR description shows a trace-profile regression (33ms → ",
+              "`adj_of_mem_walk_support` is now a single `grind` call; profiling shows a regression (33ms → 46ms). Even if acceptable, "
+            ]
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean:50",
+            "gold": "Isn't this abusing the defeq between predicates and sets?\n```suggestion\ndef IsMulIndecomposable.baseOf [Monoid S] (v : ι → M) (f : M →* S) : Set ι :=\n  {j | IsM",
+            "nearby_preds": [
+              "The additive docstring for `IsMulIndecomposable.baseOf` has a typo: 'crystallogrphic' should be 'crystallographic'.",
+              "Spelling/typos in docstring: “crystallogrphic” should be “crystallographic”.",
+              "`IsMulIndecomposable.baseOf` is defined as a `Set ι` but the name suggests it is attached to the predicate `IsMulIndecom"
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:811",
+            "gold": "```suggestion\r\n  property i j Z gi gj h := by\r\n    simp [← FunctorToTypes.map_comp_apply, ← op_comp, h]\r\n```",
+            "nearby_preds": [
+              "The new public theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` has a typo (`Compabible`), and it is alread",
+              "The new theorem name is misspelled: `isSheafFor_ofArrows_iff_bijective_toCompabible` uses `Compabible` instead of `Compa",
+              "There is a spelling error in the theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` (\"Compabible\"). This will"
+            ]
+          },
+          {
+            "pr": 33287,
+            "stratum": "V2",
+            "loc": "Mathlib/CategoryTheory/Sites/IsSheafFor.lean:856",
+            "gold": "```suggestion\r\n      IsSheafFor P (Presieve.ofArrows _ (fun i ↦ (Over.map p).map (f i))) := by\r\n```",
+            "nearby_preds": [
+              "The new public theorem name `isSheafFor_ofArrows_iff_bijective_toCompabible` has a typo (`Compabible`), and it is alread",
+              "The new theorem name is misspelled: `isSheafFor_ofArrows_iff_bijective_toCompabible` uses `Compabible` instead of `Compa",
+              "`isSheafFor_pullback_iff` is marked `[simp]` but has an `IsIso f` assumption; simp-lemmas with typeclass assumptions can"
+            ]
+          },
+          {
+            "pr": 33268,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/BoundedOrder/Lattice.lean:60",
+            "gold": "I think a more natural ordering is to put the max_left and max_right lemmas right after eachother.",
+            "nearby_preds": [
+              "In the `LinearOrder` section you assume `[OrderBot α]` globally, but most theorems are dualized to produce the `OrderTop",
+              "`min_eq_bot` is tagged `[simp]` (via `to_dual` attr), but its proof is by rewriting with `le_bot_iff`/`inf_le_iff`; cons",
+              "In the `LinearOrder` section, the new assumption `[OrderBot α]` is too strong: only `min_bot_left`, `min_bot_right`, `ma"
+            ]
+          },
+          {
+            "pr": 33232,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Distribution/TemperedDistribution.lean:260",
+            "gold": "style nit. I didn't actually test that it still elaborates properly with the starting and ending `_`, but I don't see which it shouldn't.\n```suggestion\n    𝓕⁻ (",
+            "nearby_preds": [
+              "The docstring says the result is about `𝓢(ℝ, F)`, but the statement is for general `𝓢(E, F)` (with `[InnerProductSpace ℝ",
+              "Lemma names `fourierTransform_toTemperedDistributionCLM_eq` and `fourierTransformInv_toTemperedDistributionCLM_eq` are a",
+              "The proof of `fourierTransformInv_toTemperedDistributionCLM_eq` is more complex than needed and uses `toTemperedDistribu"
+            ]
+          },
+          {
+            "pr": 33183,
+            "stratum": "V3",
+            "loc": "Mathlib/CategoryTheory/Pi/Monoidal.lean:160",
+            "gold": "```suggestion\n  closed X := {\n    rightAdj := ihom X\n    adj.unit := closedUnit X\n    adj.counit := closedCounit X }\n```",
+            "nearby_preds": [
+              "There is a typo in the documentation for `monoidalClosed` (\"equipps\").",
+              "Typos/wording in documentation: \"equipps\" should be \"equips\"; also the instance definition formatting is a bit non-idiom"
+            ]
+          }
+        ],
+        "untouched": [
+          {
+            "pr": 33421,
+            "stratum": "V3",
+            "loc": "Mathlib/Algebra/Order/Round.lean:51",
+            "gold": "How about `round_eq_div`?"
+          },
+          {
+            "pr": 33362,
+            "stratum": "V3",
+            "loc": "Mathlib/Analysis/Complex/Schwarz.lean:58",
+            "gold": "Why not move these a few lines below so that it's on the `Complex` namespace?"
+          },
+          {
+            "pr": 33321,
+            "stratum": "V3",
+            "loc": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean:19",
+            "gold": "```suggestion\nThe proof needs a set of ordered coefficients, even though the ultimate existence statement does\n```"
+          },
+          {
+            "pr": 33294,
+            "stratum": "V2",
+            "loc": "Mathlib/SetTheory/Ordinal/Topology.lean:186",
+            "gold": "```suggestion\r\n    rw [h.map_iSup (bddAbove_of_small _)]\r\n```\r\nno?\r\n"
+          },
+          {
+            "pr": 33285,
+            "stratum": "V2",
+            "loc": "Mathlib/RingTheory/Ideal/Cotangent.lean:158",
+            "gold": "or\r\n```lean\r\n  simp [I.cotangentEquivIdeal.symm_apply_eq, Subtype.ext_iff]\r\n```\r\nor\r\n```lean\r\n  exact I.cotangentEquivIdeal.injective (I.cotangentEquivIdeal.app"
+          },
+          {
+            "pr": 33267,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/WithBot.lean:899",
+            "gold": "I feel like this theorem should not be applied; it can just be `toDual_symm`. But that is outside the scope of this PR."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:905",
+            "gold": "And this could just be called `toDual_bot`."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:902",
+            "gold": "Since the WithBot namespace is open, you can avoid the `WithBot.`"
+          },
+          {
+            "pr": 33267,
+            "stratum": "V3",
+            "loc": "Mathlib/Order/WithBot.lean:950",
+            "gold": "I think the indentation where the whole statement fits one  one line is actually preferred."
+          },
+          {
+            "pr": 33267,
+            "stratum": "V2",
+            "loc": "Mathlib/Order/WithBot.lean:882",
+            "gold": "```suggestion\nSee `WithBot.toDualTopEquiv` for the related order-iso. -/\n```\nLooks like this was renamed at some point: https://leanprover-community.github.io/m"
+          },
+          {
+            "pr": 33201,
+            "stratum": "V2",
+            "loc": "Mathlib/AlgebraicTopology/SimplicialSet/HomotopyCat.lean:500",
+            "gold": "Same here: we already have `Cat.isTerminalOfUniqueOfIsDiscrete`:\r\n```suggestion\r\ninstance (X : Truncated.{u} 2) [Unique (X _⦋0⦌₂)] : Unique X.HomotopyCategory :"
+          },
+          {
+            "pr": 33201,
+            "stratum": "V3",
+            "loc": "Mathlib/CategoryTheory/Functor/Currying.lean:115",
+            "gold": "Please add the corresponding `Full` and `Faithful` instances (we really need a way to automate adding those via an attribute we can put on a `FullyFaithful` def"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "candidates": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep2/candidates.jsonl",
+  "decision": "judge_migration_not_equivalent",
+  "disagreements": [
+    {
+      "cache_key": "1136515babb4f266307adde81f97558cf0896aea04dae5e2378cb097c1ab5e5d",
+      "candidate_id": "candidate:c23072aee070a7c031f75942",
+      "issue_agrees": true,
+      "issue_votes": 2,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_agrees": false,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": true,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": false
+    },
+    {
+      "cache_key": "a7091eabebd4d2659c683a46cc759dcafb9a4ace2e7dea6ed608a4e8cc3c5b7a",
+      "candidate_id": "candidate:c80deff03228e6e38ddfacc8",
+      "issue_agrees": false,
+      "issue_votes": 3,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    }
+  ],
+  "gates": {
+    "agreement": {
+      "observed": 0.8333333333333334,
+      "pass": false,
+      "required": 0.95
+    },
+    "coverage": {
+      "comparable": 6,
+      "missing_script": 0,
+      "missing_task": 0,
+      "pairs": 6,
+      "pass": true
+    },
+    "no_split_votes": {
+      "observed_split_pairs": 1,
+      "pass": false,
+      "required": 0
+    }
+  },
+  "issue_agreement": 0.8333333333333334,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "release": "inputs/pr_review_v4/releases/dev-pilot-0.9.0",
+  "resolution_agreement": 0.8333333333333334,
+  "rows": [
+    {
+      "cache_key": "1136515babb4f266307adde81f97558cf0896aea04dae5e2378cb097c1ab5e5d",
+      "candidate_id": "candidate:c23072aee070a7c031f75942",
+      "issue_agrees": true,
+      "issue_votes": 2,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_agrees": false,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": true,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": false
+    },
+    {
+      "cache_key": "20814ee9ad0e19466b1e97c26af648980efe1dc4e547ce169792eb07d0d35bcc",
+      "candidate_id": "candidate:c80deff03228e6e38ddfacc8",
+      "issue_agrees": true,
+      "issue_votes": 0,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "b6afdef040fc42c6d02aaa55afc4364c60b15098ad418e17f47e3476123993cd",
+      "candidate_id": "candidate:c80deff03228e6e38ddfacc8",
+      "issue_agrees": true,
+      "issue_votes": 3,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": true,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": true,
+      "unanimous": true
+    },
+    {
+      "cache_key": "fc839e12758fa569d04ac3372205915bebc2cce80b343c8a7ca17d34329ef849",
+      "candidate_id": "candidate:8114bd5bb303a6dfd7669202",
+      "issue_agrees": true,
+      "issue_votes": 0,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "a7091eabebd4d2659c683a46cc759dcafb9a4ace2e7dea6ed608a4e8cc3c5b7a",
+      "candidate_id": "candidate:c80deff03228e6e38ddfacc8",
+      "issue_agrees": false,
+      "issue_votes": 3,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "65e5e5f0f534bd6f675475e563492f7ec00e246fbb5fbd71b465212fdc481bc5",
+      "candidate_id": "candidate:0671d40eaf2ccfdffba5b728",
+      "issue_agrees": true,
+      "issue_votes": 0,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    }
+  ],
+  "schema_version": "r0-judge-equivalence1",
+  "split_vote_pairs": [
+    {
+      "cache_key": "1136515babb4f266307adde81f97558cf0896aea04dae5e2378cb097c1ab5e5d",
+      "candidate_id": "candidate:c23072aee070a7c031f75942",
+      "issue_agrees": true,
+      "issue_votes": 2,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_agrees": false,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": true,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": false
+    }
+  ],
+  "task_arm": "results/pr_review_v4/audits/r0-judge-equivalence/task-arm-rep2"
+}

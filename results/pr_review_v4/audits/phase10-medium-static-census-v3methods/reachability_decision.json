@@ -1,0 +1,21 @@
+{
+  "census_sha256": "872ba15b595115a6263df0f88cc058c48429e2520e8185e0b6932d55062526dc",
+  "conditions": {
+    "c2_supported_obligations_outside_dev": {
+      "observed": 8,
+      "pass": true,
+      "required": 3
+    },
+    "distinct_implementations_outside_dev": {
+      "observed": 3,
+      "pass": true,
+      "required": 2
+    },
+    "distinct_prs_outside_dev": {
+      "observed": 6,
+      "pass": true,
+      "required": 2
+    }
+  },
+  "decision": "authorized_for_paid_smoke"
+}

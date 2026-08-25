@@ -1,0 +1,31 @@
+{
+  "builder_version": "cg1_builder_v2",
+  "change_targets": 4681,
+  "changed_ranges": 2662,
+  "episodes": 198,
+  "file_coverage": 854,
+  "graphs_sha256": "dea8c209fb3e9f3700067727552e6f5b6b98c4f6fe8eeebcae7c07dbd266a9ee",
+  "graphs_with_unparsed_targets": 0,
+  "range_mapping": {
+    "semantic": 2536,
+    "structural_only": 126,
+    "unparsed_only": 0
+  },
+  "release": "inputs/pr_review_v4/releases/dev-change-graph-0.5.1",
+  "schema_version": "cg-audit1",
+  "semantic_entities": 8531,
+  "source_status": {
+    "full": 653,
+    "full_blob_cache": 200,
+    "not_lean": 1
+  },
+  "target_kind": {
+    "command": 784,
+    "declaration": 2963,
+    "import": 81,
+    "module_doc": 186,
+    "namespace": 121,
+    "non_lean": 1,
+    "section": 545
+  }
+}

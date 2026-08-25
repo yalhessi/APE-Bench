@@ -1,0 +1,37 @@
+{
+  "by_classification_status": {
+    "complete": 184
+  },
+  "by_lifecycle": {
+    "added": 116,
+    "modified": 67,
+    "removed": 1
+  },
+  "by_subject_kind": {
+    "abbreviation": 2,
+    "command": 16,
+    "definition": 6,
+    "import": 15,
+    "instance": 1,
+    "module_doc": 27,
+    "namespace_or_section": 27,
+    "structure_or_class": 2,
+    "theorem": 88
+  },
+  "changed_components": {
+    "attributes": 52,
+    "documentation": 30,
+    "imports": 15,
+    "name": 79,
+    "namespace": 27,
+    "proof": 88,
+    "statement_or_type": 82,
+    "value_or_body": 24
+  },
+  "inventory_version": "modification-inventory/1",
+  "prs": 9,
+  "records": 184,
+  "schema_version": "modification-inventory-report1",
+  "source_sha256": "9cca1a333fbd9ac30bef8c486185870bb08a637f988524fb5cc3e654a0ac9fff",
+  "unknown_reasons": {}
+}

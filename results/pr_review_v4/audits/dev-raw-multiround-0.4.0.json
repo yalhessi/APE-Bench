@@ -1,0 +1,216 @@
+{
+  "release": {
+    "dataset_id": "mathlib-pr-review-v4-dev",
+    "version": "0.4.0-raw-multiround",
+    "source_kind": "raw_event_ledger",
+    "split": "development",
+    "manifest_tree_state": "dirty"
+  },
+  "validation": {
+    "episodes": 198,
+    "prs": 138,
+    "events": 8161,
+    "boundaries": 198,
+    "funnel_candidates": 201,
+    "round_segments": 202,
+    "unhydrated_rounds": 4
+  },
+  "input": {
+    "description_provenance": {
+      "absent": 35,
+      "legacy_post_edit_risk_omitted": 16,
+      "review_time_verified": 147
+    },
+    "title_provenance": {
+      "source_current_value_unverified": 198
+    },
+    "changed_files_per_episode": {
+      "min": 1,
+      "median": 2.0,
+      "p95": 19,
+      "max": 29
+    },
+    "diff_chars": {
+      "min": 770,
+      "median": 4745.5,
+      "p95": 21682,
+      "max": 63307
+    }
+  },
+  "events": {
+    "by_type": {
+      "commit": 875,
+      "file": 1029,
+      "issue_comment": 842,
+      "metadata_edit": 203,
+      "pull_request": 201,
+      "review": 338,
+      "review_comment": 329,
+      "review_thread": 237,
+      "timeline": 4107
+    },
+    "missing_timestamp_by_type": {
+      "file": 1029,
+      "review_thread": 237
+    }
+  },
+  "rounds": {
+    "segments": 202,
+    "hydrated_episodes": 198,
+    "hydration_status": {
+      "hydrated": 198,
+      "missing_compare": 4
+    },
+    "segments_by_round_index": {
+      "1": 138,
+      "2": 46,
+      "3": 15,
+      "4": 2,
+      "5": 1
+    },
+    "prs_by_segment_count": {
+      "1": 92,
+      "2": 31,
+      "3": 13,
+      "4": 1,
+      "5": 1
+    },
+    "segments_per_pr": {
+      "min": 1,
+      "median": 1.0,
+      "p95": 3,
+      "max": 5
+    },
+    "unhydrated": [
+      {
+        "segment_id": "segment:65ab210441b61a410f1c49742c08a8f023b22e061f1ad0bf9a5f03baba0175de",
+        "pr_number": 33047,
+        "round_index": 3,
+        "reviewed_head_sha": "038a2a32914fbb36ef756ef20f834904dc5445f2",
+        "reason": "expected one cached compare for 038a2a32914fbb36ef756ef20f834904dc5445f2, found 0"
+      },
+      {
+        "segment_id": "segment:b6fce0621470bbd9681c888eff8acc1fed32042c6ea185354f8863eef40b13d4",
+        "pr_number": 33047,
+        "round_index": 4,
+        "reviewed_head_sha": "499fd2c74e8b2d12176aad7d1e0a2207b964670f",
+        "reason": "expected one cached compare for 499fd2c74e8b2d12176aad7d1e0a2207b964670f, found 0"
+      },
+      {
+        "segment_id": "segment:6b6bbe1709da70ea2132c7b9dd66b51bc0bc11fb9456f998f4682f8dc0a943a7",
+        "pr_number": 33117,
+        "round_index": 3,
+        "reviewed_head_sha": "e7f14f3991519baa8a7633ac7ccb4c7c1249f49d",
+        "reason": "expected one cached compare for e7f14f3991519baa8a7633ac7ccb4c7c1249f49d, found 0"
+      },
+      {
+        "segment_id": "segment:da4d851ebfc6a99b6fd594988313fc91246401f78b9f61618b91dc5b497ef48b",
+        "pr_number": 33152,
+        "round_index": 2,
+        "reviewed_head_sha": "1a511fe6ec770785931ce6b56344f3c3f4ca65ce",
+        "reason": "expected one cached compare for 1a511fe6ec770785931ce6b56344f3c3f4ca65ce, found 0"
+      }
+    ]
+  },
+  "samples": [
+    {
+      "pr_number": 33047,
+      "episode_id": "leanprover-community/mathlib4:33047:round1:a08b631c38e6f49d45eaaafcefc6ad896b4fa19a",
+      "title": "chore(Analysis): prefer to use `toSpanSingleton` over `smulRight (1 : R →L[R] R)`",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "legacy_post_edit_risk_omitted",
+      "changed_files": [
+        "Mathlib/Topology/Algebra/Module/LinearMap.lean"
+      ],
+      "diff_chars": 1064,
+      "events_by_type": {
+        "commit": 36,
+        "file": 21,
+        "issue_comment": 9,
+        "metadata_edit": 7,
+        "pull_request": 1,
+        "review": 7,
+        "review_comment": 9,
+        "review_thread": 5,
+        "timeline": 72
+      }
+    },
+    {
+      "pr_number": 33117,
+      "episode_id": "leanprover-community/mathlib4:33117:round1:f76abaf5dabdb8eccb170ceab4162da1d4f48957",
+      "title": "feat: introduce predicate `Meromorphic`",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "review_time_verified",
+      "changed_files": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean"
+      ],
+      "diff_chars": 3628,
+      "events_by_type": {
+        "commit": 5,
+        "file": 1,
+        "issue_comment": 16,
+        "pull_request": 1,
+        "review": 3,
+        "review_comment": 1,
+        "review_thread": 1,
+        "timeline": 55
+      }
+    },
+    {
+      "pr_number": 33152,
+      "episode_id": "leanprover-community/mathlib4:33152:round1:85ec295a46dbbebf677664e782391b7fc940e2f0",
+      "title": "feat: use new predicate `Meromorphic`",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "review_time_verified",
+      "changed_files": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean"
+      ],
+      "diff_chars": 4018,
+      "events_by_type": {
+        "commit": 3,
+        "file": 1,
+        "issue_comment": 9,
+        "pull_request": 1,
+        "timeline": 36
+      }
+    },
+    {
+      "pr_number": 33421,
+      "episode_id": "leanprover-community/mathlib4:33421:round1:02adb3757d729e929c52452fee14158f61c95f3a",
+      "title": "chore(Algebra/Order/Floor): review API about `round`",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "absent",
+      "changed_files": [
+        "Mathlib/Algebra/AddConstMap/Basic.lean",
+        "Mathlib/Algebra/Order/Archimedean/Basic.lean",
+        "Mathlib/Algebra/Order/Floor/Ring.lean",
+        "Mathlib/Algebra/Order/Round.lean",
+        "Mathlib/Algebra/Order/ToIntervalMod.lean",
+        "Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean",
+        "Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean",
+        "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean",
+        "Mathlib/GroupTheory/Archimedean.lean",
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean",
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean",
+        "Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean",
+        "Mathlib/Order/Filter/AtTopBot/Archimedean.lean",
+        "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "Mathlib/Topology/Instances/AddCircle/Defs.lean"
+      ],
+      "diff_chars": 18437,
+      "events_by_type": {
+        "commit": 6,
+        "file": 15,
+        "issue_comment": 4,
+        "pull_request": 1,
+        "review": 3,
+        "review_comment": 4,
+        "review_thread": 3,
+        "timeline": 22
+      }
+    }
+  ],
+  "warnings": [
+    "Generator worktree was dirty; rely on artifact hashes, not commit alone."
+  ]
+}

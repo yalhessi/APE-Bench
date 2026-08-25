@@ -1,0 +1,161 @@
+{
+  "call_matched_baseline_union": {
+    "accepted_opportunity_ids_by_repetition": [
+      [],
+      [],
+      []
+    ],
+    "mean_issue_recall": 0.3333333333333333,
+    "mean_paired_precision": 0.6166666666666667,
+    "mean_resolution_recall": 0.16666666666666666,
+    "raw_candidates_by_repetition": [
+      8,
+      7,
+      7
+    ],
+    "raw_control_candidates_by_repetition": [
+      2,
+      2,
+      2
+    ]
+  },
+  "cost": {
+    "baseline_control_by_repetition": [
+      0.0846335,
+      0.05908175,
+      0.07068425
+    ],
+    "baseline_positive_by_repetition": [
+      0.18562075,
+      0.297255,
+      0.2006305
+    ],
+    "fixed_by_repetition": [
+      0.09996875,
+      0.19195225,
+      0.15536325
+    ],
+    "mean_baseline_positive": 0.22783541666666665,
+    "mean_baseline_with_control": 0.29930191666666667,
+    "mean_fixed": 0.14909475
+  },
+  "decision": "implementation_ready_for_broader_pilot",
+  "descriptive_deltas": {
+    "issue_recall": 0.0,
+    "resolution_recall": 0.08333333333333334
+  },
+  "fixed": {
+    "accepted_opportunity_ids_by_repetition": [
+      [
+        "opportunity:22049f958b613a5c6fb42331",
+        "opportunity:7c9c3d27f35bc3aebbb109da",
+        "opportunity:d647742eb3b2dd76d880300c"
+      ],
+      [
+        "opportunity:22049f958b613a5c6fb42331",
+        "opportunity:7c9c3d27f35bc3aebbb109da",
+        "opportunity:d647742eb3b2dd76d880300c"
+      ],
+      [
+        "opportunity:22049f958b613a5c6fb42331",
+        "opportunity:7c9c3d27f35bc3aebbb109da",
+        "opportunity:d647742eb3b2dd76d880300c"
+      ]
+    ],
+    "mean_issue_recall": 0.3333333333333333,
+    "mean_paired_precision": 0.8888888888888888,
+    "mean_resolution_recall": 0.25,
+    "raw_candidates_by_repetition": [
+      3,
+      3,
+      3
+    ],
+    "raw_control_candidates_by_repetition": [
+      0,
+      0,
+      0
+    ]
+  },
+  "implementation_ready": true,
+  "per_obligation": [
+    {
+      "baseline_issue_hits": 1,
+      "baseline_resolution_hits": 1,
+      "fixed_issue_hits": 3,
+      "fixed_resolution_hits": 3,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad"
+    },
+    {
+      "baseline_issue_hits": 2,
+      "baseline_resolution_hits": 0,
+      "fixed_issue_hits": 0,
+      "fixed_resolution_hits": 0,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443"
+    },
+    {
+      "baseline_issue_hits": 0,
+      "baseline_resolution_hits": 0,
+      "fixed_issue_hits": 0,
+      "fixed_resolution_hits": 0,
+      "obligation_id": "obligation:6c1da5ab47fedf5bdd05b898bf03cc177e55be0d012f63f913843cbebe5b34c7"
+    },
+    {
+      "baseline_issue_hits": 0,
+      "baseline_resolution_hits": 0,
+      "fixed_issue_hits": 0,
+      "fixed_resolution_hits": 0,
+      "obligation_id": "obligation:6db24d1d232819b1261f658fb6ec36d9e14b41ebd97ef8b08c54c7c683effa6c"
+    },
+    {
+      "baseline_issue_hits": 0,
+      "baseline_resolution_hits": 0,
+      "fixed_issue_hits": 2,
+      "fixed_resolution_hits": 0,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b"
+    },
+    {
+      "baseline_issue_hits": 2,
+      "baseline_resolution_hits": 2,
+      "fixed_issue_hits": 0,
+      "fixed_resolution_hits": 0,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5"
+    },
+    {
+      "baseline_issue_hits": 0,
+      "baseline_resolution_hits": 0,
+      "fixed_issue_hits": 3,
+      "fixed_resolution_hits": 3,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118"
+    },
+    {
+      "baseline_issue_hits": 3,
+      "baseline_resolution_hits": 1,
+      "fixed_issue_hits": 0,
+      "fixed_resolution_hits": 0,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6"
+    }
+  ],
+  "repetitions": 3,
+  "schema_version": "phase9-fixed-orchestration-report1",
+  "stable_issue_hits_at_least_two_of_three": {
+    "baseline": 3,
+    "fixed": 3
+  },
+  "stage_counts_by_repetition": [
+    {
+      "candidate_semantics": 2,
+      "recovered": 2,
+      "source_retrieval": 10
+    },
+    {
+      "candidate_semantics": 1,
+      "recovered": 3,
+      "source_retrieval": 10
+    },
+    {
+      "candidate_semantics": 1,
+      "recovered": 3,
+      "source_retrieval": 10
+    }
+  ]
+}

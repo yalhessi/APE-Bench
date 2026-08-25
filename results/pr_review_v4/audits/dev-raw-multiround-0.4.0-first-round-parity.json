@@ -1,0 +1,37 @@
+{
+  "release": "inputs/pr_review_v4/releases/dev-raw-multiround-0.4.0",
+  "release_manifest_sha256": "0735527e536aae05fb3fe7184ce9952dc675ccb00de071d3e93bfa7c7826efb2",
+  "legacy_records": "inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl",
+  "legacy_records_sha256": "f84e9bc6b034227962878229374245f8c769caa72921e52508c3678f8c72678d",
+  "raw_episodes": 138,
+  "legacy_records_count": 138,
+  "raw_only_prs": [],
+  "legacy_only_prs": [],
+  "fields": {
+    "base_sha": {
+      "match": 138
+    },
+    "description": {
+      "expected_provenance_omission": 12,
+      "match": 126
+    },
+    "diff": {
+      "match": 138
+    },
+    "feedback_window_end": {
+      "match": 138
+    },
+    "review_started_at": {
+      "match": 138
+    },
+    "reviewed_head_sha": {
+      "match": 138
+    },
+    "title": {
+      "match": 138
+    }
+  },
+  "mismatch_examples": {},
+  "hard_mismatches": 0,
+  "passed": true
+}

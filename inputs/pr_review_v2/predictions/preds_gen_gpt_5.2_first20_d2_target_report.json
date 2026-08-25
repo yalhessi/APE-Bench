@@ -1,0 +1,189 @@
+{
+  "mode": "target",
+  "topical_gate": true,
+  "line_slack": 10,
+  "verified_only": false,
+  "prs_evaluated": 20,
+  "anchored_gold": 53,
+  "gold_covered": 1,
+  "target_recall": 0.019,
+  "recall_by_stratum": {
+    "V2": {
+      "gold": 31,
+      "covered": 1,
+      "recall": 0.032
+    },
+    "V3": {
+      "gold": 22,
+      "covered": 0,
+      "recall": 0.0
+    }
+  },
+  "anchored_predictions": 21,
+  "verified_predictions": 21,
+  "on_target_predictions": 1,
+  "off_target_predictions": 20,
+  "on_target_rate": 0.048,
+  "per_pr": [
+    {
+      "pr_number": 33048,
+      "gold_anchored": 5,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33065,
+      "gold_anchored": 2,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33066,
+      "gold_anchored": 6,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33067,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33070,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33078,
+      "gold_anchored": 2,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33079,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 2,
+      "on_target": 0,
+      "off_target": 2
+    },
+    {
+      "pr_number": 33081,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33086,
+      "gold_anchored": 2,
+      "covered": 0,
+      "anchored_pred": 3,
+      "on_target": 0,
+      "off_target": 3
+    },
+    {
+      "pr_number": 33090,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33092,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33098,
+      "gold_anchored": 9,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33101,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33104,
+      "gold_anchored": 2,
+      "covered": 0,
+      "anchored_pred": 4,
+      "on_target": 0,
+      "off_target": 4
+    },
+    {
+      "pr_number": 33111,
+      "gold_anchored": 3,
+      "covered": 0,
+      "anchored_pred": 0,
+      "on_target": 0,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33117,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 5,
+      "on_target": 0,
+      "off_target": 5
+    },
+    {
+      "pr_number": 33127,
+      "gold_anchored": 2,
+      "covered": 1,
+      "anchored_pred": 1,
+      "on_target": 1,
+      "off_target": 0
+    },
+    {
+      "pr_number": 33137,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 2,
+      "on_target": 0,
+      "off_target": 2
+    },
+    {
+      "pr_number": 33141,
+      "gold_anchored": 1,
+      "covered": 0,
+      "anchored_pred": 2,
+      "on_target": 0,
+      "off_target": 2
+    },
+    {
+      "pr_number": 33145,
+      "gold_anchored": 10,
+      "covered": 0,
+      "anchored_pred": 2,
+      "on_target": 0,
+      "off_target": 2
+    }
+  ]
+}

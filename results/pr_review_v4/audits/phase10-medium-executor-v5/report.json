@@ -1,0 +1,14 @@
+{
+  "executor_version": "generic-opportunity-executor/4",
+  "operator_runs": 674,
+  "opportunities": 42,
+  "records": 2253,
+  "schema_version": "generic-opportunity-executor-report1",
+  "tasks": 2253,
+  "terminal_stages": {
+    "capability_assessed": 1720,
+    "operator_completed": 379,
+    "operator_unavailable": 112,
+    "transformation_constructed": 42
+  }
+}

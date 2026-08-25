@@ -1,0 +1,18 @@
+{
+  "pool": "grand_union",
+  "distill_model": "gpt_5.4",
+  "selector_model": "gpt_5.4",
+  "prs_distilled": 56,
+  "decls": 244,
+  "findings_matched": 309,
+  "v2_auc": {
+    "sel": 0.586,
+    "legib": 0.527,
+    "combo": 0.544
+  },
+  "v2_within_pr_auc": {
+    "sel": 0.583,
+    "legib": 0.501,
+    "combo": 0.565
+  }
+}

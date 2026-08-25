@@ -1,0 +1,151 @@
+{
+  "arm": "registered_task",
+  "counts": {
+    "candidate_obligation_pairs": 4,
+    "candidates": 9,
+    "obligations": 22,
+    "paired_candidates": 2
+  },
+  "issue_recall": 0.045454545454545456,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "location_recall": 0.18181818181818182,
+  "manual_audit_required": true,
+  "paired_candidate_issue_precision": 0.5,
+  "per_obligation": [
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:6b02b6118fcd24d676894ab9eb795826ae036cf3de57f6a1648aff81bf55a336",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:38e72250fc9d46238bf32c7595cbf8ddfb2c3650e5589e1a917b96d44425458e",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:55f6530478b34726b67e26f586cddf80293284f7d3f3852ef7a23dd40b34f783",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:cc44bb996114d36d12489bf3048af88ad5a5759c56e44dd2d482f312afe3dc97",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:57bcc9fd38464c7dbf7446b486324b3d7edbd101f1357b81f3f2001f479b11a4",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:14f5e6d6016342115f689daf4e49be91088a694d3effbe2b2c42d3374b809d56",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:6c1da5ab47fedf5bdd05b898bf03cc177e55be0d012f63f913843cbebe5b34c7",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:488d7b571fea19dbde9a635878e92b1bc4f8acb1e489ac3778a0066ab313885d",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:d779f40f12ca1db3eada2a7dde894c02080a57643258a12aa3152705ede59a76",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:ee282f05e9c27fe206e674624bd6a0363507863fb7d7af99398d4ca7f36560a3",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": true,
+      "location_hit": true,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+      "resolution_hit": true
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:64630362c31527fa23461b4551591f5a436d13f14693aa9c2bafaa15924601f6",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:c7e1405471a20c04795b5cac2028c210dc8525c2625f96cdd9a25eac0617eb76",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": true,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:6db24d1d232819b1261f658fb6ec36d9e14b41ebd97ef8b08c54c7c683effa6c",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:d4cc70e10c26e51edf54156464b475700c37268d7dcffdcfd65159a2e4d9bc58",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:9c96e853db76360f1fa330338b1db0ed3f889b91107267ff98efa1b03151ad1b",
+      "resolution_hit": false
+    },
+    {
+      "issue_hit": false,
+      "location_hit": false,
+      "obligation_id": "obligation:3ad30059e6e673738c6590c2cabc0d6111376018c5fc7b8c3bda44f30512121b",
+      "resolution_hit": false
+    }
+  ],
+  "resolution_recall": 0.045454545454545456,
+  "schema_version": "v4-semantic-report1"
+}

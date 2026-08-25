@@ -1,0 +1,95 @@
+{
+  "as_of": "2026-07-17",
+  "claims": [
+    {
+      "claim": "The stable v4 smoke has immutable run accounting and semantic reports for three repetitions.",
+      "claim_id": "stable_core_replayable",
+      "evidence_roles": [
+        "stable_release",
+        "stable_run1_manifest",
+        "stable_run1_semantic",
+        "stable_run2_manifest",
+        "stable_run2_semantic",
+        "stable_run3_manifest",
+        "stable_run3_semantic"
+      ],
+      "status": "proven",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "Identical treatment prompts recover different obligations across repetitions.",
+      "claim_id": "single_call_generation_is_stochastic",
+      "evidence_roles": [
+        "stable_run1_semantic",
+        "stable_run2_semantic",
+        "stable_run3_semantic"
+      ],
+      "status": "proven",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "The tested generic specialist split did not improve semantic recovery and increased control pressure.",
+      "claim_id": "generic_specialist_split_improves_recovery",
+      "evidence_roles": [
+        "manual_agenda_verdict"
+      ],
+      "status": "refuted_for_tested_design",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "The tested lexical context-to-ask retrieval policy did not produce a replicated semantic gain.",
+      "claim_id": "lexical_context_to_ask_is_stable",
+      "evidence_roles": [
+        "retrieval_replication_verdict"
+      ],
+      "status": "refuted_for_tested_design",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "Given the exact canonical API opportunity, adjudication recovered an issue and resolution match.",
+      "claim_id": "canonical_api_application_can_recover_target",
+      "evidence_roles": [
+        "oracle_opportunity_treatment",
+        "oracle_opportunity_adjudications",
+        "oracle_opportunity_semantic"
+      ],
+      "status": "proven_diagnostic",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "Oracle naming and wrapper-composition evidence produced two requests whose issue and resolution coverage is fixed by the semantic report.",
+      "claim_id": "naming_and_wrapper_evidence_can_recover_targets",
+      "evidence_roles": [
+        "oracle_evidence_treatment",
+        "oracle_evidence_adjudications",
+        "oracle_evidence_candidates",
+        "oracle_evidence_semantic"
+      ],
+      "observed_semantic_result": {
+        "issue_hits": 2,
+        "resolution_hits": 1
+      },
+      "status": "proven_diagnostic_partial_resolution",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "Compiling proof-compression and small syntax alternatives remained optional rather than request-worthy.",
+      "claim_id": "compilation_establishes_review_worthiness",
+      "evidence_roles": [
+        "oracle_evidence_adjudications"
+      ],
+      "status": "refuted_for_tested_cases",
+      "unresolved_evidence_roles": []
+    },
+    {
+      "claim": "Production retrieval has not yet automatically recovered the oracle API, naming population, or wrapper sources.",
+      "claim_id": "automatic_source_recovery",
+      "evidence_roles": [],
+      "status": "unproven",
+      "unresolved_evidence_roles": []
+    }
+  ],
+  "schema_version": "systematic-claim-matrix1",
+  "source_sha256": "e3a56ca70df641437af23e86af9808264b1d44815ff62ff0768e17b5831b80ab",
+  "version": "systematic-opportunity-baseline/1"
+}

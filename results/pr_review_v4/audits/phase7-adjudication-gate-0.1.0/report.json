@@ -1,0 +1,34 @@
+{
+  "complete": true,
+  "counts": {
+    "opportunities": 16,
+    "oracle_controls": 5,
+    "oracle_opportunities": 10,
+    "oracle_targeted": 5,
+    "production_opportunities": 6,
+    "redundancy_requests": 2,
+    "requests": 3
+  },
+  "deferred_opportunities": [
+    "opportunity:d647742eb3b2dd76d880300c",
+    "opportunity:22049f958b613a5c6fb42331"
+  ],
+  "gates": {
+    "all_records_citation_validated": true,
+    "byte_stable_replay": true,
+    "candidate_issue_precision_no_decline": true,
+    "minor_proofs_not_published": true,
+    "oracle_controls_no_request": true,
+    "oracle_request_precision": 1.0,
+    "production_request_precision": 1.0
+  },
+  "oracle_requests": [
+    "opportunity:7e4fd41b0f6e53066f671b2e",
+    "opportunity:bcf08b8da14b9782b82248da"
+  ],
+  "policy_version": "phase7-adjudication-policy/1",
+  "production_requests": [
+    "opportunity:7c9c3d27f35bc3aebbb109da"
+  ],
+  "schema_version": "phase7-adjudication-gate-report1"
+}

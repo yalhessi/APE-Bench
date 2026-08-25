@@ -1,0 +1,178 @@
+{
+  "by_family": {
+    "proof_compression": {
+      "queries": 2,
+      "source_recall_at_5": 0.0,
+      "useful_hits_at_5": 0
+    },
+    "structural_rewrite": {
+      "queries": 1,
+      "source_recall_at_5": 0.0,
+      "useful_hits_at_5": 0
+    }
+  },
+  "counts": {
+    "by_method_family": {
+      "other": 100,
+      "proof_compression": 9,
+      "structural_rewrite": 4
+    },
+    "by_outcome": {
+      "adopted": 52,
+      "dropped": 32,
+      "partially_adopted": 16,
+      "unknown": 13
+    },
+    "code_grounded_triggers": 99,
+    "queries": 3,
+    "records": 113,
+    "retrieval_hits": 5
+  },
+  "offline_gate": "fail",
+  "pre_registered_gate": "At least one useful adopted source in each method family and at least two of three smoke queries with a useful source in the top five.",
+  "queries": [
+    {
+      "declaration_name": "Metric.maximalSeparatedSet_subset",
+      "expected_feature_for_hidden_evaluation": "uses_grind",
+      "feature_source_audit": {
+        "eligible_not_adopted": 1,
+        "post_cutoff": 1,
+        "same_target_pr": 1
+      },
+      "method_family": "proof_compression",
+      "query_id": "historical-query:0d05bf8ba4a058f8c083b7ed",
+      "retrieved": [
+        {
+          "matched_features": [],
+          "outcome": "partially_adopted",
+          "rank": 1,
+          "score": 0.0,
+          "source_intervention_id": "pr33111_i02",
+          "source_pr_number": 33111,
+          "transformation_features": [
+            "requests_one_line_proof",
+            "uses_grind"
+          ],
+          "useful": false
+        },
+        {
+          "matched_features": [],
+          "outcome": "dropped",
+          "rank": 2,
+          "score": 0.0,
+          "source_intervention_id": "pr33081_i01",
+          "source_pr_number": 33081,
+          "transformation_features": [
+            "replacement_request"
+          ],
+          "useful": false
+        }
+      ],
+      "useful_hit_at_5": false
+    },
+    {
+      "declaration_name": "Metric.card_maximalSeparatedSet",
+      "expected_feature_for_hidden_evaluation": "uses_grind",
+      "feature_source_audit": {
+        "eligible_not_adopted": 1,
+        "post_cutoff": 1,
+        "same_target_pr": 1
+      },
+      "method_family": "proof_compression",
+      "query_id": "historical-query:914c014bafc5d7c8824fcc9a",
+      "retrieved": [
+        {
+          "matched_features": [
+            "short_proof"
+          ],
+          "outcome": "dropped",
+          "rank": 1,
+          "score": 5.5,
+          "source_intervention_id": "pr33081_i01",
+          "source_pr_number": 33081,
+          "transformation_features": [
+            "replacement_request"
+          ],
+          "useful": false
+        },
+        {
+          "matched_features": [
+            "short_proof"
+          ],
+          "outcome": "partially_adopted",
+          "rank": 2,
+          "score": 3.83333333,
+          "source_intervention_id": "pr33111_i02",
+          "source_pr_number": 33111,
+          "transformation_features": [
+            "requests_one_line_proof",
+            "uses_grind"
+          ],
+          "useful": false
+        }
+      ],
+      "useful_hit_at_5": false
+    },
+    {
+      "declaration_name": "Metric.coveringNumber_two_mul_le_externalCoveringNumber",
+      "expected_feature_for_hidden_evaluation": "uses_rfl_pattern",
+      "feature_source_audit": {
+        "same_target_pr": 1
+      },
+      "method_family": "structural_rewrite",
+      "query_id": "historical-query:c51b7c23e0f0f018917461e0",
+      "retrieved": [
+        {
+          "matched_features": [
+            "explicit_destructuring"
+          ],
+          "outcome": "adopted",
+          "rank": 1,
+          "score": 2.5,
+          "source_intervention_id": "pr33145_i04",
+          "source_pr_number": 33145,
+          "transformation_features": [
+            "uses_simp"
+          ],
+          "useful": false
+        }
+      ],
+      "useful_hit_at_5": false
+    }
+  ],
+  "raw_event_audit": {
+    "counts": {
+      "grind": 2,
+      "rfl_pattern": 0
+    },
+    "cutoff_at": "2025-12-23T13:41:22Z",
+    "events_scanned": 8161,
+    "matches": {
+      "grind": [
+        {
+          "actor": "themathqueen",
+          "body_sha256": "82ed52992ba9f1eae9266949d6fbfc69a1b5af55f04e93dca3f964ac3af9517a",
+          "event_id": "event:7737cde9faa1699db5ec446d",
+          "occurred_at": "2025-12-19T23:12:13Z",
+          "path": "Mathlib/Order/Monotone/Defs.lean",
+          "pr_number": 33111
+        },
+        {
+          "actor": "SnirBroshi",
+          "body_sha256": "145bc573f4f768db2d33b4abffa1b58ced331a979ad23053a607f3da6c342ea5",
+          "event_id": "event:0bdc20439d06bc03d5ab4c23",
+          "occurred_at": "2025-12-19T23:36:51Z",
+          "path": "Mathlib/Order/Monotone/Defs.lean",
+          "pr_number": 33111
+        }
+      ],
+      "rfl_pattern": []
+    },
+    "target_pr_excluded": 33098
+  },
+  "real_smoke_authorized": false,
+  "retrieval_version": "method-trigger-feature-retrieval/1",
+  "schema_version": "historical-transformation-retrieval-report1",
+  "stop_reason": "The current corpus contains no temporally eligible adopted grind transformation and no temporally eligible adopted empty-branch-to-rfl transformation for these targets.",
+  "store_version": "historical-transformation-store/1"
+}

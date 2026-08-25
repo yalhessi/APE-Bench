@@ -1,0 +1,45 @@
+{
+  "composition_version": "wrapper-composition-search/1",
+  "control": {
+    "primary_change_id": "change:3ef5b17a805e3c6337189653431eef93e1c019e02cd250c400ab593a1ea7c57d",
+    "related_change_ids": [
+      "change:5fd8ab92061fe7d82a0945fef55f5602c4a1249c8e62494cf1a96629aa48f303"
+    ],
+    "status": "no_composition"
+  },
+  "counts": {
+    "plans": 2,
+    "sources": 5,
+    "targets": 2
+  },
+  "offline_gate": "pass",
+  "positive": {
+    "compile_status": "unavailable",
+    "primary_change_id": "change:45cf88bca684cd3813871f4da143b9c827418cf9320465b788f860efac74900a",
+    "related_change_ids": [
+      "change:c5c9da88f1d990a90cb9913c331dedd39539e7c571bf7a0c98dce91de28c648f",
+      "change:c7ef58137fa4b7b4ee0f8b13686be4a5afcefe2e8e8c434092e3c25c8510acc0",
+      "change:d483f48d7e3a4447d26426246409ccd14c957a624be055ff2150a15e27d59768"
+    ],
+    "removed_dependencies": [
+      "iInf_le",
+      "iInf_pos",
+      "le_of_eq",
+      "trans"
+    ],
+    "source_names": [
+      "Metric.IsCover.coveringNumber_le_encard",
+      "Metric.card_maximalSeparatedSet",
+      "Metric.isCover_maximalSeparatedSet",
+      "Metric.maximalSeparatedSet_subset"
+    ],
+    "source_roles": [
+      "repository_wrapper",
+      "cardinality_bridge",
+      "cover_witness",
+      "subset_witness"
+    ],
+    "status": "composed"
+  },
+  "schema_version": "wrapper-composition-report1"
+}

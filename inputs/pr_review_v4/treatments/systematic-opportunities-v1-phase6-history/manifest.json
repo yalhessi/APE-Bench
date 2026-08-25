@@ -1,0 +1,103 @@
+{
+  "artifacts": [
+    {
+      "path": "store/triggers.jsonl",
+      "records": 113,
+      "role": "historical_triggers",
+      "schema_version": "historical-transformation-trigger1",
+      "sha256": "f9c2a6ba8095828323e2717145b9e97b14498f4e9f9dbd2d69eb7f95a635fe7a"
+    },
+    {
+      "path": "store/requests.jsonl",
+      "records": 113,
+      "role": "historical_requests",
+      "schema_version": "historical-transformation-request1",
+      "sha256": "75ed91baf4c785d9708aa1070ab36cf29e156f932f73e356409d8280619c58f9"
+    },
+    {
+      "path": "store/resolutions.jsonl",
+      "records": 113,
+      "role": "historical_resolutions",
+      "schema_version": "historical-transformation-resolution1",
+      "sha256": "0a5e491f7f9538e5ca9b2902f35a5976ed01498558bbb993e0d020124ce3825a"
+    },
+    {
+      "path": "store/records.jsonl",
+      "records": 113,
+      "role": "historical_join_records",
+      "schema_version": "historical-transformation-record1",
+      "sha256": "bbf9497df6d67f14f4ffc693e853072a6e2e31d2c474b4dc36e40d7185990765"
+    },
+    {
+      "path": "derived/queries.jsonl",
+      "records": 3,
+      "role": "gold_free_smoke_queries",
+      "schema_version": "historical-transformation-query1",
+      "sha256": "99c38876d860418968aefb68608fa0658891bae7bb4c9b8383ac976b96f0e9f1"
+    },
+    {
+      "path": "derived/retrieval_hits.jsonl",
+      "records": 5,
+      "role": "temporally_eligible_retrieval_hits",
+      "schema_version": "historical-transformation-hit1",
+      "sha256": "2f336f8940139dc099d005529fc114646f4846777747c3d11fc8f713baff8095"
+    },
+    {
+      "path": "derived/retrieval_report.json",
+      "records": 1,
+      "role": "historical_retrieval_report",
+      "schema_version": "historical-transformation-retrieval-report1",
+      "sha256": "05f4588bf42901a68f588a5a71d4dbcd515fb2b1e4247f71abb19e9365387b66"
+    }
+  ],
+  "corpus_version": "historical-transformation-store/1",
+  "created_at": "2026-07-17T00:00:00-05:00",
+  "retrieval_version": "method-trigger-feature-retrieval/1",
+  "schema_version": "historical-transformation-store-manifest1",
+  "source_sha256": "086546bd6243d1082cd3e1c1a59aa46003a5c5966f257323063824ed5ab78f1c",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v3/interventions_v5.jsonl",
+      "records": 113,
+      "role": "curated_historical_interventions",
+      "schema_version": "i5",
+      "sha256": "307806849727cbbd747ed523327a1974a41aaf1bdb91f753025ecf9074be608a"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-scope-map-0.6.1/derived/change_graphs.jsonl",
+      "records": 198,
+      "role": "historical_review_time_graphs",
+      "schema_version": "cg1",
+      "sha256": "dea8c209fb3e9f3700067727552e6f5b6b98c4f6fe8eeebcae7c07dbd266a9ee"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-scope-map-0.6.1/input/episodes.jsonl",
+      "records": 198,
+      "role": "historical_review_time_episodes",
+      "schema_version": "episode1",
+      "sha256": "fc2efd904ec7579da5a02ba766f7cbbcc2d7f8a76086a3acac2e024eeb651a4b"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-scope-map-0.6.1/source/events.jsonl",
+      "records": 8161,
+      "role": "complete_historical_event_ledger",
+      "schema_version": "event1",
+      "sha256": "e358690dc924d1779b0afc559c772373b334925f9bbb560aa0202a45682b3fa6"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/derived/change_graphs.jsonl",
+      "records": 9,
+      "role": "smoke_target_graphs",
+      "schema_version": "cg1",
+      "sha256": "614dff33af8eaf949ac826e3e253a196c70017a02c4ac8b8db4402975e1e4ea6"
+    },
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.8.11/derived/retrieval_cutoffs.jsonl",
+      "records": 9,
+      "role": "generation_safe_cutoffs",
+      "schema_version": "retrieval-cutoff1",
+      "sha256": "469ea9b8b5fd3f0d6bed70206c676be22593d0692084a7815e22435b381ace12"
+    }
+  ],
+  "store_id": "mathlib-pr-review-v4-historical-transformations-phase6"
+}

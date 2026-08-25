@@ -1,0 +1,18 @@
+{
+  "by_confidence": {
+    "exact": 111,
+    "high": 172
+  },
+  "by_kind": {
+    "changed_siblings": 94,
+    "declaration_dependency": 47,
+    "direct_use_of_changed_declaration": 64,
+    "name_family": 78
+  },
+  "evidence_records": 283,
+  "prs": 6,
+  "relation_version": "pr-relations/1",
+  "relations": 283,
+  "schema_version": "pr-relation-report1",
+  "source_sha256": "845f8db83f172033caef3512640226c75cbc2f5687e878b366e114e511b9e2a4"
+}

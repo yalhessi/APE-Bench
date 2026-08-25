@@ -1,0 +1,623 @@
+{
+  "pool": "grand_union",
+  "mode": "pointwise",
+  "selector_model": "gpt_5.4",
+  "selector_prompt_version": "v1",
+  "line_slack": 10,
+  "n_candidates": 594,
+  "n_on_target": 119,
+  "n_off_target": 475,
+  "n_covered_gold": 54,
+  "uncached_labels": 0,
+  "n_newly_scored": 0,
+  "auc_selector": 0.625,
+  "auc_severity_baseline": 0.521,
+  "auc_by_hit_stratum": {
+    "V1": 0.992,
+    "V2": 0.586,
+    "V3": 0.66,
+    "V4": 0.559
+  },
+  "mean_score_on_target": 38.7,
+  "mean_score_off_target": 29.9,
+  "mean_score_by_hit_stratum": {
+    "V1": 99.8,
+    "V2": 34.8,
+    "V3": 42.8,
+    "V4": 23.4
+  },
+  "frontier": {
+    "baseline_keep_all": {
+      "kept": 594,
+      "finding_precision": 0.2,
+      "gold_recall_retained": 1.0,
+      "covered_gold_kept": 54
+    },
+    "op_retain_90pct_gold": {
+      "threshold": 8.0,
+      "kept": 425,
+      "kept_frac": 0.715,
+      "finding_precision": 0.252,
+      "gold_recall_retained": 0.926,
+      "covered_gold_kept": 50
+    },
+    "sweep": [
+      {
+        "threshold": 0.0,
+        "kept": 594,
+        "kept_frac": 1.0,
+        "finding_precision": 0.2,
+        "gold_recall_retained": 1.0,
+        "covered_gold_kept": 54
+      },
+      {
+        "threshold": 1.0,
+        "kept": 589,
+        "kept_frac": 0.992,
+        "finding_precision": 0.2,
+        "gold_recall_retained": 0.981,
+        "covered_gold_kept": 53
+      },
+      {
+        "threshold": 2.0,
+        "kept": 573,
+        "kept_frac": 0.965,
+        "finding_precision": 0.204,
+        "gold_recall_retained": 0.981,
+        "covered_gold_kept": 53
+      },
+      {
+        "threshold": 3.0,
+        "kept": 549,
+        "kept_frac": 0.924,
+        "finding_precision": 0.211,
+        "gold_recall_retained": 0.981,
+        "covered_gold_kept": 53
+      },
+      {
+        "threshold": 4.0,
+        "kept": 530,
+        "kept_frac": 0.892,
+        "finding_precision": 0.219,
+        "gold_recall_retained": 0.981,
+        "covered_gold_kept": 53
+      },
+      {
+        "threshold": 5.0,
+        "kept": 494,
+        "kept_frac": 0.832,
+        "finding_precision": 0.225,
+        "gold_recall_retained": 0.963,
+        "covered_gold_kept": 52
+      },
+      {
+        "threshold": 6.0,
+        "kept": 477,
+        "kept_frac": 0.803,
+        "finding_precision": 0.231,
+        "gold_recall_retained": 0.963,
+        "covered_gold_kept": 52
+      },
+      {
+        "threshold": 7.0,
+        "kept": 449,
+        "kept_frac": 0.756,
+        "finding_precision": 0.243,
+        "gold_recall_retained": 0.963,
+        "covered_gold_kept": 52
+      },
+      {
+        "threshold": 8.0,
+        "kept": 425,
+        "kept_frac": 0.715,
+        "finding_precision": 0.252,
+        "gold_recall_retained": 0.926,
+        "covered_gold_kept": 50
+      },
+      {
+        "threshold": 9.0,
+        "kept": 359,
+        "kept_frac": 0.604,
+        "finding_precision": 0.262,
+        "gold_recall_retained": 0.852,
+        "covered_gold_kept": 46
+      },
+      {
+        "threshold": 10.0,
+        "kept": 346,
+        "kept_frac": 0.582,
+        "finding_precision": 0.263,
+        "gold_recall_retained": 0.833,
+        "covered_gold_kept": 45
+      },
+      {
+        "threshold": 12.0,
+        "kept": 338,
+        "kept_frac": 0.569,
+        "finding_precision": 0.263,
+        "gold_recall_retained": 0.815,
+        "covered_gold_kept": 44
+      },
+      {
+        "threshold": 14.0,
+        "kept": 283,
+        "kept_frac": 0.476,
+        "finding_precision": 0.269,
+        "gold_recall_retained": 0.741,
+        "covered_gold_kept": 40
+      },
+      {
+        "threshold": 15.0,
+        "kept": 277,
+        "kept_frac": 0.466,
+        "finding_precision": 0.267,
+        "gold_recall_retained": 0.704,
+        "covered_gold_kept": 38
+      },
+      {
+        "threshold": 16.0,
+        "kept": 276,
+        "kept_frac": 0.465,
+        "finding_precision": 0.268,
+        "gold_recall_retained": 0.704,
+        "covered_gold_kept": 38
+      },
+      {
+        "threshold": 17.0,
+        "kept": 274,
+        "kept_frac": 0.461,
+        "finding_precision": 0.27,
+        "gold_recall_retained": 0.704,
+        "covered_gold_kept": 38
+      },
+      {
+        "threshold": 18.0,
+        "kept": 272,
+        "kept_frac": 0.458,
+        "finding_precision": 0.268,
+        "gold_recall_retained": 0.704,
+        "covered_gold_kept": 38
+      },
+      {
+        "threshold": 19.0,
+        "kept": 206,
+        "kept_frac": 0.347,
+        "finding_precision": 0.282,
+        "gold_recall_retained": 0.556,
+        "covered_gold_kept": 30
+      },
+      {
+        "threshold": 21.0,
+        "kept": 205,
+        "kept_frac": 0.345,
+        "finding_precision": 0.283,
+        "gold_recall_retained": 0.556,
+        "covered_gold_kept": 30
+      },
+      {
+        "threshold": 22.0,
+        "kept": 202,
+        "kept_frac": 0.34,
+        "finding_precision": 0.282,
+        "gold_recall_retained": 0.537,
+        "covered_gold_kept": 29
+      },
+      {
+        "threshold": 23.0,
+        "kept": 190,
+        "kept_frac": 0.32,
+        "finding_precision": 0.268,
+        "gold_recall_retained": 0.481,
+        "covered_gold_kept": 26
+      },
+      {
+        "threshold": 24.0,
+        "kept": 189,
+        "kept_frac": 0.318,
+        "finding_precision": 0.27,
+        "gold_recall_retained": 0.481,
+        "covered_gold_kept": 26
+      },
+      {
+        "threshold": 27.0,
+        "kept": 187,
+        "kept_frac": 0.315,
+        "finding_precision": 0.267,
+        "gold_recall_retained": 0.463,
+        "covered_gold_kept": 25
+      },
+      {
+        "threshold": 28.0,
+        "kept": 183,
+        "kept_frac": 0.308,
+        "finding_precision": 0.251,
+        "gold_recall_retained": 0.444,
+        "covered_gold_kept": 24
+      },
+      {
+        "threshold": 30.0,
+        "kept": 178,
+        "kept_frac": 0.3,
+        "finding_precision": 0.253,
+        "gold_recall_retained": 0.444,
+        "covered_gold_kept": 24
+      },
+      {
+        "threshold": 31.0,
+        "kept": 176,
+        "kept_frac": 0.296,
+        "finding_precision": 0.256,
+        "gold_recall_retained": 0.444,
+        "covered_gold_kept": 24
+      },
+      {
+        "threshold": 32.0,
+        "kept": 175,
+        "kept_frac": 0.295,
+        "finding_precision": 0.257,
+        "gold_recall_retained": 0.444,
+        "covered_gold_kept": 24
+      },
+      {
+        "threshold": 33.0,
+        "kept": 174,
+        "kept_frac": 0.293,
+        "finding_precision": 0.259,
+        "gold_recall_retained": 0.444,
+        "covered_gold_kept": 24
+      },
+      {
+        "threshold": 35.0,
+        "kept": 173,
+        "kept_frac": 0.291,
+        "finding_precision": 0.254,
+        "gold_recall_retained": 0.426,
+        "covered_gold_kept": 23
+      },
+      {
+        "threshold": 36.0,
+        "kept": 172,
+        "kept_frac": 0.29,
+        "finding_precision": 0.25,
+        "gold_recall_retained": 0.407,
+        "covered_gold_kept": 22
+      },
+      {
+        "threshold": 37.0,
+        "kept": 171,
+        "kept_frac": 0.288,
+        "finding_precision": 0.251,
+        "gold_recall_retained": 0.407,
+        "covered_gold_kept": 22
+      },
+      {
+        "threshold": 41.0,
+        "kept": 170,
+        "kept_frac": 0.286,
+        "finding_precision": 0.253,
+        "gold_recall_retained": 0.407,
+        "covered_gold_kept": 22
+      },
+      {
+        "threshold": 42.0,
+        "kept": 169,
+        "kept_frac": 0.285,
+        "finding_precision": 0.254,
+        "gold_recall_retained": 0.407,
+        "covered_gold_kept": 22
+      },
+      {
+        "threshold": 43.0,
+        "kept": 168,
+        "kept_frac": 0.283,
+        "finding_precision": 0.256,
+        "gold_recall_retained": 0.407,
+        "covered_gold_kept": 22
+      },
+      {
+        "threshold": 46.0,
+        "kept": 166,
+        "kept_frac": 0.279,
+        "finding_precision": 0.253,
+        "gold_recall_retained": 0.389,
+        "covered_gold_kept": 21
+      },
+      {
+        "threshold": 55.0,
+        "kept": 165,
+        "kept_frac": 0.278,
+        "finding_precision": 0.248,
+        "gold_recall_retained": 0.389,
+        "covered_gold_kept": 21
+      },
+      {
+        "threshold": 56.0,
+        "kept": 164,
+        "kept_frac": 0.276,
+        "finding_precision": 0.25,
+        "gold_recall_retained": 0.389,
+        "covered_gold_kept": 21
+      },
+      {
+        "threshold": 57.0,
+        "kept": 163,
+        "kept_frac": 0.274,
+        "finding_precision": 0.252,
+        "gold_recall_retained": 0.389,
+        "covered_gold_kept": 21
+      },
+      {
+        "threshold": 58.0,
+        "kept": 162,
+        "kept_frac": 0.273,
+        "finding_precision": 0.253,
+        "gold_recall_retained": 0.389,
+        "covered_gold_kept": 21
+      },
+      {
+        "threshold": 62.0,
+        "kept": 158,
+        "kept_frac": 0.266,
+        "finding_precision": 0.253,
+        "gold_recall_retained": 0.352,
+        "covered_gold_kept": 19
+      },
+      {
+        "threshold": 63.0,
+        "kept": 157,
+        "kept_frac": 0.264,
+        "finding_precision": 0.248,
+        "gold_recall_retained": 0.333,
+        "covered_gold_kept": 18
+      },
+      {
+        "threshold": 65.0,
+        "kept": 156,
+        "kept_frac": 0.263,
+        "finding_precision": 0.25,
+        "gold_recall_retained": 0.333,
+        "covered_gold_kept": 18
+      },
+      {
+        "threshold": 66.0,
+        "kept": 155,
+        "kept_frac": 0.261,
+        "finding_precision": 0.252,
+        "gold_recall_retained": 0.333,
+        "covered_gold_kept": 18
+      },
+      {
+        "threshold": 67.0,
+        "kept": 154,
+        "kept_frac": 0.259,
+        "finding_precision": 0.253,
+        "gold_recall_retained": 0.333,
+        "covered_gold_kept": 18
+      },
+      {
+        "threshold": 68.0,
+        "kept": 153,
+        "kept_frac": 0.258,
+        "finding_precision": 0.248,
+        "gold_recall_retained": 0.315,
+        "covered_gold_kept": 17
+      },
+      {
+        "threshold": 70.0,
+        "kept": 152,
+        "kept_frac": 0.256,
+        "finding_precision": 0.243,
+        "gold_recall_retained": 0.315,
+        "covered_gold_kept": 17
+      },
+      {
+        "threshold": 71.0,
+        "kept": 151,
+        "kept_frac": 0.254,
+        "finding_precision": 0.245,
+        "gold_recall_retained": 0.315,
+        "covered_gold_kept": 17
+      },
+      {
+        "threshold": 72.0,
+        "kept": 150,
+        "kept_frac": 0.253,
+        "finding_precision": 0.247,
+        "gold_recall_retained": 0.315,
+        "covered_gold_kept": 17
+      },
+      {
+        "threshold": 73.0,
+        "kept": 136,
+        "kept_frac": 0.229,
+        "finding_precision": 0.228,
+        "gold_recall_retained": 0.278,
+        "covered_gold_kept": 15
+      },
+      {
+        "threshold": 74.0,
+        "kept": 135,
+        "kept_frac": 0.227,
+        "finding_precision": 0.222,
+        "gold_recall_retained": 0.278,
+        "covered_gold_kept": 15
+      },
+      {
+        "threshold": 76.0,
+        "kept": 134,
+        "kept_frac": 0.226,
+        "finding_precision": 0.224,
+        "gold_recall_retained": 0.278,
+        "covered_gold_kept": 15
+      },
+      {
+        "threshold": 77.0,
+        "kept": 130,
+        "kept_frac": 0.219,
+        "finding_precision": 0.208,
+        "gold_recall_retained": 0.222,
+        "covered_gold_kept": 12
+      },
+      {
+        "threshold": 78.0,
+        "kept": 129,
+        "kept_frac": 0.217,
+        "finding_precision": 0.209,
+        "gold_recall_retained": 0.222,
+        "covered_gold_kept": 12
+      },
+      {
+        "threshold": 80.0,
+        "kept": 121,
+        "kept_frac": 0.204,
+        "finding_precision": 0.215,
+        "gold_recall_retained": 0.222,
+        "covered_gold_kept": 12
+      },
+      {
+        "threshold": 81.0,
+        "kept": 119,
+        "kept_frac": 0.2,
+        "finding_precision": 0.21,
+        "gold_recall_retained": 0.204,
+        "covered_gold_kept": 11
+      },
+      {
+        "threshold": 82.0,
+        "kept": 118,
+        "kept_frac": 0.199,
+        "finding_precision": 0.212,
+        "gold_recall_retained": 0.204,
+        "covered_gold_kept": 11
+      },
+      {
+        "threshold": 83.0,
+        "kept": 112,
+        "kept_frac": 0.189,
+        "finding_precision": 0.214,
+        "gold_recall_retained": 0.204,
+        "covered_gold_kept": 11
+      },
+      {
+        "threshold": 84.0,
+        "kept": 111,
+        "kept_frac": 0.187,
+        "finding_precision": 0.216,
+        "gold_recall_retained": 0.204,
+        "covered_gold_kept": 11
+      },
+      {
+        "threshold": 86.0,
+        "kept": 107,
+        "kept_frac": 0.18,
+        "finding_precision": 0.196,
+        "gold_recall_retained": 0.167,
+        "covered_gold_kept": 9
+      },
+      {
+        "threshold": 87.0,
+        "kept": 106,
+        "kept_frac": 0.178,
+        "finding_precision": 0.198,
+        "gold_recall_retained": 0.167,
+        "covered_gold_kept": 9
+      },
+      {
+        "threshold": 88.0,
+        "kept": 105,
+        "kept_frac": 0.177,
+        "finding_precision": 0.2,
+        "gold_recall_retained": 0.167,
+        "covered_gold_kept": 9
+      },
+      {
+        "threshold": 90.0,
+        "kept": 84,
+        "kept_frac": 0.141,
+        "finding_precision": 0.202,
+        "gold_recall_retained": 0.148,
+        "covered_gold_kept": 8
+      },
+      {
+        "threshold": 91.0,
+        "kept": 80,
+        "kept_frac": 0.135,
+        "finding_precision": 0.2,
+        "gold_recall_retained": 0.148,
+        "covered_gold_kept": 8
+      },
+      {
+        "threshold": 92.0,
+        "kept": 73,
+        "kept_frac": 0.123,
+        "finding_precision": 0.205,
+        "gold_recall_retained": 0.13,
+        "covered_gold_kept": 7
+      },
+      {
+        "threshold": 93.0,
+        "kept": 59,
+        "kept_frac": 0.099,
+        "finding_precision": 0.22,
+        "gold_recall_retained": 0.111,
+        "covered_gold_kept": 6
+      },
+      {
+        "threshold": 94.0,
+        "kept": 46,
+        "kept_frac": 0.077,
+        "finding_precision": 0.261,
+        "gold_recall_retained": 0.093,
+        "covered_gold_kept": 5
+      },
+      {
+        "threshold": 95.0,
+        "kept": 41,
+        "kept_frac": 0.069,
+        "finding_precision": 0.268,
+        "gold_recall_retained": 0.074,
+        "covered_gold_kept": 4
+      },
+      {
+        "threshold": 96.0,
+        "kept": 40,
+        "kept_frac": 0.067,
+        "finding_precision": 0.275,
+        "gold_recall_retained": 0.074,
+        "covered_gold_kept": 4
+      },
+      {
+        "threshold": 97.0,
+        "kept": 34,
+        "kept_frac": 0.057,
+        "finding_precision": 0.265,
+        "gold_recall_retained": 0.074,
+        "covered_gold_kept": 4
+      },
+      {
+        "threshold": 98.0,
+        "kept": 26,
+        "kept_frac": 0.044,
+        "finding_precision": 0.231,
+        "gold_recall_retained": 0.056,
+        "covered_gold_kept": 3
+      },
+      {
+        "threshold": 99.0,
+        "kept": 17,
+        "kept_frac": 0.029,
+        "finding_precision": 0.294,
+        "gold_recall_retained": 0.056,
+        "covered_gold_kept": 3
+      },
+      {
+        "threshold": 100.0,
+        "kept": 8,
+        "kept_frac": 0.013,
+        "finding_precision": 0.375,
+        "gold_recall_retained": 0.037,
+        "covered_gold_kept": 2
+      }
+    ]
+  }
+}

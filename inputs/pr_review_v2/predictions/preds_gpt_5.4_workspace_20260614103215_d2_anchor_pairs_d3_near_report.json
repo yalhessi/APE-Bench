@@ -1,0 +1,41 @@
+{
+  "target": "near",
+  "coordinate_basis": "predicted anchors (h0) vs removed_in_revision spans (h0)",
+  "all": {
+    "slice": "all",
+    "prs": 0,
+    "gold_removed_spans": 0,
+    "recall": null,
+    "line_anchored_predictions": 0,
+    "precision": null,
+    "control_fp_rate": null,
+    "off_diff_rate": null,
+    "unlocalized": {
+      "pr_level": 0,
+      "file_only": 0
+    },
+    "approval_control_prs": {
+      "n": 0,
+      "findings_per_pr": null
+    }
+  },
+  "review_commit_id_primary": {
+    "slice": "review_commit_id",
+    "prs": 0,
+    "gold_removed_spans": 0,
+    "recall": null,
+    "line_anchored_predictions": 0,
+    "precision": null,
+    "control_fp_rate": null,
+    "off_diff_rate": null,
+    "unlocalized": {
+      "pr_level": 0,
+      "file_only": 0
+    },
+    "approval_control_prs": {
+      "n": 0,
+      "findings_per_pr": null
+    }
+  },
+  "per_pr": []
+}

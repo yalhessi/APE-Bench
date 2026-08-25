@@ -1,0 +1,1204 @@
+{
+  "target": "near",
+  "coordinate_basis": "predicted anchors (h0) vs removed_in_revision spans (h0)",
+  "all": {
+    "slice": "all",
+    "prs": 30,
+    "gold_removed_spans": 31,
+    "recall": 0.516,
+    "line_anchored_predictions": 69,
+    "precision": 0.464,
+    "control_fp_rate": 0.522,
+    "off_diff_rate": 0.014,
+    "unlocalized": {
+      "pr_level": 0,
+      "file_only": 0
+    },
+    "approval_control_prs": {
+      "n": 15,
+      "findings_per_pr": 1.73
+    }
+  },
+  "review_commit_id_primary": {
+    "slice": "review_commit_id",
+    "prs": 23,
+    "gold_removed_spans": 31,
+    "recall": 0.516,
+    "line_anchored_predictions": 53,
+    "precision": 0.604,
+    "control_fp_rate": 0.377,
+    "off_diff_rate": 0.019,
+    "unlocalized": {
+      "pr_level": 0,
+      "file_only": 0
+    },
+    "approval_control_prs": {
+      "n": 8,
+      "findings_per_pr": 1.25
+    }
+  },
+  "per_pr": [
+    {
+      "pr_number": 33322,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Tactic/Linter/TacticDocumentation.lean",
+          "span": [
+            8,
+            10
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Marking imported modules as `public` is not the right fix here. `public import` re-exports the imported names from this module and broadens the API surface unne"
+        },
+        {
+          "path": "Mathlib/Tactic/Linter/TacticDocumentation.lean",
+          "span": [
+            27,
+            27
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`public` should not be used on the `tacticDocs` declaration itself unless there is a specific namespace-renaming reason; here it needlessly creates a public ali"
+        },
+        {
+          "path": "MathlibTest/HashLint.lean",
+          "span": [
+            1,
+            14
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "The regression test is reasonable, but if the fix is changed to remove the private `module` rather than adding `public`, the test should still pass unchanged. N"
+        }
+      ]
+    },
+    {
+      "pr_number": 33400,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33337,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 3,
+      "gold_covered": 1,
+      "line_anchored": 2,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 2,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+          "span": [
+            181,
+            205
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "These renames are not aligned with mathlib naming conventions for `apply`/`coe` lemmas. In particular, `orthogonalProjection_apply_eq_linearProjOfIsCompl` shoul"
+        },
+        {
+          "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+          "span": [
+            189,
+            205
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The deprecation schedule is inconsistent: you introduce aliases deprecated since `2025-12-26` for names that are being removed in this very PR, while older alia"
+        }
+      ]
+    },
+    {
+      "pr_number": 33373,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 3,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean",
+          "span": [
+            234,
+            241
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The two new lemmas are missing docstrings. In this file, exported API lemmas should be documented, and these are parallel to the existing documented `iteratedDe"
+        },
+        {
+          "path": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean",
+          "span": [
+            234,
+            241
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The names `iteratedDeriv_comp_sub_const` and especially `iteratedDeriv_comp_const_sub` do not follow the existing naming pattern very well. The established shif"
+        },
+        {
+          "path": "Mathlib/Analysis/Calculus/IteratedDeriv/Lemmas.lean",
+          "span": [
+            227,
+            241
+          ],
+          "severity": "advisory",
+          "class": "hit",
+          "claim": "These proofs are very repetitive with the preceding two lemmas. A maintainer would likely ask for a small cleanup to keep this block uniform, for example using "
+        }
+      ]
+    },
+    {
+      "pr_number": 33334,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33356,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 2,
+      "control_fp": 1,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Ring/Units.lean",
+          "span": [
+            46,
+            48
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`val_eq_neg_one` is too specialized for `-1` and is likely duplicating the standard `Units.val_inj` API rather than extending it in a reusable way. A maintainer"
+        },
+        {
+          "path": "Mathlib/NumberTheory/ModularForms/ArithmeticSubgroups.lean",
+          "span": [
+            46,
+            49
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new lemma name does not follow mathlib naming conventions: proposition/class names start with capitals, so the theorem should be `HasDetPlusMinusOne.iff_abs"
+        },
+        {
+          "path": "Mathlib/NumberTheory/ModularForms/ArithmeticSubgroups.lean",
+          "span": [
+            49,
+            49
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The reverse implication proof uses `simpa ... using @h`, which is brittle and non-idiomatic: it relies on elaboration of an implicit-argument function and hidde"
+        }
+      ]
+    },
+    {
+      "pr_number": 33321,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 3,
+      "gold_covered": 3,
+      "line_anchored": 5,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 4,
+      "control_fp": 1,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+          "span": [
+            46,
+            50
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "`IsMulIndecomposable.baseOf` is introduced in `Algebra/Group/Irreducible/Indecomposable` with a root-system-specific docstring. This is too specialized for such"
+        },
+        {
+          "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+          "span": [
+            87,
+            114
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new theorem names `Submonoid.closure_image_isMulIndecomposable_baseOf` / `Subgroup.closure_image_isMulIndecomposable_baseOf` are not good mathlib names: the"
+        },
+        {
+          "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+          "span": [
+            115,
+            158
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The lemmas `pairwise_div_notMem_range`, `pairwise_div_notMem_range'`, and `mem_or_inv_mem_closure_baseOf` are quite specialized to the root-system application b"
+        },
+        {
+          "path": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+          "span": [
+            49,
+            58
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "`baseOf_pairwise_pairing_le_zero` duplicates the existing root-system terminology by using the bare name `baseOf` from the generic indecomposable namespace with"
+        },
+        {
+          "path": "Mathlib/Algebra/Group/Hom/Basic.lean",
+          "span": [
+            69,
+            70
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "`invMonoidHom_comp_invMonoidHom` is a useful companion lemma, but the theorem name is a bit clunky compared to existing `*_comp_*`/`self_comp` patterns. If this"
+        }
+      ]
+    },
+    {
+      "pr_number": 33399,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33421,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 8,
+      "gold_covered": 4,
+      "line_anchored": 6,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 5,
+      "control_fp": 0,
+      "off_diff": 1,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+          "span": [
+            96,
+            100
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "`continuousAt_floor` is missing the `[fun_prop]` companion on the corresponding `ContinuousOn` theorem and introduces a new continuity API for `floor`/`ceil` wi"
+        },
+        {
+          "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+          "span": [
+            112,
+            118
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The hypothesis of `continuousAt_ceil` is stated as `x ≠ ⌊x⌋`; for a ceil lemma this is the wrong API shape and is harder to use than the natural `x ≠ ⌈x⌉` or `x"
+        },
+        {
+          "path": "Mathlib/Algebra/Order/Round.lean",
+          "span": [
+            84,
+            91
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "`round_eq_half_ceil_two_mul` has a nonstandard, hard-to-discover name. Mathlib theorem names usually mirror the formula structure more directly (`round_eq_ceil_"
+        },
+        {
+          "path": "Mathlib/Algebra/Order/Floor/Ring.lean",
+          "span": [
+            270,
+            277
+          ],
+          "severity": "advisory",
+          "class": "hit",
+          "claim": "`two_mul_fract_eq_one_iff_exists_int` is useful, but the existential formulation is a bit ad hoc and tied to parity arithmetic on `ℤ`. A more reusable statement"
+        },
+        {
+          "path": "Mathlib/Topology/Algebra/Order/Floor.lean",
+          "span": [
+            202,
+            226
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new one-sided limit and continuity lemmas for `round` are substantial API additions but are completely undocumented. For nontrivial results of this size in "
+        },
+        {
+          "path": "Mathlib/Algebra/Order/Round.lean",
+          "span": [
+            147,
+            156
+          ],
+          "severity": "advisory",
+          "class": "off_diff",
+          "claim": "`round_eq_iff` is a good API theorem, but it is not marked `[simp]` and there is no companion specialized to membership in the half-open interval around an inte"
+        }
+      ]
+    },
+    {
+      "pr_number": 33370,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 4,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 4,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+          "span": [
+            191,
+            205
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The new lemma is introduced in the `Submonoid` namespace with a very specific ordered-target statement, but it has no docstring and, more importantly, its API s"
+        },
+        {
+          "path": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+          "span": [
+            137,
+            148
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`basisOfBase` is a public noncomputable definition but it is undocumented beyond a brief sentence and has no companion lemmas/API; in mathlib we generally avoid"
+        },
+        {
+          "path": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+          "span": [
+            150,
+            196
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The theorem name `exists_dual_baseOf_eq` is not descriptive enough for the statement: it asserts existence of a dual functional whose `baseOf` is exactly a pres"
+        },
+        {
+          "path": "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+          "span": [
+            154,
+            162
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "The proof constructs an ad hoc basis `b` via `LinearIndepOn.extend` and then `b.constr ℚ 1`. This is fine, but it is fairly opaque and would benefit from a shor"
+        }
+      ]
+    },
+    {
+      "pr_number": 33345,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33349,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 2,
+      "gold_covered": 1,
+      "line_anchored": 4,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 4,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Order/AddGroupWithTop.lean",
+          "span": [
+            145,
+            150
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The deprecation aliases are backwards: `alias old := new` creates `new` as an alias for `old`, but here you want to keep the old names as deprecated aliases for"
+        },
+        {
+          "path": "Mathlib/Algebra/Order/AddGroupWithTop.lean",
+          "span": [
+            169,
+            173
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The subtraction injectivity lemmas are incorrectly named left/right. `fun x ↦ x - b` is varying the left argument, so its companion iff lemma should be `sub_rig"
+        },
+        {
+          "path": "Mathlib/Algebra/Order/AddGroupWithTop.lean",
+          "span": [
+            175,
+            205
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "Several new lemmas duplicate standard cancellation/comparison API under ad hoc names (`add_left_inj_of_ne_top`, `add_lt_add_iff_left_of_ne_top`, `add_le_add_iff"
+        },
+        {
+          "path": "Mathlib/Algebra/Order/AddGroupWithTop.lean",
+          "span": [
+            145,
+            205
+          ],
+          "severity": "advisory",
+          "class": "hit",
+          "claim": "This adds a fairly large family of one-off lemmas but no module/class doc update or note explaining the API around cancellation/strict monotonicity in `AddGroup"
+        }
+      ]
+    },
+    {
+      "pr_number": 33367,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33419,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 2,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 2,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Data/Finset/Card.lean",
+          "span": [
+            577,
+            580
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new lemma name does not follow the usual `card_*` naming pattern used in this file, and `diff` is misleading here because the statement is about `sdiff`/`\\`"
+        },
+        {
+          "path": "Mathlib/Data/Finset/Card.lean",
+          "span": [
+            577,
+            580
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "This should be a `theorem`, not a `lemma`. In mathlib, top-level exported results in core API files like `Finset/Card` are normally declared as `theorem`; using"
+        }
+      ]
+    },
+    {
+      "pr_number": 33333,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 2,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 2,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/Real/Pi/Bounds.lean",
+          "span": [
+            226,
+            238
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "These theorem names do not follow mathlib naming conventions for `Int.floor`, `Int.ceil`, and `round`; the standard style is to keep the operator namespace/orde"
+        },
+        {
+          "path": "Mathlib/Analysis/Real/Pi/Bounds.lean",
+          "span": [
+            234,
+            238
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The proof of `round π = 3` is unnecessarily opaque/non-idiomatic (`round_eq _ |>.trans <| ...` with `grw`), and maintainers will usually ask for a direct proof "
+        }
+      ]
+    },
+    {
+      "pr_number": 33418,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/RingTheory/Ideal/Basic.lean",
+          "span": [
+            258,
+            272
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The three new lemmas are too specialized to this local proof refactor and introduce new API in a foundational file without docstrings or clear evidence they are"
+        },
+        {
+          "path": "Mathlib/RingTheory/Ideal/Basic.lean",
+          "span": [
+            258,
+            258
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`open Ideal in theorem isField_iff_maximal_bot ...` is not idiomatic here: it is only needed to shorten `bot_isMaximal` in a single theorem, and opening a names"
+        },
+        {
+          "path": "Mathlib/RingTheory/Ideal/Basic.lean",
+          "span": [
+            281,
+            285
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "The rewritten proof of `not_isField_iff_exists_prime` names the witness ideal `I` in the reverse direction even though it is assumed prime; this makes the state"
+        }
+      ]
+    },
+    {
+      "pr_number": 33395,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 3,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Star/LinearMap.lean",
+          "span": [
+            136,
+            142
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new lemmas are stated under unnecessarily weak/odd hypotheses (`[Semiring S] [StarAddMonoid S] [StarModule S S]`) and use a fresh section name unrelated to "
+        },
+        {
+          "path": "Mathlib/Algebra/Star/LinearMap.lean",
+          "span": [
+            136,
+            142
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "These API additions are missing docstrings/comments explaining what they provide. In a core API file like `Algebra/Star/LinearMap`, new public lemmas—especially"
+        },
+        {
+          "path": "Mathlib/Algebra/Star/LinearMap.lean",
+          "span": [
+            132,
+            134
+          ],
+          "severity": "advisory",
+          "class": "hit",
+          "claim": "`IntrinsicStar.starLinearEquiv_eq` is an unusual theorem name: names ending in `_eq` are generally reserved for a specific useful rewrite shape, but this one ju"
+        }
+      ]
+    },
+    {
+      "pr_number": 33332,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 2,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Data/Finset/Max.lean",
+          "span": [
+            44,
+            46
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Adding a global `[grind]` attribute to `Finset.max_insert` is likely too costly for the general automation set. Your own profiling shows `Finset.mem_of_max` reg"
+        },
+        {
+          "path": "Mathlib/Order/Interval/Set/UnorderedInterval.lean",
+          "span": [
+            255,
+            256
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Marking `uIoc_of_le` and `uIoc_of_ge` with `[grind]` looks too aggressive: these are broad order-splitting lemmas, and globally registering both directions can "
+        },
+        {
+          "path": "Mathlib/Combinatorics/SimpleGraph/Walks/Basic.lean",
+          "span": [
+            137,
+            139
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Registering `support_cons` as a global `[grind]` theorem is also too broad. Structural equations for recursive data are usually better supplied locally; making "
+        }
+      ]
+    },
+    {
+      "pr_number": 33385,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33343,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 1,
+      "gold_covered": 1,
+      "line_anchored": 2,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 1,
+      "control_fp": 1,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/Order/Ring/StandardPart.lean",
+          "span": [
+            405,
+            413
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The new order lemmas should follow the standard `map_*` naming/API around `stdPart`, not introduce ad hoc names `stdPart_nonneg`/`stdPart_nonpos`. Since `stdPar"
+        },
+        {
+          "path": "Mathlib/Algebra/Order/Ring/StandardPart.lean",
+          "span": [
+            154,
+            154
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Changing the public theorem back to `private` and then passing it via `by exact ordConnected_preimage_mk'` is not an improvement to the API and makes the declar"
+        }
+      ]
+    },
+    {
+      "pr_number": 33440,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 4,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 4,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/Complex/ExponentialBounds.lean",
+          "span": [
+            40,
+            55
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "These theorems are too specializedly named around `exp 1`. In `Real`, the standard constant is `Real.e`, and API should be stated/named in terms of `Real.e` (wi"
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/ExponentialBounds.lean",
+          "span": [
+            46,
+            47
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`ceil_exp_one_eq_three` does not follow mathlib naming conventions: for `ceil`, the numeral comes after `eq`, as in `Int.ceil_eq_iff`; the natural theorem name "
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/ExponentialBounds.lean",
+          "span": [
+            49,
+            51
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The proof of `round_exp_one_eq_three` uses `grind`/`grw` in a place where a short elementary proof would be clearer and more stable. In core library files we ge"
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/ExponentialBounds.lean",
+          "span": [
+            66,
+            67
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "If you keep the inverse bound, it would be more useful to also provide the equivalent formulation `2 < exp 1`/`(exp 1)⁻¹ < 1/2` in a form matching `Real.e`; use"
+        }
+      ]
+    },
+    {
+      "pr_number": 33438,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 2,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 2,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Arctan.lean",
+          "span": [
+            205,
+            216
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "These two declarations are misnamed: `arctan_inv_sqrt_three` parses as `arctan ((√3)⁻¹)`, but the theorem statement is `(arctan (√3))⁻¹ = π / 6`. In mathlib the"
+        },
+        {
+          "path": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Arctan.lean",
+          "span": [
+            205,
+            216
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "As written, the second theorem is mathematically false: from `arctan (√3) = π / 3` one gets `(arctan (√3))⁻¹ = 3 / π`, not `π / 6`. This needs to be corrected b"
+        }
+      ]
+    },
+    {
+      "pr_number": 33362,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 3,
+      "gold_covered": 1,
+      "line_anchored": 4,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 4,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+          "span": [
+            151,
+            156
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "The theorem `norm_deriv_le_one_of_mapsTo_ball` has become strictly more general (`f : ℂ → E`, codomain arbitrary) but its name and docstring still suggest the s"
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+          "span": [
+            158,
+            163
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "Similarly, `dist_le_dist_of_mapsTo_ball_self` no longer proves a `self` statement: the conclusion is `dist (f z) (f c) ≤ dist z c`, and the assumptions no longe"
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+          "span": [
+            165,
+            171
+          ],
+          "severity": "blocking",
+          "class": "hit",
+          "claim": "`norm_le_norm_of_mapsTo_ball_self` has also been generalized to arbitrary codomain `E`, but the theorem name still reads as a self-map-of-`ℂ` statement. This sh"
+        },
+        {
+          "path": "Mathlib/Analysis/Complex/Schwarz.lean",
+          "span": [
+            141,
+            146
+          ],
+          "severity": "advisory",
+          "class": "hit",
+          "claim": "The docstring for `norm_deriv_le_div_of_mapsTo_ball` still says the image is an open ball, but the theorem now assumes a `closedBall`. There are a couple of sim"
+        }
+      ]
+    },
+    {
+      "pr_number": 33357,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": []
+    },
+    {
+      "pr_number": 33413,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Order/WithBot.lean",
+          "span": [
+            899,
+            911
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The new names `toDual_symm`/`ofDual_symm` are too generic and likely to clash with the existing naming convention for lemmas about equivalences: a theorem named"
+        },
+        {
+          "path": "Mathlib/Order/WithBot.lean",
+          "span": [
+            913,
+            921
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The renaming from `toDual_apply_bot`/`ofDual_apply_bot` to `toDual_bot`/`ofDual_bot` is not aligned with the corresponding `WithTop` API introduced via `@[to_du"
+        },
+        {
+          "path": "Mathlib/Order/WithBot.lean",
+          "span": [
+            916,
+            921
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "The explicit `_root_` deprecated aliases for the `WithTop` theorems look unnecessary and make the deprecation story harder to follow. Since these are dualized d"
+        }
+      ]
+    },
+    {
+      "pr_number": 33401,
+      "h0_resolution": "review_commit_id",
+      "verdict": "COMMENT_ONLY",
+      "gold_removed_spans": 1,
+      "gold_covered": 0,
+      "line_anchored": 0,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 0,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": []
+    },
+    {
+      "pr_number": 33376,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 1,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 1,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Analysis/InnerProductSpace/Rayleigh.lean",
+          "span": [
+            66,
+            68
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "`rayleighQuotient_add` is not valid as stated: `rayleighQuotient` is only homogeneous of degree 0, not linear in the operator without side conditions on `x`. At"
+        }
+      ]
+    },
+    {
+      "pr_number": 33340,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean",
+          "span": [
+            525,
+            526
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The new proof of `exists_ne_one_of_prod_ne_one` is not valid as written: after `contrapose! h`, the goal is a pointwise hypothesis `∀ a ∈ s, f a = 1`, while `pr"
+        },
+        {
+          "path": "Mathlib/GroupTheory/QuotientGroup/Basic.lean",
+          "span": [
+            281,
+            281
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The replacement `simp [leftRel_apply, inclusion, mem_subgroupOf, hn]` is too optimistic here. In quotient-group proofs, `simp` usually does not close the requir"
+        },
+        {
+          "path": "Mathlib/Combinatorics/SimpleGraph/Matching.lean",
+          "span": [
+            402,
+            408
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Changing `(?_ : Inhabited _).default` to `(?_ : Nonempty _).some` weakens definitional transparency and introduces an unnecessary `Classical.choice`-style term "
+        }
+      ]
+    },
+    {
+      "pr_number": 33328,
+      "h0_resolution": "review_commit_id",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 2,
+      "gold_covered": 0,
+      "line_anchored": 4,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 4,
+      "off_diff": 0,
+      "is_control_pr": false,
+      "findings": [
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            72,
+            95
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The new `self_*` lemmas are introduced without docstrings/API notes, but more importantly the deprecation aliases are malformed: `@[deprecated (since := ...)] a"
+        },
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            72,
+            88
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The new negative-membership lemmas are not marked `[simp]`. Since they are intended to replace the old `x ∈ Ixx ... ↔ False` simp lemmas, omitting `[simp]` weak"
+        },
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            72,
+            95
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "This changes core theorem names (`left_mem_Ici`, `right_mem_Iic`) to `self_mem_*` in many downstream files, but the PR only renames the closed one-sided interva"
+        },
+        {
+          "path": "Mathlib/Order/Interval/Set/Basic.lean",
+          "span": [
+            80,
+            94
+          ],
+          "severity": "advisory",
+          "class": "control_fp",
+          "claim": "The explicit `by simp` proofs for the new one-sided lemmas are fine, but for the old deprecated lemmas of the form `x ∈ Ixx ... ↔ False`, you may want to keep t"
+        }
+      ]
+    },
+    {
+      "pr_number": 33432,
+      "h0_resolution": "pushed_before_t1",
+      "verdict": "APPROVED",
+      "gold_removed_spans": 0,
+      "gold_covered": 0,
+      "line_anchored": 3,
+      "pr_level": 0,
+      "file_only": 0,
+      "hits": 0,
+      "control_fp": 3,
+      "off_diff": 0,
+      "is_control_pr": true,
+      "findings": [
+        {
+          "path": "Mathlib/CategoryTheory/Groupoid.lean",
+          "span": [
+            111,
+            111
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The deprecated declaration should remain `noncomputable` (or the new equivalence should be too). As written, `invFunctor` lost its previous `noncomputable` mark"
+        },
+        {
+          "path": "Mathlib/CategoryTheory/Groupoid.lean",
+          "span": [
+            111,
+            111
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "The deprecation date is in the future. In mathlib, `@[deprecated ... (since := ...)]` should use the current release date / date of deprecation, not a future pl"
+        },
+        {
+          "path": "Mathlib/CategoryTheory/Groupoid.lean",
+          "span": [
+            116,
+            123
+          ],
+          "severity": "blocking",
+          "class": "control_fp",
+          "claim": "Introducing `Groupoid.invEquivalence` without compatibility lemmas leaves an awkward API transition: users of the old functor will now get a deprecated declarat"
+        }
+      ]
+    }
+  ]
+}

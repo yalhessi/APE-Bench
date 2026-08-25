@@ -1,0 +1,24 @@
+{
+  "atomicity_status": {
+    "metadata": 4,
+    "not_judgeable": 17,
+    "presumed_atomic": 80,
+    "reviewed_decomposed": 9,
+    "unresolved_scope": 3
+  },
+  "decisions": 9,
+  "decomposed_obligations": 25,
+  "evaluation_eligibility": {
+    "excluded_not_judgeable": 17,
+    "included": 89,
+    "metadata": 4,
+    "unresolved_scope": 3
+  },
+  "judgments": 113,
+  "judgments_sha256": "714d0ec51eea5b91e42e2a0526c6965b9b69c1c8092da2d50132910a15c3c4ee",
+  "obligations": 129,
+  "outcomes_sha256": "e1b0c04b301e6feb66d9e1ca145f31bcddae258eec27bf4707d174636f68de0e",
+  "schema_version": "judgment-stability-audit1",
+  "stabilizer_version": "judgment-decomposition/1",
+  "views_sha256": "0fa640e3e64dc4140874f9c3f590300365a1dedf1b524d66282b2681a97d6d52"
+}

@@ -1,0 +1,22 @@
+{
+  "predictions": 57,
+  "parse_failures": 0,
+  "merge_ready_true": 17,
+  "merge_ready_false": 40,
+  "findings_total": 125,
+  "findings_blocking": 15,
+  "anchored_findings": 125,
+  "input_tokens": 14491000,
+  "output_tokens": 391755,
+  "cost_usd": 51.5217,
+  "checkers": [
+    "golf",
+    "dup",
+    "gen"
+  ],
+  "findings_by_source": {
+    "golf": 78,
+    "gen": 33,
+    "dup": 14
+  }
+}

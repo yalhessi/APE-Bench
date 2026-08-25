@@ -1,0 +1,96 @@
+{
+  "corpus_cutoff_policy": "Diagnostic development smoke. Prompts expose review-time inventory, method outcomes, and accepted finding text but no maintainer comments, gold obligations, or post-review outcomes.",
+  "created_at": "2026-07-17T12:00:00-05:00",
+  "dataset_id": "mathlib-pr-review-v4-phase8-residual-smoke",
+  "derived_artifacts": [
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 2,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "c13d636f726cd670af8000d34dc0168dc1340b690906c9fab352f1218aaf5d78"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 2,
+      "role": "residual_pr_units",
+      "schema_version": "work-unit1",
+      "sha256": "de6fea6067bd9fdb6fbd0717b28af623dc1432a5e7d06ef8044636c1b76bcf9e"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 2,
+      "role": "residual_review_prompts",
+      "schema_version": "rendered-prompt1",
+      "sha256": "9d0a6596abd87a547530182725e3715d41cc41b934fd413b9532c6c32265ae94"
+    },
+    {
+      "path": "derived/synthesized_findings.jsonl",
+      "records": 3,
+      "role": "already_accepted_findings",
+      "schema_version": "synthesized-finding1",
+      "sha256": "f291fb6ed69d2aedf0c631b6ce8da5518a3eb6a3709ebc6194bcc4178c67e80b"
+    },
+    {
+      "path": "derived/residual_review_passes.jsonl",
+      "records": 2,
+      "role": "scheduled_residual_passes",
+      "schema_version": "residual-review-pass1",
+      "sha256": "0ea9dedf5dd68bdc0c774fe834348514c5c35340b5dc796f0eec011f0de13296"
+    }
+  ],
+  "generator_git_commit": null,
+  "generator_tree_state": "unknown",
+  "generator_versions": {
+    "candidate_contract": "grounded-ask/1",
+    "change_graph": "cg1_builder_v2",
+    "deterministic_discovery": "compile-style/1",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "evidence": "evidence-collectors/2",
+    "funnel": "raw_first_round_v1",
+    "generation_prior": "none",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "judgment_stabilizer": "judgment-decomposition/1",
+    "phase8_residual_review": "phase8-residual-review/2",
+    "pilot": "pilot/2",
+    "renderer": "candidate-prompt/11",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 2,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "867695174da1ff222d06ff398dfaf10eb17ab5225a847b5f5e56658a9e24b249"
+    }
+  ],
+  "pr_numbers": [
+    33098,
+    33438
+  ],
+  "release": "0.1.1-phase8-residual-smoke",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+      "records": 2,
+      "role": "parent_stable_release",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3"
+    },
+    {
+      "path": "results/pr_review_v4/audits/phase8-synthesis-gate-0.1.0/report.json",
+      "records": 1,
+      "role": "phase8_synthesis_gate",
+      "schema_version": "phase8-synthesis-gate-report1",
+      "sha256": "c05016b2e68ba89f7eb889a35ce42e0ac872bc144ee3e542264f9710b8f0e84a"
+    }
+  ],
+  "split": "development"
+}

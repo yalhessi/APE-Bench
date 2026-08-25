@@ -1,0 +1,37 @@
+{
+  "complete": true,
+  "counts": {
+    "accepted_candidates": 3,
+    "candidates": 3,
+    "findings": 3,
+    "links": 3,
+    "match_projections": 5,
+    "residual_passes": 2,
+    "synthesis_decisions": 3
+  },
+  "finding_ids": [
+    "synthesized-finding:defe4655758981e9d64b63df",
+    "synthesized-finding:81adedfe3e1a5f937e34534c",
+    "synthesized-finding:9473e2c75e81d4926466cfa4"
+  ],
+  "gates": {
+    "all_findings_have_complete_lineage": true,
+    "byte_stable_replay": true,
+    "control_findings": 0,
+    "exact_duplicate_findings": true,
+    "residual_pass_scheduled_for_both_prs": true,
+    "supported_issue_matches_retained": true
+  },
+  "issue_matched_obligations_after": [
+    "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+    "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+    "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118"
+  ],
+  "issue_matched_obligations_before": [
+    "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+    "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+    "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118"
+  ],
+  "schema_version": "phase8-synthesis-gate-report1",
+  "synthesis_version": "phase8-pr-synthesis/1"
+}

@@ -1,0 +1,139 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-07-17T00:00:00-05:00",
+  "dataset_id": "mathlib-pr-review-v4-dev-medium",
+  "derived_artifacts": [
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 16,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "64c9187e1849cc4f565553bcaa24bf1502e3757f95dd67bd3553295ae7047342"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 225,
+      "role": "candidate_work_units",
+      "schema_version": "work-unit1",
+      "sha256": "635edfe2762c0e332e39fd5710eb2c3eff454942075d75031d8ff8a3bd5ba0f6"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 225,
+      "role": "production_prompt_preview",
+      "schema_version": "rendered-prompt1",
+      "sha256": "eb59d6fd2ad1f644b6c6b5bbd2724324028ce36a1127c550ab9a5852071049bf"
+    }
+  ],
+  "generator_git_commit": null,
+  "generator_tree_state": "unknown",
+  "generator_versions": {
+    "candidate_contract": "grounded-ask/1",
+    "change_graph": "cg1_builder_v2",
+    "deterministic_discovery": "compile-style/1",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "evidence": "evidence-collectors/2",
+    "funnel": "raw_first_round_v1",
+    "generation_prior": "none",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "judgment_stabilizer": "judgment-decomposition/1",
+    "pilot": "pilot/2",
+    "renderer": "candidate-prompt/11",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [
+    {
+      "path": "gold/judgments.jsonl",
+      "records": 33,
+      "role": "hidden_judgments",
+      "schema_version": "jg1",
+      "sha256": "bb45509342d820b5cacc266e1c4721feabf14b51acc17156b371de065b8c79d6"
+    },
+    {
+      "path": "gold/intervention_views.jsonl",
+      "records": 33,
+      "role": "hidden_intervention_views",
+      "schema_version": "view1",
+      "sha256": "f9a170b48c9f1d903fb5b2ae2c8b8286b892469ebad4de9204a356306c115a81"
+    },
+    {
+      "path": "gold/outcome_observations.jsonl",
+      "records": 33,
+      "role": "hidden_outcomes",
+      "schema_version": "outcome-observation1",
+      "sha256": "232291be5b7ed04f40f628833cdd6ca7d0102aeee5958017ca6fbed84e16fd82"
+    },
+    {
+      "path": "gold/intervention_scope_migrations.jsonl",
+      "records": 33,
+      "role": "hidden_scope_maps",
+      "schema_version": "i5-cg1-map1",
+      "sha256": "997105cf5090190977e2cacef84a13daffd421c68f91e9978aa52762fd638a84"
+    },
+    {
+      "path": "gold/pilot_cases.jsonl",
+      "records": 16,
+      "role": "pilot_case_semantics",
+      "schema_version": "pilot-case1",
+      "sha256": "94b5f53aac93bdd938f528b444a7272049676c8253bde0a4e51aaf55bb875781"
+    },
+    {
+      "path": "gold/episode_boundaries.jsonl",
+      "records": 16,
+      "role": "hidden_episode_boundaries",
+      "schema_version": "episode-boundary1",
+      "sha256": "3fb7bc14fca1edaa06e20ac1be8c1174dcd610d02b7e6a7d0f82d8261c961d36"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 16,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "a81bb99cc9b04550ba3f9412702cc105f13ca41e30abca595d77880b311bede2"
+    }
+  ],
+  "pr_numbers": [
+    33057,
+    33066,
+    33098,
+    33117,
+    33145,
+    33149,
+    33285,
+    33294,
+    33304,
+    33305,
+    33315,
+    33321,
+    33337,
+    33362,
+    33421,
+    33438
+  ],
+  "release": "0.1.0-medium",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [
+    {
+      "path": "source/events.jsonl",
+      "records": 942,
+      "role": "raw_event_index",
+      "schema_version": "event1",
+      "sha256": "ea78199aa256dd9ab702f15b810143f51b2e9c7ae9da7a79fd91cf1c1514cb68"
+    }
+  ],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-judgment-stable-0.9.0",
+      "records": 16,
+      "role": "parent_release",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "dbb68999c64acabcbaa4b0b2da458d929c1f45c29344c14e03e29ddc55650c08"
+    }
+  ],
+  "split": "development"
+}

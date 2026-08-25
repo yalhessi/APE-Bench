@@ -1,0 +1,147 @@
+{
+  "candidates": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3/candidates.jsonl",
+  "decision": "judge_migration_not_equivalent",
+  "disagreements": [
+    {
+      "cache_key": "6ec187763a00acd266aefa9096ab036aa681e8e180e7265bd43c126b87badc59",
+      "candidate_id": "candidate:302c3bc18b1b030f729524a5",
+      "issue_agrees": false,
+      "issue_votes": 0,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    }
+  ],
+  "gates": {
+    "agreement": {
+      "observed": 0.8333333333333334,
+      "pass": false,
+      "required": 0.95
+    },
+    "coverage": {
+      "comparable": 6,
+      "missing_script": 0,
+      "missing_task": 0,
+      "pairs": 6,
+      "pass": true
+    },
+    "no_split_votes": {
+      "observed_split_pairs": 0,
+      "pass": true,
+      "required": 0
+    }
+  },
+  "issue_agreement": 0.8333333333333334,
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v1-v7.1-rubric",
+  "release": "inputs/pr_review_v4/releases/dev-pilot-0.9.0",
+  "resolution_agreement": 1.0,
+  "rows": [
+    {
+      "cache_key": "0780c5373c4afe309bd8b5429998138aaa0d862ba227c2073d8f00ed84541ba7",
+      "candidate_id": "candidate:1b24cee1a9608e6772ab7570",
+      "issue_agrees": true,
+      "issue_votes": 3,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "4b55691e62cd39717da0055650edc730e267b80351bd69a4901deed5a864932e",
+      "candidate_id": "candidate:0ca0c3f4fc13c9bd325cadb8",
+      "issue_agrees": true,
+      "issue_votes": 3,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": true,
+      "task_issue": true,
+      "task_present": true,
+      "task_resolution": true,
+      "unanimous": true
+    },
+    {
+      "cache_key": "170138a5e879284ee0d67803e8b31fa1a939a0bd4905691e9332096e6786cb39",
+      "candidate_id": "candidate:0ca0c3f4fc13c9bd325cadb8",
+      "issue_agrees": true,
+      "issue_votes": 0,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "3939d65cc164495481e5bdc78061a1826601476c18fa0493a13c1ba1e9ef0051",
+      "candidate_id": "candidate:a872307d53f5151e5f3813f4",
+      "issue_agrees": true,
+      "issue_votes": 0,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "0cbe11b3cd831ce6a1e0653ce2a2857f2eb09681ef45cf2f7c68e84b58f70fa5",
+      "candidate_id": "candidate:0ca0c3f4fc13c9bd325cadb8",
+      "issue_agrees": true,
+      "issue_votes": 0,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": false,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    },
+    {
+      "cache_key": "6ec187763a00acd266aefa9096ab036aa681e8e180e7265bd43c126b87badc59",
+      "candidate_id": "candidate:302c3bc18b1b030f729524a5",
+      "issue_agrees": false,
+      "issue_votes": 0,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_agrees": true,
+      "samples": 3,
+      "script_issue": true,
+      "script_present": true,
+      "script_resolution": false,
+      "task_issue": false,
+      "task_present": true,
+      "task_resolution": false,
+      "unanimous": true
+    }
+  ],
+  "schema_version": "r0-judge-equivalence1",
+  "split_vote_pairs": [],
+  "task_arm": "results/pr_review_v4/audits/r0-judge-equivalence/task-arm-rep1"
+}

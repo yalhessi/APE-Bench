@@ -1,0 +1,76 @@
+{
+  "derived_artifacts": [
+    {
+      "path": "derived/modification_inventory.jsonl",
+      "records": 184,
+      "role": "modification_inventory",
+      "schema_version": "modification1",
+      "sha256": "240f1a9b4ac166b347c65652ca6cb1e22eb2e4b4c1b85b845127c84004ed3100"
+    },
+    {
+      "path": "derived/inventory_report.json",
+      "records": 1,
+      "role": "inventory_report",
+      "schema_version": "modification-inventory-report1",
+      "sha256": "6a1d07ac1d88c24f2439d67336bb9502a93834fa940337a7d386819b0a767ed2"
+    },
+    {
+      "path": "derived/pr_relations.jsonl",
+      "records": 283,
+      "role": "pr_relations",
+      "schema_version": "pr-relation1",
+      "sha256": "8a0fff5e03507c5c9381d0d79474ff07edb4f79fe7083436f8586d838238f11b"
+    },
+    {
+      "path": "derived/relation_evidence.jsonl",
+      "records": 283,
+      "role": "relation_evidence",
+      "schema_version": "relation-evidence1",
+      "sha256": "52d2d634b5d2d899288aba0f7c3bf6214b83e655a7b02647b70fbf885727d55e"
+    },
+    {
+      "path": "derived/relation_report.json",
+      "records": 1,
+      "role": "relation_report",
+      "schema_version": "pr-relation-report1",
+      "sha256": "df0e0bac53dd37a6856bdc8b00916683e5d18aaaa53fd2a916898c062ee7cfcc"
+    },
+    {
+      "path": "derived/investigation_tasks.jsonl",
+      "records": 421,
+      "role": "investigation_tasks",
+      "schema_version": "investigation-task1",
+      "sha256": "902dd6144d5fbccd9bac1de7594853d6aa725612e963a3e70111f72c2d9cfff6"
+    },
+    {
+      "path": "derived/schedule_report.json",
+      "records": 1,
+      "role": "schedule_report",
+      "schema_version": "investigation-schedule-report1",
+      "sha256": "ea5b09d04168ef57a36e5f41c320e2d92b9e0baecdcb372d3b48397623d7200a"
+    }
+  ],
+  "generator_versions": {
+    "inventory": "modification-inventory/1",
+    "phase2": "systematic-opportunity-phase2/1",
+    "relations": "pr-relations/1",
+    "scheduler": "systematic-investigation-scheduler/1"
+  },
+  "method_registry": {
+    "path": "methods.jsonl",
+    "records": 4,
+    "role": "investigation_method_registry",
+    "schema_version": "investigation-method1",
+    "sha256": "88b7334f9e73ecd68d5d4911100c3ab0edc216988a914e235630c79d9cfec8c1"
+  },
+  "parent_dataset_manifest": {
+    "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+    "records": 1,
+    "role": "parent_dataset_manifest",
+    "schema_version": "pr4-manifest-1",
+    "sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3"
+  },
+  "schema_version": "systematic-opportunity-treatment1",
+  "source_sha256": "e535cbb90995fe089317eded0b7db6a0c155430a7ce4c7c1659c0a4015afb8dc",
+  "treatment_id": "systematic-opportunities-v1-phase2"
+}

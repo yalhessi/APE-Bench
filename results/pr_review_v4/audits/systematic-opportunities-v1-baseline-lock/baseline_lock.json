@@ -1,0 +1,129 @@
+{
+  "artifacts": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+      "required": true,
+      "role": "stable_release",
+      "sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3/run_manifest.json",
+      "required": true,
+      "role": "stable_run1_manifest",
+      "sha256": "d35d5be5cc2d4b5caf6fc7a9321135b6b2a703af722b11bf998f8d7b8410837c",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3/semantic-judge-v1/report.json",
+      "required": true,
+      "role": "stable_run1_semantic",
+      "sha256": "3aa706e6423be57809e61aa109e07a098e32502a2d73ac609288119068e2ec9a",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep2/run_manifest.json",
+      "required": true,
+      "role": "stable_run2_manifest",
+      "sha256": "58ea91de0f8264d69692fb38a91c0eed136c847894547148f55edbcc9446717e",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep2/semantic-judge-v1/report.json",
+      "required": true,
+      "role": "stable_run2_semantic",
+      "sha256": "39d482d351f77e27a2714ab4a1cdec901508836b2d31ab01e39e95d69e92fb4c",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep3/run_manifest.json",
+      "required": true,
+      "role": "stable_run3_manifest",
+      "sha256": "1999bfe6d564cd93d12a1d8628562d1a2ec3517226ea983e835acddf0417f1cd",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep3/semantic-judge-v1/report.json",
+      "required": true,
+      "role": "stable_run3_semantic",
+      "sha256": "6af41bb548500edc3b1c6af5b7f9db69fd05e26c84445f21fbfc70181279e856",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/audits/manual-agenda-probe-0.1.1-verdict.md",
+      "required": true,
+      "role": "manual_agenda_verdict",
+      "sha256": "505fad0d7166057a7db168651f5b629eb7a50001161f03cf6c027fbdab5cae48",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/audits/dev-pilot-0.8.9-vs-0.8.11-paired-three-sample-verdict.md",
+      "required": true,
+      "role": "retrieval_replication_verdict",
+      "sha256": "5441e3e850b26e164cbf670cacd4f8ac2339f423b5325bca9da85bd1b959138e",
+      "status": "available"
+    },
+    {
+      "path": "inputs/pr_review_v4/treatments/oracle-opportunity-probe-0.1.0/manifest.json",
+      "required": true,
+      "role": "oracle_opportunity_treatment",
+      "sha256": "3732a0f2b22b9454554f718adedec160641f752b19c33e76f262b31d1936b315",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/oracle-opportunity-probe-0.1.0-manual/adjudications.jsonl",
+      "required": true,
+      "role": "oracle_opportunity_adjudications",
+      "sha256": "8b395b994eae8e1d0ee423141246a3434b49c762fead2b3bcdd89a4c44ea279f",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/oracle-opportunity-probe-0.1.0-manual/semantic-judge-v1/report.json",
+      "required": true,
+      "role": "oracle_opportunity_semantic",
+      "sha256": "4e3bd5d5fb1b1a983d7b8e28d849fce62b6b3fd107631e23fb97e3b4f91801cd",
+      "status": "available"
+    },
+    {
+      "path": "inputs/pr_review_v4/treatments/oracle-evidence-probe-0.2.0/manifest.json",
+      "required": true,
+      "role": "oracle_evidence_treatment",
+      "sha256": "c2cb40f3a29055d778813e6a3122daab8854fefbafdc8fce1289b79f79449606",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/oracle-evidence-probe-0.2.0/adjudications.jsonl",
+      "required": true,
+      "role": "oracle_evidence_adjudications",
+      "sha256": "0de3fcf62fdbef8013f0d52e2606adf414e06dd93f4e8895ece2282ab04f848c",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/oracle-evidence-probe-0.2.0/candidates.jsonl",
+      "required": true,
+      "role": "oracle_evidence_candidates",
+      "sha256": "c084e171a98f134f53e1a58cd73eaccdc705c92fef676cfb9c7f051fd0299c1a",
+      "status": "available"
+    },
+    {
+      "path": "results/pr_review_v4/runs/oracle-evidence-probe-0.2.0/semantic-judge-v1/report.json",
+      "required": true,
+      "role": "oracle_evidence_semantic",
+      "sha256": "7cd5a63bf9dc11fb7f4fcda3f8fa7303b93d5e2cbd5dafe5ec2d9c6e6557a9b7",
+      "status": "available"
+    }
+  ],
+  "as_of": "2026-07-17",
+  "gate_status": "complete",
+  "missing_required_roles": [],
+  "oracle_evidence_semantic_confirmation": {
+    "issue_hits": 2,
+    "judge_version": "v4-semantic-v1-v7.1-rubric",
+    "resolution_hits": 1,
+    "schema_version": "v4-semantic-report1",
+    "status": "complete"
+  },
+  "schema_version": "systematic-baseline-lock1",
+  "source_sha256": "85757563b333b2b5c1317386583779b4a708ee90b47691d04305a9b2e0ca8c5b",
+  "version": "systematic-opportunity-baseline/1"
+}

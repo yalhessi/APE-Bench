@@ -1,0 +1,144 @@
+{
+  "arms": {
+    "v7.1": {
+      "issue_match": 9,
+      "issue_only_verdicts": 5,
+      "levels_collapsed": false,
+      "levels_collapsed_pairs": 13,
+      "pairs": 18,
+      "resolution_match": 4,
+      "self_agreement_ceiling": 0.9012345679012346,
+      "split_vote_pairs": 4
+    },
+    "v8": {
+      "issue_match": 9,
+      "issue_only_verdicts": 4,
+      "levels_collapsed": false,
+      "levels_collapsed_pairs": 14,
+      "pairs": 18,
+      "resolution_match": 5,
+      "self_agreement_ceiling": 1.0,
+      "split_vote_pairs": 0
+    }
+  },
+  "predictions": {
+    "bimodality_falls": {
+      "fell": true,
+      "note": "persistence means the contested asks are genuinely ambiguous and need a human ruling, not a better prompt",
+      "v7.1_split_pairs": 4,
+      "v8_split_pairs": 0
+    },
+    "self_agreement_ceiling": {
+      "v7.1": 0.9012345679012346,
+      "v8": 1.0
+    },
+    "two_level_separation_appears": {
+      "moved": true,
+      "v7.1_issue_only": 5,
+      "v8_issue_only": 4
+    }
+  },
+  "schema_version": "judge-rubric-comparison1",
+  "watch_pairs": {
+    "v7.1": [
+      {
+        "issue_true": 2,
+        "issue_votes_by_pair": [
+          2,
+          0,
+          2
+        ],
+        "note": "bimodal: 'split is dead code' vs 'empty-branch binder should be rfl'",
+        "obligation_suffix": "0898b0478443",
+        "pairs": 3,
+        "reasons": [
+          "Both address the unnecessary rcases on Set.eq_empty_or_nonempty and the empty-case handling, but the candidate proposes removing the split or using by_cases (a ",
+          "The candidate addresses an unused binder in the nonempty branch (suggesting replacing h_nonempty with _), while the maintainer requests using rfl for the empty-",
+          "The candidate proposes removing the Set.eq_empty_or_nonempty split and proving by transitivity, whereas the maintainer requested keeping the split but using rfl"
+        ]
+      },
+      {
+        "issue_true": 3,
+        "issue_votes_by_pair": [
+          3,
+          2,
+          2
+        ],
+        "note": "bimodal",
+        "obligation_suffix": "4bfe0de1d5f6",
+        "pairs": 3,
+        "reasons": [
+          "The candidate explicitly targets Metric.maximalSeparatedSet_subset and asks to replace the manual packingNumber split and simp-only/ exact pattern with a by_cas",
+          "The candidate addresses the same Metric.maximalSeparatedSet_subset style issue (verbose by_cases and ↓reduceDIte) but suggests a simp-based rewrite rather than ",
+          "The request targets the same theorem and verbose simp/unfolding issue, but the proposed simp-based refactor does not use the required grind formulation or IsSep"
+        ]
+      },
+      {
+        "issue_true": 1,
+        "issue_votes_by_pair": [
+          0,
+          3,
+          0
+        ],
+        "note": "stable error: gold wants a proof change, candidate asks for a rename",
+        "obligation_suffix": "e373aeb72a4b",
+        "pairs": 3,
+        "reasons": [
+          "The candidate asks to rewrite Metric.card_maximalSeparatedSet using simpa, but the maintainer's obligation concerns replacing a by_cases proof in coveringNumber",
+          "The candidate correctly targets renaming Metric.card_maximalSeparatedSet and updating its downstream uses (matching the issue), but it does not perform the requ",
+          "The candidate requests changing Metric.card_maximalSeparatedSet to use simpa, while the gold obligation requires modifying coveringNumber_le_packingNumber to us"
+        ]
+      }
+    ],
+    "v8": [
+      {
+        "issue_true": 2,
+        "issue_votes_by_pair": [
+          3,
+          0,
+          3
+        ],
+        "note": "bimodal: 'split is dead code' vs 'empty-branch binder should be rfl'",
+        "obligation_suffix": "0898b0478443",
+        "pairs": 3,
+        "reasons": [
+          "The candidate points out the unused empty/nonempty split and proposes removing or simplifying it so the empty case is not named, which satisfies the maintainer'",
+          "The candidate suggests changing the unused h_nonempty binder to _ (or removing the rcases) and retains a named h_empty, but the maintainer specifically requeste",
+          "Both identify the same style issue (an unnecessary case split/unused names), so issue_match is true, but the candidate removes the rcases entirely instead of us"
+        ]
+      },
+      {
+        "issue_true": 3,
+        "issue_votes_by_pair": [
+          3,
+          3,
+          3
+        ],
+        "note": "bimodal",
+        "obligation_suffix": "4bfe0de1d5f6",
+        "pairs": 3,
+        "reasons": [
+          "Both address simplifying the proof of maximalSeparatedSet_subset, but the candidate's suggested refactor uses simpa/simp and does not adopt the grind-based form",
+          "Both target simplifying maximalSeparatedSet_subset to avoid the verbose by_cases/↓reduceDIte pattern, but the candidate's suggested simp rewrite does not ensure",
+          "Both requests target simplifying the proof of maximalSeparatedSet_subset (style), but the maintainer specifically required a grind-based proof using IsSeparated"
+        ]
+      },
+      {
+        "issue_true": 1,
+        "issue_votes_by_pair": [
+          0,
+          3,
+          0
+        ],
+        "note": "stable error: gold wants a proof change, candidate asks for a rename",
+        "obligation_suffix": "e373aeb72a4b",
+        "pairs": 3,
+        "reasons": [
+          "The candidate proposes rewriting Metric.card_maximalSeparatedSet using simpa, but the maintainer requested changing coveringNumber_le_packingNumber to use encar",
+          "The candidate targets the same lemma (Metric.card_maximalSeparatedSet) and proposes renaming it to encard_maximalSeparatedSet and updating downstream uses (incl",
+          "The candidate requests a style change to Metric.card_maximalSeparatedSet, but the maintainer's obligation requires changing coveringNumber_le_packingNumber to u"
+        ]
+      }
+    ]
+  }
+}

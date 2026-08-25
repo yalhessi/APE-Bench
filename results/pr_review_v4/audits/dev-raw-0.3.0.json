@@ -1,0 +1,138 @@
+{
+  "release": {
+    "dataset_id": "mathlib-pr-review-v4-dev",
+    "version": "0.3.0-raw-first-round",
+    "source_kind": "raw_event_ledger",
+    "split": "development",
+    "manifest_tree_state": "dirty"
+  },
+  "validation": {
+    "episodes": 138,
+    "prs": 138,
+    "events": 8161,
+    "boundaries": 138,
+    "funnel_candidates": 201
+  },
+  "input": {
+    "description_provenance": {
+      "absent": 25,
+      "legacy_post_edit_risk_omitted": 12,
+      "review_time_verified": 101
+    },
+    "title_provenance": {
+      "source_current_value_unverified": 138
+    },
+    "changed_files_per_episode": {
+      "min": 1,
+      "median": 2.0,
+      "p95": 21,
+      "max": 29
+    },
+    "diff_chars": {
+      "min": 825,
+      "median": 4452.5,
+      "p95": 25674,
+      "max": 63307
+    }
+  },
+  "events": {
+    "by_type": {
+      "commit": 875,
+      "file": 1029,
+      "issue_comment": 842,
+      "metadata_edit": 203,
+      "pull_request": 201,
+      "review": 338,
+      "review_comment": 329,
+      "review_thread": 237,
+      "timeline": 4107
+    },
+    "missing_timestamp_by_type": {
+      "file": 1029,
+      "review_thread": 237
+    }
+  },
+  "samples": [
+    {
+      "pr_number": 33065,
+      "episode_id": "leanprover-community/mathlib4:33065:round1:b4a5e96f12247657b05a5dabba28c1cd86d516f5",
+      "title": "feat: a function is always continuous at an isolated point",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "review_time_verified",
+      "changed_files": [
+        "Mathlib/Topology/ContinuousOn.lean"
+      ],
+      "diff_chars": 1249,
+      "events_by_type": {
+        "commit": 14,
+        "file": 1,
+        "issue_comment": 3,
+        "metadata_edit": 2,
+        "pull_request": 1,
+        "review": 4,
+        "review_comment": 4,
+        "review_thread": 3,
+        "timeline": 31
+      }
+    },
+    {
+      "pr_number": 33283,
+      "episode_id": "leanprover-community/mathlib4:33283:round1:7cc21f0921cfdd38fd70ab3cd29f6b6a379b4193",
+      "title": "feat(Polynomial/Chebyshev): Differential equations for T and U",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "review_time_verified",
+      "changed_files": [
+        "Mathlib/RingTheory/Polynomial/Chebyshev.lean"
+      ],
+      "diff_chars": 2749,
+      "events_by_type": {
+        "commit": 2,
+        "file": 1,
+        "issue_comment": 3,
+        "pull_request": 1,
+        "review": 4,
+        "review_comment": 3,
+        "review_thread": 1,
+        "timeline": 18
+      }
+    },
+    {
+      "pr_number": 33421,
+      "episode_id": "leanprover-community/mathlib4:33421:round1:02adb3757d729e929c52452fee14158f61c95f3a",
+      "title": "chore(Algebra/Order/Floor): review API about `round`",
+      "title_provenance": "source_current_value_unverified",
+      "description_provenance": "absent",
+      "changed_files": [
+        "Mathlib/Algebra/AddConstMap/Basic.lean",
+        "Mathlib/Algebra/Order/Archimedean/Basic.lean",
+        "Mathlib/Algebra/Order/Floor/Ring.lean",
+        "Mathlib/Algebra/Order/Round.lean",
+        "Mathlib/Algebra/Order/ToIntervalMod.lean",
+        "Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean",
+        "Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean",
+        "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean",
+        "Mathlib/GroupTheory/Archimedean.lean",
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean",
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean",
+        "Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean",
+        "Mathlib/Order/Filter/AtTopBot/Archimedean.lean",
+        "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "Mathlib/Topology/Instances/AddCircle/Defs.lean"
+      ],
+      "diff_chars": 18437,
+      "events_by_type": {
+        "commit": 6,
+        "file": 15,
+        "issue_comment": 4,
+        "pull_request": 1,
+        "review": 3,
+        "review_comment": 4,
+        "review_thread": 3,
+        "timeline": 22
+      }
+    }
+  ],
+  "warnings": [
+    "Generator worktree was dirty; rely on artifact hashes, not commit alone."
+  ]
+}

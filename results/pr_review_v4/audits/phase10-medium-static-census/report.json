@@ -1,0 +1,399 @@
+{
+  "annotation_protocol": "obligation-issue-class/1",
+  "census_version": "method-coverage-census-static/1",
+  "decision_denominator": "included obligations only",
+  "excluded": {
+    "by_eligibility": {
+      "excluded_not_judgeable": 2,
+      "unresolved_scope": 1
+    },
+    "note": "excluded obligations cannot authorize a paid run",
+    "obligations": 3
+  },
+  "generation_side_exposure": {
+    "33057": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 8
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 8
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 8
+        }
+      },
+      "role": "intervention"
+    },
+    "33066": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 27
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 18
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 19
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 18
+        }
+      },
+      "role": "intervention"
+    },
+    "33098": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 20
+        },
+        "canonical_api.insert_separation.v1": {
+          "supported": 1,
+          "unsupported_shape": 15
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "supported": 3,
+          "unsupported_shape": 13
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "supported": 1,
+          "unsupported_shape": 15
+        }
+      },
+      "role": "intervention"
+    },
+    "33117": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 26
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 24
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 24
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 24
+        }
+      },
+      "role": "intervention"
+    },
+    "33145": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 6
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 6
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 6
+        }
+      },
+      "role": "intervention"
+    },
+    "33149": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 105
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 46
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 54
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 52
+        }
+      },
+      "role": "intervention"
+    },
+    "33285": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 11
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 6
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 11
+        }
+      },
+      "role": "intervention"
+    },
+    "33294": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 109
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 67
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 39
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 81
+        }
+      },
+      "role": "intervention"
+    },
+    "33304": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        }
+      },
+      "role": "control"
+    },
+    "33305": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 7
+        }
+      },
+      "role": "intervention"
+    },
+    "33315": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        }
+      },
+      "role": "control"
+    },
+    "33321": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 26
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 17
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 16
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 17
+        }
+      },
+      "role": "intervention"
+    },
+    "33337": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 10
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 4
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 3
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 4
+        }
+      },
+      "role": "intervention"
+    },
+    "33362": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 13
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 6
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 8
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 9
+        }
+      },
+      "role": "intervention"
+    },
+    "33421": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 41
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 25
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 19
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 25
+        }
+      },
+      "role": "intervention"
+    },
+    "33438": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 2
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 2
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 2
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 2
+        }
+      },
+      "role": "control"
+    }
+  },
+  "included": {
+    "c0": 40,
+    "c1": 28,
+    "c2": 5,
+    "manual_audit_required": 0,
+    "obligations": 40
+  },
+  "issue_class_distribution": {
+    "correctness_policy": 2,
+    "documentation_gap": 3,
+    "duplicate_implementation": 7,
+    "generalization_available": 1,
+    "naming_convention_violation": 8,
+    "proof_simplification": 13,
+    "scope_placement": 1,
+    "style_norm_violation": 5
+  },
+  "manual_audit_queue_size": 40,
+  "outside_dev_pr": {
+    "c0": 26,
+    "c1": 15,
+    "c2": 0,
+    "c2_over_c1_diagnostic": 0.0,
+    "c2_supported_prs": [],
+    "c2_supporting_implementations": [],
+    "dev_pr": 33098,
+    "manual_audit_required": 0,
+    "obligations": 26
+  },
+  "per_pr": {
+    "33066": {
+      "c0": 3,
+      "c1": 1,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 3
+    },
+    "33098": {
+      "c0": 14,
+      "c1": 13,
+      "c2": 5,
+      "manual_audit_required": 0,
+      "obligations": 14
+    },
+    "33117": {
+      "c0": 1,
+      "c1": 1,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 1
+    },
+    "33145": {
+      "c0": 5,
+      "c1": 5,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 5
+    },
+    "33149": {
+      "c0": 3,
+      "c1": 1,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 3
+    },
+    "33285": {
+      "c0": 2,
+      "c1": 2,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 2
+    },
+    "33294": {
+      "c0": 2,
+      "c1": 1,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 2
+    },
+    "33305": {
+      "c0": 1,
+      "c1": 0,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 1
+    },
+    "33321": {
+      "c0": 3,
+      "c1": 0,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 3
+    },
+    "33337": {
+      "c0": 2,
+      "c1": 2,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 2
+    },
+    "33362": {
+      "c0": 1,
+      "c1": 0,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 1
+    },
+    "33421": {
+      "c0": 3,
+      "c1": 2,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 3
+    }
+  },
+  "reachability_gate": {
+    "conditions": {
+      "c2_supported_obligations_outside_dev": {
+        "observed": 0,
+        "pass": false,
+        "required": 3
+      },
+      "distinct_implementations_outside_dev": {
+        "observed": 0,
+        "pass": false,
+        "required": 2
+      },
+      "distinct_prs_outside_dev": {
+        "observed": 0,
+        "pass": false,
+        "required": 2
+      }
+    },
+    "decision": "static_reachability_rejected"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.1.0",
+  "schema_version": "method-coverage-census-static1",
+  "source_sha256": "b8bc7b5356dbf0c6d82785e04441e8580d0b6d86c64bdea568c02928aa216c49",
+  "treatment": "inputs/pr_review_v4/treatments/systematic-opportunities-v1-medium"
+}

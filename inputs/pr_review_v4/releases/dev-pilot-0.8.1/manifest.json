@@ -1,0 +1,127 @@
+{
+  "corpus_cutoff_policy": "No retrieval in baseline; precedents must predate episode review start",
+  "created_at": "2026-07-13T00:00:00-05:00",
+  "dataset_id": "mathlib-pr-review-v4-dev-smoke",
+  "derived_artifacts": [
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 9,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "fad7596b20dd3bb5cfbfdd03fb6cfcbcff7a066346ca8f3e1f10b2554d9cecc6"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 181,
+      "role": "candidate_work_units",
+      "schema_version": "work-unit1",
+      "sha256": "f59674cbd5ad8dfaaa6cd4f2be790bc24d86e926148d768bfea847311ea0fa96"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 181,
+      "role": "production_prompt_preview",
+      "schema_version": "rendered-prompt1",
+      "sha256": "d839e2b53a4e97149bf31b3fff0b2933535d26ac5af777bd7677935471a603b4"
+    }
+  ],
+  "generator_git_commit": null,
+  "generator_tree_state": "unknown",
+  "generator_versions": {
+    "change_graph": "cg1_builder_v2",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "funnel": "raw_first_round_v1",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "pilot": "pilot/1",
+    "renderer": "candidate-prompt/1",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [
+    {
+      "path": "gold/judgments.jsonl",
+      "records": 17,
+      "role": "hidden_judgments",
+      "schema_version": "jg1",
+      "sha256": "f89d7e90a310ed2f52477dfcae8704fab983ef6ba0937d7324591ce7a346cfef"
+    },
+    {
+      "path": "gold/intervention_views.jsonl",
+      "records": 17,
+      "role": "hidden_intervention_views",
+      "schema_version": "view1",
+      "sha256": "a98fd31117b36ebddffee3300df77450b5c6c332a9b85d4d8ca011213f62ffcf"
+    },
+    {
+      "path": "gold/outcome_observations.jsonl",
+      "records": 17,
+      "role": "hidden_outcomes",
+      "schema_version": "outcome-observation1",
+      "sha256": "55c5ce13671a9bc1221dcd853e42c713c4355c28b36f895b4e29c77a7f2eb08e"
+    },
+    {
+      "path": "gold/intervention_scope_migrations.jsonl",
+      "records": 17,
+      "role": "hidden_scope_maps",
+      "schema_version": "i5-cg1-map1",
+      "sha256": "8b09e81fc8f6114b6e2a9490457074240409747dd5ffabe53e77ebe937f4fec2"
+    },
+    {
+      "path": "gold/pilot_cases.jsonl",
+      "records": 9,
+      "role": "pilot_case_semantics",
+      "schema_version": "pilot-case1",
+      "sha256": "50f43c9a3f1e0b5485dffb2ddca83f4ae72f0e67d560adeb0a0846dd978a368d"
+    },
+    {
+      "path": "gold/episode_boundaries.jsonl",
+      "records": 9,
+      "role": "hidden_episode_boundaries",
+      "schema_version": "episode-boundary1",
+      "sha256": "68e00544b4fddec138a19ef72ce5f0d12724b18406ac0ad97c5baf67fd39adda"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 9,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "0caa451ef8759cd78794390b1a1d958ff5ededc68a961ae34a64c67b251ed58e"
+    }
+  ],
+  "pr_numbers": [
+    33066,
+    33098,
+    33117,
+    33149,
+    33304,
+    33305,
+    33315,
+    33421,
+    33438
+  ],
+  "release": "0.8.1-pilot",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [
+    {
+      "path": "source/events.jsonl",
+      "records": 545,
+      "role": "raw_event_index",
+      "schema_version": "event1",
+      "sha256": "fac4951ae1ab90698e2b8c559da8e66ca4a13aa6ff8cc602863f450cd22572f0"
+    }
+  ],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-judgment-draft-0.7.0",
+      "records": 9,
+      "role": "parent_release",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "b2f4ac9b3307f12d14bec5cc086afecd3fb93eb531ba113b2202b2efaff74ee6"
+    }
+  ],
+  "split": "development"
+}

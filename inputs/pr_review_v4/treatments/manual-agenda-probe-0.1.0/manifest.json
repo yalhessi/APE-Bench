@@ -1,0 +1,82 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-07-17T00:00:00-05:00",
+  "dataset_id": "mathlib-pr-review-v4-manual-agenda-probe",
+  "derived_artifacts": [
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 2,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "c13d636f726cd670af8000d34dc0168dc1340b690906c9fab352f1218aaf5d78"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 6,
+      "role": "manual_agenda_probe_units",
+      "schema_version": "work-unit1",
+      "sha256": "27a22bfe7f9bce7cc0057cb7a64a470a3c0fa78ae1ce15cf0b318a9b46060027"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 6,
+      "role": "manual_agenda_probe_prompts",
+      "schema_version": "rendered-prompt1",
+      "sha256": "7baa46d3580cdacf779ccd6b0254d8ab39b55fc3e9e1eb83814c3bf4cbe70698"
+    },
+    {
+      "path": "derived/agenda_probe_tasks.jsonl",
+      "records": 6,
+      "role": "manual_agenda_probe_mapping",
+      "schema_version": "manual-agenda-probe-task1",
+      "sha256": "00d03df2d2be5268967d3f4bb4c0b7ee631680efa6ec492b8f989d26aa350504"
+    }
+  ],
+  "generator_git_commit": null,
+  "generator_tree_state": "unknown",
+  "generator_versions": {
+    "candidate_contract": "grounded-ask/1",
+    "change_graph": "cg1_builder_v2",
+    "deterministic_discovery": "compile-style/1",
+    "episodes": "raw_multi_round_v1",
+    "events": "bundle_index_v1",
+    "evidence": "evidence-collectors/2",
+    "funnel": "raw_first_round_v1",
+    "generation_prior": "none",
+    "judgment_graph": "jg1_i5_migration_v1",
+    "judgment_stabilizer": "judgment-decomposition/1",
+    "manual_agenda_probe": "manual-agenda-probe/1",
+    "pilot": "pilot/2",
+    "renderer": "candidate-prompt/11",
+    "scope_mapping": "i5_cg1_mapper_v2",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 2,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "867695174da1ff222d06ff398dfaf10eb17ab5225a847b5f5e56658a9e24b249"
+    }
+  ],
+  "pr_numbers": [
+    33098,
+    33438
+  ],
+  "release": "0.1.0-manual-agenda-probe",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "inputs/pr_review_v4/releases/dev-pilot-0.9.0/manifest.json",
+      "records": 2,
+      "role": "parent_stable_release",
+      "schema_version": "pr4-manifest-1",
+      "sha256": "d795381d33c8a6595bcd061f42411365f8b663b6955758ae0a81f09feee5c1a3"
+    }
+  ],
+  "split": "development"
+}

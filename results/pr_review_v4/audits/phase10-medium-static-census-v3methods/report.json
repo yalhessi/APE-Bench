@@ -1,0 +1,563 @@
+{
+  "annotation_audit_status": "pending_human_audit",
+  "annotation_protocol": "obligation-expression-class/3",
+  "census_version": "method-coverage-census-static/1",
+  "decision_denominator": "included obligations only",
+  "excluded": {
+    "by_eligibility": {
+      "excluded_not_judgeable": 2,
+      "unresolved_scope": 1
+    },
+    "note": "excluded obligations cannot authorize a paid run",
+    "obligations": 3
+  },
+  "generation_side_exposure": {
+    "33057": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 8
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 8
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 8
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 8
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 8
+        }
+      },
+      "role": "intervention"
+    },
+    "33066": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 27
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 18
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 40
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 19
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 13,
+          "unsupported_shape": 6
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 26
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 18
+        }
+      },
+      "role": "intervention"
+    },
+    "33098": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 20
+        },
+        "canonical_api.insert_separation.v1": {
+          "supported": 1,
+          "unsupported_shape": 15
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 26
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "supported": 3,
+          "unsupported_shape": 13
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 6,
+          "unsupported_shape": 10
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 19
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "supported": 1,
+          "unsupported_shape": 15
+        }
+      },
+      "role": "intervention"
+    },
+    "33117": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 26
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 24
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 30
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 24
+        },
+        "naming_norm.subject_prefix.v1": {
+          "unsupported_shape": 24
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 26
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 24
+        }
+      },
+      "role": "intervention"
+    },
+    "33145": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 6
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 12
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 6
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 2,
+          "unsupported_shape": 4
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 12
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 6
+        }
+      },
+      "role": "intervention"
+    },
+    "33149": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 105
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 46
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 108
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 54
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 2,
+          "unsupported_shape": 52
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "supported": 19,
+          "unsupported_shape": 73
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 52
+        }
+      },
+      "role": "intervention"
+    },
+    "33285": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 11
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 12
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 6
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 2,
+          "unsupported_shape": 4
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 11
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 11
+        }
+      },
+      "role": "intervention"
+    },
+    "33294": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 109
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 67
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 109
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 39
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 24,
+          "unsupported_shape": 15
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 105
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 81
+        }
+      },
+      "role": "intervention"
+    },
+    "33304": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 13
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 1
+        }
+      },
+      "role": "control"
+    },
+    "33305": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 7
+        },
+        "lint_norm.text_style.v1": {
+          "supported": 1,
+          "unsupported_shape": 6
+        }
+      },
+      "role": "intervention"
+    },
+    "33315": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 12
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 12
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 3
+        }
+      },
+      "role": "control"
+    },
+    "33321": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 26
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 17
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 39
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 16
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 7,
+          "unsupported_shape": 9
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 21
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 17
+        }
+      },
+      "role": "intervention"
+    },
+    "33337": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 10
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 4
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 10
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 3
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 3
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 10
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 4
+        }
+      },
+      "role": "intervention"
+    },
+    "33362": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 13
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 6
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 16
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 8
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 2,
+          "unsupported_shape": 6
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 12
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 9
+        }
+      },
+      "role": "intervention"
+    },
+    "33421": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 41
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 25
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 45
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 19
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 3,
+          "unsupported_shape": 16
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 27
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 25
+        }
+      },
+      "role": "intervention"
+    },
+    "33438": {
+      "by_implementation": {
+        "baseline_failure.target_compile.v1": {
+          "supported": 2
+        },
+        "canonical_api.insert_separation.v1": {
+          "unsupported_shape": 2
+        },
+        "lint_norm.text_style.v1": {
+          "unsupported_shape": 2
+        },
+        "naming_contrast.encard_subject_prefix.v1": {
+          "unsupported_shape": 2
+        },
+        "naming_norm.subject_prefix.v1": {
+          "supported": 2
+        },
+        "repository_policy.forbidden_construct.v1": {
+          "unsupported_shape": 2
+        },
+        "wrapper_composition.packing_cover_chain.v1": {
+          "unsupported_shape": 2
+        }
+      },
+      "role": "control"
+    }
+  },
+  "included": {
+    "c0": 40,
+    "c1": 20,
+    "c2": 13,
+    "manual_audit_required": 2,
+    "obligations": 40
+  },
+  "issue_class_distribution": {
+    "correctness_policy": 2,
+    "documentation_gap": 3,
+    "duplicate_implementation": 7,
+    "generalization_available": 1,
+    "naming_convention_violation": 8,
+    "proof_simplification": 13,
+    "scope_placement": 1,
+    "style_norm_violation": 5
+  },
+  "manual_audit_queue_size": 40,
+  "outside_dev_pr": {
+    "c0": 26,
+    "c1": 14,
+    "c2": 8,
+    "c2_over_c1_diagnostic": 0.5714,
+    "c2_supported_prs": [
+      33145,
+      33149,
+      33294,
+      33305,
+      33337,
+      33421
+    ],
+    "c2_supporting_implementations": [
+      "lint_norm.text_style.v1",
+      "naming_norm.subject_prefix.v1",
+      "repository_policy.forbidden_construct.v1"
+    ],
+    "dev_pr": 33098,
+    "manual_audit_required": 2,
+    "obligations": 26
+  },
+  "per_pr": {
+    "33066": {
+      "c0": 3,
+      "c1": 2,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 3
+    },
+    "33098": {
+      "c0": 14,
+      "c1": 6,
+      "c2": 5,
+      "manual_audit_required": 0,
+      "obligations": 14
+    },
+    "33117": {
+      "c0": 1,
+      "c1": 0,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 1
+    },
+    "33145": {
+      "c0": 5,
+      "c1": 2,
+      "c2": 1,
+      "manual_audit_required": 1,
+      "obligations": 5
+    },
+    "33149": {
+      "c0": 3,
+      "c1": 3,
+      "c2": 2,
+      "manual_audit_required": 0,
+      "obligations": 3
+    },
+    "33285": {
+      "c0": 2,
+      "c1": 1,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 2
+    },
+    "33294": {
+      "c0": 2,
+      "c1": 2,
+      "c2": 1,
+      "manual_audit_required": 0,
+      "obligations": 2
+    },
+    "33305": {
+      "c0": 1,
+      "c1": 1,
+      "c2": 1,
+      "manual_audit_required": 0,
+      "obligations": 1
+    },
+    "33321": {
+      "c0": 3,
+      "c1": 0,
+      "c2": 0,
+      "manual_audit_required": 1,
+      "obligations": 3
+    },
+    "33337": {
+      "c0": 2,
+      "c1": 2,
+      "c2": 2,
+      "manual_audit_required": 0,
+      "obligations": 2
+    },
+    "33362": {
+      "c0": 1,
+      "c1": 0,
+      "c2": 0,
+      "manual_audit_required": 0,
+      "obligations": 1
+    },
+    "33421": {
+      "c0": 3,
+      "c1": 1,
+      "c2": 1,
+      "manual_audit_required": 0,
+      "obligations": 3
+    }
+  },
+  "reachability_gate": {
+    "conditions": {
+      "c2_supported_obligations_outside_dev": {
+        "observed": 8,
+        "pass": true,
+        "required": 3
+      },
+      "distinct_implementations_outside_dev": {
+        "observed": 3,
+        "pass": true,
+        "required": 2
+      },
+      "distinct_prs_outside_dev": {
+        "observed": 6,
+        "pass": true,
+        "required": 2
+      }
+    },
+    "decision": "authorized_for_paid_smoke"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.1.0",
+  "schema_version": "method-coverage-census-static1",
+  "source_sha256": "872ba15b595115a6263df0f88cc058c48429e2520e8185e0b6932d55062526dc",
+  "transformation_class_distribution": {
+    "compose_wrapper_with_witnesses": 1,
+    "edit_documentation": 3,
+    "extract_shared_declaration": 3,
+    "manual_audit_required": 2,
+    "reformat_source": 4,
+    "relocate_declaration": 1,
+    "remove_declaration": 2,
+    "rename_declaration": 8,
+    "replace_with_repository_declaration": 7,
+    "rewrite_proof": 9
+  },
+  "treatment": "inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium"
+}
