@@ -22,6 +22,7 @@ import uuid
 import json
 import hashlib
 from ape.utils.logging import create_logger
+from ape.utils import deep_merge
 
 # Import data models
 from ape.tasks.models import WorkspaceInfo
@@ -590,7 +591,11 @@ def create_task_from_data(
             f"but requested {task_type}"
         )
 
-    overrides = task_config_overrides or {}
+    record_task_config_overrides = data.get("task_config_overrides")
+    if not isinstance(record_task_config_overrides, dict):
+        record_task_config_overrides = {}
+
+    overrides = deep_merge(record_task_config_overrides, task_config_overrides or {})
     valid_overrides = {
         k: v for k, v in overrides.items()
         if k in task_class.task_config_class.model_fields
