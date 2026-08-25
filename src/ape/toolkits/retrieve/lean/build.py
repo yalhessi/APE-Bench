@@ -7,10 +7,12 @@ Scan Git commits and generate semantic annotations to build Lean code retrieval 
 import argparse
 import asyncio
 import hashlib
+import inspect
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Set, Tuple
+from typing import List, Dict, Any, Optional, Set, Tuple, Callable
 from collections import defaultdict
 
 import json
@@ -22,6 +24,7 @@ from ape.tasks.base import create_task_config_for_type
 from ape.scaffolds.config import BaseScaffoldConfig
 from ape.orchestration.config import ExecutionConfig
 from ape.orchestration.orchestrator import TaskOrchestrator, OrchestratorResults
+from ape.orchestration.models import OrchestratorProgress
 from ape.utils.file_ops import normalize_repo_url
 
 from .semantic_annotation.config import AnnotationConfig
@@ -52,11 +55,21 @@ def parse_repo_spec(spec: str) -> Tuple[str, str, Optional[str]]:
 class SemanticAnnotationPipeline:
     """Simplified semantic annotation pipeline"""
 
-    def __init__(self, config: AnnotationConfig, logger=None, orchestrator_id: Optional[str] = None):
+    def __init__(
+        self,
+        config: AnnotationConfig,
+        logger=None,
+        orchestrator_id: Optional[str] = None,
+        progress_callback: Optional[Callable[[str], Any]] = None,
+    ):
         self.config = config
         self.orchestrator_id = orchestrator_id
         self.logger = logger or create_logger()
+        self.progress_callback = progress_callback
         self._config_hash = compute_config_hash(self.config)
+        self._last_annotation_progress_percent = -1
+        self._last_annotation_progress_emit_at = 0.0
+        self._last_annotation_progress_completed = -1
 
         # Initialize components
         self.collector = DataCollector(
@@ -129,6 +142,60 @@ class SemanticAnnotationPipeline:
         """Count total commit number"""
         return sum(len(commits) for commits in commit_index.values())
 
+    async def _emit_progress(self, message: str) -> None:
+        """Send a user-facing progress update when a callback is available."""
+        if not self.progress_callback:
+            return
+
+        result = self.progress_callback(message)
+        if inspect.isawaitable(result):
+            await result
+
+    @staticmethod
+    def _build_progress_bar(completed: int, total: int, width: int = 20) -> str:
+        """Build a compact ASCII progress bar."""
+        if total <= 0:
+            return "[" + ("-" * width) + "]"
+
+        clamped_completed = max(0, min(completed, total))
+        filled = int((clamped_completed / total) * width)
+        return "[" + ("=" * filled) + ("-" * (width - filled)) + "]"
+
+    @classmethod
+    def _format_annotation_progress_message(cls, progress: OrchestratorProgress) -> str:
+        """Format annotation-phase progress for interactive CLI status updates."""
+        total = max(progress.total_tasks, 0)
+        completed = min(progress.completed_tasks, total) if total else progress.completed_tasks
+        percent = 100.0 if total == 0 else (completed / total) * 100.0
+        bar = cls._build_progress_bar(completed, total if total > 0 else 1)
+        return (
+            "Lean retrieval indexing "
+            f"{bar} {completed}/{total} annotation tasks ({percent:.1f}%)"
+        )
+
+    async def _emit_annotation_progress(self, progress: OrchestratorProgress) -> None:
+        """Emit throttled annotation progress updates for the interactive CLI."""
+        total = max(progress.total_tasks, 0)
+        completed = min(progress.completed_tasks, total) if total else progress.completed_tasks
+        percent = 100 if total == 0 else int((completed / total) * 100)
+        early_milestones = {0, 1, 2, 5, 10, total}
+        step = 1 if total <= 50 else 5 if total <= 500 else 10 if total <= 5000 else 25
+        should_emit = (
+            self._last_annotation_progress_completed < 0
+            or completed in early_milestones
+            or completed >= total
+            or (step > 0 and completed > 0 and completed % step == 0)
+        )
+        if completed == self._last_annotation_progress_completed:
+            should_emit = False
+        if not should_emit:
+            return
+
+        self._last_annotation_progress_percent = percent
+        self._last_annotation_progress_emit_at = time.monotonic()
+        self._last_annotation_progress_completed = completed
+        await self._emit_progress(self._format_annotation_progress_message(progress))
+
     async def run(self) -> AnnotationStats:
         """Run complete semantic annotation pipeline"""
         start_time = time.time()
@@ -150,6 +217,10 @@ class SemanticAnnotationPipeline:
         self.logger.info(
             f"Loaded {total_existing} existing annotations across {len(existing_ids_by_repo)} repos"
         )
+        await self._emit_progress(
+            "Lean retrieval scan starting for "
+            f"{len(repos_commits)} repo(s) across {sum(len(commits) for commits in repos_commits.values())} commit(s)."
+        )
         
         # First phase: global scanning (with optional cache)
         if self.config.use_cache:
@@ -159,6 +230,7 @@ class SemanticAnnotationPipeline:
             cached_scan_result = await asyncio.to_thread(load_cache, cache_file)
             if cached_scan_result:
                 self.logger.info(f"Phase 1 cache hit: {cache_file}")
+                await self._emit_progress("Lean retrieval scan reused cached phase-1 results.")
                 scan_result = cached_scan_result
             else:
                 scan_result = await self._phase1_global_scan(
@@ -178,7 +250,9 @@ class SemanticAnnotationPipeline:
         
         if self.config.index_only_mode:
             # Index only mode
+            await self._emit_progress("Lean retrieval scan complete; updating commit indices from existing annotations.")
             total_indexed = await self._index_only_update(scan_result.commit_index, existing_ids_by_repo)
+            await self._emit_progress(f"Lean retrieval index update finished: {total_indexed} commit-index records added.")
             return AnnotationStats(
                 commits_processed=self._count_commits(scan_result.commit_index),
                 indexed=total_indexed,
@@ -189,6 +263,7 @@ class SemanticAnnotationPipeline:
             # Normal annotation mode
             if not scan_result.global_declarations:
                 self.logger.info("No new declarations to annotate")
+                await self._emit_progress("Lean retrieval scan complete; no new declarations needed annotation.")
                 return AnnotationStats(
                     commits_processed=self._count_commits(scan_result.commit_index),
                     skipped=scan_result.existing_skipped,
@@ -198,6 +273,7 @@ class SemanticAnnotationPipeline:
             # Second phase: annotation tasks
             orchestrator_id = self.orchestrator_id or self._compute_orchestrator_id()
             total_annotated = await self._phase2_annotation(scan_result, target_references, orchestrator_id)
+            await self._emit_progress(f"Lean retrieval indexing finished: {total_annotated} annotations saved.")
             
             return AnnotationStats(
                 commits_processed=self._count_commits(scan_result.commit_index),
@@ -345,13 +421,26 @@ class SemanticAnnotationPipeline:
         if not tasks:
             self.logger.info("No tasks to execute")
             return 0
+
+        await self._emit_progress(
+            "Lean retrieval indexing phase started for "
+            f"{len(tasks)} annotation tasks."
+        )
+        await self._emit_annotation_progress(
+            OrchestratorProgress(
+                last_updated=datetime.now(),
+                total_tasks=len(tasks),
+                total_samples=len(tasks),
+            )
+        )
         
         # Run tasks
         self.logger.info(f"Running {len(tasks)} tasks with orchestrator ID: {orchestrator_id}")
         orchestrator = TaskOrchestrator(
             config=self.scaffold_config,
             orchestrator_id=orchestrator_id,
-            logger=self.logger
+            logger=self.logger,
+            progress_callback=self._emit_annotation_progress,
         )
         
         results = await orchestrator.run(tasks)
@@ -574,7 +663,8 @@ async def main(
     config_path: Optional[Path] = None,
     orchestrator_id: str = None,
     cli_overrides: Dict[str, Any] = None,
-    logger = None
+    logger = None,
+    progress_callback: Optional[Callable[[str], Any]] = None,
 ) -> int:
     """Main entry function
 
@@ -586,6 +676,7 @@ async def main(
         orchestrator_id: Orchestrator ID
         cli_overrides: CLI overrides from dot-notation arguments
         logger: Logger instance
+        progress_callback: Optional callback for user-facing progress updates
     """
     if logger is None:
         logger = create_logger()
@@ -602,7 +693,12 @@ async def main(
     
     logger.info("Starting Lean Semantic Annotation Pipeline")
     
-    pipeline = SemanticAnnotationPipeline(config, logger, orchestrator_id)
+    pipeline = SemanticAnnotationPipeline(
+        config,
+        logger,
+        orchestrator_id,
+        progress_callback=progress_callback,
+    )
     stats = await pipeline.run()
     
     if stats.mode == "index_only":
