@@ -3,6 +3,7 @@ Verification engine - new simplified verification system
 """
 
 import json
+import re
 import shutil
 from datetime import datetime
 from typing import Optional, Dict, Any, List, TYPE_CHECKING
@@ -149,6 +150,19 @@ def _add_print_axioms_commands(code: str) -> str:
         # Return original code if parsing fails (does not affect verification)
         return code
 
+
+# Leading whitespace / block comments / line comments before the first real token. (Lean block
+# comments can nest; a single non-greedy pass covers the standard copyright header, which is the
+# form Mathlib files actually use.)
+_LEADING_TRIVIA_RE = re.compile(r"\A(?:\s+|/-.*?-/|--[^\n]*)*", re.S)
+
+
+def _uses_module_system(code: str) -> bool:
+    """True if the file's first real token is the `module` keyword (Lean module system)."""
+    rest = _LEADING_TRIVIA_RE.sub("", code or "", count=1)
+    return rest.startswith("module") and (len(rest) == 6 or not rest[6].isidentifier())
+
+
 class VerificationEngine:
     """Simplified Lean code verification engine"""
     
@@ -208,6 +222,14 @@ class VerificationEngine:
             lean_options = self.config.lean_options.copy()
             if options:
                 lean_options.update(options)
+            # Module-system files (`module` header + `public import`, Mathlib 2025+) need the
+            # experimental flag. Package builds get it from the lakefile's leanOptions, but we
+            # compile a standalone temp file via `lake env lean`, which does NOT read those —
+            # without this, every module-system file fails to parse ("`module` keyword is
+            # experimental and not enabled here") and in-file verification is dead for new
+            # Mathlib files (~33/138 eval PRs and growing).
+            if _uses_module_system(code) and "experimental.module" not in lean_options:
+                lean_options["experimental.module"] = "true"
             
             self.logger.debug(f"Start verification, timeout: {actual_timeout}s, working directory: {working_dir or 'default'}")
             
