@@ -5,6 +5,7 @@ Inherits from BaseScaffold and uses shared MCP management.
 """
 
 import asyncio
+import os
 import shutil
 import sys
 import tempfile
@@ -13,7 +14,13 @@ import warnings
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING, Dict
 
+from ape.cli.task_session import is_internal_cli_task, merge_task_prompt
 from ape.scaffolds.base import BaseScaffold
+from ape.scaffolds.skills import (
+    CODEX_REPO_SKILL_DIR,
+    materialize_task_skills,
+    mirror_materialized_skills,
+)
 from ape.toolkits.mcp_manager import MCPManager
 from ape.utils.project import PROJECT_ROOT
 from .config import CodexConfig
@@ -33,6 +40,7 @@ class CodexScaffold(BaseScaffold):
         super().__init__()
         self.conversation_manager: Optional[CodexConversationManager] = None
         self.mcp_manager: Optional[MCPManager] = None
+        self.managed_skills = None
 
     def _setup_asyncio_exception_handler(self) -> None:
         """Configure asyncio exception handler"""
@@ -44,6 +52,13 @@ class CodexScaffold(BaseScaffold):
     async def _setup_components(self) -> None:
         """Setup components using shared utilities"""
         self._setup_asyncio_exception_handler()
+
+        self.managed_skills = materialize_task_skills(
+            self.task,
+            self.logger,
+            repo_skill_dirs=(CODEX_REPO_SKILL_DIR,),
+        )
+        self._prepare_repo_scoped_skills()
 
         # 1. Create conversation manager
         # When model_name is None, relay will be skipped (use official Codex models)
@@ -188,6 +203,73 @@ class CodexScaffold(BaseScaffold):
 
         self.logger.info("[CodexScaffold] Conversation terminated (submit_result)")
 
+    def _prepare_repo_scoped_skills(self) -> tuple[Path, ...]:
+        """Mirror managed skills into attempt-local repo scope for batch and registered-task runs."""
+        if not self.managed_skills or not self.managed_skills.skills:
+            return tuple()
+        if self.is_cli_mode and is_internal_cli_task(self.task):
+            return tuple()
+        if not self.task.workspaces_dir:
+            raise RuntimeError("Task workspaces are not initialized for Codex managed skills")
+
+        managed_repo_root = self.task.workspaces_dir / ".agents" / "skills"
+        mirrored = mirror_materialized_skills(
+            self.managed_skills,
+            managed_repo_root,
+        )
+        self.logger.info(
+            "[CodexScaffold] Mirrored %s managed skills into %s",
+            len(mirrored),
+            managed_repo_root,
+        )
+        return mirrored
+
+    def _build_cli_environment(self) -> Optional[Dict[str, str]]:
+        """Create a per-session HOME/CODEX_HOME overlay when extra-root skills are configured."""
+        if not is_internal_cli_task(self.task):
+            return None
+        if not self.managed_skills:
+            return None
+
+        extra_root_skills = self.managed_skills.select(source_kinds={"extra_root"})
+        if not extra_root_skills:
+            return None
+        if not self.task.attempt_path or not self.task.workspaces_dir:
+            raise RuntimeError("Task workspace is not initialized for Codex CLI overlay")
+
+        overlay_home = self.task.attempt_path / "codex_home_overlay"
+        if overlay_home.exists():
+            shutil.rmtree(overlay_home)
+        overlay_home.mkdir(parents=True, exist_ok=True)
+
+        overlay_codex_home = overlay_home / ".codex"
+        overlay_codex_home.mkdir(parents=True, exist_ok=True)
+
+        user_codex_home = Path(
+            os.environ.get("CODEX_HOME", str(Path.home() / ".codex"))
+        ).expanduser()
+        if user_codex_home.is_dir():
+            shutil.copytree(user_codex_home, overlay_codex_home, dirs_exist_ok=True)
+
+        generated_codex_home = self.task.workspaces_dir / ".codex"
+        if generated_codex_home.is_dir():
+            shutil.copytree(generated_codex_home, overlay_codex_home, dirs_exist_ok=True)
+
+        mirror_materialized_skills(
+            self.managed_skills,
+            overlay_home / ".agents" / "skills",
+            source_kinds={"extra_root"},
+        )
+
+        env = os.environ.copy()
+        env["HOME"] = str(overlay_home.resolve())
+        env["CODEX_HOME"] = str(overlay_codex_home.resolve())
+        self.logger.info(
+            "[CodexScaffold] Using HOME/CODEX_HOME overlay for %s managed extra-root skills",
+            len(extra_root_skills),
+        )
+        return env
+
     async def _run_cli_mode(self) -> None:
         """
         CLI mode execution - using codex command line tool
@@ -246,10 +328,13 @@ class CodexScaffold(BaseScaffold):
             self.logger.info(f"[CodexScaffold] Sandbox mode: {self.task.config.sandbox_mode}")
             self.logger.info(f"[CodexScaffold] Approval policy: {self.task.config.approval_policy}")
 
+            codex_env = self._build_cli_environment()
+
             # Run codex command (interactive mode)
             proc = await asyncio.create_subprocess_exec(
                 *codex_args,
                 cwd=str(cwd),
+                env=codex_env,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
                 stderr=sys.stderr

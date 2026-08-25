@@ -19,6 +19,7 @@ from .execute import (
     BashExecuteToolsProvider,
     BashExecuteToolConfig,
 )
+from .skills import SkillToolsProvider
 
 # mcp_adapter has been removed, all logic moved to MCPManager
 from .registry import register_tool, get_all_tool_names, get_tool_provider_class
@@ -38,6 +39,7 @@ __all__ = [
     "VerificationEngine",
     "BashExecuteToolsProvider",
     "BashExecuteToolConfig",
+    "SkillToolsProvider",
     # Registry
     "register_tool",
     "get_all_tool_names",

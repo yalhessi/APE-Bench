@@ -4,10 +4,6 @@
 from .base import BaseScaffold, ScaffoldTerminationResult
 # Registry
 from .registry import register_scaffold, list_scaffold_types, get_scaffold_class
-# Concrete scaffold implementations (automatically registered on import)
-from .ape_agent import ApeAgentScaffold
-from .claude_code import ClaudeCodeScaffold
-from .codex import CodexScaffold
 # Factory and creation utilities
 from .factory import create_scaffold, create_scaffold_config_for_type
 
@@ -27,3 +23,23 @@ __all__ = [
     'ClaudeCodeScaffold',
     'CodexScaffold',
 ]
+
+
+def __getattr__(name: str):
+    """Lazily load concrete scaffold classes to avoid circular imports."""
+    if name == 'ApeAgentScaffold':
+        from .ape_agent import ApeAgentScaffold
+
+        return ApeAgentScaffold
+
+    if name == 'ClaudeCodeScaffold':
+        from .claude_code import ClaudeCodeScaffold
+
+        return ClaudeCodeScaffold
+
+    if name == 'CodexScaffold':
+        from .codex import CodexScaffold
+
+        return CodexScaffold
+
+    raise AttributeError(f"module 'ape.scaffolds' has no attribute {name!r}")

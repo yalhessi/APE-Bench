@@ -58,9 +58,11 @@ def create_scaffold_config_for_type(scaffold_type: str, base_config: 'BaseScaffo
         'runs_base_dir': base_config.runs_base_dir,
         'target_workspace': base_config.target_workspace,
         'task_config': base_config.task_config,
+        'task_config_overrides': base_config.task_config_overrides,
         'execution': base_config.execution,
         'llm_config': base_config.llm_config,
         'tools_config': base_config.tools_config,
+        'skills': base_config.skills,
         'runtime_config': base_config.runtime_config,
     }
 
