@@ -6,3 +6,15 @@ data/
 .DS_Store
 
 __pycache__/
+
+# Bulk research artifacts. These are reproducible from the code in this repo and
+# are far too large to version; see docs/PROJECT-STATUS.md for how to regenerate
+# each one. Everything small enough to read — manifests, lockfiles, reports,
+# benchmark definitions, audit verdicts — is tracked.
+inputs/pr_review_v2/corpus/
+inputs/pr_review_v2/precedent_bench/*.jsonl
+inputs/pr_review_v2/predictions/
+inputs/pr_review_v4/releases/
+inputs/pr_review_v4/treatments/
+results/*/runs/
+results/blueprints/
