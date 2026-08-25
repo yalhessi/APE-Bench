@@ -1,0 +1,8 @@
+skills:
+  enabled: true
+  repo_discovery: false
+  extra_roots:
+    - ../skills/mathlib-pr-review
+
+task_config:
+  strict_tag_validation: true

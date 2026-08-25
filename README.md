@@ -86,6 +86,106 @@ pip install -e .
 
 ## Quick Start
 
+### Interactive CLI
+
+Use the unified `ape` CLI for live interactive agent sessions in a local workspace:
+
+```bash
+# APE-Agent
+ape chat ape-agent --workspace .
+
+# Claude Code-backed session
+ape chat claude-code --workspace . --prompt "Inspect this Lean project"
+
+# Codex-backed session
+ape chat codex --workspace . --model gpt_5
+
+# Load interactive scaffold settings from YAML, then override selectively
+ape chat ape-agent --config configs/cli.yaml --workspace . llm_config.temperature=0.7
+```
+
+Use `ape task ...` when you want to run a registered task instead of a free-form workspace session:
+
+```bash
+# Show the registered tasks visible to the CLI
+ape task ape-agent
+
+# Run a built-in task and fill its fields interactively
+ape task ape-agent lean_pr_review
+
+# Load task-mode scaffold settings from YAML
+ape task ape-agent --config configs/cli.yaml lean_pr_review
+
+# Import a custom task module; its registered tasks become valid task names
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic
+
+# Run a specific benchmark task record
+ape task ape-agent \
+  --task-file inputs/proof_pr_review/mathlib_pr_review_10tasks.jsonl \
+  --task-index 0 \
+  lean_pr_review
+
+# Import a custom task module and run it from inline JSON
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}'
+```
+
+When you run `ape chat ...` or `ape task ...`, `--config` follows the same precedence as the batch
+scaffold entrypoints: explicit CLI flags and trailing `key=value` overrides win over YAML, which
+wins over Pydantic defaults.
+
+Managed agent skills are opt-in through the scaffold-level `skills` block. When `repo_discovery`
+is enabled, the active workspace is checked for native repo skill directories (`.agents/skills`
+for Codex, `.claude/skills` for Claude Code, and both for APE-Agent). `extra_roots` may point to
+either a single skill directory or a directory that contains multiple skills.
+
+```yaml
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/code-review
+```
+
+Relative `extra_roots` from YAML are resolved against the YAML file location. Relative trailing
+CLI overrides are resolved against the current working directory:
+
+```bash
+ape chat codex --config configs/cli.yaml --workspace . 'skills.extra_roots=["./local-skills"]'
+ape task claude-code --task-module examples.arithmetic.task arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}' \
+  'skills.enabled=True' \
+  'skills.extra_roots=["./team-skills"]'
+python -m ape.scaffolds.ape_agent.main inputs/ape_bench/ape_bench.jsonl \
+  --config configs/ape_agent.yaml \
+  'skills.extra_roots=["./benchmark-skills"]'
+```
+
+When you run `ape task ... <registered_task>` without `--task-file` or `--task-data-json`, the CLI
+inspects that task's Pydantic schema and prompts for each input field directly in the terminal. For
+nested task data such as `target_workspace`, the CLI walks the nested fields as well.
+
+`lean_pr_review` uses a friendlier interactive flow: the CLI only asks for the GitHub `pr_url` and
+the PR branch `commit`, then builds a live review snapshot automatically from GitHub. That live CLI
+entrypoint always produces the shared PR review envelope with `evaluation: null`; benchmark records
+use the same `snapshot` shape and attach `evaluation` plus `benchmark_context`.
+
+The scaffold-specific aliases remain available for compatibility:
+
+```bash
+apea --workspace .
+ape-claude --workspace .
+ape-codex --workspace .
+```
+
+These interactive commands are separate from the existing batch evaluation entrypoints such as
+`python -m ape.scaffolds.ape_agent.main ...`, which continue to work unchanged.
+
 Creating a custom task requires three components: **TaskData** (input), **Task** (logic), and **register_task** (registration).
 
 See `examples/arithmetic/task.py` for a complete minimal example.
@@ -221,6 +321,13 @@ python -m ape.scaffolds.claude_code.main \
   llm_config.model_name=claude_3_opus \
   execution.sample_max_cost=3.0 \
   --orchestrator_id claude_code_ape_bench_opus
+
+# Run PR-review benchmark (Mathlib merge-readiness task)
+python -m ape.scaffolds.ape_agent.main \
+  inputs/proof_pr_review/mathlib_pr_review_benchmark.jsonl \
+  llm_config.model_name=gpt_5.2 \
+  execution.sample_count=1 \
+  --orchestrator_id ape_agent_pr_review
 ```
 
 #### Configuration via CLI
@@ -347,6 +454,10 @@ python -m src.datasets.ape_bench.main \
 │       │   ├── main.py            # Pipeline entry point
 │       │   ├── collector.py       # Commit filtering
 │       │   └── task.py            # Instruction synthesis
+│       ├── pr_review/             # PR review benchmark pipeline
+│       │   ├── main.py            # GitHub extraction entry point
+│       │   ├── collector.py       # PR + maintainer feedback collection
+│       │   └── config.py          # Hyperparameter config
 │       └── taxonomy/               # Task taxonomy
 ├── setup.py
 ├── requirements.txt
@@ -427,6 +538,13 @@ task_config:
   semantic_validation:
     enabled: true
     num_judges: 3
+
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/reviewer
 ```
 
 ### Multi-Version Infrastructure
@@ -455,6 +573,53 @@ Default paths:
 - **Path**: `inputs/ape_judge_benchmark/ape_judge_benchmark.jsonl`
 - **Size**: 64 expert-annotated tasks
 - **Purpose**: Validate LLM-as-Judge reliability for semantic equivalence
+
+### Mathlib PR Review Benchmark
+
+- **Path**: `inputs/proof_pr_review/mathlib_pr_review_*.jsonl` (generated)
+- **Task Types**: `lean_pr_review` and `skilled_pr_review`
+- **Source**: Real pull requests from `leanprover-community/mathlib4` via GitHub API
+- **Goal**: Decide if a PR is merge-ready and identify blocking/advisory issues
+- **Task Envelope**: Shared snapshot-driven schema with top-level `snapshot`, optional `evaluation`, optional `benchmark_context`, plus `target_workspace`
+- **Temporal Snapshots**: One data point = one maintainer review round (PRs can contribute multiple rounds)
+- **Round Feedback**: Each round record groups that reviewer’s review body + inline review comments + same-round high-level issue comments
+- **Conversation Context**: `snapshot.conversation` includes both maintainer and PR-author comments for that round
+- **PR-Head Hints**: `snapshot.pr_head` carries fork/head checkout hints for live head-workspace setup
+- **Comment-Only Support**: Maintainer comments without formal review states can still become extracted rounds
+- **Ground Truth**: Benchmark labels live under `evaluation.ground_truth`, derived from feedback in that review round rather than the final PR state
+- **Live CLI Mode**: Uses the same snapshot builder but leaves `evaluation=null`, so interactive live reviews are intentionally unscored
+- **Extraction Order**: Configure `pr_order=newest` or `pr_order=oldest` when collecting candidates
+- **Primary Metric**: `review_quality_score` in `[0,1]`
+  - `0.65 * decision_accuracy`
+  - `0.25 * blocking_issue_f1`
+  - `0.10 * advisory_issue_f1`
+  - plus false-approve penalty for approving PRs that experts rejected
+
+Build/rebuild this benchmark (new pipeline under `src/datasets/pr_review/`):
+```bash
+python -m src.datasets.pr_review.main \
+  start_date=2025-01-01 \
+  end_date=2025-03-31 \
+  date_field=closed \
+  decision_review_states='["APPROVED","CHANGES_REQUESTED","COMMENTED"]' \
+  include_comment_only_rounds=True \
+  max_review_events_per_pr=0 \
+  max_prs=200 \
+  pr_order=newest \
+  output_file=inputs/proof_pr_review/mathlib_pr_review_benchmark.jsonl \
+  require_maintainer_feedback=True
+```
+
+Or with YAML config:
+```bash
+python -m src.datasets.pr_review.main --config configs/pr_review_config.yaml
+```
+
+Optional legacy wrapper (same pipeline):
+```bash
+python3 src/datasets/external_benchmarks/build_mathlib_pr_review.py \
+  start_date=2025-01-01 end_date=2025-03-31
+```
 
 ### MiniCtx v2
 
@@ -576,6 +741,105 @@ pip install -e .
 ```
 
 ## 快速开始
+
+### 交互式 CLI
+
+使用统一的 `ape` CLI 在本地工作空间中启动交互式 agent 会话：
+
+```bash
+# APE-Agent
+ape chat ape-agent --workspace .
+
+# Claude Code 会话
+ape chat claude-code --workspace . --prompt "Inspect this Lean project"
+
+# Codex 会话
+ape chat codex --workspace . --model gpt_5
+
+# 从 YAML 加载交互式 scaffold 配置，并按需用命令行覆盖
+ape chat ape-agent --config configs/cli.yaml --workspace . llm_config.temperature=0.7
+```
+
+当你想运行一个已注册任务，而不是自由交互式工作空间会话时，可以使用 `ape task ...`：
+
+```bash
+# 显示当前 CLI 可见的已注册任务
+ape task ape-agent
+
+# 运行一个内置任务，并交互式填写字段
+ape task ape-agent lean_pr_review
+
+# 从 YAML 加载 task 模式下的 scaffold 配置
+ape task ape-agent --config configs/cli.yaml lean_pr_review
+
+# 导入自定义任务模块；其中注册的任务会成为可用任务名
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic
+
+# 运行一个基准任务记录
+ape task ape-agent \
+  --task-file inputs/proof_pr_review/mathlib_pr_review_10tasks.jsonl \
+  --task-index 0 \
+  lean_pr_review
+
+# 导入自定义任务模块并通过内联 JSON 运行
+ape task ape-agent \
+  --task-module examples.arithmetic.task \
+  arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}'
+```
+
+当你运行 `ape chat ...` 或 `ape task ...` 时，`--config` 与批量 scaffold 入口遵循相同的
+优先级：显式 CLI 参数和尾随 `key=value` 覆盖优先于 YAML，YAML 又优先于 Pydantic 默认值。
+
+Agent skill 通过 scaffold 级别的 `skills` 配置块按需启用。打开 `repo_discovery` 后，
+系统会检查当前活动工作空间中的原生仓库技能目录：Codex 使用 `.agents/skills`，
+Claude Code 使用 `.claude/skills`，APE-Agent 同时读取两者。`extra_roots` 既可以指向
+单个 skill 目录，也可以指向一个包含多个 skill 的目录。
+
+```yaml
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/code-review
+```
+
+YAML 中的相对 `extra_roots` 会相对于 YAML 文件所在目录解析；尾随 CLI 覆盖中的相对路径
+会相对于当前工作目录解析：
+
+```bash
+ape chat codex --config configs/cli.yaml --workspace . 'skills.extra_roots=["./local-skills"]'
+ape task claude-code --task-module examples.arithmetic.task arithmetic \
+  --task-data-json '{"expression":"2 + 2","expected_result":4.0}' \
+  'skills.enabled=True' \
+  'skills.extra_roots=["./team-skills"]'
+python -m ape.scaffolds.ape_agent.main inputs/ape_bench/ape_bench.jsonl \
+  --config configs/ape_agent.yaml \
+  'skills.extra_roots=["./benchmark-skills"]'
+```
+
+当你运行 `ape task ... <registered_task>` 且不提供 `--task-file` 或 `--task-data-json`
+时，CLI 会读取该任务的 Pydantic schema，并在终端中逐项提示你填写输入字段。像
+`target_workspace` 这样的嵌套字段也会继续展开并逐项收集。
+
+`lean_pr_review` 提供了更友好的交互流程：CLI 只会询问 GitHub `pr_url` 和该 PR 分支上的
+`commit`，然后自动构建一个 live review snapshot。这个 CLI 入口始终生成共享的 PR review
+封装结构，并令 `evaluation: null`；基准数据则复用同样的 `snapshot` 结构，再附加
+`evaluation` 和 `benchmark_context`。
+
+兼容性别名仍然可用：
+
+```bash
+apea --workspace .
+ape-claude --workspace .
+ape-codex --workspace .
+```
+
+这些交互式命令与现有批量评测入口分离，例如
+`python -m ape.scaffolds.ape_agent.main ...`，后者保持不变。
 
 创建自定义任务需要三个组件：**TaskData**（输入）、**Task**（逻辑）、**register_task**（注册）。
 
@@ -918,6 +1182,13 @@ task_config:
   semantic_validation:
     enabled: true
     num_judges: 3
+
+skills:
+  enabled: true
+  repo_discovery: true
+  extra_roots:
+    - ./skills
+    - ../shared-skills/reviewer
 ```
 
 ### 多版本基础设施
