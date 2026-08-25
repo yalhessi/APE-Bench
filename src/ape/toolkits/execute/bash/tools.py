@@ -153,6 +153,12 @@ class BashExecuteToolsProvider(BaseExecuteToolsProvider):
                 # Call core execution logic
                 try:
                     result = await self.execute(code, max_output_chars=max_output_chars)
+                    self._record_task_tool_trace(
+                        "bash_execute",
+                        file_path=file_path,
+                        source="file" if file_path else "inline",
+                        max_output_chars=max_output_chars,
+                    )
                     self.logger.info("Tool bash_execute: execution completed")
                     return result
                 except Exception as e:

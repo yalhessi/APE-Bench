@@ -177,7 +177,13 @@ class BaseCodeToolsProvider(BaseToolsProvider):
                 """Get code hover information (routed to appropriate language provider)"""
                 try:
                     provider = self._route_to_provider(Path(file_path))
-                    return await provider.hover(Path(file_path), line, content)
+                    result = await provider.hover(Path(file_path), line, content)
+                    self._record_task_tool_trace(
+                        "code_hover",
+                        file_path=file_path,
+                        line=line,
+                    )
+                    return result
                 except Exception as e:
                     self.logger.error(f"code_hover error: {e}")
                     return {"success": False, "error": str(e)}
@@ -196,7 +202,13 @@ class BaseCodeToolsProvider(BaseToolsProvider):
                 """Jump to definition (routed to appropriate language provider)"""
                 try:
                     provider = self._route_to_provider(Path(file_path))
-                    return await provider.goto(Path(file_path), line, content)
+                    result = await provider.goto(Path(file_path), line, content)
+                    self._record_task_tool_trace(
+                        "code_goto",
+                        file_path=file_path,
+                        line=line,
+                    )
+                    return result
                 except Exception as e:
                     self.logger.error(f"code_goto error: {e}")
                     return {"success": False, "error": str(e)}
