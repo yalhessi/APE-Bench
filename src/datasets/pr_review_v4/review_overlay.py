@@ -13,8 +13,8 @@ anchor currency for gold, investigations, candidates and findings alike, and it 
 across releases (verified: candidates produced against `dev-medium-0.1.0` join 30/30 onto
 `dev-medium-0.3.0` targets), which is what makes a cross-artifact join possible at all.
 
-This module is pure data: it produces a `Blueprint` of per-PR bundles and nothing else.
-`blueprint_html` renders it. The split is deliberate — `bundle.json` is useful on its own
+This module is pure data: it produces a `Overlay` of per-PR bundles and nothing else.
+`review_overlay_html` renders it. The split is deliberate — `bundle.json` is useful on its own
 for ad-hoc analysis, and a rendering bug should never be able to corrupt the join.
 
 Every input except the release is optional. An absent arm produces *present-but-empty*
@@ -58,7 +58,7 @@ from .schema import (
     SemanticMatch,
 )
 
-BLUEPRINT_VERSION = "review-blueprint/1"
+OVERLAY_VERSION = "review-overlay/1"
 
 DEFAULT_RELEASE = paths.RELEASES / "dev-medium-0.3.0"
 #: v3, not v2. The medium executor ledger keys on v3's investigation IDs (2,253/2,253
@@ -265,7 +265,7 @@ class PRBundle:
 
 
 @dataclass
-class Blueprint:
+class Overlay:
     version: str
     sources: Dict[str, object]
     prs: List[PRBundle]
@@ -691,7 +691,7 @@ def _finding_columns(finding: ReviewFinding) -> List[str]:
 
 # --- The join ------------------------------------------------------------------------
 
-def build_blueprint(
+def build_overlay(
     release: Path,
     *,
     treatment: Optional[Path] = None,
@@ -702,7 +702,7 @@ def build_blueprint(
     include_gold: bool = True,
     pr_numbers: Optional[Iterable[int]] = None,
     workspace_root: Path = WORKSPACE_ROOT,
-) -> Blueprint:
+) -> Overlay:
     wanted = set(pr_numbers) if pr_numbers else None
 
     episodes = load_jsonl(release / "input" / "episodes.jsonl", ReviewEpisodeInput)
@@ -881,7 +881,7 @@ def build_blueprint(
         "gold": bool(include_gold),
         "unresolved_run_coverage": [arm.name for arm in arms if arm.unresolved_coverage],
     }
-    return Blueprint(version=BLUEPRINT_VERSION, sources=sources, prs=bundles, gold=gold)
+    return Overlay(version=OVERLAY_VERSION, sources=sources, prs=bundles, gold=gold)
 
 
 def _build_pr(
@@ -1562,20 +1562,20 @@ def _build_gold(release, bundles, arms, findings, matches) -> Dict[str, dict]:
 
 # --- Emission ------------------------------------------------------------------------
 
-def bundle_json(blueprint: Blueprint) -> dict:
+def bundle_json(overlay: Overlay) -> dict:
     return {
-        "version": blueprint.version,
-        "sources": blueprint.sources,
-        "prs": [asdict(bundle) for bundle in blueprint.prs],
-        "gold": blueprint.gold,
+        "version": overlay.version,
+        "sources": overlay.sources,
+        "prs": [asdict(bundle) for bundle in overlay.prs],
+        "gold": overlay.gold,
     }
 
 
-#: A rendered blueprint is a regenerable view, not a research artifact. `verify_frozen`
+#: A rendered overlay is a regenerable view, not a research artifact. `verify_frozen`
 #: hashes every file under `inputs/pr_review_v4` and `results/pr_review_v4` and fails on any
 #: it has not sealed, so writing pages there turns each render into an integrity-gate
 #: failure. Default outside those roots, and refuse to be pointed inside them.
-DEFAULT_OUT = Path("results/blueprints/pr_review_v4")
+DEFAULT_OUT = Path("results/overlays/pr_review_v4")
 
 
 def _reject_frozen_destination(out: Path) -> None:
@@ -1586,34 +1586,34 @@ def _reject_frozen_destination(out: Path) -> None:
         root = root.resolve()
         if resolved == root or root in resolved.parents:
             raise SystemExit(
-                f"refusing to write blueprints into the frozen root {root}: every render "
+                f"refusing to write overlays into the frozen root {root}: every render "
                 "would fail the FROZEN.lock integrity gate. Use "
                 f"--out {DEFAULT_OUT.as_posix()}/<name> instead."
             )
 
 
-def write_blueprint(blueprint: Blueprint, out: Path) -> dict:
+def write_overlay(overlay: Overlay, out: Path) -> dict:
     """Write `bundle.json`, one page per PR, and the index. Never raises on a page.
 
     A page that fails to render must not take the rest of the build with it: the join is
     the expensive part and the other pages are still correct.
     """
 
-    from . import blueprint_html
+    from . import review_overlay_html
 
     _reject_frozen_destination(out)
     out.mkdir(parents=True, exist_ok=True)
-    payload = bundle_json(blueprint)
+    payload = bundle_json(overlay)
     (out / "bundle.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
     )
 
     written, failed = [], {}
-    for bundle in blueprint.prs:
+    for bundle in overlay.prs:
         page = out / f"pr-{bundle.pr_number}.html"
         try:
             page.write_text(
-                blueprint_html.to_html(bundle, blueprint.gold, blueprint.sources),
+                review_overlay_html.to_html(bundle, overlay.gold, overlay.sources),
                 encoding="utf-8",
             )
             written.append(page.name)
@@ -1622,7 +1622,7 @@ def write_blueprint(blueprint: Blueprint, out: Path) -> dict:
 
     index = out / "index.html"
     index.write_text(
-        blueprint_html.write_index(blueprint.prs, blueprint.gold, blueprint.sources),
+        review_overlay_html.write_index(overlay.prs, overlay.gold, overlay.sources),
         encoding="utf-8",
     )
     return {
@@ -1655,7 +1655,7 @@ def main() -> None:
     args = parser.parse_args()
 
     paths.assert_repo_root()
-    blueprint = build_blueprint(
+    overlay = build_overlay(
         args.release,
         treatment=args.treatment if args.treatment and args.treatment.is_dir() else None,
         executor=args.executor if args.executor and args.executor.is_dir() else None,
@@ -1665,13 +1665,13 @@ def main() -> None:
         include_gold=not args.no_gold,
         pr_numbers=args.pr or None,
     )
-    report = write_blueprint(blueprint, args.out)
-    report["prs"] = [bundle.pr_number for bundle in blueprint.prs]
+    report = write_overlay(overlay, args.out)
+    report["prs"] = [bundle.pr_number for bundle in overlay.prs]
     report["totals"] = {
-        key: sum(bundle.totals[key] for bundle in blueprint.prs)
+        key: sum(bundle.totals[key] for bundle in overlay.prs)
         for key in ("sites", "investigations", "candidates", "findings", "published")
     }
-    report["sources"] = blueprint.sources
+    report["sources"] = overlay.sources
     print(json.dumps(report, indent=2))
 
 

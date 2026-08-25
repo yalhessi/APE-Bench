@@ -30,9 +30,9 @@ inputs/pr_review_v2/precedent_bench/*.jsonl
 # Run artifacts ARE tracked -- FROZEN.lock covers 466 files under
 # results/pr_review_v4/runs/, so excluding them breaks verification. Two exceptions:
 # the v5 lead arm pools (multi-MB per repetition, regenerable from the run plan) and
-# the rendered blueprint bundles.
+# the rendered overlay bundles.
 results/*/runs/*/arm_pool.jsonl
-results/blueprints/
+results/overlays/
 
 # The publishing clone used to restage this history. Redundant now that development
 # happens on this branch directly; kept out of the tree if it is ever recreated.

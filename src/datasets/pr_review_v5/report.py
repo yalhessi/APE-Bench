@@ -7,7 +7,7 @@ prints first and `score` refuses to be read as a verdict on delegation without i
 
     python -m src.datasets.pr_review_v5.report routing   --run <run_name>
     python -m src.datasets.pr_review_v5.report score     --audit <audit_dir> --run <run_name>
-    python -m src.datasets.pr_review_v5.report blueprint --run <run_name> [--audit <audit_dir>]
+    python -m src.datasets.pr_review_v5.report overlay --run <run_name> [--audit <audit_dir>]
 """
 
 from __future__ import annotations
@@ -192,33 +192,33 @@ def score(audit_dir: Path, run_name: Optional[str] = None) -> Dict[str, Any]:
     }
 
 
-def blueprint(run_name: str, audit_dir: Optional[Path] = None,
+def overlay(run_name: str, audit_dir: Optional[Path] = None,
               out: Optional[Path] = None) -> Dict[str, Any]:
     """Render v4's per-PR review visualization over a v5 run.
 
-    v5 writes `findings.jsonl` in the shape the blueprint's `--condition` expects, so no new
+    v5 writes `findings.jsonl` in the shape the overlay's `--condition` expects, so no new
     renderer is needed — the reviewed code, the gold, the findings and the judge's verdicts
     all line up. Two seams have to be bridged, and both are one-liners rather than reasons
     to fork a 1600-line renderer:
 
-    * The judge writes `semantic_matches.jsonl`; the blueprint reads `matches.jsonl`. An
+    * The judge writes `semantic_matches.jsonl`; the overlay reads `matches.jsonl`. An
       alias is created rather than a copy, so there is exactly one file of record.
     * Output must not land inside a frozen root, or every render fails the FROZEN.lock gate.
-      v5 blueprints go to `results/blueprints/pr_review_v5/`.
+      v5 overlays go to `results/overlays/pr_review_v5/`.
 
-    Note the release's *treatment* and *executor* are picked up from the blueprint's own
+    Note the release's *treatment* and *executor* are picked up from the overlay's own
     defaults, so the page shows the deterministic arm's sites and investigations as context.
     Those were not part of a v5 model-arm run and contribute no findings to it.
     """
 
-    from src.datasets.pr_review_v4.blueprint import build_blueprint, write_blueprint
+    from src.datasets.pr_review_v4.review_overlay import build_overlay, write_overlay
     from src.datasets.pr_review_v4 import paths as v4_paths
 
     directory = run_dir(run_name)
     agenda_path = directory / "agenda.json"
     if not agenda_path.is_file():
         raise FileNotFoundError(
-            f"no agenda at {agenda_path}; the blueprint needs the run's release and PR set."
+            f"no agenda at {agenda_path}; the overlay needs the run's release and PR set."
         )
     agenda = json.loads(agenda_path.read_text())
     release = Path(agenda["release"])
@@ -232,10 +232,10 @@ def blueprint(run_name: str, audit_dir: Optional[Path] = None,
             alias.symlink_to(source.name)
         judge = audit_dir if alias.exists() else None
 
-    out = out or Path("results/blueprints/pr_review_v5") / run_name
+    out = out or Path("results/overlays/pr_review_v5") / run_name
     treatment = v4_paths.TREATMENTS / "systematic-opportunities-v3-medium"
     executor = v4_paths.AUDITS / "phase10-medium-executor-v5"
-    built = build_blueprint(
+    built = build_overlay(
         release,
         treatment=treatment if treatment.is_dir() else None,
         executor=executor if executor.is_dir() else None,
@@ -245,7 +245,7 @@ def blueprint(run_name: str, audit_dir: Optional[Path] = None,
         include_gold=True,
         pr_numbers=pr_numbers or None,
     )
-    report = write_blueprint(built, out)
+    report = write_overlay(built, out)
     report["out"] = str(out)
     report["index"] = str(out / "index.html")
     report["prs"] = [bundle.pr_number for bundle in built.prs]
@@ -262,7 +262,7 @@ def main() -> None:
     score_parser.add_argument("--audit", type=Path, required=True)
     score_parser.add_argument("--run", help="the run, so recall is reported against the "
                                             "obligations it could actually reach")
-    bp = sub.add_parser("blueprint", help="render the per-PR review as browsable HTML")
+    bp = sub.add_parser("overlay", help="render the per-PR review as browsable HTML")
     bp.add_argument("--run", required=True)
     bp.add_argument("--audit", type=Path, help="judge output, to overlay gold verdicts")
     bp.add_argument("--out", type=Path)
@@ -272,7 +272,7 @@ def main() -> None:
     elif args.command == "score":
         print(json.dumps(score(args.audit, args.run), indent=2))
     else:
-        print(json.dumps(blueprint(args.run, args.audit, args.out), indent=2))
+        print(json.dumps(overlay(args.run, args.audit, args.out), indent=2))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# Review blueprint — reading how the reviewer reviewed a PR
+# Review overlay — the PR diff, with what the reviewer did to it
 
 ## Why this exists
 
@@ -20,13 +20,13 @@ carries the information.
 ## Building one
 
 ```
-./ape/bin/python -m src.datasets.pr_review_v4.blueprint \
+./ape/bin/python -m src.datasets.pr_review_v4.review_overlay \
   --release   inputs/pr_review_v4/releases/dev-medium-0.3.0 \
   --treatment inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium \
   --executor  results/pr_review_v4/audits/phase10-medium-executor-v5 \
   --run       results/pr_review_v4/runs/dev-medium-smoke4-rep1 \
   --condition results/pr_review_v4/conditions/medium-checker-only-v2 \
-  --out       results/blueprints/pr_review_v4/medium-v1
+  --out       results/overlays/pr_review_v4/medium-v1
 ```
 
 Those are the defaults for `--release`, `--treatment` and `--executor`, so a bare invocation
@@ -38,7 +38,7 @@ data, useful on its own).
 **Output must live outside `results/pr_review_v4/`.** `verify_frozen` hashes every file under
 `inputs/pr_review_v4` and `results/pr_review_v4` and fails on any it has not sealed, so
 rendered pages there turn each render into an integrity-gate failure. The default is
-`results/blueprints/pr_review_v4/latest` and `--out` refuses a frozen root outright.
+`results/overlays/pr_review_v4/latest` and `--out` refuses a frozen root outright.
 
 **Use the v3 treatment, not v2.** The medium executor ledger keys on v3's investigation IDs
 (2,253/2,253 overlap); against v2's schedule the join is empty, which renders every checker
@@ -116,6 +116,11 @@ So what decomposition buys is **per-target attribution** — 508 targets each wi
 scheduled investigations and terminal state, which one call cannot produce. The page says
 that, and claims no cost or context-window win.
 
+### The matrix — every site against every component
+
+Behind `matrix view`: one row per change target, one column per component. Better than the
+diff for scanning a 119-site PR in one screen, and the source of the cell vocabulary the
+diff pane reuses inline.
 
 **Rows are change targets** — `change:<sha>`, one changed declaration with complete
 `base_code` and `reviewed_code` — ordered by file, then by the target's own entity span.
@@ -179,7 +184,7 @@ the same site. That juxtaposition is the acceptability-gap figure.
 
 ### Gold is a physical boundary, not a CSS one
 
-`--no-gold` does not hide gold; the builder never opens `gold/`, `Blueprint.gold` is `None`,
+`--no-gold` does not hide gold; the builder never opens `gold/`, `Overlay.gold` is `None`,
 the page carries `const GOLD=null`, and the toggle button is not emitted. A test asserts no
 path containing `/gold/` is read in that mode. A page also carries only its *own* PR's
 obligations, so one page is never a side channel for another's.
@@ -207,13 +212,13 @@ A mismatch is a join bug, not a display bug.
 
 ## Where the code is
 
-- `src/datasets/pr_review_v4/blueprint.py` — the join. Pure data; produces `PRBundle`s and
+- `src/datasets/pr_review_v4/review_overlay.py` — the join. Pure data; produces `PRBundle`s and
   `bundle.json`. Reuses `io.load_jsonl`, `paths.py` roots, `schema.py` models,
   `digest.digest_findings`, and `evaluate._covered`'s semantics.
-- `src/datasets/pr_review_v4/blueprint_html.py` — the page. `PALETTE` is the single source of
+- `src/datasets/pr_review_v4/review_overlay_html.py` — the page. `PALETTE` is the single source of
   colour and every per-state rule is generated from it. The matrix is an HTML table, not SVG:
   no graphviz dependency, text stays selectable and ctrl-F works.
-- `tests/datasets/test_pr_review_v4_blueprint.py` — ladder monotonicity, multi-site
+- `tests/datasets/test_pr_review_v4_overlay.py` — ladder monotonicity, multi-site
   attribution, the gold barrier, and degradation.
 
 Page weight runs 62 KB (PR 33438, 2 sites) to 1.24 MB (PR 33149, 108 sites). A page that

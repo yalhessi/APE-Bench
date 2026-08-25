@@ -21,7 +21,7 @@ import html
 import json
 from typing import Dict, List, Optional, Sequence
 
-from .blueprint import STATE_LABEL, STATES
+from .review_overlay import STATE_LABEL, STATES
 
 #: state -> (light fill, light stroke, light ink, dark fill, dark stroke, dark ink)
 #:
@@ -1195,7 +1195,7 @@ def to_html(
     obligations = len(_distinct_obligations(pr_gold).get(bundle.pr_number, ()))
     columns = bundle.columns if isinstance(bundle.columns, list) else []
     groups = _arm_groups(columns)
-    title = f"PR {bundle.pr_number} Review Blueprint"
+    title = f"PR {bundle.pr_number} Review Overlay"
     gold_button = (
         f'<button class="tg" id="goldbtn" title="show maintainer obligations">'
         f"gold ({obligations})</button>"
@@ -1266,7 +1266,7 @@ def to_html(
         f"<style>{_CSS}\n{_state_css()}</style>"
         '<div class="shell">'
         "<header><div>"
-        f'<div class="eyebrow">review blueprint · {_esc(bundle.repo)} '
+        f'<div class="eyebrow">review overlay · {_esc(bundle.repo)} '
         f"· PR #{bundle.pr_number} · round {bundle.round_index}"
         + (
             ""
@@ -1337,10 +1337,10 @@ def write_index(bundles: Sequence, gold: Optional[dict], sources: Optional[dict]
     return (
         '<meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
-        "<title>Review blueprints</title>"
+        "<title>Review overlays</title>"
         f"<style>{_CSS}\n{_state_css()}</style>"
         '<div class="idx">'
-        '<div class="eyebrow">review blueprint</div>'
+        '<div class="eyebrow">review overlay</div>'
         "<h1>How the reviewer reviewed each PR</h1>"
         f'<p class="sub">{len(bundles)} PR(s). Each page shows the PR\'s change targets '
         "against every component that could speak about them.</p>"

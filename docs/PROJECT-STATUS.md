@@ -410,7 +410,7 @@ python -m pytest tests -q          # 768 pass, 10 fail, 4 skip on a fresh clone
 ```
 
 The 10 failures all require a built Lean workspace under `data/code_execute/` — the
-wrapper-composition, canonical-API and blueprint tests read the reviewed file at its base
+wrapper-composition, canonical-API and review-overlay tests read the reviewed file at its base
 commit. Build one and they pass; there is no way to version tens of gigabytes of compiled
 Mathlib.
 
@@ -432,7 +432,7 @@ All tooling must run from the repository root (`paths.assert_repo_root`).
 |---|---|---|
 | `inputs/pr_review_v2/corpus/` | 100 MB | `-m src.datasets.pr_review_v2.corpus` |
 | `inputs/pr_review_v2/precedent_bench/*.jsonl` | ~40 MB | `-m src.datasets.pr_review_v2.precedent_bench` (reports are tracked) |
-| `results/*/runs/`, `results/blueprints/` | ~115 MB | re-run the condition, or `-m src.datasets.pr_review_v4.blueprint` |
+| `results/*/runs/`, `results/overlays/` | ~115 MB | re-run the condition, or `-m src.datasets.pr_review_v4.review_overlay` |
 | `data/pr_review_v2/cache/{matcher,precedent_judge,concern_classify,selector,…}` | ~25 MB | regenerated on demand; costs model calls |
 | `data/code_execute/`, `data/lean_retrieve/` | tens of GB | `-m ape.toolkits.execute.lean.build`, `-m ape.toolkits.retrieve.lean.build` |
 | ~29 superseded v2 run configs | 60 KB | named in `docs/research/progress-report-2026-06.md` |
