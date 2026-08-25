@@ -709,24 +709,36 @@ def _candidate_column(candidate: CandidateClaim) -> str:
     return GENERALIST_COLUMN
 
 
-def _finding_columns(finding: ReviewFinding) -> List[str]:
+def _finding_columns(finding: ReviewFinding, known: Optional[set] = None) -> List[str]:
     """Which columns a finding belongs to, read off its sources rather than its arm.
 
     `arm` alone cannot place a merged finding, and a focused finding's spec is only on the
     source. Findings with no usable source fall back to the generalist column so that they
     appear somewhere rather than being dropped.
+
+    `known` is the axis actually being drawn. v4 names a focused column `spec:<id>` while v5
+    names its arms bare, so a v5 specialist finding mapped to `spec:proof_idiom` landed in a
+    column that does not exist and vanished from the strip and the matrix -- 11 findings on
+    the held-out run. Preferring a bare spec id when the axis has one fixes that without
+    making either generation's naming special.
     """
 
+    known = known or set()
     columns = []
     for source in finding.sources:
         if source.method_id:
             columns.append(source.method_id)
         elif source.spec_id:
-            columns.append(f"spec:{source.spec_id}")
+            columns.append(
+                source.spec_id if source.spec_id in known else f"spec:{source.spec_id}"
+            )
         elif source.arm in ("generalist", "holistic"):
             columns.append(GENERALIST_COLUMN)
         elif source.arm == "file_generalist":
-            columns.append(f"spec:{FILE_COHERENCE_SPEC}")
+            columns.append(
+                FILE_COHERENCE_SPEC if FILE_COHERENCE_SPEC in known
+                else f"spec:{FILE_COHERENCE_SPEC}"
+            )
     return columns or [GENERALIST_COLUMN]
 
 
@@ -755,7 +767,19 @@ def build_overlay(
         if is_v5_run(condition):
             v5_dir = condition
             lead_views.update(load_lead_views(condition))
+    #: The inventory the v5 agenda itself enumerated from, so a v5 page describes the same
+    #: classification the scheduler used rather than whichever treatment v4 defaults to.
+    v5_inventory: Optional[Path] = None
     if v5_dir is not None:
+        agenda_path = json.loads((v5_dir / "agenda.json").read_text()).get(
+            "modification_inventory"
+        )
+        if agenda_path:
+            v5_inventory = Path(agenda_path)
+        # v4's investigation schedule and executor ledger describe a pipeline that took no
+        # part in a v5 run. The *inventory* is not part of that: it classifies the diff
+        # itself -- added public theorem, which components changed -- and dropping it with
+        # the rest left every site reading "unknown unknown".
         treatment = executor = None
 
     episodes = load_jsonl(release / "input" / "episodes.jsonl", ReviewEpisodeInput)
@@ -770,6 +794,8 @@ def build_overlay(
         graphs = [item for item in graphs if item.pr_number in wanted]
 
     modifications: List[ModificationRecord] = []
+    if v5_inventory is not None:
+        modifications = load_jsonl_optional(v5_inventory, ModificationRecord)
     tasks: List[InvestigationTask] = []
     assessments: List[CapabilityAssessment] = []
     methods: List[InvestigationMethod] = []
@@ -979,6 +1005,8 @@ def _build_pr(
     episode_sources = episode_sources or {}
     call_chars = call_chars or {}
     evidence_by_id = evidence_by_id or {}
+    column_rows = [asdict(column) if not isinstance(column, dict) else column
+                   for column in columns]
     ranges_by_id = {item.range_id: item for item in graph.changed_ranges}
     entities_by_id = {item.entity_id: item for item in graph.entities}
     file_order = {
@@ -1128,28 +1156,52 @@ def _build_pr(
     if lead_view is not None:
         for job in lead_view.delegations:
             ran = job.disposition in ("mandatory", "proposed", "agent_added")
+            claims_by_site: Dict[str, int] = defaultdict(int)
+            for claim in job.claims:
+                if claim.get("primary_change_id"):
+                    claims_by_site[claim["primary_change_id"]] += 1
             if ran:
-                state = "silent" if not job.candidate_count else "candidate"
-                reason = (
-                    f"{job.disposition} · {job.tier or 'tier?'} · "
-                    f"{job.candidate_count or 0} claim(s)"
-                )
+                reason_tier = job.tier or "tier?"
             else:
-                state = "pruned"
-                reason = job.reason or "not selected by the lead"
+                reason_tier = None
             for change_id in job.site_change_ids:
                 site = sites.get(change_id)
                 if site is None:
                     continue
+                if not ran:
+                    state = "pruned"
+                    reason = job.reason or "not selected by the lead"
+                else:
+                    # `silent` here means the arm ran over this site and said nothing about
+                    # it, which is true even when it spoke about a sibling in the same unit.
+                    mine = claims_by_site.get(change_id, 0)
+                    state = "candidate" if mine else "silent"
+                    reason = (
+                        f"{job.disposition} · {reason_tier} · "
+                        + (f"{mine} claim(s) here" if mine else "no claim here")
+                        + (f", {job.candidate_count - mine} elsewhere in this call"
+                           if (job.candidate_count or 0) > mine else "")
+                    )
                 cell = site.cells.setdefault(
                     job.arm_id, Cell(component=job.arm_id, arm="generalist")
                 )
                 cell.raise_to(state, reason)
                 if ran:
                     cell.investigation_ids.append(job.invocation_id)
+                # A work unit holds several change targets and the arm answers about the
+                # ones it chose, so its claims must be filtered to this site. Attaching the
+                # whole list put 59 of PR 33117's 71 claims under a declaration they were
+                # not about.
+                here, elsewhere = [], 0
+                for claim in job.claims:
+                    if claim.get("primary_change_id") == change_id:
+                        here.append(claim)
+                    else:
+                        elsewhere += 1
                 entry = block(change_id, job.arm_id)
                 entry["delegations"].append({
                     "invocation_id": job.invocation_id,
+                    "claims_elsewhere": elsewhere,
                     "arm_id": job.arm_id,
                     "disposition": job.disposition,
                     "reason": job.reason,
@@ -1163,7 +1215,7 @@ def _build_pr(
                     "tool_calls": job.tool_calls,
                     "candidate_count": job.candidate_count,
                     "has_transcript": job.has_transcript,
-                    "claims": job.claims,
+                    "claims": here,
                 })
 
     # --- model arms ------------------------------------------------------------------
@@ -1266,7 +1318,7 @@ def _build_pr(
             if site is None:
                 continue
             primary = change_id == finding.primary_change_id
-            for column_id in _finding_columns(finding):
+            for column_id in _finding_columns(finding, {c["id"] for c in column_rows}):
                 cell = site.cells.setdefault(
                     column_id, Cell(component=column_id, arm="checker")
                 )

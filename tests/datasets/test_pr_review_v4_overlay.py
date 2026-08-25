@@ -584,3 +584,74 @@ def test_v4_page_is_unaffected_by_the_v5_path():
     ids = {column["id"] for column in bundle.columns}
     assert "baseline_failure.v1" in ids
     assert [stage["label"] for stage in bundle.stages][:2] == ["Review sites", "Scheduled"]
+
+
+@requires_v5
+def test_v5_sites_keep_their_inventory_classification(v5):
+    """Suppressing v4's treatment on a v5 run must not take the diff's own classification.
+
+    The modification inventory says what each target *is* — added public theorem, which
+    components changed. It is not executor machinery, and dropping it with the rest left
+    every site on PR 33117 reading "unknown unknown".
+    """
+
+    bundle = v5.prs[0]
+    assert bundle.sites
+    assert {site.lifecycle for site in bundle.sites} != {"unknown"}
+    assert {site.subject_kind for site in bundle.sites} != {"unknown"}
+    assert all(site.component_deltas for site in bundle.sites)
+
+
+@requires_v5
+def test_claims_are_shown_only_at_the_site_they_are_about(v5):
+    """An arm answers per work unit, and a unit holds several targets.
+
+    Attaching the whole claim list to every target in the unit put 59 of PR 33117's 71
+    claims under a declaration they were not about.
+    """
+
+    bundle = v5.prs[0]
+    strays = 0
+    for change_id, blocks in bundle.transcripts.items():
+        for block in blocks:
+            for job in block.get("delegations", []):
+                for claim in job.get("claims", []):
+                    if claim.get("primary_change_id") != change_id:
+                        strays += 1
+    assert strays == 0
+    # Siblings are counted, not silently dropped.
+    assert any(
+        job.get("claims_elsewhere")
+        for blocks in bundle.transcripts.values()
+        for block in blocks
+        for job in block.get("delegations", [])
+    )
+
+
+@requires_v5
+def test_no_finding_lands_outside_the_drawn_axis(v5):
+    """v4 names a focused column `spec:<id>`; v5 names its arms bare.
+
+    A v5 specialist finding mapped to `spec:proof_idiom` landed in a column the page never
+    draws, so it vanished from both the strip and the matrix.
+    """
+
+    bundle = v5.prs[0]
+    axis = {column["id"] for column in bundle.columns}
+    for site in bundle.sites:
+        assert set(site.cells) <= axis, set(site.cells) - axis
+
+
+@requires_v5
+def test_a_site_reads_silent_when_its_arm_spoke_about_a_sibling(v5):
+    """`candidate` must mean "said something here", not "said something in this call"."""
+
+    bundle = v5.prs[0]
+    for site in bundle.sites:
+        for column_id, cell in site.cells.items():
+            if cell.state != "candidate":
+                continue
+            blocks = [b for b in bundle.transcripts.get(site.change_id, [])
+                      if b["component"] == column_id]
+            assert any(job.get("claims") for block in blocks
+                       for job in block.get("delegations", [])) or cell.finding_ids

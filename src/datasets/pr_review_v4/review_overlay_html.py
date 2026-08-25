@@ -593,6 +593,11 @@ function transcriptBlock(b){
       h+='<p class="claim">'+esc(c.claim)+'</p>';
       if(c.requested_change)h+='<p>&rarr; '+esc(c.requested_change)+'</p>';
     });
+    if(!(d.claims||[]).length)h+='<p>Ran over this site and said nothing about it.</p>';
+    /* The arm answers per work unit, so it may have spoken about a sibling target in the
+       same call. Say so rather than dropping the fact silently. */
+    if(d.claims_elsewhere)h+='<p>'+d.claims_elsewhere+' further claim(s) in this call were '
+      +'about other targets in the same work unit.</p>';
     if(d.has_transcript)h+='<p>'+convLink(d.invocation_id,'read the conversation')
       +'</p>';
   });
