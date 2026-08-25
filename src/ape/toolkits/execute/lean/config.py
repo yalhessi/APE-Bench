@@ -57,6 +57,22 @@ class LeanVerifyToolConfig(CodeExecuteToolConfig):
     toolchain_install_timeout: float = Field(default=600.0, description="Toolchain install timeout")
     cache_operation_timeout: float = Field(default=3600.0, description="Cache operation timeout")
     workspace_restore_timeout: float = Field(default=300.0, description="Workspace restore timeout")
+    pr_head_cache_probe_timeout: float = Field(
+        default=30.0,
+        description="Timeout for the initial PR-head cache probe fetch (seconds)",
+    )
+    pr_head_cache_fetch_timeout: float = Field(
+        default=120.0,
+        description="Timeout for the bounded full-cache fetch in the PR-head fast path (seconds)",
+    )
+    pr_head_cache_verify_timeout: float = Field(
+        default=45.0,
+        description="Timeout for each no-build verification step in the PR-head fast path (seconds)",
+    )
+    pr_head_cache_verify_target_limit: int = Field(
+        default=8,
+        description="Maximum number of changed Lean modules to verify during PR-head cache probing",
+    )
 
     # ==================== Concurrency for Lean ====================
     max_concurrent_installs: int = Field(default=16, description="Max concurrent toolchain installs")
