@@ -219,8 +219,14 @@ def _write_pool(path: Path, pool: Dict[str, Dict[str, Any]], cutoff_by_episode: 
 def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path,
                     cutoff_by_episode: Dict[str, str],
                     census_by_pr: Optional[Dict[int, List[Dict[str, Any]]]] = None,
+                    journal_dir: Optional[Path] = None,
                     ) -> List[Dict[str, Any]]:
-    """One lead per episode. A review round is the unit a maintainer actually reviews."""
+    """One lead per episode. A review round is the unit a maintainer actually reviews.
+
+    One journal per episode too. A lead's state is its own — its spend against the per-PR cap,
+    its dedup set, whether its floor has run — so a shared file would replay one PR's
+    delegations into another PR's lead.
+    """
 
     episode_by_id = {item.episode_id: item for item in episodes}
     by_episode: Dict[str, List[Any]] = {}
@@ -247,6 +253,10 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
             "routing_mode": agenda.routing_mode,
             "retrieval_cutoff": cutoff_by_episode.get(episode_id),
             "trace_path": str(trace_path),
+            "journal_path": (
+                str(journal_dir / f"{episode_id.replace(':', '_')}.jsonl")
+                if journal_dir is not None else None
+            ),
             "target_workspace": {
                 "name": "target",
                 "commit_hash": episode.base_sha,
@@ -691,7 +701,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # jobs whatever the lead asked for, and `submit_routing` refuses to close until they
         # have run, so the floor is still not the lead's to skip.
         data = _lead_task_data(agenda, episodes, dataset, pool_path, trace_path,
-                               cutoff_by_episode, census_by_pr)
+                               cutoff_by_episode, census_by_pr,
+                               journal_dir=out / "lead_journals")
         scaffold.task_config_overrides = {
             **(task_overrides or {}),
             "standard_budget_cap": dataset.standard_budget_cap,

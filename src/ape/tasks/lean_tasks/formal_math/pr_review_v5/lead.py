@@ -26,6 +26,7 @@ from __future__ import annotations
 import json
 import time
 import traceback
+from dataclasses import asdict
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional
 
@@ -39,7 +40,8 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import (
     BasePRReviewTask,
 )
 
-from .delegation import TIER_MULTIPLIERS, JobSpec, run_jobs
+from . import journal
+from .delegation import TIER_MULTIPLIERS, JobOutcome, JobSpec, run_jobs
 from .prompts import LEAD_SYSTEM, LEAD_USER
 
 LEAD_TASK_TYPE = "lean_pr_review_v5_lead"
@@ -235,6 +237,10 @@ class LeanPRReviewV5LeadData(BasePRReviewData):
     routing_mode: str = "lead"
     retrieval_cutoff: Optional[str] = None
     trace_path: Optional[str] = None
+    #: Append-only record of what the lead has done, replayed on construction. Without it a
+    #: resumed lead starts from zero delegated spend, an empty dedup set and an unrun coverage
+    #: floor — see `journal.py`, which is a list of four ways that costs money.
+    journal_path: Optional[str] = None
     #: `work_unit_id -> {status, claims[]}` from the mandatory generalist pass, which
     #: runs before the lead. Empty when the floor produced nothing.
     floor_summary: Dict[str, Any] = Field(default_factory=dict)
@@ -323,6 +329,13 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 # that has not yet understood what it is routing.
                 "comprehension": None,
             }
+            # Everything above is a *default*, not a starting point: a resumed lead has
+            # already spent, already delegated, and already run the floor.
+            journal.replay(
+                self.data.journal_path, self._delegation_state,
+                pool=self._pool(), spec_cls=JobSpec, outcome_cls=JobOutcome,
+                logger=self.logger,
+            )
         return self._delegation_state
 
     # --- prompt --------------------------------------------------------------------
@@ -472,6 +485,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 return {"success": False,
                         "message": "summary is required: say what this PR is doing"}
             state["comprehension"] = {"summary": summary, "questions": rows}
+            journal.append(self.data.journal_path, {
+                "event": journal.COMPREHENSION,
+                "comprehension": state["comprehension"],
+            })
             return {
                 "success": True,
                 "questions_recorded": len(rows),
@@ -634,6 +651,13 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 state["requested"].add(spec.invocation_id)
             if floor_specs:
                 state["floor_done"] = True
+            # Recorded *before* the wave runs. A crash during the wave must not look like a
+            # wave that never opened, or the floor runs twice.
+            journal.append(self.data.journal_path, {
+                "event": journal.WAVE_OPENED, "wave": state["wave"],
+                "floor": bool(floor_specs),
+                "specs": [journal.spec_row(spec) for spec in specs],
+            })
             try:
                 outcomes = await run_jobs(
                     self, specs,
@@ -648,6 +672,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                                       state["wave"], traceback.format_exc())
                 for spec in specs:
                     state["requested"].discard(spec.invocation_id)
+                journal.append(self.data.journal_path, {
+                    "event": journal.WAVE_FAILED, "wave": state["wave"],
+                    "invocation_ids": [spec.invocation_id for spec in specs],
+                })
                 # Release the reservations too, or a failed wave permanently consumes budget
                 # for work that never ran.
                 state["reserved"] = 0.0
@@ -663,6 +691,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 state["spend"] += outcome.cost
                 if spec.disposition != "mandatory":
                     state["delegated_spend"] += outcome.cost
+                journal.append(self.data.journal_path, {
+                    "event": journal.SETTLED, "wave": state["wave"],
+                    "outcome": asdict(outcome),
+                })
 
             return {
                 "success": True,
