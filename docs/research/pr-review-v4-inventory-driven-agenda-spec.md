@@ -602,7 +602,7 @@ Status values are `TODO`, `IN PROGRESS`, `BLOCKED`, and `DONE`.
 ## 18. Proposed modules
 
 ```text
-src/datasets/pr_review_v4/
+src/mathlib_review/
   modification_inventory.py
   component_diff.py
   investigation_templates.py

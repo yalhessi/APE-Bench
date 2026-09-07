@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import git_state
+from src.mathlib_review.io import git_state
 from src.mathlib_review.paths import run_dir
 from src.mathlib_review.review.runner import V5DatasetConfig, _build_plan, load_run, run
 from src.mathlib_review.schema.review import V5RunPlan
@@ -128,8 +128,8 @@ def test_the_sealed_plan_carries_one_hash_per_enumerated_pair(scaffold):
     """Keyed on the invocation, not the work unit: five arms share a unit, and a unit-keyed
     map would collide — the bug v4's focused arm had to name explicitly."""
 
-    from src.datasets.pr_review_v4.io import load_jsonl
-    from src.datasets.pr_review_v4.schema import (
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.schema import (
         ChangeGraph, ModificationRecord, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
     )
     from src.mathlib_review.agenda.agenda import build_agenda
@@ -175,8 +175,8 @@ def test_a_run_that_cannot_name_its_model_is_refused():
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
     from src.mathlib_review.agenda.agenda import build_agenda
-    from src.datasets.pr_review_v4.io import load_jsonl
-    from src.datasets.pr_review_v4.schema import (
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.schema import (
         ChangeGraph, ModificationRecord, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
     )
 
@@ -199,8 +199,8 @@ def test_a_run_that_cannot_name_its_model_is_refused():
 
 
 def _agenda_and_pool():
-    from src.datasets.pr_review_v4.io import load_jsonl
-    from src.datasets.pr_review_v4.schema import (
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.schema import (
         ChangeGraph, ModificationRecord, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
     )
     from src.mathlib_review.agenda.agenda import build_agenda
@@ -251,7 +251,7 @@ def test_specialist_spend_is_counted_in_the_manifest():
 
     from types import SimpleNamespace
 
-    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
     from src.mathlib_review.schema.review import V5RunPlan
     from src.mathlib_review.review.trace import reconcile
 
@@ -397,7 +397,7 @@ def test_the_floor_is_priced_separately_from_the_discretionary_cap(caplog):
 def _manifest_with_both_currencies():
     from types import SimpleNamespace
 
-    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
     from src.mathlib_review.schema.review import V5RunPlan
     from src.mathlib_review.review.trace import reconcile
 

@@ -11,7 +11,7 @@ from collections import Counter
 
 import pytest
 
-from src.datasets.pr_review_v4.operators.naming_norm import (
+from src.mathlib_review.evidence.operators.naming_norm import (
     MIN_SUPPORT,
     SubjectPopulation,
     conclusion_subject,

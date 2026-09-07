@@ -21,8 +21,8 @@ from pathlib import Path
 import pytest
 
 from ape.utils.config_loader import load_yaml, parse_cli_args
-from src.datasets.pr_review_v4.judge_runner import JudgeDatasetConfig
-from src.datasets.pr_review_v4.runner import V4DatasetConfig
+from src.mathlib_review.judge.runner import JudgeDatasetConfig
+from src.mathlib_review.opportunities.runner import V4DatasetConfig
 from src.mathlib_review.review.runner import V5DatasetConfig
 
 
@@ -211,7 +211,9 @@ def test_load_run_has_one_implementation():
 
     import inspect
 
-    from src.datasets.pr_review_v4 import judge_runner, runner as v4_runner
+    from src.mathlib_review.judge import runner as judge_runner
+
+    from src.mathlib_review.opportunities import runner as v4_runner
     from src.mathlib_review.review import runner as v5_runner
     from src.mathlib_review.run_config import load_run as shared
 
@@ -228,7 +230,7 @@ def test_each_caller_still_validates_against_its_own_model():
     """The one thing that legitimately varies. Sharing the convention must not share the
     schema -- a judge config validated as a generation config would accept the wrong keys."""
 
-    from src.datasets.pr_review_v4.judge_runner import JudgeDatasetConfig
+    from src.mathlib_review.judge.runner import JudgeDatasetConfig
     from src.mathlib_review.run_config import load_run
 
     dataset, scaffold, overrides = load_run(

@@ -23,10 +23,10 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.contracts import (
+from src.mathlib_review.release.contracts import (
     GoldLeakError, assert_prompts_gold_free, prompt_leaks,
 )
-from src.datasets.pr_review_v4.render_focused import SUBMISSION_CONTRACT, focused_system_prompt
+from src.mathlib_review.agenda.render_focused import SUBMISSION_CONTRACT, focused_system_prompt
 from src.mathlib_review.agenda.arms import specs_by_arm_id
 
 RELEASES = Path("inputs/pr_review_v4/releases")

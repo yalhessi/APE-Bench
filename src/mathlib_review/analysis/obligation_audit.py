@@ -38,9 +38,12 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
+from src.mathlib_review.paths import LEGACY_V2_BUNDLES
 
 #: Where the raw GitHub bundles live. `source_object.path` in an event points here.
-BUNDLE_ROOT = Path("data/pr_review_v2/cache/bundles")
+#: Restated `LEGACY_V2_BUNDLES` until the packages merged and the guard could
+#: see it. Two spellings of one directory is how one of them goes stale.
+BUNDLE_ROOT = LEGACY_V2_BUNDLES
 
 #: A GitHub suggestion block. Its presence is decisive: a suggestion is a *literal
 #: replacement text*, so the ask is bounded by what it contains. An obligation demanding

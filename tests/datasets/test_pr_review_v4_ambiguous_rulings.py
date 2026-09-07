@@ -15,13 +15,13 @@ ignored entirely — the omission that made `resolution_recall > issue_recall` r
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v4.io import jsonl_bytes
-from src.datasets.pr_review_v4.semantic_judge import (
+from src.mathlib_review.io import jsonl_bytes
+from src.mathlib_review.judge.semantic_judge import (
     AMBIGUOUS_REGISTRY,
     load_ambiguous_rulings,
     semantic_report,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     CandidateClaim,
     InterventionView,
     JudgmentAction,

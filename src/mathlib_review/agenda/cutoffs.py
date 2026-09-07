@@ -32,8 +32,8 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
-from src.datasets.pr_review_v4.paths import LEGACY_V2_BUNDLES
-from src.datasets.pr_review_v4.schema import ReviewEpisodeInput
+from src.mathlib_review.paths import LEGACY_V2_BUNDLES
+from src.mathlib_review.schema import ReviewEpisodeInput
 
 
 class CutoffUnavailable(RuntimeError):

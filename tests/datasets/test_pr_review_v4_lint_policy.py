@@ -9,12 +9,12 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v4.operators.lint_policy import (
+from src.mathlib_review.evidence.operators.lint_policy import (
     find_forbidden_construct,
     find_long_lines,
     lint_target,
 )
-from src.datasets.pr_review_v4.schema import ChangeTarget
+from src.mathlib_review.schema import ChangeTarget
 
 
 def _target(code: str, *, base: str = "", kind: str = "declaration") -> ChangeTarget:

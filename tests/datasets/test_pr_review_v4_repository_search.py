@@ -14,7 +14,7 @@ candidates of either family.
 
 from __future__ import annotations
 
-from src.datasets.pr_review_v4.evidence import declares_identifier, searchable_identifiers
+from src.mathlib_review.evidence.evidence import declares_identifier, searchable_identifiers
 
 REALISTIC_QUERY = (
     "primary=Finset.sum_comm; requested_change=Replace the new declaration with the "

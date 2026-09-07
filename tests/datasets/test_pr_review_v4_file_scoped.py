@@ -24,14 +24,14 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.render_file_scoped import (
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.agenda.render_file_scoped import (
     file_claim_error,
     render_file_all,
     schedule_files,
     schedule_report,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     ReviewEpisodeInput,
     ReviewWorkUnit,
@@ -74,7 +74,7 @@ def test_scheduling_reads_only_the_change_graph(scheduled):
     import ast
     import inspect
 
-    from src.datasets.pr_review_v4 import render_file_scoped
+    from src.mathlib_review.agenda import render_file_scoped
 
     tree = ast.parse(inspect.getsource(render_file_scoped))
     imported = {
@@ -139,7 +139,7 @@ def _handler(scheduled):
         LeanPRReviewV4FileConfig,
         LeanPRReviewV4FileTask,
     )
-    from src.datasets.pr_review_v4.task_adapter import build_file_task_data
+    from src.mathlib_review.review.task_adapter import build_file_task_data
 
     prompt = max(scheduled["prompts"], key=lambda item: len(item.included_change_ids))
     invocation = next(

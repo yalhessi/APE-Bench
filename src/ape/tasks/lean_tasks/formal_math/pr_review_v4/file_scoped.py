@@ -52,7 +52,7 @@ class LeanPRReviewV4FileTask(LeanPRReviewV4CandidateTask):
         return self.data.rendered_system_prompt, self.data.rendered_user_prompt
 
     def _extra_candidate_error(self, candidate: Dict[str, Any]) -> Optional[str]:
-        from src.datasets.pr_review_v4.render_file_scoped import file_claim_error
+        from src.mathlib_review.agenda.render_file_scoped import file_claim_error
 
         return file_claim_error(
             candidate.get("change_ids") or [], candidate.get("issue_kind")

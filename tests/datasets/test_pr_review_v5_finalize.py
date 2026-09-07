@@ -17,8 +17,8 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import ReviewWorkUnit
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import ReviewWorkUnit
 from src.mathlib_review.review.finalize import finalize, ingest_responses
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")

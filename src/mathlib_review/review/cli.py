@@ -141,7 +141,7 @@ def _run(args, overrides, logger) -> int:
 
 
 def _judge(args, overrides, logger) -> int:
-    from src.datasets.pr_review_v4.judge_runner import (
+    from src.mathlib_review.judge.runner import (
         assert_paths_agree, derive_from_run, load_run, run,
     )
 

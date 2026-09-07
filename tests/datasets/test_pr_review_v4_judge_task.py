@@ -10,9 +10,11 @@ import asyncio
 
 import pytest
 
-from src.datasets.pr_review_v4 import judge_protocol, semantic_judge
-from src.datasets.pr_review_v4.judge_runner import pair_task_data, script_cache_key
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.judge import protocol as judge_protocol
+
+from src.mathlib_review.judge import semantic_judge
+from src.mathlib_review.judge.runner import pair_task_data, script_cache_key
+from src.mathlib_review.schema import (
     CandidateClaim,
     EvidenceRequest,
     JudgmentAction,
@@ -97,7 +99,7 @@ def test_there_is_one_rubric_object_not_two_equal_ones():
 
 
 def test_the_active_rubric_is_v9_and_earlier_rubrics_are_retired():
-    from src.datasets.pr_review_v4.legacy.judge_v71 import (
+    from src.mathlib_review.legacy_pipeline.judge_v71 import (
         LEGACY_JUDGE_PROMPT,
         LEGACY_JUDGE_VERSION,
     )
@@ -113,7 +115,7 @@ def test_the_task_prompt_always_carries_the_reviewed_code(tmp_path):
     """The defect this whole protocol exists to prevent, asserted directly."""
 
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from src.datasets.pr_review_v4.schema import ChangeTarget
+    from src.mathlib_review.schema import ChangeTarget
 
     pair = _pair()
     target = ChangeTarget(
@@ -151,7 +153,7 @@ def test_the_task_prompt_always_carries_the_reviewed_code(tmp_path):
 def test_the_rubric_keeps_the_clauses_v71_dropped_and_adds_abstain():
     """v8 restored three omissions; v9 keeps them and adds the abstain verdict."""
 
-    from src.datasets.pr_review_v4.legacy.judge_v71 import LEGACY_JUDGE_PROMPT
+    from src.mathlib_review.legacy_pipeline.judge_v71 import LEGACY_JUDGE_PROMPT
 
     # Prompts are hard-wrapped, so compare on whitespace-normalized text.
     squash = lambda s: " ".join(s.split())
@@ -175,7 +177,7 @@ def test_v8_record_renders_the_code_and_hashes_differently_from_its_v71_twin(tmp
     """A v8 record must be a distinct unit of work, or resume would cross the rubrics."""
 
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from src.datasets.pr_review_v4.schema import ChangeTarget
+    from src.mathlib_review.schema import ChangeTarget
 
     pair = _pair()
     target = ChangeTarget(
@@ -186,7 +188,7 @@ def test_v8_record_renders_the_code_and_hashes_differently_from_its_v71_twin(tmp
         reviewed_code="lemma Metric.card_maximalSeparatedSet : True := trivial\n",
         parse_status="semantic", source_sha256="t",
     )
-    from src.datasets.pr_review_v4.legacy.judge_v71 import LEGACY_JUDGE_VERSION
+    from src.mathlib_review.legacy_pipeline.judge_v71 import LEGACY_JUDGE_VERSION
 
     v71 = pair_task_data(pair, "gpt_5_mini", LEGACY_JUDGE_VERSION)
     v8 = pair_task_data(pair, "gpt_5_mini", semantic_judge.JUDGE_VERSION, {"change:1": target})
@@ -279,7 +281,7 @@ def test_judge_identity_covers_everything_that_can_change_a_verdict():
             f"changing {field} must change the judge's identity"
         )
     # And the retired rubric can never join to the active one.
-    from src.datasets.pr_review_v4.legacy.judge_v71 import LEGACY_JUDGE_VERSION
+    from src.mathlib_review.legacy_pipeline.judge_v71 import LEGACY_JUDGE_VERSION
 
     assert judge_protocol.judge_identity(**base, judge_version=LEGACY_JUDGE_VERSION) != identity
 
@@ -361,7 +363,7 @@ def test_match_projection_reads_source_hashes_from_the_pair_not_the_result():
     record about what was judged), so the projection has to join.
     """
 
-    from src.datasets.pr_review_v4.judge_runner import _match_from_result
+    from src.mathlib_review.judge.runner import _match_from_result
 
     pair = _pair()
     raw = {

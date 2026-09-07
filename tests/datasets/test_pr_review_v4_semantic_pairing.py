@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.semantic_judge import (
+from src.mathlib_review.judge.semantic_judge import (
     VerdictCoverageError,
     build_null_pairs,
     build_pairs,
@@ -27,7 +27,7 @@ from src.datasets.pr_review_v4.semantic_judge import (
     seal_pair,
     semantic_report,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     CandidateClaim,
     ChangeTarget,
     InterventionView,
@@ -312,7 +312,7 @@ def test_each_context_block_is_an_independent_ablation_with_its_own_identity():
     different context — and the comparison would be meaningless.
     """
 
-    from src.datasets.pr_review_v4.judge_protocol import ContextProfile, judge_identity
+    from src.mathlib_review.judge.protocol import ContextProfile, judge_identity
 
     base = dict(
         model="gpt_5_mini", sample_count=3, max_tokens=4000, thinking_budget_tokens=3000,
@@ -334,7 +334,7 @@ def test_optional_blocks_are_omitted_not_stubbed():
     """A block rendered "(not recorded)" is still a different prompt from one that never
     mentions the field, which would make the base condition unreproducible."""
 
-    from src.datasets.pr_review_v4.judge_protocol import render_prompt
+    from src.mathlib_review.judge.protocol import render_prompt
 
     base = dict(
         gold_code="code", gold_concerns="naming", gold_action="rename lemma",
@@ -355,7 +355,7 @@ def test_sibling_context_carries_claims_only_and_says_not_to_score_them():
     """Sibling *candidates* are never shown: that would let the judge credit this
     obligation using another candidate's content."""
 
-    from src.datasets.pr_review_v4.judge_protocol import render_prompt
+    from src.mathlib_review.judge.protocol import render_prompt
 
     prompt = render_prompt(
         gold_code="code", gold_concerns="naming", gold_action="rename lemma",
@@ -372,7 +372,7 @@ def test_the_context_sidecar_covers_every_included_obligation():
     """Built from the frozen raw bundles, because the release's events file is an index:
     it names the bundle and key a comment lives at, not the comment text."""
 
-    from src.datasets.pr_review_v4.obligation_context import load_context
+    from src.mathlib_review.judge.obligation_context import load_context
 
     context = load_context()
     assert len(context) == 40

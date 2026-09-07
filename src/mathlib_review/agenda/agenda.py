@@ -27,22 +27,22 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
-from src.datasets.pr_review_v4.focused_specs import (
+from src.mathlib_review.agenda.focused_specs import (
     SCHEDULER_VERSION,
     FocusedAgentSpec,
     FocusedInvocation,
     schedule_focused,
 )
-from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha256_bytes
-from src.datasets.pr_review_v4.render_focused import FOCUSED_RENDERER_VERSION, render_focused_all
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_bytes
+from src.mathlib_review.agenda.render_focused import FOCUSED_RENDERER_VERSION, render_focused_all
+from src.mathlib_review.schema import (
     ChangeGraph,
     ModificationRecord,
     RenderedPrompt,
     ReviewEpisodeInput,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v4.task_adapter import (
+from src.mathlib_review.review.task_adapter import (
     build_candidate_task_data,
     build_focused_task_data,
 )
@@ -213,7 +213,7 @@ def build_agenda(
     # Components say what a change *is* (a family, a file, a stated intent); centrality says
     # what the rest of the PR leans on. Both are gold-free and both are computed from data
     # the release already ships, so the contract adds no new input to the sealed plan.
-    from src.datasets.pr_review_v4.pr_relations import build_relations
+    from src.mathlib_review.release.pr_relations import build_relations
 
     relations, _relation_evidence = build_relations(graphs)
     components = build_components(graphs, relations, episodes)
@@ -229,7 +229,7 @@ def build_agenda(
     # alone would never ask for. Abstains rather than guessing when the snapshot is not
     # fully built, so a partial index degrades to PR-local centrality instead of silently
     # reporting every declaration as unexposed.
-    from src.datasets.pr_review_v4.evidence import snapshot_workspace
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
 
     # Off by default because it is the one expensive input: the index is per base commit,
     # a release has 14 distinct ones, and each costs ~4.4s to build — about a minute for an

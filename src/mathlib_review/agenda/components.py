@@ -29,8 +29,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
-from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
-from src.datasets.pr_review_v4.schema import ChangeGraph, PRRelation, ReviewEpisodeInput
+from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
+from src.mathlib_review.schema import ChangeGraph, PRRelation, ReviewEpisodeInput
 
 #: Grains, coarsest last. A target usually belongs to several: a declaration is its own
 #: `site`, may sit in a `family`, and always sits in a `file`.

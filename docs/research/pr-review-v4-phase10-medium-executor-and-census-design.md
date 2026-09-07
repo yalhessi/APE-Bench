@@ -548,7 +548,7 @@ treatment-version-independent, while Step 10 waits for a replacement arm whose f
 ## 13. Proposed modules
 
 ```text
-src/datasets/pr_review_v4/
+src/mathlib_review/
   implementation_registry.py
   opportunity_executor.py
   method_coverage_census.py

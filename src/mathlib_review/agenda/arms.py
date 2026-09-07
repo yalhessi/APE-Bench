@@ -25,13 +25,13 @@ from typing import Dict, List, Optional
 
 from dataclasses import replace
 
-from src.datasets.pr_review_v4.focused_specs import (
+from src.mathlib_review.agenda.focused_specs import (
     DECLARATION_KINDS,
     FocusedAgentSpec,
     prompt_hashes,
     default_specs,
 )
-from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha256_bytes
+from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_bytes
 
 from src.mathlib_review.agenda.registry import (
     ARM_DEFINITIONS, UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,

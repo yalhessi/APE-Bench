@@ -8,7 +8,7 @@ import pytest
 from ape.tasks.lean_tasks.formal_math.pr_review_v4.opportunities import (
     build_verification_artifact,
 )
-from src.datasets.pr_review_v4.phase9_fixed_orchestration import (
+from src.mathlib_review.legacy_pipeline.phase9_fixed_orchestration import (
     DEFAULT_OUT,
     build_baseline_union,
     build_evaluation_scope,
@@ -17,7 +17,7 @@ from src.datasets.pr_review_v4.phase9_fixed_orchestration import (
     finalize_repetition,
     ingest_repetition,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     OpportunityEvidenceArtifact,
     RenderedPrompt,
@@ -25,7 +25,7 @@ from src.datasets.pr_review_v4.schema import (
     ReviewOpportunity,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v4.task_adapter import build_review_opportunity_task_data
+from src.mathlib_review.review.task_adapter import build_review_opportunity_task_data
 
 
 def _load(path, cls):

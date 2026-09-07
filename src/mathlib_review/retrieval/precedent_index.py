@@ -94,7 +94,7 @@ def build(
     import numpy as np
     from sentence_transformers import SentenceTransformer
 
-    from src.datasets.pr_review_v4.io import sha256_file
+    from src.mathlib_review.io import sha256_file
     from src.mathlib_review.corpus import eval_pr_numbers as _eval_pr_numbers
     from src.mathlib_review.corpus import hunk_code
 

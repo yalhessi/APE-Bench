@@ -6,13 +6,13 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from src.datasets.pr_review_v4.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, sha256_file
-from src.datasets.pr_review_v4.investigations import (
+from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, sha256_file
+from src.mathlib_review.opportunities.investigations import (
     audit_smoke_schedule,
     schedule_investigations,
     schedule_report,
 )
-from src.datasets.pr_review_v4.method_registry import (
+from src.mathlib_review.opportunities.method_registry import (
     EXECUTION_ORDER,
     build_registry,
     default_methods,
@@ -20,10 +20,10 @@ from src.datasets.pr_review_v4.method_registry import (
     registry_sha256,
     validate_registry,
 )
-from src.datasets.pr_review_v4.modification_inventory import build_inventory, inventory_report
-from src.datasets.pr_review_v4.pr_relations import build_relations, relation_report
-from src.datasets.pr_review_v4.run_contract import create_run_plan, seal_run
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.release.modification_inventory import build_inventory, inventory_report
+from src.mathlib_review.release.pr_relations import build_relations, relation_report
+from src.mathlib_review.release.run_contract import create_run_plan, seal_run
+from src.mathlib_review.schema import (
     ChangeGraph,
     InvestigationRecord,
     InvestigationTask,
@@ -35,7 +35,7 @@ from src.datasets.pr_review_v4.schema import (
     ReviewWorkUnit,
     WorthinessDecision,
 )
-from src.datasets.pr_review_v4.systematic_baseline import (
+from src.mathlib_review.opportunities.systematic_baseline import (
     _oracle_evidence_confirmation,
     inspect_baseline,
     write_baseline,

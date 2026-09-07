@@ -2,18 +2,18 @@
 
 import json
 
-from src.datasets.pr_review_v4.implementation_registry import (
+from src.mathlib_review.opportunities.implementation_registry import (
     assess_capabilities,
     build_registry_files,
     default_implementations,
 )
-from src.datasets.pr_review_v4.io import jsonl_bytes
-from src.datasets.pr_review_v4.method_coverage_census import (
+from src.mathlib_review.io import jsonl_bytes
+from src.mathlib_review.opportunities.method_coverage_census import (
     build_static_census,
     classify_obligation_issue,
     classify_obligation_transformation,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     ChangeTarget,
     InterventionView,

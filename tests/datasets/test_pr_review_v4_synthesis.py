@@ -13,7 +13,7 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
     LeanPRReviewV4CandidateTask,
 )
 
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     CandidateClaim,
     CandidateOpportunityLink,
     PRRelation,
@@ -24,8 +24,8 @@ from src.datasets.pr_review_v4.schema import (
     ResidualReviewPass,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v4.phase8_residual import build_release, ingest_run
-from src.datasets.pr_review_v4.synthesis import (
+from src.mathlib_review.legacy_pipeline.phase8_residual import build_release, ingest_run
+from src.mathlib_review.opportunities.synthesis import (
     build_gate_artifacts,
     project_semantic_matches,
     synthesize_findings,

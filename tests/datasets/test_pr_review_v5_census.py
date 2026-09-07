@@ -18,9 +18,9 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.pr_relations import build_relations
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.release.pr_relations import build_relations
+from src.mathlib_review.schema import (
     ChangeGraph,
     ReviewEpisodeInput,
     ReviewWorkUnit,

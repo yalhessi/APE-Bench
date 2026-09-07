@@ -34,7 +34,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     ChangeTarget,
     PRRelation,

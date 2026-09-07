@@ -29,21 +29,21 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
-from src.datasets.pr_review_v4.candidates import candidates_from_response
-from src.datasets.pr_review_v4.conditions import (
+from src.mathlib_review.review.candidates import candidates_from_response
+from src.mathlib_review.review.conditions import (
     deterministic_findings,
     focused_findings,
     generalist_findings,
 )
-from src.datasets.pr_review_v4.digest import digest_findings
-from src.datasets.pr_review_v4.io import (
+from src.mathlib_review.review.digest import digest_findings
+from src.mathlib_review.io import (
     jsonl_bytes,
     pretty_json_bytes,
     sha256_bytes,
     write_once,
 )
-from src.datasets.pr_review_v4.merge import merge_findings
-from src.datasets.pr_review_v4.schema import ReviewWorkUnit
+from src.mathlib_review.review.merge import merge_findings
+from src.mathlib_review.schema import ReviewWorkUnit
 
 from src.mathlib_review.agenda.arms import CHECKABLE_ARMS, GENERALIST_ARM_ID
 from src.mathlib_review.review.lead_synthesis import apply_assessments
@@ -117,7 +117,7 @@ def _evidence_specialist_findings(candidates, supported_candidate_ids, pr_number
     `source.spec_id` still naming the specialist that produced them.
     """
 
-    from src.datasets.pr_review_v4.merge import finding_from_candidate
+    from src.mathlib_review.review.merge import finding_from_candidate
 
     supported = set(supported_candidate_ids) if supported_candidate_ids is not None else None
     wanted = set(pr_numbers) if pr_numbers else None
@@ -151,7 +151,7 @@ def _lead_removed_findings(removed: Sequence[Tuple[Any, str]], pr_numbers):
     because synthesis runs before the chain.
     """
 
-    from src.datasets.pr_review_v4.merge import finding_from_candidate
+    from src.mathlib_review.review.merge import finding_from_candidate
 
     wanted = set(pr_numbers) if pr_numbers else None
     findings = []
@@ -238,7 +238,7 @@ def _unwarranted_findings(candidates, pr_numbers):
     source names a verification artifact, and these are precisely the ones that do not.
     """
 
-    from src.datasets.pr_review_v4.merge import finding_from_candidate
+    from src.mathlib_review.review.merge import finding_from_candidate
 
     wanted = set(pr_numbers) if pr_numbers else None
     findings = []

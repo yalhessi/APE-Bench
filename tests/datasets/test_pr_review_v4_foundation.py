@@ -8,26 +8,26 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from src.datasets.pr_review_v4.change_graph import (
+from src.mathlib_review.release.change_graph import (
     build_change_graph,
     changed_ranges,
     parse_unified_diff,
 )
-from src.datasets.pr_review_v4.episodes import changed_files_from_diff, project_legacy_record
-from src.datasets.pr_review_v4.episode_builder import load_roster, segment_review_rounds
-from src.datasets.pr_review_v4.events import build_event_ledger, events_from_bundle
-from src.datasets.pr_review_v4.io import jsonl_bytes, sha256_bytes, write_once
-from src.datasets.pr_review_v4.legacy.judgment_graph import atomicity_signals, build_judgment
-from src.datasets.pr_review_v4.legacy.migrate_interventions import (
+from src.mathlib_review.release.episodes import changed_files_from_diff, project_legacy_record
+from src.mathlib_review.release.episode_builder import load_roster, segment_review_rounds
+from src.mathlib_review.release.events import build_event_ledger, events_from_bundle
+from src.mathlib_review.io import jsonl_bytes, sha256_bytes, write_once
+from src.mathlib_review.legacy_pipeline.judgment_graph import atomicity_signals, build_judgment
+from src.mathlib_review.legacy_pipeline.migrate_interventions import (
     _load_source_events,
     intervention_scope_projection,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     InterventionScopeMigration,
     ReviewEpisodeInput,
     VisibleText,
 )
-from src.datasets.pr_review_v4.validate import validate_release
+from src.mathlib_review.release.validate import validate_release
 
 
 REAL_RECORDS = Path("inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl")

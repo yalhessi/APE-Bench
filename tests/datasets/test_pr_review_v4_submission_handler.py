@@ -16,13 +16,13 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import (
     RenderedPrompt,
     ReviewEpisodeInput,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v4.task_adapter import build_candidate_task_data
+from src.mathlib_review.review.task_adapter import build_candidate_task_data
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 

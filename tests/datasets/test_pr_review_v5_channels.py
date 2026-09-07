@@ -117,7 +117,7 @@ def test_a_malformed_packet_line_does_not_break_the_read(tmp_path):
 
 
 def test_the_finding_model_carries_both_fields():
-    from src.datasets.pr_review_v4.schema import ReviewFinding
+    from src.mathlib_review.schema import ReviewFinding
 
     fields = ReviewFinding.model_fields
     assert "channels" in fields

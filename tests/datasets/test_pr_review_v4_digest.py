@@ -14,14 +14,14 @@ separates them, so the method declares it and the default is conservative.
 
 import pytest
 
-from src.datasets.pr_review_v4.digest import (
+from src.mathlib_review.review.digest import (
     AGGREGATION_BY_METHOD,
     aggregation_for,
     digest_findings,
     mask_subject,
 )
-from src.datasets.pr_review_v4.merge import finding_from_opportunity
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.review.merge import finding_from_opportunity
+from src.mathlib_review.schema import (
     ReviewOpportunity,
     WorthinessDecision,
     OpportunityTransformation,
@@ -188,7 +188,7 @@ def test_the_issue_key_names_no_arm():
     import ast
     import inspect
 
-    from src.datasets.pr_review_v4 import digest
+    from src.mathlib_review.review import digest
 
     source = inspect.getsource(digest._issue_key)
     tree = ast.parse(source.strip())

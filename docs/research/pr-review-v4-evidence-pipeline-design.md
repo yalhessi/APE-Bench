@@ -86,7 +86,7 @@ Benchmark releases and experimental runs live under separate roots:
 inputs/pr_review_v4/
 data/pr_review_v4/
 results/pr_review_v4/
-src/datasets/pr_review_v4/
+src/mathlib_review/
 ```
 
 The family bump is intentional. Existing v2 prediction records assume hunk-shaped sites and a flat
@@ -592,7 +592,7 @@ These checks are release gates, not optional audits:
 Proposed ownership boundaries:
 
 ```text
-src/datasets/pr_review_v4/
+src/mathlib_review/
   schema.py                 # Pydantic/JSON schemas and stable IDs
   io.py                     # canonical hashes and immutable writes
   release.py                # immutable release manifests and builders
@@ -684,20 +684,20 @@ review retrieval and synthetic exemplars are optional experimental prompt treatm
 content.
 
 ```bash
-./ape/bin/python -m src.datasets.pr_review_v4.prebuild \
+./ape/bin/python -m src.mathlib_review.release.prebuild \
   --config configs/pr_review_v4_pilot.yaml \
   --out data/pr_review_v4/dev-pilot-0.9.0-base-commits.jsonl
 export PATH=/research/projects/proofedit/ya475/.elan/bin:$PATH
 ./ape/bin/python -m ape.toolkits.execute.lean.build \
   --input_file data/pr_review_v4/dev-pilot-0.9.0-base-commits.jsonl --num_processes 2
 
-./ape/bin/python -m src.datasets.pr_review_v4.runner \
+./ape/bin/python -m src.mathlib_review.opportunities.runner \
   --config configs/pr_review_v4_pilot.yaml dataset.dry_run=true
 
-./ape/bin/python -m src.datasets.pr_review_v4.runner \
+./ape/bin/python -m src.mathlib_review.opportunities.runner \
   --config configs/pr_review_v4_pilot.yaml dataset.dry_run=false
 
-./ape/bin/python -m src.datasets.pr_review_v4.candidates \
+./ape/bin/python -m src.mathlib_review.review.candidates \
   --work-units inputs/pr_review_v4/releases/dev-pilot-0.9.0/derived/work_units.jsonl \
   --responses results/pr_review_v4/runs/dev-pilot-0.9.0/candidate_responses.jsonl \
   --graphs inputs/pr_review_v4/releases/dev-pilot-0.9.0/derived/change_graphs.jsonl \
@@ -705,14 +705,14 @@ export PATH=/research/projects/proofedit/ya475/.elan/bin:$PATH
   --deterministic-discovery \
   --out results/pr_review_v4/runs/dev-pilot-0.9.0/candidates.jsonl
 
-./ape/bin/python -m src.datasets.pr_review_v4.semantic_judge \
+./ape/bin/python -m src.mathlib_review.judge.semantic_judge \
   --judgments inputs/pr_review_v4/releases/dev-pilot-0.9.0/gold/judgments.jsonl \
   --views inputs/pr_review_v4/releases/dev-pilot-0.9.0/gold/intervention_views.jsonl \
   --candidates results/pr_review_v4/runs/dev-pilot-0.9.0/candidates.jsonl \
   --work-units inputs/pr_review_v4/releases/dev-pilot-0.9.0/derived/work_units.jsonl \
   --out-dir results/pr_review_v4/runs/dev-pilot-0.9.0/semantic-judge-v1
 
-./ape/bin/python -m src.datasets.pr_review_v4.evidence \
+./ape/bin/python -m src.mathlib_review.evidence.evidence \
   --candidates results/pr_review_v4/runs/dev-pilot-0.9.0/candidates.jsonl \
   --graphs inputs/pr_review_v4/releases/dev-pilot-0.9.0/derived/change_graphs.jsonl \
   --workspace-map results/pr_review_v4/runs/dev-pilot-0.9.0/candidate_responses_workspace_map.json \
@@ -720,13 +720,13 @@ export PATH=/research/projects/proofedit/ya475/.elan/bin:$PATH
   --events inputs/pr_review_v4/releases/dev-pilot-0.9.0/source/events.jsonl \
   --out-dir results/pr_review_v4/runs/dev-pilot-0.9.0/evidence
 
-./ape/bin/python -m src.datasets.pr_review_v4.select \
+./ape/bin/python -m src.mathlib_review.opportunities.select \
   --candidates results/pr_review_v4/runs/dev-pilot-0.9.0/candidates.jsonl \
   --packets results/pr_review_v4/runs/dev-pilot-0.9.0/evidence/packets.jsonl \
   --assertions results/pr_review_v4/runs/dev-pilot-0.9.0/evidence/assertions.jsonl \
   --out results/pr_review_v4/runs/dev-pilot-0.9.0/findings.jsonl
 
-./ape/bin/python -m src.datasets.pr_review_v4.evaluate \
+./ape/bin/python -m src.mathlib_review.analysis.evaluate \
   --judgments inputs/pr_review_v4/releases/dev-pilot-0.9.0/gold/judgments.jsonl \
   --views inputs/pr_review_v4/releases/dev-pilot-0.9.0/gold/intervention_views.jsonl \
   --pilot-cases inputs/pr_review_v4/releases/dev-pilot-0.9.0/gold/pilot_cases.jsonl \
@@ -737,14 +737,14 @@ export PATH=/research/projects/proofedit/ya475/.elan/bin:$PATH
   --assertions results/pr_review_v4/runs/dev-pilot-0.9.0/evidence/assertions.jsonl \
   --out results/pr_review_v4/runs/dev-pilot-0.9.0/evaluation.json
 
-./ape/bin/python -m src.datasets.pr_review_v4.run_contract seal \
+./ape/bin/python -m src.mathlib_review.release.run_contract seal \
   --run-dir results/pr_review_v4/runs/dev-pilot-0.9.0
 ```
 
 If an older run contains setup failures, retry only those work units under a fresh run name:
 
 ```bash
-./ape/bin/python -m src.datasets.pr_review_v4.runner \
+./ape/bin/python -m src.mathlib_review.opportunities.runner \
   --config configs/pr_review_v4_pilot.yaml \
   dataset.dry_run=false \
   dataset.retry_failed_from=.ape/runs/pr_review_v4_pilot_0811_candidates \

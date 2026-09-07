@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
-from src.datasets.pr_review_v4.runs import unbuilt_base_commits
+from src.mathlib_review.analysis.runs import unbuilt_base_commits
 
 from src.mathlib_review.paths import assert_repo_root
 
@@ -193,6 +193,6 @@ async def assert_workspaces_prebuilt(
     if missing:
         raise PreflightError(
             f"{len(missing)} base workspace(s) are not prebuilt: {missing}. Run "
-            "`./ape/bin/python -m src.datasets.pr_review_v4.prebuild --config "
+            "`./ape/bin/python -m src.mathlib_review.release.prebuild --config "
             "<a v4 config for this release>`, then the printed lean build command."
         )

@@ -12,7 +12,10 @@ from pathlib import Path
 
 import pytest
 
-PACKAGE = Path("src/datasets/pr_review_v4")
+#: The merged package. This was `src/datasets/pr_review_v4`; globbing a
+#: directory that no longer exists finds nothing and passes vacuously, which
+#: is how a guard becomes decoration.
+PACKAGE = Path("src/mathlib_review")
 PRIOR_GENERATIONS = ("pr_review_v2", "pr_review_v3")
 PRIOR_GENERATION_DATA = re.compile(r"(?:inputs|data)/pr_review_v[23]|pr_review_v2/data")
 
@@ -35,7 +38,7 @@ def _imported_modules(source: str):
 def _package_sources():
     return sorted(
         path for path in PACKAGE.rglob("*.py")
-        if "legacy" not in path.relative_to(PACKAGE).parts
+        if "legacy_pipeline" not in path.relative_to(PACKAGE).parts
     )
 
 
@@ -56,13 +59,40 @@ def test_no_module_imports_a_prior_generation():
 
 
 def test_prior_generation_data_paths_live_only_in_paths_module():
+    """Checked against string literals in the code, not the file text.
+
+    Scanning raw text flags a docstring that *cites* where an artifact lives -- the precedent
+    index names the Stage-1 report it was calibrated against -- which is documentation doing
+    its job, not a path being spelled twice. A guard that cannot tell those apart gets
+    silenced rather than obeyed.
+    """
+
+    import ast
+
     offenders = {}
     for path in _package_sources():
         if path.name == "paths.py":
             continue
-        hits = PRIOR_GENERATION_DATA.findall(path.read_text())
+        try:
+            tree = ast.parse(path.read_text())
+        except SyntaxError:
+            continue
+        docstrings = {
+            id(node) for parent in ast.walk(tree)
+            if isinstance(parent, (ast.Module, ast.ClassDef, ast.FunctionDef,
+                                   ast.AsyncFunctionDef))
+            for node in [ast.get_docstring(parent, clean=False)] if node
+        }
+        hits = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                if node.value in {ast.get_docstring(p, clean=False) for p in ast.walk(tree)
+                                  if isinstance(p, (ast.Module, ast.ClassDef, ast.FunctionDef,
+                                                    ast.AsyncFunctionDef))}:
+                    continue
+                hits |= set(PRIOR_GENERATION_DATA.findall(node.value))
         if hits:
-            offenders[path.as_posix()] = sorted(set(hits))
+            offenders[path.as_posix()] = sorted(hits)
     assert offenders == {}, (
         f"legacy-generation data paths spelled outside paths.py: {offenders}. "
         "Import the named constant from .paths instead."
@@ -70,7 +100,7 @@ def test_prior_generation_data_paths_live_only_in_paths_module():
 
 
 def test_paths_module_declares_the_legacy_inputs_that_manifests_record():
-    from src.datasets.pr_review_v4 import paths
+    from src.mathlib_review import paths
 
     for name in (
         "LEGACY_INTERVENTIONS_V5",
@@ -83,7 +113,7 @@ def test_paths_module_declares_the_legacy_inputs_that_manifests_record():
 
 
 def test_assert_repo_root_rejects_a_foreign_working_directory(tmp_path, monkeypatch):
-    from src.datasets.pr_review_v4.paths import assert_repo_root
+    from src.mathlib_review.paths import assert_repo_root
 
     assert_repo_root()  # the suite runs from the repo root
     monkeypatch.chdir(tmp_path)

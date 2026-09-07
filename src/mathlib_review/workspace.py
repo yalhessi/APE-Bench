@@ -6,7 +6,7 @@ across two generations imported anyway:
     opportunity_executor      from .evidence import _tool_env
     operators/canonical_api   from ..evidence import _tool_env
     v4 candidates            from .evidence import _tool_env as evidence_tool_env
-    pr_review_v5/patchset     from src.datasets.pr_review_v4.evidence import _run
+    pr_review_v5/patchset     from src.mathlib_review.evidence.evidence import _run
 
 A leading underscore is a claim that a name is nobody else's business, and four callers had
 already decided otherwise. That is not a naming quibble: `evidence.py` is where the evidence

@@ -1,10 +1,10 @@
 """Final-finding judgment and pre/post-publication reporting."""
 
-from src.datasets.pr_review_v4.judge_runner import (
+from src.mathlib_review.judge.runner import (
     candidate_from_finding,
     publication_summary,
 )
-from src.datasets.pr_review_v4.schema import FindingSource, ReviewFinding
+from src.mathlib_review.schema import FindingSource, ReviewFinding
 
 
 def _finding(admission="diagnostic"):

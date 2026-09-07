@@ -3,13 +3,13 @@
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v4.oracle_opportunities import (
+from src.mathlib_review.opportunities.oracle import (
     COVER_LE_PACK,
     DEFAULT_OUT,
     build_artifacts,
     ingest_run,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     OpportunityAdjudication,
     OracleOpportunity,
@@ -17,7 +17,7 @@ from src.datasets.pr_review_v4.schema import (
     ReviewEpisodeInput,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v4.task_adapter import build_opportunity_task_data
+from src.mathlib_review.review.task_adapter import build_opportunity_task_data
 
 
 PILOT = Path("inputs/pr_review_v4/releases/dev-pilot-0.9.0")

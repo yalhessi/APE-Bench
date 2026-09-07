@@ -5,7 +5,7 @@ prove it changed none of them. This test is the proof, and it is deliberately bl
 it re-hashes everything and fails on the first byte of drift.
 """
 
-from src.datasets.pr_review_v4.verify_frozen import (
+from src.mathlib_review.release.verify_frozen import (
     LOCK_PATH,
     verify_lock,
     verify_manifests,
@@ -21,7 +21,7 @@ def test_every_declared_artifact_reference_still_hashes_correctly():
 def test_locked_files_are_unchanged_and_lock_covers_the_frozen_roots():
     assert LOCK_PATH.is_file(), (
         f"{LOCK_PATH} is missing; run "
-        "`python -m src.datasets.pr_review_v4.verify_frozen build-lock`"
+        "`python -m src.mathlib_review.release.verify_frozen build-lock`"
     )
     failures, unlocked, checked = verify_lock()
     assert checked > 900, f"lock covers only {checked} files; expected the full frozen corpus"

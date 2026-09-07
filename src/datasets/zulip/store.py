@@ -8,7 +8,7 @@ the whole corpus is one portable file.
 is not a safety property. What makes a read safe is `gate()`: no message at or after
 `as_of`, and no message that references the PR under review. Both rules live in one
 function that every public read path calls, mirroring
-`src/datasets/pr_review_v4/retrieval.py::validate_precedents` — the leak discipline is
+`src/mathlib_review/retrieval/precedents.py::validate_precedents` — the leak discipline is
 auditable in one place instead of re-implemented per call site.
 
 The second rule matters more than it looks. A thread can predate a PR's review and

@@ -418,7 +418,7 @@ Mathlib.
 locked files, no drift.
 
 ```bash
-ape/bin/python -m src.datasets.pr_review_v4.verify_frozen verify
+ape/bin/python -m src.mathlib_review.release.verify_frozen verify
 ape/bin/python -m src.mathlib_review.review.runner --config configs/pr_review_v5.yaml --dry-run
 ape/bin/python -m src.datasets.zulip.browse --stats
 ape task ape-agent lean_pr_review          # interactive single-task session
@@ -432,7 +432,7 @@ All tooling must run from the repository root (`paths.assert_repo_root`).
 |---|---|---|
 | `inputs/pr_review_v2/corpus/` | 100 MB | `-m src.datasets.pr_review_v2.corpus` |
 | `inputs/pr_review_v2/precedent_bench/*.jsonl` | ~40 MB | `-m src.datasets.pr_review_v2.precedent_bench` (reports are tracked) |
-| `results/*/runs/`, `results/overlays/` | ~115 MB | re-run the condition, or `-m src.datasets.pr_review_v4.review_overlay` |
+| `results/*/runs/`, `results/overlays/` | ~115 MB | re-run the condition, or `-m src.mathlib_review.analysis.review_overlay` |
 | `data/pr_review_v2/cache/{matcher,precedent_judge,concern_classify,selector,…}` | ~25 MB | regenerated on demand; costs model calls |
 | `data/code_execute/`, `data/lean_retrieve/` | tens of GB | `-m ape.toolkits.execute.lean.build`, `-m ape.toolkits.retrieve.lean.build` |
 | ~29 superseded v2 run configs | 60 KB | named in `docs/research/progress-report-2026-06.md` |

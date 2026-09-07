@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v4.contracts import (
+from src.mathlib_review.release.contracts import (
     GoldLeakError,
     seal_evaluation_protocol,
     seal_evaluation_receipt,
@@ -19,7 +19,7 @@ from src.datasets.pr_review_v4.contracts import (
     seal_pair_manifest,
     verify_chain,
 )
-from src.datasets.pr_review_v4.schema import GenerationPlanV2, RunPlan
+from src.mathlib_review.schema import GenerationPlanV2, RunPlan
 
 
 def _plan(**overrides):

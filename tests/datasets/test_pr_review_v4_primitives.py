@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.datasets.pr_review_v4.io import (
+from src.mathlib_review.io import (
     canonical_json_bytes,
     display_path,
     extract_json_object,
@@ -14,13 +14,13 @@ from src.datasets.pr_review_v4.io import (
     sealed_model,
     sha256_bytes,
 )
-from src.datasets.pr_review_v4.releases import (
+from src.mathlib_review.release.releases import (
     ArtifactSpec,
     artifact_ref,
     write_artifacts,
 )
-from src.datasets.pr_review_v4.reports import compare_conditions, rep_summary
-from src.datasets.pr_review_v4.schema import InvestigationMethod, MethodApplicability, OperatorRun
+from src.mathlib_review.analysis.reports import compare_conditions, rep_summary
+from src.mathlib_review.schema import InvestigationMethod, MethodApplicability, OperatorRun
 
 
 # --- io ------------------------------------------------------------------------------

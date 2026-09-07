@@ -22,8 +22,10 @@ import json
 from pathlib import Path
 from typing import Set
 
-#: The scored set. A precedent drawn from one of these PRs is the answer, not a precedent.
-EVAL_SET = Path("inputs/pr_review_v2/mathlib_pr_review_v2_actionable_20260618.jsonl")
+from src.mathlib_review.paths import V2_EVAL_SET
+
+#: The scored set, named in `paths` with the other inputs inherited from v2.
+EVAL_SET = V2_EVAL_SET
 
 
 def eval_pr_numbers(path: Path = EVAL_SET) -> Set[int]:

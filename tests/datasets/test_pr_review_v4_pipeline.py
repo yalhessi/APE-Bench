@@ -10,30 +10,30 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
     CandidateSubmission,
     normalize_proposed_edit_path,
 )
-from src.datasets.pr_review_v4.candidates import (
+from src.mathlib_review.review.candidates import (
     candidates_from_response, discover_deterministic_candidates, ingest_responses,
 )
-from src.datasets.pr_review_v4.evidence import collect_candidate
-from src.datasets.pr_review_v4.evaluate import evaluate_funnel
-from src.datasets.pr_review_v4.io import sha256_bytes
-from src.datasets.pr_review_v4.render_prompts import render_all, render_precedent_block
-from src.datasets.pr_review_v4.run_contract import create_run_plan, seal_run
-from src.datasets.pr_review_v4.retrieval import (
+from src.mathlib_review.evidence.evidence import collect_candidate
+from src.mathlib_review.analysis.evaluate import evaluate_funnel
+from src.mathlib_review.io import sha256_bytes
+from src.mathlib_review.agenda.render_prompts import render_all, render_precedent_block
+from src.mathlib_review.release.run_contract import create_run_plan, seal_run
+from src.mathlib_review.retrieval.precedents import (
     build_prompt_precedents, build_retrieval_cutoffs, load_reviewer_roster,
     validate_precedents,
 )
-from src.datasets.pr_review_v4.semantic_judge import (
+from src.mathlib_review.judge.semantic_judge import (
     JUDGE_VERSION, _match, build_pairs, eligible_obligations, parse_verdict, semantic_report,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ArtifactRef, ChangeGraph, EvidenceRequest, PromptPrecedent,
     ReviewEpisodeBoundary, RetrievalCutoff, ReviewRoundSegment, InterventionView, JudgmentNode, PilotCase,
     RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit, SourceEvent,
 )
-from src.datasets.pr_review_v4.select import select_findings
-from src.datasets.pr_review_v4.task_adapter import build_candidate_task_data
-from src.datasets.pr_review_v4.validate import validate_release
-from src.datasets.pr_review_v4.work_units import build_work_units, validate_work_unit_coverage
+from src.mathlib_review.opportunities.select import select_findings
+from src.mathlib_review.review.task_adapter import build_candidate_task_data
+from src.mathlib_review.release.validate import validate_release
+from src.mathlib_review.release.work_units import build_work_units, validate_work_unit_coverage
 
 
 PILOT = Path("inputs/pr_review_v4/releases/dev-pilot-0.9.0")
@@ -307,7 +307,7 @@ def test_proof_golf_requires_structured_edit_and_external_compile_result(tmp_pat
         },
     }]}
     candidate = candidates_from_response(unit, response)[0]
-    monkeypatch.setattr("src.datasets.pr_review_v4.evidence.subprocess.run",
+    monkeypatch.setattr("src.mathlib_review.evidence.evidence.subprocess.run",
                         lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="", stderr=""))
     _artifacts, assertions, packet = collect_candidate(candidate, graph, tmp_path)
     assert packet.status == "supported"
@@ -379,7 +379,7 @@ def test_correctness_compile_support_requires_target_local_baseline_error(tmp_pa
             stderr=f"{target.path}:{entity.span.line_start}:1: error: failed",
         )
 
-    monkeypatch.setattr("src.datasets.pr_review_v4.evidence.subprocess.run", fail_at_target)
+    monkeypatch.setattr("src.mathlib_review.evidence.evidence.subprocess.run", fail_at_target)
     _artifacts, assertions, packet = collect_candidate(candidate, graph, tmp_path)
     assert packet.status == "supported"
     assert any(item.polarity == "supports" for item in assertions)
@@ -410,7 +410,7 @@ def test_style_policy_uses_repository_checker_and_target_local_diagnostic(tmp_pa
         "claim": "The changed lines violate the repository style checker.",
     }]})[0]
     monkeypatch.setattr(
-        "src.datasets.pr_review_v4.evidence.subprocess.run",
+        "src.mathlib_review.evidence.evidence.subprocess.run",
         lambda *args, **kwargs: SimpleNamespace(
             returncode=1,
             stdout=f"::error file={target.path},line={line},code=ERR::{target.path}:{line} ERR",
@@ -441,7 +441,7 @@ def test_baseline_compile_is_cached_across_candidates(tmp_path, monkeypatch):
         calls.append(args)
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
-    monkeypatch.setattr("src.datasets.pr_review_v4.evidence.subprocess.run", compile_ok)
+    monkeypatch.setattr("src.mathlib_review.evidence.evidence.subprocess.run", compile_ok)
     cache = {}
     collect_candidate(candidate, graph, tmp_path, baseline_compile_cache=cache)
     collect_candidate(candidate, graph, tmp_path, baseline_compile_cache=cache)

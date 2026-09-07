@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from ape.tasks.lean_tasks.formal_math.pr_review_v4.opportunities import (
     build_verification_artifact,
 )
-from src.datasets.pr_review_v4.phase7_adjudication import (
+from src.mathlib_review.legacy_pipeline.phase7_adjudication import (
     DEFAULT_PRODUCTION_RELEASES,
     EvidenceView,
     OpportunityView,
@@ -20,8 +20,8 @@ from src.datasets.pr_review_v4.phase7_adjudication import (
     validate_bundle,
     _verification_artifact_from_raw,
 )
-from src.datasets.pr_review_v4.io import jsonl_bytes
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.io import jsonl_bytes
+from src.mathlib_review.schema import (
     AdjudicationBundle,
     AdjudicationVote,
     NormAssessment,

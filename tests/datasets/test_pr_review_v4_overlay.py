@@ -24,8 +24,10 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4 import review_overlay, review_overlay_html
-from src.datasets.pr_review_v4.review_overlay import (
+from src.mathlib_review.analysis import review_overlay
+
+from src.mathlib_review.analysis import review_overlay_html
+from src.mathlib_review.analysis.review_overlay import (
     STATE_RANK,
     STATES,
     Cell,
@@ -121,7 +123,7 @@ def test_pretty_diff_drops_difflibs_empty_file_headers():
 def test_frozen_roots_are_refused_as_output():
     # An overlay is a regenerable view. Writing it under a frozen root makes every render
     # fail `verify_frozen`'s unsealed-file check, which is a confusing way to learn this.
-    from src.datasets.pr_review_v4.verify_frozen import FROZEN_ROOTS
+    from src.mathlib_review.release.verify_frozen import FROZEN_ROOTS
 
     empty = review_overlay.Overlay(version="t", sources={}, prs=[], gold=None)
     for root in FROZEN_ROOTS:
@@ -270,9 +272,9 @@ def test_sites_are_ordered_by_file_then_line(medium):
 def test_reviewed_sources_reconstruct_byte_exact():
     """The pane's line numbers are only meaningful if the reconstruction is the real file."""
 
-    from src.datasets.pr_review_v4.change_graph import parse_unified_diff
-    from src.datasets.pr_review_v4.io import sha256_bytes
-    from src.datasets.pr_review_v4.schema import ChangeGraph, ReviewEpisodeInput
+    from src.mathlib_review.release.change_graph import parse_unified_diff
+    from src.mathlib_review.io import sha256_bytes
+    from src.mathlib_review.schema import ChangeGraph, ReviewEpisodeInput
 
     episodes = {
         item.pr_number: item
@@ -374,7 +376,7 @@ def test_bands_come_from_the_release_not_the_task_field():
     """`InvestigationTask.work_unit_id` carries `dev-medium-0.1.0` ids, which share 0 of 225
     with the 0.3.0 release. Banding on them would draw nothing at all."""
 
-    from src.datasets.pr_review_v4.schema import ReviewWorkUnit
+    from src.mathlib_review.schema import ReviewWorkUnit
 
     release_units = {
         unit.work_unit_id: set(unit.change_ids)
@@ -402,7 +404,7 @@ def test_added_lines_exclude_hunk_context():
     """Marking a hunk's extent rather than its body painted 23 unchanged lines of PR 33098's
     module doc as additions."""
 
-    from src.datasets.pr_review_v4.schema import ChangeGraph, ReviewEpisodeInput
+    from src.mathlib_review.schema import ChangeGraph, ReviewEpisodeInput
 
     episode = [
         item for item in review_overlay.load_jsonl(

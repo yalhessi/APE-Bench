@@ -3,9 +3,9 @@
 from collections import Counter
 from pathlib import Path
 
-from src.datasets.pr_review_v4.oracle_evidence_probe import build_artifacts
-from src.datasets.pr_review_v4.oracle_opportunities import ADJUDICATION_SYSTEM_PROMPT
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.opportunities.evidence_probe import build_artifacts
+from src.mathlib_review.opportunities.oracle import ADJUDICATION_SYSTEM_PROMPT
+from src.mathlib_review.schema import (
     ChangeGraph,
     ReviewEpisodeInput,
     ReviewWorkUnit,

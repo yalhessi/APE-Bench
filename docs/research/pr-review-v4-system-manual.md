@@ -4,7 +4,7 @@
 represented, how the reviewing task is posed to a model, how outputs are scored, and exactly what
 a final evaluation number means. Each design decision is motivated by a concrete example or a
 measured statistic, most of them failures of our own earlier designs. Written 2026-07-18;
-normative specs live in the other `pr-review-v4-*.md` docs, code in `src/datasets/pr_review_v4/`.*
+normative specs live in the other `pr-review-v4-*.md` docs, code in `src/mathlib_review/`.*
 
 ---
 

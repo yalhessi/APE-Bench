@@ -20,7 +20,7 @@ import inspect
 
 import pytest
 
-from src.datasets.pr_review_v4 import task_adapter
+from src.mathlib_review.review import task_adapter
 
 
 def _resolve(model_name: str):
@@ -38,7 +38,7 @@ def _resolve(model_name: str):
                 if (alias.asname or alias.name) == model_name:
                     module = importlib.import_module(
                         node.module if node.level == 0
-                        else f"src.datasets.pr_review_v4.{node.module}"
+                        else f"src.mathlib_review.review.{node.module}"
                     )
                     return getattr(module, alias.name)
     raise AssertionError(f"the adapter constructs {model_name} but never imports it")

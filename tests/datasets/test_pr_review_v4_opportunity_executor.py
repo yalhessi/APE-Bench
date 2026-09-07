@@ -1,14 +1,14 @@
 """Contract tests for generic terminal execution accounting."""
 
-from src.datasets.pr_review_v4.implementation_registry import assess_capabilities, default_implementations
-from src.datasets.pr_review_v4.opportunity_executor import (
+from src.mathlib_review.opportunities.implementation_registry import assess_capabilities, default_implementations
+from src.mathlib_review.opportunities.executor import (
     RunnerOutcome,
     _operator_run,
     _opportunity,
     _unavailable,
     execute_treatment,
 )
-from src.datasets.pr_review_v4.schema import ReviewEpisodeInput, VisibleText
+from src.mathlib_review.schema import ReviewEpisodeInput, VisibleText
 
 from tests.datasets.test_pr_review_v4_implementation_registry import (
     NAMING_POSITIVE,

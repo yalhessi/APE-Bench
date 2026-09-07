@@ -2,7 +2,7 @@
 Byte-reproducible serialization helpers.
 
 Deliberately a local ~40-line copy rather than an import of
-`src/datasets/pr_review_v4/io.py`: this package must stay free of code edges to any
+`src/mathlib_review/io.py`: this package must stay free of code edges to any
 pipeline generation so that any generation can consume it later.
 """
 

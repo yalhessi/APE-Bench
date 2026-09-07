@@ -1,6 +1,6 @@
 """Semantic judgment of one candidate review request against one gold obligation.
 
-This is the registered-task form of `src/datasets/pr_review_v4/semantic_judge.py`. The
+This is the registered-task form of `src/mathlib_review/judge/semantic_judge.py`. The
 script version calls the LLM client directly and keeps a hand-rolled JSON file cache; as
 a task it inherits the framework's machinery instead:
 
@@ -15,7 +15,7 @@ It reads gold, so it is run from its own top-level orchestrator (`judge_runner.p
 never nested inside a reviewer task — the reviewer's run tree must stay gold-free.
 
 The rubric, prompt rendering and verdict shape all come from
-`src/datasets/pr_review_v4/judge_protocol.py`, so there is one judge rather than two that
+`src/mathlib_review/judge/protocol.py`, so there is one judge rather than two that
 are asserted to be equal.
 """
 
@@ -33,7 +33,7 @@ from ape.tasks.base import (
     register_task,
 )
 
-from src.datasets.pr_review_v4.judge_protocol import (
+from src.mathlib_review.judge.protocol import (
     JUDGE_PROMPT,
     JUDGE_VERSION,
     ContextProfile,
@@ -114,7 +114,7 @@ class LeanPRReviewV4JudgmentTask(BaseTask):
             raise ValueError(
                 f"unknown judge rubric version: {data.judge_version}. Only "
                 f"{JUDGE_VERSION} is active; retired rubrics are in "
-                "src/datasets/pr_review_v4/legacy/judge_v71.py and are not re-rendered."
+                "src/mathlib_review/legacy_pipeline/judge_v71.py and are not re-rendered."
             )
         return render_prompt(
             gold_code=data.target_code,

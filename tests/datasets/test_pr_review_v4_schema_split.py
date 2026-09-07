@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-PACKAGE = Path("src/datasets/pr_review_v4/schema")
+PACKAGE = Path("src/mathlib_review/schema")
 MODULES = ["base", "identity", "gold", "findings", "evidence", "opportunities",
            "runs", "scoring"]
 
@@ -39,7 +39,7 @@ def test_every_lifecycle_module_exists():
 def test_the_facade_still_resolves_every_name():
     """83 modules import `from .schema import X`. The split must not have moved any of them."""
 
-    from src.datasets.pr_review_v4 import schema
+    from src.mathlib_review import schema
 
     assert len(schema.__all__) == 129
     for name in schema.__all__:
@@ -55,7 +55,7 @@ def test_the_facade_still_resolves_every_name():
     "SemanticPair", "SemanticMatch",                                     # scoring
 ])
 def test_load_bearing_names_are_importable_from_the_package(name):
-    from src.datasets.pr_review_v4 import schema
+    from src.mathlib_review import schema
 
     assert getattr(schema, name) is not None
 

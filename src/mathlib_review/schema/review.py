@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import Field
 
-from src.datasets.pr_review_v4.schema import StrictModel
+from src.mathlib_review.schema import StrictModel
 
 #: What a lead is allowed to do with the agenda it is handed.
 #:

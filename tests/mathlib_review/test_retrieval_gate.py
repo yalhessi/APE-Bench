@@ -156,7 +156,7 @@ def test_no_source_parses_timestamps_for_itself_any_more():
     from pathlib import Path
 
     for path in (Path("src/mathlib_review/retrieval/precedent_index.py"),
-                 Path("src/datasets/pr_review_v4/retrieval.py"),
+                 Path("src/mathlib_review/retrieval/precedents.py"),
                  Path("src/datasets/zulip/store.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
         calls = [

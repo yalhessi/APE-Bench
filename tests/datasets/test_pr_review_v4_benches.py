@@ -16,11 +16,11 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.benches import (
+from src.mathlib_review.analysis.benches import (
     CONCERN_ALIASES, build_all, build_bench, coverage_report,
 )
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import JudgmentNode, ReviewWorkUnit
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import JudgmentNode, ReviewWorkUnit
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 
@@ -137,7 +137,7 @@ def _judgments():
 
 
 def test_a_perfect_run_locates_every_positive(benches):
-    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+    from src.mathlib_review.analysis.benches import gold_anchor_index, score_bench
 
     bench = benches["duplication"]
     anchors = {case.work_unit_id: list(case.change_ids) for case in bench.positives}
@@ -153,7 +153,7 @@ def test_a_silent_run_locates_nothing_and_is_counted_as_abstaining(benches):
     """The failure mode the arms actually exhibit: 30 of 46 specialist runs on smoke4
     abstained, and an abstention has to be distinguishable from a wrong answer."""
 
-    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+    from src.mathlib_review.analysis.benches import gold_anchor_index, score_bench
 
     bench = benches["duplication"]
     score = score_bench(bench, {},
@@ -167,7 +167,7 @@ def test_a_silent_run_locates_nothing_and_is_counted_as_abstaining(benches):
 def test_an_arm_that_reports_everywhere_is_penalised_on_negatives(benches):
     """Positives alone would score a maximally noisy arm perfectly."""
 
-    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+    from src.mathlib_review.analysis.benches import gold_anchor_index, score_bench
 
     bench = benches["naming"]
     everywhere = {case.work_unit_id: list(case.change_ids) for case in bench.cases}
@@ -182,7 +182,7 @@ def test_landing_in_the_right_unit_but_the_wrong_declaration_is_not_a_hit(benche
     """Gold anchors are narrower than the work unit, so a candidate anywhere in a multi-target
     unit must not count as having found the obligation's site."""
 
-    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+    from src.mathlib_review.analysis.benches import gold_anchor_index, score_bench
 
     bench = benches["duplication"]
     gold_anchors = gold_anchor_index(bench, _judgments())
@@ -196,7 +196,7 @@ def test_landing_in_the_right_unit_but_the_wrong_declaration_is_not_a_hit(benche
 
 
 def test_the_score_names_the_fixture_it_measured(benches):
-    from src.datasets.pr_review_v4.benches import score_bench
+    from src.mathlib_review.analysis.benches import score_bench
 
     bench = benches["duplication"]
     score = score_bench(bench, {})

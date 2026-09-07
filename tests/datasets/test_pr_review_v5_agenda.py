@@ -17,9 +17,9 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.contracts import assert_gold_free
-from src.datasets.pr_review_v4.io import canonical_json_bytes, load_jsonl
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.release.contracts import assert_gold_free
+from src.mathlib_review.io import canonical_json_bytes, load_jsonl
+from src.mathlib_review.schema import (
     ChangeGraph,
     ModificationRecord,
     RenderedPrompt,
@@ -117,7 +117,7 @@ def test_eligibility_is_the_v4_rule_and_not_a_second_copy(release, agenda):
     never promote one to eligible, which would silently widen the deterministic arm.
     """
 
-    from src.datasets.pr_review_v4.focused_specs import schedule_focused
+    from src.mathlib_review.agenda.focused_specs import schedule_focused
 
     units = [u for u in release["units"] if u.pr_number in set(SMOKE_PRS)]
     scheduled = {
@@ -132,7 +132,7 @@ def test_eligibility_is_the_v4_rule_and_not_a_second_copy(release, agenda):
 
 
 def test_eligible_specialist_sites_match_the_scheduler_exactly(release, agenda):
-    from src.datasets.pr_review_v4.focused_specs import schedule_focused
+    from src.mathlib_review.agenda.focused_specs import schedule_focused
 
     units = [u for u in release["units"] if u.pr_number in set(SMOKE_PRS)]
     by_id = {
@@ -248,7 +248,7 @@ def test_arm_registry_speaks_the_merge_vocabulary():
 
     from typing import get_args
 
-    from src.datasets.pr_review_v4.schema import ConcernFamily, IssueKind
+    from src.mathlib_review.schema import ConcernFamily, IssueKind
 
     families, kinds = set(get_args(ConcernFamily)), set(get_args(IssueKind))
     for arm in default_arms("candidate-prompt/12"):

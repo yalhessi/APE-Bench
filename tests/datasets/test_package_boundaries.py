@@ -1,27 +1,22 @@
-"""Boundaries that are currently violated, measured so they cannot get worse.
+"""Boundaries, measured so they cannot get worse.
 
-Mapping the tree turned up the coupling that makes one experiment touch thirteen source files
-across six packages:
+Mapping the tree once turned up the coupling that made one experiment touch thirteen source
+files across six packages: 97 names imported from v4 into v5, **backward** edges where v4
+imported v5, 42 private cross-module imports, and a shared review base living inside the
+oldest generation so that a v5-only observation changed the tool contract for every v2 checker.
 
-* 97 names imported from v4 into v5 across 41 statements, and **backward** edges where v4
-  imports v5 — so "v4 is frozen and imported as a library" is not true. 13 -> 4: `paths` and
-  `patchset` moved to `src/mathlib_review/`, which is what that package is for;
-* 42 imports of `_`-private symbols across module boundaries, six of them across generations.
-  24 now: `evidence._tool_env`/`_run`, `corpus._eval_pr_numbers` and
-  `predictions._extract_json_object` moved into `src/mathlib_review/`, and the five that
-  crossed a generation were promoted to the API two packages already treated them as;
-* one shared review base (`pr_review_v2/base.py`) edited on the strength of a v5-only
-  observation, which changed the tool contract for every v2 checker and every v4 arm. That one
-  is fixed: it lives at `formal_math/review_task.py` now, owned by no generation, and v5 -> v2
-  fell from 6 edges to 2.
+The review pipeline is one package now -- `src/mathlib_review/` -- and these pin what that
+bought, plus the boundaries inside it:
 
-The consolidation these tests belong to has not happened yet, so they do not assert zero.
-They **pin the current counts**: a new violation fails the build, and fixing one is expected
-to require lowering a number here. That is the point — the budget only moves in one direction,
-and moving it is a deliberate edit rather than a silent drift.
+* no generation imports a later one, asserted as zero rather than budgeted;
+* v5 -> v2 is zero;
+* private names do not cross a generation;
+* inside `mathlib_review`, three private imports cross a module boundary (down from 42 across
+  the tree, though most of that 42 became legitimate sibling imports when the packages
+  merged -- the honest comparison is the three, not the drop).
 
-Counts are of imported *names*, not import statements, which is why they run higher than a
-count of `from ... import` lines: v4 -> v5 is 13 names across 4 statements.
+What remains under a generation name is the *task* packages: the classes an orchestrator
+schedules. v2 keeps its data work, which has not moved.
 """
 
 from __future__ import annotations
@@ -35,13 +30,12 @@ import pytest
 SRC = Path("src")
 
 #: Packages that make up the review system, newest first.
+#: What is left that is generation-shaped. The *pipeline* is no longer: v4 and v5 both moved
+#: into `src/mathlib_review/`, so these are the task packages -- the classes an orchestrator
+#: schedules -- plus v2, whose data work has not moved yet.
 GENERATIONS = {
-    # v5's dataset half is gone: it is `src/mathlib_review/` now. What is left under this
-    # name is the task package -- the lead and the arm -- which is the part that is genuinely
-    # a generation of *tasks* rather than of the pipeline around them.
     "v5": ("src/ape/tasks/lean_tasks/formal_math/pr_review_v5",),
-    "v4": ("src/datasets/pr_review_v4",
-           "src/ape/tasks/lean_tasks/formal_math/pr_review_v4"),
+    "v4": ("src/ape/tasks/lean_tasks/formal_math/pr_review_v4",),
     "v2": ("src/datasets/pr_review_v2",
            "src/ape/tasks/lean_tasks/formal_math/pr_review_v2"),
 }
@@ -138,19 +132,46 @@ def _private_cross_module_imports():
 
 
 def test_private_cross_boundary_imports_do_not_increase():
-    """Treating another module's `_`-prefixed names as API is how a refactor of one file
-    breaks three others.
+    """In what is left of the generation packages: v2's `evaluate_d2` and `selector`, mostly.
 
-    42 -> 24, and the remaining 24 are all *within* one generation: v2's `evaluate_d2` and
-    `selector`, v4's `oracle_opportunities`, `wrapper_composition` and `phase7_adjudication`.
-    None crosses a generation any more, which is the half that blocks the collapse -- see
-    `test_no_private_name_crosses_a_generation`.
+    42 -> 14, and most of that drop is scope rather than improvement -- when v4 and v5 merged,
+    imports that used to cross a package became sibling imports inside one. The number that
+    did not shrink by definition is in the next test.
     """
 
     found = _private_cross_module_imports()
-    assert len(found) <= 24, (
-        f"{len(found)} private cross-module imports (was 24):\n" +
+    assert len(found) <= 14, (
+        f"{len(found)} private cross-module imports (was 14):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)[:12]))
+
+
+def test_private_imports_inside_mathlib_review_do_not_increase():
+    """The honest number: a private name reached across a module boundary *within* the merged
+    package, where a sibling import would be legitimate and this is not.
+
+    Three, and each is a real one -- `wrapper_composition._changed_roles` and `._target_goal`
+    read by the implementation registry, and `lean_parser._build_top_level_index` read by the
+    change-graph builder.
+    """
+
+    root = Path("src/mathlib_review")
+    found = []
+    for path in root.rglob("*.py"):
+        if "__pycache__" in path.parts:
+            continue
+        own = ".".join(path.relative_to(root).parent.parts)
+        for module, name in _imports(path):
+            if not name.startswith("_") or name.startswith("__"):
+                continue
+            if not module.startswith("src.mathlib_review."):
+                continue
+            target = module.replace("src.mathlib_review.", "")
+            if target.rsplit(".", 1)[0] == own:
+                continue
+            found.append((str(path), module, name))
+    assert len(found) <= 3, (
+        f"{len(found)} private imports cross a module boundary inside mathlib_review "
+        f"(was 3):\n" + "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)))
 
 
 def test_the_shared_review_base_belongs_to_no_generation():
@@ -241,3 +262,20 @@ def test_no_private_name_crosses_a_generation():
     assert crossing == [], (
         "private name(s) imported across a generation boundary:\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in crossing))
+
+
+def test_the_structural_guards_are_pointed_at_a_directory_that_exists():
+    """A guard that globs a deleted directory finds nothing and passes.
+
+    Three did after the merge -- `no_prior_generation`, `no_duplicate_helpers` and the task
+    adapter's field check all still named `src/datasets/pr_review_v4`. Vacuous passes are
+    worse than no test, because the suite reports them as coverage.
+    """
+
+    import re
+
+    for name in ("test_pr_review_v4_no_prior_generation.py",
+                 "test_pr_review_v4_no_duplicate_helpers.py"):
+        source = Path("tests/datasets") / name
+        for match in re.finditer(r'Path\("(src/[^"]+)"\)', source.read_text(encoding="utf-8")):
+            assert Path(match.group(1)).is_dir(), f"{name} globs {match.group(1)}, which is gone"

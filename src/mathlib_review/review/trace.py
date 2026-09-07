@@ -22,7 +22,7 @@ from __future__ import annotations
 from typing import Any, Dict, Iterable, List, Sequence
 
 from ape.orchestration.models import UsageBreakdown
-from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
 
 from src.mathlib_review.schema.review import ReviewAgenda, V5RunManifest, V5RunPlan
 

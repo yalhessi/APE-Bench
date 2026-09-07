@@ -11,15 +11,15 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.focused_specs import (
+from src.mathlib_review.agenda.focused_specs import (
     DECLARATION_KINDS,
     FocusedAgentSpec,
     default_specs,
     schedule_focused,
     schedule_report,
 )
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import ModificationRecord, ReviewWorkUnit
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import ModificationRecord, ReviewWorkUnit
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 INVENTORY = Path(
@@ -128,7 +128,7 @@ def test_scheduling_reads_nothing_from_gold():
     import ast
     import inspect
 
-    from src.datasets.pr_review_v4 import focused_specs
+    from src.mathlib_review.agenda import focused_specs
 
     tree = ast.parse(inspect.getsource(focused_specs))
     imported = {

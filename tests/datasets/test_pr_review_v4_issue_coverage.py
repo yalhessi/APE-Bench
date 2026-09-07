@@ -17,7 +17,7 @@ at issue granularity.
 
 import pytest
 
-from src.datasets.pr_review_v4.issue_coverage import coverage_report, pair_issues
+from src.mathlib_review.analysis.issue_coverage import coverage_report, pair_issues
 
 
 class _Obligation:

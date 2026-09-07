@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.reachability import (
+from src.mathlib_review.analysis.reachability import (
     AWAITING_A_WARRANT,
     VERIFIABLE_BY_COMPILE,
     annotate_recall,

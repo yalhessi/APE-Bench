@@ -148,8 +148,8 @@ def test_appending_context_rehashes_the_prompt():
     """A sealed plan whose `prompt_sha256` no longer matches its body certifies the wrong
     text, which is worse than carrying no hash at all."""
 
-    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
-    from src.datasets.pr_review_v4.schema import RenderedPrompt
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.schema import RenderedPrompt
     from src.mathlib_review.agenda.review_map import with_context
 
     base = RenderedPrompt(
@@ -167,7 +167,7 @@ def test_appending_context_rehashes_the_prompt():
 def test_an_empty_slice_leaves_the_prompt_untouched():
     """Most units need no context, and re-hashing an unchanged prompt would churn the plan."""
 
-    from src.datasets.pr_review_v4.schema import RenderedPrompt
+    from src.mathlib_review.schema import RenderedPrompt
     from src.mathlib_review.agenda.review_map import with_context
 
     base = RenderedPrompt(

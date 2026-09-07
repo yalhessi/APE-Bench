@@ -36,13 +36,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
 
-from src.datasets.pr_review_v4.evidence import (
+from src.mathlib_review.evidence.evidence import (
     LazyPopulationScan,
     collect_candidate,
     snapshot_workspace,
 )
-from src.datasets.pr_review_v4.io import jsonl_bytes, write_once
-from src.datasets.pr_review_v4.select import select_findings
+from src.mathlib_review.io import jsonl_bytes, write_once
+from src.mathlib_review.opportunities.select import select_findings
 
 
 async def reviewed_workspaces(
@@ -57,7 +57,7 @@ async def reviewed_workspaces(
 
     from types import SimpleNamespace
 
-    from src.datasets.pr_review_v4.runs import reviewed_workspace_map
+    from src.mathlib_review.analysis.runs import reviewed_workspace_map
 
     by_task_id = {
         item.get("task_id"): SimpleNamespace(episode_id=item.get("episode_id"))
@@ -88,7 +88,7 @@ def _collapse_compile_cascades(
     localisation is the part that is easy to get subtly wrong.
     """
 
-    from src.datasets.pr_review_v4.evidence import candidate_spans, diagnostic_lines
+    from src.mathlib_review.evidence.evidence import candidate_spans, diagnostic_lines
 
     by_candidate = {item.candidate_id: item for item in candidates}
     baseline_by_candidate: Dict[str, Any] = {}

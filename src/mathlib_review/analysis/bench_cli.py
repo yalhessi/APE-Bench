@@ -37,11 +37,11 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-from src.datasets.pr_review_v4.benches import (
+from src.mathlib_review.analysis.benches import (
     ArmBench, build_all, coverage_report, gold_anchor_index, score_bench,
 )
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import JudgmentNode
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import JudgmentNode
 
 from src.mathlib_review.agenda.registry import ARM_DEFINITIONS
 

@@ -18,9 +18,11 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4 import conditions, merge
-from src.datasets.pr_review_v4.method_registry import default_methods
-from src.datasets.pr_review_v4.schema import ARMS, PRODUCING_ARMS, FindingSource
+from src.mathlib_review.review import conditions
+
+from src.mathlib_review.review import merge
+from src.mathlib_review.opportunities.method_registry import default_methods
+from src.mathlib_review.schema import ARMS, PRODUCING_ARMS, FindingSource
 
 
 def test_the_arm_vocabulary_is_derived_from_the_model():
@@ -71,7 +73,7 @@ def test_a_holistic_source_is_not_held_to_the_focused_requirements():
 
 
 def _candidate(spec_id=None, requested_change="shorten the proof", change_id="change:a"):
-    from src.datasets.pr_review_v4.schema import CandidateClaim
+    from src.mathlib_review.schema import CandidateClaim
 
     return CandidateClaim(
         candidate_id="candidate:abc", source_sha256="0" * 64, work_unit_id="wu:1",
@@ -156,7 +158,7 @@ def test_a_candidate_without_a_spec_cannot_enter_the_focused_condition(tmp_path)
     carries `file_coherence`, which is a spec in the plumbing sense but not a focused agent.
     """
 
-    from src.datasets.pr_review_v4.io import jsonl_bytes
+    from src.mathlib_review.io import jsonl_bytes
 
     path = tmp_path / "candidates.jsonl"
     path.write_bytes(jsonl_bytes([_candidate()]))
@@ -167,7 +169,7 @@ def test_a_candidate_without_a_spec_cannot_enter_the_focused_condition(tmp_path)
 def test_a_focused_candidate_with_no_verification_is_dropped_not_downgraded(tmp_path):
     """Dropping loses a finding; downgrading would publish an unverified one as verified."""
 
-    from src.datasets.pr_review_v4.io import jsonl_bytes
+    from src.mathlib_review.io import jsonl_bytes
 
     path = tmp_path / "candidates.jsonl"
     path.write_bytes(jsonl_bytes([_candidate(spec_id="proof_golf")]))
@@ -185,7 +187,7 @@ def test_a_focused_candidate_with_no_verification_is_dropped_not_downgraded(tmp_
 
 
 def test_a_failed_compile_does_not_count_as_verification(tmp_path):
-    from src.datasets.pr_review_v4.io import jsonl_bytes
+    from src.mathlib_review.io import jsonl_bytes
 
     path = tmp_path / "candidates.jsonl"
     path.write_bytes(jsonl_bytes([_candidate(spec_id="proof_golf")]))
@@ -198,8 +200,8 @@ def test_a_failed_compile_does_not_count_as_verification(tmp_path):
 
 
 def _focused_plan(**overrides):
-    from src.datasets.pr_review_v4.contracts import seal_generation_plan
-    from src.datasets.pr_review_v4.focused_specs import default_specs
+    from src.mathlib_review.release.contracts import seal_generation_plan
+    from src.mathlib_review.agenda.focused_specs import default_specs
 
     values = dict(
         condition="merged_ensemble_v2",
@@ -237,7 +239,7 @@ def test_a_focused_generation_plan_binds_its_inputs_and_stays_gold_free():
 def test_the_gold_sweep_still_covers_the_new_focused_fields():
     """Fields added to the plan must be swept too, not merely added."""
 
-    from src.datasets.pr_review_v4.contracts import GoldLeakError
+    from src.mathlib_review.release.contracts import GoldLeakError
 
     with pytest.raises(GoldLeakError):
         _focused_plan(
@@ -260,7 +262,7 @@ def test_single_pr_template_operators_are_not_scheduled():
     from the conclusion and fires on 33098 *and* 33145.
     """
 
-    from src.datasets.pr_review_v4.method_registry import (
+    from src.mathlib_review.opportunities.method_registry import (
         RETIRED_SINGLE_PR_METHODS,
         all_methods,
         default_methods,
@@ -283,7 +285,7 @@ def test_retirement_is_in_the_registry_not_a_caller_flag():
     defaulted `exclude_methods` to empty, so the exclusion never actually applied.
     """
 
-    from src.datasets.pr_review_v4.method_registry import default_methods
+    from src.mathlib_review.opportunities.method_registry import default_methods
 
     assert conditions.SUBSUMED_METHODS == ()
     # The guarantee holds with no exclusions passed at all.
@@ -295,7 +297,7 @@ def test_retirement_is_in_the_registry_not_a_caller_flag():
 def test_the_frozen_v3_registry_still_loads():
     """Retiring methods must not strand the runs that were scheduled against them."""
 
-    from src.datasets.pr_review_v4.method_registry import (
+    from src.mathlib_review.opportunities.method_registry import (
         DEFAULT_REGISTRY,
         LEGACY_REGISTRY_V3,
         load_registry,
@@ -313,8 +315,8 @@ def test_the_frozen_v3_registry_still_loads():
 def test_a_file_scoped_candidate_is_not_a_focused_candidate(tmp_path):
     """`file_coherence` is a spec id, but the file arm is not a focused agent."""
 
-    from src.datasets.pr_review_v4.io import jsonl_bytes
-    from src.datasets.pr_review_v4.schema import FILE_COHERENCE_SPEC
+    from src.mathlib_review.io import jsonl_bytes
+    from src.mathlib_review.schema import FILE_COHERENCE_SPEC
 
     path = tmp_path / "candidates.jsonl"
     path.write_bytes(jsonl_bytes([_candidate(spec_id=FILE_COHERENCE_SPEC)]))
@@ -325,7 +327,7 @@ def test_a_file_scoped_candidate_is_not_a_focused_candidate(tmp_path):
 def test_the_two_generalists_are_separate_arms():
     """Control and component must be countable apart, which means separate arm values."""
 
-    from src.datasets.pr_review_v4.schema import FILE_COHERENCE_SPEC
+    from src.mathlib_review.schema import FILE_COHERENCE_SPEC
 
     control = merge.finding_from_candidate(
         _candidate(), admission="published", admission_reason="x"

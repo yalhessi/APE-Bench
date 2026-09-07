@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v4.statement_gate import (
+from src.mathlib_review.evidence.statement_gate import (
     compare_statements,
     declaration_source,
     gate_error,

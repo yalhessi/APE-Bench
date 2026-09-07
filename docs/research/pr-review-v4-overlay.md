@@ -20,7 +20,7 @@ carries the information.
 ## Building one
 
 ```
-./ape/bin/python -m src.datasets.pr_review_v4.review_overlay \
+./ape/bin/python -m src.mathlib_review.analysis.review_overlay \
   --release   inputs/pr_review_v4/releases/dev-medium-0.3.0 \
   --treatment inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium \
   --executor  results/pr_review_v4/audits/phase10-medium-executor-v5 \
@@ -295,10 +295,10 @@ A mismatch is a join bug, not a display bug.
 
 ## Where the code is
 
-- `src/datasets/pr_review_v4/review_overlay.py` — the join. Pure data; produces `PRBundle`s and
+- `src/mathlib_review/analysis/review_overlay.py` — the join. Pure data; produces `PRBundle`s and
   `bundle.json`. Reuses `io.load_jsonl`, `paths.py` roots, `schema.py` models,
   `digest.digest_findings`, and `evaluate._covered`'s semantics.
-- `src/datasets/pr_review_v4/review_overlay_html.py` — the page. `PALETTE` is the single source of
+- `src/mathlib_review/analysis/review_overlay_html.py` — the page. `PALETTE` is the single source of
   colour and every per-state rule is generated from it. The matrix is an HTML table, not SVG:
   no graphviz dependency, text stays selectable and ctrl-F works.
 - `src/mathlib_review/analysis/trajectory.py` — the `.ape` walk and sidecar writer.

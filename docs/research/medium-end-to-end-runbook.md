@@ -66,7 +66,7 @@ merge losses, cost, failure rate. Human validity applies to the *selected* condi
 **`checker_only` is already done, free, and needs no model calls:**
 
 ```bash
-./ape/bin/python -m src.datasets.pr_review_v4.conditions \
+./ape/bin/python -m src.mathlib_review.review.conditions \
   --condition checker_only \
   --execution-release inputs/pr_review_v4/releases/dev-medium-0.2.1-systematic \
   --exclude-methods naming_contrast.v1 \
@@ -91,7 +91,7 @@ Cost anchor: **$0.079 per work unit** on the 0.9.0 pilot, same model and tool se
 
 ```bash
 for REP in 1 2 3; do
-  ./ape/bin/python -m src.datasets.pr_review_v4.runner \
+  ./ape/bin/python -m src.mathlib_review.opportunities.runner \
     --config configs/pr_review_v4_medium.yaml \
     dataset.dry_run=False \
     dataset.run_name=pr_review_v4_medium_010_rep${REP} \
@@ -102,7 +102,7 @@ done
 Then candidates (free), then the condition:
 
 ```bash
-./ape/bin/python -m src.datasets.pr_review_v4.candidates \
+./ape/bin/python -m src.mathlib_review.review.candidates \
   --work-units inputs/pr_review_v4/releases/dev-medium-0.1.0/derived/work_units.jsonl \
   --responses results/pr_review_v4/runs/dev-medium-0.1.0-rep${REP}/candidate_responses.jsonl \
   --out results/pr_review_v4/runs/dev-medium-0.1.0-rep${REP}/candidates.jsonl
@@ -114,7 +114,7 @@ Then candidates (free), then the condition:
 `semantic_judge` CLI no longer judges; it reports over a supplied `matches.jsonl`.
 
 ```bash
-./ape/bin/python -m src.datasets.pr_review_v4.judge_runner \
+./ape/bin/python -m src.mathlib_review.judge.runner \
   --config configs/pr_review_v4_judge.yaml \
   dataset.dry_run=True         # renders every prompt; hard-fails if any lacks its code
 ```

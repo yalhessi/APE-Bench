@@ -3,21 +3,21 @@
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v4.io import jsonl_bytes, sha256_file
-from src.datasets.pr_review_v4.operators.canonical_api import (
+from src.mathlib_review.io import jsonl_bytes, sha256_file
+from src.mathlib_review.evidence.operators.canonical_api import (
     build_declaration_index,
     is_high_confidence_insert_separation,
     propose_insert_separation_replacement,
     rank_declarations,
 )
-from src.datasets.pr_review_v4.phase3_canonical_smoke import (
+from src.mathlib_review.legacy_pipeline.phase3_canonical_smoke import (
     DEFAULT_OUT,
     DEFAULT_PARENT,
     DEFAULT_PHASE2,
     DEFAULT_WORKSPACES,
     build_artifacts,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     CanonicalRetrievalHit,
     ChangeGraph,
     DatasetManifest,

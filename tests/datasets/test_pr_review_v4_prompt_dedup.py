@@ -19,10 +19,10 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.render_focused import _target_blocks
-from src.datasets.pr_review_v4.render_focused import FOCUSED_FACET_CHECKLIST
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.agenda.render_focused import _target_blocks
+from src.mathlib_review.agenda.render_focused import FOCUSED_FACET_CHECKLIST
+from src.mathlib_review.schema import (
     ChangeGraph, ReviewEpisodeInput, ReviewWorkUnit,
 )
 
@@ -88,7 +88,7 @@ def arm_prompts():
     once. The generalist path still carries the repetition until a release is re-rendered.
     """
 
-    from src.datasets.pr_review_v4.schema import ModificationRecord, RenderedPrompt
+    from src.mathlib_review.schema import ModificationRecord, RenderedPrompt
     from src.mathlib_review.agenda.agenda import build_agenda
 
     inventory = Path("inputs/pr_review_v4/treatments/"

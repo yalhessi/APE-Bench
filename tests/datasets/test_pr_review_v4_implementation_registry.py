@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.datasets.pr_review_v4.implementation_registry import (
+from src.mathlib_review.opportunities.implementation_registry import (
     assess_capabilities,
     build_registry_files,
     default_contracts,
@@ -12,8 +12,8 @@ from src.datasets.pr_review_v4.implementation_registry import (
     validate_contracts,
     validate_implementations,
 )
-from src.datasets.pr_review_v4.io import canonical_json_bytes, jsonl_bytes, sha256_bytes
-from src.datasets.pr_review_v4.schema import ChangeGraph, ChangeTarget, InvestigationTask
+from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes
+from src.mathlib_review.schema import ChangeGraph, ChangeTarget, InvestigationTask
 
 
 EPISODE = "episode:test"

@@ -24,15 +24,15 @@ from typing import get_args
 
 import pytest
 
-from src.datasets.pr_review_v4 import phase7_adjudication
-from src.datasets.pr_review_v4.phase7_adjudication import (
+from src.mathlib_review.legacy_pipeline import phase7_adjudication
+from src.mathlib_review.legacy_pipeline.phase7_adjudication import (
     EvidenceView,
     OpportunityView,
     _classify,
     _nonzero_exit_ids,
     production_cases,
 )
-from src.datasets.pr_review_v4.schema import NormRecord, WorthinessDecision
+from src.mathlib_review.schema import NormRecord, WorthinessDecision
 
 LINEAGE = Path(__file__).parent / "fixtures/phase9_policy_lineage.json"
 

@@ -21,8 +21,8 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.evidence import LazyPopulationScan
-from src.datasets.pr_review_v4.operators.naming_norm import (
+from src.mathlib_review.evidence.evidence import LazyPopulationScan
+from src.mathlib_review.evidence.operators.naming_norm import (
     MIN_CORPUS_FILES,
     PopulationScan,
     SubjectPopulation,
@@ -47,7 +47,7 @@ def test_a_partial_checkout_is_not_a_snapshot():
 def test_the_evidence_path_refuses_an_unrepresentative_scan(monkeypatch):
     """Built, measured, then discarded — the verifier must see no scan rather than a sample."""
 
-    import src.datasets.pr_review_v4.operators.naming_norm as naming_norm
+    import src.mathlib_review.evidence.operators.naming_norm as naming_norm
 
     sparse = _scan(81, {"encard": SubjectPopulation("encard", {"encard": 40}, 40)})
     monkeypatch.setattr(naming_norm, "scan_population", lambda *_a, **_k: sparse)
@@ -60,7 +60,7 @@ def test_the_evidence_path_refuses_an_unrepresentative_scan(monkeypatch):
 
 
 def test_a_full_scan_is_used(monkeypatch):
-    import src.datasets.pr_review_v4.operators.naming_norm as naming_norm
+    import src.mathlib_review.evidence.operators.naming_norm as naming_norm
 
     population = SubjectPopulation("encard", {"encard": 87, "card": 4}, 91)
     full = _scan(6000, {"encard": population})
@@ -74,7 +74,7 @@ def test_a_full_scan_is_used(monkeypatch):
 def test_the_scan_is_built_once_per_workspace(monkeypatch):
     """It is a full parse of the source tree; per-candidate rebuilds would dominate the run."""
 
-    import src.datasets.pr_review_v4.operators.naming_norm as naming_norm
+    import src.mathlib_review.evidence.operators.naming_norm as naming_norm
 
     calls = []
 
@@ -94,8 +94,8 @@ def test_the_scan_is_built_once_per_workspace(monkeypatch):
 def test_an_unbuildable_scan_abstains_with_its_own_reason(monkeypatch):
     """Not "the corpus shows no norm" — that would report a broken workspace as evidence."""
 
-    import src.datasets.pr_review_v4.operators.naming_norm as naming_norm
-    from src.datasets.pr_review_v4.verifiers import verify_naming_convention
+    import src.mathlib_review.evidence.operators.naming_norm as naming_norm
+    from src.mathlib_review.evidence.verifiers import verify_naming_convention
 
     monkeypatch.setattr(
         naming_norm, "scan_population",
@@ -127,7 +127,7 @@ def test_the_caller_actually_passes_a_scan():
     import ast
     import inspect
 
-    from src.datasets.pr_review_v4 import evidence
+    from src.mathlib_review.evidence import evidence
 
     tree = ast.parse(inspect.getsource(evidence))
     for node in ast.walk(tree):
@@ -151,7 +151,7 @@ def test_the_population_comes_from_the_commit_cache_not_the_run_workspace():
     them. This asserts the resolver prefers the cache and refuses anything else.
     """
 
-    from src.datasets.pr_review_v4.evidence import snapshot_workspace
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
 
     assert snapshot_workspace(None) is None
     assert snapshot_workspace("not-a-real-commit-sha") is None
@@ -162,8 +162,8 @@ def test_a_cached_snapshot_resolves_to_a_complete_checkout():
 
     from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
 
-    from src.datasets.pr_review_v4.evidence import snapshot_workspace
-    from src.datasets.pr_review_v4.operators.naming_norm import MIN_CORPUS_FILES
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
+    from src.mathlib_review.evidence.operators.naming_norm import MIN_CORPUS_FILES
 
     config = LeanVerifyToolConfig()
     repo_name, _url = config.resolve_repo(None)

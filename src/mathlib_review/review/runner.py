@@ -37,7 +37,7 @@ from ape.llm_clients.config import COST_MODELS
 from ape.utils.config_loader import deep_merge, load_yaml
 from ape.utils.logging import create_logger
 
-from src.datasets.pr_review_v4.io import (
+from src.mathlib_review.io import (
     canonical_json_bytes,
     git_state,
     jsonl_bytes,
@@ -47,7 +47,7 @@ from src.datasets.pr_review_v4.io import (
     sha256_file,
     write_once,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     ModificationRecord,
     RenderedPrompt,
@@ -818,7 +818,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # Rank each PR's work before the lead reads it. Relations are computed once for the
         # whole release: `pr_relations` already derives sibling families, shared name tokens
         # and repeated implementation shapes, and v5 had never used any of it.
-        from src.datasets.pr_review_v4.pr_relations import build_relations
+        from src.mathlib_review.release.pr_relations import build_relations
 
         relations, _relation_evidence = build_relations(release["graphs"])
         census_by_pr: Dict[int, List[Dict[str, Any]]] = {}

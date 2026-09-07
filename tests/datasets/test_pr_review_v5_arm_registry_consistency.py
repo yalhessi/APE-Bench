@@ -224,7 +224,7 @@ def test_changing_the_workspace_tools_moves_the_scaffold_hash():
 
     from pathlib import Path
 
-    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
     from src.mathlib_review.review.runner import load_run
 
     _dataset, scaffold, overrides = load_run(Path("configs/pr_review_v5_specialist4.yaml"))
@@ -244,7 +244,7 @@ def test_changing_an_arms_retrieval_grant_moves_the_agenda():
     showed matters most -- 50 of 63 retrieval calls spent on the wrong tool -- so it being
     sealed is the thing worth checking."""
 
-    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
     from src.mathlib_review.agenda.arms import default_arms
     from src.mathlib_review.schema.review import ReviewAgenda
 

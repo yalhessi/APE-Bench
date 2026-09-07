@@ -10,13 +10,13 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v4.merge import (
+from src.mathlib_review.review.merge import (
     canonical_action,
     finding_from_candidate,
     finding_from_opportunity,
     merge_findings,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     CandidateClaim,
     FindingSource,
     OpportunityTransformation,
@@ -210,7 +210,7 @@ def test_publication_ordering_never_reads_model_confidence():
     import ast
     import inspect
 
-    from src.datasets.pr_review_v4 import merge
+    from src.mathlib_review.review import merge
 
     tree = ast.parse(inspect.getsource(merge))
     reads = [
@@ -239,7 +239,7 @@ def test_ordering_prefers_verified_evidence_then_blocking_severity():
 # --- candidate quarantine ----------------------------------------------------------
 
 def _unit():
-    from src.datasets.pr_review_v4.schema import ReviewWorkUnit
+    from src.mathlib_review.schema import ReviewWorkUnit
 
     return ReviewWorkUnit(
         work_unit_id="work-unit:1", episode_id="e1", graph_id="graph:1",
@@ -264,7 +264,7 @@ def test_one_malformed_candidate_no_longer_discards_the_whole_batch():
     """Ingestion used to `raise` on the first bad item, losing every good one and leaving
     no artifact — so drop rates were unmeasurable."""
 
-    from src.datasets.pr_review_v4.candidates import candidates_from_response
+    from src.mathlib_review.review.candidates import candidates_from_response
 
     response = {"candidates": [_raw(), _raw(subject="Wrong.subject"), _raw()]}
     accepted, rejected = candidates_from_response(_unit(), response, strict=False)
@@ -276,7 +276,7 @@ def test_one_malformed_candidate_no_longer_discards_the_whole_batch():
 
 
 def test_strict_mode_is_still_the_default_so_existing_gates_keep_their_meaning():
-    from src.datasets.pr_review_v4.candidates import candidates_from_response
+    from src.mathlib_review.review.candidates import candidates_from_response
 
     with pytest.raises(ValueError):
         candidates_from_response(_unit(), {"candidates": [_raw(subject="Wrong.subject")]})
@@ -286,7 +286,7 @@ def test_a_missing_candidates_list_is_still_a_response_level_failure():
     """A malformed *candidate* is quarantined; a response that produced nothing usable is
     a coverage failure and must not be silently downgraded to an empty candidate set."""
 
-    from src.datasets.pr_review_v4.candidates import candidates_from_response
+    from src.mathlib_review.review.candidates import candidates_from_response
 
     with pytest.raises(ValueError, match="candidates list"):
         candidates_from_response(_unit(), {}, strict=False)
@@ -307,7 +307,7 @@ def test_running_both_naming_implementations_double_counts_every_rename():
     holds with no exclusions passed, which is what makes it a guarantee.
     """
 
-    from src.datasets.pr_review_v4.method_registry import default_methods
+    from src.mathlib_review.opportunities.method_registry import default_methods
 
     scheduled = {item.method_id for item in default_methods()}
     assert "naming_contrast.v1" not in scheduled
@@ -317,7 +317,7 @@ def test_running_both_naming_implementations_double_counts_every_rename():
 def test_a_condition_requires_the_inputs_its_arms_need():
     from pathlib import Path
 
-    from src.datasets.pr_review_v4.conditions import build_condition
+    from src.mathlib_review.review.conditions import build_condition
 
     with pytest.raises(ValueError, match="execution-release"):
         build_condition("checker_only", Path("/tmp/nope"))
@@ -331,7 +331,7 @@ def test_evidence_tiers_claim_verified_only_where_a_compiler_actually_ran():
     """`verified_compile` outranks everything, so claiming it loosely would let a lexical
     rule outrank a real compile in both merge resolution and publication ordering."""
 
-    from src.datasets.pr_review_v4.conditions import _EVIDENCE_BY_METHOD
+    from src.mathlib_review.review.conditions import _EVIDENCE_BY_METHOD
 
     assert _EVIDENCE_BY_METHOD["baseline_failure.v1"] == "verified_compile"
     assert _EVIDENCE_BY_METHOD["lint_norm.v1"] == "lexical_rule"
@@ -343,7 +343,7 @@ def test_evidence_tiers_claim_verified_only_where_a_compiler_actually_ran():
 def _verified(cid, requested, edit_text, change_ids=("change:1",)):
     """A finding carrying an edit the compiler accepted."""
 
-    from src.datasets.pr_review_v4.schema import ProposedEdit
+    from src.mathlib_review.schema import ProposedEdit
 
     candidate = _candidate(cid, family="proof-golf", change_ids=change_ids,
                            requested=requested)
@@ -395,7 +395,7 @@ def test_a_verified_finding_without_an_edit_is_not_an_alternative():
     """The warrant is the edit. A `verified_compile` tier with no edit proves nothing about
     a specific replacement, so it cannot be one of two competing implementations."""
 
-    from src.datasets.pr_review_v4.merge import _is_verified_proposal
+    from src.mathlib_review.review.merge import _is_verified_proposal
 
     edit_backed = _verified("candidate:a", "Use grind.", "theorem Foo.bar : True := by grind")
     tier_only = _published(_candidate("candidate:b"), tier="verified_compile")
@@ -425,7 +425,7 @@ def test_non_strict_ingestion_preserves_each_candidate_s_ordinal():
     never saw, and `candidate_id` loses the field that disambiguates it.
     """
 
-    from src.datasets.pr_review_v4.candidates import candidates_from_response
+    from src.mathlib_review.review.candidates import candidates_from_response
 
     response = {"candidates": [_raw(), _raw(claim="Foo.bar is also shadowed elsewhere.")]}
     accepted, rejected = candidates_from_response(_unit(), response, strict=False)
@@ -437,7 +437,7 @@ def test_non_strict_ingestion_preserves_each_candidate_s_ordinal():
 def test_a_rejected_candidate_does_not_renumber_its_successors():
     """Ordinals index the response, so a gap is the correct record of a dropped candidate."""
 
-    from src.datasets.pr_review_v4.candidates import candidates_from_response
+    from src.mathlib_review.review.candidates import candidates_from_response
 
     response = {"candidates": [_raw(), _raw(subject="Wrong.subject"), _raw(claim="Foo.bar has a third problem.")]}
     accepted, rejected = candidates_from_response(_unit(), response, strict=False)

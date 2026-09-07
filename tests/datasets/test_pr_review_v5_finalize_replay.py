@@ -17,8 +17,8 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import ReviewFinding, ReviewWorkUnit
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import ReviewFinding, ReviewWorkUnit
 
 RUN = Path("results/pr_review_v5/runs/pr_review_v5_specialist4_rep1")
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")

@@ -281,7 +281,7 @@ def with_context(prompt: Any, context_text: str) -> Any:
     a prompt whose `prompt_sha256` no longer matches its body is worse than no hash.
     """
 
-    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
 
     if not context_text:
         return prompt

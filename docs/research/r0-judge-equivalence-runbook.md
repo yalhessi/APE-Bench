@@ -40,18 +40,18 @@ restarts.
 
 ```bash
 # rep 1
-./ape/bin/python -m src.datasets.pr_review_v4.judge_runner \
+./ape/bin/python -m src.mathlib_review.judge.runner \
   --config configs/pr_review_v4_judge.yaml dataset.dry_run=False
 
 # rep 2
-./ape/bin/python -m src.datasets.pr_review_v4.judge_runner \
+./ape/bin/python -m src.mathlib_review.judge.runner \
   --config configs/pr_review_v4_judge.yaml dataset.dry_run=False \
   dataset.candidates=results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep2/candidates.jsonl \
   dataset.out_dir=results/pr_review_v4/audits/r0-judge-equivalence/task-arm-rep2 \
   dataset.run_name=pr_review_v4_judge_r0_rep2
 
 # rep 3
-./ape/bin/python -m src.datasets.pr_review_v4.judge_runner \
+./ape/bin/python -m src.mathlib_review.judge.runner \
   --config configs/pr_review_v4_judge.yaml dataset.dry_run=False \
   dataset.candidates=results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3-rep3/candidates.jsonl \
   dataset.out_dir=results/pr_review_v4/audits/r0-judge-equivalence/task-arm-rep3 \
@@ -63,7 +63,7 @@ Then score each repetition (free, no calls):
 ```bash
 for rep in 1 2 3; do
   suffix=""; [ $rep -gt 1 ] && suffix="-rep$rep"
-  ./ape/bin/python -m src.datasets.pr_review_v4.r0_judge_equivalence \
+  ./ape/bin/python -m src.mathlib_review.judge.r0_equivalence \
     --release inputs/pr_review_v4/releases/dev-pilot-0.9.0 \
     --candidates results/pr_review_v4/runs/dev-pilot-0.9.0-stable-smoke3$suffix/candidates.jsonl \
     --task-arm results/pr_review_v4/audits/r0-judge-equivalence/task-arm-rep$rep \
@@ -76,7 +76,7 @@ done
 Finally reseal the ledger, since R0 adds artifacts under a frozen root:
 
 ```bash
-./ape/bin/python -m src.datasets.pr_review_v4.verify_frozen build-lock
+./ape/bin/python -m src.mathlib_review.release.verify_frozen build-lock
 ./ape/bin/python -m pytest tests -q
 ```
 
@@ -102,7 +102,7 @@ The comparator prints a `decision` and per-gate pass flags:
   fix is more samples, not a prompt change, and every downstream denominator must budget
   for it.
 - **Coverage short** — a pair lacks a cached script verdict. Re-run the script arm for
-  that pair first (`python -m src.datasets.pr_review_v4.semantic_judge …`), or the
+  that pair first (`python -m src.mathlib_review.judge.semantic_judge …`), or the
   comparison is not apples-to-apples.
 
 ## After R0 passes

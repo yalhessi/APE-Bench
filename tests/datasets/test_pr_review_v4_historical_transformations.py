@@ -3,12 +3,12 @@
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v4.io import sha256_file
-from src.datasets.pr_review_v4.operators.historical_transformations import (
+from src.mathlib_review.io import sha256_file
+from src.mathlib_review.evidence.operators.historical_transformations import (
     build_historical_store,
     retrieve_historical_transformations,
 )
-from src.datasets.pr_review_v4.legacy.phase6_historical_store import (
+from src.mathlib_review.legacy_pipeline.phase6_historical_store import (
     DEFAULT_CORPUS_RELEASE,
     DEFAULT_CUTOFF_RELEASE,
     DEFAULT_INTERVENTIONS,
@@ -18,7 +18,7 @@ from src.datasets.pr_review_v4.legacy.phase6_historical_store import (
     build_store_rows,
     evaluate_store,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     HistoricalTransformationHit,
     HistoricalTransformationRecord,

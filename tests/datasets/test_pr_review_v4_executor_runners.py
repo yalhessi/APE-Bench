@@ -15,15 +15,17 @@ from typing import get_args
 
 import pytest
 
-from src.datasets.pr_review_v4 import evidence, opportunity_executor
-from src.datasets.pr_review_v4.operators import canonical_api
-from src.datasets.pr_review_v4.implementation_registry import default_implementations
-from src.datasets.pr_review_v4.opportunity_executor import (
+from src.mathlib_review.evidence import evidence
+
+from src.mathlib_review.opportunities import executor as opportunity_executor
+from src.mathlib_review.evidence.operators import canonical_api
+from src.mathlib_review.opportunities.implementation_registry import default_implementations
+from src.mathlib_review.opportunities.executor import (
     DEFAULT_RUNNERS,
     _lint_runner,
     _policy_runner,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     CapabilityAssessment,
     ChangeGraph,
     ChangedRange,

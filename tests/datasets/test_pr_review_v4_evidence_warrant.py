@@ -16,7 +16,7 @@ needing a Lean workspace. The end-to-end check against the frozen releases lives
 import inspect
 import re
 
-from src.datasets.pr_review_v4 import opportunity_executor
+from src.mathlib_review.opportunities import executor as opportunity_executor
 
 
 def _runner_source(name: str) -> str:
@@ -65,7 +65,7 @@ def test_wrapper_opportunity_names_the_witness_roles_it_composed():
 
 
 def test_wrapper_transformation_kind_uses_the_frozen_contract_vocabulary():
-    from src.datasets.pr_review_v4.implementation_registry import TRANSFORMATION_CLASSES
+    from src.mathlib_review.opportunities.implementation_registry import TRANSFORMATION_CLASSES
 
     source = _runner_source("_wrapper_runner")
     kind = re.search(r'kind="([a-z_]+)"', source).group(1)

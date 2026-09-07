@@ -59,6 +59,39 @@ def run_dir(run_name: str) -> Path:
     return RUNS / run_name
 
 
+LEGACY_INTERVENTIONS_V5 = Path("inputs/pr_review_v3/interventions_v5.jsonl")
+
+#: v2 annotated first-round review records — the source of v4's episode allowlist.
+LEGACY_V2_ANNOTATED = Path("inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl")
+
+#: The scored set. A precedent drawn from one of these PRs is the answer rather
+#: than a precedent, so the corpus builder excludes them outright.
+V2_EVAL_SET = Path("inputs/pr_review_v2/mathlib_pr_review_v2_actionable_20260618.jsonl")
+
+# --- artifact roots inherited from the v4 pipeline ------------------------------------
+#
+# Folded in from `pr_review_v4/paths.py`, which is where they were written and which is not a
+# place they belong now that there is one pipeline. The v4 names are prefixed: both packages
+# called their own outputs `RESULTS` and `RUNS`, and merging them silently would have made one
+# of the two mean the other's directory.
+
+#: Immutable cached GitHub collection bundles; v4's raw event ledger is built from these.
+LEGACY_V2_BUNDLES = Path("data/pr_review_v2/cache/bundles")
+
+#: Immutable cached Git compare responses; v4's review-time diffs are derived from these.
+LEGACY_V2_COMPARES = Path("data/pr_review_v2/cache/compares")
+
+#: Mathlib maintainer roster, used to scope temporally safe precedent retrieval.
+LEGACY_V2_ROSTER = Path("src/datasets/pr_review_v2/data/mathlib_roster.txt")
+
+# --- v4's own roots ------------------------------------------------------------------
+
+V4_RESULTS = Path("results/pr_review_v4")
+V4_AUDITS = V4_RESULTS / "audits"
+V4_RUNS = V4_RESULTS / "runs"
+
+
+#: Root markers below.
 #: Directories that exist iff the process is at the repository root.
 #:
 #: Deliberately not the review packages. This check existed twice -- once here naming

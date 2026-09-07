@@ -923,7 +923,7 @@ Reuse stable v4 I/O, hashing, runner, workspace, evidence, semantic judge, and s
 Add narrow modules rather than another parallel pipeline:
 
 ```text
-src/datasets/pr_review_v4/
+src/mathlib_review/
   modification_inventory.py
   pr_relations.py
   method_registry.py

@@ -202,8 +202,8 @@ def contamination(release: Path) -> Dict[str, Any]:
     the arms' instructions through that blind spot.
     """
 
-    from src.datasets.pr_review_v4.contracts import prompt_leaks
-    from src.datasets.pr_review_v4.render_focused import (
+    from src.mathlib_review.release.contracts import prompt_leaks
+    from src.mathlib_review.agenda.render_focused import (
         SUBMISSION_CONTRACT, focused_system_prompt,
     )
     from src.mathlib_review.agenda.arms import specs_by_arm_id
@@ -390,8 +390,8 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     Those were not part of a v5 model-arm run and contribute no findings to it.
     """
 
-    from src.datasets.pr_review_v4.review_overlay import build_overlay, write_overlay
-    from src.datasets.pr_review_v4 import paths as v4_paths
+    from src.mathlib_review.analysis.review_overlay import build_overlay, write_overlay
+    from src.mathlib_review.analysis.review_overlay import paths as v4_paths
 
     directory = run_dir(run_name)
     agenda_path = directory / "agenda.json"

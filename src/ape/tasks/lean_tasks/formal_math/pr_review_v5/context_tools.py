@@ -259,7 +259,7 @@ def _register_declaration(task, mcp) -> None:
         # `supports` verdict to every duplication claim. A second implementation would be a
         # second chance to reintroduce that. It was `_declares_identifier` until two packages
         # importing it made the underscore a claim that was not true.
-        from src.datasets.pr_review_v4.evidence import (
+        from src.mathlib_review.evidence.evidence import (
             declares_identifier, searchable_identifiers, snapshot_workspace,
         )
 

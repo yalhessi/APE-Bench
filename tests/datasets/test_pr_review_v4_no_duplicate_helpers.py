@@ -10,7 +10,10 @@ rest on artifact hashes. These assertions make the next copy fail loudly.
 import ast
 from pathlib import Path
 
-PACKAGE = Path("src/datasets/pr_review_v4")
+#: The merged package. This was `src/datasets/pr_review_v4`; globbing a
+#: directory that no longer exists finds nothing and passes vacuously, which
+#: is how a guard becomes decoration.
+PACKAGE = Path("src/mathlib_review")
 
 #: Helper name -> the primitive that replaced it.
 CONSOLIDATED = {
@@ -28,6 +31,10 @@ ALLOWED = {
     # Takes `schema` before `role`; renaming it onto releases.artifact_ref would
     # transpose those fields in a frozen manifest.
     ("phase9_fixed_orchestration.py", "_artifact_ref"),
+    # Reads ONE json object and returns None when it cannot, which is what walking an
+    # orchestrator tree of possibly-absent `task_result.json` files needs.
+    # `io.load_jsonl` parses JSONL into models and raises. Same name, different function.
+    ("trajectory.py", "_load"),
 }
 
 
@@ -43,14 +50,18 @@ def _defined_functions(path: Path):
 def _package_sources():
     return sorted(
         path for path in PACKAGE.rglob("*.py")
-        if "legacy" not in path.relative_to(PACKAGE).parts
+        if "legacy_pipeline" not in path.relative_to(PACKAGE).parts
     )
 
 
 def test_consolidated_helpers_are_not_redefined_locally():
+    """`ALLOWED` applies here too. It did not, which is why it says "each for a reason that
+    would be a bug to fix mechanically" while only one of the two tests consulted it."""
+
     offenders = {}
     for path in _package_sources():
-        hits = sorted(_defined_functions(path) & set(CONSOLIDATED))
+        hits = sorted(name for name in _defined_functions(path) & set(CONSOLIDATED)
+                      if (path.name, name) not in ALLOWED)
         if hits:
             offenders[path.name] = {name: CONSOLIDATED[name] for name in hits}
     assert offenders == {}, (

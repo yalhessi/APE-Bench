@@ -107,7 +107,7 @@ def test_judge_without_execute_resolves_paths_and_stops(monkeypatch, capsys):
     """The resolution is the valuable half: it is where a judge pointed at the wrong run is
     caught, and it costs nothing."""
 
-    import src.datasets.pr_review_v4.judge_runner as judge_runner
+    import src.mathlib_review.judge.runner as judge_runner
 
     called = {"ran": False}
 

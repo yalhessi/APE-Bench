@@ -13,8 +13,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from src.datasets.pr_review_v4.io import jsonl_bytes
-from src.datasets.pr_review_v4.releases import ArtifactSpec, write_artifacts
+from src.mathlib_review.io import jsonl_bytes
+from src.mathlib_review.release.releases import ArtifactSpec, write_artifacts
 
 OLD = Path("inputs/pr_review_v4/releases/dev-medium-0.1.0")
 NEW = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
@@ -56,8 +56,8 @@ def test_raw_bytes_round_trip_exactly(tmp_path):
 
 
 def test_the_new_release_asks_for_issue_kind_and_records_target_paths():
-    from src.datasets.pr_review_v4.io import load_jsonl
-    from src.datasets.pr_review_v4.schema import RenderedPrompt, ReviewWorkUnit
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.schema import RenderedPrompt, ReviewWorkUnit
 
     prompts = load_jsonl(NEW / "derived/rendered_prompts.jsonl", RenderedPrompt)
     units = load_jsonl(NEW / "derived/work_units.jsonl", ReviewWorkUnit)
@@ -69,8 +69,8 @@ def test_the_new_release_asks_for_issue_kind_and_records_target_paths():
 def test_the_evaluation_denominator_is_unchanged():
     """Gold is carried, so the 40 included obligations must survive the bump exactly."""
 
-    from src.datasets.pr_review_v4.io import load_jsonl
-    from src.datasets.pr_review_v4.schema import InterventionView, JudgmentNode
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.schema import InterventionView, JudgmentNode
 
     def included(release):
         views = load_jsonl(release / "gold/intervention_views.jsonl", InterventionView)

@@ -5,16 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.agenda_probe import (
+from src.mathlib_review.opportunities.agenda_probe import (
     PASS_SPECS,
     SOURCE_WORK_UNIT_IDS,
     build_probe_artifacts,
     compare_reports,
     deduplicate_probe_candidates,
 )
-from src.datasets.pr_review_v4.candidates import candidates_from_response
-from src.datasets.pr_review_v4.render_prompts import FACET_CHECKLIST
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.review.candidates import candidates_from_response
+from src.mathlib_review.agenda.render_prompts import FACET_CHECKLIST
+from src.mathlib_review.schema import (
     CandidateClaim,
     ChangeGraph,
     RenderedPrompt,

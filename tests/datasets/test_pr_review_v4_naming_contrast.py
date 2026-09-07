@@ -3,8 +3,8 @@
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v4.io import sha256_file
-from src.datasets.pr_review_v4.operators.naming_contrast import (
+from src.mathlib_review.io import sha256_file
+from src.mathlib_review.evidence.operators.naming_contrast import (
     NamingPopulationScan,
     declaration_conclusion,
     infer_semantic_subject,
@@ -13,14 +13,14 @@ from src.datasets.pr_review_v4.operators.naming_contrast import (
     proposed_subject_name,
     strong_subject_prefix_norm,
 )
-from src.datasets.pr_review_v4.phase4_naming_smoke import (
+from src.mathlib_review.legacy_pipeline.phase4_naming_smoke import (
     DEFAULT_OUT,
     DEFAULT_PARENT,
     DEFAULT_PHASE2,
     DEFAULT_WORKSPACES,
     build_artifacts,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     DatasetManifest,
     InvestigationTask,
@@ -104,7 +104,7 @@ def test_phase4_generation_never_reads_gold(monkeypatch):
         parse_failures=[],
     )
     monkeypatch.setattr(
-        "src.datasets.pr_review_v4.phase4_naming_smoke.scan_repository_population",
+        "src.mathlib_review.legacy_pipeline.phase4_naming_smoke.scan_repository_population",
         lambda _workspace, _snapshot: scan,
     )
     original = Path.read_text

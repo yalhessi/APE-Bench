@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.judge_runner import (
+from src.mathlib_review.judge.runner import (
     JudgeDatasetConfig, assert_source_run_is_complete,
 )
 
@@ -81,7 +81,7 @@ def test_a_run_with_no_manifest_is_unchecked_rather_than_assumed_good(tmp_path):
 
 
 def test_the_three_paths_are_derived_from_one_name():
-    from src.datasets.pr_review_v4.judge_runner import derive_from_run
+    from src.mathlib_review.judge.runner import derive_from_run
 
     derived = derive_from_run("pr_review_v5_specialist4_rep1")
     assert derived["candidates"] == Path(
@@ -93,7 +93,7 @@ def test_the_three_paths_are_derived_from_one_name():
 def test_candidates_pointing_at_another_run_is_refused(tmp_path):
     """The exact live mistake: judging run A's findings while claiming to judge run B."""
 
-    from src.datasets.pr_review_v4.judge_runner import (
+    from src.mathlib_review.judge.runner import (
         JudgeDatasetConfig, assert_paths_agree,
     )
 
@@ -111,7 +111,7 @@ def test_candidates_pointing_at_another_run_is_refused(tmp_path):
 
 
 def test_candidates_inside_the_named_run_are_accepted(tmp_path):
-    from src.datasets.pr_review_v4.judge_runner import (
+    from src.mathlib_review.judge.runner import (
         JudgeDatasetConfig, assert_paths_agree, derive_from_run,
     )
 

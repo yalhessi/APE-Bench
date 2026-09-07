@@ -17,9 +17,9 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v4.focused_specs import default_specs
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import ModificationRecord
+from src.mathlib_review.agenda.focused_specs import default_specs
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import ModificationRecord
 from src.mathlib_review.agenda.arms import (
     CHECKABLE_ARMS,
     GENERALIST_ARM_ID,
@@ -105,7 +105,7 @@ def test_every_concern_family_in_the_gold_vocabulary_has_an_owner():
 def test_the_new_arms_declare_a_checkable_issue_kind():
     from typing import get_args
 
-    from src.datasets.pr_review_v4.schema import ConcernFamily, IssueKind
+    from src.mathlib_review.schema import ConcernFamily, IssueKind
 
     families, kinds = set(get_args(ConcernFamily)), set(get_args(IssueKind))
     for spec in v5_specs():
@@ -180,7 +180,7 @@ def test_arm_attribution_survives_the_evidence_route():
     """A naming candidate takes the generalist path but carries a spec_id, and
     `finding_from_candidate` reads the arm from that — so it is still filed as focused."""
 
-    from src.datasets.pr_review_v4.merge import finding_from_candidate
+    from src.mathlib_review.review.merge import finding_from_candidate
     import inspect
 
     assert "spec_id" in inspect.getsource(finding_from_candidate)

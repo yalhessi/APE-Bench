@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v4.schema import ReviewFinding
+from src.mathlib_review.schema import ReviewFinding
 
 
 def test_the_finding_model_records_which_arm_found_it():
@@ -42,8 +42,8 @@ def test_concern_tags_are_plural_and_non_gating():
 def unit_and_run(tmp_path):
     """One specialist claim with no verification artifact, finalized."""
 
-    from src.datasets.pr_review_v4.io import load_jsonl
-    from src.datasets.pr_review_v4.schema import ReviewWorkUnit
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.schema import ReviewWorkUnit
     from src.mathlib_review.review.finalize import finalize
     from tests.datasets.test_pr_review_v5_finalize import RELEASE, _candidate, _response
 
@@ -63,7 +63,7 @@ def unit_and_run(tmp_path):
 
 
 def _candidate(spec_id="duplication", concern="duplication", ordinal=0):
-    from src.datasets.pr_review_v4.schema import CandidateClaim
+    from src.mathlib_review.schema import CandidateClaim
 
     return CandidateClaim(
         candidate_id=f"candidate:{spec_id}{ordinal}", producer="model",
@@ -77,7 +77,7 @@ def _candidate(spec_id="duplication", concern="duplication", ordinal=0):
 
 
 def test_provenance_is_taken_from_the_candidate():
-    from src.datasets.pr_review_v4.merge import finding_from_candidate
+    from src.mathlib_review.review.merge import finding_from_candidate
 
     finding = finding_from_candidate(
         _candidate(), admission="diagnostic", admission_reason="r", arm="generalist")
@@ -89,7 +89,7 @@ def test_merging_two_arms_records_both_concerns_and_no_single_origin():
     """Two arms finding the same thing is a fact about the finding. Keeping only the
     representative's provenance would report one arm's work as the whole of it."""
 
-    from src.datasets.pr_review_v4.merge import finding_from_candidate, merge_findings
+    from src.mathlib_review.review.merge import finding_from_candidate, merge_findings
 
     first = finding_from_candidate(
         _candidate("duplication", "duplication", 0),
@@ -109,7 +109,7 @@ def test_merging_two_arms_records_both_concerns_and_no_single_origin():
 
 
 def test_merging_one_arm_with_itself_keeps_the_origin():
-    from src.datasets.pr_review_v4.merge import finding_from_candidate, merge_findings
+    from src.mathlib_review.review.merge import finding_from_candidate, merge_findings
 
     findings = [
         finding_from_candidate(_candidate("duplication", "duplication", index),
@@ -130,7 +130,7 @@ def test_a_candidate_with_no_artifact_is_collected_rather_than_lost(tmp_path):
 
     import json
 
-    from src.datasets.pr_review_v4.conditions import focused_findings
+    from src.mathlib_review.review.conditions import focused_findings
 
     path = tmp_path / "candidates.jsonl"
     path.write_text(
@@ -146,7 +146,7 @@ def test_a_candidate_with_no_artifact_is_collected_rather_than_lost(tmp_path):
 def test_collecting_drops_is_optional_so_existing_callers_are_unchanged(tmp_path):
     import json
 
-    from src.datasets.pr_review_v4.conditions import focused_findings
+    from src.mathlib_review.review.conditions import focused_findings
 
     path = tmp_path / "candidates.jsonl"
     path.write_text(

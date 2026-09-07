@@ -3,16 +3,16 @@
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v4.io import sha256_file
-from src.datasets.pr_review_v4.operators.wrapper_composition import discover_wrapper_composition
-from src.datasets.pr_review_v4.phase5_wrapper_smoke import (
+from src.mathlib_review.io import sha256_file
+from src.mathlib_review.evidence.operators.wrapper_composition import discover_wrapper_composition
+from src.mathlib_review.legacy_pipeline.phase5_wrapper_smoke import (
     DEFAULT_OUT,
     DEFAULT_PARENT,
     DEFAULT_PHASE2,
     DEFAULT_WORKSPACES,
     build_artifacts,
 )
-from src.datasets.pr_review_v4.schema import (
+from src.mathlib_review.schema import (
     ChangeGraph,
     CompositionSource,
     DatasetManifest,

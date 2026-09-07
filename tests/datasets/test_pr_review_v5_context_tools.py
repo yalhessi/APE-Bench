@@ -18,8 +18,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.datasets.pr_review_v4.io import load_jsonl
-from src.datasets.pr_review_v4.schema import ReviewEpisodeBoundary, ReviewEpisodeInput
+from src.mathlib_review.io import load_jsonl
+from src.mathlib_review.schema import ReviewEpisodeBoundary, ReviewEpisodeInput
 from src.mathlib_review.agenda.cutoffs import (
     CutoffUnavailable,
     cutoffs_by_episode,

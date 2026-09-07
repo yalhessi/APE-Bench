@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
 
 from src.mathlib_review.paths import run_dir
 

@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v4.verifiers import VERIFIERS, verify
-from src.datasets.pr_review_v4.schema import CandidateClaim, ChangeTarget
+from src.mathlib_review.evidence.verifiers import VERIFIERS, verify
+from src.mathlib_review.schema import CandidateClaim, ChangeTarget
 
 
 def _candidate(family="style", kind=None, claim="c", requested="r"):
@@ -129,7 +129,7 @@ def test_an_unrouted_issue_kind_abstains_rather_than_passing():
 # --- proof simplification: golf and idiom are not the same claim --------------------
 
 def _proof_candidate(spec, replacement, original_family="proof-golf"):
-    from src.datasets.pr_review_v4.schema import ProposedEdit
+    from src.mathlib_review.schema import ProposedEdit
 
     candidate = _candidate(original_family, "proof_simplification",
                            claim="this proof can be improved",
