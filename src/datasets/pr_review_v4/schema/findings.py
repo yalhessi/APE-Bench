@@ -262,6 +262,26 @@ class ReviewFinding(StrictModel):
     #: ceiling and the publishable result be reported without conflating them.
     admission: Literal["published", "diagnostic"]
     admission_reason: str
+    #: Which output channels this finding belongs to.
+    #:
+    #: `admission` answers one question with one field and so conflates two: whether the
+    #: system would say this, and whether it proved it. That conflation is what makes the
+    #: publication ceiling read as a reviewer failure -- 27 of 43 gold obligations carry a
+    #: concern no deterministic warrant can settle, so a correct finding about any of them can
+    #: never be `published` however good it is.
+    #:
+    #: * `review`   -- a maintainer-facing finding. What the system would say.
+    #: * `verified` -- the subset carrying claim-scoped deterministic support and no
+    #:                 contradiction. What it proved.
+    #:
+    #: A finding in `review` but not `verified` is not a worse finding; it is one whose
+    #: concern has no warrant yet. Reporting recall against both is what separates reviewer
+    #: performance from mechanism coverage.
+    channels: List[Literal["review", "verified"]] = Field(default_factory=list)
+    #: Set when evidence actively contradicted the claim. The finding stays in `review` with
+    #: this attached rather than vanishing: a contradiction is a fact about the claim that a
+    #: maintainer would want, and deleting it destroys the evidence that the collector ran.
+    contradiction: Optional[str] = None
     change_ids: List[str]
     primary_change_id: str
     concern_family: str

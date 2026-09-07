@@ -92,7 +92,7 @@ def test_the_patch_marker_is_not_a_lock(tmp_path):
 
 def test_nested_execution_does_not_inherit_a_process_pool(tmp_path):
     """A task already running inside a worker that spawns a nested orchestrator with
-    `num_processes > 0` creates a process pool inside a pool. `_tier_config` sets it to 0, and
+    `num_processes > 0` creates a process pool inside a pool. `_wave_config` sets it to 0, and
     that is load-bearing rather than incidental."""
 
     from ape.tasks.lean_tasks.formal_math.pr_review_v5 import delegation

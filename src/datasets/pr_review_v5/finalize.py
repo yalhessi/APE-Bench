@@ -167,6 +167,62 @@ def _lead_removed_findings(removed: Sequence[Tuple[Any, str]], pr_numbers):
     return findings
 
 
+def _contradicted_candidate_ids(out) -> Set[str]:
+    """Candidates whose evidence actively contradicted the claim.
+
+    Read from `evidence/packets.jsonl` rather than returned by `collect_supported`, which
+    reports only the supported set. A contradiction is not the same as an absence of support
+    and must not be reported as one: the collector ran, it looked, and it disagreed.
+    """
+
+    path = out / "evidence" / "packets.jsonl"
+    if not path.is_file():
+        return set()
+    found: Set[str] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if row.get("status") == "contradicted" and row.get("candidate_id"):
+            found.add(row["candidate_id"])
+    return found
+
+
+def _assign_channels(findings, contradicted: Set[str]):
+    """Split one admission field into two channels, in place.
+
+    `admission` answers "would the system say this" and "did it prove this" with one value,
+    so a correct finding about a concern with no deterministic warrant is indistinguishable
+    from a wrong one. 27 of 43 gold obligations carry such a concern, which is why the
+    publication ceiling reads as a reviewer failure.
+
+    * `review`   -- every maintainer-facing finding, published or not.
+    * `verified` -- the subset with deterministic support and no contradiction.
+
+    A contradicted finding stays in `review` carrying the contradiction, rather than
+    disappearing: the collector ran and disagreed, and that is a fact a maintainer would want.
+    Deleting it would also destroy the evidence that the check happened at all.
+    """
+
+    for finding in findings:
+        sources = getattr(finding, "sources", None) or []
+        ids = {getattr(item, "candidate_id", None) for item in sources}
+        is_contradicted = bool(ids & contradicted)
+        channels = ["review"]
+        if finding.admission == "published" and not is_contradicted:
+            channels.append("verified")
+        finding.channels = channels
+        if is_contradicted:
+            finding.contradiction = (
+                "evidence contradicted this claim; retained for review and excluded from "
+                "`verified`"
+            )
+    return findings
+
+
 def finalize(
     out: Path,
     *,
@@ -267,6 +323,9 @@ def finalize(
             evidence_specialist, supported_candidate_ids, pr_numbers))
 
     merged, conflicts, report = merge_findings(findings, pr_finding_limit=None)
+    # Two channels from here on. Computed after the merge so a merged finding is classified
+    # once, on the sources that survived it.
+    _assign_channels(merged, _contradicted_candidate_ids(out))
     issues, digest_report = digest_findings(merged, pr_finding_limit=pr_finding_limit)
 
     # The lead's removals, projected only now — after the merge and after the digest.
@@ -278,6 +337,10 @@ def finalize(
     # They land in `findings.jsonl` alone: the audit trail the judge reads, so a drop can
     # finally be scored instead of vanishing.
     removed_findings = _lead_removed_findings(lead_removed, pr_numbers)
+    # Lead-removed claims are in neither channel: they are an audit record, not something the
+    # system would say. `channels: []` states that positively rather than leaving it implied.
+    for item in removed_findings:
+        item.channels = []
     write_once(out / "findings.jsonl", jsonl_bytes([*merged, *removed_findings]))
     write_once(out / "conflicts.jsonl", jsonl_bytes(conflicts))
     write_once(out / "issues.jsonl", jsonl_bytes(issues))
@@ -295,6 +358,18 @@ def finalize(
         "dropped_unverified_by_concern": {
             family: sum(item.concern_family == family for item in unverified_specialist)
             for family in sorted({item.concern_family for item in unverified_specialist})
+        },
+        # Both channels, side by side. `review` is what the system would say; `verified` is
+        # what it proved. Reporting only the second is what made the publication ceiling read
+        # as a reviewer failure.
+        "channels": {
+            "review": sum(1 for item in merged if "review" in (item.channels or [])),
+            "verified": sum(1 for item in merged if "verified" in (item.channels or [])),
+            "contradicted": sum(1 for item in merged if item.contradiction),
+            "review_only": sum(
+                1 for item in merged
+                if "review" in (item.channels or []) and "verified" not in (item.channels or [])
+            ),
         },
         "candidate_rejections": len(rejections),
         "lead_synthesis": synthesis,
