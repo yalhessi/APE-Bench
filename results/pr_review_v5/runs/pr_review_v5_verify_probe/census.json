@@ -1,0 +1,80 @@
+{
+  "33362": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:00d1dbc354aa5e2dec375fab#api_reuse",
+        "correctness": "wu:00d1dbc354aa5e2dec375fab#correctness",
+        "docs": "wu:00d1dbc354aa5e2dec375fab#docs",
+        "duplication": "wu:00d1dbc354aa5e2dec375fab#duplication",
+        "generality": "wu:00d1dbc354aa5e2dec375fab#generality",
+        "naming": "wu:00d1dbc354aa5e2dec375fab#naming",
+        "proof_golf": "wu:00d1dbc354aa5e2dec375fab#proof_golf",
+        "proof_idiom": "wu:00d1dbc354aa5e2dec375fab#proof_idiom",
+        "style": "wu:00d1dbc354aa5e2dec375fab#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div",
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div'",
+        "Complex.norm_deriv_le_one_of_mapsTo_ball",
+        "Complex.norm_dslope_le_div_of_mapsTo_ball",
+        "Mathlib/Analysis/Complex/Schwarz.lean"
+      ],
+      "suggested_arms": [
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication"
+      ],
+      "why": [
+        "the PR describes itself as 'generaliz'",
+        "`Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div` is a chain of 7 low-level tactic steps",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` is a chain of 9 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` uses a `calc` block",
+        "introduces a new declaration",
+        "`Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div` is 20 lines",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` is 18 lines"
+      ],
+      "work_unit_id": "wu:00d1dbc354aa5e2dec375fab"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:e8e62bee6beba2e12c2838c6#api_reuse",
+        "correctness": "wu:e8e62bee6beba2e12c2838c6#correctness",
+        "docs": "wu:e8e62bee6beba2e12c2838c6#docs",
+        "duplication": "wu:e8e62bee6beba2e12c2838c6#duplication",
+        "generality": "wu:e8e62bee6beba2e12c2838c6#generality",
+        "naming": "wu:e8e62bee6beba2e12c2838c6#naming",
+        "proof_golf": "wu:e8e62bee6beba2e12c2838c6#proof_golf",
+        "proof_idiom": "wu:e8e62bee6beba2e12c2838c6#proof_idiom",
+        "style": "wu:e8e62bee6beba2e12c2838c6#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div",
+        "Complex.dist_le_dist_of_mapsTo_ball_self",
+        "Complex.dist_le_div_mul_dist_of_mapsTo_ball",
+        "Complex.norm_deriv_le_div_of_mapsTo_ball",
+        "Complex.norm_le_norm_of_mapsTo_ball_self",
+        "Complex.schwarz_aux",
+        "Mathlib/Analysis/Complex/Schwarz.lean"
+      ],
+      "suggested_arms": [
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "duplication"
+      ],
+      "why": [
+        "the PR describes itself as 'generaliz'",
+        "`Complex.schwarz_aux` is a chain of 14 low-level tactic steps",
+        "introduces a new declaration",
+        "`Complex.schwarz_aux` is 26 lines"
+      ],
+      "work_unit_id": "wu:e8e62bee6beba2e12c2838c6"
+    }
+  ]
+}

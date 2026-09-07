@@ -1,0 +1,126 @@
+{
+  "ambiguity_registry_sha256": "efaf8341b05d213e29298f5ae456860e5038692cbcb6bb0e74d0ad81719661a2",
+  "ambiguous_rate": 0.0,
+  "arm": "registered_task",
+  "by_pairing_tier": {
+    "anchor": {
+      "issue_matches": 4,
+      "pairs": 25
+    },
+    "file": {
+      "issue_matches": 0,
+      "pairs": 0
+    },
+    "relation": {
+      "issue_matches": 0,
+      "pairs": 0
+    }
+  },
+  "counts": {
+    "candidates": 49,
+    "null_pairs": 0,
+    "obligations": 9,
+    "observed_pairs": 25,
+    "paired_candidates": 23
+  },
+  "coverage": {
+    "complete": true,
+    "pairs_planned": 25,
+    "verdicts_returned": 25
+  },
+  "gold_alignment_rate": 0.08163265306122448,
+  "gold_alignment_within_paired": 0.17391304347826086,
+  "issue_recall": 0.3333333333333333,
+  "issue_recall_including_ambiguous": 0.3333333333333333,
+  "judge_identity": "0711a6c01265b3e2a48a698ede6588157d41ad6c6e9d8c07c0c9fe56450d8a2d",
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v3-v9-rubric",
+  "location_recall": 0.8888888888888888,
+  "manual_audit_required": true,
+  "null_pair_diagnostics": {
+    "candidate_negative_issue_match_rate": null,
+    "coverage": null,
+    "pairs": 0,
+    "requested": 0
+  },
+  "obligation_status_counts": {
+    "issue": {
+      "ambiguous": 0,
+      "hit": 3,
+      "miss": 6
+    },
+    "resolution": {
+      "ambiguous": 0,
+      "hit": 0,
+      "miss": 9
+    }
+  },
+  "pairing_tiers": [
+    "anchor"
+  ],
+  "per_obligation": [
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:695ae9fd914c2b49a805727bfcd727e2453fb8a89330151638a019f73d6b3cef",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:ce7b5d2e038d3f00f9b05b3263b85b55bf6e4fa9740dc0c8f8d07269c8ad0e9b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:64e1164fcb5870d06d72a33db4048b7093987aa6cc295801360256f59d9ed5ad",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:e83e6544d51cc95d5ea5a8112b56f10f4de3305544784a69f6b20813679a96d4",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:bd8a8d8cf88c380c2a29938017609533da9c6dd1da359b4da6391c71d01c03a4",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:8d887ce4bdd9c3c119a2c189f09224b7f434b73d7329d17b2185d412439e70f7",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:7fef913e96518575c701cc1c6f79f645adbe4be8fb921f99e09a63fdc033749f",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:e8e028215fa3d531850a058f48103837e08c33a9613be3e1c732ec6b1463cc18",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:57bcc9fd38464c7dbf7446b486324b3d7edbd101f1357b81f3f2001f479b11a4",
+      "resolution_status": "miss"
+    }
+  ],
+  "resolution_recall": 0.0,
+  "resolution_recall_including_ambiguous": 0.0,
+  "schema_version": "v4-semantic-report3",
+  "scored": true,
+  "silent_pr_emission": {
+    "candidates": 0,
+    "candidates_per_control_pr": null,
+    "control_pr_numbers": []
+  }
+}

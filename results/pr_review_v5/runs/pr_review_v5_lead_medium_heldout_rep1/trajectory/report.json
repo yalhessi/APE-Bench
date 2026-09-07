@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": ".ape/runs/pr_review_v5_lead_medium_heldout_rep1",
+  "bytes": 7625341,
+  "cost": {
+    "actual_total": 21.063297,
+    "by_disposition": {
+      "mandatory": 14.524732,
+      "proposed": 4.642976
+    },
+    "lead": 1.89559,
+    "manifest_total": 6.5385652499999996,
+    "manifest_understates_by": 14.524732
+  },
+  "invocations": 232,
+  "leads": 12,
+  "run_name": "pr_review_v5_lead_medium_heldout_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 2607,
+  "with_transcript": 244
+}

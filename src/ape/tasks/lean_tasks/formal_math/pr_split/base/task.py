@@ -21,7 +21,6 @@ class PRSplitConfig(BaseTaskConfig):
         "file_read",
         "code_hover",
         "code_goto",
-        "code_references",
     ]
 
 

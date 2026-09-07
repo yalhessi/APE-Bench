@@ -21,7 +21,6 @@ task_config:
     - get_lean_goal
     - code_hover
     - code_goto
-    - code_references
 
 dataset:
   release: inputs/pr_review_v4/releases/dev-medium-0.3.0

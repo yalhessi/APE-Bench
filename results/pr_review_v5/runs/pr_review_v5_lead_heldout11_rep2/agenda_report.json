@@ -1,0 +1,87 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    },
+    "correctness": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    },
+    "docs": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    },
+    "duplication": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    },
+    "generalist": {
+      "cost_hint": 4.749999999999991,
+      "eligible": 95,
+      "enumerated": 95,
+      "sites": 324
+    },
+    "generality": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    },
+    "naming": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    },
+    "proof_golf": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 46,
+      "enumerated": 51,
+      "sites": 161
+    },
+    "proof_idiom": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 46,
+      "enumerated": 51,
+      "sites": 161
+    },
+    "style": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 189
+    }
+  },
+  "mandatory_floor_cost": 4.75,
+  "pr_numbers": [
+    33117,
+    33145,
+    33285,
+    33294,
+    33304,
+    33305,
+    33315,
+    33321,
+    33337,
+    33362,
+    33421
+  ],
+  "projected_cost_fanout": 27.7,
+  "projected_cost_rules": 27.2,
+  "proposals_eligible": 544,
+  "proposals_enumerated": 554,
+  "renderer_version": "candidate-prompt/12+focused-prompt/1",
+  "routing_mode": "lead",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "work_units": 95
+}

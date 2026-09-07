@@ -1,0 +1,27 @@
+{
+  "agent_added": 0,
+  "candidates_total": 53,
+  "completion_status": "complete",
+  "context_calls_total": 218,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 1.347897,
+    "nested": 11.13452
+  },
+  "delegated": 130,
+  "failed": 0,
+  "issues_total": 53,
+  "mandatory": 95,
+  "paused": 0,
+  "proposals_total": 554,
+  "pruned": 424,
+  "routing_mode": "lead",
+  "run_id": "v5run:pr_review_v5_lead_heldout11_rep1",
+  "run_name": "pr_review_v5_lead_heldout11_rep1",
+  "run_plan_sha256": "cc806092e4a8c699f1e6d12a6e89558fa8f0f03b7dc0b07c3290f828e0a4b728",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "60500f1429e1942d870fc68787a11b0b862eaa7708083d88a515195874357fbb",
+  "succeeded": 130,
+  "total_cost": 12.4824175,
+  "wall_seconds": 611.796903
+}

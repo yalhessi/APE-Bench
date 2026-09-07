@@ -48,7 +48,6 @@ class LeanProofEngineeringConfig(BaseTaskConfig):
         "get_lean_goal",
         "code_hover",
         "code_goto",
-        "code_references",
     ]
 
     def apply_to_scaffold_config(self, scaffold_config: 'BaseScaffoldConfig') -> None:

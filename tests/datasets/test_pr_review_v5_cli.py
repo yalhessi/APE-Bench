@@ -206,13 +206,44 @@ def test_judging_without_of_says_what_to_do():
     assert "--of" in message and "cannot disagree" in message
 
 
-def test_no_config_enables_a_tool_that_cannot_register():
-    """`code_references` is in `SUPPORTED_TOOLS` with its registration commented out
-    (toolkits/code/base_provider.py), so enabling it granted nothing. Seven configs did --
-    "a capability granted to nothing, readable as coverage that is not there"."""
+def test_nothing_asks_for_a_tool_that_cannot_register():
+    """`code_references` has no registration -- the provider block is commented out, and it
+    was removed from `SUPPORTED_TOOLS` with a measurement behind it (0 attempts across a full
+    11-PR run). 24 configs and a dozen per-task tool lists went on naming it: "a capability
+    granted to nothing, readable as coverage that is not there".
 
-    for path in _v5_configs():
+    The provider itself is exempt: it carries the commented-out block and the measurement
+    that justifies keeping the record.
+    """
+
+    for path in sorted(Path("configs").glob("*.yaml")):
         assert "code_references" not in path.read_text(encoding="utf-8"), path
+
+    for path in sorted(Path("src").rglob("*.py")):
+        if "toolkits/code/" in str(path):
+            continue
+        text = path.read_text(encoding="utf-8")
+        for number, line in enumerate(text.splitlines(), start=1):
+            if "code_references" not in line:
+                continue
+            assert line.lstrip().startswith("#"), f"{path}:{number} asks for it: {line!r}"
+
+
+def test_no_prompt_offers_the_model_a_tool_it_does_not_have():
+    """The half that did real harm. The `api_reuse` arm's prompt named `code_references` in
+    the sentence telling it how to search before making a claim, and the shared capability
+    line advertised "navigate declarations (hover/goto/references)" to every task in every
+    generation."""
+
+    from ape.tasks.lean_tasks.formal_math.pr_review_v2 import base
+    from ape.tasks.lean_tasks.formal_math.pr_shared import focused_prompts
+
+    for module in (focused_prompts, base):
+        source = Path(module.__file__).read_text(encoding="utf-8")
+        assert "hover/goto/references" not in source, module.__name__
+        for line in source.splitlines():
+            if "`code_references`" in line:
+                assert line.lstrip().startswith("#"), f"{module.__name__}: {line!r}"
 
 
 def test_the_generation_base_carries_the_measurements_behind_its_caps():

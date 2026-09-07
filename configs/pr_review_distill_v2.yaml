@@ -22,7 +22,7 @@ execution:
 
 task_config:
   prompt_version: v1
-  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto]
 
 dataset:
   task_type: lean_pr_review_distill

@@ -23,7 +23,6 @@ GOLF_TOOLS = [
     "get_lean_goal",
     "code_hover",
     "code_goto",
-    "code_references",
 ]
 
 GOLF_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request that
@@ -92,7 +91,6 @@ IDIOM_TOOLS = [
     "get_lean_goal",
     "code_hover",
     "code_goto",
-    "code_references",
 ]
 
 IDIOM_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request that already
@@ -169,7 +167,6 @@ DUP_TOOLS = [
     "get_lean_goal",
     "code_hover",
     "code_goto",
-    "code_references",
 ]
 
 DUP_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request that already
@@ -241,7 +238,6 @@ GEN_TOOLS = [
     "get_lean_goal",
     "code_hover",
     "code_goto",
-    "code_references",
 ]
 
 GEN_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request that already
@@ -340,8 +336,7 @@ FOCUSED_PROMPTS = {
 # ---------------------------------------------------------------------------------------
 
 NAMING_TOOLS = [
-    "file_read", "content_search", "code_hover", "code_goto", "code_references",
-]
+    "file_read", "content_search", "code_hover", "code_goto", ]
 
 NAMING_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request that
 already compiles: is each declaration it adds or renames NAMED the way this repository names things?
@@ -436,8 +431,7 @@ STYLE_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n"""
 
 APIREUSE_TOOLS = [
     "file_read", "content_search", "lean_verify", "get_lean_goal",
-    "code_hover", "code_goto", "code_references",
-]
+    "code_hover", "code_goto", ]
 
 APIREUSE_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request that
 already compiles: does it re-derive something the library ALREADY PROVIDES, or reach for a
@@ -451,8 +445,8 @@ coercion or simp lemma spelled the long way round; three rewriting steps that an
 combinator performs in one.
 
 Search before you claim. `declaration_search` tells you whether a name exists at this commit;
-`content_search` finds how the surrounding code spells the same idea; `code_references` shows how an
-existing declaration is normally used. A claim that "Mathlib surely has this" without a name is not
+`content_search` finds how the surrounding code spells the same idea, and how an existing
+declaration is normally used. A claim that "Mathlib surely has this" without a name is not
 a finding.
 
 Every claim here is checkable, so check it: construct the replacement that uses the existing API and
@@ -464,8 +458,7 @@ APIREUSE_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n""
 
 CORRECTNESS_TOOLS = [
     "file_read", "content_search", "lean_verify", "get_lean_goal",
-    "code_hover", "code_goto", "code_references",
-]
+    "code_hover", "code_goto", ]
 
 CORRECTNESS_SYSTEM = """You are a Mathlib maintainer running ONE focused check on a pull request:
 is anything here actually BROKEN? That is your only job — ignore proof length, generality,

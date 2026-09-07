@@ -28,8 +28,7 @@ class LeanPRReviewV4FileConfig(LeanPRReviewV4CandidateConfig):
     finding_budget: int = 20
     enabled_tools: list = [
         "file_read", "content_search", "lean_verify", "get_lean_goal",
-        "code_hover", "code_goto", "code_references",
-    ]
+        "code_hover", "code_goto", ]
 
 
 class LeanPRReviewV4FileData(LeanPRReviewV4CandidateData):

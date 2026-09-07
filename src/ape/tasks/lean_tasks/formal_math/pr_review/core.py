@@ -420,7 +420,7 @@ class ReviewPRCoreTask(BaseLeanTask):
                 counts.get(tool_name, 0) > 0 for tool_name in ("file_read", "content_search", "file_search")
             ),
             "used_code_navigation": any(
-                counts.get(tool_name, 0) > 0 for tool_name in ("code_hover", "code_goto", "code_references")
+                counts.get(tool_name, 0) > 0 for tool_name in ("code_hover", "code_goto")
             ),
             "used_bash_execute": counts.get("bash_execute", 0) > 0,
             "used_skill_tools": any(

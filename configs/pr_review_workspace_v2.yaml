@@ -30,12 +30,12 @@ task_config:
   # ±tools harness ablation knob (rungs to compare on V2-stratum recall):
   #   read-only:        [file_read]
   #   +grep:            [file_read, content_search]
-  #   +verify:          [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+  #   +verify:          [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto]
   #   +semantic search: add lean_retrieve to the above (needs a built per-commit index)
   # content_search (grep) is the cheap "retrieval substitute" — test it before paying
   # for lean_retrieve, which needs a per-commit index built with
   # `python -m ape.toolkits.retrieve.lean.build` (without it the tool silently no-ops).
-  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto]
 
 # Which PRs to review (the SAME 30 as the diff_only baselines, pinned by number).
 dataset:

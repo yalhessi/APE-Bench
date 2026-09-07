@@ -1,0 +1,143 @@
+{
+  "after_merge": 19,
+  "alternatives_not_selected": 0,
+  "by_admission": {
+    "diagnostic": 12,
+    "published": 7
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 7,
+    "generalist": 12,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 12,
+    "repository_measurement": 0,
+    "verified_compile": 7
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 5,
+  "candidates_generalist": 7,
+  "candidates_specialist": 7,
+  "candidates_specialist_dropped_unverified": 0,
+  "conflicts": 0,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 19
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 7,
+      "generalist": 12,
+      "holistic": 0,
+      "merged": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 19,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 19,
+    "largest_issue_sites": 3,
+    "pr_finding_limit": 20,
+    "published_after_limit": 7,
+    "published_before_limit": 7,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "evidence": {
+    "by_status": {
+      "contradicted": 1,
+      "inconclusive": 11
+    },
+    "completed_collectors": {
+      "issue_kind_verifier": 1,
+      "lean_compile": 5,
+      "local_context": 12,
+      "policy": 9,
+      "repository_search": 12
+    },
+    "packets": 12,
+    "terminal_failures": {}
+  },
+  "execution_release": null,
+  "findings_sha256": "42d1f7458e8ab8e74211b06c0f12f4eda7acd28511c076659f389effe878ac34",
+  "generalist_evidence_gate": "evidence_chain",
+  "inputs": 19,
+  "issues_published": 7,
+  "issues_sha256": "29100be70f247efe4fe8dcb0753471b057d04635e61c92abf67f7ec224b6dd11",
+  "issues_total": 19,
+  "lead_removed_findings": 30,
+  "lead_synthesis": {
+    "assessments": 49,
+    "by_verdict": {
+      "drop": 22,
+      "duplicate_of": 8,
+      "keep": 19
+    },
+    "candidates_absorbed": 8,
+    "candidates_dropped": 22,
+    "candidates_in": 49,
+    "candidates_out": 19,
+    "duplicate_cycles_broken": 0,
+    "removed_by_candidate": {
+      "candidate:07090a15fa45fa503b882d4b": "dropped by the lead",
+      "candidate:09dca3ec814ce87c07027c30": "dropped by the lead",
+      "candidate:0f2704edd0315368ad73cac1": "dropped by the lead",
+      "candidate:17997c3520a47a006975537d": "dropped by the lead",
+      "candidate:18edce3e230d3ba5ddd5b277": "dropped by the lead",
+      "candidate:1b1a563b4cb5445b84d01ebc": "dropped by the lead",
+      "candidate:204b26076a9f7045e59d2026": "dropped by the lead",
+      "candidate:20e7b80f43b63fe36796d3f2": "folded into candidate:9331f76d083d2beed2ff6901",
+      "candidate:3f049269f2cb3aa9101685a0": "folded into candidate:50bdf4a1ff81c961f638b73f",
+      "candidate:4e331fec88edfd487216ab0e": "folded into candidate:05f8ae67ff56f77fea8d459a",
+      "candidate:4e75fd1e69ac19e48752fe4d": "folded into candidate:d54fff05f26151722801d2d1",
+      "candidate:594c4708c23e7526b208bb0d": "dropped by the lead",
+      "candidate:5ac463995481e8a30c376d06": "dropped by the lead",
+      "candidate:5c46ac5b72f4052f2999b467": "dropped by the lead",
+      "candidate:5d8ab34b9f57bf1e88615651": "folded into candidate:b8eb0883956d3971909c2d0e",
+      "candidate:5e1e804d8fa5d84c02823b28": "folded into candidate:2dfaf9cea396e91d23c0314f",
+      "candidate:63d42c9303d6bde7c0b1380e": "dropped by the lead",
+      "candidate:6662f819951810a7d443ec97": "dropped by the lead",
+      "candidate:6a02063c6e436cc74d3e0cda": "dropped by the lead",
+      "candidate:79bf4a0df38bd49d9fcedd54": "dropped by the lead",
+      "candidate:7acad5ba37472b5e768b664c": "dropped by the lead",
+      "candidate:802da29bab8dc85d3d6c8359": "dropped by the lead",
+      "candidate:8658228e7668f0058933d766": "dropped by the lead",
+      "candidate:8a2d7427511bf1dc72611d28": "dropped by the lead",
+      "candidate:8a34018577a8501c570f0a69": "folded into candidate:0fb76f8be8c50ca729e25146",
+      "candidate:8e70cf13b10a7802915f8a0d": "dropped by the lead",
+      "candidate:9fef74da76cbfee60ff03257": "dropped by the lead",
+      "candidate:b4fc29bf768d1a9e09af5698": "dropped by the lead",
+      "candidate:bcfb65970224e11ae0f77c53": "dropped by the lead",
+      "candidate:cffce1279a819da60becaf5c": "folded into candidate:f157c7d891bc66dc65c74a63"
+    },
+    "severity_overrides_recorded_not_applied": 3,
+    "unmatched": []
+  },
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 7,
+  "published_before_limit": 7,
+  "published_by_concern": {
+    "proof-golf": 7
+  },
+  "published_prs": [
+    33117,
+    33145
+  ],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33117,
+    33145,
+    33337,
+    33362
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 46
+}

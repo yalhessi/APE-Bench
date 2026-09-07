@@ -1,0 +1,23 @@
+{
+  "ape_present": true,
+  "ape_root": ".ape/runs/pr_review_v5_smoke4_e2e_rep1",
+  "bytes": 2263345,
+  "cost": {
+    "actual_total": 7.770313,
+    "by_disposition": {
+      "agent_added": 0.157089,
+      "mandatory": 4.179221,
+      "proposed": 2.735931
+    },
+    "lead": 0.698073,
+    "manifest_total": 7.77031325,
+    "manifest_understates_by": 0.0
+  },
+  "invocations": 56,
+  "leads": 4,
+  "run_name": "pr_review_v5_smoke4_e2e_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 904,
+  "with_transcript": 60
+}

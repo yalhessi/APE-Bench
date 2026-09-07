@@ -1,0 +1,23 @@
+{
+  "ape_present": true,
+  "ape_root": ".ape/runs/pr_review_v5_specialist4_rep1",
+  "bytes": 1931563,
+  "cost": {
+    "actual_total": 6.984469,
+    "by_disposition": {
+      "agent_added": 1.569409,
+      "mandatory": 2.86966,
+      "proposed": 2.022204
+    },
+    "lead": 0.523196,
+    "manifest_total": 6.9844687500000004,
+    "manifest_understates_by": -0.0
+  },
+  "invocations": 50,
+  "leads": 4,
+  "run_name": "pr_review_v5_specialist4_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 806,
+  "with_transcript": 54
+}

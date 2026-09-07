@@ -32,4 +32,4 @@ scaffold_type: ape_agent
 max_turns: 40
 # cost_limit: 1.50            # per-PR USD ceiling (sample_max_cost)
 # enabled_tools: [file_read, lean_retrieve]            # no-compile worktree rung
-# enabled_tools: [file_read, lean_retrieve, lean_verify, get_lean_goal, code_hover, code_goto, code_references]  # full rung (task default)
+# enabled_tools: [file_read, lean_retrieve, lean_verify, get_lean_goal, code_hover, code_goto]  # full rung (task default)

@@ -1,0 +1,119 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 44
+    },
+    "correctness": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 44
+    },
+    "docs": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 45
+    },
+    "duplication": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 44
+    },
+    "family_design": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 44
+    },
+    "generalist": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 75
+    },
+    "generality": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 44
+    },
+    "naming": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 44
+    },
+    "proof_golf": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 39
+    },
+    "proof_idiom": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 39
+    },
+    "style": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 68
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "recommended": 103,
+      "required": 40
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 0,
+      "docs": 1,
+      "duplication": 0,
+      "family_design": 10,
+      "generalist": 13,
+      "generality": 2,
+      "naming": 9,
+      "proof_golf": 0,
+      "proof_idiom": 0,
+      "style": 5
+    },
+    "required_by_pr": {
+      "33117": 15,
+      "33145": 7,
+      "33337": 8,
+      "33362": 10
+    },
+    "required_reasons": {
+      "namespace placement and module docs are properties of the file (file)": 5,
+      "the PR states this is what it is doing (pr_intent)": 2,
+      "the per-unit broad pass, which no specialist replaces": 13,
+      "these declarations are one API family (family)": 19,
+      "this PR changes module documentation (site)": 1
+    }
+  },
+  "mandatory_floor_cost": 2.0,
+  "pr_numbers": [
+    33117,
+    33145,
+    33337,
+    33362
+  ],
+  "projected_cost_fanout": 7.15,
+  "projected_cost_rules": 7.15,
+  "proposals_eligible": 143,
+  "proposals_enumerated": 143,
+  "renderer_version": "candidate-prompt/12+focused-prompt/1",
+  "routing_mode": "lead",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "work_units": 13
+}

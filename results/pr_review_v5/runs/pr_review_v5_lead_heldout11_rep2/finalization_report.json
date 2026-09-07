@@ -1,0 +1,186 @@
+{
+  "after_merge": 50,
+  "alternatives_not_selected": 0,
+  "by_admission": {
+    "diagnostic": 33,
+    "published": 17
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 5,
+    "generalist": 45,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 45,
+    "repository_measurement": 0,
+    "verified_compile": 5
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 7,
+  "candidates_generalist": 38,
+  "candidates_specialist": 5,
+  "candidates_specialist_dropped_unverified": 0,
+  "conflicts": 2,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 50
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 5,
+      "generalist": 45,
+      "holistic": 0,
+      "merged": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 50,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 50,
+    "largest_issue_sites": 3,
+    "pr_finding_limit": 20,
+    "published_after_limit": 17,
+    "published_before_limit": 17,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "execution_release": null,
+  "findings_sha256": "607f89be8d3d71ecb73f749cc051d906160745be53900af9fa0ee9bc5c6e815b",
+  "generalist_evidence_gate": "evidence_chain",
+  "inputs": 50,
+  "issues_published": 17,
+  "issues_sha256": "79ef39f8e2119bf4358ad373ccbd21cb423bd5ee48e2e863c9c478eaf7e436ff",
+  "issues_total": 50,
+  "lead_synthesis": {
+    "assessments": 97,
+    "by_verdict": {
+      "drop": 22,
+      "duplicate_of": 29,
+      "keep": 46
+    },
+    "candidates_absorbed": 26,
+    "candidates_dropped": 21,
+    "candidates_in": 97,
+    "candidates_out": 50,
+    "duplicate_cycles_broken": 0,
+    "removed_by_candidate": {
+      "candidate:00f20d3a52bf9f5d83151a81": "folded into candidate:a217d97fb82fe64c48aa7349",
+      "candidate:07104503060dabb6fc945ff2": "dropped by the lead",
+      "candidate:08ab5d9af7714c35e51dc16d": "folded into candidate:1f8c2f1b019171a75d80d66c",
+      "candidate:0fd797a3af5386603fd066b9": "folded into candidate:c1cee279d3ae9b164cce6857",
+      "candidate:11bf0b5e5de64d70d2af4f6f": "folded into candidate:500d8313f34a7665000a2df6",
+      "candidate:16df713befc3d61a438b6ced": "folded into candidate:c5bd56d71d3c34ba9eb66ee3",
+      "candidate:1799724ad2375607dcaa43e6": "folded into candidate:b9a055acd6b538625cdf8aa7",
+      "candidate:1f6f2adf273e7272cc439081": "dropped by the lead",
+      "candidate:20bc96ca285ae4497dcfbeb7": "folded into candidate:23e8ff7d5a890013f1d79fb6",
+      "candidate:29a0533ce5ec4724a85f8656": "dropped by the lead",
+      "candidate:396f3980719d52d0d3e784b3": "dropped by the lead",
+      "candidate:3e49f1f437cc37e2c2a4163d": "folded into candidate:0e7c89d8c031d2d108714818",
+      "candidate:3fcc41e3f81f238746aa4c2e": "dropped by the lead",
+      "candidate:4144f0da31df2d92a303b6af": "dropped by the lead",
+      "candidate:4c269141f6562a7f6e9e1081": "folded into candidate:0eef8ce5be749317f0c32b27",
+      "candidate:4e16cbb5b19b242169c31f23": "dropped by the lead",
+      "candidate:56888346e300ca8d0f8334b4": "folded into candidate:ffeb8d6f1700fcf45c80aa6b",
+      "candidate:61be00b2584da2019de5d7d9": "folded into candidate:05a2bdd7511c1d274eac6808",
+      "candidate:66fbf462527f35b78e78fb1b": "dropped by the lead",
+      "candidate:672e834ff2b7676ceeab0334": "dropped by the lead",
+      "candidate:6b27a4050bb00d88ac3dbcaf": "folded into candidate:158d1a1ab7fcb88d34992ea6",
+      "candidate:73075b2055567a9fcfc4f8df": "dropped by the lead",
+      "candidate:80628ad98be2dad6479e06e8": "folded into candidate:23e8ff7d5a890013f1d79fb6",
+      "candidate:85a79c68ff5ee0616cb1a14c": "folded into candidate:23e8ff7d5a890013f1d79fb6",
+      "candidate:8b504dae3157205874b3b7ed": "dropped by the lead",
+      "candidate:905a0f5006456d0c3dc944b2": "folded into candidate:6096a9ac4b485270f24559f8",
+      "candidate:930a78c9822fab98b718c130": "folded into candidate:0e7c89d8c031d2d108714818",
+      "candidate:9d68ee1f686fd94b2b6f42d7": "dropped by the lead",
+      "candidate:9f6eae7afb20e5e7b4f23901": "folded into candidate:993167e2e18df4e3bca69d7a",
+      "candidate:a157e064592da327b28fabc7": "folded into candidate:993167e2e18df4e3bca69d7a",
+      "candidate:a20a5d28f81bba7c0b68357b": "dropped by the lead",
+      "candidate:b0557bc8f8c1545af55970a0": "dropped by the lead",
+      "candidate:b5b0a7dccabb3f0fab8dbe6a": "folded into candidate:0e7c89d8c031d2d108714818",
+      "candidate:b967dc07852ba5f84edf8038": "dropped by the lead",
+      "candidate:bb288a6860aa5a45a4ea3738": "folded into candidate:ffeb8d6f1700fcf45c80aa6b",
+      "candidate:c620e86675a717abbb7535ef": "folded into candidate:4a7e2b3e592177c99c725d0d",
+      "candidate:c9918ca92898c1360003147d": "dropped by the lead",
+      "candidate:cacd6a1d40df6fae6aa977f4": "dropped by the lead",
+      "candidate:ccbf90157abc6e111db1bafe": "dropped by the lead",
+      "candidate:d0949288053fbf4b92f0e95b": "folded into candidate:0e7c89d8c031d2d108714818",
+      "candidate:d83abbb0c46b915f99805a14": "folded into candidate:0034d0108c42670019a5aca5",
+      "candidate:d9742ad621669ff8c1b1ab09": "dropped by the lead",
+      "candidate:e0e174b7d93c93298228c044": "dropped by the lead",
+      "candidate:e17a888b963a0e7fa579d2b5": "folded into candidate:0e7c89d8c031d2d108714818",
+      "candidate:e249700ec5f158fea0b679f0": "folded into candidate:b9a055acd6b538625cdf8aa7",
+      "candidate:ec47c50d6e35ba4b82eb3159": "dropped by the lead",
+      "candidate:ef147085f20139183ec6922a": "folded into candidate:a217d97fb82fe64c48aa7349"
+    },
+    "severity_overrides_recorded_not_applied": 3,
+    "unmatched": [
+      {
+        "address": "wu:229fde64ad47ec6a4d10e573#generalist#0",
+        "duplicate_of": "wu:41f7ea76a22549e6890c8bb6#generalist#2",
+        "reason": "duplicate_of names no other candidate (expected <invocation_id>#<ordinal>)",
+        "verdict": "duplicate_of"
+      },
+      {
+        "address": "wu:229fde64ad47ec6a4d10e573#generalist#3",
+        "duplicate_of": "wu:41f7ea76a22549e6890c8bb6#generalist#2",
+        "reason": "duplicate_of names no other candidate (expected <invocation_id>#<ordinal>)",
+        "verdict": "duplicate_of"
+      },
+      {
+        "address": "wu:229fde64ad47ec6a4d10e573#generalist#4",
+        "duplicate_of": "wu:41f7ea76a22549e6890c8bb6#generalist#2",
+        "reason": "duplicate_of names no other candidate (expected <invocation_id>#<ordinal>)",
+        "verdict": "duplicate_of"
+      },
+      {
+        "address": "wu:8a543170d6676a89aab2e66f#generalist#0",
+        "reason": "names no candidate this run produced",
+        "verdict": "drop"
+      },
+      {
+        "address": "wu:8a543170d6676a89aab2e66f#generalist#1",
+        "reason": "names no candidate this run produced",
+        "verdict": "keep"
+      }
+    ]
+  },
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 17,
+  "published_before_limit": 17,
+  "published_by_concern": {
+    "correctness": 11,
+    "duplication": 4,
+    "generalization": 1,
+    "proof-golf": 1
+  },
+  "published_prs": [
+    33285,
+    33294,
+    33321,
+    33337,
+    33421
+  ],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33117,
+    33145,
+    33285,
+    33294,
+    33304,
+    33305,
+    33315,
+    33321,
+    33337,
+    33362,
+    33421
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 24
+}

@@ -37,7 +37,6 @@ class LeanPRReviewV4FocusedConfig(LeanPRReviewV4CandidateConfig):
         "get_lean_goal",
         "code_hover",
         "code_goto",
-        "code_references",
     ]
 
 

@@ -23,7 +23,7 @@ execution:
 task_config:
   finding_budget: 10
   prompt_version: acceptability_v2   # same framing as the baseline; guidelines are added on top
-  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto]
 
 dataset:
   task_type: lean_pr_review_guidelines

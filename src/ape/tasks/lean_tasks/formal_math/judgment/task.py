@@ -42,7 +42,6 @@ class LeanJudgmentConfig(BaseTaskConfig):
         "get_lean_goal",
         "code_hover",
         "code_goto",
-        "code_references",
     ]
 
 

@@ -45,7 +45,6 @@ DEFAULT_REVIEW_TOOLS = [
     "get_lean_goal",
     "code_hover",
     "code_goto",
-    "code_references",
 ]
 
 
@@ -189,8 +188,10 @@ class BasePRReviewTask(BaseLeanTask):
             parts.append("compile/verify Lean code (lean_verify)")
         if has("get_lean_goal"):
             parts.append("inspect goals")
-        if any(has(t) for t in ("code_hover", "code_goto", "code_references")):
-            parts.append("navigate declarations (hover/goto/references)")
+        if any(has(t) for t in ("code_hover", "code_goto")):
+            # Not "references": `code_references` has no registration, so naming it here told
+            # every task in every generation it had a capability it does not have.
+            parts.append("navigate declarations (hover/goto)")
         return ", ".join(parts) if parts else "none (diff only)"
 
     async def create_user_prompt(self) -> str:
