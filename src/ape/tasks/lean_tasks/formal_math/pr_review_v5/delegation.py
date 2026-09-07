@@ -178,7 +178,7 @@ def _wave_config(parent_task, wave: int):
     from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, nested_config
 
     return nested_config(
-        parent_task, group=f"wave{wave}",
+        parent_task.attempt_path, parent_task.config, group=f"wave{wave}",
         concurrency=DEFAULT_NESTED_CONCURRENCY,
         # One attempt per job. Best-of-n across arms is a different experiment, and running it
         # by accident would make a routing comparison a sampling comparison.

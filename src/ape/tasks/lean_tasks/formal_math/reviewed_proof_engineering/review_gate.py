@@ -319,9 +319,22 @@ async def lean_review_gate(
         )
 
         if parent_attempt_path:
-            subtasks_dir = parent_attempt_path / "subtasks"
-            subtasks_dir.mkdir(parents=True, exist_ok=True)
-            reviewer_config.runs_base_dir = subtasks_dir
+            # One convention for nested work, shared with every other task family: the
+            # subtask directory under the parent's attempt, which is what keeps each child's
+            # workspace its own. Three call sites had three conventions, and the divergent one
+            # cost a class of accounting failures.
+            #
+            # The config stays this caller's. It deliberately runs a different model at its own
+            # sample count, and `num_processes` is passed through unchanged rather than forced
+            # to 0 -- that default is v5's, where the lead is known to be inside a worker, and
+            # silently changing this caller's concurrency is not part of sharing a directory
+            # convention.
+            from ape.orchestration.subtasks import nested_config
+
+            reviewer_config = nested_config(
+                parent_attempt_path, reviewer_config, group="subtasks",
+                num_processes=reviewer_config.execution.num_processes,
+            )
 
         reviewer_task = LeanReviewGateTask(review_data, reviewer_config)
 

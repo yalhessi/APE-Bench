@@ -38,16 +38,19 @@ from .models import TaskExecutionSpec, TaskOutcome
 DEFAULT_NESTED_CONCURRENCY = 4
 
 
-def nested_config(parent_task, *, group: str, base=None,
+def nested_config(attempt_path, config, *, group: str,
                   concurrency: Optional[int] = None, **overrides):
     """A scaffold config for one group of children.
 
-    Imposes only what *nesting itself* requires, and leaves everything else to the caller:
+    Sets two things and leaves everything else to the caller:
 
-    * `num_processes = 0`, because the parent is already inside a worker and a process pool
-      inside a pool is not a configuration choice, it is a bug;
-    * `runs_base_dir` under the parent's attempt, which is what keeps every child's workspace
-      its own.
+    * `runs_base_dir` under the parent's attempt. This is the one genuine invariant -- it is
+      what keeps every child's workspace its own, and `_ensure_patched_target_workspace`
+      unlinks and rebuilds whatever path it is handed, so two children sharing one would race.
+    * `num_processes = 0` **by default**, because a parent that is itself inside a worker
+      cannot safely spawn a process pool. It is a default rather than a rule: `judgment` and
+      `review_gate` set their own and pass it through, and forcing them to 0 would be a silent
+      concurrency change dressed up as sharing a directory convention.
 
     Everything else -- the model, the sample count, the turn limit, early-stop behaviour --
     belongs to the caller. `judgment` deliberately runs a *different* model at
@@ -55,18 +58,19 @@ def nested_config(parent_task, *, group: str, base=None,
     config on its children could not serve it, and a primitive only one family can use is not
     a primitive.
 
-    `base` defaults to the parent's own config, which is what a child inheriting its parent's
-    model wants.
+    Takes the attempt path and a config rather than a parent task, because the two callers
+    that are not `BaseTask` subclasses -- `judgment` and `review_gate` -- have a path and a
+    config they built themselves and no task object to offer.
     """
 
-    config = (base if base is not None else parent_task.config).model_copy(deep=True)
+    config = config.model_copy(deep=True)
     config.execution.num_processes = 0
     if concurrency is not None:
         config.execution.max_concurrency = max(1, int(concurrency))
     for key, value in overrides.items():
         setattr(config.execution, key, value)
 
-    subtasks = Path(parent_task.attempt_path) / "subtasks" / group
+    subtasks = Path(attempt_path) / "subtasks" / group
     subtasks.mkdir(parents=True, exist_ok=True)
     config.runs_base_dir = subtasks
     return config
@@ -96,8 +100,9 @@ async def run_subtasks(
     if not specs:
         return {}, None
 
-    config = nested_config(parent_task, group=group, base=base,
-                           concurrency=concurrency, **(execution_overrides or {}))
+    config = nested_config(
+        parent_task.attempt_path, base if base is not None else parent_task.config,
+        group=group, concurrency=concurrency, **(execution_overrides or {}))
     tasks, spec_by_task_id = [], {}
     for spec in specs:
         payload = spec.with_limits()

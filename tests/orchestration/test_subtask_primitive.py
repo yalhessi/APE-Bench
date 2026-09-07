@@ -25,10 +25,10 @@ from ape.orchestration.models import (
 from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, nested_config
 
 
-def _parent(tmp_path):
+def _config():
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    return SimpleNamespace(config=ApeAgentConfig(), attempt_path=tmp_path)
+    return ApeAgentConfig()
 
 
 # --- per-task limits ---------------------------------------------------------------------
@@ -89,11 +89,11 @@ def test_nesting_imposes_in_process_execution(tmp_path):
     """The parent is already inside a worker; a process pool inside a pool is not a
     configuration choice."""
 
-    assert nested_config(_parent(tmp_path), group="g").execution.num_processes == 0
+    assert nested_config(tmp_path, _config(), group="g").execution.num_processes == 0
 
 
 def test_nesting_puts_children_under_the_parent_attempt(tmp_path):
-    config = nested_config(_parent(tmp_path), group="wave1")
+    config = nested_config(tmp_path, _config(), group="wave1")
     assert config.runs_base_dir == tmp_path / "subtasks" / "wave1"
     assert config.runs_base_dir.is_dir()
 
@@ -102,7 +102,7 @@ def test_nesting_does_not_impose_the_parents_sample_count(tmp_path):
     """`judgment` runs `sample_count=num_judges` for a majority vote. A primitive that forced
     the parent's value on its children could not serve it."""
 
-    config = nested_config(_parent(tmp_path), group="g", sample_count=3)
+    config = nested_config(tmp_path, _config(), group="g", sample_count=3)
     assert config.execution.sample_count == 3
 
 
@@ -113,7 +113,7 @@ def test_a_caller_may_supply_a_different_base_config(tmp_path):
 
     other = ApeAgentConfig()
     other.execution.max_turns = 7
-    config = nested_config(_parent(tmp_path), group="g", base=other)
+    config = nested_config(tmp_path, other, group="g")
     assert config.execution.max_turns == 7
     assert config.execution.num_processes == 0     # still imposed
 
@@ -122,7 +122,7 @@ def test_concurrency_is_bounded(tmp_path):
     """Nothing bounded it while tiers were gathered concurrently: four leads, four arms each,
     three tiers was up to 48 simultaneous Lean compiles from one process."""
 
-    config = nested_config(_parent(tmp_path), group="g", concurrency=2)
+    config = nested_config(tmp_path, _config(), group="g", concurrency=2)
     assert config.execution.max_concurrency == 2
     assert DEFAULT_NESTED_CONCURRENCY >= 1
 
@@ -132,7 +132,7 @@ def test_an_enum_field_set_by_a_caller_keeps_its_type(tmp_path):
     while `orchestrator.py`'s `.early_stop_mode.value` raises on it -- which is how every
     delegate call failed on the second smoke run."""
 
-    config = nested_config(_parent(tmp_path), group="g",
+    config = nested_config(tmp_path, _config(), group="g",
                            early_stop_mode=EarlyStopMode.DISABLED)
     assert isinstance(config.execution.early_stop_mode, EarlyStopMode)
     assert config.execution.early_stop_mode.value == "disabled"
@@ -142,3 +142,39 @@ def test_base_task_exposes_the_primitive():
     from ape.tasks.base import BaseTask
 
     assert callable(getattr(BaseTask, "spawn_subtasks", None))
+
+
+# --- all three call sites share one convention --------------------------------------------
+
+
+def test_every_nested_call_site_uses_the_shared_convention():
+    """The acceptance test for this being a primitive rather than a fourth convention.
+
+    `TaskOrchestrator(` was constructed directly in four files. Three of them nest work, and
+    they had three different ideas of where children go. They now share one.
+    """
+
+    from pathlib import Path
+
+    sources = {
+        "delegation": "src/ape/tasks/lean_tasks/formal_math/pr_review_v5/delegation.py",
+        "judgment": "src/ape/tasks/lean_tasks/formal_math/judgment/task.py",
+        "review_gate": (
+            "src/ape/tasks/lean_tasks/formal_math/reviewed_proof_engineering/review_gate.py"),
+    }
+    for name, path in sources.items():
+        text = Path(path).read_text(encoding="utf-8")
+        assert "nested_config" in text, f"{name} does not use the shared convention"
+        # And none of them still hand-rolls the directory.
+        assert 'parent_attempt_path / "subtasks"' not in text, name
+
+
+def test_the_directory_is_the_one_genuine_invariant(tmp_path):
+    """A caller may override the model, the sample count, the turn limit, even
+    `num_processes`. It may not put its children somewhere else: two children sharing a
+    workspace race in `_ensure_patched_target_workspace`, which unlinks and rebuilds whatever
+    path it is handed."""
+
+    config = nested_config(tmp_path, _config(), group="g", num_processes=4)
+    assert config.execution.num_processes == 4          # caller's choice honoured
+    assert config.runs_base_dir == tmp_path / "subtasks" / "g"   # not negotiable
