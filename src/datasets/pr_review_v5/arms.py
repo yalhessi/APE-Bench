@@ -34,7 +34,8 @@ from src.datasets.pr_review_v4.focused_specs import (
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha256_bytes
 
 from .arm_registry import (
-    UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
+    ARM_DEFINITIONS, UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
+    MODULE_DOC_KINDS as _MODULE_DOC_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
 )
 from .schema import CONTEXT_TOOLS, ReviewArm
 
@@ -76,123 +77,59 @@ _BOTH_LIFECYCLES = frozenset({"added", "modified"})
 V5_SPEC_VERSION = "focused/1-v5"
 
 
-def _relaxed(spec: FocusedAgentSpec) -> FocusedAgentSpec:
-    """A v4 spec with its lifecycle filter widened, and a version that says so.
-
-    `source_sha256` derives from `identity()`, so the new version and lifecycles change the
-    spec's identity automatically — a v5 run can never be confused with a v4 one that shared
-    a spec_id.
-    """
-
-    return replace(spec, lifecycles=_BOTH_LIFECYCLES, spec_version=V5_SPEC_VERSION)
+#: Declared in `arm_registry` with the arms that use them; re-exported because callers here
+#: and in the tests import them from this module.
+MODULE_DOC_KINDS = _MODULE_DOC_KINDS
+PLACEMENT_KINDS = _PLACEMENT_KINDS
 
 
-#: Changed things that are not declarations. The modification inventory for the medium
-#: release holds 49 `module_doc`, 46 `namespace_or_section`, 91 `command` and 17 `import`
-#: records — and until now *no arm accepted any of them*, because every spec took
-#: `DECLARATION_KINDS`. Two gold obligations are unreachable purely because of that: PR
-#: 33305 asks to wrap an over-long line in a module doc, and PR 33362 asks to move
-#: declarations inside `namespace Complex`. Both are ordinary review comments about things
-#: no arm was allowed to look at.
-MODULE_DOC_KINDS = frozenset({"module_doc"})
-PLACEMENT_KINDS = frozenset({"namespace_or_section", "command", "import"})
+def _new_spec(definition) -> FocusedAgentSpec:
+    """One registry entry as a `FocusedAgentSpec`. Nothing is decided here."""
 
-
-def _new_spec(spec_id: str, concern_family: str, issue_kind: str, rationale: str,
-              *, component: Optional[str] = None,
-              extra_subject_kinds: frozenset = frozenset(),
-              lifecycles: frozenset = _BOTH_LIFECYCLES) -> FocusedAgentSpec:
     hashes = _prompt_hashes()
     return FocusedAgentSpec(
-        spec_id=spec_id,
+        spec_id=definition.arm_id,
         spec_version=V5_SPEC_VERSION,
         task_type=ARM_TASK_TYPE,
-        concern_family=concern_family,
-        issue_kind=issue_kind,
-        lifecycles=lifecycles,
-        component=component,
-        subject_kinds=DECLARATION_KINDS | extra_subject_kinds,
-        prompt_sha256=hashes[spec_id][0],
-        tools_sha256=hashes[spec_id][1],
-        rationale=rationale,
+        concern_family=definition.concern_family,
+        issue_kind=definition.issue_kind,
+        lifecycles=_BOTH_LIFECYCLES,
+        component=definition.component,
+        subject_kinds=DECLARATION_KINDS | definition.extra_subject_kinds,
+        prompt_sha256=hashes[definition.arm_id][0],
+        tools_sha256=hashes[definition.arm_id][1],
+        rationale=definition.rationale,
     )
 
 
 def v5_specs() -> List[FocusedAgentSpec]:
-    """The specialist set v5 schedules: v4's four, widened, plus the four classes it lacks.
+    """The specialist set v5 schedules, built from `arm_registry`.
 
-    The additions are not speculative. On the medium smoke set the gold that no v4 arm could
-    own was: three `encard_` prefix renames, a docstring typo, a section-formatting request,
-    and a build break — naming, docs/style, and correctness respectively. `api_reuse` covers
-    the smaller sibling of duplication that kept surfacing as "use the existing lemma here"
-    inside an otherwise fine declaration.
+    This function used to re-declare all ten arms -- id, concern family, issue kind, subject
+    kinds and a rationale -- next to a registry that already declared all ten. Adding an arm
+    meant editing both, and the two rationales drifted apart in every one of the ten. Now the
+    registry is the declaration and this is its projection into v4's `FocusedAgentSpec`.
+
+    The additions to v4's four are not speculative. On the medium smoke set the gold that no
+    v4 arm could own was: three `encard_` prefix renames, a docstring typo, a
+    section-formatting request, and a build break — naming, docs/style, and correctness
+    respectively. `api_reuse` covers the smaller sibling of duplication that kept surfacing as
+    "use the existing lemma here" inside an otherwise fine declaration.
     """
 
-    widened = [_relaxed(spec) for spec in default_specs()]
-    return widened + [
-        _new_spec(
-            "naming", "naming", "naming_convention_violation",
-            "Is this declaration named the way its own family is named? Settled by reading "
-            "the siblings and past rename requests, not by taste.",
-        ),
-        # Split from a single docs+style arm because the rendered submission contract
-        # names ONE concern_family, so a style finding from a documentation-declared arm
-        # would be filed as documentation — and the judge gates on concern kind, so the
-        # mislabelling would lose the match it was trying to make.
-        _new_spec(
-            "docs", "documentation", "documentation_gap",
-            # Rewritten against what maintainers actually asked for. Measured on heldout11:
-            # every one of 16 documentation candidates was a *contradiction* claim — "the
-            # docstring says X, the code says Y" — while the three documentation obligations
-            # in gold asked to finish an unfinished sentence, correct a typo, and add an
-            # "Implementation details" discussion explaining a non-obvious proof approach.
-            # Accuracy is one of three things a docstring can fail at, and it was the only
-            # one being checked. Three of the 16 landed on control PRs, where maintainers
-            # asked for nothing at all.
-            "Is the documentation COMPLETE, CORRECT and CONFORMANT — in that order?\n"
-            "  * complete: a sentence that stops mid-thought, a hypothesis or a `TODO` left "
-            "unexplained, a module whose non-obvious approach has no `Implementation "
-            "details` note. This is the most requested and the least often noticed.\n"
-            "  * correct: a typo, or a statement the code contradicts.\n"
-            "  * conformant: over-long lines and malformed markup, which the repository's "
-            "own linter can settle.\n"
-            "A docstring that is merely terse is not a finding. Neither is a cross-reference "
-            "you have not opened and confirmed is wrong.",
-            extra_subject_kinds=MODULE_DOC_KINDS,
-        ),
-        _new_spec(
-            "style", "style", "style_norm_violation",
-            "Is this formatted and placed the way the surrounding file does it? Only a "
-            "deviation from a convention the file is otherwise consistent about — including "
-            "where a declaration sits: a lemma that belongs inside a `namespace` block and "
-            "was left outside it is a placement defect, not a matter of taste.",
-            extra_subject_kinds=MODULE_DOC_KINDS | PLACEMENT_KINDS,
-        ),
-        _new_spec(
-            "api_reuse", "duplication", "missed_canonical_api",
-            "Does the code re-derive something the library already provides, or spell an "
-            "existing API the long way? Smaller and commoner than whole-declaration "
-            "duplication, and checkable by compiling the replacement.",
-        ),
-        _new_spec(
-            # The arm that owns a group. Five of the nineteen audited obligations cannot be
-            # resolved by a reviewer confined to one declaration with one edit — rename a
-            # pair, add a lemma and prove it from its dual, attribute a family and delete the
-            # siblings it generates — and no existing arm's concern covers "these are wrong
-            # together". It is the only arm besides `migration_consistency` allowed to submit
-            # a coordinated patch, because it is the only one whose scope is a set.
-            "family_design", "generalization", "generalization_available",
-            "Are these declarations right AS A GROUP — a dual proved from scratch instead of "
-            "from its counterpart, a missing counterpart, a generated form written by hand, "
-            "a repeated argument that should be one lemma?",
-        ),
-        _new_spec(
-            "correctness", "correctness", "correctness_policy",
-            "Is anything actually broken — the build, a statement that does not say what it "
-            "claims, a looping simp lemma, an unaccepted axiom? Starts by compiling the "
-            "reviewed file, which no other arm does.",
-        ),
-    ]
+    inherited = {spec.spec_id: spec for spec in default_specs()}
+    specs = []
+    for definition in ARM_DEFINITIONS:
+        if definition.inherited_from_v4:
+            # v4's spec, widened. Its prompt and eligibility rule come from `default_specs()`;
+            # the registry supplies the rationale so it is stated in one place like the rest.
+            base = inherited[definition.arm_id]
+            specs.append(replace(
+                base, lifecycles=_BOTH_LIFECYCLES, spec_version=V5_SPEC_VERSION,
+                rationale=definition.rationale))
+            continue
+        specs.append(_new_spec(definition))
+    return specs
 
 
 #: Derived from `arm_registry`, which is the one place an arm is declared.

@@ -111,3 +111,77 @@ def test_each_declaration_says_what_the_arm_is_for(definition):
 
     assert definition.rationale.strip()
     assert definition.expected_concerns
+
+
+# --- one declaration per arm -----------------------------------------------------------------
+#
+# `v5_specs()` used to re-declare all ten arms next to a registry that already declared all
+# ten: id, concern family, issue kind, subject kinds, and a rationale each. Adding an arm meant
+# editing both, and the two rationales had drifted apart in every single one of the ten.
+
+
+def test_the_spec_set_is_exactly_the_registry():
+    from src.datasets.pr_review_v5.arms import v5_specs
+
+    assert ([spec.spec_id for spec in v5_specs()]
+            == [item.arm_id for item in arm_registry.ARM_DEFINITIONS])
+
+
+def test_an_arms_question_is_written_once():
+    """Both copies were called `rationale` and one was documented as being "for the reader",
+    which is how they were allowed to differ. The fuller text -- `docs` carries a measurement
+    in it -- is the one that survives, and it is the one the agenda ships."""
+
+    from src.datasets.pr_review_v5.arms import v5_specs
+
+    by_id = {item.arm_id: item for item in arm_registry.ARM_DEFINITIONS}
+    for spec in v5_specs():
+        assert spec.rationale == by_id[spec.spec_id].rationale, spec.spec_id
+
+
+#: What each spec hashes to. Pinned because folding the two declarations together silently
+#: dropped `docs`'s `module_doc` and all four of `style`'s extra kinds -- the exact capability
+#: two gold obligations need (PR 33305's over-long module-doc line, PR 33362's `namespace
+#: Complex` placement) -- and the whole suite stayed green. A spec's identity is what the
+#: agenda seals, so it is worth stating outright.
+EXPECTED_SPEC_IDENTITY = {
+    "api_reuse": "cab1c1dd3561", "correctness": "75bca1cae954", "docs": "0272b478d6e9",
+    "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
+    "generality": "ef5c1b06333a", "naming": "8dfd2c87af4d", "proof_golf": "854c179f8da7",
+    "proof_idiom": "d0d4b417257d", "style": "d82d80097e5a",
+}
+
+
+def test_spec_identities_are_unchanged():
+    from src.datasets.pr_review_v5.arms import v5_specs
+
+    actual = {spec.spec_id: spec.source_sha256[:12] for spec in v5_specs()}
+    assert actual == EXPECTED_SPEC_IDENTITY
+
+
+def test_the_arms_that_may_look_beyond_declarations_still_can():
+    """`docs` reaches module docs; `style` reaches module docs and placement. Every other arm
+    sees declarations only. This is the field that vanished."""
+
+    from src.datasets.pr_review_v5.arms import v5_specs
+
+    kinds = {spec.spec_id: spec.subject_kinds for spec in v5_specs()}
+    assert "module_doc" in kinds["docs"]
+    assert {"module_doc", "namespace_or_section", "command", "import"} <= kinds["style"]
+    assert "module_doc" not in kinds["naming"]
+
+
+def test_adding_an_arm_is_one_edit():
+    """The measure of whether this stayed fixed: everything `v5_specs` produces is read off
+    the registry entry, so a new `_arm(...)` line is a whole new arm."""
+
+    import inspect
+
+    from src.datasets.pr_review_v5 import arms
+
+    source = inspect.getsource(arms.v5_specs)
+    assert "for definition in ARM_DEFINITIONS" in source
+    # No arm may be named in the function that projects them.
+    for definition in arm_registry.ARM_DEFINITIONS:
+        assert f'"{definition.arm_id}"' not in source, (
+            f"v5_specs names {definition.arm_id}; it should only iterate the registry")

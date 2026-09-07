@@ -45,7 +45,13 @@ class ArmDefinition:
     concern_family: str
     #: The kind of check that would settle its claim, for the verifier table.
     issue_kind: str
-    #: What the arm exists to ask. Shown to no model; this is for the reader.
+    #: What the arm exists to ask, in the arm's own words.
+    #:
+    #: Written twice until now: once here as a one-line summary "for the reader", and once in
+    #: `arms.v5_specs()` as the fuller text that reaches the agenda -- and through it a lead
+    #: reading the flat proposal list. All ten disagreed, as two hand-maintained paraphrases
+    #: of one question will, and `docs` had a measurement in one of them and not the other.
+    #: The fuller text won and lives here; `v5_specs` reads it.
     rationale: str
 
     #: Concerns this arm is expected to report. Provenance and routing vocabulary — read by
@@ -80,6 +86,14 @@ class ArmDefinition:
 
     #: v4 `FocusedAgentSpec` knobs, kept here so the whole contract reads in one place.
     component: Optional[str] = None
+    #: Changed things that are not declarations, which this arm may also speak about.
+    #:
+    #: The modification inventory for the medium release holds 49 `module_doc`, 46
+    #: `namespace_or_section`, 91 `command` and 17 `import` records, and for a long time *no
+    #: arm accepted any of them* because every spec took `DECLARATION_KINDS` alone. Two gold
+    #: obligations were unreachable purely because of that: PR 33305 asks to wrap an over-long
+    #: line in a module doc, and PR 33362 asks to move declarations inside `namespace Complex`.
+    #: Both are ordinary review comments about things no arm was allowed to look at.
     extra_subject_kinds: FrozenSet[str] = frozenset()
 
     #: True when the arm is one of v4's four, widened by v5 rather than newly declared. The
@@ -99,50 +113,78 @@ def _arm(arm_id: str, concern: str, issue_kind: str, rationale: str, **kwargs) -
     )
 
 
+#: Changed things that are not declarations. Named here rather than in `arms.py` so an arm's
+#: whole contract, including what it is allowed to look at, reads in one place.
+MODULE_DOC_KINDS = frozenset({"module_doc"})
+PLACEMENT_KINDS = frozenset({"namespace_or_section", "command", "import"})
+
+
 #: Every arm v5 can schedule. The generalist is deliberately absent: it has no concern filter,
 #: which is what makes it the control, and it is not a `FocusedAgentSpec`.
 ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
     # --- v4's four, widened by v5 -------------------------------------------------------
     _arm("proof_golf", "proof-golf", "proof_simplification",
-         "Can this proof be replaced by a canonical lemma, tactic or structure?",
+         "Can a proof this PR changed be written shorter? Verified by recompiling.",
          context_tools=("declaration_search",), checkable=True, component="proof",
          inherited_from_v4=True),
     _arm("proof_idiom", "proof-golf", "proof_simplification",
-         "Is this proof written the way Mathlib writes this kind of proof?",
+         "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, "
+         "`omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which "
+         "is why it needs its own warrant.",
          context_tools=("declaration_search",), checkable=True, component="proof",
          inherited_from_v4=True),
     _arm("duplication", "duplication", "duplicate_implementation",
-         "Does something in the library already do this?",
+         "Does a new declaration restate something Mathlib already has? Verified by closing "
+         "the new declaration with the existing one.",
          context_tools=("declaration_search",), checkable=True, inherited_from_v4=True),
     _arm("generality", "generalization", "generalization_available",
-         "Is this stated at the level maintainers would reuse?",
+         "Is a new declaration stated less generally than it should be? The statement must "
+         "move, which is the gate that separates it from a golf finding.",
          context_tools=("declaration_search",), checkable=True, inherited_from_v4=True),
 
     # --- the classes v4 had no arm for -------------------------------------------------
     _arm("naming", "naming", "naming_convention_violation",
-         "Is this named the way its own family is named? Settled by reading the siblings and "
-         "past rename requests, not by taste.",
+         "Is this declaration named the way its own family is named? Settled by reading the "
+         "siblings and past rename requests, not by taste.",
          # Both: what the siblings are called, and what maintainers call them. The code corpus
          # argues against the maintainer on both naming asks this release scores.
          context_tools=("declaration_search", "precedent_search", "zulip_search")),
     _arm("docs", "documentation", "documentation_gap",
-         "Is the documentation complete, correct and conformant?",
-         context_tools=("precedent_search", "zulip_search")),
+         "Is the documentation COMPLETE, CORRECT and CONFORMANT — in that "
+         "order?\n  * complete: a sentence that stops mid-thought, a hypothesis or a `TODO` "
+         "left unexplained, a module whose non-obvious approach has no `Implementation "
+         "details` note. This is the most requested and the least often "
+         "noticed.\n  * correct: a typo, or a statement the code "
+         "contradicts.\n  * conformant: over-long lines and malformed markup, which the "
+         "repository's own linter can "
+         "settle.\nA docstring that is merely terse is not a finding. Neither is a "
+         "cross-reference you have not opened and confirmed is wrong.",
+         context_tools=("precedent_search", "zulip_search"),
+         extra_subject_kinds=MODULE_DOC_KINDS),
     _arm("style", "style", "style_norm_violation",
-         "Does this follow Mathlib's stated formatting and structural norms?",
-         context_tools=("precedent_search", "zulip_search")),
+         "Is this formatted and placed the way the surrounding file does it? Only a deviation "
+         "from a convention the file is otherwise consistent about — including where a "
+         "declaration sits: a lemma that belongs inside a `namespace` block and was left "
+         "outside it is a placement defect, not a matter of taste.",
+         context_tools=("precedent_search", "zulip_search"),
+         extra_subject_kinds=MODULE_DOC_KINDS | PLACEMENT_KINDS),
     _arm("api_reuse", "duplication", "missed_canonical_api",
-         "Is there a canonical API this should have gone through?",
+         "Does the code re-derive something the library already provides, or spell an existing "
+         "API the long way? Smaller and commoner than whole-declaration duplication, and "
+         "checkable by compiling the replacement.",
          context_tools=("declaration_search",), checkable=True),
     _arm("correctness", "correctness", "correctness_policy",
-         "Is there a present semantic, elaboration, build or policy error?",
+         "Is anything actually broken — the build, a statement that does not say what it "
+         "claims, a looping simp lemma, an unaccepted axiom? Starts by compiling the reviewed "
+         "file, which no other arm does.",
          # `scope` too: a declaration whose imports cannot support where it sits is a build
          # problem wearing a placement problem's clothes, and no other arm compiles.
          expected_concerns=("correctness", "scope"),
          context_tools=("declaration_search",), checkable=True),
     _arm("family_design", "generalization", "generalization_available",
-         "Are these declarations right AS A GROUP — a missing dual, a hand-written generated "
-         "form, a hardcoded shared parameter?",
+         "Are these declarations right AS A GROUP — a dual proved from scratch instead of from "
+         "its counterpart, a missing counterpart, a generated form written by hand, a repeated "
+         "argument that should be one lemma?",
          # It owns both shapes a group's defect takes, which is why it may declare either.
          expected_concerns=("generalization", "duplication"),
          # No `declaration_search`: it spent 50 of 63 retrieval calls on a name lookup that
