@@ -89,7 +89,13 @@ class JobOutcome:
     budget_cap: Optional[float] = None
     status: str = "failed"
     wall_seconds: float = 0.0
+    #: Billed — what was actually paid, and what every cap is enforced against.
     cost: float = 0.0
+    #: The no-cache counterfactual, for reporting only. Never sum this and call it spend.
+    nominal_cost: float = 0.0
+    #: This job's own usage. It used to be the enclosing tier's total stamped onto every job
+    #: in it — 59 jobs carrying 9 distinct values on smoke4 — which made per-arm token
+    #: attribution impossible and, summed, reported $1,141 against a real $21.
     token_usage: Optional[Dict[str, float]] = None
     candidates: List[Dict[str, Any]] = field(default_factory=list)
     verification_artifacts: List[Dict[str, Any]] = field(default_factory=list)
@@ -115,6 +121,11 @@ class JobOutcome:
             "candidates": len(self.candidates),
             "verified_edits": len(self.verification_artifacts),
             "cost": round(self.cost, 4),
+            # Why it produced nothing, when it produced nothing. Without this the lead cannot
+            # tell an arm that looked and declined from one that was cut off mid-review, and
+            # those call for opposite responses: accept the abstention, or re-run with more
+            # budget. Omitted on success so the common row stays compact.
+            **({"reason": self.error} if self.error else {}),
             "claims": [
                 {
                     "ordinal": index,
@@ -168,10 +179,15 @@ def _tier_config(parent_task, tier: str, standard_cap: float, wave: int):
 
 
 async def _sample_facts(orchestrator, results) -> Dict[str, Dict[str, Any]]:
-    """Per-task status and cost, read from the samples the orchestrator persisted.
+    """Per-task status, cost, usage and duration, from what the orchestrator persisted.
 
-    Taken from the sample records rather than from the returned results, because a job that
-    failed or paused has no result to read and those are exactly the rows the trace needs.
+    Read from the per-task records rather than the returned results, because a job that failed
+    or paused has no result to read and those are exactly the rows the trace needs.
+
+    `task_outcome.json` is preferred when present: it is written for every scheduled task,
+    including the paused ones that produce no `task_result.json`, and it carries billed cost,
+    nominal cost, the job's own token usage, its own wall time, and a reason. Falling back to
+    the sample records keeps this working for runs made before that file existed.
     """
 
     from ape.orchestration.persistence import TaskStorage
@@ -183,17 +199,66 @@ async def _sample_facts(orchestrator, results) -> Dict[str, Dict[str, Any]]:
         task_id = raw.get("task_id")
         if not global_index or not task_id:
             continue
-        storage = TaskStorage(orchestrator.tasks_dir / str(global_index), str(global_index))
+        task_dir = orchestrator.tasks_dir / str(global_index)
+
+        outcome_path = task_dir / "task_outcome.json"
+        if outcome_path.is_file():
+            try:
+                outcome = json.loads(outcome_path.read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                outcome = None
+            if outcome:
+                facts[task_id] = {
+                    "cost": float(outcome.get("billed_cost") or 0.0),
+                    "nominal_cost": float(outcome.get("nominal_cost") or 0.0),
+                    "status": _outcome_status(outcome),
+                    "reason": outcome.get("reason"),
+                    "wall_seconds": float(outcome.get("wall_seconds") or 0.0),
+                    "token_usage": _outcome_usage(outcome),
+                }
+                continue
+
+        storage = TaskStorage(task_dir, str(global_index))
         samples = await storage.load_all_samples()
-        cost = 0.0
+        billed = nominal = wall = 0.0
         status = None
         for _index, sample in sorted(samples.items()):
-            cost += float(sample.get_accumulated_cost() or 0.0)
+            billed += float(sample.get_accumulated_cached_cost() or 0.0)
+            nominal += float(sample.get_accumulated_cost() or 0.0)
+            for attempt in sample.attempts:
+                if attempt.started_at and attempt.completed_at:
+                    wall += (attempt.completed_at - attempt.started_at).total_seconds()
             attempt = sample.current_attempt
             if attempt is not None and attempt.status is not None:
                 status = str(getattr(attempt.status, "value", attempt.status))
-        facts[task_id] = {"cost": cost, "status": status}
+        facts[task_id] = {
+            "cost": billed, "nominal_cost": nominal, "status": status,
+            "reason": None, "wall_seconds": wall, "token_usage": None,
+        }
     return facts
+
+
+def _outcome_status(outcome: Dict[str, Any]) -> Optional[str]:
+    """The sample-level status the ledger's vocabulary is built on.
+
+    `TaskOutcome.execution_status` is coarser than the ledger needs — it says `paused` without
+    saying paused on what — so the finest sample status is used when there is one.
+    """
+
+    for sample in reversed(outcome.get("samples") or []):
+        if sample.get("status"):
+            return str(sample["status"])
+    return str(outcome.get("execution_status") or "") or None
+
+
+def _outcome_usage(outcome: Dict[str, Any]) -> Dict[str, float]:
+    """This job's own cost figures, in the shape the ledger records."""
+
+    return {
+        "billed_cost": float(outcome.get("billed_cost") or 0.0),
+        "nominal_cost": float(outcome.get("nominal_cost") or 0.0),
+        "turns": int(outcome.get("turns") or 0),
+    }
 
 
 _STATUS_MAP = {
@@ -261,21 +326,28 @@ async def run_tier(parent_task, tier: str, jobs: Sequence[JobSpec], *,
             budget_tier=tier,
             budget_cap=cap,
             status=_normalize_status(fact.get("status"), succeeded),
-            # Wall time is per tier, not per job: the tier's jobs run concurrently inside one
-            # orchestrator, so attributing the whole span to each would multiply it.
-            wall_seconds=round(elapsed, 3),
+            # This job's own span when the outcome recorded one. Falls back to the tier's
+            # elapsed only when it did not, and that case is now the exception rather than
+            # every row.
+            wall_seconds=round(float(fact.get("wall_seconds") or elapsed), 3),
             cost=float(fact.get("cost") or 0.0),
-            token_usage=(
-                results.total_token_usage.model_dump(mode="json")
-                if hasattr(results.total_token_usage, "model_dump") else None
-            ),
+            nominal_cost=float(fact.get("nominal_cost") or 0.0),
+            token_usage=fact.get("token_usage"),
             candidates=candidates,
             verification_artifacts=artifacts,
             result_sha256=_digest(candidates) if candidates else None,
             delivered_prompt_sha256=hashlib.sha256(
                 (payloads[job.invocation_id].get("rendered_user_prompt") or "").encode()
             ).hexdigest(),
-            error=(None if succeeded else str(raw.get("error") or "no terminal submission")),
+            # Say why. "no terminal submission" was recorded for a job that had actually
+            # exhausted its budget, which is the difference between an arm that declined to
+            # speak and one that was cut off — and the two were read as the same thing.
+            error=(None if succeeded else str(
+                raw.get("error")
+                or fact.get("reason")
+                or (f"{fact['status']} (no terminal submission)"
+                    if fact.get("status") else "no terminal submission")
+            )),
         ))
     return outcomes
 

@@ -149,14 +149,21 @@ def _sample_cost(result_path: Path) -> tuple:
     cost. They agree, but only the sample has the cached figure.
     """
 
-    sample = _load(result_path.parent.parent.parent / "sample.json")
+    # `<task_dir>/samples/0/sample.json`, beside the result — not three levels up, which
+    # resolved to the orchestrator root and never existed. The silent consequence was that
+    # `cached_cost` was always null and `cost` fell back to the uncached token figure, so the
+    # sidecar reported the no-cache counterfactual as if it were spend.
+    sample = _load(result_path.parent / "samples" / "0" / "sample.json")
     if not sample:
         return None, None, None
     attempts = sample.get("attempts") or []
     if not attempts:
         return None, None, sample.get("status")
-    last = attempts[-1]
-    return last.get("cost"), last.get("cached_cost"), last.get("status")
+    # Cumulative across attempts: a sample that paused and resumed spent the sum, and reading
+    # only the last attempt understates it.
+    cost = sum(a.get("cost") or 0.0 for a in attempts)
+    cached = sum((a.get("cached_cost") or a.get("cost") or 0.0) for a in attempts)
+    return cost, cached, attempts[-1].get("status")
 
 
 def _read_turns(session: Path, conversation_id: str, cap: int) -> List[Turn]:

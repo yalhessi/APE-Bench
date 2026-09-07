@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
