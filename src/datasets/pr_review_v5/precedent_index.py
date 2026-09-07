@@ -50,13 +50,28 @@ class PrecedentIndexMissing(RuntimeError):
     """The index has not been built. Carries the command that builds it."""
 
 
+#: Rows whose timestamp could not be read. They are excluded from every gated read rather
+#: than dated: the old parser returned 0 for them, which is before every real cutoff, so an
+#: undated row was eligible for *every* review. In a leak gate that is the wrong direction to
+#: fail, and it was the only direction it could fail.
+UNDATED = -1
+
+
 def _iso_to_epoch(stamp: Optional[str]) -> int:
-    if not stamp:
-        return 0
+    """Parse through the shared gate, so this index dates a row the way every other source does.
+
+    It used to parse with `datetime.fromisoformat(...).timestamp()`, which resolves a *naive*
+    timestamp in the machine's local time -- measured four hours off on a UTC-4 machine, and
+    off the other way east of UTC, so whether a row was eligible depended on where the index
+    was built. And it returned 0 on failure. See `mathlib_review/retrieval_gate.py`.
+    """
+
+    from src.mathlib_review.retrieval_gate import RetrievalGate, UngatedTimestamp
+
     try:
-        return int(datetime.fromisoformat(str(stamp).replace("Z", "+00:00")).timestamp())
-    except ValueError:
-        return 0
+        return RetrievalGate().epoch_of(stamp, field="created_at")
+    except UngatedTimestamp:
+        return UNDATED
 
 
 def _load_corpus(path: Path) -> List[Dict[str, Any]]:
@@ -187,14 +202,21 @@ class PrecedentIndex:
     def eligible_mask(self, as_of: Optional[str], exclude_pr: Optional[int]):
         """Which rows a reader at this instant is allowed to see.
 
-        `as_of` is exclusive, matching `zulip.store.gate`: a comment written at exactly the
-        cutoff was not available beforehand.
+        The rule is `mathlib_review.retrieval_gate`'s; this is its vectorised form, which is
+        why the cutoff is taken from the gate rather than parsed here. `as_of` is exclusive: a
+        comment written at exactly the cutoff was not available beforehand.
         """
 
+        from src.mathlib_review.retrieval_gate import RetrievalGate
+
         np = self._np
+        rule = RetrievalGate(as_of=as_of, exclude_pr=exclude_pr)
         mask = np.ones(len(self.meta), dtype=bool)
-        if as_of:
-            mask &= self._created < _iso_to_epoch(as_of)
+        # An undated row is never eligible under a cutoff. Ungated reads still see it: with no
+        # cutoff there is no claim being made about when it was available.
+        if rule.cutoff_epoch is not None:
+            mask &= self._created != UNDATED
+            mask &= self._created < rule.cutoff_epoch
         if exclude_pr is not None:
             mask &= self._pr != int(exclude_pr)
         return mask

@@ -192,11 +192,13 @@ def build_prompt_precedents(
         cutoff_record = cutoff_by_episode.get(unit.episode_id)
         if cutoff_record is None:
             raise ValueError(f"missing retrieval cutoff for {unit.episode_id}")
-        cutoff = datetime.fromisoformat(cutoff_record.review_started_at.replace("Z", "+00:00"))
+        # Same rule as `eligible_precedents`, from the same place. It was spelled out here a
+        # third time, with the same local-time parse.
+        rule = _rule(cutoff_record.review_started_at, unit.pr_number)
         eligible_rows = [
             row for row in corpus
-            if row[0].pr_number != unit.pr_number
-            and datetime.fromisoformat(row[0].occurred_at.replace("Z", "+00:00")) < cutoff
+            if not rule.excludes_pr(pr_number=row[0].pr_number)
+            and rule.allows_time(row[0].occurred_at, field="occurred_at")
         ]
         eligible = [(event, body, terms) for event, body, terms, _context, _path in eligible_rows]
         context_by_event = {
@@ -243,16 +245,46 @@ def build_prompt_precedents(
     return precedents
 
 
+#: Event types that carry a maintainer's opinion. A commit or a label is not a precedent.
+PRECEDENT_EVENT_TYPES = frozenset({"review", "review_comment", "issue_comment"})
+
+
+def _rule(review_started_at: str, pr_number: int):
+    """The retrieval rule, from the one place it is defined."""
+
+    from src.mathlib_review.retrieval_gate import RetrievalGate
+
+    return RetrievalGate(as_of=review_started_at, exclude_pr=pr_number)
+
+
+def _gate_for(target: ReviewEpisodeBoundary):
+    """This episode's retrieval rule, from the one place it is defined.
+
+    Both functions below used to parse `review_started_at` and every event's `occurred_at`
+    with `datetime.fromisoformat(x.replace("Z", "+00:00"))`. That handles the `Z` spelling and
+    nothing else: a naive timestamp resolves in the machine's local time, so eligibility
+    depended on where the code ran. See `mathlib_review/retrieval_gate.py`.
+    """
+
+    return _rule(target.review_started_at, target.pr_number)
+
+
 def validate_precedents(target: ReviewEpisodeBoundary, events: Iterable[SourceEvent]) -> List[SourceEvent]:
-    start = datetime.fromisoformat(target.review_started_at.replace("Z", "+00:00"))
+    """The paranoid pass: selected rows are re-checked, and a future one is an error.
+
+    Deliberately not the same shape as `eligible_precedents`. That one filters, because a
+    global ledger legitimately contains rows this episode may not see; this one raises,
+    because a row that reached selection and is in the future means the filter did not run.
+    """
+
+    rule = _gate_for(target)
     safe = []
     for event in events:
-        if event.pr_number == target.pr_number or not event.occurred_at:
+        if rule.excludes_pr(pr_number=event.pr_number) or not event.occurred_at:
             continue
-        occurred = datetime.fromisoformat(event.occurred_at.replace("Z", "+00:00"))
-        if occurred >= start:
+        if not rule.allows_time(event.occurred_at, field="occurred_at"):
             raise ValueError(f"future precedent {event.event_id} for {target.episode_id}")
-        if event.event_type in {"review", "review_comment", "issue_comment"}:
+        if event.event_type in PRECEDENT_EVENT_TYPES:
             safe.append(event)
     return safe
 
@@ -260,13 +292,14 @@ def validate_precedents(target: ReviewEpisodeBoundary, events: Iterable[SourceEv
 def eligible_precedents(target: ReviewEpisodeBoundary,
                         events: Iterable[SourceEvent]) -> List[SourceEvent]:
     """Filter a global ledger before ranking; selected rows are validated again."""
-    start = datetime.fromisoformat(target.review_started_at.replace("Z", "+00:00"))
+
+    rule = _gate_for(target)
     eligible = []
     for event in events:
-        if event.pr_number == target.pr_number or not event.occurred_at:
+        if rule.excludes_pr(pr_number=event.pr_number) or not event.occurred_at:
             continue
-        occurred = datetime.fromisoformat(event.occurred_at.replace("Z", "+00:00"))
-        if occurred < start and event.event_type in {"review", "review_comment", "issue_comment"}:
+        if (rule.allows_time(event.occurred_at, field="occurred_at")
+                and event.event_type in PRECEDENT_EVENT_TYPES):
             eligible.append(event)
     return eligible
 

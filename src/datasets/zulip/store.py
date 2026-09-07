@@ -116,20 +116,27 @@ def gate(
     as_of: Optional[str] = None,
     exclude_pr: Optional[int] = None,
 ) -> List[ZulipMessage]:
-    """The one temporal/leak filter. Every read path in this module calls it.
+    """This store's projection of the one retrieval rule. Every read path here calls it.
 
-    `as_of` is exclusive: a message posted at exactly the review-start instant was not
-    available to the reviewer beforehand.
+    The rule -- `as_of` exclusive, plus self-exclusion -- lives in
+    `mathlib_review.retrieval_gate`, because four sources were each spelling it themselves and
+    their ISO parsers disagreed. What stays here is the part that is genuinely about Zulip:
+    self-exclusion is by `pr_refs`, not by origin. A maintainer discussing the PR under review
+    in an unrelated thread is still discussing it, and that is not true of a precedent row,
+    which leaks only if it came *from* the PR.
+
+    Timestamps are already epochs in this store, so nothing is parsed per message.
     """
-    cutoff = iso_to_epoch(as_of) if as_of is not None else None
-    kept: List[ZulipMessage] = []
-    for message in messages:
-        if cutoff is not None and message.timestamp_epoch >= cutoff:
-            continue
-        if exclude_pr is not None and exclude_pr in message.pr_refs:
-            continue
-        kept.append(message)
-    return kept
+
+    from src.mathlib_review.retrieval_gate import RetrievalGate
+
+    rule = RetrievalGate(as_of=as_of, exclude_pr=exclude_pr)
+    cutoff = rule.cutoff_epoch
+    return [
+        message for message in messages
+        if (cutoff is None or message.timestamp_epoch < cutoff)
+        and not rule.excludes_pr(pr_refs=message.pr_refs)
+    ]
 
 
 def parse_narrow_url(url: str) -> Tuple[Optional[int], Optional[str], Optional[int]]:
