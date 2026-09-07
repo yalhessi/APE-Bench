@@ -66,6 +66,7 @@ from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
 from .preflight import assert_ready, assert_workspaces_prebuilt
 from .schema import ROUTING_MODES, V5RunManifest, V5RunPlan
 from .trace import reconcile
+from src.mathlib_review.run_config import load_run as _load_run
 
 LEAD_TASK_TYPE = "lean_pr_review_v5_lead"
 
@@ -144,17 +145,10 @@ class V5DatasetConfig(BaseModel):
 
 
 def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
-    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    """Load a v5 generation run. The convention itself is in `mathlib_review.run_config`, which existed
+    three times byte-identical except for the model validated against."""
 
-    raw = load_yaml(config_path)
-    if overrides:
-        raw = deep_merge(raw, overrides)
-    dataset = V5DatasetConfig.model_validate(raw.pop("dataset"))
-    task_overrides = raw.pop("task_config", {}) or {}
-    raw.setdefault("scaffold_type", "ape_agent")
-    scaffold = ApeAgentConfig.model_validate(raw)
-    scaffold.task_config_overrides = task_overrides
-    return dataset, scaffold, task_overrides
+    return _load_run(config_path, V5DatasetConfig, overrides)
 
 
 def load_release(dataset: V5DatasetConfig):

@@ -68,6 +68,7 @@ from .semantic_judge import (
     seal_pair,
     semantic_report,
 )
+from src.mathlib_review.run_config import load_run as _load_run
 
 
 class JudgeDatasetConfig(BaseModel):
@@ -188,17 +189,10 @@ def publication_summary(findings: List[ReviewFinding], pre: Dict, post: Dict) ->
 
 
 def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
-    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    """Load a judge run. The convention itself is in `mathlib_review.run_config`, which existed
+    three times byte-identical except for the model validated against."""
 
-    raw = load_yaml(config_path)
-    if overrides:
-        raw = deep_merge(raw, overrides)
-    dataset = JudgeDatasetConfig.model_validate(raw.pop("dataset"))
-    task_overrides = raw.pop("task_config", {}) or {}
-    raw.setdefault("scaffold_type", "ape_agent")
-    scaffold = ApeAgentConfig.model_validate(raw)
-    scaffold.task_config_overrides = task_overrides
-    return dataset, scaffold, task_overrides
+    return _load_run(config_path, JudgeDatasetConfig, overrides)
 
 
 def _proposed_edit_text(candidate) -> str:

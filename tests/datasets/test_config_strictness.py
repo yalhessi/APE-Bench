@@ -193,3 +193,46 @@ def test_inheritance_is_relative_to_the_child_not_the_cwd(tmp_path):
 def test_a_config_without_extends_is_unchanged(tmp_path):
     child = _write(tmp_path, "plain.yaml", "dataset:\n  release: r\n")
     assert load_yaml(child) == {"dataset": {"release": "r"}}
+
+
+# --- the loading convention itself ---------------------------------------------------------
+
+
+def test_load_run_has_one_implementation():
+    """It existed three times -- v4's runner, v4's judge runner, v5's runner -- byte-identical
+    except for which dataset model it validated against, and the unified CLI would have been a
+    fourth caller of a nine-line function with three copies.
+
+    The nine statements encode decisions that have to agree: `extends:` resolution, deep-merge
+    of overrides *before* validation so a typo is refused rather than ignored, and popping
+    `task_config` into `scaffold.task_config_overrides`, which is what puts `enabled_tools`
+    inside `scaffold_config_sha256` and so inside the run's provenance.
+    """
+
+    import inspect
+
+    from src.datasets.pr_review_v4 import judge_runner, runner as v4_runner
+    from src.datasets.pr_review_v5 import runner as v5_runner
+    from src.mathlib_review.run_config import load_run as shared
+
+    for module in (v4_runner, judge_runner, v5_runner):
+        source = inspect.getsource(module.load_run)
+        assert "_load_run(" in source, module.__name__
+        assert "ApeAgentConfig.model_validate" not in source, (
+            f"{module.__name__}.load_run reimplements the convention")
+
+    assert "task_config_overrides" in inspect.getsource(shared)
+
+
+def test_each_caller_still_validates_against_its_own_model():
+    """The one thing that legitimately varies. Sharing the convention must not share the
+    schema -- a judge config validated as a generation config would accept the wrong keys."""
+
+    from src.datasets.pr_review_v4.judge_runner import JudgeDatasetConfig
+    from src.mathlib_review.run_config import load_run
+
+    dataset, scaffold, overrides = load_run(
+        Path("configs/pr_review_v5_specialist4_judge.yaml"), JudgeDatasetConfig,
+        {"dataset": dict(JUDGE_DERIVED)})
+    assert isinstance(dataset, JudgeDatasetConfig)
+    assert scaffold.task_config_overrides == overrides

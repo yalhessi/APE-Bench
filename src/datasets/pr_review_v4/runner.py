@@ -39,6 +39,7 @@ from .task_adapter import (
     build_opportunity_task_data,
     build_review_opportunity_task_data,
 )
+from src.mathlib_review.run_config import load_run as _load_run
 
 
 #: Which reviewer this run drives. Each arm schedules and renders its own invocations from
@@ -73,17 +74,10 @@ class V4DatasetConfig(BaseModel):
 
 
 def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
-    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    """Load a v4 generation run. The convention itself is in `mathlib_review.run_config`, which existed
+    three times byte-identical except for the model validated against."""
 
-    raw = load_yaml(config_path)
-    if overrides:
-        raw = deep_merge(raw, overrides)
-    dataset = V4DatasetConfig.model_validate(raw.pop("dataset"))
-    task_overrides = raw.pop("task_config", {}) or {}
-    raw.setdefault("scaffold_type", "ape_agent")
-    scaffold = ApeAgentConfig.model_validate(raw)
-    scaffold.task_config_overrides = task_overrides
-    return dataset, scaffold, task_overrides
+    return _load_run(config_path, V4DatasetConfig, overrides)
 
 
 def _generalist_task_data(units, episode_by_id, prompt_by_id, opportunities_by_unit,
