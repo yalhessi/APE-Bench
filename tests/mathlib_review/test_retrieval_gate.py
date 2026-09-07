@@ -166,3 +166,56 @@ def test_no_source_parses_timestamps_for_itself_any_more():
         ]
         assert not calls, (
             f"{path}:{calls[0].lineno} dates a row itself; the gate owns that")
+
+
+# --- every retrieval call says how it was bounded ------------------------------------------
+
+
+def test_every_context_tool_records_a_gate():
+    """`as_of: null` meant two different things and the trace could not tell them apart.
+
+    `declaration_search` reads the tree at the PR's base commit, so nothing from the PR under
+    review and nothing after it can appear -- gated by the corpus, not by a cutoff, and its
+    `as_of`/`exclude_pr` are correctly null. A call that was simply never gated would look
+    identical, and telling those apart is the one question an audit of `context_trace.jsonl`
+    exists to answer.
+    """
+
+    from pathlib import Path
+
+    source = Path(
+        "src/ape/tasks/lean_tasks/formal_math/pr_review_v5/context_tools.py"
+    ).read_text(encoding="utf-8")
+
+    tools = ("zulip_search", "precedent_search", "declaration_search")
+    for tool in tools:
+        marker = f'"tool": "{tool}",\n            "gate": '
+        assert marker in source, f"{tool} records no gate"
+
+    # Every trace row that names a tool names a gate on the next line: no tool can be added
+    # without declaring how it is bounded.
+    assert source.count('"gate": ') == len(tools)
+
+
+def test_the_gate_kinds_are_a_closed_set():
+    """A free-text gate would let a new tool declare `"gate": "probably fine"`."""
+
+    from src.datasets.pr_review_v5.schema import ContextCall
+
+    annotation = ContextCall.model_fields["gate"].annotation
+    assert set(getattr(annotation, "__args__", ())) == {"as_of", "base_snapshot"}
+
+
+def test_a_base_snapshot_call_carries_the_commit_it_read():
+    """It is the bound, so it has to be recorded. `corpus_sha256` holds the base sha for
+    `declaration_search`, where `as_of` holds the cutoff for the other two."""
+
+    from pathlib import Path
+
+    source = Path(
+        "src/ape/tasks/lean_tasks/formal_math/pr_review_v5/context_tools.py"
+    ).read_text(encoding="utf-8")
+    block = source[source.index('"tool": "declaration_search"'):]
+    block = block[:block.index("return {")]
+    assert '"gate": "base_snapshot"' in block
+    assert '"corpus_sha256": task.data.snapshot_base_sha' in block

@@ -169,8 +169,17 @@ class ContextCall(StrictModel):
     invocation_id: str
     tool: Literal["zulip_search", "precedent_search", "declaration_search", "lean_verify_edit"]
     query: str
+    #: **How** this call was bounded, stated positively.
+    #:
+    #: `as_of` and `exclude_pr` alone could not say it. `declaration_search` records both as
+    #: null because it reads the tree at the PR's *base commit*, so nothing from the PR under
+    #: review and nothing after it can appear -- it is gated by the corpus rather than by a
+    #: cutoff. In the trace that was indistinguishable from a call that was not gated at all,
+    #: which is the one question an audit of this file exists to answer.
+    gate: Literal["as_of", "base_snapshot"] = "as_of"
     #: What the gate was set to. A Zulip read is only correct relative to its cutoff, so a
-    #: trace without the cutoff cannot be checked after the fact.
+    #: trace without the cutoff cannot be checked after the fact. Null under `base_snapshot`,
+    #: where `corpus_sha256` carries the bound instead.
     as_of: Optional[str] = None
     exclude_pr: Optional[int] = None
     #: Identifies the corpus the ranking ran over, so a result set stays interpretable when
