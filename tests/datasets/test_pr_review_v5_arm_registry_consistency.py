@@ -185,3 +185,51 @@ def test_adding_an_arm_is_one_edit():
     for definition in arm_registry.ARM_DEFINITIONS:
         assert f'"{definition.arm_id}"' not in source, (
             f"v5_specs names {definition.arm_id}; it should only iterate the registry")
+
+
+# --- what the sealed identities cover ------------------------------------------------------
+#
+# `tools_sha256` hashes the tool list the *prompt* declares, which is not the list the arm
+# runs with -- workspace tools come from `task_config.enabled_tools`, retrieval tools from the
+# registry, and for `naming`/`docs`/`style` the prompt list holds four against a runtime six
+# plus grants. That reads like a provenance hole and is not one. These pin why, so the next
+# reader does not re-derive it and then "fix" it by moving ten sealed identities.
+
+
+def test_changing_the_workspace_tools_moves_the_scaffold_hash():
+    """`load_run` pops `task_config` into `scaffold.task_config_overrides`, which is inside
+    the scaffold dump that `scaffold_config_sha256` hashes."""
+
+    from pathlib import Path
+
+    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.datasets.pr_review_v5.runner import load_run
+
+    _dataset, scaffold, overrides = load_run(Path("configs/pr_review_v5_specialist4.yaml"))
+    assert overrides["enabled_tools"]
+
+    def digest(sc):
+        return sha256_bytes(canonical_json_bytes(sc.model_dump(mode="json")))
+
+    before = digest(scaffold)
+    scaffold.task_config_overrides = {"enabled_tools": ["file_read"]}
+    assert digest(scaffold) != before
+
+
+def test_changing_an_arms_retrieval_grant_moves_the_agenda():
+    """`ReviewArm.context_tools` carries the grant and `ReviewArm`s are in the agenda, so the
+    grant is inside `agenda_sha256`. This is the capability the `family_design` measurement
+    showed matters most -- 50 of 63 retrieval calls spent on the wrong tool -- so it being
+    sealed is the thing worth checking."""
+
+    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.datasets.pr_review_v5.arms import default_arms
+    from src.datasets.pr_review_v5.schema import ReviewAgenda
+
+    arm = next(a for a in default_arms("candidate-prompt/12") if a.arm_id == "family_design")
+    payload = arm.model_dump(mode="json")
+    assert payload["context_tools"]
+    altered = {**payload, "context_tools": ["declaration_search"]}
+    assert (sha256_bytes(canonical_json_bytes(payload))
+            != sha256_bytes(canonical_json_bytes(altered)))
+    assert "arms" in ReviewAgenda.model_fields

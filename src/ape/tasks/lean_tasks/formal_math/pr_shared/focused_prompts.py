@@ -330,9 +330,12 @@ FOCUSED_PROMPTS = {
 # build fix, and the only arm that could speak to any of them was the broad generalist doing
 # eight families in one pass.
 #
-# Each of these states the ONE question it answers and refuses the others, because an arm
-# that drifts outside its concern has its findings rejected at submission — the concern is
-# what routes a claim to a verifier.
+# Each of these states the ONE question it answers and refuses the others. That is now the
+# only thing holding an arm to its concern: submission used to reject an off-concern claim and
+# no longer does, because rejecting cost correct findings (11 of the 19 gold obligations
+# labelled `style` are `grind` simplifications and `encard_` renames). The concern still routes
+# a claim to a verifier, so an arm that drifts still produces a claim nothing can settle — it
+# is now recorded as `off-concern:<arm>` rather than refused.
 # ---------------------------------------------------------------------------------------
 
 NAMING_TOOLS = [

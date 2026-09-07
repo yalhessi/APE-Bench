@@ -103,6 +103,20 @@ def _prompt_hashes() -> Dict[str, Tuple[str, str]]:
     Only the hashes leave this function. `contracts.assert_gold_free` substring-sweeps the
     serialized plan, and a spec carrying its own prompt text would put the reviewer's
     instructions into an artifact that is supposed to contain identities alone.
+
+    **What the tools hash is, and is not.** It hashes the tool list the *prompt* declares --
+    `FOCUSED_PROMPTS[arm][0]` -- which is not the list the arm runs with. Workspace tools come
+    from `task_config.enabled_tools` in the run config, and retrieval tools from
+    `arm_registry`. For `naming`, `docs` and `style` this list holds four entries while those
+    arms run with six plus their grants.
+
+    That is a naming problem and not a provenance hole, which is worth stating because it
+    looks like one. Both real lists are sealed elsewhere: the workspace tools through
+    `scaffold_config_sha256`, which hashes the scaffold including `task_config_overrides`, and
+    the per-arm grant through `ReviewArm.context_tools`, which is inside the agenda the plan
+    hashes. Changing either moves a recorded identity. Re-pointing this hash at the real lists
+    would move all ten spec identities and the agenda hash to fix a field name, so it is
+    deliberately not done.
     """
 
     from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
