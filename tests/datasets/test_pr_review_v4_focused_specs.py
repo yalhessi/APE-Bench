@@ -47,7 +47,7 @@ def test_the_reserved_method_ids_are_not_reused():
     assert not ids & {"proof_compression.v1", "structural_rewrite.v1"}
 
 
-def test_specs_carry_prompt_hashes_not_prompt_text():
+def test_specs_carryprompt_hashes_not_prompt_text():
     """`contracts.assert_gold_free` sweeps a serialized plan for words the focused prompts
     are full of — "would a maintainer say", "maintainers routinely ask"."""
 

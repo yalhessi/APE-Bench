@@ -134,7 +134,7 @@ def contamination(release: Path) -> Dict[str, Any]:
 
     from src.datasets.pr_review_v4.contracts import prompt_leaks
     from src.datasets.pr_review_v4.render_focused import (
-        _SUBMISSION_CONTRACT, focused_system_prompt,
+        SUBMISSION_CONTRACT, focused_system_prompt,
     )
     from src.datasets.pr_review_v5.arms import specs_by_arm_id
 
@@ -149,7 +149,7 @@ def contamination(release: Path) -> Dict[str, Any]:
                     if obligation.get(field):
                         gold.append(str(obligation[field]))
 
-    instructions = {"submission_contract": _SUBMISSION_CONTRACT}
+    instructions = {"submission_contract": SUBMISSION_CONTRACT}
     for arm, spec in specs_by_arm_id().items():
         instructions[arm] = focused_system_prompt(spec)
     leaks = {name: found for name, found in

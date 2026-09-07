@@ -28,7 +28,7 @@ from dataclasses import replace
 from src.datasets.pr_review_v4.focused_specs import (
     DECLARATION_KINDS,
     FocusedAgentSpec,
-    _prompt_hashes,
+    prompt_hashes,
     default_specs,
 )
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha256_bytes
@@ -86,7 +86,7 @@ PLACEMENT_KINDS = _PLACEMENT_KINDS
 def _new_spec(definition) -> FocusedAgentSpec:
     """One registry entry as a `FocusedAgentSpec`. Nothing is decided here."""
 
-    hashes = _prompt_hashes()
+    hashes = prompt_hashes()
     return FocusedAgentSpec(
         spec_id=definition.arm_id,
         spec_version=V5_SPEC_VERSION,

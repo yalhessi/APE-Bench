@@ -251,13 +251,14 @@ def _register_declaration(task, mcp) -> None:
         identifier: Annotated[str, Field(description="Declaration name, dotted or snake_cased")],
         limit: Annotated[int, Field(description=f"Max files (capped at {MAX_HITS})")] = 5,
     ) -> Dict[str, Any]:
-        # `_declares_identifier` is private to v4's evidence collector, and is used here
+        # `declares_identifier` lives with v4's evidence collector and is used here
         # deliberately rather than copied: it is the fix for a measured defect — a substring
         # search matched prose terms like "the" in 193 of 200 sampled files and handed a
         # `supports` verdict to every duplication claim. A second implementation would be a
-        # second chance to reintroduce that.
+        # second chance to reintroduce that. It was `_declares_identifier` until two packages
+        # importing it made the underscore a claim that was not true.
         from src.datasets.pr_review_v4.evidence import (
-            _declares_identifier, searchable_identifiers, snapshot_workspace,
+            declares_identifier, searchable_identifiers, snapshot_workspace,
         )
 
         terms = searchable_identifiers(identifier)
@@ -284,7 +285,7 @@ def _register_declaration(task, mcp) -> None:
                 except OSError:
                     continue
                 for term in terms:
-                    if _declares_identifier(text, term):
+                    if declares_identifier(text, term):
                         hits.append({
                             "path": str(path.relative_to(root)),
                             "declares": term,

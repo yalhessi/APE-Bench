@@ -26,7 +26,7 @@ import pytest
 from src.datasets.pr_review_v4.contracts import (
     GoldLeakError, assert_prompts_gold_free, prompt_leaks,
 )
-from src.datasets.pr_review_v4.render_focused import _SUBMISSION_CONTRACT, focused_system_prompt
+from src.datasets.pr_review_v4.render_focused import SUBMISSION_CONTRACT, focused_system_prompt
 from src.datasets.pr_review_v5.arms import specs_by_arm_id
 
 RELEASES = Path("inputs/pr_review_v4/releases")
@@ -77,7 +77,7 @@ def test_the_submission_contract_quotes_no_gold():
     gold = all_gold()
     if not gold:
         pytest.skip("no gold available in this checkout")
-    assert not prompt_leaks(_SUBMISSION_CONTRACT, gold)
+    assert not prompt_leaks(SUBMISSION_CONTRACT, gold)
 
 
 def test_the_lead_instructions_quote_no_gold():

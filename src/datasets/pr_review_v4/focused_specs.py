@@ -92,7 +92,7 @@ class FocusedAgentSpec:
         return sha256_bytes(canonical_json_bytes(self.identity()))
 
 
-def _prompt_hashes() -> Dict[str, Tuple[str, str]]:
+def prompt_hashes() -> Dict[str, Tuple[str, str]]:
     """Hash each prompt pair and tool list, without importing the text into any artifact.
 
     The text is read from `pr_shared`, not from the generation that first shipped it. The
@@ -143,7 +143,7 @@ def default_specs() -> List[FocusedAgentSpec]:
     should exist in this form, which is only a question for an added declaration.
     """
 
-    hashes = _prompt_hashes()
+    hashes = prompt_hashes()
     return [
         FocusedAgentSpec(
             spec_id="proof_golf",

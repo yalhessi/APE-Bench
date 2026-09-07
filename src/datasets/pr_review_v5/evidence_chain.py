@@ -84,11 +84,11 @@ def _collapse_compile_cascades(
     reported for that file. Everything else in the same file is a consequence, and stays
     `diagnostic`: the observation was not wrong, it was not independent.
 
-    Reuses v4's `_candidate_spans` and `_diagnostic_lines` rather than re-deriving spans —
+    Reuses v4's `candidate_spans` and `diagnostic_lines` rather than re-deriving spans —
     localisation is the part that is easy to get subtly wrong.
     """
 
-    from src.datasets.pr_review_v4.evidence import _candidate_spans, _diagnostic_lines
+    from src.datasets.pr_review_v4.evidence import candidate_spans, diagnostic_lines
 
     by_candidate = {item.candidate_id: item for item in candidates}
     baseline_by_candidate: Dict[str, Any] = {}
@@ -118,13 +118,13 @@ def _collapse_compile_cascades(
         graph = graph_by_episode.get(episode_id)
         first_line = None
         for _candidate, artifact in members:
-            lines = _diagnostic_lines(artifact.content, path)
+            lines = diagnostic_lines(artifact.content, path)
             if lines:
                 first_line = min(lines) if first_line is None else min(first_line, min(lines))
         root = None
         if graph is not None and first_line is not None:
             for candidate, _artifact in members:
-                spans = _candidate_spans(candidate, graph).get(path, [])
+                spans = candidate_spans(candidate, graph).get(path, [])
                 if any(start <= first_line <= end for start, end in spans):
                     root = candidate
                     break

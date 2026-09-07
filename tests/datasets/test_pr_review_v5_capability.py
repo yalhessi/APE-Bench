@@ -76,12 +76,12 @@ def test_none_of_this_reaches_a_prompt():
 
     from src.datasets.pr_review_v4.contracts import prompt_leaks
     from src.datasets.pr_review_v4.render_focused import (
-        _SUBMISSION_CONTRACT, focused_system_prompt,
+        SUBMISSION_CONTRACT, focused_system_prompt,
     )
     from src.datasets.pr_review_v5.arms import specs_by_arm_id
 
     derived = [row.why for row in CLASSIFICATION]
-    texts = [_SUBMISSION_CONTRACT] + [
+    texts = [SUBMISSION_CONTRACT] + [
         focused_system_prompt(spec) for spec in specs_by_arm_id().values()]
     for text in texts:
         assert not prompt_leaks(text, derived)

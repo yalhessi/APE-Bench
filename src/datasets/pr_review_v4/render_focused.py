@@ -57,7 +57,7 @@ FOCUSED_FACET_CHECKLIST = FACET_CHECKLIST.replace(
 #: claim — a proof_golf invocation asserts proof simplification and nothing else — and a
 #: model free to relabel its kind could route itself to a verifier whose warrant is laxer
 #: than the one its own instruction was written against.
-_SUBMISSION_CONTRACT = """
+SUBMISSION_CONTRACT = """
 
 # Submission contract for this run
 
@@ -153,7 +153,7 @@ def focused_system_prompt(spec: FocusedAgentSpec) -> str:
     """The spec's v2 instruction verbatim, followed by the v4 envelope."""
 
     _tools, system, _user = FOCUSED_PROMPTS[spec.spec_id]
-    return system + _SUBMISSION_CONTRACT.format(
+    return system + SUBMISSION_CONTRACT.format(
         concern_family=spec.concern_family,
         issue_kind=spec.issue_kind,
         spec_id=spec.spec_id,

@@ -55,7 +55,7 @@ def _target_spans(graph: ChangeGraph, change_id: str) -> List[Tuple[int, int]]:
     return spans
 
 
-def _diagnostic_lines(output: str, path: str) -> List[int]:
+def diagnostic_lines(output: str, path: str) -> List[int]:
     escaped = re.escape(path)
     patterns = [rf"(?:^|\s|/){escaped}:(\d+):", rf"file=(?:[^,]*/)?{escaped},line=(\d+)"]
     return [int(match) for pattern in patterns for match in re.findall(pattern, output, re.MULTILINE)]
@@ -131,7 +131,7 @@ def discover_deterministic_candidates(
             failures[f"compile:{episode_id}:{path}"] = type(exc).__name__
             continue
         compile_output = (compile_proc.stdout + "\n" + compile_proc.stderr).strip()
-        compile_lines = set(_diagnostic_lines(compile_output, path)) if compile_proc.returncode else set()
+        compile_lines = set(diagnostic_lines(compile_output, path)) if compile_proc.returncode else set()
         for change_id in change_ids:
             spans = _target_spans(graph, change_id)
             if any(start <= line <= end for line in compile_lines for start, end in spans):
@@ -156,7 +156,7 @@ def discover_deterministic_candidates(
             failures[f"style:{episode_id}:{path}"] = type(exc).__name__
             continue
         style_output = (style_proc.stdout + "\n" + style_proc.stderr).strip()
-        style_lines = set(_diagnostic_lines(style_output, path)) if style_proc.returncode == 1 else set()
+        style_lines = set(diagnostic_lines(style_output, path)) if style_proc.returncode == 1 else set()
         for change_id in change_ids:
             spans = _target_spans(graph, change_id)
             if any(start <= line <= end for line in style_lines for start, end in spans):

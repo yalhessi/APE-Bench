@@ -35,7 +35,7 @@ def baseline(cid, *, path=PATH, exit_code=1, lines=(10,)):
 
 
 def graph_with(spans):
-    """A stand-in graph whose `_candidate_spans` result is dictated by `spans`."""
+    """A stand-in graph whose `candidate_spans` result is dictated by `spans`."""
 
     entities = [SimpleNamespace(entity_id=f"ent:{cid}", side="reviewed",
                                 span=SimpleNamespace(line_start=s, line_end=e))

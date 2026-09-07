@@ -66,7 +66,7 @@ def _asserts(candidate, kinds, families) -> bool:
     return candidate.concern_family in families
 
 
-def _candidate_spans(candidate: CandidateClaim, graph: ChangeGraph) -> Dict[str, List[Tuple[int, int]]]:
+def candidate_spans(candidate: CandidateClaim, graph: ChangeGraph) -> Dict[str, List[Tuple[int, int]]]:
     entities = {item.entity_id: item for item in graph.entities}
     ranges = {item.range_id: item for item in graph.changed_ranges}
     targets = {item.change_id: item for item in graph.targets}
@@ -88,14 +88,14 @@ def _candidate_spans(candidate: CandidateClaim, graph: ChangeGraph) -> Dict[str,
     return spans
 
 
-def _diagnostic_lines(output: str, path: str) -> List[int]:
+def diagnostic_lines(output: str, path: str) -> List[int]:
     escaped = re.escape(path)
     patterns = [rf"(?:^|\s|/){escaped}:(\d+):", rf"file=(?:[^,]*/)?{escaped},line=(\d+)"]
     return [int(match) for pattern in patterns for match in re.findall(pattern, output, re.MULTILINE)]
 
 
 def _has_target_diagnostic(output: str, path: str, spans: Dict[str, List[Tuple[int, int]]]) -> bool:
-    return any(start <= line <= end for line in _diagnostic_lines(output, path)
+    return any(start <= line <= end for line in diagnostic_lines(output, path)
                for start, end in spans.get(path, []))
 
 
@@ -167,7 +167,7 @@ def searchable_identifiers(query: str) -> List[str]:
     return sorted(set(found))
 
 
-def _declares_identifier(text: str, identifier: str) -> bool:
+def declares_identifier(text: str, identifier: str) -> bool:
     """True when `text` *declares* the identifier, not merely mentions it.
 
     A substring test matched a name inside a comment, an import, or another name that
@@ -312,7 +312,7 @@ def collect_candidate(
                     text = path.read_text(errors="replace")
                 except OSError:
                     continue
-                matched = [term for term in terms if _declares_identifier(text, term)]
+                matched = [term for term in terms if declares_identifier(text, term)]
                 if matched:
                     hits.append(f"{rel} :: {', '.join(sorted(matched))}")
                 if len(hits) == 20:
@@ -359,7 +359,7 @@ def collect_candidate(
                 if baseline_compile_cache is not None:
                     baseline_compile_cache[cache_key] = baseline
             baseline_output = (baseline.stdout + "\n" + baseline.stderr).strip()[-8000:]
-            spans = _candidate_spans(candidate, graph)
+            spans = candidate_spans(candidate, graph)
             relevant_failure = baseline.returncode != 0 and _has_target_diagnostic(
                 baseline_output, compile_path, spans)
             baseline_item = _artifact(
@@ -458,7 +458,7 @@ def collect_candidate(
             if not script.is_file():
                 failures[collector] = "style_policy_checker_missing"
                 continue
-            spans = _candidate_spans(candidate, graph)
+            spans = candidate_spans(candidate, graph)
             policy_items, relevant_violations = [], []
             try:
                 for path in sorted({targets[cid].path for cid in candidate.change_ids}):

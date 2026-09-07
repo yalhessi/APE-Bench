@@ -67,7 +67,7 @@ def _identifier_boundary(term: str) -> re.Pattern:
 
     Without the boundaries, masking the subject `card_foo` inside "rename `card_foo` to
     `encard_foo`" also rewrites the *target* name, and two findings proposing different
-    renames collapse into one. The same boundary rule `evidence._declares_identifier` uses.
+    renames collapse into one. The same boundary rule `evidence.declares_identifier` uses.
     """
 
     return re.compile(

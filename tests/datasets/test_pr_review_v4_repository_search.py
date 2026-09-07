@@ -14,7 +14,7 @@ candidates of either family.
 
 from __future__ import annotations
 
-from src.datasets.pr_review_v4.evidence import _declares_identifier, searchable_identifiers
+from src.datasets.pr_review_v4.evidence import declares_identifier, searchable_identifiers
 
 REALISTIC_QUERY = (
     "primary=Finset.sum_comm; requested_change=Replace the new declaration with the "
@@ -39,21 +39,21 @@ def test_a_declaration_is_matched_but_a_mention_is_not():
     """A duplication claim is about an existing declaration, so a comment is not evidence."""
 
     declared = "theorem Finset.sum_comm (s : Finset α) : True := trivial"
-    assert _declares_identifier(declared, "Finset.sum_comm")
-    assert _declares_identifier("lemma sum_comm : True := trivial", "Finset.sum_comm")
-    assert _declares_identifier(
+    assert declares_identifier(declared, "Finset.sum_comm")
+    assert declares_identifier("lemma sum_comm : True := trivial", "Finset.sum_comm")
+    assert declares_identifier(
         "@[simp]\nprotected theorem Finset.sum_comm : True := trivial", "Finset.sum_comm"
     )
 
-    assert not _declares_identifier("-- see Finset.sum_comm for details", "Finset.sum_comm")
-    assert not _declares_identifier("import Mathlib.Finset.sum_comm", "Finset.sum_comm")
-    assert not _declares_identifier("  exact Finset.sum_comm h", "Finset.sum_comm")
+    assert not declares_identifier("-- see Finset.sum_comm for details", "Finset.sum_comm")
+    assert not declares_identifier("import Mathlib.Finset.sum_comm", "Finset.sum_comm")
+    assert not declares_identifier("  exact Finset.sum_comm h", "Finset.sum_comm")
 
 
 def test_a_longer_name_containing_the_leaf_is_not_a_match():
     """`sum_comm` must not be satisfied by `sum_comm_of_foo`."""
 
-    assert not _declares_identifier(
+    assert not declares_identifier(
         "theorem sum_comm_of_foo : True := trivial", "Finset.sum_comm"
     )
 
@@ -65,8 +65,8 @@ def test_the_rule_still_finds_real_mathlib_declarations():
         "theorem equitableOn_empty [LE β] [Add β] [One β] (f : α → β) : "
         "EquitableOn ∅ f := fun a _ ha => absurd ha (Set.not_mem_empty a)\n"
     )
-    assert _declares_identifier(source, "equitableOn_empty")
-    assert _declares_identifier(source, "Finset.equitableOn_empty"), (
+    assert declares_identifier(source, "equitableOn_empty")
+    assert declares_identifier(source, "Finset.equitableOn_empty"), (
         "a qualified claim must match the declaration's leaf name"
     )
 

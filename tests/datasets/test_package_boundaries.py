@@ -7,8 +7,9 @@ across six packages:
   imports v5 — so "v4 is frozen and imported as a library" is not true. 13 -> 4: `paths` and
   `patchset` moved to `src/mathlib_review/`, which is what that package is for;
 * 42 imports of `_`-private symbols across module boundaries, six of them across generations.
-  29 now, after `evidence._tool_env`/`_run`, `corpus._eval_pr_numbers` and
-  `predictions._extract_json_object` moved into `src/mathlib_review/`;
+  24 now: `evidence._tool_env`/`_run`, `corpus._eval_pr_numbers` and
+  `predictions._extract_json_object` moved into `src/mathlib_review/`, and the five that
+  crossed a generation were promoted to the API two packages already treated them as;
 * one shared review base (`pr_review_v2/base.py`) edited on the strength of a v5-only
   observation, which changed the tool contract for every v2 checker and every v4 arm. That one
   is fixed: it lives at `formal_math/review_task.py` now, owned by no generation, and v5 -> v2
@@ -136,18 +137,17 @@ def _private_cross_module_imports():
 
 def test_private_cross_boundary_imports_do_not_increase():
     """Treating another module's `_`-prefixed names as API is how a refactor of one file
-    breaks three others. `evidence_chain` imports `_candidate_spans` and `_diagnostic_lines`
-    from v4's evidence module; `patchset` imports `_run`; `report` imports
-    `_SUBMISSION_CONTRACT`."""
+    breaks three others.
+
+    42 -> 24, and the remaining 24 are all *within* one generation: v2's `evaluate_d2` and
+    `selector`, v4's `oracle_opportunities`, `wrapper_composition` and `phase7_adjudication`.
+    None crosses a generation any more, which is the half that blocks the collapse -- see
+    `test_no_private_name_crosses_a_generation`.
+    """
 
     found = _private_cross_module_imports()
-    # 42 -> 29. `_tool_env` and `_run` were private names in `pr_review_v4/evidence.py` that
-    # four modules across two packages imported anyway, so `evidence.py` -- where the evidence
-    # chain lives -- could not be refactored without breaking a coordinated-patch verifier
-    # that has no reason to care about evidence. And `predictions._extract_json_object` had ten
-    # import sites across four packages, the largest single violation in the tree.
-    assert len(found) <= 29, (
-        f"{len(found)} private cross-module imports (was 29):\n" +
+    assert len(found) <= 24, (
+        f"{len(found)} private cross-module imports (was 24):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)[:12]))
 
 
@@ -203,3 +203,32 @@ def test_the_context_tool_grant_has_one_owner():
     assert not re.search(r"^_CONTEXT_GRANTS\s*[:=]", schema, re.M)
     # The stale claim that every arm gets all four must not come back.
     assert "Defaulting every arm to all four is" not in schema
+
+
+
+def test_no_private_name_crosses_a_generation():
+    """The half that blocks the collapse, and it is closed.
+
+    Five v4 names were imported by v5 through their underscore: `evidence.candidate_spans`,
+    `diagnostic_lines` and `declares_identifier`, `focused_specs.prompt_hashes`, and
+    `render_focused.SUBMISSION_CONTRACT`. Moving them was not available -- `candidate_spans`
+    takes a `CandidateClaim` and a `ChangeGraph`, both still v4 schema types, so a shared home
+    would have imported v4 -- but the underscore was the part that was wrong. A name two
+    packages import is API, whatever file it sits in.
+
+    What is left is intra-generation, where a private name is a real statement about scope.
+    """
+
+    generations = {name: prefixes for name, prefixes in GENERATIONS.items()}
+    crossing = []
+    for source, prefixes in generations.items():
+        for path in _modules(prefixes):
+            for module, name in _imports(path):
+                if not name.startswith("_") or name.startswith("__"):
+                    continue
+                for target in generations:
+                    if target != source and re.search(rf"pr_review_{target}\b", module):
+                        crossing.append((str(path), module, name))
+    assert crossing == [], (
+        "private name(s) imported across a generation boundary:\n" +
+        "\n".join(f"  {p}: {m}.{n}" for p, m, n in crossing))
