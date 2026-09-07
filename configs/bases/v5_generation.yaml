@@ -1,0 +1,50 @@
+# Everything a v5 generation run shares. A run config extends this and states only what it
+# is actually varying, so the two or three lines that differ are visible instead of buried in
+# ninety lines of restated context.
+#
+# Measured before this existed: 13 of 20 flattened keys were identical across all nine v5
+# generation configs, and only `dataset.run_name` was unique to each.
+#
+# A child overrides by restating a key. Lists are replaced, not merged: `pr_numbers: [33117]`
+# in a child means that PR and not that PR plus these.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 32000
+  thinking_budget_tokens: 30000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  max_concurrency: 4
+
+task_config:
+  enabled_tools:
+    - file_read
+    - content_search
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+
+dataset:
+  routing_mode: lead
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
+  require_prebuilt_workspaces: true
+
+  # Reads the base commit's `.ilean` index so importance can raise a proposal to `required`.
+  # ~4.4s per distinct base commit.
+  use_exposure_index: true
+
+  # The deterministic arm is omitted by default: every finding scored should be one an agent
+  # produced. A child that wants it states `execution_release`.
+
+  # Caps bind BILLED cost — what was actually paid — not the no-cache counterfactual. A job
+  # that used to stop at roughly 40% of its cap now spends the whole thing, so these are real
+  # dollar ceilings rather than the accounting artefact they used to be.
+  standard_budget_cap: 0.30
+  lead_cost_cap: 1.00
+  per_pr_cost_cap: 1.50
+  max_delegations: 25

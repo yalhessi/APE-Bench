@@ -1,0 +1,35 @@
+# Everything a v5 judge run shares. 13 of 18 flattened keys were identical across all six
+# judge configs before this existed; only `candidates`, `out_dir`, `run_name`, `pr_numbers`
+# and `control_pr_numbers` varied, and the first three are all restatements of the generation
+# run's name.
+scaffold_type: ape_agent
+
+llm_config:
+  # Pinned. `judge_version` and `model_name` both enter the script cache key and the task
+  # record hash, so changing either forks the cache and forfeits every cached verdict. Any
+  # name in MODEL_MAPPINGS is accepted by validation, so this is a real hazard rather than a
+  # theoretical one — it is stated here once instead of in six places.
+  model_name: gpt_5_mini
+  max_tokens: 4000
+  thinking_budget_tokens: 3000
+
+execution:
+  max_turns: 4
+  max_concurrency: 4
+  sample_count: 3        # majority vote, and it measures its own verdict flips
+  sample_max_cost: 0.10
+
+task_config:
+  enabled_tools: []      # the judge reads its pair from the prompt
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  input_kind: finding
+  # `anchor` only. Widening can only raise recall, so it is a deliberate, recorded choice
+  # rather than something a config silently inherits — a child that widens it is declaring
+  # that its numbers are not comparable to any run that did not.
+  pairing_tiers: [anchor]
+  dry_run: true
+  # A run that did not finish covering what it promised is refused. Setting this to true
+  # scores it anyway and marks the output forensic in semantic_report.json.
+  allow_partial: false

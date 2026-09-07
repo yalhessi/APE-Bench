@@ -1,83 +1,25 @@
-# Specialist-only, on smoke4's four PRs. The question is whether the generalist earns its
-# place by being a better reviewer or only by being a louder one.
+# Specialist-only, on smoke4's four PRs. Does the generalist earn its place by being a better
+# reviewer, or only by being a louder one?
 #
 # WHAT SMOKE4 MEASURED. Per candidate the generalist and the specialists are
-# indistinguishable — 0.08 hits per candidate against 0.09. The generalist's 4x lead per
-# invocation is entirely volume: 26 candidates from 13 runs against 23 from 46. Specialists
-# ran 3.5x more often and said less. Read against rep2 (where specialists ran 30 times
-# across eleven PRs and the generalist produced every gold-reaching candidate), that retires
-# "the generalist finds what the specialists cannot" and replaces it with "the specialists
-# abstain". Forcing them to run fixed the scheduling and did not fix the abstention.
+# indistinguishable — 0.08 hits per candidate against 0.09. Its 4x lead per invocation is
+# entirely volume: 26 candidates from 13 runs against 23 from 46.
 #
-# WHAT CHANGED SINCE. Two things, both aimed at abstention, neither at the checklists:
+# NOT COMPARABLE TO THE SEPTEMBER RUNS. Since those, the accounting was repaired (caps now
+# bind billed cost, paused work is booked, a failed mandatory job is a coverage gap), 44% of
+# every arm prompt was removed as verbatim repetition, and the renderer version was bumped.
+# Execution changed materially. The September runs are forensic fixtures — see their
+# correction_sidecar.json — and the first complete run after this rework is the new baseline.
 #
-#   1. The retrieval grant is per arm (`arms._CONTEXT_GRANTS`). Given four retrieval tools
-#      the arms converged on the cheapest identifier lookup: 106 `declaration_search` calls
-#      run-wide, 50 of them from `family_design`, whose question no name lookup answers and
-#      which produced nothing from eleven invocations. `family_design`, `docs` and `style`
-#      lose it; the convention arms keep the review corpus; every arm keeps
-#      `content_search` and `lean_verify_edit`.
-#   2. `lean_verify_edit` now labels its as-is mode. 13 of 100 calls verified no edit at
-#      all and came back identical to a verified one — the reviewed file compiles by
-#      construction, so those calls always succeed. The mode stays; it is now legible.
-#
-# The mechanism index (a base-commit digest of `Mathlib/Tactic/**` module docstrings, which
-# is what PR 33117's `to_fun` ask needs) is deliberately NOT here. It is the largest piece
-# and it would move discovery and routing in the same run.
-#
-# NO PROMPT CHANGES. Every arm's system and user text is byte-identical to smoke4, so any
-# movement is attributable to the grant.
-#
-# COVERAGE IS NOT AT RISK ON THIS SET. All 13 work units draw at least one specialist with
-# the floor off — `agenda_report.units_without_specialist` is empty, checked before running.
-# Do not copy this config to another PR set without re-checking that field: without the
-# floor, a unit no specialist is eligible on is simply not reviewed, and a recall drop from
-# that measures coverage, not arms.
-#
-# HOW TO READ IT. smoke4 published 3 issue matches of 9 anchored obligations, carried by 26
-# generalist candidates. The bar is whether the specialists alone reach 3. Below it, the
-# generalist is doing work they cannot and the volume reading was wrong. At or above it,
-# the floor is buying reach that the arms can buy for themselves.
-#
-# Same denominator caveat as smoke4: 4 PRs, 9 anchored obligations, one flipped verdict is
-# 11pp, and there are no control PRs so precision is unmeasurable.
-scaffold_type: ape_agent
-
-llm_config:
-  model_name: gpt_5.2
-  max_tokens: 32000
-  thinking_budget_tokens: 30000
-  temperature: 1.0
-
-execution:
-  max_turns: 40
-  max_concurrency: 4
-
-task_config:
-  enabled_tools:
-    - file_read
-    - content_search
-    - lean_verify
-    - get_lean_goal
-    - code_hover
-    - code_goto
+# COVERAGE IS NOT AT RISK ON THIS SET. All 13 work units draw at least one specialist with the
+# floor off; `agenda_report.units_without_specialist` is empty. Do not copy this to another PR
+# set without re-checking that field: without the floor, a unit no specialist is eligible on
+# is simply not reviewed, and a recall drop from that measures coverage, not arms.
+extends: bases/v5_generation.yaml
 
 dataset:
-  routing_mode: lead
-  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
-  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
   run_name: pr_review_v5_specialist4_rep1
   pr_numbers: [33117, 33145, 33337, 33362]
-  require_prebuilt_workspaces: true
 
   # The whole point of this run.
   generalist_floor: false
-
-  use_exposure_index: true
-
-  # Deterministic arm omitted, as in smoke4: every finding scored is one an agent produced.
-
-  standard_budget_cap: 0.30
-  lead_cost_cap: 1.00
-  per_pr_cost_cap: 1.50
-  max_delegations: 25

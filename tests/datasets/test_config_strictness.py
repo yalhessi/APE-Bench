@@ -101,3 +101,76 @@ def test_the_runbook_command_form_is_the_one_that_was_being_dropped():
             "--dataset.run_name", "pr_review_v4_medium_010_rep1"]
     with pytest.raises(ValueError):
         parse_cli_args(argv)
+
+
+# --- config inheritance -------------------------------------------------------------------
+#
+# 13 of 20 keys never vary across the nine v5 generation configs, and 13 of 18 across the six
+# judge configs, so most of a config is restated context in which the two or three lines that
+# actually differ are hard to find.
+
+
+def _write(tmp_path, name, text):
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+def test_a_child_inherits_and_overrides_its_parent(tmp_path):
+    _write(tmp_path, "base.yaml",
+           "llm_config:\n  model_name: gpt_5.2\n  max_tokens: 32000\n"
+           "dataset:\n  release: r\n  per_pr_cost_cap: 1.5\n")
+    child = _write(tmp_path, "run.yaml",
+                   "extends: base.yaml\ndataset:\n  run_name: mine\n  per_pr_cost_cap: 3.0\n")
+
+    merged = load_yaml(child)
+    assert merged["llm_config"]["model_name"] == "gpt_5.2"   # inherited
+    assert merged["dataset"]["release"] == "r"               # inherited
+    assert merged["dataset"]["run_name"] == "mine"           # added
+    assert merged["dataset"]["per_pr_cost_cap"] == 3.0       # overridden
+    assert "extends" not in merged
+
+
+def test_lists_are_replaced_not_concatenated(tmp_path):
+    """Every list in these configs is a complete statement, not an accumulation: a child that
+    says `pr_numbers: [33117]` means those and not those plus the parent's."""
+
+    _write(tmp_path, "base.yaml", "dataset:\n  pr_numbers: [1, 2, 3]\n")
+    child = _write(tmp_path, "run.yaml",
+                   "extends: base.yaml\ndataset:\n  pr_numbers: [33117]\n")
+    assert load_yaml(child)["dataset"]["pr_numbers"] == [33117]
+
+
+def test_an_explicit_null_overrides_the_parent(tmp_path):
+    _write(tmp_path, "base.yaml", "dataset:\n  execution_release: some/path\n")
+    child = _write(tmp_path, "run.yaml",
+                   "extends: base.yaml\ndataset:\n  execution_release: null\n")
+    assert load_yaml(child)["dataset"]["execution_release"] is None
+
+
+def test_a_cycle_is_refused_rather_than_recursing_forever(tmp_path):
+    _write(tmp_path, "a.yaml", "extends: b.yaml\ndataset: {}\n")
+    b = _write(tmp_path, "b.yaml", "extends: a.yaml\ndataset: {}\n")
+    with pytest.raises(ValueError) as excinfo:
+        load_yaml(b)
+    assert "circular" in str(excinfo.value)
+
+
+def test_a_missing_parent_is_reported_by_path(tmp_path):
+    child = _write(tmp_path, "run.yaml", "extends: nope.yaml\ndataset: {}\n")
+    with pytest.raises(FileNotFoundError) as excinfo:
+        load_yaml(child)
+    assert "nope.yaml" in str(excinfo.value)
+
+
+def test_inheritance_is_relative_to_the_child_not_the_cwd(tmp_path):
+    _write(tmp_path, "bases/gen.yaml", "dataset:\n  release: r\n")
+    child = _write(tmp_path, "runs/one.yaml",
+                   "extends: ../bases/gen.yaml\ndataset:\n  run_name: one\n")
+    assert load_yaml(child)["dataset"]["release"] == "r"
+
+
+def test_a_config_without_extends_is_unchanged(tmp_path):
+    child = _write(tmp_path, "plain.yaml", "dataset:\n  release: r\n")
+    assert load_yaml(child) == {"dataset": {"release": "r"}}

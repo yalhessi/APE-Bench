@@ -1,45 +1,19 @@
-# Score the specialist-only run. Directly comparable to smoke4's judge: same 4 PRs, same 9
-# anchored obligations, same judge model and version, same `pairing_tiers: [anchor]`.
+# Score the specialist-only run.
 #
-# That comparability is the whole point — it is the one pair of runs in this project that
-# differ in a single thing (the generalist floor, plus a retrieval grant that changed no
-# prompt text). smoke4 scored 3/9 issue, 0/9 resolution.
-#
-# READ ONE THING WITH CARE. PR 33117's gold anchors are the thirteen *base* lemmas — the
-# sites that would gain `@[to_fun]`. Both published 33117 findings anchor on `fun_deriv` and
-# `fun_neg`, the lemmas that would be *deleted*: the same defect, the opposite end of the
-# same edit. Anchor-tier pairing cannot join them, so they will score as misses. That is a
-# real limit of the reviewer (it did not name the mechanism, only the redundancy) and also a
-# real limit of the measurement (the gold anchor set is mixed — `fun_iterated_deriv` is in
-# it, the other twelve `fun_*` are not). Do not read a 33117 miss as "nothing was found".
-#
-# Same denominator caveat as smoke4: 9 obligations, one flipped verdict is 11pp, and there
-# are no control PRs so precision and silent-PR emission are unmeasurable.
-scaffold_type: ape_agent
-
-llm_config:
-  # Must stay gpt_5_mini: judge_version and model are both in the cache key and in the task
-  # record hash, so changing either forks the cache and forfeits every cached verdict.
-  model_name: gpt_5_mini
-  max_tokens: 4000
-  thinking_budget_tokens: 3000
-
-execution:
-  max_turns: 4
-  max_concurrency: 4
-  sample_count: 3        # majority vote, and it measures its own verdict flips
-  sample_max_cost: 0.10
-
-task_config:
-  enabled_tools: []      # the judge reads its pair from the prompt
+# READ ONE THING WITH CARE. PR 33117's gold anchors are the thirteen *base* lemmas — the sites
+# that would gain `@[to_fun]`. Both published 33117 findings anchor on `fun_deriv` and
+# `fun_neg`, the lemmas that would be *deleted*: the same defect, the opposite end of the same
+# edit. Anchor-tier pairing cannot join them, so they score as misses. That is a real limit of
+# the reviewer (it named the redundancy, not the mechanism) and also a real limit of the
+# measurement (the gold anchor set is mixed — `fun_iterated_deriv` is in it, the other twelve
+# `fun_*` are not). Do not read a 33117 miss as "nothing was found".
+extends: bases/v5_judge.yaml
 
 dataset:
-  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
-  input_kind: finding
   candidates: results/pr_review_v5/runs/pr_review_v5_specialist4_rep1/findings.jsonl
   out_dir: results/pr_review_v5/audits/specialist4-rep1
   run_name: pr_review_v5_judge_specialist4_rep1
   pr_numbers: [33117, 33145, 33337, 33362]
+  # No control PRs in this set — both controls are larger than every PR here — so precision
+  # and silent-PR emission are unmeasurable.
   control_pr_numbers: []
-  pairing_tiers: [anchor]
-  dry_run: true
