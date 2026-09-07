@@ -48,3 +48,11 @@ dataset:
   lead_cost_cap: 1.00
   per_pr_cost_cap: 1.50
   max_delegations: 25
+
+  # The whole run's ceiling. per_pr_cost_cap bounds only discretionary work -- the coverage
+  # floor is exempt by design, and was therefore bounded by nothing at all. Preflight refuses
+  # a run whose floor alone exceeds this, before the first model call.
+  #
+  # 10.00 against a measured floor of ~1.35 and worst-case discretionary of 6.00 on the four
+  # smoke PRs: room to grow, but not room to run away.
+  run_total_cost_cap: 10.00

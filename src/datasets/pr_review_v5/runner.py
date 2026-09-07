@@ -128,6 +128,18 @@ class V5DatasetConfig(BaseModel):
     lead_cost_cap: float = 2.0
     per_pr_cost_cap: float = 8.0
     max_delegations: int = 60
+    #: The whole run's ceiling, in billed dollars. 0 disables it.
+    #:
+    #: The last unbounded budget. `per_pr_cost_cap` binds only *discretionary* work — the
+    #: coverage floor is deliberately exempt, because charging coverage to the routing
+    #: allowance once left PR 33149 with a $10.05 floor against a $1.50 cap and therefore zero
+    #: specialists. That exemption is right and it left nothing bounding the floor at all: it
+    #: scales with work units times required arms, so a large PR set can authorise an
+    #: arbitrary amount of mandatory work that no cap refuses.
+    #:
+    #: Checked in preflight against the agenda's own floor estimate, so a run that cannot fit
+    #: is refused before the first model call rather than discovered on the invoice.
+    run_total_cost_cap: float = 0.0
 
 
 def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
@@ -382,6 +394,56 @@ def _delegations_from_results(results, mode: str, agenda,
     ]
 
 
+class BudgetTooSmall(RuntimeError):
+    """The run cannot pay for the work it is required to do."""
+
+
+def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = False) -> None:
+    """Say what this run is committed to before it starts, and refuse it if it cannot fit.
+
+    The message this replaces compared the coverage floor against
+    `per_pr_cost_cap * pr_count` and, when it did not fit, advised raising
+    `per_pr_cost_cap` -- a cap that does not bind the floor at all. It bounds *discretionary*
+    work only; the floor is deliberately exempt, because charging coverage to the routing
+    allowance once left PR 33149 with a $10.05 floor against a $1.50 cap and therefore zero
+    specialists.
+
+    So the two are reported separately, against the caps that actually bind them, and the
+    floor is checked against the run total.
+    """
+
+    floor = float(report.get("mandatory_floor_cost") or 0.0)
+    discretionary_cap = dataset.per_pr_cost_cap * pr_count
+    run_cap = dataset.run_total_cost_cap
+
+    logger.info(
+        "budget: mandatory floor $%.2f (uncapped per PR by design) + discretionary up to "
+        "$%.2f (%d PR x $%.2f)",
+        floor, discretionary_cap, pr_count, dataset.per_pr_cost_cap)
+
+    if not run_cap:
+        logger.warning(
+            "no run_total_cost_cap set: the mandatory floor is bounded by nothing. It scales "
+            "with work units times required arms, so a larger PR set authorises more of it "
+            "with no cap refusing.")
+        return
+
+    committed = floor + discretionary_cap
+    logger.info("run_total_cost_cap $%.2f vs worst case $%.2f (floor + discretionary) — %s",
+                run_cap, committed, "fits" if committed <= run_cap else "DOES NOT FIT")
+
+    if floor > run_cap:
+        message = (
+            f"the mandatory coverage floor alone is ${floor:.2f}, above the "
+            f"run_total_cost_cap of ${run_cap:.2f}. The floor is not optional and not "
+            f"capped per PR, so this run cannot be paid for as configured. Raise "
+            f"run_total_cost_cap, narrow pr_numbers, or turn off generalist_floor."
+        )
+        if enforce:
+            raise BudgetTooSmall(message)
+        logger.warning("%s", message)
+
+
 def coordination_config(dataset) -> CoordinationConfig:
     """The run's coordination and synthesis policy, defaulted to what the code does.
 
@@ -580,11 +642,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # tell you what the real run would do could not tell you it would not start.
         guard_run_name(dataset, logger, scaffold, fatal=False)
         logger.info("%s", json.dumps(report, indent=2))
-        floor = report["mandatory_floor_cost"]
-        cap = dataset.per_pr_cost_cap * len(selected_prs)
-        logger.info(
-            "coverage floor (broad pass + required specialists) $%.2f vs run cap $%.2f — %s",
-            floor, cap, "fits" if floor <= cap else "DOES NOT FIT (raise per_pr_cost_cap)")
+        _report_budget(dataset, report, len(selected_prs), logger)
         # Resolving cutoffs during a dry run is the cheapest place to discover that a gated
         # read would have been impossible.
         cutoffs_by_episode(episodes)
@@ -594,6 +652,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
                     plan.agenda_sha256[:12], len(plan.prompt_sha256_by_invocation))
         return None
 
+    _report_budget(dataset, report, len(selected_prs), logger, enforce=True)
     guard_run_name(dataset, logger, scaffold)
     out = run_dir(dataset.run_name)
     out.mkdir(parents=True, exist_ok=True)

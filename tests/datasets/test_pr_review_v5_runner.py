@@ -14,6 +14,7 @@ to validate and, had it validated, could not have represented `unknown` at all.
 from __future__ import annotations
 
 import asyncio
+import logging
 from pathlib import Path
 
 import pytest
@@ -305,3 +306,81 @@ def test_specialist_spend_is_counted_in_the_manifest():
     # The ledger is the attribution record for that nested total, not additional spend.
     assert manifest.cost_breakdown["nested"] == pytest.approx(nested)
     assert manifest.cost_breakdown["lead"] == pytest.approx(lead_self)
+
+
+# --- the run-total budget -----------------------------------------------------------------
+#
+# `per_pr_cost_cap` bounds only DISCRETIONARY work. The coverage floor is deliberately exempt,
+# because charging coverage to the routing allowance once left PR 33149 with a $10.05 floor
+# against a $1.50 cap and therefore zero specialists. That exemption is right, and it left the
+# floor bounded by nothing at all -- it scales with work units times required arms, so a larger
+# PR set authorises more of it with no cap refusing.
+
+
+def _budget_dataset(**kwargs):
+    from src.datasets.pr_review_v5.runner import V5DatasetConfig
+
+    return V5DatasetConfig.model_validate({
+        "release": "r", "modification_inventory": "m",
+        "per_pr_cost_cap": 1.50, **kwargs,
+    })
+
+
+def _floor(amount):
+    return {"mandatory_floor_cost": amount}
+
+
+def test_a_run_whose_floor_exceeds_the_total_is_refused_before_spending():
+    from src.datasets.pr_review_v5.runner import BudgetTooSmall, _report_budget
+
+    logger = logging.getLogger("test")
+    with pytest.raises(BudgetTooSmall) as excinfo:
+        _report_budget(_budget_dataset(run_total_cost_cap=0.50), _floor(1.35), 4,
+                       logger, enforce=True)
+    message = str(excinfo.value)
+    assert "1.35" in message and "0.50" in message
+    # And says what to do about it, since the floor is not optional.
+    assert "generalist_floor" in message
+
+
+def test_a_run_that_fits_is_allowed():
+    from src.datasets.pr_review_v5.runner import _report_budget
+
+    _report_budget(_budget_dataset(run_total_cost_cap=10.0), _floor(1.35), 4,
+                   logging.getLogger("test"), enforce=True)
+
+
+def test_a_dry_run_warns_where_a_real_run_would_refuse(caplog):
+    """A dry run must be able to say the real run would not start."""
+
+    from src.datasets.pr_review_v5.runner import _report_budget
+
+    with caplog.at_level(logging.WARNING):
+        _report_budget(_budget_dataset(run_total_cost_cap=0.50), _floor(1.35), 4,
+                       logging.getLogger("test"), enforce=False)
+    assert "cannot be paid for" in caplog.text
+
+
+def test_no_cap_is_reported_as_unbounded_rather_than_passing_quietly(caplog):
+    """Zero disables the check, and that has to be visible: the failure mode it guards against
+    is a floor nobody priced."""
+
+    from src.datasets.pr_review_v5.runner import _report_budget
+
+    with caplog.at_level(logging.WARNING):
+        _report_budget(_budget_dataset(run_total_cost_cap=0.0), _floor(1.35), 4,
+                       logging.getLogger("test"), enforce=True)
+    assert "bounded by nothing" in caplog.text
+
+
+def test_the_floor_is_priced_separately_from_the_discretionary_cap(caplog):
+    """The message this replaced compared the floor against `per_pr_cost_cap * pr_count` and
+    advised raising a cap that does not bind the floor at all."""
+
+    from src.datasets.pr_review_v5.runner import _report_budget
+
+    with caplog.at_level(logging.INFO):
+        _report_budget(_budget_dataset(run_total_cost_cap=10.0), _floor(1.35), 4,
+                       logging.getLogger("test"))
+    assert "mandatory floor $1.35" in caplog.text
+    assert "discretionary up to $6.00" in caplog.text
