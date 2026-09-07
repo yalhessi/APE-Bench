@@ -410,7 +410,7 @@ def derive_from_run(run_name: str) -> Dict[str, Any]:
     Deriving them from the one name removes the class of mistake rather than the instance.
     """
 
-    from src.datasets.pr_review_v5.paths import run_dir
+    from src.mathlib_review.paths import run_dir
 
     slug = run_name.replace("pr_review_v5_", "").replace("_", "-")
     return {
@@ -429,7 +429,7 @@ def assert_paths_agree(dataset: "JudgeDatasetConfig", run_name: str) -> None:
     silently honoured.
     """
 
-    from src.datasets.pr_review_v5.paths import run_dir
+    from src.mathlib_review.paths import run_dir
 
     expected = run_dir(run_name).resolve()
     actual = Path(dataset.candidates).resolve()

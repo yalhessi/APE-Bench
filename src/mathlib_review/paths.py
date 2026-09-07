@@ -1,4 +1,9 @@
-"""The one place v5 names its own roots and the earlier-generation artifacts it reads.
+"""Where a review run reads from and writes to.
+
+Moved out of `pr_review_v5` because it is not v5's: `judge_runner` in v4 imports `run_dir`
+from here so a judge run's paths come from the generation run's name instead of three
+free-form strings that must agree by hand. That was a backward v4 -> v5 edge for a path
+convention neither generation owns.
 
 v5 owns no gold and no releases. It *consumes* a v4 release (work units, episodes, change
 graphs) and a v4 treatment's modification inventory, and it writes only under `RESULTS`.
@@ -54,16 +59,26 @@ def run_dir(run_name: str) -> Path:
     return RUNS / run_name
 
 
-def assert_repo_root() -> None:
-    """Fail loudly if the process was not launched from the repository root."""
+#: Directories that exist iff the process is at the repository root.
+#:
+#: Deliberately not the review packages. This check existed twice -- once here naming
+#: `pr_review_v5`/`pr_review_v4`, once in `pr_review_v4/paths.py` naming
+#: `pr_review_v4`/`inputs/pr_review_v4` -- and both would start failing during the collapse,
+#: when a marker they name stops existing. A root marker should outlive what it is guarding.
+ROOT_MARKERS = ("src/ape", "src/datasets", "inputs")
 
-    missing = [
-        marker for marker in ("src/datasets/pr_review_v5", "src/datasets/pr_review_v4")
-        if not Path(marker).is_dir()
-    ]
+
+def assert_repo_root() -> None:
+    """Fail loudly if the process was not launched from the repository root.
+
+    Manifest paths are stored relative to the working directory, so running a builder from
+    elsewhere silently writes unreproducible provenance into an otherwise immutable artifact.
+    """
+
+    missing = [marker for marker in ROOT_MARKERS if not Path(marker).is_dir()]
     if missing:
         raise RuntimeError(
-            "pr_review_v5 tooling must run from the repository root; missing "
+            "review tooling must run from the repository root; missing "
             f"{missing}. Manifest paths are stored relative to the working directory, so "
             "running from elsewhere writes unreproducible provenance."
         )

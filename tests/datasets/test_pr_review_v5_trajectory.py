@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 
 from src.datasets.pr_review_v5 import delegation_view, trajectory
-from src.datasets.pr_review_v5.paths import run_dir
+from src.mathlib_review.paths import run_dir
 
 RUN = "pr_review_v5_lead_medium_heldout_rep1"
 DIRECTORY = run_dir(RUN)

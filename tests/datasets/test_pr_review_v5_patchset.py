@@ -12,7 +12,7 @@ changes, and the whole candidate falls if any edit escapes or any touched file f
 
 from __future__ import annotations
 
-from src.datasets.pr_review_v5.patchset import (
+from src.mathlib_review.patchset import (
     MAX_PATCH_EDITS, PatchEdit, PatchSet, apply, validate, verification_artifact,
 )
 
@@ -143,7 +143,7 @@ def test_an_empty_patch_never_verifies():
 
     from pathlib import Path
 
-    from src.datasets.pr_review_v5.patchset import verify
+    from src.mathlib_review.patchset import verify
 
     ok, report, touched = verify(PatchSet(()), Path("/nonexistent"))
     assert ok is False and touched == []

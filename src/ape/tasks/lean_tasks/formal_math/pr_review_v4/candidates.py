@@ -295,7 +295,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         would be publishable while unverified in the fourth.
         """
 
-        from src.datasets.pr_review_v5.patchset import (
+        from src.mathlib_review.patchset import (
             PatchEdit, PatchSet, verification_artifact, verify,
         )
 
@@ -430,7 +430,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             return None
         if not self.patch_set_paths:
             return ("patch_set is not accepted by this check; submit a single proposed_edit")
-        from src.datasets.pr_review_v5.patchset import PatchEdit, PatchSet, validate
+        from src.mathlib_review.patchset import PatchEdit, PatchSet, validate
 
         patch = PatchSet(tuple(
             PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),

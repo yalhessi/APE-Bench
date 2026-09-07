@@ -37,7 +37,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from src.datasets.pr_review_v4.io import display_path
 
-from .paths import assert_repo_root, run_dir
+from src.mathlib_review.paths import assert_repo_root, run_dir
 from .schema import BUDGET_TIERS
 
 #: Distinguishes an old tier segment from the orchestrator id that replaced it.

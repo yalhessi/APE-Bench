@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional
 
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
 
-from .paths import run_dir
+from src.mathlib_review.paths import run_dir
 
 #: Bumped whenever the recovery changes what it reads or how it aggregates, so a sidecar can
 #: be told apart from one produced by a different rule.

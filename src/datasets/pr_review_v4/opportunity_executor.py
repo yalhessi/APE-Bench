@@ -20,7 +20,7 @@ from typing import Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
 
 from .change_graph import apply_file_patch, parse_unified_diff
-from .evidence import _tool_env
+from src.mathlib_review.workspace import tool_env as _tool_env
 from .implementation_registry import load_implementations
 from .io import (
     COMPILED_TARGET,

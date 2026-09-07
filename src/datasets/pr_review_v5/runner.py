@@ -62,7 +62,7 @@ from .coordination import CoordinationConfig, assert_implemented
 from .cutoffs import cutoffs_by_episode
 from .evidence_chain import collect_supported, reviewed_workspaces
 from .finalize import finalize
-from .paths import PRECEDENT_INDEX, run_dir
+from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
 from .preflight import assert_ready, assert_workspaces_prebuilt
 from .schema import ROUTING_MODES, V5RunManifest, V5RunPlan
 from .trace import reconcile

@@ -4,8 +4,10 @@ Mapping the tree turned up the coupling that makes one experiment touch thirteen
 across six packages:
 
 * 97 names imported from v4 into v5 across 41 statements, and **backward** edges where v4
-  imports v5 — so "v4 is frozen and imported as a library" is not true;
-* 42 imports of `_`-private symbols across module boundaries, six of them across generations;
+  imports v5 — so "v4 is frozen and imported as a library" is not true. 13 -> 4: `paths` and
+  `patchset` moved to `src/mathlib_review/`, which is what that package is for;
+* 42 imports of `_`-private symbols across module boundaries, six of them across generations.
+  38 now, after `evidence._tool_env` and `evidence._run` became `mathlib_review.workspace`;
 * one shared review base (`pr_review_v2/base.py`) edited on the strength of a v5-only
   observation, which changed the tool contract for every v2 checker and every v4 arm. That one
   is fixed: it lives at `formal_math/review_task.py` now, owned by no generation, and v5 -> v2
@@ -87,15 +89,16 @@ def test_v4_does_not_import_v5_beyond_the_known_backward_edges():
     """
 
     edges = _cross_generation_edges("v4", "v5")
-    # 11 -> 13: `judge_runner.derive_from_run` imports `pr_review_v5.paths.run_dir` so that a
-    # judge run's paths come from the generation run's name instead of three free-form strings
-    # that must agree by hand -- which they did not: one config was bumped to rep2 while its
-    # judge still read rep1. That the judge must know where generation writes is an
-    # unavoidable *data* dependency; the code dependency goes away in the collapse, when path
-    # conventions move to a shared core. Raised deliberately rather than worked around by
-    # duplicating the path, which is the two-sources-of-truth problem this session keeps
-    # finding.
-    assert len(edges) <= 13, (
+    # 13 -> 4. Two clusters went to `src/mathlib_review/`, which is what that package is for:
+    # `paths` (the judge deriving its own paths from the generation run it scores) and
+    # `patchset` (the coordinated multi-file edit, used by the shared candidate contract).
+    # Neither belonged to v5; both were imported backwards because that is where they were
+    # first written.
+    #
+    # What is left is one real case: v4's `review_overlay` renders a v5 run. That is a reader
+    # reaching forward to the generation whose output it displays, and it goes away when there
+    # is one generation rather than by being moved.
+    assert len(edges) <= 4, (
         "new backward v4 -> v5 import(s):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
 
@@ -134,8 +137,12 @@ def test_private_cross_boundary_imports_do_not_increase():
     `_SUBMISSION_CONTRACT`."""
 
     found = _private_cross_module_imports()
-    assert len(found) <= 42, (
-        f"{len(found)} private cross-module imports (was 42):\n" +
+    # 42 -> 38: `_tool_env` and `_run` were private names in `pr_review_v4/evidence.py` that
+    # four modules across two packages imported anyway, so `evidence.py` -- where the evidence
+    # chain lives -- could not be refactored without breaking a coordinated-patch verifier
+    # that has no reason to care about evidence. They are `mathlib_review.workspace` now.
+    assert len(found) <= 38, (
+        f"{len(found)} private cross-module imports (was 38):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)[:12]))
 
 

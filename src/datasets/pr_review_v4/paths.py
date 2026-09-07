@@ -17,6 +17,8 @@ recorded strings are only reproducible when tooling runs from the repo root — 
 
 from pathlib import Path
 
+from src.mathlib_review.paths import assert_repo_root as _assert_repo_root
+
 # --- Frozen provenance inputs from earlier generations ------------------------------
 
 #: v3 intervention gold (schema i5). The single most load-bearing legacy artifact:
@@ -44,20 +46,7 @@ AUDITS = RESULTS / "audits"
 RUNS = RESULTS / "runs"
 
 
-def assert_repo_root() -> None:
-    """Fail loudly if the process was not launched from the repository root.
-
-    Manifest paths are stored relative to the working directory, so running a builder
-    from elsewhere would silently write unreproducible provenance into an otherwise
-    immutable artifact.
-    """
-
-    missing = [
-        marker for marker in ("src/datasets/pr_review_v4", "inputs/pr_review_v4")
-        if not Path(marker).is_dir()
-    ]
-    if missing:
-        raise RuntimeError(
-            "pr_review_v4 tooling must run from the repository root "
-            f"(cannot see {', '.join(missing)} from {Path.cwd()})"
-        )
+#: The same check, from the one place it is defined. It was implemented here and again in
+#: v5's paths module, differing only in which directories each named as proof of the root --
+#: and both named a review package, so both would start failing during the collapse.
+assert_repo_root = _assert_repo_root

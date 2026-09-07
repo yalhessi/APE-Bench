@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
-from .paths import run_dir
+from src.mathlib_review.paths import run_dir
 
 DELEGATION_VIEW_VERSION = "v5-delegation-view/1"
 

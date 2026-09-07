@@ -16,17 +16,16 @@ from .schema import (
     CandidateClaim, ChangeGraph, EvidenceArtifact, EvidenceAssertion, EvidencePacket,
     ReviewEpisodeBoundary, SourceEvent,
 )
+from src.mathlib_review.workspace import run, tool_env
+
 from .retrieval import retrieve_payloads
 
 
-def _tool_env(workspace: Path) -> Dict[str, str]:
-    """Recover project-local elan tools when the orchestrator supplies a minimal PATH."""
-    env = os.environ.copy()
-    roots = [workspace, *workspace.parents, Path.home()]
-    tool_dirs = [root / ".elan" / "bin" for root in roots if (root / ".elan" / "bin").is_dir()]
-    if tool_dirs:
-        env["PATH"] = os.pathsep.join([*(str(path) for path in tool_dirs), env.get("PATH", "")])
-    return env
+#: Both moved to `mathlib_review.workspace`, which is where a primitive four modules in two
+#: packages already import belongs. Kept as names here because this module's own call sites
+#: use them; nothing outside should.
+_tool_env = tool_env
+_run = run
 
 
 #: What a claim actually asserts, as opposed to the topic its arm declares.
@@ -98,11 +97,6 @@ def _diagnostic_lines(output: str, path: str) -> List[int]:
 def _has_target_diagnostic(output: str, path: str, spans: Dict[str, List[Tuple[int, int]]]) -> bool:
     return any(start <= line <= end for line in _diagnostic_lines(output, path)
                for start, end in spans.get(path, []))
-
-
-def _run(command: List[str], workspace: Path, timeout: int = 180):
-    return subprocess.run(command, cwd=workspace, text=True, capture_output=True, timeout=timeout,
-                          env=_tool_env(workspace))
 
 
 def _artifact(candidate, collector, kind, polarity, content, source_ref, occurred_at=None):

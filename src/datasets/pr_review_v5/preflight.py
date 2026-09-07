@@ -36,7 +36,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 from src.datasets.pr_review_v4.runs import unbuilt_base_commits
 
-from .paths import assert_repo_root
+from src.mathlib_review.paths import assert_repo_root
 
 
 class PreflightError(RuntimeError):

@@ -34,7 +34,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-from .paths import PRECEDENT_CORPUS, PRECEDENT_INDEX, assert_repo_root
+from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX, assert_repo_root
 
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 INDEX_VERSION = "v5-precedent-index/1"

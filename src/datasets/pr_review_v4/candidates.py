@@ -62,7 +62,7 @@ def _diagnostic_lines(output: str, path: str) -> List[int]:
 
 
 def _tool_env(workspace: Path) -> Dict[str, str]:
-    from .evidence import _tool_env as evidence_tool_env
+    from src.mathlib_review.workspace import tool_env as evidence_tool_env
     return evidence_tool_env(workspace)
 
 

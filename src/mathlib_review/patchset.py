@@ -238,7 +238,7 @@ def verify(
     import subprocess
     import tempfile
 
-    from src.datasets.pr_review_v4.evidence import _run
+    from src.mathlib_review.workspace import run as _run
 
     def read(path: str) -> Optional[str]:
         source = workspace / path

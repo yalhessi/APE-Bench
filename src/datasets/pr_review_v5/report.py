@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
-from .paths import RESULTS, run_dir
+from src.mathlib_review.paths import RESULTS, run_dir
 from .trace import routing_report
 
 

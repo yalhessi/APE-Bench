@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 from src.datasets.pr_review_v4.io import git_state
-from src.datasets.pr_review_v5.paths import run_dir
+from src.mathlib_review.paths import run_dir
 from src.datasets.pr_review_v5.runner import V5DatasetConfig, _build_plan, load_run, run
 from src.datasets.pr_review_v5.schema import V5RunPlan
 
