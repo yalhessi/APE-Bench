@@ -93,6 +93,15 @@ class JudgeDatasetConfig(BaseModel):
     #: and therefore its identity, so enabling one is a deliberate, recorded experiment.
     include_maintainer_comment: bool = False
     include_sibling_claims: bool = False
+    #: Score a run that did not finish covering what it promised.
+    #:
+    #: Off by default, and the default is the whole point. Two September runs closed with
+    #: `completion_status: failed` and were scored anyway, because nothing between the run and
+    #: the judge looked. The resulting recall figures were reported, compared against each
+    #: other, and used to choose what to build next. A partial run's artifacts are still worth
+    #: reading; its recall is not a measurement, because the denominator includes work units
+    #: that were never reviewed.
+    allow_partial: bool = False
 
 
 def candidate_from_finding(finding: ReviewFinding) -> CandidateClaim:
@@ -335,8 +344,53 @@ def collect_pairs(dataset: JudgeDatasetConfig) -> List[Dict]:
     return pairs
 
 
+def assert_source_run_is_complete(dataset: JudgeDatasetConfig, logger) -> Optional[str]:
+    """Refuse to score a run that did not finish covering what it promised.
+
+    `dataset.candidates` points into a generation run's directory, so its manifest is a
+    sibling. Two September runs closed with `completion_status: failed` and were scored
+    anyway, because nothing between the run and the judge ever looked at it; the resulting
+    recall figures were reported and used to decide what to build next.
+
+    Returns the source run's status when one could be read, for the record. Raises unless the
+    run is complete or `allow_partial` is set.
+    """
+
+    manifest_path = Path(dataset.candidates).parent / "run_manifest.json"
+    if not manifest_path.is_file():
+        # v4 runs and hand-assembled candidate files have no manifest. Say so rather than
+        # inventing a verdict about them.
+        logger.info("no run manifest beside %s; source-run completeness unchecked",
+                    dataset.candidates)
+        return None
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    status = manifest.get("completion_status")
+    gaps = manifest.get("coverage_gaps") or []
+    if status == "complete":
+        return status
+
+    detail = (
+        f"source run {manifest.get('run_name')!r} closed as {status!r}"
+        + (f" with {len(gaps)} coverage gap(s): "
+           + ", ".join(sorted(g.get("invocation_id", "?") for g in gaps)[:6])
+           if gaps else "")
+    )
+    if not dataset.allow_partial:
+        raise ValueError(
+            f"{detail}. Recall from it is measured against work units that were never "
+            "reviewed, so it is not comparable to a complete run. Set "
+            "`dataset.allow_partial: true` to score it anyway — the output is forensic and "
+            "must not be reported as a headline number."
+        )
+    logger.warning("%s — scoring anyway because allow_partial is set. These numbers are "
+                   "forensic, not a measurement.", detail)
+    return status
+
+
 async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     assert_repo_root()
+    source_run_status = assert_source_run_is_complete(dataset, logger)
     model = scaffold.llm_config.model_name
     execution = getattr(scaffold, "execution", None)
     llm = scaffold.llm_config
@@ -478,6 +532,10 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     write_once(dataset.out_dir / "semantic_report.json", pretty_json_bytes({
         **report, "arm": "registered_task", "judge_identity": identity,
         "pairing_tiers": list(dataset.pairing_tiers),
+        # Travels with the numbers. A score read out of a file that does not say its source
+        # run was partial is exactly how two September runs were compared to each other.
+        "source_run_status": source_run_status,
+        "forensic": bool(source_run_status and source_run_status != "complete"),
     }))
     if dataset.input_kind == "finding":
         findings = load_jsonl(dataset.candidates, ReviewFinding)
