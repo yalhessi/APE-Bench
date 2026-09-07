@@ -535,6 +535,27 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
             "issue_unanimous": bool(metrics.get("issue_unanimous", 0)),
             "resolution_unanimous": bool(metrics.get("resolution_unanimous", 0)),
         })
+    # Recall against every obligation measures the reviewer and the publication mechanism
+    # together; recall against the ones the mechanism can admit measures the reviewer alone.
+    # Both September runs were reported only the first way, against a release where 27 of 43
+    # obligations were unpublishable by construction. The mapping is predeclared and hashed,
+    # never derived from what happened to publish.
+    from .reachability import annotate_recall
+
+    scored_obligation_ids = {
+        row.get("obligation_id") for row in (report.get("per_obligation") or [])
+    }
+    concerns_by_obligation = {
+        obligation.obligation_id: list(judgment.concern_labels or [])
+        for judgment in judgments
+        for obligation in (judgment.obligations or [])
+    }
+    reachability = annotate_recall(
+        report,
+        [concerns_by_obligation.get(item, []) for item in sorted(
+            scored_obligation_ids - {None})],
+    )
+
     write_once(dataset.out_dir / "semantic_report.json", pretty_json_bytes({
         **report, "arm": "registered_task", "judge_identity": identity,
         "pairing_tiers": list(dataset.pairing_tiers),
@@ -542,6 +563,7 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
         # run was partial is exactly how two September runs were compared to each other.
         "source_run_status": source_run_status,
         "forensic": bool(source_run_status and source_run_status != "complete"),
+        **reachability,
     }))
     if dataset.input_kind == "finding":
         findings = load_jsonl(dataset.candidates, ReviewFinding)
