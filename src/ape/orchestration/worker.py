@@ -3,6 +3,7 @@
 import asyncio
 import contextvars
 import inspect
+import json
 import multiprocessing as mp
 import random
 import threading
@@ -541,6 +542,46 @@ class SampleWorker:
                 mode.value,
             )
 
+    async def _write_task_outcome(
+        self,
+        job: Dict[str, Any],
+        storage: TaskStorage,
+        task_data: Dict[str, Any],
+        task_type: str,
+        samples: Dict[int, Any],
+        *,
+        has_result: bool,
+    ) -> None:
+        """Write `task_outcome.json` — the execution record for one scheduled task.
+
+        Separate from `task_result.json`, which stays reserved for a legal successful
+        submission. Every scheduled task gets an outcome: completed, paused, failed or
+        cancelled, with the billed and nominal cost of every attempt. Never raises — an
+        accounting record must not be able to fail a run that otherwise succeeded.
+        """
+
+        from ape.orchestration.models import TaskOutcome
+
+        try:
+            outcome = TaskOutcome.from_samples(
+                task_id=task_data.get("task_id") or job["task_global_index"],
+                task_type=task_type,
+                global_index=job["task_global_index"],
+                samples=samples,
+                max_retries=self.config.execution.task_max_retries,
+                max_turns=self.config.execution.max_turns,
+                sample_max_cost=self.config.execution.sample_max_cost,
+                has_result=has_result,
+            )
+            path = storage.task_dir / "task_outcome.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                json.dumps(outcome.model_dump(mode="json"), indent=2), encoding="utf-8")
+        except Exception:  # noqa: BLE001
+            self.logger.warning(
+                "could not write task_outcome.json for %s", job.get("task_global_index"),
+                exc_info=True)
+
     async def _try_aggregate(
         self,
         job: Dict[str, Any],
@@ -562,15 +603,31 @@ class SampleWorker:
             return
 
         # Check completion status outside of lock
+        still_running = False
+        resumable = False
         for sample in samples.values():
             if sample.status in {ExecutionStatus.PENDING, ExecutionStatus.RUNNING}:
-                return
+                still_running = True
+                break
             if sample.can_execute(
                 self.config.execution.task_max_retries,
                 self.config.execution.max_turns,
                 self.config.execution.sample_max_cost,
             ):
-                return
+                resumable = True
+
+        if still_running:
+            return
+
+        # A resumable task is not finished, but it has already spent money. The old code
+        # returned here with nothing written, so that spend left no record and the task reached
+        # the caller as a bare failure at $0.00 — which then satisfied a mandatory coverage
+        # check. Record the outcome, then stop; `task_result.json` stays unwritten because no
+        # legal submission happened.
+        if resumable:
+            await self._write_task_outcome(
+                job, storage, task_data, task_type, samples, has_result=False)
+            return
 
         # Now acquire lock for the aggregation
         with self.aggregation_lock:
@@ -611,6 +668,8 @@ class SampleWorker:
         await storage.save_task_result(task_result)
         aggregated_path = self.config.execution.get_aggregated_results_path(self.orchestrator_dir)
         await append_to_jsonl(aggregated_path, task_result.model_dump(mode="json"))
+        await self._write_task_outcome(
+            job, storage, task_data, task_type, samples, has_result=True)
 
         # Update progress outside of lock
         def updater(progress: OrchestratorProgress) -> None:

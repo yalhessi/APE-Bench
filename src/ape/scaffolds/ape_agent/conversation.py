@@ -766,8 +766,18 @@ class ApeAgentConversationManager:
                 raise ConversationInterruptedError("User interrupted conversation with ESC key")
 
             current_turns = session.get_assistant_count()
-            current_cost = sum(u.total_cost for u in self._conversation_usage)
-            
+            # Billed, not nominal. `total_cost` is the no-cache counterfactual and
+            # `cached_total_cost` is what was actually paid; with prompt caching they differ by
+            # roughly 2.5x. Enforcing here on nominal while `Sample.get_effective_cost` decides
+            # resumability on billed is what silently voided work: a `family_design` arm on PR
+            # 33117 paused at nominal $0.3017 against a $0.30 cap having been billed $0.1218,
+            # so `can_execute` judged it resumable, `_try_aggregate` wrote no result, and the
+            # ledger booked the job as failed at $0.00. Both sides now read the same figure.
+            current_cost = sum(
+                (u.cached_total_cost or u.total_cost) for u in self._conversation_usage
+            )
+            nominal_cost = sum(u.total_cost for u in self._conversation_usage)
+
             # Enforce turn limit
             if current_turns >= max_turns:
                 from ape.scaffolds.base import MaxTurnsReachedError
@@ -786,11 +796,13 @@ class ApeAgentConversationManager:
                 if current_cost >= self.cost_limit:
                     from ape.llm_clients.config import CostExhaustedError
                     self.logger.warning(
-                        f"Cost limit exceeded: current_cost=${current_cost:.6f} >= limit=${self.cost_limit:.6f} - "
+                        f"Cost limit exceeded: billed=${current_cost:.6f} >= limit=${self.cost_limit:.6f} "
+                        f"(nominal ${nominal_cost:.6f}) - "
                         f"last turn's message and tools are saved for potential resume"
                     )
                     raise CostExhaustedError(
-                        f"Cost limit exceeded: ${current_cost:.6f} >= ${self.cost_limit:.6f}"
+                        f"Cost limit exceeded: billed ${current_cost:.6f} >= ${self.cost_limit:.6f} "
+                        f"(nominal ${nominal_cost:.6f})"
                     )
             
             # Log state on the first turn or at regular checkpoints

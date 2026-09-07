@@ -149,8 +149,15 @@ class Sample(BaseModel):
         return sum(a.cost for a in self.attempts)
 
     def get_accumulated_cached_cost(self) -> float:
-        """Get accumulated cached cost."""
-        return sum(a.cached_cost for a in self.attempts)
+        """Accumulated billed cost across every attempt.
+
+        This is what a cap must be checked against, not `get_effective_cost`: a sample that
+        paused, resumed and paused again has spent the sum, and charging only the last attempt
+        lets a sample loop indefinitely, each attempt staying under the cap on its own.
+        Falls back to an attempt's nominal `cost` when no billed figure was recorded, which is
+        also the case where the two are equal.
+        """
+        return sum((a.cached_cost or a.cost) for a in self.attempts)
 
     def get_current_turns(self) -> int:
         """Get current conversation turns."""
@@ -201,7 +208,12 @@ class Sample(BaseModel):
             if current.status == ExecutionStatus.PAUSED_MAX_TURNS:
                 return self.get_current_turns() < max_turns
             elif current.status == ExecutionStatus.PAUSED_COST_LIMIT:
-                return sample_max_cost is None or self.get_effective_cost() < sample_max_cost
+                # Cumulative billed, matching what the conversation enforces. Charging only the
+                # last attempt (`get_effective_cost`) let a sample resume forever, and reading
+                # billed here while the conversation paused on nominal is what made a paused
+                # job look resumable, skip aggregation, and book as failed at $0.00.
+                return (sample_max_cost is None
+                        or self.get_accumulated_cached_cost() < sample_max_cost)
 
         return current.status in {ExecutionStatus.PENDING, ExecutionStatus.RUNNING}
 
@@ -232,6 +244,157 @@ class Sample(BaseModel):
             last_error=last_error,
             last_updated=self.updated_at
         )
+
+# ============================================================================
+# Task Outcome - Persisted to task_outcome.json for EVERY scheduled task
+# ============================================================================
+#
+# `task_result.json` is reserved for a legal successful submission, so a task that paused on
+# budget, failed, or was cancelled leaves no trace of the money it spent. That is not
+# hypothetical: a `family_design` arm on PR 33117 ran 184s, was billed real money, and reached
+# the delegation ledger as `status=failed, cost=0.0` — which then satisfied a mandatory
+# coverage check and was reported as an abstention.
+#
+# The shape follows the framework's own hierarchy, task -> samples -> attempts. It is not
+# task -> attempts: the judge runs `sample_count: 3`, and collapsing the sample level would
+# lose the majority-vote structure it depends on.
+
+
+class AttemptOutcome(BaseModel):
+    """One execution attempt. Immutable once written."""
+
+    attempt_id: int
+    status: ExecutionStatus
+    #: What was actually paid. The cap is enforced against this.
+    billed_cost: float = 0.0
+    #: The no-cache counterfactual, kept for reporting only. Never call this "spend".
+    nominal_cost: float = 0.0
+    turns: int = 0
+    error: Optional[str] = None
+    path: Optional[str] = None
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+
+
+class SampleOutcome(BaseModel):
+    """One sample and its retry/resume chain."""
+
+    sample_index: int
+    status: ExecutionStatus
+    attempts: List[AttemptOutcome] = Field(default_factory=list)
+    billed_cost: float = 0.0
+    nominal_cost: float = 0.0
+    #: Whether this sample may still run given the current limits.
+    resumable: bool = False
+
+
+class TaskExecutionStatus(str, Enum):
+    """How a task's execution ended, independent of what it concluded.
+
+    Distinct from `BaseTaskResult.success`, which is the *domain* verdict: a judgment task that
+    correctly returns a negative verdict is `execution_status=completed, success=False`. A task
+    that ran out of budget is `execution_status=paused` and has no result at all.
+    """
+
+    COMPLETED = "completed"
+    PAUSED = "paused"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class TaskOutcome(BaseModel):
+    """Execution record for one scheduled task. Written whether or not it produced a result."""
+
+    task_id: str
+    task_type: str
+    global_index: str
+    execution_status: TaskExecutionStatus
+    #: True when `task_result.json` was written. A paused or failed task has no result, and one
+    #: is never synthesized to stand in for the failure.
+    has_result: bool = False
+    #: Why it ended this way, when that is not "it finished".
+    reason: Optional[str] = None
+    samples: List[SampleOutcome] = Field(default_factory=list)
+    billed_cost: float = 0.0
+    nominal_cost: float = 0.0
+    turns: int = 0
+    wall_seconds: float = 0.0
+
+    @classmethod
+    def from_samples(
+        cls,
+        *,
+        task_id: str,
+        task_type: str,
+        global_index: str,
+        samples: Dict[int, "Sample"],
+        max_retries: int,
+        max_turns: int,
+        sample_max_cost: Optional[float],
+        has_result: bool,
+    ) -> "TaskOutcome":
+        """Project the persisted sample records into one execution record."""
+
+        sample_outcomes: List[SampleOutcome] = []
+        for index in sorted(samples):
+            sample = samples[index]
+            attempts = [
+                AttemptOutcome(
+                    attempt_id=attempt.attempt_id,
+                    status=attempt.status,
+                    billed_cost=float(attempt.cached_cost or attempt.cost),
+                    nominal_cost=float(attempt.cost),
+                    turns=attempt.turns,
+                    error=getattr(attempt, "error", None),
+                    path=str(attempt.path) if getattr(attempt, "path", None) else None,
+                    started_at=attempt.started_at,
+                    completed_at=attempt.completed_at,
+                )
+                for attempt in sample.attempts
+            ]
+            sample_outcomes.append(SampleOutcome(
+                sample_index=sample.sample_index,
+                status=sample.status,
+                attempts=attempts,
+                billed_cost=sample.get_accumulated_cached_cost(),
+                nominal_cost=sample.get_accumulated_cost(),
+                resumable=sample.can_execute(max_retries, max_turns, sample_max_cost),
+            ))
+
+        # Precedence is deliberate: a task with any resumable sample is paused rather than
+        # failed, because calling it failed is what discards the record of its spend.
+        statuses = {item.status for item in sample_outcomes}
+        if any(item.resumable for item in sample_outcomes):
+            execution_status = TaskExecutionStatus.PAUSED
+        elif has_result or statuses == {ExecutionStatus.SUCCESS}:
+            execution_status = TaskExecutionStatus.COMPLETED
+        else:
+            execution_status = TaskExecutionStatus.FAILED
+
+        reason = None
+        if execution_status is not TaskExecutionStatus.COMPLETED:
+            reason = ", ".join(sorted(item.status.value for item in sample_outcomes)) or None
+
+        wall = 0.0
+        for item in sample_outcomes:
+            for attempt in item.attempts:
+                if attempt.started_at and attempt.completed_at:
+                    wall += (attempt.completed_at - attempt.started_at).total_seconds()
+
+        return cls(
+            task_id=task_id,
+            task_type=task_type,
+            global_index=global_index,
+            execution_status=execution_status,
+            has_result=has_result,
+            reason=reason,
+            samples=sample_outcomes,
+            billed_cost=sum(item.billed_cost for item in sample_outcomes),
+            nominal_cost=sum(item.nominal_cost for item in sample_outcomes),
+            turns=sum(a.turns for item in sample_outcomes for a in item.attempts),
+            wall_seconds=wall,
+        )
+
 
 # ============================================================================
 # Progress State - Persisted to progress.json
