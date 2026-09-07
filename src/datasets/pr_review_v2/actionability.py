@@ -80,7 +80,7 @@ async def classify(records, sidecar_path: Path, model: str, cache_dir: Path, con
     from ape.llm_clients.client import LLMClient
     from ape.llm_clients.config import LLMConfig
     from ape.llm_clients.models import ContentBlock, ConversationSession
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     rows: Dict[tuple, Dict[str, Any]] = {}
@@ -112,7 +112,7 @@ async def classify(records, sidecar_path: Path, model: str, cache_dir: Path, con
                 text = "\n".join(b.text for n in nodes for b in n.message.content
                                  if b.type == "text" and b.text)
             try:
-                verdict = _extract_json_object(text)
+                verdict = extract_json_object(text)
                 v = {"verdict": str(verdict.get("verdict", "")).upper().strip(),
                      "reason": str(verdict.get("reason") or "")}
                 if v["verdict"] not in (NON_ACTIONABLE | {"ACTIONABLE"}):

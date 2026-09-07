@@ -98,7 +98,7 @@ async def distill_prs(
     from ape.llm_clients.client import LLMClient
     from ape.llm_clients.config import LLMConfig
     from ape.llm_clients.models import ContentBlock, ConversationSession
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
 
     DISTILL_CACHE.mkdir(parents=True, exist_ok=True)
     out: Dict[int, PRDistillation] = {}
@@ -128,7 +128,7 @@ async def distill_prs(
             text = "\n".join(b.text for n in nodes for b in n.message.content
                              if b.type == "text" and b.text)
         try:
-            v = _extract_json_object(text)
+            v = extract_json_object(text)
             decls = [DeclDistillation.model_validate(d) for d in (v.get("declarations") or [])
                      if isinstance(d, dict)]
             art = PRDistillation(pr_number=pr, pr_summary=str(v.get("pr_summary") or ""),

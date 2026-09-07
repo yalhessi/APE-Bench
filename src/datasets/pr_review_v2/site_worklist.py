@@ -148,9 +148,9 @@ def _cache_key(comment: Dict[str, Any], model: str) -> str:
 
 
 def parse_concern(text: str) -> str:
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
     try:
-        c = str(_extract_json_object(text).get("concern") or "none").strip().lower()
+        c = str(extract_json_object(text).get("concern") or "none").strip().lower()
     except ValueError:
         return "none"
     return c if c in set(CONCERNS) | {"none"} else "none"
@@ -225,7 +225,7 @@ async def distill_asks(items: List[Dict[str, Any]], *, model: str, concurrency: 
     from ape.llm_clients.client import LLMClient
     from ape.llm_clients.config import LLMConfig
     from ape.llm_clients.models import ContentBlock, ConversationSession
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
 
     ASK_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     pending = []
@@ -254,7 +254,7 @@ async def distill_asks(items: List[Dict[str, Any]], *, model: str, concurrency: 
             text = "\n".join(b.text for n in nodes for b in n.message.content
                              if b.type == "text" and b.text)
         try:
-            ask = str(_extract_json_object(text).get("ask") or "").strip()
+            ask = str(extract_json_object(text).get("ask") or "").strip()
         except ValueError:
             ask = ""
         it["typical_ask"] = ask

@@ -333,9 +333,9 @@ async def _call(client, prompt: str, max_tokens: int = 4000):
 
 
 def _parse_json(text: str) -> Dict[str, Any]:
-    from src.datasets.pr_review_v2.predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
     try:
-        return _extract_json_object(text)
+        return extract_json_object(text)
     except ValueError:
         return {}
 

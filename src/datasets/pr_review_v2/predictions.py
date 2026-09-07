@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple
 from pydantic import BaseModel, Field, ValidationError
 
 from .schema import PRReviewV2Record
+from src.mathlib_review.model_output import extract_json_object
 
 PREDICTION_SCHEMA_VERSION = "pr_review_v2_pred/0.1"
 
@@ -141,25 +142,14 @@ def build_user_prompt(record: PRReviewV2Record, *, budget: int) -> str:
     )
 
 
-def _extract_json_object(text: str) -> Dict[str, Any]:
-    """Extract the first JSON object from raw model output (fences/prose tolerated)."""
-    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
-    decoder = json.JSONDecoder()
-    for start in range(len(cleaned)):
-        if cleaned[start] != "{":
-            continue
-        try:
-            obj, _ = decoder.raw_decode(cleaned[start:])
-        except json.JSONDecodeError:
-            continue
-        if isinstance(obj, dict):
-            return obj
-    raise ValueError("no JSON object found in response")
+#: `extract_json_object` is defined in `mathlib_review.model_output`. Ten call sites across
+#: four packages used to import it from here through its underscore, which is what a shared
+#: rule written in the first place that needed it looks like.
 
 
 def parse_prediction_text(text: str, *, budget: int) -> Tuple[Optional[bool], Optional[float], List[PredictedFinding]]:
     """Parse model text into (merge_ready_as_is, confidence, findings). Raises ValueError."""
-    payload = _extract_json_object(text)
+    payload = extract_json_object(text)
 
     merge_ready = payload.get("merge_ready_as_is")
     if not isinstance(merge_ready, bool):

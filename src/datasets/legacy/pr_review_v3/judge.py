@@ -72,9 +72,9 @@ def pair_key(iv: Dict[str, Any], pred_finding: Dict[str, Any], model: str) -> st
 
 def parse_verdict(text: str) -> Tuple[bool, bool, str]:
     """(issue_match, resolution_match, reason); resolution ⇒ issue enforced here."""
-    from src.datasets.pr_review_v2.predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
     try:
-        v = _extract_json_object(text)
+        v = extract_json_object(text)
     except ValueError:
         return False, False, f"judge_unparseable: {text[:100]}"
     issue = bool(v.get("issue_match"))

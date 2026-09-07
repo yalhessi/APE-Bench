@@ -7,8 +7,8 @@ across six packages:
   imports v5 — so "v4 is frozen and imported as a library" is not true. 13 -> 4: `paths` and
   `patchset` moved to `src/mathlib_review/`, which is what that package is for;
 * 42 imports of `_`-private symbols across module boundaries, six of them across generations.
-  37 now, after `evidence._tool_env`/`_run` became `mathlib_review.workspace` and
-  `corpus._eval_pr_numbers` became `mathlib_review.corpus`;
+  29 now, after `evidence._tool_env`/`_run`, `corpus._eval_pr_numbers` and
+  `predictions._extract_json_object` moved into `src/mathlib_review/`;
 * one shared review base (`pr_review_v2/base.py`) edited on the strength of a v5-only
   observation, which changed the tool contract for every v2 checker and every v4 arm. That one
   is fixed: it lives at `formal_math/review_task.py` now, owned by no generation, and v5 -> v2
@@ -141,12 +141,13 @@ def test_private_cross_boundary_imports_do_not_increase():
     `_SUBMISSION_CONTRACT`."""
 
     found = _private_cross_module_imports()
-    # 42 -> 37: `_tool_env` and `_run` were private names in `pr_review_v4/evidence.py` that
+    # 42 -> 29. `_tool_env` and `_run` were private names in `pr_review_v4/evidence.py` that
     # four modules across two packages imported anyway, so `evidence.py` -- where the evidence
     # chain lives -- could not be refactored without breaking a coordinated-patch verifier
-    # that has no reason to care about evidence. They are `mathlib_review.workspace` now.
-    assert len(found) <= 37, (
-        f"{len(found)} private cross-module imports (was 37):\n" +
+    # that has no reason to care about evidence. And `predictions._extract_json_object` had ten
+    # import sites across four packages, the largest single violation in the tree.
+    assert len(found) <= 29, (
+        f"{len(found)} private cross-module imports (was 29):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)[:12]))
 
 

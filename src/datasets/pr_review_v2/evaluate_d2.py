@@ -223,7 +223,7 @@ async def judge_pairs_llm(
     from ape.llm_clients.client import LLMClient
     from ape.llm_clients.config import LLMConfig
     from ape.llm_clients.models import ContentBlock, ConversationSession
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
 
     config.matcher_cache_dir.mkdir(parents=True, exist_ok=True)
     pending = []
@@ -282,7 +282,7 @@ async def judge_pairs_llm(
                 b.text for n in nodes for b in n.message.content if b.type == "text" and b.text
             )
         try:
-            verdict = _extract_json_object(text)
+            verdict = extract_json_object(text)
             same = bool(verdict.get("same_issue"))
             reason = str(verdict.get("reason") or "")
         except ValueError:

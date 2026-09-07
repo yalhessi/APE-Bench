@@ -87,9 +87,9 @@ Judge the transfer of the PRINCIPLE, not surface word overlap. Reply with JSON o
 def parse_verdict(text: str):
     """(relation, principle, reason) from the judge's JSON, with the actionable-principle gate
     enforced in code: an empty/NONE principle forces relation=not_actionable regardless of label."""
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
     try:
-        verdict = _extract_json_object(text)
+        verdict = extract_json_object(text)
     except ValueError:
         return "unrelated", "", f"judge_unparseable: {text[:100]}"
     relation = str(verdict.get("relation") or "unrelated")

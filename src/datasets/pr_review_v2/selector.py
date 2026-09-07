@@ -206,7 +206,7 @@ async def score_candidates(
     from ape.llm_clients.client import LLMClient
     from ape.llm_clients.config import LLMConfig
     from ape.llm_clients.models import ContentBlock, ConversationSession
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
 
     SELECTOR_CACHE.mkdir(parents=True, exist_ok=True)
     pending = []
@@ -247,7 +247,7 @@ async def score_candidates(
             text = "\n".join(b.text for n in nodes for b in n.message.content
                              if b.type == "text" and b.text)
         try:
-            v = _extract_json_object(text)
+            v = extract_json_object(text)
             score = float(v.get("score"))
             reason = str(v.get("reason") or "")
         except (ValueError, TypeError):
@@ -282,7 +282,7 @@ async def score_candidates_listwise(
     from ape.llm_clients.client import LLMClient
     from ape.llm_clients.config import LLMConfig
     from ape.llm_clients.models import ContentBlock, ConversationSession
-    from .predictions import _extract_json_object
+    from src.mathlib_review.model_output import extract_json_object
 
     SELECTOR_CACHE.mkdir(parents=True, exist_ok=True)
     by_pr: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
@@ -326,7 +326,7 @@ async def score_candidates_listwise(
             text = "\n".join(b.text for n in nodes for b in n.message.content
                              if b.type == "text" and b.text)
         try:
-            verdict = _extract_json_object(text)
+            verdict = extract_json_object(text)
         except ValueError:
             verdict = {}
         scores_by_hash: Dict[str, float] = {}
