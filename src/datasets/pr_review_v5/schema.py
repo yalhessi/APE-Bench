@@ -20,7 +20,7 @@ mixing them inside one package is how a frozen hash quietly moves.
 
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import Field
 
@@ -293,5 +293,10 @@ class V5RunManifest(StrictModel):
     candidates_total: int
     issues_total: int
     context_calls_total: int
-    completion_status: Literal["complete", "failed"]
+    #: `partial` sits between the other two: nothing errored, but the run did not cover what
+    #: it promised to. Finalization and judging treat it as non-success, because a recall
+    #: number from a partial run is measured against a denominator it never looked at.
+    completion_status: Literal["complete", "partial", "failed"]
+    #: Mandatory jobs that did not succeed, one row each. Empty on a complete run.
+    coverage_gaps: List[Dict[str, Any]] = Field(default_factory=list)
     source_sha256: str

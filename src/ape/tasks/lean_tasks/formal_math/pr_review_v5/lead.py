@@ -257,6 +257,15 @@ class LeanPRReviewV5LeadResult(BasePRReviewResult):
     #: Every specialist candidate returned, for the finalization chain to ingest.
     arm_responses: List[Dict[str, Any]] = Field(default_factory=list)
     waves: int = 0
+    #: Mandatory jobs that did not succeed, one row each. A coverage floor job that ran and
+    #: failed used to be indistinguishable from one that ran and found nothing, because the
+    #: reconciliation only asked whether the invocation was in `outcomes` at all. On PR 33117
+    #: that turned a budget cutoff into "full coverage", and `units_without_specialist` — the
+    #: field used to green-light a specialist-only run — reported an empty list.
+    #:
+    #: A non-empty list means the run did not cover what it promised to cover, and the run is
+    #: `partial` regardless of whether the lead submitted legally.
+    coverage_gaps: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class LeanPRReviewV5LeadTask(BasePRReviewTask):
@@ -695,7 +704,7 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 for item in (candidate_assessments or [])
             ]
             try:
-                records, responses = self._reconcile(pruned_rows)
+                records, responses, coverage_gaps = self._reconcile(pruned_rows)
             except Exception:  # noqa: BLE001
                 self.logger.error("reconciliation failed: %s", traceback.format_exc())
                 return {"evaluation_result": EvaluationResult(
@@ -703,7 +712,24 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                     "message": "Submit failed"}
 
             state = self._state()
+            # Bubble what the children spent. `judgment/task.py` and `review_gate.py` both set
+            # this and the lead did not, which is why a run's manifest reported only the lead's
+            # own conversation plus a separately-summed ledger, and why the nested spend of a
+            # job that never produced a result went missing entirely.
+            #
+            # Costs only: per-job token counts used to be the enclosing tier's total stamped on
+            # every row, so summing them was meaningless. Cost is per job and reconciles.
+            from ape.llm_clients.models import TokenUsage
+            nested_usage = TokenUsage(
+                total_cost=round(sum(
+                    getattr(outcome, "nominal_cost", 0.0) or 0.0
+                    for outcome, _spec in state["outcomes"].values()), 6),
+                cached_total_cost=round(sum(
+                    outcome.cost or 0.0
+                    for outcome, _spec in state["outcomes"].values()), 6),
+            )
             result = self.create_result(
+                nested_token_usage=nested_usage,
                 success=True, score=1.0, pr_number=self.data.pr_number,
                 episode_id=self.data.episode_id,
                 routing_mode=self.data.routing_mode,
@@ -714,6 +740,7 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 comprehension=state.get("comprehension") or {},
                 arm_responses=responses,
                 waves=state["wave"],
+                coverage_gaps=coverage_gaps,
                 merge_ready_as_is=None,
                 findings=[], review_message=message or "",
             )
@@ -794,12 +821,39 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 "rendered_prompt_sha256": spec.payload.get("rendered_prompt_sha256"),
             })
 
+        # A mandatory job that RAN and failed is a coverage gap too. The check below only asks
+        # whether the invocation is in `outcomes`, and a failed job is — so a floor job that
+        # exhausted its budget counted as coverage, and the run reported no gaps at all.
+        coverage_gaps: List[Dict[str, Any]] = []
+        for invocation_id, (outcome, spec) in sorted(state["outcomes"].items()):
+            if spec.disposition != "mandatory" or outcome.status == "success":
+                continue
+            coverage_gaps.append({
+                "invocation_id": invocation_id,
+                "arm_id": outcome.arm_id,
+                "work_unit_id": outcome.work_unit_id,
+                "pr_number": outcome.pr_number,
+                "status": outcome.status,
+                "reason": outcome.error or "mandatory job did not succeed",
+            })
+            self.logger and self.logger.warning(
+                "coverage gap: mandatory job %s ended %s (%s)",
+                invocation_id, outcome.status, outcome.error or "no reason recorded")
+
         for proposal_id, proposal in sorted(proposals.items()):
             if proposal["invocation_id"] in state["outcomes"]:
                 continue
             if proposal.get("mandatory"):
-                # Only reachable if the floor could not be dispatched at all; recording it as
-                # pruned would file a coverage failure as a decision.
+                # The floor could not be dispatched at all; recording it as pruned would file
+                # a coverage failure as a decision.
+                coverage_gaps.append({
+                    "invocation_id": proposal["invocation_id"],
+                    "arm_id": proposal["arm_id"],
+                    "work_unit_id": proposal["work_unit_id"],
+                    "pr_number": proposal["pr_number"],
+                    "status": "never_ran",
+                    "reason": "mandatory job was never dispatched",
+                })
                 self.logger and self.logger.warning(
                     "mandatory job %s never ran", proposal["invocation_id"])
             records.append({
@@ -819,7 +873,7 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 "candidate_count": None, "verification_artifact_count": None,
                 "result_sha256": None, "context_calls": [],
             })
-        return records, responses
+        return records, responses, coverage_gaps
 
     def _context_calls(self) -> Dict[str, List[Dict[str, Any]]]:
         """Group the append-only context trace by invocation."""

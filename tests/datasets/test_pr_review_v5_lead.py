@@ -208,7 +208,7 @@ def test_unselected_proposals_are_pruned_automatically(lead):
     result = asyncio.run(tools["submit_routing"](pruned=[], candidate_assessments=[]))
     assert result["evaluation_result"].success is True
 
-    records, _responses = task._reconcile([])
+    records, _responses, _gaps = task._reconcile([])
     dispositions = {item["invocation_id"]: item["disposition"] for item in records}
     # Every non-mandatory proposal still ends with a disposition — nothing goes missing.
     assert dispositions["wu:1#proof_golf"] == "pruned"
@@ -221,7 +221,7 @@ def test_an_auto_pruned_proposal_is_marked_as_such(lead):
     trace cannot tell a considered decision from an unmentioned one."""
 
     task, _tools = lead
-    records, _responses = task._reconcile([
+    records, _responses, _gaps = task._reconcile([
         {"proposal_id": "wu:1#proof_golf", "reason": "no proof was modified here"}])
     by_id = {item["invocation_id"]: item for item in records}
     assert by_id["wu:1#proof_golf"]["reason_given"] is True
@@ -247,7 +247,7 @@ def test_a_pruned_proposal_is_recorded_with_its_reason(lead):
     asyncio.run(tools["submit_routing"](pruned=[
         {"proposal_id": "wu:1#proof_golf", "reason": "no proof was modified here"},
         {"proposal_id": "wu:1#duplication", "reason": "not a new declaration"}]))
-    records, _responses = task._reconcile([
+    records, _responses, _gaps = task._reconcile([
         {"proposal_id": "wu:1#proof_golf", "reason": "no proof was modified here"},
         {"proposal_id": "wu:1#duplication", "reason": "not a new declaration"}])
     by_id = {item["invocation_id"]: item for item in records}
@@ -462,3 +462,69 @@ def test_comprehension_is_submitted_once(lead):
     asyncio.run(tools["submit_comprehension"](summary="A rename.", questions=[]))
     again = asyncio.run(tools["submit_comprehension"](summary="Something else.", questions=[]))
     assert again["success"] is False
+
+
+# --- coverage gaps ----------------------------------------------------------------------
+#
+# A mandatory job that RAN and failed used to be indistinguishable from one that ran and found
+# nothing: `_reconcile` only asked whether the invocation was in `outcomes`, and a failed job
+# is. On PR 33117 the family_design floor job exhausted its budget, was booked as
+# `status=failed cost=0.0`, and satisfied the coverage check -- so the run reported
+# `units_without_specialist: []`, which is the field used to green-light a specialist-only run.
+
+
+def _record_outcome(task, invocation_id, *, disposition, status, error=None):
+    """Put a finished job into the lead's state the way `delegate` would."""
+
+    from types import SimpleNamespace
+
+    outcome = SimpleNamespace(
+        invocation_id=invocation_id, arm_id=invocation_id.split("#")[-1],
+        work_unit_id=invocation_id.split("#")[0], pr_number=1,
+        status=status, cost=0.0, nominal_cost=0.0, error=error,
+        candidates=[], verification_artifacts=[], result_sha256=None,
+        budget_tier="standard", budget_cap=0.3, wall_seconds=1.0,
+        token_usage=None, delivered_prompt_sha256="x",
+    )
+    spec = SimpleNamespace(
+        invocation_id=invocation_id, proposal_id=invocation_id,
+        disposition=disposition, reason="", brief=None,
+        payload={"rendered_prompt_sha256": "x"},
+    )
+    task._state()["outcomes"][invocation_id] = (outcome, spec)
+
+
+def test_a_failed_mandatory_job_is_a_coverage_gap_not_coverage(lead):
+    task, _tools = lead
+    _record_outcome(task, "wu:1#generalist", disposition="mandatory",
+                    status="paused_cost", error="cost limit reached")
+
+    _records, _responses, gaps = task._reconcile([])
+
+    assert [g["invocation_id"] for g in gaps] == ["wu:1#generalist"]
+    assert gaps[0]["status"] == "paused_cost"
+    assert gaps[0]["reason"] == "cost limit reached"
+
+
+def test_a_successful_mandatory_job_leaves_no_gap(lead):
+    task, _tools = lead
+    _record_outcome(task, "wu:1#generalist", disposition="mandatory", status="success")
+
+    _records, _responses, gaps = task._reconcile([])
+    assert gaps == []
+
+
+def test_a_failed_discretionary_job_is_not_a_coverage_gap(lead):
+    """Coverage is a promise about mandatory work. A specialist the lead chose to run and
+    which failed is a routing outcome, not a hole in what the run guaranteed to look at."""
+
+    task, _tools = lead
+    _record_outcome(task, "wu:1#proof_golf", disposition="delegated",
+                    status="failed", error="boom")
+
+    _records, _responses, gaps = task._reconcile([])
+    assert "wu:1#proof_golf" not in {g["invocation_id"] for g in gaps}
+    # The fixture's own mandatory job was never dispatched, so it is a gap — which is the
+    # other half of the rule and worth asserting here rather than assuming it away.
+    assert {g["invocation_id"] for g in gaps} == {"wu:1#generalist"}
+    assert gaps[0]["status"] == "never_ran"

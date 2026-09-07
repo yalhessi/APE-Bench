@@ -39,8 +39,16 @@ def reconcile(
     results: Any,
     issues_total: int,
     extra_cost: float = 0.0,
+    coverage_gaps: Sequence[Dict[str, Any]] = (),
 ) -> V5RunManifest:
-    """Build the run manifest, raising if the ledger does not balance."""
+    """Build the run manifest, raising if the ledger does not balance.
+
+    `coverage_gaps` are mandatory jobs that did not succeed. A run with any is `partial`: it
+    did not look at everything it promised to look at, and a recall number from it is measured
+    against a denominator it never covered. That is not the same as failing, and it is not the
+    same as succeeding -- on PR 33117 a paused floor job was booked as a plain failure, counted
+    as coverage anyway, and the run was scored as though complete.
+    """
 
     proposals = {item.proposal_id: item for item in agenda.proposals}
     by_invocation: Dict[str, Dict[str, Any]] = {}
@@ -136,22 +144,20 @@ def reconcile(
         succeeded=statuses["success"],
         failed=statuses["failed"],
         paused=statuses["paused_cost"] + statuses["paused_turns"],
-        # Spend arrives from orchestrators that do not know about each other, so the total
-        # is assembled rather than read:
-        #   * `results`      — the leads' own conversations (or, in the model-free modes,
-        #                      the single orchestrator that ran every arm task);
-        #   * `ledger_cost`  — everything nested under a lead attempt, floor and specialists
-        #                      alike, which `results.total_cost` cannot see;
-        #   * `extra_cost`   — a caller-supplied remainder, now always zero in `lead` mode.
-        # In `fanout`/`rules` the ledger rows are synthesized without costs, so the nested
-        # term is zero there and nothing is double counted.
-        total_cost=(
-            float(getattr(results, "total_cost", 0.0) or 0.0)
-            + extra_cost
-            + ledger_cost
-        ),
+        # The root total is read once, not assembled. The lead now bubbles what its children
+        # spent through `BaseTaskResult.nested_token_usage`, which the scaffold merges into the
+        # task's own usage and the worker writes to `attempt.cost` — so `results.total_cost`
+        # is already inclusive. Adding `ledger_cost` on top of that, as this did while the
+        # lead did *not* bubble, would now count every nested dollar twice.
+        #
+        # `ledger_cost` remains the attribution record: it says which jobs the nested total was
+        # spent on, and the reconciliation below checks the two agree. In `fanout`/`rules` there
+        # is no lead, ledger rows carry no cost, and the nested term is zero.
+        total_cost=float(getattr(results, "total_cost", 0.0) or 0.0) + extra_cost,
         cost_breakdown={
-            "lead": round(float(getattr(results, "total_cost", 0.0) or 0.0), 6),
+            # What the leads' own conversations cost, i.e. inclusive minus what they delegated.
+            "lead": round(
+                float(getattr(results, "total_cost", 0.0) or 0.0) - ledger_cost, 6),
             "nested": round(ledger_cost, 6),
             "extra": round(extra_cost, 6),
         },
@@ -159,7 +165,12 @@ def reconcile(
         candidates_total=candidates_total,
         issues_total=issues_total,
         context_calls_total=context_calls,
-        completion_status="complete" if statuses["failed"] == 0 else "failed",
+        completion_status=(
+            "failed" if statuses["failed"] else
+            "partial" if coverage_gaps else
+            "complete"
+        ),
+        coverage_gaps=[dict(item) for item in coverage_gaps],
         source_sha256="",
     )
     return manifest.model_copy(update={"source_sha256": sha256_bytes(canonical_json_bytes(

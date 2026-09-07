@@ -289,13 +289,19 @@ def test_specialist_spend_is_counted_in_the_manifest():
     )
     plan = plan.model_copy(update={"source_sha256": sha256_bytes(canonical_json_bytes(
         plan.model_dump(mode="json", exclude={"source_sha256"})))})
+    floor_jobs = sum(1 for r in records if r["disposition"] == "mandatory")
+    nested = 0.10 * specialists + 0.02 * floor_jobs
+    # `results.total_cost` is now INCLUSIVE of nested spend: the lead bubbles what its children
+    # cost through `nested_token_usage`, the scaffold merges it into the task's own usage, and
+    # the worker writes it to `attempt.cost`. This used to be exclusive, and the manifest added
+    # the ledger on top; doing that now would count every nested dollar twice.
+    lead_self = 1.30
     manifest = reconcile(
         agenda=agenda, delegations=records, responses=[], plan=plan,
-        results=SimpleNamespace(total_cost=1.30, wall_clock_time=180.0),
+        results=SimpleNamespace(total_cost=lead_self + nested, wall_clock_time=180.0),
         issues_total=30, extra_cost=2.97,
     )
-    floor_jobs = sum(1 for r in records if r["disposition"] == "mandatory")
-    assert manifest.total_cost == pytest.approx(
-        1.30 + 2.97 + 0.10 * specialists + 0.02 * floor_jobs)
-    assert manifest.cost_breakdown["nested"] == pytest.approx(
-        0.10 * specialists + 0.02 * floor_jobs)
+    assert manifest.total_cost == pytest.approx(lead_self + nested + 2.97)
+    # The ledger is the attribution record for that nested total, not additional spend.
+    assert manifest.cost_breakdown["nested"] == pytest.approx(nested)
+    assert manifest.cost_breakdown["lead"] == pytest.approx(lead_self)

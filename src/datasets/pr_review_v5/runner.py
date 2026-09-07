@@ -305,6 +305,24 @@ def _comprehension_from_results(results, mode: str) -> List[Dict[str, Any]]:
     return rows
 
 
+def _coverage_gaps_from_results(results, mode: str) -> List[Dict[str, Any]]:
+    """Mandatory jobs that did not succeed, across every lead in the run.
+
+    A run with any of these is `partial`. It is not a failure — the lead may have submitted
+    perfectly legally — but it did not look at everything it promised to, so a recall number
+    from it is measured against a denominator it never covered. On PR 33117 a paused floor job
+    was booked as a plain failure, counted as coverage anyway, and the run was scored complete.
+    """
+
+    if mode != "lead":
+        return []
+    rows: List[Dict[str, Any]] = []
+    for result in results.task_results:
+        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
+        rows.extend(raw.get("coverage_gaps") or [])
+    return rows
+
+
 def _assessments_from_results(results, mode: str) -> List[Dict[str, Any]]:
     """The lead's read on the claims that came back.
 
@@ -592,6 +610,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
     responses = _responses_from_results(results, dataset.routing_mode)
     delegations = _delegations_from_results(results, dataset.routing_mode, agenda)
     assessments = _assessments_from_results(results, dataset.routing_mode)
+    coverage_gaps = _coverage_gaps_from_results(results, dataset.routing_mode)
     comprehension = _comprehension_from_results(results, dataset.routing_mode)
     write_once(out / "arm_responses.jsonl", jsonl_bytes(responses))
     write_once(out / "delegations.jsonl", jsonl_bytes(delegations))
@@ -627,11 +646,22 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
     manifest = reconcile(
         agenda=agenda, delegations=delegations, responses=responses,
         plan=plan, results=results, issues_total=summary["issues_total"],
+        coverage_gaps=coverage_gaps,
     )
     write_once(out / "run_manifest.json", pretty_json_bytes(manifest.model_dump(mode="json")))
     logger.info("run dir: %s", out)
     logger.info("completion_status=%s issues=%d cost=$%.2f",
                 manifest.completion_status, manifest.issues_total, manifest.total_cost)
+    if manifest.coverage_gaps:
+        # Loud, and at the end where it is read. This is the signal that was missing when two
+        # runs were scored as though complete: every arm result is still on disk and worth
+        # inspecting, but a recall figure from this run is not comparable to a complete one.
+        logger.warning(
+            "PARTIAL RUN: %d mandatory job(s) did not succeed, so some work units were never "
+            "reviewed. Recall from this run is measured against coverage it did not have. "
+            "Gaps: %s",
+            len(manifest.coverage_gaps),
+            ", ".join(sorted(g.get("invocation_id", "?") for g in manifest.coverage_gaps)[:8]))
     return out
 
 

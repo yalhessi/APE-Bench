@@ -287,15 +287,27 @@ def test_failed_and_paused_jobs_are_counted_not_dropped():
     assert manifest.completion_status == "failed"
 
 
-def test_spend_is_the_orchestrator_plus_everything_nested_under_it():
-    """`results.total_cost` sees only the leads' own conversations. Floor and specialist jobs
-    run in nested orchestrators it cannot observe, so their spend has to come off the ledger —
-    omitting it is how the held-out run reported $6.54 against a true $19.17."""
+def test_the_root_total_is_inclusive_and_the_ledger_attributes_it():
+    """`results.total_cost` is now inclusive of nested spend, and is read once.
+
+    The lead bubbles what its children cost through `BaseTaskResult.nested_token_usage` — the
+    channel `judgment/task.py` and `review_gate.py` already used and the lead did not. The
+    scaffold merges it into the task's own usage and the worker writes it to `attempt.cost`,
+    so the orchestrator total already contains it.
+
+    Before that, the manifest had to add the ledger on top, because `results.total_cost` saw
+    only the leads' own conversations — omitting it is how the held-out run reported $6.54
+    against a true $19.17. Adding it *now* would count every nested dollar twice, so the
+    ledger's role changes from a missing addend to the attribution record for a total that is
+    already right.
+    """
 
     agenda = _agenda(["wu:1#generalist"])
+    inclusive = SimpleNamespace(total_cost=0.4 + 0.05, wall_clock_time=12.0)
     manifest = reconcile(agenda=agenda, delegations=[_record("wu:1#generalist", "mandatory")],
-                         responses=[], plan=_plan(), results=RESULTS, issues_total=0)
-    assert manifest.total_cost == pytest.approx(0.4 + 0.05)
+                         responses=[], plan=_plan(), results=inclusive, issues_total=0)
+    assert manifest.total_cost == pytest.approx(0.45)
+    # lead = inclusive minus what it delegated; nested = the ledger's own sum.
     assert manifest.cost_breakdown == {"lead": 0.4, "nested": 0.05, "extra": 0.0}
 
 
