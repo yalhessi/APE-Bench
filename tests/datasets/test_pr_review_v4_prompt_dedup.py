@@ -89,7 +89,7 @@ def arm_prompts():
     """
 
     from src.datasets.pr_review_v4.schema import ModificationRecord, RenderedPrompt
-    from src.datasets.pr_review_v5.agenda import build_agenda
+    from src.mathlib_review.agenda.agenda import build_agenda
 
     inventory = Path("inputs/pr_review_v4/treatments/"
                      "systematic-opportunities-v2-medium/derived/modification_inventory.jsonl")

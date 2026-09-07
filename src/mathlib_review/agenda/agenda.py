@@ -47,12 +47,12 @@ from src.datasets.pr_review_v4.task_adapter import (
     build_focused_task_data,
 )
 
-from .arms import ARM_TASK_TYPE, GENERALIST_ARM_ID, default_arms, specs_by_arm_id
-from .components import build_components, centrality
-from .exposure import LazyExposureScan, exposed_changes
-from .review_map import build_slices, slices_report, with_context
-from .routing import Pair, central_changes, plan_coverage, routing_contract_report
-from .schema import AgendaProposal, ReviewAgenda, ReviewArm
+from src.mathlib_review.agenda.arms import ARM_TASK_TYPE, GENERALIST_ARM_ID, default_arms, specs_by_arm_id
+from src.mathlib_review.agenda.components import build_components, centrality
+from src.mathlib_review.agenda.exposure import LazyExposureScan, exposed_changes
+from src.mathlib_review.agenda.review_map import build_slices, slices_report, with_context
+from src.mathlib_review.agenda.routing import Pair, central_changes, plan_coverage, routing_contract_report
+from src.mathlib_review.schema.review import AgendaProposal, ReviewAgenda, ReviewArm
 
 AGENDA_VERSION = "v5-agenda/1"
 

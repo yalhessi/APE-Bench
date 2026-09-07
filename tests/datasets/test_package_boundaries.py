@@ -36,8 +36,10 @@ SRC = Path("src")
 
 #: Packages that make up the review system, newest first.
 GENERATIONS = {
-    "v5": ("src/datasets/pr_review_v5",
-           "src/ape/tasks/lean_tasks/formal_math/pr_review_v5"),
+    # v5's dataset half is gone: it is `src/mathlib_review/` now. What is left under this
+    # name is the task package -- the lead and the arm -- which is the part that is genuinely
+    # a generation of *tasks* rather than of the pipeline around them.
+    "v5": ("src/ape/tasks/lean_tasks/formal_math/pr_review_v5",),
     "v4": ("src/datasets/pr_review_v4",
            "src/ape/tasks/lean_tasks/formal_math/pr_review_v4"),
     "v2": ("src/datasets/pr_review_v2",
@@ -82,27 +84,27 @@ def _cross_generation_edges(source: str, target: str):
     return edges
 
 
-def test_v4_does_not_import_v5_beyond_the_known_backward_edges():
-    """`v4 is frozen and imported as a library` is the stated contract and is not true.
+def test_no_generation_imports_a_later_one():
+    """13 -> 0, and this asserts zero.
 
-    Three backward edges exist: v4's overlay top-level-imports a v5 view, and the shared v4
-    candidate task imports v5's `patchset` for a capability that exists only for v5's
-    `family_design` arm. Importing v4's overlay therefore pulls in v5.
+    Two clusters moved to `src/mathlib_review/` as shared primitives: `paths` (the judge
+    deriving its own paths from the run it scores) and `patchset` (the coordinated multi-file
+    edit, used by the shared candidate contract). The last four were v4's `review_overlay`
+    importing `delegation_view` to render a v5 run -- a reader reaching forward to the
+    generation whose output it displays -- and they went when the pipeline stopped being a
+    generation at all. `delegation_view` is `mathlib_review.analysis.delegation_view` now, and
+    v4 importing it is an ordinary forward edge to shared code.
+
+    v5 -> v4 remains, and is fine: the newer task package builds on the older one's candidate
+    contract, which is what inheritance is.
     """
 
-    edges = _cross_generation_edges("v4", "v5")
-    # 13 -> 4. Two clusters went to `src/mathlib_review/`, which is what that package is for:
-    # `paths` (the judge deriving its own paths from the generation run it scores) and
-    # `patchset` (the coordinated multi-file edit, used by the shared candidate contract).
-    # Neither belonged to v5; both were imported backwards because that is where they were
-    # first written.
-    #
-    # What is left is one real case: v4's `review_overlay` renders a v5 run. That is a reader
-    # reaching forward to the generation whose output it displays, and it goes away when there
-    # is one generation rather than by being moved.
-    assert len(edges) <= 4, (
-        "new backward v4 -> v5 import(s):\n" +
-        "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
+    backward = (_cross_generation_edges("v4", "v5")
+                + _cross_generation_edges("v2", "v4")
+                + _cross_generation_edges("v2", "v5"))
+    assert backward == [], (
+        "an older generation imports a newer one:\n" +
+        "\n".join(f"  {p}: {m}.{n}" for p, m, n in backward))
 
 
 def test_v5_does_not_reach_back_into_v2_at_all():
@@ -189,7 +191,7 @@ def test_tier_multipliers_has_exactly_one_definition():
         if "__pycache__" not in path.parts
         and re.search(r"^TIER_MULTIPLIERS\s*=", path.read_text(encoding="utf-8"), re.M)
     ]
-    assert definitions == ["src/datasets/pr_review_v5/schema.py"], definitions
+    assert definitions == ["src/mathlib_review/schema/review.py"], definitions
 
 
 def test_the_context_tool_grant_has_one_owner():
@@ -202,8 +204,8 @@ def test_the_context_tool_grant_has_one_owner():
     earlier. `_grant_for` reads the registry per call now.
     """
 
-    schema = Path("src/datasets/pr_review_v5/schema.py").read_text(encoding="utf-8")
-    arms = Path("src/datasets/pr_review_v5/arms.py").read_text(encoding="utf-8")
+    schema = Path("src/mathlib_review/schema/review.py").read_text(encoding="utf-8")
+    arms = Path("src/mathlib_review/agenda/arms.py").read_text(encoding="utf-8")
     assert "context_grants().get(arm_id" in arms
     # No module-level copy in either file.
     assert not re.search(r"^_CONTEXT_GRANTS\s*[:=]", arms, re.M)

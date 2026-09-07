@@ -1550,7 +1550,7 @@ def _gantt(bundle, lead, ran) -> str:
             '<div class="lsec"><h2>Timeline</h2>'
             '<p class="n">No per-invocation timings — the trajectory sidecar was not '
             'extracted for this run, so only the logical sequence below is available. Run '
-            '<code>-m src.datasets.pr_review_v5.trajectory --run &lt;run&gt;</code> to add it.'
+            '<code>-m src.mathlib_review.analysis.trajectory --run &lt;run&gt;</code> to add it.'
             "</p></div>"
         )
 

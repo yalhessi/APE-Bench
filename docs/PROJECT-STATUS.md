@@ -419,7 +419,7 @@ locked files, no drift.
 
 ```bash
 ape/bin/python -m src.datasets.pr_review_v4.verify_frozen verify
-ape/bin/python -m src.datasets.pr_review_v5.runner --config configs/pr_review_v5.yaml --dry-run
+ape/bin/python -m src.mathlib_review.review.runner --config configs/pr_review_v5.yaml --dry-run
 ape/bin/python -m src.datasets.zulip.browse --stats
 ape task ape-agent lean_pr_review          # interactive single-task session
 ```

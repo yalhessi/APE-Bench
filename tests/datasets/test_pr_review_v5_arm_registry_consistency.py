@@ -2,7 +2,7 @@
 
 Four facts about an arm -- can a compile settle its claims, which retrieval tools it gets,
 which concerns it may declare, may it submit a coordinated patch -- used to be four
-dictionaries keyed by arm id. Two lived in `src/datasets/pr_review_v5/arms.py` and two in
+dictionaries keyed by arm id. Two lived in `src/mathlib_review/agenda/arms.py` and two in
 `src/ape/tasks/.../pr_review_v5/arm.py`, on opposite sides of the package boundary, with
 nothing checking that an arm appeared in the right subset of them.
 
@@ -15,8 +15,8 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v5 import arm_registry
-from src.datasets.pr_review_v5.arms import (
+from src.mathlib_review.agenda import registry as arm_registry
+from src.mathlib_review.agenda.arms import (
     CHECKABLE_ARMS, default_arms, resolve_context_tools, v5_specs,
 )
 from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
@@ -97,7 +97,7 @@ def test_the_generalist_is_not_in_the_registry_and_keeps_every_tool():
     """It has no concern filter, which is what makes it the control, and narrowing it would
     move both sides of the comparison at once."""
 
-    from src.datasets.pr_review_v5.schema import CONTEXT_TOOLS
+    from src.mathlib_review.schema.review import CONTEXT_TOOLS
 
     assert "generalist" not in arm_registry.BY_ID
     generalist = next(a for a in default_arms("v4-renderer/1") if a.arm_id == "generalist")
@@ -121,7 +121,7 @@ def test_each_declaration_says_what_the_arm_is_for(definition):
 
 
 def test_the_spec_set_is_exactly_the_registry():
-    from src.datasets.pr_review_v5.arms import v5_specs
+    from src.mathlib_review.agenda.arms import v5_specs
 
     assert ([spec.spec_id for spec in v5_specs()]
             == [item.arm_id for item in arm_registry.ARM_DEFINITIONS])
@@ -132,7 +132,7 @@ def test_an_arms_question_is_written_once():
     which is how they were allowed to differ. The fuller text -- `docs` carries a measurement
     in it -- is the one that survives, and it is the one the agenda ships."""
 
-    from src.datasets.pr_review_v5.arms import v5_specs
+    from src.mathlib_review.agenda.arms import v5_specs
 
     by_id = {item.arm_id: item for item in arm_registry.ARM_DEFINITIONS}
     for spec in v5_specs():
@@ -153,7 +153,7 @@ EXPECTED_SPEC_IDENTITY = {
 
 
 def test_spec_identities_are_unchanged():
-    from src.datasets.pr_review_v5.arms import v5_specs
+    from src.mathlib_review.agenda.arms import v5_specs
 
     actual = {spec.spec_id: spec.source_sha256[:12] for spec in v5_specs()}
     assert actual == EXPECTED_SPEC_IDENTITY
@@ -163,7 +163,7 @@ def test_the_arms_that_may_look_beyond_declarations_still_can():
     """`docs` reaches module docs; `style` reaches module docs and placement. Every other arm
     sees declarations only. This is the field that vanished."""
 
-    from src.datasets.pr_review_v5.arms import v5_specs
+    from src.mathlib_review.agenda.arms import v5_specs
 
     kinds = {spec.spec_id: spec.subject_kinds for spec in v5_specs()}
     assert "module_doc" in kinds["docs"]
@@ -177,7 +177,7 @@ def test_nothing_but_the_registry_names_an_arm_when_building_specs():
 
     import inspect
 
-    from src.datasets.pr_review_v5 import arms
+    from src.mathlib_review.agenda import arms
 
     source = inspect.getsource(arms.v5_specs)
     assert "for definition in ARM_DEFINITIONS" in source
@@ -198,7 +198,7 @@ def test_adding_an_arm_takes_two_edits_and_the_second_one_says_so():
 
     from dataclasses import replace
 
-    from src.datasets.pr_review_v5.arms import _new_spec
+    from src.mathlib_review.agenda.arms import _new_spec
 
     undeclared = replace(arm_registry.ARM_DEFINITIONS[0], arm_id="import_hygiene")
     with pytest.raises(KeyError) as excinfo:
@@ -225,7 +225,7 @@ def test_changing_the_workspace_tools_moves_the_scaffold_hash():
     from pathlib import Path
 
     from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
-    from src.datasets.pr_review_v5.runner import load_run
+    from src.mathlib_review.review.runner import load_run
 
     _dataset, scaffold, overrides = load_run(Path("configs/pr_review_v5_specialist4.yaml"))
     assert overrides["enabled_tools"]
@@ -245,8 +245,8 @@ def test_changing_an_arms_retrieval_grant_moves_the_agenda():
     sealed is the thing worth checking."""
 
     from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
-    from src.datasets.pr_review_v5.arms import default_arms
-    from src.datasets.pr_review_v5.schema import ReviewAgenda
+    from src.mathlib_review.agenda.arms import default_arms
+    from src.mathlib_review.schema.review import ReviewAgenda
 
     arm = next(a for a in default_arms("candidate-prompt/12") if a.arm_id == "family_design")
     payload = arm.model_dump(mode="json")
@@ -270,7 +270,8 @@ def test_a_new_arm_needs_nothing_beyond_those_two_edits(monkeypatch):
     from dataclasses import replace
 
     from ape.tasks.lean_tasks.formal_math.pr_shared import focused_prompts
-    from src.datasets.pr_review_v5 import arms, bench_cli
+    from src.mathlib_review.agenda import arms
+    from src.mathlib_review.analysis import bench_cli
 
     prompts = dict(focused_prompts.FOCUSED_PROMPTS)
     prompts["import_hygiene"] = (

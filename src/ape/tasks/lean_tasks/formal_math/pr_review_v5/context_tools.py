@@ -182,7 +182,7 @@ def _register_precedent(task, mcp) -> None:
         code: Annotated[str, Field(description="The Lean code you are reviewing, or a distinctive fragment of it")],
         limit: Annotated[int, Field(description=f"Max precedents (capped at {MAX_HITS})")] = 5,
     ) -> Dict[str, Any]:
-        from src.datasets.pr_review_v5.precedent_index import PrecedentIndex, PrecedentIndexMissing
+        from src.mathlib_review.retrieval.precedent_index import PrecedentIndex, PrecedentIndexMissing
 
         try:
             as_of = _require_cutoff(task)

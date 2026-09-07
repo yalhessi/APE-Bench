@@ -31,7 +31,7 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
     LeanPRReviewV4CandidateTask,
 )
 
-from src.datasets.pr_review_v5.arm_registry import (
+from src.mathlib_review.agenda.registry import (
     expected_concerns, patch_set_arms,
 )
 
@@ -59,7 +59,7 @@ ARM_TASK_TYPE = "lean_pr_review_v5_arm"
 #: different claims about them, and they are kept apart by `spec_id`, not by family.
 #: Derived from `arm_registry`, which is where an arm is declared. This and
 #: `PATCH_SET_ARMS` used to be dictionaries here while `CHECKABLE_ARMS` and the retrieval
-#: grant were dictionaries in `src/datasets/pr_review_v5/arms.py` — four tables keyed by
+#: grant were dictionaries in `src/mathlib_review/agenda/arms.py` — four tables keyed by
 #: arm id, on opposite sides of the package boundary, with nothing checking they agreed.
 EXPECTED_CONCERN_BY_ARM = {
     arm_id: set(concerns) for arm_id, concerns in expected_concerns().items()

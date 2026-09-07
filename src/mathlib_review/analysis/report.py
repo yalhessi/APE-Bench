@@ -5,9 +5,9 @@ or never touched a context tool — then the delegation mechanism did not engage
 number is measuring the arms rather than the thing the run was built to test. So `routing`
 prints first and `score` refuses to be read as a verdict on delegation without it.
 
-    python -m src.datasets.pr_review_v5.report routing   --run <run_name>
-    python -m src.datasets.pr_review_v5.report score     --audit <audit_dir> --run <run_name>
-    python -m src.datasets.pr_review_v5.report overlay --run <run_name> [--audit <audit_dir>]
+    python -m src.mathlib_review.analysis.report routing   --run <run_name>
+    python -m src.mathlib_review.analysis.report score     --audit <audit_dir> --run <run_name>
+    python -m src.mathlib_review.analysis.report overlay --run <run_name> [--audit <audit_dir>]
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.mathlib_review.paths import RESULTS, run_dir
-from .trace import routing_report
+from src.mathlib_review.review.trace import routing_report
 
 
 def _load_jsonl(path: Path):
@@ -149,7 +149,7 @@ def reachable_obligations(run_name: str,
     # Rows the release's own artifacts contradict — an ask its source comment does not make,
     # or an outcome its own evidence refutes. Named in `obligation_exclusions` with the
     # evidence, applied here, and reported below so they are never silently dropped.
-    from .obligation_exclusions import excluded_ids, exclusion_report
+    from src.mathlib_review.analysis.obligation_exclusions import excluded_ids, exclusion_report
 
     excluded = excluded_ids()
     audited: Dict[int, int] = {}
@@ -206,7 +206,7 @@ def contamination(release: Path) -> Dict[str, Any]:
     from src.datasets.pr_review_v4.render_focused import (
         SUBMISSION_CONTRACT, focused_system_prompt,
     )
-    from src.datasets.pr_review_v5.arms import specs_by_arm_id
+    from src.mathlib_review.agenda.arms import specs_by_arm_id
 
     gold: List[str] = []
     path = release / "gold/judgments.jsonl"

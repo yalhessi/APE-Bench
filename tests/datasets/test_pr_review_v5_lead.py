@@ -275,7 +275,7 @@ def test_assessments_reach_the_result_and_are_applied_only_subtractively(lead):
 
     import inspect
 
-    from src.datasets.pr_review_v5 import finalize as finalize_module
+    from src.mathlib_review.review import finalize as finalize_module
 
     assert "candidate_assessments" in inspect.signature(
         finalize_module.finalize).parameters
@@ -343,7 +343,7 @@ def test_the_runner_no_longer_drives_a_separate_floor():
 
     import inspect
 
-    from src.datasets.pr_review_v5 import runner
+    from src.mathlib_review.review import runner
 
     assert not hasattr(runner, "_mandatory_arm_task_data")
     assert not hasattr(runner, "_floor_delegation_records")

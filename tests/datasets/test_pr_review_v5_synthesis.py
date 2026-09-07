@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from src.datasets.pr_review_v5.synthesis import apply_assessments
+from src.mathlib_review.review.lead_synthesis import apply_assessments
 
 
 def candidate(cid, *, work_unit_id="wu:1", spec_id=None, ordinal=0):

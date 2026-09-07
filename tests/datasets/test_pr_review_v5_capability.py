@@ -12,7 +12,7 @@ is the last one: none of it may reach a prompt.
 
 from __future__ import annotations
 
-from src.datasets.pr_review_v5.obligation_capability import (
+from src.mathlib_review.analysis.obligation_capability import (
     CAPABILITIES, CLASSIFICATION, SCOPES, cross_tab, report,
 )
 
@@ -78,7 +78,7 @@ def test_none_of_this_reaches_a_prompt():
     from src.datasets.pr_review_v4.render_focused import (
         SUBMISSION_CONTRACT, focused_system_prompt,
     )
-    from src.datasets.pr_review_v5.arms import specs_by_arm_id
+    from src.mathlib_review.agenda.arms import specs_by_arm_id
 
     derived = [row.why for row in CLASSIFICATION]
     texts = [SUBMISSION_CONTRACT] + [

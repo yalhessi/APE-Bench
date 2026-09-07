@@ -1,11 +1,11 @@
 """Run one arm against its bench, with no lead and no judge.
 
     # look at the fixture, spend nothing
-    ./ape/bin/python -m src.datasets.pr_review_v5.bench_cli \
+    ./ape/bin/python -m src.mathlib_review.analysis.bench_cli \
         --config configs/bases/v5_generation.yaml --arm duplication
 
     # actually run it
-    ./ape/bin/python -m src.datasets.pr_review_v5.bench_cli \
+    ./ape/bin/python -m src.mathlib_review.analysis.bench_cli \
         --config configs/bases/v5_generation.yaml --arm duplication --execute
 
 Without `--execute` this prints the fixture and what would run, and makes no model call and no
@@ -43,7 +43,7 @@ from src.datasets.pr_review_v4.benches import (
 from src.datasets.pr_review_v4.io import load_jsonl
 from src.datasets.pr_review_v4.schema import JudgmentNode
 
-from .arm_registry import ARM_DEFINITIONS
+from src.mathlib_review.agenda.registry import ARM_DEFINITIONS
 
 
 def roster() -> Dict[str, List[str]]:
@@ -55,7 +55,7 @@ def roster() -> Dict[str, List[str]]:
 def _payloads_for(bench: ArmBench, dataset, release) -> Dict[str, Dict[str, Any]]:
     """The agenda's own arm payload for each case in the fixture, keyed by work unit."""
 
-    from .agenda import build_agenda
+    from src.mathlib_review.agenda.agenda import build_agenda
 
     pr_numbers = sorted({case.pr_number for case in bench.cases})
     _agenda, pool = build_agenda(
@@ -124,7 +124,7 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
 
     from ape.utils.logging import create_logger
 
-    from .runner import load_release, load_run
+    from src.mathlib_review.review.runner import load_release, load_run
 
     logger = logger or create_logger("bench")
     dataset, scaffold, _overrides = load_run(config)

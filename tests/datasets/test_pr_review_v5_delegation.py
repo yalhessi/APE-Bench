@@ -28,8 +28,8 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import (
     run_jobs,
 )
 from src.datasets.pr_review_v4.io import sha256_bytes, canonical_json_bytes
-from src.datasets.pr_review_v5.schema import ReviewAgenda, V5RunPlan
-from src.datasets.pr_review_v5.trace import ReconciliationError, reconcile, routing_report
+from src.mathlib_review.schema.review import ReviewAgenda, V5RunPlan
+from src.mathlib_review.review.trace import ReconciliationError, reconcile, routing_report
 
 
 # --------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ def test_a_paused_job_is_reported_as_paused_not_failed():
 
 def _agenda(proposal_ids):
     from src.datasets.pr_review_v4.io import sealed_model
-    from src.datasets.pr_review_v5.schema import AgendaProposal, ReviewArm
+    from src.mathlib_review.schema.review import AgendaProposal, ReviewArm
 
     proposals = [
         sealed_model(

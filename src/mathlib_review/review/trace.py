@@ -24,7 +24,7 @@ from typing import Any, Dict, Iterable, List, Sequence
 from ape.orchestration.models import UsageBreakdown
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
 
-from .schema import ReviewAgenda, V5RunManifest, V5RunPlan
+from src.mathlib_review.schema.review import ReviewAgenda, V5RunManifest, V5RunPlan
 
 
 class ReconciliationError(RuntimeError):

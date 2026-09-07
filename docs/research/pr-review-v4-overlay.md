@@ -202,8 +202,8 @@ A v5 run is a lead that routes and specialists that speak: one lead per PR, hold
 the overlay at a v5 run directory and it renders that instead of v4's furniture:
 
 ```
-./ape/bin/python -m src.datasets.pr_review_v5.trajectory --run <run>   # once
-./ape/bin/python -m src.datasets.pr_review_v5.report overlay --run <run>
+./ape/bin/python -m src.mathlib_review.analysis.trajectory --run <run>   # once
+./ape/bin/python -m src.mathlib_review.analysis.report overlay --run <run>
 ```
 
 Detection is structural — a condition directory containing `agenda.json` and
@@ -301,8 +301,8 @@ A mismatch is a join bug, not a display bug.
 - `src/datasets/pr_review_v4/review_overlay_html.py` — the page. `PALETTE` is the single source of
   colour and every per-state rule is generated from it. The matrix is an HTML table, not SVG:
   no graphviz dependency, text stays selectable and ctrl-F works.
-- `src/datasets/pr_review_v5/trajectory.py` — the `.ape` walk and sidecar writer.
-- `src/datasets/pr_review_v5/delegation_view.py` — joins the routing ledger, agenda, arm
+- `src/mathlib_review/analysis/trajectory.py` — the `.ape` walk and sidecar writer.
+- `src/mathlib_review/analysis/delegation_view.py` — joins the routing ledger, agenda, arm
   responses and sidecar into one `LeadView` per PR; owns the cost correction.
 - `tests/datasets/test_pr_review_v4_overlay.py` — ladder monotonicity, multi-site
   attribution, the gold barrier, the v5 declutter, and degradation.

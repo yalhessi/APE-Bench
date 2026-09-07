@@ -45,10 +45,10 @@ from ape.orchestration.config import EarlyStopMode
 #: so the lead cannot invent a budget, and so a run's cost policy is one number in config.
 #:
 #: Imported, not restated. This was a verbatim duplicate of the definition in
-#: `src.datasets.pr_review_v5.schema` with neither side importing the other — the task layer
+#: `src.mathlib_review.schema.review` with neither side importing the other — the task layer
 #: read this copy and the dataset layer read that one, so the two could drift apart and a run
 #: would price its jobs differently from the plan that budgeted them.
-from src.datasets.pr_review_v5.schema import TIER_MULTIPLIERS  # noqa: E402
+from src.mathlib_review.schema.review import TIER_MULTIPLIERS  # noqa: E402
 
 
 @dataclass

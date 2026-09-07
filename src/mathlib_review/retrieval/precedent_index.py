@@ -165,7 +165,7 @@ class PrecedentIndex:
         if not manifest_path.is_file():
             raise PrecedentIndexMissing(
                 f"no precedent index at {directory}. Build it once with "
-                "`./ape/bin/python -m src.datasets.pr_review_v5.precedent_index build`. "
+                "`./ape/bin/python -m src.mathlib_review.retrieval.precedent_index build`. "
                 "It is not built on demand: embedding the corpus inside a worker process "
                 "would pay a one-off cost in every worker of every run."
             )

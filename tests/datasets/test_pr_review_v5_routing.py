@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from src.datasets.pr_review_v5.components import ReviewComponent
-from src.datasets.pr_review_v5.routing import (
+from src.mathlib_review.agenda.components import ReviewComponent
+from src.mathlib_review.agenda.routing import (
     MAX_INTENT_REQUIRED_PER_PR, MAX_REQUIRED_SPECIALISTS_PER_PR, Pair,
     plan_coverage, routing_contract_report,
 )

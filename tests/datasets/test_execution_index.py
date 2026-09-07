@@ -155,7 +155,7 @@ def test_trajectory_prefers_the_index_over_the_globs(tmp_path, monkeypatch):
     """The point of the whole file: a run that wrote an index is read through it, so the
     subtask depth stops being load-bearing."""
 
-    from src.datasets.pr_review_v5 import trajectory
+    from src.mathlib_review.analysis import trajectory
 
     task_dir = tmp_path / "somewhere" / "entirely" / "different"
     task_dir.mkdir(parents=True)
@@ -185,7 +185,7 @@ def test_trajectory_prefers_the_index_over_the_globs(tmp_path, monkeypatch):
 def test_a_run_without_an_index_still_reads(tmp_path, monkeypatch):
     """Every September run. The globs stay for exactly this."""
 
-    from src.datasets.pr_review_v5 import trajectory
+    from src.mathlib_review.analysis import trajectory
 
     root = tmp_path / "ape" / "run1"
     task = (root / "tasks/0/samples/0/attempts/a/subtasks/wave1/orch/tasks/0")
@@ -204,7 +204,7 @@ def test_both_readers_spell_the_wave_the_same_way(tmp_path, monkeypatch):
     """One field, one format. The index path and the glob path have to agree or grouping by
     wave silently splits each wave in two."""
 
-    from src.datasets.pr_review_v5 import trajectory
+    from src.mathlib_review.analysis import trajectory
 
     result = json.dumps({"invocation_id": "wu:1#a", "arm_id": "a", "work_unit_id": "wu:1",
                          "pr_number": 1, "status": "completed"})

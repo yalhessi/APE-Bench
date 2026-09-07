@@ -1,7 +1,7 @@
 """Loading a run config: the convention, written once.
 
 `load_run` existed three times -- `pr_review_v4/runner.py`, `pr_review_v4/judge_runner.py`,
-`pr_review_v5/runner.py` -- byte-identical except for which dataset model it validates
+`mathlib_review/review/runner.py` -- byte-identical except for which dataset model it validates
 against. Nine statements, three copies, and each one encodes decisions that have to agree:
 
 * `extends:` is resolved by `load_yaml`, so a child config's inheritance works the same way

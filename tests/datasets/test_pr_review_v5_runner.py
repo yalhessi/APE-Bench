@@ -21,8 +21,8 @@ import pytest
 
 from src.datasets.pr_review_v4.io import git_state
 from src.mathlib_review.paths import run_dir
-from src.datasets.pr_review_v5.runner import V5DatasetConfig, _build_plan, load_run, run
-from src.datasets.pr_review_v5.schema import V5RunPlan
+from src.mathlib_review.review.runner import V5DatasetConfig, _build_plan, load_run, run
+from src.mathlib_review.schema.review import V5RunPlan
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 INVENTORY = Path(
@@ -132,7 +132,7 @@ def test_the_sealed_plan_carries_one_hash_per_enumerated_pair(scaffold):
     from src.datasets.pr_review_v4.schema import (
         ChangeGraph, ModificationRecord, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
     )
-    from src.datasets.pr_review_v5.agenda import build_agenda
+    from src.mathlib_review.agenda.agenda import build_agenda
 
     units = load_jsonl(RELEASE / "derived/work_units.jsonl", ReviewWorkUnit)
     episodes = [
@@ -174,7 +174,7 @@ def test_a_run_that_cannot_name_its_model_is_refused():
 
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    from src.datasets.pr_review_v5.agenda import build_agenda
+    from src.mathlib_review.agenda.agenda import build_agenda
     from src.datasets.pr_review_v4.io import load_jsonl
     from src.datasets.pr_review_v4.schema import (
         ChangeGraph, ModificationRecord, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
@@ -203,7 +203,7 @@ def _agenda_and_pool():
     from src.datasets.pr_review_v4.schema import (
         ChangeGraph, ModificationRecord, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
     )
-    from src.datasets.pr_review_v5.agenda import build_agenda
+    from src.mathlib_review.agenda.agenda import build_agenda
 
     episodes = [
         item for item in load_jsonl(RELEASE / "input/episodes.jsonl", ReviewEpisodeInput)
@@ -228,7 +228,7 @@ def test_a_failed_arm_does_not_become_an_orphan_response():
 
     from types import SimpleNamespace
 
-    from src.datasets.pr_review_v5.runner import _responses_from_results
+    from src.mathlib_review.review.runner import _responses_from_results
 
     results = SimpleNamespace(task_results=[
         {"invocation_id": "wu:1#generalist", "arm_id": "generalist", "work_unit_id": "wu:1",
@@ -252,8 +252,8 @@ def test_specialist_spend_is_counted_in_the_manifest():
     from types import SimpleNamespace
 
     from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
-    from src.datasets.pr_review_v5.schema import V5RunPlan
-    from src.datasets.pr_review_v5.trace import reconcile
+    from src.mathlib_review.schema.review import V5RunPlan
+    from src.mathlib_review.review.trace import reconcile
 
     agenda, _pool = _agenda_and_pool()
     records = []
@@ -318,7 +318,7 @@ def test_specialist_spend_is_counted_in_the_manifest():
 
 
 def _budget_dataset(**kwargs):
-    from src.datasets.pr_review_v5.runner import V5DatasetConfig
+    from src.mathlib_review.review.runner import V5DatasetConfig
 
     return V5DatasetConfig.model_validate({
         "release": "r", "modification_inventory": "m",
@@ -331,7 +331,7 @@ def _floor(amount):
 
 
 def test_a_run_whose_floor_exceeds_the_total_is_refused_before_spending():
-    from src.datasets.pr_review_v5.runner import BudgetTooSmall, _report_budget
+    from src.mathlib_review.review.runner import BudgetTooSmall, _report_budget
 
     logger = logging.getLogger("test")
     with pytest.raises(BudgetTooSmall) as excinfo:
@@ -344,7 +344,7 @@ def test_a_run_whose_floor_exceeds_the_total_is_refused_before_spending():
 
 
 def test_a_run_that_fits_is_allowed():
-    from src.datasets.pr_review_v5.runner import _report_budget
+    from src.mathlib_review.review.runner import _report_budget
 
     _report_budget(_budget_dataset(run_total_cost_cap=10.0), _floor(1.35), 4,
                    logging.getLogger("test"), enforce=True)
@@ -353,7 +353,7 @@ def test_a_run_that_fits_is_allowed():
 def test_a_dry_run_warns_where_a_real_run_would_refuse(caplog):
     """A dry run must be able to say the real run would not start."""
 
-    from src.datasets.pr_review_v5.runner import _report_budget
+    from src.mathlib_review.review.runner import _report_budget
 
     with caplog.at_level(logging.WARNING):
         _report_budget(_budget_dataset(run_total_cost_cap=0.50), _floor(1.35), 4,
@@ -365,7 +365,7 @@ def test_no_cap_is_reported_as_unbounded_rather_than_passing_quietly(caplog):
     """Zero disables the check, and that has to be visible: the failure mode it guards against
     is a floor nobody priced."""
 
-    from src.datasets.pr_review_v5.runner import _report_budget
+    from src.mathlib_review.review.runner import _report_budget
 
     with caplog.at_level(logging.WARNING):
         _report_budget(_budget_dataset(run_total_cost_cap=0.0), _floor(1.35), 4,
@@ -377,7 +377,7 @@ def test_the_floor_is_priced_separately_from_the_discretionary_cap(caplog):
     """The message this replaced compared the floor against `per_pr_cost_cap * pr_count` and
     advised raising a cap that does not bind the floor at all."""
 
-    from src.datasets.pr_review_v5.runner import _report_budget
+    from src.mathlib_review.review.runner import _report_budget
 
     with caplog.at_level(logging.INFO):
         _report_budget(_budget_dataset(run_total_cost_cap=10.0), _floor(1.35), 4,
@@ -398,8 +398,8 @@ def _manifest_with_both_currencies():
     from types import SimpleNamespace
 
     from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
-    from src.datasets.pr_review_v5.schema import V5RunPlan
-    from src.datasets.pr_review_v5.trace import reconcile
+    from src.mathlib_review.schema.review import V5RunPlan
+    from src.mathlib_review.review.trace import reconcile
 
     agenda, _pool = _agenda_and_pool()
     records = []

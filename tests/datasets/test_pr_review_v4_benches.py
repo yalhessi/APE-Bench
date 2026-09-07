@@ -29,7 +29,7 @@ RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 def benches():
     if not RELEASE.is_dir():
         pytest.skip("release not present")
-    from src.datasets.pr_review_v5.arm_registry import ARM_DEFINITIONS
+    from src.mathlib_review.agenda.registry import ARM_DEFINITIONS
     roster = {d.arm_id: sorted(d.expected_concerns) for d in ARM_DEFINITIONS}
     return build_all(RELEASE, roster)
 
@@ -56,7 +56,7 @@ def test_the_two_concern_vocabularies_are_bridged(benches):
 
     import json
 
-    from src.datasets.pr_review_v5.arm_registry import ARM_DEFINITIONS
+    from src.mathlib_review.agenda.registry import ARM_DEFINITIONS
 
     gold_labels = set()
     for line in (RELEASE / "gold/judgments.jsonl").read_text(encoding="utf-8").splitlines():
@@ -207,8 +207,8 @@ def test_the_score_names_the_fixture_it_measured(benches):
 def test_an_arm_payload_carries_no_gold():
     """The run itself must be gold-free. The scorer joins gold afterwards, on this side."""
 
-    from src.datasets.pr_review_v5.bench_cli import _payloads_for, roster
-    from src.datasets.pr_review_v5.runner import load_release, load_run
+    from src.mathlib_review.analysis.bench_cli import _payloads_for, roster
+    from src.mathlib_review.review.runner import load_release, load_run
 
     config = Path("configs/bases/v5_generation.yaml")
     if not config.is_file():

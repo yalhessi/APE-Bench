@@ -26,8 +26,8 @@ from src.datasets.pr_review_v4.schema import (
     ReviewEpisodeInput,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v5.agenda import agenda_report, build_agenda, initial_jobs
-from src.datasets.pr_review_v5.arms import GENERALIST_ARM_ID, default_arms, specs_by_arm_id
+from src.mathlib_review.agenda.agenda import agenda_report, build_agenda, initial_jobs
+from src.mathlib_review.agenda.arms import GENERALIST_ARM_ID, default_arms, specs_by_arm_id
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 INVENTORY = Path(

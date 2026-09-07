@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v5.runner import (
+from src.mathlib_review.review.runner import (
     CoverageGapAtPlanTime, PlanChangedSemantically, RESUMABLE_PLAN_FIELDS,
     assert_coverage_is_reachable, assert_the_judge_model_is_pinned, seal_or_revise_plan,
 )
@@ -76,7 +76,7 @@ def test_an_open_gate_says_nothing(caplog):
 
 
 def _plan(**overrides):
-    from src.datasets.pr_review_v5.schema import V5RunPlan
+    from src.mathlib_review.schema.review import V5RunPlan
 
     base = dict(
         run_id="v5run:t", run_name="t", routing_mode="lead", agenda_sha256="a" * 64,
@@ -158,7 +158,7 @@ def test_the_resumable_set_is_only_about_spending():
 def test_the_plan_records_what_makes_its_numbers_readable():
     """Four settings decide what a recall figure means, and all four were comments."""
 
-    from src.datasets.pr_review_v5.schema import V5RunPlan
+    from src.mathlib_review.schema.review import V5RunPlan
 
     fields = V5RunPlan.model_fields
     assert "evaluation_settings" in fields
@@ -170,7 +170,7 @@ def test_the_contract_version_is_separate_from_the_schema_version():
     Widening `pairing_tiers` can only raise recall and changes no field, so without this a run
     that widened it and one that did not are separated by nothing readable."""
 
-    from src.datasets.pr_review_v5.schema import EVALUATION_CONTRACT_VERSION, V5RunPlan
+    from src.mathlib_review.schema.review import EVALUATION_CONTRACT_VERSION, V5RunPlan
 
     plan = _plan()
     assert plan.evaluation_contract_version == EVALUATION_CONTRACT_VERSION

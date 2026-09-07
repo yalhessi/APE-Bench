@@ -23,7 +23,7 @@ import pytest
 from ape.utils.config_loader import load_yaml, parse_cli_args
 from src.datasets.pr_review_v4.judge_runner import JudgeDatasetConfig
 from src.datasets.pr_review_v4.runner import V4DatasetConfig
-from src.datasets.pr_review_v5.runner import V5DatasetConfig
+from src.mathlib_review.review.runner import V5DatasetConfig
 
 
 #: What `judge --of <run_name>` supplies, so a judge config can be validated as it is actually
@@ -212,7 +212,7 @@ def test_load_run_has_one_implementation():
     import inspect
 
     from src.datasets.pr_review_v4 import judge_runner, runner as v4_runner
-    from src.datasets.pr_review_v5 import runner as v5_runner
+    from src.mathlib_review.review import runner as v5_runner
     from src.mathlib_review.run_config import load_run as shared
 
     for module in (v4_runner, judge_runner, v5_runner):

@@ -38,7 +38,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 from src.datasets.pr_review_v4.io import display_path
 
 from src.mathlib_review.paths import assert_repo_root, run_dir
-from .schema import BUDGET_TIERS
+from src.mathlib_review.schema.review import BUDGET_TIERS
 
 #: Distinguishes an old tier segment from the orchestrator id that replaced it.
 TIER_NAMES = frozenset(BUDGET_TIERS)

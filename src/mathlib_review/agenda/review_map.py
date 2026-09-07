@@ -26,7 +26,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
-from .components import ReviewComponent
+from src.mathlib_review.agenda.components import ReviewComponent
 
 #: Target kinds that describe a file's shape rather than its contents. Their order and line
 #: positions are the whole answer to a placement question — PR 33362 asks to move

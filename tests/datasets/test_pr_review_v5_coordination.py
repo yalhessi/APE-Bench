@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pr_review_v5.coordination import (
+from src.mathlib_review.review.coordination import (
     COORDINATION_VERSION, CoordinationConfig, CoordinationPolicy, SynthesisPolicy,
     assert_implemented,
 )
@@ -96,7 +96,7 @@ def test_the_policy_is_sealed_into_the_run_plan():
 
     from pathlib import Path
 
-    from src.datasets.pr_review_v5.runner import coordination_config, load_run
+    from src.mathlib_review.review.runner import coordination_config, load_run
 
     config_path = Path("configs/pr_review_v5_specialist4.yaml")
     if not config_path.is_file():

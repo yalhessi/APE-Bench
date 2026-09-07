@@ -9,7 +9,7 @@ of those edits were dictionaries keyed by arm id that had to agree with each oth
                                arm.EXPECTED_CONCERN_BY_ARM, and no longer a gate)
     arm.PATCH_SET_ARMS         may it submit a coordinated multi-file patch
 
-Two lived in `src/datasets/pr_review_v5`, two in `src/ape/tasks/.../pr_review_v5`, on opposite
+Two lived in `src/mathlib_review`, two in `src/ape/tasks/.../pr_review_v5`, on opposite
 sides of the package boundary, with nothing checking that an arm appeared in the right subset
 of them. That is not hypothetical: `migration_consistency` was listed in `PATCH_SET_ARMS`
 while never being registered as an arm at all, and the per-arm tool grant was documented in

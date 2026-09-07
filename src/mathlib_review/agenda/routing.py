@@ -28,7 +28,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
-from .components import ReviewComponent
+from src.mathlib_review.agenda.components import ReviewComponent
 
 #: A required rule fires only when the PR supplies the trigger. Each entry is
 #: (grain, arms it makes required, why) and is checked against the components actually built.

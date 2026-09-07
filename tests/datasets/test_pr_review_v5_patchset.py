@@ -212,6 +212,6 @@ def test_every_patch_set_arm_is_a_registered_spec():
     registration commented out."""
 
     from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
-    from src.datasets.pr_review_v5.arms import specs_by_arm_id
+    from src.mathlib_review.agenda.arms import specs_by_arm_id
 
     assert LeanPRReviewV5ArmTask.PATCH_SET_ARMS <= set(specs_by_arm_id())

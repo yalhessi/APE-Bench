@@ -20,7 +20,7 @@ import pytest
 
 from src.datasets.pr_review_v4.io import load_jsonl
 from src.datasets.pr_review_v4.schema import ReviewEpisodeBoundary, ReviewEpisodeInput
-from src.datasets.pr_review_v5.cutoffs import (
+from src.mathlib_review.agenda.cutoffs import (
     CutoffUnavailable,
     cutoffs_by_episode,
     episode_cutoff,
@@ -250,7 +250,7 @@ def test_context_calls_are_traced_even_when_a_read_returns_nothing(tmp_path, mon
 INDEX_DIR = Path("data/pr_review_v5/precedent_index")
 requires_index = pytest.mark.skipif(
     not (INDEX_DIR / "manifest.json").is_file(),
-    reason="precedent index not built (python -m src.datasets.pr_review_v5.precedent_index build)",
+    reason="precedent index not built (python -m src.mathlib_review.retrieval.precedent_index build)",
 )
 
 
@@ -260,7 +260,7 @@ def test_precedent_filtering_happens_before_ranking():
     are all ineligible would return two weak precedents and look like a thin corpus rather
     than a gated one."""
 
-    from src.datasets.pr_review_v5.precedent_index import PrecedentIndex
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
 
     index = PrecedentIndex.shared()
     cutoff = "2025-01-01T00:00:00Z"
@@ -272,7 +272,7 @@ def test_precedent_filtering_happens_before_ranking():
 
 @requires_index
 def test_no_precedent_postdates_the_cutoff_or_comes_from_the_reviewed_pr():
-    from src.datasets.pr_review_v5.precedent_index import PrecedentIndex
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
 
     index = PrecedentIndex.shared()
     cutoff = "2025-03-01T00:00:00Z"
@@ -292,7 +292,7 @@ def test_the_index_excludes_the_eval_prs():
     even if it is ever pointed at a corpus whose provenance is not this repo's."""
 
     from src.datasets.pr_review_v2.corpus import _eval_pr_numbers
-    from src.datasets.pr_review_v5.precedent_index import PrecedentIndex
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex
 
     index = PrecedentIndex.shared()
     excluded = _eval_pr_numbers()

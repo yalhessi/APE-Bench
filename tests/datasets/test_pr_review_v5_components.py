@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from src.datasets.pr_review_v5.components import (
+from src.mathlib_review.agenda.components import (
     build_components, centrality, components_report, _stem,
 )
 

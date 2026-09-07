@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from src.datasets.pr_review_v5.exposure import (
+from src.mathlib_review.agenda.exposure import (
     LazyExposureScan, exposed_changes, exposure_report,
 )
 

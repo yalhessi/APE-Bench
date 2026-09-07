@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v5 import cli
+from src.mathlib_review.review import cli
 
 CONFIG = Path("configs/pr_review_v5_specialist4.yaml")
 
@@ -79,7 +79,7 @@ def test_run_without_execute_calls_no_model(monkeypatch):
         seen["dry_run"] = dataset.dry_run
         return None
 
-    import src.datasets.pr_review_v5.runner as runner
+    import src.mathlib_review.review.runner as runner
 
     async def _async(*a, **k):
         return _fake_run(*a, **k)
@@ -92,7 +92,7 @@ def test_run_without_execute_calls_no_model(monkeypatch):
 def test_run_with_execute_does_not_force_dry_run(monkeypatch):
     seen = {}
 
-    import src.datasets.pr_review_v5.runner as runner
+    import src.mathlib_review.review.runner as runner
 
     async def _async(dataset, scaffold, task_overrides, logger):
         seen["dry_run"] = dataset.dry_run
@@ -140,7 +140,7 @@ def test_bench_shares_one_implementation_of_the_gate():
 
     import inspect
 
-    from src.datasets.pr_review_v5 import bench_cli
+    from src.mathlib_review.analysis import bench_cli
 
     assert "run_benches" in inspect.getsource(bench_cli.main)
     assert "run_benches" in inspect.getsource(cli._bench)
@@ -290,7 +290,7 @@ def test_the_retrieval_report_separates_the_tools_and_the_arms():
     """Per tool because the empty rate means a different thing for each; per arm because the
     grant is per arm, and that is how you see whether an arm uses what it was given."""
 
-    from src.datasets.pr_review_v5.report import retrieval
+    from src.mathlib_review.analysis.report import retrieval
 
     found = retrieval("pr_review_v5_specialist4_rep1")
     assert found["calls"] > 0
@@ -304,7 +304,7 @@ def test_the_retrieval_report_counts_calls_that_declared_no_gate():
     """Runs made before gates were recorded have none, and a modern run should have one on
     every row -- a row without one is a tool added without saying how it is bounded."""
 
-    from src.datasets.pr_review_v5.report import retrieval
+    from src.mathlib_review.analysis.report import retrieval
 
     found = retrieval("pr_review_v5_specialist4_rep1")
     assert "calls_without_a_recorded_gate" in found

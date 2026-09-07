@@ -30,7 +30,7 @@ def replay(tmp_path_factory):
     if not (RUN / "arm_responses.jsonl").is_file():
         pytest.skip(f"{RUN} is not in this tree")
 
-    from src.datasets.pr_review_v5.finalize import finalize
+    from src.mathlib_review.review.finalize import finalize
 
     responses = [
         json.loads(line)

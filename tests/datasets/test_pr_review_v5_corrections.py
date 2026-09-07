@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v5.corrections import CORRECTION_VERSION, recover
+from src.mathlib_review.analysis.corrections import CORRECTION_VERSION, recover
 
 
 def _scratch(tmp_path, attempts, *, run_name="r1"):

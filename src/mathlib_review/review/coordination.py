@@ -34,7 +34,7 @@ from typing import Any, Dict, Literal
 
 from pydantic import ConfigDict, Field
 
-from .schema import StrictModel
+from src.mathlib_review.schema.review import StrictModel
 
 #: Bumped when a field changes meaning, so two runs' policies can be told apart by more than
 #: their hash.

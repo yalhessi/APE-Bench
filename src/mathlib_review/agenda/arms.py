@@ -33,11 +33,11 @@ from src.datasets.pr_review_v4.focused_specs import (
 )
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha256_bytes
 
-from .arm_registry import (
+from src.mathlib_review.agenda.registry import (
     ARM_DEFINITIONS, UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
     MODULE_DOC_KINDS as _MODULE_DOC_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
 )
-from .schema import CONTEXT_TOOLS, ReviewArm
+from src.mathlib_review.schema.review import CONTEXT_TOOLS, ReviewArm
 
 ARM_REGISTRY_VERSION = "v5-arm-registry/2"
 

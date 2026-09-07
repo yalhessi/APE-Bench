@@ -32,7 +32,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
-from src.datasets.pr_review_v5.delegation_view import (
+from src.mathlib_review.analysis.delegation_view import (
     is_v5_run,
     load_lead_views,
     load_turns,

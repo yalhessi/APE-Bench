@@ -19,7 +19,7 @@ import pytest
 
 from src.datasets.pr_review_v4.io import load_jsonl
 from src.datasets.pr_review_v4.schema import ReviewWorkUnit
-from src.datasets.pr_review_v5.finalize import finalize, ingest_responses
+from src.mathlib_review.review.finalize import finalize, ingest_responses
 
 RELEASE = Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
 

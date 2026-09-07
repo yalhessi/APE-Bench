@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from src.datasets.pr_review_v5.components import ReviewComponent
-from src.datasets.pr_review_v5.review_map import (
+from src.mathlib_review.agenda.components import ReviewComponent
+from src.mathlib_review.agenda.review_map import (
     ContextSlice, build_slices, convention_questions, file_skeletons, slices_report,
 )
 
@@ -150,7 +150,7 @@ def test_appending_context_rehashes_the_prompt():
 
     from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
     from src.datasets.pr_review_v4.schema import RenderedPrompt
-    from src.datasets.pr_review_v5.review_map import with_context
+    from src.mathlib_review.agenda.review_map import with_context
 
     base = RenderedPrompt(
         work_unit_id="wu:1", renderer_version="test/1",
@@ -168,7 +168,7 @@ def test_an_empty_slice_leaves_the_prompt_untouched():
     """Most units need no context, and re-hashing an unchanged prompt would churn the plan."""
 
     from src.datasets.pr_review_v4.schema import RenderedPrompt
-    from src.datasets.pr_review_v5.review_map import with_context
+    from src.mathlib_review.agenda.review_map import with_context
 
     base = RenderedPrompt(
         work_unit_id="wu:1", renderer_version="test/1",

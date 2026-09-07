@@ -45,8 +45,8 @@ from src.datasets.pr_review_v4.io import (
 from src.datasets.pr_review_v4.merge import merge_findings
 from src.datasets.pr_review_v4.schema import ReviewWorkUnit
 
-from .arms import CHECKABLE_ARMS, GENERALIST_ARM_ID
-from .synthesis import apply_assessments
+from src.mathlib_review.agenda.arms import CHECKABLE_ARMS, GENERALIST_ARM_ID
+from src.mathlib_review.review.lead_synthesis import apply_assessments
 
 
 def ingest_responses(
@@ -329,7 +329,7 @@ def finalize(
         # Read back here, not in the runner: `finalization_report.json` is written below
         # and `write_once` will not rewrite it, so a summary attached to the returned dict
         # afterwards is silently lost — which is exactly what happened on heldout11 rep2.
-        from .evidence_chain import evidence_report
+        from src.mathlib_review.evidence.chain import evidence_report
 
         evidence_summary = evidence_report(out)
 

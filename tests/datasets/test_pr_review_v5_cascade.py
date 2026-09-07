@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from src.datasets.pr_review_v5.evidence_chain import _collapse_compile_cascades
+from src.mathlib_review.evidence.chain import _collapse_compile_cascades
 
 PATH = "Mathlib/A.lean"
 

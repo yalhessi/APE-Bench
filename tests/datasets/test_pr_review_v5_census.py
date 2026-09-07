@@ -25,7 +25,7 @@ from src.datasets.pr_review_v4.schema import (
     ReviewEpisodeInput,
     ReviewWorkUnit,
 )
-from src.datasets.pr_review_v5.census import (
+from src.mathlib_review.agenda.census import (
     _CHAIN_STEPS,
     _manual_steps,
     build_census,
@@ -50,7 +50,7 @@ def release():
 
 @pytest.fixture(scope="module")
 def census(release):
-    from src.datasets.pr_review_v5.schema import ReviewAgenda
+    from src.mathlib_review.schema.review import ReviewAgenda
 
     agenda = ReviewAgenda.model_validate(json.loads((RUN / "agenda.json").read_text()))
     relations, _evidence = build_relations(release["graphs"])
@@ -109,7 +109,7 @@ def test_ranks_are_dense_and_total(census):
 
 @requires_run
 def test_the_ordering_is_reproducible(census, release):
-    from src.datasets.pr_review_v5.schema import ReviewAgenda
+    from src.mathlib_review.schema.review import ReviewAgenda
 
     rows, _agenda = census
     agenda = ReviewAgenda.model_validate(json.loads((RUN / "agenda.json").read_text()))

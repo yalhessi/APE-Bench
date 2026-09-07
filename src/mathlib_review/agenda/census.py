@@ -42,7 +42,7 @@ from src.datasets.pr_review_v4.schema import (
     ReviewWorkUnit,
 )
 
-from .schema import AgendaProposal
+from src.mathlib_review.schema.review import AgendaProposal
 
 CENSUS_VERSION = "v5-census/1"
 

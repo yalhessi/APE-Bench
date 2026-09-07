@@ -17,11 +17,11 @@ checks the budget, reports what would run -- and stops. That is the same work a 
 did, made the default rather than a flag, so forgetting a flag costs nothing instead of
 spending a budget.
 
-    python -m src.datasets.pr_review_v5.cli plan   --config configs/x.yaml
-    python -m src.datasets.pr_review_v5.cli run    --config configs/x.yaml --execute
-    python -m src.datasets.pr_review_v5.cli judge  --of <run_name> --config configs/j.yaml --execute
-    python -m src.datasets.pr_review_v5.cli bench  --config configs/x.yaml --arm proof_golf --execute
-    python -m src.datasets.pr_review_v5.cli report routing --run <run_name>
+    python -m src.mathlib_review.review.cli plan   --config configs/x.yaml
+    python -m src.mathlib_review.review.cli run    --config configs/x.yaml --execute
+    python -m src.mathlib_review.review.cli judge  --of <run_name> --config configs/j.yaml --execute
+    python -m src.mathlib_review.review.cli bench  --config configs/x.yaml --arm proof_golf --execute
+    python -m src.mathlib_review.review.cli report routing --run <run_name>
 
 `plan` is `run` without `--execute`, spelled positively, because that is what it is for.
 """
@@ -113,7 +113,7 @@ def build_parser() -> argparse.ArgumentParser:
 def _plan(config: Path, overrides, logger) -> int:
     """Render, price and check the budget. Writes nothing and calls nothing."""
 
-    from .runner import load_run, run
+    from src.mathlib_review.review.runner import load_run, run
 
     dataset, scaffold, task_overrides = load_run(config, overrides)
     dataset.dry_run = True
@@ -122,7 +122,7 @@ def _plan(config: Path, overrides, logger) -> int:
 
 
 def _run(args, overrides, logger) -> int:
-    from .runner import load_run, redo_run, run
+    from src.mathlib_review.review.runner import load_run, redo_run, run
 
     if not args.execute:
         logger.info("no --execute: preflight only, nothing will be spent")
@@ -159,7 +159,7 @@ def _judge(args, overrides, logger) -> int:
             f"{args.config} names no run to score, by design. Pass --of <run_name> to derive "
             "candidates, out_dir and run_name from the generation run, so the three cannot "
             "disagree:\n"
-            "  python -m src.datasets.pr_review_v5.cli judge "
+            "  python -m src.mathlib_review.review.cli judge "
             f"--config {args.config} --of <run_name> --execute")
     dataset, scaffold, task_overrides = load_run(args.config, overrides)
     if args.of_run:
@@ -181,7 +181,7 @@ def _judge(args, overrides, logger) -> int:
 
 
 def _bench(args, logger) -> int:
-    from .bench_cli import run_benches
+    from src.mathlib_review.analysis.bench_cli import run_benches
 
     return run_benches(
         config=args.config, arms=args.arm, pr_numbers=args.pr_numbers,
@@ -190,7 +190,7 @@ def _bench(args, logger) -> int:
 
 
 def _report(args) -> int:
-    from .report import contamination, overlay, routing, score
+    from src.mathlib_review.analysis.report import contamination, overlay, routing, score
 
     if args.report_command == "contamination":
         found = contamination(args.release)
@@ -201,14 +201,14 @@ def _report(args) -> int:
     elif args.report_command == "score":
         print(json.dumps(score(args.audit, args.run), indent=2))
     elif args.report_command == "retrieval":
-        from .report import retrieval
+        from src.mathlib_review.analysis.report import retrieval
 
         print(json.dumps(retrieval(args.run), indent=2))
     elif args.report_command == "scope":
         # The competence question the recall number cannot answer on its own: is the reviewer
         # good, or is the set unusually local? `obligation_scope` has answered it since it was
         # written and nothing could call it.
-        from .obligation_scope import scope_report
+        from src.mathlib_review.analysis.obligation_scope import scope_report
 
         print(json.dumps(scope_report(
             Path(args.audit) / "semantic_report.json",
@@ -239,7 +239,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.command == "report":
         return _report(args)
     if args.command == "trajectory":
-        from .trajectory import (
+        from src.mathlib_review.analysis.trajectory import (
             DEFAULT_APE_ROOT, DEFAULT_TOOL_RESULT_CAP, assert_repo_root, write_trajectory,
         )
 

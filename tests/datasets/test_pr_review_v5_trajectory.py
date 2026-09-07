@@ -24,7 +24,8 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v5 import delegation_view, trajectory
+from src.mathlib_review.analysis import delegation_view
+from src.mathlib_review.analysis import trajectory
 from src.mathlib_review.paths import run_dir
 
 RUN = "pr_review_v5_lead_medium_heldout_rep1"
@@ -163,7 +164,7 @@ def test_wall_seconds_is_per_tier_so_the_gantt_must_not_use_it():
 def test_briefs_survive_the_schema_gap():
     """`DelegationRecord` omits `brief`; reading through it would drop the lead's reasoning."""
 
-    from src.datasets.pr_review_v5.schema import DelegationRecord
+    from src.mathlib_review.schema.review import DelegationRecord
 
     assert "brief" not in DelegationRecord.model_fields
     views = delegation_view.load_lead_views(DIRECTORY)

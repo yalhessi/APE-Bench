@@ -44,7 +44,7 @@ def unit_and_run(tmp_path):
 
     from src.datasets.pr_review_v4.io import load_jsonl
     from src.datasets.pr_review_v4.schema import ReviewWorkUnit
-    from src.datasets.pr_review_v5.finalize import finalize
+    from src.mathlib_review.review.finalize import finalize
     from tests.datasets.test_pr_review_v5_finalize import RELEASE, _candidate, _response
 
     unit = next(
@@ -158,7 +158,7 @@ def test_a_dropped_candidate_becomes_a_diagnostic_finding():
     """So the judge can score it, and a claim that was right but unwarranted can be told apart
     from one that was wrong."""
 
-    from src.datasets.pr_review_v5.finalize import _unwarranted_findings
+    from src.mathlib_review.review.finalize import _unwarranted_findings
 
     findings = _unwarranted_findings([_candidate()], pr_numbers=None)
     assert len(findings) == 1
@@ -208,7 +208,7 @@ def test_the_drop_count_comes_from_the_function_that_drops(tmp_path):
 
     import inspect
 
-    from src.datasets.pr_review_v5 import finalize as module
+    from src.mathlib_review.review import finalize as module
 
     source = inspect.getsource(module.finalize)
     assert "verified_keys" not in source, "the drop rule is re-derived a second time"

@@ -130,7 +130,7 @@ def test_zulip_still_excludes_by_reference_not_by_origin():
 def test_the_precedent_index_refuses_an_undated_row_under_a_cutoff():
     """The vectorised form of the same refusal."""
 
-    from src.datasets.pr_review_v5.precedent_index import UNDATED, _iso_to_epoch
+    from src.mathlib_review.retrieval.precedent_index import UNDATED, _iso_to_epoch
 
     assert _iso_to_epoch(None) == UNDATED
     assert _iso_to_epoch("not-a-date") == UNDATED
@@ -138,7 +138,7 @@ def test_the_precedent_index_refuses_an_undated_row_under_a_cutoff():
 
 
 def test_the_precedent_index_reads_a_naive_stamp_as_utc():
-    from src.datasets.pr_review_v5.precedent_index import _iso_to_epoch
+    from src.mathlib_review.retrieval.precedent_index import _iso_to_epoch
 
     assert _iso_to_epoch("2026-08-01T12:00:00") == _iso_to_epoch("2026-08-01T12:00:00Z")
 
@@ -155,7 +155,7 @@ def test_no_source_parses_timestamps_for_itself_any_more():
     import ast
     from pathlib import Path
 
-    for path in (Path("src/datasets/pr_review_v5/precedent_index.py"),
+    for path in (Path("src/mathlib_review/retrieval/precedent_index.py"),
                  Path("src/datasets/pr_review_v4/retrieval.py"),
                  Path("src/datasets/zulip/store.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -200,7 +200,7 @@ def test_every_context_tool_records_a_gate():
 def test_the_gate_kinds_are_a_closed_set():
     """A free-text gate would let a new tool declare `"gate": "probably fine"`."""
 
-    from src.datasets.pr_review_v5.schema import ContextCall
+    from src.mathlib_review.schema.review import ContextCall
 
     annotation = ContextCall.model_fields["gate"].annotation
     assert set(getattr(annotation, "__args__", ())) == {"as_of", "base_snapshot"}

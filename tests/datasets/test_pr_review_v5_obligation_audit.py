@@ -20,8 +20,8 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pr_review_v5.obligation_audit import audit, audit_report
-from src.datasets.pr_review_v5.obligation_exclusions import (
+from src.mathlib_review.analysis.obligation_audit import audit, audit_report
+from src.mathlib_review.analysis.obligation_exclusions import (
     EXCLUSIONS, apply, exclusion_report,
 )
 

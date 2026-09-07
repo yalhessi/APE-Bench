@@ -5,7 +5,7 @@ Two registered task types:
   - `lean_pr_review_v5_arm`  (arm.py)  — one specialist invocation, inheriting v4's
     candidate contract whole.
 
-Scheduling, sealing and finalization live in `src/datasets/pr_review_v5`; this package is
+Scheduling, sealing and finalization live in `src/mathlib_review`; this package is
 only the execution half.
 """
 

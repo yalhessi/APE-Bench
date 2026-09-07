@@ -1,6 +1,6 @@
 """The one command that runs a v5 review, in any of its three routing modes.
 
-    ./ape/bin/python -m src.datasets.pr_review_v5.runner --config configs/pr_review_v5.yaml
+    ./ape/bin/python -m src.mathlib_review.review.runner --config configs/pr_review_v5.yaml
 
 Two things this deliberately does differently from the pipeline it descends from.
 
@@ -55,17 +55,17 @@ from src.datasets.pr_review_v4.schema import (
     ReviewWorkUnit,
 )
 
-from .agenda import agenda_report, build_agenda, initial_jobs
-from .arms import GENERALIST_ARM_ID
-from .census import build_census, census_report
-from .coordination import CoordinationConfig, assert_implemented
-from .cutoffs import cutoffs_by_episode
-from .evidence_chain import collect_supported, reviewed_workspaces
-from .finalize import finalize
+from src.mathlib_review.agenda.agenda import agenda_report, build_agenda, initial_jobs
+from src.mathlib_review.agenda.arms import GENERALIST_ARM_ID
+from src.mathlib_review.agenda.census import build_census, census_report
+from src.mathlib_review.review.coordination import CoordinationConfig, assert_implemented
+from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
+from src.mathlib_review.evidence.chain import collect_supported, reviewed_workspaces
+from src.mathlib_review.review.finalize import finalize
 from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
-from .preflight import assert_ready, assert_workspaces_prebuilt
-from .schema import ROUTING_MODES, V5RunManifest, V5RunPlan
-from .trace import reconcile
+from src.mathlib_review.review.preflight import assert_ready, assert_workspaces_prebuilt
+from src.mathlib_review.schema.review import ROUTING_MODES, V5RunManifest, V5RunPlan
+from src.mathlib_review.review.trace import reconcile
 from src.mathlib_review.run_config import load_run as _load_run
 
 LEAD_TASK_TYPE = "lean_pr_review_v5_lead"

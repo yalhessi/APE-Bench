@@ -20,7 +20,7 @@ import pytest
 from src.datasets.pr_review_v4.focused_specs import default_specs
 from src.datasets.pr_review_v4.io import load_jsonl
 from src.datasets.pr_review_v4.schema import ModificationRecord
-from src.datasets.pr_review_v5.arms import (
+from src.mathlib_review.agenda.arms import (
     CHECKABLE_ARMS,
     GENERALIST_ARM_ID,
     default_arms,
@@ -170,7 +170,7 @@ def test_only_compile_settled_arms_take_the_verification_gate():
 def test_non_checkable_arms_are_routed_to_the_evidence_chain():
     import inspect
 
-    from src.datasets.pr_review_v5 import finalize
+    from src.mathlib_review.review import finalize
 
     source = inspect.getsource(finalize.ingest_responses)
     assert "CHECKABLE_ARMS" in source
@@ -209,7 +209,7 @@ def test_every_arm_keeps_lean_verify_edit():
     guarantee is asserted rather than left to review.
     """
 
-    from src.datasets.pr_review_v5.arms import resolve_context_tools
+    from src.mathlib_review.agenda.arms import resolve_context_tools
 
     for arm in default_arms("v4-renderer/1"):
         assert "lean_verify_edit" in resolve_context_tools(arm), arm.arm_id
@@ -224,7 +224,7 @@ def test_family_design_loses_the_identifier_lookup_it_wasted():
     The arm spent its retrieval budget on name lookups instead and abstained.
     """
 
-    from src.datasets.pr_review_v5.arms import resolve_context_tools
+    from src.mathlib_review.agenda.arms import resolve_context_tools
 
     arms = {arm.arm_id: arm for arm in default_arms("v4-renderer/1")}
     assert "declaration_search" not in resolve_context_tools(arms["family_design"])
@@ -238,7 +238,7 @@ def test_the_convention_arms_keep_the_review_corpus():
     cases this release scores. The review corpus states them.
     """
 
-    from src.datasets.pr_review_v5.arms import resolve_context_tools
+    from src.mathlib_review.agenda.arms import resolve_context_tools
 
     arms = {arm.arm_id: arm for arm in default_arms("v4-renderer/1")}
     for arm_id in ("naming", "docs", "style"):
@@ -250,8 +250,8 @@ def test_the_generalist_grant_is_untouched():
     """It is the control. Narrowing the specialists and the control together would move both
     sides of the comparison at once, and neither could then be read off the result."""
 
-    from src.datasets.pr_review_v5.schema import CONTEXT_TOOLS
-    from src.datasets.pr_review_v5.arms import resolve_context_tools
+    from src.mathlib_review.schema.review import CONTEXT_TOOLS
+    from src.mathlib_review.agenda.arms import resolve_context_tools
 
     generalist = next(a for a in default_arms("v4-renderer/1")
                       if a.arm_id == GENERALIST_ARM_ID)

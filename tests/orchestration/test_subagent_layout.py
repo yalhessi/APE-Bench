@@ -104,7 +104,7 @@ def test_what_reaches_the_parent_is_truncated_not_omitted():
     the same observation, and it cannot do that from a count.
     """
 
-    from src.datasets.pr_review_v5.coordination import CoordinationPolicy
+    from src.mathlib_review.review.coordination import CoordinationPolicy
 
     assert CoordinationPolicy().parent_view == "summary"
 
@@ -133,7 +133,7 @@ def test_a_sibling_sees_nothing_of_another_sibling():
     """Sealed as a policy value so that coordination becoming a variable is a recorded change
     rather than a silent one."""
 
-    from src.datasets.pr_review_v5.coordination import CoordinationPolicy
+    from src.mathlib_review.review.coordination import CoordinationPolicy
 
     assert CoordinationPolicy().sibling_view == "none"
 

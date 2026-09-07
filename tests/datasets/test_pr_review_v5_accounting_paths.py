@@ -44,7 +44,7 @@ def _write_sample(task_dir: Path, attempts):
 
 
 def test_sample_cost_finds_the_sample_beside_the_result(tmp_path):
-    from src.datasets.pr_review_v5.trajectory import _sample_cost
+    from src.mathlib_review.analysis.trajectory import _sample_cost
 
     result = _write_sample(
         tmp_path / "tasks" / "gi",
@@ -59,7 +59,7 @@ def test_sample_cost_finds_the_sample_beside_the_result(tmp_path):
 def test_sample_cost_accumulates_across_attempts(tmp_path):
     """A sample that paused and resumed spent the sum; reading the last attempt understates."""
 
-    from src.datasets.pr_review_v5.trajectory import _sample_cost
+    from src.mathlib_review.analysis.trajectory import _sample_cost
 
     result = _write_sample(
         tmp_path / "tasks" / "gi",
@@ -75,7 +75,7 @@ def test_sample_cost_accumulates_across_attempts(tmp_path):
 
 
 def test_sample_cost_falls_back_to_nominal_when_no_billed_figure(tmp_path):
-    from src.datasets.pr_review_v5.trajectory import _sample_cost
+    from src.mathlib_review.analysis.trajectory import _sample_cost
 
     result = _write_sample(
         tmp_path / "tasks" / "gi", [{"cost": 0.25, "status": "success"}])

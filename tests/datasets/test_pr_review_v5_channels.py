@@ -20,7 +20,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.datasets.pr_review_v5.finalize import _assign_channels, _contradicted_candidate_ids
+from src.mathlib_review.review.finalize import _assign_channels, _contradicted_candidate_ids
 
 
 def _finding(admission="published", candidate_ids=("c1",)):
