@@ -111,11 +111,17 @@ class JobOutcome:
     error: Optional[str] = None
 
     def summary(self) -> Dict[str, Any]:
-        """The compact view the lead sees. Deliberately not the full candidate text.
+        """The compact view the lead sees: counts, cost, and each claim truncated.
 
-        The lead routes; it does not re-adjudicate. Returning every candidate body would
-        spend the lead's context re-reading work the finalization chain will read anyway,
-        and would invite it to arbitrate in place of the gates.
+        The first version of this returned no claim text at all, on the reasoning that the
+        lead routes and does not re-adjudicate. That stopped being the design when synthesis
+        became subtractive -- the lead now decides which claims are the same observation, and
+        it cannot do that from a count. So claims are included, and the boundary is truncation
+        rather than omission: 800 characters of claim and 400 of requested change, enough to
+        judge duplication and not enough to re-review.
+
+        What is still withheld is the rest of the candidate -- evidence requests, proposed
+        edits, verification artifacts. Those belong to the gates the lead cannot reach.
         """
 
         return {
