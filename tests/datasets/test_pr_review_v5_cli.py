@@ -274,3 +274,37 @@ def test_the_scope_report_is_read_only():
     """It reads a finished audit. Nothing it does can spend."""
 
     assert "report" not in cli.SPENDS
+
+
+def test_the_retrieval_report_is_reachable_and_read_only():
+    """The question a recall number cannot answer: which of its three retrieval tools an arm
+    actually reached for, and what came back. 83% of 2,024 calls across thirteen runs went to
+    `declaration_search`, which returns nothing but "X is declared in file Y"."""
+
+    args = cli.build_parser().parse_args(["report", "retrieval", "--run", "r"])
+    assert args.report_command == "retrieval"
+    assert "report" not in cli.SPENDS
+
+
+def test_the_retrieval_report_separates_the_tools_and_the_arms():
+    """Per tool because the empty rate means a different thing for each; per arm because the
+    grant is per arm, and that is how you see whether an arm uses what it was given."""
+
+    from src.datasets.pr_review_v5.report import retrieval
+
+    found = retrieval("pr_review_v5_specialist4_rep1")
+    assert found["calls"] > 0
+    assert set(found["by_tool"]) <= {
+        "declaration_search", "precedent_search", "zulip_search", "lean_verify_edit", "?"}
+    assert all("empty_rate" in stats for stats in found["by_tool"].values())
+    assert found["by_arm"], "per-arm rows are the point of the grant being per arm"
+
+
+def test_the_retrieval_report_counts_calls_that_declared_no_gate():
+    """Runs made before gates were recorded have none, and a modern run should have one on
+    every row -- a row without one is a tool added without saying how it is bounded."""
+
+    from src.datasets.pr_review_v5.report import retrieval
+
+    found = retrieval("pr_review_v5_specialist4_rep1")
+    assert "calls_without_a_recorded_gate" in found

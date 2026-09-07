@@ -25,6 +25,76 @@ def _load_jsonl(path: Path):
     return [json.loads(x) for x in path.read_text().splitlines() if x.strip()]
 
 
+def retrieval(run_name: str) -> Dict[str, Any]:
+    """Which retrieval tool the arms actually reached for, and what came back.
+
+    The question a recall number cannot answer: the arms have three retrieval tools and
+    measurably do not use them evenly. Across the thirteen runs in the tree at the time this
+    was written, 83% of 2,024 calls went to `declaration_search` -- the one that returns
+    nothing but "X is declared in file Y" -- and 47% of those came back empty.
+
+    An empty `declaration_search` is not automatically waste: for a duplication or `api_reuse`
+    claim it is the refutation, and the tool's own description says so. The concern is the
+    83%. `family_design` spent 50 of its 63 discretionary calls on a name lookup that cannot
+    answer a question about a group's shape, and that is what made the retrieval grant
+    per-arm. The one run made after that change, `specialist4_rep1`, is the outlier at 45%
+    and a 19% empty rate -- the cheapest evidence available that the grant does something.
+
+    The other two tools are at opposite extremes and **`empty_rate` means something different
+    for each**, which is why this reports the rate rather than a score:
+
+        declaration_search   1681 calls   47% empty
+        precedent_search      240 calls    0% empty
+        zulip_search          103 calls   80% empty
+
+    `precedent_search` never comes back empty because it is a dense top-k over 34.6k anchored
+    comments: it returns k rows whatever the query, so 0% is "never abstains", not "always
+    useful". Reading it as relevance would be reading the retrieval mode as a result.
+
+    `zulip_search` comes back empty four times in five. The store is not the problem -- it
+    holds 180k messages and resolves discussion for 10 of 10 eval PRs -- so this is a query,
+    gate or coverage question and it is open. It is also only 103 calls across thirteen runs,
+    so the arms granted it barely use it.
+    """
+
+    rows = _load_jsonl(run_dir(run_name) / "context_trace.jsonl")
+    if not rows:
+        return {"run": run_name, "calls": 0}
+
+    by_tool: Dict[str, Dict[str, int]] = {}
+    for row in rows:
+        tool = by_tool.setdefault(
+            row.get("tool") or "?", {"calls": 0, "empty": 0, "truncated": 0})
+        tool["calls"] += 1
+        tool["empty"] += int(not row.get("result_count"))
+        tool["truncated"] += int(bool(row.get("truncated")))
+
+    total = len(rows)
+    for stats in by_tool.values():
+        stats["share"] = round(stats["calls"] / total, 3)
+        stats["empty_rate"] = round(stats["empty"] / stats["calls"], 3)
+
+    by_arm: Dict[str, Dict[str, int]] = {}
+    for row in rows:
+        arm = str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
+        entry = by_arm.setdefault(arm, {"calls": 0, "declaration_search": 0})
+        entry["calls"] += 1
+        entry["declaration_search"] += int(row.get("tool") == "declaration_search")
+
+    return {
+        "run": run_name,
+        "calls": total,
+        "by_tool": dict(sorted(by_tool.items())),
+        # Per arm, because the grant is per arm and this is how you see whether an arm is
+        # using what it was given.
+        "by_arm": dict(sorted(by_arm.items())),
+        # Rows written before gates were recorded have no `gate`; a modern run has one on
+        # every row, and a row without one is a tool that was added without declaring how it
+        # is bounded.
+        "calls_without_a_recorded_gate": sum(1 for row in rows if not row.get("gate")),
+    }
+
+
 def routing(run_name: str) -> Dict[str, Any]:
     directory = run_dir(run_name)
     delegations = _load_jsonl(directory / "delegations.jsonl")
