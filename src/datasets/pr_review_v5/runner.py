@@ -30,6 +30,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import ConfigDict, BaseModel, Field
 
 from ape.orchestration import TaskOrchestrator
+from ape.orchestration.execution_index import INDEX_FILENAME as EXECUTION_INDEX_FILENAME
 from ape.tasks.base import create_task_from_data
 from ape.utils import parse_cli_args
 from ape.llm_clients.config import COST_MODELS
@@ -255,6 +256,12 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
             "trace_path": str(trace_path),
             "journal_path": (
                 str(journal_dir / f"{episode_id.replace(':', '_')}.jsonl")
+                if journal_dir is not None else None
+            ),
+            # One index for the whole run, unlike the journal: it is a location map, and a
+            # reader wants to resolve any invocation without knowing which lead ran it.
+            "execution_index_path": (
+                str(journal_dir.parent / EXECUTION_INDEX_FILENAME)
                 if journal_dir is not None else None
             ),
             "target_workspace": {

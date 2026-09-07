@@ -295,6 +295,7 @@ async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
                    standard_cap: float, wave: int, logger) -> List[JobOutcome]:
     """Run one wave's jobs in a single nested orchestrator, each with its own budget."""
 
+    from ape.orchestration import execution_index
     from ape.orchestration.models import EXECUTION_LIMITS_KEY
     from ape.orchestration.orchestrator import TaskOrchestrator
     from ape.tasks.base import create_task_from_data
@@ -326,6 +327,17 @@ async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
     orchestrator = TaskOrchestrator(config=config, orchestrator_id=orchestrator_id, logger=logger)
     results = await orchestrator.run(tasks)
     elapsed = time.monotonic() - started
+
+    # Where each invocation actually ran, written down rather than left to be inferred from
+    # the directory name later. See `ape/orchestration/execution_index.py`.
+    await execution_index.record(
+        getattr(parent_task.data, "execution_index_path", None),
+        orchestrator, results,
+        semantic_ids={payloads[job.invocation_id].get("task_id"): job.invocation_id
+                      for job in jobs},
+        group=f"wave{wave}",
+        parent=getattr(parent_task.data, "episode_id", None),
+    )
 
     facts = await _sample_facts(orchestrator, results)
     by_task_id = {}

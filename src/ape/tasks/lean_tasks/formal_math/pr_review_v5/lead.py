@@ -241,6 +241,10 @@ class LeanPRReviewV5LeadData(BasePRReviewData):
     #: resumed lead starts from zero delegated spend, an empty dedup set and an unrun coverage
     #: floor — see `journal.py`, which is a list of four ways that costs money.
     journal_path: Optional[str] = None
+    #: Append-only `semantic id -> physical path` map for every arm this lead dispatches, so a
+    #: reader of the finished run does not have to recover "which arm, which wave" by parsing
+    #: a directory name at a fixed depth.
+    execution_index_path: Optional[str] = None
     #: `work_unit_id -> {status, claims[]}` from the mandatory generalist pass, which
     #: runs before the lead. Empty when the floor produced nothing.
     floor_summary: Dict[str, Any] = Field(default_factory=dict)

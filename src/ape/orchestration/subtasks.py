@@ -85,6 +85,7 @@ async def run_subtasks(
     base=None,
     concurrency: int = DEFAULT_NESTED_CONCURRENCY,
     execution_overrides: Optional[Dict[str, Any]] = None,
+    index_path: Optional[Any] = None,
 ):
     """Run one group of children and return `(outcomes_by_spec_id, results)`.
 
@@ -112,6 +113,16 @@ async def run_subtasks(
     orchestrator = TaskOrchestrator(config=config, logger=logger)
     orchestrator.orchestrator_id = group
     results = await orchestrator.run(tasks)
+
+    # Semantic id -> physical path, recorded where the paths are made. Optional because most
+    # families do not read their own runs back; the ones that do stop parsing directory names.
+    from . import execution_index
+
+    await execution_index.record(
+        index_path or getattr(getattr(parent_task, "data", None), "execution_index_path", None),
+        orchestrator, results, semantic_ids=spec_by_task_id, group=group,
+        parent=getattr(getattr(parent_task, "data", None), "task_id", None),
+    )
 
     outcomes = await collect_outcomes(orchestrator, results, spec_by_task_id, config)
     return outcomes, results

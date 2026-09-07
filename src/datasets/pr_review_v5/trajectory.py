@@ -33,7 +33,7 @@ import json
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from src.datasets.pr_review_v4.io import display_path
 
@@ -52,13 +52,15 @@ DEFAULT_APE_ROOT = Path(".ape/runs")
 #: assistant's own text (4.51 MB) is the part worth reading and is never truncated.
 DEFAULT_TOOL_RESULT_CAP = 2000
 
-#: Where an arm's result sits under its lead. Depth is fixed by the orchestrator:
-#: lead task -> sample -> attempt -> subtasks/<wave>/<tier>/<batch> -> arm task.
-#: Two shapes, because the subtask layout changed when budget tiers were retired.
+#: Where an arm's result sits under its lead, for runs with no execution index. Depth is fixed
+#: by the orchestrator: lead task -> sample -> attempt -> subtasks/<wave>/<tier>/<batch> -> arm
+#: task. Two shapes, because the subtask layout changed when budget tiers were retired: tiers
+#: existed only to vary `sample_max_cost`, which is orchestrator-wide, so `subtasks/<wave>/
+#: <tier>/<id>/` became `subtasks/<wave>/<id>/` -- one segment shorter, and a second glob.
 #:
-#: Tiers existed only to vary `sample_max_cost`, which is orchestrator-wide; per-task limits
-#: removed the need, so `subtasks/wave<N>/<tier>/<id>/` became `subtasks/wave<N>/<id>/` -- one
-#: segment shorter. The old shape is still read so the September runs stay inspectable.
+#: Needing a second glob for a layout change is the reason `execution_index.jsonl` exists. A
+#: run that wrote one is read through it and never reaches these; they stay for the September
+#: runs, which did not.
 _ARM_RESULT_GLOBS = (
     "tasks/*/samples/*/attempts/*/subtasks/*/*/tasks/*/task_result.json",
     "tasks/*/samples/*/attempts/*/subtasks/*/*/*/tasks/*/task_result.json",
@@ -258,6 +260,59 @@ def _session_for(result_path: Path) -> Optional[Path]:
 
 # --- extraction -----------------------------------------------------------------------
 
+def _indexed_arms(run_name: str) -> Dict[str, Dict[str, Any]]:
+    """`invocation_id -> its index row`, when the run wrote one.
+
+    Empty for every run made before the index existed, which is what the globs below are still
+    for. A run that has one needs no glob at all: the row names the task directory and every
+    attempt path, so neither the subtask depth nor the sample index has to be guessed.
+    """
+
+    from ape.orchestration.execution_index import INDEX_FILENAME, by_semantic_id
+
+    try:
+        return by_semantic_id(run_dir(run_name) / INDEX_FILENAME)
+    except Exception:  # noqa: BLE001 - a missing results dir is not a trajectory failure
+        return {}
+
+
+def _arm_result_paths(root: Path, indexed: Dict[str, Dict[str, Any]]) -> List[Path]:
+    """Where the arm results are, from the index when there is one and the globs when not."""
+
+    if indexed:
+        return sorted({Path(row["task_dir"]) / "task_result.json"
+                       for row in indexed.values() if row.get("task_dir")})
+    seen, paths = set(), []
+    for pattern in _ARM_RESULT_GLOBS:
+        for path in root.glob(pattern):
+            if path not in seen:
+                seen.add(path)
+                paths.append(path)
+    return sorted(paths)
+
+
+def _indexed_cost(row: Dict[str, Any]) -> tuple:
+    """Cumulative across attempts, like `_sample_cost` -- a sample that paused and resumed
+    spent the sum, and reading only the last attempt understates it."""
+
+    attempts = row.get("attempts") or []
+    if not attempts:
+        return None, None, None
+    cost = sum(item.get("cost") or 0.0 for item in attempts)
+    cached = sum((item.get("cached_cost") or item.get("cost") or 0.0) for item in attempts)
+    return cost, cached, attempts[-1].get("status")
+
+
+def _indexed_session(row: Dict[str, Any]) -> Optional[Path]:
+    for attempt in reversed(row.get("attempts") or []):
+        if not attempt.get("path"):
+            continue
+        found = sorted(Path(attempt["path"]).glob(_SESSION_GLOB))
+        if found:
+            return found[-1]
+    return None
+
+
 def extract(run_name: str, ape_root: Path = DEFAULT_APE_ROOT,
             cap: int = DEFAULT_TOOL_RESULT_CAP) -> dict:
     """Walk one run's orchestrator tree into invocations, leads and turns."""
@@ -272,19 +327,26 @@ def extract(run_name: str, ape_root: Path = DEFAULT_APE_ROOT,
                 "invocations": [], "leads": [], "turns_by_pr": {}}
 
     # --- arm invocations ---
-    seen_paths = set()
-    for result_path in sorted(
-        path for pattern in _ARM_RESULT_GLOBS for path in root.glob(pattern)
-    ):
-        if result_path in seen_paths:
-            continue
-        seen_paths.add(result_path)
+    indexed = _indexed_arms(run_name)
+    for result_path in _arm_result_paths(root, indexed):
         result = _load(result_path)
         if not result or not result.get("invocation_id"):
             continue
-        wave, tier = _wave_and_tier(result_path)
-        cost, cached, sample_status = _sample_cost(result_path)
-        session = _session_for(result_path)
+        row = indexed.get(result["invocation_id"])
+        if row is not None:
+            # `group` is the dispatcher's own name for the wave -- "wave2" -- rather than a
+            # directory segment that happens to be spelled the same way. Kept verbatim so a
+            # row read through the index and one read through the glob below carry the same
+            # value in the same field; two spellings of one wave is how a field becomes
+            # unusable for grouping.
+            wave = str(row.get("group") or "") or None
+            tier = None
+            cost, cached, sample_status = _indexed_cost(row)
+            session = _indexed_session(row)
+        else:
+            wave, tier = _wave_and_tier(result_path)
+            cost, cached, sample_status = _sample_cost(result_path)
+            session = _session_for(result_path)
         turn_rows = _read_turns(session, result["invocation_id"], cap) if session else []
         pr_number = result.get("pr_number")
         invocations.append(Invocation(
