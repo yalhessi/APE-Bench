@@ -528,3 +528,59 @@ def test_a_failed_discretionary_job_is_not_a_coverage_gap(lead):
     # other half of the rule and worth asserting here rather than assuming it away.
     assert {g["invocation_id"] for g in gaps} == {"wu:1#generalist"}
     assert gaps[0]["status"] == "never_ran"
+
+
+# --- budget reservations ------------------------------------------------------------------
+
+
+def test_a_single_wave_cannot_overshoot_the_per_pr_cap(lead):
+    """`delegated_spend` only updates once a wave has finished, so checking it at request time
+    meant every job in a wave saw the same pre-wave figure. One `delegate` call with 25 `deep`
+    jobs at a $0.30 standard cap could authorise $15 against a $1.50 cap, and the check passed
+    25 times.
+
+    Both jobs here are refused, so nothing is dispatched and no subtask is spawned.
+    """
+
+    task, tools = lead
+    # `_task_config()` builds a fresh object on every call, so the caps have to be set where
+    # it reads them from.
+    task.config.task_config = task.task_config_class(
+        per_pr_cost_cap=0.10, standard_budget_cap=0.30)   # cap < one standard job's ceiling
+
+    state = task._state()
+    state["floor_done"] = True
+    state["comprehension"] = {"summary": "s", "questions": []}
+
+    result = asyncio.run(tools["delegate"](jobs=[
+        {"proposal_id": "wu:1#proof_golf"},
+        {"proposal_id": "wu:1#duplication"},
+    ]))
+
+    assert result["success"] is False
+    assert len(result["rejected"]) == 2
+    for row in result["rejected"]:
+        assert "cost cap would be exceeded" in row["reason"]
+    # Nothing was dispatched, so nothing is held.
+    assert state["reserved"] == 0.0 or state["reserved"] == pytest.approx(0.0)
+
+
+def test_a_deep_job_reserves_more_than_a_standard_one(lead):
+    """The reservation is the job's ceiling, so tier has to enter it — otherwise a wave of
+    `deep` jobs is bounded as though it were cheap."""
+
+    task, tools = lead
+    # A deep job reserves 2x standard: $0.60. The cap is $0.45, so the deep job is refused
+    # while a standard one at $0.30 would have been accepted.
+    task.config.task_config = task.task_config_class(
+        per_pr_cost_cap=0.45, standard_budget_cap=0.30)
+
+    state = task._state()
+    state["floor_done"] = True
+    state["comprehension"] = {"summary": "s", "questions": []}
+
+    result = asyncio.run(tools["delegate"](jobs=[
+        {"proposal_id": "wu:1#proof_golf", "budget_tier": "deep"}]))
+
+    assert result["success"] is False
+    assert "0.60" in result["rejected"][0]["reason"]

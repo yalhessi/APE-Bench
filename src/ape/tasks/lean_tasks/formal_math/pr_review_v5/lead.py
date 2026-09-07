@@ -310,6 +310,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 # the ones where routing matters. PR 33149 had 108 work units, a $10.05
                 # floor against a $1.50 cap, and therefore zero specialists.
                 "delegated_spend": 0.0,
+                # Ceiling of the jobs dispatched in the current wave but not yet settled.
+                # Without it the per-PR cap only binds *between* waves, and a single wave can
+                # overshoot it by the product of its job count and their tier caps.
+                "reserved": 0.0,
                 # The coverage floor runs *through* the lead, as its first wave, but is not
                 # the lead's to skip. Tracking it here is what lets `delegate` inject it and
                 # `submit_routing` refuse to close without it.
@@ -543,15 +547,30 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                     rejected.append({"job": invocation_id, "reason": (
                         f"delegation budget exhausted ({budget} jobs)")})
                     continue
-                if state["delegated_spend"] >= self._task_config().per_pr_cost_cap:
-                    rejected.append({"job": invocation_id, "reason": (
-                        f"per-PR cost cap reached (${state['delegated_spend']:.2f} of "
-                        f"${self._task_config().per_pr_cost_cap:.2f} spent on delegated work)")})
-                    continue
-
                 tier = str(raw.get("budget_tier") or "standard")
                 if tier not in TIER_MULTIPLIERS:
                     tier = "standard"
+
+                # Reserve this job's ceiling before dispatching it, not after the wave.
+                #
+                # `delegated_spend` only updates once a wave has finished, so checking it here
+                # meant every job in a wave saw the same pre-wave figure: one `delegate` call
+                # with 25 `deep` jobs at a $0.30 standard cap could authorise $15 against a
+                # $1.50 cap and the check would pass 25 times. Reserving the maximum each job
+                # can cost makes the bound hold within a wave as well as across waves; the
+                # reservation is released and replaced by the actual spend when the wave
+                # settles.
+                cap = self._task_config().per_pr_cost_cap
+                max_cost = self._task_config().standard_budget_cap * TIER_MULTIPLIERS[tier]
+                committed = state["delegated_spend"] + state["reserved"]
+                if committed + max_cost > cap:
+                    rejected.append({"job": invocation_id, "reason": (
+                        f"per-PR cost cap would be exceeded: ${committed:.2f} already "
+                        f"committed of ${cap:.2f}, and this {tier} job reserves up to "
+                        f"${max_cost:.2f}")})
+                    continue
+                state["reserved"] += max_cost
+
                 payload = pool[invocation_id]
                 brief = raw.get("brief")
                 brief_model = (
@@ -629,9 +648,14 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                                       state["wave"], traceback.format_exc())
                 for spec in specs:
                     state["requested"].discard(spec.invocation_id)
+                # Release the reservations too, or a failed wave permanently consumes budget
+                # for work that never ran.
+                state["reserved"] = 0.0
                 return {"success": False, "ran": 0, "rejected": rejected,
                         "error": f"delegation failed: {exc}"}
 
+            # Settle: the reservations are replaced by what the wave actually cost.
+            state["reserved"] = 0.0
             spec_by_id = {spec.invocation_id: spec for spec in specs}
             for outcome in outcomes:
                 spec = spec_by_id[outcome.invocation_id]
