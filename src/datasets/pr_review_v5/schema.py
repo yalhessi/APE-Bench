@@ -294,6 +294,10 @@ class V5RunManifest(StrictModel):
     succeeded: int
     failed: int
     paused: int
+    #: **Nominal**, inclusive of nested spend. The no-cache counterfactual, not what was paid,
+    #: and roughly 2.5x it -- specialist4 was $0.1218 billed against $0.3017 nominal. Kept
+    #: under this name because every run in the tree carries it, and every cap in this system
+    #: is enforced against the *billed* figure, which is `usage.billed`.
     total_cost: float
     #: Where `total_cost` came from: `lead` (the leads' own conversations, or the single
     #: orchestrator in the model-free modes), `nested` (everything under a lead attempt —
@@ -301,6 +305,12 @@ class V5RunManifest(StrictModel):
     #: three come from orchestrators that cannot see each other, and a total with no
     #: breakdown is exactly how the floor's $14.52 went missing for a whole run.
     cost_breakdown: Dict[str, float] = Field(default_factory=dict)
+    #: Billed and nominal, self and nested, in one place. The manifest could report only one
+    #: number and it was the wrong one: `total_cost` is nominal, while `standard_budget_cap`,
+    #: `per_pr_cost_cap`, `lead_cost_cap` and `run_total_cost_cap` all bind billed spend. A
+    #: reader comparing the reported total against the caps was comparing two different
+    #: currencies, which is what the corrections sidecar exists to undo for three runs.
+    usage: Dict[str, float] = Field(default_factory=dict)
     wall_seconds: float
     candidates_total: int
     issues_total: int

@@ -384,3 +384,80 @@ def test_the_floor_is_priced_separately_from_the_discretionary_cap(caplog):
                        logging.getLogger("test"))
     assert "mandatory floor $1.35" in caplog.text
     assert "discretionary up to $6.00" in caplog.text
+
+
+# --- the manifest reports both currencies -------------------------------------------------
+#
+# `total_cost` is NOMINAL and every cap in this system binds BILLED spend. Prompt caching puts
+# them ~2.5x apart -- specialist4 was $0.1218 billed against $0.3017 nominal -- so a reader
+# comparing the reported total against `run_total_cost_cap` was comparing two currencies.
+# That is what the corrections sidecar exists to undo for three September runs.
+
+
+def _manifest_with_both_currencies():
+    from types import SimpleNamespace
+
+    from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
+    from src.datasets.pr_review_v5.schema import V5RunPlan
+    from src.datasets.pr_review_v5.trace import reconcile
+
+    agenda, _pool = _agenda_and_pool()
+    records = []
+    for item in agenda.proposals:
+        base = {"schema_version": "v5-delegation1", "invocation_id": item.invocation_id,
+                "proposal_id": item.proposal_id, "arm_id": item.arm_id,
+                "work_unit_id": item.work_unit_id, "pr_number": item.pr_number,
+                "context_calls": []}
+        if item.mandatory:
+            records.append({**base, "disposition": "mandatory", "reason": "",
+                            "status": "success", "cost": 0.02, "nominal_cost": 0.05})
+        else:
+            # Every enumerated pair must end delegated or pruned, or `reconcile` refuses.
+            records.append({**base, "disposition": "pruned", "reason": "r",
+                            "status": None, "cost": None})
+    plan = V5RunPlan(
+        run_id="v5run:t", run_name="t", routing_mode="lead", agenda_sha256="a" * 64,
+        release="rel", prompt_sha256_by_invocation={}, arm_sha256_by_id={},
+        model_name="m", scaffold_config_sha256="b" * 64, lead_cost_cap=1.0,
+        standard_budget_cap=0.5, per_pr_cost_cap=4.0, source_sha256="",
+    )
+    plan = plan.model_copy(update={"source_sha256": sha256_bytes(canonical_json_bytes(
+        plan.model_dump(mode="json", exclude={"source_sha256"})))})
+    jobs = sum(1 for r in records if r["disposition"] == "mandatory")
+    nested_billed, nested_nominal = 0.02 * jobs, 0.05 * jobs
+    manifest = reconcile(
+        agenda=agenda, delegations=records, responses=[], plan=plan,
+        results=SimpleNamespace(
+            total_cost=0.50 + nested_nominal,
+            total_cached_cost=0.20 + nested_billed,
+            wall_clock_time=10.0),
+        issues_total=0,
+    )
+    return manifest, nested_billed, nested_nominal
+
+
+def test_the_manifest_states_billed_separately_from_nominal():
+    manifest, nested_billed, nested_nominal = _manifest_with_both_currencies()
+    assert manifest.usage["nested_billed"] == pytest.approx(nested_billed)
+    assert manifest.usage["nested_nominal"] == pytest.approx(nested_nominal)
+    assert manifest.usage["billed"] == pytest.approx(0.20 + nested_billed)
+    assert manifest.usage["nominal"] == pytest.approx(0.50 + nested_nominal)
+
+
+def test_the_billed_figure_is_the_one_to_compare_against_a_cap():
+    """And it is smaller. Reporting only the nominal total makes a run look 2.5x more
+    expensive than it was, which is the wrong direction to be wrong about a budget."""
+
+    manifest, _b, _n = _manifest_with_both_currencies()
+    assert manifest.usage["billed"] < manifest.usage["nominal"]
+    # `total_cost` keeps its meaning -- files in the tree carry it -- and it is the nominal one.
+    assert manifest.total_cost == pytest.approx(manifest.usage["nominal"])
+
+
+def test_the_leads_own_spend_is_separated_from_what_it_delegated():
+    """"The lead spent its whole budget on itself" and "the lead spent nothing and its arms
+    spent everything" are different runs. One inclusive number cannot tell them apart."""
+
+    manifest, nested_billed, _n = _manifest_with_both_currencies()
+    assert manifest.usage["self_billed"] == pytest.approx(0.20)
+    assert manifest.usage["nested_billed"] == pytest.approx(nested_billed)

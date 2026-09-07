@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Sequence
 
+from ape.orchestration.models import UsageBreakdown
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sha256_bytes
 
 from .schema import ReviewAgenda, V5RunManifest, V5RunPlan
@@ -115,6 +116,10 @@ def reconcile(
     # silently discarded it: the held-out run reported $6.54 against a ledger total of
     # $19.17, with the floor's $14.52 simply absent. Spend is spend, whoever authorised it.
     ledger_cost = sum(float(record.get("cost") or 0.0) for record in delegations)
+    # The same sum in the other currency. `cost` is billed and `nominal_cost` is the no-cache
+    # counterfactual; both are on every ledger row, and until now only one of them was carried
+    # to the manifest -- the one no cap is enforced against.
+    ledger_nominal = sum(float(record.get("nominal_cost") or 0.0) for record in delegations)
 
     # A job that ran and recorded no cost is unattributed spend: the money left the account
     # and the ledger cannot say for what. That is the shape of the bug this function just
@@ -161,6 +166,19 @@ def reconcile(
             "nested": round(ledger_cost, 6),
             "extra": round(extra_cost, 6),
         },
+        # Both currencies at both scopes. `results.total_cost` is nominal and
+        # `results.total_cached_cost` is billed; both are already inclusive of nested spend,
+        # so the leads' own halves are each total minus its own ledger sum. `extra_cost` is
+        # real spend from an orchestrator outside this one, so it lands on the billed side.
+        usage=UsageBreakdown(
+            self_billed=round(
+                float(getattr(results, "total_cached_cost", 0.0) or 0.0)
+                - ledger_cost + extra_cost, 6),
+            self_nominal=round(
+                float(getattr(results, "total_cost", 0.0) or 0.0) - ledger_nominal, 6),
+            nested_billed=round(ledger_cost, 6),
+            nested_nominal=round(ledger_nominal, 6),
+        ).summary(),
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),
         candidates_total=candidates_total,
         issues_total=issues_total,

@@ -379,6 +379,71 @@ class SampleOutcome(BaseModel):
     resumable: bool = False
 
 
+class UsageBreakdown(BaseModel):
+    """What something cost, in every way this project counts cost.
+
+    Three axes get conflated, and each conflation has already cost this project a run:
+
+    * **billed vs nominal.** `cached_total_cost` is what was paid; `total_cost` is the
+      no-cache counterfactual. Prompt caching puts them ~2.5x apart -- the specialist4 run was
+      $0.1218 billed against $0.3017 nominal. Caps enforce billed; the manifest reported
+      nominal; nothing said which was which.
+    * **self vs nested.** An agent's own conversation versus what its children spent. A lead
+      that does not bubble its children's spend reports a fraction of its cost, which is how a
+      floor's $14.52 went missing for a whole run.
+    * **charged.** What a *particular* cap counted, which is neither of the above: the coverage
+      floor is exempt from `per_pr_cost_cap` by design, so a lead's charged figure is smaller
+      than its billed figure and both are correct.
+
+    Every one of those numbers was already computed somewhere. None of them could be stated
+    together, because they lived on `TaskOutcome`, on `JobOutcome` and in the manifest as
+    bare floats named `cost`.
+    """
+
+    #: This agent's own conversation.
+    self_billed: float = 0.0
+    self_nominal: float = 0.0
+    #: Everything its children spent, at any depth.
+    nested_billed: float = 0.0
+    nested_nominal: float = 0.0
+    #: What a cap actually counted. Zero means "no cap looked at this", not "this was free" --
+    #: `budget_charged` is only meaningful where a budget was being enforced.
+    budget_charged: float = 0.0
+
+    @property
+    def billed(self) -> float:
+        """Inclusive. The number to compare against a dollar figure."""
+
+        return round(self.self_billed + self.nested_billed, 6)
+
+    @property
+    def nominal(self) -> float:
+        """Inclusive, and never spend. For reporting cache effectiveness, nothing else."""
+
+        return round(self.self_nominal + self.nested_nominal, 6)
+
+    def with_nested(self, *, billed: float, nominal: float) -> "UsageBreakdown":
+        return self.model_copy(update={
+            "nested_billed": round(billed, 6), "nested_nominal": round(nominal, 6)})
+
+    @classmethod
+    def of_self(cls, *, billed: float, nominal: float) -> "UsageBreakdown":
+        return cls(self_billed=round(billed, 6), self_nominal=round(nominal, 6))
+
+    def summary(self) -> Dict[str, float]:
+        """The flat form, for a manifest or a report. Every key names its axis."""
+
+        return {
+            "self_billed": round(self.self_billed, 6),
+            "self_nominal": round(self.self_nominal, 6),
+            "nested_billed": round(self.nested_billed, 6),
+            "nested_nominal": round(self.nested_nominal, 6),
+            "billed": self.billed,
+            "nominal": self.nominal,
+            "budget_charged": round(self.budget_charged, 6),
+        }
+
+
 class TaskExecutionStatus(str, Enum):
     """How a task's execution ended, independent of what it concluded.
 
@@ -406,8 +471,14 @@ class TaskOutcome(BaseModel):
     #: Why it ended this way, when that is not "it finished".
     reason: Optional[str] = None
     samples: List[SampleOutcome] = Field(default_factory=list)
+    #: This task's own spend. Self-only: a task that spawned children does not see their spend
+    #: here, which is what `usage` exists to make sayable.
     billed_cost: float = 0.0
     nominal_cost: float = 0.0
+    #: The whole picture, in one place. `billed_cost`/`nominal_cost` are its `self_*` half and
+    #: are kept because `task_outcome.json` files in the tree carry them; a parent that runs
+    #: children fills in the nested half.
+    usage: UsageBreakdown = Field(default_factory=UsageBreakdown)
     turns: int = 0
     wall_seconds: float = 0.0
 
@@ -482,6 +553,9 @@ class TaskOutcome(BaseModel):
             samples=sample_outcomes,
             billed_cost=sum(item.billed_cost for item in sample_outcomes),
             nominal_cost=sum(item.nominal_cost for item in sample_outcomes),
+            usage=UsageBreakdown.of_self(
+                billed=sum(item.billed_cost for item in sample_outcomes),
+                nominal=sum(item.nominal_cost for item in sample_outcomes)),
             turns=sum(a.turns for item in sample_outcomes for a in item.attempts),
             wall_seconds=wall,
         )
