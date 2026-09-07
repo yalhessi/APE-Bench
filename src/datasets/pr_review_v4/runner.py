@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 from ape.orchestration import TaskOrchestrator
 from ape.tasks.base import create_task_from_data
@@ -51,6 +51,12 @@ ARM_CHOICES = ("generalist", "focused", "file")
 
 
 class V4DatasetConfig(BaseModel):
+    # `extra="forbid"`, because the half of the config that spends money was the unvalidated
+    # half. A misspelled key was silently ignored and the field fell back to its default:
+    # `per_pr_cost_capp: 1.50` left the cap at 8.0, authorising five times the intended
+    # budget, while `ExecutionConfig` rejected the same typo one block away in the same file.
+    model_config = ConfigDict(extra="forbid")
+
     arm: str = "generalist"
     #: Focused scheduling reads the modification inventory, which is a treatment artifact
     #: rather than part of the release. Required only for `arm: focused`.

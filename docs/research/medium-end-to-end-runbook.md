@@ -93,9 +93,9 @@ Cost anchor: **$0.079 per work unit** on the 0.9.0 pilot, same model and tool se
 for REP in 1 2 3; do
   ./ape/bin/python -m src.datasets.pr_review_v4.runner \
     --config configs/pr_review_v4_medium.yaml \
-    --dataset.dry_run false \
-    --dataset.run_name pr_review_v4_medium_010_rep${REP} \
-    --dataset.output_file results/pr_review_v4/runs/dev-medium-0.1.0-rep${REP}/candidate_responses.jsonl
+    dataset.dry_run=False \
+    dataset.run_name=pr_review_v4_medium_010_rep${REP} \
+    dataset.output_file=results/pr_review_v4/runs/dev-medium-0.1.0-rep${REP}/candidate_responses.jsonl
 done
 ```
 
@@ -116,7 +116,7 @@ Then candidates (free), then the condition:
 ```bash
 ./ape/bin/python -m src.datasets.pr_review_v4.judge_runner \
   --config configs/pr_review_v4_judge.yaml \
-  --dataset.dry_run true       # renders every prompt; hard-fails if any lacks its code
+  dataset.dry_run=True         # renders every prompt; hard-fails if any lacks its code
 ```
 
 Judge budget is no longer "a few dollars": pairs are over final findings (fewer than

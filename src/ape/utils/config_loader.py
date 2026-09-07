@@ -76,11 +76,28 @@ def parse_cli_args(argv: List[str] = None) -> Dict[str, Any]:
         argv = sys.argv[1:]
 
     config_dict = {}
+    unparsed = []
 
     for arg in argv:
         if '=' in arg:
             key, value = arg.split('=', 1)
             _set_nested_value(config_dict, key, value)
+        else:
+            unparsed.append(arg)
+
+    if unparsed:
+        # Silently dropping these is how a documented command runs the wrong experiment. The
+        # runbook checked into docs/research/medium-end-to-end-runbook.md spells overrides as
+        # `--dataset.dry_run false` — space separated, `--` prefixed — and every token of it
+        # was discarded here, so the command executed with the YAML's `dry_run: true` and the
+        # previous run's output path. Refusing is the whole fix: the caller finds out at the
+        # start rather than from a result that does not match what they asked for.
+        raise ValueError(
+            "unparsed command-line override(s): " + " ".join(unparsed) + "\n"
+            "Overrides are `key.path=value` with no spaces and no leading dashes, e.g. "
+            "`dataset.dry_run=False`. A token without `=` was previously ignored, which "
+            "silently ran a different experiment than the command described."
+        )
 
     return config_dict
 
