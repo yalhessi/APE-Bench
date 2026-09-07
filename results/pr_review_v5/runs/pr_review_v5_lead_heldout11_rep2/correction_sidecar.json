@@ -1,0 +1,55 @@
+{
+  "corrected": {
+    "hidden_share_of_corrected_nominal": 0.157,
+    "paused": 4,
+    "total_cost_nominal": 12.042646
+  },
+  "correction_version": "v5-correction/1",
+  "recovered": {
+    "attempts": [
+      {
+        "billed_cost": 0.168696,
+        "nominal_cost": 0.61548,
+        "path": "tasks/4a810dbe5a72ace22f3bc9f34cb069ddc95f66ea99979b2b04ba215683cc292d/samples/0/attempts/attempt_1_20260902093219/subtasks/wave2/deep/33294_w2_deep/tasks/84524220041ff1f9d499aff95d54126d978cf938b5ed9146c3bf2b6511e7ff7a/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 12
+      },
+      {
+        "billed_cost": 0.191784,
+        "nominal_cost": 0.362345,
+        "path": "tasks/9bb4b72ec30ad292a6b1e8c735809b4426d513564d84158b608eddea2ac2dcef/samples/0/attempts/attempt_1_20260902093859/subtasks/wave2/standard/33362_w2_standard/tasks/c4997e9e534ac4a01ed28654f73fe86109b798bc43e71b8f582408737cc75cc1/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 7
+      },
+      {
+        "billed_cost": 0.103261,
+        "nominal_cost": 0.3071,
+        "path": "tasks/b2369199fe6d3e4f19a228732c96d598304e059f3398631fa1f44490a9665b1f/samples/0/attempts/attempt_1_20260902094057/subtasks/wave2/standard/33145_w2_standard/tasks/cc490dcdb61771add18f9b7b6ac3a5f83f0b07ced008d9c0c93f74567eca83fe/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 10
+      },
+      {
+        "billed_cost": 0.219183,
+        "nominal_cost": 0.605855,
+        "path": "tasks/f04bf50f3d44bd277b5d6e71eb18e3be633f85c468c46acd89687e0306b01a8d/samples/0/attempts/attempt_1_20260902093219/subtasks/wave2/deep/33321_w2_deep/tasks/31d93e1dc63a4a67907cf04475081c83d110ac27cc04cd16e93cb799e27dfdea/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 13
+      }
+    ],
+    "hidden_billed_cost": 0.682924,
+    "hidden_nominal_cost": 1.89078,
+    "paused_attempts": 4
+  },
+  "reported": {
+    "completion_status": "failed",
+    "paused": 0,
+    "total_cost_nominal": 10.1518655
+  },
+  "run_name": "pr_review_v5_lead_heldout11_rep2",
+  "schema_version": "v5-correction1",
+  "source_sha256": "c96f2547e00d074437e011c96f95a0ad4b0ea7ec3ae277d2ffa4c29d72028db7",
+  "sources": {
+    "run_manifest.json": "78bc66d3543b1fb123db77116fb637e50c1a20395c0bad0f2063f3f7fc090819"
+  },
+  "verdict": "forensic: this run's recall figures were computed over coverage it did not have, and its ledger under-reports spend. Usable as a regression fixture, not as a measurement."
+}

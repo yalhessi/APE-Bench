@@ -1,0 +1,34 @@
+{
+  "corrected": {
+    "hidden_share_of_corrected_nominal": 0.0414,
+    "paused": 1,
+    "total_cost_nominal": 7.286211
+  },
+  "correction_version": "v5-correction/1",
+  "recovered": {
+    "attempts": [
+      {
+        "billed_cost": 0.121822,
+        "nominal_cost": 0.301742,
+        "path": "tasks/bceaf94bbad741894d03a733410b5a84fbf4f654bffac1338ab4a9c3e112181e/samples/0/attempts/attempt_1_20260904031823/subtasks/wave1/standard/33117_w1_standard/tasks/2293d3c529cdaf22aa4223a92e4722447090926aeed90fba6c9c37863ecb270a/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 9
+      }
+    ],
+    "hidden_billed_cost": 0.121822,
+    "hidden_nominal_cost": 0.301742,
+    "paused_attempts": 1
+  },
+  "reported": {
+    "completion_status": "failed",
+    "paused": 0,
+    "total_cost_nominal": 6.9844687500000004
+  },
+  "run_name": "pr_review_v5_specialist4_rep1",
+  "schema_version": "v5-correction1",
+  "source_sha256": "b25793c97d3ac73c99fb8fcf44bc64d1bc869f7d6343c3242f006c8e454b01ac",
+  "sources": {
+    "run_manifest.json": "d1b9a14b3a2494bfac1797def9f1fd39f1f989519591267b64d1e6e41451d039"
+  },
+  "verdict": "forensic: this run's recall figures were computed over coverage it did not have, and its ledger under-reports spend. Usable as a regression fixture, not as a measurement."
+}

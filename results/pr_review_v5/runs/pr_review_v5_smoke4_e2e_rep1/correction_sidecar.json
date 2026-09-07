@@ -1,0 +1,48 @@
+{
+  "corrected": {
+    "hidden_share_of_corrected_nominal": 0.1116,
+    "paused": 3,
+    "total_cost_nominal": 8.746094
+  },
+  "correction_version": "v5-correction/1",
+  "recovered": {
+    "attempts": [
+      {
+        "billed_cost": 0.056195,
+        "nominal_cost": 0.305795,
+        "path": "tasks/aa332006cbbbf4d80872a812af007b15e123b5f3857b986bdfc9548d9dd57964/samples/0/attempts/attempt_1_20260904020724/subtasks/wave1/standard/33117_w1_standard/tasks/2976bb6788661fc42cf0fef5e6ea59c69ecf03c98c55d62d18ed45ce26ef91c4/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 9
+      },
+      {
+        "billed_cost": 0.093897,
+        "nominal_cost": 0.352025,
+        "path": "tasks/d100f17ecf4a2735483175452c6ebfa8b71c9068328a3d8f8406531cb1414168/samples/0/attempts/attempt_1_20260904020724/subtasks/wave1/standard/33337_w1_standard/tasks/9c0b4e30f58d2f6d0a0c40c687f6cab1f53144f7947ab2b4c1544b87bf62aebf/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 11
+      },
+      {
+        "billed_cost": 0.056921,
+        "nominal_cost": 0.317961,
+        "path": "tasks/e503ef48ae37552c3a3eb4dc512ec53ebd3d21eca22d995f7d91462a9ba20952/samples/0/attempts/attempt_1_20260904020724/subtasks/wave1/standard/33145_w1_standard/tasks/a1a804e0ae48f8681ced4730f1e797034a10abc5b1daab6b4c0b5d027b096eda/samples/0",
+        "status": "paused_cost_limit",
+        "turns": 11
+      }
+    ],
+    "hidden_billed_cost": 0.207013,
+    "hidden_nominal_cost": 0.975781,
+    "paused_attempts": 3
+  },
+  "reported": {
+    "completion_status": "failed",
+    "paused": 0,
+    "total_cost_nominal": 7.77031325
+  },
+  "run_name": "pr_review_v5_smoke4_e2e_rep1",
+  "schema_version": "v5-correction1",
+  "source_sha256": "59327deea1473a129e22f035cae04f253f99bdf5ee79682777aecc0340b692ab",
+  "sources": {
+    "run_manifest.json": "ddbe3eaf2e2ac0e9c855b3a2fff0b2bca4185b861b1b8cf74897a96fcb5620a5"
+  },
+  "verdict": "forensic: this run's recall figures were computed over coverage it did not have, and its ledger under-reports spend. Usable as a regression fixture, not as a measurement."
+}
