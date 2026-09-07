@@ -1,0 +1,33 @@
+# First-round-review dataset (v2) — see docs/research/review-task-spec.md
+#
+#   python -m src.datasets.pr_review_v2.main all --config configs/pr_review_v2.yaml
+
+repo_owner: leanprover-community
+repo_name: mathlib4
+
+# Temporal window (post-model-cutoff slices are selected downstream; collect wide)
+start_date: "2025-09-01"
+end_date: "2025-12-31"
+include_unmerged: true
+max_prs: 200
+pr_order: newest
+
+# Eligibility funnel (spec §3.8)
+min_changed_files: 1
+max_changed_files: 30
+min_diff_lines: 10
+max_diff_lines: 800
+require_mathlib_lean_file: true
+
+# Reviewer identity (spec §3.1): curated roster preferred, association fallback on.
+# Roster is required in practice: GitHub reports MEMBER only for public org
+# memberships, so active maintainers often appear as CONTRIBUTOR.
+# Rebuild with: python -m src.datasets.pr_review_v2.roster
+roster_file: src/datasets/pr_review_v2/data/mathlib_roster.txt
+use_association_fallback: true
+
+# github_token: null   # or export GITHUB_TOKEN
+request_interval_seconds: 0.2
+use_graphql_enrichment: true
+
+linkage_line_slack: 5

@@ -1,0 +1,84 @@
+# Verification diagnostic probe. Not a measurement run.
+#
+# Every Lean verification in the previous run failed — 225 of 225, across leads, floor and
+# specialists — returning `{"success": false, "errors": []}` with no diagnostics at all. The
+# same files compile fine offline in the same workspaces, so the cause is run-time and was
+# invisible. `lean_verify`/`lean_verify_edit` now attach a `diagnosis` block (return_code,
+# killed_by_signal, working_dir, stderr_tail) whenever a failure carries no Lean messages.
+#
+# PR 33362 is the cheapest probe in the set: 2 work units. The point is to read the
+# diagnosis, not the findings.
+#
+# 33149 alone carries 108 of the set's 203 work units and cost $14.52 of the last run's
+# $21.06 — over half the spend for 3 of 23 obligations. Dropping it costs 53% of the work
+# and 3 obligations, leaving 95 units and 20.
+#
+# Note what that removes from the signal: 33149 is the only PR whose gold is "remove the
+# axioms", and the census's strongest ranking win was putting its axiom-bearing units at
+# rank 1 where the old ordering showed 1 of 23. That result is already measured and stands;
+# this run just does not re-pay for it.
+#
+# Deliberately not all 16. Keeping 33057/33066/33098/33438 out preserves them as the
+# iteration set — every design decision so far was made by looking at those four, so a
+# result that includes them is partly a result about our own tuning.
+#
+# 203 work units against the smoke set's 22, and 23 eligible obligations against 17.
+# CAVEAT: this release's gold is 31/33 `migration_proposal` and only 2 curator_confirmed,
+# so anything measured here is provisional until the R1b confirmation sitting happens.
+#
+# 33057 / 33066 / 33098 carry gold (1 + 3 + 14 = 18 obligations); 33438 is the CONTROL —
+# maintainers asked for nothing there, so anything the agent emits on it is a false positive.
+# This is the same set as results/pr_review_v4/runs/dev-medium-smoke4-rep1.
+#
+# Sized for a look, not for an effect size: at 18 obligations one flipped verdict is 5.6pp.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 32000
+  thinking_budget_tokens: 30000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  max_concurrency: 2
+
+task_config:
+  enabled_tools:
+    - file_read
+    - content_search
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references
+
+dataset:
+  routing_mode: lead
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
+  run_name: pr_review_v5_verify_probe
+  pr_numbers: [33362]
+  require_prebuilt_workspaces: true
+
+  # The deterministic arm is deliberately OMITTED (no execution_release): this run is about
+  # calibrating the agent, so every finding scored should be one the agent produced.
+
+  # Cost policy, retuned for the `prompt_inclusive` cost model. Caps are now enforced on
+  # what was actually billed rather than a no-cache counterfactual, so the old numbers were
+  # roughly 5x tighter than they read. Measured billed on rep5: specialists median $0.039,
+  # max $0.117. 0.30 gives cheap=$0.15, standard=$0.30, deep=$0.60 — about 2.5x headroom
+  # over the observed maximum at the default tier.
+  standard_budget_cap: 0.30
+  # Leads billed a median $0.094 and a max $0.200 on rep5 — and that maximum is the lead
+  # that died, so it is a floor on what a full one costs. 1.00 is ~5x it, which covers a
+  # 184-proposal agenda read properly plus a second wave.
+  lead_cost_cap: 1.00
+  # Now actually enforced against delegated spend, not just printed in the dry run.
+  per_pr_cost_cap: 0.60
+  # 9 specialist arms x 22 work units = 180 eligible jobs. 30 would let the lead touch a
+  # sixth of them, which makes the run a test of its triage rather than of whether the
+  # arms can find the gold at all. Discovery first.
+  # 12 leads x 60 = 720 possible specialist jobs. The per-PR cost cap is now enforced, so
+  # this is a fan-out bound rather than the only thing standing between us and the bill.
+  max_delegations: 6

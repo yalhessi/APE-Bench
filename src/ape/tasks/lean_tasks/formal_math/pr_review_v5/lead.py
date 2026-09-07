@@ -137,6 +137,48 @@ class PrunedProposal(BaseModel):
     reason: str = ""
 
 
+class ComprehensionQuestion(BaseModel):
+    """One thing the lead does not yet know about this PR, and who could settle it.
+
+    A **question**, structurally. `submit_comprehension` rejects anything shaped like an
+    answer, and the fields are chosen so that stating a finding here is awkward rather than
+    merely discouraged: there is nowhere to put a severity, a replacement, or a verdict.
+
+    The discipline is the one `InvestigationBrief` already documents, moved one step earlier.
+    An arm told what to find will find it, and the warrant of this pipeline is that a
+    specialist established its claim independently.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    #: What kind of question this is — `duality`, `generated_family`, `shared_helper`,
+    #: `parameter_generalization`, `migration_consistency`, `convention`, `placement`.
+    #: Free-form on purpose: a closed vocabulary invented before the questions are known
+    #: would be a guess about what PRs contain.
+    kind: str
+    #: The question itself. Must end in a question mark — the cheapest structural way to
+    #: keep an assertion out.
+    question: str
+    #: What in the diff or the map prompted it. Grounds the question without answering it.
+    because: str = ""
+    #: Declarations or files to start from.
+    look_at: List[str] = Field(default_factory=list)
+    #: Which arm could settle it.
+    arms: List[str] = Field(default_factory=list)
+    #: When the honest answer is "nothing here".
+    abstain_if: str = ""
+
+
+class ComprehensionResult(BaseModel):
+    """What the lead understood before it delegated anything."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    #: What this PR is doing, in one or two sentences — a design move, not a diff summary.
+    summary: str
+    questions: List[ComprehensionQuestion] = Field(default_factory=list)
+
+
 class CandidateAssessmentInput(BaseModel):
     """The lead's read on one returned claim. Recorded; never applied."""
 
@@ -184,6 +226,10 @@ class LeanPRReviewV5LeadData(BasePRReviewData):
     #: Proposal metadata only — no prompt text. The text lives in the pool file, which is
     #: not part of the sealed agenda for exactly that reason.
     proposals: List[Dict[str, Any]] = Field(default_factory=list)
+    #: The ranked census, one row per work unit, highest signal first. Replaces reading the
+    #: agenda as a hash-ordered page of (arm, unit) pairs — which is what let nine of eleven
+    #: leads see 5 of 56 work units and route from that.
+    census: List[Dict[str, Any]] = Field(default_factory=list)
     #: Repo-relative JSONL of runnable arm payloads, keyed by `invocation_id`.
     arm_pool_path: str
     routing_mode: str = "lead"
@@ -201,7 +247,12 @@ class LeanPRReviewV5LeadResult(BasePRReviewResult):
     routing_mode: str = "lead"
     #: One row per job that ran, plus one per proposal that did not.
     delegations: List[Dict[str, Any]] = Field(default_factory=list)
-    #: Recorded, never applied. See the module docstring.
+    #: What the lead understood before it delegated: a one-line reading of the change, and
+    #: the questions it wanted settled. Questions only — `submit_comprehension` refuses
+    #: anything that does not end in a question mark, because an arm handed a conclusion
+    #: confirms it, and a confirmed conclusion is not evidence.
+    comprehension: Dict[str, Any] = Field(default_factory=dict)
+    #: Applied subtractively by `synthesis.apply_assessments`. See the module docstring.
     candidate_assessments: List[Dict[str, Any]] = Field(default_factory=list)
     #: Every specialist candidate returned, for the finalization chain to ingest.
     arm_responses: List[Dict[str, Any]] = Field(default_factory=list)
@@ -254,6 +305,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 # the lead's to skip. Tracking it here is what lets `delegate` inject it and
                 # `submit_routing` refuse to close without it.
                 "floor_done": False,
+                # Comprehension precedes delegation: a reviewer dispatched
+                # before the lead has read the PR is being routed by a lead
+                # that has not yet understood what it is routing.
+                "comprehension": None,
             }
         return self._delegation_state
 
@@ -336,38 +391,79 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
 
         @mcp.tool(
             description=(
-                "List the specialist jobs available for this PR: which arm, which work "
-                "unit, which declarations it would look at, whether the deterministic rule "
-                "marked it eligible, and why that arm exists. Paged."
+                "The work in this PR, ranked by what makes each site worth looking at — "
+                "new axioms, collapsible tactic chains, sibling families, what the PR says "
+                "it is. Each row names the declarations, why it ranked there, which arms "
+                "the signals point at, and the proposal_id to pass to `delegate`. Highest "
+                "signal first; ask for more with `offset`."
             )
         )
         async def read_agenda(
-            page: Annotated[int, Field(description="0-based page index")] = 0,
-            eligible_only: Annotated[bool, Field(
-                description="Show only jobs the rule selected")] = False,
+            top: Annotated[int, Field(description="How many ranked rows to return")] = 15,
+            offset: Annotated[int, Field(description="Skip this many, to read further down")] = 0,
         ) -> Dict[str, Any]:
-            rows = [p for p in self.data.proposals if not p.get("mandatory")]
-            if eligible_only:
-                rows = [p for p in rows if p.get("eligible")]
-            start = max(0, int(page)) * AGENDA_PAGE
-            window = rows[start:start + AGENDA_PAGE]
+            rows = self.data.census
+            if not rows:
+                # No census (older task data): fall back to the flat proposal list rather
+                # than returning nothing.
+                flat = [p for p in self.data.proposals if not p.get("mandatory")]
+                return {"total": len(flat), "ranked": False, "jobs": flat[:AGENDA_PAGE]}
+            start = max(0, int(offset))
+            window = rows[start:start + max(1, int(top))]
             return {
-                "total": len(rows),
-                "page": page,
-                "pages": max(1, (len(rows) + AGENDA_PAGE - 1) // AGENDA_PAGE),
+                "work_units_total": len(rows),
+                "showing": [start + 1, start + len(window)],
+                "remaining_below": max(0, len(rows) - (start + len(window))),
                 "mandatory_generalist_jobs": sum(
                     1 for p in self.data.proposals if p.get("mandatory")),
-                "jobs": [
-                    {
-                        "proposal_id": p["proposal_id"],
-                        "arm_id": p["arm_id"],
-                        "work_unit_id": p["work_unit_id"],
-                        "eligible": p["eligible"],
-                        "targets": p["site_change_ids"],
-                        "rationale": p["rationale"],
-                    }
-                    for p in window
-                ],
+                "ranked_work_units": window,
+            }
+
+        @mcp.tool(
+            description=(
+                "Say what this PR is doing, and what you still need to find out, BEFORE "
+                "delegating anything. Call this once, after reading the agenda. Every entry "
+                "must be a QUESTION — this is what you want established, not what you have "
+                "concluded. A reviewer told what to find will find it, and then nothing has "
+                "been established at all. There is deliberately nowhere here to record a "
+                "severity or a fix."
+            )
+        )
+        async def submit_comprehension(
+            summary: Annotated[str, Field(
+                description=("What this PR is doing, in one or two sentences. A design move "
+                             "— 'deprecates X for Y across the library', 'adds a dualised "
+                             "API' — not a restatement of the diff."))],
+            questions: Annotated[List[ComprehensionQuestion], Field(
+                description=("What you do not yet know. Each needs a `kind`, a `question` "
+                             "ending in '?', and ideally the arms that could settle it."))] = [],
+        ) -> Dict[str, Any]:
+            state = self._state()
+            if state["comprehension"] is not None:
+                return {"success": False, "message": "comprehension already submitted"}
+            rows = [
+                (item.model_dump() if hasattr(item, "model_dump") else dict(item))
+                for item in (questions or [])
+            ]
+            # Structural, not stylistic: an entry that does not ask something is an assertion
+            # wearing a question's field names, and it would reach an arm as an instruction
+            # to confirm. Rejecting it here is cheaper than detecting it in the findings.
+            assertions = [r for r in rows if not str(r.get("question", "")).strip().endswith("?")]
+            if assertions:
+                return {"success": False, "message": (
+                    f"{len(assertions)} entr(ies) are not questions: "
+                    f"{[r.get('question', '')[:60] for r in assertions][:3]}. State what you "
+                    "want established, not what you believe. An arm handed a conclusion "
+                    "confirms it, and a confirmed conclusion is not evidence.")}
+            if not str(summary or "").strip():
+                return {"success": False,
+                        "message": "summary is required: say what this PR is doing"}
+            state["comprehension"] = {"summary": summary, "questions": rows}
+            return {
+                "success": True,
+                "questions_recorded": len(rows),
+                "message": ("Recorded. Delegate now — attach the relevant question to each "
+                            "job as its brief."),
             }
 
         @mcp.tool(
@@ -389,6 +485,14 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 description="Jobs to run. Give a reason for each — it is recorded.")] = [],
         ) -> Dict[str, Any]:
             state = self._state()
+            # Comprehension gates delegation. A lead that dispatches before saying what the
+            # PR is doing is routing on the diff's surface, which is the failure the whole
+            # map exists to address — and the coverage floor rides this same call, so the
+            # gate has to sit here rather than in an optional preamble.
+            if state["comprehension"] is None:
+                return {"success": False, "ran": 0, "message": (
+                    "Call `submit_comprehension` first: say what this PR is doing and what "
+                    "you still need to find out. Nothing is delegated until you have.")}
             pool = self._pool()
             proposals = self._proposal_by_id()
             budget = self._task_config().max_delegations
@@ -459,10 +563,14 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                     brief=(brief_model.model_dump() if brief_model else None),
                 ))
 
-            # The mandatory generalist pass is prepended to the first wave, whatever the
-            # lead asked for. It runs through the lead so that there is one agent per PR
-            # delegating all of its own work — but it is injected rather than requested, so
-            # "the lead cannot drop below the coverage floor" stays true by construction.
+            # The coverage floor is prepended to the first wave, whatever the lead asked
+            # for: the per-unit broad pass, plus any specialist the agenda marked
+            # `routing_priority: required` because the PR itself supplies the trigger — a
+            # stated intent, an API family, a changed module doc. It runs through the lead so
+            # that there is one agent per PR delegating all of its own work, but it is
+            # injected rather than requested, so "the lead cannot drop below the floor" stays
+            # true by construction. Nothing here needed changing when required specialists
+            # were added: they carry the same `mandatory` flag.
             #
             # An empty `jobs` list on the first wave is therefore meaningful, not an error:
             # it is how a lead runs the broad sweep and looks at the results before choosing
@@ -544,8 +652,11 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 "Finish. Anything you did not delegate is recorded as pruned "
                 "automatically — you do NOT need to list them all. Use `pruned` only where "
                 "you want the reason recorded, and `message` for the policy behind the rest. "
-                "Optionally assess the claims that came back; your assessments are recorded "
-                "for analysis but do NOT change what gets published. Call this exactly once."
+                "Assess the claims that came back: `drop` removes one from the review and "
+                "`duplicate_of` folds one into another that says the same thing (two claims "
+                "at one target with no verified edit between them are otherwise suppressed "
+                "as a conflict and both are lost). Your assessments can only remove or "
+                "combine — they can never publish a claim. Call this exactly once."
             )
         )
         async def submit_routing(
@@ -557,8 +668,10 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
             )] = [],
             candidate_assessments: Annotated[List[CandidateAssessmentInput], Field(
                 description=(
-                    "Your read on each returned claim. Recorded for analysis; it does not "
-                    "change what gets published."
+                    "Your read on each returned claim. `drop` and `duplicate_of` remove or "
+                    "fold claims; `keep` and `needs_sibling` record only. Nothing here can "
+                    "admit a claim the evidence chain did not support. Name a duplicate's "
+                    "target as `<invocation_id>#<ordinal>`."
                 )
             )] = [],
             message: Annotated[str, Field(description="Short summary of your routing.", default="")] = "",
@@ -598,6 +711,7 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
                 candidate_assessments=[
                     dict(item, schema_version="v5-assessment1") for item in assessment_rows
                 ],
+                comprehension=state.get("comprehension") or {},
                 arm_responses=responses,
                 waves=state["wave"],
                 merge_ready_as_is=None,

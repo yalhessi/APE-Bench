@@ -94,7 +94,13 @@ class BaseCodeToolsProvider(BaseToolsProvider):
         "code_hover",
         "code_goto",
         # "code_check",
-        "code_references",
+        # `code_references` is listed in the class docstring above and its registration
+        # below is commented out, so it is never added to the MCP schema and no model has
+        # ever been able to call it (measured: 0 attempts across a full 11-PR run). Listing
+        # it here only implied a capability that does not exist — the Lean provider's own
+        # `references()` is commented out too, so enabling it would route to a missing
+        # method. Restore both together, or not at all.
+        # "code_references",
     ]
 
     def __init__(

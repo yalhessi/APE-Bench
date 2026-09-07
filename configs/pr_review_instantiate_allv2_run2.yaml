@@ -1,0 +1,41 @@
+# APPLY-ALL v2 (facet battery + counterfactual, no assertion channel), twin run 2 of 2.
+# Post identify->issue failure analysis: 24/33 failures were concern-delivery misses (neighbor
+# votes gated concerns; worklist v2 gives every site the full facet battery) and ~30% were
+# defend-the-code findings (apply_all_v2 removes the verdict channel entirely).
+#
+#   python -m src.datasets.pr_review_v2.site_worklist   # builds worklist_v2_by_pr.jsonl (mostly cached)
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_instantiate_allv2_run2.yaml
+#   python -m src.datasets.pr_review_v3.evaluate_tiers inputs/pr_review_v3/interventions_v5.jsonl <preds>
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 60
+  sample_max_cost: 3.0
+  max_concurrency: 16
+
+task_config:
+  finding_budget: 24
+  worklist_file: inputs/pr_review_v2/precedent_bench/worklist_v2_by_pr.jsonl
+  worklist_max_items: 24        # caps SITES at ~cap/3 (expected ~3 findings/site)
+  prompt_version: apply_all_v2
+  require_verification: false
+
+dataset:
+  task_type: lean_pr_review_instantiate
+  run_name: pr_review_instantiate_allv2_gpt52_57prs_run2
+  output_file: inputs/pr_review_v2/predictions/preds_instantiate_allv2_gpt_5.2_run2.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145,
+               33146, 33149, 33150, 33153, 33154, 33169, 33183, 33190, 33201, 33203,
+               33207, 33208, 33232, 33267, 33268, 33283, 33285, 33287, 33294, 33310,
+               33316, 33321, 33332, 33333, 33337, 33343, 33345, 33349, 33356, 33362,
+               33373, 33376, 33395, 33400, 33401, 33419, 33421]
+  resume: true

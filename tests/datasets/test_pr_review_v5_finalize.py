@@ -232,3 +232,289 @@ def test_a_verified_specialist_candidate_is_not_counted_as_dropped(unit, tmp_pat
                              [_artifact(unit, 0)], spec_id="proof_golf")],
     )
     assert report["candidates_specialist_dropped_unverified"] == 0
+
+
+# --- §4: the evidence chain, and the gate the lead still cannot reach -------------------
+
+def test_the_gate_reports_which_regime_it_ran_under(unit, tmp_path):
+    """`closed` and `evidence_chain` are different claims about a diagnostic finding.
+
+    Under `closed`, nothing was asked to support anything, so `diagnostic` says only that no
+    chain ran. Eight runs reported publication rates under that regime as if they were
+    strictness results. The report has to name the regime or the number is unreadable.
+    """
+
+    summary = finalize(
+        tmp_path / "closed", units=[unit], routing_mode="lead",
+        responses=[_response(unit, "generalist", [_candidate(unit)])],
+    )
+    assert summary["generalist_evidence_gate"] == "closed"
+
+    summary = finalize(
+        tmp_path / "chained", units=[unit], routing_mode="lead",
+        responses=[_response(unit, "generalist", [_candidate(unit)])],
+        collect_supported=lambda candidates: set(),
+    )
+    assert summary["generalist_evidence_gate"] == "evidence_chain"
+
+
+def test_the_chain_sees_the_candidates_whose_admission_depends_on_it(unit, tmp_path):
+    """Generalist and non-compile specialists go to the chain; compile-gated ones do not.
+
+    Putting the compile-gated arms through it would cost a baseline compile each and could
+    not change their admission, which `focused_findings` decides from their artifacts.
+    """
+
+    seen = {}
+
+    def collect(candidates):
+        seen["families"] = sorted(item.concern_family for item in candidates)
+        return set()
+
+    finalize(
+        tmp_path / "run", units=[unit], routing_mode="lead",
+        responses=[
+            _response(unit, "generalist", [_candidate(unit, concern_family="documentation",
+                                                      issue_kind="documentation_gap")]),
+            _response(unit, "naming", [_candidate(unit, concern_family="naming",
+                                                  issue_kind="naming_convention_violation")],
+                      spec_id="naming"),
+            _response(unit, "proof_golf", [_candidate(unit)],
+                      artifacts=[_artifact(unit, 0)], spec_id="proof_golf"),
+        ],
+        collect_supported=collect,
+    )
+    assert seen["families"] == ["documentation", "naming"]
+
+
+def test_a_supported_candidate_publishes_and_an_unsupported_one_stays_diagnostic(
+    unit, tmp_path
+):
+    subject = unit.primary_subjects_by_change[unit.change_ids[0]]
+    responses = [_response(unit, "generalist", [
+        _candidate(unit, claim=f"{subject} A.", concern_family="documentation",
+                   issue_kind="documentation_gap", requested_change=f"Document {subject}."),
+        _candidate(unit, claim=f"{subject} B.", concern_family="style",
+                   issue_kind="style_norm_violation", requested_change=f"Restyle {subject}."),
+    ])]
+    generalist, _s, _e, _a, _r = ingest_responses([unit], responses)
+    supported = {generalist[0].candidate_id}
+
+    summary = finalize(
+        tmp_path / "run", units=[unit], routing_mode="lead", responses=responses,
+        collect_supported=lambda candidates: supported,
+    )
+    findings = [json.loads(line) for line in
+                (tmp_path / "run" / "findings.jsonl").read_text().splitlines() if line.strip()]
+    admissions = {item["claim"][-2]: item["admission"] for item in findings}
+    assert admissions == {"A": "published", "B": "diagnostic"}
+
+
+def test_an_assessment_cannot_promote_a_candidate_the_chain_did_not_support(unit, tmp_path):
+    """The load-bearing test for §3 and §4 together.
+
+    A lead that could talk a finding past the evidence chain would make every published
+    finding mean less. `keep` is agreement, not a warrant.
+    """
+
+    responses = [_response(unit, "generalist", [_candidate(unit)])]
+    summary = finalize(
+        tmp_path / "run", units=[unit], routing_mode="lead", responses=responses,
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 0, "verdict": "keep", "severity": "blocking",
+            "reason": "I am confident about this one.",
+        }],
+        collect_supported=lambda candidates: set(),
+    )
+    assert summary["issues_published"] == 0
+    findings = [json.loads(line) for line in
+                (tmp_path / "run" / "findings.jsonl").read_text().splitlines() if line.strip()]
+    assert [item["admission"] for item in findings] == ["diagnostic"]
+
+
+def test_an_assessment_cannot_attach_a_compile_warrant(unit, tmp_path):
+    """A specialist claim with no successful artifact is dropped, and `keep` does not save it."""
+
+    summary = finalize(
+        tmp_path / "run", units=[unit], routing_mode="lead",
+        responses=[_response(unit, "proof_golf", [_candidate(unit)],
+                             artifacts=[_artifact(unit, 0, success=False)],
+                             spec_id="proof_golf")],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#proof_golf",
+            "candidate_ordinal": 0, "verdict": "keep", "reason": "it is right anyway",
+        }],
+        collect_supported=lambda candidates: set(),
+    )
+    assert summary["candidates_specialist_dropped_unverified"] == 1
+    assert summary["issues_published"] == 0
+
+
+def test_a_dropped_candidate_never_reaches_the_chain(unit, tmp_path):
+    """Synthesis is subtractive and runs first, so the expensive part is not spent
+    adjudicating a claim nobody stands by."""
+
+    seen = []
+    finalize(
+        tmp_path / "run", units=[unit], routing_mode="lead",
+        responses=[_response(unit, "generalist", [
+            _candidate(unit, claim=f"{unit.primary_subjects_by_change[unit.change_ids[0]]} A.",
+                       requested_change="Do the first thing."),
+            _candidate(unit, claim=f"{unit.primary_subjects_by_change[unit.change_ids[0]]} B.",
+                       requested_change="Do the second thing."),
+        ])],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 1, "verdict": "drop", "reason": "restates the first",
+        }],
+        collect_supported=lambda candidates: seen.extend(candidates) or set(),
+    )
+    assert len(seen) == 1
+    assert seen[0].claim.endswith("A.")
+
+
+def test_the_evidence_summary_reaches_the_written_report(unit, tmp_path):
+    """It was attached to the returned dict after the file was written, so it never landed.
+
+    `write_once` will not rewrite `finalization_report.json`, so anything a caller adds to
+    the returned summary is invisible to every reader of the run.
+    """
+
+    out = tmp_path / "run"
+    finalize(
+        out, units=[unit], routing_mode="lead",
+        responses=[_response(unit, "generalist", [_candidate(unit)])],
+        collect_supported=lambda candidates: set(),
+    )
+    written = json.loads((out / "finalization_report.json").read_text())
+    assert "evidence" in written
+
+
+# --- Stage 0: the lead's removals survive as audit trail --------------------------------
+
+def test_a_dropped_candidate_appears_as_a_diagnostic_finding(unit, tmp_path):
+    """It must reach `findings.jsonl`, which is what the judge reads.
+
+    On heldout11 rep2 seven of the twelve candidates that landed on a gold obligation's site
+    were deleted here, so nobody could tell a good drop from a bad one.
+    """
+
+    out = tmp_path / "run"
+    subject = unit.primary_subjects_by_change[unit.change_ids[0]]
+    summary = finalize(
+        out, units=[unit], routing_mode="lead", pr_numbers=[unit.pr_number],
+        responses=[_response(unit, "generalist", [
+            _candidate(unit, claim=f"{subject} A.", requested_change="Do the first thing."),
+            _candidate(unit, claim=f"{subject} B.", requested_change="Do the second thing."),
+        ])],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 1, "verdict": "drop", "reason": "a formatting nit",
+        }],
+        collect_supported=lambda candidates: set(),
+    )
+    findings = [json.loads(line) for line in
+                (out / "findings.jsonl").read_text().splitlines() if line.strip()]
+    assert len(findings) == 2
+    dropped = [f for f in findings if f["claim"].endswith("B.")]
+    assert len(dropped) == 1
+    assert dropped[0]["admission"] == "diagnostic"
+    assert "removed by the lead" in dropped[0]["admission_reason"]
+    assert summary["lead_removed_findings"] == 1
+
+
+def test_a_removed_finding_never_reaches_the_review(unit, tmp_path):
+    """`issues.jsonl` is what a maintainer would see, and the lead's judgment governs it."""
+
+    out = tmp_path / "run"
+    subject = unit.primary_subjects_by_change[unit.change_ids[0]]
+    finalize(
+        out, units=[unit], routing_mode="lead", pr_numbers=[unit.pr_number],
+        responses=[_response(unit, "generalist", [
+            _candidate(unit, claim=f"{subject} A.", requested_change="Do the first thing."),
+            _candidate(unit, claim=f"{subject} B.", requested_change="Do the second thing."),
+        ])],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 1, "verdict": "drop", "reason": "noise",
+        }],
+        collect_supported=lambda candidates: set(),
+    )
+    issues = [json.loads(line) for line in
+              (out / "issues.jsonl").read_text().splitlines() if line.strip()]
+    assert not any(i["claim"].endswith("B.") for i in issues)
+
+
+def test_a_folded_candidate_does_not_resurrect_the_conflict(unit, tmp_path):
+    """The load-bearing exclusion.
+
+    `merge_findings` demotes *both* sides of an equal-warrant clash at one anchor, so
+    re-entering a folded finding into the merge would undo exactly what `duplicate_of` was
+    built to fix. It is appended after the merge, never into it.
+    """
+
+    out = tmp_path / "run"
+    subject = unit.primary_subjects_by_change[unit.change_ids[0]]
+    summary = finalize(
+        out, units=[unit], routing_mode="lead", pr_numbers=[unit.pr_number],
+        responses=[_response(unit, "generalist", [
+            _candidate(unit, claim=f"{subject} rename it.", concern_family="naming",
+                       issue_kind="naming_convention_violation",
+                       requested_change=f"Rename {subject}."),
+            _candidate(unit, claim=f"{subject} fix its docstring.", concern_family="naming",
+                       issue_kind="naming_convention_violation",
+                       requested_change=f"Document {subject}."),
+        ])],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 1, "verdict": "duplicate_of",
+            "duplicate_of": f"{unit.work_unit_id}#generalist#0",
+        }],
+        collect_supported=lambda candidates: set(),
+    )
+    assert summary["conflicts"] == 0
+    assert summary["lead_removed_findings"] == 1
+
+
+def test_the_discovery_record_holds_every_candidate_any_arm_submitted(unit, tmp_path):
+    """Immutable, and written before synthesis touches anything."""
+
+    out = tmp_path / "run"
+    subject = unit.primary_subjects_by_change[unit.change_ids[0]]
+    finalize(
+        out, units=[unit], routing_mode="lead", pr_numbers=[unit.pr_number],
+        responses=[_response(unit, "generalist", [
+            _candidate(unit, claim=f"{subject} A.", requested_change="First."),
+            _candidate(unit, claim=f"{subject} B.", requested_change="Second."),
+        ])],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 0, "verdict": "drop", "reason": "noise",
+        }],
+        collect_supported=lambda candidates: set(),
+    )
+    discovered = [json.loads(line) for line in
+                  (out / "candidates_discovered.jsonl").read_text().splitlines() if line.strip()]
+    assert len(discovered) == 2
+
+
+def test_a_dropped_candidate_still_never_reaches_the_evidence_chain(unit, tmp_path):
+    """Restoring the record must not restore the spend: the chain is the expensive part."""
+
+    seen = []
+    subject = unit.primary_subjects_by_change[unit.change_ids[0]]
+    finalize(
+        tmp_path / "run", units=[unit], routing_mode="lead", pr_numbers=[unit.pr_number],
+        responses=[_response(unit, "generalist", [
+            _candidate(unit, claim=f"{subject} A.", requested_change="First."),
+            _candidate(unit, claim=f"{subject} B.", requested_change="Second."),
+        ])],
+        candidate_assessments=[{
+            "invocation_id": f"{unit.work_unit_id}#generalist",
+            "candidate_ordinal": 1, "verdict": "drop", "reason": "noise",
+        }],
+        collect_supported=lambda candidates: seen.extend(candidates) or set(),
+    )
+    assert len(seen) == 1
+    assert seen[0].claim.endswith("A.")

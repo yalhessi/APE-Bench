@@ -1,0 +1,51 @@
+# Agentic (workspace) v2 review — standard scaffold-config layout, same as
+# configs/ape_bench_proof_engineering_pilot.yaml. Edit params here; everything
+# (model, generation, turns, cost, tools) is controlled the standard way.
+#
+#   export OPENAI_API_KEY=...
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_workspace_v2.yaml
+#
+# CLI dot-overrides work too, e.g.:
+#   ... llm_config.model_name=gpt_5.2 execution.sample_max_cost=1.0 dataset.limit=2
+
+scaffold_type: ape_agent
+
+llm_config:
+  # Requires OPENAI_API_KEY (or GEMINI_API_KEY for gemini_* models).
+  model_name: gpt_5.4
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0        # per-PR USD ceiling
+  max_concurrency: 16          # agentic runs are heavy; keep modest
+
+task_config:
+  finding_budget: 10
+  # Review framing (ablation variable): acceptability_v2 (default — separates
+  # correctness from acceptability, no compile-exit) | mergeready_v1 (original).
+  prompt_version: acceptability_v2
+  # ±tools harness ablation knob (rungs to compare on V2-stratum recall):
+  #   read-only:        [file_read]
+  #   +grep:            [file_read, content_search]
+  #   +verify:          [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+  #   +semantic search: add lean_retrieve to the above (needs a built per-commit index)
+  # content_search (grep) is the cheap "retrieval substitute" — test it before paying
+  # for lean_retrieve, which needs a per-commit index built with
+  # `python -m ape.toolkits.retrieve.lean.build` (without it the tool silently no-ops).
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+
+# Which PRs to review (the SAME 30 as the diff_only baselines, pinned by number).
+dataset:
+  # Which review to run (decomposed checkers each get their own run dir):
+  #   lean_pr_review_v2  (holistic acceptability pass, default)
+  #   lean_pr_review_dup (duplication checker)
+  #   lean_pr_review_gen (generality checker)
+  task_type: lean_pr_review_v2
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33321, 33322, 33328, 33332, 33333, 33334, 33337, 33340, 33343, 33345,
+               33349, 33356, 33357, 33362, 33367, 33370, 33373, 33376, 33385, 33395,
+               33399, 33400, 33401, 33413, 33418, 33419, 33421, 33432, 33438, 33440]
+  resume: true

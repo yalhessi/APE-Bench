@@ -1,0 +1,31 @@
+# Generality checker on the curated 10-PR set. Generality is a LOCAL construct-and-verify task
+# (generalize the declaration in front of you, recompile) — a near-drop-in for the proven golf/idiom
+# recipe, and the checker most unblocked by in-file verification (a generalized statement leans on the
+# PR's own context). No retrieval needed. Same set/model as golf/idiom for a clean comparison.
+#
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_gen_v2_small.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 10
+
+task_config:
+  finding_budget: 10
+  # enabled_tools omitted -> the gen checker's native verify+search toolset (+ lean_verify_edit).
+
+dataset:
+  task_type: lean_pr_review_gen
+  run_name: pr_review_gen_gpt52_small_decl
+  output_file: inputs/pr_review_v2/predictions/preds_gen_gpt_5.2_small_decl.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33401, 33098, 33287, 33137, 33145, 33285, 33373, 33356, 33078, 33111]
+  resume: true

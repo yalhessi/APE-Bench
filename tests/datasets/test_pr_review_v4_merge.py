@@ -413,3 +413,33 @@ def test_demotion_reasons_distinguish_their_three_causes():
     merged, _conflicts, _report = merge_findings([weak, strong])
     demoted = [item for item in merged if item.admission == "diagnostic"]
     assert demoted and "better-warranted" in demoted[0].admission_reason
+
+
+def test_non_strict_ingestion_preserves_each_candidate_s_ordinal():
+    """`ordinal` is the candidate's index in the response it came from, strict or not.
+
+    The non-strict path validates each candidate by recursing on a one-element list, where
+    the loop index is always 0 — so every candidate in a batch used to be sealed with
+    `ordinal=0`. Finalization joins verification artifacts on `(work_unit_id, ordinal)`, so
+    a collapsed ordinal lets one candidate's compile warrant admit a sibling the compiler
+    never saw, and `candidate_id` loses the field that disambiguates it.
+    """
+
+    from src.datasets.pr_review_v4.candidates import candidates_from_response
+
+    response = {"candidates": [_raw(), _raw(claim="Foo.bar is also shadowed elsewhere.")]}
+    accepted, rejected = candidates_from_response(_unit(), response, strict=False)
+    assert not rejected
+    assert [item.ordinal for item in accepted] == [0, 1]
+    assert len({item.candidate_id for item in accepted}) == 2
+
+
+def test_a_rejected_candidate_does_not_renumber_its_successors():
+    """Ordinals index the response, so a gap is the correct record of a dropped candidate."""
+
+    from src.datasets.pr_review_v4.candidates import candidates_from_response
+
+    response = {"candidates": [_raw(), _raw(subject="Wrong.subject"), _raw(claim="Foo.bar has a third problem.")]}
+    accepted, rejected = candidates_from_response(_unit(), response, strict=False)
+    assert [item.ordinal for item in accepted] == [0, 2]
+    assert [item.ordinal for item in rejected] == [1]

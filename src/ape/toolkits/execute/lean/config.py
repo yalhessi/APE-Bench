@@ -55,6 +55,11 @@ class LeanVerifyToolConfig(CodeExecuteToolConfig):
     # ==================== Build Configuration ====================
     build_timeout: Optional[float] = Field(default=None, description="Build timeout (seconds)")
     toolchain_install_timeout: float = Field(default=600.0, description="Toolchain install timeout")
+    #: Directory holding `lake`, for machines where it is not on the launching shell's
+    #: `PATH`. Read once by `src.datasets.pr_review_v5.preflight`, which validates it and
+    #: prepends it to the run's `PATH` so every subprocess below inherits one visible
+    #: decision. Nothing searches for a toolchain: it is on `PATH`, or it is written here.
+    lean_toolchain_bin: Optional[Path] = None
     cache_operation_timeout: float = Field(default=3600.0, description="Cache operation timeout")
     workspace_restore_timeout: float = Field(default=300.0, description="Workspace restore timeout")
     pr_head_cache_probe_timeout: float = Field(

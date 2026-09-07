@@ -299,6 +299,7 @@ def semantic_report(judgments: Iterable[JudgmentNode], views: Iterable[Intervent
                     ambiguous_registry: Optional[Path] = None,
                     planned_pairs: Optional[Iterable[SemanticPair]] = None,
                     control_pr_numbers: Iterable[int] = (),
+                    scoped_pr_numbers: Optional[Iterable[int]] = None,
                     null_pairs_requested: Optional[int] = None) -> Dict:
     candidates = list(candidates)
     matches = list(matches)
@@ -325,10 +326,17 @@ def semantic_report(judgments: Iterable[JudgmentNode], views: Iterable[Intervent
             }
 
     scope = set(scoped_change_ids) if scoped_change_ids is not None else None
-    obligations = [obligation for _judgment, obligation in eligible_obligations(
+    # The denominator must be the obligations of the PRs actually judged. `pr_numbers`
+    # already filters which *pairs* are built, but nothing filtered the obligation census,
+    # so a run over 11 PRs reported 40 obligations — 20 of them belonging to PRs it never
+    # reviewed, each an automatic miss. Recall was being divided by other runs' work.
+    # `None` preserves the previous whole-release behaviour for every existing caller.
+    pr_scope = set(scoped_pr_numbers) if scoped_pr_numbers is not None else None
+    obligations = [obligation for judgment, obligation in eligible_obligations(
         judgments, views, scoped_obligation_ids
     )
-                   if scope is None or set(obligation.change_ids).intersection(scope)]
+                   if (scope is None or set(obligation.change_ids).intersection(scope))
+                   and (pr_scope is None or judgment.pr_number in pr_scope)]
     by_obligation: Dict[str, List[SemanticMatch]] = {}
     for match in observed:
         by_obligation.setdefault(match.obligation_id, []).append(match)

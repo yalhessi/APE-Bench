@@ -1,0 +1,33 @@
+# Agentic selector over a candidate pool: a per-PR triage agent reads the workspace
+# (file_read / content_search / lean_verify) and scores each pooled candidate finding
+# for maintainer-worthiness. The tool-grounded counterpart to the diff-only LLM selector
+# (src/datasets/pr_review_v2/selector.py). Tests whether inspecting the proof/library
+# lifts selection — especially on V2, where the diff-only selector is at chance.
+#
+#   python -m src.datasets.pr_review_v2.agentic_selector \
+#       --config configs/pr_review_selector_v2.yaml pool=grand_union
+#
+# `pool` (CLI) selects the candidate pool (selector.POOLS); the dataset.records gold file
+# supplies the PR inputs (diff/title/base_sha) for materialization.
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.4
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 16
+
+task_config:
+  prompt_version: v1
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+
+dataset:
+  task_type: lean_pr_review_selector
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_actionable_20260618.jsonl
+  resume: true

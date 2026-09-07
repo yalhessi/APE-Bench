@@ -190,3 +190,69 @@ def test_the_registry_is_still_a_row_plus_a_prompt():
     arms = default_arms("candidate-prompt/12")
     assert len(arms) == len(v5_specs()) + 1  # + the generalist
     assert [a.arm_id for a in arms][0] == GENERALIST_ARM_ID
+
+
+# --- the retrieval grant ----------------------------------------------------------------
+#
+# Uniform until smoke4 measured what an arm does when handed four retrieval tools: it reaches
+# for the cheapest identifier lookup regardless of the question. 106 `declaration_search`
+# calls run-wide, 50 from `family_design` alone — an arm whose question is the shape of a
+# group, which no name lookup answers, and which returned nothing from eleven invocations.
+
+
+def test_every_arm_keeps_lean_verify_edit():
+    """The one tool no arm may lose.
+
+    It is registered by the shared review base for *every* review task, and it is what turns
+    a suggestion into a checked one: 87 of its 100 calls on smoke4 carried a real edit. A
+    grant table is exactly the kind of change that quietly drops a tool from one row, so the
+    guarantee is asserted rather than left to review.
+    """
+
+    from src.datasets.pr_review_v5.arms import resolve_context_tools
+
+    for arm in default_arms("v4-renderer/1"):
+        assert "lean_verify_edit" in resolve_context_tools(arm), arm.arm_id
+
+
+def test_family_design_loses_the_identifier_lookup_it_wasted():
+    """`declaration_search` returns `X is declared in file Y` and nothing else.
+
+    On PR 33117 the maintainer asked for `@[to_fun]` to generate the thirteen hand-written
+    `fun_*` lemmas. `Mathlib/Tactic/ToFun.lean` was in the arm's own base workspace, its
+    module docstring states exactly what the attribute does, and `content_search` finds it.
+    The arm spent its retrieval budget on name lookups instead and abstained.
+    """
+
+    from src.datasets.pr_review_v5.arms import resolve_context_tools
+
+    arms = {arm.arm_id: arm for arm in default_arms("v4-renderer/1")}
+    assert "declaration_search" not in resolve_context_tools(arms["family_design"])
+
+
+def test_the_convention_arms_keep_the_review_corpus():
+    """Naming, docs and style ask questions the code corpus answers wrongly.
+
+    Measured: `coe_` outnumbers `toLinearMap_` 4,707 to 50 and flat names outnumber dot
+    notation 22,345 to 2,359, so frequency argues *against* the maintainer in both naming
+    cases this release scores. The review corpus states them.
+    """
+
+    from src.datasets.pr_review_v5.arms import resolve_context_tools
+
+    arms = {arm.arm_id: arm for arm in default_arms("v4-renderer/1")}
+    for arm_id in ("naming", "docs", "style"):
+        granted = resolve_context_tools(arms[arm_id])
+        assert "precedent_search" in granted, arm_id
+
+
+def test_the_generalist_grant_is_untouched():
+    """It is the control. Narrowing the specialists and the control together would move both
+    sides of the comparison at once, and neither could then be read off the result."""
+
+    from src.datasets.pr_review_v5.schema import CONTEXT_TOOLS
+    from src.datasets.pr_review_v5.arms import resolve_context_tools
+
+    generalist = next(a for a in default_arms("v4-renderer/1")
+                      if a.arm_id == GENERALIST_ARM_ID)
+    assert sorted(resolve_context_tools(generalist)) == sorted(CONTEXT_TOOLS)

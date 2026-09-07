@@ -59,6 +59,13 @@ ALLOWED_CONCERN_BY_ARM = {
     # `correctness` also owns `scope`: a declaration whose imports cannot support where it
     # sits is a build problem wearing a placement problem's clothes, and no other arm compiles.
     "correctness": {"correctness", "scope"},
+    # `family_design` is the one arm whose scope is a *set*, and the defect a set exhibits
+    # takes two shapes that no single concern covers: a missing counterpart or a hardcoded
+    # shared parameter is `generalization`, while a generated form written out by hand is
+    # `duplication`. Forcing one would leave the arm unable to state half the findings it
+    # exists for — PR 33117's thirteen hand-written `fun_*` lemmas are duplication-shaped,
+    # PR 33145's absent dual is generalization-shaped, and both are group properties.
+    "family_design": {"generalization", "duplication"},
 }
 
 
@@ -112,6 +119,34 @@ class LeanPRReviewV5ArmTask(LeanPRReviewV4CandidateTask):
         kwargs.setdefault("arm_id", self.data.arm_id)
         kwargs.setdefault("spec_id", self.data.spec_id)
         return super().create_result(success=success, score=score, **kwargs)
+
+    #: Arms allowed to submit a coordinated patch. Narrow on purpose: the capability exists
+    #: for fixes one edit cannot express — rename a pair, add a lemma and prove it from its
+    #: dual, attribute a family and delete the siblings it generates — and an arm reviewing
+    #: one site has no use for it. Granting it broadly would turn a bounded capability into
+    #: a licence to rewrite whatever the arm happened to be shown.
+    #
+    # Only arms that actually exist. `migration_consistency` was listed here before it had a
+    # spec or a prompt, which is the same defect as `code_references` sitting in
+    # `SUPPORTED_TOOLS` with its registration commented out: a capability granted to nothing,
+    # readable as coverage that is not there. `test_every_patch_set_arm_is_a_registered_spec`
+    # keeps it honest — add the arm first, then add it here.
+    PATCH_SET_ARMS = frozenset({"family_design"})
+
+    @property
+    def patch_set_paths(self) -> tuple:
+        """Files a coordinated patch may touch: this invocation's own targets, and no more.
+
+        Confinement comes from the task data rather than from anything the model supplies,
+        so a patch cannot widen its own scope by naming a file it would like to edit. An arm
+        not on `PATCH_SET_ARMS` gets an empty tuple, which `_patch_set_error` reads as
+        "coordinated patches are not accepted here".
+        """
+
+        if self.data.arm_id not in self.PATCH_SET_ARMS:
+            return ()
+        paths = {self.data.paths_by_change.get(cid) for cid in self.data.change_ids}
+        return tuple(sorted(p for p in paths if p))
 
     def _extra_candidate_error(self, candidate: Dict[str, Any]) -> Optional[str]:
         """Keep a specialist inside its own concern.

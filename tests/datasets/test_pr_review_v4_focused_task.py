@@ -80,11 +80,15 @@ def test_the_v4_submission_contract_supersedes_the_v2_field_list(scheduled):
     """v2 findings are not v4 candidates; without this every submission would be rejected."""
 
     for prompt in scheduled["prompts"]:
-        tail = prompt.system_prompt[len(prompt.system_prompt) // 2:]
-        assert "primary_change_id" in tail
-        assert "submit_candidates exactly once" in tail
+        system = prompt.system_prompt
+        # Positional, but on the thing that actually matters: the v4 contract must come
+        # *after* the v2 instruction it supersedes. Asserting it lands in the back half was
+        # a proxy that broke the moment the contract grew, which says nothing about order.
+        contract_at = system.index("# Submission contract for this run")
+        assert system.index("submit_candidates exactly once") > contract_at
+        assert system.index("primary_change_id") > contract_at
         spec = scheduled["specs"][prompt.spec_id]
-        assert f'"{spec.issue_kind}"' in tail
+        assert system.index(f'"{spec.issue_kind}"') > contract_at
 
 
 def test_sites_are_a_subset_of_the_work_unit(scheduled):

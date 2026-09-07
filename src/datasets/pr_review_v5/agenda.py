@@ -48,6 +48,10 @@ from src.datasets.pr_review_v4.task_adapter import (
 )
 
 from .arms import ARM_TASK_TYPE, GENERALIST_ARM_ID, default_arms, specs_by_arm_id
+from .components import build_components, centrality
+from .exposure import LazyExposureScan, exposed_changes
+from .review_map import build_slices, slices_report, with_context
+from .routing import Pair, central_changes, plan_coverage, routing_contract_report
 from .schema import AgendaProposal, ReviewAgenda, ReviewArm
 
 AGENDA_VERSION = "v5-agenda/1"
@@ -171,6 +175,14 @@ def build_agenda(
     release_prompts: Sequence[RenderedPrompt],
     modifications: Sequence[ModificationRecord],
     pr_numbers: Optional[Iterable[int]] = None,
+    #: Measure library exposure from the base commit's `.ilean` index. Off by default: it
+    #: is the one expensive input (~4.4s per distinct base commit, and a release has 14),
+    #: and every test that builds an agenda would otherwise pay it.
+    use_exposure_index: bool = False,
+    #: Schedule the mandatory per-work-unit generalist. Off makes a specialist-only run;
+    #: see `RunDataset.generalist_floor` for when that is a measurement and when it is
+    #: just missing coverage.
+    generalist_floor: bool = True,
 ) -> Tuple[ReviewAgenda, Dict[str, Dict[str, Any]]]:
     """The sealed agenda, and the pool of arm task payloads keyed by `proposal_id`.
 
@@ -196,9 +208,66 @@ def build_agenda(
     proposals: List[AgendaProposal] = []
     pool: Dict[str, Dict[str, Any]] = {}
 
+    # --- the coverage contract's inputs ------------------------------------------------
+    #
+    # Components say what a change *is* (a family, a file, a stated intent); centrality says
+    # what the rest of the PR leans on. Both are gold-free and both are computed from data
+    # the release already ships, so the contract adds no new input to the sealed plan.
+    from src.datasets.pr_review_v4.pr_relations import build_relations
+
+    relations, _relation_evidence = build_relations(graphs)
+    components = build_components(graphs, relations, episodes)
+    components_by_pr: Dict[int, List[Any]] = {}
+    for component in components:
+        components_by_pr.setdefault(component.pr_number, []).append(component)
+    central_by_change: Dict[str, int] = {}
+    for graph in graphs:
+        central_by_change.update(centrality(graph, relations))
+
+    # The library-wide half of importance: a change to a declaration many modules reference
+    # is someone else's widely-used code, touched in passing, and deserves a look the diff
+    # alone would never ask for. Abstains rather than guessing when the snapshot is not
+    # fully built, so a partial index degrades to PR-local centrality instead of silently
+    # reporting every declaration as unexposed.
+    from src.datasets.pr_review_v4.evidence import snapshot_workspace
+
+    # Off by default because it is the one expensive input: the index is per base commit,
+    # a release has 14 distinct ones, and each costs ~4.4s to build — about a minute for an
+    # 11-PR agenda, paid again by every test that builds one. The runner turns it on.
+    exposure_cache: Dict[str, Any] = {}
+    exposure_by_change: Dict[str, int] = {}
+    if use_exposure_index:
+        for graph in graphs:
+            scan = LazyExposureScan(
+                snapshot_workspace(getattr(graph, "base_sha", None)), exposure_cache)
+            exposure_by_change.update(exposed_changes(
+                {t.change_id: (t.declaration_name or "") for t in graph.targets}, scan))
+
+    subjects_by_change = {
+        t.change_id: (t.declaration_name or "") for g in graphs for t in g.targets}
+    paths_by_change = {t.change_id: t.path for g in graphs for t in g.targets}
+    graphs_by_episode = {g.episode_id: g for g in graphs}
+
+    central_ids = central_changes(
+        [], central_by_change, exposure_by_change=exposure_by_change)
+
+    # The floor's slices, built from the same map the specialists get. Constructed here
+    # rather than with the specialist slices because the generalist loop runs first and
+    # its prompts must carry their context before they are hashed.
+    floor_context = {
+        key: value.render() for key, value in build_slices(
+            components_by_pr=components_by_pr, graphs_by_episode=graphs_by_episode,
+            jobs=[(f'{u.work_unit_id}#{GENERALIST_ARM_ID}', u.pr_number, u.episode_id,
+                   u.change_ids) for u in selected_units],
+            subjects_by_change=subjects_by_change, paths_by_change=paths_by_change,
+            exposure_by_change=exposure_by_change,
+        ).items()
+    } if generalist_floor else {}
+
     # --- the mandatory generalist, one per unit ---------------------------------------
     generalist = arms_by_id[GENERALIST_ARM_ID]
-    for unit in sorted(selected_units, key=lambda item: item.work_unit_id):
+    for unit in (sorted(selected_units, key=lambda item: item.work_unit_id)
+                 if generalist_floor else ()):
         prompt = release_prompt_by_unit.get(unit.work_unit_id)
         if prompt is None:
             raise ValueError(
@@ -206,6 +275,14 @@ def build_agenda(
                 "release; the generalist floor cannot be scheduled without one"
             )
         invocation_id = f"{unit.work_unit_id}#{GENERALIST_ARM_ID}"
+        # The floor gets its slice too. It is 95 of the 161 mandatory jobs and has produced
+        # every candidate that landed on a gold obligation measured so far; contextualising
+        # only the specialists would have improved the arms that find least.
+        # Bound once and used for both the payload and the sealed hash. Building the task
+        # data from the contextualised prompt while recording the *original* hash would seal
+        # a plan whose `prompt_sha256` does not match the text that was sent — a hash that
+        # certifies the wrong body is worse than no hash.
+        prompt = with_context(prompt, floor_context.get(invocation_id, ""))
         data = build_candidate_task_data(unit, episode_by_id[unit.episode_id], prompt)
         pool[invocation_id] = _arm_payload(
             data.model_dump(mode="json"), arm=generalist,
@@ -222,6 +299,10 @@ def build_agenda(
             site_change_ids=list(unit.change_ids),
             eligible=True,
             mandatory=True,
+            routing_priority="required",
+            # No evaluation vocabulary here: `routing_reason` is shipped to the lead, and
+            # `contracts.assert_gold_free` sweeps the sealed plan for exactly that leak.
+            routing_reason="the per-unit broad pass, which no specialist replaces",
             prompt_sha256=prompt.prompt_sha256,
             cost_hint=generalist.cost_hint,
             rationale=generalist.rationale,
@@ -231,10 +312,37 @@ def build_agenda(
     invocations, eligibility = enumerate_invocations(
         selected_units, modifications, pr_numbers
     )
+    # One slice per job, carrying only what bears on that job's own targets: the families
+    # it belongs to, its files' structure, the conventions its shape raises. Rendered into
+    # the prompt and hashed with it, so the sealed plan records exactly what each reviewer
+    # was told.
+    context = build_slices(
+        components_by_pr=components_by_pr, graphs_by_episode=graphs_by_episode,
+        jobs=[(item.invocation_id, unit_by_id[item.work_unit_id].pr_number,
+               unit_by_id[item.work_unit_id].episode_id, item.site_change_ids)
+              for item in invocations],
+        subjects_by_change=subjects_by_change, paths_by_change=paths_by_change,
+        exposure_by_change=exposure_by_change,
+    )
+    context_text = {key: value.render() for key, value in context.items()}
+
     rendered = render_focused_all(
-        list(specs.values()), invocations, selected_units, episodes, graphs
+        list(specs.values()), invocations, selected_units, episodes, graphs,
+        context_by_invocation=context_text,
     )
     rendered_by_id = {item.invocation_id: item for item in rendered}
+    # The contract is allocated over the whole pool at once: "this family needs a naming
+    # look" is a budget, not a per-pair predicate, and deciding pair-by-pair made 70% of the
+    # pool mandatory.
+    decisions = plan_coverage(
+        [Pair(invocation_id=item.invocation_id, arm_id=item.spec_id,
+              work_unit_id=item.work_unit_id, pr_number=unit_by_id[item.work_unit_id].pr_number,
+              change_ids=tuple(item.site_change_ids),
+              eligible=eligibility[item.invocation_id])
+         for item in invocations],
+        components_by_pr, central_ids,
+    )
+
     for invocation in invocations:
         prompt = rendered_by_id[invocation.invocation_id]
         unit = unit_by_id[invocation.work_unit_id]
@@ -244,6 +352,7 @@ def build_agenda(
             data.model_dump(mode="json"), arm=arm,
             invocation_id=invocation.invocation_id, spec_id=invocation.spec_id,
         )
+        decision = decisions[invocation.invocation_id]
         proposals.append(sealed_model(
             AgendaProposal,
             proposal_id=invocation.invocation_id,
@@ -254,7 +363,14 @@ def build_agenda(
             pr_number=unit.pr_number,
             site_change_ids=list(invocation.site_change_ids),
             eligible=eligibility[invocation.invocation_id],
-            mandatory=False,
+            # Required work is enforced through the same `mandatory` flag the generalist
+            # floor already uses, so `submit_routing` refuses to close until it has run.
+            # One enforcement mechanism, not two.
+            mandatory=decision.priority == "required",
+            routing_priority=decision.priority,
+            routing_reason=decision.reason,
+            component_id=decision.component_id,
+            component_grain=decision.component_grain,
             prompt_sha256=prompt.prompt_sha256,
             cost_hint=arm.cost_hint,
             rationale=arm.rationale,
@@ -308,12 +424,19 @@ def agenda_report(agenda: ReviewAgenda) -> Dict[str, Any]:
         row["sites"] += len(proposal.site_change_ids)
         row["cost_hint"] += proposal.cost_hint
     eligible = [item for item in agenda.proposals if item.mandatory or item.eligible]
+    # Which work units no specialist would look at. Irrelevant while the generalist floor
+    # runs — it covers every unit by definition — and the single number that decides whether
+    # a specialist-only run is measuring arm quality or measuring missing coverage.
+    units = {item.work_unit_id for item in agenda.proposals}
+    covered = {item.work_unit_id for item in eligible
+               if item.arm_id != GENERALIST_ARM_ID}
     return {
         "agenda_version": AGENDA_VERSION,
         "scheduler_version": agenda.scheduler_version,
         "renderer_version": agenda.renderer_version,
         "routing_mode": agenda.routing_mode,
-        "work_units": len({item.work_unit_id for item in agenda.proposals}),
+        "work_units": len(units),
+        "units_without_specialist": sorted(units - covered),
         "pr_numbers": sorted({item.pr_number for item in agenda.proposals}),
         "proposals_enumerated": len(agenda.proposals),
         "proposals_eligible": len(eligible),
@@ -323,4 +446,9 @@ def agenda_report(agenda: ReviewAgenda) -> Dict[str, Any]:
         "projected_cost_rules": round(sum(item.cost_hint for item in eligible), 4),
         "mandatory_floor_cost": round(
             sum(item.cost_hint for item in agenda.proposals if item.mandatory), 4),
+        # What the coverage contract obliges, before the lead sees any of it. Read next to
+        # `trace.routing_report`, which says what the lead then did: a contract that requires
+        # nothing and a lead that prunes everything produce the same outcome and are entirely
+        # different problems.
+        "coverage_contract": routing_contract_report(agenda.proposals),
     }

@@ -446,6 +446,11 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
         scoped_obligation_ids=dataset.obligation_ids or None,
         planned_pairs=sealed,
         control_pr_numbers=dataset.control_pr_numbers,
+        # The same scope that selected the pairs must select the denominator, or recall is
+        # divided by obligations from PRs this run never saw.
+        scoped_pr_numbers=(
+            sorted({*dataset.pr_numbers, *dataset.control_pr_numbers})
+            if dataset.pr_numbers else None),
         null_pairs_requested=(
             dataset.null_pairs_per_obligation
             * len({item.obligation_id for item in sealed if item.role == "observed"})

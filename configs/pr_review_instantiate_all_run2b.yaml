@@ -1,0 +1,43 @@
+# APPLY-ALL instantiation, run 2b of 2 (twin runs, VERIFIED-GATE FIX, identical config, different run identity).
+# Ceiling measurement: the voluntary APPLY/SKIP threshold proved instruction-immune (decide-v1 37/90
+# applies, decide-v2 34/90 despite prior corrections), so this mode removes the decision entirely:
+# ONE finding per checklist item, per-finding `confidence` = P(maintainer would leave this comment)
+# as the downstream ranking signal. Precision is expected to collapse — this run's job is the
+# numerator (coverage ceiling) and, with its twin, the first same-config variance estimate.
+#
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_instantiate_all_run1b.yaml
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_instantiate_all_run2b.yaml
+#   python -m src.datasets.pr_review_v2.evaluate_d2 <gold> <preds> mode=target topical_gate=True   # each
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 60          # exhaustive instantiation + verification loops need headroom
+  sample_max_cost: 3.0
+  max_concurrency: 16
+
+task_config:
+  finding_budget: 24
+  worklist_file: inputs/pr_review_v2/precedent_bench/worklist_by_pr.jsonl
+  worklist_max_items: 24   # fallback-site PRs have 90+ items; keep top-24 by concern weight
+  prompt_version: apply_all_v1
+  require_verification: false   # claim-only findings pass unverified; only provided edits are compile-gated
+
+dataset:
+  task_type: lean_pr_review_instantiate
+  run_name: pr_review_instantiate_all_gpt52_57prs_run2b
+  output_file: inputs/pr_review_v2/predictions/preds_instantiate_all_gpt_5.2_run2b.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145,
+               33146, 33149, 33150, 33153, 33154, 33169, 33183, 33190, 33201, 33203,
+               33207, 33208, 33232, 33267, 33268, 33283, 33285, 33287, 33294, 33310,
+               33316, 33321, 33332, 33333, 33337, 33343, 33345, 33349, 33356, 33362,
+               33373, 33376, 33395, 33400, 33401, 33419, 33421]
+  resume: true

@@ -168,6 +168,43 @@ body.gold-on th.goldhead,body.gold-on td.goldcell{display:table-cell}
 tr.site.goldrow td.label{box-shadow:inset 3px 0 0 var(--gold)}
 body:not(.gold-on) tr.site.goldrow td.label{box-shadow:none}
 
+/* The same obligation, marked in the diff. The matrix's gold column is invisible in the
+   default view, which made the toggle look broken: a target the maintainer wrote about
+   has to be visible where the reading actually happens. A tint rather than `.rel`'s left
+   border, so a related target and an asked-about one stay tellable apart. */
+.gmark{display:none;font-size:10px;font-family:var(--sans);border-radius:3px;padding:0 5px;
+       border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold);
+       background:color-mix(in srgb,var(--gold) 12%,var(--panel))}
+.gmark.g-res{background:var(--addbg);color:var(--add);border-color:var(--add);font-weight:700}
+.gmark.g-iss{background:var(--addbg);color:var(--add);border-color:transparent}
+.gmark.g-no{background:var(--delbg);color:var(--del);border-color:transparent}
+body.gold-on .gmark{display:inline-block}
+body.gold-on .th.goldtarget{background:color-mix(in srgb,var(--gold) 7%,var(--panel))}
+body.gold-on .th.goldtarget:hover{background:color-mix(in srgb,var(--gold) 13%,var(--sunk))}
+
+/* Every ask on this PR in one row, so a match is found by reading rather than by hunting
+   for a filled dot in a hidden column. Chips are keyed by obligation, not by target: an
+   obligation naming 13 targets is one ask, and listing it 13 times would bury the others. */
+.goldbar{display:none;gap:6px;flex-wrap:wrap;align-items:center;padding:7px 14px;
+         border-bottom:1px solid var(--line);
+         background:color-mix(in srgb,var(--gold) 5%,var(--panel))}
+body.gold-on .goldbar{display:flex}
+.gb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);
+        font-family:var(--sans);font-weight:600;margin-right:2px}
+.gchip{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;
+       font-family:var(--sans);border:1px solid var(--line);border-radius:4px;
+       padding:2px 7px;cursor:pointer;background:var(--panel);color:var(--soft)}
+.gchip:hover{background:var(--sunk)}
+.gchip.off{cursor:default;opacity:.65}
+.gchip .gn{font-family:var(--mono);color:var(--ink)}
+.gchip .gv{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)}
+.gchip.g-res{border-color:var(--add);background:var(--addbg)}
+.gchip.g-res .gv{color:var(--add);font-weight:700}
+.gchip.g-iss{border-color:color-mix(in srgb,var(--add) 55%,transparent)}
+.gchip.g-iss .gv{color:var(--add)}
+.gchip.g-no .gv{color:var(--del)}
+.gchip.g-anc .gv{color:var(--gold)}
+
 /* Debug is opt-in: the clean page is what a reader gets, not what they must ask for.
    IDs, hashes and pipeline internals stay hidden until the toggle is on. */
 .onlydebug{display:none}
@@ -922,6 +959,9 @@ if(gb)gb.addEventListener('click',()=>{
   gb.classList.toggle('on');
   if(cur.site)renderPanel(cur.site,cur.col);else $('#panel').innerHTML=intro();
 });
+document.querySelectorAll('[data-goto]').forEach(b=>{
+  b.addEventListener('click',()=>select(b.dataset.goto,null));
+});
 document.querySelectorAll('.rf').forEach(b=>{
   b.addEventListener('click',()=>scrollToFile(b.dataset.file));
 });
@@ -1000,6 +1040,24 @@ def _distinct_obligations(gold: Optional[dict]) -> Dict[int, set]:
     rows += gold.get("unanchored", [])
     for row in rows:
         per_pr.setdefault(row["pr_number"], set()).add(row["obligation_id"])
+    return per_pr
+
+
+def _obligations_where(gold: Optional[dict], key: str) -> Dict[int, set]:
+    """Distinct obligation IDs per PR whose verdict has `key` set.
+
+    De-duplicated exactly as `_distinct_obligations` is, and for the same reason: a verdict
+    belongs to the obligation, not to each target the obligation happens to name.
+    """
+
+    per_pr: Dict[int, set] = {}
+    if not gold:
+        return per_pr
+    rows = [row for rows in gold.get("by_change", {}).values() for row in rows]
+    rows += gold.get("unanchored", [])
+    for row in rows:
+        if row.get(key):
+            per_pr.setdefault(row["pr_number"], set()).add(row["obligation_id"])
     return per_pr
 
 
@@ -1124,7 +1182,72 @@ def _cell_strip(site, columns: Sequence[dict], groups) -> str:
     return f'<span class="strip2">{"".join(parts)}</span>'
 
 
-def _target_header(site, columns, groups, new_unit: Optional[dict]) -> str:
+#: `goldHtml`'s ladder, as data. Ordered worst to best so `max` picks the best outcome at
+#: a target carrying several asks. `resolution_match` is the top rung and reads differently
+#: from `issue_match` on purpose: the run proposed an edit that satisfies the ask, not
+#: merely a claim that names it. `judged` outranks a location hit because it is an answer
+#: rather than a hint, which is the precedence `goldHtml` already uses.
+def _gold_rung(row: dict) -> tuple:
+    if row.get("resolution_match"):
+        return (4, "res", "resolved")
+    if row.get("issue_match"):
+        return (3, "iss", "matched")
+    if row.get("judged"):
+        return (2, "no", "no match")
+    if row.get("finding_location_hit"):
+        return (1, "anc", "anchored")
+    if row.get("candidate_location_hit"):
+        return (1, "anc", "candidate here")
+    return (0, "none", "nothing here")
+
+
+def _gold_bar(bundle, gold: Optional[dict]) -> str:
+    """Every maintainer ask on this PR, as one clickable row.
+
+    The verdicts were reachable only by hunting: the matrix's gold column is invisible in
+    the default view, and a badge in the diff is only found by scrolling onto it. A chip
+    carries the verdict and selects the ask's target, so `resolved` and `matched` can be
+    read off the page and jumped to.
+    """
+
+    if not gold:
+        return ""
+    by_change = gold.get("by_change", {})
+    #: First target in page order wins: an obligation repeats under every target it names,
+    #: and the chip has to land somewhere the reader can see it.
+    anchored: Dict[str, tuple] = {}
+    for site in bundle.sites:
+        for row in by_change.get(site.change_id, ()):
+            anchored.setdefault(row["obligation_id"], (row, site))
+
+    chips = []
+    for row, site in anchored.values():
+        _, cls, label = _gold_rung(row)
+        chips.append(
+            f'<button class="gchip g-{cls}" data-goto="{_esc(site.change_id)}" '
+            f'title="{_esc(row.get("claim") or "")}">'
+            f'<span class="gn">{_esc(site.declaration_name)}</span>'
+            f'<span class="gv">{_esc(label)}</span></button>'
+        )
+    for row in gold.get("unanchored", []):
+        if row.get("pr_number") != bundle.pr_number:
+            continue
+        _, cls, label = _gold_rung(row)
+        chips.append(
+            f'<span class="gchip g-{cls} off" title="{_esc(row.get("claim") or "")}">'
+            f'<span class="gn">unanchored</span>'
+            f'<span class="gv">{_esc(label)}</span></span>'
+        )
+    if not chips:
+        return ""
+    return (
+        f'<div class="goldbar"><span class="gb-lab">{len(chips)} maintainer ask'
+        f"{'' if len(chips) == 1 else 's'}</span>" + "".join(chips) + "</div>"
+    )
+
+
+def _target_header(site, columns, groups, new_unit: Optional[dict],
+                   obligations: Sequence[dict] = ()) -> str:
     scheduled = [row for row in site.routing if row["scheduled"]]
     total = len(site.routing)
     if total:
@@ -1141,18 +1264,29 @@ def _target_header(site, columns, groups, new_unit: Optional[dict]) -> str:
             + (f' · {new_unit["chars"]:,} ch' if new_unit["chars"] else "")
             + "</span>"
         )
+    gold_mark = ""
+    gold_class = ""
+    if obligations:
+        # The best outcome among the asks anchored here — see `_gold_rung`.
+        _, cls, label = max(_gold_rung(item) for item in obligations)
+        gold_class = " goldtarget"
+        gold_mark = (
+            f'<span class="gmark g-{cls}">'
+            f"{len(obligations)} ask{'' if len(obligations) == 1 else 's'} · "
+            f"{label}</span>"
+        )
     return (
-        f'<div class="th{" newunit" if new_unit is not None else ""}" '
+        f'<div class="th{" newunit" if new_unit is not None else ""}{gold_class}" '
         f'data-id="{_esc(site.change_id)}" data-rank="{STATES.index(site.depth)}">'
         f'<span class="nm">{_esc(site.declaration_name)}</span>'
         f'<span class="sub">{_esc(site.lifecycle)} {_esc(site.subject_kind)}'
         f" · L{site.line_start}</span>"
-        f"{sched}{unit}"
+        f"{sched}{unit}{gold_mark}"
         f"{_cell_strip(site, columns, groups)}</div>"
     )
 
 
-def _diff_pane(bundle, columns: Sequence[dict], groups) -> str:
+def _diff_pane(bundle, columns: Sequence[dict], groups, gold: Optional[dict] = None) -> str:
     """The PR, as a PR: real files, real line numbers, real context, elisions counted.
 
     Targets are emitted as header rows in the flow rather than absolutely-positioned
@@ -1161,6 +1295,7 @@ def _diff_pane(bundle, columns: Sequence[dict], groups) -> str:
     its first line is unambiguous — and it survives elision, which an overlay would not.
     """
 
+    by_change = (gold or {}).get("by_change", {})
     sites_by_id = {site.change_id: site for site in bundle.sites}
     units_by_change = {}
     for unit in bundle.work_units:
@@ -1198,7 +1333,8 @@ def _diff_pane(bundle, columns: Sequence[dict], groups) -> str:
             )
             for site in file_sites:
                 bits.append(_target_header(site, columns, groups,
-                                           units_by_change.get(site.change_id)))
+                                           units_by_change.get(site.change_id),
+                                           by_change.get(site.change_id, ())))
         else:
             seen_units = set()
             for window in meta["windows"]:
@@ -1213,7 +1349,9 @@ def _diff_pane(bundle, columns: Sequence[dict], groups) -> str:
                         fresh = unit if unit and unit["work_unit_id"] not in seen_units else None
                         if unit:
                             seen_units.add(unit["work_unit_id"])
-                        bits.append(_target_header(site, columns, groups, fresh))
+                        bits.append(_target_header(
+                            site, columns, groups, fresh,
+                            by_change.get(site.change_id, ())))
                     owner = _owner(line["n"], file_sites)
                     klass = "ch" if line["changed"] else ("in" if owner else "")
                     bits.append(
@@ -1230,7 +1368,8 @@ def _diff_pane(bundle, columns: Sequence[dict], groups) -> str:
             )
             for site in orphans:
                 bits.append(_target_header(site, columns, groups,
-                                           units_by_change.get(site.change_id)))
+                                           units_by_change.get(site.change_id),
+                                           by_change.get(site.change_id, ())))
         bits.append("</div></section>")
         out.append("".join(bits))
     return f'<div id="diffpane"><svg id="fan"></svg>{"".join(out)}</div>'
@@ -1739,6 +1878,17 @@ def to_html(
         else ""
     )
 
+    # The PR itself, from the episode's own `repo` rather than a hardcoded host: the
+    # overlay renders whatever release it is pointed at, and a wrong link is worse than
+    # none. Opens in a new tab so the reader does not lose the page's toggled state.
+    gh_button = (
+        f'<button class="tg"><a href="https://github.com/{_esc(bundle.repo)}/pull/'
+        f'{bundle.pr_number}" target="_blank" rel="noopener noreferrer" '
+        f'title="open PR #{bundle.pr_number} on GitHub">github &#8599;</a></button>'
+        if bundle.repo
+        else ""
+    )
+
     payload = {
         "pr_number": bundle.pr_number,
         "columns": bundle.columns,
@@ -1839,12 +1989,13 @@ def to_html(
         "matrix view</button>"
         '<button class="tg" id="debugbtn" title="show ids, hashes and pipeline internals">'
         "debug</button>"
+        + gh_button
         + ("" if standalone else '<button class="tg"><a href="index.html">all PRs</a></button>')
         + "</div></header>"
-        f"{_ribbon(bundle)}{_legend(bundle)}"
+        f"{_ribbon(bundle)}{_legend(bundle)}{_gold_bar(bundle, gold)}"
         '<div class="body"><div class="viewwrap">'
         f"{_rail(bundle)}"
-        f"{_diff_pane(bundle, columns, groups)}"
+        f"{_diff_pane(bundle, columns, groups, gold)}"
         '<div class="canvas" id="matrixpane">'
         f"{_matrix(bundle, gold)}"
         "</div>"
@@ -2001,18 +2152,39 @@ def conversation_pages(bundle) -> Dict[str, str]:
 def write_index(bundles: Sequence, gold: Optional[dict], sources: Optional[dict] = None) -> str:
     sources = sources or {}
     by_pr = {pr: len(ids) for pr, ids in _distinct_obligations(gold).items()}
+    # Without these, finding a match meant opening every PR in turn.
+    gold_cols = [
+        ("obligations", by_pr),
+        ("matched", {pr: len(ids)
+                     for pr, ids in _obligations_where(gold, "issue_match").items()}),
+        ("resolved", {pr: len(ids)
+                      for pr, ids in _obligations_where(gold, "resolution_match").items()}),
+    ] if gold else []
+    gold_head = (
+        "".join(f"<th class='n'>{name}</th>" for name, _ in gold_cols)
+        if gold_cols else "<th class='n'></th>"
+    )
+
+    # `build_overlay` nulls v4's treatment and executor for a v5 run, and the arms it
+    # counts candidates over are never loaded for one, so `investigations` and `candidates`
+    # can only read 0 on a v5 page. The per-PR pages already drop v4's method columns; this
+    # one drops their two totals rather than printing a column of zeros.
+    counts = ["sites", "investigations", "candidates", "findings", "published"]
+    if any(getattr(bundle, "lead", None) for bundle in bundles):
+        counts = ["sites", "findings", "published"]
 
     rows = []
     for bundle in bundles:
+        cells = "".join(f"<td class='n'>{bundle.totals[key]}</td>" for key in counts)
+        # Blank rather than 0: the column is scanned for the PRs worth opening.
+        cells += (
+            "".join(f"<td class='n'>{seen.get(bundle.pr_number) or ''}</td>"
+                    for _, seen in gold_cols)
+            if gold_cols else "<td class='n'></td>"
+        )
         rows.append(
             f"<tr><td><a href='pr-{bundle.pr_number}.html'>#{bundle.pr_number}</a>"
-            f"<span class='t'>{_esc(bundle.title)}</span></td>"
-            f"<td class='n'>{bundle.totals['sites']}</td>"
-            f"<td class='n'>{bundle.totals['investigations']}</td>"
-            f"<td class='n'>{bundle.totals['candidates']}</td>"
-            f"<td class='n'>{bundle.totals['findings']}</td>"
-            f"<td class='n'>{bundle.totals['published']}</td>"
-            f"<td class='n'>{by_pr.get(bundle.pr_number, '') if gold else ''}</td></tr>"
+            f"<span class='t'>{_esc(bundle.title)}</span></td>{cells}</tr>"
         )
 
     src = "".join(
@@ -2030,10 +2202,9 @@ def write_index(bundles: Sequence, gold: Optional[dict], sources: Optional[dict]
         "<h1>How the reviewer reviewed each PR</h1>"
         f'<p class="sub">{len(bundles)} PR(s). Each page shows the PR\'s change targets '
         "against every component that could speak about them.</p>"
-        "<table><thead><tr><th>PR</th><th class='n'>sites</th>"
-        "<th class='n'>investigations</th><th class='n'>candidates</th>"
-        "<th class='n'>findings</th><th class='n'>published</th>"
-        f"<th class='n'>{'obligations' if gold else ''}</th></tr></thead>"
+        "<table><thead><tr><th>PR</th>"
+        + "".join(f"<th class='n'>{key}</th>" for key in counts)
+        + gold_head + "</tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
         f'<div class="src">{src}</div></div>'
     )

@@ -1,0 +1,30 @@
+# Workspace-grounded PR distillation: a per-PR agent reads the FULL proof of each changed
+# declaration (file_read in target/, content_search, lean_verify) and emits a PRDistillation
+# artifact (per-decl NL statement/sketch + legibility + divergence). The grounded promotion of
+# the diff-only distillation probe — reading whole proofs should de-compress the legibility
+# scale that the diff-only pass maxed out.
+#
+#   python -m src.datasets.pr_review_v2.distill_runner \
+#       --config configs/pr_review_distill_v2.yaml pool=grand_union
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5_mini
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 16
+
+task_config:
+  prompt_version: v1
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+
+dataset:
+  task_type: lean_pr_review_distill
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_actionable_20260618.jsonl
+  resume: true

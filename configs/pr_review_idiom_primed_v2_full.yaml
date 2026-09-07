@@ -1,0 +1,40 @@
+# PRIMED idiom checker on the FULL gold-bearing set (57 PRs). Identical to
+# configs/pr_review_idiom_v2_full.yaml EXCEPT the checker is primed with retrieved past-maintainer
+# precedents (precedent_file). The unprimed full config stays as the ablation baseline — run both and
+# diff recall / on-target / finding-count. Confirms the first-20 idiom win (V2 recall 4/31 -> 8/31,
+# on-target 25% -> 37.5%) at full scale.
+#
+#   python -m src.datasets.pr_review_v2.precedent_prime --prs <all 57>   # build precedents for 57 first
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_idiom_primed_v2_full.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 16
+
+task_config:
+  finding_budget: 10
+  precedent_file: inputs/pr_review_v2/precedent_bench/precedents_by_pr.jsonl
+  precedent_top_k: 6
+  # enabled_tools omitted -> the idiom checker's native verify+search toolset.
+
+dataset:
+  task_type: lean_pr_review_idiom
+  run_name: pr_review_idiom_primed_gpt52_57prs_decl
+  output_file: inputs/pr_review_v2/predictions/preds_idiom_primed_gpt_5.2_decl.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145,
+               33146, 33149, 33150, 33153, 33154, 33169, 33183, 33190, 33201, 33203,
+               33207, 33208, 33232, 33267, 33268, 33283, 33285, 33287, 33294, 33310,
+               33316, 33321, 33332, 33333, 33337, 33343, 33345, 33349, 33356, 33362,
+               33373, 33376, 33395, 33400, 33401, 33419, 33421]
+  resume: true

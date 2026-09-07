@@ -332,7 +332,33 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                 response["message"] = "Lean verification completed successfully"
             else:
                 response["message"] = "Lean verification failed"
-        
+
+        # A failure that produced no Lean diagnostics did not come from the code — the
+        # compiler never got far enough to complain about it. Something outside the snippet
+        # went wrong: a killed process, an unresolvable toolchain, a working directory the
+        # runtime would not let it use.
+        #
+        # These fields exist on `VerificationResult` and were being dropped, so the agent
+        # received `{"success": false, "errors": []}` and nothing else. Across one held-out
+        # run that was 123 of 123 calls: every specialist constructed an edit, tried to
+        # verify it, got an empty refusal, and correctly abstained — and the abstention was
+        # indistinguishable from "found nothing worth reporting" in every artifact
+        # downstream. Diagnostics are cheap; a silent failure costs a run.
+        if not result.success and not result.messages:
+            response["diagnosis"] = {
+                "return_code": result.return_code,
+                "killed_by_signal": (result.return_code or 0) < 0,
+                "working_dir": str(self.target_workspace) if self.target_workspace else None,
+                "stderr_tail": (result.raw_stderr or "")[-1200:],
+                "stdout_tail": (result.raw_output or "")[-400:],
+            }
+            response["message"] = (
+                "Lean verification failed before producing any diagnostics — this is an "
+                "environment or process failure, not a problem with the code you submitted. "
+                "See `diagnosis`. Do not rewrite the edit in response to this; report it or "
+                "abstain, and say that verification was unavailable."
+            )
+
         return response
 
     @classmethod

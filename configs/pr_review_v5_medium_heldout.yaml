@@ -39,7 +39,7 @@ dataset:
   routing_mode: lead
   release: inputs/pr_review_v4/releases/dev-medium-0.3.0
   modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
-  run_name: pr_review_v5_lead_medium_heldout_rep1
+  run_name: pr_review_v5_lead_medium_heldout_rep2
   pr_numbers: [33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421]
   require_prebuilt_workspaces: true
 

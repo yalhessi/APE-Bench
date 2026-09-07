@@ -1,0 +1,34 @@
+# Guidelines-supplied holistic review — identical to configs/pr_review_workspace_v2.yaml
+# EXCEPT task_type=lean_pr_review_guidelines, which appends the distilled Mathlib
+# community guidelines (docs/guides) to the holistic agent's system prompt. The
+# supplied guidelines are the only variable vs the acceptability_v2 baseline, so the
+# two runs are directly comparable on the topical-gated actionable frontier.
+#
+#   export OPENAI_API_KEY=...
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_guidelines_v2.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.4
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 2
+
+task_config:
+  finding_budget: 10
+  prompt_version: acceptability_v2   # same framing as the baseline; guidelines are added on top
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+
+dataset:
+  task_type: lean_pr_review_guidelines
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33321, 33322, 33328, 33332, 33333, 33334, 33337, 33340, 33343, 33345,
+               33349, 33356, 33357, 33362, 33367, 33370, 33373, 33376, 33385, 33395,
+               33399, 33400, 33401, 33413, 33418, 33419, 33421, 33432, 33438, 33440]
+  resume: true

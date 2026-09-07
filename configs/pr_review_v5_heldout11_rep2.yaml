@@ -1,0 +1,94 @@
+# Held-out generalization check, rep2 — the first run whose result is interpretable.
+#
+# THE SET. Eleven PRs the design was never tuned on. 33057/33066/33098/33438 stay out as
+# the iteration set (every design decision so far was made by looking at those four, so a
+# number that includes them is partly a number about our own tuning), and 33149 stays out
+# on cost: it alone carried 108 of the medium set's 203 work units and $14.52 of a $21.06
+# run, for 4 obligations. What that removes from the signal is the only "remove the axioms"
+# gold in the set; the census's win on ranking its axiom-bearing units to rank 1 is already
+# measured and stands, and this run does not re-pay for it.
+#
+# 21 obligations across 9 gold-bearing PRs. 33304 and 33315 are CONTROLS — maintainers
+# asked for nothing there, so anything the agent emits on them is a false positive. At 21
+# obligations one flipped verdict is 4.8pp: this is sized for a look, not an effect size.
+#
+# WHY REP1 IS NOT COMPARABLE. rep1 failed 225 of 225 Lean verifications with exit 127,
+# because the shell that launched it had never exported the elan bin directory. Every
+# specialist built an edit, asked for a compile warrant, got nothing back, and correctly
+# abstained — and the run read as "the specialists find nothing on unseen code". rep1 is
+# void, not a baseline. Audited: rep5/rep6/rep7 and medium_heldout were all healthy, so
+# this was one run, not a standing condition.
+#
+# WHAT CHANGED SINCE THE LAST INTERPRETABLE RUN. Three things, and the first two are why
+# this run is worth paying for:
+#
+#   * The evidence chain is wired (§4). `finalize(supported_candidate_ids=…)` was a
+#     parameter the runner never supplied, so the generalist gate was closed by
+#     construction and every non-compile concern was diagnostic no matter what it found —
+#     319 findings, 2 published. `generalist_evidence_gate` should now read `evidence_chain`
+#     rather than `closed`. If it still reads `closed`, stop: nothing else is interpretable.
+#   * The lead's assessments are applied (§3), subtractively. `drop` removes a claim and
+#     `duplicate_of` folds one into another; nothing can admit a claim or attach a warrant.
+#     This is the fix for two arms agreeing publishing *less* than one, because equal-warrant
+#     claims at one target are suppressed together as a conflict.
+#   * Candidate ordinals no longer collapse to 0, which had let one candidate's compile
+#     warrant admit a sibling the compiler never saw.
+#
+# COST AND TIME. The evidence chain compiles and lints per candidate — measured at 8.9s
+# each, dominated by `repository_search`'s full-tree scan. rep1's set produced ~300
+# candidates, so budget roughly 45 minutes of evidence collection on top of the agent time.
+# Set `dataset.skip_evidence_chain=True` to reproduce the old closed-gate behaviour.
+#
+# CAVEAT that applies to any number from this release: gold is 31/33 `migration_proposal`
+# and only 2 curator_confirmed, so everything here is provisional until the R1b
+# confirmation sitting.
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 32000
+  thinking_budget_tokens: 30000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  max_concurrency: 4
+
+task_config:
+  enabled_tools:
+    - file_read
+    - content_search
+    - lean_verify
+    - get_lean_goal
+    - code_hover
+    - code_goto
+    - code_references
+
+dataset:
+  routing_mode: lead
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
+  run_name: pr_review_v5_lead_heldout11_rep2
+  pr_numbers: [33117, 33145, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421]
+  require_prebuilt_workspaces: true
+
+  # Rank by measured importance, not by position in the diff. Reads the base commit's
+  # `.ilean` index to find changes the library leans on — PR 33294's `Ordinal.IsNormal`
+  # cluster sits under 1671 downstream modules — and lets that raise a proposal to
+  # `required`. Costs ~4.4s per distinct base commit, about a minute for this set.
+  use_exposure_index: true
+
+  # The deterministic arm is deliberately OMITTED (no execution_release): this run calibrates
+  # the agent, so every finding scored should be one the agent produced.
+
+  # Cost policy, unchanged from rep1 so the routing behaviour stays comparable. Measured
+  # billed on rep5 (a run whose verification worked): specialists median $0.039, max $0.117.
+  # 0.30 gives cheap=$0.15, standard=$0.30, deep=$0.60 — ~2.5x headroom at the default tier.
+  # Verification working again means specialists can now iterate on real compile errors, so
+  # expect the median to rise; that is the point, and the cap is where the headroom is.
+  standard_budget_cap: 0.30
+  lead_cost_cap: 1.00
+  per_pr_cost_cap: 1.50
+  # A fan-out bound, not the thing standing between us and the bill — the per-PR cost cap is
+  # enforced against delegated spend now.
+  max_delegations: 25

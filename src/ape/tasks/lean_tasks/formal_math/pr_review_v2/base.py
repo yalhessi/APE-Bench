@@ -447,6 +447,22 @@ class BasePRReviewTask(BaseLeanTask):
             edited_only = bool(line_start or declaration_name or replacement or new_declaration)
             if edited_only:
                 result = await self._attribute_errors(path, result)
+            # Say which of the two things just happened. The as-is mode is deliberate and
+            # stays, but its result was indistinguishable from a verified edit: both come
+            # back `{"success": true, ... "Lean verification completed successfully"}`, and
+            # the reviewed file compiles by construction, so an as-is call always succeeds.
+            # On smoke4 that was 13 of 100 calls — a `family_design` invocation on PR 33117
+            # made one, read the success, and submitted nothing. Neither the agent nor
+            # anyone reading the transcript afterwards could tell it had verified nothing.
+            if isinstance(result, dict):
+                result["mode"] = "verified_edit" if edited_only else "as_is_compile_check"
+                if not edited_only:
+                    result["note"] = (
+                        "No edit was applied — this is the unmodified reviewed file's "
+                        "compile status, which is green by construction and is NOT evidence "
+                        "for any change you are considering. To check a change, pass "
+                        "`declaration_name` + `new_declaration`."
+                    )
             return result
 
     async def register_task_tools(self, mcp) -> None:

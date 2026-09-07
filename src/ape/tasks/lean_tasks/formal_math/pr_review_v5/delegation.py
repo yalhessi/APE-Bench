@@ -122,7 +122,15 @@ class JobOutcome:
                     "issue_kind": item.get("issue_kind"),
                     "severity": item.get("severity"),
                     "primary_subject": item.get("primary_subject"),
-                    "claim": str(item.get("claim") or "")[:240],
+                    # 240 characters was enough to see *that* a claim exists and too little
+                    # to tell whether two of them are the same observation. Judging that is
+                    # now a decision the lead actually makes, so it has to be able to read
+                    # far enough to make it.
+                    "claim": str(item.get("claim") or "")[:800],
+                    # What the claim asks for, which is what the merge keys a conflict on:
+                    # two claims at one target asking for different transformations are
+                    # suppressed together. Duplication is a property of this field.
+                    "requested_change": str(item.get("requested_change") or "")[:400],
                 }
                 for index, item in enumerate(self.candidates)
             ],

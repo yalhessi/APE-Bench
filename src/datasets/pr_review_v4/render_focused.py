@@ -23,7 +23,7 @@ contract — `change_ids ⊆ unit` — keeps holding unchanged.
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional
 
 from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
 
@@ -61,7 +61,26 @@ Every candidate must set concern_family to "{concern_family}" and issue_kind to
 "{issue_kind}" — this run is the {spec_id} check and makes no other kind of claim. Each
 candidate has exactly one primary target and subject; copy their IDs and subject exactly, and
 name the primary declaration in the claim. Submit a candidate only for the review targets
-listed below. Verify every edit with lean_verify_edit before submitting it."""
+listed below. Verify every edit with lean_verify_edit before submitting it.
+
+## State the change, not the impression
+
+`requested_change` must name the transformation a maintainer would perform, precisely enough
+that someone could carry it out without asking you a follow-up question. "Rename `foo_aux'`
+to `foo_of_isUnit`" is a request. "This name is unclear" is not. If you propose a rename, give
+the new name. If you propose a generalisation, give the generalised statement. If you propose
+a different proof, give it.
+
+Where a local fix and a structural one both apply, ask for the structural one. The measured
+failure of this system is under-reaching: landing on exactly the right declaration and
+requesting a smaller change than the maintainer wanted — offering a docstring rewording where
+they asked for the lemma to be renamed and reproved through `OrderDual`, or a tidier tactic
+where they asked for the result to be generalised. A reviewer who notices the right site and
+asks for the wrong size of change has not helped.
+
+Say which field your claim is about. If what you have found is that something already exists
+in the library, that is a duplication claim whatever check you are running, and saying so in
+`concern_label` is what lets it be verified against the library rather than taken on trust."""
 
 
 def _target_block(target) -> str:
@@ -93,6 +112,7 @@ def focused_system_prompt(spec: FocusedAgentSpec) -> str:
 def render_focused_invocation(
     spec: FocusedAgentSpec, invocation: FocusedInvocation, unit: ReviewWorkUnit,
     episode: ReviewEpisodeInput, graph: ChangeGraph,
+    context_text: str = "",
 ) -> RenderedPrompt:
     if invocation.spec_id != spec.spec_id:
         raise ValueError(
@@ -115,6 +135,9 @@ def render_focused_invocation(
         f"Changed files: {', '.join(episode.changed_files)}\n\n"
         f"You are running the {spec.spec_id} check on the "
         f"{len(blocks)} review target(s) below.\n\n" + "\n\n".join(blocks)
+        # Appended *after* the targets, and hashed with them: the slice is part of the
+        # sealed prompt, so a run cannot silently differ from the plan it sealed.
+        + (context_text or "")
     )
     return RenderedPrompt(
         work_unit_id=unit.work_unit_id,
@@ -142,6 +165,7 @@ def render_focused_all(
     specs: Iterable[FocusedAgentSpec], invocations: Iterable[FocusedInvocation],
     units: Iterable[ReviewWorkUnit], episodes: Iterable[ReviewEpisodeInput],
     graphs: Iterable[ChangeGraph],
+    context_by_invocation: Optional[Dict[str, str]] = None,
 ) -> List[RenderedPrompt]:
     spec_by_id: Dict[str, FocusedAgentSpec] = {item.spec_id: item for item in specs}
     unit_by_id = {item.work_unit_id: item for item in units}
@@ -153,5 +177,6 @@ def render_focused_all(
         rendered.append(render_focused_invocation(
             spec_by_id[invocation.spec_id], invocation, unit,
             episode_by_id[unit.episode_id], graph_by_id[unit.graph_id],
+            (context_by_invocation or {}).get(invocation.invocation_id, ""),
         ))
     return rendered

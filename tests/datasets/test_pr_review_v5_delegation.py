@@ -287,13 +287,27 @@ def test_failed_and_paused_jobs_are_counted_not_dropped():
     assert manifest.completion_status == "failed"
 
 
-def test_spend_comes_from_the_orchestrator_not_the_ledger():
-    """An unattributed cost is still spent; the per-job sum is only what could be attributed."""
+def test_spend_is_the_orchestrator_plus_everything_nested_under_it():
+    """`results.total_cost` sees only the leads' own conversations. Floor and specialist jobs
+    run in nested orchestrators it cannot observe, so their spend has to come off the ledger —
+    omitting it is how the held-out run reported $6.54 against a true $19.17."""
 
     agenda = _agenda(["wu:1#generalist"])
     manifest = reconcile(agenda=agenda, delegations=[_record("wu:1#generalist", "mandatory")],
                          responses=[], plan=_plan(), results=RESULTS, issues_total=0)
-    assert manifest.total_cost == 0.4
+    assert manifest.total_cost == pytest.approx(0.4 + 0.05)
+    assert manifest.cost_breakdown == {"lead": 0.4, "nested": 0.05, "extra": 0.0}
+
+
+def test_a_job_that_ran_without_a_recorded_cost_refuses_to_close():
+    """Unattributed spend: the money left the account and the ledger cannot say for what."""
+
+    agenda = _agenda(["wu:1#generalist"])
+    record = _record("wu:1#generalist", "mandatory")
+    record["cost"] = None
+    with pytest.raises(ReconciliationError, match="no cost"):
+        reconcile(agenda=agenda, delegations=[record], responses=[], plan=_plan(),
+                  results=RESULTS, issues_total=0)
 
 
 def test_the_routing_report_names_both_degenerate_cases():

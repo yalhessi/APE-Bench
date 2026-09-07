@@ -1,0 +1,35 @@
+# v2 first-round-review runner (D1/D2 predictions) — spec docs/research/review-task-spec.md §4
+#
+#   export OPENAI_API_KEY=...   # or GEMINI_API_KEY for gemini_* models
+#   python -m src.datasets.pr_review_v2.runner --config configs/pr_review_runner_v2.yaml
+#
+# Pilot tips:
+#   limit=5                      # first 5 records only
+#   pr_numbers=[33419,33285]     # explicit picks
+#   dry_run=true                 # print prompts, no API calls
+
+records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+
+model_name: gpt_5_mini        # any canonical name from ape.llm_clients MODEL_MAPPINGS
+mode: diff_only               # 'diff_only' (floor baseline) | 'workspace' (agentic, via ape-agent)
+finding_budget: 10
+max_tokens: 16000
+thinking_budget_tokens: 8000
+
+concurrency: 4
+limit: 0                      # 0 = all records
+# Audit scoping rule: D3/Δ stats are primary on the review_commit_id slice.
+# The runner itself can run on everything; flip this for delta-anchored pilots.
+h0_review_commit_only: false
+resume: true
+
+# --- workspace mode (mode=workspace): agentic review through the ape-agent scaffold ---
+# Materializes the reviewed state (merge-base snapshot + δ₀ applied) read-only and lets
+# the agent ground findings with Lean tools. Toolset = the ±tools harness ablation knob.
+#   python -m src.datasets.pr_review_v2.runner --config configs/pr_review_runner_v2.yaml \
+#     mode=workspace model_name=gpt_5.4 limit=5 concurrency=2
+scaffold_type: ape_agent
+max_turns: 40
+# cost_limit: 1.50            # per-PR USD ceiling (sample_max_cost)
+# enabled_tools: [file_read, lean_retrieve]            # no-compile worktree rung
+# enabled_tools: [file_read, lean_retrieve, lean_verify, get_lean_goal, code_hover, code_goto, code_references]  # full rung (task default)

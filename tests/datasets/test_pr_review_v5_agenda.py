@@ -99,9 +99,15 @@ def test_every_work_unit_gets_a_mandatory_generalist(agenda):
     assert all(
         item.mandatory for item in agenda.proposals if item.arm_id == GENERALIST_ARM_ID
     )
-    assert not any(
-        item.mandatory for item in agenda.proposals if item.arm_id != GENERALIST_ARM_ID
-    )
+    # A specialist may be mandatory now — the coverage contract requires work the PR itself
+    # asks for — but only ever through `routing_priority`, so there is one enforcement
+    # mechanism rather than two and every mandate carries a reason the lead can read.
+    for item in agenda.proposals:
+        if item.arm_id == GENERALIST_ARM_ID:
+            continue
+        assert item.mandatory == (item.routing_priority == "required")
+        if item.mandatory:
+            assert item.routing_reason
 
 
 def test_eligibility_is_the_v4_rule_and_not_a_second_copy(release, agenda):
@@ -249,3 +255,46 @@ def test_arm_registry_speaks_the_merge_vocabulary():
         assert arm.concern_family in families
         if arm.issue_kind is not None:
             assert arm.issue_kind in kinds
+
+
+# --- the specialist-only run ------------------------------------------------------------
+
+
+def test_the_floor_can_be_turned_off_for_a_specialist_only_run(release):
+    """smoke4 said the generalist's lead in gold-reaching candidates is volume, not quality:
+    per candidate the two are indistinguishable (0.08 against 0.09), and its 4x lead per
+    invocation is 2.0 candidates per run against the specialists' 0.5. The only way to ask
+    whether that is right is to run without it."""
+
+    agenda, pool = build_agenda(
+        run_name="test", routing_mode="lead", release=RELEASE,
+        modification_inventory=INVENTORY, pr_numbers=SMOKE_PRS,
+        generalist_floor=False, **release,
+    )
+    assert not [p for p in agenda.proposals if p.arm_id == GENERALIST_ARM_ID]
+    assert not [k for k in pool if k.endswith(f"#{GENERALIST_ARM_ID}")]
+    assert agenda.proposals, "turning off the floor must not empty the agenda"
+
+
+def test_the_floor_is_on_unless_asked_otherwise(release):
+    """Every measurement so far was taken with it running."""
+
+    agenda, _ = _build(release)
+    assert [p for p in agenda.proposals if p.arm_id == GENERALIST_ARM_ID]
+
+
+def test_a_specialist_only_agenda_reports_what_it_would_leave_unreviewed(release):
+    """The number that separates "the specialists are worse" from "nobody looked".
+
+    Without the floor, a work unit no specialist is eligible on is simply not reviewed, and a
+    recall drop from that is a coverage artifact rather than a result about the arms.
+    """
+
+    agenda, _ = build_agenda(
+        run_name="test", routing_mode="lead", release=RELEASE,
+        modification_inventory=INVENTORY, pr_numbers=SMOKE_PRS,
+        generalist_floor=False, **release,
+    )
+    report = agenda_report(agenda)
+    assert "units_without_specialist" in report
+    assert isinstance(report["units_without_specialist"], list)

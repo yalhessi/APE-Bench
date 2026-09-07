@@ -27,7 +27,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from src.datasets.pr_review_v4.candidates import candidates_from_response
 from src.datasets.pr_review_v4.conditions import (
@@ -46,6 +46,7 @@ from src.datasets.pr_review_v4.merge import merge_findings
 from src.datasets.pr_review_v4.schema import ReviewWorkUnit
 
 from .arms import CHECKABLE_ARMS, GENERALIST_ARM_ID
+from .synthesis import apply_assessments
 
 
 def ingest_responses(
@@ -137,6 +138,35 @@ def _evidence_specialist_findings(candidates, supported_candidate_ids, pr_number
     return findings
 
 
+def _lead_removed_findings(removed: Sequence[Tuple[Any, str]], pr_numbers):
+    """Project the candidates the lead dropped or folded, as `diagnostic` findings.
+
+    Filed under `generalist` for the same reason `_evidence_specialist_findings` is: these
+    carry no verification artifact, and `focused_agent` holds a hard invariant that a focused
+    source names one. `source.spec_id` still records which arm produced the claim, so the
+    per-arm attribution the routing analysis depends on survives.
+
+    `evidence_tier` stays `model_assertion` and `admission` stays `diagnostic`: this restores
+    the record of a claim, never its standing. A finding here was never evidence-checked,
+    because synthesis runs before the chain.
+    """
+
+    from src.datasets.pr_review_v4.merge import finding_from_candidate
+
+    wanted = set(pr_numbers) if pr_numbers else None
+    findings = []
+    for candidate, reason in removed:
+        if wanted is not None and candidate.pr_number not in wanted:
+            continue
+        findings.append(finding_from_candidate(
+            candidate,
+            admission="diagnostic",
+            admission_reason=f"removed by the lead before the gate: {reason}",
+            arm="generalist",
+        ))
+    return findings
+
+
 def finalize(
     out: Path,
     *,
@@ -147,14 +177,41 @@ def finalize(
     exclude_methods: Iterable[str] = (),
     pr_numbers: Optional[Iterable[int]] = None,
     supported_candidate_ids: Optional[Iterable[str]] = None,
+    collect_supported: Optional[Callable[[Sequence[Any]], Set[str]]] = None,
+    candidate_assessments: Iterable[Dict[str, Any]] = (),
     pr_finding_limit: int = 20,
     logger=None,
 ) -> Dict[str, Any]:
-    """Ingest, gate, merge, digest, and write everything the run is judged on."""
+    """Ingest, synthesise, gate, merge, digest, and write everything the run is judged on.
 
+    `collect_supported` runs the evidence chain over the candidates that need one and
+    returns the ids the gate admits. It is a callable rather than four more parameters
+    because resolving workspaces is the runner's job, not finalization's — and because a
+    caller that passes nothing must get the closed gate, not an open one.
+
+    `candidate_assessments` is the lead's read on what came back. It can only subtract; see
+    `synthesis.apply_assessments`.
+    """
+
+    responses = list(responses)
     generalist, specialist, evidence_specialist, artifacts, rejections = ingest_responses(
         units, responses, logger)
     out.mkdir(parents=True, exist_ok=True)
+
+    # Every candidate any arm submitted, before synthesis touches anything. The immutable
+    # discovery record: what the system *found* is a different question from what it chose
+    # to say, and conflating them is what made the lead's drops unevaluable.
+    write_once(out / "candidates_discovered.jsonl",
+               jsonl_bytes([*generalist, *specialist, *evidence_specialist]))
+
+    # Synthesis first: a candidate the lead dropped should never reach the evidence chain,
+    # which is the expensive part and would be spent adjudicating a claim nobody stands by.
+    (generalist, specialist, evidence_specialist,
+     lead_removed, synthesis) = apply_assessments(
+        generalist=generalist, specialist=specialist,
+        evidence_specialist=evidence_specialist, responses=responses,
+        assessments=candidate_assessments, logger=logger,
+    )
 
     generalist_path = out / "candidates_generalist.jsonl"
     specialist_path = out / "candidates_specialist.jsonl"
@@ -178,6 +235,19 @@ def finalize(
         if (item.work_unit_id, item.ordinal) not in verified_keys
     ]
 
+    # The compile-gated specialists are settled by `focused_findings` against their
+    # verification artifacts, so they are not put through the chain: it would cost a
+    # baseline compile each and could not change their admission.
+    evidence_summary: Dict[str, Any] = {}
+    if collect_supported is not None:
+        supported_candidate_ids = collect_supported([*generalist, *evidence_specialist])
+        # Read back here, not in the runner: `finalization_report.json` is written below
+        # and `write_once` will not rewrite it, so a summary attached to the returned dict
+        # afterwards is silently lost — which is exactly what happened on heldout11 rep2.
+        from .evidence_chain import evidence_report
+
+        evidence_summary = evidence_report(out)
+
     findings = []
     if execution_release is not None:
         # The deterministic arm is identical in every routing mode — it involves no model
@@ -198,7 +268,17 @@ def finalize(
 
     merged, conflicts, report = merge_findings(findings, pr_finding_limit=None)
     issues, digest_report = digest_findings(merged, pr_finding_limit=pr_finding_limit)
-    write_once(out / "findings.jsonl", jsonl_bytes(merged))
+
+    # The lead's removals, projected only now — after the merge and after the digest.
+    #
+    # Both exclusions are deliberate. Re-entering the merge would resurrect the conflicts
+    # `duplicate_of` exists to resolve, because `merge_findings` demotes *both* sides of an
+    # equal-warrant clash at one anchor. Re-entering the digest would put them in the
+    # maintainer-facing review, which is the one thing the lead's judgment should govern.
+    # They land in `findings.jsonl` alone: the audit trail the judge reads, so a drop can
+    # finally be scored instead of vanishing.
+    removed_findings = _lead_removed_findings(lead_removed, pr_numbers)
+    write_once(out / "findings.jsonl", jsonl_bytes([*merged, *removed_findings]))
     write_once(out / "conflicts.jsonl", jsonl_bytes(conflicts))
     write_once(out / "issues.jsonl", jsonl_bytes(issues))
 
@@ -217,6 +297,11 @@ def finalize(
             for family in sorted({item.concern_family for item in unverified_specialist})
         },
         "candidate_rejections": len(rejections),
+        "lead_synthesis": synthesis,
+        # Restored to `findings.jsonl` but kept out of the merge and the review. Counted
+        # separately so "what the lead removed" is readable without re-deriving it.
+        "lead_removed_findings": len(removed_findings),
+        "evidence": evidence_summary,
         "verification_artifacts": len(artifacts),
         "generalist_evidence_gate": (
             "evidence_chain" if supported_candidate_ids is not None else "closed"

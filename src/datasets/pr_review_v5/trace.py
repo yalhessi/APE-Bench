@@ -99,13 +99,29 @@ def reconcile(
         context_calls += len(record.get("context_calls") or [])
 
     delegated = counted["mandatory"] + counted["proposed"] + counted["agent_added"]
-    # Specialist spend, read off the ledger because nothing upstream aggregates it. The
-    # floor's rows carry no cost (it is passed in as `extra_cost`), so this cannot double
-    # count them.
-    delegated_cost = sum(
-        float(record.get("cost") or 0.0) for record in delegations
-        if record.get("disposition") in ("proposed", "agent_added")
-    )
+    # Every job's spend, read off the ledger because nothing upstream aggregates it.
+    #
+    # This used to filter to `proposed` and `agent_added`, which was right only while the
+    # coverage floor ran in its own orchestrator and arrived as `extra_cost`. Folding the
+    # floor into the lead turned it into a `mandatory` disposition, and the filter then
+    # silently discarded it: the held-out run reported $6.54 against a ledger total of
+    # $19.17, with the floor's $14.52 simply absent. Spend is spend, whoever authorised it.
+    ledger_cost = sum(float(record.get("cost") or 0.0) for record in delegations)
+
+    # A job that ran and recorded no cost is unattributed spend: the money left the account
+    # and the ledger cannot say for what. That is the shape of the bug this function just
+    # had, so it fails loudly rather than being found by hand two runs later.
+    unattributed = [
+        record.get("invocation_id") for record in delegations
+        if record.get("status") in ("success", "paused_cost", "paused_turns")
+        and record.get("cost") is None
+    ]
+    if unattributed:
+        raise ReconciliationError(
+            f"{len(unattributed)} job(s) ran but recorded no cost: {unattributed[:8]}. "
+            "Spend that no ledger row accounts for cannot be reported, and a manifest that "
+            "silently omits it is worse than one that refuses to close."
+        )
     candidates_total = sum(len(item.get("candidates") or []) for item in responses)
     manifest = V5RunManifest(
         run_id=plan.run_id,
@@ -120,18 +136,25 @@ def reconcile(
         succeeded=statuses["success"],
         failed=statuses["failed"],
         paused=statuses["paused_cost"] + statuses["paused_turns"],
-        # The orchestrator's own total is authoritative for spend; the per-job sum is only
-        # what the ledger could attribute, and an unattributed cost is still spent.
-        # Three separate orchestrators spend money in a lead run and none of them knows
-        # about the others: the leads (`results`), the coverage floor (`extra_cost`), and
-        # every specialist, which runs in a nested orchestrator under its lead's attempt and
-        # is therefore absent from `results.total_cost` entirely. Summing only the first two
-        # under-reported rep3 by $1.98 on $6.27 — about a third of the run.
+        # Spend arrives from orchestrators that do not know about each other, so the total
+        # is assembled rather than read:
+        #   * `results`      — the leads' own conversations (or, in the model-free modes,
+        #                      the single orchestrator that ran every arm task);
+        #   * `ledger_cost`  — everything nested under a lead attempt, floor and specialists
+        #                      alike, which `results.total_cost` cannot see;
+        #   * `extra_cost`   — a caller-supplied remainder, now always zero in `lead` mode.
+        # In `fanout`/`rules` the ledger rows are synthesized without costs, so the nested
+        # term is zero there and nothing is double counted.
         total_cost=(
             float(getattr(results, "total_cost", 0.0) or 0.0)
             + extra_cost
-            + delegated_cost
+            + ledger_cost
         ),
+        cost_breakdown={
+            "lead": round(float(getattr(results, "total_cost", 0.0) or 0.0), 6),
+            "nested": round(ledger_cost, 6),
+            "extra": round(extra_cost, 6),
+        },
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),
         candidates_total=candidates_total,
         issues_total=issues_total,

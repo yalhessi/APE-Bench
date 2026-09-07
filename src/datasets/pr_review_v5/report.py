@@ -15,7 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from .paths import RESULTS, run_dir
 from .trace import routing_report
@@ -70,6 +70,19 @@ def reachable_obligations(run_name: str,
         eligible = set(eligible_obligation_ids)
     by_pr: Dict[int, int] = {}
     ineligible: Dict[int, int] = {}
+    # An obligation carrying no `change_ids` has no anchor, and anchor-tier pairing joins on
+    # change_id — so no finding can ever be paired with it, however good the review. That is
+    # a property of the gold row, not of the agent, and counting it in the denominator makes
+    # a data gap read as a miss. Exactly one exists in dev-medium (PR 33145, "swap the sides
+    # of the iSup/iInf equalities"). Reported, never edited: the release is an input.
+    anchorless: Dict[int, int] = {}
+    # Rows the release's own artifacts contradict — an ask its source comment does not make,
+    # or an outcome its own evidence refutes. Named in `obligation_exclusions` with the
+    # evidence, applied here, and reported below so they are never silently dropped.
+    from .obligation_exclusions import excluded_ids, exclusion_report
+
+    excluded = excluded_ids()
+    audited: Dict[int, int] = {}
     for row in _load_jsonl(judgments):
         pr = row.get("pr_number")
         if pr not in reviewed:
@@ -79,9 +92,18 @@ def reachable_obligations(run_name: str,
             if eligible is not None and oid not in eligible:
                 ineligible[pr] = ineligible.get(pr, 0) + 1
                 continue
+            if not (obligation.get("change_ids") or []):
+                anchorless[pr] = anchorless.get(pr, 0) + 1
+                continue
+            if oid in excluded:
+                audited[pr] = audited.get(pr, 0) + 1
+                continue
             by_pr[pr] = by_pr.get(pr, 0) + 1
     return {
         "unscoreable_obligations_by_pr": dict(sorted(ineligible.items())),
+        "anchorless_obligations_by_pr": dict(sorted(anchorless.items())),
+        "audit_excluded_by_pr": dict(sorted(audited.items())),
+        "audit_exclusions": exclusion_report(),
         "reviewed_prs": sorted(reviewed),
         "obligations_by_pr": dict(sorted(by_pr.items())),
         "reachable": sum(by_pr.values()),
@@ -93,6 +115,88 @@ def reachable_obligations(run_name: str,
             pr for pr in reviewed
             if by_pr.get(pr, 0) == 0 and ineligible.get(pr, 0) == 0
         ),
+    }
+
+
+def contamination(release: Path) -> Dict[str, Any]:
+    """Do any arm instructions quote this release's gold?
+
+    Lives here, on the evaluation side, and deliberately **not** in the runner: the
+    generation path must never read gold — that isolation is the single structural defence
+    `contracts.assert_gold_free` exists to protect, and a pre-run check that opened
+    `judgments.jsonl` inside `run()` would breach it in order to enforce it. So this is a
+    gate an operator runs before spending, not a step inside the pipeline.
+
+    It catches what `assert_gold_free` structurally cannot: that check sweeps the sealed
+    agenda, and the agenda carries prompt *hashes* only. Three exact heldout answers reached
+    the arms' instructions through that blind spot.
+    """
+
+    from src.datasets.pr_review_v4.contracts import prompt_leaks
+    from src.datasets.pr_review_v4.render_focused import (
+        _SUBMISSION_CONTRACT, focused_system_prompt,
+    )
+    from src.datasets.pr_review_v5.arms import specs_by_arm_id
+
+    gold: List[str] = []
+    path = release / "gold/judgments.jsonl"
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            if not line.strip():
+                continue
+            for obligation in (json.loads(line).get("obligations") or []):
+                for field in ("claim", "requested_change", "resolution_criteria"):
+                    if obligation.get(field):
+                        gold.append(str(obligation[field]))
+
+    instructions = {"submission_contract": _SUBMISSION_CONTRACT}
+    for arm, spec in specs_by_arm_id().items():
+        instructions[arm] = focused_system_prompt(spec)
+    leaks = {name: found for name, found in
+             ((name, prompt_leaks(text, gold)) for name, text in sorted(instructions.items()))
+             if found}
+    return {
+        "release": str(release),
+        "gold_strings": len(gold),
+        "instructions_checked": len(instructions),
+        "clean": not leaks,
+        "leaks": leaks,
+    }
+
+
+def admission(run_name: str) -> Dict[str, Any]:
+    """Which gate ran, what it decided, and what the lead removed before it.
+
+    Assembled from the run's own `finalization_report.json` rather than recomputed, so it
+    cannot disagree with the admissions actually written.
+    """
+
+    path = run_dir(run_name) / "finalization_report.json"
+    if not path.is_file():
+        return {"available": False}
+    payload = json.loads(path.read_text())
+    synthesis = payload.get("lead_synthesis") or {}
+    return {
+        "available": True,
+        "gate": payload.get("generalist_evidence_gate"),
+        "findings": payload.get("inputs"),
+        "published": payload.get("issues_published"),
+        "published_by_concern": payload.get("published_by_concern"),
+        "by_evidence_tier": payload.get("by_evidence_tier"),
+        "conflicts": payload.get("conflicts"),
+        "specialists_dropped_unverified": payload.get(
+            "candidates_specialist_dropped_unverified"),
+        "evidence": payload.get("evidence"),
+        # Subtractive by construction, so `candidates_out <= candidates_in` always holds;
+        # `unmatched` is the one that matters, because an assessment naming no candidate
+        # means the lead was addressing claims it could not see.
+        "lead_synthesis": {
+            "assessments": synthesis.get("assessments", 0),
+            "by_verdict": synthesis.get("by_verdict", {}),
+            "dropped": synthesis.get("candidates_dropped", 0),
+            "absorbed": synthesis.get("candidates_absorbed", 0),
+            "unmatched": len(synthesis.get("unmatched") or []),
+        },
     }
 
 
@@ -180,6 +284,11 @@ def score(audit_dir: Path, run_name: Optional[str] = None) -> Dict[str, Any]:
 
     return {
         "scope": scope,
+        # Read before any recall number. A publication rate is uninterpretable without the
+        # regime that produced it: under a `closed` gate nothing was ever asked to support
+        # a claim, so `diagnostic` says only that no chain ran — which is how eight runs
+        # reported publication rates as if they were strictness results.
+        "admission": admission(run_name) if run_name else None,
         "all_findings": rescope(
             two_level(audit_dir / "semantic_report.json", "all findings")),
         "publication": publication(audit_dir / "publication_report.json"),
@@ -262,11 +371,17 @@ def main() -> None:
     score_parser.add_argument("--audit", type=Path, required=True)
     score_parser.add_argument("--run", help="the run, so recall is reported against the "
                                             "obligations it could actually reach")
+    cp = sub.add_parser(
+        "contamination", help="do any arm instructions quote gold? run before spending")
+    cp.add_argument("--release", type=Path, required=True)
     bp = sub.add_parser("overlay", help="render the per-PR review as browsable HTML")
     bp.add_argument("--run", required=True)
     bp.add_argument("--audit", type=Path, help="judge output, to overlay gold verdicts")
     bp.add_argument("--out", type=Path)
     args = parser.parse_args()
+    if args.command == "contamination":
+        print(json.dumps(contamination(args.release), indent=2))
+        raise SystemExit(0 if contamination(args.release)["clean"] else 1)
     if args.command == "routing":
         print(json.dumps(routing(args.run), indent=2))
     elif args.command == "score":

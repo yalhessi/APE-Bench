@@ -203,7 +203,8 @@ def invocation_work_unit(invocation_id: str) -> str:
 
 
 def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
-                             *, strict: bool = True, spec_id: Optional[str] = None):
+                             *, strict: bool = True, spec_id: Optional[str] = None,
+                             _ordinal: Optional[int] = None):
     """Validate one response's candidates.
 
     `spec_id`, when given, is the *invocation's* spec and is authoritative. A model is not
@@ -224,6 +225,15 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
     the system look more precise than it is.
 
     Returns the candidate list in strict mode, or `(candidates, rejections)` otherwise.
+
+    `_ordinal` is private and exists because the non-strict path validates each candidate by
+    recursing on a one-element list, where the loop index is always 0. Without it every
+    candidate in a non-strict batch was sealed with `ordinal=0` — measured on the v5 probe,
+    all 5 candidates including two responses that returned two each. That is not cosmetic:
+    `ordinal` disambiguates `candidate_id`, and finalization joins verification artifacts on
+    `(work_unit_id, ordinal)`, so a collapsed ordinal lets one candidate's compile warrant
+    admit a sibling the compiler never saw. v4's own callers are strict and were never
+    affected.
     """
 
     raw_candidates = response.get("candidates")
@@ -236,7 +246,8 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
         if not strict:
             try:
                 result.extend(candidates_from_response(
-                    unit, {"candidates": [raw]}, strict=True, spec_id=spec_id
+                    unit, {"candidates": [raw]}, strict=True, spec_id=spec_id,
+                    _ordinal=index,
                 ))
             except ValueError as error:
                 rejections.append(sealed_model(
@@ -313,7 +324,8 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
         effective_spec_id = spec_id if spec_id is not None else declared_spec_id
         requests = plan_evidence(concern_family, primary_subject, requested_change, proposed_edit)
         payload = {
-            "producer": "model", "work_unit_id": unit.work_unit_id, "ordinal": index,
+            "producer": "model", "work_unit_id": unit.work_unit_id,
+            "ordinal": index if _ordinal is None else _ordinal,
             "change_ids": change_ids,
             "entity_ids": [primary_entity_id] if primary_entity_id else [],
             "primary_change_id": primary_change_id, "primary_entity_id": primary_entity_id,
@@ -332,7 +344,8 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
         digest = sha256_bytes(canonical_json_bytes(payload))
         result.append(CandidateClaim(
             candidate_id=f"candidate:{digest[:24]}", producer="model", work_unit_id=unit.work_unit_id,
-            ordinal=index, episode_id=unit.episode_id, pr_number=unit.pr_number, change_ids=change_ids,
+            ordinal=index if _ordinal is None else _ordinal,
+            episode_id=unit.episode_id, pr_number=unit.pr_number, change_ids=change_ids,
             entity_ids=payload["entity_ids"], primary_change_id=primary_change_id,
             primary_entity_id=primary_entity_id, primary_subject=primary_subject,
             requested_change=requested_change, concern_family=payload["concern_family"],

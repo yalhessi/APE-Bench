@@ -239,7 +239,12 @@ def _register_declaration(task, mcp) -> None:
             "used to check whether something already exists before claiming it is new, or "
             "to locate the canonical spelling of an API. Matches declaration sites only, "
             "not mentions in comments or imports. Give a real identifier "
-            "(e.g. `Finset.sum_comm`), not prose."
+            "(e.g. `Finset.sum_comm`), not prose.\n\n"
+            "The corpus is the tree BEFORE this PR. So a declaration this PR adds or renames "
+            "will never be found here, and an empty result is an ANSWER, not a failure: it "
+            "means the name is genuinely new, which is what refutes a duplication or "
+            "'already exists' claim. Do not re-query a name that came back empty, and do not "
+            "treat empty as the search being broken."
         )
     )
     async def declaration_search(
@@ -303,7 +308,12 @@ def _register_declaration(task, mcp) -> None:
         })
         return {
             "success": True, "count": len(hits), "searched_terms": terms,
-            "results": rendered or f"(no declaration of {identifier!r} at the base commit)",
+            "results": rendered or (
+                f"No declaration of {identifier!r} exists at the base commit. This is a "
+                "finding, not a failed lookup: the name is new in this PR (or renamed by "
+                "it), so nothing in the pre-PR library duplicates it. Re-querying will "
+                "return the same answer."
+            ),
         }
 
 

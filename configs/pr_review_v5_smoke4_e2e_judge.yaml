@@ -1,0 +1,49 @@
+# Score the smoke4 end-to-end run. NOT comparable to rep2.
+#
+# Different denominator: 4 PRs and 9 anchored obligations here against rep2's 11 PRs and 20.
+# A recall figure from this cannot be placed beside rep2's — one flipped verdict is 11pp, and
+# the two sets do not contain the same asks. What it can answer is narrower and still worth
+# the few cents:
+#
+#   * did any of the 7 published findings match an obligation? (all 7 are `proof-golf` via the
+#     compile gate, and 33285 — the golf PR — is not in this set, so a hit here would be
+#     somewhere unexpected);
+#   * do the 12 diagnostic findings pair with anything? Stage 0 restores lead-removed claims
+#     to `findings.jsonl`, so pre-publication recall is the honest measure of what the system
+#     *found* as opposed to what it would say;
+#   * is `family_design`'s unanimous abstention (0 candidates from 11 invocations) matched by
+#     an absence of family-shaped gold reaching anything else?
+#
+# There are NO control PRs in this set — both controls are larger than every PR here — so
+# `silent_pr_emission` is unmeasurable and precision is not assessed.
+#
+# `pairing_tiers: [anchor]` stays as it is everywhere else. Widening it here would make this
+# run incomparable with every previous one on top of already having a different denominator.
+scaffold_type: ape_agent
+
+llm_config:
+  # Must stay gpt_5_mini: judge_version and model are both in the cache key and in the task
+  # record hash, so changing either forks the cache and forfeits every cached verdict.
+  model_name: gpt_5_mini
+  max_tokens: 4000
+  thinking_budget_tokens: 3000
+
+execution:
+  max_turns: 4
+  max_concurrency: 4
+  sample_count: 3        # majority vote, and it measures its own verdict flips
+  sample_max_cost: 0.10
+
+task_config:
+  enabled_tools: []      # the judge reads its pair from the prompt
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+  input_kind: finding
+  candidates: results/pr_review_v5/runs/pr_review_v5_smoke4_e2e_rep1/findings.jsonl
+  out_dir: results/pr_review_v5/audits/smoke4-e2e-rep1
+  run_name: pr_review_v5_judge_smoke4_e2e_rep1
+  pr_numbers: [33117, 33145, 33337, 33362]
+  control_pr_numbers: []
+  pairing_tiers: [anchor]
+  dry_run: true

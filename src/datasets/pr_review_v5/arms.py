@@ -35,7 +35,7 @@ from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha
 
 from .schema import CONTEXT_TOOLS, ReviewArm
 
-ARM_REGISTRY_VERSION = "v5-arm-registry/1"
+ARM_REGISTRY_VERSION = "v5-arm-registry/2"
 
 #: Every arm — generalist and specialist alike — is the same registered task type. Only its
 #: prompt, its tools and its context grant differ. Keeping one task class keeps the
@@ -84,8 +84,20 @@ def _relaxed(spec: FocusedAgentSpec) -> FocusedAgentSpec:
     return replace(spec, lifecycles=_BOTH_LIFECYCLES, spec_version=V5_SPEC_VERSION)
 
 
+#: Changed things that are not declarations. The modification inventory for the medium
+#: release holds 49 `module_doc`, 46 `namespace_or_section`, 91 `command` and 17 `import`
+#: records — and until now *no arm accepted any of them*, because every spec took
+#: `DECLARATION_KINDS`. Two gold obligations are unreachable purely because of that: PR
+#: 33305 asks to wrap an over-long line in a module doc, and PR 33362 asks to move
+#: declarations inside `namespace Complex`. Both are ordinary review comments about things
+#: no arm was allowed to look at.
+MODULE_DOC_KINDS = frozenset({"module_doc"})
+PLACEMENT_KINDS = frozenset({"namespace_or_section", "command", "import"})
+
+
 def _new_spec(spec_id: str, concern_family: str, issue_kind: str, rationale: str,
               *, component: Optional[str] = None,
+              extra_subject_kinds: frozenset = frozenset(),
               lifecycles: frozenset = _BOTH_LIFECYCLES) -> FocusedAgentSpec:
     hashes = _prompt_hashes()
     return FocusedAgentSpec(
@@ -96,7 +108,7 @@ def _new_spec(spec_id: str, concern_family: str, issue_kind: str, rationale: str
         issue_kind=issue_kind,
         lifecycles=lifecycles,
         component=component,
-        subject_kinds=DECLARATION_KINDS,
+        subject_kinds=DECLARATION_KINDS | extra_subject_kinds,
         prompt_sha256=hashes[spec_id][0],
         tools_sha256=hashes[spec_id][1],
         rationale=rationale,
@@ -126,19 +138,50 @@ def v5_specs() -> List[FocusedAgentSpec]:
         # mislabelling would lose the match it was trying to make.
         _new_spec(
             "docs", "documentation", "documentation_gap",
-            "Is the docstring accurate? Typos and contradicted statements are small, exact, "
-            "and the easiest thing for a reader scanning for something substantive to miss.",
+            # Rewritten against what maintainers actually asked for. Measured on heldout11:
+            # every one of 16 documentation candidates was a *contradiction* claim — "the
+            # docstring says X, the code says Y" — while the three documentation obligations
+            # in gold asked to finish an unfinished sentence, correct a typo, and add an
+            # "Implementation details" discussion explaining a non-obvious proof approach.
+            # Accuracy is one of three things a docstring can fail at, and it was the only
+            # one being checked. Three of the 16 landed on control PRs, where maintainers
+            # asked for nothing at all.
+            "Is the documentation COMPLETE, CORRECT and CONFORMANT — in that order?\n"
+            "  * complete: a sentence that stops mid-thought, a hypothesis or a `TODO` left "
+            "unexplained, a module whose non-obvious approach has no `Implementation "
+            "details` note. This is the most requested and the least often noticed.\n"
+            "  * correct: a typo, or a statement the code contradicts.\n"
+            "  * conformant: over-long lines and malformed markup, which the repository's "
+            "own linter can settle.\n"
+            "A docstring that is merely terse is not a finding. Neither is a cross-reference "
+            "you have not opened and confirmed is wrong.",
+            extra_subject_kinds=MODULE_DOC_KINDS,
         ),
         _new_spec(
             "style", "style", "style_norm_violation",
-            "Is this formatted the way the surrounding file formats things? Only a deviation "
-            "from a convention the file is otherwise consistent about.",
+            "Is this formatted and placed the way the surrounding file does it? Only a "
+            "deviation from a convention the file is otherwise consistent about — including "
+            "where a declaration sits: a lemma that belongs inside a `namespace` block and "
+            "was left outside it is a placement defect, not a matter of taste.",
+            extra_subject_kinds=MODULE_DOC_KINDS | PLACEMENT_KINDS,
         ),
         _new_spec(
             "api_reuse", "duplication", "missed_canonical_api",
             "Does the code re-derive something the library already provides, or spell an "
             "existing API the long way? Smaller and commoner than whole-declaration "
             "duplication, and checkable by compiling the replacement.",
+        ),
+        _new_spec(
+            # The arm that owns a group. Five of the nineteen audited obligations cannot be
+            # resolved by a reviewer confined to one declaration with one edit — rename a
+            # pair, add a lemma and prove it from its dual, attribute a family and delete the
+            # siblings it generates — and no existing arm's concern covers "these are wrong
+            # together". It is the only arm besides `migration_consistency` allowed to submit
+            # a coordinated patch, because it is the only one whose scope is a set.
+            "family_design", "generalization", "generalization_available",
+            "Are these declarations right AS A GROUP — a dual proved from scratch instead of "
+            "from its counterpart, a missing counterpart, a generated form written by hand, "
+            "a repeated argument that should be one lemma?",
         ),
         _new_spec(
             "correctness", "correctness", "correctness_policy",
@@ -156,6 +199,61 @@ def v5_specs() -> List[FocusedAgentSpec]:
 CHECKABLE_ARMS = frozenset({"proof_golf", "proof_idiom", "duplication", "generality",
                             "api_reuse", "correctness"})
 
+#: `lean_verify_edit` is granted to every arm without exception. It is registered by the
+#: shared review base for *all* review tasks, and the smoke4 run measured 87 of its 100
+#: calls carrying a real edit — it is the one tool that turns a suggestion into a checked
+#: one, and no arm should be reviewing without it.
+_UNIVERSAL_CONTEXT_TOOLS = ("lean_verify_edit",)
+
+#: The retrieval grant, per arm, matched to the shape of the answer that arm needs.
+#:
+#: This was uniform until smoke4 measured what the arms do with four retrieval tools: they
+#: reach for the cheapest identifier lookup rather than the one that answers their question.
+#: `family_design` spent **50 of its 63** discretionary retrieval calls on
+#: `declaration_search` — which returns nothing but `X is declared in file Y` — against 13
+#: on `content_search`, the only tool that could have found the mechanism its own prompt
+#: told it to look for. It produced zero candidates from eleven invocations.
+#:
+#: So the rule is output shape, not concern:
+#:
+#: * `declaration_search` answers "does this name exist, and where" — it belongs to the arms
+#:   whose question is about a *named* thing: is there already a lemma for this, where does
+#:   this sibling live, what is the canonical form called.
+#: * `precedent_search` and `zulip_search` answer "what do maintainers say" — they belong to
+#:   the arms whose question is a convention, which is not decidable from the code corpus.
+#:   This is measured too: the code corpus argues *against* the maintainer in both naming
+#:   cases (`coe_` 4,707 against `toLinearMap_` 50), while the review corpus states them.
+#: * every arm keeps `content_search` (a file-system tool, never gated here) and
+#:   `lean_verify_edit`.
+#:
+#: An arm absent from this table gets the universal grant only. That is deliberate for
+#: `family_design`: denying it the identifier lookup it wasted its budget on is the whole
+#: intervention, and `content_search` remains available to it.
+_CONTEXT_GRANTS: Dict[str, tuple] = {
+    # "is there already a declaration that does this?" — a name question.
+    "proof_golf": ("declaration_search",),
+    "proof_idiom": ("declaration_search",),
+    "duplication": ("declaration_search",),
+    "api_reuse": ("declaration_search",),
+    "generality": ("declaration_search",),
+    "correctness": ("declaration_search",),
+    # Naming is both: what the siblings are called, and what maintainers call them.
+    "naming": ("declaration_search", "precedent_search", "zulip_search"),
+    # Pure convention arms. Neither question is settled by the library's own frequencies.
+    "docs": ("precedent_search", "zulip_search"),
+    "style": ("precedent_search", "zulip_search"),
+    # `family_design` asks whether a *group* is shaped right. No identifier lookup answers
+    # that, and the measurement above is what removed it.
+    "family_design": ("precedent_search", "zulip_search"),
+}
+
+
+def _grant_for(arm_id: str) -> List[str]:
+    """This arm's context grant, in `CONTEXT_TOOLS` order so the hash is stable."""
+
+    granted = set(_CONTEXT_GRANTS.get(arm_id, ())) | set(_UNIVERSAL_CONTEXT_TOOLS)
+    return [name for name in CONTEXT_TOOLS if name in granted]
+
 
 def _generalist_arm(renderer_version: str) -> ReviewArm:
     """The per-site control: same sites and tools as the specialists, no concern filter.
@@ -163,6 +261,11 @@ def _generalist_arm(renderer_version: str) -> ReviewArm:
     Its prompt is the release's own rendered production prompt, so the arm-level hash
     identifies the *renderer* rather than a template string — there is no generalist
     template to hash, the renderer is the template.
+
+    It keeps all four context tools when the specialists no longer do. That is the point of
+    a control: it is the arm every prior run was measured against, and narrowing it would
+    make the specialist grant and the generalist's own reach move at the same time, so
+    neither could be read off the result.
     """
 
     return sealed_model(
@@ -197,7 +300,7 @@ def _specialist_arm(spec: FocusedAgentSpec) -> ReviewArm:
         spec_id=spec.spec_id,
         prompt_sha256=spec.prompt_sha256,
         tools_sha256=spec.tools_sha256,
-        context_tools=list(CONTEXT_TOOLS),
+        context_tools=_grant_for(spec.spec_id),
         cost_hint=COST_HINT_PER_WORK_UNIT,
         rationale=spec.rationale,
     )
@@ -243,10 +346,14 @@ def registry_identity(arms: List[ReviewArm]) -> Dict[str, str]:
 def resolve_context_tools(arm: ReviewArm, available: Optional[List[str]] = None) -> List[str]:
     """Which context tools this arm actually gets, intersected with what the run offers.
 
-    Every arm defaults to all four. Which evidence source a given concern needs is an open
-    question the precedent design says to settle by benchmark; answering it here by handing
-    the duplication arm retrieval and denying it to golf would bake in an assumption that
-    has never been measured. The field exists so the question stays askable.
+    This used to hand every arm all four, on the stated grounds that which evidence source a
+    concern needs was unmeasured and that answering it by assumption would bake in a guess.
+    smoke4 measured it. Given the choice of four, the arms converge on the cheapest
+    identifier lookup regardless of what they are being asked: 106 `declaration_search`
+    calls run-wide, 50 of them from `family_design`, whose question no identifier lookup can
+    answer and which returned nothing from eleven invocations. The grant is now per arm and
+    the reasoning is in `_CONTEXT_GRANTS`; the generalist is deliberately exempt so it stays
+    comparable with the runs before this one.
     """
 
     grant = [item for item in arm.context_tools if item in CONTEXT_TOOLS]

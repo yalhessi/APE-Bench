@@ -1,0 +1,43 @@
+# Site-first INSTANTIATION checker on the full 57 gold-bearing PRs.
+# The inversion of generative review: sites + concern types come from the precomputed worklist
+# (site_worklist.py — neighbor-derived concern profiles with exemplar precedents); the agent only
+# decides APPLY/SKIP per item and produces verified findings. Measures the blind
+# instantiation-match rate — the last unmeasured factor of the site-first pipeline's recall ceiling
+# (site enumeration = 100% of anchored gold; concern availability = 83%).
+#
+#   python -m src.datasets.pr_review_v2.site_worklist          # build the worklist first (needs API once)
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_instantiate_v2_full.yaml
+#   python -m src.datasets.pr_review_v2.evaluate_d2 <gold> <preds> mode=target topical_gate=True
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 16
+
+task_config:
+  finding_budget: 12          # >= max checklist items per PR (~2-4 sites x 2 concerns)
+  worklist_file: inputs/pr_review_v2/precedent_bench/worklist_by_pr.jsonl
+  # enabled_tools omitted -> idiom-style verify+search toolset (+ lean_verify_edit).
+
+dataset:
+  task_type: lean_pr_review_instantiate
+  # v2: decision-prior-corrected prompt + typical-ask worklist + module-header verify fix.
+  # Fresh run_name/output_file — do NOT resume the v1 run (prompt changed).
+  run_name: pr_review_instantiate_v2_gpt52_57prs
+  output_file: inputs/pr_review_v2/predictions/preds_instantiate_v2_gpt_5.2.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145,
+               33146, 33149, 33150, 33153, 33154, 33169, 33183, 33190, 33201, 33203,
+               33207, 33208, 33232, 33267, 33268, 33283, 33285, 33287, 33294, 33310,
+               33316, 33321, 33332, 33333, 33337, 33343, 33345, 33349, 33356, 33362,
+               33373, 33376, 33395, 33400, 33401, 33419, 33421]
+  resume: true

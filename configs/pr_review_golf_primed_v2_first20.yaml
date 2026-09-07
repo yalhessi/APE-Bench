@@ -1,0 +1,34 @@
+# PRIMED golf checker (Stage-2 Mode A). Identical to configs/pr_review_golf_v2_first20.yaml EXCEPT
+# the checker is primed with retrieved past-maintainer precedents (precedent_file). The unprimed
+# config stays as the ablation baseline — run both and diff recall / on-target / finding-count.
+#
+#   python -m src.datasets.pr_review_v2.precedent_prime            # build precedents_by_pr.jsonl first
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_golf_primed_v2_first20.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 16
+
+task_config:
+  finding_budget: 10
+  precedent_file: inputs/pr_review_v2/precedent_bench/precedents_by_pr.jsonl
+  precedent_top_k: 6
+  # enabled_tools omitted -> the golf checker's native verify+search toolset (+ lean_verify_edit).
+
+dataset:
+  task_type: lean_pr_review_golf
+  run_name: pr_review_golf_primed_gpt52_first20_decl
+  output_file: inputs/pr_review_v2/predictions/preds_golf_primed_gpt_5.2_first20.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145]
+  resume: true

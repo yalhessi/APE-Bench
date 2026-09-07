@@ -1,0 +1,34 @@
+# Guidelines-supplied review on the FULL gold-bearing set (57 PRs, 115 findings).
+# Identical to pr_review_workspace_v2_full.yaml except task_type — the supplied
+# Mathlib guidelines are the only variable. Pair the two for the scaled comparison.
+#
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_guidelines_v2_full.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.4
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 2
+
+task_config:
+  finding_budget: 10
+  prompt_version: acceptability_v2
+  enabled_tools: [file_read, content_search, lean_verify, get_lean_goal, code_hover, code_goto, code_references]
+
+dataset:
+  task_type: lean_pr_review_guidelines
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145,
+               33146, 33149, 33150, 33153, 33154, 33169, 33183, 33190, 33201, 33203,
+               33207, 33208, 33232, 33267, 33268, 33283, 33285, 33287, 33294, 33310,
+               33316, 33321, 33332, 33333, 33337, 33343, 33345, 33349, 33356, 33362,
+               33373, 33376, 33395, 33400, 33401, 33419, 33421]
+  resume: true

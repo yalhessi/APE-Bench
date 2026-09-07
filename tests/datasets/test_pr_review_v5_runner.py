@@ -263,8 +263,9 @@ def test_specialist_spend_is_counted_in_the_manifest():
                             "proposal_id": item.proposal_id, "arm_id": item.arm_id,
                             "work_unit_id": item.work_unit_id, "pr_number": item.pr_number,
                             "disposition": "mandatory", "reason": "", "status": "success",
-                            # floor rows carry no cost; it arrives as extra_cost
-                            "cost": None, "context_calls": []})
+                            # The floor now runs through the lead, so its spend is on the
+                            # ledger like any other job rather than arriving separately.
+                            "cost": 0.02, "context_calls": []})
         elif index % 7 == 0:
             records.append({"schema_version": "v5-delegation1",
                             "invocation_id": item.invocation_id,
@@ -293,6 +294,8 @@ def test_specialist_spend_is_counted_in_the_manifest():
         results=SimpleNamespace(total_cost=1.30, wall_clock_time=180.0),
         issues_total=30, extra_cost=2.97,
     )
-    assert manifest.total_cost == pytest.approx(1.30 + 2.97 + 0.10 * specialists)
-    # And the floor is not double counted through the ledger.
-    assert manifest.total_cost > 4.27
+    floor_jobs = sum(1 for r in records if r["disposition"] == "mandatory")
+    assert manifest.total_cost == pytest.approx(
+        1.30 + 2.97 + 0.10 * specialists + 0.02 * floor_jobs)
+    assert manifest.cost_breakdown["nested"] == pytest.approx(
+        0.10 * specialists + 0.02 * floor_jobs)

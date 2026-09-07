@@ -47,6 +47,19 @@ def _proposal(work_unit_id, arm_id, *, mandatory=False, eligible=True):
     }
 
 
+#: What the lead now reads: one ranked row per work unit, not a page of (arm, unit) pairs.
+CENSUS = [
+    {
+        "work_unit_id": "wu:1",
+        "rank": 1,
+        "subjects": ["Foo.bar"],
+        "why": ["`Foo.bar` is a chain of 4 low-level tactic steps"],
+        "suggested_arms": ["proof_golf", "proof_idiom"],
+        "available_arms": {"proof_golf": "wu:1#proof_golf",
+                           "duplication": "wu:1#duplication"},
+    },
+]
+
 PROPOSALS = [
     _proposal("wu:1", "generalist", mandatory=True),
     _proposal("wu:1", "proof_golf"),
@@ -79,6 +92,7 @@ def lead(tmp_path):
         task_id="pr5lead_test", episode_id="ep:1", pr_number=33098,
         pr_title="t", pr_description="d", diff="--- a\n+++ b\n",
         changed_files=["Mathlib/A.lean"], proposals=list(PROPOSALS),
+        census=list(CENSUS),
         arm_pool_path=str(_pool_file(tmp_path)),
         trace_path=str(tmp_path / "trace.jsonl"),
         target_workspace={"name": "target", "commit_hash": "c" * 40,
@@ -97,31 +111,64 @@ def test_the_lead_task_is_registered():
     assert get_task_class(LEAD_TASK_TYPE) is LeanPRReviewV5LeadTask
 
 
-def test_the_agenda_hides_the_mandatory_floor(lead):
-    """The generalist is not a decision, so offering it as one invites the lead to spend
-    reasoning on a job it cannot influence."""
+def test_the_agenda_is_ranked_work_units_not_a_hash_ordered_page(lead):
+    """The change this replaced: a page of (arm, unit) pairs ordered by content hash, which
+    let nine of eleven leads see 5 of 56 work units and route from that."""
 
     _task, tools = lead
     agenda = asyncio.run(tools["read_agenda"]())
-    assert agenda["total"] == 2
-    assert {job["arm_id"] for job in agenda["jobs"]} == {"proof_golf", "duplication"}
+    assert agenda["work_units_total"] == 1
+    row = agenda["ranked_work_units"][0]
+    assert row["rank"] == 1
+    assert row["work_unit_id"] == "wu:1"
+
+
+def test_each_row_says_why_it_ranked_there(lead):
+    """A rank with no reason is just a different arbitrary order."""
+
+    _task, tools = lead
+    row = asyncio.run(tools["read_agenda"]())["ranked_work_units"][0]
+    assert row["why"] and "tactic steps" in row["why"][0]
+    assert row["suggested_arms"] == ["proof_golf", "proof_idiom"]
+
+
+def test_each_row_carries_the_ids_delegate_needs(lead):
+    """The lead routes straight from this; a row without proposal ids is unroutable."""
+
+    _task, tools = lead
+    row = asyncio.run(tools["read_agenda"]())["ranked_work_units"][0]
+    assert row["available_arms"]["proof_golf"] == "wu:1#proof_golf"
+
+
+def test_the_lead_is_told_how_much_it_has_not_seen(lead):
+    """Truncation is fine; silent truncation is what caused the failure."""
+
+    _task, tools = lead
+    agenda = asyncio.run(tools["read_agenda"](top=1))
+    assert agenda["remaining_below"] == 0
+    assert agenda["showing"] == [1, 1]
     assert agenda["mandatory_generalist_jobs"] == 1
 
 
-def test_the_agenda_can_be_filtered_to_the_rule_selection(lead):
-    _task, tools = lead
-    agenda = asyncio.run(tools["read_agenda"](eligible_only=True))
-    assert [job["arm_id"] for job in agenda["jobs"]] == ["proof_golf"]
+def test_task_data_without_a_census_still_serves_the_agenda(tmp_path):
+    """Older runs carry no census; falling back beats returning nothing."""
 
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-def test_the_agenda_exposes_targets_and_rationale(lead):
-    """A lead choosing between arms needs to know what each would look at and why it exists."""
-
-    _task, tools = lead
-    job = asyncio.run(tools["read_agenda"]())["jobs"][0]
-    assert job["targets"] == ["change:a"]
-    assert job["rationale"]
-    assert "eligible" in job
+    data = LeanPRReviewV5LeadData(
+        task_id="t", episode_id="ep:1", pr_number=33098, pr_title="t", pr_description="d",
+        diff="d", changed_files=["A.lean"], proposals=list(PROPOSALS), census=[],
+        arm_pool_path=str(_pool_file(tmp_path)),
+        target_workspace={"name": "target", "commit_hash": "c" * 40,
+                          "repo_url": "https://e.invalid/m.git", "default_target": "Mathlib"})
+    task = LeanPRReviewV5LeadTask(
+        data, ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
+    mcp = FakeMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    agenda = asyncio.run(mcp.tools["read_agenda"]())
+    assert agenda["ranked"] is False
+    assert agenda["total"] == 2
 
 
 def test_a_job_outside_the_pool_is_refused(lead):
@@ -130,6 +177,7 @@ def test_a_job_outside_the_pool_is_refused(lead):
 
     task, tools = lead
     task._state()["floor_done"] = True   # isolate job validation from the wave-1 injection
+    task._state()["comprehension"] = {"summary": "s", "questions": []}
     result = asyncio.run(tools["delegate"](jobs=[
         {"arm_id": "proof_golf", "work_unit_id": "wu:does-not-exist"}]))
     assert result["success"] is False
@@ -139,6 +187,7 @@ def test_a_job_outside_the_pool_is_refused(lead):
 def test_a_job_naming_neither_a_proposal_nor_a_pair_is_refused(lead):
     task, tools = lead
     task._state()["floor_done"] = True
+    task._state()["comprehension"] = {"summary": "s", "questions": []}
     result = asyncio.run(tools["delegate"](jobs=[{"budget_tier": "deep"}]))
     assert result["success"] is False
     assert "proposal_id" in result["rejected"][0]["reason"]
@@ -207,9 +256,14 @@ def test_a_pruned_proposal_is_recorded_with_its_reason(lead):
     assert by_id["wu:1#proof_golf"]["status"] is None
 
 
-def test_assessments_are_recorded_verbatim_and_applied_nowhere(lead):
-    """Recorded because they are the evidence for whether arbitration is worth building;
-    applied nowhere because publication belongs to the gates."""
+def test_assessments_reach_the_result_and_are_applied_only_subtractively(lead):
+    """The v1 contract was "recorded, never applied"; §3 replaced it with a narrower one.
+
+    Assessments are now consumed by `finalize`, so the guarantee cannot be "nothing reads
+    them" any more. It is the boundary instead: `synthesis.apply_assessments` returns
+    subsets of the candidate lists it is given, so no assessment can introduce a candidate,
+    and admission still belongs to the evidence chain.
+    """
 
     task, tools = lead
     assessment = {"invocation_id": "wu:1#proof_golf", "candidate_ordinal": 0,
@@ -218,15 +272,17 @@ def test_assessments_are_recorded_verbatim_and_applied_nowhere(lead):
         pruned=[{"proposal_id": "wu:1#proof_golf", "reason": "r"},
                 {"proposal_id": "wu:1#duplication", "reason": "r"}],
         candidate_assessments=[assessment]))
-    result = task._last_result if hasattr(task, "_last_result") else None
-    # The assessment reaches the result untouched; nothing downstream consumes it.
+
     import inspect
 
     from src.datasets.pr_review_v5 import finalize as finalize_module
 
-    assert "candidate_assessments" not in inspect.signature(finalize_module.finalize).parameters
-    source = inspect.getsource(finalize_module)
-    assert "candidate_assessments" not in source
+    assert "candidate_assessments" in inspect.signature(
+        finalize_module.finalize).parameters
+    # Synthesis runs before the gate, never after it: a dropped candidate must not reach
+    # the evidence chain, and a kept one must not skip it.
+    source = inspect.getsource(finalize_module.finalize)
+    assert source.index("= apply_assessments(") < source.index("= collect_supported(")
 
 
 def test_the_lead_does_not_expose_a_findings_tool(lead):
@@ -235,7 +291,8 @@ def test_the_lead_does_not_expose_a_findings_tool(lead):
 
     _task, tools = lead
     assert "submit_findings" not in tools
-    assert set(tools) == {"lean_verify_edit", "read_agenda", "delegate", "submit_routing"}
+    assert set(tools) == {"lean_verify_edit", "read_agenda", "submit_comprehension",
+                          "delegate", "submit_routing"}
 
 
 # --------------------------------------------------------------------------------------
@@ -308,6 +365,7 @@ def test_the_per_pr_cost_cap_is_actually_enforced(lead):
     task, tools = lead
     state = task._state()
     state["floor_done"] = True
+    state["comprehension"] = {"summary": "s", "questions": []}
     state["delegated_spend"] = task._task_config().per_pr_cost_cap + 0.01
     result = asyncio.run(tools["delegate"](jobs=[
         {"proposal_id": "wu:1#proof_golf", "budget_tier": "standard"}]))
@@ -334,6 +392,7 @@ def test_the_floor_does_not_consume_the_per_pr_cost_cap(lead):
     task, tools = lead
     state = task._state()
     state["floor_done"] = True
+    state["comprehension"] = {"summary": "s", "questions": []}
     state["spend"] = 10.05          # a large floor
     state["delegated_spend"] = 0.0  # but nothing the lead chose
     # Stub the executor: what is under test is the admission decision, not the spawn.
@@ -351,3 +410,55 @@ def test_the_floor_does_not_consume_the_per_pr_cost_cap(lead):
         lead_module.run_jobs = original
     # Not refused on cost grounds: the floor is not a routing decision.
     assert not any("cost cap" in r["reason"] for r in result.get("rejected", []))
+
+
+# --- comprehension precedes delegation --------------------------------------------------
+
+def test_nothing_is_delegated_before_the_lead_has_read_the_pr(lead):
+    """A lead that dispatches before saying what the change is doing is routing on the
+    diff's surface. The gate sits on `delegate` rather than in an optional preamble because
+    the coverage floor rides that same call."""
+
+    _task, tools = lead
+    result = asyncio.run(tools["delegate"](jobs=[]))
+    assert result["success"] is False
+    assert "submit_comprehension" in result["message"]
+
+
+def test_comprehension_refuses_an_assertion_dressed_as_a_question(lead):
+    """An arm handed a conclusion confirms it, and a confirmed conclusion is not evidence.
+    The check is structural — there is nowhere here to put a severity or a fix, and an entry
+    that does not ask something is rejected outright."""
+
+    _task, tools = lead
+    result = asyncio.run(tools["submit_comprehension"](
+        summary="Deprecates the old spelling across the library.",
+        questions=[{"kind": "convention",
+                    "question": "`foo_bar` should be renamed to `foo_of_baz`."}]))
+    assert result["success"] is False
+    assert "not questions" in result["message"]
+
+
+def test_comprehension_accepts_questions_and_opens_the_gate(lead):
+    task, tools = lead
+    ok = asyncio.run(tools["submit_comprehension"](
+        summary="Adds a dualised API and deprecates the old spelling.",
+        questions=[{"kind": "duality",
+                    "question": "Does the infimum side reuse the supremum lemma, or "
+                                "duplicate its argument?",
+                    "arms": ["generality"]}]))
+    assert ok["success"] is True and ok["questions_recorded"] == 1
+    assert task._state()["comprehension"]["summary"].startswith("Adds a dualised")
+
+
+def test_comprehension_requires_a_summary(lead):
+    _task, tools = lead
+    result = asyncio.run(tools["submit_comprehension"](summary="   ", questions=[]))
+    assert result["success"] is False
+
+
+def test_comprehension_is_submitted_once(lead):
+    _task, tools = lead
+    asyncio.run(tools["submit_comprehension"](summary="A rename.", questions=[]))
+    again = asyncio.run(tools["submit_comprehension"](summary="Something else.", questions=[]))
+    assert again["success"] is False

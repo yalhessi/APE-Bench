@@ -1,0 +1,29 @@
+# Golf checker on the same CURATED 10-PR experiment set (see pr_review_idiom_v2_small.yaml for the
+# rationale of each PR). Cheap iteration before the 57-PR full run.
+#
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_golf_v2_small.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 10
+
+task_config:
+  finding_budget: 10
+  # enabled_tools omitted -> the golf checker's native verify+search toolset (+ lean_verify_edit).
+
+dataset:
+  task_type: lean_pr_review_golf
+  run_name: pr_review_golf_gpt52_small_decl
+  output_file: inputs/pr_review_v2/predictions/preds_golf_gpt_5.2_small_decl.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33401, 33098, 33287, 33137, 33145, 33285, 33373, 33356, 33078, 33111]
+  resume: true

@@ -379,3 +379,38 @@ def test_the_context_sidecar_covers_every_included_obligation():
     assert all(row["maintainer_comment"] for row in context.values())
     assert all(row["provenance"] in {"obligation_event", "judgment_event"}
                for row in context.values())
+
+
+def test_the_denominator_counts_only_the_prs_that_were_judged():
+    """`pr_numbers` selected which pairs were built but not which obligations were counted.
+
+    Measured on heldout11 rep2: a run over 11 PRs reported 40 obligations, 20 of them
+    belonging to PRs it never reviewed — each an automatic miss. Recall was being divided by
+    other runs' work.
+    """
+
+    mine = _judgment([_obligation("obligation:mine")], pr_number=1)
+    theirs = _judgment([_obligation("obligation:theirs")], pr_number=99)
+    theirs = theirs.model_copy(update={"judgment_id": "j2"})
+    views = [
+        _view(["obligation:mine"]),
+        _view(["obligation:theirs"]).model_copy(
+            update={"view_id": "v2", "judgment_ids": ["j2"]}),
+    ]
+    judgments = [mine, theirs]
+
+    unscoped = semantic_report(judgments, views, [_candidate()], [])
+    assert unscoped["counts"]["obligations"] == 2
+
+    scoped = semantic_report(judgments, views, [_candidate()], [], scoped_pr_numbers=[1])
+    assert scoped["counts"]["obligations"] == 1
+    assert [row["obligation_id"] for row in scoped["per_obligation"]] == ["obligation:mine"]
+
+
+def test_no_pr_scope_preserves_the_whole_release_denominator():
+    """Every existing v4 caller passes nothing and must be unaffected."""
+
+    judgments = [_judgment([_obligation("obligation:a"), _obligation("obligation:b")])]
+    views = [_view(["obligation:a", "obligation:b"])]
+    assert semantic_report(
+        judgments, views, [_candidate()], [])["counts"]["obligations"] == 2

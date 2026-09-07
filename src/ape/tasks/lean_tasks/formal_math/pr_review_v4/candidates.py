@@ -53,6 +53,18 @@ class ProposedEditSubmission(BaseModel):
     replacement: Optional[str] = None
 
 
+class PatchEditSubmission(BaseModel):
+    """One edit inside a coordinated fix. Same two modes as `proposed_edit`."""
+
+    model_config = ConfigDict(extra="forbid")
+    path: str
+    declaration_name: Optional[str] = None
+    new_declaration: Optional[str] = None
+    line_start: Optional[int] = Field(default=None, ge=1)
+    line_end: Optional[int] = Field(default=None, ge=1)
+    replacement: Optional[str] = None
+
+
 class CandidateSubmission(BaseModel):
     model_config = ConfigDict(extra="forbid")
     primary_change_id: str
@@ -80,6 +92,12 @@ class CandidateSubmission(BaseModel):
     requested_change: str
     suggested_fix: Optional[str] = None
     proposed_edit: Optional[ProposedEditSubmission] = None
+    #: Several edits that stand or fall together, for a fix one edit cannot express — rename
+    #: a pair, add a lemma and prove it from its dual, attribute a family and delete the
+    #: siblings it generates. Refused by default: `_patch_set_error` rejects it unless the
+    #: task opts in, so the v4 contract is unchanged and no arm gains the capability by
+    #: accident.
+    patch_set: Optional[List[PatchEditSubmission]] = None
     model_confidence: Optional[float] = Field(default=None, ge=0, le=1)
 
 
@@ -266,6 +284,47 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             )
         return gate_error(issue_kind, compare_statements(original, replacement))
 
+    async def _verify_patch_set(
+        self, candidate_ordinal: int, candidate: Dict[str, Any]
+    ) -> tuple[List[Dict[str, Any]], Optional[str]]:
+        """Apply and compile a coordinated patch, producing one artifact for the whole thing.
+
+        Deliberately one artifact rather than one per file: `focused_findings` joins a
+        warrant to a candidate, and a candidate whose warrant covered three of its four files
+        would be publishable while unverified in the fourth.
+        """
+
+        from src.datasets.pr_review_v5.patchset import (
+            PatchEdit, PatchSet, verification_artifact, verify,
+        )
+
+        workspace = self._patch_set_workspace()
+        if workspace is None:
+            return [], ("no workspace is available to compile a coordinated patch in; "
+                        "submit a single proposed_edit instead")
+        patch = PatchSet(tuple(
+            PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),
+                      new_declaration=r.get("new_declaration"),
+                      line_start=r.get("line_start"), line_end=r.get("line_end"),
+                      replacement=r.get("replacement"))
+            for r in (candidate.get("patch_set") or [])))
+        ok, report, touched = verify(patch, workspace)
+        if not ok:
+            return [], (
+                "the coordinated patch does not compile, so the whole candidate is refused "
+                f"— fix every edit or drop the candidate:\n{report[-2000:]}")
+        return [verification_artifact(
+            work_unit_id=self.data.work_unit_id, candidate_ordinal=candidate_ordinal,
+            patch=patch, success=True, content=report[-4000:],
+            snapshot_sha=self.data.snapshot_head_sha or "", touched=touched,
+        )], None
+
+    def _patch_set_workspace(self):
+        """The reviewed workspace this task compiles in, or `None`."""
+
+        root = getattr(self, "target_workspace", None)
+        return Path(root) if root else None
+
     async def _verify_candidate_submission(
         self, candidate_ordinal: int, candidate: Dict[str, Any]
     ) -> tuple[List[Dict[str, Any]], Optional[str]]:
@@ -275,6 +334,14 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         checkable = candidate.get("concern_family") in CHECKABLE_CONCERN_FAMILIES
         if self.data.submission_verification_policy != "verify_checkable_edits":
             return [], None
+        # A coordinated fix earns its warrant as one thing: every touched file is compiled
+        # and the candidate stands or falls on the whole result. It cannot fall back to the
+        # single-edit path, because the halves of a coordinated fix are individually wrong —
+        # deleting a generated sibling without the attribute that regenerates it does not
+        # compile, and correctly should not.
+        if candidate.get("patch_set"):
+            artifacts, error = await self._verify_patch_set(candidate_ordinal, candidate)
+            return artifacts, error
         if checkable and edit is None:
             return [], (
                 f"{candidate.get('concern_family')} candidates require a structured proposed_edit "
@@ -345,6 +412,34 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         ))
         return artifacts, None
 
+    #: Files a coordinated patch may touch. Empty means the task does not accept one at all,
+    #: which is the default: a capability nothing granted is a capability nothing can misuse.
+    patch_set_paths: tuple = ()
+
+    def _patch_set_error(self, candidate: Dict[str, Any]) -> Optional[str]:
+        """Refuse a patch set unless this task accepts one, and unless it is confined.
+
+        Default-deny. The v4 contract has no coordinated edits and gains none by a field
+        appearing on a shared model; a task that wants them says so by setting
+        `patch_set_paths`, which is also exactly the confinement boundary.
+        """
+
+        rows = candidate.get("patch_set")
+        if not rows:
+            return None
+        if not self.patch_set_paths:
+            return ("patch_set is not accepted by this check; submit a single proposed_edit")
+        from src.datasets.pr_review_v5.patchset import PatchEdit, PatchSet, validate
+
+        patch = PatchSet(tuple(
+            PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),
+                      new_declaration=r.get("new_declaration"),
+                      line_start=r.get("line_start"), line_end=r.get("line_end"),
+                      replacement=r.get("replacement"))
+            for r in rows))
+        problems = validate(patch, self.patch_set_paths)
+        return "; ".join(problems) if problems else None
+
     def _extra_candidate_error(self, candidate: Dict[str, Any]) -> Optional[str]:
         """A hook for scope rules a subclass adds to the shared submission contract.
 
@@ -400,6 +495,9 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                     candidate, self.data.changed_files, problems,
                     self.data.paths_by_change,
                 )
+                patch_problem = self._patch_set_error(candidate)
+                if patch_problem:
+                    problems.append(patch_problem)
                 extra = self._extra_candidate_error(candidate)
                 if extra:
                     problems.append(extra)

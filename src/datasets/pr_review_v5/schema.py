@@ -100,6 +100,24 @@ class AgendaProposal(StrictModel):
     #: True when the arm's rule selected this pair from the modification inventory.
     eligible: bool
     mandatory: bool
+    #: What the coverage contract says about this pair.
+    #:
+    #: `required` work is not the lead's to skip: it is derived from a trigger the PR itself
+    #: supplies — a stated intent, a component grain, a measured importance — rather than
+    #: from a quota. Measured on heldout11 rep2, the lead ran 30 of 459 specialist proposals
+    #: (7%) while using half its cost cap and a quarter of its job quota, and `proof_golf`,
+    #: `api_reuse` and `generality` ran *zero* times across 11 PRs — including on PR 33285,
+    #: whose title says golf and whose gold is two golf asks.
+    #:
+    #: `recommended` and `optional` remain entirely the lead's call. The contract sets a
+    #: floor under coverage; it does not take over routing.
+    routing_priority: Literal["required", "recommended", "optional"] = "optional"
+    #: Why this priority, in the PR's own terms. Read by the lead, and the thing to audit
+    #: when required work looks wrong: a reason that does not survive reading is a bad rule.
+    routing_reason: str = ""
+    #: The `ReviewComponent` this pair reviews, when one is more specific than the work unit.
+    component_id: Optional[str] = None
+    component_grain: Optional[str] = None
     prompt_sha256: str
     cost_hint: float
     rationale: str
@@ -265,6 +283,12 @@ class V5RunManifest(StrictModel):
     failed: int
     paused: int
     total_cost: float
+    #: Where `total_cost` came from: `lead` (the leads' own conversations, or the single
+    #: orchestrator in the model-free modes), `nested` (everything under a lead attempt —
+    #: floor and specialists), `extra` (caller-supplied remainder). Recorded because the
+    #: three come from orchestrators that cannot see each other, and a total with no
+    #: breakdown is exactly how the floor's $14.52 went missing for a whole run.
+    cost_breakdown: Dict[str, float] = Field(default_factory=dict)
     wall_seconds: float
     candidates_total: int
     issues_total: int

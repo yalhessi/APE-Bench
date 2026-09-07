@@ -1,0 +1,33 @@
+# Composed (fully-decomposed) review — runs the checker set and aggregates.
+# Same standard scaffold-config layout as configs/pr_review_workspace_v2.yaml.
+#
+#   export OPENAI_API_KEY=...
+#   python -m src.datasets.pr_review_v2.review --config configs/pr_review_composed_v2.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.4
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 2
+
+task_config:
+  finding_budget: 10
+  # NOTE: enabled_tools is intentionally omitted so each checker uses its OWN
+  # native toolset (golf/gen are verify-heavy, dup is search-heavy). Set it here
+  # only to force a uniform rung across all checkers.
+
+dataset:
+  # The decomposed checker set. Empty -> review.DECOMPOSED_CHECKERS (golf, dup, gen).
+  checkers: [lean_pr_review_golf, lean_pr_review_dup, lean_pr_review_gen]
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33321, 33322, 33328, 33332, 33333, 33334, 33337, 33340, 33343, 33345,
+               33349, 33356, 33357, 33362, 33367, 33370, 33373, 33376, 33385, 33395,
+               33399, 33400, 33401, 33413, 33418, 33419, 33421, 33432, 33438, 33440]
+  resume: true

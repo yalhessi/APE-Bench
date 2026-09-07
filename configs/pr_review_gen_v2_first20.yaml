@@ -1,0 +1,32 @@
+# Generality checker on the FIRST 20 of the 57 gold-bearing PRs — with the STEERED prompt
+# (generalize the statement only, keep the proof; do not golf) and scored under the v6 concern-type
+# gate. The 10-PR small set was golf-curated and couldn't test gen; the first-20 is a natural sample
+# (V2=31, V3=22), so this is where gen's true generality coverage actually shows up.
+#
+#   python -m src.datasets.pr_review_v2.runner_workspace --config configs/pr_review_gen_v2_first20.yaml
+
+scaffold_type: ape_agent
+
+llm_config:
+  model_name: gpt_5.2
+  max_tokens: 16000
+  thinking_budget_tokens: 8000
+  temperature: 1.0
+
+execution:
+  max_turns: 40
+  sample_max_cost: 2.0
+  max_concurrency: 16
+
+task_config:
+  finding_budget: 10
+  # enabled_tools omitted -> the gen checker's native verify+search toolset (+ lean_verify_edit).
+
+dataset:
+  task_type: lean_pr_review_gen
+  run_name: pr_review_gen_gpt52_first20_decl
+  output_file: inputs/pr_review_v2/predictions/preds_gen_gpt_5.2_first20.jsonl
+  records: inputs/pr_review_v2/mathlib_pr_review_v2_annotated_20260612.jsonl
+  pr_numbers: [33048, 33065, 33066, 33067, 33070, 33078, 33079, 33081, 33086, 33090,
+               33092, 33098, 33101, 33104, 33111, 33117, 33127, 33137, 33141, 33145]
+  resume: true

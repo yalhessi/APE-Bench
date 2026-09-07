@@ -29,6 +29,44 @@ def _tool_env(workspace: Path) -> Dict[str, str]:
     return env
 
 
+#: What a claim actually asserts, as opposed to the topic its arm declares.
+#:
+#: Every collector used to gate on `concern_family`, which is the arm's own label for its
+#: subject area. That silently refused checkable claims: on heldout11 rep2 an agent wrote
+#: "`Meromorphic.add` is duplicated by `Meromorphic.fun_add`" — a duplication assertion
+#: `repository_search` could settle — and filed it under `style`, so the search ran, found
+#: the declarations, and returned `inconclusive` because the *label* was wrong. Meanwhile
+#: `policy` refused to run the repository's own linter on anything not called `style`, so
+#: an over-long line in a docstring came back "no machine-checkable local policy is
+#: registered for 'documentation'".
+#:
+#: `issue_kind` is the field that says what is being claimed, and it already routes the
+#: issue-kind verifiers. Collectors now route on it too, falling back to `concern_family`
+#: for candidates old enough to predate it.
+
+#: Claims the repository's own style checker can adjudicate: anything that is a property of
+#: the changed file's text. A docstring line that is too long is a lint violation whoever
+#: files it.
+POLICY_CHECKABLE_KINDS = frozenset({"style_norm_violation", "documentation_gap"})
+
+#: Claims that are settled by whether something already exists in the library.
+SEARCH_CHECKABLE_KINDS = frozenset({
+    "duplicate_implementation", "missed_canonical_api", "generalization_available",
+})
+
+
+def _asserts(candidate, kinds, families) -> bool:
+    """Whether this claim makes a proposition the collector can decide.
+
+    Reads `issue_kind` first and `concern_family` only as a fallback, so a claim filed under
+    the wrong topic is still checked for what it actually says.
+    """
+
+    if getattr(candidate, "issue_kind", None):
+        return candidate.issue_kind in kinds
+    return candidate.concern_family in families
+
+
 def _candidate_spans(candidate: CandidateClaim, graph: ChangeGraph) -> Dict[str, List[Tuple[int, int]]]:
     entities = {item.entity_id: item for item in graph.entities}
     ranges = {item.range_id: item for item in graph.changed_ranges}
@@ -290,10 +328,11 @@ def collect_candidate(
                              "\n".join(hits) if hits else "No matching repository files found.",
                              f"workspace:{workspace}")
             artifacts.append(item)
-            externally_checkable = candidate.concern_family in {"duplication", "generalization"}
+            externally_checkable = _asserts(
+                candidate, SEARCH_CHECKABLE_KINDS, {"duplication", "generalization"})
             if hits and externally_checkable:
                 verdict = "supports"
-            elif not hits and candidate.concern_family in {"duplication", "generalization"}:
+            elif not hits and externally_checkable:
                 verdict = "contradicts"
             else:
                 verdict = "inconclusive"
@@ -409,7 +448,7 @@ def collect_candidate(
             if workspace is None:
                 failures[collector] = "workspace_not_supplied"
                 continue
-            if candidate.concern_family != "style":
+            if not _asserts(candidate, POLICY_CHECKABLE_KINDS, {"style"}):
                 item = _artifact(
                     candidate, collector, "policy_text", "neutral",
                     f"No machine-checkable local policy is registered for {candidate.concern_family!r}.",

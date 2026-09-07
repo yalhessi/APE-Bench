@@ -46,7 +46,6 @@ from src.datasets.pr_review_v4.io import (
     sha256_file,
     write_once,
 )
-from src.datasets.pr_review_v4.runs import unbuilt_base_commits
 from src.datasets.pr_review_v4.schema import (
     ChangeGraph,
     ModificationRecord,
@@ -57,9 +56,12 @@ from src.datasets.pr_review_v4.schema import (
 
 from .agenda import agenda_report, build_agenda, initial_jobs
 from .arms import GENERALIST_ARM_ID
+from .census import build_census, census_report
 from .cutoffs import cutoffs_by_episode
+from .evidence_chain import collect_supported, reviewed_workspaces
 from .finalize import finalize
-from .paths import PRECEDENT_INDEX, assert_repo_root, run_dir
+from .paths import PRECEDENT_INDEX, run_dir
+from .preflight import assert_ready, assert_workspaces_prebuilt
 from .schema import ROUTING_MODES, V5RunManifest, V5RunPlan
 from .trace import reconcile
 
@@ -85,6 +87,34 @@ class V5DatasetConfig(BaseModel):
     dry_run: bool = False
     require_prebuilt_workspaces: bool = True
     pr_finding_limit: int = 20
+    #: Skip the evidence chain, restoring the closed gate every run before this one
+    #: had. Kept so the eight runs already measured can be reproduced exactly, and
+    #: because the chain compiles and lints per candidate — real time on a large set.
+    #: Default off: a closed gate should be a choice someone made, not the default
+    #: that made "no collector ran" indistinguishable from "the claim failed".
+    skip_evidence_chain: bool = False
+    #: Measure how much of the library references each changed declaration, from the base
+    #: commit's `.ilean` index, and let that raise a proposal's priority.
+    #:
+    #: Off by default because it is the only input whose cost is visible: ~4.4s per distinct
+    #: base commit, and a release has 14, so about a minute added to every plan build. The
+    #: dry run must build the *same* plan as the real run — a dry run that skipped a routing
+    #: input is how a config bug survives to a paid run — so this cannot be skipped for dry
+    #: runs alone. Turn it on in the run config.
+    use_exposure_index: bool = False
+    #: Schedule the mandatory per-work-unit generalist. On by default: it is the coverage
+    #: floor and every measurement so far was taken with it running.
+    #:
+    #: Turning it off makes a **specialist-only** run, which is the only way to ask whether
+    #: the generalist's lead in gold-reaching candidates is quality or volume. smoke4 said
+    #: volume: per candidate the two are indistinguishable (0.08 against 0.09), and the
+    #: generalist's 4x lead per invocation comes entirely from emitting 2.0 candidates per
+    #: run against the specialists' 0.5.
+    #:
+    #: Only turn it off on a set where the specialists already cover every work unit —
+    #: `agenda_report` reports `units_without_specialist`, and a run that leaves units
+    #: unreviewed measures coverage loss, not arm quality.
+    generalist_floor: bool = True
     #: Cost policy. Both are required for a real run; a lead with no cap can spend the whole
     #: run on one work unit.
     standard_budget_cap: float = 0.25
@@ -168,7 +198,9 @@ def _write_pool(path: Path, pool: Dict[str, Dict[str, Any]], cutoff_by_episode: 
 
 
 def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path,
-                    cutoff_by_episode: Dict[str, str]) -> List[Dict[str, Any]]:
+                    cutoff_by_episode: Dict[str, str],
+                    census_by_pr: Optional[Dict[int, List[Dict[str, Any]]]] = None,
+                    ) -> List[Dict[str, Any]]:
     """One lead per episode. A review round is the unit a maintainer actually reviews."""
 
     episode_by_id = {item.episode_id: item for item in episodes}
@@ -191,6 +223,7 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
             "snapshot_head_sha": episode.reviewed_head_sha,
             "snapshot_base_sha": episode.base_sha,
             "proposals": [item.model_dump(mode="json") for item in proposals],
+            "census": (census_by_pr or {}).get(episode.pr_number, []),
             "arm_pool_path": str(pool_path),
             "routing_mode": agenda.routing_mode,
             "retrieval_cutoff": cutoff_by_episode.get(episode_id),
@@ -251,6 +284,42 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
                 "rendered_prompt_sha256": raw.get("rendered_prompt_sha256"),
             })
     return responses
+
+
+def _comprehension_from_results(results, mode: str) -> List[Dict[str, Any]]:
+    """What each lead understood before it delegated.
+
+    Recorded so the run can be read as a chain — what was understood, what was asked, what
+    was routed, what was found — rather than as a set of findings with no account of how
+    they came to be looked for.
+    """
+
+    if mode != "lead":
+        return []
+    rows: List[Dict[str, Any]] = []
+    for result in results.task_results:
+        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
+        payload = raw.get("comprehension") or {}
+        if payload:
+            rows.append({"pr_number": raw.get("pr_number"), **payload})
+    return rows
+
+
+def _assessments_from_results(results, mode: str) -> List[Dict[str, Any]]:
+    """The lead's read on the claims that came back.
+
+    Emitted since the first lead run and read by nothing: the field was sealed into the
+    result, surfaced in the trajectory view, and applied nowhere. In the model-free modes no
+    lead exists, so there is nothing to apply and the list is empty by construction.
+    """
+
+    if mode != "lead":
+        return []
+    rows: List[Dict[str, Any]] = []
+    for result in results.task_results:
+        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
+        rows.extend(raw.get("candidate_assessments") or [])
+    return rows
 
 
 def _delegations_from_results(results, mode: str, agenda,
@@ -399,20 +468,6 @@ def redo_run(dataset: V5DatasetConfig, logger) -> None:
             logger.info("redo: removed %s", target)
 
 
-async def _require_prebuilt(dataset: V5DatasetConfig, data: List[Dict[str, Any]]) -> None:
-    if not dataset.require_prebuilt_workspaces:
-        return
-    missing = await unbuilt_base_commits(
-        item["target_workspace"]["commit_hash"] for item in data
-    )
-    if missing:
-        raise RuntimeError(
-            f"{len(missing)} base workspace(s) are not prebuilt: {missing}. Run "
-            "`./ape/bin/python -m src.datasets.pr_review_v4.prebuild --config "
-            "<a v4 config for this release>`, then the printed lean build command."
-        )
-
-
 def _context_calls_by_invocation(trace_path: Path) -> Dict[str, List[Dict[str, Any]]]:
     """Group the append-only context trace. Shared by the floor and the lead."""
 
@@ -428,7 +483,7 @@ def _context_calls_by_invocation(trace_path: Path) -> Dict[str, List[Dict[str, A
 
 
 async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
-    assert_repo_root()
+    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
@@ -451,6 +506,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         units=units, episodes=episodes, graphs=release["graphs"],
         release_prompts=release["release_prompts"], modifications=release["modifications"],
         pr_numbers=selected_prs,
+        use_exposure_index=dataset.use_exposure_index,
+        generalist_floor=dataset.generalist_floor,
     )
     report = agenda_report(agenda)
 
@@ -460,7 +517,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         floor = report["mandatory_floor_cost"]
         cap = dataset.per_pr_cost_cap * len(selected_prs)
         logger.info(
-            "mandatory generalist floor $%.2f vs run cap $%.2f — %s",
+            "coverage floor (broad pass + required specialists) $%.2f vs run cap $%.2f — %s",
             floor, cap, "fits" if floor <= cap else "DOES NOT FIT (raise per_pr_cost_cap)")
         # Resolving cutoffs during a dry run is the cheapest place to discover that a gated
         # read would have been impossible.
@@ -485,13 +542,31 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
     write_once(out / "run_plan.json", pretty_json_bytes(plan.model_dump(mode="json")))
 
     if dataset.routing_mode == "lead":
+        # Rank each PR's work before the lead reads it. Relations are computed once for the
+        # whole release: `pr_relations` already derives sibling families, shared name tokens
+        # and repeated implementation shapes, and v5 had never used any of it.
+        from src.datasets.pr_review_v4.pr_relations import build_relations
+
+        relations, _relation_evidence = build_relations(release["graphs"])
+        census_by_pr: Dict[int, List[Dict[str, Any]]] = {}
+        for pr_number in selected_prs:
+            rows = build_census(
+                [item for item in agenda.proposals if item.pr_number == pr_number],
+                units, release["graphs"], episodes, relations,
+            )
+            census_by_pr[pr_number] = [row.render() for row in rows]
+        write_once(out / "census.json", pretty_json_bytes({
+            str(pr): rows for pr, rows in sorted(census_by_pr.items())}))
+        logger.info("census: %d work unit(s) ranked across %d PR(s)",
+                    sum(len(v) for v in census_by_pr.values()), len(census_by_pr))
+
         # No separate floor pass. The coverage floor is injected as the lead's first wave, so
         # there is one agent per PR delegating all of its own work — the shape the generation
         # is named for. The guarantee survives the move: `delegate` prepends the mandatory
         # jobs whatever the lead asked for, and `submit_routing` refuses to close until they
         # have run, so the floor is still not the lead's to skip.
         data = _lead_task_data(agenda, episodes, dataset, pool_path, trace_path,
-                               cutoff_by_episode)
+                               cutoff_by_episode, census_by_pr)
         scaffold.task_config_overrides = {
             **(task_overrides or {}),
             "standard_budget_cap": dataset.standard_budget_cap,
@@ -503,7 +578,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         data = _direct_arm_task_data(agenda, pool, cutoff_by_episode, trace_path)
         scaffold.execution.sample_max_cost = dataset.standard_budget_cap
 
-    await _require_prebuilt(dataset, data)
+    await assert_workspaces_prebuilt(
+        data, required=dataset.require_prebuilt_workspaces)
 
     logger.info("routing_mode=%s tasks=%d prs=%s", dataset.routing_mode, len(data), selected_prs)
     tasks = [create_task_from_data(item, scaffold,
@@ -515,13 +591,36 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
 
     responses = _responses_from_results(results, dataset.routing_mode)
     delegations = _delegations_from_results(results, dataset.routing_mode, agenda)
+    assessments = _assessments_from_results(results, dataset.routing_mode)
+    comprehension = _comprehension_from_results(results, dataset.routing_mode)
     write_once(out / "arm_responses.jsonl", jsonl_bytes(responses))
     write_once(out / "delegations.jsonl", jsonl_bytes(delegations))
+    write_once(out / "candidate_assessments.jsonl", jsonl_bytes(assessments))
+    write_once(out / "comprehension.jsonl", jsonl_bytes(comprehension))
+
+    # Evidence runs in the workspace that actually reviewed the episode, so the collectors
+    # see the code as the PR leaves it. Resolved here because only the runner knows which
+    # attempt succeeded; `finalize` is handed a callable, never a workspace.
+    workspace_by_episode = await reviewed_workspaces(orchestrator.tasks_dir, data, results)
+    write_once(out / "reviewed_workspaces.json",
+               pretty_json_bytes(dict(sorted(workspace_by_episode.items()))))
+    if len(workspace_by_episode) < len(selected_prs):
+        logger.warning(
+            "only %d of %d episode(s) resolved a reviewed workspace; the rest fall back to "
+            "the base snapshot, where a policy or compile check reads the pre-PR file",
+            len(workspace_by_episode), len(selected_prs))
 
     summary = finalize(
         out, units=units, responses=responses, routing_mode=dataset.routing_mode,
         execution_release=dataset.execution_release,
         exclude_methods=dataset.exclude_methods, pr_numbers=selected_prs,
+        candidate_assessments=assessments,
+        collect_supported=(
+            None if dataset.skip_evidence_chain else
+            lambda candidates: collect_supported(
+                candidates, graphs=release["graphs"], out=out,
+                workspace_by_episode=workspace_by_episode, logger=logger)
+        ),
         pr_finding_limit=dataset.pr_finding_limit, logger=logger,
     )
 
