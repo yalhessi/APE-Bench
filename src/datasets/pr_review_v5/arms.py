@@ -33,6 +33,9 @@ from src.datasets.pr_review_v4.focused_specs import (
 )
 from src.datasets.pr_review_v4.io import canonical_json_bytes, sealed_model, sha256_bytes
 
+from .arm_registry import (
+    UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
+)
 from .schema import CONTEXT_TOOLS, ReviewArm
 
 ARM_REGISTRY_VERSION = "v5-arm-registry/2"
@@ -192,60 +195,29 @@ def v5_specs() -> List[FocusedAgentSpec]:
     ]
 
 
-#: Which concern families are settled by compiling something. A specialist outside this set
-#: cannot carry a compile artifact, so it must be admitted through the evidence chain rather
-#: than the verification gate — otherwise its findings are dropped for lacking a warrant its
-#: concern can never produce.
-CHECKABLE_ARMS = frozenset({"proof_golf", "proof_idiom", "duplication", "generality",
-                            "api_reuse", "correctness"})
+#: Derived from `arm_registry`, which is the one place an arm is declared.
+#:
+#: These four facts -- checkable, patch-set, retrieval grant, allowed concerns -- used to be
+#: four dictionaries keyed by arm id, two here and two in `src/ape/tasks/.../arm.py`, on
+#: opposite sides of the package boundary with nothing checking they agreed. An arm could be
+#: in one and missing from another: `migration_consistency` sat in `PATCH_SET_ARMS` while
+#: never being registered as an arm at all, and this file's grant was per-arm for months while
+#: `schema.py` still documented it as uniform.
+#:
+#: The measurement behind the grant, kept here because this is where it was made: given four
+#: retrieval tools the arms reach for the cheapest identifier lookup rather than the one that
+#: answers their question. `family_design` spent 50 of its 63 discretionary retrieval calls on
+#: `declaration_search` -- which returns nothing but `X is declared in file Y` -- against 13 on
+#: `content_search`, the only tool that could have found the mechanism its own prompt told it
+#: to look for, and produced zero candidates from eleven invocations. So the rule is output
+#: shape, not concern: `declaration_search` for arms asking about a *named* thing,
+#: `precedent_search`/`zulip_search` for arms asking a convention question the code corpus
+#: answers wrongly (`coe_` outnumbers the requested form 4,707 to 50).
+CHECKABLE_ARMS = checkable_arms()
 
-#: `lean_verify_edit` is granted to every arm without exception. It is registered by the
-#: shared review base for *all* review tasks, and the smoke4 run measured 87 of its 100
-#: calls carrying a real edit — it is the one tool that turns a suggestion into a checked
-#: one, and no arm should be reviewing without it.
-_UNIVERSAL_CONTEXT_TOOLS = ("lean_verify_edit",)
+_UNIVERSAL_CONTEXT_TOOLS = UNIVERSAL_CONTEXT_TOOLS
 
-#: The retrieval grant, per arm, matched to the shape of the answer that arm needs.
-#:
-#: This was uniform until smoke4 measured what the arms do with four retrieval tools: they
-#: reach for the cheapest identifier lookup rather than the one that answers their question.
-#: `family_design` spent **50 of its 63** discretionary retrieval calls on
-#: `declaration_search` — which returns nothing but `X is declared in file Y` — against 13
-#: on `content_search`, the only tool that could have found the mechanism its own prompt
-#: told it to look for. It produced zero candidates from eleven invocations.
-#:
-#: So the rule is output shape, not concern:
-#:
-#: * `declaration_search` answers "does this name exist, and where" — it belongs to the arms
-#:   whose question is about a *named* thing: is there already a lemma for this, where does
-#:   this sibling live, what is the canonical form called.
-#: * `precedent_search` and `zulip_search` answer "what do maintainers say" — they belong to
-#:   the arms whose question is a convention, which is not decidable from the code corpus.
-#:   This is measured too: the code corpus argues *against* the maintainer in both naming
-#:   cases (`coe_` 4,707 against `toLinearMap_` 50), while the review corpus states them.
-#: * every arm keeps `content_search` (a file-system tool, never gated here) and
-#:   `lean_verify_edit`.
-#:
-#: An arm absent from this table gets the universal grant only. That is deliberate for
-#: `family_design`: denying it the identifier lookup it wasted its budget on is the whole
-#: intervention, and `content_search` remains available to it.
-_CONTEXT_GRANTS: Dict[str, tuple] = {
-    # "is there already a declaration that does this?" — a name question.
-    "proof_golf": ("declaration_search",),
-    "proof_idiom": ("declaration_search",),
-    "duplication": ("declaration_search",),
-    "api_reuse": ("declaration_search",),
-    "generality": ("declaration_search",),
-    "correctness": ("declaration_search",),
-    # Naming is both: what the siblings are called, and what maintainers call them.
-    "naming": ("declaration_search", "precedent_search", "zulip_search"),
-    # Pure convention arms. Neither question is settled by the library's own frequencies.
-    "docs": ("precedent_search", "zulip_search"),
-    "style": ("precedent_search", "zulip_search"),
-    # `family_design` asks whether a *group* is shaped right. No identifier lookup answers
-    # that, and the measurement above is what removed it.
-    "family_design": ("precedent_search", "zulip_search"),
-}
+_CONTEXT_GRANTS: Dict[str, tuple] = context_grants()
 
 
 def _grant_for(arm_id: str) -> List[str]:

@@ -31,6 +31,10 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
     LeanPRReviewV4CandidateTask,
 )
 
+from src.datasets.pr_review_v5.arm_registry import (
+    allowed_concerns, patch_set_arms,
+)
+
 from .context_tools import register_context_tools
 
 ARM_TASK_TYPE = "lean_pr_review_v5_arm"
@@ -47,25 +51,12 @@ ARM_TASK_TYPE = "lean_pr_review_v5_arm"
 #:
 #: golf and idiom share `proof-golf` on purpose: they inspect the same proofs and make
 #: different claims about them, and they are kept apart by `spec_id`, not by family.
+#: Derived from `arm_registry`, which is where an arm is declared. This and
+#: `PATCH_SET_ARMS` used to be dictionaries here while `CHECKABLE_ARMS` and the retrieval
+#: grant were dictionaries in `src/datasets/pr_review_v5/arms.py` — four tables keyed by
+#: arm id, on opposite sides of the package boundary, with nothing checking they agreed.
 ALLOWED_CONCERN_BY_ARM = {
-    "proof_golf": {"proof-golf"},
-    "proof_idiom": {"proof-golf"},
-    "duplication": {"duplication"},
-    "generality": {"generalization"},
-    "naming": {"naming"},
-    "docs": {"documentation"},
-    "style": {"style"},
-    "api_reuse": {"duplication"},
-    # `correctness` also owns `scope`: a declaration whose imports cannot support where it
-    # sits is a build problem wearing a placement problem's clothes, and no other arm compiles.
-    "correctness": {"correctness", "scope"},
-    # `family_design` is the one arm whose scope is a *set*, and the defect a set exhibits
-    # takes two shapes that no single concern covers: a missing counterpart or a hardcoded
-    # shared parameter is `generalization`, while a generated form written out by hand is
-    # `duplication`. Forcing one would leave the arm unable to state half the findings it
-    # exists for — PR 33117's thirteen hand-written `fun_*` lemmas are duplication-shaped,
-    # PR 33145's absent dual is generalization-shaped, and both are group properties.
-    "family_design": {"generalization", "duplication"},
+    arm_id: set(concerns) for arm_id, concerns in allowed_concerns().items()
 }
 
 
@@ -131,7 +122,7 @@ class LeanPRReviewV5ArmTask(LeanPRReviewV4CandidateTask):
     # `SUPPORTED_TOOLS` with its registration commented out: a capability granted to nothing,
     # readable as coverage that is not there. `test_every_patch_set_arm_is_a_registered_spec`
     # keeps it honest — add the arm first, then add it here.
-    PATCH_SET_ARMS = frozenset({"family_design"})
+    PATCH_SET_ARMS = patch_set_arms()
 
     @property
     def patch_set_paths(self) -> tuple:
