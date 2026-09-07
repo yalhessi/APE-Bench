@@ -223,6 +223,40 @@ def _assign_channels(findings, contradicted: Set[str]):
     return findings
 
 
+def _unwarranted_findings(candidates, pr_numbers):
+    """Focused candidates dropped for carrying no successful verification artifact.
+
+    They were counted to stderr and discarded. That made a correct claim whose concern has no
+    deterministic warrant indistinguishable from a wrong one, and it is why the concern gate
+    had to exist: an arm reporting an unexpected concern passed submission, produced no
+    artifact its declared concern could generate, and vanished here. Retaining them is what
+    retired that gate.
+
+    Projected as `diagnostic` and into the `review` channel, like every other claim the system
+    would say but cannot prove. Filed under `generalist` for the same reason
+    `_evidence_specialist_findings` is -- `focused_agent` holds a hard invariant that a focused
+    source names a verification artifact, and these are precisely the ones that do not.
+    """
+
+    from src.datasets.pr_review_v4.merge import finding_from_candidate
+
+    wanted = set(pr_numbers) if pr_numbers else None
+    findings = []
+    for candidate in candidates:
+        if wanted is not None and candidate.pr_number not in wanted:
+            continue
+        findings.append(finding_from_candidate(
+            candidate,
+            admission="diagnostic",
+            admission_reason=(
+                "no verification artifact: this arm's concern is settled by compiling, and "
+                "no successful compile backs this claim"
+            ),
+            arm="generalist",
+        ))
+    return findings
+
+
 def finalize(
     out: Path,
     *,
@@ -277,19 +311,14 @@ def finalize(
     write_once(artifacts_path, jsonl_bytes(artifacts))
     write_once(out / "candidate_rejections.jsonl", jsonl_bytes(rejections))
 
-    # `focused_findings` drops any specialist candidate with no successful verification
-    # artifact — correctly, since the arm's whole premise is that the compiler agreed. But
-    # it drops them silently, so a run where every specialist claim evaporated looks exactly
-    # like a run where the specialists found nothing. Count them here.
-    verified_keys = {
-        (item.get("work_unit_id"), item.get("candidate_ordinal"))
-        for item in artifacts
-        if item.get("stage") == "proposed_edit" and item.get("success")
-    }
-    unverified_specialist = [
-        item for item in specialist
-        if (item.work_unit_id, item.ordinal) not in verified_keys
-    ]
+    # Specialist candidates `focused_findings` drops for carrying no successful verification
+    # artifact — correctly, since the arm's whole premise is that the compiler agreed.
+    #
+    # This list used to be re-derived here by reimplementing the artifact join, which made the
+    # rule true in two places and gave the copy a bug: it did not apply `pr_numbers`, so an
+    # out-of-scope candidate was reported as "dropped for lacking a warrant" when it had simply
+    # not been reviewed. `focused_findings` now reports what it actually dropped.
+    unwarranted: List[Any] = []
 
     # The compile-gated specialists are settled by `focused_findings` against their
     # verification artifacts, so they are not put through the chain: it would cost a
@@ -317,7 +346,10 @@ def finalize(
             pr_numbers,
         ))
     if specialist:
-        findings.extend(focused_findings(specialist_path, artifacts_path, pr_numbers))
+        # `dropped` collects the unwarranted ones; they are projected after the digest, so
+        # they reach the judge without reaching the review. See below.
+        findings.extend(focused_findings(
+            specialist_path, artifacts_path, pr_numbers, dropped=unwarranted))
     if evidence_specialist:
         findings.extend(_evidence_specialist_findings(
             evidence_specialist, supported_candidate_ids, pr_numbers))
@@ -341,7 +373,24 @@ def finalize(
     # system would say. `channels: []` states that positively rather than leaving it implied.
     for item in removed_findings:
         item.channels = []
-    write_once(out / "findings.jsonl", jsonl_bytes([*merged, *removed_findings]))
+
+    # Specialist claims dropped for lacking a warrant, restored on the same terms and for the
+    # same reason: retained rather than counted, so a correct claim with no warrant can be
+    # told apart from a wrong one.
+    #
+    # Out of the merge and out of the digest, deliberately. `focused_findings` refuses to
+    # downgrade these to `model_assertion` because that smuggles an unverified claim into the
+    # one arm whose entire premise is that the compiler agreed; putting them in the digest
+    # under a different arm would do the same thing by a longer route. `channels` is empty for
+    # the same reason it is empty on lead-removed claims — the system withheld these, so
+    # counting them in `review` would claim credit for something it did not say.
+    unwarranted_findings = _unwarranted_findings(unwarranted, pr_numbers)
+    for item in unwarranted_findings:
+        item.channels = []
+    write_once(
+        out / "findings.jsonl",
+        jsonl_bytes([*merged, *removed_findings, *unwarranted_findings]),
+    )
     write_once(out / "conflicts.jsonl", jsonl_bytes(conflicts))
     write_once(out / "issues.jsonl", jsonl_bytes(issues))
 
@@ -354,10 +403,10 @@ def finalize(
         "candidates_generalist": len(generalist),
         "candidates_specialist": len(specialist),
         "candidates_evidence_specialist": len(evidence_specialist),
-        "candidates_specialist_dropped_unverified": len(unverified_specialist),
+        "candidates_specialist_dropped_unverified": len(unwarranted),
         "dropped_unverified_by_concern": {
-            family: sum(item.concern_family == family for item in unverified_specialist)
-            for family in sorted({item.concern_family for item in unverified_specialist})
+            family: sum(item.concern_family == family for item in unwarranted)
+            for family in sorted({item.concern_family for item in unwarranted})
         },
         # Both channels, side by side. `review` is what the system would say; `verified` is
         # what it proved. Reporting only the second is what made the publication ceiling read
@@ -371,6 +420,10 @@ def finalize(
                 if "review" in (item.channels or []) and "verified" not in (item.channels or [])
             ),
         },
+        # Dropped for lacking a warrant, not for being wrong. Kept in `findings.jsonl` as
+        # `diagnostic` — the audit trail the judge reads — and out of `issues.jsonl`, which is
+        # the maintainer-facing review.
+        "candidates_unwarranted": len(unwarranted),
         "candidate_rejections": len(rejections),
         "lead_synthesis": synthesis,
         # Restored to `findings.jsonl` but kept out of the merge and the review. Counted
@@ -399,12 +452,12 @@ def finalize(
             len(generalist) + len(specialist) + len(evidence_specialist),
             len(merged), len(issues), len(published),
         )
-        if unverified_specialist:
+        if unwarranted:
             logger.warning(
                 "%d specialist candidate(s) were dropped for carrying no successful "
                 "verification artifact (by concern: %s). A specialist claim is published "
                 "only if the compiler agreed.",
-                len(unverified_specialist),
+                len(unwarranted),
                 dict(full["dropped_unverified_by_concern"]),
             )
     return full

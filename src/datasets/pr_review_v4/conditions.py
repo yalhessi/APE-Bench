@@ -168,7 +168,8 @@ def generalist_findings(candidates_path: Path,
 
 def focused_findings(candidates_path: Path,
                      verification_artifacts_path: Optional[Path] = None,
-                     pr_numbers: Optional[Iterable[int]] = None) -> List[ReviewFinding]:
+                     pr_numbers: Optional[Iterable[int]] = None,
+                     dropped: Optional[List[CandidateClaim]] = None) -> List[ReviewFinding]:
     """Project focused-agent candidates into the common shape.
 
     Every focused candidate that exists was already compile-verified: the submission handler
@@ -186,6 +187,13 @@ def focused_findings(candidates_path: Path,
     tier nothing backs — `FindingSource` refuses a focused source with no evidence, and
     silently downgrading it to `model_assertion` would smuggle an unverified claim into the
     arm whose entire premise is verification.
+
+    Pass `dropped` to collect those candidates rather than only counting them. Until this
+    existed the drop was a line on stderr and nothing else: no artifact, nothing the judge
+    could see, no way to tell a correct claim that lacked a warrant from a wrong one. That
+    That mattered beyond bookkeeping: it was the precondition for retiring v5's concern gate,
+    which refused an off-concern submission up front precisely because such a claim lands here
+    and used to vanish. It is collected now, so the gate is gone.
     """
 
     wanted = set(pr_numbers) if pr_numbers else None
@@ -215,6 +223,8 @@ def focused_findings(candidates_path: Path,
         )
         if not artifact_ids:
             unverified += 1
+            if dropped is not None:
+                dropped.append(candidate)
             continue
         findings.append(finding_from_candidate(
             candidate,

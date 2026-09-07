@@ -172,6 +172,14 @@ class CandidateClaim(StrictModel):
     #: canonical and explicitly may not. A verifier keyed on the issue kind alone would hand
     #: idiom's laxer warrant to golf candidates and repeal golf's own rule.
     spec_id: Optional[str] = None
+    #: Non-gating, multi-valued. `concern_family` is one word chosen from a closed list and is
+    #: what routing and verification key on; tags are what the claim was additionally observed
+    #: to be. `off-concern:<arm_id>` records that a specialist declared a family outside its
+    #: expected set — the fact the concern gate used to refuse the submission over.
+    #:
+    #: Deliberately outside the identity payload that mints `candidate_id`: an annotation must
+    #: not be able to move a candidate's identity, and frozen candidate files must still load.
+    concern_tags: List[str] = Field(default_factory=list)
     concern_label: str
     severity: Literal["blocking", "advisory"]
     claim: str
@@ -278,6 +286,22 @@ class ReviewFinding(StrictModel):
     #: concern has no warrant yet. Reporting recall against both is what separates reviewer
     #: performance from mechanism coverage.
     channels: List[Literal["review", "verified"]] = Field(default_factory=list)
+    #: The arm that produced this, recorded immutably rather than inferred.
+    #:
+    #: `arm` is a coarse *class* -- `generalist`, `focused_agent`, `merged` -- and several arms
+    #: file under one value, so it cannot answer "which arm found this". `sources[].spec_id`
+    #: carries it today, which works and is easy to lose in a merge.
+    origin_arm_id: Optional[str] = None
+    #: Concerns this finding touches, as the arm saw them. Non-gating and possibly several.
+    #:
+    #: `concern_family` is one value, chosen from a closed list, and routing and verification
+    #: key on it. It used to gate submission too -- an arm could declare only concerns in its
+    #: own set -- and that rejected correct findings: 11 of the 19 gold obligations labelled
+    #: `style` are `grind` simplifications and `encard_` renames, so an arm that found one and
+    #: labelled it honestly was refused for guessing the evaluator's vocabulary wrong. Tags let
+    #: a claim say what it is without the label deciding whether it may be said at all, which
+    #: is what let the gate go.
+    concern_tags: List[str] = Field(default_factory=list)
     #: Set when evidence actively contradicted the claim. The finding stays in `review` with
     #: this attached rather than vanishing: a contradiction is a fact about the claim that a
     #: maintainer would want, and deleting it destroys the evidence that the collector ran.

@@ -134,6 +134,18 @@ def finding_from_candidate(
             candidate.concern_family,
             candidate.requested_change or candidate.suggested_fix or "",
         ),
+        # Provenance, recorded rather than inferred. `arm` is a coarse class that several arms
+        # share, so it cannot say which arm found this; `spec_id` can, and is easy to lose in
+        # a merge.
+        "origin_arm_id": candidate.spec_id,
+        # What the claim is about, as the arm saw it. Non-gating, unlike `concern_family`.
+        # The candidate's own tags carry anything the arm layer observed and declined to
+        # refuse — `off-concern:<arm_id>` above all, which is what the concern gate used to
+        # reject a submission over.
+        "concern_tags": sorted(
+            set(candidate.concern_tags or [])
+            | ({candidate.concern_family} if candidate.concern_family else set())
+        ),
         "sources": [source],
     }
     return _seal(ReviewFinding, "finding", payload)
@@ -207,6 +219,14 @@ def _merge_group(findings: Sequence[ReviewFinding]) -> ReviewFinding:
         for item in sorted(findings, key=lambda row: row.finding_id)
         for source in item.sources
     ]
+    # Provenance combines rather than inheriting the representative's. Two arms finding the
+    # same thing is a fact about the finding, and keeping only the winner's would report one
+    # arm's work as the whole of it.
+    origins = {item.origin_arm_id for item in findings if item.origin_arm_id}
+    payload["origin_arm_id"] = origins.pop() if len(origins) == 1 else None
+    payload["concern_tags"] = sorted({
+        tag for item in findings for tag in (item.concern_tags or [])
+    })
     return _seal(ReviewFinding, "finding", payload)
 
 
