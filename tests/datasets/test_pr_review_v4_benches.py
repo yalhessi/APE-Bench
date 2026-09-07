@@ -123,3 +123,103 @@ def test_restricting_to_a_pr_set_narrows_the_fixture():
                          pr_numbers=[33117, 33145, 33337, 33362])
     assert 0 < len(smoke4.cases) < len(everything.cases)
     assert {case.pr_number for case in smoke4.cases} <= {33117, 33145, 33337, 33362}
+
+
+# --- scoring --------------------------------------------------------------------------------
+#
+# The bench's cheap signal: did the arm speak, and in the right place. Whether the claim is
+# *correct* is the judge's question and needs a semantic run -- a bench hit is a necessary
+# condition for a scored hit, never a sufficient one.
+
+
+def _judgments():
+    return load_jsonl(RELEASE / "gold/judgments.jsonl", JudgmentNode)
+
+
+def test_a_perfect_run_locates_every_positive(benches):
+    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+
+    bench = benches["duplication"]
+    anchors = {case.work_unit_id: list(case.change_ids) for case in bench.positives}
+    score = score_bench(bench, anchors,
+                        gold_anchors_by_unit=gold_anchor_index(bench, _judgments()))
+
+    assert score["located"] == score["positives"]
+    assert score["location_rate"] == 1.0
+    assert score["spoke_when_quiet"] == 0
+
+
+def test_a_silent_run_locates_nothing_and_is_counted_as_abstaining(benches):
+    """The failure mode the arms actually exhibit: 30 of 46 specialist runs on smoke4
+    abstained, and an abstention has to be distinguishable from a wrong answer."""
+
+    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+
+    bench = benches["duplication"]
+    score = score_bench(bench, {},
+                        gold_anchors_by_unit=gold_anchor_index(bench, _judgments()))
+
+    assert score["located"] == 0
+    assert score["abstained_on_positives"] == score["positives"]
+    assert score["spoke_when_quiet"] == 0
+
+
+def test_an_arm_that_reports_everywhere_is_penalised_on_negatives(benches):
+    """Positives alone would score a maximally noisy arm perfectly."""
+
+    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+
+    bench = benches["naming"]
+    everywhere = {case.work_unit_id: list(case.change_ids) for case in bench.cases}
+    score = score_bench(bench, everywhere,
+                        gold_anchors_by_unit=gold_anchor_index(bench, _judgments()))
+
+    assert score["spoke_when_quiet"] == score["negatives"] > 0
+    assert score["false_alarm_rate"] == 1.0
+
+
+def test_landing_in_the_right_unit_but_the_wrong_declaration_is_not_a_hit(benches):
+    """Gold anchors are narrower than the work unit, so a candidate anywhere in a multi-target
+    unit must not count as having found the obligation's site."""
+
+    from src.datasets.pr_review_v4.benches import gold_anchor_index, score_bench
+
+    bench = benches["duplication"]
+    gold_anchors = gold_anchor_index(bench, _judgments())
+    elsewhere = {
+        case.work_unit_id: ["change:not-a-real-anchor"] for case in bench.positives
+    }
+    score = score_bench(bench, elsewhere, gold_anchors_by_unit=gold_anchors)
+
+    assert score["located"] == 0
+    assert score["candidates_total"] == len(bench.positives)   # it spoke, just wrongly
+
+
+def test_the_score_names_the_fixture_it_measured(benches):
+    from src.datasets.pr_review_v4.benches import score_bench
+
+    bench = benches["duplication"]
+    score = score_bench(bench, {})
+    assert score["fixture_sha256"] == bench.identity()
+    assert "necessary condition" in score["note"]
+
+
+def test_an_arm_payload_carries_no_gold():
+    """The run itself must be gold-free. The scorer joins gold afterwards, on this side."""
+
+    from src.datasets.pr_review_v5.bench_cli import _payloads_for, roster
+    from src.datasets.pr_review_v5.runner import load_release, load_run
+
+    config = Path("configs/bases/v5_generation.yaml")
+    if not config.is_file():
+        pytest.skip("base config not present")
+    dataset, _scaffold, _ = load_run(config)
+    release = load_release(dataset)
+    bench = build_all(dataset.release, roster(), pr_numbers=[33145])["duplication"]
+
+    payloads = _payloads_for(bench, dataset, release)
+    assert payloads
+    for payload in payloads.values():
+        for key in payload:
+            assert not any(word in key.lower()
+                           for word in ("obligation", "gold", "judgment", "expected")), key

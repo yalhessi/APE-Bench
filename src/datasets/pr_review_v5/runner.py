@@ -143,7 +143,7 @@ def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
     return dataset, scaffold, task_overrides
 
 
-def _load_release(dataset: V5DatasetConfig):
+def load_release(dataset: V5DatasetConfig):
     release = dataset.release
     return {
         "units": load_jsonl(release / "derived/work_units.jsonl", ReviewWorkUnit),
@@ -534,7 +534,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
 
-    release = _load_release(dataset)
+    release = load_release(dataset)
     units = release["units"]
     if dataset.pr_numbers:
         wanted = set(dataset.pr_numbers)

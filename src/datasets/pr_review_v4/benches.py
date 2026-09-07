@@ -250,3 +250,122 @@ def coverage_report(benches: Dict[str, ArmBench]) -> Dict[str, Any]:
             arm_id for arm_id, row in rows.items() if not row["positives"]),
         "total_positive_cases": sum(row["positives"] for row in rows.values()),
     }
+
+
+# --- scoring --------------------------------------------------------------------------------
+#
+# The bench's cheap signal, not a substitute for the judge. It answers "did the arm speak, and
+# in the right place" -- location and silence -- which is what an arm-level iteration loop needs
+# between paid semantic runs. Whether the claim is *right* is still the judge's question, and a
+# bench hit is a necessary condition for a scored hit, never a sufficient one.
+
+
+@dataclass
+class CaseResult:
+    """What one arm did on one bench case."""
+
+    work_unit_id: str
+    pr_number: int
+    is_positive: bool
+    #: change_ids the arm anchored candidates on.
+    anchored: Sequence[str] = ()
+    candidate_count: int = 0
+    #: True when a positive case drew a candidate on a change the obligation anchors.
+    located: bool = False
+    #: True when a negative case drew any candidate at all.
+    spoke_when_quiet: bool = False
+    error: Optional[str] = None
+
+
+def score_bench(
+    bench: ArmBench,
+    anchors_by_unit: Mapping[str, Sequence[str]],
+    *,
+    gold_anchors_by_unit: Optional[Mapping[str, Sequence[str]]] = None,
+    errors_by_unit: Optional[Mapping[str, str]] = None,
+) -> Dict[str, Any]:
+    """Score one arm's run over its fixture.
+
+    `anchors_by_unit` maps work unit id to the change ids the arm anchored candidates on. The
+    gold side is joined here and nowhere earlier: the arm was handed a work unit and never saw
+    an obligation.
+    """
+
+    gold_anchors = dict(gold_anchors_by_unit or {})
+    errors = dict(errors_by_unit or {})
+    results: List[CaseResult] = []
+
+    for case in bench.cases:
+        anchored = list(anchors_by_unit.get(case.work_unit_id, ()))
+        expected_anchors = set(gold_anchors.get(case.work_unit_id, case.change_ids))
+        results.append(CaseResult(
+            work_unit_id=case.work_unit_id,
+            pr_number=case.pr_number,
+            is_positive=case.is_positive,
+            anchored=anchored,
+            candidate_count=len(anchored),
+            located=bool(case.is_positive and (set(anchored) & expected_anchors)),
+            spoke_when_quiet=bool(not case.is_positive and anchored),
+            error=errors.get(case.work_unit_id),
+        ))
+
+    positives = [item for item in results if item.is_positive]
+    negatives = [item for item in results if not item.is_positive]
+    located = sum(1 for item in positives if item.located)
+    noisy = sum(1 for item in negatives if item.spoke_when_quiet)
+
+    return {
+        "bench_version": BENCH_VERSION,
+        "arm_id": bench.arm_id,
+        "fixture_sha256": bench.identity(),
+        "positives": len(positives),
+        "negatives": len(negatives),
+        # Did the arm say something where gold asked for something of its kind?
+        "located": located,
+        "location_rate": round(located / len(positives), 4) if positives else None,
+        # Did it stay quiet where gold asked for nothing of its kind?
+        "spoke_when_quiet": noisy,
+        "false_alarm_rate": round(noisy / len(negatives), 4) if negatives else None,
+        "abstained_on_positives": sum(1 for item in positives if not item.candidate_count),
+        "candidates_total": sum(item.candidate_count for item in results),
+        "errors": {item.work_unit_id: item.error for item in results if item.error},
+        "note": (
+            "Location and silence only. A bench hit is a necessary condition for a scored "
+            "hit, never a sufficient one -- whether the claim is correct is the judge's "
+            "question and needs a semantic run."
+        ),
+        "cases": [
+            {
+                "work_unit_id": item.work_unit_id,
+                "pr_number": item.pr_number,
+                "positive": item.is_positive,
+                "candidates": item.candidate_count,
+                "located": item.located,
+                "spoke_when_quiet": item.spoke_when_quiet,
+                **({"error": item.error} if item.error else {}),
+            }
+            for item in results
+        ],
+    }
+
+
+def gold_anchor_index(bench: ArmBench, judgments: Sequence[JudgmentNode]) -> Dict[str, List[str]]:
+    """`work_unit_id -> the change ids its expected obligations actually anchor`.
+
+    Narrower than the work unit's own change ids, so a candidate that lands anywhere in a
+    multi-target unit does not count as having found the obligation's site.
+    """
+
+    wanted = {
+        item for case in bench.positives for item in case.expected_obligation_ids
+    }
+    anchors: Dict[str, Set[str]] = defaultdict(set)
+    by_obligation: Dict[str, Set[str]] = defaultdict(set)
+    for judgment in judgments:
+        for obligation in judgment.obligations or []:
+            if obligation.obligation_id in wanted:
+                by_obligation[obligation.obligation_id].update(obligation.change_ids or [])
+    for case in bench.positives:
+        for obligation_id in case.expected_obligation_ids:
+            anchors[case.work_unit_id].update(by_obligation.get(obligation_id, ()))
+    return {unit: sorted(values) for unit, values in anchors.items()}
