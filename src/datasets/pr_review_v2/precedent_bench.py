@@ -50,16 +50,9 @@ _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_'.]*|[^\sA-Za-z0-9]")
 _DECL_KIND_RE = re.compile(r"\b(theorem|lemma|def|instance|structure|class|abbrev|inductive|example)\b")
 
 
-def hunk_code(hunk_text: str) -> str:
-    """Strip @@ headers and diff +/- markers → just the (added/context) code the comment is about."""
-    lines = []
-    for line in (hunk_text or "").splitlines():
-        if line.startswith("@@") or line.startswith("diff ") or line.startswith("+++") or line.startswith("---"):
-            continue
-        if line[:1] == "-":  # removed lines: not the reviewed state
-            continue
-        lines.append(line[1:] if line[:1] == "+" else line)
-    return "\n".join(lines).strip()
+#: Defined in `mathlib_review.corpus`: six call sites across two packages use it, and v5's
+#: index used to import it from here.
+from src.mathlib_review.corpus import hunk_code  # noqa: E402,F401
 
 
 def tokenize(text: str) -> List[str]:

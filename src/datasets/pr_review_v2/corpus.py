@@ -28,6 +28,7 @@ from ape.utils.project import PROJECT_ROOT
 
 from .derive import MAINTAINER_ASSOCIATIONS, is_bot, strip_trivial_tokens
 from .github import GitHubClient
+from src.mathlib_review.corpus import eval_pr_numbers
 
 REPO = "leanprover-community/mathlib4"
 DEFAULT_OUT = PROJECT_ROOT / "inputs" / "pr_review_v2" / "corpus" / "mathlib_review_comments.jsonl"
@@ -146,11 +147,13 @@ def build_corpus(
 
 
 def _eval_pr_numbers() -> Set[int]:
-    """Exclude the eval-set PRs outright (belt-and-suspenders; the date cutoff already excludes them)."""
-    f = PROJECT_ROOT / "inputs" / "pr_review_v2" / "mathlib_pr_review_v2_actionable_20260618.jsonl"
-    if not f.exists():
-        return set()
-    return {json.loads(l)["pr_number"] for l in f.read_text().splitlines() if l.strip()}
+    """Exclude the eval-set PRs outright (belt-and-suspenders; the date cutoff already
+    excludes them). Defined in `mathlib_review.corpus`, which is where v5's index reads it
+    from too -- it used to reach in here for it across a package boundary."""
+
+    return eval_pr_numbers(
+        PROJECT_ROOT / "inputs" / "pr_review_v2"
+        / "mathlib_pr_review_v2_actionable_20260618.jsonl")
 
 
 def main() -> None:

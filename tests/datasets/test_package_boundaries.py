@@ -7,7 +7,8 @@ across six packages:
   imports v5 — so "v4 is frozen and imported as a library" is not true. 13 -> 4: `paths` and
   `patchset` moved to `src/mathlib_review/`, which is what that package is for;
 * 42 imports of `_`-private symbols across module boundaries, six of them across generations.
-  38 now, after `evidence._tool_env` and `evidence._run` became `mathlib_review.workspace`;
+  37 now, after `evidence._tool_env`/`_run` became `mathlib_review.workspace` and
+  `corpus._eval_pr_numbers` became `mathlib_review.corpus`;
 * one shared review base (`pr_review_v2/base.py`) edited on the strength of a v5-only
   observation, which changed the tool contract for every v2 checker and every v4 arm. That one
   is fixed: it lives at `formal_math/review_task.py` now, owned by no generation, and v5 -> v2
@@ -103,15 +104,18 @@ def test_v4_does_not_import_v5_beyond_the_known_backward_edges():
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
 
 
-def test_v5_does_not_reach_further_back_into_v2():
-    """6 -> 2. The four that went were the shared review base: v5's lead inherited
-    `BasePRReviewTask` from inside v2, and it now lives beside the generations rather than in
-    the oldest of them. What is left is genuinely v2's own data work --
-    `corpus._eval_pr_numbers` and `precedent_bench.hunk_code`."""
+def test_v5_does_not_reach_back_into_v2_at_all():
+    """6 -> 0, and this one gets to assert zero.
+
+    Four were the shared review base, which v5's lead inherited from inside v2 and which now
+    lives beside the generations. Two were `corpus._eval_pr_numbers` and
+    `precedent_bench.hunk_code` -- the eval-set exclusion and the diff-hunk reader, both of
+    which are about what a reviewer may see and neither of which is v2's.
+    """
 
     edges = _cross_generation_edges("v5", "v2")
-    assert len(edges) <= 2, (
-        "new v5 -> v2 import(s):\n" +
+    assert edges == [], (
+        "v5 reaches back into v2:\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
 
 
@@ -137,12 +141,12 @@ def test_private_cross_boundary_imports_do_not_increase():
     `_SUBMISSION_CONTRACT`."""
 
     found = _private_cross_module_imports()
-    # 42 -> 38: `_tool_env` and `_run` were private names in `pr_review_v4/evidence.py` that
+    # 42 -> 37: `_tool_env` and `_run` were private names in `pr_review_v4/evidence.py` that
     # four modules across two packages imported anyway, so `evidence.py` -- where the evidence
     # chain lives -- could not be refactored without breaking a coordinated-patch verifier
     # that has no reason to care about evidence. They are `mathlib_review.workspace` now.
-    assert len(found) <= 38, (
-        f"{len(found)} private cross-module imports (was 38):\n" +
+    assert len(found) <= 37, (
+        f"{len(found)} private cross-module imports (was 37):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)[:12]))
 
 

@@ -94,9 +94,9 @@ def build(
     import numpy as np
     from sentence_transformers import SentenceTransformer
 
-    from src.datasets.pr_review_v2.corpus import _eval_pr_numbers
-    from src.datasets.pr_review_v2.precedent_bench import hunk_code
     from src.datasets.pr_review_v4.io import sha256_file
+    from src.mathlib_review.corpus import eval_pr_numbers as _eval_pr_numbers
+    from src.mathlib_review.corpus import hunk_code
 
     if not corpus_path.is_file():
         raise FileNotFoundError(
