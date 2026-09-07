@@ -42,53 +42,19 @@
 # CAVEAT that applies to any number from this release: gold is 31/33 `migration_proposal`
 # and only 2 curator_confirmed, so everything here is provisional until the R1b
 # confirmation sitting.
-scaffold_type: ape_agent
-
-llm_config:
-  model_name: gpt_5.2
-  max_tokens: 32000
-  thinking_budget_tokens: 30000
-  temperature: 1.0
-
-execution:
-  max_turns: 40
-  max_concurrency: 4
-
-task_config:
-  enabled_tools:
-    - file_read
-    - content_search
-    - lean_verify
-    - get_lean_goal
-    - code_hover
-    - code_goto
-    - code_references
+extends: bases/v5_generation.yaml
 
 dataset:
-  routing_mode: lead
-  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
-  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
   run_name: pr_review_v5_lead_heldout11_rep2
-  pr_numbers: [33117, 33145, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421]
-  require_prebuilt_workspaces: true
-
-  # Rank by measured importance, not by position in the diff. Reads the base commit's
-  # `.ilean` index to find changes the library leans on — PR 33294's `Ordinal.IsNormal`
-  # cluster sits under 1671 downstream modules — and lets that raise a proposal to
-  # `required`. Costs ~4.4s per distinct base commit, about a minute for this set.
-  use_exposure_index: true
-
-  # The deterministic arm is deliberately OMITTED (no execution_release): this run calibrates
-  # the agent, so every finding scored should be one the agent produced.
-
-  # Cost policy, unchanged from rep1 so the routing behaviour stays comparable. Measured
-  # billed on rep5 (a run whose verification worked): specialists median $0.039, max $0.117.
-  # 0.30 gives cheap=$0.15, standard=$0.30, deep=$0.60 — ~2.5x headroom at the default tier.
-  # Verification working again means specialists can now iterate on real compile errors, so
-  # expect the median to rise; that is the point, and the cap is where the headroom is.
-  standard_budget_cap: 0.30
-  lead_cost_cap: 1.00
-  per_pr_cost_cap: 1.50
-  # A fan-out bound, not the thing standing between us and the bill — the per-PR cost cap is
-  # enforced against delegated spend now.
-  max_delegations: 25
+  pr_numbers:
+  - 33117
+  - 33145
+  - 33285
+  - 33294
+  - 33304
+  - 33305
+  - 33315
+  - 33321
+  - 33337
+  - 33362
+  - 33421

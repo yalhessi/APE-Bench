@@ -7,12 +7,15 @@
 # the reviewer (it named the redundancy, not the mechanism) and also a real limit of the
 # measurement (the gold anchor set is mixed — `fun_iterated_deriv` is in it, the other twelve
 # `fun_*` are not). Do not read a 33117 miss as "nothing was found".
+# NO PATHS HERE. `candidates`, `out_dir` and `run_name` are derived by `judge --of <run_name>`
+# from the generation run being scored. They used to be written out, and they disagreed:
+# pr_review_v5_medium_heldout.yaml was bumped to rep2 while this file still read rep1 --
+# scoring the old run under the new run's name, with nothing to notice. One source now.
+#
+#   python -m src.datasets.pr_review_v5.cli judge --config <this> --of <run_name> --execute
 extends: bases/v5_judge.yaml
 
 dataset:
-  candidates: results/pr_review_v5/runs/pr_review_v5_specialist4_rep1/findings.jsonl
-  out_dir: results/pr_review_v5/audits/specialist4-rep1
-  run_name: pr_review_v5_judge_specialist4_rep1
   pr_numbers: [33117, 33145, 33337, 33362]
   # No control PRs in this set — both controls are larger than every PR here — so precision
   # and silent-PR emission are unmeasurable.

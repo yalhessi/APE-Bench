@@ -43,8 +43,16 @@ dataset:
 
   # Caps bind BILLED cost — what was actually paid — not the no-cache counterfactual. A job
   # that used to stop at roughly 40% of its cap now spends the whole thing, so these are real
-  # dollar ceilings rather than the accounting artefact they used to be.
+  # dollar ceilings rather than the accounting artefact they used to be. The old numbers read
+  # roughly 5x tighter than they bound.
+  #
+  # Measured billed on smoke4 rep5: specialists median $0.039, max $0.117. 0.30 gives
+  # cheap=$0.15, standard=$0.30, deep=$0.60 — about 2.5x headroom over the observed maximum
+  # at the default tier.
   standard_budget_cap: 0.30
+  # Leads billed a median $0.094 and a max $0.200 on rep5 — and that maximum is the lead that
+  # died, so it is a floor on what a full one costs. 1.00 is ~5x it, which covers a
+  # 184-proposal agenda read properly plus a second wave.
   lead_cost_cap: 1.00
   per_pr_cost_cap: 1.50
   max_delegations: 25

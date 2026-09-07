@@ -30,43 +30,12 @@
 #
 # 9 obligations across 4 PRs, so one flipped verdict is 11pp. Any recall number from this is
 # noise; the point is that the chain runs.
-scaffold_type: ape_agent
-
-llm_config:
-  model_name: gpt_5.2
-  max_tokens: 32000
-  thinking_budget_tokens: 30000
-  temperature: 1.0
-
-execution:
-  max_turns: 40
-  max_concurrency: 4
-
-task_config:
-  enabled_tools:
-    - file_read
-    - content_search
-    - lean_verify
-    - get_lean_goal
-    - code_hover
-    - code_goto
+extends: bases/v5_generation.yaml
 
 dataset:
-  routing_mode: lead
-  release: inputs/pr_review_v4/releases/dev-medium-0.3.0
-  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
   run_name: pr_review_v5_smoke4_e2e_rep1
-  pr_numbers: [33117, 33145, 33337, 33362]
-  require_prebuilt_workspaces: true
-
-  # Reads the base commit's `.ilean` index so importance can raise a proposal to `required`.
-  # ~4.4s per distinct base commit — four here, so about twenty seconds.
-  use_exposure_index: true
-
-  # The deterministic arm is deliberately OMITTED (no execution_release): every finding
-  # scored should be one the agent produced.
-
-  standard_budget_cap: 0.30
-  lead_cost_cap: 1.00
-  per_pr_cost_cap: 1.50
-  max_delegations: 25
+  pr_numbers:
+  - 33117
+  - 33145
+  - 33337
+  - 33362

@@ -113,31 +113,26 @@ async def _run_arm(payloads: Dict[str, Dict[str, Any]], scaffold, run_name: str,
     return dict(anchors), errors, results
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--config", type=Path, required=True,
-                        help="a v5 generation config; supplies the release and the model")
-    parser.add_argument("--arm", action="append", required=True,
-                        help="arm to bench; repeatable")
-    parser.add_argument("--pr", type=int, action="append", dest="pr_numbers")
-    parser.add_argument("--negatives-per-pr", type=int, default=3)
-    parser.add_argument("--out", type=Path, default=None,
-                        help="write the score here (only with --execute)")
-    parser.add_argument("--execute", action="store_true",
-                        help="actually run the arm. Without it this is read-only.")
-    args = parser.parse_args()
+def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
+                execute=False, logger=None) -> int:
+    """Build the benches, report coverage, and run them only when told to.
+
+    Split out of `main` so the unified entrypoint calls the same code path with the same
+    `--execute` gate rather than reimplementing it -- a second implementation of "does this
+    spend money" is the kind of divergence this consolidation exists to remove.
+    """
 
     from ape.utils.logging import create_logger
 
     from .runner import load_release, load_run
 
-    logger = create_logger("bench")
-    dataset, scaffold, _overrides = load_run(args.config)
+    logger = logger or create_logger("bench")
+    dataset, scaffold, _overrides = load_run(config)
     release = load_release(dataset)
 
-    benches = build_all(dataset.release, roster(), pr_numbers=args.pr_numbers,
-                        negatives_per_pr=args.negatives_per_pr)
-    wanted = set(args.arm)
+    benches = build_all(dataset.release, roster(), pr_numbers=pr_numbers,
+                        negatives_per_pr=negatives_per_pr)
+    wanted = set(arms)
     unknown = wanted - set(benches)
     if unknown:
         raise SystemExit(f"unknown arm(s): {sorted(unknown)}; known: {sorted(benches)}")
@@ -145,11 +140,11 @@ def main() -> None:
 
     print(json.dumps(coverage_report(benches), indent=2))
 
-    if not args.execute:
+    if not execute:
         total = sum(len(b.cases) for b in benches.values())
         print(f"\n-- no --execute: {total} case(s) across {len(benches)} arm(s) would run. "
               "Nothing was called and nothing was written.")
-        return
+        return 0
 
     judgments = load_jsonl(dataset.release / "gold/judgments.jsonl", JudgmentNode)
     scores = {}
@@ -174,10 +169,31 @@ def main() -> None:
         scores[arm_id] = score
         print(json.dumps(score, indent=2))
 
-    if args.out:
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
-        print(f"\nwrote {args.out}")
+    if out:
+        Path(out).parent.mkdir(parents=True, exist_ok=True)
+        Path(out).write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
+        print(f"\nwrote {out}")
+    return 0
+
+
+def main() -> None:
+    """Kept so the module stays runnable on its own; the shared path is `run_benches`."""
+
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--config", type=Path, required=True,
+                        help="a v5 generation config; supplies the release and the model")
+    parser.add_argument("--arm", action="append", required=True,
+                        help="arm to bench; repeatable")
+    parser.add_argument("--pr", type=int, action="append", dest="pr_numbers")
+    parser.add_argument("--negatives-per-pr", type=int, default=3)
+    parser.add_argument("--out", type=Path, default=None,
+                        help="write the score here (only with --execute)")
+    parser.add_argument("--execute", action="store_true",
+                        help="actually run the arm. Without it this is read-only.")
+    args = parser.parse_args()
+    raise SystemExit(run_benches(
+        config=args.config, arms=args.arm, pr_numbers=args.pr_numbers,
+        negatives_per_pr=args.negatives_per_pr, out=args.out, execute=args.execute))
 
 
 if __name__ == "__main__":

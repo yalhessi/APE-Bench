@@ -26,10 +26,24 @@ from src.datasets.pr_review_v4.runner import V4DatasetConfig
 from src.datasets.pr_review_v5.runner import V5DatasetConfig
 
 
-def _model_for(dataset: dict, path: str):
-    """Which dataset model a config belongs to, by the keys only that model has."""
+#: What `judge --of <run_name>` supplies, so a judge config can be validated as it is actually
+#: used. The v5 judge configs deliberately carry none of the three: they are one run identity
+#: written three times, and writing it three times is what let a judge score rep1's findings
+#: under rep2's name.
+JUDGE_DERIVED = {"candidates": "results/r/findings.jsonl", "out_dir": "results/audits/r",
+                 "run_name": "pr_review_v5_judge_r"}
 
-    if "candidates" in dataset:
+
+def _model_for(dataset: dict, path: str):
+    """Which dataset model a config belongs to.
+
+    Judge configs are recognised by name rather than by a `candidates` key. Keying on the key
+    was fine only while every judge config wrote its own paths; the moment they stopped, four
+    of them were silently reclassified as generation configs and validated against the wrong
+    model -- which is how a discriminator that reads a field instead of an identity fails.
+    """
+
+    if path.endswith("_judge.yaml") or "candidates" in dataset:
         return JudgeDatasetConfig
     if "routing_mode" in dataset or "v5" in path:
         return V5DatasetConfig
@@ -52,6 +66,11 @@ def _dataset_configs():
 @pytest.mark.parametrize("path,model,dataset", list(_dataset_configs()),
                          ids=lambda v: Path(v).name if isinstance(v, str) else "")
 def test_every_shipped_config_validates(path, model, dataset):
+    if model is JudgeDatasetConfig:
+        # As it is actually run. A v5 judge config is incomplete on its own by design, and
+        # `--of` is what completes it; validating it without that would test a form nobody
+        # uses and would force the paths back into the file.
+        dataset = {**JUDGE_DERIVED, **dataset}
     model.model_validate(dataset)
 
 
