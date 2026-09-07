@@ -415,6 +415,62 @@ class BudgetTooSmall(RuntimeError):
     """The run cannot pay for the work it is required to do."""
 
 
+class CoverageGapAtPlanTime(RuntimeError):
+    """The run would leave work units unreviewed, and the numbers would not mean what they say."""
+
+
+def assert_coverage_is_reachable(dataset, report, logger) -> None:
+    """A specialist-only run must not leave a work unit with nothing eligible on it.
+
+    This was a comment on `generalist_floor`: "Only turn it off on a set where the specialists
+    already cover every work unit -- `agenda_report` reports `units_without_specialist`, and a
+    run that leaves units unreviewed measures coverage loss, not arm quality."
+
+    A comment cannot check itself, and this one has already been read wrong once. On the rep2
+    heldout run `units_without_specialist` came back empty and was used to green-light a
+    specialist-only run -- but it was empty because a mandatory job that ran and *failed* was
+    counted as covered, so a budget cutoff read as full coverage. The reconciliation bug is
+    fixed; the unchecked precondition was not, and it is the cheaper of the two to enforce.
+
+    Refused rather than warned. The output of such a run is not wrong, it is unreadable: a
+    recall drop measures the units nobody looked at, and nothing downstream distinguishes that
+    from arms that looked and missed.
+    """
+
+    if dataset.generalist_floor:
+        return
+    uncovered = report.get("units_without_specialist") or []
+    if not uncovered:
+        logger.info("specialist-only: all work units draw at least one specialist")
+        return
+    raise CoverageGapAtPlanTime(
+        f"generalist_floor is off and {len(uncovered)} work unit(s) have no eligible "
+        f"specialist: {sorted(uncovered)[:8]}. Without the floor those units are not reviewed "
+        "at all, so the run measures coverage loss rather than arm quality. Either turn the "
+        "floor back on, or restrict `pr_numbers` to a set the specialists cover."
+    )
+
+
+def assert_the_judge_model_is_pinned(dataset, logger) -> None:
+    """The evidence gate must be a choice, not a default nobody made.
+
+    `skip_evidence_chain` restores the closed gate every run before this one had, and its own
+    docstring says why the default is off: a closed gate made "no collector ran"
+    indistinguishable from "the claim failed", and eight runs reported publication rates under
+    that regime as if they were strictness results.
+
+    Nothing stopped a config from turning it back on silently, so it is said out loud here --
+    at plan time, where it can still be reconsidered, rather than in the finalization report
+    after the money is spent.
+    """
+
+    if dataset.skip_evidence_chain:
+        logger.warning(
+            "skip_evidence_chain is ON: the generalist gate is CLOSED, so no generalist claim "
+            "can publish and `generalist_evidence_gate` will read `closed`. Publication rates "
+            "from this run are not strictness results.")
+
+
 def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = False) -> None:
     """Say what this run is committed to before it starts, and refuse it if it cannot fit.
 
@@ -475,6 +531,75 @@ def coordination_config(dataset) -> CoordinationConfig:
     return config
 
 
+#: Plan fields a resume may change. Everything else is semantic: change it and the run is a
+#: different experiment, whatever the directory is called.
+#:
+#: The line is drawn at "does this change what the run *measures*". A budget does not -- a
+#: resumed run with a raised cap answers the same question, having been allowed to finish
+#: asking it. A prompt hash, the model, the agenda, the routing mode, the coordination policy
+#: and the evaluation settings all do.
+RESUMABLE_PLAN_FIELDS = frozenset({
+    "lead_cost_cap", "standard_budget_cap", "per_pr_cost_cap",
+    "scaffold_config_sha256",  # carries retries and timeouts, which a resume may raise
+    "git_commit", "git_tree_state",  # provenance of *this* attempt, not of the experiment
+    "source_sha256",             # derived from the above
+})
+
+
+class PlanChangedSemantically(RuntimeError):
+    """A resume would answer a different question than the run it is resuming."""
+
+
+def seal_or_revise_plan(out: Path, plan: V5RunPlan, logger) -> Path:
+    """Write the plan, or record a revision of it when only operational fields moved.
+
+    `write_once` refuses a differing artifact, which is the right default and too blunt for a
+    resume: a run paused on budget can only be finished by raising the budget, and that made
+    the plan differ, and the resume was then refused at the first write. The two ways out were
+    both bad -- a new run name, which forfeits every completed attempt in the orchestrator
+    cache, or deleting the plan, which forfeits the pre-registration.
+
+    So the plan stays immutable and revisions accumulate beside it: `run_plan.json` is what
+    was sealed first, `run_plan_revision_2.json` is what the second attempt ran under. A
+    semantic change is still refused -- with the specific fields named, since "the plan
+    differs" was not enough to act on.
+    """
+
+    sealed = out / "run_plan.json"
+    payload = pretty_json_bytes(plan.model_dump(mode="json"))
+    if not sealed.exists():
+        write_once(sealed, payload)
+        return sealed
+    if sealed.read_bytes() == payload:
+        return sealed
+
+    import json as _json
+
+    before = _json.loads(sealed.read_text(encoding="utf-8"))
+    after = plan.model_dump(mode="json")
+    changed = {key for key in set(before) | set(after) if before.get(key) != after.get(key)}
+    semantic = sorted(changed - RESUMABLE_PLAN_FIELDS)
+    if semantic:
+        raise PlanChangedSemantically(
+            f"the sealed plan for {plan.run_name!r} differs in {semantic}, which changes what "
+            "the run measures rather than what it may spend. Resuming under the same name "
+            "would attribute two experiments to one pre-registration. Use a new run_name — "
+            "the orchestrator cache is keyed on it, so this is also what makes the changed "
+            "code actually execute."
+        )
+
+    revision = 2
+    while (out / f"run_plan_revision_{revision}.json").exists():
+        revision += 1
+    path = out / f"run_plan_revision_{revision}.json"
+    write_once(path, payload)
+    logger.warning(
+        "resuming %s under revision %d: %s changed. The original plan stands; %s records "
+        "what this attempt ran under.",
+        plan.run_name, revision, sorted(changed), path.name)
+    return path
+
+
 def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
     """Seal the pre-registration. Constructed identically in dry and real runs.
 
@@ -509,6 +634,14 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
         standard_budget_cap=dataset.standard_budget_cap,
         per_pr_cost_cap=dataset.per_pr_cost_cap,
         coordination=coordination_config(dataset).report(),
+        evaluation_settings={
+            "execution_release": (str(dataset.execution_release)
+                                  if dataset.execution_release else None),
+            "skip_evidence_chain": dataset.skip_evidence_chain,
+            "pr_finding_limit": dataset.pr_finding_limit,
+            "generalist_floor": dataset.generalist_floor,
+            "use_exposure_index": dataset.use_exposure_index,
+        },
         git_commit=commit, git_tree_state=tree_state,
         source_sha256="",
     )
@@ -660,6 +793,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         guard_run_name(dataset, logger, scaffold, fatal=False)
         logger.info("%s", json.dumps(report, indent=2))
         _report_budget(dataset, report, len(selected_prs), logger)
+        assert_coverage_is_reachable(dataset, report, logger)
+        assert_the_judge_model_is_pinned(dataset, logger)
         # Resolving cutoffs during a dry run is the cheapest place to discover that a gated
         # read would have been impossible.
         cutoffs_by_episode(episodes)
@@ -670,6 +805,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         return None
 
     _report_budget(dataset, report, len(selected_prs), logger, enforce=True)
+    assert_coverage_is_reachable(dataset, report, logger)
+    assert_the_judge_model_is_pinned(dataset, logger)
     guard_run_name(dataset, logger, scaffold)
     out = run_dir(dataset.run_name)
     out.mkdir(parents=True, exist_ok=True)
@@ -681,7 +818,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
     write_once(out / "agenda_report.json", pretty_json_bytes(report))
 
     plan = _build_plan(dataset, scaffold, agenda)
-    write_once(out / "run_plan.json", pretty_json_bytes(plan.model_dump(mode="json")))
+    seal_or_revise_plan(out, plan, logger)
 
     if dataset.routing_mode == "lead":
         # Rank each PR's work before the lead reads it. Relations are computed once for the

@@ -229,6 +229,16 @@ class DelegationRecord(StrictModel):
     source_sha256: str
 
 
+#: Incremented when a change makes two runs' numbers non-comparable without either being
+#: wrong. History, so a bump is a decision with a reason attached rather than a number:
+#:
+#:   1  the original contract: one admission axis, anchor-tier pairing, drops discarded.
+#:   2  dual admission channels (`review` / `verified`), and specialist claims dropped for
+#:      lacking a warrant retained as `diagnostic` instead of counted to stderr. Recall against
+#:      a v1 run and a v2 run answer different questions.
+EVALUATION_CONTRACT_VERSION = "v5-evaluation/2"
+
+
 class V5RunPlan(StrictModel):
     """Pre-registration, sealed before the first model call.
 
@@ -245,6 +255,15 @@ class V5RunPlan(StrictModel):
     """
 
     schema_version: Literal["v5-run-plan1"] = "v5-run-plan1"
+    #: What a recall number from this run *means*. Bumped whenever a change makes two runs'
+    #: numbers non-comparable without either run being wrong -- widening `pairing_tiers`,
+    #: changing what admission channels exist, changing whether unwarranted claims are
+    #: retained. `schema_version` says the file parses; this says the numbers compare.
+    #:
+    #: They are different questions and the file-format one was answering both. Widening
+    #: `pairing_tiers` from `[anchor]` can only raise recall and changes no field, so a run
+    #: that widened it and one that did not are separated by nothing readable.
+    evaluation_contract_version: str = EVALUATION_CONTRACT_VERSION
     run_id: str
     run_name: str
     routing_mode: Literal["fanout", "rules", "lead"]
@@ -271,6 +290,17 @@ class V5RunPlan(StrictModel):
     #: may run at most once, the parent sees a truncated summary, a child sees nothing of its
     #: siblings, the lead may drop and fold but not rewrite.
     coordination: Dict[str, Any] = Field(default_factory=dict)
+    #: Settings that change what the run's numbers mean, sealed with the rest.
+    #:
+    #: Each was documented in a comment on the field and recorded nowhere. `execution_release`
+    #: decides whether the deterministic arm's findings are in the pool at all;
+    #: `skip_evidence_chain` closes the generalist gate, so no generalist claim can publish
+    #: and a publication rate is not a strictness result; `pr_finding_limit` truncates the
+    #: per-PR review, so a run that hit the limit and one that did not are not comparable;
+    #: `generalist_floor` off is a specialist-only run. Reading a run's numbers requires all
+    #: four, and until now they had to be recovered from whichever config was believed to have
+    #: produced it.
+    evaluation_settings: Dict[str, Any] = Field(default_factory=dict)
     git_commit: Optional[str] = None
     #: `io.git_state()`'s second element verbatim. Tri-state, not a bool: `unknown` (git
     #: unavailable) is a real provenance answer and is not the same claim as `clean`.
