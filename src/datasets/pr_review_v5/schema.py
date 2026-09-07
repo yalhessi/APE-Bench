@@ -47,7 +47,7 @@ DISPOSITIONS = ("mandatory", "proposed", "agent_added", "pruned")
 
 #: Context capabilities an arm may be granted.
 #:
-#: The grant is **per arm**, and the policy lives in `arms._CONTEXT_GRANTS` — this tuple is
+#: The grant is **per arm**, and the policy lives in `arm_registry` — this tuple is
 #: only the vocabulary. It used to say that granting every arm all four was deliberate and
 #: that a per-arm subset would answer an unmeasured question by assumption; smoke4 measured
 #: it, `arms.py` was changed, and this comment was left behind asserting the opposite of what

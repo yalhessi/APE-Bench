@@ -171,9 +171,9 @@ def test_the_arms_that_may_look_beyond_declarations_still_can():
     assert "module_doc" not in kinds["naming"]
 
 
-def test_adding_an_arm_is_one_edit():
-    """The measure of whether this stayed fixed: everything `v5_specs` produces is read off
-    the registry entry, so a new `_arm(...)` line is a whole new arm."""
+def test_nothing_but_the_registry_names_an_arm_when_building_specs():
+    """Everything `v5_specs` produces is read off the registry entry, so an arm's id, concern,
+    issue kind, subject kinds and rationale appear in exactly one place."""
 
     import inspect
 
@@ -181,10 +181,32 @@ def test_adding_an_arm_is_one_edit():
 
     source = inspect.getsource(arms.v5_specs)
     assert "for definition in ARM_DEFINITIONS" in source
-    # No arm may be named in the function that projects them.
     for definition in arm_registry.ARM_DEFINITIONS:
         assert f'"{definition.arm_id}"' not in source, (
             f"v5_specs names {definition.arm_id}; it should only iterate the registry")
+
+
+def test_adding_an_arm_takes_two_edits_and_the_second_one_says_so():
+    """Measured by adding an arm through the registry alone and seeing what refused.
+
+    Two edits, and the second is irreducible: an arm is a declaration plus the one question it
+    asks, and a prompt is real content rather than boilerplate a registry could generate. What
+    was not irreducible is being told about it -- this surfaced as a bare
+    `KeyError: 'import_hygiene'` from a dict lookup two frames down, which is exactly the
+    "forgot a lesson, told nothing useful" failure this consolidation started from.
+    """
+
+    from dataclasses import replace
+
+    from src.datasets.pr_review_v5.arms import _new_spec
+
+    undeclared = replace(arm_registry.ARM_DEFINITIONS[0], arm_id="import_hygiene")
+    with pytest.raises(KeyError) as excinfo:
+        _new_spec(undeclared)
+    message = str(excinfo.value)
+    assert "import_hygiene" in message
+    assert "FOCUSED_PROMPTS" in message
+    assert "focused_prompts.py" in message
 
 
 # --- what the sealed identities cover ------------------------------------------------------
@@ -233,3 +255,49 @@ def test_changing_an_arms_retrieval_grant_moves_the_agenda():
     assert (sha256_bytes(canonical_json_bytes(payload))
             != sha256_bytes(canonical_json_bytes(altered)))
     assert "arms" in ReviewAgenda.model_fields
+
+
+def test_a_new_arm_needs_nothing_beyond_those_two_edits(monkeypatch):
+    """The end-to-end form of the guarantee, and the answer to "we end up touching way too
+    many things".
+
+    Adding `family_design` once meant editing thirteen source files across six packages, four
+    of them dictionaries keyed by arm id that had to agree by hand. A registry entry plus a
+    prompt is now the whole of it: the spec, the `ReviewArm`, the tool grant, the bench roster
+    and the concern vocabulary all fall out.
+    """
+
+    from dataclasses import replace
+
+    from ape.tasks.lean_tasks.formal_math.pr_shared import focused_prompts
+    from src.datasets.pr_review_v5 import arms, bench_cli
+
+    prompts = dict(focused_prompts.FOCUSED_PROMPTS)
+    prompts["import_hygiene"] = (
+        ["file_read", "content_search"],
+        "You are a Mathlib maintainer running ONE focused check: imports.",
+        "## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n",
+    )
+    monkeypatch.setattr(focused_prompts, "FOCUSED_PROMPTS", prompts)
+
+    declared = arm_registry._arm(
+        "import_hygiene", "scope", "scope_violation",
+        "Does this file import more than it uses, or reach across a layer boundary?",
+        context_tools=("declaration_search",))
+    roster = arm_registry.ARM_DEFINITIONS + (declared,)
+    monkeypatch.setattr(arm_registry, "ARM_DEFINITIONS", roster)
+    monkeypatch.setattr(arms, "ARM_DEFINITIONS", roster)
+    monkeypatch.setattr(bench_cli, "ARM_DEFINITIONS", roster)
+
+    specs = {spec.spec_id: spec for spec in arms.v5_specs()}
+    assert "import_hygiene" in specs
+    assert specs["import_hygiene"].concern_family == "scope"
+
+    built = {arm.arm_id: arm for arm in arms.default_arms("candidate-prompt/12")}
+    assert built["import_hygiene"].context_tools == [
+        "declaration_search", "lean_verify_edit"]
+
+    assert "import_hygiene" in bench_cli.roster()
+    assert arm_registry.expected_concerns()["import_hygiene"] == frozenset({"scope"})
+    # Not checkable unless it says so: a compile cannot settle an import-hygiene claim.
+    assert "import_hygiene" not in arm_registry.checkable_arms()

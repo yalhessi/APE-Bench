@@ -4,7 +4,7 @@ Adding a specialist used to mean editing thirteen source files across six packag
 of those edits were dictionaries keyed by arm id that had to agree with each other by hand:
 
     arms.CHECKABLE_ARMS        can a compile settle this arm's claims
-    arms._CONTEXT_GRANTS       which retrieval tools it gets
+    arms._CONTEXT_GRANTS       which retrieval tools it gets (now derived per call)
     arm.ALLOWED_CONCERN_BY_ARM which concerns it may declare on a submission (now
                                arm.EXPECTED_CONCERN_BY_ARM, and no longer a gate)
     arm.PATCH_SET_ARMS         may it submit a coordinated multi-file patch
@@ -72,7 +72,7 @@ class ArmDefinition:
     expected_concerns: FrozenSet[str]
 
     #: Retrieval tools beyond the universal grant, matched to the shape of answer this arm
-    #: needs. See `_CONTEXT_GRANTS` in `arms.py` for the measurement that made this per-arm.
+    #: needs. See `context_grants()` below for the measurement that made this per-arm.
     context_tools: Tuple[str, ...] = ()
 
     #: Can a compile settle this arm's claims? A checkable arm is admitted through the

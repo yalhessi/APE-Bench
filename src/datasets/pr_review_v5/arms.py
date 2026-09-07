@@ -87,6 +87,18 @@ def _new_spec(definition) -> FocusedAgentSpec:
     """One registry entry as a `FocusedAgentSpec`. Nothing is decided here."""
 
     hashes = prompt_hashes()
+    if definition.arm_id not in hashes:
+        # Adding an arm takes two edits and this is the second one. It used to surface as a
+        # bare `KeyError: 'import_hygiene'` from a dict lookup two frames down, which says
+        # nothing about what to do -- and forgetting a step then being told nothing useful is
+        # the specific complaint this consolidation started from.
+        raise KeyError(
+            f"arm {definition.arm_id!r} is declared in `arm_registry.ARM_DEFINITIONS` but has "
+            "no prompt. Add a `(TOOLS, SYSTEM, USER)` entry for it to `FOCUSED_PROMPTS` in "
+            "src/ape/tasks/lean_tasks/formal_math/pr_shared/focused_prompts.py. An arm is a "
+            "declaration plus the one question it asks: the registry holds the first and the "
+            f"prompt file holds the second. Known: {sorted(hashes)}"
+        )
     return FocusedAgentSpec(
         spec_id=definition.arm_id,
         spec_version=V5_SPEC_VERSION,
@@ -154,13 +166,17 @@ CHECKABLE_ARMS = checkable_arms()
 
 _UNIVERSAL_CONTEXT_TOOLS = UNIVERSAL_CONTEXT_TOOLS
 
-_CONTEXT_GRANTS: Dict[str, tuple] = context_grants()
-
-
 def _grant_for(arm_id: str) -> List[str]:
-    """This arm's context grant, in `CONTEXT_TOOLS` order so the hash is stable."""
+    """This arm's context grant, in `CONTEXT_TOOLS` order so the hash is stable.
 
-    granted = set(_CONTEXT_GRANTS.get(arm_id, ())) | set(_UNIVERSAL_CONTEXT_TOOLS)
+    Reads the registry on each call rather than a `_CONTEXT_GRANTS = context_grants()` taken
+    at import. The snapshot was correct -- the registry is static in a running process -- and
+    it was still a copy of a table this module exists to stop copying: a derived view that
+    stops tracking its source the moment the source changes is the same defect as the four
+    hand-maintained dictionaries the registry replaced, one import earlier.
+    """
+
+    granted = set(context_grants().get(arm_id, ())) | set(_UNIVERSAL_CONTEXT_TOOLS)
     return [name for name in CONTEXT_TOOLS if name in granted]
 
 
@@ -261,8 +277,8 @@ def resolve_context_tools(arm: ReviewArm, available: Optional[List[str]] = None)
     identifier lookup regardless of what they are being asked: 106 `declaration_search`
     calls run-wide, 50 of them from `family_design`, whose question no identifier lookup can
     answer and which returned nothing from eleven invocations. The grant is now per arm and
-    the reasoning is in `_CONTEXT_GRANTS`; the generalist is deliberately exempt so it stays
-    comparable with the runs before this one.
+    the reasoning is in `arm_registry.context_grants`; the generalist is deliberately
+    exempt so it stays comparable with the runs before this one.
     """
 
     grant = [item for item in arm.context_tools if item in CONTEXT_TOOLS]

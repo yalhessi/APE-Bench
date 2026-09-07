@@ -193,13 +193,20 @@ def test_tier_multipliers_has_exactly_one_definition():
 
 
 def test_the_context_tool_grant_has_one_owner():
-    """The vocabulary lives in `schema`, the policy in `arms`. The schema comment used to
-    assert the opposite of what `arms` does."""
+    """The vocabulary lives in `schema`, the policy in `arm_registry`.
+
+    `arms.py` held `_CONTEXT_GRANTS = context_grants()`, a module-level snapshot taken at
+    import. Correct, since the registry is static in a running process, and still a copy of a
+    table the registry exists to stop copying -- a derived view that stops tracking its source
+    is the same defect as the four hand-maintained dictionaries it replaced, one import
+    earlier. `_grant_for` reads the registry per call now.
+    """
 
     schema = Path("src/datasets/pr_review_v5/schema.py").read_text(encoding="utf-8")
     arms = Path("src/datasets/pr_review_v5/arms.py").read_text(encoding="utf-8")
-    assert re.search(r"^_CONTEXT_GRANTS\s*:", arms, re.M)
-    # The policy is defined in one place; `schema` may refer to it but must not restate it.
+    assert "context_grants().get(arm_id" in arms
+    # No module-level copy in either file.
+    assert not re.search(r"^_CONTEXT_GRANTS\s*[:=]", arms, re.M)
     assert not re.search(r"^_CONTEXT_GRANTS\s*[:=]", schema, re.M)
     # The stale claim that every arm gets all four must not come back.
     assert "Defaulting every arm to all four is" not in schema
