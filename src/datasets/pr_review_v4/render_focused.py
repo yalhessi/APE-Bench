@@ -23,7 +23,7 @@ contract — `change_ids ⊆ unit` — keeps holding unchanged.
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
 
@@ -32,7 +32,24 @@ from .io import canonical_json_bytes, sha256_bytes
 from .render_prompts import FACET_CHECKLIST
 from .schema import ChangeGraph, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit
 
-FOCUSED_RENDERER_VERSION = "focused-prompt/1"
+#: Bumped for the hunk/checklist deduplication: every prompt this renderer produces changed,
+#: so runs before and after are not prompt-identical and must not be compared as if they were.
+FOCUSED_RENDERER_VERSION = "focused-prompt/2"
+
+#: The same checklist, emitted once for the whole prompt instead of once per target.
+#:
+#: `render_prompts.FACET_CHECKLIST` keeps its per-target wording and is deliberately left alone:
+#: it is hashed into every frozen `rendered_prompts.jsonl`, so editing it moves every prompt
+#: hash in every release at once. The generalist path therefore still carries the repetition
+#: until a release is re-rendered; only the arms this renderer serves are deduplicated here.
+FOCUSED_FACET_CHECKLIST = FACET_CHECKLIST.replace(
+    "### Maintainer ask checklist for this target\n"
+    "Consider every item, but emit a candidate only for a concrete change you would actually "
+    "request.",
+    "### Maintainer ask checklist\n"
+    "Apply every item to every review target above, but emit a candidate only for a concrete "
+    "change you would actually request.",
+)
 
 #: The v4 submission envelope, appended after each spec's own instruction.
 #:
@@ -83,9 +100,11 @@ in the library, that is a duplication claim whatever check you are running, and 
 `concern_label` is what lets it be verified against the library rather than taken on trust."""
 
 
-def _target_block(target) -> str:
+def _target_block(target, fragments_section: Optional[str] = None) -> str:
     base = target.base_code if target.base_code is not None else "(not present)"
     reviewed = target.reviewed_code if target.reviewed_code is not None else "(not present)"
+    if fragments_section is None:
+        fragments_section = f"```diff\n{''.join(target.diff_fragments)}\n```"
     return (
         f"## Review target\nChange ID (copy exactly): `{target.change_id}`\n"
         f"Path: {target.path}\nKind: {target.kind}\n"
@@ -94,8 +113,40 @@ def _target_block(target) -> str:
         f"{', '.join(target.reviewed_entity_ids + target.base_entity_ids) or '(none)'}\n"
         f"### Complete base region\n```lean\n{base}\n```\n"
         f"### Complete reviewed region\n```lean\n{reviewed}\n```\n"
-        f"### Exact changed fragments\n```diff\n{''.join(target.diff_fragments)}\n```"
+        f"### Exact changed fragments\n{fragments_section}"
     )
+
+
+def _target_blocks(targets: Sequence[Any]) -> List[str]:
+    """One block per target, with each distinct diff hunk printed exactly once.
+
+    A work unit is a group of related changes in one file, so its targets usually share a hunk:
+    measured across smoke4's 143 prompts, the mean was 1.8 distinct hunks against 3.4 targets,
+    and 32% of all prompt text was a hunk verbatim repeated within the same prompt. One
+    `api_reuse` job carried six targets, one unique hunk, and 16,710 duplicate characters out of
+    33,174. Re-reading the same diff five times is paid for on every invocation and crowds out
+    the context the arm was given the slice for.
+
+    The first target to use a hunk prints it; later targets naming the same hunk get a pointer
+    to that target's subject. Nothing else about a target block changes, so the per-target
+    identity fields the submission contract keys on are untouched.
+    """
+
+    first_use: Dict[str, str] = {}
+    blocks: List[str] = []
+    for target in targets:
+        fragments = "".join(target.diff_fragments)
+        subject = target.declaration_name or target.path
+        owner = first_use.get(fragments)
+        if owner is None:
+            first_use[fragments] = subject
+            blocks.append(_target_block(target))
+        else:
+            blocks.append(_target_block(
+                target,
+                f"Identical to the fragments shown for `{owner}` above.",
+            ))
+    return blocks
 
 
 def focused_system_prompt(spec: FocusedAgentSpec) -> str:
@@ -123,10 +174,10 @@ def render_focused_invocation(
             f"invocation {invocation.invocation_id} names sites outside its work unit"
         )
     targets = {item.change_id: item for item in graph.targets}
-    blocks = [
-        f"{_target_block(targets[change_id])}\n{FACET_CHECKLIST}"
-        for change_id in invocation.site_change_ids
-    ]
+    # The checklist is identical for every target and was previously appended to each one: 530
+    # copies across smoke4's 143 prompts, 13% of all prompt text. It is emitted once, after the
+    # targets, so it still reads as applying to all of them.
+    blocks = _target_blocks([targets[change_id] for change_id in invocation.site_change_ids])
     system = focused_system_prompt(spec)
     user = (
         f"# PR #{episode.pr_number}: {episode.title.text or ''}\n"
@@ -135,6 +186,7 @@ def render_focused_invocation(
         f"Changed files: {', '.join(episode.changed_files)}\n\n"
         f"You are running the {spec.spec_id} check on the "
         f"{len(blocks)} review target(s) below.\n\n" + "\n\n".join(blocks)
+        + f"\n\n{FOCUSED_FACET_CHECKLIST}"
         # Appended *after* the targets, and hashed with them: the slice is part of the
         # sealed prompt, so a run cannot silently differ from the plan it sealed.
         + (context_text or "")
