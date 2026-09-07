@@ -24,7 +24,7 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import (
     TIER_MULTIPLIERS,
     JobSpec,
     _normalize_status,
-    _tier_config,
+    _wave_config,
     run_jobs,
 )
 from src.datasets.pr_review_v4.io import sha256_bytes, canonical_json_bytes
@@ -47,31 +47,49 @@ def _parent(tmp_path, cap=0.25):
     )
 
 
-def test_each_tier_gets_its_own_cap(tmp_path):
-    """`sample_max_cost` is orchestrator-wide — there is no per-task cap — so the only way
-    to give two jobs different budgets is to run them in different orchestrators."""
+def test_a_job_carries_its_own_budget_rather_than_being_grouped_by_it():
+    """This used to read: "`sample_max_cost` is orchestrator-wide, so the only way to give two
+    jobs different budgets is to run them in different orchestrators."
 
-    parent = _parent(tmp_path)
-    caps = {
-        tier: _tier_config(parent, tier, 0.25, wave=1).execution.sample_max_cost
-        for tier in TIER_MULTIPLIERS
-    }
+    That was true and is not any more. `Attempt.cost_limit` was always a per-attempt field and
+    `runtime.run_task` always took `cost_limit` per call -- both were simply filled from the
+    orchestrator config. The worker now prefers a limit carried on the task, so a `cheap` job
+    and a `deep` one run side by side in one orchestrator with different ceilings.
+
+    Retiring the grouping took three defects with it: unbounded concurrency across tiers
+    dispatched by `asyncio.gather`, an exception in one tier discarding another tier's
+    completed outcomes and their spend, and a directory depth the trajectory reader hardcoded.
+    """
+
+    from ape.orchestration.models import EXECUTION_LIMITS_KEY, task_execution_limits
+
+    execution = SimpleNamespace(max_turns=40, sample_max_cost=0.25)
+    caps = {}
+    for tier, multiplier in TIER_MULTIPLIERS.items():
+        payload = {EXECUTION_LIMITS_KEY: {"billed_cost_limit": 0.25 * multiplier}}
+        caps[tier] = task_execution_limits(payload, execution).billed_cost_limit
     assert caps == {"cheap": 0.125, "standard": 0.25, "deep": 0.5}
+
+    # And a job with no override still gets the orchestrator's value.
+    assert task_execution_limits({}, execution).billed_cost_limit == 0.25
 
 
 def test_nested_execution_stays_in_process(tmp_path):
     """The lead is very likely already inside a `SampleWorker`; spawning a multiprocessing
     pool from there is the obvious way to deadlock the run."""
 
-    config = _tier_config(_parent(tmp_path), "standard", 0.25, wave=1)
+    config = _wave_config(_parent(tmp_path), wave=1)
     assert config.execution.num_processes == 0
+    # And bounded, which nothing enforced while tiers were gathered concurrently: four leads,
+    # four arms each, three tiers was up to 48 simultaneous Lean compiles from one process.
+    assert config.execution.max_concurrency >= 1
 
 
 def test_one_attempt_per_job(tmp_path):
     """Best-of-n across arms is a different experiment; running it by accident would turn a
     routing comparison into a sampling comparison."""
 
-    config = _tier_config(_parent(tmp_path), "standard", 0.25, wave=1)
+    config = _wave_config(_parent(tmp_path), wave=1)
     assert config.execution.sample_count == 1
     # The TYPE, not just the value. `EarlyStopMode` is a `str, Enum`, so a raw string passes
     # every `==` check while `orchestrator.py`'s `.early_stop_mode.value` raises on it — and
@@ -84,42 +102,46 @@ def test_one_attempt_per_job(tmp_path):
     assert config.execution.early_stop_mode.value == "disabled"
 
 
-def test_every_tier_config_field_survives_assignment(tmp_path):
-    """`ExecutionConfig` does not validate on assignment, so anything `_tier_config` sets
-    post-construction keeps whatever type it was handed. Enum-typed fields are the ones that
-    fail late and silently."""
+def test_every_wave_config_field_survives_assignment(tmp_path):
+    """`ExecutionConfig` does not validate on assignment, so anything set post-construction
+    keeps whatever type it was handed. Enum-typed fields are the ones that fail late and
+    silently."""
 
-    for tier in TIER_MULTIPLIERS:
-        config = _tier_config(_parent(tmp_path), tier, 0.25, wave=1)
-        assert isinstance(config.execution.num_processes, int)
-        assert isinstance(config.execution.sample_count, int)
-        assert isinstance(config.execution.sample_max_cost, float)
-        assert isinstance(config.execution.early_stop_mode, EarlyStopMode)
+    config = _wave_config(_parent(tmp_path), wave=1)
+    assert isinstance(config.execution.num_processes, int)
+    assert isinstance(config.execution.sample_count, int)
+    assert isinstance(config.execution.early_stop_mode, EarlyStopMode)
 
 
 def test_subtasks_are_nested_under_the_parent_attempt(tmp_path):
-    config = _tier_config(_parent(tmp_path), "deep", 0.25, wave=2)
-    assert config.runs_base_dir == tmp_path / "subtasks" / "wave2" / "deep"
+    """One directory per wave. It was `wave<N>/<tier>` while tiers were orchestrator
+    groupings, which is one segment the trajectory reader had to hardcode a glob against."""
+
+    config = _wave_config(_parent(tmp_path), wave=2)
+    assert config.runs_base_dir == tmp_path / "subtasks" / "wave2"
     assert config.runs_base_dir.is_dir()
 
 
 def test_waves_do_not_collide(tmp_path):
     parent = _parent(tmp_path)
-    first = _tier_config(parent, "standard", 0.25, wave=1).runs_base_dir
-    second = _tier_config(parent, "standard", 0.25, wave=2).runs_base_dir
-    assert first != second
+    assert (_wave_config(parent, wave=1).runs_base_dir
+            != _wave_config(parent, wave=2).runs_base_dir)
 
 
-def test_jobs_are_grouped_into_one_orchestrator_per_tier(tmp_path, monkeypatch):
+def test_a_whole_wave_runs_in_one_orchestrator(tmp_path, monkeypatch):
+    """Mixed tiers, one orchestrator. Previously this was one per tier, dispatched with
+    `asyncio.gather` -- which is how an exception in one tier discarded another tier's
+    completed outcomes *and* their spend."""
+
     seen = []
 
-    async def fake_run_tier(parent, tier, jobs, **kwargs):
-        seen.append((tier, [job.invocation_id for job in jobs]))
+    async def fake_run_wave(parent, jobs, **kwargs):
+        seen.append([(job.invocation_id, job.budget_tier) for job in jobs])
         return []
 
     import ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation as module
 
-    monkeypatch.setattr(module, "run_tier", fake_run_tier)
+    monkeypatch.setattr(module, "run_wave", fake_run_wave)
     jobs = [
         JobSpec("a#x", "x", "a", 1, {}, budget_tier="cheap"),
         JobSpec("b#y", "y", "b", 1, {}, budget_tier="deep"),
@@ -127,27 +149,14 @@ def test_jobs_are_grouped_into_one_orchestrator_per_tier(tmp_path, monkeypatch):
     ]
     asyncio.run(run_jobs(_parent(tmp_path), jobs, standard_cap=0.25, wave=1,
                          logger=SimpleNamespace(info=lambda *a, **k: None)))
-    grouped = dict(seen)
-    assert set(grouped) == {"cheap", "deep"}
-    assert sorted(grouped["cheap"]) == ["a#x", "c#z"]
-    assert grouped["deep"] == ["b#y"]
+    assert len(seen) == 1
+    assert seen[0] == [("a#x", "cheap"), ("b#y", "deep"), ("c#z", "cheap")]
 
 
-def test_an_unknown_tier_falls_back_to_standard(tmp_path, monkeypatch):
-    seen = []
+def test_an_unknown_tier_falls_back_to_the_standard_cap():
+    """A lead cannot invent a budget by naming a tier that does not exist."""
 
-    async def fake_run_tier(parent, tier, jobs, **kwargs):
-        seen.append(tier)
-        return []
-
-    import ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation as module
-
-    monkeypatch.setattr(module, "run_tier", fake_run_tier)
-    asyncio.run(run_jobs(_parent(tmp_path),
-                         [JobSpec("a#x", "x", "a", 1, {}, budget_tier="lavish")],
-                         standard_cap=0.25, wave=1,
-                         logger=SimpleNamespace(info=lambda *a, **k: None)))
-    assert seen == ["standard"]
+    assert TIER_MULTIPLIERS.get("lavish", 1.0) == 1.0
 
 
 def test_a_paused_job_is_reported_as_paused_not_failed():

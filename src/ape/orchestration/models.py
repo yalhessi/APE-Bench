@@ -246,6 +246,97 @@ class Sample(BaseModel):
         )
 
 # ============================================================================
+# Subtask execution - one spec per child a task spawns
+# ============================================================================
+#
+# `TaskOrchestrator(` is constructed directly in four files, each with its own convention for
+# nesting, and the divergent one cost this project a class of accounting bugs. This is the
+# shared shape: what a parent asks for when it spawns a child.
+
+
+#: Where a task carries limits that differ from the orchestrator's. Read by the worker before
+#: it builds the Attempt, and absent on almost every task -- the orchestrator-wide values stay
+#: the default.
+EXECUTION_LIMITS_KEY = "execution_limits"
+
+
+class ExecutionLimits(BaseModel):
+    """Per-task turn and cost ceilings.
+
+    `Attempt.max_turns` and `Attempt.cost_limit` were already per-attempt fields, and
+    `runtime.run_task` already took `cost_limit` per call -- both were simply always filled
+    from `config.execution`. Letting a task carry its own is what retires budget *tiers*: the
+    tier machinery existed to vary one number, `sample_max_cost`, by running each group in its
+    own nested orchestrator.
+
+    The cost is BILLED, matching every other cap in this codebase. Enforcing a cap on the
+    no-cache counterfactual is what silently voided a job's work in September.
+    """
+
+    max_turns: int
+    billed_cost_limit: Optional[float] = None
+
+
+def task_execution_limits(task_data: Dict[str, Any], execution: Any) -> ExecutionLimits:
+    """This task's limits, falling back to the orchestrator's.
+
+    Never raises on a malformed override: a limit that cannot be parsed falls back rather than
+    failing the run, because the orchestrator-wide value is always a safe answer.
+    """
+
+    raw = (task_data or {}).get(EXECUTION_LIMITS_KEY) or {}
+    max_turns = execution.max_turns
+    cost_limit = execution.sample_max_cost
+    if isinstance(raw, dict):
+        try:
+            if raw.get("max_turns") is not None:
+                max_turns = int(raw["max_turns"])
+            if raw.get("billed_cost_limit") is not None:
+                cost_limit = float(raw["billed_cost_limit"])
+        except (TypeError, ValueError):
+            pass
+    return ExecutionLimits(max_turns=max_turns, billed_cost_limit=cost_limit)
+
+
+class TaskExecutionSpec(BaseModel):
+    """One child a parent task wants run.
+
+    Carries what the orchestrator needs and what the parent needs back: identity, the typed
+    payload, per-task limits, whether the child is required, and which budget scope its spend
+    is charged to.
+    """
+
+    #: Stable identity within the parent's run, used to join the outcome back to the request.
+    spec_id: str
+    task_type: str
+    task_data: Dict[str, Any]
+    sample_count: int = 1
+    max_turns: Optional[int] = None
+    retries: int = 0
+    #: Billed, like every other cap here.
+    billed_cost_limit: Optional[float] = None
+    #: A required child that does not succeed is a coverage gap, and a coverage gap closes the
+    #: run as `partial` rather than complete.
+    required: bool = False
+    #: Which budget the spend is charged against. The coverage floor is deliberately exempt
+    #: from the discretionary cap and must never be exempt from the run total.
+    budget_scope: str = "discretionary"
+
+    def with_limits(self) -> Dict[str, Any]:
+        """The payload with this spec's limits attached, ready to hand to the orchestrator."""
+
+        payload = dict(self.task_data)
+        limits: Dict[str, Any] = {}
+        if self.max_turns is not None:
+            limits["max_turns"] = self.max_turns
+        if self.billed_cost_limit is not None:
+            limits["billed_cost_limit"] = self.billed_cost_limit
+        if limits:
+            payload[EXECUTION_LIMITS_KEY] = limits
+        return payload
+
+
+# ============================================================================
 # Task Outcome - Persisted to task_outcome.json for EVERY scheduled task
 # ============================================================================
 #

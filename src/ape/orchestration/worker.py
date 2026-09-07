@@ -19,7 +19,10 @@ from ape.tasks.base import BaseTaskResult, get_task_class, result_counts_as_pass
 from ape.utils.logging import create_logger
 
 from .config import EarlyStopMode
-from .models import Attempt, ExecutionStatus, OrchestratorProgress, Sample, make_sample_id
+from .models import (
+    Attempt, ExecutionStatus, OrchestratorProgress, Sample, make_sample_id,
+    task_execution_limits,
+)
 from .persistence import ProgressManager, TaskStorage, append_to_jsonl, print_progress
 
 
@@ -90,6 +93,7 @@ class SampleWorker:
             await storage.save_sample(sample)
 
         # === 2. Prepare attempt ===
+        limits = task_execution_limits(task_data, self.config.execution)
         current_attempt = sample.current_attempt
         if not current_attempt or current_attempt.status.is_terminal() or current_attempt.status.is_system_error():
             # Need to create new attempt
@@ -98,8 +102,8 @@ class SampleWorker:
                 path=storage.get_attempt_path(sample_idx, len(sample.attempts) + 1),
                 status=ExecutionStatus.PENDING,
                 created_at=datetime.now(),
-                max_turns=self.config.execution.max_turns,
-                cost_limit=self.config.execution.sample_max_cost,
+                max_turns=limits.max_turns,
+                cost_limit=limits.billed_cost_limit,
             )
             sample.attempts.append(attempt)
         else:
@@ -415,7 +419,8 @@ class SampleWorker:
                 scaffold_type=self.scaffold_type,
                 orchestrator_id=self.orchestrator_dir.name,
                 attempt_path=attempt_path,
-                cost_limit=self.config.execution.sample_max_cost
+                cost_limit=task_execution_limits(
+                    task_data, self.config.execution).billed_cost_limit,
             )
         )
 

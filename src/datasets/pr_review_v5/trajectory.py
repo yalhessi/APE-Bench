@@ -20,8 +20,10 @@ Three things live in `.ape` and nowhere else, which is why the walk is worth doi
 * **The transcripts.** What the lead asked, what a specialist did with its tools, and what
   either of them actually said.
 
-The wave and budget tier are not recorded as fields anywhere; they are in the directory
-name (`subtasks/wave2/cheap/...`), so the walk recovers them from the path.
+The wave is in the directory name (`subtasks/wave2/...`), so the walk recovers it from the
+path. The budget *tier* used to be there too; tiers were retired as orchestrator groupings
+once per-task limits existed, so the segment is present only in runs made before that and the
+tier now comes off the delegation ledger.
 """
 
 from __future__ import annotations
@@ -36,6 +38,10 @@ from typing import Dict, Iterable, List, Optional, Sequence
 from src.datasets.pr_review_v4.io import display_path
 
 from .paths import assert_repo_root, run_dir
+from .schema import BUDGET_TIERS
+
+#: Distinguishes an old tier segment from the orchestrator id that replaced it.
+TIER_NAMES = frozenset(BUDGET_TIERS)
 
 TRAJECTORY_VERSION = "v5-trajectory/1"
 
@@ -48,7 +54,15 @@ DEFAULT_TOOL_RESULT_CAP = 2000
 
 #: Where an arm's result sits under its lead. Depth is fixed by the orchestrator:
 #: lead task -> sample -> attempt -> subtasks/<wave>/<tier>/<batch> -> arm task.
-_ARM_RESULT_GLOB = "tasks/*/samples/0/attempts/*/subtasks/*/*/*/tasks/*/task_result.json"
+#: Two shapes, because the subtask layout changed when budget tiers were retired.
+#:
+#: Tiers existed only to vary `sample_max_cost`, which is orchestrator-wide; per-task limits
+#: removed the need, so `subtasks/wave<N>/<tier>/<id>/` became `subtasks/wave<N>/<id>/` -- one
+#: segment shorter. The old shape is still read so the September runs stay inspectable.
+_ARM_RESULT_GLOBS = (
+    "tasks/*/samples/*/attempts/*/subtasks/*/*/tasks/*/task_result.json",
+    "tasks/*/samples/*/attempts/*/subtasks/*/*/*/tasks/*/task_result.json",
+)
 _LEAD_RESULT_GLOB = "tasks/*/task_result.json"
 _SESSION_GLOB = "ape_agent_session_*.jsonl"
 
@@ -126,7 +140,11 @@ def _wave_and_tier(path: Path) -> tuple:
         return None, None
     index = parts.index("subtasks")
     wave = parts[index + 1] if len(parts) > index + 1 else None
-    tier = parts[index + 2] if len(parts) > index + 2 else None
+    # The tier segment exists only in runs made before tiers were retired. In the current
+    # layout the next segment is the orchestrator id (`<pr>_w<N>`), so a value that parses as
+    # one is not a tier.
+    candidate = parts[index + 2] if len(parts) > index + 2 else None
+    tier = candidate if candidate in TIER_NAMES else None
     return wave, tier
 
 
@@ -254,7 +272,13 @@ def extract(run_name: str, ape_root: Path = DEFAULT_APE_ROOT,
                 "invocations": [], "leads": [], "turns_by_pr": {}}
 
     # --- arm invocations ---
-    for result_path in sorted(root.glob(_ARM_RESULT_GLOB)):
+    seen_paths = set()
+    for result_path in sorted(
+        path for pattern in _ARM_RESULT_GLOBS for path in root.glob(pattern)
+    ):
+        if result_path in seen_paths:
+            continue
+        seen_paths.add(result_path)
         result = _load(result_path)
         if not result or not result.get("invocation_id"):
             continue

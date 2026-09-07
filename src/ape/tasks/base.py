@@ -440,6 +440,33 @@ class BaseTask:
         task_data = cls.create_data_from_dict(data)
         return cls(task_data, config)
 
+    async def spawn_subtasks(self, specs, *, group: str = "subtasks", logger=None,
+                             base=None, concurrency: Optional[int] = None,
+                             execution_overrides: Optional[Dict[str, Any]] = None):
+        """Run child tasks and get one `TaskOutcome` back per spec.
+
+        The framework primitive for nested work. `TaskOrchestrator(` was constructed directly
+        in four files with three different conventions, and the divergent one cost this project
+        a class of accounting failures -- paused work booked at $0.00, an enclosing group's
+        totals stamped onto every child, a run scored as complete over coverage it never had.
+
+        Directory layout, isolation, per-task limits, bounded concurrency and usage aggregation
+        live in `ape.orchestration.subtasks`, once, for every task family present and future.
+
+        Returns `(outcomes_by_spec_id, results)`. Pass `nested_usage(outcomes)` to
+        `create_result(nested_token_usage=...)` so the children's spend reaches the parent's
+        own usage -- omitting that is how a lead's ledger and its manifest disagreed.
+        """
+
+        from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, run_subtasks
+
+        return await run_subtasks(
+            self, specs, group=group, logger=logger or getattr(self, "logger", None),
+            base=base,
+            concurrency=DEFAULT_NESTED_CONCURRENCY if concurrency is None else concurrency,
+            execution_overrides=execution_overrides,
+        )
+
     async def register_task_tools(self, mcp) -> None:
         """Register task-specific tools. Override in subclasses."""
         pass

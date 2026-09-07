@@ -160,27 +160,36 @@ def _digest(value: Any) -> str:
     ).hexdigest()
 
 
-def _tier_config(parent_task, tier: str, standard_cap: float, wave: int):
-    """A scaffold config for one tier's nested orchestrator."""
+def _wave_config(parent_task, wave: int):
+    """A scaffold config for one wave's nested orchestrator.
 
-    config = parent_task.config.model_copy(deep=True)
-    config.execution.sample_max_cost = round(standard_cap * TIER_MULTIPLIERS[tier], 6)
-    # In-process: the lead may already be inside a worker process.
-    config.execution.num_processes = 0
-    # One attempt per job. Best-of-n across arms is a different experiment, and running it
-    # by accident would make a routing comparison a sampling comparison.
-    config.execution.sample_count = 1
-    # The ENUM member, not the string. `ExecutionConfig` does not set `validate_assignment`,
-    # so assigning `"disabled"` post-construction stores a raw `str` that bypasses coercion.
-    # `EarlyStopMode` is a `str, Enum`, so every `==` comparison still passes and the defect
-    # is invisible — until `orchestrator.py` calls `.early_stop_mode.value` and raises
-    # `'str' object has no attribute 'value'`, which is what killed every delegate call on
-    # the second smoke run.
-    config.execution.early_stop_mode = EarlyStopMode.DISABLED
-    subtasks = Path(parent_task.attempt_path) / "subtasks" / f"wave{wave}" / tier
-    subtasks.mkdir(parents=True, exist_ok=True)
-    config.runs_base_dir = subtasks
-    return config
+    One orchestrator per wave, not one per budget tier. Tiers existed as *groupings* only
+    because `sample_max_cost` is orchestrator-wide, so varying a job's budget meant running it
+    in its own orchestrator. Per-task limits (`ExecutionLimits`, read by the worker before it
+    builds the Attempt) removed that constraint, and with it three defects: unbounded
+    concurrency across tiers dispatched by `asyncio.gather`, an exception in one tier
+    discarding another tier's completed outcomes *and* their spend, and a directory depth that
+    the trajectory reader had to hardcode.
+
+    `TIER_MULTIPLIERS` survives as the vocabulary the lead uses to ask for a budget. Only the
+    grouping is gone.
+    """
+
+    from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, nested_config
+
+    return nested_config(
+        parent_task, group=f"wave{wave}",
+        concurrency=DEFAULT_NESTED_CONCURRENCY,
+        # One attempt per job. Best-of-n across arms is a different experiment, and running it
+        # by accident would make a routing comparison a sampling comparison.
+        sample_count=1,
+        # The ENUM member, not the string: `ExecutionConfig` does not set
+        # `validate_assignment`, so assigning `"disabled"` stores a raw `str` that bypasses
+        # coercion. `EarlyStopMode` is a `str, Enum` so every `==` still passes and the defect
+        # is invisible until `orchestrator.py` calls `.early_stop_mode.value` and raises --
+        # which killed every delegate call on the second smoke run.
+        early_stop_mode=EarlyStopMode.DISABLED,
+    )
 
 
 async def _sample_facts(orchestrator, results) -> Dict[str, Dict[str, Any]]:
@@ -282,27 +291,36 @@ def _normalize_status(raw_status: Optional[str], succeeded: bool) -> str:
     return _STATUS_MAP.get(key, "failed")
 
 
-async def run_tier(parent_task, tier: str, jobs: Sequence[JobSpec], *,
+async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
                    standard_cap: float, wave: int, logger) -> List[JobOutcome]:
-    """Run one budget tier's jobs in a single nested orchestrator."""
+    """Run one wave's jobs in a single nested orchestrator, each with its own budget."""
 
+    from ape.orchestration.models import EXECUTION_LIMITS_KEY
     from ape.orchestration.orchestrator import TaskOrchestrator
     from ape.tasks.base import create_task_from_data
 
-    config = _tier_config(parent_task, tier, standard_cap, wave)
-    cap = config.execution.sample_max_cost
-    payloads = {
-        job.invocation_id: compose_prompt(job.payload, job.brief_text) for job in jobs
+    config = _wave_config(parent_task, wave)
+    caps = {
+        job.invocation_id: round(standard_cap * TIER_MULTIPLIERS.get(job.budget_tier, 1.0), 6)
+        for job in jobs
     }
+    payloads = {}
+    for job in jobs:
+        payload = dict(compose_prompt(job.payload, job.brief_text))
+        # The job's own ceiling travels with it, so one orchestrator can run a `cheap` job
+        # beside a `deep` one without either being charged the other's budget.
+        payload[EXECUTION_LIMITS_KEY] = {"billed_cost_limit": caps[job.invocation_id]}
+        payloads[job.invocation_id] = payload
     tasks = [
         create_task_from_data(dict(payloads[job.invocation_id]), config,
                               task_config_overrides=getattr(
                                   parent_task.config, "task_config_overrides", None))
         for job in jobs
     ]
-    orchestrator_id = f"{parent_task.data.pr_number}_w{wave}_{tier}"
-    logger.info("delegating %d job(s) at tier %s (cap=%s): %s",
-                len(jobs), tier, cap, ", ".join(job.arm_id for job in jobs))
+    orchestrator_id = f"{parent_task.data.pr_number}_w{wave}"
+    logger.info("delegating %d job(s) in wave %d: %s",
+                len(jobs), wave,
+                ", ".join(f"{job.arm_id}@${caps[job.invocation_id]:.2f}" for job in jobs))
 
     started = time.monotonic()
     orchestrator = TaskOrchestrator(config=config, orchestrator_id=orchestrator_id, logger=logger)
@@ -328,8 +346,8 @@ async def run_tier(parent_task, tier: str, jobs: Sequence[JobSpec], *,
             arm_id=job.arm_id,
             work_unit_id=job.work_unit_id,
             pr_number=job.pr_number,
-            budget_tier=tier,
-            budget_cap=cap,
+            budget_tier=job.budget_tier,
+            budget_cap=caps[job.invocation_id],
             status=_normalize_status(fact.get("status"), succeeded),
             # This job's own span when the outcome recorded one. Falls back to the tier's
             # elapsed only when it did not, and that case is now the exception rather than
@@ -363,14 +381,5 @@ async def run_jobs(parent_task, jobs: Sequence[JobSpec], *,
 
     if not jobs:
         return []
-    by_tier: Dict[str, List[JobSpec]] = {}
-    for job in jobs:
-        tier = job.budget_tier if job.budget_tier in TIER_MULTIPLIERS else "standard"
-        by_tier.setdefault(tier, []).append(job)
-
-    batches = await asyncio.gather(*(
-        run_tier(parent_task, tier, tier_jobs,
-                 standard_cap=standard_cap, wave=wave, logger=logger)
-        for tier, tier_jobs in sorted(by_tier.items())
-    ))
-    return [outcome for batch in batches for outcome in batch]
+    return await run_wave(parent_task, jobs,
+                          standard_cap=standard_cap, wave=wave, logger=logger)
