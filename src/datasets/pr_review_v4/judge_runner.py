@@ -394,6 +394,53 @@ def assert_source_run_is_complete(dataset: JudgeDatasetConfig, logger) -> Option
     return status
 
 
+#: Where a judge run's own outputs go, derived from the generation run it scores.
+JUDGE_AUDIT_ROOT = Path("results/pr_review_v5/audits")
+
+
+def derive_from_run(run_name: str) -> Dict[str, Any]:
+    """The judge paths implied by a generation run.
+
+    `candidates`, `out_dir` and `run_name` are three free-form strings that all encode one run
+    identity, with nothing making them agree. They disagree in the tree right now:
+    `pr_review_v5_medium_heldout.yaml` was bumped to `rep2` while its judge config still reads
+    `rep1/findings.jsonl` into `audits/medium-heldout-rep1`. Running that pair scores the old
+    run under the new run's name, and nothing errors.
+
+    Deriving them from the one name removes the class of mistake rather than the instance.
+    """
+
+    from src.datasets.pr_review_v5.paths import run_dir
+
+    slug = run_name.replace("pr_review_v5_", "").replace("_", "-")
+    return {
+        "candidates": run_dir(run_name) / "findings.jsonl",
+        "out_dir": JUDGE_AUDIT_ROOT / slug,
+        "run_name": f"pr_review_v5_judge_{run_name.replace('pr_review_v5_', '')}",
+    }
+
+
+def assert_paths_agree(dataset: "JudgeDatasetConfig", run_name: str) -> None:
+    """Refuse a config whose explicit paths point somewhere other than the named run.
+
+    An override is legitimate -- rescoring one run's findings into a second audit directory is
+    a real thing to want -- but pointing `candidates` at a *different run* while claiming to
+    judge this one is the mistake `--of` exists to prevent, so it is named rather than
+    silently honoured.
+    """
+
+    from src.datasets.pr_review_v5.paths import run_dir
+
+    expected = run_dir(run_name).resolve()
+    actual = Path(dataset.candidates).resolve()
+    if expected not in actual.parents and actual.parent != expected:
+        raise ValueError(
+            f"--of {run_name} but dataset.candidates is {dataset.candidates}, which is not in "
+            f"that run's directory ({run_dir(run_name)}). One of the two is wrong, and "
+            f"scoring the pair would attribute one run's findings to another's name."
+        )
+
+
 async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     assert_repo_root()
     source_run_status = assert_source_run_is_complete(dataset, logger)
@@ -599,8 +646,21 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
 def main() -> None:
     parser = argparse.ArgumentParser(description="Judge candidate/obligation pairs as tasks")
     parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument(
+        "--of", dest="of_run", default=None,
+        help="the generation run to score. Derives dataset.candidates, out_dir and run_name "
+             "from it, so the three cannot disagree.")
     args, rest = parser.parse_known_args()
-    dataset, scaffold, task_overrides = load_run(args.config, parse_cli_args(rest))
+    overrides = parse_cli_args(rest)
+    if args.of_run:
+        derived = {k: str(v) for k, v in derive_from_run(args.of_run).items()}
+        # Explicit overrides still win -- rescoring into a second audit directory is a real
+        # thing to want -- but the result is checked for coherence below.
+        overrides.setdefault("dataset", {})
+        overrides["dataset"] = {**derived, **(overrides.get("dataset") or {})}
+    dataset, scaffold, task_overrides = load_run(args.config, overrides)
+    if args.of_run:
+        assert_paths_agree(dataset, args.of_run)
     out = asyncio.run(run(dataset, scaffold, task_overrides, create_logger()))
     if out:
         print(out)

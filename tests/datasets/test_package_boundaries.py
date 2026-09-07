@@ -15,7 +15,7 @@ to require lowering a number here. That is the point — the budget only moves i
 and moving it is a deliberate edit rather than a silent drift.
 
 Counts are of imported *names*, not import statements, which is why they run higher than a
-count of `from ... import` lines: v4 -> v5 is 11 names across 3 statements.
+count of `from ... import` lines: v4 -> v5 is 13 names across 4 statements.
 """
 
 from __future__ import annotations
@@ -85,7 +85,15 @@ def test_v4_does_not_import_v5_beyond_the_known_backward_edges():
     """
 
     edges = _cross_generation_edges("v4", "v5")
-    assert len(edges) <= 11, (
+    # 11 -> 13: `judge_runner.derive_from_run` imports `pr_review_v5.paths.run_dir` so that a
+    # judge run's paths come from the generation run's name instead of three free-form strings
+    # that must agree by hand -- which they did not: one config was bumped to rep2 while its
+    # judge still read rep1. That the judge must know where generation writes is an
+    # unavoidable *data* dependency; the code dependency goes away in the collapse, when path
+    # conventions move to a shared core. Raised deliberately rather than worked around by
+    # duplicating the path, which is the two-sources-of-truth problem this session keeps
+    # finding.
+    assert len(edges) <= 13, (
         "new backward v4 -> v5 import(s):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
 

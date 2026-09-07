@@ -1,3 +1,15 @@
+# NOTE: this scores rep1, which is the run that exists on disk. The generation config beside
+# it was bumped to `pr_review_v5_lead_medium_heldout_rep2`, which has never been run -- so if
+# you run that first, this config will still score rep1 and report it under a rep1 name while
+# you believe you are looking at rep2.
+#
+# Prefer deriving the paths rather than restating them:
+#     python -m src.datasets.pr_review_v4.judge_runner \
+#         --config configs/pr_review_v5_medium_heldout_judge.yaml \
+#         --of pr_review_v5_lead_medium_heldout_rep2
+# `--of` sets candidates/out_dir/run_name from the one name and refuses a config whose
+# candidates point at a different run.
+
 # Score a v5 run against gold: issue_match and resolution_match, rubric v8.
 #
 # `input_kind: finding` judges the text the system actually publishes, not pre-merge
