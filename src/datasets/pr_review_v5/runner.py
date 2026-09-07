@@ -57,6 +57,7 @@ from src.datasets.pr_review_v4.schema import (
 from .agenda import agenda_report, build_agenda, initial_jobs
 from .arms import GENERALIST_ARM_ID
 from .census import build_census, census_report
+from .coordination import CoordinationConfig, assert_implemented
 from .cutoffs import cutoffs_by_episode
 from .evidence_chain import collect_supported, reviewed_workspaces
 from .finalize import finalize
@@ -381,6 +382,20 @@ def _delegations_from_results(results, mode: str, agenda,
     ]
 
 
+def coordination_config(dataset) -> CoordinationConfig:
+    """The run's coordination and synthesis policy, defaulted to what the code does.
+
+    `max_jobs` mirrors `max_delegations` rather than duplicating it: the bound is enforced in
+    `lead.py` and this records it, so the plan and the enforcement cannot disagree about what
+    the run was allowed to do.
+    """
+
+    config = CoordinationConfig()
+    config.coordination.max_jobs = dataset.max_delegations
+    assert_implemented(config)
+    return config
+
+
 def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
     """Seal the pre-registration. Constructed identically in dry and real runs.
 
@@ -414,6 +429,7 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
         lead_cost_cap=dataset.lead_cost_cap,
         standard_budget_cap=dataset.standard_budget_cap,
         per_pr_cost_cap=dataset.per_pr_cost_cap,
+        coordination=coordination_config(dataset).report(),
         git_commit=commit, git_tree_state=tree_state,
         source_sha256="",
     )

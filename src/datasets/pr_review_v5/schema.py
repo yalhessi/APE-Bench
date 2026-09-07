@@ -263,6 +263,14 @@ class V5RunPlan(StrictModel):
     standard_budget_cap: float
     per_pr_cost_cap: float
     deterministic_release_sha256: Optional[str] = None
+    #: How the lead composed its children, and what its assessments were allowed to do.
+    #:
+    #: Sealed because coordination is about to become a variable and a result attributed to a
+    #: mechanism the run does not record is not attributable at all. Every value here was a
+    #: constant in `lead.py` or `delegation.py` until it was written down: two waves, a pair
+    #: may run at most once, the parent sees a truncated summary, a child sees nothing of its
+    #: siblings, the lead may drop and fold but not rewrite.
+    coordination: Dict[str, Any] = Field(default_factory=dict)
     git_commit: Optional[str] = None
     #: `io.git_state()`'s second element verbatim. Tri-state, not a bool: `unknown` (git
     #: unavailable) is a real provenance answer and is not the same claim as `clean`.
