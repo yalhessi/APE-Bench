@@ -92,6 +92,12 @@ def build_parser() -> argparse.ArgumentParser:
     overlay.add_argument("--run", required=True)
     overlay.add_argument("--audit", type=Path)
     overlay.add_argument("--out", type=Path)
+    scope = report_sub.add_parser(
+        "scope", help="recall split by whether the ask is local or requires a design decision")
+    scope.add_argument("--audit", type=Path, required=True,
+                       help="the judge output directory, holding semantic_report.json")
+    scope.add_argument("--release", type=Path, required=True)
+    scope.add_argument("--pr", type=int, action="append", dest="pr_numbers")
 
     trajectory = sub.add_parser("trajectory", help="extract one run's transcripts")
     trajectory.add_argument("--run", required=True)
@@ -191,6 +197,16 @@ def _report(args) -> int:
         print(json.dumps(routing(args.run), indent=2))
     elif args.report_command == "score":
         print(json.dumps(score(args.audit, args.run), indent=2))
+    elif args.report_command == "scope":
+        # The competence question the recall number cannot answer on its own: is the reviewer
+        # good, or is the set unusually local? `obligation_scope` has answered it since it was
+        # written and nothing could call it.
+        from .obligation_scope import scope_report
+
+        print(json.dumps(scope_report(
+            Path(args.audit) / "semantic_report.json",
+            Path(args.release) / "gold/judgments.jsonl",
+            args.pr_numbers), indent=2))
     else:
         print(json.dumps(overlay(args.run, args.audit, args.out), indent=2))
     return 0

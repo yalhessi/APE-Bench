@@ -253,3 +253,24 @@ def test_the_generation_base_carries_the_measurements_behind_its_caps():
     text = Path("configs/bases/v5_generation.yaml").read_text(encoding="utf-8")
     assert "median $0.039" in text
     assert "median $0.094" in text
+
+
+def test_the_scope_report_is_reachable():
+    """`obligation_scope` classifies each gold ask as answerable by editing a site (`local`)
+    or as requiring a decision about what should exist (`design`). It was written to test a
+    specific claim -- that this reviewer is competent at local asks and structurally unable to
+    reach design ones -- and nothing could call it, so the claim stayed untested.
+
+    It was also the only module in the three review packages that no entrypoint and no test
+    reached.
+    """
+
+    parser = cli.build_parser()
+    args = parser.parse_args(["report", "scope", "--audit", "a", "--release", "r"])
+    assert args.report_command == "scope"
+
+
+def test_the_scope_report_is_read_only():
+    """It reads a finished audit. Nothing it does can spend."""
+
+    assert "report" not in cli.SPENDS
