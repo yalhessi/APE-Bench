@@ -187,10 +187,12 @@ def test_v5_does_not_reimplement_any_part_of_the_contract():
             f"{method} is overridden in the v5 arm; the candidate contract must stay "
             "single-implementation"
         )
-    # `_extra_candidate_error` is the opposite: v4 declares it as the hook a subclass uses to
-    # add its own *scope* rule — "rather than reimplementing the rest and drifting from it".
-    # v5 uses it to keep a specialist inside its own concern family.
-    assert "_extra_candidate_error" in owned
+    # The hooks are the opposite: v4 declares them as what a subclass extends through, "rather
+    # than reimplementing the rest and drifting from it". v5 used `_extra_candidate_error` to
+    # keep a specialist inside its concern family and now uses `_annotate_candidate` to record
+    # when it does not — a rule that decides what may be said, moved to one that records what
+    # was said. Either is the sanctioned seam; reimplementing a check is not.
+    assert "_annotate_candidate" in owned
     # The one legitimate override extends rather than replaces.
     import inspect
 
@@ -225,11 +227,20 @@ def test_identity_comes_from_the_invocation_not_the_model():
 # concern discipline
 # --------------------------------------------------------------------------------------
 
-def test_a_specialist_cannot_claim_outside_its_concern(submit):
-    """The rep2 failure: the `generality` arm submitted four candidates in `style` and
-    `naming`. Those families are not checkable, so no verification artifact was required at
-    submission — and `focused_findings` then dropped all four at finalization for having no
-    artifact, silently. Rejecting now is what turns a silent deletion into a fixable error."""
+def test_a_specialist_claiming_outside_its_concern_is_recorded_not_refused(submit):
+    """The rep2 failure and the fix that replaced the fix.
+
+    The `generality` arm submitted four candidates in `style` and `naming`. Those families are
+    not checkable, so no verification artifact was required at submission — and
+    `focused_findings` then dropped all four at finalization for having no artifact, silently.
+    Refusing the submission turned that silent deletion into a fixable error, which was an
+    improvement and cost findings: 11 of the 19 gold obligations labelled `style` are `grind`
+    simplifications and `encard_` renames, so an arm that finds one and labels it honestly was
+    refused for guessing the evaluator's vocabulary wrong.
+
+    Finalization now retains every drop as a `diagnostic` finding, so the deletion is not
+    silent whether or not submission refuses. Refusing buys nothing and still costs that.
+    """
 
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
@@ -241,11 +252,41 @@ def test_a_specialist_cannot_claim_outside_its_concern(submit):
     asyncio.run(task.register_task_tools(mcp))
     result = asyncio.run(mcp.tools["submit_candidates"](candidates=[_candidate(
         concern_family="style", issue_kind="style_norm_violation", concern_label="style")]))
-    assert result["evaluation_result"].success is False
-    message = _message(result)
-    assert "generality check" in message and "generalization" in message
-    # It must say what to do, not merely that the claim is wrong.
-    assert "drop it" in message
+    assert result["evaluation_result"].success is True
+
+
+def test_claiming_outside_its_concern_leaves_a_trace():
+    """Recorded, not merely permitted. Without the tag, "the generality arm wandered into
+    style 40% of the time" stops being answerable, and that is the routing measurement the
+    gate was standing in for."""
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    task = LeanPRReviewV5ArmTask(
+        _data(arm_id="generality", spec_id="generality"),
+        ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
+    off = {"concern_family": "style"}
+    task._annotate_candidate(off)
+    assert off["concern_tags"] == ["style", "off-concern:generality"]
+
+    on = {"concern_family": "generalization"}
+    task._annotate_candidate(on)
+    assert on["concern_tags"] == ["generalization"]
+
+
+def test_the_generalist_is_never_off_concern():
+    """It has no expected set, so there is no such thing as wandering out of it."""
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    task = LeanPRReviewV5ArmTask(
+        _data(arm_id="generalist", spec_id=None),
+        ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
+    candidate = {"concern_family": "style"}
+    task._annotate_candidate(candidate)
+    assert candidate["concern_tags"] == ["style"]
 
 
 def test_a_specialist_may_make_its_own_kind_of_claim(submit):
@@ -267,10 +308,10 @@ def test_golf_and_idiom_share_a_family_but_stay_distinct():
     """They inspect the same proofs and make different claims; `spec_id` keeps them apart,
     not the concern family. Splitting them by family would repeal one arm's warrant."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import ALLOWED_CONCERN_BY_ARM
+    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import EXPECTED_CONCERN_BY_ARM
 
-    assert ALLOWED_CONCERN_BY_ARM["proof_golf"] == ALLOWED_CONCERN_BY_ARM["proof_idiom"]
-    assert ALLOWED_CONCERN_BY_ARM["proof_golf"] == {"proof-golf"}
+    assert EXPECTED_CONCERN_BY_ARM["proof_golf"] == EXPECTED_CONCERN_BY_ARM["proof_idiom"]
+    assert EXPECTED_CONCERN_BY_ARM["proof_golf"] == {"proof-golf"}
 
 
 def test_the_generalist_has_no_concern_filter(submit):
@@ -279,9 +320,9 @@ def test_the_generalist_has_no_concern_filter(submit):
 
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import ALLOWED_CONCERN_BY_ARM
+    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import EXPECTED_CONCERN_BY_ARM
 
-    assert "generalist" not in ALLOWED_CONCERN_BY_ARM
+    assert "generalist" not in EXPECTED_CONCERN_BY_ARM
     task = LeanPRReviewV5ArmTask(
         _data(arm_id="generalist", spec_id=None),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))

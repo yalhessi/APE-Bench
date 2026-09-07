@@ -5,7 +5,8 @@ of those edits were dictionaries keyed by arm id that had to agree with each oth
 
     arms.CHECKABLE_ARMS        can a compile settle this arm's claims
     arms._CONTEXT_GRANTS       which retrieval tools it gets
-    arm.ALLOWED_CONCERN_BY_ARM which concerns it may declare on a submission
+    arm.ALLOWED_CONCERN_BY_ARM which concerns it may declare on a submission (now
+                               arm.EXPECTED_CONCERN_BY_ARM, and no longer a gate)
     arm.PATCH_SET_ARMS         may it submit a coordinated multi-file patch
 
 Two lived in `src/datasets/pr_review_v5`, two in `src/ape/tasks/.../pr_review_v5`, on opposite
@@ -47,18 +48,22 @@ class ArmDefinition:
     #: What the arm exists to ask. Shown to no model; this is for the reader.
     rationale: str
 
-    #: Concerns this arm may declare on a submission.
+    #: Concerns this arm is expected to report. Provenance and routing vocabulary — read by
+    #: the per-arm benches to decide which gold obligations this arm is answerable for, and
+    #: recorded on a submission that falls outside it. **Not** an admission rule.
     #:
-    #: Enforced today because the alternative is a silent deletion: an arm that reports a
-    #: concern outside its family passes submission, then finalization drops it for lacking a
-    #: verification artifact its declared concern can never produce — without a word. On the
-    #: rep2 smoke run that was all four specialist candidates.
+    #: It was one until the drop it guarded stopped being silent. The argument for enforcing
+    #: it was that an arm reporting an unexpected concern passes submission and is then
+    #: dropped at finalization for lacking a verification artifact its declared concern can
+    #: never produce, without a word — on the rep2 smoke run, all four specialist candidates.
+    #: Refusing up front at least told the arm.
     #:
-    #: Worth revisiting, and deliberately not revisited here: 11 of the 19 gold obligations
-    #: labelled `style` are grind simplifications and renames, so an arm that correctly finds
-    #: one and declares it honestly is rejected for guessing the evaluator's label wrong.
-    #: Removing the gate requires finalization to report every drop first.
-    allowed_concerns: FrozenSet[str]
+    #: The cost was findings: 11 of the 19 gold obligations labelled `style` are grind
+    #: simplifications and `encard_` renames, so an arm that correctly finds one and declares
+    #: it honestly was refused for guessing the evaluator's label wrong. With every drop now
+    #: retained as a `diagnostic` finding the judge can score, refusing buys nothing and still
+    #: costs that.
+    expected_concerns: FrozenSet[str]
 
     #: Retrieval tools beyond the universal grant, matched to the shape of answer this arm
     #: needs. See `_CONTEXT_GRANTS` in `arms.py` for the measurement that made this per-arm.
@@ -89,7 +94,7 @@ def _arm(arm_id: str, concern: str, issue_kind: str, rationale: str, **kwargs) -
     return ArmDefinition(
         arm_id=arm_id, concern_family=concern, issue_kind=issue_kind,
         rationale=rationale,
-        allowed_concerns=frozenset(kwargs.pop("allowed_concerns", (concern,))),
+        expected_concerns=frozenset(kwargs.pop("expected_concerns", (concern,))),
         **kwargs,
     )
 
@@ -133,13 +138,13 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          "Is there a present semantic, elaboration, build or policy error?",
          # `scope` too: a declaration whose imports cannot support where it sits is a build
          # problem wearing a placement problem's clothes, and no other arm compiles.
-         allowed_concerns=("correctness", "scope"),
+         expected_concerns=("correctness", "scope"),
          context_tools=("declaration_search",), checkable=True),
     _arm("family_design", "generalization", "generalization_available",
          "Are these declarations right AS A GROUP — a missing dual, a hand-written generated "
          "form, a hardcoded shared parameter?",
          # It owns both shapes a group's defect takes, which is why it may declare either.
-         allowed_concerns=("generalization", "duplication"),
+         expected_concerns=("generalization", "duplication"),
          # No `declaration_search`: it spent 50 of 63 retrieval calls on a name lookup that
          # cannot answer a question about a group's shape, and returned nothing from eleven
          # invocations.
@@ -172,7 +177,12 @@ def context_grants() -> Dict[str, Tuple[str, ...]]:
     return {item.arm_id: item.context_tools for item in ARM_DEFINITIONS}
 
 
-def allowed_concerns() -> Dict[str, FrozenSet[str]]:
-    """`arm_id -> the concerns it may declare on a submission`."""
+def expected_concerns() -> Dict[str, FrozenSet[str]]:
+    """`arm_id -> the concerns it is expected to report`.
 
-    return {item.arm_id: item.allowed_concerns for item in ARM_DEFINITIONS}
+    Was `allowed_concerns`, and the rename is the change: nothing refuses a submission on
+    this any more. It says what an arm is for, which is what the benches need and what makes
+    an off-concern claim worth recording.
+    """
+
+    return {item.arm_id: item.expected_concerns for item in ARM_DEFINITIONS}

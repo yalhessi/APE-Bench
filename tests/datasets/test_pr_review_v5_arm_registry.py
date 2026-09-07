@@ -143,12 +143,12 @@ def test_each_arm_prompt_refuses_the_other_concerns():
 
 
 def test_the_concern_gate_covers_every_specialist():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import ALLOWED_CONCERN_BY_ARM
+    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import EXPECTED_CONCERN_BY_ARM
 
     for spec in v5_specs():
-        assert spec.spec_id in ALLOWED_CONCERN_BY_ARM, spec.spec_id
-        assert spec.concern_family in ALLOWED_CONCERN_BY_ARM[spec.spec_id], spec.spec_id
-    assert GENERALIST_ARM_ID not in ALLOWED_CONCERN_BY_ARM
+        assert spec.spec_id in EXPECTED_CONCERN_BY_ARM, spec.spec_id
+        assert spec.concern_family in EXPECTED_CONCERN_BY_ARM[spec.spec_id], spec.spec_id
+    assert GENERALIST_ARM_ID not in EXPECTED_CONCERN_BY_ARM
 
 
 # --------------------------------------------------------------------------------------

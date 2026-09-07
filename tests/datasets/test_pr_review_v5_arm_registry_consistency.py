@@ -20,7 +20,7 @@ from src.datasets.pr_review_v5.arms import (
     CHECKABLE_ARMS, default_arms, resolve_context_tools, v5_specs,
 )
 from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
-    ALLOWED_CONCERN_BY_ARM, LeanPRReviewV5ArmTask,
+    EXPECTED_CONCERN_BY_ARM, LeanPRReviewV5ArmTask,
 )
 
 
@@ -51,16 +51,16 @@ def test_patch_set_arms_derives_from_the_registry():
     assert LeanPRReviewV5ArmTask.PATCH_SET_ARMS == arm_registry.patch_set_arms()
 
 
-def test_allowed_concerns_derives_from_the_registry():
-    derived = {k: set(v) for k, v in arm_registry.allowed_concerns().items()}
-    assert ALLOWED_CONCERN_BY_ARM == derived
+def test_expected_concerns_derives_from_the_registry():
+    derived = {k: set(v) for k, v in arm_registry.expected_concerns().items()}
+    assert EXPECTED_CONCERN_BY_ARM == derived
 
 
 def test_an_arm_may_always_declare_its_own_concern_family():
     """Otherwise the arm's own findings are rejected at its own gate."""
 
     for definition in arm_registry.ARM_DEFINITIONS:
-        assert definition.concern_family in definition.allowed_concerns, definition.arm_id
+        assert definition.concern_family in definition.expected_concerns, definition.arm_id
 
 
 def test_every_arm_keeps_lean_verify_edit():
@@ -110,4 +110,4 @@ def test_each_declaration_says_what_the_arm_is_for(definition):
     """A registry row with no rationale is a name, not a contract."""
 
     assert definition.rationale.strip()
-    assert definition.allowed_concerns
+    assert definition.expected_concerns

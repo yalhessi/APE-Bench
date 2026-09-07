@@ -349,6 +349,12 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
             entity_ids=payload["entity_ids"], primary_change_id=primary_change_id,
             primary_entity_id=primary_entity_id, primary_subject=primary_subject,
             requested_change=requested_change, concern_family=payload["concern_family"],
+            # Passed through as opaque strings, and *not* in `payload`: the arm layer owns
+            # this vocabulary (it is the only layer that knows what an arm is for), and an
+            # annotation must not move `candidate_id`.
+            concern_tags=[
+                tag for tag in (raw.get("concern_tags") or []) if isinstance(tag, str)
+            ],
             issue_kind=payload["issue_kind"], spec_id=payload["spec_id"],
             concern_label=payload["concern_label"],
             severity=payload["severity"], claim=payload["claim"],

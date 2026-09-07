@@ -32,22 +32,28 @@ from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
 )
 
 from src.datasets.pr_review_v5.arm_registry import (
-    allowed_concerns, patch_set_arms,
+    expected_concerns, patch_set_arms,
 )
 
 from .context_tools import register_context_tools
 
 ARM_TASK_TYPE = "lean_pr_review_v5_arm"
 
-#: The concern family each specialist is allowed to speak in. The generalist is absent: it
+#: The concern family each specialist is expected to speak in. The generalist is absent: it
 #: has no concern filter, which is what makes it the control.
 #:
-#: This is enforced because the alternative is a silent deletion. A `generality` arm that
-#: reports a `style` claim passes submission (style is not a checkable family, so no
-#: verification artifact is required), and `focused_findings` then drops it at finalization
-#: for having no artifact — without a word. On the rep2 smoke run that was all four
-#: specialist candidates: the generality arm wandered into style and naming, and every one
-#: of them vanished between submission and the report.
+#: **Not enforced.** It was, and the justification was that the alternative is a silent
+#: deletion: a `generality` arm reporting a `style` claim passes submission (style is not a
+#: checkable family, so no verification artifact is required), and `focused_findings` then
+#: dropped it at finalization for having no artifact — without a word. On the rep2 smoke run
+#: that was all four specialist candidates.
+#:
+#: The drop is no longer silent: finalization retains every one as a `diagnostic` finding in
+#: `findings.jsonl`, so a correct claim that lacked a warrant can be told apart from a wrong
+#: one. What remained was the cost — 11 of the 19 gold obligations labelled `style` are grind
+#: simplifications and `encard_` renames, so an arm that found one and labelled it honestly
+#: was refused for guessing the evaluator's vocabulary wrong. An off-concern submission is now
+#: recorded on the candidate as a `concern_tags` entry instead of being refused.
 #:
 #: golf and idiom share `proof-golf` on purpose: they inspect the same proofs and make
 #: different claims about them, and they are kept apart by `spec_id`, not by family.
@@ -55,9 +61,13 @@ ARM_TASK_TYPE = "lean_pr_review_v5_arm"
 #: `PATCH_SET_ARMS` used to be dictionaries here while `CHECKABLE_ARMS` and the retrieval
 #: grant were dictionaries in `src/datasets/pr_review_v5/arms.py` — four tables keyed by
 #: arm id, on opposite sides of the package boundary, with nothing checking they agreed.
-ALLOWED_CONCERN_BY_ARM = {
-    arm_id: set(concerns) for arm_id, concerns in allowed_concerns().items()
+EXPECTED_CONCERN_BY_ARM = {
+    arm_id: set(concerns) for arm_id, concerns in expected_concerns().items()
 }
+
+#: Tag written onto a candidate whose declared concern is outside its arm's expected set.
+#: Prefixed so a reader can tell a routing observation from a concern the arm asserted.
+OFF_CONCERN_TAG = "off-concern"
 
 
 class LeanPRReviewV5ArmConfig(LeanPRReviewV4CandidateConfig):
@@ -139,32 +149,36 @@ class LeanPRReviewV5ArmTask(LeanPRReviewV4CandidateTask):
         paths = {self.data.paths_by_change.get(cid) for cid in self.data.change_ids}
         return tuple(sorted(p for p in paths if p))
 
-    def _extra_candidate_error(self, candidate: Dict[str, Any]) -> Optional[str]:
-        """Keep a specialist inside its own concern.
+    def _annotate_candidate(self, candidate: Dict[str, Any]) -> None:
+        """Record which arm produced this and whether it stayed inside its own concern.
 
-        This is the hook v4 documents for exactly this purpose — "an arm whose *scope*
-        differs adds its rule here rather than reimplementing the rest and drifting from
-        it" — so the rest of the contract stays single-implementation.
+        This replaces a rejection. The rejection's argument was that refusing is kinder than
+        the alternative, because the alternative was not that the claim survives — it was
+        that the claim is dropped at finalization with no explanation. That is no longer the
+        alternative: an unwarranted claim is retained as a `diagnostic` finding the judge can
+        score, so a correct claim that lacked a warrant is distinguishable from a wrong one.
 
-        Rejecting is kinder than it sounds: the alternative is not that the claim survives,
-        it is that the claim is dropped later with no explanation. Telling the arm now lets
-        it either restate the finding in its own terms or drop it deliberately.
+        What is left of the rejection is its cost. 11 of the 19 gold obligations labelled
+        `style` are grind simplifications and `encard_` renames; an arm that finds one and
+        labels it honestly was refused for guessing the evaluator's vocabulary wrong. The arm
+        prompt still tells it what its one job is — that is where routing discipline belongs.
+        Here we record what it did, and let the measurement say whether it wandered.
         """
 
-        allowed = ALLOWED_CONCERN_BY_ARM.get(self.data.arm_id)
-        if not allowed:
-            return None
+        tags = [tag for tag in (candidate.get("concern_tags") or []) if isinstance(tag, str)]
         family = candidate.get("concern_family")
-        if family in allowed:
-            return None
-        expected = " or ".join(sorted(allowed))
-        return (
-            f"this is the {self.data.arm_id} check, which reports {expected} findings only; "
-            f"you declared concern_family={family!r}. A finding outside this arm's concern "
-            "cannot be published from here — the per-site generalist already covers the "
-            "other families. Either restate it as a genuine "
-            f"{expected} finding, or drop it."
-        )
+        if isinstance(family, str) and family not in tags:
+            tags.append(family)
+        expected = EXPECTED_CONCERN_BY_ARM.get(self.data.arm_id)
+        if expected and family not in expected:
+            tags.append(f"{OFF_CONCERN_TAG}:{self.data.arm_id}")
+            if self.logger is not None:
+                self.logger.warning(
+                    "arm %s declared concern_family=%r, outside its expected set %s; "
+                    "recorded, not refused",
+                    self.data.arm_id, family, sorted(expected),
+                )
+        candidate["concern_tags"] = tags
 
     async def register_task_tools(self, mcp) -> None:
         # The v4 contract first — `submit_candidates` plus `lean_verify_edit` — then only

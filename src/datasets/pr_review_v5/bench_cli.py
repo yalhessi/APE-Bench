@@ -49,7 +49,7 @@ from .arm_registry import ARM_DEFINITIONS
 def roster() -> Dict[str, List[str]]:
     """`arm_id -> the concern families it may declare`, from the arm registry."""
 
-    return {item.arm_id: sorted(item.allowed_concerns) for item in ARM_DEFINITIONS}
+    return {item.arm_id: sorted(item.expected_concerns) for item in ARM_DEFINITIONS}
 
 
 def _payloads_for(bench: ArmBench, dataset, release) -> Dict[str, Dict[str, Any]]:

@@ -451,6 +451,18 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
 
         return None
 
+    def _annotate_candidate(self, candidate: Dict[str, Any]) -> None:
+        """A hook for metadata a subclass records about a submission without refusing it.
+
+        The sibling of `_extra_candidate_error`, and the difference is the whole point. That
+        one decides whether a claim may be made; this one records something true about a claim
+        that is being made anyway. A rule that belongs here and is put there costs findings —
+        v5's concern gate refused correct claims for using the wrong word for them.
+
+        Mutates `candidate` in place, before validation, so anything written here is part of
+        what validation sees and part of what is recorded.
+        """
+
     async def register_task_tools(self, mcp) -> None:
         self._register_lean_verify_edit(mcp)
 
@@ -496,6 +508,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                     candidate, self.data.changed_files, problems,
                     self.data.paths_by_change,
                 )
+                self._annotate_candidate(candidate)
                 patch_problem = self._patch_set_error(candidate)
                 if patch_problem:
                     problems.append(patch_problem)

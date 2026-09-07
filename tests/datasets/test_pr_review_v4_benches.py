@@ -30,7 +30,7 @@ def benches():
     if not RELEASE.is_dir():
         pytest.skip("release not present")
     from src.datasets.pr_review_v5.arm_registry import ARM_DEFINITIONS
-    roster = {d.arm_id: sorted(d.allowed_concerns) for d in ARM_DEFINITIONS}
+    roster = {d.arm_id: sorted(d.expected_concerns) for d in ARM_DEFINITIONS}
     return build_all(RELEASE, roster)
 
 
@@ -63,7 +63,7 @@ def test_the_two_concern_vocabularies_are_bridged(benches):
         if line.strip():
             gold_labels.update(json.loads(line).get("concern_labels") or [])
 
-    arm_families = {c for d in ARM_DEFINITIONS for c in d.allowed_concerns}
+    arm_families = {c for d in ARM_DEFINITIONS for c in d.expected_concerns}
     unbridged = {
         family for family in arm_families
         if family not in gold_labels and CONCERN_ALIASES.get(family) not in gold_labels
