@@ -33,7 +33,7 @@ from typing import Annotated, Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 from ape.tasks.base import EvaluationResult, register_task
-from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import (
+from ape.tasks.lean_tasks.formal_math.review_task import (
     BasePRReviewConfig,
     BasePRReviewData,
     BasePRReviewResult,

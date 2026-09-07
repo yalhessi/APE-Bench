@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import (
+from ape.tasks.lean_tasks.formal_math.review_task import (
     _declaration_prefix_start,
     _supplies_own_prefix,
 )
@@ -204,7 +204,7 @@ def test_a_missing_declaration_says_so(task):
 # --------------------------------------------------------------------------------------
 
 def test_review_tasks_opt_in_to_reading_the_reviewed_file():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import BasePRReviewTask
+    from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewTask
     from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
 
     assert BasePRReviewTask.lean_verify_allows_target is True

@@ -7,7 +7,9 @@ across six packages:
   imports v5 — so "v4 is frozen and imported as a library" is not true;
 * 42 imports of `_`-private symbols across module boundaries, six of them across generations;
 * one shared review base (`pr_review_v2/base.py`) edited on the strength of a v5-only
-  observation, which changes the tool contract for every v2 checker and every v4 arm.
+  observation, which changed the tool contract for every v2 checker and every v4 arm. That one
+  is fixed: it lives at `formal_math/review_task.py` now, owned by no generation, and v5 -> v2
+  fell from 6 edges to 2.
 
 The consolidation these tests belong to has not happened yet, so they do not assert zero.
 They **pin the current counts**: a new violation fails the build, and fixing one is expected
@@ -99,11 +101,13 @@ def test_v4_does_not_import_v5_beyond_the_known_backward_edges():
 
 
 def test_v5_does_not_reach_further_back_into_v2():
-    """v5 imports v2 in exactly two places -- `corpus._eval_pr_numbers` and
-    `precedent_bench.hunk_code` -- plus the shared review base every generation inherits."""
+    """6 -> 2. The four that went were the shared review base: v5's lead inherited
+    `BasePRReviewTask` from inside v2, and it now lives beside the generations rather than in
+    the oldest of them. What is left is genuinely v2's own data work --
+    `corpus._eval_pr_numbers` and `precedent_bench.hunk_code`."""
 
     edges = _cross_generation_edges("v5", "v2")
-    assert len(edges) <= 6, (
+    assert len(edges) <= 2, (
         "new v5 -> v2 import(s):\n" +
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
 
@@ -135,18 +139,33 @@ def test_private_cross_boundary_imports_do_not_increase():
         "\n".join(f"  {p}: {m}.{n}" for p, m, n in sorted(found)[:12]))
 
 
-def test_the_shared_review_base_is_shared_by_all_three_generations():
-    """Pins why editing it is consequential: `pr_review_v2/base.py` is the base class for
-    every review task in v2, v4 and v5, so a v5-only observation that changes it changes the
-    tool contract for every v2 checker and every v4 arm. This session did exactly that."""
+def test_the_shared_review_base_belongs_to_no_generation():
+    """It was `pr_review_v2/base.py`, and all three generations inherited it from there, so a
+    v5-only observation about `lean_verify_edit` changed the tool contract for every v2
+    checker and every v4 arm. This session did exactly that before moving it.
 
-    importers = [
+    Now it is `formal_math/review_task.py`, beside the generations. Inside the task tree
+    rather than in `src/mathlib_review/`, because `ape/tasks/__init__.py` imports every task
+    package eagerly and a `BaseLeanTask` subclass outside that tree cannot import
+    `ape.tasks.base` without a cycle.
+    """
+
+    shared = Path("src/ape/tasks/lean_tasks/formal_math/review_task.py")
+    assert shared.is_file()
+    assert not Path("src/ape/tasks/lean_tasks/formal_math/pr_review_v2/base.py").exists()
+
+    importers = {
         str(path) for path in _modules(sum(GENERATIONS.values(), ()))
         for module, _name in _imports(path)
-        if module.endswith("pr_review_v2.base")
-    ]
-    assert any("pr_review_v4" in item for item in importers)
-    assert any("pr_review_v5" in item for item in importers)
+        if module.endswith("formal_math.review_task")
+    }
+    for generation in ("pr_review_v2", "pr_review_v4", "pr_review_v5"):
+        assert any(generation in item for item in importers), generation
+
+    # And no generation re-exports it. Doing so is what made `ape.tasks` pull v2 in to reach a
+    # class v2 does not own.
+    init = Path("src/ape/tasks/lean_tasks/formal_math/pr_review_v2/__init__.py")
+    assert "BasePRReviewTask" not in init.read_text(encoding="utf-8").split('"""')[-1]
 
 
 def test_tier_multipliers_has_exactly_one_definition():

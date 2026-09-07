@@ -2,7 +2,7 @@
 
 import ape.tasks.lean_tasks  # noqa: F401  (triggers registration)
 from ape.tasks.base import get_task_class
-from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import BasePRReviewData, BasePRReviewTask
+from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewData, BasePRReviewTask
 from ape.tasks.lean_tasks.formal_math.pr_review_v2.distill_task import (
     DISTILL_SYSTEM,
     DISTILL_USER,

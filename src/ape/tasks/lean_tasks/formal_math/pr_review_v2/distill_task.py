@@ -22,7 +22,7 @@ from pydantic import ConfigDict, Field
 
 from ape.tasks.base import BaseTaskResult, EvaluationResult, register_task
 
-from .base import BasePRReviewConfig, BasePRReviewData, BasePRReviewTask
+from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewConfig, BasePRReviewData, BasePRReviewTask
 
 DISTILL_SYSTEM = """You are reading a Mathlib pull request to understand the MATHEMATICS behind each
 proof it adds or changes — the intended idea — and to judge how transparently the Lean proof expresses

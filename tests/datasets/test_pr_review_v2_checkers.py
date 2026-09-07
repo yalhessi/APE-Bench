@@ -10,7 +10,7 @@ import logging
 
 import ape.tasks.lean_tasks  # noqa: F401  (triggers registration)
 from ape.tasks.base import get_task_class
-from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import (
+from ape.tasks.lean_tasks.formal_math.review_task import (
     BasePRReviewData,
     BasePRReviewTask,
     VerifiedPRReviewTask,
@@ -138,7 +138,7 @@ def test_in_file_verification_splices_replacement_into_patched_file(tmp_path):
     REVIEWED file and the whole file is recompiled — so the edit sees the PR's own new
     declarations (the harness fix). Falls back to a standalone `verification` snippet."""
     from types import SimpleNamespace
-    from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import _strip_ws_prefix
+    from ape.tasks.lean_tasks.formal_math.review_task import _strip_ws_prefix
 
     assert _strip_ws_prefix("target/Mathlib/A.lean") == "Mathlib/A.lean"
 

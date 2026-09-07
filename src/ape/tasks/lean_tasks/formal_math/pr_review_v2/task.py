@@ -14,7 +14,7 @@ from typing import Tuple
 
 from ape.tasks.base import register_task
 
-from .base import (
+from ape.tasks.lean_tasks.formal_math.review_task import (
     DEFAULT_REVIEW_TOOLS,
     BasePRReviewConfig,
     BasePRReviewData,

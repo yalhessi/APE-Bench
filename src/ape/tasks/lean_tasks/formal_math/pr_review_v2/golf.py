@@ -14,7 +14,7 @@ from typing import List, Tuple
 
 from ape.tasks.base import register_task
 
-from .base import BasePRReviewConfig, VerifiedPRReviewTask
+from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewConfig, VerifiedPRReviewTask
 
 # The prompt text now lives in `pr_shared.focused_prompts` so the v4 focused arm can
 # reuse it without a code edge into this frozen generation. Re-exported here under the

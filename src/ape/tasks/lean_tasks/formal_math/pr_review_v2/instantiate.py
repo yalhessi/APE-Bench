@@ -22,7 +22,7 @@ from pydantic import Field
 
 from ape.tasks.base import register_task
 
-from .base import BasePRReviewConfig, VerifiedPRReviewTask
+from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewConfig, VerifiedPRReviewTask
 from .idiom import IDIOM_TOOLS
 
 INSTANTIATE_SYSTEM = """You are a Mathlib maintainer working through a fixed review CHECKLIST for a pull

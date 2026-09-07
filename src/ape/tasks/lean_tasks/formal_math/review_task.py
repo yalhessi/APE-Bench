@@ -1,17 +1,22 @@
-"""
-Shared base for PR-review tasks.
+"""The task every Mathlib review runs on, whatever generation scheduled it.
 
-All review tasks — the holistic acceptability pass and the focused discovery
-checkers (duplication, generality, …) — share the same workspace materialization
-(merge-base snapshot + δ₀ applied, read-only), the same `submit_findings`
-contract, and the same externally-scored result. They differ only in their
-prompt (and tool defaults). This base owns the shared machinery; subclasses set
-`task_type` and implement `_get_prompts`.
+`BasePRReviewTask` and its config/data/result carry the parts of reviewing that do not vary:
+the workspace, the tool grant, `lean_verify_edit` and the edit-confinement rules around it,
+the submission plumbing, and the statement gate. A generation adds what it decides -- which
+sites to look at, what question to ask, what counts as a warrant -- by subclassing.
 
-Findings carry an optional `evidence` field — the verified artifact behind a
-finding (the existing declaration a dup checker found; the stronger statement a
-generality checker proved). This is the proof-carrying-review hook and is scored
-externally (D1/D2/D3 in src/datasets/pr_review_v2); the task never scores.
+It lived in `pr_review_v2` and was inherited from there by v4's candidate and opportunity
+tasks and by v5's lead, which made "v4 is frozen and imported as a library" untrue in the most
+consequential possible place: a v5-only observation about `lean_verify_edit` changed the tool
+contract for every v2 checker and every v4 arm, and this session did exactly that. A base
+class three generations inherit is not part of any one of them.
+
+It sits here, beside the generations, rather than in `src/mathlib_review/`. A review task is a
+`BaseLeanTask`, and `ape/tasks/__init__.py` imports every task package eagerly, so a task base
+outside that tree cannot import `ape.tasks.base` without a cycle -- the framework's layout is
+telling you where task classes go. `src/mathlib_review/` holds the parts that are not tasks.
+
+`VerifiedPRReviewTask` sits on top for the tasks whose claims a compile settles.
 """
 
 import asyncio
@@ -26,7 +31,14 @@ from pydantic import ConfigDict, Field
 from ape.tasks.base import BaseTaskConfig, BaseTaskResult, EvaluationResult
 from ape.tasks.lean_tasks.base import BaseLeanTaskData, BaseLeanTask
 
-from .prompt import DEFAULT_PROMPT_VERSION
+#: Default prompt version for a review task that does not name one.
+#:
+#: Carried here rather than imported from `pr_review_v2.prompt`, which was this module's only
+#: dependency on the generation it used to live in. The prompt *texts* stay with v2's task,
+#: which is the only thing that resolves this name into a pair of prompts; what the base needs
+#: is a default to stamp on a config, and a subclass that renders its own prompts (every v4 and
+#: v5 task does) never resolves it at all.
+DEFAULT_PROMPT_VERSION = "acceptability_v2"
 
 if TYPE_CHECKING:
     from ape.scaffolds.config import BaseScaffoldConfig

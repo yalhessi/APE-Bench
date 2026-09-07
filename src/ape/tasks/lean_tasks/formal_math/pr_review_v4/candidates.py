@@ -8,7 +8,7 @@ from typing import Annotated, Any, Dict, List, Literal, Optional, Tuple
 from pydantic import BaseModel, ConfigDict, Field
 
 from ape.tasks.base import register_task
-from ape.tasks.lean_tasks.formal_math.pr_review_v2.base import (
+from ape.tasks.lean_tasks.formal_math.review_task import (
     BasePRReviewConfig, BasePRReviewData, BasePRReviewResult, BasePRReviewTask,
 )
 

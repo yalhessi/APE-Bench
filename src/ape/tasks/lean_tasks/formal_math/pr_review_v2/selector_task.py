@@ -23,7 +23,7 @@ from pydantic import ConfigDict, Field
 
 from ape.tasks.base import BaseTaskResult, EvaluationResult, register_task
 
-from .base import BasePRReviewConfig, BasePRReviewData, BasePRReviewTask
+from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewConfig, BasePRReviewData, BasePRReviewTask
 
 SELECTOR_SYSTEM = """You are a Mathlib maintainer triaging a pull request, deciding which review
 comments are worth raising. The PR already COMPILES — correctness is settled by the kernel — so your
