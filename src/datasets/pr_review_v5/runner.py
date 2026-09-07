@@ -430,14 +430,26 @@ _TERMINAL_OUTPUTS = (
 )
 
 
-def _scratch_dirs(run_name: str) -> List[Path]:
-    from ape.orchestration.config import ExecutionConfig  # noqa: F401
+def _scratch_dirs(run_name: str, scaffold=None) -> List[Path]:
+    """Where the orchestrator would keep this run's resumable state.
 
-    base = Path(".ape/runs")
+    Read from the scaffold's `runs_base_dir` rather than hardcoded. The literal `.ape/runs`
+    here was wrong for any config that sets `runs_base_dir` and for any launch from a
+    directory other than the repo root: the guard then looked in a place nothing writes,
+    found nothing, and passed — restoring the exact silent-resume hazard it exists to prevent.
+    """
+
+    if scaffold is not None:
+        base = Path(getattr(scaffold, "runs_base_dir", None) or Path(".ape/runs"))
+    else:
+        from ape.scaffolds.config import BaseScaffoldConfig
+
+        base = Path(BaseScaffoldConfig().runs_base_dir)
     return [base / run_name, base / f"{run_name}_floor"]
 
 
-def guard_run_name(dataset: V5DatasetConfig, logger) -> None:
+def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
+                   *, fatal: bool = True) -> None:
     """Refuse to reuse a run name that already produced results, BEFORE spending anything.
 
     Two separate things go wrong when a name is reused after a code change, and neither
@@ -457,8 +469,18 @@ def guard_run_name(dataset: V5DatasetConfig, logger) -> None:
 
     directory = run_dir(dataset.run_name)
     existing = [name for name in _TERMINAL_OUTPUTS if (directory / name).is_file()]
-    scratch = [item for item in _scratch_dirs(dataset.run_name) if item.is_dir()]
+    scratch = [item for item in _scratch_dirs(dataset.run_name, scaffold) if item.is_dir()]
     if not existing and not scratch:
+        return
+    if not fatal:
+        # A dry run must be able to say the name is spent. It used to run *after* the
+        # dry-run early return, so `--dry-run` -- the one command whose whole job is to
+        # tell you what the real run would do -- could not tell you it would refuse.
+        logger.warning(
+            "run_name %r is already spent%s%s; the real run will refuse it",
+            dataset.run_name,
+            f" (outputs: {', '.join(existing)})" if existing else "",
+            f" (orchestrator state: {', '.join(str(i) for i in scratch)})" if scratch else "")
         return
     raise RuntimeError(
         f"run_name {dataset.run_name!r} has already been executed"
@@ -537,6 +559,10 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
 
     if dataset.dry_run:
         logger.info("DRY RUN — nothing is written and no model is called")
+        # Warn, don't raise: a dry run must be able to say the real run would refuse this
+        # name. The check used to sit *after* this block, so the one command whose job is to
+        # tell you what the real run would do could not tell you it would not start.
+        guard_run_name(dataset, logger, scaffold, fatal=False)
         logger.info("%s", json.dumps(report, indent=2))
         floor = report["mandatory_floor_cost"]
         cap = dataset.per_pr_cost_cap * len(selected_prs)
@@ -552,7 +578,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
                     plan.agenda_sha256[:12], len(plan.prompt_sha256_by_invocation))
         return None
 
-    guard_run_name(dataset, logger)
+    guard_run_name(dataset, logger, scaffold)
     out = run_dir(dataset.run_name)
     out.mkdir(parents=True, exist_ok=True)
     cutoff_by_episode = cutoffs_by_episode(episodes)

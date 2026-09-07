@@ -45,10 +45,14 @@ TIER_MULTIPLIERS = {"cheap": 0.5, "standard": 1.0, "deep": 2.0}
 #: other: a proposal the lead dropped is a measurement, not an absence.
 DISPOSITIONS = ("mandatory", "proposed", "agent_added", "pruned")
 
-#: Context capabilities an arm may be granted. Defaulting every arm to all four is
-#: deliberate: which evidence source a given concern needs is an open question the
-#: precedent design says to settle by benchmark, and hardcoding a per-arm subset now would
-#: answer it by assumption. The field stays so it can be measured later.
+#: Context capabilities an arm may be granted.
+#:
+#: The grant is **per arm**, and the policy lives in `arms._CONTEXT_GRANTS` — this tuple is
+#: only the vocabulary. It used to say that granting every arm all four was deliberate and
+#: that a per-arm subset would answer an unmeasured question by assumption; smoke4 measured
+#: it, `arms.py` was changed, and this comment was left behind asserting the opposite of what
+#: the code does. Policy and its rationale belong together, which is why the reasoning is
+#: there and not here.
 CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "lean_verify_edit")
 
 

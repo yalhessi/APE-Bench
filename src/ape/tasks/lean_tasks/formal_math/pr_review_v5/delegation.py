@@ -43,7 +43,12 @@ from ape.orchestration.config import EarlyStopMode
 
 #: Multipliers on the configured `standard` cap. Named tiers rather than free-form numbers
 #: so the lead cannot invent a budget, and so a run's cost policy is one number in config.
-TIER_MULTIPLIERS = {"cheap": 0.5, "standard": 1.0, "deep": 2.0}
+#:
+#: Imported, not restated. This was a verbatim duplicate of the definition in
+#: `src.datasets.pr_review_v5.schema` with neither side importing the other — the task layer
+#: read this copy and the dataset layer read that one, so the two could drift apart and a run
+#: would price its jobs differently from the plan that budgeted them.
+from src.datasets.pr_review_v5.schema import TIER_MULTIPLIERS  # noqa: E402
 
 
 @dataclass
