@@ -130,6 +130,21 @@ class V5DatasetConfig(BaseModel):
     #: Only turn it off on a set where the specialists already cover every work unit —
     #: `agenda_report` reports `units_without_specialist`, and a run that leaves units
     #: unreviewed measures coverage loss, not arm quality.
+    #: Apply the lead's assessments, or only record them.
+    #:
+    #: **Off since 2026-09-08, under investigation.** `pr5_smoke4_rep9` was the first run to
+    #: apply them: 54 candidates became 27 issues, and of the six obligations the run hit,
+    #: **two are hit only by a candidate the lead removed** -- one dropped, and four of the
+    #: five gold-matching removals were `duplicate_of` folds into a representative that did
+    #: not itself match. Folding is meant to be lossless and was not.
+    #:
+    #: rep6 and rep7, the best runs on this set, recorded assessments and applied none of
+    #: them, and scored 6 and 7 issue hits against rep9's 6 (4 after removals).
+    #:
+    #: Recording continues either way: `candidate_assessments.jsonl` is written regardless,
+    #: because the question is whether the lead's judgment is *good*, and answering that needs
+    #: the judgments whether or not they are acted on.
+    apply_lead_synthesis: bool = False
     generalist_floor: bool = True
     #: Cost policy. Both are required for a real run; a lead with no cap can spend the whole
     #: run on one work unit.
@@ -654,6 +669,7 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
             "skip_evidence_chain": dataset.skip_evidence_chain,
             "pr_finding_limit": dataset.pr_finding_limit,
             "generalist_floor": dataset.generalist_floor,
+            "apply_lead_synthesis": dataset.apply_lead_synthesis,
             "use_exposure_index": dataset.use_exposure_index,
         },
         git_commit=commit, git_tree_state=tree_state,
@@ -926,6 +942,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         execution_release=dataset.execution_release,
         exclude_methods=dataset.exclude_methods, pr_numbers=selected_prs,
         candidate_assessments=assessments,
+        apply_lead_synthesis=dataset.apply_lead_synthesis,
         collect_supported=(
             None if dataset.skip_evidence_chain else
             lambda candidates: collect_supported(

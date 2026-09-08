@@ -26,6 +26,7 @@ away.
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
@@ -269,6 +270,7 @@ def finalize(
     supported_candidate_ids: Optional[Iterable[str]] = None,
     collect_supported: Optional[Callable[[Sequence[Any]], Set[str]]] = None,
     candidate_assessments: Iterable[Dict[str, Any]] = (),
+    apply_lead_synthesis: bool = True,
     pr_finding_limit: int = 20,
     logger=None,
 ) -> Dict[str, Any]:
@@ -296,12 +298,30 @@ def finalize(
 
     # Synthesis first: a candidate the lead dropped should never reach the evidence chain,
     # which is the expensive part and would be spent adjudicating a claim nobody stands by.
-    (generalist, specialist, evidence_specialist,
-     lead_removed, synthesis) = apply_assessments(
-        generalist=generalist, specialist=specialist,
-        evidence_specialist=evidence_specialist, responses=responses,
-        assessments=candidate_assessments, logger=logger,
-    )
+    #
+    # `apply_lead_synthesis=False` records the lead's assessments and acts on none of them,
+    # which is what rep6 and rep7 did. See the field for why it is currently off.
+    if apply_lead_synthesis:
+        (generalist, specialist, evidence_specialist,
+         lead_removed, synthesis) = apply_assessments(
+            generalist=generalist, specialist=specialist,
+            evidence_specialist=evidence_specialist, responses=responses,
+            assessments=candidate_assessments, logger=logger,
+        )
+    else:
+        lead_removed = []
+        recorded = list(candidate_assessments)
+        synthesis = {
+            "applied": False,
+            "assessments": len(recorded),
+            "by_verdict": dict(Counter(
+                item.get("verdict") for item in recorded if item.get("verdict"))),
+            "note": ("recorded, not applied -- every candidate reaches the review. "
+                     "See `V5DatasetConfig.apply_lead_synthesis`."),
+        }
+        if logger is not None and recorded:
+            logger.info("lead synthesis recorded but NOT applied: %d assessment(s)",
+                        len(recorded))
 
     generalist_path = out / "candidates_generalist.jsonl"
     specialist_path = out / "candidates_specialist.jsonl"

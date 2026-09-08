@@ -518,3 +518,68 @@ def test_a_dropped_candidate_still_never_reaches_the_evidence_chain(unit, tmp_pa
     )
     assert len(seen) == 1
     assert seen[0].claim.endswith("A.")
+
+
+# --- the lead's judgment can be recorded without being applied -------------------------------
+#
+# `pr5_smoke4_rep9` was the first run to apply it: 54 candidates became 27 issues, and of the
+# six obligations the run hit, **two are hit only by a candidate the lead removed**. Four of
+# the five gold-matching removals were `duplicate_of` folds into a representative that did not
+# itself match, so folding -- which is meant to be lossless -- was not. rep6 and rep7 recorded
+# assessments and applied none, and scored 6 and 7 issue hits against rep9's 6.
+
+
+def _assessment(unit, ordinal=0, verdict="drop"):
+    return {"schema_version": "v5-assessment1",
+            "invocation_id": f"{unit.work_unit_id}#proof_golf",
+            "candidate_ordinal": ordinal, "verdict": verdict, "reason": "not worth it"}
+
+
+def test_synthesis_can_be_recorded_without_being_applied(unit, tmp_path):
+    responses = [_response(unit, "proof_golf", [_candidate(unit)], [_artifact(unit, 0)],
+                           spec_id="proof_golf")]
+    assessments = [_assessment(unit)]
+
+    applied = finalize(tmp_path / "on", units=[unit], routing_mode="lead",
+                       responses=responses, candidate_assessments=assessments,
+                       apply_lead_synthesis=True)
+    recorded = finalize(tmp_path / "off", units=[unit], routing_mode="lead",
+                        responses=responses, candidate_assessments=assessments,
+                        apply_lead_synthesis=False)
+
+    assert applied["lead_removed_findings"] == 1
+    assert recorded["lead_removed_findings"] == 0
+    assert recorded["issues_total"] > applied["issues_total"]
+
+
+def test_the_assessments_are_still_counted_when_not_applied(unit, tmp_path):
+    """The question under investigation is whether the lead's judgment is good, and answering
+    that needs the judgments whether or not they are acted on."""
+
+    report = finalize(tmp_path / "r", units=[unit], routing_mode="lead",
+                      responses=[_response(unit, "proof_golf", [_candidate(unit)],
+                                           [_artifact(unit, 0)], spec_id="proof_golf")],
+                      candidate_assessments=[_assessment(unit)],
+                      apply_lead_synthesis=False)
+    synthesis = report["lead_synthesis"]
+    assert synthesis["applied"] is False
+    assert synthesis["assessments"] == 1
+    assert synthesis["by_verdict"] == {"drop": 1}
+
+
+def test_the_setting_is_sealed_in_the_run_plan():
+    """It changes what reaches the maintainer-facing review, so two runs that differ on it are
+    not comparable -- which is exactly what `evaluation_settings` is for."""
+
+    import inspect
+
+    from src.mathlib_review.review import runner
+
+    source = inspect.getsource(runner._build_plan)
+    assert '"apply_lead_synthesis": dataset.apply_lead_synthesis' in source
+
+
+def test_it_is_off_by_default_while_under_investigation():
+    from src.mathlib_review.review.runner import V5DatasetConfig
+
+    assert V5DatasetConfig.model_fields["apply_lead_synthesis"].default is False
