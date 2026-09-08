@@ -119,7 +119,24 @@ def reconcile(
     # The same sum in the other currency. `cost` is billed and `nominal_cost` is the no-cache
     # counterfactual; both are on every ledger row, and until now only one of them was carried
     # to the manifest -- the one no cap is enforced against.
-    ledger_nominal = sum(float(record.get("nominal_cost") or 0.0) for record in delegations)
+    # `nominal_cost` is inside `token_usage`, not at the top of the row -- the top-level `cost`
+    # is the billed figure and its nominal twin never joined it there. Reading the wrong key
+    # made `nested_nominal` zero on rep9 while $6.79 of nominal arm spend sat one level down,
+    # and that made `self_nominal` the whole run: the manifest said four leads spent $7.50
+    # nominal when they spent $0.71 and their arms spent the rest. Attributing nested spend to
+    # the parent is the exact defect this branch opened with.
+    ledger_nominal = sum(
+        float((record.get("token_usage") or {}).get("nominal_cost")
+              or record.get("nominal_cost") or 0.0)
+        for record in delegations
+    )
+    # What `per_pr_cost_cap` actually counts: the coverage floor is exempt by design, so the
+    # charged figure is the discretionary half and is smaller than billed. Both are correct
+    # and they answer different questions.
+    ledger_charged = sum(
+        float(record.get("cost") or 0.0) for record in delegations
+        if record.get("disposition") != "mandatory"
+    )
 
     # A job that ran and recorded no cost is unattributed spend: the money left the account
     # and the ledger cannot say for what. That is the shape of the bug this function just
@@ -161,9 +178,16 @@ def reconcile(
         total_cost=float(getattr(results, "total_cost", 0.0) or 0.0) + extra_cost,
         cost_breakdown={
             # What the leads' own conversations cost, i.e. inclusive minus what they delegated.
+            #
+            # In NOMINAL, like the `total_cost` it is a breakdown of. It used to subtract
+            # `ledger_cost`, which is billed, from a nominal total -- two currencies, so the
+            # lead's share came out at $4.74 on rep9 against a real $0.71.
             "lead": round(
-                float(getattr(results, "total_cost", 0.0) or 0.0) - ledger_cost, 6),
-            "nested": round(ledger_cost, 6),
+                float(getattr(results, "total_cost", 0.0) or 0.0) - ledger_nominal, 6),
+            # BILLED, unlike `lead` above. The ledger is the attribution record for what
+            # was paid; `usage` carries both currencies at both scopes without this ambiguity.
+            "nested_billed": round(ledger_cost, 6),
+            "nested_nominal": round(ledger_nominal, 6),
             "extra": round(extra_cost, 6),
         },
         # Both currencies at both scopes. `results.total_cost` is nominal and
@@ -178,6 +202,7 @@ def reconcile(
                 float(getattr(results, "total_cost", 0.0) or 0.0) - ledger_nominal, 6),
             nested_billed=round(ledger_cost, 6),
             nested_nominal=round(ledger_nominal, 6),
+            budget_charged=round(ledger_charged, 6),
         ).summary(),
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),
         candidates_total=candidates_total,

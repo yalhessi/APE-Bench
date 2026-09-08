@@ -297,14 +297,28 @@ def test_specialist_spend_is_counted_in_the_manifest():
     # the worker writes it to `attempt.cost`. This used to be exclusive, and the manifest added
     # the ledger on top; doing that now would count every nested dollar twice.
     lead_self = 1.30
+    # Both currencies, explicitly. This test used to pass `total_cost=lead_self + nested` with
+    # `nested` being the ledger's *billed* sum, so it asserted that a nominal total minus a
+    # billed ledger equals the lead's share -- which is only true if the two are the same
+    # number. They are ~2.5x apart, and on rep9 that put the lead's share at $4.74 against a
+    # real $0.71. The ledger rows now carry their nominal twin, as the real ones do.
+    nested_nominal = nested * 2.5
+    for record in records:
+        if record.get("cost") is not None:
+            record["token_usage"] = {"billed_cost": record["cost"],
+                                     "nominal_cost": record["cost"] * 2.5}
     manifest = reconcile(
         agenda=agenda, delegations=records, responses=[], plan=plan,
-        results=SimpleNamespace(total_cost=lead_self + nested, wall_clock_time=180.0),
+        results=SimpleNamespace(total_cost=lead_self + nested_nominal,
+                                total_cached_cost=lead_self + nested,
+                                wall_clock_time=180.0),
         issues_total=30, extra_cost=2.97,
     )
-    assert manifest.total_cost == pytest.approx(lead_self + nested + 2.97)
-    # The ledger is the attribution record for that nested total, not additional spend.
-    assert manifest.cost_breakdown["nested"] == pytest.approx(nested)
+    assert manifest.total_cost == pytest.approx(lead_self + nested_nominal + 2.97)
+    # The ledger is the attribution record for that nested total, not additional spend --
+    # and it is reported in both currencies rather than one ambiguous `nested`.
+    assert manifest.cost_breakdown["nested_billed"] == pytest.approx(nested)
+    assert manifest.cost_breakdown["nested_nominal"] == pytest.approx(nested_nominal)
     assert manifest.cost_breakdown["lead"] == pytest.approx(lead_self)
 
 
@@ -461,3 +475,93 @@ def test_the_leads_own_spend_is_separated_from_what_it_delegated():
     manifest, nested_billed, _n = _manifest_with_both_currencies()
     assert manifest.usage["self_billed"] == pytest.approx(0.20)
     assert manifest.usage["nested_billed"] == pytest.approx(nested_billed)
+
+
+def _manifest_from(agenda, records, *, nominal, billed):
+    """Reconcile one manifest from a ledger, with both currencies supplied explicitly."""
+
+    from types import SimpleNamespace
+
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.review.trace import reconcile
+    from src.mathlib_review.schema.review import V5RunPlan
+
+    plan = V5RunPlan(
+        run_id="v5run:t", run_name="t", routing_mode="lead", agenda_sha256="a" * 64,
+        release="rel", prompt_sha256_by_invocation={}, arm_sha256_by_id={},
+        model_name="m", scaffold_config_sha256="b" * 64, lead_cost_cap=1.0,
+        standard_budget_cap=0.5, per_pr_cost_cap=4.0, source_sha256="",
+    )
+    plan = plan.model_copy(update={"source_sha256": sha256_bytes(canonical_json_bytes(
+        plan.model_dump(mode="json", exclude={"source_sha256"})))})
+    return reconcile(
+        agenda=agenda, delegations=records, responses=[], plan=plan,
+        results=SimpleNamespace(total_cost=nominal, total_cached_cost=billed,
+                                wall_clock_time=10.0),
+        issues_total=0)
+
+
+def test_nested_nominal_is_read_from_where_the_ledger_puts_it():
+    """`nominal_cost` lives inside `token_usage`; the top-level `cost` is the billed figure and
+    its nominal twin never joined it there.
+
+    Reading the wrong key made `nested_nominal` zero on rep9 while $6.79 of nominal arm spend
+    sat one level down -- and because `self_nominal` is the total minus the nested share, the
+    manifest then said four leads spent $7.50 nominal when they spent $0.71. Attributing
+    nested spend to the parent is the exact defect this branch opened with.
+    """
+
+    from types import SimpleNamespace
+
+    from src.mathlib_review.review.trace import reconcile
+
+    agenda, _pool = _agenda_and_pool()
+    records = []
+    for item in agenda.proposals:
+        base = {"schema_version": "v5-delegation1", "invocation_id": item.invocation_id,
+                "proposal_id": item.proposal_id, "arm_id": item.arm_id,
+                "work_unit_id": item.work_unit_id, "pr_number": item.pr_number,
+                "context_calls": []}
+        if item.mandatory:
+            records.append({**base, "disposition": "mandatory", "reason": "",
+                            "status": "success", "cost": 0.02,
+                            "token_usage": {"billed_cost": 0.02, "nominal_cost": 0.05}})
+        else:
+            records.append({**base, "disposition": "pruned", "reason": "r",
+                            "status": None, "cost": None})
+    jobs = sum(1 for r in records if r["disposition"] == "mandatory")
+    manifest = _manifest_from(agenda, records,
+                             nominal=0.50 + 0.05 * jobs, billed=0.20 + 0.02 * jobs)
+    assert manifest.usage["nested_nominal"] == pytest.approx(0.05 * jobs)
+    assert manifest.usage["self_nominal"] == pytest.approx(0.50)
+    assert manifest.cost_breakdown["lead"] == pytest.approx(0.50)
+
+
+def test_budget_charged_counts_only_what_the_per_pr_cap_counts():
+    """The coverage floor is exempt from `per_pr_cost_cap` by design, so the charged figure is
+    the discretionary half and is smaller than billed. Both are correct; they answer different
+    questions, and `budget_charged` was defined and never populated."""
+
+    from src.mathlib_review.review.trace import reconcile
+
+    agenda, _pool = _agenda_and_pool()
+    records = []
+    for index, item in enumerate(agenda.proposals):
+        base = {"schema_version": "v5-delegation1", "invocation_id": item.invocation_id,
+                "proposal_id": item.proposal_id, "arm_id": item.arm_id,
+                "work_unit_id": item.work_unit_id, "pr_number": item.pr_number,
+                "context_calls": [], "token_usage": {"nominal_cost": 0.05}}
+        if item.mandatory:
+            records.append({**base, "disposition": "mandatory", "reason": "",
+                            "status": "success", "cost": 0.02})
+        elif index % 9 == 0:
+            records.append({**base, "disposition": "proposed", "reason": "",
+                            "status": "success", "cost": 0.10})
+        else:
+            records.append({**base, "disposition": "pruned", "reason": "r",
+                            "status": None, "cost": None,
+                            "token_usage": {"nominal_cost": 0.0}})
+    discretionary = sum(1 for r in records if r["disposition"] == "proposed")
+    manifest = _manifest_from(agenda, records, nominal=9.0, billed=4.0)
+    assert manifest.usage["budget_charged"] == pytest.approx(0.10 * discretionary)
+    assert manifest.usage["budget_charged"] < manifest.usage["billed"]

@@ -1,0 +1,37 @@
+{
+  "agent_added": 0,
+  "candidates_total": 54,
+  "completion_status": "complete",
+  "context_calls_total": 165,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 4.738806,
+    "nested": 2.76149
+  },
+  "coverage_gaps": [],
+  "delegated": 66,
+  "failed": 0,
+  "issues_total": 27,
+  "mandatory": 47,
+  "paused": 0,
+  "proposals_total": 207,
+  "pruned": 141,
+  "routing_mode": "lead",
+  "run_id": "v5run:pr5_smoke4_rep9",
+  "run_name": "pr5_smoke4_rep9",
+  "run_plan_sha256": "993f4e35ec5de7fc0d5c89ca7cec596b72978829c59edd92754a15f563b5fe10",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "b6a55363e7c77c5d92afbecce39d5ade71a15a3a4c0033d6ba07ac85a0636c71",
+  "succeeded": 66,
+  "total_cost": 7.5002965,
+  "usage": {
+    "billed": 3.066777,
+    "budget_charged": 0.0,
+    "nested_billed": 2.76149,
+    "nested_nominal": 0.0,
+    "nominal": 7.500297,
+    "self_billed": 0.305287,
+    "self_nominal": 7.500297
+  },
+  "wall_seconds": 544.263281
+}

@@ -214,6 +214,11 @@ def _record(invocation_id, disposition, **overrides):
         "disposition": disposition, "reason": "", "status": (
             None if disposition == "pruned" else "success"),
         "cost": None if disposition == "pruned" else 0.05, "context_calls": [],
+        # Billed at the top, nominal inside `token_usage`, which is where a real row puts it.
+        # A helper that omitted the nominal twin is what let `nested_nominal` read zero in
+        # production without a test noticing.
+        "token_usage": (None if disposition == "pruned"
+                        else {"billed_cost": 0.05, "nominal_cost": 0.125}),
     }
     row.update(overrides)
     return row
@@ -312,12 +317,17 @@ def test_the_root_total_is_inclusive_and_the_ledger_attributes_it():
     """
 
     agenda = _agenda(["wu:1#generalist"])
-    inclusive = SimpleNamespace(total_cost=0.4 + 0.05, wall_clock_time=12.0)
+    # `total_cost` is nominal, so the lead's own nominal share is what is left after the
+    # ledger's nominal sum -- not after its billed one, which is a different currency.
+    inclusive = SimpleNamespace(total_cost=0.4 + 0.125, total_cached_cost=0.16 + 0.05,
+                                wall_clock_time=12.0)
     manifest = reconcile(agenda=agenda, delegations=[_record("wu:1#generalist", "mandatory")],
                          responses=[], plan=_plan(), results=inclusive, issues_total=0)
-    assert manifest.total_cost == pytest.approx(0.45)
-    # lead = inclusive minus what it delegated; nested = the ledger's own sum.
-    assert manifest.cost_breakdown == {"lead": 0.4, "nested": 0.05, "extra": 0.0}
+    assert manifest.total_cost == pytest.approx(0.525)
+    assert manifest.cost_breakdown == {
+        "lead": 0.4, "nested_billed": 0.05, "nested_nominal": 0.125, "extra": 0.0}
+    # And the floor is exempt from the per-PR cap, so a mandatory job charges nothing to it.
+    assert manifest.usage["budget_charged"] == 0.0
 
 
 def test_a_job_that_ran_without_a_recorded_cost_refuses_to_close():
