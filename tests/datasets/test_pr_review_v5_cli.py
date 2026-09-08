@@ -421,3 +421,55 @@ def test_run_says_it_the_same_way(capsys, monkeypatch):
     monkeypatch.setattr(runner, "run", _noop)
     cli.main(["run", "--config", str(CONFIG), "--run-name", "probe"])
     assert "NOTHING RAN" in capsys.readouterr().err
+
+
+def test_execute_overrides_a_configs_dry_run(monkeypatch):
+    """`--execute` is the one thing that decides whether a command spends.
+
+    The judge base carries `dry_run: true` and it silently outvoted the flag: `judge --execute`
+    resolved its paths, built its pairs, called no model, wrote no audit and exited 0. Two
+    mechanisms for one decision, which is the defect this branch exists to remove.
+    """
+
+    import src.mathlib_review.judge.runner as judge_runner
+
+    seen = {}
+
+    async def _capture(dataset, scaffold, task_overrides, logger):
+        seen["dry_run"] = dataset.dry_run
+        return None
+
+    monkeypatch.setattr(judge_runner, "run", _capture)
+    cli.main(["judge", "--config", "configs/pr_review_v5_specialist4_judge.yaml",
+              "--of", "pr_review_v5_specialist4_rep1", "--execute"])
+    assert seen["dry_run"] is False, "the config's dry_run outvoted --execute"
+
+
+def test_the_judge_base_still_defaults_to_safe():
+    """Overridden, not deleted: a config run outside this CLI should still not spend."""
+
+    from ape.utils.config_loader import load_yaml
+
+    base = load_yaml(Path("configs/bases/v5_judge.yaml"))
+    assert base["dataset"]["dry_run"] is True
+
+
+def test_a_missing_audit_says_the_judge_has_not_run(tmp_path):
+    """A raw `FileNotFoundError: .../semantic_report.json` names a file nobody chose the name
+    of. The actionable fact is that a step was skipped."""
+
+    from src.mathlib_review.analysis.report import score
+
+    with pytest.raises(SystemExit) as excinfo:
+        score(tmp_path / "audits" / "nothing-here")
+    message = str(excinfo.value)
+    assert "the judge has not run" in message
+    assert "--execute" in message
+
+
+def test_the_scope_report_says_it_too(tmp_path):
+    from src.mathlib_review.analysis.obligation_scope import scope_report
+
+    with pytest.raises(SystemExit) as excinfo:
+        scope_report(tmp_path / "a" / "semantic_report.json", tmp_path / "judgments.jsonl")
+    assert "--execute" in str(excinfo.value)

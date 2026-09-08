@@ -190,6 +190,11 @@ def _run(args, overrides, logger) -> int:
         return _plan(args.config, overrides, logger)
 
     dataset, scaffold, task_overrides = load_run(args.config, overrides)
+    if dataset.dry_run:
+        # Same rule as the judge. Generation works today only because its base happens not to
+        # set `dry_run`; relying on that is how the judge's `--execute` came to mean nothing.
+        logger.info("--execute overrides `dataset.dry_run: true` from the config")
+        dataset.dry_run = False
     if args.cost_model:
         scaffold.llm_config.cost_model = args.cost_model
     logger.info("cost model: %s", scaffold.llm_config.cost_model)
@@ -236,6 +241,14 @@ def _judge(args, overrides, logger) -> int:
             "of run": args.of_run or "(from config)",
         })
         return 0
+
+    # `--execute` is the ONE thing that decides whether a command spends. The judge base
+    # config carries `dry_run: true`, and it silently outvoted the flag: `judge --execute`
+    # built its pairs, called nothing, wrote nothing, and exited 0. Two mechanisms for one
+    # decision, which is the defect this branch exists to remove -- so the flag wins, loudly.
+    if dataset.dry_run:
+        logger.info("--execute overrides `dataset.dry_run: true` from the config")
+        dataset.dry_run = False
 
     out = asyncio.run(run(dataset, scaffold, task_overrides, logger))
     if out:

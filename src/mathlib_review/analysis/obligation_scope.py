@@ -131,6 +131,14 @@ def scope_report(semantic_report: Path, judgments: Path,
                  pr_numbers: Optional[Iterable[int]] = None) -> Dict[str, Any]:
     """Hit rate by scope, with the borderline band reported rather than absorbed."""
 
+    semantic_report = Path(semantic_report)
+    if not semantic_report.is_file():
+        raise SystemExit(
+            f"no judge output at {semantic_report.parent}. `report scope` splits the judge's "
+            "own per-obligation verdicts, so it needs a finished judge run:\n"
+            "  python -m src.mathlib_review.review.cli judge --config <judge config> "
+            "--of <run_name> --execute"
+        )
     per = {
         item["obligation_id"]: item
         for item in json.loads(semantic_report.read_text())["per_obligation"]

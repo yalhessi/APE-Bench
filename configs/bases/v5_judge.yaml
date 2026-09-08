@@ -29,6 +29,8 @@ dataset:
   # rather than something a config silently inherits — a child that widens it is declaring
   # that its numbers are not comparable to any run that did not.
   pairing_tiers: [anchor]
+  # Safe by default; `--execute` overrides it. It used to be the deciding vote, so
+  # `judge --execute` built its pairs, called nothing and wrote nothing.
   dry_run: true
   # A run that did not finish covering what it promised is refused. Setting this to true
   # scores it anyway and marks the output forensic in semantic_report.json.

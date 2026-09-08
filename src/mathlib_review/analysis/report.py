@@ -278,6 +278,16 @@ def score(audit_dir: Path, run_name: Optional[str] = None) -> Dict[str, Any]:
     bounded by the evidence gate rather than by the agent.
     """
 
+    audit_dir = Path(audit_dir)
+    if not (audit_dir / "semantic_report.json").is_file():
+        raise SystemExit(
+            f"no judge output at {audit_dir}. `report score` reads what the judge wrote; "
+            "if the directory is missing, the judge has not run.\n"
+            "  python -m src.mathlib_review.review.cli judge --config <judge config> "
+            f"--of <run_name> --execute\n"
+            "Note `--execute`: without it the judge resolves its paths and stops."
+        )
+
     def two_level(path: Path, label: str):
         if not path.is_file():
             return None
