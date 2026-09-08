@@ -1,6 +1,6 @@
 # What the two plans asked for, and what is built
 
-*Checked against the tree at `dc894b1` on `september-checkpoint`, 2026-09-08. 1295 tests pass.*
+*Checked against the tree at `052430c` on `september-checkpoint`, 2026-09-08. 1313 tests pass.*
 
 Two plans are in this directory and the second is the first one's remainder, reordered:
 
@@ -12,6 +12,11 @@ Two plans are in this directory and the second is the first one's remainder, reo
   once Stage 0 and Stage 3 had largely landed. Six steps, ordered by what unblocks what.
 
 Where they disagree the later one wins. Where it is silent the original still stands.
+
+*Second pass, 2026-09-08: the task layer collapsed too, the run state machine landed, `--set`
+and `--run-name` landed, and the dead floor block went. What moved from partial to built is in
+the tables; what moved the other way is the v2 deletion, which turned out to be blocked by
+frozen manifests rather than merely deferred.*
 
 **Status is per numbered item, and only three values are used.** *Built* means it is in the
 tree with tests. *Not built* means no part of it exists. *Partial* means some of it exists and
@@ -35,7 +40,7 @@ of anything.
 | 9 | Root inclusive usage counted once via `nested_token_usage` | **Built** |
 | 10 | Failure reasons propagate to rows, reports, manifests | **Built** |
 | 11 | Mandatory failure ⇒ coverage gap ⇒ `partial` | **Built** |
-| 12 | Run transitions written as an explicit state machine | **Partial** — every transition the plan names is enforced somewhere (`execution_status`, `completion_status`, the judge's refusal to score a non-complete run), but there is no single place that states the machine, so the guarantee is assembled from three files rather than read off one. |
+| 12 | Run transitions written as an explicit state machine | **Built** — `mathlib_review/run_state.py`. Wired rather than documented: the judge asks `SCOREABLE` instead of comparing against the literal `"complete"`. The manifest's own `complete`/`partial`/`failed` vocabulary is deliberately not renamed — those strings are in every manifest in the tree. |
 | 13 | Lead state as an append-only event journal | **Built** |
 | 14 | `execution_index.jsonl` mapping semantic ids to physical paths | **Built** |
 | 15 | Isolation contract, stated and tested | **Built** |
@@ -51,31 +56,31 @@ Correction sidecars for the September runs: **built**. Those runs are forensic f
 
 | Item | Status |
 |---|---|
-| One entrypoint with `plan / run / judge / bench / report / trajectory` | **Partial** — it is `python -m src.mathlib_review.review.cli`, not `ape review`, and there is no `resume` or `build-corpus` subcommand. `finalize` runs inside `run` rather than standing alone. |
+| One entrypoint with `plan / run / judge / bench / report / trajectory` | **Partial** — it is `python -m src.mathlib_review.review.cli`, not `ape review`, and there is no `resume` or `build-corpus` subcommand. `finalize` runs inside `run` rather than standing alone. Resume works (`run` with the same `--run-name` reuses the orchestrator cache and replays the lead's journal); it is not a separate verb. |
 | Mutating commands read-only without `--execute` | **Built**, with a structural test that every spending subcommand has the gate and no read-only one does |
 | Pure preflight must not instantiate `TaskOrchestrator` | **Built** — the dry-run branch returns at `runner.py:799`, the orchestrator is constructed at `:862` |
-| Overrides only via repeated `--set key=value` | **Not built** — overrides are bare `key=value` trailing arguments. The half that mattered *is* built: `parse_cli_args` raises on a token without `=` instead of discarding it, which is the bug that made a checked-in runbook command run the wrong experiment. |
+| Overrides only via repeated `--set key=value` | **Built** — and the leftover is now rejected by argparse itself, which names the token. Previously a mistyped subcommand was indistinguishable from a config key except by looking for an `=`. |
 | `extends:` with cycle detection | **Built** |
 | `extra="forbid"` recursively | **Built** |
 | Resume monotonic in execution only, `run_plan_revision_N` | **Built** — spending fields may move, a semantic change is refused and names the field |
 | `judge --run` derives all paths | **Built**, spelled `--of`. The v5 judge configs now carry no paths at all, so the three cannot disagree. The live rep1/rep2 mismatch the plan cites is gone. |
 | `evaluation_contract_version` | **Built**, starting at 2 |
 | Comment-invariants become preflight | **Built** — coverage reachable when the floor is off, the evidence gate announcing itself, and `execution_release`/`skip_evidence_chain`/`pr_finding_limit`/`generalist_floor` sealed in the plan |
-| Reusable templates; delete the configs naming spent runs | **Partial** — every v5 config extends a base and states only its deltas (18 keys → 2 for `medium_heldout`), and four spent one-offs are deleted. Four configs still name an already-spent run: `smoke4`, `smoke4_e2e`, `heldout11_rep2`, `specialist4`. Those are the reusable sets rather than one-offs, and `guard_run_name` refuses them fatally, so they are inert rather than dangerous — but the run name is still baked into the config, which is the shape of the problem. |
+| Reusable templates; delete the configs naming spent runs | **Built** — differently, and better. No generation config names a run at all: `--run-name` supplies it per invocation, matching what the judge already did with `--of`. Both halves of a run identity now come from the command line and neither can go stale on disk. The field's default is the sentinel `UNNAMED`, refused at preflight, because a plausible default would land a forgetful config on top of whatever ran under it last. |
 
 ## Original plan, Stage 2 — the collapse, the arm split, the coordinator
 
 | # | Item | Status |
 |---|---|---|
 | 1 | Split the 2,187-line schema by **lifecycle** | **Built** — 9 modules, façade deleted |
-| 2 | Move the live v2 modules; delete v2, `v4/legacy/`, one-off scripts | **Partial** — the two v2 functions v5 reached for (`corpus._eval_pr_numbers`, `precedent_bench.hunk_code`) moved, and v5→v2 is zero. **v2 itself is untouched**: 34 dataset modules and 12 task modules. `v4/legacy/` and the seven `phase*` drivers were *moved*, to `legacy_pipeline/`, not deleted — their artifacts are still load-bearing. |
-| 3 | Merge into `src/mathlib_review/`; `ReviewArmTask` / `ReviewLeadTask`; discovery-based registration | **Partial** — the merge is done and both old packages are deleted. The task classes keep their names (`LeanPRReviewV5ArmTask`, `LeanPRReviewV5LeadTask`) and still register through explicit `register_task(...)` calls. |
+| 2 | Move the live v2 modules; delete v2, `v4/legacy/`, one-off scripts | **Partial, and the deletion is now known to be blocked.** The shared functions moved and the review system imports nothing from v2, so the *code* is separable. `src/datasets/pr_review_v2/data/mathlib_roster.txt` is not: nine frozen release manifests under `inputs/pr_review_v4/` declare it at that exact path with a hash, and that root is frozen. Moving it was tried; nine manifests reported it missing. Deleting the package would break the frozen-artifact gate for every v4 release. `v4/legacy/` and the seven `phase*` drivers moved to `legacy_pipeline/` rather than being deleted — their artifacts are still load-bearing. |
+| 3 | Merge into `src/mathlib_review/`; `ReviewArmTask` / `ReviewLeadTask`; discovery-based registration | **Partial** — both layers are merged and all four old packages deleted: the pipeline is `src/mathlib_review/`, the tasks are `formal_math/review/`. The classes are `ReviewArmTask` and `ReviewLeadTask`. Registration is still explicit `register_task(...)`, not discovery. The task *type* strings keep their `v5` spelling on purpose: they are inside `FocusedAgentSpec.identity()`, so renaming them would move every spec hash and the sealed agenda for a cosmetic gain. |
 | 4 | `ArmCatalog` + `Coordinator`-driven dispatch replacing the pre-rendered pool | **Partial** — the catalog exists as `agenda/registry.py` and is the single declaration of an arm. Dispatch is unchanged: the agenda pool is still pre-rendered and written to `arm_pool.jsonl`. |
 | 5 | Split the arms into `arms/<arm>/` behind `ArmRuntime` | **Not built** — deliberately. See below. |
 | 6 | Separate `SynthesisPolicy` from `Coordinator`, sealed independently | **Built** |
 | 7 | De-duplicate the drifted constants | **Built** |
 | 8 | Boundary tests | **Built**, and they now assert zero rather than a budget |
-| 9 | Delete `lead.py`'s dead `floor_summary` / `_floor_block` | **Not built** — and still live: `LEAD_USER` contains no `floor_block` placeholder, so `_floor_block()` is computed each time and passed to a `.format()` that silently ignores it. |
+| 9 | Delete `lead.py`'s dead `floor_summary` / `_floor_block` | **Built** — it was dead three ways: no placeholder in `LEAD_USER`, no producer for `floor_summary` anywhere, and the reason for both is that the floor stopped being a pass before the lead and became the lead's own first wave. |
 
 ## Original plan, Stage 3 — admission channels, provenance, reachability
 
@@ -95,8 +100,8 @@ Correction sidecars for the September runs: **built**. Those runs are forensic f
 | 2 — run-total scope, `UsageBreakdown`, lead journal, `execution_index.jsonl` | **Built** |
 | 3 — dual admission channels | **Built** |
 | 4 — provenance instead of a concern gate | **Built** |
-| 5 — Stage 1 remainder | **Partial** — see the Stage 1 table. Outstanding: `--set`, `resume`/`build-corpus` subcommands, four configs naming spent runs. |
-| 6 — the collapse | **Partial** — v4 and v5 are one package, both old ones deleted, backward edges zero. `ArmRuntime` and the arm split are not built; v2 is not deleted. |
+| 5 — Stage 1 remainder | **Partial** — see the Stage 1 table. Outstanding: the `ape review` name, and `resume`/`build-corpus` as separate verbs. |
+| 6 — the collapse | **Partial** — both layers collapsed, all four old packages deleted, backward edges zero. `ArmRuntime` and the arm split are not built (deliberate); v2 cannot be deleted while nine frozen manifests pin a file inside it. |
 
 ---
 
@@ -111,9 +116,18 @@ prompt, and `code_references` sat in `SUPPORTED_TOOLS` with its registration com
 building when there is a second arm strategy to put through it, which is the per-arm literature
 work the plan itself puts outside its own scope.
 
-**Deleting v2.** Its data pipeline built inputs still in use — the precedent corpus, the eval
-set, the roster. The plan says delete it; nothing in the tree needs that yet, and doing it
-carelessly would break the release chain.
+**Deleting v2 — blocked, not deferred.** The code is separable: the review system imports
+nothing from v2, and a test asserts it. The *data* is not.
+`src/datasets/pr_review_v2/data/mathlib_roster.txt` is an input living inside a code package,
+and nine frozen release manifests under `inputs/pr_review_v4/` declare it at that exact path
+with a hash. That root is frozen, so the manifests cannot be rewritten. Moving the file was
+tried on 2026-09-08 and nine manifests reported it missing.
+
+Deleting the package therefore breaks the frozen-artifact gate for every v4 release. Getting
+past it needs a decision that is not a refactor: either re-cut those releases (they are sealed,
+which is the point of them), or accept a code directory that exists to hold one data file.
+There is also a research question underneath — memory records the v2 selector line as live with
+two untried designs — so deleting the code would close a line by fiat.
 
 **The package merge did not need to de-duplicate anything.** A scan for structurally identical
 function bodies across all three generations found exactly two, and one was `load_run` (three
