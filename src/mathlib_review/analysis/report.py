@@ -110,10 +110,15 @@ def routing(run_name: str) -> Dict[str, Any]:
     return report
 
 
-def reachable_obligations(run_name: str,
-                          eligible_obligation_ids: Optional[Iterable[str]] = None,
-                          ) -> Optional[Dict[str, Any]]:
-    """How many gold obligations this run could possibly have hit.
+def scoped_obligations(run_name: str,
+                       eligible_obligation_ids: Optional[Iterable[str]] = None,
+                       ) -> Optional[Dict[str, Any]]:
+    """How many gold obligations this run could possibly have hit, by which PRs it reviewed.
+
+    **Not the same "reachable" as `analysis/reachability.py`**, which asks whether the
+    publication mechanism can express an obligation at all. Both were called `reachable` and
+    both appeared in this report: 17 here and 2 there, for the same run. A reader comparing
+    them is comparing "in the PRs we looked at" with "a compile could settle it".
 
     The judge counts obligations across the whole release — 40 for dev-medium — regardless
     of which PRs the run actually reviewed. For a 4-PR run that denominator includes nine
@@ -176,7 +181,9 @@ def reachable_obligations(run_name: str,
         "audit_exclusions": exclusion_report(),
         "reviewed_prs": sorted(reviewed),
         "obligations_by_pr": dict(sorted(by_pr.items())),
-        "reachable": sum(by_pr.values()),
+        # In scope because the run reviewed the PR, which is a different question from
+        # whether the mechanism can publish it. See `analysis/reachability.py`.
+        "in_scope": sum(by_pr.values()),
         # A control is a PR where maintainers asked for *nothing at all* — anything emitted
         # there is a false positive. A PR whose obligations exist but are all unscoreable is
         # a different thing entirely, and calling it a control would turn a measurement gap
@@ -318,16 +325,16 @@ def score(audit_dir: Path, run_name: Optional[str] = None) -> Dict[str, Any]:
     if report_path.is_file():
         payload = json.loads(report_path.read_text())
         eligible_ids = [row["obligation_id"] for row in (payload.get("per_obligation") or [])]
-    scope = reachable_obligations(run_name, eligible_ids) if run_name else None
+    scope = scoped_obligations(run_name, eligible_ids) if run_name else None
 
     def rescope(block):
         """Recall against what the run could actually reach, alongside the judge's own."""
 
         if not block or not block.get("obligations") or not scope:
             return block
-        reachable = scope["reachable"]
+        reachable = scope["in_scope"]
         block["judge_denominator"] = block.pop("obligations")
-        block["reachable_denominator"] = reachable
+        block["scoped_denominator"] = reachable
         for level in ("issue", "resolution"):
             hits = block[level]["hit"]
             block[level]["recall_vs_judge_denominator"] = block[level].pop("recall")
@@ -352,9 +359,9 @@ def score(audit_dir: Path, run_name: Optional[str] = None) -> Dict[str, Any]:
             row = {"issue_hits": block.get("issue_hits"),
                    "resolution_hits": block.get("resolution_hits"),
                    "judge_denominator": obligations}
-            if scope and scope.get("reachable"):
-                reachable = scope["reachable"]
-                row["reachable_denominator"] = reachable
+            if scope and scope.get("in_scope"):
+                reachable = scope["in_scope"]
+                row["scoped_denominator"] = reachable
                 for level in ("issue", "resolution"):
                     hits = block.get(f"{level}_hits")
                     row[f"{level}_recall"] = (
