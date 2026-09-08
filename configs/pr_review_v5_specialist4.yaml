@@ -15,10 +15,12 @@
 # floor off; `agenda_report.units_without_specialist` is empty. Do not copy this to another PR
 # set without re-checking that field: without the floor, a unit no specialist is eligible on
 # is simply not reviewed, and a recall drop from that measures coverage, not arms.
+# The run name is an invocation argument, not a config key: this file
+# describes a PR set and a policy. Last run under `pr_review_v5_specialist4_rep1`.
+#   ... --run-name <name>
 extends: bases/v5_generation.yaml
 
 dataset:
-  run_name: pr_review_v5_specialist4_rep1
   pr_numbers: [33117, 33145, 33337, 33362]
 
   # The whole point of this run.

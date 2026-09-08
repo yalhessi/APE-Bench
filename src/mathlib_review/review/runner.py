@@ -92,7 +92,13 @@ class V5DatasetConfig(BaseModel):
     exclude_methods: List[str] = Field(default_factory=list)
     pr_numbers: List[int] = Field(default_factory=list)
     work_unit_limit: int = 0
-    run_name: str = "pr_review_v5"
+    #: Supplied at the invocation (`--run-name`), not checked into the config.
+    #:
+    #: The sentinel is deliberate: a real default means a config that forgets to name its run
+    #: lands on top of whatever ran under the default last. Configs used to name their own run,
+    #: so every paid repetition needed its own file and four of them went on naming an
+    #: already-spent run.
+    run_name: str = "UNNAMED"
     dry_run: bool = False
     require_prebuilt_workspaces: bool = True
     pr_finding_limit: int = 20
@@ -670,6 +676,21 @@ def _scratch_dirs(run_name: str, scaffold=None) -> List[Path]:
     return [base / run_name, base / f"{run_name}_floor"]
 
 
+def assert_run_is_named(dataset: V5DatasetConfig) -> None:
+    """A run must say which run it is, before anything is rendered or spent."""
+
+    if dataset.run_name and dataset.run_name != "UNNAMED":
+        return
+    raise ValueError(
+        "this run has no name. Pass --run-name, e.g.\n"
+        "  python -m src.mathlib_review.review.cli plan --config <config> "
+        "--run-name pr_review_v5_specialist4_rep2\n"
+        "The name is the results directory, the orchestrator's cache key, and the identity "
+        "the judge scores this run under. It is supplied per invocation because a config "
+        "describes a PR set and a policy, and `rep2` is part of neither."
+    )
+
+
 def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
                    *, fatal: bool = True) -> None:
     """Refuse to reuse a run name that already produced results, BEFORE spending anything.
@@ -777,6 +798,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         use_exposure_index=dataset.use_exposure_index,
         generalist_floor=dataset.generalist_floor,
     )
+    assert_run_is_named(dataset)
     report = agenda_report(agenda)
 
     if dataset.dry_run:

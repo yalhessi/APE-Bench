@@ -30,10 +30,12 @@
 #
 # 9 obligations across 4 PRs, so one flipped verdict is 11pp. Any recall number from this is
 # noise; the point is that the chain runs.
+# The run name is an invocation argument, not a config key: this file
+# describes a PR set and a policy. Last run under `pr_review_v5_smoke4_e2e_rep1`.
+#   ... --run-name <name>
 extends: bases/v5_generation.yaml
 
 dataset:
-  run_name: pr_review_v5_smoke4_e2e_rep1
   pr_numbers:
   - 33117
   - 33145

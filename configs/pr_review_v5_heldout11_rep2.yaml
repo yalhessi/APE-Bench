@@ -42,10 +42,12 @@
 # CAVEAT that applies to any number from this release: gold is 31/33 `migration_proposal`
 # and only 2 curator_confirmed, so everything here is provisional until the R1b
 # confirmation sitting.
+# The run name is an invocation argument, not a config key: this file
+# describes a PR set and a policy. Last run under `pr_review_v5_lead_heldout11_rep2`.
+#   ... --run-name <name>
 extends: bases/v5_generation.yaml
 
 dataset:
-  run_name: pr_review_v5_lead_heldout11_rep2
   pr_numbers:
   - 33117
   - 33145

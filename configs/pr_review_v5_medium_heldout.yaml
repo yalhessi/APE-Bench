@@ -13,10 +13,12 @@
 # This is the same set as results/pr_review_v4/runs/dev-medium-smoke4-rep1.
 #
 # Sized for a look, not for an effect size: at 18 obligations one flipped verdict is 5.6pp.
+# The run name is an invocation argument, not a config key: this file
+# describes a PR set and a policy. Last run under `pr_review_v5_lead_medium_heldout_rep2`.
+#   ... --run-name <name>
 extends: bases/v5_generation.yaml
 
 dataset:
-  run_name: pr_review_v5_lead_medium_heldout_rep2
   pr_numbers:
   - 33117
   - 33145

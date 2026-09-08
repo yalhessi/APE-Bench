@@ -341,3 +341,51 @@ def test_every_config_taking_command_accepts_overrides():
         options = {s for action in command._actions for s in action.option_strings}
         if "--config" in options:
             assert "--set" in options, f"{name} takes a config but not --set"
+
+
+# --- the run name is an invocation argument --------------------------------------------------
+#
+# Configs used to name the run they produced, so every paid repetition needed its own file and
+# the file went stale the moment the run was spent. Four still named an already-spent run.
+
+
+def test_no_generation_config_names_a_run():
+    """A config describes a PR set and a policy. `rep2` is part of neither."""
+
+    for path in _v5_configs():
+        if "judge" in path.name:
+            continue
+        assert "  run_name:" not in path.read_text(encoding="utf-8"), path
+
+
+def test_plan_and_run_take_a_run_name():
+    for command in ("plan", "run"):
+        args = cli.build_parser().parse_args(
+            [command, "--config", str(CONFIG), "--run-name", "some_run"])
+        assert args.run_name == "some_run"
+
+
+def test_an_unnamed_run_is_refused_before_anything_is_rendered():
+    """The sentinel matters more than the flag. A real default means a config that forgets to
+    name its run lands on top of whatever ran under the default last."""
+
+    from src.mathlib_review.review.runner import V5DatasetConfig, assert_run_is_named
+
+    unnamed = V5DatasetConfig(
+        release=Path("inputs/pr_review_v4/releases/dev-medium-0.3.0"),
+        modification_inventory=Path("x"))
+    assert unnamed.run_name == "UNNAMED"
+    with pytest.raises(ValueError) as excinfo:
+        assert_run_is_named(unnamed)
+    message = str(excinfo.value)
+    assert "--run-name" in message
+    assert "cache key" in message
+
+
+def test_a_named_run_passes():
+    from src.mathlib_review.review.runner import V5DatasetConfig, assert_run_is_named
+
+    named = V5DatasetConfig(
+        release=Path("inputs/pr_review_v4/releases/dev-medium-0.3.0"),
+        modification_inventory=Path("x"), run_name="pr_review_v5_specialist4_rep2")
+    assert assert_run_is_named(named) is None

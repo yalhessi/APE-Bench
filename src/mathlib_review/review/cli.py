@@ -46,6 +46,22 @@ from typing import List, Optional
 SPENDS = frozenset({"run", "judge", "bench"})
 
 
+def _add_run_name(parser: argparse.ArgumentParser) -> None:
+    """Which run this is, supplied at the invocation rather than checked into the config.
+
+    A config used to name the run it produced, so every paid repetition needed its own file
+    and the file went stale the moment the run was spent -- four still named an already-spent
+    run. A config describes a PR set and a policy; `rep2` is not part of either. The judge
+    already worked this way (`--of <run_name>`), and this is the generation side of the same
+    thing.
+    """
+
+    parser.add_argument(
+        "--run-name", default=None,
+        help="names this run: its results directory, its orchestrator cache key, and the "
+             "identity the judge scores it under. Required unless the config sets one.")
+
+
 def _add_set(parser: argparse.ArgumentParser) -> None:
     """Config overrides, one `--set key=value` each.
 
@@ -75,10 +91,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     plan = sub.add_parser("plan", help="render and price a run; call no model")
     plan.add_argument("--config", type=Path, required=True)
+    _add_run_name(plan)
     _add_set(plan)
 
     run = sub.add_parser("run", help="a generation run")
     run.add_argument("--config", type=Path, required=True)
+    _add_run_name(run)
     _add_set(run)
     run.add_argument("--redo", action="store_true",
                      help="discard this run_name's results and state, then run it again")
@@ -253,6 +271,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     # token, rather than something silently handed to the override parser.
     args = parser.parse_args(argv)
     overrides = parse_cli_args(list(getattr(args, "overrides", []) or []))
+    if getattr(args, "run_name", None):
+        overrides.setdefault("dataset", {})["run_name"] = args.run_name
     logger = create_logger()
 
     if args.command == "plan":
