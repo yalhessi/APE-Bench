@@ -48,6 +48,14 @@
 extends: bases/v5_generation.yaml
 
 dataset:
+  # Floor $8.30 + 11 x $1.50 discretionary = $24.80 worst case. The base's $10.00 refuses this
+  # set outright, which is correct: it was calibrated on four small PRs.
+  #
+  # 95 work units against smoke4's 22, and 21 obligations across 9 PRs with 33304 and 33315 as
+  # controls. **33149 is deliberately not here.** It is one PR with 108 work units -- it would
+  # take the set from 95 units to 203 (+114%) to add 4 obligations (+19%), and its floor alone
+  # is $5.90. Add it with `--set dataset.pr_numbers='[...]'` if that trade is wanted.
+  run_total_cost_cap: 28.00
   pr_numbers:
   - 33117
   - 33145

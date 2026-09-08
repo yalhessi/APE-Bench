@@ -17,6 +17,15 @@ dataset:
   - 33098
   - 33438
   per_pr_cost_cap: 2.0
+
+  # Preflight refuses a run whose floor plus full discretionary allowance exceeds this, before
+  # the first model call. Measured for THIS set: floor $2.35 + 4 x $2.00 = $10.35 worst case.
+  # The base's $10.00 was calibrated on the four smallest heldout PRs and refuses this one by
+  # $0.35, which is the cap working rather than a number to ignore.
+  #
+  # A ceiling, not an estimate: the lead spends what it needs and the worst case assumes it
+  # exhausts every per-PR allowance, which no run has done.
+  run_total_cost_cap: 12.00
   # 9 specialist arms x 22 work units = 180 eligible jobs. The base's 25 would let the lead
   # touch a seventh of them, which makes the run a test of its triage rather than of whether
   # the arms can find the gold at all. Discovery first.
