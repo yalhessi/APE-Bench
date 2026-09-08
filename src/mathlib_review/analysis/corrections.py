@@ -57,6 +57,10 @@ class RunCorrection:
     run_name: str
     recovered: List[RecoveredAttempt] = field(default_factory=list)
     reported_total_cost: Optional[float] = None
+    #: What the scratch tree actually holds, whatever each attempt's status.
+    on_disk_attempts: int = 0
+    on_disk_nominal_cost: float = 0.0
+    on_disk_billed_cost: float = 0.0
     reported_paused: Optional[int] = None
     reported_status: Optional[str] = None
     sources: Dict[str, str] = field(default_factory=dict)
@@ -99,6 +103,18 @@ class RunCorrection:
                     None if not corrected_nominal
                     else round(self.hidden_nominal / corrected_nominal, 4)),
                 "paused": len(self.recovered),
+            },
+            # The general check, and the one that does not depend on knowing *why* a cost was
+            # missed. `unaccounted_billed` is spend sitting in the scratch tree that the
+            # manifest's own figure does not cover. Pausing is one cause; a discarded wave is
+            # another, and there will be others.
+            "on_disk": {
+                "attempts": self.on_disk_attempts,
+                "billed_cost": self.on_disk_billed_cost,
+                "nominal_cost": self.on_disk_nominal_cost,
+                "unaccounted_nominal": (
+                    None if self.reported_total_cost is None
+                    else round(self.on_disk_nominal_cost - self.reported_total_cost, 6)),
             },
             "sources": dict(sorted(self.sources.items())),
             # Says it plainly, in the artifact, so a number lifted out of this file carries
@@ -156,6 +172,25 @@ def recover(run_name: str, *, scratch_root: Path = Path(".ape/runs")) -> RunCorr
                 turns=int(attempt.get("turns") or 0),
             ))
     correction.recovered.sort(key=lambda item: item.path)
+
+    # Everything on disk, whatever its status. `recovered` above answers "which attempts did
+    # the ledger book at $0.00 because they paused"; this answers the more general question the
+    # ledger can actually be wrong about -- "does the manifest account for what was spent".
+    #
+    # `pr5_smoke4_rep8` is why. Its attempts *succeeded*; a bookkeeping bug discarded their
+    # outcomes, so nothing paused and this function reported $0.00 hidden while $2.86 of billed
+    # work sat in the scratch tree. Under-reporting has more causes than pausing.
+    on_disk_nominal = on_disk_billed = 0.0
+    attempts = 0
+    for _path, sample in _iter_samples(scratch):
+        for attempt in sample.get("attempts") or []:
+            nominal = float(attempt.get("cost") or 0.0)
+            on_disk_nominal += nominal
+            on_disk_billed += float(attempt.get("cached_cost") or nominal)
+            attempts += 1
+    correction.on_disk_attempts = attempts
+    correction.on_disk_nominal_cost = round(on_disk_nominal, 6)
+    correction.on_disk_billed_cost = round(on_disk_billed, 6)
     return correction
 
 

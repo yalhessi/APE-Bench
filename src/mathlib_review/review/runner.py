@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -217,6 +218,19 @@ def _write_pool(path: Path, pool: Dict[str, Dict[str, Any]], cutoff_by_episode: 
     path.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in rows) + "\n")
 
 
+def _slug(episode_id: str) -> str:
+    """One path segment from an episode id.
+
+    `ep:leanprover-community/mathlib4#33057#round1#<sha>` contains a slash, and replacing only
+    the colon left it as a directory separator -- so the journals landed under
+    `lead_journals/leanprover-community/`. Harmless in itself (the writer creates parents and
+    the reader uses the same string), and exactly the kind of thing that becomes a bug the
+    first time something globs the directory.
+    """
+
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", episode_id).strip("_")
+
+
 def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path,
                     cutoff_by_episode: Dict[str, str],
                     census_by_pr: Optional[Dict[int, List[Dict[str, Any]]]] = None,
@@ -255,7 +269,7 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
             "retrieval_cutoff": cutoff_by_episode.get(episode_id),
             "trace_path": str(trace_path),
             "journal_path": (
-                str(journal_dir / f"{episode_id.replace(':', '_')}.jsonl")
+                str(journal_dir / f"{_slug(episode_id)}.jsonl")
                 if journal_dir is not None else None
             ),
             # One index for the whole run, unlike the journal: it is a location map, and a

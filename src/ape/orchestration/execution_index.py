@@ -48,13 +48,20 @@ def _relative(path: Path) -> str:
         return str(path)
 
 
-def attempt_rows(samples: Iterable[Any]) -> List[Dict[str, Any]]:
+def attempt_rows(samples: Any) -> List[Dict[str, Any]]:
     """Flatten persisted samples into `(sample_index, attempt)` locations.
 
     Reads `attempt.path`, which the orchestrator already records, rather than reconstructing
     it -- the reconstruction is what hardcodes `samples/0`.
+
+    `TaskStorage.load_all_samples()` returns `Dict[int, Sample]`, and iterating a dict yields
+    its keys. Taking an `Iterable[Any]` here and iterating it directly meant every call got a
+    list of ints and raised, which killed every delegation wave on `pr5_smoke4_rep8` -- after
+    the arms had run, so their work was spent and discarded.
     """
 
+    if isinstance(samples, dict):
+        samples = [samples[index] for index in sorted(samples)]
     rows: List[Dict[str, Any]] = []
     for sample in samples or []:
         raw = sample.model_dump(mode="json") if hasattr(sample, "model_dump") else dict(sample)
@@ -110,26 +117,38 @@ async def record(
     from .persistence import TaskStorage
 
     for result in getattr(results, "task_results", []) or []:
-        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else dict(result)
-        task_id = raw.get("task_id")
-        global_index = raw.get("global_index")
-        if global_index is None:
-            continue
-        task_dir = Path(orchestrator.tasks_dir) / str(global_index)
+        # Indexing must never be able to fail the work it indexes. `append` already swallows
+        # its errors for that reason -- "losing the index must not lose the work it indexes" --
+        # and this loop did not, so one shape bug in `attempt_rows` raised out of `run_wave`
+        # and cost a run every arm result it had just paid for. The narrow fix was the dict;
+        # this is the one that makes the class of bug survivable.
         try:
-            samples = await TaskStorage(task_dir, str(global_index)).load_all_samples()
-        except Exception:  # noqa: BLE001 - an unreadable task still gets a located row
-            samples = []
-        append(index_path, {
-            "semantic_id": semantic_ids.get(task_id, task_id),
-            "task_id": task_id,
-            "task_type": raw.get("task_type"),
-            "group": group,
-            "parent": parent,
-            "global_index": global_index,
-            "task_dir": _relative(task_dir),
-            "attempts": attempt_rows(samples),
-        })
+            raw = (result.model_dump(mode="json") if hasattr(result, "model_dump")
+                   else dict(result))
+            task_id = raw.get("task_id")
+            global_index = raw.get("global_index")
+            if global_index is None:
+                continue
+            task_dir = Path(orchestrator.tasks_dir) / str(global_index)
+            try:
+                samples = await TaskStorage(task_dir, str(global_index)).load_all_samples()
+            except Exception:  # noqa: BLE001 - an unreadable task still gets a located row
+                samples = {}
+            append(index_path, {
+                "semantic_id": semantic_ids.get(task_id, task_id),
+                "task_id": task_id,
+                "task_type": raw.get("task_type"),
+                "group": group,
+                "parent": parent,
+                "global_index": global_index,
+                "task_dir": _relative(task_dir),
+                "attempts": attempt_rows(samples),
+            })
+        except Exception:  # noqa: BLE001 - see above
+            logger = getattr(orchestrator, "logger", None)
+            if logger is not None:
+                logger.warning("execution index: could not record a task; continuing",
+                               exc_info=True)
 
 
 def load(index_path: Optional[Any]) -> List[Dict[str, Any]]:

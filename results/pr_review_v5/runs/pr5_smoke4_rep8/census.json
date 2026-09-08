@@ -1,0 +1,678 @@
+{
+  "33057": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:1ad3109ca1ef9396b2bee8b5#api_reuse",
+        "correctness": "wu:1ad3109ca1ef9396b2bee8b5#correctness",
+        "docs": "wu:1ad3109ca1ef9396b2bee8b5#docs",
+        "duplication": "wu:1ad3109ca1ef9396b2bee8b5#duplication",
+        "generality": "wu:1ad3109ca1ef9396b2bee8b5#generality",
+        "proof_golf": "wu:1ad3109ca1ef9396b2bee8b5#proof_golf",
+        "proof_idiom": "wu:1ad3109ca1ef9396b2bee8b5#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "PowerSeries.coeff_expand_mul",
+        "PowerSeries.coeff_expand_of_not_dvd",
+        "PowerSeries.expand_apply",
+        "PowerSeries.expand_monomial",
+        "PowerSeries.expand_mul_eq_comp",
+        "PowerSeries.map_expand",
+        "PowerSeries.support_expand",
+        "PowerSeries.support_expand_subset"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 4 other changed declaration(s)"
+      ],
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    }
+  ],
+  "33066": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:7a8e82f6a8770545ad29461f#api_reuse",
+        "correctness": "wu:7a8e82f6a8770545ad29461f#correctness",
+        "docs": "wu:7a8e82f6a8770545ad29461f#docs",
+        "duplication": "wu:7a8e82f6a8770545ad29461f#duplication",
+        "family_design": "wu:7a8e82f6a8770545ad29461f#family_design",
+        "generality": "wu:7a8e82f6a8770545ad29461f#generality",
+        "naming": "wu:7a8e82f6a8770545ad29461f#naming",
+        "proof_golf": "wu:7a8e82f6a8770545ad29461f#proof_golf",
+        "proof_idiom": "wu:7a8e82f6a8770545ad29461f#proof_idiom",
+        "style": "wu:7a8e82f6a8770545ad29461f#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+        "coe_symm_auxIsometry"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "`coe_symm_auxIsometry` is a chain of 3 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:70a6b15c439dca0fbd8ff70f#api_reuse",
+        "correctness": "wu:70a6b15c439dca0fbd8ff70f#correctness",
+        "docs": "wu:70a6b15c439dca0fbd8ff70f#docs",
+        "duplication": "wu:70a6b15c439dca0fbd8ff70f#duplication",
+        "family_design": "wu:70a6b15c439dca0fbd8ff70f#family_design",
+        "generality": "wu:70a6b15c439dca0fbd8ff70f#generality",
+        "naming": "wu:70a6b15c439dca0fbd8ff70f#naming",
+        "proof_golf": "wu:70a6b15c439dca0fbd8ff70f#proof_golf",
+        "proof_idiom": "wu:70a6b15c439dca0fbd8ff70f#proof_idiom",
+        "style": "wu:70a6b15c439dca0fbd8ff70f#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+        "coe_auxIsometry"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:595be49cb83e80dbe4638d1e#api_reuse",
+        "correctness": "wu:595be49cb83e80dbe4638d1e#correctness",
+        "docs": "wu:595be49cb83e80dbe4638d1e#docs",
+        "duplication": "wu:595be49cb83e80dbe4638d1e#duplication",
+        "family_design": "wu:595be49cb83e80dbe4638d1e#family_design",
+        "generality": "wu:595be49cb83e80dbe4638d1e#generality",
+        "naming": "wu:595be49cb83e80dbe4638d1e#naming",
+        "proof_golf": "wu:595be49cb83e80dbe4638d1e#proof_golf",
+        "proof_idiom": "wu:595be49cb83e80dbe4638d1e#proof_idiom",
+        "style": "wu:595be49cb83e80dbe4638d1e#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv",
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "`ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv` is a chain of 20 low-level tactic steps",
+        "introduces a new declaration",
+        "`ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv` is 55 lines"
+      ],
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:b970c47dd9b1f7a30b2ea733#api_reuse",
+        "correctness": "wu:b970c47dd9b1f7a30b2ea733#correctness",
+        "docs": "wu:b970c47dd9b1f7a30b2ea733#docs",
+        "duplication": "wu:b970c47dd9b1f7a30b2ea733#duplication",
+        "family_design": "wu:b970c47dd9b1f7a30b2ea733#family_design",
+        "generality": "wu:b970c47dd9b1f7a30b2ea733#generality",
+        "naming": "wu:b970c47dd9b1f7a30b2ea733#naming",
+        "proof_golf": "wu:b970c47dd9b1f7a30b2ea733#proof_golf",
+        "proof_idiom": "wu:b970c47dd9b1f7a30b2ea733#proof_idiom",
+        "style": "wu:b970c47dd9b1f7a30b2ea733#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+        "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` is a chain of 31 low-level tactic steps",
+        "introduces a new declaration",
+        "`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv` is 74 lines"
+      ],
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:0b643957d56818f60a614ed5#api_reuse",
+        "correctness": "wu:0b643957d56818f60a614ed5#correctness",
+        "duplication": "wu:0b643957d56818f60a614ed5#duplication",
+        "generality": "wu:0b643957d56818f60a614ed5#generality"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+        "auxIsometry",
+        "coe_auxContinuousLinearEquiv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "shares a name family with 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:31b643a1ad1031684bf2a6f1#api_reuse",
+        "correctness": "wu:31b643a1ad1031684bf2a6f1#correctness",
+        "docs": "wu:31b643a1ad1031684bf2a6f1#docs",
+        "duplication": "wu:31b643a1ad1031684bf2a6f1#duplication",
+        "generality": "wu:31b643a1ad1031684bf2a6f1#generality",
+        "style": "wu:31b643a1ad1031684bf2a6f1#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "LinearIsometryEquiv.conjStarAlgEquiv_apply",
+        "LinearIsometryEquiv.conjStarAlgEquiv_apply_apply",
+        "LinearIsometryEquiv.conjStarAlgEquiv_refl",
+        "LinearIsometryEquiv.conjStarAlgEquiv_trans",
+        "LinearIsometryEquiv.symm_conjStarAlgEquiv",
+        "LinearIsometryEquiv.symm_conjStarAlgEquiv_apply_apply",
+        "Mathlib/Analysis/InnerProductSpace/Adjoint.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "was changed alongside 4 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:81f3b33972ab0980c071ed20#api_reuse",
+        "correctness": "wu:81f3b33972ab0980c071ed20#correctness",
+        "docs": "wu:81f3b33972ab0980c071ed20#docs",
+        "duplication": "wu:81f3b33972ab0980c071ed20#duplication",
+        "family_design": "wu:81f3b33972ab0980c071ed20#family_design",
+        "generality": "wu:81f3b33972ab0980c071ed20#generality",
+        "naming": "wu:81f3b33972ab0980c071ed20#naming",
+        "proof_golf": "wu:81f3b33972ab0980c071ed20#proof_golf",
+        "proof_idiom": "wu:81f3b33972ab0980c071ed20#proof_idiom",
+        "style": "wu:81f3b33972ab0980c071ed20#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "ContinuousAlgEquiv.coe_ofAlgEquiv",
+        "ContinuousAlgEquiv.ofAlgEquiv",
+        "ContinuousAlgEquiv.ofAlgEquiv_toAlgEquiv",
+        "ContinuousAlgEquiv.ofAlgEquiv_trans_ofAlgEquiv",
+        "ContinuousAlgEquiv.symm_ofAlgEquiv",
+        "ContinuousAlgEquiv.toAlgEquiv_ofAlgEquiv",
+        "Mathlib/Topology/Algebra/Algebra/Equiv.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "available_arms": {
+        "style": "wu:3ac5204bd333a3f3d66a797a#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:3ac5204bd333a3f3d66a797a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:7e4faa2ad4a071673041e18e#api_reuse",
+        "correctness": "wu:7e4faa2ad4a071673041e18e#correctness",
+        "docs": "wu:7e4faa2ad4a071673041e18e#docs",
+        "duplication": "wu:7e4faa2ad4a071673041e18e#duplication",
+        "family_design": "wu:7e4faa2ad4a071673041e18e#family_design",
+        "generality": "wu:7e4faa2ad4a071673041e18e#generality",
+        "naming": "wu:7e4faa2ad4a071673041e18e#naming",
+        "proof_golf": "wu:7e4faa2ad4a071673041e18e#proof_golf",
+        "proof_idiom": "wu:7e4faa2ad4a071673041e18e#proof_idiom",
+        "style": "wu:7e4faa2ad4a071673041e18e#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+        "auxContinuousLinearEquiv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:a7b48444ccce05f011bcc227#docs",
+        "style": "wu:a7b48444ccce05f011bcc227#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/LinearAlgebra/GeneralLinearGroup/AlgEquiv.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a7b48444ccce05f011bcc227"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:adcb2a53e6bcaab585873def#api_reuse",
+        "correctness": "wu:adcb2a53e6bcaab585873def#correctness",
+        "docs": "wu:adcb2a53e6bcaab585873def#docs",
+        "duplication": "wu:adcb2a53e6bcaab585873def#duplication",
+        "family_design": "wu:adcb2a53e6bcaab585873def#family_design",
+        "generality": "wu:adcb2a53e6bcaab585873def#generality",
+        "naming": "wu:adcb2a53e6bcaab585873def#naming",
+        "proof_golf": "wu:adcb2a53e6bcaab585873def#proof_golf",
+        "proof_idiom": "wu:adcb2a53e6bcaab585873def#proof_idiom",
+        "style": "wu:adcb2a53e6bcaab585873def#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "LinearIsometryEquiv.conjStarAlgEquiv",
+        "Mathlib/Analysis/InnerProductSpace/Adjoint.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "available_arms": {
+        "style": "wu:da095276e0b8a0c7f6d4e0b4#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:da095276e0b8a0c7f6d4e0b4"
+    }
+  ],
+  "33098": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:14009c2826c39049c91bc590#api_reuse",
+        "correctness": "wu:14009c2826c39049c91bc590#correctness",
+        "docs": "wu:14009c2826c39049c91bc590#docs",
+        "duplication": "wu:14009c2826c39049c91bc590#duplication",
+        "generality": "wu:14009c2826c39049c91bc590#generality",
+        "proof_golf": "wu:14009c2826c39049c91bc590#proof_golf",
+        "proof_idiom": "wu:14009c2826c39049c91bc590#proof_idiom",
+        "style": "wu:14009c2826c39049c91bc590#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Metric.card_maximalSeparatedSet",
+        "Metric.coveringNumber_two_mul_le_externalCoveringNumber",
+        "Metric.isCover_maximalSeparatedSet",
+        "Metric.maximalSeparatedSet_subset"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Metric.coveringNumber_two_mul_le_externalCoveringNumber` is a chain of 3 low-level tactic steps",
+        "`Metric.isCover_maximalSeparatedSet` is a chain of 18 low-level tactic steps",
+        "shares a name family with 10 other changed declaration(s)",
+        "was changed alongside 6 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Metric.isCover_maximalSeparatedSet` is 33 lines"
+      ],
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2d98984730649af8d3134f67#api_reuse",
+        "correctness": "wu:2d98984730649af8d3134f67#correctness",
+        "duplication": "wu:2d98984730649af8d3134f67#duplication",
+        "generality": "wu:2d98984730649af8d3134f67#generality",
+        "proof_golf": "wu:2d98984730649af8d3134f67#proof_golf",
+        "proof_idiom": "wu:2d98984730649af8d3134f67#proof_idiom",
+        "style": "wu:2d98984730649af8d3134f67#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+        "Metric.coveringNumber_le_packingNumber",
+        "Metric.coveringNumber_subset_le",
+        "Metric.finite_minimalCover",
+        "Metric.minimalCover"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Metric.coveringNumber_le_packingNumber` is a chain of 3 low-level tactic steps",
+        "shares a name family with 10 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "`Metric.coveringNumber_subset_le` uses a `calc` block",
+        "introduces a new declaration",
+        "`Metric.coveringNumber_subset_le` is 12 lines"
+      ],
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c656fe9ace1ddb9d9bd84e0b#api_reuse",
+        "correctness": "wu:c656fe9ace1ddb9d9bd84e0b#correctness",
+        "docs": "wu:c656fe9ace1ddb9d9bd84e0b#docs",
+        "duplication": "wu:c656fe9ace1ddb9d9bd84e0b#duplication",
+        "family_design": "wu:c656fe9ace1ddb9d9bd84e0b#family_design",
+        "generality": "wu:c656fe9ace1ddb9d9bd84e0b#generality",
+        "naming": "wu:c656fe9ace1ddb9d9bd84e0b#naming",
+        "proof_golf": "wu:c656fe9ace1ddb9d9bd84e0b#proof_golf",
+        "proof_idiom": "wu:c656fe9ace1ddb9d9bd84e0b#proof_idiom",
+        "style": "wu:c656fe9ace1ddb9d9bd84e0b#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+        "Metric.exists_set_encard_eq_coveringNumber",
+        "Metric.isCover_minimalCover"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Metric.exists_set_encard_eq_coveringNumber` is a chain of 8 low-level tactic steps",
+        "shares a name family with 9 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Metric.exists_set_encard_eq_coveringNumber` is 17 lines"
+      ],
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:84d1055b04abab6d285805e7#api_reuse",
+        "correctness": "wu:84d1055b04abab6d285805e7#correctness",
+        "docs": "wu:84d1055b04abab6d285805e7#docs",
+        "duplication": "wu:84d1055b04abab6d285805e7#duplication",
+        "family_design": "wu:84d1055b04abab6d285805e7#family_design",
+        "generality": "wu:84d1055b04abab6d285805e7#generality",
+        "naming": "wu:84d1055b04abab6d285805e7#naming",
+        "proof_golf": "wu:84d1055b04abab6d285805e7#proof_golf",
+        "proof_idiom": "wu:84d1055b04abab6d285805e7#proof_idiom",
+        "style": "wu:84d1055b04abab6d285805e7#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+        "Metric.exists_set_encard_eq_packingNumber",
+        "Metric.maximalSeparatedSet"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Metric.exists_set_encard_eq_packingNumber` is a chain of 6 low-level tactic steps",
+        "shares a name family with 8 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Metric.exists_set_encard_eq_packingNumber` is 19 lines"
+      ],
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:14dc4a0f720d69a4650c637d#api_reuse",
+        "correctness": "wu:14dc4a0f720d69a4650c637d#correctness",
+        "docs": "wu:14dc4a0f720d69a4650c637d#docs",
+        "duplication": "wu:14dc4a0f720d69a4650c637d#duplication",
+        "generality": "wu:14dc4a0f720d69a4650c637d#generality",
+        "proof_golf": "wu:14dc4a0f720d69a4650c637d#proof_golf",
+        "proof_idiom": "wu:14dc4a0f720d69a4650c637d#proof_idiom",
+        "style": "wu:14dc4a0f720d69a4650c637d#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+        "Metric.card_minimalCover",
+        "Metric.isSeparated_maximalSeparatedSet"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 11 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2aa1c518a2deec84fbbaa244#api_reuse",
+        "correctness": "wu:2aa1c518a2deec84fbbaa244#correctness",
+        "docs": "wu:2aa1c518a2deec84fbbaa244#docs",
+        "duplication": "wu:2aa1c518a2deec84fbbaa244#duplication",
+        "generality": "wu:2aa1c518a2deec84fbbaa244#generality",
+        "proof_golf": "wu:2aa1c518a2deec84fbbaa244#proof_golf",
+        "proof_idiom": "wu:2aa1c518a2deec84fbbaa244#proof_idiom",
+        "style": "wu:2aa1c518a2deec84fbbaa244#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+        "Metric.minimalCover_subset"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 5 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d15524ece84b2ffed54c9ef1#api_reuse",
+        "correctness": "wu:d15524ece84b2ffed54c9ef1#correctness",
+        "docs": "wu:d15524ece84b2ffed54c9ef1#docs",
+        "duplication": "wu:d15524ece84b2ffed54c9ef1#duplication",
+        "family_design": "wu:d15524ece84b2ffed54c9ef1#family_design",
+        "generality": "wu:d15524ece84b2ffed54c9ef1#generality",
+        "naming": "wu:d15524ece84b2ffed54c9ef1#naming",
+        "proof_golf": "wu:d15524ece84b2ffed54c9ef1#proof_golf",
+        "proof_idiom": "wu:d15524ece84b2ffed54c9ef1#proof_idiom",
+        "style": "wu:d15524ece84b2ffed54c9ef1#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/Topology/MetricSpace/CoveringNumbers.lean",
+        "Metric.card_le_of_isSeparated"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 6 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    }
+  ],
+  "33438": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:230e4c75daf818c75b024525#api_reuse",
+        "correctness": "wu:230e4c75daf818c75b024525#correctness",
+        "docs": "wu:230e4c75daf818c75b024525#docs",
+        "duplication": "wu:230e4c75daf818c75b024525#duplication",
+        "generality": "wu:230e4c75daf818c75b024525#generality",
+        "proof_golf": "wu:230e4c75daf818c75b024525#proof_golf",
+        "proof_idiom": "wu:230e4c75daf818c75b024525#proof_idiom",
+        "style": "wu:230e4c75daf818c75b024525#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Real.arctan_inv_sqrt_three",
+        "Real.arctan_sqrt_three"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    }
+  ]
+}

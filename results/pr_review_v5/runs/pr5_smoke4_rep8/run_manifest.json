@@ -1,0 +1,414 @@
+{
+  "agent_added": 0,
+  "candidates_total": 0,
+  "completion_status": "partial",
+  "context_calls_total": 0,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.819229,
+    "nested": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#family_design",
+      "pr_number": 33057,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#generalist",
+      "pr_number": 33057,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#naming",
+      "pr_number": 33057,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "style",
+      "invocation_id": "wu:1ad3109ca1ef9396b2bee8b5#style",
+      "pr_number": 33057,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:1ad3109ca1ef9396b2bee8b5"
+    },
+    {
+      "arm_id": "docs",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#docs",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#family_design",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#naming",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "proof_golf",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#proof_golf",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#proof_idiom",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "style",
+      "invocation_id": "wu:0b643957d56818f60a614ed5#style",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:0b643957d56818f60a614ed5"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#family_design",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#naming",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "proof_golf",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#proof_golf",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "proof_idiom",
+      "invocation_id": "wu:31b643a1ad1031684bf2a6f1#proof_idiom",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:31b643a1ad1031684bf2a6f1"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:3ac5204bd333a3f3d66a797a#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:3ac5204bd333a3f3d66a797a"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:595be49cb83e80dbe4638d1e#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:595be49cb83e80dbe4638d1e"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:70a6b15c439dca0fbd8ff70f#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:70a6b15c439dca0fbd8ff70f"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:7a8e82f6a8770545ad29461f#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:7a8e82f6a8770545ad29461f"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:7e4faa2ad4a071673041e18e#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:7e4faa2ad4a071673041e18e"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:81f3b33972ab0980c071ed20#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:81f3b33972ab0980c071ed20"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:a7b48444ccce05f011bcc227#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:a7b48444ccce05f011bcc227"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:adcb2a53e6bcaab585873def#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:adcb2a53e6bcaab585873def"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:b970c47dd9b1f7a30b2ea733#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:b970c47dd9b1f7a30b2ea733"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:da095276e0b8a0c7f6d4e0b4#generalist",
+      "pr_number": 33066,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:da095276e0b8a0c7f6d4e0b4"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:026100f80707c02fbd00cebe#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:026100f80707c02fbd00cebe"
+    },
+    {
+      "arm_id": "style",
+      "invocation_id": "wu:026100f80707c02fbd00cebe#style",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:026100f80707c02fbd00cebe"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:14009c2826c39049c91bc590#family_design",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:14009c2826c39049c91bc590#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:14009c2826c39049c91bc590#naming",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:14009c2826c39049c91bc590"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#family_design",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:14dc4a0f720d69a4650c637d#naming",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:14dc4a0f720d69a4650c637d"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#family_design",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:2aa1c518a2deec84fbbaa244#naming",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2aa1c518a2deec84fbbaa244"
+    },
+    {
+      "arm_id": "docs",
+      "invocation_id": "wu:2d98984730649af8d3134f67#docs",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:2d98984730649af8d3134f67#family_design",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:2d98984730649af8d3134f67#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:2d98984730649af8d3134f67#naming",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:2d98984730649af8d3134f67"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:84d1055b04abab6d285805e7#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:84d1055b04abab6d285805e7"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:c656fe9ace1ddb9d9bd84e0b#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:d15524ece84b2ffed54c9ef1#generalist",
+      "pr_number": 33098,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:d15524ece84b2ffed54c9ef1"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:230e4c75daf818c75b024525#family_design",
+      "pr_number": 33438,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:230e4c75daf818c75b024525#generalist",
+      "pr_number": 33438,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:230e4c75daf818c75b024525#naming",
+      "pr_number": 33438,
+      "reason": "mandatory job was never dispatched",
+      "status": "never_ran",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    }
+  ],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 0,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 207,
+  "pruned": 207,
+  "routing_mode": "lead",
+  "run_id": "v5run:pr5_smoke4_rep8",
+  "run_name": "pr5_smoke4_rep8",
+  "run_plan_sha256": "f2dea012a5db2aded56735f9c895b6e78fefb8cf1b6621ab806408c88289cfc2",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "24c5925a177b2c77d60e6dff336aef3d21122fe3fea35c5505c9fcd84c550bac",
+  "succeeded": 0,
+  "total_cost": 0.81922925,
+  "usage": {
+    "billed": 0.268653,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nominal": 0.819229,
+    "self_billed": 0.268653,
+    "self_nominal": 0.819229
+  },
+  "wall_seconds": 797.061591
+}

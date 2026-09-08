@@ -291,3 +291,17 @@ def test_a_lead_with_no_journal_path_still_works(tmp_path):
         summary="Renames encard_ lemmas across the file to the new spelling.",
         questions=[{"kind": "convention", "question": "Does `grind` close these?"}]))
     assert task._state()["comprehension"] is not None
+
+
+def test_a_journal_path_is_one_segment():
+    """`ep:leanprover-community/mathlib4#33057#round1#<sha>` contains a slash, and replacing
+    only the colon left it as a directory separator -- `pr5_smoke4_rep8` wrote its journals to
+    `lead_journals/leanprover-community/`. Harmless on its own, and exactly what breaks the
+    first time something globs that directory expecting one file per episode."""
+
+    from src.mathlib_review.review.runner import _slug
+
+    slug = _slug("ep:leanprover-community/mathlib4#33057#round1#d5908adf82f9")
+    assert "/" not in slug and ":" not in slug and "#" not in slug
+    # Still distinguishes two episodes of the same PR.
+    assert _slug("ep:x/y#33057#round1#aaa") != _slug("ep:x/y#33057#round2#aaa")

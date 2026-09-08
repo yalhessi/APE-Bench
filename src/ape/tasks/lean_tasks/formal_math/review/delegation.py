@@ -345,7 +345,21 @@ async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
         parent=getattr(parent_task.data, "episode_id", None),
     )
 
-    facts = await _sample_facts(orchestrator, results)
+    # Everything from here to the `return` derives from work that has already been paid for.
+    # A failure in any of it used to lose the whole wave: `delegate` catches, discards the
+    # outcomes and releases the reservations, so the arms ran, cost money, and left nothing.
+    # That is what happened on `pr5_smoke4_rep8` -- $3.13 billed spent, $0.27 reported.
+    #
+    # So cost attribution is allowed to fail without taking the results with it. A wave with
+    # no facts reports zero cost, which is wrong and visible; a wave that raises reports
+    # nothing at all, which is wrong and silent.
+    try:
+        facts = await _sample_facts(orchestrator, results)
+    except Exception:  # noqa: BLE001 - see above
+        logger.error("wave %d: cost attribution failed; the wave's results are kept and its "
+                     "costs will read as zero", wave, exc_info=True)
+        facts = {}
+
     by_task_id = {}
     for result in results.task_results:
         raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result

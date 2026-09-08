@@ -1,0 +1,32 @@
+{
+  "corrected": {
+    "hidden_share_of_corrected_nominal": 0.0,
+    "paused": 0,
+    "total_cost_nominal": 0.819229
+  },
+  "correction_version": "v5-correction/1",
+  "on_disk": {
+    "attempts": 73,
+    "billed_cost": 3.129437,
+    "nominal_cost": 8.601917,
+    "unaccounted_nominal": 7.782688
+  },
+  "recovered": {
+    "attempts": [],
+    "hidden_billed_cost": 0,
+    "hidden_nominal_cost": 0,
+    "paused_attempts": 0
+  },
+  "reported": {
+    "completion_status": "partial",
+    "paused": 0,
+    "total_cost_nominal": 0.81922925
+  },
+  "run_name": "pr5_smoke4_rep8",
+  "schema_version": "v5-correction1",
+  "source_sha256": "058d01abc474b93fa8ba8911d1fdafba71dabbbe0277c94e5b6e0e1a85c4cc73",
+  "sources": {
+    "run_manifest.json": "cdc80cd4c286849d01507993ebddb0f51b653027fefee6a62c026a040e51f2c5"
+  },
+  "verdict": "forensic: this run's recall figures were computed over coverage it did not have, and its ledger under-reports spend. Usable as a regression fixture, not as a measurement."
+}

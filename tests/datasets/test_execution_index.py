@@ -225,3 +225,61 @@ def test_both_readers_spell_the_wave_the_same_way(tmp_path, monkeypatch):
     by_index = trajectory.extract("r", ape_root=tmp_path / "ape")["invocations"][0].wave
 
     assert by_glob == by_index == "wave1"
+
+
+# --- the index must never be able to fail the work it indexes ------------------------------
+#
+# On `pr5_smoke4_rep8` it did. `TaskStorage.load_all_samples()` returns `Dict[int, Sample]`,
+# `attempt_rows` iterated it directly and got ints, and the `TypeError` raised out of
+# `run_wave` -- *after* the orchestrator had run the arms. Every one of the four leads lost
+# every wave, the run closed `partial` with 47 coverage gaps, and $3.13 of billed arm work was
+# spent and discarded while the manifest reported $0.27.
+
+
+def test_attempt_rows_takes_what_the_storage_api_returns():
+    """A dict keyed by sample index, which is what `load_all_samples` gives."""
+
+    class _S:
+        def __init__(self, index):
+            self.index = index
+
+        def model_dump(self, mode="json"):
+            return {"sample_index": self.index,
+                    "attempts": [{"path": f"/tmp/{self.index}", "status": "completed",
+                                  "cost": 0.1, "cached_cost": 0.04, "attempt_id": 1}]}
+
+    rows = execution_index.attempt_rows({1: _S(1), 0: _S(0)})
+    assert [r["sample_index"] for r in rows] == [0, 1], "dict order must follow sample index"
+    assert execution_index.attempt_rows([_S(0)])[0]["sample_index"] == 0
+    assert execution_index.attempt_rows({}) == []
+    assert execution_index.attempt_rows(None) == []
+
+
+def test_a_broken_index_does_not_fail_the_wave(tmp_path, monkeypatch):
+    """The structural half, and the one that matters: `append` already swallowed its errors
+    because "losing the index must not lose the work it indexes". `record` did not, so a shape
+    bug one frame deeper cost a run every result it had just paid for."""
+
+    def _explode(_samples):
+        raise TypeError("'int' object is not iterable")
+
+    monkeypatch.setattr(execution_index, "attempt_rows", _explode)
+    # Must return normally rather than propagate.
+    asyncio.run(execution_index.record(
+        tmp_path / "i.jsonl", _Orchestrator(tmp_path / "tasks"),
+        _Results([_Result("t", 1)]), semantic_ids={}, group="wave1"))
+
+
+def test_one_unindexable_task_does_not_lose_the_others():
+    """Per task, not per batch: a row that cannot be built should cost that row only."""
+
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "i.jsonl"
+        results = _Results([_Result("good", 1), _Result("bad", None), _Result("also", 2)])
+        asyncio.run(execution_index.record(
+            path, _Orchestrator(Path(tmp) / "tasks"), results,
+            semantic_ids={"good": "wu:1#a", "also": "wu:2#b"}, group="wave1"))
+        indexed = execution_index.by_semantic_id(path)
+        assert {"wu:1#a", "wu:2#b"} <= set(indexed)

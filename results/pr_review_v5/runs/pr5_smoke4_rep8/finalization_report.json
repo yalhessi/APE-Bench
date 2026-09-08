@@ -1,0 +1,101 @@
+{
+  "after_merge": 0,
+  "alternatives_not_selected": 0,
+  "by_admission": {
+    "diagnostic": 0,
+    "published": 0
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 0,
+    "generalist": 0,
+    "holistic": 0,
+    "merged": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 0,
+    "repository_measurement": 0,
+    "verified_compile": 0
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 0,
+  "candidates_generalist": 0,
+  "candidates_specialist": 0,
+  "candidates_specialist_dropped_unverified": 0,
+  "candidates_unwarranted": 0,
+  "channels": {
+    "contradicted": 0,
+    "review": 0,
+    "review_only": 0,
+    "verified": 0
+  },
+  "conflicts": 0,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 0
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 0,
+      "generalist": 0,
+      "holistic": 0,
+      "merged": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 0,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 0,
+    "largest_issue_sites": 0,
+    "pr_finding_limit": 20,
+    "published_after_limit": 0,
+    "published_before_limit": 0,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "evidence": {
+    "by_status": {},
+    "completed_collectors": {},
+    "packets": 0,
+    "terminal_failures": {}
+  },
+  "execution_release": null,
+  "findings_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "generalist_evidence_gate": "evidence_chain",
+  "inputs": 0,
+  "issues_published": 0,
+  "issues_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "issues_total": 0,
+  "lead_removed_findings": 0,
+  "lead_synthesis": {
+    "assessments": 0,
+    "by_verdict": {},
+    "candidates_absorbed": 0,
+    "candidates_dropped": 0,
+    "candidates_in": 0,
+    "candidates_out": 0,
+    "duplicate_cycles_broken": 0,
+    "removed_by_candidate": {},
+    "severity_overrides_recorded_not_applied": 0,
+    "unmatched": []
+  },
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 0,
+  "published_before_limit": 0,
+  "published_by_concern": {},
+  "published_prs": [],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33057,
+    33066,
+    33098,
+    33438
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 0
+}

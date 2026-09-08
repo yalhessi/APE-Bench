@@ -342,3 +342,40 @@ def test_the_routing_report_names_both_degenerate_cases():
     assert report["degenerate_fanout"] is False
     assert report["jobs_delegated"] == 2 and report["jobs_pruned"] == 1
     assert routing_report([_record("wu:1#a", "pruned")])["degenerate_silent"] is True
+
+
+# --- paid work survives a bookkeeping failure ------------------------------------------------
+#
+# On `pr5_smoke4_rep8` it did not. Between `orchestrator.run(tasks)` returning and `run_wave`
+# returning its outcomes sit three steps -- the execution index, cost attribution, and building
+# the outcomes -- and a `TypeError` in the first raised out of `run_wave`. `delegate` caught it,
+# discarded the outcomes and released the reservations. Four leads lost every wave, the run
+# closed `partial` with 47 coverage gaps, and $3.13 of billed arm work was spent and thrown
+# away while the manifest reported $0.27.
+
+
+def test_cost_attribution_may_fail_without_losing_the_wave():
+    """Zero cost is wrong and visible. No results at all is wrong and silent."""
+
+    import inspect
+
+    from ape.tasks.lean_tasks.formal_math.review import delegation
+
+    source = inspect.getsource(delegation.run_wave)
+    attribution = source[source.index("_sample_facts(orchestrator, results)") - 200:]
+    assert "try:" in source[:source.index("_sample_facts(orchestrator, results)")][-300:], (
+        "cost attribution is not guarded; a failure there loses the whole wave")
+    assert "facts = {}" in attribution
+
+
+def test_the_index_is_recorded_before_attribution_and_cannot_raise():
+    """Ordering matters less than that neither can propagate. The index is auxiliary by
+    definition -- `append` already swallowed its own errors for exactly this reason."""
+
+    import inspect
+
+    from ape.orchestration import execution_index
+
+    source = inspect.getsource(execution_index.record)
+    assert source.count("except Exception") >= 2, (
+        "record must not be able to raise into the caller that paid for the work")

@@ -96,3 +96,41 @@ def test_the_checked_in_sidecars_match_the_hand_verified_figures(run_name, bille
     assert payload["recovered"]["hidden_billed_cost"] == pytest.approx(billed)
     assert payload["recovered"]["hidden_nominal_cost"] == pytest.approx(nominal)
     assert "forensic" in payload["verdict"]
+
+
+# --- under-reporting has more causes than pausing --------------------------------------------
+
+
+def test_the_sidecar_reports_everything_on_disk_not_only_paused_attempts():
+    """`recovered` answers "which attempts did the ledger book at $0.00 because they paused".
+    That is one cause of under-reporting and it is not the general one.
+
+    `pr5_smoke4_rep8` is why this exists. Its 73 attempts *succeeded*; a bookkeeping bug
+    discarded their outcomes before they were settled, so nothing paused, `recovered` was
+    empty, and the sidecar said $0.00 hidden while $3.13 of billed work sat in the scratch
+    tree and the manifest reported $0.27.
+    """
+
+    from src.mathlib_review.analysis.corrections import RunCorrection
+
+    fields = RunCorrection.__dataclass_fields__
+    for name in ("on_disk_attempts", "on_disk_billed_cost", "on_disk_nominal_cost"):
+        assert name in fields
+
+    correction = RunCorrection(run_name="r", reported_total_cost=0.82)
+    correction.on_disk_attempts = 73
+    correction.on_disk_nominal_cost = 8.60
+    correction.on_disk_billed_cost = 3.13
+    payload = correction.as_dict()
+    assert payload["on_disk"]["attempts"] == 73
+    assert payload["on_disk"]["billed_cost"] == 3.13
+    # The number that matters: spend the manifest's own figure does not cover.
+    assert payload["on_disk"]["unaccounted_nominal"] == pytest.approx(7.78, abs=0.01)
+
+
+def test_a_run_whose_manifest_covers_its_disk_reports_no_gap():
+    from src.mathlib_review.analysis.corrections import RunCorrection
+
+    correction = RunCorrection(run_name="r", reported_total_cost=8.60)
+    correction.on_disk_nominal_cost = 8.60
+    assert correction.as_dict()["on_disk"]["unaccounted_nominal"] == 0.0
