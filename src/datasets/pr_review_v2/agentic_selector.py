@@ -28,7 +28,7 @@ from ape.tasks.base import create_task_from_data
 from ape.utils import parse_cli_args
 from ape.utils.logging import create_logger
 
-from .evaluate_d2 import _pred_span
+from .evaluate_d2 import pred_span
 from .runner_workspace import load_workspace_run
 from .schema import PRReviewV2Record
 from .selector import (
@@ -40,7 +40,7 @@ SELECTOR_TASK = "lean_pr_review_selector"
 
 
 def _candidate_payload(finding: Dict[str, Any], index: int) -> Dict[str, Any]:
-    path, start, end = _pred_span(finding)
+    path, start, end = pred_span(finding)
     return {
         "index": index,
         "path": path,

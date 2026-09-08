@@ -82,6 +82,16 @@ LEGACY_V2_BUNDLES = Path("data/pr_review_v2/cache/bundles")
 LEGACY_V2_COMPARES = Path("data/pr_review_v2/cache/compares")
 
 #: Mathlib maintainer roster, used to scope temporally safe precedent retrieval.
+#:
+#: **It cannot move, and this is load-bearing.** It is an input living inside a code
+#: package, which is the wrong place for data -- and nine frozen release manifests under
+#: `inputs/pr_review_v4/` declare it at exactly this path with a hash. That root is frozen,
+#: so the manifests cannot be rewritten, so the file cannot be relocated without failing
+#: `verify_frozen`. Tried on 2026-09-08; nine manifests reported it missing.
+#:
+#: The consequence is bigger than the file: **deleting `src/datasets/pr_review_v2/` would
+#: break the frozen-artifact gate for every v4 release.** Whatever happens to v2's code, this
+#: path has to keep existing.
 LEGACY_V2_ROSTER = Path("src/datasets/pr_review_v2/data/mathlib_roster.txt")
 
 # --- v4's own roots ------------------------------------------------------------------

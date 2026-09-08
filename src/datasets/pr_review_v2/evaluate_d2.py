@@ -131,7 +131,7 @@ class MatcherConfig(BaseModel):
 _PATH_PREFIX_RE = re.compile(r"^(?:target/|reference/[^/]+/|scratch/|a/|b/|\./|/)+")
 
 
-def _norm_path(path: Optional[str]) -> Optional[str]:
+def norm_path(path: Optional[str]) -> Optional[str]:
     if not path:
         return path
     return _PATH_PREFIX_RE.sub("", str(path).strip())
@@ -146,7 +146,7 @@ def _gold_line(comment: Dict[str, Any]) -> Optional[int]:
     return anchor.get("line") or anchor.get("original_line")
 
 
-def _pred_span(finding: Dict[str, Any]) -> Tuple[Optional[str], Optional[int], Optional[int]]:
+def pred_span(finding: Dict[str, Any]) -> Tuple[Optional[str], Optional[int], Optional[int]]:
     anchor = finding.get("anchor")
     if not anchor:
         return None, None, None
@@ -165,11 +165,11 @@ def candidate_pairs(
     """Pairs with tier: 'anchor' (path+line window), 'file' (same path), 'pr_level'."""
     pairs = []
     for gi, gold in enumerate(gold_findings):
-        gold_path = _norm_path((gold.get("anchor") or {}).get("path"))
+        gold_path = norm_path((gold.get("anchor") or {}).get("path"))
         gold_line = _gold_line(gold)
         for pi, pred in enumerate(pred_findings):
-            pred_path_raw, start, end = _pred_span(pred)
-            pred_path = _norm_path(pred_path_raw)
+            pred_path_raw, start, end = pred_span(pred)
+            pred_path = norm_path(pred_path_raw)
             if gold_path and pred_path and gold_path == pred_path:
                 if gold_line is not None and start is not None:
                     distance = max(start - line_slack - gold_line, gold_line - (end + line_slack), 0)
@@ -249,7 +249,7 @@ async def judge_pairs_llm(
             f"{gold_anchor['path']}:{gold_line}" if gold_anchor.get("path")
             else f"PR-level {gold.get('kind', 'comment')}, no line anchor"
         )
-        pred_path, start, end = _pred_span(pred)
+        pred_path, start, end = pred_span(pred)
         pred_loc = f"{pred_path}:{start}" if pred_path else "PR-level, no line anchor"
         if gold_anchor.get("path") and pred_path == gold_anchor["path"] and gold_line and start:
             line_gap = str(max(start - gold_line, gold_line - (end or start), 0))
@@ -378,7 +378,7 @@ def evaluate(
             gold = gold_findings[pair["gold_idx"]]
             pf = pred["findings"][pair["pred_idx"]]
             gold_anchor = gold.get("anchor") or {}
-            pred_path, pred_start, pred_end = _pred_span(pf)
+            pred_path, pred_start, pred_end = pred_span(pf)
             pairs_dump.append({
                 "pr_number": pred["pr_number"],
                 "gold_id": gold["id"], "gold_stratum": gold["stratum"],
@@ -470,15 +470,15 @@ def evaluate_target(
 
         local_preds = []  # (pid, norm_path, start, end, finding)
         for p in preds:
-            path, start, end = _pred_span(p)
-            np = _norm_path(path)
+            path, start, end = pred_span(p)
+            np = norm_path(path)
             if np and start is not None:
                 pid = len(pred_items)
                 pred_items.append({"pid": pid, "pr": pr})
                 local_preds.append((pid, np, start, end or start, p))
 
         for g in gold:
-            gp = _norm_path((g.get("anchor") or {}).get("path"))
+            gp = norm_path((g.get("anchor") or {}).get("path"))
             gl = _gold_line(g)
             if not gp or gl is None:  # PR-level / unanchored gold can't be located
                 continue

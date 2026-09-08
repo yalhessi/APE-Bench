@@ -33,9 +33,9 @@ from ape.utils.project import PROJECT_ROOT
 from .evaluate_d2 import (
     _gold_findings,
     _gold_line,
-    _norm_path,
+    norm_path,
     _pair_cache_key,
-    _pred_span,
+    pred_span,
 )
 
 PRED_DIR = PROJECT_ROOT / "inputs" / "pr_review_v2" / "predictions"
@@ -102,13 +102,13 @@ def decompose_pool(
     for pr, record in gold_records.items():
         local_preds: List[Tuple[str, int, int, Dict[str, Any]]] = []
         for f in preds_by_pr.get(pr, []):
-            path, start, end = _pred_span(f)
-            np = _norm_path(path)
+            path, start, end = pred_span(f)
+            np = norm_path(path)
             if np and start is not None:
                 local_preds.append((np, start, end or start, f))
 
         for g in _gold_findings(record):
-            gp = _norm_path((g.get("anchor") or {}).get("path"))
+            gp = norm_path((g.get("anchor") or {}).get("path"))
             gl = _gold_line(g)
             if not gp or gl is None:
                 continue  # PR-level / unanchored gold is not locatable

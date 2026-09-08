@@ -30,6 +30,8 @@ DATA_URL = (
 ROSTER_TEAMS = {"Admin team", "Mathlib maintainers", "Mathlib reviewers"}
 # Kept inside the package (not data/, which is gitignored): the roster is a
 # versioned snapshot per spec §3.1, and roster drift is an audited threat (§7.7).
+#: Deliberately beside the code rather than under `inputs/`, which is where it belongs and
+#: where it cannot go: nine frozen v4 release manifests declare this exact path with a hash.
 DEFAULT_OUTPUT = Path(__file__).parent / "data" / "mathlib_roster.txt"
 
 # Known logins for roster members missing from people.yaml; checked against

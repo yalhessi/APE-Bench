@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ape.utils.logging import create_logger
 
-from src.datasets.pr_review_v2.evaluate_d2 import _norm_path, _pred_span
+from src.datasets.pr_review_v2.evaluate_d2 import norm_path, pred_span
 from .judge import judge_pairs
 
 HEADLINE_OUTCOMES = {"adopted", "partially_adopted"}
@@ -55,14 +55,14 @@ def co_located(iv: Dict[str, Any], finding: Dict[str, Any], slack: int) -> Tuple
     """Does the finding overlap ANY anchor of the intervention (±slack)? Unanchored interventions
     accept any finding on the PR (PR-level asks). Returns (hit, line_gap_desc)."""
     anchors = iv.get("anchors") or []
-    path, ls, le = _pred_span(finding)
+    path, ls, le = pred_span(finding)
     if not anchors:
         return True, "n/a (unanchored intervention — PR-level pairing)"
     if not (path and ls):
         return False, ""
     best: Optional[int] = None
     for a in anchors:
-        if _norm_path(a.get("path") or "") != _norm_path(path):
+        if norm_path(a.get("path") or "") != norm_path(path):
             continue
         gap = max(int(a["line_start"]) - (le or ls), ls - int(a["line_end"]), 0)
         best = gap if best is None else min(best, gap)
@@ -78,7 +78,7 @@ def build_pairs(interventions: List[Dict[str, Any]], preds_by_pr: Dict[int, Dict
             hit, gap = co_located(iv, f, slack)
             if not hit:
                 continue
-            path, ls, _le = _pred_span(f)
+            path, ls, _le = pred_span(f)
             pairs.append({"iv": iv, "pred": f,
                           "pred_loc": f"{path}:{ls}" if path else "PR-level",
                           "line_gap": gap})

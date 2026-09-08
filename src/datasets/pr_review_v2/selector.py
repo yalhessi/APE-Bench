@@ -35,7 +35,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from ape.utils import parse_cli_args
 from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
-from .evaluate_d2 import _gold_findings, _gold_line, _norm_path, _pair_cache_key, _pred_span
+from .evaluate_d2 import _gold_findings, _gold_line, norm_path, _pair_cache_key, pred_span
 
 PRED_DIR = PROJECT_ROOT / "inputs" / "pr_review_v2" / "predictions"
 GOLD = PROJECT_ROOT / "inputs" / "pr_review_v2" / "mathlib_pr_review_v2_actionable_20260618.jsonl"
@@ -160,15 +160,15 @@ def build_candidates(
     for pr, record in gold_records.items():
         golds = []
         for g in _gold_findings(record):
-            gp = _norm_path((g.get("anchor") or {}).get("path"))
+            gp = norm_path((g.get("anchor") or {}).get("path"))
             gl = _gold_line(g)
             if gp and gl is not None:
                 golds.append((gid_counter, g, gp, gl))
                 gid_counter += 1
 
         for f in by_pr.get(pr, []):
-            path, start, end = _pred_span(f)
-            np = _norm_path(path)
+            path, start, end = pred_span(f)
+            np = norm_path(path)
             ci = len(candidates)
             cand = {"ci": ci, "pr": pr, "finding": f, "on_target": False,
                     "gold_hits": [], "hit_strata": []}
@@ -227,7 +227,7 @@ async def score_candidates(
         rec = gold_records[c["pr"]]
         inp = rec["input"]
         f = c["finding"]
-        path, start, end = _pred_span(f)
+        path, start, end = pred_span(f)
         prompt = SELECTOR_PROMPT.format(
             title=inp.get("title", ""),
             description=(inp.get("description") or "")[:1500],
@@ -310,7 +310,7 @@ async def score_candidates_listwise(
         lines = []
         for i, c in enumerate(cands, 1):
             f = c["finding"]
-            path, start, _ = _pred_span(f)
+            path, start, _ = pred_span(f)
             lines.append(f"[{i}] ({path}:{start}; {f.get('severity','?')}) {f.get('claim','')[:400]}"
                          + (f"  Fix: {f['suggested_fix'][:200]}" if f.get("suggested_fix") else ""))
         prompt = SELECTOR_LISTWISE_PROMPT.format(

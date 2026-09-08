@@ -130,7 +130,7 @@ def test_judge_of_a_run_that_disagrees_with_the_config_is_refused(monkeypatch):
     with pytest.raises(ValueError) as excinfo:
         cli.main(["judge", "--config", "configs/pr_review_v5_specialist4_judge.yaml",
                   "--of", "pr_review_v5_specialist4_rep1",
-                  "dataset.candidates=results/pr_review_v5/runs/"
+                  "--set", "dataset.candidates=results/pr_review_v5/runs/"
                   "pr_review_v5_lead_heldout11_rep2/findings.jsonl"])
     assert "attribute one run's findings to another" in str(excinfo.value)
 
@@ -308,3 +308,36 @@ def test_the_retrieval_report_counts_calls_that_declared_no_gate():
 
     found = retrieval("pr_review_v5_specialist4_rep1")
     assert "calls_without_a_recorded_gate" in found
+
+
+# --- overrides go through a flag ------------------------------------------------------------
+
+
+def test_overrides_are_a_repeatable_flag():
+    args = cli.build_parser().parse_args(
+        ["plan", "--config", str(CONFIG),
+         "--set", "dataset.pr_numbers=[33117]", "--set", "dataset.lead_cost_cap=2.0"])
+    assert args.overrides == ["dataset.pr_numbers=[33117]", "dataset.lead_cost_cap=2.0"]
+
+
+def test_a_stray_token_is_an_error_that_names_it():
+    """It used to be handed to the override parser, which could only tell a mistyped
+    subcommand from a config key by looking for an `=`. `parse_cli_args` raising on a token
+    without one was the guard; a flag makes argparse reject the token itself and say which."""
+
+    with pytest.raises(SystemExit):
+        cli.build_parser().parse_args(["plan", "--config", str(CONFIG), "oops"])
+
+
+def test_every_config_taking_command_accepts_overrides():
+    """A command that reads a config but cannot be overridden sends you back to editing the
+    config, which is the thing `extends:` exists to stop."""
+
+    import argparse
+
+    parser = cli.build_parser()
+    sub = [a for a in parser._actions if isinstance(a, argparse._SubParsersAction)][0]
+    for name, command in sub.choices.items():
+        options = {s for action in command._actions for s in action.option_strings}
+        if "--config" in options:
+            assert "--set" in options, f"{name} takes a config but not --set"

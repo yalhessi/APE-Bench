@@ -24,6 +24,12 @@ spending a budget.
     python -m src.mathlib_review.review.cli report routing --run <run_name>
 
 `plan` is `run` without `--execute`, spelled positively, because that is what it is for.
+
+Config overrides go through repeated `--set key=value`. Trailing bare `key=value` tokens
+used to work, and the difference is what happens to something that is *not* an override: a
+mistyped subcommand or a stray path was indistinguishable from a config key, and the
+override parser could only tell them apart by looking for an `=`. Behind a flag, argparse
+rejects the leftover and the error names the token.
 """
 
 from __future__ import annotations
@@ -40,6 +46,21 @@ from typing import List, Optional
 SPENDS = frozenset({"run", "judge", "bench"})
 
 
+def _add_set(parser: argparse.ArgumentParser) -> None:
+    """Config overrides, one `--set key=value` each.
+
+    Trailing bare `key=value` tokens worked and are no longer accepted. The difference is what
+    happens to something that is *not* an override: as a positional leftover, a mistyped
+    subcommand or a stray path was indistinguishable from a config key, and `parse_cli_args`
+    could only tell them apart by looking for an `=`. Behind a flag, argparse rejects the
+    leftover itself and the error names the token.
+    """
+
+    parser.add_argument(
+        "--set", action="append", default=[], metavar="KEY=VALUE", dest="overrides",
+        help="override a config key, e.g. --set dataset.pr_numbers='[33117]'. Repeatable.")
+
+
 def _add_execute(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--execute", action="store_true",
@@ -54,9 +75,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     plan = sub.add_parser("plan", help="render and price a run; call no model")
     plan.add_argument("--config", type=Path, required=True)
+    _add_set(plan)
 
     run = sub.add_parser("run", help="a generation run")
     run.add_argument("--config", type=Path, required=True)
+    _add_set(run)
     run.add_argument("--redo", action="store_true",
                      help="discard this run_name's results and state, then run it again")
     run.add_argument("--cost-model", default=None,
@@ -65,6 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     judge = sub.add_parser("judge", help="score a generation run against gold")
     judge.add_argument("--config", type=Path, required=True)
+    _add_set(judge)
     judge.add_argument("--of", dest="of_run", default=None,
                        help="the generation run to score. Derives candidates, out_dir and "
                             "run_name from it, so the three cannot disagree.")
@@ -72,6 +96,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     bench = sub.add_parser("bench", help="run one arm against its own bench, with no lead")
     bench.add_argument("--config", type=Path, required=True)
+    _add_set(bench)
     bench.add_argument("--arm", action="append", required=True)
     bench.add_argument("--pr", type=int, action="append", dest="pr_numbers")
     bench.add_argument("--negatives-per-pr", type=int, default=3)
@@ -224,8 +249,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     from ape.utils.logging import create_logger
 
     parser = build_parser()
-    args, rest = parser.parse_known_args(argv)
-    overrides = parse_cli_args(rest)
+    # `parse_args`, not `parse_known_args`: an unrecognised token is now an error naming the
+    # token, rather than something silently handed to the override parser.
+    args = parser.parse_args(argv)
+    overrides = parse_cli_args(list(getattr(args, "overrides", []) or []))
     logger = create_logger()
 
     if args.command == "plan":

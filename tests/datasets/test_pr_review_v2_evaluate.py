@@ -2,7 +2,7 @@
 
 from src.datasets.pr_review_v2.evaluate_d2 import (
     MatcherConfig,
-    _norm_path,
+    norm_path,
     candidate_pairs,
     evaluate_target,
 )
@@ -12,7 +12,7 @@ def test_norm_path_strips_workspace_and_diff_prefixes():
     canon = "Mathlib/A.lean"
     for p in ("target/Mathlib/A.lean", "b/Mathlib/A.lean", "a/Mathlib/A.lean",
               "./Mathlib/A.lean", "/Mathlib/A.lean", "target/target/Mathlib/A.lean", canon):
-        assert _norm_path(p) == canon
+        assert norm_path(p) == canon
 
 
 def test_candidate_pairs_match_across_target_prefix():
