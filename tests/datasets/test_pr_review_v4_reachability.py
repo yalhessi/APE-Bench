@@ -96,18 +96,99 @@ def test_an_obligation_is_reachable_if_any_of_its_concerns_is():
 
 
 def test_recall_is_annotated_with_the_reachable_denominator():
-    judge_report = {"obligation_status_counts": {
-        "issue": {"hit": 2, "miss": 7}, "resolution": {"hit": 1, "miss": 8}}}
-    # Four obligations, one of which a compile can settle.
-    concerns = [["style"], ["naming"], ["duplication"], ["docs"]]
+    """This test asserted `issue_recall_reachable == 2.0` and passed.
+
+    A recall rate of 2.0 is not a number that can be right, and the assertion was written to
+    match what the code produced rather than to say what the metric means. It took a real run
+    reporting 3.0 to notice. Both halves now describe the same obligations.
+    """
+
+    # Four obligations, one of which a compile can settle -- and it was hit.
+    concerns = {"o1": ["style"], "o2": ["naming"], "o3": ["duplication"], "o4": ["docs"]}
+    judge_report = {"per_obligation": [
+        {"obligation_id": "o1", "issue_status": "hit", "resolution_status": "miss"},
+        {"obligation_id": "o2", "issue_status": "miss", "resolution_status": "miss"},
+        {"obligation_id": "o3", "issue_status": "hit", "resolution_status": "hit"},
+        {"obligation_id": "o4", "issue_status": "miss", "resolution_status": "miss"},
+    ]}
     out = annotate_recall(judge_report, concerns)
 
     assert out["reachability"]["obligations_reachable"] == 1
-    assert out["issue_recall_reachable"] == pytest.approx(2.0)
+    assert out["issue_recall_reachable"] == pytest.approx(1.0)
     assert out["resolution_recall_reachable"] == pytest.approx(1.0)
+    # The style hit is real and unpublishable, and is reported rather than folded in.
+    assert out["issue_hits_unreachable"] == 1
 
 
 def test_annotation_handles_a_zero_reachable_denominator():
     out = annotate_recall(
-        {"obligation_status_counts": {"issue": {"hit": 0}}}, [["style"]])
+        {"per_obligation": [{"obligation_id": "o1", "issue_status": "miss"}]},
+        {"o1": ["style"]})
     assert out["issue_recall_reachable"] is None
+
+
+# --- the numerator and the denominator must describe the same obligations --------------------
+
+
+def test_reachable_recall_cannot_exceed_one():
+    """`pr5_smoke4_rep9` reported `issue_recall_reachable: 3.0` -- six hits over two reachable
+    obligations. The numerator was the total hit count across every obligation; the denominator
+    counted only the reachable ones.
+
+    A rate above 1 is the visible symptom. The real error is that the halves were about
+    different sets, and about different questions: a hit is *identification*, reachable is
+    *publication*. Fourteen of that run's obligations are `style`, which no mechanism can
+    settle, and several were correctly identified.
+    """
+
+    from src.mathlib_review.analysis.reachability import annotate_recall
+
+    concerns = {
+        "o1": ["proof-golf"],   # reachable: a compile settles it
+        "o2": ["duplication"],  # reachable
+        "o3": ["style"],        # not reachable
+        "o4": ["style"],
+        "o5": ["docs"],
+    }
+    report = {"per_obligation": [
+        {"obligation_id": "o1", "issue_status": "hit", "resolution_status": "hit"},
+        {"obligation_id": "o2", "issue_status": "miss", "resolution_status": "miss"},
+        {"obligation_id": "o3", "issue_status": "hit", "resolution_status": "miss"},
+        {"obligation_id": "o4", "issue_status": "hit", "resolution_status": "miss"},
+        {"obligation_id": "o5", "issue_status": "hit", "resolution_status": "miss"},
+    ]}
+    out = annotate_recall(report, concerns)
+    assert out["reachability"]["obligations_reachable"] == 2
+    # 1 of the 2 reachable obligations was hit. Four hits total, three of them unreachable.
+    assert out["issue_recall_reachable"] == 0.5
+    assert out["issue_hits_reachable"] == 1
+    assert out["issue_hits_unreachable"] == 3
+    assert 0.0 <= out["issue_recall_reachable"] <= 1.0
+
+
+def test_both_halves_are_reported_not_only_the_ratio():
+    """A reader should be able to see the two sets rather than infer them. "Correctly
+    identified and unpublishable" is the interesting number here and a ratio hides it."""
+
+    from src.mathlib_review.analysis.reachability import annotate_recall
+
+    out = annotate_recall(
+        {"per_obligation": [{"obligation_id": "o1", "issue_status": "hit"}]},
+        {"o1": ["style"]})
+    assert out["issue_hits_unreachable"] == 1
+    assert out["issue_recall_reachable"] is None   # nothing reachable to divide by
+
+
+def test_the_report_and_the_recall_split_agree_on_what_is_reachable():
+    """They each decided it themselves, and disagreeing about exactly that is how the rate
+    came out at 3.0."""
+
+    from src.mathlib_review.analysis.reachability import (
+        _is_reachable, annotate_recall, reachability_report,
+    )
+
+    concerns = {"a": ["proof-golf"], "b": ["style"], "c": ["duplication"]}
+    out = annotate_recall({"per_obligation": []}, concerns)
+    assert out["reachability"]["obligations_reachable"] == sum(
+        _is_reachable(v) for v in concerns.values())
+    assert reachability_report(concerns.values())["obligations_reachable"] == 2

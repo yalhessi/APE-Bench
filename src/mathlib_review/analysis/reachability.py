@@ -89,6 +89,20 @@ def mechanism_identity(*, evidence_chain_admits: bool = EVIDENCE_CHAIN_ADMITS) -
     }))
 
 
+def _is_reachable(concerns, *, evidence_chain_admits: bool = EVIDENCE_CHAIN_ADMITS) -> bool:
+    """Whether one obligation has an admission path.
+
+    Reachable if *any* of its concerns does, which is the generous reading and keeps this from
+    overstating the ceiling. Extracted so `reachability_report` and `annotate_recall` cannot
+    disagree about which obligations they are each counting -- disagreeing about exactly that
+    is how a recall rate came out at 3.0.
+    """
+
+    admits = reachable_concerns(evidence_chain_admits=evidence_chain_admits)
+    labels = [str(item) for item in (concerns or [])] or ["(none)"]
+    return any(label in admits for label in labels)
+
+
 def reachability_report(
     obligation_concerns: Iterable[Iterable[str]],
     *,
@@ -108,7 +122,7 @@ def reachability_report(
     for concerns in obligation_concerns:
         labels = [str(item) for item in (concerns or [])] or ["(none)"]
         total += 1
-        is_reachable = any(label in admits for label in labels)
+        is_reachable = _is_reachable(concerns, evidence_chain_admits=evidence_chain_admits)
         reachable += int(is_reachable)
         for label in labels:
             row = by_concern.setdefault(label, {"total": 0, "reachable": 0})
@@ -138,22 +152,54 @@ def reachability_report(
 
 def annotate_recall(
     report: Mapping[str, Any],
-    obligation_concerns: Iterable[Iterable[str]],
+    concerns_by_obligation: Mapping[str, Iterable[str]],
     *,
     evidence_chain_admits: bool = EVIDENCE_CHAIN_ADMITS,
 ) -> Dict[str, Any]:
-    """Add the reachable denominator beside an existing judge report's recall figures."""
+    """Add the reachable denominator beside an existing judge report's recall figures.
 
-    reach = reachability_report(
-        obligation_concerns, evidence_chain_admits=evidence_chain_admits)
-    counts = (report.get("obligation_status_counts") or {})
+    **Numerator and denominator must describe the same obligations.** They did not: the
+    numerator was the total hit count across every obligation and the denominator counted only
+    the reachable ones, so `pr5_smoke4_rep9` reported `issue_recall_reachable: 3.0` -- six hits
+    over two reachable obligations. A rate above 1 is the visible symptom; the real error is
+    that the two halves were about different sets.
+
+    They were about different *questions* too, which is why the arithmetic could drift without
+    looking wrong. A hit is identification: the reviewer named the thing gold asks for.
+    Reachable is publication: a compile can settle it. Fourteen of that run's seventeen
+    obligations are `style`, which no mechanism can settle, and several were hit -- correctly
+    identified and unpublishable. Restricting the numerator to reachable obligations makes the
+    figure mean "of the obligations this mechanism could publish, how many did the reviewer
+    find", which is the question it is named for.
+
+    Takes a mapping now rather than a bare sequence of concern lists, because pairing a hit to
+    its reachability needs the obligation id and the old signature threw it away.
+    """
+
+    ordered = [list(concerns_by_obligation[key]) for key in sorted(concerns_by_obligation)]
+    reach = reachability_report(ordered, evidence_chain_admits=evidence_chain_admits)
+
+    reachable_ids = {
+        obligation_id for obligation_id, concerns in concerns_by_obligation.items()
+        if _is_reachable(concerns, evidence_chain_admits=evidence_chain_admits)
+    }
     out: Dict[str, Any] = {"reachability": reach}
-    denominator = reach["obligations_reachable"]
+    denominator = len(reachable_ids)
+    per_obligation = report.get("per_obligation") or []
     for axis in ("issue", "resolution"):
-        hits = ((counts.get(axis) or {}).get("hit"))
-        if hits is None:
+        field = f"{axis}_status"
+        if not any(field in row for row in per_obligation):
             continue
+        hits = sum(
+            1 for row in per_obligation
+            if row.get("obligation_id") in reachable_ids and row.get(field) == "hit"
+        )
         out[f"{axis}_recall_reachable"] = (
-            round(hits / denominator, 4) if denominator else None
+            round(hits / denominator, 4) if denominator else None)
+        # Both halves, so a reader can see the sets rather than infer them from a ratio.
+        out[f"{axis}_hits_reachable"] = hits
+        out[f"{axis}_hits_unreachable"] = sum(
+            1 for row in per_obligation
+            if row.get("obligation_id") not in reachable_ids and row.get(field) == "hit"
         )
     return out

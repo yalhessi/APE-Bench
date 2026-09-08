@@ -1,0 +1,210 @@
+{
+  "ambiguity_registry_sha256": "efaf8341b05d213e29298f5ae456860e5038692cbcb6bb0e74d0ad81719661a2",
+  "ambiguous_rate": 0.0,
+  "arm": "registered_task",
+  "by_pairing_tier": {
+    "anchor": {
+      "issue_matches": 9,
+      "pairs": 24
+    },
+    "file": {
+      "issue_matches": 0,
+      "pairs": 0
+    },
+    "relation": {
+      "issue_matches": 0,
+      "pairs": 0
+    }
+  },
+  "counts": {
+    "candidates": 54,
+    "null_pairs": 0,
+    "obligations": 17,
+    "observed_pairs": 24,
+    "paired_candidates": 17
+  },
+  "coverage": {
+    "complete": true,
+    "pairs_planned": 24,
+    "verdicts_returned": 24
+  },
+  "forensic": false,
+  "gold_alignment_rate": 0.16666666666666666,
+  "gold_alignment_within_paired": 0.5294117647058824,
+  "issue_recall": 0.35294117647058826,
+  "issue_recall_including_ambiguous": 0.35294117647058826,
+  "issue_recall_reachable": 3.0,
+  "judge_identity": "0711a6c01265b3e2a48a698ede6588157d41ad6c6e9d8c07c0c9fe56450d8a2d",
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v3-v9-rubric",
+  "location_recall": 0.8235294117647058,
+  "manual_audit_required": true,
+  "null_pair_diagnostics": {
+    "candidate_negative_issue_match_rate": null,
+    "coverage": null,
+    "pairs": 0,
+    "requested": 0
+  },
+  "obligation_status_counts": {
+    "issue": {
+      "ambiguous": 0,
+      "hit": 6,
+      "miss": 11
+    },
+    "resolution": {
+      "ambiguous": 0,
+      "hit": 3,
+      "miss": 14
+    }
+  },
+  "pairing_tiers": [
+    "anchor"
+  ],
+  "per_obligation": [
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:14f5e6d6016342115f689daf4e49be91088a694d3effbe2b2c42d3374b809d56",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:6c1da5ab47fedf5bdd05b898bf03cc177e55be0d012f63f913843cbebe5b34c7",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:488d7b571fea19dbde9a635878e92b1bc4f8acb1e489ac3778a0066ab313885d",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:d779f40f12ca1db3eada2a7dde894c02080a57643258a12aa3152705ede59a76",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:f4d1ab7fb96fc89956e85c9ab1bbbf82a1b6b3a94e6e4f500d784bfe0de1d5f6",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:ee282f05e9c27fe206e674624bd6a0363507863fb7d7af99398d4ca7f36560a3",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:a73a79ae9a7b9d20d97ee71366b3d5dfabdbff23c81aceb09d84753f6ba67ad5",
+      "resolution_status": "hit"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:64630362c31527fa23461b4551591f5a436d13f14693aa9c2bafaa15924601f6",
+      "resolution_status": "hit"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:45433fc367bdd15dc606eaabeadaa16ad98077afec83ca662fe39bcf938632ad",
+      "resolution_status": "hit"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:c7e1405471a20c04795b5cac2028c210dc8525c2625f96cdd9a25eac0617eb76",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:d1a4bd4608f602339557fe7eb8f0a36d668e3c0e3fcef83163d08013f8043118",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:a58d0d5ea6ca1dcb635a19a06e272cb7e73adefa96272448dca2e373aeb72a4b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:48ec1f14120b2955dc5842b5621da621b0ee960ab0de07a3297e0898b0478443",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": false,
+      "obligation_id": "obligation:6db24d1d232819b1261f658fb6ec36d9e14b41ebd97ef8b08c54c7c683effa6c",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:d4cc70e10c26e51edf54156464b475700c37268d7dcffdcfd65159a2e4d9bc58",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:9c96e853db76360f1fa330338b1db0ed3f889b91107267ff98efa1b03151ad1b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "miss",
+      "location_hit": true,
+      "obligation_id": "obligation:3ad30059e6e673738c6590c2cabc0d6111376018c5fc7b8c3bda44f30512121b",
+      "resolution_status": "miss"
+    }
+  ],
+  "reachability": {
+    "admitting_channels": [
+      "verification"
+    ],
+    "by_concern": {
+      "docs": {
+        "reachable": 0,
+        "total": 1
+      },
+      "duplication": {
+        "reachable": 1,
+        "total": 1
+      },
+      "proof-golf": {
+        "reachable": 1,
+        "total": 1
+      },
+      "style": {
+        "reachable": 0,
+        "total": 14
+      }
+    },
+    "mechanism_sha256": "709e6847f37bb53758bc72aaeb6e36a8b5f3ccb0a5dd0cf14f6ca9daa7ecbf1c",
+    "note": "Recall against `obligations_total` measures the reviewer and the publication mechanism together. Recall against `obligations_reachable` measures the reviewer alone, given what the mechanism can currently express. Report both.",
+    "obligations_reachable": 2,
+    "obligations_total": 17,
+    "obligations_unreachable": 15,
+    "reachability_version": "v5-reachability/1",
+    "reachable_share": 0.1176
+  },
+  "resolution_recall": 0.17647058823529413,
+  "resolution_recall_including_ambiguous": 0.17647058823529413,
+  "resolution_recall_reachable": 1.5,
+  "schema_version": "v4-semantic-report3",
+  "scored": true,
+  "silent_pr_emission": {
+    "candidates": 8,
+    "candidates_per_control_pr": 8.0,
+    "control_pr_numbers": [
+      33438
+    ]
+  },
+  "source_run_status": "complete"
+}

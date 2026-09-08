@@ -597,8 +597,8 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     }
     reachability = annotate_recall(
         report,
-        [concerns_by_obligation.get(item, []) for item in sorted(
-            scored_obligation_ids - {None})],
+        {item: concerns_by_obligation.get(item, [])
+         for item in sorted(scored_obligation_ids - {None})},
     )
 
     write_once(dataset.out_dir / "semantic_report.json", pretty_json_bytes({
