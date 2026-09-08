@@ -69,6 +69,7 @@ from src.mathlib_review.judge.semantic_judge import (
     semantic_report,
 )
 from src.mathlib_review.run_config import load_run as _load_run
+from src.mathlib_review.run_state import SCOREABLE, from_manifest
 
 
 class JudgeDatasetConfig(BaseModel):
@@ -367,7 +368,10 @@ def assert_source_run_is_complete(dataset: JudgeDatasetConfig, logger) -> Option
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     status = manifest.get("completion_status")
     gaps = manifest.get("coverage_gaps") or []
-    if status == "complete":
+    # Through the state machine rather than by comparing to the string "complete". The machine
+    # is the one place that says which states may be scored; a literal here is a second place
+    # that would have to agree with it and would not be checked.
+    if from_manifest(status) in SCOREABLE:
         return status
 
     detail = (

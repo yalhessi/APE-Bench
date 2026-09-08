@@ -425,10 +425,27 @@ locked files, no drift.
 
 ```bash
 ape/bin/python -m src.mathlib_review.release.verify_frozen verify
-ape/bin/python -m src.mathlib_review.review.runner --config configs/pr_review_v5.yaml --dry-run
 ape/bin/python -m src.datasets.zulip.browse --stats
 ape task ape-agent lean_pr_review          # interactive single-task session
 ```
+
+One entrypoint drives the review pipeline, and **nothing that spends money runs without
+`--execute`** — without it a spending subcommand does the full preflight (renders the agenda,
+prices it, checks the budget, resolves and cross-checks paths) and stops.
+
+```bash
+R="ape/bin/python -m src.mathlib_review.review.cli"
+
+$R plan   --config configs/pr_review_v5_specialist4.yaml --run-name pr5_specialist4_rep2
+$R run    --config configs/pr_review_v5_specialist4.yaml --run-name pr5_specialist4_rep2 --execute
+$R judge  --config configs/pr_review_v5_specialist4_judge.yaml --of pr5_specialist4_rep2 --execute
+$R report routing   --run pr5_specialist4_rep2
+$R report retrieval --run pr5_specialist4_rep2
+```
+
+`--run-name` is required: a config describes a PR set and a policy, and which repetition this
+is belongs to neither. Config overrides go through repeated `--set key=value`; a bare trailing
+token is now an error that names it.
 
 All tooling must run from the repository root (`paths.assert_repo_root`).
 
