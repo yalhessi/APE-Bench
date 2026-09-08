@@ -89,13 +89,13 @@ def test_the_lead_contributes_its_routing_policy():
 
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.lead import (
-        LeanPRReviewV5LeadData,
-        LeanPRReviewV5LeadTask,
+    from ape.tasks.lean_tasks.formal_math.review.lead import (
+        ReviewLeadData,
+        ReviewLeadTask,
     )
 
-    task = LeanPRReviewV5LeadTask(
-        LeanPRReviewV5LeadData(
+    task = ReviewLeadTask(
+        ReviewLeadData(
             task_id="t", episode_id="ep:1", pr_number=1, pr_title="t", pr_description="d",
             diff="d", changed_files=["A.lean"], proposals=[], arm_pool_path="/tmp/x.jsonl",
             target_workspace={"name": "target", "commit_hash": "c" * 40,
@@ -114,13 +114,13 @@ def test_the_lead_contributes_its_routing_policy():
 def test_an_arm_contributes_its_rendered_contract():
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
-        LeanPRReviewV5ArmData,
-        LeanPRReviewV5ArmTask,
+    from ape.tasks.lean_tasks.formal_math.review.arm import (
+        ReviewArmData,
+        ReviewArmTask,
     )
 
-    task = LeanPRReviewV5ArmTask(
-        LeanPRReviewV5ArmData(
+    task = ReviewArmTask(
+        ReviewArmData(
             task_id="t", invocation_id="wu:a#duplication", arm_id="duplication",
             spec_id="duplication", work_unit_id="wu:a", episode_id="ep:1", pr_number=1,
             diff="d", changed_files=["A.lean"], change_ids=["change:a"],

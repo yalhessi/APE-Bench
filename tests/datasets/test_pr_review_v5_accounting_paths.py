@@ -20,7 +20,7 @@ import pytest
 def test_the_patch_set_workspace_resolves_instead_of_raising():
     """`Path` is imported. Before, any patch_set submission raised NameError."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         LeanPRReviewV4CandidateTask,
     )
 

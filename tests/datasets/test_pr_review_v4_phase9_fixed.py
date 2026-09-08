@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v4.opportunities import (
+from ape.tasks.lean_tasks.formal_math.review.opportunities import (
     build_verification_artifact,
 )
 from src.mathlib_review.legacy_pipeline.phase9_fixed_orchestration import (

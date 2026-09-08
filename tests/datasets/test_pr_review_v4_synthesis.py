@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import pytest
 from pydantic import ValidationError
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+from ape.tasks.lean_tasks.formal_math.review.candidates import (
     LeanPRReviewV4CandidateTask,
 )
 

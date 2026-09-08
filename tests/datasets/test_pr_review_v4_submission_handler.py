@@ -41,7 +41,7 @@ class _RecordingMCP:
 
 
 def _handler_for(unit, episode, prompt):
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         LeanPRReviewV4CandidateConfig,
         LeanPRReviewV4CandidateTask,
     )
@@ -114,7 +114,7 @@ def test_a_well_formed_candidate_is_accepted(unverified_unit):
 
     unit, episode, prompt = unverified_unit
     data, submit = _handler_for(unit, episode, prompt)
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         CandidateSubmission,
     )
 
@@ -131,7 +131,7 @@ def test_a_candidate_naming_a_foreign_change_id_is_rejected(unverified_unit):
 
     unit, episode, prompt = unverified_unit
     data, submit = _handler_for(unit, episode, prompt)
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         CandidateSubmission,
     )
 

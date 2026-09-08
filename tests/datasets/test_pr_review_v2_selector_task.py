@@ -10,7 +10,7 @@ import asyncio
 import ape.tasks.lean_tasks  # noqa: F401  (triggers registration)
 from ape.tasks.base import get_task_class
 from ape.tasks.models import WorkspaceInfo
-from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewTask
+from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
 from ape.tasks.lean_tasks.formal_math.pr_review_v2.selector_task import (
     LeanPRReviewSelectorTask,
     PRReviewSelectorData,

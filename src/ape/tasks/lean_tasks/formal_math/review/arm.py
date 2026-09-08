@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import Field
 
 from ape.tasks.base import register_task
-from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+from ape.tasks.lean_tasks.formal_math.review.candidates import (
     LeanPRReviewV4CandidateConfig,
     LeanPRReviewV4CandidateData,
     LeanPRReviewV4CandidateResult,
@@ -70,13 +70,13 @@ EXPECTED_CONCERN_BY_ARM = {
 OFF_CONCERN_TAG = "off-concern"
 
 
-class LeanPRReviewV5ArmConfig(LeanPRReviewV4CandidateConfig):
+class ReviewArmConfig(LeanPRReviewV4CandidateConfig):
     """Verify-heavy defaults; a focused claim is settled by compiling the replacement."""
 
     finding_budget: int = 20
 
 
-class LeanPRReviewV5ArmData(LeanPRReviewV4CandidateData):
+class ReviewArmData(LeanPRReviewV4CandidateData):
     task_type: str = ARM_TASK_TYPE
     #: `wu:…#arm_id`. Finer than the work unit, because several arms share one.
     invocation_id: str
@@ -96,19 +96,19 @@ class LeanPRReviewV5ArmData(LeanPRReviewV4CandidateData):
     trace_path: Optional[str] = None
 
 
-class LeanPRReviewV5ArmResult(LeanPRReviewV4CandidateResult):
+class ReviewArmResult(LeanPRReviewV4CandidateResult):
     invocation_id: Optional[str] = None
     arm_id: Optional[str] = None
     spec_id: Optional[str] = None
 
 
-class LeanPRReviewV5ArmTask(LeanPRReviewV4CandidateTask):
+class ReviewArmTask(LeanPRReviewV4CandidateTask):
     task_type = ARM_TASK_TYPE
-    data_class = LeanPRReviewV5ArmData
-    task_config_class = LeanPRReviewV5ArmConfig
-    task_result_class = LeanPRReviewV5ArmResult
+    data_class = ReviewArmData
+    task_config_class = ReviewArmConfig
+    task_result_class = ReviewArmResult
 
-    def create_result(self, success: bool, score: float, **kwargs) -> LeanPRReviewV5ArmResult:
+    def create_result(self, success: bool, score: float, **kwargs) -> ReviewArmResult:
         """Stamp the invocation's identity onto every result.
 
         Taken from `self.data`, never from anything the model supplied: the whole point of
@@ -206,4 +206,4 @@ class LeanPRReviewV5ArmTask(LeanPRReviewV4CandidateTask):
         return ", ".join([base] + extra) if extra else base
 
 
-register_task(ARM_TASK_TYPE, LeanPRReviewV5ArmTask)
+register_task(ARM_TASK_TYPE, ReviewArmTask)

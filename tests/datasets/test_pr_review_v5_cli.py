@@ -235,8 +235,8 @@ def test_no_prompt_offers_the_model_a_tool_it_does_not_have():
     line advertised "navigate declarations (hover/goto/references)" to every task in every
     generation."""
 
-    from ape.tasks.lean_tasks.formal_math import review_task as base
-    from ape.tasks.lean_tasks.formal_math.pr_shared import focused_prompts
+    from ape.tasks.lean_tasks.formal_math.review import base
+    from ape.tasks.lean_tasks.formal_math.review import focused_prompts
 
     for module in (focused_prompts, base):
         source = Path(module.__file__).read_text(encoding="utf-8")

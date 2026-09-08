@@ -184,7 +184,7 @@ def test_every_context_tool_records_a_gate():
     from pathlib import Path
 
     source = Path(
-        "src/ape/tasks/lean_tasks/formal_math/pr_review_v5/context_tools.py"
+        "src/ape/tasks/lean_tasks/formal_math/review/context_tools.py"
     ).read_text(encoding="utf-8")
 
     tools = ("zulip_search", "precedent_search", "declaration_search")
@@ -213,7 +213,7 @@ def test_a_base_snapshot_call_carries_the_commit_it_read():
     from pathlib import Path
 
     source = Path(
-        "src/ape/tasks/lean_tasks/formal_math/pr_review_v5/context_tools.py"
+        "src/ape/tasks/lean_tasks/formal_math/review/context_tools.py"
     ).read_text(encoding="utf-8")
     block = source[source.index('"tool": "declaration_search"'):]
     block = block[:block.index("return {")]

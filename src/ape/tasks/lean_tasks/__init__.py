@@ -76,7 +76,7 @@ from .formal_math.pr_review_v2 import (
     LeanPRReviewDistillTask,
     PRDistillResult,
 )
-from .formal_math.pr_review_v4 import (
+from .formal_math.review import (
     LeanPRReviewV4CandidateConfig,
     LeanPRReviewV4CandidateData,
     LeanPRReviewV4CandidateResult,
@@ -93,17 +93,14 @@ from .formal_math.pr_review_v4 import (
     LeanPRReviewV4JudgmentData,
     LeanPRReviewV4JudgmentResult,
     LeanPRReviewV4JudgmentTask,
+    ReviewArmConfig,
+    ReviewArmData,
+    ReviewArmTask,
+    ReviewLeadConfig,
+    ReviewLeadData,
+    ReviewLeadTask,
 )
-from .formal_math.pr_review_v5 import (
-    LeanPRReviewV5ArmConfig,
-    LeanPRReviewV5ArmData,
-    LeanPRReviewV5ArmResult,
-    LeanPRReviewV5ArmTask,
-    LeanPRReviewV5LeadConfig,
-    LeanPRReviewV5LeadData,
-    LeanPRReviewV5LeadResult,
-    LeanPRReviewV5LeadTask,
-)
+
 from .formal_math.pr_split import (
     PRSplitChunk,
     PRSplitConfig,
@@ -187,14 +184,14 @@ __all__ = [
     'LeanPRReviewV4FocusedResult',
     'LeanPRReviewV4FocusedTask',
     'LeanPRReviewV4CandidateTask',
-    'LeanPRReviewV5ArmConfig',
-    'LeanPRReviewV5ArmData',
-    'LeanPRReviewV5ArmResult',
-    'LeanPRReviewV5ArmTask',
-    'LeanPRReviewV5LeadConfig',
-    'LeanPRReviewV5LeadData',
-    'LeanPRReviewV5LeadResult',
-    'LeanPRReviewV5LeadTask',
+    'ReviewArmConfig',
+    'ReviewArmData',
+    'ReviewArmResult',
+    'ReviewArmTask',
+    'ReviewLeadConfig',
+    'ReviewLeadData',
+    'ReviewLeadResult',
+    'ReviewLeadTask',
     'PRSplitChunk',
     'PRSplitConfig',
     'PRSplitData',

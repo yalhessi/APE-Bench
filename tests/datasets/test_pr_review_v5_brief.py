@@ -20,11 +20,11 @@ import json
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import (
+from ape.tasks.lean_tasks.formal_math.review.delegation import (
     JobSpec,
     compose_prompt,
 )
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.lead import InvestigationBrief
+from ape.tasks.lean_tasks.formal_math.review.lead import InvestigationBrief
 
 
 def _brief(**overrides):
@@ -160,7 +160,7 @@ def test_a_job_spec_carries_both_the_text_and_the_record():
 
 
 def test_the_lead_prompt_asks_for_questions_not_answers():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.prompts import LEAD_SYSTEM
+    from ape.tasks.lean_tasks.formal_math.review.prompts import LEAD_SYSTEM
 
     assert "question, not an answer" in LEAD_SYSTEM
     assert "A brief that turns out to be wrong is a good brief" in LEAD_SYSTEM

@@ -95,7 +95,7 @@ def test_nested_execution_does_not_inherit_a_process_pool(tmp_path):
     `num_processes > 0` creates a process pool inside a pool. `_wave_config` sets it to 0, and
     that is load-bearing rather than incidental."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5 import delegation
+    from ape.tasks.lean_tasks.formal_math.review import delegation
 
     source = Path(delegation.__file__).read_text(encoding="utf-8")
     assert "num_processes = 0" in source or "num_processes=0" in source

@@ -116,7 +116,7 @@ def _task(tmp_path, context_tools, cutoff="2025-06-01T00:00:00Z", pr_number=3309
 
 
 def _register(task):
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.context_tools import (
+    from ape.tasks.lean_tasks.formal_math.review.context_tools import (
         register_context_tools,
     )
 

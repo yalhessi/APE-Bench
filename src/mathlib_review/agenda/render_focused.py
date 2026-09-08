@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
-from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
+from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
 
 from src.mathlib_review.agenda.focused_specs import FocusedAgentSpec, FocusedInvocation
 from src.mathlib_review.io import canonical_json_bytes, sha256_bytes

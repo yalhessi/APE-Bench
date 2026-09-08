@@ -17,14 +17,14 @@ import asyncio
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+from ape.tasks.lean_tasks.formal_math.review.candidates import (
     CandidateSubmission,
     LeanPRReviewV4CandidateTask,
 )
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
+from ape.tasks.lean_tasks.formal_math.review.arm import (
     ARM_TASK_TYPE,
-    LeanPRReviewV5ArmData,
-    LeanPRReviewV5ArmTask,
+    ReviewArmData,
+    ReviewArmTask,
 )
 
 
@@ -65,14 +65,14 @@ def _data(**overrides):
         },
     )
     payload.update(overrides)
-    return LeanPRReviewV5ArmData(**payload)
+    return ReviewArmData(**payload)
 
 
 @pytest.fixture
 def submit():
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    task = LeanPRReviewV5ArmTask(_data(), ApeAgentConfig())
+    task = ReviewArmTask(_data(), ApeAgentConfig())
     mcp = FakeMCP()
     asyncio.run(task.register_task_tools(mcp))
     return mcp.tools["submit_candidates"]
@@ -179,7 +179,7 @@ def test_v5_does_not_reimplement_any_part_of_the_contract():
     check that is measured, and would drift from the version the baseline was measured under.
     """
 
-    owned = set(LeanPRReviewV5ArmTask.__dict__)
+    owned = set(ReviewArmTask.__dict__)
     # The checks themselves. A second implementation of any of these drifts from the version
     # the v2 recall baseline was measured under.
     for method in ("_verify_candidate_submission", "_statement_gate_error"):
@@ -196,13 +196,13 @@ def test_v5_does_not_reimplement_any_part_of_the_contract():
     # The one legitimate override extends rather than replaces.
     import inspect
 
-    source = inspect.getsource(LeanPRReviewV5ArmTask.register_task_tools)
+    source = inspect.getsource(ReviewArmTask.register_task_tools)
     assert "super().register_task_tools(mcp)" in source
 
 
 def test_the_arm_is_a_v4_candidate_task():
-    assert issubclass(LeanPRReviewV5ArmTask, LeanPRReviewV4CandidateTask)
-    assert LeanPRReviewV5ArmTask.task_type == ARM_TASK_TYPE
+    assert issubclass(ReviewArmTask, LeanPRReviewV4CandidateTask)
+    assert ReviewArmTask.task_type == ARM_TASK_TYPE
 
 
 def test_identity_comes_from_the_invocation_not_the_model():
@@ -212,7 +212,7 @@ def test_identity_comes_from_the_invocation_not_the_model():
 
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    task = LeanPRReviewV5ArmTask(_data(), ApeAgentConfig())
+    task = ReviewArmTask(_data(), ApeAgentConfig())
     result = task.create_result(
         success=True, score=1.0, pr_number=33098, work_unit_id="wu:abc",
         rendered_prompt_sha256="a" * 64, candidates=[], verification_artifacts=[],
@@ -245,7 +245,7 @@ def test_a_specialist_claiming_outside_its_concern_is_recorded_not_refused(submi
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    task = LeanPRReviewV5ArmTask(
+    task = ReviewArmTask(
         _data(arm_id="generality", spec_id="generality"),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     mcp = FakeMCP()
@@ -263,7 +263,7 @@ def test_claiming_outside_its_concern_leaves_a_trace():
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    task = LeanPRReviewV5ArmTask(
+    task = ReviewArmTask(
         _data(arm_id="generality", spec_id="generality"),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     off = {"concern_family": "style"}
@@ -281,7 +281,7 @@ def test_the_generalist_is_never_off_concern():
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    task = LeanPRReviewV5ArmTask(
+    task = ReviewArmTask(
         _data(arm_id="generalist", spec_id=None),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     candidate = {"concern_family": "style"}
@@ -293,7 +293,7 @@ def test_a_specialist_may_make_its_own_kind_of_claim(submit):
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    task = LeanPRReviewV5ArmTask(
+    task = ReviewArmTask(
         _data(arm_id="duplication", spec_id="duplication"),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     mcp = FakeMCP()
@@ -308,7 +308,7 @@ def test_golf_and_idiom_share_a_family_but_stay_distinct():
     """They inspect the same proofs and make different claims; `spec_id` keeps them apart,
     not the concern family. Splitting them by family would repeal one arm's warrant."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import EXPECTED_CONCERN_BY_ARM
+    from ape.tasks.lean_tasks.formal_math.review.arm import EXPECTED_CONCERN_BY_ARM
 
     assert EXPECTED_CONCERN_BY_ARM["proof_golf"] == EXPECTED_CONCERN_BY_ARM["proof_idiom"]
     assert EXPECTED_CONCERN_BY_ARM["proof_golf"] == {"proof-golf"}
@@ -320,10 +320,10 @@ def test_the_generalist_has_no_concern_filter(submit):
 
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import EXPECTED_CONCERN_BY_ARM
+    from ape.tasks.lean_tasks.formal_math.review.arm import EXPECTED_CONCERN_BY_ARM
 
     assert "generalist" not in EXPECTED_CONCERN_BY_ARM
-    task = LeanPRReviewV5ArmTask(
+    task = ReviewArmTask(
         _data(arm_id="generalist", spec_id=None),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     mcp = FakeMCP()

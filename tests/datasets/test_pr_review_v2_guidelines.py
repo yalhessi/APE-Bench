@@ -34,7 +34,7 @@ def test_guidelines_block_has_calibration_framing():
 def test_guidelines_task_appends_guidelines_to_holistic_system_prompt():
     # The guidelines agent's system prompt = the holistic agent's system prompt + guidelines.
     # create_system_prompt only reads config.task_config.prompt_version.
-    from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewConfig
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewConfig
 
     async def system_prompt_for(task_cls):
         task = task_cls.__new__(task_cls)          # avoid full scaffold init

@@ -287,7 +287,7 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
             raise ValueError(f"candidate {index} primary_entity_id does not match its change target")
         proposed_edit_raw = raw.get("proposed_edit")
         if proposed_edit_raw:
-            from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+            from ape.tasks.lean_tasks.formal_math.review.candidates import (
                 normalize_proposed_edit_path,
             )
 

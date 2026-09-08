@@ -122,7 +122,7 @@ def test_docs_and_style_are_separate_arms():
 
 
 def test_every_arm_has_a_prompt():
-    from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
 
     for spec in v5_specs():
         assert spec.spec_id in FOCUSED_PROMPTS, spec.spec_id
@@ -134,7 +134,7 @@ def test_each_arm_prompt_refuses_the_other_concerns():
     """An arm that drifts has its findings rejected at submission, so the prompt has to say
     what it is not for."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
 
     for spec_id in ("naming", "docs", "style", "api_reuse", "correctness"):
         _tools, system, _user = FOCUSED_PROMPTS[spec_id]
@@ -143,7 +143,7 @@ def test_each_arm_prompt_refuses_the_other_concerns():
 
 
 def test_the_concern_gate_covers_every_specialist():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import EXPECTED_CONCERN_BY_ARM
+    from ape.tasks.lean_tasks.formal_math.review.arm import EXPECTED_CONCERN_BY_ARM
 
     for spec in v5_specs():
         assert spec.spec_id in EXPECTED_CONCERN_BY_ARM, spec.spec_id

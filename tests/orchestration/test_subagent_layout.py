@@ -77,7 +77,7 @@ def test_a_review_task_writes_no_scratch_file():
     The reviewed file lives in `target/`, read-only to the agent and readable by the
     compiler."""
 
-    from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewTask
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
 
     assert BasePRReviewTask.lean_verify_allows_target is True
     source = inspect.getsource(BasePRReviewTask)
@@ -85,7 +85,7 @@ def test_a_review_task_writes_no_scratch_file():
 
 
 def _outcome(**candidate):
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import JobOutcome
+    from ape.tasks.lean_tasks.formal_math.review.delegation import JobOutcome
 
     return JobOutcome(
         invocation_id="wu:1#proof_golf", arm_id="proof_golf", work_unit_id="wu:1",

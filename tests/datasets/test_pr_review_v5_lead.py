@@ -16,10 +16,10 @@ import json
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.lead import (
+from ape.tasks.lean_tasks.formal_math.review.lead import (
     LEAD_TASK_TYPE,
-    LeanPRReviewV5LeadData,
-    LeanPRReviewV5LeadTask,
+    ReviewLeadData,
+    ReviewLeadTask,
 )
 
 
@@ -88,7 +88,7 @@ def _pool_file(tmp_path):
 def lead(tmp_path):
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    data = LeanPRReviewV5LeadData(
+    data = ReviewLeadData(
         task_id="pr5lead_test", episode_id="ep:1", pr_number=33098,
         pr_title="t", pr_description="d", diff="--- a\n+++ b\n",
         changed_files=["Mathlib/A.lean"], proposals=list(PROPOSALS),
@@ -99,7 +99,7 @@ def lead(tmp_path):
                           "repo_url": "https://example.invalid/m.git",
                           "default_target": "Mathlib"},
     )
-    task = LeanPRReviewV5LeadTask(data, ApeAgentConfig())
+    task = ReviewLeadTask(data, ApeAgentConfig())
     mcp = FakeMCP()
     asyncio.run(task.register_task_tools(mcp))
     return task, mcp.tools
@@ -108,7 +108,7 @@ def lead(tmp_path):
 def test_the_lead_task_is_registered():
     from ape.tasks.base import get_task_class
 
-    assert get_task_class(LEAD_TASK_TYPE) is LeanPRReviewV5LeadTask
+    assert get_task_class(LEAD_TASK_TYPE) is ReviewLeadTask
 
 
 def test_the_agenda_is_ranked_work_units_not_a_hash_ordered_page(lead):
@@ -156,13 +156,13 @@ def test_task_data_without_a_census_still_serves_the_agenda(tmp_path):
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
 
-    data = LeanPRReviewV5LeadData(
+    data = ReviewLeadData(
         task_id="t", episode_id="ep:1", pr_number=33098, pr_title="t", pr_description="d",
         diff="d", changed_files=["A.lean"], proposals=list(PROPOSALS), census=[],
         arm_pool_path=str(_pool_file(tmp_path)),
         target_workspace={"name": "target", "commit_hash": "c" * 40,
                           "repo_url": "https://e.invalid/m.git", "default_target": "Mathlib"})
-    task = LeanPRReviewV5LeadTask(
+    task = ReviewLeadTask(
         data, ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     mcp = FakeMCP()
     asyncio.run(task.register_task_tools(mcp))
@@ -318,7 +318,7 @@ def test_the_floor_does_not_spend_the_delegation_budget(lead):
     of 30 with eight specialists on a 22-unit PR — a formality, not a routing decision."""
 
     task, _tools = lead
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import JobSpec
+    from ape.tasks.lean_tasks.formal_math.review.delegation import JobSpec
 
     state = task._state()
     for disposition, invocation in (("mandatory", "wu:1#generalist"),
@@ -330,7 +330,7 @@ def test_the_floor_does_not_spend_the_delegation_budget(lead):
 
 
 def test_the_lead_prompt_describes_the_floor_as_its_first_wave():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.prompts import LEAD_SYSTEM
+    from ape.tasks.lean_tasks.formal_math.review.prompts import LEAD_SYSTEM
 
     assert "first wave is a broad sweep you do not choose" in LEAD_SYSTEM
     assert "empty `jobs` list" in LEAD_SYSTEM
@@ -378,7 +378,7 @@ def test_remaining_budget_is_reported_back(lead):
 
     import inspect
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5 import lead as lead_module
+    from ape.tasks.lean_tasks.formal_math.review import lead as lead_module
 
     assert "spend_remaining" in inspect.getsource(lead_module)
 
@@ -396,7 +396,7 @@ def test_the_floor_does_not_consume_the_per_pr_cost_cap(lead):
     state["spend"] = 10.05          # a large floor
     state["delegated_spend"] = 0.0  # but nothing the lead chose
     # Stub the executor: what is under test is the admission decision, not the spawn.
-    import ape.tasks.lean_tasks.formal_math.pr_review_v5.lead as lead_module
+    import ape.tasks.lean_tasks.formal_math.review.lead as lead_module
 
     async def _no_jobs(*_a, **_k):
         return []

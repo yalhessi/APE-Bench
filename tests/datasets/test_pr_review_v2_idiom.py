@@ -2,7 +2,7 @@
 
 import ape.tasks.lean_tasks  # noqa: F401  (triggers registration)
 from ape.tasks.base import get_task_class
-from ape.tasks.lean_tasks.formal_math.review_task import VerifiedPRReviewTask
+from ape.tasks.lean_tasks.formal_math.review.base import VerifiedPRReviewTask
 from ape.tasks.lean_tasks.formal_math.pr_review_v2.golf import GOLF_SYSTEM
 from ape.tasks.lean_tasks.formal_math.pr_review_v2.idiom import (
     IDIOM_SYSTEM,

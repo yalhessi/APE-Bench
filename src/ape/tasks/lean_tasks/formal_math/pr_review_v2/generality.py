@@ -13,12 +13,12 @@ from typing import List, Tuple
 
 from ape.tasks.base import register_task
 
-from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewConfig, VerifiedPRReviewTask
+from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewConfig, VerifiedPRReviewTask
 
-# The prompt text now lives in `pr_shared.focused_prompts` so the v4 focused arm can
+# The prompt text now lives in `review.focused_prompts` so the v4 focused arm can
 # reuse it without a code edge into this frozen generation. Re-exported here under the
 # original names: they are this module's public surface and the config default below.
-from ..pr_shared.focused_prompts import GEN_TOOLS, GEN_SYSTEM, GEN_USER  # noqa: F401
+from ape.tasks.lean_tasks.formal_math.review.focused_prompts import GEN_TOOLS, GEN_SYSTEM, GEN_USER  # noqa: F401
 
 
 class LeanPRReviewGenConfig(BasePRReviewConfig):

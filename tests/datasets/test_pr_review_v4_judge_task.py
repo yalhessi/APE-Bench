@@ -24,7 +24,7 @@ from src.mathlib_review.schema import (
 )
 
 from ape.tasks.base import create_task_from_data, get_task_class, list_task_types
-from ape.tasks.lean_tasks.formal_math.pr_review_v4 import judgment as judge_task
+from ape.tasks.lean_tasks.formal_math.review import judgment as judge_task
 
 
 def _pair():

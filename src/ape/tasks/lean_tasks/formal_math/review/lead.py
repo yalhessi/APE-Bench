@@ -33,7 +33,7 @@ from typing import Annotated, Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 from ape.tasks.base import EvaluationResult, register_task
-from ape.tasks.lean_tasks.formal_math.review_task import (
+from ape.tasks.lean_tasks.formal_math.review.base import (
     BasePRReviewConfig,
     BasePRReviewData,
     BasePRReviewResult,
@@ -205,7 +205,7 @@ LEAD_TOOLS = ["file_read", "content_search", "lean_verify_edit"]
 AGENDA_PAGE = 40
 
 
-class LeanPRReviewV5LeadConfig(BasePRReviewConfig):
+class ReviewLeadConfig(BasePRReviewConfig):
     enabled_tools: List[str] = list(LEAD_TOOLS)
     #: The per-job `standard` cap. `cheap` and `deep` are multiples of it. Required for a
     #: real run: a lead with no cost policy can spend the whole run on one work unit.
@@ -222,7 +222,7 @@ class LeanPRReviewV5LeadConfig(BasePRReviewConfig):
     per_pr_cost_cap: float = 2.0
 
 
-class LeanPRReviewV5LeadData(BasePRReviewData):
+class ReviewLeadData(BasePRReviewData):
     task_type: str = LEAD_TASK_TYPE
     episode_id: str
     #: Proposal metadata only — no prompt text. The text lives in the pool file, which is
@@ -245,12 +245,9 @@ class LeanPRReviewV5LeadData(BasePRReviewData):
     #: reader of the finished run does not have to recover "which arm, which wave" by parsing
     #: a directory name at a fixed depth.
     execution_index_path: Optional[str] = None
-    #: `work_unit_id -> {status, claims[]}` from the mandatory generalist pass, which
-    #: runs before the lead. Empty when the floor produced nothing.
-    floor_summary: Dict[str, Any] = Field(default_factory=dict)
 
 
-class LeanPRReviewV5LeadResult(BasePRReviewResult):
+class ReviewLeadResult(BasePRReviewResult):
     model_config = ConfigDict()
 
     episode_id: str = ""
@@ -278,13 +275,13 @@ class LeanPRReviewV5LeadResult(BasePRReviewResult):
     coverage_gaps: List[Dict[str, Any]] = Field(default_factory=list)
 
 
-class LeanPRReviewV5LeadTask(BasePRReviewTask):
+class ReviewLeadTask(BasePRReviewTask):
     task_type = LEAD_TASK_TYPE
-    data_class = LeanPRReviewV5LeadData
-    task_config_class = LeanPRReviewV5LeadConfig
-    task_result_class = LeanPRReviewV5LeadResult
+    data_class = ReviewLeadData
+    task_config_class = ReviewLeadConfig
+    task_result_class = ReviewLeadResult
 
-    def _task_config(self) -> LeanPRReviewV5LeadConfig:
+    def _task_config(self) -> ReviewLeadConfig:
         """The cost policy, with declared defaults when none was supplied.
 
         `create_task_from_data` always builds one, but a task constructed directly — a test,
@@ -364,32 +361,8 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
             standard_cap=f"{self._task_config().standard_budget_cap:.2f}",
             max_delegations=self._task_config().max_delegations,
             tool_prefix=self.config.mcp_server_name,
-            floor_block=self._floor_block(),
             diff=self.data.diff,
         )
-
-    def _floor_block(self) -> str:
-        """Render the floor's findings, or say plainly that it found nothing.
-
-        Silence is information for routing — a work unit the generalist had nothing to say
-        about is a candidate for a specialist, not a reason to skip it."""
-
-        summary = self.data.floor_summary or {}
-        if not summary:
-            return "_(the generalist pass returned no findings)_"
-        lines = []
-        for unit_id, row in sorted(summary.items()):
-            claims = row.get("claims") or []
-            if not claims:
-                lines.append(f"- `{unit_id}` — generalist found nothing")
-                continue
-            lines.append(f"- `{unit_id}` — {len(claims)} finding(s):")
-            for claim in claims[:6]:
-                lines.append(
-                    f"    - [{claim.get('concern_family')}] "
-                    f"`{claim.get('primary_subject')}`: {claim.get('claim')}"
-                )
-        return "\n".join(lines)
 
     # --- pool ----------------------------------------------------------------------
     def _pool(self) -> Dict[str, Dict[str, Any]]:
@@ -961,4 +934,4 @@ class LeanPRReviewV5LeadTask(BasePRReviewTask):
         return bool(result.success)
 
 
-register_task(LEAD_TASK_TYPE, LeanPRReviewV5LeadTask)
+register_task(LEAD_TASK_TYPE, ReviewLeadTask)

@@ -157,7 +157,7 @@ def test_every_nested_call_site_uses_the_shared_convention():
     from pathlib import Path
 
     sources = {
-        "delegation": "src/ape/tasks/lean_tasks/formal_math/pr_review_v5/delegation.py",
+        "delegation": "src/ape/tasks/lean_tasks/formal_math/review/delegation.py",
         "judgment": "src/ape/tasks/lean_tasks/formal_math/judgment/task.py",
         "review_gate": (
             "src/ape/tasks/lean_tasks/formal_math/reviewed_proof_engineering/review_gate.py"),

@@ -55,18 +55,18 @@ def _freeform_objects(node, path="") -> list:
 def lead_task():
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.lead import (
-        LeanPRReviewV5LeadData,
-        LeanPRReviewV5LeadTask,
+    from ape.tasks.lean_tasks.formal_math.review.lead import (
+        ReviewLeadData,
+        ReviewLeadTask,
     )
 
-    data = LeanPRReviewV5LeadData(
+    data = ReviewLeadData(
         task_id="t", episode_id="ep:1", pr_number=1, pr_title="t", pr_description="d",
         diff="d", changed_files=["A.lean"], proposals=[], arm_pool_path="/tmp/x.jsonl",
         target_workspace={"name": "target", "commit_hash": "c" * 40,
                           "repo_url": "https://e.invalid/m.git", "default_target": "Mathlib"},
     )
-    return LeanPRReviewV5LeadTask(
+    return ReviewLeadTask(
         data, ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
 
 
@@ -133,12 +133,12 @@ def test_the_arm_tools_are_clean_too():
 
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
-        LeanPRReviewV5ArmData,
-        LeanPRReviewV5ArmTask,
+    from ape.tasks.lean_tasks.formal_math.review.arm import (
+        ReviewArmData,
+        ReviewArmTask,
     )
 
-    data = LeanPRReviewV5ArmData(
+    data = ReviewArmData(
         task_id="t", invocation_id="wu:a#proof_golf", arm_id="proof_golf",
         spec_id="proof_golf", work_unit_id="wu:a", episode_id="ep:1", pr_number=1,
         diff="d", changed_files=["A.lean"], change_ids=["change:a"],
@@ -152,7 +152,7 @@ def test_the_arm_tools_are_clean_too():
         target_workspace={"name": "target", "commit_hash": "c" * 40,
                           "repo_url": "https://e.invalid/m.git", "default_target": "Mathlib"},
     )
-    task = LeanPRReviewV5ArmTask(
+    task = ReviewArmTask(
         data, ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
     offenders = {
         name: _freeform_objects(schema)

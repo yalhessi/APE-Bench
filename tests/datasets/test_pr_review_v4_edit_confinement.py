@@ -13,7 +13,7 @@ behaviour rather than silently rejecting everything.
 
 from __future__ import annotations
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import normalize_candidate_edit
+from ape.tasks.lean_tasks.formal_math.review.candidates import normalize_candidate_edit
 
 CHANGED_FILES = ["Mathlib/A.lean", "Mathlib/B.lean"]
 PATHS = {"change:a": "Mathlib/A.lean", "change:b": "Mathlib/B.lean"}

@@ -5,18 +5,11 @@ files across six packages: 97 names imported from v4 into v5, **backward** edges
 imported v5, 42 private cross-module imports, and a shared review base living inside the
 oldest generation so that a v5-only observation changed the tool contract for every v2 checker.
 
-The review pipeline is one package now -- `src/mathlib_review/` -- and these pin what that
-bought, plus the boundaries inside it:
-
-* no generation imports a later one, asserted as zero rather than budgeted;
-* v5 -> v2 is zero;
-* private names do not cross a generation;
-* inside `mathlib_review`, three private imports cross a module boundary (down from 42 across
-  the tree, though most of that 42 became legitimate sibling imports when the packages
-  merged -- the honest comparison is the three, not the drop).
-
-What remains under a generation name is the *task* packages: the classes an orchestrator
-schedules. v2 keeps its data work, which has not moved.
+There is one review pipeline now (`src/mathlib_review/`) and one review task package
+(`ape/tasks/lean_tasks/formal_math/review/`). **v2 is the only thing left carrying a
+generation name**, which is why the cross-generation checks below have little left to compare:
+that is the result, not a gap in the test. They stay because they are cheap and because the
+next thing that reintroduces a generation should fail loudly.
 """
 
 from __future__ import annotations
@@ -29,16 +22,17 @@ import pytest
 
 SRC = Path("src")
 
-#: Packages that make up the review system, newest first.
-#: What is left that is generation-shaped. The *pipeline* is no longer: v4 and v5 both moved
-#: into `src/mathlib_review/`, so these are the task packages -- the classes an orchestrator
-#: schedules -- plus v2, whose data work has not moved yet.
+#: What still carries a generation name. v4 and v5 are gone from both layers: the pipeline is
+#: `src/mathlib_review/`, the tasks are `formal_math/review/`.
 GENERATIONS = {
-    "v5": ("src/ape/tasks/lean_tasks/formal_math/pr_review_v5",),
-    "v4": ("src/ape/tasks/lean_tasks/formal_math/pr_review_v4",),
     "v2": ("src/datasets/pr_review_v2",
            "src/ape/tasks/lean_tasks/formal_math/pr_review_v2"),
 }
+
+#: Where the review system lives now, for the checks that are about it rather than about
+#: what it replaced.
+PIPELINE = Path("src/mathlib_review")
+TASKS = Path("src/ape/tasks/lean_tasks/formal_math/review")
 
 
 def _modules(prefixes):
@@ -78,44 +72,6 @@ def _cross_generation_edges(source: str, target: str):
     return edges
 
 
-def test_no_generation_imports_a_later_one():
-    """13 -> 0, and this asserts zero.
-
-    Two clusters moved to `src/mathlib_review/` as shared primitives: `paths` (the judge
-    deriving its own paths from the run it scores) and `patchset` (the coordinated multi-file
-    edit, used by the shared candidate contract). The last four were v4's `review_overlay`
-    importing `delegation_view` to render a v5 run -- a reader reaching forward to the
-    generation whose output it displays -- and they went when the pipeline stopped being a
-    generation at all. `delegation_view` is `mathlib_review.analysis.delegation_view` now, and
-    v4 importing it is an ordinary forward edge to shared code.
-
-    v5 -> v4 remains, and is fine: the newer task package builds on the older one's candidate
-    contract, which is what inheritance is.
-    """
-
-    backward = (_cross_generation_edges("v4", "v5")
-                + _cross_generation_edges("v2", "v4")
-                + _cross_generation_edges("v2", "v5"))
-    assert backward == [], (
-        "an older generation imports a newer one:\n" +
-        "\n".join(f"  {p}: {m}.{n}" for p, m, n in backward))
-
-
-def test_v5_does_not_reach_back_into_v2_at_all():
-    """6 -> 0, and this one gets to assert zero.
-
-    Four were the shared review base, which v5's lead inherited from inside v2 and which now
-    lives beside the generations. Two were `corpus._eval_pr_numbers` and
-    `precedent_bench.hunk_code` -- the eval-set exclusion and the diff-hunk reader, both of
-    which are about what a reviewer may see and neither of which is v2's.
-    """
-
-    edges = _cross_generation_edges("v5", "v2")
-    assert edges == [], (
-        "v5 reaches back into v2:\n" +
-        "\n".join(f"  {p}: {m}.{n}" for p, m, n in edges))
-
-
 def _private_cross_module_imports():
     found = []
     for prefixes in GENERATIONS.values():
@@ -129,6 +85,45 @@ def _private_cross_module_imports():
                     continue
                 found.append((str(path), module, name))
     return found
+
+
+def test_the_review_system_does_not_import_v2():
+    """13 backward edges, then 4, then 0 -- and now the question has changed shape.
+
+    There is no later generation for an older one to import, so what is left to check is the
+    direction between the review system and the one package still carrying a generation name.
+    It is one-way: `mathlib_review` and `formal_math/review` import nothing from v2, and v2
+    imports the shared primitives (`model_output.extract_json_object`, `corpus.hunk_code` and
+    `corpus.eval_pr_numbers`) from them.
+
+    That is the right direction. v2 depending on a shared primitive is ordinary; the review
+    system depending on v2 would mean v2 cannot be deleted.
+    """
+
+    offenders = []
+    for root in (PIPELINE, TASKS):
+        for path in sorted(root.rglob("*.py")):
+            if "__pycache__" in path.parts:
+                continue
+            for module, name in _imports(path):
+                if re.search(r"pr_review_v2\b", module):
+                    offenders.append((str(path), module, name))
+    assert offenders == [], (
+        "the review system imports v2, which is what would stop v2 being deletable:\n" +
+        "\n".join(f"  {p}: {m}.{n}" for p, m, n in offenders))
+
+
+def test_v2_reaches_forward_for_the_shared_primitives():
+    """The other half, and it is what makes the previous test meaningful rather than vacuous:
+    the two packages *do* share code, and every edge runs the same way."""
+
+    edges = [
+        (str(path), module)
+        for path in _modules(GENERATIONS["v2"])
+        for module, _name in _imports(path)
+        if module.startswith("src.mathlib_review")
+    ]
+    assert edges, "v2 shares nothing, so the direction test proves nothing"
 
 
 def test_private_cross_boundary_imports_do_not_increase():
@@ -179,28 +174,35 @@ def test_the_shared_review_base_belongs_to_no_generation():
     v5-only observation about `lean_verify_edit` changed the tool contract for every v2
     checker and every v4 arm. This session did exactly that before moving it.
 
-    Now it is `formal_math/review_task.py`, beside the generations. Inside the task tree
-    rather than in `src/mathlib_review/`, because `ape/tasks/__init__.py` imports every task
-    package eagerly and a `BaseLeanTask` subclass outside that tree cannot import
-    `ape.tasks.base` without a cycle.
+    It is `review/base.py` now -- inside the task package, because `ape/tasks/__init__.py`
+    imports every task package eagerly and a `BaseLeanTask` subclass outside that tree cannot
+    import `ape.tasks.base` without a cycle. That is the framework's layout saying where task
+    classes go.
     """
 
-    shared = Path("src/ape/tasks/lean_tasks/formal_math/review_task.py")
-    assert shared.is_file()
-    assert not Path("src/ape/tasks/lean_tasks/formal_math/pr_review_v2/base.py").exists()
+    assert (TASKS / "base.py").is_file()
+    for gone in ("src/ape/tasks/lean_tasks/formal_math/pr_review_v2/base.py",
+                 "src/ape/tasks/lean_tasks/formal_math/review_task.py"):
+        assert not Path(gone).exists(), f"{gone} came back"
 
+    # v2 still inherits it, from its new home rather than from inside itself.
     importers = {
-        str(path) for path in _modules(sum(GENERATIONS.values(), ()))
+        str(path) for path in _modules(GENERATIONS["v2"])
         for module, _name in _imports(path)
-        if module.endswith("formal_math.review_task")
+        if module.endswith("formal_math.review.base")
     }
-    for generation in ("pr_review_v2", "pr_review_v4", "pr_review_v5"):
-        assert any(generation in item for item in importers), generation
+    assert importers, "v2 no longer inherits the shared base"
 
-    # And no generation re-exports it. Doing so is what made `ape.tasks` pull v2 in to reach a
-    # class v2 does not own.
-    init = Path("src/ape/tasks/lean_tasks/formal_math/pr_review_v2/__init__.py")
-    assert "BasePRReviewTask" not in init.read_text(encoding="utf-8").split('"""')[-1]
+
+def test_the_generation_packages_are_gone():
+    """The collapse, asserted rather than described. Both layers: the pipeline packages and
+    the task packages."""
+
+    for gone in ("src/datasets/pr_review_v4", "src/datasets/pr_review_v5",
+                 "src/ape/tasks/lean_tasks/formal_math/pr_review_v4",
+                 "src/ape/tasks/lean_tasks/formal_math/pr_review_v5"):
+        assert not Path(gone).exists(), f"{gone} came back"
+    assert PIPELINE.is_dir() and TASKS.is_dir()
 
 
 def test_tier_multipliers_has_exactly_one_definition():

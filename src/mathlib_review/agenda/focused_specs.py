@@ -119,7 +119,7 @@ def prompt_hashes() -> Dict[str, Tuple[str, str]]:
     deliberately not done.
     """
 
-    from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
 
     return {
         name: (

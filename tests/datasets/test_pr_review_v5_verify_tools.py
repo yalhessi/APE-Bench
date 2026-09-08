@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.review_task import (
+from ape.tasks.lean_tasks.formal_math.review.base import (
     _declaration_prefix_start,
     _supplies_own_prefix,
 )
@@ -113,17 +113,17 @@ def test_self_decorated_replacements_are_recognised(text, expected):
 def task(tmp_path):
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
-        LeanPRReviewV5ArmData,
-        LeanPRReviewV5ArmTask,
+    from ape.tasks.lean_tasks.formal_math.review.arm import (
+        ReviewArmData,
+        ReviewArmTask,
     )
     from ape.tasks.models import WorkspaceInfo
 
     root = tmp_path / "target"
     (root / "Mathlib").mkdir(parents=True)
     (root / "Mathlib" / "A.lean").write_text(SRC)
-    item = LeanPRReviewV5ArmTask(
-        LeanPRReviewV5ArmData(
+    item = ReviewArmTask(
+        ReviewArmData(
             task_id="t", invocation_id="wu:a#proof_golf", arm_id="proof_golf",
             spec_id="proof_golf", work_unit_id="wu:a", episode_id="ep:1", pr_number=1,
             diff="d", changed_files=["Mathlib/A.lean"], change_ids=["change:a"],
@@ -204,11 +204,11 @@ def test_a_missing_declaration_says_so(task):
 # --------------------------------------------------------------------------------------
 
 def test_review_tasks_opt_in_to_reading_the_reviewed_file():
-    from ape.tasks.lean_tasks.formal_math.review_task import BasePRReviewTask
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
 
     assert BasePRReviewTask.lean_verify_allows_target is True
-    assert LeanPRReviewV5ArmTask.lean_verify_allows_target is True
+    assert ReviewArmTask.lean_verify_allows_target is True
 
 
 def test_other_tasks_do_not():
@@ -255,16 +255,16 @@ def test_a_same_line_self_decorated_replacement_does_not_double(tmp_path):
 
     from ape.llm_clients.config import LLMConfig
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
-        LeanPRReviewV5ArmData, LeanPRReviewV5ArmTask,
+    from ape.tasks.lean_tasks.formal_math.review.arm import (
+        ReviewArmData, ReviewArmTask,
     )
     from ape.tasks.models import WorkspaceInfo
 
     root = tmp_path / "target"
     (root / "Mathlib").mkdir(parents=True)
     (root / "Mathlib" / "B.lean").write_text(SAME_LINE)
-    task = LeanPRReviewV5ArmTask(
-        LeanPRReviewV5ArmData(
+    task = ReviewArmTask(
+        ReviewArmData(
             task_id="t", invocation_id="wu:a#proof_golf", arm_id="proof_golf",
             spec_id="proof_golf", work_unit_id="wu:a", episode_id="ep:1", pr_number=1,
             diff="d", changed_files=["Mathlib/B.lean"], change_ids=["change:a"],
@@ -306,7 +306,7 @@ def test_rejection_detail_carries_line_and_source():
     the `data` field alone, no position, no source text — against a spliced file the agent
     never sees. `unexpected token '@['` with nothing else is a riddle, not a diagnostic."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         LeanPRReviewV4CandidateTask,
     )
 
@@ -322,7 +322,7 @@ def test_rejection_detail_carries_line_and_source():
 
 
 def test_rejection_detail_prefers_errors_the_edit_caused():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         LeanPRReviewV4CandidateTask,
     )
 

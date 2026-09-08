@@ -81,7 +81,7 @@ def test_the_submission_contract_quotes_no_gold():
 
 
 def test_the_lead_instructions_quote_no_gold():
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5 import prompts as v5_prompts
+    from ape.tasks.lean_tasks.formal_math.review import prompts as v5_prompts
 
     gold = all_gold()
     if not gold:

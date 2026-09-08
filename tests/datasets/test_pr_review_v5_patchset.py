@@ -159,9 +159,9 @@ def test_only_the_structural_arms_may_carry_a_patch_set():
 
     from types import SimpleNamespace
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
 
-    task = LeanPRReviewV5ArmTask.__new__(LeanPRReviewV5ArmTask)
+    task = ReviewArmTask.__new__(ReviewArmTask)
     task.data = SimpleNamespace(
         arm_id="proof_golf", change_ids=["c1"],
         paths_by_change={"c1": "Mathlib/A.lean"})
@@ -185,9 +185,9 @@ def test_a_patch_cannot_widen_its_own_scope():
 
     from types import SimpleNamespace
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
 
-    task = LeanPRReviewV5ArmTask.__new__(LeanPRReviewV5ArmTask)
+    task = ReviewArmTask.__new__(ReviewArmTask)
     task.data = SimpleNamespace(
         arm_id="family_design", change_ids=["c1"],
         paths_by_change={"c1": "Mathlib/A.lean"})
@@ -199,9 +199,9 @@ def test_a_patch_cannot_widen_its_own_scope():
 def test_a_candidate_with_no_patch_set_is_unaffected():
     from types import SimpleNamespace
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
 
-    task = LeanPRReviewV5ArmTask.__new__(LeanPRReviewV5ArmTask)
+    task = ReviewArmTask.__new__(ReviewArmTask)
     task.data = SimpleNamespace(arm_id="proof_golf", change_ids=[], paths_by_change={})
     assert task._patch_set_error({"proposed_edit": {"path": "A"}}) is None
 
@@ -211,7 +211,7 @@ def test_every_patch_set_arm_is_a_registered_spec():
     there — the same defect as `code_references` sitting in `SUPPORTED_TOOLS` with its
     registration commented out."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import LeanPRReviewV5ArmTask
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
     from src.mathlib_review.agenda.arms import specs_by_arm_id
 
-    assert LeanPRReviewV5ArmTask.PATCH_SET_ARMS <= set(specs_by_arm_id())
+    assert ReviewArmTask.PATCH_SET_ARMS <= set(specs_by_arm_id())

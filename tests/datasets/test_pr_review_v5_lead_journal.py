@@ -20,8 +20,8 @@ from pathlib import Path
 
 import pytest
 
-from ape.tasks.lean_tasks.formal_math.pr_review_v5 import journal
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import JobOutcome, JobSpec
+from ape.tasks.lean_tasks.formal_math.review import journal
+from ape.tasks.lean_tasks.formal_math.review.delegation import JobOutcome, JobSpec
 
 
 def _fresh_state():
@@ -238,12 +238,12 @@ def _lead(tmp_path, journal_path):
     import asyncio
 
     from ape.scaffolds.ape_agent.config import ApeAgentConfig
-    from ape.tasks.lean_tasks.formal_math.pr_review_v5.lead import (
-        LeanPRReviewV5LeadData, LeanPRReviewV5LeadTask,
+    from ape.tasks.lean_tasks.formal_math.review.lead import (
+        ReviewLeadData, ReviewLeadTask,
     )
     from tests.datasets.test_pr_review_v5_lead import CENSUS, PROPOSALS, FakeMCP, _pool_file
 
-    data = LeanPRReviewV5LeadData(
+    data = ReviewLeadData(
         task_id="pr5lead_test", episode_id="ep:1", pr_number=33098,
         pr_title="t", pr_description="d", diff="--- a\n+++ b\n",
         changed_files=["Mathlib/A.lean"], proposals=list(PROPOSALS), census=list(CENSUS),
@@ -254,7 +254,7 @@ def _lead(tmp_path, journal_path):
                           "repo_url": "https://example.invalid/m.git",
                           "default_target": "Mathlib"},
     )
-    task = LeanPRReviewV5LeadTask(data, ApeAgentConfig())
+    task = ReviewLeadTask(data, ApeAgentConfig())
     mcp = FakeMCP()
     asyncio.run(task.register_task_tools(mcp))
     return task, mcp.tools

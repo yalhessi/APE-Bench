@@ -120,7 +120,7 @@ def build_opportunity_task_data(
     prompt: RenderedPrompt,
     opportunities: list[OracleOpportunity],
 ):
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.opportunities import (
+    from ape.tasks.lean_tasks.formal_math.review.opportunities import (
         LeanPRReviewV4OpportunityData,
     )
 
@@ -173,7 +173,7 @@ def build_review_opportunity_task_data(
 ):
     """Adapt automatically discovered production opportunities to the same adjudication task."""
 
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.opportunities import (
+    from ape.tasks.lean_tasks.formal_math.review.opportunities import (
         LeanPRReviewV4OpportunityData,
     )
 

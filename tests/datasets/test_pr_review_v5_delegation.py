@@ -20,7 +20,7 @@ from types import SimpleNamespace
 import pytest
 
 from ape.orchestration.config import EarlyStopMode
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation import (
+from ape.tasks.lean_tasks.formal_math.review.delegation import (
     TIER_MULTIPLIERS,
     JobSpec,
     _normalize_status,
@@ -139,7 +139,7 @@ def test_a_whole_wave_runs_in_one_orchestrator(tmp_path, monkeypatch):
         seen.append([(job.invocation_id, job.budget_tier) for job in jobs])
         return []
 
-    import ape.tasks.lean_tasks.formal_math.pr_review_v5.delegation as module
+    import ape.tasks.lean_tasks.formal_math.review.delegation as module
 
     monkeypatch.setattr(module, "run_wave", fake_run_wave)
     jobs = [

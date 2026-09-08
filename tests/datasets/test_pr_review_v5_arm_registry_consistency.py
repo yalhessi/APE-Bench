@@ -19,8 +19,8 @@ from src.mathlib_review.agenda import registry as arm_registry
 from src.mathlib_review.agenda.arms import (
     CHECKABLE_ARMS, default_arms, resolve_context_tools, v5_specs,
 )
-from ape.tasks.lean_tasks.formal_math.pr_review_v5.arm import (
-    EXPECTED_CONCERN_BY_ARM, LeanPRReviewV5ArmTask,
+from ape.tasks.lean_tasks.formal_math.review.arm import (
+    EXPECTED_CONCERN_BY_ARM, ReviewArmTask,
 )
 
 
@@ -48,7 +48,7 @@ def test_checkable_arms_derives_from_the_registry():
 
 
 def test_patch_set_arms_derives_from_the_registry():
-    assert LeanPRReviewV5ArmTask.PATCH_SET_ARMS == arm_registry.patch_set_arms()
+    assert ReviewArmTask.PATCH_SET_ARMS == arm_registry.patch_set_arms()
 
 
 def test_expected_concerns_derives_from_the_registry():
@@ -269,7 +269,7 @@ def test_a_new_arm_needs_nothing_beyond_those_two_edits(monkeypatch):
 
     from dataclasses import replace
 
-    from ape.tasks.lean_tasks.formal_math.pr_shared import focused_prompts
+    from ape.tasks.lean_tasks.formal_math.review import focused_prompts
     from src.mathlib_review.agenda import arms
     from src.mathlib_review.analysis import bench_cli
 

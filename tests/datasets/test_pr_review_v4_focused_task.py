@@ -67,7 +67,7 @@ def scheduled():
 
 
 def test_the_v2_instruction_is_reused_verbatim(scheduled):
-    from ape.tasks.lean_tasks.formal_math.pr_shared.focused_prompts import FOCUSED_PROMPTS
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
 
     for prompt in scheduled["prompts"]:
         _tools, system, _user = FOCUSED_PROMPTS[prompt.spec_id]
@@ -267,7 +267,7 @@ def test_a_claim_only_focused_candidate_is_refused(scheduled):
         LeanPRReviewV4FocusedConfig,
         LeanPRReviewV4FocusedTask,
     )
-    from ape.tasks.lean_tasks.formal_math.pr_review_v4.candidates import (
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
         CandidateSubmission,
     )
 
