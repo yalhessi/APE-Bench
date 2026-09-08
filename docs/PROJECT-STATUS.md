@@ -20,6 +20,12 @@ community would actually request.
 
 ---
 
+## Plans
+
+`docs/plans/` holds the two plans the `september-checkpoint` work was built from, verbatim,
+plus `STATUS.md` — every numbered item marked built, partial or not built, checked against the
+tree. Read `STATUS.md` first.
+
 ## How to read this branch
 
 | Commits | What |
