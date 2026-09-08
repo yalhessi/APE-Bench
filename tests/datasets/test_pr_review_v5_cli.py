@@ -119,9 +119,12 @@ def test_judge_without_execute_resolves_paths_and_stops(monkeypatch, capsys):
                      "--of", "pr_review_v5_specialist4_rep1"])
     assert code == 0
     assert called["ran"] is False
-    out = json.loads(capsys.readouterr().out)
-    assert out["would_judge"].endswith("pr_review_v5_specialist4_rep1/findings.jsonl")
-    assert out["into"].endswith("audits/specialist4-rep1")
+    # Reported on stderr as a banner rather than as a result-shaped object, so it cannot be
+    # read as a finished judge run. It was, once.
+    err = capsys.readouterr().err
+    assert "NOTHING RAN" in err
+    assert "pr_review_v5_specialist4_rep1/findings.jsonl" in err
+    assert "audits/specialist4-rep1" in err
 
 
 def test_judge_of_a_run_that_disagrees_with_the_config_is_refused(monkeypatch):
@@ -389,3 +392,32 @@ def test_a_named_run_passes():
         release=Path("inputs/pr_review_v4/releases/dev-medium-0.3.0"),
         modification_inventory=Path("x"), run_name="pr_review_v5_specialist4_rep2")
     assert assert_run_is_named(named) is None
+
+
+def test_a_preflight_cannot_be_mistaken_for_a_completed_run(capsys):
+    """`judge` without `--execute` printed a success-shaped JSON object, it read like a
+    result, and it was taken for one -- the only signal that nothing had happened was the
+    absence of an audit directory.
+
+    Banner on stderr, and never a bare JSON object: a preflight has to be unmistakable rather
+    than merely accurate.
+    """
+
+    cli.main(["judge", "--config", "configs/pr_review_v5_specialist4_judge.yaml",
+              "--of", "pr_review_v5_specialist4_rep1"])
+    captured = capsys.readouterr()
+    assert "NOTHING RAN" in captured.err
+    assert "--execute" in captured.err
+    # Not parseable as a result.
+    assert not captured.out.strip().startswith("{")
+
+
+def test_run_says_it_the_same_way(capsys, monkeypatch):
+    import src.mathlib_review.review.runner as runner
+
+    async def _noop(dataset, scaffold, task_overrides, logger):
+        return None
+
+    monkeypatch.setattr(runner, "run", _noop)
+    cli.main(["run", "--config", str(CONFIG), "--run-name", "probe"])
+    assert "NOTHING RAN" in capsys.readouterr().err

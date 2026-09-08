@@ -46,6 +46,23 @@ from typing import List, Optional
 SPENDS = frozenset({"run", "judge", "bench"})
 
 
+def _say_nothing_ran(command: str, facts: dict) -> None:
+    """Report a preflight so it cannot be read as a completed run.
+
+    On stderr, banner first, and never as a bare JSON object -- `judge` without `--execute`
+    printed one, it looked exactly like a result, and it was taken for one.
+    """
+
+    width = max(len(f"  {k}: {v}") for k, v in facts.items()) if facts else 40
+    line = "=" * max(width, 58)
+    print(line, file=sys.stderr)
+    print(f"NOTHING RAN. `{command}` is read-only without --execute.", file=sys.stderr)
+    print(line, file=sys.stderr)
+    for key, value in facts.items():
+        print(f"  {key}: {value}", file=sys.stderr)
+    print(f"\nAdd --execute to actually run it.", file=sys.stderr)
+
+
 def _add_run_name(parser: argparse.ArgumentParser) -> None:
     """Which run this is, supplied at the invocation rather than checked into the config.
 
@@ -168,7 +185,8 @@ def _run(args, overrides, logger) -> int:
     from src.mathlib_review.review.runner import load_run, redo_run, run
 
     if not args.execute:
-        logger.info("no --execute: preflight only, nothing will be spent")
+        _say_nothing_ran("run", {"config": str(args.config),
+                                 "run name": getattr(args, "run_name", None) or "(from config)"})
         return _plan(args.config, overrides, logger)
 
     dataset, scaffold, task_overrides = load_run(args.config, overrides)
@@ -209,12 +227,14 @@ def _judge(args, overrides, logger) -> int:
         assert_paths_agree(dataset, args.of_run)
 
     if not args.execute:
-        print(json.dumps({
-            "would_judge": str(dataset.candidates),
+        # A success-shaped JSON object was the whole of this, and it read like a result: it
+        # was mistaken for a finished judge run, and the absence of an audit directory was
+        # the only way to tell. A preflight has to be unmistakable, not merely accurate.
+        _say_nothing_ran("judge", {
+            "would judge": str(dataset.candidates),
             "into": str(dataset.out_dir),
-            "of_run": args.of_run,
-            "note": "no --execute: paths resolved and checked, no model called",
-        }, indent=2))
+            "of run": args.of_run or "(from config)",
+        })
         return 0
 
     out = asyncio.run(run(dataset, scaffold, task_overrides, logger))
