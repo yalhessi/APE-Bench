@@ -94,8 +94,13 @@ async def _run_arm(payloads: Dict[str, Dict[str, Any]], scaffold, run_name: str,
         tasks.append(task)
         by_task_id[data["task_id"]] = work_unit_id
 
-    scaffold.execution.run_name = run_name
-    results = await TaskOrchestrator(config=scaffold, logger=logger).run(tasks)
+    # `orchestrator_id`, not `scaffold.execution.run_name`: `ExecutionConfig` has no such
+    # field and pydantic refuses the assignment, so `--execute` raised before reaching a model
+    # every time it was tried. The whole execute path had never run. The v5 runner names its
+    # orchestrator the same way (`runner.py`), which is also what puts the scratch tree at
+    # `runs_base_dir / <run_name>` where the trajectory extractor looks for it.
+    results = await TaskOrchestrator(
+        config=scaffold, orchestrator_id=run_name, logger=logger).run(tasks)
 
     anchors: Dict[str, List[str]] = defaultdict(list)
     errors: Dict[str, str] = {}
