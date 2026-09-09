@@ -113,7 +113,25 @@ async def _run_arm(payloads: Dict[str, Dict[str, Any]], scaffold, run_name: str,
     return dict(anchors), errors, results
 
 
+#: Billed cost a bench may reach before it is refused, in dollars. Measured on
+#: `pr5_smoke4_rep9`: specialists billed a median $0.039 and a max $0.117, so a 16-case bench
+#: has a realistic ceiling near $2 and this is roughly 4x it.
+DEFAULT_BENCH_COST_CAP = 8.00
+
+
+def estimate_cost(benches, *, per_case: float) -> float:
+    """Worst-case billed spend, as `cases x the per-task ceiling`.
+
+    A ceiling, not a forecast: it assumes every case exhausts its budget, which no run has
+    done. It exists so the refusal below happens before the first model call rather than
+    after the last one.
+    """
+
+    return sum(len(bench.cases) for bench in benches.values()) * per_case
+
+
 def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
+                selector="audited", cost_cap=DEFAULT_BENCH_COST_CAP,
                 execute=False, logger=None) -> int:
     """Build the benches, report coverage, and run them only when told to.
 
@@ -130,8 +148,12 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
     dataset, scaffold, _overrides = load_run(config)
     release = load_release(dataset)
 
+    # `audited` by default: the gold-label rule gives `family_design` one positive case in
+    # the whole release and `proof_idiom` three, and floods `style` with twelve that belong to
+    # other arms. A bench meant to test a conclusion has to be selected from the audited
+    # request groups. `--selector gold_label` reproduces the old fixture for comparison.
     benches = build_all(dataset.release, roster(), pr_numbers=pr_numbers,
-                        negatives_per_pr=negatives_per_pr)
+                        negatives_per_pr=negatives_per_pr, selector=selector)
     wanted = set(arms)
     unknown = wanted - set(benches)
     if unknown:
@@ -140,11 +162,28 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
 
     print(json.dumps(coverage_report(benches), indent=2))
 
+    # The per-task ceiling the arms will actually run under, from the config rather than a
+    # number restated here — a second copy of a budget is how a cap stops matching the thing
+    # it caps.
+    per_case = float(getattr(dataset, "standard_budget_cap", 0.30) or 0.30)
+    projected = estimate_cost(benches, per_case=per_case)
+
     if not execute:
         total = sum(len(b.cases) for b in benches.values())
-        print(f"\n-- no --execute: {total} case(s) across {len(benches)} arm(s) would run. "
+        print(f"\n-- no --execute: {total} case(s) across {len(benches)} arm(s) would run, "
+              f"at most ${projected:.2f} billed (${per_case:.2f} per case). "
               "Nothing was called and nothing was written.")
         return 0
+
+    # Refused before the first model call, not reported after the last one. This project has
+    # already lost a paid run to a spend gate that printed a number instead of stopping.
+    if cost_cap is not None and projected > cost_cap:
+        raise SystemExit(
+            f"this bench could bill up to ${projected:.2f} "
+            f"({sum(len(b.cases) for b in benches.values())} cases x ${per_case:.2f}), over "
+            f"the ${cost_cap:.2f} cap. Narrow it with --pr/--arm, or raise --cost-cap "
+            "deliberately."
+        )
 
     judgments = load_jsonl(dataset.release / "gold/judgments.jsonl", JudgmentNode)
     scores = {}
@@ -186,6 +225,10 @@ def main() -> None:
                         help="arm to bench; repeatable")
     parser.add_argument("--pr", type=int, action="append", dest="pr_numbers")
     parser.add_argument("--negatives-per-pr", type=int, default=3)
+    parser.add_argument("--selector", choices=("audited", "gold_label"), default="audited",
+                        help="how positives are chosen; see build_all")
+    parser.add_argument("--cost-cap", type=float, default=DEFAULT_BENCH_COST_CAP,
+                        help="refuse before running if the worst case exceeds this")
     parser.add_argument("--out", type=Path, default=None,
                         help="write the score here (only with --execute)")
     parser.add_argument("--execute", action="store_true",
@@ -193,7 +236,8 @@ def main() -> None:
     args = parser.parse_args()
     raise SystemExit(run_benches(
         config=args.config, arms=args.arm, pr_numbers=args.pr_numbers,
-        negatives_per_pr=args.negatives_per_pr, out=args.out, execute=args.execute))
+        negatives_per_pr=args.negatives_per_pr, out=args.out, execute=args.execute,
+        selector=args.selector, cost_cap=args.cost_cap))
 
 
 if __name__ == "__main__":

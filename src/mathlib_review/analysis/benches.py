@@ -85,6 +85,10 @@ class ArmBench:
     arm_id: str
     concern_families: Sequence[str]
     cases: List[BenchCase] = field(default_factory=list)
+    #: How the positives were chosen. Part of the identity, because a bench selected by gold
+    #: label and one selected from the audited request groups are different experiments that
+    #: would otherwise share a fixture hash.
+    selector: str = "gold_label"
 
     @property
     def positives(self) -> List[BenchCase]:
@@ -100,6 +104,7 @@ class ArmBench:
         return sha256_bytes(canonical_json_bytes({
             "version": BENCH_VERSION,
             "arm_id": self.arm_id,
+            "selector": self.selector,
             "cases": [
                 {"work_unit_id": case.work_unit_id,
                  "expected": sorted(case.expected_obligation_ids)}
@@ -112,6 +117,7 @@ class ArmBench:
             "bench_version": BENCH_VERSION,
             "arm_id": self.arm_id,
             "concern_families": list(self.concern_families),
+            "selector": self.selector,
             "fixture_sha256": self.identity(),
             "cases": len(self.cases),
             "positives": len(self.positives),
@@ -139,12 +145,23 @@ def build_bench(
     judgments: Sequence[JudgmentNode],
     pr_numbers: Optional[Sequence[int]] = None,
     negatives_per_pr: int = 3,
+    audited_obligation_ids: Optional[Set[str]] = None,
 ) -> ArmBench:
-    """The cases for one arm: units where gold asks for its concern, plus quiet units.
+    """The cases for one arm: units gold says it should speak at, plus quiet units.
 
     An obligation lands on one or more `change_id`s; a work unit is a set of change ids. A unit
     is a positive when it contains a change the obligation anchors, which is the same join the
     judge's anchor tier uses — so a bench hit and a scored hit mean the same thing.
+
+    **Which obligations count as this arm's, and why the default is wrong.** Passing
+    `audited_obligation_ids` selects from `request_groups`, where the answerable arms were read
+    off the maintainer's comment. Omitting it falls back to matching the arm's concern family
+    against the *gold concern label*, which is unusable for this question: 13 of PR33098's 14
+    obligations carry `style`, the seven `grind` requests included. Measured across the
+    development set the two selectors disagree on more than half of every arm's fixture, and on
+    `family_design` they share **no** group at all — the label rule hands it one, and it is the
+    wrong one. The fallback is kept only so existing callers keep their meaning; a bench that
+    is meant to test a conclusion should pass the audited set.
     """
 
     wanted_prs = set(pr_numbers) if pr_numbers else None
@@ -159,9 +176,14 @@ def build_bench(
         if wanted_prs is not None and judgment.pr_number not in wanted_prs:
             continue
         touched_prs.add(judgment.pr_number)
-        if not (families & {str(item) for item in (judgment.concern_labels or [])}):
+        by_label = bool(
+            families & {str(item) for item in (judgment.concern_labels or [])})
+        if audited_obligation_ids is None and not by_label:
             continue
         for obligation in judgment.obligations or []:
+            if (audited_obligation_ids is not None
+                    and obligation.obligation_id not in audited_obligation_ids):
+                continue
             for change_id in obligation.change_ids or []:
                 for unit in by_change.get(change_id, ()):
                     expected_by_unit[unit.work_unit_id].add(obligation.obligation_id)
@@ -169,7 +191,8 @@ def build_bench(
                     if text:
                         words_by_unit[unit.work_unit_id].add(text)
 
-    bench = ArmBench(arm_id=arm_id, concern_families=sorted(families))
+    bench = ArmBench(arm_id=arm_id, concern_families=sorted(families),
+                     selector="audited" if audited_obligation_ids is not None else "gold_label")
     seen: Set[str] = set()
     for unit in units:
         if wanted_prs is not None and unit.pr_number not in wanted_prs:
@@ -207,12 +230,31 @@ def build_bench(
     return bench
 
 
+def audited_obligations_by_arm(release: Path) -> Dict[str, Set[str]]:
+    """`arm_id -> the obligations the audited request groups say it could answer`.
+
+    Imported lazily so this module keeps no import-time dependency on the classification, and
+    so a checkout without it degrades to the gold-label fallback rather than failing.
+    """
+
+    from src.mathlib_review.analysis.request_groups import answerable_by, build
+
+    groups = {group.group_id: group for group in build(release)}
+    return {
+        arm_id: {obligation
+                 for group_id in group_ids
+                 for obligation in groups[group_id].obligation_ids}
+        for arm_id, group_ids in answerable_by(groups.values()).items()
+    }
+
+
 def build_all(
     release: Path,
     arms: Mapping[str, Sequence[str]],
     *,
     pr_numbers: Optional[Sequence[int]] = None,
     negatives_per_pr: int = 3,
+    selector: str = "gold_label",
 ) -> Dict[str, ArmBench]:
     """A bench per arm, from one release.
 
@@ -220,15 +262,28 @@ def build_all(
     than imported: this module is evaluation, the arm registry is generation, and evaluation
     importing generation is the direction that makes gold reachable from a prompt. The caller
     supplies the roster.
+
+    `selector="audited"` chooses positives from the audited request groups instead of the gold
+    concern label. It changes the fixture substantially and on purpose: `family_design` goes
+    from **1** positive to 14, `proof_idiom` from 3 to 8, and `style` — which the label rule
+    floods, because 13 of PR33098's 14 obligations are labelled `style` — from 12 down to 4.
     """
 
+    if selector not in ("gold_label", "audited"):
+        raise ValueError(f"unknown bench selector {selector!r}")
     units = load_jsonl(release / "derived/work_units.jsonl", ReviewWorkUnit)
     judgments = load_jsonl(release / "gold/judgments.jsonl", JudgmentNode)
+    audited = audited_obligations_by_arm(release) if selector == "audited" else {}
     return {
         arm_id: build_bench(
             arm_id, sorted(concerns),
             units=units, judgments=judgments, pr_numbers=pr_numbers,
             negatives_per_pr=negatives_per_pr,
+            # An arm the audit never names still gets an audited bench -- an empty one. That
+            # is the honest fixture: it says "gold asks this arm for nothing here", where
+            # falling back to the label rule would silently hand it someone else's work.
+            audited_obligation_ids=(audited.get(arm_id, set())
+                                    if selector == "audited" else None),
         )
         for arm_id, concerns in sorted(arms.items())
     }
@@ -325,7 +380,17 @@ def score_bench(
         "location_rate": round(located / len(positives), 4) if positives else None,
         # Did it stay quiet where gold asked for nothing of its kind?
         "spoke_when_quiet": noisy,
-        "false_alarm_rate": round(noisy / len(negatives), 4) if negatives else None,
+        # NOT a false-alarm rate, and it used to be called one. A "negative" here is a work
+        # unit where *this release's gold* records no request of this kind — and maintainer
+        # comment gold is a lower bound on what could legitimately have been asked, not an
+        # enumeration of it. The control PR is the standing proof: 33438 was merged with no
+        # comments at all and the reviewer found two compile-verified improvements there.
+        # Speaking where gold is silent is therefore evidence about gold as much as about the
+        # arm. `false_alarm_rate` is reserved for negatives someone has adjudicated.
+        "gold_silent_speech_rate": (
+            round(noisy / len(negatives), 4) if negatives else None),
+        "false_alarm_rate": None,
+        "negatives_are_adjudicated": False,
         "abstained_on_positives": sum(1 for item in positives if not item.candidate_count),
         "candidates_total": sum(item.candidate_count for item in results),
         "errors": {item.work_unit_id: item.error for item in results if item.error},

@@ -165,7 +165,16 @@ def test_a_silent_run_locates_nothing_and_is_counted_as_abstaining(benches):
 
 
 def test_an_arm_that_reports_everywhere_is_penalised_on_negatives(benches):
-    """Positives alone would score a maximally noisy arm perfectly."""
+    """Positives alone would score a maximally noisy arm perfectly.
+
+    The rate this reports is `gold_silent_speech_rate`, not a false-alarm rate. A bench
+    negative is a unit where *this release's gold* records no request of this kind, and
+    maintainer-comment gold is a lower bound on what could legitimately have been asked rather
+    than an enumeration of it — the control PR 33438 was merged with no comments at all and
+    the reviewer found two compile-verified improvements there. So speaking where gold is
+    silent is evidence about gold as much as about the arm, and `false_alarm_rate` stays
+    `None` until someone adjudicates the negatives.
+    """
 
     from src.mathlib_review.analysis.benches import gold_anchor_index, score_bench
 
@@ -175,7 +184,9 @@ def test_an_arm_that_reports_everywhere_is_penalised_on_negatives(benches):
                         gold_anchors_by_unit=gold_anchor_index(bench, _judgments()))
 
     assert score["spoke_when_quiet"] == score["negatives"] > 0
-    assert score["false_alarm_rate"] == 1.0
+    assert score["gold_silent_speech_rate"] == 1.0
+    assert score["false_alarm_rate"] is None
+    assert score["negatives_are_adjudicated"] is False
 
 
 def test_landing_in_the_right_unit_but_the_wrong_declaration_is_not_a_hit(benches):
