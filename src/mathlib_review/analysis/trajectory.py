@@ -369,12 +369,51 @@ def extract(run_name: str, ape_root: Path = DEFAULT_APE_ROOT,
         if turn_rows:
             turns_by_pr[str(pr_number)].extend(turn_rows)
 
-    # --- leads ---
+    # --- leads, and the top-level arms a standalone bench produces -----------------------
+    #
+    # `_ARM_RESULT_GLOBS` are nested: they assume an arm ran under a lead, inside
+    # `subtasks/<wave>/...`. A bench run has no lead, so `bench_cli` dispatches arms as
+    # *top-level* tasks and their results land at exactly the lead's depth. This loop used to
+    # reject them -- a lead was identified as "a top-level result with no invocation_id", so a
+    # top-level result *with* one fell through both paths and the whole bench was invisible.
+    #
+    # That is the read-side gap that matters for the oracle ladder: every rung runs as a bench,
+    # and a rung whose queries cannot be read cannot be attributed. So the discriminator is now
+    # positive in both directions -- an invocation_id means an arm, its absence means a lead.
+    seen_invocations = {item.invocation_id for item in invocations}
     for result_path in sorted(root.glob(_LEAD_RESULT_GLOB)):
         result = _load(result_path)
-        # An arm result also matches nothing here (different depth), but a lead result is
-        # distinguished positively: it carries routing output, never an invocation_id.
-        if not result or result.get("invocation_id"):
+        if not result:
+            continue
+        invocation_id = result.get("invocation_id")
+        if invocation_id:
+            if invocation_id in seen_invocations:
+                continue
+            seen_invocations.add(invocation_id)
+            cost, cached, sample_status = _sample_cost(result_path)
+            session = _session_for(result_path)
+            turn_rows = _read_turns(session, invocation_id, cap) if session else []
+            pr_number = result.get("pr_number")
+            invocations.append(Invocation(
+                invocation_id=invocation_id,
+                arm_id=result.get("arm_id"),
+                work_unit_id=result.get("work_unit_id"),
+                pr_number=pr_number,
+                # A bench has no waves and no tiers; saying so beats inventing one.
+                wave=None, tier=None,
+                status=result.get("status") or sample_status,
+                started_at=result.get("started_at"),
+                completed_at=result.get("completed_at"),
+                execution_time=result.get("execution_time"),
+                cost=cost if cost is not None else _token_block(result).get("total_cost"),
+                cached_cost=cached,
+                turns=len(turn_rows),
+                token_usage=_token_block(result),
+                tool_calls=_tool_counts(turn_rows),
+                has_transcript=bool(turn_rows),
+            ))
+            if turn_rows:
+                turns_by_pr[str(pr_number)].extend(turn_rows)
             continue
         pr_number = result.get("pr_number")
         conversation_id = f"lead:{pr_number}"

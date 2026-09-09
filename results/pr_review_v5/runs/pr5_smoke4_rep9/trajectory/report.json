@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": ".ape/runs/pr5_smoke4_rep9",
+  "bytes": 2363417,
+  "cost": {
+    "actual_total": 14.289915,
+    "by_disposition": {
+      "mandatory": 5.073091,
+      "proposed": 1.716528
+    },
+    "lead": 7.500297,
+    "manifest_total": 7.5002965,
+    "manifest_understates_by": 6.789619
+  },
+  "invocations": 66,
+  "leads": 4,
+  "run_name": "pr5_smoke4_rep9",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 1002,
+  "with_transcript": 70
+}
