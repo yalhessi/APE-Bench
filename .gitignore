@@ -37,3 +37,6 @@ results/overlays/
 # The publishing clone used to restage this history. Redundant now that development
 # happens on this branch directly; kept out of the tree if it is ever recreated.
 share/
+
+# `create_logger("bench")` drops its log in the repo root.
+bench
