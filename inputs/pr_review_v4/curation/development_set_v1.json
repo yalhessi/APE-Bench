@@ -1,0 +1,28 @@
+{
+  "schema_version": "v5-development-set/1",
+  "declared": "2026-09-09",
+  "release": "dev-medium-0.3.0",
+  "why": [
+    "These PRs have been read comment-by-comment against agent output by both Claude and",
+    "Codex, and the readings decided what to build: the exposure boundary, the query-shape",
+    "audit, the oracle-ladder cases, and the hittability exclusion all come from them.",
+    "They are therefore no longer held out, whatever their directory is called, and no",
+    "number computed on them is a held-out result. They remain the right place to run the",
+    "ladder, because diagnosing capability is exactly what a burned set is for."
+  ],
+  "pr_numbers": [
+    33057, 33066, 33098, 33117, 33145, 33149, 33285,
+    33294, 33305, 33321, 33337, 33362, 33421
+  ],
+  "populations": {
+    "raw": 43,
+    "eligible": 40,
+    "hittable": 39,
+    "note": "eligible = proposed_atomic and admitted by intervention_views; hittable per obligation_hittability_v1.json"
+  },
+  "obligation_bearing_pr_numbers": [
+    33066, 33098, 33117, 33145, 33149, 33285,
+    33294, 33305, 33321, 33337, 33362, 33421
+  ],
+  "next": "A fresh set must be sealed before any treatment from the ladder is reported as a result."
+}

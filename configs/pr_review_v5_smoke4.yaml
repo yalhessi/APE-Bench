@@ -1,10 +1,20 @@
 # Calibration run: the delegating reviewer on the 4-PR smoke set.
 #
-# 33057 / 33066 / 33098 carry gold (1 + 3 + 14 = 18 obligations); 33438 is the CONTROL —
-# maintainers asked for nothing there, so anything the agent emits on it is a false positive.
-# This is the same set as results/pr_review_v4/runs/dev-medium-smoke4-rep1.
+# 33057 / 33066 / 33098 carry gold; 33438 is the CONTROL — maintainers asked for nothing
+# there, so anything the agent emits on it is a false positive. This is the same set as
+# results/pr_review_v4/runs/dev-medium-smoke4-rep1.
 #
-# Sized for a look, not for an effect size: at 18 obligations one flipped verdict is 5.6pp.
+# THE DENOMINATOR IS 17, NOT 18 AND NOT 40. This set raises 18 raw obligations
+# (1 + 3 + 14), and 33057's single one is `not_evaluable` — it is "fix the last error...bors
+# d+", a CI verdict with no site claim — so the scored population is 3 from 33066 and 14 from
+# 33098. Every audit before `pr5-smoke4-rep9` printed 40 instead, the size of the whole
+# curated pool across twelve PRs, so its rates are 2.35x too low; the corrected figures sit
+# in each audit's `denominator_correction.json`.
+#
+# 33098 alone carries 14 of the 17, and seven of those come from two comments of the form
+# "this and the next three lemmas can be proven with `grind [...]`". One family is worth 4.
+#
+# Sized for a look, not for an effect size: at 17 obligations one flipped verdict is 5.9pp.
 # The run name is an invocation argument, not a config key: this file
 # describes a PR set and a policy. Last run under `pr_review_v5_lead_smoke4_rep7`.
 #   ... --run-name <name>

@@ -285,6 +285,27 @@ def load_ambiguous_rulings(path: Optional[Path] = None) -> Dict:
     return {"path": path, "sha256": sha256_bytes(path.read_bytes()), "rulings": rulings}
 
 
+#: One side's read of which eligible obligations a reviewer could actually have hit. Absent by
+#: default: a missing file means the population is simply not reported, which is honest, where
+#: a hardcoded default would be an unreviewed judgement wearing a measurement's clothes.
+HITTABILITY_REGISTRY = Path("inputs/pr_review_v4/curation/obligation_hittability_v1.json")
+
+
+def load_hittability(path: Optional[Path] = None) -> Optional[Dict[str, bool]]:
+    """`obligation_id -> hittable`, or `None` when no annotation exists.
+
+    Evaluation-only, like the ambiguity registry: it says which rows the *gold* is capable of
+    being matched on, and never reaches generation. Unlike that registry a missing file is not
+    an error -- scoring without it loses a reported population, not a correctness property.
+    """
+
+    path = path or HITTABILITY_REGISTRY
+    if not path.is_file():
+        return None
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return {row["obligation_id"]: bool(row["hittable"]) for row in payload.get("rows", [])}
+
+
 def _is_ambiguous(rulings: Dict, obligation_id: str, candidate_id: str, level: str) -> bool:
     return (
         (obligation_id, candidate_id, level) in rulings
@@ -300,6 +321,7 @@ def semantic_report(judgments: Iterable[JudgmentNode], views: Iterable[Intervent
                     planned_pairs: Optional[Iterable[SemanticPair]] = None,
                     control_pr_numbers: Iterable[int] = (),
                     scoped_pr_numbers: Optional[Iterable[int]] = None,
+                    hittability_registry: Optional[Path] = None,
                     null_pairs_requested: Optional[int] = None) -> Dict:
     candidates = list(candidates)
     matches = list(matches)
@@ -337,6 +359,20 @@ def semantic_report(judgments: Iterable[JudgmentNode], views: Iterable[Intervent
     )
                    if (scope is None or set(obligation.change_ids).intersection(scope))
                    and (pr_scope is None or judgment.pr_number in pr_scope)]
+    # Every obligation these PRs carry, before eligibility narrows it. Same scope, no status
+    # or view filter, so the gap between the two is legible instead of being folded into one
+    # number that looks like the whole story.
+    wanted_obligations = (
+        set(scoped_obligation_ids) if scoped_obligation_ids is not None else None
+    )
+    raw_count = len([
+        obligation for judgment in judgments for obligation in judgment.obligations
+        if (scope is None or set(obligation.change_ids).intersection(scope))
+        and (pr_scope is None or judgment.pr_number in pr_scope)
+        and (wanted_obligations is None
+             or obligation.obligation_id in wanted_obligations)
+    ])
+    hittability = load_hittability(hittability_registry)
     by_obligation: Dict[str, List[SemanticMatch]] = {}
     for match in observed:
         by_obligation.setdefault(match.obligation_id, []).append(match)
@@ -402,6 +438,29 @@ def semantic_report(judgments: Iterable[JudgmentNode], views: Iterable[Intervent
             "observed_pairs": len(observed),
             "null_pairs": len(nulls),
             "paired_candidates": len(paired_candidates),
+        },
+        # What the denominator was taken over. Recorded because its absence is unreadable:
+        # every audit before `pr5-smoke4-rep9` printed `obligations: 40` whether it had
+        # reviewed 4 PRs or 11, and nothing in the report said which. `null` still means the
+        # whole release, so an unscoped run now says so out loud instead of looking scoped.
+        "denominator_pr_scope": sorted(pr_scope) if pr_scope is not None else None,
+        # Three populations, because collapsing them is how a denominator goes wrong quietly.
+        # `raw` is every obligation these PRs carry; `eligible` is the `proposed_atomic`
+        # subset the views admit, and is what `counts.obligations` divides by. `hittable`
+        # awaits the gold audit -- 33057's only obligation is "fix the last error...bors d+",
+        # a CI verdict with no site claim, which no reviewer could ever match -- and is null
+        # until that audit annotates them.
+        "obligation_populations": {
+            "raw": raw_count,
+            "eligible": count,
+            # `null` when no annotation is installed. An obligation absent from the registry
+            # is counted hittable: the registry records exclusions, so silence about a row
+            # must not quietly drop it from the population it belongs to.
+            "hittable": (
+                None if hittability is None
+                else sum(1 for item in obligations
+                         if hittability.get(item.obligation_id, True))
+            ),
         },
         "location_recall": (
             sum(location.values()) / count if count else None

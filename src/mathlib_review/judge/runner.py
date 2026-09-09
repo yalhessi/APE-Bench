@@ -392,6 +392,53 @@ def assert_source_run_is_complete(dataset: JudgeDatasetConfig, logger) -> Option
     return status
 
 
+def judged_pr_scope(dataset: JudgeDatasetConfig, logger) -> Optional[List[int]]:
+    """The PRs whose obligations may appear in this run's denominator.
+
+    `semantic_report` takes `scoped_pr_numbers` and defaults it to `None`, which means the
+    whole release. That default is how every audit before `pr5-smoke4-rep9` came to be scored
+    against the same 40-obligation pool spanning twelve PRs no matter which PRs it ran:
+    `lead-smoke4-rep7` (4 PRs) and `heldout11-rep2` (11 PRs) have byte-identical obligation
+    sets, so both were dividing their hits by other runs' work.
+
+    Stating `pr_numbers` in the judge config fixes it, and leaving it out silently restores the
+    bug. So the scope is taken from the generation run itself when it can be: `agenda_report`
+    is a sibling of the candidates and records the PRs the run actually enumerated work for —
+    the run manifest and run plan do not carry them.
+
+    A config that names PRs is still authoritative (an R0 replay deliberately scores a subset),
+    but it may not name a PR the run never reviewed: those obligations are automatic misses and
+    including them is the whole defect.
+    """
+
+    report_path = Path(dataset.candidates).parent / "agenda_report.json"
+    stated = sorted({*dataset.pr_numbers, *dataset.control_pr_numbers}) or None
+    if not report_path.is_file():
+        # v4 runs and hand-assembled candidate files have no agenda report. Fall back to what
+        # the config says, and say that nothing corroborated it.
+        logger.info("no agenda report beside %s; PR scope is whatever the config stated (%s)",
+                    dataset.candidates, stated)
+        return stated
+
+    planned = set(json.loads(report_path.read_text(encoding="utf-8")).get("pr_numbers") or [])
+    if not planned:
+        return stated
+    if not dataset.pr_numbers:
+        scope = sorted(planned | set(dataset.control_pr_numbers))
+        logger.info("judge config named no PRs; scoping the denominator to the %d the run "
+                    "reviewed: %s", len(scope), scope)
+        return scope
+
+    unreviewed = sorted(set(dataset.pr_numbers) - planned)
+    if unreviewed:
+        raise ValueError(
+            f"judge config scores PR(s) {unreviewed} that the source run never reviewed "
+            f"(it enumerated {sorted(planned)}). Their obligations can only be misses, so "
+            "including them divides recall by work that was never attempted."
+        )
+    return stated
+
+
 #: Where a judge run's own outputs go, derived from the generation run it scores.
 JUDGE_AUDIT_ROOT = Path("results/pr_review_v5/audits")
 
@@ -442,6 +489,9 @@ def assert_paths_agree(dataset: "JudgeDatasetConfig", run_name: str) -> None:
 async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     assert_repo_root()
     source_run_status = assert_source_run_is_complete(dataset, logger)
+    # Computed once so the pre- and post-publication reports cannot disagree about what they
+    # are dividing by. They did: only the pre-publication call was given a scope.
+    pr_scope = judged_pr_scope(dataset, logger)
     model = scaffold.llm_config.model_name
     execution = getattr(scaffold, "execution", None)
     llm = scaffold.llm_config
@@ -553,9 +603,7 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
         control_pr_numbers=dataset.control_pr_numbers,
         # The same scope that selected the pairs must select the denominator, or recall is
         # divided by obligations from PRs this run never saw.
-        scoped_pr_numbers=(
-            sorted({*dataset.pr_numbers, *dataset.control_pr_numbers})
-            if dataset.pr_numbers else None),
+        scoped_pr_numbers=pr_scope,
         null_pairs_requested=(
             dataset.null_pairs_per_obligation
             * len({item.obligation_id for item in sealed if item.role == "observed"})
@@ -629,6 +677,10 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
             scoped_obligation_ids=dataset.obligation_ids or None,
             planned_pairs=published_pairs,
             control_pr_numbers=dataset.control_pr_numbers,
+            # `publication_summary` prints one denominator, taken from the pre-publication
+            # report, beside hit counts from this one. Scoring them over different obligation
+            # populations is the same defect one function call further along.
+            scoped_pr_numbers=pr_scope,
             null_pairs_requested=None,
         )
 
