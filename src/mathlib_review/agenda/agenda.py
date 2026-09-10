@@ -183,6 +183,11 @@ def build_agenda(
     #: see `RunDataset.generalist_floor` for when that is a measurement and when it is
     #: just missing coverage.
     generalist_floor: bool = True,
+    #: A named procedure supplement appended to each focused arm's system prompt. `baseline`
+    #: is the prompts as written; a ladder rung selects its own so the run it is compared
+    #: against is unmoved. The name reaches `renderer_version` and the text reaches
+    #: `prompt_sha256`, so two variants cannot share a prompt identity.
+    procedure_variant: str = "baseline",
 ) -> Tuple[ReviewAgenda, Dict[str, Dict[str, Any]]]:
     """The sealed agenda, and the pool of arm task payloads keyed by `proposal_id`.
 
@@ -329,6 +334,7 @@ def build_agenda(
     rendered = render_focused_all(
         list(specs.values()), invocations, selected_units, episodes, graphs,
         context_by_invocation=context_text,
+        procedure_variant=procedure_variant,
     )
     rendered_by_id = {item.invocation_id: item for item in rendered}
     # The contract is allocated over the whole pool at once: "this family needs a naming

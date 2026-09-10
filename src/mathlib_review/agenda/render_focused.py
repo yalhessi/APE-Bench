@@ -25,7 +25,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
-from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
+from ape.tasks.lean_tasks.formal_math.review.focused_prompts import (
+    FOCUSED_PROMPTS, procedure_supplement,
+)
 
 from src.mathlib_review.agenda.focused_specs import FocusedAgentSpec, FocusedInvocation
 from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
@@ -149,21 +151,42 @@ def _target_blocks(targets: Sequence[Any]) -> List[str]:
     return blocks
 
 
-def focused_system_prompt(spec: FocusedAgentSpec) -> str:
-    """The spec's v2 instruction verbatim, followed by the v4 envelope."""
+def renderer_version_for(procedure_variant: str = "baseline") -> str:
+    """The renderer version a variant stamps on its prompts.
+
+    The variant travels in the version string as well as in the prompt hash: the hash alone
+    says two runs differed, and the name says how without reading the prompt. `baseline` is
+    spelled as the bare version so every pre-existing artifact keeps its value.
+    """
+
+    if procedure_variant == "baseline":
+        return FOCUSED_RENDERER_VERSION
+    return f"{FOCUSED_RENDERER_VERSION}+{procedure_variant}"
+
+
+def focused_system_prompt(spec: FocusedAgentSpec,
+                          procedure_variant: str = "baseline") -> str:
+    """The spec's v2 instruction verbatim, a procedure supplement, then the v4 envelope.
+
+    The supplement sits between the check and the submission contract on purpose: it modifies
+    how the arm conducts the check, and the contract is about what a valid submission is. An
+    unknown variant raises rather than rendering the baseline under the treatment's name.
+    """
 
     _tools, system, _user = FOCUSED_PROMPTS[spec.spec_id]
-    return system + SUBMISSION_CONTRACT.format(
-        concern_family=spec.concern_family,
-        issue_kind=spec.issue_kind,
-        spec_id=spec.spec_id,
-    )
+    return system + procedure_supplement(procedure_variant, spec.spec_id) + \
+        SUBMISSION_CONTRACT.format(
+            concern_family=spec.concern_family,
+            issue_kind=spec.issue_kind,
+            spec_id=spec.spec_id,
+        )
 
 
 def render_focused_invocation(
     spec: FocusedAgentSpec, invocation: FocusedInvocation, unit: ReviewWorkUnit,
     episode: ReviewEpisodeInput, graph: ChangeGraph,
     context_text: str = "",
+    procedure_variant: str = "baseline",
 ) -> RenderedPrompt:
     if invocation.spec_id != spec.spec_id:
         raise ValueError(
@@ -178,7 +201,7 @@ def render_focused_invocation(
     # copies across smoke4's 143 prompts, 13% of all prompt text. It is emitted once, after the
     # targets, so it still reads as applying to all of them.
     blocks = _target_blocks([targets[change_id] for change_id in invocation.site_change_ids])
-    system = focused_system_prompt(spec)
+    system = focused_system_prompt(spec, procedure_variant)
     user = (
         f"# PR #{episode.pr_number}: {episode.title.text or ''}\n"
         f"Round: {episode.round_index}\n"
@@ -195,7 +218,7 @@ def render_focused_invocation(
         work_unit_id=unit.work_unit_id,
         invocation_id=invocation.invocation_id,
         spec_id=spec.spec_id,
-        renderer_version=FOCUSED_RENDERER_VERSION,
+        renderer_version=renderer_version_for(procedure_variant),
         system_prompt=system, user_prompt=user,
         system_sha256=sha256_bytes(system.encode()),
         user_sha256=sha256_bytes(user.encode()),
@@ -218,6 +241,7 @@ def render_focused_all(
     units: Iterable[ReviewWorkUnit], episodes: Iterable[ReviewEpisodeInput],
     graphs: Iterable[ChangeGraph],
     context_by_invocation: Optional[Dict[str, str]] = None,
+    procedure_variant: str = "baseline",
 ) -> List[RenderedPrompt]:
     spec_by_id: Dict[str, FocusedAgentSpec] = {item.spec_id: item for item in specs}
     unit_by_id = {item.work_unit_id: item for item in units}
@@ -230,5 +254,6 @@ def render_focused_all(
             spec_by_id[invocation.spec_id], invocation, unit,
             episode_by_id[unit.episode_id], graph_by_id[unit.graph_id],
             (context_by_invocation or {}).get(invocation.invocation_id, ""),
+            procedure_variant,
         ))
     return rendered

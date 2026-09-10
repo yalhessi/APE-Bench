@@ -548,3 +548,81 @@ FAMILY_DESIGN_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff
 
 FOCUSED_PROMPTS["family_design"] = (
     FAMILY_DESIGN_TOOLS, FAMILY_DESIGN_SYSTEM, FAMILY_DESIGN_USER)
+
+
+# --- procedure supplements: named, per-arm addenda for ladder rungs --------------------------
+#
+# A rung of the oracle ladder changes ONE thing and has to be comparable against the rung
+# before it, so a treatment cannot be an edit to the prompt above -- that would move the
+# baseline it is measured against. Supplements are appended by name instead, and the name
+# travels into `renderer_version` while the text changes `prompt_sha256`, so a run records
+# which variant it ran under and two variants can never share a prompt identity.
+#
+# `baseline` is the empty supplement: the prompts above, unchanged.
+
+#: Rung 3a -- procedure only.
+#:
+#: What rung 0 established: both proof arms reached all five work units of PR33098's `grind`
+#: family, located 5 of 5, abstained on none, compiled 44 candidate edits between them with no
+#: errors -- and proposed `simpa` 51 times and `grind` zero times. `proof_golf` made no
+#: retrieval call of any kind across seven invocations; `proof_idiom` made one file-scoped
+#: `content_search`; neither called `get_lean_goal`, which its own prompt already requires.
+#:
+#: So the arms can construct and verify a replacement and are not looking for which one to
+#: construct. This supplement adds no information: it requires the arm to *carry out* the
+#: search its prompt already describes, over the tactic families its prompt already names,
+#: and to report what it tried. If that alone produces the requested transformation, the
+#: retrieval and norm-knowledge workstream is unnecessary for this failure class.
+#:
+#: Deliberately absent: any PR-specific term, any named tactic beyond the list already above,
+#: any statement about how common a tactic is, any worked example, anything gold-derived. The
+#: families are referenced, never re-listed -- restating them would let this supplement
+#: re-weight them, which would make it a recommendation rather than a procedure.
+RUNG3A_PROCEDURE = """
+
+## Required procedure (do this before you decide what to propose)
+
+The check above describes a search. Carry it out explicitly, and do not shortcut it by
+proposing the first alternative that comes to mind — that is the failure this procedure exists
+to prevent.
+
+For EACH proof you are reviewing, in order:
+
+1. Call `get_lean_goal` on it and read the goal state. You may not propose a replacement for a
+   proof whose goal you have not inspected.
+2. Work through the list of patterns above and decide, for each one, whether it could apply to
+   THIS goal. Consider every entry before settling on any of them; the list is not ordered by
+   likelihood, and the first plausible entry is not therefore the right one.
+3. For each entry you judged applicable, write the candidate replacement and run
+   `lean_verify_edit` on it. Attempt them all before choosing between them. A tactic you did
+   not attempt is not a tactic you ruled out.
+4. Choose among the attempts that compiled. If several compile, prefer the one a maintainer
+   would name — the most direct expression of the argument, not the shortest text.
+
+In `rationale`, state which entries you attempted and what each attempt did: compiled, failed,
+or was judged inapplicable and why. An arm that attempted one entry has not run this check.
+If nothing you attempted compiled, submit nothing for that proof and say so."""
+
+#: `variant -> {arm_id -> supplement}`. An arm absent from a variant gets the empty string, so
+#: a rung can treat one arm and leave every other exactly as it was.
+PROCEDURE_SUPPLEMENTS = {
+    "baseline": {},
+    "rung3a": {
+        "proof_idiom": RUNG3A_PROCEDURE,
+        "proof_golf": RUNG3A_PROCEDURE,
+    },
+}
+
+
+def procedure_supplement(variant: str, arm_id: str) -> str:
+    """The addendum this variant gives this arm. Raises on an unknown variant.
+
+    Raising matters more than it looks: a typo'd variant name that silently returned nothing
+    would run the baseline under the treatment's name and report it as a rung result.
+    """
+
+    if variant not in PROCEDURE_SUPPLEMENTS:
+        raise ValueError(
+            f"unknown procedure variant {variant!r}; known: {sorted(PROCEDURE_SUPPLEMENTS)}"
+        )
+    return PROCEDURE_SUPPLEMENTS[variant].get(arm_id, "")

@@ -52,7 +52,8 @@ def roster() -> Dict[str, List[str]]:
     return {item.arm_id: sorted(item.expected_concerns) for item in ARM_DEFINITIONS}
 
 
-def _payloads_for(bench: ArmBench, dataset, release) -> Dict[str, Dict[str, Any]]:
+def _payloads_for(bench: ArmBench, dataset, release,
+                  procedure_variant: str = "baseline") -> Dict[str, Dict[str, Any]]:
     """The agenda's own arm payload for each case in the fixture, keyed by work unit."""
 
     from src.mathlib_review.agenda.agenda import build_agenda
@@ -65,6 +66,7 @@ def _payloads_for(bench: ArmBench, dataset, release) -> Dict[str, Dict[str, Any]
         # The floor is a coverage device for a whole review; a bench runs one arm.
         generalist_floor=False,
         use_exposure_index=dataset.use_exposure_index,
+        procedure_variant=procedure_variant,
         **release,
     )
     # A pool entry *is* the arm's task data -- `_arm_payload` returns the v4 payload with the
@@ -137,6 +139,7 @@ def estimate_cost(benches, *, per_case: float) -> float:
 
 def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
                 selector="audited", cost_cap=DEFAULT_BENCH_COST_CAP,
+                procedure_variant="baseline",
                 execute=False, logger=None) -> int:
     """Build the benches, report coverage, and run them only when told to.
 
@@ -193,7 +196,7 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
     judgments = load_jsonl(dataset.release / "gold/judgments.jsonl", JudgmentNode)
     scores = {}
     for arm_id, bench in sorted(benches.items()):
-        payloads = _payloads_for(bench, dataset, release)
+        payloads = _payloads_for(bench, dataset, release, procedure_variant)
         missing = {case.work_unit_id for case in bench.cases} - set(payloads)
         if missing:
             # An arm is not eligible everywhere, so a case with no rendered payload is a
@@ -210,6 +213,10 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
         )
         score["cases_not_eligible"] = sorted(missing)
         score["cost"] = round(float(getattr(results, "total_cost", 0.0) or 0.0), 6)
+        # Which rung this is. Recorded on the score so a result file can never be read as
+        # the wrong treatment; the prompt hash in the payload says the same thing, less
+        # legibly.
+        score["procedure_variant"] = procedure_variant
         scores[arm_id] = score
         print(json.dumps(score, indent=2))
 
@@ -234,6 +241,9 @@ def main() -> None:
                         help="how positives are chosen; see build_all")
     parser.add_argument("--cost-cap", type=float, default=DEFAULT_BENCH_COST_CAP,
                         help="refuse before running if the worst case exceeds this")
+    parser.add_argument("--procedure-variant", default="baseline",
+                        help="named procedure supplement for the treated arms; "
+                             "`baseline` is the prompts as written")
     parser.add_argument("--out", type=Path, default=None,
                         help="write the score here (only with --execute)")
     parser.add_argument("--execute", action="store_true",
@@ -242,7 +252,8 @@ def main() -> None:
     raise SystemExit(run_benches(
         config=args.config, arms=args.arm, pr_numbers=args.pr_numbers,
         negatives_per_pr=args.negatives_per_pr, out=args.out, execute=args.execute,
-        selector=args.selector, cost_cap=args.cost_cap))
+        selector=args.selector, cost_cap=args.cost_cap,
+        procedure_variant=args.procedure_variant))
 
 
 if __name__ == "__main__":
