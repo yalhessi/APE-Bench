@@ -456,6 +456,62 @@ term, tactic recommendation, example or frequency. If that produces the exact tr
 2 of 3 attempts, the entire retrieval and norm-card workstream closes for this failure class
 without being built.
 
+### Phase 3 rung 3a — RAN, and fails. Procedure adds depth, not breadth.
+
+**First, a defect of mine that cost real money and must be read before the result.** The bench
+used `bench_{arm}` as its orchestrator id, and that name is the orchestrator's *resume key*.
+So of the five attempts run, only **two** executed: `rung3a_1` (06:16–06:18, the only window
+with LLM logs) and the original rung-0 baseline. `rung3a_2`, `rung3a_3`, `rung0_idiom_2` and
+`rung0_idiom_3` found every task already complete and returned it from cache — costs identical
+to the microdollar (0.979 three times, 0.574 three times), four runs paid for, four reporting
+the earlier attempt's behaviour as if it were new. `review.runner.guard_run_name` documents
+exactly this hazard for the pipeline path; the bench path had no equivalent. It does now: the
+run name carries variant and attempt, and an existing attempt is refused with the reason unless
+`--resume` is passed deliberately.
+
+**So the sample is n=1 per variant, not n=3.** Read the result accordingly.
+
+**The result.** The arm complied partially and the outcome did not move.
+
+```
+                      baseline (n=1)     rung3a (n=1)
+located                     5 / 5            5 / 5
+abstained                       0                0
+get_lean_goal calls             0                6   <- on 3 of 7 units, not 7
+lean_verify_edit               19               30
+candidates submitted           11               10
+`grind` submitted               0                0
+`grind` ATTEMPTED               0                0
+```
+
+Compliance was incomplete: `get_lean_goal` was called on **3 of 7** work units, though the
+supplement says a replacement may not be proposed for a proof whose goal has not been
+inspected.
+
+The decisive number is the last row. Of **30 verify attempts**, 29 contain a `simp`-family
+tactic and 17 contain `by_cases`. **Zero** contain `grind`, `omega`, `decide`, `gcongr`, `grw`
+or `fun_prop` — five of the six families its own prompt lists. And across every channel in the
+transcripts — tool inputs, tool results, and the arm's own text — the string `grind` appears
+**zero times**.
+
+**Mechanism: the procedure increased depth within one family and left breadth untouched.**
+Forced to sweep, the arm produced twelve `simpa` variants on a single work unit rather than one
+attempt from each family. It is not failing to search; it is searching a space that does not
+contain the answer.
+
+**Verdict: 3a fails, and the failure is informative.** "Try harder within your repertoire" is
+not the missing resource, because `grind` is not in the repertoire for this goal shape — the
+arm never wrote the word, though its prompt names it once. That is the case for **3b**: the
+arm needs evidence that `grind` applies to goals of *this shape*, which is exactly Codex's
+constraint that evidence "must say more than 'this tactic exists'". The bounded
+`corpus_frequency` tool is the cheapest thing that could supply it, and it is now the indicated
+next rung rather than a speculative one.
+
+**One caveat before 3b.** A procedure rung that the arm follows on 3 of 7 targets has not been
+fully tested. Whether to re-run 3a with compliance enforced mechanically — refusing a
+submission whose proof had no `get_lean_goal` — or to accept the breadth finding and move to
+3b, is a judgment call about spend, not about evidence.
+
 ---
 ---
 

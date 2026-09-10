@@ -126,6 +126,47 @@ async def _run_arm(payloads: Dict[str, Dict[str, Any]], scaffold, run_name: str,
 DEFAULT_BENCH_COST_CAP = 8.00
 
 
+def bench_run_name(arm_id: str, procedure_variant: str, attempt: int) -> str:
+    """The orchestrator id for one bench attempt.
+
+    It has to carry the variant AND the attempt, because the name is the orchestrator's
+    *resume key*. `bench_{arm}` alone meant that a second attempt found every task already
+    complete and returned it from cache: five runs of this bench produced two distinct results
+    and four no-ops, with costs identical to the microdollar and four of them paid for
+    nothing. Only the prompt change saved the variants from collapsing into each other too --
+    a different prompt is a different task id.
+    """
+
+    return f"bench_{arm_id}_{procedure_variant}_a{attempt}"
+
+
+def assert_scratch_is_unused(run_name: str, scaffold, *, resume: bool, logger) -> None:
+    """Refuse a bench whose orchestrator state already exists, before spending anything.
+
+    The same discipline as `review.runner.guard_run_name`, which documents the hazard this
+    path was missing: every attempt that already succeeded is returned from cache, so the
+    change under test never executes and the run reports the old behaviour as if it were new.
+    """
+
+    from src.mathlib_review.review.runner import _scratch_dirs
+
+    existing = [item for item in _scratch_dirs(run_name, scaffold) if item.is_dir()]
+    if not existing:
+        return
+    if resume:
+        logger.warning(
+            "resuming %s from %s -- completed cases will NOT be re-run and this is not an "
+            "independent attempt", run_name, ", ".join(str(item) for item in existing))
+        return
+    raise SystemExit(
+        f"orchestrator state for {run_name!r} already exists "
+        f"({', '.join(str(item) for item in existing)}). That name is a resume key: rerunning "
+        "it returns the completed cases from cache, so the result would be a copy of the "
+        "earlier attempt rather than a new sample. Use --attempt N for an independent "
+        "attempt, or --resume to continue this one deliberately."
+    )
+
+
 def estimate_cost(benches, *, per_case: float) -> float:
     """Worst-case billed spend, as `cases x the per-task ceiling`.
 
@@ -139,7 +180,7 @@ def estimate_cost(benches, *, per_case: float) -> float:
 
 def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
                 selector="audited", cost_cap=DEFAULT_BENCH_COST_CAP,
-                procedure_variant="baseline",
+                procedure_variant="baseline", attempt=1, resume=False,
                 execute=False, logger=None) -> int:
     """Build the benches, report coverage, and run them only when told to.
 
@@ -204,8 +245,10 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
             logger.info("%s: %d of %d case(s) have no rendered payload (arm not eligible "
                         "there); scoring the remaining %d",
                         arm_id, len(missing), len(bench.cases), len(payloads))
+        run_name = bench_run_name(arm_id, procedure_variant, attempt)
+        assert_scratch_is_unused(run_name, scaffold, resume=resume, logger=logger)
         anchors, errors, results = asyncio.run(
-            _run_arm(payloads, scaffold, f"bench_{arm_id}", logger))
+            _run_arm(payloads, scaffold, run_name, logger))
         score = score_bench(
             bench, anchors,
             gold_anchors_by_unit=gold_anchor_index(bench, judgments),
@@ -217,6 +260,8 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
         # the wrong treatment; the prompt hash in the payload says the same thing, less
         # legibly.
         score["procedure_variant"] = procedure_variant
+        score["attempt"] = attempt
+        score["run_name"] = run_name
         scores[arm_id] = score
         print(json.dumps(score, indent=2))
 
@@ -244,6 +289,12 @@ def main() -> None:
     parser.add_argument("--procedure-variant", default="baseline",
                         help="named procedure supplement for the treated arms; "
                              "`baseline` is the prompts as written")
+    parser.add_argument("--attempt", type=int, default=1,
+                        help="which independent attempt this is; part of the resume key, so "
+                             "repeats MUST increment it or they return the first from cache")
+    parser.add_argument("--resume", action="store_true",
+                        help="continue an existing attempt instead of refusing it. Completed "
+                             "cases are not re-run, so the result is not a new sample.")
     parser.add_argument("--out", type=Path, default=None,
                         help="write the score here (only with --execute)")
     parser.add_argument("--execute", action="store_true",
@@ -253,7 +304,8 @@ def main() -> None:
         config=args.config, arms=args.arm, pr_numbers=args.pr_numbers,
         negatives_per_pr=args.negatives_per_pr, out=args.out, execute=args.execute,
         selector=args.selector, cost_cap=args.cost_cap,
-        procedure_variant=args.procedure_variant))
+        procedure_variant=args.procedure_variant, attempt=args.attempt,
+        resume=args.resume))
 
 
 if __name__ == "__main__":
