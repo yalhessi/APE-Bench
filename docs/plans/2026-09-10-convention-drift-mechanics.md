@@ -355,10 +355,49 @@ hunk, 7 % more from git's `@@ … @@` function-context line), 33 % reported unre
 guessed. **696 comments land on `of:P`**, the dot-notation situation. Artifact under
 `data/pr_review_v5/review_join/`.
 
-**Pending.** The precision hand-read: a stratified 50 (14 `of:P`, 8 `goal:subset`, 10 `goal:eq`,
-9 `predicate`, 9 `subject`) rated by two independent five-rater panels, the second refute-framed,
-reporting inter-rater agreement and strict/lenient precision per stratum. The September corpus
-fetch (`configs/pr_review_v2_corpus_2025_09.yaml`, user's shell).
+**Measured — and the gate fails.** Fifty comments, stratified, rated by two independent
+five-rater panels (panel B refute-framed). Inter-rater agreement is high — about-declaration
+43/50, requests-form-change 47/50, key-fits 38/50 — so the number is reliable:
+
+```
+                          n   strict (both: about ∧ request ∧ key fits)   lenient (either, fits ≠ no)
+of:P  (dot-notation)     14        1                                          5
+subject                   9        1                                          4
+goal:subset               8        1                                          3
+goal:eq                  10        0                                          2
+predicate                 9        0                                          1
+ALL                      50        3   (6 %)                                 15  (30 %)
+```
+
+**Two causes, visible in the per-comment rows, and they are different fixes.**
+
+*The join resolves the right declaration less than it should.* Only 27/50 comments are about the
+declaration the hunk resolved to; the rest are on another line of the same hunk. The precedent
+index carries no `line`/`position` for the comment, so the resolver takes *any* declaration in
+the hunk. Whether the raw bundles kept the position decides if this is fixable.
+
+*The facets do not cover what reviewers actually ask for.* Of the 23 comments that request a
+form change, the categories are **proof_style 11, statement_form 5, typeclass 4, naming 3,
+tactic 3, attribute 2, docs 2, placement 2, api_family 2**. My situation keys — goal head,
+predicate head, LHS subject, `of`-lemma — are tactic- and naming-shaped, because those were the
+two conventions I already knew about. Reviewers' form requests are dominated by **how proofs are
+structured and how statements are phrased**, and there is no proof-structure facet and no
+statement-shape facet at all; `typeclass` (4) has no binder-head facet and scored 0/4 "fits".
+The 11 proof_style requests all came back "partial": right declaration, facet that describes its
+goal rather than its proof. That is "designed knowing the answer" a third time, caught by the
+gate before it reached a prompt.
+
+**What this does and does not say.** It does *not* say review comments cannot be joined to
+situations — the declaration resolution is mostly right where a form is requested, and the
+"partial" mass is a missing facet, not a wrong declaration. It *does* say the enforcement
+component cannot be used until (a) resolution is line-level and (b) facets exist for the
+categories reviewers actually comment on, in the proportions they comment on them — which the
+machinery sweep judged feasible with no parser change for proof_style, statement_form and
+typeclass. Then re-measure, per category.
+
+**Pending.** Line-level resolution (if the bundles kept `line`); facets for proof_style,
+statement_form, typeclass; re-measurement per category. The September corpus fetch
+(`configs/pr_review_v2_corpus_2025_09.yaml`, user's shell).
 
 ## The first experiment, after step zero (~$8, one day)
 
