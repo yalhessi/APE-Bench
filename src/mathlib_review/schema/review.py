@@ -53,7 +53,8 @@ DISPOSITIONS = ("mandatory", "proposed", "agent_added", "pruned")
 #: it, `arms.py` was changed, and this comment was left behind asserting the opposite of what
 #: the code does. Policy and its rationale belong together, which is why the reasoning is
 #: there and not here.
-CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "lean_verify_edit")
+CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "proof_profile",
+                 "lean_verify_edit")
 
 
 class ReviewArm(StrictModel):

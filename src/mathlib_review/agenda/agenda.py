@@ -35,6 +35,7 @@ from src.mathlib_review.agenda.focused_specs import (
 )
 from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_bytes
 from src.mathlib_review.agenda.render_focused import FOCUSED_RENDERER_VERSION, render_focused_all
+from src.mathlib_review.schema.review import CONTEXT_TOOLS
 from src.mathlib_review.schema import (
     ChangeGraph,
     ModificationRecord,
@@ -142,6 +143,7 @@ def enumerate_invocations(
 
 
 def _arm_payload(base_payload: Dict[str, Any], *, arm: ReviewArm, invocation_id: str,
+                 procedure_variant: str = "baseline",
                  spec_id: Optional[str]) -> Dict[str, Any]:
     """Turn a v4 task-data payload into a v5 arm payload.
 
@@ -158,7 +160,12 @@ def _arm_payload(base_payload: Dict[str, Any], *, arm: ReviewArm, invocation_id:
     payload["invocation_id"] = invocation_id
     payload["arm_id"] = arm.arm_id
     payload["spec_id"] = spec_id
-    payload["context_tools"] = list(arm.context_tools)
+    # The arm's standing grant, plus whatever the ladder variant adds. Ordered by
+    # `CONTEXT_TOOLS` so the list is stable and two runs of one variant hash alike.
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import procedure_tool_grant
+
+    granted = set(arm.context_tools) | set(procedure_tool_grant(procedure_variant, arm.arm_id))
+    payload["context_tools"] = [item for item in CONTEXT_TOOLS if item in granted]
     payload["task_id"] = "pr5_" + invocation_id.replace(":", "_").replace("#", "__")
     return payload
 
@@ -292,6 +299,7 @@ def build_agenda(
         pool[invocation_id] = _arm_payload(
             data.model_dump(mode="json"), arm=generalist,
             invocation_id=invocation_id, spec_id=None,
+            procedure_variant=procedure_variant,
         )
         proposals.append(sealed_model(
             AgendaProposal,
@@ -357,6 +365,7 @@ def build_agenda(
         pool[invocation.invocation_id] = _arm_payload(
             data.model_dump(mode="json"), arm=arm,
             invocation_id=invocation.invocation_id, spec_id=invocation.spec_id,
+            procedure_variant=procedure_variant,
         )
         decision = decisions[invocation.invocation_id]
         proposals.append(sealed_model(

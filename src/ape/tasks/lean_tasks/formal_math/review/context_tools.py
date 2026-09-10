@@ -321,10 +321,109 @@ def _register_declaration(task, mcp) -> None:
         }
 
 
+def _register_proof_profile(task, mcp) -> None:
+    @mcp.tool(
+        description=(
+            "Ask the repository what actually closes proofs LIKE THIS ONE, at this PR's base "
+            "commit. Returns the tactics that close proofs in the same reference class, "
+            "RANKED, each with how common it is and whether its use is rising or flat.\n\n"
+            "Use this BEFORE deciding what to propose, not to confirm a tactic you have "
+            "already chosen. It answers 'what would a maintainer reach for here', which is a "
+            "question you cannot ask by searching for a tactic you have not thought of.\n\n"
+            "READ THE RANK AND THE TREND, NOT ONLY THE SHARE. A tactic the library is adopting "
+            "is rare in absolute terms and still the thing a maintainer will ask for — a "
+            "convention is where the code is going, and a share is where it has been. A tactic "
+            "ranked second at 3% whose use went from nothing to that in a year is a stronger "
+            "signal than the 25% tactic that has been flat for three.\n\n"
+            "The corpus is the tree BEFORE this PR, so nothing this PR adds appears in it."
+        )
+    )
+    async def proof_profile(
+        conclusion_head: Annotated[Optional[str], Field(description=(
+            "Restrict to proofs whose goal concludes in this relation: subset, ssubset, le, "
+            "ge, eq, iff, mem, quantified, other. Omit for no restriction."))] = None,
+        directory: Annotated[Optional[str], Field(description=(
+            "Restrict to a Mathlib subtree, e.g. `Topology/MetricSpace`. Omit for the whole "
+            "library. Narrow is not better: a subtree can be behind the library."))] = None,
+        limit: Annotated[int, Field(description="Max tactics to return")] = 8,
+    ) -> Dict[str, Any]:
+        from src.mathlib_review.retrieval.declaration_table import (
+            curve_dates, distribution, load_table, trajectory,
+        )
+
+        sha = task.data.snapshot_base_sha
+        try:
+            table = load_table(sha)
+        except (FileNotFoundError, ValueError) as exc:
+            # Absence is reported, never papered over: a profile computed from a partial
+            # checkout would be a 2% sample that still clears any support threshold.
+            return {"success": False, "error": str(exc)}
+
+        rows = table.select(conclusion_head_=conclusion_head, directory=directory)
+        if not rows:
+            return {"success": True, "population": 0, "results": (
+                "No proofs in the base commit match that reference class. Widen it — drop the "
+                "directory, or drop the conclusion restriction — rather than reading this as "
+                "'there is no convention here'.")}
+
+        payload = distribution(rows)
+        top = payload["tactics"][:max(1, min(int(limit or 8), 20))]
+
+        # The trend is what makes the level readable, so it is computed for what is returned
+        # rather than offered as a second call the arm has to think to make.
+        # Anchored to the base commit's own date rather than to literals, so the right-hand
+        # end of every curve is the state this PR was opened against.
+        dates = curve_dates(sha)
+        lines = []
+        for item in top:
+            try:
+                curve = trajectory(item["tactic"], sha, dates, subdir="Mathlib") if dates else []
+            except (FileNotFoundError, OSError):
+                curve = []
+            # The trend is read from the curve ALONE. `item["share"]` is a share of proofs in
+            # this reference class; the curve is a share of files across the library. Comparing
+            # them would divide two different denominators -- the first version of this did,
+            # and reported `simpa` as "declining" because 5.9% of subset proofs is less than
+            # half the fraction of files that mention it anywhere.
+            trend = ""
+            if len(curve) >= 2:
+                early = curve[0]["share"] or 0.0
+                late = curve[-1]["share"] or 0.0
+                if late > 0.005 and early < 0.005:
+                    # Categorically different from a tactic that merely grew: this one did not
+                    # meaningfully exist a year ago, which is the strongest available signal
+                    # that it is a convention arriving rather than one the author has already
+                    # applied.
+                    trend = ("  NEW — essentially absent a year ago (%.2f%% of files), "
+                             "now %.2f%%" % (100 * early, 100 * late))
+                elif late > 0.005 and late > max(2 * early, early + 0.01):
+                    trend = "  rising (%.2f%% -> %.2f%% of files)" % (
+                        100 * early, 100 * late)
+                elif early > 0.005 and late < early / 2:
+                    trend = "  declining (%.2f%% -> %.2f%% of files)" % (
+                        100 * early, 100 * late)
+                else:
+                    trend = "  flat"
+            lines.append("%2d. `%s` — %.1f%% of %d proofs%s"
+                         % (len(lines) + 1, item["tactic"], 100 * (item["share"] or 0.0),
+                            payload["population"], trend))
+
+        return {
+            "success": True,
+            "reference_class": {"conclusion_head": conclusion_head, "directory": directory,
+                                "population": payload["population"]},
+            "corpus_sha256": sha,
+            "conclusion_classifier_version": payload["conclusion_classifier_version"],
+            "tactic_vocabulary_version": payload["tactic_vocabulary_version"],
+            "results": "\n".join(lines),
+        }
+
+
 _REGISTRARS = {
     "zulip_search": _register_zulip,
     "precedent_search": _register_precedent,
     "declaration_search": _register_declaration,
+    "proof_profile": _register_proof_profile,
 }
 
 

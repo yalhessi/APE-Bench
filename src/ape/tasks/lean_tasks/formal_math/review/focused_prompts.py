@@ -603,6 +603,44 @@ In `rationale`, state which entries you attempted and what each attempt did: com
 or was judged inapplicable and why. An arm that attempted one entry has not run this check.
 If nothing you attempted compiled, submit nothing for that proof and say so."""
 
+#: Rung 3b -- procedure plus evidence.
+#:
+#: Rung 3a held the tactic list fixed and required the arm to sweep it. It complied partially
+#: and the outcome did not move: of 30 verified attempts, 29 were `simp`-family and 17 were
+#: `by_cases`, while five of the six families its own prompt lists were attempted **zero**
+#: times. The procedure increased depth inside one family and left breadth untouched -- so
+#: "search your repertoire harder" is not the missing resource, because the answer was not in
+#: the repertoire.
+#:
+#: 3b adds one thing: a channel that *enumerates* the candidates. `proof_profile` answers "what
+#: closes proofs like this one" over the base commit, ranked, with a trend. That is a question
+#: the arm cannot ask by searching for a tactic it has not thought of, which is why rung 3a's
+#: sweep could not reach it.
+#:
+#: Deliberately absent, exactly as in 3a: no tactic is named, no PR-specific term, no
+#: declaration name, no frequency, no worked example, nothing gold-derived. The supplement says
+#: *ask the repository and read the answer*; it does not say what the answer is. If it named
+#: `grind` it would be an oracle leak wearing a mechanism's name, and the rung would prove
+#: nothing.
+RUNG3B_EVIDENCE = RUNG3A_PROCEDURE + """
+
+## Before step 2, ask the repository what it does
+
+Your own sense of which tactic fits is the thing under test here, so do not start from it.
+
+Call `proof_profile` for the goal you just inspected — give it the relation your goal concludes
+in, and leave the directory off unless you have a reason to narrow it. It returns, ranked, what
+actually closes proofs of that shape in this library, with how common each is and whether its use
+is rising.
+
+Then treat the ranked list as the candidate set for step 2, **including entries you would not
+have considered**. An entry you dismissed without attempting is not an entry you ruled out.
+
+Weigh the trend, not only the share. A tactic the library is visibly adopting is the thing a
+maintainer will ask for even while it is still uncommon; a long-flat tactic at a high share is
+how the library already reads, which is the thing the author has usually already done. Where the
+two disagree, say so in `rationale` and explain which you followed."""
+
 #: `variant -> {arm_id -> supplement}`. An arm absent from a variant gets the empty string, so
 #: a rung can treat one arm and leave every other exactly as it was.
 PROCEDURE_SUPPLEMENTS = {
@@ -611,7 +649,38 @@ PROCEDURE_SUPPLEMENTS = {
         "proof_idiom": RUNG3A_PROCEDURE,
         "proof_golf": RUNG3A_PROCEDURE,
     },
+    "rung3b": {
+        "proof_idiom": RUNG3B_EVIDENCE,
+        "proof_golf": RUNG3B_EVIDENCE,
+    },
 }
+
+
+#: Extra context tools a variant grants, over and above the arm's standing registry grant.
+#:
+#: The grant belongs to the variant and not to the registry, because a tool present in
+#: `baseline` would change what `baseline` means: rung 0 and rung 3a were measured with the
+#: proof arms holding `declaration_search` and nothing else, and a later comparison against a
+#: baseline that quietly had `proof_profile` available would not be a comparison at all. The
+#: arm could have discovered and used it without the prompt ever mentioning it.
+PROCEDURE_TOOL_GRANTS = {
+    "baseline": {},
+    "rung3a": {},
+    "rung3b": {
+        "proof_idiom": ("proof_profile",),
+        "proof_golf": ("proof_profile",),
+    },
+}
+
+
+def procedure_tool_grant(variant: str, arm_id: str) -> tuple:
+    """The extra tools this variant gives this arm. Raises on an unknown variant."""
+
+    if variant not in PROCEDURE_TOOL_GRANTS:
+        raise ValueError(
+            f"unknown procedure variant {variant!r}; "
+            f"known: {sorted(PROCEDURE_TOOL_GRANTS)}")
+    return tuple(PROCEDURE_TOOL_GRANTS[variant].get(arm_id, ()))
 
 
 def procedure_supplement(variant: str, arm_id: str) -> str:

@@ -237,6 +237,34 @@ def _git(clone: Path, *args: str) -> str:
                           capture_output=True, text=True, timeout=300).stdout
 
 
+def commit_date(base_sha: str, *, clone: Path = MATHLIB_CLONE) -> Optional[str]:
+    """The base commit's own date, so a curve can be anchored to it rather than to a literal.
+
+    Hardcoded sample dates are how a trend gets missed: the first version of the tool sampled
+    2025-01 and 2025-07 for a commit dated 2025-12, which straddled none of `grind`'s rise and
+    reported every tactic as flat.
+    """
+
+    if not clone.is_dir():
+        return None
+    out = _git(clone, "log", "-1", "--format=%ad", "--date=short", base_sha).strip()
+    return out or None
+
+
+def curve_dates(base_sha: str, *, clone: Path = MATHLIB_CLONE) -> List[str]:
+    """Points for a trend ending at the base commit: two years back, one year back, and it.
+
+    The last point is the base's own date, so the curve's right-hand end is the state the PR was
+    opened against. Earlier points are calendar-shifted from it, not fixed.
+    """
+
+    anchored = commit_date(base_sha, clone=clone)
+    if not anchored:
+        return []
+    year = int(anchored[:4])
+    return [f"{year - 2}{anchored[4:]}", f"{year - 1}{anchored[4:]}", anchored]
+
+
 def trajectory(pattern: str, base_sha: str, dates: Sequence[str],
                *, clone: Path = MATHLIB_CLONE,
                subdir: str = "Mathlib") -> List[Dict[str, Any]]:

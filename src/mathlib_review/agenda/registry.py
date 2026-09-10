@@ -125,12 +125,23 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
     # --- v4's four, widened by v5 -------------------------------------------------------
     _arm("proof_golf", "proof-golf", "proof_simplification",
          "Can a proof this PR changed be written shorter? Verified by recompiling.",
+         # Rung 0 measured this arm making **zero** retrieval calls of any kind across seven
+         # invocations: it read the file, compiled 25 candidate edits and submitted, never
+         # asking the repository anything. A name lookup was not the channel it was missing --
+         # but `proof_profile` is granted by the *ladder variant*, not here, so that `baseline`
+         # keeps meaning what it meant when rung 0 ran. See `PROCEDURE_TOOL_GRANTS`.
          context_tools=("declaration_search",), checkable=True, component="proof",
          inherited_from_v4=True),
     _arm("proof_idiom", "proof-golf", "proof_simplification",
          "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, "
          "`omega`/`grind`, `fun_prop`, the canonical lemma? Explicitly not about length, which "
          "is why it needs its own warrant.",
+         # This arm's warrant is canonicality and its standing grant is a name lookup. Measured
+         # across two runs: 7 of its 9 `content_search` calls were confined to the file it was
+         # handed, none was tactic-shaped under either vocabulary, and on PR 33098 it proposed
+         # `simpa` where `grind` is the second most common closer of subset-concluding lemmas.
+         # `proof_profile` answers that, and is granted by the ladder variant rather than here:
+         # a tool present in `baseline` would move the baseline rung 0 was measured against.
          context_tools=("declaration_search",), checkable=True, component="proof",
          inherited_from_v4=True),
     _arm("duplication", "duplication", "duplicate_implementation",
