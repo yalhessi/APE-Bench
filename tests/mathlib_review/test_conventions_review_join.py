@@ -84,3 +84,44 @@ def test_the_real_corpus_resolves_about_two_thirds():
     assert payload["comments"] == 34640
     assert 0.66 <= payload["resolved_share"] <= 0.72
     assert payload["situation_key_kinds"]["of_lemma_of_predicate"] >= 600
+
+
+def test_a_positioned_comment_resolves_to_the_declaration_enclosing_its_line():
+    """The gate found only 27/50 comments were about the declaration they were joined to,
+    because the index carried no position and the resolver took any declaration in the hunk. With
+    GitHub's `original_position` the declaration is the one whose head is at or above the
+    commented line. On PR 33098's nine raw comments this resolves 9/9 exactly."""
+
+    hunk = ("@@ -10,6 +10,9 @@ section\n"
+            " lemma first_thing : A := by\n"
+            "   simp\n"
+            "+lemma second_thing : B := by\n"
+            "+  by_cases h : x\n"
+            "+  · simpa using foo\n")
+    on_second = situate_hunk(hunk, position=5)   # the `simpa` line, inside second_thing
+    assert on_second["resolved_via"] == "line"
+    assert on_second["declaration"] == "second_thing"
+    on_first = situate_hunk(hunk, position=2)    # the `simp` line, inside first_thing
+    assert on_first["declaration"] == "first_thing"
+    # Without a position the resolver falls back to the coarse behaviour the gate measured.
+    assert situate_hunk(hunk)["resolved_via"] == "head"
+
+
+def test_the_real_33098_comments_resolve_to_the_lemmas_the_maintainer_named():
+    bundle = Path("data/pr_review_v2/cache/bundles/pr_33098.json")
+    if not bundle.is_file():
+        pytest.skip("no 33098 bundle in this checkout")
+    comments = json.loads(bundle.read_text(encoding="utf-8"))["review_comments"]
+    resolved = {}
+    for comment in comments:
+        joined = join_comment({"comment_id": comment["id"], "pr_number": 33098,
+                               "created_at": comment["created_at"], "path": comment["path"],
+                               "commenter": None, "body": comment["body"],
+                               "diff_hunk": comment["diff_hunk"],
+                               "original_position": comment.get("original_position")})
+        resolved[joined.declaration] = joined.resolved_via
+    assert all(via == "line" for via in resolved.values())
+    for lemma in ("minimalCover_subset", "maximalSeparatedSet_subset", "card_minimalCover",
+                  "card_maximalSeparatedSet", "card_le_of_isSeparated",
+                  "coveringNumber_le_packingNumber"):
+        assert lemma in resolved, lemma

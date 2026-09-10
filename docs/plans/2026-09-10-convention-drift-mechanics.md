@@ -395,9 +395,51 @@ categories reviewers actually comment on, in the proportions they comment on the
 machinery sweep judged feasible with no parser change for proof_style, statement_form and
 typeclass. Then re-measure, per category.
 
-**Pending.** Line-level resolution (if the bundles kept `line`); facets for proof_style,
-statement_form, typeclass; re-measurement per category. The September corpus fetch
-(`configs/pr_review_v2_corpus_2025_09.yaml`, user's shell).
+**Both fixes are built; the re-measurement is blocked on a re-fetch.**
+
+*Line-level resolution.* The raw bundles keep `original_position` (1-based over the hunk's
+lines after the `@@` header, stable across force-pushes). `situate_hunk(hunk, position)` now
+resolves in order: the declaration whose head is at or above the commented line (`via=line`),
+then a head anywhere in the hunk, then git's `@@ … @@` function-context line, then
+`unresolved`. On PR 33098's nine positioned comments it resolves **9/9 to the commented
+lemma**; the head-anywhere fallback had put four of them on a neighbour. Both the corpus
+collector (`corpus.py: corpus_row`) and the index writer (`precedent_index.py: meta_row`) now
+carry `original_position`, `original_line`, `side`, `subject_type`; pinned by
+`tests/mathlib_review/test_comment_positions_carried.py`.
+
+*Facets.* `conventions/facets.py`: `proof_structure` (term/tactic mode, step count, calc,
+case splits, `have`s, focus bullets, `simp only`, closing tactic, one-liner), `statement_shape`
+(binder count, explicit/implicit/instance split, ∀/∃/→ in the conclusion, iff, set-builder),
+`typeclass_binders` (instance-binder class heads, including those from `variable` lines).
+Wired into `Situation.keys()` as `proof:`, `stmt:`, `class:` keys; the grind family now reads
+`{goal:subset, proof:tactic:cases, stmt:plain}`.
+
+*What cannot be done yet.* Every row of the current 34,640-row index was collected before the
+position fields existed, and the corpus JSONL it was built from
+(`inputs/pr_review_v2/corpus/mathlib_review_comments.jsonl`) **is no longer on disk** — only
+the derived index survives. So line-level resolution over the corpus needs a re-fetch, and
+the 329 positioned comments in the cached bundles are all December-2025 eval PRs, usable only
+as unit fixtures. The collector is `corpus.py` (repo-level review-comment endpoint, maintainer
+`.lean` comments, eval PRs excluded by number); `fetch.py` and
+`configs/pr_review_v2_corpus_2025_09.yaml` build *per-PR bundles* for the eval dataset and are
+not what the index reads. One run, in the user's shell (needs `GITHUB_TOKEN`; the endpoint
+returns every review comment in the window, 100 per page, and the collector keeps the maintainer
+`.lean` subset — the original window yielded 34,640 kept rows; no scanned count was recorded):
+
+```
+./ape/bin/python -m src.datasets.pr_review_v2.corpus --start 2024-03-01 --end 2025-11-30
+./ape/bin/python -m src.mathlib_review.retrieval.precedent_index build
+./ape/bin/python -m src.mathlib_review.conventions.review_join
+```
+
+The window now runs to November 2025 on purpose. Leakage is prevented at read time — the
+index gates every row at the consuming PR's own base date (`eligible_mask`, `created_epoch <
+cutoff`), and eval PRs' own comments are excluded at collection — so a December PR sees
+September–November enforcement and nothing after its base. That is exactly the evidence the
+August-ending corpus could not supply: `grind`'s 21 enforcement comments are all 2025-H2.
+
+*Then:* re-run the 50-comment precision gate **per category**, with line-level resolution and
+the three new facets, against the same strict/lenient rubric. The number to beat is 6 % strict.
 
 ## The first experiment, after step zero (~$8, one day)
 

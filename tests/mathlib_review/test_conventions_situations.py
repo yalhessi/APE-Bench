@@ -60,7 +60,12 @@ def test_the_grind_family_lands_in_the_subset_goal_class_with_its_tactics():
         "lemma", "Metric.minimalCover_subset",
         "(h : coveringNumber ε A ≠ ⊤) : minimalCover ε A ⊆ A",
         "by\n  by_cases h' : x\n  · simpa [minimalCover] using foo")
-    assert situation.keys() == {"goal": "goal:subset"}
+    keys = situation.keys()
+    assert keys["goal"] == "goal:subset"
+    # The gate added facets; the goal class is still there and the proof facet now says what the
+    # PR's proof actually does -- the thing the maintainer's request was about.
+    assert keys["proof_style"] == "proof:tactic:cases"
+    assert "predicate" not in keys and "of_lemma_of_predicate" not in keys
     assert situation.tactics == ("by_cases", "simpa")
     assert situation.predicate_head is None
 

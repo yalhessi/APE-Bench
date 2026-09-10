@@ -55,7 +55,7 @@ class JoinedComment:
     path: str
     commenter: Optional[str]
     body: str
-    resolved_via: str            # "head" | "context" | "unresolved"
+    resolved_via: str            # "line" | "head" | "context" | "unresolved"
     declaration: Optional[str]
     kind: Optional[str]
     situation_keys: Dict[str, str]
@@ -79,10 +79,46 @@ def _strip_diff_markers(hunk: str) -> str:
     return "\n".join(out)
 
 
-def situate_hunk(hunk: str) -> Dict[str, Any]:
-    """Resolve a hunk to a declaration and its situation, saying how it was resolved."""
+def _declaration_enclosing_line(hunk: str, position: Optional[int]) -> Optional[re.Match]:
+    """The declaration head at or above the commented line, when the comment's position is known.
+
+    GitHub's `original_position` is 1-based over the hunk's lines *after* the `@@` header. The
+    precedent index dropped it, and the resolver then took *any* declaration in the hunk -- which
+    is why only 27 of 50 hand-read comments were about the declaration they were joined to. The
+    raw bundles keep it (`original_position`, `original_line`, `side`, `subject_type`), so a
+    rebuilt index can carry it and this walks back from the commented line instead.
+    """
+
+    if position is None or position < 1:
+        return None
+    lines = hunk.splitlines()
+    if not lines or lines[0].startswith("@@") is False:
+        return None
+    index = min(position, len(lines) - 1)   # lines[0] is the header; position 1 -> lines[1]
+    for back in range(index, 0, -1):
+        match = _HEAD.match(lines[back])
+        if match:
+            return match
+    return None
+
+
+def situate_hunk(hunk: str, position: Optional[int] = None) -> Dict[str, Any]:
+    """Resolve a hunk to a declaration and its situation, saying how it was resolved.
+
+    With `position` (the comment's `original_position`), the declaration is the one enclosing the
+    commented line; without it, the first declaration in the hunk -- the coarse behaviour the
+    gate measured at 27/50 about-declaration.
+    """
 
     hunk = hunk or ""
+    # 0. Line-level: the declaration whose head is at or above the commented line.
+    enclosing = _declaration_enclosing_line(hunk, position)
+    if enclosing:
+        kind, name = enclosing.group(1), enclosing.group(2)
+        # `_HEAD.match` ran on one hunk line, so `.string` is that line: the declaration header.
+        header = enclosing.string.split(":=")[0]
+        situation = situation_of(kind, name, header, "")
+        return {"resolved_via": "line", "declaration": name, "kind": kind, "situation": situation}
     source = _strip_diff_markers(hunk)
     # 1. A full declaration inside the hunk: parse it properly.
     try:
@@ -113,7 +149,9 @@ def situate_hunk(hunk: str) -> Dict[str, Any]:
 
 
 def join_comment(row: Dict[str, Any]) -> JoinedComment:
-    resolved = situate_hunk(row.get("diff_hunk") or "")
+    position = row.get("original_position")
+    resolved = situate_hunk(row.get("diff_hunk") or "",
+                            int(position) if isinstance(position, int) else None)
     situation: Optional[Situation] = resolved["situation"]
     return JoinedComment(
         comment_id=str(row.get("comment_id")),

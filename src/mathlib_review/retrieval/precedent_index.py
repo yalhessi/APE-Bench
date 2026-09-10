@@ -83,6 +83,32 @@ def _load_corpus(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 
+def meta_row(row: dict) -> dict:
+    """The per-comment record the index keeps beside its embedding.
+
+    `original_position`, `original_line`, `side` and `subject_type` are carried through so a
+    comment can be attached to the declaration *enclosing its line* rather than to any
+    declaration in its hunk (`conventions.review_join.situate_hunk`). The 34,640-row corpus
+    the current index was built from predates these fields, so its rows carry `None` here; a
+    re-fetched corpus does not. The hunk itself is truncated for display, so resolution
+    against it must go through these fields, never through the stored text."""
+    return {
+        "comment_id": row.get("comment_id"),
+        "pr_number": row.get("pr_number"),
+        "path": row.get("path"),
+        "created_at": row.get("created_at"),
+        "created_epoch": _iso_to_epoch(row.get("created_at")),
+        "original_position": row.get("original_position"),
+        "original_line": row.get("original_line") or row.get("line"),
+        "side": row.get("side"),
+        "subject_type": row.get("subject_type"),
+        "commenter": row.get("commenter"),
+        "html_url": row.get("html_url"),
+        "body": (row.get("body") or "")[:DISPLAY_BODY_CHARS],
+        "diff_hunk": (row.get("diff_hunk") or "")[:DISPLAY_HUNK_CHARS],
+    }
+
+
 def build(
     corpus_path: Path = PRECEDENT_CORPUS,
     out_dir: Path = PRECEDENT_INDEX,
@@ -124,17 +150,7 @@ def build(
     np.save(out_dir / "embeddings.npy", embeddings)
     with (out_dir / "meta.jsonl").open("w", encoding="utf-8") as handle:
         for row in rows:
-            handle.write(json.dumps({
-                "comment_id": row.get("comment_id"),
-                "pr_number": row.get("pr_number"),
-                "path": row.get("path"),
-                "created_at": row.get("created_at"),
-                "created_epoch": _iso_to_epoch(row.get("created_at")),
-                "commenter": row.get("commenter"),
-                "html_url": row.get("html_url"),
-                "body": (row.get("body") or "")[:DISPLAY_BODY_CHARS],
-                "diff_hunk": (row.get("diff_hunk") or "")[:DISPLAY_HUNK_CHARS],
-            }, ensure_ascii=False) + "\n")
+            handle.write(json.dumps(meta_row(row), ensure_ascii=False) + "\n")
     manifest = {
         "index_version": INDEX_VERSION,
         "model_name": model_name,

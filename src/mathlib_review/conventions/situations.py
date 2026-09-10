@@ -19,12 +19,15 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
 from ape.toolkits.code.lean.lean_parser import mask_noncode_regions
 
 from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
 from src.mathlib_review.evidence.operators.naming_norm import conclusion_subject, leaf_prefix
+from src.mathlib_review.conventions.facets import (
+    proof_structure, statement_shape, typeclass_binders,
+)
 from src.mathlib_review.retrieval.declaration_table import conclusion_head
 from src.mathlib_review.tactics import TACTIC_VOCABULARY, tactics_used
 
@@ -98,6 +101,12 @@ class Situation:
     #: For an `of`-lemma concluding predicate P: is it named inside P's namespace?
     named_inside_predicate: Optional[bool]
     tactics: Tuple[str, ...]
+    #: The facets the review-join gate showed reviewers actually comment on -- proof_style 11,
+    #: statement_form 5, typeclass 4 of 23 form requests -- and which the first four keys did
+    #: not represent at all. Stored as small dicts; `keys()` turns them into join keys.
+    proof: Dict[str, object]
+    statement: Dict[str, object]
+    typeclasses: Tuple[str, ...]
 
     def keys(self) -> Dict[str, str]:
         """The join keys other sources are indexed by. Each is one reference class."""
@@ -111,10 +120,29 @@ class Situation:
             out["subject"] = f"subject:{self.subject_token}"
         if self.is_of_lemma and self.predicate_head:
             out["of_lemma_of_predicate"] = f"of:{self.predicate_head}"
+        # proof_style: the shape of the proof, coarse enough to be a class.
+        mode = self.proof.get("mode")
+        if mode and mode != "none":
+            shape = "term" if mode == "term" else (
+                "tactic:one-liner" if self.proof.get("one_liner") else
+                "tactic:cases" if self.proof.get("case_splits") else
+                "tactic:calc" if self.proof.get("has_calc") else "tactic:multi")
+            out["proof_style"] = f"proof:{shape}"
+        # statement_form: iff / implication / plain, with whether numerals are hard-coded.
+        if self.statement:
+            form = ("iff" if self.statement.get("conclusion_is_iff") else
+                    "impl" if self.statement.get("conclusion_is_implication") else "plain")
+            if self.statement.get("numerals_in_hypotheses"):
+                form += "+numeral-hyp"
+            out["statement_form"] = f"stmt:{form}"
+        # typeclass: one key per instance head, so "you only need X" can be indexed by X.
+        for head in self.typeclasses:
+            out.setdefault("typeclass", f"class:{head}")
         return out
 
 
-def situation_of(kind: str, fullname: str, signature: str, proof: str) -> Situation:
+def situation_of(kind: str, fullname: str, signature: str, proof: str,
+                 variables: Sequence[str] = ()) -> Situation:
     """Every situation one declaration is in, from the fields `MajorDecl` already exposes."""
 
     conclusion = declaration_conclusion(signature or "")
@@ -137,4 +165,7 @@ def situation_of(kind: str, fullname: str, signature: str, proof: str) -> Situat
         primed=bool(form["primed"]),
         named_inside_predicate=inside,
         tactics=tuple(sorted(tactics_used(masked, TACTIC_VOCABULARY))) if masked else (),
+        proof=proof_structure(proof),
+        statement=statement_shape(signature),
+        typeclasses=tuple(typeclass_binders(signature, variables)["instance_heads"]),
     )

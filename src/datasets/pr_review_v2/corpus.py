@@ -60,6 +60,16 @@ def corpus_row(comment: Dict[str, Any]) -> Dict[str, Any]:
         "path": comment.get("path"),
         "line": comment.get("line") or comment.get("original_line"),
         "start_line": comment.get("start_line") or comment.get("original_start_line"),
+        # Where in the hunk the comment sits. `original_position` is 1-based over the hunk's
+        # lines after the `@@` header and is stable across force-pushes, unlike `position`.
+        # Without it a comment can only be attached to *some* declaration in its hunk -- and
+        # measured on a hand-read 50, that was the right declaration 27 times. With it the
+        # declaration enclosing the commented line resolves 9/9 on PR 33098. The precedent
+        # corpus was built without these fields; every row here now carries them.
+        "original_position": comment.get("original_position"),
+        "original_line": comment.get("original_line"),
+        "side": comment.get("side"),
+        "subject_type": comment.get("subject_type"),
         "diff_hunk": comment.get("diff_hunk") or "",
         "body": comment.get("body") or "",
         "commenter": (comment.get("user") or {}).get("login"),
@@ -159,8 +169,14 @@ def _eval_pr_numbers() -> Set[int]:
 def main() -> None:
     p = argparse.ArgumentParser(description="Stage 0: build the maintainer-comment precedent corpus")
     p.add_argument("--start", default="2024-03-01", help="YYYY-MM-DD (inclusive) — window start")
-    p.add_argument("--end", default="2025-08-31", help="YYYY-MM-DD (inclusive) — window end; must be "
-                   "before the eval window (2025-09-01..2025-12-31) to avoid leakage")
+    p.add_argument("--end", default="2025-08-31", help="YYYY-MM-DD (inclusive) — window end. "
+                   "The window MAY now extend into the eval period: leakage is prevented at READ "
+                   "time, where the precedent index gates every row at the consuming PR's own "
+                   "base-commit date (RetrievalGate on created_epoch), and the eval PRs' own "
+                   "comments are excluded here regardless of window. A December PR reading a "
+                   "corpus that runs to November sees September-November discussion and nothing "
+                   "after its base -- which is exactly the evidence the review-corpus window "
+                   "ending in August could not supply.")
     p.add_argument("--out", type=Path, default=DEFAULT_OUT)
     p.add_argument("--max-pages", type=int, default=3000)
     p.add_argument("--interval", type=float, default=0.0, help="seconds between requests")
