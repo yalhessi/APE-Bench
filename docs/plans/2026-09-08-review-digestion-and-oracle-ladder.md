@@ -835,6 +835,88 @@ That is rung 3e, and it is the natural next step. If it works, the lever is *pre
 retrieved evidence, not retrieval and not coordination — and the fix is a renderer change, not a
 knowledge product.
 
+### Self-review: six problems with the ladder as run, and what is actually robust
+
+Prompted by the observation that the diagnosis does not feel accurate and the fixes do not look
+robust. Both are right. Ordered by how much each undermines what has been concluded.
+
+**1. The 3b → 3c contrast is confounded three ways, and I isolated the weakest one.**
+3c does not add "the tactic, named". Diffing the supplements, it adds:
+
+* **placement** — the tactic appears in the prompt rather than a tool response;
+* **a mandate** — *"Add it to the candidate set for **every** proof you inspect, and run
+  `lean_verify_edit` on it, even where you judge it unlikely"*;
+* **a description of the mechanism** — *"It is a general-purpose closer: it discharges a goal by
+  combining hypotheses in context with the facts you name in the brackets, so it replaces case
+  splits and rewrite chains that exist only to assemble what is already available."*
+
+3b's tool response carried rank, trend and bare exemplars and **no statement of what the tactic
+does**. So the third factor is the one the user predicted two turns ago — that raw numbers fail
+to communicate motivation — and my proposed rung 3e isolates *placement*, which is the least
+likely of the three. `rung3d` was built for the motivation reading and has never been run.
+
+**2. The 20-of-20 same-family finding is close to tautological.** `rejected_alternatives` is a
+field *inside a submitted candidate*, so a rejection can only exist for something the arm
+generated. "Zero cross-family rejections" given "zero cross-family generations" is implied, not
+evidence. I wrote that it "names the mechanism"; it restates the observation. What it does
+establish — that within-family comparison is careful, reasoned and technically precise — is real
+but much weaker.
+
+**3. Every conclusion rests on one PR, one obligation family, two arms.** Benched PRs: **33098
+only**. Request groups exercised: **2 of 35**. Obligations covered: **7 of 40**. Codex's stated
+condition for generalisation — the same procedure improving a second independently audited proof
+request — has never been attempted. Four rungs, a declaration table, a retrieval tool and a
+schema change were designed against a single data point.
+
+**4. The reference-class axis was chosen while knowing the answer.** `conclusion_head` surfaces
+`grind` for a `⊆`-concluding lemma; I picked that axis, validated it on that lemma, and it
+worked. Nothing in the design *discovers* the axis for an arbitrary PR, and a rename request
+(33337, 33421) or a generality request (33145) would need a different one. That is a leak
+through design choice rather than through data, and it is precisely what makes a result
+non-transferable.
+
+**5. "Excluded" has been doing more work than the evidence supports.** A rung can only exclude a
+resource *as delivered*. 3b excluded "rank and trend in a tool response the arm fetches", not
+"evidence". Corrected 3a excluded "sweep your own list with goal inspection", not "procedure". I
+have been writing the general word for the specific treatment, which is how a ladder starts
+closing branches it never tested.
+
+**6. We optimised a level below the metric we agreed mattered.** The plan says a change that
+moves obligation hits without moving comment hits has moved a proxy. We then spent ~$14 and four
+rungs on a *single obligation family*. Comment-level recall (7 of 15) has not been measured since
+the ladder began.
+
+### The altitude the evidence actually supports
+
+Strip the information framing away and what has been observed three times, on n=3 each, is:
+
+> The arm produces candidates from **one tactic family**, refines within it competently, compares
+> within it with precise technical reasons, and never generates a member of another family —
+> unless a prompt instruction mandates attempting one, in which case it does so and 38% compile.
+
+That is not an information failure. It is a **search failure**: depth-first refinement of the
+first idea that compiles. Every rung so far tried to fix it by supplying better information,
+which is why every rung failed in the same way.
+
+**The robust intervention is generation-side and norm-agnostic.** Require k candidates from k
+*distinct* families before any submission, verify each, then choose. It needs no knowledge of
+which norm applies, no reference-class axis, no trend, and no corpus — so it transfers to renames
+and generality requests unchanged, which nothing built so far does. `rejected_alternatives`
+already exists to record the losers, and would stop being tautological the moment generation is
+forced to cross families.
+
+### Revised order of work
+
+1. **Decompose 3c into three single-factor variants** — placement, mandate, description — instead
+   of one three-factor jump. Cheap, and it is the only way to know which of the three did the
+   work. Run `rung3d` (description) first, since it is built and is the live hypothesis.
+2. **Family-diverse generation** as a variant: k families, verified, then choose. Test on 33098
+   *and* on a second group of a different kind.
+3. **Only then** claim any mechanism. Nothing so far has been shown on a second request group,
+   and no claim should outrun that.
+4. **Re-measure comment-level recall** on the smoke4 set before and after, so the proxy chain is
+   closed rather than assumed.
+
 ---
 ---
 
