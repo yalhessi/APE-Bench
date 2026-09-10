@@ -619,6 +619,84 @@ and the lever is how candidates are chosen. If it cannot, the gap is capability 
 tactic search or a different arm strategy entirely. Either answer closes a branch; the current
 evidence closes neither.
 
+### Rung 3c — RAN, n=3. The capability is there. The failure is selection.
+
+**GOLD-DERIVED ORACLE. A capability measurement, not review performance.** $2.54 total.
+
+Told the tactic and nothing about where it applies, the arm's behaviour changes completely:
+
+```
+                        3b (evidence)      3c (oracle)
+grind ATTEMPTED             0 / 0 / 0       19 / 20 / 18
+grind that COMPILED         0                18 of 48 attempts (38%)
+grind SUBMITTED             0 / 0 / 0        0 /  0 /  1
+lean_verify_edit        21 / 28 / 23        74 / 42 / 44
+located                  4/5, 5/5, 4/5      5/5, 5/5, 5/5
+```
+
+It wrote `grind [minimalCover, ...]` — structurally the maintainer's own
+`grind [minimalCover]` — and **18 of those attempts compiled**, on five of the seven lemmas the
+maintainer named: `card_minimalCover`, `finite_minimalCover`, `isCover_minimalCover`,
+`maximalSeparatedSet_subset`, `card_maximalSeparatedSet`.
+
+**And it submitted `simpa` anyway.** On `Metric.card_minimalCover` in attempt 1 a `grind` edit
+compiled twice, and what it submitted was:
+
+> *Rewrite `Metric.card_minimalCover` to `simpa [minimalCover, h] using
+> (exists_set_encard_eq_coveringNumber h).choose_spec.2.2.2`.*
+
+It never mentions `grind` in any rationale or in its own text, in any of the three attempts —
+though the 3c supplement explicitly instructs it to state what it attempted and what the
+compiler said. A verified alternative was produced and silently discarded.
+
+### The ladder resolves
+
+| rung | added | grind attempted | grind compiled | grind submitted |
+|---|---|---|---|---|
+| 0 | all five family sites | 0 | — | 0 |
+| 3a | enforced sweep of its own list | 0 | — | 0 |
+| 3b | ranked evidence + trend | 0 | — | 0 |
+| **3c** | **the tactic, named** | **57** | **18** | **1** |
+
+So **capability is present, and every information channel was already sufficient**. The arm can
+write the transformation the maintainer asked for, and does not choose it. That is not a
+retrieval problem, not a coordination problem, and not a norm-knowledge problem — the three
+things the earlier rungs were built to test and the workstreams they would have justified.
+
+**The lever is candidate selection at submission time.** Everything upstream of it works.
+
+**Two secondary findings worth keeping:**
+
+* **12 of 30 failures were one repeated usage error**: *"redundant parameter `h`, `grind` uses
+  local hypotheses automatically"*. The arm passes hypotheses in the brackets, which `grind`
+  takes from context. The compiler says exactly this, and the arm repeated it twelve times
+  across three runs — so it is not reading its own tool output well either. That is a distinct
+  and cheaply fixable gap: a one-line usage note, not a corpus.
+* **The oracle made it work much harder** — 160 verified edits against 72 in 3b — and *better*
+  on location (5/5 in all three, against 4/5, 5/5, 4/5). So the earlier rungs were not
+  saturating effort.
+
+### What comes next, and what does not
+
+**Does not:** the norm-knowledge product, a Zulip retrieval grant, `InvestigationScope`, lead
+redesign, tier-3 InfoTree. Each was contingent on a rung that has now failed for a reason none
+of them addresses.
+
+**Does:** why a verified candidate loses to an unverified-but-familiar one. The concrete
+suspects, in order of cheapness:
+
+1. **The submission contract's own framing.** `SUBMISSION_CONTRACT` and `IDIOM_SYSTEM` tell the
+   arm to report "a genuine canonicality improvement ... not a token-saving micro-edit", and my
+   3a supplement said to prefer "the most direct expression of the argument". A `simpa ... using
+   <explicit term>` reads as direct and a `grind [...]` reads as a black box, so the contract may
+   be selecting against the tactic the maintainers now prefer. This is a prompt-level hypothesis
+   and costs one variant to test.
+2. **Nothing scores the choice.** The arm submits one candidate per site and nothing compares the
+   verified alternatives it discarded. The run records `verification_artifacts`; it does not
+   record *rejected but compiling* edits, which is why this took an oracle to see at all.
+3. **A `grind` prior in the model.** Distinguishable from (1) by whether an explicit instruction
+   to prefer the newly-adopted tactic flips the submission while leaving everything else fixed.
+
 ---
 ---
 
