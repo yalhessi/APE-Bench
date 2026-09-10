@@ -1,0 +1,21 @@
+{
+  "ape_present": true,
+  "ape_root": ".ape/runs/bench_proof_idiom_rung3a_a2",
+  "bytes": 191985,
+  "cost": {
+    "actual_total": 0.699454,
+    "by_disposition": {
+      "unknown": 0.699454
+    },
+    "lead": 0,
+    "manifest_total": null,
+    "manifest_understates_by": null
+  },
+  "invocations": 7,
+  "leads": 0,
+  "run_name": "bench_proof_idiom_rung3a_a2",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 96,
+  "with_transcript": 7
+}

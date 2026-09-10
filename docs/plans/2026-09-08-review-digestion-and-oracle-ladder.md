@@ -772,6 +772,69 @@ Both corrections point the same way as 3c, and sharpen it:
 3. Only then test whether the contract's framing selects against the tactic — the
    first-compiling-candidate bias visible here suggests ordering matters more than wording.
 
+### Rung 3a, re-run with the tooling fixed — verdict now safe, and still a failure
+
+$2.10, three attempts. **`get_lean_goal` works**: 48 successes against 2 failures, versus
+**0 of 122** in every prior run. So the rung's own hypothesis was testable for the first time.
+
+```
+                    original 3a     corrected 3a
+get_lean_goal        6 fail          48 ok / 2 fail
+located              5/5             5/5, 5/5, 5/5
+candidates           10              11 / 11 / 12
+grind attempted      0                0 / 0 / 0
+```
+
+**Procedure is now properly excluded.** The arm genuinely reads goal states and still attempts
+`simpa` 29–34 times, `by_cases` 10–12, `calc` 1–2, and `grind`, `gcongr`, `grw`, `omega`,
+`aesop` **zero** times. Working goal inspection did not widen the candidate set at all.
+
+### `rejected_alternatives` closes the measurement gap, and names the mechanism
+
+The field is populated: **20 recorded rejections across three attempts, 7 of which compiled**.
+The reasons are substantive and technically precise — not box-ticking:
+
+> *"Does not typecheck: in the second branch `h` is negated so it cannot be passed to
+> `exists_set_encard_eq_coveringNumber`."*
+> *"Compiles but triggers `linter.unnecessarySimpa` suggesting `simp`."*
+> *"Also idiomatic, but the chosen version is a single `simpa` that avoids an intermediate `rw`."*
+
+And the decisive count:
+
+```
+same tactic family as the submitted candidate:  20
+cross-family:                                    0
+```
+
+**The comparison machinery is fine. The generation is family-locked.** The arm compares `simpa`
+against `simpa`-plus-`classical` against `simp`, carefully and correctly, and never against a
+different family. It is not failing to weigh alternatives; it is failing to *produce* any
+alternative outside one family.
+
+That is now visible **without an oracle** — which is what the field was added for. A run-level
+20-same-family / 0-cross-family reading is a readable signal for the failure that previously
+took a gold-derived probe plus a hand transcript read.
+
+### The refinement this forces
+
+Rungs 3b and 3c differ in exactly one way that now looks load-bearing:
+
+| | where `grind` appeared | grind attempted |
+|---|---|---|
+| 3b | in a **tool response** the arm requested | 0 |
+| 3c | in the **prompt** | 57 |
+
+The arm acts on instructions in its prompt and not on content in a tool result it fetched
+itself. That is a sharper hypothesis than "selection failure", and it is cheap and **gold-free**
+to test: render the top few tactics for the work unit's own conclusion class into the system
+prompt at agenda-build time, from the declaration table, rather than leaving them behind a tool
+call. No maintainer comment is consulted, so it is a mechanism rather than an oracle — unlike
+3c, which named the tactic because gold named it.
+
+That is rung 3e, and it is the natural next step. If it works, the lever is *presentation* of
+retrieved evidence, not retrieval and not coordination — and the fix is a renderer change, not a
+knowledge product.
+
 ---
 ---
 
