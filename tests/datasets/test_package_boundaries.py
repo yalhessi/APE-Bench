@@ -217,6 +217,34 @@ def test_tier_multipliers_has_exactly_one_definition():
     assert definitions == ["src/mathlib_review/schema/review.py"], definitions
 
 
+def test_the_tactic_vocabulary_has_exactly_one_definition():
+    """Three hand-written tactic keyword lists already exist in this tree and they disagree.
+
+    `datasets/taxonomy/ape_bench_parser_taxonomy.py` counts ten families for ape_bench's edit
+    taxonomy and `agenda/census.py` lists twenty names for the agenda's "manual tactic chain"
+    signal (its own docstring: "deliberately crude"). Those answer different questions for
+    different consumers and are left alone. What must not happen is a fourth: the list used to
+    classify *agent queries* and the list used to classify *Mathlib proofs* have to be the same
+    list, or a finding about one cannot be compared with a measurement of the other.
+    """
+
+    definitions = [
+        str(path) for path in SRC.rglob("*.py")
+        if "__pycache__" not in path.parts
+        and re.search(r"^TACTIC_VOCABULARY\s*=", path.read_text(encoding="utf-8"), re.M)
+    ]
+    assert definitions == ["src/mathlib_review/tactics.py"], definitions
+
+
+def test_the_wide_tactic_vocabulary_is_a_superset_of_the_strict_one():
+    """The strict/wide pair exists so a result cannot rest on where the line was drawn. If the
+    wide list ever stopped containing the strict one, "survives widening" would mean nothing."""
+
+    from src.mathlib_review.tactics import TACTIC_VOCABULARY, WIDE_TACTIC_VOCABULARY
+
+    assert set(TACTIC_VOCABULARY) < set(WIDE_TACTIC_VOCABULARY)
+
+
 def test_the_context_tool_grant_has_one_owner():
     """The vocabulary lives in `schema`, the policy in `arm_registry`.
 

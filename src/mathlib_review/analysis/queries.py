@@ -33,30 +33,23 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.mathlib_review.paths import assert_repo_root, run_dir
+from src.mathlib_review.tactics import (
+    TACTIC_VOCABULARY,
+    TACTIC_VOCABULARY_VERSION,
+    WIDE_TACTIC_VOCABULARY,
+    mentions_tactic,
+)
 
 QUERY_ANALYSIS_VERSION = "v5-query-analysis/1"
 
 #: Tactic names a Mathlib reviewer would reach for. Versioned with the analysis and reported
 #: per arm, because "did this arm ever ask about a tactic" is only a question for the arms
 #: whose warrant is tactic idiom.
-TACTIC_VOCABULARY_VERSION = "v5-tactic-vocabulary/1"
-TACTIC_VOCABULARY = (
-    "grind", "by_cases", "gcongr", "grw", "omega", "fun_prop", "decide", "simpa",
-    "simp_all", "norm_num", "positivity", "aesop", "field_simp", "ring_nf", "calc",
-    "bound", "linarith", "nlinarith", "polyrith", "continuity", "measurability",
-)
-
-#: The same question asked with a deliberately generous boundary. `simp`, `rw` and `exact` are
-#: tactic names too, and excluding them could be argued either way -- a search for `@[simp]`
-#: is looking for an attributed lemma, not for tactic idiom.
-#:
-#: Both are reported because the finding must not rest on where that line is drawn. On
-#: `pr5_smoke4_rep9` the wide vocabulary takes tactic-shaped queries from 2 to 14 and leaves
-#: `proof_idiom` and `proof_golf` at **zero under both**, while `style` goes to nine. A result
-#: that survives its own definition being loosened sevenfold is not a definition artifact.
-WIDE_TACTIC_VOCABULARY = TACTIC_VOCABULARY + (
-    "simp", "rw", "erw", "norm_cast", "push_cast", "ring", "abel", "exact", "apply",
-)
+# The vocabularies are owned by `mathlib_review.tactics` and imported above, not restated
+# here: three hand-written tactic keyword lists already exist in this tree and disagree, and the
+# list that classifies agent queries must be the same one that classifies Mathlib proofs or the
+# two measurements cannot be compared. `test_the_tactic_vocabulary_has_exactly_one_definition`
+# keeps it that way.
 
 #: The arms whose stated job is tactic idiom, and for whom a zero tactic-shaped rate is a
 #: finding rather than correct behaviour.
@@ -111,28 +104,15 @@ def scope_class_of(path: Optional[str]) -> Optional[str]:
     return "file" if Path(cleaned).suffix else "subtree"
 
 
-#: Regex syntax that appears *inside* a query string and must not be read as word characters.
-#: The case that forced this: the generalist searched for the literal pattern `\bgrind\b`, and
-#: a naive word-boundary test scores it as NOT asking about `grind` -- the `b` of the escape
-#: sits against the `g` and closes the boundary. Reading a `grind` search as a non-tactic
-#: search is the exact error this analysis exists to avoid, so the query is normalized before
-#: it is classified.
-_REGEX_NOISE = re.compile(r"\\[bBsSwWdDAZzG]|[\\^$.|?*+()\[\]{}]")
-
-
 def is_tactic_shaped(pattern: Optional[str],
                      vocabulary: Iterable[str] = TACTIC_VOCABULARY) -> bool:
     """Does this pattern ask about a tactic rather than a name?
 
-    Word-boundary matched against the *normalized* query, so `card_le_of_isSeparated` is not
-    read as asking about `calc`, a lemma called `decide_eq` is not read as asking about
-    `decide`, and a regex like `\bgrind\b` is read as asking about `grind`.
+    Delegates to `mathlib_review.tactics.mentions_tactic` with normalization on, because the
+    input here is a *query an agent wrote* and may carry regex syntax.
     """
 
-    if not pattern:
-        return False
-    cleaned = _REGEX_NOISE.sub(" ", pattern)
-    return any(re.search(rf"\b{re.escape(word)}\b", cleaned) for word in vocabulary)
+    return mentions_tactic(pattern, vocabulary, normalize=True)
 
 
 def _result_facts(body: str, byte_count: Optional[int], cap: int) -> Dict[str, Any]:

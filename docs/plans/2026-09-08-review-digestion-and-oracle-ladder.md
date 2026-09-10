@@ -512,6 +512,48 @@ fully tested. Whether to re-run 3a with compliance enforced mechanically — ref
 submission whose proof had no `get_lean_goal` — or to accept the breadth finding and move to
 3b, is a judgment call about spend, not about evidence.
 
+### Rung 3b infrastructure — BUILT. And the tier-3 probe came back negative.
+
+`src/mathlib_review/retrieval/declaration_table.py`, built for PR 33098's base commit:
+**168,058 proved declarations from 7,409 files in 55 s, zero parse failures**, persisted under
+`data/pr_review_v5/declaration_tables/<sha>/`.
+
+**The design argument, now reproducible from the table rather than from a probe:**
+
+```
+reference class                     n        grind share   grind rank
+all proved declarations       168,058           1.06 %        —
+directory Topology/MetricSpace  1,756           0.46 %        —     <- the reviewed PR's own
+conclusion head = subset        2,302           2.65 %        #2 of 13
+```
+
+The last row is the finding the earlier probes missed. **Share buries `grind` at every
+granularity; rank inside the right reference class surfaces it.** `minimalCover_subset` concludes
+in `⊆`, and among the 2,302 Mathlib lemmas that do, `grind` is the second most common thing that
+closes them — behind `simpa`, which is exactly what the arm proposed. A ranked candidate list
+returns what a modal guess cannot.
+
+**Trajectory**, same substrate, differing only in `as_of`: 0.00 / 0.00 / 0.02 / 0.09 / 5.73 /
+9.21 % of files across 2024-10 → 2025-12. The temporal gate is structural rather than checked —
+`git rev-list --before` walks ancestors of the base, so asking for 2026-06-01 returns the base
+commit itself. And the five lemmas the maintainer named are **absent from the table**, because
+they are new in this PR.
+
+**One definition of the tactic vocabulary.** Three hand-written lists already existed and
+disagreed; the list that classifies agent queries and the list that classifies Mathlib proofs
+are now the same list (`src/mathlib_review/tactics.py`), pinned by
+`test_the_tactic_vocabulary_has_exactly_one_definition`. The other two classify different things
+for different consumers and are left alone.
+
+**Tier-3 probe: negative, and cheap to have run.** `leanclient` 0.10.0 imports, a client starts
+in 1.4 s, and `get_info_trees` returns **zero trees** on both a simple file and the reviewed one,
+at ~4.1 s per call. The cause is visible in the filesystem: prebuilt workspaces are read-only
+(`dr-xr-xr-x`, `-r--r--r--`, hardlink count 45 — content-addressed and shared across snapshots)
+and `get_info_trees` works by *injecting* `#info_trees in` into the file. So tier 3 is not
+blocked on Lean; it is blocked on needing a writable copy, plus ~4.1 s per file on top. Targeted
+at one PR's work units that is seconds; across the corpus it is ~8 hours single-threaded before
+any parsing. Recorded, not built — which is what the probe was for.
+
 ---
 ---
 
