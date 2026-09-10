@@ -599,9 +599,12 @@ For EACH proof you are reviewing, in order:
 4. Choose among the attempts that compiled. If several compile, prefer the one a maintainer
    would name — the most direct expression of the argument, not the shortest text.
 
-In `rationale`, state which entries you attempted and what each attempt did: compiled, failed,
-or was judged inapplicable and why. An arm that attempted one entry has not run this check.
-If nothing you attempted compiled, submit nothing for that proof and say so."""
+Record the sweep in the submission itself. Any entry that **compiled and you did not choose**
+goes in `rejected_alternatives`, with its edit text and the reason it lost; there is no free-text
+`rationale` field, so a comparison you make only in your head leaves no trace. Say in `claim`
+what you attempted and what the compiler said for the rest. An arm that attempted one entry has
+not run this check. If nothing you attempted compiled, submit nothing for that proof and say
+so."""
 
 #: Rung 3b -- procedure plus evidence.
 #:
@@ -639,7 +642,7 @@ have considered**. An entry you dismissed without attempting is not an entry you
 Weigh the trend, not only the share. A tactic the library is visibly adopting is the thing a
 maintainer will ask for even while it is still uncommon; a long-flat tactic at a high share is
 how the library already reads, which is the thing the author has usually already done. Where the
-two disagree, say so in `rationale` and explain which you followed."""
+two disagree, say which you followed in `claim`."""
 
 #: Rung 3d -- motivation rather than magnitude. An alternative to 3b, not a step past it.
 #:
@@ -674,7 +677,9 @@ fact established on the line before, a simp set. A tactic you dismissed because 
 seen it work is not a tactic you ruled out — and an unfamiliar tactic whose examples look
 structurally like your goal is a stronger candidate than a familiar one whose examples do not.
 
-State in `rationale` which example you judged closest to your goal, and why."""
+State in `claim` which example you judged closest to your goal, and why. If an unfamiliar
+tactic's edit compiled and you still chose another, that belongs in `rejected_alternatives` --
+otherwise the comparison you made is invisible to everyone downstream."""
 
 #: Rung 3c -- the capability probe. **GOLD-DERIVED. NOT A PERFORMANCE MEASUREMENT.**
 #:
@@ -713,7 +718,10 @@ even where you judge it unlikely. You are not told which declarations it suits, 
 suits any of them -- deciding that is still your job, and reporting that it failed everywhere is
 a valid and useful outcome.
 
-In `rationale`, state for each proof what you attempted with it and what the compiler said."""
+Every attempt with it that **compiled and you did not submit** goes in
+`rejected_alternatives`, with the edit text and why it lost. That field is the only record of a
+choice between two working proofs, and without it a discarded correct answer is
+indistinguishable from one you never found."""
 
 #: `variant -> {arm_id -> supplement}`. An arm absent from a variant gets the empty string, so
 #: a rung can treat one arm and leave every other exactly as it was.

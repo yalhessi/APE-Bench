@@ -62,6 +62,30 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
         # Workspace root directory
         self._workspace_root = task.workspaces_dir if task else Path.cwd()
 
+    def _resolve_in_workspace(self, file_path: Path) -> Path:
+        """A workspace-relative path made absolute, the way every other toolkit reads one.
+
+        The tools hand these methods exactly what the agent typed --
+        `target/Mathlib/Topology/MetricSpace/CoveringNumbers.lean` -- and `find_project_path`
+        then walked *up from a relative path*, so it looked for `target/lean-toolchain`
+        beneath the process working directory instead of beneath the task's workspace, found
+        nothing, and raised. Measured across every ladder run: **122 `get_lean_goal` calls,
+        122 failures**, all "Cannot find Lean project". No arm has ever inspected a goal state,
+        and the rung whose whole hypothesis was "inspect the goal before proposing" could not
+        have passed.
+
+        Same rules as `file_system.core._resolve_path`, deliberately: relative joins onto the
+        workspace root, `..` is refused, and an already-absolute path is left alone so callers
+        that resolve for themselves keep working.
+        """
+
+        if file_path.is_absolute():
+            return file_path
+        if ".." in file_path.parts:
+            raise ValueError(
+                f"Parent directory references (..) are not allowed: {file_path}")
+        return (Path(self._workspace_root) / file_path).resolve()
+
     def _ensure_client(self, file_path: Path) -> LeanLSPClient:
         """Ensure LSP client is initialized"""
         project_path = find_project_path(file_path)
@@ -202,6 +226,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
     ) -> Dict[str, Any]:
         """Implement hover interface"""
         try:
+            file_path = self._resolve_in_workspace(file_path)
             client = self._ensure_client(file_path)
             rel_path = self._get_relative_path(file_path)
 
@@ -256,6 +281,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
     ) -> Dict[str, Any]:
         """Implement goto interface"""
         try:
+            file_path = self._resolve_in_workspace(file_path)
             client = self._ensure_client(file_path)
             rel_path = self._get_relative_path(file_path)
 
@@ -310,6 +336,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
     async def diagnostics(self, file_path: Path) -> Dict[str, Any]:
         """Implement diagnostics interface"""
         try:
+            file_path = self._resolve_in_workspace(file_path)
             client = self._ensure_client(file_path)
             rel_path = self._get_relative_path(file_path)
 
@@ -394,6 +421,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
     ) -> Dict[str, Any]:
         """Lean-specific: Get proof goals"""
         try:
+            file_path = self._resolve_in_workspace(file_path)
             client = self._ensure_client(file_path)
             rel_path = self._get_relative_path(file_path)
 

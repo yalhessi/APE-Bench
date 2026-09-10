@@ -66,6 +66,22 @@ class PatchEditSubmission(BaseModel):
     replacement: Optional[str] = None
 
 
+class RejectedAlternative(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """One verified edit that lost, and why.
+
+    `compiled` is the arm's own report and is not trusted as evidence -- nothing admits a
+    finding on the strength of it. It is here so a rejection can be told apart from an
+    attempt that simply failed, which is the whole distinction that made rung 3c readable.
+    """
+
+    replacement: str = Field(description="The edit text that was not chosen")
+    compiled: bool = Field(description="Whether lean_verify_edit accepted it")
+    why_not: str = Field(description=(
+        "Why this lost to the submitted candidate. Required: a rejection with no reason is "
+        "the state the artifacts were already in."))
+
 class CandidateSubmission(BaseModel):
     model_config = ConfigDict(extra="forbid")
     primary_change_id: str
@@ -100,6 +116,24 @@ class CandidateSubmission(BaseModel):
     #: accident.
     patch_set: Optional[List[PatchEditSubmission]] = None
     model_confidence: Optional[float] = Field(default=None, ge=0, le=1)
+    #: Edits the arm wrote, compiled, and did NOT choose.
+    #:
+    #: Added because the system could not see its own most consequential failure. On PR 33098,
+    #: rung 3c, the arm produced `grind [minimalCover]` -- the maintainer's request character
+    #: for character -- watched it compile, and submitted `simpa [minimalCover, h] using ...`
+    #: instead. Nothing recorded the discarded alternative: the submission carries one
+    #: candidate per site, `verification_artifacts` keeps only the edit that was chosen, and
+    #: the run reported a plain miss. Detecting it took a gold-derived oracle and a hand read
+    #: of the transcript.
+    #:
+    #: So this is a measurement field before it is a behaviour one. It is optional -- making it
+    #: required would have arms inventing rejections to satisfy a schema -- and it is scored
+    #: nowhere: it exists so that "the arm had the right answer and did not pick it" is a
+    #: question the artifacts can answer.
+    rejected_alternatives: Optional[List[RejectedAlternative]] = None
+
+
+
 
 
 CHECKABLE_CONCERN_FAMILIES = {

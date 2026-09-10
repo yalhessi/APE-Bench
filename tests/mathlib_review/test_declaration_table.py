@@ -204,8 +204,20 @@ def test_the_trajectory_is_what_makes_the_norm_visible():
                       ["2024-10-01", "2025-01-01", "2025-04-01",
                        "2025-07-01", "2025-10-01", "2025-12-19"])
     shares = [row["share"] for row in rows]
-    assert shares == [0.0, 0.0, 0.0002, 0.0009, 0.0573, 0.0921]
+
+    # Shape, with tolerance, not four decimal places. `rev-list -1 --before=<date>` picks the
+    # newest ancestor before a midnight boundary, and adjacent ancestors differ by a file or
+    # two -- an earlier measurement of this same curve landed on a neighbouring commit and read
+    # 0.0921 where this one reads 0.0922. Pinning the digit made the test fail on a difference
+    # of one file, which is not the claim. The claim is that the tactic went from absent to
+    # widespread inside fourteen months, and that is what is asserted.
     assert shares == sorted(shares), "the curve must be monotone over these points"
+    assert shares[0] == 0.0 and shares[1] == 0.0, "absent for the first year"
+    assert shares[2] < 0.001 and shares[3] < 0.002, "still negligible by mid-2025"
+    assert shares[4] > 0.04, "inflects in Q4 2025"
+    assert shares[5] > 0.08, "widespread by the base commit"
+    # And the rise is an order of magnitude, which is the part a share alone cannot show.
+    assert shares[5] > 40 * max(shares[3], 1e-9)
 
 
 def test_the_trajectory_cannot_reach_past_the_base_commit():
