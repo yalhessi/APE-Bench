@@ -697,6 +697,81 @@ suspects, in order of cheapness:
 3. **A `grind` prior in the model.** Distinguishable from (1) by whether an explicit instruction
    to prefer the newly-adopted tactic flips the submission while leaving everything else fixed.
 
+### Walkthrough: one conversation, and two defects of mine it exposes
+
+`wu:14dc4a0f720d69a4650c637d#proof_idiom`, rung 3c attempt 1, 27 turns, 16 verified edits. This
+work unit owns `card_minimalCover` — one of the four lemmas in the maintainer's
+`grind [minimalCover]` comment.
+
+**Before any tactic attempt.** Read the file (lines 240–340). Called `get_lean_goal` twice —
+**both failed**. Called `proof_profile` twice, for `conclusion_head: eq` and `other` — notably
+*not* `subset`, the class where `grind` ranks second. Then its **first** edit was
+`simpa [minimalCover, h] using (exists_set_encard_eq_coveringNumber h).choose_spec…`, which
+**compiled on the first try**.
+
+**The grind sequence** — a competent refinement loop:
+
+```
+ 2. grind [minimalCover, h, exists_set_encard_eq_coveringNumber]   FAIL  "redundant parameter `h`,
+                                                                          grind uses local
+                                                                          hypotheses automatically"
+11. grind [minimalCover, exists_set_encard_eq_coveringNumber]      OK
+12. grind [minimalCover]                                           OK   <- the maintainer's request,
+                                                                          character for character
+```
+
+It read the compiler error, dropped the redundant hypothesis, and then minimised the bracket
+list until only the definition remained — arriving exactly at `grind [minimalCover]`.
+
+**What it did next.** Step 13: went back to building a *longer* `by_cases` + `simpa` variant of
+the same lemma. Then moved on. Then submitted its **step-1 first idea**:
+
+> `Rewrite Metric.card_minimalCover to simpa [minimalCover, h] using (…).choose_spec.2.2.2`
+
+**Why it abandoned the compiling `grind`: nothing in the transcript says, and structurally
+there is nowhere for it to say.** The submission carries exactly one candidate per site, and
+`CandidateSubmission` has no field for alternatives considered or rejected — so the compiling
+`grind [minimalCover]` leaves **no trace in any artifact**. That is why this needed an oracle to
+become visible. What the trace shows is a first-compiling-candidate bias: the simpa version was
+found first and never displaced by anything found later.
+
+### Two corrections to my own earlier reporting
+
+**1. `get_lean_goal` has never worked. 122 calls, 122 failures, every run.**
+
+```
+bench_proof_idiom (rung 0/3a)      6 fail    "Cannot find Lean project for
+rung3b  a1/a2/a3        18 / 19 / 25 fail     target/Mathlib/Topology/MetricSpace/
+rung3c  a1/a2/a3        17 / 15 / 22 fail     CoveringNumbers.lean"
+```
+
+I reported 3b's 18–25 calls as "full procedural compliance" and 3a's 6 as partial compliance.
+Both readings were wrong: the arm dutifully called a broken tool and got an error every time. It
+has **never inspected a goal state** in any run. So **rung 3a was not a fair test of its own
+hypothesis** — "inspect the goal before proposing" was unsatisfiable — and its failure cannot be
+attributed to procedure. Rung 3c's conclusion is unaffected, because it rests on compiling
+`grind` edits being produced and discarded, which is independent of goal inspection.
+
+**2. All three of my supplements instructed the arm to write into a field that does not exist.**
+3a, 3b and 3c each end with "state in `rationale` …", and `CandidateSubmission` has no
+`rationale` field — its text fields are `claim`, `requested_change` and `suggested_fix`. The
+submitted candidates carry an empty rationale because there was nowhere to put one. So every
+"say what you attempted" instruction in the ladder was inert, and the absence of `grind` from
+the arm's stated reasoning is partly my doing rather than only its silence.
+
+### What this makes the next step
+
+Both corrections point the same way as 3c, and sharpen it:
+
+1. **Fix `get_lean_goal`'s path resolution** and re-run 3a. Cheap, and it is the one rung whose
+   verdict is currently unsafe.
+2. **Give the submission somewhere to record the choice** — a `rejected_alternatives` field
+   carrying the edits that compiled and were not chosen, and a required reason when a verified
+   candidate is discarded. Today the run cannot even *detect* this failure without an oracle,
+   which is a measurement gap before it is a behaviour gap.
+3. Only then test whether the contract's framing selects against the tactic — the
+   first-compiling-candidate bias visible here suggests ordering matters more than wording.
+
 ---
 ---
 
