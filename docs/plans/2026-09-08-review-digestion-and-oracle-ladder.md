@@ -554,6 +554,71 @@ blocked on Lean; it is blocked on needing a writable copy, plus ~4.1 s per file 
 at one PR's work units that is seconds; across the corpus it is ~8 hours single-threaded before
 any parsing. Recorded, not built — which is what the probe was for.
 
+### Rung 3b — RAN, n=3, and it fails. All three rungs are now excluded.
+
+Three genuinely independent attempts ($2.48 total; distinct costs 0.751 / 0.888 / 0.837, so no
+cache collision this time).
+
+**The arm complied fully and used the tool well.** Per attempt: `proof_profile` **12–14** calls,
+`get_lean_goal` **18–25** calls (against 6 in 3a and 0 in baseline), 21–28 verified edits. It
+queried the right reference classes — `subset`, `eq`, `le`, `mem`, `other` — and left
+`directory: null`, which is what the supplement told it to do and which avoids the misleading
+0.46% local rate.
+
+**The tool returned exactly the intended signal**, in a call the arm made itself:
+
+```
+1. `simpa` — 5.9% of 2302 proofs  flat
+2. `grind` — 2.6% of 2302 proofs  NEW — essentially absent a year ago (0.00% of files), now 9.21%
+```
+
+**And `grind` was attempted zero times, in all three attempts.** Not submitted zero times —
+*attempted* zero times, across 21/28/23 verified edits. `simpa` was attempted 20/46/34 times and
+submitted 21–24 times. The arm never wrote the word `grind` in its own text or in any
+submission, in any attempt.
+
+What it proposed on the four lemmas the maintainer named:
+
+> *Rewrite `Metric.minimalCover_subset` to use `simpa [minimalCover, h] using
+> (exists_set_encard_eq_coveringNumber h).choose_spec.1`…*
+
+Right declaration, right definition unfolded — `minimalCover`, the same one the maintainer's
+`grind [minimalCover]` names — and the previous generation's tactic, chosen after being shown
+that `grind` is the second most common closer of proofs of exactly this shape and the only one
+the library has newly adopted.
+
+**3b was also mildly worse on what 3a and rung 0 were good at**: location 4/5, 5/5, 4/5 against
+rung 0's 5/5, candidates 7 against 11, and both misses landed on
+`wu:14009c2826c39049c91bc590` — one of the two grind-family work units.
+
+### The ladder's verdict
+
+| rung | added | compliance | `grind` attempted |
+|---|---|---|---|
+| 0 — exposure | all 5 family sites, both arms | 5/5 located, 0 abstained | **0** |
+| 3a — procedure | enforced goal inspection + sweep the arm's own list | `get_lean_goal` 6, 30 verified edits | **0** |
+| 3b — evidence | `proof_profile`, ranked, with trend | 12–14 calls, correct classes, `get_lean_goal` 18–25 | **0** |
+
+Exposure, procedure and evidence are each excluded, on n=1, n=1 and n=3. This is Codex's step-5
+branch reached by measurement rather than by argument: *"No oracle helps: the arm/model lacks
+transformation ability; test tactic search or a different arm strategy instead of enlarging
+coordination."* No amount of retrieval or coordination is indicated next, and the
+norm-knowledge workstream — which this rung was built to justify — does not get built.
+
+**What this does and does not establish.** It establishes that *delivering* correct, ranked,
+trend-annotated convention evidence is not sufficient for this arm on this transformation. It
+does not distinguish two remaining explanations, and they imply different work:
+
+* **belief/selection** — the arm can write `grind [minimalCover]` but will not choose it;
+* **capability** — the arm cannot write it, so no evidence could have helped.
+
+**Rung 3c separates them, and is the cheapest experiment left.** Hand the arm the tactic
+directly — an explicit oracle recommendation, gold-derived and labelled as such, valid only on
+this burned case. If it then produces a compiling `grind [minimalCover]`, the gap is selection
+and the lever is how candidates are chosen. If it cannot, the gap is capability and the lever is
+tactic search or a different arm strategy entirely. Either answer closes a branch; the current
+evidence closes neither.
+
 ---
 ---
 

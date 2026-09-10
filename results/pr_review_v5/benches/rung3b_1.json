@@ -1,0 +1,92 @@
+{
+  "proof_idiom": {
+    "bench_version": "v5-bench/1",
+    "arm_id": "proof_idiom",
+    "fixture_sha256": "9a7e0991f9e6897039459634b6ca08f417f4604d28bb2f10f6fe67fbc89bde81",
+    "positives": 5,
+    "negatives": 3,
+    "located": 4,
+    "location_rate": 0.8,
+    "spoke_when_quiet": 1,
+    "gold_silent_speech_rate": 0.3333,
+    "false_alarm_rate": null,
+    "negatives_are_adjudicated": false,
+    "abstained_on_positives": 1,
+    "candidates_total": 7,
+    "errors": {},
+    "note": "Location and silence only. A bench hit is a necessary condition for a scored hit, never a sufficient one -- whether the claim is correct is the judge's question and needs a semantic run.",
+    "cases": [
+      {
+        "work_unit_id": "wu:026100f80707c02fbd00cebe",
+        "pr_number": 33098,
+        "positive": false,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:14009c2826c39049c91bc590",
+        "pr_number": 33098,
+        "positive": true,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:14dc4a0f720d69a4650c637d",
+        "pr_number": 33098,
+        "positive": true,
+        "candidates": 2,
+        "located": true,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:2aa1c518a2deec84fbbaa244",
+        "pr_number": 33098,
+        "positive": true,
+        "candidates": 1,
+        "located": true,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:2d98984730649af8d3134f67",
+        "pr_number": 33098,
+        "positive": true,
+        "candidates": 2,
+        "located": true,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:84d1055b04abab6d285805e7",
+        "pr_number": 33098,
+        "positive": false,
+        "candidates": 1,
+        "located": false,
+        "spoke_when_quiet": true
+      },
+      {
+        "work_unit_id": "wu:c656fe9ace1ddb9d9bd84e0b",
+        "pr_number": 33098,
+        "positive": true,
+        "candidates": 1,
+        "located": true,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:d15524ece84b2ffed54c9ef1",
+        "pr_number": 33098,
+        "positive": false,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      }
+    ],
+    "cases_not_eligible": [
+      "wu:026100f80707c02fbd00cebe"
+    ],
+    "cost": 0.750711,
+    "procedure_variant": "rung3b",
+    "attempt": 1,
+    "run_name": "bench_proof_idiom_rung3b_a1"
+  }
+}
