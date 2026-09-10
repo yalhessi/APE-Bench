@@ -400,6 +400,62 @@ bound rather than an enumeration — the control PR 33438 was merged with no com
 the reviewer found two compile-verified improvements there. Speaking where gold is silent is
 evidence about gold as much as about the arm.
 
+### Phase 3 rung 0 — RAN. Exposure is excluded.
+
+`results/pr_review_v5/benches/rung0.json`, $1.25 billed against a $4.80 ceiling. Both proof
+arms dispatched to all **five** work units carrying the `grind` family — the thing rep9 never
+did, where only two of the five ever ran a proof arm.
+
+```
+arm            positives  located  location_rate  abstained  candidates  cost
+proof_idiom            5        5           1.00          0          11  $0.57
+proof_golf             5        5           1.00          0          11  $0.68
+```
+
+**Perfect location, zero abstentions, 15 submissions, and not one `grind`.** Across every
+submitted candidate from both arms:
+
+```
+simpa 51    simp only 27    by_cases 21    grind 0    by_cases! 0
+```
+
+On `Metric.minimalCover_subset` — the exact lemma the maintainer said "can be proven with
+`grind [minimalCover]`" — `proof_idiom` proposed:
+
+> *Rewrite the proof of `Metric.minimalCover_subset` to use `simpa [minimalCover, h]` in each
+> branch (optionally adding `classical`)…*
+
+Right declaration, right definition unfolded, previous generation's tactic. This is the idiom
+lag at the sharpest resolution available.
+
+**Verdict: rung 0 fails, and that is the useful outcome.** The 4-of-7 dispatch gap was real and
+is not the binding constraint. Exposure is now excluded, so the procedure (3a) and evidence (3b)
+rungs carry the whole explanation.
+
+**Three findings the rung produced beyond its own question:**
+
+1. **`proof_golf` made zero retrieval calls of any kind** across 7 invocations — no
+   `content_search`, no `declaration_search`, nothing. It read the file, compiled 25 candidate
+   edits, and submitted. It never asked the repository anything.
+2. **`proof_idiom` searched *less* when handed the family**, not more: 13 queries, of which one
+   `content_search`, file-scoped, non-tactic-shaped, zero corpus-scope. Handing an arm the whole
+   family did not make it look outward.
+3. **`get_lean_goal` was called zero times by either arm**, again, though `IDIOM_SYSTEM`
+   requires it. That is now three independent runs with the same absence.
+
+Capability is not the issue: the two arms constructed and compiled 19 and 25 candidate edits
+between them, with zero errors. They can do the work; they are answering in the wrong idiom and
+they are not looking for the right one.
+
+**Arm screen resolves to `proof_idiom`**, on Codex's tiebreak: it at least searched (13 queries
+against 0) and it was cheaper ($0.57 against $0.68). The rest of the ladder runs one arm.
+
+**Next: rung 3a.** Enforce a recorded `get_lean_goal` per proof target and a bounded attempt of
+tactics from the arm's *existing* list, with compilation of each attempt — and no PR-specific
+term, tactic recommendation, example or frequency. If that produces the exact transformation in
+2 of 3 attempts, the entire retrieval and norm-card workstream closes for this failure class
+without being built.
+
 ---
 ---
 
