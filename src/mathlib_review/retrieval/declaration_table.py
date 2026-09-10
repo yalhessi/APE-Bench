@@ -47,6 +47,12 @@ from src.mathlib_review.tactics import (
 
 TABLE_VERSION = "v5-declaration-table/1"
 
+#: The answer shape `proof_profile` returns. Bumped when the tool starts saying something new,
+#: so a run can be told apart from one made against an earlier answer: `/1` returned rank and
+#: trend only, and rung 3b ran against it. `/2` adds worked exemplars, because rank and trend
+#: told the arm how common a tactic is and nothing about what it is for.
+PROOF_PROFILE_VERSION = "v5-proof-profile/2"
+
 #: The classifier that turns a conclusion into a reference class. Versioned separately from the
 #: table because a change here re-partitions every population without changing a single row.
 CONCLUSION_CLASSIFIER_VERSION = "v5-conclusion-head/1"
@@ -220,6 +226,65 @@ def distribution(rows: Sequence[DeclarationRow], *, wide: bool = False) -> Dict[
             for tactic, count in counts.most_common()
         ],
     }
+
+
+def exemplars(rows: Sequence[DeclarationRow], tactic: str, workspace: Path,
+              *, limit: int = 3, max_chars: int = 260) -> List[Dict[str, str]]:
+    """Real proofs from this reference class that use `tactic`, shortest first.
+
+    **Why a count is not enough.** A share tells an arm how often a tactic appears and nothing
+    about what it is for. `grind` at 2.6% conveys "uncommon"; `map_div' := by grind
+    [div_eq_mul_inv]` conveys the mechanism -- name the fact the goal needs and the tactic
+    assembles the rest -- which is the thing that transfers to a new goal. Rung 3b delivered
+    rank and trend, the arm read them, and proposed the tactic it already knew; motivation by
+    demonstration is the part that was missing.
+
+    Read from the snapshot on demand rather than stored: the table is 4.3 MB without proof
+    bodies and would be an order of magnitude larger with them, for text that is wanted a
+    handful of rows at a time.
+
+    Sampled ACROSS the length range rather than taking the k shortest. Taking the shortest
+    returned three bare `by grind` proofs, which show that the tactic closes such goals and not
+    how it is aimed; the bracketed form that carries the mechanism only appears in longer ones.
+    Filtering *for* the bracketed spelling would be steering dressed as evidence -- a maintainer
+    asked for it on this PR, and the tool must not know that -- so the rule is length diversity,
+    which is spelling-blind and gets there anyway.
+    """
+
+    candidates = [row for row in rows if tactic in row.tactics]
+    candidates.sort(key=lambda row: (row.proof_lines, row.fullname))
+    if not candidates:
+        return []
+
+    # Round-robin over length terciles rather than sampling fixed indices: a candidate that
+    # fails the `max_chars` filter or whose declaration cannot be re-found has to be replaced,
+    # and index sampling silently returned two exemplars where three were asked for.
+    terciles: List[List[DeclarationRow]] = [[], [], []]
+    for position, row in enumerate(candidates):
+        terciles[min(2, position * 3 // len(candidates))].append(row)
+
+    ordered: List[DeclarationRow] = []
+    for depth in range(len(candidates)):
+        for bucket in terciles:
+            if depth < len(bucket):
+                ordered.append(bucket[depth])
+
+    out: List[Dict[str, str]] = []
+    for row in ordered:
+        if len(out) >= limit:
+            break
+        try:
+            source = (workspace / row.path).read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for declaration in parse_major_declarations(source):
+            if (declaration.fullname or declaration.name) != row.fullname:
+                continue
+            proof = (getattr(declaration, "proof", "") or "").strip()
+            if proof and tactic in mask_noncode_regions(proof) and len(proof) <= max_chars:
+                out.append({"fullname": row.fullname, "path": row.path, "proof": proof})
+            break
+    return out
 
 
 # --- trajectory ------------------------------------------------------------------------

@@ -109,9 +109,11 @@ def test_it_ranks_the_tactic_the_arm_never_considered_second():
 
     payload = _skip_without_table(_call(conclusion_head="subset", limit=6))
     assert payload["reference_class"]["population"] == 2302
-    lines = payload["results"].splitlines()
-    assert "`simpa`" in lines[0]
-    assert "`grind`" in lines[1]
+    # Ranked entries only: exemplar lines are indented under the tactic they illustrate.
+    ranked = [line for line in payload["results"].splitlines()
+              if not line.lstrip().startswith("e.g.")]
+    assert "`simpa`" in ranked[0]
+    assert "`grind`" in ranked[1]
 
 
 def test_a_tactic_that_did_not_exist_a_year_ago_is_marked_new_not_merely_rising():
@@ -119,7 +121,7 @@ def test_a_tactic_that_did_not_exist_a_year_ago_is_marked_new_not_merely_rising(
     grew, and only one is a convention arriving. Collapsing them would bury the signal in the
     noise of every tactic that happens to be popular."""
 
-    payload = _skip_without_table(_call(conclusion_head="subset", limit=6))
+    payload = _skip_without_table(_call(conclusion_head="subset", limit=6, examples=0))
     grind_line = next(l for l in payload["results"].splitlines() if "`grind`" in l)
     assert "NEW" in grind_line
     assert sum(1 for l in payload["results"].splitlines() if "NEW" in l) == 1
@@ -130,7 +132,7 @@ def test_the_trend_is_read_from_the_curve_alone():
     *files across the library* — two different denominators — and reported `simpa` as declining
     because 5.9% of subset proofs is less than half the fraction of files mentioning it."""
 
-    payload = _skip_without_table(_call(conclusion_head="subset", limit=6))
+    payload = _skip_without_table(_call(conclusion_head="subset", limit=6, examples=0))
     simpa_line = next(l for l in payload["results"].splitlines() if "`simpa`" in l)
     assert "flat" in simpa_line
     assert "declining" not in simpa_line
@@ -157,3 +159,69 @@ def test_a_missing_table_is_reported_not_papered_over():
     payload = asyncio.run(_tool(sha="0" * 40)(conclusion_head="eq"))
     assert payload["success"] is False
     assert "declaration table" in payload["error"]
+
+
+# --- rungs 3c and 3d --------------------------------------------------------------------
+
+def test_only_the_capability_probe_is_an_oracle_and_only_it_names_a_tactic():
+    """3c removes the choice on purpose; every other variant must leave it with the arm.
+
+    A tactic named in 3b or 3d would make the rung measure transcription, and its result would
+    say nothing about whether the arm can find the tactic itself.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import is_oracle_variant
+
+    for variant in ("baseline", "rung3a", "rung3b", "rung3d"):
+        assert not is_oracle_variant(variant), variant
+        supplement = procedure_supplement(variant, "proof_idiom")
+        for tactic in ("grind", "simpa", "gcongr", "omega", "aesop"):
+            assert tactic not in supplement, f"{tactic} named in {variant}"
+    assert is_oracle_variant("rung3c")
+    assert "grind" in procedure_supplement("rung3c", "proof_idiom")
+
+
+def test_the_oracle_names_a_tactic_but_never_where_to_apply_it():
+    """Otherwise it measures transcription rather than capability: the arm still has to decide
+    which declarations the tactic suits, and 'it failed everywhere' stays a valid outcome."""
+
+    supplement = procedure_supplement("rung3c", "proof_idiom")
+    for gold in ("minimalCover", "maximalSeparatedSet", "33098", "encard",
+                 "isCover", "card_minimalCover"):
+        assert gold not in supplement, f"{gold} leaked into the oracle"
+    assert "not told which declarations" in supplement
+
+
+def test_3c_and_3d_both_extend_3b_but_neither_extends_the_other():
+    """They are alternatives — capability and motivation — and stacking them would confound
+    the two remaining explanations for rung 3b's failure."""
+
+    three_b = procedure_supplement("rung3b", "proof_idiom")
+    three_c = procedure_supplement("rung3c", "proof_idiom")
+    three_d = procedure_supplement("rung3d", "proof_idiom")
+    assert three_b in three_c and three_b in three_d
+    assert three_c not in three_d and three_d not in three_c
+
+
+def test_the_motivation_variant_points_at_the_examples_not_the_numbers():
+    supplement = procedure_supplement("rung3d", "proof_idiom")
+    assert "examples" in supplement.lower()
+    assert "percentage" in supplement.lower()
+
+
+def test_the_profile_returns_worked_examples_and_says_which_answer_shape_it_is():
+    """Rung 3b ran against `/1`, which returned counts alone. A run cannot be compared against
+    one made under a different answer shape unless the shape is recorded."""
+
+    from src.mathlib_review.retrieval.declaration_table import PROOF_PROFILE_VERSION
+
+    payload = _skip_without_table(_call(conclusion_head="subset", limit=3, examples=2))
+    assert payload["proof_profile_version"] == PROOF_PROFILE_VERSION
+    assert "e.g. `" in payload["results"]
+    # Examples are attributed, so a claim built on one can be checked.
+    assert payload["results"].count("e.g. `") >= 2
+
+
+def test_examples_can_be_switched_off():
+    payload = _skip_without_table(_call(conclusion_head="subset", limit=3, examples=0))
+    assert "e.g. `" not in payload["results"]

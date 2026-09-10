@@ -260,6 +260,17 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
         # the wrong treatment; the prompt hash in the payload says the same thing, less
         # legibly.
         score["procedure_variant"] = procedure_variant
+        # A variant carrying gold-derived material measures what the arm *can* do, not what it
+        # would do unaided. Stamped here so a score file can never be quoted as performance.
+        from ape.tasks.lean_tasks.formal_math.review.focused_prompts import is_oracle_variant
+
+        score["oracle_variant"] = is_oracle_variant(procedure_variant)
+        if score["oracle_variant"]:
+            score["note_oracle"] = (
+                "GOLD-DERIVED ORACLE. This variant's supplement names a tactic taken from the "
+                "maintainer's own comment on a PR in the burned development set. The result is "
+                "a capability measurement and must not be reported as review performance."
+            )
         score["attempt"] = attempt
         score["run_name"] = run_name
         scores[arm_id] = score

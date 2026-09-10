@@ -346,10 +346,16 @@ def _register_proof_profile(task, mcp) -> None:
             "Restrict to a Mathlib subtree, e.g. `Topology/MetricSpace`. Omit for the whole "
             "library. Narrow is not better: a subtree can be behind the library."))] = None,
         limit: Annotated[int, Field(description="Max tactics to return")] = 8,
+        examples: Annotated[int, Field(description=(
+            "Real proofs to show per tactic, sampled across the length range. A count says how "
+            "often a tactic is used; an example shows what it is FOR, which is the part that "
+            "transfers to your goal. 0 to omit."))] = 2,
     ) -> Dict[str, Any]:
         from src.mathlib_review.retrieval.declaration_table import (
-            curve_dates, distribution, load_table, trajectory,
+            PROOF_PROFILE_VERSION, curve_dates, distribution, exemplars, load_table,
+            trajectory,
         )
+        from src.mathlib_review.evidence.evidence import snapshot_workspace
 
         sha = task.data.snapshot_base_sha
         try:
@@ -374,7 +380,11 @@ def _register_proof_profile(task, mcp) -> None:
         # Anchored to the base commit's own date rather than to literals, so the right-hand
         # end of every curve is the state this PR was opened against.
         dates = curve_dates(sha)
+        # Exemplars are read from the same snapshot the table was built from. `None` when the
+        # snapshot is gone: the numbers still stand, the examples are simply omitted.
+        workspace = snapshot_workspace(sha)
         lines = []
+        ranked = 1
         for item in top:
             try:
                 curve = trajectory(item["tactic"], sha, dates, subdir="Mathlib") if dates else []
@@ -405,14 +415,21 @@ def _register_proof_profile(task, mcp) -> None:
                 else:
                     trend = "  flat"
             lines.append("%2d. `%s` — %.1f%% of %d proofs%s"
-                         % (len(lines) + 1, item["tactic"], 100 * (item["share"] or 0.0),
+                         % (ranked, item["tactic"], 100 * (item["share"] or 0.0),
                             payload["population"], trend))
+            ranked += 1
+            if examples and workspace is not None:
+                for case in exemplars(rows, item["tactic"], workspace,
+                                      limit=max(0, min(int(examples), 3))):
+                    body = " ".join(case["proof"].split())
+                    lines.append("      e.g. `%s` := %s" % (case["fullname"], body))
 
         return {
             "success": True,
             "reference_class": {"conclusion_head": conclusion_head, "directory": directory,
                                 "population": payload["population"]},
             "corpus_sha256": sha,
+            "proof_profile_version": PROOF_PROFILE_VERSION,
             "conclusion_classifier_version": payload["conclusion_classifier_version"],
             "tactic_vocabulary_version": payload["tactic_vocabulary_version"],
             "results": "\n".join(lines),

@@ -641,6 +641,80 @@ maintainer will ask for even while it is still uncommon; a long-flat tactic at a
 how the library already reads, which is the thing the author has usually already done. Where the
 two disagree, say so in `rationale` and explain which you followed."""
 
+#: Rung 3d -- motivation rather than magnitude. An alternative to 3b, not a step past it.
+#:
+#: Rung 3b's evidence was numeric: a rank and a trend. The arm called the tool 12-14 times per
+#: attempt, was shown that `grind` is the second most common closer of proofs of exactly its
+#: goal shape and the only newly adopted one, and attempted it zero times across 72 verified
+#: edits. A share communicates how common a tactic is; it does not communicate what the tactic
+#: is FOR, and only the latter transfers to a goal the arm has in front of it.
+#:
+#: So `proof_profile` now returns worked exemplars alongside the counts (`v5-proof-profile/2`;
+#: 3b ran against `/1`, which returned counts alone), and this variant tells the arm to read
+#: them as the primary signal. `Real.tanh_artanh := by have := sq_sub_sq 1 x; grind
+#: [tanh_eq_sinh_div_cosh, ...]` says establish the fact, then name what the tactic needs --
+#: which is a mechanism, not a frequency.
+#:
+#: Gold-free: the exemplars are ordinary Mathlib proofs at the base commit, chosen by length
+#: diversity, and the supplement names no tactic. Only 3c is an oracle.
+RUNG3D_MOTIVATED = RUNG3B_EVIDENCE + """
+
+## Read the examples, not just the percentages
+
+Each entry `proof_profile` returns comes with real proofs from the same reference class. Those
+are the point of the call; the percentage is context for them.
+
+A percentage tells you how often a tactic appears. An example tells you what it is *for* — what
+kind of goal it discharges, and what it needs to be given to do it. Only the second is
+transferable to the goal in front of you, so read the examples first and let them tell you
+whether the shape matches your proof.
+
+In particular, note what each example *supplies* to its tactic: a lemma named in brackets, a
+fact established on the line before, a simp set. A tactic you dismissed because you have not
+seen it work is not a tactic you ruled out — and an unfamiliar tactic whose examples look
+structurally like your goal is a stronger candidate than a familiar one whose examples do not.
+
+State in `rationale` which example you judged closest to your goal, and why."""
+
+#: Rung 3c -- the capability probe. **GOLD-DERIVED. NOT A PERFORMANCE MEASUREMENT.**
+#:
+#: Rung 3b delivered ranked, trend-annotated evidence naming `grind` as the second most common
+#: closer of proofs of exactly this shape, and the only newly adopted one. The arm called the
+#: tool 12-14 times per attempt, read that answer, and attempted `grind` **zero** times across
+#: 72 verified edits in three attempts -- never writing the word in its own text at all.
+#:
+#: So exposure, procedure and evidence are all excluded, and two explanations remain:
+#:
+#:   selection  -- the arm can write the tactic and will not choose it;
+#:   capability -- the arm cannot write it, so no evidence could ever have helped.
+#:
+#: They imply different work, and nothing measured so far separates them. This variant does, by
+#: removing the choice: it names the tactic. If a compiling `grind` proof appears, the gap is
+#: selection and the lever is how candidates are chosen. If it does not, the gap is capability
+#: and the lever is tactic search or a different arm strategy.
+#:
+#: **This is an oracle.** It is derived from the maintainer's own comment on a PR in the burned
+#: development set, so a result under it is a capability fact and can never be reported as
+#: review performance. It names a tactic and deliberately says nothing about *which*
+#: declarations want it, so the arm still has to decide where it applies -- otherwise the probe
+#: would measure transcription rather than capability.
+RUNG3C_ORACLE = RUNG3B_EVIDENCE + """
+
+## One named candidate (diagnostic input, not a review instruction)
+
+For this experiment you are told one tactic to include in your attempts: **`grind`**, in the
+form `grind [<lemma>]`, where the bracketed lemma is a definition or lemma the goal needs
+unfolded or applied. It is a general-purpose closer: it discharges a goal by combining
+hypotheses in context with the facts you name in the brackets, so it replaces case splits and
+rewrite chains that exist only to assemble what is already available.
+
+Add it to the candidate set for **every** proof you inspect, and run `lean_verify_edit` on it,
+even where you judge it unlikely. You are not told which declarations it suits, or whether it
+suits any of them -- deciding that is still your job, and reporting that it failed everywhere is
+a valid and useful outcome.
+
+In `rationale`, state for each proof what you attempted with it and what the compiler said."""
+
 #: `variant -> {arm_id -> supplement}`. An arm absent from a variant gets the empty string, so
 #: a rung can treat one arm and leave every other exactly as it was.
 PROCEDURE_SUPPLEMENTS = {
@@ -652,6 +726,14 @@ PROCEDURE_SUPPLEMENTS = {
     "rung3b": {
         "proof_idiom": RUNG3B_EVIDENCE,
         "proof_golf": RUNG3B_EVIDENCE,
+    },
+    "rung3c": {
+        "proof_idiom": RUNG3C_ORACLE,
+        "proof_golf": RUNG3C_ORACLE,
+    },
+    "rung3d": {
+        "proof_idiom": RUNG3D_MOTIVATED,
+        "proof_golf": RUNG3D_MOTIVATED,
     },
 }
 
@@ -670,7 +752,26 @@ PROCEDURE_TOOL_GRANTS = {
         "proof_idiom": ("proof_profile",),
         "proof_golf": ("proof_profile",),
     },
+    "rung3c": {
+        "proof_idiom": ("proof_profile",),
+        "proof_golf": ("proof_profile",),
+    },
+    "rung3d": {
+        "proof_idiom": ("proof_profile",),
+        "proof_golf": ("proof_profile",),
+    },
 }
+
+
+#: Variants whose supplement contains gold-derived material. A run under one of these measures
+#: a *capability*, never review performance, and the bench stamps it on the score so a result
+#: file cannot be read as the latter. Kept beside the supplements rather than in the bench,
+#: because whoever adds an oracle variant is the person who knows it is one.
+ORACLE_VARIANTS = frozenset({"rung3c"})
+
+
+def is_oracle_variant(variant: str) -> bool:
+    return variant in ORACLE_VARIANTS
 
 
 def procedure_tool_grant(variant: str, arm_id: str) -> tuple:
