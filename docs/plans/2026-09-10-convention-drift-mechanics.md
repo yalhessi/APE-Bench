@@ -341,6 +341,25 @@ attached to a hunk in situation S, body names B" actually mean "maintainer asked
 Report the number. Then run `fetch.py` for September 2025 (user's shell) and re-index. Only then
 is "enforced" a component the recipe can use.
 
+## Step zero — status
+
+**Built and measured.** `src/mathlib_review/conventions/situations.py` — the per-declaration
+situation extractors (goal head, predicate head, LHS subject, name form, tactic multiset), with
+the one the existing operators could not produce: `predicate_head`, for conclusions that assert
+a predicate rather than relate two sides. Flat and dotted spellings of one `of`-lemma now share
+every key and differ on exactly `named_inside_predicate`.
+
+`src/mathlib_review/conventions/review_join.py` — each of the 34,640 review comments attached
+to the situation of the declaration its hunk sits on: **68.9 % resolve** (61 % from a head in the
+hunk, 7 % more from git's `@@ … @@` function-context line), 33 % reported unresolved rather than
+guessed. **696 comments land on `of:P`**, the dot-notation situation. Artifact under
+`data/pr_review_v5/review_join/`.
+
+**Pending.** The precision hand-read: a stratified 50 (14 `of:P`, 8 `goal:subset`, 10 `goal:eq`,
+9 `predicate`, 9 `subject`) rated by two independent five-rater panels, the second refute-framed,
+reporting inter-rater agreement and strict/lenient precision per stratum. The September corpus
+fetch (`configs/pr_review_v2_corpus_2025_09.yaml`, user's shell).
+
 ## The first experiment, after step zero (~$8, one day)
 
 Every design schedules 8–10 engineering days before testing the one assumption they all share:

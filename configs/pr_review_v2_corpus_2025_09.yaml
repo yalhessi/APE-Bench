@@ -1,0 +1,37 @@
+# Corpus extension: every Mathlib PR closed in September 2025, fetched as raw bundles.
+#
+# Why a whole month and not the evaluation PRs. The convention-discovery corpus is the review
+# corpus -- 34,640 comments from 5,605 PRs -- and it is the ONLY source for the largest class of
+# conventions: those maintainers enforce in review that the codebase does not follow. Dot
+# notation is asked for in 224 dated comments and written in 14% of the declarations it applies
+# to; no reading of the code finds it. That corpus ends 2025-08-31. The evaluation PRs are
+# December 2025, and `grind`'s enforcement onset is in exactly the missing months (21 comments,
+# all 2025-H2). Extending by whole months keeps the corpus a sample of Mathlib review, not a
+# sample of our own targets.
+#
+# Temporal safety is applied at READ time, not here: the precedent index gates every row at the
+# consuming PR's base-commit date (`commit_date(base_sha)`), so a December PR sees September and
+# nothing after its own base. This file only decides what is on disk.
+#
+# Stage A searches closed PRs in the window; Stage B fetches per-PR bundles into `cache_dir`,
+# which `derive`/the precedent-corpus build then read without re-fetching. Needs GITHUB_TOKEN.
+#
+#   GITHUB_TOKEN=... ./ape/bin/python -m src.datasets.pr_review_v2.main fetch \
+#       --config configs/pr_review_v2_corpus_2025_09.yaml
+#
+# `fetch` is the only stage run: it searches and caches bundles. `derive`/`delta`/`all` build
+# evaluation artifacts and must not be run on corpus months. Then October and November as
+# siblings of this file; then rebuild the precedent corpus/index from the union.
+#
+# `PRReviewV2Config` silently ignores keys it does not define, so every key below is one it has.
+
+start_date: "2025-09-01"
+end_date: "2025-09-30"
+
+# ~1,000 PRs close per month; do not let a default cap silently sample the month.
+max_prs: 2000
+max_search_pages: 40
+
+# Review on PRs that were closed WITHOUT merging is still maintainers stating conventions --
+# often the clearest statements, since the PR did not comply. Keep them.
+include_unmerged: true
