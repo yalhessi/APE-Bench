@@ -917,6 +917,91 @@ forced to cross families.
 4. **Re-measure comment-level recall** on the smoke4 set before and after, so the proxy chain is
    closed rather than assumed.
 
+### Second review: my "search failure" reframe was also a symptom, and the ladder closed the wrong branch
+
+**What the ladder actually established, stripped of inference.** Five facts, each on n≥3:
+
+1. The model has `grind` in its weights — correct syntax, correct bracket form, and it repairs
+   the "redundant parameter" error when the compiler reports it.
+2. It does not reach for it unprompted, with or without goal inspection.
+3. Rank, trend and bare exemplars **in a fetched tool response** do not change (2).
+4. A prose description of what the tactic does, plus a mandate to attempt it, **in the prompt**,
+   changes (2) completely: 57 attempts, 38% compile.
+5. Its within-family comparison is competent and technically precise.
+
+Everything else I wrote — "exposure excluded", "evidence excluded", "selection failure", "search
+failure", "family-locked generation" — was inference over these five, and each was a description
+of the symptom dressed as a cause.
+
+**The two causes still standing, and why 3c cannot tell them apart.** (A) *search*: depth-first
+refinement of the first compiling idea; would cross families if forced. (B) *knowledge*: does not
+know `grind` is the canonical closer for this goal shape; would cross families if told what the
+tactic is for. 3c added a mandate (tests A) **and** a mechanism description (tests B) in one
+step. My proposed rung 3e — placement — isolates neither.
+
+**The branch the ladder closed was the wrong one.** 3c's description —
+
+> *"a general-purpose closer: it discharges a goal by combining hypotheses in context with the
+> facts you name in the brackets, so it replaces case splits and rewrite chains that exist only
+> to assemble what is already available"*
+
+— **is a mechanism card**. It is Codex's original proposal from §9, hand-written from gold. The
+ladder "excluded" the norm-knowledge workstream by testing *numeric retrieval at review time*
+(3b), which is not what Codex proposed, and then 3c reintroduced the thing Codex proposed and it
+worked. I closed the branch that the strongest result then reopened.
+
+**The gold-free version exists and is cheap.** Both inputs a mechanism card needs are on disk
+at the base commit, with no reference to any PR's review:
+
+* *which tactics are arriving* — the trajectory over the base commit's own ancestry, from the
+  declaration table (`grind`: 0.00 % → 9.21 % of files);
+* *what each one is for* — the tactic's own docstring, in the toolchain source
+  (`~/.elan/toolchains/…/src/lean/Init/Grind/Tactics.lean`: *"`grind` is a tactic inspired by
+  modern SMT solvers … equality reasoning, apply known theorems, propagate new facts, perform
+  case analysis"*), and for Mathlib tactics in `Mathlib/Tactic/`.
+
+Rendered into the proof arms' system prompt **at agenda-build time**, identically for every PR
+at that base commit. That is PR-agnostic by construction — the property nothing built so far
+has — and it is descriptive rather than numeric, which is the property 3c had and 3b lacked.
+
+### The robustness problem, at three layers
+
+**Instance.** One PR; 2 of 35 request groups; 7 of 40 obligations; a reference-class axis
+chosen while looking at the answer.
+
+**Class.** The `grind` family is `(repository, patch_set)` — **3 of 35 groups**. The classes
+that dominate the development set are untouched and need different mechanisms:
+
+```
+(diff, single_edit)          13   docs / style / local proof edits
+(convention, rename)          8   encard_, toLinearMap_, dot-notation, round_eq_div
+(repository, patch_set)       3   <- the only class the ladder has run
+(repository, single_edit)     3
+(diff, patch_set)             3   family_design's ciSup/ciInf, to_fun
+```
+
+`conclusion_head` is meaningless for a rename. The briefing idea transfers — *"the `encard_`
+prefix is arriving; `coe_` is being retired"* is the same shape of card, and `naming_norm`
+already measures it — but the axis and the classifier do not, and nothing has checked that the
+proof-arm result says anything about the other 32 groups.
+
+**Hypothesis.** The user's second hypothesis — coordination: choosing which subtasks matter and
+producing one plan — has **not been tested by a single rung**. Every run was one arm, no lead,
+one work unit at a time. The digestion found the lead collapses 0 findings into larger issues
+and that the maintainer's highest-yield move spans four sites; nothing since has touched it.
+
+### Discipline, going forward
+
+1. **No variant runs on 33098 alone.** Every treatment runs on the `grind` group *and* one group
+   of a different class — a rename (33337 or 33421) is the natural second — or it does not run.
+   Two runs, ~$5, before any mechanism is named.
+2. **Decompose 3c**: description-only (`rung3d`, built), mandate-only (new), and the gold-free
+   briefing rendered at agenda time. Three single-factor variants replace one three-factor jump.
+3. **Measure the metric that was agreed**: comment-level recall on smoke4 before and after any
+   treatment, so the proxy chain is closed rather than assumed.
+4. **Return to hypothesis 2** once one arm-level treatment has transferred. Not before — the
+   digestion's own finding was that coordination cannot rescue arms that fail alone.
+
 ---
 ---
 
