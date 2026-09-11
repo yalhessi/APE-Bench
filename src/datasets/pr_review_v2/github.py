@@ -31,6 +31,7 @@ class GitHubClient:
         request_interval_seconds: float = 0.0,
         max_retries: int = 5,
         retry_backoff: float = 2.0,
+        max_rate_limit_wait: float = 3900.0,
         logger=None,
     ):
         self.token = token or os.environ.get("GITHUB_TOKEN") or None
@@ -45,6 +46,9 @@ class GitHubClient:
         self._interval = max(0.0, request_interval_seconds)
         self._max_retries = max(0, max_retries)
         self._retry_backoff = max(0.0, retry_backoff)
+        # A `core` window is an hour long, so a run that exhausts 5,000 requests waits rather
+        # than dies: the alternative is losing an hour of collection to a 403.
+        self._max_rate_limit_wait = max(0.0, max_rate_limit_wait)
         self._logger = logger
 
     @property
@@ -53,6 +57,30 @@ class GitHubClient:
 
     def close(self) -> None:
         self._client.close()
+
+    def _rate_limit_wait(self, response: httpx.Response) -> Optional[float]:
+        """Seconds to wait before retrying a 403/429, or None if it is not a rate limit.
+
+        GitHub meters several buckets separately and says which in `x-ratelimit-resource`:
+        `core` is 5,000/hour authenticated, **`search` is 30 per minute**, and a burst on any
+        endpoint can trip a secondary limit that answers with `retry-after`. A 403 that carries
+        `remaining: 0` or `retry-after` is a wait, not a failure -- raising on it threw away 27
+        successful requests mid-collection.
+        """
+
+        retry_after = response.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return float(retry_after) + 1.0
+            except ValueError:
+                pass
+        if response.headers.get("X-RateLimit-Remaining") == "0":
+            try:
+                reset = float(response.headers["X-RateLimit-Reset"])
+            except (KeyError, TypeError, ValueError):
+                return None
+            return max(0.0, reset - time.time()) + 1.0
+        return None
 
     def _backoff_sleep(self, attempt: int, reason: str, retry_after: Optional[str] = None) -> None:
         delay = self._retry_backoff * (2 ** attempt)
@@ -82,8 +110,20 @@ class GitHubClient:
             if response.status_code in {403, 429}:
                 remaining = response.headers.get("X-RateLimit-Remaining")
                 reset_at = response.headers.get("X-RateLimit-Reset")
+                resource = response.headers.get("X-RateLimit-Resource", "?")
+                wait = self._rate_limit_wait(response)
+                if wait is not None and wait <= self._max_rate_limit_wait and attempt < self._max_retries:
+                    if self._logger:
+                        self._logger.warning(
+                            "GitHub %s rate limit reached (status=%d, remaining=%s); waiting %.0fs "
+                            "for the window to reset, then continuing",
+                            resource, response.status_code, remaining, wait)
+                    time.sleep(wait)
+                    continue
                 raise RateLimitError(
-                    f"GitHub rate limit (status={response.status_code}, remaining={remaining}, reset={reset_at})"
+                    f"GitHub rate limit (status={response.status_code}, resource={resource}, "
+                    f"remaining={remaining}, reset={reset_at}"
+                    + (f", would need to wait {wait:.0f}s" if wait is not None else "") + ")"
                 )
             if response.status_code in {500, 502, 503, 504} and attempt < self._max_retries:
                 self._backoff_sleep(attempt, f"HTTP {response.status_code}",

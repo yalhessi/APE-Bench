@@ -600,6 +600,158 @@ extractor for it is a *second* source and stays labelled as model-derived. (d) C
 each row keeps the declaration's facets (kind, goal head, typeclass heads, proof shape) so
 "`grind` replaces case-split proofs of subset goals" is a query over the ledger, not a key.
 
+### Collecting a month of comments: two quota failures, and the route that works
+
+Both attempts at extending the corpus failed on quotas, not on logic, and the second failure
+changed the design.
+
+**Attempt 1 -- the listing endpoint is down for this repo.** `/pulls/comments?sort=created&
+since=…` answered HTTP 500 after ~8 s on its *first* page, six times running (measured
+unauthenticated, 2026-09-11); the state file from the user's run records zero successful
+requests. GitHub has to sort every comment updated since `since` to answer it, and on mathlib4
+that no longer completes. No amount of re-anchoring helps a page-1 timeout.
+
+**Attempt 2 -- the search API allows 30 requests per minute.** The per-PR route's stage A found
+the window's PRs with `/search/issues`, and died with `RateLimitError` after 27 successful
+requests in 28 seconds. Two defects, both fixed: search is metered separately from core
+(confirmed on `/rate_limit`: `core` and `search` are distinct resources), and `GitHubClient`
+*raised* on the 403 instead of waiting ~30 s for the window to reset -- so a `core` exhaustion
+would have thrown away an hour of collection the same way. The client now reads
+`x-ratelimit-resource`, honours `retry-after` and `x-ratelimit-reset`, waits, and retries; a 403
+with quota left (revoked token, private repo) still raises immediately.
+
+**The route that works: both stages on the core bucket.** `/repos/{repo}/pulls?state=all&
+sort=updated&direction=desc` is core-metered (5,000/hour), answers in ~1 s at any depth, and is
+ordered by update time. A review comment bumps its PR's `updated_at`, so every PR we need has
+`updated_at >= start`: walk from the top, stop when a page falls below the window, keep those
+also created on or before `end`. Measured depth, unauthenticated: page 100 reaches 2026-02-23,
+page 140 reaches 2025-11-11, so December 2025 is ~130 pages.
+
+```
+stage A  walk the PR list to the window            ~130 requests   ~2 min
+stage B  one request per PR for its comments      ~2,800 requests  ~45 min
+                                                  --------------
+                                                  ~2,930 < 5,000/hour
+```
+
+Ordering under concurrent updates is safe in one direction: an update moves a PR *up*, so a PR
+above the cursor is only re-read (deduped). A PR bumped from *below* the cursor to the top would
+be stepped over, so the first three pages are read again at the end and anything new is logged.
+Stage A's PR list is persisted, so a stage-B crash never repeats it -- the first attempt lost 27
+requests' worth of work precisely because it was not. Progress is PRs done over PRs found, with
+a rate and a time estimate, every 25 PRs.
+
+**December 2025 is the month to add, not September.** The user asked when the development-set PRs
+are from: all fourteen were **opened 2025-12-18 .. 2025-12-31** and reviewed 2025-12-20 ..
+2025-12-31 (33057 Dec 18; 33066/33098 Dec 19; 33117/33145 Dec 20; 33149 Dec 21; 33285 Dec 25;
+33294/33305/33321 Dec 26; 33337 Dec 27; 33362 Dec 28; 33421/33438 Dec 31). The 201 cached eval
+bundles were opened 2025-11-07 .. 2025-12-31. So December 2025 is the month that brackets the
+development set, and the corpus stops in August: the four intervening months are exactly where
+`grind` enforcement matured (3 comments in July, 20 in August, then nothing indexed). The eval
+PRs' own comments are excluded by number at collection, so December's other ~2,700 PRs are
+same-month convention evidence with the gold removed; at read time the base-date gate keeps a
+December PR from seeing anything after its own base.
+
+```
+./ape/bin/python -m src.datasets.pr_review_v2.corpus --start 2025-12-01 --end 2025-12-31
+./ape/bin/python -m src.mathlib_review.retrieval.precedent_index build
+./ape/bin/python -m src.mathlib_review.conventions.review_join --write
+```
+
+Interrupting is safe: the same command resumes, stage A cached and finished PRs skipped. The
+September–November months follow by the same command with those dates, if December warrants it.
+
+### August gate result (80 comments, two three-rater panels, agreement 0.96)
+
+```
+                            n  strict  lenient   about=yes A/B   request A/B   key_fits=yes A/B
+def/instance                8     0       0         5/5             4/3            0/0
+goal:eq                     8     0       2         6/6             5/5            0/0
+goal:le/mem/subset          8     0       5         8/8             7/7            1/0
+predicate/of                8     0       3         7/5             4/4            0/0
+proof_style:tactic          8     0       2         8/3             3/3            0/0
+proof_style:term            8     1       1         3/3             4/4            1/1
+statement_form:iff/impl     8     0       2         7/4             4/4            0/0
+statement_form:numeral-hyp  8     0       4         5/4             6/6            1/0
+subject                     8     0       5         7/6             7/7            1/0
+typeclass                   8     2       4         8/6             5/5            2/2
+ALL                        80     3 (4%) 28 (35%)  63/50          49/48           6/3
+```
+
+The three columns fail for three different reasons, and only one of them is the join.
+
+**About-declaration is now mostly right, and v2 fixes the rest.** Panel A says 63/80 are about
+the joined declaration. The 13 records resolver v2 changes (7 `between`, 6 to an anonymous
+instance or the `inductive`) are *exactly* 13 records on which the panels had not agreed
+`about=yes` -- and four of the six raters never saw v2. Of the 67 records v2 leaves alone, 50
+are both-panels `yes`; the 17 others are `partial` because the comment is a status reply or a
+general remark, not because the declaration is wrong. The declaration join is no longer the
+problem.
+
+**Sixty percent of August maintainer comments request a form change** (48/80, both panels), in
+these categories: proof_style 12, naming 6, api_family 6, tactic 5, generality 5, whitespace 4,
+placement 3, typeclass 2, statement_form 2, attribute 2, docs 1. The other 32 are status
+replies, thanks, questions, and correctness. This is the enforcement mass, and it is large.
+
+**The situation keys do not describe what is requested -- 4 % strict, 4–8 % key_fits.** The
+facets I built -- goal head, statement iff/impl/numeral, typeclass head, predicate, subject,
+proof shape -- are properties of the *declaration*. Reviewers request changes to a *pattern in
+the code*: inline this `have`; one `simp` call instead of `rw; simp; exact`; `simp only` for a
+non-terminal `simp`; `refine` with no `?_` → `exact`; `wlog` instead of a `by_cases` ladder;
+a `let` for data; drop the unused hypothesis; `[Unique β]` → `[Subsingleton β] [Nonempty β]`.
+The only keys that fit are the ones that *are* the pattern: typeclass heads (2 strict, both
+"weaken this class") and generality. `proof:tactic:multi` fits "partially" ten times because it
+names the proof, not the property. The gate did its job a second time: **S cannot be a coarse
+shape of the declaration. S is the dispreferred form A itself** -- the convention is
+"code that looks like A should look like B", and the reference class is "code exhibiting A".
+
+**The evidence is already machine-readable.** 8,660 of the 34,640 corpus comments (25 %) and
+685 of August's 2,312 (30 %, rising month over month from 22 % in January) carry a GitHub
+```` ```suggestion ```` block: the *replacement code B*, paired with the commented line(s) A
+that the hunk tail gives exactly. In the sample, **0 of 32 non-requests** and 23 of 48 requests
+carry one -- precision 100 % as a request marker -- with coverage concentrated where the
+dev-set's conventions live: proof_style 11/12, tactic 4/5, whitespace 3/4; and thin where the
+request is prose: naming 1/6, api_family 1/6, generality 1/5, typeclass 0/2, placement 0/3. Of
+August's 685, 510 are line-resolved; 453 replace a single line. That is an A→B ledger of the
+enforced component, with no NL classification in the loop, and every row dated and attributed.
+
+**Consequence for the plan.** The enforced component is not "comments joined by facet key"
+but an **A→B ledger**: `(commented lines, suggestion block, category, date, reviewer,
+declaration situation)`, clustered by the transformation (leading tactic A → leading tactic B,
+attribute added/removed, name A → name B, binder change). Facets stay as *conditioning*
+metadata on each row (goal head, kind, typeclass heads -- so "`grind` replaces case splits on
+subset goals" is still expressible), not as the join key. NL requests without a block (naming,
+generality, api_family) need the rater-style `form_A`/`form_B` extraction the panel just did
+by hand -- a second, LLM-in-the-loop source, kept separate and marked as such. First
+measurement of the ledger over August below.
+
+**First look at the August ledger (no model in the loop).** 510 line-resolved suggestion
+comments; 327 replace exactly one line. Where the leading token changes:
+
+```
+  7  simp  -> (deleted)        3  exact -> grind        2  refine -> exact      2  have  -> let
+  5  rw    -> (deleted)        3  exact -> simp         2  apply  -> refine     2  rfl   -> simp
+  3  simp  -> simp_rw          3  apply -> exact        2  exact  -> simpa      1  induction -> cases
+```
+
+Where the leading token stays: 46 `theorem` and 33 `lemma` statement lines edited in place
+(statement-form and naming requests as code), 15 `simp` sets, 11 `simpa`, 9 `have`, 8 `exact`.
+Three `exact → grind` rows in one month, from a corpus with 23 `grind` mentions in total, is the
+onset of the convention PR 33098 was held to in December -- visible as *code*, four months
+ahead, in a source the December reviewer was already indexing and reading as prose.
+
+**What the ledger still needs before it is a component.** (a) Multi-line A: the commented
+*range* for multi-line comments is `original_start_line..original_line`; the hunk tail gives
+the end, the start needs the position fields the corpus rows now carry -- or a re-fetch of
+August alone (a few hundred shallow pages). (b) A clustering of transformations coarser than
+leading tokens and finer than categories: "non-terminal `simp` → `simp only [...]`", "`have h :=
+…; exact h` → inline", "`refine` with no `?_` → `exact`", "tactic block → `grind`". (c) The NL
+half -- naming, generality, api_family, typeclass, placement: 25 of the 48 sampled requests
+had no block. The panel's `form_A`/`form_B` fields are that extraction done by hand; an
+extractor for it is a *second* source and stays labelled as model-derived. (d) Conditioning:
+each row keeps the declaration's facets (kind, goal head, typeclass heads, proof shape) so
+"`grind` replaces case-split proofs of subset goals" is a query over the ledger, not a key.
+
 ### The listing endpoint is down for this repo; the corpus grows PR by PR now
 
 The September extension failed again after the re-anchoring fix, and the state file says why:

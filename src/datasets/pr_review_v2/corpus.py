@@ -13,17 +13,26 @@ retrieval design (query = a site; precedent = a situation).
   python -m src.datasets.pr_review_v2.corpus --start 2024-03-01 --end 2025-08-31 \
       --out inputs/pr_review_v2/corpus/mathlib_review_comments.jsonl
 
-Two routes to the same rows. `listing` streams the repo-level endpoint sorted by created
-date; it is one request per 100 comments but GitHub must sort every comment updated since
-`since`, and on a repo this size that query now times out (HTTP 500, ~8 s) on the *first* page,
-before any re-anchoring can help -- the user's September run made zero successful requests.
-`per-pr` searches the PRs updated in the window (week slices, so no search exceeds GitHub's
-1,000-result cap) and reads each PR's own comment list, which is shallow and has never failed;
-it costs one request per PR (~3,000 a month, ~40 minutes authenticated). `auto` (default) tries
-one listing page and falls back.
+Two routes to the same rows.
 
-Needs GITHUB_TOKEN (unauthenticated is 60 req/hr). Resumable: re-running appends only
-comment_ids not already present; per-pr mode also skips PRs the state file records as done.
+`--mode per-pr` (the default) works in two stages, both metered against GitHub's 5,000/hour
+*core* bucket: walk the repo's pull-request list newest-update-first until it falls below the
+window (~130 requests for a month nine months back) to get the PRs that can carry a comment in
+it, then read each PR's own comment list (one request per PR, ~2,800 for a month of Mathlib).
+Shallow, resumable, and the only route that currently works.
+
+`--mode listing` streams the repo-level comment endpoint, one request per 100 comments. GitHub
+has to sort every comment updated since `since` to answer it, and on a repo this size that now
+times out: measured 2026-09-11, HTTP 500 after ~8 s on the *first* page, six times running. Kept
+for when that recovers. `--mode auto` probes it once and falls back.
+
+A note on quotas, because both failures so far were quota-shaped. The *search* API allows **30
+requests per minute**, separately from core -- a stage A built on it died after 27. Core is
+5,000/hour authenticated, 60 unauthenticated. `GitHubClient` now waits out a rate-limit window
+rather than raising, so a long collection survives hitting one.
+
+Needs GITHUB_TOKEN. Resumable: re-running appends only comment_ids not already present; per-pr
+mode also caches its stage-A PR list and skips PRs the state file records as done.
 """
 
 import argparse
@@ -330,65 +339,153 @@ def search_prs_active_in(client, start: str, end: str, logger) -> List[int]:
     return sorted(set(numbers))
 
 
+def list_prs_active_since(client, start: str, end: str, logger, *,
+                          log_every_pages: int = 10, recheck_pages: int = 3) -> List[int]:
+    """Every PR that can carry a review comment created in [start, end], from the **core**
+    endpoint rather than search.
+
+    `/repos/{repo}/pulls?state=all&sort=updated&direction=desc` is metered against the 5,000/hour
+    core bucket (search is 30 **per minute**, which is what killed the first attempt), answers in
+    about a second at any depth, and is ordered by `updated_at` descending. A review comment bumps
+    its PR's `updated_at`, so every PR we need has `updated_at >= start`: walk from the top and
+    stop at the first page whose rows have all fallen below `start`. Keep those also created on or
+    before `end`.
+
+    Ordering under concurrent updates is safe in one direction and not the other: an update moves
+    a PR *up*, so a PR above the cursor can only be re-read (harmless, the caller dedups). A PR
+    bumped from below the cursor to the top, though, would be missed -- so the first
+    `recheck_pages` pages are read again at the end and anything new is reported.
+    """
+
+    path = f"/repos/{REPO}/pulls"
+    params = {"state": "all", "sort": "updated", "direction": "desc"}
+    found: Dict[int, str] = {}
+    pages = 0
+    reached = ""
+    t0 = time.monotonic()
+    for page in client.pages(path, params=params, per_page=100, max_pages=None):
+        pages += 1
+        if not page:
+            break
+        for item in page:
+            number, updated, created = item.get("number"), item.get("updated_at") or "", item.get("created_at") or ""
+            reached = updated[:10] or reached
+            if number and updated[:10] >= start and created[:10] <= end:
+                found[int(number)] = updated
+        if pages % max(1, log_every_pages) == 0 or (page and (page[-1].get("updated_at") or "")[:10] < start):
+            elapsed = max(1e-6, time.monotonic() - t0)
+            logger.info("  stage A page %d | back to %s (window starts %s) | %d PRs in window | "
+                        "%.1f req/s", pages, reached or "?", start, len(found), pages / elapsed)
+        if (page[-1].get("updated_at") or "")[:10] < start:
+            break
+    # A PR bumped from below the cursor to the top during the walk would have been stepped over.
+    before = set(found)
+    for page in client.pages(path, params=params, per_page=100, max_pages=recheck_pages):
+        for item in page:
+            number, updated, created = item.get("number"), item.get("updated_at") or "", item.get("created_at") or ""
+            if number and updated[:10] >= start and created[:10] <= end:
+                found[int(number)] = updated
+    missed = set(found) - before
+    if missed:
+        logger.info("  stage A re-check of the first %d pages found %d PR(s) bumped during the "
+                    "walk: %s", recheck_pages, len(missed), sorted(missed))
+    return sorted(found)
+
+
 def build_corpus_per_pr(
     start: str, end: str, out: Path, *, exclude_prs: Set[int], logger,
     interval: float = 0.0, log_every_prs: int = 25, client=None,
+    stage_a: str = "listing",
 ) -> int:
-    """The per-PR route: search the PRs updated in the window, read each one's review comments,
-    keep those created in the window that pass `keep_comment`. Progress is PRs done over PRs
-    found -- a real denominator, unlike the listing route."""
+    """The per-PR route, in two stages, both metered against the 5,000/hour core bucket.
+
+    Stage A lists every PR that can carry a review comment created in [start, end]; stage B reads
+    each one's review comments and keeps those created in the window that pass `keep_comment`.
+    Progress is PRs done over PRs found -- a real denominator. The stage-A result is persisted, so
+    a crash in stage B never repeats it, and finished PRs are skipped on a rerun.
+    """
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    seen, max_created = _existing_state(out)
+    seen, _ = _existing_state(out)
     client = client or GitHubClient(None, request_interval_seconds=interval, logger=logger)
     state_path = _state_path(out)
     done_prs: Set[int] = set()
+    prior_state: Dict[str, Any] = {}
     if state_path.is_file():
         try:
             prior = json.loads(state_path.read_text(encoding="utf-8"))
-            if prior.get("mode") == "per-pr" and prior.get("start") == start and prior.get("end") == end:
-                done_prs = set(int(n) for n in prior.get("done_prs", []))
+            if (prior.get("mode") == "per-pr" and prior.get("start") == start
+                    and prior.get("end") == end):
+                prior_state = prior
+                done_prs = {int(n) for n in prior.get("done_prs") or ()}
         except (ValueError, TypeError):
             pass
-    logger.info(
-        "PLAN  window %s..%s (per-pr route) | %d rows already in %s | GITHUB_TOKEN %s\n"
-        "      stage A: search PRs created on or before the window's end and updated since its "
-        "start, in created-date slices; "
-        "stage B: one request per PR for its review comments (more if it has over 100); "
-        "keep maintainer .lean comments created in the window; %d eval PRs skipped outright.",
-        start, end, len(seen), out.name,
-        "set" if client.authenticated else "MISSING (60 requests/hour; this will not finish)",
-        len(exclude_prs))
-    prs = [n for n in search_prs_active_in(client, start, end, logger) if n not in exclude_prs]
-    todo = [n for n in prs if n not in done_prs]
-    logger.info("      stage A done: %d PRs active in the window, %d already collected, %d to read "
-                "(~%d requests)", len(prs), len(prs) - len(todo), len(todo), len(todo))
 
     kept = scanned = requests = 0
+    found_prs: List[int] = []
     t0 = time.monotonic()
-    fh = out.open("a", encoding="utf-8")
 
     def save_state(done: bool) -> None:
+        # `prs_found` is the stage-A result. Persisting it means a crash in stage B never repeats
+        # stage A -- the first attempt lost 27 successful search requests to a 403 before stage B
+        # had begun, and threw the list away with them.
         state_path.write_text(json.dumps({
-            "mode": "per-pr", "start": start, "end": end, "prs_found": len(prs),
+            "mode": "per-pr", "start": start, "end": end, "prs_found": sorted(found_prs),
             "done_prs": sorted(done_prs), "requests": requests, "scanned": scanned, "kept": kept,
             "done": done, "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "resume_hint": f"--mode per-pr --start {start} --end {end}  (finished PRs are skipped)",
+            "resume_hint": f"--mode per-pr --start {start} --end {end}  "
+                           "(stage A is cached and finished PRs are skipped)",
         }, indent=2) + "\n", encoding="utf-8")
+
+    cached = [int(n) for n in prior_state.get("prs_found") or ()]
+    logger.info(
+        "PLAN  window %s..%s | per-pr route, stage A = %s | %d rows already in %s | "
+        "GITHUB_TOKEN %s\n"
+        "      stage A: every PR updated since %s and created on or before %s -- one walk of the "
+        "repo's pull-request list, newest update first, stopping when it falls below the window. "
+        "stage B: one request per PR for its review comments (more if it has over 100), keeping "
+        "maintainer .lean comments created in the window. %d eval PRs are skipped outright. "
+        "Both stages use the 5,000/hour core bucket (the search API's 30/minute cap is what "
+        "stopped the first attempt).",
+        start, end, "cached from the last run" if cached else stage_a, len(seen), out.name,
+        "set" if client.authenticated else "MISSING (60 requests/hour; this will not finish)",
+        start, end, len(exclude_prs))
+
+    try:
+        if cached:
+            found_prs = [n for n in cached if n not in exclude_prs]
+        elif stage_a == "search":
+            found_prs = [n for n in search_prs_active_in(client, start, end, logger)
+                         if n not in exclude_prs]
+        else:
+            found_prs = [n for n in list_prs_active_since(client, start, end, logger)
+                         if n not in exclude_prs]
+    except BaseException:
+        client.close()
+        raise
+    todo = [n for n in found_prs if n not in done_prs]
+    save_state(done=False)
+    logger.info("      stage A done: %d PRs active in the window, %d already collected, "
+                "%d to read (~%d requests, ~%s at 1/s)",
+                len(found_prs), len(found_prs) - len(todo), len(todo), len(todo),
+                _fmt_seconds(len(todo)))
 
     def progress(index: int, number: int, final: bool = False) -> None:
         elapsed = max(1e-6, time.monotonic() - t0)
         rate = index / elapsed
         left = len(todo) - index
         logger.info("%s PR %d/%d (%3.0f%%) | #%d | scanned %s kept %s | %.1f PR/s | ~%s left",
-                    "DONE " if final else "     ", index, len(todo), 100 * index / max(1, len(todo)),
-                    number, f"{scanned:,}", f"{kept:,}", rate,
+                    "DONE " if final else "     ", index, len(todo),
+                    100 * index / max(1, len(todo)), number, f"{scanned:,}", f"{kept:,}", rate,
                     _fmt_seconds(left / rate) if rate else "?")
 
+    t0 = time.monotonic()
+    fh = out.open("a", encoding="utf-8")
     number = 0
     try:
         for index, number in enumerate(todo, start=1):
-            for page in client.pages(f"/repos/{REPO}/pulls/{number}/comments", per_page=100, max_pages=None):
+            for page in client.pages(f"/repos/{REPO}/pulls/{number}/comments",
+                                     per_page=100, max_pages=None):
                 requests += 1
                 for c in page:
                     scanned += 1
@@ -408,17 +505,17 @@ def build_corpus_per_pr(
                 save_state(done=False)
     except BaseException:
         save_state(done=False)
-        logger.error("Interrupted at PR #%d with %d of %d PRs read; %d rows written and kept. "
-                     "Resume with: --mode per-pr --start %s --end %s (finished PRs are skipped)",
-                     number, len(done_prs), len(prs), kept, start, end)
+        logger.error("Interrupted at PR #%d with %d of %d PRs read; %d rows written this run and "
+                     "kept. Resume with the same command: stage A is cached and finished PRs are "
+                     "skipped.", number, len(done_prs), len(found_prs), kept)
         raise
     finally:
         fh.close()
         client.close()
     save_state(done=True)
     progress(len(todo), number, final=True)
-    logger.info("Kept %d maintainer .lean comments this run (scanned %d across %d PRs, %d requests) -> %s",
-                kept, scanned, len(todo), requests, out)
+    logger.info("Kept %d maintainer .lean comments this run (scanned %d across %d PRs, "
+                "%d requests) -> %s", kept, scanned, len(todo), requests, out)
     return kept
 
 
@@ -464,11 +561,16 @@ def main() -> None:
                    help="print a progress line every N pages (one page = one request of 100)")
     p.add_argument("--reanchor-every-pages", type=int, default=REANCHOR_EVERY_PAGES,
                    help="restart the walk from the last created_at every N pages (GitHub 5xxs deep chains)")
-    p.add_argument("--mode", choices=["auto", "listing", "per-pr"], default="auto",
-                   help="listing: the repo-level comment stream (fast, but GitHub now 500s its first "
-                        "page for this repo); per-pr: search PRs updated in the window and read each "
-                        "one's comments (one request per PR, never deep); auto: probe listing once, "
-                        "fall back to per-pr")
+    p.add_argument("--stage-a", choices=["listing", "search"], default="listing",
+                   help="how per-pr mode finds the window's PRs: listing walks the repo's "
+                        "pull-request list on the 5,000/hour core bucket (default); search uses "
+                        "the search API, which allows only 30 requests per minute")
+    p.add_argument("--mode", choices=["per-pr", "listing", "auto"], default="per-pr",
+                   help="per-pr (default): find the window's PRs, then read each one's comments -- "
+                        "shallow, metered against the core bucket, resumable; listing: the "
+                        "repo-level comment stream, one request per 100 comments, but GitHub has "
+                        "been answering HTTP 500 on its first page for this repo since ~2026-09; "
+                        "auto: probe listing once and fall back to per-pr")
     args = p.parse_args()
     logger = create_logger()
     excl = _eval_pr_numbers()
@@ -483,7 +585,7 @@ def main() -> None:
             probe.close()
     if mode == "per-pr":
         build_corpus_per_pr(args.start, args.end, args.out, exclude_prs=excl, logger=logger,
-                            interval=args.interval)
+                            interval=args.interval, stage_a=args.stage_a)
     else:
         build_corpus(args.start, args.end, args.out, exclude_prs=excl,
                      max_pages=args.max_pages, logger=logger, interval=args.interval,

@@ -37,9 +37,11 @@ class FakeGitHub:
 
     authenticated = True
 
-    def __init__(self, prs, comments, *, cap_override=None):
+    def __init__(self, prs, comments, *, cap_override=None, bump_after=None, bump_pr=None):
         self.prs, self.comments = prs, comments
         self.cap_override = cap_override      # {(lo, hi): total_count} to simulate the cap
+        self.bump_after = bump_after          # page index after which `bump_pr` jumps to the top
+        self.bump_pr = bump_pr
         self.requests: List[str] = []
 
     def _search(self, q: str):
@@ -56,6 +58,20 @@ class FakeGitHub:
         return {"total_count": total, "items": hits[:100]}
 
     def pages(self, path, *, params=None, per_page=100, max_pages=None):
+        if path.endswith("/pulls"):                      # the core listing, updated desc
+            rows = sorted(self.prs, key=lambda p: p["updated_at"], reverse=True)
+            for index, offset in enumerate(range(0, len(rows), 100)):
+                if max_pages is not None and index >= max_pages:
+                    return
+                self.requests.append(path)
+                yield rows[offset:offset + 100]
+                if self.bump_after and index + 1 == self.bump_after:
+                    # A PR is updated mid-walk and jumps to the top of the list.
+                    for row in self.prs:
+                        if row["number"] == self.bump_pr:
+                            row["updated_at"] = "2026-09-11T00:00:00Z"
+                    rows = sorted(self.prs, key=lambda p: p["updated_at"], reverse=True)
+            return
         if path == "/search/issues":
             hits, _ = self._search(params["q"])
             start = (params.get("page", 1) - 1) * 100
@@ -94,10 +110,37 @@ def test_every_pr_that_can_carry_a_comment_in_the_window_is_read():
     comments = [_comment(10, 1, "2025-12-06"), _comment(11, 2, "2025-12-10"),
                 _comment(12, 2, "2026-01-10"), _comment(13, 3, "2025-11-25")]
     import tempfile, pathlib
-    kept, rows, client, _ = _run(pathlib.Path(tempfile.mkdtemp()), prs, comments)
+    kept, rows, client, _ = _run(pathlib.Path(tempfile.mkdtemp()), prs, comments, stage_a="search")
     assert sorted(r["comment_id"] for r in rows) == [10, 11]     # 12 and 13 are outside the window
     read = sorted(int(p.split("/pulls/")[1].split("/")[0]) for p in client.requests if "/pulls/" in p)
     assert read == [1, 2]
+
+
+def test_the_listing_route_walks_until_the_window_and_no_further(tmp_path):
+    """The default stage A. `/repos/{repo}/pulls?sort=updated&direction=desc` is on the 5,000/hour
+    core bucket; the search API allows 30 requests a minute, which is what stopped the first
+    attempt after 27 of them. The walk stops at the first page that has fallen below the window."""
+
+    prs = ([_pr(i, "2025-12-05", f"2026-0{1 + i // 60}-{1 + i % 27:02d}") for i in range(1, 120)]
+           + [_pr(500, "2025-06-01", "2025-12-20"),      # old PR, active in the window
+              _pr(501, "2025-11-20", "2025-11-28"),      # fell quiet before the window
+              _pr(502, "2026-02-02", "2026-03-03")])     # opened after the window
+    kept, rows, client, _ = _run(tmp_path, prs, [_comment(10, 500, "2025-12-20")])
+    assert [r["comment_id"] for r in rows] == [10]
+    read = {int(p.split("/pulls/")[1].split("/")[0]) for p in client.requests if "/pulls/" in p and p.endswith("/comments")}
+    assert 500 in read and 501 not in read and 502 not in read
+    assert not any(p == "/search/issues" for p in client.requests)
+
+
+def test_a_pr_bumped_past_the_cursor_mid_walk_is_caught_by_the_recheck(tmp_path):
+    """An update moves a PR *up* the list, so one below the cursor can jump above it and be
+    stepped over. The first pages are read again at the end for exactly this."""
+
+    prs = [_pr(i, "2025-12-05", f"2026-01-{1 + i % 28:02d}") for i in range(1, 250)]
+    prs.append(_pr(999, "2025-12-10", "2025-12-11"))      # last in the list, then bumped to top
+    client = FakeGitHub(prs, [_comment(77, 999, "2025-12-10")], bump_after=1, bump_pr=999)
+    kept, rows, client, _ = _run(tmp_path, prs, [_comment(77, 999, "2025-12-10")], client=client)
+    assert [r["comment_id"] for r in rows] == [77]
 
 
 def test_eval_prs_are_never_fetched(tmp_path):
@@ -111,7 +154,7 @@ def test_eval_prs_are_never_fetched(tmp_path):
 def test_a_slice_at_the_search_cap_is_split(tmp_path):
     prs = [_pr(i, "2025-12-03", "2025-12-10") for i in range(1, 6)]
     client = FakeGitHub(prs, [], cap_override={("2025-12-01", "2025-12-07"): 1000})
-    kept, rows, client, _ = _run(tmp_path, prs, [], client=client)
+    kept, rows, client, _ = _run(tmp_path, prs, [], client=client, stage_a="search")
     searches = [p for p in client.requests if p == "/search/issues"]
     assert len(searches) > 6          # the week was split rather than truncated
     read = {int(p.split("/pulls/")[1].split("/")[0]) for p in client.requests if "/pulls/" in p}
@@ -125,11 +168,12 @@ def test_a_rerun_skips_finished_prs_and_adds_nothing(tmp_path):
     assert kept == 2
     state = json.loads(corpus._state_path(out).read_text())
     assert state["mode"] == "per-pr" and state["done"] is True and state["done_prs"] == [1, 2]
+    assert state["prs_found"] == [1, 2]          # stage A is cached, never repeated
     client2 = FakeGitHub(prs, comments)
     again = corpus.build_corpus_per_pr("2025-12-01", "2025-12-31", out, exclude_prs=set(),
                                        logger=logging.getLogger("t"), client=client2)
     assert again == 0
-    assert not any("/pulls/" in p for p in client2.requests)   # nothing re-read
+    assert not client2.requests                  # neither stage A nor stage B ran again
     assert len(out.read_text().splitlines()) == 2
 
 
@@ -139,6 +183,6 @@ def test_the_log_gives_prs_done_over_prs_found(tmp_path, caplog):
     with caplog.at_level(logging.INFO, logger="per-pr-test"):
         _run(tmp_path, prs, comments, log_every_prs=3)
     text = caplog.text
-    assert "PLAN  window 2025-12-01..2025-12-31 (per-pr route)" in text
+    assert "PLAN  window 2025-12-01..2025-12-31 | per-pr route" in text
     assert "stage A done: 7 PRs active in the window" in text
     assert "PR 3/7" in text and "DONE  PR 7/7" in text
