@@ -1,5 +1,10 @@
 .ape/
-.claude
+# Claude Code: the shared project config is tracked (settings.json, rules/, hooks/);
+# personal overrides (settings.local.json) and worktrees are not.
+.claude/*
+!.claude/settings.json
+!.claude/rules/
+!.claude/hooks/
 *egg-info
 .vscode
 .DS_Store
