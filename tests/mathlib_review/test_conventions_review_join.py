@@ -98,7 +98,15 @@ def test_the_real_corpus_resolves_line_level_for_about_seven_in_ten():
         pytest.skip("run `python -m src.mathlib_review.conventions.review_join --write`")
     payload = json.loads(report.read_text(encoding="utf-8"))
     assert payload["schema_version"] == REVIEW_JOIN_VERSION
-    assert payload["comments"] == 34640
+    # Not a fixed count: the corpus grows with every collected month, and this assertion was
+    # pinned at 34,640 until December's collection made it false. What must hold is that the
+    # report describes the rows the join reads *now* -- a stale report is the defect, and one
+    # was on disk for a day after 7,184 September-November rows landed without a rerun.
+    from src.mathlib_review.conventions.review_join import load_rows
+    current = len(load_rows())
+    assert payload["comments"] == current, (
+        f"review_join report covers {payload['comments']} comments but its source has {current}; "
+        "rerun `python -m src.mathlib_review.conventions.review_join --write`")
     assert payload["source"].startswith("corpus")
     assert 0.70 <= payload["line_level_share"] <= 0.74
     assert 0.22 <= payload["resolved_via"]["between"] / payload["comments"] <= 0.26

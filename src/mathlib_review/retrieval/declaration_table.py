@@ -421,6 +421,22 @@ def load_table(snapshot_sha: str, root: Path = TABLE_ROOT) -> DeclarationTable:
             f"no declaration table for {snapshot_sha}; build it with "
             f"`python -m src.mathlib_review.retrieval.declaration_table --commit {snapshot_sha}`")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    # Versions are checked, not just recorded. A classifier change re-partitions every population
+    # without changing a row count, so a stale table loads cleanly and answers wrongly: the one
+    # table on disk was labelled `conclusion-head/1` for a day after the code moved to `/2`, and
+    # nothing noticed because this function looked only at `representative`.
+    expected = {
+        "schema_version": TABLE_VERSION,
+        "conclusion_classifier_version": CONCLUSION_CLASSIFIER_VERSION,
+        "tactic_vocabulary_version": TACTIC_VOCABULARY_VERSION,
+    }
+    stale = {key: (manifest.get(key), want) for key, want in expected.items()
+             if manifest.get(key) != want}
+    if stale:
+        detail = ", ".join(f"{key} {have!r} != {want!r}" for key, (have, want) in stale.items())
+        raise ValueError(
+            f"the declaration table for {snapshot_sha} is stale ({detail}); rebuild it with "
+            f"`python -m src.mathlib_review.retrieval.declaration_table --commit {snapshot_sha} --write`")
     if not manifest.get("representative"):
         raise ValueError(
             f"the declaration table for {snapshot_sha} was built from "

@@ -1,0 +1,50 @@
+{
+  "schema_version": "pull-reviews-acceptance-baseline/1",
+  "what": "The retrieval corpus as the old pipeline (`pr_review_v2/corpus.py: keep_comment`) left it, frozen before the store replaces it. The corpus projection must contain every row here (old <= new), and every row it adds needs a named cause.",
+  "path": "data/pull_reviews/baseline/mathlib_review_comments.jsonl",
+  "copied_from": "inputs/pr_review_v2/corpus/mathlib_review_comments.jsonl",
+  "sha256": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+  "rows": 43881,
+  "created_range": [
+    "2024-03-01T03:55:31Z",
+    "2025-12-31T19:46:31Z"
+  ],
+  "rows_by_month": {
+    "2024-03": 1116,
+    "2024-04": 1159,
+    "2024-05": 1395,
+    "2024-06": 1512,
+    "2024-07": 2183,
+    "2024-08": 1273,
+    "2024-09": 1990,
+    "2024-10": 2610,
+    "2024-11": 2134,
+    "2024-12": 1279,
+    "2025-01": 2604,
+    "2025-02": 2180,
+    "2025-03": 2251,
+    "2025-04": 2290,
+    "2025-05": 2412,
+    "2025-06": 1930,
+    "2025-07": 2010,
+    "2025-08": 2312,
+    "2025-09": 2148,
+    "2025-10": 2163,
+    "2025-11": 2875,
+    "2025-12": 2055
+  },
+  "rows_with_positions": 9241,
+  "old_filter": "non-bot login; author_association in {MEMBER, OWNER, COLLABORATOR}; path ends .lean (case-insensitive); body survives strip_trivial_tokens. No roster, no PR-author exclusion.",
+  "collector_state_at_snapshot": {
+    "mode": "per-pr",
+    "start": "2025-09-01",
+    "end": "2025-11-30",
+    "done": false,
+    "kept": 7186,
+    "scanned": 31656,
+    "requests": 4925,
+    "prs_found": 4921,
+    "done_prs": 4910
+  },
+  "snapshotted_at": "2026-09-11T10:52:21Z"
+}

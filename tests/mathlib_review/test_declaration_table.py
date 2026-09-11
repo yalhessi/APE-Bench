@@ -250,3 +250,32 @@ def test_a_binders_membership_is_not_the_conclusions_relation():
     # Set-of-sets union is not a binder.
     assert conclusion_head("⋃₀ S ⊆ t") == "subset"
     assert conclusion_head("⋂₀ S = t") == "eq"
+
+
+def test_a_stale_table_is_refused_not_loaded(tmp_path):
+    """A classifier change re-partitions every population without changing a row count, so the
+    only way a stale table shows up is a version check. The one table on disk was labelled
+    `conclusion-head/1` for a day after the code moved to `/2`, and loaded without complaint."""
+
+    import json as _json
+
+    import pytest
+
+    from src.mathlib_review.retrieval.declaration_table import (
+        CONCLUSION_CLASSIFIER_VERSION, DeclarationRow, DeclarationTable, load_table, write_table,
+    )
+
+    table = DeclarationTable(snapshot_sha="abc", parsed_files=5000)
+    table.rows.append(DeclarationRow(path="Mathlib/A.lean", directory="Mathlib", namespace=None,
+                                     kind="theorem", fullname="foo", conclusion_head="eq",
+                                     tactics=("simp",), wide_tactics=(), proof_lines=1))
+    write_table(table, tmp_path)
+    assert load_table("abc", tmp_path).rows            # current versions load
+    manifest = tmp_path / "abc" / "manifest.json"
+    payload = _json.loads(manifest.read_text())
+    payload["conclusion_classifier_version"] = "v5-conclusion-head/1"
+    manifest.write_text(_json.dumps(payload))
+    with pytest.raises(ValueError) as excinfo:
+        load_table("abc", tmp_path)
+    assert "stale" in str(excinfo.value)
+    assert CONCLUSION_CLASSIFIER_VERSION in str(excinfo.value)

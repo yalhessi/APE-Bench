@@ -15,6 +15,13 @@ from pathlib import Path
 #: is how a guard becomes decoration.
 PACKAGE = Path("src/mathlib_review")
 
+#: The PR store builds manifests, hashes payloads and writes immutable files -- exactly the code
+#: that grew twenty-two private `_load`s here. It gets the same guard from its first commit
+#: rather than after its first copy.
+STORE_PACKAGE = Path("src/datasets/pull_reviews")
+
+PACKAGES = (PACKAGE, STORE_PACKAGE)
+
 #: Helper name -> the primitive that replaced it.
 CONSOLIDATED = {
     "_load": "io.load_jsonl",
@@ -49,8 +56,10 @@ def _defined_functions(path: Path):
 
 def _package_sources():
     return sorted(
-        path for path in PACKAGE.rglob("*.py")
-        if "legacy_pipeline" not in path.relative_to(PACKAGE).parts
+        path
+        for package in PACKAGES
+        for path in package.rglob("*.py")
+        if "legacy_pipeline" not in path.relative_to(package).parts
     )
 
 
