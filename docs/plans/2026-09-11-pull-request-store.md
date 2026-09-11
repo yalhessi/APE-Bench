@@ -118,3 +118,77 @@ reviewer view beside the old ones.
   mostly for size) yield 74 corpus rows, 42 in the reviewer view. Pointing retrieval at that would
   shrink its corpus from 43,881 rows to 42. (The step 8 commit message says the projection "holds
   only scored PRs"; that is wrong in the way just described, and the conclusion is unchanged.)
+
+## The live collection, measured mid-run (2026-09-11)
+
+The window actually being collected is **2024-03-01 .. 2026-08-31**, eight months wider than the
+one above. Tier 0 walked **32,851 PRs**. Measured at 10:09 EDT, ~2 h into tier 1:
+
+```
+tier 1 complete      5,071 of 32,851     (201 of them the June seed)
+tier 2 complete         201              the seeded bundles only
+```
+
+**The collector is quota-bound, and its opening rate misleads.** Tier 1 costs three requests per
+PR against the 5,000/hour core bucket, so the ceiling is ~1,667 PRs/hour. The first hour beat it
+by spending an accumulated bucket; the second hour is the quota exactly:
+
+```
+UTC hour     PRs    requests
+12:00      2,587       7,761     <- opening burst, spending a full bucket
+13:00      1,655       4,965     <- the 5,000/hour core quota, exactly
+14:00        628       1,884     (partial)
+```
+
+At the ceiling the remaining 27,780 PRs cost 83,340 requests, so **tier 1 has ~17 h left, not the
+~10.5 h the burst rate suggests.**
+
+**Tier 2 is the long pole, and it was not costed.** Running `Collector.gate_report` read-only over
+the finished PRs (a `NoNetwork` client that raises on any attribute access, so read-only is proven
+rather than asserted) gives the pre-gate the collector will not print for another ten hours:
+
+```
+                 n   still_open    bot   no_rev    pass   pass|closed
+ 38000-39999  1618        17.3%   3.2%     7.5%   72.0%         87.1%
+ 40000-41999  1987        25.8%   4.8%     6.0%   63.4%         85.4%
+ 42000-43999  1264        39.2%   4.4%     4.4%   51.9%         85.4%
+ (32000-33999  200         0.0%   1.0%     5.0%   94.0%         94.0%  <- the seeded eval
+                                                                          bundles: selection,
+                                                                          not a sample)
+```
+
+The collector reads **newest PR first**, so the sample is the worst slice for the gate: `pass`
+falls from 72% to 52% purely because recent PRs are still open. `pass | closed` is flat at
+**85–87% across every bucket**, and `still_open` is the only age-varying term — which makes the
+projection over the remaining 27,781 (all older, so nearly all closed) straightforward:
+
+```
+if the rest match this sample (26.5% open)    ~20,800 pass  ->  ~165,000 requests  ~33 h
+if the rest are ~all closed (the real case)   ~26,700 pass  ->  ~212,000 requests  ~42 h
+```
+
+**So the full collection is ~2.5 days, not an evening**: ~17 h of tier 1 left plus ~33–42 h of
+tier 2, both against the same 5,000/hour core quota. Tier 2 is resumable, and
+`TIER2_REQUESTS_PER_PR = 8` is the collector's own estimate; the true figure moves with how many
+compares the funnel asks for.
+
+**`store.content_digest()` is not a scale problem.** It walks every ledger and `open_index`
+recomputes it on every open, which at 163× the 201 PRs it was designed against looked like a tax
+worth paying down. Measured: **2.9 s over 32,851 PRs**, of which 2.7 s is `iter_ledgers` itself.
+Left alone. It will grow when tier 2 thickens each ledger; re-measure then rather than now.
+
+## The corpus's end date was doing the work of a date gate
+
+Collecting to 2026-08-31 removes a safety property nothing had noticed relying on. The corpus
+stopped at 2025-08-31 — before every eval PR (the 201 bundles open 2025-11-07..12-31) — so the
+analysis readers were leak-safe *by construction*, gated or not. Two were not gated:
+`precedent_bench.load_corpus` defaulted its window and all four of its callers passed none, and
+`review_join.load_corpus_rows` applied no window at all. After the repoint this section
+prescribes, `review_join` would have computed the **enforced** component from review written up to
+eight months after the episodes it describes, and the four v2 readers would have kept the old pin
+and silently ignored twelve new months. Neither would have failed a test.
+
+Fixed in `f47a8f0`: both loaders take a **required** `end`, `review_join --write` a required
+`--end`, recorded in `report.json` as `window` beside the span the rows actually cover. The live
+retrieval path was already safe (`precedent_index` → `RetrievalGate`, `UNDATED = -1`) and is
+untouched.
