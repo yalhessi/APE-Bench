@@ -141,8 +141,10 @@ class Situation:
             out["proof_style"] = f"proof:{shape}"
         # statement_form: iff / implication / plain, with whether numerals are hard-coded.
         if self.statement:
-            form = ("iff" if self.statement.get("conclusion_is_iff") else
-                    "impl" if self.statement.get("conclusion_is_implication") else "plain")
+            # iff / implication are shapes of a *proposition*; on a def, `→` in the type is a
+            # function type (`TermDecl → Term` is not an implication).
+            form = ("iff" if proposition and self.statement.get("conclusion_is_iff") else
+                    "impl" if proposition and self.statement.get("conclusion_is_implication") else "plain")
             if self.statement.get("numerals_in_hypotheses"):
                 form += "+numeral-hyp"
             out["statement_form"] = f"stmt:{form}"

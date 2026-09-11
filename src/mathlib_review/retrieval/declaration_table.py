@@ -45,7 +45,7 @@ from src.mathlib_review.tactics import (
     TACTIC_VOCABULARY, TACTIC_VOCABULARY_VERSION, WIDE_TACTIC_VOCABULARY, tactics_used,
 )
 
-TABLE_VERSION = "v5-declaration-table/1"
+TABLE_VERSION = "v5-declaration-table/2"   # /2: binder-aware conclusion_head (a big operator's ∈ is not a membership goal)
 
 #: The answer shape `proof_profile` returns. Bumped when the tool starts saying something new,
 #: so a run can be told apart from one made against an earlier answer: `/1` returned rank and
@@ -55,7 +55,7 @@ PROOF_PROFILE_VERSION = "v5-proof-profile/2"
 
 #: The classifier that turns a conclusion into a reference class. Versioned separately from the
 #: table because a change here re-partitions every population without changing a single row.
-CONCLUSION_CLASSIFIER_VERSION = "v5-conclusion-head/1"
+CONCLUSION_CLASSIFIER_VERSION = "v5-conclusion-head/2"   # /2: binder-aware; ⋃₀ is not a binder
 
 #: Below this the scan is a sample, not a census. `naming_norm` uses the same floor for the
 #: same reason, and the number is the point: a 2% scan still clears any support threshold.
@@ -71,6 +71,10 @@ _HEADS: Tuple[Tuple[str, str], ...] = (
     ("⊆", "subset"), ("⊂", "ssubset"), ("≤", "le"), ("≥", "ge"),
     ("↔", "iff"), ("∈", "mem"), ("=", "eq"),
 )
+
+
+#: Symbols that open a binder `… x ∈ s, body` at depth 0: big operators, integrals, quantifiers.
+_BINDER_OPENERS = "∑∏⋃⋂⨆⨅⨁∫∮⨍∀∃"
 
 
 def conclusion_head(conclusion: Optional[str]) -> Optional[str]:
@@ -91,12 +95,26 @@ def conclusion_head(conclusion: Optional[str]) -> Optional[str]:
     if text.startswith(("∃", "∀")):
         return "quantified"
     depth = 0
+    # A binder's `∈` is not a relation: in `∑ i ∈ s, f i = g` the conclusion is an equation, and
+    # `∀ i ∈ t, p i` inside a larger conclusion quantifies. Big operators and quantifiers open a
+    # binder that runs to the next depth-0 comma; relation symbols inside it do not decide.
+    in_binder = False
     for index, character in enumerate(text):
         if character in "([{":
             depth += 1
         elif character in ")]}":
             depth = max(0, depth - 1)
         elif depth == 0:
+            if character in _BINDER_OPENERS:
+                # `⋃₀ S` / `⋂₀ S` are set-of-sets operators, not binders: no `x ∈ s,` follows,
+                # and treating them as binders swallowed `⋃₀ S ⊆ t` into "other".
+                if text[index + 1: index + 2] != "₀":
+                    in_binder = True
+                continue
+            if in_binder:
+                if character == ",":
+                    in_binder = False
+                continue
             for symbol, name in _HEADS:
                 if character != symbol:
                     continue

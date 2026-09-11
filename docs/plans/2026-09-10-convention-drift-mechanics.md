@@ -472,6 +472,43 @@ independent three-rater panels (B refute-framed) with the same rubric as the 50-
 plus `form_A`/`form_B` -- what the PR wrote, what the reviewer wants -- so the same sample also
 seeds the (S, A, B) ledger. Scorer: `conventions/gate_score.py`. Result appended below when in.
 
+**Resolver v2, from what the first two raters caught before the panel closed.** Both flagged
+the same three things from the code, independently of the rubric:
+
+* *Anonymous instances are invisible to the head regex.* `instance : Module …` has no name, so
+  a comment inside its `where` block walked back to the lemma above. Now a head, reported as
+  `<anonymous instance>` with statement and typeclass facets only.
+* *A blank line above the tail is a declaration boundary.* An `omit`, `export`, `end`, an
+  `@[to_additive]` or a docstring for the *next* declaration sits after a blank line and
+  belongs to nothing in the hunk. Reported `between` (declaration `None`) instead of joined to
+  the lemma above -- 7 of the 9 mis-joins in the sample. Corpus-wide this is **24 %** of
+  comments (8,353); the commented line there begins with a blank (13 %), `/--` (11 %),
+  `variable` (7 %), `@[` (7 %), a `--` comment (4 %), `open`/`end`/`section`/`namespace`, module
+  docs. Blank lines *inside* a proof -- the failure mode of this rule -- are 2.5 % of the
+  `between` rows by first token.
+* *Two facet defects.* `goal:mem` on equations whose big-operator binder contains `∈`
+  (`⁅∑ i ∈ s, f i, m⁆ = …`), and `stmt:impl` on `def`s whose type is a function arrow. The
+  conclusion classifier is now binder-aware (`v5-conclusion-head/2`, `⋃₀` excluded) and
+  iff/impl are proposition-only. This changes the **declaration table**: `mem` 6,953 → 5,925,
+  `eq` 84,395 → 85,125, `subset` 2,302 → 2,307 (`TABLE_VERSION /2`, rebuilt, pins updated).
+  Rungs 0–3d ran against `/1`; their `proof_profile` outputs carry the classifier version.
+
+`structure`/`class`/`inductive`/`axiom`/`opaque` are heads now too (a comment on an `inductive`
+had fallen to the theorem above; a class-field comment had been "unresolved").
+
+```
+whole-hunk corpus, v2         all 34,640     2025-08
+line   (enclosing head)          71.5 %       75.6 %
+between (boundary above tail)    24.1 %       19.4 %
+context                           1.8 %        2.5 %
+unresolved                        2.6 %        2.5 %
+```
+
+Of the 80 sampled records, rated as originally joined: 59 unchanged under v2, 7 now `between`,
+6 change declaration (5 to an anonymous instance, 1 to the `inductive`), 8 change only a key.
+The panel result below is on the records *as rated*; the v2 deltas are listed beside it so the
+correction is not silently folded into the number.
+
 ## The first experiment, after step zero (~$8, one day)
 
 Every design schedules 8–10 engineering days before testing the one assumption they all share:

@@ -108,7 +108,7 @@ def test_it_ranks_the_tactic_the_arm_never_considered_second():
     Mathlib lemmas that do, the arm's own choice `simpa` is first and `grind` is second."""
 
     payload = _skip_without_table(_call(conclusion_head="subset", limit=6))
-    assert payload["reference_class"]["population"] == 2302
+    assert payload["reference_class"]["population"] == 2307
     # Ranked entries only: exemplar lines are indented under the tactic they illustrate.
     ranked = [line for line in payload["results"].splitlines()
               if not line.lstrip().startswith("e.g.")]

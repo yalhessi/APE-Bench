@@ -62,10 +62,17 @@ def test_a_proof_interior_hunk_is_resolved_from_gits_function_context():
     assert resolved["situation"].named_inside_predicate is False
 
 
-def test_a_structure_field_hunk_is_reported_unresolved_not_guessed():
+def test_a_structure_field_hunk_is_joined_to_its_class_with_no_proposition_facets():
+    """A comment on a class field is about the class. `class` is a head now (it was not, and
+    this hunk was 'unresolved'); the class's situation carries statement and typeclass facets
+    but no goal or proof facets, since it proves nothing."""
+
     resolved = situate_hunk(FIELD_HUNK)
-    assert resolved["resolved_via"] == "unresolved"
-    assert resolved["declaration"] is None
+    assert resolved["resolved_via"] == "line"
+    assert resolved["declaration"] == "CanonicallyOrderedAdd" and resolved["kind"] == "class"
+    keys = resolved["situation"].keys()
+    assert "goal" not in keys and "proof_style" not in keys
+    assert keys["typeclass"] == "class:Add"
 
 
 def test_join_carries_provenance_and_keys():
@@ -77,13 +84,14 @@ def test_join_carries_provenance_and_keys():
     assert joined.created_at.startswith("2025-12-01")
 
 
-def test_the_real_corpus_resolves_line_level_for_about_four_fifths():
+def test_the_real_corpus_resolves_line_level_for_about_seven_in_ten():
     """Pinned so a regression in either resolver shows up as a share change. Over the whole-hunk
-    corpus: 78 % resolve to the declaration enclosing the commented line, 5 % from git's context
-    line, 2 % first-head only, 15 % genuinely unresolvable from the hunk. (The earlier 61/7/33 was
-    measured on the index's front-truncated hunks with the first-head resolver.) And 74 % of the
-    time the enclosing declaration is *not* the first head in the hunk -- the number behind the
-    gate's 27/50."""
+    corpus, resolver v2: 71.5 % resolve to the declaration enclosing the commented line; 24 %
+    are `between` -- the tail sits after a blank line with no head in between (a docstring,
+    `variable`, attribute or `end` for something the hunk does not contain), which v1 had joined
+    to the lemma above; 2 % context, 3 % unresolved. (The original 61/7/33 was measured on the
+    index's front-truncated hunks with the first-head resolver; and the first-head resolver
+    disagreed with the tail 74 % of the time -- the number behind the gate's 27/50.)"""
 
     report = Path("data/pr_review_v5/review_join/report.json")
     if not report.is_file():
@@ -92,8 +100,9 @@ def test_the_real_corpus_resolves_line_level_for_about_four_fifths():
     assert payload["schema_version"] == REVIEW_JOIN_VERSION
     assert payload["comments"] == 34640
     assert payload["source"].startswith("corpus")
-    assert 0.76 <= payload["line_level_share"] <= 0.80
-    assert 0.83 <= payload["resolved_share"] <= 0.88
+    assert 0.70 <= payload["line_level_share"] <= 0.74
+    assert 0.22 <= payload["resolved_via"]["between"] / payload["comments"] <= 0.26
+    assert 0.72 <= payload["resolved_share"] <= 0.76
     assert payload["situation_key_kinds"]["of_lemma_of_predicate"] >= 600
 
 
@@ -155,3 +164,46 @@ def test_the_real_33098_comments_resolve_to_the_lemmas_the_maintainer_named():
                   "card_maximalSeparatedSet", "card_le_of_isSeparated",
                   "coveringNumber_le_packingNumber"):
         assert lemma in resolved, lemma
+
+
+def test_a_comment_inside_an_anonymous_instance_is_not_joined_to_the_lemma_above():
+    hunk = ("@@ -1,3 +1,8 @@\n"
+            " lemma coeFn_star (f : α →ₘ[μ] β) : ⇑(star f) =ᵐ[μ] star ⇑f := by\n"
+            "   simp\n"
+            "+instance : StarAddMonoid (α →ₘ[μ] β) where\n"
+            "+  star_involutive f := by\n"
+            "+    ext\n"
+            "+    simp only [hx, Pi.star_apply, hy, star_star]")
+    resolved = situate_hunk(hunk)
+    assert resolved["resolved_via"] == "line"
+    assert resolved["kind"] == "instance"
+    assert resolved["declaration"] == "<anonymous instance>"
+
+
+def test_a_structural_line_after_a_blank_is_between_declarations_not_inside_the_one_above():
+    """`omit`, `export`, `end`, an `@[to_additive]` or a docstring for the *next* declaration:
+    the hunk does not contain what the comment is about, and saying so beats joining it to the
+    lemma above -- which the first tail resolver did for seven of nine mis-joins in the August
+    sample."""
+
+    for tail in ("+omit [CompleteSpace V]", "+@[to_additive]", "+end CWComplex.Subcomplex",
+                 "+/-- The next declaration's docstring", "+export Foo (bar baz)"):
+        hunk = ("@@ -1,3 +1,6 @@\n"
+                " lemma isSelfAdjoint_rankOne_add : IsSelfAdjoint (rankOne 𝕜 x y) :=\n"
+                "+  (adjoint_rankOne y x) ▸ IsSelfAdjoint.star_add_self _\n"
+                "+\n" + tail)
+        resolved = situate_hunk(hunk)
+        assert resolved["resolved_via"] == "between", tail
+        assert resolved["declaration"] is None
+
+
+def test_an_inductive_is_a_head():
+    hunk = ("@@ -1,3 +1,6 @@\n"
+            " theorem uncurry_bind : True := trivial\n"
+            "+\n"
+            "+/-- This presieve generates `functorPushforward`. -/\n"
+            "+inductive map : Presieve (F.obj X) where\n"
+            "+  | of {Y : C} {u : Y ⟶ X} (h : s u) : map (F.map u)")
+    resolved = situate_hunk(hunk)
+    assert resolved["resolved_via"] == "line"
+    assert resolved["declaration"] == "map" and resolved["kind"] == "inductive"

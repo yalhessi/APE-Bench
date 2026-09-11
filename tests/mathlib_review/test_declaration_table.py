@@ -88,13 +88,16 @@ def test_the_corpus_populations_are_what_was_measured():
     heads = {}
     for row in table.rows:
         heads[row.conclusion_head] = heads.get(row.conclusion_head, 0) + 1
-    assert heads["eq"] == 84395
-    assert heads["other"] == 42205
-    assert heads["iff"] == 14919
-    assert heads["le"] == 10171
-    assert heads["mem"] == 6953
+    # v5-conclusion-head/2: a big operator's binder `∈` no longer reads as a membership goal
+    # (mem 6953 -> 5925; those rows were equations, inequalities and iffs), and `⋃₀`/`⋂₀` are
+    # not binders (subset 2302 -> 2307).
+    assert heads["eq"] == 85125
+    assert heads["other"] == 42353
+    assert heads["iff"] == 14948
+    assert heads["le"] == 10297
+    assert heads["mem"] == 5925
     assert heads["quantified"] == 6608
-    assert heads["subset"] == 2302
+    assert heads["subset"] == 2307
     # A large unextracted class would mean the conclusion extractor is failing.
     assert heads[None] == 321
     assert heads[None] / len(table.rows) < 0.01
@@ -144,7 +147,7 @@ def test_the_table_cannot_see_the_prs_own_declarations():
 def test_a_distribution_always_carries_its_population_and_versions():
     table = _table()
     payload = distribution(table.select(conclusion_head_="subset"))
-    assert payload["population"] == 2302
+    assert payload["population"] == 2307
     assert payload["conclusion_classifier_version"] == CONCLUSION_CLASSIFIER_VERSION
     assert payload["tactic_vocabulary_version"]
     assert payload["vocabulary"] == "strict"
@@ -230,3 +233,20 @@ def test_the_trajectory_cannot_reach_past_the_base_commit():
         pytest.skip("no Mathlib clone with history")
     rows = trajectory("grind", BASE, ["2026-06-01"])
     assert rows[0]["commit"] == BASE[:12]
+
+
+def test_a_binders_membership_is_not_the_conclusions_relation():
+    """`∑ i ∈ s, f i = g` concludes in an equation; the `∈` belongs to the big operator's binder.
+    The August review-join sample carried `goal:mem` on two equalities for this reason, and a
+    rater caught it from the code. Big operators, integrals and quantifiers open a binder that
+    runs to the next depth-0 comma; nothing inside it decides the class."""
+
+    assert conclusion_head("⁅∑ i ∈ s, f i, m⁆ = ∑ i ∈ s, ⁅f i, m⁆") == "eq"
+    assert conclusion_head("∫ x in ⋃ i ∈ t, s i, f x ∂μ = ∑ u ∈ t.powerset, g u") == "eq"
+    assert conclusion_head("∑ i ∈ s, f i ≤ ∑ i ∈ s, g i") == "le"
+    assert conclusion_head("x ∈ ⋃ i, s i") == "mem"
+    assert conclusion_head("(∑ i ∈ s, f i) ∈ t") == "mem"
+    assert conclusion_head("∀ i ∈ t, p i") == "quantified"
+    # Set-of-sets union is not a binder.
+    assert conclusion_head("⋃₀ S ⊆ t") == "subset"
+    assert conclusion_head("⋂₀ S = t") == "eq"

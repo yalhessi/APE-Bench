@@ -43,9 +43,18 @@ from src.mathlib_review.retrieval.precedent_index import DISPLAY_HUNK_CHARS
 REVIEW_JOIN_VERSION = "v5-review-join/2"
 
 #: A declaration head on a diff line (`+`, `-`, or context), with attributes and modifiers.
+#: `structure`/`class`/`inductive`/`axiom`/`opaque` are heads too: without them a comment on an
+#: `inductive` fell through to the theorem above it.
 _HEAD = re.compile(
-    r"^[-+ ]?\s*(?:@\[[^\]]*\]\s*)*(?:private |protected |noncomputable |nonrec )*"
-    r"(theorem|lemma|def|instance|abbrev)\s+([A-Za-z0-9_.'«»]+)", re.M)
+    r"^[-+ ]?\s*(?:@\[[^\]]*\]\s*)*(?:private |protected |noncomputable |nonrec |unsafe |partial )*"
+    r"(theorem|lemma|def|instance|abbrev|structure|class|inductive|axiom|opaque)\s+([A-Za-z0-9_.'«»]+)", re.M)
+#: An anonymous instance: `instance : Module …`, `instance [Foo A] : Bar A`, `instance (priority := …) :`.
+#: Two of the nine mis-joined comments in the August sample sat inside one; with no name after
+#: `instance` the head regex skipped it and the walk-back landed on the lemma above.
+_ANON_INSTANCE = re.compile(
+    r"^[-+ ]?\s*(?:@\[[^\]]*\]\s*)*(?:private |protected |noncomputable )*"
+    r"(instance)\b\s*(?:\(priority\s*:=[^)]*\)\s*)?(?=[:\[\{\(⦃])", re.M)
+ANONYMOUS_INSTANCE = "<anonymous instance>"
 #: git's function-context: `@@ -a,b +c,d @@ <the enclosing declaration's header line>`.
 _CONTEXT = re.compile(
     r"^@@[^\n]*?@@[^\n]*?\b(theorem|lemma|def|instance|abbrev)\s+([A-Za-z0-9_.'«»]+)([^\n]*)", re.M)
@@ -61,7 +70,7 @@ class JoinedComment:
     path: str
     commenter: Optional[str]
     body: str
-    resolved_via: str            # "line" | "head" | "context" | "unresolved"
+    resolved_via: str            # "line" | "between" | "head" | "context" | "unresolved"
     declaration: Optional[str]
     kind: Optional[str]
     situation_keys: Dict[str, str]
@@ -92,23 +101,33 @@ def _hunk_lines(hunk: str) -> List[str]:
     return lines
 
 
-def _declaration_enclosing_tail(hunk: str) -> Optional[Tuple[re.Match, int, List[str]]]:
+def _declaration_enclosing_tail(hunk: str) -> Optional[Tuple[Optional[re.Match], int, List[str]]]:
     """The declaration head at or above the commented line -- the hunk's last line.
 
     GitHub's `diff_hunk` for a review comment runs from a (possibly re-cut) `@@` header down to
     the commented line and stops there; for a multi-line comment it stops at the range's end.
     Measured 328/328 on the cached bundles. `original_position` is therefore redundant for
     resolution -- and unreliable as an index: when GitHub re-cuts the header, a comment at
-    position 149 arrives with a five-line hunk. Returns the match, its line index, and the lines.
+    position 149 arrives with a five-line hunk.
+
+    A blank line between the tail and the nearest head means the tail is *outside* that
+    declaration -- on the next one's docstring or attribute, an `omit`/`export`/`end` line, a
+    `variable` -- and the hunk does not contain the declaration it is about. That is returned
+    as `(None, index_of_blank, lines)` and reported `"between"`, not joined to the wrong lemma:
+    seven of nine mis-joins in the August sample were this. Returns the match, its line index,
+    and the lines.
     """
 
     lines = _hunk_lines(hunk)
     if len(lines) < 2 or not lines[0].startswith("@@"):
         return None
     for back in range(len(lines) - 1, 0, -1):
-        match = _HEAD.match(lines[back])
+        line = lines[back]
+        match = _HEAD.match(line) or _ANON_INSTANCE.match(line)
         if match:
             return match, back, lines
+        if not line[1:].strip() and line[:1] in "+- ":
+            return None, back, lines            # a declaration boundary above the tail
     return None
 
 
@@ -147,9 +166,14 @@ def situate_hunk(hunk: str, *, tail_is_comment: bool = True) -> Dict[str, Any]:
     enclosing = _declaration_enclosing_tail(hunk) if tail_is_comment else None
     if enclosing:
         match, head_index, lines = enclosing
-        kind, name = match.group(1), match.group(2)
+        if match is None:
+            # The tail sits after a blank line with no head in between: the comment is on a
+            # structural line or on the *next* declaration, which the hunk does not contain.
+            return {"resolved_via": "between", "declaration": None, "kind": None, "situation": None}
+        kind = match.group(1)
+        name = match.group(2) if match.re is _HEAD else ANONYMOUS_INSTANCE
         signature, proof = _declaration_text_to_tail(lines, head_index)
-        situation = situation_of(kind, name, signature, proof)
+        situation = situation_of(kind, "" if name == ANONYMOUS_INSTANCE else name, signature, proof)
         return {"resolved_via": "line", "declaration": name, "kind": kind, "situation": situation}
     source = _strip_diff_markers(hunk)
     # 1. A full declaration inside the hunk: parse it properly.
