@@ -94,6 +94,24 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   outcome table. **Reopens if:** used as one corroborating source among ≥ 2 — its `descr` / "How to
   fix this?" text remains the right `stated` extractor — never as the oracle, and never to date a
   convention.
+- **Surface proxies for convention discovery** (2026-09-11) — five designs proposed in one session,
+  all rejected for one reason: each substituted a statistic *about* code for the semantic question.
+  Linter firing ("can `grind` close this goal"); marginal drift in per-declaration features ("how
+  often does this token appear"); the A→B ledger from review ("what did a reviewer correct");
+  recurring migration targets in commit titles ("what did someone name a PR" — and Mathlib
+  squash-merges, so 14,730/14,730 commits are PR titles, the same tier-0 data, not a new substrate);
+  author breadth ("how many people did it" — `grind` is 232 commits from 19 authors with 69 % by one,
+  `gcongr` 88 from 22 with 28 % by one). The user's ruling on the last: one author running a
+  migration does not make `grind` not a convention — it makes commit titles a weak signal, and the
+  weakness is of the signal, not a property of the phenomenon. Two further errors made while arguing
+  for these: measurements ungated (a `to_dual` example that was 85 % post-eval data, withdrawn), and
+  a circular validation ("every target with n ≥ 6 is a genuine convention" was recognition of names
+  already known, not a measurement). **The constraint that survives:** evidence must carry what the
+  code was *for* and how it was *expressed*, together. Only a modified declaration has both — the
+  statement pins the purpose, the before/after pins the form; review corrections are a small late
+  sample of that shape, and the authored version is the modified declarations across the merged PR
+  diffs (tier 2, not titles). **Reopens if:** a proxy is used as one corroborating source beside a
+  semantic one, never as the discovery mechanism.
 - **`mergeready_v1` prompt** — approved on compile-exit; more tools produced *fewer* findings under
   it (69 → 3 → 2). The binding constraint was the framing, not tools; `acceptability_v2` is default.
 - **Sibling-propagation post-processor** — superseded by the intervention gold unit.
