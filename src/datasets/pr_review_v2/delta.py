@@ -79,23 +79,10 @@ def _patch_index(compare: Dict[str, Any]) -> Dict[str, List[ParsedHunk]]:
     return index
 
 
-def assemble_unified_diff(compare: Dict[str, Any]) -> str:
-    """Render the compare payload back into one unified diff (δ₀ for the record)."""
-    parts: List[str] = []
-    for entry in compare.get("files") or []:
-        path = entry.get("filename")
-        status = entry.get("status")
-        old_path = entry.get("previous_filename") or path
-        old_label = "/dev/null" if status == "added" else f"a/{old_path}"
-        new_label = "/dev/null" if status == "removed" else f"b/{path}"
-        parts.append(f"diff --git a/{old_path} b/{path}")
-        parts.append(f"--- {old_label}")
-        parts.append(f"+++ {new_label}")
-        if entry.get("patch"):
-            parts.append(entry["patch"])
-        else:
-            parts.append(f"(no textual patch available for {path}, status={status})")
-    return "\n".join(parts) + ("\n" if parts else "")
+# `assemble_unified_diff` lived here and in `mathlib_review/diffs.py` as two copies. They agree on
+# all 223 cached compares; the shared one also skips a file entry with no filename, where this copy
+# emitted `diff --git a/None b/None`. Re-exported so `delta` reads as it did.
+from src.mathlib_review.diffs import assemble_unified_diff  # noqa: E402,F401
 
 
 def diff_patches(p_before: Dict[str, List[ParsedHunk]], p_after: Dict[str, List[ParsedHunk]]) -> List[DeltaHunk]:

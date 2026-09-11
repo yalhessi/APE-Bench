@@ -1,6 +1,5 @@
 """Temporally safe, content-ranked maintainer precedent retrieval."""
 
-import json
 import math
 import re
 from collections import Counter
@@ -8,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable, List, Set, Tuple
 
-from src.mathlib_review.release.events import payload_at_source_key
+from src.mathlib_review.release.events import resolve_payload
 from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
 from src.mathlib_review.schema import (
     ChangeGraph,
@@ -97,17 +96,14 @@ def idiom_terms(text: str) -> List[str]:
 
 
 def _payload_text(event: SourceEvent) -> str:
-    path = Path(event.source_object.path)
-    payload = payload_at_source_key(json.loads(path.read_text()), event.source_key)
+    payload = resolve_payload(event)
     if isinstance(payload, dict):
         return str(payload.get("body") or "")
     return str(payload)
 
 
 def _prompt_precedent_payload(event: SourceEvent) -> Tuple[str, str, str, bool]:
-    payload = payload_at_source_key(
-        json.loads(Path(event.source_object.path).read_text()), event.source_key
-    )
+    payload = resolve_payload(event)
     if not isinstance(payload, dict):
         return str(payload), "", "", False
     body = str(payload.get("body") or "").strip()
@@ -307,8 +303,7 @@ def retrieve_payloads(target: ReviewEpisodeBoundary, events: Iterable[SourceEven
                       query: str, limit: int = 6) -> List[Tuple[SourceEvent, str]]:
     rows = []
     for event in eligible_precedents(target, events):
-        path = Path(event.source_object.path)
-        payload = payload_at_source_key(json.loads(path.read_text()), event.source_key)
+        payload = resolve_payload(event)
         text = str(payload.get("body") or payload.get("state") or "") if isinstance(payload, dict) else str(payload)
         rows.append((event, text))
     terms = set(re.findall(r"[a-z0-9_]{3,}", query.lower()))

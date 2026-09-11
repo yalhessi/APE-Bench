@@ -10,7 +10,10 @@
 
 **Payload files are immutable** (`io.write_once`): tiers add files, nothing is rewritten, and a
 refetch that returns different bytes for an endpoint already recorded raises rather than
-overwriting. This is the "data never moves" rule applied at file granularity, so a projection that
+overwriting. One transition is allowed, because it gains information without moving any: a
+recorded *null* may be filled once by a later successful fetch. GraphQL enrichment fails or needs a
+token; if a null froze forever, one failed fetch would permanently omit that PR's description. The
+reverse never happens -- a later failure does not erase a value. This is the "data never moves" rule applied at file granularity, so a projection that
 pinned an endpoint's sha can never be silently invalidated. The ledger itself evolves as tiers are
 added, but only by *adding* entries, each immutable once written, and it is replaced atomically so a
 crash mid-collection cannot leave a PR unreadable.
@@ -171,12 +174,16 @@ class PullReviewStore:
                      "sha256": sha256_bytes(content)}
         existing = ledger["endpoints"].get(endpoint)
         if existing is not None:
-            if (existing["present"], existing["sha256"]) != (entry["present"], entry["sha256"]):
+            if existing["present"] and payload is None:
+                return False                     # a later failure never erases a value
+            if existing["present"] and existing["sha256"] != entry["sha256"]:
                 raise ImmutableEndpointError(
-                    f"PR {number} {endpoint}: already recorded "
-                    f"({existing['sha256'] or 'null'}), now offered "
-                    f"({entry['sha256'] or 'null'}); the store does not rewrite endpoints")
-            return False
+                    f"PR {number} {endpoint}: already recorded ({existing['sha256']}), now "
+                    f"offered ({entry['sha256']}); the store does not rewrite endpoints")
+            if existing["present"] or payload is None:
+                return False                     # identical, or null offered for a null
+            entry["filled_from_null"] = {"fetched_at": existing.get("fetched_at"),
+                                         "source": existing.get("source")}
         if payload is not None:
             write_once(self.pr_dir(number) / filename, content)
         entry.update({"request": request, "fetched_at": fetched_at, "source": source})
@@ -267,6 +274,10 @@ class PullReviewStore:
         raw = (self.pr_dir(number) / entry["file"]).read_bytes()
         return json.loads(raw), sha256_bytes(raw)
 
+    def compares(self, number: int) -> "StoreCompares":
+        """This PR's compares as a `diffs.CompareSource`, for the funnel."""
+        return StoreCompares(self, number)
+
     def commit_timestamp(self, number: int, sha: str) -> Optional[str]:
         """Committer date of `sha` among this PR's commits -- the retrieval cutoff's source."""
 
@@ -281,6 +292,18 @@ class PullReviewStore:
         for number in self.numbers():
             yield self.ledger(number)
 
+    def bundle_ref(self, number: int):
+        """What the funnel's event index cites as this PR's source. Seeded PRs cite the legacy
+        bundle file they came from; collected PRs cite their store directory."""
+
+        from src.mathlib_review.schema import ArtifactRef
+
+        legacy = self.ledger(number).get("legacy_bundle")
+        if legacy:
+            return ArtifactRef(path=legacy["path"], role="raw_github_bundle", sha256=legacy["sha256"])
+        return ArtifactRef(path=self.pr_dir(number).as_posix(), role="pull_review_pr",
+                           sha256=self.bundle_sha256(number))
+
     def content_digest(self) -> str:
         """A deterministic digest of everything in the store: every PR's endpoint and compare
         shas. The index and every projection pin this, so a store that gains or loses one byte
@@ -293,3 +316,25 @@ class PullReviewStore:
                 "compares": {k: v["sha256"] for k, v in sorted(ledger["compares"].items())},
             }
         return sha256_bytes(canonical_json_bytes(tree))
+
+
+class StoreCompares:
+    """A PR's compares from the store, as a `diffs.CompareSource`.
+
+    A missing compare raises with the same message the directory source uses, so a funnel
+    `hydration` exclusion reads identically whichever source produced it."""
+
+    def __init__(self, store: PullReviewStore, number: int):
+        self.store = store
+        self.number = int(number)
+
+    def review_diff(self, reviewed_head_sha: str):
+        from src.mathlib_review.diffs import diff_from_compare
+
+        try:
+            payload, sha = self.store.compare(self.number, reviewed_head_sha)
+        except IncompletePR:
+            raise ValueError(
+                f"expected one cached compare for {reviewed_head_sha}, found 0") from None
+        return diff_from_compare(
+            payload, sha, where=self.store.pr_dir(self.number) / "compares" / f"{reviewed_head_sha}.json")

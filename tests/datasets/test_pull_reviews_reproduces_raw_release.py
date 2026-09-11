@@ -1,15 +1,18 @@
-"""The task pipeline still produces the frozen raw release, byte for byte.
+"""The task pipeline produces the frozen raw releases byte for byte -- from the v2 cache *and* from
+the PR store.
 
-`dev-raw-0.3.0` holds 201 funnel decisions, 138 reviewer-visible episodes and 138 hidden
-boundaries, built by `legacy_pipeline/raw_release.py` from the 201 cached bundles, the 223 cached
-compares and the 59-login roster. Rebuilding them in memory takes under a second, which makes them
-the oracle for every change this refactor makes to the definitions the funnel uses and to where
-its inputs come from: if a consolidated rule or a new data source moved one reviewer event, one
-title, one diff, a byte here moves.
+`dev-raw-0.3.0` (first review rounds: 201 funnel decisions, 138 episodes, 138 boundaries) and
+`dev-raw-multiround-0.4.0` (every round: 198 episodes and boundaries, 202 round segments) were built
+by `legacy_pipeline/raw_release.py` from the 201 cached bundles, the 223 cached compares and the
+59-login roster, each with an event ledger over the bundles. All of it rebuilds in about a second.
 
-The roster is the one the release's manifest pins, not a newer snapshot. Membership is
-time-varying, so a newer roster would shift reviewer events and fail this test for a reason that
-has nothing to do with the code under test.
+That makes them the oracle for this refactor twice over. Rebuilt from the legacy cache, they prove
+that consolidating the funnel's definitions changed no behaviour. Rebuilt from the store seeded
+with the same bytes, they prove the store can *replace* the cache: same reviewer events, same
+diffs, same provenance hashes, same event ids. If either source moves one byte, this fails.
+
+The roster is the one each release's manifest pins. Membership is time-varying, so a newer
+snapshot would shift reviewer events and fail this test for a reason unrelated to the code.
 """
 
 from __future__ import annotations
@@ -19,57 +22,146 @@ from pathlib import Path
 
 import pytest
 
+from src.datasets.pull_reviews.projections.episodes import (
+    project_episodes, write_episode_release,
+)
+from src.datasets.pull_reviews.seed import seed_from_legacy
+from src.datasets.pull_reviews.store import PullReviewStore
 from src.mathlib_review.io import jsonl_bytes, sha256_file
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES, LEGACY_V2_ROSTER
-from src.mathlib_review.release.episode_builder import funnel_and_first_round, load_roster
+from src.mathlib_review.release.episode_builder import (
+    funnel_and_first_round, load_roster, segment_review_rounds,
+)
+from src.mathlib_review.release.events import build_event_ledger
 
-RELEASE = Path("inputs/pr_review_v4/releases/dev-raw-0.3.0")
+FIRST_ROUND = Path("inputs/pr_review_v4/releases/dev-raw-0.3.0")
+ALL_ROUNDS = Path("inputs/pr_review_v4/releases/dev-raw-multiround-0.4.0")
 
 
-def _pinned_roster_path() -> Path:
-    manifest = json.loads((RELEASE / "manifest.json").read_text())
+def _pinned_roster(release: Path) -> Path:
+    manifest = json.loads((release / "manifest.json").read_text())
     ref = next(r for r in manifest["sources"] if r["role"] == "reviewer_roster")
-    path = Path(ref["path"])
-    assert sha256_file(path) == ref["sha256"], "the pinned roster changed; verify_frozen would fail too"
-    return path
+    assert sha256_file(Path(ref["path"])) == ref["sha256"]
+    return Path(ref["path"])
 
 
-def _rebuild_from_legacy_caches():
-    roster = load_roster(_pinned_roster_path())
-    funnels, episodes, boundaries = [], [], []
+def _from_legacy(all_rounds: bool, tmp_path: Path):
+    roster = load_roster(_pinned_roster(ALL_ROUNDS if all_rounds else FIRST_ROUND))
+    funnel, episodes, boundaries, segments = [], [], [], []
     for bundle_path in sorted(LEGACY_V2_BUNDLES.glob("pr_*.json")):
-        decision, result = funnel_and_first_round(
-            json.loads(bundle_path.read_text()), bundle_path=bundle_path,
-            compare_cache=LEGACY_V2_COMPARES, roster=roster)
-        funnels.append(decision)
-        if result:
-            episodes.append(result.episode)
-            boundaries.append(result.boundary)
-    episodes.sort(key=lambda item: (item.pr_number, item.round_index))
-    boundaries.sort(key=lambda item: (item.pr_number, item.round_index))
-    funnels.sort(key=lambda item: item.pr_number)
-    return funnels, episodes, boundaries
+        bundle = json.loads(bundle_path.read_text())
+        if all_rounds:
+            decision, multi = segment_review_rounds(bundle, bundle_path=bundle_path,
+                                                    compare_cache=LEGACY_V2_COMPARES, roster=roster)
+            if multi:
+                episodes += multi.episodes
+                boundaries += multi.boundaries
+                segments += multi.segments
+        else:
+            decision, result = funnel_and_first_round(bundle, bundle_path=bundle_path,
+                                                      compare_cache=LEGACY_V2_COMPARES, roster=roster)
+            if result:
+                episodes.append(result.episode)
+                boundaries.append(result.boundary)
+        funnel.append(decision)
+    key = lambda item: (item.pr_number, item.round_index)  # noqa: E731
+    events, _ = build_event_ledger(bundles_dir=LEGACY_V2_BUNDLES, out=tmp_path / "events.jsonl")
+    return {"derived/funnel.jsonl": sorted(funnel, key=lambda f: f.pr_number),
+            "input/episodes.jsonl": sorted(episodes, key=key),
+            "gold/episode_boundaries.jsonl": sorted(boundaries, key=key),
+            "derived/round_segments.jsonl": sorted(segments, key=key),
+            "source/events.jsonl": events}
 
 
 @pytest.fixture(scope="module")
-def rebuilt():
-    if not RELEASE.is_dir() or not LEGACY_V2_BUNDLES.is_dir():
-        pytest.skip("frozen raw release or bundle cache absent")
-    return _rebuild_from_legacy_caches()
+def store(tmp_path_factory):
+    if not LEGACY_V2_BUNDLES.is_dir():
+        pytest.skip("no legacy bundle cache")
+    store = PullReviewStore(tmp_path_factory.mktemp("store"))
+    seed_from_legacy(store)
+    return store
 
 
-def test_the_roster_the_release_pins_is_the_legacy_roster():
-    assert _pinned_roster_path() == LEGACY_V2_ROSTER
+def _from_store(store: PullReviewStore, all_rounds: bool):
+    roster = load_roster(_pinned_roster(ALL_ROUNDS if all_rounds else FIRST_ROUND))
+    projection = project_episodes(store, roster=roster, all_rounds=all_rounds)
+    return {"derived/funnel.jsonl": projection.funnel, "input/episodes.jsonl": projection.episodes,
+            "gold/episode_boundaries.jsonl": projection.boundaries,
+            "derived/round_segments.jsonl": projection.segments,
+            "source/events.jsonl": projection.events}
 
 
-@pytest.mark.parametrize("index,relpath,count", [
-    (0, "derived/funnel.jsonl", 201),
-    (1, "input/episodes.jsonl", 138),
-    (2, "gold/episode_boundaries.jsonl", 138),
-])
-def test_the_funnel_reproduces_the_frozen_release_byte_for_byte(rebuilt, index, relpath, count):
-    rows = rebuilt[index]
-    assert len(rows) == count
-    assert jsonl_bytes(rows) == (RELEASE / relpath).read_bytes(), (
-        f"{relpath} no longer reproduces from the same inputs; a definition or data source the "
-        "funnel reads has changed behaviour")
+CASES = [
+    (FIRST_ROUND, False, {"derived/funnel.jsonl": 201, "input/episodes.jsonl": 138,
+                          "gold/episode_boundaries.jsonl": 138}),
+    (ALL_ROUNDS, True, {"derived/funnel.jsonl": 201, "input/episodes.jsonl": 198,
+                        "gold/episode_boundaries.jsonl": 198, "derived/round_segments.jsonl": 202}),
+]
+
+
+def test_the_rosters_the_releases_pin_are_the_legacy_roster():
+    assert _pinned_roster(FIRST_ROUND) == _pinned_roster(ALL_ROUNDS) == LEGACY_V2_ROSTER
+
+
+@pytest.mark.parametrize("source", ["legacy_cache", "store"])
+@pytest.mark.parametrize("release,all_rounds,counts", CASES, ids=["first-round", "all-rounds"])
+def test_the_frozen_release_reproduces_byte_for_byte(source, release, all_rounds, counts, store, tmp_path):
+    if not release.is_dir():
+        pytest.skip(f"{release} absent")
+    rebuilt = _from_legacy(all_rounds, tmp_path) if source == "legacy_cache" else _from_store(store, all_rounds)
+    for relpath, count in counts.items():
+        assert len(rebuilt[relpath]) == count, relpath
+    for relpath in list(counts) + ["source/events.jsonl"]:
+        assert jsonl_bytes(rebuilt[relpath]) == (release / relpath).read_bytes(), (
+            f"{relpath} from the {source} no longer matches {release.name}")
+
+
+def test_a_store_built_release_seals_and_carries_the_same_episodes(store, tmp_path):
+    from src.mathlib_review.release.validate import validate_release
+
+    out = tmp_path / "release"
+    manifest = write_episode_release(out, store, roster_path=LEGACY_V2_ROSTER,
+                                     dataset_id="pull-reviews-test", release="0.0.0-test")
+    assert (out / "input/episodes.jsonl").read_bytes() == \
+        (FIRST_ROUND / "input/episodes.jsonl").read_bytes()
+    roles = {ref.role: ref for ref in manifest.sources}
+    assert roles["pull_review_store"].sha256 == store.content_digest()
+    assert roles["reviewer_roster"].sha256 == sha256_file(LEGACY_V2_ROSTER)
+    assert manifest.generator_versions["events"] == "pull_review_store_v1"
+    validate_release(out)
+
+
+def test_a_collected_pr_needs_no_legacy_cache_and_changes_only_its_provenance(store, tmp_path):
+    """A PR fetched into the store -- not seeded -- cites its store directory and the assembled
+    bundle's sha. Its episode must carry the same reviewer-visible content as the frozen one; only
+    `source_projection_sha256`, which hashes the bundle's provenance, may differ. And its events
+    must dereference through the store, since no bundle file exists for them to open."""
+
+    from src.mathlib_review.release.events import resolve_payload
+    from src.datasets.pull_reviews.store import BUNDLE_ENDPOINTS
+
+    fresh = PullReviewStore(tmp_path / "fresh")
+    number = 33098
+    for endpoint in BUNDLE_ENDPOINTS:
+        fresh.write_endpoint(number, endpoint, store.read(number, endpoint),
+                             request=f"/repos/x/pulls/{number}/{endpoint}", fetched_at="2026-09-11T00:00:00Z",
+                             source="github")
+    for head in store.ledger(number)["compares"]:
+        raw = (store.pr_dir(number) / f"compares/{head}.json").read_bytes()
+        fresh.write_compare(number, head, raw, base_ref="master", request="compare",
+                            fetched_at="2026-09-11T00:00:00Z", source="github")
+    assert fresh.bundle_ref(number).role == "pull_review_pr"
+
+    projection = project_episodes(fresh, roster=load_roster(LEGACY_V2_ROSTER))
+    (episode,) = projection.episodes
+    frozen = next(json.loads(line) for line in (FIRST_ROUND / "input/episodes.jsonl").read_text().splitlines()
+                  if json.loads(line)["pr_number"] == number)
+    ours = json.loads(episode.model_dump_json())
+    assert ours["source_projection_sha256"] != frozen["source_projection_sha256"]
+    for field in ("episode_id", "diff", "base_sha", "reviewed_head_sha", "title", "description",
+                  "changed_files", "patch_sha256"):
+        assert ours[field] == frozen[field], field
+
+    comment = next(e for e in projection.events if e.event_type == "review_comment")
+    assert comment.source_object.role == "pull_review_pr"
+    assert "grind" in resolve_payload(comment)["body"]

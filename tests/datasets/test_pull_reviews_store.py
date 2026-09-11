@@ -88,15 +88,34 @@ def test_the_caches_are_not_touched(seeded):
     assert sha256_directory(LEGACY_V2_COMPARES) == pins[str(LEGACY_V2_COMPARES)]
 
 
-def test_an_endpoint_is_never_rewritten(tmp_path):
+def test_an_endpoint_value_is_never_rewritten_or_erased(tmp_path):
     store = PullReviewStore(tmp_path)
     store.write_endpoint(1, "reviews", [{"id": 1}], request="r", fetched_at="t", source="github")
     assert store.write_endpoint(1, "reviews", [{"id": 1}], request="r", fetched_at="t2",
                                source="github") is False          # identical: no-op
     with pytest.raises(ImmutableEndpointError):
         store.write_endpoint(1, "reviews", [{"id": 2}], request="r", fetched_at="t3", source="github")
+    # A later failed fetch does not erase what was recorded.
+    assert store.write_endpoint(1, "reviews", None, request="r", fetched_at="t4",
+                               source="github") is False
+    assert store.read(1, "reviews") == [{"id": 1}]
+
+
+def test_a_null_can_be_filled_once_by_a_later_successful_fetch(tmp_path):
+    """GraphQL enrichment needs a token and sometimes fails. If a recorded null were frozen, one
+    failure would omit that PR's description for good (the funnel omits it when `body_edits` is
+    null). Filling a null moves no bytes, so it is allowed -- once, and recorded."""
+
+    store = PullReviewStore(tmp_path)
+    store.write_endpoint(2, "body_edits", None, request="graphql", fetched_at="t1", source="github")
+    assert store.write_endpoint(2, "body_edits", [{"edited_at": "x"}], request="graphql",
+                                fetched_at="t2", source="github") is True
+    assert store.read(2, "body_edits") == [{"edited_at": "x"}]
+    entry = store.ledger(2)["endpoints"]["body_edits"]
+    assert entry["filled_from_null"] == {"fetched_at": "t1", "source": "github"}
     with pytest.raises(ImmutableEndpointError):
-        store.write_endpoint(1, "reviews", None, request="r", fetched_at="t4", source="github")
+        store.write_endpoint(2, "body_edits", [{"edited_at": "y"}], request="graphql",
+                             fetched_at="t3", source="github")
 
 
 def test_a_null_endpoint_has_no_file_and_reads_back_as_none(tmp_path):

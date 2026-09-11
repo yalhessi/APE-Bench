@@ -11,6 +11,12 @@ from src.mathlib_review.schema import ArtifactRef, SourceEvent
 
 EVENT_LEDGER_VERSION = "bundle_index_v1"
 
+#: The same index built from the PR store. For a PR seeded from the v2 cache it cites the legacy
+#: bundle and is byte-identical to `bundle_index_v1`; for a collected PR it cites the store
+#: directory (role `pull_review_pr`) and the assembled bundle's sha, which changes if any
+#: endpoint's bytes do.
+STORE_EVENT_LEDGER_VERSION = "pull_review_store_v1"
+
 _COLLECTIONS = (
     ("reviews", "review"),
     ("review_comments", "review_comment"),
@@ -81,14 +87,23 @@ def _event(
     )
 
 
-def events_from_bundle(bundle: Dict[str, Any], *, bundle_path: Path, repo: str) -> List[SourceEvent]:
+def events_from_bundle(bundle: Dict[str, Any], *, bundle_path: Optional[Path] = None,
+                       repo: str, source_object: Optional[ArtifactRef] = None) -> List[SourceEvent]:
+    """Index a bundle's payloads as events. `source_object` names where the bundle came from; by
+    default it is the bundle file at `bundle_path`. Event ids do not depend on it -- they hash the
+    repo, PR, event type and the payload's own identity -- so the same PR yields the same ids from
+    the legacy cache or from the PR store."""
+
     pr = bundle.get("pr") or {}
     pr_number = int(pr["number"])
-    source_object = ArtifactRef(
-        path=bundle_path.as_posix(),
-        role="raw_github_bundle",
-        sha256=sha256_file(bundle_path),
-    )
+    if source_object is None:
+        if bundle_path is None:
+            raise TypeError("events_from_bundle needs bundle_path or source_object")
+        source_object = ArtifactRef(
+            path=bundle_path.as_posix(),
+            role="raw_github_bundle",
+            sha256=sha256_file(bundle_path),
+        )
     events = [
         _event(
             repo=repo,
@@ -146,6 +161,39 @@ def payload_at_source_key(bundle: Dict[str, Any], source_key: str) -> Dict[str, 
     return payload
 
 
+def order_events(events: List[SourceEvent]) -> List[SourceEvent]:
+    """The ledger's canonical order, and its refusal of duplicate identities -- shared by every
+    source a ledger can be built from, so two sources cannot order the same events differently."""
+
+    events = sorted(events, key=lambda event: (
+        event.pr_number,
+        event.occurred_at is None,
+        event.occurred_at or "",
+        event.event_type,
+        event.event_id,
+    ))
+    ids = [event.event_id for event in events]
+    if len(ids) != len(set(ids)):
+        duplicates = [event_id for event_id, count in Counter(ids).items() if count > 1]
+        raise ValueError(f"duplicate source event identities: {duplicates[:10]}")
+    return events
+
+
+def resolve_payload(event: SourceEvent) -> Dict[str, Any]:
+    """The payload an event points at, whichever source its ledger was built from. Readers use
+    this rather than opening `source_object.path` as a bundle file, which a store-built event does
+    not point at."""
+
+    if event.source_object.role == "pull_review_pr":
+        from src.datasets.pull_reviews.store import PullReviewStore
+
+        root = Path(event.source_object.path).parent.parent          # <store>/pr/<n>
+        bundle = PullReviewStore(root).load_bundle(event.pr_number)
+    else:
+        bundle = json.loads(Path(event.source_object.path).read_text())
+    return payload_at_source_key(bundle, event.source_key)
+
+
 def build_event_ledger(
     *,
     bundles_dir: Path,
@@ -168,19 +216,7 @@ def build_event_ledger(
     if missing:
         raise ValueError(f"raw bundles missing requested PRs: {sorted(missing)}")
 
-    events.sort(
-        key=lambda event: (
-            event.pr_number,
-            event.occurred_at is None,
-            event.occurred_at or "",
-            event.event_type,
-            event.event_id,
-        )
-    )
-    ids = [event.event_id for event in events]
-    if len(ids) != len(set(ids)):
-        duplicates = [event_id for event_id, count in Counter(ids).items() if count > 1]
-        raise ValueError(f"duplicate source event identities: {duplicates[:10]}")
+    events = order_events(events)
     write_once(out, jsonl_bytes(events))
     report = {
         "bundles": bundle_count,

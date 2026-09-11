@@ -18,8 +18,16 @@ reviewer is looking at. Three properties make it the right choice:
 * It is *conservative*. Review starts after the code was pushed, so this instant is at or
   before `review_started_at`; gating here can only ever be stricter than gating on the real
   boundary, never looser.
-* It is *offline*. It comes from the cached PR bundle, which is immutable and already the
-  provenance root of v4's whole event ledger.
+* It is *offline*. It comes from immutable collected data: the PR store's commit list, or for a
+  PR the store does not hold, the cached v2 bundle.
+
+**Where it is read from.** The store first, then the tracked v2 bundle cache. It used to be the
+cache alone -- and eleven frozen release manifests hash that cache as a tree, so it is
+append-forbidden, so no PR outside the 201 it holds could ever resolve a cutoff, so no new PR could
+become a reviewable task. The store holds the same bytes for those 201 (seeded from the cache), so
+every existing cutoff is unchanged -- `test_pull_reviews_cutoffs` checks every episode of every
+release both ways -- and the cache stays as the fallback because it is tracked in git while the store
+is not: a fresh clone must still run the existing releases.
 
 The cutoff is not the whole mechanism. `exclude_pr` is the other half, and it is the half
 time cannot do: a thread *about* this PR can predate the reviewed commit and still give the
@@ -32,8 +40,11 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
-from src.mathlib_review.paths import LEGACY_V2_BUNDLES
+from src.mathlib_review.paths import LEGACY_V2_BUNDLES, PULL_REVIEWS_STORE
 from src.mathlib_review.schema import ReviewEpisodeInput
+
+#: Sentinel: "use the default store if it exists". `None` means "no store".
+_DEFAULT = object()
 
 
 class CutoffUnavailable(RuntimeError):
@@ -44,14 +55,31 @@ class CutoffUnavailable(RuntimeError):
     """
 
 
-def _bundle_path(pr_number: int) -> Path:
-    return LEGACY_V2_BUNDLES / f"pr_{pr_number}.json"
+def _bundle_path(pr_number: int, legacy_bundles: Path = LEGACY_V2_BUNDLES) -> Path:
+    return legacy_bundles / f"pr_{pr_number}.json"
 
 
-def commit_timestamp(pr_number: int, sha: str) -> Optional[str]:
-    """Committer timestamp of `sha` within this PR's cached bundle, as ISO-8601 Z."""
+def _default_store():
+    from src.datasets.pull_reviews.store import PullReviewStore
 
-    path = _bundle_path(pr_number)
+    return PullReviewStore() if PULL_REVIEWS_STORE.is_dir() else None
+
+
+def commit_timestamp(pr_number: int, sha: str, *, store=_DEFAULT,
+                     legacy_bundles: Optional[Path] = LEGACY_V2_BUNDLES) -> Optional[str]:
+    """Committer timestamp of `sha` among this PR's commits, as ISO-8601 Z: from the PR store,
+    else from the cached v2 bundle. `store=None` / `legacy_bundles=None` disable a source."""
+
+    if store is _DEFAULT:
+        store = _default_store()
+    if store is not None and store.has(pr_number) and \
+            "commits" in store.ledger(pr_number)["endpoints"]:
+        stamp = store.commit_timestamp(pr_number, sha)
+        if stamp:
+            return stamp
+    if legacy_bundles is None:
+        return None
+    path = _bundle_path(pr_number, legacy_bundles)
     if not path.is_file():
         return None
     bundle = json.loads(path.read_text())
@@ -70,10 +98,10 @@ def episode_cutoff(episode: ReviewEpisodeInput) -> str:
         return stamp
     raise CutoffUnavailable(
         f"cannot resolve a retrieval cutoff for episode {episode.episode_id}: "
-        f"{episode.reviewed_head_sha[:12]} is not in the cached bundle for PR "
-        f"#{episode.pr_number} ({_bundle_path(episode.pr_number)}). Refusing to run an "
-        "ungated context read — fetch the bundle first "
-        "(`python -m src.datasets.pr_review_v2.fetch`)."
+        f"{episode.reviewed_head_sha[:12]} is in neither the PR store's commits for "
+        f"#{episode.pr_number} ({PULL_REVIEWS_STORE}/pr/{episode.pr_number}) nor the cached v2 "
+        f"bundle ({_bundle_path(episode.pr_number)}). Refusing to run an ungated context read -- "
+        "collect the PR to tier 2 first (`python -m src.datasets.pull_reviews.collect`)."
     )
 
 

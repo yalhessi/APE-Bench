@@ -1,8 +1,13 @@
-"""Review-time unified diffs from immutable cached compare responses."""
+"""Review-time unified diffs from immutable cached compare responses.
+
+Where a compare comes from is a *source*: the flat v2 cache directory (`DirectoryCompares`), or the
+PR store (`PullReviewStore.compares(n)`). The funnel asks a source for `review_diff(head)` and never
+learns which; that is what lets the store replace the frozen cache without the funnel changing.
+"""
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Protocol, Tuple
 
 from src.mathlib_review.io import sha256_file
 
@@ -42,9 +47,32 @@ def load_review_compare(cache_dir: Path, reviewed_head_sha: str) -> Tuple[Dict[s
     return json.loads(path.read_text()), path
 
 
-def review_diff(cache_dir: Path, reviewed_head_sha: str) -> Tuple[str, str, str, Path]:
-    compare, path = load_review_compare(cache_dir, reviewed_head_sha)
+def diff_from_compare(compare: Dict[str, Any], compare_sha256: str, *, where: Any) -> Tuple[str, str, str]:
+    """`(unified diff, merge base, compare sha)` from one compare payload."""
+
     merge_base = str(compare.get("merge_base_sha") or "").strip()
     if not merge_base:
-        raise ValueError(f"cached compare has no merge base: {path}")
-    return assemble_unified_diff(compare), merge_base, sha256_file(path), path
+        raise ValueError(f"cached compare has no merge base: {where}")
+    return assemble_unified_diff(compare), merge_base, compare_sha256
+
+
+def review_diff(cache_dir: Path, reviewed_head_sha: str) -> Tuple[str, str, str, Path]:
+    compare, path = load_review_compare(cache_dir, reviewed_head_sha)
+    diff, merge_base, sha = diff_from_compare(compare, sha256_file(path), where=path)
+    return diff, merge_base, sha, path
+
+
+class CompareSource(Protocol):
+    def review_diff(self, reviewed_head_sha: str) -> Tuple[str, str, str]:
+        """`(diff, merge base, compare sha256)`; raises ValueError when there is no compare."""
+
+
+class DirectoryCompares:
+    """Compares from a flat cache directory, found by head sha -- the v2 cache's layout."""
+
+    def __init__(self, cache_dir: Path):
+        self.cache_dir = Path(cache_dir)
+
+    def review_diff(self, reviewed_head_sha: str) -> Tuple[str, str, str]:
+        diff, merge_base, sha, _path = review_diff(self.cache_dir, reviewed_head_sha)
+        return diff, merge_base, sha
