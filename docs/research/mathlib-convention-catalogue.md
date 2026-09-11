@@ -1,7 +1,15 @@
 # A catalogue of Mathlib's conventions, and what it says about discovery
 
 *2026-09-11. Built by `src/mathlib_review/conventions/catalogue.py` against the clone at
-`28908c09`. Regenerate with `ape/bin/python -m src.mathlib_review.conventions.catalogue --out <path>`.*
+`28908c09`.*
+
+**The rows live in [`inputs/conventions/catalogue.jsonl`](../../inputs/conventions/catalogue.jsonl)**
+— 112 entries, one per line — beside `manifest.json`, which records the workspace revision they were
+read from and a sha over the rows. This document is the reading of them, not the data. Regenerate:
+
+```
+ape/bin/python -m src.mathlib_review.conventions.catalogue --write
+```
 
 ## Why this exists
 

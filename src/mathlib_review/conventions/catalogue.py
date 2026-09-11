@@ -48,7 +48,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from src.mathlib_review.paths import assert_repo_root
+from src.mathlib_review.io import sha256_bytes
+from src.mathlib_review.paths import CONVENTIONS_TRACKED, assert_repo_root
 from src.mathlib_review.retrieval.declaration_table import MATHLIB_CLONE
 
 CATALOGUE_VERSION = "convention-catalogue/1"
@@ -242,20 +243,41 @@ def build(workspace: Path = MATHLIB_CLONE) -> Dict[str, object]:
     }
 
 
+def write(payload: Dict[str, object], out_dir: Path = CONVENTIONS_TRACKED) -> Dict[str, str]:
+    """Rows as JSONL beside a manifest, matching `inputs/pull_requests/`.
+
+    The rows are the artifact and the manifest names the snapshot they were read from, so a number
+    quoted from this catalogue can always be tied back to a revision. `rows_sha256` is over the
+    JSONL bytes, so a manifest can never describe rows it did not produce.
+    """
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows = payload["rows"]
+    body = "".join(json.dumps(r, ensure_ascii=False, sort_keys=True) + "\n" for r in rows)
+    (out_dir / "catalogue.jsonl").write_text(body, encoding="utf-8")
+    manifest = {k: v for k, v in payload.items() if k != "rows"}
+    manifest["rows_sha256"] = sha256_bytes(body.encode("utf-8"))
+    manifest["rows_file"] = "catalogue.jsonl"
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    return {"rows": str(out_dir / "catalogue.jsonl"), "manifest": str(out_dir / "manifest.json")}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--workspace", type=Path, default=MATHLIB_CLONE,
-                        help="a Mathlib source tree; the revision is recorded in the output")
-    parser.add_argument("--out", type=Path, default=None,
-                        help="write the catalogue here as JSON; otherwise print the summary only")
+                        help="a Mathlib source tree; the revision is recorded in the manifest")
+    parser.add_argument("--out", type=Path, default=CONVENTIONS_TRACKED,
+                        help="directory for catalogue.jsonl + manifest.json")
+    parser.add_argument("--write", action="store_true",
+                        help="write the artifact; without it this prints the summary and stops")
     args = parser.parse_args()
     assert_repo_root()
     payload = build(args.workspace)
-    if args.out:
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(json.dumps(payload, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        payload["written"] = str(args.out)
-    print(json.dumps({k: v for k, v in payload.items() if k != "rows"}, indent=1, sort_keys=True))
+    summary = {k: v for k, v in payload.items() if k != "rows"}
+    if args.write:
+        summary["written"] = write(payload, args.out)
+    print(json.dumps(summary, indent=1, sort_keys=True))
 
 
 if __name__ == "__main__":
