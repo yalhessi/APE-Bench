@@ -1,0 +1,54 @@
+"""The consumers the store feeds are gated, and the paths they read cannot silently disagree."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX, ZULIP_STORE
+
+
+def test_the_research_corpus_loader_excludes_scored_prs_and_pins_its_window():
+    """`precedent_bench`, `precedent_prime`, `site_worklist` and `site_discrimination` share this
+    loader and applied neither exclusion nor window; the corpus now reaches December 2025, the
+    month their queries come from."""
+
+    if not PRECEDENT_CORPUS.is_file():
+        pytest.skip("corpus absent")
+    from src.datasets.pr_review_v2.precedent_bench import VALIDATED_CORPUS_END, load_corpus
+    from src.datasets.pull_reviews.definitions import scored_pr_numbers
+
+    rows = load_corpus(PRECEDENT_CORPUS)
+    assert rows
+    assert max(r["created_at"][:10] for r in rows) <= VALIDATED_CORPUS_END == "2025-08-31"
+    assert not {r["pr_number"] for r in rows} & scored_pr_numbers()
+    assert len(load_corpus(PRECEDENT_CORPUS, end=None)) > len(rows)
+
+
+def test_a_precedent_index_built_from_a_different_corpus_is_refused(tmp_path):
+    import numpy as np
+
+    from src.mathlib_review.retrieval.precedent_index import PrecedentIndex, StalePrecedentIndex
+
+    corpus = tmp_path / "corpus.jsonl"
+    corpus.write_text('{"comment_id": 1}\n')
+    index = tmp_path / "index"
+    index.mkdir()
+    np.save(index / "embeddings.npy", np.zeros((1, 4), dtype="float32"))
+    (index / "meta.jsonl").write_text(json.dumps({"comment_id": 1, "pr_number": 1, "created_epoch": 0}) + "\n")
+    (index / "manifest.json").write_text(json.dumps({"corpus_path": str(corpus), "corpus_sha256": "0" * 64}))
+    with pytest.raises(StalePrecedentIndex) as excinfo:
+        PrecedentIndex(index)
+    assert "Rebuild it" in str(excinfo.value)
+
+
+def test_the_zulip_store_path_is_spelled_once():
+    """`paths.ZULIP_STORE` was declared and unused; the live reader asks `ZulipConfig`. Pinned
+    equal so the two cannot drift apart without a failure."""
+
+    from ape.utils.project import PROJECT_ROOT
+    from src.datasets.zulip.config import ZulipConfig
+
+    assert ZulipConfig().sqlite_path.resolve() == (PROJECT_ROOT / ZULIP_STORE).resolve()

@@ -50,6 +50,15 @@ class PrecedentIndexMissing(RuntimeError):
     """The index has not been built. Carries the command that builds it."""
 
 
+class StalePrecedentIndex(PrecedentIndexMissing):
+    """The index was built from a corpus that has since changed.
+
+    The manifest always recorded `corpus_sha256`; nothing compared it. The index was found built
+    from 36,695 rows while its corpus held 43,874 -- September to November collected, never
+    indexed -- and every precedent search in that state silently ignored three months, with the run
+    plan still sealing the old sha as though it described what was searched."""
+
+
 #: Rows whose timestamp could not be read. They are excluded from every gated read rather
 #: than dated: the old parser returned 0 for them, which is before every real cutoff, so an
 #: undated row was eligible for *every* review. In a leak gate that is the wrong direction to
@@ -188,6 +197,17 @@ class PrecedentIndex:
         self.directory = directory
         self.manifest = json.loads(manifest_path.read_text())
         self.corpus_sha256 = self.manifest.get("corpus_sha256")
+        corpus = Path(self.manifest.get("corpus_path") or "")
+        if corpus.is_file():
+            from src.mathlib_review.io import sha256_file
+
+            current = sha256_file(corpus)
+            if current != self.corpus_sha256:
+                raise StalePrecedentIndex(
+                    f"precedent index at {directory} was built from {corpus} at sha "
+                    f"{str(self.corpus_sha256)[:12]}; the corpus is now {current[:12]}. Rebuild it "
+                    "(`./ape/bin/python -m src.mathlib_review.retrieval.precedent_index build`) "
+                    "rather than search a corpus that no longer exists.")
         self.model_name = self.manifest.get("model_name", DEFAULT_MODEL)
         self._np = np
         self.embeddings = np.load(directory / "embeddings.npy", mmap_mode="r")

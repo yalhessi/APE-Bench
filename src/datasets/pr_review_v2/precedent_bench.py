@@ -137,11 +137,31 @@ def load_queries(path: Path = QUERIES_PATH) -> List[Dict[str, Any]]:
 # 2. corpus + retrievers
 # ---------------------------------------------------------------------------
 
-def load_corpus(path: Path = DEFAULT_CORPUS) -> List[Dict[str, Any]]:
+#: The corpus these retrieval experiments were designed and validated on ended here. Their queries
+#: are December 2025 eval PRs, so every precedent then predated every query by construction -- and
+#: none of them applies a per-query temporal gate. The corpus has since grown into September-
+#: December 2025, which made that construction false: loading it whole would hand a query
+#: precedents written after it. So the window is pinned, and widening it is an explicit choice.
+VALIDATED_CORPUS_END = "2025-08-31"
+
+
+def load_corpus(path: Path = DEFAULT_CORPUS, *, end: Optional[str] = VALIDATED_CORPUS_END) -> List[Dict[str, Any]]:
+    """The precedent corpus these scripts use: scored PRs excluded, created on or before `end`.
+
+    Shared by `precedent_bench`, `precedent_prime`, `site_worklist` and `site_discrimination`,
+    which applied neither the eval-PR exclusion nor any date window. `end=None` removes the window
+    -- only correct for a caller that gates each query on its own review time."""
+
+    from src.datasets.pull_reviews.definitions import scored_pr_numbers
+
     if not path.exists():
         raise FileNotFoundError(f"Corpus not found at {path}. Run `python -m "
-                                f"src.datasets.pr_review_v2.corpus` first.")
-    return [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
+                                f"src.datasets.pull_reviews.collect` first.")
+    rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
+    scored = scored_pr_numbers()
+    return [row for row in rows
+            if row.get("pr_number") not in scored
+            and (end is None or str(row.get("created_at") or "")[:10] <= end)]
 
 
 class BM25:
