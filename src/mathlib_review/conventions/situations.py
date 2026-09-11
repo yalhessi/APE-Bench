@@ -108,23 +108,34 @@ class Situation:
     statement: Dict[str, object]
     typeclasses: Tuple[str, ...]
 
+    #: Kinds whose body is a proof of a proposition. The goal / predicate / subject / of-lemma
+    #: and proof_style facets describe a *proposition* and *its proof*; on a `def` the
+    #: "conclusion" is a type (`MetaM Unit`, `Type`) and the body is a term by construction, so
+    #: they read as `pred:MetaM` and `proof:term` -- 3,750 and 3,493 such keys in the corpus
+    #: join before this gate. Statement form and typeclass binders are legitimately commented
+    #: on for every kind and stay.
+    PROPOSITION_KINDS = ("theorem", "lemma")
+
     def keys(self) -> Dict[str, str]:
         """The join keys other sources are indexed by. Each is one reference class."""
 
         out: Dict[str, str] = {}
-        if self.conclusion_head:
+        proposition = self.kind in self.PROPOSITION_KINDS
+        if proposition and self.conclusion_head:
             out["goal"] = f"goal:{self.conclusion_head}"
-        if self.predicate_head:
+        if proposition and self.predicate_head:
             out["predicate"] = f"pred:{self.predicate_head}"
-        if self.subject_token:
+        if proposition and self.subject_token:
             out["subject"] = f"subject:{self.subject_token}"
-        if self.is_of_lemma and self.predicate_head:
+        if proposition and self.is_of_lemma and self.predicate_head:
             out["of_lemma_of_predicate"] = f"of:{self.predicate_head}"
         # proof_style: the shape of the proof, coarse enough to be a class.
         mode = self.proof.get("mode")
-        if mode and mode != "none":
+        if proposition and mode and mode != "none":
+            # "one-liner" is a single tactic step, whether or not `by` sits on its own line:
+            # `by\n  fun_prop` is the same request target as `by fun_prop`.
             shape = "term" if mode == "term" else (
-                "tactic:one-liner" if self.proof.get("one_liner") else
+                "tactic:one-liner" if int(self.proof.get("steps") or 0) <= 1 else
                 "tactic:cases" if self.proof.get("case_splits") else
                 "tactic:calc" if self.proof.get("has_calc") else "tactic:multi")
             out["proof_style"] = f"proof:{shape}"

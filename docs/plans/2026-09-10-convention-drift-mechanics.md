@@ -414,32 +414,63 @@ case splits, `have`s, focus bullets, `simp only`, closing tactic, one-liner), `s
 Wired into `Situation.keys()` as `proof:`, `stmt:`, `class:` keys; the grind family now reads
 `{goal:subset, proof:tactic:cases, stmt:plain}`.
 
-*What cannot be done yet.* Every row of the current 34,640-row index was collected before the
-position fields existed, and the corpus JSONL it was built from
-(`inputs/pr_review_v2/corpus/mathlib_review_comments.jsonl`) **is no longer on disk** — only
-the derived index survives. So line-level resolution over the corpus needs a re-fetch, and
-the 329 positioned comments in the cached bundles are all December-2025 eval PRs, usable only
-as unit fixtures. The collector is `corpus.py` (repo-level review-comment endpoint, maintainer
-`.lean` comments, eval PRs excluded by number); `fetch.py` and
-`configs/pr_review_v2_corpus_2025_09.yaml` build *per-PR bundles* for the eval dataset and are
-not what the index reads. One run, in the user's shell (needs `GITHUB_TOKEN`; the endpoint
-returns every review comment in the window, 100 per page, and the collector keeps the maintainer
-`.lean` subset — the original window yielded 34,640 kept rows; no scanned count was recorded):
+*The re-fetch was not needed, and the position field was not either.* Two facts found the
+morning after, both verified:
+
+1. **The corpus file is in git.** `inputs/pr_review_v2/corpus/mathlib_review_comments.jsonl`
+   is gitignored and was absent from the checkout, but the snapshot commit `f61c1a1`
+   (2026-08-25) carries it; its sha256 is the one the index manifest records. Restored to its
+   canonical path. Whole hunks for all 34,640 rows, no GitHub call.
+2. **GitHub ends a review comment's `diff_hunk` at the commented line.** Checked on all 328
+   positioned comments in the cached bundles by recomputing the last line's number from the
+   `@@` header: **328/328** equal `original_line` on the comment's side. So the commented line
+   is the hunk's tail, and the resolver needs no position at all: the declaration is the
+   nearest head at or above the tail, and the text from that head to the tail is the region
+   the comment is about -- a *partial* proof whose last line is the commented one. (The
+   `original_position` plumbing stays -- it is a cheap consistency check -- but it is not
+   load-bearing, and as an index into the hunk it is wrong whenever GitHub re-cuts the header:
+   position 149, five lines.)
+
+The user's attempt to run the collector meanwhile died on GitHub HTTP 500s: with the file
+absent the walk restarted at 2024-03-01, and `/pulls/comments` fails once a `next`-link chain
+runs ~2,000 pages deep. The collector now re-anchors `since` on the last `created_at` every ten
+pages (created-ascending, so nothing is skipped; same-second duplicates fall to the id dedup),
+logs a PLAN line and a progress line every five pages giving the share of the date window
+reached with a derived page estimate, and writes a state file with a `--start` resume hint after
+every page. Tested against a fake paging client. The only fetch still worth running is the
+*extension*, from the corpus's end: `--start 2025-09-01 --end 2025-11-30` (three months, a few
+hundred shallow pages).
+
+**Resolution over the whole-hunk corpus, tail resolver** (`review_join --write`, v2):
 
 ```
-./ape/bin/python -m src.datasets.pr_review_v2.corpus --start 2024-03-01 --end 2025-11-30
-./ape/bin/python -m src.mathlib_review.retrieval.precedent_index build
-./ape/bin/python -m src.mathlib_review.conventions.review_join
+                         all 34,640      2025-08 (2,312)
+line   (enclosing head)     78.0 %            80.3 %
+context (@@ … @@ header)     5.4 %             5.2 %
+head   (first head only)     2.0 %             2.5 %
+unresolved                  14.6 %            12.0 %
 ```
 
-The window now runs to November 2025 on purpose. Leakage is prevented at read time — the
-index gates every row at the consuming PR's own base date (`eligible_mask`, `created_epoch <
-cutoff`), and eval PRs' own comments are excluded at collection — so a December PR sees
-September–November enforcement and nothing after its base. That is exactly the evidence the
-August-ending corpus could not supply: `grind`'s 21 enforcement comments are all 2025-H2.
+The number that explains the failed gate: among comments the old and new resolvers both
+resolve, the declaration enclosing the tail **differs from the first head in the hunk 73.6 %
+of the time** (19,038 / 25,863). The join had been on the wrong declaration for most of the
+corpus, not for 23 of 50.
 
-*Then:* re-run the 50-comment precision gate **per category**, with line-level resolution and
-the three new facets, against the same strict/lenient rubric. The number to beat is 6 % strict.
+Two facet corrections the regenerated join forced: proposition facets (goal, predicate,
+subject, of-lemma, proof_style) are emitted only for `theorem`/`lemma` -- a `def`'s conclusion
+is a type and its body is a term by construction, and 3,750 `pred:MetaM`-style keys and 3,493
+`proof:term`-on-def keys said so; and "one-liner" means one tactic step, not one physical line.
+
+**August 2025 is the study month** (the user's call: the rows are in hand; September needs the
+fetch). 2,312 maintainer comments on 458 PRs from 75 reviewers; 1,856 line-resolved, of which
+proof_style keys 1,399 (tactic 787 / term 327 after the kind gate), statement_form 1,856,
+typeclass 526 (108 distinct class heads; `DecidableEq` 72), goal 1,514 (`eq` 613, `subset` 12),
+predicate 452, subject 599. The precision sample is **80 comments, 8 per stratum across ten
+strata** (proof_style tactic / term, statement_form iff-impl / numeral-hyp, typeclass, goal eq /
+le-mem-subset, predicate-of, subject, def-instance), 64 PRs, 25 reviewers, rated by two
+independent three-rater panels (B refute-framed) with the same rubric as the 50-comment gate
+plus `form_A`/`form_B` -- what the PR wrote, what the reviewer wants -- so the same sample also
+seeds the (S, A, B) ledger. Scorer: `conventions/gate_score.py`. Result appended below when in.
 
 ## The first experiment, after step zero (~$8, one day)
 

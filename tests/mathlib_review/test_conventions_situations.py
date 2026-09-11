@@ -83,3 +83,21 @@ def test_name_form_reads_the_features_naming_conventions_are_stated_over():
     assert form["is_of_lemma"] is True
     assert form["primed"] is True
     assert name_form("Foo.of_bar")["is_of_lemma"] is True
+
+
+def test_proposition_facets_are_not_emitted_for_definitions():
+    """A `def`'s conclusion is a type and its body is a term by construction. Before this gate
+    the corpus join carried 3,750 `pred:` keys and 3,493 `proof:term` keys on defs, instances
+    and abbrevs -- `pred:MetaM`, `pred:Type` -- which are not situations a proof convention can
+    live in. Statement form and typeclass binders stay for every kind."""
+
+    from src.mathlib_review.conventions.situations import situation_of
+
+    definition = situation_of("def", "Foo.bar", "def Foo.bar [DecidableEq α] (x : α) : MetaM Unit", "do pure ()")
+    keys = definition.keys()
+    assert "goal" not in keys and "predicate" not in keys and "proof_style" not in keys
+    assert keys["typeclass"] == "class:DecidableEq"
+    assert keys["statement_form"] == "stmt:plain"
+    theorem = situation_of("theorem", "Foo.baz", "theorem Foo.baz (x : α) : Continuous f", "by\n  fun_prop")
+    assert theorem.keys()["predicate"] == "pred:Continuous"
+    assert theorem.keys()["proof_style"] == "proof:tactic:one-liner"

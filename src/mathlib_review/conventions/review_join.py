@@ -7,12 +7,17 @@ declarations it applies to. Git history shows what maintainers *did*; only revie
 they *asked contributors for*. So "enforced" is the component that cannot be read anywhere else,
 and it is only usable once a comment is attached to a *situation* rather than to a PR.
 
-**How a comment finds its declaration.** The precedent index keeps each comment's `diff_hunk`.
-Measured on all 34,640: 61% of hunks contain a declaration head outright; a further 7% name the
-enclosing declaration in git's `@@ … @@ <function context>` line, which carries the header of the
-declaration the hunk sits inside; 33% resolve to nothing from the hunk alone (a `variable` block,
-a structure field, a proof interior whose context line is not a declaration). The 67% is the
-join; the 33% is reported as unresolved, never guessed.
+**How a comment finds its declaration.** GitHub builds a review comment's `diff_hunk` to *end
+at the commented line* -- checked on all 328 positioned comments in the cached bundles by
+recomputing the last line's number from the `@@` header: 328/328 equal `original_line` on the
+comment's side. So the commented line is the hunk's last line, and no position field is needed:
+the declaration is the nearest head at or above the tail (`resolved_via="line"`). This replaced
+"any head in the hunk", which the precision gate caught putting 23 of 50 comments on a
+neighbouring declaration. When the tail is *not* trustworthy -- the index stores hunks cut at
+`DISPLAY_HUNK_CHARS` from the front, which loses the tail for a third of rows -- the resolver
+falls back to the first head (`"head"`, coarse), then to git's `@@ … @@ <function context>`
+line (`"context"`), else reports `"unresolved"` rather than guessing. The full-hunk corpus at
+`PRECEDENT_CORPUS` is preferred whenever it is present.
 
 **What the join is not.** It is not a claim that the comment is *about* the convention the
 situation suggests. A comment on a `⊆`-goal proof may be about a typo. Precision -- "a comment
@@ -27,14 +32,15 @@ import json
 import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
 
 from src.mathlib_review.conventions.situations import SITUATIONS_VERSION, Situation, situation_of
-from src.mathlib_review.paths import PRECEDENT_INDEX
+from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX
+from src.mathlib_review.retrieval.precedent_index import DISPLAY_HUNK_CHARS
 
-REVIEW_JOIN_VERSION = "v5-review-join/1"
+REVIEW_JOIN_VERSION = "v5-review-join/2"
 
 #: A declaration head on a diff line (`+`, `-`, or context), with attributes and modifiers.
 _HEAD = re.compile(
@@ -79,45 +85,71 @@ def _strip_diff_markers(hunk: str) -> str:
     return "\n".join(out)
 
 
-def _declaration_enclosing_line(hunk: str, position: Optional[int]) -> Optional[re.Match]:
-    """The declaration head at or above the commented line, when the comment's position is known.
+def _hunk_lines(hunk: str) -> List[str]:
+    lines = hunk.split("\n")
+    while lines and lines[-1] == "":
+        lines.pop()
+    return lines
 
-    GitHub's `original_position` is 1-based over the hunk's lines *after* the `@@` header. The
-    precedent index dropped it, and the resolver then took *any* declaration in the hunk -- which
-    is why only 27 of 50 hand-read comments were about the declaration they were joined to. The
-    raw bundles keep it (`original_position`, `original_line`, `side`, `subject_type`), so a
-    rebuilt index can carry it and this walks back from the commented line instead.
+
+def _declaration_enclosing_tail(hunk: str) -> Optional[Tuple[re.Match, int, List[str]]]:
+    """The declaration head at or above the commented line -- the hunk's last line.
+
+    GitHub's `diff_hunk` for a review comment runs from a (possibly re-cut) `@@` header down to
+    the commented line and stops there; for a multi-line comment it stops at the range's end.
+    Measured 328/328 on the cached bundles. `original_position` is therefore redundant for
+    resolution -- and unreliable as an index: when GitHub re-cuts the header, a comment at
+    position 149 arrives with a five-line hunk. Returns the match, its line index, and the lines.
     """
 
-    if position is None or position < 1:
+    lines = _hunk_lines(hunk)
+    if len(lines) < 2 or not lines[0].startswith("@@"):
         return None
-    lines = hunk.splitlines()
-    if not lines or lines[0].startswith("@@") is False:
-        return None
-    index = min(position, len(lines) - 1)   # lines[0] is the header; position 1 -> lines[1]
-    for back in range(index, 0, -1):
+    for back in range(len(lines) - 1, 0, -1):
         match = _HEAD.match(lines[back])
         if match:
-            return match
+            return match, back, lines
     return None
 
 
-def situate_hunk(hunk: str, position: Optional[int] = None) -> Dict[str, Any]:
+def _declaration_text_to_tail(lines: List[str], head_index: int) -> Tuple[str, str]:
+    """(signature, proof) of the declaration from its head line down to the commented line.
+
+    The proof is *partial* -- it stops where the comment is -- but that is exactly the region the
+    comment is about, and its last line is the commented one. Only the side the comment is on is
+    kept: a comment on a `+`/context line reads the new text (drop `-` lines); a comment on a
+    `-` line reads the old text (drop `+` lines). Split at the first `:=`, which for a theorem
+    is where the proof begins.
+    """
+
+    tail_marker = lines[-1][:1]
+    drop = "+" if tail_marker == "-" else "-"
+    source = [line[1:] if line[:1] in "+- " else line
+              for line in lines[head_index:] if line[:1] != drop]
+    text = "\n".join(source)
+    if ":=" in text:
+        signature, proof = text.split(":=", 1)
+        return signature, proof.strip()
+    return text, ""
+
+
+def situate_hunk(hunk: str, *, tail_is_comment: bool = True) -> Dict[str, Any]:
     """Resolve a hunk to a declaration and its situation, saying how it was resolved.
 
-    With `position` (the comment's `original_position`), the declaration is the one enclosing the
-    commented line; without it, the first declaration in the hunk -- the coarse behaviour the
-    gate measured at 27/50 about-declaration.
+    `tail_is_comment=True` (a complete GitHub hunk): the declaration is the one enclosing the
+    hunk's last line, which is the commented line. `False` (a hunk truncated from the front, as
+    the index stores them): the tail is unknown, so the first declaration in the hunk is taken --
+    the coarse behaviour the gate measured at 27/50 about-declaration -- and labelled `"head"`.
     """
 
     hunk = hunk or ""
-    # 0. Line-level: the declaration whose head is at or above the commented line.
-    enclosing = _declaration_enclosing_line(hunk, position)
+    # 0. Line-level: the declaration whose head is at or above the commented (last) line.
+    enclosing = _declaration_enclosing_tail(hunk) if tail_is_comment else None
     if enclosing:
-        kind, name = enclosing.group(1), enclosing.group(2)
-        # `_HEAD.match` ran on one hunk line, so `.string` is that line: the declaration header.
-        header = enclosing.string.split(":=")[0]
-        situation = situation_of(kind, name, header, "")
+        match, head_index, lines = enclosing
+        kind, name = match.group(1), match.group(2)
+        signature, proof = _declaration_text_to_tail(lines, head_index)
+        situation = situation_of(kind, name, signature, proof)
         return {"resolved_via": "line", "declaration": name, "kind": kind, "situation": situation}
     source = _strip_diff_markers(hunk)
     # 1. A full declaration inside the hunk: parse it properly.
@@ -149,9 +181,10 @@ def situate_hunk(hunk: str, position: Optional[int] = None) -> Dict[str, Any]:
 
 
 def join_comment(row: Dict[str, Any]) -> JoinedComment:
-    position = row.get("original_position")
-    resolved = situate_hunk(row.get("diff_hunk") or "",
-                            int(position) if isinstance(position, int) else None)
+    # A corpus row carries the whole hunk. An index row is cut at DISPLAY_HUNK_CHARS from the
+    # front; at the cap the commented line may be gone, so the tail must not be trusted.
+    hunk = row.get("diff_hunk") or ""
+    resolved = situate_hunk(hunk, tail_is_comment=bool(row.get("hunk_complete", True)))
     situation: Optional[Situation] = resolved["situation"]
     return JoinedComment(
         comment_id=str(row.get("comment_id")),
@@ -172,7 +205,43 @@ def join_comment(row: Dict[str, Any]) -> JoinedComment:
 
 
 def load_index_rows(meta: Path = PRECEDENT_INDEX / "meta.jsonl") -> List[Dict[str, Any]]:
-    return [json.loads(line) for line in meta.read_text(encoding="utf-8").splitlines() if line.strip()]
+    """Index rows: hunks cut at DISPLAY_HUNK_CHARS, so `hunk_complete` is decided per row."""
+
+    rows = [json.loads(line) for line in meta.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for row in rows:
+        row["hunk_complete"] = len(row.get("diff_hunk") or "") < DISPLAY_HUNK_CHARS
+    return rows
+
+
+def load_corpus_rows(corpus: Path = PRECEDENT_CORPUS) -> List[Dict[str, Any]]:
+    """Corpus rows: whole hunks, so the tail is the commented line for every row.
+
+    The file is gitignored and was absent from the checkout when the gate was first run; it is
+    recoverable from the snapshot commit `f61c1a1` and its sha256 matches the index manifest.
+    Eval PRs are excluded here exactly as the index build excludes them.
+    """
+
+    from src.mathlib_review.corpus import eval_pr_numbers
+
+    excluded = eval_pr_numbers()
+    rows = []
+    for line in corpus.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if row.get("pr_number") in excluded:
+            continue
+        row["hunk_complete"] = True
+        rows.append(row)
+    return rows
+
+
+def load_rows() -> List[Dict[str, Any]]:
+    """The full-hunk corpus when present, else the index's truncated rows."""
+
+    if PRECEDENT_CORPUS.is_file():
+        return load_corpus_rows()
+    return load_index_rows()
 
 
 def join_all(rows: Iterable[Dict[str, Any]]) -> List[JoinedComment]:
@@ -189,15 +258,18 @@ def by_situation(joined: Iterable[JoinedComment]) -> Dict[str, List[JoinedCommen
     return dict(index)
 
 
-def report(joined: Sequence[JoinedComment]) -> Dict[str, Any]:
+def report(joined: Sequence[JoinedComment], *, source: Optional[str] = None) -> Dict[str, Any]:
     via = collections.Counter(item.resolved_via for item in joined)
     keys = collections.Counter(k for item in joined for k in item.situation_keys)
     return {
         "schema_version": REVIEW_JOIN_VERSION,
+        "source": source or ("corpus (whole hunks)" if PRECEDENT_CORPUS.is_file()
+                             else "index (hunks cut at %d chars)" % DISPLAY_HUNK_CHARS),
         "situations_version": SITUATIONS_VERSION,
         "comments": len(joined),
         "resolved_via": dict(via),
-        "resolved_share": round((via["head"] + via["context"]) / max(1, len(joined)), 4),
+        "resolved_share": round((via["line"] + via["head"] + via["context"]) / max(1, len(joined)), 4),
+        "line_level_share": round(via["line"] / max(1, len(joined)), 4),
         "situation_key_kinds": dict(keys),
         "note": (
             "A resolved comment is attached to the situation of the declaration its hunk sits "
@@ -224,7 +296,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=Path("data/pr_review_v5/review_join"))
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args()
-    joined = join_all(load_index_rows())
+    joined = join_all(load_rows())
     payload = report(joined)
     if args.write:
         payload["written"] = str(write(joined, args.out))

@@ -39,11 +39,16 @@ FIELD_HUNK = """@@ -25,6 +25,7 @@ variable {α : Type u}
 """
 
 
-def test_a_hunk_with_a_declaration_is_resolved_from_its_head():
+def test_a_hunk_with_a_declaration_is_resolved_from_the_head_enclosing_its_tail():
     resolved = situate_hunk(HEAD_HUNK)
-    assert resolved["resolved_via"] == "head"
+    assert resolved["resolved_via"] == "line"
     assert resolved["declaration"] == "smul"
     assert resolved["situation"].predicate_head == "PosSemidef"
+    # The same hunk, cut from the front by the index: the tail is not trusted, the first head
+    # is taken, and the record says so.
+    coarse = situate_hunk(HEAD_HUNK, tail_is_comment=False)
+    assert coarse["resolved_via"] == "head"
+    assert coarse["declaration"] == "smul"
 
 
 def test_a_proof_interior_hunk_is_resolved_from_gits_function_context():
@@ -72,9 +77,13 @@ def test_join_carries_provenance_and_keys():
     assert joined.created_at.startswith("2025-12-01")
 
 
-def test_the_real_corpus_resolves_about_two_thirds():
-    """Pinned so a regression in either resolver shows up as a share change. 61 % from heads,
-    7 % from context lines, 33 % genuinely unresolvable from the hunk alone."""
+def test_the_real_corpus_resolves_line_level_for_about_four_fifths():
+    """Pinned so a regression in either resolver shows up as a share change. Over the whole-hunk
+    corpus: 78 % resolve to the declaration enclosing the commented line, 5 % from git's context
+    line, 2 % first-head only, 15 % genuinely unresolvable from the hunk. (The earlier 61/7/33 was
+    measured on the index's front-truncated hunks with the first-head resolver.) And 74 % of the
+    time the enclosing declaration is *not* the first head in the hunk -- the number behind the
+    gate's 27/50."""
 
     report = Path("data/pr_review_v5/review_join/report.json")
     if not report.is_file():
@@ -82,29 +91,51 @@ def test_the_real_corpus_resolves_about_two_thirds():
     payload = json.loads(report.read_text(encoding="utf-8"))
     assert payload["schema_version"] == REVIEW_JOIN_VERSION
     assert payload["comments"] == 34640
-    assert 0.66 <= payload["resolved_share"] <= 0.72
+    assert payload["source"].startswith("corpus")
+    assert 0.76 <= payload["line_level_share"] <= 0.80
+    assert 0.83 <= payload["resolved_share"] <= 0.88
     assert payload["situation_key_kinds"]["of_lemma_of_predicate"] >= 600
 
 
-def test_a_positioned_comment_resolves_to_the_declaration_enclosing_its_line():
-    """The gate found only 27/50 comments were about the declaration they were joined to,
-    because the index carried no position and the resolver took any declaration in the hunk. With
-    GitHub's `original_position` the declaration is the one whose head is at or above the
-    commented line. On PR 33098's nine raw comments this resolves 9/9 exactly."""
+def test_the_commented_line_is_the_hunks_last_line_and_the_declaration_is_the_one_enclosing_it():
+    """GitHub builds a review comment's `diff_hunk` to end at the commented line -- 328/328 of
+    the positioned comments in the cached bundles, checked by recomputing the last line's number
+    from the `@@` header. So the declaration is the nearest head at or above the tail, and no
+    position field is needed. The gate had found only 27/50 comments were about the declaration
+    they were joined to, because the resolver took the *first* head in the hunk."""
 
-    hunk = ("@@ -10,6 +10,9 @@ section\n"
-            " lemma first_thing : A := by\n"
-            "   simp\n"
-            "+lemma second_thing : B := by\n"
-            "+  by_cases h : x\n"
-            "+  · simpa using foo\n")
-    on_second = situate_hunk(hunk, position=5)   # the `simpa` line, inside second_thing
-    assert on_second["resolved_via"] == "line"
-    assert on_second["declaration"] == "second_thing"
-    on_first = situate_hunk(hunk, position=2)    # the `simp` line, inside first_thing
-    assert on_first["declaration"] == "first_thing"
-    # Without a position the resolver falls back to the coarse behaviour the gate measured.
-    assert situate_hunk(hunk)["resolved_via"] == "head"
+    on_second = ("@@ -10,6 +10,9 @@ section\n"
+                 " lemma first_thing : A := by\n"
+                 "   simp\n"
+                 "+lemma second_thing : B := by\n"
+                 "+  by_cases h : x\n"
+                 "+  · simpa using foo")            # <- the commented line
+    resolved = situate_hunk(on_second)
+    assert resolved["resolved_via"] == "line"
+    assert resolved["declaration"] == "second_thing"
+    on_first = ("@@ -10,6 +10,9 @@ section\n"
+                " lemma first_thing : A := by\n"
+                "   simp")                           # <- the commented line
+    assert situate_hunk(on_first)["declaration"] == "first_thing"
+    # A truncated hunk (the index cuts hunks from the front at DISPLAY_HUNK_CHARS) has no
+    # trustworthy tail; the resolver falls back to the coarse first-head behaviour and says so.
+    coarse = situate_hunk(on_second, tail_is_comment=False)
+    assert coarse["resolved_via"] == "head"
+    assert coarse["declaration"] == "first_thing"
+
+
+def test_a_recut_header_does_not_matter():
+    """When GitHub re-cuts a long hunk, the `@@` header starts a few lines above the comment and
+    `original_position` (149 here, in the raw bundle) no longer indexes the hunk's lines. The
+    tail is still the commented line."""
+
+    hunk = ("@@ -170,7 +170,9 @@ theorem far_above : True := by\n"
+            "   have h := foo\n"
+            "+  simp only [bar] at h\n"
+            "+  exact h")
+    resolved = situate_hunk(hunk)
+    assert resolved["resolved_via"] == "context"     # no head in the hunk; git's context names it
+    assert resolved["declaration"] == "far_above"
 
 
 def test_the_real_33098_comments_resolve_to_the_lemmas_the_maintainer_named():
@@ -117,8 +148,7 @@ def test_the_real_33098_comments_resolve_to_the_lemmas_the_maintainer_named():
         joined = join_comment({"comment_id": comment["id"], "pr_number": 33098,
                                "created_at": comment["created_at"], "path": comment["path"],
                                "commenter": None, "body": comment["body"],
-                               "diff_hunk": comment["diff_hunk"],
-                               "original_position": comment.get("original_position")})
+                               "diff_hunk": comment["diff_hunk"]})
         resolved[joined.declaration] = joined.resolved_via
     assert all(via == "line" for via in resolved.values())
     for lemma in ("minimalCover_subset", "maximalSeparatedSet_subset", "card_minimalCover",
