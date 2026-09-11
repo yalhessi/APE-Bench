@@ -97,6 +97,32 @@ class GitHubClient:
     def get_json(self, path: str, *, params: Optional[Dict[str, Any]] = None) -> Any:
         return self._request("GET", f"{API_ROOT}{path}", params=params).json()
 
+    def pages(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        per_page: int = 100,
+        max_pages: Optional[int] = 50,
+    ) -> Iterator[List[Any]]:
+        """One list per page, following `next` links. `max_pages=None` follows them to the end.
+
+        Callers that need to know how many requests they have made, or to stop and restart the
+        walk from a new anchor (GitHub's list endpoints return 5xx on deep pages), iterate this;
+        `paginate` flattens it for callers that only want items."""
+        page_params = dict(params or {})
+        page_params["per_page"] = per_page
+        url: Optional[str] = f"{API_ROOT}{path}"
+        pages = 0
+        while url and (max_pages is None or pages < max_pages):
+            response = self._request("GET", url, params=page_params if pages == 0 else None)
+            payload = response.json()
+            if isinstance(payload, dict):  # search API wraps items
+                payload = payload.get("items", [])
+            yield list(payload)
+            url = response.links.get("next", {}).get("url")
+            pages += 1
+
     def paginate(
         self,
         path: str,
@@ -105,18 +131,8 @@ class GitHubClient:
         per_page: int = 100,
         max_pages: int = 50,
     ) -> Iterator[Any]:
-        page_params = dict(params or {})
-        page_params["per_page"] = per_page
-        url: Optional[str] = f"{API_ROOT}{path}"
-        pages = 0
-        while url and pages < max_pages:
-            response = self._request("GET", url, params=page_params if pages == 0 else None)
-            payload = response.json()
-            if isinstance(payload, dict):  # search API wraps items
-                payload = payload.get("items", [])
-            yield from payload
-            url = response.links.get("next", {}).get("url")
-            pages += 1
+        for page in self.pages(path, params=params, per_page=per_page, max_pages=max_pages):
+            yield from page
 
     def paginate_all(self, path: str, **kwargs) -> List[Any]:
         return list(self.paginate(path, **kwargs))

@@ -20,8 +20,10 @@ Resumable: re-running appends only comment_ids not already present.
 import argparse
 import json
 import re
+import time
+from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 
 from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
@@ -98,61 +100,166 @@ def _existing_state(out: Path) -> Tuple[Set[Any], Optional[str]]:
     return ids, max_created
 
 
+#: GitHub's `/pulls/comments` listing answers 5xx once a `next`-link chain runs deep (a 21-month
+#: window is ~2,000 pages; the user's run died there). The walk is created-ascending, so every
+#: `REANCHOR_EVERY_PAGES` pages the query is restarted with `since` = the last created_at seen.
+#: `since` filters on updated_at, and updated ≥ created, so nothing created later is skipped;
+#: comments created in the anchor's own second are re-fetched and dropped by the id dedup.
+REANCHOR_EVERY_PAGES = 10
+
+
+def _day(iso: str) -> date:
+    return date.fromisoformat(iso[:10])
+
+
+def _window_fraction(day: str, start: str, end: str) -> float:
+    """How far through [start, end] a created date is: the only progress GitHub lets us compute,
+    since the endpoint carries no total."""
+    span = max(1, (_day(end) - _day(start)).days + 1)
+    done = (_day(day) - _day(start)).days + 1
+    return min(1.0, max(0.0, done / span))
+
+
+def _fmt_seconds(seconds: float) -> str:
+    seconds = max(0.0, seconds)
+    if seconds < 90:
+        return f"{seconds:.0f}s"
+    if seconds < 5400:
+        return f"{seconds / 60:.0f}m"
+    return f"{seconds / 3600:.1f}h"
+
+
+def _state_path(out: Path) -> Path:
+    return out.with_name(out.name + ".state.json")
+
+
 def build_corpus(
     start: str, end: str, out: Path, *, exclude_prs: Set[int], max_pages: int, logger,
-    interval: float = 0.0, progress_every: int = 500,
+    interval: float = 0.0, log_every_pages: int = 5,
+    reanchor_every_pages: int = REANCHOR_EVERY_PAGES, client: Optional[GitHubClient] = None,
 ) -> int:
-    """Walk review comments in created-ascending order, filtered server-side by `since` so we start
-    at the window (not at the repo's whole history and not the newer eval region). Keep the window
-    [start, end]; stop once created passes end. Returns #rows written this run.
+    """Walk review comments in created-ascending order through [start, end], appending the
+    maintainer `.lean` comments not already in `out`. Returns the number of rows written.
 
-    Ascending+`since` (vs newest-first) matters here: it starts near `start` so progress is visible
-    immediately, and it never paginates the post-window eval region at all."""
+    The walk is server-filtered by `since` so it begins near `start` and never touches the
+    post-window region; it stops at the first comment created after `end`. It is re-anchored
+    every `reanchor_every_pages` pages (see `REANCHOR_EVERY_PAGES`). Progress is logged as the
+    share of the date window reached, with a page estimate derived from it; a state file beside
+    `out` records the created-at frontier after every page so an interrupted run can be resumed
+    with `--start <frontier day>` — everything before the frontier was walked contiguously.
+    """
     out.parent.mkdir(parents=True, exist_ok=True)
     seen, max_created = _existing_state(out)
-    if seen:
-        # Always re-scan the whole window from `start` and dedup by comment_id. We deliberately do
-        # NOT resume from max(created) as a frontier: an interrupted run (or an older newest-first
-        # run) can leave a non-contiguous slice, so a created frontier would silently skip the gap.
-        logger.info("Resume: %d existing rows (max created %s); re-scanning from %s, dedup by id",
-                    len(seen), max_created or "-", start)
-    since_iso = f"{start}T00:00:00Z"
-    client = GitHubClient(None, request_interval_seconds=interval, logger=logger)
-    if not client.authenticated:
-        logger.warning("No GITHUB_TOKEN set — GitHub allows only 60 req/hr unauthenticated; "
-                       "a full window needs hundreds of requests. Set GITHUB_TOKEN.")
-    logger.info("Fetching review comments created %s..%s (since=%s), ascending", start, end, since_iso)
-    kept = scanned = pre_window = 0
+    client = client or GitHubClient(None, request_interval_seconds=interval, logger=logger)
+    logger.info(
+        "PLAN  window %s..%s | %d rows already in %s (latest created %s) | GITHUB_TOKEN %s\n"
+        "      walk /pulls/comments created-ascending, 100 per page, re-anchoring `since` every "
+        "%d pages so no page is deep; keep maintainer .lean comments not already present; "
+        "stop at the first comment created after %s. GitHub reports no total, so progress is "
+        "the share of the date window reached and the page estimate is derived from it.",
+        start, end, len(seen), out.name, max_created or "-",
+        "set" if client.authenticated else "MISSING (60 requests/hour; this will not finish)",
+        reanchor_every_pages, end)
+    if seen and max_created and max_created[:10] < start:
+        logger.info("      existing rows end %s, before this window: nothing is re-scanned.",
+                    max_created[:10])
+    elif seen:
+        logger.info("      re-scanning from %s and deduplicating by comment id "
+                    "(an earlier interrupted run may have left a gap, so no frontier is assumed).",
+                    start)
+
+    since = f"{start}T00:00:00Z"
+    kept = scanned = pre_window = requests = 0
+    last_created: Optional[str] = None
+    t0 = time.monotonic()
+    done = False
     fh = out.open("a", encoding="utf-8")
+
+    def progress(final: bool = False) -> None:
+        elapsed = max(1e-6, time.monotonic() - t0)
+        rate = requests / elapsed
+        if last_created:
+            frac = _window_fraction(last_created, start, end)
+            est_total = requests / frac if frac > 0 else float("inf")
+            left = max(0.0, est_total - requests)
+            where = f"at {last_created[:10]} ({100 * frac:4.1f}% of window)"
+            eta = f"~{left:.0f} pages left (~{_fmt_seconds(left / rate if rate else 0)})"
+        else:
+            where, eta = "before the window (older comments edited recently)", "no estimate yet"
+        logger.info("%s page %d | %s | scanned %s kept %s | %.1f req/s | %s",
+                    "DONE " if final else "     ", requests, where,
+                    f"{scanned:,}", f"{kept:,}", rate, eta)
+
+    def save_state() -> None:
+        _state_path(out).write_text(json.dumps({
+            "start": start, "end": end, "frontier_created_at": last_created,
+            "requests": requests, "scanned": scanned, "kept": kept, "done": done,
+            "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "resume_hint": (f"--start {last_created[:10]} --end {end}" if last_created else
+                            f"--start {start} --end {end}"),
+        }, indent=2) + "\n", encoding="utf-8")
+
     try:
-        for c in client.paginate(
-            f"/repos/{REPO}/pulls/comments",
-            params={"sort": "created", "direction": "asc", "since": since_iso},
-            per_page=100, max_pages=max_pages,
-        ):
-            scanned += 1
-            day = str(c.get("created_at") or "")[:10]
-            if scanned % progress_every == 0:
-                logger.info("  scanned %d, kept %d (at %s)", scanned, kept, day or "?")
-            if not day:
-                continue
-            if day < start:          # updated-in-window but created before it → not yet in window
-                pre_window += 1
-                continue
-            if day > end:            # created past the window (ascending → all rest are too) → done
-                break
-            cid = c.get("id")
-            if cid in seen or pr_number(c) in exclude_prs or not keep_comment(c):
-                continue
-            fh.write(json.dumps(corpus_row(c), ensure_ascii=False) + "\n")
-            fh.flush()
-            seen.add(cid)
-            kept += 1
+        while not done and requests < max_pages:
+            anchor_created = last_created
+            pages_this_anchor = 0
+            for page in client.pages(
+                f"/repos/{REPO}/pulls/comments",
+                params={"sort": "created", "direction": "asc", "since": since},
+                per_page=100, max_pages=None,
+            ):
+                requests += 1
+                pages_this_anchor += 1
+                for c in page:
+                    scanned += 1
+                    created = str(c.get("created_at") or "")
+                    day = created[:10]
+                    if not day:
+                        continue
+                    if day < start:          # updated in the window, created before it
+                        pre_window += 1
+                        continue
+                    if day > end:            # ascending: everything after this is past the window
+                        done = True
+                        break
+                    last_created = created
+                    cid = c.get("id")
+                    if cid in seen or pr_number(c) in exclude_prs or not keep_comment(c):
+                        continue
+                    fh.write(json.dumps(corpus_row(c), ensure_ascii=False) + "\n")
+                    fh.flush()
+                    seen.add(cid)
+                    kept += 1
+                save_state()
+                if requests % max(1, log_every_pages) == 0:
+                    progress()
+                if done or requests >= max_pages:
+                    break
+                # Re-anchor once this chain is `reanchor_every_pages` deep -- but only if the
+                # frontier moved, otherwise the chain is still in pre-window comments and a
+                # re-anchor at the same `since` would loop forever.
+                if pages_this_anchor >= reanchor_every_pages and last_created != anchor_created:
+                    break
+            else:
+                done = True                  # the chain ended: no `next` link, nothing more exists
+            if not done and requests < max_pages and last_created:
+                since = last_created
+        if requests >= max_pages and not done:
+            logger.warning("Stopped at --max-pages %d before reaching %s; resume with %s",
+                           max_pages, end, json.loads(_state_path(out).read_text())["resume_hint"])
+    except BaseException:
+        save_state()
+        logger.error("Interrupted after %d pages at %s; %d rows were written and are kept. "
+                     "Resume with: %s", requests, (last_created or "-")[:10], kept,
+                     json.loads(_state_path(out).read_text())["resume_hint"])
+        raise
     finally:
         fh.close()
         client.close()
-    logger.info("Done: kept %d maintainer .lean comments this run (scanned %d, %d pre-window) -> %s",
-                kept, scanned, pre_window, out)
+    save_state()
+    progress(final=True)
+    logger.info("Kept %d maintainer .lean comments this run (scanned %d, %d created before the "
+                "window) -> %s", kept, scanned, pre_window, out)
     return kept
 
 
@@ -178,15 +285,21 @@ def main() -> None:
                    "after its base -- which is exactly the evidence the review-corpus window "
                    "ending in August could not supply.")
     p.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    p.add_argument("--max-pages", type=int, default=3000)
+    p.add_argument("--max-pages", type=int, default=3000, help="hard cap on requests this run")
     p.add_argument("--interval", type=float, default=0.0, help="seconds between requests")
+    p.add_argument("--log-every-pages", type=int, default=5,
+                   help="print a progress line every N pages (one page = one request of 100)")
+    p.add_argument("--reanchor-every-pages", type=int, default=REANCHOR_EVERY_PAGES,
+                   help="restart the walk from the last created_at every N pages (GitHub 5xxs deep chains)")
     args = p.parse_args()
     logger = create_logger()
     excl = _eval_pr_numbers()
     logger.info("Corpus window [%s .. %s], excluding %d eval PRs -> %s",
                 args.start, args.end, len(excl), args.out)
     build_corpus(args.start, args.end, args.out, exclude_prs=excl,
-                 max_pages=args.max_pages, logger=logger, interval=args.interval)
+                 max_pages=args.max_pages, logger=logger, interval=args.interval,
+                 log_every_pages=args.log_every_pages,
+                 reanchor_every_pages=args.reanchor_every_pages)
 
 
 if __name__ == "__main__":
