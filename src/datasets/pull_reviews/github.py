@@ -1,0 +1,282 @@
+"""GitHub access for the PR store: REST with rate-limit waiting, GraphQL enrichment, compares.
+
+Moved here from `pr_review_v2/github.py`, which re-exports it, so the store's collector does not
+depend on a package that carries a generation name. REST works unauthenticated for smoke tests;
+GraphQL (review-thread resolution, body-edit history) needs a token.
+
+Two quota facts every caller should know, because both collection failures so far were quota-shaped:
+the core bucket is 5,000 requests/hour authenticated, and the **search** bucket is 30 per minute,
+separately. `GitHubClient` waits out a rate-limit window instead of raising, so a long collection
+survives one, and a 403 that arrives with quota left (a revoked token, a private repo) still raises.
+"""
+
+import os
+import time
+from typing import Any, Dict, Iterator, List, Optional
+
+import httpx
+
+API_ROOT = "https://api.github.com"
+TIMELINE_ACCEPT = "application/vnd.github+json"
+
+
+class GitHubError(RuntimeError):
+    pass
+
+
+class RateLimitError(GitHubError):
+    pass
+
+
+class GitHubClient:
+    def __init__(
+        self,
+        token: Optional[str],
+        *,
+        timeout_seconds: float = 30.0,
+        request_interval_seconds: float = 0.0,
+        max_retries: int = 5,
+        retry_backoff: float = 2.0,
+        max_rate_limit_wait: float = 3900.0,
+        logger=None,
+    ):
+        self.token = token or os.environ.get("GITHUB_TOKEN") or None
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "ape-bench-pr-review-v2",
+        }
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        self._client = httpx.Client(headers=headers, timeout=timeout_seconds)
+        self._interval = max(0.0, request_interval_seconds)
+        self._max_retries = max(0, max_retries)
+        self._retry_backoff = max(0.0, retry_backoff)
+        # A `core` window is an hour long, so a run that exhausts 5,000 requests waits rather
+        # than dies: the alternative is losing an hour of collection to a 403.
+        self._max_rate_limit_wait = max(0.0, max_rate_limit_wait)
+        self._logger = logger
+
+    @property
+    def authenticated(self) -> bool:
+        return self.token is not None
+
+    def close(self) -> None:
+        self._client.close()
+
+    def _rate_limit_wait(self, response: httpx.Response) -> Optional[float]:
+        """Seconds to wait before retrying a 403/429, or None if it is not a rate limit.
+
+        GitHub meters several buckets separately and says which in `x-ratelimit-resource`:
+        `core` is 5,000/hour authenticated, **`search` is 30 per minute**, and a burst on any
+        endpoint can trip a secondary limit that answers with `retry-after`. A 403 that carries
+        `remaining: 0` or `retry-after` is a wait, not a failure -- raising on it threw away 27
+        successful requests mid-collection.
+        """
+
+        retry_after = response.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return float(retry_after) + 1.0
+            except ValueError:
+                pass
+        if response.headers.get("X-RateLimit-Remaining") == "0":
+            try:
+                reset = float(response.headers["X-RateLimit-Reset"])
+            except (KeyError, TypeError, ValueError):
+                return None
+            return max(0.0, reset - time.time()) + 1.0
+        return None
+
+    def _backoff_sleep(self, attempt: int, reason: str, retry_after: Optional[str] = None) -> None:
+        delay = self._retry_backoff * (2 ** attempt)
+        if retry_after:
+            try:
+                delay = max(delay, float(retry_after))
+            except ValueError:
+                pass
+        delay = min(delay, 60.0)
+        if self._logger:
+            self._logger.warning("GitHub %s; retry %d in %.0fs", reason, attempt + 1, delay)
+        time.sleep(delay)
+
+    def _request(self, method: str, url: str, **kwargs) -> httpx.Response:
+        # Retry transient failures (5xx, network/timeout) with exponential backoff so one 502 does
+        # not kill a long paginated collection. 403/429 stay a RateLimitError (caller's concern).
+        for attempt in range(self._max_retries + 1):
+            try:
+                response = self._client.request(method, url, **kwargs)
+            except httpx.TransportError as exc:
+                if attempt >= self._max_retries:
+                    raise
+                self._backoff_sleep(attempt, f"transport error ({type(exc).__name__})")
+                continue
+            if self._interval:
+                time.sleep(self._interval)
+            if response.status_code in {403, 429}:
+                remaining = response.headers.get("X-RateLimit-Remaining")
+                reset_at = response.headers.get("X-RateLimit-Reset")
+                resource = response.headers.get("X-RateLimit-Resource", "?")
+                wait = self._rate_limit_wait(response)
+                if wait is not None and wait <= self._max_rate_limit_wait and attempt < self._max_retries:
+                    if self._logger:
+                        self._logger.warning(
+                            "GitHub %s rate limit reached (status=%d, remaining=%s); waiting %.0fs "
+                            "for the window to reset, then continuing",
+                            resource, response.status_code, remaining, wait)
+                    time.sleep(wait)
+                    continue
+                raise RateLimitError(
+                    f"GitHub rate limit (status={response.status_code}, resource={resource}, "
+                    f"remaining={remaining}, reset={reset_at}"
+                    + (f", would need to wait {wait:.0f}s" if wait is not None else "") + ")"
+                )
+            if response.status_code in {500, 502, 503, 504} and attempt < self._max_retries:
+                self._backoff_sleep(attempt, f"HTTP {response.status_code}",
+                                    response.headers.get("Retry-After"))
+                continue
+            response.raise_for_status()
+            return response
+        # unreachable: loop either returns or raises
+        raise GitHubError(f"exhausted retries for {method} {url}")
+
+    def get_json(self, path: str, *, params: Optional[Dict[str, Any]] = None) -> Any:
+        return self._request("GET", f"{API_ROOT}{path}", params=params).json()
+
+    def pages(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        per_page: int = 100,
+        max_pages: Optional[int] = 50,
+    ) -> Iterator[List[Any]]:
+        """One list per page, following `next` links. `max_pages=None` follows them to the end.
+
+        Callers that need to know how many requests they have made, or to stop and restart the
+        walk from a new anchor (GitHub's list endpoints return 5xx on deep pages), iterate this;
+        `paginate` flattens it for callers that only want items."""
+        page_params = dict(params or {})
+        page_params["per_page"] = per_page
+        url: Optional[str] = f"{API_ROOT}{path}"
+        pages = 0
+        while url and (max_pages is None or pages < max_pages):
+            response = self._request("GET", url, params=page_params if pages == 0 else None)
+            payload = response.json()
+            if isinstance(payload, dict):  # search API wraps items
+                payload = payload.get("items", [])
+            yield list(payload)
+            url = response.links.get("next", {}).get("url")
+            pages += 1
+
+    def paginate(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        per_page: int = 100,
+        max_pages: int = 50,
+    ) -> Iterator[Any]:
+        for page in self.pages(path, params=params, per_page=per_page, max_pages=max_pages):
+            yield from page
+
+    def paginate_all(self, path: str, **kwargs) -> List[Any]:
+        return list(self.paginate(path, **kwargs))
+
+    def graphql(self, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
+        if not self.authenticated:
+            raise GitHubError("GraphQL requires an authenticated client")
+        response = self._request(
+            "POST", f"{API_ROOT}/graphql", json={"query": query, "variables": variables}
+        )
+        payload = response.json()
+        if payload.get("errors"):
+            raise GitHubError(f"GraphQL errors: {payload['errors']}")
+        return payload["data"]
+
+
+# --- GraphQL enrichment -------------------------------------------------------------------------
+
+REVIEW_THREADS_QUERY = """
+query($owner: String!, $name: String!, $number: Int!, $cursor: String) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      reviewThreads(first: 100, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id
+          isResolved
+          comments(first: 100) { nodes { databaseId } }
+        }
+      }
+    }
+  }
+}
+"""
+
+BODY_EDITS_QUERY = """
+query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      userContentEdits(first: 100) {
+        nodes { editedAt createdAt }
+      }
+    }
+  }
+}
+"""
+
+
+def fetch_review_threads(client: "GitHubClient", owner: str, name: str, number: int) -> List[Dict[str, Any]]:
+    threads: List[Dict[str, Any]] = []
+    cursor: Optional[str] = None
+    while True:
+        data = client.graphql(REVIEW_THREADS_QUERY,
+                              {"owner": owner, "name": name, "number": number, "cursor": cursor})
+        connection = data["repository"]["pullRequest"]["reviewThreads"]
+        for node in connection["nodes"]:
+            threads.append({
+                "thread_id": node["id"],
+                "is_resolved": node["isResolved"],
+                "comment_ids": [c["databaseId"] for c in node["comments"]["nodes"]],
+            })
+        if not connection["pageInfo"]["hasNextPage"]:
+            return threads
+        cursor = connection["pageInfo"]["endCursor"]
+
+
+def fetch_body_edits(client: "GitHubClient", owner: str, name: str, number: int) -> List[Dict[str, Any]]:
+    data = client.graphql(BODY_EDITS_QUERY, {"owner": owner, "name": name, "number": number})
+    nodes = data["repository"]["pullRequest"]["userContentEdits"]["nodes"] or []
+    return [{"edited_at": n.get("editedAt") or n.get("createdAt")} for n in nodes if n]
+
+
+# --- compares -----------------------------------------------------------------------------------
+
+def compact_compare(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """The part of a three-dot compare the review pipeline reads: the merge base and each file's
+    name, status and patch. `files` is capped at 300 by the API and not paginated by Link header;
+    the funnel's 30-file ceiling keeps us far from it."""
+
+    return {
+        "merge_base_sha": (payload.get("merge_base_commit") or {}).get("sha"),
+        "files": [
+            {
+                "filename": f.get("filename"),
+                "previous_filename": f.get("previous_filename"),
+                "status": f.get("status"),
+                "additions": f.get("additions"),
+                "deletions": f.get("deletions"),
+                "patch": f.get("patch"),
+            }
+            for f in payload.get("files", [])
+        ],
+    }
+
+
+def compare_bytes(compact: Dict[str, Any]) -> bytes:
+    """Serialised exactly as the v2 compare cache wrote it, so both stores' files read alike."""
+
+    import json as _json
+
+    return _json.dumps(compact, ensure_ascii=False).encode("utf-8")

@@ -348,55 +348,14 @@ def search_prs_active_in(client, start: str, end: str, logger) -> List[int]:
 
 def list_prs_active_since(client, start: str, end: str, logger, *,
                           log_every_pages: int = 10, recheck_pages: int = 3) -> List[int]:
-    """Every PR that can carry a review comment created in [start, end], from the **core**
-    endpoint rather than search.
+    """Every PR that can carry a review comment created in [start, end]. The walk lives in the PR
+    store's collector now (`pull_reviews.collect.walk_listing`), which also keeps each listing row;
+    this returns just the numbers, as it always did."""
 
-    `/repos/{repo}/pulls?state=all&sort=updated&direction=desc` is metered against the 5,000/hour
-    core bucket (search is 30 **per minute**, which is what killed the first attempt), answers in
-    about a second at any depth, and is ordered by `updated_at` descending. A review comment bumps
-    its PR's `updated_at`, so every PR we need has `updated_at >= start`: walk from the top and
-    stop at the first page whose rows have all fallen below `start`. Keep those also created on or
-    before `end`.
+    from src.datasets.pull_reviews.collect import walk_listing
 
-    Ordering under concurrent updates is safe in one direction and not the other: an update moves
-    a PR *up*, so a PR above the cursor can only be re-read (harmless, the caller dedups). A PR
-    bumped from below the cursor to the top, though, would be missed -- so the first
-    `recheck_pages` pages are read again at the end and anything new is reported.
-    """
-
-    path = f"/repos/{REPO}/pulls"
-    params = {"state": "all", "sort": "updated", "direction": "desc"}
-    found: Dict[int, str] = {}
-    pages = 0
-    reached = ""
-    t0 = time.monotonic()
-    for page in client.pages(path, params=params, per_page=100, max_pages=None):
-        pages += 1
-        if not page:
-            break
-        for item in page:
-            number, updated, created = item.get("number"), item.get("updated_at") or "", item.get("created_at") or ""
-            reached = updated[:10] or reached
-            if number and updated[:10] >= start and created[:10] <= end:
-                found[int(number)] = updated
-        if pages % max(1, log_every_pages) == 0 or (page and (page[-1].get("updated_at") or "")[:10] < start):
-            elapsed = max(1e-6, time.monotonic() - t0)
-            logger.info("  stage A page %d | back to %s (window starts %s) | %d PRs in window | "
-                        "%.1f req/s", pages, reached or "?", start, len(found), pages / elapsed)
-        if (page[-1].get("updated_at") or "")[:10] < start:
-            break
-    # A PR bumped from below the cursor to the top during the walk would have been stepped over.
-    before = set(found)
-    for page in client.pages(path, params=params, per_page=100, max_pages=recheck_pages):
-        for item in page:
-            number, updated, created = item.get("number"), item.get("updated_at") or "", item.get("created_at") or ""
-            if number and updated[:10] >= start and created[:10] <= end:
-                found[int(number)] = updated
-    missed = set(found) - before
-    if missed:
-        logger.info("  stage A re-check of the first %d pages found %d PR(s) bumped during the "
-                    "walk: %s", recheck_pages, len(missed), sorted(missed))
-    return sorted(found)
+    return sorted(walk_listing(client, start, end, logger, log_every_pages=log_every_pages,
+                               recheck_pages=recheck_pages))
 
 
 def build_corpus_per_pr(

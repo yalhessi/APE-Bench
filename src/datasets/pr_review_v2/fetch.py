@@ -16,34 +16,11 @@ from .github import GitHubClient, GitHubError
 
 BUNDLE_VERSION = 1
 
-_THREADS_QUERY = """
-query($owner: String!, $name: String!, $number: Int!, $cursor: String) {
-  repository(owner: $owner, name: $name) {
-    pullRequest(number: $number) {
-      reviewThreads(first: 100, after: $cursor) {
-        pageInfo { hasNextPage endCursor }
-        nodes {
-          id
-          isResolved
-          comments(first: 100) { nodes { databaseId } }
-        }
-      }
-    }
-  }
-}
-"""
-
-_BODY_EDITS_QUERY = """
-query($owner: String!, $name: String!, $number: Int!) {
-  repository(owner: $owner, name: $name) {
-    pullRequest(number: $number) {
-      userContentEdits(first: 100) {
-        nodes { editedAt createdAt }
-      }
-    }
-  }
-}
-"""
+from src.datasets.pull_reviews.github import (  # noqa: E402
+    BODY_EDITS_QUERY as _BODY_EDITS_QUERY,
+    REVIEW_THREADS_QUERY as _THREADS_QUERY,
+    compact_compare,
+)
 
 
 def search_candidate_numbers(client: GitHubClient, config: PRReviewV2Config) -> List[int]:
@@ -186,20 +163,7 @@ def fetch_compare(
     )
     # `files` is capped at 300 and not paginated via Link headers on this endpoint;
     # the funnel's max_changed_files (≤30) keeps us far from the cap.
-    compact = {
-        "merge_base_sha": (payload.get("merge_base_commit") or {}).get("sha"),
-        "files": [
-            {
-                "filename": f.get("filename"),
-                "previous_filename": f.get("previous_filename"),
-                "status": f.get("status"),
-                "additions": f.get("additions"),
-                "deletions": f.get("deletions"),
-                "patch": f.get("patch"),
-            }
-            for f in payload.get("files", [])
-        ],
-    }
+    compact = compact_compare(payload)
     cache_file.parent.mkdir(parents=True, exist_ok=True)
     cache_file.write_text(json.dumps(compact, ensure_ascii=False))
     return compact
