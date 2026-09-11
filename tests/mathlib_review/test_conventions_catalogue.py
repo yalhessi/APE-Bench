@@ -126,3 +126,86 @@ def test_the_real_catalogue_records_the_revision_it_was_read_from():
     # Options whose docstring could not be read are reported rather than silently dropped.
     assert isinstance(payload["linter_options_without_a_readable_docstring"], list)
     assert payload["by_tier"].get("standard", 0) >= 10
+
+
+# --- the pre-registration ------------------------------------------------------------------------
+
+def test_the_calibration_thresholds_are_frozen():
+    """Frozen 2026-09-11 before the first declaration was read.
+
+    This test exists to be an obstacle. The project has fitted thresholds while looking at the
+    answer twice -- `n>=2 with docstring` existed so `to_fun` would pass, and "every target with
+    n>=6 is a genuine convention" was recognition of names already known. Moving a number here
+    means editing an assertion that says it was frozen, which is the only protection available
+    against doing it quietly.
+    """
+
+    from src.mathlib_review.conventions import catalogue as c
+
+    assert c.CALIBRATION_SAMPLE == 30
+    assert c.CALIBRATION_SEED == 20260911
+    assert c.KILL_CRITERION_MIN_USEFUL_FRACTION == pytest.approx(1.0 / 3.0)
+    assert c.ADHERENCE_BANDS[0] == (0.95, "settled")
+
+
+def test_a_candidate_needing_a_field_the_table_lacks_is_unverifiable_not_a_silent_pass():
+    """The gap has to be counted, not estimated.
+
+    `DeclarationRow` holds no signature, attributes or binders, so statement-shape and typeclass
+    candidates cannot be checked. If such a candidate quietly evaluated to a rate, the tooling gap
+    would be invisible and the pilot would overstate its own reach.
+    """
+
+    from src.mathlib_review.conventions.catalogue import Candidate, adherence
+
+    checkable = Candidate(key="k1", statement="tactic-level", requires=("tactics", "conclusion_head"))
+    needs_more = Candidate(key="k2", statement="typeclass-level", requires=("signature", "binders"))
+
+    assert checkable.verifiable and checkable.missing_fields == []
+    assert not needs_more.verifiable
+    assert needs_more.missing_fields == ["binders", "signature"]
+
+    class _Table:
+        rows = []
+
+    result = adherence(_Table(), needs_more, lambda r: True, lambda r: True)
+    assert result["verifiable"] is False and result["rate"] is None
+    assert result["missing_fields"] == ["binders", "signature"]
+
+
+def test_the_sample_is_reproducible_and_spread_across_directories():
+    from src.mathlib_review.conventions.catalogue import CALIBRATION_SEED, sample
+
+    class _Row:
+        def __init__(self, directory, fullname):
+            self.directory, self.fullname = directory, fullname
+
+    class _Table:
+        rows = [_Row(f"Mathlib/D{i % 40}", f"lemma_{i}") for i in range(400)]
+
+    first = [r.fullname for r in sample(_Table(), 20, seed=CALIBRATION_SEED)]
+    again = [r.fullname for r in sample(_Table(), 20, seed=CALIBRATION_SEED)]
+    other = [r.fullname for r in sample(_Table(), 20, seed=CALIBRATION_SEED + 1)]
+
+    assert first == again, "a sample must be reproducible from its recorded seed"
+    assert first != other
+    # One declaration per directory: uniform sampling would pool wherever the library is largest.
+    assert len({r.directory for r in sample(_Table(), 20, seed=CALIBRATION_SEED)}) == 20
+
+
+def test_the_verdict_is_computed_from_counts_not_from_an_impression():
+    from src.mathlib_review.conventions.catalogue import Candidate, calibration_verdict
+
+    candidates = [
+        Candidate(key="a", statement="", requires=("tactics",)),                       # useful
+        Candidate(key="b", statement="", requires=("kind",)),                          # useful
+        Candidate(key="c", statement="", requires=("tactics",), encoded_as="linter.x"),  # encoded
+        Candidate(key="d", statement="", requires=("signature",)),                     # unverifiable
+    ]
+    verdict = calibration_verdict(candidates)
+
+    assert verdict["unencoded_and_checkable"] == 2
+    assert verdict["already_encoded"] == 1
+    assert verdict["unencoded_but_unverifiable"] == 1
+    assert verdict["useful_fraction"] == pytest.approx(0.5)
+    assert verdict["proceed_to_model_pass"] is True

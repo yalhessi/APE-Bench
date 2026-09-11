@@ -76,6 +76,30 @@ _SET_RE = re.compile(r"register_linter_set\s+(linter\.\w+)\s*:=\s*\n((?:[ \t]*(?
 DIAGNOSTIC_SETS = frozenset({"linter.nightlyRegressionSet"})
 
 
+# --- pre-registration ---------------------------------------------------------------------------
+# Frozen 2026-09-11, BEFORE the calibration sample was drawn, and pinned by
+# `tests/mathlib_review/test_conventions_catalogue.py`. This project has fitted thresholds while
+# looking at the answer at least twice -- the `n>=2 with docstring` clause existed so `to_fun`
+# would pass, and "every target with n>=6 is a genuine convention" was recognition of names already
+# known. Changing a value below means editing a test that says it was frozen, which is the point.
+
+#: Declarations read in the free calibration pass before any model spend is considered.
+CALIBRATION_SAMPLE = 30
+
+#: Fixed so the sample is reproducible from the manifest alone.
+CALIBRATION_SEED = 20260911
+
+#: The kill criterion. A calibration candidate is *useful* when it is both unencoded (not already
+#: a linter or a library note) and checkable against the fields `DeclarationRow` exposes. Below
+#: this fraction the idea's ceiling is the easy end that CI already handles, and it stops here
+#: rather than proceeding to the model pass.
+KILL_CRITERION_MIN_USEFUL_FRACTION = 1.0 / 3.0
+
+#: Adherence bands, reported rather than judged. A rate is not a verdict: 95% says the library is
+#: consistent, not that a maintainer would request it.
+ADHERENCE_BANDS = ((0.95, "settled"), (0.60, "contested_or_in_transition"), (0.0, "not_a_convention"))
+
+
 @dataclass(frozen=True)
 class ConventionRow:
     """One convention the repository states about itself."""
@@ -215,6 +239,111 @@ def unregistered_options(workspace: Path, extracted: List[ConventionRow]) -> Lis
     for path in _lean_files(workspace):
         every.update(_ANY_OPTION_RE.findall(_read(path)))
     return sorted(every - {r.key for r in extracted if r.source == "linter"})
+
+
+# --- observed candidates: sample, then check ------------------------------------------------------
+
+#: The fields the built declaration table actually holds. A candidate predicate that needs anything
+#: else cannot be checked today, and saying so is the point: the *count* of such candidates is the
+#: measured gap that would justify widening the table, rather than widening it speculatively.
+VERIFIABLE_FIELDS = frozenset({
+    "path", "directory", "namespace", "kind", "fullname",
+    "conclusion_head", "tactics", "wide_tactics", "proof_lines",
+})
+
+
+@dataclass(frozen=True)
+class Candidate:
+    """A convention someone claims to have *observed*, stated so it can be refuted.
+
+    `requires` is the honest half: the declaration-table fields the predicate reads. A candidate
+    naming a field the table lacks is recorded unverifiable rather than quietly passed, which is
+    how the tooling gap gets counted instead of estimated.
+    """
+
+    key: str
+    statement: str
+    requires: tuple
+    source: str = "observed"          # observed | model_observed
+    encoded_as: Optional[str] = None  # a catalogue key when this duplicates an encoded convention
+
+    @property
+    def verifiable(self) -> bool:
+        return set(self.requires) <= VERIFIABLE_FIELDS
+
+    @property
+    def missing_fields(self) -> List[str]:
+        return sorted(set(self.requires) - VERIFIABLE_FIELDS)
+
+
+def sample(table, count: int = CALIBRATION_SAMPLE, *, seed: int = CALIBRATION_SEED) -> List:
+    """A reproducible sample stratified over directories.
+
+    Uniform sampling of 168,058 declarations would concentrate wherever the library is largest and
+    read like a tour of one subject. Stratifying by directory spreads the read across the 970 of
+    them, which is what makes "conventions I already knew" less likely to be all that comes back.
+    """
+
+    import random
+
+    by_directory: Dict[str, List] = collections.defaultdict(list)
+    for row in table.rows:
+        by_directory[row.directory].append(row)
+    rng = random.Random(seed)
+    directories = sorted(by_directory)
+    rng.shuffle(directories)
+    picked = []
+    for directory in directories:
+        if len(picked) >= count:
+            break
+        picked.append(rng.choice(sorted(by_directory[directory], key=lambda r: r.fullname)))
+    return picked
+
+
+def band(rate: float) -> str:
+    for threshold, name in ADHERENCE_BANDS:
+        if rate >= threshold:
+            return name
+    return ADHERENCE_BANDS[-1][1]
+
+
+def adherence(table, candidate: Candidate, applicable, conforming) -> Dict[str, object]:
+    """How much of the class the candidate claims actually conforms to it.
+
+    `applicable` selects the reference class the convention speaks about and `conforming` picks out
+    the rows that follow it, so the denominator is declared by the candidate rather than inherited
+    from whatever happened to be observed -- which is the objection that sank the edit-clustering
+    design.
+    """
+
+    if not candidate.verifiable:
+        return {"key": candidate.key, "verifiable": False,
+                "missing_fields": candidate.missing_fields,
+                "applicable": None, "conforming": None, "rate": None, "band": None}
+    rows = [row for row in table.rows if applicable(row)]
+    hits = [row for row in rows if conforming(row)]
+    rate = (len(hits) / len(rows)) if rows else None
+    return {"key": candidate.key, "verifiable": True, "missing_fields": [],
+            "applicable": len(rows), "conforming": len(hits),
+            "rate": round(rate, 4) if rate is not None else None,
+            "band": band(rate) if rate is not None else "no_applicable_rows"}
+
+
+def calibration_verdict(candidates: List[Candidate]) -> Dict[str, object]:
+    """The pre-registered decision, computed from the counts rather than from an impression."""
+
+    useful = [c for c in candidates if c.encoded_as is None and c.verifiable]
+    fraction = len(useful) / len(candidates) if candidates else 0.0
+    return {
+        "candidates": len(candidates),
+        "already_encoded": sum(1 for c in candidates if c.encoded_as is not None),
+        "unencoded_and_checkable": len(useful),
+        "unencoded_but_unverifiable": sum(
+            1 for c in candidates if c.encoded_as is None and not c.verifiable),
+        "useful_fraction": round(fraction, 4),
+        "threshold": round(KILL_CRITERION_MIN_USEFUL_FRACTION, 4),
+        "proceed_to_model_pass": fraction >= KILL_CRITERION_MIN_USEFUL_FRACTION,
+    }
 
 
 def workspace_revision(workspace: Path) -> Optional[str]:
