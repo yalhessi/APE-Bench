@@ -188,8 +188,10 @@ precedent index, 45 flat→dot deprecation pairs — and the code adopts it at *
 years against a 42 % incumbent**, because renaming 6,521 lemmas is a migration nobody runs at
 once. A classifier tuned on `grind`'s 0 → 9 % step calls this *flat*. So "arriving" is not a
 property of a curve: `grind` arrives as a step, dot notation arrives as enforcement with a
-nearly stationary codebase, `by_cases!` steps 0 → 192 in six weeks from one chore PR and is
-*not* something a reviewer requests. The same shape means three different things.
+nearly stationary codebase, `by_cases!` steps 0 → 192 in six weeks from one chore PR and was
+read as *not* something a reviewer requests -- a reading the December fetch refuted (12 comments,
+4 reviewers; see the December section). The same shape means three different things, and a
+truncated source turns "not yet enforced" into "not a convention".
 
 **Conventions cannot be enumerated.** A census finds what is lexically a token. The majority of
 the 35 groups are *shapes* — state at the weakest typeclass, factor out a repeated argument, put
@@ -244,7 +246,7 @@ situation reads 86 % the "wrong" way — which is the next point.
 | `grind` | +++ (534, organic, many authors) | ++ | + (21/3) | maintainers adopted it; contributors not yet asked |
 | dot notation | + (45 deprecation pairs) | **−** (86 % wrong) | +++ (224/102) | enforced on contributors; codebase is legacy |
 | generalise / weakest typeclass | ++ (**257** "generaliz*" commits) | ? | +++ (355/123) | a *shape* convention, no token, strongly enforced |
-| `by_cases!` | one chore PR, 0→192 in 6 weeks | ? | 0 | a refactor, **not** a convention a reviewer requests |
+| `by_cases!` | one chore PR, 0→192 in 6 weeks | ? | ~~0~~ → **12 (Dec)** | ~~a refactor, not a convention a reviewer requests~~ **wrong, and wrong because the corpus stopped in August**: 12 comments from 4 reviewers in December, mostly as suggestion blocks. Applied 2025-10-30, enforced from December. |
 
 No single source suffices. **Code alone reads dot notation backwards** at every granularity.
 **Review alone misses `grind`'s onset** (21 comments by Aug 2025). **Trajectory alone cannot
@@ -508,6 +510,56 @@ Of the 80 sampled records, rated as originally joined: 59 unchanged under v2, 7 
 6 change declaration (5 to an anonymous instance, 1 to the `inductive`), 8 change only a key.
 The panel result below is on the records *as rated*; the v2 deltas are listed beside it so the
 correction is not silently folded into the number.
+
+### December 2025 collected: 2,055 comments, and they overturn one of this document's readings
+
+The fetch completed: 2,636 PRs read in 2,648 requests, 21,210 comments scanned, **2,055 kept**,
+zero rows from the 138 eval PRs, and every row carrying the position fields. Corpus now 36,695
+rows over 2024-03-01..2025-08-31 plus 2025-12. Against August as a benchmark: 2,055 comments /
+401 PRs / 66 reviewers, versus 2,312 / 458 / 78 -- the month is normal, not thin.
+
+**The A→B ledger is denser in December than in August.** Comments carrying a GitHub
+```` ```suggestion ```` block, i.e. the replacement as code:
+
+```
+                comments   with a block      line-resolved A→B pairs
+2024-03..2025-08  34,640    8,660  (25.0%)        5,927
+2025-08            2,312      685  (29.6%)          510
+2025-12            2,055      741  (36.1%)          565
+```
+
+**`grind` enforcement, the thing the ladder was about, is now visible and dated.** Comments
+naming it, per thousand: **July 1.5 → August 9.1 → December 22.4**, a 15-fold rise. In December
+46 comments from **9 reviewers across 25 PRs** name it, and **31 of the 46 carry the
+replacement as code**. The A sides are exactly PR 33098's shape -- `positivity`, `linarith`,
+`aesop`, `simp [...]`, `exact` chains and case-split ladders replaced by `grind [...]`; two are
+literally `positivity → grind`. Among the reviewers doing it is the maintainer whose comment
+generated 33098's gold. None of this is gold: the eval PRs are excluded, so these are the
+*neighbouring* December PRs, several within twenty numbers of the dev set.
+
+**And `by_cases!` overturns a claim made earlier in this document.** On the August-ending corpus
+it read as "one chore PR, 0→192 files in six weeks, 0 review comments -- a refactor, **not** a
+convention a reviewer requests". The December rows say otherwise:
+
+```
+by_cases! named in maintainer comments:  June 0   July 0   August 0   December 12
+```
+
+Twelve comments from four reviewers, most as suggestion blocks -- including three from
+`jcommelin` on PR 33091 on **2025-12-19**, the day PR 33098 was opened, one of them annotated
+"This will push the negation for you." The code onset was 2025-10-30; enforcement began in
+December. Both months were outside the corpus, so the corpus's cutoff, not the convention,
+produced the "not a convention" reading. That is precisely the failure mode this document warned
+about for the other direction ("review alone misses `grind`'s onset"), and it has now bitten a
+claim in the life-stage table. **Corrected there, and the general lesson stands harder: a
+component measured on a truncated source yields a confident wrong life stage, not a missing
+one.**
+
+The other dev-set conventions, per thousand comments, June → December: dot notation 3.1 → 9.2;
+generalise/weaken 16.1 → 25.3; `encard` 0.5 → 2.9; deprecation 5.2 → 14.1; `toLinearMap_`/`coe_`
+7.8 → 15.1 (flat since August); `to_fun`/`fun_prop` 3.1 → 1.9; `push` 4.1 → 0.5 (receding).
+Four of the five "unknown / post-cutoff" conventions now have dated enforcement evidence in a
+gold-free source.
 
 ### August gate result (80 comments, two three-rater panels, agreement 0.96)
 
