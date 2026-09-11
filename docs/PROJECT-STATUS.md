@@ -26,6 +26,9 @@ community would actually request.
 plus `STATUS.md` — every numbered item marked built, partial or not built, checked against the
 tree. Read `STATUS.md` first.
 
+`docs/dead-ends.md` is the register of abandoned threads and retracted conclusions, each with what
+would reopen it; `CLAUDE.md` at the root is the standing instruction set for working in this tree.
+
 ## How to read this branch
 
 | Commits | What |
