@@ -1,0 +1,29 @@
+{
+  "compares": 230,
+  "content_sha256": "ca0283fb190a905da490c141745a47920b96699a5365bb8890f277e54f33f6b4",
+  "definitions_version": "pull-review-definitions/1",
+  "endpoint_sources": {
+    "legacy_bundle_cache": 1809
+  },
+  "export_version": "pull-review-export/1",
+  "exported_at": "2026-09-11T11:07:15Z",
+  "generator_git_commit": "c8daf56edbdf3ba166869fea50ac53607f6ade10",
+  "generator_tree_state": "dirty",
+  "prs": 201,
+  "prs_by_complete_tier": {
+    "1": 201,
+    "2": 201
+  },
+  "rows_by_endpoint": {
+    "body_edits": 203,
+    "commits": 875,
+    "files": 1029,
+    "issue_comments": 842,
+    "pr": 201,
+    "review_comments": 329,
+    "review_threads": 237,
+    "reviews": 338,
+    "timeline": 4107
+  },
+  "schema_version": "pull-review-store/1"
+}
