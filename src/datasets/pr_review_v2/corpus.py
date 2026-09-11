@@ -421,7 +421,7 @@ def build_corpus_per_pr(
         except (ValueError, TypeError):
             pass
 
-    kept = scanned = requests = 0
+    kept = scanned = requests = prs_with_comments = 0
     found_prs: List[int] = []
     t0 = time.monotonic()
 
@@ -463,7 +463,13 @@ def build_corpus_per_pr(
     except BaseException:
         client.close()
         raise
-    todo = [n for n in found_prs if n not in done_prs]
+    # Highest number first, which is newest first. Two thirds of the PRs a month-long window
+    # turns up were opened long before it and merely *touched* inside it -- a rebase, a bot ping,
+    # one late reply -- and they yield about 0.25 comments each. The PRs opened in the window
+    # itself carry the mass. Ascending order put them last, so the first half hour of a run
+    # looked like it was keeping almost nothing, and an interrupted run had done only the
+    # low-yield tail.
+    todo = sorted((n for n in found_prs if n not in done_prs), reverse=True)
     save_state(done=False)
     logger.info("      stage A done: %d PRs active in the window, %d already collected, "
                 "%d to read (~%d requests, ~%s at 1/s)",
@@ -471,19 +477,25 @@ def build_corpus_per_pr(
                 _fmt_seconds(len(todo)))
 
     def progress(index: int, number: int, final: bool = False) -> None:
+        # `scanned` and `kept` count *comments*, not PRs: a PR's comment list carries every
+        # comment it ever received, and most are outside the window, from a non-maintainer, on a
+        # non-.lean file, or already in the corpus. Measured on August 2025: only 458 of ~2,600
+        # PRs active in a month carry a maintainer .lean comment at all.
         elapsed = max(1e-6, time.monotonic() - t0)
         rate = index / elapsed
         left = len(todo) - index
-        logger.info("%s PR %d/%d (%3.0f%%) | #%d | scanned %s kept %s | %.1f PR/s | ~%s left",
+        logger.info("%s PR %d/%d (%3.0f%%) | #%d | comments scanned %s, kept %s from %d PRs | "
+                    "%.1f PR/s | ~%s left",
                     "DONE " if final else "     ", index, len(todo),
-                    100 * index / max(1, len(todo)), number, f"{scanned:,}", f"{kept:,}", rate,
-                    _fmt_seconds(left / rate) if rate else "?")
+                    100 * index / max(1, len(todo)), number, f"{scanned:,}", f"{kept:,}",
+                    prs_with_comments, rate, _fmt_seconds(left / rate) if rate else "?")
 
     t0 = time.monotonic()
     fh = out.open("a", encoding="utf-8")
     number = 0
     try:
         for index, number in enumerate(todo, start=1):
+            kept_here = 0
             for page in client.pages(f"/repos/{REPO}/pulls/{number}/comments",
                                      per_page=100, max_pages=None):
                 requests += 1
@@ -499,6 +511,8 @@ def build_corpus_per_pr(
                     fh.flush()
                     seen.add(cid)
                     kept += 1
+                    kept_here += 1
+            prs_with_comments += 1 if kept_here else 0
             done_prs.add(number)
             if index % max(1, log_every_prs) == 0:
                 progress(index, number)
@@ -514,8 +528,9 @@ def build_corpus_per_pr(
         client.close()
     save_state(done=True)
     progress(len(todo), number, final=True)
-    logger.info("Kept %d maintainer .lean comments this run (scanned %d across %d PRs, "
-                "%d requests) -> %s", kept, scanned, len(todo), requests, out)
+    logger.info("Kept %d maintainer .lean comments this run from %d of %d PRs (%d comments "
+                "scanned, %d requests) -> %s",
+                kept, prs_with_comments, len(todo), scanned, requests, out)
     return kept
 
 

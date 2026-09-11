@@ -186,3 +186,30 @@ def test_the_log_gives_prs_done_over_prs_found(tmp_path, caplog):
     assert "PLAN  window 2025-12-01..2025-12-31 | per-pr route" in text
     assert "stage A done: 7 PRs active in the window" in text
     assert "PR 3/7" in text and "DONE  PR 7/7" in text
+
+
+def test_the_highest_numbered_prs_are_read_first(tmp_path):
+    """Newest first. Of the 2,636 PRs a December window turned up, 1,479 were opened before
+    September and merely touched inside it, yielding ~0.25 comments each; the ~1,150 opened in
+    December carry the mass. Ascending order put those last, so half an hour of a real run looked
+    like it was keeping nothing, and an interrupted run had done only the low-yield tail."""
+
+    prs = [_pr(n, "2025-12-05", "2025-12-20") for n in (100, 33444, 5000, 32900)]
+    _, _, client, _ = _run(tmp_path, prs, [])
+    order = [int(p.split("/pulls/")[1].split("/")[0])
+             for p in client.requests if p.endswith("/comments")]
+    assert order == [33444, 32900, 5000, 100]
+
+
+def test_the_progress_line_says_comments_and_counts_the_prs_that_yielded_any(tmp_path, caplog):
+    """`scanned`/`kept` count comments, not PRs -- the unlabelled version was read as PRs and
+    looked like a bug. A PR's comment list carries every comment it ever received."""
+
+    prs = [_pr(n, "2025-12-05", "2025-12-20") for n in (1, 2, 3, 4)]
+    # Only PR 3 has a comment inside the window; PR 4's is a year earlier.
+    comments = [_comment(30, 3, "2025-12-06"), _comment(40, 4, "2024-12-06")]
+    with caplog.at_level(logging.INFO, logger="per-pr-test"):
+        kept, rows, _, _ = _run(tmp_path, prs, comments, log_every_prs=2)
+    assert kept == 1
+    assert "comments scanned 2, kept 1 from 1 PRs" in caplog.text
+    assert "from 1 of 4 PRs" in caplog.text
