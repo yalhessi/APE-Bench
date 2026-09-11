@@ -113,5 +113,8 @@ reviewer view beside the old ones.
   file: it reproduces the frozen ledgers byte for byte and still changes if any endpoint byte does.
 * The acceptance baseline keeps PR authors' self-comments (tagged `commenter_is_author`), so the new
   corpus is a strict superset; `reviewer_view` removes them.
-* `PRECEDENT_CORPUS` is repointed after collection, not in step 8: until then the projection holds
-  only scored PRs, which it excludes, and an empty corpus would silently disable retrieval.
+* `PRECEDENT_CORPUS` is repointed after collection, not in step 8. Until then the store holds only
+  the 201 seeded bundles: 138 are scored and excluded, and the other 63 (PRs the funnel dropped,
+  mostly for size) yield 74 corpus rows, 42 in the reviewer view. Pointing retrieval at that would
+  shrink its corpus from 43,881 rows to 42. (The step 8 commit message says the projection "holds
+  only scored PRs"; that is wrong in the way just described, and the conclusion is unchanged.)
