@@ -102,8 +102,11 @@ def test_the_real_corpus_resolves_line_level_for_about_seven_in_ten():
     # pinned at 34,640 until December's collection made it false. What must hold is that the
     # report describes the rows the join reads *now* -- a stale report is the defect, and one
     # was on disk for a day after 7,184 September-November rows landed without a rerun.
+    # Re-read through the window the report itself declares, so this also catches a report
+    # built over a different window than the one its numbers are read as.
+    assert "window" in payload, "the report must declare the window it was built over"
     from src.mathlib_review.conventions.review_join import load_rows
-    current = len(load_rows())
+    current = len(load_rows(end=payload["window"]["end"]))
     assert payload["comments"] == current, (
         f"review_join report covers {payload['comments']} comments but its source has {current}; "
         "rerun `python -m src.mathlib_review.conventions.review_join --write`")

@@ -31,7 +31,7 @@ from typing import Any, Dict, List
 from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
 
-from .precedent_bench import DEFAULT_CORPUS, hunk_code, load_corpus
+from .precedent_bench import DEFAULT_CORPUS, VALIDATED_CORPUS_END, hunk_code, load_corpus
 
 DEFAULT_RECORDS = PROJECT_ROOT / "inputs" / "pr_review_v2" / "mathlib_pr_review_v2_annotated_20260612.jsonl"
 OUT_DIR = PROJECT_ROOT / "inputs" / "pr_review_v2" / "precedent_bench"
@@ -152,7 +152,7 @@ def main() -> None:
     logger.info("PRs with >=1 flagged site: %d | sites: %d (%d flagged, %d silent)",
                 len(by_pr), len(all_sites), n_flag, len(all_sites) - n_flag)
 
-    corpus = load_corpus(args.corpus)
+    corpus = load_corpus(args.corpus, end=VALIDATED_CORPUS_END)
     score_sites(all_sites, corpus, args.k, logger)
 
     report: Dict[str, Any] = {"n_prs": len(by_pr), "n_sites": len(all_sites), "n_flagged": n_flag}

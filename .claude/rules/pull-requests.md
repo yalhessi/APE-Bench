@@ -26,8 +26,15 @@ paths:
   30 req/min bucket. Collection is per-PR on the core quota, tiered and resumable.
 - After the full collection passes acceptance: repoint `paths.PRECEDENT_CORPUS` to
   `data/pull_requests/projections/corpus/reviewer_view.jsonl`, rebuild the precedent index, rerun
-  `conventions.review_join --write`, re-measure. Until then the index is built from the old
-  33%-recall corpus, and every corpus-derived level understates by roughly 2.5×.
+  `conventions.review_join --write --end <date>`, re-measure. Until then the index is built from the
+  old 33%-recall corpus, and every corpus-derived level understates by roughly 2.5×.
+- **The corpus's end date is no longer a date gate, so state the window.** It stopped at 2025-08-31,
+  before every eval PR, so the analysis readers were leak-safe whether or not they gated; collection
+  now runs to 2026-08-31. `precedent_bench.load_corpus` and `review_join.load_*` therefore take a
+  **required** `end` and `review_join --write` a required `--end`, recorded in `report.json`'s
+  `window`. A join that feeds a *brief* must be gated at `commit_date(base_sha)`; `--end all` is only
+  for descriptive month statistics. The live retrieval path is separately safe -- `precedent_index`
+  goes through `RetrievalGate`, where an undated row is `UNDATED = -1` and never eligible.
 - GitHub ends a review comment's `diff_hunk` at the commented line, so the situated declaration is
   the one enclosing the hunk's *tail*. Facets are conditioning metadata, never the join key (a
   facet-keyed join fit 4–8% of requests); the enforced component is the A→B ledger from

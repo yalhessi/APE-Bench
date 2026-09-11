@@ -10,21 +10,51 @@ import pytest
 from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX, ZULIP_STORE
 
 
-def test_the_research_corpus_loader_excludes_scored_prs_and_pins_its_window():
+def test_the_analysis_loaders_refuse_to_pick_a_corpus_window_for_you():
+    """The corpus's end date used to *be* the date gate.
+
+    It stopped at 2025-08-31, before every eval PR (the 201 bundles open 2025-11-07..12-31), so
+    `precedent_bench`'s four callers were leak-safe whether or not they gated, and
+    `review_join` applied no window at all and was leak-safe too. Collection now runs to
+    2026-08-31. Keeping the old pin silently discards a year of review; dropping it silently
+    hands a query its own future. Both are invisible at the call site, so neither loader has a
+    default any more -- omitting the window is a `TypeError`, not a guess."""
+
+    from src.datasets.pr_review_v2.precedent_bench import load_corpus
+    from src.mathlib_review.conventions.review_join import load_corpus_rows, load_index_rows, load_rows
+
+    for loader in (load_corpus, load_corpus_rows, load_index_rows, load_rows):
+        with pytest.raises(TypeError, match="end"):
+            loader()
+
+
+def test_the_research_corpus_loader_excludes_scored_prs_and_its_window_binds():
     """`precedent_bench`, `precedent_prime`, `site_worklist` and `site_discrimination` share this
     loader and applied neither exclusion nor window; the corpus now reaches December 2025, the
-    month their queries come from."""
+    month their queries come from.
+
+    The window assertion is over the *raw* file, not over rows the loader already filtered --
+    the previous form (`max(created_at) <= VALIDATED_CORPUS_END` on the loaded rows) was true by
+    construction and so could not observe the corpus growing underneath it."""
 
     if not PRECEDENT_CORPUS.is_file():
         pytest.skip("corpus absent")
     from src.datasets.pr_review_v2.precedent_bench import VALIDATED_CORPUS_END, load_corpus
     from src.datasets.pull_requests.definitions import scored_pr_numbers
 
-    rows = load_corpus(PRECEDENT_CORPUS)
+    raw = [json.loads(l) for l in PRECEDENT_CORPUS.read_text().splitlines() if l.strip()]
+    raw_end = max(str(r.get("created_at") or "")[:10] for r in raw)
+
+    rows = load_corpus(PRECEDENT_CORPUS, end=VALIDATED_CORPUS_END)
     assert rows
-    assert max(r["created_at"][:10] for r in rows) <= VALIDATED_CORPUS_END == "2025-08-31"
     assert not {r["pr_number"] for r in rows} & scored_pr_numbers()
-    assert len(load_corpus(PRECEDENT_CORPUS, end=None)) > len(rows)
+    assert max(r["created_at"][:10] for r in rows) <= VALIDATED_CORPUS_END == "2025-08-31"
+
+    unwindowed = load_corpus(PRECEDENT_CORPUS, end=None)
+    if raw_end > VALIDATED_CORPUS_END:
+        assert len(unwindowed) > len(rows), (
+            f"the corpus reaches {raw_end}, past the pinned window {VALIDATED_CORPUS_END}, yet "
+            "windowing dropped nothing -- the window is not binding")
 
 
 def test_a_precedent_index_built_from_a_different_corpus_is_refused(tmp_path):
