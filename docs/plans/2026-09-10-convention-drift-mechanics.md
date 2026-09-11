@@ -561,6 +561,77 @@ generalise/weaken 16.1 → 25.3; `encard` 0.5 → 2.9; deprecation 5.2 → 14.1;
 Four of the five "unknown / post-cutoff" conventions now have dated enforcement evidence in a
 gold-free source.
 
+### The corpus holds 40 % of Mathlib review, and the cause is two pipelines with two definitions
+
+Raised by the user as a design objection -- "having two different PR extraction pipelines is a
+very bad idea" -- and the objection turns out to name a live correctness bug, not just
+duplication.
+
+There are two collectors. `fetch.py` pulls a per-PR *bundle* (the PR, reviews, review comments,
+issue comments, commits, files, timeline) for the eval side. `corpus.py` pulls review comments
+for the retrieval side. Since the per-PR rewrite they hit the **same endpoint**,
+`/pulls/{n}/comments`, so a PR in both windows is fetched twice. That is the cheap half of the
+problem.
+
+The expensive half is that they decide *who counts as a reviewer* differently.
+
+* The eval side uses `_is_reviewer(login, association, author, roster)`: a **curated roster**
+  first, `author_association` only as a fallback.
+* `corpus.py`'s `keep_comment` uses `author_association` **alone**.
+
+`roster.py`'s own docstring states why that is wrong, and states it in the same words the
+measurement below produces: *"GitHub's author_association only reports MEMBER for public org
+memberships -- active Mathlib maintainers routinely appear as CONTRIBUTOR (observed on real
+PRs), so association alone misses reviewers."* The roster exists, has 59 logins, and is wired
+into the release builder. The corpus pipeline, written separately, reimplemented the test using
+only the fallback.
+
+Measured on the 201 cached bundles -- substantive, non-bot, `.lean` review comments:
+
+```
+roster AND association    67      kept by either definition
+association only          48      kept by corpus.py
+ROSTER ONLY              170      DROPPED by corpus.py -- real reviewers
+neither                   26      genuine non-reviewers
+                         ---
+corpus.py recall of real reviewers: 40 %
+```
+
+The dropped reviewers are the core of Mathlib review: YaelDillies 39 comments, **j-loreaux 38**,
+grunweg 29, JovanGerb 14, robin-carlier 10, joelriou 9, Ruben-VandeVelde, ocfnash, sgouezel,
+Vierkantor, adomani, alreadydone, dagurtomas, b-mehta. **j-loreaux is the reviewer whose
+comments generated PR 33098's gold** -- the `grind [minimalCover]` request this entire iteration
+is built on. He is on the roster, his association on that PR is CONTRIBUTOR, and so every one of
+his comments has been excluded from the retrieval corpus from the start.
+
+**What this does to the numbers in this document.** Everything measured on the corpus is a 40 %
+sample biased toward people with repository write access. Levels are understated by roughly
+2.5x: `grind` at 22.4 per thousand in December is probably ~50, `by_cases!`'s 12 December
+comments probably ~30. *Directions* are likely to survive, because association is stable per
+login (0 of 41 logins varied across the eval window), but that is an argument, not a
+measurement -- someone gaining COLLABORATOR mid-window would manufacture a trend, and that has
+not been checked over 22 months. The August gate's 80-comment sample was drawn from the 40 %, so
+no YaelDillies or j-loreaux comment was ever rated; the gate's conclusion (facet keys do not
+describe what reviewers ask for) does not depend on the sample's composition, but the category
+mix does.
+
+**The consolidation, smallest first.**
+
+1. **One reviewer definition.** `corpus.py` calls the same roster-primary `_is_reviewer` the
+   release builder uses. The PR author, needed to drop self-comments, comes free from stage A:
+   the pull-request listing already carries each PR's `user.login`.
+2. **One fetch per PR.** `corpus.py` reads `review_comments` out of a cached bundle when one
+   exists instead of re-requesting it.
+3. **One discovery stage.** `fetch.py`'s `search_candidate_numbers` uses the search API, which
+   is capped at 30 requests a minute -- the same cap that killed the December run. Replace it
+   with the core-bucket listing walk, shared.
+
+**And the corpus has to be re-collected.** Only the rows that passed the filter were kept, so
+the missing 60 % cannot be recovered from disk. December is one run. The 2024-03..2025-08
+window is a wide per-PR run (the listing endpoint that built it originally is dead), roughly
+8,000-10,000 PRs, a few hours. **The September-November fetch should wait for the filter fix**,
+or it collects three more months at 40 % recall.
+
 ### August gate result (80 comments, two three-rater panels, agreement 0.96)
 
 ```
