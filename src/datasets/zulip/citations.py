@@ -36,7 +36,9 @@ ZULIP_LINK = re.compile(r"https://leanprover\.zulipchat\.com/[^\s\)\]\">]+")
 #: Trailing punctuation swept up by the URL pattern when a link ends a sentence.
 _TRAILING = ".,;:!?'\""
 
-MAINTAINER_ASSOCIATIONS = {"MEMBER", "OWNER", "COLLABORATOR"}
+#: Shared with every other PR pipeline. This copy compared without `.upper()`, the only one of
+#: five that did not normalise case.
+from src.datasets.pull_reviews.definitions import MAINTAINER_ASSOCIATIONS  # noqa: E402
 
 
 def iter_citations(path: Path = REVIEW_COMMENTS) -> Iterator[Dict]:
@@ -130,7 +132,7 @@ def summarize(records: List[Dict]) -> Dict:
     resolved = [r for r in records if r["resolved"]]
     maintainer = [
         r for r in records
-        if (r.get("author_association") or "") in MAINTAINER_ASSOCIATIONS
+        if (r.get("author_association") or "").upper() in MAINTAINER_ASSOCIATIONS
     ]
     reasons: Dict[str, int] = {}
     for record in records:

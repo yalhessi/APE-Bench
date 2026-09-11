@@ -49,11 +49,10 @@ _DISTINCTIVE_IDIOMS = {
 
 
 def load_reviewer_roster(path: Path) -> Set[str]:
-    return {
-        line.strip().lower()
-        for line in path.read_text().splitlines()
-        if line.strip() and not line.lstrip().startswith("#")
-    }
+    """The reviewer roster -- one of five loaders, now one (`pull_reviews.definitions`)."""
+    from src.datasets.pull_reviews.definitions import load_roster
+
+    return set(load_roster(path))
 
 
 def build_retrieval_cutoffs(segments: Iterable[ReviewRoundSegment]) -> List[RetrievalCutoff]:

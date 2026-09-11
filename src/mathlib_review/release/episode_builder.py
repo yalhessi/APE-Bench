@@ -1,10 +1,21 @@
 """Derive first-review episodes directly from raw GitHub events and cached Git compares."""
 
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from src.datasets.pull_reviews.definitions import (
+    APPROVAL_SIGNAL_RE,
+    BORS_MERGED_TITLE_RE,
+    REVERT_TITLE_RE,
+    TOOLCHAIN_ONLY_FILES,
+    clean_description as _clean_description,
+    clean_title as _clean_title,
+    is_bot as _is_bot,
+    is_reviewer as _is_reviewer,
+    is_substantive_event as _is_substantive,
+    load_roster,
+)
 from src.mathlib_review.diffs import review_diff
 from src.mathlib_review.release.episodes import changed_files_from_diff
 from src.mathlib_review.release.events import events_from_bundle
@@ -20,21 +31,13 @@ from src.mathlib_review.schema import (
 
 RAW_EPISODE_BUILDER_VERSION = "raw_first_round_v1"
 MULTI_ROUND_BUILDER_VERSION = "raw_multi_round_v1"
-MAINTAINER_ASSOCIATIONS = {"MEMBER", "OWNER", "COLLABORATOR"}
-TOOLCHAIN_ONLY_FILES = {"lean-toolchain", "lakefile.lean", "lakefile.toml", "lake-manifest.json"}
-BORS_MERGED_TITLE_RE = re.compile(r"^\s*\[merged by bors\](?:\s|-|$)", re.I)
-BORS_TITLE_PREFIX_RE = re.compile(r"^\s*\[(?:merged|closed) by bors\]\s*-?\s*", re.I)
-REVERT_TITLE_RE = re.compile(r"^\s*revert\b", re.I)
-APPROVAL_SIGNAL_RE = re.compile(r"\bbors\s+(?:merge|r\+|d\+|d=)|\bmaintainer\s+merge\b", re.I)
-TRIVIAL_FEEDBACK_PATTERNS = (
-    r"\bmaintainer\s+merge\b",
-    r"\bbors\s+(?:merge|r\+|d\+|d=)",
-    r"\blgtm\b",
-    r"\blooks good(?: to me)?\b",
-    r"\bthanks?\b",
-    r"\bthank you\b",
-    r":\w+:",
-)
+
+# Who counts as a reviewer, what counts as substance, which titles and files gate the funnel: all
+# of it lives in `src/datasets/pull_reviews/definitions.py` now. This module and `derive.py` held
+# byte-identical copies, and the retrieval corpus held a third that diverged (association alone,
+# no author rule). The builder's output is unchanged -- `test_pull_reviews_reproduces_raw_release`
+# rebuilds `dev-raw-0.3.0` byte for byte -- and the private names are kept as aliases so the
+# funnel below reads as it did.
 
 
 @dataclass(frozen=True)
@@ -48,62 +51,6 @@ class MultiRoundBuildResult:
     episodes: List[ReviewEpisodeInput]
     boundaries: List[ReviewEpisodeBoundary]
     segments: List[ReviewRoundSegment]
-
-
-def _strip_trivial_tokens(body: Any) -> str:
-    text = re.sub(r"\s+", " ", str(body or "").strip().lower())
-    for pattern in TRIVIAL_FEEDBACK_PATTERNS:
-        text = re.sub(pattern, " ", text)
-    text = re.sub(r"[`*_>#:\-.,!?()\[\]{}\"'/\\~+]+", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def _clean_title(title: Any) -> str:
-    return BORS_TITLE_PREFIX_RE.sub("", str(title or "")).strip()
-
-
-def _clean_description(body: Any) -> str:
-    text = str(body or "").replace("\r\n", "\n").replace("\r", "\n")
-    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
-    kept = []
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped == "---" or "gitpod.io/" in stripped.lower():
-            continue
-        kept.append(line.rstrip())
-    return re.sub(r"\n{3,}", "\n\n", "\n".join(kept)).strip()
-
-
-def _is_bot(login: Optional[str]) -> bool:
-    lowered = str(login or "").lower()
-    return not lowered or lowered.endswith("[bot]") or lowered.endswith("-bot") or lowered in {
-        "bors",
-        "github-actions",
-        "leanprover-community-bot",
-        "leanprover-community-mathlib4-bot",
-    }
-
-
-def load_roster(path: Path) -> set[str]:
-    return {
-        line.strip().lower()
-        for line in path.read_text().splitlines()
-        if line.strip() and not line.strip().startswith("#")
-    }
-
-
-def _is_reviewer(
-    login: Optional[str], association: Optional[str], author: str, roster: set[str]
-) -> bool:
-    return bool(
-        login
-        and not _is_bot(login)
-        and login.lower() != author.lower()
-        and (
-            login.lower() in roster
-            or str(association or "").upper() in MAINTAINER_ASSOCIATIONS
-        )
-    )
 
 
 def _commit_times(bundle: Dict[str, Any]) -> List[Tuple[str, str]]:
@@ -185,12 +132,6 @@ def _normalized_feedback_events(
         )
     order = {"review": 0, "review_comment": 1, "issue_comment": 2}
     return sorted(events, key=lambda event: (event["at"], order[event["kind"]], event["source_event_id"]))
-
-
-def _is_substantive(event: Dict[str, Any]) -> bool:
-    return event.get("state") == "CHANGES_REQUESTED" or bool(
-        _strip_trivial_tokens(event.get("body"))
-    )
 
 
 def _ready_for_review_floor(bundle: Dict[str, Any]) -> Optional[str]:

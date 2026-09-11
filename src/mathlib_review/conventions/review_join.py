@@ -245,9 +245,9 @@ def load_corpus_rows(corpus: Path = PRECEDENT_CORPUS) -> List[Dict[str, Any]]:
     Eval PRs are excluded here exactly as the index build excludes them.
     """
 
-    from src.mathlib_review.corpus import eval_pr_numbers
+    from src.datasets.pull_reviews.definitions import scored_pr_numbers
 
-    excluded = eval_pr_numbers()
+    excluded = scored_pr_numbers()
     rows = []
     for line in corpus.read_text(encoding="utf-8").splitlines():
         if not line.strip():

@@ -40,6 +40,23 @@ PRECEDENT_INDEX = Path("data/pr_review_v5/precedent_index")
 #: The Zulip discussion store. Read-only, and every read is gated (`as_of` + `exclude_pr`).
 ZULIP_STORE = Path("data/zulip/corpus/zulip.sqlite3")
 
+# --- The PR store --------------------------------------------------------------------
+#
+# One raw directory per PR, from which every PR dataset is a projection. Payloads are gitignored
+# (1-2 GB, a day of quota to rebuild); provenance is tracked, the Zulip store's pattern. See
+# `src/datasets/pull_reviews/__init__.py`.
+
+#: The raw store: `pr/<n>/` payloads, `index.sqlite3`, `projections/`. Gitignored.
+PULL_REVIEWS_STORE = Path("data/pull_reviews")
+
+#: Tracked provenance for the store: manifest, per-PR endpoint hashes, collection report,
+#: acceptance baseline, dated rosters.
+PULL_REVIEWS_TRACKED = Path("inputs/pull_reviews")
+
+#: Dated roster snapshots (spec §3.1 "snapshotted into a versioned file"). The v2 roster below
+#: stays where nine frozen manifests pin it; new snapshots go here.
+PULL_REVIEWS_ROSTERS = PULL_REVIEWS_TRACKED / "rosters"
+
 # --- v5's own roots -----------------------------------------------------------------
 
 RESULTS = Path("results/pr_review_v5")

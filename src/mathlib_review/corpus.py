@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Set
+from typing import Optional, Set
 
 from src.mathlib_review.paths import V2_EVAL_SET
 
@@ -28,13 +28,23 @@ from src.mathlib_review.paths import V2_EVAL_SET
 EVAL_SET = V2_EVAL_SET
 
 
-def eval_pr_numbers(path: Path = EVAL_SET) -> Set[int]:
+def eval_pr_numbers(path: Optional[Path] = None) -> Set[int]:
     """PRs the system is scored on, excluded from the corpus outright.
 
-    Returns empty when the file is absent rather than raising: the corpus can legitimately be
-    built in a tree that has no eval set, and the date cutoff is the primary exclusion.
+    With no argument this is `pull_reviews.definitions.scored_pr_numbers()`: the v2 eval set plus
+    every release manifest's PRs, anchored at the repo root, **raising** if the eval set is
+    missing. It used to read a relative path and return an empty set when absent, on the grounds
+    that "the date cutoff is the primary exclusion" -- which stopped being true when the corpus
+    ran into December, the month the scored PRs are from. A wrong working directory then disabled
+    the only exclusion left, silently.
+
+    With an explicit `path`, reads that file and nothing else (absent -> empty), for tests.
     """
 
+    if path is None:
+        from src.datasets.pull_reviews.definitions import scored_pr_numbers
+
+        return set(scored_pr_numbers())
     if not path.is_file():
         return set()
     return {

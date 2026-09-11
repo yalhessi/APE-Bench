@@ -121,7 +121,7 @@ def build(
     from sentence_transformers import SentenceTransformer
 
     from src.mathlib_review.io import sha256_file
-    from src.mathlib_review.corpus import eval_pr_numbers as _eval_pr_numbers
+    from src.datasets.pull_reviews.definitions import scored_pr_numbers
     from src.mathlib_review.corpus import hunk_code
 
     if not corpus_path.is_file():
@@ -133,7 +133,7 @@ def build(
     # The corpus builder already excludes eval PRs at collection time. Re-applying it here
     # costs nothing and means the index is safe even if it is ever pointed at a corpus whose
     # provenance is not this repo's.
-    excluded = _eval_pr_numbers()
+    excluded = set(scored_pr_numbers())
     rows = [row for row in rows if row.get("pr_number") not in excluded]
     if logger:
         logger.info("precedent index: %d rows (%d eval-PR rows excluded)",

@@ -29,16 +29,10 @@ from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 import httpx
 import yaml
 
-DATA_URL = (
-    "https://api.github.com/repos/leanprover-community/leanprover-community.github.io"
-    "/contents/data/{name}"
-)
-
-#: Teams whose members set or enforce Mathlib norms. Mirrors
-#: `pr_review_v2.roster.ROSTER_TEAMS` — the same three teams, for the same reason:
-#: GitHub's author_association reports MEMBER only for *public* org membership, so
-#: association alone misses active maintainers.
-ROSTER_TEAMS = {"Admin team", "Mathlib maintainers", "Mathlib reviewers"}
+#: The fetch URL and the three roster teams are shared with the reviewer roster: they used to be
+#: spelled here and in `pr_review_v2/roster.py`, independently, for the same reason.
+from src.datasets.pull_reviews.roster import DATA_URL, ROSTER_TEAMS  # noqa: E402
+from src.datasets.pull_reviews.roster import fetch_yaml as _fetch_yaml  # noqa: E402
 
 IDENTITY_VERSION = "zulip-identity/1"
 DEFAULT_PATH = Path(__file__).parent / "data" / "identity.tsv"
@@ -82,14 +76,6 @@ class Identities:
 
     def rows(self) -> List[Person]:
         return sorted(self._people.values())
-
-
-def _fetch_yaml(client: httpx.Client, name: str):
-    response = client.get(
-        DATA_URL.format(name=name), headers={"Accept": "application/vnd.github.raw+json"}
-    )
-    response.raise_for_status()
-    return yaml.safe_load(response.text)
 
 
 def fetch_identities() -> Tuple[Identities, List[str]]:

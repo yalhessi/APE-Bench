@@ -46,9 +46,10 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
 
-from .derive import MAINTAINER_ASSOCIATIONS, is_bot, strip_trivial_tokens
+from src.datasets.pull_reviews.definitions import (
+    MAINTAINER_ASSOCIATIONS, is_bot, is_lean_anchor, is_substantive_text, scored_pr_numbers,
+)
 from .github import GitHubClient
-from src.mathlib_review.corpus import eval_pr_numbers
 
 REPO = "leanprover-community/mathlib4"
 DEFAULT_OUT = PROJECT_ROOT / "inputs" / "pr_review_v2" / "corpus" / "mathlib_review_comments.jsonl"
@@ -61,15 +62,21 @@ def pr_number(comment: Dict[str, Any]) -> Optional[int]:
 
 
 def keep_comment(comment: Dict[str, Any]) -> bool:
-    """A substantive maintainer comment on a .lean file."""
+    """The *legacy* corpus gate: a substantive `.lean` comment whose author association is
+    MEMBER/OWNER/COLLABORATOR. Superseded, and kept only so this collector's output stays
+    comparable with the 43,881-row acceptance baseline it produced.
+
+    It is not spec §3.1. It has no roster, so it drops every reviewer GitHub reports as
+    CONTRIBUTOR, and no author rule, so it keeps PR authors replying on their own PRs -- on the 201
+    cached bundles, 144 and 44 comments respectively. The corpus is now a projection of the PR
+    store (`src/datasets/pull_reviews/projections/corpus.py`), which keeps every such comment and
+    *tags* reviewer status through `definitions.classify_commenter` instead of filtering on it.
+    """
     login = (comment.get("user") or {}).get("login")
-    if not login or is_bot(login):
-        return False
-    if (comment.get("author_association") or "").upper() not in MAINTAINER_ASSOCIATIONS:
-        return False
-    if not str(comment.get("path") or "").lower().endswith(".lean"):
-        return False
-    return bool(strip_trivial_tokens(comment.get("body")))
+    return (not is_bot(login)
+            and (comment.get("author_association") or "").upper() in MAINTAINER_ASSOCIATIONS
+            and is_lean_anchor(comment.get("path"))
+            and is_substantive_text(comment.get("body")))
 
 
 def corpus_row(comment: Dict[str, Any]) -> Dict[str, Any]:
@@ -553,9 +560,7 @@ def _eval_pr_numbers() -> Set[int]:
     excludes them). Defined in `mathlib_review.corpus`, which is where v5's index reads it
     from too -- it used to reach in here for it across a package boundary."""
 
-    return eval_pr_numbers(
-        PROJECT_ROOT / "inputs" / "pr_review_v2"
-        / "mathlib_pr_review_v2_actionable_20260618.jsonl")
+    return set(scored_pr_numbers())
 
 
 def main() -> None:

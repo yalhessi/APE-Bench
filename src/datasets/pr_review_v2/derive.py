@@ -30,27 +30,30 @@ from .schema import (
     ValidationBlock,
 )
 
-MAINTAINER_ASSOCIATIONS = {"MEMBER", "OWNER", "COLLABORATOR"}
+# The identity, substance, title and file rules shared with the release builder live in
+# `src/datasets/pull_reviews/definitions.py`; this module and `episode_builder.py` held
+# byte-identical copies. Names are re-exported because the v2 tests and `corpus.py` import them.
+from src.datasets.pull_reviews.definitions import (  # noqa: E402
+    APPROVAL_SIGNAL_RE,
+    BORS_MERGED_TITLE_RE,
+    BORS_TITLE_PREFIX_RE,
+    MAINTAINER_ASSOCIATIONS,
+    REVERT_TITLE_RE,
+    TOOLCHAIN_ONLY_FILES,
+    TRIVIAL_FEEDBACK_PATTERNS,
+    classify_commenter,
+    clean_description as clean_input_description,
+    clean_title as clean_input_title,
+    is_bot,
+    is_substantive_event as _is_substantive,
+    load_roster as _load_roster_file,
+    strip_trivial_tokens,
+)
+
 AI_GENERATED_LABELS = {"llm-generated", "llm_generated", "ai-generated"}
-BORS_MERGED_TITLE_RE = re.compile(r"^\s*\[merged by bors\](?:\s|-|$)", re.IGNORECASE)
-BORS_TITLE_PREFIX_RE = re.compile(r"^\s*\[(?:merged|closed) by bors\]\s*-?\s*", re.IGNORECASE)
-REVERT_TITLE_RE = re.compile(r"^\s*revert\b", re.IGNORECASE)
 AUTOMATED_SWEEP_TITLE_RE = re.compile(
     r"^\s*chore(\(|:)|deprecat(e|ion)s? .*sweep|bump .*(toolchain|dependenc)", re.IGNORECASE
 )
-TOOLCHAIN_ONLY_FILES = {"lean-toolchain", "lakefile.lean", "lakefile.toml", "lake-manifest.json"}
-
-# Delegation/merge commands: command-only messages set the verdict but are not findings (§3.2).
-APPROVAL_SIGNAL_RE = re.compile(r"\bbors\s+(?:merge|r\+|d\+|d=)|\bmaintainer\s+merge\b", re.IGNORECASE)
-TRIVIAL_FEEDBACK_PATTERNS = [
-    r"\bmaintainer\s+merge\b",
-    r"\bbors\s+(?:merge|r\+|d\+|d=)",
-    r"\blgtm\b",
-    r"\blooks good(?: to me)?\b",
-    r"\bthanks?\b",
-    r"\bthank you\b",
-    r":\w+:",  # :emoji: shortcodes
-]
 
 DeriveResult = Union[PRReviewV2Record, SkipReason]
 
@@ -59,62 +62,12 @@ DeriveResult = Union[PRReviewV2Record, SkipReason]
 # small text/identity helpers
 # ---------------------------------------------------------------------------
 
-def strip_trivial_tokens(body: Optional[str]) -> str:
-    text = re.sub(r"\s+", " ", str(body or "").strip().lower())
-    for pattern in TRIVIAL_FEEDBACK_PATTERNS:
-        text = re.sub(pattern, " ", text)
-    text = re.sub(r"[`*_>#:\-.,!?()\[\]{}\"'/\\~+]+", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def clean_input_title(title: Optional[str]) -> str:
-    """Remove post-hoc Mathlib/Bors outcome prefixes from model-visible titles."""
-    return BORS_TITLE_PREFIX_RE.sub("", str(title or "")).strip()
-
-
-def clean_input_description(body: Optional[str]) -> str:
-    """Remove PR-template boilerplate from the model-visible description.
-
-    We keep author-written prose, including text that appears below the template
-    separator, but strip hidden HTML comments and standard convenience badges.
-    """
-    text = str(body or "").replace("\r\n", "\n").replace("\r", "\n")
-    text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
-
-    kept_lines: List[str] = []
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped:
-            kept_lines.append("")
-            continue
-        if stripped == "---":
-            continue
-        if "gitpod.io/" in stripped.lower():
-            continue
-        kept_lines.append(line.rstrip())
-
-    cleaned = "\n".join(kept_lines)
-    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
-    return cleaned.strip()
-
-
-def is_bot(login: Optional[str]) -> bool:
-    if not login:
-        return True
-    lowered = login.lower()
-    return lowered.endswith("[bot]") or lowered.endswith("-bot") or lowered in {
-        "bors", "github-actions", "leanprover-community-bot", "leanprover-community-mathlib4-bot",
-    }
-
-
 def load_roster(config: PRReviewV2Config) -> Set[str]:
+    """The configured roster, or empty when none is configured (derive then falls back to
+    `author_association`, and `ReviewerIdentity` stops counting disagreements)."""
     if not config.roster_file or not config.roster_file.exists():
         return set()
-    return {
-        line.strip().lower()
-        for line in config.roster_file.read_text().splitlines()
-        if line.strip() and not line.strip().startswith("#")
-    }
+    return set(_load_roster_file(config.roster_file))
 
 
 class ReviewerIdentity:
@@ -127,15 +80,11 @@ class ReviewerIdentity:
         self.association_only_hits = 0  # roster-vs-association disagreement counter (§7.7)
 
     def is_reviewer(self, login: Optional[str], association: Optional[str]) -> bool:
-        if not login or is_bot(login) or login.lower() == self.pr_author:
-            return False
-        if login.lower() in self.roster:
-            return True
-        if self.use_fallback and (association or "").upper() in MAINTAINER_ASSOCIATIONS:
-            if self.roster:
-                self.association_only_hits += 1
-            return True
-        return False
+        decision = classify_commenter(login, association, self.pr_author, self.roster,
+                                      use_association_fallback=self.use_fallback)
+        if decision.is_reviewer and decision.basis == "association" and self.roster:
+            self.association_only_hits += 1
+        return decision.is_reviewer
 
 
 # ---------------------------------------------------------------------------
@@ -211,12 +160,6 @@ def _normalize_events(bundle: Dict[str, Any], identity: ReviewerIdentity) -> Lis
     kind_order = {"review_body": 0, "inline": 1, "issue_comment": 2}
     events.sort(key=lambda e: (e["submitted_at"], kind_order[e["kind"]], e["id"]))
     return events
-
-
-def _is_substantive(event: Dict[str, Any]) -> bool:
-    if event.get("state") == "CHANGES_REQUESTED":
-        return True
-    return bool(strip_trivial_tokens(event.get("body")))
 
 
 def _commit_times(bundle: Dict[str, Any]) -> List[Tuple[str, str]]:
