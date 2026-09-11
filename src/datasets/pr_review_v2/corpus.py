@@ -56,9 +56,10 @@ DEFAULT_OUT = PROJECT_ROOT / "inputs" / "pr_review_v2" / "corpus" / "mathlib_rev
 _PR_NUM_RE = re.compile(r"/pulls/(\d+)$")
 
 
-def pr_number(comment: Dict[str, Any]) -> Optional[int]:
-    m = _PR_NUM_RE.search(str(comment.get("pull_request_url") or ""))
-    return int(m.group(1)) if m else None
+# `pr_number` and `corpus_row` -- the 17-field retrieval row -- live with the corpus projection now
+# (`src/datasets/pull_reviews/projections/corpus.py`), which is what builds the corpus. Re-exported
+# so this collector and its tests keep writing identical rows.
+from src.datasets.pull_reviews.projections.corpus import corpus_row, pr_number  # noqa: E402,F401
 
 
 def keep_comment(comment: Dict[str, Any]) -> bool:
@@ -77,35 +78,6 @@ def keep_comment(comment: Dict[str, Any]) -> bool:
             and (comment.get("author_association") or "").upper() in MAINTAINER_ASSOCIATIONS
             and is_lean_anchor(comment.get("path"))
             and is_substantive_text(comment.get("body")))
-
-
-def corpus_row(comment: Dict[str, Any]) -> Dict[str, Any]:
-    """A retrieval situation: the comment + the code it was anchored to."""
-    return {
-        "comment_id": comment.get("id"),
-        "pr_number": pr_number(comment),
-        "path": comment.get("path"),
-        "line": comment.get("line") or comment.get("original_line"),
-        "start_line": comment.get("start_line") or comment.get("original_start_line"),
-        # Where in the hunk the comment sits. `original_position` is 1-based over the hunk's
-        # lines after the `@@` header and is stable across force-pushes, unlike `position`.
-        # Without it a comment can only be attached to *some* declaration in its hunk -- and
-        # measured on a hand-read 50, that was the right declaration 27 times. With it the
-        # declaration enclosing the commented line resolves 9/9 on PR 33098. The precedent
-        # corpus was built without these fields; every row here now carries them.
-        "original_position": comment.get("original_position"),
-        "original_line": comment.get("original_line"),
-        "side": comment.get("side"),
-        "subject_type": comment.get("subject_type"),
-        "diff_hunk": comment.get("diff_hunk") or "",
-        "body": comment.get("body") or "",
-        "commenter": (comment.get("user") or {}).get("login"),
-        "author_association": comment.get("author_association"),
-        "created_at": comment.get("created_at"),
-        "in_reply_to_id": comment.get("in_reply_to_id"),
-        "commit_id": comment.get("commit_id"),
-        "html_url": comment.get("html_url"),
-    }
 
 
 def _existing_state(out: Path) -> Tuple[Set[Any], Optional[str]]:
