@@ -561,6 +561,19 @@ generalise/weaken 16.1 → 25.3; `encard` 0.5 → 2.9; deprecation 5.2 → 14.1;
 Four of the five "unknown / post-cutoff" conventions now have dated enforcement evidence in a
 gold-free source.
 
+### Correction, and what replaced the corpus (2026-09-11)
+
+The 40 % below compared two definitions that both omitted spec §3.1's author rule. With it: of 115
+comments the old gate kept on the 201 cached bundles, 71 were reviewer comments and **44 were PR
+authors replying on their own PRs**, and 144 roster reviewers were missing — **recall 33 %,
+precision 62 %**. The author replies are the "status replies" the August raters kept flagging.
+
+**Every corpus-derived number in this document rests on that corpus** — the `grind` and `by_cases!`
+curves, the suggestion-block shares, the August gate's sample. Directions may survive; levels do
+not. The corpus is now a projection of the PR store (`docs/plans/2026-09-11-pull-review-store.md`)
+with reviewer status tagged, and the plan is to re-measure each of these on its reviewer view beside
+the old value once the full collection has run.
+
 ### The corpus holds 40 % of Mathlib review, and the cause is two pipelines with two definitions
 
 Raised by the user as a design objection -- "having two different PR extraction pipelines is a

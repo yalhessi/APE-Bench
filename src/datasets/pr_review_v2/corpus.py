@@ -494,54 +494,29 @@ def _eval_pr_numbers() -> Set[int]:
     return set(scored_pr_numbers())
 
 
+SUPERSEDED = """\
+This collector is superseded, and running it now would build a corpus with the defect it had:
+reviewer status by `author_association` alone -- 33 % recall and 62 % precision against spec §3.1,
+measured on the 201 cached bundles (it drops roster reviewers GitHub calls CONTRIBUTOR and keeps PR
+authors replying on their own PRs).
+
+The corpus is now a projection of the PR store:
+
+  ./ape/bin/python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31
+  ./ape/bin/python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31 --tier 2
+  ./ape/bin/python -m src.datasets.pull_reviews.index build
+  ./ape/bin/python -m src.datasets.pull_reviews.projections.corpus --acceptance
+
+The functions here remain importable; they produced the frozen acceptance baseline
+(inputs/pull_reviews/acceptance_baseline.json), and their tests pin that behaviour.
+"""
+
+
 def main() -> None:
-    p = argparse.ArgumentParser(description="Stage 0: build the maintainer-comment precedent corpus")
-    p.add_argument("--start", default="2024-03-01", help="YYYY-MM-DD (inclusive) — window start")
-    p.add_argument("--end", default="2025-08-31", help="YYYY-MM-DD (inclusive) — window end. "
-                   "The window MAY now extend into the eval period: leakage is prevented at READ "
-                   "time, where the precedent index gates every row at the consuming PR's own "
-                   "base-commit date (RetrievalGate on created_epoch), and the eval PRs' own "
-                   "comments are excluded here regardless of window. A December PR reading a "
-                   "corpus that runs to November sees September-November discussion and nothing "
-                   "after its base -- which is exactly the evidence the review-corpus window "
-                   "ending in August could not supply.")
-    p.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    p.add_argument("--max-pages", type=int, default=3000, help="hard cap on requests this run")
-    p.add_argument("--interval", type=float, default=0.0, help="seconds between requests")
-    p.add_argument("--log-every-pages", type=int, default=5,
-                   help="print a progress line every N pages (one page = one request of 100)")
-    p.add_argument("--reanchor-every-pages", type=int, default=REANCHOR_EVERY_PAGES,
-                   help="restart the walk from the last created_at every N pages (GitHub 5xxs deep chains)")
-    p.add_argument("--stage-a", choices=["listing", "search"], default="listing",
-                   help="how per-pr mode finds the window's PRs: listing walks the repo's "
-                        "pull-request list on the 5,000/hour core bucket (default); search uses "
-                        "the search API, which allows only 30 requests per minute")
-    p.add_argument("--mode", choices=["per-pr", "listing", "auto"], default="per-pr",
-                   help="per-pr (default): find the window's PRs, then read each one's comments -- "
-                        "shallow, metered against the core bucket, resumable; listing: the "
-                        "repo-level comment stream, one request per 100 comments, but GitHub has "
-                        "been answering HTTP 500 on its first page for this repo since ~2026-09; "
-                        "auto: probe listing once and fall back to per-pr")
-    args = p.parse_args()
-    logger = create_logger()
-    excl = _eval_pr_numbers()
-    logger.info("Corpus window [%s .. %s], excluding %d eval PRs -> %s",
-                args.start, args.end, len(excl), args.out)
-    mode = args.mode
-    if mode == "auto":
-        probe = GitHubClient(None, request_interval_seconds=args.interval, logger=logger, max_retries=1)
-        try:
-            mode = "listing" if listing_is_available(probe, args.start, logger) else "per-pr"
-        finally:
-            probe.close()
-    if mode == "per-pr":
-        build_corpus_per_pr(args.start, args.end, args.out, exclude_prs=excl, logger=logger,
-                            interval=args.interval, stage_a=args.stage_a)
-    else:
-        build_corpus(args.start, args.end, args.out, exclude_prs=excl,
-                     max_pages=args.max_pages, logger=logger, interval=args.interval,
-                     log_every_pages=args.log_every_pages,
-                     reanchor_every_pages=args.reanchor_every_pages)
+    import sys
+
+    print(SUPERSEDED, file=sys.stderr)
+    raise SystemExit(2)
 
 
 if __name__ == "__main__":

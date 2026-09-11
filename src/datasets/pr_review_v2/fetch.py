@@ -66,6 +66,23 @@ def bundle_path(config: PRReviewV2Config, pr_number: int) -> Path:
     return config.cache_dir / "bundles" / f"pr_{pr_number}.json"
 
 
+def _refuse_frozen_cache(target: Path) -> None:
+    """The default cache *is* the frozen one. Eleven release manifests hash
+    `data/pr_review_v2/cache/bundles` and eight hash `.../compares` as trees, so writing one new
+    file there fails `verify_frozen` for every v4 release -- and `main fetch` over a new window did
+    exactly that by default. Reading what is already cached is fine; new PRs go to the PR store
+    (`python -m src.datasets.pull_reviews.collect`)."""
+
+    from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES
+
+    frozen = {LEGACY_V2_BUNDLES.resolve(), LEGACY_V2_COMPARES.resolve()}
+    if target.parent.resolve() in frozen:
+        raise PermissionError(
+            f"refusing to write {target}: that cache is hashed by frozen release manifests, so a new "
+            "file breaks verify_frozen. Collect new PRs into the PR store instead: "
+            "`python -m src.datasets.pull_reviews.collect --start … --end …`.")
+
+
 def fetch_pr_bundle(
     client: GitHubClient,
     config: PRReviewV2Config,
@@ -77,6 +94,7 @@ def fetch_pr_bundle(
     path = bundle_path(config, pr_number)
     if path.exists() and not refresh:
         return json.loads(path.read_text())
+    _refuse_frozen_cache(path)
 
     repo = f"/repos/{config.repo_slug}"
     bundle: Dict[str, Any] = {
@@ -157,6 +175,7 @@ def fetch_compare(
     cache_file = config.cache_dir / "compares" / f"{base_ref.replace('/', '_')}...{head_sha}.json"
     if cache_file.exists() and not refresh:
         return json.loads(cache_file.read_text())
+    _refuse_frozen_cache(cache_file)
 
     payload = client.get_json(
         f"/repos/{config.repo_slug}/compare/{base_ref}...{head_sha}", params={"per_page": 100}

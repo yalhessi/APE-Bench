@@ -160,11 +160,18 @@ def build(
     with (out_dir / "meta.jsonl").open("w", encoding="utf-8") as handle:
         for row in rows:
             handle.write(json.dumps(meta_row(row), ensure_ascii=False) + "\n")
+    # When the corpus is a projection of the PR store, record which view of it was indexed, so a
+    # run plan that seals this manifest says whose comments it could retrieve.
+    projection_manifest = corpus_path.parent / "manifest.json"
+    projection = (json.loads(projection_manifest.read_text()) if projection_manifest.is_file()
+                  else {})
     manifest = {
         "index_version": INDEX_VERSION,
         "model_name": model_name,
         "corpus_path": str(corpus_path),
         "corpus_sha256": sha256_file(corpus_path),
+        "corpus_view": projection.get("view"),
+        "corpus_store_content_sha256": projection.get("store_content_sha256"),
         "rows": len(rows),
         "dim": int(embeddings.shape[1]),
         "excluded_eval_prs": sorted(excluded),

@@ -52,3 +52,33 @@ def test_the_zulip_store_path_is_spelled_once():
     from src.datasets.zulip.config import ZulipConfig
 
     assert ZulipConfig().sqlite_path.resolve() == (PROJECT_ROOT / ZULIP_STORE).resolve()
+
+
+def test_the_v2_fetcher_cannot_write_into_the_frozen_caches(monkeypatch):
+    """Its default cache directory is the one eleven release manifests hash. Reading cached
+    bundles still works; fetching a new PR refuses before any request is made."""
+
+    from src.datasets.pr_review_v2.config import PRReviewV2Config
+    from src.datasets.pr_review_v2 import fetch
+
+    class NoNetwork:
+        def __getattr__(self, name):
+            raise AssertionError("must refuse before touching the network")
+
+    config = PRReviewV2Config()
+    assert fetch.fetch_pr_bundle(NoNetwork(), config, 33098)["pr"]["number"] == 33098   # cached: fine
+    with pytest.raises(PermissionError) as excinfo:
+        fetch.fetch_pr_bundle(NoNetwork(), config, 99999999)
+    assert "pull_reviews.collect" in str(excinfo.value)
+    with pytest.raises(PermissionError):
+        fetch.fetch_compare(NoNetwork(), config, "master", "f" * 40)
+
+
+def test_the_old_corpus_command_refuses_and_names_the_new_one(capsys):
+    from src.datasets.pr_review_v2 import corpus
+
+    with pytest.raises(SystemExit) as excinfo:
+        corpus.main()
+    assert excinfo.value.code == 2
+    err = capsys.readouterr().err
+    assert "pull_reviews.collect" in err and "--acceptance" in err

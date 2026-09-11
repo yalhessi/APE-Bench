@@ -101,6 +101,9 @@ The classifications that turned out to matter: merged vs unmerged vs *abandoned*
 giving up is a different signal than a rejection), AI-authored PRs held separately, and
 maintainer vs drive-by commenters resolved against the roster.
 
+*Superseded for new collection by the PR store (§10); this pipeline is the published-paper
+reference and is left as it is.*
+
 **Outstanding:** the window is 2026-01-01 to 2026-03-31 plus the v2 window
 (2025-09-01 to 2025-12-31). Extending it is mechanical (`config.pr_numbers` pins an exact
 list) but every extension re-opens the matcher-validation question below.
@@ -379,7 +382,26 @@ cannot silently carry a conclusion.
 
 ---
 
-## 10. Planned, not started
+## 10. PR data: one store, many projections — September 2026
+
+**Status: built; the full collection is the user's next run.** Three pipelines used to fetch Mathlib
+PRs and they disagreed about what a review comment is: the retrieval corpus kept comments by
+`author_association` alone, which is **33 % recall and 62 % precision** against spec §3.1 on the
+201 cached bundles — it drops roster reviewers GitHub calls CONTRIBUTOR and keeps PR authors replying
+on their own PRs. The reviewer whose comments generated PR 33098's gold was never in it.
+
+`src/datasets/pull_reviews/` replaces collection with one raw store — a directory per PR of what
+GitHub returned, immutable, in gitignored `data/pull_reviews/`, with provenance tracked under
+`inputs/pull_reviews/` — and derives every dataset as a projection through one definitions module:
+reviewable episodes (the same funnel; both frozen raw releases rebuild from the store byte for
+byte), the review-comment corpus (reviewer status tagged, not filtered; a strict superset of the old
+one), and the A→B ledger. The retrieval cutoff reads the store, so a PR outside the 201 frozen
+bundles can become a task for the first time. Full record and run order:
+`docs/plans/2026-09-11-pull-review-store.md`.
+
+---
+
+## 11. Planned, not started
 
 - **L0 — norm provisioning (`norms/`).** A dated store with
   `lifecycle ∈ {announced, emerging, contested, established, hardened}`, `as_of_date` and
@@ -446,6 +468,15 @@ $R report retrieval --run pr5_specialist4_rep2
 `--run-name` is required: a config describes a PR set and a policy, and which repetition this
 is belongs to neither. Config overrides go through repeated `--set key=value`; a bare trailing
 token is now an error that names it.
+
+PR data is collected into the store and projected from it (needs `GITHUB_TOKEN`; resumable):
+
+```bash
+P="ape/bin/python -m src.datasets.pull_reviews"
+$P.collect --start 2024-03-01 --end 2025-12-31            # tiers 0+1, then prints the pre-gate
+$P.collect --start 2024-03-01 --end 2025-12-31 --tier 2   # tier 2 for pre-gate survivors
+$P.index build && $P.projections.corpus --acceptance && $P.projections.ledger
+```
 
 All tooling must run from the repository root (`paths.assert_repo_root`).
 
