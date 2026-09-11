@@ -29,7 +29,7 @@ December 2025 with neither eval-PR exclusion nor a date window.
 ## What exists now
 
 ```
-src/datasets/pull_reviews/
+src/datasets/pull_requests/
   definitions.py      the one home for what a review comment is (spec §3.1 and its neighbours)
   roster.py           the roster fetch, shared with Zulip identities; writes dated snapshots only
   github.py           GitHubClient (moved; pr_review_v2/github.py re-exports), GraphQL, compares
@@ -42,12 +42,12 @@ src/datasets/pull_reviews/
     corpus.py         the review-comment corpus, reviewer status tagged; acceptance report
     ledger.py         the A->B ledger from suggestion blocks
 
-data/pull_reviews/                gitignored; authoritative raw data
+data/pull_requests/                gitignored; authoritative raw data
   pr/<n>/{listing.json, review_comments.jsonl, reviews.jsonl, issue_comments.jsonl,
           pr.json, commits.jsonl, files.jsonl, timeline.jsonl, review_threads.jsonl,
           body_edits.jsonl, compares/<head>.json, fetch.json}
   index.sqlite3  collect.state.json  manifest.json  projections/{corpus,ledger}/
-inputs/pull_reviews/              tracked provenance
+inputs/pull_requests/              tracked provenance
   manifest.json  prs.jsonl  collection_report.json  acceptance_baseline.json
   acceptance_report.json  rosters/mathlib_roster_<date>.txt
 ```
@@ -91,19 +91,19 @@ The window is 2024-03-01 → 2025-12-31: 23,092 PRs measured with the search API
 
 ```bash
 # tiers 0+1: ~400 listing pages + ~69,000 conversation requests, ~14 h of core quota, resumable
-./ape/bin/python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31
+./ape/bin/python -m src.datasets.pull_requests.collect --start 2024-03-01 --end 2025-12-31
 #   ends with a NEXT line: how many PRs pass the pre-gate and what tier 2 costs
 
 # tier 2 for pre-gate survivors (PR object, commits, files, timeline, GraphQL, compares)
-./ape/bin/python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31 --tier 2
+./ape/bin/python -m src.datasets.pull_requests.collect --start 2024-03-01 --end 2025-12-31 --tier 2
 
-./ape/bin/python -m src.datasets.pull_reviews.index build
-./ape/bin/python -m src.datasets.pull_reviews.projections.corpus --acceptance   # exits non-zero if it fails
-./ape/bin/python -m src.datasets.pull_reviews.projections.ledger
+./ape/bin/python -m src.datasets.pull_requests.index build
+./ape/bin/python -m src.datasets.pull_requests.projections.corpus --acceptance   # exits non-zero if it fails
+./ape/bin/python -m src.datasets.pull_requests.projections.ledger
 ```
 
 Rerun any command to resume. Then, once acceptance passes: repoint `paths.PRECEDENT_CORPUS` to
-`data/pull_reviews/projections/corpus/reviewer_view.jsonl`, rebuild the precedent index (it records
+`data/pull_requests/projections/corpus/reviewer_view.jsonl`, rebuild the precedent index (it records
 the view), rerun `conventions.review_join --write`, and re-measure the convention numbers on the
 reviewer view beside the old ones.
 

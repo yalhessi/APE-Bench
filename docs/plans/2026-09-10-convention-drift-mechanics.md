@@ -570,7 +570,7 @@ precision 62 %**. The author replies are the "status replies" the August raters 
 
 **Every corpus-derived number in this document rests on that corpus** — the `grind` and `by_cases!`
 curves, the suggestion-block shares, the August gate's sample. Directions may survive; levels do
-not. The corpus is now a projection of the PR store (`docs/plans/2026-09-11-pull-review-store.md`)
+not. The corpus is now a projection of the PR store (`docs/plans/2026-09-11-pull-request-store.md`)
 with reviewer status tagged, and the plan is to re-measure each of these on its reviewer view beside
 the old value once the full collection has run.
 

@@ -38,7 +38,7 @@ _TRAILING = ".,;:!?'\""
 
 #: Shared with every other PR pipeline. This copy compared without `.upper()`, the only one of
 #: five that did not normalise case.
-from src.datasets.pull_reviews.definitions import MAINTAINER_ASSOCIATIONS  # noqa: E402
+from src.datasets.pull_requests.definitions import MAINTAINER_ASSOCIATIONS  # noqa: E402
 
 
 def iter_citations(path: Path = REVIEW_COMMENTS) -> Iterator[Dict]:

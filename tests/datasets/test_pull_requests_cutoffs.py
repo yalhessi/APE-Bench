@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pull_reviews.seed import seed_from_legacy
-from src.datasets.pull_reviews.store import PullReviewStore
+from src.datasets.pull_requests.seed import seed_from_legacy
+from src.datasets.pull_requests.store import PullRequestStore
 from src.mathlib_review.agenda.cutoffs import CutoffUnavailable, commit_timestamp, episode_cutoff
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, V4_RELEASES
 from src.mathlib_review.schema import ReviewEpisodeInput
@@ -25,7 +25,7 @@ from src.mathlib_review.schema import ReviewEpisodeInput
 def store(tmp_path_factory):
     if not LEGACY_V2_BUNDLES.is_dir():
         pytest.skip("no legacy bundle cache")
-    store = PullReviewStore(tmp_path_factory.mktemp("store"))
+    store = PullRequestStore(tmp_path_factory.mktemp("store"))
     seed_from_legacy(store)
     return store
 
@@ -50,7 +50,7 @@ def test_every_release_episode_has_the_same_cutoff_from_the_store_and_the_cache(
 
 
 def test_a_collected_pr_resolves_with_no_cache_at_all(store, tmp_path):
-    fresh = PullReviewStore(tmp_path / "fresh")
+    fresh = PullRequestStore(tmp_path / "fresh")
     commits = store.read(33098, "commits")
     fresh.write_endpoint(33098, "commits", commits, request="/commits",
                          fetched_at="2026-09-11T00:00:00Z", source="github")
@@ -66,4 +66,4 @@ def test_an_unresolvable_cutoff_names_both_sources_and_the_collector():
         episode_cutoff(broken)
     message = str(excinfo.value)
     assert "PR store" in message and "cached v2" in message
-    assert "pull_reviews.collect" in message
+    assert "pull_requests.collect" in message

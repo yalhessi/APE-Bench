@@ -1,6 +1,6 @@
 """Every consolidated rule agrees with the copy it replaced, except where the spec says otherwise.
 
-`src/datasets/pull_reviews/definitions.py` replaces five copies of the association set, four bot
+`src/datasets/pull_requests/definitions.py` replaces five copies of the association set, four bot
 predicates, three `.lean` predicates, two trivial-feedback filters and five roster loaders. A
 consolidation is only safe if it is shown to change nothing it did not mean to, so the old
 implementations are kept below **verbatim** as reference oracles and compared over every login,
@@ -21,10 +21,10 @@ from typing import Any, Dict, List, Optional
 
 import pytest
 
-from src.datasets.pull_reviews import definitions as d
+from src.datasets.pull_requests import definitions as d
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_ROSTER
 
-BASELINE = Path("data/pull_reviews/baseline/mathlib_review_comments.jsonl")
+BASELINE = Path("data/pull_requests/baseline/mathlib_review_comments.jsonl")
 
 # --- verbatim pre-consolidation copies (reference oracles; do not "fix") ---------------------
 

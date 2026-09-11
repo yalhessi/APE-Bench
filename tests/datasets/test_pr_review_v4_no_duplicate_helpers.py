@@ -18,7 +18,7 @@ PACKAGE = Path("src/mathlib_review")
 #: The PR store builds manifests, hashes payloads and writes immutable files -- exactly the code
 #: that grew twenty-two private `_load`s here. It gets the same guard from its first commit
 #: rather than after its first copy.
-STORE_PACKAGE = Path("src/datasets/pull_reviews")
+STORE_PACKAGE = Path("src/datasets/pull_requests")
 
 PACKAGES = (PACKAGE, STORE_PACKAGE)
 

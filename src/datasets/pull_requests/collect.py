@@ -1,7 +1,7 @@
 """Collect Mathlib PRs into the store, by tier, resumably, on the core quota.
 
-    python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31          # tiers 0+1
-    python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31 --tier 2 # then tier 2
+    python -m src.datasets.pull_requests.collect --start 2024-03-01 --end 2025-12-31          # tiers 0+1
+    python -m src.datasets.pull_requests.collect --start 2024-03-01 --end 2025-12-31 --tier 2 # then tier 2
 
 **Tier 0** walks `/repos/{repo}/pulls?state=all&sort=updated&direction=desc` from the top until it
 falls below the window, keeping every PR updated on or after the start and created on or before the
@@ -28,7 +28,7 @@ The store is neutral: scored (eval) PRs are collected like any other, because th
 them. Exclusion is a projection's job (`definitions.scored_pr_numbers`), not collection's.
 
 Resumable at every point: an endpoint already recorded for a PR is never fetched again, and the
-tier-0 PR list for a window is cached in `data/pull_reviews/collect.state.json`.
+tier-0 PR list for a window is cached in `data/pull_requests/collect.state.json`.
 """
 
 from __future__ import annotations
@@ -41,19 +41,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
-from src.datasets.pull_reviews.definitions import (
+from src.datasets.pull_requests.definitions import (
     REVERT_TITLE_RE, is_bot, load_roster, roster_sha256,
 )
-from src.datasets.pull_reviews.github import (
+from src.datasets.pull_requests.github import (
     GitHubClient, GitHubError, compact_compare, compare_bytes, fetch_body_edits,
     fetch_review_threads,
 )
-from src.datasets.pull_reviews.store import PullReviewStore, write_atomically
-from src.mathlib_review.paths import PULL_REVIEWS_ROSTERS, PULL_REVIEWS_TRACKED, assert_repo_root
+from src.datasets.pull_requests.store import PullRequestStore, write_atomically
+from src.mathlib_review.paths import PULL_REQUESTS_ROSTERS, PULL_REQUESTS_TRACKED, assert_repo_root
 
 REPO = "leanprover-community/mathlib4"
 OWNER, NAME = REPO.split("/")
-COLLECTOR_VERSION = "pull-review-collector/1"
+COLLECTOR_VERSION = "pull-request-collector/1"
 
 TIER1 = {
     "review_comments": "/repos/{repo}/pulls/{n}/comments",
@@ -88,10 +88,10 @@ def _fmt_seconds(seconds: float) -> str:
 
 
 def latest_roster() -> Path:
-    snapshots = sorted(PULL_REVIEWS_ROSTERS.glob("mathlib_roster_*.txt"))
+    snapshots = sorted(PULL_REQUESTS_ROSTERS.glob("mathlib_roster_*.txt"))
     if not snapshots:
-        raise FileNotFoundError(f"no dated roster under {PULL_REVIEWS_ROSTERS}; run "
-                                "`python -m src.datasets.pull_reviews.roster`")
+        raise FileNotFoundError(f"no dated roster under {PULL_REQUESTS_ROSTERS}; run "
+                                "`python -m src.datasets.pull_requests.roster`")
     return snapshots[-1]
 
 
@@ -141,7 +141,7 @@ def walk_listing(client, start: str, end: str, logger: logging.Logger, *,
 
 # --- the pre-gate ---------------------------------------------------------------------------------
 
-def pre_gate(store: PullReviewStore, number: int, roster) -> Tuple[bool, str]:
+def pre_gate(store: PullRequestStore, number: int, roster) -> Tuple[bool, str]:
     """Whether a PR is worth tier 2, from tier 0 and 1 alone. The changed-files and size gates need
     tier 2 and stay in the funnel; this only drops what the funnel certainly would."""
 
@@ -169,7 +169,7 @@ def pre_gate(store: PullReviewStore, number: int, roster) -> Tuple[bool, str]:
 # --- collection ----------------------------------------------------------------------------------
 
 class Collector:
-    def __init__(self, store: PullReviewStore, client, logger: logging.Logger, *,
+    def __init__(self, store: PullRequestStore, client, logger: logging.Logger, *,
                  roster_path: Path, state_path: Optional[Path] = None, log_every_prs: int = 25):
         self.store = store
         self.client = client
@@ -329,7 +329,7 @@ class Collector:
 class _RecordingCompares:
     """A compare source that notes every head the funnel asks for, then answers from the store."""
 
-    def __init__(self, store: PullReviewStore, number: int):
+    def __init__(self, store: PullRequestStore, number: int):
         self.inner = store.compares(number)
         self.requested: List[str] = []
 
@@ -338,7 +338,7 @@ class _RecordingCompares:
         return self.inner.review_diff(reviewed_head_sha)
 
 
-def _append_report(entry: Dict[str, Any], tracked: Path = PULL_REVIEWS_TRACKED) -> None:
+def _append_report(entry: Dict[str, Any], tracked: Path = PULL_REQUESTS_TRACKED) -> None:
     path = tracked / "collection_report.json"
     history = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {"runs": []}
     history["runs"].append(entry)
@@ -347,7 +347,7 @@ def _append_report(entry: Dict[str, Any], tracked: Path = PULL_REVIEWS_TRACKED) 
 
 def main() -> None:
     from ape.utils.logging import create_logger
-    from src.datasets.pull_reviews.index import write_tracked_export
+    from src.datasets.pull_requests.index import write_tracked_export
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--start", required=True, help="YYYY-MM-DD, inclusive")
@@ -360,7 +360,7 @@ def main() -> None:
     args = parser.parse_args()
     assert_repo_root()
     logger = create_logger()
-    store = PullReviewStore(args.store) if args.store else PullReviewStore()
+    store = PullRequestStore(args.store) if args.store else PullRequestStore()
     roster_path = args.roster or latest_roster()
     client = GitHubClient(None, logger=logger)
     collector = Collector(store, client, logger, roster_path=roster_path)
@@ -387,7 +387,7 @@ def main() -> None:
                     "roster": {"path": str(roster_path), "sha256": roster_sha256(roster_path)},
                     "store_content_sha256": manifest["content_sha256"]})
     logger.info("DONE  %s | store now %d PRs | report appended to %s/collection_report.json",
-                json.dumps(result), manifest["prs"], PULL_REVIEWS_TRACKED)
+                json.dumps(result), manifest["prs"], PULL_REQUESTS_TRACKED)
     if args.tier == 1:
         logger.info("NEXT  %d PRs pass the pre-gate; tier 2 for %d of them costs ~%d requests "
                     "(~%.1f h). Run with --tier 2.", gate["passing"], gate["tier2_needed"],

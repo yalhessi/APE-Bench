@@ -31,9 +31,9 @@ from .schema import (
 )
 
 # The identity, substance, title and file rules shared with the release builder live in
-# `src/datasets/pull_reviews/definitions.py`; this module and `episode_builder.py` held
+# `src/datasets/pull_requests/definitions.py`; this module and `episode_builder.py` held
 # byte-identical copies. Names are re-exported because the v2 tests and `corpus.py` import them.
-from src.datasets.pull_reviews.definitions import (  # noqa: E402
+from src.datasets.pull_requests.definitions import (  # noqa: E402
     APPROVAL_SIGNAL_RE,
     BORS_MERGED_TITLE_RE,
     BORS_TITLE_PREFIX_RE,

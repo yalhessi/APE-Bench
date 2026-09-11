@@ -23,9 +23,9 @@ import yaml
 
 from ape.utils.project import PROJECT_ROOT
 
-# The fetch, the team set and the writer moved to `src/datasets/pull_reviews/roster.py`, which is
+# The fetch, the team set and the writer moved to `src/datasets/pull_requests/roster.py`, which is
 # shared with `zulip/identity.py`. Re-exported so existing callers keep working.
-from src.datasets.pull_reviews.roster import (  # noqa: E402
+from src.datasets.pull_requests.roster import (  # noqa: E402
     DATA_URL, MANUAL_LOGINS, ROSTER_TEAMS, build_roster, dated_roster_path, write_roster,
 )
 

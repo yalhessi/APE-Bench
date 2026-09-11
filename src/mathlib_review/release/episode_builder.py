@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.datasets.pull_reviews.definitions import (
+from src.datasets.pull_requests.definitions import (
     APPROVAL_SIGNAL_RE,
     BORS_MERGED_TITLE_RE,
     REVERT_TITLE_RE,
@@ -35,9 +35,9 @@ RAW_EPISODE_BUILDER_VERSION = "raw_first_round_v1"
 MULTI_ROUND_BUILDER_VERSION = "raw_multi_round_v1"
 
 # Who counts as a reviewer, what counts as substance, which titles and files gate the funnel: all
-# of it lives in `src/datasets/pull_reviews/definitions.py` now. This module and `derive.py` held
+# of it lives in `src/datasets/pull_requests/definitions.py` now. This module and `derive.py` held
 # byte-identical copies, and the retrieval corpus held a third that diverged (association alone,
-# no author rule). The builder's output is unchanged -- `test_pull_reviews_reproduces_raw_release`
+# no author rule). The builder's output is unchanged -- `test_pull_requests_reproduces_raw_release`
 # rebuilds `dev-raw-0.3.0` byte for byte -- and the private names are kept as aliases so the
 # funnel below reads as it did.
 
@@ -83,7 +83,7 @@ def _sources(
         ref = ArtifactRef(path=bundle_path.as_posix(), role="raw_github_bundle", sha256=sha)
     else:
         sha = str(bundle_sha256)
-        ref = ArtifactRef(path="pull_review_store", role="raw_github_bundle", sha256=sha)
+        ref = ArtifactRef(path="pull_request_store", role="raw_github_bundle", sha256=sha)
     return sha, ref, compares if compares is not None else DirectoryCompares(compare_cache)
 
 
@@ -222,8 +222,8 @@ def funnel_and_first_round(
     """The eligibility funnel and first review round for one PR.
 
     Inputs come either from the v2 cache (`bundle_path` + `compare_cache`) or from the PR store
-    (`bundle_sha256` + `compares`, from `PullReviewStore.bundle_sha256` / `.compares`). The two are
-    byte-equivalent for the 201 seeded PRs -- `test_pull_reviews_reproduces_raw_release` rebuilds
+    (`bundle_sha256` + `compares`, from `PullRequestStore.bundle_sha256` / `.compares`). The two are
+    byte-equivalent for the 201 seeded PRs -- `test_pull_requests_reproduces_raw_release` rebuilds
     `dev-raw-0.3.0` from each."""
 
     bundle_hash, source_object, compare_source = _sources(

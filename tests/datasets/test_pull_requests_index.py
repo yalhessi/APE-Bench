@@ -11,11 +11,11 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pull_reviews.index import (
+from src.datasets.pull_requests.index import (
     StaleIndex, build_index, index_content_sha256, open_index, pr_export_rows, store_manifest,
 )
-from src.datasets.pull_reviews.seed import seed_from_legacy
-from src.datasets.pull_reviews.store import PullReviewStore
+from src.datasets.pull_requests.seed import seed_from_legacy
+from src.datasets.pull_requests.store import PullRequestStore
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES
 
 
@@ -23,7 +23,7 @@ from src.mathlib_review.paths import LEGACY_V2_BUNDLES
 def indexed(tmp_path_factory):
     if not LEGACY_V2_BUNDLES.is_dir():
         pytest.skip("no legacy bundle cache")
-    store = PullReviewStore(tmp_path_factory.mktemp("store"))
+    store = PullRequestStore(tmp_path_factory.mktemp("store"))
     seed_from_legacy(store)
     summary = build_index(store)
     return store, summary
@@ -66,7 +66,7 @@ def test_rebuilding_the_same_store_yields_the_same_rows(indexed, tmp_path):
 
 def test_an_index_from_a_different_store_is_refused(indexed, tmp_path):
     store, _ = indexed
-    other = PullReviewStore(tmp_path / "other")
+    other = PullRequestStore(tmp_path / "other")
     seed_from_legacy(other)
     build_index(other)
     other.write_endpoint(99999999, "review_comments", [], request="r", fetched_at="t",

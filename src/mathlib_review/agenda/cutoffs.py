@@ -25,7 +25,7 @@ reviewer is looking at. Three properties make it the right choice:
 cache alone -- and eleven frozen release manifests hash that cache as a tree, so it is
 append-forbidden, so no PR outside the 201 it holds could ever resolve a cutoff, so no new PR could
 become a reviewable task. The store holds the same bytes for those 201 (seeded from the cache), so
-every existing cutoff is unchanged -- `test_pull_reviews_cutoffs` checks every episode of every
+every existing cutoff is unchanged -- `test_pull_requests_cutoffs` checks every episode of every
 release both ways -- and the cache stays as the fallback because it is tracked in git while the store
 is not: a fresh clone must still run the existing releases.
 
@@ -40,7 +40,7 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, Optional
 
-from src.mathlib_review.paths import LEGACY_V2_BUNDLES, PULL_REVIEWS_STORE
+from src.mathlib_review.paths import LEGACY_V2_BUNDLES, PULL_REQUESTS_STORE
 from src.mathlib_review.schema import ReviewEpisodeInput
 
 #: Sentinel: "use the default store if it exists". `None` means "no store".
@@ -60,9 +60,9 @@ def _bundle_path(pr_number: int, legacy_bundles: Path = LEGACY_V2_BUNDLES) -> Pa
 
 
 def _default_store():
-    from src.datasets.pull_reviews.store import PullReviewStore
+    from src.datasets.pull_requests.store import PullRequestStore
 
-    return PullReviewStore() if PULL_REVIEWS_STORE.is_dir() else None
+    return PullRequestStore() if PULL_REQUESTS_STORE.is_dir() else None
 
 
 def commit_timestamp(pr_number: int, sha: str, *, store=_DEFAULT,
@@ -99,9 +99,9 @@ def episode_cutoff(episode: ReviewEpisodeInput) -> str:
     raise CutoffUnavailable(
         f"cannot resolve a retrieval cutoff for episode {episode.episode_id}: "
         f"{episode.reviewed_head_sha[:12]} is in neither the PR store's commits for "
-        f"#{episode.pr_number} ({PULL_REVIEWS_STORE}/pr/{episode.pr_number}) nor the cached v2 "
+        f"#{episode.pr_number} ({PULL_REQUESTS_STORE}/pr/{episode.pr_number}) nor the cached v2 "
         f"bundle ({_bundle_path(episode.pr_number)}). Refusing to run an ungated context read -- "
-        "collect the PR to tier 2 first (`python -m src.datasets.pull_reviews.collect`)."
+        "collect the PR to tier 2 first (`python -m src.datasets.pull_requests.collect`)."
     )
 
 

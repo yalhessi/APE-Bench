@@ -130,7 +130,7 @@ def build(
     from sentence_transformers import SentenceTransformer
 
     from src.mathlib_review.io import sha256_file
-    from src.datasets.pull_reviews.definitions import scored_pr_numbers
+    from src.datasets.pull_requests.definitions import scored_pr_numbers
     from src.mathlib_review.corpus import hunk_code
 
     if not corpus_path.is_file():

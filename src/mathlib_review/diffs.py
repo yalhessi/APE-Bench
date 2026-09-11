@@ -1,7 +1,7 @@
 """Review-time unified diffs from immutable cached compare responses.
 
 Where a compare comes from is a *source*: the flat v2 cache directory (`DirectoryCompares`), or the
-PR store (`PullReviewStore.compares(n)`). The funnel asks a source for `review_diff(head)` and never
+PR store (`PullRequestStore.compares(n)`). The funnel asks a source for `review_diff(head)` and never
 learns which; that is what lets the store replace the frozen cache without the funnel changing.
 """
 

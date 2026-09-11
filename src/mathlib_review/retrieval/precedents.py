@@ -48,8 +48,8 @@ _DISTINCTIVE_IDIOMS = {
 
 
 def load_reviewer_roster(path: Path) -> Set[str]:
-    """The reviewer roster -- one of five loaders, now one (`pull_reviews.definitions`)."""
-    from src.datasets.pull_reviews.definitions import load_roster
+    """The reviewer roster -- one of five loaders, now one (`pull_requests.definitions`)."""
+    from src.datasets.pull_requests.definitions import load_roster
 
     return set(load_roster(path))
 

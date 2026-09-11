@@ -390,14 +390,14 @@ PRs and they disagreed about what a review comment is: the retrieval corpus kept
 201 cached bundles — it drops roster reviewers GitHub calls CONTRIBUTOR and keeps PR authors replying
 on their own PRs. The reviewer whose comments generated PR 33098's gold was never in it.
 
-`src/datasets/pull_reviews/` replaces collection with one raw store — a directory per PR of what
-GitHub returned, immutable, in gitignored `data/pull_reviews/`, with provenance tracked under
-`inputs/pull_reviews/` — and derives every dataset as a projection through one definitions module:
+`src/datasets/pull_requests/` replaces collection with one raw store — a directory per PR of what
+GitHub returned, immutable, in gitignored `data/pull_requests/`, with provenance tracked under
+`inputs/pull_requests/` — and derives every dataset as a projection through one definitions module:
 reviewable episodes (the same funnel; both frozen raw releases rebuild from the store byte for
 byte), the review-comment corpus (reviewer status tagged, not filtered; a strict superset of the old
 one), and the A→B ledger. The retrieval cutoff reads the store, so a PR outside the 201 frozen
 bundles can become a task for the first time. Full record and run order:
-`docs/plans/2026-09-11-pull-review-store.md`.
+`docs/plans/2026-09-11-pull-request-store.md`.
 
 ---
 
@@ -472,7 +472,7 @@ token is now an error that names it.
 PR data is collected into the store and projected from it (needs `GITHUB_TOKEN`; resumable):
 
 ```bash
-P="ape/bin/python -m src.datasets.pull_reviews"
+P="ape/bin/python -m src.datasets.pull_requests"
 $P.collect --start 2024-03-01 --end 2025-12-31            # tiers 0+1, then prints the pre-gate
 $P.collect --start 2024-03-01 --end 2025-12-31 --tier 2   # tier 2 for pre-gate survivors
 $P.index build && $P.projections.corpus --acceptance && $P.projections.ledger

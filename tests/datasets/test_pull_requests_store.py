@@ -13,9 +13,9 @@ import json
 
 import pytest
 
-from src.datasets.pull_reviews.seed import seed_from_legacy
-from src.datasets.pull_reviews.store import (
-    ImmutableEndpointError, IncompletePR, PullReviewStore, StoreError,
+from src.datasets.pull_requests.seed import seed_from_legacy
+from src.datasets.pull_requests.store import (
+    ImmutableEndpointError, IncompletePR, PullRequestStore, StoreError,
 )
 from src.mathlib_review.io import sha256_directory, sha256_file
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES
@@ -25,7 +25,7 @@ from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES
 def seeded(tmp_path_factory):
     if not LEGACY_V2_BUNDLES.is_dir():
         pytest.skip("no legacy bundle cache")
-    store = PullReviewStore(tmp_path_factory.mktemp("store"))
+    store = PullRequestStore(tmp_path_factory.mktemp("store"))
     report = seed_from_legacy(store)
     return store, report
 
@@ -89,7 +89,7 @@ def test_the_caches_are_not_touched(seeded):
 
 
 def test_an_endpoint_value_is_never_rewritten_or_erased(tmp_path):
-    store = PullReviewStore(tmp_path)
+    store = PullRequestStore(tmp_path)
     store.write_endpoint(1, "reviews", [{"id": 1}], request="r", fetched_at="t", source="github")
     assert store.write_endpoint(1, "reviews", [{"id": 1}], request="r", fetched_at="t2",
                                source="github") is False          # identical: no-op
@@ -106,7 +106,7 @@ def test_a_null_can_be_filled_once_by_a_later_successful_fetch(tmp_path):
     failure would omit that PR's description for good (the funnel omits it when `body_edits` is
     null). Filling a null moves no bytes, so it is allowed -- once, and recorded."""
 
-    store = PullReviewStore(tmp_path)
+    store = PullRequestStore(tmp_path)
     store.write_endpoint(2, "body_edits", None, request="graphql", fetched_at="t1", source="github")
     assert store.write_endpoint(2, "body_edits", [{"edited_at": "x"}], request="graphql",
                                 fetched_at="t2", source="github") is True
@@ -119,7 +119,7 @@ def test_a_null_can_be_filled_once_by_a_later_successful_fetch(tmp_path):
 
 
 def test_a_null_endpoint_has_no_file_and_reads_back_as_none(tmp_path):
-    store = PullReviewStore(tmp_path)
+    store = PullRequestStore(tmp_path)
     store.write_endpoint(5, "body_edits", None, request="graphql", fetched_at="t", source="github")
     store.write_endpoint(5, "review_threads", [], request="graphql", fetched_at="t", source="github")
     assert store.read(5, "body_edits") is None
@@ -129,7 +129,7 @@ def test_a_null_endpoint_has_no_file_and_reads_back_as_none(tmp_path):
 
 
 def test_reading_an_unfetched_tier_raises(tmp_path):
-    store = PullReviewStore(tmp_path)
+    store = PullRequestStore(tmp_path)
     store.write_endpoint(7, "review_comments", [], request="r", fetched_at="t", source="github")
     with pytest.raises(IncompletePR):
         store.read(7, "commits")
@@ -139,5 +139,5 @@ def test_reading_an_unfetched_tier_raises(tmp_path):
 
 def test_a_store_inside_the_frozen_caches_is_refused():
     with pytest.raises(StoreError) as excinfo:
-        PullReviewStore(LEGACY_V2_BUNDLES.parent / "store")
+        PullRequestStore(LEGACY_V2_BUNDLES.parent / "store")
     assert "verify_frozen" in str(excinfo.value)

@@ -3,7 +3,7 @@
 `src/datasets/pr_review_v2/data/mathlib_roster.txt` is declared with a hash by nine frozen release
 manifests. `python -m src.datasets.pr_review_v2.roster` used to write there when run without
 arguments, so a routine roster refresh would have failed `verify_frozen` for every v4 release.
-New snapshots are dated files under `inputs/pull_reviews/rosters/`.
+New snapshots are dated files under `inputs/pull_requests/rosters/`.
 """
 
 from __future__ import annotations
@@ -12,8 +12,8 @@ from datetime import date
 
 import pytest
 
-from src.datasets.pull_reviews import roster
-from src.mathlib_review.paths import LEGACY_V2_ROSTER, PULL_REVIEWS_ROSTERS
+from src.datasets.pull_requests import roster
+from src.mathlib_review.paths import LEGACY_V2_ROSTER, PULL_REQUESTS_ROSTERS
 
 
 def test_writing_the_pinned_roster_is_refused_before_any_network_call(monkeypatch):
@@ -26,7 +26,7 @@ def test_writing_the_pinned_roster_is_refused_before_any_network_call(monkeypatc
 
 def test_the_default_output_is_a_dated_snapshot_not_the_pinned_file():
     path = roster.dated_roster_path(date(2026, 9, 11))
-    assert path == PULL_REVIEWS_ROSTERS / "mathlib_roster_2026-09-11.txt"
+    assert path == PULL_REQUESTS_ROSTERS / "mathlib_roster_2026-09-11.txt"
     assert path.resolve() != LEGACY_V2_ROSTER.resolve()
 
 

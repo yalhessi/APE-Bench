@@ -22,11 +22,11 @@ from pathlib import Path
 
 import pytest
 
-from src.datasets.pull_reviews.projections.episodes import (
+from src.datasets.pull_requests.projections.episodes import (
     project_episodes, write_episode_release,
 )
-from src.datasets.pull_reviews.seed import seed_from_legacy
-from src.datasets.pull_reviews.store import PullReviewStore
+from src.datasets.pull_requests.seed import seed_from_legacy
+from src.datasets.pull_requests.store import PullRequestStore
 from src.mathlib_review.io import jsonl_bytes, sha256_file
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES, LEGACY_V2_ROSTER
 from src.mathlib_review.release.episode_builder import (
@@ -77,12 +77,12 @@ def _from_legacy(all_rounds: bool, tmp_path: Path):
 def store(tmp_path_factory):
     if not LEGACY_V2_BUNDLES.is_dir():
         pytest.skip("no legacy bundle cache")
-    store = PullReviewStore(tmp_path_factory.mktemp("store"))
+    store = PullRequestStore(tmp_path_factory.mktemp("store"))
     seed_from_legacy(store)
     return store
 
 
-def _from_store(store: PullReviewStore, all_rounds: bool):
+def _from_store(store: PullRequestStore, all_rounds: bool):
     roster = load_roster(_pinned_roster(ALL_ROUNDS if all_rounds else FIRST_ROUND))
     projection = project_episodes(store, roster=roster, all_rounds=all_rounds)
     return {"derived/funnel.jsonl": projection.funnel, "input/episodes.jsonl": projection.episodes,
@@ -121,13 +121,13 @@ def test_a_store_built_release_seals_and_carries_the_same_episodes(store, tmp_pa
 
     out = tmp_path / "release"
     manifest = write_episode_release(out, store, roster_path=LEGACY_V2_ROSTER,
-                                     dataset_id="pull-reviews-test", release="0.0.0-test")
+                                     dataset_id="pull-requests-test", release="0.0.0-test")
     assert (out / "input/episodes.jsonl").read_bytes() == \
         (FIRST_ROUND / "input/episodes.jsonl").read_bytes()
     roles = {ref.role: ref for ref in manifest.sources}
-    assert roles["pull_review_store"].sha256 == store.content_digest()
+    assert roles["pull_request_store"].sha256 == store.content_digest()
     assert roles["reviewer_roster"].sha256 == sha256_file(LEGACY_V2_ROSTER)
-    assert manifest.generator_versions["events"] == "pull_review_store_v1"
+    assert manifest.generator_versions["events"] == "pull_request_store_v1"
     validate_release(out)
 
 
@@ -138,9 +138,9 @@ def test_a_collected_pr_needs_no_legacy_cache_and_changes_only_its_provenance(st
     must dereference through the store, since no bundle file exists for them to open."""
 
     from src.mathlib_review.release.events import resolve_payload
-    from src.datasets.pull_reviews.store import BUNDLE_ENDPOINTS
+    from src.datasets.pull_requests.store import BUNDLE_ENDPOINTS
 
-    fresh = PullReviewStore(tmp_path / "fresh")
+    fresh = PullRequestStore(tmp_path / "fresh")
     number = 33098
     for endpoint in BUNDLE_ENDPOINTS:
         fresh.write_endpoint(number, endpoint, store.read(number, endpoint),
@@ -150,7 +150,7 @@ def test_a_collected_pr_needs_no_legacy_cache_and_changes_only_its_provenance(st
         raw = (store.pr_dir(number) / f"compares/{head}.json").read_bytes()
         fresh.write_compare(number, head, raw, base_ref="master", request="compare",
                             fetched_at="2026-09-11T00:00:00Z", source="github")
-    assert fresh.bundle_ref(number).role == "pull_review_pr"
+    assert fresh.bundle_ref(number).role == "pull_request_dir"
 
     projection = project_episodes(fresh, roster=load_roster(LEGACY_V2_ROSTER))
     (episode,) = projection.episodes
@@ -163,5 +163,5 @@ def test_a_collected_pr_needs_no_legacy_cache_and_changes_only_its_provenance(st
         assert ours[field] == frozen[field], field
 
     comment = next(e for e in projection.events if e.event_type == "review_comment")
-    assert comment.source_object.role == "pull_review_pr"
+    assert comment.source_object.role == "pull_request_dir"
     assert "grind" in resolve_payload(comment)["body"]

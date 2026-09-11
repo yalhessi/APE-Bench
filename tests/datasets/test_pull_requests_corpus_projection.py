@@ -12,11 +12,11 @@ import json
 
 import pytest
 
-from src.datasets.pull_reviews.projections.corpus import (
+from src.datasets.pull_requests.projections.corpus import (
     CORPUS_ROW_VERSION, _old_gate, acceptance_report, corpus_row, project_corpus, reviewer_view,
 )
-from src.datasets.pull_reviews.seed import seed_from_legacy
-from src.datasets.pull_reviews.store import PullReviewStore
+from src.datasets.pull_requests.seed import seed_from_legacy
+from src.datasets.pull_requests.store import PullRequestStore
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_ROSTER
 
 ROSTER = {"rev1"}
@@ -31,7 +31,7 @@ def _c(i, login, assoc, *, pr=1, path="Mathlib/A.lean", body="please golf this",
 
 
 def _store(tmp_path, comments, *, author="alice", pr=1):
-    store = PullReviewStore(tmp_path / "store")
+    store = PullRequestStore(tmp_path / "store")
     store.write_endpoint(pr, "listing", {"number": pr, "user": {"login": author}}, request="l",
                          fetched_at="t", source="github")
     store.write_endpoint(pr, "review_comments", comments, request="c", fetched_at="t", source="github")
@@ -111,9 +111,9 @@ def test_on_the_201_seeded_prs_the_projection_is_a_superset_of_the_old_gate(tmp_
 
     if not LEGACY_V2_BUNDLES.is_dir():
         pytest.skip("no legacy bundle cache")
-    from src.datasets.pull_reviews.definitions import load_roster
+    from src.datasets.pull_requests.definitions import load_roster
 
-    store = PullReviewStore(tmp_path / "store")
+    store = PullRequestStore(tmp_path / "store")
     seed_from_legacy(store)
     baseline = []
     for number in store.numbers():

@@ -1,6 +1,6 @@
 """The raw PR store: one directory per PR, holding what GitHub returned and nothing else.
 
-    data/pull_reviews/pr/<n>/
+    data/pull_requests/pr/<n>/
       listing.json                                        tier 0, free from the listing walk
       review_comments.jsonl reviews.jsonl issue_comments.jsonl                       tier 1
       pr.json commits.jsonl files.jsonl timeline.jsonl review_threads.jsonl body_edits.jsonl
@@ -39,10 +39,10 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 from src.mathlib_review.io import (
     canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once,
 )
-from src.mathlib_review.paths import LEGACY_V2_BUNDLES, PULL_REVIEWS_STORE
+from src.mathlib_review.paths import LEGACY_V2_BUNDLES, PULL_REQUESTS_STORE
 
-LEDGER_VERSION = "pull-review-ledger/1"
-STORE_VERSION = "pull-review-store/1"
+LEDGER_VERSION = "pull-request-ledger/1"
+STORE_VERSION = "pull-request-store/1"
 
 #: endpoint -> (tier, file name, shape). Order is the legacy bundle's key order after `pr`.
 ENDPOINTS: Dict[str, Tuple[int, str, str]] = {
@@ -106,10 +106,10 @@ def _payload_bytes(shape: str, payload: Any) -> bytes:
     return jsonl_bytes(payload)
 
 
-class PullReviewStore:
+class PullRequestStore:
     """Read and append to the store. Consumers go through this, never through the layout."""
 
-    def __init__(self, root: Path = PULL_REVIEWS_STORE):
+    def __init__(self, root: Path = PULL_REQUESTS_STORE):
         self.root = Path(root)
         forbidden = LEGACY_V2_BUNDLES.parent.parent.resolve()      # data/pr_review_v2
         resolved = self.root.resolve()
@@ -301,7 +301,7 @@ class PullReviewStore:
         legacy = self.ledger(number).get("legacy_bundle")
         if legacy:
             return ArtifactRef(path=legacy["path"], role="raw_github_bundle", sha256=legacy["sha256"])
-        return ArtifactRef(path=self.pr_dir(number).as_posix(), role="pull_review_pr",
+        return ArtifactRef(path=self.pr_dir(number).as_posix(), role="pull_request_dir",
                            sha256=self.bundle_sha256(number))
 
     def content_digest(self) -> str:
@@ -324,7 +324,7 @@ class StoreCompares:
     A missing compare raises with the same message the directory source uses, so a funnel
     `hydration` exclusion reads identically whichever source produced it."""
 
-    def __init__(self, store: PullReviewStore, number: int):
+    def __init__(self, store: PullRequestStore, number: int):
         self.store = store
         self.number = int(number)
 

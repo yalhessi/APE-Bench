@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.datasets.pull_reviews.projections.ledger import commented_lines, leading_token, ledger_rows
+from src.datasets.pull_requests.projections.ledger import commented_lines, leading_token, ledger_rows
 
 
 def _row(cid, body, hunk, *, is_reviewer=True, author=False, **positions):

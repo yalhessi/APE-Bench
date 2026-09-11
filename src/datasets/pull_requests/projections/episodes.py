@@ -7,7 +7,7 @@ frozen v2 caches.
 
 For the 201 PRs seeded from those caches the output is **byte-identical** to the frozen releases
 they built: `dev-raw-0.3.0` (first rounds) and `dev-raw-multiround-0.4.0` (every round), funnel,
-episodes, boundaries, segments and event ledger alike. `test_pull_reviews_reproduces_raw_release`
+episodes, boundaries, segments and event ledger alike. `test_pull_requests_reproduces_raw_release`
 rebuilds both from each source. That is the evidence the store can replace the caches.
 
 A store-built release records the store's content digest and the roster's sha among its sources,
@@ -21,8 +21,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, List, Optional
 
-from src.datasets.pull_reviews.definitions import DEFINITIONS_VERSION, load_roster, roster_sha256
-from src.datasets.pull_reviews.store import STORE_VERSION, PullReviewStore
+from src.datasets.pull_requests.definitions import DEFINITIONS_VERSION, load_roster, roster_sha256
+from src.datasets.pull_requests.store import STORE_VERSION, PullRequestStore
 from src.mathlib_review.io import display_path
 from src.mathlib_review.release.episode_builder import (
     MULTI_ROUND_BUILDER_VERSION, RAW_EPISODE_BUILDER_VERSION, funnel_and_first_round,
@@ -49,7 +49,7 @@ class EpisodeProjection:
     events: List[SourceEvent] = field(default_factory=list)
 
 
-def eligible_numbers(store: PullReviewStore, prs: Optional[Iterable[int]] = None) -> List[int]:
+def eligible_numbers(store: PullRequestStore, prs: Optional[Iterable[int]] = None) -> List[int]:
     """PRs the funnel can run on: those collected to tier 2. Anything else has no bundle."""
 
     wanted = sorted(set(prs)) if prs is not None else store.numbers()
@@ -57,7 +57,7 @@ def eligible_numbers(store: PullReviewStore, prs: Optional[Iterable[int]] = None
 
 
 def project_episodes(
-    store: PullReviewStore, *, roster: Iterable[str], prs: Optional[Iterable[int]] = None,
+    store: PullRequestStore, *, roster: Iterable[str], prs: Optional[Iterable[int]] = None,
     all_rounds: bool = False, repo: str = REPO,
 ) -> EpisodeProjection:
     """Run the funnel over the store, in the order and shape `legacy_pipeline/raw_release.py`
@@ -93,7 +93,7 @@ def project_episodes(
 
 
 def write_episode_release(
-    out: Path, store: PullReviewStore, *, roster_path: Path, dataset_id: str, release: str,
+    out: Path, store: PullRequestStore, *, roster_path: Path, dataset_id: str, release: str,
     prs: Optional[Iterable[int]] = None, all_rounds: bool = False, split: str = "development",
 ) -> DatasetManifest:
     """Seal a release of store-derived episodes with `releases.build_release`."""
@@ -115,7 +115,7 @@ def write_episode_release(
         },
         created_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         sources=[
-            ArtifactRef(path=display_path(store.root), role="pull_review_store",
+            ArtifactRef(path=display_path(store.root), role="pull_request_store",
                         sha256=store.content_digest(), records=len(eligible_numbers(store, prs))),
             ArtifactRef(path=display_path(roster_path), role="reviewer_roster",
                         sha256=roster_sha256(roster_path), records=len(load_roster(roster_path))),

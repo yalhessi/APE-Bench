@@ -31,7 +31,7 @@ EVAL_SET = V2_EVAL_SET
 def eval_pr_numbers(path: Optional[Path] = None) -> Set[int]:
     """PRs the system is scored on, excluded from the corpus outright.
 
-    With no argument this is `pull_reviews.definitions.scored_pr_numbers()`: the v2 eval set plus
+    With no argument this is `pull_requests.definitions.scored_pr_numbers()`: the v2 eval set plus
     every release manifest's PRs, anchored at the repo root, **raising** if the eval set is
     missing. It used to read a relative path and return an empty set when absent, on the grounds
     that "the date cutoff is the primary exclusion" -- which stopped being true when the corpus
@@ -42,7 +42,7 @@ def eval_pr_numbers(path: Optional[Path] = None) -> Set[int]:
     """
 
     if path is None:
-        from src.datasets.pull_reviews.definitions import scored_pr_numbers
+        from src.datasets.pull_requests.definitions import scored_pr_numbers
 
         return set(scored_pr_numbers())
     if not path.is_file():

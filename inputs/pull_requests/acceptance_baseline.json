@@ -1,7 +1,7 @@
 {
-  "schema_version": "pull-reviews-acceptance-baseline/1",
+  "schema_version": "pull-requests-acceptance-baseline/1",
   "what": "The retrieval corpus as the old pipeline (`pr_review_v2/corpus.py: keep_comment`) left it, frozen before the store replaces it. The corpus projection must contain every row here (old <= new), and every row it adds needs a named cause.",
-  "path": "data/pull_reviews/baseline/mathlib_review_comments.jsonl",
+  "path": "data/pull_requests/baseline/mathlib_review_comments.jsonl",
   "copied_from": "inputs/pr_review_v2/corpus/mathlib_review_comments.jsonl",
   "sha256": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
   "rows": 43881,

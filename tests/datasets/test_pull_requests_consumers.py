@@ -18,7 +18,7 @@ def test_the_research_corpus_loader_excludes_scored_prs_and_pins_its_window():
     if not PRECEDENT_CORPUS.is_file():
         pytest.skip("corpus absent")
     from src.datasets.pr_review_v2.precedent_bench import VALIDATED_CORPUS_END, load_corpus
-    from src.datasets.pull_reviews.definitions import scored_pr_numbers
+    from src.datasets.pull_requests.definitions import scored_pr_numbers
 
     rows = load_corpus(PRECEDENT_CORPUS)
     assert rows
@@ -69,7 +69,7 @@ def test_the_v2_fetcher_cannot_write_into_the_frozen_caches(monkeypatch):
     assert fetch.fetch_pr_bundle(NoNetwork(), config, 33098)["pr"]["number"] == 33098   # cached: fine
     with pytest.raises(PermissionError) as excinfo:
         fetch.fetch_pr_bundle(NoNetwork(), config, 99999999)
-    assert "pull_reviews.collect" in str(excinfo.value)
+    assert "pull_requests.collect" in str(excinfo.value)
     with pytest.raises(PermissionError):
         fetch.fetch_compare(NoNetwork(), config, "master", "f" * 40)
 
@@ -81,4 +81,4 @@ def test_the_old_corpus_command_refuses_and_names_the_new_one(capsys):
         corpus.main()
     assert excinfo.value.code == 2
     err = capsys.readouterr().err
-    assert "pull_reviews.collect" in err and "--acceptance" in err
+    assert "pull_requests.collect" in err and "--acceptance" in err

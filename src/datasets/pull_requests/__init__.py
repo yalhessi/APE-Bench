@@ -1,5 +1,11 @@
 """One raw store of Mathlib pull requests, and the projections every dataset is derived from.
 
+**Named for what it holds.** The raw data is pull requests -- the PR, its commits, files, timeline,
+compares and conversation. A *review* benchmark is one thing built from them (`projections/episodes`
+turns them into reviewable episodes and releases); the review-comment corpus, the A→B ledger of
+maintainer corrections, and whatever comes next are others. Nothing in collection is specific to
+any one of them, and nothing should be.
+
 Three pipelines used to collect PRs from GitHub, and they disagreed about what a review comment
 is. The retrieval corpus kept comments by `author_association` alone, so it dropped every roster
 reviewer GitHub reports as CONTRIBUTOR (GitHub only reports MEMBER for *public* org membership)
@@ -15,9 +21,9 @@ So this package separates two things that were fused:
   episodes for review tasks, the A→B ledger for convention discovery -- through the single
   definitions module, so a rule like "who is a reviewer" exists in exactly one place.
 
-Layout and durability follow the Zulip store: payloads under gitignored `data/pull_reviews/`,
+Layout and durability follow the Zulip store: payloads under gitignored `data/pull_requests/`,
 provenance (manifest, per-PR endpoint hashes, collection report) tracked under
-`inputs/pull_reviews/`, so a wiped store is a resumable refetch of a known list rather than a
+`inputs/pull_requests/`, so a wiped store is a resumable refetch of a known list rather than a
 rediscovery.
 
 Two caches this package must never write: `data/pr_review_v2/cache/{bundles,compares}`. Eleven

@@ -1,13 +1,13 @@
 {
   "compares": 230,
   "content_sha256": "ca0283fb190a905da490c141745a47920b96699a5365bb8890f277e54f33f6b4",
-  "definitions_version": "pull-review-definitions/1",
+  "definitions_version": "pull-request-definitions/1",
   "endpoint_sources": {
     "legacy_bundle_cache": 1809
   },
-  "export_version": "pull-review-export/1",
-  "exported_at": "2026-09-11T11:07:15Z",
-  "generator_git_commit": "c8daf56edbdf3ba166869fea50ac53607f6ade10",
+  "export_version": "pull-request-export/1",
+  "exported_at": "2026-09-11T11:55:24Z",
+  "generator_git_commit": "ec8ec83469e29569268b58e6b4803b37f486ecb9",
   "generator_tree_state": "dirty",
   "prs": 201,
   "prs_by_complete_tier": {
@@ -25,5 +25,5 @@
     "reviews": 338,
     "timeline": 4107
   },
-  "schema_version": "pull-review-store/1"
+  "schema_version": "pull-request-store/1"
 }

@@ -31,8 +31,8 @@ import yaml
 
 #: The fetch URL and the three roster teams are shared with the reviewer roster: they used to be
 #: spelled here and in `pr_review_v2/roster.py`, independently, for the same reason.
-from src.datasets.pull_reviews.roster import DATA_URL, ROSTER_TEAMS  # noqa: E402
-from src.datasets.pull_reviews.roster import fetch_yaml as _fetch_yaml  # noqa: E402
+from src.datasets.pull_requests.roster import DATA_URL, ROSTER_TEAMS  # noqa: E402
+from src.datasets.pull_requests.roster import fetch_yaml as _fetch_yaml  # noqa: E402
 
 IDENTITY_VERSION = "zulip-identity/1"
 DEFAULT_PATH = Path(__file__).parent / "data" / "identity.tsv"

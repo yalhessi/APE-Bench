@@ -16,7 +16,7 @@ from .github import GitHubClient, GitHubError
 
 BUNDLE_VERSION = 1
 
-from src.datasets.pull_reviews.github import (  # noqa: E402
+from src.datasets.pull_requests.github import (  # noqa: E402
     BODY_EDITS_QUERY as _BODY_EDITS_QUERY,
     REVIEW_THREADS_QUERY as _THREADS_QUERY,
     compact_compare,
@@ -71,7 +71,7 @@ def _refuse_frozen_cache(target: Path) -> None:
     `data/pr_review_v2/cache/bundles` and eight hash `.../compares` as trees, so writing one new
     file there fails `verify_frozen` for every v4 release -- and `main fetch` over a new window did
     exactly that by default. Reading what is already cached is fine; new PRs go to the PR store
-    (`python -m src.datasets.pull_reviews.collect`)."""
+    (`python -m src.datasets.pull_requests.collect`)."""
 
     from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES
 
@@ -80,7 +80,7 @@ def _refuse_frozen_cache(target: Path) -> None:
         raise PermissionError(
             f"refusing to write {target}: that cache is hashed by frozen release manifests, so a new "
             "file breaks verify_frozen. Collect new PRs into the PR store instead: "
-            "`python -m src.datasets.pull_reviews.collect --start … --end …`.")
+            "`python -m src.datasets.pull_requests.collect --start … --end …`.")
 
 
 def fetch_pr_bundle(

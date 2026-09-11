@@ -13,9 +13,9 @@ EVENT_LEDGER_VERSION = "bundle_index_v1"
 
 #: The same index built from the PR store. For a PR seeded from the v2 cache it cites the legacy
 #: bundle and is byte-identical to `bundle_index_v1`; for a collected PR it cites the store
-#: directory (role `pull_review_pr`) and the assembled bundle's sha, which changes if any
+#: directory (role `pull_request_dir`) and the assembled bundle's sha, which changes if any
 #: endpoint's bytes do.
-STORE_EVENT_LEDGER_VERSION = "pull_review_store_v1"
+STORE_EVENT_LEDGER_VERSION = "pull_request_store_v1"
 
 _COLLECTIONS = (
     ("reviews", "review"),
@@ -184,11 +184,11 @@ def resolve_payload(event: SourceEvent) -> Dict[str, Any]:
     this rather than opening `source_object.path` as a bundle file, which a store-built event does
     not point at."""
 
-    if event.source_object.role == "pull_review_pr":
-        from src.datasets.pull_reviews.store import PullReviewStore
+    if event.source_object.role == "pull_request_dir":
+        from src.datasets.pull_requests.store import PullRequestStore
 
         root = Path(event.source_object.path).parent.parent          # <store>/pr/<n>
-        bundle = PullReviewStore(root).load_bundle(event.pr_number)
+        bundle = PullRequestStore(root).load_bundle(event.pr_number)
     else:
         bundle = json.loads(Path(event.source_object.path).read_text())
     return payload_at_source_key(bundle, event.source_key)

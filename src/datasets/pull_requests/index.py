@@ -12,12 +12,12 @@ the body carries a GitHub suggestion block: facts from the payloads. Whether the
 `definitions.classify_commenter`, never frozen into the cache.
 
 **What is tracked.** `data/` is gitignored, and the retrieval corpus vanished from a checkout once
-already. So, following the Zulip store's "pin provenance, not bytes": `inputs/pull_reviews/
+already. So, following the Zulip store's "pin provenance, not bytes": `inputs/pull_requests/
 manifest.json` (the store's digest, tier counts, sources) and `prs.jsonl` (one compact row per PR:
 tiers, row counts, per-PR digest). A wiped store is then a resumable refetch of a known PR list
 whose every PR can be checked against the digest it had.
 
-    python -m src.datasets.pull_reviews.index build
+    python -m src.datasets.pull_requests.index build
 """
 
 from __future__ import annotations
@@ -33,15 +33,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
-from src.datasets.pull_reviews.definitions import DEFINITIONS_VERSION
-from src.datasets.pull_reviews.store import (
-    ENDPOINTS, STORE_VERSION, PullReviewStore, write_atomically,
+from src.datasets.pull_requests.definitions import DEFINITIONS_VERSION
+from src.datasets.pull_requests.store import (
+    ENDPOINTS, STORE_VERSION, PullRequestStore, write_atomically,
 )
 from src.mathlib_review.io import canonical_json_bytes, git_state, sha256_bytes
-from src.mathlib_review.paths import PULL_REVIEWS_TRACKED, assert_repo_root
+from src.mathlib_review.paths import PULL_REQUESTS_TRACKED, assert_repo_root
 
-INDEX_VERSION = "pull-review-index/1"
-EXPORT_VERSION = "pull-review-export/1"
+INDEX_VERSION = "pull-request-index/1"
+EXPORT_VERSION = "pull-request-export/1"
 UNDATED = -1
 
 SUGGESTION = re.compile(r"```suggestion\b")
@@ -91,7 +91,7 @@ def _epoch(stamp: Optional[str]) -> int:
         return UNDATED
 
 
-def _pr_facts(store: PullReviewStore, number: int) -> Dict[str, Any]:
+def _pr_facts(store: PullRequestStore, number: int) -> Dict[str, Any]:
     """PR-level fields from the listing row when there is one, else from `pr.json`. The two are
     the same GitHub object at different endpoints; seeded PRs have only the latter."""
 
@@ -104,7 +104,7 @@ def _pr_facts(store: PullReviewStore, number: int) -> Dict[str, Any]:
     return source or {}
 
 
-def _comment_rows(store: PullReviewStore, number: int, pr_author: str) -> Iterator[Tuple]:
+def _comment_rows(store: PullRequestStore, number: int, pr_author: str) -> Iterator[Tuple]:
     endpoints = store.ledger(number)["endpoints"]
     for endpoint, kind in COMMENT_KINDS:
         if not endpoints.get(endpoint, {}).get("present"):
@@ -122,7 +122,7 @@ def _comment_rows(store: PullReviewStore, number: int, pr_author: str) -> Iterat
                    int(bool(SUGGESTION.search(body))), body, item.get("diff_hunk"))
 
 
-def build_index(store: PullReviewStore, out: Optional[Path] = None) -> Dict[str, Any]:
+def build_index(store: PullRequestStore, out: Optional[Path] = None) -> Dict[str, Any]:
     """Rebuild the index from the tree, atomically. Returns a summary including the index's own
     content digest, which is identical for identical stores."""
 
@@ -189,13 +189,13 @@ def index_content_sha256(con: sqlite3.Connection) -> str:
     return sha256_bytes(canonical_json_bytes(parts))
 
 
-def open_index(store: PullReviewStore, path: Optional[Path] = None) -> sqlite3.Connection:
+def open_index(store: PullRequestStore, path: Optional[Path] = None) -> sqlite3.Connection:
     """A read-only connection, refused if the index was built from a different store."""
 
     path = Path(path) if path else store.root / "index.sqlite3"
     if not path.is_file():
         raise FileNotFoundError(f"no index at {path}; build it with "
-                                "`python -m src.datasets.pull_reviews.index build`")
+                                "`python -m src.datasets.pull_requests.index build`")
     con = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
     pinned = dict(con.execute("SELECT key, value FROM meta"))
     current = store.content_digest()
@@ -209,7 +209,7 @@ def open_index(store: PullReviewStore, path: Optional[Path] = None) -> sqlite3.C
 
 # --- tracked provenance -----------------------------------------------------------------------
 
-def store_manifest(store: PullReviewStore) -> Dict[str, Any]:
+def store_manifest(store: PullRequestStore) -> Dict[str, Any]:
     tiers = collections.Counter()
     sources = collections.Counter()
     rows = collections.Counter()
@@ -233,7 +233,7 @@ def store_manifest(store: PullReviewStore) -> Dict[str, Any]:
     }
 
 
-def pr_export_rows(store: PullReviewStore) -> List[Dict[str, Any]]:
+def pr_export_rows(store: PullRequestStore) -> List[Dict[str, Any]]:
     out = []
     for ledger in store.iter_ledgers():
         number = ledger["pr_number"]
@@ -249,7 +249,7 @@ def pr_export_rows(store: PullReviewStore) -> List[Dict[str, Any]]:
     return out
 
 
-def write_tracked_export(store: PullReviewStore, tracked: Path = PULL_REVIEWS_TRACKED) -> Dict[str, Any]:
+def write_tracked_export(store: PullRequestStore, tracked: Path = PULL_REQUESTS_TRACKED) -> Dict[str, Any]:
     manifest = store_manifest(store)
     manifest["exported_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     manifest["export_version"] = EXPORT_VERSION
@@ -269,7 +269,7 @@ def main() -> None:
     parser.add_argument("--store", type=Path, default=None)
     args = parser.parse_args()
     assert_repo_root()
-    store = PullReviewStore(args.store) if args.store else PullReviewStore()
+    store = PullRequestStore(args.store) if args.store else PullRequestStore()
     summary = build_index(store)
     manifest = write_tracked_export(store)
     print(json.dumps({"index": summary, "manifest": {k: manifest[k] for k in (

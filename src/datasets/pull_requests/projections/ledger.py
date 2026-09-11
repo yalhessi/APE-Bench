@@ -31,8 +31,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
-from src.datasets.pull_reviews.projections.corpus import reviewer_view
-from src.datasets.pull_reviews.store import write_atomically
+from src.datasets.pull_requests.projections.corpus import reviewer_view
+from src.datasets.pull_requests.store import write_atomically
 from src.mathlib_review.io import jsonl_bytes, sha256_bytes
 
 LEDGER_VERSION = "ab-ledger/1"
@@ -135,10 +135,10 @@ def write_ledger(corpus_dir: Path, out: Optional[Path] = None) -> Dict[str, Any]
 if __name__ == "__main__":
     import argparse
 
-    from src.mathlib_review.paths import PULL_REVIEWS_STORE, assert_repo_root
+    from src.mathlib_review.paths import PULL_REQUESTS_STORE, assert_repo_root
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--corpus", type=Path, default=PULL_REVIEWS_STORE / "projections" / "corpus")
+    parser.add_argument("--corpus", type=Path, default=PULL_REQUESTS_STORE / "projections" / "corpus")
     args = parser.parse_args()
     assert_repo_root()
     manifest = write_ledger(args.corpus)

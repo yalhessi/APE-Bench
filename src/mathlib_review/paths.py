@@ -44,18 +44,18 @@ ZULIP_STORE = Path("data/zulip/corpus/zulip.sqlite3")
 #
 # One raw directory per PR, from which every PR dataset is a projection. Payloads are gitignored
 # (1-2 GB, a day of quota to rebuild); provenance is tracked, the Zulip store's pattern. See
-# `src/datasets/pull_reviews/__init__.py`.
+# `src/datasets/pull_requests/__init__.py`.
 
 #: The raw store: `pr/<n>/` payloads, `index.sqlite3`, `projections/`. Gitignored.
-PULL_REVIEWS_STORE = Path("data/pull_reviews")
+PULL_REQUESTS_STORE = Path("data/pull_requests")
 
 #: Tracked provenance for the store: manifest, per-PR endpoint hashes, collection report,
 #: acceptance baseline, dated rosters.
-PULL_REVIEWS_TRACKED = Path("inputs/pull_reviews")
+PULL_REQUESTS_TRACKED = Path("inputs/pull_requests")
 
 #: Dated roster snapshots (spec §3.1 "snapshotted into a versioned file"). The v2 roster below
 #: stays where nine frozen manifests pin it; new snapshots go here.
-PULL_REVIEWS_ROSTERS = PULL_REVIEWS_TRACKED / "rosters"
+PULL_REQUESTS_ROSTERS = PULL_REQUESTS_TRACKED / "rosters"
 
 # --- v5's own roots -----------------------------------------------------------------
 

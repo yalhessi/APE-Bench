@@ -16,10 +16,10 @@ from typing import Any, Dict, List
 
 import pytest
 
-from src.datasets.pull_reviews.collect import Collector, pre_gate
-from src.datasets.pull_reviews.projections.episodes import project_episodes
-from src.datasets.pull_reviews.seed import seed_from_legacy
-from src.datasets.pull_reviews.store import PullReviewStore
+from src.datasets.pull_requests.collect import Collector, pre_gate
+from src.datasets.pull_requests.projections.episodes import project_episodes
+from src.datasets.pull_requests.seed import seed_from_legacy
+from src.datasets.pull_requests.store import PullRequestStore
 from src.mathlib_review.agenda.cutoffs import commit_timestamp
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_ROSTER
 
@@ -121,7 +121,7 @@ def _fixture_prs():
 def collected(tmp_path):
     roster = tmp_path / "roster.txt"
     roster.write_text(f"# test roster\n{REVIEWER}\n")
-    store = PullReviewStore(tmp_path / "store")
+    store = PullRequestStore(tmp_path / "store")
     fake = FakeGitHub(_fixture_prs())
     collector = Collector(store, fake, LOG, roster_path=roster, state_path=tmp_path / "state.json")
     prs = collector.window_prs("2025-12-01", "2025-12-31")
@@ -192,9 +192,9 @@ def test_on_the_real_201_the_pre_gate_keeps_every_pr_the_funnel_includes(tmp_pat
 
     if not LEGACY_V2_BUNDLES.is_dir():
         pytest.skip("no legacy bundle cache")
-    from src.datasets.pull_reviews.definitions import load_roster
+    from src.datasets.pull_requests.definitions import load_roster
 
-    store = PullReviewStore(tmp_path / "store")
+    store = PullRequestStore(tmp_path / "store")
     seed_from_legacy(store)
     roster = load_roster(LEGACY_V2_ROSTER)
     funnel = [json.loads(line) for line in

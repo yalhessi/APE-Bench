@@ -1,5 +1,5 @@
 # Mathlib reviewer roster (spec §3.1): admin + maintainers + reviewers teams,
-# built by src/datasets/pull_reviews/roster.py from leanprover-community.github.io data.
+# built by src/datasets/pull_requests/roster.py from leanprover-community.github.io data.
 # 64 logins; 0 team members had no GitHub mapping (listed below).
 adamtopaz
 adedecker

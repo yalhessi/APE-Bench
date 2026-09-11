@@ -39,7 +39,7 @@ from ape.utils.project import PROJECT_ROOT
 from src.mathlib_review.io import sha256_file
 from src.mathlib_review.paths import V2_EVAL_SET, V4_RELEASES
 
-DEFINITIONS_VERSION = "pull-review-definitions/1"
+DEFINITIONS_VERSION = "pull-request-definitions/1"
 
 # --- identity ------------------------------------------------------------------------------
 

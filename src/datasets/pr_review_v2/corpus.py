@@ -46,7 +46,7 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
 
-from src.datasets.pull_reviews.definitions import (
+from src.datasets.pull_requests.definitions import (
     MAINTAINER_ASSOCIATIONS, is_bot, is_lean_anchor, is_substantive_text, scored_pr_numbers,
 )
 from .github import GitHubClient
@@ -57,9 +57,9 @@ _PR_NUM_RE = re.compile(r"/pulls/(\d+)$")
 
 
 # `pr_number` and `corpus_row` -- the 17-field retrieval row -- live with the corpus projection now
-# (`src/datasets/pull_reviews/projections/corpus.py`), which is what builds the corpus. Re-exported
+# (`src/datasets/pull_requests/projections/corpus.py`), which is what builds the corpus. Re-exported
 # so this collector and its tests keep writing identical rows.
-from src.datasets.pull_reviews.projections.corpus import corpus_row, pr_number  # noqa: E402,F401
+from src.datasets.pull_requests.projections.corpus import corpus_row, pr_number  # noqa: E402,F401
 
 
 def keep_comment(comment: Dict[str, Any]) -> bool:
@@ -70,7 +70,7 @@ def keep_comment(comment: Dict[str, Any]) -> bool:
     It is not spec §3.1. It has no roster, so it drops every reviewer GitHub reports as
     CONTRIBUTOR, and no author rule, so it keeps PR authors replying on their own PRs -- on the 201
     cached bundles, 144 and 44 comments respectively. The corpus is now a projection of the PR
-    store (`src/datasets/pull_reviews/projections/corpus.py`), which keeps every such comment and
+    store (`src/datasets/pull_requests/projections/corpus.py`), which keeps every such comment and
     *tags* reviewer status through `definitions.classify_commenter` instead of filtering on it.
     """
     login = (comment.get("user") or {}).get("login")
@@ -321,10 +321,10 @@ def search_prs_active_in(client, start: str, end: str, logger) -> List[int]:
 def list_prs_active_since(client, start: str, end: str, logger, *,
                           log_every_pages: int = 10, recheck_pages: int = 3) -> List[int]:
     """Every PR that can carry a review comment created in [start, end]. The walk lives in the PR
-    store's collector now (`pull_reviews.collect.walk_listing`), which also keeps each listing row;
+    store's collector now (`pull_requests.collect.walk_listing`), which also keeps each listing row;
     this returns just the numbers, as it always did."""
 
-    from src.datasets.pull_reviews.collect import walk_listing
+    from src.datasets.pull_requests.collect import walk_listing
 
     return sorted(walk_listing(client, start, end, logger, log_every_pages=log_every_pages,
                                recheck_pages=recheck_pages))
@@ -502,13 +502,13 @@ authors replying on their own PRs).
 
 The corpus is now a projection of the PR store:
 
-  ./ape/bin/python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31
-  ./ape/bin/python -m src.datasets.pull_reviews.collect --start 2024-03-01 --end 2025-12-31 --tier 2
-  ./ape/bin/python -m src.datasets.pull_reviews.index build
-  ./ape/bin/python -m src.datasets.pull_reviews.projections.corpus --acceptance
+  ./ape/bin/python -m src.datasets.pull_requests.collect --start 2024-03-01 --end 2025-12-31
+  ./ape/bin/python -m src.datasets.pull_requests.collect --start 2024-03-01 --end 2025-12-31 --tier 2
+  ./ape/bin/python -m src.datasets.pull_requests.index build
+  ./ape/bin/python -m src.datasets.pull_requests.projections.corpus --acceptance
 
 The functions here remain importable; they produced the frozen acceptance baseline
-(inputs/pull_reviews/acceptance_baseline.json), and their tests pin that behaviour.
+(inputs/pull_requests/acceptance_baseline.json), and their tests pin that behaviour.
 """
 
 

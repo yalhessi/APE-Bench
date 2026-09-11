@@ -7,7 +7,7 @@ team set live here now; each keeps what it builds from them.
 **Never written over the pinned roster.** `src/datasets/pr_review_v2/data/mathlib_roster.txt` is
 declared with a hash by nine frozen release manifests, and `pr_review_v2/roster.py` used to write
 there by default when run without arguments -- one invocation would have failed `verify_frozen` for
-every v4 release. New snapshots go to `inputs/pull_reviews/rosters/mathlib_roster_<date>.txt`.
+every v4 release. New snapshots go to `inputs/pull_requests/rosters/mathlib_roster_<date>.txt`.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from typing import Dict, List, Set, Tuple
 import httpx
 import yaml
 
-from src.mathlib_review.paths import LEGACY_V2_ROSTER, PULL_REVIEWS_ROSTERS
+from src.mathlib_review.paths import LEGACY_V2_ROSTER, PULL_REQUESTS_ROSTERS
 
 DATA_URL = (
     "https://api.github.com/repos/leanprover-community/leanprover-community.github.io"
@@ -72,7 +72,7 @@ def build_roster() -> Tuple[Set[str], List[str]]:
 
 
 def dated_roster_path(on: date | None = None) -> Path:
-    return PULL_REVIEWS_ROSTERS / f"mathlib_roster_{(on or date.today()).isoformat()}.txt"
+    return PULL_REQUESTS_ROSTERS / f"mathlib_roster_{(on or date.today()).isoformat()}.txt"
 
 
 def write_roster(output: Path) -> Path:
@@ -80,11 +80,11 @@ def write_roster(output: Path) -> Path:
         raise PermissionError(
             f"refusing to write {LEGACY_V2_ROSTER}: nine frozen release manifests hash it, so "
             "rewriting it fails verify_frozen for every v4 release. Write a dated snapshot "
-            f"under {PULL_REVIEWS_ROSTERS} instead.")
+            f"under {PULL_REQUESTS_ROSTERS} instead.")
     logins, unmapped = build_roster()
     lines = [
         "# Mathlib reviewer roster (spec §3.1): admin + maintainers + reviewers teams,",
-        "# built by src/datasets/pull_reviews/roster.py from leanprover-community.github.io data.",
+        "# built by src/datasets/pull_requests/roster.py from leanprover-community.github.io data.",
         f"# {len(logins)} logins; {len(unmapped)} team members had no GitHub mapping (listed below).",
         *sorted(logins),
         *(f"# UNMAPPED: {name}" for name in unmapped),

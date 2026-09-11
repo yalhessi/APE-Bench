@@ -28,11 +28,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from src.datasets.pull_reviews.definitions import (
+from src.datasets.pull_requests.definitions import (
     DEFINITIONS_VERSION, MAINTAINER_ASSOCIATIONS, classify_commenter, is_bot, is_lean_anchor,
     is_substantive_text, load_roster, roster_sha256, scored_pr_numbers,
 )
-from src.datasets.pull_reviews.store import PullReviewStore, write_atomically
+from src.datasets.pull_requests.store import PullRequestStore, write_atomically
 from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes
 
 CORPUS_ROW_VERSION = "pr-corpus-row/2"
@@ -72,7 +72,7 @@ def corpus_row(comment: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def _pr_author(store: PullReviewStore, number: int) -> str:
+def _pr_author(store: PullRequestStore, number: int) -> str:
     endpoints = store.ledger(number)["endpoints"]
     for name in ("listing", "pr"):
         if endpoints.get(name, {}).get("present"):
@@ -80,7 +80,7 @@ def _pr_author(store: PullReviewStore, number: int) -> str:
     return ""
 
 
-def project_corpus(store: PullReviewStore, *, roster: Iterable[str], start: Optional[str] = None,
+def project_corpus(store: PullRequestStore, *, roster: Iterable[str], start: Optional[str] = None,
                    end: Optional[str] = None, exclude: Optional[Iterable[int]] = None) -> List[Dict[str, Any]]:
     """Every corpus row the store supports, tagged. `exclude` defaults to the scored PRs."""
 
@@ -118,7 +118,7 @@ def reviewer_view(rows: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return [row for row in rows if row["is_reviewer"] and not row["commenter_is_author"]]
 
 
-def write_corpus_projection(store: PullReviewStore, *, roster_path: Path, out: Optional[Path] = None,
+def write_corpus_projection(store: PullRequestStore, *, roster_path: Path, out: Optional[Path] = None,
                             start: Optional[str] = None, end: Optional[str] = None) -> Dict[str, Any]:
     out = Path(out) if out else store.root / "projections" / "corpus"
     rows = project_corpus(store, roster=load_roster(roster_path), start=start, end=end)
@@ -157,7 +157,7 @@ def _old_gate(row: Dict[str, Any]) -> bool:
 
 
 def acceptance_report(new_rows: List[Dict[str, Any]], baseline_rows: List[Dict[str, Any]],
-                      store: PullReviewStore) -> Dict[str, Any]:
+                      store: PullRequestStore) -> Dict[str, Any]:
     """Old ⊆ new, field for field, and a cause for every added row.
 
     A baseline row missing from the projection is a **failure** unless the comment is also absent
@@ -244,7 +244,7 @@ def load_baseline(path: Path) -> List[Dict[str, Any]]:
 def main() -> None:
     import argparse
 
-    from src.mathlib_review.paths import PULL_REVIEWS_TRACKED, assert_repo_root
+    from src.mathlib_review.paths import PULL_REQUESTS_TRACKED, assert_repo_root
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--start", default="2024-03-01")
@@ -253,18 +253,18 @@ def main() -> None:
     parser.add_argument("--store", type=Path, default=None)
     parser.add_argument("--acceptance", action="store_true",
                         help="also check the projection against the frozen acceptance baseline and "
-                             "write inputs/pull_reviews/acceptance_report.json")
+                             "write inputs/pull_requests/acceptance_report.json")
     args = parser.parse_args()
     assert_repo_root()
-    from src.datasets.pull_reviews.collect import latest_roster
+    from src.datasets.pull_requests.collect import latest_roster
 
-    store = PullReviewStore(args.store) if args.store else PullReviewStore()
+    store = PullRequestStore(args.store) if args.store else PullRequestStore()
     roster_path = args.roster or latest_roster()
     manifest = write_corpus_projection(store, roster_path=roster_path, start=args.start, end=args.end)
     print(json.dumps({k: manifest[k] for k in ("rows", "reviewer_view_rows", "by_basis",
                                                "author_self_comments", "with_suggestion")}, indent=2))
     if args.acceptance:
-        record = json.loads((PULL_REVIEWS_TRACKED / "acceptance_baseline.json").read_text())
+        record = json.loads((PULL_REQUESTS_TRACKED / "acceptance_baseline.json").read_text())
         baseline_path = Path(record["path"])
         if sha256_bytes(baseline_path.read_bytes()) != record["sha256"]:
             raise SystemExit(f"the acceptance baseline at {baseline_path} no longer matches its "
@@ -274,12 +274,12 @@ def main() -> None:
         report = acceptance_report(rows, load_baseline(baseline_path), store)
         report.update({"baseline_sha256": record["sha256"], "projection": {
             k: manifest[k] for k in ("store_content_sha256", "comments_sha256", "roster", "window")}})
-        write_atomically(PULL_REVIEWS_TRACKED / "acceptance_report.json",
+        write_atomically(PULL_REQUESTS_TRACKED / "acceptance_report.json",
                          (json.dumps(report, indent=2, sort_keys=True) + "\n").encode("utf-8"))
         print(json.dumps({k: report[k] for k in ("passed", "superset", "fields_agree", "missing",
                                                  "shared_row_mismatches", "added_by_cause")}, indent=2))
         if not report["passed"]:
-            raise SystemExit("acceptance FAILED; see inputs/pull_reviews/acceptance_report.json")
+            raise SystemExit("acceptance FAILED; see inputs/pull_requests/acceptance_report.json")
 
 
 if __name__ == "__main__":

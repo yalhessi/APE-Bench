@@ -6,7 +6,7 @@ lets the retrieval cutoff move off the frozen cache without changing a single ex
 
 Compares are copied **verbatim**: the episode builder hashes the compare file into each episode's
 provenance, so a re-serialised copy would change every episode. Bundles are split into per-endpoint
-files, and the legacy file's sha is recorded so `PullReviewStore.bundle_sha256` returns it.
+files, and the legacy file's sha is recorded so `PullRequestStore.bundle_sha256` returns it.
 
 A compare is keyed by head sha, not PR. Seven of the 223 heads are in two PRs' commit lists
 (stacked PRs sharing a commit), so those are stored in both PR directories -- each PR stays
@@ -15,7 +15,7 @@ self-contained, and the bytes, hence the sha, are identical in both.
 The caches are read and never written, and `seed_from_legacy` proves it: it hashes both directories
 before and after and raises if either moved.
 
-    python -m src.datasets.pull_reviews.seed
+    python -m src.datasets.pull_requests.seed
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 
-from src.datasets.pull_reviews.store import BUNDLE_ENDPOINTS, PullReviewStore
+from src.datasets.pull_requests.store import BUNDLE_ENDPOINTS, PullRequestStore
 from src.mathlib_review.io import display_path, sha256_bytes, sha256_directory
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES, assert_repo_root
 
@@ -34,7 +34,7 @@ SOURCE_BUNDLE = "legacy_bundle_cache"
 SOURCE_COMPARE = "legacy_compare_cache"
 
 
-def seed_from_legacy(store: PullReviewStore, *, bundles: Path = LEGACY_V2_BUNDLES,
+def seed_from_legacy(store: PullRequestStore, *, bundles: Path = LEGACY_V2_BUNDLES,
                      compares: Path = LEGACY_V2_COMPARES) -> Dict[str, Any]:
     before = (sha256_directory(bundles), sha256_directory(compares))
     written = collections.Counter()
@@ -90,7 +90,7 @@ def main() -> None:
     parser.add_argument("--store", type=Path, default=None)
     args = parser.parse_args()
     assert_repo_root()
-    store = PullReviewStore(args.store) if args.store else PullReviewStore()
+    store = PullRequestStore(args.store) if args.store else PullRequestStore()
     print(json.dumps(seed_from_legacy(store), indent=2))
 
 

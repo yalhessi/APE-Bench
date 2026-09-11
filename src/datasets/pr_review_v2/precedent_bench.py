@@ -152,11 +152,11 @@ def load_corpus(path: Path = DEFAULT_CORPUS, *, end: Optional[str] = VALIDATED_C
     which applied neither the eval-PR exclusion nor any date window. `end=None` removes the window
     -- only correct for a caller that gates each query on its own review time."""
 
-    from src.datasets.pull_reviews.definitions import scored_pr_numbers
+    from src.datasets.pull_requests.definitions import scored_pr_numbers
 
     if not path.exists():
         raise FileNotFoundError(f"Corpus not found at {path}. Run `python -m "
-                                f"src.datasets.pull_reviews.collect` first.")
+                                f"src.datasets.pull_requests.collect` first.")
     rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
     scored = scored_pr_numbers()
     return [row for row in rows
