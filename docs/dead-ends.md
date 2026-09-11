@@ -78,6 +78,22 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
 - **`lean_retrieve` in the review path** — silently returned empty (no per-commit index; the build is
   a heavy LLM-annotation job). Removed from the default toolset; the dense precedent index serves
   instead. **Reopens if:** a per-commit index is built for the base commits in use.
+- **Linter-as-convention-oracle** (2026-09-11) — read Mathlib's own `tacticAnalysis` linters
+  (`terminalToGrind`, `tryAtEachStepGrindSuggestions`) as a dated, gold-free statement of the
+  convention at a base commit, on the argument that "the linter present at base *is* the convention
+  at base". It is not. `terminalToGrind` landed 2025-08-14 (`609d272edf`) with `grind` in **4.0 %**
+  of Mathlib files and is unchanged while adoption reached 8.4 % (2025-12) and **14.5 % (2026-05)**,
+  and review enforcement went 9.1 → 22.4 mentions per thousand Aug → Dec. A linter is a step
+  function and a convention is a ramp: it dates *availability*, not the convention. It also answers
+  "where **can** X be used", and the can/does gap is the quantity that moves — a high-recall
+  generator aimed at a pipeline whose measured bottleneck is **selection, not generation**
+  (81 % of missed gold already had a candidate at the line). In the life-stage vector a linter is a
+  `stated` source only, which the census spec already said (`suggestion_round` … "never read as
+  adopting") and the ≥2-independent-components rule already forbids briefing alone. Raised by the
+  user more than once before being written down, which is why it was re-derived from the plan's own
+  outcome table. **Reopens if:** used as one corroborating source among ≥ 2 — its `descr` / "How to
+  fix this?" text remains the right `stated` extractor — never as the oracle, and never to date a
+  convention.
 - **`mergeready_v1` prompt** — approved on compile-exit; more tools produced *fewer* findings under
   it (69 → 3 → 2). The binding constraint was the framing, not tools; `acceptability_v2` is default.
 - **Sibling-propagation post-processor** — superseded by the intervention gold unit.
