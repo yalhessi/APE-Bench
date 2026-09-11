@@ -600,6 +600,49 @@ extractor for it is a *second* source and stays labelled as model-derived. (d) C
 each row keeps the declaration's facets (kind, goal head, typeclass heads, proof shape) so
 "`grind` replaces case-split proofs of subset goals" is a query over the ledger, not a key.
 
+### The listing endpoint is down for this repo; the corpus grows PR by PR now
+
+The September extension failed again after the re-anchoring fix, and the state file says why:
+**zero successful requests**. Probed unauthenticated from this machine: `/pulls/comments?sort=
+created&direction=asc&since=2025-09-01` answered 200 once (5.3 s) and then **HTTP 500 six
+times in a row at ~8.3 s each** -- GitHub's query timeout, on the *first* page. It has to sort
+every comment updated in the last year before returning one; on mathlib4 that no longer fits.
+No re-anchoring can help a page-1 timeout. The listing route is kept but is not the default.
+
+**Per-PR route** (`corpus.py --mode per-pr`, the `auto` default falls back to it after one
+probe): stage A searches the PRs that *can* carry a comment in the window -- created on or
+before its end and updated on or after its start, since a comment bumps `updated_at` -- as
+`created:` slices under GitHub's 1,000-result cap (weekly for the window and the 90 days
+before it, one slice for everything older, any slice at the cap split in half); stage B reads
+each PR's own comment list, one shallow request per PR. Progress is *PRs done / PRs found*, a
+real denominator, and the state file lists finished PRs so a rerun skips them. Tested against
+a fake GitHub. Sizes for December 2025, measured with the search API:
+
+```
+created before 2025-09-01, active in Dec      836 PRs
+created 2025-09-01..2025-11-30, active in Dec  799
+created in December                          1,137
+                                             -----  ~2,770 PRs  ->  ~2,800 requests, ~35–40 min with a token
+```
+
+**December is the month to add, not September.** The user asked when the development-set PRs
+are from: all fourteen were **opened 2025-12-18 .. 2025-12-31** and reviewed 2025-12-20 ..
+2025-12-31 (33057 Dec 18; 33066/33098 Dec 19; 33117/33145 Dec 20; 33149 Dec 21; 33285 Dec 25;
+33294/33305/33321 Dec 26; 33337 Dec 27; 33362 Dec 28; 33421/33438 Dec 31). The 201 cached eval
+bundles were opened 2025-11-07 .. 2025-12-31. So the month that brackets the development set is
+December 2025, and the corpus already stops in August: the four intervening months are where
+`grind` enforcement matured (3 comments in July, 20 in August, then nothing indexed). The
+eval PRs' own comments are excluded by number at collection, so December's other ~1,000 PRs
+are the "same-month conventions" evidence with the gold removed; at read time the base-date
+gate keeps a December PR from seeing anything after its own base.
+
+```
+./ape/bin/python -m src.datasets.pr_review_v2.corpus --mode per-pr --start 2025-12-01 --end 2025-12-31
+```
+
+Then September–November by the same command with those dates, if the December study warrants
+it. After any fetch: `precedent_index build`, then `conventions.review_join --write`.
+
 ## The first experiment, after step zero (~$8, one day)
 
 Every design schedules 8–10 engineering days before testing the one assumption they all share:
