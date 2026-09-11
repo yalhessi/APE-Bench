@@ -509,6 +509,97 @@ Of the 80 sampled records, rated as originally joined: 59 unchanged under v2, 7 
 The panel result below is on the records *as rated*; the v2 deltas are listed beside it so the
 correction is not silently folded into the number.
 
+### August gate result (80 comments, two three-rater panels, agreement 0.96)
+
+```
+                            n  strict  lenient   about=yes A/B   request A/B   key_fits=yes A/B
+def/instance                8     0       0         5/5             4/3            0/0
+goal:eq                     8     0       2         6/6             5/5            0/0
+goal:le/mem/subset          8     0       5         8/8             7/7            1/0
+predicate/of                8     0       3         7/5             4/4            0/0
+proof_style:tactic          8     0       2         8/3             3/3            0/0
+proof_style:term            8     1       1         3/3             4/4            1/1
+statement_form:iff/impl     8     0       2         7/4             4/4            0/0
+statement_form:numeral-hyp  8     0       4         5/4             6/6            1/0
+subject                     8     0       5         7/6             7/7            1/0
+typeclass                   8     2       4         8/6             5/5            2/2
+ALL                        80     3 (4%) 28 (35%)  63/50          49/48           6/3
+```
+
+The three columns fail for three different reasons, and only one of them is the join.
+
+**About-declaration is now mostly right, and v2 fixes the rest.** Panel A says 63/80 are about
+the joined declaration. The 13 records resolver v2 changes (7 `between`, 6 to an anonymous
+instance or the `inductive`) are *exactly* 13 records on which the panels had not agreed
+`about=yes` -- and four of the six raters never saw v2. Of the 67 records v2 leaves alone, 50
+are both-panels `yes`; the 17 others are `partial` because the comment is a status reply or a
+general remark, not because the declaration is wrong. The declaration join is no longer the
+problem.
+
+**Sixty percent of August maintainer comments request a form change** (48/80, both panels), in
+these categories: proof_style 12, naming 6, api_family 6, tactic 5, generality 5, whitespace 4,
+placement 3, typeclass 2, statement_form 2, attribute 2, docs 1. The other 32 are status
+replies, thanks, questions, and correctness. This is the enforcement mass, and it is large.
+
+**The situation keys do not describe what is requested -- 4 % strict, 4–8 % key_fits.** The
+facets I built -- goal head, statement iff/impl/numeral, typeclass head, predicate, subject,
+proof shape -- are properties of the *declaration*. Reviewers request changes to a *pattern in
+the code*: inline this `have`; one `simp` call instead of `rw; simp; exact`; `simp only` for a
+non-terminal `simp`; `refine` with no `?_` → `exact`; `wlog` instead of a `by_cases` ladder;
+a `let` for data; drop the unused hypothesis; `[Unique β]` → `[Subsingleton β] [Nonempty β]`.
+The only keys that fit are the ones that *are* the pattern: typeclass heads (2 strict, both
+"weaken this class") and generality. `proof:tactic:multi` fits "partially" ten times because it
+names the proof, not the property. The gate did its job a second time: **S cannot be a coarse
+shape of the declaration. S is the dispreferred form A itself** -- the convention is
+"code that looks like A should look like B", and the reference class is "code exhibiting A".
+
+**The evidence is already machine-readable.** 8,660 of the 34,640 corpus comments (25 %) and
+685 of August's 2,312 (30 %, rising month over month from 22 % in January) carry a GitHub
+```` ```suggestion ```` block: the *replacement code B*, paired with the commented line(s) A
+that the hunk tail gives exactly. In the sample, **0 of 32 non-requests** and 23 of 48 requests
+carry one -- precision 100 % as a request marker -- with coverage concentrated where the
+dev-set's conventions live: proof_style 11/12, tactic 4/5, whitespace 3/4; and thin where the
+request is prose: naming 1/6, api_family 1/6, generality 1/5, typeclass 0/2, placement 0/3. Of
+August's 685, 510 are line-resolved; 453 replace a single line. That is an A→B ledger of the
+enforced component, with no NL classification in the loop, and every row dated and attributed.
+
+**Consequence for the plan.** The enforced component is not "comments joined by facet key"
+but an **A→B ledger**: `(commented lines, suggestion block, category, date, reviewer,
+declaration situation)`, clustered by the transformation (leading tactic A → leading tactic B,
+attribute added/removed, name A → name B, binder change). Facets stay as *conditioning*
+metadata on each row (goal head, kind, typeclass heads -- so "`grind` replaces case splits on
+subset goals" is still expressible), not as the join key. NL requests without a block (naming,
+generality, api_family) need the rater-style `form_A`/`form_B` extraction the panel just did
+by hand -- a second, LLM-in-the-loop source, kept separate and marked as such. First
+measurement of the ledger over August below.
+
+**First look at the August ledger (no model in the loop).** 510 line-resolved suggestion
+comments; 327 replace exactly one line. Where the leading token changes:
+
+```
+  7  simp  -> (deleted)        3  exact -> grind        2  refine -> exact      2  have  -> let
+  5  rw    -> (deleted)        3  exact -> simp         2  apply  -> refine     2  rfl   -> simp
+  3  simp  -> simp_rw          3  apply -> exact        2  exact  -> simpa      1  induction -> cases
+```
+
+Where the leading token stays: 46 `theorem` and 33 `lemma` statement lines edited in place
+(statement-form and naming requests as code), 15 `simp` sets, 11 `simpa`, 9 `have`, 8 `exact`.
+Three `exact → grind` rows in one month, from a corpus with 23 `grind` mentions in total, is the
+onset of the convention PR 33098 was held to in December -- visible as *code*, four months
+ahead, in a source the December reviewer was already indexing and reading as prose.
+
+**What the ledger still needs before it is a component.** (a) Multi-line A: the commented
+*range* for multi-line comments is `original_start_line..original_line`; the hunk tail gives
+the end, the start needs the position fields the corpus rows now carry -- or a re-fetch of
+August alone (a few hundred shallow pages). (b) A clustering of transformations coarser than
+leading tokens and finer than categories: "non-terminal `simp` → `simp only [...]`", "`have h :=
+…; exact h` → inline", "`refine` with no `?_` → `exact`", "tactic block → `grind`". (c) The NL
+half -- naming, generality, api_family, typeclass, placement: 25 of the 48 sampled requests
+had no block. The panel's `form_A`/`form_B` fields are that extraction done by hand; an
+extractor for it is a *second* source and stays labelled as model-derived. (d) Conditioning:
+each row keeps the declaration's facets (kind, goal head, typeclass heads, proof shape) so
+"`grind` replaces case-split proofs of subset goals" is a query over the ledger, not a key.
+
 ## The first experiment, after step zero (~$8, one day)
 
 Every design schedules 8–10 engineering days before testing the one assumption they all share:
