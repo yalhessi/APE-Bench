@@ -121,6 +121,78 @@ classes (primed→unprimed 183:26, flat→dot 45, gains-`Is` 119); `@[simps]` / 
 `@[fun_prop]` attribute-usage patterns; the Zulip store (180k messages); and reading the code,
 which is the only source for the exemplar-taught majority.
 
+## Calibration pass, 2026-09-11: the pre-registered criterion says stop
+
+Terms were frozen and committed in `0d097c2` **before** the sample was drawn: 30 declarations,
+seed `20260911`, and a kill criterion of one third of candidates being both unencoded and
+checkable. Artifact: [`inputs/conventions/calibration.json`](../../inputs/conventions/calibration.json).
+
+```
+candidates                  12          from 23 of 30 sampled declarations read in source
+already_encoded              2          namespace_not_repeated, structured_induction
+unencoded_and_checkable      2          <- the numerator
+unencoded_but_unverifiable   8
+useful_fraction          0.167   threshold 0.333   proceed_to_model_pass: FALSE
+```
+
+**The decision stands as written.** The threshold is not being moved; that is the entire purpose of
+having committed it first.
+
+### What nonetheless worked
+
+**The positive control fired.** `namespace_not_repeated` measures **0.997** over 147,415 namespaced
+declarations — and it is `linter.dupNamespace`, an encoded convention the articulation step
+recovered without being told. Reading declarations does produce real conventions.
+
+**And a count refuted my own articulation, which is the first time this session a mechanism
+corrected me rather than the other way round.** I proposed "the leaf name carries a token naming the
+conclusion's relation" as one convention. By conclusion head:
+
+```
+mem          5,925 applicable   rate 0.939
+le          10,297              rate 0.914
+iff         14,948              rate 0.722
+quantified   6,608              rate 0.419
+eq          85,125              rate 0.254   <- refuted
+```
+
+It is a convention for membership and inequality, and **not** one for equations: an equation is
+named by its content (`Prod.swap_iSup`, `PMF.map_comp`), not by its relation. I would have predicted
+this uniform, and the largest class contradicts it.
+
+### Why it stopped, and it is not the articulation
+
+Eight of twelve candidates could not be checked at all, each naming the field it wanted:
+
+```
+attributes       2   @[reassoc] on CT composite equalities; @[gcongr] on monotonicity
+tactic_sequence  3   rw-then-close; structured induction; computational delegation
+signature        2   hypotheses after `_of_`; `_comp_` transcribing `≫`
+proof_mode       1   term mode for one-step consequences
+source_commands  1   an iff `@[simp]` lemma getting an `alias` split
+```
+
+That is the **counted tooling gap**, and it is the measurement that would justify a
+`TABLE_VERSION /3` carrying attributes, signature and binder heads — rather than widening the table
+speculatively, which is what the pre-registration was designed to prevent.
+
+A related defect found on the way: `DeclarationRow.tactics` records only a **curated 20-token
+vocabulary** (`simpa`, `grind`, `calc`, …); `rw`/`simp`/`exact`/`apply` sit in `wide_tactics`. So
+`tactics == ()` means "no vocabulary tactic", not "term mode" — 87.2% of rows are empty by that
+measure against 49.2% for `wide_tactics`. Any candidate about proof mode is unmeasurable until this
+is fixed, and reading the empty tuple as term mode would have produced a confident wrong number.
+
+Also honest: **7 of the 30 sampled declarations could not be located in source** by the extraction
+regex (primed variants such as `ae_empty_or_univ_of_preimage_ae_le'`, and restated forms), so the
+read was 23, not 30.
+
+### The decision this leaves
+
+Per the pre-registration, no model pass. The two live options are to extend the declaration table
+and re-run calibration against the same frozen criterion, or to stop the catalogue line here. The
+choice turns on whether ~8 candidates per 23 declarations read, blocked only on fields that are
+mechanically extractable, is worth a table rebuild.
+
 ## The reachability census this is for
 
 To be filled once the hand-observed section reaches its target. For each candidate mechanism, the
