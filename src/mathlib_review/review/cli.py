@@ -199,7 +199,7 @@ def _run(args, overrides, logger) -> int:
         scaffold.llm_config.cost_model = args.cost_model
     logger.info("cost model: %s", scaffold.llm_config.cost_model)
     if args.redo:
-        redo_run(dataset, logger)
+        redo_run(dataset, logger, scaffold)
     result = asyncio.run(run(dataset, scaffold, task_overrides, logger))
     if result:
         print(result)

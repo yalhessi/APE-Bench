@@ -154,3 +154,44 @@ def test_the_arm_modes_still_account_for_their_floor():
                    {"mandatory_floor_cost": 2.35}, 4, logger)
 
     assert "mandatory floor $2.35" in "\n".join(logger.lines)
+
+
+# --- --redo, which had never worked ---------------------------------------------------------
+
+
+def test_the_scratch_dir_fallback_does_not_need_a_scaffold_instance():
+    """`--redo` is the only caller that reaches this branch, and it raised on every invocation:
+    `BaseScaffoldConfig` requires `scaffold_type`, so constructing one bare is a
+    `ValidationError`. The guard path always passes a scaffold, so nothing else exercised it
+    and the failure surfaced only when a run actually needed redoing.
+    """
+
+    from src.mathlib_review.review.runner import _scratch_dirs
+
+    dirs = _scratch_dirs("some-run")
+    assert len(dirs) == 2
+    assert dirs[0].name == "some-run" and dirs[1].name == "some-run_floor"
+
+
+def test_the_scratch_dir_follows_the_config_that_wrote_it():
+    """A config that sets `runs_base_dir` writes its resume key somewhere else. Falling back to
+    the packaged default there removes nothing and leaves the resume key intact, so the redo
+    rebuilds from cached attempts and looks like a fresh run -- the exact failure `redo_run`
+    exists to prevent."""
+
+    from src.mathlib_review.review.runner import _scratch_dirs
+
+    class _Scaffold:
+        runs_base_dir = "/tmp/elsewhere/runs"
+
+    assert _scratch_dirs("r", _Scaffold())[0].as_posix() == "/tmp/elsewhere/runs/r"
+
+
+def test_redo_is_handed_the_scaffold_by_its_caller():
+    """The parameter is only useful if the CLI passes it."""
+
+    import inspect
+
+    from src.mathlib_review.review import cli
+
+    assert "redo_run(dataset, logger, scaffold)" in inspect.getsource(cli._run)

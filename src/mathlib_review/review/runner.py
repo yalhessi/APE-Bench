@@ -935,7 +935,11 @@ def _scratch_dirs(run_name: str, scaffold=None) -> List[Path]:
     else:
         from ape.scaffolds.config import BaseScaffoldConfig
 
-        base = Path(BaseScaffoldConfig().runs_base_dir)
+        # The field's default, not an instance. `BaseScaffoldConfig` requires `scaffold_type`,
+        # so constructing one bare raised `ValidationError` -- which made this whole branch
+        # dead, and with it `--redo`, whose only job is to reach it. Nothing caught it because
+        # the guard path always passes a scaffold; `redo_run` was the one caller that did not.
+        base = Path(BaseScaffoldConfig.model_fields["runs_base_dir"].default)
     return [base / run_name, base / f"{run_name}_floor"]
 
 
@@ -1003,18 +1007,23 @@ def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
     )
 
 
-def redo_run(dataset: V5DatasetConfig, logger) -> None:
+def redo_run(dataset: V5DatasetConfig, logger, scaffold=None) -> None:
     """Discard a run's results AND its orchestrator state, so a redo really re-executes.
 
     Clearing only the results directory would leave the resume key intact, which is the
     failure this exists to prevent: the outputs would be rebuilt from cached attempts and
     look like a fresh run.
+
+    `scaffold` is passed so the scratch directories are read from the config that wrote them.
+    Without it this falls back to the packaged default, which is right for every config that
+    does not set `runs_base_dir` and silently wrong -- removing nothing, and leaving the
+    resume key intact -- for any that does.
     """
 
     import shutil
 
     directory = run_dir(dataset.run_name)
-    for target in [directory, *_scratch_dirs(dataset.run_name)]:
+    for target in [directory, *_scratch_dirs(dataset.run_name, scaffold)]:
         if target.is_dir():
             shutil.rmtree(target)
             logger.info("redo: removed %s", target)
