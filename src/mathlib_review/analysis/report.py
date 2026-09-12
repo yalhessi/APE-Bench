@@ -594,6 +594,8 @@ def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str
     if release is not None:
         out["attention"] = _attention_vs_maintainers(runs, Path(release), reference)
         out["redundancy"] = {label: _redundancy(run_name) for label, run_name in runs.items()}
+        out["examination"] = {label: _examination(run_name, Path(release))
+                              for label, run_name in runs.items()}
     return out
 
 
@@ -673,3 +675,103 @@ def _redundancy(run_name: str) -> Optional[Dict[str, Any]]:
         "targets_written_up_more_than_once": sum(1 for v in per_target.values() if v > 1),
         "families_per_target": {str(k): v for k, v in sorted(families.items())},
     }
+
+
+def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
+    """What a condition actually looked at, per PR: the depth exhibit.
+
+    The design's motivating claim is that one model call does not examine a PR deeply -- it
+    reads a few things that are easy to examine and stops. That is a claim about *attention*,
+    and it is checkable from the transcript without gold: which files were read and over which
+    lines, which declarations were searched for, and how much of the PR's change surface that
+    touched. A change target counts as examined if a `file_read` span on its path overlaps its
+    span, or its name appears in a search. Emitting a finding on it is not required -- the
+    question is what was looked at, not what was said.
+
+    Measured the same way for every condition, from transcripts, so the scheduled design's
+    coverage is observed rather than asserted from its floor. Reported beside the PR's diff
+    size and file count, because the claim only bites on large PRs: on a 912-character,
+    single-file PR every condition reads everything, and 33294 is 46k characters over 11 files.
+    """
+
+    from collections import defaultdict
+
+    from ape.tasks.lean_tasks.formal_math.review.candidates import normalize_proposed_edit_path
+    from src.mathlib_review.analysis.trajectory import extract
+    from src.mathlib_review.schema import ChangeGraph
+
+    extracted = extract(run_name)
+    if not extracted.get("present"):
+        return None
+
+    reads: Dict[int, List[tuple]] = defaultdict(list)       # pr -> (path, start, end)
+    searched: Dict[int, set] = defaultdict(set)              # pr -> identifiers / patterns
+    tools: Dict[int, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for pr_key, turns in (extracted.get("turns_by_pr") or {}).items():
+        try:
+            pr = int(pr_key)
+        except (TypeError, ValueError):
+            continue
+        for turn in turns:
+            for item in turn.items:
+                if item.get("t") != "use":
+                    continue
+                name = item.get("name")
+                tools[pr][name] += 1
+                try:
+                    payload = json.loads(item.get("v") or "{}")
+                except json.JSONDecodeError:
+                    payload = {}
+                if not isinstance(payload, dict):
+                    continue
+                if name == "file_read":
+                    path = normalize_proposed_edit_path(
+                        payload.get("file_path") or payload.get("path") or "")
+                    span = payload.get("line_range") or [None, None]
+                    start = span[0] if isinstance(span, list) and span else None
+                    end = span[1] if isinstance(span, list) and len(span) > 1 else None
+                    reads[pr].append((path, start, end))
+                elif name in ("declaration_search", "content_search", "precedent_search"):
+                    for key in ("identifier", "content_pattern", "query", "declaration"):
+                        if payload.get(key):
+                            searched[pr].add(str(payload[key]))
+
+    episodes = {row["pr_number"]: row for row in _load_jsonl(release / "input/episodes.jsonl")}
+    out: Dict[str, Any] = {}
+    for row in _load_jsonl(release / "derived/change_graphs.jsonl"):
+        graph = ChangeGraph.model_validate(row)
+        pr = graph.pr_number
+        if pr not in tools and pr not in reads:
+            continue
+        entities = {e.entity_id: e for e in graph.entities}
+        ranges = {r.range_id: r for r in graph.changed_ranges}
+        examined = 0
+        for target in graph.targets:
+            spans = [(entities[e].span.line_start, entities[e].span.line_end)
+                     for e in target.reviewed_entity_ids
+                     if e in entities and entities[e].span]
+            if not spans:
+                spans = [(ranges[r].reviewed_span.line_start, ranges[r].reviewed_span.line_end)
+                         for r in target.changed_range_ids
+                         if r in ranges and ranges[r].reviewed_span]
+            by_read = any(
+                path == target.path and (
+                    start is None or end is None
+                    or any(s <= end and start <= t for s, t in spans))
+                for path, start, end in reads.get(pr, []))
+            short = (target.declaration_name or "").rsplit(".", 1)[-1]
+            by_search = bool(short) and any(short in q for q in searched.get(pr, ()))
+            examined += bool(by_read or by_search)
+        episode = episodes.get(pr) or {}
+        out[str(pr)] = {
+            "targets_total": len(graph.targets),
+            "targets_examined": examined,
+            "examined_share": round(examined / len(graph.targets), 3) if graph.targets else None,
+            "file_reads": len(reads.get(pr, [])),
+            "distinct_files_read": len({path for path, _s, _e in reads.get(pr, [])}),
+            "searches": len(searched.get(pr, ())),
+            "tool_calls": dict(sorted(tools.get(pr, {}).items())),
+            "diff_chars": len(episode.get("diff") or ""),
+            "changed_files": len(episode.get("changed_files") or []),
+        }
+    return out

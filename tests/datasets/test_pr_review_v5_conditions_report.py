@@ -131,3 +131,96 @@ def test_union_and_exclusive_sets_are_the_output_not_just_the_rates(tmp_path, mo
     assert out["funnel"]["A"]["issue"]["recall"] == out["funnel"]["B"]["issue"]["recall"] == 0.5
     assert issue["exclusive_ids"] == {"A": ["ob:1", "ob:2"], "B": ["ob:3", "ob:4"]}
     assert issue["combined_union_recall"] == 1.0
+
+
+# --- examination depth: the claim that one call does not look deeply -------------------------
+
+PROBE_RUN = "pr5_solo_ape_33438_probe"
+PROBE_TRANSCRIPTS = Path(".ape/runs") / PROBE_RUN
+
+
+@pytest.mark.skipif(not PROBE_TRANSCRIPTS.is_dir() or not RELEASE.is_dir(),
+                    reason="needs the probe run's orchestrator tree and the release on disk")
+def test_examination_is_read_from_the_transcript_not_asserted_from_the_floor():
+    """On 33438 the solo agent made one `file_read` of lines 160-260 of Arctan.lean; the PR's
+    two change targets sit at 205-211 and 212-218, and both were also named in searches. So
+    2 of 2 examined, from one read -- and on a 912-character PR that is the expected result.
+    The exhibit only bites on 33294 (46k characters, 11 files), which is why size is reported
+    beside it."""
+
+    out = report_module._examination(PROBE_RUN, RELEASE)
+    assert out is not None and "33438" in out, out
+    row = out["33438"]
+
+    assert row["targets_total"] == 2
+    assert row["targets_examined"] == 2 and row["examined_share"] == 1.0
+    assert row["file_reads"] == 1 and row["distinct_files_read"] == 1
+    # `searches` counts DISTINCT query strings: `arctan_sqrt_three` was both content-searched
+    # and declaration-searched, so seven search calls are six distinct questions. The metric
+    # is what the agent asked about, not how many times it pressed the button.
+    assert row["searches"] == 6
+    assert row["tool_calls"].get("content_search") == 5
+    assert row["tool_calls"].get("declaration_search") == 2
+    assert row["diff_chars"] == 912 and row["changed_files"] == 1
+
+
+def test_a_target_counts_as_examined_by_span_overlap_or_by_name(tmp_path, monkeypatch):
+    """Two ways to have looked at a declaration: read the lines it lives on, or search for it
+    by name. A read that stops short of it and a search for something else count as neither
+    -- the metric must be able to say "not examined", or it is the floor restated."""
+
+    import json as _json
+
+    from src.mathlib_review.analysis import trajectory
+
+    class _Turn:
+        def __init__(self, items):
+            self.items = items
+
+    def use(name, **payload):
+        return {"t": "use", "name": name, "v": _json.dumps(payload), "bytes": 1}
+
+    turns = [_Turn([use("file_read", file_path="target/Mathlib/A.lean", line_range=[1, 10]),
+                    use("declaration_search", identifier="Foo.named")])]
+    monkeypatch.setattr(trajectory, "extract",
+                        lambda run_name, *a, **k: {"present": True, "turns_by_pr": {"7": turns}})
+
+    release = tmp_path / "rel"
+    (release / "input").mkdir(parents=True)
+    (release / "derived").mkdir()
+    (release / "input/episodes.jsonl").write_text(_json.dumps(
+        {"pr_number": 7, "diff": "x" * 100, "changed_files": ["Mathlib/A.lean"]}) + "\n")
+
+    def target(cid, name, start, end):
+        return {"schema_version": "change-target1", "change_id": cid, "episode_id": "ep:7",
+                "pr_number": 7, "kind": "declaration", "path": "Mathlib/A.lean",
+                "declaration_name": name, "base_entity_ids": [],
+                "reviewed_entity_ids": [f"ent:{cid}"], "changed_range_ids": [],
+                "diff_fragments": [], "parse_status": "semantic", "source_sha256": "0" * 64}
+
+    def entity(cid, start, end):
+        return {"schema_version": "semantic-entity1", "entity_id": f"ent:{cid}",
+                "side": "reviewed", "path": "Mathlib/A.lean", "kind": "theorem",
+                "name": cid, "span": {"line_start": start, "line_end": end},
+                "code": "theorem x : True := trivial", "source_sha256": "0" * 64,
+                "parser_version": "test"}
+
+    graph = {"schema_version": "cg1", "graph_id": "g:7", "episode_id": "ep:7", "repo": "r",
+             "pr_number": 7, "round_index": 1, "patch_sha256": "0" * 64, "parser_version": "p",
+             "changed_ranges": [], "file_coverage": [], "source_sha256": "0" * 64,
+             "entities": [entity("a", 2, 5), entity("b", 40, 45), entity("c", 80, 85)],
+             "targets": [target("a", "Foo.in_read", 2, 5),
+                         target("b", "Foo.named", 40, 45),
+                         target("c", "Foo.untouched", 80, 85)]}
+    # The fixture must be a real graph or the test tests nothing -- and a skip here would be
+    # a structural guard going vacuous, which this repository has been bitten by before. Fail.
+    from src.mathlib_review.schema import ChangeGraph
+    try:
+        ChangeGraph.model_validate(graph)
+    except Exception as exc:
+        pytest.fail(f"fixture graph does not validate against the schema: {exc}")
+    (release / "derived/change_graphs.jsonl").write_text(_json.dumps(graph) + "\n")
+
+    row = report_module._examination("any", release)["7"]
+    assert row["targets_total"] == 3
+    assert row["targets_examined"] == 2, row   # by read, by name; not the untouched one

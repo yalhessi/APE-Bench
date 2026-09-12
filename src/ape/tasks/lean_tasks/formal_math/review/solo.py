@@ -175,6 +175,11 @@ class SoloReviewData(BasePRReviewData):
 
 class SoloReviewResult(BasePRReviewResult):
     episode_id: str = ""
+    #: On the result as well as the data, so the run's own tooling files this as one
+    #: invocation. `analysis.trajectory.extract` reads `task_result.json` and classifies a
+    #: top-level result by whether it carries an `invocation_id`; without it the whole-PR
+    #: review was filed as a lead, and its transcript could be found but not attributed.
+    invocation_id: str = ""
 
 
 class SoloReviewTask(BasePRReviewTask):
@@ -200,6 +205,7 @@ class SoloReviewTask(BasePRReviewTask):
         # From `self.data`, never the model's self-report -- the same rule the arms follow, and
         # for the same reason: an identity the model can state is an identity it can get wrong.
         kwargs.setdefault("episode_id", self.data.episode_id)
+        kwargs.setdefault("invocation_id", self.data.invocation_id)
         return super().create_result(**kwargs)
 
 
