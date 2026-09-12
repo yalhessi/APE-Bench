@@ -37,5 +37,14 @@ paths:
 - **Caps bind billed cost, not nominal** (they differ ~2.5× with prompt caching), so a job spends its
   whole cap; every scheduled task writes `task_outcome.json`; `task_result.json` is never synthesised
   for a pause or failure.
+- **Never read JSONL with `splitlines()`; use `io.jsonl_rows` (or `io.load_jsonl`).** `jsonl_bytes`
+  joins on `\n` and `canonical_json_bytes` writes `ensure_ascii=False`, so a record keeps U+2028,
+  U+2029, U+0085, `\v`, `\f`, `\x1c`, `\x1d`, `\x1e` verbatim -- and `splitlines()` breaks on all
+  of them, cutting a record in half mid-string. Two of 32,851 collected PRs carry U+2028 in a
+  comment body; it killed the pre-gate with `Unterminated string` and a traceback naming no PR.
+  Fixing the *writer* is not an option: escaping at write time rewrites every stored digest.
+- **Check a store file against its ledger digest before believing it is corrupt.** Both damaged
+  reads were `digest=ok json=BAD` -- intact bytes, wrong reader. `store.read` now reports which,
+  and that distinction is the whole diagnosis.
 - Boundary counts are pinned in `tests/datasets/test_package_boundaries.py` (0 backward
   cross-generation edges, 0 v5→v2, 3 private in-package imports). They may only go down.
