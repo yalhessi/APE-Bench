@@ -29,6 +29,13 @@ them. Exclusion is a projection's job (`definitions.scored_pr_numbers`), not col
 
 Resumable at every point: an endpoint already recorded for a PR is never fetched again, and the
 tier-0 PR list for a window is cached in `data/pull_requests/collect.state.json`.
+
+**Scope a run with `--created-from/--created-to`, never with a narrower `--start/--end`.** The
+window is the tier-0 cache key, so changing it walks the listing again -- and a second walk over
+an overlapping window meets rows whose `updated_at` has moved since, which the store used to
+refuse. Slicing filters the cached list on data already held and costs nothing:
+
+    ... --start 2024-03-01 --end 2026-08-31 --tier 2 --created-from 2025-12-01 --created-to 2026-01-31
 """
 
 from __future__ import annotations
@@ -48,7 +55,9 @@ from src.datasets.pull_requests.github import (
     GitHubClient, GitHubError, compact_compare, compare_bytes, fetch_body_edits,
     fetch_review_threads,
 )
-from src.datasets.pull_requests.store import PullRequestStore, write_atomically
+from src.datasets.pull_requests.store import (
+    ImmutableEndpointError, PullRequestStore, write_atomically,
+)
 from src.mathlib_review.paths import PULL_REQUESTS_ROSTERS, PULL_REQUESTS_TRACKED, assert_repo_root
 
 REPO = "leanprover-community/mathlib4"
@@ -212,13 +221,56 @@ class Collector:
             return cached["prs"]
         rows = walk_listing(self.client, start, end, self.logger)
         fetched_at = _now()
+        bumped = 0
         for number, row in rows.items():
-            self.store.write_endpoint(number, "listing", row, request=f"/repos/{REPO}/pulls#listing",
-                                      fetched_at=fetched_at, source="github")
+            try:
+                self.store.write_endpoint(number, "listing", row,
+                                          request=f"/repos/{REPO}/pulls#listing",
+                                          fetched_at=fetched_at, source="github")
+            except ImmutableEndpointError:
+                # Unlike a conversation endpoint, a listing row is a snapshot of a *mutable*
+                # object: one comment bumps `updated_at` and the bytes differ. A second walk over
+                # an overlapping window would otherwise raise on the first PR touched since the
+                # first walk -- which, in a repo as busy as mathlib4, is within the hour. The
+                # recorded row stands ("data never moves"); tier 0's job is deciding which PRs
+                # exist, and the fields the pre-gate reads do not change once a PR is closed.
+                bumped += 1
+        if bumped:
+            self.logger.info("  tier 0: %d listing row(s) changed since an earlier walk; keeping "
+                             "the recorded ones", bumped)
         prs = sorted(rows)
         state["windows"][key] = {"prs": prs, "complete": True, "walked_at": fetched_at}
         self._save_state(state)
         return prs
+
+    def created_on(self, number: int) -> str:
+        """The PR's creation day, from whichever of listing/pr the store has. "" if neither."""
+
+        endpoints = self.store.ledger(number)["endpoints"]
+        for name in ("listing", "pr"):
+            if endpoints.get(name, {}).get("present"):
+                return str((self.store.read(number, name) or {}).get("created_at") or "")[:10]
+        return ""
+
+    def slice_prs(self, prs: Iterable[int], created_from: Optional[str],
+                  created_to: Optional[str]) -> List[int]:
+        """PRs from an already-walked window, narrowed by creation date.
+
+        This is how a tier-2 run is scoped, and the reason it is not done with `--start`/`--end`:
+        those name the *window*, which keys the tier-0 cache, so changing them walks the listing
+        again -- 300-odd pages, and then a raise on the first row bumped since the first walk.
+        Slicing reads only what the store already has and spends nothing.
+        """
+
+        prs = list(prs)
+        if not (created_from or created_to):
+            return prs
+        kept = [n for n in prs
+                if (not created_from or self.created_on(n) >= created_from)
+                and (not created_to or (self.created_on(n) or "9999") <= created_to)]
+        self.logger.info("  slice: %d of %d PRs created in %s..%s", len(kept), len(prs),
+                         created_from or "start", created_to or "end")
+        return kept
 
     def _progress(self, label: str, index: int, total: int, number: int, t0: float, done: int) -> None:
         elapsed = max(1e-6, time.monotonic() - t0)
@@ -393,6 +445,13 @@ def main() -> None:
     parser.add_argument("--tier", type=int, choices=[1, 2], default=1,
                         help="1: walk the window and fetch conversations (then report the pre-gate); "
                              "2: fetch tier 2 for PRs passing the pre-gate")
+    parser.add_argument("--created-from", default=None, metavar="YYYY-MM-DD",
+                        help="restrict this run to PRs created on or after this day, inside the "
+                             "window already walked. Use this to scope a tier-2 run -- NOT a "
+                             "narrower --start/--end, which keys the tier-0 cache and walks the "
+                             "listing again")
+    parser.add_argument("--created-to", default=None, metavar="YYYY-MM-DD",
+                        help="restrict this run to PRs created on or before this day")
     parser.add_argument("--roster", type=Path, default=None, help="default: the latest dated roster")
     parser.add_argument("--store", type=Path, default=None)
     args = parser.parse_args()
@@ -409,6 +468,7 @@ def main() -> None:
     try:
         prs = collector.window_prs(args.start, args.end)
         logger.info("  tier 0: %d PRs in the window", len(prs))
+        prs = collector.slice_prs(prs, args.created_from, args.created_to)
         if args.tier == 1:
             result = collector.tier1(prs)
             gate = collector.gate_report(prs)
@@ -419,7 +479,7 @@ def main() -> None:
         client.close()
     manifest = write_tracked_export(store)
     _append_report({"collector_version": COLLECTOR_VERSION, "window": [args.start, args.end],
-                    "tier": args.tier, "started_at": started, "finished_at": _now(),
+                    "slice": [args.created_from, args.created_to], "tier": args.tier, "started_at": started, "finished_at": _now(),
                     "requests": collector.requests, "result": result,
                     "pre_gate": {k: v for k, v in gate.items() if k != "passing_prs"},
                     "roster": {"path": str(roster_path), "sha256": roster_sha256(roster_path)},

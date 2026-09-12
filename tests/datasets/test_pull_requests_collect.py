@@ -285,3 +285,38 @@ def test_the_collector_reports_what_the_client_spent_not_what_it_guessed(collect
     store, fake, collector, prs = collected
     assert collector.requests == fake.request_count
     assert collector.requests > 0
+
+
+# --- scoping a run without re-walking tier 0 ---------------------------------------------------
+
+def test_a_second_walk_keeps_the_recorded_listing_row_when_github_has_bumped_it(collected, tmp_path):
+    """A listing row is a snapshot of a mutable object -- one new comment moves `updated_at`.
+    The store refuses a changed payload, so an uncaught re-walk died on the first PR touched
+    since the first walk. The recorded row stands and the walk finishes."""
+
+    store, fake, collector, prs = collected
+    for entry in fake.prs.values():                      # GitHub moves on
+        entry["listing"]["updated_at"] = "2025-12-20T00:00:00Z"
+
+    fresh = Collector(store, fake, LOG, roster_path=collector.roster_path,
+                      state_path=tmp_path / "other-state.json")
+    assert fresh.window_prs("2025-12-01", "2025-12-31") == prs
+    assert store.read(101, "listing")["updated_at"] == "2025-12-05T00:00:00Z"   # the first one
+
+
+def test_a_slice_narrows_the_run_without_touching_tier_0(collected):
+    """The point of the slice: scoping tier 2 must not change the window, because the window keys
+    the tier-0 cache and a re-walk costs 300-odd pages before it fetches anything."""
+
+    store, fake, collector, prs = collected
+    before = len(fake.requests)
+    december = collector.slice_prs(prs, "2025-12-01", "2025-12-31")
+    january = collector.slice_prs(prs, "2026-01-01", "2026-01-31")
+    assert len(fake.requests) == before                  # slicing spends nothing
+    assert set(december) == set(prs)                     # every fixture PR is a December PR
+    assert january == []
+
+
+def test_slicing_with_no_bounds_is_the_whole_window(collected):
+    _, _, collector, prs = collected
+    assert collector.slice_prs(prs, None, None) == prs
