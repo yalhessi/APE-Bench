@@ -251,3 +251,37 @@ def test_a_response_anchored_outside_the_sealed_scope_is_still_refused():
         reconcile(agenda=agenda, delegations=_pruned_delegations(agenda),
                   responses=[_solo_response("wu:not-in-the-agenda")],
                   plan=_plan(), results=_Usage(), issues_total=0)
+
+
+def test_retrieval_calls_are_counted_from_the_trace_not_the_empty_ledger():
+    """`context_calls_total` is summed over delegation rows. A solo run's delegations are all
+    `pruned` with empty call lists, so the manifest reported 0 while `context_trace.jsonl` held
+    real retrievals -- and 0 there is indistinguishable from an agent that chose not to
+    retrieve, which is a claim this experiment would otherwise have made by accident.
+    """
+
+    from src.mathlib_review.review.trace import reconcile
+
+    agenda = _solo_agenda()
+    manifest = reconcile(
+        agenda=agenda, delegations=_pruned_delegations(agenda),
+        responses=[_solo_response("wu:1")], plan=_plan(), results=_Usage(),
+        issues_total=2, context_calls_total=2)
+
+    assert manifest.context_calls_total == 2
+
+
+def test_the_ledger_still_supplies_the_count_when_nothing_overrides_it():
+    """The override must not become the only path: every other mode's count comes from the
+    delegation rows, and reading it from a trace file they do not write would zero them."""
+
+    from src.mathlib_review.review.trace import reconcile
+
+    agenda = _solo_agenda()
+    delegations = _pruned_delegations(agenda)
+    delegations[0]["context_calls"] = [{"tool": "declaration_search"}]
+    manifest = reconcile(agenda=agenda, delegations=delegations,
+                         responses=[_solo_response("wu:1")], plan=_plan(),
+                         results=_Usage(), issues_total=0)
+
+    assert manifest.context_calls_total == 1

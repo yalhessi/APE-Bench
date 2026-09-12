@@ -43,6 +43,7 @@ from src.mathlib_review.io import (
     canonical_json_bytes,
     git_state,
     jsonl_bytes,
+    jsonl_rows,
     load_jsonl,
     pretty_json_bytes,
     sha256_bytes,
@@ -1228,6 +1229,14 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         agenda=agenda, delegations=delegations, responses=responses,
         plan=plan, results=results, issues_total=summary["issues_total"],
         coverage_gaps=coverage_gaps,
+        # Counted off the trace in `solo`, not off the ledger. The manifest's figure is the sum
+        # over delegation rows, and a solo run's delegations are all `pruned` with empty call
+        # lists -- so it reported 0 while `context_trace.jsonl` held real retrievals. Zero
+        # retrieval calls and zero instrumentation are the two things this project has most
+        # often confused, and they read identically in a manifest.
+        context_calls_total=(
+            len(list(jsonl_rows(trace_path))) if dataset.routing_mode == "solo"
+            and trace_path.is_file() else None),
     )
     write_once(out / "run_manifest.json", pretty_json_bytes(manifest.model_dump(mode="json")))
     logger.info("run dir: %s", out)

@@ -49,6 +49,7 @@ def reconcile(
     issues_total: int,
     extra_cost: float = 0.0,
     coverage_gaps: Sequence[Dict[str, Any]] = (),
+    context_calls_total: int | None = None,
 ) -> V5RunManifest:
     """Build the run manifest, raising if the ledger does not balance.
 
@@ -235,7 +236,8 @@ def reconcile(
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),
         candidates_total=candidates_total,
         issues_total=issues_total,
-        context_calls_total=context_calls,
+        context_calls_total=(context_calls if context_calls_total is None
+                             else context_calls_total),
         completion_status=(
             "failed" if statuses["failed"] else
             "partial" if coverage_gaps else

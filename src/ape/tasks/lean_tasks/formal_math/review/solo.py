@@ -24,6 +24,14 @@ is the confound that cell exists to remove.
 No submission tool is defined here. `BasePRReviewTask` already registers `submit_findings`
 with exactly the free-form shape this condition wants -- `{path, line_start, line_end,
 severity, claim, suggested_fix, evidence}` -- and `create_user_prompt` already names it.
+
+**Known and deliberate: the `verified` channel is structurally empty for this condition.** The
+base grant includes `lean_verify_edit` and the agent does use it -- 4 calls on the first clean
+probe run -- but nothing captures those compiles as verification artifacts, so no finding here
+can ever carry a `verified_compile` warrant. That is the generalist arm's situation exactly,
+for the same reason, and it is why the comparison is read on the `review` channel: `published`
+recall measures the evidence gate rather than either reviewer. Recorded here so it is a stated
+limitation rather than a surprise found while reading a result.
 """
 
 from typing import List, Optional, Tuple
