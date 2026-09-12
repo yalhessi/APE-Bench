@@ -481,7 +481,7 @@ if __name__ == "__main__":
     main()
 
 
-def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str, Any]:
+def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str, Any]:
     """Two or more judged runs on one denominator: the funnel, the union, the exclusive sets.
 
     The first production caller of `analysis.reports.compare_conditions`, which has implemented
@@ -491,8 +491,11 @@ def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str
     sets are the only honest output: `stable` is undefined and a rate delta at these
     denominators is inside the judge's own disagreement with itself.
 
-    `runs` is `{label: run_name}`. Audits are derived from run names the way `judge --of`
-    derives them, so a condition cannot be paired with an audit that scored a different run.
+    `runs` is `{label: run_name}` or `{label: [run_name, ...]}` -- several runs under one label
+    are repetitions of one condition, and are what turns the funnel into mean / union / stable
+    and makes `hit_frequency` say how many of N repetitions found each obligation. Audits are
+    derived from run names the way `judge --of` derives them, so a condition cannot be paired
+    with an audit that scored a different run.
 
     Refuses to compare across judges: `judge_identity` hashes the rubric, model, sampling and
     decode budgets, and R0 found two judge arms disagreeing on 4 of 18 pairs from decode
@@ -508,22 +511,28 @@ def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str
     from src.mathlib_review.analysis.reports import compare_conditions, rep_summary
     from src.mathlib_review.judge.runner import derive_from_run
 
-    loaded: Dict[str, Dict[str, Any]] = {}
-    for label, run_name in runs.items():
-        audit = derive_from_run(run_name)["out_dir"] / "semantic_report.json"
-        if not audit.is_file():
-            raise SystemExit(
-                f"{label}: no judge output at {audit}. Judge the run first:\n"
-                f"  python -m src.mathlib_review.review.cli judge --config <judge config> "
-                f"--of {run_name} --execute")
-        payload = json.loads(audit.read_text())
-        if not payload.get("scored", True):
-            raise SystemExit(
-                f"{label}: {run_name} is not scored "
-                f"({payload.get('coverage', {}).get('error')}); nothing to compare")
-        loaded[label] = payload
+    reps: Dict[str, List[str]] = {
+        label: ([names] if isinstance(names, str) else list(names))
+        for label, names in runs.items()}
+    loaded: Dict[str, List[Dict[str, Any]]] = {}
+    for label, names in reps.items():
+        loaded[label] = []
+        for run_name in names:
+            audit = derive_from_run(run_name)["out_dir"] / "semantic_report.json"
+            if not audit.is_file():
+                raise SystemExit(
+                    f"{label}: no judge output at {audit}. Judge the run first:\n"
+                    f"  python -m src.mathlib_review.review.cli judge --config <judge config> "
+                    f"--of {run_name} --execute")
+            payload = json.loads(audit.read_text())
+            if not payload.get("scored", True):
+                raise SystemExit(
+                    f"{label}: {run_name} is not scored "
+                    f"({payload.get('coverage', {}).get('error')}); nothing to compare")
+            loaded[label].append(payload)
 
-    identities = {label: p.get("judge_identity") for label, p in loaded.items()}
+    identities = {f"{label}[{i}]": p.get("judge_identity")
+                  for label, ps in loaded.items() for i, p in enumerate(ps)}
     if len(set(identities.values())) > 1:
         raise SystemExit(
             f"conditions were judged by different instruments: {identities}. "
@@ -531,8 +540,8 @@ def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str
             "under one is not comparable to a verdict under another.")
 
     denominators = {
-        label: sorted(row["obligation_id"] for row in p.get("per_obligation") or [])
-        for label, p in loaded.items()}
+        f"{label}[{i}]": sorted(row["obligation_id"] for row in p.get("per_obligation") or [])
+        for label, ps in loaded.items() for i, p in enumerate(ps)}
     reference = next(iter(denominators.values()))
     for label, ids in denominators.items():
         if ids != reference:
@@ -551,17 +560,29 @@ def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str
 
     levels: Dict[str, Any] = {}
     for level in ("location", "issue", "resolution"):
-        summaries = {label: rep_summary([hits(p, level)], reference)
-                     for label, p in loaded.items()}
+        summaries = {label: rep_summary([hits(p, level) for p in ps], reference)
+                     for label, ps in loaded.items()}
         levels[level] = compare_conditions(summaries)
 
     n = len(reference)
+    # With one repetition per label the three coincide and `hit` is the run's count. With
+    # several, `hit` is the per-repetition mean and the union / stable figures sit beside it
+    # -- a condition that finds an obligation in 1 of 10 runs and one that finds it in 10 of
+    # 10 have the same union and very different means, and the talk needs to know which.
     funnel = {
         label: {
-            level: {"hit": len(levels[level]["conditions"][label]["union_ids"]),
-                    "recall": round(len(levels[level]["conditions"][label]["union_ids"]) / n, 3)
-                    if n else None}
+            level: {
+                "hit": round(sum(c["per_repetition_hits"]) / c["repetitions"], 2)
+                if c["repetitions"] else None,
+                "recall": round(c["mean_recall"], 3) if c["mean_recall"] is not None else None,
+                "union_recall": round(c["union_recall"], 3)
+                if c["union_recall"] is not None else None,
+                "stable_recall": round(c["stable_recall"], 3)
+                if c["stable_recall"] is not None else None,
+                "per_repetition_hits": c["per_repetition_hits"],
+            }
             for level in ("location", "issue", "resolution")
+            for c in [levels[level]["conditions"][label]]
         }
         for label in loaded}
 
@@ -571,31 +592,41 @@ def conditions(runs: Dict[str, str], release: Optional[Path] = None) -> Dict[str
         # read at a precision it cannot bear.
         "one_flip_pp": round(100.0 / n, 1) if n else None,
         "judge_identity": next(iter(identities.values())),
-        "repetitions": {label: 1 for label in loaded},
+        "repetitions": {label: len(ps) for label, ps in loaded.items()},
+        "runs": reps,
         "funnel": funnel,
         "by_level": levels,
         # The only precision signal there is. NOT a false-finding rate: a control PR is one
         # where maintainers asked for nothing, and emission there is counted, not judged.
-        "control_emission": {label: p.get("silent_pr_emission") for label, p in loaded.items()},
+        # One entry per repetition, never pooled: the reader can see the spread.
+        "control_emission": {label: [p.get("silent_pr_emission") for p in ps]
+                             for label, ps in loaded.items()},
     }
 
-    manifests = {}
-    for label, run_name in runs.items():
-        path = run_dir(run_name) / "run_manifest.json"
-        if path.is_file():
-            m = json.loads(path.read_text())
-            manifests[label] = {"billed": (m.get("usage") or {}).get("billed"),
-                                "nominal": (m.get("usage") or {}).get("nominal"),
-                                "completion_status": m.get("completion_status"),
-                                "routing_mode": m.get("routing_mode")}
+    manifests: Dict[str, List[Dict[str, Any]]] = {}
+    for label, names in reps.items():
+        for run_name in names:
+            path = run_dir(run_name) / "run_manifest.json"
+            if path.is_file():
+                m = json.loads(path.read_text())
+                manifests.setdefault(label, []).append({
+                    "run": run_name,
+                    "billed": (m.get("usage") or {}).get("billed"),
+                    "nominal": (m.get("usage") or {}).get("nominal"),
+                    "completion_status": m.get("completion_status"),
+                    "routing_mode": m.get("routing_mode")})
     if manifests:
         out["cost"] = manifests
 
     if release is not None:
-        out["attention"] = _attention_vs_maintainers(runs, Path(release), reference)
-        out["redundancy"] = {label: _redundancy(run_name) for label, run_name in runs.items()}
+        # The per-run exhibits are computed on the first repetition of each label. They are
+        # facts about a run, and the first is as representative as any; a per-rep spread of
+        # attention or examination is a separate question from the one this block answers.
+        first = {label: names[0] for label, names in reps.items()}
+        out["attention"] = _attention_vs_maintainers(first, Path(release), reference)
+        out["redundancy"] = {label: _redundancy(run_name) for label, run_name in first.items()}
         out["examination"] = {label: _examination(run_name, Path(release))
-                              for label, run_name in runs.items()}
+                              for label, run_name in first.items()}
     return out
 
 

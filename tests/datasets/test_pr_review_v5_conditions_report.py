@@ -224,3 +224,64 @@ def test_a_target_counts_as_examined_by_span_overlap_or_by_name(tmp_path, monkey
     row = report_module._examination("any", release)["7"]
     assert row["targets_total"] == 3
     assert row["targets_examined"] == 2, row   # by read, by name; not the untouched one
+
+
+# --- repetitions: several runs under one label ------------------------------------------------
+
+
+@pytest.mark.skipif(not REAL_AUDIT.is_file(), reason="needs the rep9 audit on disk")
+def test_several_runs_under_one_label_are_repetitions_of_one_condition():
+    """`hit_frequency` is what answers "does it find this every time or once in ten". With the
+    same audit twice, every hit is found 2 of 2, mean equals union, and `stable` (two-thirds
+    rule: ceil(2*2/3) = 2) equals both -- the degenerate case that pins the plumbing."""
+
+    out = report_module.conditions({"A": ["pr5_smoke4_rep9", "pr5_smoke4_rep9"]})
+
+    assert out["repetitions"] == {"A": 2}
+    assert out["runs"] == {"A": ["pr5_smoke4_rep9", "pr5_smoke4_rep9"]}
+    issue = out["by_level"]["issue"]["conditions"]["A"]
+    assert issue["per_repetition_hits"] == [6, 6]
+    assert set(issue["hit_frequency"].values()) == {2}
+    assert issue["mean_recall"] == issue["union_recall"] == issue["stable_recall"]
+    assert out["funnel"]["A"]["issue"]["hit"] == 6.0
+    assert out["funnel"]["A"]["issue"]["per_repetition_hits"] == [6, 6]
+    # Control emission is per repetition, never pooled.
+    assert len(out["control_emission"]["A"]) == 2
+
+
+def test_a_condition_found_in_one_repetition_but_not_another_shows_in_the_frequency(
+        tmp_path, monkeypatch):
+    """The reason to repeat at all. One design that finds an obligation in 1 of 3 runs and one
+    that finds it in 3 of 3 have the same union and are not the same reviewer."""
+
+    obs = ["ob:1", "ob:2"]
+    _audit(tmp_path, "r1", identity="j", obligations=obs,
+           hits={"location": obs, "issue": ["ob:1"], "resolution": []})
+    _audit(tmp_path, "r2", identity="j", obligations=obs,
+           hits={"location": obs, "issue": [], "resolution": []})
+    _audit(tmp_path, "r3", identity="j", obligations=obs,
+           hits={"location": obs, "issue": ["ob:1"], "resolution": []})
+    _point_audits_at(monkeypatch, tmp_path)
+
+    out = report_module.conditions({"B": ["r1", "r2", "r3"]})
+    issue = out["by_level"]["issue"]["conditions"]["B"]
+
+    assert issue["per_repetition_hits"] == [1, 0, 1]
+    assert issue["hit_frequency"] == {"ob:1": 2}
+    assert issue["stable_min_repetitions"] == 2          # ceil(2 * 3 / 3)
+    assert issue["stable_ids"] == ["ob:1"]               # 2 of 3 clears the two-thirds rule
+    assert round(issue["mean_recall"], 3) == round(2 / 3 / 2, 3)
+    assert issue["union_recall"] == 0.5
+
+
+def test_the_cli_accepts_comma_separated_repetitions_and_repeated_labels():
+    """Either spelling aggregates; a typo that split one condition into two labels would
+    silently compare a condition against itself."""
+
+    import inspect
+
+    from src.mathlib_review.review import cli
+
+    source = inspect.getsource(cli._report)
+    assert 'names.split(",")' in source
+    assert "pairs.setdefault(label, [])" in source
