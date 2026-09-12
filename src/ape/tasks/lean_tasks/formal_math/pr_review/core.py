@@ -5,7 +5,7 @@ Evaluates whether an agent can provide Mathlib-quality pull request review feedb
 including merge readiness and issue identification.
 """
 
-from typing import Annotated, Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast
+from typing import Annotated, Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast, Sequence
 import asyncio
 import hashlib
 import inspect
@@ -1205,13 +1205,18 @@ class ReviewPRCoreTask(BaseLeanTask):
         cls,
         overlay_root: Path,
         base_root: Optional[Path],
-        data: ReviewPRData,
         *,
+        pr_diff: str,
+        changed_files: Sequence[str],
         logger: Optional["logging.LoggerAdapter"] = None,
         progress_callback=None,
     ) -> None:
         """Lay the PR's source state over a base snapshot: every touched path materialised as a
         real copy, then δ₀ applied.
+
+        Takes the diff and the file list rather than a task-data object because the prebuild
+        has an episode, not a task: the two inputs are all this needs, and naming them is what
+        lets both callers be seen to pass the same thing.
 
         Shared by the per-attempt overlay (`_ensure_patched_target_workspace`) and by the
         reviewed-workspace prebuild, whose Lean half lives in the toolkit and takes this as a
@@ -1219,8 +1224,15 @@ class ReviewPRCoreTask(BaseLeanTask):
         touched-path rules already live, and the toolkit must not import a task.
         """
 
+        if not overlay_root.exists():
+            # The prebuild starts from nothing; the per-attempt path arrives with the overlay
+            # already laid down. Same overlay either way: every base child symlinked.
+            if base_root is None:
+                raise RuntimeError(
+                    f"Cannot create a reviewed overlay without a base snapshot: {overlay_root}")
+            await asyncio.to_thread(cls._create_snapshot_overlay, base_root, overlay_root)
         await asyncio.to_thread(cls._make_path_user_writable, overlay_root)
-        touched_paths = cls._collect_patch_touched_paths(data.pr_diff, data.changed_files)
+        touched_paths = cls._collect_patch_touched_paths(pr_diff, list(changed_files))
         await cls._emit_progress(
             progress_callback,
             "Materializing only the changed paths so the PR patch can be applied cleanly...",
@@ -1238,7 +1250,7 @@ class ReviewPRCoreTask(BaseLeanTask):
         await cls._emit_progress(
             progress_callback, "Applying the PR diff to the review workspace...",
         )
-        await cls._apply_pr_diff(overlay_root, data.pr_diff, logger=logger)
+        await cls._apply_pr_diff(overlay_root, pr_diff, logger=logger)
 
     @classmethod
     async def _maybe_setup_reviewed_target_workspace(
@@ -1336,7 +1348,8 @@ class ReviewPRCoreTask(BaseLeanTask):
             )
 
         await cls.prepare_reviewed_sources(
-            target_path, base_workspace_path, data, logger=logger,
+            target_path, base_workspace_path, pr_diff=data.pr_diff,
+            changed_files=data.changed_files, logger=logger,
             progress_callback=progress_callback,
         )
         await cls._write_patch_marker(

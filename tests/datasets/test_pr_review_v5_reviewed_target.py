@@ -174,3 +174,51 @@ def test_against_a_reviewed_workspace_the_note_says_the_error_is_genuine(tmp_pat
     note = _task_with_target(tmp_path, reviewed_workspace_key(SHA, DIFF))._verification_environment_note()
     assert "reviewed workspace" in note and "genuine" in note
     assert "base commit's build products" not in note
+
+
+def test_prepare_reviewed_sources_from_nothing_lays_the_overlay_and_patches(tmp_path):
+    """The prebuild hands the toolkit an empty path. The preparation creates the overlay --
+    every base child symlinked -- materialises the touched file as a real copy, applies the
+    diff to it, and leaves the base exactly as it was. `.lake` stays a symlink here: replacing
+    it with a writable build tree is the toolkit's step, after this one."""
+
+    import asyncio
+    import os
+
+    from ape.tasks.lean_tasks.formal_math.pr_review.core import ReviewPRCoreTask
+
+    base = tmp_path / "base"
+    (base / "Mathlib/A").mkdir(parents=True)
+    (base / "Mathlib.lean").write_text("import Mathlib.A.B\n")
+    (base / "Mathlib/A/B.lean").write_text("theorem old : True := trivial\n")
+    (base / ".lake/build").mkdir(parents=True)
+    (base / ".lake/build/x.olean").write_bytes(b"olean")
+    for p in base.rglob("*"):
+        os.chmod(p, 0o555 if p.is_dir() else 0o444)
+    os.chmod(base, 0o555)
+    before = {str(p.relative_to(base)): (p.read_bytes() if p.is_file() else None)
+              for p in base.rglob("*")}
+
+    diff = (
+        "diff --git a/Mathlib/A/B.lean b/Mathlib/A/B.lean\n"
+        "--- a/Mathlib/A/B.lean\n+++ b/Mathlib/A/B.lean\n"
+        "@@ -1 +1 @@\n-theorem old : True := trivial\n+theorem new : True := trivial\n"
+    )
+    overlay = tmp_path / "overlay"
+    try:
+        asyncio.run(ReviewPRCoreTask.prepare_reviewed_sources(
+            overlay, base, pr_diff=diff, changed_files=["Mathlib/A/B.lean"]))
+
+        assert (overlay / "Mathlib.lean").is_symlink()
+        assert (overlay / ".lake").is_symlink() and (overlay / ".lake").resolve() == (base / ".lake").resolve()
+        patched = overlay / "Mathlib/A/B.lean"
+        assert patched.is_file() and not patched.is_symlink()
+        assert patched.read_text() == "theorem new : True := trivial\n"
+        assert (base / "Mathlib/A/B.lean").read_text() == "theorem old : True := trivial\n"
+        after = {str(p.relative_to(base)): (p.read_bytes() if p.is_file() else None)
+                 for p in base.rglob("*")}
+        assert after == before, "the base snapshot is not written to"
+    finally:
+        for p in list(base.rglob("*")) + [base]:
+            if not p.is_symlink():
+                os.chmod(p, 0o755 if p.is_dir() else 0o644)
