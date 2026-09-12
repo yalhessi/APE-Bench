@@ -4,10 +4,15 @@ Moved here from `pr_review_v2/github.py`, which re-exports it, so the store's co
 depend on a package that carries a generation name. REST works unauthenticated for smoke tests;
 GraphQL (review-thread resolution, body-edit history) needs a token.
 
-Two quota facts every caller should know, because both collection failures so far were quota-shaped:
-the core bucket is 5,000 requests/hour authenticated, and the **search** bucket is 30 per minute,
-separately. `GitHubClient` waits out a rate-limit window instead of raising, so a long collection
-survives one, and a 403 that arrives with quota left (a revoked token, a private repo) still raises.
+Two quota facts every caller should know, because the first two collection failures were
+quota-shaped: the core bucket is 5,000 requests/hour authenticated, and the **search** bucket is 30
+per minute, separately. `GitHubClient` waits out a rate-limit window instead of raising, so a long
+collection survives one, and a 403 that arrives with quota left (a revoked token, a private repo)
+still raises.
+
+The third was not: a single heavy endpoint 502'd past the retries and killed a 32,650-PR tier-1
+run at 99.9 %. Every failure that survives the retries is a `GitHubHTTPError`, a `GitHubError`, so
+a caller can guard one endpoint and keep going -- which is what the collector's tiers do.
 """
 
 import os
@@ -28,6 +33,19 @@ class RateLimitError(GitHubError):
     pass
 
 
+class GitHubHTTPError(GitHubError):
+    """A status or transport failure that survived every retry.
+
+    A `GitHubError` rather than the raw `httpx` exception so that a caller guarding one endpoint
+    -- the collector's tiers, which already write `null` or skip and move on -- catches a 502 the
+    same way it catches a GraphQL failure. One endpoint failing must not end a collection.
+    """
+
+    def __init__(self, message: str, *, status_code: Optional[int] = None):
+        super().__init__(message)
+        self.status_code = status_code
+
+
 class GitHubClient:
     def __init__(
         self,
@@ -35,7 +53,7 @@ class GitHubClient:
         *,
         timeout_seconds: float = 30.0,
         request_interval_seconds: float = 0.0,
-        max_retries: int = 5,
+        max_retries: int = 8,
         retry_backoff: float = 2.0,
         max_rate_limit_wait: float = 3900.0,
         logger=None,
@@ -103,12 +121,15 @@ class GitHubClient:
     def _request(self, method: str, url: str, **kwargs) -> httpx.Response:
         # Retry transient failures (5xx, network/timeout) with exponential backoff so one 502 does
         # not kill a long paginated collection. 403/429 stay a RateLimitError (caller's concern).
+        # Eight attempts, not five: a 502 here is usually GitHub timing out while *generating* a
+        # heavy response, and the same cold request keeps failing until it warms. `/pulls/4197/
+        # comments` is 1.2 MB and 502'd through 62 s of backoff, then served in 0.1 s once warm.
         for attempt in range(self._max_retries + 1):
             try:
                 response = self._client.request(method, url, **kwargs)
             except httpx.TransportError as exc:
                 if attempt >= self._max_retries:
-                    raise
+                    raise GitHubHTTPError(f"{type(exc).__name__} for {method} {url}: {exc}") from exc
                 self._backoff_sleep(attempt, f"transport error ({type(exc).__name__})")
                 continue
             if self._interval:
@@ -135,7 +156,11 @@ class GitHubClient:
                 self._backoff_sleep(attempt, f"HTTP {response.status_code}",
                                     response.headers.get("Retry-After"))
                 continue
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                raise GitHubHTTPError(f"GitHub HTTP {response.status_code} for {method} {url}",
+                                      status_code=response.status_code) from exc
             return response
         # unreachable: loop either returns or raises
         raise GitHubError(f"exhausted retries for {method} {url}")

@@ -1,9 +1,14 @@
-"""A rate limit is a wait, not a failure.
+"""A rate limit is a wait, not a failure, and a 5xx that outlives the retries is a `GitHubError`.
 
 The December collection died on `RateLimitError` after 27 successful requests: GitHub meters the
 search API at **30 requests per minute**, separately from the 5,000/hour core bucket, and the
 client raised on the first 403 instead of waiting ~30 seconds for the window to reset. A `core`
 window is an hour long, so the same bug would throw away an hour of collection.
+
+The September collection died differently: `/pulls/4197/comments` is a 1.2 MB page that GitHub
+502s while generating and then serves in 0.1 s once warm, so five retries across 62 s all hit the
+cold path, and the raw `httpx.HTTPStatusError` escaped every caller that guards an endpoint. Hence
+eight attempts, and `GitHubHTTPError` -- a `GitHubError` -- for whatever still fails.
 """
 
 from __future__ import annotations
@@ -14,7 +19,9 @@ import time
 import httpx
 import pytest
 
-from src.datasets.pr_review_v2.github import GitHubClient, RateLimitError
+from src.datasets.pr_review_v2.github import (
+    GitHubClient, GitHubError, GitHubHTTPError, RateLimitError,
+)
 
 
 class FakeResponse:
@@ -91,3 +98,47 @@ def test_retries_are_finite(monkeypatch):
     with pytest.raises(RateLimitError):
         client.get_json("/search/issues")
     assert len(slept) == 2
+
+
+# --- a 5xx that outlives the retries ---------------------------------------------------------
+
+SERVER_ERROR = FakeResponse(502, {"X-RateLimit-Remaining": "4000"})
+
+
+def test_a_5xx_is_retried_further_than_a_minute_of_backoff(monkeypatch):
+    """A 502 here is GitHub timing out while generating a heavy response; the same cold request
+    keeps failing until it warms, so the budget has to outlast the warm-up, not just a blip."""
+
+    client, slept = _client([SERVER_ERROR] * 5 + [OK], monkeypatch)
+    assert client.get_json("/repos/x/y/pulls/4197/comments") == [{"number": 1}]
+    assert sum(slept) > 60
+
+
+def test_a_persistent_5xx_raises_a_githuberror_carrying_the_status(monkeypatch):
+    """Not `httpx.HTTPStatusError`: the collector guards one endpoint with `except GitHubError`,
+    and a raw httpx exception walked straight through that guard and ended a 12-hour collection."""
+
+    client, _ = _client([SERVER_ERROR] * 9, monkeypatch, max_retries=8)
+    with pytest.raises(GitHubError) as excinfo:
+        client.get_json("/repos/x/y/pulls/4197/comments")
+    assert isinstance(excinfo.value, GitHubHTTPError)
+    assert excinfo.value.status_code == 502
+    assert "502" in str(excinfo.value)
+
+
+def test_a_404_raises_a_githuberror_without_retrying(monkeypatch):
+    client, slept = _client([FakeResponse(404, {"X-RateLimit-Remaining": "4000"})], monkeypatch)
+    with pytest.raises(GitHubHTTPError) as excinfo:
+        client.get_json("/repos/x/y/pulls/999999")
+    assert excinfo.value.status_code == 404
+    assert slept == []
+
+
+def test_a_transport_error_that_outlives_the_retries_is_also_a_githuberror(monkeypatch):
+    client = GitHubClient("token", logger=logging.getLogger("rate-test"), max_retries=1)
+    def boom(*a, **k):
+        raise httpx.ConnectError("connection reset")
+    monkeypatch.setattr(client._client, "request", boom)
+    monkeypatch.setattr(time, "sleep", lambda s: None)
+    with pytest.raises(GitHubError):
+        client.get_json("/repos/x/y/pulls")
