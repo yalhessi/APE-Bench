@@ -39,8 +39,12 @@ paths:
   `review_comments` -- no tier-2 endpoint anywhere -- so the precedent/conventions thread needs
   only tier 1. `project_episodes` goes through `load_bundle`, which requires tier 2 (diff at the
   reviewed head, base commit, commit timestamps for the cutoff, `body_edits` for leak-safety).
-  Measured 2026-09-12 on the finished tier 1: 107,187 reviewer_view rows from 14,981 PRs, against
-  the 43,881-row frozen baseline -- the ~2.5x the corpus repoint was predicted to gain.
+  Built 2026-09-12 from the finished tier 1, window 2024-03-01..2026-08-31: **104,093
+  reviewer_view rows from 14,718 PRs** (146,819 comment rows), against the 43,881-row frozen
+  baseline -- the ~2.4x the corpus repoint was predicted to gain. Quote the *dated* figure: the
+  same projection without `--start` reads 107,187, because 4,534 comments sit on PRs updated
+  inside the window but written before it (earliest 2022-03-17). `by_basis` in the manifest counts
+  **all** rows, not reviewer rows, so it sums to 146,819 and includes `none`.
 - **A deferred PR may stay dropped, so quote the collected count, not the window count.** Dropped
   PRs sit at tier 0 and are counted in the tracked manifest's `prs_by_complete_tier` -- as of
   2026-09-12, 32,851 in the window, 32,805 at tier 1. That gap is the denominator correction; it is
