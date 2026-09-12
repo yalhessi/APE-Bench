@@ -161,6 +161,16 @@ def build_parser() -> argparse.ArgumentParser:
                        help="the judge output directory, holding semantic_report.json")
     scope.add_argument("--release", type=Path, required=True)
     scope.add_argument("--pr", type=int, action="append", dest="pr_numbers")
+    conditions = report_sub.add_parser(
+        "conditions",
+        help="two or more judged runs on one denominator: funnel, union, exclusive sets")
+    conditions.add_argument(
+        "--condition", action="append", required=True, dest="conditions",
+        metavar="LABEL=RUN_NAME",
+        help="repeatable; audits are derived from the run name the way `judge --of` does")
+    conditions.add_argument(
+        "--release", type=Path,
+        help="adds attention-vs-maintainers and redundancy, which read gold concern labels")
 
     trajectory = sub.add_parser("trajectory", help="extract one run's transcripts")
     trajectory.add_argument("--run", required=True)
@@ -280,6 +290,16 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import retrieval
 
         print(json.dumps(retrieval(args.run), indent=2))
+    elif args.report_command == "conditions":
+        from src.mathlib_review.analysis.report import conditions as conditions_report
+
+        pairs = {}
+        for item in args.conditions:
+            if "=" not in item:
+                raise SystemExit(f"--condition wants LABEL=RUN_NAME, got {item!r}")
+            label, run_name = item.split("=", 1)
+            pairs[label] = run_name
+        print(json.dumps(conditions_report(pairs, args.release), indent=2))
     elif args.report_command == "scope":
         # The competence question the recall number cannot answer on its own: is the reviewer
         # good, or is the set unusually local? `obligation_scope` has answered it since it was
