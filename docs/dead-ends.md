@@ -35,6 +35,16 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   in-file edit would not). Replaced by in-file splicing, `lean_verify_edit`, and declaration-targeted
   edits. Part A — building changed modules for cross-file dependencies — was never built; the small
   set hit no cross-file failures. **Reopens if:** multi-file PRs need verified edits.
+  **Reopened 2026-09-12.** They do, and the failure is not a missing feature but a false statement:
+  the review overlay applies δ₀ to source only, `lean_verify`/`lean_verify_edit` compile against the
+  base `.olean`s, so a lemma the PR renames in a sibling file is an `Unknown constant`, and
+  `_attribute_errors` then tells the model *"the file does not compile as it stands"*. On the 12-PR
+  held-out `lead` run, **41 of 321 arm sessions** received such an error; 16 became `broken_build`
+  findings on PRs that all build, 4 of them `published`; all 10 resolvable "missing" names were
+  introduced by the PR itself. The naming arm on 33337 burned 2–5 verify calls on it in 5 of 10
+  reps. Filtering by identifier cannot fix it — the stale sibling cascades into `simp made no
+  progress` / `unsolved goals`. The fix is a targeted rebuild of the changed modules in the overlay,
+  copy-on-write because `.lake` is a symlink into the shared base cache (branch `verify-reviewed-state`).
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition

@@ -48,3 +48,20 @@ paths:
   and that distinction is the whole diagnosis.
 - Boundary counts are pinned in `tests/datasets/test_package_boundaries.py` (0 backward
   cross-generation edges, 0 v5→v2, 3 private in-package imports). They may only go down.
+- **The review overlay is source-only; every compile sees base `.olean`s.** `_ensure_patched_target_workspace`
+  symlinks the base snapshot, materialises touched paths and applies δ₀ — it builds nothing, and
+  `.lake` is a symlink into the shared cache. So on a multi-file PR, a declaration the PR adds or
+  renames in one file is `Unknown constant` when any other file is verified, and the tool's own note
+  then asserts the file does not compile. 13% of arm sessions on the held-out run hit this. Never
+  suppress it in a prompt; a compile claim from a review arm on a PR that builds is a tool defect
+  until proven otherwise. (Rebuild fix in progress: branch `verify-reviewed-state`.)
+- **The naming arm is calibrated to the *local family*, by its prompt, and the maintainer often is not.**
+  On 33337 the local siblings at base all used the `_coe_` style; the maintainer asked for the
+  repo-wide emerging `toLinearMap_` prefix (24 files elsewhere, 0 in the PR's files, 0 precedent
+  hits, 0 Zulip). The arm searched correctly and submitted nothing, 10/10 reps — as its contract
+  says. The generalist, carrying no such guardrail, named the convention 8/10. The registry row
+  already records that *"the code corpus argues against the maintainer on both naming asks this
+  release scores"*. This is a contract decision, not a bug: widening the arm's evidence bar trades
+  its precision for the maintainer's convention radius. Decide it on purpose.
+- **`declaration_search` is base-only by construction** and says so — an arm judging a *rename*
+  cannot look up the name the PR introduced. Search the reviewed overlay too, labelled.
