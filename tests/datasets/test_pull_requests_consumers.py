@@ -112,3 +112,30 @@ def test_the_old_corpus_command_refuses_and_names_the_new_one(capsys):
     assert excinfo.value.code == 2
     err = capsys.readouterr().err
     assert "pull_requests.collect" in err and "--acceptance" in err
+
+
+# --- diff headers are not shell words ----------------------------------------------------------
+
+def test_a_primed_mathlib_filename_survives_the_diff_header():
+    """`shlex.split` is POSIX *shell* lexing, where `'` opens a quoted string. Mathlib is full of
+    primed filenames, so one apostrophe made the header unparseable and two silently stripped
+    them -- recording a file that does not exist. Found by the first tier-2 batch beyond the
+    original 201 PRs, none of which touched such a file."""
+
+    from src.mathlib_review.release.episodes import changed_files_from_diff
+
+    one = "diff --git a/Mathlib/Tactic/LinearCombination'.lean b/Mathlib/Tactic/LinearCombination'.lean"
+    assert changed_files_from_diff(one) == ["Mathlib/Tactic/LinearCombination'.lean"]
+
+    two = "diff --git a/Foo'bar'.lean b/Foo'bar'.lean"
+    assert changed_files_from_diff(two) == ["Foo'bar'.lean"]        # not "Foobar.lean"
+
+
+def test_the_diff_header_still_handles_quoting_hashes_and_deletions():
+    from src.mathlib_review.release.episodes import changed_files_from_diff
+
+    assert changed_files_from_diff('diff --git "a/with space.lean" "b/with space.lean"') == \
+        ["with space.lean"]
+    assert changed_files_from_diff("diff --git a/with#hash.lean b/with#hash.lean") == \
+        ["with#hash.lean"]
+    assert changed_files_from_diff("diff --git a/gone.lean /dev/null") == ["gone.lean"]

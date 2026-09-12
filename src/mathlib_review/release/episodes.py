@@ -23,6 +23,27 @@ def _is_dev_null(path: str) -> bool:
     return _strip_git_prefix(path) in {"/dev/null", "dev/null"}
 
 
+def _split_diff_header(line: str) -> List[str]:
+    """Split a `diff --git` header into fields.
+
+    Deliberately not `shlex.split`, which is POSIX *shell* lexing: there a single quote opens a
+    quoted string, and Mathlib is full of primed filenames -- `LinearCombination'.lean`,
+    `Basic'.lean`. On one apostrophe shell lexing swallowed the rest of the line into a single
+    field and the header was rejected as invalid; on two it silently stripped them, turning
+    `Foo'bar'.lean` into `Foobar.lean` and recording a file that does not exist.
+
+    Git quotes a path only when it has to, and only with double quotes (C-style, backslash
+    escapes). So double quote is the one quoting character here, `#` is a legal path character
+    rather than a comment introducer, and a bare apostrophe is just a character.
+    """
+
+    lexer = shlex.shlex(line, posix=True)
+    lexer.whitespace_split = True
+    lexer.quotes = '"'
+    lexer.commenters = ""
+    return list(lexer)
+
+
 def changed_files_from_diff(diff: str) -> List[str]:
     """Return paths in diff order, including files deleted by the PR."""
     paths: List[str] = []
@@ -31,7 +52,7 @@ def changed_files_from_diff(diff: str) -> List[str]:
         if not line.startswith("diff --git "):
             continue
         try:
-            fields = shlex.split(line)
+            fields = _split_diff_header(line)
         except ValueError as exc:
             raise ValueError(f"invalid diff header: {line!r}") from exc
         if len(fields) < 4:
