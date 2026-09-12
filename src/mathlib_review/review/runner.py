@@ -67,7 +67,9 @@ from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
 from src.mathlib_review.evidence.chain import collect_supported, reviewed_workspaces
 from src.mathlib_review.review.finalize import finalize
 from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
-from src.mathlib_review.review.preflight import assert_ready, assert_workspaces_prebuilt
+from src.mathlib_review.review.preflight import (
+    assert_ready, assert_reviewed_workspaces_prebuilt, assert_workspaces_prebuilt,
+)
 from src.mathlib_review.schema.review import ROUTING_MODES, V5RunManifest, V5RunPlan
 from src.mathlib_review.review.trace import reconcile
 from src.mathlib_review.run_config import load_run as _load_run
@@ -105,6 +107,14 @@ class V5DatasetConfig(BaseModel):
     run_name: str = "UNNAMED"
     dry_run: bool = False
     require_prebuilt_workspaces: bool = True
+    #: Refuse a run whose episodes have no reviewed workspace -- base + diff + changed modules
+    #: rebuilt. Without one, verification resolves imports against the base commit's `.olean`s
+    #: and a declaration the PR renames in a sibling file reads as `Unknown constant`
+    #: everywhere else (41 of 321 arm sessions on the held-out run; 16 false build-failure
+    #: findings). Off by default only until the workspaces for the sets in use are prebuilt;
+    #: `plan` reports how many are missing either way, and a run that proceeds without them
+    #: is told so at WARNING per attempt. Flip it on in the base config once they exist.
+    require_reviewed_workspaces: bool = False
     pr_finding_limit: int = 20
     #: Skip the evidence chain, restoring the closed gate every run before this one
     #: had. Kept so the eight runs already measured can be reproduced exactly, and
@@ -198,6 +208,28 @@ def load_release(dataset: V5DatasetConfig):
         "release_prompts": load_jsonl(release / "derived/rendered_prompts.jsonl", RenderedPrompt),
         "modifications": load_jsonl(dataset.modification_inventory, ModificationRecord),
     }
+
+
+def select_units_and_episodes(dataset: V5DatasetConfig, release: Dict[str, Any]):
+    """The work units a config selects, and the episodes those units belong to.
+
+    One function because two things must agree on it: the run, which schedules the units, and
+    the reviewed-workspace prebuild, which must build a workspace for exactly the episodes the
+    run will verify in. `work_unit_limit` can drop a PR entirely, so the episode set follows
+    from the unit set rather than from `pr_numbers` directly.
+    """
+
+    units = release["units"]
+    if dataset.pr_numbers:
+        wanted = set(dataset.pr_numbers)
+        units = [unit for unit in units if unit.pr_number in wanted]
+    if dataset.work_unit_limit:
+        units = units[:dataset.work_unit_limit]
+    if not units:
+        raise ValueError("no work units selected; check dataset.pr_numbers")
+    selected_prs = {unit.pr_number for unit in units}
+    episodes = [item for item in release["episodes"] if item.pr_number in selected_prs]
+    return units, episodes
 
 
 def _context_index_identity() -> Dict[str, str]:
@@ -1058,16 +1090,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
 
     release = load_release(dataset)
-    units = release["units"]
-    if dataset.pr_numbers:
-        wanted = set(dataset.pr_numbers)
-        units = [unit for unit in units if unit.pr_number in wanted]
-    if dataset.work_unit_limit:
-        units = units[:dataset.work_unit_limit]
-    if not units:
-        raise ValueError("no work units selected; check dataset.pr_numbers")
+    units, episodes = select_units_and_episodes(dataset, release)
     selected_prs = sorted({unit.pr_number for unit in units})
-    episodes = [item for item in release["episodes"] if item.pr_number in set(selected_prs)]
 
     agenda, pool = build_agenda(
         run_name=dataset.run_name, routing_mode=dataset.routing_mode,
@@ -1095,6 +1119,13 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # read would have been impossible.
         cutoffs_by_episode(episodes)
         logger.info("retrieval cutoffs resolve for all %d episode(s)", len(episodes))
+        # Same for the verification environment: a dry run must say whether the real run
+        # would verify against the PR's own build products or the base commit's.
+        missing = await assert_reviewed_workspaces_prebuilt(
+            episodes, required=dataset.require_reviewed_workspaces, logger=logger)
+        logger.info("reviewed workspaces: %d of %d episode(s) prebuilt%s",
+                    len(episodes) - len(missing), len(episodes),
+                    "" if not missing else " — the rest would verify against base .oleans")
         plan = _build_plan(dataset, scaffold, agenda)
         logger.info("run plan seals (agenda %s, %d prompt hashes) — not written",
                     plan.agenda_sha256[:12], len(plan.prompt_sha256_by_invocation))
@@ -1162,6 +1193,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
 
     await assert_workspaces_prebuilt(
         data, required=dataset.require_prebuilt_workspaces)
+    await assert_reviewed_workspaces_prebuilt(
+        episodes, required=dataset.require_reviewed_workspaces, logger=logger)
 
     logger.info("routing_mode=%s tasks=%d prs=%s", dataset.routing_mode, len(data), selected_prs)
     tasks = [create_task_from_data(item, scaffold,
