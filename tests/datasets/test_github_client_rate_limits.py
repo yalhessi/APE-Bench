@@ -50,15 +50,24 @@ def _client(responses, monkeypatch, **kw):
     return client, slept
 
 
-SEARCH_429 = FakeResponse(403, {
-    "X-RateLimit-Remaining": "0", "X-RateLimit-Resource": "search",
-    "X-RateLimit-Reset": str(int(time.time()) + 28),
-})
+def search_429():
+    """A search window that resets 28 seconds from now.
+
+    Built per call, not once at import: as a module-level constant the window drained while
+    the rest of the suite was collected, so the wait asserted below came out short in a full
+    run (25.4s against a 27-31s band) and correct when the file ran on its own.
+    """
+
+    return FakeResponse(403, {
+        "X-RateLimit-Remaining": "0", "X-RateLimit-Resource": "search",
+        "X-RateLimit-Reset": str(int(time.time()) + 28),
+    })
+
 OK = FakeResponse(200, {"X-RateLimit-Remaining": "29"}, [{"number": 1}])
 
 
 def test_an_exhausted_window_is_waited_out_and_the_request_retried(monkeypatch, caplog):
-    client, slept = _client([SEARCH_429, OK], monkeypatch)
+    client, slept = _client([search_429(), OK], monkeypatch)
     with caplog.at_level(logging.WARNING, logger="rate-test"):
         assert client.get_json("/search/issues") == [{"number": 1}]
     assert len(slept) == 1 and 27 <= slept[0] <= 31      # until the reset, plus a second
@@ -96,7 +105,7 @@ def test_a_wait_longer_than_the_cap_raises_with_the_length_in_the_message(monkey
 
 
 def test_retries_are_finite(monkeypatch):
-    client, slept = _client([SEARCH_429] * 3, monkeypatch, max_retries=2)
+    client, slept = _client([search_429()] * 3, monkeypatch, max_retries=2)
     with pytest.raises(RateLimitError):
         client.get_json("/search/issues")
     assert len(slept) == 2
@@ -182,6 +191,6 @@ def test_a_retried_5xx_counts_every_attempt_because_github_meters_them(monkeypat
 
 
 def test_a_rate_limit_wait_counts_the_rejected_request(monkeypatch):
-    client, _ = _client([SEARCH_429, OK], monkeypatch)
+    client, _ = _client([search_429(), OK], monkeypatch)
     client.get_json("/search/issues")
     assert client.request_count == 2
