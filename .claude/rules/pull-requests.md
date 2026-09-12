@@ -30,6 +30,17 @@ paths:
   run -- and the retry budget stays at five attempts, because a longer one is paid per dead endpoint
   across 32k PRs and buys nothing. Do not raise it again; `test_the_5xx_budget_stays_short_because_
   deferring_is_the_defence` pins this.
+- **Scope a collection run with `--created-from/--created-to`, never a narrower `--start/--end`.**
+  The window string keys the tier-0 cache, so a new one re-walks the listing -- and a second walk
+  over an overlapping window meets rows whose `updated_at` has moved, which the store refuses. The
+  walk now keeps the recorded row, but the re-walk is still hundreds of wasted pages. Slicing reads
+  the cached list and spends nothing.
+- **Tier 1 feeds the corpus; tier 2 feeds episodes.** `project_corpus` gates only on
+  `review_comments` -- no tier-2 endpoint anywhere -- so the precedent/conventions thread needs
+  only tier 1. `project_episodes` goes through `load_bundle`, which requires tier 2 (diff at the
+  reviewed head, base commit, commit timestamps for the cutoff, `body_edits` for leak-safety).
+  Measured 2026-09-12 on the finished tier 1: 107,187 reviewer_view rows from 14,981 PRs, against
+  the 43,881-row frozen baseline -- the ~2.5x the corpus repoint was predicted to gain.
 - **A deferred PR may stay dropped, so quote the collected count, not the window count.** Dropped
   PRs sit at tier 0 and are counted in the tracked manifest's `prs_by_complete_tier` -- as of
   2026-09-12, 32,851 in the window, 32,805 at tier 1. That gap is the denominator correction; it is
