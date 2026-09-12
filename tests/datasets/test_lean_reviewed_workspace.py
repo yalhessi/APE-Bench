@@ -130,10 +130,16 @@ class _StateManager:
         return _State(status="built" if success else "failed")
 
 
+def _workspaces(tmp_path) -> Path:
+    """Where a real manager on a config rooted at `tmp_path` keeps restored workspaces."""
+
+    return tmp_path / "repos" / "mathlib4" / "workspaces"
+
+
 def _base(tmp_path):
     """A miniature base workspace laid out like a restored one: 444 files, 555 dirs."""
 
-    base = tmp_path / "workspaces" / SHA
+    base = _workspaces(tmp_path) / SHA
     (base / "Mathlib/A").mkdir(parents=True)
     (base / "Mathlib.lean").write_text("import Mathlib.A.B\n")
     (base / "Mathlib/A/B.lean").write_text("theorem old : True := trivial\n")
@@ -148,19 +154,23 @@ def _base(tmp_path):
 
 
 def _manager(tmp_path, state_manager, run_command):
-    """A BuildManager with only what the reviewed build touches."""
+    """A real BuildManager on a config rooted at `tmp_path`, with the state machine and `lake`
+    replaced.
 
-    from types import SimpleNamespace
+    Constructed the real way on purpose. An earlier version built it with `__new__` and set
+    `workspace_dir` by hand -- and the real class has no such attribute, so the first real
+    build failed in one second on a path the tests had never asked the manager to resolve.
+    The paths must come from the same config method the manager uses in production.
+    """
 
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
     from ape.toolkits.execute.lean.core.build_manager import BuildManager
 
-    manager = BuildManager.__new__(BuildManager)
-    manager.workspace_dir = tmp_path / "workspaces"
-    manager.build_workspace_dir = tmp_path / "build_workspaces"
+    config = LeanVerifyToolConfig(
+        base_dir=tmp_path, storage_dir=tmp_path / "storage", repos_dir=tmp_path / "repos",
+        build_timeout=60)
+    manager = BuildManager(config)
     manager.state_manager = state_manager
-    manager.config = SimpleNamespace(build_timeout=60)
-    manager.logger = SimpleNamespace(info=lambda *a, **k: None, error=lambda *a, **k: None,
-                                     warning=lambda *a, **k: None, debug=lambda *a, **k: None)
     import ape.toolkits.execute.lean.core.build_manager as module
     module.run_command = run_command
     return manager
@@ -194,10 +204,10 @@ def test_a_reviewed_workspace_is_built_beside_the_base_and_renamed_into_place(tm
     manager = _manager(tmp_path, states, fake_lake)
     key = reviewed_workspace_key(SHA, "diff")
     result = asyncio.run(manager.build_reviewed_workspace(
-        key, SHA, prepare_sources=_prepare, targets=["+Mathlib.A.B"]))
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
 
     assert result.success
-    final = tmp_path / "workspaces" / key
+    final = _workspaces(tmp_path) / key
     assert final.is_dir(), "renamed into place under workspaces/<key>"
     assert seen["cmd"] == ["lake", "build", "+Mathlib.A.B"]
     assert seen["cwd"] != final, "Lake ran in the temp build dir, not the final path"
@@ -226,7 +236,7 @@ def test_the_base_is_never_written(tmp_path):
 
     manager = _manager(tmp_path, _StateManager(), fake_lake)
     asyncio.run(manager.build_reviewed_workspace(
-        reviewed_workspace_key(SHA, "diff"), SHA, prepare_sources=_prepare, targets=["+M"]))
+        reviewed_workspace_key(SHA, "diff"), SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
 
     after = {p: p.stat().st_mtime_ns for p in base.rglob("*") if p.is_file()}
     assert after == before
@@ -245,10 +255,10 @@ def test_a_failed_build_leaves_no_workspace_and_marks_failed(tmp_path):
     key = reviewed_workspace_key(SHA, "diff")
     with pytest.raises(RuntimeError, match="lake build"):
         asyncio.run(manager.build_reviewed_workspace(
-            key, SHA, prepare_sources=_prepare, targets=["+M"]))
+            key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
 
-    assert not (tmp_path / "workspaces" / key).exists(), "nothing half-built left in place"
-    assert not [p for p in (tmp_path / "workspaces").iterdir() if p.name.startswith(".")], \
+    assert not (_workspaces(tmp_path) / key).exists(), "nothing half-built left in place"
+    assert not [p for p in (_workspaces(tmp_path)).iterdir() if p.name.startswith(".")], \
         "temp dir removed"
     assert states.calls[-1][:3] == ("complete", key, False)
 
@@ -268,11 +278,16 @@ def test_an_already_built_key_is_not_rebuilt(tmp_path):
 
     manager = _manager(tmp_path, Built(), lake)
     result = asyncio.run(manager.build_reviewed_workspace(
-        reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare, targets=["+M"]))
+        reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
     assert result.success and result.build_duration == 0.0 and ran == []
 
 
 def test_no_targets_is_refused_before_anything_is_copied(tmp_path):
+    """A PR that touches no library module -- docs, scripts, a deleted file -- has nothing to
+    rebuild, and a workspace built for it would be the base overlay under a name that promises
+    more. Refused after the sources are prepared (that is where the answer is) and before the
+    build tree is copied (that is the expensive step)."""
+
     _base(tmp_path)
 
     async def lake(cmd, cwd, **kw):
@@ -281,4 +296,7 @@ def test_no_targets_is_refused_before_anything_is_copied(tmp_path):
     manager = _manager(tmp_path, _StateManager(), lake)
     with pytest.raises(RuntimeError, match="no Lake targets"):
         asyncio.run(manager.build_reviewed_workspace(
-            reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare, targets=[]))
+            reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare,
+            changed_files=["docs/README.md", "Mathlib/A/Deleted.lean"]))
+    left = sorted(p.name for p in (_workspaces(tmp_path)).iterdir())
+    assert left == [SHA], f"only the base remains; the hidden build tree is removed: {left}"

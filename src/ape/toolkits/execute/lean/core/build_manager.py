@@ -351,7 +351,7 @@ class BuildManager(BaseSourceManager):
         base_commit: str,
         *,
         prepare_sources: Callable[[Path, Path], Awaitable[None]],
-        targets: Sequence[str],
+        changed_files: Sequence[str],
         force_rebuild: bool = False,
     ) -> BuildResult:
         """Build `workspaces/<key>`: the base snapshot, the PR's diff, and its changed modules rebuilt.
@@ -362,6 +362,11 @@ class BuildManager(BaseSourceManager):
         must not import it. This method owns the Lean half: replacing the `.lake` symlink with
         a real directory whose `build` is a writable copy, the targeted `lake build`, the
         read-only finalisation, the atomic rename into place, and the state machine.
+
+        The Lake targets are derived from `changed_files` *after* the sources are prepared,
+        against the patched tree: a module the PR adds is absent at base and one it deletes is
+        present there, so the base tree gives the wrong answer in both directions and the
+        patched tree exists only inside this call.
 
         Locking, waiting and dead-builder takeover are the base build's, unchanged: the key is
         just a workspace id to `try_start_build`.
@@ -378,7 +383,8 @@ class BuildManager(BaseSourceManager):
                 return BuildResult(success=True, commit_hash=key, build_duration=0.0,
                                    file_count=current_state.file_count)
             file_count = await self._execute_reviewed_build(
-                key, base_commit, prepare_sources=prepare_sources, targets=list(targets))
+                key, base_commit, prepare_sources=prepare_sources,
+                changed_files=list(changed_files))
             build_duration = (datetime.now() - start_time).total_seconds()
             await self.state_manager.complete_build(key, True, build_duration, file_count)
             self.logger.info("Reviewed workspace built: %s in %.1fs", key, build_duration)
@@ -406,28 +412,37 @@ class BuildManager(BaseSourceManager):
         base_commit: str,
         *,
         prepare_sources: Callable[[Path, Path], Awaitable[None]],
-        targets: list[str],
+        changed_files: list[str],
     ) -> int:
         from .restore_manager import set_workspace_readonly
 
-        base_root = self.workspace_dir / base_commit
+        # The restored-workspace root, the same one `RestoreManager.get_workspace` links
+        # `target/` to. It is asked of the config each time rather than cached on the manager
+        # because this manager builds into `build_workspaces/` everywhere else and has no
+        # attribute for it -- the first real run failed on exactly that assumption.
+        workspace_dir = self.config.get_workspace_dir(self.repo_name)
+        base_root = workspace_dir / base_commit
         if not (base_root / "Mathlib").is_dir():
             raise RuntimeError(
                 f"[{key}] base workspace {base_commit} is not built at {base_root}; "
                 "build the base commit first")
-        if not targets:
-            raise RuntimeError(f"[{key}] no Lake targets: nothing in the diff is a library module")
 
-        final_root = self.workspace_dir / key
+        final_root = workspace_dir / key
         # A hidden sibling of its final name, not the manager's scratch area. `rename()` of a
         # directory across parents must rewrite its `..` entry, which needs write permission on
         # the directory being moved -- and it has just been finalised to 0o555. Same-parent, the
         # rename touches only the parent's write bit, and `workspaces/<key>` exists only once it
         # is complete and read-only. A crash leaves a dotted name nothing looks up by.
-        build_root = self.workspace_dir / f".{key}.{os.getpid()}.{uuid.uuid4().hex[:8]}"
-        await aiofiles.os.makedirs(self.workspace_dir, exist_ok=True)
+        build_root = workspace_dir / f".{key}.{os.getpid()}.{uuid.uuid4().hex[:8]}"
+        await aiofiles.os.makedirs(workspace_dir, exist_ok=True)
         try:
             await prepare_sources(build_root, base_root)
+            targets = lake_targets_for_changed_files(changed_files, build_root)
+            if not targets:
+                # Before the copy: it is the expensive step, and a workspace with nothing
+                # rebuilt in it would be the base overlay under a name that promises more.
+                raise RuntimeError(
+                    f"[{key}] no Lake targets: nothing in the diff is a library module")
             await asyncio.to_thread(self._materialize_build_tree, build_root, base_root)
 
             stdout, stderr, code = await run_command(
