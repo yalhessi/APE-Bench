@@ -45,9 +45,16 @@ paths:
   same projection without `--start` reads 107,187, because 4,534 comments sit on PRs updated
   inside the window but written before it (earliest 2022-03-17). `by_basis` in the manifest counts
   **all** rows, not reviewer rows, so it sums to 146,819 and includes `none`.
+- **The 201-PR dev set was not representative; expect scale bugs at each new batch.** The first
+  tier-2 batch beyond it (2,059 PRs, Dec 2025 + Jan 2026) broke the episode projection twice, both
+  times on input the 201 never contained: a primed filename (`LinearCombination'.lean`) through
+  `shlex.split`, and two files sharing a GitHub **blob** sha (`files[].sha` hashes content, so
+  identical files collide) through the event ledger's identity. Both were fixed *narrowly*, so no
+  frozen id moved -- check that property before touching an identity or a parser, with
+  `test_pull_requests_reproduces_raw_release` and `verify_frozen`.
 - **A deferred PR may stay dropped, so quote the collected count, not the window count.** Dropped
   PRs sit at tier 0 and are counted in the tracked manifest's `prs_by_complete_tier` -- as of
-  2026-09-12, 32,851 in the window, 32,805 at tier 1. That gap is the denominator correction; it is
+  2026-09-12, 32,851 in the window, 32,850 at tier 1 (only #4197 dropped). That gap is the denominator correction; it is
   recorded, not silent, and `pre_gate` reports each as `tier1_incomplete` rather than as a PR with
   no comments.
 - After the full collection passes acceptance: repoint `paths.PRECEDENT_CORPUS` to
