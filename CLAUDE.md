@@ -20,8 +20,9 @@ many threads, some abandoned. Read the record before proposing anything that sou
 
 - **One thread per session.** A thread is one feature, experiment or subsystem — what would be one
   topic branch or one commit series. When a prompt starts a different thread from the one this
-  session has been on, say so in one line and recommend a fresh session (`/clear` or a new session)
-  before continuing; offer to write any unsaved lesson to disk first. The `[session]` line printed on
+  session has been on, say so in one line and recommend a fresh session before continuing — in a
+  fresh **worktree** if this tree stays in use (see Git) — and offer to write any unsaved lesson to
+  disk first. The `[session]` line printed on
   every prompt carries the compaction count; after any compaction, treat a new thread as a hard
   recommendation rather than a suggestion.
 - **Record a lesson the moment it is learned**, in the strongest place it fits, in this order: a test
@@ -35,6 +36,19 @@ many threads, some abandoned. Read the record before proposing anything that sou
   the upstream APE-Bench drop; the guard hook refuses commits there. Work that may not land — a new
   experiment, a speculative refactor — goes on a topic branch off `develop` and is merged only when it
   succeeds. If it is abandoned, write its `docs/dead-ends.md` entry first, then delete the branch.
+- **One working tree per session.** A branch is a pointer; the working tree is the files. Two
+  sessions in one directory share the files whatever branch each believes it is on, so a switch in
+  one rewrites the other's files under it (2026-09-12: `baseline-solo-agent` was created in a tree
+  another session was committing to `develop` from; that commit landed on the wrong branch and
+  `develop` had to be reset by hand). A new thread while this tree is in use starts in a worktree:
+  `git worktree add -b <topic> .claude/worktrees/<topic> develop && .claude/worktree-setup.sh
+  .claude/worktrees/<topic>` — the setup links the venv, `.ape/` and the untracked data stores from
+  the main checkout, never tracked files. The `[session]` line reports other sessions in the tree,
+  and the guard refuses `switch/checkout/rebase/clean/reset --hard` while any exist. The stash stack
+  is shared by every worktree: never a bare `git stash` or `git stash pop`; set work aside with a
+  WIP commit. The shared venv's editable install pins `ape` to the main checkout, so `pytest.ini`
+  and the Claude Code settings put `src` first and `assert_repo_root` refuses a mixed tree; in your
+  own shell in a worktree, `export PYTHONPATH=$PWD/src`.
 - **Small logical commits, always.** One commit is one thing, with the suite green. Message form is
   `<area>: <what changed, and why it is right>`, measurements in the body (see `git log`). Commit at
   each step boundary — a standing instruction (2026-09-11): uncommitted work spanning steps is how the
