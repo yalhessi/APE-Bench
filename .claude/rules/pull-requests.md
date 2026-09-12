@@ -24,6 +24,17 @@ paths:
   run; its 43,881-row corpus is the frozen acceptance baseline.
 - GitHub's `/pulls/comments` listing returns HTTP 500 for mathlib4 and the search API has its own
   30 req/min bucket. Collection is per-PR on the core quota, tiered and resumable.
+- **A heavy endpoint can 502 permanently, and retrying is not the answer.** `/pulls/4197/comments`
+  is 1.2 MB; GitHub times out generating it and fails identically through 62 s and 242 s of backoff.
+  The collector defers such an endpoint -- unrecorded, never written empty, refetched by the next
+  run -- and the retry budget stays at five attempts, because a longer one is paid per dead endpoint
+  across 32k PRs and buys nothing. Do not raise it again; `test_the_5xx_budget_stays_short_because_
+  deferring_is_the_defence` pins this.
+- **A deferred PR may stay dropped, so quote the collected count, not the window count.** Dropped
+  PRs sit at tier 0 and are counted in the tracked manifest's `prs_by_complete_tier` -- as of
+  2026-09-12, 32,851 in the window, 32,805 at tier 1. That gap is the denominator correction; it is
+  recorded, not silent, and `pre_gate` reports each as `tier1_incomplete` rather than as a PR with
+  no comments.
 - After the full collection passes acceptance: repoint `paths.PRECEDENT_CORPUS` to
   `data/pull_requests/projections/corpus/reviewer_view.jsonl`, rebuild the precedent index, rerun
   `conventions.review_join --write --end <date>`, re-measure. Until then the index is built from the
