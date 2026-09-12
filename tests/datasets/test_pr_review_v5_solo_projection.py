@@ -164,3 +164,90 @@ def test_a_solo_candidate_carries_every_field_the_claim_model_requires():
         "producer", "entity_ids", "evidence_requests",
     }
     assert not (required - supplied), sorted(required - supplied)
+
+
+# --- closing a solo run's ledger ------------------------------------------------------------
+
+
+def _solo_agenda(work_unit_ids=("wu:1",)):
+    from src.mathlib_review.io import sealed_model
+    from src.mathlib_review.schema.review import AgendaProposal, ReviewAgenda
+
+    proposals = [
+        sealed_model(
+            AgendaProposal, proposal_id=f"{wu}#generalist", invocation_id=f"{wu}#generalist",
+            arm_id="generalist", work_unit_id=wu, episode_id="ep:1", pr_number=1,
+            site_change_ids=["change:a"], eligible=True, mandatory=True,
+            prompt_sha256="a" * 64, cost_hint=0.079, rationale="r",
+        )
+        for wu in work_unit_ids
+    ]
+    return sealed_model(
+        ReviewAgenda, agenda_id="agenda:t", run_name="t", routing_mode="solo",
+        release="rel", arms=[], proposals=proposals,
+        scheduler_version="s", renderer_version="r")
+
+
+def _pruned_delegations(agenda):
+    return [{"schema_version": "v5-delegation1", "invocation_id": item.invocation_id,
+             "proposal_id": item.proposal_id, "arm_id": item.arm_id,
+             "work_unit_id": item.work_unit_id, "pr_number": item.pr_number,
+             "disposition": "pruned", "reason": "solo mode schedules no work-unit job",
+             "budget_tier": None, "context_calls": []}
+            for item in agenda.proposals]
+
+
+def _solo_response(work_unit_id):
+    return {"invocation_id": f"{work_unit_id}#{SOLO_ARM_ID}", "arm_id": SOLO_ARM_ID,
+            "work_unit_id": work_unit_id, "spec_id": SOLO_ARM_ID, "pr_number": 1,
+            "status": "success", "candidates": [], "verification_artifacts": []}
+
+
+def _plan():
+    from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
+    from src.mathlib_review.schema.review import V5RunPlan
+
+    plan = V5RunPlan(
+        run_id="v5run:t", run_name="t", routing_mode="solo", agenda_sha256="a" * 64,
+        release="rel", prompt_sha256_by_invocation={}, arm_sha256_by_id={},
+        model_name="m", scaffold_config_sha256="b" * 64,
+        lead_cost_cap=1.0, standard_budget_cap=0.25, per_pr_cost_cap=4.0, source_sha256="")
+    return plan.model_copy(update={"source_sha256": sha256_bytes(canonical_json_bytes(
+        plan.model_dump(mode="json", exclude={"source_sha256"})))})
+
+
+class _Usage:
+    task_results = []
+    total_cost = 0.0
+    total_cached_cost = 0.0
+
+
+def test_a_solo_run_closes_though_no_response_maps_to_a_delegation():
+    """The two standing rules are mutually exclusive for anything that is not an `(arm, unit)`
+    pair: a response must map to a delegation, and a delegation must be an enumerated
+    proposal. A whole-PR review is not one, so the first real run raised
+    `1 response(s) map to no recorded job` after finalizing successfully -- the ledger refused
+    a run whose output was already on disk."""
+
+    from src.mathlib_review.review.trace import reconcile
+
+    agenda = _solo_agenda()
+    manifest = reconcile(
+        agenda=agenda, delegations=_pruned_delegations(agenda),
+        responses=[_solo_response("wu:1")], plan=_plan(), results=_Usage(), issues_total=2)
+
+    assert manifest.routing_mode == "solo"
+
+
+def test_a_response_anchored_outside_the_sealed_scope_is_still_refused():
+    """Where the teeth are in this mode. A solo response's work unit comes from the anchoring
+    pass rather than from the plan, so it is the one place an unplanned unit can enter -- and
+    it would otherwise reach the judge as ordinary output."""
+
+    from src.mathlib_review.review.trace import ReconciliationError, reconcile
+
+    agenda = _solo_agenda()
+    with pytest.raises(ReconciliationError, match="never enumerated"):
+        reconcile(agenda=agenda, delegations=_pruned_delegations(agenda),
+                  responses=[_solo_response("wu:not-in-the-agenda")],
+                  plan=_plan(), results=_Usage(), issues_total=0)
