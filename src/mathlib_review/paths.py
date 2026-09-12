@@ -148,3 +148,20 @@ def assert_repo_root() -> None:
             f"{missing}. Manifest paths are stored relative to the working directory, so "
             "running from elsewhere writes unreproducible provenance."
         )
+
+    # A worktree shares the main checkout's venv, and that venv's editable install pins
+    # `ape` to the main checkout's src/. Everything under `src.` would then come from this
+    # tree while the framework came from another -- refuse the mixed state.
+    import ape
+
+    origin = getattr(ape, "__file__", None)
+    if origin is not None:
+        framework = Path(origin).resolve().parent
+        expected = (Path.cwd() / "src" / "ape").resolve()
+        if framework != expected:
+            raise RuntimeError(
+                f"`ape` is imported from {framework}, not from this tree's {expected}. In a "
+                "worktree the shared venv's editable install points at the main checkout; run "
+                "with PYTHONPATH=src (pytest.ini and the Claude Code settings already do) so the "
+                "framework and the pipeline come from the same tree."
+            )

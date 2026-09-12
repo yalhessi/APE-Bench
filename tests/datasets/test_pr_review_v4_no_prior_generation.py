@@ -119,3 +119,15 @@ def test_assert_repo_root_rejects_a_foreign_working_directory(tmp_path, monkeypa
     monkeypatch.chdir(tmp_path)
     with pytest.raises(RuntimeError, match="repository root"):
         assert_repo_root()
+
+
+def test_assert_repo_root_rejects_a_framework_imported_from_another_tree(monkeypatch):
+    """A worktree that imports `ape` through the shared venv gets the main checkout's
+    framework and its own pipeline; the root check refuses that mix and names the fix."""
+    import ape
+
+    from src.mathlib_review.paths import assert_repo_root
+
+    monkeypatch.setattr(ape, "__file__", "/elsewhere/APE-Bench/src/ape/__init__.py")
+    with pytest.raises(RuntimeError, match="PYTHONPATH=src"):
+        assert_repo_root()
