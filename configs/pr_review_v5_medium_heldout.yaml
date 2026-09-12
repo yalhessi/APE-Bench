@@ -32,3 +32,14 @@ dataset:
   - 33337
   - 33362
   - 33421
+
+  # Measured by preflight on this set: mandatory floor $14.20 (uncapped per PR by design) plus
+  # up to $18.00 discretionary (12 PR x $1.50) = $32.20 worst case. The base's $10.00 is
+  # calibrated for the 4-PR smoke set and is BELOW THE FLOOR ALONE, so `run` refused this
+  # config outright -- the cap doing its job, on a dry run, before the first model call.
+  #
+  # A ceiling, not an estimate: the worst case assumes every PR exhausts its discretionary
+  # allowance, which no run has done. Measured actual is $0.784/PR billed (heldout11_rep2),
+  # about $9.40 for the set. `run_total_cost_cap` is not a field of `V5RunPlan`, so raising it
+  # moves no plan hash and leaves this set's runs comparable to their own history.
+  run_total_cost_cap: 35.00

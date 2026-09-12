@@ -1,0 +1,32 @@
+# CONDITION C on the 12-PR held-out set.
+#
+# DO NOT READ A NUMBER FROM THIS UNTIL THE TRANSCRIPT LEAK AUDIT EXISTS AND HAS BEEN SHOWN TO
+# FIRE ON A PLANTED LURE. See the smoke4 sibling.
+extends: bases/v5_solo.yaml
+
+scaffold_type: claude_code
+
+# Containment. NOT optional, and NOT a security posture -- a measurement one. The scaffold's
+# defaults refuse exactly one tool while auto-approving everything, and from a review
+# workspace that reaches: this repository's own gold via upward git resolution, a cached
+# mathlib clone whose HEAD is months past every episode and contains the merged form of the
+# PR under review, and the GitHub PR page itself, which is where the obligations came from.
+# See src/ape/scaffolds/claude_code/config.py for the verified list.
+#
+# Dropping Bash is not a handicap against the arms: DEFAULT_REVIEW_TOOLS is read-only and has
+# no shell either, so granting one would hand this condition a capability class the incumbent
+# lacks -- breaking the comparison in the same motion that it breaks containment.
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob, TodoWrite]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+dataset:
+  pr_numbers: [33117, 33145, 33149, 33285, 33294, 33304,
+               33305, 33315, 33321, 33337, 33362, 33421]   # 33304, 33315 are CONTROLS
+
+  # 12 PR x $1.50 = $18.00 worst case, against the base's $10.00 -- which is calibrated for
+  # the 4-PR smoke set and refuses this one. Preflight caught it on a dry run, before the
+  # first model call, which is the cap working rather than a number to raise thoughtlessly.
+  # There is no coverage floor to add: solo schedules no work-unit job.
+  run_total_cost_cap: 20.00

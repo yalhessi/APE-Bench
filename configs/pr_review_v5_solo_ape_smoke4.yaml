@@ -1,0 +1,10 @@
+# CONDITION B on smoke4 -- one agent, the whole PR, our own harness.
+#
+# smoke4 is the DEVELOPMENT set: every design decision in the scheduled system was made by
+# looking at these four, so a first-draft solo prompt scored here is scored on the incumbent's
+# home ground. Report it separately from the held-out set, never pooled.
+extends: bases/v5_solo.yaml
+
+scaffold_type: ape_agent
+dataset:
+  pr_numbers: [33057, 33066, 33098, 33438]   # 33438 is the CONTROL
