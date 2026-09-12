@@ -27,7 +27,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List
 
-from src.mathlib_review.io import load_jsonl, pretty_json_bytes, write_once
+from src.mathlib_review.io import load_jsonl, pretty_json_bytes, write_once, jsonl_rows
 from src.mathlib_review.schema import SemanticMatch
 
 #: Obligations R0 singled out, by id suffix.
@@ -44,7 +44,7 @@ def _load_arm(dirs: List[Path]) -> Dict:
         matches += load_jsonl(d / "semantic_matches.jsonl", SemanticMatch)
         vp = d / "sample_votes.jsonl"
         if vp.is_file():
-            for row in (json.loads(l) for l in vp.read_text().splitlines() if l.strip()):
+            for row in jsonl_rows(vp):
                 votes[(row["candidate_id"], row["obligation_id"])] = row
     return {"matches": matches, "votes": votes}
 

@@ -36,6 +36,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
 
+from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.conventions.situations import SITUATIONS_VERSION, Situation, situation_of
 from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX
 from src.mathlib_review.retrieval.precedent_index import DISPLAY_HUNK_CHARS
@@ -236,7 +237,7 @@ def load_index_rows(meta: Path = PRECEDENT_INDEX / "meta.jsonl", *,
                     end: Optional[str]) -> List[Dict[str, Any]]:
     """Index rows: hunks cut at DISPLAY_HUNK_CHARS, so `hunk_complete` is decided per row."""
 
-    rows = [json.loads(line) for line in meta.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = jsonl_rows(meta)
     for row in rows:
         row["hunk_complete"] = len(row.get("diff_hunk") or "") < DISPLAY_HUNK_CHARS
     return [row for row in rows if _within(row, end)]

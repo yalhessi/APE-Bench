@@ -27,7 +27,7 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
-from src.mathlib_review.io import canonical_json_bytes, load_jsonl, pretty_json_bytes, sha256_bytes, write_once
+from src.mathlib_review.io import canonical_json_bytes, load_jsonl, pretty_json_bytes, sha256_bytes, write_once, jsonl_rows
 from src.mathlib_review.schema import CandidateClaim, InterventionView, JudgmentNode, SemanticMatch
 from src.mathlib_review.legacy_pipeline.judge_v71 import LEGACY_CACHE_DIR, LEGACY_JUDGE_VERSION
 from src.mathlib_review.judge.semantic_judge import build_pairs
@@ -65,7 +65,7 @@ def compare(
     votes = {}
     votes_path = task_arm_dir / "sample_votes.jsonl"
     if votes_path.is_file():
-        for row in (json.loads(l) for l in votes_path.read_text().splitlines() if l.strip()):
+        for row in jsonl_rows(votes_path):
             votes[(row.get("candidate_id"), row.get("obligation_id"))] = row
 
     rows: List[Dict] = []

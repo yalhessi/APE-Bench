@@ -9,6 +9,7 @@ from typing import Iterable, List, Optional
 
 from src.mathlib_review.release.releases import artifact_ref
 from src.mathlib_review.io import (
+    jsonl_rows,
     canonical_json_bytes,
     display_path,
     load_jsonl,
@@ -157,7 +158,7 @@ def seal_run(run_dir: Path, created_at: Optional[str] = None) -> RunManifest:
     plan_path = run_dir / "run_plan.json"
     plan = RunPlan.model_validate_json(plan_path.read_text())
     response_path = run_dir / "candidate_responses.jsonl"
-    responses = [json.loads(line) for line in response_path.read_text().splitlines() if line]
+    responses = jsonl_rows(response_path)
     expected = set(plan.expected_work_unit_ids)
     response_ids = [
         item.get("invocation_id") or item.get("work_unit_id") for item in responses

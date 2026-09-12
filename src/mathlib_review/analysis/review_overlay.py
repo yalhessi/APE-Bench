@@ -41,7 +41,7 @@ from src.mathlib_review.analysis.delegation_view import (
 
 from src.mathlib_review import paths
 from src.mathlib_review.review.digest import digest_findings
-from src.mathlib_review.io import display_path, load_jsonl, load_jsonl_optional
+from src.mathlib_review.io import display_path, load_jsonl, load_jsonl_optional, jsonl_rows
 from src.mathlib_review.schema import (
     CandidateClaim,
     CapabilityAssessment,
@@ -621,7 +621,7 @@ def _load_ledger(executor: Optional[Path]) -> Dict[str, dict]:
     path = executor / "pipeline_ledger.jsonl"
     if not path.is_file():
         return {}
-    rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    rows = jsonl_rows(path)
     return {row["investigation_id"]: row for row in rows}
 
 

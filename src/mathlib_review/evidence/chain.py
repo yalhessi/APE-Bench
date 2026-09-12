@@ -41,7 +41,7 @@ from src.mathlib_review.evidence.evidence import (
     collect_candidate,
     snapshot_workspace,
 )
-from src.mathlib_review.io import jsonl_bytes, write_once
+from src.mathlib_review.io import jsonl_bytes, write_once, jsonl_rows
 from src.mathlib_review.opportunities.select import select_findings
 
 
@@ -222,7 +222,7 @@ def evidence_report(out: Path) -> Dict[str, Any]:
     path = out / "evidence" / "packets.jsonl"
     if not path.is_file():
         return {"packets": 0}
-    rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    rows = jsonl_rows(path)
     by_status: Dict[str, int] = {}
     failures: Dict[str, int] = {}
     completed: Dict[str, int] = {}
