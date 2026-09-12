@@ -238,3 +238,56 @@ def test_each_caller_still_validates_against_its_own_model():
         {"dataset": dict(JUDGE_DERIVED)})
     assert isinstance(dataset, JudgeDatasetConfig)
     assert scaffold.task_config_overrides == overrides
+
+
+# --- scaffold_type selects the model, and used not to -------------------------------------
+
+
+def test_the_default_scaffold_still_validates_against_the_ape_agent_model():
+    """The common path is unchanged, and must stay reachable without a vendor SDK."""
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from src.mathlib_review.run_config import scaffold_config_class
+
+    assert scaffold_config_class("ape_agent") is ApeAgentConfig
+
+
+def test_a_non_default_scaffold_selects_its_own_config_model():
+    """`scaffold_type` was a string with one legal value: every config was validated against
+    `ApeAgentConfig` whatever it said, so a `claude_code` run sealed `scaffold_config_sha256`
+    over a model it did not run under."""
+
+    from ape.scaffolds.claude_code.config import ClaudeCodeConfig
+    from src.mathlib_review.run_config import scaffold_config_class
+
+    assert scaffold_config_class("claude_code") is ClaudeCodeConfig
+
+
+def test_an_unknown_scaffold_is_refused_by_name():
+    """Silently falling back to the default would run the baseline under the incumbent's
+    scaffold and label it as the baseline."""
+
+    from src.mathlib_review.run_config import scaffold_config_class
+
+    with pytest.raises(ValueError, match="unknown scaffold_type"):
+        scaffold_config_class("claude-code")
+
+
+def test_a_scaffold_specific_key_now_loads_instead_of_being_refused(tmp_path):
+    """`BaseScaffoldConfig` is `extra='forbid'`, so this config was refused at load: the key is
+    real, it is just not `ApeAgentConfig`'s. This is the blocker that kept every review config
+    on one scaffold."""
+
+    from src.mathlib_review.run_config import load_run
+
+    config = tmp_path / "solo.yaml"
+    config.write_text(
+        "scaffold_type: claude_code\n"
+        "permission_mode: dontAsk\n"
+        "dataset:\n"
+        "  release: r\n"
+        "  modification_inventory: m\n"
+    )
+    _dataset, scaffold, _overrides = load_run(config, V5DatasetConfig)
+    assert scaffold.scaffold_type == "claude_code"
+    assert scaffold.permission_mode == "dontAsk"
