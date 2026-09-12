@@ -146,6 +146,24 @@ class SoloReviewData(BasePRReviewData):
     #: the whole temporal-isolation story for an agent that is otherwise unconstrained.
     retrieval_cutoff: Optional[str] = None
 
+    #: What every context tool stamps its trace row with. An arm's is its `(unit, arm)` pair;
+    #: a whole-PR review has one per episode, so it is minted from the episode.
+    #:
+    #: Required, not optional, and this is why: the tools read `task.data.invocation_id` while
+    #: building the row, *before* the best-effort trace write can swallow anything. Without the
+    #: field every retrieval call returned
+    #: `'SoloReviewData' object has no attribute 'invocation_id'` to the agent. Measured on the
+    #: first paid run: 3 of 3 calls failed that way -- two `declaration_search`, one
+    #: `precedent_search` -- so the condition reviewed the PR with its retrieval grant revoked
+    #: and nothing said so. A default would have restored exactly that silence.
+    invocation_id: str
+
+    #: Where those rows land. The retrieval record is not a nicety: the fairness invariant this
+    #: comparison rests on is that every condition saw the same sources under the same gate,
+    #: and the leak audit's temporal check is that every row carries a non-null `gate` and an
+    #: `as_of` no later than the cutoff. Neither is checkable without the file.
+    trace_path: Optional[str] = None
+
 
 class SoloReviewResult(BasePRReviewResult):
     episode_id: str = ""

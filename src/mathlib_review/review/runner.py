@@ -319,7 +319,7 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
 
 
 def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str],
-                    ) -> List[Dict[str, Any]]:
+                    trace_path: Path) -> List[Dict[str, Any]]:
     """`solo`: one agent per episode, handed the whole PR and no work units.
 
     Built from the episodes rather than from `agenda.proposals`, because the proposals are the
@@ -351,6 +351,13 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
             "snapshot_base_sha": episode.base_sha,
             "context_tools": list(dataset.solo_context_tools),
             "retrieval_cutoff": cutoff_by_episode.get(episode.episode_id),
+            # One invocation per episode, and both fields are load-bearing rather than
+            # bookkeeping: every context tool stamps its trace row with `invocation_id` before
+            # the best-effort write can swallow an error, so omitting it returned
+            # `'SoloReviewData' object has no attribute 'invocation_id'` to the agent on every
+            # retrieval call. The first paid run lost 3 of 3 that way and still closed clean.
+            "invocation_id": f"{episode.episode_id}#{SOLO_ARM_ID}",
+            "trace_path": str(trace_path),
             # Caps bind BILLED cost. The whole point of the condition is a cost-matched
             # comparison, so the ceiling is per task and stated by the run rather than
             # inherited from an orchestrator-wide setting.
@@ -1146,7 +1153,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # No census, no arm pool, no journal: there is nothing to route. The agenda was still
         # built and sealed above, which is what makes this run's `agenda_report.json` scope
         # identically to the `lead` run on the same config.
-        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode)
+        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap
     else:
         data = _direct_arm_task_data(agenda, pool, cutoff_by_episode, trace_path)

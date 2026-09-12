@@ -30,6 +30,7 @@ def _data(**overrides):
         task_id="solo-1", pr_number=33098, pr_title="feat: minimal covers",
         pr_description="A description.", diff="--- a/Mathlib/A.lean\n+++ b/Mathlib/A.lean\n",
         changed_files=["Mathlib/A.lean"], episode_id="ep:33098",
+        invocation_id="ep:33098#solo_agent",
         target_workspace=WorkspaceInfo(name="target", commit_hash="c" * 40, repo_url="x"),
     )
     payload.update(overrides)
@@ -119,3 +120,60 @@ def test_the_task_is_scaffold_agnostic():
     executable = ast.unparse(ast.fix_missing_locations(tree))
     for scaffold_type in ("ape_agent", "claude_code", "codex"):
         assert scaffold_type not in executable, scaffold_type
+
+
+# --- the contract the retrieval tools read off task.data ------------------------------------
+
+
+def _attributes_the_context_tools_read():
+    """Every `task.data.<attr>` in `context_tools.py`, read off the AST rather than listed."""
+
+    import ast
+    import inspect
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+
+    names = set()
+    for node in ast.walk(ast.parse(inspect.getsource(context_tools))):
+        if (isinstance(node, ast.Attribute) and isinstance(node.value, ast.Attribute)
+                and node.value.attr == "data"
+                and isinstance(node.value.value, ast.Name)
+                and node.value.value.id == "task"):
+            names.add(node.attr)
+    return names
+
+
+def test_the_solo_task_satisfies_the_contract_the_context_tools_read():
+    """Granting a tool is not the same as being able to call it.
+
+    The tools read attributes straight off `task.data` while building their trace row, and
+    that happens *before* the best-effort trace write can swallow anything -- so a missing
+    field is not a missing trace, it is an exception returned to the agent as the tool's
+    result. Measured on the first paid run: `invocation_id` was absent, and all 3 retrieval
+    calls the agent made came back as
+    `'SoloReviewData' object has no attribute 'invocation_id'`. The run still closed
+    `complete` with findings on disk, so nothing downstream could tell that the condition had
+    reviewed the PR with its retrieval grant silently revoked.
+
+    Derived from the AST rather than a hand-written list, so the next attribute added to a
+    context tool fails here instead of in a paid run.
+    """
+
+    required = _attributes_the_context_tools_read()
+    assert "invocation_id" in required, "the AST scan found nothing; the guard is vacuous"
+
+    missing = sorted(name for name in required
+                     if name not in SoloReviewData.model_fields)
+    assert not missing, (
+        f"the solo task grants context tools but its data lacks {missing}; every call to "
+        f"them would return an AttributeError to the agent as a tool result")
+
+
+def test_the_retrieval_grant_is_traceable_or_it_cannot_be_audited():
+    """Two things depend on the trace existing, and both are load-bearing for this experiment:
+    the fairness invariant that every condition saw the same sources under the same gate, and
+    the leak audit's temporal check that each row carries a non-null `gate` and an `as_of` at
+    or before the cutoff. An untraced retrieval grant is unverifiable in both directions."""
+
+    fields = SoloReviewData.model_fields
+    assert "trace_path" in fields and "retrieval_cutoff" in fields
