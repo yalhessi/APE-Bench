@@ -234,6 +234,16 @@ def _register_precedent(task, mcp) -> None:
 # Declarations
 # --------------------------------------------------------------------------------------
 
+def _reviewed_overlay_root(task):
+    """The attempt's `target/`: base + δ₀, with the PR's changed files materialised as real
+    files. `None` when the task has no target workspace, in which case only the base corpus
+    is searched and the tool says so."""
+
+    workspace = getattr(task, "target_workspace", None)
+    path = getattr(workspace, "path", None)
+    return Path(path) if path else None
+
+
 def _register_declaration(task, mcp) -> None:
     @mcp.tool(
         description=(
@@ -242,11 +252,12 @@ def _register_declaration(task, mcp) -> None:
             "to locate the canonical spelling of an API. Matches declaration sites only, "
             "not mentions in comments or imports. Give a real identifier "
             "(e.g. `Finset.sum_comm`), not prose.\n\n"
-            "The corpus is the tree BEFORE this PR. So a declaration this PR adds or renames "
-            "will never be found here, and an empty result is an ANSWER, not a failure: it "
-            "means the name is genuinely new, which is what refutes a duplication or "
-            "'already exists' claim. Do not re-query a name that came back empty, and do not "
-            "treat empty as the search being broken."
+            "Two corpora, reported separately: the tree BEFORE this PR (the base commit), and "
+            "the files this PR changes, as this PR leaves them. A name found only in the "
+            "second is one this PR introduces or renames -- which is what refutes a "
+            "duplication or 'already exists' claim, and what lets a rename be looked up "
+            "under its new name. An empty result in the base corpus is an ANSWER, not a "
+            "failure. Do not re-query a name that came back empty in both."
         )
     )
     async def declaration_search(
@@ -296,28 +307,63 @@ def _register_declaration(task, mcp) -> None:
         except Exception as exc:  # noqa: BLE001
             return {"success": False, "error": f"declaration search failed: {exc}"}
 
-        rendered, truncated = _truncate("\n".join(
-            f"- `{item['declares']}` is declared in `{item['path']}`" for item in hits
-        ))
+        # The reviewed state of the files this PR changes. Base-only search blinds a rename
+        # review to the very name under review: on 33337 the naming arm looked up the PR's new
+        # name, got "no declaration exists at the base commit", and had nothing to reason
+        # about. Only the changed files are searched -- they are the only files whose reviewed
+        # text differs from the base, and the only ones the overlay materialises as real
+        # files -- so this is a few reads, not a second tree walk. Kept apart from the base
+        # hits: "exists before this PR" and "exists because of this PR" answer opposite
+        # questions, and folding them would turn a rename into a duplicate.
+        introduced: List[Dict[str, Any]] = []
+        overlay = _reviewed_overlay_root(task)
+        if overlay is not None:
+            for rel in getattr(task.data, "changed_files", None) or []:
+                if len(introduced) >= limit:
+                    break
+                path = Path(overlay) / rel
+                if path.is_symlink() or not path.is_file():
+                    continue
+                try:
+                    text = path.read_text(encoding="utf-8", errors="ignore")
+                except OSError:
+                    continue
+                for term in terms:
+                    if declares_identifier(text, term):
+                        introduced.append({"path": rel, "declares": term})
+                        break
+
+        lines = [f"- `{item['declares']}` is declared in `{item['path']}` (before this PR)"
+                 for item in hits]
+        lines += [f"- `{item['declares']}` is declared in `{item['path']}` (IN THIS PR, as "
+                  "it leaves the file)" for item in introduced]
+        rendered, truncated = _truncate("\n".join(lines))
         _append_trace(task, {
             "schema_version": "v5-context-call1",
             "invocation_id": task.data.invocation_id,
             "tool": "declaration_search",
             "gate": "base_snapshot",
+            # `gate` is a closed vocabulary the leak audit enumerates, and the temporal bound
+            # here is still the base snapshot: the second corpus is the PR's own changed files,
+            # which can see nothing later than the PR itself. Overlay hits are distinguishable
+            # in `result_ids` by their `reviewed:` prefix.
             "query": identifier,
             "as_of": None, "exclude_pr": None,
             "corpus_sha256": task.data.snapshot_base_sha,
-            "result_ids": [item["path"] for item in hits],
-            "result_count": len(hits), "truncated": truncated,
+            "result_ids": [item["path"] for item in hits] + [
+                f"reviewed:{item['path']}" for item in introduced],
+            "result_count": len(hits) + len(introduced), "truncated": truncated,
         })
+        empty = (
+            f"No declaration of {identifier!r} exists at the base commit"
+            + (" or in the files this PR changes." if overlay is not None else ".")
+            + " This is a finding, not a failed lookup. Re-querying will return the same answer."
+        )
         return {
-            "success": True, "count": len(hits), "searched_terms": terms,
-            "results": rendered or (
-                f"No declaration of {identifier!r} exists at the base commit. This is a "
-                "finding, not a failed lookup: the name is new in this PR (or renamed by "
-                "it), so nothing in the pre-PR library duplicates it. Re-querying will "
-                "return the same answer."
-            ),
+            "success": True, "count": len(hits) + len(introduced),
+            "declared_before_this_pr": len(hits), "declared_in_this_pr": len(introduced),
+            "searched_terms": terms,
+            "results": rendered or empty,
         }
 
 
