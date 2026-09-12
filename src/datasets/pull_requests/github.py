@@ -12,7 +12,9 @@ still raises.
 
 The third was not: a single heavy endpoint 502'd past the retries and killed a 32,650-PR tier-1
 run at 99.9 %. Every failure that survives the retries is a `GitHubHTTPError`, a `GitHubError`, so
-a caller can guard one endpoint and keep going -- which is what the collector's tiers do.
+a caller can guard one endpoint and keep going -- which is what the collector's tiers do. That
+guard, not a longer retry budget, is the defence: the budget was tried at 242 s and the same
+endpoint still failed, so retries stay short and giving up stays cheap.
 """
 
 import os
@@ -53,7 +55,7 @@ class GitHubClient:
         *,
         timeout_seconds: float = 30.0,
         request_interval_seconds: float = 0.0,
-        max_retries: int = 8,
+        max_retries: int = 5,
         retry_backoff: float = 2.0,
         max_rate_limit_wait: float = 3900.0,
         logger=None,
@@ -119,11 +121,14 @@ class GitHubClient:
         time.sleep(delay)
 
     def _request(self, method: str, url: str, **kwargs) -> httpx.Response:
-        # Retry transient failures (5xx, network/timeout) with exponential backoff so one 502 does
-        # not kill a long paginated collection. 403/429 stay a RateLimitError (caller's concern).
-        # Eight attempts, not five: a 502 here is usually GitHub timing out while *generating* a
-        # heavy response, and the same cold request keeps failing until it warms. `/pulls/4197/
-        # comments` is 1.2 MB and 502'd through 62 s of backoff, then served in 0.1 s once warm.
+        # Retry transient failures (5xx, network/timeout) with exponential backoff, then hand the
+        # caller a GitHubError. 403/429 stay a RateLimitError (caller's concern).
+        # Five attempts (~62 s), deliberately not more. A 502 on a heavy endpoint is GitHub timing
+        # out while *generating* the response, and the same cold request keeps failing: 4197's
+        # 1.2 MB comments page 502'd through 62 s of backoff and again through 242 s. Retrying is
+        # no defence against that -- deferring the endpoint is (see `Collector.tier1`) -- so the
+        # budget only has to cover a transient blip. A longer one makes the give-up slower, and
+        # the collector pays it per dead endpoint.
         for attempt in range(self._max_retries + 1):
             try:
                 response = self._client.request(method, url, **kwargs)

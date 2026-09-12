@@ -5,10 +5,12 @@ search API at **30 requests per minute**, separately from the 5,000/hour core bu
 client raised on the first 403 instead of waiting ~30 seconds for the window to reset. A `core`
 window is an hour long, so the same bug would throw away an hour of collection.
 
-The September collection died differently: `/pulls/4197/comments` is a 1.2 MB page that GitHub
-502s while generating and then serves in 0.1 s once warm, so five retries across 62 s all hit the
-cold path, and the raw `httpx.HTTPStatusError` escaped every caller that guards an endpoint. Hence
-eight attempts, and `GitHubHTTPError` -- a `GitHubError` -- for whatever still fails.
+The September collection died differently: `/pulls/4197/comments` is a 1.2 MB page GitHub 502s
+while generating, and the raw `httpx.HTTPStatusError` escaped every caller that guards an endpoint.
+So whatever outlives the retries is a `GitHubHTTPError` -- a `GitHubError` -- and the caller defers
+that endpoint. Retrying harder was tried and does not work: 242 s of backoff failed where 62 s had.
+The budget therefore stays short, because giving up is now cheap and the collector pays the wait
+once per dead endpoint.
 """
 
 from __future__ import annotations
@@ -105,20 +107,28 @@ def test_retries_are_finite(monkeypatch):
 SERVER_ERROR = FakeResponse(502, {"X-RateLimit-Remaining": "4000"})
 
 
-def test_a_5xx_is_retried_further_than_a_minute_of_backoff(monkeypatch):
-    """A 502 here is GitHub timing out while generating a heavy response; the same cold request
-    keeps failing until it warms, so the budget has to outlast the warm-up, not just a blip."""
-
-    client, slept = _client([SERVER_ERROR] * 5 + [OK], monkeypatch)
+def test_a_transient_5xx_is_retried_and_never_reaches_the_caller(monkeypatch):
+    client, slept = _client([SERVER_ERROR, SERVER_ERROR, OK], monkeypatch)
     assert client.get_json("/repos/x/y/pulls/4197/comments") == [{"number": 1}]
-    assert sum(slept) > 60
+    assert slept == [2.0, 4.0]
+
+
+def test_the_5xx_budget_stays_short_because_deferring_is_the_defence(monkeypatch):
+    """Retrying harder is not the fix and this pins that: raising it to 242 s did not rescue
+    4197, and a longer budget is paid *per dead endpoint* by a collection walking 32k PRs.
+    The caller defers the endpoint instead, so giving up quickly is the cheap move."""
+
+    client, slept = _client([SERVER_ERROR] * 6, monkeypatch)
+    with pytest.raises(GitHubHTTPError):
+        client.get_json("/repos/x/y/pulls/4197/comments")
+    assert sum(slept) < 90
 
 
 def test_a_persistent_5xx_raises_a_githuberror_carrying_the_status(monkeypatch):
     """Not `httpx.HTTPStatusError`: the collector guards one endpoint with `except GitHubError`,
     and a raw httpx exception walked straight through that guard and ended a 12-hour collection."""
 
-    client, _ = _client([SERVER_ERROR] * 9, monkeypatch, max_retries=8)
+    client, _ = _client([SERVER_ERROR] * 6, monkeypatch)
     with pytest.raises(GitHubError) as excinfo:
         client.get_json("/repos/x/y/pulls/4197/comments")
     assert isinstance(excinfo.value, GitHubHTTPError)
