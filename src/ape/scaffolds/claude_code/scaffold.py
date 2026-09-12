@@ -156,6 +156,23 @@ class ClaudeCodeScaffold(BaseScaffold):
             # Disallow SDK builtin file tools when using native MCP tools
             disallowed_tools.extend(["Read", "Write", "Edit", "MultiEdit", "LS", "Glob", "Grep"])
             self.logger.info("[ClaudeCodeScaffold] use_native_tools=True, disallowed SDK builtin file tools")
+        # Configured containment, on top of the above rather than replacing it. Until this
+        # existed the only tool this scaffold ever refused was `Explore`, while
+        # `permission_mode` defaulted to `bypassPermissions` -- so Bash, WebFetch, WebSearch
+        # and Task were live and auto-approved. See `config.py` for what that reaches from a
+        # Mathlib review workspace; it is not a theoretical list.
+        for tool_name in config.disallowed_tools:
+            if tool_name not in disallowed_tools:
+                disallowed_tools.append(tool_name)
+        # Logged at INFO because the containment a run actually had is part of reading its
+        # result: a number from a run whose posture is unknown is not interpretable.
+        self.logger.info(
+            "[ClaudeCodeScaffold] containment: permission_mode=%s tools=%s disallowed=%s "
+            "setting_sources=%s strict_mcp_config=%s",
+            config.permission_mode, config.tools or "<SDK default: all>", disallowed_tools,
+            "<all>" if config.setting_sources is None else config.setting_sources,
+            config.strict_mcp_config,
+        )
 
         # Get resume session ID
         resume_session_id = self.conversation_manager.resume_session_id
@@ -181,6 +198,16 @@ class ClaudeCodeScaffold(BaseScaffold):
 
         # Build Claude Agent options
         # Note: system_prompt is not passed here, it will be merged into initial_prompt instead
+        optional_containment = {}
+        if config.tools is not None:
+            optional_containment["tools"] = list(config.tools)
+        if config.setting_sources is not None:
+            # `[]` and "unset" mean opposite things to the SDK -- none versus all -- so this
+            # must distinguish them rather than treating an empty list as absent.
+            optional_containment["setting_sources"] = list(config.setting_sources)
+        if config.strict_mcp_config:
+            optional_containment["strict_mcp_config"] = True
+
         options = ClaudeAgentOptions(
             model=config.llm_config.model_name,
             max_turns=config.execution.max_turns,
@@ -189,6 +216,7 @@ class ClaudeCodeScaffold(BaseScaffold):
             add_dirs=add_dirs,
             permission_mode=config.permission_mode,
             disallowed_tools=disallowed_tools,
+            **optional_containment,
             include_partial_messages=True,
             resume=resume_session_id,
             fork_session=True if resume_session_id else False,
