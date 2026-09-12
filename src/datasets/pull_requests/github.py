@@ -76,6 +76,11 @@ class GitHubClient:
         # than dies: the alternative is losing an hour of collection to a 403.
         self._max_rate_limit_wait = max(0.0, max_rate_limit_wait)
         self._logger = logger
+        #: Every request that reached GitHub -- each page of a paginated call, and each retried
+        #: 5xx or 403, since GitHub meters those too. A caller counting its own calls instead
+        #: under-reports a paginated endpoint by however many pages it took, which is exactly the
+        #: big PRs. Read this, do not infer it.
+        self.request_count = 0
 
     @property
     def authenticated(self) -> bool:
@@ -137,6 +142,7 @@ class GitHubClient:
                     raise GitHubHTTPError(f"{type(exc).__name__} for {method} {url}: {exc}") from exc
                 self._backoff_sleep(attempt, f"transport error ({type(exc).__name__})")
                 continue
+            self.request_count += 1
             if self._interval:
                 time.sleep(self._interval)
             if response.status_code in {403, 429}:

@@ -178,7 +178,20 @@ class Collector:
         self.roster = load_roster(self.roster_path)
         self.state_path = state_path or store.root / "collect.state.json"
         self.log_every_prs = log_every_prs
-        self.requests = 0
+        self._requests_at_start = getattr(client, "request_count", 0)
+
+    @property
+    def requests(self) -> int:
+        """HTTP requests this collector has spent, as the client counted them.
+
+        Counted by the client, not inferred here: `paginate_all` on a PR with 300 changed files
+        is four requests, and tier 2 used to score it as one. The under-count fell entirely on
+        the largest PRs, so a quota estimate built from it was optimistic exactly where it
+        mattered. Tier 1's `(rows + 99) // 100` was a closer guess but still a guess -- it
+        cannot see a retry.
+        """
+
+        return getattr(self.client, "request_count", 0) - self._requests_at_start
 
     # state: the tier-0 PR list per window, so a resume never re-walks
     def _state(self) -> Dict[str, Any]:
@@ -241,7 +254,6 @@ class Collector:
                                         number, name, exc)
                     deferred.append(number)
                     continue
-                self.requests += max(1, (len(payload) + 99) // 100)
                 rows += len(payload)
                 self.store.write_endpoint(number, name, payload, request=path,
                                           fetched_at=_now(), source="github")
@@ -296,7 +308,6 @@ class Collector:
                                         number, name, exc)
                     deferred.append(number)
                     continue
-                self.requests += 1
                 self.store.write_endpoint(number, name, payload, request=path, fetched_at=_now(),
                                           source="github")
             for name, fetch in TIER2_GRAPHQL.items():
@@ -308,7 +319,6 @@ class Collector:
                     self.logger.warning("  #%d %s: GraphQL failed (%s); recorded as null, fillable "
                                         "by a later run", number, name, exc)
                     payload = None
-                self.requests += 1
                 self.store.write_endpoint(number, name, payload, request=f"graphql:{name}",
                                           fetched_at=_now(), source="github")
             compares += self.fetch_compares(number)
@@ -347,7 +357,6 @@ class Collector:
                     self.logger.warning("  #%d compare %s failed: %s", number, head[:12], exc)
                     wanted.discard(head)
                     continue
-                self.requests += 1
                 self.store.write_compare(number, head, compare_bytes(compact_compare(payload)),
                                          base_ref="master", request=path, fetched_at=_now(),
                                          source="github")

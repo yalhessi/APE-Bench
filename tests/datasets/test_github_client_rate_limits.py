@@ -152,3 +152,36 @@ def test_a_transport_error_that_outlives_the_retries_is_also_a_githuberror(monke
     monkeypatch.setattr(time, "sleep", lambda s: None)
     with pytest.raises(GitHubError):
         client.get_json("/repos/x/y/pulls")
+
+
+# --- the quota counter -------------------------------------------------------------------------
+
+def _paged(n_pages):
+    """n pages of 100, linked by `next` -- what a big PR's /files or /commits looks like."""
+    pages = []
+    for i in range(n_pages):
+        r = FakeResponse(200, {"X-RateLimit-Remaining": "4000"}, [{"i": i}] * 100)
+        r.links = {"next": {"url": f"https://api.github.com/next/{i+1}"}} if i < n_pages - 1 else {}
+        pages.append(r)
+    return pages
+
+
+def test_every_page_counts_as_a_request(monkeypatch):
+    """The under-count this replaces: tier 2 scored a `paginate_all` as one request no matter how
+    many pages it pulled, so a quota estimate was optimistic exactly on the largest PRs."""
+
+    client, _ = _client(_paged(4), monkeypatch)
+    assert len(client.paginate_all("/repos/x/y/pulls/1/files", max_pages=None)) == 400
+    assert client.request_count == 4
+
+
+def test_a_retried_5xx_counts_every_attempt_because_github_meters_them(monkeypatch):
+    client, _ = _client([SERVER_ERROR, SERVER_ERROR, OK], monkeypatch)
+    client.get_json("/repos/x/y/pulls/1")
+    assert client.request_count == 3
+
+
+def test_a_rate_limit_wait_counts_the_rejected_request(monkeypatch):
+    client, _ = _client([SEARCH_429, OK], monkeypatch)
+    client.get_json("/search/issues")
+    assert client.request_count == 2

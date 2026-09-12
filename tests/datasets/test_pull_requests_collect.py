@@ -54,6 +54,11 @@ class FakeGitHub:
     def __init__(self, prs: Dict[int, Dict[str, Any]]):
         self.prs = prs
         self.requests: List[str] = []
+        self.request_count = 0          # the real client meters here; the collector reads it
+
+    def _spend(self, path: str, pages: int = 1) -> None:
+        self.requests.append(path)
+        self.request_count += pages
 
     def pages(self, path, *, params=None, per_page=100, max_pages=None):
         assert path.endswith("/pulls")
@@ -61,19 +66,20 @@ class FakeGitHub:
         for index, offset in enumerate(range(0, len(rows), 100)):
             if max_pages is not None and index >= max_pages:
                 return
-            self.requests.append(path)
+            self._spend(path)
             yield rows[offset:offset + 100]
 
     def paginate_all(self, path, **kwargs):
-        self.requests.append(path)
         n = int(re.search(r"/(?:pulls|issues)/(\d+)/", path).group(1))
         kind = path.rsplit("/", 1)[1]
         key = {"comments": "issue_comments" if "/issues/" in path else "review_comments",
                "reviews": "reviews", "commits": "commits", "files": "files", "timeline": "timeline"}[kind]
-        return list(self.prs[n].get(key, []))
+        rows = list(self.prs[n].get(key, []))
+        self._spend(path, max(1, (len(rows) + 99) // 100))
+        return rows
 
     def get_json(self, path, params=None):
-        self.requests.append(path)
+        self._spend(path)
         if "/compare/" in path:
             head = path.rsplit("...", 1)[1]
             return {"merge_base_commit": {"sha": "base0"},
@@ -84,7 +90,7 @@ class FakeGitHub:
         return self.prs[n]["pr"]
 
     def graphql(self, query, variables):
-        self.requests.append("graphql")
+        self._spend("graphql")
         if "reviewThreads" in query:
             return {"repository": {"pullRequest": {"reviewThreads": {
                 "pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": []}}}}
@@ -270,3 +276,12 @@ def test_the_next_run_refetches_only_the_deferred_endpoint(flaky):
     assert fake.requests[before:] == ["/repos/leanprover-community/mathlib4/pulls/102/comments"]
     assert store.tiers(102) == {0, 1}
     assert pre_gate(store, 102, collector.roster) == (True, "pass")
+
+
+def test_the_collector_reports_what_the_client_spent_not_what_it_guessed(collected):
+    """Tier 2 used to score a paginated endpoint as one request however many pages it pulled.
+    The client is the only thing that knows, so the collector reads its meter."""
+
+    store, fake, collector, prs = collected
+    assert collector.requests == fake.request_count
+    assert collector.requests > 0
