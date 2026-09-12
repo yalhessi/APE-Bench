@@ -1,0 +1,118 @@
+{
+  "ambiguity_registry_sha256": "efaf8341b05d213e29298f5ae456860e5038692cbcb6bb0e74d0ad81719661a2",
+  "ambiguous_rate": 0.0,
+  "arm": "registered_task",
+  "by_pairing_tier": {
+    "anchor": {
+      "issue_matches": 3,
+      "pairs": 3
+    },
+    "file": {
+      "issue_matches": 0,
+      "pairs": 0
+    },
+    "relation": {
+      "issue_matches": 0,
+      "pairs": 0
+    }
+  },
+  "counts": {
+    "candidates": 4,
+    "null_pairs": 0,
+    "obligations": 2,
+    "observed_pairs": 3,
+    "paired_candidates": 2
+  },
+  "coverage": {
+    "complete": true,
+    "pairs_planned": 3,
+    "verdicts_returned": 3
+  },
+  "denominator_pr_scope": [
+    33337
+  ],
+  "forensic": false,
+  "gold_alignment_rate": 0.5,
+  "gold_alignment_within_paired": 1.0,
+  "issue_hits_reachable": 0,
+  "issue_hits_unreachable": 2,
+  "issue_recall": 1.0,
+  "issue_recall_including_ambiguous": 1.0,
+  "issue_recall_reachable": null,
+  "judge_identity": "0711a6c01265b3e2a48a698ede6588157d41ad6c6e9d8c07c0c9fe56450d8a2d",
+  "judge_model": "gpt_5_mini",
+  "judge_version": "v4-semantic-v3-v9-rubric",
+  "location_recall": 1.0,
+  "manual_audit_required": true,
+  "null_pair_diagnostics": {
+    "candidate_negative_issue_match_rate": null,
+    "coverage": null,
+    "pairs": 0,
+    "requested": 0
+  },
+  "obligation_populations": {
+    "eligible": 2,
+    "hittable": 2,
+    "raw": 2
+  },
+  "obligation_status_counts": {
+    "issue": {
+      "ambiguous": 0,
+      "hit": 2,
+      "miss": 0
+    },
+    "resolution": {
+      "ambiguous": 0,
+      "hit": 0,
+      "miss": 2
+    }
+  },
+  "pairing_tiers": [
+    "anchor"
+  ],
+  "per_obligation": [
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:ce7b5d2e038d3f00f9b05b3263b85b55bf6e4fa9740dc0c8f8d07269c8ad0e9b",
+      "resolution_status": "miss"
+    },
+    {
+      "issue_status": "hit",
+      "location_hit": true,
+      "obligation_id": "obligation:64e1164fcb5870d06d72a33db4048b7093987aa6cc295801360256f59d9ed5ad",
+      "resolution_status": "miss"
+    }
+  ],
+  "reachability": {
+    "admitting_channels": [
+      "verification"
+    ],
+    "by_concern": {
+      "naming": {
+        "reachable": 0,
+        "total": 2
+      }
+    },
+    "mechanism_sha256": "709e6847f37bb53758bc72aaeb6e36a8b5f3ccb0a5dd0cf14f6ca9daa7ecbf1c",
+    "note": "Recall against `obligations_total` measures the reviewer and the publication mechanism together. Recall against `obligations_reachable` measures the reviewer alone, given what the mechanism can currently express. Report both.",
+    "obligations_reachable": 0,
+    "obligations_total": 2,
+    "obligations_unreachable": 2,
+    "reachability_version": "v5-reachability/1",
+    "reachable_share": 0.0
+  },
+  "resolution_hits_reachable": 0,
+  "resolution_hits_unreachable": 0,
+  "resolution_recall": 0.0,
+  "resolution_recall_including_ambiguous": 0.0,
+  "resolution_recall_reachable": null,
+  "schema_version": "v4-semantic-report3",
+  "scored": true,
+  "silent_pr_emission": {
+    "candidates": 0,
+    "candidates_per_control_pr": null,
+    "control_pr_numbers": []
+  },
+  "source_run_status": "complete"
+}

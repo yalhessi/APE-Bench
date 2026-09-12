@@ -1,0 +1,11 @@
+{
+  "anchored": 4,
+  "by_failure": {},
+  "by_method": {
+    "review_line_entity": 4
+  },
+  "findings_in": 4,
+  "unanchored": 0,
+  "unanchored_rate": 0.0,
+  "work_units_reached": 1
+}

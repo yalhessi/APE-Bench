@@ -1,0 +1,90 @@
+{
+  "agenda_sha256": "9fe4e36b845781b5eaee11ed42b30793b606f30d93a478bb56ee08ca1bc2a034",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "70c603573bbe30a1f03f3368423384a6618f355167f8f709ff5935e078227a61",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "ea84bb7e94944eacb231ad7a13578b8292bf1ec9d9e9121ff50fd1c649e9b4dc",
+    "generalist": "f0df7629ab33f643d7941263e14d8cac11dcdd8fa8d9e0d377d9599c067f54d2",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "9cea507c9980dff73ecd54323fb10f9a7878587f7c13cd99346bab0ea1bd3db6",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 25
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "bb6c41667121b3504f9719658e1dbfca3ec1bf13",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "model_name": "gpt_5.2",
+  "per_pr_cost_cap": 1.5,
+  "prompt_sha256_by_invocation": {
+    "wu:1f9cf7865fe0948dfc6e47f8#api_reuse": "bbfe7afb878b3b29f0df49933d012be0ac0174f68d21dfb5ba65181c3eb40f07",
+    "wu:1f9cf7865fe0948dfc6e47f8#correctness": "e80a3db497f388f83c76a8c49d281648e03e496f9055ad55a8bd18684ed61b87",
+    "wu:1f9cf7865fe0948dfc6e47f8#docs": "4a4ab4ca7ecb1fc3202459ca21a491d4f2cf7e94f4ab035a9c63cc235b0cf4f9",
+    "wu:1f9cf7865fe0948dfc6e47f8#duplication": "355b4812e155f850ad88f69b7a9f46c0a0556cd6f787596b9de079aca357f260",
+    "wu:1f9cf7865fe0948dfc6e47f8#family_design": "89fb4934eda0504988f597c9fe1c59884860bec655a5b50040bb2ddde6c01d64",
+    "wu:1f9cf7865fe0948dfc6e47f8#generalist": "6cd67fb80c2cdc2a640f0f4b8ec28cae97b9d4c987bd87d1e907b92b46e93ca4",
+    "wu:1f9cf7865fe0948dfc6e47f8#generality": "6034cc4ee18ade0414e32a5236dfaebe3c030c3083685a570a6d009fe202c4fa",
+    "wu:1f9cf7865fe0948dfc6e47f8#naming": "97f39eae32f96c157f3e98d439198100c24591d0112558345efec87cf6054703",
+    "wu:1f9cf7865fe0948dfc6e47f8#proof_golf": "d499afe32861420dea44b012ec330102aeb094afa765fbdb7cdd875690505405",
+    "wu:1f9cf7865fe0948dfc6e47f8#proof_idiom": "b9d0ceaee7e8afff00859208f7d28a85dd57f497983c7f138ac95a2685887fb3",
+    "wu:1f9cf7865fe0948dfc6e47f8#style": "8e95679e04b9077998b6a4424796845590c896cfd555b3e3222b0cf7e05cd5e6",
+    "wu:ed4ebc2fd8ff4c98194ac766#api_reuse": "96946f1df1e5bba7fb1fb06a11dad57ad5809b0f9c70affadaa464fa1fd5c500",
+    "wu:ed4ebc2fd8ff4c98194ac766#correctness": "b4a7571afa829e7bd68a40778f78c5f9817722ef328d7e3f2565f7654c43cae6",
+    "wu:ed4ebc2fd8ff4c98194ac766#docs": "4fdd52eda4313d7328f43544996e58b78bf031548fe38f892cf7013dcc2cb8cd",
+    "wu:ed4ebc2fd8ff4c98194ac766#duplication": "470b59dbc3e503060fe8fe24fc4961f9baa5441dba7fdc2f3396f967ab132829",
+    "wu:ed4ebc2fd8ff4c98194ac766#family_design": "ce6bb5211f4e5175bb128aef740f1f6b78439da516e4fb6264ff94fd5ec1f604",
+    "wu:ed4ebc2fd8ff4c98194ac766#generalist": "5f6337c9cdc6026ca1067cd4e9c9c4f7960232ed589a9cfbf2c57e9c0257ffd6",
+    "wu:ed4ebc2fd8ff4c98194ac766#generality": "1972c38db80d509237320c5dbc78b9f28e5868c133ca9fef871d7d00112bcb9f",
+    "wu:ed4ebc2fd8ff4c98194ac766#naming": "fd7510d80d77759176333dc4f37bbfe9f84970cf402a44adcb9d9f5064fac52f",
+    "wu:ed4ebc2fd8ff4c98194ac766#proof_golf": "4c80c063db4be149dc22f5c32fe8b7c51dab67b33a259811fa448584d504f280",
+    "wu:ed4ebc2fd8ff4c98194ac766#proof_idiom": "93b8d8278778db63ce9ffb21374a2022daa01a2b567cc6b416f1dc5cf9b4133c",
+    "wu:ed4ebc2fd8ff4c98194ac766#style": "c45dd2abef40bac83b596b65e1339836f35abb3f2f4adf3859625e24dec0c91c"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "release_manifest_sha256": null,
+  "routing_mode": "lead",
+  "run_id": "v5run:pr5_A_33337_rep5",
+  "run_name": "pr5_A_33337_rep5",
+  "scaffold_config_sha256": "65aa67ba9c7fdf209239879fb16e639dddf71a3ce030d33ad6d739b3571c2f80",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "40b2d017ece1117a600fdad1d1574434b8f3c46a944fe0852c6b7406f6714304",
+  "standard_budget_cap": 0.3
+}
