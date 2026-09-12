@@ -62,6 +62,38 @@ def _external_identity(event_type: str, payload: Dict[str, Any], payload_hash: s
     return f"payload:{payload_hash}"
 
 
+def _unambiguous_identity(payload: Dict[str, Any], payload_hash: str) -> str:
+    """A key for a payload whose preferred key does not distinguish it from a sibling.
+
+    `_external_identity` takes the first key present, and for a `file` payload that is `sha` --
+    GitHub's **blob** sha, which two files with identical resulting content share. Measured on the
+    Dec-2025/Jan-2026 batch: 2 PRs of 2,059, one of them a bulk edit where 12 shas each covered
+    several files. `filename` is unique within a PR, so it is the right key there; anything else
+    falls back to its own payload hash, and byte-identical payloads to their position.
+    """
+
+    name = payload.get("filename")
+    return f"filename:{name}" if name is not None else f"payload:{payload_hash}"
+
+
+def _identities(event_type: str, payloads: List[Dict[str, Any]],
+                hashes: List[str]) -> List[str]:
+    """One external identity per payload, distinct within the collection.
+
+    Only payloads whose preferred key repeats are re-keyed, so a collection with no ambiguity --
+    every PR in every frozen release, checked -- keeps the identities it already had.
+    """
+
+    identities = [_external_identity(event_type, p, h) for p, h in zip(payloads, hashes)]
+    repeated = {key for key, n in Counter(identities).items() if n > 1}
+    if not repeated:
+        return identities
+    identities = [_unambiguous_identity(payloads[i], hashes[i]) if key in repeated else key
+                  for i, key in enumerate(identities)]
+    still = {key for key, n in Counter(identities).items() if n > 1}
+    return [f"{key}#{i}" if key in still else key for i, key in enumerate(identities)]
+
+
 def _event(
     *,
     repo: str,
@@ -70,9 +102,11 @@ def _event(
     payload: Dict[str, Any],
     source_object: ArtifactRef,
     source_key: str,
+    identity: Optional[str] = None,
 ) -> SourceEvent:
     payload_hash = sha256_bytes(canonical_json_bytes(payload))
-    identity = _external_identity(event_type, payload, payload_hash)
+    if identity is None:
+        identity = _external_identity(event_type, payload, payload_hash)
     id_hash = sha256_bytes(canonical_json_bytes([repo, pr_number, event_type, identity]))[:24]
     return SourceEvent(
         event_id=f"event:{id_hash}",
@@ -125,6 +159,9 @@ def events_from_bundle(bundle: Dict[str, Any], *, bundle_path: Optional[Path] = 
                 raise ValueError(
                     f"PR {pr_number}: {collection}[{index}] is not a JSON object"
                 )
+        hashes = [sha256_bytes(canonical_json_bytes(payload)) for payload in values]
+        for index, (payload, identity) in enumerate(
+                zip(values, _identities(event_type, values, hashes))):
             events.append(
                 _event(
                     repo=repo,
@@ -133,6 +170,7 @@ def events_from_bundle(bundle: Dict[str, Any], *, bundle_path: Optional[Path] = 
                     payload=payload,
                     source_object=source_object,
                     source_key=f"/{collection}/{index}",
+                    identity=identity,
                 )
             )
     return events
