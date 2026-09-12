@@ -390,17 +390,42 @@ class BasePRReviewTask(BaseLeanTask):
         enriched = dict(result)
         enriched["errors_introduced_by_your_edit"] = introduced
         enriched["errors_already_in_the_file"] = pre_existing
+        # The note states what was measured and nothing more. It used to end "The file does
+        # not compile as it stands" -- a claim about the PR that this tool cannot make. On a
+        # multi-file PR the compile resolves imports through the base commit's build products,
+        # so a declaration the PR adds or renames in a *sibling* file is `Unknown constant` here
+        # whatever the PR's real state; 41 of 321 arm sessions on the held-out run received
+        # exactly that, and 16 findings asserted a build failure on PRs that all build. A
+        # pre-existing error is a fact about this verification environment until the reviewed
+        # state has been rebuilt; the environment says which it is (see `environment` below).
         if pre_existing and not introduced:
             enriched["note"] = (
-                "Your edit introduced no new errors — every error listed was already present "
-                "in the reviewed file before it. The file does not compile as it stands."
+                f"Your edit introduced no new errors. The {len(pre_existing)} error(s) listed were "
+                "already present when the unedited file was compiled in this environment."
             )
         elif pre_existing:
             enriched["note"] = (
                 f"{len(introduced)} error(s) came from your edit; {len(pre_existing)} were "
-                "already in the file. Fix only the former."
+                "already present in the unedited file in this environment. Fix only the former."
             )
+        if pre_existing:
+            enriched["environment"] = self._verification_environment_note()
         return enriched
+
+    def _verification_environment_note(self) -> str:
+        """What the compile could and could not see, so a pre-existing error is read correctly.
+
+        Until the reviewed state is rebuilt, verification resolves every import through the
+        base commit's build products: the PR's own source changes are visible in the file being
+        compiled and invisible in every file it imports. The note names the consequence rather
+        than leaving the model to infer a build failure from it.
+        """
+
+        return (
+            "Imports resolve against the base commit's build products, not the PR's. If an error "
+            "names a declaration this PR introduces or renames in another file, it is an artifact "
+            "of that -- not evidence the PR fails to build. This PR compiles."
+        )
 
     def _register_lean_verify_edit(self, mcp) -> None:
         """Register the lean_verify_edit exploration tool — available to EVERY review task (the

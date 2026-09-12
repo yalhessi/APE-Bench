@@ -427,3 +427,58 @@ def test_error_identity_ignores_position(task):
     same = task._error_key({"data": "boom", "pos": {"line": 10}})
     moved = task._error_key({"data": "boom", "pos": {"line": 250}})
     assert same == moved
+
+
+def test_a_pre_existing_error_is_never_reported_as_the_pr_failing_to_build(task, monkeypatch):
+    """The note used to end "The file does not compile as it stands" -- a claim about the PR
+    that this tool cannot make. On a multi-file PR the compile resolves imports through the
+    base commit's build products, so a declaration the PR renames in a *sibling* file is
+    `Unknown constant` here whatever the PR's real state. 41 of 321 arm sessions on the
+    held-out run received exactly that; 16 findings asserted a build failure on PRs that all
+    build, 4 of them published. The tool now states what was measured and names the
+    environment, and stops there."""
+
+    import asyncio
+
+    class FakeLean:
+        def __init__(self, **kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20):
+            return {"success": False, "errors": [
+                {"data": "Unknown constant `Submodule.coe_starProjection_eq_isComplProjection`"}]}
+
+    import ape.toolkits.execute.lean.tools as tools_module
+
+    monkeypatch.setattr(tools_module, "LeanVerifyToolsProvider", FakeLean)
+    result = asyncio.run(task._attribute_errors("Mathlib/A.lean", {
+        "success": False, "errors": [
+            {"data": "Unknown constant `Submodule.coe_starProjection_eq_isComplProjection`"}]}))
+
+    assert "does not compile" not in result["note"]
+    assert "in this environment" in result["note"]
+    assert "base commit's build products" in result["environment"]
+    assert "This PR compiles" in result["environment"]
+
+
+def test_the_environment_note_is_absent_when_every_error_is_the_edits_own(task, monkeypatch):
+    """No pre-existing errors, nothing to explain: the model should not be handed a caveat
+    about the environment when the errors are simply its edit's."""
+
+    import asyncio
+
+    class FakeLean:
+        def __init__(self, **kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20):
+            return {"success": True, "errors": []}
+
+    import ape.toolkits.execute.lean.tools as tools_module
+
+    monkeypatch.setattr(tools_module, "LeanVerifyToolsProvider", FakeLean)
+    result = asyncio.run(task._attribute_errors("Mathlib/A.lean", {
+        "success": False, "errors": [{"data": "type mismatch"}]}))
+
+    assert result["errors_already_in_the_file"] == []
+    assert "environment" not in result
