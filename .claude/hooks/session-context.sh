@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# UserPromptSubmit hook. Prints one [session] status line per prompt, plus a
-# warning line for each threshold crossed. Stdout is added to Claude's context;
-# it never blocks the prompt. Companion to the "Session discipline" and "Git"
-# sections of CLAUDE.md: the rules live there, the facts they need arrive here.
+# UserPromptSubmit hook. Prints one [session] status line per prompt, plus a warning
+# line for each threshold crossed. Stdout is added to Claude's context; it never blocks
+# the prompt. Companion to the "Session discipline" and "Git" sections of CLAUDE.md:
+# the rules live there, the facts they need arrive here.
 set -u
+. "$(dirname "$0")/lib.sh"
 input=$(cat 2>/dev/null || true)
 cwd=$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)
 transcript=$(printf '%s' "$input" | jq -r '.transcript_path // empty' 2>/dev/null)
@@ -27,15 +28,21 @@ if [ -n "$transcript" ] && [ -f "$transcript" ]; then
   compactions=${compactions:-0}
 fi
 
-echo "[session] branch=$branch  uncommitted=$changed files (+$ins/-$del, $untracked untracked)  compactions=$compactions"
+others=$(sessions_sharing_tree | tr '\n' ' '); others=${others% }
+n_others=$(printf '%s' "$others" | wc -w | tr -d ' ')
+
+echo "[session] branch=$branch  uncommitted=$changed files (+$ins/-$del, $untracked untracked)  compactions=$compactions  other_sessions_in_tree=$n_others"
 
 if [ "$branch" = "main" ]; then
   echo "[session] WARNING: on main. main is the upstream APE-Bench drop and the guard hook refuses commits here. Switch to develop or a topic branch first."
+fi
+if [ "$n_others" -gt 0 ]; then
+  echo "[session] $n_others other Claude Code session(s) share this working tree: $(describe_pids $others). Do not switch branches, checkout, rebase, clean, hard-reset or stash here (the guard refuses it). A new thread starts in a worktree: $WORKTREE_HOWTO"
 fi
 if [ "$changed" -gt "$MAX_FILES" ] || [ "$lines" -gt "$MAX_LINES" ]; then
   echo "[session] Uncommitted work is past the small-commit threshold ($MAX_FILES files / $MAX_LINES lines). Commit the finished part as one logical commit before taking on more."
 fi
 if [ "$compactions" -ge 1 ]; then
-  echo "[session] This session has compacted ${compactions}x. If this prompt starts a new thread (a different feature, experiment or subsystem), say so in one line and recommend a fresh session before continuing."
+  echo "[session] This session has compacted ${compactions}x. If this prompt starts a new thread (a different feature, experiment or subsystem), say so in one line and recommend a fresh session -- in a worktree if this tree stays in use -- before continuing."
 fi
 exit 0
