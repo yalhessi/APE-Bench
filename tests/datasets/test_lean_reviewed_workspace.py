@@ -30,6 +30,28 @@ from ape.toolkits.execute.lean.core.build_manager import (
 SHA = "a36c84ab8236a4869899268a42a44af07daa21ed"
 
 
+@pytest.fixture(autouse=True)
+def _writable_on_teardown(tmp_path):
+    """The base fixture is 0o555/0o444 like a restored snapshot, and a finished reviewed
+    workspace is finalised the same way -- that is the point. pytest's tmp cleanup cannot
+    remove read-only trees and warns for every directory; restore write bits after the test
+    so the assertions above are made against the real modes and the cleanup is quiet."""
+
+    yield
+    for dirpath, _dirnames, filenames in os.walk(tmp_path):
+        try:
+            os.chmod(dirpath, 0o755)
+        except OSError:
+            pass
+        for name in filenames:
+            path = Path(dirpath) / name
+            if not path.is_symlink():
+                try:
+                    os.chmod(path, 0o644)
+                except OSError:
+                    pass
+
+
 # --- the key --------------------------------------------------------------------------------
 
 
