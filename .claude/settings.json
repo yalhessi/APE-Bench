@@ -1,4 +1,11 @@
 {
+  "env": {
+    "PYTHONPATH": "src"
+  },
+  "worktree": {
+    "baseRef": "head",
+    "symlinkDirectories": ["ape", ".ape"]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {

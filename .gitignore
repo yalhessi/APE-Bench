@@ -1,10 +1,14 @@
-.ape/
+# `.ape` and `/ape` without a trailing slash: in a worktree they are symlinks to the main
+# checkout (see .claude/worktree-setup.sh), and a dir-only pattern would not match those.
+.ape
+/ape
 # Claude Code: the shared project config is tracked (settings.json, rules/, hooks/);
 # personal overrides (settings.local.json) and worktrees are not.
 .claude/*
 !.claude/settings.json
 !.claude/rules/
 !.claude/hooks/
+!.claude/worktree-setup.sh
 *egg-info
 .vscode
 .DS_Store
@@ -29,7 +33,7 @@ __pycache__/
 # Bulk derived artifacts: raw GitHub fetches and retrieval sweeps that are large,
 # regenerable from the code here, and not read by anything in this repo.
 # docs/PROJECT-STATUS.md gives the command that rebuilds each.
-inputs/pr_review_v2/corpus/
+inputs/pr_review_v2/corpus
 inputs/pr_review_v2/precedent_bench/*.jsonl
 
 # Run artifacts ARE tracked -- FROZEN.lock covers 466 files under
@@ -37,7 +41,7 @@ inputs/pr_review_v2/precedent_bench/*.jsonl
 # the v5 lead arm pools (multi-MB per repetition, regenerable from the run plan) and
 # the rendered overlay bundles.
 results/*/runs/*/arm_pool.jsonl
-results/overlays/
+results/overlays
 
 # The publishing clone used to restage this history. Redundant now that development
 # happens on this branch directly; kept out of the tree if it is ever recreated.
