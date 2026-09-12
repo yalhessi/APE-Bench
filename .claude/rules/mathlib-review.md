@@ -48,13 +48,20 @@ paths:
   and that distinction is the whole diagnosis.
 - Boundary counts are pinned in `tests/datasets/test_package_boundaries.py` (0 backward
   cross-generation edges, 0 v5→v2, 3 private in-package imports). They may only go down.
-- **The review overlay is source-only; every compile sees base `.olean`s.** `_ensure_patched_target_workspace`
-  symlinks the base snapshot, materialises touched paths and applies δ₀ — it builds nothing, and
-  `.lake` is a symlink into the shared cache. So on a multi-file PR, a declaration the PR adds or
-  renames in one file is `Unknown constant` when any other file is verified, and the tool's own note
-  then asserts the file does not compile. 13% of arm sessions on the held-out run hit this. Never
-  suppress it in a prompt; a compile claim from a review arm on a PR that builds is a tool defect
-  until proven otherwise. (Rebuild fix in progress: branch `verify-reviewed-state`.)
+- **Verification needs the *reviewed* workspace, not the source-only overlay.** The overlay
+  (`_ensure_patched_target_workspace`) symlinks the base snapshot, materialises touched paths and
+  applies δ₀ — it builds nothing, and `.lake` is a symlink into the shared cache — so every compile
+  sees base `.olean`s, and on a multi-file PR a declaration the PR adds or renames in one file is
+  `Unknown constant` when any other file is verified; the tool's note then asserted the file does not
+  compile (13% of arm sessions on the held-out run; 16 `broken_build` findings on PRs that build).
+  Fixed 2026-09-12: `workspaces/<base>+<fp>` = base + diff + changed modules rebuilt
+  (`BuildManager.build_reviewed_workspace`; 4–12 min each on this NFS depending on cache, the
+  `.lake/build` copy is the cost — hardlinks fail because Lean truncates `.ilean` in place). Build with
+  `prebuild --reviewed --config <run cfg> --execute`; `plan` reports how many episodes lack one;
+  `dataset.require_reviewed_workspaces: true` makes `run` refuse; the task falls back to the overlay
+  at WARNING otherwise. Still true: never suppress a compile claim in a prompt — a compile claim on
+  a PR that builds is a tool defect until proven otherwise, and now the first question is whether
+  the run verified against a reviewed workspace (`plan` says).
 - **The naming arm is calibrated to the *local family*, by its prompt, and the maintainer often is not.**
   On 33337 the local siblings at base all used the `_coe_` style; the maintainer asked for the
   repo-wide emerging `toLinearMap_` prefix (24 files elsewhere, 0 in the PR's files, 0 precedent
@@ -63,5 +70,7 @@ paths:
   already records that *"the code corpus argues against the maintainer on both naming asks this
   release scores"*. This is a contract decision, not a bug: widening the arm's evidence bar trades
   its precision for the maintainer's convention radius. Decide it on purpose.
-- **`declaration_search` is base-only by construction** and says so — an arm judging a *rename*
-  cannot look up the name the PR introduced. Search the reviewed overlay too, labelled.
+- **`declaration_search` was base-only by construction** — an arm judging a *rename* could not look
+  up the name the PR introduced. It now also searches the PR's changed files in the reviewed
+  overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays
+  `base_snapshot` because the gate vocabulary is closed (`test_retrieval_gate.py`).

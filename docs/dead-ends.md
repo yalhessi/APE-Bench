@@ -43,8 +43,13 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   findings on PRs that all build, 4 of them `published`; all 10 resolvable "missing" names were
   introduced by the PR itself. The naming arm on 33337 burned 2–5 verify calls on it in 5 of 10
   reps. Filtering by identifier cannot fix it — the stale sibling cascades into `simp made no
-  progress` / `unsolved goals`. The fix is a targeted rebuild of the changed modules in the overlay,
-  copy-on-write because `.lake` is a symlink into the shared base cache (branch `verify-reviewed-state`).
+  progress` / `unsolved goals`. **Closed 2026-09-12** on branch `verify-reviewed-state`: a *reviewed
+  workspace* per episode — `workspaces/<base>+<fp>`, the base snapshot, the diff, and the changed
+  modules rebuilt by a targeted `lake build` in a real copy of `.lake/build` (hardlinks are not an
+  option: Lean truncates `.ilean` in place; NFSv3 has no reflink; measured 585 s copy + 67 s build on
+  33337). `prebuild --reviewed` makes them, `plan` reports which episodes lack one,
+  `require_reviewed_workspaces` refuses a run without them. Not yet built for any set but 33337;
+  the 12-PR held-out rerun on reviewed workspaces is the check that the 16 compile claims vanish.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
