@@ -90,3 +90,67 @@ def test_solo_and_lead_agendas_scope_the_same_prs():
     lead = agenda_report(_agenda("lead"))
     solo = agenda_report(_agenda("solo"))
     assert solo["pr_numbers"] == lead["pr_numbers"] == [1, 2]
+
+
+# --- the budget a solo run is actually committed to -----------------------------------------
+
+
+def _dataset(**overrides):
+    from src.mathlib_review.review.runner import V5DatasetConfig
+
+    payload = {"release": "r", "modification_inventory": "m", "routing_mode": "solo",
+               "solo_cost_cap": 1.50, "run_total_cost_cap": 8.00}
+    payload.update(overrides)
+    return V5DatasetConfig.model_validate(payload)
+
+
+class _Log:
+    def __init__(self):
+        self.lines = []
+
+    def _record(self, message, *args):
+        self.lines.append(message % args if args else message)
+
+    info = warning = error = _record
+
+
+def test_a_solo_run_is_not_charged_for_a_coverage_floor_it_never_pays():
+    """The agenda still enumerates the full pool -- that is what keeps the denominator
+    identical to the `lead` run -- so `mandatory_floor_cost` is populated and describes work a
+    solo run will never do. Reporting it is fiction; checking against it refuses a run for
+    money it cannot spend. Measured on smoke4: a $2.35 phantom floor turned a $6.00 run into
+    "DOES NOT FIT" against an $8.00 cap.
+    """
+
+    from src.mathlib_review.review.runner import _report_budget
+
+    logger = _Log()
+    _report_budget(_dataset(), {"mandatory_floor_cost": 2.35}, 4, logger, enforce=True)
+    text = "\n".join(logger.lines)
+
+    assert "no coverage floor" in text
+    assert "$6.00" in text and "fits" in text
+    assert "2.35" not in text, "the phantom floor reached the budget report"
+
+
+def test_a_solo_run_that_cannot_fit_is_still_refused():
+    """The cap must bind something. It binds `solo_cost_cap` x PRs, which is the only money
+    this condition can spend."""
+
+    from src.mathlib_review.review.runner import BudgetTooSmall, _report_budget
+
+    with pytest.raises(BudgetTooSmall, match="solo_cost_cap"):
+        _report_budget(_dataset(run_total_cost_cap=2.00), {"mandatory_floor_cost": 2.35},
+                       4, _Log(), enforce=True)
+
+
+def test_the_arm_modes_still_account_for_their_floor():
+    """The branch above must not have taken the floor out of the modes that do pay it."""
+
+    from src.mathlib_review.review.runner import _report_budget
+
+    logger = _Log()
+    _report_budget(_dataset(routing_mode="lead", run_total_cost_cap=20.0),
+                   {"mandatory_floor_cost": 2.35}, 4, logger)
+
+    assert "mandatory floor $2.35" in "\n".join(logger.lines)

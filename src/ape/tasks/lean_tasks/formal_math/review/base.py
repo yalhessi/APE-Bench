@@ -566,6 +566,21 @@ class BasePRReviewTask(BaseLeanTask):
                 "anchor": anchor,
                 "severity": severity,
                 "claim": claim,
+                # Carried through when the caller asked for them, absent otherwise. The
+                # `solo` condition needs both because `candidates_from_response` refuses a
+                # candidate with no `issue_kind` on any release rendered at
+                # `candidate-prompt/12` or later -- which is all 225 work units of
+                # dev-medium-0.3.0 -- so without them every finding it files would be
+                # rejected and the run would read as a reviewer that found nothing.
+                #
+                # Deliberately not added to the tool's *description*: that string is
+                # delivered verbatim to the v2 checkers, which are measured assets, and
+                # changing what they are shown would make their next run incomparable to
+                # their last for a reason unrelated to anything being tested. The schema is
+                # already free-form, so a task that wants these asks for them in its own
+                # prompt and they arrive here without a shared surface changing.
+                "concern_family": (str(raw["concern_family"]) if raw.get("concern_family") else None),
+                "issue_kind": (str(raw["issue_kind"]) if raw.get("issue_kind") else None),
                 "suggested_fix": (str(raw["suggested_fix"]) if raw.get("suggested_fix") else None),
                 "evidence": (str(raw["evidence"]) if raw.get("evidence") else None),
                 "verified": raw.get("verified") if isinstance(raw.get("verified"), bool) else None,

@@ -32,6 +32,7 @@ from pydantic import ConfigDict, BaseModel, Field
 
 from ape.orchestration import TaskOrchestrator
 from ape.orchestration.execution_index import INDEX_FILENAME as EXECUTION_INDEX_FILENAME
+from ape.orchestration.models import EXECUTION_LIMITS_KEY
 from ape.tasks.base import create_task_from_data
 from ape.utils import parse_cli_args
 from ape.llm_clients.config import COST_MODELS
@@ -57,6 +58,7 @@ from src.mathlib_review.schema import (
 )
 
 from src.mathlib_review.agenda.agenda import agenda_report, build_agenda, initial_jobs
+from src.mathlib_review.review.candidates import anchoring_report
 from src.mathlib_review.agenda.arms import GENERALIST_ARM_ID
 from src.mathlib_review.agenda.census import build_census, census_report
 from src.mathlib_review.review.coordination import CoordinationConfig, assert_implemented
@@ -152,6 +154,19 @@ class V5DatasetConfig(BaseModel):
     lead_cost_cap: float = 2.0
     per_pr_cost_cap: float = 8.0
     max_delegations: int = 60
+    #: `solo` only. The per-task billed ceiling for a whole-PR reviewer, and the instrument of
+    #: the cost-matched comparison: set it to the *measured* billed per-PR spend of the `lead`
+    #: run it is being compared against, not to `per_pr_cost_cap`, which is a ceiling no run
+    #: has ever exhausted. Measured on the reference runs: $0.767/PR (`pr5_smoke4_rep9`) and
+    #: $0.784/PR (`heldout11_rep2`), with a per-PR maximum of $1.445.
+    solo_cost_cap: float = 1.50
+    #: `solo` only. The retrieval grant, defaulting to the generalist arm's four — the
+    #: scheduled design's own control keeps all of them "because that is the point of a
+    #: control", and a narrower grant here would make an information difference read as an
+    #: architecture difference. Empty disables retrieval entirely.
+    solo_context_tools: List[str] = Field(
+        default_factory=lambda: ["zulip_search", "precedent_search", "declaration_search",
+                                 "proof_profile"])
     #: The whole run's ceiling, in billed dollars. 0 disables it.
     #:
     #: The last unbounded budget. `per_pr_cost_cap` binds only *discretionary* work — the
@@ -303,6 +318,53 @@ def _lead_task_data(agenda, episodes, dataset, pool_path: Path, trace_path: Path
     return data
 
 
+def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str],
+                    ) -> List[Dict[str, Any]]:
+    """`solo`: one agent per episode, handed the whole PR and no work units.
+
+    Built from the episodes rather than from `agenda.proposals`, because the proposals are the
+    decomposition and this condition exists to do without it. The agenda is still built and
+    still sealed -- it is what makes `agenda_report.json` scope identically to the `lead` run
+    on the same config, which is the denominator the judge corroborates against.
+
+    The retrieval cutoff is carried even though no work unit is: it is gold-free and it is what
+    stops a retrieval tool answering from after the review happened.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review.solo import SOLO_TASK_TYPE
+
+    wanted = {item.episode_id for item in agenda.proposals}
+    data = []
+    for episode in sorted(episodes, key=lambda item: item.episode_id):
+        if episode.episode_id not in wanted:
+            continue
+        data.append({
+            "task_type": SOLO_TASK_TYPE,
+            "task_id": f"pr5solo_{episode.episode_id.replace(':', '_')}",
+            "episode_id": episode.episode_id,
+            "pr_number": episode.pr_number,
+            "pr_title": episode.title.text or "",
+            "pr_description": episode.description.text or "",
+            "diff": episode.diff,
+            "changed_files": list(episode.changed_files),
+            "snapshot_head_sha": episode.reviewed_head_sha,
+            "snapshot_base_sha": episode.base_sha,
+            "context_tools": list(dataset.solo_context_tools),
+            "retrieval_cutoff": cutoff_by_episode.get(episode.episode_id),
+            # Caps bind BILLED cost. The whole point of the condition is a cost-matched
+            # comparison, so the ceiling is per task and stated by the run rather than
+            # inherited from an orchestrator-wide setting.
+            EXECUTION_LIMITS_KEY: {"billed_cost_limit": dataset.solo_cost_cap},
+            "target_workspace": {
+                "name": "target",
+                "commit_hash": episode.base_sha,
+                "repo_url": "https://github.com/leanprover-community/mathlib4.git",
+                "default_target": "Mathlib",
+            },
+        })
+    return data
+
+
 def _direct_arm_task_data(agenda, pool: Dict[str, Dict[str, Any]],
                           cutoff_by_episode: Dict[str, str],
                           trace_path: Path) -> List[Dict[str, Any]]:
@@ -349,6 +411,122 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
                 "rendered_prompt_sha256": raw.get("rendered_prompt_sha256"),
             })
     return responses
+
+
+#: The arm a whole-PR reviewer's findings are filed under. Not `holistic`: that is the retired
+#: spelling of `generalist` and `RETIRED_ARM_SPELLINGS` maps it away, so filing the baseline
+#: there would make it indistinguishable from the treatment in every `by_arm` breakdown -- the
+#: "an arm's whole output silently reads as zero" failure the derived `ARMS` exists to prevent.
+SOLO_ARM_ID = "solo_agent"
+
+
+def _solo_responses(results, graphs, units, logger=None):
+    """Anchor each whole-PR review and project it onto work units.
+
+    Returns `(responses, anchor_rows)`. The responses are shaped exactly like an arm's, so
+    `finalize` -- which resolves every response through `unit_by_id[work_unit_id]` and skips an
+    unknown one with a warning only -- runs unchanged.
+    """
+
+    from src.mathlib_review.review.candidates import anchor_submitted_findings  # noqa: F401
+
+    graph_by_episode = {graph.episode_id: graph for graph in graphs}
+    units_by_episode: Dict[str, List[Any]] = {}
+    for unit in units:
+        units_by_episode.setdefault(unit.episode_id, []).append(unit)
+
+    responses: List[Dict[str, Any]] = []
+    anchor_rows: List[Dict[str, Any]] = []
+    for result in results.task_results:
+        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
+        episode_id = raw.get("episode_id")
+        if not raw.get("success") or not episode_id:
+            # Booked as a coverage gap instead, which is what makes the run `partial`. A run
+            # that silently recorded nothing here would be scored as a reviewer that found
+            # nothing -- a statement about the budget or the harness presented as one about
+            # the agent.
+            continue
+        graph = graph_by_episode.get(episode_id)
+        if graph is None:
+            if logger:
+                logger.warning("solo: no change graph for episode %s — not anchored", episode_id)
+            continue
+        by_unit, rows = anchor_submitted_findings(
+            raw.get("findings") or [], graph=graph,
+            units=units_by_episode.get(episode_id, []), logger=logger)
+        for row in rows:
+            anchor_rows.append({**row, "episode_id": episode_id,
+                                "pr_number": raw.get("pr_number")})
+        unit_by_id = {unit.work_unit_id: unit
+                      for unit in units_by_episode.get(episode_id, [])}
+        for work_unit_id, findings in sorted(by_unit.items()):
+            unit = unit_by_id[work_unit_id]
+            responses.append({
+                "invocation_id": f"{work_unit_id}#{SOLO_ARM_ID}",
+                "arm_id": SOLO_ARM_ID,
+                "work_unit_id": work_unit_id,
+                "spec_id": SOLO_ARM_ID,
+                "pr_number": raw.get("pr_number"),
+                "status": "success",
+                "candidates": [_solo_candidate(finding, unit) for finding in findings],
+                "verification_artifacts": [],
+                "rendered_prompt_sha256": None,
+            })
+    return responses, anchor_rows
+
+
+def _solo_candidate(finding: Dict[str, Any], unit) -> Dict[str, Any]:
+    """One anchored free-form finding, in the shape the candidate validator expects.
+
+    `primary_subject` and `primary_entity_id` come from the work unit, never from the model:
+    it was never told the subject, so requiring it to name one would be requiring it to guess
+    the decomposition's vocabulary. Every other check the validator runs still applies.
+    """
+
+    change_id = finding["primary_change_id"]
+    entity_ids = (unit.entity_ids_by_change or {}).get(change_id) or []
+    return {
+        "primary_change_id": change_id,
+        "change_ids": finding["change_ids"],
+        "primary_subject": (unit.primary_subjects_by_change or {}).get(change_id, ""),
+        # `None` when the target has no entities, which the validator requires; a guess here
+        # would be rejected, and a guess that happened to match would be worse.
+        "primary_entity_id": entity_ids[0] if entity_ids else None,
+        "concern_family": finding.get("concern_family") or "other",
+        "issue_kind": finding.get("issue_kind"),
+        "severity": finding.get("severity") or "advisory",
+        "claim": finding.get("claim") or "",
+        "requested_change": finding.get("suggested_fix") or finding.get("claim") or "",
+        "suggested_fix": finding.get("suggested_fix"),
+    }
+
+
+def _solo_coverage_gaps(results, data) -> List[Dict[str, Any]]:
+    """Every episode whose whole-PR review did not reach a submission.
+
+    Without this the run closes `complete` with an empty `findings.jsonl` -- `solo` has no
+    mandatory jobs, so nothing else would notice -- and the judge would score it as a reviewer
+    that found nothing. The likeliest cause is the cost cap: the relay refuses the next request
+    once billed spend reaches it, and an external CLI handed that error usually dies without
+    submitting. A budget result reported as a capability result is the same shape as the
+    `exit 127` incident that voided a run's worth of numbers.
+    """
+
+    submitted = set()
+    for result in results.task_results:
+        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
+        if raw.get("success") and raw.get("episode_id"):
+            submitted.add(raw["episode_id"])
+    return [
+        {
+            "episode_id": item["episode_id"],
+            "pr_number": item["pr_number"],
+            "arm_id": SOLO_ARM_ID,
+            "reason": "the whole-PR review did not reach a submission",
+        }
+        for item in data
+        if item["episode_id"] not in submitted
+    ]
 
 
 def _comprehension_from_results(results, mode: str) -> List[Dict[str, Any]]:
@@ -419,6 +597,31 @@ def _delegations_from_results(results, mode: str, agenda,
             raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
             records.extend(raw.get("delegations") or [])
         return records + floor_records
+    if mode == "solo":
+        # Every proposal is `pruned`, and by nothing -- no lead declined it and no rule
+        # excluded it; the condition simply schedules no work-unit job. The records still have
+        # to exist because `reconcile` refuses a run that leaves a sealed proposal with no
+        # disposition, and because the alternative -- an empty ledger -- would read as a run
+        # that lost its accounting rather than one that had none to keep.
+        #
+        # The solo tasks' own outcomes deliberately do NOT go here: `reconcile` raises for any
+        # invocation the sealed agenda did not enumerate, and a whole-PR review is not one of
+        # them. A solo task that failed is a coverage gap, not a delegation.
+        return [
+            {
+                "schema_version": "v5-delegation1",
+                "invocation_id": item.invocation_id,
+                "proposal_id": item.proposal_id,
+                "arm_id": item.arm_id,
+                "work_unit_id": item.work_unit_id,
+                "pr_number": item.pr_number,
+                "disposition": "pruned",
+                "reason": "solo mode schedules no work-unit job",
+                "budget_tier": None,
+                "context_calls": [],
+            }
+            for item in agenda.proposals
+        ]
     ran = {item.invocation_id for item in initial_jobs(agenda)}
     return [
         {
@@ -514,9 +717,34 @@ def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = Fa
     floor is checked against the run total.
     """
 
+    run_cap = dataset.run_total_cost_cap
+
+    if dataset.routing_mode == "solo":
+        # There is no floor and no discretionary allowance: `solo` schedules no work-unit job
+        # at all, so the agenda's `mandatory_floor_cost` describes work this run will never do.
+        # Reporting it would be fiction, and checking against it would refuse a run for money
+        # it cannot spend -- the agenda's floor for the smoke set is $2.35, which against an
+        # $8.00 total cap turns a $6.00 run into "DOES NOT FIT".
+        committed = dataset.solo_cost_cap * pr_count
+        logger.info(
+            "budget: no coverage floor (solo schedules no work-unit job) + up to $%.2f "
+            "(%d PR x $%.2f billed)", committed, pr_count, dataset.solo_cost_cap)
+        if not run_cap:
+            logger.warning("no run_total_cost_cap set")
+            return
+        logger.info("run_total_cost_cap $%.2f vs worst case $%.2f — %s", run_cap, committed,
+                    "fits" if committed <= run_cap else "DOES NOT FIT")
+        if committed > run_cap:
+            message = (
+                f"{pr_count} PR x solo_cost_cap ${dataset.solo_cost_cap:.2f} = "
+                f"${committed:.2f}, above the run_total_cost_cap of ${run_cap:.2f}.")
+            if enforce:
+                raise BudgetTooSmall(message)
+            logger.warning("%s", message)
+        return
+
     floor = float(report.get("mandatory_floor_cost") or 0.0)
     discretionary_cap = dataset.per_pr_cost_cap * pr_count
-    run_cap = dataset.run_total_cost_cap
 
     logger.info(
         "budget: mandatory floor $%.2f (uncapped per PR by design) + discretionary up to "
@@ -900,6 +1128,12 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
             "per_pr_cost_cap": dataset.per_pr_cost_cap,
         }
         scaffold.execution.sample_max_cost = dataset.lead_cost_cap
+    elif dataset.routing_mode == "solo":
+        # No census, no arm pool, no journal: there is nothing to route. The agenda was still
+        # built and sealed above, which is what makes this run's `agenda_report.json` scope
+        # identically to the `lead` run on the same config.
+        data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode)
+        scaffold.execution.sample_max_cost = dataset.solo_cost_cap
     else:
         data = _direct_arm_task_data(agenda, pool, cutoff_by_episode, trace_path)
         scaffold.execution.sample_max_cost = dataset.standard_budget_cap
@@ -915,10 +1149,27 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
                                     logger=logger)
     results = await orchestrator.run(tasks)
 
-    responses = _responses_from_results(results, dataset.routing_mode)
+    if dataset.routing_mode == "solo":
+        responses, anchor_rows = _solo_responses(
+            results, release["graphs"], units, logger)
+        write_once(out / "anchoring.jsonl", jsonl_bytes(anchor_rows))
+        report = anchoring_report(anchor_rows)
+        write_once(out / "anchoring_report.json", pretty_json_bytes(report))
+        # Loud, because a high loss rate makes every recall number downstream a measurement of
+        # the anchoring pass rather than of the reviewer. ~5% is the rate measured on arm
+        # output, which is the only prior available.
+        log = logger.warning if report["unanchored_rate"] > 0.15 else logger.info
+        log("anchoring: %d/%d findings anchored (%.1f%% lost) across %d work unit(s); %s",
+            report["anchored"], report["findings_in"],
+            100 * report["unanchored_rate"], report["work_units_reached"],
+            report["by_failure"] or "no failures")
+    else:
+        responses = _responses_from_results(results, dataset.routing_mode)
     delegations = _delegations_from_results(results, dataset.routing_mode, agenda)
     assessments = _assessments_from_results(results, dataset.routing_mode)
-    coverage_gaps = _coverage_gaps_from_results(results, dataset.routing_mode)
+    coverage_gaps = (
+        _solo_coverage_gaps(results, data) if dataset.routing_mode == "solo"
+        else _coverage_gaps_from_results(results, dataset.routing_mode))
     comprehension = _comprehension_from_results(results, dataset.routing_mode)
     write_once(out / "arm_responses.jsonl", jsonl_bytes(responses))
     write_once(out / "delegations.jsonl", jsonl_bytes(delegations))

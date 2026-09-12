@@ -1,0 +1,130 @@
+"""From a whole-PR review to scorable findings, and the two ways that silently returns zero.
+
+Both failure modes here produce an empty `findings.jsonl` and a run that closes cleanly, which
+the judge then scores as "the baseline found nothing". That is a statement about the plumbing
+presented as a statement about the agent, and it is the single most likely way this experiment
+produces a confident wrong answer:
+
+1. `candidates_from_response` refuses a candidate with no `issue_kind` on any release rendered
+   at `candidate-prompt/12` or later -- which is every work unit of dev-medium-0.3.0. A solo
+   finding that does not carry one is rejected at ingestion.
+2. A solo task that never submitted -- the likeliest cause being the billed cost cap, after
+   which the relay refuses the next request and an external CLI usually dies -- leaves no
+   response at all. `solo` schedules no mandatory jobs, so nothing else would notice.
+"""
+
+from __future__ import annotations
+
+import pytest
+
+from src.mathlib_review.review.runner import (
+    SOLO_ARM_ID, _solo_candidate, _solo_coverage_gaps, _solo_responses,
+)
+
+
+class _Unit:
+    def __init__(self):
+        self.work_unit_id = "wu:1"
+        self.episode_id = "ep:1"
+        self.primary_subjects_by_change = {"change:a": "Foo.bar"}
+        self.entity_ids_by_change = {"change:a": ["entity:1"], "change:b": []}
+
+
+class _Result(dict):
+    """A task result as the orchestrator hands it over."""
+
+
+class _Results:
+    def __init__(self, rows):
+        self.task_results = rows
+
+
+def _finding(**overrides):
+    row = {"primary_change_id": "change:a", "change_ids": ["change:a"],
+           "claim": "`Foo.bar` duplicates `Bar.foo`", "suggested_fix": "reuse `Bar.foo`",
+           "severity": "blocking", "concern_family": "duplication",
+           "issue_kind": "duplicate_implementation"}
+    row.update(overrides)
+    return row
+
+
+def test_a_candidate_carries_the_issue_kind_ingestion_requires():
+    """Trap 1. Without this every finding is rejected and the condition reads as silent."""
+
+    candidate = _solo_candidate(_finding(), _Unit())
+    assert candidate["issue_kind"] == "duplicate_implementation"
+    assert candidate["concern_family"] == "duplication"
+
+
+def test_an_unlabelled_finding_still_produces_a_usable_candidate():
+    """A model that omits the labels should cost that finding its routing, not its existence.
+    `concern_family` falls back to the closed list's own escape hatch rather than to a guess;
+    `issue_kind` stays absent, so ingestion refuses it loudly instead of silently mislabelling
+    it as something a verifier would then check under the wrong rule."""
+
+    candidate = _solo_candidate(_finding(concern_family=None, issue_kind=None), _Unit())
+    assert candidate["concern_family"] == "other"
+    assert candidate["issue_kind"] is None
+
+
+def test_the_subject_comes_from_the_work_unit_not_the_model():
+    """It was never told the subject, so requiring it to name one would require it to guess the
+    decomposition's vocabulary -- which is the thing being withheld."""
+
+    candidate = _solo_candidate(_finding(), _Unit())
+    assert candidate["primary_subject"] == "Foo.bar"
+    assert candidate["primary_entity_id"] == "entity:1"
+
+
+def test_a_target_with_no_entities_gets_none_rather_than_a_guess():
+    candidate = _solo_candidate(
+        _finding(primary_change_id="change:b", change_ids=["change:b"]), _Unit())
+    assert candidate["primary_entity_id"] is None
+
+
+def test_an_episode_that_never_submitted_is_a_coverage_gap():
+    """Trap 2, and the reason the run must not close `complete`. `assert_source_run_is_complete`
+    then refuses to score it without `allow_partial`, which is the point: a budget result must
+    not be reportable as a capability result."""
+
+    data = [{"episode_id": "ep:1", "pr_number": 1},
+            {"episode_id": "ep:2", "pr_number": 2}]
+    results = _Results([_Result(success=True, episode_id="ep:1", pr_number=1)])
+
+    gaps = _solo_coverage_gaps(results, data)
+    assert [row["episode_id"] for row in gaps] == ["ep:2"]
+    assert gaps[0]["arm_id"] == SOLO_ARM_ID
+
+
+def test_a_failed_submission_is_a_gap_not_an_empty_success():
+    """`success=False` with findings attached is still a gap: the task did not reach a terminal
+    submission, so whatever it accumulated is not a review it stands behind."""
+
+    data = [{"episode_id": "ep:1", "pr_number": 1}]
+    results = _Results([_Result(success=False, episode_id="ep:1", pr_number=1,
+                                findings=[{"claim": "half-finished"}])])
+
+    assert len(_solo_coverage_gaps(results, data)) == 1
+
+
+def test_a_review_is_filed_under_its_own_arm_and_never_the_generalists():
+    """`solo_agent` and `generalist` are the control and the treatment of this comparison. A
+    shared value would make them indistinguishable in every `by_arm` breakdown -- the "an arm's
+    whole output silently reads as zero" failure the derived `ARMS` exists to prevent."""
+
+    from src.mathlib_review.schema import ARMS
+
+    assert SOLO_ARM_ID == "solo_agent" and SOLO_ARM_ID in ARMS
+    assert SOLO_ARM_ID != "generalist"
+
+
+def test_a_solo_finding_projects_under_solo_agent_not_generalist():
+    """The bucket it shares with the evidence specialists files everything as `generalist`
+    unless the producer is read off the candidate."""
+
+    import inspect
+
+    from src.mathlib_review.review import finalize
+
+    source = inspect.getsource(finalize._evidence_specialist_findings)
+    assert 'candidate.spec_id == "solo_agent"' in source

@@ -26,7 +26,9 @@ with exactly the free-form shape this condition wants -- `{path, line_start, lin
 severity, claim, suggested_fix, evidence}` -- and `create_user_prompt` already names it.
 """
 
-from typing import Tuple
+from typing import List, Optional, Tuple
+
+from pydantic import Field
 
 from ape.tasks.base import register_task
 
@@ -96,9 +98,22 @@ SOLO_USER = """\
 Review this PR. Investigate what you need to before deciding -- open the files, look for \
 existing declarations that overlap, check whether a proof could be shorter.
 
-Then call `{submit_tool_name}` exactly once with at most {budget} findings. For each, give \
-`path` and `line_start` so the finding can be located, a `claim` naming the declaration and \
-stating what is wrong, and a `suggested_fix` saying what to do instead.
+Then call `{submit_tool_name}` exactly once with at most {budget} findings. For each, give:
+
+- `path` and `line_start` -- where in the reviewed file the problem is, so the finding can be \
+located. Give the line of the declaration your claim is about.
+- `claim` -- name the declaration and say what is wrong with it.
+- `suggested_fix` -- what to do instead.
+- `severity` -- `blocking` if a maintainer would withhold merge over it, else `advisory`.
+- `concern_family` -- one of: `correctness`, `proof-golf`, `duplication`, `naming`, \
+`generalization`, `documentation`, `style`, `scope`, `other`.
+- `issue_kind` -- one of: `broken_build`, `correctness_policy`, `documentation_gap`, \
+`duplicate_implementation`, `generalization_available`, `missed_canonical_api`, \
+`naming_convention_violation`, `policy_violation`, `proof_simplification`, \
+`scope_placement`, `style_norm_violation`.
+
+Label a finding with what it actually is. The labels route it to the right check; they are not \
+a guess at what the grader wants, and a wrong one is worse than the honest nearest fit.
 """
 
 
@@ -117,6 +132,20 @@ class SoloReviewData(BasePRReviewData):
     #: carry no episode at all.
     episode_id: str
 
+    #: The same grant the generalist arm gets, for the same reason. The generalist is the
+    #: scheduled design's own control and is documented as keeping all four "because that is
+    #: the point of a control"; this condition is a control too, so a narrower grant would
+    #: make an information difference read as an architecture difference. Retrieval is
+    #: effectively one tool in practice -- `declaration_search` is 83% of observed calls --
+    #: but the asymmetry would be in the wrong direction and free to avoid.
+    context_tools: List[str] = Field(default_factory=list)
+
+    #: Gates every retrieval tool: the committer timestamp of `reviewed_head_sha`, which is
+    #: gold-free. The tools raise `CutoffUnavailable` rather than answering without it -- "a
+    #: read that could see the future is not allowed to happen at all" -- and that refusal is
+    #: the whole temporal-isolation story for an agent that is otherwise unconstrained.
+    retrieval_cutoff: Optional[str] = None
+
 
 class SoloReviewResult(BasePRReviewResult):
     episode_id: str = ""
@@ -130,6 +159,16 @@ class SoloReviewTask(BasePRReviewTask):
 
     def _get_prompts(self, version: str) -> Tuple[str, str]:
         return SOLO_SYSTEM, SOLO_USER
+
+    async def register_task_tools(self, mcp) -> None:
+        # The base grant first -- `lean_verify_edit` and `submit_findings` -- then exactly the
+        # context tools this run granted. Order matters: `register_context_tools` deliberately
+        # omits `lean_verify_edit` because the base registers it, and registering it twice
+        # would shadow it.
+        await super().register_task_tools(mcp)
+        from .context_tools import register_context_tools
+
+        register_context_tools(self, mcp)
 
     def create_result(self, **kwargs):
         # From `self.data`, never the model's self-report -- the same rule the arms follow, and

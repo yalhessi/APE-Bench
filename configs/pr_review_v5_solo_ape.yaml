@@ -1,0 +1,68 @@
+# CONDITION B: one agent, the whole PR, on our own harness. No work units, no arms.
+#
+# The floor the scheduled design has never been measured against. `docs/research/step-by-step.md:24`
+# named it Step 5 -- "purpose is not leaderboard numbers but instrument validation" -- and :28
+# warned against skipping it. It was skipped, and `docs/dead-ends.md` has no entry for it.
+#
+# WHAT THIS CELL IS FOR. Condition C (`pr_review_v5_solo_claude.yaml`) differs from the `lead`
+# design on two axes at once: the unit of work AND the agentic harness. This file is the cell
+# that separates them. It is the SAME task and the SAME prompt as C, under `ape_agent`:
+#
+#   A  lead  = work units + arms + ape_agent        A vs B -> the unit of work
+#   B  solo  = whole PR            + ape_agent      B vs C -> the harness, byte-identical prompts
+#   C  solo  = whole PR            + claude_code    A vs C -> the practitioner floor
+#
+# Without B, no outcome can say anything about decomposition -- which is the claim the
+# motivation this experiment exists to support actually needs.
+#
+# RUN THIS ONE FIRST. It needs no leak containment (it runs under the same cutoff-gated MCP
+# tools the arms use) and no transcript audit, so it shakes out the solo task, the anchoring
+# pass and the coverage-gap handling under a harness we already trust.
+#
+# READ BEFORE ANY NUMBER FROM IT:
+# * `anchoring_report.json` first. The baseline is judged by resolving `file:line` onto change
+#   targets; ~5% unanchored is the rate measured on arm output. Materially above that and the
+#   recall figure is a measurement of the anchoring pass, not of the reviewer.
+# * `run_manifest.json` completion status. A solo task that did not submit is a coverage gap
+#   and makes the run `partial`; the judge then refuses it without `allow_partial`, which is
+#   the guard working. An empty findings file from a capped run is a budget result, not a
+#   capability result.
+# * Emission volume on the CONTROL PR beside recall, always. "The generalist arm dominates on
+#   quality" was retracted as a volume artifact -- 0.08 vs 0.09 hits per candidate while
+#   emitting 2.0 per run against 0.5 -- and a whole-PR reviewer will emit a different number of
+#   findings than the lead by construction.
+#
+# The run name is an invocation argument, not a config key: this file describes a PR set and a
+# policy. Three repetitions, distinct names, because a single-run delta at this n is noise.
+#   ... --run-name pr5_solo_ape_smoke4_rep1
+extends: bases/v5_generation.yaml
+
+dataset:
+  routing_mode: solo
+
+  # The DEVELOPMENT set, deliberately. Every design decision in the scheduled system was made
+  # by looking at these four, so scoring a first-draft solo prompt against them is rigged in
+  # the incumbent's favour. Use this set to shake out the plumbing and iterate the prompt; take
+  # the headline from the 12-PR held-out set, whose 23 obligations split 10 local / 11 design
+  # against smoke4's 16 / 1.
+  #
+  # 33438 is the CONTROL -- maintainers asked for nothing, so anything emitted on it is a false
+  # positive, and it is the only precision instrument this project has.
+  pr_numbers: [33057, 33066, 33098, 33438]
+
+  # Cost-matched to the lead, and measured rather than assumed: `per_pr_cost_cap` is a ceiling
+  # no run has exhausted, so matching against it would starve nothing and prove nothing. The
+  # lead's actual BILLED spend per PR is $0.767 (pr5_smoke4_rep9: $0.690 nested + $0.076 self)
+  # and $0.784 (heldout11_rep2) -- two independent sets agreeing to 2%. This is its observed
+  # per-PR maximum, $1.445, rounded up: the baseline cannot be said to have been starved, and
+  # what it actually spent is reported beside its recall.
+  solo_cost_cap: 1.50
+
+  # The generalist arm's grant. The scheduled design's own control keeps all four "because that
+  # is the point of a control"; this is a control too, so a narrower grant would make an
+  # information difference read as an architecture difference. Every one is cutoff-gated.
+  solo_context_tools: [zulip_search, precedent_search, declaration_search, proof_profile]
+
+  # 4 PRs x $1.50 = $6.00 worst case, and no coverage floor to pay for -- `solo` schedules no
+  # work-unit job at all, which is what the condition means.
+  run_total_cost_cap: 8.00

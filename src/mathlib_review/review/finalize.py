@@ -134,7 +134,11 @@ def _evidence_specialist_findings(candidates, supported_candidate_ids, pr_number
                 "evidence packet supports the claim" if published
                 else "no collector can support this claim's concern family"
             ),
-            arm="generalist",
+            # From the recorded producer, not a constant. The whole-PR baseline shares this
+            # bucket -- it has no compile to point at either -- but filing it as `generalist`
+            # would merge the control of the comparison into its treatment and make the two
+            # indistinguishable in every `by_arm` breakdown.
+            arm="solo_agent" if candidate.spec_id == "solo_agent" else "generalist",
         ))
     return findings
 

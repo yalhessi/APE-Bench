@@ -214,8 +214,12 @@ class FindingSource(StrictModel):
     #: 225 medium work units hold a single change target, and its prompt never contained the
     #: PR diff. It is a generalist reviewer of the same sites, with the same seven tools as
     #: the focused arm, differing only in breadth of checklist.
+    #: `solo_agent` is the whole-PR baseline: one agent, the entire diff, no work units and
+    #: no arms. It is filed under its own value rather than `generalist` because the two are
+    #: the treatment and the control of the comparison it exists for, and a shared value would
+    #: make them indistinguishable in every `by_arm` breakdown.
     arm: Literal["deterministic", "holistic", "generalist", "file_generalist",
-                 "focused_agent"]
+                 "focused_agent", "solo_agent"]
     candidate_id: Optional[str] = None
     opportunity_id: Optional[str] = None
     method_id: Optional[str] = None
@@ -231,7 +235,8 @@ class FindingSource(StrictModel):
                 "a deterministic source must name its opportunity and evidence; that "
                 "lineage is what makes the arm auditable"
             )
-        if self.arm in ("holistic", "generalist", "file_generalist") and not self.candidate_id:
+        if self.arm in ("holistic", "generalist", "file_generalist",
+                        "solo_agent") and not self.candidate_id:
             raise ValueError(f"a {self.arm} source must name its candidate")
         if self.arm == "focused_agent":
             # A focused finding's whole warrant is "an agent constructed this replacement and
@@ -264,7 +269,7 @@ class ReviewFinding(StrictModel):
     pr_number: int
     episode_id: str
     arm: Literal["deterministic", "holistic", "generalist", "file_generalist",
-                 "focused_agent", "merged"]
+                 "focused_agent", "solo_agent", "merged"]
     #: `published` is what the system would show a maintainer; `diagnostic` is retained and
     #: judged but never counted as system output. Keeping both is what lets the detection
     #: ceiling and the publishable result be reported without conflating them.
