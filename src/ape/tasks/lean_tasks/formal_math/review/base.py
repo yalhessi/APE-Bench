@@ -166,10 +166,21 @@ class BasePRReviewTask(BaseLeanTask):
         if target_workspace is not None and (data.diff or "").strip():
             from ape.tasks.lean_tasks.formal_math.pr_review.core import ReviewPRCoreTask
 
-            target_workspace = await ReviewPRCoreTask._ensure_patched_target_workspace(
-                data=data, target_workspace=target_workspace,
-                logger=logger, progress_callback=progress_callback,
+            # A prebuilt reviewed workspace -- base + diff + changed modules rebuilt -- if one
+            # exists for this (base, diff). Then there is nothing to patch, and a compile of any
+            # changed file resolves the declarations the PR itself adds or renames. Without it,
+            # the source-only overlay below is the environment in which 41 of 321 arm sessions
+            # read a renamed sibling as `Unknown constant`; the fallback logs that at WARNING.
+            reviewed = await ReviewPRCoreTask._maybe_setup_reviewed_target_workspace(
+                data, target_workspace.path, logger=logger, progress_callback=progress_callback,
             )
+            if reviewed is not None:
+                target_workspace = reviewed
+            else:
+                target_workspace = await ReviewPRCoreTask._ensure_patched_target_workspace(
+                    data=data, target_workspace=target_workspace,
+                    logger=logger, progress_callback=progress_callback,
+                )
         return attempt_path, scratch_workspace, target_workspace, reference_workspaces
 
     async def setup(self, termination_callback, orchestrator_id: str, attempt_path=None):
@@ -415,12 +426,24 @@ class BasePRReviewTask(BaseLeanTask):
     def _verification_environment_note(self) -> str:
         """What the compile could and could not see, so a pre-existing error is read correctly.
 
-        Until the reviewed state is rebuilt, verification resolves every import through the
-        base commit's build products: the PR's own source changes are visible in the file being
-        compiled and invisible in every file it imports. The note names the consequence rather
-        than leaving the model to infer a build failure from it.
+        Two environments, told apart by the target's key. Against a *reviewed* workspace the
+        PR's changed modules are rebuilt, so imports resolve the PR's own declarations and a
+        pre-existing error is real -- rare on a PR that builds, and usually a file that cannot
+        be checked standalone. Against a source-only overlay of the *base* commit, the PR's
+        changes are visible in the file being compiled and invisible in every file it imports,
+        so an error naming a declaration this PR adds or renames elsewhere is an artifact. The
+        note names which, rather than leaving the model to infer a build failure.
         """
 
+        from ape.toolkits.execute.lean.core.build_manager import is_reviewed_workspace_key
+
+        commit = str(getattr(self.target_workspace, "commit_hash", "") or "")
+        if is_reviewed_workspace_key(commit):
+            return (
+                "Verified against the reviewed workspace: this PR's changed modules are rebuilt, "
+                "so imports resolve the declarations this PR adds or renames. A pre-existing "
+                "error here is genuine -- most often a file that cannot be checked on its own."
+            )
         return (
             "Imports resolve against the base commit's build products, not the PR's. If an error "
             "names a declaration this PR introduces or renames in another file, it is an artifact "
