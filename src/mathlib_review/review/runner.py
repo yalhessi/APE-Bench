@@ -417,7 +417,8 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
 #: spelling of `generalist` and `RETIRED_ARM_SPELLINGS` maps it away, so filing the baseline
 #: there would make it indistinguishable from the treatment in every `by_arm` breakdown -- the
 #: "an arm's whole output silently reads as zero" failure the derived `ARMS` exists to prevent.
-SOLO_ARM_ID = "solo_agent"
+#: Defined in `finalize`, which is the module that has to act on it, and re-exported here.
+from src.mathlib_review.review.finalize import SOLO_ARM_ID  # noqa: E402
 
 
 def _solo_responses(results, graphs, units, logger=None):
@@ -493,6 +494,10 @@ def _solo_candidate(finding: Dict[str, Any], unit) -> Dict[str, Any]:
         # would be rejected, and a guess that happened to match would be worse.
         "primary_entity_id": entity_ids[0] if entity_ids else None,
         "concern_family": finding.get("concern_family") or "other",
+        # The free-text label beside the closed family. An arm's is its spec's own phrasing;
+        # a whole-PR reviewer has no spec, so the family is the most it can honestly say and
+        # inventing a richer label here would be this module putting words in its mouth.
+        "concern_label": finding.get("concern_family") or "other",
         "issue_kind": finding.get("issue_kind"),
         "severity": finding.get("severity") or "advisory",
         "claim": finding.get("claim") or "",

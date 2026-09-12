@@ -204,6 +204,7 @@ def invocation_work_unit(invocation_id: str) -> str:
 
 def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
                              *, strict: bool = True, spec_id: Optional[str] = None,
+                             require_subject_in_claim: bool = True,
                              _ordinal: Optional[int] = None):
     """Validate one response's candidates.
 
@@ -247,6 +248,10 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
             try:
                 result.extend(candidates_from_response(
                     unit, {"candidates": [raw]}, strict=True, spec_id=spec_id,
+                    # Must be threaded: the non-strict path re-enters per candidate, so any
+                    # validation option not passed here is silently reset to its default for
+                    # every real caller -- `finalize` only ever ingests non-strict.
+                    require_subject_in_claim=require_subject_in_claim,
                     _ordinal=index,
                 ))
             except ValueError as error:
@@ -311,7 +316,13 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
             raise ValueError(f"candidate {index} has an empty claim")
         if not requested_change:
             raise ValueError(f"candidate {index} has an empty requested_change")
-        if "/" not in primary_subject:
+        # An arm was handed its target's name in the prompt, so a claim that does not use it
+        # is about something else and the check catches a real mis-anchor. A whole-PR reviewer
+        # was never given the name -- withholding the decomposition's vocabulary is the
+        # treatment -- so requiring it to quote one would require it to guess exactly what is
+        # being withheld, and would reject every finding it files. Its anchoring is checked
+        # instead by where its file and line landed, which is evidence the arms never produce.
+        if require_subject_in_claim and "/" not in primary_subject:
             short_subject = primary_subject.rsplit(".", 1)[-1]
             if short_subject not in f"{claim} {requested_change}":
                 raise ValueError(f"candidate {index} does not name its primary subject")

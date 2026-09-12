@@ -49,6 +49,11 @@ from src.mathlib_review.schema import ReviewWorkUnit
 from src.mathlib_review.agenda.arms import CHECKABLE_ARMS, GENERALIST_ARM_ID
 from src.mathlib_review.review.lead_synthesis import apply_assessments
 
+#: The whole-PR baseline. Defined here rather than in the runner because this is the module
+#: that has to act on it, and `finalize` must not depend on the runner; the runner imports it
+#: from here so the string exists once.
+SOLO_ARM_ID = "solo_agent"
+
 
 def ingest_responses(
     units: Sequence[ReviewWorkUnit],
@@ -89,6 +94,15 @@ def ingest_responses(
         spec_id = response.get("spec_id")
         accepted, rejected = candidates_from_response(
             unit, response, strict=False, spec_id=spec_id,
+            # The one submission check the whole-PR reviewer cannot meet. An arm is handed its
+            # target's name in the prompt, so a claim that never uses it is about something
+            # else and the check catches a real mis-anchor. The solo condition is never given
+            # the name -- withholding that vocabulary is the treatment -- so requiring it to
+            # quote one would require it to guess precisely what is being withheld, and would
+            # reject every finding it ever files. Measured: 1 of 1 on the first end-to-end run.
+            # Its anchoring is checked instead by where its file and line landed, which is
+            # evidence no arm produces.
+            require_subject_in_claim=response.get("arm_id") != SOLO_ARM_ID,
         )
         rejections.extend(rejected)
         # Split by whether the arm's concern is settled by *compiling* something, not by

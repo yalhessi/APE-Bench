@@ -128,3 +128,39 @@ def test_a_solo_finding_projects_under_solo_agent_not_generalist():
 
     source = inspect.getsource(finalize._evidence_specialist_findings)
     assert 'candidate.spec_id == "solo_agent"' in source
+
+
+def test_a_validation_option_survives_the_non_strict_re_entry():
+    """`candidates_from_response` re-enters itself per candidate when `strict=False`, and any
+    option not threaded through that call is silently reset to its default. `finalize` only
+    ever ingests non-strict, so an unthreaded option is one that never takes effect for any
+    real caller while its unit test passes -- which is how `require_subject_in_claim` appeared
+    to work and rejected every solo finding anyway.
+    """
+
+    import inspect
+
+    from src.mathlib_review.review import candidates as module
+
+    source = inspect.getsource(module.candidates_from_response)
+    recursive = source.split("strict=True, spec_id=spec_id", 1)[1][:400]
+    for option in ("require_subject_in_claim",):
+        assert option in recursive, f"{option} is not threaded through the re-entry"
+
+
+def test_a_solo_candidate_carries_every_field_the_claim_model_requires():
+    """Constructed against the real model rather than a fixture: `concern_label` is required
+    and was missing, which rejected the candidate under a generic `other` code that named a
+    pydantic error rather than anything about reviewing."""
+
+    from src.mathlib_review.schema import CandidateClaim
+
+    candidate = _solo_candidate(_finding(), _Unit())
+    required = {name for name, field in CandidateClaim.model_fields.items()
+                if field.is_required()}
+    supplied = set(candidate) | {
+        # Filled by the validator from the invocation, not by the producer.
+        "candidate_id", "source_sha256", "work_unit_id", "episode_id", "pr_number",
+        "producer", "entity_ids", "evidence_requests",
+    }
+    assert not (required - supplied), sorted(required - supplied)
