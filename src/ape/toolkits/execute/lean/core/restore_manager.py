@@ -435,132 +435,145 @@ class RestoreManager:
             raise OSError(f"[{workspace_id}] Create workspace directory failed") from e
 
     async def _set_workspace_readonly(self, workspace_path: Path) -> None:
-        """Set entire workspace to readonly in parallel
-        
-        Rules:
-        - All .lean files and regular files: 0o444 (r--r--r--)
-        - All directories: 0o555 (r-xr-xr-x, need x permission to traverse)
-        
-        Args:
-            workspace_path: workspace root directory
-        """
-        # 1. Collect all paths that need to set permissions
-        def collect_paths(root: Path):
-            """Collect all file and directory paths"""
-            files = []
-            dirs = []
-            for item in root.rglob('*'):
-                if item.is_dir():
-                    dirs.append(item)
-                elif item.is_file() or item.is_symlink():
-                    files.append(item)
-            return files, dirs
-        
-        files, dirs = await asyncio.to_thread(collect_paths, workspace_path)
-        total_items = len(files) + len(dirs)
-        self.logger.info(f"Start setting readonly permissions: {total_items} items ({len(files)} files, {len(dirs)} directories)")
-        
-        # 2. Set permissions in parallel
-        semaphore = asyncio.Semaphore(100)  # Limit concurrency
-        
-        async def set_file_readonly(file_path: Path) -> bool:
-            """Set file to readonly"""
-            async with semaphore:
-                try:
-                    await asyncio.to_thread(os.chmod, str(file_path), 0o444)
-                    return True
-                except (OSError, PermissionError) as e:
-                    self.logger.debug(f"Set file readonly failed {file_path}: {e}")
-                    return False
-        
-        async def set_dir_readonly(dir_path: Path) -> bool:
-            """Set directory to readonly"""
-            async with semaphore:
-                try:
-                    await asyncio.to_thread(os.chmod, str(dir_path), 0o555)
-                    return True
-                except (OSError, PermissionError) as e:
-                    self.logger.debug(f"Set directory readonly failed {dir_path}: {e}")
-                    return False
-        
-        # 3. Process all files first, then process directories (with progress monitoring)
-        file_tasks = [asyncio.create_task(set_file_readonly(f)) for f in files]
-        
-        # Process files and monitor progress
-        completed_count = 0
-        last_report_time = datetime.now()
-        start_time = datetime.now()
-        
-        for coro in asyncio.as_completed(file_tasks):
+        await set_workspace_readonly(workspace_path, self.logger,
+                                     progress=self._emit_progress, label=self.repo_name)
+
+
+async def set_workspace_readonly(workspace_path: Path, logger, *,
+                                 progress=None, label: str = "") -> None:
+    """Set an entire workspace to readonly, in parallel.
+
+    Module-level so the build manager can finalise a reviewed workspace it built in place
+    under the same rules the restore path applies, instead of a second copy of them.
+    `RestoreManager._set_workspace_readonly` delegates here.
+
+    
+    Rules:
+    - All .lean files and regular files: 0o444 (r--r--r--)
+    - All directories: 0o555 (r-xr-xr-x, need x permission to traverse)
+    
+    Args:
+        workspace_path: workspace root directory
+    """
+    # 1. Collect all paths that need to set permissions
+    def collect_paths(root: Path):
+        """Collect all file and directory paths"""
+        files = []
+        dirs = []
+        for item in root.rglob('*'):
+            if item.is_dir():
+                dirs.append(item)
+            elif item.is_file() or item.is_symlink():
+                files.append(item)
+        return files, dirs
+    
+    files, dirs = await asyncio.to_thread(collect_paths, workspace_path)
+    total_items = len(files) + len(dirs)
+    logger.info(f"Start setting readonly permissions: {total_items} items ({len(files)} files, {len(dirs)} directories)")
+    
+    # 2. Set permissions in parallel
+    semaphore = asyncio.Semaphore(100)  # Limit concurrency
+    
+    async def set_file_readonly(file_path: Path) -> bool:
+        """Set file to readonly"""
+        async with semaphore:
             try:
-                await coro
-                completed_count += 1
-            except Exception:
-                completed_count += 1
-            
-            # Print progress every 10 seconds
-            current_time = datetime.now()
-            if (current_time - last_report_time).total_seconds() >= 10:
-                progress = completed_count / total_items
-                total_elapsed = (current_time - start_time).total_seconds()
-                
-                # Calculate ETA
-                avg_time_per_item = total_elapsed / completed_count
-                remaining_items = total_items - completed_count
-                eta_seconds = avg_time_per_item * remaining_items
-                eta_minutes = int(eta_seconds // 60)
-                eta_secs = int(eta_seconds % 60)
-                eta_str = f"{eta_minutes}m{eta_secs}s" if eta_minutes > 0 else f"{eta_secs}s"
-                
-                self.logger.info(
-                    f"Readonly permission setting progress: {completed_count}/{total_items} ({progress*100:.1f}%) | "
-                    f"Elapsed time: {int(total_elapsed)}s | ETA: {eta_str}"
-                )
-                await self._emit_progress(
-                    f"Finalizing workspace permissions for {self.repo_name}@{workspace_path.name[:8]} "
-                    f"({progress*100:.0f}% complete, ETA {eta_str})..."
-                )
-                last_report_time = current_time
-        
-        # 4. Process all directories (from deep to shallow, to avoid permission issues)
-        sorted_dirs = sorted(dirs, key=lambda d: len(d.parts), reverse=True)
-        dir_tasks = [asyncio.create_task(set_dir_readonly(d)) for d in sorted_dirs]
-        
-        for coro in asyncio.as_completed(dir_tasks):
+                await asyncio.to_thread(os.chmod, str(file_path), 0o444)
+                return True
+            except (OSError, PermissionError) as e:
+                logger.debug(f"Set file readonly failed {file_path}: {e}")
+                return False
+    
+    async def set_dir_readonly(dir_path: Path) -> bool:
+        """Set directory to readonly"""
+        async with semaphore:
             try:
-                await coro
-                completed_count += 1
-            except Exception:
-                completed_count += 1
-            
-            # Print progress every 10 seconds
-            current_time = datetime.now()
-            if (current_time - last_report_time).total_seconds() >= 10:
-                progress = completed_count / total_items
-                total_elapsed = (current_time - start_time).total_seconds()
-                
-                # Calculate ETA
-                avg_time_per_item = total_elapsed / completed_count
-                remaining_items = total_items - completed_count
-                eta_seconds = avg_time_per_item * remaining_items
-                eta_minutes = int(eta_seconds // 60)
-                eta_secs = int(eta_seconds % 60)
-                eta_str = f"{eta_minutes}m{eta_secs}s" if eta_minutes > 0 else f"{eta_secs}s"
-                
-                self.logger.info(
-                    f"Readonly permission setting progress: {completed_count}/{total_items} ({progress*100:.1f}%) | "
-                    f"Elapsed time: {int(total_elapsed)}s | ETA: {eta_str}"
-                )
-                await self._emit_progress(
-                    f"Finalizing workspace permissions for {self.repo_name}@{workspace_path.name[:8]} "
-                    f"({progress*100:.0f}% complete, ETA {eta_str})..."
-                )
-                last_report_time = current_time
-        
-        self.logger.info(f"Readonly permission setting completed: {completed_count}/{total_items} processed")
-        
-        # 6. Finally set root directory to readonly
+                await asyncio.to_thread(os.chmod, str(dir_path), 0o555)
+                return True
+            except (OSError, PermissionError) as e:
+                logger.debug(f"Set directory readonly failed {dir_path}: {e}")
+                return False
+    
+    # 3. Process all files first, then process directories (with progress monitoring)
+    file_tasks = [asyncio.create_task(set_file_readonly(f)) for f in files]
+    
+    # Process files and monitor progress
+    completed_count = 0
+    last_report_time = datetime.now()
+    start_time = datetime.now()
+    
+    for coro in asyncio.as_completed(file_tasks):
         try:
-            await asyncio.to_thread(os.chmod, str(workspace_path), 0o555)
-        except (OSError, PermissionError) as e:
-            self.logger.debug(f"Set root directory readonly failed: {e}")
+            await coro
+            completed_count += 1
+        except Exception:
+            completed_count += 1
+        
+        # Print progress every 10 seconds
+        current_time = datetime.now()
+        if (current_time - last_report_time).total_seconds() >= 10:
+            fraction = completed_count / total_items
+            total_elapsed = (current_time - start_time).total_seconds()
+            
+            # Calculate ETA
+            avg_time_per_item = total_elapsed / completed_count
+            remaining_items = total_items - completed_count
+            eta_seconds = avg_time_per_item * remaining_items
+            eta_minutes = int(eta_seconds // 60)
+            eta_secs = int(eta_seconds % 60)
+            eta_str = f"{eta_minutes}m{eta_secs}s" if eta_minutes > 0 else f"{eta_secs}s"
+            
+            logger.info(
+                f"Readonly permission setting progress: {completed_count}/{total_items} ({fraction*100:.1f}%) | "
+                f"Elapsed time: {int(total_elapsed)}s | ETA: {eta_str}"
+            )
+            if progress is not None:
+                await progress(
+                    f"Finalizing workspace permissions for {label}@{workspace_path.name[:8]} "
+                    f"({fraction*100:.0f}% complete, ETA {eta_str})..."
+                )
+            last_report_time = current_time
+    
+    # 4. Process all directories (from deep to shallow, to avoid permission issues)
+    sorted_dirs = sorted(dirs, key=lambda d: len(d.parts), reverse=True)
+    dir_tasks = [asyncio.create_task(set_dir_readonly(d)) for d in sorted_dirs]
+    
+    for coro in asyncio.as_completed(dir_tasks):
+        try:
+            await coro
+            completed_count += 1
+        except Exception:
+            completed_count += 1
+        
+        # Print progress every 10 seconds
+        current_time = datetime.now()
+        if (current_time - last_report_time).total_seconds() >= 10:
+            fraction = completed_count / total_items
+            total_elapsed = (current_time - start_time).total_seconds()
+            
+            # Calculate ETA
+            avg_time_per_item = total_elapsed / completed_count
+            remaining_items = total_items - completed_count
+            eta_seconds = avg_time_per_item * remaining_items
+            eta_minutes = int(eta_seconds // 60)
+            eta_secs = int(eta_seconds % 60)
+            eta_str = f"{eta_minutes}m{eta_secs}s" if eta_minutes > 0 else f"{eta_secs}s"
+            
+            logger.info(
+                f"Readonly permission setting progress: {completed_count}/{total_items} ({fraction*100:.1f}%) | "
+                f"Elapsed time: {int(total_elapsed)}s | ETA: {eta_str}"
+            )
+            if progress is not None:
+                await progress(
+                    f"Finalizing workspace permissions for {label}@{workspace_path.name[:8]} "
+                    f"({fraction*100:.0f}% complete, ETA {eta_str})..."
+                )
+            last_report_time = current_time
+    
+    logger.info(f"Readonly permission setting completed: {completed_count}/{total_items} processed")
+    
+    # 6. Finally set root directory to readonly
+    try:
+        await asyncio.to_thread(os.chmod, str(workspace_path), 0o555)
+    except (OSError, PermissionError) as e:
+        logger.debug(f"Set root directory readonly failed: {e}")
