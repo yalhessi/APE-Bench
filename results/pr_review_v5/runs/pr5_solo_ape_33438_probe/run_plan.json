@@ -1,0 +1,79 @@
+{
+  "agenda_sha256": "40661fe20f37c5015207290ec2ff6ada6e1c41d07e382e7329849488a68dcbc8",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "70c603573bbe30a1f03f3368423384a6618f355167f8f709ff5935e078227a61",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "ea84bb7e94944eacb231ad7a13578b8292bf1ec9d9e9121ff50fd1c649e9b4dc",
+    "generalist": "f0df7629ab33f643d7941263e14d8cac11dcdd8fa8d9e0d377d9599c067f54d2",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "9cea507c9980dff73ecd54323fb10f9a7878587f7c13cd99346bab0ea1bd3db6",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 25
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "c83e117d65af0f277eccfbfa52ee83c7ac80fe22",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "model_name": "gpt_5.2",
+  "per_pr_cost_cap": 1.5,
+  "prompt_sha256_by_invocation": {
+    "wu:230e4c75daf818c75b024525#api_reuse": "cc845ba499b5fc5e6d313cb073035a68201a4959a7e785b01dfbf69c63dfaa5c",
+    "wu:230e4c75daf818c75b024525#correctness": "f74e25761365859440a953b41d8f6467927ceb340d6c24abfea237d7644c88fd",
+    "wu:230e4c75daf818c75b024525#docs": "25505bccff8a3ae04f01c4512b8b727e7f280b7fe44a507aedb9f3502c1155d5",
+    "wu:230e4c75daf818c75b024525#duplication": "ab110259f44d20bad257826853d0cb4694af2d757e7366df9b6b278858401134",
+    "wu:230e4c75daf818c75b024525#family_design": "0576d43b5fe6ad50c306a3dbf00630aebb5fe75577a4ebea5bb33c22a35c2e10",
+    "wu:230e4c75daf818c75b024525#generalist": "ee5f1255d7d76e4e5f932b4b7ba2b1ed2f625ebaacc6d8828227368f0dce44f5",
+    "wu:230e4c75daf818c75b024525#generality": "6297a832f3cbab75275b910af4f36d27bf5790e5417e96ede8ac9e8664637bf0",
+    "wu:230e4c75daf818c75b024525#naming": "4ed5c3210ec7fe5e77f223d543b2bd81dc03994e90f241a25232e678cd5548b5",
+    "wu:230e4c75daf818c75b024525#proof_golf": "9f73395bd596a1ba41909c22035625dde51abc0e77de01adf7cfe94f554d4d0c",
+    "wu:230e4c75daf818c75b024525#proof_idiom": "2236c9a37813f8496602564cb7f3a47886cd809a7311bd374be2547028d67f3c",
+    "wu:230e4c75daf818c75b024525#style": "ed7a4e8e32260697072497f74bf8ab6e3b37f08b201f31140eb679f27d47902d"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "release_manifest_sha256": null,
+  "routing_mode": "solo",
+  "run_id": "v5run:pr5_solo_ape_33438_probe",
+  "run_name": "pr5_solo_ape_33438_probe",
+  "scaffold_config_sha256": "65aa67ba9c7fdf209239879fb16e639dddf71a3ce030d33ad6d739b3571c2f80",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "10029198152a39f9e20c4a56b8929010201c24ffb09c4cce0cc70ac0dffdb692",
+  "standard_budget_cap": 0.3
+}
