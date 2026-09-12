@@ -17,6 +17,7 @@ from typing import Any, Dict, List
 import pytest
 
 from src.datasets.pull_requests.collect import Collector, pre_gate
+from src.datasets.pull_requests.github import GitHubHTTPError
 from src.datasets.pull_requests.projections.episodes import project_episodes
 from src.datasets.pull_requests.seed import seed_from_legacy
 from src.datasets.pull_requests.store import PullRequestStore
@@ -203,3 +204,69 @@ def test_on_the_real_201_the_pre_gate_keeps_every_pr_the_funnel_includes(tmp_pat
     assert len(included) == 138
     missed = [n for n in included if not pre_gate(store, n, roster)[0]]
     assert missed == []
+
+
+# --- one endpoint failing must not end the run ------------------------------------------------
+
+class FlakyGitHub(FakeGitHub):
+    """GitHub as it actually behaved: one heavy endpoint 502s past every retry, the rest are fine."""
+
+    def __init__(self, prs, *, failing=("/pulls/102/comments",)):
+        super().__init__(prs)
+        self.failing = failing
+
+    def paginate_all(self, path, **kwargs):
+        if any(path.endswith(suffix) for suffix in self.failing):
+            self.requests.append(path)
+            raise GitHubHTTPError(f"GitHub HTTP 502 for GET {path}", status_code=502)
+        return super().paginate_all(path, **kwargs)
+
+
+@pytest.fixture
+def flaky(tmp_path):
+    roster = tmp_path / "roster.txt"
+    roster.write_text(f"# test roster\n{REVIEWER}\n")
+    store = PullRequestStore(tmp_path / "store")
+    fake = FlakyGitHub(_fixture_prs())
+    collector = Collector(store, fake, LOG, roster_path=roster, state_path=tmp_path / "state.json")
+    return store, fake, collector
+
+
+def test_a_dead_endpoint_defers_its_pr_and_the_rest_of_the_window_is_collected(flaky):
+    """The 12 hours are the thing worth saving, not the PR: #102's review comments are skipped,
+    every other PR completes, and the run reports what it deferred."""
+
+    store, fake, collector = flaky
+    prs = collector.window_prs("2025-12-01", "2025-12-31")
+    result = collector.tier1(prs)
+
+    assert result["prs_deferred"] == [102]
+    assert store.tiers(102) == {0}                       # tier 1 incomplete, not wrongly complete
+    for n in (101, 103, 104, 105, 106):
+        assert store.tiers(n) == {0, 1}
+
+
+def test_a_deferred_endpoint_is_not_recorded_as_empty(flaky):
+    """`[]` would mean "this PR drew no inline comments" -- a claim the collector cannot make from
+    a 502, and one the pre-gate would act on."""
+
+    store, _, collector = flaky
+    prs = collector.window_prs("2025-12-01", "2025-12-31")
+    collector.tier1(prs)
+
+    assert "review_comments" not in store.ledger(102)["endpoints"]
+    assert pre_gate(store, 102, collector.roster) == (False, "tier1_incomplete")
+
+
+def test_the_next_run_refetches_only_the_deferred_endpoint(flaky):
+    store, fake, collector = flaky
+    prs = collector.window_prs("2025-12-01", "2025-12-31")
+    collector.tier1(prs)
+
+    fake.failing = ()                                    # GitHub warms up
+    before = len(fake.requests)
+    result = collector.tier1(prs)
+    assert result["prs_deferred"] == []
+    assert fake.requests[before:] == ["/repos/leanprover-community/mathlib4/pulls/102/comments"]
+    assert store.tiers(102) == {0, 1}
+    assert pre_gate(store, 102, collector.roster) == (True, "pass")

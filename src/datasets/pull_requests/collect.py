@@ -216,24 +216,41 @@ class Collector:
                          _fmt_seconds(left / rate) if rate else "?")
 
     def tier1(self, prs: Iterable[int]) -> Dict[str, int]:
+        """The three conversation endpoints for every PR that lacks one, newest first.
+
+        An endpoint that fails past the client's retries is **left unrecorded**, not written empty:
+        the PR stays tier-1 incomplete, the pre-gate reports it as `tier1_incomplete` rather than
+        counting it as a PR with no comments, and the next run retries just that endpoint. One
+        endpoint must not end the run -- a 502 on `/pulls/4197/comments` killed a 32,650-PR walk
+        with 46 left, and the loss was the twelve hours, not the PR."""
+
         todo = sorted((n for n in prs if not all(
             name in self.store.ledger(n)["endpoints"] for name in TIER1)), reverse=True)
         self.logger.info("  tier 1: %d PRs to read, newest first (~%d requests, ~%s at the core limit)",
                          len(todo), 3 * len(todo), _fmt_seconds(3 * len(todo) / 1.39))
-        t0, rows = time.monotonic(), 0
+        t0, rows, deferred = time.monotonic(), 0, []
         for index, number in enumerate(todo, start=1):
             for name, template in TIER1.items():
                 if name in self.store.ledger(number)["endpoints"]:
                     continue
-                payload = self.client.paginate_all(template.format(repo=REPO, n=number), max_pages=None)
+                path = template.format(repo=REPO, n=number)
+                try:
+                    payload = self.client.paginate_all(path, max_pages=None)
+                except GitHubError as exc:
+                    self.logger.warning("  #%d %s: %s; left unrecorded, refetched by the next run",
+                                        number, name, exc)
+                    deferred.append(number)
+                    continue
                 self.requests += max(1, (len(payload) + 99) // 100)
                 rows += len(payload)
-                self.store.write_endpoint(number, name, payload,
-                                          request=template.format(repo=REPO, n=number),
+                self.store.write_endpoint(number, name, payload, request=path,
                                           fetched_at=_now(), source="github")
             if index % max(1, self.log_every_prs) == 0 or index == len(todo):
                 self._progress("tier 1", index, len(todo), number, t0, index)
-        return {"prs_read": len(todo), "rows": rows}
+        if deferred:
+            self.logger.warning("  tier 1: %d PR(s) left incomplete, rerun to fill them: %s",
+                                len(set(deferred)), sorted(set(deferred)))
+        return {"prs_read": len(todo), "rows": rows, "prs_deferred": sorted(set(deferred))}
 
     def gate_report(self, prs: Iterable[int]) -> Dict[str, Any]:
         reasons: Dict[str, int] = {}
@@ -262,15 +279,23 @@ class Collector:
                 "and without them every description would be recorded as possibly post-edited")
         todo = sorted((n for n in prs if 2 not in self.store.tiers(n)), reverse=True)
         self.logger.info("  tier 2: %d PRs, newest first", len(todo))
-        t0, compares = time.monotonic(), 0
+        t0, compares, deferred = time.monotonic(), 0, []
         for index, number in enumerate(todo, start=1):
             endpoints = self.store.ledger(number)["endpoints"]
             for name, template in TIER2_REST.items():
                 if name in endpoints:
                     continue
                 path = template.format(repo=REPO, n=number)
-                payload = self.client.get_json(path) if name == "pr" else \
-                    self.client.paginate_all(path, max_pages=None)
+                try:
+                    payload = self.client.get_json(path) if name == "pr" else \
+                        self.client.paginate_all(path, max_pages=None)
+                except GitHubError as exc:
+                    # Unrecorded, not null: a REST endpoint has no "unknown" reading the way
+                    # GraphQL enrichment does, so the PR stays tier-2 incomplete and is refetched.
+                    self.logger.warning("  #%d %s: %s; left unrecorded, refetched by the next run",
+                                        number, name, exc)
+                    deferred.append(number)
+                    continue
                 self.requests += 1
                 self.store.write_endpoint(number, name, payload, request=path, fetched_at=_now(),
                                           source="github")
@@ -289,7 +314,11 @@ class Collector:
             compares += self.fetch_compares(number)
             if index % max(1, self.log_every_prs) == 0 or index == len(todo):
                 self._progress("tier 2", index, len(todo), number, t0, index)
-        return {"prs_read": len(todo), "compares_fetched": compares}
+        if deferred:
+            self.logger.warning("  tier 2: %d PR(s) left incomplete, rerun to fill them: %s",
+                                len(set(deferred)), sorted(set(deferred)))
+        return {"prs_read": len(todo), "compares_fetched": compares,
+                "prs_deferred": sorted(set(deferred))}
 
     def fetch_compares(self, number: int, *, max_rounds: int = 12) -> int:
         """Fetch every compare the funnel asks for, by asking it: run the multi-round builder with
