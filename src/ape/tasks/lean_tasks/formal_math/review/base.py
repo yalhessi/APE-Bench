@@ -440,9 +440,12 @@ class BasePRReviewTask(BaseLeanTask):
         commit = str(getattr(self.target_workspace, "commit_hash", "") or "")
         if is_reviewed_workspace_key(commit):
             return (
-                "Verified against the reviewed workspace: this PR's changed modules are rebuilt, "
-                "so imports resolve the declarations this PR adds or renames. A pre-existing "
-                "error here is genuine -- most often a file that cannot be checked on its own."
+                "Verified against the reviewed workspace: this PR's changed modules, and the "
+                "modules between them on the import graph, are rebuilt, so imports resolve the "
+                "declarations this PR adds or renames. Modules the PR did not touch are as they "
+                "were compiled at the merge-base; only a changed file has a fully rebuilt import "
+                "closure. A pre-existing error in a changed file is genuine -- most often a file "
+                "that cannot be checked on its own."
             )
         return (
             "Imports resolve against the base commit's build products, not the PR's. If an error "

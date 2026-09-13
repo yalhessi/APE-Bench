@@ -171,8 +171,13 @@ def test_against_a_base_overlay_the_note_names_the_artifact(tmp_path):
 
 
 def test_against_a_reviewed_workspace_the_note_says_the_error_is_genuine(tmp_path):
+    """And says the scope: the changed modules and the modules between them are rebuilt, the
+    rest is the merge-base's -- so an arm compiling an *unchanged* file is told what it is
+    looking at instead of inferring a rebuilt world from the word 'reviewed'."""
+
     note = _task_with_target(tmp_path, reviewed_workspace_key(SHA, DIFF))._verification_environment_note()
     assert "reviewed workspace" in note and "genuine" in note
+    assert "modules between them" in note and "did not touch" in note
     assert "base commit's build products" not in note
 
 
