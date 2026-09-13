@@ -93,6 +93,17 @@ paths:
   open and is §D2 of `docs/research/pr-review-v5-principled-design.md` (norm store with maturity;
   emerging norms license advisory findings only), never built. Flat prefix prevalence is not the
   bar: at 33337's base `toLinearMap_` has ~50 declarations to `coe_`'s ~4,714.
+- **A closed vocabulary silently filters a correct registration — three times now.** The pattern:
+  a thing is registered correctly in the place that looks authoritative, and a second list that
+  nothing checks it against drops it with no error. `documentation` vs `docs` made the docs arm
+  unmeasurable for its whole life; the retrieval gate's closed `gate` Literal refused a compound
+  value; `CONTEXT_TOOLS` in `schema/review.py` filtered `naming_norm` out of the naming arm's
+  grant after it was added to `ARM_DEFINITIONS` *and* `_REGISTRARS`, so a paid run came back
+  looking like "the new contract changed nothing" when the tool had never been registered
+  ($1.11, 33337 rep14). **Before spending on a run that tests a new capability, assert the
+  capability reaches the task**: read `arm_pool.jsonl`'s `task_data.context_tools`, or run the
+  guard (`tests/datasets/test_context_tool_grants_survive.py`). Adding an arm is two edits;
+  adding a *tool* is four — registrar, `ARM_DEFINITIONS`, `CONTEXT_TOOLS`, and `ContextCall.tool`.
 - **`declaration_search` was base-only by construction** — an arm judging a *rename* could not look
   up the name the PR introduced. It now also searches the PR's changed files in the reviewed
   overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays
