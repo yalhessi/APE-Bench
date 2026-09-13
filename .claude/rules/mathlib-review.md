@@ -101,9 +101,13 @@ paths:
   grant after it was added to `ARM_DEFINITIONS` *and* `_REGISTRARS`, so a paid run came back
   looking like "the new contract changed nothing" when the tool had never been registered
   ($1.11, 33337 rep14). **Before spending on a run that tests a new capability, assert the
-  capability reaches the task**: read `arm_pool.jsonl`'s `task_data.context_tools`, or run the
-  guard (`tests/datasets/test_context_tool_grants_survive.py`). Adding an arm is two edits;
-  adding a *tool* is four — registrar, `ARM_DEFINITIONS`, `CONTEXT_TOOLS`, and `ContextCall.tool`.
+  capability reaches the task** — and not with `plan`, which logs "DRY RUN — nothing is written"
+  and leaves no `arm_pool.jsonl` to read. What works, in a second and for nothing:
+  `ape/bin/python -c "from src.mathlib_review.agenda.arms import _grant_for; print(_grant_for('naming'))"`,
+  or `ape/bin/python -m pytest tests/datasets/test_context_tool_grants_survive.py -q`. After a
+  paid run, `arm_pool.jsonl`'s `task_data.context_tools` is the record of what the arm actually
+  held. Adding an arm is two edits; adding a *tool* is four — registrar, `ARM_DEFINITIONS`,
+  `CONTEXT_TOOLS`, and `ContextCall.tool`.
 - **`declaration_search` was base-only by construction** — an arm judging a *rename* could not look
   up the name the PR introduced. It now also searches the PR's changed files in the reviewed
   overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays
