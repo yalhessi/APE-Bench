@@ -116,6 +116,7 @@ class RestoreManager:
         if await aiofiles.os.path.exists(workspace_path) and await aiofiles.os.path.isdir(workspace_path):
             state = await self.state_manager.read_state(commit_hash)
             if state and state.status == WorkspaceStatus.READY:
+                assert_base_present(self.workspace_dir, commit_hash)
                 self.logger.info(f"Workspace is ready: {commit_hash}")
                 await self._emit_progress(
                     f"Using cached Lean workspace {self.repo_name}@{commit_hash[:8]}."
@@ -437,6 +438,26 @@ class RestoreManager:
     async def _set_workspace_readonly(self, workspace_path: Path) -> None:
         await set_workspace_readonly(workspace_path, self.logger,
                                      progress=self._emit_progress, label=self.repo_name)
+
+
+def assert_base_present(workspace_dir: Path, workspace_id: str) -> None:
+    """Refuse to serve a reviewed workspace whose base workspace is gone.
+
+    A reviewed workspace (`<base>+<fp>`) symlinks absolutely into `workspaces/<base>` -- the
+    sources it did not touch, `.lake/packages`, `.lake/config` -- and its state file records
+    nothing about that dependency. Remove the base out of band and the state still says READY
+    while every `lake env lean` inside fails on a dangling link. The key names the base, so the
+    check is one `isdir`; raising here turns a confusing compile failure into a named one.
+    """
+
+    if "+" not in workspace_id:
+        return
+    base = workspace_id.split("+", 1)[0]
+    if not (workspace_dir / base).is_dir():
+        raise RuntimeError(
+            f"[{workspace_id}] reviewed workspace is READY but its base {base} is missing from "
+            f"{workspace_dir}; restore the base (it is in the content store) or rebuild the "
+            f"reviewed workspace with `prebuild --reviewed --execute --force-rebuild`")
 
 
 async def set_workspace_readonly(workspace_path: Path, logger, *,

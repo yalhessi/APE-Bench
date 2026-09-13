@@ -20,6 +20,7 @@ import os
 from pathlib import Path
 
 import pytest
+from types import SimpleNamespace
 
 from ape.toolkits.execute.lean.core.build_manager import (
     is_reviewed_workspace_key,
@@ -261,6 +262,13 @@ def test_a_failed_build_leaves_no_workspace_and_marks_failed(tmp_path):
     assert not [p for p in (_workspaces(tmp_path)).iterdir() if p.name.startswith(".")], \
         "temp dir removed"
     assert states.calls[-1][:3] == ("complete", key, False)
+    # The cleanup walked a tree of symlinks into the base. `os.chmod` follows symlinks, and
+    # the base's files are hardlinked blob-store inodes shared by every restored workspace:
+    # a cleanup that chmod'ed through the links would have rewritten them all. It must not.
+    base = _workspaces(tmp_path) / SHA
+    for rel, want in (("Mathlib", 0o555), ("Mathlib.lean", 0o444), ("Mathlib/A/B.lean", 0o444),
+                      (".lake/packages", 0o555), (".lake/packages/batteries/x", 0o444)):
+        assert (base / rel).stat().st_mode & 0o777 == want, f"{rel}: base mode rewritten"
 
 
 def test_an_already_built_key_is_not_rebuilt(tmp_path):
@@ -300,3 +308,100 @@ def test_no_targets_is_refused_before_anything_is_copied(tmp_path):
             changed_files=["docs/README.md", "Mathlib/A/Deleted.lean"]))
     left = sorted(p.name for p in (_workspaces(tmp_path)).iterdir())
     assert left == [SHA], f"only the base remains; the hidden build tree is removed: {left}"
+
+
+def test_force_rebuild_replaces_the_existing_tree(tmp_path):
+    """Without this, a forced rebuild built the new tree, failed to `rename` it onto the
+    non-empty old one, read the refusal as 'another builder won', deleted the new tree and
+    recorded success -- the operator was told the rebuild happened."""
+
+    _base(tmp_path)
+    states = _StateManager()
+    stamp = {"value": b"first"}
+
+    async def lake(cmd, cwd, **kw):
+        (Path(cwd) / ".lake/build/lib/lean/Mathlib/A/B.olean").write_bytes(stamp["value"])
+        return "", "", 0
+
+    manager = _manager(tmp_path, states, lake)
+    key = reviewed_workspace_key(SHA, "diff")
+    asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+    stamp["value"] = b"second"
+    result = asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"], force_rebuild=True))
+
+    final = _workspaces(tmp_path) / key
+    assert result.success
+    assert (final / ".lake/build/lib/lean/Mathlib/A/B.olean").read_bytes() == b"second"
+    assert sorted(p.name for p in _workspaces(tmp_path).iterdir()) == sorted([SHA, key]), (
+        "the replaced tree is gone and no dotted tree remains")
+    assert [c for c in states.calls if c[0] == "complete"] == [
+        ("complete", key, True, None), ("complete", key, True, None)]
+
+
+def test_orphaned_trees_of_dead_builders_are_swept_before_building(tmp_path):
+    """A hard-killed builder skips its `finally`; its dotted tree stays. The next builder on
+    the same key removes it -- and only trees whose pid is dead."""
+
+    import os
+
+    _base(tmp_path)
+    key = reviewed_workspace_key(SHA, "diff")
+    dead = _workspaces(tmp_path) / f".{key}.4194303.deadbeef"
+    (dead / "Mathlib").mkdir(parents=True)
+    (dead / "Mathlib/x.lean").write_text("stale")
+    live = _workspaces(tmp_path) / f".{key}.{os.getpid()}.cafef00d"
+    live.mkdir()
+    (live / "marker").write_text("someone else's build, still running")
+
+    async def lake(cmd, cwd, **kw):
+        (Path(cwd) / ".lake/build/lib/lean/Mathlib/A/B.olean").write_bytes(b"rebuilt")
+        return "", "", 0
+
+    manager = _manager(tmp_path, _StateManager(), lake)
+    asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    assert not dead.exists(), "the dead builder's tree is swept"
+    assert live.is_dir(), "a live builder's tree is left alone"
+
+
+def test_a_second_builder_waits_on_the_reviewed_bound_not_the_restore_one(tmp_path):
+    """Two of the first twelve real builds took 776 s and 997 s; the restore bound is 600 s.
+    A waiter on the restore bound reported FAILED while the first builder was fine."""
+
+    from ape.toolkits.execute.lean.core.build_manager import REVIEWED_BUILD_WAIT_SECONDS
+    from ape.toolkits.execute.lean.utils.exceptions import AlreadyBuildingError
+
+    class Busy(_StateManager):
+        async def try_start_build(self, key, force_rebuild=False):
+            raise AlreadyBuildingError(f"[{key}] building elsewhere")
+
+    _base(tmp_path)
+    manager = _manager(tmp_path, Busy(), None)
+    seen = {}
+
+    async def fake_wait(key, timeout=None):
+        seen["timeout"] = timeout
+        return SimpleNamespace(success=True, commit_hash=key, build_duration=0.0, file_count=1)
+
+    manager._wait_for_build_completion = fake_wait
+    asyncio.run(manager.build_reviewed_workspace(
+        reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare,
+        changed_files=["Mathlib/A/B.lean"]))
+
+    assert seen["timeout"] == REVIEWED_BUILD_WAIT_SECONDS >= 3600
+
+
+def test_a_ready_reviewed_workspace_whose_base_is_gone_is_refused(tmp_path):
+    """The state file says READY and knows nothing about the base the tree symlinks into."""
+
+    from ape.toolkits.execute.lean.core.restore_manager import assert_base_present
+
+    key = reviewed_workspace_key(SHA, "d")
+    assert_base_present(tmp_path, SHA)              # a base key: nothing to check
+    with pytest.raises(RuntimeError, match="base .* is missing"):
+        assert_base_present(tmp_path, key)          # base dir absent
+    (tmp_path / SHA).mkdir()
+    assert_base_present(tmp_path, key)              # base present: passes

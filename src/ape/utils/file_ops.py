@@ -313,11 +313,18 @@ async def safe_remove_directory(directory: Path, max_retries: int = 3) -> None:
         if not directory.exists():
             return
         
-        # Step 1: make every entry writable
+        # Step 1: make every entry writable. Symlinks are skipped, not chmod'ed: `os.chmod`
+        # follows them, and a tree being removed here can be an overlay whose entries are
+        # symlinks into a shared read-only workspace whose files are hardlinked blob-store
+        # inodes -- chmod'ing through the link would rewrite the modes of every workspace
+        # that shares them. `rmtree` unlinks a symlink without following it, so nothing is
+        # lost by leaving its mode alone.
         for root, dirs, files in os.walk(directory, topdown=False):
             # Ensure files are writable
             for name in files:
                 file_path = os.path.join(root, name)
+                if os.path.islink(file_path):
+                    continue
                 try:
                     os.chmod(file_path, stat.S_IWUSR | stat.S_IRUSR)
                 except (OSError, PermissionError):
@@ -326,6 +333,8 @@ async def safe_remove_directory(directory: Path, max_retries: int = 3) -> None:
             # Ensure directories are writable/executable
             for name in dirs:
                 dir_path = os.path.join(root, name)
+                if os.path.islink(dir_path):
+                    continue
                 try:
                     os.chmod(dir_path, stat.S_IRWXU)
                 except (OSError, PermissionError):

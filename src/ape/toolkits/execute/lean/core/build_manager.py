@@ -118,6 +118,13 @@ def lake_targets_for_changed_files(changed_files: Sequence[str], root: Path) -> 
             targets.append(target)
     return targets
 
+#: How long a second builder waits for a reviewed build another process owns. The base
+#: build's bound is `restore_queue_timeout` (600 s), sized for a restore; a reviewed build
+#: is a 2.8 GB copy plus a Lake rebuild and two of the first twelve took 776 s and 997 s, so
+#: a waiter on that bound reported the key FAILED while the first builder was fine.
+REVIEWED_BUILD_WAIT_SECONDS = 3600.0
+
+
 class BuildManager(BaseSourceManager):
     """Lean Build Manager - extends BaseSourceManager with Lean compilation.
 
@@ -207,9 +214,11 @@ class BuildManager(BaseSourceManager):
 
         return removed_count
 
-    async def _wait_for_build_completion(self, commit_hash: str) -> BuildResult:
+    async def _wait_for_build_completion(
+        self, commit_hash: str, timeout: Optional[float] = None,
+    ) -> BuildResult:
         """Wait for another process to finish building the same workspace."""
-        actual_timeout = self.config.restore_queue_timeout
+        actual_timeout = timeout if timeout is not None else self.config.restore_queue_timeout
         poll_interval = self.config.workspace_restore_poll_interval
         start_time = datetime.now()
         last_progress_report = start_time
@@ -384,7 +393,7 @@ class BuildManager(BaseSourceManager):
                                    file_count=current_state.file_count)
             file_count = await self._execute_reviewed_build(
                 key, base_commit, prepare_sources=prepare_sources,
-                changed_files=list(changed_files))
+                changed_files=list(changed_files), force_rebuild=force_rebuild)
             build_duration = (datetime.now() - start_time).total_seconds()
             await self.state_manager.complete_build(key, True, build_duration, file_count)
             self.logger.info("Reviewed workspace built: %s in %.1fs", key, build_duration)
@@ -392,9 +401,9 @@ class BuildManager(BaseSourceManager):
                                build_duration=build_duration, file_count=file_count)
         except AlreadyBuildingError:
             self.logger.info("Another process is building %s; waiting", key)
-            return await self._wait_for_build_completion(key)
+            return await self._wait_for_build_completion(key, timeout=REVIEWED_BUILD_WAIT_SECONDS)
         except AlreadyRestoringError:
-            return await self._wait_for_build_completion(key)
+            return await self._wait_for_build_completion(key, timeout=REVIEWED_BUILD_WAIT_SECONDS)
         except Exception as exc:
             build_duration = (datetime.now() - start_time).total_seconds()
             self.logger.error("Reviewed workspace build failed %s: %s", key, exc)
@@ -413,6 +422,7 @@ class BuildManager(BaseSourceManager):
         *,
         prepare_sources: Callable[[Path, Path], Awaitable[None]],
         changed_files: list[str],
+        force_rebuild: bool = False,
     ) -> int:
         from .restore_manager import set_workspace_readonly
 
@@ -435,6 +445,13 @@ class BuildManager(BaseSourceManager):
         # is complete and read-only. A crash leaves a dotted name nothing looks up by.
         build_root = workspace_dir / f".{key}.{os.getpid()}.{uuid.uuid4().hex[:8]}"
         await aiofiles.os.makedirs(workspace_dir, exist_ok=True)
+        # A builder that died hard (SIGKILL, OOM, node loss) skips its `finally` and leaves a
+        # dotted tree of up to 2.8 GB that nothing else enumerates. The pid is in the name.
+        for stale in self._dead_build_roots(workspace_dir, key):
+            self.logger.warning("Removing orphaned reviewed build tree %s: its builder is gone",
+                                stale.name)
+            await asyncio.to_thread(self._make_tree_removable, stale)
+            await safe_remove_directory(stale)
         try:
             await prepare_sources(build_root, base_root)
             targets = lake_targets_for_changed_files(changed_files, build_root)
@@ -457,6 +474,15 @@ class BuildManager(BaseSourceManager):
                 raise RuntimeError(f"[{key}] lake build {' '.join(targets)} failed:\n{tail}")
 
             await set_workspace_readonly(build_root, self.logger)
+            replaced: Optional[Path] = None
+            if force_rebuild and await aiofiles.os.path.isdir(final_root):
+                # Move the tree being replaced aside first. `rename` refuses a non-empty
+                # target, and the OSError branch below would read that refusal as "another
+                # builder won" -- keeping the old tree, discarding the new one, and
+                # recording success. Same parent, so the rename needs no write bit on the
+                # 0o555 tree itself.
+                replaced = workspace_dir / f".{key}.replaced.{os.getpid()}.{uuid.uuid4().hex[:8]}"
+                await asyncio.to_thread(os.rename, final_root, replaced)
             try:
                 await asyncio.to_thread(os.rename, build_root, final_root)
             except OSError:
@@ -465,12 +491,32 @@ class BuildManager(BaseSourceManager):
                     self.logger.info("Reviewed workspace %s appeared while building; using it", key)
                 else:
                     raise
+            if replaced is not None:
+                await asyncio.to_thread(self._make_tree_removable, replaced)
+                await safe_remove_directory(replaced)
             files = await list_files_recursive(final_root)
             return len(files)
         finally:
             if await aiofiles.os.path.exists(build_root):
                 await asyncio.to_thread(self._make_tree_removable, build_root)
                 await safe_remove_directory(build_root)
+
+    @staticmethod
+    def _dead_build_roots(workspace_dir: Path, key: str) -> list[Path]:
+        """Hidden build trees for `key` whose builder pid is no longer alive.
+
+        Names are `.<key>.<pid>.<hex>` and `.<key>.replaced.<pid>.<hex>`; the key itself has
+        no dots. A live pid means another builder owns that tree and it is left alone.
+        """
+
+        stale = []
+        for path in sorted(workspace_dir.glob(f".{key}.*")):
+            if not path.is_dir() or path.is_symlink():
+                continue
+            pid = next((int(part) for part in path.name.split(".") if part.isdigit()), None)
+            if pid is None or not is_process_alive(pid):
+                stale.append(path)
+        return stale
 
     @staticmethod
     def _materialize_build_tree(build_root: Path, base_root: Path) -> None:
