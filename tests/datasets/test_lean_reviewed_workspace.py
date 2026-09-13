@@ -127,7 +127,16 @@ class _StateManager:
         return _State(status="building")
 
     async def complete_build(self, key, success, duration, file_count=0, **kw):
-        self.calls.append(("complete", key, success, kw.get("error_type")))
+        # Validated the way the real state manager validates it. The fake used to accept
+        # anything, so nobody noticed that the builder passed `type(exc).__name__` into a
+        # field typed `ErrorType`: pydantic rejected the assignment, the builder swallowed
+        # that to avoid masking the build error, and the state stayed BUILDING with a dead
+        # pid. Two prebuilds of 33057 paid 8 minutes each and recorded nothing.
+        from ape.toolkits.execute.lean.models import ErrorType
+        error_type = kw.get("error_type")
+        assert error_type is None or isinstance(error_type, ErrorType), (
+            f"error_type must be an ErrorType, got {error_type!r}")
+        self.calls.append(("complete", key, success, error_type))
         return _State(status="built" if success else "failed")
 
 
@@ -405,3 +414,88 @@ def test_a_ready_reviewed_workspace_whose_base_is_gone_is_refused(tmp_path):
         assert_base_present(tmp_path, key)          # base dir absent
     (tmp_path / SHA).mkdir()
     assert_base_present(tmp_path, key)              # base present: passes
+
+
+# --- what a failed build tells the operator -------------------------------------------------
+
+
+def test_a_failed_build_reports_the_lean_error_not_the_package_warning():
+    """Lake puts the diagnosis on stdout and noise on stderr; the message must carry the first.
+
+    Every `lake` invocation in this repo prints `batteries: repository ... has local changes`
+    to stderr -- a *clean* build of a base prints it too. The Lean `error:` lines go to
+    stdout. Tailing `stderr or stdout` therefore showed only the warning and `error: build
+    failed` on every failure. PR 33057's reviewed build was reported that way twice before
+    anyone could see that its one real error was `unsolved goals` in `expand_apply`.
+    """
+
+    from ape.toolkits.execute.lean.core.build_manager import lake_failure_tail
+
+    stdout = (
+        "info: compiling Mathlib.RingTheory.PowerSeries.Expand\n"
+        "error: ./Mathlib/RingTheory/PowerSeries/Expand.lean:35:78: error: unsolved goals\n"
+        "R : Type u_2\n"
+        "⊢ (MvPowerSeries.substAlgHom ⋯) f = MvPowerSeries.subst (fun x => X () ^ p) f\n"
+    )
+    stderr = ("warning: batteries: repository '/w/.lake/packages/batteries' has local changes\n"
+              "error: build failed\n")
+
+    tail = lake_failure_tail(stdout, stderr)
+    assert "unsolved goals" in tail, "the diagnosis on stdout must survive"
+    assert "Expand.lean:35:78" in tail, "and the site with it"
+    assert "error: build failed" in tail, "stderr is kept too, it is the exit reason"
+    assert not tail.startswith("info:"), "the window starts at the first error, not the log head"
+
+
+def test_the_failure_window_is_bounded_and_starts_at_the_first_error():
+    from ape.toolkits.execute.lean.core.build_manager import (
+        LAKE_FAILURE_TAIL_LINES, lake_failure_tail,
+    )
+
+    noise = "\n".join(f"info: built module {i}" for i in range(500))
+    tail = lake_failure_tail(f"{noise}\nerror: real problem\nR : Type\n", "error: build failed\n")
+    assert tail.splitlines()[0] == "error: real problem", \
+        "a long build log must not push the diagnosis out of the window"
+    assert len(tail.splitlines()) <= LAKE_FAILURE_TAIL_LINES
+
+    # No `error:` line at all (a crash, a signal): fall back to the end of the output.
+    plain = lake_failure_tail(noise, "")
+    assert plain.splitlines()[-1] == "info: built module 499"
+    assert len(plain.splitlines()) <= LAKE_FAILURE_TAIL_LINES
+
+
+def test_a_failed_build_is_recorded_FAILED_by_the_real_state_manager(tmp_path):
+    """End to end through the real pydantic model, because the bug lived in its validation.
+
+    `build_reviewed_workspace` passed `type(exc).__name__` -- "RuntimeError" -- for a field
+    typed `ErrorType`. `complete_build` raised `ValidationError` before it wrote anything and
+    the builder's `except Exception` swallowed it, so the state kept `status=building` with
+    the dead builder's pid. Every later prebuild "took over" that state, rebuilt for eight
+    minutes, failed the same way and again recorded nothing.
+    """
+
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+    from ape.toolkits.execute.lean.core.workspace_state import WorkspaceStateManager
+    from ape.toolkits.execute.lean.models import ErrorType, WorkspaceStatus
+
+    _base(tmp_path)
+    config = LeanVerifyToolConfig(
+        base_dir=tmp_path, storage_dir=tmp_path / "storage", repos_dir=tmp_path / "repos",
+        build_timeout=60)
+    states = WorkspaceStateManager(config)
+
+    async def failing_lake(cmd, cwd, **kw):
+        return ("error: ./Mathlib/A/B.lean:1:0: error: unsolved goals\n",
+                "warning: batteries: repository '/w' has local changes\nerror: build failed\n", 1)
+
+    manager = _manager(tmp_path, states, failing_lake)
+    key = reviewed_workspace_key(SHA, "diff")
+    with pytest.raises(RuntimeError, match="unsolved goals"):
+        asyncio.run(manager.build_reviewed_workspace(
+            key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    state = asyncio.run(states.read_state(key))
+    assert state.status == WorkspaceStatus.FAILED, "a failure that is not recorded is repaid"
+    assert state.error_type == ErrorType.BUILD_FAILED
+    assert state.build_pid is None, "a stale pid is what the next run mistakes for a dead builder"
+    assert "unsolved goals" in state.error_message

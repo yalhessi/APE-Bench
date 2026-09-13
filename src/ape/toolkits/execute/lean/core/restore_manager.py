@@ -14,7 +14,7 @@ from datetime import datetime
 import aiofiles.os
 
 from ..config import LeanVerifyToolConfig
-from ..models import RestoreResult, WorkspaceStatus
+from ..models import ErrorType, RestoreResult, WorkspaceStatus
 from .blob_store import create_blob_store
 from .bundle_manager import SnapshotBundleManager
 from ..core.workspace_state import WorkspaceStateManager
@@ -209,11 +209,15 @@ class RestoreManager:
             
             try:
                 await self.state_manager.complete_restore(
-                    commit_hash, False, None, restore_duration, error_message, type(e).__name__
+                    commit_hash, False, None, restore_duration, error_message,
+                    ErrorType.RESTORE_FAILED
                 )
-            except Exception:
-                # Status update failure cannot prevent exception propagation
-                pass
+            except Exception as state_error:
+                self.logger.error(
+                    "[%s] restore failed AND the FAILED state could not be recorded (%s); the "
+                    "state stays RESTORING and the next restore will take it over",
+                    commit_hash, state_error,
+                )
             
             # Re-throw original exception
             raise

@@ -20,7 +20,7 @@ import aiofiles.os
 # Import base class
 from ape.toolkits.execute.base_source_manager import BaseSourceManager
 from ..config import LeanVerifyToolConfig
-from ..models import BuildResult, WorkspaceStatus
+from ..models import BuildResult, WorkspaceStatus, build_error_type
 from .blob_store import create_blob_store
 from .bundle_manager import SnapshotBundleManager
 from ..core.workspace_state import WorkspaceStateManager
@@ -117,6 +117,33 @@ def lake_targets_for_changed_files(changed_files: Sequence[str], root: Path) -> 
         if target not in targets:
             targets.append(target)
     return targets
+
+
+#: Lines of a failed `lake build`'s output carried in the exception message.
+LAKE_FAILURE_TAIL_LINES = 40
+
+
+def lake_failure_tail(stdout: str, stderr: str) -> str:
+    """The part of a failed `lake build`'s output that says what actually went wrong.
+
+    Lake writes each job's log -- the Lean `error:` lines, with file, line and goal state --
+    to **stdout**, and reserves stderr for the terminal `error: build failed` plus package
+    warnings it emits on every invocation (`batteries: repository ... has local changes` is
+    printed by a *clean* build of the base too; it is noise, not a cause). So on a failure
+    stderr is non-empty and carries no diagnosis, and a tail of `stderr or stdout` showed the
+    noise and dropped the only part worth reading: 33057's reviewed build reported two lines
+    of warning for two runs while the real error -- `unsolved goals` in `expand_apply` -- sat
+    in the discarded stream.
+
+    Both streams, stdout first, cut from the first `error:` line so a long build log cannot
+    push the diagnosis out of the window.
+    """
+
+    lines = "\n".join(p for p in (stdout or "", stderr or "") if p.strip()).splitlines()
+    first_error = next((i for i, line in enumerate(lines) if line.lstrip().startswith("error:")), None)
+    window = lines[first_error:] if first_error is not None else lines[-LAKE_FAILURE_TAIL_LINES:]
+    return "\n".join(window[:LAKE_FAILURE_TAIL_LINES])
+
 
 #: How long a second builder waits for a reviewed build another process owns. The base
 #: build's bound is `restore_queue_timeout` (600 s), sized for a restore; a reviewed build
@@ -345,11 +372,14 @@ class BuildManager(BaseSourceManager):
             
             try:
                 await self.state_manager.complete_build(
-                    commit_hash, False, build_duration, 0, error_message, type(e).__name__
+                    commit_hash, False, build_duration, 0, error_message, build_error_type(e)
                 )
-            except Exception:
-                # State update failure cannot prevent exception propagation
-                pass
+            except Exception as state_error:
+                self.logger.error(
+                    "[%s] build failed AND the FAILED state could not be recorded (%s); the "
+                    "state stays BUILDING and the next build will take it over",
+                    commit_hash, state_error,
+                )
             
             # Rethrow original exception
             raise
@@ -410,9 +440,13 @@ class BuildManager(BaseSourceManager):
             try:
                 await self.state_manager.complete_build(
                     key, False, build_duration, 0,
-                    error_message=str(exc), error_type=type(exc).__name__)
-            except Exception:  # noqa: BLE001
-                pass
+                    error_message=str(exc), error_type=build_error_type(exc))
+            except Exception as state_error:  # noqa: BLE001
+                self.logger.error(
+                    "[%s] reviewed build failed AND the FAILED state could not be recorded "
+                    "(%s); the state stays BUILDING and the next prebuild will take it over",
+                    key, state_error,
+                )
             raise
 
     async def _execute_reviewed_build(
@@ -470,8 +504,8 @@ class BuildManager(BaseSourceManager):
             if code == -15:
                 raise TimeoutError(f"[{key}] reviewed build timed out ({self.config.build_timeout}s)")
             if code != 0:
-                tail = "\n".join((stderr or stdout or "").splitlines()[-25:])
-                raise RuntimeError(f"[{key}] lake build {' '.join(targets)} failed:\n{tail}")
+                raise RuntimeError(f"[{key}] lake build {' '.join(targets)} failed:\n"
+                                   f"{lake_failure_tail(stdout, stderr)}")
 
             await set_workspace_readonly(build_root, self.logger)
             replaced: Optional[Path] = None
@@ -650,10 +684,14 @@ class BuildManager(BaseSourceManager):
 
             try:
                 await self.state_manager.complete_build(
-                    commit_hash, False, build_duration, 0, error_message, type(e).__name__
+                    commit_hash, False, build_duration, 0, error_message, build_error_type(e)
                 )
-            except Exception:
-                pass
+            except Exception as state_error:
+                self.logger.error(
+                    "[%s] build failed AND the FAILED state could not be recorded (%s); the "
+                    "state stays BUILDING and the next build will take it over",
+                    commit_hash, state_error,
+                )
 
             raise
 
@@ -742,10 +780,14 @@ class BuildManager(BaseSourceManager):
 
             try:
                 await self.state_manager.complete_build(
-                    commit_hash, False, build_duration, 0, error_message, type(e).__name__
+                    commit_hash, False, build_duration, 0, error_message, build_error_type(e)
                 )
-            except Exception:
-                pass
+            except Exception as state_error:
+                self.logger.error(
+                    "[%s] build failed AND the FAILED state could not be recorded (%s); the "
+                    "state stays BUILDING and the next build will take it over",
+                    commit_hash, state_error,
+                )
 
             raise
 
@@ -1120,7 +1162,7 @@ class BuildManager(BaseSourceManager):
                 f"[{commit_hash}] No-build verification timed out after {timeout}s for {', '.join(normalized_targets)}"
             )
 
-        error_message = stderr or stdout or "unknown no-build verification failure"
+        error_message = lake_failure_tail(stdout, stderr) or "unknown no-build verification failure"
         raise RuntimeError(f"[{commit_hash}] No-build verification failed: {error_message}")
 
     async def _get_cache_for_workspace(
