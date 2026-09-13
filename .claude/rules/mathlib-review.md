@@ -136,3 +136,28 @@ paths:
   because they were free to be wrong. **Construct the real class in a fixture** — a dataclass or
   pydantic model is cheap to build and will refuse an argument it does not have. Reserve
   `SimpleNamespace` for things with no class to construct.
+- **"Last tool before submit" is not investigation depth — retracted 2026-09-13.** A last-action
+  analysis of `pr5_A_lead_heldout12_rep1` put 40% of empty arm submissions (33 of 82) at
+  "stopped on an as-is compile check, which proves nothing", and that number went into
+  `591961d`'s commit message as evidence of shallow specialist work. It is an accurate count of
+  *final tool calls* and a wrong diagnosis. Once `submit_candidates` recorded why an arm
+  abstained (`5699f3a`), the arms ending that way turned out to have done the work and then made
+  a closing compile call: *"Checked the module doc in `Mathlib/Data/Matrix/Mul.lean`: the updated
+  reference `.../ConjTranspose.lean` exists and its module doc indeed introduces…"*. Measured
+  directly, tool calls before an empty submission are **median 6.0** against **median 7.0 before
+  a finding** (n=95/23; the validation run repeats it at 6.0 vs 6.5, n=17/8) — an arm that
+  abstains investigates about as much as one that files, and the shallow-work premise does not
+  survive it. **A tool-call histogram cannot see deliberation; ask the agent and record the
+  answer.** The reshape in `591961d` stands on its own ground — a no-op compile returning
+  `success: true` was wrong however deep the session was, and it fixed a false promise in the
+  `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
+  the fix for a problem that was mostly not there.
+- **Control-PR emission is 0-1 per run, not 0.** Measured over every v5 run covering 33315:
+  `heldout12_rep1` 0/13 invocations, `heldout11_rep1` 1/11 (generalist), `heldout11_rep2` 1/11
+  (generalist), `medium_heldout_rep1` 0/13, `validate_abstention_rep1` 1/18 (docs). The "0 false
+  candidates per control per rep" figure is the **v4 deterministic arm's**, from the
+  deterministic-precision comparison (0 vs 2 against the generalist), and does not transfer to a
+  v5 lead run — it was mis-transferred into a commit message and into run advice on 2026-09-13.
+  A single control candidate is inside the historical range and is not evidence that a change
+  regressed precision; it takes reps, and the source says to label it `silent_pr_emission`,
+  never a false-finding rate.
