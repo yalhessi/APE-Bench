@@ -383,17 +383,41 @@ class ZulipStore:
             return self.thread(stream_id, topic, as_of, exclude_pr)
         return None
 
+    #: Which message field each `refs.kind` was extracted from. Used to re-check a reference
+    #: against the messages that survive the gate.
+    _REF_FIELD = {"decl": "decl_refs", "pr": "pr_refs", "issue": "issue_refs", "file": "file_refs"}
+
     def _threads_by_ref(
         self, kind: str, value: str, as_of: Optional[str], exclude_pr: Optional[int]
     ) -> List[ThreadView]:
+        """Threads in which a *visible* message carries this reference.
+
+        The `refs` table is built over the whole thread, so selecting on it alone answers
+        "some message here mentions X" for messages the gate is about to remove. That is an
+        existence claim about the future: asked for a declaration first named after the
+        cutoff, the store returned a thread whose visible half never mentions it. Measured on
+        the 33337 cutoff, 89 of 2,920 declaration references (3%) selected a thread that way.
+
+        The re-check runs against `view.messages` rather than in SQL so that one rule --
+        `gate`, and through it `RetrievalGate` -- decides visibility everywhere. Spelling the
+        cutoff a second time in SQL is what this store's own docstring warns against.
+        """
+
         rows = self._conn.execute(
             "SELECT DISTINCT thread_key FROM refs WHERE kind = ? AND value = ?", (kind, value)
         ).fetchall()
+        field = self._REF_FIELD.get(kind)
         views = []
         for row in rows:
             view = self._view(row["thread_key"], as_of, exclude_pr)
-            if view and view.messages:
-                views.append(view)
+            if not view or not view.messages:
+                continue
+            if field is not None and not any(
+                any(str(ref) == str(value) for ref in (getattr(message, field, None) or []))
+                for message in view.messages
+            ):
+                continue
+            views.append(view)
         views.sort(key=lambda v: v.thread.first_ts_epoch)
         return views
 
