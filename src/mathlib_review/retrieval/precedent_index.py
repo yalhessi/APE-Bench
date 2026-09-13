@@ -128,6 +128,25 @@ def row_references_pr(row: Dict[str, Any], pr_number: Optional[int]) -> bool:
     return references_pr(row.get("body"), pr_number)
 
 
+def _model_revision(model_name: str = DEFAULT_MODEL) -> str:
+    """The Hub snapshot the embedder resolves to on this machine, or `""`.
+
+    `model_name` alone does not identify an embedding: a Hugging Face ref can move, and two
+    indexes built from the same corpus under the same name would then rank differently with
+    nothing recording it. The loaded model object only reports the repo name, so the snapshot
+    is read from the Hub cache's `refs/main`, which is what `local_files_only` resolves.
+    """
+
+    import os
+
+    home = os.environ.get("HF_HOME") or os.path.expanduser("~/.cache/huggingface")
+    ref = (Path(home) / "hub" / f"models--{model_name.replace('/', '--')}" / "refs" / "main")
+    try:
+        return ref.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+
+
 def _pr_authors(numbers: Iterable[int], logger=None) -> Dict[int, Optional[str]]:
     """`pr_number -> author login`, read from the PR store's listings.
 
@@ -228,6 +247,7 @@ def build(
     authors = _pr_authors({row.get("pr_number") for row in rows if row.get("pr_number")}, logger)
     texts = [hunk_code(row.get("diff_hunk") or "") for row in rows]
     model = SentenceTransformer(model_name)
+    model_revision = _model_revision(model_name)
     embeddings = model.encode(
         texts, normalize_embeddings=True, batch_size=256,
         show_progress_bar=bool(logger),
@@ -247,6 +267,7 @@ def build(
         "index_version": INDEX_VERSION,
         "meta_version": META_VERSION,
         "model_name": model_name,
+        "model_revision": model_revision,
         "corpus_path": str(corpus_path),
         "corpus_sha256": sha256_file(corpus_path),
         "corpus_view": projection.get("view"),
@@ -328,7 +349,11 @@ class PrecedentIndex:
         if self._model is None:
             from sentence_transformers import SentenceTransformer
 
-            self._model = SentenceTransformer(self.model_name)
+            # `local_files_only`, as `ape.toolkits.retrieve` already does. Without it a query
+            # can reach the Hugging Face Hub and, if the cache were missing or `refs/main`
+            # moved, silently embed against a different snapshot than the index was built
+            # with -- a retrieval regime change with nothing in the run saying so.
+            self._model = SentenceTransformer(self.model_name, local_files_only=True)
         return self._model.encode([text], normalize_embeddings=True)[0]
 
     def eligible_mask(self, as_of: Optional[str], exclude_pr: Optional[int]):

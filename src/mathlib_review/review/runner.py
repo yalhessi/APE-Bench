@@ -246,6 +246,14 @@ def _context_index_identity() -> Dict[str, str]:
         payload = json.loads(manifest.read_text())
         identity["precedent_corpus"] = payload.get("corpus_sha256", "")
         identity["precedent_model"] = payload.get("model_name", "")
+        # The corpus sha and the model name do not move when the *recipe* does: re-embedding
+        # a different slice of each hunk, or adding a metadata field the query path filters
+        # on, changes every answer while leaving both untouched. This field exists to say a
+        # retrieval regime changed, so it has to carry the things that change it.
+        identity["precedent_index_version"] = payload.get("index_version", "")
+        identity["precedent_meta_version"] = payload.get("meta_version", "")
+        identity["precedent_model_revision"] = payload.get("model_revision", "")
+        identity["precedent_rows"] = str(payload.get("rows", ""))
     from src.datasets.zulip.config import ZulipConfig
 
     zulip = Path(ZulipConfig().sqlite_path)

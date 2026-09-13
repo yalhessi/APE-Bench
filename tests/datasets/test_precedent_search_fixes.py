@@ -218,3 +218,50 @@ def test_an_index_whose_meta_predates_the_query_path_is_refused(tmp_path, monkey
 
     with pytest.raises(StalePrecedentIndex, match="refresh-meta"):
         PrecedentIndex(d)
+
+
+# --- the run must be able to say which retrieval regime produced it ----------------------
+
+
+def test_the_run_identity_carries_what_changes_an_answer(tmp_path, monkeypatch):
+    """`_context_index_identity` exists because "rebuild the index and the same query returns
+    something else, with nothing in the run saying so". It recorded only the corpus sha and the
+    model name -- neither of which moves when the *recipe* does. Re-embedding a different slice
+    of each hunk, or adding a metadata field the query path filters on, changes every answer
+    and leaves both untouched."""
+
+    import json
+
+    import src.mathlib_review.review.runner as runner
+
+    index = tmp_path / "precedent_index"
+    index.mkdir()
+    (index / "manifest.json").write_text(json.dumps({
+        "corpus_sha256": "c" * 64, "model_name": "m", "model_revision": "r" * 40,
+        "index_version": "v5-precedent-index/9", "meta_version": "v5-precedent-meta/9",
+        "rows": 17,
+    }))
+    monkeypatch.setattr(runner, "PRECEDENT_INDEX", index)
+
+    identity = runner._context_index_identity()
+
+    assert identity["precedent_index_version"] == "v5-precedent-index/9"
+    assert identity["precedent_meta_version"] == "v5-precedent-meta/9"
+    assert identity["precedent_model_revision"] == "r" * 40
+    assert identity["precedent_rows"] == "17"
+
+
+def test_the_shipped_index_reports_a_complete_identity():
+    """A field that is silently empty records nothing. Skips where no index is built."""
+
+    import json
+
+    from src.mathlib_review.paths import PRECEDENT_INDEX
+
+    manifest = PRECEDENT_INDEX / "manifest.json"
+    if not manifest.is_file():
+        pytest.skip("no precedent index on this machine")
+    payload = json.loads(manifest.read_text())
+    for key in ("corpus_sha256", "model_name", "model_revision", "index_version",
+                "meta_version", "rows"):
+        assert payload.get(key), f"{key} is missing from the index manifest"
