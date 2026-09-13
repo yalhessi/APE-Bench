@@ -112,3 +112,17 @@ paths:
   up the name the PR introduced. It now also searches the PR's changed files in the reviewed
   overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays
   `base_snapshot` because the gate vocabulary is closed (`test_retrieval_gate.py`).
+- **Tool output lives in `result_content`; a transcript's `tool_result.content` is always `null`.**
+  `ape.llm_clients.models:55` stores the unified string form in `result_content` and never
+  populates `content` for a `tool_result` block. Hand-parsing `content` therefore yields the
+  literal string `"null"` for every tool result, which matches no pattern and lands every session
+  in whatever bucket the classifier uses last — a 100%-in-one-class result that looks like a
+  finding. This cost three retracted analyses in one sitting (100% "judgement stop", then all
+  "unclear", then 100% "had usable content"). **A uniform 100% partition is the symptom; check the
+  field before believing it.** `src/mathlib_review/analysis/trajectory.py:226` already reads it
+  correctly — use `cli trajectory`, or copy its accessor, rather than re-parsing JSONL by hand.
+  Two more shapes that bit the same analysis: the per-turn files under an attempt's
+  `conversations/` are **cumulative** (read only the last one, or every call is counted N times),
+  and `_attribute_errors` (`review/base.py:392`) **keeps `errors` intact** and *adds*
+  `errors_introduced_by_your_edit` / `errors_already_in_the_file` — so a non-empty `errors` does
+  not mean the agent's edit failed, only the split field does.
