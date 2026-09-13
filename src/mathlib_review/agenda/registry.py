@@ -155,8 +155,9 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
 
     # --- the classes v4 had no arm for -------------------------------------------------
     _arm("naming", "naming", "naming_convention_violation",
-         "Is this declaration named the way its own family is named? Settled by reading the "
-         "siblings and past rename requests, not by taste.",
+         "Is this declaration named the way this repository names declarations about the same "
+         "subject? Settled by a counted population over the base snapshot (`naming_norm`) and "
+         "past rename requests, not by the neighbouring file and not by taste.",
          # Both: what the siblings are called, and what maintainers call them. This row used
          # to add "the code corpus argues against the maintainer on both naming asks this
          # release scores". Retracted 2026-09-13: that rested on a flat count over two

@@ -126,8 +126,10 @@ class ContextSlice:
         for skeleton in self.skeletons:
             out.append(skeleton.render())
         if self.conventions:
-            out.append("**Conventions this change touches** — settle these against review "
-                       "history, not against how common a spelling is today:")
+            out.append("**Conventions this change touches** — settle these against evidence "
+                       "you can cite: the counted population for the declaration's subject, "
+                       "a maintainer precedent, or a discussion. Not against taste, and not "
+                       "against the handful of lemmas that happen to sit beside it:")
             out.extend(item.render() for item in self.conventions)
         if self.exposure:
             out.append("**Referenced elsewhere in the library** (how much depends on this):")
@@ -246,10 +248,16 @@ def build_slices(
         names = [subjects_by_change.get(c, "") for c in mine]
         conventions = tuple(convention_questions(
             [c for c in components if mine & set(c.change_ids)], names))
+        # Sorted by reach and then by name, because `mine` is a set: keying on reach alone
+        # leaves ties in set-iteration order, which Python randomises per process. Two
+        # declarations at equal reach were enough to give one work unit on the held-out set
+        # two different rendered prompts, and so `agenda_sha256` two values across processes
+        # -- a sealed plan that does not reproduce, and a legitimate resume refused as a
+        # semantic change about one time in three.
         exposure = tuple(sorted(
             ((subjects_by_change.get(c, c), exposure_by_change[c])
              for c in mine if c in exposure_by_change),
-            key=lambda item: -item[1]))
+            key=lambda item: (-item[1], item[0])))
         slices[invocation_id] = ContextSlice(
             invocation_id=invocation_id, families=families, skeletons=skeletons,
             conventions=conventions, exposure=exposure)
