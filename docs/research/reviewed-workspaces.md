@@ -239,5 +239,58 @@ shared state beyond the one-time BUILT→READY flip.
   re-render orphans a set. 34 GB today.
 - Eleven of the 12 are BUILT not READY; the first attempt on each flips the state (3 ms write
   to shared `.state`). The 33337 artifact test does the same for that key.
-- smoke4's four PRs (33057, 33066, 33098, 33438) have no reviewed workspace; a smoke4 run
-  today warns and verifies against base `.olean`s.
+- smoke4: 33066, 33098 and 33438 built 2026-09-13; **33057 cannot be built** (below), so a
+  smoke4 run still warns and verifies that one against base `.olean`s, and
+  `require_reviewed_workspaces` must stay off for the set.
+
+
+## An episode whose reviewed state does not compile
+
+*2026-09-13, found prebuilding smoke4.* The corpus premise — "a real Mathlib PR that already
+compiles" — is about the **merged** state. An episode is cut at a review round, and a maintainer
+reviewing a red PR is reviewing exactly the state `prebuild --reviewed` tries to build. So a
+reviewed build can fail for a reason that is not a defect and that no rebuild will clear.
+
+**33057 is one.** Its round-1 head `d5908adf` is the PR's first commit; `mattrobball` answered it
+nine minutes later with *"Thanks! Delegating so you can fix the last error. bors d+"* — which is
+the episode's single gold obligation, and the one the smoke4 config already marks
+`not_evaluable` ("a CI verdict with no site claim"). Measured, not inferred: the round-1 patched
+`Mathlib/RingTheory/PowerSeries/Expand.lean` compiled against the base gives exactly one error,
+
+```
+Expand.lean:35:78: error: unsolved goals
+⊢ (MvPowerSeries.substAlgHom ⋯) f = MvPowerSeries.subst (fun x => MvPowerSeries.X () ^ p) f
+```
+
+in `expand_apply`. The merged version of that file differs from the reviewed one in **one token**
+— `simp only [expand, MvPowerSeries.expand, subst, X]` → `simp [...]` — and compiles clean (exit
+0). Every other lemma the round-1 proofs name (`MvPowerSeries.map_expand`, `expand_mul_eq_comp`,
+`coeff_expand_smul`, …) exists at the base. The PR's later commits restructure `MvPolynomial`,
+which is a different episode's worth of change and not what was reviewed.
+
+**Diagnosing one cheaply.** On a PR that changes **one** file, the base workspace's build products
+are already the right environment — nothing else changed — so the reviewed workspace is not needed
+to reproduce the error:
+
+```
+cd data/code_execute/repos/mathlib4/workspaces/<base sha>
+lake env lean /path/to/patched/<changed file>.lean      # ~1 min, vs ~8 for a reviewed build
+```
+
+Do this before treating a reviewed build failure as a tooling bug. (On a multi-file PR it is only
+valid for a changed file none of the other changed files is on the import path of.)
+
+`batteries: repository ... has local changes` on stderr is **noise**: a clean compile against an
+untouched base prints it too, exit 0. It looked like the cause only because the failure message
+dropped stdout — fixed in `60fa897`, along with the state write that made every retry lose the
+reason (`type(exc).__name__` into a field typed `ErrorType`; state stayed BUILDING with a dead
+pid, and the next prebuild "took over" and paid for the same 8-minute failure again).
+
+**Open, and the owner's call:** what the pipeline should do with such an episode. Today nothing
+records "cannot be built", so `prebuild --reviewed` re-attempts 33057 on every invocation and
+`require_reviewed_workspaces: true` would refuse the whole set. Untried: a per-episode
+`reviewed_state_compiles: false` in the release; a FAILED-state check in `plan_reviewed_builds`
+that reports the episode as terminal rather than `to build`; or accepting the base-overlay
+fallback for these episodes and saying so in the environment note. Note the inversion the
+fallback creates here — the note tells the agent a compile failure is "not evidence the PR fails
+to build" on the one PR in the set where it *is* the gold finding.

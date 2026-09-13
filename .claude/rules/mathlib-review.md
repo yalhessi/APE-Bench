@@ -67,6 +67,18 @@ paths:
   Still true: never suppress a compile claim in a prompt — a compile claim on a PR that builds is a
   tool defect until proven otherwise, and now the first question is whether the run verified against
   a reviewed workspace (`plan` says).
+- **A reviewed state that does not compile has no reviewed workspace, and never will.** The corpus
+  premise "the PR compiles" is about the *merged* state; an episode is cut at a review round, and a
+  maintainer who reviews a red PR is reviewing exactly the state `prebuild --reviewed` tries to
+  build. 33057 round1 is one: the gold obligation *is* "Delegating so you can fix the last error",
+  and the reviewed file has one `unsolved goals` at `expand_apply` — the merged version differs in
+  one token (`simp only` → `simp`). `prebuild` will fail on such an episode on every invocation and
+  `require_reviewed_workspaces: true` refuses any run containing it. Before treating a reviewed
+  build failure as a tooling bug, compile the patched changed file against the base and read the
+  error: on a **one-file** PR the base `.olean`s are the right environment, so `lake env lean
+  <patched file>` with cwd = the base workspace answers in ~1 min instead of ~8. Note the inversion
+  such an episode creates: the overlay fallback tells the agent "not evidence the PR fails to
+  build", while the gold finding *is* a build failure.
 - **The naming arm is calibrated to the *local family*, by its prompt, and the maintainer often is not.**
   On 33337 the local siblings at base all used the `_coe_` style; the maintainer asked for the
   repo-wide emerging `toLinearMap_` prefix (24 files elsewhere, 0 in the PR's files, 0 precedent
