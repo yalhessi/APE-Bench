@@ -18,11 +18,12 @@ is not reproducible from the generalized path.
 
 from __future__ import annotations
 
+import json
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
 from ape.toolkits.file_system.utils import walk_workspace_files
@@ -356,6 +357,79 @@ class RenameProposal:
             f"review-base population has {self.support}/{self.members} direct-subject "
             f"declarations with an `{self.conventional_prefix}_` leaf prefix and {conflicts}."
         )
+
+
+#: Where a scanned snapshot's norms are kept, beside the workspaces they were read from.
+#: One file per base commit; the scan is deterministic given the snapshot, so the sha is the
+#: whole key and a stale entry is impossible without the snapshot changing.
+NORM_CACHE_DIR = Path("data/code_execute/norms")
+
+NORM_INDEX_VERSION = "naming-norm-index/1"
+
+
+def norm_index(
+    workspace: Path,
+    snapshot_sha: str,
+    cache_dir: Optional[Path] = None,
+    *,
+    build_if_missing: bool = True,
+) -> Optional[Dict[str, Any]]:
+    """The snapshot's prefix norms, cached on disk: `{subject: {prefix: count}}` + notation.
+
+    `scan_population` costs ~35 s over Mathlib's 7,400 modules, which is fine once per snapshot
+    and not fine once per arm invocation. This persists the part a naming question needs --
+    the per-subject prefix counts and the notation map -- and deliberately not
+    `all_fullnames`, which is 214k strings and is only wanted by the collision check that runs
+    in the executor, where the full scan is already in hand.
+
+    Returns None when the snapshot is not on this machine, so a caller can degrade to asking
+    the question without the counts rather than failing.
+    """
+
+    root = Path(cache_dir) if cache_dir is not None else NORM_CACHE_DIR
+    path = root / f"{snapshot_sha}.json"
+    if path.is_file():
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if payload.get("version") == NORM_INDEX_VERSION:
+                return payload
+        except (OSError, ValueError):
+            pass
+    if not build_if_missing or not (Path(workspace) / "Mathlib").is_dir():
+        # `build_if_missing=False` is for callers that must stay cheap -- a dry run should
+        # read a norm that is already there and otherwise ask its question without counts,
+        # not spend 36s per snapshot to build one.
+        return None
+    scan = scan_population(Path(workspace), snapshot_sha)
+    payload = {
+        "version": NORM_INDEX_VERSION,
+        "snapshot_sha": snapshot_sha,
+        "parsed_files": scan.parsed_files,
+        "representative": scan.is_representative(),
+        "notation": dict(scan.notation),
+        "subjects": {
+            token: dict(population.prefix_counts)
+            for token, population in scan.by_subject.items()
+        },
+    }
+    try:
+        root.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+    except OSError:
+        pass                      # a cache that cannot be written is still a usable answer
+    return payload
+
+
+def norm_for(index: Optional[Dict[str, Any]], subject_token: Optional[str]) -> Optional[SubjectPopulation]:
+    """The population for one subject, rebuilt from a cached index."""
+
+    if not index or not subject_token:
+        return None
+    counts = (index.get("subjects") or {}).get(subject_token)
+    if not counts:
+        return None
+    prefix_counts = Counter({str(k): int(v) for k, v in counts.items()})
+    return SubjectPopulation(subject_token, prefix_counts, sum(prefix_counts.values()))
 
 
 def propose_rename(
