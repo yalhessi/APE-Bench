@@ -55,13 +55,18 @@ paths:
   `Unknown constant` when any other file is verified; the tool's note then asserted the file does not
   compile (13% of arm sessions on the held-out run; 16 `broken_build` findings on PRs that build).
   Fixed 2026-09-12: `workspaces/<base>+<fp>` = base + diff + changed modules rebuilt
-  (`BuildManager.build_reviewed_workspace`; 4–12 min each on this NFS depending on cache, the
-  `.lake/build` copy is the cost — hardlinks fail because Lean truncates `.ilean` in place). Build with
+  (`BuildManager.build_reviewed_workspace`; 2.4–16.6 min each on this NFS, driven by the import-path
+  length between changed modules, not file count; the 2.8 GB `.lake/build` copy is the cost —
+  hardlinks fail because Lean truncates `.ilean` in place). Build with
   `prebuild --reviewed --config <run cfg> --execute`; `plan` reports how many episodes lack one;
-  `dataset.require_reviewed_workspaces: true` makes `run` refuse; the task falls back to the overlay
-  at WARNING otherwise. Still true: never suppress a compile claim in a prompt — a compile claim on
-  a PR that builds is a tool defect until proven otherwise, and now the first question is whether
-  the run verified against a reviewed workspace (`plan` says).
+  `dataset.require_reviewed_workspaces: true` makes `run` refuse (on for the held-out configs, off in
+  the base because smoke4 is unbuilt); the task falls back to the overlay at WARNING otherwise. Scope:
+  only a *changed* file has a fully rebuilt import closure — dependents off the path between changed
+  modules keep merge-base `.olean`s, and `lake env lean` never checks traces. Prebuild from one host
+  and one shell (pid liveness is host-local). Full account: `docs/research/reviewed-workspaces.md`.
+  Still true: never suppress a compile claim in a prompt — a compile claim on a PR that builds is a
+  tool defect until proven otherwise, and now the first question is whether the run verified against
+  a reviewed workspace (`plan` says).
 - **The naming arm is calibrated to the *local family*, by its prompt, and the maintainer often is not.**
   On 33337 the local siblings at base all used the `_coe_` style; the maintainer asked for the
   repo-wide emerging `toLinearMap_` prefix (24 files elsewhere, 0 in the PR's files, 0 precedent

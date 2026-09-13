@@ -48,8 +48,13 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   modules rebuilt by a targeted `lake build` in a real copy of `.lake/build` (hardlinks are not an
   option: Lean truncates `.ilean` in place; NFSv3 has no reflink; measured 585 s copy + 67 s build on
   33337). `prebuild --reviewed` makes them, `plan` reports which episodes lack one,
-  `require_reviewed_workspaces` refuses a run without them. Not yet built for any set but 33337;
-  the 12-PR held-out rerun on reviewed workspaces is the check that the 16 compile claims vanish.
+  `require_reviewed_workspaces` refuses a run without them. Built for all 12 held-out PRs on
+  2026-09-12 (144–997 s each, 74.9 min sequential, 34 GB; the driver is import-path length, not
+  file count) and required by both held-out configs; smoke4's four PRs are not built. On 33337 the
+  `Unknown constant` transcripts went 19–68 per rep → 0 (reps 11–12), phantom `broken_build` 2 → 0,
+  recall unmoved. Design, scope and the hardening that followed a verification pass:
+  `docs/research/reviewed-workspaces.md`. The held-out rerun is still the check that the 16
+  compile claims vanish across the set.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
