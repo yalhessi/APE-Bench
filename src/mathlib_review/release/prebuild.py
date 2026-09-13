@@ -239,15 +239,62 @@ def _main_base(args: argparse.Namespace, overrides: Dict[str, Any]) -> int:
     return 0
 
 
+def _main_norms(args: argparse.Namespace, overrides: Dict[str, Any]) -> int:
+    """Warm the naming-norm index for every base commit this run's episodes sit on.
+
+    `scan_population` walks ~7,400 Mathlib modules and costs about 35 s. Cached per base
+    commit, that is fine once; paid inside an attempt it is not, and it is paid unevenly --
+    the first rep of a condition would carry the scans that later reps read from disk, which
+    is a difference between reps that is not the treatment. Warming costs no model money.
+    """
+
+    from src.mathlib_review.evidence.operators.naming_norm import NORM_CACHE_DIR, norm_index
+
+    logger = create_logger()
+    episodes, _scaffold = _selected_episodes(args.config, overrides)
+    shas = sorted({episode.base_sha for episode in episodes})
+    warm = [sha for sha in shas if (NORM_CACHE_DIR / f"{sha}.json").is_file()]
+    print(f"naming-norm index for {len(shas)} base commit(s): {len(warm)} warm, "
+          f"{len(shas) - len(warm)} to scan")
+    if not args.execute:
+        print("Nothing scanned. Re-run with --execute to warm the rest "
+              "(about 35 s each; spends no model money).")
+        return 0
+
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+
+    workspaces = LeanVerifyToolConfig().get_workspace_dir("mathlib4")
+    built = missing = 0
+    for sha in shas:
+        if (NORM_CACHE_DIR / f"{sha}.json").is_file():
+            continue
+        payload = norm_index(workspaces / sha, sha)
+        if payload is None:
+            missing += 1
+            logger.warning("no base workspace for %s; its arms will ask the naming question "
+                           "without counts", sha)
+            continue
+        built += 1
+        logger.info("naming-norm index for %s: %d subjects, %d files parsed, representative=%s",
+                    sha, len(payload.get("subjects") or {}), payload.get("parsed_files"),
+                    payload.get("representative"))
+    print(f"scanned {built}; {missing} base workspace(s) absent")
+    return 1 if missing else 0
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Prebuild the Lean workspaces a run verifies in: base (default) or --reviewed")
+        description="Prepare what a run reads before it starts: base workspaces (default), "
+                    "--reviewed workspaces, or the --norms index")
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--reviewed", action="store_true",
                         help="plan (and with --execute, build) the per-episode reviewed "
                              "workspaces -- base + diff + changed modules rebuilt")
+    parser.add_argument("--norms", action="store_true",
+                        help="warm the naming-norm index for this run's base commits, so the "
+                             "~35s scan is not paid inside an attempt (and unevenly across reps)")
     parser.add_argument("--execute", action="store_true",
-                        help="with --reviewed: actually build; without it, only report")
+                        help="with --reviewed or --norms: actually do it; else only report")
     parser.add_argument("--force-rebuild", action="store_true",
                         help="with --reviewed --execute: rebuild ones that are already ready")
     parser.add_argument("--out", type=Path,
@@ -255,6 +302,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--num-processes", type=int, default=2)
     args, rest = parser.parse_known_args(argv)
     overrides = parse_cli_args(rest)
+    if args.norms:
+        return _main_norms(args, overrides)
     if args.reviewed:
         return _main_reviewed(args, overrides)
     return _main_base(args, overrides)

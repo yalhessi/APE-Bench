@@ -413,8 +413,13 @@ def norm_index(
         },
     }
     try:
-        root.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+        # Atomically, because three of the held-out PRs share one base commit: two arms
+        # scanning it at once would otherwise interleave into a half-written file, and the
+        # next reader's `json.loads` would fail, silently buying another 35 s scan -- per
+        # reader, for as long as the partial file survived.
+        from src.datasets.pull_requests.store import write_atomically
+
+        write_atomically(path, json.dumps(payload, sort_keys=True).encode("utf-8"))
     except OSError:
         pass                      # a cache that cannot be written is still a usable answer
     return payload

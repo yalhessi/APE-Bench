@@ -215,3 +215,94 @@ def test_the_toolchain_is_checked_before_a_manager_exists(monkeypatch):
     with pytest.raises(preflight.PreflightError, match="no lake"):
         prebuild.main(["--reviewed", "--execute",
                        "--config", "configs/pr_review_v5_medium_heldout.yaml"])
+
+
+# --- the naming-norm index is warmed before the run, not inside it -----------------------
+
+
+def test_norms_reports_without_scanning_unless_execute(monkeypatch, capsys, tmp_path):
+    """`scan_population` walks ~7,400 modules and costs ~35 s. Paid inside an attempt it is
+    also paid UNEVENLY: the first rep of a condition carries the scans later reps read off
+    disk, which is a difference between reps that is not the treatment."""
+
+    from src.mathlib_review.evidence.operators import naming_norm
+
+    monkeypatch.setattr(prebuild, "_selected_episodes",
+                        lambda config, overrides: ([_episode(1, SHA_A), _episode(2, SHA_B)], None))
+    monkeypatch.setattr(naming_norm, "NORM_CACHE_DIR", tmp_path)
+    (tmp_path / f"{SHA_A}.json").write_text("{}")
+
+    def no_scan(*a, **k):
+        raise AssertionError("nothing may be scanned without --execute")
+
+    monkeypatch.setattr(naming_norm, "norm_index", no_scan)
+    prebuild.main(["--norms", "--config", "configs/pr_review_v5_medium_heldout.yaml"])
+
+    out = capsys.readouterr().out
+    assert "1 warm" in out and "1 to scan" in out and "--execute" in out
+
+
+def test_norms_scans_only_what_is_cold(monkeypatch, capsys, tmp_path):
+    from src.mathlib_review.evidence.operators import naming_norm
+
+    monkeypatch.setattr(prebuild, "_selected_episodes",
+                        lambda config, overrides: ([_episode(1, SHA_A), _episode(2, SHA_B)], None))
+    monkeypatch.setattr(naming_norm, "NORM_CACHE_DIR", tmp_path)
+    (tmp_path / f"{SHA_A}.json").write_text("{}")
+    scanned = []
+
+    def fake_index(workspace, sha, *a, **k):
+        scanned.append(sha)
+        return {"subjects": {"x": {}}, "parsed_files": 7400, "representative": True}
+
+    monkeypatch.setattr(naming_norm, "norm_index", fake_index)
+    code = prebuild.main(["--norms", "--execute",
+                          "--config", "configs/pr_review_v5_medium_heldout.yaml"])
+
+    assert scanned == [SHA_B], "the warm commit must not be rescanned"
+    assert code == 0 and "scanned 1" in capsys.readouterr().out
+
+
+def test_a_missing_base_workspace_is_reported_not_silently_skipped(monkeypatch, capsys, tmp_path):
+    """None means the snapshot is not on this machine; its arms then ask the naming question
+    without counts, which is a degradation the operator should hear about before the run."""
+
+    from src.mathlib_review.evidence.operators import naming_norm
+
+    monkeypatch.setattr(prebuild, "_selected_episodes",
+                        lambda config, overrides: ([_episode(1, SHA_A)], None))
+    monkeypatch.setattr(naming_norm, "NORM_CACHE_DIR", tmp_path)
+    monkeypatch.setattr(naming_norm, "norm_index", lambda *a, **k: None)
+
+    code = prebuild.main(["--norms", "--execute",
+                          "--config", "configs/pr_review_v5_medium_heldout.yaml"])
+
+    assert code == 1 and "1 base workspace(s) absent" in capsys.readouterr().out
+
+
+def test_the_norm_cache_is_written_atomically(tmp_path, monkeypatch):
+    """Three held-out PRs share one base commit, so two arms can scan it at once. A
+    half-written file makes the next reader's json.loads fail and buy another 35 s scan."""
+
+    import json
+
+    from src.mathlib_review.evidence.operators import naming_norm
+
+    seen = {}
+
+    def fake_scan(workspace, sha):
+        from types import SimpleNamespace
+        return SimpleNamespace(parsed_files=10, is_representative=lambda: True,
+                               notation={}, by_subject={})
+
+    monkeypatch.setattr(naming_norm, "scan_population", fake_scan)
+    monkeypatch.setattr(naming_norm.Path, "is_dir", lambda self: True)
+    import src.datasets.pull_requests.store as store
+    real = store.write_atomically
+    monkeypatch.setattr(store, "write_atomically",
+                        lambda path, content: (seen.update(path=path), real(path, content))[1])
+
+    naming_norm.norm_index(tmp_path, "abc", tmp_path)
+
+    assert seen.get("path") == tmp_path / "abc.json", "the cache must go through the atomic write"
+    assert json.loads((tmp_path / "abc.json").read_text())["snapshot_sha"] == "abc"
