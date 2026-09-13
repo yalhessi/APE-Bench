@@ -33,12 +33,18 @@ import re
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX, assert_repo_root
 
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 INDEX_VERSION = "v5-precedent-index/1"
+
+#: The shape of `meta.jsonl`. Bumped when a field is added that the query path relies on, so an
+#: index whose meta predates it is refused loudly instead of quietly behaving differently -- the
+#: same contract `corpus_sha256` already has. `data/` is gitignored, so every machine builds its
+#: own index and this is the only thing that can tell an operator to refresh it.
+META_VERSION = "v5-precedent-meta/2"
 
 #: How much of the anchored hunk is kept for display. The full hunk can be hundreds of
 #: lines (a new file arrives as one hunk), and an arm shown a 400-line block has been handed
@@ -107,7 +113,51 @@ def references_pr(text: Optional[str], pr_number: Optional[int]) -> bool:
     return any(found == target for found in _PR_REFERENCE.findall(text))
 
 
-def meta_row(row: dict) -> dict:
+def row_references_pr(row: Dict[str, Any], pr_number: Optional[int]) -> bool:
+    """Whether an index row discusses `pr_number`.
+
+    Prefers `pr_refs`, parsed at index time from the comment's whole body; falls back to the
+    stored body, which is truncated for display and so can miss a late reference.
+    """
+
+    if pr_number is None:
+        return False
+    refs = row.get("pr_refs")
+    if refs is not None:
+        return int(pr_number) in {int(ref) for ref in refs}
+    return references_pr(row.get("body"), pr_number)
+
+
+def _pr_authors(numbers: Iterable[int], logger=None) -> Dict[int, Optional[str]]:
+    """`pr_number -> author login`, read from the PR store's listings.
+
+    Roster-independent on purpose. Whether a commenter is the PR's own author is a fact about
+    who opened the PR, fixed at the moment it was opened; whether they are a *reviewer* is a
+    roster question whose answer has moved since (the shipped reviewer projection classifies
+    against a 2026 roster, which would date a 2024 comment by a 2026 fact). Only the first is
+    used here.
+    """
+
+    from src.datasets.pull_requests.store import PullRequestStore
+
+    store = PullRequestStore()
+    authors: Dict[int, Optional[str]] = {}
+    for number in sorted({int(n) for n in numbers}):
+        try:
+            listing = store.read(number, "listing")
+        except Exception:  # noqa: BLE001 -- a PR absent from the store is simply unknown
+            authors[number] = None
+            continue
+        authors[number] = ((listing or {}).get("user") or {}).get("login")
+    missing = [n for n, a in authors.items() if not a]
+    if missing and logger:
+        logger.warning("precedent meta: no author for %d of %d PRs (e.g. %s); their comments "
+                       "cannot be identified as author replies",
+                       len(missing), len(authors), missing[:5])
+    return authors
+
+
+def meta_row(row: dict, authors: Optional[Dict[int, Optional[str]]] = None) -> dict:
     """The per-comment record the index keeps beside its embedding.
 
     `original_position`, `original_line`, `side` and `subject_type` are carried through so a
@@ -130,6 +180,18 @@ def meta_row(row: dict) -> dict:
         "html_url": row.get("html_url"),
         "body": (row.get("body") or "")[:DISPLAY_BODY_CHARS],
         "diff_hunk": (row.get("diff_hunk") or "")[:DISPLAY_HUNK_CHARS],
+        # Whether this comment is the PR author replying on their own PR. The corpus keeps
+        # comments by GitHub `author_association`, which an author carries on their own PR, so
+        # 37% of rows are "Done." / "My bad, thanks." rather than review. `definitions.py`
+        # already says a reviewer is "not the PR author"; the retrieval corpus never
+        # implemented it, and this is where that is repaired.
+        "commenter_is_pr_author": bool(
+            authors and row.get("commenter")
+            and row.get("commenter") == authors.get(int(row.get("pr_number") or 0))
+        ),
+        # Parsed from the FULL body, not the truncated copy above, so a reference past the
+        # display cap is still caught.
+        "pr_refs": sorted({int(found) for found in _PR_REFERENCE.findall(row.get("body") or "")}),
     }
 
 
@@ -163,6 +225,7 @@ def build(
         logger.info("precedent index: %d rows (%d eval-PR rows excluded)",
                     len(rows), len(excluded))
 
+    authors = _pr_authors({row.get("pr_number") for row in rows if row.get("pr_number")}, logger)
     texts = [hunk_code(row.get("diff_hunk") or "") for row in rows]
     model = SentenceTransformer(model_name)
     embeddings = model.encode(
@@ -174,7 +237,7 @@ def build(
     np.save(out_dir / "embeddings.npy", embeddings)
     with (out_dir / "meta.jsonl").open("w", encoding="utf-8") as handle:
         for row in rows:
-            handle.write(json.dumps(meta_row(row), ensure_ascii=False) + "\n")
+            handle.write(json.dumps(meta_row(row, authors), ensure_ascii=False) + "\n")
     # When the corpus is a projection of the PR store, record which view of it was indexed, so a
     # run plan that seals this manifest says whose comments it could retrieve.
     projection_manifest = corpus_path.parent / "manifest.json"
@@ -182,6 +245,7 @@ def build(
                   else {})
     manifest = {
         "index_version": INDEX_VERSION,
+        "meta_version": META_VERSION,
         "model_name": model_name,
         "corpus_path": str(corpus_path),
         "corpus_sha256": sha256_file(corpus_path),
@@ -230,6 +294,16 @@ class PrecedentIndex:
                     f"{str(self.corpus_sha256)[:12]}; the corpus is now {current[:12]}. Rebuild it "
                     "(`./ape/bin/python -m src.mathlib_review.retrieval.precedent_index build`) "
                     "rather than search a corpus that no longer exists.")
+        # Checked after the corpus, deliberately: if the corpus moved, refreshing the metadata
+        # cannot help and `refresh_meta` refuses it, so "rebuild" is the instruction that
+        # applies. Only once the corpus still matches is a stale meta the actionable fault.
+        if self.manifest.get("meta_version") != META_VERSION:
+            raise StalePrecedentIndex(
+                f"the index at {directory} carries meta "
+                f"{self.manifest.get('meta_version') or '(none)'}, but the query path needs "
+                f"{META_VERSION}: without it a precedent cannot be told from the PR author's "
+                f"own reply. Refresh it (no re-embedding) with "
+                f"`python -m src.mathlib_review.retrieval.precedent_index refresh-meta`.")
         self.model_name = self.manifest.get("model_name", DEFAULT_MODEL)
         self._np = np
         self.embeddings = np.load(directory / "embeddings.npy", mmap_mode="r")
@@ -312,7 +386,14 @@ class PrecedentIndex:
         seen_hunks: set = set()
         for index in ranked:
             row = self.meta[int(index)]
-            if references_pr(row.get("body"), exclude_pr):
+            if row.get("commenter_is_pr_author"):
+                # The PR's own author replying on their own PR. `definitions.py` has said
+                # since it was written that a reviewer is "not the PR author"; the retrieval
+                # corpus kept them because GitHub reports an author's own association as
+                # COLLABORATOR. 37% of the index and 46% of everything ever delivered to an
+                # arm was this -- "Done.", "My bad, thanks." -- shown as review.
+                continue
+            if row_references_pr(row, exclude_pr):
                 # A comment that names the PR under review is discussion *of* it, whoever
                 # wrote it and whenever. `eligible_mask` cannot see this: it excludes by the
                 # row's own `pr_number`, so a pre-cutoff comment on a different PR that
@@ -332,11 +413,70 @@ class PrecedentIndex:
         return hits
 
 
+def refresh_meta(out_dir: Path = PRECEDENT_INDEX, logger=None) -> Path:
+    """Recompute `meta.jsonl` from the corpus without re-embedding anything.
+
+    The embeddings are a function of the hunk text alone, so a field added to the *metadata*
+    needs no model run -- but it does need the rows to stay in the order the embedding matrix
+    was written in, because a query maps a row index straight into `self.meta`.
+
+    That alignment is proved, not assumed: the recomputed `comment_id` sequence is compared
+    against the existing `meta.jsonl`, which `build` wrote in the same loop as the matrix. If
+    the corpus has changed under the index, or the eval-PR exclusion now removes a different
+    set, the sequences differ and this refuses rather than silently shifting every row's
+    metadata by one.
+    """
+
+    from src.mathlib_review.io import sha256_file
+    from src.datasets.pull_requests.definitions import scored_pr_numbers
+
+    manifest_path = out_dir / "manifest.json"
+    meta_path = out_dir / "meta.jsonl"
+    if not manifest_path.is_file() or not meta_path.is_file():
+        raise PrecedentIndexMissing(f"no precedent index at {out_dir}; build it first")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    corpus_path = Path(manifest["corpus_path"])
+    if not corpus_path.is_file():
+        raise StalePrecedentIndex(f"the indexed corpus {corpus_path} is gone; rebuild the index")
+    current = sha256_file(corpus_path)
+    if current != manifest.get("corpus_sha256"):
+        raise StalePrecedentIndex(
+            f"{corpus_path} has changed since the index was built "
+            f"({str(manifest.get('corpus_sha256'))[:12]} -> {current[:12]}); rebuild, do not refresh")
+
+    rows = _load_corpus(corpus_path)
+    excluded = set(scored_pr_numbers())
+    rows = [row for row in rows if row.get("pr_number") not in excluded]
+    existing = _load_corpus(meta_path)
+    recomputed_ids = [str(row.get("comment_id")) for row in rows]
+    existing_ids = [str(row.get("comment_id")) for row in existing]
+    if recomputed_ids != existing_ids:
+        raise StalePrecedentIndex(
+            f"the corpus no longer reproduces the indexed row order "
+            f"({len(recomputed_ids)} rows against {len(existing_ids)}); the embedding matrix "
+            f"cannot be reused, so rebuild the index instead of refreshing its metadata")
+
+    authors = _pr_authors({row.get("pr_number") for row in rows if row.get("pr_number")}, logger)
+    tmp = meta_path.with_suffix(".jsonl.refreshing")
+    with tmp.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(meta_row(row, authors), ensure_ascii=False) + "\n")
+    tmp.replace(meta_path)
+    manifest["meta_version"] = META_VERSION
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if logger:
+        by_author = sum(1 for row in rows
+                        if row.get("commenter") == authors.get(int(row.get("pr_number") or 0)))
+        logger.info("precedent meta refreshed: %d rows, %d (%.0f%%) are the PR author's own "
+                    "replies", len(rows), by_author, 100.0 * by_author / max(len(rows), 1))
+    return meta_path
+
+
 def main() -> None:
     from ape.utils.logging import create_logger
 
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("command", choices=["build", "stats"])
+    parser.add_argument("command", choices=["build", "refresh-meta", "stats"])
     parser.add_argument("--corpus", type=Path, default=PRECEDENT_CORPUS)
     parser.add_argument("--out", type=Path, default=PRECEDENT_INDEX)
     parser.add_argument("--model", default=DEFAULT_MODEL)
@@ -344,6 +484,8 @@ def main() -> None:
     assert_repo_root()
     if args.command == "build":
         print(build(args.corpus, args.out, args.model, logger=create_logger()))
+    elif args.command == "refresh-meta":
+        print(refresh_meta(args.out, logger=create_logger()))
     else:
         index = PrecedentIndex(args.out)
         print(json.dumps(index.manifest, indent=2))

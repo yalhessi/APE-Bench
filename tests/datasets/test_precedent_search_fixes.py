@@ -28,7 +28,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from src.mathlib_review.retrieval.precedent_index import PrecedentIndex, references_pr
+from src.mathlib_review.retrieval.precedent_index import (
+    META_VERSION, PrecedentIndex, StalePrecedentIndex, references_pr, refresh_meta,
+    row_references_pr,
+)
 
 
 @pytest.mark.parametrize("text,pr,expected", [
@@ -110,3 +113,108 @@ def test_the_cutoff_still_runs_before_ranking(monkeypatch):
     hits = index.search("q", k=5, as_of=epoch_to_iso(5_000), exclude_pr=None)
 
     assert [h["comment_id"] for h in hits] == [2]
+
+
+# --- the data step: metadata the query path needs ---------------------------------------
+
+
+def test_an_author_reply_is_not_a_precedent(monkeypatch):
+    """37% of the index and 46% of everything ever delivered to an arm was the PR's own author
+    replying on their own PR. `definitions.py` has always said a reviewer is "not the PR
+    author"; the retrieval corpus kept them because GitHub reports an author's own association
+    as COLLABORATOR."""
+
+    rows = [_row(1, 100, "HUNK A", body="Done."), _row(2, 101, "HUNK B", body="wrong name here")]
+    rows[0]["commenter_is_pr_author"] = True
+    rows[1]["commenter_is_pr_author"] = False
+    index = _index(monkeypatch, rows, [[1.0, 0.0], [0.9, 0.4]])
+
+    assert [h["comment_id"] for h in index.search("q", k=5, as_of=None, exclude_pr=None)] == [2]
+
+
+def test_pr_refs_is_preferred_over_the_truncated_body():
+    """The stored body is cut for display, so a reference past the cap is invisible in it.
+    `pr_refs` is parsed from the whole body at index time."""
+
+    late = {"body": "a" * 600, "pr_refs": [33302]}
+    assert row_references_pr(late, 33302) is True
+    assert row_references_pr(late, 111) is False
+    # no pr_refs (an index built before the field): fall back to the body
+    assert row_references_pr({"body": "see #33302"}, 33302) is True
+    assert row_references_pr({"body": "see #33302"}, None) is False
+
+
+def _fake_index(tmp_path, corpus_rows, *, meta_version=META_VERSION):
+    import json
+    from src.mathlib_review.io import sha256_file
+
+    corpus = tmp_path / "corpus.jsonl"
+    corpus.write_text("".join(json.dumps(r) + "\n" for r in corpus_rows), encoding="utf-8")
+    d = tmp_path / "index"
+    d.mkdir()
+    (d / "meta.jsonl").write_text(
+        "".join(json.dumps({"comment_id": r["comment_id"]}) + "\n" for r in corpus_rows),
+        encoding="utf-8")
+    (d / "manifest.json").write_text(json.dumps({
+        "corpus_path": str(corpus), "corpus_sha256": sha256_file(corpus),
+        "meta_version": meta_version, "rows": len(corpus_rows)}), encoding="utf-8")
+    return d, corpus
+
+
+def _corpus_row(cid, pr, commenter="alice", body="looks wrong"):
+    return {"comment_id": cid, "pr_number": pr, "path": "M/A.lean", "line": 3,
+            "diff_hunk": "@@\n+x", "body": body, "commenter": commenter,
+            "author_association": "COLLABORATOR", "created_at": "2025-01-01T00:00:00Z"}
+
+
+def test_refresh_refuses_when_the_corpus_no_longer_reproduces_the_indexed_rows(tmp_path, monkeypatch):
+    """The embeddings are reused, so the rows must line up. Alignment is proved against the
+    existing meta, not assumed: a shifted corpus would silently give every row its neighbour's
+    metadata."""
+
+    import src.mathlib_review.retrieval.precedent_index as mod
+
+    rows = [_corpus_row(1, 100), _corpus_row(2, 101)]
+    d, corpus = _fake_index(tmp_path, rows)
+    monkeypatch.setattr(mod, "_pr_authors", lambda numbers, logger=None: {100: "alice", 101: "bob"})
+    # the same corpus refreshes cleanly
+    refresh_meta(d)
+    # now the corpus gains a row at the front: same file, different order
+    import json
+    from src.mathlib_review.io import sha256_file
+    new_rows = [_corpus_row(9, 102)] + rows
+    corpus.write_text("".join(json.dumps(r) + "\n" for r in new_rows), encoding="utf-8")
+    manifest = json.loads((d / "manifest.json").read_text())
+    manifest["corpus_sha256"] = sha256_file(corpus)      # pretend the sha was updated too
+    (d / "manifest.json").write_text(json.dumps(manifest))
+
+    with pytest.raises(StalePrecedentIndex, match="row order"):
+        refresh_meta(d)
+
+
+def test_refresh_marks_the_authors_own_replies(tmp_path, monkeypatch):
+    import json
+
+    import src.mathlib_review.retrieval.precedent_index as mod
+
+    rows = [_corpus_row(1, 100, commenter="alice"), _corpus_row(2, 100, commenter="carol")]
+    d, _ = _fake_index(tmp_path, rows)
+    monkeypatch.setattr(mod, "_pr_authors", lambda numbers, logger=None: {100: "alice"})
+
+    refresh_meta(d)
+
+    meta = [json.loads(line) for line in (d / "meta.jsonl").read_text().splitlines()]
+    assert [m["commenter_is_pr_author"] for m in meta] == [True, False]
+
+
+def test_an_index_whose_meta_predates_the_query_path_is_refused(tmp_path, monkeypatch):
+    """`data/` is gitignored, so every machine builds its own index. A loud refusal naming the
+    refresh command is the only thing that can tell an operator to update it."""
+
+    import numpy as np
+
+    d, _ = _fake_index(tmp_path, [_corpus_row(1, 100)], meta_version="v5-precedent-meta/1")
+    np.save(d / "embeddings.npy", np.zeros((1, 2), dtype="float32"))
+
+    with pytest.raises(StalePrecedentIndex, match="refresh-meta"):
+        PrecedentIndex(d)
