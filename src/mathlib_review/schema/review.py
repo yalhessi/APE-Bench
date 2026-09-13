@@ -176,7 +176,8 @@ class ContextCall(StrictModel):
 
     schema_version: Literal["v5-context-call1"] = "v5-context-call1"
     invocation_id: str
-    tool: Literal["zulip_search", "precedent_search", "declaration_search", "lean_verify_edit"]
+    tool: Literal["zulip_search", "precedent_search", "declaration_search",
+                  "naming_norm", "lean_verify_edit"]
     query: str
     #: **How** this call was bounded, stated positively.
     #:

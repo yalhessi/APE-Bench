@@ -552,10 +552,142 @@ def _register_proof_profile(task, mcp) -> None:
         }
 
 
+def _register_naming_norm(task, mcp) -> None:
+    @mcp.tool(
+        description=(
+            "What this repository CALLS lemmas like this one, counted over the whole base "
+            "snapshot. Give a declaration this PR adds or renames.\n\n"
+            "Returns the declaration's conclusion subject (what the statement is *about*), "
+            "every leaf prefix the corpus uses for that subject with its count, and -- only "
+            "when the corpus has an opinion worth holding a PR to -- candidate names.\n\n"
+            "This is a census, not a sample: `content_search` caps at a handful of files and "
+            "says so, and a prefix count read off a capped grep is the kind of number this "
+            "tool exists to replace. Counts come from the BASE commit, so the PR's own new "
+            "names are not counted into the norm they are being judged against.\n\n"
+            "`verdict` is the answer, not the counts: `established` means the corpus is "
+            "lopsided enough to hold a PR to (a blocking ask); `emerging` means one spelling "
+            "leads clearly but is not dominant (advisory at most); `insufficient_evidence` "
+            "means the corpus has no opinion here and you should submit nothing on naming."
+        )
+    )
+    async def naming_norm(
+        declaration: Annotated[str, Field(
+            description="Declaration this PR adds or renames, e.g. `Submodule.coe_starProjection_eq_x`")],
+    ) -> Dict[str, Any]:
+        from ape.toolkits.code.lean.lean_parser import parse_major_declarations
+        from src.mathlib_review.evidence.evidence import snapshot_workspace
+        from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
+        from src.mathlib_review.evidence.operators.naming_norm import (
+            MAX_CONFLICT_RATIO, MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix,
+            norm_for, norm_index, rename_candidates,
+        )
+
+        base = task.data.snapshot_base_sha
+        root = snapshot_workspace(base)
+        if root is None:
+            return {"success": False, "error": (
+                f"no complete base snapshot for {base}; a norm read from the attempt overlay "
+                "would be a 2% sample reported as a repository measurement.")}
+        index = norm_index(Path(root), base)
+        if index is None:
+            return {"success": False, "error": f"no naming norms are available for {base}."}
+
+        # The declaration's own conclusion, from the reviewed text -- the arm is asking about a
+        # name this PR introduces, which by construction is not in the base tree.
+        signature = ""
+        overlay = _reviewed_overlay_root(task)
+        wanted = declaration.rsplit(".", 1)[-1]
+        for rel in getattr(task.data, "changed_files", None) or []:
+            if not str(rel).endswith(".lean") or overlay is None:
+                continue
+            source = overlay / str(rel)
+            if not source.is_file():
+                continue
+            try:
+                parsed = parse_major_declarations(source.read_text(encoding="utf-8", errors="ignore"))
+            except Exception:  # noqa: BLE001
+                continue
+            for item in parsed:
+                name = item.fullname or item.name or ""
+                if name == declaration or name.rsplit(".", 1)[-1] == wanted:
+                    signature = item.signature or ""
+                    break
+            if signature:
+                break
+        if not signature:
+            return {"success": False, "error": (
+                f"{declaration!r} is not among the declarations this PR changes; this tool "
+                "answers for a name the PR adds or renames.")}
+
+        subject = conclusion_subject(declaration_conclusion(signature))
+        population = norm_for(index, subject.token)
+        if subject.token is None or subject.confidence != "high" or population is None:
+            _append_trace(task, {
+                "schema_version": "v5-context-call1",
+                "invocation_id": task.data.invocation_id,
+                "tool": "naming_norm",
+                "gate": "base_snapshot",
+                "query": declaration,
+                "as_of": None, "exclude_pr": None, "corpus_sha256": base,
+                "result_ids": [], "result_count": 0, "truncated": False,
+            })
+            return {"success": True, "verdict": "insufficient_evidence", "subject": subject.token,
+                    "results": (
+                        "The corpus has no counted opinion about this declaration's subject, so "
+                        "there is no convention here to hold the PR to. Submit nothing on naming "
+                        "unless a maintainer precedent says otherwise.")}
+
+        current = leaf_prefix(declaration.rsplit(".", 1)[-1])
+        ranked = population.prefix_counts.most_common()
+        dominant, support = ranked[0]
+        runner_up = ranked[1][1] if len(ranked) > 1 else 0
+        established = population.is_strong() and population.conflict_ratio(current) <= MAX_CONFLICT_RATIO
+        emerging = (support >= MIN_SUPPORT and support >= 3 * max(runner_up, 1)
+                    and population.prefix_counts.get(current, 0) < support)
+        verdict = ("established" if established and dominant != current
+                   else "emerging" if emerging and dominant != current
+                   else "insufficient_evidence")
+        candidates = (rename_candidates(declaration, dominant, subject.expression,
+                                        index.get("notation"))
+                      if verdict != "insufficient_evidence" else [])
+        counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
+        lines = [
+            f"Subject of the conclusion: `{subject.token}` (from {subject.kind}).",
+            f"Of {population.members} declarations in the base snapshot with that subject: {counted}.",
+            f"This declaration uses `{current}_` ({population.prefix_counts.get(current, 0)}).",
+            f"Verdict: **{verdict}**.",
+        ]
+        if verdict == "established":
+            lines.append(f"`{dominant}_` is the convention here ({support}/{population.members}, "
+                         f"over the {MIN_SUPPORT_RATIO:.0%} bar). A rename is a fair ask.")
+        elif verdict == "emerging":
+            lines.append(f"`{dominant}_` leads {support} to {runner_up} but is not dominant. "
+                         "Advisory at most -- say it is the emerging spelling, not the rule.")
+        else:
+            lines.append("The corpus does not back a rename here. Submit nothing on naming.")
+        if candidates:
+            lines.append("Candidate names: " + ", ".join(f"`{name}`" for name in candidates))
+        rendered, truncated = _truncate("\n".join(lines))
+        _append_trace(task, {
+            "schema_version": "v5-context-call1",
+            "invocation_id": task.data.invocation_id,
+            "tool": "naming_norm",
+            "gate": "base_snapshot",
+            "query": declaration,
+            "as_of": None, "exclude_pr": None, "corpus_sha256": base,
+            "result_ids": [f"{subject.token}:{dominant}:{support}/{population.members}"],
+            "result_count": population.members, "truncated": truncated,
+        })
+        return {"success": True, "verdict": verdict, "subject": subject.token,
+                "members": population.members, "counts": dict(ranked[:8]),
+                "candidates": candidates, "results": rendered}
+
+
 _REGISTRARS = {
     "zulip_search": _register_zulip,
     "precedent_search": _register_precedent,
     "declaration_search": _register_declaration,
+    "naming_norm": _register_naming_norm,
     "proof_profile": _register_proof_profile,
 }
 
