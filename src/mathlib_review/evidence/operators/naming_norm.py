@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
@@ -60,6 +60,14 @@ _IDENT = r"[A-Za-z_][A-Za-z0-9_'!?]*"
 _PROJECTION_RE = re.compile(rf"\.({_IDENT})\s*$")
 #: Leading application head: `upperBounds (f '' S)`.
 _HEAD_RE = re.compile(rf"^\(*\s*({_IDENT})")
+#: `infixl:80 " '' " => Set.image` -- a value-level notation and the declaration it denotes.
+#: Derived from the snapshot rather than tabulated here, for the same reason the prefix norm
+#: is: a name Mathlib writes with notation (`f '' S`) is named after what the notation means
+#: (`image`), and only the corpus knows which is which. 300+ such operators are declared.
+_VALUE_NOTATION_RE = re.compile(
+    r'^\s*(?:scoped\s+)?(?:infixl|infixr|notation)[^\n=]*?'
+    r'"\s*([^A-Za-z0-9\s"][^"]*?)\s*"[^\n=]*?=>\s*([A-Za-z_][\w.]*)')
+
 #: A coercion ascription: `(K.orthogonalProjection : E →ₗ[𝕜] K)`.
 _ASCRIPTION_RE = re.compile(r"^\(\s*(?P<expr>.+?)\s*:\s*(?P<type>.+?)\s*\)$", re.DOTALL)
 #: Type arrows/constructors that name a coercion family. The token is the *arrow*, not a
@@ -156,6 +164,9 @@ class PopulationScan:
     all_fullnames: Set[str]
     parsed_files: int
     parse_failures: List[str]
+    #: Value-level notation declared by this snapshot, operator -> denoted declaration.
+    #: Empty is a valid scan; it only costs `rename_candidates` its statement-derived guess.
+    notation: Dict[str, str] = field(default_factory=dict)
 
     def population(self, subject_token: str) -> Optional[SubjectPopulation]:
         return self.by_subject.get(subject_token)
@@ -184,6 +195,7 @@ def scan_population(workspace: Path, snapshot_sha: str) -> PopulationScan:
         raise FileNotFoundError(f"Mathlib source tree is unavailable: {mathlib}")
 
     buckets: Dict[str, Counter] = defaultdict(Counter)
+    notation: Dict[str, str] = {}
     all_fullnames: Set[str] = set()
     failures: List[str] = []
     # Not `rglob`: it does not descend symlinked directories, and a review attempt's
@@ -202,6 +214,14 @@ def scan_population(workspace: Path, snapshot_sha: str) -> PopulationScan:
         except (OSError, UnicodeError, ValueError) as exc:
             failures.append(f"{relative}: {exc}")
             continue
+        if "=>" in source:
+            for line in source.split("\n"):
+                if "=>" not in line:
+                    continue
+                match = _VALUE_NOTATION_RE.match(line)
+                if match:
+                    notation.setdefault(match.group(1).strip(),
+                                        match.group(2).rsplit(".", 1)[-1])
         for declaration in declarations:
             fullname = declaration.fullname or declaration.name or ""
             if fullname:
@@ -221,7 +241,90 @@ def scan_population(workspace: Path, snapshot_sha: str) -> PopulationScan:
         all_fullnames=all_fullnames,
         parsed_files=len(paths),
         parse_failures=failures,
+        notation=notation,
     )
+
+
+def statement_head(expression: str, notation: Optional[Dict[str, str]] = None) -> Optional[str]:
+    """What the subject is applied *to*: the second half of a Mathlib name.
+
+    A name is "the head symbol and the shape of the statement, in the order they appear"
+    (`encard_le_encard`, `isOpen_iUnion`). The prefix norm supplies the head; this supplies
+    the shape, by reading the conclusion rather than reusing the old name's tail. That
+    difference is the whole of PR 33145's resolution miss: the rule proposed
+    `upperBounds_upperBounds` by keeping the old remainder, where the conclusion
+    `upperBounds (f '' S) = …` says `upperBounds_image` -- `''` being `Set.image`, which the
+    snapshot declares and `scan_population` collects.
+    """
+
+    text = (expression or "").strip()
+    while text.startswith("(") and text.endswith(")"):
+        text = text[1:-1].strip()
+    if not text:
+        return None
+    for operator in sorted(notation or {}, key=len, reverse=True):
+        # Single-character operators are far too eager: `+` appears in half of Mathlib.
+        if len(operator) >= 2 and operator in text:
+            # Last component, defensively: the scan stores `Set.image` as `image`, but a
+            # caller passing the raw declaration would otherwise yield `set.image` as a
+            # name fragment.
+            denoted = (notation or {})[operator].rsplit(".", 1)[-1]
+            return denoted[:1].lower() + denoted[1:] if denoted else None
+    projection = _PROJECTION_RE.search(text)
+    if projection:
+        return projection.group(1)
+    head = re.search(_IDENT, text)
+    return head.group(0) if head else None
+
+
+def rename_candidates(
+    current_fullname: str,
+    conventional_prefix: str,
+    expression: Optional[str],
+    notation: Optional[Dict[str, str]] = None,
+) -> List[str]:
+    """Ranked rename candidates for one declaration, best first.
+
+    Two generators disagree usefully, so both are offered rather than one being guessed at:
+
+    * **prefix swap** -- the conventional prefix with the old name's remainder. Right when the
+      old name already described the statement and only its head was wrong (PR 33337:
+      `coe_starProjection_eq_isComplProjection` -> `toLinearMap_starProjection_eq_…`).
+    * **statement-derived** -- the conventional prefix with what the conclusion is applied to.
+      Right when the old name's remainder was the thing being corrected (PR 33145:
+      `continuous_upperBounds` -> `upperBounds_image`, never `upperBounds_upperBounds`).
+
+    Measured over the release's rename asks that this operator fires on, the first is right on
+    one and the second on the other; offering both puts the maintainer's name in the list for
+    both. Candidates change only *what* a firing says, never *whether* it fires, so this
+    cannot cost control-PR silence -- unlike widening the population test, which can.
+    """
+
+    namespace, _, leaf = current_fullname.rpartition(".")
+    remainder = leaf.split("_", 1)[1] if "_" in leaf else ""
+    ranked: List[str] = []
+
+    def offer(candidate_leaf: str) -> None:
+        full = f"{namespace}.{candidate_leaf}" if namespace else candidate_leaf
+        if full != current_fullname and full not in ranked:
+            ranked.append(full)
+
+    if remainder:
+        offer(f"{conventional_prefix}_{remainder}")
+    text = (expression or "").strip()
+    ascription = _ASCRIPTION_RE.match(text)
+    if ascription:
+        subject_of = ascription.group("expr")
+    else:
+        projection = _PROJECTION_RE.search(text)
+        subject_of = text[: projection.start()] if projection else re.sub(_IDENT, "", text, count=1)
+    applied_to = statement_head(subject_of, notation)
+    if applied_to:
+        offer(f"{conventional_prefix}_{applied_to}")
+        tail = remainder.split("_", 1)[1] if "_" in remainder else ""
+        if tail:
+            offer(f"{conventional_prefix}_{applied_to}_{tail}")
+    return ranked
 
 
 @dataclass(frozen=True)
@@ -234,6 +337,11 @@ class RenameProposal:
     support: int
     members: int
     conflict_count: int
+    #: Further candidate names, best first, excluding `proposed_fullname`. Defaulted and
+    #: appended last on purpose: `proposed_fullname` and `observed_pattern()` are what the
+    #: opportunities executor reads and what the frozen naming-smoke releases sealed, and
+    #: neither moves because this exists.
+    alternatives: Tuple[str, ...] = ()
 
     def observed_pattern(self) -> str:
         """The quantitative warrant, in the form the evidence-parity gate requires."""
@@ -254,6 +362,7 @@ def propose_rename(
     current_fullname: str,
     subject: SubjectInference,
     population: Optional[SubjectPopulation],
+    notation: Optional[Dict[str, str]] = None,
 ) -> Optional[RenameProposal]:
     """Propose a rename only when the corpus demonstrably disagrees with the current name.
 
@@ -284,9 +393,11 @@ def propose_rename(
     proposed = f"{namespace}.{proposed_leaf}" if namespace else proposed_leaf
     if proposed == current_fullname:
         return None
+    ranked = rename_candidates(current_fullname, conventional, subject.expression, notation)
     return RenameProposal(
         current_fullname=current_fullname,
         proposed_fullname=proposed,
+        alternatives=tuple(name for name in ranked if name != proposed),
         subject_token=subject.token,
         current_prefix=current_prefix,
         conventional_prefix=conventional,
