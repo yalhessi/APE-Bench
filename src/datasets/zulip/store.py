@@ -182,6 +182,40 @@ def _row_to_thread(row: sqlite3.Row) -> ZulipThread:
     return ZulipThread(**payload)
 
 
+#: Query text is split on anything that is not a word character or `_`, so a Lean identifier
+#: fragment (`coe_`, `toLinearMap`, `IsCompl`) survives as one term while `.`, backticks,
+#: apostrophes, `:` and brackets -- every one of which is FTS5 syntax -- do not reach the
+#: matcher.
+_FTS_TERM = re.compile(r"[A-Za-z0-9_]+")
+
+
+def fts_query(text: str, *, match_all: bool = False) -> str:
+    """An FTS5 MATCH expression for free-text `text`; `""` when it holds no searchable term.
+
+    Two failures this exists to stop, both measured over the 140 `zulip_search` calls the v5
+    runs made (99 of them, 71%, returned nothing):
+
+    * **Raw text is FTS5 syntax.** A backtick, an apostrophe, a `.` or a bracket raised
+      `OperationalError: fts5: syntax error`, and `a:b` was read as a column filter -- the
+      tool reported "zulip search failed" for a question that was perfectly well formed.
+    * **FTS5 ANDs adjacent terms.** A six-word question therefore demanded all six words in
+      one message. `coe_ lemma naming convention toLinearMap` returned nothing; its terms
+      OR-ed return the `mathlib4 > Naming convention` thread where a maintainer writes
+      "`coe` should be a prefix" -- the exact evidence the asking arm concluded did not exist.
+
+    Terms are OR-ed by default and ranked by BM25, which is what makes this safe: a message
+    carrying more of the terms, and rarer ones, outranks a message carrying one common word,
+    so an AND-style hit still comes back first when it exists. `match_all=True` restores the
+    conjunction for a caller that means it.
+    """
+
+    terms = _FTS_TERM.findall(text or "")
+    if not terms:
+        return ""
+    joiner = " AND " if match_all else " OR "
+    return joiner.join(f'"{term}"' for term in terms)
+
+
 class ZulipStore:
     """Read access to a built store. Open with `ZulipStore(path)`."""
 
@@ -396,15 +430,24 @@ class ZulipStore:
         as_of: Optional[str] = None,
         exclude_pr: Optional[int] = None,
         limit: int = 25,
+        match_all: bool = False,
     ) -> List[ZulipMessage]:
         """Full-text search, BM25-ranked. `as_of` still applies on top of `until`.
+
+        `query` is free text, not FTS5 syntax: it is normalised by `fts_query`, which quotes
+        each term and OR-s them. Passing raw text straight to `MATCH` both raised syntax
+        errors on ordinary punctuation and silently demanded every word at once; see
+        `fts_query`. `match_all=True` asks for the conjunction on purpose.
 
         `exclude_bots` defaults on: CI and notification bots post ~12k messages that
         match ordinary queries and carry no opinion, so including them by default would
         make the common search worse.
         """
+        expression = fts_query(query, match_all=match_all)
+        if not expression:
+            return []
         where = ["messages_fts MATCH ?"]
-        params: List = [query]
+        params: List = [expression]
         if since:
             where.append("m.timestamp_epoch >= ?")
             params.append(iso_to_epoch(since))

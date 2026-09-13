@@ -97,7 +97,10 @@ def _register_zulip(task, mcp) -> None:
         )
     )
     async def zulip_search(
-        query: Annotated[str, Field(description="Free-text query, e.g. a declaration name, tactic, or convention")],
+        query: Annotated[str, Field(description=(
+            "Free-text query, e.g. a declaration name, tactic, or convention. Terms are "
+            "OR-ed and ranked by relevance, so extra words widen the search rather than "
+            "narrowing it; punctuation is ignored. Not FTS5 syntax."))],
         declaration: Annotated[Optional[str], Field(
             description="Optional: find threads referencing this exact declaration name")] = None,
         maintainers_only: Annotated[bool, Field(
@@ -157,10 +160,30 @@ def _register_zulip(task, mcp) -> None:
             "corpus_sha256": None,
             "result_ids": ids, "result_count": count, "truncated": truncated,
         })
-        return {
+        response = {
             "success": True, "count": count, "as_of": as_of, "excluded_pr": exclude_pr,
             "results": body or "(no discussion found before the cutoff)",
         }
+        if not declaration:
+            # What was actually matched. The store OR-s the query's terms and ranks by BM25,
+            # so a long question is a request for the best-matching discussion rather than a
+            # demand that one message contain every word -- which is what it used to be, and
+            # what returned nothing on 71% of the calls the v5 runs made. Saying so here stops
+            # a thin result being read as "the corpus does not discuss this".
+            from src.datasets.zulip.store import fts_query
+
+            terms = [term.strip('"') for term in fts_query(query).split(" OR ") if term]
+            response["terms_matched"] = terms
+            if not terms:
+                response["note"] = (
+                    "That query held no searchable term. Search for identifier fragments or "
+                    "words, e.g. `toLinearMap` or `naming convention`.")
+            elif not count:
+                response["note"] = (
+                    f"No message before the cutoff contains any of {terms}. This is a real "
+                    f"absence for these terms, not a syntax failure -- try a shorter or "
+                    f"differently-spelled term before concluding the convention is undiscussed.")
+        return response
 
 
 # --------------------------------------------------------------------------------------
