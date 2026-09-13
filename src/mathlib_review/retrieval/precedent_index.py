@@ -38,7 +38,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX, assert_repo_root
 
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-INDEX_VERSION = "v5-precedent-index/1"
+INDEX_VERSION = "v5-precedent-index/2"
 
 #: The shape of `meta.jsonl`. Bumped when a field is added that the query path relies on, so an
 #: index whose meta predates it is refused loudly instead of quietly behaving differently -- the
@@ -126,6 +126,49 @@ def row_references_pr(row: Dict[str, Any], pr_number: Optional[int]) -> bool:
     if refs is not None:
         return int(pr_number) in {int(ref) for ref in refs}
     return references_pr(row.get("body"), pr_number)
+
+
+#: The embedder's context window, less the two special tokens it adds.
+EMBED_TOKEN_BUDGET = 254
+
+
+def embedding_text(diff_hunk: str, tokenizer=None) -> str:
+    """The part of a hunk that is embedded: the END of it, not the beginning.
+
+    GitHub builds a review comment's `diff_hunk` so that it ENDS at the commented line, and
+    `all-MiniLM-L6-v2` truncates at 256 tokens from the START. Measured over a 3,000-row
+    sample of the corpus, 53% of hunks exceed that window, so for most of the index the
+    embedding described the context *before* the point -- on a new file, the copyright header
+    -- while the line the maintainer was writing about was never seen by the model at all.
+    That is the same wrong end the renderer was taking, and it is why a query matched "code
+    that looks like a file opening" rather than "code that looks like what was flagged".
+
+    The slice is tokenizer-driven rather than a fixed number of lines: how much fits varies
+    from 1 line to dozens (median 12, p10 4), so any constant would truncate some rows and
+    waste the window on others. Whole lines are kept, so the text stays syntactically
+    readable.
+
+    One case this cannot reach: a comment anchored to a *deleted* line. `hunk_code` drops
+    removed lines, so the tail is then the nearest surviving line rather than the commented
+    one.
+    """
+
+    from src.mathlib_review.corpus import hunk_code
+
+    code = hunk_code(diff_hunk or "")
+    if tokenizer is None or not code:
+        return code
+    if len(tokenizer.encode(code, add_special_tokens=False)) <= EMBED_TOKEN_BUDGET:
+        return code
+    lines = code.split("\n")
+    kept: List[str] = []
+    for line in reversed(lines):
+        candidate = [line] + kept
+        if len(tokenizer.encode("\n".join(candidate), add_special_tokens=False)) > EMBED_TOKEN_BUDGET:
+            break
+        kept = candidate
+    # A single line longer than the window still has to yield something; take its tail.
+    return "\n".join(kept) if kept else code[-(EMBED_TOKEN_BUDGET * 4):]
 
 
 def _model_revision(model_name: str = DEFAULT_MODEL) -> str:
@@ -245,9 +288,9 @@ def build(
                     len(rows), len(excluded))
 
     authors = _pr_authors({row.get("pr_number") for row in rows if row.get("pr_number")}, logger)
-    texts = [hunk_code(row.get("diff_hunk") or "") for row in rows]
     model = SentenceTransformer(model_name)
     model_revision = _model_revision(model_name)
+    texts = [embedding_text(row.get("diff_hunk") or "", model.tokenizer) for row in rows]
     embeddings = model.encode(
         texts, normalize_embeddings=True, batch_size=256,
         show_progress_bar=bool(logger),
@@ -354,7 +397,11 @@ class PrecedentIndex:
             # moved, silently embed against a different snapshot than the index was built
             # with -- a retrieval regime change with nothing in the run saying so.
             self._model = SentenceTransformer(self.model_name, local_files_only=True)
-        return self._model.encode([text], normalize_embeddings=True)[0]
+        # The query is cut by the same 256-token window as a row, so it gets the same slice:
+        # an arm pasting a long declaration would otherwise be matched on its opening lines.
+        return self._model.encode(
+            [embedding_text(text, self._model.tokenizer) if "\n" in text else text],
+            normalize_embeddings=True)[0]
 
     def eligible_mask(self, as_of: Optional[str], exclude_pr: Optional[int]):
         """Which rows a reader at this instant is allowed to see.

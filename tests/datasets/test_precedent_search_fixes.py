@@ -265,3 +265,56 @@ def test_the_shipped_index_reports_a_complete_identity():
     for key in ("corpus_sha256", "model_name", "model_revision", "index_version",
                 "meta_version", "rows"):
         assert payload.get(key), f"{key} is missing from the index manifest"
+
+
+# --- what gets embedded ------------------------------------------------------------------
+
+
+class _FakeTokenizer:
+    """One token per whitespace-separated word: enough to exercise the budget logic."""
+
+    def encode(self, text, add_special_tokens=False):
+        return text.split()
+
+
+def test_the_embedded_slice_is_the_end_of_the_hunk():
+    """GitHub builds a hunk to END at the commented line and the embedder truncates at 256
+    tokens from the START, so 53% of the corpus was embedded from its opening lines -- on a new
+    file, the copyright header -- and the flagged line was never seen by the model."""
+
+    from src.mathlib_review.retrieval.precedent_index import embedding_text
+
+    hunk = "@@ -0,0 +1,9 @@\n" + "\n".join(f"+filler {i}" for i in range(200)) + \
+           "\n+theorem the_commented_one : True"
+    text = embedding_text(hunk, _FakeTokenizer())
+
+    assert text.strip().endswith("theorem the_commented_one : True")
+    assert len(text.split()) <= 254
+    assert "filler 0" not in text, "the head is what gets dropped, not the tail"
+
+
+def test_a_hunk_inside_the_window_is_untouched():
+    from src.mathlib_review.retrieval.precedent_index import embedding_text
+
+    hunk = "@@ -1,2 +1,2 @@\n+theorem a : True := trivial"
+    assert embedding_text(hunk, _FakeTokenizer()) == "theorem a : True := trivial"
+
+
+def test_whole_lines_are_kept():
+    """The slice keeps line boundaries so the embedded text stays readable Lean."""
+
+    from src.mathlib_review.retrieval.precedent_index import embedding_text
+
+    hunk = "@@\n" + "\n".join(f"+aaa bbb ccc line{i}" for i in range(300))
+    text = embedding_text(hunk, _FakeTokenizer())
+    assert all(line.startswith("aaa bbb ccc") for line in text.split("\n") if line)
+
+
+def test_without_a_tokenizer_the_whole_hunk_comes_back():
+    """The slice is a property of the embedder's window; a caller with no tokenizer (any
+    non-embedding use of the text) must not get a silently shortened hunk."""
+
+    from src.mathlib_review.retrieval.precedent_index import embedding_text
+
+    hunk = "@@\n" + "\n".join(f"+line{i}" for i in range(300))
+    assert len(embedding_text(hunk, None).split("\n")) == 300
