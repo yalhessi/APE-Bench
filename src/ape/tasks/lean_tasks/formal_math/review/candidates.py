@@ -566,18 +566,28 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             # as pressure to produce something would destroy the one result this project has
             # that nothing else replaces: 0 candidates per control PR, per rep. Abstention
             # must stay exactly as cheap as submitting.
+            #
+            # Asked once, and once only. `termination_callback` fires on the success path
+            # alone, so an arm that keeps omitting the reason would never submit legally: it
+            # would burn its turns and be recorded as a failed job, and a failed *mandatory*
+            # job is a coverage gap. That would convert the cleanest outcome an arm has —
+            # looking properly and finding nothing — into a hole in the run, which is a far
+            # worse error than an unlabelled silence. So the second empty submission is
+            # accepted and labelled `unstated`, which the report already counts and shows.
             if not raw_candidates and abstention_reason is None:
-                return {"evaluation_result": EvaluationResult(
-                    success=False, score=0.0,
-                    message=(
-                        "Submitting nothing is a valid and expected outcome, and this is NOT "
-                        "a request to find something — do not add a candidate to satisfy it. "
-                        "Only the label is missing. Call submit_candidates again with the "
-                        "same empty list, plus abstention_reason set to one of: "
-                        f"{', '.join(ABSTENTION_REASONS)}; and one sentence in "
-                        "abstention_detail saying what you considered."
-                    )),
-                    "message": "Abstention recorded without a reason"}
+                self._mute_abstentions = getattr(self, "_mute_abstentions", 0) + 1
+                if self._mute_abstentions == 1:
+                    return {"evaluation_result": EvaluationResult(
+                        success=False, score=0.0,
+                        message=(
+                            "Submitting nothing is a valid and expected outcome, and this is "
+                            "NOT a request to find something — do not add a candidate to "
+                            "satisfy it. Only the label is missing. Call submit_candidates "
+                            "again with the same empty list, plus abstention_reason set to "
+                            f"one of: {', '.join(ABSTENTION_REASONS)}; and one sentence in "
+                            "abstention_detail saying what you considered."
+                        )),
+                        "message": "Abstention recorded without a reason"}
             allowed = set(self.data.change_ids)
             allowed_by_suffix = {item.removeprefix("change:"): item for item in allowed}
             for index, candidate in enumerate(raw_candidates):
@@ -649,7 +659,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                 rendered_prompt_sha256=self.data.rendered_prompt_sha256,
                 candidates=raw_candidates,
                 verification_artifacts=verification_artifacts,
-                abstention=({"reason": abstention_reason,
+                abstention=({"reason": abstention_reason or "unstated",
                              "detail": (abstention_detail or "").strip()}
                             if not raw_candidates else None),
                 findings=[], review_message="",

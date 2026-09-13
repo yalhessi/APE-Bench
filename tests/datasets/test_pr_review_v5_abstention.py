@@ -213,3 +213,33 @@ def test_the_report_breaks_abstentions_down_by_arm(tmp_path, monkeypatch):
         "a submission with candidates is not an abstention")
     assert out["docs"] == {"unstated": 1}, (
         "a row from before the reason was required is reported, not hidden in a denominator")
+
+
+def test_a_second_mute_submission_is_accepted_as_unstated(submit):
+    """The contract asks once and never twice.
+
+    `termination_callback` fires on the success path alone, so an arm that kept omitting the
+    reason would never submit legally -- it would burn its turns, be recorded as a failed job,
+    and if the job were mandatory become a coverage gap. That converts the cleanest outcome an
+    arm has, looking properly and finding nothing, into a hole in the run. An unlabelled
+    silence is much the lesser error, and the report already counts it.
+    """
+
+    tool, task = submit
+    recorded = {}
+    original = task.create_result
+
+    def capture(**kwargs):
+        recorded.update(kwargs)
+        return original(**kwargs)
+
+    task.create_result = capture
+
+    first = asyncio.run(tool(candidates=[]))
+    assert first["evaluation_result"].success is False
+
+    second = asyncio.run(tool(candidates=[]))
+    assert second["evaluation_result"].success is True, (
+        "a second mute submission must not be refused again -- that is an infinite loop that "
+        "ends in a failed job")
+    assert recorded["abstention"]["reason"] == "unstated"
