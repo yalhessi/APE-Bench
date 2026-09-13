@@ -468,8 +468,11 @@ class BasePRReviewTask(BaseLeanTask):
                 "counting). You may include the declaration's `@[...]` attributes and "
                 "modifiers or omit them; either way they are not duplicated. Or "
                 "`line_start`/`line_end` + `replacement` to splice a line span. Your edit may "
-                "reference the PR's own new declarations. Omit all edit args to check whether "
-                "the file compiles as-is. Errors come back split into "
+                "reference the PR's own new declarations. Omitting all edit args answers a "
+                "DIFFERENT question — whether the file compiles as the PR leaves it — and "
+                "returns `compiles` plus `errors_already_in_the_file`, with no `success` "
+                "field, because nothing was verified: it tests none of the changes you are "
+                "weighing. Errors come back split into "
                 "`errors_introduced_by_your_edit` and `errors_already_in_the_file` — fix only "
                 "the former; line numbers refer to the whole spliced file, so use `code_line` "
                 "to locate them."
@@ -511,23 +514,49 @@ class BasePRReviewTask(BaseLeanTask):
             edited_only = bool(line_start or declaration_name or replacement or new_declaration)
             if edited_only:
                 result = await self._attribute_errors(path, result)
-            # Say which of the two things just happened. The as-is mode is deliberate and
-            # stays, but its result was indistinguishable from a verified edit: both come
-            # back `{"success": true, ... "Lean verification completed successfully"}`, and
-            # the reviewed file compiles by construction, so an as-is call always succeeds.
-            # On smoke4 that was 13 of 100 calls — a `family_design` invocation on PR 33117
-            # made one, read the success, and submitted nothing. Neither the agent nor
-            # anyone reading the transcript afterwards could tell it had verified nothing.
-            if isinstance(result, dict):
-                result["mode"] = "verified_edit" if edited_only else "as_is_compile_check"
-                if not edited_only:
-                    result["note"] = (
-                        "No edit was applied — this is the unmodified reviewed file's "
-                        "compile status, which is green by construction and is NOT evidence "
-                        "for any change you are considering. To check a change, pass "
-                        "`declaration_name` + `new_declaration`."
-                    )
-            return result
+                if isinstance(result, dict):
+                    result["mode"] = "verified_edit"
+                return result
+            # Two different questions, and they must not come back in the same shape.
+            #
+            # "Does this file compile?" is legitimate and is the `correctness` arm's opening
+            # move — a reviewed state that is red is the most serious thing a reviewer can
+            # report (33057's gold obligation is exactly that). "Is my proposed change sound?"
+            # is the other question, and only an edit can answer it.
+            #
+            # Spelling both `lean_verify_edit(path=...)` was survivable; returning both as
+            # `{"success": true, ... "Lean verification completed successfully"}` was not. The
+            # file compiles by construction in the ordinary case, so the no-edit call is a
+            # guaranteed green that reads exactly like a discharged verification. A `note`
+            # saying otherwise did not hold: all 86 no-edit calls in
+            # `pr5_A_lead_heldout12_rep1` carried it, and the call was still the last act
+            # before 33 of 82 empty submissions — 9 of 9 for `docs`, 10 of 19 for `naming`.
+            # Text does not beat shape, so the shape changes here: this answers the status
+            # question, in the vocabulary of the status question, and claims nothing else.
+            #
+            # `schema/evidence.py:88` already rules for the evidence layer that "we did not
+            # check" and "we checked and found nothing" must not look alike. This is that rule
+            # applied one layer up, where the artifacts are produced.
+            if not isinstance(result, dict):
+                return result
+            errors = list(result.get("errors") or [])
+            return {
+                "mode": "as_is_compile_check",
+                "compiles": not errors,
+                # Every error is pre-existing by definition when no edit was applied, so this
+                # needs no baseline compile — and it makes the `correctness` prompt's promise
+                # of a split true for the first time, which it never was on this path.
+                "errors_already_in_the_file": errors,
+                "errors_introduced_by_your_edit": [],
+                "warnings": result.get("warnings") or [],
+                "environment": self._verification_environment_note(),
+                "warrants": (
+                    "The current state of the file as the PR leaves it, and nothing else. "
+                    "This is NOT evidence for or against any change you are considering: no "
+                    "edit was applied, so nothing you are weighing has been tested. To test "
+                    "a change, call again with `declaration_name` + `new_declaration`."
+                ),
+            }
 
     async def register_task_tools(self, mcp) -> None:
         from typing import Annotated

@@ -481,10 +481,14 @@ is anything here actually BROKEN? That is your only job — ignore proof length,
 duplication, naming, docstrings, and formatting.
 
 Start by compiling. Call `lean_verify_edit` on the reviewed file with no edit arguments to compile
-it as it stands. Read the result carefully: it separates errors your edit introduced from errors
-already in the file, and here you have made no edit, so anything reported is a real defect in the
-PR. A reviewed file that does not compile is the most serious finding you can report and the
-easiest to miss, because every other check assumes it does.
+it as it stands. That call answers one question and only that one: `compiles`, with anything under
+`errors_already_in_the_file` being a real defect in the PR, since you have made no edit for an
+error to come from. A reviewed file that does not compile is the most serious finding you can
+report and the easiest to miss, because every other check assumes it does.
+
+`compiles: true` is the ordinary case and is where your work starts, not where it ends. It says the
+file builds; it says nothing about whether what it builds is correct, and none of the defects below
+are visible to the compiler. Reaching it means the build question is settled — go and ask the rest.
 
 Beyond the build, look for: a statement that does not say what its name and docstring claim; a
 hypothesis that is unused and whose absence would make the statement false; `sorry`, `admit`, or an

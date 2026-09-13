@@ -482,3 +482,121 @@ def test_the_environment_note_is_absent_when_every_error_is_the_edits_own(task, 
 
     assert result["errors_already_in_the_file"] == []
     assert "environment" not in result
+
+
+# --- the two questions one tool name answers ----------------------------------------------
+#
+# `lean_verify_edit(path=...)` with no edit arguments asks "does this file compile?". With an
+# edit it asks "is my change sound?". Both used to come back as
+# `{"success": true, ..., "Lean verification completed successfully"}`, and because the
+# reviewed file compiles by construction the first is a guaranteed green shaped exactly like
+# a discharged verification. Measured on `pr5_A_lead_heldout12_rep1`: all 86 no-edit calls
+# carried the `note` warning that they proved nothing, and the call was still the last act
+# before 33 of 82 empty arm submissions — 9 of 9 for `docs`, 10 of 19 for `naming`.
+
+
+class _FakeMCP:
+    def __init__(self):
+        self.tools = {}
+
+    def tool(self, **_kwargs):
+        def decorate(fn):
+            self.tools[fn.__name__] = fn
+            return fn
+        return decorate
+
+
+@pytest.fixture
+def verify_edit(task, monkeypatch):
+    """The registered tool closure, not the helper underneath it. The distinction is the
+    point: `_edited_file_code` and `_baseline_errors` legitimately compile the unedited file
+    and must keep working, so the refusal to *claim verification* belongs in the tool."""
+
+    import asyncio
+
+    compiled = {"errors": []}
+
+    class FakeLean:
+        def __init__(self, **kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20):
+            errors = compiled["errors"]
+            return {"success": not errors, "errors": list(errors), "warnings": [],
+                    "message": "Lean verification completed successfully"}
+
+    import ape.toolkits.execute.lean.tools as tools_module
+    monkeypatch.setattr(tools_module, "LeanVerifyToolsProvider", FakeLean)
+    mcp = _FakeMCP()
+    task._register_lean_verify_edit(mcp)
+    return mcp.tools["lean_verify_edit"], compiled, asyncio
+
+
+def test_a_no_edit_call_does_not_report_success(verify_edit):
+    """The whole defect in one assertion. Nothing was verified, so there is no `success` to
+    report, and an agent scanning for one finds no green to stop on."""
+
+    tool, _compiled, asyncio = verify_edit
+    result = asyncio.run(tool(path="Mathlib/A.lean"))
+    assert "success" not in result
+    assert "Lean verification completed successfully" not in str(result)
+
+
+def test_a_no_edit_call_answers_the_status_question_in_its_own_vocabulary(verify_edit):
+    tool, _compiled, asyncio = verify_edit
+    result = asyncio.run(tool(path="Mathlib/A.lean"))
+    assert result["mode"] == "as_is_compile_check"
+    assert result["compiles"] is True
+    assert result["errors_already_in_the_file"] == []
+
+
+def test_a_no_edit_call_says_what_it_does_not_warrant(verify_edit):
+    """`correctness` is told to open with this call, so it must stay available and must stay
+    honest. Removing the capability would cost 33057's obligation, whose gold finding is that
+    the reviewed file does not compile."""
+
+    tool, _compiled, asyncio = verify_edit
+    result = asyncio.run(tool(path="Mathlib/A.lean"))
+    assert "not evidence" in result["warrants"].lower()
+    assert "no edit was applied" in result["warrants"].lower()
+
+
+def test_a_red_file_is_reported_as_red_with_every_error_pre_existing(verify_edit):
+    """The one outcome of this call that is a finding. With no edit applied there is nothing
+    for an error to have come from, so the split is true by construction — which is what the
+    `correctness` prompt promised all along and never delivered, because `_attribute_errors`
+    is skipped on this path."""
+
+    tool, compiled, asyncio = verify_edit
+    compiled["errors"] = [{"data": "unsolved goals at expand_apply"}]
+    result = asyncio.run(tool(path="Mathlib/A.lean"))
+    assert result["compiles"] is False
+    assert [e["data"] for e in result["errors_already_in_the_file"]] == [
+        "unsolved goals at expand_apply"]
+    assert result["errors_introduced_by_your_edit"] == []
+
+
+def test_an_edit_call_still_reports_success_and_is_labelled_a_verified_edit(verify_edit):
+    """The other half of the contract: the mode that *can* warrant a claim is unchanged, so
+    the submission gate keeps reading the field it has always read."""
+
+    tool, _compiled, asyncio = verify_edit
+    result = asyncio.run(tool(
+        path="Mathlib/A.lean", declaration_name="Foo.bar",
+        new_declaration="theorem bar : True := trivial"))
+    assert result["mode"] == "verified_edit"
+    assert result["success"] is True
+
+
+def test_the_two_modes_are_not_confusable(verify_edit):
+    """`schema/evidence.py:88` for the arm layer: "we did not check" and "we checked and
+    found nothing" must not look alike. Same file, same green compile, two shapes."""
+
+    tool, _compiled, asyncio = verify_edit
+    as_is = asyncio.run(tool(path="Mathlib/A.lean"))
+    verified = asyncio.run(tool(
+        path="Mathlib/A.lean", declaration_name="Foo.bar",
+        new_declaration="theorem bar : True := trivial"))
+    assert set(as_is) != set(verified)
+    assert "success" in verified and "success" not in as_is
+    assert "warrants" in as_is and "warrants" not in verified

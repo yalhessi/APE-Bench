@@ -145,7 +145,14 @@ def test_an_arms_question_is_written_once():
 #: Complex` placement) -- and the whole suite stayed green. A spec's identity is what the
 #: agenda seals, so it is worth stating outright.
 EXPECTED_SPEC_IDENTITY = {
-    "api_reuse": "cab1c1dd3561", "correctness": "75bca1cae954", "docs": "0272b478d6e9",
+    # `correctness` moved 75bca1cae954 -> 9fe3c13087f2 on 2026-09-13, deliberately. Its
+    # opening instruction described a result the tool never returned on that path: it
+    # promised the no-edit compile "separates errors your edit introduced from errors
+    # already in the file", but `_attribute_errors` is gated on `edited_only`, so no split
+    # was ever produced for a call with no edit. The prompt now describes what that call
+    # actually answers (`compiles`, `errors_already_in_the_file`) and says outright that
+    # `compiles: true` is where the work starts. Nine of ten identities are unchanged.
+    "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "0272b478d6e9",
     "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
     # `naming` moved 8dfd2c87af4d -> ee245f077b7e on 2026-09-13, deliberately: the arm was
     # calibrated to "what the local family already does" and stayed silent 13/13 reps on a
