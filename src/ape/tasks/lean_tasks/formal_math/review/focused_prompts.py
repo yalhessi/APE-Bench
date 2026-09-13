@@ -347,22 +347,35 @@ That is your only job — ignore proof length, generality, duplication, docstrin
 
 Mathlib naming is a convention system, not a matter of taste, and the convention is discoverable in
 the repository itself. A name is built from the head symbol and the shape of the statement, in the
-order they appear: `encard_le_encard`, `isOpen_iUnion`, `Finset.sum_comm`. What matters is
-what the local family already does — a lemma about `Set.encard` sits beside other `encard_` lemmas
-and takes the same prefix, even when a plausible alternative reads better in isolation.
+order they appear: `encard_le_encard`, `isOpen_iUnion`, `Finset.sum_comm`.
 
-So DO NOT propose a name from first principles. Establish the convention first:
-- Use `content_search` and `code_goto` to find the declaration's siblings — other lemmas in the same
-  file, the same namespace, and about the same head symbol — and read what they are called.
+The convention that governs a name is the one for the subject its CONCLUSION is about, measured
+across the whole repository — not the handful of lemmas that happen to sit beside it. Those are
+different answers often enough to matter: a file can be the last corner using a spelling the
+library has moved away from, and its siblings will agree with each other all the way down.
+
+So DO NOT propose a name from first principles, and do not read a convention off a directory:
+- Call `naming_norm` on each declaration this PR adds or renames. It reports the conclusion's
+  subject, every prefix the repository uses for that subject WITH COUNTS over the base commit, and
+  a verdict. The verdict is the answer — not your own reading of the counts:
+    * `established` — the corpus is lopsided enough to hold a PR to. A rename is a fair ask.
+    * `emerging` — one spelling leads clearly but does not dominate. Say so as an ADVISORY
+      suggestion, naming it as the emerging spelling rather than the rule.
+    * `insufficient_evidence` — the repository has no opinion here. Submit nothing on naming.
 - Use `precedent_search` to find what maintainers have actually asked for on similar declarations.
-  A past rename request is the strongest evidence available about what will be asked here.
+  A past rename request is the strongest evidence available about what will be asked here, and it
+  can justify an ask the counts alone would not.
 - Use `zulip_search` when a convention looks contested or recent; a name being established is not
-  yet visible in the population.
+  yet visible in the population. Keep queries short — a few words, not a sentence.
+- `content_search` and `code_goto` are for READING the siblings you cite, not for counting them.
+  A capped grep over a few files cannot measure a convention, and it will tell you so.
 
-Report a finding only when the proposed name follows a convention you can point to. Say which
-sibling declarations or which precedent establishes it. "This name could be clearer" is not a
-finding; "this file's other cardinality lemmas use the `encard_` prefix and this one does not" is.
-If the name already matches its family, submit nothing."""
+Report a finding only when the evidence you can point to supports it: quote the counts
+`naming_norm` returned, or the precedent, or the discussion. "This name could be clearer" is not a
+finding; "of 121 declarations whose conclusion is about `toLinearMap`, 21 use `toLinearMap_` and 7
+use `coe_`" is. If the verdict is `insufficient_evidence` and no precedent says otherwise, or the
+name already follows the convention, submit nothing — a naming check that finds nothing is a
+normal and correct outcome."""
 
 NAMING_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n"""
 

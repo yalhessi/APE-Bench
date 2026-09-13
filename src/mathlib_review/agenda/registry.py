@@ -163,7 +163,11 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          # different populations. Conditioned on the subject a lemma is *about* -- which is
          # what `naming_norm` already measures -- the corpus agrees with the maintainer on
          # 33337: `toLinearMap_` is the modal prefix, 21 against `coe_`'s 7, of 121.
-         context_tools=("declaration_search", "precedent_search", "zulip_search")),
+         # `naming_norm` answers the one question the other three cannot: not "does this
+         # name exist" or "what did a maintainer once say", but "what does this repository
+         # call lemmas with this subject, counted". Measured: the arm asked convention
+         # questions with `content_search` and could only ever sample.
+         context_tools=("naming_norm", "declaration_search", "precedent_search", "zulip_search")),
     _arm("docs", "documentation", "documentation_gap",
          "Is the documentation COMPLETE, CORRECT and CONFORMANT — in that "
          "order?\n  * complete: a sentence that stops mid-thought, a hypothesis or a `TODO` "

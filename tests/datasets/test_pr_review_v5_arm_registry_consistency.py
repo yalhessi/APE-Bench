@@ -147,7 +147,13 @@ def test_an_arms_question_is_written_once():
 EXPECTED_SPEC_IDENTITY = {
     "api_reuse": "cab1c1dd3561", "correctness": "75bca1cae954", "docs": "0272b478d6e9",
     "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
-    "generality": "ef5c1b06333a", "naming": "8dfd2c87af4d", "proof_golf": "854c179f8da7",
+    # `naming` moved 8dfd2c87af4d -> ee245f077b7e on 2026-09-13, deliberately: the arm was
+    # calibrated to "what the local family already does" and stayed silent 13/13 reps on a
+    # real naming ask while its tools worked, so the contract now points at the repository's
+    # counted population for the conclusion's subject (`naming_norm`) and licenses an
+    # advisory ask on an emerging one. Nine of ten identities are unchanged, which is the
+    # check that this touched one arm and not the registry's shape.
+    "generality": "ef5c1b06333a", "naming": "ee245f077b7e", "proof_golf": "854c179f8da7",
     "proof_idiom": "d0d4b417257d", "style": "d82d80097e5a",
 }
 
