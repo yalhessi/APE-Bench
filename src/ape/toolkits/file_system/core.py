@@ -19,7 +19,7 @@ from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 from ape.utils.logging import create_logger
 from .utils import (
     generate_unified_diff, generate_word_diff, search_content_with_timeout,
-    add_line_numbers, resolve_search_paths, calculate_relative_path,
+    add_line_numbers, resolve_search_paths, calculate_relative_path, walk_workspace_files,
     validate_file_exists_and_is_file,
     check_file_size_limit, read_file_content_safe, apply_line_range_to_content,
     get_default_config_values,
@@ -323,11 +323,14 @@ class FileSystemProvider:
             
             results = []
             count = 0
+            scanned = 0
+            truncated = False
             
             for file_path in files_to_search:
                 if count >= max_results:
+                    truncated = True
                     break
-                
+                scanned += 1
                 
                 # Check file size limit
                 max_size = self.fs_config.performance.max_file_size_for_content_search
@@ -369,10 +372,27 @@ class FileSystemProvider:
                 })
                 count += 1
             
-            return {
+            # How much of the search space this answer covers. Without it the caller cannot
+            # tell a census from a sample: a capped search over a partial tree returned a
+            # handful of files and read as "the convention is not there". The verifier path
+            # already refuses to read a population from a partial tree (`analysis/evidence.py`,
+            # "a 2% sample that still clears MIN_SUPPORT"); the search tool now says so too.
+            report = {
                 "success": True,
-                "results": results
+                "results": results,
+                "files_available": len(files_to_search),
+                "files_scanned": scanned,
+                "files_with_matches": count,
+                "truncated": truncated,
             }
+            if truncated:
+                report["note"] = (
+                    f"Stopped at the file limit ({max_results}) after scanning {scanned} of "
+                    f"{len(files_to_search)} files. These results are a SAMPLE, not a census: "
+                    f"do not read a count or a prevalence off them. Narrow the pattern or the "
+                    f"path, or raise `limit`, before concluding how common something is."
+                )
+            return report
             
         except Exception as e:
             self.logger.error(f"Error searching file content: {traceback.format_exc()}")
@@ -424,13 +444,9 @@ class FileSystemProvider:
             results = []
             count = 0
             
-            # File traversal
-            if recursive:
-                file_iter = resolved_path.rglob('*')
-            else:
-                file_iter = resolved_path.iterdir()
-            
-            for file_path in file_iter:
+            # Same traversal as content_search: symlinked directories are descended and
+            # hidden ones skipped, so a workspace overlay does not silently hide the corpus.
+            for file_path in walk_workspace_files(resolved_path, recursive):
                 if count >= max_results:
                     break
                 

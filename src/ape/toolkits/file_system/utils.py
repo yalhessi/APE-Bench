@@ -5,6 +5,7 @@ Contains common tool functions for file system, independent of language.
 Uses asynchronous IO to avoid blocking the event loop.
 """
 
+import os
 import re
 import difflib
 import traceback
@@ -259,15 +260,7 @@ def resolve_search_paths(path_input: Path, base_workspace: Path, recursive: bool
                 # Single file
                 files_to_search.append(resolved_path)
             elif resolved_path.is_dir():
-                # Directory: iterate through files
-                if recursive:
-                    file_iter = resolved_path.rglob('*')
-                else:
-                    file_iter = resolved_path.iterdir()
-                
-                for file_path in file_iter:
-                    if file_path.is_file():
-                        files_to_search.append(file_path)
+                files_to_search.extend(walk_workspace_files(resolved_path, recursive))
         
         return files_to_search
         
@@ -278,6 +271,56 @@ def resolve_search_paths(path_input: Path, base_workspace: Path, recursive: bool
 
 
 # ===== Workspace path processing tool =====
+
+def walk_workspace_files(root: Path, recursive: bool = True) -> List[Path]:
+    """Every file under `root`, descending into symlinked directories, skipping hidden ones.
+
+    `Path.rglob` does not descend a symlinked directory, and a review attempt's `target/` is a
+    farm of symlinks into a shared read-only workspace with only the PR's own subtree
+    materialised. So `rglob` on `target/Mathlib` reached 66 of Mathlib's 7,443 files and said
+    nothing about it: an arm asking a repository-wide question was handed its own neighbourhood
+    with the corpus's authority. Measured on a real attempt workspace, and it is why the naming
+    arm's convention searches came back empty.
+
+    Hidden directories are skipped below the root (never the root itself, so an explicit
+    `.lake/build` path still works). That is what `glob` already does in the wildcard branch of
+    `resolve_search_paths`, so the two branches now agree rather than disagreeing silently --
+    and it is what keeps this fast: at a workspace root, `rglob` walked 96,920 files of
+    `.lake/build` in 23.2 s and still missed Mathlib, against 8,000 files in 0.3 s here.
+
+    Symlinked directories are followed, so a cycle is possible in principle; each directory is
+    visited at most once by (device, inode).
+    """
+
+    root = Path(root)
+    if not recursive:
+        try:
+            return [item for item in root.iterdir() if item.is_file()]
+        except OSError:
+            return []
+
+    files: List[Path] = []
+    seen: set = set()
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
+        try:
+            stat = os.stat(dirpath)
+            key = (stat.st_dev, stat.st_ino)
+        except OSError:
+            dirnames[:] = []
+            continue
+        if key in seen:
+            dirnames[:] = []
+            continue
+        seen.add(key)
+        dirnames[:] = [name for name in dirnames if not name.startswith(".")]
+        for name in filenames:
+            if name.startswith("."):
+                continue
+            candidate = Path(dirpath) / name
+            if candidate.is_file():
+                files.append(candidate)
+    return files
+
 
 def calculate_relative_path(absolute_path: Path, base_workspace: Path) -> Path:
     """Calculate relative path, return original path if failed"""
