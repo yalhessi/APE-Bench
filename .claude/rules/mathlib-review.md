@@ -126,3 +126,13 @@ paths:
   and `_attribute_errors` (`review/base.py:392`) **keeps `errors` intact** and *adds*
   `errors_introduced_by_your_edit` / `errors_already_in_the_file` — so a non-empty `errors` does
   not mean the agent's edit failed, only the split field does.
+- **A hand-built fake cannot disagree with the class it stands in for.** Twice in one session:
+  a fixture built a `BuildManager` with `__new__` and set `workspace_dir` by hand, so the fake
+  had an attribute the real class did not and the first real prebuild died in 1s with
+  `'BuildManager' object has no attribute 'workspace_dir'`; and `_record_outcome` in
+  `test_pr_review_v5_lead.py` built a `SimpleNamespace` shaped like a `JobOutcome`, so when the
+  lead started reading a new field the three tests that exercise that exact code path kept
+  passing until the field was added to the real dataclass. Both fakes were green precisely
+  because they were free to be wrong. **Construct the real class in a fixture** — a dataclass or
+  pydantic model is cheap to build and will refuse an argument it does not have. Reserve
+  `SimpleNamespace` for things with no class to construct.

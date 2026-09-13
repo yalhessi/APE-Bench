@@ -101,12 +101,28 @@ def _valid_candidate(data):
 
 
 def test_an_empty_submission_is_accepted(unverified_unit):
-    """`[]` is a valid review outcome and must not error."""
+    """`[]` is a valid review outcome and must not error.
+
+    It now has to say which outcome it is. That is not a narrowing of what may be submitted
+    -- every reason is accepted and none is preferred -- it is the difference between a
+    silence that can be read afterwards and one that cannot. See
+    `test_pr_review_v5_abstention.py` for the contract and for the check that the refusal
+    never reads as pressure to produce a finding.
+    """
+
+    _data, submit = _handler_for(*unverified_unit)
+    result = asyncio.run(submit(candidates=[], abstention_reason="nothing_of_this_kind_here",
+                                abstention_detail="No target here falls under this check."))
+    evaluation = result.get("evaluation_result")
+    assert evaluation is None or evaluation.success
+
+
+def test_an_empty_submission_without_a_reason_is_sent_back(unverified_unit):
+    """The mute form, which is what 81% of specialist invocations on the held-out run were."""
 
     _data, submit = _handler_for(*unverified_unit)
     result = asyncio.run(submit(candidates=[]))
-    evaluation = result.get("evaluation_result")
-    assert evaluation is None or evaluation.success
+    assert result["evaluation_result"].success is False
 
 
 def test_a_well_formed_candidate_is_accepted(unverified_unit):

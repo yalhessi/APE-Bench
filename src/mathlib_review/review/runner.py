@@ -456,6 +456,7 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
                 "status": "success" if raw.get("success") else "failed",
                 "candidates": raw.get("candidates") or [],
                 "verification_artifacts": raw.get("verification_artifacts") or [],
+                "abstention": raw.get("abstention"),
                 "rendered_prompt_sha256": raw.get("rendered_prompt_sha256"),
             })
     return responses
@@ -519,6 +520,12 @@ def _solo_responses(results, graphs, units, logger=None):
                 "status": "success",
                 "candidates": [_solo_candidate(finding, unit) for finding in findings],
                 "verification_artifacts": [],
+                # Always None, and present rather than absent so all three row builders emit
+                # one key set. A solo agent reviews the whole PR and its findings are
+                # projected onto the units they anchor to, so a unit with no finding produces
+                # no row at all -- there is no submission here to have abstained, and
+                # inventing a reason for one would be fabricating the agent's rationale.
+                "abstention": None,
                 "rendered_prompt_sha256": None,
             })
     return responses, anchor_rows

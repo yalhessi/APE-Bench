@@ -76,6 +76,13 @@ Finish by calling submit_candidates exactly once, using:
 "declaration_name": "...", "new_declaration": "complete replacement"}} or null,
 "model_confidence": 0.0}}]}}. An empty candidates list is valid.
 
+Submitting nothing is a correct and common outcome of this check, and nothing below asks you to
+avoid it. It does have to say which outcome it was: when `candidates` is empty, set
+`abstention_reason` — `nothing_of_this_kind_here`, `already_correct`, `below_my_bar`,
+`could_not_establish`, or `belongs_to_another_concern` — and put one sentence in
+`abstention_detail` naming what you considered. Never add a candidate you do not believe in to
+avoid abstaining; a wrong finding costs this review far more than a silence does.
+
 Every candidate must set concern_family to "{concern_family}" and issue_kind to
 "{issue_kind}" — this run is the {spec_id} check and makes no other kind of claim. Each
 candidate has exactly one primary target and subject; copy their IDs and subject exactly, and

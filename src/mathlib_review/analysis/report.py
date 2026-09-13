@@ -92,7 +92,33 @@ def retrieval(run_name: str) -> Dict[str, Any]:
         # every row, and a row without one is a tool that was added without declaring how it
         # is bounded.
         "calls_without_a_recorded_gate": sum(1 for row in rows if not row.get("gate")),
+        # The other half of the same question. `by_arm` says what an arm looked at; this says
+        # what it concluded when it reported nothing, which on the held-out run was 81% of
+        # specialist invocations. Before `abstention` existed the only way to answer this was
+        # to reconstruct each session's last tool result from the transcripts, and three
+        # successive attempts at that were wrong before one was right.
+        "abstentions": _abstentions(run_name),
     }
+
+
+def _abstentions(run_name: str) -> Dict[str, Any]:
+    """Per arm, why it submitted nothing.
+
+    `unstated` counts rows written before the reason was required, or by a routing mode that
+    does not produce one. It is reported rather than dropped: an arm whose silence is
+    unexplained is exactly the thing this field exists to make visible, so hiding it in a
+    denominator would reproduce the problem in the report that is supposed to expose it.
+    """
+
+    by_arm: Dict[str, Dict[str, int]] = {}
+    for row in _load_jsonl(run_dir(run_name) / "arm_responses.jsonl"):
+        if row.get("candidates"):
+            continue
+        arm = row.get("arm_id") or str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
+        reason = (row.get("abstention") or {}).get("reason") or "unstated"
+        entry = by_arm.setdefault(arm, {})
+        entry[reason] = entry.get(reason, 0) + 1
+    return dict(sorted(by_arm.items()))
 
 
 def routing(run_name: str) -> Dict[str, Any]:

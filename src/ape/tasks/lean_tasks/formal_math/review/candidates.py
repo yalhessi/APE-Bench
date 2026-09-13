@@ -3,7 +3,7 @@
 import hashlib
 import json
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Literal, Optional, Tuple
+from typing import Annotated, Any, Dict, List, Literal, Optional, Tuple, get_args
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -37,11 +37,38 @@ class LeanPRReviewV4CandidateData(BasePRReviewData):
     ] = "none"
 
 
+#: Why an arm submitted nothing.
+#:
+#: An empty submission was mute: `submit_candidates([])` carried no reason, so "nothing here
+#: falls under my concern", "I found something and it did not meet my bar" and "I could not
+#: establish it" all arrived as the same empty list. 81% of specialist invocations on
+#: `pr5_A_lead_heldout12_rep1` were empty, and the rules file records the consequence —
+#: "there was never a rationale to aim a prompt at". These are the five endings a
+#: last-action analysis of that run could distinguish from the outside; recording them at the
+#: source costs one enum and replaces the inference.
+#:
+#: Declared once, as a Literal, so the tool schema enumerates it for the model and no second
+#: copy can drift: a closed vocabulary maintained in two places is this repo's most expensive
+#: recurring bug.
+AbstentionReason = Literal[
+    "nothing_of_this_kind_here",
+    "already_correct",
+    "below_my_bar",
+    "could_not_establish",
+    "belongs_to_another_concern",
+]
+ABSTENTION_REASONS: Tuple[str, ...] = get_args(AbstentionReason)
+
+
 class LeanPRReviewV4CandidateResult(BasePRReviewResult):
     work_unit_id: str
     rendered_prompt_sha256: str
     candidates: List[Dict[str, Any]] = Field(default_factory=list)
     verification_artifacts: List[Dict[str, Any]] = Field(default_factory=list)
+    #: `{"reason": ..., "detail": ...}` when the arm submitted nothing, else None. Declared
+    #: here because `BaseTaskResult` is pydantic with the default `extra='ignore'`: an
+    #: undeclared keyword reaches `create_result` and is dropped with no error at all.
+    abstention: Optional[Dict[str, str]] = None
 
 
 class ProposedEditSubmission(BaseModel):
@@ -505,10 +532,52 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             candidates: Annotated[List[CandidateSubmission], Field(
                 description="Candidate objects matching the JSON contract in the prompt; [] is valid."
             )] = [],
+            abstention_reason: Annotated[Optional[AbstentionReason], Field(
+                description=(
+                    "REQUIRED when `candidates` is empty, ignored otherwise. Submitting "
+                    "nothing is a correct and common outcome; this only records which "
+                    "outcome it was. `nothing_of_this_kind_here`: no target falls under "
+                    "this check. `already_correct`: the check applies and the code already "
+                    "satisfies it. `below_my_bar`: you found a candidate issue and it did "
+                    "not meet the evidence or severity bar. `could_not_establish`: you "
+                    "needed evidence your tools could not produce. "
+                    "`belongs_to_another_concern`: you saw a real issue that is not this "
+                    "check's business."
+                )
+            )] = None,
+            abstention_detail: Annotated[str, Field(
+                description=(
+                    "One sentence, when abstaining: name the specific thing you considered "
+                    "and what was missing. 'Checked the three new lemma names against the "
+                    "counted population; all three match the dominant prefix.' Not 'nothing "
+                    "found'."
+                )
+            )] = "",
         ) -> Dict[str, Any]:
             from ape.tasks.base import EvaluationResult
 
             raw_candidates = [item.model_dump(mode="json") for item in candidates or []]
+            # Silence has to say which silence it is, or it cannot be read afterwards and
+            # cannot be aimed at. Refusing here rather than accepting a mute submission is
+            # the same treatment every other contract violation gets, and it costs one short
+            # round trip with no re-investigation.
+            #
+            # The wording carries real weight and is not decoration. An arm that reads this
+            # as pressure to produce something would destroy the one result this project has
+            # that nothing else replaces: 0 candidates per control PR, per rep. Abstention
+            # must stay exactly as cheap as submitting.
+            if not raw_candidates and abstention_reason is None:
+                return {"evaluation_result": EvaluationResult(
+                    success=False, score=0.0,
+                    message=(
+                        "Submitting nothing is a valid and expected outcome, and this is NOT "
+                        "a request to find something — do not add a candidate to satisfy it. "
+                        "Only the label is missing. Call submit_candidates again with the "
+                        "same empty list, plus abstention_reason set to one of: "
+                        f"{', '.join(ABSTENTION_REASONS)}; and one sentence in "
+                        "abstention_detail saying what you considered."
+                    )),
+                    "message": "Abstention recorded without a reason"}
             allowed = set(self.data.change_ids)
             allowed_by_suffix = {item.removeprefix("change:"): item for item in allowed}
             for index, candidate in enumerate(raw_candidates):
@@ -580,6 +649,9 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                 rendered_prompt_sha256=self.data.rendered_prompt_sha256,
                 candidates=raw_candidates,
                 verification_artifacts=verification_artifacts,
+                abstention=({"reason": abstention_reason,
+                             "detail": (abstention_detail or "").strip()}
+                            if not raw_candidates else None),
                 findings=[], review_message="",
             )
             if self.termination_callback:
