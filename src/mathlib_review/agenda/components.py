@@ -34,7 +34,7 @@ from src.mathlib_review.schema import ChangeGraph, PRRelation, ReviewEpisodeInpu
 
 #: Grains, coarsest last. A target usually belongs to several: a declaration is its own
 #: `site`, may sit in a `family`, and always sits in a `file`.
-GRAINS = ("site", "family", "file", "migration", "pr_intent")
+GRAINS = ("site", "introduction", "family", "file", "migration", "pr_intent")
 
 #: Relations that make two declarations part of one design decision. Deliberately not
 #: `declaration_dependency` — A using B in its statement makes B *important* (see
@@ -296,6 +296,32 @@ def build_components(
                 suggested_arms=("docs", "style") if target.kind == "module_doc" else (),
             ))
 
+        # --- introduction: a declaration this PR adds that did not exist at base --------
+        #
+        # The shape that asks "does this already exist, and is it sound?" -- the questions
+        # `duplication`/`api_reuse` and `correctness` are for. Without it neither arm has a
+        # trigger, and measured on the 12-PR held-out run neither was ever required: the lead
+        # pruned all 107 `correctness` pairs and the arm ran zero times, on a set holding
+        # three correctness obligations. PR 33149 is the case -- 56 introduced declarations,
+        # gold asking to remove newly added bare axioms, and all ten of its required slots
+        # spent on arms that cannot publish.
+        #
+        # It is silent where it should be: the two control PRs introduce nothing at all
+        # (33304 and 33315, 0 of 13 and 0 of 12 targets), so this grain cannot put required
+        # work on the PRs that measure precision -- the failure the `site`/`docs` rule was
+        # narrowed for.
+        for target in sorted(graph.targets, key=lambda t: t.change_id):
+            if target.kind != "declaration":
+                continue
+            if (target.base_code or "").strip() or not (target.reviewed_code or "").strip():
+                continue
+            components.append(_component(
+                "introduction", graph, [target.change_id],
+                [subject_of.get(target.change_id, "")],
+                "this declaration is new in this PR", paths=[target.path],
+                suggested_arms=("duplication", "api_reuse", "correctness"),
+            ))
+
         # --- family: declarations that are one design decision --------------------------
         for members, evidence, reason in sorted(
                 _families(graph, relations), key=lambda item: sorted(item[0])[0]):
@@ -346,6 +372,11 @@ def build_components(
     # with `file` on single-file PRs, but they are not restatements of it: they carry what the
     # PR says it is *doing* and route different arms for it. Deduping them away silently
     # deleted the golf routing on PR 33285, which is the case the intent grain exists for.
+    # `introduction` is exempt for the same reason as `migration`: it covers the same
+    # changes as that declaration's `site` component and is not a restatement of it -- it
+    # carries a different question ("is this new thing already in the library, and is it
+    # sound?") and routes different arms. Deduping it against `site` would delete it
+    # entirely, since every introduced declaration is also a site.
     structural = {"site", "family", "file"}
     seen: Set[Tuple[int, Tuple[str, ...]]] = set()
     deduped: List[ReviewComponent] = []
