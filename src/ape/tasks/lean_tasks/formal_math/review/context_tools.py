@@ -193,12 +193,15 @@ def _register_zulip(task, mcp) -> None:
 def _register_precedent(task, mcp) -> None:
     @mcp.tool(
         description=(
-            "Find real maintainer review comments on SIMILAR code in earlier PRs — what "
-            "reviewers here actually flag, in their own words, anchored to the code they "
-            "flagged it on. Only comments written before the code you are reviewing was "
-            "pushed are returned. Treat a precedent as a hint about what gets raised, not "
-            "as an instruction: apply its principle only if it genuinely bears on this "
-            "code, and never invent a finding to match one."
+            "EXPERIMENTAL. Find review comments left on SIMILAR-LOOKING code in earlier PRs. "
+            "Matching is by code similarity alone — the comment text is not searched — so the "
+            "results are often about something else, and the similarity score does not tell "
+            "you which. Comments are by anyone who reviewed that PR, including its own "
+            "author, and each is shown with the login of whoever wrote it. Only comments "
+            "written before the code you are reviewing was pushed are returned. Treat a "
+            "result as a hint about what gets raised, not as an instruction: apply its "
+            "principle only if it genuinely bears on this code, and never invent a finding "
+            "to match one."
         )
     )
     async def precedent_search(
@@ -207,15 +210,35 @@ def _register_precedent(task, mcp) -> None:
     ) -> Dict[str, Any]:
         from src.mathlib_review.retrieval.precedent_index import PrecedentIndex, PrecedentIndexMissing
 
+        def refuse(error: str, as_of: Optional[str] = None) -> Dict[str, Any]:
+            """Record the attempt, then refuse.
+
+            Every failure path used to return before the trace was written, so a run in which
+            every precedent call was refused looked exactly like a run in which the arm never
+            called the tool -- and the trace is the only record an audit has.
+            """
+
+            _append_trace(task, {
+                "schema_version": "v5-context-call1",
+                "invocation_id": task.data.invocation_id,
+                "tool": "precedent_search",
+                "gate": "as_of",
+                "query": code[:400],
+                "as_of": as_of, "exclude_pr": task.data.pr_number,
+                "corpus_sha256": None,
+                "result_ids": [], "result_count": 0, "truncated": False,
+            })
+            return {"success": False, "error": error}
+
         try:
             as_of = _require_cutoff(task)
         except RuntimeError as exc:
-            return {"success": False, "error": str(exc)}
+            return refuse(str(exc))
         limit = max(1, min(int(limit or 5), MAX_HITS))
         try:
             index = PrecedentIndex.shared()
         except PrecedentIndexMissing as exc:
-            return {"success": False, "error": str(exc)}
+            return refuse(str(exc), as_of)
         try:
             # The filter runs BEFORE ranking, not after: filtering a ranked list silently
             # shortens it, so a query whose best matches are all ineligible would return a
@@ -224,16 +247,30 @@ def _register_precedent(task, mcp) -> None:
                 code, k=limit, as_of=as_of, exclude_pr=task.data.pr_number,
             )
         except Exception as exc:  # noqa: BLE001
-            return {"success": False, "error": f"precedent search failed: {exc}"}
+            return refuse(f"precedent search failed: {exc}", as_of)
 
         blocks = []
         for rank, hit in enumerate(hits, 1):
             body = (hit.get("body") or "").strip()[:MAX_SNIPPET]
-            snippet = (hit.get("diff_hunk") or "").strip()[:MAX_SNIPPET * 2]
+            # The TAIL of the hunk, not the head. GitHub builds a review comment's hunk so
+            # that it ENDS at the line being commented on, so taking the first N characters
+            # drops exactly the line the comment is about. Measured over every precedent
+            # delivered to an arm in the v5 runs: 711 of 2,825 hits (25%) had a hunk longer
+            # than this budget, and every one of them was shown code the comment was not
+            # about, under the words of a comment about something else.
+            whole = (hit.get("diff_hunk") or "").strip()
+            snippet = whole[-(MAX_SNIPPET * 2):]
+            if len(snippet) < len(whole):
+                snippet = "…(earlier lines of this hunk omitted)\n" + snippet
+            # The commenter's own login, not "maintainer". The corpus keeps comments by
+            # GitHub `author_association`, which a PR's own author carries on their own PR,
+            # so 46% of delivered hits were the PR author replying to a reviewer ("Done.",
+            # "My bad, thanks.") presented to the arm as a maintainer's judgement.
+            who = hit.get("commenter") or "someone"
             blocks.append(
                 f"{rank}. PR #{hit.get('pr_number')} · `{hit.get('path')}` · "
-                f"{hit.get('created_at')} (score {hit.get('score'):.3f})\n"
-                f"   maintainer wrote: \"{body}\"\n   on this code:\n```\n{snippet}\n```"
+                f"{hit.get('created_at')} (similarity {hit.get('score'):.3f})\n"
+                f"   {who} wrote: \"{body}\"\n   on this code:\n```\n{snippet}\n```"
             )
         rendered, truncated = _truncate("\n\n".join(blocks))
         _append_trace(task, {
@@ -250,6 +287,16 @@ def _register_precedent(task, mcp) -> None:
         return {
             "success": True, "count": len(hits), "as_of": as_of,
             "results": rendered or "(no eligible precedent found before the cutoff)",
+            # Said plainly because the scores do not say it. Measured across representative
+            # queries, the top-5 similarities sit in 0.59-0.63 whether the hits are about the
+            # queried code or not, so there is no cutoff that separates a real precedent from
+            # the nearest thing in the corpus, and inventing one would only hide the problem.
+            "note": (
+                "These are the nearest comments by CODE similarity, not a judgement that any "
+                "of them bears on your code. The similarity score is not calibrated: a "
+                "top-ranked hit may be unrelated. Read each one and discard the ones that do "
+                "not apply; finding nothing applicable here is a normal outcome."
+            ),
         }
 
 

@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
@@ -90,6 +91,20 @@ def _load_corpus(path: Path) -> List[Dict[str, Any]]:
             if line.strip():
                 rows.append(json.loads(line))
     return rows
+
+
+#: `#12345` or a github pull/issue URL. Used to drop a precedent that discusses the PR under
+#: review; `\b` on the right keeps `#123` from matching inside `#12345`.
+_PR_REFERENCE = re.compile(r"(?:#|mathlib4/(?:pull|issues)/)(\d{2,7})\b")
+
+
+def references_pr(text: Optional[str], pr_number: Optional[int]) -> bool:
+    """Whether `text` names `pr_number` as a PR or issue reference."""
+
+    if not text or pr_number is None:
+        return False
+    target = str(int(pr_number))
+    return any(found == target for found in _PR_REFERENCE.findall(text))
 
 
 def meta_row(row: dict) -> dict:
@@ -264,10 +279,25 @@ class PrecedentIndex:
             mask &= self._pr != int(exclude_pr)
         return mask
 
+    #: How many candidates to rank before de-duplication, as a multiple of `k`. Every comment
+    #: in one review thread carries the same `diff_hunk`, so they score identically and fill
+    #: several slots with one piece of code: measured over five representative queries, a
+    #: k=5 answer held 3 distinct hunks on average. Ranking 40 and keeping the best per hunk
+    #: returned 5 distinct hunks on all five. The multiple is what makes that affordable --
+    #: the whole index is 43,881 x 384 floats and a full scan is ~4 ms, so widening the
+    #: candidate set costs nothing measurable.
+    DEDUPE_FETCH_MULTIPLE = 8
+
     def search(
         self, code: str, k: int = 5, *, as_of: Optional[str] = None,
         exclude_pr: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
+        """The `k` best eligible precedents, one per distinct hunk.
+
+        Fewer than `k` rows is a real answer, not a failure: it means the corpus holds fewer
+        distinct pieces of commented code that match. The tool says so rather than padding.
+        """
+
         np = self._np
         mask = self.eligible_mask(as_of, exclude_pr)
         rows = np.flatnonzero(mask)
@@ -275,9 +305,31 @@ class PrecedentIndex:
             return []
         query = self._encode(code)
         sims = np.asarray(self.embeddings[rows]) @ query
-        top = rows[np.argsort(-sims)[:k]]
+        ranked = rows[np.argsort(-sims)[: k * self.DEDUPE_FETCH_MULTIPLE]]
         order = {int(row): float(score) for row, score in zip(rows, sims)}
-        return [{**self.meta[int(i)], "score": order[int(i)]} for i in top]
+
+        hits: List[Dict[str, Any]] = []
+        seen_hunks: set = set()
+        for index in ranked:
+            row = self.meta[int(index)]
+            if references_pr(row.get("body"), exclude_pr):
+                # A comment that names the PR under review is discussion *of* it, whoever
+                # wrote it and whenever. `eligible_mask` cannot see this: it excludes by the
+                # row's own `pr_number`, so a pre-cutoff comment on a different PR that
+                # announces or describes this one passes. Measured on the shipped corpus: 3
+                # of 43,881 rows name a scored PR, and one of them is eligible for two real
+                # episodes of #33302. The stored body is capped, so this catches the common
+                # case rather than every case; the complete fix is a `pr_refs` field parsed
+                # from the full body at build time.
+                continue
+            hunk = row.get("diff_hunk")
+            if hunk in seen_hunks:
+                continue
+            seen_hunks.add(hunk)
+            hits.append({**row, "score": order[int(index)]})
+            if len(hits) == k:
+                break
+        return hits
 
 
 def main() -> None:
