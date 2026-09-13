@@ -1,0 +1,27 @@
+# The 12-PR held-out set for the whole-PR conditions, hoisted so that B (`ape_agent`) and
+# C (`claude_code`) cannot restate it differently. The identity test compares their resolved
+# `dataset:` blocks; this file is what makes that equality structural rather than two copies
+# kept in step by hand -- which is how a policy key landed in one and not the other.
+#
+# 23 of the corpus's 40 obligations, split 10 local / 11 design against smoke4's 16 / 1, and
+# two controls of real size (33304: 10.8k chars over 13 files; 33315: 7.5k over 11) rather
+# than smoke4's single 912-character one.
+#
+# CAVEAT carried from the release: this set's gold is 31/33 `migration_proposal` and only 2
+# curator_confirmed, so anything measured here is provisional until the R1b sitting.
+extends: v5_solo.yaml
+
+dataset:
+  pr_numbers: [33117, 33145, 33149, 33285, 33294, 33304,
+               33305, 33315, 33321, 33337, 33362, 33421]   # 33304, 33315 are CONTROLS
+
+  # 12 PR x $1.50 = $18.00 worst case, against the base's $10.00 -- which is calibrated for
+  # the 4-PR smoke set and refuses this one. Preflight caught it on a dry run, before the
+  # first model call, which is the cap working rather than a number to raise thoughtlessly.
+  # There is no coverage floor to add: solo schedules no work-unit job.
+  run_total_cost_cap: 20.00
+
+  # All 12 reviewed workspaces for this set exist (built 2026-09-12). A run here verifies in
+  # them or is refused at preflight -- never quietly against base .oleans. The same rule as
+  # pr_review_v5_medium_heldout.yaml, so B and C see the environment A sees.
+  require_reviewed_workspaces: true
