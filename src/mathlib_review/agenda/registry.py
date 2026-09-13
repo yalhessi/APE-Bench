@@ -187,6 +187,16 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          "declaration sits: a lemma that belongs inside a `namespace` block and was left "
          "outside it is a placement defect, not a matter of taste.",
          context_tools=("precedent_search", "zulip_search"),
+         # `scope` alongside `style` because this arm already owns placement -- its rationale
+         # says so and `PLACEMENT_KINDS` gives it the targets -- while gold files a placement
+         # ask under `scope` (PR 33362: "move the declarations inside `namespace Complex`").
+         # Without this the one arm that can see the defect is tagged `off-concern` for
+         # naming it the way the maintainer did. A separate `scope` arm was considered and
+         # rejected: it would duplicate this remit, and `scope` is in `AWAITING_A_WARRANT`,
+         # so its findings would be diagnostic either way. What 33362 measures is an arm that
+         # ran, produced one candidate and did not make this ask -- an arm-quality question,
+         # not a missing-arm one.
+         expected_concerns=("style", "scope"),
          extra_subject_kinds=MODULE_DOC_KINDS | PLACEMENT_KINDS),
     _arm("api_reuse", "duplication", "missed_canonical_api",
          "Does the code re-derive something the library already provides, or spell an existing "
