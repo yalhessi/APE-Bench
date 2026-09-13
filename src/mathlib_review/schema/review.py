@@ -61,8 +61,14 @@ DISPOSITIONS = ("mandatory", "proposed", "agent_added", "pruned")
 #: it, `arms.py` was changed, and this comment was left behind asserting the opposite of what
 #: the code does. Policy and its rationale belong together, which is why the reasoning is
 #: there and not here.
+#: A tool absent from this tuple is dropped from every grant SILENTLY: `arms._grant_for`
+#: returns `[name for name in CONTEXT_TOOLS if name in granted]`, so the registry can name a
+#: tool, the registrar can exist, and the arm can still never see it. That happened to
+#: `naming_norm` and cost a paid run (rep14) that looked like a null result about a contract
+#: and was a null result about a missing tuple entry. `test_every_granted_tool_survives_the_grant`
+#: exists so the next one fails in the suite instead of in a run.
 CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "proof_profile",
-                 "lean_verify_edit")
+                 "naming_norm", "lean_verify_edit")
 
 
 class ReviewArm(StrictModel):
