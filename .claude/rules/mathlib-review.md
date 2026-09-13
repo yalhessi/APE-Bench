@@ -79,14 +79,20 @@ paths:
   <patched file>` with cwd = the base workspace answers in ~1 min instead of ~8. Note the inversion
   such an episode creates: the overlay fallback tells the agent "not evidence the PR fails to
   build", while the gold finding *is* a build failure.
-- **The naming arm is calibrated to the *local family*, by its prompt, and the maintainer often is not.**
-  On 33337 the local siblings at base all used the `_coe_` style; the maintainer asked for the
-  repo-wide emerging `toLinearMap_` prefix (24 files elsewhere, 0 in the PR's files, 0 precedent
-  hits, 0 Zulip). The arm searched correctly and submitted nothing, 10/10 reps — as its contract
-  says. The generalist, carrying no such guardrail, named the convention 8/10. The registry row
-  already records that *"the code corpus argues against the maintainer on both naming asks this
-  release scores"*. This is a contract decision, not a bug: widening the arm's evidence bar trades
-  its precision for the maintainer's convention radius. Decide it on purpose.
+- **The naming arm's silence was tooling before it was contract — retracted 2026-09-13.** This entry
+  called it "a contract decision, not a bug". The arm *did* ask the corpus question (39 of 109
+  `content_search` calls in the held-out run scoped to `target/Mathlib`, 60 with regex) and got its
+  own neighbourhood back: `Path.rglob` does not descend the overlay's symlinks, so `target/Mathlib`
+  reached 66 of 7,443 files with no warning — its `toLinearMap_` query matched 4 files then, 105 now
+  (`c14fa9b`). `zulip_search` returned nothing on 71% of calls (FTS5 ANDed every term, and
+  punctuation was a syntax error) — 4% after `9bf474e`. Naming hits from `precedent_search` are
+  chance-level (3.3% naming-shaped vs a 3.28% base rate): the index embeds the diff hunk, never the
+  comment body. And the abstention is mute — `submit_candidates([])` carries no reason — so there
+  was never a rationale to aim a prompt at. **Before reading an arm's silence as its contract,
+  replay its own queries through the tool on the real attempt workspace.** The contract is still
+  open and is §D2 of `docs/research/pr-review-v5-principled-design.md` (norm store with maturity;
+  emerging norms license advisory findings only), never built. Flat prefix prevalence is not the
+  bar: at 33337's base `toLinearMap_` has ~50 declarations to `coe_`'s ~4,714.
 - **`declaration_search` was base-only by construction** — an arm judging a *rename* could not look
   up the name the PR introduced. It now also searches the PR's changed files in the reviewed
   overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays
