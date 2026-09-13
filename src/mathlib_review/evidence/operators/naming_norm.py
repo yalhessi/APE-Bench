@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
+from ape.toolkits.file_system.utils import walk_workspace_files
 
 from .naming_contrast import declaration_conclusion, outer_lhs
 
@@ -36,10 +37,13 @@ POPULATION_VERSION = "snapshot-subject-prefix-population/1"
 #: population (87/91 with no counterexamples).
 #: Below this many parsed modules the workspace is a partial checkout, not a snapshot.
 #:
-#: Mathlib is roughly six thousand modules. The review workspaces materialize the full
-#: directory tree but only the files a task touches — measured at 59, 81, 113 and 229
-#: `.lean` files, with `Mathlib.lean` itself truncated to three imports, so there is no
-#: self-describing module count to compare against and a floor has to be stated.
+#: Mathlib is roughly six thousand modules. The review workspaces were measured at 59, 81,
+#: 113 and 229 `.lean` files, which is why this floor exists — but that count was a traversal
+#: defect, not a partial checkout: `rglob` refuses to descend the overlay's symlinks, so the
+#: scan saw one neighbourhood of a complete tree and said nothing about it (fixed in
+#: `scan_population`; the same defect blinded `content_search`, commit `c14fa9b`). The floor
+#: stays, because `Mathlib.lean` can itself be truncated to three imports and there is no
+#: self-describing module count to compare against.
 #:
 #: This is a correctness guard, not tidiness. A scan of ~2% of the corpus still produces
 #: subjects that clear `MIN_SUPPORT`: measured, 30 subjects across those four workspaces
@@ -182,7 +186,14 @@ def scan_population(workspace: Path, snapshot_sha: str) -> PopulationScan:
     buckets: Dict[str, Counter] = defaultdict(Counter)
     all_fullnames: Set[str] = set()
     failures: List[str] = []
-    paths = sorted(mathlib.rglob("*.lean"))
+    # Not `rglob`: it does not descend symlinked directories, and a review attempt's
+    # workspace is an overlay of symlinks into the shared base with only the PR's own subtree
+    # materialised. That is what produced the 59-229 file counts below -- the scan was not
+    # looking at a partial checkout, it was looking at a full tree through a traversal that
+    # stopped at every symlink.
+    paths = sorted(
+        path for path in walk_workspace_files(mathlib) if path.suffix == ".lean"
+    )
     for path in paths:
         relative = path.relative_to(workspace).as_posix()
         try:
