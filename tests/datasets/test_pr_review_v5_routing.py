@@ -178,3 +178,56 @@ def test_an_unrelated_arm_is_not_required_by_a_family():
     fam = component("family", ["c1", "c2"])
     decisions = plan_coverage([pair("proof_golf", "wu:1", ["c1"])], {1: [fam]})
     assert decisions["wu:1#proof_golf"].priority != "required"
+
+
+# --- the arms that could publish, and the budget that was going elsewhere ----------------
+
+def test_family_design_claims_once_per_pr_not_once_per_component():
+    """Measured on the 12-PR held-out run: `family_design` was required 24 times, produced
+    ONE candidate at $1.00 each and published nothing -- the worst ratio of any arm -- and
+    took 4 of PR 33149's 10 required slots on a PR whose entire gold is correctness and
+    duplication. It keeps the family grain (it is one of only two arms that may submit a
+    coordinated patch); it loses the right to claim the budget once per component.
+
+    Rebuilding the real agenda with this bound: 24 required jobs -> 8."""
+
+    fams = [component("family", ["c1", "c2"], cid="component:family:a"),
+            component("family", ["c3", "c4"], cid="component:family:b")]
+    pairs = [pair("family_design", "wu:1", ["c1"]), pair("family_design", "wu:2", ["c3"])]
+    decisions = plan_coverage(pairs, {1: fams})
+    required = [d for d in decisions.values() if d.priority == "required"]
+    assert len(required) == 1, "two family components, one required family_design job"
+
+
+def test_naming_still_claims_per_family():
+    """The bound is on `family_design` alone: renaming a pair is the commonest family ask and
+    is a different question from whether the group's design is right."""
+
+    fams = [component("family", ["c1", "c2"], cid="component:family:a"),
+            component("family", ["c3", "c4"], cid="component:family:b")]
+    pairs = [pair("naming", "wu:1", ["c1"]), pair("naming", "wu:2", ["c3"])]
+    decisions = plan_coverage(pairs, {1: fams})
+    assert sum(d.priority == "required" for d in decisions.values()) == 2
+
+
+def test_an_introduced_declaration_requires_duplication_and_correctness():
+    """The trigger neither arm had. On the held-out run the lead pruned all 107 `correctness`
+    pairs and the arm ran zero times, on a set holding three correctness obligations."""
+
+    intro = component("introduction", ["c1"], arms=("duplication", "api_reuse", "correctness"))
+    pairs = [pair("duplication", "wu:1", ["c1"]), pair("correctness", "wu:1", ["c1"]),
+             pair("style", "wu:1", ["c1"])]
+    decisions = plan_coverage(pairs, {1: [intro]})
+    required = {d_id.split("#")[-1] for d_id, d in decisions.items() if d.priority == "required"}
+    assert required == {"duplication", "correctness"}
+
+
+def test_introductions_claim_once_per_pr_however_many_there_are():
+    """PR 33149 introduces 56 declarations and does not need 56 required jobs to be asked one
+    question about them."""
+
+    intros = [component("introduction", [f"c{i}"], arms=("duplication", "correctness"),
+                        cid=f"component:introduction:{i}") for i in range(5)]
+    pairs = [pair("duplication", f"wu:{i}", [f"c{i}"]) for i in range(5)]
+    decisions = plan_coverage(pairs, {1: intros})
+    assert sum(d.priority == "required" for d in decisions.values()) == 1
