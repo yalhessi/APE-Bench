@@ -61,13 +61,23 @@ class FileSkeleton:
 class ConventionQuestion:
     """A naming or structural norm the PR's own shape raises, and where to settle it.
 
-    Deliberately a *question with a corpus to search*, not an answer. Measured: the code
-    corpus argues against the maintainer on both naming conventions in this set —
-    `toLinearMap_` appears 50 times against `coe_`'s 4,707, dot notation 2,359 against
-    22,345 — because these are conventions Mathlib is moving toward, and frequency measures
-    where it has been. The same norms are stated plainly in review: 224 comments discuss dot
-    notation, and one says "we want to move away from primed names". So the retrieval target
-    is the review corpus, and repository frequency is at most supporting evidence.
+    Deliberately a *question with a corpus to search*, not an answer.
+
+    This docstring used to say the code corpus argues against the maintainer on both naming
+    conventions in this set, citing `toLinearMap_` 50 against `coe_`'s 4,707 and dot notation
+    2,359 against 22,345. **Retracted 2026-09-13 for the first figure and suspect for the
+    second**: both compare every name carrying one token against every name carrying another,
+    which are different populations. Conditioned on the subject the lemma is about — the
+    measurement `naming_norm.scan_population` already makes — `toLinearMap_` is the *modal*
+    prefix for that subject, 21 against `coe_`'s 7, of 121. The dot-notation figure has not
+    been re-derived under conditioning and should not be relied on.
+
+    What survives is the positive half: the same norms are stated plainly in review (224
+    comments discuss dot notation, one says "we want to move away from primed names"), so the
+    review corpus is a genuine retrieval target. What does not survive is the inference that
+    repository frequency is therefore at most supporting evidence; subject-conditioned
+    frequency is the strongest gold-free signal measured so far, and the rendered instruction
+    below still tells the arm to discount it.
     """
 
     kind: str

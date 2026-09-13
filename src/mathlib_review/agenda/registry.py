@@ -157,8 +157,12 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
     _arm("naming", "naming", "naming_convention_violation",
          "Is this declaration named the way its own family is named? Settled by reading the "
          "siblings and past rename requests, not by taste.",
-         # Both: what the siblings are called, and what maintainers call them. The code corpus
-         # argues against the maintainer on both naming asks this release scores.
+         # Both: what the siblings are called, and what maintainers call them. This row used
+         # to add "the code corpus argues against the maintainer on both naming asks this
+         # release scores". Retracted 2026-09-13: that rested on a flat count over two
+         # different populations. Conditioned on the subject a lemma is *about* -- which is
+         # what `naming_norm` already measures -- the corpus agrees with the maintainer on
+         # 33337: `toLinearMap_` is the modal prefix, 21 against `coe_`'s 7, of 121.
          context_tools=("declaration_search", "precedent_search", "zulip_search")),
     _arm("docs", "documentation", "documentation_gap",
          "Is the documentation COMPLETE, CORRECT and CONFORMANT — in that "
