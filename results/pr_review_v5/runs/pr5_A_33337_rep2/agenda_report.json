@@ -1,0 +1,112 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "correctness": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "docs": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "duplication": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "family_design": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "generalist": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 11
+    },
+    "generality": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "naming": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 5
+    },
+    "proof_golf": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 4
+    },
+    "proof_idiom": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 4
+    },
+    "style": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 10
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "recommended": 14,
+      "required": 8
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 0,
+      "docs": 0,
+      "duplication": 0,
+      "family_design": 2,
+      "generalist": 2,
+      "generality": 0,
+      "naming": 2,
+      "proof_golf": 0,
+      "proof_idiom": 0,
+      "style": 2
+    },
+    "required_by_pr": {
+      "33337": 8
+    },
+    "required_reasons": {
+      "namespace placement and module docs are properties of the file (file)": 2,
+      "the per-unit broad pass, which no specialist replaces": 2,
+      "these declarations are one API family (family)": 4
+    }
+  },
+  "mandatory_floor_cost": 0.4,
+  "pr_numbers": [
+    33337
+  ],
+  "projected_cost_fanout": 1.1,
+  "projected_cost_rules": 1.1,
+  "proposals_eligible": 22,
+  "proposals_enumerated": 22,
+  "renderer_version": "candidate-prompt/12+focused-prompt/2",
+  "routing_mode": "lead",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "units_without_specialist": [],
+  "work_units": 2
+}

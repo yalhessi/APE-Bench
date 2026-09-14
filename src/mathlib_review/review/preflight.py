@@ -176,6 +176,81 @@ def assert_ready(scaffold: Any, logger: Any, *, enforce: bool = True) -> None:
     raise PreflightError(report)
 
 
+def assert_toolchain(scaffold: Any, logger: Any) -> None:
+    """The toolchain check alone, for a caller that compiles Lean and calls no model.
+
+    The reviewed-workspace prebuild is such a caller: it needs `lake`, and it needs the same
+    `lean_toolchain_bin` decision the run will make, so that the workspace it builds and the
+    verification that later runs in it come from one toolchain. It does not need a model
+    credential, and refusing it for lacking one would be a refusal for a reason that does not
+    apply.
+    """
+
+    unmet = [item for item in (_check_repo_root(), _check_toolchain(scaffold, logger)) if item]
+    if unmet:
+        raise PreflightError("\n\n".join(f"{u.name}: {u.consequence}\n  -> {u.remedy}" for u in unmet))
+
+
+async def reviewed_workspace_keys(episodes: Iterable[Any]) -> Dict[str, Any]:
+    """`key -> episode` for every episode that carries a diff. Computed from the episodes, not
+    the task data: a solo run has one task per episode and an arm run has hundreds per PR, and
+    the reviewed workspace is a property of the episode either way."""
+
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+
+    keys: Dict[str, Any] = {}
+    for episode in episodes:
+        diff = getattr(episode, "diff", "") or ""
+        base = getattr(episode, "base_sha", "") or ""
+        if base and diff.strip():
+            keys[reviewed_workspace_key(base, diff)] = episode
+    return keys
+
+
+async def unbuilt_reviewed_workspaces(episodes: Iterable[Any]) -> Dict[str, Any]:
+    """The episodes whose reviewed workspace is not built, keyed by the workspace they need."""
+
+    keys = await reviewed_workspace_keys(episodes)
+    missing = set(await unbuilt_base_commits(keys))
+    return {key: episode for key, episode in keys.items() if key in missing}
+
+
+async def assert_reviewed_workspaces_prebuilt(
+    episodes: Iterable[Any], *, required: bool, logger=None
+) -> Dict[str, Any]:
+    """Refuse a run whose episodes would be verified against the base commit's build products.
+
+    A reviewed workspace is the base snapshot plus the PR's diff plus its changed modules
+    rebuilt. Without it, every compile resolves imports through the base `.olean`s, and a
+    declaration the PR adds or renames in a sibling file is `Unknown constant` in every other
+    file -- 41 of 321 arm sessions on the held-out run, 16 findings asserting a build failure on
+    PRs that all build. That is a property of the run's environment, decided before the first
+    model call, so it is refused here rather than discovered in the findings.
+
+    Always reports what is missing, so `plan` can say it. Refuses only when `required`, so a
+    run can be configured to accept the degraded environment knowingly -- the task then logs
+    the fallback at WARNING per attempt and the attribution note names the artifact.
+    """
+
+    missing = await unbuilt_reviewed_workspaces(episodes)
+    if missing and logger:
+        prs = sorted({getattr(ep, "pr_number", "?") for ep in missing.values()})
+        logger.warning(
+            "%d episode(s) have no reviewed workspace (PRs %s); verification would resolve "
+            "imports against the base commit's build products",
+            len(missing), prs)
+    if missing and required:
+        prs = sorted({getattr(ep, "pr_number", "?") for ep in missing.values()})
+        raise PreflightError(
+            f"{len(missing)} reviewed workspace(s) are not prebuilt (PRs {prs}). A run against "
+            "the base commit's build products reads the PR's own renames as unknown constants. "
+            "Build them first:\n  ./ape/bin/python -m src.mathlib_review.release.prebuild "
+            "--reviewed --config <this run config>\n"
+            "or set `dataset.require_reviewed_workspaces: false` to accept that environment."
+        )
+    return missing
+
+
 async def assert_workspaces_prebuilt(
     data: Iterable[Dict[str, Any]], *, required: bool = True
 ) -> None:

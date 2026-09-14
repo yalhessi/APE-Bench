@@ -14,11 +14,9 @@ import hashlib
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-import httpx
-
 from .config import PRReviewV2Config
 from .fetch import fetch_compare
-from .github import GitHubClient
+from .github import GitHubClient, GitHubHTTPError
 from .schema import DeltaHunk, GoldComment, PRReviewV2Record
 
 _HUNK_HEADER_RE = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
@@ -203,6 +201,6 @@ def hydrate_record(
             record.gold.delta_near or [],
             line_slack=config.linkage_line_slack,
         )
-    except httpx.HTTPStatusError as exc:
-        record.validation.hydration_error = f"compare_failed: {exc.response.status_code}"
+    except GitHubHTTPError as exc:
+        record.validation.hydration_error = f"compare_failed: {exc.status_code}"
     return record

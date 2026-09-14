@@ -35,6 +35,62 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   in-file edit would not). Replaced by in-file splicing, `lean_verify_edit`, and declaration-targeted
   edits. Part A — building changed modules for cross-file dependencies — was never built; the small
   set hit no cross-file failures. **Reopens if:** multi-file PRs need verified edits.
+  **Reopened 2026-09-12.** They do, and the failure is not a missing feature but a false statement:
+  the review overlay applies δ₀ to source only, `lean_verify`/`lean_verify_edit` compile against the
+  base `.olean`s, so a lemma the PR renames in a sibling file is an `Unknown constant`, and
+  `_attribute_errors` then tells the model *"the file does not compile as it stands"*. On the 12-PR
+  held-out `lead` run, **41 of 321 arm sessions** received such an error; 16 became `broken_build`
+  findings on PRs that all build, 4 of them `published`; all 10 resolvable "missing" names were
+  introduced by the PR itself. The naming arm on 33337 burned 2–5 verify calls on it in 5 of 10
+  reps. Filtering by identifier cannot fix it — the stale sibling cascades into `simp made no
+  progress` / `unsolved goals`. **Closed 2026-09-12** on branch `verify-reviewed-state`: a *reviewed
+  workspace* per episode — `workspaces/<base>+<fp>`, the base snapshot, the diff, and the changed
+  modules rebuilt by a targeted `lake build` in a real copy of `.lake/build` (hardlinks are not an
+  option: Lean truncates `.ilean` in place; NFSv3 has no reflink; measured 585 s copy + 67 s build on
+  33337). `prebuild --reviewed` makes them, `plan` reports which episodes lack one,
+  `require_reviewed_workspaces` refuses a run without them. Built for all 12 held-out PRs on
+  2026-09-12 (144–997 s each, 74.9 min sequential, 34 GB; the driver is import-path length, not
+  file count) and required by both held-out configs; smoke4's four PRs are not built. On 33337 the
+  `Unknown constant` transcripts went 19–68 per rep → 0 (reps 11–12), phantom `broken_build` 2 → 0,
+  recall unmoved. Design, scope and the hardening that followed a verification pass:
+  `docs/research/reviewed-workspaces.md`. The held-out rerun is still the check that the 16
+  compile claims vanish across the set.
+- **Specialists as the coverage floor** (2026-09-14) — *"the generalist is the floor and the
+  specialists get pruned; force the specialists to be the floor instead"*. Tested at its ceiling
+  rather than by tuning: `routing_mode: fanout` on 4 held-out PRs gives every specialist every
+  eligible slot with no lead and no pruning — 140 specialist jobs, 173 total, $14.72 billed. It
+  recovered **2 of 10 obligations, exactly what `lead` recovered on the same PRs, against `solo`'s
+  4**, at `gold_alignment_rate` 0.041 (2 of 49 candidates). The mechanism is the point: the
+  specialist submit-rate was **16%, against lead's 19%** — unlimited slots did not raise output,
+  and **104 of 136 abstentions were `already_correct`**. `correctness` filed nothing in 11 jobs and
+  `family_design` nothing in 11, the two arms that were the strongest candidates for being starved.
+  Silence is a judgement about the code, not a scheduling artifact, so more slots buy more
+  abstentions. Two corrections fell out: fanout costs **$0.085/job against lead's $0.040** (arms are
+  top-level tasks, so they lose the nesting/caching benefit and all spend lands in the `lead` bucket
+  with `nested_billed: 0.0`), making the full 12-PR fanout ~$111 rather than the $70.45 the agenda
+  projects; and fanout is *not* a precision disaster — it emitted 1 candidate on the control, not
+  the pile predicted. **Reopens if:** the reason arms decline changes. Reading the abstention details
+  at gold sites, the declines are three different things and only one is a bar problem: the right arm
+  was never asked (33145 wanted a *rename* and the arms present were duplication/api_reuse/style,
+  each correctly reporting nothing in its own concern), an evidence bar refused a correct instinct
+  (33337 `naming` considered the exact rename and `naming_norm` returned `insufficient_evidence` —
+  that obligation was never hit by any condition), or the arm lacked knowledge (33117 `family_design`
+  judged the family balanced; the ask was to use `@[to_fun]`, which it does not know about). Only the
+  second is scheduling-adjacent, and it is a threshold question, not a floor question.
+  **Amended 2026-09-14, same day:** the conclusion stands -- more slots do not help -- but the
+  cause stated above was wrong. Re-running the identical 4 PRs with `forbid_abstention` (arms
+  refused an empty submission) took **issue recall 0.20 -> 0.50 and location 0.80 -> 1.00**,
+  strictly dominating: 3 forced-only hits, 0 unforced-only. The arms were not short of findings,
+  they were withholding them -- forced, `naming` produced `Dense.upperBounds_image`, character
+  for character the rename gold asked for, on an obligation it had abstained on. And the bar is
+  a **volume filter, not a quality filter**: the suppressed candidates align with gold at the
+  same rate as the kept ones (marginal 5 aligned / 130 extra = 0.038, against 0.041 unforced).
+  So `already_correct` was the label on good and bad candidates alike. The cost is why this is
+  still not a design: control emission went 1 -> 36 findings on a PR where maintainers asked for
+  nothing, about 12 spurious control findings per real obligation recovered. **The lever is the
+  bar, not the schedule** -- which is a calibration and downstream-selection problem, and
+  `model_confidence` came back null on every forced finding, so the ranking signal that would
+  make selection possible is not currently captured.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
@@ -78,6 +134,40 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
 - **`lean_retrieve` in the review path** — silently returned empty (no per-commit index; the build is
   a heavy LLM-annotation job). Removed from the default toolset; the dense precedent index serves
   instead. **Reopens if:** a per-commit index is built for the base commits in use.
+- **Linter-as-convention-oracle** (2026-09-11) — read Mathlib's own `tacticAnalysis` linters
+  (`terminalToGrind`, `tryAtEachStepGrindSuggestions`) as a dated, gold-free statement of the
+  convention at a base commit, on the argument that "the linter present at base *is* the convention
+  at base". It is not. `terminalToGrind` landed 2025-08-14 (`609d272edf`) with `grind` in **4.0 %**
+  of Mathlib files and is unchanged while adoption reached 8.4 % (2025-12) and **14.5 % (2026-05)**,
+  and review enforcement went 9.1 → 22.4 mentions per thousand Aug → Dec. A linter is a step
+  function and a convention is a ramp: it dates *availability*, not the convention. It also answers
+  "where **can** X be used", and the can/does gap is the quantity that moves — a high-recall
+  generator aimed at a pipeline whose measured bottleneck is **selection, not generation**
+  (81 % of missed gold already had a candidate at the line). In the life-stage vector a linter is a
+  `stated` source only, which the census spec already said (`suggestion_round` … "never read as
+  adopting") and the ≥2-independent-components rule already forbids briefing alone. Raised by the
+  user more than once before being written down, which is why it was re-derived from the plan's own
+  outcome table. **Reopens if:** used as one corroborating source among ≥ 2 — its `descr` / "How to
+  fix this?" text remains the right `stated` extractor — never as the oracle, and never to date a
+  convention.
+- **Surface proxies for convention discovery** (2026-09-11) — five designs proposed in one session,
+  all rejected for one reason: each substituted a statistic *about* code for the semantic question.
+  Linter firing ("can `grind` close this goal"); marginal drift in per-declaration features ("how
+  often does this token appear"); the A→B ledger from review ("what did a reviewer correct");
+  recurring migration targets in commit titles ("what did someone name a PR" — and Mathlib
+  squash-merges, so 14,730/14,730 commits are PR titles, the same tier-0 data, not a new substrate);
+  author breadth ("how many people did it" — `grind` is 232 commits from 19 authors with 69 % by one,
+  `gcongr` 88 from 22 with 28 % by one). The user's ruling on the last: one author running a
+  migration does not make `grind` not a convention — it makes commit titles a weak signal, and the
+  weakness is of the signal, not a property of the phenomenon. Two further errors made while arguing
+  for these: measurements ungated (a `to_dual` example that was 85 % post-eval data, withdrawn), and
+  a circular validation ("every target with n ≥ 6 is a genuine convention" was recognition of names
+  already known, not a measurement). **The constraint that survives:** evidence must carry what the
+  code was *for* and how it was *expressed*, together. Only a modified declaration has both — the
+  statement pins the purpose, the before/after pins the form; review corrections are a small late
+  sample of that shape, and the authored version is the modified declarations across the merged PR
+  diffs (tier 2, not titles). **Reopens if:** a proxy is used as one corroborating source beside a
+  semantic one, never as the discovery mechanism.
 - **`mergeready_v1` prompt** — approved on compile-exit; more tools produced *fewer* findings under
   it (69 → 3 → 2). The binding constraint was the framing, not tools; `acceptability_v2` is default.
 - **Sibling-propagation post-processor** — superseded by the intervention gold unit.

@@ -182,6 +182,40 @@ def _row_to_thread(row: sqlite3.Row) -> ZulipThread:
     return ZulipThread(**payload)
 
 
+#: Query text is split on anything that is not a word character or `_`, so a Lean identifier
+#: fragment (`coe_`, `toLinearMap`, `IsCompl`) survives as one term while `.`, backticks,
+#: apostrophes, `:` and brackets -- every one of which is FTS5 syntax -- do not reach the
+#: matcher.
+_FTS_TERM = re.compile(r"[A-Za-z0-9_]+")
+
+
+def fts_query(text: str, *, match_all: bool = False) -> str:
+    """An FTS5 MATCH expression for free-text `text`; `""` when it holds no searchable term.
+
+    Two failures this exists to stop, both measured over the 140 `zulip_search` calls the v5
+    runs made (99 of them, 71%, returned nothing):
+
+    * **Raw text is FTS5 syntax.** A backtick, an apostrophe, a `.` or a bracket raised
+      `OperationalError: fts5: syntax error`, and `a:b` was read as a column filter -- the
+      tool reported "zulip search failed" for a question that was perfectly well formed.
+    * **FTS5 ANDs adjacent terms.** A six-word question therefore demanded all six words in
+      one message. `coe_ lemma naming convention toLinearMap` returned nothing; its terms
+      OR-ed return the `mathlib4 > Naming convention` thread where a maintainer writes
+      "`coe` should be a prefix" -- the exact evidence the asking arm concluded did not exist.
+
+    Terms are OR-ed by default and ranked by BM25, which is what makes this safe: a message
+    carrying more of the terms, and rarer ones, outranks a message carrying one common word,
+    so an AND-style hit still comes back first when it exists. `match_all=True` restores the
+    conjunction for a caller that means it.
+    """
+
+    terms = _FTS_TERM.findall(text or "")
+    if not terms:
+        return ""
+    joiner = " AND " if match_all else " OR "
+    return joiner.join(f'"{term}"' for term in terms)
+
+
 class ZulipStore:
     """Read access to a built store. Open with `ZulipStore(path)`."""
 
@@ -349,17 +383,41 @@ class ZulipStore:
             return self.thread(stream_id, topic, as_of, exclude_pr)
         return None
 
+    #: Which message field each `refs.kind` was extracted from. Used to re-check a reference
+    #: against the messages that survive the gate.
+    _REF_FIELD = {"decl": "decl_refs", "pr": "pr_refs", "issue": "issue_refs", "file": "file_refs"}
+
     def _threads_by_ref(
         self, kind: str, value: str, as_of: Optional[str], exclude_pr: Optional[int]
     ) -> List[ThreadView]:
+        """Threads in which a *visible* message carries this reference.
+
+        The `refs` table is built over the whole thread, so selecting on it alone answers
+        "some message here mentions X" for messages the gate is about to remove. That is an
+        existence claim about the future: asked for a declaration first named after the
+        cutoff, the store returned a thread whose visible half never mentions it. Measured on
+        the 33337 cutoff, 89 of 2,920 declaration references (3%) selected a thread that way.
+
+        The re-check runs against `view.messages` rather than in SQL so that one rule --
+        `gate`, and through it `RetrievalGate` -- decides visibility everywhere. Spelling the
+        cutoff a second time in SQL is what this store's own docstring warns against.
+        """
+
         rows = self._conn.execute(
             "SELECT DISTINCT thread_key FROM refs WHERE kind = ? AND value = ?", (kind, value)
         ).fetchall()
+        field = self._REF_FIELD.get(kind)
         views = []
         for row in rows:
             view = self._view(row["thread_key"], as_of, exclude_pr)
-            if view and view.messages:
-                views.append(view)
+            if not view or not view.messages:
+                continue
+            if field is not None and not any(
+                any(str(ref) == str(value) for ref in (getattr(message, field, None) or []))
+                for message in view.messages
+            ):
+                continue
+            views.append(view)
         views.sort(key=lambda v: v.thread.first_ts_epoch)
         return views
 
@@ -396,15 +454,24 @@ class ZulipStore:
         as_of: Optional[str] = None,
         exclude_pr: Optional[int] = None,
         limit: int = 25,
+        match_all: bool = False,
     ) -> List[ZulipMessage]:
         """Full-text search, BM25-ranked. `as_of` still applies on top of `until`.
+
+        `query` is free text, not FTS5 syntax: it is normalised by `fts_query`, which quotes
+        each term and OR-s them. Passing raw text straight to `MATCH` both raised syntax
+        errors on ordinary punctuation and silently demanded every word at once; see
+        `fts_query`. `match_all=True` asks for the conjunction on purpose.
 
         `exclude_bots` defaults on: CI and notification bots post ~12k messages that
         match ordinary queries and carry no opinion, so including them by default would
         make the common search worse.
         """
+        expression = fts_query(query, match_all=match_all)
+        if not expression:
+            return []
         where = ["messages_fts MATCH ?"]
-        params: List = [query]
+        params: List = [expression]
         if since:
             where.append("m.timestamp_epoch >= ?")
             params.append(iso_to_epoch(since))

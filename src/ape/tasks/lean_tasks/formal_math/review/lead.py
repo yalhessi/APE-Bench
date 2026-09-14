@@ -851,6 +851,7 @@ class ReviewLeadTask(BasePRReviewTask):
                 "status": outcome.status,
                 "candidates": outcome.candidates,
                 "verification_artifacts": outcome.verification_artifacts,
+                "abstention": outcome.abstention,
                 "rendered_prompt_sha256": spec.payload.get("rendered_prompt_sha256"),
             })
 

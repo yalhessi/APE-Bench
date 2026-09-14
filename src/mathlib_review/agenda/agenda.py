@@ -413,14 +413,22 @@ def initial_jobs(agenda: ReviewAgenda) -> List[AgendaProposal]:
     """The proposals a non-`lead` mode runs, with no model call involved.
 
     `fanout` takes the whole pool; `rules` takes the mandatory floor plus whatever the
-    deterministic scheduler marked eligible. `lead` is absent here on purpose — it is the
-    only mode where the set is not knowable before a model call.
+    deterministic scheduler marked eligible. `lead` and `solo` are absent here on purpose, for
+    two different reasons, and the caller is told which: `lead`'s set is not knowable before a
+    model call, while `solo` schedules no `(arm, unit)` job at all. Both are reached through
+    the same `else:` in the runner, so a mode that lands here has been routed as an arm mode by
+    mistake -- which is a bug in the caller, not a fact about the agenda.
     """
 
     if agenda.routing_mode == "fanout":
         return list(agenda.proposals)
     if agenda.routing_mode == "rules":
         return [item for item in agenda.proposals if item.mandatory or item.eligible]
+    if agenda.routing_mode == "solo":
+        raise ValueError(
+            "routing_mode 'solo' schedules no work-unit job; one agent reviews the whole PR. "
+            "Reaching initial_jobs means the runner routed it as an arm mode."
+        )
     raise ValueError(
         f"routing_mode {agenda.routing_mode!r} decides its jobs at run time, not statically"
     )

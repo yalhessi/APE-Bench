@@ -57,6 +57,27 @@ _GRAIN_REQUIREMENTS: Dict[str, Tuple[Tuple[str, ...], str]] = {
     # positives on the PRs that measure precision. Documentation is also 3 of 43 gold
     # obligations release-wide, so a large share of required work was doubly unwarranted.
     "site": (("docs",), "this PR changes module documentation"),
+    # A declaration that did not exist at base is the trigger for the two questions no grain
+    # asked: is it already in the library (`duplication`), and is it sound (`correctness`)?
+    # Both are compile-warrantable concerns, so unlike most required work their findings can
+    # actually be published. Bounded once per PR below -- 33149 introduces 56 declarations
+    # and does not need 56 required jobs to be asked one question about them.
+    "introduction": (("duplication", "correctness"),
+                     "this PR introduces declarations that did not exist before"),
+}
+
+#: (grain, arm) pairs that claim ONE required job per PR rather than one per component.
+#:
+#: `site`/`docs` was the first: claiming per site put 17 of 27 required `docs` jobs on the two
+#: control PRs. `family`/`family_design` is the second, and measured on the 12-PR held-out run:
+#: it was required 24 times across 12 PRs, produced **1 candidate** at $1.00 each and published
+#: nothing -- the worst ratio of any arm -- while taking 4 of PR 33149's 10 required slots on a
+#: PR whose entire gold is correctness and duplication. The arm keeps the family grain, because
+#: it is one of only two that may submit a coordinated patch and the family obligations need
+#: that; what it loses is the right to claim the budget once per component.
+_ONCE_PER_PR: Set[Tuple[str, str]] = {
+    ("site", "docs"), ("family", "family_design"),
+    ("introduction", "duplication"), ("introduction", "correctness"),
 }
 
 #: `pr_intent` is the exception to once-per-component. When a PR says it is a golf PR, the
@@ -171,9 +192,10 @@ def plan_coverage(
                 # and meant nothing: a site grain says "one change", not "a doc change".
                 required_arms &= set(component.suggested_arms)
             key = (
-                # Module-doc sites share one claim across the whole PR; every other grain
-                # claims per component.
-                (pair.pr_number, "module_doc") if component.grain == "site"
+                # A (grain, arm) in `_ONCE_PER_PR` shares one claim across the whole PR;
+                # every other pairing claims per component.
+                (pair.pr_number, component.grain)
+                if (component.grain, pair.arm_id) in _ONCE_PER_PR
                 else component.component_id,
                 pair.arm_id,
             )

@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Tuple
 from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
 
-from .precedent_bench import DEFAULT_CORPUS, RETRIEVERS, load_corpus
+from .precedent_bench import DEFAULT_CORPUS, RETRIEVERS, VALIDATED_CORPUS_END, load_corpus
 
 DEFAULT_RECORDS = PROJECT_ROOT / "inputs" / "pr_review_v2" / "mathlib_pr_review_v2_annotated_20260612.jsonl"
 DEFAULT_OUT = PROJECT_ROOT / "inputs" / "pr_review_v2" / "precedent_bench" / "precedents_by_pr.jsonl"
@@ -61,7 +61,7 @@ def changed_sites(rec: Dict[str, Any]) -> List[Tuple[str, str]]:
 def build(prs, records_path, corpus_path, design, per_hunk_k, keep, out, logger) -> Path:
     recs = {json.loads(l)["pr_number"]: json.loads(l)
             for l in records_path.read_text().splitlines() if l.strip()}
-    corpus = load_corpus(corpus_path)
+    corpus = load_corpus(corpus_path, end=VALIDATED_CORPUS_END)
     logger.info("Priming %d PRs against %d corpus situations (design=%s)", len(prs), len(corpus), design)
     retriever = RETRIEVERS[design](corpus, logger=logger)
     out.parent.mkdir(parents=True, exist_ok=True)

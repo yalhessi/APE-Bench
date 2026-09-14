@@ -1,0 +1,42 @@
+{
+ "by_tier": {
+  "available": 28,
+  "cited": 22,
+  "default_on": 17,
+  "disabled": 1,
+  "nightly": 4,
+  "standard": 23,
+  "uncited": 14,
+  "weekly": 3
+ },
+ "counts": {
+  "library_notes": 36,
+  "linters": 76,
+  "total": 112
+ },
+ "linter_options_without_a_readable_docstring": [
+  "linter.allScriptsDocumented",
+  "linter.modulesForbiddenWindows",
+  "linter.modulesUpperCamelCase",
+  "linter.pythonStyle",
+  "linter.simpsUnusedCustomDeclarations",
+  "linter.style.commandStart",
+  "linter.style.header",
+  "linter.style.nativeDecide",
+  "linter.tacticAnalysis.unknownTacticTest",
+  "linter.trailingWhitespace",
+  "linter.translateExisting",
+  "linter.translateGenerateName",
+  "linter.translateOverwrite",
+  "linter.translateRedundant",
+  "linter.translateRelevantArg",
+  "linter.translateReorder",
+  "linter.unicodeLinter",
+  "linter.whitespaceBeforeSemicolon"
+ ],
+ "rows_file": "catalogue.jsonl",
+ "rows_sha256": "f24830f917dede05f72bccd0c6908c74607904f86b6de6346aec390db7da428f",
+ "schema_version": "convention-catalogue/1",
+ "workspace": "data/code_execute/repos/mathlib4/source",
+ "workspace_revision": "28908c09b504f5d7b6603a1cad9b75389d247873"
+}

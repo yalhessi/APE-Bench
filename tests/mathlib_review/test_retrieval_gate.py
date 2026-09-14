@@ -181,6 +181,7 @@ def test_every_context_tool_records_a_gate():
     exists to answer.
     """
 
+    import re
     from pathlib import Path
 
     source = Path(
@@ -188,13 +189,17 @@ def test_every_context_tool_records_a_gate():
     ).read_text(encoding="utf-8")
 
     tools = ("zulip_search", "precedent_search", "declaration_search")
+    #: A trace row names its tool and then, on the very next line, how it was bounded. Matched
+    #: with a regex rather than a fixed indent because one tool legitimately writes a row from
+    #: more than one place: `precedent_search` records its refusals too, so that "the tool was
+    #: refused" and "the arm never called it" stop being the same trace.
+    rows = re.findall(r'"tool": "(\w+)",\s*\n\s*"gate": ', source)
     for tool in tools:
-        marker = f'"tool": "{tool}",\n            "gate": '
-        assert marker in source, f"{tool} records no gate"
+        assert tool in rows, f"{tool} records no gate"
 
-    # Every trace row that names a tool names a gate on the next line: no tool can be added
-    # without declaring how it is bounded.
-    assert source.count('"gate": ') == len(tools)
+    # No trace row may name a tool without naming a gate: every `"tool":` in a row is paired.
+    assert len(rows) == len(re.findall(r'"tool": "\w+",', source)), (
+        "a trace row names a tool but declares no gate on the next line")
 
 
 def test_the_gate_kinds_are_a_closed_set():

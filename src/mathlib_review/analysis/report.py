@@ -92,7 +92,33 @@ def retrieval(run_name: str) -> Dict[str, Any]:
         # every row, and a row without one is a tool that was added without declaring how it
         # is bounded.
         "calls_without_a_recorded_gate": sum(1 for row in rows if not row.get("gate")),
+        # The other half of the same question. `by_arm` says what an arm looked at; this says
+        # what it concluded when it reported nothing, which on the held-out run was 81% of
+        # specialist invocations. Before `abstention` existed the only way to answer this was
+        # to reconstruct each session's last tool result from the transcripts, and three
+        # successive attempts at that were wrong before one was right.
+        "abstentions": _abstentions(run_name),
     }
+
+
+def _abstentions(run_name: str) -> Dict[str, Any]:
+    """Per arm, why it submitted nothing.
+
+    `unstated` counts rows written before the reason was required, or by a routing mode that
+    does not produce one. It is reported rather than dropped: an arm whose silence is
+    unexplained is exactly the thing this field exists to make visible, so hiding it in a
+    denominator would reproduce the problem in the report that is supposed to expose it.
+    """
+
+    by_arm: Dict[str, Dict[str, int]] = {}
+    for row in _load_jsonl(run_dir(run_name) / "arm_responses.jsonl"):
+        if row.get("candidates"):
+            continue
+        arm = row.get("arm_id") or str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
+        reason = (row.get("abstention") or {}).get("reason") or "unstated"
+        entry = by_arm.setdefault(arm, {})
+        entry[reason] = entry.get(reason, 0) + 1
+    return dict(sorted(by_arm.items()))
 
 
 def routing(run_name: str) -> Dict[str, Any]:
@@ -479,3 +505,330 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str, Any]:
+    """Two or more judged runs on one denominator: the funnel, the union, the exclusive sets.
+
+    The first production caller of `analysis.reports.compare_conditions`, which has implemented
+    the mean / union / stable protocol since Phase 9 and been called only by its tests. Phase
+    9's central finding was that two arms tied on mean recall while recovering nearly disjoint
+    obligations, so this reports the sets and not just the rates -- and at one repetition the
+    sets are the only honest output: `stable` is undefined and a rate delta at these
+    denominators is inside the judge's own disagreement with itself.
+
+    `runs` is `{label: run_name}` or `{label: [run_name, ...]}` -- several runs under one label
+    are repetitions of one condition, and are what turns the funnel into mean / union / stable
+    and makes `hit_frequency` say how many of N repetitions found each obligation. Audits are
+    derived from run names the way `judge --of` derives them, so a condition cannot be paired
+    with an audit that scored a different run.
+
+    Refuses to compare across judges: `judge_identity` hashes the rubric, model, sampling and
+    decode budgets, and R0 found two judge arms disagreeing on 4 of 18 pairs from decode
+    budgets alone. Refuses a denominator mismatch: every condition must have been scored over
+    the same obligations, or the comparison is between two questions.
+
+    With `release`, adds the two gold-light exhibits that motivate the design rather than
+    score it: each condition's *attention* -- the concern-family distribution of what it raised
+    -- against the maintainers', and its redundancy, the number of times it wrote up one change
+    target. Neither needs a repetition to be a fact about a run.
+    """
+
+    from src.mathlib_review.analysis.reports import compare_conditions, rep_summary
+    from src.mathlib_review.judge.runner import derive_from_run
+
+    reps: Dict[str, List[str]] = {
+        label: ([names] if isinstance(names, str) else list(names))
+        for label, names in runs.items()}
+    loaded: Dict[str, List[Dict[str, Any]]] = {}
+    for label, names in reps.items():
+        loaded[label] = []
+        for run_name in names:
+            audit = derive_from_run(run_name)["out_dir"] / "semantic_report.json"
+            if not audit.is_file():
+                raise SystemExit(
+                    f"{label}: no judge output at {audit}. Judge the run first:\n"
+                    f"  python -m src.mathlib_review.review.cli judge --config <judge config> "
+                    f"--of {run_name} --execute")
+            payload = json.loads(audit.read_text())
+            if not payload.get("scored", True):
+                raise SystemExit(
+                    f"{label}: {run_name} is not scored "
+                    f"({payload.get('coverage', {}).get('error')}); nothing to compare")
+            loaded[label].append(payload)
+
+    identities = {f"{label}[{i}]": p.get("judge_identity")
+                  for label, ps in loaded.items() for i, p in enumerate(ps)}
+    if len(set(identities.values())) > 1:
+        raise SystemExit(
+            f"conditions were judged by different instruments: {identities}. "
+            "judge_identity covers the rubric, model, sampling and decode budgets; a verdict "
+            "under one is not comparable to a verdict under another.")
+
+    denominators = {
+        f"{label}[{i}]": sorted(row["obligation_id"] for row in p.get("per_obligation") or [])
+        for label, ps in loaded.items() for i, p in enumerate(ps)}
+    reference = next(iter(denominators.values()))
+    for label, ids in denominators.items():
+        if ids != reference:
+            diff = sorted(set(ids) ^ set(reference))
+            raise SystemExit(
+                f"{label} was scored over a different denominator ({len(ids)} vs "
+                f"{len(reference)} obligations; symmetric difference {len(diff)}). The judge "
+                "scopes obligations to the PRs a run reviewed, so this means the runs did not "
+                "review the same PRs, and a recall from one is not a recall from the other.")
+
+    def hits(payload, level):
+        rows = payload.get("per_obligation") or []
+        if level == "location":
+            return [r["obligation_id"] for r in rows if r.get("location_hit")]
+        return [r["obligation_id"] for r in rows if r.get(f"{level}_status") == "hit"]
+
+    levels: Dict[str, Any] = {}
+    for level in ("location", "issue", "resolution"):
+        summaries = {label: rep_summary([hits(p, level) for p in ps], reference)
+                     for label, ps in loaded.items()}
+        levels[level] = compare_conditions(summaries)
+
+    n = len(reference)
+    # With one repetition per label the three coincide and `hit` is the run's count. With
+    # several, `hit` is the per-repetition mean and the union / stable figures sit beside it
+    # -- a condition that finds an obligation in 1 of 10 runs and one that finds it in 10 of
+    # 10 have the same union and very different means, and the talk needs to know which.
+    funnel = {
+        label: {
+            level: {
+                "hit": round(sum(c["per_repetition_hits"]) / c["repetitions"], 2)
+                if c["repetitions"] else None,
+                "recall": round(c["mean_recall"], 3) if c["mean_recall"] is not None else None,
+                "union_recall": round(c["union_recall"], 3)
+                if c["union_recall"] is not None else None,
+                "stable_recall": round(c["stable_recall"], 3)
+                if c["stable_recall"] is not None else None,
+                "per_repetition_hits": c["per_repetition_hits"],
+            }
+            for level in ("location", "issue", "resolution")
+            for c in [levels[level]["conditions"][label]]
+        }
+        for label in loaded}
+
+    out: Dict[str, Any] = {
+        "denominator": n,
+        # A single flipped verdict moves the headline by this much; printed so a rate is never
+        # read at a precision it cannot bear.
+        "one_flip_pp": round(100.0 / n, 1) if n else None,
+        "judge_identity": next(iter(identities.values())),
+        "repetitions": {label: len(ps) for label, ps in loaded.items()},
+        "runs": reps,
+        "funnel": funnel,
+        "by_level": levels,
+        # The only precision signal there is. NOT a false-finding rate: a control PR is one
+        # where maintainers asked for nothing, and emission there is counted, not judged.
+        # One entry per repetition, never pooled: the reader can see the spread.
+        "control_emission": {label: [p.get("silent_pr_emission") for p in ps]
+                             for label, ps in loaded.items()},
+    }
+
+    manifests: Dict[str, List[Dict[str, Any]]] = {}
+    for label, names in reps.items():
+        for run_name in names:
+            path = run_dir(run_name) / "run_manifest.json"
+            if path.is_file():
+                m = json.loads(path.read_text())
+                manifests.setdefault(label, []).append({
+                    "run": run_name,
+                    "billed": (m.get("usage") or {}).get("billed"),
+                    "nominal": (m.get("usage") or {}).get("nominal"),
+                    "completion_status": m.get("completion_status"),
+                    "routing_mode": m.get("routing_mode")})
+    if manifests:
+        out["cost"] = manifests
+
+    if release is not None:
+        # The per-run exhibits are computed on the first repetition of each label. They are
+        # facts about a run, and the first is as representative as any; a per-rep spread of
+        # attention or examination is a separate question from the one this block answers.
+        first = {label: names[0] for label, names in reps.items()}
+        out["attention"] = _attention_vs_maintainers(first, Path(release), reference)
+        out["redundancy"] = {label: _redundancy(run_name) for label, run_name in first.items()}
+        out["examination"] = {label: _examination(run_name, Path(release))
+                              for label, run_name in first.items()}
+    return out
+
+
+def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
+                              scoped_obligation_ids: Iterable[str]) -> Dict[str, Any]:
+    """What each condition raised, by concern family, against what maintainers raised.
+
+    Gold-light: uses the judgments' concern labels weighted by eligible obligations, not
+    per-obligation matching, so it is a fact about a single run. `documentation` and `docs`
+    are bridged through `CONCERN_ALIASES`, the one-word mismatch that made the docs arm
+    unmeasurable for its whole life.
+    """
+
+    from collections import Counter
+
+    from src.mathlib_review.analysis.benches import CONCERN_ALIASES
+
+    def canon(name: str) -> str:
+        return CONCERN_ALIASES.get(name, name)
+
+    scoped = set(scoped_obligation_ids)
+    gold: Counter = Counter()
+    for node in _load_jsonl(release / "gold/judgments.jsonl"):
+        weight = sum(1 for ob in node.get("obligations") or []
+                     if ob.get("obligation_id") in scoped)
+        if not weight:
+            continue
+        for label in node.get("concern_labels") or ["(none)"]:
+            gold[canon(label)] += weight
+
+    def share(counter: Counter) -> Dict[str, float]:
+        total = sum(counter.values())
+        return {k: round(v / total, 3) for k, v in counter.most_common()} if total else {}
+
+    out: Dict[str, Any] = {"maintainers": {"n": sum(gold.values()), "share": share(gold)}}
+    gold_share = share(gold)
+    for label, run_name in runs.items():
+        path = run_dir(run_name) / "findings.jsonl"
+        if not path.is_file():
+            continue
+        raised: Counter = Counter(canon(r["concern_family"]) for r in _load_jsonl(path))
+        raised_share = share(raised)
+        keys = set(gold_share) | set(raised_share)
+        # Half the L1 distance between the two distributions: 0 is identical attention, 1 is
+        # disjoint. One number for "does it look at what maintainers look at".
+        distance = round(sum(abs(gold_share.get(k, 0.0) - raised_share.get(k, 0.0))
+                             for k in keys) / 2, 3)
+        out[label] = {"n": sum(raised.values()), "share": raised_share,
+                      "distance_from_maintainers": distance}
+    return out
+
+
+def _redundancy(run_name: str) -> Optional[Dict[str, Any]]:
+    """How many times a run wrote up one change target.
+
+    On the control PR the lead emitted 8 findings for 3 distinct observations across 2
+    targets, restating one complaint under three concern vocabularies; the digest did not
+    collapse them. That is a cost of decomposition, and it has to be measured beside recall or
+    a condition that says the same thing four times reads as four times as thorough.
+    """
+
+    from collections import Counter
+
+    path = run_dir(run_name) / "findings.jsonl"
+    if not path.is_file():
+        return None
+    rows = list(_load_jsonl(path))
+    per_target = Counter((r["pr_number"], r["primary_change_id"]) for r in rows)
+    families = Counter(
+        len({r["concern_family"] for r in rows
+             if (r["pr_number"], r["primary_change_id"]) == target})
+        for target in per_target)
+    return {
+        "findings": len(rows),
+        "targets": len(per_target),
+        "findings_per_target": round(len(rows) / len(per_target), 2) if per_target else None,
+        "targets_written_up_more_than_once": sum(1 for v in per_target.values() if v > 1),
+        "families_per_target": {str(k): v for k, v in sorted(families.items())},
+    }
+
+
+def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
+    """What a condition actually looked at, per PR: the depth exhibit.
+
+    The design's motivating claim is that one model call does not examine a PR deeply -- it
+    reads a few things that are easy to examine and stops. That is a claim about *attention*,
+    and it is checkable from the transcript without gold: which files were read and over which
+    lines, which declarations were searched for, and how much of the PR's change surface that
+    touched. A change target counts as examined if a `file_read` span on its path overlaps its
+    span, or its name appears in a search. Emitting a finding on it is not required -- the
+    question is what was looked at, not what was said.
+
+    Measured the same way for every condition, from transcripts, so the scheduled design's
+    coverage is observed rather than asserted from its floor. Reported beside the PR's diff
+    size and file count, because the claim only bites on large PRs: on a 912-character,
+    single-file PR every condition reads everything, and 33294 is 46k characters over 11 files.
+    """
+
+    from collections import defaultdict
+
+    from ape.tasks.lean_tasks.formal_math.review.candidates import normalize_proposed_edit_path
+    from src.mathlib_review.analysis.trajectory import extract
+    from src.mathlib_review.schema import ChangeGraph
+
+    extracted = extract(run_name)
+    if not extracted.get("present"):
+        return None
+
+    reads: Dict[int, List[tuple]] = defaultdict(list)       # pr -> (path, start, end)
+    searched: Dict[int, set] = defaultdict(set)              # pr -> identifiers / patterns
+    tools: Dict[int, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for pr_key, turns in (extracted.get("turns_by_pr") or {}).items():
+        try:
+            pr = int(pr_key)
+        except (TypeError, ValueError):
+            continue
+        for turn in turns:
+            for item in turn.items:
+                if item.get("t") != "use":
+                    continue
+                name = item.get("name")
+                tools[pr][name] += 1
+                try:
+                    payload = json.loads(item.get("v") or "{}")
+                except json.JSONDecodeError:
+                    payload = {}
+                if not isinstance(payload, dict):
+                    continue
+                if name == "file_read":
+                    path = normalize_proposed_edit_path(
+                        payload.get("file_path") or payload.get("path") or "")
+                    span = payload.get("line_range") or [None, None]
+                    start = span[0] if isinstance(span, list) and span else None
+                    end = span[1] if isinstance(span, list) and len(span) > 1 else None
+                    reads[pr].append((path, start, end))
+                elif name in ("declaration_search", "content_search", "precedent_search"):
+                    for key in ("identifier", "content_pattern", "query", "declaration"):
+                        if payload.get(key):
+                            searched[pr].add(str(payload[key]))
+
+    episodes = {row["pr_number"]: row for row in _load_jsonl(release / "input/episodes.jsonl")}
+    out: Dict[str, Any] = {}
+    for row in _load_jsonl(release / "derived/change_graphs.jsonl"):
+        graph = ChangeGraph.model_validate(row)
+        pr = graph.pr_number
+        if pr not in tools and pr not in reads:
+            continue
+        entities = {e.entity_id: e for e in graph.entities}
+        ranges = {r.range_id: r for r in graph.changed_ranges}
+        examined = 0
+        for target in graph.targets:
+            spans = [(entities[e].span.line_start, entities[e].span.line_end)
+                     for e in target.reviewed_entity_ids
+                     if e in entities and entities[e].span]
+            if not spans:
+                spans = [(ranges[r].reviewed_span.line_start, ranges[r].reviewed_span.line_end)
+                         for r in target.changed_range_ids
+                         if r in ranges and ranges[r].reviewed_span]
+            by_read = any(
+                path == target.path and (
+                    start is None or end is None
+                    or any(s <= end and start <= t for s, t in spans))
+                for path, start, end in reads.get(pr, []))
+            short = (target.declaration_name or "").rsplit(".", 1)[-1]
+            by_search = bool(short) and any(short in q for q in searched.get(pr, ()))
+            examined += bool(by_read or by_search)
+        episode = episodes.get(pr) or {}
+        out[str(pr)] = {
+            "targets_total": len(graph.targets),
+            "targets_examined": examined,
+            "examined_share": round(examined / len(graph.targets), 3) if graph.targets else None,
+            "file_reads": len(reads.get(pr, [])),
+            "distinct_files_read": len({path for path, _s, _e in reads.get(pr, [])}),
+            "searches": len(searched.get(pr, ())),
+            "tool_calls": dict(sorted(tools.get(pr, {}).items())),
+            "diff_chars": len(episode.get("diff") or ""),
+            "changed_files": len(episode.get("changed_files") or []),
+        }
+    return out

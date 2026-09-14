@@ -1,0 +1,27 @@
+# CONDITION C on smoke4 -- the same task and prompt as B, under Claude Code.
+#
+# DO NOT READ A NUMBER FROM THIS UNTIL THE TRANSCRIPT LEAK AUDIT EXISTS AND HAS BEEN SHOWN TO
+# FIRE ON A PLANTED LURE. Containment below is necessary and not sufficient:
+# `assert_prompts_gold_free` sweeps prompt hashes only, and that blind spot previously let
+# three exact held-out answers through.
+extends: bases/v5_solo.yaml
+
+scaffold_type: claude_code
+
+# Containment. NOT optional, and NOT a security posture -- a measurement one. The scaffold's
+# defaults refuse exactly one tool while auto-approving everything, and from a review
+# workspace that reaches: this repository's own gold via upward git resolution, a cached
+# mathlib clone whose HEAD is months past every episode and contains the merged form of the
+# PR under review, and the GitHub PR page itself, which is where the obligations came from.
+# See src/ape/scaffolds/claude_code/config.py for the verified list.
+#
+# Dropping Bash is not a handicap against the arms: DEFAULT_REVIEW_TOOLS is read-only and has
+# no shell either, so granting one would hand this condition a capability class the incumbent
+# lacks -- breaking the comparison in the same motion that it breaks containment.
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob, TodoWrite]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+dataset:
+  pr_numbers: [33057, 33066, 33098, 33438]   # 33438 is the CONTROL

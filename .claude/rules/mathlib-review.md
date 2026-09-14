@@ -37,5 +37,127 @@ paths:
 - **Caps bind billed cost, not nominal** (they differ ~2.5× with prompt caching), so a job spends its
   whole cap; every scheduled task writes `task_outcome.json`; `task_result.json` is never synthesised
   for a pause or failure.
+- **Never read JSONL with `splitlines()`; use `io.jsonl_rows` (or `io.load_jsonl`).** `jsonl_bytes`
+  joins on `\n` and `canonical_json_bytes` writes `ensure_ascii=False`, so a record keeps U+2028,
+  U+2029, U+0085, `\v`, `\f`, `\x1c`, `\x1d`, `\x1e` verbatim -- and `splitlines()` breaks on all
+  of them, cutting a record in half mid-string. Two of 32,851 collected PRs carry U+2028 in a
+  comment body; it killed the pre-gate with `Unterminated string` and a traceback naming no PR.
+  Fixing the *writer* is not an option: escaping at write time rewrites every stored digest.
+- **Check a store file against its ledger digest before believing it is corrupt.** Both damaged
+  reads were `digest=ok json=BAD` -- intact bytes, wrong reader. `store.read` now reports which,
+  and that distinction is the whole diagnosis.
 - Boundary counts are pinned in `tests/datasets/test_package_boundaries.py` (0 backward
   cross-generation edges, 0 v5→v2, 3 private in-package imports). They may only go down.
+- **Verification needs the *reviewed* workspace, not the source-only overlay.** The overlay
+  (`_ensure_patched_target_workspace`) symlinks the base snapshot, materialises touched paths and
+  applies δ₀ — it builds nothing, and `.lake` is a symlink into the shared cache — so every compile
+  sees base `.olean`s, and on a multi-file PR a declaration the PR adds or renames in one file is
+  `Unknown constant` when any other file is verified; the tool's note then asserted the file does not
+  compile (13% of arm sessions on the held-out run; 16 `broken_build` findings on PRs that build).
+  Fixed 2026-09-12: `workspaces/<base>+<fp>` = base + diff + changed modules rebuilt
+  (`BuildManager.build_reviewed_workspace`; 2.4–16.6 min each on this NFS, driven by the import-path
+  length between changed modules, not file count; the 2.8 GB `.lake/build` copy is the cost —
+  hardlinks fail because Lean truncates `.ilean` in place). Build with
+  `prebuild --reviewed --config <run cfg> --execute`; `plan` reports how many episodes lack one;
+  `dataset.require_reviewed_workspaces: true` makes `run` refuse (on for the held-out configs, off in
+  the base because smoke4 is unbuilt); the task falls back to the overlay at WARNING otherwise. Scope:
+  only a *changed* file has a fully rebuilt import closure — dependents off the path between changed
+  modules keep merge-base `.olean`s, and `lake env lean` never checks traces. Prebuild from one host
+  and one shell (pid liveness is host-local). Full account: `docs/research/reviewed-workspaces.md`.
+  Still true: never suppress a compile claim in a prompt — a compile claim on a PR that builds is a
+  tool defect until proven otherwise, and now the first question is whether the run verified against
+  a reviewed workspace (`plan` says).
+- **A reviewed state that does not compile has no reviewed workspace, and never will.** The corpus
+  premise "the PR compiles" is about the *merged* state; an episode is cut at a review round, and a
+  maintainer who reviews a red PR is reviewing exactly the state `prebuild --reviewed` tries to
+  build. 33057 round1 is one: the gold obligation *is* "Delegating so you can fix the last error",
+  and the reviewed file has one `unsolved goals` at `expand_apply` — the merged version differs in
+  one token (`simp only` → `simp`). `prebuild` will fail on such an episode on every invocation and
+  `require_reviewed_workspaces: true` refuses any run containing it. Before treating a reviewed
+  build failure as a tooling bug, compile the patched changed file against the base and read the
+  error: on a **one-file** PR the base `.olean`s are the right environment, so `lake env lean
+  <patched file>` with cwd = the base workspace answers in ~1 min instead of ~8. Note the inversion
+  such an episode creates: the overlay fallback tells the agent "not evidence the PR fails to
+  build", while the gold finding *is* a build failure.
+- **The naming arm's silence was tooling before it was contract — retracted 2026-09-13.** This entry
+  called it "a contract decision, not a bug". The arm *did* ask the corpus question (39 of 109
+  `content_search` calls in the held-out run scoped to `target/Mathlib`, 60 with regex) and got its
+  own neighbourhood back: `Path.rglob` does not descend the overlay's symlinks, so `target/Mathlib`
+  reached 66 of 7,443 files with no warning — its `toLinearMap_` query matched 4 files then, 105 now
+  (`c14fa9b`). `zulip_search` returned nothing on 71% of calls (FTS5 ANDed every term, and
+  punctuation was a syntax error) — 4% after `9bf474e`. Naming hits from `precedent_search` are
+  chance-level (3.3% naming-shaped vs a 3.28% base rate): the index embeds the diff hunk, never the
+  comment body. And the abstention is mute — `submit_candidates([])` carries no reason — so there
+  was never a rationale to aim a prompt at. **Before reading an arm's silence as its contract,
+  replay its own queries through the tool on the real attempt workspace.** The contract is still
+  open and is §D2 of `docs/research/pr-review-v5-principled-design.md` (norm store with maturity;
+  emerging norms license advisory findings only), never built. Flat prefix prevalence is not the
+  bar: at 33337's base `toLinearMap_` has ~50 declarations to `coe_`'s ~4,714.
+- **A closed vocabulary silently filters a correct registration — three times now.** The pattern:
+  a thing is registered correctly in the place that looks authoritative, and a second list that
+  nothing checks it against drops it with no error. `documentation` vs `docs` made the docs arm
+  unmeasurable for its whole life; the retrieval gate's closed `gate` Literal refused a compound
+  value; `CONTEXT_TOOLS` in `schema/review.py` filtered `naming_norm` out of the naming arm's
+  grant after it was added to `ARM_DEFINITIONS` *and* `_REGISTRARS`, so a paid run came back
+  looking like "the new contract changed nothing" when the tool had never been registered
+  ($1.11, 33337 rep14). **Before spending on a run that tests a new capability, assert the
+  capability reaches the task** — and not with `plan`, which logs "DRY RUN — nothing is written"
+  and leaves no `arm_pool.jsonl` to read. What works, in a second and for nothing:
+  `ape/bin/python -c "from src.mathlib_review.agenda.arms import _grant_for; print(_grant_for('naming'))"`,
+  or `ape/bin/python -m pytest tests/datasets/test_context_tool_grants_survive.py -q`. After a
+  paid run, `arm_pool.jsonl`'s `task_data.context_tools` is the record of what the arm actually
+  held. Adding an arm is two edits; adding a *tool* is four — registrar, `ARM_DEFINITIONS`,
+  `CONTEXT_TOOLS`, and `ContextCall.tool`.
+- **`declaration_search` was base-only by construction** — an arm judging a *rename* could not look
+  up the name the PR introduced. It now also searches the PR's changed files in the reviewed
+  overlay (`declared_before_this_pr` / `declared_in_this_pr`, `reviewed:` ids); the gate stays
+  `base_snapshot` because the gate vocabulary is closed (`test_retrieval_gate.py`).
+- **Tool output lives in `result_content`; a transcript's `tool_result.content` is always `null`.**
+  `ape.llm_clients.models:55` stores the unified string form in `result_content` and never
+  populates `content` for a `tool_result` block. Hand-parsing `content` therefore yields the
+  literal string `"null"` for every tool result, which matches no pattern and lands every session
+  in whatever bucket the classifier uses last — a 100%-in-one-class result that looks like a
+  finding. This cost three retracted analyses in one sitting (100% "judgement stop", then all
+  "unclear", then 100% "had usable content"). **A uniform 100% partition is the symptom; check the
+  field before believing it.** `src/mathlib_review/analysis/trajectory.py:226` already reads it
+  correctly — use `cli trajectory`, or copy its accessor, rather than re-parsing JSONL by hand.
+  Two more shapes that bit the same analysis: the per-turn files under an attempt's
+  `conversations/` are **cumulative** (read only the last one, or every call is counted N times),
+  and `_attribute_errors` (`review/base.py:392`) **keeps `errors` intact** and *adds*
+  `errors_introduced_by_your_edit` / `errors_already_in_the_file` — so a non-empty `errors` does
+  not mean the agent's edit failed, only the split field does.
+- **A hand-built fake cannot disagree with the class it stands in for.** Twice in one session:
+  a fixture built a `BuildManager` with `__new__` and set `workspace_dir` by hand, so the fake
+  had an attribute the real class did not and the first real prebuild died in 1s with
+  `'BuildManager' object has no attribute 'workspace_dir'`; and `_record_outcome` in
+  `test_pr_review_v5_lead.py` built a `SimpleNamespace` shaped like a `JobOutcome`, so when the
+  lead started reading a new field the three tests that exercise that exact code path kept
+  passing until the field was added to the real dataclass. Both fakes were green precisely
+  because they were free to be wrong. **Construct the real class in a fixture** — a dataclass or
+  pydantic model is cheap to build and will refuse an argument it does not have. Reserve
+  `SimpleNamespace` for things with no class to construct.
+- **"Last tool before submit" is not investigation depth — retracted 2026-09-13.** A last-action
+  analysis of `pr5_A_lead_heldout12_rep1` put 40% of empty arm submissions (33 of 82) at
+  "stopped on an as-is compile check, which proves nothing", and that number went into
+  `591961d`'s commit message as evidence of shallow specialist work. It is an accurate count of
+  *final tool calls* and a wrong diagnosis. Once `submit_candidates` recorded why an arm
+  abstained (`5699f3a`), the arms ending that way turned out to have done the work and then made
+  a closing compile call: *"Checked the module doc in `Mathlib/Data/Matrix/Mul.lean`: the updated
+  reference `.../ConjTranspose.lean` exists and its module doc indeed introduces…"*. Measured
+  directly, tool calls before an empty submission are **median 6.0** against **median 7.0 before
+  a finding** (n=95/23; the validation run repeats it at 6.0 vs 6.5, n=17/8) — an arm that
+  abstains investigates about as much as one that files, and the shallow-work premise does not
+  survive it. **A tool-call histogram cannot see deliberation; ask the agent and record the
+  answer.** The reshape in `591961d` stands on its own ground — a no-op compile returning
+  `success: true` was wrong however deep the session was, and it fixed a false promise in the
+  `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
+  the fix for a problem that was mostly not there.
+- **Control-PR emission is 0-1 per run, not 0.** Measured over every v5 run covering 33315:
+  `heldout12_rep1` 0/13 invocations, `heldout11_rep1` 1/11 (generalist), `heldout11_rep2` 1/11
+  (generalist), `medium_heldout_rep1` 0/13, `validate_abstention_rep1` 1/18 (docs). The "0 false
+  candidates per control per rep" figure is the **v4 deterministic arm's**, from the
+  deterministic-precision comparison (0 vs 2 against the generalist), and does not transfer to a
+  v5 lead run — it was mis-transferred into a commit message and into run advice on 2026-09-13.
+  A single control candidate is inside the historical range and is not evidence that a change
+  regressed precision; it takes reps, and the source says to label it `silent_pr_emission`,
+  never a false-finding rate.

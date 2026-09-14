@@ -36,11 +36,12 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
 
+from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.conventions.situations import SITUATIONS_VERSION, Situation, situation_of
 from src.mathlib_review.paths import PRECEDENT_CORPUS, PRECEDENT_INDEX
 from src.mathlib_review.retrieval.precedent_index import DISPLAY_HUNK_CHARS
 
-REVIEW_JOIN_VERSION = "v5-review-join/2"
+REVIEW_JOIN_VERSION = "v5-review-join/3"
 
 #: A declaration head on a diff line (`+`, `-`, or context), with attributes and modifiers.
 #: `structure`/`class`/`inductive`/`axiom`/`opaque` are heads too: without them a comment on an
@@ -228,21 +229,34 @@ def join_comment(row: Dict[str, Any]) -> JoinedComment:
     )
 
 
-def load_index_rows(meta: Path = PRECEDENT_INDEX / "meta.jsonl") -> List[Dict[str, Any]]:
+def _within(row: Dict[str, Any], end: Optional[str]) -> bool:
+    return end is None or str(row.get("created_at") or "")[:10] <= end
+
+
+def load_index_rows(meta: Path = PRECEDENT_INDEX / "meta.jsonl", *,
+                    end: Optional[str]) -> List[Dict[str, Any]]:
     """Index rows: hunks cut at DISPLAY_HUNK_CHARS, so `hunk_complete` is decided per row."""
 
-    rows = [json.loads(line) for line in meta.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = jsonl_rows(meta)
     for row in rows:
         row["hunk_complete"] = len(row.get("diff_hunk") or "") < DISPLAY_HUNK_CHARS
-    return rows
+    return [row for row in rows if _within(row, end)]
 
 
-def load_corpus_rows(corpus: Path = PRECEDENT_CORPUS) -> List[Dict[str, Any]]:
+def load_corpus_rows(corpus: Path = PRECEDENT_CORPUS, *,
+                     end: Optional[str]) -> List[Dict[str, Any]]:
     """Corpus rows: whole hunks, so the tail is the commented line for every row.
 
     The file is gitignored and was absent from the checkout when the gate was first run; it is
     recoverable from the snapshot commit `f61c1a1` and its sha256 matches the index manifest.
     Eval PRs are excluded here exactly as the index build excludes them.
+
+    **`end` has no default, on purpose.** This loader applied no date window at all, which was
+    safe only because the corpus stopped at 2025-08-31 -- before every eval PR, so the file's own
+    end date was the gate. The store now collects to 2026-08-31, so an unwindowed read would
+    compute the *enforced* component from review written up to eight months after the episodes it
+    describes, and nothing would say so. `end=None` is still legal and still means "no window";
+    it just has to be asked for, and `report` records what was asked.
     """
 
     from src.datasets.pull_requests.definitions import scored_pr_numbers
@@ -253,19 +267,19 @@ def load_corpus_rows(corpus: Path = PRECEDENT_CORPUS) -> List[Dict[str, Any]]:
         if not line.strip():
             continue
         row = json.loads(line)
-        if row.get("pr_number") in excluded:
+        if row.get("pr_number") in excluded or not _within(row, end):
             continue
         row["hunk_complete"] = True
         rows.append(row)
     return rows
 
 
-def load_rows() -> List[Dict[str, Any]]:
+def load_rows(*, end: Optional[str]) -> List[Dict[str, Any]]:
     """The full-hunk corpus when present, else the index's truncated rows."""
 
     if PRECEDENT_CORPUS.is_file():
-        return load_corpus_rows()
-    return load_index_rows()
+        return load_corpus_rows(end=end)
+    return load_index_rows(end=end)
 
 
 def join_all(rows: Iterable[Dict[str, Any]]) -> List[JoinedComment]:
@@ -282,14 +296,21 @@ def by_situation(joined: Iterable[JoinedComment]) -> Dict[str, List[JoinedCommen
     return dict(index)
 
 
-def report(joined: Sequence[JoinedComment], *, source: Optional[str] = None) -> Dict[str, Any]:
+def report(joined: Sequence[JoinedComment], *, source: Optional[str] = None,
+           end: Optional[str] = None) -> Dict[str, Any]:
     via = collections.Counter(item.resolved_via for item in joined)
     keys = collections.Counter(k for item in joined for k in item.situation_keys)
+    dates = [item.created_at[:10] for item in joined if item.created_at]
     return {
         "schema_version": REVIEW_JOIN_VERSION,
         "source": source or ("corpus (whole hunks)" if PRECEDENT_CORPUS.is_file()
                              else "index (hunks cut at %d chars)" % DISPLAY_HUNK_CHARS),
         "situations_version": SITUATIONS_VERSION,
+        # What window was *asked* for, and what the rows actually span. A consumer that feeds a
+        # brief must check `window.end` against its episode's base date; an unwindowed join is
+        # legal and says so rather than looking like a gated one.
+        "window": {"end": end, "rows_from": min(dates) if dates else None,
+                   "rows_to": max(dates) if dates else None},
         "comments": len(joined),
         "resolved_via": dict(via),
         "resolved_share": round((via["line"] + via["head"] + via["context"]) / max(1, len(joined)), 4),
@@ -303,13 +324,13 @@ def report(joined: Sequence[JoinedComment], *, source: Optional[str] = None) -> 
     }
 
 
-def write(joined: Sequence[JoinedComment], out: Path) -> Path:
+def write(joined: Sequence[JoinedComment], out: Path, *, end: Optional[str] = None) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     (out / "joined_comments.jsonl").write_text(
         "".join(json.dumps(asdict(item), ensure_ascii=False, sort_keys=True,
                            separators=(",", ":")) + "\n" for item in joined), encoding="utf-8")
-    (out / "report.json").write_text(json.dumps(report(joined), indent=2, sort_keys=True) + "\n",
-                                     encoding="utf-8")
+    (out / "report.json").write_text(
+        json.dumps(report(joined, end=end), indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return out
 
 
@@ -319,11 +340,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out", type=Path, default=Path("data/pr_review_v5/review_join"))
     parser.add_argument("--write", action="store_true")
+    parser.add_argument("--end", required=True, metavar="YYYY-MM-DD|all",
+                        help="keep comments created on or before this date; `all` reads the "
+                             "whole corpus. Required: the corpus now runs past the episodes "
+                             "this join describes, so the window is a choice, not a default.")
     args = parser.parse_args()
-    joined = join_all(load_rows())
-    payload = report(joined)
+    end = None if args.end == "all" else args.end
+    joined = join_all(load_rows(end=end))
+    payload = report(joined, end=end)
     if args.write:
-        payload["written"] = str(write(joined, args.out))
+        payload["written"] = str(write(joined, args.out, end=end))
     print(json.dumps(payload, indent=2, sort_keys=True))
 
 

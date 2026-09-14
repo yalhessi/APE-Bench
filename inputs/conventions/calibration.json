@@ -1,0 +1,242 @@
+{
+ "adherence": {
+  "name_mirrors_conclusion_by_head": {
+   "eq": {
+    "applicable": 85125,
+    "band": "not_a_convention",
+    "conforming": 21618,
+    "key": "name_mirrors_conclusion",
+    "missing_fields": [],
+    "rate": 0.254,
+    "verifiable": true
+   },
+   "iff": {
+    "applicable": 14948,
+    "band": "contested_or_in_transition",
+    "conforming": 10796,
+    "key": "name_mirrors_conclusion",
+    "missing_fields": [],
+    "rate": 0.7222,
+    "verifiable": true
+   },
+   "le": {
+    "applicable": 10297,
+    "band": "contested_or_in_transition",
+    "conforming": 9414,
+    "key": "name_mirrors_conclusion",
+    "missing_fields": [],
+    "rate": 0.9142,
+    "verifiable": true
+   },
+   "mem": {
+    "applicable": 5925,
+    "band": "contested_or_in_transition",
+    "conforming": 5564,
+    "key": "name_mirrors_conclusion",
+    "missing_fields": [],
+    "rate": 0.9391,
+    "verifiable": true
+   },
+   "ne": {
+    "applicable": 0,
+    "band": "no_applicable_rows",
+    "conforming": 0,
+    "key": "name_mirrors_conclusion",
+    "missing_fields": [],
+    "rate": null,
+    "verifiable": true
+   },
+   "quantified": {
+    "applicable": 6608,
+    "band": "not_a_convention",
+    "conforming": 2769,
+    "key": "name_mirrors_conclusion",
+    "missing_fields": [],
+    "rate": 0.419,
+    "verifiable": true
+   }
+  },
+  "namespace_not_repeated": {
+   "applicable": 147415,
+   "band": "settled",
+   "conforming": 146967,
+   "key": "namespace_not_repeated",
+   "missing_fields": [],
+   "rate": 0.997,
+   "verifiable": true
+  }
+ },
+ "candidates": [
+  {
+   "encoded_as": null,
+   "key": "name_mirrors_conclusion",
+   "missing_fields": [],
+   "requires": [
+    "fullname",
+    "conclusion_head"
+   ],
+   "source": "observed",
+   "statement": "The leaf name carries a token naming the conclusion's relation.",
+   "verifiable": true
+  },
+  {
+   "encoded_as": null,
+   "key": "hypotheses_after_of",
+   "missing_fields": [
+    "signature"
+   ],
+   "requires": [
+    "fullname",
+    "signature"
+   ],
+   "source": "observed",
+   "statement": "Hypotheses are named in the suffix after `_of_`, in order.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "term_mode_one_step",
+   "missing_fields": [
+    "proof_mode"
+   ],
+   "requires": [
+    "proof_mode"
+   ],
+   "source": "observed",
+   "statement": "A one-step consequence is proved as a term, not `by exact`.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "reassoc_on_composites",
+   "missing_fields": [
+    "attributes"
+   ],
+   "requires": [
+    "attributes"
+   ],
+   "source": "observed",
+   "statement": "A CT equality between morphism composites carries `@[reassoc]`.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "comp_transcribes_composition",
+   "missing_fields": [
+    "signature"
+   ],
+   "requires": [
+    "fullname",
+    "signature"
+   ],
+   "source": "observed",
+   "statement": "`_comp_` in a name transcribes `\u226b` in the statement.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "iff_simp_gets_alias",
+   "missing_fields": [
+    "source_commands"
+   ],
+   "requires": [
+    "source_commands"
+   ],
+   "source": "observed",
+   "statement": "An iff `@[simp]` lemma gets an `alias` splitting both directions.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "exhaustive_hypothesis_families",
+   "missing_fields": [],
+   "requires": [
+    "fullname"
+   ],
+   "source": "observed",
+   "statement": "Helper lemmas are stated exhaustively over hypothesis variants.",
+   "verifiable": true
+  },
+  {
+   "encoded_as": null,
+   "key": "gcongr_on_monotonicity",
+   "missing_fields": [
+    "attributes"
+   ],
+   "requires": [
+    "attributes"
+   ],
+   "source": "observed",
+   "statement": "A two-sided monotonicity lemma carries `@[gcongr]`.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "rw_then_close",
+   "missing_fields": [
+    "tactic_sequence"
+   ],
+   "requires": [
+    "tactic_sequence"
+   ],
+   "source": "observed",
+   "statement": "Rewrite then close, rather than one maximal `simp [...]`.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": "linter.dupNamespace",
+   "key": "namespace_not_repeated",
+   "missing_fields": [],
+   "requires": [
+    "fullname",
+    "namespace"
+   ],
+   "source": "observed",
+   "statement": "A namespaced declaration does not repeat its namespace in the leaf name.",
+   "verifiable": true
+  },
+  {
+   "encoded_as": "linter.style.induction",
+   "key": "structured_induction",
+   "missing_fields": [
+    "tactic_sequence"
+   ],
+   "requires": [
+    "tactic_sequence"
+   ],
+   "source": "observed",
+   "statement": "`induction x with | c => ...` rather than unstructured `induction`.",
+   "verifiable": false
+  },
+  {
+   "encoded_as": null,
+   "key": "computational_proof_delegates",
+   "missing_fields": [
+    "tactic_sequence"
+   ],
+   "requires": [
+    "tactic_sequence"
+   ],
+   "source": "observed",
+   "statement": "A numeric/computational proof delegates to a custom tactic.",
+   "verifiable": false
+  }
+ ],
+ "sample": {
+  "declarations_located_and_read": 23,
+  "n": 30,
+  "not_located_by_extractor": 7,
+  "seed": 20260911
+ },
+ "schema_version": "convention-calibration/1",
+ "snapshot": "af239326a46dea977a6d5444466c14aa423f4b10",
+ "verdict": {
+  "already_encoded": 2,
+  "candidates": 12,
+  "proceed_to_model_pass": false,
+  "threshold": 0.3333,
+  "unencoded_and_checkable": 2,
+  "unencoded_but_unverifiable": 8,
+  "useful_fraction": 0.1667
+ }
+}

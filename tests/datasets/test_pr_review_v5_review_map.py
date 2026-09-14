@@ -91,17 +91,32 @@ def test_a_slice_never_asserts_a_finding():
     assert "Establish anything you report" in text
 
 
-def test_conventions_point_at_review_history_not_corpus_frequency():
-    """Measured: the code corpus argues against the maintainer on both naming conventions in
-    this set — `toLinearMap_` 50 against `coe_`'s 4,707, dot notation 2,359 against 22,345.
-    Frequency measures where the library has been, not where it is going."""
+def test_conventions_ask_for_evidence_that_can_be_cited():
+    """This used to assert the opposite instruction -- "settle these against review history,
+    not against how common a spelling is today" -- on the strength of `toLinearMap_` appearing
+    50 times against `coe_`'s 4,707.
+
+    Retracted 2026-09-13: that compares every name containing one token against every name
+    containing another, which are different populations. Conditioned on the subject a lemma is
+    *about*, the ranking inverts -- of the 121 declarations whose conclusion is about
+    `toLinearMap`, 21 use `toLinearMap_` and 7 use `coe_`. The instruction that followed from
+    the bad comparison closed the one route measured to work, and contradicted the naming
+    arm's own contract once that arm was given `naming_norm`: one prompt told it to count the
+    repository and the block beside it told it not to.
+
+    The block still may not hand over an answer -- it asks a question and names what would
+    settle it.
+    """
 
     questions = convention_questions([component("migration", ["c1"])], ["N.coe_thing"])
     kinds = {q.kind for q in questions}
     assert "rename_form" in kinds and "coercion_name" in kinds
     text = ContextSlice("wu:1#naming", conventions=tuple(questions)).render()
-    assert "review history" in text
-    assert "not against how common a spelling is today" in text
+    assert "counted population" in text
+    assert "precedent" in text
+    assert "not against how common a spelling is today" not in text, (
+        "the retracted instruction is back")
+    assert "Establish anything you report" in text, "still context, never a finding"
 
 
 def test_a_primed_name_raises_its_own_question():

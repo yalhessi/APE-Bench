@@ -1,0 +1,501 @@
+"""A reviewed workspace: the base snapshot, the PR's diff, and its changed modules rebuilt.
+
+The environment a PR is verified in has to be the one it was written in. The review overlay
+applied the diff to source only and every compile resolved imports through the base commit's
+build products, so a declaration the PR renames in a sibling file was an `Unknown constant`
+whatever the PR's real state -- 41 of 321 arm sessions on the held-out run, 16 findings
+asserting a build failure on PRs that all build.
+
+These tests drive the builder with `lake` and the copy faked. What they pin is the part that
+matters for a shared, read-only, 444-protected base: the state transitions, the atomic rename
+into place, that nothing under the base path is ever opened for writing, and that a failed
+build leaves neither a half-built workspace nor a BUILT state behind. The real build was
+measured separately (33337: 67s, ten modules, base untouched, zero unknown constants).
+"""
+
+from __future__ import annotations
+
+import asyncio
+import os
+from pathlib import Path
+
+import pytest
+from types import SimpleNamespace
+
+from ape.toolkits.execute.lean.core.build_manager import (
+    is_reviewed_workspace_key,
+    lake_targets_for_changed_files,
+    reviewed_workspace_key,
+)
+
+SHA = "a36c84ab8236a4869899268a42a44af07daa21ed"
+
+
+@pytest.fixture(autouse=True)
+def _writable_on_teardown(tmp_path):
+    """The base fixture is 0o555/0o444 like a restored snapshot, and a finished reviewed
+    workspace is finalised the same way -- that is the point. pytest's tmp cleanup cannot
+    remove read-only trees and warns for every directory; restore write bits after the test
+    so the assertions above are made against the real modes and the cleanup is quiet."""
+
+    yield
+    for dirpath, _dirnames, filenames in os.walk(tmp_path):
+        try:
+            os.chmod(dirpath, 0o755)
+        except OSError:
+            pass
+        for name in filenames:
+            path = Path(dirpath) / name
+            if not path.is_symlink():
+                try:
+                    os.chmod(path, 0o644)
+                except OSError:
+                    pass
+
+
+# --- the key --------------------------------------------------------------------------------
+
+
+def test_the_key_is_the_base_commit_plus_the_diffs_mark():
+    key = reviewed_workspace_key(SHA, "--- a/x\n+++ b/x\n")
+    assert key.startswith(SHA + "+") and len(key) == len(SHA) + 1 + 12
+    assert is_reviewed_workspace_key(key) and not is_reviewed_workspace_key(SHA)
+
+
+def test_the_key_is_deterministic_and_diff_sensitive():
+    assert reviewed_workspace_key(SHA, "d1") == reviewed_workspace_key(SHA, "d1")
+    assert reviewed_workspace_key(SHA, "d1") != reviewed_workspace_key(SHA, "d2")
+    assert reviewed_workspace_key(SHA, "d1") != reviewed_workspace_key("b" * 40, "d1")
+
+
+def test_the_key_uses_the_patch_markers_recipe():
+    """Commit, NUL, diff -- the same bytes `ReviewPRCoreTask._patch_fingerprint` hashes, so
+    the overlay's marker and the reviewed workspace agree on identity by construction."""
+
+    import hashlib
+
+    digest = hashlib.sha256(SHA.encode() + b"\0" + b"the diff").hexdigest()
+    assert reviewed_workspace_key(SHA, "the diff") == f"{SHA}+{digest[:12]}"
+
+
+# --- which modules to build -------------------------------------------------------------------
+
+
+def test_targets_name_only_library_modules_that_still_exist(tmp_path):
+    (tmp_path / "Mathlib.lean").write_text("")
+    (tmp_path / "Mathlib/Analysis").mkdir(parents=True)
+    (tmp_path / "Mathlib/Analysis/Positive.lean").write_text("")
+    (tmp_path / "Mathlib/Analysis/Deleted.lean")  # not created: the PR deleted it
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "scripts/lint.lean").write_text("")   # no `scripts.lean` root: not a library
+    (tmp_path / "docs.md").write_text("")
+
+    targets = lake_targets_for_changed_files(
+        ["Mathlib/Analysis/Positive.lean", "Mathlib/Analysis/Deleted.lean",
+         "scripts/lint.lean", "docs.md", "Mathlib/Analysis/Positive.lean"], tmp_path)
+
+    assert targets == ["+Mathlib.Analysis.Positive"]
+
+
+def test_archive_and_counterexamples_are_libraries_too(tmp_path):
+    for root in ("Archive", "Counterexamples"):
+        (tmp_path / f"{root}.lean").write_text("")
+        (tmp_path / root).mkdir()
+        (tmp_path / root / "Thing.lean").write_text("")
+    assert lake_targets_for_changed_files(
+        ["Archive/Thing.lean", "Counterexamples/Thing.lean"], tmp_path
+    ) == ["+Archive.Thing", "+Counterexamples.Thing"]
+
+
+# --- the build, with Lake faked ---------------------------------------------------------------
+
+
+class _State:
+    def __init__(self, status=None):
+        self.status = status
+        self.file_count = 0
+
+
+class _StateManager:
+    """Records the transitions the builder asks for."""
+
+    def __init__(self):
+        self.calls = []
+
+    async def try_start_build(self, key, force_rebuild=False):
+        self.calls.append(("start", key))
+        return _State(status="building")
+
+    async def complete_build(self, key, success, duration, file_count=0, **kw):
+        # Validated the way the real state manager validates it. The fake used to accept
+        # anything, so nobody noticed that the builder passed `type(exc).__name__` into a
+        # field typed `ErrorType`: pydantic rejected the assignment, the builder swallowed
+        # that to avoid masking the build error, and the state stayed BUILDING with a dead
+        # pid. Two prebuilds of 33057 paid 8 minutes each and recorded nothing.
+        from ape.toolkits.execute.lean.models import ErrorType
+        error_type = kw.get("error_type")
+        assert error_type is None or isinstance(error_type, ErrorType), (
+            f"error_type must be an ErrorType, got {error_type!r}")
+        self.calls.append(("complete", key, success, error_type))
+        return _State(status="built" if success else "failed")
+
+
+def _workspaces(tmp_path) -> Path:
+    """Where a real manager on a config rooted at `tmp_path` keeps restored workspaces."""
+
+    return tmp_path / "repos" / "mathlib4" / "workspaces"
+
+
+def _base(tmp_path):
+    """A miniature base workspace laid out like a restored one: 444 files, 555 dirs."""
+
+    base = _workspaces(tmp_path) / SHA
+    (base / "Mathlib/A").mkdir(parents=True)
+    (base / "Mathlib.lean").write_text("import Mathlib.A.B\n")
+    (base / "Mathlib/A/B.lean").write_text("theorem old : True := trivial\n")
+    (base / ".lake/build/lib/lean/Mathlib/A").mkdir(parents=True)
+    (base / ".lake/build/lib/lean/Mathlib/A/B.olean").write_bytes(b"olean")
+    (base / ".lake/packages/batteries").mkdir(parents=True)
+    (base / ".lake/packages/batteries/x").write_text("dep")
+    for p in base.rglob("*"):
+        os.chmod(p, 0o555 if p.is_dir() else 0o444)
+    os.chmod(base, 0o555)
+    return base
+
+
+def _manager(tmp_path, state_manager, run_command):
+    """A real BuildManager on a config rooted at `tmp_path`, with the state machine and `lake`
+    replaced.
+
+    Constructed the real way on purpose. An earlier version built it with `__new__` and set
+    `workspace_dir` by hand -- and the real class has no such attribute, so the first real
+    build failed in one second on a path the tests had never asked the manager to resolve.
+    The paths must come from the same config method the manager uses in production.
+    """
+
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+    from ape.toolkits.execute.lean.core.build_manager import BuildManager
+
+    config = LeanVerifyToolConfig(
+        base_dir=tmp_path, storage_dir=tmp_path / "storage", repos_dir=tmp_path / "repos",
+        build_timeout=60)
+    manager = BuildManager(config)
+    manager.state_manager = state_manager
+    import ape.toolkits.execute.lean.core.build_manager as module
+    module.run_command = run_command
+    return manager
+
+
+async def _prepare(build_root: Path, base_root: Path) -> None:
+    """The task layer's job, done minimally: symlink the base, patch one source file."""
+
+    build_root.mkdir(parents=True)
+    for child in base_root.iterdir():
+        (build_root / child.name).symlink_to(child)
+    # materialise Mathlib/A/B.lean as a patched real copy
+    (build_root / "Mathlib").unlink()
+    (build_root / "Mathlib/A").mkdir(parents=True)
+    (build_root / "Mathlib/A/B.lean").write_text("theorem new : True := trivial\n")
+
+
+def test_a_reviewed_workspace_is_built_beside_the_base_and_renamed_into_place(tmp_path):
+    base = _base(tmp_path)
+    states = _StateManager()
+    seen = {}
+
+    async def fake_lake(cmd, cwd, **kw):
+        seen["cmd"] = cmd
+        seen["cwd"] = Path(cwd)
+        # Lean writes an artifact where the real one would go
+        out = Path(cwd) / ".lake/build/lib/lean/Mathlib/A/B.olean"
+        out.write_bytes(b"rebuilt")
+        return "", "", 0
+
+    manager = _manager(tmp_path, states, fake_lake)
+    key = reviewed_workspace_key(SHA, "diff")
+    result = asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    assert result.success
+    final = _workspaces(tmp_path) / key
+    assert final.is_dir(), "renamed into place under workspaces/<key>"
+    assert seen["cmd"] == ["lake", "build", "+Mathlib.A.B"]
+    assert seen["cwd"] != final, "Lake ran in the temp build dir, not the final path"
+    assert seen["cwd"].parent == final.parent, "same parent: the rename never rewrites `..`"
+    assert not [p for p in final.parent.iterdir() if p.name.startswith(".")], "temp dir removed"
+    assert oct(final.stat().st_mode & 0o777) == "0o555", "finalised before the rename"
+    assert oct((final / "Mathlib/A/B.lean").stat().st_mode & 0o777) == "0o444"
+    assert (final / ".lake/build/lib/lean/Mathlib/A/B.olean").read_bytes() == b"rebuilt"
+    assert (final / "Mathlib/A/B.lean").read_text().startswith("theorem new")
+    assert (final / ".lake/packages").is_symlink(), "dependency packages stay shared"
+    assert states.calls == [("start", key), ("complete", key, True, None)]
+
+
+def test_the_base_is_never_written(tmp_path):
+    """The whole design constraint. The base's 444 files turned every wrong guess into a loud
+    failure during measurement; the builder must not rely on that -- it must not try."""
+
+    base = _base(tmp_path)
+    before = {p: p.stat().st_mtime_ns for p in base.rglob("*") if p.is_file()}
+    olean = base / ".lake/build/lib/lean/Mathlib/A/B.olean"
+    before_inode = olean.stat().st_ino
+
+    async def fake_lake(cmd, cwd, **kw):
+        (Path(cwd) / ".lake/build/lib/lean/Mathlib/A/B.olean").write_bytes(b"rebuilt")
+        return "", "", 0
+
+    manager = _manager(tmp_path, _StateManager(), fake_lake)
+    asyncio.run(manager.build_reviewed_workspace(
+        reviewed_workspace_key(SHA, "diff"), SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    after = {p: p.stat().st_mtime_ns for p in base.rglob("*") if p.is_file()}
+    assert after == before
+    assert olean.read_bytes() == b"olean" and olean.stat().st_ino == before_inode
+    assert oct(olean.stat().st_mode & 0o777) == "0o444"
+
+
+def test_a_failed_build_leaves_no_workspace_and_marks_failed(tmp_path):
+    _base(tmp_path)
+    states = _StateManager()
+
+    async def failing_lake(cmd, cwd, **kw):
+        return "", "error: Lean exited with code 1", 1
+
+    manager = _manager(tmp_path, states, failing_lake)
+    key = reviewed_workspace_key(SHA, "diff")
+    with pytest.raises(RuntimeError, match="lake build"):
+        asyncio.run(manager.build_reviewed_workspace(
+            key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    assert not (_workspaces(tmp_path) / key).exists(), "nothing half-built left in place"
+    assert not [p for p in (_workspaces(tmp_path)).iterdir() if p.name.startswith(".")], \
+        "temp dir removed"
+    assert states.calls[-1][:3] == ("complete", key, False)
+    # The cleanup walked a tree of symlinks into the base. `os.chmod` follows symlinks, and
+    # the base's files are hardlinked blob-store inodes shared by every restored workspace:
+    # a cleanup that chmod'ed through the links would have rewritten them all. It must not.
+    base = _workspaces(tmp_path) / SHA
+    for rel, want in (("Mathlib", 0o555), ("Mathlib.lean", 0o444), ("Mathlib/A/B.lean", 0o444),
+                      (".lake/packages", 0o555), (".lake/packages/batteries/x", 0o444)):
+        assert (base / rel).stat().st_mode & 0o777 == want, f"{rel}: base mode rewritten"
+
+
+def test_an_already_built_key_is_not_rebuilt(tmp_path):
+    class Built(_StateManager):
+        async def try_start_build(self, key, force_rebuild=False):
+            self.calls.append(("start", key))
+            return _State(status=__import__("ape.toolkits.execute.lean.models",
+                                            fromlist=["WorkspaceStatus"]).WorkspaceStatus.BUILT)
+
+    ran = []
+
+    async def lake(cmd, cwd, **kw):
+        ran.append(cmd)
+        return "", "", 0
+
+    manager = _manager(tmp_path, Built(), lake)
+    result = asyncio.run(manager.build_reviewed_workspace(
+        reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+    assert result.success and result.build_duration == 0.0 and ran == []
+
+
+def test_no_targets_is_refused_before_anything_is_copied(tmp_path):
+    """A PR that touches no library module -- docs, scripts, a deleted file -- has nothing to
+    rebuild, and a workspace built for it would be the base overlay under a name that promises
+    more. Refused after the sources are prepared (that is where the answer is) and before the
+    build tree is copied (that is the expensive step)."""
+
+    _base(tmp_path)
+
+    async def lake(cmd, cwd, **kw):
+        raise AssertionError("lake must not run")
+
+    manager = _manager(tmp_path, _StateManager(), lake)
+    with pytest.raises(RuntimeError, match="no Lake targets"):
+        asyncio.run(manager.build_reviewed_workspace(
+            reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare,
+            changed_files=["docs/README.md", "Mathlib/A/Deleted.lean"]))
+    left = sorted(p.name for p in (_workspaces(tmp_path)).iterdir())
+    assert left == [SHA], f"only the base remains; the hidden build tree is removed: {left}"
+
+
+def test_force_rebuild_replaces_the_existing_tree(tmp_path):
+    """Without this, a forced rebuild built the new tree, failed to `rename` it onto the
+    non-empty old one, read the refusal as 'another builder won', deleted the new tree and
+    recorded success -- the operator was told the rebuild happened."""
+
+    _base(tmp_path)
+    states = _StateManager()
+    stamp = {"value": b"first"}
+
+    async def lake(cmd, cwd, **kw):
+        (Path(cwd) / ".lake/build/lib/lean/Mathlib/A/B.olean").write_bytes(stamp["value"])
+        return "", "", 0
+
+    manager = _manager(tmp_path, states, lake)
+    key = reviewed_workspace_key(SHA, "diff")
+    asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+    stamp["value"] = b"second"
+    result = asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"], force_rebuild=True))
+
+    final = _workspaces(tmp_path) / key
+    assert result.success
+    assert (final / ".lake/build/lib/lean/Mathlib/A/B.olean").read_bytes() == b"second"
+    assert sorted(p.name for p in _workspaces(tmp_path).iterdir()) == sorted([SHA, key]), (
+        "the replaced tree is gone and no dotted tree remains")
+    assert [c for c in states.calls if c[0] == "complete"] == [
+        ("complete", key, True, None), ("complete", key, True, None)]
+
+
+def test_orphaned_trees_of_dead_builders_are_swept_before_building(tmp_path):
+    """A hard-killed builder skips its `finally`; its dotted tree stays. The next builder on
+    the same key removes it -- and only trees whose pid is dead."""
+
+    import os
+
+    _base(tmp_path)
+    key = reviewed_workspace_key(SHA, "diff")
+    dead = _workspaces(tmp_path) / f".{key}.4194303.deadbeef"
+    (dead / "Mathlib").mkdir(parents=True)
+    (dead / "Mathlib/x.lean").write_text("stale")
+    live = _workspaces(tmp_path) / f".{key}.{os.getpid()}.cafef00d"
+    live.mkdir()
+    (live / "marker").write_text("someone else's build, still running")
+
+    async def lake(cmd, cwd, **kw):
+        (Path(cwd) / ".lake/build/lib/lean/Mathlib/A/B.olean").write_bytes(b"rebuilt")
+        return "", "", 0
+
+    manager = _manager(tmp_path, _StateManager(), lake)
+    asyncio.run(manager.build_reviewed_workspace(
+        key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    assert not dead.exists(), "the dead builder's tree is swept"
+    assert live.is_dir(), "a live builder's tree is left alone"
+
+
+def test_a_second_builder_waits_on_the_reviewed_bound_not_the_restore_one(tmp_path):
+    """Two of the first twelve real builds took 776 s and 997 s; the restore bound is 600 s.
+    A waiter on the restore bound reported FAILED while the first builder was fine."""
+
+    from ape.toolkits.execute.lean.core.build_manager import REVIEWED_BUILD_WAIT_SECONDS
+    from ape.toolkits.execute.lean.utils.exceptions import AlreadyBuildingError
+
+    class Busy(_StateManager):
+        async def try_start_build(self, key, force_rebuild=False):
+            raise AlreadyBuildingError(f"[{key}] building elsewhere")
+
+    _base(tmp_path)
+    manager = _manager(tmp_path, Busy(), None)
+    seen = {}
+
+    async def fake_wait(key, timeout=None):
+        seen["timeout"] = timeout
+        return SimpleNamespace(success=True, commit_hash=key, build_duration=0.0, file_count=1)
+
+    manager._wait_for_build_completion = fake_wait
+    asyncio.run(manager.build_reviewed_workspace(
+        reviewed_workspace_key(SHA, "d"), SHA, prepare_sources=_prepare,
+        changed_files=["Mathlib/A/B.lean"]))
+
+    assert seen["timeout"] == REVIEWED_BUILD_WAIT_SECONDS >= 3600
+
+
+def test_a_ready_reviewed_workspace_whose_base_is_gone_is_refused(tmp_path):
+    """The state file says READY and knows nothing about the base the tree symlinks into."""
+
+    from ape.toolkits.execute.lean.core.restore_manager import assert_base_present
+
+    key = reviewed_workspace_key(SHA, "d")
+    assert_base_present(tmp_path, SHA)              # a base key: nothing to check
+    with pytest.raises(RuntimeError, match="base .* is missing"):
+        assert_base_present(tmp_path, key)          # base dir absent
+    (tmp_path / SHA).mkdir()
+    assert_base_present(tmp_path, key)              # base present: passes
+
+
+# --- what a failed build tells the operator -------------------------------------------------
+
+
+def test_a_failed_build_reports_the_lean_error_not_the_package_warning():
+    """Lake puts the diagnosis on stdout and noise on stderr; the message must carry the first.
+
+    Every `lake` invocation in this repo prints `batteries: repository ... has local changes`
+    to stderr -- a *clean* build of a base prints it too. The Lean `error:` lines go to
+    stdout. Tailing `stderr or stdout` therefore showed only the warning and `error: build
+    failed` on every failure. PR 33057's reviewed build was reported that way twice before
+    anyone could see that its one real error was `unsolved goals` in `expand_apply`.
+    """
+
+    from ape.toolkits.execute.lean.core.build_manager import lake_failure_tail
+
+    stdout = (
+        "info: compiling Mathlib.RingTheory.PowerSeries.Expand\n"
+        "error: ./Mathlib/RingTheory/PowerSeries/Expand.lean:35:78: error: unsolved goals\n"
+        "R : Type u_2\n"
+        "⊢ (MvPowerSeries.substAlgHom ⋯) f = MvPowerSeries.subst (fun x => X () ^ p) f\n"
+    )
+    stderr = ("warning: batteries: repository '/w/.lake/packages/batteries' has local changes\n"
+              "error: build failed\n")
+
+    tail = lake_failure_tail(stdout, stderr)
+    assert "unsolved goals" in tail, "the diagnosis on stdout must survive"
+    assert "Expand.lean:35:78" in tail, "and the site with it"
+    assert "error: build failed" in tail, "stderr is kept too, it is the exit reason"
+    assert not tail.startswith("info:"), "the window starts at the first error, not the log head"
+
+
+def test_the_failure_window_is_bounded_and_starts_at_the_first_error():
+    from ape.toolkits.execute.lean.core.build_manager import (
+        LAKE_FAILURE_TAIL_LINES, lake_failure_tail,
+    )
+
+    noise = "\n".join(f"info: built module {i}" for i in range(500))
+    tail = lake_failure_tail(f"{noise}\nerror: real problem\nR : Type\n", "error: build failed\n")
+    assert tail.splitlines()[0] == "error: real problem", \
+        "a long build log must not push the diagnosis out of the window"
+    assert len(tail.splitlines()) <= LAKE_FAILURE_TAIL_LINES
+
+    # No `error:` line at all (a crash, a signal): fall back to the end of the output.
+    plain = lake_failure_tail(noise, "")
+    assert plain.splitlines()[-1] == "info: built module 499"
+    assert len(plain.splitlines()) <= LAKE_FAILURE_TAIL_LINES
+
+
+def test_a_failed_build_is_recorded_FAILED_by_the_real_state_manager(tmp_path):
+    """End to end through the real pydantic model, because the bug lived in its validation.
+
+    `build_reviewed_workspace` passed `type(exc).__name__` -- "RuntimeError" -- for a field
+    typed `ErrorType`. `complete_build` raised `ValidationError` before it wrote anything and
+    the builder's `except Exception` swallowed it, so the state kept `status=building` with
+    the dead builder's pid. Every later prebuild "took over" that state, rebuilt for eight
+    minutes, failed the same way and again recorded nothing.
+    """
+
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+    from ape.toolkits.execute.lean.core.workspace_state import WorkspaceStateManager
+    from ape.toolkits.execute.lean.models import ErrorType, WorkspaceStatus
+
+    _base(tmp_path)
+    config = LeanVerifyToolConfig(
+        base_dir=tmp_path, storage_dir=tmp_path / "storage", repos_dir=tmp_path / "repos",
+        build_timeout=60)
+    states = WorkspaceStateManager(config)
+
+    async def failing_lake(cmd, cwd, **kw):
+        return ("error: ./Mathlib/A/B.lean:1:0: error: unsolved goals\n",
+                "warning: batteries: repository '/w' has local changes\nerror: build failed\n", 1)
+
+    manager = _manager(tmp_path, states, failing_lake)
+    key = reviewed_workspace_key(SHA, "diff")
+    with pytest.raises(RuntimeError, match="unsolved goals"):
+        asyncio.run(manager.build_reviewed_workspace(
+            key, SHA, prepare_sources=_prepare, changed_files=["Mathlib/A/B.lean"]))
+
+    state = asyncio.run(states.read_state(key))
+    assert state.status == WorkspaceStatus.FAILED, "a failure that is not recorded is repaid"
+    assert state.error_type == ErrorType.BUILD_FAILED
+    assert state.build_pid is None, "a stale pid is what the next run mistakes for a dead builder"
+    assert "unsolved goals" in state.error_message

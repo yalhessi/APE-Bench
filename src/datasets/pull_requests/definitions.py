@@ -36,7 +36,7 @@ from pathlib import Path
 from typing import Any, Dict, FrozenSet, Iterable, Literal, Mapping, Optional
 
 from ape.utils.project import PROJECT_ROOT
-from src.mathlib_review.io import sha256_file
+from src.mathlib_review.io import jsonl_rows, sha256_file
 from src.mathlib_review.paths import V2_EVAL_SET, V4_RELEASES
 
 DEFINITIONS_VERSION = "pull-request-definitions/1"
@@ -253,10 +253,7 @@ def scored_pr_numbers(*, root: Path = PROJECT_ROOT) -> FrozenSet[int]:
         raise FileNotFoundError(
             f"the scored-PR set is missing ({eval_set}); refusing to return an empty exclusion, "
             "which would let the answers into the corpus")
-    numbers = {
-        int(json.loads(line)["pr_number"])
-        for line in eval_set.read_text(encoding="utf-8").splitlines() if line.strip()
-    }
+    numbers = {int(row["pr_number"]) for row in jsonl_rows(eval_set)}
     for manifest in sorted((root / V4_RELEASES).glob("*/manifest.json")):
         numbers.update(int(n) for n in json.loads(manifest.read_text(encoding="utf-8"))
                        .get("pr_numbers") or ())

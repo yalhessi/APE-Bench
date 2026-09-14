@@ -474,11 +474,19 @@ def test_comprehension_is_submitted_once(lead):
 
 
 def _record_outcome(task, invocation_id, *, disposition, status, error=None):
-    """Put a finished job into the lead's state the way `delegate` would."""
+    """Put a finished job into the lead's state the way `delegate` would.
 
+    The real `JobOutcome`, not a `SimpleNamespace` shaped like one. A hand-built stand-in
+    cannot disagree with the class it stands in for, so it silently keeps passing while the
+    real dataclass grows a field the lead now reads -- and the same fixture pattern cost a
+    prebuild run earlier: a fake `BuildManager` built with `__new__` had an attribute set by
+    hand that the real class did not have.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review.delegation import JobOutcome
     from types import SimpleNamespace
 
-    outcome = SimpleNamespace(
+    outcome = JobOutcome(
         invocation_id=invocation_id, arm_id=invocation_id.split("#")[-1],
         work_unit_id=invocation_id.split("#")[0], pr_number=1,
         status=status, cost=0.0, nominal_cost=0.0, error=error,

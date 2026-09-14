@@ -8,6 +8,7 @@ from typing import Dict, Iterable, List, Tuple
 
 from src.mathlib_review.review.candidates import candidates_from_response
 from src.mathlib_review.io import (
+    jsonl_rows,
     canonical_json_bytes,
     display_path,
     jsonl_bytes,
@@ -495,7 +496,7 @@ def build_release(parent: Path = DEFAULT_PARENT, out: Path = DEFAULT_OUT) -> Dat
 def ingest_run(release: Path, responses_path: Path, out_dir: Path) -> Dict:
     units = load_jsonl(release / "derived/work_units.jsonl", ReviewWorkUnit)
     opportunities = load_jsonl(release / "derived/oracle_opportunities.jsonl", OracleOpportunity)
-    responses = [json.loads(line) for line in responses_path.read_text().splitlines() if line]
+    responses = jsonl_rows(responses_path)
     unit_by_id = {item.work_unit_id: item for item in units}
     opportunity_by_id = {item.opportunity_id: item for item in opportunities}
     response_by_unit = {}

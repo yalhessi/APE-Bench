@@ -298,3 +298,111 @@ def test_the_index_excludes_the_eval_prs():
     excluded = _eval_pr_numbers()
     assert excluded, "no eval PR list found — the exclusion is untested"
     assert not (excluded & {row["pr_number"] for row in index.meta})
+
+
+# --- declaration_search sees the PR's own changed files --------------------------------------
+
+
+def _task_with_overlay(tmp_path, base_text, reviewed_text):
+    """A base snapshot and a reviewed overlay that disagree about one declaration."""
+
+    base = tmp_path / "base" / "Mathlib"
+    base.mkdir(parents=True)
+    (base / "A.lean").write_text(base_text)
+    target = tmp_path / "target" / "Mathlib"
+    target.mkdir(parents=True)
+    (target / "A.lean").write_text(reviewed_text)
+
+    task = _task(tmp_path, ["declaration_search"])
+    task.data.changed_files = ["Mathlib/A.lean"]
+    task.target_workspace = SimpleNamespace(path=tmp_path / "target")
+    return task, tmp_path / "base"
+
+
+def test_a_name_the_pr_introduces_is_found_in_the_reviewed_file(tmp_path, monkeypatch):
+    """Base-only search blinded a rename review to the very name under review: on 33337 the
+    naming arm looked up the PR's new name and was told no such declaration exists at the base
+    commit -- true, useless, and the end of its investigation. The two corpora answer opposite
+    questions and are reported apart."""
+
+    import src.mathlib_review.evidence.evidence as evidence
+
+    task, base_root = _task_with_overlay(
+        tmp_path,
+        base_text="theorem starProjection_coe_eq_isCompl_projection : True := trivial\n",
+        reviewed_text="theorem coe_starProjection_eq_isComplProjection : True := trivial\n")
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: base_root)
+    tool = _register(task).tools["declaration_search"]
+
+    new = asyncio.run(tool(identifier="coe_starProjection_eq_isComplProjection"))
+    assert new["success"]
+    assert new["declared_before_this_pr"] == 0
+    assert new["declared_in_this_pr"] == 1
+    assert "IN THIS PR" in new["results"]
+
+    old = asyncio.run(tool(identifier="starProjection_coe_eq_isCompl_projection"))
+    assert old["declared_before_this_pr"] == 1
+    assert old["declared_in_this_pr"] == 0
+    assert "before this PR" in old["results"]
+
+
+def test_the_two_corpora_are_never_folded_into_one_count(tmp_path, monkeypatch):
+    """A name declared in both is not a duplicate of itself: it is the same declaration seen
+    twice. Folding would turn every unchanged declaration in a changed file into an
+    'already exists' hit."""
+
+    import src.mathlib_review.evidence.evidence as evidence
+
+    task, base_root = _task_with_overlay(
+        tmp_path,
+        base_text="theorem unchanged_lemma : True := trivial\n",
+        reviewed_text="theorem unchanged_lemma : True := trivial\n")
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: base_root)
+    tool = _register(task).tools["declaration_search"]
+
+    result = asyncio.run(tool(identifier="unchanged_lemma"))
+    assert result["declared_before_this_pr"] == 1 and result["declared_in_this_pr"] == 1
+    assert result["count"] == 2
+
+
+def test_the_trace_keeps_the_closed_gate_and_marks_overlay_hits_by_prefix(tmp_path, monkeypatch):
+    """`gate` is a closed vocabulary (`as_of` | `base_snapshot`) that the leak audit
+    enumerates, and the temporal bound of this tool is still the base snapshot -- the PR's own
+    files can see nothing later than the PR. So the row keeps `base_snapshot`, and a hit from
+    the reviewed overlay is told apart in `result_ids` by its `reviewed:` prefix rather than
+    by inventing a gate value the audit has never heard of."""
+
+    import json
+
+    import src.mathlib_review.evidence.evidence as evidence
+
+    task, base_root = _task_with_overlay(
+        tmp_path, base_text="",
+        reviewed_text="theorem coe_starProjection_eq_isComplProjection : True := trivial\n")
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: base_root)
+    tool = _register(task).tools["declaration_search"]
+    asyncio.run(tool(identifier="coe_starProjection_eq_isComplProjection"))
+
+    rows = [json.loads(line) for line in open(task.data.trace_path) if line.strip()]
+    assert rows[-1]["gate"] == "base_snapshot"
+    assert rows[-1]["result_ids"] == ["reviewed:Mathlib/A.lean"]
+    assert rows[-1]["result_count"] == 1
+
+
+def test_without_a_target_workspace_the_tool_is_base_only_and_says_so(tmp_path, monkeypatch):
+    import json
+
+    import src.mathlib_review.evidence.evidence as evidence
+
+    base = tmp_path / "base" / "Mathlib"
+    base.mkdir(parents=True)
+    (base / "A.lean").write_text("")
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: tmp_path / "base")
+    task = _task(tmp_path, ["declaration_search"])
+    tool = _register(task).tools["declaration_search"]
+
+    result = asyncio.run(tool(identifier="anything_at_all"))
+    assert result["declared_in_this_pr"] == 0
+    assert "or in the files this PR changes" not in result["results"]
+    rows = [json.loads(line) for line in open(task.data.trace_path) if line.strip()]
+    assert rows[-1]["gate"] == "base_snapshot" and rows[-1]["result_ids"] == []

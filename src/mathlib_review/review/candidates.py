@@ -204,6 +204,7 @@ def invocation_work_unit(invocation_id: str) -> str:
 
 def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
                              *, strict: bool = True, spec_id: Optional[str] = None,
+                             require_subject_in_claim: bool = True,
                              _ordinal: Optional[int] = None):
     """Validate one response's candidates.
 
@@ -247,6 +248,10 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
             try:
                 result.extend(candidates_from_response(
                     unit, {"candidates": [raw]}, strict=True, spec_id=spec_id,
+                    # Must be threaded: the non-strict path re-enters per candidate, so any
+                    # validation option not passed here is silently reset to its default for
+                    # every real caller -- `finalize` only ever ingests non-strict.
+                    require_subject_in_claim=require_subject_in_claim,
                     _ordinal=index,
                 ))
             except ValueError as error:
@@ -311,7 +316,13 @@ def candidates_from_response(unit: ReviewWorkUnit, response: Dict[str, Any],
             raise ValueError(f"candidate {index} has an empty claim")
         if not requested_change:
             raise ValueError(f"candidate {index} has an empty requested_change")
-        if "/" not in primary_subject:
+        # An arm was handed its target's name in the prompt, so a claim that does not use it
+        # is about something else and the check catches a real mis-anchor. A whole-PR reviewer
+        # was never given the name -- withholding the decomposition's vocabulary is the
+        # treatment -- so requiring it to quote one would require it to guess exactly what is
+        # being withheld, and would reject every finding it files. Its anchoring is checked
+        # instead by where its file and line landed, which is evidence the arms never produce.
+        if require_subject_in_claim and "/" not in primary_subject:
             short_subject = primary_subject.rsplit(".", 1)[-1]
             if short_subject not in f"{claim} {requested_change}":
                 raise ValueError(f"candidate {index} does not name its primary subject")
@@ -449,3 +460,142 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# --- anchoring a whole-PR review onto change targets ---------------------------------------
+#
+# The `solo` condition is given the PR and no change-id vocabulary, so it says what a
+# maintainer would say -- at a path and a line. Everything downstream keys on change targets:
+# `ingest_responses` resolves a response through `unit_by_id[work_unit_id]` and skips an
+# unknown one with a warning only, and the judge pairs a finding to an obligation on shared
+# `change_ids`. So the free-form findings have to be projected onto that vocabulary, and the
+# projection has to be measured rather than assumed.
+#
+# The resolver is `GraphIndex.line_targets`, which already exists and was already validated:
+# it was written to migrate curated maintainer review-comment anchors onto change targets, and
+# replayed against the 41 `source_comment` resolutions in `dev-medium-0.3.0` it reproduces all
+# 41 exactly, every one at its strictest tier and none through a fallback. Those rows are the
+# same provenance as a baseline finding -- a human commenting at a file and a line -- which is
+# why they are the right validation set and why a second resolver would be the duplicate this
+# repository has paid for before.
+
+#: How a finding failed to reach a work unit. Recorded per finding rather than summed, because
+#: the three have different fixes: a bad path is a prompt problem, an unresolved line is a
+#: resolver limit, and a resolved change target outside every unit is a release problem.
+ANCHOR_FAILURES = ("no_location", "unknown_path", "unresolved_line", "no_work_unit")
+
+
+def anchor_submitted_findings(
+    findings: Iterable[Dict[str, Any]],
+    *,
+    graph: ChangeGraph,
+    units: Iterable[ReviewWorkUnit],
+    logger=None,
+) -> Tuple[Dict[str, List[Dict[str, Any]]], List[Dict[str, Any]]]:
+    """Project free-form findings onto work units. Returns `(by_work_unit, anchor_rows)`.
+
+    Two hops, both off data the release already carries: `(path, line)` to a `change_id` via
+    the change graph's entity and changed-range spans, then `change_id` to the work unit that
+    contains it. The second is total and unique on this release -- every change target sits in
+    exactly one unit -- so it cannot silently drop a finding the first hop resolved.
+
+    **A finding that anchors nowhere is kept, not dropped.** It comes back under the
+    `None` key with its failure recorded. A whole-PR reviewer will comment on unchanged context
+    lines, and deleting those would hand the condition a free precision gain -- fewer emissions
+    on a control PR -- and a recall penalty, while making its own loss rate invisible. The
+    caller is expected to project them as `diagnostic` with empty `channels` and to report the
+    rate beside every recall number: above the ~5% measured on arm output, a number from this
+    condition is measuring the anchoring pass rather than the agent.
+
+    `change_ids` keeps every target the line resolved to. The judge's anchor tier pairs on set
+    intersection, so a finding spanning two targets is anchored twice over, not diluted.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
+        normalize_proposed_edit_path,
+    )
+    from src.mathlib_review.legacy_pipeline.migrate_interventions import GraphIndex
+
+    index = GraphIndex(graph)
+    unit_by_change: Dict[str, ReviewWorkUnit] = {}
+    for unit in units:
+        for change_id in unit.change_ids:
+            unit_by_change.setdefault(change_id, unit)
+    paths = {target.path for target in graph.targets}
+
+    by_work_unit: Dict[str, List[Dict[str, Any]]] = {}
+    rows: List[Dict[str, Any]] = []
+
+    for ordinal, finding in enumerate(findings):
+        anchor = finding.get("anchor") or {}
+        path = normalize_proposed_edit_path(anchor.get("path") or "")
+        line = anchor.get("line_start")
+        row: Dict[str, Any] = {
+            "ordinal": ordinal, "path": path, "line_start": line,
+            "claim": (finding.get("claim") or "")[:200],
+            "change_ids": [], "work_unit_id": None, "method": None, "failure": None,
+        }
+
+        if not path or not isinstance(line, int):
+            row["failure"] = "no_location"
+        elif path not in paths:
+            # The PR did not touch this file, or the model invented the path. Either way the
+            # change graph has nothing to anchor to, and `line_targets` would say `unresolved`
+            # for a reason that is not the resolver's.
+            row["failure"] = "unknown_path"
+        else:
+            change_ids, method = index.line_targets(path, line, "RIGHT")
+            row["method"] = method
+            row["change_ids"] = change_ids
+            if not change_ids:
+                row["failure"] = "unresolved_line"
+            else:
+                owned = [cid for cid in change_ids if cid in unit_by_change]
+                if not owned:
+                    row["failure"] = "no_work_unit"
+                else:
+                    unit = unit_by_change[owned[0]]
+                    row["work_unit_id"] = unit.work_unit_id
+                    row["change_ids"] = owned
+                    by_work_unit.setdefault(unit.work_unit_id, []).append({
+                        **finding,
+                        # The normalised path, not the one the agent wrote. It resolved via
+                        # the normalised form, so carrying the raw `target/...` onward would
+                        # leave every downstream consumer holding a path that matches no
+                        # repository file while the finding itself is correctly anchored.
+                        "anchor": {**anchor, "path": path},
+                        "change_ids": owned,
+                        "primary_change_id": owned[0],
+                    })
+        rows.append(row)
+
+    if logger:
+        anchored = sum(1 for row in rows if row["work_unit_id"])
+        logger.info("anchoring: %d/%d findings reached a work unit across %d unit(s)",
+                    anchored, len(rows), len(by_work_unit))
+    return by_work_unit, rows
+
+
+def anchoring_report(rows: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
+    """What the projection cost, in the shape a run writes beside its findings."""
+
+    rows = list(rows)
+    anchored = [row for row in rows if row["work_unit_id"]]
+    by_method: Dict[str, int] = {}
+    by_failure: Dict[str, int] = {}
+    for row in rows:
+        if row.get("method"):
+            by_method[row["method"]] = by_method.get(row["method"], 0) + 1
+        if row.get("failure"):
+            by_failure[row["failure"]] = by_failure.get(row["failure"], 0) + 1
+    return {
+        "findings_in": len(rows),
+        "anchored": len(anchored),
+        "unanchored": len(rows) - len(anchored),
+        # Report it, do not make the reader divide. A run whose rate sits far above the ~5%
+        # measured on arm output is reporting the resolver, not the reviewer.
+        "unanchored_rate": (round((len(rows) - len(anchored)) / len(rows), 4) if rows else 0.0),
+        "work_units_reached": len({row["work_unit_id"] for row in anchored}),
+        "by_method": dict(sorted(by_method.items())),
+        "by_failure": dict(sorted(by_failure.items())),
+    }

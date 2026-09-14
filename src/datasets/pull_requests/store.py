@@ -37,7 +37,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
 
 from src.mathlib_review.io import (
-    canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once,
+    canonical_json_bytes, jsonl_bytes, jsonl_rows, sha256_bytes, write_once,
 )
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, PULL_REQUESTS_STORE
 
@@ -233,10 +233,18 @@ class PullRequestStore:
         if not entry["present"]:
             return None
         path = self.pr_dir(number) / entry["file"]
-        if ENDPOINTS[endpoint][2] == "object":
-            return json.loads(path.read_text(encoding="utf-8"))
-        return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
-                if line.strip()]
+        try:
+            if ENDPOINTS[endpoint][2] == "object":
+                return json.loads(path.read_text(encoding="utf-8"))
+            return jsonl_rows(path)
+        except json.JSONDecodeError as exc:
+            actual = sha256_bytes(path.read_bytes())
+            raise StoreError(
+                f"PR {number} {endpoint}: {path} did not parse ({exc}); recorded sha256 "
+                f"{entry['sha256']}, on disk {actual} -- "
+                + ("same bytes, so the reader is at fault, not the store"
+                   if actual == entry["sha256"] else "the file has changed since it was written")
+            ) from exc
 
     def load_bundle(self, number: int) -> Dict[str, Any]:
         """The PR in the legacy bundle shape the funnel and event ledger consume. Requires tier 2."""

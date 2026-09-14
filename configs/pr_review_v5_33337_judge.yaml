@@ -1,0 +1,19 @@
+# Judge scope for the single-PR repeatability probe on 33337.
+#
+# The question: is "B finds the naming ask, A does not" a property of the designs or of one
+# draw? On the held-out run the two conditions landed on the same site with opposite lenses --
+# A filed three `correctness` findings there (its compile check fired on the renamed lemma),
+# B filed a `naming` one, and the maintainer's ask was naming. Ten repetitions of each on this
+# one PR turn that into `hit_frequency`: how many of N found it.
+#
+# 33337 carries 2 eligible obligations, 4.2k chars over 2 files, and cost the lead $0.52 nested
+# on the held-out run -- the cheapest of the five PRs where B alone found the issue.
+#
+# No control PR: this set has one gold-bearing PR and nothing else, so `silent_pr_emission` is
+# unmeasurable here and precision is not assessed. That is deliberate and stated; the probe
+# asks about consistency at one site, not about emission.
+extends: bases/v5_judge.yaml
+
+dataset:
+  pr_numbers: [33337]
+  control_pr_numbers: []

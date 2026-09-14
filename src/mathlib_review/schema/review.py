@@ -33,7 +33,15 @@ from src.mathlib_review.schema import StrictModel
 #:              decides anything; this is the control that separates "routing helped" from
 #:              "the lead's own inspection helped".
 #: * `lead`   — the mandatory floor, plus whichever specialists the lead keeps or adds.
-ROUTING_MODES = ("fanout", "rules", "lead")
+#: * `solo`   — no work-unit job is scheduled at all. One agent is given the whole PR and
+#:              reviews it, which is the degenerate limit of the series and the floor the
+#:              other three have never been measured against. `docs/research/step-by-step.md`
+#:              names it Step 5 and warns against skipping it; it was skipped.
+ROUTING_MODES = ("fanout", "rules", "lead", "solo")
+
+#: The modes that schedule no `(arm, unit)` job, so `initial_jobs` cannot enumerate their work
+#: statically. `lead` decides at run time; `solo` has no such work to decide about.
+RUNTIME_ROUTED_MODES = ("lead", "solo")
 
 #: Budget tiers, as multiples of the configured `standard` cap. Named rather than numeric
 #: because `sample_max_cost` is an *orchestrator*-level setting, so a tier is not a per-job
@@ -53,8 +61,14 @@ DISPOSITIONS = ("mandatory", "proposed", "agent_added", "pruned")
 #: it, `arms.py` was changed, and this comment was left behind asserting the opposite of what
 #: the code does. Policy and its rationale belong together, which is why the reasoning is
 #: there and not here.
+#: A tool absent from this tuple is dropped from every grant SILENTLY: `arms._grant_for`
+#: returns `[name for name in CONTEXT_TOOLS if name in granted]`, so the registry can name a
+#: tool, the registrar can exist, and the arm can still never see it. That happened to
+#: `naming_norm` and cost a paid run (rep14) that looked like a null result about a contract
+#: and was a null result about a missing tuple entry. `test_every_granted_tool_survives_the_grant`
+#: exists so the next one fails in the suite instead of in a run.
 CONTEXT_TOOLS = ("zulip_search", "precedent_search", "declaration_search", "proof_profile",
-                 "lean_verify_edit")
+                 "naming_norm", "lean_verify_edit")
 
 
 class ReviewArm(StrictModel):
@@ -135,7 +149,7 @@ class ReviewAgenda(StrictModel):
     schema_version: Literal["v5-agenda1"] = "v5-agenda1"
     agenda_id: str
     run_name: str
-    routing_mode: Literal["fanout", "rules", "lead"]
+    routing_mode: Literal["fanout", "rules", "lead", "solo"]
     release: str
     modification_inventory: Optional[str] = None
     arms: List[ReviewArm]
@@ -168,7 +182,8 @@ class ContextCall(StrictModel):
 
     schema_version: Literal["v5-context-call1"] = "v5-context-call1"
     invocation_id: str
-    tool: Literal["zulip_search", "precedent_search", "declaration_search", "lean_verify_edit"]
+    tool: Literal["zulip_search", "precedent_search", "declaration_search",
+                  "naming_norm", "lean_verify_edit"]
     query: str
     #: **How** this call was bounded, stated positively.
     #:
@@ -276,7 +291,7 @@ class V5RunPlan(StrictModel):
     evaluation_contract_version: str = EVALUATION_CONTRACT_VERSION
     run_id: str
     run_name: str
-    routing_mode: Literal["fanout", "rules", "lead"]
+    routing_mode: Literal["fanout", "rules", "lead", "solo"]
     agenda_sha256: str
     release: str
     release_manifest_sha256: Optional[str] = None
@@ -325,7 +340,7 @@ class V5RunManifest(StrictModel):
     run_id: str
     run_name: str
     run_plan_sha256: str
-    routing_mode: Literal["fanout", "rules", "lead"]
+    routing_mode: Literal["fanout", "rules", "lead", "solo"]
     proposals_total: int
     delegated: int
     pruned: int

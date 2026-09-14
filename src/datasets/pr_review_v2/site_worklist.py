@@ -29,7 +29,7 @@ from ape.utils.logging import create_logger
 from ape.utils.project import PROJECT_ROOT
 
 from .delta import parse_patch_hunks
-from .precedent_bench import DEFAULT_CORPUS, hunk_code, load_corpus
+from .precedent_bench import DEFAULT_CORPUS, VALIDATED_CORPUS_END, hunk_code, load_corpus
 from .precedent_prime import DEFAULT_RECORDS, FIRST20  # noqa: F401  (FIRST20 re-exported for configs)
 
 WORKLIST_OUT = PROJECT_ROOT / "inputs" / "pr_review_v2" / "precedent_bench" / "worklist_by_pr.jsonl"
@@ -302,7 +302,7 @@ def build_worklist(prs: List[int], *, records_path: Path, corpus_path: Path, k: 
     else:
         from sentence_transformers import SentenceTransformer
         import numpy as np
-        corpus = load_corpus(corpus_path)
+        corpus = load_corpus(corpus_path, end=VALIDATED_CORPUS_END)
         by_id = {c["comment_id"]: c for c in corpus}
         logger.info("Worklist: %d PRs, %d sites, corpus %d", len(sites_by_pr), len(flat), len(corpus))
         modelE = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")

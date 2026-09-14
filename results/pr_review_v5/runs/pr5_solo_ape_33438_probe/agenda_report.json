@@ -1,0 +1,111 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "correctness": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "docs": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "duplication": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "family_design": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "generalist": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "generality": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "naming": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "proof_golf": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "proof_idiom": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    },
+    "style": {
+      "cost_hint": 0.05,
+      "eligible": 1,
+      "enumerated": 1,
+      "sites": 2
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "recommended": 8,
+      "required": 3
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 0,
+      "docs": 0,
+      "duplication": 0,
+      "family_design": 1,
+      "generalist": 1,
+      "generality": 0,
+      "naming": 1,
+      "proof_golf": 0,
+      "proof_idiom": 0,
+      "style": 0
+    },
+    "required_by_pr": {
+      "33438": 3
+    },
+    "required_reasons": {
+      "the per-unit broad pass, which no specialist replaces": 1,
+      "these declarations are one API family (family)": 2
+    }
+  },
+  "mandatory_floor_cost": 0.15,
+  "pr_numbers": [
+    33438
+  ],
+  "projected_cost_fanout": 0.55,
+  "projected_cost_rules": 0.55,
+  "proposals_eligible": 11,
+  "proposals_enumerated": 11,
+  "renderer_version": "candidate-prompt/12+focused-prompt/2",
+  "routing_mode": "solo",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "units_without_specialist": [],
+  "work_units": 1
+}

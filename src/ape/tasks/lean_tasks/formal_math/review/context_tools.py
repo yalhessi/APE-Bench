@@ -97,7 +97,10 @@ def _register_zulip(task, mcp) -> None:
         )
     )
     async def zulip_search(
-        query: Annotated[str, Field(description="Free-text query, e.g. a declaration name, tactic, or convention")],
+        query: Annotated[str, Field(description=(
+            "Free-text query, e.g. a declaration name, tactic, or convention. Terms are "
+            "OR-ed and ranked by relevance, so extra words widen the search rather than "
+            "narrowing it; punctuation is ignored. Not FTS5 syntax."))],
         declaration: Annotated[Optional[str], Field(
             description="Optional: find threads referencing this exact declaration name")] = None,
         maintainers_only: Annotated[bool, Field(
@@ -157,10 +160,30 @@ def _register_zulip(task, mcp) -> None:
             "corpus_sha256": None,
             "result_ids": ids, "result_count": count, "truncated": truncated,
         })
-        return {
+        response = {
             "success": True, "count": count, "as_of": as_of, "excluded_pr": exclude_pr,
             "results": body or "(no discussion found before the cutoff)",
         }
+        if not declaration:
+            # What was actually matched. The store OR-s the query's terms and ranks by BM25,
+            # so a long question is a request for the best-matching discussion rather than a
+            # demand that one message contain every word -- which is what it used to be, and
+            # what returned nothing on 71% of the calls the v5 runs made. Saying so here stops
+            # a thin result being read as "the corpus does not discuss this".
+            from src.datasets.zulip.store import fts_query
+
+            terms = [term.strip('"') for term in fts_query(query).split(" OR ") if term]
+            response["terms_matched"] = terms
+            if not terms:
+                response["note"] = (
+                    "That query held no searchable term. Search for identifier fragments or "
+                    "words, e.g. `toLinearMap` or `naming convention`.")
+            elif not count:
+                response["note"] = (
+                    f"No message before the cutoff contains any of {terms}. This is a real "
+                    f"absence for these terms, not a syntax failure -- try a shorter or "
+                    f"differently-spelled term before concluding the convention is undiscussed.")
+        return response
 
 
 # --------------------------------------------------------------------------------------
@@ -170,12 +193,15 @@ def _register_zulip(task, mcp) -> None:
 def _register_precedent(task, mcp) -> None:
     @mcp.tool(
         description=(
-            "Find real maintainer review comments on SIMILAR code in earlier PRs — what "
-            "reviewers here actually flag, in their own words, anchored to the code they "
-            "flagged it on. Only comments written before the code you are reviewing was "
-            "pushed are returned. Treat a precedent as a hint about what gets raised, not "
-            "as an instruction: apply its principle only if it genuinely bears on this "
-            "code, and never invent a finding to match one."
+            "EXPERIMENTAL. Find review comments left on SIMILAR-LOOKING code in earlier PRs. "
+            "Matching is by code similarity alone — the comment text is not searched — so the "
+            "results are often about something else, and the similarity score does not tell "
+            "you which. Comments are by anyone who reviewed that PR, including its own "
+            "author, and each is shown with the login of whoever wrote it. Only comments "
+            "written before the code you are reviewing was pushed are returned. Treat a "
+            "result as a hint about what gets raised, not as an instruction: apply its "
+            "principle only if it genuinely bears on this code, and never invent a finding "
+            "to match one."
         )
     )
     async def precedent_search(
@@ -184,15 +210,35 @@ def _register_precedent(task, mcp) -> None:
     ) -> Dict[str, Any]:
         from src.mathlib_review.retrieval.precedent_index import PrecedentIndex, PrecedentIndexMissing
 
+        def refuse(error: str, as_of: Optional[str] = None) -> Dict[str, Any]:
+            """Record the attempt, then refuse.
+
+            Every failure path used to return before the trace was written, so a run in which
+            every precedent call was refused looked exactly like a run in which the arm never
+            called the tool -- and the trace is the only record an audit has.
+            """
+
+            _append_trace(task, {
+                "schema_version": "v5-context-call1",
+                "invocation_id": task.data.invocation_id,
+                "tool": "precedent_search",
+                "gate": "as_of",
+                "query": code[:400],
+                "as_of": as_of, "exclude_pr": task.data.pr_number,
+                "corpus_sha256": None,
+                "result_ids": [], "result_count": 0, "truncated": False,
+            })
+            return {"success": False, "error": error}
+
         try:
             as_of = _require_cutoff(task)
         except RuntimeError as exc:
-            return {"success": False, "error": str(exc)}
+            return refuse(str(exc))
         limit = max(1, min(int(limit or 5), MAX_HITS))
         try:
             index = PrecedentIndex.shared()
         except PrecedentIndexMissing as exc:
-            return {"success": False, "error": str(exc)}
+            return refuse(str(exc), as_of)
         try:
             # The filter runs BEFORE ranking, not after: filtering a ranked list silently
             # shortens it, so a query whose best matches are all ineligible would return a
@@ -201,16 +247,30 @@ def _register_precedent(task, mcp) -> None:
                 code, k=limit, as_of=as_of, exclude_pr=task.data.pr_number,
             )
         except Exception as exc:  # noqa: BLE001
-            return {"success": False, "error": f"precedent search failed: {exc}"}
+            return refuse(f"precedent search failed: {exc}", as_of)
 
         blocks = []
         for rank, hit in enumerate(hits, 1):
             body = (hit.get("body") or "").strip()[:MAX_SNIPPET]
-            snippet = (hit.get("diff_hunk") or "").strip()[:MAX_SNIPPET * 2]
+            # The TAIL of the hunk, not the head. GitHub builds a review comment's hunk so
+            # that it ENDS at the line being commented on, so taking the first N characters
+            # drops exactly the line the comment is about. Measured over every precedent
+            # delivered to an arm in the v5 runs: 711 of 2,825 hits (25%) had a hunk longer
+            # than this budget, and every one of them was shown code the comment was not
+            # about, under the words of a comment about something else.
+            whole = (hit.get("diff_hunk") or "").strip()
+            snippet = whole[-(MAX_SNIPPET * 2):]
+            if len(snippet) < len(whole):
+                snippet = "…(earlier lines of this hunk omitted)\n" + snippet
+            # The commenter's own login, not "maintainer". The corpus keeps comments by
+            # GitHub `author_association`, which a PR's own author carries on their own PR,
+            # so 46% of delivered hits were the PR author replying to a reviewer ("Done.",
+            # "My bad, thanks.") presented to the arm as a maintainer's judgement.
+            who = hit.get("commenter") or "someone"
             blocks.append(
                 f"{rank}. PR #{hit.get('pr_number')} · `{hit.get('path')}` · "
-                f"{hit.get('created_at')} (score {hit.get('score'):.3f})\n"
-                f"   maintainer wrote: \"{body}\"\n   on this code:\n```\n{snippet}\n```"
+                f"{hit.get('created_at')} (similarity {hit.get('score'):.3f})\n"
+                f"   {who} wrote: \"{body}\"\n   on this code:\n```\n{snippet}\n```"
             )
         rendered, truncated = _truncate("\n\n".join(blocks))
         _append_trace(task, {
@@ -227,12 +287,32 @@ def _register_precedent(task, mcp) -> None:
         return {
             "success": True, "count": len(hits), "as_of": as_of,
             "results": rendered or "(no eligible precedent found before the cutoff)",
+            # Said plainly because the scores do not say it. Measured across representative
+            # queries, the top-5 similarities sit in 0.59-0.63 whether the hits are about the
+            # queried code or not, so there is no cutoff that separates a real precedent from
+            # the nearest thing in the corpus, and inventing one would only hide the problem.
+            "note": (
+                "These are the nearest comments by CODE similarity, not a judgement that any "
+                "of them bears on your code. The similarity score is not calibrated: a "
+                "top-ranked hit may be unrelated. Read each one and discard the ones that do "
+                "not apply; finding nothing applicable here is a normal outcome."
+            ),
         }
 
 
 # --------------------------------------------------------------------------------------
 # Declarations
 # --------------------------------------------------------------------------------------
+
+def _reviewed_overlay_root(task):
+    """The attempt's `target/`: base + δ₀, with the PR's changed files materialised as real
+    files. `None` when the task has no target workspace, in which case only the base corpus
+    is searched and the tool says so."""
+
+    workspace = getattr(task, "target_workspace", None)
+    path = getattr(workspace, "path", None)
+    return Path(path) if path else None
+
 
 def _register_declaration(task, mcp) -> None:
     @mcp.tool(
@@ -242,11 +322,12 @@ def _register_declaration(task, mcp) -> None:
             "to locate the canonical spelling of an API. Matches declaration sites only, "
             "not mentions in comments or imports. Give a real identifier "
             "(e.g. `Finset.sum_comm`), not prose.\n\n"
-            "The corpus is the tree BEFORE this PR. So a declaration this PR adds or renames "
-            "will never be found here, and an empty result is an ANSWER, not a failure: it "
-            "means the name is genuinely new, which is what refutes a duplication or "
-            "'already exists' claim. Do not re-query a name that came back empty, and do not "
-            "treat empty as the search being broken."
+            "Two corpora, reported separately: the tree BEFORE this PR (the base commit), and "
+            "the files this PR changes, as this PR leaves them. A name found only in the "
+            "second is one this PR introduces or renames -- which is what refutes a "
+            "duplication or 'already exists' claim, and what lets a rename be looked up "
+            "under its new name. An empty result in the base corpus is an ANSWER, not a "
+            "failure. Do not re-query a name that came back empty in both."
         )
     )
     async def declaration_search(
@@ -296,28 +377,63 @@ def _register_declaration(task, mcp) -> None:
         except Exception as exc:  # noqa: BLE001
             return {"success": False, "error": f"declaration search failed: {exc}"}
 
-        rendered, truncated = _truncate("\n".join(
-            f"- `{item['declares']}` is declared in `{item['path']}`" for item in hits
-        ))
+        # The reviewed state of the files this PR changes. Base-only search blinds a rename
+        # review to the very name under review: on 33337 the naming arm looked up the PR's new
+        # name, got "no declaration exists at the base commit", and had nothing to reason
+        # about. Only the changed files are searched -- they are the only files whose reviewed
+        # text differs from the base, and the only ones the overlay materialises as real
+        # files -- so this is a few reads, not a second tree walk. Kept apart from the base
+        # hits: "exists before this PR" and "exists because of this PR" answer opposite
+        # questions, and folding them would turn a rename into a duplicate.
+        introduced: List[Dict[str, Any]] = []
+        overlay = _reviewed_overlay_root(task)
+        if overlay is not None:
+            for rel in getattr(task.data, "changed_files", None) or []:
+                if len(introduced) >= limit:
+                    break
+                path = Path(overlay) / rel
+                if path.is_symlink() or not path.is_file():
+                    continue
+                try:
+                    text = path.read_text(encoding="utf-8", errors="ignore")
+                except OSError:
+                    continue
+                for term in terms:
+                    if declares_identifier(text, term):
+                        introduced.append({"path": rel, "declares": term})
+                        break
+
+        lines = [f"- `{item['declares']}` is declared in `{item['path']}` (before this PR)"
+                 for item in hits]
+        lines += [f"- `{item['declares']}` is declared in `{item['path']}` (IN THIS PR, as "
+                  "it leaves the file)" for item in introduced]
+        rendered, truncated = _truncate("\n".join(lines))
         _append_trace(task, {
             "schema_version": "v5-context-call1",
             "invocation_id": task.data.invocation_id,
             "tool": "declaration_search",
             "gate": "base_snapshot",
+            # `gate` is a closed vocabulary the leak audit enumerates, and the temporal bound
+            # here is still the base snapshot: the second corpus is the PR's own changed files,
+            # which can see nothing later than the PR itself. Overlay hits are distinguishable
+            # in `result_ids` by their `reviewed:` prefix.
             "query": identifier,
             "as_of": None, "exclude_pr": None,
             "corpus_sha256": task.data.snapshot_base_sha,
-            "result_ids": [item["path"] for item in hits],
-            "result_count": len(hits), "truncated": truncated,
+            "result_ids": [item["path"] for item in hits] + [
+                f"reviewed:{item['path']}" for item in introduced],
+            "result_count": len(hits) + len(introduced), "truncated": truncated,
         })
+        empty = (
+            f"No declaration of {identifier!r} exists at the base commit"
+            + (" or in the files this PR changes." if overlay is not None else ".")
+            + " This is a finding, not a failed lookup. Re-querying will return the same answer."
+        )
         return {
-            "success": True, "count": len(hits), "searched_terms": terms,
-            "results": rendered or (
-                f"No declaration of {identifier!r} exists at the base commit. This is a "
-                "finding, not a failed lookup: the name is new in this PR (or renamed by "
-                "it), so nothing in the pre-PR library duplicates it. Re-querying will "
-                "return the same answer."
-            ),
+            "success": True, "count": len(hits) + len(introduced),
+            "declared_before_this_pr": len(hits), "declared_in_this_pr": len(introduced),
+            "searched_terms": terms,
+            "results": rendered or empty,
         }
 
 
@@ -436,10 +552,142 @@ def _register_proof_profile(task, mcp) -> None:
         }
 
 
+def _register_naming_norm(task, mcp) -> None:
+    @mcp.tool(
+        description=(
+            "What this repository CALLS lemmas like this one, counted over the whole base "
+            "snapshot. Give a declaration this PR adds or renames.\n\n"
+            "Returns the declaration's conclusion subject (what the statement is *about*), "
+            "every leaf prefix the corpus uses for that subject with its count, and -- only "
+            "when the corpus has an opinion worth holding a PR to -- candidate names.\n\n"
+            "This is a census, not a sample: `content_search` caps at a handful of files and "
+            "says so, and a prefix count read off a capped grep is the kind of number this "
+            "tool exists to replace. Counts come from the BASE commit, so the PR's own new "
+            "names are not counted into the norm they are being judged against.\n\n"
+            "`verdict` is the answer, not the counts: `established` means the corpus is "
+            "lopsided enough to hold a PR to (a blocking ask); `emerging` means one spelling "
+            "leads clearly but is not dominant (advisory at most); `insufficient_evidence` "
+            "means the corpus has no opinion here and you should submit nothing on naming."
+        )
+    )
+    async def naming_norm(
+        declaration: Annotated[str, Field(
+            description="Declaration this PR adds or renames, e.g. `Submodule.coe_starProjection_eq_x`")],
+    ) -> Dict[str, Any]:
+        from ape.toolkits.code.lean.lean_parser import parse_major_declarations
+        from src.mathlib_review.evidence.evidence import snapshot_workspace
+        from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
+        from src.mathlib_review.evidence.operators.naming_norm import (
+            MAX_CONFLICT_RATIO, MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix,
+            norm_for, norm_index, rename_candidates,
+        )
+
+        base = task.data.snapshot_base_sha
+        root = snapshot_workspace(base)
+        if root is None:
+            return {"success": False, "error": (
+                f"no complete base snapshot for {base}; a norm read from the attempt overlay "
+                "would be a 2% sample reported as a repository measurement.")}
+        index = norm_index(Path(root), base)
+        if index is None:
+            return {"success": False, "error": f"no naming norms are available for {base}."}
+
+        # The declaration's own conclusion, from the reviewed text -- the arm is asking about a
+        # name this PR introduces, which by construction is not in the base tree.
+        signature = ""
+        overlay = _reviewed_overlay_root(task)
+        wanted = declaration.rsplit(".", 1)[-1]
+        for rel in getattr(task.data, "changed_files", None) or []:
+            if not str(rel).endswith(".lean") or overlay is None:
+                continue
+            source = overlay / str(rel)
+            if not source.is_file():
+                continue
+            try:
+                parsed = parse_major_declarations(source.read_text(encoding="utf-8", errors="ignore"))
+            except Exception:  # noqa: BLE001
+                continue
+            for item in parsed:
+                name = item.fullname or item.name or ""
+                if name == declaration or name.rsplit(".", 1)[-1] == wanted:
+                    signature = item.signature or ""
+                    break
+            if signature:
+                break
+        if not signature:
+            return {"success": False, "error": (
+                f"{declaration!r} is not among the declarations this PR changes; this tool "
+                "answers for a name the PR adds or renames.")}
+
+        subject = conclusion_subject(declaration_conclusion(signature))
+        population = norm_for(index, subject.token)
+        if subject.token is None or subject.confidence != "high" or population is None:
+            _append_trace(task, {
+                "schema_version": "v5-context-call1",
+                "invocation_id": task.data.invocation_id,
+                "tool": "naming_norm",
+                "gate": "base_snapshot",
+                "query": declaration,
+                "as_of": None, "exclude_pr": None, "corpus_sha256": base,
+                "result_ids": [], "result_count": 0, "truncated": False,
+            })
+            return {"success": True, "verdict": "insufficient_evidence", "subject": subject.token,
+                    "results": (
+                        "The corpus has no counted opinion about this declaration's subject, so "
+                        "there is no convention here to hold the PR to. Submit nothing on naming "
+                        "unless a maintainer precedent says otherwise.")}
+
+        current = leaf_prefix(declaration.rsplit(".", 1)[-1])
+        ranked = population.prefix_counts.most_common()
+        dominant, support = ranked[0]
+        runner_up = ranked[1][1] if len(ranked) > 1 else 0
+        established = population.is_strong() and population.conflict_ratio(current) <= MAX_CONFLICT_RATIO
+        emerging = (support >= MIN_SUPPORT and support >= 3 * max(runner_up, 1)
+                    and population.prefix_counts.get(current, 0) < support)
+        verdict = ("established" if established and dominant != current
+                   else "emerging" if emerging and dominant != current
+                   else "insufficient_evidence")
+        candidates = (rename_candidates(declaration, dominant, subject.expression,
+                                        index.get("notation"))
+                      if verdict != "insufficient_evidence" else [])
+        counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
+        lines = [
+            f"Subject of the conclusion: `{subject.token}` (from {subject.kind}).",
+            f"Of {population.members} declarations in the base snapshot with that subject: {counted}.",
+            f"This declaration uses `{current}_` ({population.prefix_counts.get(current, 0)}).",
+            f"Verdict: **{verdict}**.",
+        ]
+        if verdict == "established":
+            lines.append(f"`{dominant}_` is the convention here ({support}/{population.members}, "
+                         f"over the {MIN_SUPPORT_RATIO:.0%} bar). A rename is a fair ask.")
+        elif verdict == "emerging":
+            lines.append(f"`{dominant}_` leads {support} to {runner_up} but is not dominant. "
+                         "Advisory at most -- say it is the emerging spelling, not the rule.")
+        else:
+            lines.append("The corpus does not back a rename here. Submit nothing on naming.")
+        if candidates:
+            lines.append("Candidate names: " + ", ".join(f"`{name}`" for name in candidates))
+        rendered, truncated = _truncate("\n".join(lines))
+        _append_trace(task, {
+            "schema_version": "v5-context-call1",
+            "invocation_id": task.data.invocation_id,
+            "tool": "naming_norm",
+            "gate": "base_snapshot",
+            "query": declaration,
+            "as_of": None, "exclude_pr": None, "corpus_sha256": base,
+            "result_ids": [f"{subject.token}:{dominant}:{support}/{population.members}"],
+            "result_count": population.members, "truncated": truncated,
+        })
+        return {"success": True, "verdict": verdict, "subject": subject.token,
+                "members": population.members, "counts": dict(ranked[:8]),
+                "candidates": candidates, "results": rendered}
+
+
 _REGISTRARS = {
     "zulip_search": _register_zulip,
     "precedent_search": _register_precedent,
     "declaration_search": _register_declaration,
+    "naming_norm": _register_naming_norm,
     "proof_profile": _register_proof_profile,
 }
 

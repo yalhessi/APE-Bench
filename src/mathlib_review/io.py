@@ -6,7 +6,7 @@ import os
 import re
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, List
 
 from pydantic import BaseModel
 
@@ -31,6 +31,24 @@ def pretty_json_bytes(value: Any) -> bytes:
 
 def jsonl_bytes(rows: Iterable[Any]) -> bytes:
     return b"".join(canonical_json_bytes(row) + b"\n" for row in rows)
+
+
+def jsonl_rows(path: Path) -> List[Any]:
+    r"""The inverse of `jsonl_bytes`. Splits on "\n" and nothing else -- never `splitlines()`.
+
+    `canonical_json_bytes` writes `ensure_ascii=False`, so a record keeps whatever exotic
+    character a GitHub comment body carries, verbatim; `json.dumps` escapes "\n" and "\r" inside a
+    string but nothing else. `str.splitlines()` additionally breaks on U+2028, U+2029, U+0085,
+    \v, \f, \x1c, \x1d and \x1e -- so it cuts such a record in half mid-string, and both halves
+    fail to parse. Measured: 2 of the 32,851 collected PRs carry U+2028 in a comment body, and
+    reading either raised `JSONDecodeError: Unterminated string`. The files were not damaged --
+    their recorded digests matched; the reader was.
+
+    Splitting on "\n" is exactly right because it is exactly what the writer joined on.
+    """
+
+    text = Path(path).read_text(encoding="utf-8")
+    return [json.loads(line) for line in text.split("\n") if line.strip()]
 
 
 def extract_json_object(text: str) -> Dict[str, Any]:
@@ -84,11 +102,14 @@ def load_jsonl(path: Path, cls):
 
     Blank and whitespace-only lines are skipped. Artifacts written by `jsonl_bytes`
     never contain them, so this only ever turns a would-be crash into a clean parse.
+
+    Splits on "\n" for the reason `jsonl_rows` gives: `splitlines()` would break a record that
+    contains U+2028 or one of its relatives, which a quoted review comment can.
     """
 
     return [
         cls.model_validate_json(line)
-        for line in path.read_text().splitlines()
+        for line in path.read_text(encoding="utf-8").split("\n")
         if line.strip()
     ]
 

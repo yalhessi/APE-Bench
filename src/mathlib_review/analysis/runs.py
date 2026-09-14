@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from ape.orchestration.persistence import TaskStorage
+from src.mathlib_review.io import jsonl_rows
 
 CANDIDATE_RESPONSE_SCHEMA = "pr4-candidate-response1"
 
@@ -112,7 +113,7 @@ def write_candidate_responses(path: Path, rows: Iterable[Dict]) -> Path:
 def load_candidate_responses(path: Path) -> List[Dict]:
     """Read a candidate-response artifact. The single reader for phases 7, 8, and 9."""
 
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    return jsonl_rows(path)
 
 
 async def unbuilt_base_commits(commits: Iterable[str], repo_name: str = "mathlib4") -> List[str]:

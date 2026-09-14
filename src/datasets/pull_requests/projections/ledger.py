@@ -33,7 +33,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 from src.datasets.pull_requests.projections.corpus import reviewer_view
 from src.datasets.pull_requests.store import write_atomically
-from src.mathlib_review.io import jsonl_bytes, sha256_bytes
+from src.mathlib_review.io import jsonl_bytes, jsonl_rows, sha256_bytes
 
 LEDGER_VERSION = "ab-ledger/1"
 SUGGESTION_BLOCK = re.compile(r"```suggestion[^\n]*\n(.*?)```", re.S)
@@ -111,7 +111,7 @@ def ledger_rows(corpus_rows: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
 def write_ledger(corpus_dir: Path, out: Optional[Path] = None) -> Dict[str, Any]:
     comments = corpus_dir / "comments.jsonl"
     corpus_manifest = json.loads((corpus_dir / "manifest.json").read_text(encoding="utf-8"))
-    rows = [json.loads(line) for line in comments.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = jsonl_rows(comments)
     ledger = ledger_rows(rows)
     out = Path(out) if out else corpus_dir.parent / "ledger"
     content = jsonl_bytes(ledger)

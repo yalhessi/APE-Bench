@@ -100,6 +100,16 @@ class BasePRReviewData(BaseLeanTaskData):
 
     task_type: str = Field(default="lean_pr_review_v2")
 
+    #: Diagnostic only: refuse an empty submission instead of recording an abstention, so the
+    #: arm must name its best candidate however weak. NOT a production setting — it inverts
+    #: the contract that makes control PRs measurable. It exists to separate three
+    #: explanations of the 76% `already_correct` rate that the abstention data alone cannot:
+    #: a bar set too high (recall rises under duress), arms that cannot see what maintainers
+    #: want (volume rises, recall flat), or arms with genuinely nothing to say (neither moves).
+    #: Bounded by `_FORCED_SUBMISSION_ATTEMPTS` so a refusal loop cannot turn a job into a
+    #: coverage gap — the failure d06a144 fixed for the ordinary path.
+    forbid_abstention: bool = Field(default=False)
+
     pr_number: int = Field(..., description="GitHub PR number")
     pr_title: str = Field(default="", description="PR title (model-visible, cleaned)")
     pr_description: str = Field(default="", description="PR description (model-visible, cleaned)")
@@ -166,10 +176,21 @@ class BasePRReviewTask(BaseLeanTask):
         if target_workspace is not None and (data.diff or "").strip():
             from ape.tasks.lean_tasks.formal_math.pr_review.core import ReviewPRCoreTask
 
-            target_workspace = await ReviewPRCoreTask._ensure_patched_target_workspace(
-                data=data, target_workspace=target_workspace,
-                logger=logger, progress_callback=progress_callback,
+            # A prebuilt reviewed workspace -- base + diff + changed modules rebuilt -- if one
+            # exists for this (base, diff). Then there is nothing to patch, and a compile of any
+            # changed file resolves the declarations the PR itself adds or renames. Without it,
+            # the source-only overlay below is the environment in which 41 of 321 arm sessions
+            # read a renamed sibling as `Unknown constant`; the fallback logs that at WARNING.
+            reviewed = await ReviewPRCoreTask._maybe_setup_reviewed_target_workspace(
+                data, target_workspace.path, logger=logger, progress_callback=progress_callback,
             )
+            if reviewed is not None:
+                target_workspace = reviewed
+            else:
+                target_workspace = await ReviewPRCoreTask._ensure_patched_target_workspace(
+                    data=data, target_workspace=target_workspace,
+                    logger=logger, progress_callback=progress_callback,
+                )
         return attempt_path, scratch_workspace, target_workspace, reference_workspaces
 
     async def setup(self, termination_callback, orchestrator_id: str, attempt_path=None):
@@ -390,17 +411,57 @@ class BasePRReviewTask(BaseLeanTask):
         enriched = dict(result)
         enriched["errors_introduced_by_your_edit"] = introduced
         enriched["errors_already_in_the_file"] = pre_existing
+        # The note states what was measured and nothing more. It used to end "The file does
+        # not compile as it stands" -- a claim about the PR that this tool cannot make. On a
+        # multi-file PR the compile resolves imports through the base commit's build products,
+        # so a declaration the PR adds or renames in a *sibling* file is `Unknown constant` here
+        # whatever the PR's real state; 41 of 321 arm sessions on the held-out run received
+        # exactly that, and 16 findings asserted a build failure on PRs that all build. A
+        # pre-existing error is a fact about this verification environment until the reviewed
+        # state has been rebuilt; the environment says which it is (see `environment` below).
         if pre_existing and not introduced:
             enriched["note"] = (
-                "Your edit introduced no new errors — every error listed was already present "
-                "in the reviewed file before it. The file does not compile as it stands."
+                f"Your edit introduced no new errors. The {len(pre_existing)} error(s) listed were "
+                "already present when the unedited file was compiled in this environment."
             )
         elif pre_existing:
             enriched["note"] = (
                 f"{len(introduced)} error(s) came from your edit; {len(pre_existing)} were "
-                "already in the file. Fix only the former."
+                "already present in the unedited file in this environment. Fix only the former."
             )
+        if pre_existing:
+            enriched["environment"] = self._verification_environment_note()
         return enriched
+
+    def _verification_environment_note(self) -> str:
+        """What the compile could and could not see, so a pre-existing error is read correctly.
+
+        Two environments, told apart by the target's key. Against a *reviewed* workspace the
+        PR's changed modules are rebuilt, so imports resolve the PR's own declarations and a
+        pre-existing error is real -- rare on a PR that builds, and usually a file that cannot
+        be checked standalone. Against a source-only overlay of the *base* commit, the PR's
+        changes are visible in the file being compiled and invisible in every file it imports,
+        so an error naming a declaration this PR adds or renames elsewhere is an artifact. The
+        note names which, rather than leaving the model to infer a build failure.
+        """
+
+        from ape.toolkits.execute.lean.core.build_manager import is_reviewed_workspace_key
+
+        commit = str(getattr(self.target_workspace, "commit_hash", "") or "")
+        if is_reviewed_workspace_key(commit):
+            return (
+                "Verified against the reviewed workspace: this PR's changed modules, and the "
+                "modules between them on the import graph, are rebuilt, so imports resolve the "
+                "declarations this PR adds or renames. Modules the PR did not touch are as they "
+                "were compiled at the merge-base; only a changed file has a fully rebuilt import "
+                "closure. A pre-existing error in a changed file is genuine -- most often a file "
+                "that cannot be checked on its own."
+            )
+        return (
+            "Imports resolve against the base commit's build products, not the PR's. If an error "
+            "names a declaration this PR introduces or renames in another file, it is an artifact "
+            "of that -- not evidence the PR fails to build. This PR compiles."
+        )
 
     def _register_lean_verify_edit(self, mcp) -> None:
         """Register the lean_verify_edit exploration tool — available to EVERY review task (the
@@ -417,8 +478,11 @@ class BasePRReviewTask(BaseLeanTask):
                 "counting). You may include the declaration's `@[...]` attributes and "
                 "modifiers or omit them; either way they are not duplicated. Or "
                 "`line_start`/`line_end` + `replacement` to splice a line span. Your edit may "
-                "reference the PR's own new declarations. Omit all edit args to check whether "
-                "the file compiles as-is. Errors come back split into "
+                "reference the PR's own new declarations. Omitting all edit args answers a "
+                "DIFFERENT question — whether the file compiles as the PR leaves it — and "
+                "returns `compiles` plus `errors_already_in_the_file`, with no `success` "
+                "field, because nothing was verified: it tests none of the changes you are "
+                "weighing. Errors come back split into "
                 "`errors_introduced_by_your_edit` and `errors_already_in_the_file` — fix only "
                 "the former; line numbers refer to the whole spliced file, so use `code_line` "
                 "to locate them."
@@ -460,23 +524,49 @@ class BasePRReviewTask(BaseLeanTask):
             edited_only = bool(line_start or declaration_name or replacement or new_declaration)
             if edited_only:
                 result = await self._attribute_errors(path, result)
-            # Say which of the two things just happened. The as-is mode is deliberate and
-            # stays, but its result was indistinguishable from a verified edit: both come
-            # back `{"success": true, ... "Lean verification completed successfully"}`, and
-            # the reviewed file compiles by construction, so an as-is call always succeeds.
-            # On smoke4 that was 13 of 100 calls — a `family_design` invocation on PR 33117
-            # made one, read the success, and submitted nothing. Neither the agent nor
-            # anyone reading the transcript afterwards could tell it had verified nothing.
-            if isinstance(result, dict):
-                result["mode"] = "verified_edit" if edited_only else "as_is_compile_check"
-                if not edited_only:
-                    result["note"] = (
-                        "No edit was applied — this is the unmodified reviewed file's "
-                        "compile status, which is green by construction and is NOT evidence "
-                        "for any change you are considering. To check a change, pass "
-                        "`declaration_name` + `new_declaration`."
-                    )
-            return result
+                if isinstance(result, dict):
+                    result["mode"] = "verified_edit"
+                return result
+            # Two different questions, and they must not come back in the same shape.
+            #
+            # "Does this file compile?" is legitimate and is the `correctness` arm's opening
+            # move — a reviewed state that is red is the most serious thing a reviewer can
+            # report (33057's gold obligation is exactly that). "Is my proposed change sound?"
+            # is the other question, and only an edit can answer it.
+            #
+            # Spelling both `lean_verify_edit(path=...)` was survivable; returning both as
+            # `{"success": true, ... "Lean verification completed successfully"}` was not. The
+            # file compiles by construction in the ordinary case, so the no-edit call is a
+            # guaranteed green that reads exactly like a discharged verification. A `note`
+            # saying otherwise did not hold: all 86 no-edit calls in
+            # `pr5_A_lead_heldout12_rep1` carried it, and the call was still the last act
+            # before 33 of 82 empty submissions — 9 of 9 for `docs`, 10 of 19 for `naming`.
+            # Text does not beat shape, so the shape changes here: this answers the status
+            # question, in the vocabulary of the status question, and claims nothing else.
+            #
+            # `schema/evidence.py:88` already rules for the evidence layer that "we did not
+            # check" and "we checked and found nothing" must not look alike. This is that rule
+            # applied one layer up, where the artifacts are produced.
+            if not isinstance(result, dict):
+                return result
+            errors = list(result.get("errors") or [])
+            return {
+                "mode": "as_is_compile_check",
+                "compiles": not errors,
+                # Every error is pre-existing by definition when no edit was applied, so this
+                # needs no baseline compile — and it makes the `correctness` prompt's promise
+                # of a split true for the first time, which it never was on this path.
+                "errors_already_in_the_file": errors,
+                "errors_introduced_by_your_edit": [],
+                "warnings": result.get("warnings") or [],
+                "environment": self._verification_environment_note(),
+                "warrants": (
+                    "The current state of the file as the PR leaves it, and nothing else. "
+                    "This is NOT evidence for or against any change you are considering: no "
+                    "edit was applied, so nothing you are weighing has been tested. To test "
+                    "a change, call again with `declaration_name` + `new_declaration`."
+                ),
+            }
 
     async def register_task_tools(self, mcp) -> None:
         from typing import Annotated
@@ -566,6 +656,21 @@ class BasePRReviewTask(BaseLeanTask):
                 "anchor": anchor,
                 "severity": severity,
                 "claim": claim,
+                # Carried through when the caller asked for them, absent otherwise. The
+                # `solo` condition needs both because `candidates_from_response` refuses a
+                # candidate with no `issue_kind` on any release rendered at
+                # `candidate-prompt/12` or later -- which is all 225 work units of
+                # dev-medium-0.3.0 -- so without them every finding it files would be
+                # rejected and the run would read as a reviewer that found nothing.
+                #
+                # Deliberately not added to the tool's *description*: that string is
+                # delivered verbatim to the v2 checkers, which are measured assets, and
+                # changing what they are shown would make their next run incomparable to
+                # their last for a reason unrelated to anything being tested. The schema is
+                # already free-form, so a task that wants these asks for them in its own
+                # prompt and they arrive here without a shared surface changing.
+                "concern_family": (str(raw["concern_family"]) if raw.get("concern_family") else None),
+                "issue_kind": (str(raw["issue_kind"]) if raw.get("issue_kind") else None),
                 "suggested_fix": (str(raw["suggested_fix"]) if raw.get("suggested_fix") else None),
                 "evidence": (str(raw["evidence"]) if raw.get("evidence") else None),
                 "verified": raw.get("verified") if isinstance(raw.get("verified"), bool) else None,

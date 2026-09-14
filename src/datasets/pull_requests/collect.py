@@ -29,6 +29,13 @@ them. Exclusion is a projection's job (`definitions.scored_pr_numbers`), not col
 
 Resumable at every point: an endpoint already recorded for a PR is never fetched again, and the
 tier-0 PR list for a window is cached in `data/pull_requests/collect.state.json`.
+
+**Scope a run with `--created-from/--created-to`, never with a narrower `--start/--end`.** The
+window is the tier-0 cache key, so changing it walks the listing again -- and a second walk over
+an overlapping window meets rows whose `updated_at` has moved since, which the store used to
+refuse. Slicing filters the cached list on data already held and costs nothing:
+
+    ... --start 2024-03-01 --end 2026-08-31 --tier 2 --created-from 2025-12-01 --created-to 2026-01-31
 """
 
 from __future__ import annotations
@@ -48,7 +55,9 @@ from src.datasets.pull_requests.github import (
     GitHubClient, GitHubError, compact_compare, compare_bytes, fetch_body_edits,
     fetch_review_threads,
 )
-from src.datasets.pull_requests.store import PullRequestStore, write_atomically
+from src.datasets.pull_requests.store import (
+    ImmutableEndpointError, PullRequestStore, write_atomically,
+)
 from src.mathlib_review.paths import PULL_REQUESTS_ROSTERS, PULL_REQUESTS_TRACKED, assert_repo_root
 
 REPO = "leanprover-community/mathlib4"
@@ -178,7 +187,20 @@ class Collector:
         self.roster = load_roster(self.roster_path)
         self.state_path = state_path or store.root / "collect.state.json"
         self.log_every_prs = log_every_prs
-        self.requests = 0
+        self._requests_at_start = getattr(client, "request_count", 0)
+
+    @property
+    def requests(self) -> int:
+        """HTTP requests this collector has spent, as the client counted them.
+
+        Counted by the client, not inferred here: `paginate_all` on a PR with 300 changed files
+        is four requests, and tier 2 used to score it as one. The under-count fell entirely on
+        the largest PRs, so a quota estimate built from it was optimistic exactly where it
+        mattered. Tier 1's `(rows + 99) // 100` was a closer guess but still a guess -- it
+        cannot see a retry.
+        """
+
+        return getattr(self.client, "request_count", 0) - self._requests_at_start
 
     # state: the tier-0 PR list per window, so a resume never re-walks
     def _state(self) -> Dict[str, Any]:
@@ -199,13 +221,56 @@ class Collector:
             return cached["prs"]
         rows = walk_listing(self.client, start, end, self.logger)
         fetched_at = _now()
+        bumped = 0
         for number, row in rows.items():
-            self.store.write_endpoint(number, "listing", row, request=f"/repos/{REPO}/pulls#listing",
-                                      fetched_at=fetched_at, source="github")
+            try:
+                self.store.write_endpoint(number, "listing", row,
+                                          request=f"/repos/{REPO}/pulls#listing",
+                                          fetched_at=fetched_at, source="github")
+            except ImmutableEndpointError:
+                # Unlike a conversation endpoint, a listing row is a snapshot of a *mutable*
+                # object: one comment bumps `updated_at` and the bytes differ. A second walk over
+                # an overlapping window would otherwise raise on the first PR touched since the
+                # first walk -- which, in a repo as busy as mathlib4, is within the hour. The
+                # recorded row stands ("data never moves"); tier 0's job is deciding which PRs
+                # exist, and the fields the pre-gate reads do not change once a PR is closed.
+                bumped += 1
+        if bumped:
+            self.logger.info("  tier 0: %d listing row(s) changed since an earlier walk; keeping "
+                             "the recorded ones", bumped)
         prs = sorted(rows)
         state["windows"][key] = {"prs": prs, "complete": True, "walked_at": fetched_at}
         self._save_state(state)
         return prs
+
+    def created_on(self, number: int) -> str:
+        """The PR's creation day, from whichever of listing/pr the store has. "" if neither."""
+
+        endpoints = self.store.ledger(number)["endpoints"]
+        for name in ("listing", "pr"):
+            if endpoints.get(name, {}).get("present"):
+                return str((self.store.read(number, name) or {}).get("created_at") or "")[:10]
+        return ""
+
+    def slice_prs(self, prs: Iterable[int], created_from: Optional[str],
+                  created_to: Optional[str]) -> List[int]:
+        """PRs from an already-walked window, narrowed by creation date.
+
+        This is how a tier-2 run is scoped, and the reason it is not done with `--start`/`--end`:
+        those name the *window*, which keys the tier-0 cache, so changing them walks the listing
+        again -- 300-odd pages, and then a raise on the first row bumped since the first walk.
+        Slicing reads only what the store already has and spends nothing.
+        """
+
+        prs = list(prs)
+        if not (created_from or created_to):
+            return prs
+        kept = [n for n in prs
+                if (not created_from or self.created_on(n) >= created_from)
+                and (not created_to or (self.created_on(n) or "9999") <= created_to)]
+        self.logger.info("  slice: %d of %d PRs created in %s..%s", len(kept), len(prs),
+                         created_from or "start", created_to or "end")
+        return kept
 
     def _progress(self, label: str, index: int, total: int, number: int, t0: float, done: int) -> None:
         elapsed = max(1e-6, time.monotonic() - t0)
@@ -216,24 +281,40 @@ class Collector:
                          _fmt_seconds(left / rate) if rate else "?")
 
     def tier1(self, prs: Iterable[int]) -> Dict[str, int]:
+        """The three conversation endpoints for every PR that lacks one, newest first.
+
+        An endpoint that fails past the client's retries is **left unrecorded**, not written empty:
+        the PR stays tier-1 incomplete, the pre-gate reports it as `tier1_incomplete` rather than
+        counting it as a PR with no comments, and the next run retries just that endpoint. One
+        endpoint must not end the run -- a 502 on `/pulls/4197/comments` killed a 32,650-PR walk
+        with 46 left, and the loss was the twelve hours, not the PR."""
+
         todo = sorted((n for n in prs if not all(
             name in self.store.ledger(n)["endpoints"] for name in TIER1)), reverse=True)
         self.logger.info("  tier 1: %d PRs to read, newest first (~%d requests, ~%s at the core limit)",
                          len(todo), 3 * len(todo), _fmt_seconds(3 * len(todo) / 1.39))
-        t0, rows = time.monotonic(), 0
+        t0, rows, deferred = time.monotonic(), 0, []
         for index, number in enumerate(todo, start=1):
             for name, template in TIER1.items():
                 if name in self.store.ledger(number)["endpoints"]:
                     continue
-                payload = self.client.paginate_all(template.format(repo=REPO, n=number), max_pages=None)
-                self.requests += max(1, (len(payload) + 99) // 100)
+                path = template.format(repo=REPO, n=number)
+                try:
+                    payload = self.client.paginate_all(path, max_pages=None)
+                except GitHubError as exc:
+                    self.logger.warning("  #%d %s: %s; left unrecorded, refetched by the next run",
+                                        number, name, exc)
+                    deferred.append(number)
+                    continue
                 rows += len(payload)
-                self.store.write_endpoint(number, name, payload,
-                                          request=template.format(repo=REPO, n=number),
+                self.store.write_endpoint(number, name, payload, request=path,
                                           fetched_at=_now(), source="github")
             if index % max(1, self.log_every_prs) == 0 or index == len(todo):
                 self._progress("tier 1", index, len(todo), number, t0, index)
-        return {"prs_read": len(todo), "rows": rows}
+        if deferred:
+            self.logger.warning("  tier 1: %d PR(s) left incomplete, rerun to fill them: %s",
+                                len(set(deferred)), sorted(set(deferred)))
+        return {"prs_read": len(todo), "rows": rows, "prs_deferred": sorted(set(deferred))}
 
     def gate_report(self, prs: Iterable[int]) -> Dict[str, Any]:
         reasons: Dict[str, int] = {}
@@ -262,16 +343,23 @@ class Collector:
                 "and without them every description would be recorded as possibly post-edited")
         todo = sorted((n for n in prs if 2 not in self.store.tiers(n)), reverse=True)
         self.logger.info("  tier 2: %d PRs, newest first", len(todo))
-        t0, compares = time.monotonic(), 0
+        t0, compares, deferred = time.monotonic(), 0, []
         for index, number in enumerate(todo, start=1):
             endpoints = self.store.ledger(number)["endpoints"]
             for name, template in TIER2_REST.items():
                 if name in endpoints:
                     continue
                 path = template.format(repo=REPO, n=number)
-                payload = self.client.get_json(path) if name == "pr" else \
-                    self.client.paginate_all(path, max_pages=None)
-                self.requests += 1
+                try:
+                    payload = self.client.get_json(path) if name == "pr" else \
+                        self.client.paginate_all(path, max_pages=None)
+                except GitHubError as exc:
+                    # Unrecorded, not null: a REST endpoint has no "unknown" reading the way
+                    # GraphQL enrichment does, so the PR stays tier-2 incomplete and is refetched.
+                    self.logger.warning("  #%d %s: %s; left unrecorded, refetched by the next run",
+                                        number, name, exc)
+                    deferred.append(number)
+                    continue
                 self.store.write_endpoint(number, name, payload, request=path, fetched_at=_now(),
                                           source="github")
             for name, fetch in TIER2_GRAPHQL.items():
@@ -283,13 +371,16 @@ class Collector:
                     self.logger.warning("  #%d %s: GraphQL failed (%s); recorded as null, fillable "
                                         "by a later run", number, name, exc)
                     payload = None
-                self.requests += 1
                 self.store.write_endpoint(number, name, payload, request=f"graphql:{name}",
                                           fetched_at=_now(), source="github")
             compares += self.fetch_compares(number)
             if index % max(1, self.log_every_prs) == 0 or index == len(todo):
                 self._progress("tier 2", index, len(todo), number, t0, index)
-        return {"prs_read": len(todo), "compares_fetched": compares}
+        if deferred:
+            self.logger.warning("  tier 2: %d PR(s) left incomplete, rerun to fill them: %s",
+                                len(set(deferred)), sorted(set(deferred)))
+        return {"prs_read": len(todo), "compares_fetched": compares,
+                "prs_deferred": sorted(set(deferred))}
 
     def fetch_compares(self, number: int, *, max_rounds: int = 12) -> int:
         """Fetch every compare the funnel asks for, by asking it: run the multi-round builder with
@@ -318,7 +409,6 @@ class Collector:
                     self.logger.warning("  #%d compare %s failed: %s", number, head[:12], exc)
                     wanted.discard(head)
                     continue
-                self.requests += 1
                 self.store.write_compare(number, head, compare_bytes(compact_compare(payload)),
                                          base_ref="master", request=path, fetched_at=_now(),
                                          source="github")
@@ -355,6 +445,13 @@ def main() -> None:
     parser.add_argument("--tier", type=int, choices=[1, 2], default=1,
                         help="1: walk the window and fetch conversations (then report the pre-gate); "
                              "2: fetch tier 2 for PRs passing the pre-gate")
+    parser.add_argument("--created-from", default=None, metavar="YYYY-MM-DD",
+                        help="restrict this run to PRs created on or after this day, inside the "
+                             "window already walked. Use this to scope a tier-2 run -- NOT a "
+                             "narrower --start/--end, which keys the tier-0 cache and walks the "
+                             "listing again")
+    parser.add_argument("--created-to", default=None, metavar="YYYY-MM-DD",
+                        help="restrict this run to PRs created on or before this day")
     parser.add_argument("--roster", type=Path, default=None, help="default: the latest dated roster")
     parser.add_argument("--store", type=Path, default=None)
     args = parser.parse_args()
@@ -371,6 +468,7 @@ def main() -> None:
     try:
         prs = collector.window_prs(args.start, args.end)
         logger.info("  tier 0: %d PRs in the window", len(prs))
+        prs = collector.slice_prs(prs, args.created_from, args.created_to)
         if args.tier == 1:
             result = collector.tier1(prs)
             gate = collector.gate_report(prs)
@@ -381,7 +479,7 @@ def main() -> None:
         client.close()
     manifest = write_tracked_export(store)
     _append_report({"collector_version": COLLECTOR_VERSION, "window": [args.start, args.end],
-                    "tier": args.tier, "started_at": started, "finished_at": _now(),
+                    "slice": [args.created_from, args.created_to], "tier": args.tier, "started_at": started, "finished_at": _now(),
                     "requests": collector.requests, "result": result,
                     "pre_gate": {k: v for k, v in gate.items() if k != "passing_prs"},
                     "roster": {"path": str(roster_path), "sha256": roster_sha256(roster_path)},

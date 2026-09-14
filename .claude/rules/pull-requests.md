@@ -24,10 +24,50 @@ paths:
   run; its 43,881-row corpus is the frozen acceptance baseline.
 - GitHub's `/pulls/comments` listing returns HTTP 500 for mathlib4 and the search API has its own
   30 req/min bucket. Collection is per-PR on the core quota, tiered and resumable.
+- **A heavy endpoint can 502 permanently, and retrying is not the answer.** `/pulls/4197/comments`
+  is 1.2 MB; GitHub times out generating it and fails identically through 62 s and 242 s of backoff.
+  The collector defers such an endpoint -- unrecorded, never written empty, refetched by the next
+  run -- and the retry budget stays at five attempts, because a longer one is paid per dead endpoint
+  across 32k PRs and buys nothing. Do not raise it again; `test_the_5xx_budget_stays_short_because_
+  deferring_is_the_defence` pins this.
+- **Scope a collection run with `--created-from/--created-to`, never a narrower `--start/--end`.**
+  The window string keys the tier-0 cache, so a new one re-walks the listing -- and a second walk
+  over an overlapping window meets rows whose `updated_at` has moved, which the store refuses. The
+  walk now keeps the recorded row, but the re-walk is still hundreds of wasted pages. Slicing reads
+  the cached list and spends nothing.
+- **Tier 1 feeds the corpus; tier 2 feeds episodes.** `project_corpus` gates only on
+  `review_comments` -- no tier-2 endpoint anywhere -- so the precedent/conventions thread needs
+  only tier 1. `project_episodes` goes through `load_bundle`, which requires tier 2 (diff at the
+  reviewed head, base commit, commit timestamps for the cutoff, `body_edits` for leak-safety).
+  Built 2026-09-12 from the finished tier 1, window 2024-03-01..2026-08-31: **104,093
+  reviewer_view rows from 14,718 PRs** (146,819 comment rows), against the 43,881-row frozen
+  baseline -- the ~2.4x the corpus repoint was predicted to gain. Quote the *dated* figure: the
+  same projection without `--start` reads 107,187, because 4,534 comments sit on PRs updated
+  inside the window but written before it (earliest 2022-03-17). `by_basis` in the manifest counts
+  **all** rows, not reviewer rows, so it sums to 146,819 and includes `none`.
+- **The 201-PR dev set was not representative; expect scale bugs at each new batch.** The first
+  tier-2 batch beyond it (2,059 PRs, Dec 2025 + Jan 2026) broke the episode projection twice, both
+  times on input the 201 never contained: a primed filename (`LinearCombination'.lean`) through
+  `shlex.split`, and two files sharing a GitHub **blob** sha (`files[].sha` hashes content, so
+  identical files collide) through the event ledger's identity. Both were fixed *narrowly*, so no
+  frozen id moved -- check that property before touching an identity or a parser, with
+  `test_pull_requests_reproduces_raw_release` and `verify_frozen`.
+- **A deferred PR may stay dropped, so quote the collected count, not the window count.** Dropped
+  PRs sit at tier 0 and are counted in the tracked manifest's `prs_by_complete_tier` -- as of
+  2026-09-12, 32,851 in the window, 32,850 at tier 1 (only #4197 dropped). That gap is the denominator correction; it is
+  recorded, not silent, and `pre_gate` reports each as `tier1_incomplete` rather than as a PR with
+  no comments.
 - After the full collection passes acceptance: repoint `paths.PRECEDENT_CORPUS` to
   `data/pull_requests/projections/corpus/reviewer_view.jsonl`, rebuild the precedent index, rerun
-  `conventions.review_join --write`, re-measure. Until then the index is built from the old
-  33%-recall corpus, and every corpus-derived level understates by roughly 2.5×.
+  `conventions.review_join --write --end <date>`, re-measure. Until then the index is built from the
+  old 33%-recall corpus, and every corpus-derived level understates by roughly 2.5×.
+- **The corpus's end date is no longer a date gate, so state the window.** It stopped at 2025-08-31,
+  before every eval PR, so the analysis readers were leak-safe whether or not they gated; collection
+  now runs to 2026-08-31. `precedent_bench.load_corpus` and `review_join.load_*` therefore take a
+  **required** `end` and `review_join --write` a required `--end`, recorded in `report.json`'s
+  `window`. A join that feeds a *brief* must be gated at `commit_date(base_sha)`; `--end all` is only
+  for descriptive month statistics. The live retrieval path is separately safe -- `precedent_index`
+  goes through `RetrievalGate`, where an undated row is `UNDATED = -1` and never eligible.
 - GitHub ends a review comment's `diff_hunk` at the commented line, so the situated declaration is
   the one enclosing the hunk's *tail*. Facets are conditioning metadata, never the join key (a
   facet-keyed join fit 4–8% of requests); the enforced component is the A→B ledger from

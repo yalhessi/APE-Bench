@@ -1,0 +1,35 @@
+# Everything the whole-PR baseline shares, so a condition file states only the two things it
+# actually varies: which scaffold runs the agent, and which PRs it reviews.
+#
+# The point of hoisting this is the B-vs-C contrast. Conditions B (`ape_agent`) and C
+# (`claude_code`) run the SAME task, the SAME prompt, the SAME submission contract and the
+# SAME anchoring pass, so any difference between them is the agentic harness and nothing else.
+# That restores commit 43e9d88's byte-identity invariant for one arm of the comparison -- the
+# whole-PR-vs-work-unit contrast cannot have it, since the unit of work is the treatment.
+#
+# `dataset:` and `task_config:` here are therefore load-bearing as a *shared* block:
+# `test_the_two_solo_conditions_differ_only_in_their_scaffold` asserts that no condition file
+# overrides them, because an override would silently turn the harness contrast into a policy
+# contrast.
+extends: v5_generation.yaml
+
+dataset:
+  routing_mode: solo
+
+  # Cost-matched to the lead, measured rather than assumed. `per_pr_cost_cap` is a ceiling no
+  # run has exhausted, so matching against it would prove nothing. The lead's actual BILLED
+  # spend per PR is $0.767 (pr5_smoke4_rep9) and $0.784 (heldout11_rep2) -- two independent
+  # sets agreeing to 2% -- with an observed per-PR maximum of $1.445. This is that maximum
+  # rounded up: the baseline cannot be said to have been starved, and what it actually spent
+  # is reported beside its recall.
+  #
+  # Measured so far: $0.040 billed on 33438, the smallest PR in the corpus. Expect more on the
+  # larger ones; the cap is a ceiling, not a forecast.
+  solo_cost_cap: 1.50
+
+  # The generalist arm's grant. The scheduled design's own control keeps all four "because
+  # that is the point of a control"; this is a control too, so a narrower grant would make an
+  # information difference read as an architecture difference. Every one is cutoff-gated, and
+  # every call lands in `context_trace.jsonl` -- which is both how the grant is shown to have
+  # been real and what the leak audit reads.
+  solo_context_tools: [zulip_search, precedent_search, declaration_search, proof_profile]

@@ -5,7 +5,7 @@ Evaluates whether an agent can provide Mathlib-quality pull request review feedb
 including merge readiness and issue identification.
 """
 
-from typing import Annotated, Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast
+from typing import Annotated, Dict, Any, Optional, List, TYPE_CHECKING, Literal, Set, Tuple, cast, Sequence
 import asyncio
 import hashlib
 import inspect
@@ -530,11 +530,11 @@ class ReviewPRCoreTask(BaseLeanTask):
 
     @classmethod
     def _patch_fingerprint(cls, data: ReviewPRData) -> str:
-        digest = hashlib.sha256()
-        digest.update((data.target_workspace.commit_hash or "").encode("utf-8"))
-        digest.update(b"\0")
-        digest.update((data.pr_diff or "").encode("utf-8"))
-        return digest.hexdigest()
+        # One recipe with the reviewed-workspace key, so the marker and the workspace name
+        # agree on identity by construction.
+        from ape.toolkits.execute.lean.core.build_manager import patch_fingerprint
+
+        return patch_fingerprint(data.target_workspace.commit_hash or "", data.pr_diff or "")
 
     @classmethod
     def _safe_overlay_path_parts(cls, rel_path: str) -> Tuple[str, ...]:
@@ -1201,6 +1201,104 @@ class ReviewPRCoreTask(BaseLeanTask):
             )
 
     @classmethod
+    async def prepare_reviewed_sources(
+        cls,
+        overlay_root: Path,
+        base_root: Optional[Path],
+        *,
+        pr_diff: str,
+        changed_files: Sequence[str],
+        logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
+    ) -> None:
+        """Lay the PR's source state over a base snapshot: every touched path materialised as a
+        real copy, then δ₀ applied.
+
+        Takes the diff and the file list rather than a task-data object because the prebuild
+        has an episode, not a task: the two inputs are all this needs, and naming them is what
+        lets both callers be seen to pass the same thing.
+
+        Shared by the per-attempt overlay (`_ensure_patched_target_workspace`) and by the
+        reviewed-workspace prebuild, whose Lean half lives in the toolkit and takes this as a
+        callable -- overlay creation and patching belong here, where the patch marker and the
+        touched-path rules already live, and the toolkit must not import a task.
+        """
+
+        if not overlay_root.exists():
+            # The prebuild starts from nothing; the per-attempt path arrives with the overlay
+            # already laid down. Same overlay either way: every base child symlinked.
+            if base_root is None:
+                raise RuntimeError(
+                    f"Cannot create a reviewed overlay without a base snapshot: {overlay_root}")
+            await asyncio.to_thread(cls._create_snapshot_overlay, base_root, overlay_root)
+        await asyncio.to_thread(cls._make_path_user_writable, overlay_root)
+        touched_paths = cls._collect_patch_touched_paths(pr_diff, list(changed_files))
+        await cls._emit_progress(
+            progress_callback,
+            "Materializing only the changed paths so the PR patch can be applied cleanly...",
+        )
+        if touched_paths:
+            if base_root is None:
+                raise RuntimeError(
+                    "Unable to determine the immutable base snapshot for the PR review overlay. "
+                    f"workspace={overlay_root}"
+                )
+            for rel_path in touched_paths:
+                await asyncio.to_thread(
+                    cls._materialize_overlay_path, base_root, overlay_root, rel_path,
+                )
+        await cls._emit_progress(
+            progress_callback, "Applying the PR diff to the review workspace...",
+        )
+        await cls._apply_pr_diff(overlay_root, pr_diff, logger=logger)
+
+    @classmethod
+    async def _maybe_setup_reviewed_target_workspace(
+        cls,
+        data: ReviewPRData,
+        target_link_path: Path,
+        *,
+        logger: Optional["logging.LoggerAdapter"] = None,
+        progress_callback=None,
+    ) -> Optional[WorkspaceInfo]:
+        """Link `target/` to the prebuilt reviewed workspace for this (base, diff), if one exists.
+
+        A reviewed workspace already carries the diff and has its changed modules rebuilt, so
+        when it is used there is nothing to patch and every compile resolves the PR's own
+        declarations. When it is absent the caller falls back to the source-only overlay -- and
+        says so at WARNING, because that fallback is precisely the environment in which a
+        renamed sibling reads as `Unknown constant`, and a silent fallback would reintroduce the
+        defect while looking fixed.
+        """
+
+        base = str((data.target_workspace and data.target_workspace.commit_hash) or "").strip()
+        if not base or not (data.pr_diff or "").strip():
+            return None
+        from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+
+        key = reviewed_workspace_key(base, data.pr_diff)
+        spec = data.target_workspace.model_copy(update={"commit_hash": key})
+        path = await cls._maybe_resolve_cached_workspace(
+            spec, logger=logger, progress_callback=progress_callback,
+        )
+        if path is None:
+            if logger:
+                logger.warning(
+                    "no reviewed workspace %s for PR %s: verifying against a source-only "
+                    "overlay of the base commit, where declarations this PR adds or renames in "
+                    "sibling files will read as unknown. Prebuild it: "
+                    "`python -m src.mathlib_review.release.prebuild --reviewed --config <cfg>`",
+                    key, data.pr_number,
+                )
+            return None
+        if logger:
+            logger.info("Using reviewed workspace %s for PR %s", key, data.pr_number)
+        await cls._emit_progress(
+            progress_callback, f"Using the prebuilt reviewed workspace {key[-16:]}...",
+        )
+        return await cls._link_resolved_workspace(spec, path, target_link_path, logger=logger)
+
+    @classmethod
     async def _ensure_patched_target_workspace(
         cls,
         data: ReviewPRData,
@@ -1249,30 +1347,11 @@ class ReviewPRCoreTask(BaseLeanTask):
                 f"workspace={target_path}"
             )
 
-        await asyncio.to_thread(cls._make_path_user_writable, target_path)
-        touched_paths = cls._collect_patch_touched_paths(data.pr_diff, data.changed_files)
-        await cls._emit_progress(
-            progress_callback,
-            "Materializing only the changed paths so the PR patch can be applied cleanly...",
+        await cls.prepare_reviewed_sources(
+            target_path, base_workspace_path, pr_diff=data.pr_diff,
+            changed_files=data.changed_files, logger=logger,
+            progress_callback=progress_callback,
         )
-        if touched_paths:
-            if base_workspace_path is None:
-                raise RuntimeError(
-                    "Unable to determine the immutable base snapshot for the PR review overlay. "
-                    f"workspace={target_path}"
-                )
-            for rel_path in touched_paths:
-                await asyncio.to_thread(
-                    cls._materialize_overlay_path,
-                    base_workspace_path,
-                    target_path,
-                    rel_path,
-                )
-        await cls._emit_progress(
-            progress_callback,
-            "Applying the PR diff to the review workspace...",
-        )
-        await cls._apply_pr_diff(target_path, data.pr_diff, logger=logger)
         await cls._write_patch_marker(
             marker_path,
             patch_fingerprint=patch_fingerprint,
@@ -1325,6 +1404,11 @@ class ReviewPRCoreTask(BaseLeanTask):
                     )
                 target_workspace = None
 
+            if target_workspace is None:
+                target_workspace = await cls._maybe_setup_reviewed_target_workspace(
+                    data, workspaces_dir / "target",
+                    logger=logger, progress_callback=progress_callback,
+                )
             if target_workspace is None:
                 await cls._emit_progress(
                     progress_callback,

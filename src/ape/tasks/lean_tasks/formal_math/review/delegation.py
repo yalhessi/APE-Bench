@@ -104,6 +104,10 @@ class JobOutcome:
     token_usage: Optional[Dict[str, float]] = None
     candidates: List[Dict[str, Any]] = field(default_factory=list)
     verification_artifacts: List[Dict[str, Any]] = field(default_factory=list)
+    #: `{"reason": ..., "detail": ...}` when the arm submitted nothing. Carried here because
+    #: this dataclass is a closed list between the child result and the response row: a field
+    #: the tool records and this does not declare is dropped silently, with the suite green.
+    abstention: Optional[Dict[str, str]] = None
     result_sha256: Optional[str] = None
     #: sha256 of the user prompt as delivered, including any brief. Differs from the sealed
     #: `rendered_prompt_sha256` exactly when a brief was attached.
@@ -390,6 +394,7 @@ async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
             token_usage=fact.get("token_usage"),
             candidates=candidates,
             verification_artifacts=artifacts,
+            abstention=raw.get("abstention"),
             result_sha256=_digest(candidates) if candidates else None,
             delivered_prompt_sha256=hashlib.sha256(
                 (payloads[job.invocation_id].get("rendered_user_prompt") or "").encode()

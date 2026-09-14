@@ -145,12 +145,20 @@ def load_queries(path: Path = QUERIES_PATH) -> List[Dict[str, Any]]:
 VALIDATED_CORPUS_END = "2025-08-31"
 
 
-def load_corpus(path: Path = DEFAULT_CORPUS, *, end: Optional[str] = VALIDATED_CORPUS_END) -> List[Dict[str, Any]]:
+def load_corpus(path: Path = DEFAULT_CORPUS, *, end: Optional[str]) -> List[Dict[str, Any]]:
     """The precedent corpus these scripts use: scored PRs excluded, created on or before `end`.
 
     Shared by `precedent_bench`, `precedent_prime`, `site_worklist` and `site_discrimination`,
     which applied neither the eval-PR exclusion nor any date window. `end=None` removes the window
-    -- only correct for a caller that gates each query on its own review time."""
+    -- only correct for a caller that gates each query on its own review time.
+
+    **`end` has no default, on purpose.** It used to default to `VALIDATED_CORPUS_END`, which was
+    right only while the corpus ended before every eval PR: the file's own end date was doing the
+    work of a date gate, and no caller had to think. The store now collects to 2026-08-31, eight
+    months past the December 2025 queries, so that accident is gone in both directions -- keeping
+    the old pin silently discards a year of new review, and dropping it silently hands a query its
+    own future. Neither is visible at the call site unless the window is stated there, so it is.
+    """
 
     from src.datasets.pull_requests.definitions import scored_pr_numbers
 
@@ -295,7 +303,7 @@ def run_retrieval(design: str, k: int, corpus_path: Path, out: Path, logger) -> 
     if design not in RETRIEVERS:
         raise ValueError(f"Unknown design {design!r}; choose from {sorted(RETRIEVERS)}")
     queries = load_queries()
-    corpus = load_corpus(corpus_path)
+    corpus = load_corpus(corpus_path, end=VALIDATED_CORPUS_END)
     logger.info("Retrieval design=%s: %d queries over %d corpus situations, top-%d",
                 design, len(queries), len(corpus), k)
     retriever = RETRIEVERS[design](corpus, logger=logger)

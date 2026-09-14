@@ -17,6 +17,7 @@ from typing import Any, Dict, List
 import pytest
 
 from src.datasets.pull_requests.collect import Collector, pre_gate
+from src.datasets.pull_requests.github import GitHubHTTPError
 from src.datasets.pull_requests.projections.episodes import project_episodes
 from src.datasets.pull_requests.seed import seed_from_legacy
 from src.datasets.pull_requests.store import PullRequestStore
@@ -53,6 +54,11 @@ class FakeGitHub:
     def __init__(self, prs: Dict[int, Dict[str, Any]]):
         self.prs = prs
         self.requests: List[str] = []
+        self.request_count = 0          # the real client meters here; the collector reads it
+
+    def _spend(self, path: str, pages: int = 1) -> None:
+        self.requests.append(path)
+        self.request_count += pages
 
     def pages(self, path, *, params=None, per_page=100, max_pages=None):
         assert path.endswith("/pulls")
@@ -60,19 +66,20 @@ class FakeGitHub:
         for index, offset in enumerate(range(0, len(rows), 100)):
             if max_pages is not None and index >= max_pages:
                 return
-            self.requests.append(path)
+            self._spend(path)
             yield rows[offset:offset + 100]
 
     def paginate_all(self, path, **kwargs):
-        self.requests.append(path)
         n = int(re.search(r"/(?:pulls|issues)/(\d+)/", path).group(1))
         kind = path.rsplit("/", 1)[1]
         key = {"comments": "issue_comments" if "/issues/" in path else "review_comments",
                "reviews": "reviews", "commits": "commits", "files": "files", "timeline": "timeline"}[kind]
-        return list(self.prs[n].get(key, []))
+        rows = list(self.prs[n].get(key, []))
+        self._spend(path, max(1, (len(rows) + 99) // 100))
+        return rows
 
     def get_json(self, path, params=None):
-        self.requests.append(path)
+        self._spend(path)
         if "/compare/" in path:
             head = path.rsplit("...", 1)[1]
             return {"merge_base_commit": {"sha": "base0"},
@@ -83,7 +90,7 @@ class FakeGitHub:
         return self.prs[n]["pr"]
 
     def graphql(self, query, variables):
-        self.requests.append("graphql")
+        self._spend("graphql")
         if "reviewThreads" in query:
             return {"repository": {"pullRequest": {"reviewThreads": {
                 "pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": []}}}}
@@ -203,3 +210,113 @@ def test_on_the_real_201_the_pre_gate_keeps_every_pr_the_funnel_includes(tmp_pat
     assert len(included) == 138
     missed = [n for n in included if not pre_gate(store, n, roster)[0]]
     assert missed == []
+
+
+# --- one endpoint failing must not end the run ------------------------------------------------
+
+class FlakyGitHub(FakeGitHub):
+    """GitHub as it actually behaved: one heavy endpoint 502s past every retry, the rest are fine."""
+
+    def __init__(self, prs, *, failing=("/pulls/102/comments",)):
+        super().__init__(prs)
+        self.failing = failing
+
+    def paginate_all(self, path, **kwargs):
+        if any(path.endswith(suffix) for suffix in self.failing):
+            self.requests.append(path)
+            raise GitHubHTTPError(f"GitHub HTTP 502 for GET {path}", status_code=502)
+        return super().paginate_all(path, **kwargs)
+
+
+@pytest.fixture
+def flaky(tmp_path):
+    roster = tmp_path / "roster.txt"
+    roster.write_text(f"# test roster\n{REVIEWER}\n")
+    store = PullRequestStore(tmp_path / "store")
+    fake = FlakyGitHub(_fixture_prs())
+    collector = Collector(store, fake, LOG, roster_path=roster, state_path=tmp_path / "state.json")
+    return store, fake, collector
+
+
+def test_a_dead_endpoint_defers_its_pr_and_the_rest_of_the_window_is_collected(flaky):
+    """The 12 hours are the thing worth saving, not the PR: #102's review comments are skipped,
+    every other PR completes, and the run reports what it deferred."""
+
+    store, fake, collector = flaky
+    prs = collector.window_prs("2025-12-01", "2025-12-31")
+    result = collector.tier1(prs)
+
+    assert result["prs_deferred"] == [102]
+    assert store.tiers(102) == {0}                       # tier 1 incomplete, not wrongly complete
+    for n in (101, 103, 104, 105, 106):
+        assert store.tiers(n) == {0, 1}
+
+
+def test_a_deferred_endpoint_is_not_recorded_as_empty(flaky):
+    """`[]` would mean "this PR drew no inline comments" -- a claim the collector cannot make from
+    a 502, and one the pre-gate would act on."""
+
+    store, _, collector = flaky
+    prs = collector.window_prs("2025-12-01", "2025-12-31")
+    collector.tier1(prs)
+
+    assert "review_comments" not in store.ledger(102)["endpoints"]
+    assert pre_gate(store, 102, collector.roster) == (False, "tier1_incomplete")
+
+
+def test_the_next_run_refetches_only_the_deferred_endpoint(flaky):
+    store, fake, collector = flaky
+    prs = collector.window_prs("2025-12-01", "2025-12-31")
+    collector.tier1(prs)
+
+    fake.failing = ()                                    # GitHub warms up
+    before = len(fake.requests)
+    result = collector.tier1(prs)
+    assert result["prs_deferred"] == []
+    assert fake.requests[before:] == ["/repos/leanprover-community/mathlib4/pulls/102/comments"]
+    assert store.tiers(102) == {0, 1}
+    assert pre_gate(store, 102, collector.roster) == (True, "pass")
+
+
+def test_the_collector_reports_what_the_client_spent_not_what_it_guessed(collected):
+    """Tier 2 used to score a paginated endpoint as one request however many pages it pulled.
+    The client is the only thing that knows, so the collector reads its meter."""
+
+    store, fake, collector, prs = collected
+    assert collector.requests == fake.request_count
+    assert collector.requests > 0
+
+
+# --- scoping a run without re-walking tier 0 ---------------------------------------------------
+
+def test_a_second_walk_keeps_the_recorded_listing_row_when_github_has_bumped_it(collected, tmp_path):
+    """A listing row is a snapshot of a mutable object -- one new comment moves `updated_at`.
+    The store refuses a changed payload, so an uncaught re-walk died on the first PR touched
+    since the first walk. The recorded row stands and the walk finishes."""
+
+    store, fake, collector, prs = collected
+    for entry in fake.prs.values():                      # GitHub moves on
+        entry["listing"]["updated_at"] = "2025-12-20T00:00:00Z"
+
+    fresh = Collector(store, fake, LOG, roster_path=collector.roster_path,
+                      state_path=tmp_path / "other-state.json")
+    assert fresh.window_prs("2025-12-01", "2025-12-31") == prs
+    assert store.read(101, "listing")["updated_at"] == "2025-12-05T00:00:00Z"   # the first one
+
+
+def test_a_slice_narrows_the_run_without_touching_tier_0(collected):
+    """The point of the slice: scoping tier 2 must not change the window, because the window keys
+    the tier-0 cache and a re-walk costs 300-odd pages before it fetches anything."""
+
+    store, fake, collector, prs = collected
+    before = len(fake.requests)
+    december = collector.slice_prs(prs, "2025-12-01", "2025-12-31")
+    january = collector.slice_prs(prs, "2026-01-01", "2026-01-31")
+    assert len(fake.requests) == before                  # slicing spends nothing
+    assert set(december) == set(prs)                     # every fixture PR is a December PR
+    assert january == []
+
+
+def test_slicing_with_no_bounds_is_the_whole_window(collected):
+    _, _, collector, prs = collected
+    assert collector.slice_prs(prs, None, None) == prs

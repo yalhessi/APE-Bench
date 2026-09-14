@@ -1,0 +1,8 @@
+# CONDITION B on the 12-PR held-out set -- the headline half of the B contrast.
+#
+# Everything about the set -- PRs, cost cap, the reviewed-workspace requirement -- lives in
+# bases/v5_solo_heldout12.yaml, shared with condition C. This file says only which harness
+# runs the agent, which is the one thing B and C are allowed to disagree on.
+extends: bases/v5_solo_heldout12.yaml
+
+scaffold_type: ape_agent

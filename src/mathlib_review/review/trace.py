@@ -12,6 +12,14 @@ The guarantee has the same shape as v4's — nothing ran that was not planned, n
 went missing without a reason — while allowing the set that ran to be a decision rather than
 a constant.
 
+`solo` keeps the guarantee and cannot keep that second rule. A whole-PR review is not an
+`(arm, unit)` pair, and the two rules above are mutually exclusive for anything that is not:
+a response must map to a delegation, and a delegation must be an enumerated proposal. So there
+the rule becomes *every response is about a work unit the sealed agenda enumerated*. That is
+where the teeth actually are in this mode — a solo response's work unit comes from the
+anchoring pass rather than from the plan, so it is the one place an unplanned unit could enter,
+and it would otherwise reach the judge as ordinary output.
+
 Failed and paused jobs are counted, never dropped. A run summary that reports only what
 succeeded makes budget exhaustion invisible, and budget exhaustion is a fact about routing,
 which is the thing being measured.
@@ -41,6 +49,7 @@ def reconcile(
     issues_total: int,
     extra_cost: float = 0.0,
     coverage_gaps: Sequence[Dict[str, Any]] = (),
+    context_calls_total: int | None = None,
 ) -> V5RunManifest:
     """Build the run manifest, raising if the ledger does not balance.
 
@@ -84,14 +93,34 @@ def reconcile(
             f"{unplanned[:8]}. A job outside the pool has a prompt the plan did not vouch for."
         )
 
-    orphan = [
-        response.get("invocation_id") for response in responses
-        if response.get("invocation_id") not in by_invocation
-    ]
-    if orphan:
-        raise ReconciliationError(
-            f"{len(orphan)} response(s) map to no recorded job: {orphan[:8]}"
-        )
+    if agenda.routing_mode == "solo":
+        # There are no delegations to map a response to, and there cannot be: the two checks
+        # above require every delegation to be an enumerated `(arm, unit)` proposal, and a
+        # whole-PR review is not one of those by construction -- that is the condition. So the
+        # guarantee is kept in the form it can take here. "Nothing ran that was not planned"
+        # becomes: every response is about a work unit the sealed agenda enumerated, which is
+        # the check with teeth, since a response's unit comes from the anchoring pass rather
+        # than from the plan. An anchoring that attributed a finding to a unit outside the
+        # run's scope would otherwise reach the judge as ordinary output.
+        planned_units = {item.work_unit_id for item in agenda.proposals}
+        orphan = [
+            response.get("invocation_id") for response in responses
+            if response.get("work_unit_id") not in planned_units
+        ]
+        if orphan:
+            raise ReconciliationError(
+                f"{len(orphan)} response(s) anchor to a work unit the sealed agenda never "
+                f"enumerated: {orphan[:8]}"
+            )
+    else:
+        orphan = [
+            response.get("invocation_id") for response in responses
+            if response.get("invocation_id") not in by_invocation
+        ]
+        if orphan:
+            raise ReconciliationError(
+                f"{len(orphan)} response(s) map to no recorded job: {orphan[:8]}"
+            )
 
     counted = {"mandatory": 0, "proposed": 0, "agent_added": 0, "pruned": 0}
     statuses = {"success": 0, "failed": 0, "paused_cost": 0, "paused_turns": 0}
@@ -207,7 +236,8 @@ def reconcile(
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),
         candidates_total=candidates_total,
         issues_total=issues_total,
-        context_calls_total=context_calls,
+        context_calls_total=(context_calls if context_calls_total is None
+                             else context_calls_total),
         completion_status=(
             "failed" if statuses["failed"] else
             "partial" if coverage_gaps else

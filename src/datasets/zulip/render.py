@@ -28,6 +28,17 @@ def render_message(message: ZulipMessage, *, indent: str = "", body: bool = True
     return "\n".join(lines).rstrip()
 
 
+def _unique(values: Iterable) -> List:
+    """First-appearance order, no duplicates. Deterministic, so a rendering is reproducible."""
+
+    seen, out = set(), []
+    for value in values:
+        if value not in seen:
+            seen.add(value)
+            out.append(value)
+    return out
+
+
 def render_thread(
     thread: ZulipThread,
     messages: Sequence[ZulipMessage],
@@ -35,20 +46,35 @@ def render_thread(
     truncated: bool = False,
     max_messages: Optional[int] = None,
 ) -> str:
+    # EVERY summary line is computed from `messages`, never from `thread`.
+    #
+    # `thread` is the row the builder wrote over the whole thread, so its aggregates describe
+    # messages the gate has just removed. Measured against the 33337 cutoff over the 400
+    # threads that span it: `last_ts` and `message_count` were post-cutoff in 100% of them
+    # (one header would have printed 2026-06-16, nearly six months past the cutoff), `pr_refs`
+    # in 29%, `maintainer_participants` in 28%, and `decl_refs` in 22% -- the last being a
+    # declaration name from the future handed to an arm whose whole job is to judge a name.
+    # `messages` is already gated by `ZulipStore._view`, so deriving from it is correct both
+    # here and for an ungated human browse, where the two sets coincide.
+    ordered = list(messages)
+    span = f"{ordered[0].timestamp} .. {ordered[-1].timestamp}" if ordered else "(no messages)"
+    count = f"{len(ordered)} message(s)" + (" (prefix)" if truncated else "")
     header = [
         RULE,
         f"#{thread.stream} > {thread.topic}",
-        f"{len(messages)} of {thread.message_count} messages"
-        f" | {thread.first_ts} .. {thread.last_ts}",
+        f"{count} | {span}",
     ]
-    if thread.maintainer_participants:
-        header.append(f"maintainers: {', '.join(thread.maintainer_participants)}")
-    if thread.decl_refs:
-        shown = thread.decl_refs[:12]
-        suffix = f" (+{len(thread.decl_refs) - 12} more)" if len(thread.decl_refs) > 12 else ""
+    maintainers = _unique(m.sender_full_name for m in ordered if m.sender_is_maintainer)
+    if maintainers:
+        header.append(f"maintainers: {', '.join(maintainers)}")
+    decl_refs = _unique(ref for m in ordered for ref in (m.decl_refs or []))
+    if decl_refs:
+        shown = decl_refs[:12]
+        suffix = f" (+{len(decl_refs) - 12} more)" if len(decl_refs) > 12 else ""
         header.append(f"declarations: {', '.join(shown)}{suffix}")
-    if thread.pr_refs:
-        header.append(f"PRs: {', '.join('#' + str(n) for n in thread.pr_refs)}")
+    pr_refs = _unique(ref for m in ordered for ref in (m.pr_refs or []))
+    if pr_refs:
+        header.append(f"PRs: {', '.join('#' + str(n) for n in pr_refs)}")
     if truncated:
         header.append(
             "NOTE: filtered by the temporal gate — this is a prefix, not the whole thread."

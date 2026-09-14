@@ -1,0 +1,38 @@
+{
+  "agent_added": 0,
+  "candidates_total": 49,
+  "completion_status": "complete",
+  "context_calls_total": 0,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 14.724412,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 173,
+  "failed": 0,
+  "issues_total": 49,
+  "mandatory": 55,
+  "paused": 0,
+  "proposals_total": 173,
+  "pruned": 0,
+  "routing_mode": "fanout",
+  "run_id": "v5run:pr5_F_fanout_stage1_rep1",
+  "run_name": "pr5_F_fanout_stage1_rep1",
+  "run_plan_sha256": "7d565fe72214157d3c6bb7fee6bab44a7195a3ef3a887efc42dfd5fce8453c4f",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "77766a1cb1d23cc4314693c19524e504b92d18cd1e16e75e620d45f0a1e0f678",
+  "succeeded": 0,
+  "total_cost": 14.7244125,
+  "usage": {
+    "billed": 5.066141,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nominal": 14.724412,
+    "self_billed": 5.066141,
+    "self_nominal": 14.724412
+  },
+  "wall_seconds": 1481.42046
+}

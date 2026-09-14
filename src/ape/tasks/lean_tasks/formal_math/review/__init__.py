@@ -41,6 +41,10 @@ from .judgment import (
 )
 from .arm import ARM_TASK_TYPE, ReviewArmConfig, ReviewArmData, ReviewArmTask
 from .lead import LEAD_TASK_TYPE, ReviewLeadConfig, ReviewLeadData, ReviewLeadTask
+from .solo import (
+    SOLO_RENDERER_VERSION, SOLO_TASK_TYPE, SoloReviewConfig, SoloReviewData,
+    SoloReviewResult, SoloReviewTask,
+)
 
 __all__ = [
     "BasePRReviewConfig", "BasePRReviewData", "BasePRReviewResult", "BasePRReviewTask",
@@ -55,4 +59,6 @@ __all__ = [
     "LeanPRReviewV4JudgmentResult", "LeanPRReviewV4JudgmentTask",
     "ARM_TASK_TYPE", "ReviewArmConfig", "ReviewArmData", "ReviewArmTask",
     "LEAD_TASK_TYPE", "ReviewLeadConfig", "ReviewLeadData", "ReviewLeadTask",
+    "SOLO_RENDERER_VERSION", "SOLO_TASK_TYPE", "SoloReviewConfig", "SoloReviewData",
+    "SoloReviewResult", "SoloReviewTask",
 ]

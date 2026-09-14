@@ -18,10 +18,21 @@ from src.mathlib_review.agenda.components import (
 )
 
 
-def target(change_id, name=None, path="Mathlib/A.lean", kind="declaration"):
+def target(change_id, name=None, path="Mathlib/A.lean", kind="declaration",
+           base_code="theorem old : True := trivial", reviewed_code="theorem new : True := trivial"):
+    """`base_code`/`reviewed_code` default to a MODIFIED declaration -- present on both sides.
+
+    `ChangeTarget` always carries both fields (Optional, defaulting to None), and the
+    `introduction` grain reads them to ask whether a declaration is new. Leaving them off the
+    fixture made every test here construct a target the schema cannot produce, and the grain
+    read as an AttributeError rather than as "this is not an introduction". The default is
+    deliberately the *modified* shape, so a test that does not care about introductions does
+    not silently acquire one."""
+
     return SimpleNamespace(change_id=change_id, kind=kind, path=path,
                            declaration_name=name, base_entity_ids=[], reviewed_entity_ids=[],
-                           context_refs=[], declaration_kind="theorem")
+                           context_refs=[], declaration_kind="theorem",
+                           base_code=base_code, reviewed_code=reviewed_code)
 
 
 def graph(targets, pr_number=1, episode_id="e1"):

@@ -57,6 +57,12 @@ PULL_REQUESTS_TRACKED = Path("inputs/pull_requests")
 #: stays where nine frozen manifests pin it; new snapshots go here.
 PULL_REQUESTS_ROSTERS = PULL_REQUESTS_TRACKED / "rosters"
 
+#: Tracked provenance for the convention catalogue: the rows a snapshot scan produced, and the
+#: manifest naming the snapshot they were read from. Small, derived and regenerable, so it is
+#: tracked rather than gitignored -- the point of the catalogue is to be cited in an argument, and
+#: an artifact that lives only in a scratchpad cannot be.
+CONVENTIONS_TRACKED = Path("inputs/conventions")
+
 # --- v5's own roots -----------------------------------------------------------------
 
 RESULTS = Path("results/pr_review_v5")

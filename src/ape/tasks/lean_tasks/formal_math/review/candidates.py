@@ -3,7 +3,7 @@
 import hashlib
 import json
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Literal, Optional, Tuple
+from typing import Annotated, Any, Dict, List, Literal, Optional, Tuple, get_args
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -37,11 +37,53 @@ class LeanPRReviewV4CandidateData(BasePRReviewData):
     ] = "none"
 
 
+#: Why an arm submitted nothing.
+#:
+#: An empty submission was mute: `submit_candidates([])` carried no reason, so "nothing here
+#: falls under my concern", "I found something and it did not meet my bar" and "I could not
+#: establish it" all arrived as the same empty list. 81% of specialist invocations on
+#: `pr5_A_lead_heldout12_rep1` were empty, and the rules file records the consequence —
+#: "there was never a rationale to aim a prompt at". These are the five endings a
+#: last-action analysis of that run could distinguish from the outside; recording them at the
+#: source costs one enum and replaces the inference.
+#:
+#: Declared once, as a Literal, so the tool schema enumerates it for the model and no second
+#: copy can drift: a closed vocabulary maintained in two places is this repo's most expensive
+#: recurring bug.
+#: How many times `forbid_abstention` presses before it accepts an empty submission anyway.
+#:
+#: It has to give up eventually. `termination_callback` fires on the success path alone, so an
+#: arm that never submits burns its turns and is recorded as failed — and a failed mandatory job
+#: is a coverage gap, which would turn "this arm had nothing" into a hole in the run and make the
+#: experiment unreadable. Three presses, then the refusal is recorded under its own reason so
+#: "pressed and still nothing" stays distinguishable from an ordinary abstention.
+_FORCED_SUBMISSION_ATTEMPTS = 3
+
+#: Assigned by the system, never offered to the model: it is not in `AbstentionReason` and does
+#: not appear in the tool schema. An arm reaches it only by being pressed
+#: `_FORCED_SUBMISSION_ATTEMPTS` times and still submitting nothing, which is the outcome the
+#: `forbid_abstention` experiment exists to count.
+FORCED_EMPTY_REASON = "nothing_found_under_duress"
+
+AbstentionReason = Literal[
+    "nothing_of_this_kind_here",
+    "already_correct",
+    "below_my_bar",
+    "could_not_establish",
+    "belongs_to_another_concern",
+]
+ABSTENTION_REASONS: Tuple[str, ...] = get_args(AbstentionReason)
+
+
 class LeanPRReviewV4CandidateResult(BasePRReviewResult):
     work_unit_id: str
     rendered_prompt_sha256: str
     candidates: List[Dict[str, Any]] = Field(default_factory=list)
     verification_artifacts: List[Dict[str, Any]] = Field(default_factory=list)
+    #: `{"reason": ..., "detail": ...}` when the arm submitted nothing, else None. Declared
+    #: here because `BaseTaskResult` is pydantic with the default `extra='ignore'`: an
+    #: undeclared keyword reaches `create_result` and is dropped with no error at all.
+    abstention: Optional[Dict[str, str]] = None
 
 
 class ProposedEditSubmission(BaseModel):
@@ -505,10 +547,81 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             candidates: Annotated[List[CandidateSubmission], Field(
                 description="Candidate objects matching the JSON contract in the prompt; [] is valid."
             )] = [],
+            abstention_reason: Annotated[Optional[AbstentionReason], Field(
+                description=(
+                    "REQUIRED when `candidates` is empty, ignored otherwise. Submitting "
+                    "nothing is a correct and common outcome; this only records which "
+                    "outcome it was. `nothing_of_this_kind_here`: no target falls under "
+                    "this check. `already_correct`: the check applies and the code already "
+                    "satisfies it. `below_my_bar`: you found a candidate issue and it did "
+                    "not meet the evidence or severity bar. `could_not_establish`: you "
+                    "needed evidence your tools could not produce. "
+                    "`belongs_to_another_concern`: you saw a real issue that is not this "
+                    "check's business."
+                )
+            )] = None,
+            abstention_detail: Annotated[str, Field(
+                description=(
+                    "One sentence, when abstaining: name the specific thing you considered "
+                    "and what was missing. 'Checked the three new lemma names against the "
+                    "counted population; all three match the dominant prefix.' Not 'nothing "
+                    "found'."
+                )
+            )] = "",
         ) -> Dict[str, Any]:
             from ape.tasks.base import EvaluationResult
 
             raw_candidates = [item.model_dump(mode="json") for item in candidates or []]
+            # Silence has to say which silence it is, or it cannot be read afterwards and
+            # cannot be aimed at. Refusing here rather than accepting a mute submission is
+            # the same treatment every other contract violation gets, and it costs one short
+            # round trip with no re-investigation.
+            #
+            # The wording carries real weight and is not decoration. An arm that reads this
+            # as pressure to produce something would destroy the one result this project has
+            # that nothing else replaces: 0 candidates per control PR, per rep. Abstention
+            # must stay exactly as cheap as submitting.
+            #
+            # Asked once, and once only. `termination_callback` fires on the success path
+            # alone, so an arm that keeps omitting the reason would never submit legally: it
+            # would burn its turns and be recorded as a failed job, and a failed *mandatory*
+            # job is a coverage gap. That would convert the cleanest outcome an arm has —
+            # looking properly and finding nothing — into a hole in the run, which is a far
+            # worse error than an unlabelled silence. So the second empty submission is
+            # accepted and labelled `unstated`, which the report already counts and shows.
+            # The diagnostic path. Press for a candidate rather than accept the abstention,
+            # a bounded number of times, and keep "pressed and still nothing" as its own
+            # outcome — collapsing it into `already_correct` would destroy the only signal
+            # that separates a high bar from an arm with nothing to say.
+            if not raw_candidates and getattr(self.data, "forbid_abstention", False):
+                self._forced_presses = getattr(self, "_forced_presses", 0) + 1
+                if self._forced_presses <= _FORCED_SUBMISSION_ATTEMPTS:
+                    return {"evaluation_result": EvaluationResult(
+                        success=False, score=0.0,
+                        message=(
+                            "This run is not accepting abstentions: submit the single best "
+                            "candidate you considered, even if you judged it below your "
+                            "usual bar, and set model_confidence to reflect how weak it is. "
+                            "Say what you would flag if you had to flag exactly one thing. "
+                            f"(attempt {self._forced_presses} of "
+                            f"{_FORCED_SUBMISSION_ATTEMPTS})"
+                        )),
+                        "message": "Abstention not accepted in this run"}
+                abstention_reason = FORCED_EMPTY_REASON
+            if not raw_candidates and abstention_reason is None:
+                self._mute_abstentions = getattr(self, "_mute_abstentions", 0) + 1
+                if self._mute_abstentions == 1:
+                    return {"evaluation_result": EvaluationResult(
+                        success=False, score=0.0,
+                        message=(
+                            "Submitting nothing is a valid and expected outcome, and this is "
+                            "NOT a request to find something — do not add a candidate to "
+                            "satisfy it. Only the label is missing. Call submit_candidates "
+                            "again with the same empty list, plus abstention_reason set to "
+                            f"one of: {', '.join(ABSTENTION_REASONS)}; and one sentence in "
+                            "abstention_detail saying what you considered."
+                        )),
+                        "message": "Abstention recorded without a reason"}
             allowed = set(self.data.change_ids)
             allowed_by_suffix = {item.removeprefix("change:"): item for item in allowed}
             for index, candidate in enumerate(raw_candidates):
@@ -580,6 +693,9 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                 rendered_prompt_sha256=self.data.rendered_prompt_sha256,
                 candidates=raw_candidates,
                 verification_artifacts=verification_artifacts,
+                abstention=({"reason": abstention_reason or "unstated",
+                             "detail": (abstention_detail or "").strip()}
+                            if not raw_candidates else None),
                 findings=[], review_message="",
             )
             if self.termination_callback:

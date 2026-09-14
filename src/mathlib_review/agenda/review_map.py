@@ -61,13 +61,23 @@ class FileSkeleton:
 class ConventionQuestion:
     """A naming or structural norm the PR's own shape raises, and where to settle it.
 
-    Deliberately a *question with a corpus to search*, not an answer. Measured: the code
-    corpus argues against the maintainer on both naming conventions in this set —
-    `toLinearMap_` appears 50 times against `coe_`'s 4,707, dot notation 2,359 against
-    22,345 — because these are conventions Mathlib is moving toward, and frequency measures
-    where it has been. The same norms are stated plainly in review: 224 comments discuss dot
-    notation, and one says "we want to move away from primed names". So the retrieval target
-    is the review corpus, and repository frequency is at most supporting evidence.
+    Deliberately a *question with a corpus to search*, not an answer.
+
+    This docstring used to say the code corpus argues against the maintainer on both naming
+    conventions in this set, citing `toLinearMap_` 50 against `coe_`'s 4,707 and dot notation
+    2,359 against 22,345. **Retracted 2026-09-13 for the first figure and suspect for the
+    second**: both compare every name carrying one token against every name carrying another,
+    which are different populations. Conditioned on the subject the lemma is about — the
+    measurement `naming_norm.scan_population` already makes — `toLinearMap_` is the *modal*
+    prefix for that subject, 21 against `coe_`'s 7, of 121. The dot-notation figure has not
+    been re-derived under conditioning and should not be relied on.
+
+    What survives is the positive half: the same norms are stated plainly in review (224
+    comments discuss dot notation, one says "we want to move away from primed names"), so the
+    review corpus is a genuine retrieval target. What does not survive is the inference that
+    repository frequency is therefore at most supporting evidence; subject-conditioned
+    frequency is the strongest gold-free signal measured so far, and the rendered instruction
+    below still tells the arm to discount it.
     """
 
     kind: str
@@ -116,8 +126,10 @@ class ContextSlice:
         for skeleton in self.skeletons:
             out.append(skeleton.render())
         if self.conventions:
-            out.append("**Conventions this change touches** — settle these against review "
-                       "history, not against how common a spelling is today:")
+            out.append("**Conventions this change touches** — settle these against evidence "
+                       "you can cite: the counted population for the declaration's subject, "
+                       "a maintainer precedent, or a discussion. Not against taste, and not "
+                       "against the handful of lemmas that happen to sit beside it:")
             out.extend(item.render() for item in self.conventions)
         if self.exposure:
             out.append("**Referenced elsewhere in the library** (how much depends on this):")
@@ -236,10 +248,16 @@ def build_slices(
         names = [subjects_by_change.get(c, "") for c in mine]
         conventions = tuple(convention_questions(
             [c for c in components if mine & set(c.change_ids)], names))
+        # Sorted by reach and then by name, because `mine` is a set: keying on reach alone
+        # leaves ties in set-iteration order, which Python randomises per process. Two
+        # declarations at equal reach were enough to give one work unit on the held-out set
+        # two different rendered prompts, and so `agenda_sha256` two values across processes
+        # -- a sealed plan that does not reproduce, and a legitimate resume refused as a
+        # semantic change about one time in three.
         exposure = tuple(sorted(
             ((subjects_by_change.get(c, c), exposure_by_change[c])
              for c in mine if c in exposure_by_change),
-            key=lambda item: -item[1]))
+            key=lambda item: (-item[1], item[0])))
         slices[invocation_id] = ContextSlice(
             invocation_id=invocation_id, families=families, skeletons=skeletons,
             conventions=conventions, exposure=exposure)

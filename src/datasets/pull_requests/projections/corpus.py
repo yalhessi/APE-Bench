@@ -33,7 +33,7 @@ from src.datasets.pull_requests.definitions import (
     is_substantive_text, load_roster, roster_sha256, scored_pr_numbers,
 )
 from src.datasets.pull_requests.store import PullRequestStore, write_atomically
-from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes
+from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, jsonl_rows, sha256_bytes
 
 CORPUS_ROW_VERSION = "pr-corpus-row/2"
 CORPUS_PROJECTION_VERSION = "pr-corpus-projection/1"
@@ -238,7 +238,7 @@ def acceptance_report(new_rows: List[Dict[str, Any]], baseline_rows: List[Dict[s
 
 
 def load_baseline(path: Path) -> List[Dict[str, Any]]:
-    return [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
+    return jsonl_rows(Path(path))
 
 
 def main() -> None:
@@ -269,8 +269,7 @@ def main() -> None:
         if sha256_bytes(baseline_path.read_bytes()) != record["sha256"]:
             raise SystemExit(f"the acceptance baseline at {baseline_path} no longer matches its "
                              "recorded sha; restore it before judging the projection against it")
-        rows = [json.loads(line) for line in (store.root / "projections/corpus/comments.jsonl")
-                .read_text(encoding="utf-8").splitlines() if line.strip()]
+        rows = jsonl_rows(store.root / "projections/corpus/comments.jsonl")
         report = acceptance_report(rows, load_baseline(baseline_path), store)
         report.update({"baseline_sha256": record["sha256"], "projection": {
             k: manifest[k] for k in ("store_content_sha256", "comments_sha256", "roster", "window")}})

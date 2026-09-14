@@ -141,3 +141,46 @@ def test_a_store_inside_the_frozen_caches_is_refused():
     with pytest.raises(StoreError) as excinfo:
         PullRequestStore(LEGACY_V2_BUNDLES.parent / "store")
     assert "verify_frozen" in str(excinfo.value)
+
+
+# --- a record may contain a character `splitlines()` calls a line break -----------------------
+
+#: U+2028 LINE SEPARATOR, U+2029, U+0085 NEL, and the C0 separators. `str.splitlines()` breaks on
+#: every one; `json.dumps` escapes none of them, because only "\n" and "\r" must be escaped
+#: inside a JSON string. Two of the 32,851 collected PRs carry U+2028 in a comment body.
+LINE_BREAKS_SPLITLINES_HONOURS = "\u2028\u2029\u0085\v\f\x1c\x1d\x1e"
+
+
+def test_a_comment_body_carrying_u2028_round_trips(tmp_path):
+    """The bug that killed the pre-gate pass: the file was intact and its digest matched, but
+    `splitlines()` cut the record in half mid-string and both halves failed to parse."""
+
+    store = PullRequestStore(tmp_path / "store")
+    rows = [{"id": 1, "body": f"set-based API:{LINE_BREAKS_SPLITLINES_HONOURS}see above"},
+            {"id": 2, "body": "plain"}]
+    store.write_endpoint(7, "issue_comments", rows, request="/x", fetched_at="2026-09-12T00:00:00Z",
+                         source="github")
+
+    assert store.read(7, "issue_comments") == rows
+    assert store.ledger(7)["endpoints"]["issue_comments"]["rows"] == 2
+
+    raw = (store.pr_dir(7) / "issue_comments.jsonl").read_text(encoding="utf-8")
+    assert len(raw.splitlines()) > 2          # the trap: splitlines() sees more records than exist
+    assert len([l for l in raw.split("\n") if l.strip()]) == 2
+
+
+def test_a_file_that_does_not_parse_names_the_pr_and_says_whether_the_bytes_moved(tmp_path):
+    """The traceback that started this named no PR, so finding it meant scanning 32,851. An
+    unparseable payload now says which PR, and whether the store or the reader is at fault."""
+
+    store = PullRequestStore(tmp_path / "store")
+    store.write_endpoint(7, "issue_comments", [{"id": 1}], request="/x",
+                         fetched_at="2026-09-12T00:00:00Z", source="github")
+    path = store.pr_dir(7) / "issue_comments.jsonl"
+    path.unlink()
+    path.write_text('{"id": 1', encoding="utf-8")      # truncated after the fact
+
+    with pytest.raises(StoreError) as excinfo:
+        store.read(7, "issue_comments")
+    assert "PR 7 issue_comments" in str(excinfo.value)
+    assert "the file has changed since it was written" in str(excinfo.value)

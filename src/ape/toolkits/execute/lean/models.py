@@ -31,6 +31,23 @@ class ErrorType(Enum):
     SNAPSHOT_MISSING = "snapshot_missing"
     DISK_FULL = "disk_full"
 
+
+def build_error_type(exc: BaseException) -> ErrorType:
+    """The `ErrorType` a failed build is recorded under.
+
+    `WorkspaceState.error_type` is this enum, so a Python class name -- `type(exc).__name__`,
+    which is what every caller used to pass -- fails pydantic's assignment validation and
+    takes the whole state write down with it. The managers swallow that failure to keep it
+    from masking the build error, so the state stayed BUILDING with a dead pid and the next
+    run "took over" and paid for the same failing build again (33057, twice, 2026-09-13).
+    """
+
+    if isinstance(exc, TimeoutError):
+        return ErrorType.BUILD_TIMEOUT
+    if isinstance(exc, MemoryError):
+        return ErrorType.BUILD_OOM
+    return ErrorType.BUILD_FAILED
+
 # ==================== Data classes ====================
 
 class LeanMessage(BaseModel):

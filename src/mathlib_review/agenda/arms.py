@@ -160,8 +160,12 @@ def v5_specs() -> List[FocusedAgentSpec]:
 #: `content_search`, the only tool that could have found the mechanism its own prompt told it
 #: to look for, and produced zero candidates from eleven invocations. So the rule is output
 #: shape, not concern: `declaration_search` for arms asking about a *named* thing,
-#: `precedent_search`/`zulip_search` for arms asking a convention question the code corpus
-#: answers wrongly (`coe_` outnumbers the requested form 4,707 to 50).
+#: `precedent_search`/`zulip_search` for arms asking a convention question. The reason given
+#: here was once "the code corpus answers wrongly (`coe_` outnumbers the requested form 4,707
+#: to 50)"; that compares all `coe_` names against all `toLinearMap_` names, which are not the
+#: same population. Among the 121 declarations whose conclusion subject *is* `toLinearMap`,
+#: `toLinearMap_` leads 21 to 7. The grant still stands -- a convention question wants review
+#: history as well as code -- but not for that reason.
 CHECKABLE_ARMS = checkable_arms()
 
 _UNIVERSAL_CONTEXT_TOOLS = UNIVERSAL_CONTEXT_TOOLS

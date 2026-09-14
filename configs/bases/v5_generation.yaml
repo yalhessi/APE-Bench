@@ -34,6 +34,16 @@ dataset:
   modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl
   require_prebuilt_workspaces: true
 
+  # The verification environment. A reviewed workspace is the base snapshot plus this PR's diff
+  # plus its changed modules rebuilt; without it every compile resolves imports against the
+  # base commit's .oleans, and a declaration the PR renames in a sibling file is an `Unknown
+  # constant` in every other file -- 41 of 321 arm sessions on the held-out run, 16 findings
+  # asserting a build failure on PRs that all build. `plan` reports how many episodes lack one.
+  # Off only until they are prebuilt for the sets in use (~12 min each on this NFS, once):
+  #   ./ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --config <run config>
+  # then flip this to true. A run that proceeds without them is told so at WARNING per attempt.
+  require_reviewed_workspaces: false
+
   # Reads the base commit's `.ilean` index so importance can raise a proposal to `required`.
   # ~4.4s per distinct base commit.
   use_exposure_index: true

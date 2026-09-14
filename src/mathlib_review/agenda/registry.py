@@ -155,11 +155,20 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
 
     # --- the classes v4 had no arm for -------------------------------------------------
     _arm("naming", "naming", "naming_convention_violation",
-         "Is this declaration named the way its own family is named? Settled by reading the "
-         "siblings and past rename requests, not by taste.",
-         # Both: what the siblings are called, and what maintainers call them. The code corpus
-         # argues against the maintainer on both naming asks this release scores.
-         context_tools=("declaration_search", "precedent_search", "zulip_search")),
+         "Is this declaration named the way this repository names declarations about the same "
+         "subject? Settled by a counted population over the base snapshot (`naming_norm`) and "
+         "past rename requests, not by the neighbouring file and not by taste.",
+         # Both: what the siblings are called, and what maintainers call them. This row used
+         # to add "the code corpus argues against the maintainer on both naming asks this
+         # release scores". Retracted 2026-09-13: that rested on a flat count over two
+         # different populations. Conditioned on the subject a lemma is *about* -- which is
+         # what `naming_norm` already measures -- the corpus agrees with the maintainer on
+         # 33337: `toLinearMap_` is the modal prefix, 21 against `coe_`'s 7, of 121.
+         # `naming_norm` answers the one question the other three cannot: not "does this
+         # name exist" or "what did a maintainer once say", but "what does this repository
+         # call lemmas with this subject, counted". Measured: the arm asked convention
+         # questions with `content_search` and could only ever sample.
+         context_tools=("naming_norm", "declaration_search", "precedent_search", "zulip_search")),
     _arm("docs", "documentation", "documentation_gap",
          "Is the documentation COMPLETE, CORRECT and CONFORMANT — in that "
          "order?\n  * complete: a sentence that stops mid-thought, a hypothesis or a `TODO` "
@@ -178,6 +187,16 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          "declaration sits: a lemma that belongs inside a `namespace` block and was left "
          "outside it is a placement defect, not a matter of taste.",
          context_tools=("precedent_search", "zulip_search"),
+         # `scope` alongside `style` because this arm already owns placement -- its rationale
+         # says so and `PLACEMENT_KINDS` gives it the targets -- while gold files a placement
+         # ask under `scope` (PR 33362: "move the declarations inside `namespace Complex`").
+         # Without this the one arm that can see the defect is tagged `off-concern` for
+         # naming it the way the maintainer did. A separate `scope` arm was considered and
+         # rejected: it would duplicate this remit, and `scope` is in `AWAITING_A_WARRANT`,
+         # so its findings would be diagnostic either way. What 33362 measures is an arm that
+         # ran, produced one candidate and did not make this ask -- an arm-quality question,
+         # not a missing-arm one.
+         expected_concerns=("style", "scope"),
          extra_subject_kinds=MODULE_DOC_KINDS | PLACEMENT_KINDS),
     _arm("api_reuse", "duplication", "missed_canonical_api",
          "Does the code re-derive something the library already provides, or spell an existing "
