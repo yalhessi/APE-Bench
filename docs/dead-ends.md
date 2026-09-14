@@ -77,6 +77,20 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   that obligation was never hit by any condition), or the arm lacked knowledge (33117 `family_design`
   judged the family balanced; the ask was to use `@[to_fun]`, which it does not know about). Only the
   second is scheduling-adjacent, and it is a threshold question, not a floor question.
+  **Amended 2026-09-14, same day:** the conclusion stands -- more slots do not help -- but the
+  cause stated above was wrong. Re-running the identical 4 PRs with `forbid_abstention` (arms
+  refused an empty submission) took **issue recall 0.20 -> 0.50 and location 0.80 -> 1.00**,
+  strictly dominating: 3 forced-only hits, 0 unforced-only. The arms were not short of findings,
+  they were withholding them -- forced, `naming` produced `Dense.upperBounds_image`, character
+  for character the rename gold asked for, on an obligation it had abstained on. And the bar is
+  a **volume filter, not a quality filter**: the suppressed candidates align with gold at the
+  same rate as the kept ones (marginal 5 aligned / 130 extra = 0.038, against 0.041 unforced).
+  So `already_correct` was the label on good and bad candidates alike. The cost is why this is
+  still not a design: control emission went 1 -> 36 findings on a PR where maintainers asked for
+  nothing, about 12 spurious control findings per real obligation recovered. **The lever is the
+  bar, not the schedule** -- which is a calibration and downstream-selection problem, and
+  `model_confidence` came back null on every forced finding, so the ranking signal that would
+  make selection possible is not currently captured.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
