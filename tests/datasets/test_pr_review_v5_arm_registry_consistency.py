@@ -152,7 +152,15 @@ EXPECTED_SPEC_IDENTITY = {
     # was ever produced for a call with no edit. The prompt now describes what that call
     # actually answers (`compiles`, `errors_already_in_the_file`) and says outright that
     # `compiles: true` is where the work starts. Nine of ten identities are unchanged.
-    "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "0272b478d6e9",
+    # `docs` moved 0272b478d6e9 -> 017bf3f92a5c and `style` d82d80097e5a -> ba219a5656d0 on
+    # 2026-09-14, deliberately and together: `cg1_builder_v3` stopped filing a declaration's
+    # `/-- … -/` and `@[…]` under `command`, so `DOCUMENTATION_KINDS` gained `doc_comment` and
+    # `PLACEMENT_KINDS` gained `attribute`. Without that the two arms chartered for
+    # documentation and placement could be scheduled on none of the 85 such targets in
+    # `dev-medium-0.4.0` -- including the doc-comment PR 33321's two documentation obligations
+    # sit on. Eight of ten identities are unchanged, which is the check that this widened two
+    # arms and not the registry's shape.
+    "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "017bf3f92a5c",
     "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
     # `naming` moved 8dfd2c87af4d -> ee245f077b7e on 2026-09-13, deliberately: the arm was
     # calibrated to "what the local family already does" and stayed silent 13/13 reps on a
@@ -161,7 +169,7 @@ EXPECTED_SPEC_IDENTITY = {
     # advisory ask on an emerging one. Nine of ten identities are unchanged, which is the
     # check that this touched one arm and not the registry's shape.
     "generality": "ef5c1b06333a", "naming": "ee245f077b7e", "proof_golf": "854c179f8da7",
-    "proof_idiom": "d0d4b417257d", "style": "d82d80097e5a",
+    "proof_idiom": "d0d4b417257d", "style": "ba219a5656d0",
 }
 
 
@@ -173,15 +181,22 @@ def test_spec_identities_are_unchanged():
 
 
 def test_the_arms_that_may_look_beyond_declarations_still_can():
-    """`docs` reaches module docs; `style` reaches module docs and placement. Every other arm
-    sees declarations only. This is the field that vanished."""
+    """`docs` reaches documentation; `style` reaches documentation and placement. Every other
+    arm sees declarations only. This is the field that vanished.
+
+    `doc_comment` and `attribute` are named here too: a declaration's own docstring is
+    documentation and its attributes are placement, and filing both under `command` is what
+    made them unschedulable.
+    """
 
     from src.mathlib_review.agenda.arms import v5_specs
 
     kinds = {spec.spec_id: spec.subject_kinds for spec in v5_specs()}
-    assert "module_doc" in kinds["docs"]
-    assert {"module_doc", "namespace_or_section", "command", "import"} <= kinds["style"]
+    assert {"module_doc", "doc_comment"} <= kinds["docs"]
+    assert {"module_doc", "doc_comment", "namespace_or_section", "command", "import",
+            "attribute"} <= kinds["style"]
     assert "module_doc" not in kinds["naming"]
+    assert "doc_comment" not in kinds["naming"]
 
 
 def test_nothing_but_the_registry_names_an_arm_when_building_specs():

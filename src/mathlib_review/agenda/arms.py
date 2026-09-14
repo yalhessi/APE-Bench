@@ -35,7 +35,7 @@ from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_byt
 
 from src.mathlib_review.agenda.registry import (
     ARM_DEFINITIONS, UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
-    MODULE_DOC_KINDS as _MODULE_DOC_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
+    DOCUMENTATION_KINDS as _DOCUMENTATION_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
 )
 from src.mathlib_review.schema.review import CONTEXT_TOOLS, ReviewArm
 
@@ -79,7 +79,7 @@ V5_SPEC_VERSION = "focused/1-v5"
 
 #: Declared in `arm_registry` with the arms that use them; re-exported because callers here
 #: and in the tests import them from this module.
-MODULE_DOC_KINDS = _MODULE_DOC_KINDS
+DOCUMENTATION_KINDS = _DOCUMENTATION_KINDS
 PLACEMENT_KINDS = _PLACEMENT_KINDS
 
 

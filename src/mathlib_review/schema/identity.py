@@ -381,6 +381,11 @@ SubjectKind = Literal[
     "command",
     "import",
     "module_doc",
+    #: A declaration's own doc-comment and attributes, split out of `command` by
+    #: `cg1_builder_v3`. This Literal is the fifth list that enumerates kinds, and it is the one
+    #: that fails loudly -- the other four dropped the new values in silence.
+    "doc_comment",
+    "attribute",
     "namespace_or_section",
     "non_lean",
     "unknown",

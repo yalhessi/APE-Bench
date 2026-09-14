@@ -32,7 +32,8 @@ from src.mathlib_review.agenda.components import ReviewComponent
 #: positions are the whole answer to a placement question — PR 33362 asks to move
 #: declarations inside `namespace Complex`, which is visible only as the ordering of a
 #: `namespace` marker against the declarations around it.
-STRUCTURE_KINDS = ("module_doc", "namespace", "section", "command", "import")
+STRUCTURE_KINDS = ("module_doc", "doc_comment", "attribute", "namespace", "section",
+                   "command", "import")
 
 #: How many structural entries a skeleton may carry before it is truncated. A skeleton is
 #: orientation, not the file.

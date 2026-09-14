@@ -115,8 +115,14 @@ def _arm(arm_id: str, concern: str, issue_kind: str, rationale: str, **kwargs) -
 
 #: Changed things that are not declarations. Named here rather than in `arms.py` so an arm's
 #: whole contract, including what it is allowed to look at, reads in one place.
-MODULE_DOC_KINDS = frozenset({"module_doc"})
-PLACEMENT_KINDS = frozenset({"namespace_or_section", "command", "import"})
+#: Documentation, whether the module's or a declaration's own. `doc_comment` joined when
+#: `cg1_builder_v3` stopped filing a declaration's `/-- … -/` under `command`: the arm chartered
+#: for documentation could not otherwise be scheduled on the 59 doc-comments in
+#: `dev-medium-0.4.0`, which is exactly where PR 33321's two documentation obligations live.
+DOCUMENTATION_KINDS = frozenset({"module_doc", "doc_comment"})
+#: Where a changed thing sits. `attribute` joined for the same reason, and belongs here because
+#: the style arm's own rationale already claims attribute placement.
+PLACEMENT_KINDS = frozenset({"namespace_or_section", "command", "import", "attribute"})
 
 
 #: Every arm v5 can schedule. The generalist is deliberately absent: it has no concern filter,
@@ -180,7 +186,7 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          "settle.\nA docstring that is merely terse is not a finding. Neither is a "
          "cross-reference you have not opened and confirmed is wrong.",
          context_tools=("precedent_search", "zulip_search"),
-         extra_subject_kinds=MODULE_DOC_KINDS),
+         extra_subject_kinds=DOCUMENTATION_KINDS),
     _arm("style", "style", "style_norm_violation",
          "Is this formatted and placed the way the surrounding file does it? Only a deviation "
          "from a convention the file is otherwise consistent about — including where a "
@@ -197,7 +203,7 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          # ran, produced one candidate and did not make this ask -- an arm-quality question,
          # not a missing-arm one.
          expected_concerns=("style", "scope"),
-         extra_subject_kinds=MODULE_DOC_KINDS | PLACEMENT_KINDS),
+         extra_subject_kinds=DOCUMENTATION_KINDS | PLACEMENT_KINDS),
     _arm("api_reuse", "duplication", "missed_canonical_api",
          "Does the code re-derive something the library already provides, or spell an existing "
          "API the long way? Smaller and commoner than whole-declaration duplication, and "
