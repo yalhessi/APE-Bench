@@ -1,16 +1,20 @@
-"""A rendered prompt says each thing once.
+"""A rendered prompt says each thing once, and says it about the target it is for.
 
-Measured on smoke4's 143 prompts before this change: 44% of all prompt text was a verbatim
-repeat of text already in the same prompt — 32% diff hunks re-pasted once per review target,
-13% the maintainer checklist appended to every target. The mean prompt carried 1.8 distinct
-hunks across 3.4 targets, and one `api_reuse` job carried six targets, one unique hunk, and
-16,710 duplicate characters out of 33,174.
+Two rounds of the same defect. Within one prompt, measured on smoke4's 143 prompts: 44% of all
+prompt text was a verbatim repeat of text already in that prompt — 32% diff hunks re-pasted once
+per review target, 13% the checklist appended to every target. That is not only cost; the
+`family_design` arm on PR 33117 was handed the same 100-line diff five times and ran out of
+budget mid-review.
 
-That is not only cost. The `family_design` arm on PR 33117 was handed the same 100-line diff
-five times and then ran out of budget mid-review.
+Across prompts, measured on the 12-PR held-out lead run: `### Exact changed fragments` was 43.6%
+of all rendered prompt characters and 95.5% of its volume was a re-send of a block another job
+for the same PR already carried, because the section held the raw `@@` hunks and a target in a
+single-hunk file inherits the whole file diff. PR 33149 shipped one 17,303-char hunk to 120 jobs
+that each review one declaration. Scoping the section to the target's own regions removes 94.0%
+of `dev-medium-0.3.0`'s fragment characters and 73.8% of the arm pool's target-block volume.
 
-These tests assert the structural property — each payload appears once — rather than a
-percentage, which would be an incidental number that drifts with the fixture.
+These tests assert the structural properties — each payload appears once, and a target's diff is
+about that target — rather than percentages, which drift with the fixture.
 """
 
 from __future__ import annotations
@@ -20,8 +24,11 @@ from pathlib import Path
 import pytest
 
 from src.mathlib_review.io import load_jsonl
-from src.mathlib_review.agenda.render_focused import _target_blocks
-from src.mathlib_review.agenda.render_focused import FOCUSED_FACET_CHECKLIST
+from src.mathlib_review.agenda.render_prompts import (
+    FACET_CHECKLIST_ONCE,
+    target_blocks,
+    target_diff_section,
+)
 from src.mathlib_review.schema import (
     ChangeGraph, ReviewEpisodeInput, ReviewWorkUnit,
 )
@@ -49,11 +56,11 @@ def test_a_shared_hunk_is_printed_once_and_pointed_at_afterwards():
     hunk."""
 
     hunk = "@@ -1,3 +1,9 @@\n+lemma neg : True := trivial\n+lemma fun_neg : True := trivial\n"
-    blocks = _target_blocks([
+    blocks = target_blocks([
         _Target("c1", "Meromorphic.neg", hunk),
         _Target("c2", "Meromorphic.fun_neg", hunk),
         _Target("c3", "Meromorphic.add", hunk),
-    ])
+    ], scoped=False)
     rendered = "\n\n".join(blocks)
 
     assert rendered.count(hunk) == 1
@@ -68,24 +75,66 @@ def test_a_shared_hunk_is_printed_once_and_pointed_at_afterwards():
 def test_distinct_hunks_are_all_printed():
     """Deduplication must not drop a hunk a target actually needs."""
 
-    blocks = _target_blocks([
+    blocks = target_blocks([
         _Target("c1", "A", "@@ hunk one @@\n"),
         _Target("c2", "B", "@@ hunk two @@\n"),
-    ])
+    ], scoped=False)
     rendered = "\n\n".join(blocks)
     assert "@@ hunk one @@" in rendered
     assert "@@ hunk two @@" in rendered
     assert "Identical to the fragments" not in rendered
 
 
+def test_a_targets_diff_is_about_that_target():
+    """The scoped section shows the target's own change, not the hunk it happens to sit in.
+
+    `_Target` gives every target the same file-wide hunk and its own reviewed region, which is
+    the shape that made this section 43.6% of a run's prompt characters: three targets, one
+    17,000-char-style hunk, three copies.
+    """
+
+    hunk = ("@@ -1,3 +1,9 @@\n+lemma neg : True := trivial\n"
+            "+lemma fun_neg : True := trivial\n+lemma add : True := trivial\n")
+    blocks = target_blocks([
+        _Target("c1", "Meromorphic.neg", hunk),
+        _Target("c2", "Meromorphic.fun_neg", hunk),
+    ], scoped=True)
+    rendered = "\n\n".join(blocks)
+
+    assert hunk not in rendered, "the raw file-wide hunk is still being pasted"
+    # Each target's own reviewed region is what it is shown, as an addition.
+    assert "+lemma Meromorphic.neg : True := trivial" in rendered
+    assert "+lemma Meromorphic.fun_neg : True := trivial" in rendered
+    # Distinct diffs, so neither is deduplicated away.
+    assert "Identical to the fragments" not in rendered
+
+
+def test_a_target_with_no_regions_keeps_its_raw_hunk():
+    """Import blocks carry no semantic entities, so the hunk is the only record of the change.
+
+    Falling through to an empty diff would show the arm a blank change; on
+    `dev-medium-0.3.0` this exception is 17 of 508 targets and 2,195 of 2,583,336 fragment
+    characters.
+    """
+
+    target = _Target("c1", "Mathlib/X.lean", "@@ -1 +1,2 @@\n+import Mathlib.Tactic.ToFun\n")
+    target.kind = "import"
+    target.declaration_name = None
+    target.base_code = None
+    target.reviewed_code = None
+
+    assert "+import Mathlib.Tactic.ToFun" in target_diff_section(target)
+
+
 @pytest.fixture(scope="module")
 def arm_prompts():
     """Every specialist prompt the agenda renders for the smoke4 PRs.
 
-    Only the focused renderer is deduplicated. `render_prompts.FACET_CHECKLIST` and the
-    production target block keep their per-target form on purpose: they are hashed into every
-    frozen `rendered_prompts.jsonl`, so editing them moves every prompt hash in every release at
-    once. The generalist path still carries the repetition until a release is re-rendered.
+    `FACET_CHECKLIST` and the raw-hunk section keep their per-target form for every renderer
+    version that already exists, because they are hashed into every frozen
+    `rendered_prompts.jsonl`. The deduplicated and scoped forms are what the newer versions
+    select — `focused-prompt/3` for the arms this fixture renders, `candidate-prompt/13` for the
+    generalist, which reaches a release only through `rerender_release`.
     """
 
     from src.mathlib_review.schema import ModificationRecord, RenderedPrompt
@@ -116,7 +165,7 @@ def test_every_arm_prompt_carries_exactly_one_checklist(arm_prompts):
     assert arm_prompts, "no specialist prompts were rendered"
     for arm_id, prompt in arm_prompts:
         assert prompt.count("### Maintainer ask checklist") == 1, arm_id
-        assert prompt.count(FOCUSED_FACET_CHECKLIST) == 1, arm_id
+        assert prompt.count(FACET_CHECKLIST_ONCE) == 1, arm_id
 
 
 def test_no_arm_prompt_repeats_a_diff_hunk(arm_prompts):

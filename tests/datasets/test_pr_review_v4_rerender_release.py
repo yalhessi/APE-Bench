@@ -82,3 +82,39 @@ def test_the_evaluation_denominator_is_unchanged():
 
     assert included(NEW) == included(OLD)
     assert len(included(NEW)) == 40
+
+
+def test_a_frozen_release_still_renders_to_the_hashes_it_recorded():
+    """Today's renderer must reproduce an old release's prompts byte for byte.
+
+    This is the invariant every renderer version exists to protect, and the one that breaks
+    silently: the prompt text is hashed into `derived/rendered_prompts.jsonl`, so editing a
+    shared constant in place — `SYSTEM_PROMPT`, `FACET_CHECKLIST`, the target block — moves
+    every prompt hash in every release at once, and nothing else in the suite notices. A new
+    behaviour therefore arrives as a new `candidate-prompt/N` that `renderer_number` selects,
+    never as an edit to what an existing N renders.
+
+    `dev-medium-0.3.0` is at `candidate-prompt/12`; `candidate-prompt/13` scopes each target's
+    diff, says each fragments section once, and states the checklist once below the targets.
+    """
+
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.agenda.render_prompts import render_work_unit
+    from src.mathlib_review.schema import (
+        ChangeGraph, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit,
+    )
+
+    graphs = {item.episode_id: item for item in
+              load_jsonl(NEW / "derived/change_graphs.jsonl", ChangeGraph)}
+    episodes = {item.episode_id: item for item in
+                load_jsonl(NEW / "input/episodes.jsonl", ReviewEpisodeInput)}
+    frozen = {item.work_unit_id: item for item in
+              load_jsonl(NEW / "derived/rendered_prompts.jsonl", RenderedPrompt)}
+    units = load_jsonl(NEW / "derived/work_units.jsonl", ReviewWorkUnit)
+    assert units, "the release has no work units to re-render"
+
+    for unit in units:
+        rendered = render_work_unit(unit, episodes[unit.episode_id], graphs[unit.episode_id])
+        assert rendered.prompt_sha256 == frozen[unit.work_unit_id].prompt_sha256, (
+            f"{unit.work_unit_id} at {unit.renderer_version} no longer renders to its "
+            "recorded hash")

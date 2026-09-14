@@ -1,9 +1,10 @@
 """Single production renderer for both prompt previews and task execution."""
 
 import argparse
+import difflib
 import json
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once
 from src.mathlib_review.schema import ChangeGraph, PromptPrecedent, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit
@@ -91,6 +92,106 @@ Consider every item, but emit a candidate only for a concrete change you would a
 Do not report that an item was checked, does not apply, or is merely worth investigating."""
 
 
+#: The same checklist, addressed to every target at once instead of repeated under each.
+#:
+#: The per-target wording above is hashed into every frozen `rendered_prompts.jsonl`, so it is
+#: never edited in place; a renderer version chooses between them.
+FACET_CHECKLIST_ONCE = FACET_CHECKLIST.replace(
+    "### Maintainer ask checklist for this target\n"
+    "Consider every item, but emit a candidate only for a concrete change you would actually "
+    "request.",
+    "### Maintainer ask checklist\n"
+    "Apply every item to every review target above, but emit a candidate only for a concrete "
+    "change you would actually request.",
+)
+
+
+def target_diff_section(target: Any) -> str:
+    """The `Exact changed fragments` body for one target, scoped to that target.
+
+    `diff_fragments` holds the raw `@@` hunks covering the target's changed ranges, so a target
+    in a single-hunk file inherits the whole file's diff. On PR 33149 that is one 17,303-char
+    hunk shipped to all 120 jobs, each reviewing one declaration averaging 163 characters — a
+    106:1 ratio of pasted diff to reviewed code — and across a 12-PR lead repetition the section
+    is 43.6% of all rendered prompt characters with 95.5% of its volume a re-send of a block
+    another job for the same PR already carries. Caching does not absorb it: the prompt diverges
+    at the change-id line, which precedes this section.
+
+    A target is by definition not a fragment, so the section is rendered from the target's own
+    two complete regions instead — the choice `analysis/review_overlay._pretty_diff` already
+    makes for the overlay, for the same stated reason.
+
+    Import blocks are the one kind with nothing to diff: `base_code` and `reviewed_code` are
+    built from semantic entities and an import block has none, so they keep the raw hunk, which
+    is the only record of what changed there. Measured over `dev-medium-0.3.0` that exception is
+    17 of 508 targets and 2,195 of 2,583,336 fragment characters. An empty diff falls back the
+    same way, so a target can never be shown a blank change.
+    """
+
+    raw = f"```diff\n{''.join(target.diff_fragments)}\n```"
+    base = target.base_code or ""
+    reviewed = target.reviewed_code or ""
+    if not base and not reviewed:
+        return raw
+    lines = list(difflib.unified_diff(
+        base.splitlines(), reviewed.splitlines(), lineterm="", n=3))
+    # `unified_diff` emits `--- ` / `+++ ` headers even with no file names given; the path is
+    # already in the target block's own header.
+    if lines[:1] and lines[0].startswith("---"):
+        lines = lines[2:] if lines[1:] and lines[1].startswith("+++") else lines[1:]
+    if not lines:
+        return raw
+    return "```diff\n" + "\n".join(lines) + "\n```"
+
+
+def target_block(target: Any, fragments_section: Optional[str] = None) -> str:
+    """One `## Review target` block, shared by the generalist and focused renderers.
+
+    The two renderers emitted this byte-for-byte independently until the fragment scoping
+    landed; it lives here because `render_focused` imports this module and not the reverse.
+    """
+
+    base = target.base_code if target.base_code is not None else "(not present)"
+    reviewed = target.reviewed_code if target.reviewed_code is not None else "(not present)"
+    if fragments_section is None:
+        fragments_section = f"```diff\n{''.join(target.diff_fragments)}\n```"
+    return (
+        f"## Review target\nChange ID (copy exactly): `{target.change_id}`\n"
+        f"Path: {target.path}\nKind: {target.kind}\n"
+        f"Primary subject (copy exactly): `{target.declaration_name or target.path}`\n"
+        f"Primary entity IDs (copy one, or null if none): "
+        f"{', '.join(target.reviewed_entity_ids + target.base_entity_ids) or '(none)'}\n"
+        f"### Complete base region\n```lean\n{base}\n```\n"
+        f"### Complete reviewed region\n```lean\n{reviewed}\n```\n"
+        f"### Exact changed fragments\n{fragments_section}"
+    )
+
+
+def target_blocks(targets: Iterable[Any], *, scoped: bool) -> List[str]:
+    """One block per target, with each distinct fragments section printed exactly once.
+
+    The first target to use a section prints it; a later target whose section is identical gets
+    a pointer to that target's subject. Under `scoped` the sections are per-target diffs and
+    rarely repeat, so the pointer is mostly inert there — it still fires for genuinely identical
+    changes, and it is what collapses a shared hunk when a target falls back to the raw form.
+    """
+
+    first_use: Dict[str, str] = {}
+    blocks: List[str] = []
+    for target in targets:
+        section = target_diff_section(target) if scoped else (
+            f"```diff\n{''.join(target.diff_fragments)}\n```")
+        subject = target.declaration_name or target.path
+        owner = first_use.get(section)
+        if owner is None:
+            first_use[section] = subject
+            blocks.append(target_block(target, section))
+        else:
+            blocks.append(target_block(
+                target, f"Identical to the fragments shown for `{owner}` above."))
+    return blocks
+
+
 GENERIC_MAINTAINER_EXEMPLARS = """# Synthetic maintainer-request exemplars
 These examples teach specificity and register only. They are not evidence or patterns to copy unless
 the reviewed target independently supports the same request.
@@ -160,22 +261,17 @@ def render_work_unit(
     precedents: Iterable[PromptPrecedent] = (),
 ) -> RenderedPrompt:
     targets = _index(graph.targets, "change_id")
-    blocks = []
-    for change_id in unit.change_ids:
-        target = targets[change_id]
-        base = target.base_code if target.base_code is not None else "(not present)"
-        reviewed = target.reviewed_code if target.reviewed_code is not None else "(not present)"
-        blocks.append(
-            f"## Review target\nChange ID (copy exactly): `{change_id}`\n"
-            f"Path: {target.path}\nKind: {target.kind}\n"
-            f"Primary subject (copy exactly): `{target.declaration_name or target.path}`\n"
-            f"Primary entity IDs (copy one, or null if none): "
-            f"{', '.join(target.reviewed_entity_ids + target.base_entity_ids) or '(none)'}\n"
-            f"### Complete base region\n```lean\n{base}\n```\n"
-            f"### Complete reviewed region\n```lean\n{reviewed}\n```\n"
-            f"### Exact changed fragments\n```diff\n{''.join(target.diff_fragments)}\n```"
-            f"\n{FACET_CHECKLIST}"
-        )
+    unit_targets = [targets[change_id] for change_id in unit.change_ids]
+    # `candidate-prompt/13` scopes each target's diff to that target, says each distinct
+    # fragments section once, and moves the checklist below the targets instead of repeating it
+    # under every one. Measured on `dev-medium-0.3.0`, the scoping alone removes 94.0% of the
+    # release's fragment characters. Earlier versions keep the per-target hunk and the repeated
+    # checklist, so every frozen `rendered_prompts.jsonl` re-renders byte-identically.
+    scoped = renderer_number(unit.renderer_version) >= 13
+    if scoped:
+        blocks = target_blocks(unit_targets, scoped=True) + [FACET_CHECKLIST_ONCE]
+    else:
+        blocks = [f"{target_block(target)}\n{FACET_CHECKLIST}" for target in unit_targets]
     treatment = ""
     if unit.renderer_version == "candidate-prompt/9":
         treatment = f"{GENERIC_MAINTAINER_EXEMPLARS}\n\n"
