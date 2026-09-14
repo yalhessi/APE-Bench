@@ -1,0 +1,25 @@
+# Judge for the held-out twelve on `dev-medium-0.4.0`.
+#
+# The release override is the whole point of this file. `cg1_builder_v3` re-anchored 85
+# `change_id`s, and the judge pairs a finding to an obligation by anchor, so scoring a 0.4.0 run
+# against 0.3.0's gold would silently fail to pair exactly the targets this release changed.
+# Same 43 obligations either way -- they were carried through the re-anchoring, not re-cut.
+
+extends: bases/v5_judge.yaml
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-medium-0.4.0
+  pr_numbers:
+  - 33117
+  - 33145
+  - 33149
+  - 33285
+  - 33294
+  - 33305
+  - 33321
+  - 33337
+  - 33362
+  - 33421
+  control_pr_numbers:
+  - 33304
+  - 33315
