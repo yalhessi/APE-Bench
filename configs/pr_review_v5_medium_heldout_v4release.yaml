@@ -1,0 +1,48 @@
+# The held-out twelve on `dev-medium-0.4.0` -- the same PRs, the same policy, the rebuilt
+# release.
+#
+# `0.4.0` differs from `0.3.0` in three ways that all move `wu:` identities, which is why it is
+# a separate config rather than an edit: a declaration's doc-comment and attributes are named
+# and packed with it (`cg1_builder_v3`), the packing budget charges a shared hunk once per unit
+# (203 work units -> 92 over these twelve), and the generalist renders at `candidate-prompt/13`.
+# Nothing here joins to a run recorded against 0.3.0.
+#
+# Reviewed workspaces carry over: `input/episodes.jsonl` is byte-identical between the two
+# releases, so the 12 prebuilt `<base>+<fp>` workspaces still apply and need no rebuild.
+
+extends: bases/v5_generation.yaml
+
+dataset:
+  release: inputs/pr_review_v4/releases/dev-medium-0.4.0
+  modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v4-medium/derived/modification_inventory.jsonl
+
+  pr_numbers:
+  - 33117
+  - 33145
+  - 33149
+  - 33285
+  - 33294
+  - 33304
+  - 33305
+  - 33315
+  - 33321
+  - 33337
+  - 33362
+  - 33421
+
+  # Measured by preflight on this set: mandatory floor $14.20 (uncapped per PR by design) plus
+  # up to $18.00 discretionary (12 PR x $1.50) = $32.20 worst case. The base's $10.00 is
+  # calibrated for the 4-PR smoke set and is BELOW THE FLOOR ALONE, so `run` refused this
+  # config outright -- the cap doing its job, on a dry run, before the first model call.
+  #
+  # A ceiling, not an estimate: the worst case assumes every PR exhausts its discretionary
+  # allowance, which no run has done. Measured actual is $0.784/PR billed (heldout11_rep2),
+  # about $9.40 for the set. `run_total_cost_cap` is not a field of `V5RunPlan`, so raising it
+  # moves no plan hash and leaves this set's runs comparable to their own history.
+  run_total_cost_cap: 35.00
+
+  # All 12 reviewed workspaces for this set exist (built 2026-09-12, 144-997 s each, 74.9 min
+  # sequential), so a run here must verify in them: a missing one is refused at preflight
+  # instead of quietly compiling against base .oleans. Rebuild after any release re-render:
+  #   ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --execute --config <this file>
+  require_reviewed_workspaces: true

@@ -467,6 +467,8 @@
     "inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium/manifest.json": "8bec06b75bdb08298520b82b817e60fd13c5715af3a05f0e57e130bd65fd5deb",
     "inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium/method_expression_contracts.jsonl": "8ddd991c1c1bd804e2613e3853675780a3c921ad4c722ca24843d2c206542458",
     "inputs/pr_review_v4/treatments/systematic-opportunities-v3-medium/methods.jsonl": "c864ddbe148f7daef224074580a491e71e44e55157e622683a18596f94c57fc4",
+    "inputs/pr_review_v4/treatments/systematic-opportunities-v4-medium/derived/modification_inventory.jsonl": "135ab7642655fb9212fbe681ce341730ca4d9b4b443203c0e0d448e06f6eb460",
+    "inputs/pr_review_v4/treatments/systematic-opportunities-v4-medium/derived/modification_inventory_report.json": "bc32c70c4c9c714d2a5a21155fedb3e8bd374fa2011a7d37d0cc0e12e0ed2045",
     "results/pr_review_v4/audits/b1-naming-generalization-feasibility.md": "7adfe28c746c6b9a85dab7e48852196d577e6957d37be67d9abec55fb95a3623",
     "results/pr_review_v4/audits/convention-class-reach.md": "80ca9edd8161d0c844e3a6614eb5e76ddb10dd8247557109a282122125203515",
     "results/pr_review_v4/audits/dev-events-0.2.1.json": "36deb27bbf9da11af68e6f2acedb07f2f3d483d8dd8c74351bcccde8c59e7d74",
