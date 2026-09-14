@@ -105,3 +105,23 @@ def test_packing_charges_a_shared_hunk_once_per_unit(graphs):
     by_pr_old = sum(1 for unit in old if unit.pr_number == 33145)
     by_pr_new = sum(1 for unit in new if unit.pr_number == 33145)
     assert by_pr_new < by_pr_old
+
+
+def test_a_hunk_shared_across_a_whole_pr_is_charged_once_per_unit_not_once_per_unit_boundary(graphs):
+    """The fragment dedup has to survive a unit boundary.
+
+    PR 33149 is one file, 108 targets, and exactly ONE distinct 17,303-char hunk. The first
+    version of this packer recomputed a bundle's size when it flushed a unit but carried the
+    stale fresh-fragment set into the new one, so each new unit started without the hunk
+    registered and was charged for it again on its very next bundle. It packed into 31 units;
+    the dedup it implements predicts 12, which is what an independent repack of the release
+    computed before any of this was written.
+
+    The held-out twelve go from 203 units to 92 under the same fix.
+    """
+
+    units = build_work_units(graphs, renderer_version="candidate-prompt/13")
+    for_33149 = [unit for unit in units if unit.pr_number == 33149]
+    assert for_33149, "PR 33149 is not in this release"
+    assert len(for_33149) <= 15, (
+        f"{len(for_33149)} units for a PR with one distinct hunk — the dedup is being reset")

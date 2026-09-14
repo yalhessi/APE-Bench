@@ -3,7 +3,7 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once
 from src.mathlib_review.schema import ChangeGraph, ChangeTarget, ReviewWorkUnit
@@ -60,29 +60,41 @@ def _pack_bundles(graph: ChangeGraph) -> List[List[ChangeTarget]]:
         head = by_id.get(owner) or members[0]
         ordered.append((head.path, owner, members))
 
+    def cost(members: Sequence[ChangeTarget], seen: Set[str]) -> Tuple[int, Set[str]]:
+        """What this bundle adds to a unit that has already been charged for `seen`.
+
+        Returns the fresh fragments as well as the size, because the two have to be recomputed
+        together. Deriving one against the old unit's `seen` and then carrying it into a new one
+        is what made PR 33149 pack into 31 units instead of 4: its 108 targets share a single
+        17,303-char hunk, the first unit charged it, every later bundle was correctly charged
+        nothing -- and then the new unit inherited an empty fresh-set, never registered the hunk,
+        and charged it again on the very next bundle.
+        """
+
+        size = 0
+        fresh: Set[str] = set()
+        for target in members:
+            for fragment in target.diff_fragments:
+                if fragment not in seen and fragment not in fresh:
+                    fresh.add(fragment)
+                    size += len(fragment)
+            size += len(target.base_code or "") + len(target.reviewed_code or "") + 500
+        return size, fresh
+
     groups: List[List[ChangeTarget]] = []
     current: List[ChangeTarget] = []
     current_path: Optional[str] = None
     current_chars = 0
-    seen_fragments: set = set()
+    seen_fragments: Set[str] = set()
     for path, _owner, members in sorted(ordered, key=lambda row: (row[0], row[1])):
-        size = 0
-        fragments = set()
-        for target in members:
-            for fragment in target.diff_fragments:
-                if fragment not in seen_fragments and fragment not in fragments:
-                    fragments.add(fragment)
-                    size += len(fragment)
-            size += len(target.base_code or "") + len(target.reviewed_code or "") + 500
+        size, fresh = cost(members, seen_fragments)
         if current and (path != current_path
                         or current_chars + size > MAX_TARGET_CONTENT_CHARS):
             groups.append(current)
             current, current_chars, seen_fragments = [], 0, set()
-            size = sum(len(f) for target in members for f in set(target.diff_fragments))
-            size += sum(len(t.base_code or "") + len(t.reviewed_code or "") + 500
-                        for t in members)
+            size, fresh = cost(members, seen_fragments)
         current.extend(members)
-        seen_fragments |= fragments
+        seen_fragments |= fresh
         current_path, current_chars = path, current_chars + size
     if current:
         groups.append(current)
