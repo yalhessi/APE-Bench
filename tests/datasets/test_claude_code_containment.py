@@ -110,6 +110,11 @@ def test_a_review_workspace_resolves_git_upward_into_this_repository():
 
     If this ever fails because the run root moved outside the repository, that is the fix
     landing, not a broken test -- relocate the assertion, do not delete it.
+
+    The tree git resolves to is not always this one: in a worktree `.ape/` is a symlink to the
+    main checkout's store (`.claude/worktree-setup.sh`), so git resolves into *that* checkout.
+    The hazard is unchanged -- what matters is that the tree reached holds gold, not which tree
+    it is -- so that is what is asserted.
     """
 
     import subprocess
@@ -123,6 +128,8 @@ def test_a_review_workspace_resolves_git_upward_into_this_repository():
     if top.returncode != 0:
         pytest.skip("git unavailable")
 
-    assert Path(top.stdout.strip()) == REPO
-    assert (REPO / "inputs/pr_review_v4/releases").is_dir(), (
+    resolved = Path(top.stdout.strip())
+    assert resolved in (REPO, Path(runs_root.resolve()).parent), (
+        f"`.ape/` resolved to an unrelated work tree: {resolved}")
+    assert (resolved / "inputs/pr_review_v4/releases").is_dir(), (
         "the upward work tree is the one holding gold")
