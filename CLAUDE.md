@@ -11,6 +11,11 @@ many threads, some abandoned. Read the record before proposing anything that sou
 - `docs/plans/STATUS.md` — every planned item marked built / partial / not built, checked against the tree.
 - `docs/dead-ends.md` — abandoned threads and retracted conclusions, each with what would reopen it.
   **Check it before starting, or "rediscovering", a direction.** If a proposal is on that list, say so.
+- `docs/todo/README.md` — the open hypotheses: what is worth doing, the motivating result that made
+  it interesting, and what would close it. **Read it with `dead-ends.md` before proposing a
+  direction**, and when a session surfaces a hypothesis it will not pursue, write it there before the
+  session ends. Every entry carries its motivating example; one with no measurement behind it is a
+  wish and does not go in.
 - `docs/plans/<date>-*.md` are plans kept verbatim; `docs/research/` holds designs and result write-ups.
 - Commit bodies carry the reasoning and the measurements; `git log` is the primary document.
 - Auto-memory holds only the user's preferences, funder context and external references. Project
