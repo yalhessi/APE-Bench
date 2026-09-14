@@ -157,6 +157,13 @@ class SemanticEntity(StrictModel):
 
 ChangeTargetKind = Literal[
     "declaration",
+    #: A declaration's own `/-- … -/` doc-comment and its `@[…]` attributes are parsed as
+    #: separate entities, so they arrive here as separate targets. They were all `command`
+    #: until 2026-09-14, which made 85% of that bucket unlabelled parts of a declaration:
+    #: on `dev-medium-0.3.0`, 59 doc-comments and 26 attributes against 6 real commands.
+    #: `attached_to` names the declaration each belongs to; see `ChangeTarget`.
+    "doc_comment",
+    "attribute",
     "command",
     "import",
     "module_doc",
@@ -186,6 +193,17 @@ class ChangeTarget(StrictModel):
     base_code: Optional[str] = None
     reviewed_code: Optional[str] = None
     context_refs: List[str] = Field(default_factory=list)
+    #: For a `doc_comment` or `attribute`, the `change_id` of the declaration it documents or
+    #: decorates. Deliberately OUTSIDE the identity payload, so adding it moved no `change_id`.
+    #:
+    #: It exists because severing the two is a measured recall defect, not a tidiness problem.
+    #: On PR 33321 the doc-comment for `IsMulIndecomposable.baseOf` landed in a different work
+    #: unit from the declaration (`wu:d60bad80…` against `wu:07d1ab97…`), and 38 of 59
+    #: doc-comments sat in a unit holding no declaration at all. While the prompt pasted the
+    #: raw `@@` hunk that defect was invisible — the hunk happened to carry both — and scoping
+    #: each target's diff to itself exposed it as two lost obligations, both of which every
+    #: baseline repetition had found.
+    attached_to: Optional[str] = None
     parse_status: Literal["semantic", "structural", "unparsed"]
     source_sha256: str
 

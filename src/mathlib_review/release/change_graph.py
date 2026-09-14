@@ -23,7 +23,12 @@ from src.mathlib_review.schema import (
 )
 
 
-CHANGE_GRAPH_BUILDER_VERSION = "cg1_builder_v2"
+#: `v3` names a declaration's doc-comment and attributes instead of filing them under
+#: `command`, and records which declaration each belongs to. `kind` is inside a target's
+#: identity payload, so every reclassified target has a new `change_id`: on
+#: `dev-medium-0.3.0` that is the 85 doc-comment and attribute targets, of which gold anchors
+#: on exactly one. Declarations keep their ids, and with them 118 of 122 gold anchors.
+CHANGE_GRAPH_BUILDER_VERSION = "cg1_builder_v3"
 LEAN_PARSER_VERSION = "ape_lean_major_decl_v1"
 _HUNK_RE = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
 _DIFF_RE = re.compile(r"^diff --git a/(.*?) b/(.*)$")
@@ -358,16 +363,34 @@ def _source_entities(side: str, path: str, source: str) -> List[SemanticEntity]:
     return sorted([*declarations, *regions], key=lambda item: (item.span.line_start, item.entity_id))
 
 
+def _command_kind(code: str) -> str:
+    """Name what a `command` entity actually is.
+
+    `command` was the bucket everything unrecognised fell into, and it was overwhelmingly not
+    commands: on `dev-medium-0.3.0` it held 59 doc-comments and 26 attributes against 6 real
+    commands (`#check`, `#print axioms`). Both of the first two are parts of the declaration
+    that follows them, and calling them `command` is what let them be scheduled away from it.
+    """
+
+    stripped = code.lstrip()
+    if stripped.startswith("/-!"):
+        return "module_doc"
+    if stripped.startswith("/--") or stripped.startswith("/-"):
+        return "doc_comment"
+    if stripped.startswith("@["):
+        return "attribute"
+    if re.match(r"^(?:namespace|open|export)\b", stripped):
+        return "namespace"
+    if re.match(r"^(?:section|end|variable|variables|include|omit|attribute)\b", stripped):
+        return "section"
+    return "command"
+
+
 def _target_kind_for_entity(entity: SemanticEntity) -> str:
     if entity.kind in {"module_doc", "namespace", "section", "import"}:
         return entity.kind
     if entity.kind == "command":
-        stripped = entity.code.lstrip()
-        if re.match(r"^(?:namespace|open|export)\b", stripped):
-            return "namespace"
-        if re.match(r"^(?:section|end|variable|variables|include|omit|attribute)\b", stripped):
-            return "section"
-        return "command"
+        return _command_kind(entity.code)
     return "declaration"
 
 
@@ -400,7 +423,14 @@ def _structural_kind(path: str, item: ChangedRange) -> str:
         for line in nonempty
     ):
         return "command"
-    if any("/-!" in line or "-/" in line for line in nonempty):
+    # `/-!` opens a module doc and `/--` a declaration's doc-comment; the old rule keyed on
+    # either marker or a bare closing `-/` and called all of it `module_doc`. A bare `-/` still
+    # does, because on its own it says only that some block comment ended here.
+    if any("/-!" in line for line in nonempty):
+        return "module_doc"
+    if any(line.startswith("/--") for line in nonempty):
+        return "doc_comment"
+    if any("-/" in line for line in nonempty):
         return "module_doc"
     if all(re.match(r"^(?:namespace|open|export)\b", line) for line in nonempty):
         return "namespace"
@@ -457,6 +487,59 @@ def _target(
         parse_status="semantic" if semantic else "structural" if kind != "unparsed" else "unparsed",
         source_sha256=sha256_bytes(canonical_json_bytes(source)),
     )
+
+
+#: Kinds that are part of the declaration that follows them rather than sites in their own right.
+ATTACHABLE_KINDS = frozenset({"doc_comment", "attribute"})
+
+
+def _attach_to_declarations(
+    targets: Sequence[ChangeTarget], entities: Dict[str, SemanticEntity],
+) -> List[ChangeTarget]:
+    """Point each doc-comment and attribute at the declaration it belongs to.
+
+    A declaration's `/-- … -/` and its `@[…]` are separate parser entities, so they arrive as
+    separate targets and were scheduled as if they were separate review sites. On PR 33321 that
+    put the doc-comment for `IsMulIndecomposable.baseOf` in a different work unit from the
+    declaration, and 38 of 59 doc-comments in `dev-medium-0.3.0` sat in a unit with no
+    declaration at all. Two obligations every baseline repetition found were lost the moment the
+    prompt stopped pasting the raw `@@` hunk that had been reuniting them by accident.
+
+    In Lean both always precede what they qualify, so the owner is the next declaration in the
+    same file. An attachable target with no declaration after it keeps `attached_to` empty and
+    stays a site of its own — a doc-comment at the end of a file documents nothing.
+
+    `attached_to` is not part of the identity payload, so this moves no `change_id`.
+    """
+
+    def line_of(target: ChangeTarget) -> int:
+        spans = [entities[i].span.line_start
+                 for i in (*target.reviewed_entity_ids, *target.base_entity_ids)
+                 if i in entities]
+        return min(spans) if spans else 0
+
+    by_path: Dict[str, List[ChangeTarget]] = {}
+    for item in targets:
+        by_path.setdefault(item.path, []).append(item)
+
+    owner_of: Dict[str, str] = {}
+    for path_targets in by_path.values():
+        ordered = sorted(path_targets, key=lambda item: (line_of(item), item.change_id))
+        pending: List[ChangeTarget] = []
+        for item in ordered:
+            if item.kind in ATTACHABLE_KINDS:
+                pending.append(item)
+            elif item.kind == "declaration":
+                for waiting in pending:
+                    owner_of[waiting.change_id] = item.change_id
+                pending = []
+            else:
+                # A namespace, section or import between the two ends the run: whatever the
+                # comment was introducing, it is not the declaration on the far side.
+                pending = []
+    return [item.model_copy(update={"attached_to": owner_of.get(item.change_id)})
+            if item.change_id in owner_of else item
+            for item in targets]
 
 
 def build_change_graph(
@@ -643,6 +726,8 @@ def build_change_graph(
                 exclusion_reason=exclusion_reason,
             )
         )
+
+    targets = _attach_to_declarations(targets, all_entities)
 
     source_identity = {
         "episode_id": episode.episode_id,
