@@ -50,6 +50,21 @@ class LeanPRReviewV4CandidateData(BasePRReviewData):
 #: Declared once, as a Literal, so the tool schema enumerates it for the model and no second
 #: copy can drift: a closed vocabulary maintained in two places is this repo's most expensive
 #: recurring bug.
+#: How many times `forbid_abstention` presses before it accepts an empty submission anyway.
+#:
+#: It has to give up eventually. `termination_callback` fires on the success path alone, so an
+#: arm that never submits burns its turns and is recorded as failed — and a failed mandatory job
+#: is a coverage gap, which would turn "this arm had nothing" into a hole in the run and make the
+#: experiment unreadable. Three presses, then the refusal is recorded under its own reason so
+#: "pressed and still nothing" stays distinguishable from an ordinary abstention.
+_FORCED_SUBMISSION_ATTEMPTS = 3
+
+#: Assigned by the system, never offered to the model: it is not in `AbstentionReason` and does
+#: not appear in the tool schema. An arm reaches it only by being pressed
+#: `_FORCED_SUBMISSION_ATTEMPTS` times and still submitting nothing, which is the outcome the
+#: `forbid_abstention` experiment exists to count.
+FORCED_EMPTY_REASON = "nothing_found_under_duress"
+
 AbstentionReason = Literal[
     "nothing_of_this_kind_here",
     "already_correct",
@@ -574,6 +589,25 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             # looking properly and finding nothing — into a hole in the run, which is a far
             # worse error than an unlabelled silence. So the second empty submission is
             # accepted and labelled `unstated`, which the report already counts and shows.
+            # The diagnostic path. Press for a candidate rather than accept the abstention,
+            # a bounded number of times, and keep "pressed and still nothing" as its own
+            # outcome — collapsing it into `already_correct` would destroy the only signal
+            # that separates a high bar from an arm with nothing to say.
+            if not raw_candidates and getattr(self.data, "forbid_abstention", False):
+                self._forced_presses = getattr(self, "_forced_presses", 0) + 1
+                if self._forced_presses <= _FORCED_SUBMISSION_ATTEMPTS:
+                    return {"evaluation_result": EvaluationResult(
+                        success=False, score=0.0,
+                        message=(
+                            "This run is not accepting abstentions: submit the single best "
+                            "candidate you considered, even if you judged it below your "
+                            "usual bar, and set model_confidence to reflect how weak it is. "
+                            "Say what you would flag if you had to flag exactly one thing. "
+                            f"(attempt {self._forced_presses} of "
+                            f"{_FORCED_SUBMISSION_ATTEMPTS})"
+                        )),
+                        "message": "Abstention not accepted in this run"}
+                abstention_reason = FORCED_EMPTY_REASON
             if not raw_candidates and abstention_reason is None:
                 self._mute_abstentions = getattr(self, "_mute_abstentions", 0) + 1
                 if self._mute_abstentions == 1:

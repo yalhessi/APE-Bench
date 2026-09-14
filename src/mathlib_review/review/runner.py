@@ -178,6 +178,19 @@ class V5DatasetConfig(BaseModel):
     solo_context_tools: List[str] = Field(
         default_factory=lambda: ["zulip_search", "precedent_search", "declaration_search",
                                  "proof_profile"])
+    #: DIAGNOSTIC. Refuse arm abstentions, so every arm must name its best candidate however
+    #: weak. Never for a production run: it inverts the contract that makes the control PRs
+    #: measurable, and a control's whole value is that a correct reviewer emits nothing there.
+    #:
+    #: It exists because the abstention data cannot, on its own, separate three readings of the
+    #: 76% `already_correct` rate measured under `fanout`: a bar set too high, arms that cannot
+    #: see what maintainers want, or arms with genuinely nothing to say. Under duress those
+    #: predict different things — recall up; volume up and recall flat; neither moves.
+    #:
+    #: Put it in the run name as well as here. It changes what the run produces, and a resumed
+    #: run that silently disagreed with its own name would be worse than the experiment is worth.
+    forbid_abstention: bool = False
+
     #: The whole run's ceiling, in billed dollars. 0 disables it.
     #:
     #: The last unbounded budget. `per_pr_cost_cap` binds only *discretionary* work — the
@@ -1117,6 +1130,15 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         use_exposure_index=dataset.use_exposure_index,
         generalist_floor=dataset.generalist_floor,
     )
+    # Stamped on the payloads rather than passed through `RenderedPrompt`, because the prompt is
+    # sealed and hashed: routing an execution policy through it would move every prompt identity
+    # in the run and make this diagnostic incomparable with the runs it exists to explain. Only
+    # written when set, so an ordinary run's payloads stay byte-identical to their history.
+    if dataset.forbid_abstention:
+        logger.warning("forbid_abstention is ON — arms may not abstain. Diagnostic only: "
+                       "control PRs cannot measure precision in this run.")
+        for payload in pool.values():
+            payload["forbid_abstention"] = True
     assert_run_is_named(dataset)
     report = agenda_report(agenda)
 

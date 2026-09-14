@@ -243,3 +243,136 @@ def test_a_second_mute_submission_is_accepted_as_unstated(submit):
         "a second mute submission must not be refused again -- that is an infinite loop that "
         "ends in a failed job")
     assert recorded["abstention"]["reason"] == "unstated"
+
+
+# --- the forced-submission diagnostic ------------------------------------------------------
+#
+# Measured under `fanout` on 4 held-out PRs: specialists submitted on 16% of invocations (lead:
+# 19%) and 104 of 136 abstentions were `already_correct`, with `correctness` and `family_design`
+# filing nothing in 11 jobs each. That rate has three readings the abstention data cannot
+# separate -- a bar set too high, arms that cannot see what maintainers want, or arms with
+# nothing to say -- and under duress they predict different things.
+
+
+@pytest.fixture
+def forced():
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from tests.datasets.test_pr_review_v5_arm import _data
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
+
+    task = ReviewArmTask(_data(forbid_abstention=True), ApeAgentConfig())
+    mcp = FakeMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    return mcp.tools["submit_candidates"], task
+
+
+def test_an_abstention_is_refused_even_with_a_reason(forced):
+    """The ordinary contract accepts a reasoned abstention; this one does not. That is the
+    whole manipulation."""
+
+    tool, _task = forced
+    out = asyncio.run(tool(candidates=[], abstention_reason="already_correct",
+                           abstention_detail="Looked; the code is fine."))
+    assert out["evaluation_result"].success is False
+    assert "not accepting abstentions" in out["evaluation_result"].message
+
+
+def test_the_press_does_not_dictate_what_to_find(forced):
+    """It asks for the best candidate already considered and for confidence to carry the
+    weakness. An instruction to find a *particular kind* of problem would plant the finding
+    rather than measure whether the arm had one."""
+
+    tool, _task = forced
+    msg = asyncio.run(tool(candidates=[]))["evaluation_result"].message
+    assert "best candidate you considered" in msg
+    assert "below your usual bar" in msg
+    assert "model_confidence" in msg
+
+
+def test_it_gives_up_before_starving_the_job(forced):
+    """`termination_callback` fires on success alone, so an unbounded press would burn the
+    arm's turns, record the job as failed, and -- if mandatory -- make a coverage gap. That
+    would turn "this arm had nothing" into a hole in the run."""
+
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
+        FORCED_EMPTY_REASON, _FORCED_SUBMISSION_ATTEMPTS,
+    )
+
+    tool, task = forced
+    recorded = {}
+    original = task.create_result
+
+    def capture(**kwargs):
+        recorded.update(kwargs)
+        return original(**kwargs)
+
+    task.create_result = capture
+    for _ in range(_FORCED_SUBMISSION_ATTEMPTS):
+        assert asyncio.run(tool(candidates=[]))["evaluation_result"].success is False
+    final = asyncio.run(tool(candidates=[]))
+    assert final["evaluation_result"].success is True
+    assert recorded["abstention"]["reason"] == FORCED_EMPTY_REASON, (
+        "pressed-and-still-nothing must stay distinguishable from an ordinary abstention")
+
+
+def test_the_forced_reason_is_never_offered_to_the_model():
+    """It is an outcome the system assigns, not a choice. If it were in the tool schema an arm
+    could select it to escape the press, and the experiment would measure nothing."""
+
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
+        ABSTENTION_REASONS, FORCED_EMPTY_REASON,
+    )
+
+    assert FORCED_EMPTY_REASON not in ABSTENTION_REASONS
+
+
+def test_a_submission_with_candidates_is_unaffected(forced):
+    from tests.datasets.test_pr_review_v5_arm import _candidate
+
+    tool, _task = forced
+    out = asyncio.run(tool(candidates=[_candidate()]))
+    assert out["evaluation_result"].success is True
+
+
+def test_the_default_run_is_untouched(submit):
+    """The knob defaults off and an ordinary run must behave exactly as before, or every run
+    this diagnostic is compared against becomes incomparable."""
+
+    tool, _task = submit
+    out = asyncio.run(tool(candidates=[], abstention_reason="already_correct",
+                           abstention_detail="Looked; the code is fine."))
+    assert out["evaluation_result"].success is True
+
+
+def test_the_dataset_knob_exists_and_defaults_off():
+    from src.mathlib_review.review.runner import V5DatasetConfig
+
+    assert V5DatasetConfig.model_fields["forbid_abstention"].default is False
+
+
+def test_the_flag_survives_the_payload_hop_into_task_data():
+    """The hop that has silently dropped a value three times in this repo: a thing set in the
+    authoritative-looking place and lost by a layer nothing checks it against. Here the risk is
+    real in both directions -- task data is `extra='forbid'`, so an undeclared key would raise,
+    and a declared-but-unstamped one would read as "the experiment changed nothing"."""
+
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmData
+    from tests.datasets.test_pr_review_v5_arm import _data
+
+    payload = _data().model_dump(mode="json")
+    payload["forbid_abstention"] = True          # exactly what the runner stamps on the pool
+    assert ReviewArmData(**payload).forbid_abstention is True
+
+
+def test_the_fanout_path_carries_the_flag():
+    """`fanout` is the mode this experiment runs in, and it builds task data through its own
+    branch (`_direct_arm_task_data`) rather than the lead's."""
+
+    import inspect
+
+    from src.mathlib_review.review import runner
+
+    src = inspect.getsource(runner._direct_arm_task_data)
+    assert "dict(pool[proposal.invocation_id])" in src, (
+        "the fanout branch must copy the whole pool payload; a hand-built dict here would drop "
+        "any field the runner stamps")

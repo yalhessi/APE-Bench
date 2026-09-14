@@ -100,6 +100,16 @@ class BasePRReviewData(BaseLeanTaskData):
 
     task_type: str = Field(default="lean_pr_review_v2")
 
+    #: Diagnostic only: refuse an empty submission instead of recording an abstention, so the
+    #: arm must name its best candidate however weak. NOT a production setting — it inverts
+    #: the contract that makes control PRs measurable. It exists to separate three
+    #: explanations of the 76% `already_correct` rate that the abstention data alone cannot:
+    #: a bar set too high (recall rises under duress), arms that cannot see what maintainers
+    #: want (volume rises, recall flat), or arms with genuinely nothing to say (neither moves).
+    #: Bounded by `_FORCED_SUBMISSION_ATTEMPTS` so a refusal loop cannot turn a job into a
+    #: coverage gap — the failure d06a144 fixed for the ordinary path.
+    forbid_abstention: bool = Field(default=False)
+
     pr_number: int = Field(..., description="GitHub PR number")
     pr_title: str = Field(default="", description="PR title (model-visible, cleaned)")
     pr_description: str = Field(default="", description="PR description (model-visible, cleaned)")
