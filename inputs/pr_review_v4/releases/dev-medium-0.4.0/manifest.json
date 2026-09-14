@@ -1,21 +1,21 @@
 {
   "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
-  "created_at": "2026-09-14T18:57:13Z",
+  "created_at": "2026-09-14T20:13:12Z",
   "dataset_id": "mathlib-pr-review-v4-dev-medium",
   "derived_artifacts": [
     {
       "path": "derived/work_units.jsonl",
-      "records": 121,
+      "records": 101,
       "role": "candidate_work_units",
       "schema_version": "work-unit1",
-      "sha256": "046e056df10f07150882f798a7d749c1033c870ddfea89f8a26e36d31628a3d7"
+      "sha256": "6c8b772e2d9473e8d91028861b3655b3b8287e614cfe8f51082f90df33b714e5"
     },
     {
       "path": "derived/rendered_prompts.jsonl",
-      "records": 121,
+      "records": 101,
       "role": "production_prompt_preview",
       "schema_version": "rendered-prompt1",
-      "sha256": "e14963fd616861fb88d4d6b412db1f611ed06d4d3c54b44b04cd9976776e8ed3"
+      "sha256": "59c59014c9e00925c6afbb4f8e5df1d21be72baff3e5734c3241ae6572cbfb0a"
     },
     {
       "path": "derived/change_graphs.jsonl",
@@ -25,7 +25,7 @@
       "sha256": "c526a15df317d8803c2383ea1f88af9891df4b0ef37232eb238cbf1491e60b02"
     }
   ],
-  "generator_git_commit": "28a2bca9ea41afe1ecf427915fb4d3c5930d5cfb",
+  "generator_git_commit": "0584c5c784251fec09e6aae931a3f3a14a810bdc",
   "generator_tree_state": "dirty",
   "generator_versions": {
     "candidate_contract": "grounded-ask/1",

@@ -13,14 +13,14 @@
     "gold/intervention_scope_migrations.jsonl"
   ],
   "graphs_rebuilt": true,
-  "manifest_sha256": "2bb5a21c1c79660654f5c9d8a2322526f6402c67f94e961edfd63d901ff481f9",
+  "manifest_sha256": "dbab342a3910a0f5c25d798a347bb2ef4fbb57b94344a20a37dcf9b536533582",
   "parent": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
-  "prompt_hashes_changed": 121,
-  "prompts": 121,
+  "prompt_hashes_changed": 101,
+  "prompts": 101,
   "renderer_version": "candidate-prompt/13",
   "schema_version": "rerender-release-report1",
-  "units_carrying_paths": 121,
+  "units_carrying_paths": 101,
   "version": "rerender-release/1",
-  "work_unit_ids_changed": 121,
-  "work_units": 121
+  "work_unit_ids_changed": 101,
+  "work_units": 101
 }
