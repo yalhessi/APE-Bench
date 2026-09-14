@@ -1,6 +1,8 @@
 # Lead-mode prompt cost — one section is 43.6% of the prompt and 95% of it is a re-send
 
-**Status** — open; measurement complete and replicated across three reps
+**Status** — **renderer landed on `lead-prompt-cost` (`9d4de8f`); two steps remain.** The arms are
+scoped now (`focused-prompt/3`, live in every new run). The generalist moves only at
+`candidate-prompt/13`, which no release uses yet, and the billed effect is still unmeasured.
 **Cost** — no spend to measure; one rep to confirm the fix changes nothing else
 **Answer to the question asked** — the dominant part is *not* the instructions, the checklist or the
 schema. It is `### Exact changed fragments`.
@@ -70,14 +72,22 @@ runs 321 sessions to solo's 12.
 
 ## What would close it
 
-1. Bump the renderer version once and make **both** changes together, since both touch the hashed
-   target block: target-scope the fragments section, and (already understood, deliberately deferred
-   in `0e8fff9`) give the generalist the pointer-dedup the focused renderer has.
-2. Render the same agenda both ways, diff the prompt pool sizes, run one rep, and confirm
-   `issue_recall` and the per-obligation spine are unchanged — especially on 33149, where the
-   removal is largest.
-3. Check the structural-target case first: for `module_doc`/`namespace`/`command` targets `base_code`
-   is often absent, so a base→reviewed diff needs a defined fallback.
+1. ~~Bump the renderer version and make both changes together.~~ **Done in `9d4de8f`.** Measured on
+   `dev-medium-0.3.0`: fragment characters 2,583,336 → 155,178 (94.0%); arm target-block volume over
+   1,391 enumerated invocations 16,452,187 → 4,313,256 (73.8%); generalist user prompts at
+   `candidate-prompt/13` 4,245,015 → 1,548,784 (63.5%, and 78.6% on 33149). The structural-target
+   case turned out to be narrower than feared: only *import* targets lack regions (17 of 508 targets,
+   2,195 characters), and they keep the raw hunk.
+2. **Re-render the release at `candidate-prompt/13`** — `rerender_release --parent
+   inputs/pr_review_v4/releases/dev-medium-0.3.0 --renderer-version candidate-prompt/13`. This is the
+   step that has a cost beyond prompt size: `renderer_version` sits in the work-unit identity, so
+   every `work_unit_id` changes and every `wu:` join in the recorded runs and audits stops resolving.
+   Decide deliberately whether to move the evaluated configs onto the new release or keep the
+   generalist at /12 until the next experiment needs a fresh release anyway.
+3. **Confirm with one rep** against the per-obligation spine — especially 33149, where the removal is
+   largest — and report `issue_recall` and control emission beside the cost. Prompt volume is
+   measured; the billed effect is not. The projection from the section's measured share is ~16% of
+   lead spend, and that number is not yet earned.
 4. Re-measure the lead/solo ratio afterwards. If it moves from ~17× to ~14×, that is the whole
    prompt-side lever and any further reduction has to come from the schedule.
 
@@ -85,6 +95,13 @@ runs 321 sessions to solo's 12.
 
 The clean test of "is the whole-file diff load-bearing" is an A/B on one rep, because "no candidate
 outside its targets" is also consistent with the extra diff being used as orientation. Run it per-PR.
+
+One measured regression to keep in view: three documentation PRs render marginally *larger* under
+the scoped section — 33304 +2.7%, 33305 +2.3%, 33315 +1.0%, a few hundred characters each on the
+smallest prompts — because a region diff re-emits context a tight `@@` block did not. Two of those
+are the control PRs. `min(raw, scoped)` would buy it back at the cost of the property that makes the
+block trustworthy, so it was not taken; if control emission moves in the confirming rep, this is the
+first thing to look at.
 
 ## Record correction this forces
 
