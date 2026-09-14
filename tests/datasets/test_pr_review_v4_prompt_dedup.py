@@ -49,6 +49,7 @@ class _Target:
         self.base_code = None
         self.reviewed_code = f"lemma {subject} : True := trivial"
         self.diff_fragments = [fragments]
+        self.attached_to = None
 
 
 def test_a_shared_hunk_is_printed_once_and_pointed_at_afterwards():
@@ -219,3 +220,43 @@ def test_the_contract_is_sent_once_from_candidate_prompt_13():
     assert "# Review contract" not in new.user_prompt
     # The review targets themselves are untouched by this.
     assert "## Review target" in new.user_prompt
+
+
+def test_a_declarations_diff_carries_its_doc_comment():
+    """The doc-comment is part of the declaration, so it is diffed with it.
+
+    This is the repair for the two PR 33321 obligations that scoping lost: the obligation
+    anchors on `IsMulIndecomposable.baseOf`, so the docstring it asks about has to be visible in
+    that target's own section. The doc-comment keeps its block — it is still an anchorable
+    change_id — and points at its owner instead of repeating the diff.
+    """
+
+    decl = _Target("c1", "Meromorphic.baseOf", "@@ -0,0 +1,3 @@\n+def baseOf := 1\n")
+    decl.reviewed_code = "def baseOf := 1"
+    doc = _Target("c2", "Mathlib/X.lean", "@@ -0,0 +1,1 @@\n+/-- The base. -/\n")
+    doc.kind = "doc_comment"
+    doc.declaration_name = None
+    doc.reviewed_code = "/-- The base. -/"
+    doc.attached_to = "c1"
+
+    rendered = "\n\n".join(target_blocks([decl, doc], scoped=True))
+    declaration_block = rendered.split("## Review target")[1]
+
+    assert "+/-- The base. -/" in declaration_block, "the docstring is missing from its declaration"
+    assert "+def baseOf := 1" in declaration_block
+    # The attachment stays a target so it can still be anchored to, but says it once.
+    assert "Shown with the changed fragments for `Meromorphic.baseOf`." in rendered
+    assert rendered.count("+/-- The base. -/") == 1
+
+
+def test_an_unattached_doc_comment_is_still_its_own_site():
+    """A doc-comment with no declaration after it documents nothing, so it keeps its own diff."""
+
+    doc = _Target("c1", "Mathlib/X.lean", "@@ -0,0 +1,1 @@\n+/-- Orphan. -/\n")
+    doc.kind = "doc_comment"
+    doc.reviewed_code = "/-- Orphan. -/"
+    doc.attached_to = None
+
+    rendered = "\n\n".join(target_blocks([doc], scoped=True))
+    assert "+/-- Orphan. -/" in rendered
+    assert "Shown with the changed fragments" not in rendered

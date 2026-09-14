@@ -4,7 +4,7 @@ import argparse
 import difflib
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once
 from src.mathlib_review.schema import ChangeGraph, PromptPrecedent, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit
@@ -106,7 +106,7 @@ FACET_CHECKLIST_ONCE = FACET_CHECKLIST.replace(
 )
 
 
-def target_diff_section(target: Any) -> str:
+def target_diff_section(target: Any, attachments: Sequence[Any] = ()) -> str:
     """The `Exact changed fragments` body for one target, scoped to that target.
 
     `diff_fragments` holds the raw `@@` hunks covering the target's changed ranges, so a target
@@ -129,8 +129,12 @@ def target_diff_section(target: Any) -> str:
     """
 
     raw = f"```diff\n{''.join(target.diff_fragments)}\n```"
-    base = target.base_code or ""
-    reviewed = target.reviewed_code or ""
+    # A declaration's doc-comment and attributes are separate targets but not separate code:
+    # in Lean they precede what they qualify, so they are diffed as part of it. Severing them
+    # cost two obligations on PR 33321 that every baseline repetition had found.
+    ordered = [*attachments, target]
+    base = "\n".join(item.base_code for item in ordered if item.base_code)
+    reviewed = "\n".join(item.reviewed_code for item in ordered if item.reviewed_code)
     if not base and not reviewed:
         return raw
     lines = list(difflib.unified_diff(
@@ -176,10 +180,35 @@ def target_blocks(targets: Iterable[Any], *, scoped: bool) -> List[str]:
     changes, and it is what collapses a shared hunk when a target falls back to the raw form.
     """
 
+    targets = list(targets)
+    # Attachments are rendered inside their owner's diff, so they point at it instead of
+    # repeating it. The owner may appear after them in the unit, so the wording does not say
+    # "above".
+    present = {item.change_id: item for item in targets}
+    attached_to_owner: Dict[str, List[Any]] = {}
+    if scoped:
+        for item in targets:
+            owner_id = getattr(item, "attached_to", None)
+            if owner_id and owner_id in present:
+                attached_to_owner.setdefault(owner_id, []).append(item)
+    owner_subject = {
+        owner_id: (present[owner_id].declaration_name or present[owner_id].path)
+        for owner_id in attached_to_owner
+    }
+    shown_with_owner = {
+        item.change_id: owner_id
+        for owner_id, items in attached_to_owner.items() for item in items
+    }
+
     first_use: Dict[str, str] = {}
     blocks: List[str] = []
     for target in targets:
-        section = target_diff_section(target) if scoped else (
+        if target.change_id in shown_with_owner:
+            blocks.append(target_block(target, "Shown with the changed fragments for "
+                                       f"`{owner_subject[shown_with_owner[target.change_id]]}`."))
+            continue
+        section = target_diff_section(
+            target, attached_to_owner.get(target.change_id, ())) if scoped else (
             f"```diff\n{''.join(target.diff_fragments)}\n```")
         subject = target.declaration_name or target.path
         owner = first_use.get(section)
