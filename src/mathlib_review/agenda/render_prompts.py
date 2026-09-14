@@ -278,9 +278,18 @@ def render_work_unit(
     elif unit.renderer_version == "candidate-prompt/10":
         rendered_precedents = render_precedent_block(precedents)
         treatment = f"{rendered_precedents}\n\n" if rendered_precedents else ""
+    # The contract is the system prompt. Sending it again under `# Review contract` in the user
+    # message put the identical 2,482 characters in front of the model twice on every call —
+    # 203 of 203 generalist prompts in `pr5_A_lead_heldout12_fp3_rep1`, 503,846 characters,
+    # 12.5% of that run's generalist user text — and the copy is the expensive one: user text is
+    # billed at roughly 4.7x a token inside the cached prefix. The focused arms never carried it
+    # (0 of 1,206 in the same run) and review normally, which is the evidence that it is
+    # redundant rather than load-bearing.
+    contract = (
+        "" if renderer_number(unit.renderer_version) >= 13
+        else f"# Review contract\n{system_prompt_for(unit.renderer_version)}\n\n")
     user = (
-        "# Review contract\n"
-        f"{system_prompt_for(unit.renderer_version)}\n\n"
+        f"{contract}"
         f"{treatment}"
         f"# PR #{episode.pr_number}: {episode.title.text or ''}\n"
         f"Round: {episode.round_index}\nDescription: {episode.description.text or '(unavailable)'}\n"

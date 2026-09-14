@@ -182,3 +182,40 @@ def test_no_arm_prompt_repeats_a_diff_hunk(arm_prompts):
             if section.lstrip().startswith("```")
         ]
         assert len(hunks) == len(set(hunks)), f"{arm_id} repeats a hunk"
+
+
+def test_the_contract_is_sent_once_from_candidate_prompt_13():
+    """The system prompt is the contract; the user message must not repeat it.
+
+    Measured on `pr5_A_lead_heldout12_fp3_rep1`: 203 of 203 generalist prompts carried the
+    identical 2,482-character contract twice — once as the system prompt and once under
+    `# Review contract` — for 503,846 characters, 12.5% of that run's generalist user text, and
+    the duplicate is the expensive copy, since user text is billed at roughly 4.7x a token
+    inside the cached prefix. The focused arms never carried it (0 of 1,206 in the same run)
+    and review normally.
+
+    Pinned at the version boundary in both directions: /12 keeps it, because that text is
+    hashed into every frozen `rendered_prompts.jsonl`.
+    """
+
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.agenda.render_prompts import render_work_unit
+    from src.mathlib_review.schema import ChangeGraph, ReviewEpisodeInput, ReviewWorkUnit
+
+    graphs = {item.episode_id: item for item in
+              load_jsonl(RELEASE / "derived/change_graphs.jsonl", ChangeGraph)}
+    episodes = {item.episode_id: item for item in
+                load_jsonl(RELEASE / "input/episodes.jsonl", ReviewEpisodeInput)}
+    unit = load_jsonl(RELEASE / "derived/work_units.jsonl", ReviewWorkUnit)[0]
+    episode, graph = episodes[unit.episode_id], graphs[unit.episode_id]
+
+    old = render_work_unit(unit, episode, graph)
+    assert old.system_prompt in old.user_prompt, "/12 must keep the copy it was frozen with"
+
+    new = render_work_unit(
+        unit.model_copy(update={"renderer_version": "candidate-prompt/13"}), episode, graph)
+    assert new.system_prompt, "the contract still has to be sent as the system prompt"
+    assert new.system_prompt not in new.user_prompt
+    assert "# Review contract" not in new.user_prompt
+    # The review targets themselves are untouched by this.
+    assert "## Review target" in new.user_prompt
