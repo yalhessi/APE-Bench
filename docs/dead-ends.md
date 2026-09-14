@@ -55,6 +55,28 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   recall unmoved. Design, scope and the hardening that followed a verification pass:
   `docs/research/reviewed-workspaces.md`. The held-out rerun is still the check that the 16
   compile claims vanish across the set.
+- **Specialists as the coverage floor** (2026-09-14) — *"the generalist is the floor and the
+  specialists get pruned; force the specialists to be the floor instead"*. Tested at its ceiling
+  rather than by tuning: `routing_mode: fanout` on 4 held-out PRs gives every specialist every
+  eligible slot with no lead and no pruning — 140 specialist jobs, 173 total, $14.72 billed. It
+  recovered **2 of 10 obligations, exactly what `lead` recovered on the same PRs, against `solo`'s
+  4**, at `gold_alignment_rate` 0.041 (2 of 49 candidates). The mechanism is the point: the
+  specialist submit-rate was **16%, against lead's 19%** — unlimited slots did not raise output,
+  and **104 of 136 abstentions were `already_correct`**. `correctness` filed nothing in 11 jobs and
+  `family_design` nothing in 11, the two arms that were the strongest candidates for being starved.
+  Silence is a judgement about the code, not a scheduling artifact, so more slots buy more
+  abstentions. Two corrections fell out: fanout costs **$0.085/job against lead's $0.040** (arms are
+  top-level tasks, so they lose the nesting/caching benefit and all spend lands in the `lead` bucket
+  with `nested_billed: 0.0`), making the full 12-PR fanout ~$111 rather than the $70.45 the agenda
+  projects; and fanout is *not* a precision disaster — it emitted 1 candidate on the control, not
+  the pile predicted. **Reopens if:** the reason arms decline changes. Reading the abstention details
+  at gold sites, the declines are three different things and only one is a bar problem: the right arm
+  was never asked (33145 wanted a *rename* and the arms present were duplication/api_reuse/style,
+  each correctly reporting nothing in its own concern), an evidence bar refused a correct instinct
+  (33337 `naming` considered the exact rename and `naming_norm` returned `insufficient_evidence` —
+  that obligation was never hit by any condition), or the arm lacked knowledge (33117 `family_design`
+  judged the family balanced; the ask was to use `@[to_fun]`, which it does not know about). Only the
+  second is scheduling-adjacent, and it is a threshold question, not a floor question.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
