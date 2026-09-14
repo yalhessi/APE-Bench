@@ -271,6 +271,51 @@ VERIFIERS = {
 }
 
 
+#: What a `supports` from each verifier is *worth*, in `EVIDENCE_TIERS` vocabulary. Declared
+#: beside the verifier table so the two cannot drift; a kind absent from here confers
+#: `model_assertion`, the floor, which is what every holistic finding carries today.
+#:
+#: This table is the missing half of a chain that was otherwise complete.
+#: `conditions._EVIDENCE_BY_METHOD` already maps `naming_norm.v1 -> repository_measurement`,
+#: but it is read only by `deterministic_findings` — the v4 arm. A holistic candidate whose
+#: claim `naming_norm` supported with a counted population was still projected at
+#: `model_assertion`, because `generalist_findings` never passed a tier and
+#: `merge.finding_from_candidate` defaults to the floor. Measured on
+#: `pr5_A_lead_heldout12_v2_rep1`: 11 candidates cleared `select_findings`, two of them on
+#: `naming_norm` verdicts like "27/27 declarations with subject `upperBounds` use the
+#: `upperBounds_` prefix", and `finalization_report.by_evidence_tier.repository_measurement`
+#: was **0** in all three reps.
+#:
+#: The tier is not cosmetic: `merge_findings` resolves two findings at one anchor by
+#: `evidence_rank`, and only when the ranks *differ* (`merge.py:298-307`). With every
+#: holistic finding at the floor, every same-anchor pair is an unresolved conflict and
+#: **both** sides are demoted — 37, 35 and 34 conflicts per rep.
+#:
+#: Conservative by construction. Only two kinds are raised, and only to the tier their
+#: operator actually earns:
+#:
+#: * `naming_convention_violation` — `naming_norm` counts the snapshot population
+#:   conditioned on the conclusion subject. That is a measurement over the repository, and
+#:   `review_map.py`'s 2026-09-13 retraction records it as "the strongest gold-free signal
+#:   measured so far".
+#: * `style_norm_violation` — `lint_policy` reports codified lint codes. A rule, not a
+#:   measurement, so `lexical_rule`.
+#:
+#: Deliberately absent, each for a stated reason rather than an oversight:
+#:
+#: * `documentation_gap` — `docstring_presence` reads the reviewed target's own text, not
+#:   the repository, and D3 was falsified at 8%/67% docstring coverage. A local syntactic
+#:   fact about one declaration is not a warrant to outrank another finding.
+#: * `scope_placement` — the verifier abstains unconditionally today.
+#: * `proof_simplification` — its warrant is the compile, which arrives as a `lean_compile`
+#:   artifact and is tiered from the artifact rather than from the issue kind. Tiering it
+#:   here as well would let a statement-gate pass alone stand in for a compile.
+WARRANT_BY_ISSUE_KIND: Dict[str, str] = {
+    "naming_convention_violation": "repository_measurement",
+    "style_norm_violation": "lexical_rule",
+}
+
+
 def verify(candidate: CandidateClaim, target: Optional[ChangeTarget],
            **context) -> VerificationResult:
     if candidate.issue_kind is None:

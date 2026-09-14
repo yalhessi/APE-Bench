@@ -28,6 +28,7 @@ from src.mathlib_review.legacy_pipeline.phase7_adjudication import adjudicate, p
 from src.mathlib_review.schema import (
     FILE_COHERENCE_SPEC,
     CandidateClaim,
+    EvidenceArtifact,
     EvidenceAssertion,
     EvidencePacket,
     ReviewFinding,
@@ -135,7 +136,8 @@ def deterministic_findings(execution_release: Path,
 
 def generalist_findings(candidates_path: Path,
                       supported_candidate_ids: Optional[Iterable[str]] = None,
-                      pr_numbers: Optional[Iterable[int]] = None) -> List[ReviewFinding]:
+                      pr_numbers: Optional[Iterable[int]] = None,
+                      evidence_tiers: Optional[Dict[str, str]] = None) -> List[ReviewFinding]:
     """Project reviewer candidates into the common shape.
 
     `supported_candidate_ids` are those whose evidence packet passes the publication gate
@@ -149,12 +151,17 @@ def generalist_findings(candidates_path: Path,
     """
 
     supported = set(supported_candidate_ids) if supported_candidate_ids is not None else None
+    tiers = evidence_tiers or {}
     wanted = set(pr_numbers) if pr_numbers else None
     findings = []
     for candidate in load_jsonl(candidates_path, CandidateClaim):
         if wanted is not None and candidate.pr_number not in wanted:
             continue
         published = supported is None or candidate.candidate_id in supported
+        # Only a published candidate can carry a warrant. A diagnostic one was not supported,
+        # so there is nothing to tier it from, and letting a tier ride on an unsupported
+        # claim would let it outrank a supported rival at the same anchor.
+        tier = tiers.get(candidate.candidate_id) if published else None
         findings.append(finding_from_candidate(
             candidate,
             admission="published" if published else "diagnostic",
@@ -162,6 +169,7 @@ def generalist_findings(candidates_path: Path,
                 "evidence packet supports the claim" if published
                 else "no collector can support this claim's concern family"
             ),
+            **({"evidence_tier": tier} if tier else {}),
         ))
     return findings
 
@@ -274,12 +282,98 @@ def supported_from_evidence(candidates_path: Path, evidence_dir: Path) -> List[s
     a claim-scoped `supports` for naming, documentation or scope — and that strictness is
     not loosened to make the holistic arm look better: it is what keeps the arm's silent-PR
     behaviour meaningful.
+
+    `tiers_from_evidence` reads the same pass for the warrant each survivor earned; the two
+    are separate calls because publication and rank are separate questions, and only the
+    first one is a gate.
     """
 
     candidates = load_jsonl(candidates_path, CandidateClaim)
     packets = load_jsonl(evidence_dir / "packets.jsonl", EvidencePacket)
     assertions = load_jsonl(evidence_dir / "assertions.jsonl", EvidenceAssertion)
     return [item.candidate_id for item in select_findings(candidates, packets, assertions)]
+
+
+def tiers_from_evidence(candidates_path: Path, evidence_dir: Path) -> Dict[str, str]:
+    """The warrant each supported candidate actually earned, keyed by candidate id.
+
+    Read from the same `select_findings` pass that decides publication, so a candidate can
+    never be published on one set of assertions and tiered on another.
+
+    The rule is deliberately narrow, and it is keyed on *what produced the support*, never
+    on the claim's text:
+
+    * a `lean_compile` artifact supporting the `proposed_edit` -> `verified_compile`. The
+      compiler accepted the replacement; that is the same warrant `focused_findings` states,
+      established the same way.
+    * otherwise an `issue_kind_verifier` artifact -> whatever
+      `verifiers.WARRANT_BY_ISSUE_KIND` says that kind's operator earns, which today is
+      `naming_norm` and `lint_policy` and nothing else.
+    * otherwise the floor, `model_assertion`.
+
+    `repository_search` is pointedly *not* in that list even though it supports 7 of the 11
+    selected candidates on rep1. "Found 1 file(s) declaring a cited identifier" is a
+    retrieval hit, not a measurement over the repository, and promoting it would hand the
+    largest holistic family a tier it did not earn — which is the rubber stamp
+    `generalist_findings` and `verifiers` both warn about in their own docstrings.
+
+    Returns only the candidates that clear the gate. Everything else is absent, and an
+    absent candidate keeps `finding_from_candidate`'s `model_assertion` default.
+    """
+
+    from src.mathlib_review.evidence.verifiers import WARRANT_BY_ISSUE_KIND
+
+    packets_path = evidence_dir / "packets.jsonl"
+    assertions_path = evidence_dir / "assertions.jsonl"
+    artifacts_path = evidence_dir / "artifacts.jsonl"
+    # A chain that did not run leaves no files, and "no chain" means "no warrant" — every
+    # candidate keeps the `model_assertion` floor. Raising here instead would make a caller
+    # that supplies its own `collect_supported` — every finalize test does — die on a file
+    # the gate it stubbed never wrote.
+    if not (packets_path.is_file() and assertions_path.is_file()):
+        return {}
+
+    candidates = load_jsonl(candidates_path, CandidateClaim)
+    packets = load_jsonl(packets_path, EvidencePacket)
+    assertions = load_jsonl(assertions_path, EvidenceAssertion)
+    artifacts = ({item.artifact_id: item
+                  for item in load_jsonl(artifacts_path, EvidenceArtifact)}
+                 if artifacts_path.is_file() else {})
+
+    by_id = {item.candidate_id: item for item in candidates}
+    assertion_by_id = {item.assertion_id: item for item in assertions}
+    packet_by_candidate = {item.candidate_id: item for item in packets}
+
+    tiers: Dict[str, str] = {}
+    for selected in select_findings(candidates, packets, assertions):
+        candidate = by_id.get(selected.candidate_id)
+        if candidate is None:
+            continue
+        packet = packet_by_candidate.get(selected.candidate_id)
+        packet_assertions = [assertion_by_id[item] for item in (packet.assertion_ids if packet else [])
+                             if item in assertion_by_id]
+        # The compile has to be the one that vouched for the *edit*. A `lean_compile`
+        # artifact also rides along on `local_context` baselines, and "the file compiled
+        # before we touched it" is not a warrant for the claim.
+        verified = any(
+            item.assertion_scope == "proposed_edit" and item.polarity == "supports"
+            and any(artifacts[ref].collector == "lean_compile"
+                    for ref in item.artifact_ids if ref in artifacts)
+            for item in packet_assertions
+        )
+        if verified:
+            tiers[candidate.candidate_id] = "verified_compile"
+            continue
+        supporting = [assertion_by_id[item] for item in selected.evidence_assertion_ids
+                      if item in assertion_by_id]
+        by_verifier = any(
+            artifacts[ref].collector == "issue_kind_verifier"
+            for item in supporting for ref in item.artifact_ids if ref in artifacts
+        )
+        warrant = WARRANT_BY_ISSUE_KIND.get(candidate.issue_kind or "")
+        if by_verifier and warrant:
+            tiers[candidate.candidate_id] = warrant
+    return tiers
 
 
 def build_condition(
@@ -291,6 +385,7 @@ def build_condition(
     pr_numbers: Optional[Iterable[int]] = None,
     candidates: Optional[Path] = None,
     supported_candidate_ids: Optional[Iterable[str]] = None,
+    evidence_tiers: Optional[Dict[str, str]] = None,
     focused_candidates: Optional[Path] = None,
     file_candidates: Optional[Path] = None,
     focused_verification_artifacts: Optional[Path] = None,
@@ -310,7 +405,8 @@ def build_condition(
                      "merged_ensemble_v3"):
         if candidates is None:
             raise ValueError(f"{condition} requires --candidates")
-        findings.extend(generalist_findings(candidates, supported_candidate_ids, pr_numbers))
+        findings.extend(generalist_findings(candidates, supported_candidate_ids, pr_numbers,
+                                            evidence_tiers))
     if condition in ("file_generalist_only", "merged_ensemble_v3"):
         if file_candidates is None:
             raise ValueError(f"{condition} requires --file-candidates")

@@ -362,6 +362,10 @@ def finalize(
     # verification artifacts, so they are not put through the chain: it would cost a
     # baseline compile each and could not change their admission.
     evidence_summary: Dict[str, Any] = {}
+    #: candidate_id -> the warrant its evidence earned. Empty unless the chain ran; an absent
+    #: candidate keeps `finding_from_candidate`'s `model_assertion` floor, which is what every
+    #: holistic finding carried before `tiers_from_evidence` existed.
+    evidence_tiers: Dict[str, str] = {}
     if collect_supported is not None:
         supported_candidate_ids = collect_supported([*generalist, *evidence_specialist])
         # Read back here, not in the runner: `finalization_report.json` is written below
@@ -370,6 +374,12 @@ def finalize(
         from src.mathlib_review.evidence.chain import evidence_report
 
         evidence_summary = evidence_report(out)
+        # Same pass, same directory the chain just wrote. Publication and rank are decided
+        # from one set of assertions so a finding cannot be published on one warrant and
+        # ranked on another.
+        from src.mathlib_review.review.conditions import tiers_from_evidence
+
+        evidence_tiers = tiers_from_evidence(generalist_path, out / "evidence")
 
     findings = []
     if execution_release is not None:
@@ -382,6 +392,7 @@ def finalize(
             # Never `None` by omission: that branch publishes every claim unsupported.
             supported_candidate_ids if supported_candidate_ids is not None else set(),
             pr_numbers,
+            evidence_tiers,
         ))
     if specialist:
         # `dropped` collects the unwarranted ones; they are projected after the digest, so
