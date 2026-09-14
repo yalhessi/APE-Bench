@@ -59,14 +59,7 @@ many threads, some abandoned. Read the record before proposing anything that sou
   each step boundary — a standing instruction (2026-09-11): uncommitted work spanning steps is how the
   codebase imploded and threads got duplicated across places. The hook warns past 10 files / 400 lines
   uncommitted; the median commit here is 5 files. Never push, rewrite published history, or delete a
-  branch without being asked.
-- **Git worktrees do not work here, and fail silently.** `ape/` is an editable install whose
-  `__editable__.ape-0.1.0.pth` hardcodes *this* checkout's `src/`, so in a worktree `import ape`
-  loads the main checkout while `import src.mathlib_review` loads the worktree — tests then pass
-  against a mix of two trees, and an edit to `src/ape/` appears to have no effect. Real isolation
-  needs a second venv. Also: several sessions may share this one working directory, so a
-  `git checkout -b` moves all of them and a peer's commit can land on your branch (2026-09-12:
-  `b7d4c14` did). Commit by explicit path, never `git add -A`.
+  branch without being asked. Commit by explicit path, never `git add -A`.
 - **Frozen artifact roots** — `inputs/pr_review_v4/`, `results/pr_review_v4/`, `data/pr_review_v2/` —
   are hook-guarded against Edit/Write because release manifests hash those trees. Add artifacts
   through the tooling (`verify_frozen build-lock`) and run `verify_frozen verify` after any change
