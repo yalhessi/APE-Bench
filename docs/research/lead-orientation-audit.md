@@ -153,3 +153,67 @@ widen your scope") is prompt text. `registry.py:56-71` says so explicitly: `expe
   (`family_design`) returned nothing in 26 invocations.
 - Any comparison of a new architecture against A should first re-measure A with (a), (b), (c) on,
   or the new design will be credited with fixing plumbing.
+
+---
+
+## 7. Increment 0, measured (2026-09-14)
+
+The three dormant mechanisms of §5, each taken as far as free evidence allows. Replays are in
+`scratchpad`-style scripts, use no model calls, and read only tracked run artifacts.
+
+### (1) Evidence tier — **done, small, real**
+
+Attaching the warrant a holistic finding's evidence earned, replayed over each rep's recorded
+findings with pre-merge admission restored from the gate (the "before" reproduces each run's
+own conflict count exactly, 37/35/34):
+
+| rep | conflicts | published | gain |
+|---|---|---|---|
+| 1 | 37 → 35 | 25 → 27 | naming +2 |
+| 2 | 35 → 33 | 28 → 30 | naming +2 |
+| 3 | 34 → 32 | 27 → 29 | naming +2 |
+
+Two conflicts resolved per rep in all three, both on PR 33145's `Dense.continuous_*` renames.
+`naming` published **zero** in all three reps before. Read narrowly: the judge scores
+`counts.candidates` = all 285 findings, so this moves `post_publication` only and **does not
+move the A/B spine's reported recall.**
+
+### (2) `apply_lead_synthesis` — **do not turn on**
+
+This was never dormant plumbing. It has been off since 2026-09-08 with a measured regression
+on `pr5_smoke4_rep9`, and the held-out 12 reproduces it worse. Replaying the recorded
+assessments and intersecting removals with the candidates that carried an issue hit:
+
+| rep | obligations hit | lost entirely if applied |
+|---|---:|---|
+| 1 | 7 | **3** — `073625ed`, `57bcc9fd`, `64e1164f` |
+| 2 | 5 | **1** — `073625ed` |
+| 3 | 6 | **2** — `073625ed`, `c9739efc` |
+
+43%, 20% and 33% of each run's hits. **`073625ed` goes in all three reps** — PR 33285's
+proof-golf obligation, `HHH` in the spine, one of the five stable hits that are A's only
+distinguishing claim over solo. Folding is meant to be lossless and is not.
+
+### (3) `FILE_COHERENCE_SPEC` — **a feature, not a switch**
+
+Reach on the held-out 12, computed from `schedule_files` over the release's change graphs:
+**78 file invocations**, 52 single-target (which may only make a `scope_placement` claim) and
+**26 multi-target**. Of the 17 obligations whose gold `change_ids` the audits record, **4 span
+more than one work unit** — `3dacf72e`, `f54010d8` (33149's axioms, which A already hits
+`HHH` through the generalist) and `57bcc9fd`, `bd8a8d8c`, both currently `L` rows whose ask is
+inherently multi-target. So the distinctive new reach is **2 obligations**, at roughly
++78 jobs/rep (~$1.2, ~8% on A's $14.59).
+
+It cannot be switched on. `AgendaProposal.work_unit_id` is a required, non-optional field and
+a file-scoped invocation spans several work units, so scheduling one needs either a widened
+agenda schema — which rewrites every agenda hash — or a synthetic per-file pseudo-unit. That
+is a design decision with sealing consequences, not a config line, and it is why this arm has
+sat wired-but-unscheduled.
+
+### A worktree note
+
+`tests/datasets/test_claude_code_containment.py::test_a_review_workspace_resolves_git_upward_into_this_repository`
+**fails in any worktree and passes in the main checkout.** `.claude/worktree-setup.sh` symlinks
+`data/`, so a review workspace reached through it resolves `git rev-parse --show-toplevel` to
+the main checkout rather than to the worktree. It is a property of the worktree arrangement,
+not a regression.

@@ -160,6 +160,26 @@ class V5DatasetConfig(BaseModel):
     #: rep6 and rep7, the best runs on this set, recorded assessments and applied none of
     #: them, and scored 6 and 7 issue hits against rep9's 6 (4 after removals).
     #:
+    #: **Reproduced on the held-out 12, 2026-09-14, and it is worse there.** Replaying the
+    #: recorded assessments through `apply_assessments` and intersecting the removed set with
+    #: the candidates that carried an issue hit in that rep's audit:
+    #:
+    #:     rep   obligations hit   lost entirely if applied
+    #:     1     7                 3   (073625ed, 57bcc9fd, 64e1164f)
+    #:     2     5                 1   (073625ed)
+    #:     3     6                 2   (073625ed, c9739efc)
+    #:
+    #: "Lost entirely" means every candidate that hit the obligation was removed, so the hit
+    #: does not survive. That is 43%, 20% and 33% of the run's hits. **073625ed goes in all
+    #: three reps** -- PR 33285's proof-golf obligation, which the A/B spine records as `HHH`,
+    #: one of the five stable hits that are condition A's only distinguishing claim over solo.
+    #: 64e1164f (33337 naming, `HHH`) goes in rep1.
+    #:
+    #: So applying synthesis does not trade breadth for precision here; it removes the
+    #: reproducible core. Do not turn this on to "reduce noise" without re-running that
+    #: replay: `apply_assessments` is not lossless, and the folds are where it loses.
+    #: The replay needs no model calls -- see `docs/research/lead-orientation-audit.md`.
+    #:
     #: Recording continues either way: `candidate_assessments.jsonl` is written regardless,
     #: because the question is whether the lead's judgment is *good*, and answering that needs
     #: the judgments whether or not they are acted on.
