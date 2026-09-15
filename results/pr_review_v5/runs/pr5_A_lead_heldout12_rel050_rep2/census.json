@@ -1,0 +1,2526 @@
+{
+  "33117": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:f8dd8a3f6ffd17d0a86bb556#api_reuse",
+        "docs": "wu:f8dd8a3f6ffd17d0a86bb556#docs",
+        "generality": "wu:f8dd8a3f6ffd17d0a86bb556#generality",
+        "proof_golf": "wu:f8dd8a3f6ffd17d0a86bb556#proof_golf",
+        "proof_idiom": "wu:f8dd8a3f6ffd17d0a86bb556#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic",
+        "Meromorphic.add",
+        "Meromorphic.deriv",
+        "Meromorphic.div",
+        "Meromorphic.fun_add",
+        "Meromorphic.fun_deriv",
+        "Meromorphic.fun_div",
+        "Meromorphic.fun_iterated_deriv",
+        "Meromorphic.fun_mul",
+        "Meromorphic.fun_neg",
+        "Meromorphic.fun_pow",
+        "Meromorphic.fun_prod",
+        "Meromorphic.fun_sub",
+        "Meromorphic.fun_sum",
+        "Meromorphic.fun_zpow",
+        "Meromorphic.iterated_deriv",
+        "Meromorphic.mul",
+        "Meromorphic.neg",
+        "Meromorphic.pow",
+        "Meromorphic.prod",
+        "Meromorphic.sub",
+        "Meromorphic.sum",
+        "Meromorphic.zpow",
+        "meromorphicOn_univ"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 4 other changed declaration(s)",
+        "was changed alongside 22 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:f8dd8a3f6ffd17d0a86bb556"
+    }
+  ],
+  "33145": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:1905fddc8858993e2f553367#api_reuse",
+        "docs": "wu:1905fddc8858993e2f553367#docs",
+        "generality": "wu:1905fddc8858993e2f553367#generality",
+        "proof_golf": "wu:1905fddc8858993e2f553367#proof_golf",
+        "proof_idiom": "wu:1905fddc8858993e2f553367#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Dense.continuous_inf",
+        "Dense.continuous_inf'",
+        "Dense.continuous_lowerBounds",
+        "Dense.continuous_sup",
+        "Dense.continuous_sup'",
+        "Dense.continuous_upperBounds",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_sup'` is a chain of 10 low-level tactic steps",
+        "`Dense.continuous_sup` is a chain of 5 low-level tactic steps",
+        "`Dense.continuous_upperBounds` is a chain of 5 low-level tactic steps",
+        "`Dense.continuous_lowerBounds` is a chain of 5 low-level tactic steps",
+        "`Dense.continuous_inf` is a chain of 5 low-level tactic steps",
+        "`Dense.continuous_inf'` is a chain of 10 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_sup'` is 21 lines",
+        "`Dense.continuous_sup` is 12 lines",
+        "`Dense.continuous_inf` is 12 lines",
+        "`Dense.continuous_inf'` is 21 lines"
+      ],
+      "work_unit_id": "wu:1905fddc8858993e2f553367"
+    }
+  ],
+  "33149": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:d6195dc38d8924aef72a37de#api_reuse",
+        "correctness": "wu:d6195dc38d8924aef72a37de#correctness",
+        "docs": "wu:d6195dc38d8924aef72a37de#docs",
+        "duplication": "wu:d6195dc38d8924aef72a37de#duplication",
+        "family_design": "wu:d6195dc38d8924aef72a37de#family_design",
+        "generality": "wu:d6195dc38d8924aef72a37de#generality",
+        "naming": "wu:d6195dc38d8924aef72a37de#naming",
+        "proof_golf": "wu:d6195dc38d8924aef72a37de#proof_golf",
+        "proof_idiom": "wu:d6195dc38d8924aef72a37de#proof_idiom",
+        "style": "wu:d6195dc38d8924aef72a37de#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "GalerkinAt",
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "bkm_finite_anyT",
+        "cMoser",
+        "cSobolev",
+        "vorticity_hs_bound"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`vorticity_hs_bound` introduces an axiom",
+        "`cSobolev` introduces an axiom",
+        "`cMoser` introduces an axiom",
+        "`bkm_finite_anyT` is a chain of 7 low-level tactic steps",
+        "shares a name family with 11 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "`bkm_finite_anyT` uses a `calc` block",
+        "introduces a new declaration",
+        "`bkm_finite_anyT` is 21 lines"
+      ],
+      "work_unit_id": "wu:d6195dc38d8924aef72a37de"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:671e45d0b4338f2788e59ee5#api_reuse",
+        "correctness": "wu:671e45d0b4338f2788e59ee5#correctness",
+        "docs": "wu:671e45d0b4338f2788e59ee5#docs",
+        "duplication": "wu:671e45d0b4338f2788e59ee5#duplication",
+        "family_design": "wu:671e45d0b4338f2788e59ee5#family_design",
+        "generality": "wu:671e45d0b4338f2788e59ee5#generality",
+        "naming": "wu:671e45d0b4338f2788e59ee5#naming",
+        "proof_golf": "wu:671e45d0b4338f2788e59ee5#proof_golf",
+        "proof_idiom": "wu:671e45d0b4338f2788e59ee5#proof_idiom",
+        "style": "wu:671e45d0b4338f2788e59ee5#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "T3",
+        "cGronwall_pos",
+        "cMoser_pos",
+        "fourierTransform",
+        "fubini_torus3",
+        "invFourier"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cGronwall_pos` introduces an axiom",
+        "`cMoser_pos` introduces an axiom",
+        "`fubini_torus3` introduces an axiom",
+        "shares a name family with 15 other changed declaration(s)",
+        "was changed alongside 6 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:671e45d0b4338f2788e59ee5"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:52e5259da660d7bc55435cfd#api_reuse",
+        "correctness": "wu:52e5259da660d7bc55435cfd#correctness",
+        "docs": "wu:52e5259da660d7bc55435cfd#docs",
+        "duplication": "wu:52e5259da660d7bc55435cfd#duplication",
+        "family_design": "wu:52e5259da660d7bc55435cfd#family_design",
+        "generality": "wu:52e5259da660d7bc55435cfd#generality",
+        "proof_golf": "wu:52e5259da660d7bc55435cfd#proof_golf",
+        "proof_idiom": "wu:52e5259da660d7bc55435cfd#proof_idiom",
+        "style": "wu:52e5259da660d7bc55435cfd#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "FourierCoeff",
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "fourier3D",
+        "moser_estimate",
+        "parseval_orthonormal",
+        "spectralNSResidual",
+        "uniform_vorticity_bound"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`moser_estimate` introduces an axiom",
+        "`parseval_orthonormal` introduces an axiom",
+        "`uniform_vorticity_bound` is a chain of 6 low-level tactic steps",
+        "shares a name family with 21 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "`uniform_vorticity_bound` uses a `calc` block",
+        "introduces a new declaration",
+        "`uniform_vorticity_bound` is 27 lines"
+      ],
+      "work_unit_id": "wu:52e5259da660d7bc55435cfd"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4a527761a3c2565ca235e611#api_reuse",
+        "correctness": "wu:4a527761a3c2565ca235e611#correctness",
+        "docs": "wu:4a527761a3c2565ca235e611#docs",
+        "duplication": "wu:4a527761a3c2565ca235e611#duplication",
+        "family_design": "wu:4a527761a3c2565ca235e611#family_design",
+        "generality": "wu:4a527761a3c2565ca235e611#generality",
+        "naming": "wu:4a527761a3c2565ca235e611#naming",
+        "proof_golf": "wu:4a527761a3c2565ca235e611#proof_golf",
+        "proof_idiom": "wu:4a527761a3c2565ca235e611#proof_idiom",
+        "style": "wu:4a527761a3c2565ca235e611#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "fourierCoeff3D",
+        "fourierCoeff_summable",
+        "fourierTruncate",
+        "hs_gronwall_bound",
+        "parseval3D"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourierCoeff_summable` introduces an axiom",
+        "`hs_gronwall_bound` introduces an axiom",
+        "`parseval3D` is a chain of 4 low-level tactic steps",
+        "shares a name family with 17 other changed declaration(s)",
+        "was changed alongside 6 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4a527761a3c2565ca235e611"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c757e1d47ceb2ff31e325d53#api_reuse",
+        "correctness": "wu:c757e1d47ceb2ff31e325d53#correctness",
+        "docs": "wu:c757e1d47ceb2ff31e325d53#docs",
+        "duplication": "wu:c757e1d47ceb2ff31e325d53#duplication",
+        "family_design": "wu:c757e1d47ceb2ff31e325d53#family_design",
+        "generality": "wu:c757e1d47ceb2ff31e325d53#generality",
+        "naming": "wu:c757e1d47ceb2ff31e325d53#naming",
+        "proof_golf": "wu:c757e1d47ceb2ff31e325d53#proof_golf",
+        "proof_idiom": "wu:c757e1d47ceb2ff31e325d53#proof_idiom",
+        "style": "wu:c757e1d47ceb2ff31e325d53#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "GalerkinLimit.smooth",
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "bkmPhysical",
+        "integral_le_const_mul_length",
+        "vorticity_integrable"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "`integral_le_const_mul_length` introduces an axiom",
+        "`vorticity_integrable` introduces an axiom",
+        "shares a name family with 7 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration",
+        "`GalerkinLimit.smooth` is 15 lines"
+      ],
+      "work_unit_id": "wu:c757e1d47ceb2ff31e325d53"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:497179ec0e415a9782d97321#api_reuse",
+        "correctness": "wu:497179ec0e415a9782d97321#correctness",
+        "docs": "wu:497179ec0e415a9782d97321#docs",
+        "duplication": "wu:497179ec0e415a9782d97321#duplication",
+        "family_design": "wu:497179ec0e415a9782d97321#family_design",
+        "generality": "wu:497179ec0e415a9782d97321#generality",
+        "naming": "wu:497179ec0e415a9782d97321#naming",
+        "proof_golf": "wu:497179ec0e415a9782d97321#proof_golf",
+        "proof_idiom": "wu:497179ec0e415a9782d97321#proof_idiom",
+        "style": "wu:497179ec0e415a9782d97321#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "cGronwall",
+        "fourier_inversion"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourier_inversion` introduces an axiom",
+        "`cGronwall` introduces an axiom",
+        "shares a name family with 15 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:497179ec0e415a9782d97321"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:a5b0052af78ca188e4dc2afc#api_reuse",
+        "correctness": "wu:a5b0052af78ca188e4dc2afc#correctness",
+        "docs": "wu:a5b0052af78ca188e4dc2afc#docs",
+        "duplication": "wu:a5b0052af78ca188e4dc2afc#duplication",
+        "family_design": "wu:a5b0052af78ca188e4dc2afc#family_design",
+        "generality": "wu:a5b0052af78ca188e4dc2afc#generality",
+        "naming": "wu:a5b0052af78ca188e4dc2afc#naming",
+        "proof_golf": "wu:a5b0052af78ca188e4dc2afc#proof_golf",
+        "proof_idiom": "wu:a5b0052af78ca188e4dc2afc#proof_idiom",
+        "style": "wu:a5b0052af78ca188e4dc2afc#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "bkm_implies_regularity",
+        "cSobolev_pos",
+        "fourierDecay",
+        "l2Norm",
+        "linftyNorm"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`bkm_implies_regularity` introduces an axiom",
+        "`cSobolev_pos` introduces an axiom",
+        "shares a name family with 15 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a5b0052af78ca188e4dc2afc"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:adb425d89a3a78f8c74024a7#api_reuse",
+        "correctness": "wu:adb425d89a3a78f8c74024a7#correctness",
+        "docs": "wu:adb425d89a3a78f8c74024a7#docs",
+        "duplication": "wu:adb425d89a3a78f8c74024a7#duplication",
+        "family_design": "wu:adb425d89a3a78f8c74024a7#family_design",
+        "generality": "wu:adb425d89a3a78f8c74024a7#generality",
+        "naming": "wu:adb425d89a3a78f8c74024a7#naming",
+        "proof_golf": "wu:adb425d89a3a78f8c74024a7#proof_golf",
+        "proof_idiom": "wu:adb425d89a3a78f8c74024a7#proof_idiom",
+        "style": "wu:adb425d89a3a78f8c74024a7#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "BKMFinite",
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "VorticityResponse.regularity",
+        "bkmLifted",
+        "fourier3D_orthogonal",
+        "fourier_ortho_integral"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourier_ortho_integral` introduces an axiom",
+        "`fourier3D_orthogonal` is a chain of 15 low-level tactic steps",
+        "`VorticityResponse.regularity` is a chain of 10 low-level tactic steps",
+        "shares a name family with 13 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`fourier3D_orthogonal` is 27 lines",
+        "`VorticityResponse.regularity` is 21 lines"
+      ],
+      "work_unit_id": "wu:adb425d89a3a78f8c74024a7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:31c31aef12d040a04f034e2a#api_reuse",
+        "correctness": "wu:31c31aef12d040a04f034e2a#correctness",
+        "docs": "wu:31c31aef12d040a04f034e2a#docs",
+        "duplication": "wu:31c31aef12d040a04f034e2a#duplication",
+        "family_design": "wu:31c31aef12d040a04f034e2a#family_design",
+        "generality": "wu:31c31aef12d040a04f034e2a#generality",
+        "proof_golf": "wu:31c31aef12d040a04f034e2a#proof_golf",
+        "proof_idiom": "wu:31c31aef12d040a04f034e2a#proof_idiom",
+        "style": "wu:31c31aef12d040a04f034e2a#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "TemporalLifting",
+        "Vorticity",
+        "bkm_coordinate_invariance",
+        "sobolev_embedding",
+        "spectralCurl"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`sobolev_embedding` introduces an axiom",
+        "`bkm_coordinate_invariance` is a chain of 7 low-level tactic steps",
+        "shares a name family with 10 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration",
+        "`bkm_coordinate_invariance` is 19 lines"
+      ],
+      "work_unit_id": "wu:31c31aef12d040a04f034e2a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:0599fa4844ee4e5f3358ec5a#api_reuse",
+        "generality": "wu:0599fa4844ee4e5f3358ec5a#generality",
+        "proof_golf": "wu:0599fa4844ee4e5f3358ec5a#proof_golf",
+        "proof_idiom": "wu:0599fa4844ee4e5f3358ec5a#proof_idiom"
+      },
+      "rank": 10,
+      "subjects": [
+        "GalerkinProjection",
+        "LerayProjection",
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "galerkin_energy_bound",
+        "hsNorm",
+        "smoothInTime",
+        "smooth_initial_hs_finite"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`smooth_initial_hs_finite` introduces an axiom",
+        "shares a name family with 6 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:0599fa4844ee4e5f3358ec5a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:f7f8fad6798c3112259361eb#api_reuse",
+        "correctness": "wu:f7f8fad6798c3112259361eb#correctness",
+        "docs": "wu:f7f8fad6798c3112259361eb#docs",
+        "duplication": "wu:f7f8fad6798c3112259361eb#duplication",
+        "family_design": "wu:f7f8fad6798c3112259361eb#family_design",
+        "generality": "wu:f7f8fad6798c3112259361eb#generality",
+        "naming": "wu:f7f8fad6798c3112259361eb#naming",
+        "proof_golf": "wu:f7f8fad6798c3112259361eb#proof_golf",
+        "proof_idiom": "wu:f7f8fad6798c3112259361eb#proof_idiom",
+        "style": "wu:f7f8fad6798c3112259361eb#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "DivergenceFree",
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "SmoothSpacetime",
+        "tau_interval_finite"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`tau_interval_finite` is a chain of 13 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "`tau_interval_finite` uses a `calc` block",
+        "introduces a new declaration",
+        "`tau_interval_finite` is 33 lines"
+      ],
+      "work_unit_id": "wu:f7f8fad6798c3112259361eb"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2d2e5225aca4efb4283bac0a#api_reuse",
+        "correctness": "wu:2d2e5225aca4efb4283bac0a#correctness",
+        "docs": "wu:2d2e5225aca4efb4283bac0a#docs",
+        "duplication": "wu:2d2e5225aca4efb4283bac0a#duplication",
+        "family_design": "wu:2d2e5225aca4efb4283bac0a#family_design",
+        "generality": "wu:2d2e5225aca4efb4283bac0a#generality",
+        "proof_golf": "wu:2d2e5225aca4efb4283bac0a#proof_golf",
+        "proof_idiom": "wu:2d2e5225aca4efb4283bac0a#proof_idiom",
+        "style": "wu:2d2e5225aca4efb4283bac0a#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean",
+        "SmoothInitial",
+        "SolvesNavierStokes",
+        "VorticityResponse",
+        "fourier1D"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 19 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2d2e5225aca4efb4283bac0a"
+    }
+  ],
+  "33285": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:08f6394de9f2cf92f9e30e0e#api_reuse",
+        "correctness": "wu:08f6394de9f2cf92f9e30e0e#correctness",
+        "docs": "wu:08f6394de9f2cf92f9e30e0e#docs",
+        "duplication": "wu:08f6394de9f2cf92f9e30e0e#duplication",
+        "generality": "wu:08f6394de9f2cf92f9e30e0e#generality",
+        "style": "wu:08f6394de9f2cf92f9e30e0e#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Matrix.rank_eq_finrank_range_toLin"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`Matrix.rank_eq_finrank_range_toLin` is a chain of 10 low-level tactic steps",
+        "shares a name family with 2 other changed declaration(s)",
+        "`Matrix.rank_eq_finrank_range_toLin` is 20 lines"
+      ],
+      "work_unit_id": "wu:08f6394de9f2cf92f9e30e0e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:3e33b702bd15e424407acc48#api_reuse",
+        "correctness": "wu:3e33b702bd15e424407acc48#correctness",
+        "docs": "wu:3e33b702bd15e424407acc48#docs",
+        "duplication": "wu:3e33b702bd15e424407acc48#duplication",
+        "family_design": "wu:3e33b702bd15e424407acc48#family_design",
+        "generality": "wu:3e33b702bd15e424407acc48#generality",
+        "proof_golf": "wu:3e33b702bd15e424407acc48#proof_golf",
+        "proof_idiom": "wu:3e33b702bd15e424407acc48#proof_idiom",
+        "style": "wu:3e33b702bd15e424407acc48#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "LinearIsometry.isComplete_image_iff",
+        "LinearIsometry.isComplete_image_iff'"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)"
+      ],
+      "work_unit_id": "wu:3e33b702bd15e424407acc48"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:106916443547674c1fc655ce#api_reuse",
+        "correctness": "wu:106916443547674c1fc655ce#correctness",
+        "docs": "wu:106916443547674c1fc655ce#docs",
+        "duplication": "wu:106916443547674c1fc655ce#duplication",
+        "family_design": "wu:106916443547674c1fc655ce#family_design",
+        "generality": "wu:106916443547674c1fc655ce#generality",
+        "naming": "wu:106916443547674c1fc655ce#naming",
+        "style": "wu:106916443547674c1fc655ce#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Submodule.inf_comap_le_comap_add"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`Submodule.inf_comap_le_comap_add` is a chain of 4 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:106916443547674c1fc655ce"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:ec2dea5e3944ddf82f7aafd9#api_reuse",
+        "correctness": "wu:ec2dea5e3944ddf82f7aafd9#correctness",
+        "docs": "wu:ec2dea5e3944ddf82f7aafd9#docs",
+        "duplication": "wu:ec2dea5e3944ddf82f7aafd9#duplication",
+        "family_design": "wu:ec2dea5e3944ddf82f7aafd9#family_design",
+        "generality": "wu:ec2dea5e3944ddf82f7aafd9#generality",
+        "naming": "wu:ec2dea5e3944ddf82f7aafd9#naming",
+        "proof_golf": "wu:ec2dea5e3944ddf82f7aafd9#proof_golf",
+        "proof_idiom": "wu:ec2dea5e3944ddf82f7aafd9#proof_idiom",
+        "style": "wu:ec2dea5e3944ddf82f7aafd9#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Ideal.cotangentEquivIdeal_symm_apply"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`Ideal.cotangentEquivIdeal_symm_apply` is a chain of 3 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:ec2dea5e3944ddf82f7aafd9"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:72d6d4a1ab7832f7ed6e9302#api_reuse",
+        "correctness": "wu:72d6d4a1ab7832f7ed6e9302#correctness",
+        "docs": "wu:72d6d4a1ab7832f7ed6e9302#docs",
+        "duplication": "wu:72d6d4a1ab7832f7ed6e9302#duplication",
+        "family_design": "wu:72d6d4a1ab7832f7ed6e9302#family_design",
+        "generality": "wu:72d6d4a1ab7832f7ed6e9302#generality",
+        "naming": "wu:72d6d4a1ab7832f7ed6e9302#naming",
+        "proof_golf": "wu:72d6d4a1ab7832f7ed6e9302#proof_golf",
+        "proof_idiom": "wu:72d6d4a1ab7832f7ed6e9302#proof_idiom",
+        "style": "wu:72d6d4a1ab7832f7ed6e9302#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "LinearEquiv.symm_prodComm"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:72d6d4a1ab7832f7ed6e9302"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2d11af71f37b0337e2d82b20#api_reuse",
+        "correctness": "wu:2d11af71f37b0337e2d82b20#correctness",
+        "docs": "wu:2d11af71f37b0337e2d82b20#docs",
+        "duplication": "wu:2d11af71f37b0337e2d82b20#duplication",
+        "family_design": "wu:2d11af71f37b0337e2d82b20#family_design",
+        "generality": "wu:2d11af71f37b0337e2d82b20#generality",
+        "naming": "wu:2d11af71f37b0337e2d82b20#naming"
+      },
+      "rank": 6,
+      "subjects": [
+        "ContinuousLinearMap.antilipschitz_of_injective_of_isClosed_range",
+        "ContinuousLinearMap.equivRange_symm_apply"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:2d11af71f37b0337e2d82b20"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c41028a09b41ced137e38caf#api_reuse",
+        "correctness": "wu:c41028a09b41ced137e38caf#correctness",
+        "docs": "wu:c41028a09b41ced137e38caf#docs",
+        "duplication": "wu:c41028a09b41ced137e38caf#duplication",
+        "family_design": "wu:c41028a09b41ced137e38caf#family_design",
+        "generality": "wu:c41028a09b41ced137e38caf#generality",
+        "naming": "wu:c41028a09b41ced137e38caf#naming",
+        "proof_golf": "wu:c41028a09b41ced137e38caf#proof_golf",
+        "proof_idiom": "wu:c41028a09b41ced137e38caf#proof_idiom",
+        "style": "wu:c41028a09b41ced137e38caf#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "IsContDiffImplicitAt.implicitFunctionData"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:c41028a09b41ced137e38caf"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d3def81aa639f6ae4a4f3e88#api_reuse",
+        "correctness": "wu:d3def81aa639f6ae4a4f3e88#correctness",
+        "docs": "wu:d3def81aa639f6ae4a4f3e88#docs",
+        "duplication": "wu:d3def81aa639f6ae4a4f3e88#duplication",
+        "family_design": "wu:d3def81aa639f6ae4a4f3e88#family_design",
+        "generality": "wu:d3def81aa639f6ae4a4f3e88#generality",
+        "naming": "wu:d3def81aa639f6ae4a4f3e88#naming",
+        "proof_golf": "wu:d3def81aa639f6ae4a4f3e88#proof_golf",
+        "proof_idiom": "wu:d3def81aa639f6ae4a4f3e88#proof_idiom",
+        "style": "wu:d3def81aa639f6ae4a4f3e88#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "ContinuousLinearEquiv.submoduleMap",
+        "ContinuousLinearMap.iInfKerProjEquiv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:d3def81aa639f6ae4a4f3e88"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:fba645d9ac2428326accbb44#api_reuse",
+        "correctness": "wu:fba645d9ac2428326accbb44#correctness",
+        "docs": "wu:fba645d9ac2428326accbb44#docs",
+        "duplication": "wu:fba645d9ac2428326accbb44#duplication",
+        "family_design": "wu:fba645d9ac2428326accbb44#family_design",
+        "generality": "wu:fba645d9ac2428326accbb44#generality",
+        "naming": "wu:fba645d9ac2428326accbb44#naming",
+        "proof_golf": "wu:fba645d9ac2428326accbb44#proof_golf",
+        "proof_idiom": "wu:fba645d9ac2428326accbb44#proof_idiom",
+        "style": "wu:fba645d9ac2428326accbb44#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Submodule.IsOrtho.map"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:fba645d9ac2428326accbb44"
+    }
+  ],
+  "33294": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:a6ae853a172902c6176749e2#api_reuse",
+        "correctness": "wu:a6ae853a172902c6176749e2#correctness",
+        "docs": "wu:a6ae853a172902c6176749e2#docs",
+        "duplication": "wu:a6ae853a172902c6176749e2#duplication",
+        "family_design": "wu:a6ae853a172902c6176749e2#family_design",
+        "generality": "wu:a6ae853a172902c6176749e2#generality",
+        "naming": "wu:a6ae853a172902c6176749e2#naming",
+        "proof_golf": "wu:a6ae853a172902c6176749e2#proof_golf",
+        "proof_idiom": "wu:a6ae853a172902c6176749e2#proof_idiom",
+        "style": "wu:a6ae853a172902c6176749e2#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/FixedPoint.lean",
+        "Ordinal.IsNormal.apply_le_nfp",
+        "Ordinal.IsNormal.nfp_le_apply",
+        "Ordinal.add_eq_right_iff_mul_omega0_le",
+        "Ordinal.apply_lt_nfpFamily_iff",
+        "Ordinal.derivFamily_fp",
+        "Ordinal.deriv_add_eq_mul_omega0_add",
+        "Ordinal.deriv_eq_id_of_nfp_eq_id",
+        "Ordinal.deriv_mul_eq_opow_omega0_mul",
+        "Ordinal.fp_iff_deriv",
+        "Ordinal.le_iff_deriv",
+        "Ordinal.mem_range_deriv",
+        "Ordinal.mul_le_right_iff_opow_omega0_dvd",
+        "Ordinal.nfp_fp",
+        "Ordinal.nfp_le_apply"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.le_iff_deriv` is a chain of 3 low-level tactic steps",
+        "`Ordinal.deriv_mul_eq_opow_omega0_mul` is a chain of 3 low-level tactic steps",
+        "`Ordinal.derivFamily_fp` is a chain of 10 low-level tactic steps",
+        "`Ordinal.deriv_add_eq_mul_omega0_add` is a chain of 4 low-level tactic steps",
+        "`Ordinal.add_eq_right_iff_mul_omega0_le` is a chain of 4 low-level tactic steps",
+        "was changed alongside 10 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.derivFamily_fp` is 18 lines"
+      ],
+      "work_unit_id": "wu:a6ae853a172902c6176749e2"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:a5d197d0a6a1a282f37ede75#api_reuse",
+        "correctness": "wu:a5d197d0a6a1a282f37ede75#correctness",
+        "docs": "wu:a5d197d0a6a1a282f37ede75#docs",
+        "duplication": "wu:a5d197d0a6a1a282f37ede75#duplication",
+        "family_design": "wu:a5d197d0a6a1a282f37ede75#family_design",
+        "generality": "wu:a5d197d0a6a1a282f37ede75#generality",
+        "naming": "wu:a5d197d0a6a1a282f37ede75#naming",
+        "proof_golf": "wu:a5d197d0a6a1a282f37ede75#proof_golf",
+        "proof_idiom": "wu:a5d197d0a6a1a282f37ede75#proof_idiom",
+        "style": "wu:a5d197d0a6a1a282f37ede75#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/FixedPoint.lean",
+        "Ordinal.IsNormal.fp_iff_deriv",
+        "Ordinal.IsNormal.le_iff_deriv",
+        "Ordinal.add_le_right_iff_mul_omega0_le",
+        "Ordinal.apply_le_nfp",
+        "Ordinal.apply_le_nfpFamily",
+        "Ordinal.apply_lt_nfp",
+        "Ordinal.deriv_fp",
+        "Ordinal.fp_iff_derivFamily",
+        "Ordinal.le_iff_derivFamily",
+        "Ordinal.nfpFamily_fp",
+        "Ordinal.nfp_add_zero",
+        "Ordinal.nfp_mul_one",
+        "Ordinal.nfp_mul_opow_omega0_add"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.apply_le_nfpFamily` is a chain of 3 low-level tactic steps",
+        "`Ordinal.apply_lt_nfp` is a chain of 3 low-level tactic steps",
+        "`Ordinal.nfp_mul_opow_omega0_add` is a chain of 7 low-level tactic steps",
+        "was changed alongside 11 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.nfp_mul_opow_omega0_add` is 18 lines",
+        "`Ordinal.le_iff_derivFamily` is 29 lines"
+      ],
+      "work_unit_id": "wu:a5d197d0a6a1a282f37ede75"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:15457af8622e5b4fc85111d8#api_reuse",
+        "correctness": "wu:15457af8622e5b4fc85111d8#correctness",
+        "docs": "wu:15457af8622e5b4fc85111d8#docs",
+        "duplication": "wu:15457af8622e5b4fc85111d8#duplication",
+        "family_design": "wu:15457af8622e5b4fc85111d8#family_design",
+        "generality": "wu:15457af8622e5b4fc85111d8#generality",
+        "proof_golf": "wu:15457af8622e5b4fc85111d8#proof_golf",
+        "proof_idiom": "wu:15457af8622e5b4fc85111d8#proof_idiom"
+      },
+      "rank": 3,
+      "subjects": [
+        "Ordinal.add_omega0_opow",
+        "Ordinal.mul_lt_omega0_opow",
+        "Ordinal.op_eq_self_of_principal"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.add_omega0_opow` is a chain of 8 low-level tactic steps",
+        "`Ordinal.mul_lt_omega0_opow` is a chain of 5 low-level tactic steps",
+        "`Ordinal.op_eq_self_of_principal` is a chain of 3 low-level tactic steps",
+        "`Ordinal.add_omega0_opow` uses a `calc` block",
+        "`Ordinal.add_omega0_opow` is 21 lines",
+        "`Ordinal.mul_lt_omega0_opow` is 15 lines"
+      ],
+      "work_unit_id": "wu:15457af8622e5b4fc85111d8"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:93988ab6b1e6bb91d4f29613#api_reuse",
+        "correctness": "wu:93988ab6b1e6bb91d4f29613#correctness",
+        "docs": "wu:93988ab6b1e6bb91d4f29613#docs",
+        "duplication": "wu:93988ab6b1e6bb91d4f29613#duplication",
+        "family_design": "wu:93988ab6b1e6bb91d4f29613#family_design",
+        "generality": "wu:93988ab6b1e6bb91d4f29613#generality",
+        "naming": "wu:93988ab6b1e6bb91d4f29613#naming",
+        "proof_golf": "wu:93988ab6b1e6bb91d4f29613#proof_golf",
+        "proof_idiom": "wu:93988ab6b1e6bb91d4f29613#proof_idiom",
+        "style": "wu:93988ab6b1e6bb91d4f29613#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Exponential.lean",
+        "Ordinal.iSup_pow_natCast",
+        "Ordinal.isNormal_opow",
+        "Ordinal.isSuccLimit_opow",
+        "Ordinal.opow_add",
+        "Ordinal.opow_le_opow_iff_right",
+        "Ordinal.opow_lt_opow_iff_right",
+        "Ordinal.opow_mul",
+        "Ordinal.opow_right_inj",
+        "Ordinal.right_le_opow"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.opow_add` is a chain of 7 low-level tactic steps",
+        "`Ordinal.opow_mul` is a chain of 5 low-level tactic steps",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.opow_add` is 18 lines",
+        "`Ordinal.opow_mul` is 15 lines"
+      ],
+      "work_unit_id": "wu:93988ab6b1e6bb91d4f29613"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:f5e5ffc12e8a577e3d4c3d2e#api_reuse",
+        "correctness": "wu:f5e5ffc12e8a577e3d4c3d2e#correctness",
+        "docs": "wu:f5e5ffc12e8a577e3d4c3d2e#docs",
+        "duplication": "wu:f5e5ffc12e8a577e3d4c3d2e#duplication",
+        "family_design": "wu:f5e5ffc12e8a577e3d4c3d2e#family_design",
+        "generality": "wu:f5e5ffc12e8a577e3d4c3d2e#generality",
+        "naming": "wu:f5e5ffc12e8a577e3d4c3d2e#naming",
+        "proof_golf": "wu:f5e5ffc12e8a577e3d4c3d2e#proof_golf",
+        "proof_idiom": "wu:f5e5ffc12e8a577e3d4c3d2e#proof_idiom",
+        "style": "wu:f5e5ffc12e8a577e3d4c3d2e#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Veblen.lean",
+        "Ordinal.isNormal_veblen",
+        "Ordinal.isNormal_veblenWith_zero",
+        "Ordinal.isNormal_veblen_zero",
+        "Ordinal.mem_range_gamma",
+        "Ordinal.omega0_opow_epsilon",
+        "Ordinal.veblenWith_right_strictMono",
+        "Ordinal.veblenWith_succ",
+        "Ordinal.veblen_gamma_zero"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isNormal_veblenWith_zero` is a chain of 11 low-level tactic steps",
+        "`Ordinal.veblenWith_succ` is a chain of 5 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.isNormal_veblenWith_zero` is 20 lines",
+        "`Ordinal.veblenWith_succ` is 15 lines"
+      ],
+      "work_unit_id": "wu:f5e5ffc12e8a577e3d4c3d2e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:483ae1bd0fa66f7747dd9fdb#api_reuse",
+        "correctness": "wu:483ae1bd0fa66f7747dd9fdb#correctness",
+        "docs": "wu:483ae1bd0fa66f7747dd9fdb#docs",
+        "duplication": "wu:483ae1bd0fa66f7747dd9fdb#duplication",
+        "family_design": "wu:483ae1bd0fa66f7747dd9fdb#family_design",
+        "generality": "wu:483ae1bd0fa66f7747dd9fdb#generality",
+        "naming": "wu:483ae1bd0fa66f7747dd9fdb#naming",
+        "proof_golf": "wu:483ae1bd0fa66f7747dd9fdb#proof_golf",
+        "proof_idiom": "wu:483ae1bd0fa66f7747dd9fdb#proof_idiom",
+        "style": "wu:483ae1bd0fa66f7747dd9fdb#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/SetTheory/Cardinal/Cofinality.lean",
+        "Ordinal.IsNormal.cof_eq",
+        "Ordinal.IsNormal.cof_le",
+        "Ordinal.cof_add",
+        "Ordinal.cof_eq_of_isNormal",
+        "Ordinal.cof_le_of_isNormal",
+        "Ordinal.cof_omega",
+        "Ordinal.cof_preOmega",
+        "Ordinal.isFundamentalSequence_of_isNormal"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isFundamentalSequence_of_isNormal` is a chain of 15 low-level tactic steps",
+        "`Ordinal.cof_le_of_isNormal` is a chain of 3 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.isFundamentalSequence_of_isNormal` is 28 lines"
+      ],
+      "work_unit_id": "wu:483ae1bd0fa66f7747dd9fdb"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:08062fea93599aa3dfbba0ae#api_reuse",
+        "correctness": "wu:08062fea93599aa3dfbba0ae#correctness",
+        "docs": "wu:08062fea93599aa3dfbba0ae#docs",
+        "duplication": "wu:08062fea93599aa3dfbba0ae#duplication",
+        "generality": "wu:08062fea93599aa3dfbba0ae#generality",
+        "proof_golf": "wu:08062fea93599aa3dfbba0ae#proof_golf",
+        "proof_idiom": "wu:08062fea93599aa3dfbba0ae#proof_idiom",
+        "style": "wu:08062fea93599aa3dfbba0ae#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Ordinal.isNormal_enumOrd"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isNormal_enumOrd` is a chain of 3 low-level tactic steps",
+        "`Ordinal.isNormal_enumOrd` is 13 lines"
+      ],
+      "work_unit_id": "wu:08062fea93599aa3dfbba0ae"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:3dfacfbc3c0c2f76f600d392#api_reuse",
+        "correctness": "wu:3dfacfbc3c0c2f76f600d392#correctness",
+        "docs": "wu:3dfacfbc3c0c2f76f600d392#docs",
+        "duplication": "wu:3dfacfbc3c0c2f76f600d392#duplication",
+        "family_design": "wu:3dfacfbc3c0c2f76f600d392#family_design",
+        "generality": "wu:3dfacfbc3c0c2f76f600d392#generality",
+        "naming": "wu:3dfacfbc3c0c2f76f600d392#naming",
+        "proof_golf": "wu:3dfacfbc3c0c2f76f600d392#proof_golf",
+        "proof_idiom": "wu:3dfacfbc3c0c2f76f600d392#proof_idiom",
+        "style": "wu:3dfacfbc3c0c2f76f600d392#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Arithmetic.lean",
+        "Ordinal.IsNormal.inj",
+        "Ordinal.IsNormal.isSuccLimit",
+        "Ordinal.IsNormal.le_iff",
+        "Ordinal.IsNormal.le_set",
+        "Ordinal.IsNormal.le_set'",
+        "Ordinal.IsNormal.lt_iff",
+        "Ordinal.IsNormal.monotone",
+        "Ordinal.IsNormal.refl",
+        "Ordinal.isNormal_iff_strictMono_limit",
+        "Ordinal.isNormal_mul_right"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.IsNormal.le_set` is a chain of 3 low-level tactic steps",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:3dfacfbc3c0c2f76f600d392"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6e5d624e82fec58daa2a7280#api_reuse",
+        "correctness": "wu:6e5d624e82fec58daa2a7280#correctness",
+        "docs": "wu:6e5d624e82fec58daa2a7280#docs",
+        "duplication": "wu:6e5d624e82fec58daa2a7280#duplication",
+        "family_design": "wu:6e5d624e82fec58daa2a7280#family_design",
+        "generality": "wu:6e5d624e82fec58daa2a7280#generality",
+        "naming": "wu:6e5d624e82fec58daa2a7280#naming",
+        "proof_golf": "wu:6e5d624e82fec58daa2a7280#proof_golf",
+        "proof_idiom": "wu:6e5d624e82fec58daa2a7280#proof_idiom",
+        "style": "wu:6e5d624e82fec58daa2a7280#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Ordinal.enumOrd_isNormal_iff_isClosed"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.enumOrd_isNormal_iff_isClosed` is a chain of 14 low-level tactic steps",
+        "`Ordinal.enumOrd_isNormal_iff_isClosed` is 28 lines"
+      ],
+      "work_unit_id": "wu:6e5d624e82fec58daa2a7280"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:3e8ded8fd07e2d62d9fec379#api_reuse",
+        "correctness": "wu:3e8ded8fd07e2d62d9fec379#correctness",
+        "docs": "wu:3e8ded8fd07e2d62d9fec379#docs",
+        "duplication": "wu:3e8ded8fd07e2d62d9fec379#duplication",
+        "family_design": "wu:3e8ded8fd07e2d62d9fec379#family_design",
+        "generality": "wu:3e8ded8fd07e2d62d9fec379#generality",
+        "naming": "wu:3e8ded8fd07e2d62d9fec379#naming",
+        "proof_golf": "wu:3e8ded8fd07e2d62d9fec379#proof_golf",
+        "proof_idiom": "wu:3e8ded8fd07e2d62d9fec379#proof_idiom",
+        "style": "wu:3e8ded8fd07e2d62d9fec379#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Ordinal.isNormal_omega",
+        "Ordinal.isNormal_preOmega",
+        "Ordinal.preOmega_omega0"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isNormal_preOmega` is a chain of 6 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:3e8ded8fd07e2d62d9fec379"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:0ef0e87605081f4eba84876a#api_reuse",
+        "correctness": "wu:0ef0e87605081f4eba84876a#correctness",
+        "docs": "wu:0ef0e87605081f4eba84876a#docs",
+        "duplication": "wu:0ef0e87605081f4eba84876a#duplication",
+        "family_design": "wu:0ef0e87605081f4eba84876a#family_design",
+        "generality": "wu:0ef0e87605081f4eba84876a#generality",
+        "proof_golf": "wu:0ef0e87605081f4eba84876a#proof_golf",
+        "proof_idiom": "wu:0ef0e87605081f4eba84876a#proof_idiom"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Arithmetic.lean",
+        "Ordinal.IsNormal",
+        "Ordinal.IsNormal.id_le",
+        "Ordinal.IsNormal.le_apply",
+        "Ordinal.IsNormal.le_iff_eq",
+        "Ordinal.IsNormal.limit_le",
+        "Ordinal.IsNormal.limit_lt",
+        "Ordinal.IsNormal.strictMono",
+        "Ordinal.IsNormal.trans",
+        "Ordinal.isNormal_add_right",
+        "Ordinal.isSuccLimit_add",
+        "Ordinal.isSuccLimit_mul"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "was changed alongside 2 other changed declaration(s)"
+      ],
+      "work_unit_id": "wu:0ef0e87605081f4eba84876a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:1b3f1aaf4a49200bd91159a5#api_reuse",
+        "docs": "wu:1b3f1aaf4a49200bd91159a5#docs",
+        "family_design": "wu:1b3f1aaf4a49200bd91159a5#family_design",
+        "generality": "wu:1b3f1aaf4a49200bd91159a5#generality",
+        "proof_golf": "wu:1b3f1aaf4a49200bd91159a5#proof_golf",
+        "proof_idiom": "wu:1b3f1aaf4a49200bd91159a5#proof_idiom"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Family.lean",
+        "Ordinal.IsNormal.apply_of_isSuccLimit",
+        "Ordinal.IsNormal.apply_omega0",
+        "Ordinal.IsNormal.bsup",
+        "Ordinal.IsNormal.eq_iff_zero_and_succ",
+        "Ordinal.IsNormal.map_iSup",
+        "Ordinal.IsNormal.map_iSup_of_bddAbove",
+        "Ordinal.IsNormal.map_sSup",
+        "Ordinal.IsNormal.map_sSup_of_bddAbove",
+        "Ordinal.apply_omega0_of_isNormal",
+        "Ordinal.iSup_add_nat",
+        "Ordinal.iSup_add_natCast",
+        "Ordinal.iSup_mul_nat",
+        "Ordinal.iSup_mul_natCast"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1b3f1aaf4a49200bd91159a5"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:53607bdedf86ead11ed6e07d#api_reuse",
+        "correctness": "wu:53607bdedf86ead11ed6e07d#correctness",
+        "docs": "wu:53607bdedf86ead11ed6e07d#docs",
+        "duplication": "wu:53607bdedf86ead11ed6e07d#duplication",
+        "family_design": "wu:53607bdedf86ead11ed6e07d#family_design",
+        "generality": "wu:53607bdedf86ead11ed6e07d#generality",
+        "naming": "wu:53607bdedf86ead11ed6e07d#naming",
+        "proof_golf": "wu:53607bdedf86ead11ed6e07d#proof_golf",
+        "proof_idiom": "wu:53607bdedf86ead11ed6e07d#proof_idiom",
+        "style": "wu:53607bdedf86ead11ed6e07d#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "Order.IsNormal.monotone"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:53607bdedf86ead11ed6e07d"
+    }
+  ],
+  "33304": [
+    {
+      "available_arms": {
+        "docs": "wu:521bc248d42d06110f6b407b#docs",
+        "style": "wu:521bc248d42d06110f6b407b#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/HasLimits.lean"
+      ],
+      "suggested_arms": [
+        "docs",
+        "proof_golf"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'",
+        "`Mathlib/CategoryTheory/Limits/HasLimits.lean` uses a `calc` block"
+      ],
+      "work_unit_id": "wu:521bc248d42d06110f6b407b"
+    },
+    {
+      "available_arms": {
+        "style": "wu:053c0fa3d5cd4c06efb31d56#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/CategoryTheory/Groupoid/Subgroupoid.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:053c0fa3d5cd4c06efb31d56"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:06c69d9bd26adb71b356bb3f#api_reuse",
+        "correctness": "wu:06c69d9bd26adb71b356bb3f#correctness",
+        "docs": "wu:06c69d9bd26adb71b356bb3f#docs",
+        "duplication": "wu:06c69d9bd26adb71b356bb3f#duplication",
+        "family_design": "wu:06c69d9bd26adb71b356bb3f#family_design",
+        "generality": "wu:06c69d9bd26adb71b356bb3f#generality",
+        "naming": "wu:06c69d9bd26adb71b356bb3f#naming",
+        "proof_golf": "wu:06c69d9bd26adb71b356bb3f#proof_golf",
+        "proof_idiom": "wu:06c69d9bd26adb71b356bb3f#proof_idiom",
+        "style": "wu:06c69d9bd26adb71b356bb3f#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "CategoryTheory.UnbundledHom"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:06c69d9bd26adb71b356bb3f"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:3edc987b0144c0ed96f004ec#docs",
+        "style": "wu:3edc987b0144c0ed96f004ec#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/CategoryTheory/Monoidal/Mon_.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:3edc987b0144c0ed96f004ec"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:52325b9f1dd0492a4ddbf090#docs",
+        "style": "wu:52325b9f1dd0492a4ddbf090#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/CategoryTheory/Localization/Equivalence.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:52325b9f1dd0492a4ddbf090"
+    },
+    {
+      "available_arms": {
+        "style": "wu:5614086b22e9ddfefbd003e1#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/CategoryTheory/Functor/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:5614086b22e9ddfefbd003e1"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:803be464970cded4ce491bf7#docs",
+        "style": "wu:803be464970cded4ce491bf7#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/CategoryTheory/ConcreteCategory/Bundled.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:803be464970cded4ce491bf7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:b5ed93ce595d3bdc80c5733b#api_reuse",
+        "correctness": "wu:b5ed93ce595d3bdc80c5733b#correctness",
+        "docs": "wu:b5ed93ce595d3bdc80c5733b#docs",
+        "duplication": "wu:b5ed93ce595d3bdc80c5733b#duplication",
+        "family_design": "wu:b5ed93ce595d3bdc80c5733b#family_design",
+        "generality": "wu:b5ed93ce595d3bdc80c5733b#generality",
+        "naming": "wu:b5ed93ce595d3bdc80c5733b#naming",
+        "proof_golf": "wu:b5ed93ce595d3bdc80c5733b#proof_golf",
+        "proof_idiom": "wu:b5ed93ce595d3bdc80c5733b#proof_idiom",
+        "style": "wu:b5ed93ce595d3bdc80c5733b#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "CategoryTheory.BundledHom"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:b5ed93ce595d3bdc80c5733b"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:cea5a17e4168e33f019a3e9a#docs",
+        "style": "wu:cea5a17e4168e33f019a3e9a#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/Preserves/Over.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:cea5a17e4168e33f019a3e9a"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:cf88c70f759488be7b8bed12#docs",
+        "style": "wu:cf88c70f759488be7b8bed12#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/CategoryTheory/Bicategory/Functor/StrictPseudofunctor.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:cf88c70f759488be7b8bed12"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:d58e370e89be6b5c2a2d883c#docs",
+        "style": "wu:d58e370e89be6b5c2a2d883c#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/FunctorCategory/Finite.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:d58e370e89be6b5c2a2d883c"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:e1d455a583d57cdae25dfcc2#docs",
+        "style": "wu:e1d455a583d57cdae25dfcc2#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/FunctorCategory/Filtered.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:e1d455a583d57cdae25dfcc2"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:f48b0d852e6a9f96c2998d49#docs",
+        "style": "wu:f48b0d852e6a9f96c2998d49#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/Preserves/Limits.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:f48b0d852e6a9f96c2998d49"
+    }
+  ],
+  "33305": [
+    {
+      "available_arms": {
+        "style": "wu:28c87431428ea3b2f6bfd499#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:28c87431428ea3b2f6bfd499"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:3d70db85b1107adecc83f53a#docs",
+        "style": "wu:3d70db85b1107adecc83f53a#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/GroupTheory/FreeAbelianGroup.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:3d70db85b1107adecc83f53a"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:3f485e9a7944f56227f7bd82#docs",
+        "style": "wu:3f485e9a7944f56227f7bd82#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/GroupTheory/Abelianization/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:3f485e9a7944f56227f7bd82"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:4bfbde783050ada18f3f65ba#docs",
+        "style": "wu:4bfbde783050ada18f3f65ba#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/GroupTheory/Submonoid/Inverses.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:4bfbde783050ada18f3f65ba"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:6269d4d34639e6cf160fca2c#docs",
+        "style": "wu:6269d4d34639e6cf160fca2c#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/GroupTheory/FreeGroup/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:6269d4d34639e6cf160fca2c"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:93acdf8dc6be4974ce355a94#docs",
+        "style": "wu:93acdf8dc6be4974ce355a94#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/GroupTheory/GroupExtension/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:93acdf8dc6be4974ce355a94"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:9bc304366a52f21af51fb3d0#docs",
+        "style": "wu:9bc304366a52f21af51fb3d0#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/GroupTheory/Perm/Sign.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:9bc304366a52f21af51fb3d0"
+    }
+  ],
+  "33315": [
+    {
+      "available_arms": {
+        "style": "wu:583f15a76bf8277027098685#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Data/Nat/Init.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:583f15a76bf8277027098685"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:6190c1352e773bc9a0593db5#docs",
+        "style": "wu:6190c1352e773bc9a0593db5#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Data/Complex/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:6190c1352e773bc9a0593db5"
+    },
+    {
+      "available_arms": {
+        "style": "wu:61e76dac7dfa6525561dcac7#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Data/Array/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:61e76dac7dfa6525561dcac7"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:726e01bc51db7385dd63b59f#docs",
+        "style": "wu:726e01bc51db7385dd63b59f#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Data/Finsupp/MonomialOrder.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:726e01bc51db7385dd63b59f"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:a6da17244c596cd62daf7ad6#docs",
+        "style": "wu:a6da17244c596cd62daf7ad6#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Data/Finset/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:a6da17244c596cd62daf7ad6"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:abc28f8cd811464fcfceed50#api_reuse",
+        "correctness": "wu:abc28f8cd811464fcfceed50#correctness",
+        "docs": "wu:abc28f8cd811464fcfceed50#docs",
+        "duplication": "wu:abc28f8cd811464fcfceed50#duplication",
+        "family_design": "wu:abc28f8cd811464fcfceed50#family_design",
+        "generality": "wu:abc28f8cd811464fcfceed50#generality",
+        "naming": "wu:abc28f8cd811464fcfceed50#naming",
+        "proof_golf": "wu:abc28f8cd811464fcfceed50#proof_golf",
+        "proof_idiom": "wu:abc28f8cd811464fcfceed50#proof_idiom"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/Data/Vector3.lean",
+        "Vector3.unexpandNil"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:abc28f8cd811464fcfceed50"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:cf85809a06ac07c3fec192f1#docs",
+        "style": "wu:cf85809a06ac07c3fec192f1#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/Data/List/Lex.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:cf85809a06ac07c3fec192f1"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:de9469fb8d7d023941b476db#docs",
+        "style": "wu:de9469fb8d7d023941b476db#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:de9469fb8d7d023941b476db"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:f46a6f60c04292c5720e6167#docs",
+        "style": "wu:f46a6f60c04292c5720e6167#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Data/Matrix/Mul.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:f46a6f60c04292c5720e6167"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:f5e71ad2cb87f317221c299e#docs",
+        "style": "wu:f5e71ad2cb87f317221c299e#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/Data/Set/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:f5e71ad2cb87f317221c299e"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:fe6bdfb39bb79de6bd80789f#docs",
+        "style": "wu:fe6bdfb39bb79de6bd80789f#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/Data/Option/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:fe6bdfb39bb79de6bd80789f"
+    }
+  ],
+  "33321": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:bcacc3ebf207d1eff4a20fae#api_reuse",
+        "correctness": "wu:bcacc3ebf207d1eff4a20fae#correctness",
+        "docs": "wu:bcacc3ebf207d1eff4a20fae#docs",
+        "duplication": "wu:bcacc3ebf207d1eff4a20fae#duplication",
+        "family_design": "wu:bcacc3ebf207d1eff4a20fae#family_design",
+        "generality": "wu:bcacc3ebf207d1eff4a20fae#generality",
+        "proof_golf": "wu:bcacc3ebf207d1eff4a20fae#proof_golf",
+        "proof_idiom": "wu:bcacc3ebf207d1eff4a20fae#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "IsMulIndecomposable.baseOf",
+        "IsMulIndecomposable.baseOf_subset_one_lt",
+        "IsMulIndecomposable.image_baseOf_inv_comp_eq",
+        "IsMulIndecomposable.mem_or_inv_mem_closure_baseOf",
+        "IsMulIndecomposable.pairwise_baseOf_div_notMem",
+        "IsMulIndecomposable.pairwise_div_notMem_range",
+        "IsMulIndecomposable.pairwise_div_notMem_range'",
+        "IsMulIndecomposable.subset",
+        "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+        "Subgroup.closure_image_isMulIndecomposable_baseOf",
+        "Submonoid.closure_image_isMulIndecomposable_baseOf"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`IsMulIndecomposable.image_baseOf_inv_comp_eq` is a chain of 4 low-level tactic steps",
+        "`IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` is a chain of 4 low-level tactic steps",
+        "`Submonoid.closure_image_isMulIndecomposable_baseOf` is a chain of 10 low-level tactic steps",
+        "`IsMulIndecomposable.pairwise_div_notMem_range` is a chain of 7 low-level tactic steps",
+        "`IsMulIndecomposable.pairwise_div_notMem_range'` is a chain of 3 low-level tactic steps",
+        "`Subgroup.closure_image_isMulIndecomposable_baseOf` is a chain of 12 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 8 other changed declaration(s)",
+        "introduces a new declaration",
+        "`IsMulIndecomposable.image_baseOf_inv_comp_eq` is 23 lines",
+        "`IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` is 14 lines",
+        "`Submonoid.closure_image_isMulIndecomposable_baseOf` is 33 lines",
+        "`IsMulIndecomposable.pairwise_div_notMem_range` is 21 lines",
+        "`Subgroup.closure_image_isMulIndecomposable_baseOf` is 24 lines"
+      ],
+      "work_unit_id": "wu:bcacc3ebf207d1eff4a20fae"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:e46e18b875d5daea0910cf23#api_reuse",
+        "correctness": "wu:e46e18b875d5daea0910cf23#correctness",
+        "duplication": "wu:e46e18b875d5daea0910cf23#duplication",
+        "family_design": "wu:e46e18b875d5daea0910cf23#family_design",
+        "generality": "wu:e46e18b875d5daea0910cf23#generality",
+        "proof_golf": "wu:e46e18b875d5daea0910cf23#proof_golf",
+        "proof_idiom": "wu:e46e18b875d5daea0910cf23#proof_idiom",
+        "style": "wu:e46e18b875d5daea0910cf23#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+        "RootPairing.baseOf_pairwise_pairing_le_zero",
+        "RootPairing.linearIndepOn_root_baseOf",
+        "RootPairing.linearIndepOn_root_baseOf'"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`RootPairing.linearIndepOn_root_baseOf'` is a chain of 9 low-level tactic steps",
+        "`RootPairing.baseOf_pairwise_pairing_le_zero` is a chain of 3 low-level tactic steps",
+        "`RootPairing.linearIndepOn_root_baseOf` is a chain of 16 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "introduces a new declaration",
+        "`RootPairing.linearIndepOn_root_baseOf'` is 24 lines",
+        "`RootPairing.linearIndepOn_root_baseOf` is 35 lines"
+      ],
+      "work_unit_id": "wu:e46e18b875d5daea0910cf23"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:331c3c6d47dd8af7a1e42531#api_reuse",
+        "correctness": "wu:331c3c6d47dd8af7a1e42531#correctness",
+        "docs": "wu:331c3c6d47dd8af7a1e42531#docs",
+        "duplication": "wu:331c3c6d47dd8af7a1e42531#duplication",
+        "generality": "wu:331c3c6d47dd8af7a1e42531#generality",
+        "proof_golf": "wu:331c3c6d47dd8af7a1e42531#proof_golf",
+        "proof_idiom": "wu:331c3c6d47dd8af7a1e42531#proof_idiom"
+      },
+      "rank": 3,
+      "subjects": [
+        "RootPairing.algebraMap_pairingIn'",
+        "RootPairing.pairingIn_rat"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`RootPairing.algebraMap_pairingIn'` is a chain of 3 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:331c3c6d47dd8af7a1e42531"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d35ebe31b713191272d60139#api_reuse",
+        "correctness": "wu:d35ebe31b713191272d60139#correctness",
+        "docs": "wu:d35ebe31b713191272d60139#docs",
+        "duplication": "wu:d35ebe31b713191272d60139#duplication",
+        "family_design": "wu:d35ebe31b713191272d60139#family_design",
+        "generality": "wu:d35ebe31b713191272d60139#generality",
+        "proof_golf": "wu:d35ebe31b713191272d60139#proof_golf",
+        "proof_idiom": "wu:d35ebe31b713191272d60139#proof_idiom",
+        "style": "wu:d35ebe31b713191272d60139#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "coe_invMonoidHom",
+        "invMonoidHom_apply",
+        "invMonoidHom_comp_invMonoidHom"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d35ebe31b713191272d60139"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:0fa694051ea98fda710dfb1d#api_reuse",
+        "docs": "wu:0fa694051ea98fda710dfb1d#docs",
+        "family_design": "wu:0fa694051ea98fda710dfb1d#family_design",
+        "generality": "wu:0fa694051ea98fda710dfb1d#generality",
+        "naming": "wu:0fa694051ea98fda710dfb1d#naming",
+        "proof_golf": "wu:0fa694051ea98fda710dfb1d#proof_golf",
+        "proof_idiom": "wu:0fa694051ea98fda710dfb1d#proof_idiom",
+        "style": "wu:0fa694051ea98fda710dfb1d#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "RootPairing.RootPositiveForm.posForm_apply_root_root_le_zero_iff"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:0fa694051ea98fda710dfb1d"
+    },
+    {
+      "available_arms": {
+        "style": "wu:455a2b93d21e77333c390ab6#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:455a2b93d21e77333c390ab6"
+    }
+  ],
+  "33337": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:a9d88f95bc97af64d6e1ae1a#api_reuse",
+        "correctness": "wu:a9d88f95bc97af64d6e1ae1a#correctness",
+        "docs": "wu:a9d88f95bc97af64d6e1ae1a#docs",
+        "duplication": "wu:a9d88f95bc97af64d6e1ae1a#duplication",
+        "family_design": "wu:a9d88f95bc97af64d6e1ae1a#family_design",
+        "generality": "wu:a9d88f95bc97af64d6e1ae1a#generality",
+        "proof_golf": "wu:a9d88f95bc97af64d6e1ae1a#proof_golf",
+        "proof_idiom": "wu:a9d88f95bc97af64d6e1ae1a#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "LinearMap.IsSymmetricProjection.le_iff_range_le_range",
+        "Submodule.starProjection_le_starProjection_iff"
+      ],
+      "suggested_arms": [
+        "naming",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "`LinearMap.IsSymmetricProjection.le_iff_range_le_range` is a chain of 6 low-level tactic steps",
+        "shares a name family with 5 other changed declaration(s)",
+        "`LinearMap.IsSymmetricProjection.le_iff_range_le_range` is 15 lines"
+      ],
+      "work_unit_id": "wu:a9d88f95bc97af64d6e1ae1a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:7b8f0fdfd5abe18bedfd23d1#api_reuse",
+        "correctness": "wu:7b8f0fdfd5abe18bedfd23d1#correctness",
+        "docs": "wu:7b8f0fdfd5abe18bedfd23d1#docs",
+        "duplication": "wu:7b8f0fdfd5abe18bedfd23d1#duplication",
+        "generality": "wu:7b8f0fdfd5abe18bedfd23d1#generality",
+        "proof_golf": "wu:7b8f0fdfd5abe18bedfd23d1#proof_golf",
+        "proof_idiom": "wu:7b8f0fdfd5abe18bedfd23d1#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+        "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl",
+        "Submodule.coe_starProjection_eq_isComplProjection",
+        "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl",
+        "Submodule.starProjection_coe_eq_isCompl_projection"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "shares a name family with 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7b8f0fdfd5abe18bedfd23d1"
+    }
+  ],
+  "33362": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:fa34eedb0bf2bd7626392e2e#api_reuse",
+        "correctness": "wu:fa34eedb0bf2bd7626392e2e#correctness",
+        "duplication": "wu:fa34eedb0bf2bd7626392e2e#duplication",
+        "family_design": "wu:fa34eedb0bf2bd7626392e2e#family_design",
+        "proof_golf": "wu:fa34eedb0bf2bd7626392e2e#proof_golf",
+        "proof_idiom": "wu:fa34eedb0bf2bd7626392e2e#proof_idiom",
+        "style": "wu:fa34eedb0bf2bd7626392e2e#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div",
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div'",
+        "Complex.norm_deriv_le_one_of_mapsTo_ball",
+        "Complex.norm_dslope_le_div_of_mapsTo_ball",
+        "Mathlib/Analysis/Complex/Schwarz.lean"
+      ],
+      "suggested_arms": [
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication"
+      ],
+      "why": [
+        "the PR describes itself as 'generaliz'",
+        "`Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div` is a chain of 7 low-level tactic steps",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` is a chain of 9 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` uses a `calc` block",
+        "introduces a new declaration",
+        "`Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div` is 20 lines",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` is 18 lines"
+      ],
+      "work_unit_id": "wu:fa34eedb0bf2bd7626392e2e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2f64d32a8432a96d7bba67ea#api_reuse",
+        "correctness": "wu:2f64d32a8432a96d7bba67ea#correctness",
+        "docs": "wu:2f64d32a8432a96d7bba67ea#docs",
+        "duplication": "wu:2f64d32a8432a96d7bba67ea#duplication",
+        "proof_golf": "wu:2f64d32a8432a96d7bba67ea#proof_golf",
+        "proof_idiom": "wu:2f64d32a8432a96d7bba67ea#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div",
+        "Complex.dist_le_dist_of_mapsTo_ball_self",
+        "Complex.dist_le_div_mul_dist_of_mapsTo_ball",
+        "Complex.norm_deriv_le_div_of_mapsTo_ball",
+        "Complex.norm_le_norm_of_mapsTo_ball_self",
+        "Complex.schwarz_aux",
+        "Mathlib/Analysis/Complex/Schwarz.lean"
+      ],
+      "suggested_arms": [
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "duplication"
+      ],
+      "why": [
+        "the PR describes itself as 'generaliz'",
+        "`Complex.schwarz_aux` is a chain of 14 low-level tactic steps",
+        "introduces a new declaration",
+        "`Complex.schwarz_aux` is 26 lines"
+      ],
+      "work_unit_id": "wu:2f64d32a8432a96d7bba67ea"
+    }
+  ],
+  "33421": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:b08998eef1c9b41c27e4657d#api_reuse",
+        "correctness": "wu:b08998eef1c9b41c27e4657d#correctness",
+        "docs": "wu:b08998eef1c9b41c27e4657d#docs",
+        "duplication": "wu:b08998eef1c9b41c27e4657d#duplication",
+        "family_design": "wu:b08998eef1c9b41c27e4657d#family_design",
+        "generality": "wu:b08998eef1c9b41c27e4657d#generality",
+        "proof_golf": "wu:b08998eef1c9b41c27e4657d#proof_golf",
+        "proof_idiom": "wu:b08998eef1c9b41c27e4657d#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "ContinuousOn.comp_fract''",
+        "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "continuousAt_ceil",
+        "continuousAt_floor",
+        "continuousAt_fract",
+        "continuousAt_round",
+        "continuousOn_ceil",
+        "continuousOn_ceil_compl_range",
+        "continuousOn_floor",
+        "continuousOn_floor_compl_range",
+        "continuousOn_fract",
+        "continuousOn_round",
+        "tendsto_round_nhdsGE_pure",
+        "tendsto_round_nhdsLT_pure_half_ceil"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`tendsto_round_nhdsGE_pure` is a chain of 6 low-level tactic steps",
+        "`tendsto_round_nhdsLT_pure_half_ceil` is a chain of 5 low-level tactic steps",
+        "`continuousAt_round` is a chain of 3 low-level tactic steps",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b08998eef1c9b41c27e4657d"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6712102dd5bd333e57b00282#api_reuse",
+        "correctness": "wu:6712102dd5bd333e57b00282#correctness",
+        "docs": "wu:6712102dd5bd333e57b00282#docs",
+        "duplication": "wu:6712102dd5bd333e57b00282#duplication",
+        "family_design": "wu:6712102dd5bd333e57b00282#family_design",
+        "generality": "wu:6712102dd5bd333e57b00282#generality",
+        "proof_golf": "wu:6712102dd5bd333e57b00282#proof_golf",
+        "proof_idiom": "wu:6712102dd5bd333e57b00282#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Algebra/Order/Round.lean",
+        "round_eq",
+        "round_eq'",
+        "round_eq_half_ceil_two_mul",
+        "round_eq_iff",
+        "round_eq_zero_iff",
+        "round_neg_two_inv",
+        "round_two_inv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`round_eq'` is a chain of 4 low-level tactic steps",
+        "`round_eq_half_ceil_two_mul` is a chain of 4 low-level tactic steps",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration",
+        "`round_eq'` is 18 lines"
+      ],
+      "work_unit_id": "wu:6712102dd5bd333e57b00282"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2eba2376cb4e494003d131c2#api_reuse",
+        "docs": "wu:2eba2376cb4e494003d131c2#docs",
+        "generality": "wu:2eba2376cb4e494003d131c2#generality",
+        "proof_golf": "wu:2eba2376cb4e494003d131c2#proof_golf",
+        "proof_idiom": "wu:2eba2376cb4e494003d131c2#proof_idiom"
+      },
+      "rank": 3,
+      "subjects": [
+        "Int.ceil_intCast_add",
+        "Int.ceil_natCast_add",
+        "Int.ceil_ofNat_add",
+        "Int.ceil_one_add",
+        "Int.two_mul_fract_eq_one_iff_exists_int"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Int.two_mul_fract_eq_one_iff_exists_int` is a chain of 4 low-level tactic steps",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2eba2376cb4e494003d131c2"
+    },
+    {
+      "available_arms": {
+        "style": "wu:126e2a85360e483af6be70ba#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Order/Filter/AtTopBot/Archimedean.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:126e2a85360e483af6be70ba"
+    },
+    {
+      "available_arms": {
+        "style": "wu:1b147003d67985aaf3452639#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Algebra/AddConstMap/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1b147003d67985aaf3452639"
+    },
+    {
+      "available_arms": {
+        "style": "wu:1d838019374f00d2705b2b87#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1d838019374f00d2705b2b87"
+    },
+    {
+      "available_arms": {
+        "style": "wu:2241079a29181314173f9fbe#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2241079a29181314173f9fbe"
+    },
+    {
+      "available_arms": {
+        "style": "wu:299dcdfb6177819ea90533c8#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/Algebra/Order/Archimedean/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:299dcdfb6177819ea90533c8"
+    },
+    {
+      "available_arms": {
+        "style": "wu:41209fe029d96e787937f8e0#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Algebra/Order/ToIntervalMod.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:41209fe029d96e787937f8e0"
+    },
+    {
+      "available_arms": {
+        "style": "wu:90946f755dafa11425492061#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/Topology/Instances/AddCircle/Defs.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:90946f755dafa11425492061"
+    },
+    {
+      "available_arms": {
+        "style": "wu:90e7e79aea6aa267ab80d7db#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:90e7e79aea6aa267ab80d7db"
+    },
+    {
+      "available_arms": {
+        "style": "wu:a4dc36a59fb2ed9877737ff3#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a4dc36a59fb2ed9877737ff3"
+    },
+    {
+      "available_arms": {
+        "style": "wu:b24ffaed8b4e7aa75da98055#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b24ffaed8b4e7aa75da98055"
+    },
+    {
+      "available_arms": {
+        "style": "wu:d2d52f43538638dbfca93154#style"
+      },
+      "rank": 14,
+      "subjects": [
+        "Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d2d52f43538638dbfca93154"
+    },
+    {
+      "available_arms": {
+        "style": "wu:e369bc295f2a6eaedd1e2e2b#style"
+      },
+      "rank": 15,
+      "subjects": [
+        "Mathlib/GroupTheory/Archimedean.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:e369bc295f2a6eaedd1e2e2b"
+    }
+  ]
+}
