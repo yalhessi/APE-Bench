@@ -176,7 +176,7 @@ def search_content_with_timeout(content: str, pattern: str, use_regex: bool, tim
 
 
 def grep_candidate_files(
-    pattern: str,
+    pattern,
     files: List[Path],
     *,
     use_regex: bool = True,
@@ -206,17 +206,24 @@ def grep_candidate_files(
     bound.
     """
 
-    if not files:
+    patterns = [pattern] if isinstance(pattern, str) else list(pattern)
+    if not files or not patterns:
         return set()
 
     flag = '-P' if use_regex else '-F'
+    # Several patterns mean "any of these", which is what both callers want: one is an
+    # alternation the matcher would have run anyway, the other a set of identifiers whose
+    # declaration regexes each embed one as a literal.
+    selectors: List[str] = []
+    for item in patterns:
+        selectors += ['-e', item]
     found: set = set()
     # argv has a size limit and the tree is ~8.5k paths; chunk rather than risk E2BIG.
     for start in range(0, len(files), 2000):
         chunk = [str(path) for path in files[start:start + 2000]]
         try:
             completed = subprocess.run(
-                ['grep', '-l', flag, '-e', pattern, '--', *chunk],
+                ['grep', '-l', flag, *selectors, '--', *chunk],
                 capture_output=True, text=True, timeout=timeout,
             )
         except (OSError, subprocess.TimeoutExpired, ValueError) as exc:

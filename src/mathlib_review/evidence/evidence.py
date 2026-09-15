@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
+from ape.toolkits.file_system.utils import grep_candidate_files
 from src.mathlib_review.io import COMPILED_TARGET, canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once
 from src.mathlib_review.evidence.verifiers import VERIFIER_VERSION, verify
 from src.mathlib_review.schema import (
@@ -304,9 +305,26 @@ def collect_candidate(
                 continue
             hits = []
             target_paths = {targets[cid].path for cid in candidate.change_ids}
-            for path in sorted(workspace.rglob("*.lean")):
+            searchable = sorted(workspace.rglob("*.lean"))
+            # `declares_identifier` builds its pattern around `re.escape(leaf)`, so a file
+            # that does not contain the leaf literally cannot possibly declare it. That makes
+            # a fixed-string grep a sound prefilter -- it can only ever hand back too many
+            # files -- and it is why the decision stays with `declares_identifier` below
+            # rather than moving into the regex. `None` means grep did not answer, and then
+            # every file is read exactly as before.
+            #
+            # This scan is a second, independent copy of the one `content_search` had, and
+            # cost what that one cost: measured at 5.4 s per candidate over 8,504 files, run
+            # serially for 200 of the 268 candidates in a 12-PR run's finalization.
+            candidates_with_leaf = grep_candidate_files(
+                sorted({term.rsplit(".", 1)[-1] for term in terms}),
+                searchable, use_regex=False,
+            )
+            for path in searchable:
                 rel = str(path.relative_to(workspace))
                 if rel in target_paths:
+                    continue
+                if candidates_with_leaf is not None and str(path) not in candidates_with_leaf:
                     continue
                 try:
                     text = path.read_text(errors="replace")
