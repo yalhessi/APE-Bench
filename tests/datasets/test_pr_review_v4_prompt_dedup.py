@@ -260,3 +260,53 @@ def test_an_unattached_doc_comment_is_still_its_own_site():
     rendered = "\n\n".join(target_blocks([doc], scoped=True))
     assert "+/-- Orphan. -/" in rendered
     assert "Shown with the changed fragments" not in rendered
+
+
+def test_a_declarations_parts_are_joined_the_way_the_file_has_them():
+    """A region already ends with its own newline, so joining on one fabricates a blank line.
+
+    On PR 33321 that turned `… -/\\n@[to_additive …` -- a doc-comment immediately followed by the
+    attribute it belongs to, which is ordinary Lean -- into two floating comments, and the
+    reviewer answered the artifact: it asked to remove "an extra adjacent doc comment" on an
+    obligation about fixing that docstring's content. Located, and scored a miss.
+    """
+
+    from src.mathlib_review.agenda.render_prompts import target_diff_section
+
+    decl = _Target("c1", "Foo.baseOf", "@@ -0,0 +1,2 @@\n+@[to_additive]\n+def baseOf := 1\n")
+    decl.reviewed_code = "@[to_additive]\ndef baseOf := 1"
+    doc = _Target("c2", "Mathlib/X.lean", "@@ -0,0 +1,1 @@\n+/-- The base. -/\n")
+    doc.kind = "doc_comment"
+    doc.reviewed_code = "/-- The base. -/\n"   # as the parser emits it: trailing newline
+    doc.attached_to = "c1"
+
+    section = target_diff_section(decl, [doc])
+    assert "+/-- The base. -/\n+@[to_additive]" in section, "a blank line was fabricated"
+    assert "+\n+@[to_additive]" not in section
+
+    # /13's release was built from the fabricated form and must still reproduce it.
+    legacy = target_diff_section(decl, [doc], preserve_adjacency=False)
+    assert "+/-- The base. -/\n+\n+@[to_additive]" in legacy
+
+
+def test_the_generalist_prompt_changes_are_separately_selectable():
+    """/13 moved three things at once and the generalist's candidates per job fell 45%.
+
+    1.24 and 1.30 across the two 0.3.0 repetitions against 0.71 on
+    `pr5_A_lead_heldout12_rel040_rep1`, while the focused arms -- which none of the three touched
+    -- held at 0.14/0.20 -> 0.21. Nothing in that says which change did it, so each is a flag and
+    /14 moves exactly one of them back.
+    """
+
+    from src.mathlib_review.agenda.render_prompts import generalist_features
+
+    v12, v13, v14 = (generalist_features(f"candidate-prompt/{n}") for n in (12, 13, 14))
+
+    assert not v12["scoped_diffs"] and v12["contract_in_user_message"]
+    assert v13["scoped_diffs"] and v13["checklist_once"]
+    assert not v13["contract_in_user_message"], "/13 is what the 0.4.0 run measured"
+    # /14 differs from /13 in the contract and the join, and in nothing else.
+    assert v14["scoped_diffs"] and v14["checklist_once"]
+    assert v14["contract_in_user_message"] and v14["preserve_adjacency"]
+    assert {k for k in v13 if v13[k] != v14[k]} == {
+        "contract_in_user_message", "preserve_adjacency"}

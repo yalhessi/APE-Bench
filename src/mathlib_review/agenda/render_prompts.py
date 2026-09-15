@@ -106,7 +106,33 @@ FACET_CHECKLIST_ONCE = FACET_CHECKLIST.replace(
 )
 
 
-def target_diff_section(target: Any, attachments: Sequence[Any] = ()) -> str:
+def _join_regions(chunks: Sequence[str], *, preserve_adjacency: bool) -> str:
+    """Concatenate a declaration's parts the way the file has them.
+
+    `"\n".join` inserts a separator unconditionally, and a region already ends with its own
+    newline, so it fabricated a blank line that is not in the source. On PR 33321 that turned
+    `… -/\n@[to_additive …` -- a doc-comment immediately followed by the attribute it belongs
+    to, which is ordinary Lean -- into `… -/\n\n@[to_additive …`, two floating comments. The
+    reviewer answered the artifact: it asked to remove "an extra adjacent doc comment" and the
+    judge scored the obligation a miss on a run where the site was correctly located.
+
+    `preserve_adjacency` is False only for `candidate-prompt/13`, whose release was built from
+    the fabricated form and must still re-render to the prompts it froze.
+    """
+
+    parts = [chunk for chunk in chunks if chunk]
+    if not preserve_adjacency:
+        return "\n".join(parts)
+    out = ""
+    for chunk in parts:
+        if out and not out.endswith("\n"):
+            out += "\n"
+        out += chunk
+    return out
+
+
+def target_diff_section(target: Any, attachments: Sequence[Any] = (),
+                        *, preserve_adjacency: bool = True) -> str:
     """The `Exact changed fragments` body for one target, scoped to that target.
 
     `diff_fragments` holds the raw `@@` hunks covering the target's changed ranges, so a target
@@ -133,8 +159,10 @@ def target_diff_section(target: Any, attachments: Sequence[Any] = ()) -> str:
     # in Lean they precede what they qualify, so they are diffed as part of it. Severing them
     # cost two obligations on PR 33321 that every baseline repetition had found.
     ordered = [*attachments, target]
-    base = "\n".join(item.base_code for item in ordered if item.base_code)
-    reviewed = "\n".join(item.reviewed_code for item in ordered if item.reviewed_code)
+    base = _join_regions([item.base_code for item in ordered],
+                         preserve_adjacency=preserve_adjacency)
+    reviewed = _join_regions([item.reviewed_code for item in ordered],
+                             preserve_adjacency=preserve_adjacency)
     if not base and not reviewed:
         return raw
     lines = list(difflib.unified_diff(
@@ -171,7 +199,8 @@ def target_block(target: Any, fragments_section: Optional[str] = None) -> str:
     )
 
 
-def target_blocks(targets: Iterable[Any], *, scoped: bool) -> List[str]:
+def target_blocks(targets: Iterable[Any], *, scoped: bool,
+                  preserve_adjacency: bool = True) -> List[str]:
     """One block per target, with each distinct fragments section printed exactly once.
 
     The first target to use a section prints it; a later target whose section is identical gets
@@ -208,7 +237,8 @@ def target_blocks(targets: Iterable[Any], *, scoped: bool) -> List[str]:
                                        f"`{owner_subject[shown_with_owner[target.change_id]]}`."))
             continue
         section = target_diff_section(
-            target, attached_to_owner.get(target.change_id, ())) if scoped else (
+            target, attached_to_owner.get(target.change_id, ()),
+            preserve_adjacency=preserve_adjacency) if scoped else (
             f"```diff\n{''.join(target.diff_fragments)}\n```")
         subject = target.declaration_name or target.path
         owner = first_use.get(section)
@@ -285,22 +315,57 @@ def _index(items: Iterable, attr: str) -> Dict[str, object]:
     return {getattr(item, attr): item for item in items}
 
 
+def generalist_features(renderer_version: str) -> Dict[str, bool]:
+    """Which prompt changes a generalist renderer version selects, one flag each.
+
+    They arrived together at `candidate-prompt/13` and should not have. On
+    `pr5_A_lead_heldout12_rel040_rep1` the generalist's candidates per job fell from 1.24 and
+    1.30 across the two 0.3.0 repetitions to 0.71 -- a 45% drop in the arm that produces most of
+    this system's matched output -- while the focused arms, which none of these three changes
+    touched, held at 0.14/0.20 -> 0.21. Three simultaneous prompt changes and one moved number
+    says nothing about which.
+
+    `/14` therefore keeps the two with measurement behind them and restores the contract, which
+    had the least. It was dropped on the argument that the focused arms do not carry it and
+    review normally -- but the arms emit 0.2 candidates per job against the generalist's 1.3, so
+    they were never the reference class for an instruction whose job is to make the model speak.
+
+    Each flag is separate so a later version can move exactly one and be read.
+    """
+
+    number = renderer_number(renderer_version)
+    return {
+        #: Each target's diff is its own change, not the `@@` hunk it happens to sit in.
+        "scoped_diffs": number >= 13,
+        #: The checklist once below the targets instead of under every one.
+        "checklist_once": number >= 13,
+        #: The contract repeated in the user message, where the model may weight it more than
+        #: the identical system prompt. Dropped at /13, restored at /14, and the difference
+        #: between those two releases is the measurement of whether it was load-bearing.
+        "contract_in_user_message": number < 13 or number >= 14,
+        #: Join a declaration's parts the way the file has them. False only for /13, whose
+        #: release was built from a join that fabricated a blank line.
+        "preserve_adjacency": number >= 14,
+    }
+
+
 def render_work_unit(
     unit: ReviewWorkUnit, episode: ReviewEpisodeInput, graph: ChangeGraph,
     precedents: Iterable[PromptPrecedent] = (),
 ) -> RenderedPrompt:
     targets = _index(graph.targets, "change_id")
     unit_targets = [targets[change_id] for change_id in unit.change_ids]
-    # `candidate-prompt/13` scopes each target's diff to that target, says each distinct
-    # fragments section once, and moves the checklist below the targets instead of repeating it
-    # under every one. Measured on `dev-medium-0.3.0`, the scoping alone removes 94.0% of the
-    # release's fragment characters. Earlier versions keep the per-target hunk and the repeated
-    # checklist, so every frozen `rendered_prompts.jsonl` re-renders byte-identically.
-    scoped = renderer_number(unit.renderer_version) >= 13
-    if scoped:
-        blocks = target_blocks(unit_targets, scoped=True) + [FACET_CHECKLIST_ONCE]
+    features = generalist_features(unit.renderer_version)
+    if features["scoped_diffs"]:
+        blocks = target_blocks(
+            unit_targets, scoped=True,
+            preserve_adjacency=features["preserve_adjacency"])
     else:
-        blocks = [f"{target_block(target)}\n{FACET_CHECKLIST}" for target in unit_targets]
+        blocks = [target_block(target) for target in unit_targets]
+    if features["checklist_once"]:
+        blocks = blocks + [FACET_CHECKLIST_ONCE]
+    else:
+        blocks = [f"{block}\n{FACET_CHECKLIST}" for block in blocks]
     treatment = ""
     if unit.renderer_version == "candidate-prompt/9":
         treatment = f"{GENERIC_MAINTAINER_EXEMPLARS}\n\n"
@@ -315,8 +380,8 @@ def render_work_unit(
     # (0 of 1,206 in the same run) and review normally, which is the evidence that it is
     # redundant rather than load-bearing.
     contract = (
-        "" if renderer_number(unit.renderer_version) >= 13
-        else f"# Review contract\n{system_prompt_for(unit.renderer_version)}\n\n")
+        f"# Review contract\n{system_prompt_for(unit.renderer_version)}\n\n"
+        if features["contract_in_user_message"] else "")
     user = (
         f"{contract}"
         f"{treatment}"
