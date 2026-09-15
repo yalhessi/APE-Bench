@@ -1,0 +1,24 @@
+# Decision-turn replay of a generation run's arm sessions (src/mathlib_review/review/replay.py).
+#
+# The model, tool grant and task config are the source run's own, read from the orchestrator
+# config each arm ran under; a replay config sets only `dataset` and `execution`.
+#
+#   ape/bin/python -m src.mathlib_review.review.cli replay --config configs/v5_replay.yaml \
+#       --of pr5_A_lead_heldout12_v2_rep1 --run-name pr5_replay_null_v2_rep1          # preflight
+#
+# The null condition first, always: its disagreement with the recorded decisions is the noise
+# floor every other condition is read against. A condition is a `--set dataset.condition=...`
+# or a child config that `extends:` this one, and its name must appear in the run name.
+
+execution:
+  # Resamples per session. At temperature 1 one sample says little about one decision.
+  sample_count: 3
+  max_concurrency: 8
+
+dataset:
+  condition:
+    # Quoted: bare `null` is YAML's None.
+    name: "null"
+  # The recorded decision stage of v2_rep1's 321 arm sessions billed $4.02 cached and $10.10
+  # nominal; a replay weeks later pays about the nominal figure, per sample.
+  run_total_cost_cap: 40.0

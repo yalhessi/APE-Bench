@@ -22,9 +22,22 @@ successful attempt with a submission.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+import copy
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from ape.scaffolds.ape_agent.replay import tool_calls
+from pydantic import BaseModel, ConfigDict, Field
+
+from ape.scaffolds.ape_agent.replay import (
+    REPLAY_RECORD_FILENAME, SESSION_REPLAY_KEY, ReplayCondition, ReplayRefused,
+    cut_before_tool_call, replay_task_data, tool_calls,
+)
+from src.mathlib_review.io import (
+    canonical_json_bytes, git_state, jsonl_bytes, jsonl_rows, load_jsonl, pretty_json_bytes,
+    sha256_bytes, sha256_file, write_once,
+)
+from src.mathlib_review.paths import run_dir
 
 SUBMIT_TOOL = "submit_candidates"
 
@@ -76,3 +89,566 @@ def decision_record(nodes: List[Dict[str, Any]], start: int) -> Dict[str, Any]:
         "refusals": [call["message"] for call in calls if call["accepted"] is False],
         "first": submission_summary(calls[0]["arguments"]) if calls else None,
     }
+
+
+# --- the run -------------------------------------------------------------------------------
+
+
+class ReplayDatasetConfig(BaseModel):
+    """What a replay run is. Everything here is sealed into its plan."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    #: The generation run whose arm sessions are replayed; `--of` on the command line.
+    of_run: str
+    run_name: str = "UNNAMED"
+    condition: ReplayCondition
+    arm_ids: List[str] = Field(default_factory=list)
+    pr_numbers: List[int] = Field(default_factory=list)
+    invocation_limit: int = 0
+    #: Assistant turns a replay may take from the cut. The recorded decision stage took one
+    #: turn in 293 / 283 / 294 of the v2 held-out sessions and at most 7; 8 truncates none.
+    decision_turns: int = 8
+    per_task_cost_cap: float = 0.30
+    #: Required. Checked before the first call against the recorded decision stage priced
+    #: uncached, which is what a replay pays once its source's cache has expired.
+    run_total_cost_cap: float = Field(gt=0)
+
+
+class ReplayPlan(BaseModel):
+    """Sealed before the first model call by `runner.seal_or_revise_plan`, whose resumable
+    fields (`git_commit`, `git_tree_state`, `scaffold_config_sha256`) it shares by name."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_name: str
+    of_run: str
+    condition: Dict[str, Any]
+    condition_sha256: str
+    selection: Dict[str, Any]
+    decision_turns: int
+    per_task_cost_cap: float
+    run_total_cost_cap: float
+    sample_count: int
+    model_name: str
+    prefix_sha256_by_invocation: Dict[str, str]
+    skipped: List[Dict[str, str]]
+    estimate: Dict[str, float]
+    scaffold_config_sha256: str
+    git_commit: str
+    git_tree_state: str
+
+
+class ReplaySource(BaseModel):
+    """One recorded arm session, located through the run's own records."""
+
+    invocation_id: str
+    payload: Dict[str, Any]
+    session_path: str
+    session_sha256: str
+    nodes: List[Dict[str, Any]]
+    decision_index: int
+    #: What the task accepted, from the successful attempt.
+    result: Optional[Dict[str, Any]]
+    #: The orchestrator config the arm ran under -- the nested one, not its lead's.
+    scaffold_config: Dict[str, Any]
+
+    def decision_stage_cost(self) -> Tuple[float, float]:
+        """`(billed, nominal)` over every assistant turn from the first submission on."""
+
+        usage = [(node.get("message") or {}).get("usage") or {}
+                 for node in self.nodes[self.decision_index:] if node.get("type") == "assistant"]
+        billed = sum(float(u.get("cached_total_cost") or u.get("total_cost") or 0) for u in usage)
+        return billed, sum(float(u.get("total_cost") or 0) for u in usage)
+
+
+def load_replay(config_path, overrides: Optional[Dict[str, Any]] = None):
+    """`(dataset, execution overrides)`. Model, tools and task config come from the source run.
+
+    A replay under another model, tool grant or temperature is not a replay of the recorded
+    decision, so a config sets only `dataset` and `execution` (concurrency, and `sample_count`
+    -- the resamples per session).
+    """
+
+    from ape.utils.config_loader import deep_merge, load_yaml
+
+    raw = load_yaml(config_path)
+    if overrides:
+        raw = deep_merge(raw, overrides)
+    dataset = ReplayDatasetConfig.model_validate(raw.pop("dataset"))
+    extra = sorted(set(raw) - {"execution"})
+    if extra:
+        raise ReplayRefused(
+            "a replay runs under the source run's model, tools and task config; a replay "
+            f"config sets only `dataset` and `execution`, not {extra}")
+    return dataset, raw.get("execution") or {}
+
+
+async def select_sources(dataset: ReplayDatasetConfig):
+    """`(sources, skipped)`: the recorded arm sessions to replay, and why any others were not.
+
+    Located through the run's `execution_index.jsonl` and each task's `TaskStorage`, never by
+    globbing; a repeated invocation keeps its last row, which is the retry.
+    """
+
+    from ape.orchestration.execution_index import INDEX_FILENAME, by_semantic_id
+    from ape.orchestration.persistence import TaskStorage
+    from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
+    from ape.tasks.lean_tasks.formal_math.review.arm import ARM_TASK_TYPE
+
+    source = run_dir(dataset.of_run)
+    index_path, pool_path = source / INDEX_FILENAME, source / "arm_pool.jsonl"
+    for required in (index_path, pool_path):
+        if not required.is_file():
+            raise ReplayRefused(
+                f"{required} is missing. A replay rebuilds each task from the run's own arm "
+                "pool and finds each session through its execution index. arm_pool.jsonl is "
+                "gitignored, so a worktree has it only if linked from the main checkout; the "
+                "rel050 reps lost theirs with a deleted worktree (docs/todo/operational-floor.md).")
+    wanted_arms = set(dataset.arm_ids)
+    rows = {invocation_id: row for invocation_id, row in by_semantic_id(index_path).items()
+            if row.get("task_type") == ARM_TASK_TYPE
+            and (not wanted_arms or invocation_id.rsplit("#", 1)[-1] in wanted_arms)}
+    pool = {row["invocation_id"]: row["task_data"] for row in jsonl_rows(pool_path)
+            if row.get("invocation_id") in rows}
+
+    sources: List[ReplaySource] = []
+    skipped: List[Dict[str, str]] = []
+    for invocation_id in sorted(rows):
+        if dataset.invocation_limit and len(sources) >= dataset.invocation_limit:
+            break
+        row, payload = rows[invocation_id], pool.get(invocation_id)
+        if payload is None:
+            skipped.append({"invocation_id": invocation_id, "reason": "not in arm_pool.jsonl"})
+            continue
+        if dataset.pr_numbers and payload.get("pr_number") not in dataset.pr_numbers:
+            continue
+        samples = await TaskStorage(Path(row["task_dir"]), row["global_index"]).load_all_samples()
+        attempt = next((samples[i].successful_attempt for i in sorted(samples)
+                        if samples[i].successful_attempt is not None), None)
+        session = (ApeAgentConversationManager.find_latest_session_path(Path(attempt.path))
+                   if attempt is not None else None)
+        if session is None:
+            skipped.append({"invocation_id": invocation_id, "reason": (
+                "no successful attempt" if attempt is None else "the attempt kept no session")})
+            continue
+        nodes = jsonl_rows(session)
+        try:
+            _, index = cut_before_tool_call(nodes, SUBMIT_TOOL)
+        except ReplayRefused as exc:
+            skipped.append({"invocation_id": invocation_id, "reason": str(exc)})
+            continue
+        config = json.loads((Path(row["task_dir"]).parent.parent / "config.json").read_text())
+        result = attempt.result
+        sources.append(ReplaySource(
+            invocation_id=invocation_id, payload=payload, session_path=str(session),
+            session_sha256=sha256_file(session), nodes=nodes, decision_index=index,
+            result=result.model_dump(mode="json") if hasattr(result, "model_dump") else result,
+            scaffold_config=config["config"]))
+    return sources, skipped
+
+
+#: The parts of an orchestrator config that decide what the model does. Every replayed session
+#: must agree on them, and the replay runs under them.
+_SEMANTIC_SCAFFOLD_KEYS = ("scaffold_type", "llm_config", "task_config_overrides",
+                           "tools_config", "skills")
+
+
+def replay_scaffold(sources: List[ReplaySource], execution: Dict[str, Any]):
+    """The source's own scaffold config with only `execution` and the runs root replaced."""
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from ape.scaffolds.config import BaseScaffoldConfig
+    from ape.utils.config_loader import deep_merge
+
+    def semantic(config):
+        return {key: config.get(key) for key in _SEMANTIC_SCAFFOLD_KEYS}
+
+    first = sources[0].scaffold_config
+    differing = sorted(item.invocation_id for item in sources
+                       if semantic(item.scaffold_config) != semantic(first))
+    if differing:
+        raise ReplayRefused("the selected sessions ran under different model or tool configs, "
+                            f"e.g. {differing[:3]}; replay them separately")
+    raw = copy.deepcopy(first)
+    # The nested config's root is inside its lead's attempt; a replay runs top-level.
+    raw["runs_base_dir"] = str(BaseScaffoldConfig.model_fields["runs_base_dir"].default)
+    raw["execution"] = deep_merge(raw.get("execution") or {}, execution)
+    return ApeAgentConfig.model_validate(raw)
+
+
+def replay_payload(source: ReplaySource, dataset: ReplayDatasetConfig, out: Path):
+    """`(payload, prefix bytes)`: the recorded arm task, started just before it submitted."""
+
+    from ape.orchestration.models import EXECUTION_LIMITS_KEY
+
+    prefix, index = cut_before_tool_call(source.nodes, SUBMIT_TOOL)
+    task_data = {**source.payload,
+                 # Never the source run's trace: a call made while deciding is this run's.
+                 "trace_path": str(out / "context_trace.jsonl")}
+    payload, content = replay_task_data(
+        task_data, prefix, dataset.condition,
+        # Named by hash: an invocation id carries `:` and `#`.
+        out / "prefixes" / f"{sha256_bytes(source.invocation_id.encode())[:24]}.jsonl",
+        {"run": dataset.of_run, "invocation_id": source.invocation_id,
+         "session": source.session_path, "session_sha256": source.session_sha256,
+         "decision_node_index": index})
+    turns = payload[SESSION_REPLAY_KEY]["source"]["prefix_assistant_turns"]
+    payload[EXECUTION_LIMITS_KEY] = {"max_turns": turns + dataset.decision_turns,
+                                     "billed_cost_limit": dataset.per_task_cost_cap}
+    return payload, content
+
+
+def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySource],
+               skipped, built) -> ReplayPlan:
+    billed = sum(source.decision_stage_cost()[0] for source in sources)
+    nominal = sum(source.decision_stage_cost()[1] for source in sources)
+    samples = scaffold.execution.sample_count
+    commit, tree_state = git_state()
+    return ReplayPlan(
+        run_name=dataset.run_name, of_run=dataset.of_run,
+        condition=dataset.condition.model_dump(mode="json"),
+        condition_sha256=dataset.condition.sha256(),
+        selection={"arm_ids": dataset.arm_ids, "pr_numbers": dataset.pr_numbers,
+                   "invocation_limit": dataset.invocation_limit},
+        decision_turns=dataset.decision_turns, per_task_cost_cap=dataset.per_task_cost_cap,
+        run_total_cost_cap=dataset.run_total_cost_cap, sample_count=samples,
+        model_name=scaffold.llm_config.model_name or "",
+        prefix_sha256_by_invocation={
+            payload["invocation_id"]: payload[SESSION_REPLAY_KEY]["prefix_sha256"]
+            for payload, _ in built},
+        skipped=skipped,
+        estimate={
+            "recorded_decision_stage_billed": round(billed, 4),
+            "recorded_decision_stage_nominal": round(nominal, 4),
+            "expected_billed_if_cached": round(billed * samples, 2),
+            "expected_billed_if_uncached": round(nominal * samples, 2),
+            "ceiling_at_task_caps": round(len(sources) * samples * dataset.per_task_cost_cap, 2),
+        },
+        scaffold_config_sha256=sha256_bytes(canonical_json_bytes(
+            {key: scaffold.model_dump(mode="json").get(key) for key in _SEMANTIC_SCAFFOLD_KEYS})),
+        git_commit=commit, git_tree_state=tree_state,
+    )
+
+
+#: Written only after the orchestrator returns; their presence means the name is spent.
+_TERMINAL_OUTPUTS = ("replay_outcomes.jsonl", "replay_report.json")
+
+
+async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], logger, *,
+                     execute: bool):
+    """Preflight, and with `execute`, run the replay and write its outcomes and report.
+
+    Without `execute` this selects, cuts and conditions every session, prices the run against
+    its cap and checks the verification environment -- every refusal the real run would raise
+    -- and writes nothing.
+    """
+
+    from ape.orchestration import TaskOrchestrator, execution_index
+    from ape.tasks.base import create_task_from_data
+    from src.mathlib_review.review.preflight import (
+        assert_ready, assert_reviewed_workspaces_prebuilt, assert_workspaces_prebuilt,
+    )
+    from src.mathlib_review.review.runner import seal_or_revise_plan
+    from src.mathlib_review.schema import ReviewEpisodeInput
+
+    dataset.condition.assert_named_honestly()
+    if dataset.run_name == "UNNAMED":
+        raise ReplayRefused("a replay needs --run-name")
+    if dataset.condition.name not in dataset.run_name:
+        raise ReplayRefused(
+            f"run name {dataset.run_name!r} does not contain the condition "
+            f"{dataset.condition.name!r}; the name is how a replay's outcomes are told apart")
+
+    sources, skipped = await select_sources(dataset)
+    if not sources:
+        raise ReplayRefused(f"nothing to replay in {dataset.of_run}; skipped: {skipped[:5]}")
+    scaffold = replay_scaffold(sources, execution)
+    out = run_dir(dataset.run_name)
+    built = [replay_payload(source, dataset, out) for source in sources]
+    plan = build_plan(dataset, scaffold, sources, skipped, built)
+    logger.info("replay %s of %s: %d session(s) x %d sample(s), %d skipped; condition %s (%s)",
+                dataset.run_name, dataset.of_run, len(sources), plan.sample_count, len(skipped),
+                dataset.condition.name, plan.condition_sha256[:12])
+    logger.info("estimate: %s", json.dumps(plan.estimate))
+    if plan.estimate["expected_billed_if_uncached"] > dataset.run_total_cost_cap:
+        message = (f"the recorded decision stage priced uncached is "
+                   f"${plan.estimate['expected_billed_if_uncached']:.2f} at "
+                   f"{plan.sample_count} sample(s), above run_total_cost_cap "
+                   f"${dataset.run_total_cost_cap:.2f}")
+        if execute:
+            raise ReplayRefused(message)
+        logger.warning("%s; the real run will refuse", message)
+
+    # Required, not configurable: submissions that compile in another environment than the
+    # recorded run's are not a replay of its decisions.
+    release = Path(json.loads((run_dir(dataset.of_run) / "run_plan.json").read_text())["release"])
+    episode_ids = {payload["episode_id"] for payload, _ in built}
+    episodes = [episode for episode in load_jsonl(release / "input/episodes.jsonl",
+                                                  ReviewEpisodeInput)
+                if episode.episode_id in episode_ids]
+    assert_ready(scaffold, logger, enforce=execute)
+    missing = await assert_reviewed_workspaces_prebuilt(episodes, required=execute, logger=logger)
+    if not execute:
+        logger.info("reviewed workspaces: %d of %d episode(s) prebuilt",
+                    len(episodes) - len(missing), len(episodes))
+        return plan
+    await assert_workspaces_prebuilt([payload for payload, _ in built], required=True)
+
+    existing = [name for name in _TERMINAL_OUTPUTS if (out / name).is_file()]
+    if existing:
+        raise ReplayRefused(f"run {dataset.run_name!r} already produced {existing}; a replay's "
+                            "name is its resume key, so use a new one")
+    for payload, content in built:
+        write_once(Path(payload[SESSION_REPLAY_KEY]["prefix_path"]), content)
+    seal_or_revise_plan(out, plan, logger)
+
+    tasks = [create_task_from_data(payload, scaffold,
+                                   task_config_overrides=scaffold.task_config_overrides)
+             for payload, _ in built]
+    orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
+                                    logger=logger)
+    results = await orchestrator.run(tasks)
+    index_path = out / execution_index.INDEX_FILENAME
+    await execution_index.record(
+        index_path, orchestrator, results, group="replay",
+        semantic_ids={payload["task_id"]: payload["invocation_id"] for payload, _ in built})
+
+    outcomes = await collect_outcomes(index_path, sources, built, dataset.condition.name)
+    write_once(out / "replay_outcomes.jsonl", jsonl_bytes(outcomes))
+    report = replay_report(outcomes)
+    write_once(out / "replay_report.json", pretty_json_bytes(report))
+    logger.info("agreement with the recorded decision: %s",
+                json.dumps(report["agreement_with_recorded"]))
+    return out
+
+
+async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
+                           condition: str) -> List[Dict[str, Any]]:
+    """One row per replayed sample, beside the recorded decision it replays."""
+
+    from ape.orchestration.execution_index import by_semantic_id
+    from ape.orchestration.persistence import TaskStorage
+    from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
+
+    index = by_semantic_id(index_path)
+    rows: List[Dict[str, Any]] = []
+    for source, (payload, content) in zip(sources, built):
+        start = len([line for line in content.split(b"\n") if line.strip()])
+        recorded = {"decision": decision_record(source.nodes, source.decision_index),
+                    "accepted": accepted_summary(source.result)}
+        row = index.get(source.invocation_id)
+        samples = (await TaskStorage(Path(row["task_dir"]), row["global_index"])
+                   .load_all_samples()) if row else {}
+        for sample_index in sorted(samples):
+            attempt = samples[sample_index].successful_attempt or \
+                samples[sample_index].current_attempt
+            if attempt is None:
+                continue
+            result = attempt.result
+            if hasattr(result, "model_dump"):
+                result = result.model_dump(mode="json")
+            session = ApeAgentConversationManager.find_latest_session_path(Path(attempt.path))
+            drift_file = Path(attempt.path) / REPLAY_RECORD_FILENAME
+            rows.append({
+                "invocation_id": source.invocation_id,
+                "arm_id": source.payload.get("arm_id"),
+                "pr_number": source.payload.get("pr_number"),
+                "work_unit_id": source.payload.get("work_unit_id"),
+                "condition": condition,
+                "sample_index": sample_index,
+                "status": getattr(attempt.status, "value", str(attempt.status)),
+                "cost": attempt.cost,
+                "cached_cost": attempt.cached_cost,
+                "recorded": recorded,
+                "replay": {
+                    "decision": (decision_record(jsonl_rows(session), start)
+                                 if session is not None else None),
+                    "accepted": accepted_summary(result),
+                    "tool_drift": (json.loads(drift_file.read_text()).get("tool_drift")
+                                   if drift_file.is_file() else None),
+                },
+            })
+    return rows
+
+
+# --- reading it ----------------------------------------------------------------------------
+
+#: How closely a replayed decision matches the recorded one, coarsest first. Every level
+#: requires the same filed/abstained outcome; the finer two then compare the abstention reason
+#: when both abstained, or the anchors (`primary_change_id`s) / candidate keys
+#: (`primary_change_id|concern_family|issue_kind`) when both filed.
+AGREEMENT_LEVELS = ("outcome", "reason_or_anchors", "reason_or_candidates")
+
+READING = (
+    "The null condition's agreement with the recorded decision is the noise floor: at "
+    "temperature 1 a decision re-sampled from an identical prefix does not reproduce itself. "
+    "A condition's effect is its paired difference from the null on the same sessions "
+    "(`report replay --against <null run>`), not its agreement with the recording, and is "
+    "provisional until it holds on all three source reps.")
+
+
+def _agrees(recorded: Optional[Dict[str, Any]], replayed: Optional[Dict[str, Any]],
+            level: str) -> Optional[bool]:
+    if recorded is None or replayed is None:
+        return None
+    if recorded["filed"] != replayed["filed"]:
+        return False
+    if level == "outcome":
+        return True
+    if not recorded["filed"]:
+        return recorded["abstention_reason"] == replayed["abstention_reason"]
+    key = "anchors" if level == "reason_or_anchors" else "candidate_keys"
+    return recorded[key] == replayed[key]
+
+
+def _mean(values) -> Optional[float]:
+    values = [float(value) for value in values]
+    return round(sum(values) / len(values), 4) if values else None
+
+
+def _by_session(rows) -> Dict[str, List[Dict[str, Any]]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for row in rows:
+        grouped.setdefault(row["invocation_id"], []).append(row)
+    return grouped
+
+
+def replay_report(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """One replay run against the decisions it replayed."""
+
+    sessions = _by_session(rows)
+    accepted = [row for row in rows if row["replay"]["accepted"] is not None]
+    agreement = {}
+    for level in AGREEMENT_LEVELS:
+        per_session = {
+            invocation_id: [_agrees(r["recorded"]["accepted"], r["replay"]["accepted"], level)
+                            for r in items if r["replay"]["accepted"] is not None]
+            for invocation_id, items in sessions.items()}
+        per_session = {k: [v for v in votes if v is not None]
+                       for k, votes in per_session.items()}
+        votes = [vote for session_votes in per_session.values() for vote in session_votes]
+        agreement[level] = {
+            "rate": _mean(votes), "samples": len(votes),
+            "sessions_every_sample_agrees": sum(1 for v in per_session.values() if v and all(v)),
+            "sessions_no_sample_agrees": sum(1 for v in per_session.values()
+                                             if v and not any(v)),
+        }
+    by_arm: Dict[str, Dict[str, Any]] = {}
+    for arm_id in sorted({row["arm_id"] for row in rows}):
+        arm_rows = [row for row in accepted if row["arm_id"] == arm_id]
+        arm_sessions = {row["invocation_id"]: row for row in rows if row["arm_id"] == arm_id}
+        by_arm[arm_id] = {
+            "sessions": len(arm_sessions),
+            "recorded_filing_rate": _mean(
+                (row["recorded"]["accepted"] or {}).get("filed", False)
+                for row in arm_sessions.values()),
+            "replayed_filing_rate": _mean(row["replay"]["accepted"]["filed"]
+                                          for row in arm_rows),
+            "outcome_agreement": _mean(
+                vote for vote in (_agrees(r["recorded"]["accepted"], r["replay"]["accepted"],
+                                          "outcome") for r in arm_rows) if vote is not None),
+        }
+    first_calls = [row["replay"]["decision"]["first"] for row in rows
+                   if (row["replay"]["decision"] or {}).get("first")]
+    confidences = [value for call in first_calls for value in call["model_confidence"]]
+    statuses: Dict[str, int] = {}
+    for row in rows:
+        statuses[row["status"]] = statuses.get(row["status"], 0) + 1
+    return {
+        "condition": rows[0]["condition"] if rows else None,
+        "sessions": len(sessions),
+        "samples": len(rows),
+        "samples_with_no_accepted_submission": len(rows) - len(accepted),
+        "statuses": statuses,
+        "agreement_with_recorded": agreement,
+        "filing_rate": {
+            "recorded": _mean((items[0]["recorded"]["accepted"] or {}).get("filed", False)
+                              for items in sessions.values()),
+            "replayed": _mean(row["replay"]["accepted"]["filed"] for row in accepted),
+        },
+        "refusals": {
+            "recorded_sessions_with_a_refusal": sum(
+                1 for items in sessions.values() if items[0]["recorded"]["decision"]["refusals"]),
+            "replayed_samples_with_a_refusal": sum(
+                1 for row in rows if (row["replay"]["decision"] or {}).get("refusals")),
+        },
+        "replayed_turns_max": max((row["replay"]["decision"] or {}).get("turns", 0)
+                                  for row in rows) if rows else 0,
+        "model_confidence_null_rate_first_call": _mean(value is None for value in confidences),
+        "tool_drift": sorted({name for row in rows
+                              for name in (row["replay"]["tool_drift"] or [])}),
+        "cost": {"billed": round(sum(row["cached_cost"] or 0 for row in rows), 4),
+                 "nominal": round(sum(row["cost"] or 0 for row in rows), 4)},
+        "by_arm": by_arm,
+        "reading": READING,
+    }
+
+
+def _sign_test(more: int, less: int) -> Optional[float]:
+    """Two-sided exact sign test over sessions whose filing rate moved; ties are dropped."""
+
+    from math import comb
+
+    n = more + less
+    if not n:
+        return None
+    tail = sum(comb(n, k) for k in range(min(more, less) + 1)) / 2 ** n
+    return round(min(1.0, 2 * tail), 4)
+
+
+def compare_replays(baseline: List[Dict[str, Any]],
+                    treatment: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """A condition against a baseline replay (normally the null), paired by session.
+
+    Per session, the filing rate over its accepted samples in each run; the difference is read
+    per session, never pooled, because samples of one prefix are not independent of it.
+    """
+
+    def filing(rows):
+        return {invocation_id: _mean(r["replay"]["accepted"]["filed"] for r in items
+                                     if r["replay"]["accepted"] is not None)
+                for invocation_id, items in _by_session(rows).items()}
+
+    base, treat = filing(baseline), filing(treatment)
+    paired = sorted(k for k in set(base) & set(treat)
+                    if base[k] is not None and treat[k] is not None)
+    differences = {k: treat[k] - base[k] for k in paired}
+    more = sum(1 for d in differences.values() if d > 0)
+    less = sum(1 for d in differences.values() if d < 0)
+    arm_of = {row["invocation_id"]: row["arm_id"] for row in baseline + treatment}
+    by_arm: Dict[str, Dict[str, Any]] = {}
+    for arm_id in sorted({arm_of[k] for k in paired}):
+        keys = [k for k in paired if arm_of[k] == arm_id]
+        by_arm[arm_id] = {
+            "sessions": len(keys),
+            "baseline_filing_rate": _mean(base[k] for k in keys),
+            "treatment_filing_rate": _mean(treat[k] for k in keys),
+            "files_more": sum(1 for k in keys if differences[k] > 0),
+            "files_less": sum(1 for k in keys if differences[k] < 0),
+        }
+    return {
+        "baseline_condition": baseline[0]["condition"] if baseline else None,
+        "treatment_condition": treatment[0]["condition"] if treatment else None,
+        "paired_sessions": len(paired),
+        "unpaired_sessions": len(set(base) ^ set(treat)),
+        "filing_rate": {"baseline": _mean(base[k] for k in paired),
+                        "treatment": _mean(treat[k] for k in paired),
+                        "mean_paired_difference": _mean(differences.values())},
+        "sessions_treatment_files_more": more,
+        "sessions_treatment_files_less": less,
+        "sign_test_p": _sign_test(more, less),
+        "agreement_with_recorded": {
+            "baseline": replay_report(baseline)["agreement_with_recorded"],
+            "treatment": replay_report(treatment)["agreement_with_recorded"]},
+        "by_arm": by_arm,
+        "reading": READING,
+    }
+
+
+def load_outcomes(run_name: str) -> List[Dict[str, Any]]:
+    path = run_dir(run_name) / "replay_outcomes.jsonl"
+    if not path.is_file():
+        raise ReplayRefused(f"{path} does not exist; has `replay --run-name {run_name} "
+                            "--execute` finished?")
+    return jsonl_rows(path)
