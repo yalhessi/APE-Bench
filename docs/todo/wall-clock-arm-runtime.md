@@ -1,6 +1,8 @@
 # Wall clock — a run is ~38 min, the manifest measures 27, and one Python scan is written twice
 
-**Status** — open; measurement done and one claim refuted (see *Correction* below), fixes not written
+**Status** — the two grep fixes are **landed** on `wall-clock` (`969b7d2`, `02eba94`); the
+concurrency and caching items below are open. Two claims in the first version were wrong and are
+corrected in place — see *Corrections*.
 **Cost** — no spend to measure; one rep to confirm any fix
 **Motivating example** — A 12-PR lead run spans **~38 min** end to end, but `run_manifest.json`
 records `wall_seconds: 1627` (**27.1 min**) — it times the orchestrator only, so **29% of the
@@ -24,7 +26,60 @@ mutable state and would need locking or sharding.
 
 ---
 
-## Correction — `record_turn` is real but third-order, not 21%
+## Corrections
+
+### The batching fix moved the ground under the straggler analysis
+
+Everything below about **PR 33149 being the critical path was measured before work-unit batching
+landed**, and batching changed it: **33149 went from 119 delegated jobs to 24**, a run's total from
+~320 to ~200, and cost from $13.88 to ~$7.40.
+
+| run | 33149 jobs | total jobs | longest task | orchestrator wall | arm-wall |
+|---|---|---|---|---|---|
+| `..._v2_rep1` | 119 | 320 | 27.1 min | 27.1 min | 282 min |
+| `..._fp3_rep1` | 119 | 319 | 24.4 min | 27.5 min | 273 min |
+| `..._rel040_rep1` | **25** | 192 | 8.6 min | **19.3 min** | 174 min |
+| `..._rel050_rep1` | **24** | 206 | 19.9 min | **34.3 min** | **326 min** |
+
+**There is no single straggler any more, so runs are now throughput-bound.** rel050's 326 arm-min
+÷ 9.5 mean concurrency = 34.4 min against a 34.3 min observed wall. That *strengthens* the case for
+cutting per-arm work — it now converts to wall clock roughly linearly instead of hiding behind one
+long task — and it is what makes the concurrency item below worth doing.
+
+`content_search` survives the change as the largest bucket: **29.6% of arm wall in rel050** (18–29%
+across all four runs), still almost entirely whole-tree. In rel050 just **88 calls cost 91.9 min —
+62.7 s each**, up from 32.7 s, which is what the contention curve predicts once batched arms are
+bigger and overlap more.
+
+Two caveats on the table. rel040 → rel050 **doubled arm-wall (174 → 326 min) with byte-identical
+scaffold configs** (diffed; zero differences), so that is the agenda data or machine load, not the
+harness. And these runs share a 64-core box with up to eleven other Claude Code sessions, so
+cross-run wall comparisons are confounded; the within-run *proportions* are the robust part and
+they hold across all four.
+
+### grep is ~2–3 s, not 0.28 s
+
+The first version quoted `grep` at **0.28 s** over the Mathlib tree. That was a **warm-cache
+artifact** — measured immediately after another grep over the same tree. Re-measured at a
+controlled cache state, grep over 8,504 files is **~2.0 s (`-F`), 2.2 s (`-E`), 2.4 s (`-P`)**, and
+`-P` is not meaningfully slower than `-E`. A single uncontended Python scan is ~4 s, so the
+single-threaded win is only ~2×.
+
+**The win is in scaling, not in single-call latency.** Measured through the provider on 25 real
+patterns at the same cache state:
+
+| arms | Python | grep | Python throughput | grep throughput |
+|---|---|---|---|---|
+| 1 | 4.7 s | 2.2 s | 0.21/s | 0.45/s |
+| 4 | 10.6 s | 2.8 s | 0.38/s | 1.41/s |
+| 8 | 15.1 s | 4.7 s | 0.53/s | 1.70/s |
+| 16 | **44.0 s** | **7.9 s** | **0.36/s** | **2.01/s** |
+
+**5.6× at the operating point** (a run peaks at 16 arms in flight). The throughput column is the
+real result: Python's is flat-to-declining, grep's scales. That is the precondition for raising
+nested concurrency — before this, raising it made things worse.
+
+### `record_turn` is real but third-order, not 21%
 
 The first version of this entry claimed per-turn bookkeeping was **21%** of arm wall and named
 `record_turn` as the cause. **That was a residual, not a measurement** — it was arm wall minus the
@@ -88,7 +143,22 @@ caller"* — and snapshots are immutable and content-addressed (88 of them under
 `data/code_execute/repos/mathlib4/workspaces/`). The cache is in-process only, so **every rep re-pays
 the full 89 s**. A disk cache keyed by snapshot sha makes this free from the second run onward.
 
-### Tail: a serial loop on a 64-core machine
+### Tail: a serial loop on a 64-core machine — and it is not there by necessity
+
+**Checked, because "run it earlier" is the obvious alternative to "run it in parallel".** The chain
+has no cross-PR dependency: `collect_candidate` is per-episode, `_collapse_compile_cascades` groups
+by `(episode_id, path)`, `select_findings`'s admission is per-candidate (only the `rank` *label* is
+global), and `baseline_compile_cache` is keyed by `(workspace, path)` where workspaces are
+per-episode, so it never shares across PRs anyway. Every input for PR X exists the moment X's lead
+returns.
+
+**But pipelining it buys almost nothing: 2.1 min of 9.5.** Simulated per-PR against rep1's real lead
+finish times, because **210 of 285 candidates belonged to PR 33149 — the PR that finished last**.
+That is why the fix is concurrency *within* the chain and not moving it earlier. (Whether that
+concentration survives batching is unmeasured: the rel0xx runs have no `results/` directory, so
+their candidate distribution could not be read.)
+
+
 
 `chain.py:170` is a plain `for candidate in candidates:` over **268 candidates**, each running up to
 five collectors — `local_context` 268, `repository_search` 200, `policy` 151, `lean_compile` 102,
@@ -126,17 +196,25 @@ per work unit, which `lead.py:295-307` deliberately exempts from `max_delegation
 of arm wall at `DEFAULT_NESTED_CONCURRENCY = 4`, so 97.7/4 = **24.4 min predicted, 25.6 observed** of
 a 27.1 min orchestrator span. Every other PR finishes inside 13 min.
 
-## Suggested order
+## Order
 
-1. **One subprocess-grep primitive, used by both `content_search` and `repository_search`.** It is
-   the largest arm lever (26–30% of arm time), the largest tail lever, and the precondition for
-   step 3. CLAUDE.md's no-duplicate-helpers rule applies: this should land as one primitive, not two
-   fixes.
+1. ~~**One subprocess-grep primitive, used by both `content_search` and `repository_search`.**~~
+   **Done** — `grep_candidate_files` in `ape/toolkits/file_system/utils.py`, wired into both call
+   sites (`969b7d2`, `02eba94`). It is a prefilter, not a search: the existing matchers still decide,
+   and every failure path returns `None` meaning "scan everything", with `set()` kept distinct from
+   `None`. Soundness on the `content_search` side was validated against the 765 compilable patterns
+   arms actually issued (60-sample: 60/60 agreed, 25-pattern A/B returned byte-identical result
+   dicts); on the `repository_search` side it is sound by construction, since
+   `declares_identifier`'s pattern embeds `re.escape(leaf)`.
 2. **Bound-concurrency the evidence chain** and **disk-cache the exposure scan** by snapshot sha.
    Together these attack the 29% of the process the manifest does not even measure, and neither
-   changes what the run decides.
+   changes what the run decides. Also in this path: `sorted(workspace.rglob("*.lean"))` is ~2 s and
+   is re-walked **per candidate** though the workspace is immutable for the run — ~200 walks of a
+   tree that never changes. It wants the treatment `population_cache` already gets.
 3. **Then re-measure `DEFAULT_NESTED_CONCURRENCY`**, per-family rather than globally — the memory
-   argument may still hold for families that materialise a real workspace.
+   argument may still hold for families that materialise a real workspace. This is now the largest
+   remaining lever, because runs are throughput-bound (see *Corrections*) and grep restored the
+   scaling that made raising it counterproductive before.
 4. **`record_turn` incremental writes** as hygiene, on its own merits, not for wall clock.
 
 Also worth fixing while here: **`wall_seconds` should cover the process**, or be renamed. Every
