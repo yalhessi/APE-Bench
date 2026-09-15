@@ -5,6 +5,7 @@ Contains common tool functions for file system, independent of language.
 Uses asynchronous IO to avoid blocking the event loop.
 """
 
+import asyncio
 import os
 import re
 import difflib
@@ -175,6 +176,54 @@ def search_content_with_timeout(content: str, pattern: str, use_regex: bool, tim
     return matches
 
 
+def _grep_plan(pattern, files, use_regex):
+    """(argv prefixes, chunks) for one prefilter query, or None if there is nothing to ask."""
+
+    patterns = [pattern] if isinstance(pattern, str) else list(pattern)
+    if not files or not patterns:
+        return None
+
+    selectors: List[str] = []
+    for item in patterns:
+        selectors += ['-e', item]
+    head = ['grep', '-l', '-P' if use_regex else '-F', *selectors, '--']
+
+    # One grep pass, not several. argv is bounded (ARG_MAX, 2 MiB here) so a chunk is still
+    # needed for a big enough tree, but sizing it by bytes against the real limit keeps
+    # Mathlib's ~7,400 paths (~800 KiB) in a single process. A fixed 2,000-path chunk made
+    # this four *sequential* greps and cost 0.68s where one pass costs 0.21s -- each chunk
+    # pays its own startup and the waits do not overlap.
+    budget = max(131072, (os.sysconf('SC_ARG_MAX') if hasattr(os, 'sysconf') else 262144) // 2)
+    overhead = sum(len(item) + 1 for item in head) + 4096
+    chunks: List[List[str]] = []
+    current: List[str] = []
+    used = overhead
+    for item in (str(path) for path in files):
+        if current and used + len(item) + 1 > budget:
+            chunks.append(current)
+            current, used = [], overhead
+        current.append(item)
+        used += len(item) + 1
+    if current:
+        chunks.append(current)
+    return head, chunks
+
+
+def _grep_reading(returncode, stdout, stderr, logger):
+    """Interpret one grep exit, or None when grep did not answer the question.
+
+    0 = matched, 1 = no match, anything else (2 = bad pattern, unreadable file) means grep
+    declined, and its silence must never be read as "nothing matched".
+    """
+
+    if returncode not in (0, 1):
+        if logger:
+            logger.warning(f"grep prefilter declined pattern "
+                           f"({(stderr or '').strip()[:120]}); falling back to a full scan")
+        return None
+    return {line for line in (stdout or '').split('\n') if line}
+
+
 def grep_candidate_files(
     pattern,
     files: List[Path],
@@ -189,8 +238,8 @@ def grep_candidate_files(
     says which files are worth opening, and it is allowed to be generous. The contract that
     makes it safe is one-sided: **every file the Python matcher would accept appears in the
     returned set.** Extra files cost a wasted read, a missing one silently loses a result, so
-    every failure path here returns `None` — meaning "scan everything" — rather than an empty
-    set.
+    every failure path here returns `None` -- meaning "scan everything" -- rather than an empty
+    set, and `set()` (an answer) stays distinct from `None` (not an answer).
 
     Soundness rests on the two matchers being the same operation. `search_content_with_timeout`
     runs `regex.search(line)` per line and keeps non-empty matches; `grep` is line-oriented and
@@ -198,47 +247,85 @@ def grep_candidate_files(
     patterns that arms actually issued against Mathlib, a 60-pattern sample agreed on the file
     set for 60 of 60, with no case of grep missing a file Python matched.
 
-    Why it exists: the scan it replaces reads every file in the tree into Python and dispatches
-    a per-file regex into the default 32-worker executor -- ~8,500 `asyncio.to_thread` calls per
-    search, in a pool `aiofiles` shares. Measured on a 12-PR run, whole-tree searches were
-    26-30% of all arm wall time at 33-63s each, against 0.28s for `grep` over the same tree,
-    and throughput was flat from concurrency 1 to 8 because the pool -- not the disk -- was the
-    bound.
+    Prefer `grep_candidate_files_async` from a coroutine; this form is for the evidence chain,
+    which is synchronous.
     """
 
-    patterns = [pattern] if isinstance(pattern, str) else list(pattern)
-    if not files or not patterns:
+    plan = _grep_plan(pattern, files, use_regex)
+    if plan is None:
         return set()
-
-    flag = '-P' if use_regex else '-F'
-    # Several patterns mean "any of these", which is what both callers want: one is an
-    # alternation the matcher would have run anyway, the other a set of identifiers whose
-    # declaration regexes each embed one as a literal.
-    selectors: List[str] = []
-    for item in patterns:
-        selectors += ['-e', item]
+    head, chunks = plan
     found: set = set()
-    # argv has a size limit and the tree is ~8.5k paths; chunk rather than risk E2BIG.
-    for start in range(0, len(files), 2000):
-        chunk = [str(path) for path in files[start:start + 2000]]
+    for chunk in chunks:
         try:
-            completed = subprocess.run(
-                ['grep', '-l', flag, *selectors, '--', *chunk],
-                capture_output=True, text=True, timeout=timeout,
-            )
+            done = subprocess.run([*head, *chunk], capture_output=True, text=True,
+                                  timeout=timeout)
         except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
             if logger:
                 logger.warning(f"grep prefilter unavailable ({type(exc).__name__}); "
                                f"falling back to a full scan")
             return None
-        # 0 = matched, 1 = no match, anything else (2 = bad pattern, unreadable file) means
-        # grep did not answer the question and its silence must not be read as "no match".
-        if completed.returncode not in (0, 1):
-            if logger:
-                logger.warning(f"grep prefilter declined pattern "
-                               f"({completed.stderr.strip()[:120]}); falling back to a full scan")
+        reading = _grep_reading(done.returncode, done.stdout, done.stderr, logger)
+        if reading is None:
             return None
-        found.update(line for line in completed.stdout.split('\n') if line)
+        found |= reading
+    return found
+
+
+async def grep_candidate_files_async(
+    pattern,
+    files: List[Path],
+    *,
+    use_regex: bool = True,
+    timeout: float = 60.0,
+    logger: Optional['logging.LoggerAdapter'] = None,
+) -> Optional[set]:
+    """`grep_candidate_files` without occupying a thread.
+
+    Same contract, same chunking, same reading of grep's exit -- only the driver differs, so
+    there is one prefilter and not two.
+
+    The driver is the point. `asyncio.to_thread(subprocess.run, ...)` parks a worker of the
+    default 32-thread executor for as long as grep runs, and that executor is also what every
+    `aiofiles` read and every conversation write goes through. Measured through the provider,
+    search throughput rose to 6.5/s at 16 concurrent and then *collapsed* to 3.7/s at 32, with
+    the slowest call at 8.6s: at 32 in flight every worker is parked on a grep and the file
+    I/O behind them starves. A run already reaches 16 arms, and raising nested concurrency is
+    exactly what walks into that wall, so the subprocess is awaited rather than parked.
+    """
+
+    plan = _grep_plan(pattern, files, use_regex)
+    if plan is None:
+        return set()
+    head, chunks = plan
+    found: set = set()
+    for chunk in chunks:
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *head, *chunk,
+                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        except (OSError, ValueError) as exc:
+            if logger:
+                logger.warning(f"grep prefilter unavailable ({type(exc).__name__}); "
+                               f"falling back to a full scan")
+            return None
+        try:
+            out, err = await asyncio.wait_for(proc.communicate(), timeout=timeout)
+        except (asyncio.TimeoutError, OSError) as exc:
+            try:
+                proc.kill()
+                await proc.wait()
+            except (OSError, ProcessLookupError):
+                pass
+            if logger:
+                logger.warning(f"grep prefilter timed out ({type(exc).__name__}); "
+                               f"falling back to a full scan")
+            return None
+        reading = _grep_reading(proc.returncode, out.decode('utf-8', 'replace'),
+                                err.decode('utf-8', 'replace'), logger)
+        if reading is None:
+            return None
+        found |= reading
     return found
 
 

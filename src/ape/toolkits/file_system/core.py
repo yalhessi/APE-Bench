@@ -19,7 +19,7 @@ from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 from ape.utils.logging import create_logger
 from .utils import (
     generate_unified_diff, generate_word_diff, search_content_with_timeout,
-    grep_candidate_files,
+    grep_candidate_files_async,
     add_line_numbers, resolve_search_paths, calculate_relative_path, walk_workspace_files,
     validate_file_exists_and_is_file,
     check_file_size_limit, read_file_content_safe, apply_line_range_to_content,
@@ -84,9 +84,46 @@ class FileSystemProvider:
         if not self.workspaces_dir.exists():
             raise FileNotFoundError(f"Workspaces directory does not exist: {self.workspaces_dir}")
 
+        # The file list of a search path, walked once per attempt.
+        #
+        # A workspace's `target/` is a symlink farm over a content-addressed, read-only
+        # snapshot: between this provider's construction and its disposal the set of files in
+        # it does not change unless *this* provider writes one. Resolving it per call was the
+        # single worst thing `content_search` did under concurrency, and not because of the
+        # disk -- the walk is Python holding the GIL, so it does not parallelise at all.
+        # Measured over Mathlib's 7,435 files, one walk per concurrent search:
+        #
+        #     searches     1       4       8      16
+        #     walk      0.16s   0.84s   1.66s   3.01s      <- 16x the work, 16x the time
+        #     grep      0.68s   0.92s   1.26s   2.15s      <- 16x the work, 3.2x the time
+        #
+        # grep is a subprocess and scales; the walk is the part that cannot. Caching it is
+        # what makes raising nested concurrency worth anything.
+        #
+        # Only creating or deleting a file can invalidate this -- an edit changes content,
+        # and content is re-read by grep on every search -- so the writers below drop it.
+        self._search_path_cache: Dict[Tuple[str, bool], List[Path]] = {}
+
         self.logger.info(f"FileSystemProvider initialized")
         self.logger.info(f"  Workspaces directory: {self.workspaces_dir}")
         self.logger.info(f"  CLI mode: {is_cli_mode}")
+
+    async def _files_under(self, search_path: Path, recursive: bool) -> List[Path]:
+        """`resolve_search_paths`, memoised for this attempt. See `_search_path_cache`."""
+
+        key = (str(search_path), recursive)
+        cached = self._search_path_cache.get(key)
+        if cached is not None:
+            return cached
+        resolved = await asyncio.to_thread(
+            resolve_search_paths, search_path, self.workspaces_dir, recursive, self.logger)
+        self._search_path_cache[key] = resolved
+        return resolved
+
+    def _invalidate_search_paths(self) -> None:
+        """Called by every writer: a created or removed file changes what a search must walk."""
+
+        self._search_path_cache.clear()
     
     def _get_language_provider(self, file_path: Path):
         """Get language provider for file extension through code provider."""
@@ -308,14 +345,8 @@ class FileSystemProvider:
                     timeout = default_timeout
 
             # Parse search path relative to workspaces_dir
-            files_to_search = await asyncio.to_thread(
-                resolve_search_paths,
-                search_path,
-                self.workspaces_dir,
-                recursive,
-                self.logger
-            )
-            
+            files_to_search = await self._files_under(search_path, recursive)
+
             if not files_to_search:
                 return {
                     "success": False,
@@ -333,10 +364,8 @@ class FileSystemProvider:
             # `files_available` keep counting the census they have always counted. A file grep
             # excludes is one it has proved holds no matching line, so skipping the read
             # cannot change `results`.
-            candidates = await asyncio.to_thread(
-                grep_candidate_files, content_pattern, files_to_search,
-                use_regex=use_regex, logger=self.logger,
-            )
+            candidates = await grep_candidate_files_async(
+                content_pattern, files_to_search, use_regex=use_regex, logger=self.logger)
 
             for file_path in files_to_search:
                 if count >= max_results:
@@ -521,6 +550,8 @@ class FileSystemProvider:
             Operation result dictionary
         """
         try:
+            # A write may create a file, and the search cache is a list of files.
+            self._invalidate_search_paths()
             # Resolve path
             success, resolved_path, error_msg = self._resolve_path(file_path)
             if not success:
@@ -650,6 +681,9 @@ class FileSystemProvider:
             - modified_content: Modified content (only when show_modified_content=True)
         """
         try:
+            # Derived mode and the read-only fallback both create a new file, so this is a
+            # writer for cache purposes even when the edit itself is in place.
+            self._invalidate_search_paths()
             if show_modified_content is None:
                 show_modified_content = self.fs_config.show_modified_content
             # Standardize edits parameter: None and [] are equivalent
