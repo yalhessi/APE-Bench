@@ -59,6 +59,7 @@ above "one rep" without a measurement behind it.
 
 | Todo | The motivating result | Cost |
 |---|---|---|
+| [Decision-turn replay](replay-decision-turn.md) *(prioritised 2026-09-15)* | Forcing only the submit decision took issue recall **0.20 → 0.50** on identical PRs, and abstaining arms investigate as much as filing ones (**median 6.0 vs 7.0** tool calls) — yet every decision-stage change is tested with a full **$7.26 / ~38 min** rep that re-samples the investigation too. Resume each recorded session at its `submit_candidates` turn with one thing swapped. OCR settled its filter fix this way: 455 recorded calls replayed, precision **36% → 88%**. | code + replay turns |
 | [Work-unit batching](batching-work-units.md) *(grouping landed and measured; authority, `patch_set` open)* | PR 33145's six-theorem family is split across 4 work units by a **sha256 sort and a double-counted 24,000-char budget** — the packer charges one 5,196-char hunk 12 times when the renderer prints it once. Repacking on real content: **203 units → 92**. 41 of 62 families span >1 unit; 22 of 32 required family-grain jobs hold part of their family. `patch_set` has never been submitted in **1,660 recorded candidates** and would raise TypeError on first use. | code + 1 rerun |
 | [Specialist arm contents](specialist-arm-contents.md) | **Seven** of ten specialists match nothing, for three different reasons — `style` 126 findings / 0 published / 0 matches; `family_design` 26 invocations / 0 candidates; `api_reuse` 107 proposals / **0 mandatory rows** / 0 invocations. `naming_norm`'s `established` bar needs ratio ≥ 0.80 while 33337's gold prefix is **21 of 121**. `docs` is told a linter settles a check that is not in the toolset. | mostly re-scoring |
 | ~~[Lead prompt cost](lead-prompt-cost.md)~~ *(closed 2026-09-15)* | `### Exact changed fragments` is **43.6%** of rendered prompt characters and **61.8%** of prompt spend, and **95.5% of it is a verbatim re-send**. PR 33149 is **48% of the run's billed cost**: one 17,303-char hunk shipped to 120 jobs that each review one 163-char declaration. Target-scoping it removes 89.9% of the section and **16% of lead spend**. | code + 1 rep |
@@ -104,12 +105,8 @@ currencies do not even rank the same runs in the same order.
 
 `docs/research/open-code-review-comparison-2026-09.md` has the mechanism and risk for each.
 
-- **Replay the decision turn, not the job.** *Motivating result:* abstaining arms investigate as
-  much as filing ones (median 6.0 vs 7.0 tool calls) and forcing the decision alone took issue
-  recall 0.20 → 0.50 — the lever is the decision — yet each decision-stage change costs a full rep
-  ($7.26, ~38 min) with investigation variance included. Resample only the recorded
-  `submit_candidates` turn under the changed schema/instruction. OCR settled its filter fix this
-  way (455 recorded calls replayed, precision 36% → 88%). Enables the field-order item below.
+- **Replay the decision turn, not the job** — promoted to its own entry,
+  [replay-decision-turn.md](replay-decision-turn.md). Enables the field-order item below.
 
 - **Reason fields before verdict fields in tool schemas.** *Motivating result:* under
   `forbid_abstention`, `already_correct` labelled suppressed candidates aligning with gold at the

@@ -71,6 +71,15 @@ the batching comparison rests on.
 Why it matters: the worktree rule in `CLAUDE.md` makes every thread run from a worktree that is
 later deleted, so this will be the common case, not an edge.
 
+**The same deletion lost `arm_pool.jsonl` for all three `rel050` reps.** It is gitignored
+(`.gitignore:43`), so merging the branch brought the tracked run artifacts across and left the pool
+behind; `worktree-setup.sh` links `results/*` entries that exist at setup time, and a run created
+afterwards lives in the worktree's own tree. The per-task directories keep no copy of task data.
+The pool is the input any replay or re-audit of those runs needs (`replay-decision-turn.md`);
+`run_plan.json`'s `prompt_sha256_by_invocation` would at least let a rebuilt pool be checked.
+
 What would close it: resolve index paths relative to the `.ape` root (store them relative, or
 re-root an absolute path whose worktree prefix is gone), and make `extract` refuse — not return
-empty — when the index names directories none of which exist.
+empty — when the index names directories none of which exist; and either write new run
+directories through the main checkout's `results/` or refuse to remove a worktree holding an
+untracked run artifact.
