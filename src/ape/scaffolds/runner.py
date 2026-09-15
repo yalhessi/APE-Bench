@@ -412,6 +412,14 @@ async def main_from_params(params: Dict[str, Any]) -> Tuple['BaseTaskResult', Op
     config_class = getattr(scaffold_class, 'config_class', BaseScaffoldConfig)
     config = config_class.model_validate(params['config'])
 
+    # The task's own turn ceiling. The worker stamped `execution_limits.max_turns` on the
+    # Attempt and nothing handed it to the conversation, which enforces
+    # `config.execution.max_turns` -- so a per-task turn limit was recorded and never bound.
+    # The cost half already arrives as `cost_limit`; this is the other half of the same limit.
+    from ape.orchestration.models import task_execution_limits
+    config.execution.max_turns = task_execution_limits(
+        params['task_data'], config.execution).max_turns
+
     # Rebuild task (task_type is extracted from task_data['task_type'])
     task = create_task_from_data(
         params['task_data'],

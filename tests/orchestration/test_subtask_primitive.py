@@ -67,6 +67,39 @@ def test_a_malformed_override_falls_back_rather_than_failing_the_run(bad):
     assert limits.max_turns == 40
 
 
+@pytest.mark.parametrize("task_limits, expected", [
+    ({EXECUTION_LIMITS_KEY: {"max_turns": 5}}, 5),
+    ({}, 40),
+])
+def test_a_per_task_turn_limit_reaches_the_conversation(monkeypatch, task_limits, expected):
+    """The worker put `max_turns` on the Attempt, and the conversation enforces
+    `config.execution.max_turns`, which nothing overrode -- so the limit was recorded and never
+    bound. Asserted on the config the task runner actually receives."""
+
+    import asyncio
+
+    import ape.scaffolds.runner as runner
+
+    seen = {}
+
+    async def fake_run_task(self, **kwargs):
+        seen["max_turns"] = self.config.execution.max_turns
+        return None, None
+
+    monkeypatch.setattr(runner, "TaskRunner", type("R", (runner.TaskRunner,), {
+        "run_task": fake_run_task}))
+    monkeypatch.setattr("ape.tasks.base.create_task_from_data",
+                        lambda data, config, task_config_overrides=None: None)
+    config = _config()
+    config.execution.max_turns = 40
+    asyncio.run(runner.main_from_params({
+        "task_data": {"task_type": "t", **task_limits},
+        "config": config.model_dump(mode="json"),
+        "scaffold_type": "ape_agent",
+    }))
+    assert seen["max_turns"] == expected
+
+
 def test_a_spec_attaches_its_limits_to_the_payload():
     spec = TaskExecutionSpec(
         spec_id="s1", task_type="t", task_data={"task_id": "x"}, billed_cost_limit=0.5)
