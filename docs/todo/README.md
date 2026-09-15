@@ -59,9 +59,9 @@ above "one rep" without a measurement behind it.
 
 | Todo | The motivating result | Cost |
 |---|---|---|
-| [Work-unit batching](batching-work-units.md) *(grouping landed, `24746b2`)* | PR 33145's six-theorem family is split across 4 work units by a **sha256 sort and a double-counted 24,000-char budget** — the packer charges one 5,196-char hunk 12 times when the renderer prints it once. Repacking on real content: **203 units → 92**. 41 of 62 families span >1 unit; 22 of 32 required family-grain jobs hold part of their family. `patch_set` has never been submitted in **1,660 recorded candidates** and would raise TypeError on first use. | code + 1 rerun |
+| [Work-unit batching](batching-work-units.md) *(grouping landed and measured; authority, `patch_set` open)* | PR 33145's six-theorem family is split across 4 work units by a **sha256 sort and a double-counted 24,000-char budget** — the packer charges one 5,196-char hunk 12 times when the renderer prints it once. Repacking on real content: **203 units → 92**. 41 of 62 families span >1 unit; 22 of 32 required family-grain jobs hold part of their family. `patch_set` has never been submitted in **1,660 recorded candidates** and would raise TypeError on first use. | code + 1 rerun |
 | [Specialist arm contents](specialist-arm-contents.md) | **Seven** of ten specialists match nothing, for three different reasons — `style` 126 findings / 0 published / 0 matches; `family_design` 26 invocations / 0 candidates; `api_reuse` 107 proposals / **0 mandatory rows** / 0 invocations. `naming_norm`'s `established` bar needs ratio ≥ 0.80 while 33337's gold prefix is **21 of 121**. `docs` is told a linter settles a check that is not in the toolset. | mostly re-scoring |
-| [Lead prompt cost](lead-prompt-cost.md) *(renderer landed, `9d4de8f`)* | `### Exact changed fragments` is **43.6%** of rendered prompt characters and **61.8%** of prompt spend, and **95.5% of it is a verbatim re-send**. PR 33149 is **48% of the run's billed cost**: one 17,303-char hunk shipped to 120 jobs that each review one 163-char declaration. Target-scoping it removes 89.9% of the section and **16% of lead spend**. | code + 1 rep |
+| ~~[Lead prompt cost](lead-prompt-cost.md)~~ *(closed 2026-09-15)* | `### Exact changed fragments` is **43.6%** of rendered prompt characters and **61.8%** of prompt spend, and **95.5% of it is a verbatim re-send**. PR 33149 is **48% of the run's billed cost**: one 17,303-char hunk shipped to 120 jobs that each review one 163-char declaration. Target-scoping it removes 89.9% of the section and **16% of lead spend**. | code + 1 rep |
 | [The judge and the denominators](judge-and-measurement.md) | The judge has only ever paired at `anchor` — **705 of 705 pairs, no other tier ever emitted** — so an ask anchored one change away is never shown to it. The active v9 rubric splits its own vote on **76 of 705** pairs, against a v8 result of 0/18 that does not carry forward. PR 33149 is **68.9%** of condition A's findings. | no spend |
 | [Evidence tiers and traces](evidence-tiers-and-traces.md) | `repository_measurement` is declared in the schema and **produced by no v5 code path**, so "27 of 27 lemmas use this prefix" serialises exactly like a guess. Two collectors can only ever return `inconclusive`. `proof_profile` writes **no trace row at all** while gating condition C's leak audit. | no spend |
 | [Selection signal](selection-signal.md) | **Refuted in its absolute form**, which is what the 2026-09-14 plan proposed: at 10× the data — 907 candidates, 71 hit-candidates — within-PR AUC is **0.486 / 0.485 / 0.516**. The forced-run frontier is one PR (drop 33145 → AUC 0.511). Kept because the **relative within-PR** form is recorded as working and was never tested here. | no spend |
@@ -75,3 +75,16 @@ The four no-spend measurement items — judge pairing tier, judge noise, the 331
 the evidence tiers — change what every recall number in the record *means*, and all four are cheaper
 than any run. Anything scheduled before they land will be read against denominators that are known
 to be wrong in a known direction.
+
+### Added 2026-09-15, from the batching comparison
+
+- **Adjudicating findings that are not maintainer obligations.** ~90% of what the system emits is
+  off-gold, and gold is a lower bound, so `gold_alignment_rate` is not precision and nothing in the
+  evaluation says whether those findings are useful or noise. *Motivating result:* the batching
+  comparison moved alignment 0.069–0.091 → 0.181–0.202 and control emission 2/3/4 → 0/0/1, and
+  neither can be read as better output. This is now the largest gap in the evaluation.
+- **Per-target attention under consolidated units.** Packing 203 work units into 92 cut generalist
+  candidates per target from **0.494 to 0.154**; the generalist emits a roughly constant number per
+  *job*, not per target. *Motivating result:* 33321's docstring had a dedicated job in 0.3.0 and
+  caught the typo; in 0.5.0 it is one of ten-plus targets and the job filed about a different
+  declaration. Untried: a cap on targets per unit, or telling the generalist its target count.

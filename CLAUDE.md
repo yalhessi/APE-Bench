@@ -109,6 +109,16 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
   this project's history was really an evidence gap.
 - Read the routing degenerate-check before any recall number. Externally, never show the
   leak-inflated Phase-C numbers (~70%).
+- **`location_recall` is not a quality signal.** It counts obligations where some candidate
+  anchored to the gold `change_id` *without* naming the issue — the agent asking for something
+  else at the right line, which is at best neutral. For coverage use `coverage_gaps` (0 means
+  every gold site had a job, and it is gold-independent); for what the reviewer could express
+  use `issue_recall_reachable`. A 2026-09-15 comparison was nearly read as a regression on a
+  location drop that meant only that a quieter run said fewer off-target things.
+- Gold is a lower bound, so `gold_alignment_rate` is not precision and a candidate absent from
+  gold is unaligned rather than wrong. Nothing in the current evaluation adjudicates the ~90% of
+  findings that are not maintainer obligations; until something does, precision claims in either
+  direction are unsupported.
 
 ## Running
 

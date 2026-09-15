@@ -1,8 +1,10 @@
 # Lead-mode prompt cost — one section is 43.6% of the prompt and 95% of it is a re-send
 
-**Status** — **renderer landed on `lead-prompt-cost` (`9d4de8f`); two steps remain.** The arms are
-scoped now (`focused-prompt/3`, live in every new run). The generalist moves only at
-`candidate-prompt/13`, which no release uses yet, and the billed effect is still unmeasured.
+**Status** — **closed 2026-09-15.** Measured over three repetitions each: billed $13.44 -> $7.26
+(46%), recall unchanged within noise. See `docs/research/batching-and-prompt-repair-2026-09.md`.
+The finding worth keeping is that the saving did **not** come from prompt volume: the arms' 73.8%
+volume cut bought 9.9% of arm spend, and the money was in the coverage floor (203 work units ->
+92), which is the batching entry, not this one.
 **Cost** — no spend to measure; one rep to confirm the fix changes nothing else
 **Answer to the question asked** — the dominant part is *not* the instructions, the checklist or the
 schema. It is `### Exact changed fragments`.
