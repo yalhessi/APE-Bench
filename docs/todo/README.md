@@ -89,8 +89,29 @@ currencies do not even rank the same runs in the same order.
   evaluation says whether those findings are useful or noise. *Motivating result:* the batching
   comparison moved alignment 0.069–0.091 → 0.181–0.202 and control emission 2/3/4 → 0/0/1, and
   neither can be read as better output. This is now the largest gap in the evaluation.
+  *Design precedent (2026-09-15):* AACR-Bench labels model-found comments correct **and incorrect**
+  (1,505 / 640) and folds them into gold; a stable finding key lets one label serve every rep that
+  reproduces it. See `docs/research/open-code-review-comparison-2026-09.md` §1.
 - **Per-target attention under consolidated units.** Packing 203 work units into 92 cut generalist
   candidates per target from **0.494 to 0.154**; the generalist emits a roughly constant number per
   *job*, not per target. *Motivating result:* 33321's docstring had a dedicated job in 0.3.0 and
   caught the typo; in 0.5.0 it is one of ten-plus targets and the job filed about a different
-  declaration. Untried: a cap on targets per unit, or telling the generalist its target count.
+  declaration. Untried: a cap on targets per unit, or telling the generalist its target count, or
+  requiring a per-target disposition (candidate or abstention label per `change_id`) in
+  `submit_candidates` — OCR's "every file reviewed or skipped with a reason".
+
+### Added 2026-09-15, from the open-code-review comparison
+
+`docs/research/open-code-review-comparison-2026-09.md` has the mechanism and risk for each.
+
+- **Reason fields before verdict fields in tool schemas.** *Motivating result:* under
+  `forbid_abstention`, `already_correct` labelled suppressed candidates aligning with gold at the
+  kept rate (0.038 vs 0.041), and `model_confidence` — the last field — was null on every forced
+  finding; `abstention_reason` is emitted before `abstention_detail`. OCR found by session replay
+  that an id field ahead of its analysis field could not be retracted. One arm on `bench`, 3 reps.
+- **Verbatim-quote anchoring, re-filed deterministically.** *Motivating result:* 705 of 705 judge
+  pairs are at `anchor`, so an ask one change away is never judged. An optional `quoted_code`
+  resolved against every PR fragment gives a gold-free `resolved_change_id`. No spend to measure
+  how many existing candidates would move, if arms are asked to quote.
+- **`plan` writes the dispatch pool to scratch.** *Motivating result:* the `naming_norm` run
+  ($1.11, 33337 rep14) lost to a tool that never reached the arm, which `plan` cannot show.
