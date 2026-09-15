@@ -67,7 +67,7 @@ above "one rep" without a measurement behind it.
 | [Selection signal](selection-signal.md) | **Refuted in its absolute form**, which is what the 2026-09-14 plan proposed: at 10× the data — 907 candidates, 71 hit-candidates — within-PR AUC is **0.486 / 0.485 / 0.516**. The forced-run frontier is one PR (drop 33145 → AUC 0.511). Kept because the **relative within-PR** form is recorded as working and was never tested here. | no spend |
 | [Parked corpora](parked-corpora.md) | A **30,297-row** A→B ledger whose only importer is a test, with a clean `grind` curve countable in it. The Zulip benchmark's 45% unresolved rate is **exhaustively** two build parameters. The precedent gate's 49%/56% was measured on embeddings the bench builds itself, **never on the shipped index**. | no spend |
 | [Record corrections](record-corrections.md) | Three `dead-ends.md` clauses assert mechanisms the artifacts contradict — including the 33145 decline, where `naming` **did** run at the gold site and filed both renames. Every conclusion survives; the causes do not. | no spend |
-| [Operational floor](operational-floor.md) | An **aborted** fanout run sits untracked under a resumable name with a sealed plan — a resume would seal onto a retired design at ~$111. The acceptance report fails on **one unexplained row**. | no spend |
+| [Operational floor](operational-floor.md) | An **aborted** fanout run sits untracked under a resumable name with a sealed plan — a resume would seal onto a retired design at ~$111. The acceptance report fails on **one unexplained row**. `cli trajectory` returns **0 arm invocations** for all three `rel050` reps: the index holds absolute paths into a deleted worktree. | no spend |
 | [Wall clock — the whole run process](wall-clock-arm-runtime.md) | A run is **~38 min** but `run_manifest.json` records **27.1** — it times the orchestrator only, missing **89 s** of agenda build and **9.5 min** of finalization that runs *after* the last line prints. The same full-tree Python scan is written **twice in two modules**: `content_search` (**26–30%** of arm time) and `repository_search` (dominates the tail), at **32.7 s / 5.4 s** where `grep` takes **0.28 s**. Startup is **97% `exposure._scan`**, run **14×** at 8.5 s, **12.3 M `json.loads`**, on immutable snapshots it never caches to disk. The evidence chain is a **serial loop over 268 candidates** on 64 cores. Concurrency can't be raised first: `content_search` throughput is **flat 0.39→0.69/s**, degrading **2.7 s → 25.0 s** from 6 to 16 arms. *Correction: `record_turn` is **7%**, not the 21% first claimed — median write 0.0 s; the 68% byte amplification is real but third-order.* | code + 1 rep |
 | [Billed as the only spend number](cost-accounting-billed-only.md) | Across 52 v5 manifests the field named `total_cost` sums to **$283.53** against a true billed **$84.23**, at a per-run ratio of **2.06×–3.38×** — so **69 of 820 run pairs (8.4%) are ordered differently by nominal than by billed**. Nominal is still what the live progress line labels `Cost:`, what `Already spent:` prints beside a billed cap, and what reaches `report["cost"]` and `score["cost"]`. | no spend |
 
@@ -103,6 +103,13 @@ currencies do not even rank the same runs in the same order.
 ### Added 2026-09-15, from the open-code-review comparison
 
 `docs/research/open-code-review-comparison-2026-09.md` has the mechanism and risk for each.
+
+- **Replay the decision turn, not the job.** *Motivating result:* abstaining arms investigate as
+  much as filing ones (median 6.0 vs 7.0 tool calls) and forcing the decision alone took issue
+  recall 0.20 → 0.50 — the lever is the decision — yet each decision-stage change costs a full rep
+  ($7.26, ~38 min) with investigation variance included. Resample only the recorded
+  `submit_candidates` turn under the changed schema/instruction. OCR settled its filter fix this
+  way (455 recorded calls replayed, precision 36% → 88%). Enables the field-order item below.
 
 - **Reason fields before verdict fields in tool schemas.** *Motivating result:* under
   `forbid_abstention`, `already_correct` labelled suppressed candidates aligning with gold at the

@@ -33,6 +33,67 @@ resume identity that refuses a resume whose input or rules changed (`session/man
 Their own benchmark claim: higher precision and F1 than Claude Code with the same model at ~1/9 the
 tokens, **lower recall**, a trade-off they state as deliberate.
 
+## Stages, side by side
+
+`D` = deterministic code, `L` = model call.
+
+| # | OCR | | Ours (v5) | |
+|---|---|---|---|---|
+| 0 | resolve refs, freeze commits; pure file selection shared with `--preview` | D | release: targets, entities, families, work units, sealed rendered prompts | D |
+| 1 | per-path rule checklist | D | agenda: arm × unit proposals, eligibility, mandatory generalist floor | D |
+| 2 | group files — skipped below 4 files; indices, not paths | L/D | lead routes specialists per PR (prune / add / budget) | L |
+| 3 | plan — only above a churn threshold, no tools, plain text | L | — (the arm's concern prompt stands in) | |
+| 4 | main loop per group: context tools, `code_comment` **incrementally**, `task_done` gated on a pass per file; grace round on budget stop | L | arm session: context tools + `lean_verify_edit`, one terminal `submit_candidates` validated and compile-checked **as a batch** | L+D |
+| 5 | anchor each comment from its quote; cross-file re-file; LLM re-locate last | D→L | anchor declared by `change_ids`, refused if outside the unit | D |
+| 6 | refutation-only filter, per round | L | lead synthesis (subtractive, currently off) → evidence gate → merge → digest | L/D |
+| 7 | rounds 2+ with confirmed findings, no plan; stop when a round adds nothing | L | — (one pass per arm × unit) | |
+| 8 | manifest, render | D | semantic judge v9, 3 samples, anchor pairing | L |
+
+The shapes differ in one place that matters: OCR has no router and no specialists, but it has
+two stages we lack — a separate filter with narrow authority, and a second pass over the same
+code.
+
+## Which stages paid off — only three have numbers
+
+OCR's history (694 commits, read in full) carries a measurement for three components. Everything
+else — grace round, plan skip, index-based grouping, cross-file re-filing, the round loop — ships
+with a rationale and no number, and their headline benchmark is not decomposed by component.
+
+1. **The filter was harmful, then fixed** (`c8b6a39`, #295). An A/B over 194 commit ranges with
+   claude-opus-4-6: the filter removed 22 comments at 36% precision, 8 of them real defects. Two
+   causes: `comment_ids` serialised before any reasoning field (replay showed the model writing
+   "this is a protected subject" after the id it could not retract), and a prompt step inviting a
+   value judgement. After the fix, replaying all 455 recorded filter calls: **precision 36% → 88%,
+   real findings deleted 8 → 0**, +37% filter tokens. Their caveat: grounds derived from the same
+   data, so a training-set result.
+2. **Grouping cost recall, and they measured why** (`a662400`, #808). Grouping cut recall
+   **20.0% → 12.7%** (F1 25.2 → 19.1). The 396 dropped comments hit gold at 27.8%, "only 14% better
+   than a random cut of the same size" — indiscriminate thinning. Secondary group members starved:
+   `.h` files lost 79% of their comments and went silent 68% of the time against ~30% for
+   implementation files; tool calls per file fell 4.12 → 2.92. Four fixes, one of which gates
+   `task_done` on a pass per file. No post-fix recall is recorded in the commit.
+3. **Stringified tool arguments** (`41917e2`, #1153). 13 of 4,540 tool calls, 37 comments lost;
+   the repair recovers 12 batches / 34 comments. Also: the parser's "invalid character" wording
+   made the model regenerate 13/13, a schema-violation message only 4/13.
+
+Item 2 is our batching result from the other side: consolidating units cut generalist candidates
+per target 0.494 → 0.154 here, and their starved-member measurement is the same mechanism.
+
+The method behind items 1 and 3 is the transferable part: **every LLM request is recorded with
+its inputs, so one stage is re-evaluated by replaying its recorded inputs** rather than by a new
+end-to-end run.
+
+## Measured on our side before recommending
+
+- **Batch refusal** (the case for incremental emission). On `v2_rep1-3`, 24/319, 28/314 and 27/322
+  arm sessions (~8.6%) had a submission refused at least once (`is invalid` 31/37/36,
+  verification 8/3/2). All later submitted legally; **5/3/2 sessions resubmitted fewer candidates,
+  losing 7/8/5 candidates per rep**, two of them becoming abstentions. Real but small — not worth
+  restructuring emission for.
+- **Budget stops** (the case for a grace round). 0 of 1,574 arm jobs ended without a result.
+- `rel050_rep1-3` could not be measured the same way: see the trajectory defect in
+  `docs/todo/operational-floor.md` §5.
+
 ## AACR-Bench scores the way we do; the difference is its gold
 
 File → diff side → line overlap within k=1 → LLM semantic judge. That is our "same place AND same
@@ -58,6 +119,23 @@ reviewers that resemble the enhancer.
 Each item names the OCR mechanism and **our** measurement that makes it worth doing; OCR's success
 with it is not evidence it works here.
 
+### 0. Replay a recorded decision turn instead of re-running the job
+
+*OCR:* the filter fix and the argument-repair wording were both settled by replaying recorded
+requests (455 filter calls; 13 failed batches), not by new end-to-end runs.
+*Ours:* the decision, not the investigation, is where findings are withheld — arms that abstain
+investigate as much as arms that file (median 6.0 vs 7.0 tool calls, n=95/23), and forcing the
+decision took issue recall 0.20 → 0.50 on identical PRs. Yet every change to the decision stage
+(abstention wording, field order, the bar) is tested with a full rep: $7.26 billed, ~38 minutes,
+investigation variance included, read through a judge that disagrees with itself on ~11% of pairs.
+*Change:* take recorded arm sessions up to their `submit_candidates` call, swap the tool schema or
+the closing instruction, and resample only that turn N times. The cost is one cached-prefix turn
+per session, and the investigation is held fixed, so the difference is the change alone. Items 3
+and 5 below, and the abstention bar generally, become cheap to test this way. APE already saves
+completed turns for resume (`scaffolds/ape_agent/conversation.py:433`) — start there.
+*Risk:* a replayed decision sees the transcript of an investigation shaped by the old schema; it
+tests the decision, not a changed investigation.
+
 ### 1. Adjudicate off-gold findings once, and keep the labels
 
 *OCR/AACR:* human correct/incorrect labels on model-found comments, folded into gold; OCR's
@@ -76,7 +154,8 @@ across reps because most keys recur. This is not the deferred recruited-annotato
 
 *OCR:* the main prompt requires "every `<file>` in `<review_files>` its own pass … a file being
 the smaller or secondary member is not a reason to skip it"; delegate mode makes coverage
-mandatory: every file ends `reviewed` or `skipped` with a concrete reason.
+mandatory: every file ends `reviewed` or `skipped` with a concrete reason. Added after grouping
+starved secondary members (`.h` files silent 68% of the time; see "Which stages paid off" §2).
 *Ours:* consolidating units cut generalist candidates per target 0.494 → 0.154; 33321's docstring
 typo was caught with a dedicated job and missed as one of ten-plus targets.
 *Change:* `submit_candidates` requires each `change_id` in the unit to be covered by a candidate or
@@ -135,6 +214,8 @@ missing exists; a claimed compile failure does not reproduce).
 
 - **Grace round** (one submit-only turn when the tool budget is exhausted). All 1,574 arm and 72
   lead jobs across the six held-out runs (`v2_rep1-3`, `rel050_rep1-3`) completed with a result.
+- **Incremental emission instead of one validated batch.** Refusal cost 7/8/5 candidates per rep
+  on `v2_rep1-3` (see "Measured on our side").
 - **More review rounds with confirmed findings.** `forbid_abstention` already bought volume at an
   unchanged alignment rate; revisit once item 1 can say whether the extra findings are useful.
 - **Memory compression.** Arms run a median of 6–7 tool calls before submitting.

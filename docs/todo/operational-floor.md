@@ -56,3 +56,21 @@ the set." It is now answerable and the answer splits:
 What would close it: classify each residual name in the three v2 reps as either introduced by the PR
 under review — the stale-sibling defect, still live — or invented by the model, which is expected.
 Ten distinct names across three reps; one `declaration_search` each.
+
+## 5. `cli trajectory` silently finds no arms in runs made from a deleted worktree
+
+Found 2026-09-15. `extract("pr5_A_lead_heldout12_rel050_rep1")` returns **0 invocations** although
+the run has 206 arm rows in `execution_index.jsonl` and 218 `task_result.json` files on disk.
+Every index row's `task_dir` is absolute and names
+`.claude/worktrees/batching-work-units/.ape/runs/…`; that worktree has been removed, while `.ape/`
+was a link into the main checkout, so the transcripts still exist at `.ape/runs/<run>/…`.
+`_arm_result_paths` trusts the index when it is non-empty and never falls back to the globs, so
+the result is an empty trajectory with no warning — all three `rel050` reps, which are the runs
+the batching comparison rests on.
+
+Why it matters: the worktree rule in `CLAUDE.md` makes every thread run from a worktree that is
+later deleted, so this will be the common case, not an edge.
+
+What would close it: resolve index paths relative to the `.ape` root (store them relative, or
+re-root an absolute path whose worktree prefix is gone), and make `extract` refuse — not return
+empty — when the index names directories none of which exist.
