@@ -68,6 +68,8 @@ above "one rep" without a measurement behind it.
 | [Parked corpora](parked-corpora.md) | A **30,297-row** A→B ledger whose only importer is a test, with a clean `grind` curve countable in it. The Zulip benchmark's 45% unresolved rate is **exhaustively** two build parameters. The precedent gate's 49%/56% was measured on embeddings the bench builds itself, **never on the shipped index**. | no spend |
 | [Record corrections](record-corrections.md) | Three `dead-ends.md` clauses assert mechanisms the artifacts contradict — including the 33145 decline, where `naming` **did** run at the gold site and filed both renames. Every conclusion survives; the causes do not. | no spend |
 | [Operational floor](operational-floor.md) | An **aborted** fanout run sits untracked under a resumable name with a sealed plan — a resume would seal onto a retired design at ~$111. The acceptance report fails on **one unexplained row**. | no spend |
+| [Wall clock — the whole run process](wall-clock-arm-runtime.md) | A run is **~38 min** but `run_manifest.json` records **27.1** — it times the orchestrator only, missing **89 s** of agenda build and **9.5 min** of finalization that runs *after* the last line prints. The same full-tree Python scan is written **twice in two modules**: `content_search` (**26–30%** of arm time) and `repository_search` (dominates the tail), at **32.7 s / 5.4 s** where `grep` takes **0.28 s**. Startup is **97% `exposure._scan`**, run **14×** at 8.5 s, **12.3 M `json.loads`**, on immutable snapshots it never caches to disk. The evidence chain is a **serial loop over 268 candidates** on 64 cores. Concurrency can't be raised first: `content_search` throughput is **flat 0.39→0.69/s**, degrading **2.7 s → 25.0 s** from 6 to 16 arms. *Correction: `record_turn` is **7%**, not the 21% first claimed — median write 0.0 s; the 68% byte amplification is real but third-order.* | code + 1 rep |
+| [Billed as the only spend number](cost-accounting-billed-only.md) | Across 52 v5 manifests the field named `total_cost` sums to **$283.53** against a true billed **$84.23**, at a per-run ratio of **2.06×–3.38×** — so **69 of 820 run pairs (8.4%) are ordered differently by nominal than by billed**. Nominal is still what the live progress line labels `Cost:`, what `Already spent:` prints beside a billed cap, and what reaches `report["cost"]` and `score["cost"]`. | no spend |
 
 ### Reading order
 
@@ -75,6 +77,10 @@ The four no-spend measurement items — judge pairing tier, judge noise, the 331
 the evidence tiers — change what every recall number in the record *means*, and all four are cheaper
 than any run. Anything scheduled before they land will be read against denominators that are known
 to be wrong in a known direction.
+
+[Billed as the only spend number](cost-accounting-billed-only.md) is the same argument on the cost
+axis: until it lands, a cost figure in the record does not say which currency it is in, and the two
+currencies do not even rank the same runs in the same order.
 
 ### Added 2026-09-15, from the batching comparison
 
