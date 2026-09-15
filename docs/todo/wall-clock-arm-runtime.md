@@ -57,6 +57,34 @@ harness. And these runs share a 64-core box with up to eleven other Claude Code 
 cross-run wall comparisons are confounded; the within-run *proportions* are the robust part and
 they hold across all four.
 
+### It is NFS, not file count — and the benchmark that said otherwise changed two variables
+
+`d5eb2f4`'s closing table concluded the root cause was **corpus shape**: 7,435 files per search,
+whose `open`/`fstat`/`close` syscalls serialise in the kernel. That table compared 7,435 files **on
+NFS** against one blob **on tmpfs** — two variables at once — and attributed the whole difference to
+the one that was wrong.
+
+The store is **NFSv3 over TCP** (`vers=3, rsize=wsize=131072, hard, sec=krb5, fsc`); `/tmp` is
+tmpfs. Holding content and pattern fixed and varying corpus shape and filesystem independently
+(`grep -rlF`, k = concurrent searches):
+
+| corpus | k=1 | k=8 | k=32 | k=64 |
+|---|---|---|---|---|
+| 7,425 files, **NFS** | 0.60 s | 1.33 s | 5.30 s | **10.08 s** |
+| 7,425 files, **tmpfs** | 0.07 s | 0.10 s | 0.12 s | **0.14 s** |
+| 1 blob, NFS | 0.03 s | 0.03 s | 0.04 s | 0.06 s |
+| 1 blob, tmpfs | 0.04 s | 0.05 s | 0.10 s | 0.15 s |
+
+**The identical 7,425-file tree scales fine to 64-way on local storage.** File count is not the
+bottleneck; every per-file `open` being an NFS round-trip is. That also means the packed-blob index
+is *one* possible fix rather than *the* fix — staging the corpus on node-local storage keeps the
+natural file layout and lands in the same range.
+
+Relevant capacities, since they were never part of the design discussion: `/tmp` and `/dev/shm` are
+**565 GB tmpfs** (538 GB free), `/data/local` is a **14 TB local NVMe** (3.7 TB free), and a
+snapshot's **Mathlib source is only 65 MB** — the 3.2 GB is `.lake` build output. Staging source for
+a 12-PR run is ~780 MB.
+
 ### grep is ~2–3 s, not 0.28 s
 
 The first version quoted `grep` at **0.28 s** over the Mathlib tree. That was a **warm-cache
