@@ -34,6 +34,9 @@ from ape.tasks.lean_tasks.formal_math.review.candidates import (
 from src.mathlib_review.agenda.registry import (
     expected_concerns, patch_set_arms,
 )
+from src.mathlib_review.review.replay import (
+    DecisionReplaySpec, recorded_tools, tool_definition_sha256,
+)
 
 from .context_tools import register_context_tools
 
@@ -207,3 +210,83 @@ class ReviewArmTask(LeanPRReviewV4CandidateTask):
 
 
 register_task(ARM_TASK_TYPE, ReviewArmTask)
+
+
+ARM_REPLAY_TASK_TYPE = "lean_pr_review_v5_arm_replay"
+
+
+class ReviewArmReplayData(ReviewArmData):
+    task_type: str = ARM_REPLAY_TASK_TYPE
+    replay: DecisionReplaySpec
+
+
+class ReviewArmReplayResult(ReviewArmResult):
+    #: The spec the replay started from, plus what it found about today's tool registration.
+    replay: Optional[Dict[str, Any]] = None
+
+
+class ReviewArmReplayTask(ReviewArmTask):
+    """An arm task that starts from a recorded session, just before its first submission.
+
+    Everything else is the arm task: the same payload, the same `submit_candidates` contract,
+    the same tools executing. What differs is where the conversation starts
+    (`session_prefix`) and which tool definitions the model is shown (`adapt_tool_definitions`)
+    -- the recorded ones, with at most the one change the replay condition made. The pipeline
+    side, and why the cut is at the *first* submission, is `src/mathlib_review/review/replay.py`.
+    """
+
+    task_type = ARM_REPLAY_TASK_TYPE
+    data_class = ReviewArmReplayData
+    task_result_class = ReviewArmReplayResult
+
+    def _prefix_rows(self) -> List[Dict[str, Any]]:
+        """The sealed prefix, refused if it is not the one the task data names."""
+
+        cached = getattr(self, "_prefix_cache", None)
+        if cached is not None:
+            return cached
+        from pathlib import Path
+
+        from src.mathlib_review.io import jsonl_rows, sha256_file
+
+        spec = self.data.replay
+        path = Path(spec.prefix_path)
+        if sha256_file(path) != spec.prefix_sha256:
+            raise RuntimeError(
+                f"replay prefix {path} does not match its recorded sha256; the replay would "
+                "start from a conversation other than the one its task identity names")
+        self._prefix_cache = jsonl_rows(path)
+        return self._prefix_cache
+
+    async def session_prefix(self) -> List[Dict[str, Any]]:
+        return self._prefix_rows()
+
+    def adapt_tool_definitions(self, registered: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Show the recorded definitions; execute against today's registration.
+
+        A recorded tool that is no longer registered is refused -- the model would be offered a
+        call that cannot run. A registered tool whose definition differs from the recording is
+        `tool_drift`: the replay still shows the recorded one, and the result says it drifted,
+        because its behaviour is today's.
+        """
+
+        shown = recorded_tools(self._prefix_rows())
+        live = {(tool.get("function") or {}).get("name"): tool for tool in registered}
+        missing = sorted(name for name in ((t.get("function") or {}).get("name") for t in shown)
+                         if name not in live)
+        if missing:
+            raise RuntimeError(f"replay shows recorded tools that are not registered: {missing}")
+        recorded = self.data.replay.recorded_tool_sha256
+        self._tool_drift = sorted(
+            name for name, tool in live.items()
+            if name in recorded and tool_definition_sha256(tool) != recorded[name])
+        return shown
+
+    def create_result(self, success: bool, score: float, **kwargs) -> ReviewArmReplayResult:
+        kwargs.setdefault("replay", {
+            **self.data.replay.model_dump(mode="json"),
+            "tool_drift": getattr(self, "_tool_drift", None)})
+        return super().create_result(success=success, score=score, **kwargs)
+
+
+register_task(ARM_REPLAY_TASK_TYPE, ReviewArmReplayTask)
