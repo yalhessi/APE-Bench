@@ -422,43 +422,39 @@ class ApeAgentConversationManager:
                     self.logger.warning(
                         f"Failed to load session file {latest_session_file.name}, will create a new session"
                     )
-            else:
-                seeded = await self._session_from_task_prefix()
-                if seeded is not None:
-                    return seeded
+            elif getattr(self.task, "session_replay", None) is not None:
+                return await self._session_from_replay()
 
+        if getattr(self.task, "session_replay", None) is not None:
+            from .replay import ReplayRefused
+
+            raise ReplayRefused(
+                "a replay reached a fresh session (no attempt path, or an unreadable session "
+                "file); refusing to start it from its prompt")
         return await self.create_conversation_session(max_turns, tools)
 
-    async def _session_from_task_prefix(self) -> Optional['ConversationSession']:
-        """Start from a conversation the task supplies, when it supplies one.
+    async def _session_from_replay(self) -> 'ConversationSession':
+        """Start from the recorded prefix a `session_replay` directive names.
 
-        Optional, like `create_system_prompt`: a task that defines `session_prefix()` returns
-        recorded nodes -- system, tool definitions, prompt, and every turn up to the point it
-        wants the model to take over -- and the conversation continues from there exactly as a
-        resume would, through `_create_session_from_existing`. Consulted only when the attempt
-        has no session file yet, so a paused attempt resumes its own file and is never reseeded.
+        The conversation then continues exactly as a resume would, through
+        `_create_session_from_existing`. Consulted only when the attempt has no session file,
+        so a paused replay resumes its own file and is never reseeded.
 
-        Two things are deliberately not carried over. The session id is fresh, because this is
-        a new conversation and N resamples of one prefix must not share an identity. And
-        assistant `usage` is dropped, because `_restore_conversation_usage` would otherwise
-        charge the recorded session's spend to this attempt -- against its cost cap and in its
-        reported cost -- when that spend was billed to the run that produced it.
+        Two things are deliberately not carried over. The session id is fresh: this is a new
+        conversation, and N resamples of one prefix must not share an identity. And assistant
+        `usage` is dropped, because `_restore_conversation_usage` would otherwise charge the
+        recorded session's spend to this attempt -- against its cost cap and in its reported
+        cost -- when that spend was billed to the run that produced it.
 
-        Unlike `_task_system_prompt`, a failure here raises. A task that asked to start from a
-        recorded conversation and silently started from scratch would be measured as if it had.
+        Every failure raises. A task that was asked to start from a recording and silently
+        started from its prompt would be measured as if it had not.
         """
 
-        builder = getattr(self.task, "session_prefix", None)
-        if builder is None:
-            return None
-        rows = await builder()
-        if not rows:
-            return None
-
         from ape.llm_clients.models import ConversationNode, ConversationSession
+        from .replay import load_prefix
 
         session = ConversationSession()
-        for row in rows:
+        for row in load_prefix(self.task.session_replay):
             node = ConversationNode.model_validate(row)
             if node.type == "assistant":
                 node.message.usage = None
@@ -466,22 +462,50 @@ class ApeAgentConversationManager:
         seeded = await self._create_session_from_existing(session)
         self._restore_conversation_usage(seeded)
         self.logger.info(
-            f"Started session {seeded.session_id} from a task-supplied prefix of "
+            f"Replay: started session {seeded.session_id} from a recorded prefix of "
             f"{len(seeded.nodes)} nodes ({seeded.get_assistant_count()} assistant turns)"
         )
         return seeded
 
-    def _task_tool_definitions(self, tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """The tool definitions the model is shown, when the task decides them.
+    def _replay_tool_definitions(self, registered: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Under a replay, show the recorded tool definitions; calls execute as registered.
 
-        Optional: a task that defines `adapt_tool_definitions(tools)` receives the definitions
-        the MCP server registered and returns the ones sent to the API. Calls still execute
-        against the registered tools. A replay uses it to show the model the definitions its
-        recorded prefix was produced under, or one deliberate change to them.
+        A recorded tool that is no longer registered is refused -- the model would be offered
+        a call that cannot run. A registered tool whose definition differs from the recording
+        is `tool_drift`: the recording is still what is shown, and the attempt says so in
+        `session_replay.json`, because the tool's behaviour is today's.
         """
 
-        adapt = getattr(self.task, "adapt_tool_definitions", None)
-        return tools if adapt is None else adapt(tools)
+        replay = getattr(self.task, "session_replay", None)
+        if replay is None:
+            return registered
+
+        from .replay import (
+            REPLAY_RECORD_FILENAME, ReplayRefused, load_prefix, recorded_tools,
+            tool_definition_sha256,
+        )
+
+        shown = recorded_tools(load_prefix(replay))
+        live = {(tool.get("function") or {}).get("name"): tool for tool in registered}
+        missing = sorted(name for name in ((t.get("function") or {}).get("name") for t in shown)
+                         if name not in live)
+        if missing:
+            raise ReplayRefused(f"replay shows recorded tools that are not registered: {missing}")
+        record = {
+            "prefix_sha256": replay.prefix_sha256,
+            "tool_drift": sorted(
+                name for name, tool in live.items()
+                if name in replay.recorded_tool_sha256
+                and tool_definition_sha256(tool) != replay.recorded_tool_sha256[name]),
+            "registered_not_shown": sorted(set(live) - set(replay.recorded_tool_sha256)),
+        }
+        if self.task.attempt_path:
+            (self.task.attempt_path / REPLAY_RECORD_FILENAME).write_text(
+                json.dumps(record, indent=2) + "\n", encoding="utf-8")
+        if record["tool_drift"]:
+            self.logger.warning(f"Replay: tool definitions drifted since recording: "
+                                f"{record['tool_drift']}")
+        return shown
     
     async def _create_session_from_existing(self, existing_session: 'ConversationSession') -> 'ConversationSession':
         """
@@ -754,7 +778,7 @@ class ApeAgentConversationManager:
 
         # Fetch available tools so we can record them in the session
         tools_list = await self._get_available_tools(mcp_instance) if mcp_instance else []
-        tools_list = self._task_tool_definitions(tools_list)
+        tools_list = self._replay_tool_definitions(tools_list)
         self.tools = tools_list
 
         # Initialize or resume the session

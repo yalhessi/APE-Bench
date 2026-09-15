@@ -39,10 +39,7 @@ from .judgment import (
     LeanPRReviewV4JudgmentConfig, LeanPRReviewV4JudgmentData,
     LeanPRReviewV4JudgmentResult, LeanPRReviewV4JudgmentTask,
 )
-from .arm import (
-    ARM_REPLAY_TASK_TYPE, ARM_TASK_TYPE, ReviewArmConfig, ReviewArmData, ReviewArmReplayTask,
-    ReviewArmTask,
-)
+from .arm import ARM_TASK_TYPE, ReviewArmConfig, ReviewArmData, ReviewArmTask
 from .lead import LEAD_TASK_TYPE, ReviewLeadConfig, ReviewLeadData, ReviewLeadTask
 from .solo import (
     SOLO_RENDERER_VERSION, SOLO_TASK_TYPE, SoloReviewConfig, SoloReviewData,
@@ -61,7 +58,6 @@ __all__ = [
     "LeanPRReviewV4JudgmentConfig", "LeanPRReviewV4JudgmentData",
     "LeanPRReviewV4JudgmentResult", "LeanPRReviewV4JudgmentTask",
     "ARM_TASK_TYPE", "ReviewArmConfig", "ReviewArmData", "ReviewArmTask",
-    "ARM_REPLAY_TASK_TYPE", "ReviewArmReplayTask",
     "LEAD_TASK_TYPE", "ReviewLeadConfig", "ReviewLeadData", "ReviewLeadTask",
     "SOLO_RENDERER_VERSION", "SOLO_TASK_TYPE", "SoloReviewConfig", "SoloReviewData",
     "SoloReviewResult", "SoloReviewTask",

@@ -179,6 +179,9 @@ class BaseTask:
         target_workspace: Target workspace (optional)
         reference_workspaces: Reference workspaces (optional)
         logger: Logger instance (set during setup)
+        session_replay: A `SessionReplay` directive when this attempt starts from a recorded
+            conversation rather than from its prompt; set at the runtime boundary from the
+            task data's `session_replay` key, never by the task (scaffolds/ape_agent/replay.py)
     """
 
     # Class variables to be defined by subclasses
@@ -204,6 +207,7 @@ class BaseTask:
         self.logger: Optional['logging.LoggerAdapter'] = None
         self.termination_callback: Optional[Callable[['BaseTaskResult'], Awaitable[None]]] = None
         self.progress_callback: Optional[Callable[[str], Any]] = None
+        self.session_replay = None
 
         if self.data.task_type != self.task_type:
             raise ValueError(

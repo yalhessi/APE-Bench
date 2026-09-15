@@ -1,29 +1,31 @@
-"""Decision-turn replay: where a session is cut, what a condition may change, and what is read.
+"""Decision-turn replay of a review arm: the arm task itself, cut before it submits.
 
-Built from real classes throughout -- the arm task, its registered `submit_candidates` schema as
-the scaffold lists it, and sessions assembled with `ConversationSession` -- because a replay
-that is wrong is wrong silently: it would still produce a submission, and the submission would
-be read as the effect of a condition.
+Built from real classes -- the arm task, its `submit_candidates` schema as the scaffold lists
+it, sessions assembled with `ConversationSession` -- because a wrong replay is wrong silently:
+it still produces a submission, and the submission would be read as a condition's effect.
+The generic mechanics are pinned in `tests/ape/test_session_replay.py`.
 """
 
 from __future__ import annotations
 
 import asyncio
-import json
 
 import pytest
 
 from ape.llm_clients.config import LLMConfig
-from ape.llm_clients.models import ContentBlock, ConversationNode, ConversationSession
+from ape.llm_clients.models import ContentBlock, ConversationSession
 from ape.scaffolds.ape_agent.config import ApeAgentConfig
 from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
-from ape.tasks.lean_tasks.formal_math.review.arm import (
-    ReviewArmReplayData, ReviewArmReplayTask,
+from ape.scaffolds.ape_agent.replay import (
+    SESSION_REPLAY_KEY, ReplayCondition, SessionReplay, cut_before_tool_call, load_prefix,
+    recorded_tools, replay_task_data,
 )
-from src.mathlib_review.io import jsonl_rows, sha256_bytes
+from ape.tasks.base import create_task_from_data
+from ape.tasks.lean_tasks.formal_math.review.arm import (
+    ARM_TASK_TYPE, ReviewArmData, ReviewArmTask,
+)
 from src.mathlib_review.review.replay import (
-    DecisionReplaySpec, ReplayCondition, ReplayRefused, accepted_summary, apply_condition,
-    decision_prefix, decision_record, prefix_bytes, recorded_tools, tool_definition_sha256,
+    SUBMIT_TOOL, accepted_summary, decision_record,
 )
 
 ARM_FIELDS = dict(
@@ -36,10 +38,11 @@ ARM_FIELDS = dict(
     target_workspace={"name": "target", "commit_hash": "c" * 40,
                       "repo_url": "https://e.invalid/m.git", "default_target": "Mathlib"},
 )
+CONFIG = ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"))
 
 
 def _registered_tools(task):
-    """The definitions the scaffold would send: registered on fastmcp, listed by the manager."""
+    """What the scaffold sends: registered on fastmcp, listed by the conversation manager."""
 
     from fastmcp import Client, FastMCP
 
@@ -47,19 +50,20 @@ def _registered_tools(task):
         mcp = FastMCP("probe")
         await task.register_task_tools(mcp)
         async with Client(mcp) as client:
-            manager = ApeAgentConversationManager(ApeAgentConfig(), task=None)
-            return await manager._get_available_tools(client)
+            return await ApeAgentConversationManager(ApeAgentConfig())._get_available_tools(
+                client)
 
     return asyncio.run(listed())
 
 
 @pytest.fixture(scope="module")
-def tools():
-    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmData, ReviewArmTask
+def payload():
+    return ReviewArmData(**ARM_FIELDS).model_dump(mode="json")
 
-    task = ReviewArmTask(ReviewArmData(**ARM_FIELDS),
-                         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
-    return _registered_tools(task)
+
+@pytest.fixture(scope="module")
+def tools(payload):
+    return _registered_tools(create_task_from_data(payload, CONFIG))
 
 
 def _call(session, call_id, name, arguments, result):
@@ -69,192 +73,82 @@ def _call(session, call_id, name, arguments, result):
 
 
 def _session(tools):
-    """Investigate, submit a mute abstention (refused), then resubmit it labelled."""
+    """Investigate, submit a mute abstention (refused), resubmit it labelled -- the shape of
+    26 of 321 arm sessions on the v2 held-out rep."""
 
     session = ConversationSession()
     session.add_system_message([ContentBlock.text_block(ARM_FIELDS["rendered_system_prompt"])],
                                cwd="/w")
     session.add_tool_definitions(tools, cwd="/w")
     session.add_user_message([ContentBlock.text_block("Review Foo.bar.")], cwd="/w")
-    _call(session, "c1", "file_read", {"path": "A.lean"}, {"content": "theorem Foo.bar"})
-    _call(session, "c2", "submit_candidates", {"candidates": []},
+    _call(session, "c1", "lean_verify_edit", {"path": "A.lean"}, {"success": True})
+    _call(session, "c2", SUBMIT_TOOL, {"candidates": []},
           {"evaluation_result": {"success": False, "message": "Only the label is missing."}})
-    _call(session, "c3", "submit_candidates",
+    _call(session, "c3", SUBMIT_TOOL,
           {"abstention_reason": "already_correct", "candidates": [],
            "abstention_detail": "Foo.bar matches the prefix."},
           {"evaluation_result": {"success": True, "message": "Recorded 0 candidates"}})
     return [node.model_dump(mode="json") for node in session.nodes]
 
 
-# --- where a session is cut ----------------------------------------------------------------
-
-
-def test_the_cut_is_before_the_first_submission_not_the_last(tools):
-    """A replayed task counts refusals from zero, so a prefix holding a refused submission
-    would disagree with the live contract about how many times it has already refused."""
-
+def test_the_decision_starts_before_the_first_submission(tools):
     nodes = _session(tools)
-    prefix, index = decision_prefix(nodes)
-    assert index == 5
-    assert [row["type"] for row in prefix] == [
-        "system", "tool_definitions", "user", "assistant", "user"]
-    assert "submit_candidates" not in json.dumps([r["message"] for r in prefix[3:]])
-
-
-def test_a_session_that_never_submitted_is_refused(tools):
-    nodes = _session(tools)[:5]
-    with pytest.raises(ReplayRefused, match="never called"):
-        decision_prefix(nodes)
-
-
-def test_an_unanswered_tool_call_before_the_decision_is_refused(tools):
-    """The manager drops an unanswered trailing call on resume, which would start the replay
-    earlier than the point it reports."""
-
-    nodes = _session(tools)
-    del nodes[4]
-    with pytest.raises(ReplayRefused, match="unanswered"):
-        decision_prefix(nodes)
-
-
-# --- what a condition may change -----------------------------------------------------------
-
-
-def test_the_null_condition_changes_nothing(tools):
-    prefix, _ = decision_prefix(_session(tools))
-    assert apply_condition(prefix, ReplayCondition(name="null")) == prefix
-
-
-@pytest.mark.parametrize("condition", [
-    ReplayCondition(name="null", closing_instruction="Decide."),
-    ReplayCondition(name="reason_first"),
-])
-def test_a_condition_must_be_named_for_what_it_does(tools, condition):
-    prefix, _ = decision_prefix(_session(tools))
-    with pytest.raises(ReplayRefused):
-        apply_condition(prefix, condition)
-
-
-def test_a_prompt_replacement_must_match_exactly_once(tools):
-    prefix, _ = decision_prefix(_session(tools))
-    edited = apply_condition(prefix, ReplayCondition(name="bar", prompt_replacements=[
-        {"node": "system", "old": "Abstain when unsure.", "new": "File when plausible."}]))
-    assert edited[0]["message"]["content"][0]["text"] == "NAMING CONTRACT. File when plausible."
-    with pytest.raises(ReplayRefused, match="0 times"):
-        apply_condition(prefix, ReplayCondition(name="bar", prompt_replacements=[
-            {"node": "user", "old": "not in the prompt", "new": "x"}]))
-
-
-def test_reason_before_verdict_reorders_the_schema_and_survives_the_prefix_file(tools, tmp_path):
-    """The one thing a field-order condition changes is key order, and `jsonl_bytes` sorts keys
-    -- so the prefix is written in the session file's encoding and read back with
-    `jsonl_rows`, and the order the model is shown is asserted after that round trip."""
-
-    prefix, _ = decision_prefix(_session(tools))
-    condition = ReplayCondition(name="detail_first", tool_schema_edits=[
-        {"at": "", "property_order": ["abstention_detail", "abstention_reason"]},
-        {"at": "properties/candidates/items", "property_order": ["claim", "requested_change"],
-         "descriptions": {"model_confidence": "Your probability that a maintainer asks for this."}},
-    ])
-    path = tmp_path / "prefix.jsonl"
-    path.write_bytes(prefix_bytes(apply_condition(prefix, condition)))
-    shown = {t["function"]["name"]: t["function"]["parameters"]
-             for t in recorded_tools(jsonl_rows(path))}["submit_candidates"]
-
-    assert list(shown["properties"])[:3] == [
-        "abstention_detail", "abstention_reason", "candidates"]
-    candidate = shown["properties"]["candidates"]["items"]
-    assert list(candidate["properties"])[:2] == ["claim", "requested_change"]
-    assert set(candidate["properties"]) == set(
-        {t["function"]["name"]: t for t in recorded_tools(prefix)}["submit_candidates"]
-        ["function"]["parameters"]["properties"]["candidates"]["items"]["properties"])
-    assert candidate["properties"]["model_confidence"]["description"].startswith("Your prob")
-    # The recording itself is untouched.
-    original = {t["function"]["name"]: t for t in recorded_tools(prefix)}["submit_candidates"]
-    assert list(original["function"]["parameters"]["properties"])[0] == "candidates"
-
-
-def test_a_schema_edit_naming_a_field_that_does_not_exist_is_refused(tools):
-    prefix, _ = decision_prefix(_session(tools))
-    with pytest.raises(ReplayRefused, match="does not have"):
-        apply_condition(prefix, ReplayCondition(name="typo", tool_schema_edits=[
-            {"property_order": ["abstention_reasons"]}]))
-
-
-def test_a_closing_instruction_is_a_user_message_the_session_model_accepts(tools):
-    prefix, _ = decision_prefix(_session(tools))
-    edited = apply_condition(prefix, ReplayCondition(
-        name="closing", closing_instruction="Before submitting, name the best candidate."))
-    node = ConversationNode.model_validate(edited[-1])
-    assert node.type == "user" and node.parentUuid == prefix[-1]["uuid"]
-    assert node.message.content[0].text.startswith("Before submitting")
-
-
-# --- what was decided ----------------------------------------------------------------------
-
-
-def test_the_decision_record_keeps_refusals_and_emission_order(tools):
-    nodes = _session(tools)
-    _, index = decision_prefix(nodes)
+    prefix, index = cut_before_tool_call(nodes, SUBMIT_TOOL)
+    assert index == 5 and prefix[-1]["type"] == "user"
     record = decision_record(nodes, index)
     assert (record["turns"], record["submissions"]) == (2, 2)
     assert record["refusals"] == ["Only the label is missing."]
     assert record["first"]["filed"] is False and record["first"]["abstention_reason"] is None
+
+
+def test_a_replay_is_the_arm_task_not_a_new_task_type(tools, payload, tmp_path):
+    """Its results are ordinary arm results, so finalize and the judge read them unchanged."""
+
+    prefix, _ = cut_before_tool_call(_session(tools), SUBMIT_TOOL)
+    replayed, content = replay_task_data(payload, prefix, ReplayCondition(name="null"),
+                                         tmp_path / "p.jsonl", {"run": "r"})
+    task = create_task_from_data(replayed, CONFIG)
+    assert type(task) is ReviewArmTask and task.data.task_type == ARM_TASK_TYPE
+    assert task.data.task_id == payload["task_id"]
+    # `session_replay` is not a task field: the runtime attaches it.
+    assert not hasattr(task.data, SESSION_REPLAY_KEY)
+
+
+def test_reason_before_verdict_on_the_real_candidate_schema(tools, payload, tmp_path):
+    """fastmcp inlines `$defs`, so one candidate's schema is at `properties/candidates/items`."""
+
+    prefix, _ = cut_before_tool_call(_session(tools), SUBMIT_TOOL)
+    condition = ReplayCondition(name="claim_first", tool_schema_edits=[
+        {"tool": SUBMIT_TOOL, "property_order": ["abstention_detail", "abstention_reason"]},
+        {"tool": SUBMIT_TOOL, "at": "properties/candidates/items",
+         "property_order": ["claim", "requested_change"]},
+    ])
+    replayed, content = replay_task_data(payload, prefix, condition, tmp_path / "p.jsonl", {})
+    (tmp_path / "p.jsonl").write_bytes(content)
+    replay = SessionReplay.model_validate(replayed[SESSION_REPLAY_KEY])
+    shown = {t["function"]["name"]: t["function"]["parameters"]
+             for t in recorded_tools(load_prefix(replay))}[SUBMIT_TOOL]
+    assert list(shown["properties"]) == ["abstention_detail", "abstention_reason", "candidates"]
+    assert list(shown["properties"]["candidates"]["items"]["properties"])[:2] == [
+        "claim", "requested_change"]
+
+    # And the replayed arm task, run by the manager, is shown exactly that -- no drift today.
+    task = create_task_from_data(replayed, CONFIG)
+    task.session_replay = replay
+    task.attempt_path = tmp_path
+    manager = ApeAgentConversationManager(CONFIG, task=task)
+    sent = manager._replay_tool_definitions(_registered_tools(task))
+    assert {t["function"]["name"]: t["function"]["parameters"] for t in sent}[SUBMIT_TOOL] == shown
+    assert '"tool_drift": []' in (tmp_path / "session_replay.json").read_text()
+
+
+def test_the_accepted_submission_is_read_off_the_result():
     assert accepted_summary({"success": True, "candidates": [],
                              "abstention": {"reason": "already_correct"}}) == {
         "filed": False, "abstention_reason": "already_correct", "anchors": [],
         "candidate_keys": [], "model_confidence": []}
+    filed = accepted_summary({"success": True, "candidates": [
+        {"primary_change_id": "change:a", "concern_family": "naming",
+         "issue_kind": "naming_convention_violation", "model_confidence": None}]})
+    assert filed["anchors"] == ["change:a"] and filed["model_confidence"] == [None]
     assert accepted_summary({"success": False}) is None
-
-
-# --- the task ------------------------------------------------------------------------------
-
-
-def _replay_task(tools, tmp_path, condition=None, recorded=None):
-    prefix, index = decision_prefix(_session(tools))
-    rows = apply_condition(prefix, condition or ReplayCondition(name="null"))
-    path = tmp_path / "prefix.jsonl"
-    path.write_bytes(prefix_bytes(rows))
-    spec = DecisionReplaySpec(
-        source_run="r", source_invocation_id="wu:a#naming", source_session="s.jsonl",
-        source_session_sha256="0" * 64, prefix_path=str(path),
-        prefix_sha256=sha256_bytes(path.read_bytes()), decision_node_index=index,
-        prefix_assistant_turns=1, condition="null", condition_sha256="0" * 64,
-        recorded_tool_sha256=recorded if recorded is not None else {
-            t["function"]["name"]: tool_definition_sha256(t) for t in recorded_tools(prefix)})
-    task = ReviewArmReplayTask(ReviewArmReplayData(**ARM_FIELDS, replay=spec),
-                               ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
-    return task, rows, path
-
-
-def test_the_task_starts_from_the_sealed_prefix_and_refuses_a_different_one(tools, tmp_path):
-    task, rows, path = _replay_task(tools, tmp_path)
-    assert asyncio.run(task.session_prefix()) == rows
-    task, _, path = _replay_task(tools, tmp_path)
-    path.write_bytes(path.read_bytes().replace(b"NAMING CONTRACT", b"OTHER CONTRACT"))
-    with pytest.raises(RuntimeError, match="sha256"):
-        asyncio.run(task.session_prefix())
-
-
-def test_the_task_shows_recorded_tools_and_names_drift(tools, tmp_path):
-    condition = ReplayCondition(name="detail_first", tool_schema_edits=[
-        {"property_order": ["abstention_detail"]}])
-    recorded = {t["function"]["name"]: tool_definition_sha256(t) for t in tools}
-    recorded["lean_verify_edit"] = "0" * 64         # registered today, recorded differently
-    task, rows, _ = _replay_task(tools, tmp_path, condition, recorded)
-    registered = _registered_tools(task)
-    shown = task.adapt_tool_definitions(registered)
-    assert shown == recorded_tools(rows)
-    assert task._tool_drift == ["lean_verify_edit"]  # the swap itself is not drift
-    with pytest.raises(RuntimeError, match="not registered"):
-        task.adapt_tool_definitions([t for t in registered
-                                     if t["function"]["name"] != "submit_candidates"])
-
-
-def test_the_result_carries_the_replay_it_came_from(tools, tmp_path):
-    task, _, _ = _replay_task(tools, tmp_path)
-    result = task.create_result(success=True, score=1.0, pr_number=1, work_unit_id="wu:a",
-                                rendered_prompt_sha256="a" * 64, findings=[],
-                                review_message="")
-    assert result.replay["source_invocation_id"] == "wu:a#naming"
-    assert result.invocation_id == "wu:a#naming"
