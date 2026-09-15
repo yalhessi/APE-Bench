@@ -422,8 +422,66 @@ class ApeAgentConversationManager:
                     self.logger.warning(
                         f"Failed to load session file {latest_session_file.name}, will create a new session"
                     )
+            else:
+                seeded = await self._session_from_task_prefix()
+                if seeded is not None:
+                    return seeded
 
         return await self.create_conversation_session(max_turns, tools)
+
+    async def _session_from_task_prefix(self) -> Optional['ConversationSession']:
+        """Start from a conversation the task supplies, when it supplies one.
+
+        Optional, like `create_system_prompt`: a task that defines `session_prefix()` returns
+        recorded nodes -- system, tool definitions, prompt, and every turn up to the point it
+        wants the model to take over -- and the conversation continues from there exactly as a
+        resume would, through `_create_session_from_existing`. Consulted only when the attempt
+        has no session file yet, so a paused attempt resumes its own file and is never reseeded.
+
+        Two things are deliberately not carried over. The session id is fresh, because this is
+        a new conversation and N resamples of one prefix must not share an identity. And
+        assistant `usage` is dropped, because `_restore_conversation_usage` would otherwise
+        charge the recorded session's spend to this attempt -- against its cost cap and in its
+        reported cost -- when that spend was billed to the run that produced it.
+
+        Unlike `_task_system_prompt`, a failure here raises. A task that asked to start from a
+        recorded conversation and silently started from scratch would be measured as if it had.
+        """
+
+        builder = getattr(self.task, "session_prefix", None)
+        if builder is None:
+            return None
+        rows = await builder()
+        if not rows:
+            return None
+
+        from ape.llm_clients.models import ConversationNode, ConversationSession
+
+        session = ConversationSession()
+        for row in rows:
+            node = ConversationNode.model_validate(row)
+            if node.type == "assistant":
+                node.message.usage = None
+            session.nodes.append(node)
+        seeded = await self._create_session_from_existing(session)
+        self._restore_conversation_usage(seeded)
+        self.logger.info(
+            f"Started session {seeded.session_id} from a task-supplied prefix of "
+            f"{len(seeded.nodes)} nodes ({seeded.get_assistant_count()} assistant turns)"
+        )
+        return seeded
+
+    def _task_tool_definitions(self, tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """The tool definitions the model is shown, when the task decides them.
+
+        Optional: a task that defines `adapt_tool_definitions(tools)` receives the definitions
+        the MCP server registered and returns the ones sent to the API. Calls still execute
+        against the registered tools. A replay uses it to show the model the definitions its
+        recorded prefix was produced under, or one deliberate change to them.
+        """
+
+        adapt = getattr(self.task, "adapt_tool_definitions", None)
+        return tools if adapt is None else adapt(tools)
     
     async def _create_session_from_existing(self, existing_session: 'ConversationSession') -> 'ConversationSession':
         """
@@ -696,6 +754,7 @@ class ApeAgentConversationManager:
 
         # Fetch available tools so we can record them in the session
         tools_list = await self._get_available_tools(mcp_instance) if mcp_instance else []
+        tools_list = self._task_tool_definitions(tools_list)
         self.tools = tools_list
 
         # Initialize or resume the session
