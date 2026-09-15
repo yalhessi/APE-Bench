@@ -61,6 +61,22 @@ across thresholds), and `pr-review-v4-evidence-pipeline-design.md:768`.
    lead ones. Solo is the condition that already emits **0 control findings at ~1/17 the cost**, so
    it is the condition where a selection signal would actually matter.
 
+## A new signal, measured 2026-09-15: cross-rep agreement
+
+**Status** — open, provisional, no spend. *Motivating example:* on the six committed held-out runs,
+judge-paired findings whose `(pr, primary_change_id, issue_kind)` key also appears in **both other
+reps** hit gold at **0.70** (0.5.0) and **0.29** (0.3.0) with PR 33149 excluded, against **0.18** and
+**0.07** for keys in neither; within-PR AUC **0.706 / 0.631** (0.892 / 0.783 with 33149). Monotone in
+all four slices. It is gold-free and, unlike every signal above, not near chance.
+
+*Why provisional:* outside 33149 the top bucket is 6 and 13 distinct keys over 3 and 4 obligations;
+correlated hits from the same obligation; in-sample on twelve PRs already consumed by failure
+analysis. *Precedent:* Cursor Bugbot's 8-pass majority vote; SWR-Bench's multi-review aggregation
+(+43.7% F1). *What would close it:* the same table on the fresh held-out window, plus control-PR
+emission under a keep-2-of-3 rule; then whether a cheaper source of agreement (repeated generalist
+passes only, or reordered targets as Bugbot does) keeps the effect. Full table and method:
+`docs/research/code-review-systems-survey-2026-09.md` §1.
+
 ## Corrections to the plan document and commit `5691ade`
 
 - The stated spread "0.22–0.90" is wrong: the artifact range is **0.12–0.92** (median 0.38).

@@ -53,8 +53,9 @@ retracted — a schema property no end-to-end run would have isolated.
    emitted candidates through the existing merge and judge, so recall and control-PR emission are
    read on the same scale as a rep.
 
-What it unlocks first, cheapest first: the reason-before-verdict field order (`abstention_detail`
-before `abstention_reason`, `claim` before `severity`); abstention wording; asking for
+What it unlocks first, cheapest first: verdict/reason field order in both directions — OCR found
+reasoning must come first, ByteDance's BitsAI-CR measured conclusion-first better (77.1% vs 65.8%
+filter precision), so the replay decides it for this model rather than either paper; abstention wording; asking for
 `model_confidence` in a way that does not come back null (null on every forced finding); the
 per-target disposition from `batching-work-units` follow-ups.
 
