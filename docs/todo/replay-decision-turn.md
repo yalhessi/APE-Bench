@@ -1,7 +1,9 @@
 # Decision-turn replay — test a change to what an arm decides without re-running what it investigated
 
-**Status** — open; **prioritised by the user 2026-09-15** ("worth adding to our system asap")
-**Cost** — code; then one cached-prefix turn per replayed session instead of a whole rep
+**Status** — **built, not yet run** (branch `decision-replay`, 2026-09-15); prioritised by the user 2026-09-15
+**Cost** — measured at preflight: the recorded decision stage of v2_rep1's 319 replayable sessions
+is **$4.87 billed / $12.40 nominal per sample**, so a 3-sample null replay is $14.61–$37.20 (see
+"Built" below — this corrects the cost argument in the motivating example)
 **Owner question** — how cheaply, and with how little noise, can a decision-stage change be measured?
 
 ## Motivating example
@@ -58,6 +60,40 @@ reasoning must come first, ByteDance's BitsAI-CR measured conclusion-first bette
 filter precision), so the replay decides it for this model rather than either paper; abstention wording; asking for
 `model_confidence` in a way that does not come back null (null on every forced finding); the
 per-target disposition from `batching-work-units` follow-ups.
+
+## Built (2026-09-15) — and where it departs from the design above
+
+- **Replay is a way to run a task, not a task** (the user's correction, mid-build). A first cut
+  subclassed the arm task; replaced by a `session_replay` task-data key, carried like
+  `execution_limits`, attached at the runtime boundary and honoured by the ape_agent conversation
+  manager (`src/ape/scaffolds/ape_agent/replay.py`). The replayed task keeps its type and id, so
+  any task family can be replayed and a replayed arm's results are ordinary arm results. Only the
+  cut point and the submission summary are review code (`src/mathlib_review/review/replay.py`).
+- **The cut is before the *first* `submit_candidates`, not the terminal one** (step 2 above).
+  26 / 31 / 28 of the 321 / 316 / 322 v2 sessions had a first submission refused and repaired; the
+  task counts refusals on its instance and a replayed instance starts at zero, so only a prefix
+  with no submission agrees with the live contract. Repairs are re-sampled as part of the decision.
+- **The cost argument was overstated.** "One cached-prefix turn instead of a whole rep" is true
+  of turns, not dollars: the decision turn carries the whole investigation as input, so the
+  recorded decision stage is ~38% of arm billed spend per sample ($4.87 of $12.83 on v2_rep1) and
+  nearer all of it uncached. What replay buys is **the investigation held fixed** — the noise
+  argument — plus wall clock and selectability (one arm, one PR), not an order of magnitude.
+- Also built on the way: a per-task `execution_limits.max_turns` was recorded on the Attempt and
+  never bound the conversation (`d329b13`); arm pools were invisible in worktrees
+  (`.claude/worktree-setup.sh` now links them).
+- **Not built:** feeding replayed candidates through finalize and the judge (step 6's second
+  half). Outcomes are compared at the submission level only — filed/abstained, abstention reason,
+  anchors, candidate keys — which needs no judge and no gold.
+
+Run it:
+
+```
+ape/bin/python -m src.mathlib_review.review.cli replay --config configs/v5_replay.yaml \
+    --of pr5_A_lead_heldout12_v2_rep1 --run-name pr5_replay_null_v2_rep1 --execute
+ape/bin/python -m src.mathlib_review.review.cli report replay --run pr5_replay_null_v2_rep1
+ape/bin/python -m src.mathlib_review.review.cli report replay --run <condition run> \
+    --against pr5_replay_null_v2_rep1
+```
 
 ## What would close it
 
