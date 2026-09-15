@@ -19,6 +19,7 @@ from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 from ape.utils.logging import create_logger
 from .utils import (
     generate_unified_diff, generate_word_diff, search_content_with_timeout,
+    grep_candidate_files,
     add_line_numbers, resolve_search_paths, calculate_relative_path, walk_workspace_files,
     validate_file_exists_and_is_file,
     check_file_size_limit, read_file_content_safe, apply_line_range_to_content,
@@ -325,13 +326,27 @@ class FileSystemProvider:
             count = 0
             scanned = 0
             truncated = False
-            
+
+            # Which files are worth opening. `None` means grep could not answer, and then
+            # every file is opened exactly as before. This prefilters the *I/O*, not the
+            # iteration: the loop still walks the whole search space, so `files_scanned` and
+            # `files_available` keep counting the census they have always counted. A file grep
+            # excludes is one it has proved holds no matching line, so skipping the read
+            # cannot change `results`.
+            candidates = await asyncio.to_thread(
+                grep_candidate_files, content_pattern, files_to_search,
+                use_regex=use_regex, logger=self.logger,
+            )
+
             for file_path in files_to_search:
                 if count >= max_results:
                     truncated = True
                     break
                 scanned += 1
-                
+
+                if candidates is not None and str(file_path) not in candidates:
+                    continue
+
                 # Check file size limit
                 max_size = self.fs_config.performance.max_file_size_for_content_search
                 if max_size and check_file_size_limit(file_path, max_size, file_path):

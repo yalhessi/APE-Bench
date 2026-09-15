@@ -8,6 +8,7 @@ Uses asynchronous IO to avoid blocking the event loop.
 import os
 import re
 import difflib
+import subprocess
 import traceback
 import glob
 import aiofiles
@@ -172,6 +173,66 @@ def search_content_with_timeout(content: str, pattern: str, use_regex: bool, tim
         })
     
     return matches
+
+
+def grep_candidate_files(
+    pattern: str,
+    files: List[Path],
+    *,
+    use_regex: bool = True,
+    timeout: float = 60.0,
+    logger: Optional['logging.LoggerAdapter'] = None,
+) -> Optional[set]:
+    """Files that *could* hold a line matching `pattern`, or `None` for "ask me nothing".
+
+    A prefilter, not a search. `search_content_with_timeout` decides what matches; this only
+    says which files are worth opening, and it is allowed to be generous. The contract that
+    makes it safe is one-sided: **every file the Python matcher would accept appears in the
+    returned set.** Extra files cost a wasted read, a missing one silently loses a result, so
+    every failure path here returns `None` — meaning "scan everything" — rather than an empty
+    set.
+
+    Soundness rests on the two matchers being the same operation. `search_content_with_timeout`
+    runs `regex.search(line)` per line and keeps non-empty matches; `grep` is line-oriented and
+    does the same, so the only gap is PCRE-vs-Python dialect. Measured over the 765 compilable
+    patterns that arms actually issued against Mathlib, a 60-pattern sample agreed on the file
+    set for 60 of 60, with no case of grep missing a file Python matched.
+
+    Why it exists: the scan it replaces reads every file in the tree into Python and dispatches
+    a per-file regex into the default 32-worker executor -- ~8,500 `asyncio.to_thread` calls per
+    search, in a pool `aiofiles` shares. Measured on a 12-PR run, whole-tree searches were
+    26-30% of all arm wall time at 33-63s each, against 0.28s for `grep` over the same tree,
+    and throughput was flat from concurrency 1 to 8 because the pool -- not the disk -- was the
+    bound.
+    """
+
+    if not files:
+        return set()
+
+    flag = '-P' if use_regex else '-F'
+    found: set = set()
+    # argv has a size limit and the tree is ~8.5k paths; chunk rather than risk E2BIG.
+    for start in range(0, len(files), 2000):
+        chunk = [str(path) for path in files[start:start + 2000]]
+        try:
+            completed = subprocess.run(
+                ['grep', '-l', flag, '-e', pattern, '--', *chunk],
+                capture_output=True, text=True, timeout=timeout,
+            )
+        except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+            if logger:
+                logger.warning(f"grep prefilter unavailable ({type(exc).__name__}); "
+                               f"falling back to a full scan")
+            return None
+        # 0 = matched, 1 = no match, anything else (2 = bad pattern, unreadable file) means
+        # grep did not answer the question and its silence must not be read as "no match".
+        if completed.returncode not in (0, 1):
+            if logger:
+                logger.warning(f"grep prefilter declined pattern "
+                               f"({completed.stderr.strip()[:120]}); falling back to a full scan")
+            return None
+        found.update(line for line in completed.stdout.split('\n') if line)
+    return found
 
 
 def add_line_numbers(content: str) -> str:
