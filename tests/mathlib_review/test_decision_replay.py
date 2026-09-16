@@ -17,9 +17,8 @@ from ape.llm_clients.models import ContentBlock, ConversationSession
 from ape.scaffolds.ape_agent.config import ApeAgentConfig
 from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
 from ape.scaffolds.ape_agent.replay import (
-    SESSION_REPLAY_KEY, ReplayCondition, ReplayRefused, SessionReplay, cut_before_tool_call,
-    load_prefix,
-    recorded_tools, replay_task_data,
+    SESSION_REPLAY_KEY, CutPoint, ReplayCondition, ReplayRefused, SessionReplay, cut,
+    load_prefix, recorded_tools, replay_task_data,
 )
 from ape.tasks.base import create_task_from_data
 from ape.tasks.lean_tasks.formal_math.review.arm import (
@@ -40,6 +39,8 @@ ARM_FIELDS = dict(
                       "repo_url": "https://e.invalid/m.git", "default_target": "Mathlib"},
 )
 CONFIG = ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"))
+#: The decision turn is one cut among many; the pipeline takes it from the run config.
+DECISION_CUT = CutPoint(before_tool_call={"tool": SUBMIT_TOOL, "occurrence": "first"})
 
 
 def _registered_tools(task):
@@ -92,9 +93,9 @@ def _session(tools):
     return [node.model_dump(mode="json") for node in session.nodes]
 
 
-def test_the_decision_starts_before_the_first_submission(tools):
+def test_the_cut_a_run_asks_for_is_where_the_replay_starts(tools):
     nodes = _session(tools)
-    prefix, index = cut_before_tool_call(nodes, SUBMIT_TOOL)
+    prefix, index = cut(nodes, DECISION_CUT)
     assert index == 5 and prefix[-1]["type"] == "user"
     record = decision_record(nodes, index)
     assert (record["turns"], record["submissions"]) == (2, 2)
@@ -105,7 +106,7 @@ def test_the_decision_starts_before_the_first_submission(tools):
 def test_a_replay_is_the_arm_task_not_a_new_task_type(tools, payload, tmp_path):
     """Its results are ordinary arm results, so finalize and the judge read them unchanged."""
 
-    prefix, _ = cut_before_tool_call(_session(tools), SUBMIT_TOOL)
+    prefix, _ = cut(_session(tools), DECISION_CUT)
     replayed, content = replay_task_data(payload, prefix, ReplayCondition(name="null"),
                                          tmp_path / "p.jsonl", {"run": "r"})
     task = create_task_from_data(replayed, CONFIG)
@@ -118,7 +119,7 @@ def test_a_replay_is_the_arm_task_not_a_new_task_type(tools, payload, tmp_path):
 def test_reason_before_verdict_on_the_real_candidate_schema(tools, payload, tmp_path):
     """fastmcp inlines `$defs`, so one candidate's schema is at `properties/candidates/items`."""
 
-    prefix, _ = cut_before_tool_call(_session(tools), SUBMIT_TOOL)
+    prefix, _ = cut(_session(tools), DECISION_CUT)
     condition = ReplayCondition(name="claim_first", tool_schema_edits=[
         {"tool": SUBMIT_TOOL, "property_order": ["abstention_detail", "abstention_reason"]},
         {"tool": SUBMIT_TOOL, "at": "properties/candidates/items",
@@ -222,8 +223,9 @@ def _dataset(**fields):
     from src.mathlib_review.review.replay import ReplayDatasetConfig
 
     return ReplayDatasetConfig.model_validate({
-        "of_run": "source", "run_name": "replay_null", "condition": {"name": "null"},
-        "run_total_cost_cap": 10.0, **fields})
+        "of_run": "source", "run_name": "replay_null_first_submit_candidates",
+        "condition": {"name": "null"}, "run_total_cost_cap": 10.0,
+        "cut": {"before_tool_call": {"tool": SUBMIT_TOOL}}, **fields})
 
 
 def test_sessions_are_found_through_the_index_and_storage(recorded_run):
@@ -233,8 +235,41 @@ def test_sessions_are_found_through_the_index_and_storage(recorded_run):
     assert [s.invocation_id for s in sources] == ["wu:a#docs", "wu:a#naming"]
     assert skipped == [{"invocation_id": "wu:a#style",
                         "reason": "the session never called submit_candidates"}]
+    assert [s.cut_index for s in sources] == [5, 5]
     only, _ = asyncio.run(select_sources(_dataset(arm_ids=["naming"])))
     assert [s.invocation_id for s in only] == ["wu:a#naming"]
+
+
+def test_another_cut_of_the_same_sessions_replays_more_of_each(recorded_run):
+    """The point of a configurable cut: the same recordings, taken over earlier. `before_turn:
+    1` re-runs the whole task from its recorded prompt, so the re-sampled stage is the whole
+    session and the turn cap is counted from a prefix with no assistant turns in it."""
+
+    from ape.orchestration.models import EXECUTION_LIMITS_KEY
+    from src.mathlib_review.review.replay import replay_payload, select_sources
+
+    dataset = _dataset(cut={"before_turn": 1}, run_name="replay_null_turn1",
+                       turns_after_cut=12)
+    sources, skipped = asyncio.run(select_sources(dataset))
+    # Three, not two: the session that never submitted is replayable from its prompt, so a
+    # cut decides which recordings are even eligible.
+    assert [s.cut_index for s in sources] == [3, 3, 3]
+    assert skipped == []
+    built, _ = replay_payload(sources[0], dataset, recorded_run / "replay_null_turn1")
+    assert built[EXECUTION_LIMITS_KEY]["max_turns"] == 0 + 12
+    assert built[SESSION_REPLAY_KEY]["source"]["cut_label"] == "turn1"
+    assert sources[0].replayed_stage_cost() == (0.0095, 0.032)   # every recorded turn
+
+
+def test_a_cut_that_does_not_resolve_skips_that_session_only(recorded_run):
+    from src.mathlib_review.review.replay import select_sources
+
+    sources, skipped = asyncio.run(select_sources(
+        _dataset(cut={"before_turn": 9}, run_name="replay_null_turn9")))
+    assert sources == []
+    assert {row["invocation_id"] for row in skipped} == {
+        "wu:a#naming", "wu:a#docs", "wu:a#style"}
+    assert all("assistant turn" in row["reason"] for row in skipped)
 
 
 def test_a_missing_arm_pool_is_refused_with_the_reason(recorded_run):
@@ -251,12 +286,13 @@ def test_a_replay_payload_is_capped_from_the_cut_and_writes_its_own_trace(record
 
     sources, _ = asyncio.run(select_sources(_dataset()))
     out = recorded_run / "replay_null"
-    built, content = replay_payload(sources[0], _dataset(decision_turns=3), out)
+    built, content = replay_payload(sources[0], _dataset(turns_after_cut=3), out)
     assert built[EXECUTION_LIMITS_KEY] == {"max_turns": 1 + 3, "billed_cost_limit": 0.3}
     assert built["trace_path"] == str(out / "context_trace.jsonl")
     assert built[SESSION_REPLAY_KEY]["prefix_path"].startswith(str(out / "prefixes"))
-    assert built[SESSION_REPLAY_KEY]["source"]["decision_node_index"] == 5
-    assert sources[0].decision_stage_cost() == (0.0095, 0.032)
+    assert built[SESSION_REPLAY_KEY]["source"]["cut_node_index"] == 5
+    assert built[SESSION_REPLAY_KEY]["source"]["cut_label"] == "first_submit_candidates"
+    assert sources[0].replayed_stage_cost() == (0.0095, 0.032)
     assert built["task_type"] == ARM_TASK_TYPE
 
 
@@ -277,7 +313,8 @@ def test_a_replay_config_cannot_change_the_model(tmp_path):
 
     path = tmp_path / "r.yaml"
     path.write_text('llm_config: {model_name: other}\ndataset: {of_run: s, '
-                    'condition: {name: "null"}, run_total_cost_cap: 1}\n')
+                    'condition: {name: "null"}, run_total_cost_cap: 1, '
+                    'cut: {before_turn: -1}}\n')
     with pytest.raises(ReplayRefused, match="only `dataset` and `execution`"):
         load_replay(path)
 
@@ -296,7 +333,8 @@ def test_the_checked_in_config_loads_with_a_null_condition():
 
 
 @pytest.mark.parametrize("fields, match", [
-    ({"run_name": "replay_other"}, "does not contain the condition"),
+    ({"run_name": "replay_other_first_submit_candidates"}, "does not contain the condition"),
+    ({"run_name": "replay_null"}, "does not contain the cut"),
     ({"run_total_cost_cap": 0.0001}, "above run_total_cost_cap"),
 ])
 def test_a_replay_is_refused_before_anything_is_written(recorded_run, fields, match):
@@ -306,10 +344,11 @@ def test_a_replay_is_refused_before_anything_is_written(recorded_run, fields, ma
 
     with pytest.raises((ReplayRefused, ValueError), match=match):
         asyncio.run(run_replay(_dataset(**fields), {}, logging.getLogger("t"), execute=True))
-    assert not (recorded_run / "replay_null").exists()
+    assert not (recorded_run / "replay_null_first_submit_candidates").exists()
 
 
-def _row(invocation_id, arm, recorded_filed, replay_filed, condition="null", sample=0):
+def _row(invocation_id, arm, recorded_filed, replay_filed, condition="null", sample=0,
+         cut="first_submit_candidates"):
     def summary(filed):
         if filed is None:
             return None
@@ -319,7 +358,7 @@ def _row(invocation_id, arm, recorded_filed, replay_filed, condition="null", sam
                 "model_confidence": [None] if filed else []}
 
     return {"invocation_id": invocation_id, "arm_id": arm, "condition": condition,
-            "sample_index": sample, "status": "success", "cost": 0.03, "cached_cost": 0.01,
+            "cut": cut, "sample_index": sample, "status": "success", "cost": 0.03, "cached_cost": 0.01,
             "recorded": {"decision": {"refusals": []}, "accepted": summary(recorded_filed)},
             "replay": {"decision": {"turns": 1, "refusals": [],
                                     "first": {"model_confidence": [None] if replay_filed else []}},
@@ -351,3 +390,22 @@ def test_a_condition_is_read_against_the_null_paired_by_session():
             comparison["sessions_treatment_files_less"]) == (9, 0)
     assert comparison["filing_rate"]["mean_paired_difference"] == 0.9
     assert comparison["sign_test_p"] == 0.0039
+
+
+def test_two_cuts_of_one_session_are_two_measurements(tools):
+    from src.mathlib_review.review.replay import compare_replays, replay_report
+
+    rows = [_row("s1", "naming", False, False, cut="first_submit_candidates"),
+            _row("s1", "naming", False, True, cut="turn1")]
+    report = replay_report(rows)
+    assert report["cuts"] == ["first_submit_candidates", "turn1"]
+    assert report["sessions"] == 2            # one invocation, two cuts, never pooled
+    # Two runs of one condition at different cuts ask how much the cut decides, so they pair
+    # on the invocation; two runs at the same cut pair on the prefix and compare conditions.
+    early = [_row("s1", "naming", False, False, cut="turn1")]
+    late = [_row("s1", "naming", False, True, cut="first_submit_candidates")]
+    across = compare_replays(early, late)
+    assert across["compared_axis"] == "cut" and across["paired_sessions"] == 1
+    same = compare_replays(early, [_row("s1", "naming", False, True, condition="forced",
+                                        cut="turn1")])
+    assert same["compared_axis"] == "condition" and same["paired_sessions"] == 1

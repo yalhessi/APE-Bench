@@ -7,9 +7,10 @@ of from its prompt. So it travels the way `execution_limits` does: a reserved ta
 honoured by this scaffold's conversation manager. Its results are ordinary results of the
 replayed task type, so everything that reads that task type reads a replay unchanged.
 
-What a family supplies is only what is specific to it: which recorded attempts to replay, and
-where to cut. `cut_before_tool_call` covers the common case -- a review arm's first
-`submit_candidates`, a proof task's `submit_result`.
+Where a replay takes over is a parameter, never a policy in the code: `CutPoint` names any
+point in the recording -- an assistant turn counted from either end, a raw node index, or
+wherever a tool was called. A family supplies only what is specific to it: which recorded
+attempts to replay, and how to read what came out.
 
 **What is held fixed.** Everything before the cut is replayed as recorded. The OpenAI provider
 here is stateless Chat Completions, so a session file is exactly the messages the model was
@@ -29,9 +30,9 @@ import copy
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 #: The task-data key a replay travels under. Absent on every task that is not a replay.
 SESSION_REPLAY_KEY = "session_replay"
@@ -181,21 +182,142 @@ def recorded_tools(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return list(((definitions or {}).get("message") or {}).get("tools") or [])
 
 
-def cut_before_tool_call(nodes: List[Dict[str, Any]],
-                         tool_name: str) -> Tuple[List[Dict[str, Any]], int]:
-    """`(prefix, index)`: everything before the first assistant node that calls `tool_name`.
+class ToolCallCut(BaseModel):
+    """A cut located by a tool call rather than by counting turns."""
 
-    The first call, not the last: a task that refuses a submission typically counts refusals
-    on its instance, and a replayed instance counts from zero, so only a prefix holding no
-    call agrees with the live contract. Refused unless every tool call in the prefix was
-    answered -- the manager drops an unanswered trailing call on resume, and the replay would
-    silently start earlier than the point it reports.
+    model_config = ConfigDict(extra="forbid")
+
+    tool: str
+    #: `first`, `last`, or a 1-based ordinal among this session's calls to the tool.
+    occurrence: Union[Literal["first", "last"], int] = "first"
+
+
+class CutPoint(BaseModel):
+    """Where a replay takes over the conversation. Exactly one of the three spellings.
+
+    Nothing about a cut is predetermined: a replay continues from any point in the recording.
+    The three spellings answer the three ways one wants to say it.
+
+    * `before_turn: k` -- the model regenerates assistant turn `k` onward, numbered as
+      `record_turn` numbers them (1 = the first). Negative counts from the end, so `-1` is the
+      last turn the recording took. `before_turn: 1` replays the whole task from its recorded
+      prompt.
+    * `at_node: i` -- the raw node index, for a cut a turn number cannot express. Negative
+      counts from the end.
+    * `before_tool_call: {tool, occurrence}` -- wherever the session first (or last, or nth)
+      called a tool, which is how one names a decision without knowing which turn made it.
+
+    A cut is refused rather than nudged if it lands inside a turn -- with tool calls whose
+    results the prefix does not contain -- because the conversation manager drops an
+    unanswered trailing call on resume, and the replay would then silently start earlier than
+    the point it reports. That is why `at_node` is the last resort: one node index is not
+    turn-aligned across recordings, and `at_node: 7` was mid-turn in 232 of 320 real arm
+    sessions (3 more were shorter than 7 nodes), while `before_turn` and `before_tool_call`
+    resolve in every session that is long enough.
     """
 
-    index = next((i for i, node in enumerate(nodes) if node.get("type") == "assistant"
-                  and any(b.get("name") == tool_name for b in _blocks(node, "tool_use"))), None)
-    if index is None:
-        raise ReplayRefused(f"the session never called {tool_name}")
+    model_config = ConfigDict(extra="forbid")
+
+    #: Names the cut in run names, prefix files and outcome rows. Derived when absent.
+    label: Optional[str] = Field(default=None, pattern=r"^[a-z0-9][a-z0-9_]*$")
+    at_node: Optional[int] = None
+    before_turn: Optional[int] = None
+    before_tool_call: Optional[ToolCallCut] = None
+
+    @model_validator(mode="after")
+    def _exactly_one_spelling(self) -> "CutPoint":
+        given = [name for name in ("at_node", "before_turn", "before_tool_call")
+                 if getattr(self, name) is not None]
+        if len(given) != 1:
+            raise ValueError(
+                "a cut is exactly one of at_node, before_turn, before_tool_call; "
+                f"got {given or 'none'}")
+        if self.before_turn == 0:
+            raise ValueError("before_turn counts from 1 (and -1 is the last turn); 0 is not a turn")
+        return self
+
+    @property
+    def name(self) -> str:
+        if self.label:
+            return self.label
+        if self.at_node is not None:
+            return f"node{self.at_node}" if self.at_node >= 0 else f"node_back{-self.at_node}"
+        if self.before_turn is not None:
+            return (f"turn{self.before_turn}" if self.before_turn > 0
+                    else "last_turn" if self.before_turn == -1
+                    else f"turn_back{-self.before_turn}")
+        occurrence = self.before_tool_call.occurrence
+        return f"{occurrence}_{self.before_tool_call.tool}" if isinstance(occurrence, str) \
+            else f"{self.before_tool_call.tool}_{occurrence}"
+
+    def resolve(self, nodes: List[Dict[str, Any]]) -> int:
+        """The node index this cut means in one session, or `ReplayRefused`."""
+
+        if self.at_node is not None:
+            index = self.at_node if self.at_node >= 0 else len(nodes) + self.at_node
+            if not 0 <= index <= len(nodes):
+                raise ReplayRefused(
+                    f"at_node {self.at_node} is outside a session of {len(nodes)} nodes")
+            return index
+        turns = [i for i, node in enumerate(nodes) if node.get("type") == "assistant"]
+        if self.before_turn is not None:
+            ordinal = self.before_turn - 1 if self.before_turn > 0 else self.before_turn
+            try:
+                return turns[ordinal]
+            except IndexError:
+                raise ReplayRefused(
+                    f"before_turn {self.before_turn} needs more than the {len(turns)} "
+                    "assistant turn(s) this session took") from None
+        cut = self.before_tool_call
+        calls = [i for i in turns
+                 if any(block.get("name") == cut.tool for block in _blocks(nodes[i], "tool_use"))]
+        if not calls:
+            raise ReplayRefused(f"the session never called {cut.tool}")
+        if cut.occurrence == "first":
+            return calls[0]
+        if cut.occurrence == "last":
+            return calls[-1]
+        try:
+            return calls[cut.occurrence - 1]
+        except IndexError:
+            raise ReplayRefused(
+                f"the session called {cut.tool} {len(calls)} time(s), "
+                f"so occurrence {cut.occurrence} does not exist") from None
+
+
+def parse_cut(text: str) -> CutPoint:
+    """One command-line token as a cut: `turn=-1`, `node=7`, `tool=submit_candidates[:last|:N]`.
+
+    A flag rather than a config override because overrides deep-*merge*: `--set dataset.cut=`
+    leaves the config's spelling in place beside the new one, and a cut carrying two spellings
+    is refused. A flag replaces the cut outright, which is what anyone typing it means.
+    """
+
+    kind, _, value = text.partition("=")
+    if not value:
+        raise ReplayRefused(
+            f"a cut is `turn=<n>`, `node=<i>` or `tool=<name>[:first|:last|:<n>]`, not {text!r}")
+    if kind == "turn":
+        return CutPoint(before_turn=int(value))
+    if kind == "node":
+        return CutPoint(at_node=int(value))
+    if kind == "tool":
+        tool, _, occurrence = value.partition(":")
+        if occurrence.isdigit():
+            return CutPoint(before_tool_call=ToolCallCut(tool=tool, occurrence=int(occurrence)))
+        return CutPoint(before_tool_call=ToolCallCut(
+            tool=tool, occurrence=occurrence or "first"))
+    raise ReplayRefused(f"unknown cut kind {kind!r}; expected turn, node or tool")
+
+
+def cut_at_node(nodes: List[Dict[str, Any]],
+                index: int) -> Tuple[List[Dict[str, Any]], int]:
+    """`(prefix, index)`: the conversation up to `index`, refused if it is mid-turn.
+
+    Every tool call in the prefix must have its result, or the manager would drop the trailing
+    assistant node on resume and the replay would start before the point it reports.
+    """
+
     prefix = nodes[:index]
     pending = set()
     for node in prefix:
@@ -203,8 +325,16 @@ def cut_before_tool_call(nodes: List[Dict[str, Any]],
         pending.difference_update(block.get("tool_use_id")
                                   for block in _blocks(node, "tool_result"))
     if pending:
-        raise ReplayRefused(f"the prefix ends with unanswered tool calls {sorted(pending)}")
+        raise ReplayRefused(
+            f"a cut at node {index} lands inside a turn: {len(pending)} tool call(s) have no "
+            f"result in the prefix ({sorted(pending)[:3]})")
     return copy.deepcopy(prefix), index
+
+
+def cut(nodes: List[Dict[str, Any]], point: CutPoint) -> Tuple[List[Dict[str, Any]], int]:
+    """`(prefix, index)` for one cut point in one session."""
+
+    return cut_at_node(nodes, point.resolve(nodes))
 
 
 def _replace_once(rows: List[Dict[str, Any]], replacement: PromptReplacement) -> None:

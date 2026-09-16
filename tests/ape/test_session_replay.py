@@ -21,9 +21,9 @@ from ape.llm_clients.models import (
 from ape.scaffolds.ape_agent.config import ApeAgentConfig
 from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
 from ape.scaffolds.ape_agent.replay import (
-    REPLAY_RECORD_FILENAME, SESSION_REPLAY_KEY, ReplayCondition, ReplayRefused, SessionReplay,
-    apply_condition, cut_before_tool_call, load_prefix, recorded_tools, replay_task_data,
-    tool_calls, tool_definition_sha256,
+    REPLAY_RECORD_FILENAME, SESSION_REPLAY_KEY, CutPoint, ReplayCondition, ReplayRefused,
+    SessionReplay, apply_condition, cut, cut_at_node, load_prefix, recorded_tools,
+    replay_task_data, tool_calls, tool_definition_sha256,
 )
 
 SUBMIT = {"type": "function", "function": {
@@ -61,30 +61,73 @@ def _nodes():
 # --- the cut and the condition --------------------------------------------------------------
 
 
-def test_the_cut_is_before_the_first_call_to_the_named_tool():
-    prefix, index = cut_before_tool_call(_nodes(), "submit_result")
-    assert index == 5
-    assert [row["type"] for row in prefix] == [
-        "system", "tool_definitions", "user", "assistant", "user"]
+@pytest.mark.parametrize("spelling, expected_index, expected_label", [
+    # The session is: system, tools, prompt, [turn1 + result], [turn2 + result], [turn3 + result]
+    ({"before_turn": 1}, 3, "turn1"),               # the whole task again, from its prompt
+    ({"before_turn": 2}, 5, "turn2"),
+    ({"before_turn": -1}, 7, "last_turn"),          # whatever the last turn was
+    ({"before_turn": -2}, 5, "turn_back2"),
+    ({"at_node": 5}, 5, "node5"),
+    ({"at_node": -2}, 7, "node_back2"),   # 9 nodes, so the last assistant node
+    ({"at_node": 0}, 0, "node0"),                   # before the system prompt itself
+    ({"before_tool_call": {"tool": "submit_result"}}, 5, "first_submit_result"),
+    ({"before_tool_call": {"tool": "submit_result", "occurrence": "last"}}, 7,
+     "last_submit_result"),
+    ({"before_tool_call": {"tool": "submit_result", "occurrence": 2}}, 7, "submit_result_2"),
+    ({"before_tool_call": {"tool": "file_read"}}, 3, "first_file_read"),
+])
+def test_a_cut_is_any_point_the_caller_names(spelling, expected_index, expected_label):
+    """Nothing about the cut is predetermined: three spellings, one resolved node index."""
+
+    point = CutPoint.model_validate(spelling)
+    prefix, index = cut(_nodes(), point)
+    assert index == expected_index
+    assert len(prefix) == expected_index
+    assert point.name == expected_label
 
 
-def test_a_session_that_never_called_the_tool_is_refused():
-    with pytest.raises(ReplayRefused, match="never called"):
-        cut_before_tool_call(_nodes()[:5], "submit_result")
+def test_a_label_names_the_cut_when_the_caller_gives_one():
+    assert CutPoint(label="decision", before_turn=-1).name == "decision"
 
 
-def test_an_unanswered_call_before_the_cut_is_refused():
+@pytest.mark.parametrize("spelling, match", [
+    ({}, "exactly one"),
+    ({"before_turn": 2, "at_node": 3}, "exactly one"),
+    ({"before_turn": 0}, "counts from 1"),
+])
+def test_a_cut_must_say_exactly_one_thing(spelling, match):
+    with pytest.raises(Exception, match=match):
+        CutPoint.model_validate(spelling)
+
+
+@pytest.mark.parametrize("spelling, match", [
+    ({"before_turn": 9}, "more than the 3 assistant turn"),
+    ({"before_turn": -9}, "more than the 3 assistant turn"),
+    ({"at_node": 99}, "outside a session of 9 nodes"),
+    ({"before_tool_call": {"tool": "never_called"}}, "never called"),
+    ({"before_tool_call": {"tool": "submit_result", "occurrence": 5}}, "2 time"),
+])
+def test_a_cut_that_does_not_exist_in_this_session_is_refused(spelling, match):
+    """Per session, because one run's cut resolves differently in each recording."""
+
+    with pytest.raises(ReplayRefused, match=match):
+        cut(_nodes(), CutPoint.model_validate(spelling))
+
+
+def test_a_cut_inside_a_turn_is_refused():
     """The manager drops an unanswered trailing call on resume, so the replay would start
     earlier than the point it reports."""
 
+    with pytest.raises(ReplayRefused, match="lands inside a turn"):
+        cut_at_node(_nodes(), 4)         # after the tool call, before its result
     nodes = _nodes()
     del nodes[4]
-    with pytest.raises(ReplayRefused, match="unanswered"):
-        cut_before_tool_call(nodes, "submit_result")
+    with pytest.raises(ReplayRefused, match="lands inside a turn"):
+        cut(nodes, CutPoint(before_tool_call={"tool": "submit_result"}))
 
 
 def test_null_changes_nothing_and_nothing_else_may_be_called_null():
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     assert apply_condition(prefix, ReplayCondition(name="null")) == prefix
     for condition in (ReplayCondition(name="null", closing_instruction="Decide."),
                       ReplayCondition(name="other"),
@@ -94,7 +137,7 @@ def test_null_changes_nothing_and_nothing_else_may_be_called_null():
 
 
 def test_a_prompt_replacement_must_match_exactly_once():
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     edited = apply_condition(prefix, ReplayCondition(name="bold", prompt_replacements=[
         {"node": "system", "old": "Be careful.", "new": "Be bold."}]))
     assert edited[0]["message"]["content"][0]["text"] == "CONTRACT. Be bold."
@@ -107,7 +150,7 @@ def test_a_field_order_edit_survives_the_prefix_file(tmp_path):
     """Sorted-key JSON would erase the one thing a field-order condition changes, and would
     make the null replay show the model something it was not shown."""
 
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     condition = ReplayCondition(name="reason_first", tool_schema_edits=[
         {"tool": "submit_result", "property_order": ["reasoning"], "required": ["reasoning"],
          "descriptions": {"answer": "last"}}])
@@ -127,14 +170,14 @@ def test_a_field_order_edit_survives_the_prefix_file(tmp_path):
 
 
 def test_a_schema_edit_naming_a_missing_field_is_refused():
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     with pytest.raises(ReplayRefused, match="does not have"):
         apply_condition(prefix, ReplayCondition(name="typo", tool_schema_edits=[
             {"tool": "submit_result", "property_order": ["answers"]}]))
 
 
 def test_a_closing_instruction_is_a_user_message_the_session_model_accepts():
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     edited = apply_condition(prefix, ReplayCondition(name="closing",
                                                      closing_instruction="Now decide."))
     node = ConversationNode.model_validate(edited[-1])
@@ -142,7 +185,7 @@ def test_a_closing_instruction_is_a_user_message_the_session_model_accepts():
 
 
 def test_task_data_overrides_change_the_contract_not_the_prompt(tmp_path):
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     payload, content = replay_task_data(
         {"task_type": "t", "task_id": "x", "strict": False}, prefix,
         ReplayCondition(name="strict", task_data_overrides={"strict": True}),
@@ -163,7 +206,7 @@ def test_tool_calls_read_result_content_and_acceptance():
 
 
 def _replaying_task(tmp_path, condition=None, recorded=None):
-    prefix, _ = cut_before_tool_call(_nodes(), "submit_result")
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
     payload, content = replay_task_data({"task_type": "t", "task_id": "x"}, prefix,
                                         condition or ReplayCondition(name="null"),
                                         tmp_path / "prefix.jsonl", {})

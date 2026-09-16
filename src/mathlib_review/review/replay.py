@@ -11,13 +11,22 @@ The replay itself is not review code. `ape.scaffolds.ape_agent.replay` runs any 
 again from a point inside its conversation, as the same task type; this module supplies the
 two things that are review's own: where an arm's decision starts, and what it decided.
 
-**Where the decision starts: before the first `submit_candidates` call.** Not the last: ~9% of
-arm sessions on the held-out reps had their first submission refused (26 / 31 / 28 of 321 / 316 /
-322) and then repaired it, and the arm task counts refusals on its instance
-(`_mute_abstentions`, `_forced_presses`), which a replayed instance starts at zero. The repair
-turns are part of the decision stage and are re-sampled with it. Measured on the same reps: no
-session puts another tool call in the assistant node that submits, and every arm session has a
-successful attempt with a submission.
+**Where the replay takes over is the run's choice**, stated as a `cut` in its config -- any
+assistant turn from either end, a node index, or a tool call (`ape.scaffolds.ape_agent.replay`
+resolves it per session). Three cuts this evidence makes worth asking about:
+
+* `before_tool_call: {tool: submit_candidates, occurrence: first}` -- the decision turn, with
+  the whole investigation held fixed. **The first call, not the last:** 26 / 31 / 28 of the
+  321 / 316 / 322 sessions on the v2 reps had a first submission refused and then repaired it,
+  and the arm task counts refusals on its instance (`_mute_abstentions`, `_forced_presses`),
+  which a replayed instance starts at zero -- so a prefix holding a refusal would disagree with
+  the contract it replays against. The repair turns are re-sampled as part of the decision.
+* `before_turn: -1` -- the last turn the arm took, whatever it was.
+* `before_turn: 1` -- the whole task from its recorded prompt, which is how a tool-schema or
+  prompt change is tested against the investigation *and* the decision it would cause.
+
+The cut is refused, per session, when it cannot resolve or would land inside a turn, and the
+skipped sessions are named in the plan rather than silently dropped.
 """
 
 from __future__ import annotations
@@ -30,8 +39,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from pydantic import BaseModel, ConfigDict, Field
 
 from ape.scaffolds.ape_agent.replay import (
-    REPLAY_RECORD_FILENAME, SESSION_REPLAY_KEY, ReplayCondition, ReplayRefused,
-    cut_before_tool_call, replay_task_data, tool_calls,
+    REPLAY_RECORD_FILENAME, SESSION_REPLAY_KEY, CutPoint, ReplayCondition, ReplayRefused, cut,
+    parse_cut, replay_task_data, tool_calls,
 )
 from src.mathlib_review.io import (
     canonical_json_bytes, git_state, jsonl_bytes, jsonl_rows, load_jsonl, pretty_json_bytes,
@@ -106,9 +115,13 @@ class ReplayDatasetConfig(BaseModel):
     arm_ids: List[str] = Field(default_factory=list)
     pr_numbers: List[int] = Field(default_factory=list)
     invocation_limit: int = 0
-    #: Assistant turns a replay may take from the cut. The recorded decision stage took one
-    #: turn in 293 / 283 / 294 of the v2 held-out sessions and at most 7; 8 truncates none.
-    decision_turns: int = 8
+    #: Where the model takes over. Required: nothing about a replay's cut is predetermined, and
+    #: a default would quietly make one experiment look like the only one available.
+    cut: CutPoint
+    #: Assistant turns a replay may take after the cut. From the first-submission cut the
+    #: recorded stage took one turn in 293 / 283 / 294 of the v2 sessions and at most 7, so 8
+    #: truncates none of them; an earlier cut needs the turns that follow it too.
+    turns_after_cut: int = 8
     per_task_cost_cap: float = 0.30
     #: Required. Checked before the first call against the recorded decision stage priced
     #: uncached, which is what a replay pays once its source's cache has expired.
@@ -126,7 +139,9 @@ class ReplayPlan(BaseModel):
     condition: Dict[str, Any]
     condition_sha256: str
     selection: Dict[str, Any]
-    decision_turns: int
+    cut: Dict[str, Any]
+    cut_label: str
+    turns_after_cut: int
     per_task_cost_cap: float
     run_total_cost_cap: float
     sample_count: int
@@ -147,22 +162,24 @@ class ReplaySource(BaseModel):
     session_path: str
     session_sha256: str
     nodes: List[Dict[str, Any]]
-    decision_index: int
+    #: Where this run's cut resolved in this session.
+    cut_index: int
     #: What the task accepted, from the successful attempt.
     result: Optional[Dict[str, Any]]
     #: The orchestrator config the arm ran under -- the nested one, not its lead's.
     scaffold_config: Dict[str, Any]
 
-    def decision_stage_cost(self) -> Tuple[float, float]:
-        """`(billed, nominal)` over every assistant turn from the first submission on."""
+    def replayed_stage_cost(self) -> Tuple[float, float]:
+        """`(billed, nominal)` over the recorded assistant turns this replay re-samples."""
 
         usage = [(node.get("message") or {}).get("usage") or {}
-                 for node in self.nodes[self.decision_index:] if node.get("type") == "assistant"]
+                 for node in self.nodes[self.cut_index:] if node.get("type") == "assistant"]
         billed = sum(float(u.get("cached_total_cost") or u.get("total_cost") or 0) for u in usage)
         return billed, sum(float(u.get("total_cost") or 0) for u in usage)
 
 
-def load_replay(config_path, overrides: Optional[Dict[str, Any]] = None):
+def load_replay(config_path, overrides: Optional[Dict[str, Any]] = None,
+                cut_point: Optional[CutPoint] = None):
     """`(dataset, execution overrides)`. Model, tools and task config come from the source run.
 
     A replay under another model, tool grant or temperature is not a replay of the recorded
@@ -175,6 +192,10 @@ def load_replay(config_path, overrides: Optional[Dict[str, Any]] = None):
     raw = load_yaml(config_path)
     if overrides:
         raw = deep_merge(raw, overrides)
+    if cut_point is not None:
+        # Replaces, never merges: a merged cut keeps the config's spelling beside the new one,
+        # and a cut with two spellings is refused.
+        raw.setdefault("dataset", {})["cut"] = cut_point.model_dump(exclude_none=True)
     dataset = ReplayDatasetConfig.model_validate(raw.pop("dataset"))
     extra = sorted(set(raw) - {"execution"})
     if extra:
@@ -234,7 +255,7 @@ async def select_sources(dataset: ReplayDatasetConfig):
             continue
         nodes = jsonl_rows(session)
         try:
-            _, index = cut_before_tool_call(nodes, SUBMIT_TOOL)
+            _, index = cut(nodes, dataset.cut)
         except ReplayRefused as exc:
             skipped.append({"invocation_id": invocation_id, "reason": str(exc)})
             continue
@@ -242,7 +263,7 @@ async def select_sources(dataset: ReplayDatasetConfig):
         result = attempt.result
         sources.append(ReplaySource(
             invocation_id=invocation_id, payload=payload, session_path=str(session),
-            session_sha256=sha256_file(session), nodes=nodes, decision_index=index,
+            session_sha256=sha256_file(session), nodes=nodes, cut_index=index,
             result=result.model_dump(mode="json") if hasattr(result, "model_dump") else result,
             scaffold_config=config["config"]))
     return sources, skipped
@@ -278,11 +299,11 @@ def replay_scaffold(sources: List[ReplaySource], execution: Dict[str, Any]):
 
 
 def replay_payload(source: ReplaySource, dataset: ReplayDatasetConfig, out: Path):
-    """`(payload, prefix bytes)`: the recorded arm task, started just before it submitted."""
+    """`(payload, prefix bytes)`: the recorded arm task, started from this run's cut."""
 
     from ape.orchestration.models import EXECUTION_LIMITS_KEY
 
-    prefix, index = cut_before_tool_call(source.nodes, SUBMIT_TOOL)
+    prefix, index = cut(source.nodes, dataset.cut)
     task_data = {**source.payload,
                  # Never the source run's trace: a call made while deciding is this run's.
                  "trace_path": str(out / "context_trace.jsonl")}
@@ -292,17 +313,18 @@ def replay_payload(source: ReplaySource, dataset: ReplayDatasetConfig, out: Path
         out / "prefixes" / f"{sha256_bytes(source.invocation_id.encode())[:24]}.jsonl",
         {"run": dataset.of_run, "invocation_id": source.invocation_id,
          "session": source.session_path, "session_sha256": source.session_sha256,
-         "decision_node_index": index})
+         "cut": dataset.cut.model_dump(mode="json", exclude_none=True),
+         "cut_label": dataset.cut.name, "cut_node_index": index})
     turns = payload[SESSION_REPLAY_KEY]["source"]["prefix_assistant_turns"]
-    payload[EXECUTION_LIMITS_KEY] = {"max_turns": turns + dataset.decision_turns,
+    payload[EXECUTION_LIMITS_KEY] = {"max_turns": turns + dataset.turns_after_cut,
                                      "billed_cost_limit": dataset.per_task_cost_cap}
     return payload, content
 
 
 def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySource],
                skipped, built) -> ReplayPlan:
-    billed = sum(source.decision_stage_cost()[0] for source in sources)
-    nominal = sum(source.decision_stage_cost()[1] for source in sources)
+    billed = sum(source.replayed_stage_cost()[0] for source in sources)
+    nominal = sum(source.replayed_stage_cost()[1] for source in sources)
     samples = scaffold.execution.sample_count
     commit, tree_state = git_state()
     return ReplayPlan(
@@ -311,7 +333,9 @@ def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySourc
         condition_sha256=dataset.condition.sha256(),
         selection={"arm_ids": dataset.arm_ids, "pr_numbers": dataset.pr_numbers,
                    "invocation_limit": dataset.invocation_limit},
-        decision_turns=dataset.decision_turns, per_task_cost_cap=dataset.per_task_cost_cap,
+        cut=dataset.cut.model_dump(mode="json", exclude_none=True),
+        cut_label=dataset.cut.name, turns_after_cut=dataset.turns_after_cut,
+        per_task_cost_cap=dataset.per_task_cost_cap,
         run_total_cost_cap=dataset.run_total_cost_cap, sample_count=samples,
         model_name=scaffold.llm_config.model_name or "",
         prefix_sha256_by_invocation={
@@ -319,8 +343,8 @@ def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySourc
             for payload, _ in built},
         skipped=skipped,
         estimate={
-            "recorded_decision_stage_billed": round(billed, 4),
-            "recorded_decision_stage_nominal": round(nominal, 4),
+            "recorded_replayed_stage_billed": round(billed, 4),
+            "recorded_replayed_stage_nominal": round(nominal, 4),
             "expected_billed_if_cached": round(billed * samples, 2),
             "expected_billed_if_uncached": round(nominal * samples, 2),
             "ceiling_at_task_caps": round(len(sources) * samples * dataset.per_task_cost_cap, 2),
@@ -355,10 +379,12 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
     dataset.condition.assert_named_honestly()
     if dataset.run_name == "UNNAMED":
         raise ReplayRefused("a replay needs --run-name")
-    if dataset.condition.name not in dataset.run_name:
-        raise ReplayRefused(
-            f"run name {dataset.run_name!r} does not contain the condition "
-            f"{dataset.condition.name!r}; the name is how a replay's outcomes are told apart")
+    for what, value in (("condition", dataset.condition.name), ("cut", dataset.cut.name)):
+        if value not in dataset.run_name:
+            raise ReplayRefused(
+                f"run name {dataset.run_name!r} does not contain the {what} {value!r}; a "
+                "replay's name is how its outcomes are told apart, and one task identity per "
+                "session means one cut per run")
 
     sources, skipped = await select_sources(dataset)
     if not sources:
@@ -367,9 +393,10 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
     out = run_dir(dataset.run_name)
     built = [replay_payload(source, dataset, out) for source in sources]
     plan = build_plan(dataset, scaffold, sources, skipped, built)
-    logger.info("replay %s of %s: %d session(s) x %d sample(s), %d skipped; condition %s (%s)",
-                dataset.run_name, dataset.of_run, len(sources), plan.sample_count, len(skipped),
-                dataset.condition.name, plan.condition_sha256[:12])
+    logger.info("replay %s of %s: %d session(s) x %d sample(s), %d skipped; cut %s, "
+                "condition %s (%s)", dataset.run_name, dataset.of_run, len(sources),
+                plan.sample_count, len(skipped), plan.cut_label, dataset.condition.name,
+                plan.condition_sha256[:12])
     logger.info("estimate: %s", json.dumps(plan.estimate))
     if plan.estimate["expected_billed_if_uncached"] > dataset.run_total_cost_cap:
         message = (f"the recorded decision stage priced uncached is "
@@ -414,7 +441,8 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
         index_path, orchestrator, results, group="replay",
         semantic_ids={payload["task_id"]: payload["invocation_id"] for payload, _ in built})
 
-    outcomes = await collect_outcomes(index_path, sources, built, dataset.condition.name)
+    outcomes = await collect_outcomes(index_path, sources, built, dataset.condition.name,
+                                      dataset.cut.name)
     write_once(out / "replay_outcomes.jsonl", jsonl_bytes(outcomes))
     report = replay_report(outcomes)
     write_once(out / "replay_report.json", pretty_json_bytes(report))
@@ -424,7 +452,7 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
 
 
 async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
-                           condition: str) -> List[Dict[str, Any]]:
+                           condition: str, cut_label: str) -> List[Dict[str, Any]]:
     """One row per replayed sample, beside the recorded decision it replays."""
 
     from ape.orchestration.execution_index import by_semantic_id
@@ -435,7 +463,7 @@ async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
     rows: List[Dict[str, Any]] = []
     for source, (payload, content) in zip(sources, built):
         start = len([line for line in content.split(b"\n") if line.strip()])
-        recorded = {"decision": decision_record(source.nodes, source.decision_index),
+        recorded = {"decision": decision_record(source.nodes, source.cut_index),
                     "accepted": accepted_summary(source.result)}
         row = index.get(source.invocation_id)
         samples = (await TaskStorage(Path(row["task_dir"]), row["global_index"])
@@ -456,6 +484,7 @@ async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
                 "pr_number": source.payload.get("pr_number"),
                 "work_unit_id": source.payload.get("work_unit_id"),
                 "condition": condition,
+                "cut": cut_label,
                 "sample_index": sample_index,
                 "status": getattr(attempt.status, "value", str(attempt.status)),
                 "cost": attempt.cost,
@@ -507,10 +536,17 @@ def _mean(values) -> Optional[float]:
     return round(sum(values) / len(values), 4) if values else None
 
 
+def _session_key(row: Dict[str, Any]) -> str:
+    """One replayed session: an invocation at one cut. Two cuts of one session are two
+    measurements and must never be pooled into one rate."""
+
+    return f"{row['invocation_id']}@{row.get('cut') or ''}"
+
+
 def _by_session(rows) -> Dict[str, List[Dict[str, Any]]]:
     grouped: Dict[str, List[Dict[str, Any]]] = {}
     for row in rows:
-        grouped.setdefault(row["invocation_id"], []).append(row)
+        grouped.setdefault(_session_key(row), []).append(row)
     return grouped
 
 
@@ -537,7 +573,7 @@ def replay_report(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     by_arm: Dict[str, Dict[str, Any]] = {}
     for arm_id in sorted({row["arm_id"] for row in rows}):
         arm_rows = [row for row in accepted if row["arm_id"] == arm_id]
-        arm_sessions = {row["invocation_id"]: row for row in rows if row["arm_id"] == arm_id}
+        arm_sessions = {_session_key(row): row for row in rows if row["arm_id"] == arm_id}
         by_arm[arm_id] = {
             "sessions": len(arm_sessions),
             "recorded_filing_rate": _mean(
@@ -557,6 +593,7 @@ def replay_report(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
         statuses[row["status"]] = statuses.get(row["status"], 0) + 1
     return {
         "condition": rows[0]["condition"] if rows else None,
+        "cuts": sorted({row.get("cut") for row in rows if row.get("cut")}),
         "sessions": len(sessions),
         "samples": len(rows),
         "samples_with_no_accepted_submission": len(rows) - len(accepted),
@@ -599,16 +636,33 @@ def _sign_test(more: int, less: int) -> Optional[float]:
 
 def compare_replays(baseline: List[Dict[str, Any]],
                     treatment: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """A condition against a baseline replay (normally the null), paired by session.
+    """Two replay runs, paired session by session; normally a condition against the null.
 
-    Per session, the filing rate over its accepted samples in each run; the difference is read
-    per session, never pooled, because samples of one prefix are not independent of it.
+    Per session, the filing rate over its accepted samples in each run; differences are read
+    per session and never pooled, because samples of one prefix are not independent of it.
+
+    Which axis moved decides how sessions pair, and the answer is stated rather than assumed.
+    Two runs at the same cut pair on the invocation *and* that cut, so a condition is compared
+    against a baseline that saw the same prefix. Two runs of the same condition at different
+    cuts pair on the invocation alone, which asks the other question -- how much the cut
+    itself decides. A run holding several cuts pairs on both and compares nothing across them.
     """
 
+    def cuts(rows):
+        return sorted({row.get("cut") for row in rows if row.get("cut")})
+
+    base_cuts, treat_cuts = cuts(baseline), cuts(treatment)
+    axis = ("cut" if len(base_cuts) == len(treat_cuts) == 1 and base_cuts != treat_cuts
+            else "condition" if len(base_cuts) <= 1 and len(treat_cuts) <= 1 else "mixed")
+    key = (lambda row: row["invocation_id"]) if axis == "cut" else _session_key
+
     def filing(rows):
-        return {invocation_id: _mean(r["replay"]["accepted"]["filed"] for r in items
-                                     if r["replay"]["accepted"] is not None)
-                for invocation_id, items in _by_session(rows).items()}
+        grouped: Dict[str, List[Dict[str, Any]]] = {}
+        for row in rows:
+            grouped.setdefault(key(row), []).append(row)
+        return {session: _mean(r["replay"]["accepted"]["filed"] for r in items
+                               if r["replay"]["accepted"] is not None)
+                for session, items in grouped.items()}
 
     base, treat = filing(baseline), filing(treatment)
     paired = sorted(k for k in set(base) & set(treat)
@@ -616,7 +670,7 @@ def compare_replays(baseline: List[Dict[str, Any]],
     differences = {k: treat[k] - base[k] for k in paired}
     more = sum(1 for d in differences.values() if d > 0)
     less = sum(1 for d in differences.values() if d < 0)
-    arm_of = {row["invocation_id"]: row["arm_id"] for row in baseline + treatment}
+    arm_of = {key(row): row["arm_id"] for row in baseline + treatment}
     by_arm: Dict[str, Dict[str, Any]] = {}
     for arm_id in sorted({arm_of[k] for k in paired}):
         keys = [k for k in paired if arm_of[k] == arm_id]
@@ -630,6 +684,9 @@ def compare_replays(baseline: List[Dict[str, Any]],
     return {
         "baseline_condition": baseline[0]["condition"] if baseline else None,
         "treatment_condition": treatment[0]["condition"] if treatment else None,
+        "baseline_cuts": base_cuts,
+        "treatment_cuts": treat_cuts,
+        "compared_axis": axis,
         "paired_sessions": len(paired),
         "unpaired_sessions": len(set(base) ^ set(treat)),
         "filing_rate": {"baseline": _mean(base[k] for k in paired),

@@ -144,6 +144,10 @@ def build_parser() -> argparse.ArgumentParser:
     replay.add_argument("--config", type=Path, required=True)
     replay.add_argument("--of", dest="of_run", default=None,
                         help="the generation run whose arm sessions are replayed")
+    replay.add_argument(
+        "--cut", default=None, metavar="turn=N|node=I|tool=NAME[:first|:last|:N]",
+        help="where the model takes over, replacing the config's cut. `--set dataset.cut=` "
+             "would merge with it instead, leaving two spellings, which is refused.")
     _add_run_name(replay)
     _add_set(replay)
     _add_execute(replay)
@@ -295,15 +299,18 @@ def _bench(args, logger) -> int:
 def _replay(args, overrides, logger) -> int:
     """Preflight without `--execute`: select, cut, condition, price, check -- and write nothing."""
 
+    from ape.scaffolds.ape_agent.replay import parse_cut
     from src.mathlib_review.review.replay import load_replay, run_replay
 
     if args.of_run:
         overrides.setdefault("dataset", {})["of_run"] = args.of_run
-    dataset, execution = load_replay(args.config, overrides)
+    dataset, execution = load_replay(
+        args.config, overrides, parse_cut(args.cut) if args.cut else None)
     if not args.execute:
         _say_nothing_ran("replay", {"config": str(args.config), "of run": dataset.of_run,
                                     "run name": dataset.run_name,
-                                    "condition": dataset.condition.name})
+                                    "condition": dataset.condition.name,
+                                    "cut": dataset.cut.name})
     result = asyncio.run(run_replay(dataset, execution, logger, execute=args.execute))
     if not args.execute:
         print(json.dumps({"sessions": len(result.prefix_sha256_by_invocation),
