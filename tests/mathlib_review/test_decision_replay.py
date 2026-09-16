@@ -409,3 +409,14 @@ def test_two_cuts_of_one_session_are_two_measurements(tools):
     same = compare_replays(early, [_row("s1", "naming", False, True, condition="forced",
                                         cut="turn1")])
     assert same["compared_axis"] == "condition" and same["paired_sessions"] == 1
+
+
+def test_named_sessions_are_replayed_and_a_mistyped_name_is_refused(recorded_run):
+    """A case study names its sessions. A typo must not quietly shrink the run to the rest."""
+
+    from src.mathlib_review.review.replay import select_sources
+
+    sources, _ = asyncio.run(select_sources(_dataset(invocation_ids=["wu:a#naming"])))
+    assert [s.invocation_id for s in sources] == ["wu:a#naming"]
+    with pytest.raises(ReplayRefused, match="holds no arm session"):
+        asyncio.run(select_sources(_dataset(invocation_ids=["wu:a#naming", "wu:a#typo"])))

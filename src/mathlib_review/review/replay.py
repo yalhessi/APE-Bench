@@ -114,6 +114,10 @@ class ReplayDatasetConfig(BaseModel):
     condition: ReplayCondition
     arm_ids: List[str] = Field(default_factory=list)
     pr_numbers: List[int] = Field(default_factory=list)
+    #: Exactly these sessions, for a case study on decisions someone has read. A requested id
+    #: that the run does not hold is refused rather than dropped: a mistyped id would quietly
+    #: shrink the run to the ones that matched, and the result would look like a measurement.
+    invocation_ids: List[str] = Field(default_factory=list)
     invocation_limit: int = 0
     #: Where the model takes over. Required: nothing about a replay's cut is predetermined, and
     #: a default would quietly make one experiment look like the only one available.
@@ -226,10 +230,16 @@ async def select_sources(dataset: ReplayDatasetConfig):
                 "pool and finds each session through its execution index. arm_pool.jsonl is "
                 "gitignored, so a worktree has it only if linked from the main checkout; the "
                 "rel050 reps lost theirs with a deleted worktree (docs/todo/operational-floor.md).")
-    wanted_arms = set(dataset.arm_ids)
+    wanted_arms, wanted_ids = set(dataset.arm_ids), set(dataset.invocation_ids)
     rows = {invocation_id: row for invocation_id, row in by_semantic_id(index_path).items()
             if row.get("task_type") == ARM_TASK_TYPE
-            and (not wanted_arms or invocation_id.rsplit("#", 1)[-1] in wanted_arms)}
+            and (not wanted_arms or invocation_id.rsplit("#", 1)[-1] in wanted_arms)
+            and (not wanted_ids or invocation_id in wanted_ids)}
+    missing = sorted(wanted_ids - set(rows))
+    if missing:
+        raise ReplayRefused(
+            f"{dataset.of_run} holds no arm session for {missing}; a replay of named sessions "
+            "does not quietly become a replay of the ones that matched")
     pool = {row["invocation_id"]: row["task_data"] for row in jsonl_rows(pool_path)
             if row.get("invocation_id") in rows}
 
