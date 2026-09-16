@@ -1,9 +1,11 @@
 # Decision-turn replay — test a change to what an arm decides without re-running what it investigated
 
 **Status** — **built, not yet run** (branch `decision-replay`, 2026-09-15); prioritised by the user 2026-09-15
-**Cost** — measured at preflight: the recorded decision stage of v2_rep1's 319 replayable sessions
-is **$4.87 billed / $12.40 nominal per sample**, so a 3-sample null replay is $14.61–$37.20 (see
-"Built" below — this corrects the cost argument in the motivating example)
+**Cost** — measured at preflight, and a function of where the cut is. On v2_rep1 at 3 samples,
+billed if uncached: **$37.20** from the first submission (319 sessions), **$30.44** from the last
+turn (320), **$91.12** replaying each task from its prompt (320). The stage re-sampled from the
+first-submission cut is $4.87 billed / $12.40 nominal per sample — see "Built" below, which
+corrects the cost argument in the motivating example
 **Owner question** — how cheaply, and with how little noise, can a decision-stage change be measured?
 
 ## Motivating example
@@ -69,10 +71,19 @@ per-target disposition from `batching-work-units` follow-ups.
   manager (`src/ape/scaffolds/ape_agent/replay.py`). The replayed task keeps its type and id, so
   any task family can be replayed and a replayed arm's results are ordinary arm results. Only the
   cut point and the submission summary are review code (`src/mathlib_review/review/replay.py`).
-- **The cut is before the *first* `submit_candidates`, not the terminal one** (step 2 above).
-  26 / 31 / 28 of the 321 / 316 / 322 v2 sessions had a first submission refused and repaired; the
-  task counts refusals on its instance and a replayed instance starts at zero, so only a prefix
-  with no submission agrees with the live contract. Repairs are re-sampled as part of the decision.
+- **The cut is a parameter, not a policy** (the user's second correction). `CutPoint` names any
+  point in a recording — an assistant turn from either end (`turn=-1`, `turn=1`), a raw node index,
+  or a tool call — resolved per session, and refused per session when it cannot resolve or would
+  land inside a turn. The decision turn is one choice of cut, not what the system is. One task
+  identity per session means **one cut per run**, so the run name carries the cut label, and
+  `report replay --against` states whether it compared conditions (same cut) or cuts (same
+  condition). Measured on v2_rep1: `turn=-1` and `tool=submit_candidates:last` are the same 320
+  sessions; `node=7` lands mid-turn in 232 of them, which is why a node index is the last resort.
+- **Within the decision-turn cut it is the *first* `submit_candidates`, not the terminal one**
+  (step 2 above). 26 / 31 / 28 of the 321 / 316 / 322 v2 sessions had a first submission refused
+  and repaired; the task counts refusals on its instance and a replayed instance starts at zero,
+  so only a prefix with no submission agrees with the live contract. Repairs are re-sampled with
+  the decision.
 - **The cost argument was overstated.** "One cached-prefix turn instead of a whole rep" is true
   of turns, not dollars: the decision turn carries the whole investigation as input, so the
   recorded decision stage is ~38% of arm billed spend per sample ($4.87 of $12.83 on v2_rep1) and
@@ -85,21 +96,25 @@ per-target disposition from `batching-work-units` follow-ups.
   half). Outcomes are compared at the submission level only — filed/abstained, abstention reason,
   anchors, candidate keys — which needs no judge and no gold.
 
-Run it:
+Run it (preflight without `--execute`; `--cut turn=N|node=I|tool=NAME[:first|:last|:N]`
+replaces the config's cut, while `--set dataset.cut=` deep-merges and leaves two spellings,
+which is refused):
 
 ```
-ape/bin/python -m src.mathlib_review.review.cli replay --config configs/v5_replay.yaml \
-    --of pr5_A_lead_heldout12_v2_rep1 --run-name pr5_replay_null_v2_rep1 --execute
-ape/bin/python -m src.mathlib_review.review.cli report replay --run pr5_replay_null_v2_rep1
-ape/bin/python -m src.mathlib_review.review.cli report replay --run <condition run> \
-    --against pr5_replay_null_v2_rep1
+R="ape/bin/python -m src.mathlib_review.review.cli"
+$R replay --config configs/v5_replay.yaml --of pr5_A_lead_heldout12_v2_rep1 \
+    --run-name pr5_replay_null_first_submit_candidates_v2_rep1 --execute
+$R replay --config configs/v5_replay.yaml --of pr5_A_lead_heldout12_v2_rep1 --cut turn=-1 \
+    --run-name pr5_replay_null_last_turn_v2_rep1 --execute
+$R report replay --run pr5_replay_null_first_submit_candidates_v2_rep1
+$R report replay --run <condition run> --against pr5_replay_null_first_submit_candidates_v2_rep1
 ```
 
 ## What would close it
 
 A replay run on `pr5_A_lead_heldout12_v2_rep1` that (a) reproduces the original submission when
 nothing is swapped — the null replay, at a rate that sets its own noise floor — and (b) reports one
-swapped condition against it. Without (a), no replay difference can be read.
+swapped condition against it, at the same cut. Without (a), no replay difference can be read.
 
 ## Evidence
 
