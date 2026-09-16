@@ -1,0 +1,74 @@
+{
+  "agreement_with_recorded": {
+    "outcome": {
+      "rate": 0.9,
+      "samples": 20,
+      "sessions_every_sample_agrees": 3,
+      "sessions_no_sample_agrees": 0
+    },
+    "reason_or_anchors": {
+      "rate": 0.6,
+      "samples": 20,
+      "sessions_every_sample_agrees": 2,
+      "sessions_no_sample_agrees": 1
+    },
+    "reason_or_candidates": {
+      "rate": 0.6,
+      "samples": 20,
+      "sessions_every_sample_agrees": 2,
+      "sessions_no_sample_agrees": 1
+    }
+  },
+  "by_arm": {
+    "correctness": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.0,
+      "sessions": 1
+    },
+    "docs": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 1.0,
+      "replayed_filing_rate": 1.0,
+      "sessions": 1
+    },
+    "naming": {
+      "outcome_agreement": 0.6,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.4,
+      "sessions": 1
+    },
+    "style": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 1.0,
+      "replayed_filing_rate": 1.0,
+      "sessions": 1
+    }
+  },
+  "condition": "null",
+  "cost": {
+    "billed": 0.3179,
+    "nominal": 0.6607
+  },
+  "cuts": [
+    "first_submit_candidates"
+  ],
+  "filing_rate": {
+    "recorded": 0.5,
+    "replayed": 0.6
+  },
+  "model_confidence_null_rate_first_call": 0.0,
+  "reading": "The null condition's agreement with the recorded decision is the noise floor: at temperature 1 a decision re-sampled from an identical prefix does not reproduce itself. A condition's effect is its paired difference from the null on the same sessions (`report replay --against <null run>`), not its agreement with the recording, and is provisional until it holds on all three source reps.",
+  "refusals": {
+    "recorded_sessions_with_a_refusal": 0,
+    "replayed_samples_with_a_refusal": 0
+  },
+  "replayed_turns_max": 1,
+  "samples": 20,
+  "samples_with_no_accepted_submission": 0,
+  "sessions": 4,
+  "statuses": {
+    "success": 20
+  },
+  "tool_drift": []
+}
