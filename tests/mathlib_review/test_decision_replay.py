@@ -360,7 +360,8 @@ def _row(invocation_id, arm, recorded_filed, replay_filed, condition="null", sam
     return {"invocation_id": invocation_id, "arm_id": arm, "condition": condition,
             "cut": cut, "sample_index": sample, "status": "success", "cost": 0.03, "cached_cost": 0.01,
             "recorded": {"decision": {"refusals": []}, "accepted": summary(recorded_filed)},
-            "replay": {"decision": {"turns": 1, "refusals": [],
+            "replay": {"replayed_from_prefix": True,
+                       "decision": {"turns": 1, "refusals": [],
                                     "first": {"model_confidence": [None] if replay_filed else []}},
                        "accepted": summary(replay_filed), "tool_drift": []}}
 
@@ -420,3 +421,16 @@ def test_named_sessions_are_replayed_and_a_mistyped_name_is_refused(recorded_run
     assert [s.invocation_id for s in sources] == ["wu:a#naming"]
     with pytest.raises(ReplayRefused, match="holds no arm session"):
         asyncio.run(select_sources(_dataset(invocation_ids=["wu:a#naming", "wu:a#typo"])))
+
+
+def test_a_sample_that_did_not_start_from_its_prefix_refuses_the_report():
+    """It ran the task from its prompt, submitted, and looks like every other row. Pooling it
+    would report the variance of a whole re-run as the variance of a decision -- which is what
+    happened on the first real replay, before the orchestrator carried the directive."""
+
+    from src.mathlib_review.review.replay import replay_report
+
+    rows = [_row("s1", "naming", False, False), _row("s2", "docs", True, True)]
+    rows[1]["replay"]["replayed_from_prefix"] = False
+    with pytest.raises(ReplayRefused, match="did not start from their recorded prefix"):
+        replay_report(rows)

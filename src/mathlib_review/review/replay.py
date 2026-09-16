@@ -488,6 +488,13 @@ async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
                 result = result.model_dump(mode="json")
             session = ApeAgentConversationManager.find_latest_session_path(Path(attempt.path))
             drift_file = Path(attempt.path) / REPLAY_RECORD_FILENAME
+            # The attempt's own proof that it started from the sealed prefix. Written by the
+            # conversation manager when it is shown the recorded tools; absent means the
+            # directive never arrived and the attempt ran the task from its prompt -- which
+            # still submits, and would otherwise be read as replay consistency.
+            record = json.loads(drift_file.read_text()) if drift_file.is_file() else {}
+            from_prefix = (record.get("prefix_sha256")
+                           == payload[SESSION_REPLAY_KEY]["prefix_sha256"])
             rows.append({
                 "invocation_id": source.invocation_id,
                 "arm_id": source.payload.get("arm_id"),
@@ -501,11 +508,11 @@ async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
                 "cached_cost": attempt.cached_cost,
                 "recorded": recorded,
                 "replay": {
+                    "replayed_from_prefix": from_prefix,
                     "decision": (decision_record(jsonl_rows(session), start)
-                                 if session is not None else None),
+                                 if session is not None and from_prefix else None),
                     "accepted": accepted_summary(result),
-                    "tool_drift": (json.loads(drift_file.read_text()).get("tool_drift")
-                                   if drift_file.is_file() else None),
+                    "tool_drift": record.get("tool_drift"),
                 },
             })
     return rows
@@ -561,7 +568,20 @@ def _by_session(rows) -> Dict[str, List[Dict[str, Any]]]:
 
 
 def replay_report(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """One replay run against the decisions it replayed."""
+    """One replay run against the decisions it replayed.
+
+    Refuses outright if any sample did not start from its prefix. Such a sample is a fresh run
+    of the task: it submits, it looks like every other row, and pooling it into an agreement
+    rate would report the variance of a whole re-run as the variance of a decision.
+    """
+
+    stray = [row["invocation_id"] for row in rows
+             if not (row["replay"] or {}).get("replayed_from_prefix")]
+    if stray:
+        raise ReplayRefused(
+            f"{len(stray)} of {len(rows)} sample(s) did not start from their recorded prefix "
+            f"(e.g. {stray[:3]}); they are ordinary runs of the task and their agreement with "
+            "the recorded decision would measure a re-run, not a decision")
 
     sessions = _by_session(rows)
     accepted = [row for row in rows if row["replay"]["accepted"] is not None]

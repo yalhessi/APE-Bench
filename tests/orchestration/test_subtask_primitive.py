@@ -100,6 +100,52 @@ def test_a_per_task_turn_limit_reaches_the_conversation(monkeypatch, task_limits
     assert seen["max_turns"] == expected
 
 
+def test_reserved_run_level_keys_survive_into_the_job(monkeypatch):
+    """`BaseTaskData` ignores keys it does not declare, so a task's dump loses every
+    run-level directive. This silently dropped every `execution_limits` a lead attached to its
+    arms -- they ran under the nested orchestrator's sample_max_cost instead -- and turned a
+    session replay into an ordinary run from the prompt."""
+
+    from ape.scaffolds.ape_agent.replay import SESSION_REPLAY_KEY
+    from ape.tasks.base import create_task_from_data
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmData
+
+    payload = {
+        **ReviewArmData(
+            task_id="t", invocation_id="wu:a#naming", arm_id="naming", work_unit_id="wu:a",
+            episode_id="ep:1", pr_number=1, diff="d", changed_files=["A.lean"],
+            change_ids=["change:a"], entity_ids_by_change={}, primary_subjects_by_change={},
+            rendered_system_prompt="s", rendered_user_prompt="u",
+            rendered_prompt_sha256="a" * 64,
+            target_workspace={"name": "target", "commit_hash": "c" * 40,
+                              "repo_url": "https://e.invalid/m.git",
+                              "default_target": "Mathlib"}).model_dump(mode="json"),
+        EXECUTION_LIMITS_KEY: {"max_turns": 5, "billed_cost_limit": 0.1},
+        SESSION_REPLAY_KEY: {"prefix_path": "p.jsonl", "prefix_sha256": "0" * 64,
+                             "recorded_tool_sha256": {}},
+    }
+    task = create_task_from_data(payload, _config())
+    job = task.job_data()
+    assert job[EXECUTION_LIMITS_KEY] == {"max_turns": 5, "billed_cost_limit": 0.1}
+    assert job[SESSION_REPLAY_KEY]["prefix_path"] == "p.jsonl"
+    # Still the validated model otherwise, including the identity the orchestrator keys on.
+    assert job["global_index"] == task.data.global_index
+    assert task_execution_limits(job, SimpleNamespace(max_turns=40, sample_max_cost=0.3)
+                                 ).max_turns == 5
+
+
+def test_the_orchestrator_hands_the_worker_job_data():
+    """The seam where the keys were lost: a re-dump of the model instead of the payload."""
+
+    import inspect
+
+    from ape.orchestration.orchestrator import TaskOrchestrator
+
+    source = inspect.getsource(TaskOrchestrator)
+    assert '"task_data": task.job_data()' in source
+    assert 'task.data.model_dump(mode="json")' not in source
+
+
 def test_a_spec_attaches_its_limits_to_the_payload():
     spec = TaskExecutionSpec(
         spec_id="s1", task_type="t", task_data={"task_id": "x"}, billed_cost_limit=0.5)

@@ -34,6 +34,20 @@ paths:
   ranking (filtering a ranked top-k silently shortens it).
 - **Per-arm benches score location + silence only** — a bench hit is necessary, not sufficient, for a
   scored hit. Payloads come from `build_agenda`; never rebuild them, and they carry no gold.
+- **A task-data key the task model does not declare was dropped on the way to the worker
+  (fixed 2026-09-16).** `TaskOrchestrator` built each job's `task_data` from
+  `task.data.model_dump()`, and `BaseTaskData` ignores undeclared keys, so every reserved
+  run-level directive vanished between the caller and the runtime: the lead's
+  `execution_limits` never reached its arms (they ran under the *nested* orchestrator's
+  `sample_max_cost` -- $1.00 -- not the run's `standard_budget_cap` of $0.30, so every v5 arm
+  cap in the record is the looser number), and a decision-turn replay ran the task from its
+  prompt instead, producing submissions that looked exactly like replays. `BaseTask.job_data()`
+  now carries the payload's extra keys alongside the validated dump. **A directive that
+  travels in task data must be asserted at the far end, not at the near one:** the unit test
+  passed `task_data` straight to `main_from_params` and could not see the orchestrator drop it;
+  what caught it was one real one-sample run and the absence of `session_replay.json` in the
+  attempt. Every replay outcome row now carries `replayed_from_prefix`, and `replay_report`
+  refuses a run with any stray row rather than reporting a re-run's variance as a decision's.
 - **Caps bind billed cost, not nominal** (they differ ~2.5× with prompt caching), so a job spends its
   whole cap; every scheduled task writes `task_outcome.json`; `task_result.json` is never synthesised
   for a pause or failure.
