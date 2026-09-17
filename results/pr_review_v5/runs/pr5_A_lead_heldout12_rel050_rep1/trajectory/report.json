@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/pr5_A_lead_heldout12_rel050_rep1",
+  "bytes": 5555269,
+  "cost": {
+    "actual_total": 35.163336,
+    "by_disposition": {
+      "mandatory": 12.104533,
+      "proposed": 4.546162
+    },
+    "lead": 18.512641,
+    "manifest_total": 18.512641,
+    "manifest_understates_by": 16.650695
+  },
+  "invocations": 206,
+  "leads": 12,
+  "run_name": "pr5_A_lead_heldout12_rel050_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 2699,
+  "with_transcript": 218
+}
