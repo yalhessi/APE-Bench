@@ -96,8 +96,11 @@ afterwards lives in the worktree's own tree. The per-task directories keep no co
 The pool is the input any replay or re-audit of those runs needs (`replay-decision-turn.md`);
 `run_plan.json`'s `prompt_sha256_by_invocation` would at least let a rebuilt pool be checked.
 
-What would close it: resolve index paths relative to the `.ape` root (store them relative, or
-re-root an absolute path whose worktree prefix is gone), and make `extract` refuse — not return
-empty — when the index names directories none of which exist; and either write new run
-directories through the main checkout's `results/` or refuse to remove a worktree holding an
-untracked run artifact.
+**Reader half closed 2026-09-17.** `trajectory._reroot` moves an index path whose worktree is
+gone onto `.ape/runs/<run>/`, and `_arm_result_paths` refuses an index none of whose directories
+exist. `rel050_rep1` now extracts **206 invocations, 218 transcripts** (it read 0), and its sidecar
+is committed so the transcripts no longer depend on `.ape/`. rep2 and rep3 are not extracted yet.
+
+What would close the rest: store index paths relative to the `.ape` root at write time, and either
+write new run directories through the main checkout's `results/` or refuse to remove a worktree
+holding an untracked run artifact. The lost `arm_pool.jsonl` files are not recoverable this way.

@@ -91,6 +91,27 @@ def test_missing_ape_root_degrades(tmp_path):
     assert extracted["invocations"] == [] and extracted["leads"] == []
 
 
+def test_an_index_path_through_a_deleted_worktree_is_rerooted(tmp_path):
+    """`rel050_rep1`'s 206 index rows name `.claude/worktrees/batching-work-units/.ape/runs/…`;
+    the worktree is gone and the files are under the shared `.ape/runs/<run>/`."""
+
+    root = tmp_path / "ape" / "runs" / "r1"
+    (root / "tasks" / "t1").mkdir(parents=True)
+    gone = tmp_path / "wt" / "gone" / ".ape" / "runs" / "r1" / "tasks" / "t1"
+    assert trajectory._reroot(str(gone), root) == root / "tasks" / "t1"
+    assert trajectory._arm_result_paths(root, {"i": {"task_dir": str(gone)}}) == [
+        root / "tasks" / "t1" / "task_result.json"]
+
+
+def test_an_index_naming_only_missing_directories_is_refused(tmp_path):
+    """It used to read as a run with no arms: an empty trajectory and no warning."""
+
+    root = tmp_path / "runs" / "r1"
+    root.mkdir(parents=True)
+    with pytest.raises(FileNotFoundError, match="none exist"):
+        trajectory._arm_result_paths(root, {"i": {"task_dir": str(tmp_path / "elsewhere")}})
+
+
 def test_is_v5_run_is_structural(tmp_path):
     assert not delegation_view.is_v5_run(tmp_path)
     (tmp_path / "agenda.json").write_text("{}")

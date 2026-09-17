@@ -276,12 +276,38 @@ def _indexed_arms(run_name: str) -> Dict[str, Dict[str, Any]]:
         return {}
 
 
+def _reroot(recorded: str, root: Path) -> Path:
+    """An index path, moved onto `root` when the tree it was written through is gone.
+
+    A run made from a worktree records absolute paths through that worktree's `.ape` link.
+    Removing the worktree leaves them dangling while the files still sit under the shared
+    `.ape/runs/<run>/` -- all three `rel050` reps read as 0 invocations for exactly this reason.
+    """
+
+    path = Path(recorded)
+    if path.exists():
+        return path
+    parts = path.parts
+    for index in range(len(parts) - 1):
+        if parts[index] == "runs" and parts[index + 1] == root.name:
+            return root.joinpath(*parts[index + 2:])
+    return path
+
+
 def _arm_result_paths(root: Path, indexed: Dict[str, Dict[str, Any]]) -> List[Path]:
-    """Where the arm results are, from the index when there is one and the globs when not."""
+    """Where the arm results are, from the index when there is one and the globs when not.
+
+    An index none of whose directories exist is refused rather than read as a run with no arms,
+    which is how a deleted worktree used to turn a whole run's transcripts into silence.
+    """
 
     if indexed:
-        return sorted({Path(row["task_dir"]) / "task_result.json"
-                       for row in indexed.values() if row.get("task_dir")})
+        dirs = {_reroot(row["task_dir"], root) for row in indexed.values() if row.get("task_dir")}
+        if dirs and not any(path.is_dir() for path in dirs):
+            raise FileNotFoundError(
+                f"execution index names {len(dirs)} task directories and none exist under {root}"
+            )
+        return sorted(path / "task_result.json" for path in dirs)
     seen, paths = set(), []
     for pattern in _ARM_RESULT_GLOBS:
         for path in root.glob(pattern):
@@ -303,11 +329,11 @@ def _indexed_cost(row: Dict[str, Any]) -> tuple:
     return cost, cached, attempts[-1].get("status")
 
 
-def _indexed_session(row: Dict[str, Any]) -> Optional[Path]:
+def _indexed_session(row: Dict[str, Any], root: Path) -> Optional[Path]:
     for attempt in reversed(row.get("attempts") or []):
         if not attempt.get("path"):
             continue
-        found = sorted(Path(attempt["path"]).glob(_SESSION_GLOB))
+        found = sorted(_reroot(attempt["path"], root).glob(_SESSION_GLOB))
         if found:
             return found[-1]
     return None
@@ -342,7 +368,7 @@ def extract(run_name: str, ape_root: Path = DEFAULT_APE_ROOT,
             wave = str(row.get("group") or "") or None
             tier = None
             cost, cached, sample_status = _indexed_cost(row)
-            session = _indexed_session(row)
+            session = _indexed_session(row, root)
         else:
             wave, tier = _wave_and_tier(result_path)
             cost, cached, sample_status = _sample_cost(result_path)
