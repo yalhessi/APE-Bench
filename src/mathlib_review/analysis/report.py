@@ -481,8 +481,8 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     judge = audit_dir if audit_dir and audit_dir.is_dir() else None
 
     out = out or Path("results/overlays/pr_review_v5") / run_name
-    treatment = v4_paths.TREATMENTS / "systematic-opportunities-v3-medium"
-    executor = v4_paths.AUDITS / "phase10-medium-executor-v5"
+    treatment = v4_paths.V4_TREATMENTS / "systematic-opportunities-v3-medium"
+    executor = v4_paths.V4_AUDITS / "phase10-medium-executor-v5"
     built = build_overlay(
         release,
         treatment=treatment if treatment.is_dir() else None,
