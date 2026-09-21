@@ -166,6 +166,27 @@ paths:
   `success: true` was wrong however deep the session was, and it fixed a false promise in the
   `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
   the fix for a problem that was mostly not there.
+- **A gold-site silence is not evidence about an arm unless the ask was in that arm's remit
+  (2026-09-21).** "41 of 45 gold-site specialist silences reproduce under replay" was read for a
+  week as arms withholding findings, and a plan costed three interventions against it. Labelling
+  all 58 silent sessions against the ask each was silent about says otherwise: **37 are an arm
+  correctly quiet about somebody else's concern** (`duplication` at a rename, `naming` at "factor
+  out the repeated argument"), 17 are the right arm declining on stated grounds, and the three
+  mechanisms total four sessions. An on-concern arm was scheduled at **22 of 22** counted
+  obligations, so this is not a coverage gap either. `cli report silences` computes the remit test
+  (`registry.expected_concerns` bridged through `benches.gold_labels_for`); use it before reading
+  any silence count as a fact about a contract, and see
+  `docs/research/specialist-silences-2026-09.md`.
+- **The abstention *reason* is not the diagnosis; the detail is.** Replay produced a different
+  `abstention_reason` on 17 of 45 sessions with the outcome unchanged -- `already_correct` and
+  `could_not_establish` swap freely -- so any split built on the enum (including the 76%
+  `already_correct` figure that motivated the forcing experiment) is measuring a coin flip. Label
+  from `abstention_detail`, which now survives into replay outcome rows and into `report silences`.
+  `finalize` reads neither: it contains no occurrence of `abstention`.
+- **`naming_norm` counts leaf PREFIXES only** (`naming_norm.py:122`, `leaf.split("_", 1)[0]`), so a
+  convention expressed in a suffix is invisible to it at any threshold. PR 33421's gold ask renames
+  `round_eq'` to `round_eq_div`; both are prefix `round`. Separate from the unreachable 0.80 bar
+  already recorded in `docs/todo/specialist-arm-contents.md`.
 - **Control-PR emission is 0-1 per run, not 0.** Measured over every v5 run covering 33315:
   `heldout12_rep1` 0/13 invocations, `heldout11_rep1` 1/11 (generalist), `heldout11_rep2` 1/11
   (generalist), `medium_heldout_rep1` 0/13, `validate_abstention_rep1` 1/18 (docs). The "0 false
