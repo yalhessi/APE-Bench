@@ -743,6 +743,14 @@ async def collect_outcomes(task_dirs: Dict[str, Path], sources: List[ReplaySourc
             record = json.loads(drift_file.read_text()) if drift_file.is_file() else {}
             from_prefix = (record.get("prefix_sha256")
                            == payload[SESSION_REPLAY_KEY]["prefix_sha256"])
+            # Did the condition's own overrides reach the task? The payload says what was
+            # sent and the attempt's record says what the task held, so the comparison needs
+            # nothing new. `None` when the condition overrides nothing, which is every null.
+            overridden = payload[SESSION_REPLAY_KEY].get("overridden_keys") or []
+            seen = record.get("task_data_seen") or {}
+            arrived = (None if not overridden
+                       else all(key in seen and seen[key] == payload.get(key)
+                                for key in overridden))
             rows.append({
                 "invocation_id": source.invocation_id,
                 "arm_id": source.payload.get("arm_id"),
@@ -761,6 +769,13 @@ async def collect_outcomes(task_dirs: Dict[str, Path], sources: List[ReplaySourc
                                  if session is not None and from_prefix else None),
                     "accepted": accepted_summary(result),
                     "tool_drift": record.get("tool_drift"),
+                    # What the task held for each key the condition overrode, read off the
+                    # live task by the conversation manager. `{}` for a null condition, which
+                    # overrides nothing; a key here whose value is not what the condition set
+                    # means the condition did not arrive, and the run measured the null under
+                    # another name.
+                    "task_data_seen": record.get("task_data_seen") or {},
+                    "condition_arrived": arrived,
                 },
             })
     return rows
@@ -830,6 +845,18 @@ def replay_report(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
             f"{len(stray)} of {len(rows)} sample(s) did not start from their recorded prefix "
             f"(e.g. {stray[:3]}); they are ordinary runs of the task and their agreement with "
             "the recorded decision would measure a re-run, not a decision")
+
+    # The same refusal for the other half of a condition. A task-data override that did not
+    # arrive leaves a run that is a null wearing the condition's name, and its zero effect
+    # would be read as the condition having none -- which is exactly the $1.11 mistake this
+    # project has already made once, when a tool was added to the registry, never registered,
+    # and the paid run came back looking like "the new contract changed nothing".
+    lost = [row["invocation_id"] for row in rows
+            if (row["replay"] or {}).get("condition_arrived") is False]
+    if lost:
+        raise ReplayRefused(
+            f"{len(lost)} of {len(rows)} sample(s) ran without the condition's task-data "
+            f"override (e.g. {lost[:3]}); the run measured the null under another name")
 
     sessions = _by_session(rows)
     accepted = [row for row in rows if row["replay"]["accepted"] is not None]

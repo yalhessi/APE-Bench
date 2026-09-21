@@ -331,3 +331,62 @@ def test_a_scaffold_without_a_session_format_refuses_a_replay(monkeypatch):
             "task_data": {"task_type": "t", SESSION_REPLAY_KEY: {
                 "prefix_path": "p", "prefix_sha256": "0", "recorded_tool_sha256": {}}},
             "config": ApeAgentConfig().model_dump(mode="json"), "scaffold_type": "codex"}))
+
+
+def test_the_attempt_records_what_the_task_actually_held(tmp_path):
+    """A directive that travels in task data is asserted at the FAR end, not the near one.
+
+    This repository has paid for the difference once already: `execution_limits` was recorded
+    on the attempt and never bound the conversation, so every v5 arm ran at $1.00 against a
+    $0.30 cap, and a replay whose directive was dropped ran the task from its prompt and
+    produced submissions that looked exactly like replays. The unit test passed `task_data`
+    straight to the runtime and could not see the orchestrator drop it.
+
+    So the condition's own overrides are read back off the live task and written beside
+    `prefix_sha256`. `collect_outcomes` compares them with what was sent, and `replay_report`
+    refuses a run whose condition did not arrive -- otherwise it is a null under another name
+    and its zero effect reads as the condition having none.
+    """
+
+    condition = ReplayCondition(
+        name="ask_without_fix",
+        task_data_overrides={"submission_verification_policy": "verify_edits_if_present"})
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
+    payload, content = replay_task_data(
+        {"task_type": "t", "task_id": "x", "submission_verification_policy": "verify_checkable_edits"},
+        prefix, condition, tmp_path / "prefix.jsonl", {})
+    (tmp_path / "prefix.jsonl").write_bytes(content)
+
+    # Sent: merged into the payload, and the directive names the key it set.
+    assert payload["submission_verification_policy"] == "verify_edits_if_present"
+    replay = SessionReplay.model_validate(payload[SESSION_REPLAY_KEY])
+    assert replay.overridden_keys == ["submission_verification_policy"]
+
+    # Held: read off the task the runtime built, when it is shown its tools.
+    attempt = tmp_path / "attempt"
+    attempt.mkdir()
+    task = SimpleNamespace(
+        session_replay=replay, attempt_path=attempt, scratch_workspace=None,
+        data=SimpleNamespace(submission_verification_policy="verify_edits_if_present"))
+    manager = ApeAgentConversationManager(ApeAgentConfig(), task=task)
+    manager._replay_tool_definitions(recorded_tools(prefix))
+    record = json.loads((attempt / REPLAY_RECORD_FILENAME).read_text())
+    assert record["task_data_seen"] == {
+        "submission_verification_policy": "verify_edits_if_present"}
+
+    # And a task that did NOT receive it says so, rather than looking like any other replay.
+    dropped = tmp_path / "dropped"
+    dropped.mkdir()
+    stale = SimpleNamespace(
+        session_replay=replay, attempt_path=dropped, scratch_workspace=None,
+        data=SimpleNamespace(submission_verification_policy="verify_checkable_edits"))
+    ApeAgentConversationManager(ApeAgentConfig(), task=stale)._replay_tool_definitions(
+        recorded_tools(prefix))
+    assert json.loads((dropped / REPLAY_RECORD_FILENAME).read_text())["task_data_seen"] == {
+        "submission_verification_policy": "verify_checkable_edits"}
+
+    # A null overrides nothing, so there is nothing to have arrived.
+    null_payload, _ = replay_task_data({"task_type": "t", "task_id": "x"}, prefix,
+                                       ReplayCondition(name="null"), tmp_path / "n.jsonl", {})
+    assert SessionReplay.model_validate(
+        null_payload[SESSION_REPLAY_KEY]).overridden_keys == []

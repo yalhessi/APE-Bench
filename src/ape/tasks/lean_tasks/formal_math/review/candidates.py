@@ -33,7 +33,7 @@ class LeanPRReviewV4CandidateData(BasePRReviewData):
     rendered_user_prompt: str
     rendered_prompt_sha256: str
     submission_verification_policy: Literal[
-        "none", "verify_checkable_edits"
+        "none", "verify_checkable_edits", "verify_edits_if_present"
     ] = "none"
 
 
@@ -409,7 +409,8 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
 
         edit = candidate.get("proposed_edit")
         checkable = candidate.get("concern_family") in CHECKABLE_CONCERN_FAMILIES
-        if self.data.submission_verification_policy != "verify_checkable_edits":
+        policy = self.data.submission_verification_policy
+        if policy not in {"verify_checkable_edits", "verify_edits_if_present"}:
             return [], None
         # A coordinated fix earns its warrant as one thing: every touched file is compiled
         # and the candidate stands or falls on the whole result. It cannot fall back to the
@@ -419,7 +420,19 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         if candidate.get("patch_set"):
             artifacts, error = await self._verify_patch_set(candidate_ordinal, candidate)
             return artifacts, error
+        # The rule this policy exists to relax. Under `verify_checkable_edits` an arm that has
+        # the maintainer's answer and cannot make it compile must abstain: on the 2026-09-21
+        # read of the held-out run, that is what the largest group of in-remit gold-site
+        # silences says happened, including PR 33149, where the ask was "replace the
+        # axiomatized Parseval identity with the existing one", the arm found the existing
+        # lemma, and could not connect the PR's own setup to it. `verify_edits_if_present`
+        # still compiles every edit it is given and still refuses one that fails; what it
+        # allows is the unverified ask, which `finalize` admits as `diagnostic` and never
+        # publishes. It does not ask for more findings -- an empty submission stays exactly as
+        # cheap -- so the control-PR property is untouched by the rule itself.
         if checkable and edit is None:
+            if policy == "verify_edits_if_present":
+                return [], None
             return [], (
                 f"{candidate.get('concern_family')} candidates require a structured proposed_edit "
                 "under the verification-backed residual policy"
