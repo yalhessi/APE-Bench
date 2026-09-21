@@ -152,12 +152,17 @@ def scoped_obligations(run_name: str,
     generation side never touches it.
     """
 
-    agenda_path = run_dir(run_name) / "agenda.json"
-    if not agenda_path.is_file():
+    from src.mathlib_review.run_state import MissingArtifact, StageInput
+
+    try:
+        stage = StageInput.at(run_dir(run_name), run_name=run_name, allow_partial=True)
+        agenda = json.loads(stage.path("agenda").read_text())
+    except (MissingArtifact, FileNotFoundError):
         return None
-    agenda = json.loads(agenda_path.read_text())
     reviewed = {item["pr_number"] for item in agenda.get("proposals", [])}
-    judgments = Path(agenda["release"]) / "gold/judgments.jsonl"
+    if stage.release is None:
+        return None
+    judgments = stage.release / "gold/judgments.jsonl"
     if not judgments.is_file():
         return None
     # Count *eligible* obligations, not raw ones. The judge scores a filtered set — 40 of
@@ -420,8 +425,10 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     all line up. Two seams have to be bridged, and both are one-liners rather than reasons
     to fork a 1600-line renderer:
 
-    * The judge writes `semantic_matches.jsonl`; the overlay reads `matches.jsonl`. An
-      alias is created rather than a copy, so there is exactly one file of record.
+    * The judge writes `semantic_matches.jsonl` and v4 audits hold `matches.jsonl`; the
+      renderer reads whichever it finds, in that order. It used to be given an alias planted
+      inside the audit directory -- a read-only report writing into another stage's output,
+      which is the one thing an immutable artifact tree must not allow.
     * Output must not land inside a frozen root, or every render fails the FROZEN.lock gate.
       v5 overlays go to `results/overlays/pr_review_v5/`.
 
@@ -433,23 +440,17 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     from src.mathlib_review.analysis.review_overlay import build_overlay, write_overlay
     from src.mathlib_review.analysis.review_overlay import paths as v4_paths
 
-    directory = run_dir(run_name)
-    agenda_path = directory / "agenda.json"
-    if not agenda_path.is_file():
-        raise FileNotFoundError(
-            f"no agenda at {agenda_path}; the overlay needs the run's release and PR set."
-        )
-    agenda = json.loads(agenda_path.read_text())
-    release = Path(agenda["release"])
+    from src.mathlib_review.run_state import StageInput
+
+    # Read forensically: an overlay of a partial run is exactly what someone wants to look at
+    # when a run went wrong, and the page is not a measurement.
+    stage = StageInput.at(run_dir(run_name), run_name=run_name, allow_partial=True)
+    directory = stage.run_dir
+    agenda = json.loads(stage.path("agenda").read_text())
+    release = stage.release
     pr_numbers = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
 
-    judge = None
-    if audit_dir and audit_dir.is_dir():
-        alias = audit_dir / "matches.jsonl"
-        source = audit_dir / "semantic_matches.jsonl"
-        if source.is_file() and not alias.exists():
-            alias.symlink_to(source.name)
-        judge = audit_dir if alias.exists() else None
+    judge = audit_dir if audit_dir and audit_dir.is_dir() else None
 
     out = out or Path("results/overlays/pr_review_v5") / run_name
     treatment = v4_paths.TREATMENTS / "systematic-opportunities-v3-medium"
@@ -541,6 +542,8 @@ def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str
     for label, names in reps.items():
         loaded[label] = []
         for run_name in names:
+            # Derived the way `judge --of` derives it, so a condition cannot be paired with an
+            # audit that scored a different run.
             audit = derive_from_run(run_name)["out_dir"] / "semantic_report.json"
             if not audit.is_file():
                 raise SystemExit(
