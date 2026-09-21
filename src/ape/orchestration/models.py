@@ -593,6 +593,12 @@ class ChildRun(BaseModel):
     #: for the same reason `Attempt.result` is: `ape.tasks.base` imports this module, so naming
     #: `BaseTaskResult` here would be an import cycle.
     result: Optional[Any] = None
+    #: What the failure said, when a result was written and it was not a success. The worker
+    #: does write one for a task whose samples all failed -- a bare `BaseTaskResult` carrying
+    #: `All samples failed: [...]` -- and that sentence is the most specific thing anyone knows
+    #: about the child. It is kept here rather than in `result`, which stays reserved for a
+    #: legal submission so `succeeded` cannot quietly become "something was written".
+    error: Optional[str] = None
 
     @property
     def succeeded(self) -> bool:

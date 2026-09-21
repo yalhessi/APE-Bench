@@ -15,7 +15,7 @@ Nothing detected any of it, because from inside a resumed run looks exactly like
 from __future__ import annotations
 
 import json
-from dataclasses import asdict
+from dataclasses import asdict, fields
 from pathlib import Path
 
 import pytest
@@ -305,3 +305,76 @@ def test_a_journal_path_is_one_segment():
     assert "/" not in slug and ":" not in slug and "#" not in slug
     # Still distinguishes two episodes of the same PR.
     assert _slug("ep:x/y#33057#round1#aaa") != _slug("ep:x/y#33057#round2#aaa")
+
+
+def test_a_journal_written_by_an_earlier_run_still_replays():
+    """The journals in the tree are the compatibility contract.
+
+    `JobSpec` and `JobOutcome` are the wire records of a resume: `spec_row` writes every
+    non-payload field of the one and `SETTLED` writes `asdict` of the other, and `replay`
+    rebuilds both by filtering on `dataclasses.fields`. So a field removed from either makes a
+    committed journal rebuild into something quietly different, and a lead resumed against it
+    would re-dispatch work it had already paid for.
+
+    Read against the run's own `arm_pool.jsonl` when the worktree has one -- payloads are
+    rejoined from the pool by `invocation_id`, and the pool is gitignored, so without it the
+    rows can still be checked for shape but not rebuilt.
+    """
+
+    runs = sorted(Path("results/pr_review_v5/runs").glob("*/lead_journals/*.jsonl"))
+    if not runs:
+        pytest.skip("no committed lead journal in this tree")
+
+    rebuilt_any = False
+    for path in runs[:12]:
+        pool_path = path.parent.parent / "arm_pool.jsonl"
+        pool = {}
+        if pool_path.is_file():
+            for line in pool_path.read_text(encoding="utf-8").split("\n"):
+                if line.strip():
+                    row = json.loads(line)
+                    pool[row["invocation_id"]] = row
+
+        settled = [json.loads(line)["outcome"]
+                   for line in path.read_text(encoding="utf-8").split("\n")
+                   if line.strip() and json.loads(line).get("event") == journal.SETTLED]
+        state = journal.replay(str(path), _fresh_state(), pool=pool, spec_cls=JobSpec,
+                               outcome_cls=JobOutcome)
+        assert state["spend"] == pytest.approx(
+            sum(float(row.get("cost") or 0.0) for row in settled)), path
+        if pool and settled:
+            rebuilt_any = True
+            # Every settled row rebuilt into a real `JobOutcome`, not a subset that happened
+            # to survive the field filter.
+            assert set(state["outcomes"]) >= {row["invocation_id"] for row in settled}, path
+            for invocation_id, (outcome, spec) in state["outcomes"].items():
+                assert isinstance(outcome, JobOutcome) and isinstance(spec, JobSpec)
+                assert outcome.invocation_id == invocation_id
+    if not rebuilt_any:
+        pytest.skip("no committed journal had its arm pool linked into this tree")
+
+
+def test_every_journalled_field_is_still_a_field_of_its_dataclass():
+    """The narrow form of the same check, and it needs no pool: a key in a committed journal
+    row that the dataclass no longer declares is dropped by `replay`'s field filter, silently
+    and in exactly the way the filter exists to tolerate for the opposite case."""
+
+    journals = sorted(Path("results/pr_review_v5/runs").glob("*/lead_journals/*.jsonl"))
+    if not journals:
+        pytest.skip("no committed lead journal in this tree")
+
+    spec_fields = {item.name for item in fields(JobSpec)}
+    outcome_fields = {item.name for item in fields(JobOutcome)}
+    dropped = {"spec": set(), "outcome": set()}
+    for path in journals:
+        for line in path.read_text(encoding="utf-8").split("\n"):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            if row.get("event") == journal.WAVE_OPENED:
+                for spec_row in row.get("specs") or []:
+                    dropped["spec"] |= set(spec_row) - spec_fields
+            elif row.get("event") == journal.SETTLED:
+                dropped["outcome"] |= set(row.get("outcome") or {}) - outcome_fields
+    assert dropped == {"spec": set(), "outcome": set()}, (
+        f"committed journals carry fields these dataclasses no longer declare: {dropped}")

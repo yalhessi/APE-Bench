@@ -666,7 +666,9 @@ class ReviewLeadTask(BasePRReviewTask):
                 spec = spec_by_id[outcome.invocation_id]
                 state["outcomes"][outcome.invocation_id] = (outcome, spec)
                 state["spend"] += outcome.cost
-                if spec.disposition != "mandatory":
+                # The floor is exempt from the discretionary cap, and asking the spec rather
+                # than re-testing the disposition string keeps that rule in one place.
+                if spec.budget_scope == "discretionary":
                     state["delegated_spend"] += outcome.cost
                 journal.append(self.data.journal_path, {
                     "event": journal.SETTLED, "wave": state["wave"],
@@ -860,7 +862,7 @@ class ReviewLeadTask(BasePRReviewTask):
         # exhausted its budget counted as coverage, and the run reported no gaps at all.
         coverage_gaps: List[Dict[str, Any]] = []
         for invocation_id, (outcome, spec) in sorted(state["outcomes"].items()):
-            if spec.disposition != "mandatory" or outcome.status == "success":
+            if not spec.required or outcome.status == "success":
                 continue
             coverage_gaps.append({
                 "invocation_id": invocation_id,

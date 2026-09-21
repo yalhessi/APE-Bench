@@ -476,15 +476,15 @@ def test_comprehension_is_submitted_once(lead):
 def _record_outcome(task, invocation_id, *, disposition, status, error=None):
     """Put a finished job into the lead's state the way `delegate` would.
 
-    The real `JobOutcome`, not a `SimpleNamespace` shaped like one. A hand-built stand-in
-    cannot disagree with the class it stands in for, so it silently keeps passing while the
-    real dataclass grows a field the lead now reads -- and the same fixture pattern cost a
-    prebuild run earlier: a fake `BuildManager` built with `__new__` had an attribute set by
-    hand that the real class did not have.
+    Both halves are the real dataclasses. A hand-built stand-in cannot disagree with the class
+    it stands in for, so it keeps passing while the real one grows a field the lead reads --
+    and half of this fixture was a `SimpleNamespace` until the lead started asking the spec
+    whether it was `required` instead of re-testing its disposition string, at which point the
+    three tests that exercise exactly that line failed on the fake and not on the code. The
+    same pattern cost a prebuild run earlier, with a `BuildManager` built by `__new__`.
     """
 
-    from ape.tasks.lean_tasks.formal_math.review.delegation import JobOutcome
-    from types import SimpleNamespace
+    from ape.tasks.lean_tasks.formal_math.review.delegation import JobOutcome, JobSpec
 
     outcome = JobOutcome(
         invocation_id=invocation_id, arm_id=invocation_id.split("#")[-1],
@@ -494,10 +494,11 @@ def _record_outcome(task, invocation_id, *, disposition, status, error=None):
         budget_tier="standard", budget_cap=0.3, wall_seconds=1.0,
         token_usage=None, delivered_prompt_sha256="x",
     )
-    spec = SimpleNamespace(
-        invocation_id=invocation_id, proposal_id=invocation_id,
-        disposition=disposition, reason="", brief=None,
+    spec = JobSpec(
+        invocation_id=invocation_id, arm_id=invocation_id.split("#")[-1],
+        work_unit_id=invocation_id.split("#")[0], pr_number=1,
         payload={"rendered_prompt_sha256": "x"},
+        proposal_id=invocation_id, disposition=disposition, reason="",
     )
     task._state()["outcomes"][invocation_id] = (outcome, spec)
 

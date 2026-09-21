@@ -1,34 +1,34 @@
 """Spawn specialist subagents from inside a running task, and report what each one cost.
 
-The primitive already existed and was used twice, both hardcoded to one subtask type:
-`lean_semantic_evaluation` and `lean_review_gate` each build a subtask, point
-`runs_base_dir` at `<parent_attempt>/subtasks/`, run a nested `TaskOrchestrator`, and return
-`nested_token_usage`. This generalizes that shape so a *model* can drive it.
+This is the review family's use of the framework primitive (`ape.orchestration.subtasks`),
+not a second copy of it. It used to be a third convention: its own nested orchestrator, its own
+reader of what the children did, its own status vocabulary, its own cost aggregation -- and the
+accounting failures that voided two September runs were what that divergence cost. What is
+left here is what is genuinely the review family's: how a lead's job becomes a runnable spec,
+and how a finished child becomes a row in the delegation ledger.
 
-Three things here are not obvious and are load-bearing.
+Three things are still not obvious and are still load-bearing.
 
-**Budgets are grouped, not per-job.** `sample_max_cost` lives on `ExecutionConfig`, which is
-orchestrator-wide — there is no per-task cost cap. A tier is therefore not a knob on a job,
-it is the set a job is placed into: one nested orchestrator per tier, launched concurrently,
-each with its own cap.
+**A budget is per job, not per group.** Tiers existed as *groupings* only because
+`sample_max_cost` is orchestrator-wide, so varying a job's budget meant running it in its own
+orchestrator. `ExecutionLimits` travels on the payload and the worker reads it before building
+the attempt, so one wave runs a `cheap` job beside a `deep` one. `TIER_MULTIPLIERS` survives as
+the vocabulary the lead asks in.
 
-**Nested execution runs in-process.** `num_processes=0` selects the orchestrator's
-main-process async mode. The lead is itself very likely running inside a `SampleWorker`
-process, and spawning a multiprocessing pool from there is the obvious way to deadlock the
-run.
+**Nested execution runs in-process.** The lead is itself inside a `SampleWorker`, and spawning
+a multiprocessing pool from there is the obvious way to deadlock the run. The primitive's
+default of `num_processes=0` is what that is.
 
 **Every subtask keeps its own workspace overlay.** `_ensure_patched_target_workspace` unlinks
-the snapshot symlink, builds a lazy overlay in its place, and writes a patch marker that
-raises if a different patch is applied. Handing several concurrent subagents one path — each
-compiling into it via `lean_verify_edit` — corrupts the thing they are all reading. The
-overlay is lazy over the cached base snapshot, so isolation costs a symlink and a patch, not
-a rebuild; passing a materialized path between tasks would save little and break much.
+the snapshot symlink, builds a lazy overlay in its place, and writes a patch marker that raises
+if a different patch is applied. Handing several concurrent subagents one path -- each
+compiling into it via `lean_verify_edit` -- corrupts the thing they are all reading. Isolation
+is the primitive's directory derivation, and it is why that derivation is not negotiable.
 
 A paused job is reported as paused and is never silently retried at a higher tier. Budget
-exhaustion is a measurement about routing — the whole reason the trace exists — and quietly
+exhaustion is a measurement about routing -- the whole reason the trace exists -- and quietly
 buying more of it would erase the signal.
 """
-
 from __future__ import annotations
 
 import asyncio
@@ -40,6 +40,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
 from ape.orchestration.config import EarlyStopMode
+from ape.orchestration.models import ChildRun, ExecutionStatus, TaskExecutionSpec
+from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, run_subtasks
 
 #: Multipliers on the configured `standard` cap. Named tiers rather than free-form numbers
 #: so the lead cannot invent a budget, and so a run's cost policy is one number in config.
@@ -68,6 +70,42 @@ class JobSpec:
     brief_text: str = ""
     #: Serialized brief, for the ledger.
     brief: Optional[Dict[str, Any]] = None
+
+    @property
+    def required(self) -> bool:
+        """The coverage floor. A required job that does not succeed is a coverage gap, and a
+        coverage gap closes the run `partial` rather than complete."""
+
+        return self.disposition == "mandatory"
+
+    @property
+    def budget_scope(self) -> str:
+        """Which budget this job's spend is charged to.
+
+        The floor is exempt from the per-PR discretionary cap by design: charging coverage to
+        the routing allowance once left PR 33149 with a $10.05 floor against a $1.50 cap and
+        therefore zero specialists.
+        """
+
+        return "floor" if self.required else "discretionary"
+
+    def execution_spec(self, standard_cap: float) -> TaskExecutionSpec:
+        """This job as the framework describes a child: identity, payload, and its own ceiling.
+
+        The payload is the sealed arm prompt with the lead's brief composed onto it, which is
+        what the model actually reads -- and what `global_index` therefore hashes, so two
+        dispatches of one pair with different briefs are different tasks rather than a resume.
+        """
+
+        return TaskExecutionSpec(
+            spec_id=self.invocation_id,
+            task_type=self.payload.get("task_type", ""),
+            task_data=compose_prompt(self.payload, self.brief_text),
+            billed_cost_limit=round(
+                standard_cap * TIER_MULTIPLIERS.get(self.budget_tier, 1.0), 6),
+            required=self.required,
+            budget_scope=self.budget_scope,
+        )
 
 
 #: Appended to the arm's sealed user prompt at dispatch. The sealed plan vouches for the
@@ -113,6 +151,53 @@ class JobOutcome:
     #: `rendered_prompt_sha256` exactly when a brief was attached.
     delivered_prompt_sha256: Optional[str] = None
     error: Optional[str] = None
+
+    @classmethod
+    def from_run(cls, job: JobSpec, child: ChildRun, *, elapsed: float,
+                 delivered_prompt_sha256: str) -> "JobOutcome":
+        """One finished child as the ledger's row.
+
+        Everything here comes off the typed `ChildRun`: the result is the arm's own
+        `ReviewArmResult`, not a re-dumped dict read by key, and the outcome is built from what
+        the orchestrator persisted for the task that was scheduled -- so a job that paused on
+        its cap has a row with its spend on it instead of being absent.
+        """
+
+        result = child.result
+        candidates = list(getattr(result, "candidates", None) or [])
+        artifacts = list(getattr(result, "verification_artifacts", None) or [])
+        return cls(
+            invocation_id=job.invocation_id,
+            arm_id=job.arm_id,
+            work_unit_id=job.work_unit_id,
+            pr_number=job.pr_number,
+            budget_tier=job.budget_tier,
+            budget_cap=child.spec.billed_cost_limit,
+            status=ledger_status(child),
+            # This job's own span. The wave's elapsed time is the fallback only, and that case
+            # is now the exception rather than every row.
+            wall_seconds=round(float(child.outcome.wall_seconds or elapsed), 3),
+            cost=float(child.outcome.billed_cost or 0.0),
+            nominal_cost=float(child.outcome.nominal_cost or 0.0),
+            token_usage={
+                "billed_cost": float(child.outcome.billed_cost or 0.0),
+                "nominal_cost": float(child.outcome.nominal_cost or 0.0),
+                "turns": int(child.outcome.turns or 0),
+            },
+            candidates=candidates,
+            verification_artifacts=artifacts,
+            abstention=getattr(result, "abstention", None),
+            result_sha256=_digest(candidates) if candidates else None,
+            delivered_prompt_sha256=delivered_prompt_sha256,
+            # Say why. "no terminal submission" was recorded for a job that had actually
+            # exhausted its budget, which is the difference between an arm that declined to
+            # speak and one that was cut off -- and the two were read as the same thing.
+            error=(None if child.succeeded else str(
+                child.error
+                or child.outcome.reason
+                or f"{child.outcome.execution_status.value} (no terminal submission)"
+            )),
+        )
 
     def summary(self) -> Dict[str, Any]:
         """The compact view the lead sees: counts, cost, and each claim truncated.
@@ -170,245 +255,100 @@ def _digest(value: Any) -> str:
     ).hexdigest()
 
 
-def _wave_config(parent_task, wave: int):
-    """A scaffold config for one wave's nested orchestrator.
+#: The wave's execution policy. Two values, and both are deliberate.
+#:
+#: One attempt per job: best-of-n across arms is a different experiment, and running it by
+#: accident would make a routing comparison a sampling comparison. Early stop disabled as the
+#: ENUM member, not the string -- `ExecutionConfig` does not set `validate_assignment`, so
+#: assigning `"disabled"` stores a raw `str` that passes every `==` until `orchestrator.py`
+#: calls `.early_stop_mode.value` and raises, which killed every delegate call on the second
+#: smoke run.
+WAVE_EXECUTION = {"sample_count": 1, "early_stop_mode": EarlyStopMode.DISABLED}
 
-    One orchestrator per wave, not one per budget tier. Tiers existed as *groupings* only
-    because `sample_max_cost` is orchestrator-wide, so varying a job's budget meant running it
-    in its own orchestrator. Per-task limits (`ExecutionLimits`, read by the worker before it
-    builds the Attempt) removed that constraint, and with it three defects: unbounded
-    concurrency across tiers dispatched by `asyncio.gather`, an exception in one tier
-    discarding another tier's completed outcomes *and* their spend, and a directory depth that
-    the trajectory reader had to hardcode.
-
-    `TIER_MULTIPLIERS` survives as the vocabulary the lead uses to ask for a budget. Only the
-    grouping is gone.
-    """
-
-    from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, nested_config
-
-    return nested_config(
-        parent_task.attempt_path, parent_task.config, group=f"wave{wave}",
-        concurrency=DEFAULT_NESTED_CONCURRENCY,
-        # One attempt per job. Best-of-n across arms is a different experiment, and running it
-        # by accident would make a routing comparison a sampling comparison.
-        sample_count=1,
-        # The ENUM member, not the string: `ExecutionConfig` does not set
-        # `validate_assignment`, so assigning `"disabled"` stores a raw `str` that bypasses
-        # coercion. `EarlyStopMode` is a `str, Enum` so every `==` still passes and the defect
-        # is invisible until `orchestrator.py` calls `.early_stop_mode.value` and raises --
-        # which killed every delegate call on the second smoke run.
-        early_stop_mode=EarlyStopMode.DISABLED,
-    )
-
-
-async def _sample_facts(orchestrator, results) -> Dict[str, Dict[str, Any]]:
-    """Per-task status, cost, usage and duration, from what the orchestrator persisted.
-
-    Read from the per-task records rather than the returned results, because a job that failed
-    or paused has no result to read and those are exactly the rows the trace needs.
-
-    `task_outcome.json` is preferred when present: it is written for every scheduled task,
-    including the paused ones that produce no `task_result.json`, and it carries billed cost,
-    nominal cost, the job's own token usage, its own wall time, and a reason. Falling back to
-    the sample records keeps this working for runs made before that file existed.
-    """
-
-    from ape.orchestration.persistence import TaskStorage
-
-    facts: Dict[str, Dict[str, Any]] = {}
-    for result in results.task_results:
-        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
-        global_index = raw.get("global_index")
-        task_id = raw.get("task_id")
-        if not global_index or not task_id:
-            continue
-        task_dir = orchestrator.tasks_dir / str(global_index)
-
-        outcome_path = task_dir / "task_outcome.json"
-        if outcome_path.is_file():
-            try:
-                outcome = json.loads(outcome_path.read_text(encoding="utf-8"))
-            except Exception:  # noqa: BLE001
-                outcome = None
-            if outcome:
-                facts[task_id] = {
-                    "cost": float(outcome.get("billed_cost") or 0.0),
-                    "nominal_cost": float(outcome.get("nominal_cost") or 0.0),
-                    "status": _outcome_status(outcome),
-                    "reason": outcome.get("reason"),
-                    "wall_seconds": float(outcome.get("wall_seconds") or 0.0),
-                    "token_usage": _outcome_usage(outcome),
-                }
-                continue
-
-        storage = TaskStorage(task_dir, str(global_index))
-        samples = await storage.load_all_samples()
-        billed = nominal = wall = 0.0
-        status = None
-        for _index, sample in sorted(samples.items()):
-            billed += float(sample.get_accumulated_cached_cost() or 0.0)
-            nominal += float(sample.get_accumulated_cost() or 0.0)
-            for attempt in sample.attempts:
-                if attempt.started_at and attempt.completed_at:
-                    wall += (attempt.completed_at - attempt.started_at).total_seconds()
-            attempt = sample.current_attempt
-            if attempt is not None and attempt.status is not None:
-                status = str(getattr(attempt.status, "value", attempt.status))
-        facts[task_id] = {
-            "cost": billed, "nominal_cost": nominal, "status": status,
-            "reason": None, "wall_seconds": wall, "token_usage": None,
-        }
-    return facts
-
-
-def _outcome_status(outcome: Dict[str, Any]) -> Optional[str]:
-    """The sample-level status the ledger's vocabulary is built on.
-
-    `TaskOutcome.execution_status` is coarser than the ledger needs — it says `paused` without
-    saying paused on what — so the finest sample status is used when there is one.
-    """
-
-    for sample in reversed(outcome.get("samples") or []):
-        if sample.get("status"):
-            return str(sample["status"])
-    return str(outcome.get("execution_status") or "") or None
-
-
-def _outcome_usage(outcome: Dict[str, Any]) -> Dict[str, float]:
-    """This job's own cost figures, in the shape the ledger records."""
-
-    return {
-        "billed_cost": float(outcome.get("billed_cost") or 0.0),
-        "nominal_cost": float(outcome.get("nominal_cost") or 0.0),
-        "turns": int(outcome.get("turns") or 0),
-    }
-
-
-_STATUS_MAP = {
-    "SUCCESS": "success",
-    "PAUSED_COST_LIMIT": "paused_cost",
-    "PAUSED_MAX_TURNS": "paused_turns",
+#: Sample statuses, in the vocabulary the delegation ledger has always used. A status outside
+#: this map is `failed`: the ledger's job is to separate "declined" from "cut off", and an
+#: unrecognised state is neither.
+_LEDGER_STATUS = {
+    ExecutionStatus.SUCCESS: "success",
+    ExecutionStatus.PAUSED_COST_LIMIT: "paused_cost",
+    ExecutionStatus.PAUSED_MAX_TURNS: "paused_turns",
 }
 
 
-def _normalize_status(raw_status: Optional[str], succeeded: bool) -> str:
-    if succeeded:
+def ledger_status(child: ChildRun) -> str:
+    """How this job ended, in the ledger's four words.
+
+    Read off the typed sample status rather than off a string that had been round-tripped
+    through JSON and back -- the old reader took `str(status).rsplit(".")[-1].upper()` and
+    looked it up in a dict of spellings, which is a second vocabulary nothing checked against
+    the first.
+
+    The finest sample status wins, not `TaskOutcome.execution_status`: the outcome says
+    `paused` without saying paused on *what*, and "exhausted its budget" and "ran out of turns"
+    call for opposite responses.
+    """
+
+    if child.succeeded:
         return "success"
-    if not raw_status:
-        return "failed"
-    key = raw_status.rsplit(".", 1)[-1].upper()
-    return _STATUS_MAP.get(key, "failed")
+    for sample in reversed(child.outcome.samples or []):
+        if sample.status is not None:
+            return _LEDGER_STATUS.get(sample.status, "failed")
+    return "failed"
 
 
 async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
                    standard_cap: float, wave: int, logger) -> List[JobOutcome]:
-    """Run one wave's jobs in a single nested orchestrator, each with its own budget."""
+    """Run one wave's jobs as the lead's children, each with its own budget.
 
-    from ape.orchestration import execution_index
-    from ape.orchestration.models import EXECUTION_LIMITS_KEY
-    from ape.orchestration.orchestrator import TaskOrchestrator
-    from ape.tasks.base import create_task_from_data
+    One orchestrator per wave, not one per budget tier. Tiers were groupings only because
+    `sample_max_cost` is orchestrator-wide; per-task limits removed that constraint and with it
+    three defects -- unbounded concurrency across tiers dispatched by `asyncio.gather`, an
+    exception in one tier discarding another tier's completed outcomes *and* their spend, and a
+    directory depth the trajectory reader had to hardcode.
 
-    config = _wave_config(parent_task, wave)
-    caps = {
-        job.invocation_id: round(standard_cap * TIER_MULTIPLIERS.get(job.budget_tier, 1.0), 6)
-        for job in jobs
-    }
-    payloads = {}
-    for job in jobs:
-        payload = dict(compose_prompt(job.payload, job.brief_text))
-        # The job's own ceiling travels with it, so one orchestrator can run a `cheap` job
-        # beside a `deep` one without either being charged the other's budget.
-        payload[EXECUTION_LIMITS_KEY] = {"billed_cost_limit": caps[job.invocation_id]}
-        payloads[job.invocation_id] = payload
-    tasks = [
-        create_task_from_data(dict(payloads[job.invocation_id]), config,
-                              task_config_overrides=getattr(
-                                  parent_task.config, "task_config_overrides", None))
-        for job in jobs
-    ]
-    orchestrator_id = f"{parent_task.data.pr_number}_w{wave}"
+    Everything after `run_subtasks` returns derives from work that has already been paid for, so
+    none of it may raise: a failure there used to lose the whole wave, because `delegate`
+    catches, discards the outcomes and releases the reservations -- the arms ran, cost money and
+    left nothing (`pr5_smoke4_rep8`: $3.13 billed, $0.27 reported). The primitive keeps that
+    guarantee per child; this keeps it for the projection.
+    """
+
+    specs = [job.execution_spec(standard_cap) for job in jobs]
     logger.info("delegating %d job(s) in wave %d: %s",
                 len(jobs), wave,
-                ", ".join(f"{job.arm_id}@${caps[job.invocation_id]:.2f}" for job in jobs))
+                ", ".join(f"{job.arm_id}@${spec.billed_cost_limit:.2f}"
+                          for job, spec in zip(jobs, specs)))
 
     started = time.monotonic()
-    orchestrator = TaskOrchestrator(config=config, orchestrator_id=orchestrator_id, logger=logger)
-    results = await orchestrator.run(tasks)
+    runs, _results = await run_subtasks(
+        specs,
+        attempt_path=parent_task.attempt_path,
+        config=parent_task.config,
+        group=f"wave{wave}",
+        logger=logger,
+        concurrency=DEFAULT_NESTED_CONCURRENCY,
+        execution_overrides=WAVE_EXECUTION,
+        # Deterministic, and it has to be: the orchestrator fixes its directory from this in
+        # `__init__`, and a resumed lead must find the wave it already paid for.
+        orchestrator_id=f"{parent_task.data.pr_number}_w{wave}",
+        index_path=getattr(parent_task.data, "execution_index_path", None),
+        parent_id=getattr(parent_task.data, "episode_id", None),
+    )
     elapsed = time.monotonic() - started
 
-    # Where each invocation actually ran, written down rather than left to be inferred from
-    # the directory name later. See `ape/orchestration/execution_index.py`.
-    await execution_index.record(
-        getattr(parent_task.data, "execution_index_path", None),
-        orchestrator, results,
-        semantic_ids={payloads[job.invocation_id].get("task_id"): job.invocation_id
-                      for job in jobs},
-        group=f"wave{wave}",
-        parent=getattr(parent_task.data, "episode_id", None),
-    )
-
-    # Everything from here to the `return` derives from work that has already been paid for.
-    # A failure in any of it used to lose the whole wave: `delegate` catches, discards the
-    # outcomes and releases the reservations, so the arms ran, cost money, and left nothing.
-    # That is what happened on `pr5_smoke4_rep8` -- $3.13 billed spent, $0.27 reported.
-    #
-    # So cost attribution is allowed to fail without taking the results with it. A wave with
-    # no facts reports zero cost, which is wrong and visible; a wave that raises reports
-    # nothing at all, which is wrong and silent.
-    try:
-        facts = await _sample_facts(orchestrator, results)
-    except Exception:  # noqa: BLE001 - see above
-        logger.error("wave %d: cost attribution failed; the wave's results are kept and its "
-                     "costs will read as zero", wave, exc_info=True)
-        facts = {}
-
-    by_task_id = {}
-    for result in results.task_results:
-        raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
-        by_task_id[raw.get("task_id")] = raw
-
     outcomes = []
-    for job in jobs:
-        task_id = job.payload.get("task_id")
-        raw = by_task_id.get(task_id) or {}
-        fact = facts.get(task_id) or {}
-        succeeded = bool(raw.get("success"))
-        candidates = list(raw.get("candidates") or [])
-        artifacts = list(raw.get("verification_artifacts") or [])
-        outcomes.append(JobOutcome(
-            invocation_id=job.invocation_id,
-            arm_id=job.arm_id,
-            work_unit_id=job.work_unit_id,
-            pr_number=job.pr_number,
-            budget_tier=job.budget_tier,
-            budget_cap=caps[job.invocation_id],
-            status=_normalize_status(fact.get("status"), succeeded),
-            # This job's own span when the outcome recorded one. Falls back to the tier's
-            # elapsed only when it did not, and that case is now the exception rather than
-            # every row.
-            wall_seconds=round(float(fact.get("wall_seconds") or elapsed), 3),
-            cost=float(fact.get("cost") or 0.0),
-            nominal_cost=float(fact.get("nominal_cost") or 0.0),
-            token_usage=fact.get("token_usage"),
-            candidates=candidates,
-            verification_artifacts=artifacts,
-            abstention=raw.get("abstention"),
-            result_sha256=_digest(candidates) if candidates else None,
+    for job, spec in zip(jobs, specs):
+        child = runs.get(job.invocation_id)
+        if child is None:
+            # Cannot happen -- the primitive returns one run per spec -- but a missing row here
+            # would be a silently shorter ledger, which is the shape of defect this whole
+            # contract exists to refuse.
+            logger.error("wave %d: no child run came back for %s", wave, job.invocation_id)
+            continue
+        outcomes.append(JobOutcome.from_run(
+            job, child, elapsed=elapsed,
             delivered_prompt_sha256=hashlib.sha256(
-                (payloads[job.invocation_id].get("rendered_user_prompt") or "").encode()
-            ).hexdigest(),
-            # Say why. "no terminal submission" was recorded for a job that had actually
-            # exhausted its budget, which is the difference between an arm that declined to
-            # speak and one that was cut off — and the two were read as the same thing.
-            error=(None if succeeded else str(
-                raw.get("error")
-                or fact.get("reason")
-                or (f"{fact['status']} (no terminal submission)"
-                    if fact.get("status") else "no terminal submission")
-            )),
-        ))
+                (spec.task_data.get("rendered_user_prompt") or "").encode()).hexdigest()))
     return outcomes
 
 

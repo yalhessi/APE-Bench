@@ -215,6 +215,11 @@ async def collect_child_runs(
             raw_result = await storage.load_task_result()
             has_result = bool(raw_result and raw_result.get("success"))
             result = None
+            # A task whose samples all failed still gets a `task_result.json` -- a bare
+            # `BaseTaskResult` the worker synthesises with `All samples failed: [...]`. That is
+            # not a submission, so it is not `result`; its sentence is the best account of the
+            # failure anyone has, so it is not discarded either.
+            error = None if has_result else (raw_result or {}).get("error")
             if has_result:
                 try:
                     result = task.task_result_class.model_validate(raw_result)
@@ -241,9 +246,10 @@ async def collect_child_runs(
                 task_id=task.data.task_id, task_type=task.task_type, global_index=index,
                 execution_status=TaskExecutionStatus.FAILED, has_result=False,
                 reason=f"records unreadable: {error}")
-            result = None
+            result, error = None, f"records unreadable: {error}"
         runs[spec.spec_id] = ChildRun(
-            spec=spec, global_index=index, task_dir=str(task_dir), outcome=outcome, result=result)
+            spec=spec, global_index=index, task_dir=str(task_dir), outcome=outcome,
+            result=result, error=error)
     return runs
 
 

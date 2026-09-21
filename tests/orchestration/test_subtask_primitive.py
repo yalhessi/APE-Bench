@@ -230,7 +230,10 @@ def test_every_nested_call_site_uses_the_shared_convention():
     """The acceptance test for this being a primitive rather than a fourth convention.
 
     `TaskOrchestrator(` was constructed directly in four files. Three of them nest work, and
-    they had three different ideas of where children go. They now share one.
+    they had three different ideas of where children go, how to read what came back, and what
+    to call a job that paused. They now call `run_subtasks` and construct no orchestrator at
+    all -- which is the stronger statement, because sharing the directory helper while keeping
+    a private reader is exactly the state that lost a paused child in two of them.
     """
 
     from pathlib import Path
@@ -243,9 +246,18 @@ def test_every_nested_call_site_uses_the_shared_convention():
     }
     for name, path in sources.items():
         text = Path(path).read_text(encoding="utf-8")
-        assert "nested_config" in text, f"{name} does not use the shared convention"
+        assert "run_subtasks" in text or "nested_config" in text, (
+            f"{name} does not use the shared convention")
         # And none of them still hand-rolls the directory.
         assert 'parent_attempt_path / "subtasks"' not in text, name
+
+    # Fully migrated: no private orchestrator, no private reader of what the children did.
+    # `judgment` and `review_gate` follow; they share the directory helper today.
+    delegation = Path(sources["delegation"]).read_text(encoding="utf-8")
+    assert "run_subtasks" in delegation
+    assert "TaskOrchestrator(" not in delegation, (
+        "delegation constructs its own orchestrator again; the primitive exists so the layout, "
+        "the reader and the ledger vocabulary are not written a second time")
 
 
 def test_the_directory_is_the_one_genuine_invariant(tmp_path):
