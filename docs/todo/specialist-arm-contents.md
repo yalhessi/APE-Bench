@@ -34,6 +34,16 @@ above" and says every candidate must set one concern. Result corpus-wide: `famil
 tags have ever been emitted**, so the `OFF_CONCERN_TAG` diagnostic built to measure drift measures
 nothing, and the registry's long justification for the widened sets is inert.
 
+**`naming_norm` counts prefixes, and at least one gold ask is a suffix change** (added
+2026-09-21). `leaf_prefix` (`naming_norm.py:122-125`) is `leaf.split("_", 1)[0]`, so the counted
+population is over first tokens only. PR 33421's obligation is "rename `round_eq'` to
+`round_eq_div`" — both names have the prefix `round`, so the tool cannot distinguish them at any
+threshold, and the arm duly reported `insufficient_evidence`. This is structural and separate from
+the bar below: lowering `MIN_SUPPORT_RATIO` does not make a prefix oracle see a suffix convention.
+Both `evidence_gap` labels in the 2026-09-21 silence read name this tool
+(`docs/research/specialist-silences-2026-09.md`). Free to check how many naming golds are
+suffix-shaped before deciding whether the operator should count segments rather than prefixes.
+
 **`naming` is the most precise specialist and is throttled by an unreachable bar.** 10 issue-matches
 from 29 findings (34%) — four times the generalist's per-finding rate — but it submits on 4 of 75
 lead invocations (5%). `naming_norm` requires `support >= 20` **and** `support/members >= 0.80`

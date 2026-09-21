@@ -1,12 +1,17 @@
 # Improving the specialist arms, given that their silence is stable
 
-**Status** — in progress; the interventions below were reviewed against the artifacts on
-2026-09-21 and **five of them did not survive it** — see *Corrections* at the foot of this file, and
-`docs/plans/2026-09-21-specialist-silences.md` for the plan that replaces the ordering here
-**Cost** — $0 to diagnose; ~$3.30 per contract condition (the $2.60 omitted the control population);
-a whole-task replay cannot test a new tool or a changed prompt at all
-**Owner question** — the arms are silent at 41 of 45 gold sites *every time*; which of the
-mechanisms behind that silence is worth paying to fix?
+**Status** — **closed 2026-09-21, unfunded.** Step 0 ran (free) and none of the three mechanisms
+clears its gate: labelling all 58 silent gold-site sessions gives **0** advisory-suppressed, **0**
+cross-unit and **1** blocked-by-the-compiling-edit-rule, against **37** wrong-arm-correctly-quiet
+and **17** right-arm-disagrees. Result: `docs/research/specialist-silences-2026-09.md`. Plan and
+instrument: `docs/plans/2026-09-21-specialist-silences.md`. The routing half moved to
+[routing-remit-and-silence.md](routing-remit-and-silence.md); what is left of this one is the
+judgement residue, which no contract change reaches
+**Cost** — $0 spent. The conditions were built and priced ($2.66 gold-site + $0.07 control, cached)
+and are not worth running on this population
+**Owner question** — *answered*: none of them, on the evidence available. The arms are silent at
+41 of 45 gold sites every time because they were mostly the wrong arms, and where they were the
+right arm they mostly disagreed.
 
 ## Motivating result
 
@@ -144,3 +149,38 @@ And because 17 of 45 abstention *labels* swap under replay, **step 0 labels from
 not from the reason enum**; `replay_outcomes.jsonl` does not carry `abstention_detail` (fixed
 forward), so the replayed texts are in the attempt session files under
 `.claude/worktrees/decision-replay/.ape/runs/…`.
+
+## Closed, 2026-09-21 — what step 0 returned
+
+Full account in `docs/research/specialist-silences-2026-09.md`; the store is
+`results/pr_review_v5/adjudications/silence_labels.jsonl` and the instrument is
+`cli report silences`. Of **58** distinct silent sessions at gold sites:
+
+| label | sessions | |
+|---|---|---|
+| `off_concern` | 37 | correct silence; a routing question, now its own todo |
+| `disagreement` | 17 | the right arm declined the ask on stated grounds |
+| `evidence_gap` | 2 | both `naming_norm` |
+| `decision_noise` | 2 | includes 33337, which the replay files 3/3 |
+| `fix_required` | **1** | one `duplication` session on 33149 |
+| `knowledge_gap` | 1 | |
+| `advisory_suppressed` / `cross_unit` | **0** / **0** | |
+
+So mechanism 2 (advisory verdicts becoming silence) and mechanism 1 (seen and unfileable at this
+grain) have **no instance in this population**, and mechanism 3 has two, both in one tool. The
+mechanism this file's corrections added — the contract refusing a claim with no compiling edit —
+has one, and it is PR 33149's axioms again.
+
+An adversarial second reader overturned 7 of the 13 repairable labels it was shown, taking
+`fix_required` from 6 sessions to 1; it was told to default to refuting, so **1 is a lower bound
+and 6 is the ceiling**. Even at the ceiling this is one PR and two arms.
+
+**What would reopen it.** The same read on `v2_rep2` and `v2_rep3` — free, and the only thing that
+would turn any of these counts into a rate. A population drawn from somewhere other than gold-site
+silences (what arms *file*, the generalist, the off-gold ~90%). Or a whole-task replay
+(`--cut turn=1`), which re-samples the investigation and could move a `disagreement`, where a
+decision-turn replay cannot.
+
+**What is still live and is not this todo.** The judgement residue: 17 sessions where the right arm
+looked at the maintainer's ask and said no. That is a capability and evidence question, and the
+contract, the tools and the prompts do not reach it.

@@ -131,7 +131,10 @@ def test_the_report_puts_each_label_on_its_silence(tmp_path):
 
     from src.mathlib_review.analysis.report import silences
 
-    plain = silences(RUN)
+    # Its own empty store, never the real one: a test that reads the production store passes or
+    # fails on what somebody labelled last week.
+    empty = tmp_path / "empty.jsonl"
+    plain = silences(RUN, labels=empty)
     assert plain["silent_cells"] == 76 and plain["labelled"] == 0
 
     target = next(row for row in plain["rows"] if row["on_concern"])
@@ -153,14 +156,14 @@ def test_the_report_puts_each_label_on_its_silence(tmp_path):
 
 
 @runs_exist
-def test_the_report_separates_the_arms_remit_from_the_arms_decision():
+def test_the_report_separates_the_arms_remit_from_the_arms_decision(tmp_path):
     """The headline the instrument exists to produce, and the correction it forced: most
     gold-site silence is the wrong arm being correctly quiet. A contract change reaches the
     on-concern ones only, and there are 13 of them here, not 76."""
 
     from src.mathlib_review.analysis.report import silences
 
-    payload = silences(RUN)
+    payload = silences(RUN, labels=tmp_path / "empty.jsonl")
     assert payload["on_concern_cells"] == 13
     assert payload["off_concern_cells"] == 53
     assert payload["remitless_cells"] == 10       # the generalist, which has no remit
@@ -183,3 +186,46 @@ def test_a_label_is_not_gold_and_the_report_says_so():
         pytest.skip("the held-out reps are not in this tree")
     assert "never enters recall" in payload["note"]
     assert "routing, not the contract" in payload["note"]
+
+
+@runs_exist
+def test_the_labelled_corpus_says_what_it_says():
+    """The step-0 result, pinned against the committed store so a later change to the report
+    or the remit bridge cannot quietly restate it.
+
+    The finding is that gold-site silence is mostly not a thing an intervention repairs: of 58
+    distinct silent sessions, 37 are an arm correctly quiet about somebody else's concern and
+    17 are the right arm declining on stated grounds. The three mechanisms the interventions
+    in `docs/todo/specialist-abstention-interventions.md` were costed against total four
+    sessions between them, and two of the three have none at all.
+    """
+
+    from src.mathlib_review.analysis.report import silences
+
+    payload = silences(RUN)
+    if not payload["labelled"]:
+        pytest.skip("the silence-label store is not in this tree")
+
+    assert payload["labelled"] == payload["silent_cells"] == 76
+    assert payload["by_label"] == {
+        "off_concern": 50, "disagreement": 19, "evidence_gap": 2,
+        "decision_noise": 2, "fix_required": 2, "knowledge_gap": 1}
+    # Neither mechanism that motivated a contract condition has a single instance here.
+    assert "advisory_suppressed" not in payload["by_label"]
+    assert "cross_unit" not in payload["by_label"]
+
+    # Cells are not sessions: the one `fix_required` session is PR 33149's duplication arm,
+    # counted against both of that PR's "remove the axioms" obligations.
+    by_label_sessions = {}
+    for row in payload["rows"]:
+        by_label_sessions.setdefault(row["label"], set()).add(row["invocation_id"])
+    assert len(by_label_sessions["fix_required"]) == 1
+    assert {row["pr_number"] for row in payload["rows"]
+            if row["label"] == "fix_required"} == {33149}
+
+    # Both evidence gaps name one tool, which is what makes them worth a code check.
+    assert {row["evidence_gap_tool"] for row in payload["rows"]
+            if row["label"] == "evidence_gap"} == {"naming_norm"}
+
+    # Seven cells where the reader and its adversary disagreed, kept as disagreement.
+    assert len(payload["contested_keys"]) == 7
