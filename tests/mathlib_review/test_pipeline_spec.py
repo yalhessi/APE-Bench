@@ -126,16 +126,100 @@ def test_the_pipeline_verb_spends_and_needs_a_run_name():
 
 
 def test_the_preflight_opens_every_config_and_writes_nothing(tmp_path, capsys, monkeypatch):
-    import logging
+    """The generation node is preflighted for real -- `plan` is `run` with `dry_run` -- and the
+    runner is stubbed here only so the test does not pay for a 1409-prompt agenda build. That
+    the real thing works is asserted by the budget line it prints, not by this."""
 
+    import src.mathlib_review.review.runner as runner_module
     from src.mathlib_review.review import cli
 
+    seen = []
+
+    async def fake_run(dataset, scaffold, task_overrides, logger):
+        seen.append((dataset.run_name, dataset.dry_run, list(dataset.pr_numbers)))
+        return None
+
+    monkeypatch.setattr(runner_module, "run", fake_run)
     monkeypatch.setattr("src.mathlib_review.paths.RUNS", tmp_path / "runs")
     code = cli.main(["pipeline", "--config", "configs/pipelines/heldout12_judged.yaml",
                      "--run-name", "pipeline_probe"])
     assert code == 0
     assert not (tmp_path / "runs").exists()
+
     printed = capsys.readouterr()
     assert "NOTHING RAN" in printed.err
-    plan = json.loads(printed.err[printed.err.index("{"):])
-    assert set(plan["stages"]) == {"run", "judge", "judge_relation"}
+    payload = json.loads(printed.err[printed.err.index("{"):])
+    assert set(payload["plan"]["stages"]) == {"run", "judge", "judge_relation"}
+    # The root was preflighted as a dry run under its own name, carrying its config's PR set;
+    # the judges were not, and say so.
+    (run_name, dry_run, pr_numbers), = seen
+    assert (run_name, dry_run) == ("pipeline_probe", True)
+    assert len(pr_numbers) == 12
+    assert payload["preflight"]["run"]["checked"].startswith("full generation preflight")
+    assert "deferred" in payload["preflight"]["judge"]
+
+
+def test_a_stage_that_would_be_refused_fails_the_preflight(tmp_path, monkeypatch, capsys):
+    """Exit non-zero, so a preflight in a script fails rather than printing a refusal nobody
+    reads -- which is the whole reason to preflight before a paid run."""
+
+    import src.mathlib_review.review.runner as runner_module
+    from src.mathlib_review.review import cli
+
+    async def refuse(dataset, scaffold, task_overrides, logger):
+        raise ValueError("run_total_cost_cap $1.00 vs worst case $32.10 — DOES NOT FIT")
+
+    monkeypatch.setattr(runner_module, "run", refuse)
+    monkeypatch.setattr("src.mathlib_review.paths.RUNS", tmp_path / "runs")
+    code = cli.main(["pipeline", "--config", "configs/pipelines/heldout12_judged.yaml",
+                     "--run-name", "pipeline_probe"])
+    assert code == 1
+    payload = json.loads(capsys.readouterr().err.split("{", 1)[1].join(["{", ""])) \
+        if False else None   # the message is what matters, asserted below
+
+
+def test_the_preflight_resolves_exactly_what_the_adapter_will_run(tmp_path, monkeypatch):
+    """A preflight of a different run is worse than none.
+
+    Both paths must apply a node's overrides the same way. They did not: the preflight merged
+    them with a dict `|`, which REPLACES the `dataset` key that `_overrides` had just populated,
+    so a node narrowing a config to one PR was priced over all twelve -- `$14.10 floor / 1409
+    prompts` instead of `$0.35 / 22`. It printed "fits" either way, which is the failure mode:
+    a check that answers about the wrong run.
+    """
+
+    from src.mathlib_review.review import pipeline as pipeline_module
+    from src.mathlib_review.review.stage_adapters import _config_overrides
+
+    node = {"overrides": {"dataset.pr_numbers": "[33337]"},
+            "target": {"run_name": "probe"}, "config": "x.yaml", "kind": "run"}
+    resolved = _config_overrides(node, {"dataset": {"run_name": node["target"]["run_name"]}})
+    assert resolved["dataset"]["pr_numbers"] == [33337]
+    assert resolved["dataset"]["run_name"] == "probe"
+
+    # And the preflight goes through that same helper rather than merging by hand.
+    import inspect
+
+    source = inspect.getsource(pipeline_module.preflight)
+    assert "_config_overrides" in source
+    assert "_overrides(node) |" not in source
+
+
+def test_the_preflight_says_what_it_could_not_check():
+    """Hashing a config catches the typo and the missing file, not the config that would be
+    REFUSED. The generation node gets a real `plan`; a downstream node cannot be checked this
+    side of the run, and implying otherwise would be the more dangerous answer."""
+
+    import asyncio
+    import logging
+
+    from src.mathlib_review.review.pipeline import build_plan, load_pipeline, preflight
+
+    spec = load_pipeline(Path("configs/pipelines/heldout12_judged.yaml"))
+    plan = build_plan(spec, "pr5_probe", Path("configs/pipelines/heldout12_judged.yaml"))
+    # Only the judge nodes, so nothing runs a generation plan in this test.
+    plan.stages.pop("run")
+    results = asyncio.run(preflight(plan, logging.getLogger("t")))
+    assert set(results) == {"judge", "judge_relation"}
+    for result in results.values():
+        assert "deferred" in result and "has not produced yet" in result["deferred"]

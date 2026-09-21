@@ -163,14 +163,66 @@ def _nodes(plan: PipelinePlan) -> List[StageNode]:
     return [StageNode(name, tuple(node["needs"])) for name, node in sorted(plan.stages.items())]
 
 
+async def preflight(plan: PipelinePlan, logger) -> Dict[str, Any]:
+    """Run what each node can check before anything has happened, and say what it cannot.
+
+    Hashing every config catches the typo and the missing file. It does not catch the config
+    that would be REFUSED -- a budget that cannot fit its own coverage floor, an episode with no
+    reviewed workspace, a set whose retrieval cutoffs do not resolve. Those refusals are the
+    generation stage's own, and they are free: `plan` is `run` with `dry_run`, so the root node
+    is preflighted exactly the way `cli plan` preflights it.
+
+    A downstream node cannot be preflighted this side of the run, and saying so is the honest
+    answer rather than implying a check happened. `judge` refuses a partial source run, a
+    second judge identity in one audit, and a PR the run never reviewed -- every one of those
+    reads artifacts that do not exist yet. What IS checked for it here is that its config loads
+    and its paths derive, which `build_plan` did.
+    """
+
+    results: Dict[str, Any] = {}
+    for name in sorted(plan.stages):
+        node = plan.stages[name]
+        if node["kind"] != "run":
+            results[name] = {
+                "checked": "config loads, paths derive",
+                "deferred": ("this stage's own refusals read artifacts the root run has not "
+                             "produced yet"),
+            }
+            continue
+        try:
+            from src.mathlib_review.review.runner import load_run, run as run_generation
+
+            from src.mathlib_review.review.stage_adapters import _config_overrides
+
+            # Through the adapter's own merge, not a dict `|`: `_overrides(node)` already puts
+            # the node's settings under `dataset`, and a shallow merge REPLACES that key --
+            # which silently priced all twelve PRs for a config whose node narrows it to one.
+            # The preflight must resolve exactly what the adapter will run, or it is a check on
+            # a different run.
+            dataset, scaffold, task_overrides = load_run(
+                Path(node["config"]),
+                _config_overrides(node, {"dataset": {"run_name": node["target"]["run_name"]}}))
+            dataset.dry_run = True
+            await run_generation(dataset, scaffold, task_overrides, logger)
+            results[name] = {"checked": "full generation preflight (plan)"}
+        except Exception as error:  # noqa: BLE001 - a refusal here is the answer, not a crash
+            logger.error("stage %s would be refused: %s", name, error)
+            results[name] = {"refused": str(error)}
+    refused = sorted(key for key, value in results.items() if "refused" in value)
+    if refused:
+        logger.error("PIPELINE WOULD NOT START: %s", ", ".join(refused))
+    return results
+
+
 async def run(spec: PipelineSpec, root_run: str, config_path: Path, logger, *,
               execute: bool) -> Dict[str, Any]:
     """Preflight the whole graph, and with `execute`, run it.
 
     Without `execute` nothing is written and no model is called: the graph is resolved, every
-    node's config is opened and hashed, and the plan is printed. That is the same rule every
-    other verb here follows, and it matters more rather than less for a pipeline -- the cost of
-    discovering a bad judge config after the generation run is the generation run.
+    node's config is opened and hashed, each node that can be preflighted is, and the plan is
+    printed. That is the same rule every other verb here follows, and it matters more rather
+    than less for a pipeline -- the cost of discovering a bad generation config after the
+    generation run is the generation run.
     """
 
     plan = build_plan(spec, root_run, config_path)
@@ -182,7 +234,8 @@ async def run(spec: PipelineSpec, root_run: str, config_path: Path, logger, *,
                     ",".join(node["needs"]) or "-", json.dumps(node["target"]))
 
     if not execute:
-        return {"plan": plan.model_dump(mode="json"), "ran": False}
+        return {"plan": plan.model_dump(mode="json"), "ran": False,
+                "preflight": await preflight(plan, logger)}
 
     out = run_dir(root_run)
     out.mkdir(parents=True, exist_ok=True)
