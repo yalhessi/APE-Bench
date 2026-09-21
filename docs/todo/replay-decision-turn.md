@@ -1,7 +1,11 @@
 # Decision-turn replay — test a change to what an arm decides without re-running what it investigated
 
-**Status** — open; **prioritised by the user 2026-09-15** ("worth adding to our system asap")
-**Cost** — code; then one cached-prefix turn per replayed session instead of a whole rep
+**Status** — **built; closing diagnostic run 2026-09-21** (`docs/research/decision-replay-gold-abstentions-2026-09.md`: 41 of 45 gold-site specialist silences are stable, $1.97). Remaining: one swapped condition against that null (branch `decision-replay`, 2026-09-15); prioritised by the user 2026-09-15
+**Cost** — measured at preflight, and a function of where the cut is. On v2_rep1 at 3 samples,
+billed if uncached: **$37.20** from the first submission (319 sessions), **$30.44** from the last
+turn (320), **$91.12** replaying each task from its prompt (320). The stage re-sampled from the
+first-submission cut is $4.87 billed / $12.40 nominal per sample — see "Built" below, which
+corrects the cost argument in the motivating example
 **Owner question** — how cheaply, and with how little noise, can a decision-stage change be measured?
 
 ## Motivating example
@@ -59,11 +63,108 @@ filter precision), so the replay decides it for this model rather than either pa
 `model_confidence` in a way that does not come back null (null on every forced finding); the
 per-target disposition from `batching-work-units` follow-ups.
 
+## Built (2026-09-15) — and where it departs from the design above
+
+- **Replay is a way to run a task, not a task** (the user's correction, mid-build). A first cut
+  subclassed the arm task; replaced by a `session_replay` task-data key, carried like
+  `execution_limits`, attached at the runtime boundary and honoured by the ape_agent conversation
+  manager (`src/ape/scaffolds/ape_agent/replay.py`). The replayed task keeps its type and id, so
+  any task family can be replayed and a replayed arm's results are ordinary arm results. Only the
+  cut point and the submission summary are review code (`src/mathlib_review/review/replay.py`).
+- **The cut is a parameter, not a policy** (the user's second correction). `CutPoint` names any
+  point in a recording — an assistant turn from either end (`turn=-1`, `turn=1`), a raw node index,
+  or a tool call — resolved per session, and refused per session when it cannot resolve or would
+  land inside a turn. The decision turn is one choice of cut, not what the system is. One task
+  identity per session means **one cut per run**, so the run name carries the cut label, and
+  `report replay --against` states whether it compared conditions (same cut) or cuts (same
+  condition). Measured on v2_rep1: `turn=-1` and `tool=submit_candidates:last` are the same 320
+  sessions; `node=7` lands mid-turn in 232 of them, which is why a node index is the last resort.
+- **Within the decision-turn cut it is the *first* `submit_candidates`, not the terminal one**
+  (step 2 above). 26 / 31 / 28 of the 321 / 316 / 322 v2 sessions had a first submission refused
+  and repaired; the task counts refusals on its instance and a replayed instance starts at zero,
+  so only a prefix with no submission agrees with the live contract. Repairs are re-sampled with
+  the decision.
+- **The cost argument was overstated.** "One cached-prefix turn instead of a whole rep" is true
+  of turns, not dollars: the decision turn carries the whole investigation as input, so the
+  recorded decision stage is ~38% of arm billed spend per sample ($4.87 of $12.83 on v2_rep1) and
+  nearer all of it uncached. What replay buys is **the investigation held fixed** — the noise
+  argument — plus wall clock and selectability (one arm, one PR), not an order of magnitude.
+- Also built on the way: a per-task `execution_limits.max_turns` was recorded on the Attempt and
+  never bound the conversation (`d329b13`); arm pools were invisible in worktrees
+  (`.claude/worktree-setup.sh` now links them).
+- **Not built:** feeding replayed candidates through finalize and the judge (step 6's second
+  half). Outcomes are compared at the submission level only — filed/abstained, abstention reason,
+  anchors, candidate keys — which needs no judge and no gold.
+
+Run it (preflight without `--execute`; `--cut turn=N|node=I|tool=NAME[:first|:last|:N]`
+replaces the config's cut, while `--set dataset.cut=` deep-merges and leaves two spellings,
+which is refused):
+
+```
+R="ape/bin/python -m src.mathlib_review.review.cli"
+$R replay --config configs/v5_replay.yaml --of pr5_A_lead_heldout12_v2_rep1 \
+    --run-name pr5_replay_null_first_submit_candidates_v2_rep1 --execute
+$R replay --config configs/v5_replay.yaml --of pr5_A_lead_heldout12_v2_rep1 --cut turn=-1 \
+    --run-name pr5_replay_null_last_turn_v2_rep1 --execute
+$R report replay --run pr5_replay_null_first_submit_candidates_v2_rep1
+$R report replay --run <condition run> --against pr5_replay_null_first_submit_candidates_v2_rep1
+```
+
 ## What would close it
 
-A replay run on `pr5_A_lead_heldout12_v2_rep1` that (a) reproduces the original submission when
-nothing is swapped — the null replay, at a rate that sets its own noise floor — and (b) reports one
-swapped condition against it. Without (a), no replay difference can be read.
+**Revised 2026-09-21, after the user refused the price.** The original condition was a null
+replay of all 319 sessions, quoted at $37.20. Two things were wrong with it. The figure was the
+*uncached* price: the case-study run measured billed/nominal = **0.48** (samples of one prefix
+run back-to-back hit the provider cache), so it is ~$15-18 billed. And a standalone null buys
+almost nothing — a condition experiment carries its own control on the same prefixes, and a
+noise floor paid for today is only reusable while the model, the code and the session set stand
+still, which this project already treats as a new-run-name event. Most of that $18 covered
+sessions where nothing is contested: the generalist is 203 of 319 sessions and 69% of the cost,
+and PR 33149 alone is 53%.
+
+So the closing condition is the measurement that changes what we fund next:
+
+**The diagnostic — $2.59 billed.** The 45 specialist invocations whose work unit carries a
+*required gold* change and that abstained in `pr5_A_lead_heldout12_v2_rep1`, replayed at the
+first-submission cut, 3 samples each under `null` (nominal $5.40; 0.48 cache ratio measured).
+Every one is a site where a maintainer asked for something, an arm looked, and it said nothing.
+The run splits them into
+
+* **decision-limited** — some sample files instead of abstaining, so a bar, forcing or
+  elicitation change can recover it (the `naming` 33337 session: the gold rename, 2 of 5); and
+* **contract-limited** — every sample abstains identically, so no decision-stage change touches
+  it, only a contract, prompt or investigation change (the `correctness` 33149 session on the
+  axioms file: 5 of 5, established for $0.02).
+
+At 3 samples the decision-limited fraction is a **lower bound** (a session that flips one time
+in five is caught about half the time), which is the safe direction for deciding what to fund.
+It measures *instability*, not recall: whether a flip produces the maintainer's ask needs the
+judge or a hand read.
+
+**Then, per condition, ~$5.20:** the condition and its null on those same 45 prefixes, run in
+one window so both see the same code and the same cache, against $14.50 for two full reps plus
+judge noise.
+
+Priced from the recorded decision stages, billed at the measured 0.48 ratio, 3 samples:
+
+| population | sessions | billed |
+|---|---|---|
+| everything (the old condition) | 319 | $17.85 |
+| specialists only | 116 | $5.54 |
+| **specialists at gold sites that abstained** | **45** | **$2.59** |
+| specialists at gold sites (incl. the 10 that filed) | 55 | $3.16 |
+| cross-rep unstable specialists (biased subset) | 23 | $1.14 |
+
+Free before any of it: across the three v2 reps, **23 of 89** specialist invocations flip
+filed/abstained — an *upper* bound on decision instability, since it also contains investigation
+variance. The diagnostic says how much of that is the decision alone, at the sites where a flip
+would change recall.
+
+**What the cheap version gives up**, stated so a later reader does not overclaim: no run-level
+recall number, no judge, and a floor measured only on abstaining specialists at gold sites — a
+condition aimed at filing behaviour or at the generalist needs its control drawn from that
+population instead. Gold-based selection is in-sample, which is fine for a diagnostic and is not
+a precision claim.
 
 ## Evidence
 

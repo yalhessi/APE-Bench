@@ -179,6 +179,9 @@ class BaseTask:
         target_workspace: Target workspace (optional)
         reference_workspaces: Reference workspaces (optional)
         logger: Logger instance (set during setup)
+        session_replay: A `SessionReplay` directive when this attempt starts from a recorded
+            conversation rather than from its prompt; set at the runtime boundary from the
+            task data's `session_replay` key, never by the task (scaffolds/ape_agent/replay.py)
     """
 
     # Class variables to be defined by subclasses
@@ -204,6 +207,11 @@ class BaseTask:
         self.logger: Optional['logging.LoggerAdapter'] = None
         self.termination_callback: Optional[Callable[['BaseTaskResult'], Awaitable[None]]] = None
         self.progress_callback: Optional[Callable[[str], Any]] = None
+        self.session_replay = None
+        #: The dict this task was built from, when it was built from one. Kept because
+        #: `BaseTaskData` ignores keys it does not declare, so a reserved run-level key --
+        #: `execution_limits`, `session_replay` -- exists only here after validation.
+        self.payload: Optional[Dict[str, Any]] = None
 
         if self.data.task_type != self.task_type:
             raise ValueError(
@@ -218,6 +226,23 @@ class BaseTask:
         result = self.progress_callback(message)
         if inspect.isawaitable(result):
             await result
+
+    def job_data(self) -> Dict[str, Any]:
+        """What the orchestrator hands the worker for this task.
+
+        The validated model's dump, plus any key the model ignored. Reserved run-level keys
+        travel in the payload rather than in the task's own schema -- they say how to *run* a
+        task, not what it is -- and `BaseTaskData` drops what it does not declare, so a dump
+        alone loses them. That is not theoretical: it silently discarded every
+        `execution_limits` the lead attached to its arms (so the arms ran under the nested
+        orchestrator's `sample_max_cost`, not the run's `standard_budget_cap`), and it turned
+        a decision-turn replay into an ordinary run from the prompt -- which still produced
+        submissions, and would have been read as replay consistency.
+        """
+
+        dumped = self.data.model_dump(mode="json")
+        extra = {key: value for key, value in (self.payload or {}).items() if key not in dumped}
+        return {**dumped, **extra}
 
     async def setup(
         self,
@@ -652,7 +677,10 @@ def create_task_from_data(
     task_specific_config = config.model_copy(update={'task_config': task_config}, deep=True)
     task_config.apply_to_scaffold_config(task_specific_config)
 
-    return task_class.from_data(data, task_specific_config)
+    task = task_class.from_data(data, task_specific_config)
+    # So reserved run-level keys survive validation; see `BaseTask.job_data`.
+    task.payload = dict(data)
+    return task
 
 
 def create_task_config_for_type(task_type: str, **overrides) -> 'BaseTaskConfig':

@@ -1,0 +1,54 @@
+# Decision-turn replay of a generation run's arm sessions (src/mathlib_review/review/replay.py).
+#
+# The model, tool grant and task config are the source run's own, read from the orchestrator
+# config each arm ran under; a replay config sets only `dataset` and `execution`.
+#
+#   ape/bin/python -m src.mathlib_review.review.cli replay --config configs/v5_replay.yaml \
+#       --of pr5_A_lead_heldout12_v2_rep1 --run-name pr5_replay_null_first_submit_candidates_rep1
+#
+# The null condition first, always: its disagreement with the recorded decisions is the noise
+# floor every other condition is read against. A condition is a `--set dataset.condition=...`
+# or a child config that `extends:` this one, and the run name must carry both the condition
+# and the cut -- one task identity per session means one cut per run.
+
+execution:
+  # Resamples per session. At temperature 1 one sample says little about one decision.
+  sample_count: 3
+  max_concurrency: 8
+
+dataset:
+  condition:
+    # Quoted: bare `null` is YAML's None.
+    name: "null"
+
+  # Where the model takes over. Nothing here is a default: say which point you mean.
+  #   {before_tool_call: {tool: submit_candidates, occurrence: first}}  the decision turn
+  #   {before_turn: -1}    the last turn the arm took, whatever it was
+  #   {before_turn: 1}     the whole task again from its recorded prompt
+  #   {at_node: 7}         a raw node index -- a last resort, not turn-aligned: on v2_rep1
+  #                        node 7 lands mid-turn in 232 of 320 sessions, which are skipped
+  # `occurrence: first` and not `last`: the arm task counts submission refusals from zero, so
+  # a prefix holding a refused submission disagrees with the contract it replays against.
+  #
+  # Override it on the command line with `--cut turn=-1` / `node=7` / `tool=NAME[:last|:N]`,
+  # never `--set dataset.cut=`: overrides deep-merge, so the config's spelling would survive
+  # beside the new one and a cut carrying two spellings is refused.
+  #
+  # Measured on v2_rep1 (3 samples, nothing spent): eligible sessions and billed-if-uncached
+  #   tool=submit_candidates:first  319 sessions, $37.20     the decision turn
+  #   turn=-1 (= :last)             320 sessions, $30.44     the last turn, whatever it was
+  #   turn=1                        320 sessions, $91.12     the whole task from its prompt
+  cut:
+    before_tool_call:
+      tool: submit_candidates
+      occurrence: first
+
+  # Assistant turns allowed after the cut. From the first-submission cut the recorded stage
+  # took at most 7 turns on the v2 reps; an earlier cut re-samples the turns that follow it.
+  turns_after_cut: 8
+
+  # The recorded stage this cut re-samples billed $4.87 cached and $12.40 nominal across
+  # v2_rep1's 319 replayable sessions; a replay weeks later pays about the nominal figure, per
+  # sample. An earlier cut re-samples more and costs more -- `replay` without --execute prices
+  # the cut you actually asked for and refuses a run that cannot fit.
+  run_total_cost_cap: 40.0

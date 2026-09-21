@@ -412,12 +412,32 @@ async def main_from_params(params: Dict[str, Any]) -> Tuple['BaseTaskResult', Op
     config_class = getattr(scaffold_class, 'config_class', BaseScaffoldConfig)
     config = config_class.model_validate(params['config'])
 
+    # The task's own turn ceiling. The worker stamped `execution_limits.max_turns` on the
+    # Attempt and nothing handed it to the conversation, which enforces
+    # `config.execution.max_turns` -- so a per-task turn limit was recorded and never bound.
+    # The cost half already arrives as `cost_limit`; this is the other half of the same limit.
+    from ape.orchestration.models import task_execution_limits
+    config.execution.max_turns = task_execution_limits(
+        params['task_data'], config.execution).max_turns
+
     # Rebuild task (task_type is extracted from task_data['task_type'])
     task = create_task_from_data(
         params['task_data'],
         config,
         task_config_overrides=config.task_config_overrides
     )
+
+    # A replay is the same task started from a recorded conversation. It travels as task data,
+    # like the limits above, and only a scaffold that owns a session format can honour it --
+    # any other would silently start from the prompt and be measured as a replay.
+    from ape.scaffolds.ape_agent.replay import SESSION_REPLAY_KEY, SessionReplay
+    replay = params['task_data'].get(SESSION_REPLAY_KEY)
+    if replay is not None:
+        if params['scaffold_type'] != 'ape_agent':
+            raise ValueError(
+                f"{SESSION_REPLAY_KEY} is honoured only by the ape_agent scaffold, not "
+                f"{params['scaffold_type']!r}")
+        task.session_replay = SessionReplay.model_validate(replay)
 
     # Create runner and execute
     logger = create_logger(to_console=False)

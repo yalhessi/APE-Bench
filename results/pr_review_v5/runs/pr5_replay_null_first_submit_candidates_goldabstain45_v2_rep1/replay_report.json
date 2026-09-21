@@ -1,0 +1,93 @@
+{
+  "agreement_with_recorded": {
+    "outcome": {
+      "rate": 0.9398,
+      "samples": 133,
+      "sessions_every_sample_agrees": 41,
+      "sessions_no_sample_agrees": 2
+    },
+    "reason_or_anchors": {
+      "rate": 0.6917,
+      "samples": 133,
+      "sessions_every_sample_agrees": 25,
+      "sessions_no_sample_agrees": 7
+    },
+    "reason_or_candidates": {
+      "rate": 0.6917,
+      "samples": 133,
+      "sessions_every_sample_agrees": 25,
+      "sessions_no_sample_agrees": 7
+    }
+  },
+  "by_arm": {
+    "correctness": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.0,
+      "sessions": 5
+    },
+    "duplication": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.0,
+      "sessions": 11
+    },
+    "family_design": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.0,
+      "sessions": 6
+    },
+    "generality": {
+      "outcome_agreement": 0.8889,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.1111,
+      "sessions": 3
+    },
+    "naming": {
+      "outcome_agreement": 0.9167,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.0833,
+      "sessions": 12
+    },
+    "proof_idiom": {
+      "outcome_agreement": 1.0,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.0,
+      "sessions": 4
+    },
+    "style": {
+      "outcome_agreement": 0.6667,
+      "recorded_filing_rate": 0.0,
+      "replayed_filing_rate": 0.3333,
+      "sessions": 4
+    }
+  },
+  "condition": "null",
+  "cost": {
+    "billed": 1.9733,
+    "nominal": 6.3546
+  },
+  "cuts": [
+    "first_submit_candidates"
+  ],
+  "filing_rate": {
+    "recorded": 0.0,
+    "replayed": 0.0602
+  },
+  "model_confidence_null_rate_first_call": 0.0,
+  "reading": "The null condition's agreement with the recorded decision is the noise floor: at temperature 1 a decision re-sampled from an identical prefix does not reproduce itself. A condition's effect is its paired difference from the null on the same sessions (`report replay --against <null run>`), not its agreement with the recording, and is provisional until it holds on all three source reps.",
+  "refusals": {
+    "recorded_sessions_with_a_refusal": 4,
+    "replayed_samples_with_a_refusal": 11
+  },
+  "replayed_turns_max": 8,
+  "samples": 135,
+  "samples_with_no_accepted_submission": 2,
+  "sessions": 45,
+  "statuses": {
+    "paused_max_turns": 2,
+    "success": 133
+  },
+  "tool_drift": []
+}

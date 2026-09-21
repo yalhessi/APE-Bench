@@ -32,5 +32,11 @@ for root in data data/pr_review_v2/cache inputs/pr_review_v2 results; do
     [ -e "$p" ] && link "${p#"$main"/}"
   done
 done
+# Arm pools are gitignored *inside* tracked run directories, so the loop above never reaches
+# them, and a worktree could not replay or re-finalize any run: `cli replay` rebuilds each task
+# from its run's arm_pool.jsonl (src/mathlib_review/review/replay.py).
+for p in "$main"/results/*/runs/*/arm_pool.jsonl; do
+  [ -e "$p" ] && link "${p#"$main"/}"
+done
 echo "$linked new link(s) into $wt from $main."
 echo 'In your own shell here: export PYTHONPATH=$PWD/src   (pytest.ini and Claude Code sessions already put src first)'

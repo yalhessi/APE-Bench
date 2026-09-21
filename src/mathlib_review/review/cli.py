@@ -21,6 +21,7 @@ spending a budget.
     python -m src.mathlib_review.review.cli run    --config configs/x.yaml --execute
     python -m src.mathlib_review.review.cli judge  --of <run_name> --config configs/j.yaml --execute
     python -m src.mathlib_review.review.cli bench  --config configs/x.yaml --arm proof_golf --execute
+    python -m src.mathlib_review.review.cli replay --config configs/r.yaml --of <run> --run-name <n>
     python -m src.mathlib_review.review.cli report routing --run <run_name>
 
 `plan` is `run` without `--execute`, spelled positively, because that is what it is for.
@@ -43,7 +44,7 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench"})
+SPENDS = frozenset({"run", "judge", "bench", "replay"})
 
 
 def _say_nothing_ran(command: str, facts: dict) -> None:
@@ -138,6 +139,19 @@ def build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--out", type=Path, default=None)
     _add_execute(bench)
 
+    replay = sub.add_parser(
+        "replay", help="re-decide recorded arm sessions from just before they submitted")
+    replay.add_argument("--config", type=Path, required=True)
+    replay.add_argument("--of", dest="of_run", default=None,
+                        help="the generation run whose arm sessions are replayed")
+    replay.add_argument(
+        "--cut", default=None, metavar="turn=N|node=I|tool=NAME[:first|:last|:N]",
+        help="where the model takes over, replacing the config's cut. `--set dataset.cut=` "
+             "would merge with it instead, leaving two spellings, which is refused.")
+    _add_run_name(replay)
+    _add_set(replay)
+    _add_execute(replay)
+
     report = sub.add_parser("report", help="read a finished run")
     report_sub = report.add_subparsers(dest="report_command", required=True)
     routing = report_sub.add_parser("routing", help="what the lead did")
@@ -171,6 +185,13 @@ def build_parser() -> argparse.ArgumentParser:
     conditions.add_argument(
         "--release", type=Path,
         help="adds attention-vs-maintainers and redundancy, which read gold concern labels")
+
+    replay_report = report_sub.add_parser(
+        "replay", help="a replay against the decisions it replayed, or against another replay")
+    replay_report.add_argument("--run", required=True)
+    replay_report.add_argument(
+        "--against", default=None,
+        help="a baseline replay (normally the null) to pair with, session by session")
 
     trajectory = sub.add_parser("trajectory", help="extract one run's transcripts")
     trajectory.add_argument("--run", required=True)
@@ -275,6 +296,31 @@ def _bench(args, logger) -> int:
         execute=args.execute, logger=logger)
 
 
+def _replay(args, overrides, logger) -> int:
+    """Preflight without `--execute`: select, cut, condition, price, check -- and write nothing."""
+
+    from ape.scaffolds.ape_agent.replay import parse_cut
+    from src.mathlib_review.review.replay import load_replay, run_replay
+
+    if args.of_run:
+        overrides.setdefault("dataset", {})["of_run"] = args.of_run
+    dataset, execution = load_replay(
+        args.config, overrides, parse_cut(args.cut) if args.cut else None)
+    if not args.execute:
+        _say_nothing_ran("replay", {"config": str(args.config), "of run": dataset.of_run,
+                                    "run name": dataset.run_name,
+                                    "condition": dataset.condition.name,
+                                    "cut": dataset.cut.name})
+    result = asyncio.run(run_replay(dataset, execution, logger, execute=args.execute))
+    if not args.execute:
+        print(json.dumps({"sessions": len(result.prefix_sha256_by_invocation),
+                          "skipped": len(result.skipped), "sample_count": result.sample_count,
+                          "estimate": result.estimate}, indent=2), file=sys.stderr)
+    elif result:
+        print(result)
+    return 0
+
+
 def _report(args) -> int:
     from src.mathlib_review.analysis.report import contamination, overlay, routing, score
 
@@ -286,6 +332,12 @@ def _report(args) -> int:
         print(json.dumps(routing(args.run), indent=2))
     elif args.report_command == "score":
         print(json.dumps(score(args.audit, args.run), indent=2))
+    elif args.report_command == "replay":
+        from src.mathlib_review.review.replay import compare_replays, load_outcomes, replay_report
+
+        treatment = load_outcomes(args.run)
+        print(json.dumps(compare_replays(load_outcomes(args.against), treatment)
+                         if args.against else replay_report(treatment), indent=2))
     elif args.report_command == "retrieval":
         from src.mathlib_review.analysis.report import retrieval
 
@@ -338,6 +390,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _judge(args, overrides, logger)
     if args.command == "bench":
         return _bench(args, logger)
+    if args.command == "replay":
+        return _replay(args, overrides, logger)
     if args.command == "report":
         return _report(args)
     if args.command == "trajectory":

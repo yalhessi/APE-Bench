@@ -1,0 +1,46 @@
+{
+  "condition": {
+    "closing_instruction": null,
+    "name": "null",
+    "prompt_replacements": [],
+    "task_data_overrides": {},
+    "tool_schema_edits": []
+  },
+  "condition_sha256": "3d240b0991730a06d911d3896d07cb9bd94fb726be7ef5f10c6d2f36cf98b9a5",
+  "cut": {
+    "before_tool_call": {
+      "occurrence": "first",
+      "tool": "submit_candidates"
+    }
+  },
+  "cut_label": "first_submit_candidates",
+  "estimate": {
+    "ceiling_at_task_caps": 6.0,
+    "expected_billed_if_cached": 0.28,
+    "expected_billed_if_uncached": 0.61,
+    "recorded_replayed_stage_billed": 0.0563,
+    "recorded_replayed_stage_nominal": 0.1218
+  },
+  "git_commit": "ac396ee7f0835b1818f75767586f418a5714bcce",
+  "git_tree_state": "clean",
+  "model_name": "gpt_5.2",
+  "of_run": "pr5_A_lead_heldout12_v2_rep1",
+  "per_task_cost_cap": 0.3,
+  "prefix_sha256_by_invocation": {
+    "wu:1c5956b98c096a64f567d656#correctness": "27c22654839c5dc195c51e31c344a952b78f1c1074957bd52264a73a070f1099",
+    "wu:1e94e402e9bf04c7094996fd#docs": "bf8d8b7b3963edf013a2be5f71524addd2cff19bbec01ed837d8c237ad4fe1b8",
+    "wu:1f9cf7865fe0948dfc6e47f8#naming": "919ea066fd7c4c90318aa067a65ee6deeb885f956db5ad6386da109dbf4ebd1c",
+    "wu:1f9cf7865fe0948dfc6e47f8#style": "c1d3534c567c06bf8e480986ce10a38186d719f22fb16f82cdd11593b149bd8a"
+  },
+  "run_name": "pr5_replay_null_first_submit_candidates_case4b_v2_rep1",
+  "run_total_cost_cap": 40.0,
+  "sample_count": 5,
+  "scaffold_config_sha256": "bad0a81eb51995f8e560a987239f7ab034f36f256718d6a6ed6469037eb773e0",
+  "selection": {
+    "arm_ids": [],
+    "invocation_limit": 0,
+    "pr_numbers": []
+  },
+  "skipped": [],
+  "turns_after_cut": 8
+}
