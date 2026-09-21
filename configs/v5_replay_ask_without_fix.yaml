@@ -19,6 +19,25 @@
 # statement changes to be provided via declaration_name+new_declaration" on 33145, on an edit
 # that compiled.
 #
+# Two things to hold on to when reading the result.
+#
+# The validator refusal binds only the seven arms whose concern family is checkable --
+# correctness, duplication, generality, family_design, api_reuse, proof_golf, proof_idiom. For
+# `naming`, `docs` and `style` nothing refuses a candidate without an edit, so on those arms
+# only the closing instruction below operates, against prompt text ("report ONLY verified
+# edits", "Verify every edit with lean_verify_edit before submitting it") rather than against
+# a rule. A conversion on a naming cell and a conversion on a duplication cell are therefore
+# evidence about different things.
+#
+# And a converted candidate is recorded, not said. `finalize` gives an unwarranted claim
+# `admission: diagnostic` and `channels: []` -- deliberately out of the merge and out of the
+# digest, because "the system withheld these, so counting them in `review` would claim credit
+# for something it did not say". So this condition measures whether the arms HAVE the asks.
+# Whether an unverified ask should reach a maintainer is a second decision, and that is where
+# the control-PR guard would really bite. What moves immediately is measurable without a
+# judge: `origin_arm_id` survives onto the finding, so `report silences` shows the cell go
+# from `silent` to `candidate` and its obligation from UNTOUCHED to located.
+#
 # What it does NOT do: ask for more findings. An empty submission stays exactly as cheap, the
 # mute-abstention refusal is untouched, and nothing in the added text says to lower a bar.
 # `forbid_abstention` is the opposite experiment and took control emission 1 -> 36.
