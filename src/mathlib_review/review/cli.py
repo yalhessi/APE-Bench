@@ -44,7 +44,7 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench", "replay"})
+SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline"})
 
 
 def _say_nothing_ran(command: str, facts: dict) -> None:
@@ -151,6 +151,13 @@ def build_parser() -> argparse.ArgumentParser:
     _add_run_name(replay)
     _add_set(replay)
     _add_execute(replay)
+
+    pipeline = sub.add_parser(
+        "pipeline", help="a declared experiment: one run and the stages that read it")
+    pipeline.add_argument("--config", type=Path, required=True)
+    _add_run_name(pipeline)
+    _add_set(pipeline)
+    _add_execute(pipeline)
 
     report = sub.add_parser("report", help="read a finished run")
     report_sub = report.add_subparsers(dest="report_command", required=True)
@@ -324,6 +331,39 @@ def _replay(args, overrides, logger) -> int:
     return 0
 
 
+def _pipeline(args, overrides, logger) -> int:
+    """Resolve the whole graph, and with `--execute`, run it.
+
+    Without it: every node's config is opened and hashed and the plan is printed, and nothing
+    is written. That rule matters more for a pipeline than for a single verb -- the cost of
+    discovering a bad judge config after the generation run is the generation run.
+    """
+
+    from src.mathlib_review.review.pipeline import load_pipeline, run as run_pipeline_spec
+
+    if not args.run_name:
+        raise SystemExit(
+            "--run-name is required: it names the generation run at the root of the pipeline, "
+            "and every other stage's run name and audit directory derive from it.")
+    # `--set` here targets the GRAPH -- `max_parallel_stages`, or one node's own overrides --
+    # not a dataset. The run name is the root's, and it is passed as such rather than merged
+    # into a config that has no `dataset` key and would refuse one.
+    spec = load_pipeline(args.config, {key: value for key, value in overrides.items()
+                                       if key != "dataset"})
+    if not args.execute:
+        _say_nothing_ran("pipeline", {"config": str(args.config), "root run": args.run_name,
+                                      "stages": ", ".join(sorted(spec.stages))})
+    summary = asyncio.run(run_pipeline_spec(
+        spec, args.run_name, args.config, logger, execute=args.execute))
+    if not args.execute:
+        print(json.dumps(summary["plan"], indent=2), file=sys.stderr)
+        return 0
+    print(json.dumps(summary, indent=2))
+    # Non-zero when any stage did not produce its output, so a pipeline in a script fails the
+    # way a command does. The stages that did finish keep their artifacts and their rows.
+    return 1 if summary.get("unfinished") else 0
+
+
 def _report(args) -> int:
     from src.mathlib_review.analysis.report import contamination, overlay, routing, score
 
@@ -399,6 +439,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _bench(args, logger)
     if args.command == "replay":
         return _replay(args, overrides, logger)
+    if args.command == "pipeline":
+        return _pipeline(args, overrides, logger)
     if args.command == "report":
         return _report(args)
     if args.command == "trajectory":

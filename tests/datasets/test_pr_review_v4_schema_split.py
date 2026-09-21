@@ -120,5 +120,6 @@ def test_every_class_landed_in_exactly_one_module():
                 assert node.name not in seen, (
                     f"{node.name} defined in both {seen.get(node.name)} and {module}")
                 seen[node.name] = module
-    # 106 at the split; 107 with `StageRecord` (2026-09-21).
-    assert len(seen) == 107
+    # 106 at the split; 110 with the stage records added 2026-09-21 -- `StageRecord`, and
+    # `PipelineNode` / `PipelineSpec` / `PipelinePlan` for a declared experiment.
+    assert len(seen) == 110
