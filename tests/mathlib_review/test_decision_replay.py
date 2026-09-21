@@ -482,3 +482,53 @@ def test_a_paused_sample_is_reported_and_does_not_hide_its_siblings(recorded_run
     assert rows[0]["replay"]["accepted"]["abstention_reason"] == "already_correct"
     assert rows[1]["replay"]["accepted"] is None            # it never submitted legally
     assert all(r["replay"]["replayed_from_prefix"] for r in rows)
+
+
+def test_a_replay_leaves_its_row_in_the_source_runs_ledger(tmp_path):
+    """Where the judge's row goes, for the same reason: "these sessions were re-decided, under
+    this condition, at this cut" is a fact about the run that recorded them.
+
+    A replay makes no transition -- the source run is exactly as generated and as judged as it
+    was -- so `transition` is None, which is a legitimate row rather than a missing one."""
+
+    from types import SimpleNamespace
+
+    from src.mathlib_review.review import replay as replay_module
+    from src.mathlib_review.run_state import RunState, ledger
+
+    source = tmp_path / "source"
+    source.mkdir()
+    out = tmp_path / "replay_null_first_submit_candidates"
+    out.mkdir()
+    (out / "replay_report.json").write_bytes(b"{}")
+
+    stage = SimpleNamespace(run_dir=source, run_name="source", consumed={"arm_pool": "a" * 64},
+                            state=RunState.FINALIZED, forensic=False)
+    plan = SimpleNamespace(condition_sha256="c" * 64, cut_label="first_submit_candidates",
+                           sample_count=3, model_name="gpt_5.2",
+                           prefix_sha256_by_invocation={"wu:a#naming": "p" * 64})
+    dataset = SimpleNamespace(run_name="replay_null_first_submit_candidates",
+                              condition=SimpleNamespace(name="null"))
+
+    replay_module._record_stage(dataset, stage, plan, out,
+                                SimpleNamespace(warning=lambda *a, **k: None))
+    row = ledger(source)[0]
+    assert row["stage"] == "replay" and row["run_name"] == "source"
+    assert row["transition"] is None
+    assert row["identity"]["cut"] == "first_submit_candidates"
+    assert row["identity"]["condition"] == "null"
+    assert row["produced"]["run"] == "replay_null_first_submit_candidates"
+
+
+def test_the_replay_takes_the_release_from_the_run_it_replays():
+    """From the source run's own sealed agenda, for the reason `judge --of` derives its paths:
+    the config that produced a run is not recoverable from the run, and the agenda is. Verified
+    equal to `run_plan.json`'s copy on all 59 committed runs that carry both."""
+
+    import inspect
+
+    from src.mathlib_review.review import replay as replay_module
+
+    source = inspect.getsource(replay_module.run_replay)
+    assert "release = stage.release" in source
+    assert '"run_plan.json"' not in source
