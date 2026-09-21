@@ -265,16 +265,28 @@ class StageInput:
 
         directory = Path(directory)
         state = state_of(directory)
-        if state not in SCOREABLE | {RunState.JUDGED} and not allow_partial:
-            raise ValueError(
-                f"{directory} is {state.value}. A recall number from it is measured against "
-                f"work units that were never reviewed, so it is not comparable to a complete "
-                f"run. Pass `allow_partial` to read it anyway -- the output is forensic and "
-                f"must not be reported as a headline number."
-            )
         manifest_path = directory / RUN_ARTIFACTS["run_manifest"].filename
         manifest = (json.loads(manifest_path.read_text(encoding="utf-8"))
                     if manifest_path.is_file() else None)
+        # Refused on the manifest's word, not on the derived state. A directory with no
+        # manifest is UNCHECKED, not bad: v4 runs never wrote one and a hand-assembled
+        # candidates file has no run at all, and refusing those would be a new rule wearing a
+        # refactor's clothes. What is refused is a run that closed and said it did not cover
+        # what it promised.
+        if manifest is not None and state not in SCOREABLE | {RunState.JUDGED} \
+                and not allow_partial:
+            gaps = manifest.get("coverage_gaps") or []
+            raise ValueError(
+                f"source run {manifest.get('run_name')!r} closed as "
+                f"{manifest.get('completion_status')!r}"
+                + (f" with {len(gaps)} coverage gap(s): "
+                   + ", ".join(sorted(g.get("invocation_id", "?") for g in gaps)[:6])
+                   if gaps else "")
+                + ". Recall from it is measured against work units that were never reviewed, "
+                "so it is not comparable to a complete run. Set `dataset.allow_partial: true` "
+                "to score it anyway -- the output is forensic and must not be reported as a "
+                "headline number."
+            )
 
         consumed = {}
         for name in require:
@@ -331,9 +343,20 @@ class StageInput:
 
     @property
     def forensic(self) -> bool:
-        """Whether anything read from this run is forensic rather than a measurement."""
+        """Whether anything read from this run is forensic rather than a measurement.
 
-        return self.state not in SCOREABLE | {RunState.JUDGED}
+        A run whose manifest says it did not cover what it promised. Not the same as
+        `unchecked`: one is a run that reported a gap, the other is a run that reported
+        nothing.
+        """
+
+        return self.manifest is not None and self.state not in SCOREABLE | {RunState.JUDGED}
+
+    @property
+    def unchecked(self) -> bool:
+        """No manifest, so completeness was never established either way."""
+
+        return self.manifest is None
 
 
 def _require(directory: Path, name: str) -> Path:

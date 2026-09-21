@@ -103,9 +103,13 @@ def test_the_judge_asks_the_machine_rather_than_comparing_a_string():
 
     from src.mathlib_review.judge import runner
 
-    source = inspect.getsource(runner.assert_source_run_is_complete)
-    assert "SCOREABLE" in source
-    assert '== "complete"' not in source
+    # The refusal moved into `StageInput.at`, which is where every stage now asks it -- so the
+    # judge asks the machine through one hop rather than restating the rule.
+    from src.mathlib_review.run_state import StageInput
+
+    assert "SCOREABLE" in inspect.getsource(StageInput.at)
+    assert '== "complete"' not in inspect.getsource(runner)
+    assert "StageInput" in inspect.getsource(runner.source_run)
 
 
 # --- StageInput: what a stage reads, and what it records having read -----------------------
@@ -265,3 +269,26 @@ def test_the_audit_root_is_spelled_once():
     ]
     assert definitions == [], definitions
     assert paths.AUDITS == paths.RESULTS / "audits"
+
+
+def test_the_judge_reads_its_source_run_through_stage_input():
+    """The hand-off is only worth naming if it is the thing used. A stage that rebuilds a
+    sibling path by hand is the defect `judge --of` fixed once and nothing generalised."""
+
+    import inspect
+
+    from src.mathlib_review.judge import runner as judge_runner
+
+    assert "StageInput" in inspect.getsource(judge_runner.source_run)
+    # And the two siblings it used to rebuild are resolved through the artifact table.
+    assert 'parent / "run_manifest.json"' not in inspect.getsource(judge_runner)
+
+
+def test_a_run_with_no_manifest_is_unchecked_rather_than_refused(tmp_path):
+    """v4 runs never wrote a manifest and a hand-assembled candidates file has no run at all.
+    Refusing those would be a new rule wearing a refactor's clothes: what is refused is a run
+    that CLOSED and said it did not cover what it promised."""
+
+    directory = _run(tmp_path, status=None, findings=True)
+    stage = StageInput.at(directory)
+    assert stage.unchecked is True and stage.forensic is False
