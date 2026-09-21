@@ -72,3 +72,26 @@ underlying contradiction is untouched.
 **What would close it:** either stop writing the synthetic result (and let `task_outcome.json`
 carry the failure, which is what it exists for), or amend the rule and the docstring to say a
 failure result is written deliberately. Both are readable; the current state is not.
+
+## 5. A pipeline's rows do not say they came from a pipeline
+
+`StageRecord` declares `pipeline` (the root run) and `node` (which node of the graph), and
+nothing writes either: both are `None` on every row, including the rows of the run that was
+driven by `cli pipeline` on 2026-09-21. Verified on
+`results/pr_review_v5/runs/pr5_verify_typed_handoffs_rep1/stages.jsonl`.
+
+The rows are not wrong -- each says what its stage consumed, produced and transitioned -- but
+the two fields that would let a reader reconstruct *which graph* produced them are declared and
+empty, which is the "a field that is read but not implemented" shape one step removed: here it
+is written by nobody rather than read by nobody.
+
+It is empty because each stage writes its own row through its own `run()`, and the pipeline
+deliberately does not reach into them -- the same separation that keeps every node runnable by
+its own command. Threading the context would mean a reserved task-data-style key on the stage
+call, which is a real design choice rather than a fix.
+
+**What would close it:** either pass the pipeline context the way `execution_limits` travels --
+as a reserved argument the stage records and otherwise ignores -- or delete the two fields and
+let `pipeline.json` be the only record of the graph, joined by run name. The second is cheaper
+and loses the ability to tell two nodes of one kind apart in the ledger, which is exactly what a
+run carrying two judgements needs. Decide before a run carries two.
