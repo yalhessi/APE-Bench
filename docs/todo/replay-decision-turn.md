@@ -1,6 +1,6 @@
 # Decision-turn replay — test a change to what an arm decides without re-running what it investigated
 
-**Status** — **built, not yet run** (branch `decision-replay`, 2026-09-15); prioritised by the user 2026-09-15
+**Status** — **built; closing diagnostic run 2026-09-21** (`docs/research/decision-replay-gold-abstentions-2026-09.md`: 41 of 45 gold-site specialist silences are stable, $1.97). Remaining: one swapped condition against that null (branch `decision-replay`, 2026-09-15); prioritised by the user 2026-09-15
 **Cost** — measured at preflight, and a function of where the cut is. On v2_rep1 at 3 samples,
 billed if uncached: **$37.20** from the first submission (319 sessions), **$30.44** from the last
 turn (320), **$91.12** replaying each task from its prompt (320). The stage re-sampled from the
