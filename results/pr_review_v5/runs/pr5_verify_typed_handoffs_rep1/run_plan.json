@@ -1,0 +1,94 @@
+{
+  "agenda_sha256": "b3a206d39b8704bf56124a1c19c234c3d0ad6e46fbfc31cdc2058002d81d751f",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "7682ad4cc34607864be97fda5ec529c45b4bbb1ab5f44635c7b4f6bcea478788",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "ea84bb7e94944eacb231ad7a13578b8292bf1ec9d9e9121ff50fd1c649e9b4dc",
+    "generalist": "af0055979fa0304f38d8766b80cf51de4c2a25ff052956ac333ba74cce30a8e8",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "cd6fd9ef2ee98e2709ee143d676d0b80b18788ae7ba02b111ed4dd879f360eb3",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_index_version": "v5-precedent-index/2",
+    "precedent_meta_version": "v5-precedent-meta/2",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "precedent_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "precedent_rows": "43881",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 25
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "b235021f2d704b535c91c5d7be918e6e5921b4ad",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "model_name": "gpt_5.2",
+  "per_pr_cost_cap": 1.5,
+  "prompt_sha256_by_invocation": {
+    "wu:1f9cf7865fe0948dfc6e47f8#api_reuse": "3d2982bf31f296ff310a6762eccc26ef95bc5ea19d9d53a3233271561f25ea3a",
+    "wu:1f9cf7865fe0948dfc6e47f8#correctness": "7d22a49313769159a359bc68da863e13a1465320f09744e7907650e19ef69dd3",
+    "wu:1f9cf7865fe0948dfc6e47f8#docs": "d826123061a73aaa4f3264f2b8d7cbbc6e0f02a5661b72ce421caa86fc79ef18",
+    "wu:1f9cf7865fe0948dfc6e47f8#duplication": "05b300367a81f1a994c8b16ff8f87b5cc5d059b5ad32039b17ff6b1cf5d406ec",
+    "wu:1f9cf7865fe0948dfc6e47f8#family_design": "2e0a7ea59b78ab7b96cccf9acf06a51935da5adb71e5077b078fdb2df49af4df",
+    "wu:1f9cf7865fe0948dfc6e47f8#generalist": "1351b5d5fc25dcbe5b947ccd176fec2880be50adc8e2dedf43eac13c53b7493f",
+    "wu:1f9cf7865fe0948dfc6e47f8#generality": "584b7e819e1252af5e4c421199ded4fd9ec99508b17289a36bf88f08e0d156df",
+    "wu:1f9cf7865fe0948dfc6e47f8#naming": "21ea680d6b7480d2dcc387a7432f9a6b4027a83c5096073b0837f248a6af8561",
+    "wu:1f9cf7865fe0948dfc6e47f8#proof_golf": "b33e12b9a3bc263e9202869cbcd4e4cb2005b446581c2c13fb97cfdd69c733b0",
+    "wu:1f9cf7865fe0948dfc6e47f8#proof_idiom": "0037d38e85969e71ebb20be35ed8ab70068f26cea87a6bc881e578d0bee34afb",
+    "wu:1f9cf7865fe0948dfc6e47f8#style": "f59108e99da29bcfc2fcbf79cd88a8ef12b6c864c0732fd0d4721abcd6250989",
+    "wu:ed4ebc2fd8ff4c98194ac766#api_reuse": "087b526f4c6a9e32d731247f8960939a54b1d7eda0f251aaf63bd3d07c651ab3",
+    "wu:ed4ebc2fd8ff4c98194ac766#correctness": "451e4114ba95296ea79bcb8e18a73709be4d46b373ac2c7b98b3d94673c91e3f",
+    "wu:ed4ebc2fd8ff4c98194ac766#docs": "97d6688f2fedc6a3099a28122b7bd3e045c91f6f4054fdf7842dc35ec4f3ddd0",
+    "wu:ed4ebc2fd8ff4c98194ac766#duplication": "62bbd88141d7f4175ac4af485e86de671d3fe387059c3dcb4791bd4f5fddf81f",
+    "wu:ed4ebc2fd8ff4c98194ac766#family_design": "e9199554e2be783a43a940d4e6217b972d84bb10d5d2aacd2d25ee723dd98c83",
+    "wu:ed4ebc2fd8ff4c98194ac766#generalist": "3fda4deab9478bf7de7b2092854c842fcbbcdd9c6fe3724eb473fc9b973d23bf",
+    "wu:ed4ebc2fd8ff4c98194ac766#generality": "e85cb0c24534886573d540f245f1d97f5cc88a52eb603095e05f4700f1dd8da0",
+    "wu:ed4ebc2fd8ff4c98194ac766#naming": "5f6dda823f0f0f5711b37d2e61515a6bfb4b78fcca14282313f8ea2d3f8cde3a",
+    "wu:ed4ebc2fd8ff4c98194ac766#proof_golf": "db1c060109bd6d28b98df1e28e1164395b4bdf94bfc16d8fffe152248d4e6431",
+    "wu:ed4ebc2fd8ff4c98194ac766#proof_idiom": "022459f396585b7215b5a2b75907d743c99df2f6d0424745323c3b003eae7b38",
+    "wu:ed4ebc2fd8ff4c98194ac766#style": "cd615c714fda33b1c51fc66c0c7847c360ba19c2b3536347bf350b6b0147dd60"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "release_manifest_sha256": null,
+  "routing_mode": "lead",
+  "run_id": "v5run:pr5_verify_typed_handoffs_rep1",
+  "run_name": "pr5_verify_typed_handoffs_rep1",
+  "scaffold_config_sha256": "7303a28fdea065666465730c4e7d2c567a1e21d13f2a26ad5e36d52a3535b49b",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "f16f40a292a8ebb6e431b78ed40cd8418939d08a4b163c56642409c790ff02cf",
+  "standard_budget_cap": 0.3
+}
