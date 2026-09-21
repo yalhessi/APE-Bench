@@ -532,3 +532,101 @@ def test_the_replay_takes_the_release_from_the_run_it_replays():
     source = inspect.getsource(replay_module.run_replay)
     assert "release = stage.release" in source
     assert '"run_plan.json"' not in source
+
+
+# --- named selectors ------------------------------------------------------------------------
+
+
+from pathlib import Path
+
+
+RUN = "pr5_A_lead_heldout12_v2_rep1"
+_has_run = pytest.mark.skipif(
+    not Path(f"results/pr_review_v5/runs/{RUN}/findings.jsonl").is_file(),
+    reason="the held-out reps are not in this tree")
+
+
+def _selector_dataset(**fields):
+    from types import SimpleNamespace
+
+    base = dict(of_run=RUN, selector="all", arm_ids=[], invocation_ids=[])
+    base.update(fields)
+    return SimpleNamespace(**base)
+
+
+def test_a_selector_that_needs_arguments_refuses_rather_than_meaning_everything():
+    """`--select arm` with no arms is `all` under a name that says otherwise, and a replay of
+    "named sessions" that names none is a replay of everything with the fact hidden."""
+
+    from src.mathlib_review.review.replay import select_invocations
+
+    for selector in ("arm", "invocation_ids"):
+        with pytest.raises(ReplayRefused, match="needs"):
+            select_invocations(_selector_dataset(selector=selector))
+
+
+def test_an_explicit_list_restricts_whatever_the_selector_says():
+    """Naming sessions is how a case study runs; a selector narrows that rather than widening
+    it."""
+
+    from src.mathlib_review.review.replay import select_invocations
+
+    ids, provenance = select_invocations(
+        _selector_dataset(invocation_ids=["wu:a#naming"]))
+    assert ids == {"wu:a#naming"} and provenance["gold_derived"] is False
+
+
+@_has_run
+def test_the_gold_derived_selectors_name_what_a_scratch_join_used_to():
+    """Choosing the sessions for the first planned diagnostic took an ad-hoc join across four
+    files, written in a scratchpad and thrown away -- and it is not reproducible: it selected 45
+    where this selects 58, because it filtered on required gold changes rather than on gold
+    sites. That is the argument for naming one, not against."""
+
+    from src.mathlib_review.review.replay import select_invocations
+
+    silent, provenance = select_invocations(
+        _selector_dataset(selector="gold-site-abstentions"))
+    assert len(silent) == 58
+    assert provenance["gold_derived"] is True and len(provenance["obligation_ids"]) == 22
+
+    # Narrowed by arm, which is what a single-arm case study wants.
+    naming, _ = select_invocations(
+        _selector_dataset(selector="gold-site-abstentions", arm_ids=["naming"]))
+    assert len(naming) == 11 and naming < silent
+
+    missed, provenance = select_invocations(_selector_dataset(selector="missed-obligations"))
+    assert len(missed) == 142
+    # Only the obligations the judge did not score as hits: 22 counted, 7 covered.
+    assert len(provenance["obligation_ids"]) == 15
+
+
+@_has_run
+def test_missed_obligations_refuses_without_the_judges_verdicts(monkeypatch):
+    """Which obligations were missed is not knowable without them, and guessing would make the
+    selection a fiction."""
+
+    from src.mathlib_review.analysis import report as report_module
+    from src.mathlib_review.review.replay import select_invocations
+
+    def no_audit(*args, **kwargs):
+        raise FileNotFoundError("semantic_report.json does not exist")
+
+    monkeypatch.setattr(report_module, "buckets", no_audit)
+    with pytest.raises(ReplayRefused, match="Judge the run first"):
+        select_invocations(_selector_dataset(selector="missed-obligations"))
+
+
+def test_the_selection_is_sealed_into_the_plan_and_is_not_resumable():
+    """A selector changed under one run name would make two different experiments share an
+    identity. `selection` is outside `RESUMABLE_PLAN_FIELDS`, so the second is refused."""
+
+    import inspect
+
+    from src.mathlib_review.review import replay as replay_module
+    from src.mathlib_review.review.runner import RESUMABLE_PLAN_FIELDS
+
+    assert "selection" not in RESUMABLE_PLAN_FIELDS
+    source = inspect.getsource(replay_module.build_plan)
+    assert "select_invocations(dataset)[1]" in source
+    assert "resolved_invocation_ids" in source

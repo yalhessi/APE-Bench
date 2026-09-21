@@ -34,7 +34,7 @@ from __future__ import annotations
 import copy
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -119,6 +119,20 @@ class ReplayDatasetConfig(BaseModel):
     #: shrink the run to the ones that matched, and the result would look like a measurement.
     invocation_ids: List[str] = Field(default_factory=list)
     invocation_limit: int = 0
+    #: WHICH recorded sessions to re-decide, by name.
+    #:
+    #: Selecting the 45 sessions for the first planned diagnostic took an ad-hoc join across
+    #: `arm_pool.jsonl`, `arm_responses.jsonl`, the execution index and `gold/judgments.jsonl`,
+    #: written in a scratchpad, untested, and thrown away -- and a re-derivation of it a week
+    #: later produced a different set. A selector a later run cannot name is a selector nobody
+    #: can reproduce, which makes the replay it chose unrepeatable rather than merely
+    #: in-sample.
+    #:
+    #: The two gold-derived selectors are evaluation-side and say so in the sealed plan: the
+    #: prefix the model sees is still the recording, so gold never reaches a prompt, but the
+    #: SELECTION is in-sample and every report of such a replay has to carry that.
+    selector: Literal["all", "arm", "invocation_ids",
+                      "gold-site-abstentions", "missed-obligations"] = "all"
     #: Where the model takes over. Required: nothing about a replay's cut is predetermined, and
     #: a default would quietly make one experiment look like the only one available.
     cut: CutPoint
@@ -236,6 +250,79 @@ def replay_source(dataset: ReplayDatasetConfig):
             f"session through its execution index.") from error
 
 
+def select_invocations(dataset: ReplayDatasetConfig) -> Tuple[Optional[set], Dict[str, Any]]:
+    """The invocations this run's selector names, and the provenance of that choice.
+
+    `None` means "do not restrict by id" -- `all` and `arm`, which filter by arm instead.
+
+    The two gold-derived selectors read `report buckets`, which is the evaluation side, and set
+    `gold_derived` so the sealed plan and every report of the replay carry it. They are the
+    named versions of joins that were previously written by hand:
+
+    * `gold-site-abstentions` -- specialist invocations that were silent at a gold obligation's
+      site. 48 of them on `heldout12_v2_rep1`. The diagnostic that motivated replay used 45,
+      from a scratch join over required gold changes; the two are near neighbours and not the
+      same set, which is the argument for naming one.
+    * `missed-obligations` -- every invocation that ran over a site of an obligation the judge
+      did not score as a hit. 30 specialist silences on the same run, and it needs an audit:
+      without one, which obligations were missed is not known and refusing is the only honest
+      answer.
+    """
+
+    selector = dataset.selector
+    if selector in {"all", "arm"}:
+        if selector == "arm" and not dataset.arm_ids:
+            raise ReplayRefused("--select arm needs `dataset.arm_ids`; without them it is `all` "
+                                "under a name that says otherwise")
+        # An explicit list always restricts, whatever the selector says: naming sessions is how
+        # a case study is run, and a selector must narrow that rather than widen it.
+        return (set(dataset.invocation_ids) or None,
+                {"selector": selector, "gold_derived": False})
+    if selector == "invocation_ids":
+        if not dataset.invocation_ids:
+            raise ReplayRefused(
+                "--select invocation_ids needs `dataset.invocation_ids`. A replay of named "
+                "sessions that names none is a replay of everything under a name that hides it")
+        return set(dataset.invocation_ids), {"selector": selector, "gold_derived": False}
+
+    from src.mathlib_review.analysis.report import buckets
+
+    audit = selector == "missed-obligations"
+    try:
+        payload = buckets([dataset.of_run], audit=audit)["per_run"][dataset.of_run]
+    except FileNotFoundError as error:
+        raise ReplayRefused(
+            f"--select {selector} needs the judge's verdicts for {dataset.of_run}, and there "
+            f"are none ({error}). Judge the run first: which obligations it missed is not "
+            f"knowable without them, and guessing would make the selection a fiction.") from error
+
+    wanted, obligations = set(), []
+    for row in payload["obligations"]:
+        if selector == "missed-obligations" and row["coarse"] == "COVERED":
+            continue
+        obligations.append(row["obligation_id"])
+        for cell in row["cells"]:
+            if selector == "gold-site-abstentions" and cell["state"] != "silent":
+                continue
+            if dataset.arm_ids and cell["arm_id"] not in dataset.arm_ids:
+                continue
+            wanted.add(cell["invocation_id"])
+    if not wanted:
+        raise ReplayRefused(
+            f"--select {selector} matched no session in {dataset.of_run}. An empty selection is "
+            f"refused rather than run as nothing: it means the filter is wrong, not that there "
+            f"is nothing to re-decide.")
+    return wanted, {
+        "selector": selector,
+        "gold_derived": True,
+        "obligation_ids": sorted(obligations),
+        "audit_semantic_report_sha256": (
+            payload["requires"].get("findings") if not audit else None),
+        "note": ("the SELECTION is gold-derived and in-sample; the prefix the model replays is "
+                 "still the recording, so gold does not reach a prompt"),
+    }
+
+
 async def select_sources(dataset: ReplayDatasetConfig):
     """`(sources, skipped)`: the recorded arm sessions to replay, and why any others were not.
 
@@ -251,16 +338,22 @@ async def select_sources(dataset: ReplayDatasetConfig):
     stage = replay_source(dataset)
     source = stage.run_dir
     index_path, pool_path = stage.path("execution_index"), stage.path("arm_pool")
-    wanted_arms, wanted_ids = set(dataset.arm_ids), set(dataset.invocation_ids)
+    wanted_arms = set(dataset.arm_ids)
+    selected, provenance = select_invocations(dataset)
+    wanted_ids = set(selected) if selected is not None else set()
     rows = {invocation_id: row for invocation_id, row in by_semantic_id(index_path).items()
             if row.get("task_type") == ARM_TASK_TYPE
             and (not wanted_arms or invocation_id.rsplit("#", 1)[-1] in wanted_arms)
             and (not wanted_ids or invocation_id in wanted_ids)}
-    missing = sorted(wanted_ids - set(rows))
-    if missing:
-        raise ReplayRefused(
-            f"{dataset.of_run} holds no arm session for {missing}; a replay of named sessions "
-            "does not quietly become a replay of the ones that matched")
+    # A named session the run does not hold is refused; one a *derived* selector names but the
+    # index has no arm row for is not, because the selector reads the ledger and the ledger
+    # holds jobs the index never indexed -- a pruned one, most obviously.
+    if dataset.invocation_ids:
+        missing = sorted(set(dataset.invocation_ids) - set(rows))
+        if missing:
+            raise ReplayRefused(
+                f"{dataset.of_run} holds no arm session for {missing}; a replay of named "
+                "sessions does not quietly become a replay of the ones that matched")
     pool = {row["invocation_id"]: row["task_data"] for row in jsonl_rows(pool_path)
             if row.get("invocation_id") in rows}
 
@@ -364,7 +457,13 @@ def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySourc
         condition_sha256=dataset.condition.sha256(),
         selection={"arm_ids": dataset.arm_ids, "pr_numbers": dataset.pr_numbers,
                    "invocation_ids": dataset.invocation_ids,
-                   "invocation_limit": dataset.invocation_limit},
+                   "invocation_limit": dataset.invocation_limit,
+                   # Which sessions, and why those. Sealed rather than reported so a selector
+                   # cannot be changed under one run name: `selection` is not a resumable plan
+                   # field, so a second invocation naming a different set is refused.
+                   **select_invocations(dataset)[1],
+                   "resolved_invocation_ids": sorted(
+                       payload["invocation_id"] for payload, _ in built)},
         cut=dataset.cut.model_dump(mode="json", exclude_none=True),
         cut_label=dataset.cut.name, turns_after_cut=dataset.turns_after_cut,
         per_task_cost_cap=dataset.per_task_cost_cap,

@@ -145,6 +145,12 @@ def build_parser() -> argparse.ArgumentParser:
     replay.add_argument("--of", dest="of_run", default=None,
                         help="the generation run whose arm sessions are replayed")
     replay.add_argument(
+        "--select", default=None,
+        metavar="all|arm|invocation_ids|gold-site-abstentions|missed-obligations",
+        help="which recorded sessions to re-decide. The two gold-derived selectors read the "
+             "judge's verdicts and are sealed into the plan as such: the prefix replayed is "
+             "still the recording, so gold reaches no prompt, but the selection is in-sample.")
+    replay.add_argument(
         "--cut", default=None, metavar="turn=N|node=I|tool=NAME[:first|:last|:N]",
         help="where the model takes over, replacing the config's cut. `--set dataset.cut=` "
              "would merge with it instead, leaving two spellings, which is refused.")
@@ -325,6 +331,8 @@ def _replay(args, overrides, logger) -> int:
 
     if args.of_run:
         overrides.setdefault("dataset", {})["of_run"] = args.of_run
+    if args.select:
+        overrides.setdefault("dataset", {})["selector"] = args.select
     dataset, execution = load_replay(
         args.config, overrides, parse_cut(args.cut) if args.cut else None)
     if not args.execute:
