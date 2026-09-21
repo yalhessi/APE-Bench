@@ -884,3 +884,299 @@ def stages(run_name: str) -> Dict[str, Any]:
                 if item and not (Path(item) / "semantic_report.json").is_file()),
         },
     }
+
+
+#: The coarse split, and it is miss-decomposition's, unchanged since June 2026.
+#:
+#: `UNTOUCHED` is pure geometry and judge-independent: nothing the system emitted anchors at
+#: this obligation's sites, so no verdict can make it a hit. That is the number the 2026-06
+#: analysis called the robust one, and it is computable before any judge runs.
+#:
+#: `LOCATED_MISS` is the selection gap the whole project turns on -- something *was* emitted
+#: there and it was about something else. Splitting it from `COVERED` needs the judge, which is
+#: why a bucket report without an audit reports `LOCATED_UNJUDGED` rather than guessing.
+COARSE = ("UNTOUCHED", "LOCATED_MISS", "LOCATED_UNJUDGED", "COVERED")
+
+#: Why an obligation sits where it does, one rung finer, in the overlay's own vocabulary.
+#: Deliberately not a new taxonomy: `review_overlay.STATES` already names these states for the
+#: per-target page, and a second vocabulary for the same facts is how `documentation` and
+#: `docs` made an arm unmeasurable for its whole life.
+FINE = ("unscheduled", "pruned", "unavailable", "silent", "candidate", "finding")
+
+
+def _context_quality(calls) -> str:
+    """What retrieval this job actually got back: `none`, `empty`, `partial` or `ok`.
+
+    An ANNOTATION, never a bucket. It answers "did the arm have anything to work from", which
+    is a different question from "what did the arm do", and folding it into the ladder would
+    make a tooling failure and a judgement call the same row.
+
+    It is also incomplete by construction and says so: three tools write no trace row at all
+    (`proof_profile` on every path, `naming_norm` on three failure returns), so `none` means
+    "no row", not "no call". Tool refusals are not recorded anywhere, so they are not offered
+    as a value -- `docs/todo/evidence-tiers-and-traces.md` §4.
+    """
+
+    calls = list(calls or [])
+    if not calls:
+        return "none"
+    empty = sum(1 for call in calls if not call.get("result_count"))
+    if empty == len(calls):
+        return "empty"
+    return "partial" if empty else "ok"
+
+
+def _cell_state(job, anchored_findings) -> str:
+    """What one scheduled (arm, site) pair did, on the overlay's ladder."""
+
+    if job.disposition == "pruned":
+        return "pruned"
+    if job.status != "success":
+        # Ran and did not come back: a coverage gap, not a silence. A failed mandatory job
+        # counted as coverage once, and the run was scored as complete over work nobody did.
+        return "unavailable"
+    if not anchored_findings:
+        return "silent"
+    if any(item.get("admission") == "published" and item.get("channels")
+           for item in anchored_findings):
+        return "finding"
+    return "candidate"
+
+
+def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
+    """Why each gold obligation ended where it did, and what became of every finding.
+
+    The join that has been done by hand in a scratchpad every time someone asked "why did we
+    miss this". It reads the agenda (was anything scheduled here), the delegation ledger (did
+    the lead decline it, did the job run), the arm responses (did the arm abstain, and saying
+    what), the context trace (did its retrieval return anything), `findings.jsonl` (was a claim
+    emitted, and did the gate publish it) and, when there is one, the judge's own report.
+
+    Two levels, and the coarse one is miss-decomposition's: `UNTOUCHED` is judge-independent
+    geometry, and the `COVERED` / `LOCATED_MISS` split needs a verdict. Without an audit the
+    located set is reported as `LOCATED_UNJUDGED` rather than guessed at.
+
+    The fine level is `review_overlay.STATES`, not a new vocabulary -- a second set of words
+    for the same facts is how `documentation` and `docs` made an arm unmeasurable for its whole
+    life. Everything else is an annotation beside the bucket: the abstention's own reason, the
+    retrieval it got, the gate's verdict, the judge's pairing, and whether a replay found the
+    decision stable. Those answer different questions and must not be folded into one ladder.
+
+    Several runs make the per-finding half say `reps_with_key`: how many of them reproduced a
+    claim. It is reported and not ranked on -- cross-rep agreement separates hits in-sample and
+    is recorded as provisional (`docs/todo/selection-signal.md`).
+
+    Costs nothing and calls no model.
+    """
+
+    from src.mathlib_review.analysis.delegation_view import load_lead_views
+    from src.mathlib_review.analysis.obligation_exclusions import excluded_ids
+    from src.mathlib_review.analysis.review_overlay import deepest
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.review.merge import finding_key
+    from src.mathlib_review.run_state import StageInput
+
+    run_names = [runs] if isinstance(runs, str) else list(runs)
+    per_run: Dict[str, Any] = {}
+    key_runs: Dict[str, set] = {}
+
+    for run_name in run_names:
+        stage = StageInput.of(
+            run_name, audit=audit,
+            require=("agenda", "delegations", "arm_responses", "findings"),
+            allow_partial=True)
+        agenda = json.loads(stage.path("agenda").read_text())
+        reviewed = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
+        findings = jsonl_rows(stage.path("findings"))
+        responses = {row["invocation_id"]: row
+                     for row in jsonl_rows(stage.path("arm_responses"))}
+        views = load_lead_views(stage.run_dir)
+        jobs = [job for view in views.values() for job in view.delegations]
+
+        # Findings by the change target they anchor to, which is the join anchor-tier pairing
+        # makes and therefore the only one an obligation can be reached through.
+        by_change: Dict[str, List[Dict[str, Any]]] = {}
+        for finding in findings:
+            for change_id in finding.get("change_ids") or []:
+                by_change.setdefault(change_id, []).append(finding)
+
+        verdict_by_obligation: Dict[str, str] = {}
+        paired_candidates: set = set()
+        matched_candidates: set = set()
+        if audit:
+            report = json.loads(stage.audit_path("semantic_report").read_text())
+            verdict_by_obligation = {
+                row["obligation_id"]: row.get("issue_status")
+                for row in report.get("per_obligation") or []}
+            for pair in jsonl_rows(stage.audit_path("semantic_pairs")):
+                if pair.get("role") == "observed":
+                    paired_candidates.add(pair["candidate_id"])
+            for match in jsonl_rows(stage.audit_path("semantic_matches")):
+                if match.get("role") == "observed" and match.get("issue_match"):
+                    matched_candidates.add(match["candidate_id"])
+
+        stable_by_invocation: Dict[str, bool] = {}
+        if replay:
+            stable_by_invocation = _replay_stability(replay)
+
+        excluded = excluded_ids()
+        obligations = []
+        # Why this report's denominator differs from the judge's, counted rather than left to
+        # be discovered. Two kinds of row are dropped here that a judge report still scores as
+        # misses, and neither is a fact about the reviewer: one whose gold has no `change_ids`
+        # at all, which anchor-tier pairing can never reach, and one `obligation_exclusions`
+        # names as contradicted by the release's own artifacts. On `heldout12_v2_rep1` the
+        # difference is exactly one audit-excluded row -- 23 in the judge's report, 22 here.
+        skipped = {"not_proposed_atomic": 0, "audit_excluded": 0, "anchorless": 0}
+        for row in jsonl_rows(stage.release / "gold/judgments.jsonl"):
+            if row.get("pr_number") not in reviewed:
+                continue
+            for obligation in row.get("obligations") or []:
+                if obligation.get("status") != "proposed_atomic":
+                    skipped["not_proposed_atomic"] += 1
+                    continue
+                if obligation["obligation_id"] in excluded:
+                    skipped["audit_excluded"] += 1
+                    continue
+                if not (obligation.get("change_ids") or []):
+                    skipped["anchorless"] += 1
+                    continue
+                obligations.append((row["pr_number"], obligation))
+
+        rows = []
+        for pr_number, obligation in obligations:
+            sites = set(obligation["change_ids"])
+            cells = [job for job in jobs if sites & set(job.site_change_ids or [])]
+            anchored = [finding for change_id in sites for finding in by_change.get(change_id, [])]
+            anchored_ids = {item["finding_id"] for item in anchored}
+
+            states = []
+            annotations = []
+            for job in cells:
+                job_findings = [
+                    item for item in anchored
+                    if item.get("origin_arm_id") == job.arm_id
+                    or (job.arm_id == "generalist" and not item.get("origin_arm_id"))]
+                state = _cell_state(job, job_findings)
+                states.append(state)
+                response = responses.get(job.invocation_id) or {}
+                annotations.append({
+                    "invocation_id": job.invocation_id,
+                    "arm_id": job.arm_id,
+                    "state": state,
+                    "abstention_reason": ((response.get("abstention") or {}).get("reason")
+                                          if state == "silent" else None),
+                    "context": _context_quality(job.context_calls),
+                    "filed_elsewhere_in_unit": bool(
+                        state == "silent" and (job.claims or [])),
+                    "replay_stable": stable_by_invocation.get(job.invocation_id),
+                })
+
+            state = deepest(*states) if states else "unscheduled"
+            located = state in {"candidate", "finding"}
+            if not located:
+                coarse = "UNTOUCHED"
+            elif not audit:
+                coarse = "LOCATED_UNJUDGED"
+            else:
+                coarse = ("COVERED"
+                          if verdict_by_obligation.get(obligation["obligation_id"]) == "hit"
+                          else "LOCATED_MISS")
+            rows.append({
+                "obligation_id": obligation["obligation_id"],
+                "pr_number": pr_number,
+                "coarse": coarse,
+                "state": state,
+                "gate": sorted({item.get("admission") for item in anchored}) or None,
+                "judge": verdict_by_obligation.get(obligation["obligation_id"]) if audit else None,
+                "findings_at_site": sorted(anchored_ids),
+                "cells": annotations,
+            })
+
+        finding_rows = []
+        for finding in findings:
+            key = finding_key(_asobj(finding))
+            key_runs.setdefault(key, set()).add(run_name)
+            if not audit:
+                judged = None
+            elif finding["finding_id"] in matched_candidates:
+                judged = "matched"
+            elif finding["finding_id"] in paired_candidates:
+                judged = "paired_unmatched"
+            else:
+                judged = "unpaired"
+            finding_rows.append({
+                "finding_id": finding["finding_id"], "key": key,
+                "pr_number": finding["pr_number"],
+                "admission": finding.get("admission"),
+                "judge": judged,
+            })
+
+        per_run[run_name] = {
+            "state": stage.state.value,
+            "forensic": stage.forensic,
+            "prs_reviewed": reviewed,
+            "requires": stage.consumed,
+            "obligations_counted": len(obligations),
+            "obligations_not_counted": skipped,
+            "coarse": {name: sum(1 for row in rows if row["coarse"] == name)
+                       for name in COARSE},
+            "fine": {name: sum(1 for row in rows if row["state"] == name) for name in FINE},
+            "obligations": rows,
+            "obligation_ids_by_bucket": {
+                name: sorted(row["obligation_id"] for row in rows if row["coarse"] == name)
+                for name in COARSE},
+            "findings": finding_rows,
+            "findings_by_judge": {
+                name: sum(1 for row in finding_rows if row["judge"] == name)
+                for name in ("matched", "paired_unmatched", "unpaired")},
+        }
+
+    if len(run_names) > 1:
+        for run_name, payload in per_run.items():
+            for row in payload["findings"]:
+                row["reps_with_key"] = len(key_runs.get(row["key"], ()))
+
+    return {
+        "runs": run_names,
+        "judged": bool(audit),
+        "per_run": per_run,
+        "coarse_vocabulary": list(COARSE),
+        "fine_vocabulary": list(FINE),
+        "note": (
+            "UNTOUCHED is judge-independent: nothing the system emitted anchors at the "
+            "obligation's sites, so no verdict could make it a hit. COVERED and LOCATED_MISS "
+            "split the rest by the judge's own per-obligation verdict, and without an audit "
+            "that split is not made. The annotations beside each cell -- abstention reason, "
+            "retrieval, gate, replay stability -- answer different questions and are not "
+            "buckets. `reps_with_key` is reported, never ranked on: cross-rep agreement "
+            "separates hits in-sample and is provisional."),
+    }
+
+
+def _asobj(row: Dict[str, Any]):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(**row)
+
+
+def _replay_stability(replay_run: str) -> Dict[str, bool]:
+    """Per invocation, whether every replayed sample made the recorded decision.
+
+    A decision that reproduces is the arm's reading of its contract; one that does not is
+    sampling noise wearing a diagnosis. 41 of 45 gold-site specialist silences were stable.
+    """
+
+    from src.mathlib_review.run_state import StageInput
+
+    stage = StageInput.of(replay_run, require=("replay_outcomes",), allow_partial=True)
+    by_invocation: Dict[str, List[bool]] = {}
+    for row in jsonl_rows(stage.path("replay_outcomes")):
+        recorded = (row.get("recorded") or {}).get("decision") or {}
+        replayed = (row.get("replay") or {}).get("decision") or {}
+        if not replayed:
+            continue
+        agreed = bool((recorded.get("first") or {}).get("filed")
+                      == (replayed.get("first") or {}).get("filed"))
+        by_invocation.setdefault(row["invocation_id"], []).append(agreed)
+    return {key: all(value) for key, value in by_invocation.items()}

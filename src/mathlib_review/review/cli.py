@@ -179,6 +179,17 @@ def build_parser() -> argparse.ArgumentParser:
     stages = report_sub.add_parser(
         "stages", help="what has happened to this run, and whether its artifacts agree")
     stages.add_argument("--run", required=True)
+    buckets = report_sub.add_parser(
+        "buckets",
+        help="why each gold obligation ended where it did, and what became of every finding")
+    buckets.add_argument("--run", action="append", required=True, dest="runs",
+                         help="repeatable; several runs add `reps_with_key` per finding")
+    buckets.add_argument("--audit", action="store_true",
+                         help="read the judge's verdicts too, which is what splits the located "
+                              "obligations into COVERED and LOCATED_MISS")
+    buckets.add_argument("--replay", default=None,
+                         help="a replay run, to annotate each silence with whether it was "
+                              "stable under re-sampling")
     scope = report_sub.add_parser(
         "scope", help="recall split by whether the ask is local or requires a design decision")
     scope.add_argument("--audit", type=Path, required=True,
@@ -389,6 +400,11 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import stages as stages_report
 
         print(json.dumps(stages_report(args.run), indent=2))
+    elif args.report_command == "buckets":
+        from src.mathlib_review.analysis.report import buckets as buckets_report
+
+        print(json.dumps(
+            buckets_report(args.runs, audit=args.audit, replay=args.replay), indent=2))
     elif args.report_command == "conditions":
         from src.mathlib_review.analysis.report import conditions as conditions_report
 
