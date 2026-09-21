@@ -383,8 +383,13 @@ def _pipeline(args, overrides, logger) -> int:
     summary = asyncio.run(run_pipeline_spec(
         spec, args.run_name, args.config, logger, execute=args.execute))
     if not args.execute:
-        print(json.dumps(summary["plan"], indent=2), file=sys.stderr)
-        return 0
+        print(json.dumps({"plan": summary["plan"], "preflight": summary.get("preflight")},
+                         indent=2), file=sys.stderr)
+        # Non-zero when a stage would be refused, so a preflight in a script fails rather than
+        # printing a refusal nobody reads.
+        refused = [name for name, result in (summary.get("preflight") or {}).items()
+                   if "refused" in result]
+        return 1 if refused else 0
     print(json.dumps(summary, indent=2))
     # Non-zero when any stage did not produce its output, so a pipeline in a script fails the
     # way a command does. The stages that did finish keep their artifacts and their rows.
