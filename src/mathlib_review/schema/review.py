@@ -20,7 +20,7 @@ mixing them inside one package is how a frozen hash quietly moves.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import Field
 
@@ -227,8 +227,60 @@ class CandidateAssessment(StrictModel):
     reason: str = ""
 
 
+class ArmResponse(StrictModel):
+    """One arm invocation's output, as the finalization chain reads it.
+
+    Written in three places -- the lead's reconciliation, the direct-arm runner and the solo
+    projection -- as three dict literals that had to agree and were compared only by a test
+    that parsed their source for quoted keys. That test was right to exist: `abstention` was
+    added to two of them and the third kept writing nine keys, and a field the finalization
+    chain reads being absent for one routing mode is invisible until a condition reports zero.
+
+    Not sealed. These rows are the raw hand-off between the arms and `finalize`, and nothing
+    downstream joins on a digest of them; `candidates` carry their own sealed ids.
+    """
+
+    #: `wu:...#arm_id`. The run identity of one invocation -- finer than the work unit, which
+    #: five arms share.
+    invocation_id: str
+    arm_id: str
+    work_unit_id: str
+    #: The focused spec behind this arm, when it has one. `None` for the generalist and solo.
+    spec_id: Optional[str] = None
+    pr_number: int
+    #: The ledger's word for how the job ended. Deliberately a plain string: a closed
+    #: vocabulary here would silently drop a status the ledger learned to say, and this
+    #: repository has lost a correct registration to exactly that three times.
+    status: str
+    candidates: List[Dict[str, Any]] = Field(default_factory=list)
+    verification_artifacts: List[Dict[str, Any]] = Field(default_factory=list)
+    #: `{"reason": ..., "detail": ...}` when the arm submitted nothing. Its absence is not the
+    #: same as an arm that filed, and `finalize` reads it to tell a decision from a failure.
+    abstention: Optional[Dict[str, Any]] = None
+    #: `None` for the solo baseline, which is never handed a rendered work-unit prompt.
+    rendered_prompt_sha256: Optional[str] = None
+
+    def row(self) -> Dict[str, Any]:
+        """The JSONL row. Every field, always -- an optional field omitted rather than null
+        is what made the three literals disagree in the first place."""
+
+        return self.model_dump(mode="json")
+
+
 class DelegationRecord(StrictModel):
-    """What became of one job. The unit the routing ablation is measured on."""
+    """What became of one job. The unit the routing ablation is measured on.
+
+    This validated no row in the tree until now: it required a `source_sha256` nothing wrote
+    and forbade three fields every lead row carries, so the ledger was assembled as dict
+    literals in two files and read back raw, with a note in `delegation_view` saying so. A
+    model that cannot load its own artifacts is documentation, not a contract.
+
+    Three shapes are legitimate and `row()` preserves each exactly, which is why it excludes
+    what a constructor did not set: a job that RAN carries cost, status and outcome counts; a
+    job the lead PRUNED carries those keys explicitly null plus `reason_given`, because "the
+    lead gave no reason" and "the field is missing" are different facts; a job dispatched by
+    RULE has neither, since no lead ever considered it.
+    """
 
     schema_version: Literal["v5-delegation1"] = "v5-delegation1"
     invocation_id: str
@@ -240,18 +292,42 @@ class DelegationRecord(StrictModel):
     #: The lead's stated reason for keeping, adding or dropping this job. Free text, and
     #: the only place the lead's routing rationale is captured at all.
     reason: str = ""
+    #: Whether the lead actually said why it pruned this, as opposed to the runner recording
+    #: that it made a choice. Requiring a reason for every prune once cost a lead its whole
+    #: budget in rejected submissions, so the absence of one is a fact worth keeping.
+    reason_given: Optional[bool] = None
     budget_tier: Optional[Literal["cheap", "standard", "deep"]] = None
     budget_cap: Optional[float] = None
     #: `None` for a pruned job, which never executed.
     status: Optional[Literal["success", "failed", "paused_cost", "paused_turns"]] = None
     wall_seconds: Optional[float] = None
     cost: Optional[float] = None
-    token_usage: Optional[Dict[str, float]] = None
+    #: Whatever the producer recorded, and two producers recorded different things: the
+    #: per-job figures this writes today, and -- before `8f0bad5` -- the enclosing tier's
+    #: totals stamped onto every job in it, which summed to $1,141 against a real $21. Left
+    #: open so both load; `turns` is an int and must stay one, so a float-typed map would
+    #: rewrite every historical row on re-read.
+    token_usage: Optional[Dict[str, Union[int, float, None]]] = None
     candidate_count: Optional[int] = None
     verification_artifact_count: Optional[int] = None
     result_sha256: Optional[str] = None
-    context_calls: List[ContextCall] = Field(default_factory=list)
-    source_sha256: str
+    #: The lead's brief, as delivered. The sealed plan vouches for the prompt TEMPLATE; the
+    #: text the model read is template plus brief, so both halves are recorded.
+    brief: Optional[Dict[str, Any]] = None
+    #: sha256 of the user prompt as delivered, briefs included. Differs from the sealed
+    #: `rendered_prompt_sha256` exactly when a brief was attached.
+    delivered_prompt_sha256: Optional[str] = None
+    context_calls: List[Dict[str, Any]] = Field(default_factory=list)
+
+    def row(self) -> Dict[str, Any]:
+        """The JSONL row, carrying exactly the fields this record was given.
+
+        `exclude_unset` is the whole point: a rule-dispatched job has no `status` key at all
+        and a pruned one has `status: null`, and flattening those two into each other would
+        make "never considered" and "considered and declined" the same row.
+        """
+
+        return self.model_dump(mode="json", exclude_unset=True)
 
 
 #: Incremented when a change makes two runs' numbers non-comparable without either being

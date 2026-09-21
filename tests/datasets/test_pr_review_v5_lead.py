@@ -528,7 +528,10 @@ def test_a_failed_discretionary_job_is_not_a_coverage_gap(lead):
     which failed is a routing outcome, not a hole in what the run guaranteed to look at."""
 
     task, _tools = lead
-    _record_outcome(task, "wu:1#proof_golf", disposition="delegated",
+    # `proposed`, not `delegated`: the ledger's vocabulary is
+    # mandatory/proposed/agent_added/pruned, and this fixture invented a fifth value that
+    # `DISPOSITIONS` never held. It passed for as long as the row was a dict literal.
+    _record_outcome(task, "wu:1#proof_golf", disposition="proposed",
                     status="failed", error="boom")
 
     _records, _responses, gaps = task._reconcile([])

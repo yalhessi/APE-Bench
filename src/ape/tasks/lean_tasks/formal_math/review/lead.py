@@ -40,6 +40,8 @@ from ape.tasks.lean_tasks.formal_math.review.base import (
     BasePRReviewTask,
 )
 
+from src.mathlib_review.schema.review import ArmResponse, DelegationRecord
+
 from . import journal
 from .delegation import TIER_MULTIPLIERS, JobOutcome, JobSpec, run_jobs
 from .prompts import LEAD_SYSTEM, LEAD_USER
@@ -820,42 +822,41 @@ class ReviewLeadTask(BasePRReviewTask):
         context_calls = self._context_calls()
 
         for invocation_id, (outcome, spec) in sorted(state["outcomes"].items()):
-            records.append({
-                "schema_version": "v5-delegation1",
-                "invocation_id": invocation_id,
-                "proposal_id": spec.proposal_id,
-                "arm_id": outcome.arm_id,
-                "work_unit_id": outcome.work_unit_id,
-                "pr_number": outcome.pr_number,
-                "disposition": spec.disposition,
-                "reason": spec.reason,
-                "budget_tier": outcome.budget_tier,
-                "budget_cap": outcome.budget_cap,
-                "status": outcome.status,
-                "wall_seconds": outcome.wall_seconds,
-                "cost": outcome.cost,
-                "token_usage": outcome.token_usage,
-                "candidate_count": len(outcome.candidates),
-                "verification_artifact_count": len(outcome.verification_artifacts),
-                "result_sha256": outcome.result_sha256,
+            records.append(DelegationRecord(
+                invocation_id=invocation_id,
+                proposal_id=spec.proposal_id,
+                arm_id=outcome.arm_id,
+                work_unit_id=outcome.work_unit_id,
+                pr_number=outcome.pr_number,
+                disposition=spec.disposition,
+                reason=spec.reason,
+                budget_tier=outcome.budget_tier,
+                budget_cap=outcome.budget_cap,
+                status=outcome.status,
+                wall_seconds=outcome.wall_seconds,
+                cost=outcome.cost,
+                token_usage=outcome.token_usage,
+                candidate_count=len(outcome.candidates),
+                verification_artifact_count=len(outcome.verification_artifacts),
+                result_sha256=outcome.result_sha256,
                 # Both halves of what the model actually read: the brief itself, and the hash
                 # of the composed prompt. The sealed plan vouches for the template alone.
-                "brief": spec.brief,
-                "delivered_prompt_sha256": outcome.delivered_prompt_sha256,
-                "context_calls": context_calls.get(invocation_id, []),
-            })
-            responses.append({
-                "invocation_id": invocation_id,
-                "arm_id": outcome.arm_id,
-                "work_unit_id": outcome.work_unit_id,
-                "spec_id": spec.payload.get("spec_id"),
-                "pr_number": outcome.pr_number,
-                "status": outcome.status,
-                "candidates": outcome.candidates,
-                "verification_artifacts": outcome.verification_artifacts,
-                "abstention": outcome.abstention,
-                "rendered_prompt_sha256": spec.payload.get("rendered_prompt_sha256"),
-            })
+                brief=spec.brief,
+                delivered_prompt_sha256=outcome.delivered_prompt_sha256,
+                context_calls=context_calls.get(invocation_id, []),
+            ).row())
+            responses.append(ArmResponse(
+                invocation_id=invocation_id,
+                arm_id=outcome.arm_id,
+                work_unit_id=outcome.work_unit_id,
+                spec_id=spec.payload.get("spec_id"),
+                pr_number=outcome.pr_number,
+                status=outcome.status,
+                candidates=outcome.candidates,
+                verification_artifacts=outcome.verification_artifacts,
+                abstention=outcome.abstention,
+                rendered_prompt_sha256=spec.payload.get("rendered_prompt_sha256"),
+            ).row())
 
         # A mandatory job that RAN and failed is a coverage gap too. The check below only asks
         # whether the invocation is in `outcomes`, and a failed job is — so a floor job that
@@ -892,23 +893,25 @@ class ReviewLeadTask(BasePRReviewTask):
                 })
                 self.logger and self.logger.warning(
                     "mandatory job %s never ran", proposal["invocation_id"])
-            records.append({
-                "schema_version": "v5-delegation1",
-                "invocation_id": proposal["invocation_id"],
-                "proposal_id": proposal_id,
-                "arm_id": proposal["arm_id"],
-                "work_unit_id": proposal["work_unit_id"],
-                "pr_number": proposal["pr_number"],
-                "disposition": "pruned",
+            records.append(DelegationRecord(
+                invocation_id=proposal["invocation_id"],
+                proposal_id=proposal_id,
+                arm_id=proposal["arm_id"],
+                work_unit_id=proposal["work_unit_id"],
+                pr_number=proposal["pr_number"],
+                disposition="pruned",
                 # The lead's own words when it gave them; otherwise a marker that says it
                 # made a choice rather than that the choice went unrecorded.
-                "reason": pruned_by_id.get(proposal_id, "not selected by the lead"),
-                "reason_given": proposal_id in pruned_by_id,
-                "budget_tier": None, "budget_cap": None, "status": None,
-                "wall_seconds": None, "cost": None, "token_usage": None,
-                "candidate_count": None, "verification_artifact_count": None,
-                "result_sha256": None, "context_calls": [],
-            })
+                reason=pruned_by_id.get(proposal_id, "not selected by the lead"),
+                reason_given=proposal_id in pruned_by_id,
+                # Explicitly null, not absent: a pruned job was considered and declined, and a
+                # rule-dispatched one was never considered at all. `row()` keeps them apart
+                # only because these are set here.
+                budget_tier=None, budget_cap=None, status=None,
+                wall_seconds=None, cost=None, token_usage=None,
+                candidate_count=None, verification_artifact_count=None,
+                result_sha256=None, context_calls=[],
+            ).row())
         return records, responses, coverage_gaps
 
     def _context_calls(self) -> Dict[str, List[Dict[str, Any]]]:

@@ -70,7 +70,9 @@ from src.mathlib_review.paths import PRECEDENT_INDEX, run_dir
 from src.mathlib_review.review.preflight import (
     assert_ready, assert_reviewed_workspaces_prebuilt, assert_workspaces_prebuilt,
 )
-from src.mathlib_review.schema.review import ROUTING_MODES, V5RunManifest, V5RunPlan
+from src.mathlib_review.schema.review import (
+    ROUTING_MODES, ArmResponse, DelegationRecord, V5RunManifest, V5RunPlan,
+)
 from src.mathlib_review.review.trace import reconcile
 from src.mathlib_review.run_config import load_run as _load_run
 
@@ -460,18 +462,18 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
             # response instead and blocked reconciliation.
             if not raw.get("invocation_id"):
                 continue
-            responses.append({
-                "invocation_id": raw.get("invocation_id"),
-                "arm_id": raw.get("arm_id"),
-                "work_unit_id": raw.get("work_unit_id"),
-                "spec_id": raw.get("spec_id"),
-                "pr_number": raw.get("pr_number"),
-                "status": "success" if raw.get("success") else "failed",
-                "candidates": raw.get("candidates") or [],
-                "verification_artifacts": raw.get("verification_artifacts") or [],
-                "abstention": raw.get("abstention"),
-                "rendered_prompt_sha256": raw.get("rendered_prompt_sha256"),
-            })
+            responses.append(ArmResponse(
+                invocation_id=raw.get("invocation_id"),
+                arm_id=raw.get("arm_id"),
+                work_unit_id=raw.get("work_unit_id"),
+                spec_id=raw.get("spec_id"),
+                pr_number=raw.get("pr_number"),
+                status="success" if raw.get("success") else "failed",
+                candidates=raw.get("candidates") or [],
+                verification_artifacts=raw.get("verification_artifacts") or [],
+                abstention=raw.get("abstention"),
+                rendered_prompt_sha256=raw.get("rendered_prompt_sha256"),
+            ).row())
     return responses
 
 
@@ -524,23 +526,23 @@ def _solo_responses(results, graphs, units, logger=None):
                       for unit in units_by_episode.get(episode_id, [])}
         for work_unit_id, findings in sorted(by_unit.items()):
             unit = unit_by_id[work_unit_id]
-            responses.append({
-                "invocation_id": f"{work_unit_id}#{SOLO_ARM_ID}",
-                "arm_id": SOLO_ARM_ID,
-                "work_unit_id": work_unit_id,
-                "spec_id": SOLO_ARM_ID,
-                "pr_number": raw.get("pr_number"),
-                "status": "success",
-                "candidates": [_solo_candidate(finding, unit) for finding in findings],
-                "verification_artifacts": [],
-                # Always None, and present rather than absent so all three row builders emit
-                # one key set. A solo agent reviews the whole PR and its findings are
-                # projected onto the units they anchor to, so a unit with no finding produces
-                # no row at all -- there is no submission here to have abstained, and
-                # inventing a reason for one would be fabricating the agent's rationale.
-                "abstention": None,
-                "rendered_prompt_sha256": None,
-            })
+            responses.append(ArmResponse(
+                invocation_id=f"{work_unit_id}#{SOLO_ARM_ID}",
+                arm_id=SOLO_ARM_ID,
+                work_unit_id=work_unit_id,
+                spec_id=SOLO_ARM_ID,
+                pr_number=raw.get("pr_number"),
+                status="success",
+                candidates=[_solo_candidate(finding, unit) for finding in findings],
+                verification_artifacts=[],
+                # Always None, and present rather than absent -- `row()` emits every field, so
+                # all three routing modes write one key set. A solo agent reviews the whole PR
+                # and its findings are projected onto the units they anchor to, so a unit with
+                # no finding produces no row at all: there is no submission here to have
+                # abstained, and inventing a reason would be fabricating the agent's rationale.
+                abstention=None,
+                rendered_prompt_sha256=None,
+            ).row())
     return responses, anchor_rows
 
 
@@ -681,37 +683,35 @@ def _delegations_from_results(results, mode: str, agenda,
         # invocation the sealed agenda did not enumerate, and a whole-PR review is not one of
         # them. A solo task that failed is a coverage gap, not a delegation.
         return [
-            {
-                "schema_version": "v5-delegation1",
-                "invocation_id": item.invocation_id,
-                "proposal_id": item.proposal_id,
-                "arm_id": item.arm_id,
-                "work_unit_id": item.work_unit_id,
-                "pr_number": item.pr_number,
-                "disposition": "pruned",
-                "reason": "solo mode schedules no work-unit job",
-                "budget_tier": None,
-                "context_calls": [],
-            }
+            DelegationRecord(
+                invocation_id=item.invocation_id,
+                proposal_id=item.proposal_id,
+                arm_id=item.arm_id,
+                work_unit_id=item.work_unit_id,
+                pr_number=item.pr_number,
+                disposition="pruned",
+                reason="solo mode schedules no work-unit job",
+                budget_tier=None,
+                context_calls=[],
+            ).row()
             for item in agenda.proposals
         ]
     ran = {item.invocation_id for item in initial_jobs(agenda)}
     return [
-        {
-            "schema_version": "v5-delegation1",
-            "invocation_id": item.invocation_id,
-            "proposal_id": item.proposal_id,
-            "arm_id": item.arm_id,
-            "work_unit_id": item.work_unit_id,
-            "pr_number": item.pr_number,
-            "disposition": (
+        DelegationRecord(
+            invocation_id=item.invocation_id,
+            proposal_id=item.proposal_id,
+            arm_id=item.arm_id,
+            work_unit_id=item.work_unit_id,
+            pr_number=item.pr_number,
+            disposition=(
                 "mandatory" if item.mandatory
                 else "proposed" if item.invocation_id in ran else "pruned"
             ),
-            "reason": ("" if item.invocation_id in ran else f"not selected in {mode} mode"),
-            "budget_tier": "standard" if item.invocation_id in ran else None,
-            "context_calls": [],
-        }
+            reason=("" if item.invocation_id in ran else f"not selected in {mode} mode"),
+            budget_tier="standard" if item.invocation_id in ran else None,
+            context_calls=[],
+        ).row()
         for item in agenda.proposals
     ]
 
