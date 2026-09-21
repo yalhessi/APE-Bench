@@ -43,7 +43,7 @@ of anything.
 | 12 | Run transitions written as an explicit state machine | **Built** — `mathlib_review/run_state.py`. Wired rather than documented: the judge asks `SCOREABLE` instead of comparing against the literal `"complete"`. The manifest's own `complete`/`partial`/`failed` vocabulary is deliberately not renamed — those strings are in every manifest in the tree. |
 | 13 | Lead state as an append-only event journal | **Built** |
 | 14 | `execution_index.jsonl` mapping semantic ids to physical paths | **Built** |
-| 15 | Isolation contract, stated and tested | **Built** |
+| 15 | Isolation contract, stated and tested | **Built**. Strengthened 2026-09-21: the guard asserted only that each nested call site mentioned `nested_config`, which two of them satisfied while keeping a private orchestrator. It now forbids `TaskOrchestrator(` in all three. |
 | 16 | Kill the prompt redundancy | **Built** — 32% of the arm prompt |
 | 17 | Two one-line bugs | **Built** |
 
@@ -92,11 +92,28 @@ Correction sidecars for the September runs: **built**. Those runs are forensic f
 | 4 | Judging consumes final serialized findings | **Built** |
 | 5 | No broad new style/documentation checkers | **Held** — none added |
 
+## What the subtask contract makes cheap — coordination, 2026-09-21
+
+`CoordinationPolicy` names five decisions that were constants in `lead.py` and `delegation.py`,
+and `assert_implemented` refuses every value the code cannot honour — because a field that is
+read but not implemented makes a run record a policy it did not follow. Three of those refusals
+are now three files each, and the refusal message itself names them:
+
+| Refused value | What it takes |
+|---|---|
+| `sibling_view: blackboard` | a typed entry and a `board` on the brief (`review/lead.py`), a `BOARD_POSTED` event so a resumed lead replays what it posted (`review/journal.py`), the refusal. A board-bearing brief changes the delivered prompt, hence the child's `global_index`, so it cannot collide with a resume of the unbriefed job. |
+| `parent_view: counts \| full` | a `view` argument on `JobOutcome.summary` (`review/delegation.py`), the policy value at its one call site (`review/lead.py`), the refusal. |
+| `max_redispatches_per_pair > 0` | a per-pair counter and an `@n` suffix on the invocation id (`review/lead.py`), the suffix stripped before the agenda check (`review/trace.py`), the refusal. The payload **must** differ: `global_index` is a content hash and the orchestrator skips a task whose result exists, so an identical re-dispatch silently resumes the first — which is why `run_subtasks` refuses two specs with identical task data. |
+| `authority: final_arbiter` | not three files. A rewrite is a new finding revision and claim-scoped evidence does not transfer to it, so the evidence must be rebound or re-run before it could publish. |
+
+None is implemented here. Each changes what a run does and therefore needs its own run name,
+and the experiments themselves are the coordination thread's, not this one's.
+
 ## Updated plan — the six steps
 
 | Step | Status |
 |---|---|
-| 1 — `TaskExecutionSpec`, `spawn_subtasks`, retire budget tiers | **Built**. `judgment` and `review_gate` migrated onto it and their tests still pass, which was the plan's own test of whether it is a primitive or a fourth convention. |
+| 1 — `TaskExecutionSpec`, `spawn_subtasks`, retire budget tiers | **Built**, and as of 2026-09-21 actually adopted. This row overstated itself: `judgment` and `review_gate` shared the *directory helper* (`nested_config`) and kept their own orchestrator, their own reader of what the children did, and their own failure test, while `spawn_subtasks` had no caller at all. All three families now go through `run_subtasks` and none of them constructs a `TaskOrchestrator`, which is what the plan's own acceptance test was for. The unused primitive had two defects the first caller would have hit: children were read from `results.task_results`, which omits any task with a paused sample, and `orchestrator_id` was assigned after construction, so the batch landed in a timestamped directory a resumed parent could not find. |
 | 2 — run-total scope, `UsageBreakdown`, lead journal, `execution_index.jsonl` | **Built** |
 | 3 — dual admission channels | **Built** |
 | 4 — provenance instead of a concern gate | **Built** |

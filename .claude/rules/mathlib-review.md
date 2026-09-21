@@ -175,3 +175,27 @@ paths:
   A single control candidate is inside the historical range and is not evidence that a change
   regressed precision; it takes reps, and the source says to label it `silent_pr_emission`,
   never a false-finding rate.
+- **Read a nested run's children from what was SCHEDULED, never from `results.task_results`.**
+  The orchestrator aggregates only finished tasks, and a task with a resumable sample writes
+  `task_outcome.json` and returns *before* aggregation — so a job that spent its whole cap and
+  concluded nothing is absent from that list entirely. Both readers this repository had did
+  exactly that; `cli replay` hit it, lost two whole sessions, and worked around it by locating
+  task directories from the tasks it had scheduled. `run_subtasks` is now the one way to nest
+  work and returns a `ChildRun` per spec — the spec, the `TaskOutcome` and the child's own
+  *typed* result — built from the scheduled tasks. `succeeded` means a legal submission came
+  back, never `execution_status == COMPLETED`: a task can complete having concluded nothing,
+  and a failed floor job once counted as coverage on exactly that conflation.
+- **`orchestrator_id` is a constructor argument.** `TaskOrchestrator.__init__` fixes
+  `workspace_path = runs_base_dir / orchestrator_id`, so assigning it afterwards changes
+  nothing except making `OrchestratorResults.orchestrator_id` disagree with the directory —
+  children land under `orchestrator_<timestamp>_<hash>/` and a resumed parent cannot find work
+  it already paid for.
+- **A ledger row has one constructor.** `ArmResponse` and `DelegationRecord`
+  (`schema/review.py`) are the only writers of `arm_responses.jsonl` and `delegations.jsonl`;
+  five dict literals in two files wrote them before, compared only by a test that parsed their
+  own source for quoted keys. `row()` uses `exclude_unset` deliberately: a pruned job carries
+  its outcome keys explicitly null and a rule-dispatched job does not carry them at all, and
+  flattening those makes "considered and declined" indistinguishable from "never considered".
+  Before changing either model, run `tests/datasets/test_pr_review_v5_row_models.py` — it
+  round-trips every row in the tree, byte for byte, which is how a float-typed `turns` gets
+  caught before it rewrites 20,262 rows.
