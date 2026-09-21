@@ -122,3 +122,63 @@ def test_candidates_inside_the_named_run_are_accepted(tmp_path):
         out_dir=tmp_path / "audit",
     )
     assert_paths_agree(config, run_name)
+
+
+# --- one judge identity per audit ----------------------------------------------------------
+
+
+def test_a_second_judge_identity_into_one_audit_is_refused_before_spending(tmp_path):
+    """`judge_identity` covers the rubric, the model, the sampling and the decode budgets, and
+    R0 found two judge arms disagreeing on 4 of 18 pairs from decode budgets alone. Two of them
+    in one directory are two measurements presented as one.
+
+    Caught today only by `write_once` refusing `semantic_report.json` -- after every pair has
+    been judged and paid for."""
+
+    from types import SimpleNamespace
+
+    from src.mathlib_review.io import canonical_json_bytes
+    from src.mathlib_review.judge.runner import assert_one_judge_per_audit
+
+    audit = tmp_path / "audit"
+    audit.mkdir()
+    (audit / "semantic_report.json").write_bytes(canonical_json_bytes(
+        {"judge_identity": "a" * 64}))
+    dataset = SimpleNamespace(out_dir=audit)
+    stage = SimpleNamespace(ledger=[])
+    logger = SimpleNamespace(info=lambda *a, **k: None, warning=lambda *a, **k: None)
+
+    with pytest.raises(ValueError) as error:
+        assert_one_judge_per_audit(dataset, stage, "b" * 64, logger)
+    message = str(error.value)
+    assert "aaaaaaaaaaaa" in message and "bbbbbbbbbbbb" in message
+    # And it says what a legitimate second judgement does instead.
+    assert "dataset.out_dir" in message and "node" in message
+
+    # The same identity is a resume, which is the judge's cache and is allowed.
+    assert_one_judge_per_audit(dataset, stage, "a" * 64, logger) is None
+
+
+def test_the_ledger_outranks_the_report_for_what_was_judged(tmp_path):
+    """The report is a fallback for audits written before the ledger existed. A row is the
+    authority, because it also says which run and which node produced it."""
+
+    from types import SimpleNamespace
+
+    from src.mathlib_review.judge.runner import assert_one_judge_per_audit
+
+    audit = tmp_path / "audit"
+    audit.mkdir()
+    dataset = SimpleNamespace(out_dir=audit)
+    stage = SimpleNamespace(ledger=[{
+        "stage": "judge", "identity": {"judge_identity": "c" * 64},
+        "produced": {"out_dir": str(audit)}}])
+    logger = SimpleNamespace(info=lambda *a, **k: None, warning=lambda *a, **k: None)
+
+    with pytest.raises(ValueError):
+        assert_one_judge_per_audit(dataset, stage, "d" * 64, logger)
+    # A row for a DIFFERENT audit says nothing about this one.
+    other = SimpleNamespace(ledger=[{
+        "stage": "judge", "identity": {"judge_identity": "c" * 64},
+        "produced": {"out_dir": str(tmp_path / "elsewhere")}}])
+    assert_one_judge_per_audit(dataset, other, "d" * 64, logger)

@@ -44,7 +44,7 @@ from typing import List, Optional
 
 #: Subcommands that call a model. Listed once so the gate cannot be added to a new command by
 #: remembering to; a command absent from here is asserted to be read-only by the tests.
-SPENDS = frozenset({"run", "judge", "bench", "replay"})
+SPENDS = frozenset({"run", "judge", "bench", "replay", "pipeline"})
 
 
 def _say_nothing_ran(command: str, facts: dict) -> None:
@@ -145,12 +145,33 @@ def build_parser() -> argparse.ArgumentParser:
     replay.add_argument("--of", dest="of_run", default=None,
                         help="the generation run whose arm sessions are replayed")
     replay.add_argument(
+        "--select", default=None,
+        metavar="all|arm|invocation_ids|gold-site-abstentions|missed-obligations",
+        help="which recorded sessions to re-decide. The two gold-derived selectors read the "
+             "judge's verdicts and are sealed into the plan as such: the prefix replayed is "
+             "still the recording, so gold reaches no prompt, but the selection is in-sample.")
+    replay.add_argument(
         "--cut", default=None, metavar="turn=N|node=I|tool=NAME[:first|:last|:N]",
         help="where the model takes over, replacing the config's cut. `--set dataset.cut=` "
              "would merge with it instead, leaving two spellings, which is refused.")
     _add_run_name(replay)
     _add_set(replay)
     _add_execute(replay)
+
+    pipeline = sub.add_parser(
+        "pipeline", help="a declared experiment: one run and the stages that read it")
+    pipeline.add_argument("--config", type=Path, required=True)
+    _add_run_name(pipeline)
+    _add_set(pipeline)
+    _add_execute(pipeline)
+
+    adjudicate = sub.add_parser(
+        "adjudicate",
+        help="label the findings gold cannot judge, and report how many still are not")
+    adjudicate.add_argument("--of", dest="of_run", required=True,
+                            help="the judged generation run whose off-gold findings to read")
+    adjudicate.add_argument("--labels", type=Path, default=None,
+                            help="a JSONL file of human labels to add to the store first")
 
     report = sub.add_parser("report", help="read a finished run")
     report_sub = report.add_subparsers(dest="report_command", required=True)
@@ -169,6 +190,20 @@ def build_parser() -> argparse.ArgumentParser:
     retrieval = report_sub.add_parser(
         "retrieval", help="which retrieval tool the arms reached for, and what came back")
     retrieval.add_argument("--run", required=True)
+    stages = report_sub.add_parser(
+        "stages", help="what has happened to this run, and whether its artifacts agree")
+    stages.add_argument("--run", required=True)
+    buckets = report_sub.add_parser(
+        "buckets",
+        help="why each gold obligation ended where it did, and what became of every finding")
+    buckets.add_argument("--run", action="append", required=True, dest="runs",
+                         help="repeatable; several runs add `reps_with_key` per finding")
+    buckets.add_argument("--audit", action="store_true",
+                         help="read the judge's verdicts too, which is what splits the located "
+                              "obligations into COVERED and LOCATED_MISS")
+    buckets.add_argument("--replay", default=None,
+                         help="a replay run, to annotate each silence with whether it was "
+                              "stable under re-sampling")
     scope = report_sub.add_parser(
         "scope", help="recall split by whether the ask is local or requires a design decision")
     scope.add_argument("--audit", type=Path, required=True,
@@ -304,6 +339,8 @@ def _replay(args, overrides, logger) -> int:
 
     if args.of_run:
         overrides.setdefault("dataset", {})["of_run"] = args.of_run
+    if args.select:
+        overrides.setdefault("dataset", {})["selector"] = args.select
     dataset, execution = load_replay(
         args.config, overrides, parse_cut(args.cut) if args.cut else None)
     if not args.execute:
@@ -319,6 +356,39 @@ def _replay(args, overrides, logger) -> int:
     elif result:
         print(result)
     return 0
+
+
+def _pipeline(args, overrides, logger) -> int:
+    """Resolve the whole graph, and with `--execute`, run it.
+
+    Without it: every node's config is opened and hashed and the plan is printed, and nothing
+    is written. That rule matters more for a pipeline than for a single verb -- the cost of
+    discovering a bad judge config after the generation run is the generation run.
+    """
+
+    from src.mathlib_review.review.pipeline import load_pipeline, run as run_pipeline_spec
+
+    if not args.run_name:
+        raise SystemExit(
+            "--run-name is required: it names the generation run at the root of the pipeline, "
+            "and every other stage's run name and audit directory derive from it.")
+    # `--set` here targets the GRAPH -- `max_parallel_stages`, or one node's own overrides --
+    # not a dataset. The run name is the root's, and it is passed as such rather than merged
+    # into a config that has no `dataset` key and would refuse one.
+    spec = load_pipeline(args.config, {key: value for key, value in overrides.items()
+                                       if key != "dataset"})
+    if not args.execute:
+        _say_nothing_ran("pipeline", {"config": str(args.config), "root run": args.run_name,
+                                      "stages": ", ".join(sorted(spec.stages))})
+    summary = asyncio.run(run_pipeline_spec(
+        spec, args.run_name, args.config, logger, execute=args.execute))
+    if not args.execute:
+        print(json.dumps(summary["plan"], indent=2), file=sys.stderr)
+        return 0
+    print(json.dumps(summary, indent=2))
+    # Non-zero when any stage did not produce its output, so a pipeline in a script fails the
+    # way a command does. The stages that did finish keep their artifacts and their rows.
+    return 1 if summary.get("unfinished") else 0
 
 
 def _report(args) -> int:
@@ -342,6 +412,15 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import retrieval
 
         print(json.dumps(retrieval(args.run), indent=2))
+    elif args.report_command == "stages":
+        from src.mathlib_review.analysis.report import stages as stages_report
+
+        print(json.dumps(stages_report(args.run), indent=2))
+    elif args.report_command == "buckets":
+        from src.mathlib_review.analysis.report import buckets as buckets_report
+
+        print(json.dumps(
+            buckets_report(args.runs, audit=args.audit, replay=args.replay), indent=2))
     elif args.report_command == "conditions":
         from src.mathlib_review.analysis.report import conditions as conditions_report
 
@@ -392,6 +471,15 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _bench(args, logger)
     if args.command == "replay":
         return _replay(args, overrides, logger)
+    if args.command == "pipeline":
+        return _pipeline(args, overrides, logger)
+    if args.command == "adjudicate":
+        from src.mathlib_review.judge.adjudicate import adjudicate_run
+
+        # Not in `SPENDS`: no model runs. A label is in the store or it is not, and the report
+        # says how much of the run is still unadjudicated rather than filling the gap.
+        print(adjudicate_run(args.of_run, labels=args.labels, logger=logger))
+        return 0
     if args.command == "report":
         return _report(args)
     if args.command == "trajectory":

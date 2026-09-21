@@ -174,10 +174,12 @@ from .runs import (  # noqa: F401
     PairManifest,
     PairingTier,
     RunManifest,
+    StageRecord,
     RunPlan,
 )
 
 from .scoring import (  # noqa: F401
+    AdjudicationLabel,
     SemanticMatch,
     SemanticPair,
 )
@@ -294,10 +296,12 @@ __all__ = [
     "ReviewRoundSegment",
     "ReviewWorkUnit",
     "RunManifest",
+    "StageRecord",
     "RunPlan",
     "ScopeResolution",
     "SelectedFinding",
     "SemanticEntity",
+    "AdjudicationLabel",
     "SemanticMatch",
     "SemanticPair",
     "SemanticSubjectInference",

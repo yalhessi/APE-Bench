@@ -17,12 +17,11 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.paths import RESULTS, run_dir
 from src.mathlib_review.review.trace import routing_report
 
 
-def _load_jsonl(path: Path):
-    return [json.loads(x) for x in path.read_text().splitlines() if x.strip()]
 
 
 def retrieval(run_name: str) -> Dict[str, Any]:
@@ -57,7 +56,7 @@ def retrieval(run_name: str) -> Dict[str, Any]:
     so the arms granted it barely use it.
     """
 
-    rows = _load_jsonl(run_dir(run_name) / "context_trace.jsonl")
+    rows = jsonl_rows(run_dir(run_name) / "context_trace.jsonl")
     if not rows:
         return {"run": run_name, "calls": 0}
 
@@ -111,7 +110,7 @@ def _abstentions(run_name: str) -> Dict[str, Any]:
     """
 
     by_arm: Dict[str, Dict[str, int]] = {}
-    for row in _load_jsonl(run_dir(run_name) / "arm_responses.jsonl"):
+    for row in jsonl_rows(run_dir(run_name) / "arm_responses.jsonl"):
         if row.get("candidates"):
             continue
         arm = row.get("arm_id") or str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
@@ -123,7 +122,7 @@ def _abstentions(run_name: str) -> Dict[str, Any]:
 
 def routing(run_name: str) -> Dict[str, Any]:
     directory = run_dir(run_name)
-    delegations = _load_jsonl(directory / "delegations.jsonl")
+    delegations = jsonl_rows(directory / "delegations.jsonl")
     report = routing_report(delegations)
     manifest_path = directory / "run_manifest.json"
     if manifest_path.is_file():
@@ -153,12 +152,17 @@ def scoped_obligations(run_name: str,
     generation side never touches it.
     """
 
-    agenda_path = run_dir(run_name) / "agenda.json"
-    if not agenda_path.is_file():
+    from src.mathlib_review.run_state import MissingArtifact, StageInput
+
+    try:
+        stage = StageInput.at(run_dir(run_name), run_name=run_name, allow_partial=True)
+        agenda = json.loads(stage.path("agenda").read_text())
+    except (MissingArtifact, FileNotFoundError):
         return None
-    agenda = json.loads(agenda_path.read_text())
     reviewed = {item["pr_number"] for item in agenda.get("proposals", [])}
-    judgments = Path(agenda["release"]) / "gold/judgments.jsonl"
+    if stage.release is None:
+        return None
+    judgments = stage.release / "gold/judgments.jsonl"
     if not judgments.is_file():
         return None
     # Count *eligible* obligations, not raw ones. The judge scores a filtered set — 40 of
@@ -184,7 +188,7 @@ def scoped_obligations(run_name: str,
 
     excluded = excluded_ids()
     audited: Dict[int, int] = {}
-    for row in _load_jsonl(judgments):
+    for row in jsonl_rows(judgments):
         pr = row.get("pr_number")
         if pr not in reviewed:
             continue
@@ -244,10 +248,8 @@ def contamination(release: Path) -> Dict[str, Any]:
     gold: List[str] = []
     path = release / "gold/judgments.jsonl"
     if path.is_file():
-        for line in path.read_text().splitlines():
-            if not line.strip():
-                continue
-            for obligation in (json.loads(line).get("obligations") or []):
+        for row in jsonl_rows(path):
+            for obligation in (row.get("obligations") or []):
                 for field in ("claim", "requested_change", "resolution_criteria"):
                     if obligation.get(field):
                         gold.append(str(obligation[field]))
@@ -423,8 +425,10 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     all line up. Two seams have to be bridged, and both are one-liners rather than reasons
     to fork a 1600-line renderer:
 
-    * The judge writes `semantic_matches.jsonl`; the overlay reads `matches.jsonl`. An
-      alias is created rather than a copy, so there is exactly one file of record.
+    * The judge writes `semantic_matches.jsonl` and v4 audits hold `matches.jsonl`; the
+      renderer reads whichever it finds, in that order. It used to be given an alias planted
+      inside the audit directory -- a read-only report writing into another stage's output,
+      which is the one thing an immutable artifact tree must not allow.
     * Output must not land inside a frozen root, or every render fails the FROZEN.lock gate.
       v5 overlays go to `results/overlays/pr_review_v5/`.
 
@@ -436,23 +440,17 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     from src.mathlib_review.analysis.review_overlay import build_overlay, write_overlay
     from src.mathlib_review.analysis.review_overlay import paths as v4_paths
 
-    directory = run_dir(run_name)
-    agenda_path = directory / "agenda.json"
-    if not agenda_path.is_file():
-        raise FileNotFoundError(
-            f"no agenda at {agenda_path}; the overlay needs the run's release and PR set."
-        )
-    agenda = json.loads(agenda_path.read_text())
-    release = Path(agenda["release"])
+    from src.mathlib_review.run_state import StageInput
+
+    # Read forensically: an overlay of a partial run is exactly what someone wants to look at
+    # when a run went wrong, and the page is not a measurement.
+    stage = StageInput.at(run_dir(run_name), run_name=run_name, allow_partial=True)
+    directory = stage.run_dir
+    agenda = json.loads(stage.path("agenda").read_text())
+    release = stage.release
     pr_numbers = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
 
-    judge = None
-    if audit_dir and audit_dir.is_dir():
-        alias = audit_dir / "matches.jsonl"
-        source = audit_dir / "semantic_matches.jsonl"
-        if source.is_file() and not alias.exists():
-            alias.symlink_to(source.name)
-        judge = audit_dir if alias.exists() else None
+    judge = audit_dir if audit_dir and audit_dir.is_dir() else None
 
     out = out or Path("results/overlays/pr_review_v5") / run_name
     treatment = v4_paths.TREATMENTS / "systematic-opportunities-v3-medium"
@@ -544,6 +542,8 @@ def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str
     for label, names in reps.items():
         loaded[label] = []
         for run_name in names:
+            # Derived the way `judge --of` derives it, so a condition cannot be paired with an
+            # audit that scored a different run.
             audit = derive_from_run(run_name)["out_dir"] / "semantic_report.json"
             if not audit.is_file():
                 raise SystemExit(
@@ -675,7 +675,7 @@ def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
 
     scoped = set(scoped_obligation_ids)
     gold: Counter = Counter()
-    for node in _load_jsonl(release / "gold/judgments.jsonl"):
+    for node in jsonl_rows(release / "gold/judgments.jsonl"):
         weight = sum(1 for ob in node.get("obligations") or []
                      if ob.get("obligation_id") in scoped)
         if not weight:
@@ -693,7 +693,7 @@ def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
         path = run_dir(run_name) / "findings.jsonl"
         if not path.is_file():
             continue
-        raised: Counter = Counter(canon(r["concern_family"]) for r in _load_jsonl(path))
+        raised: Counter = Counter(canon(r["concern_family"]) for r in jsonl_rows(path))
         raised_share = share(raised)
         keys = set(gold_share) | set(raised_share)
         # Half the L1 distance between the two distributions: 0 is identical attention, 1 is
@@ -719,7 +719,7 @@ def _redundancy(run_name: str) -> Optional[Dict[str, Any]]:
     path = run_dir(run_name) / "findings.jsonl"
     if not path.is_file():
         return None
-    rows = list(_load_jsonl(path))
+    rows = list(jsonl_rows(path))
     per_target = Counter((r["pr_number"], r["primary_change_id"]) for r in rows)
     families = Counter(
         len({r["concern_family"] for r in rows
@@ -793,9 +793,9 @@ def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
                         if payload.get(key):
                             searched[pr].add(str(payload[key]))
 
-    episodes = {row["pr_number"]: row for row in _load_jsonl(release / "input/episodes.jsonl")}
+    episodes = {row["pr_number"]: row for row in jsonl_rows(release / "input/episodes.jsonl")}
     out: Dict[str, Any] = {}
-    for row in _load_jsonl(release / "derived/change_graphs.jsonl"):
+    for row in jsonl_rows(release / "derived/change_graphs.jsonl"):
         graph = ChangeGraph.model_validate(row)
         pr = graph.pr_number
         if pr not in tools and pr not in reads:
@@ -832,3 +832,351 @@ def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
             "changed_files": len(episode.get("changed_files") or []),
         }
     return out
+
+
+def stages(run_name: str) -> Dict[str, Any]:
+    """What has happened to this run, and what the artifacts say happened.
+
+    Two halves, and the second is the point. The ledger says what each stage recorded; the
+    reconciliation says whether the run directory agrees with it. They can disagree in exactly
+    the ways a crash produces -- a manifest with no row means a run closed and died before
+    recording itself, an audit on disk with no row means it was judged before rows existed (or
+    by hand) -- and naming those is more useful than a ledger that pretends to be complete.
+
+    Read-only, and free.
+    """
+
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.paths import AUDITS
+    from src.mathlib_review.run_state import RUN_ARTIFACTS, ledger, state_of
+
+    directory = run_dir(run_name)
+    rows = ledger(directory)
+    manifest_path = directory / RUN_ARTIFACTS["run_manifest"].filename
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else None
+
+    audits_on_disk = sorted(
+        str(path) for path in AUDITS.glob(f"{derive_from_run(run_name)['out_dir'].name}*")
+        if (path / "semantic_report.json").is_file())
+    audits_in_ledger = {row.get("produced", {}).get("out_dir")
+                        for row in rows if row.get("stage") == "judge"}
+
+    return {
+        "run": run_name,
+        "state": state_of(directory).value,
+        "completion_status": (manifest or {}).get("completion_status"),
+        "stages": [
+            {key: row.get(key) for key in
+             ("stage", "node", "pipeline", "transition", "forensic", "written_at",
+              "git_commit", "git_tree_state", "identity")}
+            for row in rows
+        ],
+        "forensic_rows": [row.get("stage") for row in rows if row.get("forensic")],
+        "reconciliation": {
+            # A run that closed and died before recording itself. The artifacts are intact and
+            # the row is not; that is worth saying rather than papering over.
+            "ledger_missing_run_row": bool(
+                manifest and not any(row.get("stage") == "run" for row in rows)),
+            "audits_without_a_row": [
+                item for item in audits_on_disk if item not in audits_in_ledger],
+            "rows_without_an_audit": sorted(
+                item for item in audits_in_ledger
+                if item and not (Path(item) / "semantic_report.json").is_file()),
+        },
+    }
+
+
+#: The coarse split, and it is miss-decomposition's, unchanged since June 2026.
+#:
+#: `UNTOUCHED` is pure geometry and judge-independent: nothing the system emitted anchors at
+#: this obligation's sites, so no verdict can make it a hit. That is the number the 2026-06
+#: analysis called the robust one, and it is computable before any judge runs.
+#:
+#: `LOCATED_MISS` is the selection gap the whole project turns on -- something *was* emitted
+#: there and it was about something else. Splitting it from `COVERED` needs the judge, which is
+#: why a bucket report without an audit reports `LOCATED_UNJUDGED` rather than guessing.
+COARSE = ("UNTOUCHED", "LOCATED_MISS", "LOCATED_UNJUDGED", "COVERED")
+
+#: Why an obligation sits where it does, one rung finer, in the overlay's own vocabulary.
+#: Deliberately not a new taxonomy: `review_overlay.STATES` already names these states for the
+#: per-target page, and a second vocabulary for the same facts is how `documentation` and
+#: `docs` made an arm unmeasurable for its whole life.
+FINE = ("unscheduled", "pruned", "unavailable", "silent", "candidate", "finding")
+
+
+def _context_quality(calls) -> str:
+    """What retrieval this job actually got back: `none`, `empty`, `partial` or `ok`.
+
+    An ANNOTATION, never a bucket. It answers "did the arm have anything to work from", which
+    is a different question from "what did the arm do", and folding it into the ladder would
+    make a tooling failure and a judgement call the same row.
+
+    It is also incomplete by construction and says so: three tools write no trace row at all
+    (`proof_profile` on every path, `naming_norm` on three failure returns), so `none` means
+    "no row", not "no call". Tool refusals are not recorded anywhere, so they are not offered
+    as a value -- `docs/todo/evidence-tiers-and-traces.md` §4.
+    """
+
+    calls = list(calls or [])
+    if not calls:
+        return "none"
+    empty = sum(1 for call in calls if not call.get("result_count"))
+    if empty == len(calls):
+        return "empty"
+    return "partial" if empty else "ok"
+
+
+def _cell_state(job, anchored_findings) -> str:
+    """What one scheduled (arm, site) pair did, on the overlay's ladder."""
+
+    if job.disposition == "pruned":
+        return "pruned"
+    if job.status != "success":
+        # Ran and did not come back: a coverage gap, not a silence. A failed mandatory job
+        # counted as coverage once, and the run was scored as complete over work nobody did.
+        return "unavailable"
+    if not anchored_findings:
+        return "silent"
+    if any(item.get("admission") == "published" and item.get("channels")
+           for item in anchored_findings):
+        return "finding"
+    return "candidate"
+
+
+def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
+    """Why each gold obligation ended where it did, and what became of every finding.
+
+    The join that has been done by hand in a scratchpad every time someone asked "why did we
+    miss this". It reads the agenda (was anything scheduled here), the delegation ledger (did
+    the lead decline it, did the job run), the arm responses (did the arm abstain, and saying
+    what), the context trace (did its retrieval return anything), `findings.jsonl` (was a claim
+    emitted, and did the gate publish it) and, when there is one, the judge's own report.
+
+    Two levels, and the coarse one is miss-decomposition's: `UNTOUCHED` is judge-independent
+    geometry, and the `COVERED` / `LOCATED_MISS` split needs a verdict. Without an audit the
+    located set is reported as `LOCATED_UNJUDGED` rather than guessed at.
+
+    The fine level is `review_overlay.STATES`, not a new vocabulary -- a second set of words
+    for the same facts is how `documentation` and `docs` made an arm unmeasurable for its whole
+    life. Everything else is an annotation beside the bucket: the abstention's own reason, the
+    retrieval it got, the gate's verdict, the judge's pairing, and whether a replay found the
+    decision stable. Those answer different questions and must not be folded into one ladder.
+
+    Several runs make the per-finding half say `reps_with_key`: how many of them reproduced a
+    claim. It is reported and not ranked on -- cross-rep agreement separates hits in-sample and
+    is recorded as provisional (`docs/todo/selection-signal.md`).
+
+    Costs nothing and calls no model.
+    """
+
+    from src.mathlib_review.analysis.delegation_view import load_lead_views
+    from src.mathlib_review.analysis.obligation_exclusions import excluded_ids
+    from src.mathlib_review.analysis.review_overlay import deepest
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.review.merge import finding_key
+    from src.mathlib_review.run_state import StageInput
+
+    run_names = [runs] if isinstance(runs, str) else list(runs)
+    per_run: Dict[str, Any] = {}
+    key_runs: Dict[str, set] = {}
+
+    for run_name in run_names:
+        stage = StageInput.of(
+            run_name, audit=audit,
+            require=("agenda", "delegations", "arm_responses", "findings"),
+            allow_partial=True)
+        agenda = json.loads(stage.path("agenda").read_text())
+        reviewed = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
+        findings = jsonl_rows(stage.path("findings"))
+        responses = {row["invocation_id"]: row
+                     for row in jsonl_rows(stage.path("arm_responses"))}
+        views = load_lead_views(stage.run_dir)
+        jobs = [job for view in views.values() for job in view.delegations]
+
+        # Findings by the change target they anchor to, which is the join anchor-tier pairing
+        # makes and therefore the only one an obligation can be reached through.
+        by_change: Dict[str, List[Dict[str, Any]]] = {}
+        for finding in findings:
+            for change_id in finding.get("change_ids") or []:
+                by_change.setdefault(change_id, []).append(finding)
+
+        verdict_by_obligation: Dict[str, str] = {}
+        paired_candidates: set = set()
+        matched_candidates: set = set()
+        if audit:
+            report = json.loads(stage.audit_path("semantic_report").read_text())
+            verdict_by_obligation = {
+                row["obligation_id"]: row.get("issue_status")
+                for row in report.get("per_obligation") or []}
+            for pair in jsonl_rows(stage.audit_path("semantic_pairs")):
+                if pair.get("role") == "observed":
+                    paired_candidates.add(pair["candidate_id"])
+            for match in jsonl_rows(stage.audit_path("semantic_matches")):
+                if match.get("role") == "observed" and match.get("issue_match"):
+                    matched_candidates.add(match["candidate_id"])
+
+        stable_by_invocation: Dict[str, bool] = {}
+        if replay:
+            stable_by_invocation = _replay_stability(replay)
+
+        excluded = excluded_ids()
+        obligations = []
+        # Why this report's denominator differs from the judge's, counted rather than left to
+        # be discovered. Two kinds of row are dropped here that a judge report still scores as
+        # misses, and neither is a fact about the reviewer: one whose gold has no `change_ids`
+        # at all, which anchor-tier pairing can never reach, and one `obligation_exclusions`
+        # names as contradicted by the release's own artifacts. On `heldout12_v2_rep1` the
+        # difference is exactly one audit-excluded row -- 23 in the judge's report, 22 here.
+        skipped = {"not_proposed_atomic": 0, "audit_excluded": 0, "anchorless": 0}
+        for row in jsonl_rows(stage.release / "gold/judgments.jsonl"):
+            if row.get("pr_number") not in reviewed:
+                continue
+            for obligation in row.get("obligations") or []:
+                if obligation.get("status") != "proposed_atomic":
+                    skipped["not_proposed_atomic"] += 1
+                    continue
+                if obligation["obligation_id"] in excluded:
+                    skipped["audit_excluded"] += 1
+                    continue
+                if not (obligation.get("change_ids") or []):
+                    skipped["anchorless"] += 1
+                    continue
+                obligations.append((row["pr_number"], obligation))
+
+        rows = []
+        for pr_number, obligation in obligations:
+            sites = set(obligation["change_ids"])
+            cells = [job for job in jobs if sites & set(job.site_change_ids or [])]
+            anchored = [finding for change_id in sites for finding in by_change.get(change_id, [])]
+            anchored_ids = {item["finding_id"] for item in anchored}
+
+            states = []
+            annotations = []
+            for job in cells:
+                job_findings = [
+                    item for item in anchored
+                    if item.get("origin_arm_id") == job.arm_id
+                    or (job.arm_id == "generalist" and not item.get("origin_arm_id"))]
+                state = _cell_state(job, job_findings)
+                states.append(state)
+                response = responses.get(job.invocation_id) or {}
+                annotations.append({
+                    "invocation_id": job.invocation_id,
+                    "arm_id": job.arm_id,
+                    "state": state,
+                    "abstention_reason": ((response.get("abstention") or {}).get("reason")
+                                          if state == "silent" else None),
+                    "context": _context_quality(job.context_calls),
+                    "filed_elsewhere_in_unit": bool(
+                        state == "silent" and (job.claims or [])),
+                    "replay_stable": stable_by_invocation.get(job.invocation_id),
+                })
+
+            state = deepest(*states) if states else "unscheduled"
+            located = state in {"candidate", "finding"}
+            if not located:
+                coarse = "UNTOUCHED"
+            elif not audit:
+                coarse = "LOCATED_UNJUDGED"
+            else:
+                coarse = ("COVERED"
+                          if verdict_by_obligation.get(obligation["obligation_id"]) == "hit"
+                          else "LOCATED_MISS")
+            rows.append({
+                "obligation_id": obligation["obligation_id"],
+                "pr_number": pr_number,
+                "coarse": coarse,
+                "state": state,
+                "gate": sorted({item.get("admission") for item in anchored}) or None,
+                "judge": verdict_by_obligation.get(obligation["obligation_id"]) if audit else None,
+                "findings_at_site": sorted(anchored_ids),
+                "cells": annotations,
+            })
+
+        finding_rows = []
+        for finding in findings:
+            key = finding_key(_asobj(finding))
+            key_runs.setdefault(key, set()).add(run_name)
+            if not audit:
+                judged = None
+            elif finding["finding_id"] in matched_candidates:
+                judged = "matched"
+            elif finding["finding_id"] in paired_candidates:
+                judged = "paired_unmatched"
+            else:
+                judged = "unpaired"
+            finding_rows.append({
+                "finding_id": finding["finding_id"], "key": key,
+                "pr_number": finding["pr_number"],
+                "admission": finding.get("admission"),
+                "judge": judged,
+            })
+
+        per_run[run_name] = {
+            "state": stage.state.value,
+            "forensic": stage.forensic,
+            "prs_reviewed": reviewed,
+            "requires": stage.consumed,
+            "obligations_counted": len(obligations),
+            "obligations_not_counted": skipped,
+            "coarse": {name: sum(1 for row in rows if row["coarse"] == name)
+                       for name in COARSE},
+            "fine": {name: sum(1 for row in rows if row["state"] == name) for name in FINE},
+            "obligations": rows,
+            "obligation_ids_by_bucket": {
+                name: sorted(row["obligation_id"] for row in rows if row["coarse"] == name)
+                for name in COARSE},
+            "findings": finding_rows,
+            "findings_by_judge": {
+                name: sum(1 for row in finding_rows if row["judge"] == name)
+                for name in ("matched", "paired_unmatched", "unpaired")},
+        }
+
+    if len(run_names) > 1:
+        for run_name, payload in per_run.items():
+            for row in payload["findings"]:
+                row["reps_with_key"] = len(key_runs.get(row["key"], ()))
+
+    return {
+        "runs": run_names,
+        "judged": bool(audit),
+        "per_run": per_run,
+        "coarse_vocabulary": list(COARSE),
+        "fine_vocabulary": list(FINE),
+        "note": (
+            "UNTOUCHED is judge-independent: nothing the system emitted anchors at the "
+            "obligation's sites, so no verdict could make it a hit. COVERED and LOCATED_MISS "
+            "split the rest by the judge's own per-obligation verdict, and without an audit "
+            "that split is not made. The annotations beside each cell -- abstention reason, "
+            "retrieval, gate, replay stability -- answer different questions and are not "
+            "buckets. `reps_with_key` is reported, never ranked on: cross-rep agreement "
+            "separates hits in-sample and is provisional."),
+    }
+
+
+def _asobj(row: Dict[str, Any]):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(**row)
+
+
+def _replay_stability(replay_run: str) -> Dict[str, bool]:
+    """Per invocation, whether every replayed sample made the recorded decision.
+
+    A decision that reproduces is the arm's reading of its contract; one that does not is
+    sampling noise wearing a diagnosis. 41 of 45 gold-site specialist silences were stable.
+    """
+
+    from src.mathlib_review.run_state import StageInput
+
+    stage = StageInput.of(replay_run, require=("replay_outcomes",), allow_partial=True)
+    by_invocation: Dict[str, List[bool]] = {}
+    for row in jsonl_rows(stage.path("replay_outcomes")):
+        recorded = (row.get("recorded") or {}).get("decision") or {}
+        replayed = (row.get("replay") or {}).get("decision") or {}
+        if not replayed:
+            continue
+        agreed = bool((recorded.get("first") or {}).get("filed")
+                      == (replayed.get("first") or {}).get("filed"))
+        by_invocation.setdefault(row["invocation_id"], []).append(agreed)
+    return {key: all(value) for key, value in by_invocation.items()}

@@ -109,6 +109,26 @@ are now three files each, and the refusal message itself names them:
 None is implemented here. Each changes what a run does and therefore needs its own run name,
 and the experiments themselves are the coordination thread's, not this one's.
 
+## Stage provenance and the declared graph — 2026-09-21
+
+Not from either September plan; it came from `docs/todo/pipeline-stage-chaining.md` and from the
+user asking for an arbitrary number of downstream stages. Branch `stage-provenance`.
+
+| Item | Status |
+|---|---|
+| `StageInput` -- a stage names what it consumes, it is resolved and hashed, the run state is checked | **Built** (`run_state.py`). `judge`, `replay`, `report overlay/score` read through it; `RUN_ARTIFACTS` holds each artifact's filename, writing stage and missing-file hint. A run with no manifest is *unchecked* rather than refused, because v4 runs never wrote one. |
+| The state machine writes, rather than being described | **Built.** `assert_transition` had no caller outside its tests and `FINALIZED`/`JUDGED` had no writer; `run` and `judge` now assert and record. `state_of` derives the rest from the artifacts. |
+| An append-only stage ledger per run | **Built** — `stages.jsonl`, one `StageRecord` per stage with consumed and produced digests, identity, transition and `forensic`. The judge's and the replay's rows go in the SOURCE run's ledger. `report stages` reconciles it against the directory. |
+| One judge identity per audit, refused before spending | **Built.** It was caught only by `write_once` refusing the report, after every pair had been judged and paid for. |
+| Named replay selectors | **Built** — `--select gold-site-abstentions | missed-obligations | arm | invocation_ids`, sealed into the plan with `gold_derived`. The scratch join they replace chose 45 sessions; the named selector chooses 58, because it filtered required gold changes and this filters gold sites. |
+| `report buckets` -- why each obligation ended where it did | **Built**, on miss-decomposition's coarse split (UNTOUCHED judge-independent) and the overlay's fine vocabulary. Per run on the held-out reps: 8/9/9 UNTOUCHED, 7/8/7 LOCATED_MISS, 7/5/6 COVERED, and 86-88% of findings never paired with any obligation. |
+| `cli adjudicate` -- a cross-run label store for off-gold findings | **Built, and empty.** 259 unadjudicated findings over 214 keys on one rep. Human labels only; the LLM adjudicator's socket exists and its rubric is [a todo](../todo/adjudication-rubric.md). |
+| `cli pipeline` -- a declared stage graph | **Built.** One `run` node and the stages that read it, starting as inputs allow, independent ones overlapping under a cap, re-invocation resuming. The graph is sealed into the root run; every node still runs by its own command, and a test asserts the adapters do no path arithmetic of their own. Stage-granular: per-item streaming is [a todo](../todo/pipeline-streaming.md). |
+
+The plan is kept verbatim at `2026-09-21-typed-handoffs.md`. Its workstream A -- one typed
+contract for nested work -- is on branch `subtask-contract` and is recorded in the Stage 0 table
+above.
+
 ## Updated plan — the six steps
 
 | Step | Status |

@@ -849,7 +849,11 @@ def build_overlay(
 
     matches: List[SemanticMatch] = []
     if judge is not None:
-        matches = load_jsonl_optional(judge / "matches.jsonl", SemanticMatch)
+        # The judge's own filename first. `matches.jsonl` is v4's spelling and stays readable
+        # because those audits are frozen -- but a v5 caller used to plant a symlink under that
+        # name INSIDE the audit, so a read-only report wrote into another stage's output.
+        matches = (load_jsonl_optional(judge / "semantic_matches.jsonl", SemanticMatch)
+                   or load_jsonl_optional(judge / "matches.jsonl", SemanticMatch))
 
     # --- indices ---------------------------------------------------------------------
     modification_by_change = {item.primary_change_id: item for item in modifications}

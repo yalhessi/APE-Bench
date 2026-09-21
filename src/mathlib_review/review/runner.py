@@ -1111,6 +1111,58 @@ def _context_calls_by_invocation(trace_path: Path) -> Dict[str, List[Dict[str, A
     return grouped
 
 
+def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
+    """Leave this run's row in its own ledger, and assert the move it just made.
+
+    The state machine has existed since `052430c` and nothing wrote to it: `FINALIZED` and
+    `JUDGED` had no writer and `assert_transition` had no caller outside its tests, so the
+    guarantee was documentation. Asserting here is the cheapest place it can be real -- the run
+    is closed, the manifest says how, and `finalize` has already written the findings that
+    separate `generated` from `finalized`.
+
+    Never fatal. The work is paid for and the artifacts are on disk; a provenance row that
+    could fail a finished run would be worse than a missing one, and `report stages`
+    reconciles a manifest with no row.
+    """
+
+    from src.mathlib_review.run_state import (
+        RUN_ARTIFACTS, RunState, append_stage, assert_transition, digests_of, from_manifest,
+        stage_record,
+    )
+    from src.mathlib_review.schema.review import EVALUATION_CONTRACT_VERSION
+
+    try:
+        closed = from_manifest(manifest.completion_status)
+        assert_transition(RunState.RUNNING, closed)
+        state_after = closed
+        transition = f"{RunState.RUNNING.value} -> {closed.value}"
+        if closed is RunState.GENERATED and (out / "findings.jsonl").is_file():
+            assert_transition(closed, RunState.FINALIZED)
+            state_after = RunState.FINALIZED
+            transition = f"{transition}, {closed.value} -> {RunState.FINALIZED.value}"
+        append_stage(out, stage_record(
+            "run", run_name=dataset.run_name,
+            consumed={"release_manifest": plan.release_manifest_sha256 or "",
+                      "agenda": plan.agenda_sha256},
+            produced=digests_of(
+                out / RUN_ARTIFACTS[name].filename for name in
+                ("agenda", "agenda_report", "run_plan", "run_manifest", "arm_responses",
+                 "delegations", "findings", "issues", "finalization_report")),
+            identity={
+                "run_plan_sha256": plan.source_sha256,
+                "routing_mode": dataset.routing_mode,
+                "scaffold_config_sha256": plan.scaffold_config_sha256,
+                "findings_sha256": summary.get("findings_sha256"),
+            },
+            state_before=RunState.RUNNING, state_after=state_after, transition=transition,
+            forensic=closed not in {RunState.GENERATED},
+            evaluation_contract_version=EVALUATION_CONTRACT_VERSION,
+        ))
+    except Exception:  # noqa: BLE001 - see the docstring
+        logger.warning("could not record this run's stage row; the artifacts are unaffected",
+                       exc_info=True)
+
+
 async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
     assert_ready(scaffold, logger, enforce=not dataset.dry_run)
     if dataset.routing_mode not in ROUTING_MODES:
@@ -1309,6 +1361,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
             and trace_path.is_file() else None),
     )
     write_once(out / "run_manifest.json", pretty_json_bytes(manifest.model_dump(mode="json")))
+    _record_stage(out, dataset, plan, manifest, summary, logger)
     logger.info("run dir: %s", out)
     logger.info("completion_status=%s issues=%d cost=$%.2f",
                 manifest.completion_status, manifest.issues_total, manifest.total_cost)
