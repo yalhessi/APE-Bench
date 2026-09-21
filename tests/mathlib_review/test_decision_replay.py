@@ -145,10 +145,20 @@ def test_reason_before_verdict_on_the_real_candidate_schema(tools, payload, tmp_
 
 
 def test_the_accepted_submission_is_read_off_the_result():
+    """The detail travels with the reason. The reason alone is not evidence about a silence:
+    17 of the 45 gold-site sessions replayed on 2026-09-21 produced a different one with the
+    outcome unchanged, so a diagnosis built on it is a coin flip."""
+
     assert accepted_summary({"success": True, "candidates": [],
-                             "abstention": {"reason": "already_correct"}}) == {
-        "filed": False, "abstention_reason": "already_correct", "anchors": [],
+                             "abstention": {"reason": "already_correct",
+                                            "detail": "checked all five; they match"}}) == {
+        "filed": False, "abstention_reason": "already_correct",
+        "abstention_detail": "checked all five; they match", "anchors": [],
         "candidate_keys": [], "model_confidence": []}
+    # A filed submission has no abstention of either kind.
+    assert accepted_summary({"success": True, "candidates": [],
+                             "abstention": {"reason": "already_correct"}})[
+        "abstention_detail"] is None
     filed = accepted_summary({"success": True, "candidates": [
         {"primary_change_id": "change:a", "concern_family": "naming",
          "issue_kind": "naming_convention_violation", "model_confidence": None}]})
@@ -379,6 +389,34 @@ def test_the_report_reads_agreement_per_session_not_pooled():
     assert report["samples_with_no_accepted_submission"] == 1
     assert report["filing_rate"] == {"recorded": 0.5, "replayed": round(2 / 3, 4)}
     assert report["by_arm"]["naming"]["replayed_filing_rate"] == 0.5
+
+
+def test_a_replayed_decision_records_the_sentence_as_well_as_the_label():
+    """What the condition experiments will be read from.
+
+    The decision record is the only place a replayed arm's own words are kept in the results
+    tree -- the session files live in whichever worktree ran the replay, and the first
+    diagnostic's texts were only reachable there. Since the label swaps under re-sampling on
+    better than a third of sessions, a run that kept the label and dropped the sentence
+    recorded the unreliable half.
+    """
+
+    from src.mathlib_review.review.replay import submission_summary
+
+    silent = submission_summary({
+        "candidates": [],
+        "abstention_reason": "below_my_bar",
+        "abstention_detail": "`toLinearMap_` leads 21 to 7 but is not established.",
+    })
+    assert silent["abstention_reason"] == "below_my_bar"
+    assert silent["abstention_detail"] == "`toLinearMap_` leads 21 to 7 but is not established."
+
+    # A filed submission carries neither, and an empty detail is None rather than "".
+    filed = submission_summary({"candidates": [{"primary_change_id": "change:a"}],
+                                "abstention_detail": "ignored when candidates are present"})
+    assert filed["abstention_reason"] is None and filed["abstention_detail"] is None
+    assert submission_summary({"candidates": [], "abstention_detail": ""})[
+        "abstention_detail"] is None
 
 
 def test_a_condition_is_read_against_the_null_paired_by_session():

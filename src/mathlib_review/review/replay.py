@@ -57,12 +57,19 @@ def submission_summary(arguments: Dict[str, Any]) -> Dict[str, Any]:
     `argument_order` and `candidate_field_order` are the model's emission order, read off the
     call arguments -- a field-order condition is effective only if the model follows it, and the
     accepted result cannot say, because validation re-serialises it in schema order.
+
+    `abstention_detail` is kept beside the reason because the reason is not evidence: across the
+    45 gold-site sessions replayed on 2026-09-21, 17 produced a *different* reason with the same
+    outcome, `already_correct` and `could_not_establish` swapping freely. The sentence the arm
+    wrote is what a silence can be diagnosed from, and dropping it here meant the diagnosis had
+    to be read out of attempt directories belonging to whichever worktree the replay ran in.
     """
 
     candidates = [item for item in (arguments.get("candidates") or []) if isinstance(item, dict)]
     return {
         "filed": bool(candidates),
         "abstention_reason": None if candidates else arguments.get("abstention_reason"),
+        "abstention_detail": None if candidates else (arguments.get("abstention_detail") or None),
         "anchors": sorted({str(item.get("primary_change_id")) for item in candidates}),
         "candidate_keys": sorted({
             "|".join(str(item.get(key)) for key in
@@ -82,6 +89,7 @@ def accepted_summary(result: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any
     summary = submission_summary({
         "candidates": result.get("candidates") or [],
         "abstention_reason": (result.get("abstention") or {}).get("reason"),
+        "abstention_detail": (result.get("abstention") or {}).get("detail"),
     })
     for key in ("argument_order", "candidate_field_order"):
         summary.pop(key)

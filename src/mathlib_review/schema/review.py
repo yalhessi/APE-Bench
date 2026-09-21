@@ -255,7 +255,11 @@ class ArmResponse(StrictModel):
     candidates: List[Dict[str, Any]] = Field(default_factory=list)
     verification_artifacts: List[Dict[str, Any]] = Field(default_factory=list)
     #: `{"reason": ..., "detail": ...}` when the arm submitted nothing. Its absence is not the
-    #: same as an arm that filed, and `finalize` reads it to tell a decision from a failure.
+    #: same as an arm that filed: an abstention is a decision and a missing row is a failure.
+    #: Correction 2026-09-21 -- this said `finalize` reads it, and `finalize` does not; it
+    #: contains no occurrence of `abstention` and skips a response that filed nothing. The
+    #: readers are `report._abstentions` (the reason only) and `report.buckets` / `silences`
+    #: (the detail, which is the only thing a silence can be diagnosed from).
     abstention: Optional[Dict[str, Any]] = None
     #: `None` for the solo baseline, which is never handed a rendered work-unit prompt.
     rendered_prompt_sha256: Optional[str] = None
