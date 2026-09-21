@@ -112,9 +112,59 @@ $R report replay --run <condition run> --against pr5_replay_null_first_submit_ca
 
 ## What would close it
 
-A replay run on `pr5_A_lead_heldout12_v2_rep1` that (a) reproduces the original submission when
-nothing is swapped — the null replay, at a rate that sets its own noise floor — and (b) reports one
-swapped condition against it, at the same cut. Without (a), no replay difference can be read.
+**Revised 2026-09-21, after the user refused the price.** The original condition was a null
+replay of all 319 sessions, quoted at $37.20. Two things were wrong with it. The figure was the
+*uncached* price: the case-study run measured billed/nominal = **0.48** (samples of one prefix
+run back-to-back hit the provider cache), so it is ~$15-18 billed. And a standalone null buys
+almost nothing — a condition experiment carries its own control on the same prefixes, and a
+noise floor paid for today is only reusable while the model, the code and the session set stand
+still, which this project already treats as a new-run-name event. Most of that $18 covered
+sessions where nothing is contested: the generalist is 203 of 319 sessions and 69% of the cost,
+and PR 33149 alone is 53%.
+
+So the closing condition is the measurement that changes what we fund next:
+
+**The diagnostic — $2.59 billed.** The 45 specialist invocations whose work unit carries a
+*required gold* change and that abstained in `pr5_A_lead_heldout12_v2_rep1`, replayed at the
+first-submission cut, 3 samples each under `null` (nominal $5.40; 0.48 cache ratio measured).
+Every one is a site where a maintainer asked for something, an arm looked, and it said nothing.
+The run splits them into
+
+* **decision-limited** — some sample files instead of abstaining, so a bar, forcing or
+  elicitation change can recover it (the `naming` 33337 session: the gold rename, 2 of 5); and
+* **contract-limited** — every sample abstains identically, so no decision-stage change touches
+  it, only a contract, prompt or investigation change (the `correctness` 33149 session on the
+  axioms file: 5 of 5, established for $0.02).
+
+At 3 samples the decision-limited fraction is a **lower bound** (a session that flips one time
+in five is caught about half the time), which is the safe direction for deciding what to fund.
+It measures *instability*, not recall: whether a flip produces the maintainer's ask needs the
+judge or a hand read.
+
+**Then, per condition, ~$5.20:** the condition and its null on those same 45 prefixes, run in
+one window so both see the same code and the same cache, against $14.50 for two full reps plus
+judge noise.
+
+Priced from the recorded decision stages, billed at the measured 0.48 ratio, 3 samples:
+
+| population | sessions | billed |
+|---|---|---|
+| everything (the old condition) | 319 | $17.85 |
+| specialists only | 116 | $5.54 |
+| **specialists at gold sites that abstained** | **45** | **$2.59** |
+| specialists at gold sites (incl. the 10 that filed) | 55 | $3.16 |
+| cross-rep unstable specialists (biased subset) | 23 | $1.14 |
+
+Free before any of it: across the three v2 reps, **23 of 89** specialist invocations flip
+filed/abstained — an *upper* bound on decision instability, since it also contains investigation
+variance. The diagnostic says how much of that is the decision alone, at the sites where a flip
+would change recall.
+
+**What the cheap version gives up**, stated so a later reader does not overclaim: no run-level
+recall number, no judge, and a floor measured only on abstaining specialists at gold sites — a
+condition aimed at filing behaviour or at the generalist needs its control drawn from that
+population instead. Gold-based selection is in-sample, which is fine for a diagnostic and is not
+a precision claim.
 
 ## Evidence
 
