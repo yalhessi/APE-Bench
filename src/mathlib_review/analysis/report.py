@@ -17,12 +17,11 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.paths import RESULTS, run_dir
 from src.mathlib_review.review.trace import routing_report
 
 
-def _load_jsonl(path: Path):
-    return [json.loads(x) for x in path.read_text().splitlines() if x.strip()]
 
 
 def retrieval(run_name: str) -> Dict[str, Any]:
@@ -57,7 +56,7 @@ def retrieval(run_name: str) -> Dict[str, Any]:
     so the arms granted it barely use it.
     """
 
-    rows = _load_jsonl(run_dir(run_name) / "context_trace.jsonl")
+    rows = jsonl_rows(run_dir(run_name) / "context_trace.jsonl")
     if not rows:
         return {"run": run_name, "calls": 0}
 
@@ -111,7 +110,7 @@ def _abstentions(run_name: str) -> Dict[str, Any]:
     """
 
     by_arm: Dict[str, Dict[str, int]] = {}
-    for row in _load_jsonl(run_dir(run_name) / "arm_responses.jsonl"):
+    for row in jsonl_rows(run_dir(run_name) / "arm_responses.jsonl"):
         if row.get("candidates"):
             continue
         arm = row.get("arm_id") or str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
@@ -123,7 +122,7 @@ def _abstentions(run_name: str) -> Dict[str, Any]:
 
 def routing(run_name: str) -> Dict[str, Any]:
     directory = run_dir(run_name)
-    delegations = _load_jsonl(directory / "delegations.jsonl")
+    delegations = jsonl_rows(directory / "delegations.jsonl")
     report = routing_report(delegations)
     manifest_path = directory / "run_manifest.json"
     if manifest_path.is_file():
@@ -184,7 +183,7 @@ def scoped_obligations(run_name: str,
 
     excluded = excluded_ids()
     audited: Dict[int, int] = {}
-    for row in _load_jsonl(judgments):
+    for row in jsonl_rows(judgments):
         pr = row.get("pr_number")
         if pr not in reviewed:
             continue
@@ -244,10 +243,8 @@ def contamination(release: Path) -> Dict[str, Any]:
     gold: List[str] = []
     path = release / "gold/judgments.jsonl"
     if path.is_file():
-        for line in path.read_text().splitlines():
-            if not line.strip():
-                continue
-            for obligation in (json.loads(line).get("obligations") or []):
+        for row in jsonl_rows(path):
+            for obligation in (row.get("obligations") or []):
                 for field in ("claim", "requested_change", "resolution_criteria"):
                     if obligation.get(field):
                         gold.append(str(obligation[field]))
@@ -675,7 +672,7 @@ def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
 
     scoped = set(scoped_obligation_ids)
     gold: Counter = Counter()
-    for node in _load_jsonl(release / "gold/judgments.jsonl"):
+    for node in jsonl_rows(release / "gold/judgments.jsonl"):
         weight = sum(1 for ob in node.get("obligations") or []
                      if ob.get("obligation_id") in scoped)
         if not weight:
@@ -693,7 +690,7 @@ def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
         path = run_dir(run_name) / "findings.jsonl"
         if not path.is_file():
             continue
-        raised: Counter = Counter(canon(r["concern_family"]) for r in _load_jsonl(path))
+        raised: Counter = Counter(canon(r["concern_family"]) for r in jsonl_rows(path))
         raised_share = share(raised)
         keys = set(gold_share) | set(raised_share)
         # Half the L1 distance between the two distributions: 0 is identical attention, 1 is
@@ -719,7 +716,7 @@ def _redundancy(run_name: str) -> Optional[Dict[str, Any]]:
     path = run_dir(run_name) / "findings.jsonl"
     if not path.is_file():
         return None
-    rows = list(_load_jsonl(path))
+    rows = list(jsonl_rows(path))
     per_target = Counter((r["pr_number"], r["primary_change_id"]) for r in rows)
     families = Counter(
         len({r["concern_family"] for r in rows
@@ -793,9 +790,9 @@ def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
                         if payload.get(key):
                             searched[pr].add(str(payload[key]))
 
-    episodes = {row["pr_number"]: row for row in _load_jsonl(release / "input/episodes.jsonl")}
+    episodes = {row["pr_number"]: row for row in jsonl_rows(release / "input/episodes.jsonl")}
     out: Dict[str, Any] = {}
-    for row in _load_jsonl(release / "derived/change_graphs.jsonl"):
+    for row in jsonl_rows(release / "derived/change_graphs.jsonl"):
         graph = ChangeGraph.model_validate(row)
         pr = graph.pr_number
         if pr not in tools and pr not in reads:
