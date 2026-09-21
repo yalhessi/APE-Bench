@@ -182,6 +182,8 @@ from .scoring import (  # noqa: F401
     AdjudicationLabel,
     SemanticMatch,
     SemanticPair,
+    SilenceLabel,
+    silence_key,
 )
 
 
@@ -304,6 +306,7 @@ __all__ = [
     "AdjudicationLabel",
     "SemanticMatch",
     "SemanticPair",
+    "SilenceLabel",
     "SemanticSubjectInference",
     "SourceEvent",
     "StrictModel",
@@ -317,4 +320,5 @@ __all__ = [
     "WorthinessDecision",
     "WrapperCompositionPlan",
     "evidence_rank",
+    "silence_key",
 ]

@@ -48,8 +48,13 @@ CONCERN_ALIASES: Dict[str, str] = {
 }
 
 
-def _gold_labels_for(families: Sequence[str]) -> Set[str]:
-    """The gold labels that correspond to a set of arm concern families."""
+def gold_labels_for(families: Sequence[str]) -> Set[str]:
+    """The gold labels that correspond to a set of arm concern families.
+
+    Public because `report.buckets` asks the same question of a silence -- was this arm even
+    the one the ask belonged to -- and a second copy of the bridge is exactly how the
+    documentation/docs mismatch survived as long as it did.
+    """
 
     out: Set[str] = set()
     for family in families:
@@ -165,7 +170,7 @@ def build_bench(
     """
 
     wanted_prs = set(pr_numbers) if pr_numbers else None
-    families = _gold_labels_for(concern_families)
+    families = gold_labels_for(concern_families)
     by_change = _units_by_change(units)
 
     expected_by_unit: Dict[str, Set[str]] = defaultdict(set)
