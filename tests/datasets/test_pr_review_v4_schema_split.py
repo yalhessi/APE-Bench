@@ -46,7 +46,7 @@ def test_the_facade_still_resolves_every_name():
 
     from src.mathlib_review import schema
 
-    assert len(schema.__all__) == 130
+    assert len(schema.__all__) == 131
     for name in schema.__all__:
         assert hasattr(schema, name), name
 
@@ -120,6 +120,6 @@ def test_every_class_landed_in_exactly_one_module():
                 assert node.name not in seen, (
                     f"{node.name} defined in both {seen.get(node.name)} and {module}")
                 seen[node.name] = module
-    # 106 at the split; 110 with the stage records added 2026-09-21 -- `StageRecord`, and
-    # `PipelineNode` / `PipelineSpec` / `PipelinePlan` for a declared experiment.
-    assert len(seen) == 110
+    # 106 at the split; 111 with what 2026-09-21 added -- `StageRecord`, the three pipeline
+    # records for a declared experiment, and `AdjudicationLabel`.
+    assert len(seen) == 111

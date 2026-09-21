@@ -179,6 +179,7 @@ from .runs import (  # noqa: F401
 )
 
 from .scoring import (  # noqa: F401
+    AdjudicationLabel,
     SemanticMatch,
     SemanticPair,
 )
@@ -300,6 +301,7 @@ __all__ = [
     "ScopeResolution",
     "SelectedFinding",
     "SemanticEntity",
+    "AdjudicationLabel",
     "SemanticMatch",
     "SemanticPair",
     "SemanticSubjectInference",
