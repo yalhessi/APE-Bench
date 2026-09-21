@@ -169,6 +169,9 @@ def build_parser() -> argparse.ArgumentParser:
     retrieval = report_sub.add_parser(
         "retrieval", help="which retrieval tool the arms reached for, and what came back")
     retrieval.add_argument("--run", required=True)
+    stages = report_sub.add_parser(
+        "stages", help="what has happened to this run, and whether its artifacts agree")
+    stages.add_argument("--run", required=True)
     scope = report_sub.add_parser(
         "scope", help="recall split by whether the ask is local or requires a design decision")
     scope.add_argument("--audit", type=Path, required=True,
@@ -342,6 +345,10 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import retrieval
 
         print(json.dumps(retrieval(args.run), indent=2))
+    elif args.report_command == "stages":
+        from src.mathlib_review.analysis.report import stages as stages_report
+
+        print(json.dumps(stages_report(args.run), indent=2))
     elif args.report_command == "conditions":
         from src.mathlib_review.analysis.report import conditions as conditions_report
 

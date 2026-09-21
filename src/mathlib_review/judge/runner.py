@@ -746,8 +746,67 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
             pretty_json_bytes(publication_summary(findings, report, post_report)),
         )
     write_once(dataset.out_dir / "sample_votes.jsonl", jsonl_bytes(votes))
+    _record_stage(dataset, stage, identity, model, logger)
     logger.info("Wrote %d matches to %s", len(matches), dataset.out_dir)
     return dataset.out_dir
+
+
+def _record_stage(dataset: JudgeDatasetConfig, stage, identity: str, model: str,
+                  logger) -> None:
+    """Leave the judge's row in the SOURCE run's ledger.
+
+    In the run's ledger and not the audit's, because "this run has been judged, under this
+    identity, into that directory" is a fact about the run -- it is what `state_of` reads to
+    say `JUDGED`, and what the next judge reads to refuse a second identity before spending.
+    The audit keeps its own outputs; the run keeps the record that they exist.
+
+    Digests and identity only. Gold is hashed as the files the judge loaded, never quoted: the
+    run directory must stay gold-free, and a row carrying an obligation's text would put gold
+    into it by the back door.
+
+    Never fatal, for the reason the generation run's row is not: the verdicts are paid for and
+    written, and a provenance row must not be able to fail the stage it describes.
+    """
+
+    from src.mathlib_review.run_state import (
+        RunState, append_stage, assert_transition, digests_of, stage_record,
+    )
+    from src.mathlib_review.schema.review import EVALUATION_CONTRACT_VERSION
+
+    try:
+        forensic = bool(stage.forensic or dataset.allow_partial and stage.forensic)
+        transition = None
+        state_after = None
+        if not forensic and stage.state is RunState.FINALIZED:
+            assert_transition(RunState.FINALIZED, RunState.JUDGED)
+            state_after = RunState.JUDGED
+            transition = f"{RunState.FINALIZED.value} -> {RunState.JUDGED.value}"
+        produced = digests_of(
+            Path(dataset.out_dir) / name for name in
+            ("semantic_pairs.jsonl", "semantic_matches.jsonl", "semantic_report.json",
+             "publication_report.json", "sample_votes.jsonl"))
+        produced["out_dir"] = str(dataset.out_dir)
+        append_stage(stage.run_dir, stage_record(
+            "judge", run_name=stage.run_name,
+            consumed={**stage.consumed, **digests_of(
+                Path(dataset.release) / name for name in
+                ("gold/judgments.jsonl", "gold/intervention_views.jsonl",
+                 "derived/change_graphs.jsonl", "derived/pr_relations.jsonl"))},
+            produced=produced,
+            identity={
+                "judge_identity": identity,
+                "judge_version": JUDGE_VERSION,
+                "judge_model": model,
+                "pairing_tiers": list(dataset.pairing_tiers),
+                "input_kind": dataset.input_kind,
+            },
+            state_before=stage.state, state_after=state_after, transition=transition,
+            forensic=forensic,
+            evaluation_contract_version=EVALUATION_CONTRACT_VERSION,
+        ))
+    except Exception:  # noqa: BLE001 - see the docstring
+        logger.warning("could not record the judge's stage row; the audit is unaffected",
+                       exc_info=True)
 
 
 def main() -> None:

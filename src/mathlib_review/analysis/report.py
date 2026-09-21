@@ -829,3 +829,55 @@ def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
             "changed_files": len(episode.get("changed_files") or []),
         }
     return out
+
+
+def stages(run_name: str) -> Dict[str, Any]:
+    """What has happened to this run, and what the artifacts say happened.
+
+    Two halves, and the second is the point. The ledger says what each stage recorded; the
+    reconciliation says whether the run directory agrees with it. They can disagree in exactly
+    the ways a crash produces -- a manifest with no row means a run closed and died before
+    recording itself, an audit on disk with no row means it was judged before rows existed (or
+    by hand) -- and naming those is more useful than a ledger that pretends to be complete.
+
+    Read-only, and free.
+    """
+
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.paths import AUDITS
+    from src.mathlib_review.run_state import RUN_ARTIFACTS, ledger, state_of
+
+    directory = run_dir(run_name)
+    rows = ledger(directory)
+    manifest_path = directory / RUN_ARTIFACTS["run_manifest"].filename
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else None
+
+    audits_on_disk = sorted(
+        str(path) for path in AUDITS.glob(f"{derive_from_run(run_name)['out_dir'].name}*")
+        if (path / "semantic_report.json").is_file())
+    audits_in_ledger = {row.get("produced", {}).get("out_dir")
+                        for row in rows if row.get("stage") == "judge"}
+
+    return {
+        "run": run_name,
+        "state": state_of(directory).value,
+        "completion_status": (manifest or {}).get("completion_status"),
+        "stages": [
+            {key: row.get(key) for key in
+             ("stage", "node", "pipeline", "transition", "forensic", "written_at",
+              "git_commit", "git_tree_state", "identity")}
+            for row in rows
+        ],
+        "forensic_rows": [row.get("stage") for row in rows if row.get("forensic")],
+        "reconciliation": {
+            # A run that closed and died before recording itself. The artifacts are intact and
+            # the row is not; that is worth saying rather than papering over.
+            "ledger_missing_run_row": bool(
+                manifest and not any(row.get("stage") == "run" for row in rows)),
+            "audits_without_a_row": [
+                item for item in audits_on_disk if item not in audits_in_ledger],
+            "rows_without_an_audit": sorted(
+                item for item in audits_in_ledger
+                if item and not (Path(item) / "semantic_report.json").is_file()),
+        },
+    }

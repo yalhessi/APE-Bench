@@ -174,6 +174,7 @@ from .runs import (  # noqa: F401
     PairManifest,
     PairingTier,
     RunManifest,
+    StageRecord,
     RunPlan,
 )
 
@@ -294,6 +295,7 @@ __all__ = [
     "ReviewRoundSegment",
     "ReviewWorkUnit",
     "RunManifest",
+    "StageRecord",
     "RunPlan",
     "ScopeResolution",
     "SelectedFinding",

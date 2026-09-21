@@ -31,7 +31,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, FrozenSet, List, Optional, Sequence
 
-from src.mathlib_review.io import jsonl_rows, sha256_file
+from src.mathlib_review.io import sha256_file
 
 
 class RunState(str, Enum):
@@ -228,8 +228,66 @@ def state_of(directory: Path) -> RunState:
 def ledger(directory: Path) -> List[Dict[str, Any]]:
     """Every stage row this run has, in the order written."""
 
-    path = Path(directory) / RUN_ARTIFACTS["stages"].filename
-    return list(jsonl_rows(path)) if path.is_file() else []
+    from src.mathlib_review.io import appended_rows
+
+    return appended_rows(Path(directory) / RUN_ARTIFACTS["stages"].filename)
+
+
+def append_stage(directory, record) -> Path:
+    """Add one stage row to a run's ledger.
+
+    Appended, never written once: a stage that crashes between writing its artifacts and
+    writing its row must leave the artifacts findable, and `report stages` saying "a manifest
+    with no run row" is more useful than a row that lies. `--redo` removes the ledger with the
+    run it discards, which is right -- the rows describe that run and it no longer exists.
+    """
+
+    from src.mathlib_review.io import append_jsonl
+
+    return append_jsonl(Path(directory) / RUN_ARTIFACTS["stages"].filename, record)
+
+
+def stage_record(stage: str, *, run_name: str, produced: Optional[Dict[str, str]] = None,
+                 identity: Optional[Dict[str, Any]] = None,
+                 consumed: Optional[Dict[str, str]] = None,
+                 consumed_audit: Optional[Dict[str, str]] = None,
+                 node: Optional[str] = None, pipeline: Optional[str] = None,
+                 state_before: Optional["RunState"] = None,
+                 state_after: Optional["RunState"] = None,
+                 transition: Optional[str] = None, forensic: bool = False,
+                 evaluation_contract_version: Optional[str] = None):
+    """A `StageRecord` with the provenance every row carries filled in the same way.
+
+    Git state and the timestamp are read here rather than by each stage, because a row whose
+    provenance depends on which caller remembered to add it is not provenance.
+    """
+
+    from datetime import datetime, timezone
+
+    from src.mathlib_review.io import git_state
+    from src.mathlib_review.schema.runs import StageRecord
+
+    commit, tree_state = git_state()
+    return StageRecord(
+        stage=stage, node=node, pipeline=pipeline, run_name=run_name,
+        consumed=dict(consumed or {}), consumed_audit=dict(consumed_audit or {}),
+        produced=dict(produced or {}), identity=dict(identity or {}),
+        state_before=state_before.value if state_before else None,
+        state_after=state_after.value if state_after else None,
+        transition=transition, forensic=forensic,
+        evaluation_contract_version=evaluation_contract_version,
+        git_commit=commit, git_tree_state=tree_state,
+        written_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    )
+
+
+def digests_of(paths) -> Dict[str, str]:
+    """`display_path -> sha256` for the artifacts a stage wrote that exist."""
+
+    from src.mathlib_review.io import display_path, sha256_file
+
+    return {display_path(Path(path)): sha256_file(Path(path))
+            for path in paths if Path(path).is_file()}
 
 
 @dataclass(frozen=True)

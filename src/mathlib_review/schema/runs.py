@@ -1,6 +1,6 @@
 """Pre-registration and receipts: what a run promised to do, and what it did."""
 
-from typing import Dict, List, Literal, Optional, get_args
+from typing import Any, Dict, List, Literal, Optional, get_args
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .base import StrictModel
@@ -217,3 +217,59 @@ class RunManifest(StrictModel):
     completion_status: Literal["complete", "failed", "incomplete"]
     created_at: str
     source_sha256: str
+
+
+class StageRecord(StrictModel):
+    """One completed stage of one run: what it read, what it wrote, and under what identity.
+
+    A v5 experiment is several processes chained by a run name, and nothing recorded that the
+    chain happened. Whether a run had been judged was answered by looking for an audit
+    directory; which judge produced it, by reading the report inside; whether a replay came
+    from this run at all, by its name. Each of those is a reconstruction, and the whole class
+    of mistake `judge --of` exists to remove.
+
+    A row is *named provenance*, never a scheduler: it records a hand-off that already
+    happened, digest by digest. That is what keeps the stages separable -- each still runs on
+    its own, from its own command, and writes the same artifacts -- while making the chain
+    checkable after the fact.
+
+    Rows are appended, never rewritten, for the reason the lead's journal is: a stage that
+    crashes between its artifacts and its row must leave the artifacts findable, and a
+    reconciliation that says "manifest present, no row" is more useful than a row that lies.
+    """
+
+    schema_version: Literal["v5-stage1"] = "v5-stage1"
+    #: What kind of stage this was. Plain strings, extended by adding a stage.
+    stage: str
+    #: Which node of a pipeline this was, when it ran inside one. `judge` and `judge_relation`
+    #: are two nodes of the same stage kind, and they are what a run carrying two judgements
+    #: has to be able to say apart.
+    node: Optional[str] = None
+    #: The root run of the pipeline that drove this, when one did. Absent for a stage invoked
+    #: on its own, which every stage must remain able to be.
+    pipeline: Optional[str] = None
+    #: The run this row belongs to -- the generation run, even for stages that read it and
+    #: write elsewhere. A judge's outputs live in an audit directory; the fact that the run was
+    #: judged belongs to the run.
+    run_name: str
+    #: artifact name -> sha256 of what was read. Exactly what the stage asked for.
+    consumed: Dict[str, str] = Field(default_factory=dict)
+    consumed_audit: Dict[str, str] = Field(default_factory=dict)
+    #: repo-relative path -> sha256 of what was written, plus plain strings for what a path
+    #: cannot express (`out_dir`, a replay's own run name).
+    produced: Dict[str, str] = Field(default_factory=dict)
+    #: What makes this stage's output comparable to another's: `judge_identity` for a judge,
+    #: the condition and cut for a replay, the plan hash for a generation run.
+    identity: Dict[str, Any] = Field(default_factory=dict)
+    state_before: Optional[str] = None
+    state_after: Optional[str] = None
+    #: The machine move this stage made, when it made one. `None` is legitimate and common: a
+    #: replay changes no state, and a re-judgement under one identity is a resume.
+    transition: Optional[str] = None
+    #: Output that must never be read as a measurement -- a partial run scored deliberately.
+    forensic: bool = False
+    #: What a recall number from this stage MEANS. `schema_version` says the row parses.
+    evaluation_contract_version: Optional[str] = None
+    git_commit: Optional[str] = None
+    git_tree_state: Optional[Literal["clean", "dirty", "unknown"]] = None
+    written_at: str
