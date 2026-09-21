@@ -257,3 +257,272 @@ def test_the_directory_is_the_one_genuine_invariant(tmp_path):
     config = nested_config(tmp_path, _config(), group="g", num_processes=4)
     assert config.execution.num_processes == 4          # caller's choice honoured
     assert config.runs_base_dir == tmp_path / "subtasks" / "g"   # not negotiable
+
+
+# --- what comes back: one typed ChildRun per spec ------------------------------------------
+
+
+import asyncio
+import json
+from datetime import datetime
+
+from ape.orchestration.models import (
+    Attempt, ChildRun, ExecutionStatus, Sample, TaskExecutionStatus,
+)
+from ape.orchestration.persistence import TaskStorage
+from ape.tasks.base import (
+    BaseTask, BaseTaskConfig, BaseTaskData, BaseTaskResult, register_task,
+)
+
+
+class _ProbeData(BaseTaskData):
+    task_type: str = "subtask_probe"
+    payload: str = ""
+
+
+class _ProbeResult(BaseTaskResult):
+    answer: str = ""
+
+
+class _ProbeConfig(BaseTaskConfig):
+    pass
+
+
+class _ProbeTask(BaseTask):
+    task_type = "subtask_probe"
+    data_class = _ProbeData
+    task_config_class = _ProbeConfig
+    task_result_class = _ProbeResult
+
+
+register_task("subtask_probe", _ProbeTask)
+
+
+def _spec(spec_id: str, payload: str, **kwargs):
+    return TaskExecutionSpec(
+        spec_id=spec_id, task_type="subtask_probe",
+        task_data={"task_type": "subtask_probe", "task_id": spec_id, "payload": payload},
+        **kwargs)
+
+
+async def _write_success(task_dir, index, answer="filed"):
+    """What a finished task leaves: an aggregated result and a successful sample."""
+
+    storage = TaskStorage(task_dir, index)
+    result = _ProbeResult(task_id="t", task_type="subtask_probe", global_index=index,
+                          success=True, score=1.0, answer=answer)
+    await storage.save_task_result(result)
+    await storage.save_sample(Sample(
+        sample_id="s", task_global_index=index, sample_index=0,
+        status=ExecutionStatus.SUCCESS, created_at=datetime.now(), updated_at=datetime.now(),
+        attempts=[Attempt(attempt_id=0, path=task_dir / "a", status=ExecutionStatus.SUCCESS,
+                          created_at=datetime.now(), max_turns=10, cost_limit=None,
+                          cost=0.2, cached_cost=0.1,
+                          result=result.model_dump(mode="json"))]))
+
+
+async def _write_paused(task_dir, index):
+    """What a task that stopped on its budget leaves: a sample, and NO task_result.json.
+
+    This is the row the old readers could not see: the orchestrator aggregates only finished
+    tasks, so a paused child is absent from `results.task_results` entirely.
+    """
+
+    storage = TaskStorage(task_dir, index)
+    await storage.save_sample(Sample(
+        sample_id="s", task_global_index=index, sample_index=0,
+        status=ExecutionStatus.PAUSED_COST_LIMIT, created_at=datetime.now(),
+        updated_at=datetime.now(),
+        attempts=[Attempt(attempt_id=0, path=task_dir / "a",
+                          status=ExecutionStatus.PAUSED_COST_LIMIT,
+                          created_at=datetime.now(), max_turns=10, cost_limit=0.3,
+                          cost=0.6, cached_cost=0.3, result=None)]))
+
+
+def _run(monkeypatch, tmp_path, specs, writers, **kwargs):
+    """Drive `run_subtasks` with the orchestrator's execution stubbed but its layout real."""
+
+    from ape.orchestration import orchestrator as orchestrator_module
+
+    seen = {}
+
+    async def fake_run(self, tasks):
+        seen["tasks_dir"] = self.tasks_dir
+        seen["workspace_path"] = self.workspace_path
+        seen["max_concurrency"] = self.config.execution.max_concurrency
+        seen["num_processes"] = self.config.execution.num_processes
+        for task in tasks:
+            index = task.data.global_index
+            await writers[task.data.task_id](self.tasks_dir / index, index)
+        return SimpleNamespace(task_results=[], total_token_usage=None)
+
+    monkeypatch.setattr(orchestrator_module.TaskOrchestrator, "run", fake_run)
+    from ape.orchestration.subtasks import run_subtasks
+
+    runs, _results = asyncio.run(run_subtasks(
+        specs, attempt_path=tmp_path, config=_config(), group="wave1", **kwargs))
+    return runs, seen
+
+
+def test_a_paused_child_is_reported_rather_than_lost(monkeypatch, tmp_path):
+    """The defect this contract exists to close. `results.task_results` holds only tasks the
+    orchestrator aggregated, and a task with a resumable sample writes `task_outcome.json` and
+    returns before aggregation -- so both readers this replaces dropped it, and a wave's ledger
+    silently omitted the job that spent its whole budget."""
+
+    runs, _ = _run(monkeypatch, tmp_path,
+                   [_spec("filed", "a"), _spec("starved", "b")],
+                   {"filed": _write_success, "starved": _write_paused})
+
+    assert sorted(runs) == ["filed", "starved"]
+    assert runs["starved"].outcome.execution_status is TaskExecutionStatus.PAUSED
+    assert runs["starved"].succeeded is False and runs["starved"].result is None
+    # And its spend is on the row, which is the reason the row has to exist at all.
+    assert runs["starved"].outcome.billed_cost == pytest.approx(0.3)
+
+
+def test_a_successful_child_comes_back_as_its_own_result_class(monkeypatch, tmp_path):
+    """Not a dict the caller re-validates. `JobOutcome` re-dumped the result and read fields off
+    the dump, which is why a field the arm recorded and the result class did not declare was
+    invisible for a whole run."""
+
+    runs, _ = _run(monkeypatch, tmp_path, [_spec("filed", "a")], {"filed": _write_success})
+    child = runs["filed"]
+    assert isinstance(child.result, _ProbeResult) and child.result.answer == "filed"
+    assert child.succeeded is True
+    assert child.outcome.execution_status is TaskExecutionStatus.COMPLETED
+
+
+def test_the_spec_travels_with_the_answer(monkeypatch, tmp_path):
+    """`required` and `budget_scope` are read beside the outcome -- the coverage-gap rule and
+    the discretionary-spend rule both need them, and joining them back on by id is what they
+    did before."""
+
+    runs, _ = _run(monkeypatch, tmp_path,
+                   [_spec("floor", "a", required=True, budget_scope="floor")],
+                   {"floor": _write_success})
+    assert runs["floor"].spec.required is True
+    assert runs["floor"].spec.budget_scope == "floor"
+
+
+def test_a_required_child_without_a_result_is_said_out_loud(monkeypatch, tmp_path):
+    messages = []
+    logger = SimpleNamespace(warning=lambda *args, **kwargs: messages.append(args[0] % args[1:]),
+                             info=lambda *a, **k: None, error=lambda *a, **k: None)
+    _run(monkeypatch, tmp_path, [_spec("floor", "a", required=True)],
+         {"floor": _write_paused}, logger=logger)
+    assert any("coverage gap" in item for item in messages), messages
+
+
+def test_the_batch_directory_is_the_id_the_caller_gave(monkeypatch, tmp_path):
+    """`orchestrator_id` was assigned AFTER construction, which is too late: the orchestrator
+    fixes `workspace_path = runs_base_dir / orchestrator_id` in `__init__`, so children landed
+    in a timestamped directory and a resumed parent could not find the work it had paid for."""
+
+    _runs, seen = _run(monkeypatch, tmp_path, [_spec("filed", "a")], {"filed": _write_success},
+                       orchestrator_id="33098_w1")
+    assert seen["workspace_path"] == tmp_path / "subtasks" / "wave1" / "33098_w1"
+
+
+def test_two_specs_with_the_same_payload_are_refused(monkeypatch, tmp_path):
+    """`global_index` is a content hash and resume skips a task whose result exists, so two
+    identical payloads are one task and the second spec would be handed the first's result with
+    nothing saying so."""
+
+    from ape.orchestration.subtasks import run_subtasks
+
+    with pytest.raises(ValueError) as error:
+        asyncio.run(run_subtasks(
+            [_spec("first", "same"), _spec("second", "same")],
+            attempt_path=tmp_path, config=_config(), group="wave1"))
+    assert "identical task data" in str(error.value)
+    assert "'first'" in str(error.value) and "'second'" in str(error.value)
+
+
+def test_an_unreadable_child_does_not_lose_the_wave(monkeypatch, tmp_path):
+    """Everything after the orchestrator returns derives from work already paid for. A failure
+    there used to discard the whole wave -- `pr5_smoke4_rep8` spent $3.13 billed and reported
+    $0.27 -- so a child that cannot be read is a failed row, not an exception."""
+
+    async def explode(task_dir, index):
+        task_dir.mkdir(parents=True, exist_ok=True)
+        (task_dir / "samples").mkdir()
+        (task_dir / "samples" / "sample_0.json").write_text("{ not json")
+
+    runs, _ = _run(monkeypatch, tmp_path, [_spec("broken", "a"), _spec("fine", "b")],
+                   {"broken": explode, "fine": _write_success})
+    assert sorted(runs) == ["broken", "fine"]
+    assert runs["fine"].succeeded is True
+    assert runs["broken"].succeeded is False
+
+
+def test_concurrency_none_leaves_the_callers_value_alone(monkeypatch, tmp_path):
+    """`judgment` sets its own `max_concurrency` and passes its config through. A default that
+    overwrote it would be a silent change to how many judges run at once."""
+
+    config = _config()
+    config.execution.max_concurrency = 7
+
+    from ape.orchestration import orchestrator as orchestrator_module
+    from ape.orchestration.subtasks import run_subtasks
+
+    seen = {}
+
+    async def fake_run(self, tasks):
+        seen["max_concurrency"] = self.config.execution.max_concurrency
+        return SimpleNamespace(task_results=[], total_token_usage=None)
+
+    monkeypatch.setattr(orchestrator_module.TaskOrchestrator, "run", fake_run)
+    asyncio.run(run_subtasks([_spec("one", "a")], attempt_path=tmp_path, config=config,
+                             group="wave1"))
+    assert seen["max_concurrency"] == 7
+
+
+def test_without_an_attempt_path_the_children_are_not_nested(monkeypatch, tmp_path):
+    """`judgment` and `review_gate` both branch on having a parent attempt: invoked outside one
+    there is nowhere to nest, and their children have always gone to the default runs root."""
+
+    config = _config()
+    config.runs_base_dir = tmp_path / "top"
+    config.execution.num_processes = 2
+
+    from ape.orchestration import orchestrator as orchestrator_module
+    from ape.orchestration.subtasks import run_subtasks
+
+    seen = {}
+
+    async def fake_run(self, tasks):
+        seen["base"] = self.config.runs_base_dir
+        seen["num_processes"] = self.config.execution.num_processes
+        return SimpleNamespace(task_results=[], total_token_usage=None)
+
+    monkeypatch.setattr(orchestrator_module.TaskOrchestrator, "run", fake_run)
+    asyncio.run(run_subtasks([_spec("one", "a")], attempt_path=None, config=config,
+                             group="subtasks"))
+    assert seen["base"] == tmp_path / "top"
+    assert seen["num_processes"] == 2       # not forced to 0 when there is no parent worker
+
+
+def test_nested_usage_sums_the_children(monkeypatch, tmp_path):
+    runs, _ = _run(monkeypatch, tmp_path, [_spec("a", "a"), _spec("b", "b")],
+                   {"a": _write_success, "b": _write_success})
+    from ape.orchestration.subtasks import nested_usage
+
+    usage = nested_usage(runs)
+    assert usage.cached_total_cost == pytest.approx(0.2)   # billed, both children
+    assert usage.total_cost == pytest.approx(0.4)          # nominal
+
+
+def test_every_scheduled_child_is_indexed_including_the_paused_one(monkeypatch, tmp_path):
+    """The index is how a later stage finds a session. Built from the results alone it held
+    only aggregated tasks, so a paused child had no row and `cli replay` had to locate task
+    directories another way -- it says so in its own comment, having lost two sessions to it."""
+
+    from ape.orchestration.execution_index import by_semantic_id
+
+    index = tmp_path / "execution_index.jsonl"
+    runs, _ = _run(monkeypatch, tmp_path, [_spec("filed", "a"), _spec("starved", "b")],
+                   {"filed": _write_success, "starved": _write_paused}, index_path=index)
+    rows = by_semantic_id(index)
+    assert sorted(rows) == ["filed", "starved"]
+    assert rows["starved"]["global_index"] == runs["starved"].global_index

@@ -5,8 +5,8 @@ Orchestration Data Models - Resume and retry aware execution state.
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, AliasChoices
+from typing import Any, Dict, List, Literal, Optional
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 # ============================================================================
@@ -304,23 +304,27 @@ class TaskExecutionSpec(BaseModel):
     Carries what the orchestrator needs and what the parent needs back: identity, the typed
     payload, per-task limits, whether the child is required, and which budget scope its spend
     is charged to.
+
+    `sample_count` and `retries` used to be declared here and were read by nothing: the
+    orchestrator takes both from `config.execution`, so a spec that set them described a run
+    that did not happen. A caller wanting a different sample count passes it through
+    `run_subtasks(execution_overrides=...)`, which reaches the orchestrator that honours it.
     """
 
     #: Stable identity within the parent's run, used to join the outcome back to the request.
     spec_id: str
     task_type: str
     task_data: Dict[str, Any]
-    sample_count: int = 1
     max_turns: Optional[int] = None
-    retries: int = 0
     #: Billed, like every other cap here.
     billed_cost_limit: Optional[float] = None
     #: A required child that does not succeed is a coverage gap, and a coverage gap closes the
-    #: run as `partial` rather than complete.
+    #: run as `partial` rather than complete. Read by `run_subtasks`, which says so at WARNING,
+    #: and by the caller through `ChildRun.spec`.
     required: bool = False
     #: Which budget the spend is charged against. The coverage floor is deliberately exempt
     #: from the discretionary cap and must never be exempt from the run total.
-    budget_scope: str = "discretionary"
+    budget_scope: Literal["floor", "discretionary"] = "discretionary"
 
     def with_limits(self) -> Dict[str, Any]:
         """The payload with this spec's limits attached, ready to hand to the orchestrator."""
@@ -559,6 +563,46 @@ class TaskOutcome(BaseModel):
             turns=sum(a.turns for item in sample_outcomes for a in item.attempts),
             wall_seconds=wall,
         )
+
+
+class ChildRun(BaseModel):
+    """One child a parent scheduled: what it was asked for, what it did, and what it returned.
+
+    The parent's whole view of a subtask, so nothing downstream re-derives it from a directory
+    name or a raw dict. Three things it fixes:
+
+    * **A paused child is present.** The orchestrator emits a task result only for what it
+      aggregated, and a task with a resumable sample writes `task_outcome.json` and returns
+      before aggregation (`worker.py`). Every reader that iterated `results.task_results` --
+      the old `collect_outcomes`, and v5's own `run_wave` -- therefore lost exactly the rows an
+      honest ledger needs. `ChildRun`s are built from the tasks that were SCHEDULED.
+    * **The result is typed.** `result` is the child's own `task_result_class` instance, read
+      back through `TaskStorage`, rather than a dict every caller re-validates by hand.
+    * **The request travels with the answer.** `spec` is the `TaskExecutionSpec` the parent
+      handed in, so `required` and `budget_scope` are readable beside the outcome instead of
+      being joined back on by id.
+    """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    spec: TaskExecutionSpec
+    global_index: str
+    task_dir: str
+    outcome: TaskOutcome
+    #: The child's own result model, or None when it produced no legal submission. Typed `Any`
+    #: for the same reason `Attempt.result` is: `ape.tasks.base` imports this module, so naming
+    #: `BaseTaskResult` here would be an import cycle.
+    result: Optional[Any] = None
+
+    @property
+    def succeeded(self) -> bool:
+        """Whether a legal submission came back.
+
+        Never `execution_status == COMPLETED`: a task can complete having concluded nothing,
+        and those are different facts about different questions.
+        """
+
+        return self.result is not None
 
 
 # ============================================================================

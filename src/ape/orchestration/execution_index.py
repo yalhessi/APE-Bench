@@ -102,6 +102,7 @@ async def record(
     semantic_ids: Dict[str, str],
     group: str,
     parent: Optional[str] = None,
+    tasks: Optional[Iterable[Any]] = None,
 ) -> None:
     """Index every task this orchestrator scheduled.
 
@@ -109,6 +110,13 @@ async def record(
     for a review arm, a spec id for anything using `spawn_subtasks`. Tasks whose id is absent
     are still recorded, under their `task_id`: an unindexed task is worse than a
     coarsely-indexed one.
+
+    `tasks` is what was SCHEDULED, and passing it is what makes the index complete. Read from
+    `results` alone the index holds only the tasks the orchestrator aggregated, and a task with
+    a resumable sample writes `task_outcome.json` and returns before aggregation -- so a paused
+    child had no row at all, and the reader that needed it most (a replay selecting recorded
+    sessions) had to locate task directories another way and said so. Given the tasks, every
+    scheduled child gets a row whether or not it finished.
     """
 
     if not index_path:
@@ -116,7 +124,12 @@ async def record(
 
     from .persistence import TaskStorage
 
-    for result in getattr(results, "task_results", []) or []:
+    scheduled = [
+        {"task_id": task.data.task_id, "global_index": task.data.global_index,
+         "task_type": task.task_type}
+        for task in (tasks or [])
+    ]
+    for result in scheduled or getattr(results, "task_results", []) or []:
         # Indexing must never be able to fail the work it indexes. `append` already swallows
         # its errors for that reason -- "losing the index must not lose the work it indexes" --
         # and this loop did not, so one shape bug in `attempt_rows` raised out of `run_wave`

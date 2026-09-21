@@ -467,18 +467,23 @@ class BaseTask:
 
     async def spawn_subtasks(self, specs, *, group: str = "subtasks", logger=None,
                              base=None, concurrency: Optional[int] = None,
-                             execution_overrides: Optional[Dict[str, Any]] = None):
-        """Run child tasks and get one `TaskOutcome` back per spec.
+                             execution_overrides: Optional[Dict[str, Any]] = None,
+                             orchestrator_id: Optional[str] = None):
+        """Run child tasks and get one `ChildRun` back per spec.
 
         The framework primitive for nested work. `TaskOrchestrator(` was constructed directly
         in four files with three different conventions, and the divergent one cost this project
         a class of accounting failures -- paused work booked at $0.00, an enclosing group's
         totals stamped onto every child, a run scored as complete over coverage it never had.
 
-        Directory layout, isolation, per-task limits, bounded concurrency and usage aggregation
-        live in `ape.orchestration.subtasks`, once, for every task family present and future.
+        Directory layout, isolation, per-task limits, bounded concurrency, the execution index
+        and usage aggregation live in `ape.orchestration.subtasks`, once, for every task family
+        present and future.
 
-        Returns `(outcomes_by_spec_id, results)`. Pass `nested_usage(outcomes)` to
+        Returns `({spec_id: ChildRun}, results)`. A `ChildRun` carries the spec, the
+        `TaskOutcome` and the child's own typed result -- including for a child that paused,
+        which the orchestrator never aggregates and which every reader that iterated
+        `results.task_results` therefore lost. Pass `nested_usage(runs)` to
         `create_result(nested_token_usage=...)` so the children's spend reaches the parent's
         own usage -- omitting that is how a lead's ledger and its manifest disagreed.
         """
@@ -486,10 +491,18 @@ class BaseTask:
         from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, run_subtasks
 
         return await run_subtasks(
-            self, specs, group=group, logger=logger or getattr(self, "logger", None),
-            base=base,
+            specs,
+            attempt_path=self.attempt_path,
+            config=base if base is not None else self.config,
+            group=group, logger=logger or getattr(self, "logger", None),
             concurrency=DEFAULT_NESTED_CONCURRENCY if concurrency is None else concurrency,
             execution_overrides=execution_overrides,
+            orchestrator_id=orchestrator_id,
+            # Where this task's children ran, written down rather than inferred from a
+            # directory name later. Both are task-data fields the review family sets; a family
+            # that sets neither simply gets no index and no parent id.
+            index_path=getattr(self.data, "execution_index_path", None),
+            parent_id=getattr(self.data, "episode_id", None) or self.data.task_id,
         )
 
     async def register_task_tools(self, mcp) -> None:
