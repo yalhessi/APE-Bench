@@ -175,3 +175,27 @@ paths:
   A single control candidate is inside the historical range and is not evidence that a change
   regressed precision; it takes reps, and the source says to label it `silent_pr_emission`,
   never a false-finding rate.
+- **A stage reads a run through `StageInput` and leaves a row in `stages.jsonl`.** Rebuilding a
+  sibling path by hand is the defect `judge --of` fixed once and nothing generalised: the judge
+  still rebuilt `run_manifest.json` and `agenda_report.json` that way, replay re-implemented the
+  whole check, and choosing 45 replay sessions took a scratch join across four files that a
+  named selector reproduces as 58 (it filtered on required gold changes; the selector filters on
+  gold sites). `StageInput.at/of` resolves the artifacts a stage names, hashes exactly those,
+  and refuses a run whose manifest says it did not cover what it promised -- while a run with no
+  manifest stays *unchecked* rather than refused, because v4 runs never wrote one.
+  `run_state.RUN_ARTIFACTS` is where an artifact's filename, its writing stage and its
+  missing-file hint live; add one there, not in a caller.
+- **`write_once` and `append_jsonl` are different guarantees, and mixing them loses one.**
+  `write_once` refuses a second write with different bytes, which is what makes a run
+  reproducible; it must never touch a file written *while* work happens. Those -- the lead
+  journal, the context trace, the execution index, `stages.jsonl` -- are appended, and their
+  reader (`io.appended_rows`) stops at the first line it cannot parse, because a crash truncates
+  the last line by construction. Reading one with the strict reader loses every row before the
+  tear.
+- **A label is not gold and must never become gold.** `cli adjudicate` records judgements about
+  the ~90% of findings gold cannot judge, keyed by `finding_key` (site and kind, which recurs
+  127 times across three reps where the full key recurs 0). Gold's worth is that it is revealed
+  preference -- what maintainers actually asked for. An adjudication label is an opinion about
+  what they did not ask for: it may order a queue and say how much output has been read, and it
+  may not enter recall or be reported as precision. A human row outranks a `task:` row, a
+  correction is a later row rather than an edit, and disagreement is reported, never averaged.

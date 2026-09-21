@@ -122,10 +122,18 @@ def _overrides(node: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _is_done(plan: PipelinePlan, name: str) -> Callable[[], bool]:
-    """Whether this node's work already exists, asked of the artifacts and the ledger.
+    """Whether this node's work already exists.
 
-    Artifacts alone would call a hand-copied directory done; a ledger row alone would miss
-    every stage that ran before rows existed. Both, because either on its own has been wrong.
+    The generation stage is asked of its artifacts -- the run's own state. Every other stage is
+    asked of the LEDGER, and deliberately not of its output directory: an audit on disk says a
+    judgement happened, not that it was this one's, and a pipeline that called a foreign audit
+    "done" would silently not run the judge it was asked for.
+
+    Being conservative here costs almost nothing and buys the refusal. Re-running a judge over
+    an audit it already produced is a resume -- resume is the judge's cache, so no pair is
+    called twice and `write_once` no-ops on identical bytes -- while re-running one over an
+    audit written under a DIFFERENT identity is refused before it spends, with both identities
+    named. Skipping the node would have skipped that refusal too.
     """
 
     node = plan.stages[name]
