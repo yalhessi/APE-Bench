@@ -146,10 +146,14 @@ def build_parser() -> argparse.ArgumentParser:
                         help="the generation run whose arm sessions are replayed")
     replay.add_argument(
         "--select", default=None,
-        metavar="all|arm|invocation_ids|gold-site-abstentions|missed-obligations",
-        help="which recorded sessions to re-decide. The two gold-derived selectors read the "
-             "judge's verdicts and are sealed into the plan as such: the prefix replayed is "
-             "still the recording, so gold reaches no prompt, but the selection is in-sample.")
+        metavar=("all|arm|invocation_ids|gold-site-abstentions|missed-obligations|"
+                 "control-abstentions"),
+        help="which recorded sessions to re-decide. The gold-derived selectors read the "
+             "judge's verdicts or the release, and are sealed into the plan as such: the "
+             "prefix replayed is still the recording, so gold reaches no prompt, but the "
+             "selection is in-sample. `control-abstentions` is the guard population -- silent "
+             "specialists on PRs the release records no obligation for -- and a condition "
+             "measured without it cannot say whether it bought reach or noise.")
     replay.add_argument(
         "--cut", default=None, metavar="turn=N|node=I|tool=NAME[:first|:last|:N]",
         help="where the model takes over, replacing the config's cut. `--set dataset.cut=` "
