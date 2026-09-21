@@ -439,29 +439,34 @@ def judged_pr_scope(dataset: JudgeDatasetConfig, logger) -> Optional[List[int]]:
     return stated
 
 
-#: Where a judge run's own outputs go, derived from the generation run it scores.
-JUDGE_AUDIT_ROOT = Path("results/pr_review_v5/audits")
-
-
-def derive_from_run(run_name: str) -> Dict[str, Any]:
+def derive_from_run(run_name: str, node: str = "judge") -> Dict[str, Any]:
     """The judge paths implied by a generation run.
 
     `candidates`, `out_dir` and `run_name` are three free-form strings that all encode one run
-    identity, with nothing making them agree. They disagree in the tree right now:
-    `pr_review_v5_medium_heldout.yaml` was bumped to `rep2` while its judge config still reads
+    identity, with nothing making them agree. They disagreed in the tree:
+    `pr_review_v5_medium_heldout.yaml` was bumped to `rep2` while its judge config still read
     `rep1/findings.jsonl` into `audits/medium-heldout-rep1`. Running that pair scores the old
     run under the new run's name, and nothing errors.
 
     Deriving them from the one name removes the class of mistake rather than the instance.
+
+    `node` names *which* judgement of that run this is, and the default keeps every existing
+    path exactly as it was. A second node -- a widened pairing tier, a different rubric -- gets
+    its own audit directory and its own orchestrator rather than resuming into the first one's,
+    which is what makes "judge this run twice, differently" expressible at all. A run may
+    legitimately carry several judgements; what it must never do is have two of them
+    indistinguishable.
     """
 
-    from src.mathlib_review.paths import run_dir
+    from src.mathlib_review.paths import AUDITS, run_dir
 
     slug = run_name.replace("pr_review_v5_", "").replace("_", "-")
+    suffix = "" if node == "judge" else f".{node}"
     return {
         "candidates": run_dir(run_name) / "findings.jsonl",
-        "out_dir": JUDGE_AUDIT_ROOT / slug,
-        "run_name": f"pr_review_v5_judge_{run_name.replace('pr_review_v5_', '')}",
+        "out_dir": AUDITS / f"{slug}{suffix}",
+        "run_name": (f"pr_review_v5_judge_{run_name.replace('pr_review_v5_', '')}"
+                     + (f"_{node}" if node != "judge" else "")),
     }
 
 

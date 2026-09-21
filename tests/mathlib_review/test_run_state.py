@@ -106,3 +106,162 @@ def test_the_judge_asks_the_machine_rather_than_comparing_a_string():
     source = inspect.getsource(runner.assert_source_run_is_complete)
     assert "SCOREABLE" in source
     assert '== "complete"' not in source
+
+
+# --- StageInput: what a stage reads, and what it records having read -----------------------
+
+
+import itertools
+from pathlib import Path
+
+from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_file
+from src.mathlib_review.run_state import (
+    AUDIT_ARTIFACTS, RUN_ARTIFACTS, MissingArtifact, StageInput, state_of,
+)
+
+
+_PROBE = itertools.count()
+
+
+def _run(tmp_path, *, status="complete", findings=True, plan=True, agenda=True):
+    """A run directory with exactly the artifacts named, and nothing else.
+
+    A fresh directory per call: two runs in one test must not inherit each other's artifacts,
+    which is the whole property `state_of` is being asked about.
+    """
+
+    directory = tmp_path / f"pr5_probe_rep{next(_PROBE)}"
+    directory.mkdir(parents=True, exist_ok=True)
+    if agenda:
+        (directory / "agenda.json").write_bytes(canonical_json_bytes(
+            {"release": "inputs/pr_review_v4/releases/dev-medium-0.3.0"}))
+    if plan:
+        (directory / "run_plan.json").write_bytes(canonical_json_bytes({"run_name": "probe"}))
+    if status:
+        (directory / "run_manifest.json").write_bytes(canonical_json_bytes(
+            {"run_name": "pr5_probe_rep1", "completion_status": status}))
+    if findings:
+        (directory / "findings.jsonl").write_bytes(jsonl_bytes([{"finding_id": "finding:a"}]))
+    (directory / "agenda_report.json").write_bytes(canonical_json_bytes({"pr_numbers": [1]}))
+    return directory
+
+
+def test_a_sealed_but_unclosed_run_is_running_not_planned(tmp_path):
+    """A plan with no manifest is a run that started and did not close. `PAUSED` would be a
+    claim about resumability that only the samples can support."""
+
+    assert state_of(_run(tmp_path, status=None)) is RunState.RUNNING
+    assert state_of(tmp_path / "nothing-here") is RunState.PLANNED
+
+
+def test_finalized_is_generated_plus_findings(tmp_path):
+    """`finalize` runs BEFORE `reconcile` writes the manifest, so a partial run has findings
+    too -- which is why `FINALIZED` cannot be read off the manifest alone, and why it is
+    reserved for a run that also covered what it promised."""
+
+    assert state_of(_run(tmp_path, findings=False)) is RunState.GENERATED
+    assert state_of(_run(tmp_path, findings=True)) is RunState.FINALIZED
+    assert state_of(_run(tmp_path, status="partial", findings=True)) is RunState.PARTIAL
+
+
+def test_judged_comes_from_a_ledger_row_not_from_an_audit_existing(tmp_path):
+    """An audit directory can be written by hand, and `--allow-partial` writes one deliberately
+    marked forensic. Only a non-forensic row from the judge stage means the run was scored."""
+
+    directory = _run(tmp_path)
+    (directory / "stages.jsonl").write_bytes(jsonl_bytes([
+        {"stage": "judge", "forensic": True, "run_name": "pr5_probe_rep1"}]))
+    assert state_of(directory) is RunState.FINALIZED
+    with (directory / "stages.jsonl").open("ab") as handle:
+        handle.write(canonical_json_bytes(
+            {"stage": "judge", "forensic": False, "run_name": "pr5_probe_rep1"}) + b"\n")
+    assert state_of(directory) is RunState.JUDGED
+
+
+def test_a_partial_run_is_refused_unless_it_is_asked_for(tmp_path):
+    directory = _run(tmp_path, status="partial")
+    with pytest.raises(ValueError) as error:
+        StageInput.at(directory)
+    assert "partial" in str(error.value) and "forensic" in str(error.value)
+    stage = StageInput.at(directory, allow_partial=True)
+    assert stage.forensic is True
+
+
+def test_only_the_required_artifacts_are_hashed(tmp_path):
+    """`context_trace.jsonl` runs to tens of megabytes and one reader needs it. Hashing
+    everything by default would make every stage pay for the most expensive reader."""
+
+    directory = _run(tmp_path)
+    stage = StageInput.at(directory, require=("findings", "agenda_report"))
+    assert set(stage.consumed) == {"findings", "agenda_report"}
+    assert stage.consumed["findings"] == sha256_file(directory / "findings.jsonl")
+
+
+def test_a_missing_artifact_names_the_stage_that_writes_it(tmp_path):
+    """"No such file" three frames into a join is how an unlinked arm pool read as an empty
+    run. The refusal says whose output it is, and carries the hint where there is one."""
+
+    directory = _run(tmp_path)
+    with pytest.raises(MissingArtifact) as error:
+        StageInput.at(directory).path("arm_pool")
+    message = str(error.value)
+    assert "written by the `run` stage" in message
+    assert "gitignored" in message and "worktree" in message
+
+
+def test_the_release_comes_from_the_runs_own_agenda(tmp_path):
+    """Not from a config: the config that produced a run is not recoverable from the run, and
+    the sealed agenda is. That is the same reason `judge --of` derives its paths."""
+
+    stage = StageInput.at(_run(tmp_path))
+    assert stage.release == Path("inputs/pr_review_v4/releases/dev-medium-0.3.0")
+    assert StageInput.at(_run(tmp_path, agenda=False)).release is None
+
+
+def test_an_audit_is_read_by_the_node_that_wrote_it(tmp_path):
+    """A run may carry several judgements -- a widened pairing tier, a different rubric. Each
+    gets its own directory, so they cannot resume into each other, and either can be read."""
+
+    directory = _run(tmp_path)
+    audit = tmp_path / "audit"
+    audit.mkdir()
+    (audit / "semantic_report.json").write_bytes(canonical_json_bytes({"issue_recall": 0.2}))
+    stage = StageInput.at(directory, audit_dir=audit)
+    assert set(stage.consumed_audit) == {"semantic_report"}
+    assert stage.audit_path("semantic_report").is_file()
+    with pytest.raises(MissingArtifact):
+        stage.audit_path("semantic_matches")
+    with pytest.raises(MissingArtifact) as error:
+        StageInput.at(directory).audit_path("semantic_report")
+    assert "judge the run first" in str(error.value)
+
+
+def test_derive_from_run_keeps_its_default_paths_and_names_other_nodes(tmp_path):
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.paths import AUDITS
+
+    default = derive_from_run("pr5_A_lead_heldout12_v2_rep1")
+    assert default["out_dir"] == AUDITS / "pr5-A-lead-heldout12-v2-rep1"
+    assert default["run_name"] == "pr_review_v5_judge_pr5_A_lead_heldout12_v2_rep1"
+    widened = derive_from_run("pr5_A_lead_heldout12_v2_rep1", "judge_relation")
+    assert widened["out_dir"] != default["out_dir"]
+    assert widened["run_name"] != default["run_name"]
+    assert widened["candidates"] == default["candidates"]
+
+
+def test_the_audit_root_is_spelled_once():
+    """It was spelled twice -- `judge.runner.JUDGE_AUDIT_ROOT` and
+    `analysis.denominators._AUDIT_ROOT` -- and a run's identity written in two places is the
+    class of mistake `judge --of` exists to remove."""
+
+    import re
+
+    from src.mathlib_review import paths
+
+    definitions = [
+        str(path) for path in Path("src").rglob("*.py")
+        if "__pycache__" not in path.parts
+        and re.search(r'^\s*\w*AUDIT_ROOT\s*=\s*Path\(', path.read_text(encoding="utf-8"), re.M)
+    ]
+    assert definitions == [], definitions
+    assert paths.AUDITS == paths.RESULTS / "audits"
