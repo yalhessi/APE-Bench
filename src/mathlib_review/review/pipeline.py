@@ -121,6 +121,64 @@ def _overrides(node: Dict[str, Any]) -> Dict[str, Any]:
     return parse_cli_args([f"{key}={value}" for key, value in (node["overrides"] or {}).items()])
 
 
+#: Fields of a sealed pipeline plan a later invocation may legitimately differ in.
+#:
+#: The same set, and the same reasoning, as `runner.RESUMABLE_PLAN_FIELDS`: these are
+#: provenance of *this attempt*, not of the experiment. Everything else -- the graph, the
+#: nodes, their configs and their digests -- is what the plan pre-registers, and a change
+#: there is a different pipeline under one name.
+RESUMABLE_PIPELINE_FIELDS = frozenset({"git_commit", "git_tree_state"})
+
+
+class PipelineChangedSemantically(RuntimeError):
+    """A re-invocation would run a different graph than the one sealed under this name."""
+
+
+def seal_or_revise(out: Path, plan: PipelinePlan, logger) -> Path:
+    """Write the pipeline plan, or record a revision when only provenance moved.
+
+    `write_once` refuses a differing artifact, which is right for the graph and too blunt for
+    re-invocation -- and re-invoking IS the documented way to resume a pipeline that stopped.
+    Found by doing it: the second invocation died on `FileExistsError` before reaching the
+    resume logic at all, because the plan embeds `git_commit` and `git_tree_state` and the tree
+    had moved. That is not an edge case; it is what happens whenever anything is committed
+    between two invocations, which is most of the time.
+
+    So the plan follows `runner.seal_or_revise_plan`, the convention this repository already
+    settled on for exactly this problem: `pipeline.json` is what was sealed first,
+    `pipeline_revision_2.json` is what the second invocation ran under, and a change to the
+    GRAPH is still refused with the differing fields named.
+    """
+
+    sealed = out / "pipeline.json"
+    payload = pretty_json_bytes(plan.model_dump(mode="json"))
+    if not sealed.exists():
+        write_once(sealed, payload)
+        return sealed
+    if sealed.read_bytes() == payload:
+        return sealed
+
+    before = json.loads(sealed.read_text(encoding="utf-8"))
+    after = plan.model_dump(mode="json")
+    changed = {key for key in set(before) | set(after) if before.get(key) != after.get(key)}
+    semantic = sorted(changed - RESUMABLE_PIPELINE_FIELDS)
+    if semantic:
+        raise PipelineChangedSemantically(
+            f"the pipeline sealed for {plan.root_run!r} differs in {semantic}, which changes "
+            f"what the experiment IS rather than when it ran. Re-invoking under the same name "
+            f"would attribute two graphs to one pre-registration. Use a new --run-name."
+        )
+
+    revision = 2
+    while (out / f"pipeline_revision_{revision}.json").exists():
+        revision += 1
+    path = out / f"pipeline_revision_{revision}.json"
+    write_once(path, payload)
+    logger.info("re-invoked %s: %s changed. The original pipeline.json stands; %s records this "
+                "invocation.", plan.root_run, sorted(changed), path.name)
+    return path
+
+
 def _is_done(plan: PipelinePlan, name: str) -> Callable[[], bool]:
     """Whether this node's work already exists.
 
@@ -239,10 +297,7 @@ async def run(spec: PipelineSpec, root_run: str, config_path: Path, logger, *,
 
     out = run_dir(root_run)
     out.mkdir(parents=True, exist_ok=True)
-    # Sealed before the first stage, and revisable only by re-running with the same graph:
-    # `write_once` refuses different bytes, so a pipeline cannot be edited mid-flight and
-    # resumed as though it had always said the new thing.
-    write_once(out / "pipeline.json", pretty_json_bytes(plan.model_dump(mode="json")))
+    seal_or_revise(out, plan, logger)
 
     from src.mathlib_review.review import stage_adapters
 

@@ -223,3 +223,42 @@ def test_the_preflight_says_what_it_could_not_check():
     assert set(results) == {"judge", "judge_relation"}
     for result in results.values():
         assert "deferred" in result and "has not produced yet" in result["deferred"]
+
+
+def test_re_invoking_a_pipeline_resumes_instead_of_dying_on_its_own_seal(tmp_path, monkeypatch):
+    """Re-invoking IS the documented way to continue a pipeline that stopped, and it died on
+    `FileExistsError` before reaching the resume logic at all.
+
+    Found by running the paid check twice. `write_once` refuses a differing artifact -- right
+    for the graph, too blunt for the plan -- and the plan embeds `git_commit` and
+    `git_tree_state`, so the bytes differ whenever anything was committed in between. That is
+    not an edge case; it is the normal case.
+
+    So the plan follows `runner.seal_or_revise_plan`: provenance may move and is recorded as a
+    revision, the graph may not."""
+
+    import logging
+
+    from src.mathlib_review.review.pipeline import (
+        PipelineChangedSemantically, build_plan, load_pipeline, seal_or_revise,
+    )
+
+    spec = load_pipeline(Path("configs/pipelines/verify_33337.yaml"))
+    plan = build_plan(spec, "pr5_probe", Path("configs/pipelines/verify_33337.yaml"))
+    logger = logging.getLogger("t")
+
+    first = seal_or_revise(tmp_path, plan, logger)
+    assert first.name == "pipeline.json"
+    # Same graph, same bytes: a no-op, not a revision.
+    assert seal_or_revise(tmp_path, plan, logger).name == "pipeline.json"
+
+    # The tree moved between invocations. That is provenance, and it gets a revision.
+    moved = plan.model_copy(update={"git_commit": "f" * 40, "git_tree_state": "clean"})
+    assert seal_or_revise(tmp_path, moved, logger).name == "pipeline_revision_2.json"
+    assert (tmp_path / "pipeline.json").read_bytes() != (
+        tmp_path / "pipeline_revision_2.json").read_bytes()
+
+    # The GRAPH moved. That is a different experiment under one name, and it is refused.
+    other = plan.model_copy(update={"spec_sha256": "0" * 64})
+    with pytest.raises(PipelineChangedSemantically, match="spec_sha256"):
+        seal_or_revise(tmp_path, other, logger)
