@@ -501,9 +501,32 @@ class BaseTask:
         return ""
 
     def create_result(self, **kwargs) -> BaseTaskResult:
-        """Create task result using the configured task_result_class."""
+        """Create task result using the configured task_result_class.
+
+        **A keyword the result class does not declare is refused, not dropped.**
+        `BaseTaskResult` is pydantic with the default `extra="ignore"`, so an undeclared
+        keyword reached here, vanished, and left the suite green -- which is the producer end
+        of this repository's most expensive bug class. It has cost a field six times:
+        `abstention` on a candidate result, `model_confidence` and `rejected_alternatives`
+        between candidates and findings, `execution_limits` and `session_replay` between the
+        orchestrator and the worker, and `documentation` vs `docs` in the concern vocabulary.
+        Every one of them looked like a working feature until something downstream read zero.
+
+        Only *construction* is strict. Loading a persisted `task_result.json` still goes
+        through `model_validate` (`persistence.py::TaskStorage._normalize_sample`), which stays
+        lenient on purpose: a result written before a field existed must keep loading, or every
+        historical run becomes unreadable.
+        """
         if self.task_result_class is None:
             raise ValueError(f"Task class {self.__class__.__name__} must define task_result_class")
+        undeclared = sorted(set(kwargs) - set(self.task_result_class.model_fields))
+        if undeclared:
+            raise TypeError(
+                f"{type(self).__name__}.create_result() was given "
+                f"{undeclared}, which {self.task_result_class.__name__} does not declare. "
+                f"Pydantic would ignore them and the value would be lost with no error. "
+                f"Declare the field on the result class, or stop passing it."
+            )
         identity_fields = {
             "task_id": self.data.task_id,
             "task_type": self.task_type or self.data.task_type,

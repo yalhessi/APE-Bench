@@ -390,11 +390,14 @@ class LeanProofEngineeringTask(BaseLeanTask):
 
                 if should_terminate and self.termination_callback:
                     try:
+                        # `evaluation_result` is deliberately not passed:
+                        # `LeanProofEngineeringResult` does not declare it, so it was dropped
+                        # silently and never reached `task_result.json`. `success` and `score`
+                        # above already carry everything it held.
                         task_result = self.create_result(
                             success=evaluation_result.success,
                             score=evaluation_result.score,
                             improved_code=final_code,
-                            evaluation_result=evaluation_result
                         )
                         await self.termination_callback(task_result)
                     except Exception as e:
