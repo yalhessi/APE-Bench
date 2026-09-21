@@ -165,6 +165,14 @@ def build_parser() -> argparse.ArgumentParser:
     _add_set(pipeline)
     _add_execute(pipeline)
 
+    adjudicate = sub.add_parser(
+        "adjudicate",
+        help="label the findings gold cannot judge, and report how many still are not")
+    adjudicate.add_argument("--of", dest="of_run", required=True,
+                            help="the judged generation run whose off-gold findings to read")
+    adjudicate.add_argument("--labels", type=Path, default=None,
+                            help="a JSONL file of human labels to add to the store first")
+
     report = sub.add_parser("report", help="read a finished run")
     report_sub = report.add_subparsers(dest="report_command", required=True)
     routing = report_sub.add_parser("routing", help="what the lead did")
@@ -465,6 +473,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         return _replay(args, overrides, logger)
     if args.command == "pipeline":
         return _pipeline(args, overrides, logger)
+    if args.command == "adjudicate":
+        from src.mathlib_review.judge.adjudicate import adjudicate_run
+
+        # Not in `SPENDS`: no model runs. A label is in the store or it is not, and the report
+        # says how much of the run is still unadjudicated rather than filling the gap.
+        print(adjudicate_run(args.of_run, labels=args.labels, logger=logger))
+        return 0
     if args.command == "report":
         return _report(args)
     if args.command == "trajectory":
