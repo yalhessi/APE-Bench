@@ -342,6 +342,7 @@ def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySourc
         condition=dataset.condition.model_dump(mode="json"),
         condition_sha256=dataset.condition.sha256(),
         selection={"arm_ids": dataset.arm_ids, "pr_numbers": dataset.pr_numbers,
+                   "invocation_ids": dataset.invocation_ids,
                    "invocation_limit": dataset.invocation_limit},
         cut=dataset.cut.model_dump(mode="json", exclude_none=True),
         cut_label=dataset.cut.name, turns_after_cut=dataset.turns_after_cut,
@@ -451,7 +452,12 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
         index_path, orchestrator, results, group="replay",
         semantic_ids={payload["task_id"]: payload["invocation_id"] for payload, _ in built})
 
-    outcomes = await collect_outcomes(index_path, sources, built, dataset.condition.name,
+    # Located from the tasks this run scheduled, not from the index: the index is built from
+    # `results.task_results`, and the orchestrator emits no result for a task with a paused
+    # sample -- which silently dropped two whole sessions, successful samples included.
+    task_dirs = {payload["invocation_id"]: Path(orchestrator.tasks_dir) / task.data.global_index
+                 for (payload, _), task in zip(built, tasks)}
+    outcomes = await collect_outcomes(task_dirs, sources, built, dataset.condition.name,
                                       dataset.cut.name)
     write_once(out / "replay_outcomes.jsonl", jsonl_bytes(outcomes))
     report = replay_report(outcomes)
@@ -461,23 +467,28 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
     return out
 
 
-async def collect_outcomes(index_path: Path, sources: List[ReplaySource], built,
+async def collect_outcomes(task_dirs: Dict[str, Path], sources: List[ReplaySource], built,
                            condition: str, cut_label: str) -> List[Dict[str, Any]]:
-    """One row per replayed sample, beside the recorded decision it replays."""
+    """One row per replayed sample, beside the recorded decision it replays.
 
-    from ape.orchestration.execution_index import by_semantic_id
+    `task_dirs` maps invocation to where its task ran. Every scheduled sample is reported,
+    including one that paused on the turn cap: such a sample has no accepted submission, which
+    is a fact about the replay, and its task's *other* samples are ordinary results. Reading
+    these through the execution index instead lost both -- the index carries only tasks the
+    orchestrator returned a result for, and a task with any paused sample returns none.
+    """
+
     from ape.orchestration.persistence import TaskStorage
     from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
 
-    index = by_semantic_id(index_path)
     rows: List[Dict[str, Any]] = []
     for source, (payload, content) in zip(sources, built):
         start = len([line for line in content.split(b"\n") if line.strip()])
         recorded = {"decision": decision_record(source.nodes, source.cut_index),
                     "accepted": accepted_summary(source.result)}
-        row = index.get(source.invocation_id)
-        samples = (await TaskStorage(Path(row["task_dir"]), row["global_index"])
-                   .load_all_samples()) if row else {}
+        task_dir = task_dirs.get(source.invocation_id)
+        samples = (await TaskStorage(Path(task_dir), Path(task_dir).name).load_all_samples()
+                   if task_dir and Path(task_dir).is_dir() else {})
         for sample_index in sorted(samples):
             attempt = samples[sample_index].successful_attempt or \
                 samples[sample_index].current_attempt

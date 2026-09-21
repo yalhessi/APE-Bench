@@ -164,6 +164,7 @@ def _write_arm_task(run, tasks_root, invocation_id, nodes, result, config):
 
     import json
     from datetime import datetime
+    from pathlib import Path
 
     from ape.orchestration.models import Attempt, ExecutionStatus, Sample, make_sample_id
     from ape.orchestration.persistence import TaskStorage
@@ -434,3 +435,50 @@ def test_a_sample_that_did_not_start_from_its_prefix_refuses_the_report():
     rows[1]["replay"]["replayed_from_prefix"] = False
     with pytest.raises(ReplayRefused, match="did not start from their recorded prefix"):
         replay_report(rows)
+
+
+def test_a_paused_sample_is_reported_and_does_not_hide_its_siblings(recorded_run, tmp_path):
+    """A task with any paused sample returns no result, so the execution index never names it.
+    Reading outcomes through the index lost two whole sessions of a real run -- their successful
+    samples included -- and the run still reported a clean agreement rate."""
+
+    import json
+    from datetime import datetime
+    from pathlib import Path
+
+    from ape.orchestration.models import Attempt, ExecutionStatus, Sample, make_sample_id
+    from ape.orchestration.persistence import TaskStorage
+    from src.mathlib_review.review.replay import collect_outcomes, replay_payload, select_sources
+
+    dataset = _dataset(invocation_ids=["wu:a#naming"])
+    sources, _ = asyncio.run(select_sources(dataset))
+    out = recorded_run / "replay_null_first_submit_candidates"
+    payload, content = replay_payload(sources[0], dataset, out)
+    Path(payload[SESSION_REPLAY_KEY]["prefix_path"]).parent.mkdir(parents=True, exist_ok=True)
+    Path(payload[SESSION_REPLAY_KEY]["prefix_path"]).write_bytes(content)
+
+    task_dir = tmp_path / "gi"
+    now = datetime.now()
+    for index, status in ((0, ExecutionStatus.SUCCESS), (1, ExecutionStatus.PAUSED_MAX_TURNS)):
+        attempt_path = task_dir / f"samples/{index}/attempts/attempt_1"
+        attempt_path.mkdir(parents=True)
+        (attempt_path / "session_replay.json").write_text(json.dumps(
+            {"prefix_sha256": payload[SESSION_REPLAY_KEY]["prefix_sha256"], "tool_drift": []}))
+        (attempt_path / "ape_agent_session_20260921_000000__s.jsonl").write_bytes(content)
+        asyncio.run(TaskStorage(task_dir, "gi").save_sample(Sample(
+            sample_id=make_sample_id("gi", index), sample_index=index, task_global_index="gi",
+            created_at=now, updated_at=now,
+            attempts=[Attempt(attempt_id=1, path=attempt_path, status=status, created_at=now,
+                              max_turns=9, cost_limit=0.3,
+                              result={"success": True, "candidates": [], "task_id": "t",
+                                      "task_type": ARM_TASK_TYPE,
+                                      "abstention": {"reason": "already_correct"}}
+                              if status is ExecutionStatus.SUCCESS else None)])))
+
+    rows = asyncio.run(collect_outcomes({"wu:a#naming": task_dir}, sources,
+                                        [(payload, content)], "null", "first_submit_candidates"))
+    assert len(rows) == 2                                   # both samples, not just the good one
+    assert [r["status"] for r in rows] == ["success", "paused_max_turns"]
+    assert rows[0]["replay"]["accepted"]["abstention_reason"] == "already_correct"
+    assert rows[1]["replay"]["accepted"] is None            # it never submitted legally
+    assert all(r["replay"]["replayed_from_prefix"] for r in rows)
