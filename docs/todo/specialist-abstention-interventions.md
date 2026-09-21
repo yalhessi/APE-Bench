@@ -1,8 +1,11 @@
 # Improving the specialist arms, given that their silence is stable
 
-**Status** — open, written 2026-09-21 from the replay diagnostic; **step 0 is free**
-**Cost** — $0 to diagnose; $2.60 per contract condition; $5.82–$13.95 for a whole-task replay
-**Owner question** — the arms are silent at 41 of 45 gold sites *every time*; which of the three
+**Status** — in progress; the interventions below were reviewed against the artifacts on
+2026-09-21 and **five of them did not survive it** — see *Corrections* at the foot of this file, and
+`docs/plans/2026-09-21-specialist-silences.md` for the plan that replaces the ordering here
+**Cost** — $0 to diagnose; ~$3.30 per contract condition (the $2.60 omitted the control population);
+a whole-task replay cannot test a new tool or a changed prompt at all
+**Owner question** — the arms are silent at 41 of 45 gold sites *every time*; which of the
 mechanisms behind that silence is worth paying to fix?
 
 ## Motivating result
@@ -91,3 +94,53 @@ argument against all three.
   system emits is already unadjudicated (`README.md`, "Adjudicating findings that are not
   maintainer obligations"). Control-PR emission is the guard to watch: 0–1 per run historically,
   and a condition that raises it is not an improvement.
+
+## Corrections, 2026-09-21 (read these before costing anything above)
+
+Written the same day, from a join of the 45 sessions to their gold asks and a read of the 43 that
+appear as silent cells in `report buckets`. The diagnostic is untouched; the *interventions* it
+motivated needed five changes, and the plan
+(`docs/plans/2026-09-21-specialist-silences.md`) is ordered by them rather than by this file.
+
+1. **Most of the population is the wrong arm, correctly silent.** Only **11 of 43** silent cells sit
+   at an obligation whose gold `concern_labels` intersect the arm's own `expected_concerns` (mapped
+   through `CONCERN_ALIASES`). The other 32 are `duplication` at a rename, `naming` at "factor out a
+   lemma", four arms at a docstring ask. "41 of 45 stable" is true and mostly means this. The miss
+   there is **routing**, not the contract — bounded by the fanout entry in `dead-ends.md`, measured
+   by `on_concern_arm_scheduled`, and split out as its own todo.
+2. **The dominant on-concern blocker is not in the three mechanisms.** About **9 of 43** texts say
+   they could not produce, or were refused, a *compiling edit*: `candidates.py:420-424` refuses a
+   candidate in a checkable family (`correctness`, `proof-golf`, `duplication`, `generalization`)
+   with `proposed_edit: null`, and the supplements say "report ONLY verified edits" / "If nothing you
+   attempted compiled, submit nothing". 33149's ask was "replace the axiomatized Parseval with the
+   existing one"; the arm found the existing lemma and could not say so without a patch the
+   maintainer never supplied either. This is now the first paid condition (`ask_without_fix`).
+3. **Mechanism 1's example is not in this population.** `wu:1c5956b9…#correctness` (the axioms) comes
+   from the four-session case study; its unit carries no required gold change, and both "remove the
+   axioms" obligations were COVERED in this rep by `docs`. No text among the 45 describes a defect
+   seen outside its unit. The retention half is still real and free — `abstention_detail` is written
+   to `arm_responses.jsonl` and **read by nothing**; `finalize.py` contains no occurrence of
+   `abstention`, and `report._abstentions` keeps the reason and drops the text. The observation
+   *channel* is deferred behind step 0.
+4. **Advisory licensing is already in the arm prompt, so condition 2 as written restates it.**
+   `NAMING_SYSTEM` (`focused_prompts.py:363-368`) says an `emerging` verdict should be said "as an
+   ADVISORY suggestion", and `naming_norm` renders "Advisory at most". What is missing is downstream:
+   `SUBMISSION_CONTRACT` (`render_focused.py:52-99`) names advisory only inside the JSON literal and
+   closes with "a wrong finding costs this review far more than a silence does". Gold marks **17 of
+   22** counted obligations `blocking_force: advisory`. The condition survives as a *contract and
+   schema* change and is gated on step 0 finding ≥ 3 advisory-suppressed cells; today's count is 1,
+   and its one example filed the gold rename 3/3 under replay, i.e. it is decision-limited.
+5. **A whole-task replay cannot test the tool work this file prices at $5.82/$13.95.** `--cut turn=1`
+   resumes from the *recorded* system prompt, user prompt and tool list
+   (`conversation.py:470-507`; `:638-690` is bypassed, and a newly registered tool lands in
+   `registered_not_shown` and is never shown). It exercises today's *implementation* of an
+   already-granted tool. Merge-base file access and a working `patch_set` are a rep, not a replay; a
+   `naming_norm` behaviour fix is replayable on the naming sessions.
+
+Two smaller ones. **No replay so far could measure the guard this file names**: the 45-session
+selection contains no control PR, so control-PR emission was unobservable. `v2_rep1` has 7 specialist
+abstentions on 33304/33315, ~$0.35 to replay, and a `control-abstentions` selector is in the plan.
+And because 17 of 45 abstention *labels* swap under replay, **step 0 labels from the detail texts,
+not from the reason enum**; `replay_outcomes.jsonl` does not carry `abstention_detail` (fixed
+forward), so the replayed texts are in the attempt session files under
+`.claude/worktrees/decision-replay/.ape/runs/…`.
