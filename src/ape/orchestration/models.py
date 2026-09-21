@@ -249,9 +249,11 @@ class Sample(BaseModel):
 # Subtask execution - one spec per child a task spawns
 # ============================================================================
 #
-# `TaskOrchestrator(` is constructed directly in four files, each with its own convention for
-# nesting, and the divergent one cost this project a class of accounting bugs. This is the
-# shared shape: what a parent asks for when it spawns a child.
+# `TaskOrchestrator(` was constructed directly in four files, each with its own convention for
+# nesting, and the divergent one cost this project a class of accounting bugs. Nesting now goes
+# through `subtasks.run_subtasks` in all three families, and the remaining direct constructions
+# are top-level drivers starting a run of their own. These are the shared shapes: what a parent
+# asks for when it spawns a child, and what it gets back.
 
 
 #: Where a task carries limits that differ from the orchestrator's. Read by the worker before

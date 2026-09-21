@@ -246,18 +246,14 @@ def test_every_nested_call_site_uses_the_shared_convention():
     }
     for name, path in sources.items():
         text = Path(path).read_text(encoding="utf-8")
-        assert "run_subtasks" in text or "nested_config" in text, (
-            f"{name} does not use the shared convention")
+        assert "run_subtasks" in text, f"{name} does not use the shared primitive"
+        assert "TaskOrchestrator(" not in text, (
+            f"{name} constructs its own orchestrator; the primitive exists so that the layout, "
+            f"the reader of what the children did, and the ledger vocabulary are not written a "
+            f"second time -- sharing only the directory helper is the state that lost a paused "
+            f"child in two of these three")
         # And none of them still hand-rolls the directory.
         assert 'parent_attempt_path / "subtasks"' not in text, name
-
-    # Fully migrated: no private orchestrator, no private reader of what the children did.
-    # `judgment` and `review_gate` follow; they share the directory helper today.
-    delegation = Path(sources["delegation"]).read_text(encoding="utf-8")
-    assert "run_subtasks" in delegation
-    assert "TaskOrchestrator(" not in delegation, (
-        "delegation constructs its own orchestrator again; the primitive exists so the layout, "
-        "the reader and the ledger vocabulary are not written a second time")
 
 
 def test_the_directory_is_the_one_genuine_invariant(tmp_path):

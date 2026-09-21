@@ -6,9 +6,10 @@ inspection setup and majority-vote aggregation) but plays a Mathlib *maintainer*
 is encoded in the reused ``judgment_conclusion`` field ("positive" == merge-ready) so that
 all existing sub-task orchestration and majority voting apply unchanged.
 
-``lean_review_gate`` mirrors ``lean_semantic_evaluation``: it spins up N reviewer samples via
-a ``TaskOrchestrator`` and returns the aggregated merge-readiness decision plus the union of
-blocking issues, for use as a gate inside the reviewed proof-engineering task.
+``lean_review_gate`` mirrors ``lean_semantic_evaluation``: it spins up N reviewer samples
+through the shared subtask primitive (``ape.orchestration.subtasks.run_subtasks``) and returns
+the aggregated merge-readiness decision plus the union of blocking issues, for use as a gate
+inside the reviewed proof-engineering task.
 """
 
 from __future__ import annotations
@@ -285,7 +286,6 @@ async def lean_review_gate(
     try:
         from ape.orchestration.config import ExecutionConfig
         from ape.scaffolds.factory import create_scaffold_config_for_type
-        from ape.orchestration.orchestrator import TaskOrchestrator
         from ape.llm_clients.config import LLMConfig
         from ape.runtime.factory import create_runtime_config_for_type
 
@@ -318,51 +318,47 @@ async def lean_review_gate(
             runtime_config=reviewer_runtime_config,
         )
 
-        if parent_attempt_path:
-            # One convention for nested work, shared with every other task family: the
-            # subtask directory under the parent's attempt, which is what keeps each child's
-            # workspace its own. Three call sites had three conventions, and the divergent one
-            # cost a class of accounting failures.
-            #
-            # The config stays this caller's. It deliberately runs a different model at its own
-            # sample count, and `num_processes` is passed through unchanged rather than forced
-            # to 0 -- that default is v5's, where the lead is known to be inside a worker, and
-            # silently changing this caller's concurrency is not part of sharing a directory
-            # convention.
-            from ape.orchestration.subtasks import nested_config
-
-            reviewer_config = nested_config(
-                parent_attempt_path, reviewer_config, group="subtasks",
-                num_processes=reviewer_config.execution.num_processes,
-            )
-
-        reviewer_task = LeanReviewGateTask(review_data, reviewer_config)
+        # One way to run nested work, shared with every other task family: the primitive owns
+        # the subtask directory under the parent's attempt -- which is what keeps each child's
+        # workspace its own -- the reader of what the children did, and the ledger vocabulary.
+        # Three call sites had three conventions, and the divergent one cost a class of
+        # accounting failures.
+        #
+        # The config stays this caller's: a different model at `sample_count=num_reviewers`,
+        # and its own `num_processes` and `max_concurrency`. `attempt_path=None` is how "there
+        # is no parent attempt to nest under" is said, and it is the branch a review gate
+        # invoked outside a task attempt has always taken.
+        from ape.orchestration.models import TaskExecutionSpec
+        from ape.orchestration.subtasks import run_subtasks
 
         logger.info(f"Running maintainer-reviewer gate with {num_reviewers} reviewer(s)...")
-        reviewer_results = await TaskOrchestrator(config=reviewer_config, logger=logger).run([reviewer_task])
+        reviewer_runs, reviewer_results = await run_subtasks(
+            [TaskExecutionSpec(
+                spec_id="review_gate",
+                task_type=LeanReviewGateTask.task_type,
+                task_data=review_data.model_dump(mode="json"),
+            )],
+            attempt_path=parent_attempt_path,
+            config=reviewer_config,
+            group="subtasks",
+            logger=logger,
+            concurrency=None,
+        )
 
-        if not reviewer_results.task_results:
+        nested_usage = reviewer_results.total_token_usage if reviewer_results else None
+        reviewer_run = reviewer_runs.get("review_gate")
+        aggregated = reviewer_run.result if reviewer_run else None
+        if aggregated is None:
+            reason = (reviewer_run.error or reviewer_run.outcome.reason) if reviewer_run else None
+            logger.error(f"Reviewer task failed: {reason or 'unknown'}")
             return {
                 "success": False,
-                "message": "No reviewer results received, please retry",
+                "message": f"Reviewer task failed: {reason or 'no details'}",
                 "merge_ready": False,
                 "blocking_issues": [],
                 "advisory_issues": [],
                 "summary": "",
-                "nested_token_usage": reviewer_results.total_token_usage,
-            }
-
-        aggregated = reviewer_results.task_results[0]
-        if not isinstance(aggregated, LeanJudgmentResult):
-            logger.error(f"Reviewer task failed: {getattr(aggregated, 'error', None) or 'unknown'}")
-            return {
-                "success": False,
-                "message": f"Reviewer task failed: {getattr(aggregated, 'error', None) or 'no details'}",
-                "merge_ready": False,
-                "blocking_issues": [],
-                "advisory_issues": [],
-                "summary": "",
-                "nested_token_usage": reviewer_results.total_token_usage,
+                "nested_token_usage": nested_usage,
             }
 
         merge_ready = aggregated.judgment_conclusion == "positive"
@@ -397,7 +393,7 @@ async def lean_review_gate(
             "advisory_issues": advisory_issues,
             "summary": summaries[0] if summaries else "",
             "review_data": aggregated.judgment_data,
-            "nested_token_usage": reviewer_results.total_token_usage,
+            "nested_token_usage": nested_usage,
         }
 
     except Exception:

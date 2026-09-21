@@ -762,9 +762,10 @@ async def lean_semantic_evaluation(
         logger.info(f"Starting semantic validation with {num_judges} judges using unified BoN mechanism...")
 
         from ape.orchestration.config import ExecutionConfig
+        from ape.orchestration.models import TaskExecutionSpec
+        from ape.orchestration.subtasks import run_subtasks
         from ape.scaffolds.factory import create_scaffold_config_for_type
-        from ape.orchestration.orchestrator import TaskOrchestrator
-        from ape.tasks.lean_tasks.formal_math.judgment.task import LeanJudgmentTask, LeanJudgmentData
+        from ape.tasks.lean_tasks.formal_math.judgment.task import LeanJudgmentData
 
         if target_workspace is None:
             raise ValueError("target_workspace specification is required for semantic evaluation")
@@ -807,62 +808,55 @@ async def lean_semantic_evaluation(
             runtime_config=judge_runtime_config  # Use semantic_config's runtime
         )
 
-        if parent_attempt_path:
-            # One convention for nested work, shared with every other task family: the
-            # subtask directory under the parent's attempt, which is what keeps each child's
-            # workspace its own. Three call sites had three conventions, and the divergent one
-            # cost a class of accounting failures.
-            #
-            # The config stays this caller's. It deliberately runs a different model at its own
-            # sample count, and `num_processes` is passed through unchanged rather than forced
-            # to 0 -- that default is v5's, where the lead is known to be inside a worker, and
-            # silently changing this caller's concurrency is not part of sharing a directory
-            # convention.
-            from ape.orchestration.subtasks import nested_config
-
-            judge_config = nested_config(
-                parent_attempt_path, judge_config, group="subtasks",
-                num_processes=judge_config.execution.num_processes,
-            )
-
-        judge_task = LeanJudgmentTask(judge_data, judge_config)
-
-        judge_runner = TaskOrchestrator(
-            config=judge_config,
-            logger=logger
-        )
-        
+        # One way to run nested work, shared with every other task family: the primitive owns
+        # the subtask directory under the parent's attempt -- which is what keeps each child's
+        # workspace its own -- the reader of what the children did, and the ledger vocabulary.
+        # Three call sites had three conventions, and the divergent one cost a class of
+        # accounting failures.
+        #
+        # The config stays this caller's. It deliberately runs a DIFFERENT model at
+        # `sample_count=num_judges` for its majority vote, and `num_processes` and
+        # `max_concurrency` are its own: a primitive that forced the parent's config on its
+        # children could not serve this, and a primitive only one family can use is not one.
+        # `concurrency=None` and `attempt_path=None` are how that is said.
         logger.info(f"Executing semantic validation with unified BoN ({num_judges} samples)...")
-        judge_results = await judge_runner.run([judge_task])
+        judge_runs, judge_results = await run_subtasks(
+            [TaskExecutionSpec(
+                spec_id="semantic_judge",
+                task_type=LeanJudgmentTask.task_type,
+                task_data=judge_data.model_dump(mode="json"),
+            )],
+            attempt_path=parent_attempt_path,
+            config=judge_config,
+            group="subtasks",
+            logger=logger,
+            concurrency=None,
+        )
 
-        if judge_results.workspace_path:
+        if judge_results is not None and judge_results.workspace_path:
             logger.info(f"Semantic judgment execution completed. Judge results saved to: {judge_results.workspace_path}")
 
-        if not judge_results.task_results:
+        judge_run = judge_runs.get("semantic_judge")
+        aggregated_result = judge_run.result if judge_run else None
+
+        if aggregated_result is None:
+            reason = (judge_run.error or judge_run.outcome.reason) if judge_run else None
+            logger.error(f"Judgment task failed during setup or execution: {reason or 'Unknown error'}")
             return {
                 "success": False,
-                "message": "No judge results received, please retry"
-            }
-
-        aggregated_result = judge_results.task_results[0]
-
-        if not isinstance(aggregated_result, LeanJudgmentResult):
-            logger.error(f"Judgment task failed during setup or execution: {aggregated_result.error or 'Unknown error'}")
-            return {
-                "success": False,
-                "message": f"Judgment task failed: {aggregated_result.error or 'No error details available'}",
+                "message": f"Judgment task failed: {reason or 'No error details available'}",
                 "judgment_conclusion": "negative",
-                "nested_token_usage": judge_results.total_token_usage
+                "nested_token_usage": judge_results.total_token_usage if judge_results else None
             }
         
         logger.info(f"🏁 Unified BoN semantic validation result: {aggregated_result.judgment_conclusion.upper()}")
-        
+
         return {
             "success": aggregated_result.success,
             "message": f"Semantic validation completed with {num_judges} judges",
             "judgment_conclusion": aggregated_result.judgment_conclusion,
             "aggregated_evaluations": aggregated_result.judgment_data,
-            "nested_token_usage": judge_results.total_token_usage
+            "nested_token_usage": judge_results.total_token_usage if judge_results else None
         }
         
     except Exception as e:
