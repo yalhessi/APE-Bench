@@ -12,9 +12,16 @@ changes, and the whole candidate falls if any edit escapes or any touched file f
 
 from __future__ import annotations
 
+from ape.tasks.lean_tasks.formal_math.review.base import splice_declaration
 from src.mathlib_review.patchset import (
     MAX_PATCH_EDITS, PatchEdit, PatchSet, apply, validate, verification_artifact,
 )
+
+#: The real splice both edit paths use. `apply` takes it rather than importing it, and these
+#: tests pass the real one rather than a stand-in: the defect it replaced was a substring
+#: `str.replace` that every test here agreed with, because they all used single-line sources
+#: whose declaration name occurred exactly once.
+SPLICE = splice_declaration
 
 ALLOWED = ["Mathlib/A.lean", "Mathlib/B.lean"]
 
@@ -82,7 +89,7 @@ def test_spans_are_applied_bottom_up_so_line_numbers_stay_valid():
     text = "".join(f"line{i}\n" for i in range(1, 11))
     patch = PatchSet((span("Mathlib/A.lean", 2, 3, "EARLY"),
                       span("Mathlib/A.lean", 8, 9, "LATE")))
-    out, problems = apply(patch, lambda p: text)
+    out, problems = apply(patch, lambda p: text, SPLICE)
     assert problems == []
     body = out["Mathlib/A.lean"].splitlines()
     assert body[1] == "EARLY"
@@ -92,24 +99,66 @@ def test_spans_are_applied_bottom_up_so_line_numbers_stay_valid():
 
 def test_a_missing_file_is_reported_not_skipped():
     patch = PatchSet((decl("Mathlib/A.lean", "foo", "bar"),))
-    _out, problems = apply(patch, lambda p: None)
+    _out, problems = apply(patch, lambda p: None, SPLICE)
     assert any("not present" in p for p in problems)
 
 
 def test_a_declaration_that_does_not_occur_is_reported():
-    patch = PatchSet((decl("Mathlib/A.lean", "theorem missing", "x"),))
-    _out, problems = apply(patch, lambda p: "theorem present := rfl\n")
-    assert any("does not occur" in p for p in problems)
+    patch = PatchSet((decl("Mathlib/A.lean", "missing", "theorem x : True := trivial"),))
+    _out, problems = apply(patch, lambda p: "theorem present : True := trivial\n", SPLICE)
+    assert any("not found" in p for p in problems)
 
 
 def test_edits_across_two_files_are_both_applied():
     """The shape PR 33337 needs: rename a pair that lives in two files."""
 
-    patch = PatchSet((decl("Mathlib/A.lean", "old_a", "new_a"),
-                      decl("Mathlib/B.lean", "old_b", "new_b")))
-    out, problems = apply(patch, lambda p: f"theorem old_{p[8].lower()} := rfl\n")
+    patch = PatchSet((decl("Mathlib/A.lean", "old_a", "theorem new_a : True := trivial"),
+                      decl("Mathlib/B.lean", "old_b", "theorem new_b : True := trivial")))
+    out, problems = apply(
+        patch, lambda p: f"theorem old_{p[8].lower()} : True := trivial\n", SPLICE)
     assert problems == []
     assert set(out) == {"Mathlib/A.lean", "Mathlib/B.lean"}
+    assert "theorem new_a" in out["Mathlib/A.lean"]
+    assert "old_a" not in out["Mathlib/A.lean"]
+
+
+def test_declaration_mode_replaces_the_declaration_not_the_first_mention_of_its_name():
+    """The defect this file could not see, because every source in it was one line.
+
+    `apply` used `text.replace(declaration_name, new_declaration, 1)` under a comment claiming
+    it did what the single-edit path does. On a real file the first occurrence of a
+    declaration's name is its own docstring, so a well-formed edit spliced the whole
+    replacement into the comment, left the declaration standing, and reported no problem --
+    then compiled the wreckage and blamed the model.
+    """
+
+    src = ("/-- `Dense.continuous_sup` is the supremum form. -/\n"
+           "theorem Dense.continuous_sup (h : Dense s) : True := by\n"
+           "  trivial\n")
+    patch = PatchSet((decl("Mathlib/A.lean", "Dense.continuous_sup",
+                           "theorem Dense.upperBounds_image (h : Dense s) : True := by\n"
+                           "  trivial"),))
+    out, problems = apply(patch, lambda p: src, SPLICE)
+    assert problems == []
+    edited = out["Mathlib/A.lean"]
+    assert "theorem Dense.upperBounds_image" in edited
+    assert "theorem Dense.continuous_sup" not in edited
+    # The docstring is untouched: it mentions the old name and is not the declaration.
+    assert edited.startswith("/-- `Dense.continuous_sup` is the supremum form. -/")
+
+
+def test_an_empty_replacement_deletes_the_declaration():
+    """`deletion` is 3 of the 11 obligation shapes that need a coordinated fix -- PR 33066
+    deletes a definition and its five simp lemmas -- and `PatchEdit.mode()` already admits an
+    empty `new_declaration`."""
+
+    src = ("theorem keep : True := trivial\n\n"
+           "theorem drop_me : True := trivial\n")
+    patch = PatchSet((decl("Mathlib/A.lean", "drop_me", ""),))
+    out, problems = apply(patch, lambda p: src, SPLICE)
+    assert problems == []
+    assert "drop_me" not in out["Mathlib/A.lean"]
+    assert "theorem keep" in out["Mathlib/A.lean"]
 
 
 # --- the warrant ------------------------------------------------------------------------

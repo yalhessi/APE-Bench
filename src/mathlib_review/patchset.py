@@ -129,11 +129,18 @@ def validate(patch: PatchSet, allowed_paths: Iterable[str]) -> List[str]:
     return problems
 
 
-def apply(patch: PatchSet, read: Any) -> Tuple[Dict[str, str], List[str]]:
+def apply(patch: PatchSet, read: Any, splice: Any) -> Tuple[Dict[str, str], List[str]]:
     """Compute the patched text of every touched file. Nothing is written here.
 
     `read(path) -> str | None` supplies the current text, so this stays testable without a
-    workspace and callers cannot accidentally mutate a shared snapshot.
+    workspace and callers cannot accidentally mutate a shared snapshot. `splice(src, name,
+    new, label=...) -> (edited | None, error)` locates and replaces one declaration; it is
+    passed in rather than imported so this module keeps no dependency on the task layer, and
+    it is **required** rather than defaulted because the default this code used to have was
+    the bug: `text.replace(declaration_name, new_declaration, 1)`, under a comment claiming it
+    was "exactly as the single-edit path does". It is not. On a real file the first occurrence
+    of a declaration's name is usually its own docstring, so a well-formed edit spliced the
+    replacement into the comment, left the declaration standing, and reported no problem.
 
     Span edits within a file are applied from the bottom up, so earlier line numbers stay
     valid while later ones are being rewritten.
@@ -158,13 +165,12 @@ def apply(patch: PatchSet, read: Any) -> Tuple[Dict[str, str], List[str]]:
             continue
         text = sources[path]
         for edit in [e for e in edits if e.mode() == "declaration"]:
-            old = edit.declaration_name or ""
-            # Located by its full text, exactly as the single-edit path does: a declaration
-            # matched by name alone can hit a docstring mention or a call site.
-            if text.count(old) == 0:
-                problems.append(f"{old!r} does not occur in {path}")
+            edited, error = splice(
+                text, edit.declaration_name or "", edit.new_declaration or "", label=path)
+            if edited is None:
+                problems.append(error)
                 continue
-            text = text.replace(old, edit.new_declaration or "", 1)
+            text = edited
         spans = sorted(
             (e for e in edits if e.mode() == "span"),
             key=lambda e: -(e.line_start or 0))
@@ -215,7 +221,7 @@ def verification_artifact(
 
 
 def verify(
-    patch: PatchSet, workspace: Path, *, timeout: int = 300,
+    patch: PatchSet, workspace: Path, *, splice: Any = None, timeout: int = 300,
 ) -> Tuple[bool, str, List[str]]:
     """Apply the patch and compile every file it touches. Returns `(ok, report, touched)`.
 
@@ -253,7 +259,7 @@ def verify(
         # candidate, so "no files failed" would publish a claim backed by no compile at all.
         return False, "a patch set with no edits proposes nothing to verify", []
 
-    patched, problems = apply(patch, read)
+    patched, problems = apply(patch, read, splice)
     if problems:
         return False, "patch could not be applied:\n" + "\n".join(problems), []
     if not patched:

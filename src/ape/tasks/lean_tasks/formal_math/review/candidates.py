@@ -385,7 +385,9 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                       line_start=r.get("line_start"), line_end=r.get("line_end"),
                       replacement=r.get("replacement"))
             for r in (candidate.get("patch_set") or [])))
-        ok, report, touched = verify(patch, workspace)
+        from ape.tasks.lean_tasks.formal_math.review.base import splice_declaration
+
+        ok, report, touched = verify(patch, workspace, splice=splice_declaration)
         if not ok:
             return [], (
                 "the coordinated patch does not compile, so the whole candidate is refused "
