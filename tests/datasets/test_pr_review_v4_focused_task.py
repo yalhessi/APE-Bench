@@ -304,3 +304,46 @@ def test_a_claim_only_focused_candidate_is_refused(scheduled):
     evaluation = result["evaluation_result"]
     assert not evaluation.success
     assert "proposed_edit" in evaluation.message
+
+
+def test_only_a_granted_arm_is_told_that_patch_set_exists():
+    """The field is in the contract that supersedes everything above it, for the arms that
+    hold the grant and no others.
+
+    `family_design` alone carried this instruction, in its own system prompt, 2,400 characters
+    above a JSON template that did not list the field and that opens "This supersedes any
+    field list above". So the one arm that could submit a coordinated fix was told about it by
+    the text the contract overrides, and 0 of 3,411 candidates across 60 runs ever carried
+    one.
+
+    An arm without the grant must see the prompt it saw before, byte for byte: a renderer bump
+    that quietly reworded ten prompts would make every cross-run comparison a comparison of
+    two things.
+    """
+
+    from src.mathlib_review.agenda.arms import specs_by_arm_id
+    from src.mathlib_review.agenda.registry import patch_set_arms
+    from src.mathlib_review.agenda.render_focused import focused_system_prompt
+
+    granted = patch_set_arms()
+    assert granted and not (granted & {"naming", "docs", "style"})
+
+    for arm_id, spec in specs_by_arm_id().items():
+        system = focused_system_prompt(spec)
+        contract_at = system.index("# Submission contract for this run")
+        if arm_id in granted:
+            assert '"patch_set"' in system, arm_id
+            assert system.index('"patch_set"') > contract_at, arm_id
+            # The rule that makes the widened grant safe travels with the field.
+            assert "must be one your candidate" in system, arm_id
+            assert "## Coordinated fixes" in system, arm_id
+        else:
+            assert "patch_set" not in system, arm_id
+            assert "Coordinated fixes" not in system, arm_id
+
+    # And the instruction lives in one place now: the arm that used to carry its own copy
+    # reads the same words as the other six.
+    from ape.tasks.lean_tasks.formal_math.review.focused_prompts import FOCUSED_PROMPTS
+
+    _tools, family_system, _user = FOCUSED_PROMPTS["family_design"]
+    assert "Coordinated fixes" not in family_system

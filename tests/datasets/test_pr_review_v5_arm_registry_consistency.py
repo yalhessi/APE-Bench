@@ -172,8 +172,15 @@ EXPECTED_SPEC_IDENTITY = {
     # `dev-medium-0.4.0` -- including the doc-comment PR 33321's two documentation obligations
     # sit on. Eight of ten identities are unchanged, which is the check that this widened two
     # arms and not the registry's shape.
+    # `family_design` moved 860fd12098a9 -> b1a9a457a573 on 2026-09-22, deliberately: its
+    # "## Coordinated fixes" paragraph moved out of its own system prompt and into
+    # SUBMISSION_CONTRACT, which every granted arm now reads. It had been the one arm allowed
+    # to submit a `patch_set` and it was told so 2,400 characters above a JSON template that
+    # did not list the field and that opens "This supersedes any field list above"; 0 of 3,411
+    # candidates across 60 runs ever carried one. Nine of ten identities are unchanged, which
+    # is the check that the instruction moved rather than that ten prompts were reworded.
     "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "017bf3f92a5c",
-    "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
+    "duplication": "dcef56db2ee5", "family_design": "b1a9a457a573",
     # `naming` moved 8dfd2c87af4d -> ee245f077b7e on 2026-09-13, deliberately: the arm was
     # calibrated to "what the local family already does" and stayed silent 13/13 reps on a
     # real naming ask while its tools worked, so the contract now points at the repository's
