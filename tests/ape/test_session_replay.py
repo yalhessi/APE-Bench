@@ -390,3 +390,48 @@ def test_the_attempt_records_what_the_task_actually_held(tmp_path):
                                        ReplayCondition(name="null"), tmp_path / "n.jsonl", {})
     assert SessionReplay.model_validate(
         null_payload[SESSION_REPLAY_KEY]).overridden_keys == []
+
+
+def test_the_record_reads_the_reserved_keys_where_they_actually_live(tmp_path):
+    """`task_data_seen` looked only at `task.data`, and the keys it exists to check are not there.
+
+    A reserved run-level key -- `execution_limits`, `session_replay` -- is deliberately not a
+    field on the data model: `BaseTaskData` ignores what it does not declare, so `BaseTask`
+    keeps the original dict in `self.payload`. Reading only the validated model therefore
+    reported `None` for exactly the directives this check was built to catch, which is the
+    defect it exists to prevent, committed inside the check.
+    """
+
+    from types import SimpleNamespace
+
+    from ape.scaffolds.ape_agent.replay import (
+        REPLAY_RECORD_FILENAME, ReplayCondition, SessionReplay, replay_task_data,
+    )
+
+    prefix, _ = cut(_nodes(), CutPoint(before_tool_call={"tool": "submit_result"}))
+    condition = ReplayCondition(
+        name="capped", task_data_overrides={"execution_limits": {"max_turns": 3}})
+    payload, content = replay_task_data(
+        {"task_type": "t", "task_id": "x"}, prefix, condition, tmp_path / "p.jsonl", {})
+    (tmp_path / "p.jsonl").write_bytes(content)
+    replay = SessionReplay.model_validate(payload[SESSION_REPLAY_KEY])
+    assert replay.overridden_keys == ["execution_limits"]
+
+    attempt = tmp_path / "attempt"
+    attempt.mkdir()
+    # The shape the runtime produces: the key is in `payload` and absent from `data`.
+    task = SimpleNamespace(session_replay=replay, attempt_path=attempt, scratch_workspace=None,
+                           data=SimpleNamespace(), payload={"execution_limits": {"max_turns": 3}})
+    ApeAgentConversationManager(ApeAgentConfig(), task=task)._replay_tool_definitions(
+        recorded_tools(prefix))
+    record = json.loads((attempt / REPLAY_RECORD_FILENAME).read_text())
+    assert record["task_data_seen"] == {"execution_limits": {"max_turns": 3}}
+
+    # A key that IS a declared field still reads off the model.
+    declared = SimpleNamespace(
+        session_replay=replay, attempt_path=tmp_path, scratch_workspace=None,
+        data=SimpleNamespace(execution_limits={"max_turns": 9}), payload={})
+    ApeAgentConversationManager(ApeAgentConfig(), task=declared)._replay_tool_definitions(
+        recorded_tools(prefix))
+    assert json.loads((tmp_path / REPLAY_RECORD_FILENAME).read_text())["task_data_seen"] == {
+        "execution_limits": {"max_turns": 9}}

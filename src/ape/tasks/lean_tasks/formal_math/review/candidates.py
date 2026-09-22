@@ -548,6 +548,15 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             return None
         if not self.patch_set_paths:
             return ("patch_set is not accepted by this check; submit a single proposed_edit")
+        # One fix per candidate, in one shape. `_verify_candidate_submission` handles a patch
+        # set first and returns, so a candidate carrying both would publish a warrant that
+        # compiled the patch and never touched the `proposed_edit` -- and the statement gate,
+        # which only reads `proposed_edit`, would never run. A claim is verified by what it
+        # actually proposes or it is not verified at all.
+        if candidate.get("proposed_edit"):
+            return ("a candidate carries one fix: either a single proposed_edit or a "
+                    "patch_set, not both. The warrant is a compile of what you propose, and "
+                    "only the patch_set would be compiled here")
         from src.mathlib_review.patchset import anchor_problems, validate
 
         patch = _patch_set_from(rows, candidate.get("primary_change_id"))

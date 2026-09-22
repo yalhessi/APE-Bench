@@ -548,9 +548,7 @@ share a prefix and have nothing to do with each other.
 This check accepts two, because a group's defect takes two shapes: use `duplication` when a
 form that should be generated is written out by hand, and `generalization` when a counterpart is
 missing or a shared parameter is hardcoded. The contract line above names one — declare whichever
-of these two your finding actually is.
-
-"""
+of these two your finding actually is."""
 
 FAMILY_DESIGN_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n"""
 
