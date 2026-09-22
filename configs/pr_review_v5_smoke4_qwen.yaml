@@ -1,0 +1,25 @@
+# smoke4 on Qwen — the iteration-tier twin of `pr_review_v5_smoke4.yaml`.
+#
+# Extends the gpt_5.2 smoke4 config rather than restating it, so the PR set, the caps, the
+# token twins, `max_delegations: 60` and every comment justifying them stay in ONE place. The
+# only thing this file says is which model runs it. If smoke4's set or caps change, this
+# follows automatically, which is the point — a Qwen variant that drifted from its paid twin
+# would answer a different question while looking like a cheap version of the same one.
+#
+# Everything in `pr_review_v5_smoke4.yaml` still applies, including the denominator warning:
+# THE DENOMINATOR IS 17, NOT 18 AND NOT 40.
+#
+# Read `bases/v5_generation_qwen.yaml` before using this — the tier boundary, why
+# `reasoning_effort` is off, and why the inherited token ceilings are an extrapolation from
+# gpt_5.2 that the first real rep should be read against rather than trusted.
+#
+# The run name is an invocation argument, not a config key. Name it `iter_`:
+#   ape/bin/python -m src.mathlib_review.review.cli plan \
+#     --config configs/pr_review_v5_smoke4_qwen.yaml --run-name iter_smoke4_qwen_rep1
+#   ape/bin/python -m src.mathlib_review.review.cli run \
+#     --config configs/pr_review_v5_smoke4_qwen.yaml --run-name iter_smoke4_qwen_rep1 --execute
+extends: pr_review_v5_smoke4.yaml
+
+llm_config:
+  model_name: elm_qwen_3.5
+  reasoning_effort: none

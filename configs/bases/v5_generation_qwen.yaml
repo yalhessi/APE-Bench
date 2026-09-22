@@ -1,0 +1,76 @@
+# The iteration tier: v5 generation on the locally hosted Qwen, through the ELM gateway.
+#
+# Two tiers, and which one a run is in is a decision about what its numbers are FOR:
+#
+#   iteration  elm_qwen_3.5  — free, local. For "does this change do anything", pipeline
+#                              debugging, and shaking out a new arm or prompt. Its numbers
+#                              are a signal, not a result, and must never be quoted as one.
+#   keeps      gpt_5.2       — the existing `bases/v5_generation.yaml`, unchanged. For a
+#                              number that gets written down, compared across reps, or shown
+#                              to anyone.
+#
+# Nothing enforces the boundary except the run name and this comment, so: **name every run
+# from this base `iter_<something>`**. The artifacts are self-describing — `V5RunPlan.model_name`
+# records `elm_qwen_3.5` and `judge_identity` keys on the model, so no cache or plan can
+# silently mix the tiers — but a person reading a report is the failure mode, and this
+# project's record already contains an iteration number that was read as a result.
+extends: v5_generation.yaml
+
+llm_config:
+  model_name: elm_qwen_3.5
+
+  # OFF, deliberately, and this is the load-bearing line in the file.
+  #
+  # Qwen reasons when nothing is sent — it is the only ELM model that does, and
+  # `elm_mistral_small_4` is the opposite, so there is no "ELM default" to rely on. Measured
+  # 2026-09-22: reasoning on is ~100x the completion tokens (451 against 4 on one arithmetic
+  # prompt) and ~23x the latency (11.5s against 0.5s).
+  #
+  # Both of those defeat the purpose of this tier. The latency is the direct cost — an
+  # iteration loop that takes 23x longer is not an iteration loop. The token count is worse
+  # than it looks: the ceilings inherited below were calibrated on `gpt_5.2`, whose 2,857 arm
+  # attempts report `reasoning_tokens: 0` in 2,857 of 2,857, so they authorise
+  # NON-reasoning work. Turning reasoning on here would burn them ~100x faster and produce
+  # runs that pause on `PAUSED_TOKEN_LIMIT` for a reason that has nothing to do with the
+  # change under test.
+  #
+  # `high` is the only other value ELM accepts for this model, and it needs its own
+  # calibration rep before it is used for anything — see
+  # docs/todo/reasoning-in-the-arms.md, which is the open question of whether the arms
+  # should be reasoning at all. Do not set it here to "make Qwen better" without re-measuring
+  # the ceilings; that is the same trade this file just declined.
+  reasoning_effort: none
+
+  # NOT restated, and worth knowing why: the parent's `thinking_budget_tokens: 30000` is
+  # inert. Only `BaseProvider` sends it, and the provider table is OpenAI and ELM, both of
+  # which override that method. It is left alone rather than zeroed because ~20 configs carry
+  # it and docs/todo/reasoning-in-the-arms.md owns removing them together; `reasoning_effort`
+  # above is the knob that actually reaches the endpoint.
+
+execution:
+  # Unchanged at 4, and measured rather than inherited. Qwen through ELM: 1 request 9.2s;
+  # 4 concurrent 14.0s wall (median latency 11.2s); 8 concurrent 45.4s wall with a 45.4s
+  # straggler. Four is about the knee.
+  #
+  # CAVEAT: that was measured on trivial prompts. A real arm sends 12k-38k prompt tokens
+  # (p50 12,160 / p90 20,298 / max 38,154 over 554 recorded v5 sessions), so per-request
+  # latency under load will be worse than 9.2s and the knee may be lower. Treat 4 as the
+  # ceiling to verify on the first real rep, not one that has been confirmed under load.
+  # Free tokens are not a reason to raise it: the constraint is a shared cluster, not a bill.
+  max_concurrency: 4
+
+# The token block in the parent is inherited UNCHANGED, which is a claim worth defending
+# because it was calibrated on a different model.
+#
+# It survives the move for two reasons. `processed_tokens` counts the whole prompt plus the
+# completion and is not discounted for caching, so it measures the same thing on a provider
+# that caches and one that does not — and Qwen reports no cache at all. And the prompts are
+# byte-identical: the same agenda, the same renderer, the same work units. What changes is
+# only the completion, which `reasoning_effort: none` keeps in the same order.
+#
+# It is still an extrapolation. The outstanding item in
+# docs/research/2026-09-22-token-budget-calibration.md is exactly this: the caps are
+# "calibrated on gpt_5.2 behaviour and applied to a model nobody has watched". Read the first
+# rep from this base against that write-up's arm p50 35,276 / p90 87,589 / p99 243,736 before
+# concluding anything from it, and expect to revise `standard_budget_tokens` rather than to
+# find it already right.
