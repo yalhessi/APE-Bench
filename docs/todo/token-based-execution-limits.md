@@ -26,6 +26,18 @@ records it, so two runs with different ceilings are not silently comparable.
   both streaming and non-streaming calls, so token counts *are* available to enforce
   against. The open-weight ones return `prompt_tokens_details: null`, so there is no cache
   accounting to reconcile — input, output and total are all the enforcement needs.
+- **The dry run cannot warn you.** `cli plan` on `configs/pr_review_v5_smoke4.yaml` prints
+  byte-identical budget lines for `elm_gpt_5.2` (real rates) and `elm_qwen_3.5` (0.0):
+
+      budget: mandatory floor $2.45 (uncapped per PR by design) + discretionary up to $8.00
+      run_total_cost_cap $12.00 vs worst case $10.45 (floor + discretionary) — fits
+
+  `_report_budget` (`src/mathlib_review/review/runner.py:819-836`) computes `floor` from
+  `mandatory_floor_cost` — required jobs times `standard_budget_cap` — and
+  `discretionary_cap` as `per_pr_cost_cap * pr_count`. Both are cap arithmetic with no
+  model price in them, so preflight reports the same reassuring "fits" for a model whose
+  caps bind and one whose caps cannot. Whatever the ceiling ends up being denominated in,
+  this report should be able to say which currency it is estimating.
 
 **Risk** — Two ceilings for one concept is how budget *tiers* got built and then retired
 (`ExecutionLimits` replaced them). The failure mode to avoid is a second parallel mechanism:
