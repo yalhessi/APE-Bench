@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 0,
+  "completion_status": "complete",
+  "context_calls_total": 0,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 11,
+  "failed": 0,
+  "issues_total": 0,
+  "mandatory": 5,
+  "paused": 0,
+  "proposals_total": 11,
+  "pruned": 0,
+  "routing_mode": "fanout",
+  "run_id": "v5run:pr5_elm_qwen_tokencap_probe1",
+  "run_name": "pr5_elm_qwen_tokencap_probe1",
+  "run_plan_sha256": "702a93f95803c816ba5f7625c4c85dce8ad504a7a7ab452a589aee30c4040fff",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "5d72ac76dacbe6eb1ed3ea07c4e7b2271c3a721c0f5c7dd2354b41a0f3043f4e",
+  "succeeded": 0,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 396769.0,
+    "tokens": 396769.0
+  },
+  "wall_seconds": 247.340893
+}

@@ -84,6 +84,24 @@ outcome reads `execution_status: completed` for a task that completed nothing.
 sentence on `ChildRun.error`, which is the most specific account of the failure anyone has. The
 underlying contradiction is untouched.
 
+*Measured 2026-09-22, and it is not only a paused task's own record that suffers.* On
+`pr5_elm_qwen_tokencap_probe1` 10 of 11 arms stopped on their token ceiling. Each got a
+synthesised `task_result.json` carrying `token_usage=None`, so all eleven read
+`execution_status: completed` and `OrchestratorResults.total_token_usage` summed only the one
+job that finished -- **27,593 tokens against a true 385,684**, a 14x under-report of what the
+run consumed. The manifest's `self_tokens` now reads `task_outcome.json` instead
+(`analysis/runs.py::scheduled_task_tokens`), which is a workaround at the reader rather than a
+fix: every other consumer of `total_token_usage` still sees the short number, and on a paid
+run `total_cached_cost` is short in exactly the same way.
+
+**A second thing the same run showed.** In `fanout` the manifest reported `delegated: 11,
+succeeded: 0, failed: 0, paused: 0` and `completion_status: complete`. Those three counters
+are summed over delegation-ledger `status` fields, and a fanout ledger has no lead to write
+them, so they are structurally zero however the run went -- eleven jobs delegated and none
+accounted for is a sum that does not balance, and nothing refuses it. `arm_responses.jsonl`
+had the one successful row. The `solo` mode already carries a note of this shape for
+`context_calls_total` in `review/trace.py`; this is the same gap on the status counters.
+
 **What would close it:** either stop writing the synthetic result (and let `task_outcome.json`
 carry the failure, which is what it exists for), or amend the rule and the docstring to say a
 failure result is written deliberately. Both are readable; the current state is not.

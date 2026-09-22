@@ -130,7 +130,62 @@ changes: the rate is a property of a price list and this project's cache hit rat
 nature. The per-role token *distributions* are the more durable half — they are what the model
 actually does — and the caps should be re-derived if a run's p99 approaches its cap.
 
-Not yet measured: the distributions on an ELM open-weight model. A 397B MoE may be more or less
+## The ceiling on a zero-priced model, measured
+
+`pr5_elm_qwen_tokencap_probe1`: `elm_qwen_3.5`, `reasoning_effort=high`, fanout on the control
+PR 33438, 11 arms, `standard_budget_tokens` set to **30,000** — deliberately below the gpt_5.2
+arm p50 of 35,276 so the ceiling would bind.
+
+**Ten of eleven arms stopped on `paused_token_limit`**, at 32,145–41,319 processed tokens each,
+every one of them logging `Token limit exceeded: NN,NNN >= limit 30,000 (billed $0.000000)`.
+The eleventh finished at 27,555, under the cap. Total for the run: **396,769 tokens for $0.00**.
+That is the todo's closing condition: a task on a model no dollar cap can bind stops on the
+token one. (The same experiment run twice agreed: 10 of 11 both times, 385,684 and 396,769
+tokens.)
+
+Two things to hold onto before reading anything else into it:
+
+* **The distribution is censored.** Every one of those ten is a lower bound — the arm was cut,
+  not finished. Qwen's p50 of 36,145 against gpt_5.2's 35,276 is therefore *not* evidence that
+  the two models consume alike; it is evidence that ten arms were stopped at about the same
+  place. The uncensored ELM distribution is still unmeasured, and a rep at the real 360,000 cap
+  is what would give it.
+* **The one uncensored arm's output share was 2.29%**, against gpt_5.2's 1.6–1.9%. With
+  reasoning ON. That is the first indication that prompt re-sending dominates on both models
+  and the gpt_5.2-derived caps may transfer — one arm, so it is an indication and nothing more.
+
+**Operational note.** The gateway is not reliably fast. The same 11 jobs took 5m12s on one
+invocation and, on the next, stalled for **46 minutes** inside a single streaming call before
+the run hit its wall-clock limit at 10 of 11. `LLMConfig.timeout` is 3600s, so one call can
+hang for an hour with nothing but the absence of progress to say so. Size an ELM run's
+wall-clock budget accordingly, and do not read a slow run as a large one.
+
+## Two defects this run exposed
+
+* **The census this document tells you to re-run was wrong when it mattered most.** It read
+  `result.token_usage`, which a paused attempt never writes, so it reported the distribution of
+  the one job that finished — 1 attempt of 11 — and paused attempts are the heavy ones by
+  construction. It now reads `Attempt.tokens`. Re-checked against the gpt_5.2 runs: every
+  number in this document is unchanged.
+* **The manifest under-reported the run by 14x**, `self_tokens: 27,555` against 396,769,
+  because `worker._try_aggregate` synthesises a `task_result.json` with `token_usage=None` for
+  a task that paused (framework defect #4) and `OrchestratorResults.total_token_usage` sums
+  those results. `self_tokens` now comes from `task_outcome.json`, which is written for every
+  scheduled task precisely because `task_result.json` is reserved for a successful submission.
+  That is a fix at the reader: every other consumer of `total_token_usage` still sees the short
+  number, and on a paid run `total_cached_cost` is short the same way.
+
+## Reasoning is the other axis, and it was not being recorded
+
+`reasoning_effort` moves Qwen's completion tokens by about two orders of magnitude (4 against
+451 on one arithmetic prompt) and its latency by about 23x. `elm_qwen_3.5` reasons by default
+and `elm_mistral_small_4` does not, so there is no single "ELM default" for a run to inherit,
+and a token distribution measured without stating the setting is unreadable. The knob is now
+`LLMConfig.reasoning_effort`, inside `scaffold_config_sha256`; the per-model measurements are
+in `MODEL_MAPPINGS`. The parameter is `reasoning_effort` — `reasoning: null` returns HTTP 200,
+leaves reasoning on, and reports nothing.
+
+Not yet measured: the uncensored distributions on an ELM open-weight model. A 397B MoE may be more or less
 verbose per turn than `gpt_5.2`, and until one full rep exists the caps above are calibrated on
 OpenAI behaviour and applied to a model that has not been watched. The first ELM rep should be read
 against the arm p50/p90 here before anything is concluded from it.
