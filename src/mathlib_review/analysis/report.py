@@ -1010,6 +1010,7 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
         verdict_by_obligation: Dict[str, str] = {}
         paired_candidates: set = set()
         matched_candidates: set = set()
+        hit_obligation_by_finding: Dict[str, set] = {}
         if audit:
             report = json.loads(stage.audit_path("semantic_report").read_text())
             verdict_by_obligation = {
@@ -1021,6 +1022,8 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
             for match in jsonl_rows(stage.audit_path("semantic_matches")):
                 if match.get("role") == "observed" and match.get("issue_match"):
                     matched_candidates.add(match["candidate_id"])
+                    hit_obligation_by_finding.setdefault(
+                        match["candidate_id"], set()).add(match["obligation_id"])
 
         replay_by_invocation: Dict[str, Dict[str, Any]] = {}
         if replay:
@@ -1151,6 +1154,10 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
             })
 
         per_run[run_name] = {
+            "gate": _gate_report(findings, hit_obligation_by_finding, reviewed,
+                                 {pr_number for pr_number, _obligation, _judgment
+                                  in obligations},
+                                 audit),
             "state": stage.state.value,
             "forensic": stage.forensic,
             "prs_reviewed": reviewed,
@@ -1296,6 +1303,73 @@ def silences(run: str, replay: Optional[str] = None, audit: bool = True,
             "reader's diagnosis of a silence -- it orders work and explains a number, and it "
             "never enters recall."),
     }
+
+
+def _gate_report(findings, hit_obligation_by_finding, reviewed, prs_with_gold, audit):
+    """What the admission gate did to what the run had already found.
+
+    The last stage between a finding and a maintainer, and the one nothing measured. `finalize`
+    publishes a claim only when a deterministic collector can warrant its concern family; the
+    rest are kept as `diagnostic` with no channel, which is honest about what the system would
+    *say* and is not the same as what it *found*. Both numbers matter and only one was reported.
+
+    On the three held-out A reps this is the largest gold-scored loss in the pipeline: the run
+    hits 7 / 5 / 6 obligations and publishes 2 / 1 / 1 of them. The dominant reason is not that
+    the claim is doubted -- 39 of rep1's 42 suppressed hits are "no collector can support this
+    claim's concern family", which is a statement about available evidence for a KIND of claim,
+    not about this one.
+
+    Read with the other column: published control-PR emission is 0 on all three reps against 3
+    / 4 / 5 pre-gate, so the gate is what buys the control property the project measures
+    precision by. Opening it is therefore a trade, not a free gain, and this block reports both
+    sides so nobody quotes one of them alone.
+    """
+
+    published = [item for item in findings if item.get("admission") == "published"]
+    controls = sorted(set(reviewed) - set(prs_with_gold))
+    payload = {
+        "findings": len(findings),
+        "published": len(published),
+        "suppressed": len(findings) - len(published),
+        # The precision side of the same trade, per PR the release records no obligation for.
+        "control_findings": sum(1 for item in findings if item["pr_number"] in controls),
+        "control_published": sum(1 for item in published if item["pr_number"] in controls),
+        "control_pr_numbers": controls,
+        "note": (
+            "`published` is what the system would say; `findings` is what it found. The gap is "
+            "the admission gate, whose axis is whether a collector can warrant the claim's "
+            "concern family -- not whether the claim is right. Control emission is reported "
+            "beside it because the gate is what keeps it at zero."),
+    }
+    if not audit:
+        return payload
+
+    hit_pre, hit_post = set(), set()
+    reasons: Dict[str, int] = {}
+    by_family: Dict[str, Dict[str, int]] = {}
+    for item in findings:
+        obligations = hit_obligation_by_finding.get(item["finding_id"]) or set()
+        family = item.get("concern_family") or "unknown"
+        row = by_family.setdefault(family, {"findings": 0, "hits": 0, "published": 0})
+        row["findings"] += 1
+        row["hits"] += bool(obligations)
+        row["published"] += item.get("admission") == "published"
+        if not obligations:
+            continue
+        hit_pre |= obligations
+        if item.get("admission") == "published":
+            hit_post |= obligations
+        else:
+            reason = item.get("admission_reason") or "unstated"
+            reasons[reason] = reasons.get(reason, 0) + 1
+    payload.update({
+        "obligations_hit_pre_gate": len(hit_pre),
+        "obligations_hit_post_gate": len(hit_post),
+        "obligations_lost_to_gate": sorted(hit_pre - hit_post),
+        "suppressed_hits_by_reason": dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
+        "by_concern_family": dict(sorted(by_family.items())),
+    })
+    return payload
 
 
 def _asobj(row: Dict[str, Any]):

@@ -230,3 +230,51 @@ def test_replay_annotations_carry_more_than_stability():
     # The naming session that filed the gold rename in every replay is the unstable one.
     unstable = {cell["invocation_id"] for cell in replayed if not cell["replay_stable"]}
     assert "wu:1f9cf7865fe0948dfc6e47f8#naming" in unstable
+
+
+@runs_exist
+def test_the_gate_is_reported_beside_what_the_run_found(judged):
+    """The last stage between a finding and a maintainer, and the one nothing measured.
+
+    `finalize` publishes a claim only when a deterministic collector can warrant its concern
+    family; everything else is kept as `diagnostic` with no channel. That is honest about what
+    the system would *say*, and it is not the same as what it *found* -- so both numbers have
+    to be visible or the smaller one gets quoted as the only one. On this rep the run hits 7
+    gold obligations and publishes 2 of them, and 21 of the 24 suppressed hit-findings
+    carry one reason: no collector can support that concern family, which is a statement about a KIND of
+    claim rather than about this one.
+
+    The control column is reported with it because the gate is what keeps published control-PR
+    emission at zero, so opening it is a trade and not a free gain.
+    """
+
+    gate = judged["gate"]
+    assert (gate["findings"], gate["published"]) == (285, 25)
+    assert (gate["obligations_hit_pre_gate"], gate["obligations_hit_post_gate"]) == (7, 2)
+    assert len(gate["obligations_lost_to_gate"]) == 5
+    assert gate["control_findings"] == 3 and gate["control_published"] == 0
+
+    top_reason, count = max(gate["suppressed_hits_by_reason"].items(), key=lambda kv: kv[1])
+    assert "no collector can support" in top_reason and count == 21
+
+    # And the inversion that makes this worth a report rather than a footnote: the families
+    # that hit are not the families that publish.
+    families = gate["by_concern_family"]
+    assert families["correctness"]["hits"] == 14 and families["correctness"]["published"] == 0
+    assert families["naming"]["hits"] == 4 and families["naming"]["published"] == 0
+    assert families["style"]["hits"] == 0 and families["style"]["findings"] == 108
+    assert families["proof-golf"]["hits"] == 1 and families["proof-golf"]["published"] == 8
+    assert families["generalization"]["hits"] == 0 and families["generalization"]["published"] == 2
+
+
+@runs_exist
+def test_the_gate_block_needs_no_judge_for_the_half_that_needs_none():
+    """Volume and control emission are facts about the run; only the obligation counts need an
+    audit. Reporting the first pair without the second is what lets a reader see the gate at
+    all on an unjudged run."""
+
+    gate = buckets([RUN])["per_run"][RUN]["gate"]
+    assert gate["findings"] == 285 and gate["published"] == 25
+    assert gate["control_published"] == 0
+    assert "obligations_hit_pre_gate" not in gate
+    assert "not whether the claim is right" in gate["note"]
