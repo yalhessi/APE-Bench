@@ -26,6 +26,9 @@ links to it.
 - **Before proposing a direction:** read this index and `docs/dead-ends.md`. If the direction is
   already here, pick it up rather than restating it; if it is in `dead-ends.md`, say so and cite the
   entry.
+- **When you pick one up:** its `Start here` block is the reading list, and the preflight command
+  in it spends nothing. Anything you had to search for that the block should have named goes into
+  the block, in the same commit as the work.
 - **When a session surfaces a new hypothesis it will not pursue:** write it here before the session
   ends. Compaction drops what only exists in conversation, and this project has re-derived the same
   idea in three separate sessions.
@@ -44,9 +47,33 @@ links to it.
 **Cost** — an estimate in dollars of billed spend, or "no spend"
 **Motivating example** — the measurement, PR, or line of code that made this interesting
 **What would close it** — the concrete check, not a direction of travel
+**Start here** — the working set: what to open, what to run, what is already settled
 **Evidence** — file:line, run paths, commit hashes
 **Risk** — what makes this possibly not worth doing
 ```
+
+### `Start here` — the working set
+
+`Evidence` backs the claim; `Start here` starts the work. It is what a session must have open before
+it can act, so that picking an item up is not another sweep of the tree. The session writing the todo
+already has that set open and capturing it costs a minute; reconstructing it later is a search, and
+it is a search paid again by every session that picks the item up.
+
+Three lines, each verified at the moment it is written:
+
+- **read:** repo-relative paths in the order they make sense, each with what it is for. Full paths,
+  never the `review/…` shorthand — `review/candidates.py` resolves to two different files, and only
+  `src/ape/tasks/lean_tasks/formal_math/review/candidates.py` carries the submission constraints.
+- **run:** the commands that reproduce the motivating result or take the next step, spelled out in
+  full (`$R` in `CLAUDE.md` is documentation, not a shell variable), and given in the preflight form
+  — without `--execute` — which is the form that spends nothing.
+- **bounded by:** the `dead-ends.md` entries, sibling todos and settled questions that fence the
+  item, so the required reading is targeted instead of the whole record.
+
+A stale block is worse than an absent one, because it sends the next session to a path that moved:
+`cli trajectory` returns 0 arm invocations for all three `rel050` reps for exactly this reason, an
+index of absolute paths into a deleted worktree. Paths and run names are checked when the block is
+written, and a wrong one is fixed by the session that finds it, in that session's commit.
 
 ---
 

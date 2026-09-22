@@ -70,6 +70,59 @@ measured by preflight.
 precision measurable), or "be less conservative" prompt nudges. The 41/45 stability is the
 argument against all three.
 
+## Start here
+
+**read**
+
+- `docs/research/decision-replay-gold-abstentions-2026-09.md` — the 41/45 result, the $1.97 replay,
+  and the split of the 125 abstention texts. This is the stage's *input*; it is what the rule means
+  by reading the inputs before touching a prompt.
+- `src/ape/tasks/lean_tasks/formal_math/review/focused_prompts.py:495` — the `correctness` prompt
+  already naming "an axiom the repository does not accept". Mechanism 1 is a defect this prompt
+  asked for, saw, and could not file.
+- `src/ape/tasks/lean_tasks/formal_math/review/context_tools.py:567-569` — `emerging` means
+  "advisory at most". Mechanism 2 is licensing that exists in the tool text and reaches no decision.
+- `src/ape/tasks/lean_tasks/formal_math/review/candidates.py` — `change_ids` and
+  `primary_subjects_by_change` on `LeanPRReviewV4CandidateData` (l.24, l.26), `CandidateSubmission`
+  (l.127, fields at l.131-132): the constraint that leaves a file-level defect no legal anchor.
+  Not `src/mathlib_review/review/candidates.py`, a different file of the same name.
+- `docs/research/pr-review-v5-principled-design.md` §D2 — advisory licensing as designed and never
+  built.
+
+**run**
+
+Step 0 spends nothing: the null is on disk at
+`results/pr_review_v5/runs/pr5_replay_null_first_submit_candidates_goldabstain45_v2_rep1/`, and the
+pairing reads `replay_outcomes.jsonl` (135 samples, 45 sites x 3), `replay_report.json` for the
+per-site summary, and `execution_index.jsonl` to get back to the source sessions in
+`pr5_A_lead_heldout12_v2_rep1`. There is no command for that join yet; writing one is
+`pipeline-stage-chaining.md`'s `--select`, not this entry.
+
+A condition is that same plan with one thing swapped. Without `--execute` this prices it and stops:
+
+```
+ape/bin/python -m src.mathlib_review.review.cli replay \
+  --config configs/v5_replay.yaml \
+  --of pr5_A_lead_heldout12_v2_rep1 \
+  --select gold-site-abstentions \
+  --cut tool=submit_candidates:first \
+  --run-name <condition>_v2_rep1
+```
+
+**bounded by**
+
+- The **Do not** paragraph above. More reps, forcing, and "be less conservative" nudges are all
+  answered by the 41/45 stability, and forcing additionally inverts the control-PR property that
+  makes precision measurable.
+- `dead-ends.md`, the retracted naming-arm entry: the advisory contract is the question it leaves
+  open, not a fresh idea.
+- Siblings that own the neighbouring pieces, so this entry does not re-derive them —
+  `specialist-arm-contents.md` (what the arms contain), `evidence-tiers-and-traces.md` (collectors
+  that can only return `inconclusive`), `batching-work-units.md` (unit grain and `patch_set`),
+  `replay-decision-turn.md` (the instrument and its remaining condition).
+- `CLAUDE.md`: three reps minimum reported as mean / union / stable, and `location_recall` is not a
+  quality signal for anything measured here.
+
 ## Evidence
 
 - `results/pr_review_v5/runs/pr5_replay_null_first_submit_candidates_goldabstain45_v2_rep1/`
