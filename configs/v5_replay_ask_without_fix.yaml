@@ -1,0 +1,77 @@
+# Condition A: may an arm file the maintainer's ask when it cannot make the fix compile?
+#
+#   ape/bin/python -m src.mathlib_review.review.cli replay \
+#       --config configs/v5_replay_ask_without_fix.yaml --of pr5_A_lead_heldout12_v2_rep1 \
+#       --select gold-site-abstentions \
+#       --run-name pr5_replay_ask_without_fix_first_submit_candidates_goldsite58_v2_rep1
+#
+# Read against the null on the same prefixes and the same cut, and against the control
+# population (`--select control-abstentions`), which is where a condition that buys noise
+# rather than reach shows up.
+#
+# The mechanism it tests. `submit_candidates` refuses a candidate in a checkable concern
+# family -- correctness, proof-golf, duplication, generalization -- that carries no
+# `proposed_edit`, and the arm supplements say "report ONLY verified edits" and "If nothing you
+# attempted compiled, submit nothing". Reading the 2026-09-21 held-out run, the largest group
+# of in-remit gold-site silences is arms that had the maintainer's answer and could not make it
+# compile: "no verified replacement compiles" on 33149, whose gold ask is "replace the
+# axiomatized Parseval identity with the existing one"; "the submission validator requires
+# statement changes to be provided via declaration_name+new_declaration" on 33145, on an edit
+# that compiled.
+#
+# Two things to hold on to when reading the result.
+#
+# The validator refusal binds only the seven arms whose concern family is checkable --
+# correctness, duplication, generality, family_design, api_reuse, proof_golf, proof_idiom. For
+# `naming`, `docs` and `style` nothing refuses a candidate without an edit, so on those arms
+# only the closing instruction below operates, against prompt text ("report ONLY verified
+# edits", "Verify every edit with lean_verify_edit before submitting it") rather than against
+# a rule. A conversion on a naming cell and a conversion on a duplication cell are therefore
+# evidence about different things.
+#
+# And a converted candidate is recorded, not said. `finalize` gives an unwarranted claim
+# `admission: diagnostic` and `channels: []` -- deliberately out of the merge and out of the
+# digest, because "the system withheld these, so counting them in `review` would claim credit
+# for something it did not say". So this condition measures whether the arms HAVE the asks.
+# Whether an unverified ask should reach a maintainer is a second decision, and that is where
+# the control-PR guard would really bite. What moves immediately is measurable without a
+# judge: `origin_arm_id` survives onto the finding, so `report silences` shows the cell go
+# from `silent` to `candidate` and its obligation from UNTOUCHED to located.
+#
+# What it does NOT do: ask for more findings. An empty submission stays exactly as cheap, the
+# mute-abstention refusal is untouched, and nothing in the added text says to lower a bar.
+# `forbid_abstention` is the opposite experiment and took control emission 1 -> 36.
+
+extends: v5_replay.yaml
+
+dataset:
+  condition:
+    name: ask_without_fix
+
+    # The contract change itself, as a task-data override rather than as prompt text: the
+    # refusal lives in `submit_candidates`, so relaxing it in the prompt alone would leave the
+    # arm told one thing and refused another. Under this policy every edit that IS supplied is
+    # still compiled, and one that fails to compile is still refused; what is allowed is the
+    # ask with no edit, which `finalize` admits as `diagnostic` and never publishes.
+    task_data_overrides:
+      submission_verification_policy: verify_edits_if_present
+
+    # And the arm has to be told, or it will apply the rule it was trained on in this session.
+    # A `closing_instruction` rather than `prompt_replacements` because the sentences that
+    # state the rule differ per arm -- each supplement writes its own -- while this text is
+    # one string every arm can be given. Shipping it for real is a prompt change, tested by a
+    # rep; this measures whether the rule is what was binding.
+    closing_instruction: |
+      One amendment to the submission contract for this call, and nothing else changes.
+
+      A candidate may be submitted with `proposed_edit: null` when you have identified a
+      change a maintainer would want and could not produce an edit that compiles. Put the
+      transformation in `requested_change`, precisely enough to carry out, and in
+      `suggested_fix` say what you attempted and what the compiler said. Such a candidate is
+      recorded as unverified: it is not published as a verified finding, and it is not held
+      against you that it carries no edit.
+
+      This is not a request to find something. Submitting nothing remains a correct and
+      common outcome, a wrong finding still costs more than a silence, and you should not add
+      a candidate you do not believe in. It removes one specific reason for silence: that the
+      fix would not compile, when you were confident about the ask itself.

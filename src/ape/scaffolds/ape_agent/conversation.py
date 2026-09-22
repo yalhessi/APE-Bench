@@ -500,6 +500,14 @@ class ApeAgentConversationManager:
                 if name in replay.recorded_tool_sha256
                 and tool_definition_sha256(tool) != replay.recorded_tool_sha256[name]),
             "registered_not_shown": sorted(set(live) - set(replay.recorded_tool_sha256)),
+            # What the task actually holds for each key the condition overrode, read off the
+            # live task rather than off the directive. A condition that does not arrive is
+            # otherwise indistinguishable from one that changed nothing, and that is the
+            # shape of the defect that made arms run at $1.00 against a $0.30 cap for the
+            # whole of v5: the directive was asserted where it was written, not where it lands.
+            "task_data_seen": {
+                key: getattr(getattr(self.task, "data", None), key, None)
+                for key in getattr(replay, "overridden_keys", [])},
         }
         if self.task.attempt_path:
             (self.task.attempt_path / REPLAY_RECORD_FILENAME).write_text(

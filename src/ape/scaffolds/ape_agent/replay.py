@@ -65,6 +65,12 @@ class SessionReplay(BaseModel):
     #: Where the prefix came from: run, attempt, session file and its hash, cut point, condition.
     #: Provenance for readers; nothing in the replay path acts on it.
     source: Dict[str, Any] = Field(default_factory=dict)
+    #: The task-data keys the condition overrode. Carried so the *far* end can say whether the
+    #: override arrived: a directive asserted where it is written proves nothing, and this
+    #: repository has already paid for that once -- `execution_limits` was recorded on the
+    #: attempt and never bound the conversation, and a replay whose directive was dropped ran
+    #: from its prompt and produced submissions that looked exactly like replays.
+    overridden_keys: List[str] = Field(default_factory=list)
 
 
 def load_prefix(replay: SessionReplay) -> List[Dict[str, Any]]:
@@ -432,6 +438,7 @@ def replay_task_data(task_data: Dict[str, Any], prefix: List[Dict[str, Any]],
         prefix_path=str(prefix_path), prefix_sha256=_sha256(content),
         recorded_tool_sha256={tool["function"]["name"]: tool_definition_sha256(tool)
                               for tool in recorded_tools(prefix)},
+        overridden_keys=sorted(condition.task_data_overrides),
         source={**source, "condition": condition.name, "condition_sha256": condition.sha256(),
                 "prefix_assistant_turns": sum(1 for n in prefix if n.get("type") == "assistant"),
                 "prefix_nodes": len(prefix)})

@@ -324,29 +324,7 @@ class BasePRReviewTask(BaseLeanTask):
         src = fp.read_text(encoding="utf-8")
 
         if declaration_name and new_declaration:
-            from ape.toolkits.code.lean.lean_parser import extract_proof_blocks
-            try:
-                decls = extract_proof_blocks(src)
-            except Exception as exc:  # noqa: BLE001
-                return None, f"could not parse {norm} to locate `{declaration_name}`: {exc}"
-            matches = [d for d in decls if declaration_name in (d.name, d.fullname)
-                       or (d.fullname and d.fullname.endswith("." + declaration_name))]
-            if not matches:
-                return None, f"declaration `{declaration_name}` not found in {norm}"
-            if len(matches) > 1:
-                opts = ", ".join(sorted({m.fullname or m.name or "?" for m in matches}))
-                return None, f"`{declaration_name}` is ambiguous in {norm}; use the full name (one of: {opts})"
-            d = matches[0]
-            # Replace from the keyword by default, which preserves any attributes and
-            # modifiers already in the file. When the replacement supplies its own, replace
-            # from the start of that decoration instead — otherwise the two concatenate into
-            # `@[simp] @[simp] theorem …`, which fails to parse and reads to the agent as a
-            # mysterious syntax error in code it did not write.
-            start = d.header_span[0]
-            if _supplies_own_prefix(new_declaration):
-                start = _declaration_prefix_start(src, d.header_span[0])
-            edited = src[:start] + str(new_declaration).rstrip() + "\n\n" + src[d.body_span[1]:]
-            return edited, ""
+            return splice_declaration(src, declaration_name, new_declaration, label=norm)
 
         lines = src.split("\n")
         if line_start is None or line_end is None or replacement is None:
@@ -704,6 +682,54 @@ _VERIFY_CONCURRENCY = 3
 # Predicted paths are workspace-relative (target/Mathlib/…); the materialized reviewed
 # tree is rooted at target_workspace.path with repo-relative paths (Mathlib/…).
 _WS_PREFIX_RE = re.compile(r"^(?:target/|reference/[^/]+/|scratch/|a/|b/|\./|/)+")
+
+
+def splice_declaration(
+    src: str, declaration_name: str, new_declaration: str, *, label: str = "the file",
+) -> Tuple[Optional[str], str]:
+    """Replace one whole declaration in `src`, located by parsing rather than by text search.
+
+    Returns `(edited, "")` or `(None, error)`. Public and shared, because there are two edit
+    paths and they must mean the same thing by "declaration mode": the single-edit path
+    (`_edited_file_code`) and the coordinated one (`patchset.apply`, which is handed this as a
+    callable so it stays workspace-free). `patchset` used to do
+    `text.replace(declaration_name, new_declaration, 1)` while its comment claimed to be doing
+    this -- so an edit naming `Dense.continuous_sup` rewrote the first *mention* of that name,
+    which on a real file is its own docstring, and then compiled the wreckage.
+
+    An empty `new_declaration` deletes the declaration; `deletion` is 3 of the 11 obligation
+    shapes that need a coordinated fix, and `PatchEdit.mode()` already admits it.
+    """
+
+    from ape.toolkits.code.lean.lean_parser import extract_proof_blocks
+
+    try:
+        decls = extract_proof_blocks(src)
+    except Exception as exc:  # noqa: BLE001
+        return None, f"could not parse {label} to locate `{declaration_name}`: {exc}"
+    matches = [d for d in decls if declaration_name in (d.name, d.fullname)
+               or (d.fullname and d.fullname.endswith("." + declaration_name))]
+    if not matches:
+        return None, f"declaration `{declaration_name}` not found in {label}"
+    if len(matches) > 1:
+        opts = ", ".join(sorted({m.fullname or m.name or "?" for m in matches}))
+        return None, (f"`{declaration_name}` is ambiguous in {label}; use the full name "
+                      f"(one of: {opts})")
+    found = matches[0]
+    # Replace from the keyword by default, which preserves any attributes and modifiers
+    # already in the file. When the replacement supplies its own, replace from the start of
+    # that decoration instead -- otherwise the two concatenate into `@[simp] @[simp] theorem
+    # ...`, which fails to parse and reads to the agent as a mysterious syntax error in code
+    # it did not write.
+    start = found.header_span[0]
+    if _supplies_own_prefix(new_declaration):
+        start = _declaration_prefix_start(src, found.header_span[0])
+    body = str(new_declaration).rstrip()
+    if not body:
+        # Deletion: drop the declaration and the blank line that separated it.
+        return src[:start].rstrip("\n") + ("\n" if src[:start].strip() else "") + \
+            src[found.body_span[1]:].lstrip("\n"), ""
+    return src[:start] + body + "\n\n" + src[found.body_span[1]:], ""
 
 
 def _strip_ws_prefix(path: Optional[str]) -> Optional[str]:

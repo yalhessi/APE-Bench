@@ -926,12 +926,23 @@ def _context_quality(calls) -> str:
     return "partial" if empty else "ok"
 
 
-def _cell_state(job, anchored_findings) -> str:
-    """What one scheduled (arm, site) pair did, on the overlay's ladder."""
+def _cell_state(job, anchored_findings, response_status: Optional[str] = None) -> str:
+    """What one scheduled (arm, site) pair did, on the overlay's ladder.
+
+    `response_status` is what the arm itself recorded, and it is consulted only when the
+    delegation row carries no status at all. That is not a rare case: `ArmResponse.row()` uses
+    `exclude_unset` so "considered and declined" stays distinguishable from "never considered",
+    and in a **fanout** run the arms are top-level tasks rather than lead-delegated jobs, so no
+    row carries an outcome. Reading that absence as "ran and did not come back" put every
+    obligation of `pr5_F_fanout_stage1_rep1` in `UNTOUCHED` while the judge scored two of them
+    `hit` -- the report contradicting the audit beside it, on a run whose 173 arm responses all
+    say `success`.
+    """
 
     if job.disposition == "pruned":
         return "pruned"
-    if job.status != "success":
+    status = job.status if job.status is not None else response_status
+    if status != "success":
         # Ran and did not come back: a coverage gap, not a silence. A failed mandatory job
         # counted as coverage once, and the run was scored as complete over work nobody did.
         return "unavailable"
@@ -969,12 +980,19 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
     Costs nothing and calls no model.
     """
 
+    from src.mathlib_review.agenda.registry import expected_concerns
+    from src.mathlib_review.analysis.benches import gold_labels_for
     from src.mathlib_review.analysis.delegation_view import load_lead_views
     from src.mathlib_review.analysis.obligation_exclusions import excluded_ids
     from src.mathlib_review.analysis.review_overlay import deepest
     from src.mathlib_review.judge.runner import derive_from_run
     from src.mathlib_review.review.merge import finding_key
     from src.mathlib_review.run_state import StageInput
+
+    # An arm's remit as gold spells it. Computed once: `gold_labels_for` bridges the two
+    # concern vocabularies, and asking it per cell would call it a few thousand times.
+    remit = {arm: gold_labels_for(sorted(families))
+             for arm, families in expected_concerns().items()}
 
     run_names = [runs] if isinstance(runs, str) else list(runs)
     per_run: Dict[str, Any] = {}
@@ -1003,6 +1021,7 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
         verdict_by_obligation: Dict[str, str] = {}
         paired_candidates: set = set()
         matched_candidates: set = set()
+        hit_obligation_by_finding: Dict[str, set] = {}
         if audit:
             report = json.loads(stage.audit_path("semantic_report").read_text())
             verdict_by_obligation = {
@@ -1014,10 +1033,12 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
             for match in jsonl_rows(stage.audit_path("semantic_matches")):
                 if match.get("role") == "observed" and match.get("issue_match"):
                     matched_candidates.add(match["candidate_id"])
+                    hit_obligation_by_finding.setdefault(
+                        match["candidate_id"], set()).add(match["obligation_id"])
 
-        stable_by_invocation: Dict[str, bool] = {}
+        replay_by_invocation: Dict[str, Dict[str, Any]] = {}
         if replay:
-            stable_by_invocation = _replay_stability(replay)
+            replay_by_invocation = _replay_annotations(replay)
 
         excluded = excluded_ids()
         obligations = []
@@ -1041,10 +1062,15 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
                 if not (obligation.get("change_ids") or []):
                     skipped["anchorless"] += 1
                     continue
-                obligations.append((row["pr_number"], obligation))
+                # The judgment, not just the obligation: `concern_labels` says whose ask this
+                # was and `blocking_force` says how hard. Without them a silence cannot be
+                # told from a correct silence -- 32 of 43 gold-site silences on
+                # `heldout12_v2_rep1` are an arm quiet about somebody else's concern.
+                obligations.append((row["pr_number"], obligation, row))
 
         rows = []
-        for pr_number, obligation in obligations:
+        for pr_number, obligation, judgment in obligations:
+            gold_labels = {str(label) for label in judgment.get("concern_labels") or []}
             sites = set(obligation["change_ids"])
             cells = [job for job in jobs if sites & set(job.site_change_ids or [])]
             anchored = [finding for change_id in sites for finding in by_change.get(change_id, [])]
@@ -1057,19 +1083,32 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
                     item for item in anchored
                     if item.get("origin_arm_id") == job.arm_id
                     or (job.arm_id == "generalist" and not item.get("origin_arm_id"))]
-                state = _cell_state(job, job_findings)
-                states.append(state)
                 response = responses.get(job.invocation_id) or {}
+                state = _cell_state(job, job_findings, response.get("status"))
+                states.append(state)
+                abstention = (response.get("abstention") or {}) if state == "silent" else {}
+                replayed = replay_by_invocation.get(job.invocation_id) or {}
                 annotations.append({
                     "invocation_id": job.invocation_id,
                     "arm_id": job.arm_id,
                     "state": state,
-                    "abstention_reason": ((response.get("abstention") or {}).get("reason")
-                                          if state == "silent" else None),
+                    "abstention_reason": abstention.get("reason") or None,
+                    # The sentence the arm wrote, which is the only thing a silence can be
+                    # diagnosed from: the reason *enum* swapped under replay on 17 of 45
+                    # sessions with the outcome unchanged, so it labels nothing on its own.
+                    "abstention_detail": abstention.get("detail") or None,
+                    # Whether the ask was this arm's business at all. `None` for the
+                    # generalist and anything else outside the registry, which has no remit
+                    # to be outside of.
+                    "on_concern": (bool(gold_labels & remit[job.arm_id])
+                                   if job.arm_id in remit else None),
                     "context": _context_quality(job.context_calls),
                     "filed_elsewhere_in_unit": bool(
                         state == "silent" and (job.claims or [])),
-                    "replay_stable": stable_by_invocation.get(job.invocation_id),
+                    "replay_stable": replayed.get("stable"),
+                    "replay_reasons": replayed.get("reasons"),
+                    "replay_details": replayed.get("details"),
+                    "replay_filed": replayed.get("filed"),
                 })
 
             state = deepest(*states) if states else "unscheduled"
@@ -1086,6 +1125,19 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
                 "obligation_id": obligation["obligation_id"],
                 "pr_number": pr_number,
                 "coarse": coarse,
+                # What the maintainer actually asked for, beside what happened to it. Reading
+                # a silence means reading the ask, and this report is where the join lives so
+                # that nobody does it in a scratchpad again.
+                "claim": obligation.get("claim"),
+                "required": obligation.get("required"),
+                "concern_labels": sorted(gold_labels),
+                "blocking_force": judgment.get("blocking_force"),
+                "speech_act": judgment.get("speech_act"),
+                # Was an arm whose remit covers this ask scheduled here at all? Gold-free
+                # apart from the ask's own label, and it separates "the right arm declined"
+                # from "the right arm never ran", which are different repairs.
+                "on_concern_arm_scheduled": any(
+                    cell["on_concern"] for cell in annotations),
                 "state": state,
                 "gate": sorted({item.get("admission") for item in anchored}) or None,
                 "judge": verdict_by_obligation.get(obligation["obligation_id"]) if audit else None,
@@ -1113,6 +1165,10 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
             })
 
         per_run[run_name] = {
+            "gate": _gate_report(findings, hit_obligation_by_finding, reviewed,
+                                 {pr_number for pr_number, _obligation, _judgment
+                                  in obligations},
+                                 audit),
             "state": stage.state.value,
             "forensic": stage.forensic,
             "prs_reviewed": reviewed,
@@ -1154,29 +1210,244 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
     }
 
 
+def silences(run: str, replay: Optional[str] = None, audit: bool = True,
+             labels: Optional[Path] = None) -> Dict[str, Any]:
+    """Every gold-site silence beside the ask it is silent about, and its label.
+
+    The step-0 instrument. `buckets` already computes the join; this flattens it to the unit a
+    reader can actually work through -- one row per (obligation, silent cell) -- and adds the
+    two things a reader needs and an aggregate cannot supply: the arm's own sentence, and
+    whether the ask was that arm's business at all.
+
+    The second one reorders everything. On `heldout12_v2_rep1` only a minority of gold-site
+    silences are an arm declining inside its own remit; the rest are the wrong arm, correctly
+    quiet, and counting them as silences to be fixed is how an intervention aimed at a
+    contract ends up aimed at nothing. `on_concern` is that split, computed through
+    `benches.gold_labels_for` so the two concern vocabularies stay bridged.
+
+    A silence is not a miss and this is not a score. An obligation is missed once, however
+    many arms were quiet at it, and `by_label` below counts *cells*: several belong to one
+    obligation, most of them off-concern. Read `buckets` for the obligation-level number.
+
+    Costs nothing and calls no model.
+    """
+
+    from src.mathlib_review.judge.adjudicate import (
+        SILENCE_LABELS, load_silence_labels, resolve_silences,
+    )
+    from src.mathlib_review.schema import silence_key
+
+    payload = buckets([run], audit=audit, replay=replay)["per_run"][run]
+    store = Path(labels) if labels else SILENCE_LABELS
+    resolved = resolve_silences(load_silence_labels(store)) if store.is_file() else {}
+
+    rows = []
+    for obligation in payload["obligations"]:
+        for cell in obligation["cells"]:
+            if cell["state"] != "silent":
+                continue
+            key = silence_key(cell["invocation_id"], obligation["obligation_id"])
+            verdict = resolved.get(key) or {}
+            rows.append({
+                "key": key,
+                "pr_number": obligation["pr_number"],
+                "obligation_id": obligation["obligation_id"],
+                "claim": obligation["claim"],
+                "concern_labels": obligation["concern_labels"],
+                "blocking_force": obligation["blocking_force"],
+                "coarse": obligation["coarse"],
+                "invocation_id": cell["invocation_id"],
+                "arm_id": cell["arm_id"],
+                "on_concern": cell["on_concern"],
+                "abstention_reason": cell["abstention_reason"],
+                "abstention_detail": cell["abstention_detail"],
+                "context": cell["context"],
+                "filed_elsewhere_in_unit": cell["filed_elsewhere_in_unit"],
+                "replay_stable": cell["replay_stable"],
+                "replay_reasons": cell["replay_reasons"],
+                "replay_details": cell["replay_details"],
+                "replay_filed": cell["replay_filed"],
+                "label": verdict.get("label"),
+                "evidence_gap_tool": verdict.get("evidence_gap_tool"),
+                "labelled_by": verdict.get("labelled_by"),
+                "label_note": verdict.get("note"),
+                "label_from_run": verdict.get("from_run"),
+                # A label made by reading ANOTHER run's silence at this slot. The key recurs
+                # across reps because a work unit is release-derived, but the silence does not
+                # recur for the same reason: across the 59 cells rep1 and rep2 share, the two
+                # `abstention_detail` texts have median similarity 0.16 and the reason enum
+                # agrees 73% of the time. Only `off_concern` is a property of the ask and the
+                # arm's remit rather than of the session, so only it carries; everything else
+                # is borrowed and says so here.
+                "label_borrowed": bool(verdict) and verdict.get("from_run") != run,
+                "contested": verdict.get("contested", False),
+            })
+
+    from collections import Counter
+
+    on_concern = [row for row in rows if row["on_concern"]]
+    labelled = [row for row in rows if row["label"]]
+    borrowed = [row for row in labelled if row["label_borrowed"]]
+    return {
+        "run": run,
+        "replay": replay,
+        "labels_store": str(store),
+        "silent_cells": len(rows),
+        "obligations_with_a_silence": len({row["obligation_id"] for row in rows}),
+        "on_concern_cells": len(on_concern),
+        "off_concern_cells": sum(1 for row in rows if row["on_concern"] is False),
+        "remitless_cells": sum(1 for row in rows if row["on_concern"] is None),
+        # Whether an arm whose remit covers the ask was scheduled at all, per obligation.
+        # `False` is a routing failure and no contract change reaches it.
+        "obligations_without_an_on_concern_arm": sorted(
+            item["obligation_id"] for item in payload["obligations"]
+            if not item["on_concern_arm_scheduled"]),
+        "labelled": len(labelled),
+        "labelled_share": round(len(labelled) / len(rows), 4) if rows else None,
+        # Of the labelled cells, how many were labelled by reading a different run. Reported
+        # rather than filtered: a borrowed `off_concern` is sound and a borrowed
+        # `fix_required` is a guess, and the reader has to be able to tell which they have.
+        "labelled_from_another_run": len(borrowed),
+        "borrowed_by_label": dict(Counter(row["label"] for row in borrowed)),
+        "by_label": dict(Counter(row["label"] for row in labelled)),
+        "by_label_on_concern": dict(
+            Counter(row["label"] for row in labelled if row["on_concern"])),
+        "by_arm": {
+            arm: {
+                "cells": sum(1 for row in rows if row["arm_id"] == arm),
+                "on_concern": sum(1 for row in rows
+                                  if row["arm_id"] == arm and row["on_concern"]),
+            }
+            for arm in sorted({row["arm_id"] for row in rows})},
+        "contested_keys": sorted({row["key"] for row in rows if row["contested"]}),
+        "rows": rows,
+        "note": (
+            "A label whose `label_from_run` is not this run was made by reading another run's "
+            "silence at the same slot, and only `off_concern` carries that way: the ask and "
+            "the arm's remit do not change between repetitions, but the sentence the arm "
+            "writes does (median similarity 0.16 across the cells rep1 and rep2 share). "
+            "One row per (obligation, silent arm), not per obligation: an obligation with "
+            "five quiet arms contributes five. `on_concern` says whether gold's own concern "
+            "label for the ask falls in that arm's `expected_concerns`; where it is false the "
+            "silence is correct and the question is routing, not the contract. A label is a "
+            "reader's diagnosis of a silence -- it orders work and explains a number, and it "
+            "never enters recall."),
+    }
+
+
+def _gate_report(findings, hit_obligation_by_finding, reviewed, prs_with_gold, audit):
+    """What the admission gate did to what the run had already found.
+
+    The last stage between a finding and a maintainer, and the one nothing measured. `finalize`
+    publishes a claim only when a deterministic collector can warrant its concern family; the
+    rest are kept as `diagnostic` with no channel, which is honest about what the system would
+    *say* and is not the same as what it *found*. Both numbers matter and only one was reported.
+
+    On the three held-out A reps this is the largest gold-scored loss in the pipeline: the run
+    hits 7 / 5 / 6 obligations and publishes 2 / 1 / 1 of them. The dominant reason is not that
+    the claim is doubted -- 39 of rep1's 42 suppressed hits are "no collector can support this
+    claim's concern family", which is a statement about available evidence for a KIND of claim,
+    not about this one.
+
+    Read with the other column: published control-PR emission is 0 on all three reps against 3
+    / 4 / 5 pre-gate, so the gate is what buys the control property the project measures
+    precision by. Opening it is therefore a trade, not a free gain, and this block reports both
+    sides so nobody quotes one of them alone.
+    """
+
+    published = [item for item in findings if item.get("admission") == "published"]
+    controls = sorted(set(reviewed) - set(prs_with_gold))
+    payload = {
+        "findings": len(findings),
+        "published": len(published),
+        "suppressed": len(findings) - len(published),
+        # The precision side of the same trade, per PR the release records no obligation for.
+        "control_findings": sum(1 for item in findings if item["pr_number"] in controls),
+        "control_published": sum(1 for item in published if item["pr_number"] in controls),
+        "control_pr_numbers": controls,
+        "note": (
+            "`published` is what the system would say; `findings` is what it found. The gap is "
+            "the admission gate, whose axis is whether a collector can warrant the claim's "
+            "concern family -- not whether the claim is right. Control emission is reported "
+            "beside it because the gate is what keeps it at zero."),
+    }
+    if not audit:
+        return payload
+
+    hit_pre, hit_post = set(), set()
+    reasons: Dict[str, int] = {}
+    by_family: Dict[str, Dict[str, int]] = {}
+    for item in findings:
+        obligations = hit_obligation_by_finding.get(item["finding_id"]) or set()
+        family = item.get("concern_family") or "unknown"
+        row = by_family.setdefault(family, {"findings": 0, "hits": 0, "published": 0})
+        row["findings"] += 1
+        row["hits"] += bool(obligations)
+        row["published"] += item.get("admission") == "published"
+        if not obligations:
+            continue
+        hit_pre |= obligations
+        if item.get("admission") == "published":
+            hit_post |= obligations
+        else:
+            reason = item.get("admission_reason") or "unstated"
+            reasons[reason] = reasons.get(reason, 0) + 1
+    payload.update({
+        "obligations_hit_pre_gate": len(hit_pre),
+        "obligations_hit_post_gate": len(hit_post),
+        "obligations_lost_to_gate": sorted(hit_pre - hit_post),
+        "suppressed_hits_by_reason": dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
+        "by_concern_family": dict(sorted(by_family.items())),
+    })
+    return payload
+
+
 def _asobj(row: Dict[str, Any]):
     from types import SimpleNamespace
 
     return SimpleNamespace(**row)
 
 
-def _replay_stability(replay_run: str) -> Dict[str, bool]:
-    """Per invocation, whether every replayed sample made the recorded decision.
+def _replay_annotations(replay_run: str) -> Dict[str, Dict[str, Any]]:
+    """Per invocation, what re-deciding from the recorded prefix produced.
 
     A decision that reproduces is the arm's reading of its contract; one that does not is
     sampling noise wearing a diagnosis. 41 of 45 gold-site specialist silences were stable.
+
+    `stable` is that question and is what the overlay prints. The rest is for diagnosing the
+    stable ones, which is the harder job: `reasons` because the abstention *label* is less
+    reproducible than the abstention (17 of 45 sessions produced a reason the recording did
+    not), `details` because the label is not the diagnosis and the arm's own sentence is, and
+    `filed` because a silence that files in some samples is a different repair from one that
+    never does. `details` is empty for a replay run written before the outcome rows carried
+    the text; it is reported as absent rather than reconstructed from attempt directories,
+    which belong to the worktree the replay ran in and may not exist.
     """
 
     from src.mathlib_review.run_state import StageInput
 
     stage = StageInput.of(replay_run, require=("replay_outcomes",), allow_partial=True)
-    by_invocation: Dict[str, List[bool]] = {}
+    samples: Dict[str, List[Dict[str, Any]]] = {}
     for row in jsonl_rows(stage.path("replay_outcomes")):
         recorded = (row.get("recorded") or {}).get("decision") or {}
         replayed = (row.get("replay") or {}).get("decision") or {}
         if not replayed:
             continue
-        agreed = bool((recorded.get("first") or {}).get("filed")
-                      == (replayed.get("first") or {}).get("filed"))
-        by_invocation.setdefault(row["invocation_id"], []).append(agreed)
-    return {key: all(value) for key, value in by_invocation.items()}
+        first = replayed.get("first") or {}
+        samples.setdefault(row["invocation_id"], []).append({
+            "agreed": bool((recorded.get("first") or {}).get("filed") == first.get("filed")),
+            "filed": bool(first.get("filed")),
+            "reason": first.get("abstention_reason"),
+            "detail": first.get("abstention_detail"),
+        })
+
+    out: Dict[str, Dict[str, Any]] = {}
+    for invocation, rows in samples.items():
+        out[invocation] = {
+            "stable": all(row["agreed"] for row in rows),
+            "samples": len(rows),
+            "filed": sum(row["filed"] for row in rows),
+            "reasons": sorted({row["reason"] for row in rows if row["reason"]}),
+            "details": [row["detail"] for row in rows if row["detail"]] or None,
+        }
+    return out

@@ -57,12 +57,19 @@ def submission_summary(arguments: Dict[str, Any]) -> Dict[str, Any]:
     `argument_order` and `candidate_field_order` are the model's emission order, read off the
     call arguments -- a field-order condition is effective only if the model follows it, and the
     accepted result cannot say, because validation re-serialises it in schema order.
+
+    `abstention_detail` is kept beside the reason because the reason is not evidence: across the
+    45 gold-site sessions replayed on 2026-09-21, 17 produced a *different* reason with the same
+    outcome, `already_correct` and `could_not_establish` swapping freely. The sentence the arm
+    wrote is what a silence can be diagnosed from, and dropping it here meant the diagnosis had
+    to be read out of attempt directories belonging to whichever worktree the replay ran in.
     """
 
     candidates = [item for item in (arguments.get("candidates") or []) if isinstance(item, dict)]
     return {
         "filed": bool(candidates),
         "abstention_reason": None if candidates else arguments.get("abstention_reason"),
+        "abstention_detail": None if candidates else (arguments.get("abstention_detail") or None),
         "anchors": sorted({str(item.get("primary_change_id")) for item in candidates}),
         "candidate_keys": sorted({
             "|".join(str(item.get(key)) for key in
@@ -82,6 +89,7 @@ def accepted_summary(result: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any
     summary = submission_summary({
         "candidates": result.get("candidates") or [],
         "abstention_reason": (result.get("abstention") or {}).get("reason"),
+        "abstention_detail": (result.get("abstention") or {}).get("detail"),
     })
     for key in ("argument_order", "candidate_field_order"):
         summary.pop(key)
@@ -131,8 +139,8 @@ class ReplayDatasetConfig(BaseModel):
     #: The two gold-derived selectors are evaluation-side and say so in the sealed plan: the
     #: prefix the model sees is still the recording, so gold never reaches a prompt, but the
     #: SELECTION is in-sample and every report of such a replay has to carry that.
-    selector: Literal["all", "arm", "invocation_ids",
-                      "gold-site-abstentions", "missed-obligations"] = "all"
+    selector: Literal["all", "arm", "invocation_ids", "gold-site-abstentions",
+                      "missed-obligations", "control-abstentions"] = "all"
     #: Where the model takes over. Required: nothing about a replay's cut is predetermined, and
     #: a default would quietly make one experiment look like the only one available.
     cut: CutPoint
@@ -262,6 +270,63 @@ def replay_source(dataset: ReplayDatasetConfig):
             f"session through its execution index.") from error
 
 
+def _control_abstentions(dataset: ReplayDatasetConfig) -> Tuple[set, Dict[str, Any]]:
+    """Specialist silences on the PRs where maintainers asked for nothing.
+
+    The control side of a condition experiment. It reads the same two artifacts a report does
+    -- the agenda for what was reviewed, the release's judgments for what carries gold -- and
+    calls a reviewed PR a control when the release records no obligation for it at all. That is
+    deliberately the release's own definition rather than a config list: a config could name a
+    PR a control that gold disagrees about, and the resulting precision number would be a
+    fiction. `control_pr_numbers` in the judge configs is the same set, maintained by hand.
+    """
+
+    from src.mathlib_review.run_state import StageInput
+
+    stage = StageInput.at(run_dir(dataset.of_run), run_name=dataset.of_run,
+                          require=("agenda", "arm_responses"), allow_partial=True)
+    if stage.release is None:
+        raise ReplayRefused(
+            "--select control-abstentions needs the release the run was built from, to say "
+            "which PRs carry no obligation; this run's plan names none")
+    agenda = json.loads(stage.path("agenda").read_text())
+    reviewed = {item["pr_number"] for item in agenda.get("proposals", [])}
+    with_gold = {row.get("pr_number") for row in jsonl_rows(stage.release / "gold/judgments.jsonl")
+                 if any((obligation.get("status") == "proposed_atomic")
+                        for obligation in row.get("obligations") or [])}
+    controls = sorted(reviewed - with_gold)
+    if not controls:
+        raise ReplayRefused(
+            f"--select control-abstentions found no control PR in {dataset.of_run}: every one "
+            f"of the {len(reviewed)} PRs it reviewed carries a gold obligation. A condition "
+            f"measured here would have no precision guard, which is the whole point of the "
+            f"selector -- run it on a set that includes one.")
+
+    wanted = set()
+    for row in jsonl_rows(stage.path("arm_responses")):
+        if row.get("pr_number") not in controls or row.get("arm_id") == "generalist":
+            continue
+        if row.get("candidates") or not row.get("abstention"):
+            continue
+        if dataset.arm_ids and row.get("arm_id") not in dataset.arm_ids:
+            continue
+        wanted.add(row["invocation_id"])
+    if not wanted:
+        raise ReplayRefused(
+            f"--select control-abstentions matched no silent specialist on PRs {controls} in "
+            f"{dataset.of_run}. An empty selection is refused rather than run as nothing.")
+    return wanted, {
+        "selector": "control-abstentions",
+        "gold_derived": True,
+        "control_pr_numbers": controls,
+        "note": ("the SELECTION is gold-derived -- which PRs carry no obligation comes from the "
+                 "release -- and the prefix the model replays is still the recording, so gold "
+                 "does not reach a prompt. A conversion here is a candidate on a PR maintainers "
+                 "asked nothing about; historically that rate is 0-1 per run, and it is the "
+                 "number that says whether a condition bought reach or noise"),
+    }
+
+
 def select_invocations(dataset: ReplayDatasetConfig) -> Tuple[Optional[set], Dict[str, Any]]:
     """The invocations this run's selector names, and the provenance of that choice.
 
@@ -279,6 +344,13 @@ def select_invocations(dataset: ReplayDatasetConfig) -> Tuple[Optional[set], Dic
       did not score as a hit. 30 specialist silences on the same run, and it needs an audit:
       without one, which obligations were missed is not known and refusing is the only honest
       answer.
+    * `control-abstentions` -- specialist invocations that were silent on a **control** PR, one
+      the release records no obligation for. The guard, and the population every replay so far
+      has lacked: a condition that converts silences into asks is an improvement only if it
+      leaves the PRs where maintainers wanted nothing alone, and control emission has run 0-1
+      per run historically while forcing took it 1 -> 36. Gold-derived in the same weak sense
+      as the others -- which PRs are controls comes from the release, and the replayed prefix
+      is still the recording.
     """
 
     selector = dataset.selector
@@ -296,6 +368,9 @@ def select_invocations(dataset: ReplayDatasetConfig) -> Tuple[Optional[set], Dic
                 "--select invocation_ids needs `dataset.invocation_ids`. A replay of named "
                 "sessions that names none is a replay of everything under a name that hides it")
         return set(dataset.invocation_ids), {"selector": selector, "gold_derived": False}
+
+    if selector == "control-abstentions":
+        return _control_abstentions(dataset)
 
     from src.mathlib_review.analysis.report import buckets
 
@@ -694,6 +769,14 @@ async def collect_outcomes(task_dirs: Dict[str, Path], sources: List[ReplaySourc
             record = json.loads(drift_file.read_text()) if drift_file.is_file() else {}
             from_prefix = (record.get("prefix_sha256")
                            == payload[SESSION_REPLAY_KEY]["prefix_sha256"])
+            # Did the condition's own overrides reach the task? The payload says what was
+            # sent and the attempt's record says what the task held, so the comparison needs
+            # nothing new. `None` when the condition overrides nothing, which is every null.
+            overridden = payload[SESSION_REPLAY_KEY].get("overridden_keys") or []
+            seen = record.get("task_data_seen") or {}
+            arrived = (None if not overridden
+                       else all(key in seen and seen[key] == payload.get(key)
+                                for key in overridden))
             rows.append({
                 "invocation_id": source.invocation_id,
                 "arm_id": source.payload.get("arm_id"),
@@ -712,6 +795,13 @@ async def collect_outcomes(task_dirs: Dict[str, Path], sources: List[ReplaySourc
                                  if session is not None and from_prefix else None),
                     "accepted": accepted_summary(result),
                     "tool_drift": record.get("tool_drift"),
+                    # What the task held for each key the condition overrode, read off the
+                    # live task by the conversation manager. `{}` for a null condition, which
+                    # overrides nothing; a key here whose value is not what the condition set
+                    # means the condition did not arrive, and the run measured the null under
+                    # another name.
+                    "task_data_seen": record.get("task_data_seen") or {},
+                    "condition_arrived": arrived,
                 },
             })
     return rows
@@ -781,6 +871,18 @@ def replay_report(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
             f"{len(stray)} of {len(rows)} sample(s) did not start from their recorded prefix "
             f"(e.g. {stray[:3]}); they are ordinary runs of the task and their agreement with "
             "the recorded decision would measure a re-run, not a decision")
+
+    # The same refusal for the other half of a condition. A task-data override that did not
+    # arrive leaves a run that is a null wearing the condition's name, and its zero effect
+    # would be read as the condition having none -- which is exactly the $1.11 mistake this
+    # project has already made once, when a tool was added to the registry, never registered,
+    # and the paid run came back looking like "the new contract changed nothing".
+    lost = [row["invocation_id"] for row in rows
+            if (row["replay"] or {}).get("condition_arrived") is False]
+    if lost:
+        raise ReplayRefused(
+            f"{len(lost)} of {len(rows)} sample(s) ran without the condition's task-data "
+            f"override (e.g. {lost[:3]}); the run measured the null under another name")
 
     sessions = _by_session(rows)
     accepted = [row for row in rows if row["replay"]["accepted"] is not None]

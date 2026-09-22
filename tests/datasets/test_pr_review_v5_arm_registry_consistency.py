@@ -70,11 +70,23 @@ def test_every_arm_keeps_lean_verify_edit():
         assert "lean_verify_edit" in definition.granted_tools(), definition.arm_id
 
 
-def test_a_patch_set_arm_is_one_whose_scope_is_a_group():
-    """Only an arm reviewing a set of declarations has anything to coordinate. Granting it
-    broadly turns a bounded capability into a licence to rewrite whatever the arm was shown."""
+def test_a_patch_set_arm_is_one_a_compile_can_settle_or_one_whose_remit_is_the_group():
+    """A coordinated patch's only warrant is one compile of every file it touches, so the
+    grant is the compile-checkable arms plus `family_design`, whose whole remit is the group.
+    `naming`, `docs` and `style` ask for names, prose and formatting, where the compile is not
+    what makes the ask right, and they have no way to earn the warrant.
 
-    assert arm_registry.patch_set_arms() == {"family_design"}
+    This asserted `== {"family_design"}` until 2026-09-22, on the reasoning that only an arm
+    reviewing a set of declarations has anything to coordinate and that a broad grant is "a
+    licence to rewrite whatever the arm was shown". Both halves moved: since the repack a work
+    unit routinely holds a dozen declarations, so every arm reviews a set, and the licence
+    objection is what `patchset.anchor_problems` removes -- an edit may only touch a target the
+    candidate claimed. The arm that held the capability was the one that never used it: 182
+    responses, 0 candidates.
+    """
+
+    assert arm_registry.patch_set_arms() == arm_registry.checkable_arms() | {"family_design"}
+    assert not (arm_registry.patch_set_arms() & {"naming", "docs", "style"})
 
 
 def test_family_design_has_no_identifier_lookup():
@@ -160,8 +172,15 @@ EXPECTED_SPEC_IDENTITY = {
     # `dev-medium-0.4.0` -- including the doc-comment PR 33321's two documentation obligations
     # sit on. Eight of ten identities are unchanged, which is the check that this widened two
     # arms and not the registry's shape.
+    # `family_design` moved 860fd12098a9 -> b1a9a457a573 on 2026-09-22, deliberately: its
+    # "## Coordinated fixes" paragraph moved out of its own system prompt and into
+    # SUBMISSION_CONTRACT, which every granted arm now reads. It had been the one arm allowed
+    # to submit a `patch_set` and it was told so 2,400 characters above a JSON template that
+    # did not list the field and that opens "This supersedes any field list above"; 0 of 3,411
+    # candidates across 60 runs ever carried one. Nine of ten identities are unchanged, which
+    # is the check that the instruction moved rather than that ten prompts were reworded.
     "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "017bf3f92a5c",
-    "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
+    "duplication": "dcef56db2ee5", "family_design": "b1a9a457a573",
     # `naming` moved 8dfd2c87af4d -> ee245f077b7e on 2026-09-13, deliberately: the arm was
     # calibrated to "what the local family already does" and stayed silent 13/13 reps on a
     # real naming ask while its tools worked, so the contract now points at the repository's
