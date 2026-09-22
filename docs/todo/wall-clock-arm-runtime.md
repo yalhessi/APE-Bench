@@ -24,6 +24,48 @@ mutable state and would need locking or sharding.
 
 ---
 
+
+## The exposure scan answers questions nobody asked (measured 2026-09-22)
+
+`plan` on three PRs took **164 s**, of which `build_agenda` was **159 s** and
+`exposure._scan` **156 s**. Profiled: 104,486 `read_text`, **12,340,823 `json.loads`**, 59,109
+`scandir`. The shape of the waste, per workspace:
+
+| | |
+|---|---|
+| `.ilean` files read | 7,443 |
+| reference keys parsed, each its own `json.loads` | ~716,000 |
+| declaration names the agenda actually asks about | **6** (PR 33145), 24 (33117), 1 (33315) |
+| files mentioning any of PR 33145's names | **0 of 7,443** |
+
+So the scan builds a **library-wide reverse-reference index** — every declaration to how many
+modules cite it — in order to answer a handful of lookups. For PR 33145 the answer was nothing
+at all: 100% of the parsing was discarded.
+
+**And for most targets the answer is zero by construction.** These are declarations the PR
+*adds*; a base-commit index cannot contain a reference to a name that does not exist at base.
+Only a renamed or modified declaration has a meaningful reach.
+
+Three fixes, increasing in payoff, none of them caching:
+
+1. **Scan only the agenda's episodes.** A release has 14 base commits and the loop ran over all
+   of them whatever `pr_numbers` said (`agenda.py`, `graphs=release["graphs"]` at
+   `runner.py:1380`). Filtering: 14 scans to 3, **164 s → 34 s**, and the sealed agenda is
+   byte-identical — 138 of 138 proposals and all arms equal, same seal `1a52e32ec12b` with the
+   run name held constant. *(Done on `merge-probe`; the one-line filter this entry predicted.)*
+2. **Ask for the names you need.** `_scan` computes reach for every name in Mathlib and
+   `reach(name)` then queries a handful. Passing the wanted set down turns a full index build
+   into a targeted count, and lets the common case short-circuit: a name absent from the base
+   snapshot has reach 0 without parsing anything.
+3. **Prefilter before parsing.** A raw substring pass over the same 7,443 files is 4.1 s against
+   11 s, and `grep -rlE` answers "which files mention any of these names" in 4–5 s — but it
+   returned **18 files for PR 33117 and 0 for 33145**, so the parse that follows is over tens of
+   files rather than thousands. Combined with (2) this is the difference between seconds and
+   milliseconds, and it is the same `grep` vs `Path.rglob` gap this file already records for
+   `content_search` (0.28 s against 32.7 s).
+
+Caching the result helps a rerun of the same set and nothing else; none of the above needs it.
+
 ## Correction — `record_turn` is real but third-order, not 21%
 
 The first version of this entry claimed per-turn bookkeeping was **21%** of arm wall and named

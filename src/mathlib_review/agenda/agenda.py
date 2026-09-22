@@ -250,7 +250,18 @@ def build_agenda(
     exposure_cache: Dict[str, Any] = {}
     exposure_by_change: Dict[str, int] = {}
     if use_exposure_index:
+        # Only the episodes this agenda is for. The scan is per base commit and the release
+        # has 14 of them, so an unfiltered loop paid for every PR in the release however few
+        # were asked for: a 3-PR preflight scanned 14 distinct workspaces, 11s each, and
+        # `build_agenda` was 97% of a 164s `plan`. `exposure_by_change` is keyed by
+        # `change_id` and a change belongs to exactly one PR, so dropping the unselected
+        # episodes cannot change the value for a selected one -- asserted by
+        # `test_the_exposure_scan_is_paid_only_for_the_prs_in_the_agenda`, which builds the
+        # agenda both ways and compares the sealed bytes.
+        wanted_prs = set(pr_numbers) if pr_numbers else None
         for graph in graphs:
+            if wanted_prs is not None and getattr(graph, "pr_number", None) not in wanted_prs:
+                continue
             scan = LazyExposureScan(
                 snapshot_workspace(getattr(graph, "base_sha", None)), exposure_cache)
             exposure_by_change.update(exposed_changes(
