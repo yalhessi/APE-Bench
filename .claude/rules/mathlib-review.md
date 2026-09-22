@@ -166,6 +166,17 @@ paths:
   `success: true` was wrong however deep the session was, and it fixed a false promise in the
   `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
   the fix for a problem that was mostly not there.
+- **"What the run found" and "what it would tell a maintainer" are different numbers, and only
+  one was ever reported (2026-09-22).** `finalize` publishes a claim only when a deterministic
+  collector can warrant its concern family and keeps the rest as `diagnostic` with `channels: []`.
+  Over the three held-out A reps the run hits **7 / 5 / 6** gold obligations and publishes
+  **2 / 1 / 1**; 21 of rep1's 24 suppressed hit-findings say "no collector can support this
+  claim's concern family". The gate's axis is close to orthogonal to where maintainers ask:
+  `correctness` files 161, hits 39, publishes 2, while `generalization` has never hit and
+  publishes 40%; the generalist holds **64 of 71** hits at 2.8% publication. Quote the pair, never
+  one of them -- `report buckets --audit` prints both in its `gate` block, with control emission
+  beside them, because published control emission is **0/0/0** against 12 pre-gate and the gate is
+  what buys it. `docs/research/the-admission-gate-2026-09.md`.
 - **A gold-site silence is not evidence about an arm unless the ask was in that arm's remit
   (2026-09-21).** "41 of 45 gold-site specialist silences reproduce under replay" was read for a
   week as arms withholding findings, and a plan costed three interventions against it. Labelling
