@@ -125,7 +125,7 @@ Claude Code CLI is an enhanced version of the claude command line tool, providin
 Examples:
   ape chat claude-code --workspace /path/to/workspace
   ape chat claude-code --prompt "Help me with this task"
-  ape chat claude-code --model deepseek_v3.1 --workspace .
+  ape chat claude-code --model gpt_5.2 --workspace .
 
 Configuration Override (use Python literal syntax):
   ape chat claude-code llm_config.temperature=0.7

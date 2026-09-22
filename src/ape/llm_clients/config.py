@@ -5,12 +5,23 @@ LLM Clients Configuration System.
 import os
 from typing import Optional, Dict, Any, Literal
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 class LLMProvider(Enum):
     """LLM provider enumeration."""
     OPENAI = "openai"
     GEMINI = "gemini"
+
+
+#: Which environment variable holds each provider's key, in the order they are tried.
+#:
+#: A table rather than a chain of `if`s because two callers need to *name* the variable, not
+#: just read it: preflight's remedy text, which was previously the unactionable "export the
+#: provider's key", and the worker-boundary check that refuses a YAML-supplied key.
+PROVIDER_KEY_ENV_VARS: Dict[LLMProvider, tuple] = {
+    LLMProvider.OPENAI: ("OPENAI_API_KEY",),
+    LLMProvider.GEMINI: ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
+}
 
 MODEL_MAPPINGS = {
     "gemini_3_pro": {
@@ -136,9 +147,17 @@ DEFAULT_COST_MODEL = "prompt_inclusive"
 class LLMConfig(BaseModel):
     """LLM configuration class with a consistent model naming scheme.
 
-    model_name: Canonical name that never changes (for example "deepseek_v3.1")
-    formal_model_name: Provider-required name (for example "Ark-deepseek-v3.1-0821")
+    model_name: Canonical name that never changes (for example "gpt_5.2")
+    formal_model_name: Provider-required name (for example "gpt-5.2-2025-12-11")
     """
+
+    #: `extra='forbid'`, like `BaseScaffoldConfig` and `BaseToolsConfig` -- this was the one
+    #: block in the config tree that silently swallowed a typo. Pydantic's default is
+    #: `ignore`, so `llm_config: {base_rul: ...}` validated cleanly and dropped the key, and
+    #: the run went to the default endpoint with no warning. That is the failure `extra`
+    #: exists to prevent, and it matters most for exactly the keys nothing else checks:
+    #: `base_url`, `api_key`, `cost_model`.
+    model_config = ConfigDict(extra='forbid')
 
     # Basic configuration
     model_name: Optional[str] = None  # Canonical name provided by the user that always stays the same. None means use official models.
@@ -151,7 +170,20 @@ class LLMConfig(BaseModel):
 
     # Connection settings
     base_url: Optional[str] = None
-    api_key: Optional[str] = None
+
+    #: Never serialized. `model_dump` feeds four consumers and only one of them wants a
+    #: credential: the on-disk run snapshot (`save_orchestrator_config`), the container
+    #: runtime's `--scaffold-config-json` *argv* (world-readable through /proc), the
+    #: `scaffold_config_sha256` provenance hash, and the worker-process handoff. Including
+    #: the key wrote it to 640 files under `.ape/runs/` across 289 runs, and made an
+    #: otherwise-identical pair of runs hash differently after a key rotation.
+    #:
+    #: The worker does not lose it: `model_post_init` re-resolves from the environment
+    #: whenever `api_key` is falsy, and worker processes inherit the launching environment.
+    #: A key supplied as `llm_config.api_key` in YAML has no such fallback and therefore does
+    #: not survive the process boundary -- `preflight._check_model_credential` refuses that
+    #: case up front rather than letting it fail inside a worker.
+    api_key: Optional[str] = Field(default=None, exclude=True)
 
     # Retry configuration
     retry_max_attempts: int = 100
@@ -222,10 +254,10 @@ class LLMConfig(BaseModel):
     @staticmethod
     def _resolve_api_key_from_environment(provider_type: Optional[LLMProvider]) -> Optional[str]:
         """Resolve provider API key from standard environment variables."""
-        if provider_type == LLMProvider.OPENAI:
-            return os.getenv("OPENAI_API_KEY")
-        if provider_type == LLMProvider.GEMINI:
-            return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        for name in PROVIDER_KEY_ENV_VARS.get(provider_type, ()):
+            value = os.getenv(name)
+            if value:
+                return value
         return None
 
 # Exception classes

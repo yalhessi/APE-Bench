@@ -428,7 +428,10 @@ if __name__ == "__main__":
 
     async def main():
         parser = argparse.ArgumentParser(description="Codex relay service")
-        parser.add_argument('--model', default="deepseek_v3.1", help='Model name')
+        parser.add_argument('--model', required=True,
+                            help='Canonical model name from MODEL_MAPPINGS. Required: the old\n'
+                                 'default named a model that is not in the table, so this\n'
+                                 'entry point failed on its own default.')
         parser.add_argument('--host', default='localhost', help='Listening address')
         parser.add_argument('--retry_max_attempts', type=int, default=1, help='Max retry attempts')
         parser.add_argument('--conversations_dir', default="data/relay_conversations", help='Conversation directory')
