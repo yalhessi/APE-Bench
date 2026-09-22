@@ -26,6 +26,7 @@ class ExecutionStatus(str, Enum):
     # Paused states (resumable)
     PAUSED_MAX_TURNS = "paused_max_turns"
     PAUSED_COST_LIMIT = "paused_cost_limit"
+    PAUSED_TOKEN_LIMIT = "paused_token_limit"
 
     # Failed states (not continuable)
     FAILED_MODEL = "failed_model"
@@ -44,7 +45,8 @@ class ExecutionStatus(str, Enum):
         """Check if this is a paused state (resumable)."""
         return self in {
             ExecutionStatus.PAUSED_MAX_TURNS,
-            ExecutionStatus.PAUSED_COST_LIMIT
+            ExecutionStatus.PAUSED_COST_LIMIT,
+            ExecutionStatus.PAUSED_TOKEN_LIMIT
         }
 
     def is_system_error(self) -> bool:
@@ -81,6 +83,13 @@ class Attempt(BaseModel):
     
     max_turns: int
     cost_limit: Optional[float]
+    #: The token ceiling this attempt ran under, recorded for the same reason `cost_limit` is:
+    #: a paused attempt has to be able to say what stopped it. Optional with a default so
+    #: attempt records written before the ceiling existed still load.
+    token_limit: Optional[int] = None
+    #: Tokens this attempt's own conversation processed. `cost`/`cached_cost` have always been
+    #: here; the token count was reachable only by reloading the result.
+    tokens: int = 0
 
 
 # ============================================================================
@@ -159,6 +168,15 @@ class Sample(BaseModel):
         """
         return sum((a.cached_cost or a.cost) for a in self.attempts)
 
+    def get_accumulated_tokens(self) -> int:
+        """Accumulated processed tokens across every attempt.
+
+        Cumulative for the same reason `get_accumulated_cached_cost` is: a sample that paused
+        on its ceiling, resumed and paused again has processed the sum, and a per-attempt
+        check lets it loop forever with each attempt under the ceiling on its own.
+        """
+        return sum(int(a.tokens or 0) for a in self.attempts)
+
     def get_current_turns(self) -> int:
         """Get current conversation turns."""
         for attempt in reversed(self.attempts):
@@ -185,7 +203,8 @@ class Sample(BaseModel):
             return False
         return self.get_error_count() <= max_retries
 
-    def can_execute(self, max_retries: int, max_turns: int, sample_max_cost: Optional[float]) -> bool:
+    def can_execute(self, max_retries: int, max_turns: int, sample_max_cost: Optional[float],
+                    sample_max_tokens: Optional[int] = None) -> bool:
         """Check if execution is possible (first time/retry/resume).
 
         Returns False when:
@@ -214,6 +233,14 @@ class Sample(BaseModel):
                 # job look resumable, skip aggregation, and book as failed at $0.00.
                 return (sample_max_cost is None
                         or self.get_accumulated_cached_cost() < sample_max_cost)
+            elif current.status == ExecutionStatus.PAUSED_TOKEN_LIMIT:
+                # The cost branch's twin, read the same cumulative way. Both are computed
+                # against the orchestrator-wide ceiling rather than the attempt's own, which
+                # is wrong in the same way for both and is tracked as one defect
+                # (docs/todo/framework-defects-2026-09.md); fixing it here alone would leave
+                # the two halves of one ceiling disagreeing about what resumable means.
+                return (sample_max_tokens is None
+                        or self.get_accumulated_tokens() < sample_max_tokens)
 
         return current.status in {ExecutionStatus.PENDING, ExecutionStatus.RUNNING}
 
@@ -221,13 +248,15 @@ class Sample(BaseModel):
         self,
         max_retries: int,
         max_turns: int,
-        sample_max_cost: Optional[float]
+        sample_max_cost: Optional[float],
+        sample_max_tokens: Optional[int] = None
     ) -> "SampleProgress":
         """Construct SampleProgress snapshot."""
         attempt = self.current_attempt
         status = attempt.status if attempt else ExecutionStatus.PENDING
         can_retry = status.is_system_error() and self.get_error_count() <= max_retries
-        can_resume = status.is_paused() and self.can_execute(max_retries, max_turns, sample_max_cost)
+        can_resume = status.is_paused() and self.can_execute(
+            max_retries, max_turns, sample_max_cost, sample_max_tokens)
         last_error = attempt.error_message if attempt else None
 
         return SampleProgress(
@@ -262,6 +291,27 @@ class Sample(BaseModel):
 EXECUTION_LIMITS_KEY = "execution_limits"
 
 
+def execution_limits_payload(*, max_turns: Optional[int] = None,
+                             billed_cost_limit: Optional[float] = None,
+                             token_limit: Optional[int] = None) -> Dict[str, Any]:
+    """The task-data block for `EXECUTION_LIMITS_KEY`, omitting whatever does not bind.
+
+    One place decides the block's shape, because `task_execution_limits` reads a key's
+    *absence* as "use the orchestrator's value" -- so a caller that writes `token_limit: 0`
+    meaning "no ceiling" would instead pin the ceiling at zero and stop the task on its first
+    turn. Falsy is absent here, which makes `0` the way a config disables a cap.
+    """
+
+    payload: Dict[str, Any] = {}
+    if max_turns:
+        payload["max_turns"] = int(max_turns)
+    if billed_cost_limit:
+        payload["billed_cost_limit"] = float(billed_cost_limit)
+    if token_limit:
+        payload["token_limit"] = int(token_limit)
+    return payload
+
+
 class ExecutionLimits(BaseModel):
     """Per-task turn and cost ceilings.
 
@@ -273,10 +323,21 @@ class ExecutionLimits(BaseModel):
 
     The cost is BILLED, matching every other cap in this codebase. Enforcing a cap on the
     no-cache counterfactual is what silently voided a job's work in September.
+
+    `token_limit` is the same ceiling in the denomination that survives a zero price. Every
+    dollar cap here is satisfied by any run whatsoever on a locally hosted open-weight model
+    -- the four `elm_*` open-weight rows are priced `0.0` because that is what they cost --
+    so before this field a task on one was bounded by `max_turns` alone. It is a second field
+    on this object and not a second limiter: same object, same `task_execution_limits`, same
+    checkpoint in the conversation loop, and the two are independent rather than converted
+    into each other, because a rate that turned tokens into dollars would put a made-up price
+    into figures the repo reports as spend.
     """
 
     max_turns: int
     billed_cost_limit: Optional[float] = None
+    #: Processed tokens (prompt + completion, cache-inclusive), summed over the conversation.
+    token_limit: Optional[int] = None
 
 
 def task_execution_limits(task_data: Dict[str, Any], execution: Any) -> ExecutionLimits:
@@ -289,15 +350,19 @@ def task_execution_limits(task_data: Dict[str, Any], execution: Any) -> Executio
     raw = (task_data or {}).get(EXECUTION_LIMITS_KEY) or {}
     max_turns = execution.max_turns
     cost_limit = execution.sample_max_cost
+    token_limit = getattr(execution, "sample_max_tokens", None)
     if isinstance(raw, dict):
         try:
             if raw.get("max_turns") is not None:
                 max_turns = int(raw["max_turns"])
             if raw.get("billed_cost_limit") is not None:
                 cost_limit = float(raw["billed_cost_limit"])
+            if raw.get("token_limit") is not None:
+                token_limit = int(raw["token_limit"])
         except (TypeError, ValueError):
             pass
-    return ExecutionLimits(max_turns=max_turns, billed_cost_limit=cost_limit)
+    return ExecutionLimits(max_turns=max_turns, billed_cost_limit=cost_limit,
+                           token_limit=token_limit)
 
 
 class TaskExecutionSpec(BaseModel):
@@ -320,6 +385,9 @@ class TaskExecutionSpec(BaseModel):
     max_turns: Optional[int] = None
     #: Billed, like every other cap here.
     billed_cost_limit: Optional[float] = None
+    #: The same ceiling in tokens. A parent that sets one and not the other has said the
+    #: other does not bind, which on a zero-priced model is true of the dollar one.
+    token_limit: Optional[int] = None
     #: A required child that does not succeed is a coverage gap, and a coverage gap closes the
     #: run as `partial` rather than complete. Read by `run_subtasks`, which says so at WARNING,
     #: and by the caller through `ChildRun.spec`.
@@ -332,11 +400,10 @@ class TaskExecutionSpec(BaseModel):
         """The payload with this spec's limits attached, ready to hand to the orchestrator."""
 
         payload = dict(self.task_data)
-        limits: Dict[str, Any] = {}
-        if self.max_turns is not None:
-            limits["max_turns"] = self.max_turns
-        if self.billed_cost_limit is not None:
-            limits["billed_cost_limit"] = self.billed_cost_limit
+        limits = execution_limits_payload(
+            max_turns=self.max_turns,
+            billed_cost_limit=self.billed_cost_limit,
+            token_limit=self.token_limit)
         if limits:
             payload[EXECUTION_LIMITS_KEY] = limits
         return payload
@@ -366,6 +433,9 @@ class AttemptOutcome(BaseModel):
     billed_cost: float = 0.0
     #: The no-cache counterfactual, kept for reporting only. Never call this "spend".
     nominal_cost: float = 0.0
+    #: Processed tokens. The `token_limit` half of the ceiling is enforced against this, the
+    #: way `billed_cost` is the half the dollar cap is enforced against.
+    tokens: int = 0
     turns: int = 0
     error: Optional[str] = None
     path: Optional[str] = None
@@ -381,6 +451,7 @@ class SampleOutcome(BaseModel):
     attempts: List[AttemptOutcome] = Field(default_factory=list)
     billed_cost: float = 0.0
     nominal_cost: float = 0.0
+    tokens: int = 0
     #: Whether this sample may still run given the current limits.
     resumable: bool = False
 
@@ -388,7 +459,12 @@ class SampleOutcome(BaseModel):
 class UsageBreakdown(BaseModel):
     """What something cost, in every way this project counts cost.
 
-    Three axes get conflated, and each conflation has already cost this project a run:
+    Three axes get conflated, and each conflation has already cost this project a run. A
+    fourth quantity, tokens, rides the self/nested axis with them, because the ceiling that
+    binds a run on a zero-priced model is denominated in tokens and had nowhere to be said:
+    costs bubbled from children to parent while token counts did not, so a lead's recorded
+    `token_usage` held its children's *dollars* and only its own *tokens* -- one measured
+    lead read 65,471 tokens against $2.54, a rate 13x its own arms'.
 
     * **billed vs nominal.** `cached_total_cost` is what was paid; `total_cost` is the
       no-cache counterfactual. Prompt caching puts them ~2.5x apart -- the specialist4 run was
@@ -415,6 +491,11 @@ class UsageBreakdown(BaseModel):
     #: What a cap actually counted. Zero means "no cap looked at this", not "this was free" --
     #: `budget_charged` is only meaningful where a budget was being enforced.
     budget_charged: float = 0.0
+    #: Processed tokens, on the same self/nested split as the costs above. No `budget_charged`
+    #: twin: the coverage floor's exemption is a *dollar* policy, and inventing a token
+    #: version of it would be a rule nothing enforces.
+    self_tokens: int = 0
+    nested_tokens: int = 0
 
     @property
     def billed(self) -> float:
@@ -428,13 +509,23 @@ class UsageBreakdown(BaseModel):
 
         return round(self.self_nominal + self.nested_nominal, 6)
 
-    def with_nested(self, *, billed: float, nominal: float) -> "UsageBreakdown":
+    @property
+    def tokens(self) -> int:
+        """Inclusive. The number to compare against a token ceiling."""
+
+        return int(self.self_tokens + self.nested_tokens)
+
+    def with_nested(self, *, billed: float, nominal: float,
+                    tokens: int = 0) -> "UsageBreakdown":
         return self.model_copy(update={
-            "nested_billed": round(billed, 6), "nested_nominal": round(nominal, 6)})
+            "nested_billed": round(billed, 6), "nested_nominal": round(nominal, 6),
+            "nested_tokens": int(tokens)})
 
     @classmethod
-    def of_self(cls, *, billed: float, nominal: float) -> "UsageBreakdown":
-        return cls(self_billed=round(billed, 6), self_nominal=round(nominal, 6))
+    def of_self(cls, *, billed: float, nominal: float,
+                tokens: int = 0) -> "UsageBreakdown":
+        return cls(self_billed=round(billed, 6), self_nominal=round(nominal, 6),
+                   self_tokens=int(tokens))
 
     def summary(self) -> Dict[str, float]:
         """The flat form, for a manifest or a report. Every key names its axis."""
@@ -447,6 +538,9 @@ class UsageBreakdown(BaseModel):
             "billed": self.billed,
             "nominal": self.nominal,
             "budget_charged": round(self.budget_charged, 6),
+            "self_tokens": int(self.self_tokens),
+            "nested_tokens": int(self.nested_tokens),
+            "tokens": self.tokens,
         }
 
 
@@ -481,9 +575,11 @@ class TaskOutcome(BaseModel):
     #: here, which is what `usage` exists to make sayable.
     billed_cost: float = 0.0
     nominal_cost: float = 0.0
-    #: The whole picture, in one place. `billed_cost`/`nominal_cost` are its `self_*` half and
-    #: are kept because `task_outcome.json` files in the tree carry them; a parent that runs
-    #: children fills in the nested half.
+    #: This task's own processed tokens, self-only like the two costs above.
+    tokens: int = 0
+    #: The whole picture, in one place. `billed_cost`/`nominal_cost`/`tokens` are its `self_*`
+    #: half and are kept because `task_outcome.json` files in the tree carry them; a parent
+    #: that runs children fills in the nested half.
     usage: UsageBreakdown = Field(default_factory=UsageBreakdown)
     turns: int = 0
     wall_seconds: float = 0.0
@@ -500,6 +596,7 @@ class TaskOutcome(BaseModel):
         max_turns: int,
         sample_max_cost: Optional[float],
         has_result: bool,
+        sample_max_tokens: Optional[int] = None,
     ) -> "TaskOutcome":
         """Project the persisted sample records into one execution record."""
 
@@ -512,6 +609,7 @@ class TaskOutcome(BaseModel):
                     status=attempt.status,
                     billed_cost=float(attempt.cached_cost or attempt.cost),
                     nominal_cost=float(attempt.cost),
+                    tokens=int(getattr(attempt, "tokens", 0) or 0),
                     turns=attempt.turns,
                     error=getattr(attempt, "error", None),
                     path=str(attempt.path) if getattr(attempt, "path", None) else None,
@@ -526,7 +624,9 @@ class TaskOutcome(BaseModel):
                 attempts=attempts,
                 billed_cost=sample.get_accumulated_cached_cost(),
                 nominal_cost=sample.get_accumulated_cost(),
-                resumable=sample.can_execute(max_retries, max_turns, sample_max_cost),
+                tokens=sample.get_accumulated_tokens(),
+                resumable=sample.can_execute(max_retries, max_turns, sample_max_cost,
+                                             sample_max_tokens),
             ))
 
         # Precedence is deliberate: a task with any resumable sample is paused rather than
@@ -559,9 +659,11 @@ class TaskOutcome(BaseModel):
             samples=sample_outcomes,
             billed_cost=sum(item.billed_cost for item in sample_outcomes),
             nominal_cost=sum(item.nominal_cost for item in sample_outcomes),
+            tokens=sum(item.tokens for item in sample_outcomes),
             usage=UsageBreakdown.of_self(
                 billed=sum(item.billed_cost for item in sample_outcomes),
-                nominal=sum(item.nominal_cost for item in sample_outcomes)),
+                nominal=sum(item.nominal_cost for item in sample_outcomes),
+                tokens=sum(item.tokens for item in sample_outcomes)),
             turns=sum(a.turns for item in sample_outcomes for a in item.attempts),
             wall_seconds=wall,
         )

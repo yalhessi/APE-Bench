@@ -54,6 +54,10 @@ def test_a_default_breakdown_is_all_zero_and_says_nothing():
     assert UsageBreakdown().summary() == {
         "self_billed": 0.0, "self_nominal": 0.0, "nested_billed": 0.0,
         "nested_nominal": 0.0, "billed": 0.0, "nominal": 0.0, "budget_charged": 0.0,
+        # Tokens ride the self/nested axis with the costs. No `budget_charged` twin: the
+        # floor's exemption from `per_pr_cost_cap` is a dollar policy, and a token version
+        # of it would be a rule nothing enforces.
+        "self_tokens": 0, "nested_tokens": 0, "tokens": 0,
     }
 
 
@@ -63,7 +67,8 @@ def test_every_summary_key_names_its_axis():
 
     keys = set(UsageBreakdown().summary())
     assert keys == {"self_billed", "self_nominal", "nested_billed", "nested_nominal",
-                    "billed", "nominal", "budget_charged"}
+                    "billed", "nominal", "budget_charged",
+                    "self_tokens", "nested_tokens", "tokens"}
     assert not any(key in ("cost", "total_cost") for key in keys)
 
 

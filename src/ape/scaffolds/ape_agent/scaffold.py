@@ -104,7 +104,8 @@ class ApeAgentScaffold(BaseScaffold):
             cost_limit=self.cost_limit,
             logger=self.logger,
             interrupt_event=None,
-            is_cli_mode=self.is_cli_mode
+            is_cli_mode=self.is_cli_mode,
+            token_limit=self.token_limit
         )
         await self.conversation_manager.initialize()
 

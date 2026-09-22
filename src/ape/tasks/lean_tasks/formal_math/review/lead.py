@@ -222,6 +222,12 @@ class ReviewLeadConfig(BasePRReviewConfig):
     #: because subagents run in their own orchestrator. Without this a 17-work-unit PR could
     #: quietly authorise 60 jobs nobody budgeted for.
     per_pr_cost_cap: float = 2.0
+    #: The same two ceilings in processed tokens. A run on a model priced 0.0 satisfies both
+    #: dollar caps above at any fan-out, so on those these are the only budget the lead has.
+    #: 0 disables one; both disabled on a zero-priced model leaves `max_delegations` alone,
+    #: which preflight refuses.
+    standard_budget_tokens: int = 0
+    per_pr_token_cap: int = 0
 
 
 class ReviewLeadData(BasePRReviewData):
@@ -323,6 +329,12 @@ class ReviewLeadTask(BasePRReviewTask):
                 # Without it the per-PR cap only binds *between* waves, and a single wave can
                 # overshoot it by the product of its job count and their tier caps.
                 "reserved": 0.0,
+                # The same three quantities in processed tokens, kept separately rather than
+                # converted: on a zero-priced model the dollar three are all 0.0 for every
+                # wave, so they cannot stand in for these.
+                "tokens": 0,
+                "delegated_tokens": 0,
+                "reserved_tokens": 0,
                 # The coverage floor runs *through* the lead, as its first wave, but is not
                 # the lead's to skip. Tracking it here is what lets `delegate` inject it and
                 # `submit_routing` refuse to close without it.
@@ -565,6 +577,25 @@ class ReviewLeadTask(BasePRReviewTask):
                         f"committed of ${cap:.2f}, and this {tier} job reserves up to "
                         f"${max_cost:.2f}")})
                     continue
+
+                # The same reservation in tokens, and a separate refusal rather than a
+                # combined one: a job rejected for the wrong reason sends the lead looking for
+                # budget it has. Skipped entirely when `per_pr_token_cap` is 0, which is how a
+                # run says it is governed in dollars only.
+                token_cap = self._task_config().per_pr_token_cap
+                max_tokens = int(
+                    self._task_config().standard_budget_tokens * TIER_MULTIPLIERS[tier])
+                if token_cap:
+                    committed_tokens = (state["delegated_tokens"]
+                                        + state["reserved_tokens"])
+                    if committed_tokens + max_tokens > token_cap:
+                        rejected.append({"job": invocation_id, "reason": (
+                            f"per-PR token cap would be exceeded: {committed_tokens:,} "
+                            f"already committed of {token_cap:,}, and this {tier} job "
+                            f"reserves up to {max_tokens:,}")})
+                        continue
+                    state["reserved_tokens"] += max_tokens
+
                 state["reserved"] += max_cost
 
                 payload = pool[invocation_id]
@@ -641,6 +672,7 @@ class ReviewLeadTask(BasePRReviewTask):
                 outcomes = await run_jobs(
                     self, specs,
                     standard_cap=self._task_config().standard_budget_cap,
+                    standard_tokens=self._task_config().standard_budget_tokens,
                     wave=state["wave"], logger=self.logger,
                 )
             except Exception as exc:  # noqa: BLE001
@@ -658,20 +690,24 @@ class ReviewLeadTask(BasePRReviewTask):
                 # Release the reservations too, or a failed wave permanently consumes budget
                 # for work that never ran.
                 state["reserved"] = 0.0
+                state["reserved_tokens"] = 0
                 return {"success": False, "ran": 0, "rejected": rejected,
                         "error": f"delegation failed: {exc}"}
 
             # Settle: the reservations are replaced by what the wave actually cost.
             state["reserved"] = 0.0
+            state["reserved_tokens"] = 0
             spec_by_id = {spec.invocation_id: spec for spec in specs}
             for outcome in outcomes:
                 spec = spec_by_id[outcome.invocation_id]
                 state["outcomes"][outcome.invocation_id] = (outcome, spec)
                 state["spend"] += outcome.cost
+                state["tokens"] += outcome.tokens
                 # The floor is exempt from the discretionary cap, and asking the spec rather
                 # than re-testing the disposition string keeps that rule in one place.
                 if spec.budget_scope == "discretionary":
                     state["delegated_spend"] += outcome.cost
+                    state["delegated_tokens"] += outcome.tokens
                 journal.append(self.data.journal_path, {
                     "event": journal.SETTLED, "wave": state["wave"],
                     "outcome": asdict(outcome),
@@ -687,6 +723,15 @@ class ReviewLeadTask(BasePRReviewTask):
                 "spend_remaining": round(
                     max(0.0, self._task_config().per_pr_cost_cap
                         - state["delegated_spend"]), 4),
+                # Reported only where it binds. A token figure beside a dollar figure on a
+                # paid run is one more number for the lead to reason about and no extra
+                # budget; on a zero-priced run it is the only one that means anything.
+                **({"tokens_so_far": state["tokens"],
+                    "delegated_tokens": state["delegated_tokens"],
+                    "tokens_remaining": max(
+                        0, self._task_config().per_pr_token_cap
+                        - state["delegated_tokens"])}
+                   if self._task_config().per_pr_token_cap else {}),
                 "delegations_used": self._specialist_count(state),
                 "delegations_remaining": max(0, budget - self._specialist_count(state)),
                 "floor_jobs_run": len(floor_specs),

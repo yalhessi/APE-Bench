@@ -31,6 +31,32 @@ class TokenUsage(BaseModel):
         if self.total_tokens is None:
             self.total_tokens = self.input_tokens + self.output_tokens
 
+    @property
+    def processed_tokens(self) -> int:
+        """Every token the provider handled for this call: the whole prompt, plus the reply.
+
+        What `ExecutionLimits.token_limit` is enforced against, and the denominator of the
+        token census. Three things it deliberately is not:
+
+        * **Not discounted for caching.** A cached prompt token is still a token the model
+          read. `cached_total_cost` discounts it because the vendor charges less for it; the
+          ceiling exists for models that charge nothing at all, where there is no discount to
+          apply and no cache accounting reported (`prompt_tokens_details` is null on every
+          locally hosted ELM model).
+        * **Not affected by `cost_model`.** `prompt_inclusive` vs `prompt_exclusive` is a
+          disagreement about *pricing* — whether cached tokens are a subset of the prompt or
+          are added to it. `total_tokens` as the provider reports it is prompt + completion
+          either way, so the count does not move when the pricing convention does.
+        * **Not self-plus-nested.** This is one call's usage. A parent's children are counted
+          where their own attempts are recorded; see `TaskOutcome.usage`.
+
+        Falls back to `input + output` because `parse_usage` defaults a missing
+        `total_tokens` to 0 rather than None, so `model_post_init` never backfills it — and a
+        ceiling that reads zero is a ceiling that never binds.
+        """
+
+        return int(self.total_tokens or (self.input_tokens + self.output_tokens))
+
 
 class ContentBlock(BaseModel):
     """Message content block - explicit types, no Union types."""

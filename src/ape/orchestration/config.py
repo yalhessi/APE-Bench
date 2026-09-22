@@ -49,6 +49,11 @@ class ExecutionConfig(BaseModel):
 
     # Sample cost control
     sample_max_cost: Optional[float] = None  # Max cost per sample (can resume after increase)
+    #: Max processed tokens per sample. The same ceiling as `sample_max_cost` in the
+    #: denomination that survives a zero price: the locally hosted open-weight models are
+    #: priced 0.0 because that is what they cost, so no dollar cap binds a run on one.
+    #: A task may narrow either through `ExecutionLimits`.
+    sample_max_tokens: Optional[int] = None
 
     # Sample queue randomization configuration
     shuffle_seed: Optional[int] = 42  # Random seed (None = random each time)

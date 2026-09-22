@@ -236,6 +236,7 @@ async def collect_child_runs(
                 max_retries=config.execution.task_max_retries,
                 max_turns=config.execution.max_turns,
                 sample_max_cost=config.execution.sample_max_cost,
+                sample_max_tokens=config.execution.sample_max_tokens,
                 has_result=has_result,
             )
         except Exception as error:  # noqa: BLE001 - see the docstring
@@ -256,8 +257,20 @@ async def collect_child_runs(
 def nested_usage(runs: Dict[str, ChildRun]):
     """What the children cost, in the shape `BaseTaskResult.nested_token_usage` expects.
 
-    Costs only. Per-child token counts were the enclosing tier's totals stamped on every row,
-    so summing them was meaningless; cost is per child and reconciles against the ledger.
+    Costs only, and now deliberately so rather than for want of the numbers. `TaskOutcome.tokens`
+    is a real per-child count, so a token total *could* be summed here -- but `_merge_token_usage`
+    would fold it into the parent's flat `TokenUsage`, where `total_tokens` would then include the
+    children while `input_tokens` and `output_tokens` did not, and `total != input + output` is
+    exactly the confusion the `prompt_inclusive` investigation had to undo.
+
+    It also has to stay self-only for the ceiling to work: the conversation loop enforces
+    `token_limit` against the scaffold's own turns, and `Sample.get_accumulated_tokens` -- which
+    decides whether a paused sample may resume -- reads `attempt.tokens`, which is filled from
+    this merged record. The cost half reads an inclusive figure against a self-only ceiling and is
+    wrong for a lead because of it.
+
+    The children's token total is carried on `UsageBreakdown.nested_tokens` instead, where it sits
+    beside `nested_billed` and cannot be mistaken for the parent's own.
     """
 
     from ape.llm_clients.models import TokenUsage

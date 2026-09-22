@@ -93,10 +93,12 @@ class ApeAgentConversationManager:
                  task: Optional['BaseTask'] = None, cost_limit: Optional[float] = None,
                  logger: Optional['logging.LoggerAdapter'] = None,
                  interrupt_event: Optional[asyncio.Event] = None,
-                 is_cli_mode: bool = False):
+                 is_cli_mode: bool = False,
+                 token_limit: Optional[int] = None):
         self.config = config
         self.task = task
         self.cost_limit = cost_limit
+        self.token_limit = token_limit
         self.logger = logger or create_logger()
         self.is_cli_mode = is_cli_mode
 
@@ -860,6 +862,8 @@ class ApeAgentConversationManager:
                 (u.cached_total_cost or u.total_cost) for u in self._conversation_usage
             )
             nominal_cost = sum(u.total_cost for u in self._conversation_usage)
+            current_tokens = sum(
+                u.processed_tokens for u in self._conversation_usage)
 
             # Enforce turn limit
             if current_turns >= max_turns:
@@ -887,12 +891,36 @@ class ApeAgentConversationManager:
                         f"Cost limit exceeded: billed ${current_cost:.6f} >= ${self.cost_limit:.6f} "
                         f"(nominal ${nominal_cost:.6f})"
                     )
+
+            # Enforce the token ceiling, at the same checkpoint and off the same records.
+            #
+            # Not discounted for caching, deliberately and unlike the cost above: a cached
+            # prompt token is still a token the provider processed, and the ceiling exists for
+            # models where nothing is billed and the cache discount therefore does not exist.
+            # Counting billed-equivalent tokens would make the same conversation measure
+            # differently on two providers, which is the one property this ceiling has that
+            # the dollar one does not.
+            if self.token_limit is not None:
+                if current_tokens >= self.token_limit:
+                    from ape.llm_clients.config import TokenBudgetExhaustedError
+                    self.logger.warning(
+                        f"Token limit exceeded: {current_tokens:,} >= limit {self.token_limit:,} "
+                        f"(billed ${current_cost:.6f}) - "
+                        f"last turn's message and tools are saved for potential resume"
+                    )
+                    raise TokenBudgetExhaustedError(
+                        f"Token limit exceeded: {current_tokens:,} >= {self.token_limit:,} "
+                        f"(billed ${current_cost:.6f})"
+                    )
             
             # Log state on the first turn or at regular checkpoints
             if current_turns == 0:
                 cost_str = f"limit ${self.cost_limit:.6f}" if self.cost_limit else "N/A"
+                token_str = f"limit {self.token_limit:,}" if self.token_limit else "N/A"
                 self.logger.info(
-                    f"Starting conversation - turns: {current_turns}/{max_turns}, current_cost: ${current_cost:.6f}, {cost_str}"
+                    f"Starting conversation - turns: {current_turns}/{max_turns}, "
+                    f"current_cost: ${current_cost:.6f}, {cost_str}, "
+                    f"current_tokens: {current_tokens:,}, {token_str}"
                 )
             
             # ================================================================

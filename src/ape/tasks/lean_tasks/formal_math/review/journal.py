@@ -144,6 +144,7 @@ def replay(
                                "(spec=%s, pool=%s)", invocation_id,
                                spec_data is not None, payload is not None)
             state["spend"] += float(outcome_row.get("cost") or 0.0)
+            state["tokens"] = state.get("tokens", 0) + int(outcome_row.get("tokens") or 0)
             continue
         known = {item.name for item in fields(outcome_cls)}
         outcome = outcome_cls(**{k: v for k, v in outcome_row.items() if k in known})
@@ -151,7 +152,16 @@ def replay(
         state["outcomes"][invocation_id] = (outcome, spec)
         state["requested"].add(invocation_id)
         state["spend"] += outcome.cost
+        # The token half of the same accounting. A resumed lead that forgot it would hand out
+        # a second full `per_pr_token_cap`, which is exactly the bug this replay exists to
+        # prevent in dollars -- and on a zero-priced model the dollar half is 0.0 throughout,
+        # so it is the only half that can be doubled. `state.get` rather than `state[...]`
+        # because journals written before the token ceiling are replayed onto states built
+        # by callers that predate the keys.
+        state["tokens"] = state.get("tokens", 0) + outcome.tokens
         if spec.disposition != "mandatory":
             state["delegated_spend"] += outcome.cost
+            state["delegated_tokens"] = (
+                state.get("delegated_tokens", 0) + outcome.tokens)
 
     return state

@@ -104,6 +104,7 @@ class SampleWorker:
                 created_at=datetime.now(),
                 max_turns=limits.max_turns,
                 cost_limit=limits.billed_cost_limit,
+                token_limit=limits.token_limit,
             )
             sample.attempts.append(attempt)
         else:
@@ -213,9 +214,21 @@ class SampleWorker:
         if result and result.token_usage:
             attempt.cost = float(result.token_usage.total_cost or 0.0)
             attempt.cached_cost = float(result.token_usage.cached_total_cost or 0.0)
+            # SELF-ONLY, unlike the two costs above, and deliberately so.
+            #
+            # `runner._merge_token_usage` folds a parent's children into this record, but
+            # `subtasks.nested_usage` fills only the cost fields, so the token counts that
+            # arrive here are the scaffold's own. That is the figure the conversation loop
+            # enforces `token_limit` against, so it is also the figure
+            # `Sample.get_accumulated_tokens` must resume against -- the cost side reads an
+            # inclusive total against a self-only ceiling, which is a defect (see
+            # docs/todo/framework-defects-2026-09.md) and not one to copy for symmetry.
+            # Children's tokens are carried separately, on `UsageBreakdown.nested_tokens`.
+            attempt.tokens = int(result.token_usage.processed_tokens)
         else:
             attempt.cost = 0.0
             attempt.cached_cost = 0.0
+            attempt.tokens = 0
 
         if termination:
             attempt.turns = termination.current_turns
@@ -224,10 +237,11 @@ class SampleWorker:
         await storage.save_sample(sample)
 
         self.logger.info(
-            "Sample %s: completed with %s (cost=$%.4f, turns=%s)",
+            "Sample %s: completed with %s (cost=$%.4f, tokens=%s, turns=%s)",
             sample.sample_id,
             attempt.status.value,
             attempt.cost,
+            f"{attempt.tokens:,}",
             attempt.turns,
         )
 
@@ -373,6 +387,7 @@ class SampleWorker:
         return {
             ScaffoldTerminationReason.MAX_TURNS_REACHED: ExecutionStatus.PAUSED_MAX_TURNS,
             ScaffoldTerminationReason.COST_EXHAUSTED: ExecutionStatus.PAUSED_COST_LIMIT,
+            ScaffoldTerminationReason.TOKENS_EXHAUSTED: ExecutionStatus.PAUSED_TOKEN_LIMIT,
             ScaffoldTerminationReason.CONVERSATION_STOPPED: ExecutionStatus.FAILED_MODEL,
             ScaffoldTerminationReason.EARLY_STOPPED: ExecutionStatus.FAILED_EARLY_STOP,
         }.get(reason, ExecutionStatus.FAILED_ERROR)
@@ -384,6 +399,7 @@ class SampleWorker:
                 self.config.execution.task_max_retries,
                 self.config.execution.max_turns,
                 self.config.execution.sample_max_cost,
+                self.config.execution.sample_max_tokens,
             )
             progress.total_samples = len(progress.samples)
 
@@ -411,6 +427,8 @@ class SampleWorker:
         # Create independent runtime for this task
         from ape.runtime.factory import create_runtime
         runtime = create_runtime(config=self.config.runtime_config, logger=self.logger)
+
+        _limits = task_execution_limits(task_data, self.config.execution)
         
         exec_task = asyncio.create_task(
             runtime.run_task(
@@ -419,8 +437,8 @@ class SampleWorker:
                 scaffold_type=self.scaffold_type,
                 orchestrator_id=self.orchestrator_dir.name,
                 attempt_path=attempt_path,
-                cost_limit=task_execution_limits(
-                    task_data, self.config.execution).billed_cost_limit,
+                cost_limit=_limits.billed_cost_limit,
+                token_limit=_limits.token_limit,
             )
         )
 
@@ -576,6 +594,7 @@ class SampleWorker:
                 max_retries=self.config.execution.task_max_retries,
                 max_turns=self.config.execution.max_turns,
                 sample_max_cost=self.config.execution.sample_max_cost,
+                sample_max_tokens=self.config.execution.sample_max_tokens,
                 has_result=has_result,
             )
             path = storage.task_dir / "task_outcome.json"
@@ -618,6 +637,7 @@ class SampleWorker:
                 self.config.execution.task_max_retries,
                 self.config.execution.max_turns,
                 self.config.execution.sample_max_cost,
+                self.config.execution.sample_max_tokens,
             ):
                 resumable = True
 

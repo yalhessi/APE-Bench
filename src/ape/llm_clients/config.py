@@ -418,3 +418,15 @@ class CostExhaustedError(LLMError):
     Raised when total conversation cost exceeds the budget; runners must not retry.
     """
     pass
+
+
+class TokenBudgetExhaustedError(LLMError):
+    """
+    Token ceiling exhausted.
+
+    The same event as `CostExhaustedError` against the other denomination, raised at the same
+    checkpoint in the same loop. It is a separate class only so the record says which ceiling
+    stopped the task: on a zero-priced model the cost ceiling cannot fire, and on a paid one
+    either can, so "paused on budget" without saying which budget is not actionable.
+    """
+    pass

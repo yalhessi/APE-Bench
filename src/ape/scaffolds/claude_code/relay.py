@@ -40,7 +40,8 @@ class ClaudeCodeRelaySession(BaseRelaySession):
         logger: Optional['logging.LoggerAdapter'] = None,
         conversation_trees_path: Optional[Path] = None,
         max_turns: Optional[int] = None,
-        cost_limit: Optional[float] = None
+        cost_limit: Optional[float] = None,
+        token_limit: Optional[int] = None
     ):
         """
         Initialize Claude Code relay session
@@ -56,6 +57,7 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             conversation_trees_path: Prefix tree JSONL path (optional)
             max_turns: Maximum turns allowed (None means unlimited)
             cost_limit: Maximum cost allowed (None means unlimited)
+            token_limit: Maximum processed tokens allowed (None means unlimited)
         """
         super().__init__(
             port=port,
@@ -66,7 +68,8 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             logger=logger,
             conversation_trees_path=conversation_trees_path,
             max_turns=max_turns,
-            cost_limit=cost_limit
+            cost_limit=cost_limit,
+            token_limit=token_limit
         )
         # Claude Code specific: fast model for subagents
         self.fast_llm_config = fast_llm_config or llm_config

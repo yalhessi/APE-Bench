@@ -177,6 +177,7 @@ class TaskOrchestrator:
                     self.config.execution.task_max_retries,
                     self.config.execution.max_turns,
                     self.config.execution.sample_max_cost,
+                    self.config.execution.sample_max_tokens,
                 )
 
             # Skip tasks that were already completed and update progress
@@ -220,6 +221,7 @@ class TaskOrchestrator:
                     self.config.execution.task_max_retries,
                     self.config.execution.max_turns,
                     self.config.execution.sample_max_cost,
+                    self.config.execution.sample_max_tokens,
                 )
 
                 # Check if the sample can be executed
@@ -227,6 +229,7 @@ class TaskOrchestrator:
                     self.config.execution.task_max_retries,
                     self.config.execution.max_turns,
                     self.config.execution.sample_max_cost,
+                    self.config.execution.sample_max_tokens,
                 ):
                     continue
 

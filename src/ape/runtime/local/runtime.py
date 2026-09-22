@@ -36,6 +36,7 @@ class LocalRuntime(BaseRuntime):
         orchestrator_id: str,
         attempt_path: Path,
         cost_limit: Optional[float] = None,
+        token_limit: Optional[int] = None,
     ) -> Tuple['BaseTaskResult', Optional['ScaffoldTerminationResult']]:
         """Execute task directly in the same process."""
         from ape.scaffolds.runner import main_from_params
@@ -67,6 +68,7 @@ class LocalRuntime(BaseRuntime):
             'scaffold_type': scaffold_type,
             'orchestrator_id': orchestrator_id,
             'cost_limit': cost_limit,
+            'token_limit': token_limit,
             'attempt_path': str(attempt_path),
         }
 

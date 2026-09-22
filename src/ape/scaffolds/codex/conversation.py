@@ -75,7 +75,8 @@ class CodexConversationManager(BaseConversationManager):
             logger=logger,
             conversation_trees_path=conversation_trees_path,
             max_turns=self.config.execution.max_turns,  # Pass max_turns to relay
-            cost_limit=self.cost_limit  # Pass cost_limit to relay
+            cost_limit=self.cost_limit,  # Pass cost_limit to relay
+            token_limit=self.token_limit  # and the same ceiling in tokens
         )
 
     async def _start_codexbridge(self) -> None:

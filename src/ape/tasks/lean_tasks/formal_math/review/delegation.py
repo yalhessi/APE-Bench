@@ -89,7 +89,8 @@ class JobSpec:
 
         return "floor" if self.required else "discretionary"
 
-    def execution_spec(self, standard_cap: float) -> TaskExecutionSpec:
+    def execution_spec(self, standard_cap: float,
+                       standard_tokens: int = 0) -> TaskExecutionSpec:
         """This job as the framework describes a child: identity, payload, and its own ceiling.
 
         The payload is the sealed arm prompt with the lead's brief composed onto it, which is
@@ -103,6 +104,8 @@ class JobSpec:
             task_data=compose_prompt(self.payload, self.brief_text),
             billed_cost_limit=round(
                 standard_cap * TIER_MULTIPLIERS.get(self.budget_tier, 1.0), 6),
+            token_limit=(int(standard_tokens * TIER_MULTIPLIERS.get(self.budget_tier, 1.0))
+                         or None),
             required=self.required,
             budget_scope=self.budget_scope,
         )
@@ -136,6 +139,9 @@ class JobOutcome:
     cost: float = 0.0
     #: The no-cache counterfactual, for reporting only. Never sum this and call it spend.
     nominal_cost: float = 0.0
+    #: Processed tokens. What the per-PR token reservation settles against, and the only
+    #: figure of the three that is non-zero on a model priced 0.0.
+    tokens: int = 0
     #: This job's own usage. It used to be the enclosing tier's total stamped onto every job
     #: in it — 59 jobs carrying 9 distinct values on smoke4 — which made per-arm token
     #: attribution impossible and, summed, reported $1,141 against a real $21.
@@ -179,9 +185,11 @@ class JobOutcome:
             wall_seconds=round(float(child.outcome.wall_seconds or elapsed), 3),
             cost=float(child.outcome.billed_cost or 0.0),
             nominal_cost=float(child.outcome.nominal_cost or 0.0),
+            tokens=int(child.outcome.tokens or 0),
             token_usage={
                 "billed_cost": float(child.outcome.billed_cost or 0.0),
                 "nominal_cost": float(child.outcome.nominal_cost or 0.0),
+                "tokens": int(child.outcome.tokens or 0),
                 "turns": int(child.outcome.turns or 0),
             },
             candidates=candidates,
@@ -271,6 +279,7 @@ WAVE_EXECUTION = {"sample_count": 1, "early_stop_mode": EarlyStopMode.DISABLED}
 _LEDGER_STATUS = {
     ExecutionStatus.SUCCESS: "success",
     ExecutionStatus.PAUSED_COST_LIMIT: "paused_cost",
+    ExecutionStatus.PAUSED_TOKEN_LIMIT: "paused_tokens",
     ExecutionStatus.PAUSED_MAX_TURNS: "paused_turns",
 }
 
@@ -297,7 +306,8 @@ def ledger_status(child: ChildRun) -> str:
 
 
 async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
-                   standard_cap: float, wave: int, logger) -> List[JobOutcome]:
+                   standard_cap: float, wave: int, logger,
+                   standard_tokens: int = 0) -> List[JobOutcome]:
     """Run one wave's jobs as the lead's children, each with its own budget.
 
     One orchestrator per wave, not one per budget tier. Tiers were groupings only because
@@ -313,11 +323,13 @@ async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
     guarantee per child; this keeps it for the projection.
     """
 
-    specs = [job.execution_spec(standard_cap) for job in jobs]
+    specs = [job.execution_spec(standard_cap, standard_tokens) for job in jobs]
     logger.info("delegating %d job(s) in wave %d: %s",
                 len(jobs), wave,
-                ", ".join(f"{job.arm_id}@${spec.billed_cost_limit:.2f}"
-                          for job, spec in zip(jobs, specs)))
+                ", ".join(
+                    f"{job.arm_id}@${spec.billed_cost_limit:.2f}"
+                    + (f"/{spec.token_limit:,}tok" if spec.token_limit else "")
+                    for job, spec in zip(jobs, specs)))
 
     started = time.monotonic()
     runs, _results = await run_subtasks(
@@ -353,10 +365,11 @@ async def run_wave(parent_task, jobs: Sequence[JobSpec], *,
 
 
 async def run_jobs(parent_task, jobs: Sequence[JobSpec], *,
-                   standard_cap: float, wave: int, logger) -> List[JobOutcome]:
+                   standard_cap: float, wave: int, logger,
+                   standard_tokens: int = 0) -> List[JobOutcome]:
     """Group jobs into budget tiers and run every tier concurrently."""
 
     if not jobs:
         return []
-    return await run_wave(parent_task, jobs,
-                          standard_cap=standard_cap, wave=wave, logger=logger)
+    return await run_wave(parent_task, jobs, standard_cap=standard_cap,
+                          standard_tokens=standard_tokens, wave=wave, logger=logger)
