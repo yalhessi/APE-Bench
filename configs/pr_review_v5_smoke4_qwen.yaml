@@ -26,13 +26,13 @@ llm_config:
 
 dataset:
   # smoke4's token twins, scaled 3x for the same measured reason as
-  # `bases/v5_generation_qwen.yaml` — Qwen's median arm is ~9.7x gpt_5.2's and the inherited
-  # 360,000 paused 3 of 9 arms on one PR. Restated here rather than inherited because this
+  # `bases/v5_generation_qwen.yaml` — measured post-fix, Qwen's median arm is ~5x gpt_5.2's
+  # and 360,000 still paused one of nine. Restated here rather than inherited because this
   # file's parent is the gpt_5.2 smoke4 config, which is where the un-scaled twins live.
   #
-  # smoke4's own ratio is preserved: 2,400,000 / 360,000 = 6.67, and 7,200,000 / 1,080,000 is
+  # smoke4's own ratio is preserved: 2,400,000 / 360,000 = 6.67, and 4,800,000 / 720,000 is
   # the same. PROVISIONAL on n=9 arms from one control PR; see the base for the measurement.
-  standard_budget_tokens: 1080000
-  per_pr_token_cap: 7200000
-  lead_token_cap: 3600000
-  run_total_token_cap: 43200000
+  standard_budget_tokens: 720000
+  per_pr_token_cap: 4800000
+  lead_token_cap: 2400000
+  run_total_token_cap: 28800000

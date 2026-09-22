@@ -77,20 +77,25 @@ dataset:
   # declared and burned turns recovering. With that fixed its tool discipline matches
   # gpt_5.2's (11% against 10%) and the remaining gap is ~5x, not ~10x.
   #
-  # The ceilings stay at 3x anyway. rep2 still paused one arm at 360,000 and its largest
-  # completed arm was 393,171, so the original number is genuinely too tight for this model;
-  # 1,080,000 is ~6x the observed median and ~2.7x the observed max, which is the regime
-  # gpt_5.2 runs in -- a ceiling that stops a runaway while `max_turns` stops a normal arm.
-  # Ratios preserved throughout (1,080,000 x 5 = 5,400,000).
+  # 2x, not the 3x first set. rep1's 3x was sized against a distribution inflated by the
+  # tool defect; rep2's is the honest one. Its nine arms ran 93,519 / 119,423 / 159,517 /
+  # 161,638 / 181,259 / 223,737 / 282,500 / 361,927 / 393,171, so 720,000 is 4.0x the
+  # median, 1.83x the observed max, and would have cut none of them. 360,000 still paused
+  # one, so the inherited figure is genuinely too tight for this model.
+  #
+  # 2x rather than 3x because gpt_5.2's ceiling sits at 1.48x its p99 and BELOW its max
+  # (0.65x), cutting 0.21% of arms by design. 3x would have been looser than the regime it
+  # is meant to match; 2x is already generous against it. Ratios preserved (720,000 x 5 =
+  # 3,600,000).
   #
   # PROVISIONAL: n=9 arms on ONE control PR, the cheapest in the set, twice. A multi-PR rep
   # should revise these, and 2x may well be enough once one exists.
-  standard_budget_tokens: 1080000
-  per_pr_token_cap: 5400000
+  standard_budget_tokens: 720000
+  per_pr_token_cap: 3600000
   # Scaled with the others. `_warn_on_denomination_drift` compares RATIOS -- this cap over
   # `standard_budget_tokens` against `lead_cost_cap` over `standard_budget_cap` -- so a
   # block scaled 3x with one member left behind is drift, not conservatism. The measured
   # lead used 567,725 of its 1,200,000, nowhere near the ceiling; this moves to keep the
   # five-standard-jobs relation intact, not because the lead needed room.
-  lead_token_cap: 3600000
-  run_total_token_cap: 36000000
+  lead_token_cap: 2400000
+  run_total_token_cap: 24000000

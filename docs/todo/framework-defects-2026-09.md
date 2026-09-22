@@ -128,3 +128,19 @@ as a reserved argument the stage records and otherwise ignores -- or delete the 
 let `pipeline.json` be the only record of the graph, joined by run name. The second is cheaper
 and loses the ability to tell two nodes of one kind apart in the ledger, which is exactly what a
 run carrying two judgements needs. Decide before a run carries two.
+
+## Added 2026-09-22: `cli trajectory` cannot see a paused task
+
+`iter_qwen_plumbing_33438_rep1` scheduled 9 arms plus a lead and 3 arms stopped on their token
+ceiling. `cli trajectory` reports **7 conversations** — the lead and the 6 arms that finished.
+The transcripts of the paused three are on disk; the tool does not reach them.
+
+That is backwards from what the tool is for. After a `completion_status=partial` run the arms
+you most want to read are exactly the ones that were cut off, and those are the ones it cannot
+show. It is the same family as the defect already recorded in `.claude/rules/mathlib-review.md`
+— read a nested run's children from what was SCHEDULED, never from `results.task_results`,
+because a task that pauses returns before aggregation.
+
+**What would close it:** `cli trajectory` on that run reporting 10 conversations, with the
+paused arms' turns present and marked as truncated.
+
