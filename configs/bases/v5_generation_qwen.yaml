@@ -59,18 +59,39 @@ execution:
   # Free tokens are not a reason to raise it: the constraint is a shared cluster, not a bill.
   max_concurrency: 4
 
-# The token block in the parent is inherited UNCHANGED, which is a claim worth defending
-# because it was calibrated on a different model.
-#
-# It survives the move for two reasons. `processed_tokens` counts the whole prompt plus the
-# completion and is not discounted for caching, so it measures the same thing on a provider
-# that caches and one that does not — and Qwen reports no cache at all. And the prompts are
-# byte-identical: the same agenda, the same renderer, the same work units. What changes is
-# only the completion, which `reasoning_effort: none` keeps in the same order.
-#
-# It is still an extrapolation. The outstanding item in
-# docs/research/2026-09-22-token-budget-calibration.md is exactly this: the caps are
-# "calibrated on gpt_5.2 behaviour and applied to a model nobody has watched". Read the first
-# rep from this base against that write-up's arm p50 35,276 / p90 87,589 / p99 243,736 before
-# concluding anything from it, and expect to revise `standard_budget_tokens` rather than to
-# find it already right.
+dataset:
+  # The token ceilings do NOT transfer from gpt_5.2, and this file said they did until the
+  # first rep was run. Measured on `iter_qwen_plumbing_33438_rep1` (PR 33438, the control —
+  # 1 work unit, 9 arms):
+  #
+  #   Qwen arm processed tokens: 42,692 / 128,355 / 279,140 / 296,271 / 341,210 / 358,378 /
+  #                              371,405 / 376,393 / 377,152     median 341,210
+  #   gpt_5.2 arm p50 35,276 / p90 87,589 / p99 243,736          (16 runs, 2,857 attempts)
+  #
+  # About 9.7x the median. The inherited `standard_budget_tokens: 360000` — which cut 6 of
+  # 2,857 gpt_5.2 arms, 0.21% — paused 3 of 9 here, 33%, with a fourth finishing at 99.5% of
+  # it. The run came back `completion_status=partial`.
+  #
+  # The mechanism is turns, not verbosity per turn: these arms ran 18-26 turns where the
+  # gpt_5.2 arms run a median of ~6-7 tool calls, and processed tokens grow superlinearly in
+  # turns because each turn re-sends the whole conversation. `processed_tokens` being
+  # cache-inclusive is what makes the two numbers comparable at all; it is not the cause.
+  #
+  # So the ceiling is raised 3x, with the ratios preserved (1,080,000 x 5 = 5,400,000 keeps
+  # the same five standard jobs a lead may buy). The basis is not the observed maximum — it is
+  # that a ceiling should stop a runaway and let `max_turns` stop a normal arm, which is the
+  # regime gpt_5.2 runs in. At ~350k by turn 25, an arm going the full 40 turns lands near
+  # 1M, so 1,080,000 puts the turn limit back in charge.
+  #
+  # PROVISIONAL: n=9 arms on ONE control PR, the cheapest in the set. A real multi-PR rep
+  # should revise these, and until one exists do not read a `paused_tokens` arm here as a
+  # finding about Qwen's diligence.
+  standard_budget_tokens: 1080000
+  per_pr_token_cap: 5400000
+  # Scaled with the others. `_warn_on_denomination_drift` compares RATIOS -- this cap over
+  # `standard_budget_tokens` against `lead_cost_cap` over `standard_budget_cap` -- so a
+  # block scaled 3x with one member left behind is drift, not conservatism. The measured
+  # lead used 567,725 of its 1,200,000, nowhere near the ceiling; this moves to keep the
+  # five-standard-jobs relation intact, not because the lead needed room.
+  lead_token_cap: 3600000
+  run_total_token_cap: 36000000

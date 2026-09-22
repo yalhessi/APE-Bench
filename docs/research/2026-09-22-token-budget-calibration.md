@@ -226,3 +226,47 @@ provider reports on every call, on both the streaming and non-streaming paths. G
 a question about how much of a shared cluster a *run* may occupy, which is a scheduling concern and
 belongs with [wall-clock-arm-runtime.md](../todo/wall-clock-arm-runtime.md), not a second field on
 `ExecutionLimits`.
+
+## The ELM rep, and what it did to the caps above
+
+**Measured 2026-09-22**, `iter_qwen_plumbing_33438_rep1`: PR 33438 (the control — 1 work unit,
+9 arms, 11 invocations) on `elm_qwen_3.5` with `reasoning_effort: none`. 16m3s wall, $0.00,
+6 candidates → 6 findings → 4 published. It answers the paragraph above, and the answer is that
+the caps do not transfer.
+
+| | arm processed tokens |
+|---|---|
+| `gpt_5.2` (16 runs, 2,857 attempts) | p50 **35,276** · p90 87,589 · p99 243,736 · max 558,101 |
+| `elm_qwen_3.5` (1 PR, 9 attempts) | 42,692 · 128,355 · 279,140 · 296,271 · **341,210** · 358,378 · 371,405 · 376,393 · 377,152 |
+
+About **9.7x the median**. `standard_budget_tokens: 360000` — chosen above because it would
+have cut 6 of 2,857 `gpt_5.2` arms, 0.21% — paused **3 of 9** here, and a fourth finished at
+99.5% of it. The run returned `completion_status=partial` with 2 mandatory jobs unreviewed.
+
+**The cause is turns, not tokens per turn.** The paused arms ran 24, 24 and 25 turns; the
+successful ones 5 to 26. The `gpt_5.2` arms behind the table above run a median of ~6-7 tool
+calls before submitting. Processed tokens grow superlinearly in turns because every turn
+re-sends the whole conversation, so a 3-4x difference in turns is a ~10x difference in
+processed tokens. `processed_tokens` being cache-inclusive is what makes the two columns
+comparable at all — it is not what makes them differ.
+
+This is worth stating plainly because it cuts against the reading that a token ceiling is a
+model-independent currency. It is model-independent as a *unit*; the number is not. A ceiling
+calibrated on one model's turn-taking is a statement about that model's turn-taking.
+
+**What changed:** `configs/bases/v5_generation_qwen.yaml` and
+`configs/pr_review_v5_smoke4_qwen.yaml` carry ceilings 3x the ones above, ratios preserved.
+The basis is not the observed maximum but the regime: a ceiling should stop a runaway and let
+`max_turns` stop a normal arm, which is where `gpt_5.2` sits. At ~350k by turn 25, an arm going
+the full 40 turns lands near 1M, so 1,080,000 puts the turn limit back in charge. The caps in
+`bases/v5_generation.yaml` are untouched — nothing here is evidence about `gpt_5.2`.
+
+**Provisional, and thin.** n=9 arms on one PR, and the cheapest one in the set: 33438 is the
+control, one work unit. A real multi-PR rep should revise these numbers, and a `paused_tokens`
+arm under them should not be read as a finding about Qwen until one exists.
+
+**One observation that is NOT a result.** 33438 is the control — maintainers asked for nothing,
+so every one of the 4 published findings is a false positive. Measured control emission on
+`gpt_5.2` v5 runs is 0-1 per run, so 4 is outside that range. It is one PR on one rep with
+three arms truncated mid-investigation, which is not a precision measurement; it is a reason to
+look at control emission on the first real Qwen rep.

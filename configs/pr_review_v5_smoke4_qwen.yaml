@@ -23,3 +23,16 @@ extends: pr_review_v5_smoke4.yaml
 llm_config:
   model_name: elm_qwen_3.5
   reasoning_effort: none
+
+dataset:
+  # smoke4's token twins, scaled 3x for the same measured reason as
+  # `bases/v5_generation_qwen.yaml` — Qwen's median arm is ~9.7x gpt_5.2's and the inherited
+  # 360,000 paused 3 of 9 arms on one PR. Restated here rather than inherited because this
+  # file's parent is the gpt_5.2 smoke4 config, which is where the un-scaled twins live.
+  #
+  # smoke4's own ratio is preserved: 2,400,000 / 360,000 = 6.67, and 7,200,000 / 1,080,000 is
+  # the same. PROVISIONAL on n=9 arms from one control PR; see the base for the measurement.
+  standard_budget_tokens: 1080000
+  per_pr_token_cap: 7200000
+  lead_token_cap: 3600000
+  run_total_token_cap: 43200000
