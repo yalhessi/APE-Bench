@@ -1260,6 +1260,15 @@ def silences(run: str, replay: Optional[str] = None, audit: bool = True,
                 "evidence_gap_tool": verdict.get("evidence_gap_tool"),
                 "labelled_by": verdict.get("labelled_by"),
                 "label_note": verdict.get("note"),
+                "label_from_run": verdict.get("from_run"),
+                # A label made by reading ANOTHER run's silence at this slot. The key recurs
+                # across reps because a work unit is release-derived, but the silence does not
+                # recur for the same reason: across the 59 cells rep1 and rep2 share, the two
+                # `abstention_detail` texts have median similarity 0.16 and the reason enum
+                # agrees 73% of the time. Only `off_concern` is a property of the ask and the
+                # arm's remit rather than of the session, so only it carries; everything else
+                # is borrowed and says so here.
+                "label_borrowed": bool(verdict) and verdict.get("from_run") != run,
                 "contested": verdict.get("contested", False),
             })
 
@@ -1267,6 +1276,7 @@ def silences(run: str, replay: Optional[str] = None, audit: bool = True,
 
     on_concern = [row for row in rows if row["on_concern"]]
     labelled = [row for row in rows if row["label"]]
+    borrowed = [row for row in labelled if row["label_borrowed"]]
     return {
         "run": run,
         "replay": replay,
@@ -1283,6 +1293,11 @@ def silences(run: str, replay: Optional[str] = None, audit: bool = True,
             if not item["on_concern_arm_scheduled"]),
         "labelled": len(labelled),
         "labelled_share": round(len(labelled) / len(rows), 4) if rows else None,
+        # Of the labelled cells, how many were labelled by reading a different run. Reported
+        # rather than filtered: a borrowed `off_concern` is sound and a borrowed
+        # `fix_required` is a guess, and the reader has to be able to tell which they have.
+        "labelled_from_another_run": len(borrowed),
+        "borrowed_by_label": dict(Counter(row["label"] for row in borrowed)),
         "by_label": dict(Counter(row["label"] for row in labelled)),
         "by_label_on_concern": dict(
             Counter(row["label"] for row in labelled if row["on_concern"])),
@@ -1296,6 +1311,10 @@ def silences(run: str, replay: Optional[str] = None, audit: bool = True,
         "contested_keys": sorted({row["key"] for row in rows if row["contested"]}),
         "rows": rows,
         "note": (
+            "A label whose `label_from_run` is not this run was made by reading another run's "
+            "silence at the same slot, and only `off_concern` carries that way: the ask and "
+            "the arm's remit do not change between repetitions, but the sentence the arm "
+            "writes does (median similarity 0.16 across the cells rep1 and rep2 share). "
             "One row per (obligation, silent arm), not per obligation: an obligation with "
             "five quiet arms contributes five. `on_concern` says whether gold's own concern "
             "label for the ask falls in that arm's `expected_concerns`; where it is false the "

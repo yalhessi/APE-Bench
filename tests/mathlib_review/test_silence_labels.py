@@ -229,3 +229,37 @@ def test_the_labelled_corpus_says_what_it_says():
 
     # Seven cells where the reader and its adversary disagreed, kept as disagreement.
     assert len(payload["contested_keys"]) == 7
+
+
+@runs_exist
+def test_a_label_read_off_another_run_says_so():
+    """The key recurs across repetitions; the silence does not recur for the same reason.
+
+    A work unit is derived from the release, so `<invocation_id>|<obligation_id>` is the same
+    key in every rep built on it, and rep1's labels cover 59 of rep2's 73 cells and 57 of
+    rep3's 66. That looked like the amortisation the store was designed for and it is only
+    half of one. Across the 59 cells rep1 and rep2 share, the two `abstention_detail` texts
+    have median similarity 0.16 with none above 0.9, and the abstention reason agrees 73% of
+    the time: the same arm is silent at the same slot and says something different about why.
+
+    `off_concern` is a property of the ask and the arm's remit, neither of which changes
+    between repetitions, so it carries. Every other label is a property of the session and is
+    a guess when borrowed. The report marks the difference instead of hiding it, because a
+    borrowed `off_concern` is sound and a borrowed `fix_required` is not.
+    """
+
+    from src.mathlib_review.analysis.report import silences
+
+    own = silences(RUN)
+    if not own["labelled"]:
+        pytest.skip("the silence-label store is not in this tree")
+    assert own["labelled_from_another_run"] == 0
+    assert all(row["label_from_run"] == RUN for row in own["rows"] if row["label"])
+
+    other = silences("pr5_A_lead_heldout12_v2_rep2")
+    assert other["labelled_from_another_run"] == other["labelled"] > 0
+    assert all(row["label_borrowed"] for row in other["rows"] if row["label"])
+    # And the split that says how much of the carry-over is sound.
+    assert other["borrowed_by_label"]["off_concern"] > sum(
+        count for label, count in other["borrowed_by_label"].items() if label != "off_concern")
+    assert "only `off_concern` carries" in other["note"]

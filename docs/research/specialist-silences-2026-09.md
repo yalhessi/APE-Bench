@@ -121,3 +121,35 @@ The four conditions were preflighted and priced, and the prices stand if the pop
 justifies them: the gold-site population is 58 sessions at $2.66 cached / $6.81 uncached for three
 samples, and the control population is 7 sessions at $0.07 / $0.34 — the guard no replay before this
 one could measure, because every earlier selection drew only from PRs carrying gold.
+
+## Correction, 2026-09-22: these labels do not carry across repetitions
+
+The store keys a label `<invocation_id>|<obligation_id>`, and because a work unit is derived from
+the release, the same key recurs in every repetition built on it. That was the argument for
+labelling once: running `report silences` on reps 2 and 3 finds **59 of 73** and **57 of 66** cells
+already carrying a label from rep1.
+
+They should not be trusted. Comparing the 59 cells shared by rep1 and rep2:
+
+| | |
+|---|---|
+| same `abstention_reason` | 43 of 59 (73%) |
+| median similarity of the two `abstention_detail` texts | **0.16** |
+| pairs above 0.9 similarity | **0** |
+| pairs below 0.5 | 42 of 49 |
+
+The same arm is silent at the same slot both times and says something almost entirely different
+about why. One `style` cell reads "found a likely style issue … but `lean_verify_edit` … failed to
+compile" in rep1 and "checked binder/line-break style … and found no violations" in rep2: those are
+different mechanisms, and a label made by reading the first does not describe the second.
+
+The distinction that survives is between two kinds of label. `off_concern` is a property of the
+**ask and the arm's remit**, neither of which changes between repetitions, so it carries. Every
+other label is a property of the **session**, and does not. That is the opposite of
+`AdjudicationLabel`, where the key identifies a recurring *claim* and carrying is the whole point.
+
+Consequence for the numbers above: they are rep1's, and replicating them means relabelling the
+session-level cells on reps 2 and 3 rather than reading the carry-over. Consequence for the store:
+`report silences` should mark a label whose `from_run` is not the run being reported, so a borrowed
+one is visibly weaker than a fresh one.
+
