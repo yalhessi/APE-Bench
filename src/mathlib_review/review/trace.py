@@ -50,6 +50,7 @@ def reconcile(
     extra_cost: float = 0.0,
     coverage_gaps: Sequence[Dict[str, Any]] = (),
     context_calls_total: int | None = None,
+    self_tokens: int | None = None,
 ) -> V5RunManifest:
     """Build the run manifest, raising if the ledger does not balance.
 
@@ -243,11 +244,18 @@ def reconcile(
             nested_nominal=round(ledger_nominal, 6),
             budget_charged=round(ledger_charged, 6),
             # Tokens do NOT bubble the way costs do: `subtasks.nested_usage` fills only the
-            # cost fields, deliberately, so `results.total_token_usage` is already the leads'
-            # own and needs no subtraction. The two halves therefore come from different
-            # places and are each self-contained.
-            self_tokens=int(getattr(
-                getattr(results, "total_token_usage", None), "processed_tokens", 0) or 0),
+            # cost fields, deliberately, so the top-level figure is already the leads' own and
+            # needs no subtraction. The two halves come from different places and are each
+            # self-contained.
+            #
+            # `self_tokens` is read off `task_outcome.json` by the caller, NOT off
+            # `results.total_token_usage`: a task that paused on its ceiling reaches
+            # `task_results` carrying no usage, so the orchestrator aggregate reported 27,593
+            # against a true 385,684 on the first run where the ceiling bound. Falls back to
+            # the aggregate when the caller passes nothing, which is what the tests that
+            # construct a bare `results` do.
+            self_tokens=(int(self_tokens) if self_tokens is not None else int(getattr(
+                getattr(results, "total_token_usage", None), "processed_tokens", 0) or 0)),
             nested_tokens=ledger_tokens,
         ).summary(),
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),

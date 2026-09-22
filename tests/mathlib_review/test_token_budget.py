@@ -344,3 +344,43 @@ def test_every_shipped_config_keeps_its_two_blocks_in_step():
         if said:
             drifted[str(path)] = said
     assert not drifted, drifted
+
+
+# --- what the manifest can and cannot see -------------------------------------------------
+
+
+def test_a_paused_task_is_counted_by_the_record_that_exists_for_it(tmp_path):
+    """`OrchestratorResults.total_token_usage` cannot answer this: a task that paused reaches
+    `task_results` carrying no usage, because `worker._try_aggregate` synthesises a bare
+    result with `token_usage=None`. Measured on `pr5_elm_qwen_tokencap_probe1`, where 10 of
+    11 arms stopped on their ceiling: the aggregate said 27,593 against a true 385,684."""
+
+    import json
+
+    from src.mathlib_review.analysis.runs import scheduled_task_tokens
+
+    for index, tokens in enumerate([27_593, 33_547, 39_227]):
+        task = tmp_path / "tasks" / f"t{index}"
+        task.mkdir(parents=True)
+        (task / "task_outcome.json").write_text(json.dumps({"tokens": tokens}))
+    # A lead's children live deeper and are the manifest's `nested_tokens`, off the ledger.
+    nested = tmp_path / "tasks" / "t0" / "samples" / "0" / "attempts" / "a" / "subtasks" / "w"
+    (nested / "tasks" / "child").mkdir(parents=True)
+    (nested / "tasks" / "child" / "task_outcome.json").write_text(json.dumps({"tokens": 999}))
+
+    assert scheduled_task_tokens(tmp_path) == 27_593 + 33_547 + 39_227
+
+
+def test_an_unreadable_outcome_contributes_nothing_rather_than_failing(tmp_path):
+    import json
+
+    from src.mathlib_review.analysis.runs import scheduled_task_tokens
+
+    good = tmp_path / "tasks" / "good"
+    good.mkdir(parents=True)
+    (good / "task_outcome.json").write_text(json.dumps({"tokens": 100}))
+    bad = tmp_path / "tasks" / "bad"
+    bad.mkdir(parents=True)
+    (bad / "task_outcome.json").write_text("{ truncated")
+
+    assert scheduled_task_tokens(tmp_path) == 100

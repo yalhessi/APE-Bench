@@ -59,6 +59,7 @@ from src.mathlib_review.schema import (
 )
 
 from src.mathlib_review.agenda.agenda import agenda_report, build_agenda, initial_jobs
+from src.mathlib_review.analysis.runs import scheduled_task_tokens
 from src.mathlib_review.review.candidates import anchoring_report
 from src.mathlib_review.agenda.arms import GENERALIST_ARM_ID
 from src.mathlib_review.agenda.census import build_census, census_report
@@ -1565,6 +1566,11 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         context_calls_total=(
             len(list(jsonl_rows(trace_path))) if dataset.routing_mode == "solo"
             and trace_path.is_file() else None),
+        # Off the scratch tree, because a task that paused on its ceiling carries no usage
+        # into `results`. On a zero-priced model this is the only figure in the manifest that
+        # says what the run consumed.
+        self_tokens=sum(scheduled_task_tokens(path)
+                        for path in _scratch_dirs(dataset.run_name, scaffold)),
     )
     write_once(out / "run_manifest.json", pretty_json_bytes(manifest.model_dump(mode="json")))
     _record_stage(out, dataset, plan, manifest, summary, logger)

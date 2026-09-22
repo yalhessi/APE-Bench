@@ -230,12 +230,39 @@ def _quantile(values: List[float], fraction: float) -> float:
     return ordered[min(len(ordered) - 1, round(fraction * (len(ordered) - 1)))]
 
 
+def _task_types(scratch: Path) -> Dict[str, str]:
+    """`task directory -> task_type`, from the record written for every scheduled task.
+
+    A paused attempt has no result and therefore no `task_type` on it, and a run whose jobs
+    all hit their ceiling would otherwise report its whole distribution as `unknown`.
+    `task_outcome.json` exists precisely because `task_result.json` is reserved for a legal
+    successful submission.
+    """
+
+    types: Dict[str, str] = {}
+    for path in scratch.rglob("task_outcome.json"):
+        try:
+            types[str(path.parent)] = json.loads(
+                path.read_text(encoding="utf-8")).get("task_type") or ""
+        except Exception:  # noqa: BLE001 - an unreadable outcome leaves the role unknown
+            continue
+    return types
+
+
 def token_census(run_names: Iterable[str], *,
                  scratch_root: Path = Path(".ape/runs")) -> Dict[str, Any]:
     """Per-role processed-token distributions, and the tokens-per-billed-dollar rate.
 
-    Reads every attempt's own record, so a paused attempt counts: it consumed its tokens
-    whether or not it produced a result, which is exactly the case the ceiling exists for.
+    Reads `Attempt.tokens`, so a paused attempt counts: it consumed its tokens whether or not
+    it produced a result, which is exactly the case the ceiling exists for -- and the paused
+    ones are the heavy ones by construction, so dropping them understates a run precisely
+    where it matters. The first version of this read `result.token_usage`, which a pause
+    never writes: on the ELM probe it saw 1 attempt of 11 and reported the distribution of
+    the single job that finished under the ceiling.
+
+    `result.token_usage` stays as the fallback for runs recorded before `Attempt.tokens`
+    existed. Those lose their paused attempts, which is a property of what was written down
+    at the time and not something this can recover; `recover()` above is what reads them.
 
     **The lead rows are the lead's OWN turns.** Costs bubble from children to parents and
     token counts do not -- `subtasks.nested_usage` fills only the cost fields -- so an
@@ -250,18 +277,26 @@ def token_census(run_names: Iterable[str], *,
         scratch = scratch_root / run_name
         if not scratch.is_dir():
             continue
+        types = _task_types(scratch)
         for path, sample in _iter_samples(scratch):
+            # `<task dir>/samples/<n>/sample.json`
+            task_type = types.get(str(path.parent.parent.parent), "")
             for attempt in sample.get("attempts") or []:
                 result = attempt.get("result") or {}
                 usage = result.get("token_usage") or {}
-                tokens = int(usage.get("total_tokens")
+                tokens = int(attempt.get("tokens")
+                             or usage.get("total_tokens")
                              or (int(usage.get("input_tokens") or 0)
                                  + int(usage.get("output_tokens") or 0)))
                 if not tokens:
                     continue
                 rows.append({
                     "run": run_name,
-                    "role": _CENSUS_ROLES.get(result.get("task_type"), "other"),
+                    "role": _CENSUS_ROLES.get(
+                        result.get("task_type") or task_type, "other"),
+                    # Only the aggregate survives on a paused attempt, so the input/output
+                    # split is unknown there rather than zero.
+                    "split_known": bool(usage),
                     "tokens": tokens,
                     "input_tokens": int(usage.get("input_tokens") or 0),
                     "output_tokens": int(usage.get("output_tokens") or 0),
@@ -277,6 +312,7 @@ def token_census(run_names: Iterable[str], *,
     for role in sorted({row["role"] for row in rows}):
         group = [row for row in rows if row["role"] == role]
         tokens = [row["tokens"] for row in group]
+        split = [row for row in group if row["split_known"]]
         by_role[role] = {
             "n": len(group),
             "p50": _quantile(tokens, 0.50),
@@ -284,31 +320,36 @@ def token_census(run_names: Iterable[str], *,
             "p99": _quantile(tokens, 0.99),
             "max": max(tokens),
             "mean": round(sum(tokens) / len(tokens)),
-            "output_share": round(sum(row["output_tokens"] for row in group)
-                                  / sum(tokens), 4),
+            # Over the attempts whose split survives, and null when none does. Reporting 0.0
+            # for a paused attempt would read as "it generated nothing", which is the
+            # opposite of why it paused.
+            "output_share": (round(sum(row["output_tokens"] for row in split)
+                                   / sum(row["tokens"] for row in split), 4)
+                             if split else None),
+            "output_share_n": len(split),
             "turns_p50": _quantile([row["turns"] for row in group], 0.50),
         }
 
-    # Per run, and only where no lead muddies the denominator: a run whose leads bubble their
-    # children's dollars cannot state a rate from its recorded costs, and saying so beats
-    # printing a number that is wrong by however much the leads delegated.
-    rates = {}
+    # Per run, with the reason stated wherever there is no rate to state. Two different
+    # reasons, and conflating them would hide the one that matters: a run whose leads bubble
+    # their children's dollars cannot divide its own tokens by its own cost, and a run on a
+    # model priced 0.0 has no denominator at all -- which is the entire premise of the token
+    # ceiling rather than a gap in the measurement.
+    rates: Dict[str, Any] = {}
     for run_name in sorted({row["run"] for row in rows}):
         group = [row for row in rows if row["run"] == run_name]
         if any(row["role"] == "lead" for row in group):
-            rates[run_name] = None
+            rates[run_name] = "no rate: nested spend is inside this run's recorded costs"
             continue
         billed = sum(row["recorded_billed"] for row in group)
-        rates[run_name] = (round(sum(row["tokens"] for row in group) / billed)
-                           if billed else None)
-    stated = [value for value in rates.values() if value]
+        rates[run_name] = (round(sum(row["tokens"] for row in group) / billed) if billed
+                           else "no rate: nothing was billed, the model is priced 0.0")
+    stated = [value for value in rates.values() if isinstance(value, int)]
     return {
         "attempts": len(rows),
         "by_role": by_role,
         "tokens_per_billed_dollar": rates,
         "tokens_per_billed_dollar_median": (_quantile(stated, 0.50) if stated else None),
-        "note": ("runs containing a lead report no rate: an attempt's recorded cost is "
-                 "inclusive of what its children spent and its token count is not."),
     }
 
 
