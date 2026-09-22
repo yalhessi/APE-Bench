@@ -175,7 +175,7 @@ wall-clock budget accordingly, and do not read a slow run as a large one.
   That is a fix at the reader: every other consumer of `total_token_usage` still sees the short
   number, and on a paid run `total_cached_cost` is short the same way.
 
-## Reasoning is the other axis, and it was not being recorded
+## Reasoning is the other axis, and it was neither recorded nor kept
 
 `reasoning_effort` moves Qwen's completion tokens by about two orders of magnitude (4 against
 451 on one arithmetic prompt) and its latency by about 23x. `elm_qwen_3.5` reasons by default
@@ -184,6 +184,33 @@ and a token distribution measured without stating the setting is unreadable. The
 `LLMConfig.reasoning_effort`, inside `scaffold_config_sha256`; the per-model measurements are
 in `MODEL_MAPPINGS`. The parameter is `reasoning_effort` — `reasoning: null` returns HTTP 200,
 leaves reasoning on, and reports nothing.
+
+**What is separable on a local model, and what is not.** The reasoning *text* comes back in its
+own field and never mixed into `content` — `message.reasoning` non-streaming,
+`delta.reasoning` streaming, `null` when reasoning is off. The reasoning *token count* does
+not: the gateway sends no `completion_tokens_details` at all, so `completion_tokens` is
+reasoning plus answer undifferentiated. vLLM can emit that breakout when a reasoning parser is
+configured, so it is a reasonable thing to ask ELM to enable; failing that the count is
+recoverable by tokenizing the text.
+
+This repo was reading only `reasoning_content`, the DeepSeek and older-vLLM spelling, so on an
+ELM model with reasoning on it kept the answer and dropped the thinking — a 2,551-character
+trace and about 75% of the completion tokens, absent from the session record, on a project
+whose method is reading what the agent did. Both spellings are now normalised at the boundary
+(`llm_clients/models.py::REASONING_KEYS`) and the trace arrives as a thinking block on both
+transports.
+
+**On commercial models the count is not a separate currency.** Reasoning tokens are output
+tokens: billed at the output rate, inside the completion/output count, against the output
+limit, on every frontier provider. What varies is visibility — OpenAI breaks them out as
+`completion_tokens_details.reasoning_tokens` without returning the text, Anthropic returns the
+thinking blocks, Gemini reports `thoughtsTokenCount`. So `processed_tokens` already counts them
+correctly everywhere and the cost model already prices them at `output_per_1M`; nothing in the
+ceiling needs a reasoning-specific case.
+
+Which leaves one open question, in [reasoning-in-the-arms.md](../todo/reasoning-in-the-arms.md):
+all 2,857 arm attempts behind the caps above report `reasoning_tokens: 0`, and the config field
+that appears to control thinking is inert for every provider this project uses.
 
 Not yet measured: the uncensored distributions on an ELM open-weight model. A 397B MoE may be more or less
 verbose per turn than `gpt_5.2`, and until one full rep exists the caps above are calibrated on
