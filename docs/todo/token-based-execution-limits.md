@@ -1,9 +1,9 @@
 # A token-based ceiling in `ExecutionLimits`
 
-**Status** — **CLOSED 2026-09-22.** Built and calibrated; the live check on a local model is the
-one thing outstanding and needs `ELM_API_KEY` in the launching shell. See the closing note at the
-foot of this file. The entry stands as written, because the reason it was open is part of the
-record.
+**Status** — **CLOSED 2026-09-22.** Built, calibrated, and checked live: 10 of 11 arms on
+`elm_qwen_3.5` stopped on `paused_token_limit` at $0.00 billed
+(`results/pr_review_v5/runs/pr5_elm_qwen_tokencap_probe1`). See the closing note at the foot of
+this file. The entry stands as written, because the reason it was open is part of the record.
 **Cost** — no spend (code), plus one cheap rep on a local model to check the ceiling binds
 **Motivating example** — Every cap this project relies on is denominated in dollars, and the
 Edinburgh ELM gateway serves four open-weight models that cost nothing per token. Priced
@@ -88,6 +88,20 @@ the concrete answer to "bounded by nothing the run plan records": the caps are a
 *this* ceiling and left open for scheduling; see the last section of the calibration write-up and
 [wall-clock-arm-runtime.md](wall-clock-arm-runtime.md).
 
-**Still outstanding:** the cheap rep on a local model, which needs `ELM_API_KEY`. The caps are
-calibrated on `gpt_5.2` behaviour and applied to a model nobody has watched; the first ELM rep
-should be read against the arm p50/p90 in the write-up before anything is concluded from it.
+**The live check, done.** `pr5_elm_qwen_tokencap_probe1`: `elm_qwen_3.5` at
+`reasoning_effort=high`, fanout on the control PR 33438, `standard_budget_tokens=30000`. Ten of
+eleven arms stopped on `paused_token_limit` at 32,145-41,319 tokens, each logging `Token limit
+exceeded: NN,NNN >= limit 30,000 (billed $0.000000)`; 396,769 tokens for $0.00. Run twice, 10 of
+11 both times.
+
+**What is still open, and why it is not this entry.** The ELM distribution is *censored* -- ten
+of eleven arms were cut, so they are lower bounds and Qwen's p50 says where the cap is, not what
+the model consumes. An uncensored rep at the real 360,000 cap would give it, and would need to
+state its `reasoning_effort`, since Qwen at `none` and at `high` are different measurements
+(4 against 451 completion tokens on one prompt). That is a calibration refinement on a ceiling
+that now exists and binds, not the hole this entry described. It is written up in
+[the calibration](../research/2026-09-22-token-budget-calibration.md) rather than kept open here.
+
+Two defects the live run exposed are in
+[framework-defects-2026-09.md](framework-defects-2026-09.md): the manifest under-reporting a run
+by 14x when its tasks pause, and `fanout`'s status counters being structurally zero.
