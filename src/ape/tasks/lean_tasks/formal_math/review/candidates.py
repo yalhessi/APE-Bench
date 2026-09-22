@@ -397,9 +397,17 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         )], None
 
     def _patch_set_workspace(self):
-        """The reviewed workspace this task compiles in, or `None`."""
+        """The reviewed workspace this task compiles in, or `None`.
 
-        root = getattr(self, "target_workspace", None)
+        `target_workspace` is a `WorkspaceInfo`, not a path (`ape/tasks/base.py`), so this read
+        `.path` the way every other consumer does -- `_edited_file_code`, `_resolve_decl_lines`
+        and through them `lean_verify_edit`. It used to call `Path(root)` on the model, which
+        raises `TypeError` on the first real coordinated patch; the test that guarded it
+        assigned a *string*, so it agreed with itself and not with the class.
+        """
+
+        workspace = getattr(self, "target_workspace", None)
+        root = getattr(workspace, "path", None) if workspace is not None else None
         return Path(root) if root else None
 
     async def _verify_candidate_submission(
