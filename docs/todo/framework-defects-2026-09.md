@@ -56,6 +56,21 @@ outcome's. It stops being harmless the moment anything resumes a wave.
 **What would close it:** pass the child's limit where one exists. The ledger vocabulary must
 not move with it — `ledger_status` is what the routing analysis reads.
 
+*Widened 2026-09-22.* The token ceiling was built with the same defect on purpose. `can_execute`
+now takes `sample_max_tokens` beside `sample_max_cost` and both come from the orchestrator, so
+fixing one half alone would leave the two halves of one ceiling disagreeing about what resumable
+means. Fix them together.
+
+*And a second, adjacent one found by the same measurement.* `Sample.get_accumulated_cached_cost`
+— what the cost branch of `can_execute` reads — sums `attempt.cached_cost`, which for a lead is
+**inclusive of its children**: `runner._merge_token_usage` folds `nested_token_usage` into the
+result before the worker writes it. So a lead's resumability is decided by comparing a
+self-plus-nested figure against a ceiling the conversation loop enforced on its own turns alone.
+On the held-out runs leads recorded a median $0.712 inclusive against $0.067 of their own, so the
+comparison is off by roughly 10x in the direction that refuses a legitimate resume.
+`attempt.tokens` is deliberately self-only and does not inherit this; the two should agree once
+this is fixed, and `subtasks.nested_usage` is where the asymmetry is documented.
+
 ## 4. A synthesised failure is written as a result, against the rule that says not to
 
 The 2026-09-06 plan states it: *"Never synthesize a result to represent a failure or pause."*

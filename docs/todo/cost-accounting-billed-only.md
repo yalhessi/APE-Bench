@@ -28,6 +28,14 @@ table ([`providers/base.py:278`](../../src/ape/llm_clients/providers/base.py#L27
 `(input + cache_read) × input_rate + output × output_rate`. Tokens are already on disk, so the field
 carries no information that could not be recomputed at analysis time.
 
+*Amended 2026-09-22.* "Tokens are already on disk" is true per attempt and was **not** true for a
+parent: `subtasks.nested_usage` filled only the cost fields, so a lead's recorded `token_usage`
+carried its children's dollars and only its own tokens. Recomputing nominal from the persisted
+counts would therefore have come out ~11.5x low for every lead row. The token half now lives on
+`UsageBreakdown.self_tokens` / `nested_tokens`, deliberately beside the costs rather than folded
+into the flat `TokenUsage` — see `subtasks.nested_usage` for why. With that, the recompute this
+entry proposes is available at every level.
+
 The one rationale in its own docstring — "For reporting cache effectiveness, nothing else"
 ([`orchestration/models.py:420-423`](../../src/ape/orchestration/models.py#L420-L423)) — does not
 survive contact with how cache effectiveness is actually measured here. The live number in

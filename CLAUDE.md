@@ -78,7 +78,7 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
 |---|---|
 | Run a batch of tasks | `TaskOrchestrator` (`src/ape/orchestration/orchestrator.py`): standard layout `.ape/runs/<run>/tasks/<id>/samples/<n>/attempts/`, resumable. Never a loop over `TaskRunner.run_task`. |
 | Nested or delegated work inside a task | `BaseTask.spawn_subtasks` with `orchestration/subtasks.py::nested_config` |
-| Per-task budget | `ExecutionLimits` (task-data key `execution_limits`); caps bind **billed** cost |
+| Per-task budget | `ExecutionLimits` (task-data key `execution_limits`): `billed_cost_limit` binds **billed** cost, `token_limit` binds **processed tokens** (prompt + completion, cache-inclusive). Two fields on one object, enforced at one checkpoint — never a second limiter. A zero-priced model needs the token half; nothing converts between them. Calibration: `docs/research/2026-09-22-token-budget-calibration.md` |
 | Usage and outcome | `UsageBreakdown`, `TaskOutcome / SampleOutcome / AttemptOutcome` in `orchestration/models.py`; `task_result.json` only for a legal successful submission |
 | A new task | subclass `BaseTask` / `BaseLeanTask` under `src/ape/tasks/`. Review tasks build on `src/ape/tasks/lean_tasks/formal_math/review/` (`base.py`, `ReviewArmTask`, `ReviewLeadTask`). `ape/tasks/__init__.py` imports every task package eagerly, so a task class outside that tree cannot import `ape.tasks.base` without a cycle; do not retry moving the base out. |
 | Run configs | the standard scaffold YAML (`llm_config / execution / task_config / scaffold_type`), `extends:`, `extra="forbid"`, overrides as repeated `--set key=value` |
@@ -136,8 +136,7 @@ go through the University of Edinburgh gateway. Separate variables on purpose �
 exported in the same shell and neither may stand in for the other. `elm_*` names are their own
 canonical models, not a `base_url` override, so the run plan records which endpoint produced a run;
 switching one forks the judge cache, so switch at a run boundary. The four open-weight `elm_*`
-models are priced at **0.0**, which makes every dollar cap vacuous and `cli plan`'s budget report
-unable to say so — `max_turns`/`max_delegations` are the only real bounds until
-`docs/todo/token-based-execution-limits.md` lands. Llama 3.3 and EuroLLM are served without
-tool-calling and are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are
-agent-capable.
+models are priced at **0.0**, which makes every dollar cap vacuous; the token block in
+`configs/bases/v5_generation.yaml` is what bounds a run on one, and `cli plan` refuses a
+zero-priced run that has left it unset. Llama 3.3 and EuroLLM are served without tool-calling and
+are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are agent-capable.
