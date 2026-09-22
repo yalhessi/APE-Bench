@@ -26,6 +26,9 @@ dataset:
   # Measured so far: $0.040 billed on 33438, the smallest PR in the corpus. Expect more on the
   # larger ones; the cap is a ceiling, not a forecast.
   solo_cost_cap: 1.50
+  # Token twin at the calibrated 1,200,000 tokens per billed dollar. Stated here even
+  # though it equals the base's value, so the pair moves together when this is retuned.
+  solo_token_cap: 1800000
 
   # The generalist arm's grant. The scheduled design's own control keeps all four "because
   # that is the point of a control"; this is a control too, so a narrower grant would make an

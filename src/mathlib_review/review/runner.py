@@ -32,7 +32,7 @@ from pydantic import ConfigDict, BaseModel, Field
 
 from ape.orchestration import TaskOrchestrator
 from ape.orchestration.execution_index import INDEX_FILENAME as EXECUTION_INDEX_FILENAME
-from ape.orchestration.models import EXECUTION_LIMITS_KEY
+from ape.orchestration.models import EXECUTION_LIMITS_KEY, execution_limits_payload
 from ape.tasks.base import create_task_from_data
 from ape.utils import parse_cli_args
 from ape.llm_clients.config import COST_MODELS
@@ -167,12 +167,36 @@ class V5DatasetConfig(BaseModel):
     lead_cost_cap: float = 2.0
     per_pr_cost_cap: float = 8.0
     max_delegations: int = 60
+
+    #: The same three caps in processed tokens, plus `solo` and the run total below.
+    #:
+    #: Every dollar cap above is satisfied by any run whatsoever on a model priced 0.0, which
+    #: is what the four locally hosted `elm_*` models cost, so on those the whole block is
+    #: decorative and `max_turns`/`max_delegations` are the only bounds. These are the ceilings
+    #: that survive a zero price. They are not derived from the dollar caps at runtime -- no
+    #: exchange rate is applied anywhere in the code -- but the *defaults* were picked so the
+    #: two denominations authorise the same work, at a measured 1,200,000 processed tokens per
+    #: billed dollar (16 runs, median 1,230,650, range 1.01M-1.70M; see
+    #: docs/research/2026-09-22-token-budget-calibration.md). Their ratios match the dollar
+    #: caps' exactly, which is what keeps "how many jobs may a lead buy" the same number.
+    #:
+    #: 0 disables one, and a run on a zero-priced model with these disabled is refused by
+    #: preflight rather than started unbounded.
+    #: Twins of the three dollar defaults above at the calibrated 1,200,000 processed tokens
+    #: per billed dollar, so a config that states neither block gets the same ratios in both.
+    #: The *calibrated* values live in configs/bases/v5_generation.yaml beside the dollar caps
+    #: they were measured against; these, like their dollar counterparts, are only the shape.
+    standard_budget_tokens: int = 300_000
+    lead_token_cap: int = 2_400_000
+    per_pr_token_cap: int = 9_600_000
     #: `solo` only. The per-task billed ceiling for a whole-PR reviewer, and the instrument of
     #: the cost-matched comparison: set it to the *measured* billed per-PR spend of the `lead`
     #: run it is being compared against, not to `per_pr_cost_cap`, which is a ceiling no run
     #: has ever exhausted. Measured on the reference runs: $0.767/PR (`pr5_smoke4_rep9`) and
     #: $0.784/PR (`heldout11_rep2`), with a per-PR maximum of $1.445.
     solo_cost_cap: float = 1.50
+    #: `solo` only, the token twin of `solo_cost_cap`. 0 disables it.
+    solo_token_cap: int = 1_800_000
     #: `solo` only. The retrieval grant, defaulting to the generalist arm's four — the
     #: scheduled design's own control keeps all of them "because that is the point of a
     #: control", and a narrower grant here would make an information difference read as an
@@ -205,6 +229,13 @@ class V5DatasetConfig(BaseModel):
     #: Checked in preflight against the agenda's own floor estimate, so a run that cannot fit
     #: is refused before the first model call rather than discovered on the invoice.
     run_total_cost_cap: float = 0.0
+
+    #: The whole run's ceiling in processed tokens. 0 disables it.
+    #:
+    #: Checked in the same preflight and in the same way, against the same floor estimate
+    #: counted in tokens. On a zero-priced model this is the only one of the two that can
+    #: refuse anything, which is the whole reason it exists.
+    run_total_token_cap: int = 0
 
 
 def load_run(config_path: Path, overrides: Optional[Dict[str, Any]] = None):
@@ -414,10 +445,14 @@ def _solo_task_data(agenda, episodes, dataset, cutoff_by_episode: Dict[str, str]
             # retrieval call. The first paid run lost 3 of 3 that way and still closed clean.
             "invocation_id": f"{episode.episode_id}#{SOLO_ARM_ID}",
             "trace_path": str(trace_path),
-            # Caps bind BILLED cost. The whole point of the condition is a cost-matched
-            # comparison, so the ceiling is per task and stated by the run rather than
-            # inherited from an orchestrator-wide setting.
-            EXECUTION_LIMITS_KEY: {"billed_cost_limit": dataset.solo_cost_cap},
+            # Caps bind BILLED cost, and the token ceiling beside it binds processed tokens.
+            # The whole point of the condition is a cost-matched comparison, so the ceiling is
+            # per task and stated by the run rather than inherited from an orchestrator-wide
+            # setting. Both halves travel, because a solo run on a zero-priced model is matched
+            # on the half that is not zero.
+            EXECUTION_LIMITS_KEY: execution_limits_payload(
+                billed_cost_limit=dataset.solo_cost_cap,
+                token_limit=dataset.solo_token_cap),
             "target_workspace": {
                 "name": "target",
                 "commit_hash": episode.base_sha,
@@ -776,7 +811,161 @@ def assert_the_judge_model_is_pinned(dataset, logger) -> None:
             "from this run are not strictness results.")
 
 
-def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = False) -> None:
+def _report_token_budget(dataset, report, pr_count: int, logger, *,
+                         enforce: bool = False) -> None:
+    """The dollar budget report's twin, against `run_total_token_cap`.
+
+    Same shape and same refusals as `_report_budget`, one denomination over: `solo` has no
+    coverage floor to count, every other mode checks the floor against the run total, and a
+    floor that alone exceeds the cap is refused rather than warned about. Kept as its own
+    function rather than a second currency threaded through the first, because the two
+    differ in exactly one place -- which of them can be `0` meaning "off" -- and the dollar
+    version's every log line would have had to grow a conditional.
+    """
+
+    run_cap = dataset.run_total_token_cap
+
+    if dataset.routing_mode == "solo":
+        committed = dataset.solo_token_cap * pr_count
+        logger.info("token budget: up to %s (%d PR x %s)",
+                    f"{committed:,}", pr_count, f"{dataset.solo_token_cap:,}")
+        if not run_cap:
+            return
+        if committed > run_cap:
+            message = (
+                f"{pr_count} PR x solo_token_cap {dataset.solo_token_cap:,} = "
+                f"{committed:,} tokens, above the run_total_token_cap of {run_cap:,}.")
+            if enforce:
+                raise BudgetTooSmall(message)
+            logger.warning("%s", message)
+        return
+
+    floor = int(report.get("mandatory_floor_tokens") or 0)
+    discretionary_cap = dataset.per_pr_token_cap * pr_count
+    logger.info(
+        "token budget: mandatory floor %s (uncapped per PR by design) + discretionary up to "
+        "%s (%d PR x %s)",
+        f"{floor:,}", f"{discretionary_cap:,}", pr_count, f"{dataset.per_pr_token_cap:,}")
+
+    if not run_cap:
+        return
+    committed = floor + discretionary_cap
+    logger.info("run_total_token_cap %s vs worst case %s (floor + discretionary) - %s",
+                f"{run_cap:,}", f"{committed:,}",
+                "fits" if committed <= run_cap else "DOES NOT FIT")
+    if floor > run_cap:
+        message = (
+            f"the mandatory coverage floor alone is {floor:,} tokens, above the "
+            f"run_total_token_cap of {run_cap:,}. The floor is not optional and not capped "
+            f"per PR, so this run cannot fit as configured. Raise run_total_token_cap, "
+            f"narrow pr_numbers, or turn off generalist_floor."
+        )
+        if enforce:
+            raise BudgetTooSmall(message)
+        logger.warning("%s", message)
+
+
+#: How far the two denominations' implied job counts may drift before the run says so.
+#: Generous on purpose: this is a "did you forget the other block" check, not a policy.
+_DRIFT_TOLERANCE = 0.10
+
+
+def _warn_on_denomination_drift(dataset, logger) -> None:
+    """Say when the dollar and token budgets no longer authorise the same work.
+
+    A child config restates only what it varies, and a config that retunes one block and not
+    the other changes the experiment for one class of model and not the other.
+    `pr_review_v5_smoke4.yaml` is the live example: `per_pr_cost_cap: 2.0` against the base's
+    `standard_budget_cap: 0.30` buys 6.7 standard jobs, while the token block it did not touch
+    buys 5. Two runs "under the same config" then differ by a quarter of the fan-out depending
+    on which model they ran.
+
+    A warning and not a refusal: a deliberately different token policy is a legitimate thing
+    to want, and this cannot tell it apart from an omission. What it can do is make the
+    omission visible at plan time instead of in a comparison three weeks later.
+    """
+
+    pairs = [("per_pr", dataset.per_pr_cost_cap, dataset.per_pr_token_cap),
+             ("lead", dataset.lead_cost_cap, dataset.lead_token_cap),
+             ("run_total", dataset.run_total_cost_cap, dataset.run_total_token_cap)]
+    if not (dataset.standard_budget_cap and dataset.standard_budget_tokens):
+        return
+    for name, dollars, tokens in pairs:
+        if not (dollars and tokens):
+            continue
+        in_dollars = dollars / dataset.standard_budget_cap
+        in_tokens = tokens / dataset.standard_budget_tokens
+        if abs(in_tokens - in_dollars) <= _DRIFT_TOLERANCE * in_dollars:
+            continue
+        logger.warning(
+            "%s_cost_cap buys %.1f standard jobs but %s_token_cap buys %.1f: the two "
+            "denominations no longer authorise the same work. A config that retunes one "
+            "block should retune the other, or this run is a different experiment on a "
+            "priced model than on a free one.",
+            name, in_dollars, name, in_tokens)
+
+
+def _model_is_free(scaffold) -> bool:
+    """Whether this run's model is priced at zero, so no dollar cap can bind it.
+
+    True for the four locally hosted `elm_*` models, which cost the project nothing per token
+    and say so. Unknown models are treated as paid: a model with no row cannot be asserted to
+    be free, and guessing "free" would turn the refusal below into a false alarm on every new
+    model name.
+    """
+
+    from ape.llm_clients.config import MODEL_MAPPINGS
+
+    entry = MODEL_MAPPINGS.get(getattr(getattr(scaffold, "llm_config", None),
+                                       "model_name", None))
+    if entry is None:
+        return False
+    return not (entry.get("input_per_1M") or entry.get("output_per_1M"))
+
+
+def _assert_a_ceiling_binds(dataset, scaffold, logger, *, enforce: bool) -> None:
+    """Refuse a run on a zero-priced model that has no token ceiling.
+
+    Every cap in this config is denominated in dollars except the token block, and on a model
+    priced 0.0 every dollar cap is satisfied by any run whatsoever -- a lead may delegate
+    `max_delegations` jobs of `max_turns` turns each and no budget refuses one of them. That
+    is not a hypothetical shape: it is what the four open-weight ELM models do, and the
+    budget report above would print "$0.00 vs $10.00 -- fits" while describing an unbounded
+    run.
+
+    So the check is about whether *some* ceiling binds, not about which. A paid model is
+    bounded by its dollar caps whatever the token block says.
+    """
+
+    if not _model_is_free(scaffold):
+        return
+    if dataset.routing_mode == "solo":
+        bound = bool(dataset.solo_token_cap)
+        knob = "solo_token_cap"
+    elif dataset.routing_mode == "lead":
+        bound = bool(dataset.standard_budget_tokens and dataset.per_pr_token_cap)
+        knob = "standard_budget_tokens and per_pr_token_cap"
+    else:
+        bound = bool(dataset.standard_budget_tokens)
+        knob = "standard_budget_tokens"
+    if bound:
+        return
+    message = (
+        f"{scaffold.llm_config.model_name} is priced at 0.0 per token, so every dollar cap in "
+        f"this config is satisfied by any run whatsoever -- standard_budget_cap, "
+        f"lead_cost_cap, per_pr_cost_cap and run_total_cost_cap all bind billed spend and "
+        f"there is none. With {knob} unset, the only bounds left are max_turns "
+        f"({dataset.max_delegations} delegations x the scaffold's turn limit), which is not a "
+        f"budget. Set {knob} (see docs/research/2026-09-22-token-budget-calibration.md for "
+        f"the measured values), or run a priced model."
+    )
+    if enforce:
+        raise BudgetTooSmall(message)
+    logger.warning("%s", message)
+
+
+def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = False,
+                   scaffold=None) -> None:
     """Say what this run is committed to before it starts, and refuse it if it cannot fit.
 
     The message this replaces compared the coverage floor against
@@ -787,8 +976,15 @@ def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = Fa
     specialists.
 
     So the two are reported separately, against the caps that actually bind them, and the
-    floor is checked against the run total.
+    floor is checked against the run total -- in both denominations, because on a zero-priced
+    model the dollar half of this report is all zeroes and says nothing.
     """
+
+    if scaffold is not None:
+        _assert_a_ceiling_binds(dataset, scaffold, logger, enforce=enforce)
+    if dataset.routing_mode != "solo":
+        _warn_on_denomination_drift(dataset, logger)
+    _report_token_budget(dataset, report, pr_count, logger, enforce=enforce)
 
     run_cap = dataset.run_total_cost_cap
 
@@ -870,6 +1066,7 @@ def coordination_config(dataset) -> CoordinationConfig:
 #: and the evaluation settings all do.
 RESUMABLE_PLAN_FIELDS = frozenset({
     "lead_cost_cap", "standard_budget_cap", "per_pr_cost_cap",
+    "lead_token_cap", "standard_budget_tokens", "per_pr_token_cap",
     "scaffold_config_sha256",  # carries retries and timeouts, which a resume may raise
     "git_commit", "git_tree_state",  # provenance of *this* attempt, not of the experiment
     "source_sha256",             # derived from the above
@@ -963,6 +1160,9 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
         lead_cost_cap=dataset.lead_cost_cap,
         standard_budget_cap=dataset.standard_budget_cap,
         per_pr_cost_cap=dataset.per_pr_cost_cap,
+        lead_token_cap=dataset.lead_token_cap,
+        standard_budget_tokens=dataset.standard_budget_tokens,
+        per_pr_token_cap=dataset.per_pr_token_cap,
         coordination=coordination_config(dataset).report(),
         evaluation_settings={
             "execution_release": (str(dataset.execution_release)
@@ -1201,7 +1401,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # tell you what the real run would do could not tell you it would not start.
         guard_run_name(dataset, logger, scaffold, fatal=False)
         logger.info("%s", json.dumps(report, indent=2))
-        _report_budget(dataset, report, len(selected_prs), logger)
+        _report_budget(dataset, report, len(selected_prs), logger, scaffold=scaffold)
         assert_coverage_is_reachable(dataset, report, logger)
         assert_the_judge_model_is_pinned(dataset, logger)
         # Resolving cutoffs during a dry run is the cheapest place to discover that a gated
@@ -1220,7 +1420,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
                     plan.agenda_sha256[:12], len(plan.prompt_sha256_by_invocation))
         return None
 
-    _report_budget(dataset, report, len(selected_prs), logger, enforce=True)
+    _report_budget(dataset, report, len(selected_prs), logger, enforce=True,
+                   scaffold=scaffold)
     assert_coverage_is_reachable(dataset, report, logger)
     assert_the_judge_model_is_pinned(dataset, logger)
     guard_run_name(dataset, logger, scaffold)
@@ -1268,17 +1469,22 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
             "standard_budget_cap": dataset.standard_budget_cap,
             "max_delegations": dataset.max_delegations,
             "per_pr_cost_cap": dataset.per_pr_cost_cap,
+            "standard_budget_tokens": dataset.standard_budget_tokens,
+            "per_pr_token_cap": dataset.per_pr_token_cap,
         }
         scaffold.execution.sample_max_cost = dataset.lead_cost_cap
+        scaffold.execution.sample_max_tokens = dataset.lead_token_cap or None
     elif dataset.routing_mode == "solo":
         # No census, no arm pool, no journal: there is nothing to route. The agenda was still
         # built and sealed above, which is what makes this run's `agenda_report.json` scope
         # identically to the `lead` run on the same config.
         data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path)
         scaffold.execution.sample_max_cost = dataset.solo_cost_cap
+        scaffold.execution.sample_max_tokens = dataset.solo_token_cap or None
     else:
         data = _direct_arm_task_data(agenda, pool, cutoff_by_episode, trace_path)
         scaffold.execution.sample_max_cost = dataset.standard_budget_cap
+        scaffold.execution.sample_max_tokens = dataset.standard_budget_tokens or None
 
     await assert_workspaces_prebuilt(
         data, required=dataset.require_prebuilt_workspaces)

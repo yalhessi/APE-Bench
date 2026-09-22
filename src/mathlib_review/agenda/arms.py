@@ -58,6 +58,20 @@ GENERALIST_ARM_ID = "generalist"
 #: made every dry-run projection pessimistic by the same factor.
 COST_HINT_PER_WORK_UNIT = 0.05
 
+#: The same hint in processed tokens, for the run-total token ceiling's preflight.
+#:
+#: Measured 2026-09-22 over 2,857 arm attempts on nine v5 runs: median 35,276, mean 47,594,
+#: p90 87,589 (docs/research/2026-09-22-token-budget-calibration.md). 60,000 sits above the
+#: mean by the same ~1.3x the dollar hint sits above its own, so the two projections are
+#: equally conservative and a run that fits in one fits in the other.
+#:
+#: A module constant rather than a field on `ReviewArm` deliberately: `cost_hint` is inside
+#: `arm_sha256_by_id`, so a token twin beside it would re-hash every arm, every agenda and
+#: every sealed plan for a number no arm varies. Both call sites here pass the same value, so
+#: a count times this constant is exactly the sum. If arm hints ever diverge, this has to move
+#: onto the arm and take the re-hash.
+TOKEN_HINT_PER_WORK_UNIT = 60_000
+
 
 
 #: Lifecycles a v5 specialist may be scheduled on.

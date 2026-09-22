@@ -123,7 +123,8 @@ def reconcile(
             )
 
     counted = {"mandatory": 0, "proposed": 0, "agent_added": 0, "pruned": 0}
-    statuses = {"success": 0, "failed": 0, "paused_cost": 0, "paused_turns": 0}
+    statuses = {"success": 0, "failed": 0, "paused_cost": 0, "paused_tokens": 0,
+                "paused_turns": 0}
     total_cost = 0.0
     context_calls = 0
     for record in delegations:
@@ -166,13 +167,21 @@ def reconcile(
         float(record.get("cost") or 0.0) for record in delegations
         if record.get("disposition") != "mandatory"
     )
+    # The children's processed tokens, which is the one figure above that is not zero on a
+    # model priced 0.0. Absent from rows written before the token ceiling existed, and read as
+    # zero there rather than refused: an old ledger genuinely does not know.
+    ledger_tokens = sum(
+        int((record.get("token_usage") or {}).get("tokens") or 0)
+        for record in delegations
+    )
 
     # A job that ran and recorded no cost is unattributed spend: the money left the account
     # and the ledger cannot say for what. That is the shape of the bug this function just
     # had, so it fails loudly rather than being found by hand two runs later.
     unattributed = [
         record.get("invocation_id") for record in delegations
-        if record.get("status") in ("success", "paused_cost", "paused_turns")
+        if record.get("status") in ("success", "paused_cost", "paused_tokens",
+                                    "paused_turns")
         and record.get("cost") is None
     ]
     if unattributed:
@@ -194,7 +203,8 @@ def reconcile(
         mandatory=counted["mandatory"],
         succeeded=statuses["success"],
         failed=statuses["failed"],
-        paused=statuses["paused_cost"] + statuses["paused_turns"],
+        paused=(statuses["paused_cost"] + statuses["paused_tokens"]
+                + statuses["paused_turns"]),
         # The root total is read once, not assembled. The lead now bubbles what its children
         # spent through `BaseTaskResult.nested_token_usage`, which the scaffold merges into the
         # task's own usage and the worker writes to `attempt.cost` — so `results.total_cost`
@@ -232,6 +242,13 @@ def reconcile(
             nested_billed=round(ledger_cost, 6),
             nested_nominal=round(ledger_nominal, 6),
             budget_charged=round(ledger_charged, 6),
+            # Tokens do NOT bubble the way costs do: `subtasks.nested_usage` fills only the
+            # cost fields, deliberately, so `results.total_token_usage` is already the leads'
+            # own and needs no subtraction. The two halves therefore come from different
+            # places and are each self-contained.
+            self_tokens=int(getattr(
+                getattr(results, "total_token_usage", None), "processed_tokens", 0) or 0),
+            nested_tokens=ledger_tokens,
         ).summary(),
         wall_seconds=float(getattr(results, "wall_clock_time", 0.0) or 0.0),
         candidates_total=candidates_total,

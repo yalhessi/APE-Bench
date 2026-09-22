@@ -48,7 +48,8 @@ from src.mathlib_review.review.task_adapter import (
     build_focused_task_data,
 )
 
-from src.mathlib_review.agenda.arms import ARM_TASK_TYPE, GENERALIST_ARM_ID, default_arms, specs_by_arm_id
+from src.mathlib_review.agenda.arms import (
+    ARM_TASK_TYPE, GENERALIST_ARM_ID, TOKEN_HINT_PER_WORK_UNIT, default_arms, specs_by_arm_id)
 from src.mathlib_review.agenda.components import build_components, centrality
 from src.mathlib_review.agenda.exposure import LazyExposureScan, exposed_changes
 from src.mathlib_review.agenda.review_map import build_slices, slices_report, with_context
@@ -469,6 +470,11 @@ def agenda_report(agenda: ReviewAgenda) -> Dict[str, Any]:
         "projected_cost_rules": round(sum(item.cost_hint for item in eligible), 4),
         "mandatory_floor_cost": round(
             sum(item.cost_hint for item in agenda.proposals if item.mandatory), 4),
+        # The same floor in processed tokens, which is the only one of the two that can refuse
+        # anything on a model priced 0.0. A count times the constant, for the reason given at
+        # `TOKEN_HINT_PER_WORK_UNIT`.
+        "mandatory_floor_tokens": TOKEN_HINT_PER_WORK_UNIT * sum(
+            1 for item in agenda.proposals if item.mandatory),
         # What the coverage contract obliges, before the lead sees any of it. Read next to
         # `trace.routing_report`, which says what the lead then did: a contract that requires
         # nothing and a lead that prunes everything produce the same outcome and are entirely

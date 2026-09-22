@@ -52,3 +52,6 @@ dataset:
   # sample. An earlier cut re-samples more and costs more -- `replay` without --execute prices
   # the cut you actually asked for and refuses a run that cannot fit.
   run_total_cost_cap: 40.0
+  # Token twin at the calibrated 1,200,000 tokens per billed dollar; the two budgets
+  # must authorise the same work or `plan` says so.
+  run_total_token_cap: 48000000

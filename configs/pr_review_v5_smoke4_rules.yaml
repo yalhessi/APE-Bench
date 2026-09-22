@@ -19,4 +19,8 @@ dataset:
   - 33438
   standard_budget_cap: 0.2
   per_pr_cost_cap: 4.0
+  # Token twin at the calibrated 1,200,000 tokens per billed dollar; the two budgets
+  # must authorise the same work or `plan` says so.
+  standard_budget_tokens: 240000
+  per_pr_token_cap: 4800000
   max_delegations: 30

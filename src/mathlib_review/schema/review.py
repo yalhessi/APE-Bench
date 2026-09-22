@@ -299,7 +299,8 @@ class DelegationRecord(StrictModel):
     budget_tier: Optional[Literal["cheap", "standard", "deep"]] = None
     budget_cap: Optional[float] = None
     #: `None` for a pruned job, which never executed.
-    status: Optional[Literal["success", "failed", "paused_cost", "paused_turns"]] = None
+    status: Optional[
+        Literal["success", "failed", "paused_cost", "paused_tokens", "paused_turns"]] = None
     wall_seconds: Optional[float] = None
     cost: Optional[float] = None
     #: Whatever the producer recorded, and two producers recorded different things: the
@@ -382,6 +383,13 @@ class V5RunPlan(StrictModel):
     lead_cost_cap: float
     standard_budget_cap: float
     per_pr_cost_cap: float
+    #: The same three ceilings in processed tokens. Sealed for the same reason the dollar
+    #: three are: two runs under different ceilings are not comparable, and on a model priced
+    #: 0.0 these are the only ceilings that bound anything. Defaulted so plans sealed before
+    #: they existed still load; 0 means the cap was off.
+    lead_token_cap: int = 0
+    standard_budget_tokens: int = 0
+    per_pr_token_cap: int = 0
     deterministic_release_sha256: Optional[str] = None
     #: How the lead composed its children, and what its assessments were allowed to do.
     #:

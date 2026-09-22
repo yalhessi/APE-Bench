@@ -288,7 +288,8 @@ def test_a_replay_payload_is_capped_from_the_cut_and_writes_its_own_trace(record
     sources, _ = asyncio.run(select_sources(_dataset()))
     out = recorded_run / "replay_null"
     built, content = replay_payload(sources[0], _dataset(turns_after_cut=3), out)
-    assert built[EXECUTION_LIMITS_KEY] == {"max_turns": 1 + 3, "billed_cost_limit": 0.3}
+    assert built[EXECUTION_LIMITS_KEY] == {"max_turns": 1 + 3, "billed_cost_limit": 0.3,
+                                           "token_limit": 360_000}
     assert built["trace_path"] == str(out / "context_trace.jsonl")
     assert built[SESSION_REPLAY_KEY]["prefix_path"].startswith(str(out / "prefixes"))
     assert built[SESSION_REPLAY_KEY]["source"]["cut_node_index"] == 5

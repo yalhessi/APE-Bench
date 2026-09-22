@@ -141,9 +141,19 @@ class ReplayDatasetConfig(BaseModel):
     #: truncates none of them; an earlier cut needs the turns that follow it too.
     turns_after_cut: int = 8
     per_task_cost_cap: float = 0.30
+    #: The same per-task ceiling in processed tokens, at the calibrated parity with $0.30
+    #: (docs/research/2026-09-22-token-budget-calibration.md). A replay on a zero-priced model
+    #: is bounded by this and by `turns_after_cut`, and by nothing else. 0 disables it.
+    per_task_token_cap: int = 360_000
     #: Required. Checked before the first call against the recorded decision stage priced
     #: uncached, which is what a replay pays once its source's cache has expired.
     run_total_cost_cap: float = Field(gt=0)
+    #: The run's token ceiling, checked against `ceiling_at_task_caps` rather than against a
+    #: recorded figure: the recorded stage's *cost* is on every source and its token count is
+    #: not, so the dollar check can use the measured estimate and this one uses the worst
+    #: case. It is the stricter of the two comparisons, and on a zero-priced model it is the
+    #: only one that can refuse anything. 0 disables it.
+    run_total_token_cap: int = 0
 
 
 class ReplayPlan(BaseModel):
@@ -161,7 +171,9 @@ class ReplayPlan(BaseModel):
     cut_label: str
     turns_after_cut: int
     per_task_cost_cap: float
+    per_task_token_cap: int = 0
     run_total_cost_cap: float
+    run_total_token_cap: int = 0
     sample_count: int
     model_name: str
     prefix_sha256_by_invocation: Dict[str, str]
@@ -425,7 +437,7 @@ def replay_scaffold(sources: List[ReplaySource], execution: Dict[str, Any]):
 def replay_payload(source: ReplaySource, dataset: ReplayDatasetConfig, out: Path):
     """`(payload, prefix bytes)`: the recorded arm task, started from this run's cut."""
 
-    from ape.orchestration.models import EXECUTION_LIMITS_KEY
+    from ape.orchestration.models import EXECUTION_LIMITS_KEY, execution_limits_payload
 
     prefix, index = cut(source.nodes, dataset.cut)
     task_data = {**source.payload,
@@ -440,8 +452,10 @@ def replay_payload(source: ReplaySource, dataset: ReplayDatasetConfig, out: Path
          "cut": dataset.cut.model_dump(mode="json", exclude_none=True),
          "cut_label": dataset.cut.name, "cut_node_index": index})
     turns = payload[SESSION_REPLAY_KEY]["source"]["prefix_assistant_turns"]
-    payload[EXECUTION_LIMITS_KEY] = {"max_turns": turns + dataset.turns_after_cut,
-                                     "billed_cost_limit": dataset.per_task_cost_cap}
+    payload[EXECUTION_LIMITS_KEY] = execution_limits_payload(
+        max_turns=turns + dataset.turns_after_cut,
+        billed_cost_limit=dataset.per_task_cost_cap,
+        token_limit=dataset.per_task_token_cap)
     return payload, content
 
 
@@ -467,7 +481,9 @@ def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySourc
         cut=dataset.cut.model_dump(mode="json", exclude_none=True),
         cut_label=dataset.cut.name, turns_after_cut=dataset.turns_after_cut,
         per_task_cost_cap=dataset.per_task_cost_cap,
-        run_total_cost_cap=dataset.run_total_cost_cap, sample_count=samples,
+        per_task_token_cap=dataset.per_task_token_cap,
+        run_total_cost_cap=dataset.run_total_cost_cap,
+        run_total_token_cap=dataset.run_total_token_cap, sample_count=samples,
         model_name=scaffold.llm_config.model_name or "",
         prefix_sha256_by_invocation={
             payload["invocation_id"]: payload[SESSION_REPLAY_KEY]["prefix_sha256"]
@@ -479,6 +495,7 @@ def build_plan(dataset: ReplayDatasetConfig, scaffold, sources: List[ReplaySourc
             "expected_billed_if_cached": round(billed * samples, 2),
             "expected_billed_if_uncached": round(nominal * samples, 2),
             "ceiling_at_task_caps": round(len(sources) * samples * dataset.per_task_cost_cap, 2),
+            "ceiling_at_task_token_caps": len(sources) * samples * dataset.per_task_token_cap,
         },
         scaffold_config_sha256=sha256_bytes(canonical_json_bytes(
             {key: scaffold.model_dump(mode="json").get(key) for key in _SEMANTIC_SCAFFOLD_KEYS})),
@@ -535,6 +552,15 @@ async def run_replay(dataset: ReplayDatasetConfig, execution: Dict[str, Any], lo
                    f"${plan.estimate['expected_billed_if_uncached']:.2f} at "
                    f"{plan.sample_count} sample(s), above run_total_cost_cap "
                    f"${dataset.run_total_cost_cap:.2f}")
+        if execute:
+            raise ReplayRefused(message)
+        logger.warning("%s; the real run will refuse", message)
+    if (dataset.run_total_token_cap
+            and plan.estimate["ceiling_at_task_token_caps"] > dataset.run_total_token_cap):
+        message = (f"{len(sources)} session(s) x {plan.sample_count} sample(s) x "
+                   f"per_task_token_cap {dataset.per_task_token_cap:,} = "
+                   f"{plan.estimate['ceiling_at_task_token_caps']:,} tokens, above "
+                   f"run_total_token_cap {dataset.run_total_token_cap:,}")
         if execute:
             raise ReplayRefused(message)
         logger.warning("%s; the real run will refuse", message)
