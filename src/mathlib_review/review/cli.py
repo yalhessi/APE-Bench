@@ -193,6 +193,12 @@ def build_parser() -> argparse.ArgumentParser:
     stages = report_sub.add_parser(
         "stages", help="what has happened to this run, and whether its artifacts agree")
     stages.add_argument("--run", required=True)
+    token_census = report_sub.add_parser(
+        "token-census",
+        help="processed tokens per role, and the tokens-per-billed-dollar rate the token "
+             "caps were calibrated against; re-run it when the model changes")
+    token_census.add_argument("--run", action="append", required=True, dest="runs",
+                              help="repeatable; several runs widen the distribution")
     buckets = report_sub.add_parser(
         "buckets",
         help="why each gold obligation ended where it did, and what became of every finding")
@@ -421,6 +427,10 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.report import stages as stages_report
 
         print(json.dumps(stages_report(args.run), indent=2))
+    elif args.report_command == "token-census":
+        from src.mathlib_review.analysis.corrections import token_census
+
+        print(json.dumps(token_census(args.runs), indent=2))
     elif args.report_command == "buckets":
         from src.mathlib_review.analysis.report import buckets as buckets_report
 

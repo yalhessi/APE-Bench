@@ -12,6 +12,13 @@ derivation version, the hash of every source it read, and the figures the ledger
 
 The sidecar is what makes those runs usable as regression fixtures. It is not a score, and the
 runs it describes remain forensic.
+
+`token_census` answers the neighbouring question off the same walk of the same tree: not "what
+did the ledger miss" but "what did each role actually consume", which is what the token
+ceilings in `configs/bases/v5_generation.yaml` were calibrated against. It lives here because
+`_iter_samples` is here; the caps it feeds are in
+`docs/research/2026-09-22-token-budget-calibration.md`, and the rate it reports has to be
+re-measured whenever the model changes.
 """
 
 from __future__ import annotations
@@ -19,7 +26,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
 
@@ -29,8 +36,10 @@ from src.mathlib_review.paths import run_dir
 #: be told apart from one produced by a different rule.
 CORRECTION_VERSION = "v5-correction/1"
 
-#: Attempt statuses that spent money without producing a terminal result.
-_UNBOOKED = {"paused_cost_limit", "paused_max_turns"}
+#: Attempt statuses that consumed budget without producing a terminal result. "Money" was the
+#: right word while every ceiling was a dollar one; a token-paused attempt on a zero-priced
+#: model spent no money and is just as unbooked.
+_UNBOOKED = {"paused_cost_limit", "paused_token_limit", "paused_max_turns"}
 
 
 @dataclass
@@ -203,6 +212,104 @@ def write_sidecar(run_name: str, *, scratch_root: Path = Path(".ape/runs")) -> P
     out.write_text(
         json.dumps(correction.as_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return out
+
+
+#: Which task types the census reports separately. Grouping by `task_type` and not by depth:
+#: an arm run directly by a fanout orchestrator and one run as a lead's child are the same
+#: task under the same ceiling, and splitting them would halve every n for no question.
+_CENSUS_ROLES = {
+    "lean_pr_review_v5_arm": "arm",
+    "lean_pr_review_v5_lead": "lead",
+    "lean_pr_review_v5_solo": "solo",
+    "lean_pr_review_v4_semantic_judgment": "judge",
+}
+
+
+def _quantile(values: List[float], fraction: float) -> float:
+    ordered = sorted(values)
+    return ordered[min(len(ordered) - 1, round(fraction * (len(ordered) - 1)))]
+
+
+def token_census(run_names: Iterable[str], *,
+                 scratch_root: Path = Path(".ape/runs")) -> Dict[str, Any]:
+    """Per-role processed-token distributions, and the tokens-per-billed-dollar rate.
+
+    Reads every attempt's own record, so a paused attempt counts: it consumed its tokens
+    whether or not it produced a result, which is exactly the case the ceiling exists for.
+
+    **The lead rows are the lead's OWN turns.** Costs bubble from children to parents and
+    token counts do not -- `subtasks.nested_usage` fills only the cost fields -- so an
+    attempt's `cost` is inclusive for a lead while its `tokens` are not. Dividing one by the
+    other gives a rate 11.5x too low, which is what the first pass of this measurement did.
+    The rate below is therefore computed from the tokens and a *recomputed* self cost, and is
+    reported per run rather than per task for the same reason.
+    """
+
+    rows: List[Dict[str, Any]] = []
+    for run_name in run_names:
+        scratch = scratch_root / run_name
+        if not scratch.is_dir():
+            continue
+        for path, sample in _iter_samples(scratch):
+            for attempt in sample.get("attempts") or []:
+                result = attempt.get("result") or {}
+                usage = result.get("token_usage") or {}
+                tokens = int(usage.get("total_tokens")
+                             or (int(usage.get("input_tokens") or 0)
+                                 + int(usage.get("output_tokens") or 0)))
+                if not tokens:
+                    continue
+                rows.append({
+                    "run": run_name,
+                    "role": _CENSUS_ROLES.get(result.get("task_type"), "other"),
+                    "tokens": tokens,
+                    "input_tokens": int(usage.get("input_tokens") or 0),
+                    "output_tokens": int(usage.get("output_tokens") or 0),
+                    "cache_read": int(usage.get("cache_read_input_tokens") or 0),
+                    "turns": int(attempt.get("turns") or 0),
+                    "status": str(attempt.get("status") or ""),
+                    # Inclusive of nested spend for a lead; see the docstring.
+                    "recorded_billed": float(attempt.get("cached_cost")
+                                             or attempt.get("cost") or 0.0),
+                })
+
+    by_role: Dict[str, Any] = {}
+    for role in sorted({row["role"] for row in rows}):
+        group = [row for row in rows if row["role"] == role]
+        tokens = [row["tokens"] for row in group]
+        by_role[role] = {
+            "n": len(group),
+            "p50": _quantile(tokens, 0.50),
+            "p90": _quantile(tokens, 0.90),
+            "p99": _quantile(tokens, 0.99),
+            "max": max(tokens),
+            "mean": round(sum(tokens) / len(tokens)),
+            "output_share": round(sum(row["output_tokens"] for row in group)
+                                  / sum(tokens), 4),
+            "turns_p50": _quantile([row["turns"] for row in group], 0.50),
+        }
+
+    # Per run, and only where no lead muddies the denominator: a run whose leads bubble their
+    # children's dollars cannot state a rate from its recorded costs, and saying so beats
+    # printing a number that is wrong by however much the leads delegated.
+    rates = {}
+    for run_name in sorted({row["run"] for row in rows}):
+        group = [row for row in rows if row["run"] == run_name]
+        if any(row["role"] == "lead" for row in group):
+            rates[run_name] = None
+            continue
+        billed = sum(row["recorded_billed"] for row in group)
+        rates[run_name] = (round(sum(row["tokens"] for row in group) / billed)
+                           if billed else None)
+    stated = [value for value in rates.values() if value]
+    return {
+        "attempts": len(rows),
+        "by_role": by_role,
+        "tokens_per_billed_dollar": rates,
+        "tokens_per_billed_dollar_median": (_quantile(stated, 0.50) if stated else None),
+        "note": ("runs containing a lead report no rate: an attempt's recorded cost is "
+                 "inclusive of what its children spent and its token count is not."),
+    }
 
 
 def main() -> None:
