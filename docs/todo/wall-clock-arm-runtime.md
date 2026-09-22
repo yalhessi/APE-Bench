@@ -88,6 +88,19 @@ caller"* — and snapshots are immutable and content-addressed (88 of them under
 `data/code_execute/repos/mathlib4/workspaces/`). The cache is in-process only, so **every rep re-pays
 the full 89 s**. A disk cache keyed by snapshot sha makes this free from the second run onward.
 
+**Added 2026-09-22, and cheaper than the cache: the count is 14 whatever `pr_numbers` says.**
+`build_agenda` filters `units` by `pr_numbers` (`agenda/agenda.py:215-216`) and then loops
+`for graph in graphs` **unfiltered** (`agenda/agenda.py:253-257`), so the scan count is a property of
+the release, not of the run. Measured on a **one-PR** agenda (33145) reached through
+`analysis/bench_cli.py::_payloads_for`: **125.16 s against 0.62 s** with the index off, same 40-entry
+pool, `_scan` called 14 times for the one PR — 104,065 file reads and 12.3 M `json.loads` for
+13 snapshots nothing selected can reference. So a `--pr-numbers` run pays the full-release startup,
+and the disk cache above would make the *second* such run free without making the first one honest.
+Not fixed when found, and this is the risk: `exposure_by_change` feeds `central_changes` →
+`central_ids`, which reaches the sealed plan and the prompt hashes, so filtering `graphs` has to be
+shown to leave the plan byte-identical on a full-set build before it can land. That check is the
+work; the filter itself is one line.
+
 ### Tail: a serial loop on a 64-core machine
 
 `chain.py:170` is a plain `for candidate in candidates:` over **268 candidates**, each running up to

@@ -46,7 +46,7 @@ import re
 import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from src.mathlib_review.io import sha256_bytes
 from src.mathlib_review.paths import CONVENTIONS_TRACKED, assert_repo_root
@@ -126,6 +126,19 @@ def _read(path: Path) -> str:
         return ""
 
 
+def _sources(workspace: Path) -> List[Tuple[Path, str]]:
+    """Every Lean file with its text, read once.
+
+    The three extractors each used to glob and read the tree for themselves, and
+    `extract_library_notes` read it twice over -- four passes across 8,567 files and 96MB for
+    one catalogue, 21.9s of which 16 was re-reading what was already in hand. They still
+    accept a workspace and scan it when called alone; `build` reads once and passes the
+    result down.
+    """
+
+    return [(path, _read(path)) for path in _lean_files(workspace)]
+
+
 def linter_sets(workspace: Path) -> Dict[str, Dict[str, object]]:
     """Each `register_linter_set` and its members, keeping the commented-out ones.
 
@@ -177,13 +190,13 @@ def _tier(option: str, default: Optional[str], sets: Dict[str, Dict[str, object]
     return "available", None
 
 
-def extract_linters(workspace: Path) -> List[ConventionRow]:
+def extract_linters(workspace: Path,
+                    sources: Optional[List[Tuple[Path, str]]] = None) -> List[ConventionRow]:
     sets = linter_sets(workspace)
     lakefile = lakefile_options(workspace)
     rows: List[ConventionRow] = []
     seen = set()
-    for path in _lean_files(workspace):
-        source = _read(path)
+    for path, source in (sources if sources is not None else _sources(workspace)):
         if "register_option linter." not in source:
             continue
         for match in _LINTER_RE.finditer(source):
@@ -203,16 +216,16 @@ def extract_linters(workspace: Path) -> List[ConventionRow]:
     return sorted(rows, key=lambda r: r.key)
 
 
-def extract_library_notes(workspace: Path) -> List[ConventionRow]:
-    files = _lean_files(workspace)
+def extract_library_notes(workspace: Path,
+                          sources: Optional[List[Tuple[Path, str]]] = None) -> List[ConventionRow]:
+    files = sources if sources is not None else _sources(workspace)
     citations: collections.Counter = collections.Counter()
-    for path in files:
-        citations.update(_CITE_RE.findall(_read(path)))
+    for _path, source in files:
+        citations.update(_CITE_RE.findall(source))
 
     rows: List[ConventionRow] = []
     seen = set()
-    for path in files:
-        source = _read(path)
+    for path, source in files:
         if "library_note" not in source:
             continue
         for match in _NOTE_RE.finditer(source):
@@ -232,12 +245,13 @@ def extract_library_notes(workspace: Path) -> List[ConventionRow]:
     return sorted(rows, key=lambda r: (-(r.weight or 0), r.key))
 
 
-def unregistered_options(workspace: Path, extracted: List[ConventionRow]) -> List[str]:
+def unregistered_options(workspace: Path, extracted: List[ConventionRow],
+                         sources: Optional[List[Tuple[Path, str]]] = None) -> List[str]:
     """Options that exist but whose docstring could not be read -- reported, never silently lost."""
 
     every = set()
-    for path in _lean_files(workspace):
-        every.update(_ANY_OPTION_RE.findall(_read(path)))
+    for _path, source in (sources if sources is not None else _sources(workspace)):
+        every.update(_ANY_OPTION_RE.findall(source))
     return sorted(every - {r.key for r in extracted if r.source == "linter"})
 
 
@@ -357,8 +371,9 @@ def workspace_revision(workspace: Path) -> Optional[str]:
 def build(workspace: Path = MATHLIB_CLONE) -> Dict[str, object]:
     if not (workspace / "Mathlib").is_dir():
         raise FileNotFoundError(f"no Mathlib tree at {workspace}")
-    linters = extract_linters(workspace)
-    notes = extract_library_notes(workspace)
+    sources = _sources(workspace)
+    linters = extract_linters(workspace, sources)
+    notes = extract_library_notes(workspace, sources)
     rows = linters + notes
     tiers = collections.Counter(r.tier for r in rows)
     return {
@@ -367,7 +382,8 @@ def build(workspace: Path = MATHLIB_CLONE) -> Dict[str, object]:
         "workspace_revision": workspace_revision(workspace),
         "counts": {"linters": len(linters), "library_notes": len(notes), "total": len(rows)},
         "by_tier": dict(sorted(tiers.items())),
-        "linter_options_without_a_readable_docstring": unregistered_options(workspace, rows),
+        "linter_options_without_a_readable_docstring": unregistered_options(
+            workspace, rows, sources),
         "rows": [asdict(r) for r in rows],
     }
 
