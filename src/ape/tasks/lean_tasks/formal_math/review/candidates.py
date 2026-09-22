@@ -97,10 +97,15 @@ class ProposedEditSubmission(BaseModel):
 
 
 class PatchEditSubmission(BaseModel):
-    """One edit inside a coordinated fix. Same two modes as `proposed_edit`."""
+    """One edit inside a coordinated fix. Same two modes as `proposed_edit`, plus its anchor."""
 
     model_config = ConfigDict(extra="forbid")
     path: str
+    #: The review target this edit is about. Optional, and defaults to the candidate's
+    #: `primary_change_id`: a recorded session was shown a schema without it, and a replay of
+    #: one must still validate. Supplying it is what lets a coordinated fix touch a *second*
+    #: target the candidate claims, which is the whole point of the field.
+    change_id: Optional[str] = None
     declaration_name: Optional[str] = None
     new_declaration: Optional[str] = None
     line_start: Optional[int] = Field(default=None, ge=1)
@@ -198,6 +203,26 @@ def normalize_proposed_edit_path(path: str) -> str:
                 changed = True
                 break
     return normalized
+
+
+def _patch_set_from(rows: List[Dict[str, Any]], primary_change_id: Optional[str]):
+    """The one place a submission's rows become a `PatchSet`.
+
+    Both call sites built it separately and one of them would have gone on disagreeing with
+    the other the first time a field was added. An edit that names no `change_id` is about
+    the candidate's primary target, which is what a recorded session's schema implies.
+    """
+
+    from src.mathlib_review.patchset import PatchEdit, PatchSet
+
+    return PatchSet(tuple(
+        PatchEdit(path=row.get("path", ""),
+                  change_id=row.get("change_id") or primary_change_id,
+                  declaration_name=row.get("declaration_name"),
+                  new_declaration=row.get("new_declaration"),
+                  line_start=row.get("line_start"), line_end=row.get("line_end"),
+                  replacement=row.get("replacement"))
+        for row in rows))
 
 
 def normalize_candidate_edit(
@@ -371,20 +396,14 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         would be publishable while unverified in the fourth.
         """
 
-        from src.mathlib_review.patchset import (
-            PatchEdit, PatchSet, verification_artifact, verify,
-        )
+        from src.mathlib_review.patchset import verification_artifact, verify
 
         workspace = self._patch_set_workspace()
         if workspace is None:
             return [], ("no workspace is available to compile a coordinated patch in; "
                         "submit a single proposed_edit instead")
-        patch = PatchSet(tuple(
-            PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),
-                      new_declaration=r.get("new_declaration"),
-                      line_start=r.get("line_start"), line_end=r.get("line_end"),
-                      replacement=r.get("replacement"))
-            for r in (candidate.get("patch_set") or [])))
+        patch = _patch_set_from(
+            candidate.get("patch_set") or [], candidate.get("primary_change_id"))
         from ape.tasks.lean_tasks.formal_math.review.base import splice_declaration
 
         ok, report, touched = verify(patch, workspace, splice=splice_declaration)
@@ -529,15 +548,15 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             return None
         if not self.patch_set_paths:
             return ("patch_set is not accepted by this check; submit a single proposed_edit")
-        from src.mathlib_review.patchset import PatchEdit, PatchSet, validate
+        from src.mathlib_review.patchset import anchor_problems, validate
 
-        patch = PatchSet(tuple(
-            PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),
-                      new_declaration=r.get("new_declaration"),
-                      line_start=r.get("line_start"), line_end=r.get("line_end"),
-                      replacement=r.get("replacement"))
-            for r in rows))
+        patch = _patch_set_from(rows, candidate.get("primary_change_id"))
         problems = validate(patch, self.patch_set_paths)
+        problems += anchor_problems(
+            patch,
+            change_ids=[str(c) for c in (candidate.get("change_ids") or [])],
+            paths_by_change=self.data.paths_by_change,
+            subjects_by_change=self.data.primary_subjects_by_change)
         return "; ".join(problems) if problems else None
 
     def _extra_candidate_error(self, candidate: Dict[str, Any]) -> Optional[str]:

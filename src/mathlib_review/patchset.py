@@ -42,6 +42,10 @@ class PatchEdit:
     """One edit inside a patch set. Same two modes as `ProposedEdit`, deliberately."""
 
     path: str
+    #: The review target this edit is about. Confinement is by anchor and not only by file:
+    #: a unit holds up to a dozen declarations in one file, so "the edit is in an allowed
+    #: file" permits rewriting a declaration the candidate never claimed.
+    change_id: Optional[str] = None
     declaration_name: Optional[str] = None
     new_declaration: Optional[str] = None
     line_start: Optional[int] = None
@@ -67,7 +71,8 @@ class PatchSet:
 
     def digest(self) -> str:
         payload = [
-            {"path": e.path, "declaration_name": e.declaration_name,
+            {"path": e.path, "change_id": e.change_id,
+             "declaration_name": e.declaration_name,
              "new_declaration": e.new_declaration, "line_start": e.line_start,
              "line_end": e.line_end, "replacement": e.replacement}
             for e in self.edits
@@ -126,6 +131,68 @@ def validate(patch: PatchSet, allowed_paths: Iterable[str]) -> List[str]:
                     f"edits {declarations[key]} and {index} both replace "
                     f"{edit.declaration_name!r} in {edit.path}")
             declarations[key] = index
+    return problems
+
+
+def anchor_problems(
+    patch: PatchSet, *, change_ids: Iterable[str], paths_by_change: Dict[str, str],
+    subjects_by_change: Dict[str, str],
+) -> List[str]:
+    """Every reason an edit is not confined to a target the candidate claimed.
+
+    `validate` confines a patch to the component's *files*. Since the repack a work unit holds
+    up to a dozen declarations of one file, so file confinement permits an edit to rewrite a
+    declaration the candidate never claimed and whose author never saw the request. The
+    2026-09-08 plan flagged this as the precondition for granting patch sets more widely:
+    *"every edit must carry an `anchor_change_id` and be validated against the investigation's
+    allowed anchors."*
+
+    Three rules, and the first two are `normalize_candidate_edit`'s applied per edit:
+
+    * the anchor is one of the candidate's own `change_ids` (themselves already a subset of
+      the unit);
+    * the edit's file is that anchor's file -- an edit must change the target it is about;
+    * a declaration-mode edit may not name a *different* target of the unit. That is the
+      tightening: without it an edit anchored at a claimed target can rewrite an unclaimed
+      sibling in the same file.
+
+    Span edits keep file confinement only. A line span may legitimately cover an import, a
+    `namespace` line or a blank region that belongs to no declaration, and there is no anchor
+    to check it against.
+    """
+
+    allowed = {str(c) for c in change_ids}
+    problems: List[str] = []
+    for index, edit in enumerate(patch.edits):
+        anchor = edit.change_id
+        if not anchor:
+            problems.append(
+                f"edit {index} names no change_id and the candidate has no primary target to "
+                "default to")
+            continue
+        if anchor not in allowed:
+            problems.append(
+                f"edit {index} is anchored at {anchor!r}, which this candidate does not "
+                f"claim; allowed: {sorted(allowed)}")
+            continue
+        expected = paths_by_change.get(anchor)
+        if expected and edit.path != expected:
+            problems.append(
+                f"edit {index} touches {edit.path!r} but is anchored at {anchor!r}, whose "
+                f"file is {expected!r}; an edit must change the target it is about")
+        if edit.mode() != "declaration" or not edit.declaration_name:
+            continue
+        name = edit.declaration_name
+        leaf = name.rsplit(".", 1)[-1]
+        for change_id, subject in subjects_by_change.items():
+            if change_id in allowed or not subject:
+                continue
+            if subject == name or subject.rsplit(".", 1)[-1] == leaf:
+                problems.append(
+                    f"edit {index} rewrites {name!r}, which is target {change_id!r} of this "
+                    "unit and is not one this candidate claims; claim it in change_ids or "
+                    "leave it alone")
+                break
     return problems
 
 
