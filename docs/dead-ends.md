@@ -233,6 +233,24 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
 
 ## Deferred by choice (not dead)
 
+- **Track 1.C's second half, and the oracle ladder that replaced it** (2026-09-08 → 2026-09-22) —
+  `docs/plans/2026-09-08-review-digestion-and-oracle-ladder.md` §5(i) found that "multi-declaration
+  edits exist and are unreachable" and proposed Track 1.C: group sibling declarations into one work
+  unit **and** extend `patch_set=True` to `proof_idiom`/`proof_golf`. The grouping half landed
+  (`12a3939`, 225 → 121 units). The grant half was never built: Track 1 was replaced by the oracle
+  ladder, whose own self-critique in the same document then found it rested on "one PR, one
+  obligation family, two arms" (33098; **2 of 35 request groups exercised, 7 of 40 obligations**).
+  Neither the dropped track nor the ladder's outcome was recorded here, in `PROJECT-STATUS.md`, in
+  `plans/STATUS.md` or in the todo index — `batching-work-units.md`'s status line ("authority,
+  `patch_set` … still open") was the only trace, so this is unfinished rather than abandoned.
+  **Reopened 2026-09-22** as `docs/plans/2026-09-22-coordinated-emission.md`, under the same plan's
+  own correction (`:1376`, **[verified]**): patch sets are file-confined, not anchor-confined, and
+  every edit must carry an anchor validated against the investigation's targets *before* the grant
+  widens. Two further defects found on reopening and not known in 2026-09: `patchset.apply` splices
+  a declaration by substring replacement of its name, and `_patch_set_workspace` calls
+  `Path(WorkspaceInfo)`.
+
+
 - Recruited Mathlib annotators and the inter-annotator ceiling — not until the agent is worth their time.
 - Phase-D scale-up to 150–200 PRs — affordable about three times ever; needs a stopping point first.
 - Norm store (L0), generalised checkers (L1), calibration, the thesis experiment, a clean v5

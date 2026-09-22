@@ -24,4 +24,5 @@ account of what it got built, in its own text and in the commits that cite it.
 | [`2026-09-11-pull-request-store.md`](2026-09-11-pull-request-store.md) | One PR store, many projections — written as built. |
 | [`2026-09-14-selection-over-coverage.md`](2026-09-14-selection-over-coverage.md) | Selection, not coverage: what the September runs did to the talk. |
 | [`2026-09-21-typed-handoffs.md`](2026-09-21-typed-handoffs.md) | The task↔subtask contract, stage provenance, and a declared stage graph. |
+| [`2026-09-22-coordinated-emission.md`](2026-09-22-coordinated-emission.md) | Where generation fails to align with maintainer obligations: five audits, four candidate holes, and the one worth building — a fix that spans declarations. |
 | [`2026-09-21-specialist-silences.md`](2026-09-21-specialist-silences.md) | Why specialists are silent at gold sites, which silences are worth paying to change, and how to test each one. |

@@ -17,14 +17,28 @@ arm's remit taken from `expected_concerns` and bridged to gold's own `concern_la
 | the ask is in that arm's remit | **13** |
 | the ask is not | **53** |
 | the generalist, which has no remit | 10 |
-| obligations where *no* on-concern arm was scheduled | **0 of 22** |
+| obligations where no on-concern arm was *proposed* | **0 of 22** |
+| obligations where no on-concern arm was *executed* | **10 of 22** (all three reps) |
 
-The last row is the one that reorders things. Routing is not failing to send the right arm: it sent
-one to every single counted obligation. What it also does is send four or five others, and those
-arms then correctly say nothing — `duplication` at a rename, `naming` at "factor out the repeated
-`Tendsto` argument", four arms at a docstring. Of 20 obligations with any silence, **11** have an
-on-concern arm that was itself silent; the other 9 are silent only in arms that had no business
-speaking.
+**Corrected 2026-09-22.** This row read "obligations where *no* on-concern arm was scheduled | 0 of
+22", and concluded "Routing is not failing to send the right arm: it sent one to every single
+counted obligation." That counted **proposals**: `report silences` builds its cells from every row
+of `delegations.jsonl`, `disposition: pruned` included. Executed, the on-concern arm reaches **12 of
+22**; the lead prunes it at the other 10, identically in reps 1, 2 and 3, with
+`"not selected by the lead"` on 1,087 of 1,089 prune rows. The rest of the entry stands: routing
+also sends four or five arms whose remit does not cover the ask, and those correctly say nothing —
+`duplication` at a rename, `naming` at "factor out the repeated `Tendsto` argument", four arms at a
+docstring.
+
+**And pruning is still not the binding constraint, measured.** `pr5_F_fanout_stage1_rep1` runs every
+specialist at every eligible slot with no lead and no pruning, and covers 3 of those 10 obligations.
+At all three, every on-concern arm the lead prunes ran to `success` and **submitted nothing — 7 of 7
+arm-cells**: 33421 `38e722` (api_reuse, duplication, family_design), 33145 `7fef91` (the same three),
+33145 `e8e028` (style). So un-pruning buys their silence, which is what `dead-ends.md`'s fanout entry
+found at its ceiling. Caveats: 3 of 10, one rep, one release, and all three are coordinated design
+asks — the shape the arms cannot emit at all
+(`docs/plans/2026-09-22-coordinated-emission.md`) — so this subset was the one most likely to come out
+this way. The other 7 need a run and are not free.
 
 This matters because "41 of 45 gold-site silences reproduce under replay"
 (`docs/research/decision-replay-gold-abstentions-2026-09.md`) has been read as a statement about
@@ -51,7 +65,9 @@ Cheapest first; the first two are free and change what the third would even mean
    (`adjudication-rubric.md`, and `cli adjudicate` is the socket).
 3. **Only then, a routing change.** Two shapes, neither designed here: score an (arm, site) pair by
    whether the arm's remit intersects anything the site plausibly raises, or let the lead see the
-   remit table it is dispatching against. Both need a rep.
+   remit table it is dispatching against. Both need a rep. **A remit floor — making the on-concern
+   arm non-prunable — is the targeted version, and the 2026-09-22 measurement argues against it**:
+   where it can be checked, the pruned arm runs and says nothing.
 
 ## What this is not
 
