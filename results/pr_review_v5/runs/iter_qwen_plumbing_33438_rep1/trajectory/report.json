@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/iter_qwen_plumbing_33438_rep1",
+  "bytes": 273302,
+  "cost": {
+    "actual_total": 0.0,
+    "by_disposition": {
+      "agent_added": 0.0,
+      "mandatory": 0.0
+    },
+    "lead": 0.0,
+    "manifest_total": 0.0,
+    "manifest_understates_by": 0.0
+  },
+  "invocations": 6,
+  "leads": 1,
+  "run_name": "iter_qwen_plumbing_33438_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 308,
+  "with_transcript": 7
+}
