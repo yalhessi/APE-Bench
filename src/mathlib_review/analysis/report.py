@@ -926,12 +926,23 @@ def _context_quality(calls) -> str:
     return "partial" if empty else "ok"
 
 
-def _cell_state(job, anchored_findings) -> str:
-    """What one scheduled (arm, site) pair did, on the overlay's ladder."""
+def _cell_state(job, anchored_findings, response_status: Optional[str] = None) -> str:
+    """What one scheduled (arm, site) pair did, on the overlay's ladder.
+
+    `response_status` is what the arm itself recorded, and it is consulted only when the
+    delegation row carries no status at all. That is not a rare case: `ArmResponse.row()` uses
+    `exclude_unset` so "considered and declined" stays distinguishable from "never considered",
+    and in a **fanout** run the arms are top-level tasks rather than lead-delegated jobs, so no
+    row carries an outcome. Reading that absence as "ran and did not come back" put every
+    obligation of `pr5_F_fanout_stage1_rep1` in `UNTOUCHED` while the judge scored two of them
+    `hit` -- the report contradicting the audit beside it, on a run whose 173 arm responses all
+    say `success`.
+    """
 
     if job.disposition == "pruned":
         return "pruned"
-    if job.status != "success":
+    status = job.status if job.status is not None else response_status
+    if status != "success":
         # Ran and did not come back: a coverage gap, not a silence. A failed mandatory job
         # counted as coverage once, and the run was scored as complete over work nobody did.
         return "unavailable"
@@ -1072,9 +1083,9 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
                     item for item in anchored
                     if item.get("origin_arm_id") == job.arm_id
                     or (job.arm_id == "generalist" and not item.get("origin_arm_id"))]
-                state = _cell_state(job, job_findings)
-                states.append(state)
                 response = responses.get(job.invocation_id) or {}
+                state = _cell_state(job, job_findings, response.get("status"))
+                states.append(state)
                 abstention = (response.get("abstention") or {}) if state == "silent" else {}
                 replayed = replay_by_invocation.get(job.invocation_id) or {}
                 annotations.append({

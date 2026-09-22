@@ -278,3 +278,50 @@ def test_the_gate_block_needs_no_judge_for_the_half_that_needs_none():
     assert gate["control_published"] == 0
     assert "obligations_hit_pre_gate" not in gate
     assert "not whether the claim is right" in gate["note"]
+
+
+FANOUT = "pr5_F_fanout_stage1_rep1"
+fanout_exists = pytest.mark.skipif(
+    not Path(f"results/pr_review_v5/runs/{FANOUT}/findings.jsonl").is_file(),
+    reason="the fanout stage-1 run is not in this tree")
+
+
+@fanout_exists
+def test_a_run_whose_ledger_carries_no_status_is_read_from_what_the_arms_said():
+    """The report must never contradict the audit printed beside it.
+
+    `ArmResponse.row()` uses `exclude_unset` on purpose, so "considered and declined" stays
+    distinguishable from "never considered". In a fanout run the arms are top-level tasks
+    rather than lead-delegated jobs, so *no* delegation row carries an outcome at all: all 173
+    rows of `pr5_F_fanout_stage1_rep1` omit `status`, while all 173 arm responses say
+    `success`. Reading that absence as "ran and did not come back" put every obligation in
+    `UNTOUCHED` — including the two the judge scored `hit`.
+
+    Same class as the rules-file trap "a closed vocabulary silently filters a correct
+    registration": an absent value read as a negative one.
+    """
+
+    payload = buckets([FANOUT], audit=True)["per_run"][FANOUT]
+
+    # The contradiction this fixes: nothing the judge called a hit may be UNTOUCHED, which is
+    # judge-independent geometry and means nothing anchored there at all.
+    hits = [row for row in payload["obligations"] if row["judge"] == "hit"]
+    assert len(hits) == 2
+    assert all(row["coarse"] == "COVERED" for row in hits), [
+        (row["obligation_id"], row["coarse"]) for row in hits]
+    assert payload["coarse"]["UNTOUCHED"] == 2
+
+    # And no cell is `unavailable` merely because the ledger said nothing about it.
+    cells = [cell for row in payload["obligations"] for cell in row["cells"]]
+    assert cells and not any(cell["state"] == "unavailable" for cell in cells)
+
+
+@runs_exist
+def test_a_lead_runs_buckets_are_unchanged_by_that_fallback(judged):
+    """The fallback reads the arm's status only when the delegation row carries none, so a
+    lead run — where every row carries one, including the pruned jobs — is untouched."""
+
+    assert judged["coarse"] == {
+        "UNTOUCHED": 8, "LOCATED_MISS": 7, "LOCATED_UNJUDGED": 0, "COVERED": 7}
+    states = {cell["state"] for row in judged["obligations"] for cell in row["cells"]}
+    assert "pruned" in states
