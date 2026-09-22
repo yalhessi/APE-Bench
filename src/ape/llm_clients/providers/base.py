@@ -245,56 +245,81 @@ class BaseProvider:
         if input_tokens == 0 and output_tokens == 0 and cache_read_input_tokens == 0:
             return 0.0, 0.0
 
-        from ..config import DEFAULT_COST_MODEL, MODEL_MAPPINGS
+        from ..config import DEFAULT_COST_MODEL
 
         cost_model = getattr(self.config, "cost_model", DEFAULT_COST_MODEL)
-        for config in MODEL_MAPPINGS.values():
-            if config["model_name"] == self.config.formal_model_name:
-                # The one thing the two models disagree about: is `cache_read_input_tokens`
-                # part of `input_tokens`, or separate from it?
-                #
-                # `prompt_inclusive` says part of. Then the full prompt is `input_tokens`,
-                # and the portion billed at the normal rate is what is left after removing
-                # the cached part. `prompt_exclusive` says separate, so the full prompt is
-                # the sum and `input_tokens` is already the uncached remainder.
-                #
-                # Getting this backwards charges the cached tokens twice — at full rate
-                # inside `input_tokens` and again at the cache rate — which inflates *both*
-                # returned figures, not just the nominal one.
-                if cost_model == "prompt_inclusive":
-                    total_input_tokens = input_tokens
-                    # Defensive: a provider that ever reports more cached than prompt tokens
-                    # is not describing a subset, so fall back rather than go negative.
-                    uncached_input_tokens = (
-                        input_tokens - cache_read_input_tokens
-                        if cache_read_input_tokens <= input_tokens else input_tokens
-                    )
-                else:
-                    total_input_tokens = cache_read_input_tokens + input_tokens
-                    uncached_input_tokens = input_tokens
+        config = self._pricing_entry()
+        if config is None:
+            raise ValueError(
+                f"Model pricing configuration not found for: {self.config.formal_model_name}")
 
-                # `total_cost` is the counterfactual: what the call would have cost with no
-                # cache at all. `cached_total_cost` is what was actually billed.
-                total_cost = (total_input_tokens / 1_000_000) * config["input_per_1M"] + \
-                            (output_tokens / 1_000_000) * config["output_per_1M"]
+        # The one thing the two models disagree about: is `cache_read_input_tokens`
+        # part of `input_tokens`, or separate from it?
+        #
+        # `prompt_inclusive` says part of. Then the full prompt is `input_tokens`,
+        # and the portion billed at the normal rate is what is left after removing
+        # the cached part. `prompt_exclusive` says separate, so the full prompt is
+        # the sum and `input_tokens` is already the uncached remainder.
+        #
+        # Getting this backwards charges the cached tokens twice — at full rate
+        # inside `input_tokens` and again at the cache rate — which inflates *both*
+        # returned figures, not just the nominal one.
+        if cost_model == "prompt_inclusive":
+            total_input_tokens = input_tokens
+            # Defensive: a provider that ever reports more cached than prompt tokens
+            # is not describing a subset, so fall back rather than go negative.
+            uncached_input_tokens = (
+                input_tokens - cache_read_input_tokens
+                if cache_read_input_tokens <= input_tokens else input_tokens
+            )
+        else:
+            total_input_tokens = cache_read_input_tokens + input_tokens
+            uncached_input_tokens = input_tokens
 
-                input_cost = (uncached_input_tokens / 1_000_000) * config["input_per_1M"]
+        # `total_cost` is the counterfactual: what the call would have cost with no
+        # cache at all. `cached_total_cost` is what was actually billed.
+        total_cost = (total_input_tokens / 1_000_000) * config["input_per_1M"] + \
+                    (output_tokens / 1_000_000) * config["output_per_1M"]
 
-                cache_read_cost = 0.0
-                if cache_read_input_tokens > 0 and config["cached_input_per_1M_usd"]:
-                    cache_read_cost = (cache_read_input_tokens / 1_000_000) * config["cached_input_per_1M_usd"]
-                
-                cache_creation_cost = 0.0
-                if cache_creation_input_tokens > 0 and config["cache_creation_per_1M_usd"]:
-                    cache_creation_cost = (cache_creation_input_tokens / 1_000_000) * config["cache_creation_per_1M_usd"]
-                
-                output_cost = (output_tokens / 1_000_000) * config["output_per_1M"]
-                
-                cached_total_cost = input_cost + cache_read_cost + cache_creation_cost + output_cost
-                
-                return total_cost, cached_total_cost
-        
-        raise ValueError(f"Model pricing configuration not found for: {self.config.formal_model_name}")
+        input_cost = (uncached_input_tokens / 1_000_000) * config["input_per_1M"]
+
+        cache_read_cost = 0.0
+        if cache_read_input_tokens > 0 and config["cached_input_per_1M_usd"]:
+            cache_read_cost = (cache_read_input_tokens / 1_000_000) * config["cached_input_per_1M_usd"]
+
+        cache_creation_cost = 0.0
+        if cache_creation_input_tokens > 0 and config["cache_creation_per_1M_usd"]:
+            cache_creation_cost = (cache_creation_input_tokens / 1_000_000) * config["cache_creation_per_1M_usd"]
+
+        output_cost = (output_tokens / 1_000_000) * config["output_per_1M"]
+
+        cached_total_cost = input_cost + cache_read_cost + cache_creation_cost + output_cost
+
+        return total_cost, cached_total_cost
+
+    def _pricing_entry(self) -> Optional[Dict[str, Any]]:
+        """This model's row in `MODEL_MAPPINGS`, by canonical name first.
+
+        The canonical name is the unambiguous key; the formal name is not. Two canonical
+        entries can legitimately share a formal name -- `gpt_5.4` and `elm_gpt_5.4` both send
+        `gpt-5.4`, to OpenAI and to the Edinburgh gateway respectively -- and a scan keyed on
+        the formal name alone would price whichever happened to be declared first. That is
+        harmless only while the two rows carry identical rates, which is not a property
+        anything enforces.
+
+        The formal-name scan is kept as a fallback because `normalize_model_name` accepts a
+        raw provider id, so `formal_model_name` is not always reachable from a canonical key.
+        """
+
+        from ..config import MODEL_MAPPINGS
+
+        entry = MODEL_MAPPINGS.get(self.config.model_name)
+        if entry is not None:
+            return entry
+        for entry in MODEL_MAPPINGS.values():
+            if entry["model_name"] == self.config.formal_model_name:
+                return entry
+        return None
     
     def parse_usage(self, usage_data: Dict[str, Any]) -> TokenUsage:
         """

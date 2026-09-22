@@ -16,7 +16,7 @@ from ape.utils.logging import create_logger
 from .config import LLMConfig, LLMProvider, ProviderError, ContextLengthExceededError, MalformedResponseError
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
 from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
-from .providers import BaseProvider, OpenAIProvider
+from .providers import BaseProvider, ElmProvider, OpenAIProvider
 from .logger import LLMLogger
 
 if TYPE_CHECKING:
@@ -36,17 +36,29 @@ class LLMClient:
         self.streaming_processor = StreamingProcessor(logger=self.logger, llm_logger=self.llm_logger)
         self.message_formatter = self._create_message_formatter()
 
+    #: Provider implementation and message format, per provider.
+    #:
+    #: A table rather than a chain of `if`s because the fallback is a trap: `BaseProvider`
+    #: puts the key in the query string (`?ak=`) and has no default endpoint, so a provider
+    #: that is merely *missing* from this mapping does not fail loudly -- it POSTs to the
+    #: literal URL "None?ak=<key>" and logs the first 100 characters of it. Anything
+    #: OpenAI-compatible belongs on the OpenAI row.
+    _PROVIDER_IMPLEMENTATIONS = {
+        LLMProvider.OPENAI: (OpenAIProvider, OpenAIMessageFormatter),
+        LLMProvider.ELM: (ElmProvider, OpenAIMessageFormatter),
+    }
+
     def _create_provider(self):
         """Create provider instance based on configuration."""
-        if self.config.provider_type == LLMProvider.OPENAI:
-            return OpenAIProvider(self.config, self.logger, self.llm_logger)
-        return BaseProvider(self.config, self.logger, self.llm_logger)
+        provider_class, _ = self._PROVIDER_IMPLEMENTATIONS.get(
+            self.config.provider_type, (BaseProvider, MessageFormatter))
+        return provider_class(self.config, self.logger, self.llm_logger)
 
     def _create_message_formatter(self):
         """Create message formatter instance based on configuration."""
-        if self.config.provider_type == LLMProvider.OPENAI:
-            return OpenAIMessageFormatter()
-        return MessageFormatter()
+        _, formatter_class = self._PROVIDER_IMPLEMENTATIONS.get(
+            self.config.provider_type, (BaseProvider, MessageFormatter))
+        return formatter_class()
 
     async def __aenter__(self):
         """Enter async context manager."""

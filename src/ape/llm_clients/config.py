@@ -11,6 +11,11 @@ class LLMProvider(Enum):
     """LLM provider enumeration."""
     OPENAI = "openai"
     GEMINI = "gemini"
+    #: The University of Edinburgh's OpenAI-compatible gateway. A separate provider rather
+    #: than an `llm_config.base_url` override on OPENAI, because `V5RunPlan.model_name` is
+    #: the field that says which model produced a run: routing `gpt_5.2` through ELM under
+    #: its own name would make two runs against different endpoints read identically there.
+    ELM = "elm"
 
 
 #: Which environment variable holds each provider's key, in the order they are tried.
@@ -18,9 +23,13 @@ class LLMProvider(Enum):
 #: A table rather than a chain of `if`s because two callers need to *name* the variable, not
 #: just read it: preflight's remedy text, which was previously the unactionable "export the
 #: provider's key", and the worker-boundary check that refuses a YAML-supplied key.
+#: ELM gets its own variable rather than reusing `OPENAI_API_KEY`, deliberately: both keys
+#: are commonly exported in the same shell, and a shared variable means a misconfigured
+#: `base_url` silently sends one provider's credential to the other's endpoint.
 PROVIDER_KEY_ENV_VARS: Dict[LLMProvider, tuple] = {
     LLMProvider.OPENAI: ("OPENAI_API_KEY",),
     LLMProvider.GEMINI: ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
+    LLMProvider.ELM: ("ELM_API_KEY",),
 }
 
 MODEL_MAPPINGS = {
@@ -115,7 +124,113 @@ MODEL_MAPPINGS = {
         "output_per_1M": 0.4,
         "cached_input_per_1M_usd": 0.05,
         "cache_creation_per_1M_usd": None
-    }
+    },
+
+    # ---------------------------------------------------------------------------------
+    # Edinburgh ELM gateway (LLMProvider.ELM). Ids verified against
+    # GET https://elm.edina.ac.uk/api/v1/models on 2026-09-22.
+    #
+    # ELM exposes **bare aliases only** -- no dated snapshots -- so these rows differ from
+    # their direct-API counterparts in `model_name`, not just `provider`. Sending
+    # `gpt-5-mini-2025-08-07` (what `gpt_5_mini` resolves to) would be rejected. Note also
+    # that bare `gpt-5` is not offered by ELM at all, so there is no `elm_gpt_5`.
+    #
+    # `supports_tools` is a property of how ELM runs each backend, not of the model: the
+    # open-weight ones are served by vLLM, and two of those servers were started without
+    # `--enable-auto-tool-choice`, which makes any request carrying `tools` a 400.
+    # `ElmProvider.build_request_payload` turns that into a named error. Measured per model
+    # on 2026-09-22; re-measure before trusting it, since it is a deployment setting ELM can
+    # change without notice.
+    # ---------------------------------------------------------------------------------
+
+    # OpenAI models proxied by ELM. Rates are OpenAI list price, which is the best available
+    # estimate of what the institution is billed -- ELM publishes no tariff. They exist to
+    # keep the cost caps binding and the preflight estimate honest, not as an invoice.
+    "elm_gpt_5.2": {
+        "model_name": "gpt-5.2",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 1.75,
+        "output_per_1M": 14.00,
+        "cached_input_per_1M_usd": 0.125,
+        "cache_creation_per_1M_usd": 1.25,
+        "supports_tools": True,
+    },
+    "elm_gpt_5.4": {
+        "model_name": "gpt-5.4",
+        "provider": LLMProvider.ELM,
+        # Same PLACEHOLDER rates as `gpt_5.4`; see the note there.
+        "input_per_1M": 1.75,
+        "output_per_1M": 14.00,
+        "cached_input_per_1M_usd": 0.125,
+        "cache_creation_per_1M_usd": 1.25,
+        "supports_tools": True,
+    },
+    "elm_gpt_5_mini": {
+        "model_name": "gpt-5-mini",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 0.25,
+        "output_per_1M": 2.00,
+        "cached_input_per_1M_usd": 0.0625,
+        "cache_creation_per_1M_usd": None,
+        "supports_tools": True,
+    },
+
+    # Locally hosted open-weight models. These cost the project nothing per token, and the
+    # rates below say so. Do not be tempted to put a fictional rate here to make the dollar
+    # caps bite: a made-up number in `input_per_1M` is indistinguishable downstream from a
+    # real one, and every cost figure this repo reports -- preflight estimates, the budget
+    # ledger, `run_total_cost_cap` -- would silently become a mix of money and metaphor.
+    #
+    # The consequence is real and must be understood before running one of these:
+    # `standard_budget_cap`, `lead_cost_cap`, `per_pr_cost_cap` and `run_total_cost_cap` all
+    # bind on billed cost, and `ExecutionLimits` carries only `max_turns` and
+    # `billed_cost_limit`. At a true rate of zero every dollar cap is vacuous, and a run on
+    # these models is bounded by `max_turns` and `max_delegations` alone.
+    #
+    # The fix is a token-based limit in `ExecutionLimits`, not a price here. Until that
+    # exists, size local-model runs with `max_turns`/`max_delegations` and know that the
+    # dollar caps are not protecting you. See docs/todo/README.md.
+    #
+    # `prompt_tokens_details` comes back null from every one of these, so no cache discount
+    # is ever applied and the nominal and billed figures coincide (at zero).
+    "elm_qwen_3.5": {
+        "model_name": "Qwen/Qwen3.5-397B-A17B-FP8",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 0.0,
+        "output_per_1M": 0.0,
+        "cached_input_per_1M_usd": None,
+        "cache_creation_per_1M_usd": None,
+        # Verified: emits well-formed tool_calls under both tool_choice=auto and =required.
+        "supports_tools": True,
+    },
+    "elm_mistral_small_4": {
+        "model_name": "mistralai/Mistral-Small-4-119B-2603",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 0.0,
+        "output_per_1M": 0.0,
+        "cached_input_per_1M_usd": None,
+        "cache_creation_per_1M_usd": None,
+        "supports_tools": True,
+    },
+    "elm_llama_3.3": {
+        "model_name": "meta-llama/Llama-3.3-70B-Instruct",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 0.0,
+        "output_per_1M": 0.0,
+        "cached_input_per_1M_usd": None,
+        "cache_creation_per_1M_usd": None,
+        # 400: '"auto" tool choice requires --enable-auto-tool-choice ... to be set'.
+        "supports_tools": False,
+    },
+    "elm_eurollm_22b": {
+        "model_name": "utter-project/EuroLLM-22B-Instruct-2512",
+        "provider": LLMProvider.ELM,
+        "input_per_1M": 0.0,
+        "output_per_1M": 0.0,
+        "cached_input_per_1M_usd": None,
+        "cache_creation_per_1M_usd": None,
+        "supports_tools": False,
+    },
 }
 
 #: How to read a provider's token accounting when pricing a call.
