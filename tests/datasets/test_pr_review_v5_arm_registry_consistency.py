@@ -70,11 +70,23 @@ def test_every_arm_keeps_lean_verify_edit():
         assert "lean_verify_edit" in definition.granted_tools(), definition.arm_id
 
 
-def test_a_patch_set_arm_is_one_whose_scope_is_a_group():
-    """Only an arm reviewing a set of declarations has anything to coordinate. Granting it
-    broadly turns a bounded capability into a licence to rewrite whatever the arm was shown."""
+def test_a_patch_set_arm_is_one_a_compile_can_settle_or_one_whose_remit_is_the_group():
+    """A coordinated patch's only warrant is one compile of every file it touches, so the
+    grant is the compile-checkable arms plus `family_design`, whose whole remit is the group.
+    `naming`, `docs` and `style` ask for names, prose and formatting, where the compile is not
+    what makes the ask right, and they have no way to earn the warrant.
 
-    assert arm_registry.patch_set_arms() == {"family_design"}
+    This asserted `== {"family_design"}` until 2026-09-22, on the reasoning that only an arm
+    reviewing a set of declarations has anything to coordinate and that a broad grant is "a
+    licence to rewrite whatever the arm was shown". Both halves moved: since the repack a work
+    unit routinely holds a dozen declarations, so every arm reviews a set, and the licence
+    objection is what `patchset.anchor_problems` removes -- an edit may only touch a target the
+    candidate claimed. The arm that held the capability was the one that never used it: 182
+    responses, 0 candidates.
+    """
+
+    assert arm_registry.patch_set_arms() == arm_registry.checkable_arms() | {"family_design"}
+    assert not (arm_registry.patch_set_arms() & {"naming", "docs", "style"})
 
 
 def test_family_design_has_no_identifier_lookup():
