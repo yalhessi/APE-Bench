@@ -130,3 +130,14 @@ $R plan --config <cfg> --run-name <name>                             # preflight
 ```
 
 Tests that need a built Lean workspace under `data/code_execute/` fail on a fresh clone; expected.
+
+**Providers.** `OPENAI_API_KEY` for the `gpt_*` models; `ELM_API_KEY` for the `elm_*` ones, which
+go through the University of Edinburgh gateway. Separate variables on purpose — both are usually
+exported in the same shell and neither may stand in for the other. `elm_*` names are their own
+canonical models, not a `base_url` override, so the run plan records which endpoint produced a run;
+switching one forks the judge cache, so switch at a run boundary. The four open-weight `elm_*`
+models are priced at **0.0**, which makes every dollar cap vacuous and `cli plan`'s budget report
+unable to say so — `max_turns`/`max_delegations` are the only real bounds until
+`docs/todo/token-based-execution-limits.md` lands. Llama 3.3 and EuroLLM are served without
+tool-calling and are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are
+agent-capable.
