@@ -202,6 +202,9 @@ MODEL_MAPPINGS = {
         "cache_creation_per_1M_usd": None,
         # Verified: emits well-formed tool_calls under both tool_choice=auto and =required.
         "supports_tools": True,
+        #: Measured 2026-09-22; see `LLMConfig.reasoning_effort`. Reasoning is ON when
+        #: nothing is sent, and `none` is the only way to turn it off.
+        "reasoning_efforts": ("none", "high"),
     },
     "elm_mistral_small_4": {
         "model_name": "mistralai/Mistral-Small-4-119B-2603",
@@ -211,6 +214,9 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": None,
         "cache_creation_per_1M_usd": None,
         "supports_tools": True,
+        #: Reasoning is OFF when nothing is sent -- the opposite of Qwen's default, so
+        #: "the ELM default" is not one setting and a run has to say which it used.
+        "reasoning_efforts": ("none", "high"),
     },
     "elm_llama_3.3": {
         "model_name": "meta-llama/Llama-3.3-70B-Instruct",
@@ -221,6 +227,10 @@ MODEL_MAPPINGS = {
         "cache_creation_per_1M_usd": None,
         # 400: '"auto" tool choice requires --enable-auto-tool-choice ... to be set'.
         "supports_tools": False,
+        #: No reasoning mode. The gateway ACCEPTS every effort value for this model and
+        #: honours none of them -- 2 completion tokens in all six cells -- so an empty tuple
+        #: means "refuse the knob" rather than "untested".
+        "reasoning_efforts": (),
     },
     "elm_eurollm_22b": {
         "model_name": "utter-project/EuroLLM-22B-Instruct-2512",
@@ -230,6 +240,8 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": None,
         "cache_creation_per_1M_usd": None,
         "supports_tools": False,
+        #: No reasoning mode; accepted and ignored, like Llama above.
+        "reasoning_efforts": (),
     },
 }
 
@@ -317,6 +329,31 @@ class LLMConfig(BaseModel):
 
     #: Which token-accounting model to price this call under. See `COST_MODELS`.
     cost_model: Literal["prompt_inclusive", "prompt_exclusive"] = DEFAULT_COST_MODEL
+
+    #: How much the model may think before answering. `None` sends nothing and takes the
+    #: provider's default, which is what every run before this field did.
+    #:
+    #: It belongs in the config rather than being left to the endpoint because it moves token
+    #: consumption by two orders of magnitude and therefore moves every token ceiling with it.
+    #: Measured on the ELM gateway 2026-09-22, 3 samples per cell on one arithmetic prompt,
+    #: completion tokens:
+    #:
+    #:     elm_qwen_3.5          none 4    absent 451   high 395    (default: ON)
+    #:     elm_mistral_small_4   none 4    absent 4     high 143    (default: OFF)
+    #:     elm_llama_3.3         2 in every cell -- no reasoning mode
+    #:     elm_eurollm_22b       4 in every cell -- no reasoning mode
+    #:
+    #: Two things that table is worth stating out loud. The two agent-capable open-weight
+    #: models have OPPOSITE defaults, so "the ELM default" is not one setting. And the
+    #: parameter is `reasoning_effort`: a payload carrying `reasoning: null` returns HTTP 200,
+    #: leaves reasoning ON (321 completion tokens against 4 when it is actually off) and says
+    #: nothing -- so a config written that way would buy a hundredfold token bill believing it
+    #: had bought none.
+    #:
+    #: `low` and `medium` are refused by name by both models that have a reasoning mode, and
+    #: accepted-and-ignored by both that do not; `ElmProvider` therefore checks the value
+    #: against the measured row rather than letting either outcome happen at runtime.
+    reasoning_effort: Optional[str] = None
 
     def model_post_init(self, __context: Any) -> None:
         """Auto-configure immediately after initialization."""

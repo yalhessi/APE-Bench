@@ -172,3 +172,87 @@ def test_local_model_usage_without_cache_details_parses():
 
     assert (usage.input_tokens, usage.output_tokens) == (42, 2)
     assert usage.cache_read_input_tokens is None
+
+
+# --- reasoning effort ----------------------------------------------------------------------
+#
+# Measured on the live gateway 2026-09-22, 3 samples per cell, completion tokens on one
+# arithmetic prompt:
+#
+#     elm_qwen_3.5          none 4    absent 451   high 395    low/medium: HTTP 400
+#     elm_mistral_small_4   none 4    absent 4     high 143    low/medium: HTTP 400
+#     elm_llama_3.3         2 in every cell, every value accepted
+#     elm_eurollm_22b       4 in every cell, every value accepted
+#
+# The two agent-capable models have OPPOSITE defaults, which is why this cannot be left to
+# the endpoint: a token ceiling calibrated under one is meaningless under the other.
+
+
+def test_nothing_is_sent_when_no_effort_is_stated():
+    """Absent means the provider's default, which is what every run before the field did."""
+
+    payload = client_for("elm_qwen_3.5").provider.build_request_payload([])
+    assert "reasoning_effort" not in payload
+
+
+def test_a_stated_effort_reaches_the_payload():
+    config = LLMConfig(model_name="elm_qwen_3.5", reasoning_effort="none")
+    payload = OpenAIProvider(config).build_request_payload([])
+    assert payload["reasoning_effort"] == "none"
+
+
+@pytest.mark.parametrize("model,effort", [
+    ("elm_qwen_3.5", "none"), ("elm_qwen_3.5", "high"),
+    ("elm_mistral_small_4", "none"), ("elm_mistral_small_4", "high"),
+])
+def test_a_measured_effort_is_sent(model, effort):
+    config = LLMConfig(model_name=model, reasoning_effort=effort)
+    assert ElmProvider(config).build_request_payload([])["reasoning_effort"] == effort
+
+
+@pytest.mark.parametrize("model,effort", [
+    ("elm_qwen_3.5", "low"), ("elm_qwen_3.5", "medium"),
+    ("elm_mistral_small_4", "low"), ("elm_mistral_small_4", "medium"),
+])
+def test_an_effort_the_gateway_refuses_is_named_here_instead(model, effort):
+    """A raw 400 on the first call of every task, once per run, is how this was discovered."""
+
+    config = LLMConfig(model_name=model, reasoning_effort=effort)
+    with pytest.raises(ProviderError, match="not honoured"):
+        ElmProvider(config).build_request_payload([])
+
+
+@pytest.mark.parametrize("model", ["elm_llama_3.3", "elm_eurollm_22b"])
+@pytest.mark.parametrize("effort", ["none", "low", "medium", "high"])
+def test_a_model_with_no_reasoning_mode_refuses_the_knob(model, effort):
+    """These ACCEPT every value and honour none -- 200 with nothing changed. A knob the run
+    plan records and the endpoint ignores is worse than one that is refused."""
+
+    config = LLMConfig(model_name=model, reasoning_effort=effort)
+    with pytest.raises(ProviderError, match="no reasoning mode"):
+        ElmProvider(config).build_request_payload([])
+
+
+def test_an_unmeasured_model_passes_the_knob_through():
+    """An untested model cannot be asserted to lack a reasoning mode. The OpenAI models
+    proxied by ELM carry no measured row, so nothing here may refuse them."""
+
+    config = LLMConfig(model_name="elm_gpt_5.2", reasoning_effort="high")
+    assert ElmProvider(config).build_request_payload([])["reasoning_effort"] == "high"
+
+
+def test_the_reasoning_table_covers_every_open_weight_model():
+    """A model added without a row would silently gain an unchecked knob."""
+
+    for model in ("elm_qwen_3.5", "elm_mistral_small_4", "elm_llama_3.3", "elm_eurollm_22b"):
+        assert "reasoning_efforts" in MODEL_MAPPINGS[model], model
+
+
+def test_reasoning_effort_is_inside_the_provenance_hash():
+    """It moves token consumption ~100x, so two runs that differ in it are different
+    experiments. `scaffold_config_sha256` hashes the llm_config dump, so the field has to
+    survive serialization -- unlike `api_key`, which is deliberately excluded."""
+
+    dumped = LLMConfig(model_name="elm_qwen_3.5", reasoning_effort="none").model_dump(
+        mode="json")
+    assert dumped["reasoning_effort"] == "none"
