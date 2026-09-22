@@ -123,13 +123,27 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
 ## Running
 
 ```
-ape/bin/python -m pytest tests -q                                    # suite
+ape/bin/python -m pytest tests -q -n auto --dist loadfile            # suite, ~45s
 ape/bin/python -m src.mathlib_review.release.verify_frozen verify   # must print ok
 R="ape/bin/python -m src.mathlib_review.review.cli"
 $R plan --config <cfg> --run-name <name>                             # preflight, spends nothing
 ```
 
 Tests that need a built Lean workspace under `data/code_execute/` fail on a fresh clone; expected.
+
+**The suite is parallel, and the flags are not in `pytest.ini` on purpose.** `--dist loadfile`
+keeps a file's tests on one worker, which the module-scoped fixtures need. Leave the flags off a
+targeted run — worker startup costs more than the file does (`tests/orchestration/test_pipeline.py`
+alone: 0.24s serial, 2.38s under `-n auto`) — and off `--pdb`. A bare `pytest tests -q` still
+passes, just serially, so a checkout without `pytest-xdist` degrades rather than breaks.
+
+**A slow test is nearly always repeated work, not coverage.** The suite was 350s in 2026-09-22 and
+88% of that sat in 60 of its 2,213 tests; the three worst were 50% between them and none was
+buying anything. They were, in order: a test asserting payload *key spellings* that built the
+library exposure index first (130s), an AST guard that rebuilt its docstring set once per string
+constant (25s), and a catalogue that read the Mathlib tree four times over (22s). Profile the
+outlier before marking it slow, splitting the suite or reaching for any other machinery — all
+three were plain redundancy, and the fixes took a line each.
 
 **Providers.** `OPENAI_API_KEY` for the `gpt_*` models; `ELM_API_KEY` for the `elm_*` ones, which
 go through the University of Edinburgh gateway. Separate variables on purpose — both are usually
