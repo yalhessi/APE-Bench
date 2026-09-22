@@ -567,7 +567,11 @@ def _register_naming_norm(task, mcp) -> None:
             "`verdict` is the answer, not the counts: `established` means the corpus is "
             "lopsided enough to hold a PR to (a blocking ask); `emerging` means one spelling "
             "leads clearly but is not dominant (advisory at most); `insufficient_evidence` "
-            "means the corpus has no opinion here and you should submit nothing on naming."
+            "covers two different things and `empty_because` says which. `no_population`: the "
+            "corpus was consulted and has no opinion here, so submit nothing on naming. "
+            "`subject_unresolved`: this tool could not work out what the declaration is about "
+            "and never asked the corpus, so naming here is UNMEASURED rather than settled -- "
+            "judge it on the evidence you have."
         )
     )
     async def naming_norm(

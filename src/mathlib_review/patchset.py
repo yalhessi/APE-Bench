@@ -183,11 +183,24 @@ def anchor_problems(
         if edit.mode() != "declaration" or not edit.declaration_name:
             continue
         name = edit.declaration_name
-        leaf = name.rsplit(".", 1)[-1]
+        # Two rules, both learned by replaying the 390 recorded declaration-mode edits.
+        #
+        # A declaration the candidate DOES claim is never an unclaimed sibling, however many
+        # targets carry its name: one declaration yields two change targets whenever its diff
+        # splits into hunks (PR 33362's `Complex.norm_dslope_le_div_of_mapsTo_ball`, whose
+        # second target is a one-line deletion fragment). Without this the rule refused 6 real
+        # edits, each rewriting exactly the declaration its own claimed target names.
+        #
+        # And the comparison is on the full name, never the leaf. Leaf matching refuses an edit
+        # to `Foo.bar` because some unclaimed target is `Baz.bar` -- namespace siblings sharing
+        # a leaf are this feature's own motivating shape, so the heuristic fired hardest
+        # exactly where a coordinated fix belongs.
+        if name in {subjects_by_change.get(c) for c in allowed}:
+            continue
         for change_id, subject in subjects_by_change.items():
             if change_id in allowed or not subject:
                 continue
-            if subject == name or subject.rsplit(".", 1)[-1] == leaf:
+            if subject == name:
                 problems.append(
                     f"edit {index} rewrites {name!r}, which is target {change_id!r} of this "
                     "unit and is not one this candidate claims; claim it in change_ids or "

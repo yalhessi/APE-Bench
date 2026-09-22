@@ -374,3 +374,58 @@ def test_the_anchor_is_part_of_the_patch_identity():
     a = PatchSet((anchored("c1", "Foo.claimed"),))
     b = PatchSet((anchored("c2", "Foo.claimed"),))
     assert a.digest() != b.digest()
+
+
+def test_a_claimed_declaration_is_never_an_unclaimed_sibling():
+    """One declaration produces two change targets whenever its diff splits into hunks.
+
+    PR 33362's `Complex.norm_dslope_le_div_of_mapsTo_ball` is one: a target holding the
+    reviewed code and a second holding a one-line deletion fragment, both carrying the same
+    `declaration_name`. A candidate claims one of them and edits exactly the declaration that
+    target names -- and the unclaimed-sibling rule fired on the *other* target. Replayed over
+    the 390 recorded declaration-mode edits it refused 6, every one of them legitimate.
+
+    The rule is about editing a declaration the candidate is not asking about. A declaration it
+    IS asking about is not that, however many targets carry the name.
+    """
+
+    from src.mathlib_review.patchset import anchor_problems
+
+    # `c1` and `c2` are two hunks of ONE declaration; the candidate claims c1 only.
+    split = {"c1": "Foo.split", "c2": "Foo.split"}
+    paths = {"c1": "Mathlib/A.lean", "c2": "Mathlib/A.lean"}
+    patch = PatchSet((anchored("c1", "Foo.split"),))
+    assert anchor_problems(patch, change_ids=["c1"], paths_by_change=paths,
+                           subjects_by_change=split) == []
+
+    # A genuinely different declaration is still refused.
+    other = PatchSet((anchored("c1", "Foo.other"),))
+    assert any("is not one this candidate claims" in p for p in anchor_problems(
+        other, change_ids=["c1"], paths_by_change=paths,
+        subjects_by_change={"c1": "Foo.split", "c2": "Foo.other"}))
+
+
+def test_a_candidate_may_not_carry_both_a_proposed_edit_and_a_patch_set():
+    """Both fields are Optional and nothing joined them, so both could be set.
+
+    `_verify_candidate_submission` handles a patch set first and returns, so such a candidate
+    would be published carrying a warrant that compiled the patch and never touched the
+    `proposed_edit` -- and `_statement_gate_error`, which reads only `proposed_edit`, would
+    never run at all. A `proof_simplification` claim could then move its statement unnoticed
+    behind a warrant earned by different code.
+    """
+
+    from src.mathlib_review.agenda import registry
+
+    task = _arm_task(sorted(registry.patch_set_arms())[0])
+    both = _candidate([{"path": "Mathlib/A.lean", "change_id": "c1",
+                        "declaration_name": "Foo.claimed",
+                        "new_declaration": "theorem Foo.claimed : True := trivial"}])
+    both["proposed_edit"] = {"path": "Mathlib/A.lean", "declaration_name": "Foo.claimed",
+                             "new_declaration": "theorem Foo.claimed : True := trivial"}
+    error = task._patch_set_error(both)
+    assert error and "not both" in error
+
+    # Either one alone is still fine.
+    del both["proposed_edit"]
+    assert task._patch_set_error(both) is None

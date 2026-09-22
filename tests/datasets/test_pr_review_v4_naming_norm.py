@@ -184,3 +184,22 @@ def test_an_empty_naming_verdict_says_which_of_three_things_happened():
     # Rows written before the split still load.
     assert ContextCall(invocation_id="wu:a#naming", tool="naming_norm", query="Foo.bar",
                        gate="base_snapshot").empty_because is None
+
+
+def test_the_tool_description_scopes_the_silence_to_the_cause_that_warrants_it():
+    """The results text was split and the description was not, so they contradicted.
+
+    97.3% of the 477 recorded empty calls are `subject_unresolved` -- the tool never asked the
+    corpus -- and the description told the arm that `insufficient_evidence` means the corpus
+    has no opinion and it should submit nothing. An arm reading the description rather than the
+    result would draw the conclusion the split exists to prevent, on almost every empty call.
+    """
+
+    import inspect
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+
+    source = inspect.getsource(context_tools)
+    assert "no opinion here and you should submit nothing" not in source
+    assert "`no_population`" in source and "`subject_unresolved`" in source
+    assert "UNMEASURED rather than settled" in source
