@@ -6,7 +6,8 @@ Processes non-streaming LLM responses and converts them to ConversationNode list
 
 import json
 from typing import Dict, Any, List, Optional, Callable, TYPE_CHECKING
-from ..models import ConversationNode, ConversationMessage, ContentBlock, TokenUsage
+from ..models import (
+    ConversationNode, ConversationMessage, ContentBlock, TokenUsage, reasoning_text)
 from ..config import MalformedResponseError
 
 if TYPE_CHECKING:
@@ -76,7 +77,7 @@ def parse_message_to_node(
     # Extract content blocks (order: thinking -> text -> tool_use)
     blocks = []
 
-    reasoning_content = message_data.get("reasoning_content")
+    reasoning_content = reasoning_text(message_data)
     if reasoning_content:
         blocks.append(ContentBlock.thinking_block(reasoning_content))
 
@@ -188,7 +189,7 @@ class ResponseProcessor:
                             f"finish_reason: {finish_reason}, "
                             f"role: {message_data.get('role')}, "
                             f"content: '{message_data.get('content', '')}', "
-                            f"reasoning_content: '{message_data.get('reasoning_content', '')}', "
+                            f"reasoning: '{reasoning_text(message_data)}', "
                             f"tool_calls: {len(message_data.get('tool_calls', []))} calls"
                         )
                     raise MalformedResponseError(error_msg)

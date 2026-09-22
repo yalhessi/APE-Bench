@@ -15,6 +15,30 @@ from typing import Dict, Any, Optional, List, Literal, Union
 from pydantic import BaseModel, Field
 
 
+#: Wire spellings for the model's reasoning trace, in the order they are tried.
+#:
+#: There is no single convention. OpenAI does not return the text at all; DeepSeek and older
+#: vLLM builds call it `reasoning_content`; the vLLM build behind the Edinburgh ELM gateway
+#: (`vllm-0.21.0`) calls it `reasoning`, on both `message` and the streaming `delta`.
+#:
+#: Reading only one spelling is not a degraded reading, it is a silent one: measured
+#: 2026-09-22, `elm_qwen_3.5` at `reasoning_effort=high` returned a 2,551-character `reasoning`
+#: field beside a clean `content`, and this repo kept only the answer -- about 75% of the
+#: completion tokens left no trace in the session record, on a project whose method is reading
+#: what the agent did.
+REASONING_KEYS = ("reasoning_content", "reasoning")
+
+
+def reasoning_text(data: dict) -> str:
+    """The reasoning trace from a message or a streaming delta, whichever spelling it used."""
+
+    for key in REASONING_KEYS:
+        value = data.get(key)
+        if value:
+            return value
+    return ""
+
+
 class TokenUsage(BaseModel):
     """Token usage statistics."""
 

@@ -289,6 +289,16 @@ class LLMConfig(BaseModel):
     # Basic configuration
     model_name: Optional[str] = None  # Canonical name provided by the user that always stays the same. None means use official models.
     max_tokens: int = 32000
+    #: INERT for every model this project has run. Only `BaseProvider.build_request_payload`
+    #: sends it, as Anthropic's `thinking: {type: enabled, budget_tokens: N}`; `OpenAIProvider`
+    #: and `ElmProvider` both override that method and neither sends it, and those two are the
+    #: whole provider table. About twenty configs set it (8000 or 30000) and none of them has
+    #: ever reached an API.
+    #:
+    #: Left in place rather than removed or refused: `BaseProvider` is a real code path, and
+    #: refusing a non-zero value would fail every one of those configs at once. Use
+    #: `reasoning_effort` to ask an OpenAI or ELM model to think. Tracked in
+    #: docs/todo/reasoning-in-the-arms.md.
     thinking_budget_tokens: int = 30000
     temperature: float = 1.0
     streaming: bool = True  # Whether to use streaming (default True to avoid socket read timeouts)

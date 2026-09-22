@@ -11,7 +11,8 @@ from typing import Dict, Any, List, Optional, Callable, AsyncGenerator, TYPE_CHE
 from pydantic import BaseModel, Field
 
 from ..config import LLMError, MalformedResponseError, ContextLengthExceededError
-from ..models import ConversationNode, ConversationMessage, ContentBlock, TokenUsage
+from ..models import (
+    ConversationNode, ConversationMessage, ContentBlock, TokenUsage, REASONING_KEYS)
 
 if TYPE_CHECKING:
     import logging
@@ -203,7 +204,12 @@ class StreamingProcessor:
                             callback(value, 'content')
                         except TypeError:
                             callback(value)
-                elif key == 'reasoning_content' and value:
+                elif key in REASONING_KEYS and value:
+                    # Normalised onto one key whatever the wire spelling: the ELM gateway's
+                    # vLLM sends `reasoning` and everything downstream reads
+                    # `reasoning_content`, so a delta that matched no branch here was dropped
+                    # entirely -- no branch ran, and the `choice['message']` merge below never
+                    # fires on a streaming chunk, which carries `delta`.
                     message['reasoning_content'] = message.get('reasoning_content', '') + value
                     if callback:
                         try:
@@ -226,7 +232,7 @@ class StreamingProcessor:
             # Merge all other fields in choice['message'] (like raw_output_ids, response_log_probs)
             if 'message' in choice:
                 for key, value in choice['message'].items():
-                    if key not in ['role', 'content', 'reasoning_content', 'signature', 'tool_calls']:
+                    if key not in ('role', 'content', 'signature', 'tool_calls', *REASONING_KEYS):
                         # These are cumulative fields like raw_output_ids
                         if isinstance(value, list):
                             if key not in message:
