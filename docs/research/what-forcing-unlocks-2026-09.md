@@ -76,9 +76,14 @@ three of the five forced-only hits produced *nothing* unforced.
 
 ## Caveats
 
-- **One unreplicated pair of runs**, 4 pull requests, 10 obligations, one judge pass. Under judge
-  unanimity the obligation count is 2 → 3 rather than 2 → 5. `forbid_abstention` has never been run
-  a second time.
+- **One unreplicated pair of runs**, 4 pull requests, 10 obligations, one judge pass.
+  `forbid_abstention` has never been run a second time.
+- **The size of the gain depends on the judge's aggregation rule**, recomputed here from
+  `sample_votes.jsonl`: forcing takes obligations hit from **2 → 5** on a majority of the three
+  judge samples and from **2 → 3** unanimously, against 2 → 2 unforced under either rule. Six of
+  the forced run's 68 voted pairs are split votes, against two of the unforced run's 34. The
+  direction is the same under both rules and the headline halves under the stricter one, so quote
+  the rule with the number.
 - **Four naming gold obligations** (six rename-shaped asks counting 33145's pair). The 2-of-4 split
   is a description of this release, not a rate.
 - Forcing is a diagnostic, not a design: it took control-PR emission 1 → 36 on the one control in
@@ -93,3 +98,26 @@ three of the five forced-only hits produced *nothing* unforced.
 - `src/mathlib_review/evidence/operators/naming_norm.py` (`leaf_prefix`, `MIN_SUPPORT`,
   `MIN_SUPPORT_RATIO`), `src/ape/tasks/lean_tasks/formal_math/review/context_tools.py:600-660`.
 - `docs/research/specialist-silences-2026-09.md`, `docs/todo/specialist-arm-contents.md`.
+
+## What to buy when paid runs resume
+
+Queued for after the provider change, in order. Nothing here is a selection experiment.
+
+1. **`forbid_abstention` replicated** — rep2 and rep3 on the same four pull requests, then the
+   other eight held-out ones. It is the only thing that turns 0.20 → 0.50 into a rate, and every
+   claim in this file rests on one pair of runs. The config exists
+   (`ReviewDataset.forbid_abstention`) and the runner already warns that it is diagnostic only.
+2. **`ask_without_fix`** (`configs/v5_replay_ask_without_fix.yaml`, built and priced at $2.66 on
+   the gold-site population plus $0.07 on the control one). It is the intermediate between "may
+   abstain" and "must submit": the arm may file the maintainer's ask when it cannot make the fix
+   compile. Read against its null on the same prefixes, and against the control population, which
+   is what `--select control-abstentions` exists for.
+3. **A rep with the corrected `naming_norm`** — the split zero branch changes what a future call
+   tells the arm, and the arm's behaviour under it is not knowable from recordings made before it.
+   This is the one that tests whether the naming arm speaks when its tool stops instructing silence.
+
+The provider change resets what a recorded prefix can be replayed against: a replay pins the model
+from its source run, so the recorded sessions here are replayable only while that model is
+reachable. Anything that needs the old recordings should be run before the switch or accepted as
+lost.
+
