@@ -17,6 +17,32 @@ if TYPE_CHECKING:
     import logging
 
 
+#: What `file_read` reads when the caller gives no range. Unchanged from when `line_range`
+#: was the only parameter and defaulted to `[1, 200]`, so a caller that passes nothing still
+#: gets exactly what it used to.
+_DEFAULT_LINE_RANGE = [1, 200]
+
+
+def _resolve_line_range(line_start, line_end, line_range):
+    """One line range from the scalar pair or the deprecated list form.
+
+    `line_start`/`line_end` exist because a nested parameter is the one shape a tool schema
+    cannot rely on every model producing: served without schema-constrained decoding, some
+    models emit the *text* of a list where the schema declares an array. Two integers have no
+    such failure mode. `line_range` stays accepted so nothing that already uses it changes
+    behaviour, and because the scalars cannot express a list the caller already wrote.
+
+    The list form wins when given, since a caller that sent it meant it.
+    """
+
+    if line_range is not None:
+        return list(line_range)
+    if line_start is None and line_end is None:
+        return list(_DEFAULT_LINE_RANGE)
+    return [line_start, line_end]
+
+
+
 class FileSystemToolsProvider(BaseToolsProvider):
     """
     File system tools provider
@@ -81,13 +107,13 @@ class FileSystemToolsProvider(BaseToolsProvider):
 
 **OUTPUT**: Lines prefixed with `LINE_NUMBER|CONTENT` (line numbers are display metadata only).
 
-**DEFAULT**: `line_range` defaults to `[1, 200]`.
+**DEFAULT**: reading lines 1 to 200 when no range is given.
 
-**RANGE SEMANTICS**: `line_range=[start, end]` uses Python-style slicing on 1-indexed lines:
-- `[start, end)` - end is exclusive
-- Negative indices: -1 is last line, -2 is second-to-last, etc.
-- None for start means "from the beginning", None for end means "to the end"
-- Examples: `[None, None]` = all lines, `[None, 10]` = first 9 lines, `[10, None]` = from line 10 to end, `[-10, None]` = last 10 lines, `[None, -1]` = all except last
+**RANGE SEMANTICS**: `line_start`/`line_end` are 1-indexed, `line_end` exclusive:
+- Negative indices: -1 is the last line, -2 the second-to-last, etc.
+- Omit `line_start` to read from the beginning; omit `line_end` to read to the end.
+- Examples: omit both = lines 1-200; `line_end=10` = first 9 lines; `line_start=10` = from
+  line 10 to the end; `line_start=-10` = last 10 lines; `line_end=-1` = all except the last.
 
 **WARNING**: Large ranges can be expensive; keep reads focused.
 
@@ -97,24 +123,31 @@ class FileSystemToolsProvider(BaseToolsProvider):
                 file_path: Annotated[str, Field(
                     description="Workspace file path (e.g., scratch/file.lean)"
                 )],
-                line_range: Annotated[Optional[list], Field(
-                    description="Read specific lines [start, end). Both can be None/int/negative. Examples: [None, None] = all, [None, 10] = first 9, [10, None] = from 10, [-10, None] = last 10"
-                )] = [1, 200],
+                line_start: Annotated[Optional[int], Field(
+                    description="First line to read, 1-indexed. Negative counts from the end (-10 = tenth from last). Omit to read from the beginning."
+                )] = None,
+                line_end: Annotated[Optional[int], Field(
+                    description="Stop before this line (exclusive), 1-indexed. Negative counts from the end. Omit to read to the end."
+                )] = None,
+                line_range: Annotated[Optional[List[Optional[int]]], Field(
+                    description="Deprecated two-element form of line_start/line_end: [start, end), each an integer or null. Prefer line_start/line_end."
+                )] = None,
                 omit_details: Annotated[bool, Field(
                     description="Hide implementation details (proofs, function bodies) with display-only markers"
                 )] = True
             ) -> Dict[str, Any]:
                 """Read file content."""
                 self.logger.info(f"Tool file_read: execution started (file_path={file_path})")
+                effective_range = _resolve_line_range(line_start, line_end, line_range)
                 result = await self.file_system.file_read(
                     file_path=Path(file_path),
-                    line_range=line_range,
+                    line_range=effective_range,
                     omit_details=omit_details
                 )
                 self._record_task_tool_trace(
                     "file_read",
                     file_path=file_path,
-                    line_range=line_range,
+                    line_range=effective_range,
                     omit_details=omit_details,
                 )
                 self.logger.info(f"Tool file_read: execution completed")
