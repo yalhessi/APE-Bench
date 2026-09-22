@@ -77,18 +77,19 @@ def test_prior_generation_data_paths_live_only_in_paths_module():
             tree = ast.parse(path.read_text())
         except SyntaxError:
             continue
+        # Walked once and held. The docstring set used to be rebuilt inside the constant
+        # loop, which made the scan quadratic in the size of each module and cost 24s of a
+        # 350s suite on its own -- one test, for a guard that reads 132 files.
+        nodes = list(ast.walk(tree))
         docstrings = {
-            id(node) for parent in ast.walk(tree)
+            ast.get_docstring(parent, clean=False) for parent in nodes
             if isinstance(parent, (ast.Module, ast.ClassDef, ast.FunctionDef,
                                    ast.AsyncFunctionDef))
-            for node in [ast.get_docstring(parent, clean=False)] if node
         }
         hits = set()
-        for node in ast.walk(tree):
+        for node in nodes:
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                if node.value in {ast.get_docstring(p, clean=False) for p in ast.walk(tree)
-                                  if isinstance(p, (ast.Module, ast.ClassDef, ast.FunctionDef,
-                                                    ast.AsyncFunctionDef))}:
+                if node.value in docstrings:
                     continue
                 hits |= set(PRIOR_GENERATION_DATA.findall(node.value))
         if hits:
