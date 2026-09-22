@@ -188,6 +188,18 @@ paths:
   one of them -- `report buckets --audit` prints both in its `gate` block, with control emission
   beside them, because published control emission is **0/0/0** against 12 pre-gate and the gate is
   what buys it. `docs/research/the-admission-gate-2026-09.md`.
+- **A capability nothing has ever exercised is a capability nobody has ever tested (2026-09-22).**
+  `patch_set` -- the one way to submit a fix spanning declarations -- was carried by 0 of 3,411
+  candidates across 60 runs, and *five* independent defects were waiting in it: granted to the one
+  arm that never files, `Path(WorkspaceInfo)` raising on first use, `apply` splicing a declaration
+  by `text.replace(name, new, 1)` so a well-formed edit rewrote the first *mention* of the name
+  (its own docstring) and compiled the wreckage, the contract template omitting the field under
+  "This supersedes any field list above", and the finding schema dropping it before the judge. Two
+  of the five had tests written over them that passed: one assigned a string where the runtime
+  passes a `WorkspaceInfo`, and every source in the patch-set tests was a single line whose
+  declaration name occurred exactly once. **Before costing a capability's absence as a finding
+  about the model, exercise it once by hand** -- here that was two local compiles, no spend, and it
+  is the check that separates "the arms decline to use it" from "it never worked".
 - **A gold-site silence is not evidence about an arm unless the ask was in that arm's remit
   (2026-09-21).** "41 of 45 gold-site specialist silences reproduce under replay" was read for a
   week as arms withholding findings, and a plan costed three interventions against it. Labelling
