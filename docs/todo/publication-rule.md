@@ -1,7 +1,12 @@
 # The admission gate drops most of what the run finds, on the wrong axis
 
-**Status** — open, written 2026-09-22 from a re-scoring of three committed reps; **measurement done,
-the change is not made**
+**Status** — **PARKED 2026-09-22 by the user's ruling, the same day it was written.** "Talking
+about publishing is talking about selection. We currently don't have a good enough reviewer to
+start talking about selection." The measurement below stands and its instrument is kept; the
+*change* is not to be designed or costed until the generator is worth selecting from. Do not
+reopen this as a ranking, a keep-rule, a threshold or a channel without that ruling being revisited
+— those are the same proposal wearing different words, which is how it got written in the first
+place. See `docs/dead-ends.md`, "Publication as selection".
 **Cost** — the measurement was free and is done; the change is code plus one rep to confirm
 **Owner question** — the gate keeps published control-PR emission at zero and costs 71–83% of the
 obligations the run already found. Is there a rule that keeps the first and not the second?
@@ -29,7 +34,23 @@ reps are `documentation` (11) and `style` (1) — the two families that also nev
 admitting a family only if on the other eleven PRs it hit at least once and emitted nothing on a
 control: obligations published **2 → 6 of 7**, findings published 80 → 241, control emission **0**.
 
-## What would close it
+## Why it is parked, and what it does not license
+
+The finding is a measurement and is kept as one: every recall figure in the record is pre-gate,
+and what a maintainer would see is 2/1/1 of the 7/5/6 obligations. That correction is worth
+having and `report buckets --audit` keeps printing it.
+
+What it is not is a direction. Deciding which of the system's findings to show is selection, and
+this project has an ordering rule that comes before any of it: **fix the generator first**. The
+arms are not yet good enough reviewers for the question "which of their output should a
+maintainer see" to be the binding one — and the one intervention that raised issue recall
+(0.20 → 0.50, `forbid_abstention`) did it by changing what the arms *say*, not by re-ranking what
+they had already said.
+
+The entry is kept rather than deleted because the numbers are real and because a later session
+that measures the gate again should find the ruling rather than the proposal.
+
+## What would close it, IF the ruling is ever revisited
 
 1. **Re-judge the same artifacts under unanimity** (free, not done). The 7 pre-gate hits are
    majority verdicts, and the gate's loss should be quoted against the stricter denominator too.

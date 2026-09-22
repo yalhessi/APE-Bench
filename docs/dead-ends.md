@@ -106,6 +106,21 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   whether the claim is right: `docs/research/the-admission-gate-2026-09.md`. **Reopens if:** a
   second `forbid_abstention` rep exists, or the forced run is re-judged under unanimity -- both
   free of new generation spend, neither done.
+- **Publication as selection** (2026-09-22) — re-scoring the three held-out reps found the
+  admission gate discarding 71-83% of the gold obligations the run had already found (7/5/6 hit →
+  2/1/1 published), filtering on whether a collector can warrant the claim's *family* rather than on
+  whether the claim is right, with a leave-one-PR-out family rule reaching 6 of 7 at zero control
+  emission. Proposed as "the publication rule", which is **selection under another name** — the
+  fifth derivation of a thread `selection-signal.md` already says is kept "so the next session does
+  not re-derive it a fourth time", and the rationalisation that got past the standing refusal was
+  "families, not findings". **The user's ruling, same day:** *"Talking about publishing is talking
+  about selection. We currently don't have a good enough reviewer to start talking about selection.
+  The specialist arms clearly perform much better when they can't abstain, so I don't want to
+  consider anything related to selection at the moment."* The ordering is generator first. **The
+  measurement is kept** — it is a real correction to every pre-gate recall number in the record, and
+  `report buckets --audit` prints the pair — and the *change* is `docs/todo/publication-rule.md`,
+  parked. **Reopens if:** the generator is good enough that what to show becomes the binding
+  question, which is a judgement the user makes, not a number this report can produce.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
