@@ -28,10 +28,15 @@ The parameter is `reasoning_effort`. A payload carrying `reasoning: null` return
 leaves reasoning ON and reports nothing -- measured, not assumed.
 """
 
+import json
 from typing import Any, Dict, List, Optional
 
 from ..config import MODEL_MAPPINGS, ProviderError
 from .openai_provider import OpenAIProvider
+
+
+#: Sentinel: distinguishes "leave this argument alone" from a repair that yields None.
+_UNREPAIRED = object()
 
 
 class ElmProvider(OpenAIProvider):
@@ -42,6 +47,19 @@ class ElmProvider(OpenAIProvider):
     #: environment variable is inside nothing -- an invisible knob that redirects a run is
     #: exactly what the run plan exists to prevent. Override per run with `llm_config.base_url`.
     DEFAULT_BASE_URL = "https://elm.edina.ac.uk/api/v1/chat/completions"
+
+    #: Master switch for the argument repair below. Flip to False to see the raw behaviour,
+    #: or delete the block it guards once the gateway enforces tool schemas.
+    REPAIR_STRINGIFIED_ARGUMENTS = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #: Schemas from the most recent request, so the repair below is schema-driven rather
+        #: than a guess. Populated by `build_request_payload`, read by `postprocess_nodes`.
+        self._tool_parameter_schemas: Dict[str, Dict[str, Any]] = {}
+        #: How many arguments this provider has repaired. The number that says whether the
+        #: workaround is still needed.
+        self.repaired_argument_count = 0
 
     def build_request_payload(
         self,
@@ -67,6 +85,7 @@ class ElmProvider(OpenAIProvider):
                 f"Qwen/Qwen3.5-397B-A17B-FP8), or run a scaffold that sends none."
             )
         self._assert_reasoning_effort_is_real()
+        self._remember_tool_schemas(tools)
         return super().build_request_payload(messages, tools=tools, stream=stream)
 
     def _assert_reasoning_effort_is_real(self) -> None:
@@ -112,3 +131,117 @@ class ElmProvider(OpenAIProvider):
             if entry["model_name"] == self.config.formal_model_name:
                 return entry.get("supports_tools", True)
         return True
+
+    # ======================================================================================
+    # WORKAROUND: stringified tool arguments. Self-contained, and meant to be deleted.
+    #
+    # Measured 2026-09-22 against the live gateway, one tool, 8 trials, only `tool_choice`
+    # varied:
+    #
+    #     tool_choice=auto      Qwen 0/8 schema-conformant, 6/8 stringified   gpt-5-mini 8/8
+    #     tool_choice=required  Qwen 7/8                                      gpt-5-mini 8/8
+    #     tool_choice=<named>   Qwen 8/8                                      gpt-5-mini 8/8
+    #
+    # vLLM applies guided decoding against a tool's JSON Schema only when a call is
+    # compelled. Under `auto` -- which is what an agent sends -- nothing enforces the schema,
+    # and the model writes the *text* of a list where an array is declared. This is an
+    # enforcement gap in the serving stack, not a comprehension gap in the model: the same
+    # model emits a conformant call the instant the constraint is applied.
+    #
+    # It is not a schema-quality problem, which was checked separately: typing `items` and
+    # replacing Python `None` with JSON `null` in the description left it at 0/8 under
+    # `auto`. Only removing the nesting (5/8) or compelling the call (7/8) helped.
+    #
+    # On one real run it was 64 of 79 tool-call failures; without them Qwen's failure rate is
+    # 15/155, the same 10% gpt_5.2 shows on the same PR set.
+    #
+    # THE REAL FIXES, neither of which this is:
+    #   * EDINA enabling guided decoding for tool calls under `auto` (asked for separately);
+    #   * flattening nested tool parameters, done for `file_read` in the same commit.
+    # `tool_choice: "required"` would also work and is deliberately NOT used here: it would
+    # forbid a tool-free assistant turn for every model and stage, which is a larger and
+    # longer-lived commitment than this.
+    #
+    # DELETE THIS BLOCK when the gateway enforces schemas. `repaired_argument_count` is how
+    # you tell: when it stays 0 across a run, nothing here is load-bearing any more.
+    # ======================================================================================
+
+    def _remember_tool_schemas(self, tools: Optional[List[Dict[str, Any]]]) -> None:
+        """Index this request's declared parameter schemas by tool name."""
+
+        if not self.REPAIR_STRINGIFIED_ARGUMENTS or not tools:
+            return
+        for tool in tools:
+            function = tool.get("function") or {}
+            name = function.get("name")
+            properties = (function.get("parameters") or {}).get("properties")
+            if name and isinstance(properties, dict):
+                self._tool_parameter_schemas[name] = properties
+
+    @staticmethod
+    def _declared_types(schema: Dict[str, Any]) -> set:
+        """Every JSON type a parameter may take, flattening `anyOf`/`oneOf`."""
+
+        types = set()
+        declared = schema.get("type")
+        if isinstance(declared, str):
+            types.add(declared)
+        elif isinstance(declared, list):
+            types.update(t for t in declared if isinstance(t, str))
+        for branch in (schema.get("anyOf") or []) + (schema.get("oneOf") or []):
+            if isinstance(branch, dict):
+                types |= ElmProvider._declared_types(branch)
+        return types
+
+    def postprocess_nodes(self, nodes: List):
+        """Repair arguments the gateway let through unvalidated.
+
+        Conservative by construction: a value is rewritten only when the schema says it is
+        NOT a string, the model sent a string, and that string parses as JSON to exactly a
+        type the schema allows. A parameter that may legitimately be a string is never
+        touched, so a regex like `"[a-z]+"` or a Lean snippet is safe even if it happens to
+        parse.
+        """
+
+        nodes = super().postprocess_nodes(nodes)
+        if not self.REPAIR_STRINGIFIED_ARGUMENTS or not self._tool_parameter_schemas:
+            return nodes
+
+        for node in nodes:
+            for block in getattr(getattr(node, "message", None), "content", None) or []:
+                if getattr(block, "type", None) != "tool_use":
+                    continue
+                properties = self._tool_parameter_schemas.get(block.name)
+                if not properties or not isinstance(block.input, dict):
+                    continue
+                for key, value in list(block.input.items()):
+                    repaired = self._repair_value(properties.get(key), value)
+                    if repaired is not _UNREPAIRED:
+                        block.input[key] = repaired
+                        self.repaired_argument_count += 1
+                        self.logger.warning(
+                            "repaired stringified argument %s.%s: %r -> %r "
+                            "(the gateway does not enforce tool schemas under tool_choice=auto)",
+                            block.name, key, value, repaired)
+        return nodes
+
+    def _repair_value(self, schema: Optional[Dict[str, Any]], value: Any) -> Any:
+        """The repaired value, or `_UNREPAIRED` to leave it exactly as it arrived."""
+
+        if not isinstance(schema, dict) or not isinstance(value, str):
+            return _UNREPAIRED
+        allowed = self._declared_types(schema)
+        # A parameter that may be a string is ambiguous: leave it alone.
+        if not allowed or "string" in allowed:
+            return _UNREPAIRED
+        try:
+            parsed = json.loads(value)
+        except (ValueError, TypeError):
+            return _UNREPAIRED
+        actual = {list: "array", dict: "object", bool: "boolean",
+                  int: "integer", float: "number", type(None): "null"}.get(type(parsed))
+        if actual is None or actual not in allowed:
+            # `integer` also satisfies a `number` declaration.
+            if not (actual == "integer" and "number" in allowed):
+                return _UNREPAIRED
+        return parsed

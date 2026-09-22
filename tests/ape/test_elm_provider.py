@@ -256,3 +256,121 @@ def test_reasoning_effort_is_inside_the_provenance_hash():
     dumped = LLMConfig(model_name="elm_qwen_3.5", reasoning_effort="none").model_dump(
         mode="json")
     assert dumped["reasoning_effort"] == "none"
+
+
+# --- the stringified-argument workaround -------------------------------------------------
+#
+# Measured cause: vLLM enforces a tool's JSON Schema only when a call is compelled, so under
+# `tool_choice=auto` Qwen writes the *text* of a list where an array is declared (0/8
+# conformant against gpt-5-mini's 8/8). These pin the repair's contract -- above all what it
+# refuses to touch, since a workaround that corrupts a legitimate string is worse than the
+# bug it fixes.
+
+ARRAY = {"anyOf": [{"items": {}, "type": "array"}, {"type": "null"}]}
+TOOLS_WITH_ARRAY = [{
+    "type": "function",
+    "function": {
+        "name": "file_read",
+        "parameters": {"type": "object", "properties": {
+            "file_path": {"type": "string"},
+            "line_range": ARRAY,
+            "max_messages": {"anyOf": [{"type": "integer"}, {"type": "null"}]},
+            "pattern": {"type": "string"},
+            "either": {"anyOf": [{"type": "string"}, {"items": {}, "type": "array"}]},
+        }},
+    },
+}]
+
+
+def _tool_use_node(name, payload):
+    """A real `ConversationNode`, built the way the client builds one.
+
+    Via `ConversationSession`, not by hand: a hand-made stand-in is free to disagree with
+    the class it stands in for, which is how a fixture stays green while production breaks.
+    """
+
+    from ape.llm_clients.models import ContentBlock, ConversationSession
+
+    session = ConversationSession(session_id="repair-test")
+    return session.add_assistant_message(
+        [ContentBlock.tool_use_block(id="c1", name=name, input=payload)], cwd="/")
+
+
+def _repair(payload, tools=TOOLS_WITH_ARRAY, model="elm_qwen_3.5"):
+    provider = client_for(model).provider
+    provider.build_request_payload([], tools=tools)
+    nodes = provider.postprocess_nodes([_tool_use_node("file_read", payload)])
+    return nodes[0].message.content[0].input, provider.repaired_argument_count
+
+
+def test_a_stringified_array_is_repaired():
+    repaired, count = _repair({"file_path": "a.lean", "line_range": "[200, 220]"})
+    assert repaired["line_range"] == [200, 220]
+    assert count == 1
+
+
+def test_a_stringified_integer_is_repaired():
+    """`lean_verify.max_messages` arrived as a string twice in the measured run."""
+
+    repaired, count = _repair({"file_path": "a.lean", "max_messages": "20"})
+    assert repaired["max_messages"] == 20 and count == 1
+
+
+def test_a_correct_array_is_left_exactly_alone():
+    repaired, count = _repair({"file_path": "a.lean", "line_range": [200, 220]})
+    assert repaired["line_range"] == [200, 220]
+    assert count == 0, "a conformant call must not be counted as a repair"
+
+
+@pytest.mark.parametrize("value", ["[a-z]+", "{x | x > 0}", "theorem foo : 1 = 1 := rfl", "[1,2"])
+def test_a_declared_string_is_never_touched(value):
+    """A regex, a set-builder or a Lean snippet can parse as JSON or look like it. The
+    parameter is declared `string`, so it is not this repair's business either way."""
+
+    repaired, count = _repair({"file_path": "a.lean", "pattern": value})
+    assert repaired["pattern"] == value and count == 0
+
+
+def test_an_ambiguous_union_is_left_alone():
+    """`anyOf: [string, array]` -- a string is a legal value, so rewriting it would be a
+    guess about intent rather than a repair of a type error."""
+
+    repaired, count = _repair({"file_path": "a.lean", "either": "[1, 2]"})
+    assert repaired["either"] == "[1, 2]" and count == 0
+
+
+def test_a_string_that_parses_to_the_wrong_type_is_left_alone():
+    """`"42"` parses, but an integer is not an array, so the schema is not satisfied."""
+
+    repaired, count = _repair({"file_path": "a.lean", "line_range": "42"})
+    assert repaired["line_range"] == "42" and count == 0
+
+
+def test_an_undeclared_parameter_is_left_alone():
+    repaired, count = _repair({"file_path": "a.lean", "mystery": "[1, 2]"})
+    assert repaired["mystery"] == "[1, 2]" and count == 0
+
+
+def test_the_repair_can_be_switched_off():
+    from ape.llm_clients.providers import ElmProvider
+
+    provider = client_for("elm_qwen_3.5").provider
+    provider.REPAIR_STRINGIFIED_ARGUMENTS = False
+    try:
+        provider.build_request_payload([], tools=TOOLS_WITH_ARRAY)
+        nodes = provider.postprocess_nodes(
+            [_tool_use_node("file_read", {"file_path": "a.lean", "line_range": "[1, 2]"})])
+        assert nodes[0].message.content[0].input["line_range"] == "[1, 2]"
+    finally:
+        provider.REPAIR_STRINGIFIED_ARGUMENTS = ElmProvider.REPAIR_STRINGIFIED_ARGUMENTS
+
+
+def test_the_direct_openai_provider_has_no_repair():
+    """The gap is ELM's serving stack. OpenAI conformed 8/8 in every tool_choice mode, so
+    nothing about this belongs on the shared provider."""
+
+    from ape.llm_clients.providers import OpenAIProvider
+
+    assert not hasattr(OpenAIProvider, "postprocess_nodes") or \
+        "repair" not in (OpenAIProvider.postprocess_nodes.__doc__ or "").lower()
+    assert not hasattr(OpenAIProvider, "REPAIR_STRINGIFIED_ARGUMENTS")
