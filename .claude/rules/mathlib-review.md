@@ -166,6 +166,17 @@ paths:
   `success: true` was wrong however deep the session was, and it fixed a false promise in the
   `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
   the fix for a problem that was mostly not there.
+- **Any proposal about which of the system's findings reach a maintainer is SELECTION, however it
+  is phrased (2026-09-22).** It has now been derived five times under five names: a pointwise
+  selector, a listwise one, an agentic one, a legibility score, and "the publication rule" -- the
+  last of which got past the standing refusal in `dead-ends.md` by being about concern *families*
+  rather than individual findings, which is the same decision at a coarser grain. The tells: a keep
+  rule, a threshold, a ranking, a second channel, a confidence cut, "publish the families that
+  hit". **The ordering rule that comes first: fix the generator.** The user's ruling, 2026-09-22 --
+  *"we currently don't have a good enough reviewer to start talking about selection"* -- and the one
+  intervention that moved issue recall (0.20 -> 0.50) did it by changing what the arms say, not by
+  re-ranking what they had already said. Measuring the gate is fine and the measurement is kept;
+  proposing a different gate is not.
 - **"What the run found" and "what it would tell a maintainer" are different numbers, and only
   one was ever reported (2026-09-22).** `finalize` publishes a claim only when a deterministic
   collector can warrant its concern family and keeps the rest as `diagnostic` with `channels: []`.
