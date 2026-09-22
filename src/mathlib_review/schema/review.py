@@ -204,6 +204,14 @@ class ContextCall(StrictModel):
     result_ids: List[str] = Field(default_factory=list)
     result_count: int = 0
     truncated: bool = False
+    #: Why a call came back with nothing, when the tool can tell the difference. `naming_norm`
+    #: returned one sentence for three causes and that sentence asserted the third -- "the
+    #: corpus has no counted opinion" -- so a subject its own parser could not resolve was
+    #: reported to the arm as the repository having no convention, with an instruction to
+    #: submit nothing. 477 of 632 calls across the three held-out reps came back empty and the
+    #: trace could not say which cause fired. Null on a call that returned something, and on
+    #: every row written before the split.
+    empty_because: Optional[Literal["subject_unresolved", "no_population"]] = None
 
 
 class CandidateAssessment(StrictModel):

@@ -136,3 +136,51 @@ def test_generalization_reaches_the_subjects_the_frozen_operator_could_not():
     )
     assert linear is not None
     assert linear.proposed_fullname.startswith("Submodule.toLinearMap_")
+
+
+def test_an_empty_naming_verdict_says_which_of_three_things_happened():
+    """One sentence used to stand for three causes, and it asserted the third.
+
+    `subject.token is None`, `subject.confidence != "high"` and `population is None` all
+    returned "The corpus has no counted opinion about this declaration's subject ... Submit
+    nothing on naming". The first two are this tool failing to parse a subject out of the
+    conclusion; only the third is a fact about the repository. So a tool failure was reported
+    to the arm as the repository having no convention, with an instruction to be silent
+    attached -- and 477 of 632 calls across the three held-out reps came back empty with
+    nothing to say which had happened.
+
+    The distinction matters for what the arm does next: an unmeasured subject is a reason to
+    fall back on its own judgement, and a counted corpus with no population is a reason to
+    drop the question.
+    """
+
+    import inspect
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+    from src.mathlib_review.schema.review import ContextCall
+
+    source = inspect.getsource(context_tools)
+    assert 'cause = "subject_unresolved" if unresolved else "no_population"' in source
+
+    # The unresolved branch must not tell the arm the corpus was consulted, and must not
+    # instruct silence -- that instruction is what the measured behaviour followed.
+    unresolved_text = source.split('if unresolved:', 1)[1].split('return {', 1)[1].split('}', 1)[0]
+    assert "could not work out what this declaration is ABOUT" in unresolved_text
+    assert "limit of" in unresolved_text
+    assert "Submit nothing" not in unresolved_text
+
+    # The corpus branch keeps both, because there it is true.
+    corpus_text = source.split('"no_population"', 1)[1]
+    assert "holds no counted population" in corpus_text
+    assert "Submit nothing on naming" in corpus_text
+
+    # And the trace carries the cause, declared on the row model rather than smuggled into a
+    # dict -- a trace row that does not validate is how a vocabulary goes unchecked.
+    annotation = ContextCall.model_fields["empty_because"].annotation
+    assert "subject_unresolved" in str(annotation) and "no_population" in str(annotation)
+    row = ContextCall(invocation_id="wu:a#naming", tool="naming_norm", query="Foo.bar",
+                      gate="base_snapshot", empty_because="subject_unresolved")
+    assert row.empty_because == "subject_unresolved"
+    # Rows written before the split still load.
+    assert ContextCall(invocation_id="wu:a#naming", tool="naming_norm", query="Foo.bar",
+                       gate="base_snapshot").empty_because is None
