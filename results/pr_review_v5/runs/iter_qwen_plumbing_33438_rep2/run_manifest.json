@@ -1,0 +1,50 @@
+{
+  "agent_added": 4,
+  "candidates_total": 4,
+  "completion_status": "partial",
+  "context_calls_total": 25,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:230e4c75daf818c75b024525#generalist",
+      "pr_number": 33438,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    }
+  ],
+  "delegated": 9,
+  "failed": 0,
+  "issues_total": 4,
+  "mandatory": 5,
+  "paused": 1,
+  "proposals_total": 11,
+  "pruned": 2,
+  "routing_mode": "lead",
+  "run_id": "v5run:iter_qwen_plumbing_33438_rep2",
+  "run_name": "iter_qwen_plumbing_33438_rep2",
+  "run_plan_sha256": "3cf42516b8e3b3f385b43e3971cb996f30ab6234b4d45bdb1d5e5b1741ee3023",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "107a4e2f039cfdda24c5e50560dacde94bc990f4300846217b002e0272bc7fec",
+  "succeeded": 8,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 1976691.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 189957.0,
+    "tokens": 2166648.0
+  },
+  "wall_seconds": 1194.674757
+}

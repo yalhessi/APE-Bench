@@ -270,3 +270,44 @@ so every one of the 4 published findings is a false positive. Measured control e
 `gpt_5.2` v5 runs is 0-1 per run, so 4 is outside that range. It is one PR on one rep with
 three arms truncated mid-investigation, which is not a precision measurement; it is a reason to
 look at control emission on the first real Qwen rep.
+
+## rep2: what the gap was actually made of
+
+The section above read Qwen's ~9.7x token gap as a property of the model. Half of it was a
+tool-calling defect. `iter_qwen_plumbing_33438_rep2` is the same PR, the same config and the
+**same ceilings as rep1** (pinned with `--set`), differing only by two fixes: `file_read`
+taking scalar line bounds, and `ElmProvider` repairing stringified arguments.
+
+| | rep1 | rep2 | `gpt_5.2` |
+|---|---:|---:|---:|
+| arm tokens, median | 341,210 | **181,259** | 35,276 (p50) |
+| arm turns, median | 24 | **11** | ~6-7 tool calls |
+| lead tokens | 567,725 | **189,957** | |
+| lead turns | 39 | **14** | |
+| tool-call failures | 79/155 (51%) | **16/140 (11%)** | 65/644 (10%) |
+| arms paused on tokens | 3/9 | **1/9** | |
+
+**Qwen's tool discipline is now `gpt_5.2`'s**: 11% against 10%, and the residue is ordinary
+workspace-path confusion of the same kind, not a serialization defect. The remaining token
+gap is ~5x rather than ~10x, and it is a real difference in how many turns the model takes.
+
+**The substance was unchanged**, which is the check that matters: both runs produced the same
+two asks on the same two declarations — rewrite `arctan_sqrt_three` and
+`arctan_inv_sqrt_three` in the `arctan_eq_of_tan_eq` idiom of their sibling `arctan_one` —
+both at `verified_compile`, found independently by `proof_golf` and `proof_idiom`. The fixes
+removed retries, not findings.
+
+**Flattening alone would not have done it.** The repair fired 47 times in rep2, and 41 were on
+the *new scalars*: `file_read.line_start` 22, `line_end` 19. Under a full agent context Qwen
+stringifies a plain integer too, not only an array — the isolated probe that showed it
+choosing clean scalars 9/10 overstated how clean it is in situ. Both fixes were load-bearing.
+
+**One escaped, correctly.** `submit_routing.candidate_assessments` arrived as a 1,342-character
+string that is not valid JSON at all (`Extra data: line 2 column 1006`) — a malformed payload
+rather than a double-encoded one. The repair declines anything that does not parse to a type
+the schema allows, so it left it alone and the call failed loudly. That is the intended
+contract: a workaround that guesses is worse than the bug.
+
+**The ceilings stay at 3x.** rep2 still paused one arm at 360,000 and its largest completed arm
+was 393,171, so the original figure is genuinely too tight for this model. 1,080,000 is ~6x
+the observed median and ~2.7x the observed max. Still n=9 on one control PR, twice.

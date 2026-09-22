@@ -60,32 +60,31 @@ execution:
   max_concurrency: 4
 
 dataset:
-  # The token ceilings do NOT transfer from gpt_5.2, and this file said they did until the
-  # first rep was run. Measured on `iter_qwen_plumbing_33438_rep1` (PR 33438, the control —
-  # 1 work unit, 9 arms):
+  # The token ceilings do NOT transfer from gpt_5.2, and the reason turned out to be half
+  # tooling rather than half the model. Two measured runs on PR 33438 (the control, 1 work
+  # unit, 9 arms), identical except for the tool fixes in abc17df and cb8594b:
   #
-  #   Qwen arm processed tokens: 42,692 / 128,355 / 279,140 / 296,271 / 341,210 / 358,378 /
-  #                              371,405 / 376,393 / 377,152     median 341,210
-  #   gpt_5.2 arm p50 35,276 / p90 87,589 / p99 243,736          (16 runs, 2,857 attempts)
+  #                        rep1 (before)   rep2 (after)   gpt_5.2 reference
+  #   arm tokens median      341,210         181,259        35,276 (p50, 16 runs)
+  #   arm turns median            24              11        ~6-7 tool calls
+  #   lead tokens            567,725         189,957
+  #   lead turns                  39              14
+  #   tool-call failures     79/155 (51%)    16/140 (11%)   65/644 (10%)
+  #   arms paused on tokens      3/9             1/9
   #
-  # About 9.7x the median. The inherited `standard_budget_tokens: 360000` — which cut 6 of
-  # 2,857 gpt_5.2 arms, 0.21% — paused 3 of 9 here, 33%, with a fourth finishing at 99.5% of
-  # it. The run came back `completion_status=partial`.
+  # rep1's 9.7x gap against gpt_5.2 was mostly retry overhead: ELM does not enforce tool
+  # schemas under `tool_choice=auto`, so Qwen emitted the text of a list where an array was
+  # declared and burned turns recovering. With that fixed its tool discipline matches
+  # gpt_5.2's (11% against 10%) and the remaining gap is ~5x, not ~10x.
   #
-  # The mechanism is turns, not verbosity per turn: these arms ran 18-26 turns where the
-  # gpt_5.2 arms run a median of ~6-7 tool calls, and processed tokens grow superlinearly in
-  # turns because each turn re-sends the whole conversation. `processed_tokens` being
-  # cache-inclusive is what makes the two numbers comparable at all; it is not the cause.
+  # The ceilings stay at 3x anyway. rep2 still paused one arm at 360,000 and its largest
+  # completed arm was 393,171, so the original number is genuinely too tight for this model;
+  # 1,080,000 is ~6x the observed median and ~2.7x the observed max, which is the regime
+  # gpt_5.2 runs in -- a ceiling that stops a runaway while `max_turns` stops a normal arm.
+  # Ratios preserved throughout (1,080,000 x 5 = 5,400,000).
   #
-  # So the ceiling is raised 3x, with the ratios preserved (1,080,000 x 5 = 5,400,000 keeps
-  # the same five standard jobs a lead may buy). The basis is not the observed maximum — it is
-  # that a ceiling should stop a runaway and let `max_turns` stop a normal arm, which is the
-  # regime gpt_5.2 runs in. At ~350k by turn 25, an arm going the full 40 turns lands near
-  # 1M, so 1,080,000 puts the turn limit back in charge.
-  #
-  # PROVISIONAL: n=9 arms on ONE control PR, the cheapest in the set. A real multi-PR rep
-  # should revise these, and until one exists do not read a `paused_tokens` arm here as a
-  # finding about Qwen's diligence.
+  # PROVISIONAL: n=9 arms on ONE control PR, the cheapest in the set, twice. A multi-PR rep
+  # should revise these, and 2x may well be enough once one exists.
   standard_budget_tokens: 1080000
   per_pr_token_cap: 5400000
   # Scaled with the others. `_warn_on_denomination_drift` compares RATIOS -- this cap over
