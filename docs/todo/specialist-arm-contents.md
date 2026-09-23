@@ -34,6 +34,25 @@ above" and says every candidate must set one concern. Result corpus-wide: `famil
 tags have ever been emitted**, so the `OFF_CONCERN_TAG` diagnostic built to measure drift measures
 nothing, and the registry's long justification for the widened sets is inert.
 
+**`naming_norm` counts prefixes, and at least one gold ask is a suffix change** (added
+2026-09-21). `leaf_prefix` (`naming_norm.py:122-125`) is `leaf.split("_", 1)[0]`, so the counted
+population is over first tokens only. PR 33421's obligation is "rename `round_eq'` to
+`round_eq_div`" — both names have the prefix `round`, so the tool cannot distinguish them at any
+threshold, and the arm duly reported `insufficient_evidence`. This is structural and separate from
+the bar below: lowering `MIN_SUPPORT_RATIO` does not make a prefix oracle see a suffix convention.
+Both `evidence_gap` labels in the 2026-09-21 silence read name this tool
+(`docs/research/specialist-silences-2026-09.md`).
+
+**Counted 2026-09-22, and it is worse than a threshold problem.** Of the release's four
+naming-labelled gold obligations, **two are not prefix questions at all**: 33421 is a suffix change
+(`round_eq'` -> `round_eq_div`, both prefix `round`) and 33294 is a dot-notation/namespace move
+(`isFundamentalSequence_of_isNormal` -> `IsFundamentalSequence.of_isNormal`). The other two --
+33337's `coe_` -> `toLinearMap_` pair -- the tool *did* express, correctly, as `emerging` (21 vs 7),
+and the arm read `emerging` as grounds for silence. So on this set the tool is the wrong shape for
+half the asks and correct-but-ignored on the rest, and forcing the same arm produced the gold rename
+for both 33337 and 33145 (`docs/research/what-forcing-unlocks-2026-09.md`). Four obligations, one
+release: a description, not a rate.
+
 **`naming` is the most precise specialist and is throttled by an unreachable bar.** 10 issue-matches
 from 29 findings (34%) — four times the generalist's per-finding rate — but it submits on 4 of 75
 lead invocations (5%). `naming_norm` requires `support >= 20` **and** `support/members >= 0.80`

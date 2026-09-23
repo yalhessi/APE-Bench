@@ -42,7 +42,7 @@ from src.mathlib_review.io import (
 from src.mathlib_review.paths import ADJUDICATIONS
 from src.mathlib_review.run_state import StageInput, append_stage, digests_of, stage_record
 from src.mathlib_review.review.merge import finding_key
-from src.mathlib_review.schema import AdjudicationLabel
+from src.mathlib_review.schema import AdjudicationLabel, SilenceLabel
 
 #: Bumped when what a label MEANS changes -- the vocabulary, or what a labeller is shown.
 #: Separate from `schema_version`, which says the row parses.
@@ -52,6 +52,12 @@ ADJUDICATION_VERSION = "v5-adjudication/1"
 #: outside `AUDITS`: a label is about a claim, not about a run, and it has to outlive every run
 #: that reproduces the claim.
 LABELS = ADJUDICATIONS / "labels.jsonl"
+
+#: The same arrangement for the other side of the ledger: why an arm said nothing where a
+#: maintainer asked for something. Separate file because the key is a different thing (a
+#: silence at a site, not a claim) and mixing them would make either store's coverage
+#: unreadable.
+SILENCE_LABELS = ADJUDICATIONS / "silence_labels.jsonl"
 
 
 def load_labels(path: Path = LABELS) -> List[AdjudicationLabel]:
@@ -94,15 +100,13 @@ def resolve(labels: Iterable[AdjudicationLabel]) -> Dict[str, Dict[str, Any]]:
     return resolved
 
 
-def ingest(path: Path, *, store: Path = LABELS) -> Dict[str, int]:
-    """Read a file of human labels into the store.
+def _assert_human(path: Path, rows) -> None:
+    """Refuse a hand-written file that claims a model wrote it.
 
-    Validated as `AdjudicationLabel`, and a row that does not say a human wrote it is refused:
-    the whole point of the prefix is that a human verdict outranks a model's, and a file that
+    The whole point of the prefix is that a human verdict outranks a model's, and a file that
     could claim either would make that ordering meaningless.
     """
 
-    rows = [AdjudicationLabel.model_validate(row) for row in jsonl_rows(path)]
     impostors = [row.key for row in rows if not row.labelled_by.startswith("human:")]
     if impostors:
         raise ValueError(
@@ -110,9 +114,65 @@ def ingest(path: Path, *, store: Path = LABELS) -> Dict[str, int]:
             f"(e.g. {impostors[0]}). A human label outranks a model's, so a file that can claim "
             f"to be either makes that ordering meaningless. Write model labels through the "
             f"adjudicator that produced them.")
+
+
+def ingest(path: Path, *, store: Path = LABELS) -> Dict[str, int]:
+    """Read a file of human labels into the store, validated as `AdjudicationLabel`."""
+
+    rows = [AdjudicationLabel.model_validate(row) for row in jsonl_rows(path)]
+    _assert_human(path, rows)
     for row in rows:
         append_label(row, store)
     return {"ingested": len(rows), "keys": len({row.key for row in rows})}
+
+
+def load_silence_labels(path: Path = SILENCE_LABELS) -> List[SilenceLabel]:
+    """Every silence label ever written, in order."""
+
+    return [SilenceLabel.model_validate(row) for row in appended_rows(path)]
+
+
+def ingest_silences(path: Path, *, store: Path = SILENCE_LABELS) -> Dict[str, int]:
+    """Read a file of hand-made silence labels into the silence store.
+
+    Same contract as `ingest`, one model along: validated, human-only, appended never edited.
+    """
+
+    rows = [SilenceLabel.model_validate(row) for row in jsonl_rows(path)]
+    _assert_human(path, rows)
+    for row in rows:
+        append_jsonl(store, row)
+    return {"ingested": len(rows), "keys": len({row.key for row in rows})}
+
+
+def resolve_silences(labels: Iterable[SilenceLabel]) -> Dict[str, Dict[str, Any]]:
+    """The current label per silence, and whether the rows on that silence disagree.
+
+    `resolve` for the other store, and deliberately the same rules: a human row outranks a
+    model row, a later row of the same kind outranks an earlier one, and disagreement is
+    reported rather than averaged. Two readers calling one silence `off_concern` and
+    `fix_required` is the row worth looking at, not a tie to break.
+    """
+
+    by_key: Dict[str, List[SilenceLabel]] = {}
+    for label in labels:
+        by_key.setdefault(label.key, []).append(label)
+
+    resolved: Dict[str, Dict[str, Any]] = {}
+    for key, rows in by_key.items():
+        human = [row for row in rows if row.labelled_by.startswith("human:")]
+        chosen = (human or rows)[-1]
+        resolved[key] = {
+            "label": chosen.label,
+            "evidence_gap_tool": chosen.evidence_gap_tool,
+            "labelled_by": chosen.labelled_by,
+            "note": chosen.note,
+            "from_run": chosen.from_run,
+            "replay_run": chosen.replay_run,
+            "contested": len({row.label for row in rows}) > 1,
+            "rows": len(rows),
+        }
+    return resolved
 
 
 def population(findings: List[Dict[str, Any]], pairs, matches) -> List[Dict[str, Any]]:

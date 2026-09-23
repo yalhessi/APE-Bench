@@ -567,7 +567,11 @@ def _register_naming_norm(task, mcp) -> None:
             "`verdict` is the answer, not the counts: `established` means the corpus is "
             "lopsided enough to hold a PR to (a blocking ask); `emerging` means one spelling "
             "leads clearly but is not dominant (advisory at most); `insufficient_evidence` "
-            "means the corpus has no opinion here and you should submit nothing on naming."
+            "covers two different things and `empty_because` says which. `no_population`: the "
+            "corpus was consulted and has no opinion here, so submit nothing on naming. "
+            "`subject_unresolved`: this tool could not work out what the declaration is about "
+            "and never asked the corpus, so naming here is UNMEASURED rather than settled -- "
+            "judge it on the evidence you have."
         )
     )
     async def naming_norm(
@@ -621,7 +625,16 @@ def _register_naming_norm(task, mcp) -> None:
 
         subject = conclusion_subject(declaration_conclusion(signature))
         population = norm_for(index, subject.token)
-        if subject.token is None or subject.confidence != "high" or population is None:
+        # Three different things used to return one sentence, and that sentence asserted the
+        # third: "The corpus has no counted opinion about this declaration's subject ... Submit
+        # nothing on naming." Only `population is None` is a fact about the corpus. The other
+        # two are this tool failing to resolve a subject from the conclusion, and reporting a
+        # tool failure as a corpus verdict tells the arm the repository has no convention when
+        # nobody looked -- then instructs silence. 477 of 632 calls across the three held-out
+        # reps came back empty with no way to tell which cause fired.
+        unresolved = subject.token is None or subject.confidence != "high"
+        if unresolved or population is None:
+            cause = "subject_unresolved" if unresolved else "no_population"
             _append_trace(task, {
                 "schema_version": "v5-context-call1",
                 "invocation_id": task.data.invocation_id,
@@ -630,12 +643,25 @@ def _register_naming_norm(task, mcp) -> None:
                 "query": declaration,
                 "as_of": None, "exclude_pr": None, "corpus_sha256": base,
                 "result_ids": [], "result_count": 0, "truncated": False,
+                "empty_because": cause,
             })
-            return {"success": True, "verdict": "insufficient_evidence", "subject": subject.token,
+            if unresolved:
+                return {
+                    "success": True, "verdict": "insufficient_evidence",
+                    "subject": subject.token, "empty_because": cause,
                     "results": (
-                        "The corpus has no counted opinion about this declaration's subject, so "
-                        "there is no convention here to hold the PR to. Submit nothing on naming "
-                        "unless a maintainer precedent says otherwise.")}
+                        "This tool could not work out what this declaration is ABOUT from its "
+                        "conclusion, so it never asked the corpus anything. That is a limit of "
+                        "this tool, not a statement that the repository has no convention here "
+                        "-- treat naming for this declaration as unmeasured and judge it on the "
+                        "evidence you have.")}
+            return {"success": True, "verdict": "insufficient_evidence", "subject": subject.token,
+                    "empty_because": cause,
+                    "results": (
+                        "The subject resolved to `" + str(subject.token) + "`, and the corpus "
+                        "holds no counted population for it, so there is no convention here to "
+                        "hold the PR to. Submit nothing on naming unless a maintainer precedent "
+                        "says otherwise.")}
 
         current = leaf_prefix(declaration.rsplit(".", 1)[-1])
         ranked = population.prefix_counts.most_common()

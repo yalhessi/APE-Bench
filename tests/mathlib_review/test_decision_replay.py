@@ -145,10 +145,20 @@ def test_reason_before_verdict_on_the_real_candidate_schema(tools, payload, tmp_
 
 
 def test_the_accepted_submission_is_read_off_the_result():
+    """The detail travels with the reason. The reason alone is not evidence about a silence:
+    17 of the 45 gold-site sessions replayed on 2026-09-21 produced a different one with the
+    outcome unchanged, so a diagnosis built on it is a coin flip."""
+
     assert accepted_summary({"success": True, "candidates": [],
-                             "abstention": {"reason": "already_correct"}}) == {
-        "filed": False, "abstention_reason": "already_correct", "anchors": [],
+                             "abstention": {"reason": "already_correct",
+                                            "detail": "checked all five; they match"}}) == {
+        "filed": False, "abstention_reason": "already_correct",
+        "abstention_detail": "checked all five; they match", "anchors": [],
         "candidate_keys": [], "model_confidence": []}
+    # A filed submission has no abstention of either kind.
+    assert accepted_summary({"success": True, "candidates": [],
+                             "abstention": {"reason": "already_correct"}})[
+        "abstention_detail"] is None
     filed = accepted_summary({"success": True, "candidates": [
         {"primary_change_id": "change:a", "concern_family": "naming",
          "issue_kind": "naming_convention_violation", "model_confidence": None}]})
@@ -382,6 +392,34 @@ def test_the_report_reads_agreement_per_session_not_pooled():
     assert report["by_arm"]["naming"]["replayed_filing_rate"] == 0.5
 
 
+def test_a_replayed_decision_records_the_sentence_as_well_as_the_label():
+    """What the condition experiments will be read from.
+
+    The decision record is the only place a replayed arm's own words are kept in the results
+    tree -- the session files live in whichever worktree ran the replay, and the first
+    diagnostic's texts were only reachable there. Since the label swaps under re-sampling on
+    better than a third of sessions, a run that kept the label and dropped the sentence
+    recorded the unreliable half.
+    """
+
+    from src.mathlib_review.review.replay import submission_summary
+
+    silent = submission_summary({
+        "candidates": [],
+        "abstention_reason": "below_my_bar",
+        "abstention_detail": "`toLinearMap_` leads 21 to 7 but is not established.",
+    })
+    assert silent["abstention_reason"] == "below_my_bar"
+    assert silent["abstention_detail"] == "`toLinearMap_` leads 21 to 7 but is not established."
+
+    # A filed submission carries neither, and an empty detail is None rather than "".
+    filed = submission_summary({"candidates": [{"primary_change_id": "change:a"}],
+                                "abstention_detail": "ignored when candidates are present"})
+    assert filed["abstention_reason"] is None and filed["abstention_detail"] is None
+    assert submission_summary({"candidates": [], "abstention_detail": ""})[
+        "abstention_detail"] is None
+
+
 def test_a_condition_is_read_against_the_null_paired_by_session():
     from src.mathlib_review.review.replay import compare_replays
 
@@ -603,6 +641,76 @@ def test_the_gold_derived_selectors_name_what_a_scratch_join_used_to():
 
 
 @_has_run
+@_has_run
+def test_the_control_selector_is_the_guard_every_replay_so_far_lacked():
+    """A condition that turns silences into asks is an improvement only if it leaves alone the
+    PRs where maintainers wanted nothing. No replay could measure that: the diagnostic's 45
+    sessions and the named gold-site selector both draw only from PRs that carry gold, so the
+    precision side was unobservable at any price.
+
+    Which PRs are controls comes from the release -- a PR it records no `proposed_atomic`
+    obligation for -- and not from a config list, because a list could name a control gold
+    disagrees about and the resulting number would be a fiction.
+    """
+
+    from src.mathlib_review.review.replay import select_invocations
+
+    controls, provenance = select_invocations(_selector_dataset(selector="control-abstentions"))
+    assert provenance["control_pr_numbers"] == [33304, 33315]
+    assert provenance["gold_derived"] is True
+    assert len(controls) == 7
+    assert all(invocation.split("#")[-1] != "generalist" for invocation in controls)
+
+    # Disjoint from the gold-site population by construction: that is what makes it a control.
+    gold_site, _ = select_invocations(_selector_dataset(selector="gold-site-abstentions"))
+    assert not (controls & gold_site)
+
+    # And narrowable by arm like the others.
+    docs, _ = select_invocations(
+        _selector_dataset(selector="control-abstentions", arm_ids=["docs"]))
+    assert docs < controls and len(docs) == 5
+
+
+def test_a_set_with_no_control_pr_is_refused_rather_than_measured_without_one(
+        tmp_path, monkeypatch):
+    """Two of this project's PR sets have no control -- both controls are larger than every PR
+    in them -- and a condition run there has no precision guard at all. Saying so is the
+    selector's job; returning nothing would read as "no silences to fix".
+
+    Built as a real run directory rather than a stand-in: a fake `StageInput` would be free to
+    disagree with the class, which is how a fixture here once passed while the code it stood
+    for was broken.
+    """
+
+    import json as json_module
+
+    import src.mathlib_review.review.replay as replay_module
+    from src.mathlib_review.io import append_jsonl, pretty_json_bytes
+    from src.mathlib_review.review.replay import select_invocations
+    from src.mathlib_review.schema.review import ArmResponse
+
+    release = tmp_path / "release"
+    (release / "gold").mkdir(parents=True)
+    (release / "gold" / "judgments.jsonl").write_text(json_module.dumps({
+        "pr_number": 33057, "obligations": [
+            {"obligation_id": "obligation:a", "status": "proposed_atomic",
+             "change_ids": ["change:a"], "claim": "fix the last error"}]}) + "\n")
+
+    directory = tmp_path / "runs" / "every_pr_has_gold"
+    directory.mkdir(parents=True)
+    (directory / "agenda.json").write_bytes(pretty_json_bytes({
+        "release": str(release), "proposals": [{"pr_number": 33057}]}))
+    append_jsonl(directory / "arm_responses.jsonl", ArmResponse(
+        invocation_id="wu:a#docs", arm_id="docs", work_unit_id="wu:a", spec_id="docs",
+        pr_number=33057, status="success", candidates=[],
+        abstention={"reason": "already_correct", "detail": "checked"}))
+
+    monkeypatch.setattr(replay_module, "run_dir", lambda _name: directory)
+    with pytest.raises(ReplayRefused, match="no control PR"):
+        select_invocations(
+            _selector_dataset(selector="control-abstentions", of_run="every_pr_has_gold"))
+
+
 def test_missed_obligations_refuses_without_the_judges_verdicts(monkeypatch):
     """Which obligations were missed is not knowable without them, and guessing would make the
     selection a fiction."""

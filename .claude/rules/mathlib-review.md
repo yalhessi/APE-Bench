@@ -166,6 +166,61 @@ paths:
   `success: true` was wrong however deep the session was, and it fixed a false promise in the
   `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
   the fix for a problem that was mostly not there.
+- **Any proposal about which of the system's findings reach a maintainer is SELECTION, however it
+  is phrased (2026-09-22).** It has now been derived five times under five names: a pointwise
+  selector, a listwise one, an agentic one, a legibility score, and "the publication rule" -- the
+  last of which got past the standing refusal in `dead-ends.md` by being about concern *families*
+  rather than individual findings, which is the same decision at a coarser grain. The tells: a keep
+  rule, a threshold, a ranking, a second channel, a confidence cut, "publish the families that
+  hit". **The ordering rule that comes first: fix the generator.** The user's ruling, 2026-09-22 --
+  *"we currently don't have a good enough reviewer to start talking about selection"* -- and the one
+  intervention that moved issue recall (0.20 -> 0.50) did it by changing what the arms say, not by
+  re-ranking what they had already said. Measuring the gate is fine and the measurement is kept;
+  proposing a different gate is not.
+- **"What the run found" and "what it would tell a maintainer" are different numbers, and only
+  one was ever reported (2026-09-22).** `finalize` publishes a claim only when a deterministic
+  collector can warrant its concern family and keeps the rest as `diagnostic` with `channels: []`.
+  Over the three held-out A reps the run hits **7 / 5 / 6** gold obligations and publishes
+  **2 / 1 / 1**; 21 of rep1's 24 suppressed hit-findings say "no collector can support this
+  claim's concern family". The gate's axis is close to orthogonal to where maintainers ask:
+  `correctness` files 161, hits 39, publishes 2, while `generalization` has never hit and
+  publishes 40%; the generalist holds **64 of 71** hits at 2.8% publication. Quote the pair, never
+  one of them -- `report buckets --audit` prints both in its `gate` block, with control emission
+  beside them, because published control emission is **0/0/0** against 12 pre-gate and the gate is
+  what buys it. `docs/research/the-admission-gate-2026-09.md`.
+- **A capability nothing has ever exercised is a capability nobody has ever tested (2026-09-22).**
+  `patch_set` -- the one way to submit a fix spanning declarations -- was carried by 0 of 3,411
+  candidates across 60 runs, and *five* independent defects were waiting in it: granted to the one
+  arm that never files, `Path(WorkspaceInfo)` raising on first use, `apply` splicing a declaration
+  by `text.replace(name, new, 1)` so a well-formed edit rewrote the first *mention* of the name
+  (its own docstring) and compiled the wreckage, the contract template omitting the field under
+  "This supersedes any field list above", and the finding schema dropping it before the judge. Two
+  of the five had tests written over them that passed: one assigned a string where the runtime
+  passes a `WorkspaceInfo`, and every source in the patch-set tests was a single line whose
+  declaration name occurred exactly once. **Before costing a capability's absence as a finding
+  about the model, exercise it once by hand** -- here that was two local compiles, no spend, and it
+  is the check that separates "the arms decline to use it" from "it never worked".
+- **A gold-site silence is not evidence about an arm unless the ask was in that arm's remit
+  (2026-09-21).** "41 of 45 gold-site specialist silences reproduce under replay" was read for a
+  week as arms withholding findings, and a plan costed three interventions against it. Labelling
+  all 58 silent sessions against the ask each was silent about says otherwise: **37 are an arm
+  correctly quiet about somebody else's concern** (`duplication` at a rename, `naming` at "factor
+  out the repeated argument"), 17 are the right arm declining on stated grounds, and the three
+  mechanisms total four sessions. An on-concern arm was scheduled at **22 of 22** counted
+  obligations, so this is not a coverage gap either. `cli report silences` computes the remit test
+  (`registry.expected_concerns` bridged through `benches.gold_labels_for`); use it before reading
+  any silence count as a fact about a contract, and see
+  `docs/research/specialist-silences-2026-09.md`.
+- **The abstention *reason* is not the diagnosis; the detail is.** Replay produced a different
+  `abstention_reason` on 17 of 45 sessions with the outcome unchanged -- `already_correct` and
+  `could_not_establish` swap freely -- so any split built on the enum (including the 76%
+  `already_correct` figure that motivated the forcing experiment) is measuring a coin flip. Label
+  from `abstention_detail`, which now survives into replay outcome rows and into `report silences`.
+  `finalize` reads neither: it contains no occurrence of `abstention`.
+- **`naming_norm` counts leaf PREFIXES only** (`naming_norm.py:122`, `leaf.split("_", 1)[0]`), so a
+  convention expressed in a suffix is invisible to it at any threshold. PR 33421's gold ask renames
+  `round_eq'` to `round_eq_div`; both are prefix `round`. Separate from the unreachable 0.80 bar
+  already recorded in `docs/todo/specialist-arm-contents.md`.
 - **Control-PR emission is 0-1 per run, not 0.** Measured over every v5 run covering 33315:
   `heldout12_rep1` 0/13 invocations, `heldout11_rep1` 1/11 (generalist), `heldout11_rep2` 1/11
   (generalist), `medium_heldout_rep1` 0/13, `validate_abstention_rep1` 1/18 (docs). The "0 false

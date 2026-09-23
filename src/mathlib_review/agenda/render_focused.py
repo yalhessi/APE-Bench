@@ -38,10 +38,13 @@ from src.mathlib_review.agenda.render_prompts import (
 from src.mathlib_review.schema import ChangeGraph, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit
 
 #: `/2` deduplicated the hunk and the checklist within a prompt; `/3` scopes each target's
-#: diff to that target (`render_prompts.target_diff_section`). Every prompt this renderer
-#: produces changed at each bump, so runs across one are not prompt-identical and must not be
-#: compared as if they were.
-FOCUSED_RENDERER_VERSION = "focused-prompt/3"
+#: diff to that target (`render_prompts.target_diff_section`); `/4` tells the arms a compile
+#: can settle that `patch_set` exists, in the contract rather than in one arm's own prose.
+#: Every prompt this renderer produces changed at each bump, so runs across one are not
+#: prompt-identical and must not be compared as if they were -- except at `/4`, where the
+#: seven granted arms' prompts change and the other three are byte-identical, which is
+#: asserted rather than assumed (`test_pr_review_v4_focused_task.py`).
+FOCUSED_RENDERER_VERSION = "focused-prompt/4"
 
 #: The v4 submission envelope, appended after each spec's own instruction.
 #:
@@ -64,7 +67,7 @@ Finish by calling submit_candidates exactly once, using:
 "claim": "specific present problem", "requested_change": "concrete maintainer request",
 "suggested_fix": "optional implementation detail or null", "proposed_edit": {{"path": "...",
 "declaration_name": "...", "new_declaration": "complete replacement"}} or null,
-"model_confidence": 0.0}}]}}. An empty candidates list is valid.
+{patch_set_field}"model_confidence": 0.0}}]}}. An empty candidates list is valid.
 
 Submitting nothing is a correct and common outcome of this check, and nothing below asks you to
 avoid it. It does have to say which outcome it was: when `candidates` is empty, set
@@ -96,7 +99,33 @@ asks for the wrong size of change has not helped.
 
 Say which field your claim is about. If what you have found is that something already exists
 in the library, that is a duplication claim whatever check you are running, and saying so in
-`concern_label` is what lets it be verified against the library rather than taken on trust."""
+`concern_label` is what lets it be verified against the library rather than taken on trust.{patch_set_clause}"""
+
+#: What a granted arm is told about coordinated fixes, in the contract that supersedes the
+#: prompt above it. `family_design` alone carried this, in its own prompt, 2,400 characters
+#: above a template that did not list the field -- so the one arm that could submit one was
+#: told about it by the text the contract overrides. The instruction is the same instruction;
+#: what changes is that it is now where the arm reads its field list, and that every arm whose
+#: fix a compile settles reads it.
+PATCH_SET_FIELD = ('"patch_set": [{"path": "...", "change_id": "change:...",\n'
+                   '"declaration_name": "...", "new_declaration": "complete replacement"}] '
+                   'or null,\n')
+
+PATCH_SET_CLAUSE = """
+
+## Coordinated fixes
+
+Where the fix genuinely spans several declarations, submit it as `patch_set` — a list of edits
+applied and compiled TOGETHER, instead of `proposed_edit`. Use it when the halves are
+individually wrong: deleting a generated lemma without adding the attribute that regenerates
+it does not compile, and neither does adding a dual before the lemma it is derived from
+exists. An empty `new_declaration` deletes the declaration.
+
+Every edit names the `change_id` it is about, and that target must be one your candidate
+claims in `change_ids` — an edit may not rewrite a declaration you are not asking about. The
+whole candidate is refused if any edit escapes its target, if two edits overlap, or if any
+touched file fails to compile, so verify with lean_verify_edit as you go. Where one edit
+suffices, use `proposed_edit` as usual."""
 
 
 def renderer_version_for(procedure_variant: str = "baseline") -> str:
@@ -121,12 +150,17 @@ def focused_system_prompt(spec: FocusedAgentSpec,
     unknown variant raises rather than rendering the baseline under the treatment's name.
     """
 
+    from src.mathlib_review.agenda.registry import patch_set_arms
+
+    coordinated = spec.spec_id in patch_set_arms()
     _tools, system, _user = FOCUSED_PROMPTS[spec.spec_id]
     return system + procedure_supplement(procedure_variant, spec.spec_id) + \
         SUBMISSION_CONTRACT.format(
             concern_family=spec.concern_family,
             issue_kind=spec.issue_kind,
             spec_id=spec.spec_id,
+            patch_set_field=PATCH_SET_FIELD if coordinated else "",
+            patch_set_clause=PATCH_SET_CLAUSE if coordinated else "",
         )
 
 

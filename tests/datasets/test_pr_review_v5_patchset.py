@@ -12,9 +12,16 @@ changes, and the whole candidate falls if any edit escapes or any touched file f
 
 from __future__ import annotations
 
+from ape.tasks.lean_tasks.formal_math.review.base import splice_declaration
 from src.mathlib_review.patchset import (
     MAX_PATCH_EDITS, PatchEdit, PatchSet, apply, validate, verification_artifact,
 )
+
+#: The real splice both edit paths use. `apply` takes it rather than importing it, and these
+#: tests pass the real one rather than a stand-in: the defect it replaced was a substring
+#: `str.replace` that every test here agreed with, because they all used single-line sources
+#: whose declaration name occurred exactly once.
+SPLICE = splice_declaration
 
 ALLOWED = ["Mathlib/A.lean", "Mathlib/B.lean"]
 
@@ -82,7 +89,7 @@ def test_spans_are_applied_bottom_up_so_line_numbers_stay_valid():
     text = "".join(f"line{i}\n" for i in range(1, 11))
     patch = PatchSet((span("Mathlib/A.lean", 2, 3, "EARLY"),
                       span("Mathlib/A.lean", 8, 9, "LATE")))
-    out, problems = apply(patch, lambda p: text)
+    out, problems = apply(patch, lambda p: text, SPLICE)
     assert problems == []
     body = out["Mathlib/A.lean"].splitlines()
     assert body[1] == "EARLY"
@@ -92,24 +99,66 @@ def test_spans_are_applied_bottom_up_so_line_numbers_stay_valid():
 
 def test_a_missing_file_is_reported_not_skipped():
     patch = PatchSet((decl("Mathlib/A.lean", "foo", "bar"),))
-    _out, problems = apply(patch, lambda p: None)
+    _out, problems = apply(patch, lambda p: None, SPLICE)
     assert any("not present" in p for p in problems)
 
 
 def test_a_declaration_that_does_not_occur_is_reported():
-    patch = PatchSet((decl("Mathlib/A.lean", "theorem missing", "x"),))
-    _out, problems = apply(patch, lambda p: "theorem present := rfl\n")
-    assert any("does not occur" in p for p in problems)
+    patch = PatchSet((decl("Mathlib/A.lean", "missing", "theorem x : True := trivial"),))
+    _out, problems = apply(patch, lambda p: "theorem present : True := trivial\n", SPLICE)
+    assert any("not found" in p for p in problems)
 
 
 def test_edits_across_two_files_are_both_applied():
     """The shape PR 33337 needs: rename a pair that lives in two files."""
 
-    patch = PatchSet((decl("Mathlib/A.lean", "old_a", "new_a"),
-                      decl("Mathlib/B.lean", "old_b", "new_b")))
-    out, problems = apply(patch, lambda p: f"theorem old_{p[8].lower()} := rfl\n")
+    patch = PatchSet((decl("Mathlib/A.lean", "old_a", "theorem new_a : True := trivial"),
+                      decl("Mathlib/B.lean", "old_b", "theorem new_b : True := trivial")))
+    out, problems = apply(
+        patch, lambda p: f"theorem old_{p[8].lower()} : True := trivial\n", SPLICE)
     assert problems == []
     assert set(out) == {"Mathlib/A.lean", "Mathlib/B.lean"}
+    assert "theorem new_a" in out["Mathlib/A.lean"]
+    assert "old_a" not in out["Mathlib/A.lean"]
+
+
+def test_declaration_mode_replaces_the_declaration_not_the_first_mention_of_its_name():
+    """The defect this file could not see, because every source in it was one line.
+
+    `apply` used `text.replace(declaration_name, new_declaration, 1)` under a comment claiming
+    it did what the single-edit path does. On a real file the first occurrence of a
+    declaration's name is its own docstring, so a well-formed edit spliced the whole
+    replacement into the comment, left the declaration standing, and reported no problem --
+    then compiled the wreckage and blamed the model.
+    """
+
+    src = ("/-- `Dense.continuous_sup` is the supremum form. -/\n"
+           "theorem Dense.continuous_sup (h : Dense s) : True := by\n"
+           "  trivial\n")
+    patch = PatchSet((decl("Mathlib/A.lean", "Dense.continuous_sup",
+                           "theorem Dense.upperBounds_image (h : Dense s) : True := by\n"
+                           "  trivial"),))
+    out, problems = apply(patch, lambda p: src, SPLICE)
+    assert problems == []
+    edited = out["Mathlib/A.lean"]
+    assert "theorem Dense.upperBounds_image" in edited
+    assert "theorem Dense.continuous_sup" not in edited
+    # The docstring is untouched: it mentions the old name and is not the declaration.
+    assert edited.startswith("/-- `Dense.continuous_sup` is the supremum form. -/")
+
+
+def test_an_empty_replacement_deletes_the_declaration():
+    """`deletion` is 3 of the 11 obligation shapes that need a coordinated fix -- PR 33066
+    deletes a definition and its five simp lemmas -- and `PatchEdit.mode()` already admits an
+    empty `new_declaration`."""
+
+    src = ("theorem keep : True := trivial\n\n"
+           "theorem drop_me : True := trivial\n")
+    patch = PatchSet((decl("Mathlib/A.lean", "drop_me", ""),))
+    out, problems = apply(patch, lambda p: src, SPLICE)
+    assert problems == []
+    assert "drop_me" not in out["Mathlib/A.lean"]
+    assert "theorem keep" in out["Mathlib/A.lean"]
 
 
 # --- the warrant ------------------------------------------------------------------------
@@ -152,48 +201,83 @@ def test_an_empty_patch_never_verifies():
 
 # --- the capability is granted narrowly, and confinement comes from the task -------------
 
-def test_only_the_structural_arms_may_carry_a_patch_set():
-    """A capability nothing granted is a capability nothing can misuse. An arm reviewing one
-    site has no use for a coordinated fix, and granting it broadly would turn a bounded
-    capability into a licence to rewrite whatever the arm was shown."""
+def _arm_task(arm_id):
+    """A real `ReviewArmTask` over a real `ReviewArmData`.
 
-    from types import SimpleNamespace
+    Not a `SimpleNamespace`: these tests used one for `task.data`, so they agreed with
+    whatever fields the code happened to read on the day they were written and stopped
+    compiling against the class. Both of the defects this file now covers survived tests in
+    this file for that reason.
+    """
 
-    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmData, ReviewArmTask
 
-    task = ReviewArmTask.__new__(ReviewArmTask)
-    task.data = SimpleNamespace(
-        arm_id="proof_golf", change_ids=["c1"],
-        paths_by_change={"c1": "Mathlib/A.lean"})
-    assert task.patch_set_paths == ()
-    assert "not accepted" in (task._patch_set_error(
-        {"patch_set": [{"path": "Mathlib/A.lean", "declaration_name": "a",
-                        "new_declaration": "b"}]}) or "")
+    data = ReviewArmData(
+        task_id="pr5_test", invocation_id=f"wu:abc#{arm_id}", arm_id=arm_id, spec_id=arm_id,
+        work_unit_id="wu:abc", episode_id="ep:abc", pr_number=33145,
+        diff="--- a\n+++ b\n", changed_files=["Mathlib/A.lean", "Mathlib/B.lean"],
+        change_ids=["c1"], entity_ids_by_change={"c1": []},
+        primary_subjects_by_change={"c1": "Foo.claimed", "c2": "Foo.unclaimed"},
+        paths_by_change={"c1": "Mathlib/A.lean", "c2": "Mathlib/A.lean"},
+        rendered_system_prompt="sys", rendered_user_prompt="usr",
+        rendered_prompt_sha256="a" * 64, submission_verification_policy="none",
+        context_tools=[],
+        target_workspace={
+            "name": "target", "commit_hash": "c" * 40,
+            "repo_url": "https://example.invalid/mathlib4.git", "default_target": "Mathlib"},
+    )
+    return ReviewArmTask(data, ApeAgentConfig())
 
-    task.data = SimpleNamespace(
-        arm_id="family_design", change_ids=["c1"],
-        paths_by_change={"c1": "Mathlib/A.lean"})
-    assert task.patch_set_paths == ("Mathlib/A.lean",)
-    assert task._patch_set_error(
-        {"patch_set": [{"path": "Mathlib/A.lean", "declaration_name": "a",
-                        "new_declaration": "b"}]}) is None
+
+def _candidate(patch_set):
+    return {"primary_change_id": "c1", "change_ids": ["c1"], "patch_set": patch_set}
+
+
+def test_only_the_arms_a_compile_can_settle_may_carry_a_patch_set():
+    """A coordinated patch's only warrant is one compile of every file it touches, so the
+    grant is the arms whose claims a compile settles. An arm outside that set has no way to
+    earn the warrant, and `_patch_set_error` says so rather than letting it try."""
+
+    from src.mathlib_review.agenda import registry
+
+    granted = _arm_task(sorted(registry.patch_set_arms())[0])
+    assert granted.patch_set_paths == ("Mathlib/A.lean",)
+    assert granted._patch_set_error(_candidate([
+        {"path": "Mathlib/A.lean", "change_id": "c1", "declaration_name": "Foo.claimed",
+         "new_declaration": "theorem Foo.claimed : True := trivial"}])) is None
+
+    ungranted = _arm_task("naming")
+    assert ungranted.patch_set_paths == ()
+    assert "not accepted" in (ungranted._patch_set_error(_candidate([
+        {"path": "Mathlib/A.lean", "declaration_name": "Foo.claimed",
+         "new_declaration": "x"}])) or "")
 
 
 def test_a_patch_cannot_widen_its_own_scope():
     """Confinement comes from the task data, never from the submission: a patch naming a file
     it would like to edit does not thereby gain permission to edit it."""
 
-    from types import SimpleNamespace
+    from src.mathlib_review.agenda import registry
 
-    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
-
-    task = ReviewArmTask.__new__(ReviewArmTask)
-    task.data = SimpleNamespace(
-        arm_id="family_design", change_ids=["c1"],
-        paths_by_change={"c1": "Mathlib/A.lean"})
-    error = task._patch_set_error({"patch_set": [
-        {"path": "Mathlib/Elsewhere.lean", "declaration_name": "a", "new_declaration": "b"}]})
+    task = _arm_task(sorted(registry.patch_set_arms())[0])
+    error = task._patch_set_error(_candidate([
+        {"path": "Mathlib/Elsewhere.lean", "change_id": "c1", "declaration_name": "a",
+         "new_declaration": "b"}]))
     assert error and "does not change" in error
+
+
+def test_the_submission_path_refuses_an_unclaimed_sibling():
+    """End to end through the task, not just the pure checker: the unit holds `Foo.unclaimed`
+    as target `c2`, the candidate claims only `c1`, and the edit rewrites the sibling."""
+
+    from src.mathlib_review.agenda import registry
+
+    task = _arm_task(sorted(registry.patch_set_arms())[0])
+    error = task._patch_set_error(_candidate([
+        {"path": "Mathlib/A.lean", "change_id": "c1", "declaration_name": "Foo.unclaimed",
+         "new_declaration": "theorem Foo.unclaimed : True := trivial"}]))
+    assert error and "is not one this candidate claims" in error
 
 
 def test_a_candidate_with_no_patch_set_is_unaffected():
@@ -215,3 +299,133 @@ def test_every_patch_set_arm_is_a_registered_spec():
     from src.mathlib_review.agenda.arms import specs_by_arm_id
 
     assert ReviewArmTask.PATCH_SET_ARMS <= set(specs_by_arm_id())
+
+
+# --- confinement by anchor, not only by file ---------------------------------------------
+
+PATHS = {"c1": "Mathlib/A.lean", "c2": "Mathlib/A.lean"}
+SUBJECTS = {"c1": "Foo.claimed", "c2": "Foo.unclaimed"}
+
+
+def anchored(change_id, name, new="theorem Foo.claimed : True := trivial"):
+    return PatchEdit(path="Mathlib/A.lean", change_id=change_id,
+                     declaration_name=name, new_declaration=new)
+
+
+def test_an_edit_anchored_outside_the_candidates_targets_is_refused():
+    """`validate` confines a patch to the component's files. Since the repack a unit holds up
+    to a dozen declarations of one file, so file confinement alone lets an edit rewrite a
+    declaration the candidate never claimed. The 2026-09-08 plan named this the precondition
+    for granting patch sets more widely."""
+
+    from src.mathlib_review.patchset import anchor_problems
+
+    patch = PatchSet((anchored("c9", "Foo.claimed"),))
+    problems = anchor_problems(patch, change_ids=["c1"], paths_by_change=PATHS,
+                               subjects_by_change=SUBJECTS)
+    assert any("does not claim" in p for p in problems)
+
+
+def test_a_declaration_edit_may_not_rewrite_a_target_the_candidate_did_not_claim():
+    """The tightening. Anchored at a claimed target, in the right file, rewriting a sibling
+    the request was never about."""
+
+    from src.mathlib_review.patchset import anchor_problems
+
+    patch = PatchSet((anchored("c1", "Foo.unclaimed"),))
+    problems = anchor_problems(patch, change_ids=["c1"], paths_by_change=PATHS,
+                               subjects_by_change=SUBJECTS)
+    assert any("is not one this candidate claims" in p for p in problems)
+
+    # Claim it and the same edit is allowed: this confines, it does not forbid coordination.
+    assert anchor_problems(patch, change_ids=["c1", "c2"], paths_by_change=PATHS,
+                           subjects_by_change=SUBJECTS) == []
+
+
+def test_an_edit_must_change_the_file_of_the_target_it_is_about():
+    """`normalize_candidate_edit`'s rule for `proposed_edit`, applied per edit."""
+
+    from src.mathlib_review.patchset import anchor_problems
+
+    patch = PatchSet((PatchEdit(path="Mathlib/B.lean", change_id="c1",
+                                declaration_name="Foo.claimed", new_declaration="x"),))
+    problems = anchor_problems(patch, change_ids=["c1"],
+                               paths_by_change={"c1": "Mathlib/A.lean"},
+                               subjects_by_change=SUBJECTS)
+    assert any("must change the target it is about" in p for p in problems)
+
+
+def test_a_span_edit_keeps_file_confinement_only():
+    """A line span may cover an import, a `namespace` line or a blank region that belongs to
+    no declaration, so there is no anchor to check it against."""
+
+    from src.mathlib_review.patchset import anchor_problems
+
+    patch = PatchSet((PatchEdit(path="Mathlib/A.lean", change_id="c1",
+                                line_start=1, line_end=2, replacement="import Mathlib.Tactic"),))
+    assert anchor_problems(patch, change_ids=["c1"], paths_by_change=PATHS,
+                           subjects_by_change=SUBJECTS) == []
+
+
+def test_the_anchor_is_part_of_the_patch_identity():
+    """Two patches that edit different targets are different patches, so the digest the
+    warrant is keyed on must say so."""
+
+    a = PatchSet((anchored("c1", "Foo.claimed"),))
+    b = PatchSet((anchored("c2", "Foo.claimed"),))
+    assert a.digest() != b.digest()
+
+
+def test_a_claimed_declaration_is_never_an_unclaimed_sibling():
+    """One declaration produces two change targets whenever its diff splits into hunks.
+
+    PR 33362's `Complex.norm_dslope_le_div_of_mapsTo_ball` is one: a target holding the
+    reviewed code and a second holding a one-line deletion fragment, both carrying the same
+    `declaration_name`. A candidate claims one of them and edits exactly the declaration that
+    target names -- and the unclaimed-sibling rule fired on the *other* target. Replayed over
+    the 390 recorded declaration-mode edits it refused 6, every one of them legitimate.
+
+    The rule is about editing a declaration the candidate is not asking about. A declaration it
+    IS asking about is not that, however many targets carry the name.
+    """
+
+    from src.mathlib_review.patchset import anchor_problems
+
+    # `c1` and `c2` are two hunks of ONE declaration; the candidate claims c1 only.
+    split = {"c1": "Foo.split", "c2": "Foo.split"}
+    paths = {"c1": "Mathlib/A.lean", "c2": "Mathlib/A.lean"}
+    patch = PatchSet((anchored("c1", "Foo.split"),))
+    assert anchor_problems(patch, change_ids=["c1"], paths_by_change=paths,
+                           subjects_by_change=split) == []
+
+    # A genuinely different declaration is still refused.
+    other = PatchSet((anchored("c1", "Foo.other"),))
+    assert any("is not one this candidate claims" in p for p in anchor_problems(
+        other, change_ids=["c1"], paths_by_change=paths,
+        subjects_by_change={"c1": "Foo.split", "c2": "Foo.other"}))
+
+
+def test_a_candidate_may_not_carry_both_a_proposed_edit_and_a_patch_set():
+    """Both fields are Optional and nothing joined them, so both could be set.
+
+    `_verify_candidate_submission` handles a patch set first and returns, so such a candidate
+    would be published carrying a warrant that compiled the patch and never touched the
+    `proposed_edit` -- and `_statement_gate_error`, which reads only `proposed_edit`, would
+    never run at all. A `proof_simplification` claim could then move its statement unnoticed
+    behind a warrant earned by different code.
+    """
+
+    from src.mathlib_review.agenda import registry
+
+    task = _arm_task(sorted(registry.patch_set_arms())[0])
+    both = _candidate([{"path": "Mathlib/A.lean", "change_id": "c1",
+                        "declaration_name": "Foo.claimed",
+                        "new_declaration": "theorem Foo.claimed : True := trivial"}])
+    both["proposed_edit"] = {"path": "Mathlib/A.lean", "declaration_name": "Foo.claimed",
+                             "new_declaration": "theorem Foo.claimed : True := trivial"}
+    error = task._patch_set_error(both)
+    assert error and "not both" in error
+
+    # Either one alone is still fine.
+    del both["proposed_edit"]
+    assert task._patch_set_error(both) is None

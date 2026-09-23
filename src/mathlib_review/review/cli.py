@@ -146,10 +146,14 @@ def build_parser() -> argparse.ArgumentParser:
                         help="the generation run whose arm sessions are replayed")
     replay.add_argument(
         "--select", default=None,
-        metavar="all|arm|invocation_ids|gold-site-abstentions|missed-obligations",
-        help="which recorded sessions to re-decide. The two gold-derived selectors read the "
-             "judge's verdicts and are sealed into the plan as such: the prefix replayed is "
-             "still the recording, so gold reaches no prompt, but the selection is in-sample.")
+        metavar=("all|arm|invocation_ids|gold-site-abstentions|missed-obligations|"
+                 "control-abstentions"),
+        help="which recorded sessions to re-decide. The gold-derived selectors read the "
+             "judge's verdicts or the release, and are sealed into the plan as such: the "
+             "prefix replayed is still the recording, so gold reaches no prompt, but the "
+             "selection is in-sample. `control-abstentions` is the guard population -- silent "
+             "specialists on PRs the release records no obligation for -- and a condition "
+             "measured without it cannot say whether it bought reach or noise.")
     replay.add_argument(
         "--cut", default=None, metavar="turn=N|node=I|tool=NAME[:first|:last|:N]",
         help="where the model takes over, replacing the config's cut. `--set dataset.cut=` "
@@ -172,6 +176,10 @@ def build_parser() -> argparse.ArgumentParser:
                             help="the judged generation run whose off-gold findings to read")
     adjudicate.add_argument("--labels", type=Path, default=None,
                             help="a JSONL file of human labels to add to the store first")
+    adjudicate.add_argument("--silences", type=Path, default=None,
+                            help="a JSONL file of hand-made SilenceLabel rows -- why arms said "
+                                 "nothing at gold sites -- added to the silence store. Its own "
+                                 "store and its own key; `report silences` reads it back")
 
     report = sub.add_parser("report", help="read a finished run")
     report_sub = report.add_subparsers(dest="report_command", required=True)
@@ -210,6 +218,19 @@ def build_parser() -> argparse.ArgumentParser:
     buckets.add_argument("--replay", default=None,
                          help="a replay run, to annotate each silence with whether it was "
                               "stable under re-sampling")
+    silences = report_sub.add_parser(
+        "silences",
+        help="every gold-site silence beside the ask it is silent about, and its label")
+    silences.add_argument("--run", required=True)
+    silences.add_argument("--replay", default=None,
+                          help="a replay run, to say which silences reproduce and what the "
+                               "replayed arms gave as their reason")
+    silences.add_argument("--no-audit", dest="audit", action="store_false",
+                          help="skip the judge's verdicts; the coarse bucket is then "
+                               "LOCATED_UNJUDGED and nothing else changes")
+    silences.add_argument("--labels", type=Path, default=None,
+                          help="a silence-label store to read instead of the default")
+
     scope = report_sub.add_parser(
         "scope", help="recall split by whether the ask is local or requires a design decision")
     scope.add_argument("--audit", type=Path, required=True,
@@ -431,6 +452,11 @@ def _report(args) -> int:
         from src.mathlib_review.analysis.corrections import token_census
 
         print(json.dumps(token_census(args.runs), indent=2))
+    elif args.report_command == "silences":
+        from src.mathlib_review.analysis.report import silences as silences_report
+
+        print(json.dumps(silences_report(args.run, replay=args.replay, audit=args.audit,
+                                         labels=args.labels), indent=2))
     elif args.report_command == "buckets":
         from src.mathlib_review.analysis.report import buckets as buckets_report
 
@@ -493,6 +519,10 @@ def main(argv: Optional[List[str]] = None) -> int:
 
         # Not in `SPENDS`: no model runs. A label is in the store or it is not, and the report
         # says how much of the run is still unadjudicated rather than filling the gap.
+        if args.silences:
+            from src.mathlib_review.judge.adjudicate import ingest_silences
+
+            print(json.dumps(ingest_silences(args.silences)))
         print(adjudicate_run(args.of_run, labels=args.labels, logger=logger))
         return 0
     if args.command == "report":

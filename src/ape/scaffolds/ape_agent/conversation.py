@@ -79,6 +79,26 @@ def should_stop_conversation(session: 'ConversationSession',
     return False, ""
 
 
+
+def _jsonable(value: Any) -> Any:
+    """A last-resort encoder for the replay record, so tracing can never fail a replay.
+
+    `task_data_seen` echoes whatever the condition overrode, and a task-data value is not
+    always JSON: `target_workspace` is a `WorkspaceInfo`. Without this, writing the record
+    raised `TypeError` inside `_replay_tool_definitions` and killed the attempt -- a
+    diagnostic taking down the run it was meant to make legible, which is the same shape as
+    the defect it was added to catch.
+    """
+
+    dump = getattr(value, "model_dump", None)
+    if callable(dump):
+        try:
+            return dump(mode="json")
+        except Exception:  # noqa: BLE001
+            pass
+    return repr(value)
+
+
 class ApeAgentConversationManager:
     """Conversation manager for APE Agent scaffold.
 
@@ -500,10 +520,26 @@ class ApeAgentConversationManager:
                 if name in replay.recorded_tool_sha256
                 and tool_definition_sha256(tool) != replay.recorded_tool_sha256[name]),
             "registered_not_shown": sorted(set(live) - set(replay.recorded_tool_sha256)),
+            # What the task actually holds for each key the condition overrode, read off the
+            # live task rather than off the directive. A condition that does not arrive is
+            # otherwise indistinguishable from one that changed nothing, and that is the
+            # shape of the defect that made arms run at $1.00 against a $0.30 cap for the
+            # whole of v5: the directive was asserted where it was written, not where it lands.
+            # Read the payload first, then the validated model. A reserved run-level key --
+            # `execution_limits`, `session_replay` -- is deliberately NOT a field on the data
+            # model (`BaseTask.payload`, `ape/tasks/base.py`), so reading only `task.data`
+            # reported `None` for exactly the keys this check exists to catch. That is the
+            # defect it was built for, in the check itself.
+            "task_data_seen": {
+                key: (self.task.payload or {}).get(
+                    key, getattr(getattr(self.task, "data", None), key, None))
+                if getattr(self.task, "payload", None)
+                else getattr(getattr(self.task, "data", None), key, None)
+                for key in getattr(replay, "overridden_keys", [])},
         }
         if self.task.attempt_path:
             (self.task.attempt_path / REPLAY_RECORD_FILENAME).write_text(
-                json.dumps(record, indent=2) + "\n", encoding="utf-8")
+                json.dumps(record, indent=2, default=_jsonable) + "\n", encoding="utf-8")
         if record["tool_drift"]:
             self.logger.warning(f"Replay: tool definitions drifted since recording: "
                                 f"{record['tool_drift']}")

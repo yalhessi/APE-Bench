@@ -33,7 +33,7 @@ class LeanPRReviewV4CandidateData(BasePRReviewData):
     rendered_user_prompt: str
     rendered_prompt_sha256: str
     submission_verification_policy: Literal[
-        "none", "verify_checkable_edits"
+        "none", "verify_checkable_edits", "verify_edits_if_present"
     ] = "none"
 
 
@@ -97,10 +97,15 @@ class ProposedEditSubmission(BaseModel):
 
 
 class PatchEditSubmission(BaseModel):
-    """One edit inside a coordinated fix. Same two modes as `proposed_edit`."""
+    """One edit inside a coordinated fix. Same two modes as `proposed_edit`, plus its anchor."""
 
     model_config = ConfigDict(extra="forbid")
     path: str
+    #: The review target this edit is about. Optional, and defaults to the candidate's
+    #: `primary_change_id`: a recorded session was shown a schema without it, and a replay of
+    #: one must still validate. Supplying it is what lets a coordinated fix touch a *second*
+    #: target the candidate claims, which is the whole point of the field.
+    change_id: Optional[str] = None
     declaration_name: Optional[str] = None
     new_declaration: Optional[str] = None
     line_start: Optional[int] = Field(default=None, ge=1)
@@ -198,6 +203,26 @@ def normalize_proposed_edit_path(path: str) -> str:
                 changed = True
                 break
     return normalized
+
+
+def _patch_set_from(rows: List[Dict[str, Any]], primary_change_id: Optional[str]):
+    """The one place a submission's rows become a `PatchSet`.
+
+    Both call sites built it separately and one of them would have gone on disagreeing with
+    the other the first time a field was added. An edit that names no `change_id` is about
+    the candidate's primary target, which is what a recorded session's schema implies.
+    """
+
+    from src.mathlib_review.patchset import PatchEdit, PatchSet
+
+    return PatchSet(tuple(
+        PatchEdit(path=row.get("path", ""),
+                  change_id=row.get("change_id") or primary_change_id,
+                  declaration_name=row.get("declaration_name"),
+                  new_declaration=row.get("new_declaration"),
+                  line_start=row.get("line_start"), line_end=row.get("line_end"),
+                  replacement=row.get("replacement"))
+        for row in rows))
 
 
 def normalize_candidate_edit(
@@ -371,21 +396,17 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         would be publishable while unverified in the fourth.
         """
 
-        from src.mathlib_review.patchset import (
-            PatchEdit, PatchSet, verification_artifact, verify,
-        )
+        from src.mathlib_review.patchset import verification_artifact, verify
 
         workspace = self._patch_set_workspace()
         if workspace is None:
             return [], ("no workspace is available to compile a coordinated patch in; "
                         "submit a single proposed_edit instead")
-        patch = PatchSet(tuple(
-            PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),
-                      new_declaration=r.get("new_declaration"),
-                      line_start=r.get("line_start"), line_end=r.get("line_end"),
-                      replacement=r.get("replacement"))
-            for r in (candidate.get("patch_set") or [])))
-        ok, report, touched = verify(patch, workspace)
+        patch = _patch_set_from(
+            candidate.get("patch_set") or [], candidate.get("primary_change_id"))
+        from ape.tasks.lean_tasks.formal_math.review.base import splice_declaration
+
+        ok, report, touched = verify(patch, workspace, splice=splice_declaration)
         if not ok:
             return [], (
                 "the coordinated patch does not compile, so the whole candidate is refused "
@@ -397,9 +418,17 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         )], None
 
     def _patch_set_workspace(self):
-        """The reviewed workspace this task compiles in, or `None`."""
+        """The reviewed workspace this task compiles in, or `None`.
 
-        root = getattr(self, "target_workspace", None)
+        `target_workspace` is a `WorkspaceInfo`, not a path (`ape/tasks/base.py`), so this read
+        `.path` the way every other consumer does -- `_edited_file_code`, `_resolve_decl_lines`
+        and through them `lean_verify_edit`. It used to call `Path(root)` on the model, which
+        raises `TypeError` on the first real coordinated patch; the test that guarded it
+        assigned a *string*, so it agreed with itself and not with the class.
+        """
+
+        workspace = getattr(self, "target_workspace", None)
+        root = getattr(workspace, "path", None) if workspace is not None else None
         return Path(root) if root else None
 
     async def _verify_candidate_submission(
@@ -409,7 +438,8 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
 
         edit = candidate.get("proposed_edit")
         checkable = candidate.get("concern_family") in CHECKABLE_CONCERN_FAMILIES
-        if self.data.submission_verification_policy != "verify_checkable_edits":
+        policy = self.data.submission_verification_policy
+        if policy not in {"verify_checkable_edits", "verify_edits_if_present"}:
             return [], None
         # A coordinated fix earns its warrant as one thing: every touched file is compiled
         # and the candidate stands or falls on the whole result. It cannot fall back to the
@@ -419,7 +449,19 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         if candidate.get("patch_set"):
             artifacts, error = await self._verify_patch_set(candidate_ordinal, candidate)
             return artifacts, error
+        # The rule this policy exists to relax. Under `verify_checkable_edits` an arm that has
+        # the maintainer's answer and cannot make it compile must abstain: on the 2026-09-21
+        # read of the held-out run, that is what the largest group of in-remit gold-site
+        # silences says happened, including PR 33149, where the ask was "replace the
+        # axiomatized Parseval identity with the existing one", the arm found the existing
+        # lemma, and could not connect the PR's own setup to it. `verify_edits_if_present`
+        # still compiles every edit it is given and still refuses one that fails; what it
+        # allows is the unverified ask, which `finalize` admits as `diagnostic` and never
+        # publishes. It does not ask for more findings -- an empty submission stays exactly as
+        # cheap -- so the control-PR property is untouched by the rule itself.
         if checkable and edit is None:
+            if policy == "verify_edits_if_present":
+                return [], None
             return [], (
                 f"{candidate.get('concern_family')} candidates require a structured proposed_edit "
                 "under the verification-backed residual policy"
@@ -506,15 +548,24 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             return None
         if not self.patch_set_paths:
             return ("patch_set is not accepted by this check; submit a single proposed_edit")
-        from src.mathlib_review.patchset import PatchEdit, PatchSet, validate
+        # One fix per candidate, in one shape. `_verify_candidate_submission` handles a patch
+        # set first and returns, so a candidate carrying both would publish a warrant that
+        # compiled the patch and never touched the `proposed_edit` -- and the statement gate,
+        # which only reads `proposed_edit`, would never run. A claim is verified by what it
+        # actually proposes or it is not verified at all.
+        if candidate.get("proposed_edit"):
+            return ("a candidate carries one fix: either a single proposed_edit or a "
+                    "patch_set, not both. The warrant is a compile of what you propose, and "
+                    "only the patch_set would be compiled here")
+        from src.mathlib_review.patchset import anchor_problems, validate
 
-        patch = PatchSet(tuple(
-            PatchEdit(path=r.get("path", ""), declaration_name=r.get("declaration_name"),
-                      new_declaration=r.get("new_declaration"),
-                      line_start=r.get("line_start"), line_end=r.get("line_end"),
-                      replacement=r.get("replacement"))
-            for r in rows))
+        patch = _patch_set_from(rows, candidate.get("primary_change_id"))
         problems = validate(patch, self.patch_set_paths)
+        problems += anchor_problems(
+            patch,
+            change_ids=[str(c) for c in (candidate.get("change_ids") or [])],
+            paths_by_change=self.data.paths_by_change,
+            subjects_by_change=self.data.primary_subjects_by_change)
         return "; ".join(problems) if problems else None
 
     def _extra_candidate_error(self, candidate: Dict[str, Any]) -> Optional[str]:

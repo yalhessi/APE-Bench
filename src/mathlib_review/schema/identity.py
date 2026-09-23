@@ -367,7 +367,7 @@ class RenderedPrompt(StrictModel):
     included_change_ids: List[str]
     omitted_change_ids: List[str] = Field(default_factory=list)
     submission_verification_policy: Literal[
-        "none", "verify_checkable_edits"
+        "none", "verify_checkable_edits", "verify_edits_if_present"
     ] = "none"
 
 

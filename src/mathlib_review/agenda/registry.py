@@ -136,7 +136,7 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          # asking the repository anything. A name lookup was not the channel it was missing --
          # but `proof_profile` is granted by the *ladder variant*, not here, so that `baseline`
          # keeps meaning what it meant when rung 0 ran. See `PROCEDURE_TOOL_GRANTS`.
-         context_tools=("declaration_search",), checkable=True, component="proof",
+         context_tools=("declaration_search",), checkable=True, patch_set=True, component="proof",
          inherited_from_v4=True),
     _arm("proof_idiom", "proof-golf", "proof_simplification",
          "Is a changed proof written the canonical way — `grw`/`gcongr`, `simp`, "
@@ -148,16 +148,16 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          # `simpa` where `grind` is the second most common closer of subset-concluding lemmas.
          # `proof_profile` answers that, and is granted by the ladder variant rather than here:
          # a tool present in `baseline` would move the baseline rung 0 was measured against.
-         context_tools=("declaration_search",), checkable=True, component="proof",
+         context_tools=("declaration_search",), checkable=True, patch_set=True, component="proof",
          inherited_from_v4=True),
     _arm("duplication", "duplication", "duplicate_implementation",
          "Does a new declaration restate something Mathlib already has? Verified by closing "
          "the new declaration with the existing one.",
-         context_tools=("declaration_search",), checkable=True, inherited_from_v4=True),
+         context_tools=("declaration_search",), checkable=True, patch_set=True, inherited_from_v4=True),
     _arm("generality", "generalization", "generalization_available",
          "Is a new declaration stated less generally than it should be? The statement must "
          "move, which is the gate that separates it from a golf finding.",
-         context_tools=("declaration_search",), checkable=True, inherited_from_v4=True),
+         context_tools=("declaration_search",), checkable=True, patch_set=True, inherited_from_v4=True),
 
     # --- the classes v4 had no arm for -------------------------------------------------
     _arm("naming", "naming", "naming_convention_violation",
@@ -208,7 +208,7 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          "Does the code re-derive something the library already provides, or spell an existing "
          "API the long way? Smaller and commoner than whole-declaration duplication, and "
          "checkable by compiling the replacement.",
-         context_tools=("declaration_search",), checkable=True),
+         context_tools=("declaration_search",), checkable=True, patch_set=True),
     _arm("correctness", "correctness", "correctness_policy",
          "Is anything actually broken — the build, a statement that does not say what it "
          "claims, a looping simp lemma, an unaccepted axiom? Starts by compiling the reviewed "
@@ -216,7 +216,7 @@ ARM_DEFINITIONS: Tuple[ArmDefinition, ...] = (
          # `scope` too: a declaration whose imports cannot support where it sits is a build
          # problem wearing a placement problem's clothes, and no other arm compiles.
          expected_concerns=("correctness", "scope"),
-         context_tools=("declaration_search",), checkable=True),
+         context_tools=("declaration_search",), checkable=True, patch_set=True),
     _arm("family_design", "generalization", "generalization_available",
          "Are these declarations right AS A GROUP — a dual proved from scratch instead of from "
          "its counterpart, a missing counterpart, a generated form written by hand, a repeated "
@@ -244,7 +244,23 @@ def checkable_arms() -> FrozenSet[str]:
 
 
 def patch_set_arms() -> FrozenSet[str]:
-    """Arms that may submit a coordinated multi-file patch."""
+    """Arms that may submit a coordinated multi-declaration patch.
+
+    The rule: an arm may submit one when its fix is a change to code whose correctness a
+    compile settles -- `checkable_arms()` -- or when the group itself is its whole remit,
+    which is `family_design`. A coordinated patch's only warrant is one compile of every file
+    it touches, so an arm outside that set has no way to earn it; `naming`, `docs` and `style`
+    ask for names, prose and formatting, where the compile is not what makes the ask right.
+
+    Until 2026-09-22 this was `family_design` alone, on the reasoning that only an arm
+    reviewing a set of declarations has anything to coordinate. Both halves of that have
+    moved. Since the repack a work unit routinely holds a dozen declarations of one file, so
+    every arm reviews a set; and the objection that a broad grant is "a licence to rewrite
+    whatever the arm was shown" is what anchor confinement removes -- an edit may now only
+    touch a target the candidate itself claimed (`patchset.anchor_problems`). The arm that
+    held the capability was also the one that never used it: `family_design` has 182 recorded
+    responses and 0 candidates.
+    """
 
     return frozenset(item.arm_id for item in ARM_DEFINITIONS if item.patch_set)
 
