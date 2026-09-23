@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import threading
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
@@ -217,6 +218,51 @@ def snapshot_workspace(base_sha: Optional[str]) -> Optional[Path]:
     return candidate if (candidate / "Mathlib").is_dir() else None
 
 
+_WORKSPACE_FILES_LOCK = threading.Lock()
+
+
+def workspace_lean_files(workspace: Path,
+                         cache: Optional[Dict[str, List[Path]]] = None) -> List[Path]:
+    """The workspace's `.lean` files, sorted -- walked once per `cache`, if one is given.
+
+    `repository_search` re-walked the reviewed workspace for every candidate -- ~8,500 entries
+    over NFS, part of the ~125 s of directory walking in a 692 s finalization for 40
+    candidates -- though nothing changes the file list while one evidence chain runs: the
+    workspace is a symlink farm over a read-only snapshot, and the compile collector writes its
+    edited copy to the system temp directory, never into the workspace. So `collect_supported`
+    passes one cache for the whole chain, the way it passes `population_cache`; a caller that
+    passes none walks every time, as before. Safe from the chain's worker threads: two that miss
+    at once both walk, and the first result is kept.
+    """
+
+    if cache is None:
+        return sorted(Path(workspace).rglob("*.lean"))
+    key = str(workspace)
+    with _WORKSPACE_FILES_LOCK:
+        files = cache.get(key)
+    if files is None:
+        files = sorted(Path(workspace).rglob("*.lean"))
+        with _WORKSPACE_FILES_LOCK:
+            files = cache.setdefault(key, files)
+    return files
+
+
+#: Guards the population cache, which the evidence chain's worker threads share: a snapshot is
+#: read (or, the first time, scanned) once, not once per thread that asks at the same moment.
+_POPULATION_LOCK = threading.Lock()
+
+
+class _IndexPopulation:
+    """A snapshot's cached norm index behind the one method the naming verifier calls."""
+
+    def __init__(self, index: Dict[str, object]):
+        self._index = index
+
+    def population(self, subject_token: str):
+        from src.mathlib_review.evidence.operators.naming_norm import norm_for
+        return norm_for(self._index, subject_token)
+
+
 class LazyPopulationScan:
     """A naming population scan built on first use and shared across candidates.
 
@@ -234,28 +280,54 @@ class LazyPopulationScan:
     outcome; substituting a partial scan would let a missing corpus read as a naming norm.
     """
 
-    def __init__(self, workspace: Optional[Path], cache: Dict[str, object]):
+    def __init__(self, workspace: Optional[Path], cache: Dict[str, object],
+                 snapshot_sha: Optional[str] = None):
         self._workspace = workspace
         self._cache = cache
+        self._snapshot_sha = snapshot_sha
 
     def _scan(self):
         if self._workspace is None:
             return None
         key = str(self._workspace)
-        if key not in self._cache:
-            from src.mathlib_review.evidence.operators.naming_norm import scan_population
+        with _POPULATION_LOCK:
+            if key not in self._cache:
+                self._cache[key] = self._build()
+            return self._cache[key]
+
+    def _build(self):
+        """The snapshot's population: its cached norm index when the sha is known, else a scan.
+
+        The verifier asks only `population(subject)` and `available()`, and the norm index --
+        `naming_norm.norm_index`, persisted per snapshot under `data/code_execute/norms/` and
+        already read by the arms' own `naming_norm` tool -- holds exactly the per-subject prefix
+        counts a scan's `population` returns, with `members` summed the same way. Rebuilding a
+        full parse of Mathlib on every finalization cost ~106 s per snapshot (213 s of a 692 s
+        chain on 40 candidates). The index is built by that same scan the first time a snapshot
+        is seen, and read thereafter.
+        """
+
+        if self._snapshot_sha:
+            from src.mathlib_review.evidence.operators.naming_norm import norm_index
             try:
-                scan = scan_population(self._workspace, key)
+                index = norm_index(self._workspace, self._snapshot_sha)
             except (FileNotFoundError, OSError, ValueError):
-                scan = None
-            # A partial checkout is not a snapshot. Review workspaces materialize the full
-            # directory tree but only the files a task touches, and a scan of ~2% of Mathlib
-            # still yields subjects that clear `MIN_SUPPORT` — sampling artifacts that would
-            # be published as repository measurements. Treated as no scan at all.
-            if scan is not None and not scan.is_representative():
-                scan = None
-            self._cache[key] = scan
-        return self._cache[key]
+                index = None
+            # The same representativeness rule as a scan: an index built from a partial
+            # checkout would publish sampling artifacts as repository measurements.
+            return _IndexPopulation(index) if index and index.get("representative") else None
+        from src.mathlib_review.evidence.operators.naming_norm import scan_population
+        try:
+            scan = scan_population(self._workspace, str(self._workspace))
+        except (FileNotFoundError, OSError, ValueError):
+            scan = None
+        # A partial checkout is not a snapshot. Review workspaces materialize the full
+        # directory tree but only the files a task touches, and a scan of ~2% of Mathlib
+        # still yields subjects that clear `MIN_SUPPORT` — sampling artifacts that would
+        # be published as repository measurements. Treated as no scan at all.
+        if scan is not None and not scan.is_representative():
+            scan = None
+        return scan
 
     def available(self) -> bool:
         """Whether a scan could actually be built, so a failure is not read as a finding."""
@@ -273,6 +345,7 @@ def collect_candidate(
     events: Optional[Iterable[SourceEvent]] = None,
     baseline_compile_cache: Optional[Dict[Tuple[str, str], object]] = None,
     naming_population_scan=None,
+    workspace_files: Optional[Dict[str, List[Path]]] = None,
 ) -> Tuple[List[EvidenceArtifact], List[EvidenceAssertion], EvidencePacket]:
     """Run deterministic collectors; unsupported tools become explicit terminal failures."""
     targets = {item.change_id: item for item in graph.targets}
@@ -305,7 +378,7 @@ def collect_candidate(
                 continue
             hits = []
             target_paths = {targets[cid].path for cid in candidate.change_ids}
-            searchable = sorted(workspace.rglob("*.lean"))
+            searchable = workspace_lean_files(workspace, workspace_files)
             # `declares_identifier` builds its pattern around `re.escape(leaf)`, so a file
             # that does not contain the leaf literally cannot possibly declare it. That makes
             # a fixed-string grep a sound prefilter -- it can only ever hand back too many
