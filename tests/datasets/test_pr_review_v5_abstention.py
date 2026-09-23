@@ -241,6 +241,24 @@ def test_the_report_breaks_abstentions_down_by_arm(tmp_path, monkeypatch):
         "a row from before the reason was required is reported, not hidden in a denominator")
 
 
+def test_the_report_prints_each_arms_filing_rate(tmp_path, monkeypatch):
+    from src.mathlib_review.analysis import report
+    from src.mathlib_review.io import jsonl_bytes
+
+    run = tmp_path / "run"
+    run.mkdir()
+    (run / "arm_responses.jsonl").write_bytes(jsonl_bytes([
+        {"arm_id": "naming", "candidates": [], "abstention": {"reason": "already_correct"}},
+        {"arm_id": "naming", "candidates": [{"claim": "x"}]},
+        {"arm_id": "naming", "candidates": []},
+        {"arm_id": "generalist", "candidates": [{"claim": "y"}]},
+    ]))
+    monkeypatch.setattr(report, "run_dir", lambda _name: run)
+    out = report._filing("whatever")
+    assert out["naming"] == {"ran": 3, "filed": 1, "rate": 0.333}
+    assert out["generalist"] == {"ran": 1, "filed": 1, "rate": 1.0}
+
+
 def test_a_second_mute_submission_is_accepted_as_unstated(submit):
     """The contract asks once and never twice.
 

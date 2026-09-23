@@ -97,7 +97,27 @@ def retrieval(run_name: str) -> Dict[str, Any]:
         # to reconstruct each session's last tool result from the transcripts, and three
         # successive attempts at that were wrong before one was right.
         "abstentions": _abstentions(run_name),
+        "filing": _filing(run_name),
     }
+
+
+def _filing(run_name: str) -> Dict[str, Dict[str, Any]]:
+    """Per arm, how many jobs ran and how many filed at least one candidate.
+
+    The specialist submit rate, which every discussion of the arms' silence quotes and nothing
+    printed: 16% under fanout, 19% under lead, 88% forced. A row with no `status` predates it
+    and is counted as ran, like every other row in the file.
+    """
+
+    by_arm: Dict[str, Dict[str, Any]] = {}
+    for row in jsonl_rows(run_dir(run_name) / "arm_responses.jsonl"):
+        arm = row.get("arm_id") or str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
+        entry = by_arm.setdefault(arm, {"ran": 0, "filed": 0})
+        entry["ran"] += 1
+        entry["filed"] += bool(row.get("candidates"))
+    for entry in by_arm.values():
+        entry["rate"] = round(entry["filed"] / entry["ran"], 3) if entry["ran"] else None
+    return dict(sorted(by_arm.items()))
 
 
 def _abstentions(run_name: str) -> Dict[str, Any]:
@@ -1386,6 +1406,8 @@ def _gate_report(findings, hit_obligation_by_finding, reviewed, prs_with_gold, a
     hit_pre, hit_post = set(), set()
     reasons: Dict[str, int] = {}
     by_family: Dict[str, Dict[str, int]] = {}
+    by_arm: Dict[str, Dict[str, Any]] = {}
+    arms_by_obligation: Dict[str, set] = {}
     for item in findings:
         obligations = hit_obligation_by_finding.get(item["finding_id"]) or set()
         family = item.get("concern_family") or "unknown"
@@ -1393,6 +1415,16 @@ def _gate_report(findings, hit_obligation_by_finding, reviewed, prs_with_gold, a
         row["findings"] += 1
         row["hits"] += bool(obligations)
         row["published"] += item.get("admission") == "published"
+        # The same attribution `buckets` uses for its cells: a finding without an origin arm
+        # is the generalist's, which includes a merged finding more than one arm contributed
+        # to. None occur on the held-out reps; where they do, this favours the generalist.
+        arm = item.get("origin_arm_id") or "generalist"
+        arm_row = by_arm.setdefault(arm, {"findings": 0, "hit_findings": 0, "obligations": set()})
+        arm_row["findings"] += 1
+        arm_row["hit_findings"] += bool(obligations)
+        arm_row["obligations"] |= obligations
+        for obligation in obligations:
+            arms_by_obligation.setdefault(obligation, set()).add(arm)
         if not obligations:
             continue
         hit_pre |= obligations
@@ -1407,6 +1439,15 @@ def _gate_report(findings, hit_obligation_by_finding, reviewed, prs_with_gold, a
         "obligations_lost_to_gate": sorted(hit_pre - hit_post),
         "suppressed_hits_by_reason": dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
         "by_concern_family": dict(sorted(by_family.items())),
+        # Which arm found what, pre-gate. `sole_finder` counts the obligations no other arm hit,
+        # which is the number the question "is the generalist doing the work" is about: 4 of
+        # the 7 obligations `pr5_A_lead_heldout12_v2_rep1` hits have no other finder.
+        "hits_by_arm": {
+            arm: {"findings": row["findings"], "hit_findings": row["hit_findings"],
+                  "obligations": len(row["obligations"]),
+                  "sole_finder": sum(1 for obligation in row["obligations"]
+                                     if arms_by_obligation[obligation] == {arm})}
+            for arm, row in sorted(by_arm.items())},
     })
     return payload
 

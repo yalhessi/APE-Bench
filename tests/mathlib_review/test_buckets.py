@@ -266,6 +266,15 @@ def test_the_gate_is_reported_beside_what_the_run_found(judged):
     assert families["proof-golf"]["hits"] == 1 and families["proof-golf"]["published"] == 8
     assert families["generalization"]["hits"] == 0 and families["generalization"]["published"] == 2
 
+    # Which arm found what. Four of the seven obligations have the generalist as their only
+    # finder, and the one proof_golf hit is proof_golf's alone -- recomputed by hand from
+    # `semantic_matches.jsonl` joined to `findings.jsonl` on 2026-09-23.
+    arms = gate["hits_by_arm"]
+    assert arms["generalist"]["obligations"] == 6 and arms["generalist"]["sole_finder"] == 4
+    assert arms["proof_golf"]["sole_finder"] == 1
+    assert arms["naming"]["obligations"] == 1 and arms["naming"]["sole_finder"] == 0
+    assert sum(row["sole_finder"] for row in arms.values()) <= gate["obligations_hit_pre_gate"]
+
 
 @runs_exist
 def test_the_gate_block_needs_no_judge_for_the_half_that_needs_none():
