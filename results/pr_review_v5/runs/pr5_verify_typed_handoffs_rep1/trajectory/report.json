@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/pr5_verify_typed_handoffs_rep1",
+  "bytes": 260808,
+  "cost": {
+    "actual_total": 1.136668,
+    "by_disposition": {
+      "mandatory": 0.371751,
+      "proposed": 0.158377
+    },
+    "lead": 0.606541,
+    "manifest_total": 0.60654075,
+    "manifest_understates_by": 0.530128
+  },
+  "invocations": 10,
+  "leads": 1,
+  "run_name": "pr5_verify_typed_handoffs_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 117,
+  "with_transcript": 11
+}

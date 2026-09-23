@@ -1,0 +1,30 @@
+{
+  "33438": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:230e4c75daf818c75b024525#api_reuse",
+        "docs": "wu:230e4c75daf818c75b024525#docs",
+        "generality": "wu:230e4c75daf818c75b024525#generality",
+        "proof_golf": "wu:230e4c75daf818c75b024525#proof_golf",
+        "proof_idiom": "wu:230e4c75daf818c75b024525#proof_idiom",
+        "style": "wu:230e4c75daf818c75b024525#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Real.arctan_inv_sqrt_three",
+        "Real.arctan_sqrt_three"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    }
+  ]
+}

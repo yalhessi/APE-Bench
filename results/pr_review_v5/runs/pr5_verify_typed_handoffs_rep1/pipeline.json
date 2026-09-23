@@ -1,0 +1,42 @@
+{
+  "git_commit": "b235021f2d704b535c91c5d7be918e6e5921b4ad",
+  "git_tree_state": "clean",
+  "max_parallel_stages": 2,
+  "pipeline_id": "pipeline:441cebee2f75d45bda6b5f37",
+  "root_run": "pr5_verify_typed_handoffs_rep1",
+  "schema_version": "v5-pipeline-plan1",
+  "spec_sha256": "441cebee2f75d45bda6b5f37fb4bd5593b249b94290c0355dbd20c9d0c9de825",
+  "stages": {
+    "judge": {
+      "config": "configs/pr_review_v5_33337_judge.yaml",
+      "config_sha256": "b7c9f708bf812a48014c883463b4e5c70578beddd6a92ed476a1026c2f86d736",
+      "kind": "judge",
+      "labels": null,
+      "needs": [
+        "run"
+      ],
+      "of": "run",
+      "overrides": {},
+      "select": null,
+      "target": {
+        "out_dir": "results/pr_review_v5/audits/pr5-verify-typed-handoffs-rep1",
+        "run_name": "pr_review_v5_judge_pr5_verify_typed_handoffs_rep1"
+      }
+    },
+    "run": {
+      "config": "configs/pr_review_v5_medium_heldout.yaml",
+      "config_sha256": "8c02e7c001b22836c204a2e132bc42727a1566661c798ed39e0f28161dccc85e",
+      "kind": "run",
+      "labels": null,
+      "needs": [],
+      "of": null,
+      "overrides": {
+        "dataset.pr_numbers": "[33337]"
+      },
+      "select": null,
+      "target": {
+        "run_name": "pr5_verify_typed_handoffs_rep1"
+      }
+    }
+  }
+}

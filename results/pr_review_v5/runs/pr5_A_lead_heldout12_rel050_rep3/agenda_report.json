@@ -1,0 +1,138 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 245
+    },
+    "correctness": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 245
+    },
+    "docs": {
+      "cost_hint": 3.8499999999999943,
+      "eligible": 77,
+      "enumerated": 77,
+      "sites": 340
+    },
+    "duplication": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 245
+    },
+    "family_design": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 245
+    },
+    "generalist": {
+      "cost_hint": 4.599999999999992,
+      "eligible": 92,
+      "enumerated": 92,
+      "sites": 432
+    },
+    "generality": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 245
+    },
+    "naming": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 51,
+      "enumerated": 51,
+      "sites": 245
+    },
+    "proof_golf": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 42,
+      "enumerated": 51,
+      "sites": 187
+    },
+    "proof_idiom": {
+      "cost_hint": 2.549999999999999,
+      "eligible": 42,
+      "enumerated": 51,
+      "sites": 187
+    },
+    "style": {
+      "cost_hint": 4.599999999999992,
+      "eligible": 92,
+      "enumerated": 92,
+      "sites": 413
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 10,
+      "recommended": 493,
+      "required": 166
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 6,
+      "docs": 6,
+      "duplication": 6,
+      "family_design": 9,
+      "generalist": 92,
+      "generality": 2,
+      "naming": 23,
+      "proof_golf": 3,
+      "proof_idiom": 3,
+      "style": 16
+    },
+    "required_by_pr": {
+      "33117": 6,
+      "33145": 6,
+      "33149": 21,
+      "33285": 19,
+      "33294": 23,
+      "33304": 14,
+      "33305": 8,
+      "33315": 13,
+      "33321": 16,
+      "33337": 7,
+      "33362": 9,
+      "33421": 24
+    },
+    "required_reasons": {
+      "namespace placement and module docs are properties of the file (file)": 16,
+      "the PR states this is what it is doing (pr_intent)": 8,
+      "the per-unit broad pass, which no specialist replaces": 92,
+      "these declarations are one API family (family)": 32,
+      "this PR changes module documentation (site)": 6,
+      "this PR introduces declarations that did not exist before (introduction)": 12
+    }
+  },
+  "mandatory_floor_cost": 8.3,
+  "pr_numbers": [
+    33117,
+    33145,
+    33149,
+    33285,
+    33294,
+    33304,
+    33305,
+    33315,
+    33321,
+    33337,
+    33362,
+    33421
+  ],
+  "projected_cost_fanout": 33.45,
+  "projected_cost_rules": 32.55,
+  "proposals_eligible": 651,
+  "proposals_enumerated": 669,
+  "renderer_version": "candidate-prompt/14+focused-prompt/3",
+  "routing_mode": "lead",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "units_without_specialist": [],
+  "work_units": 92
+}

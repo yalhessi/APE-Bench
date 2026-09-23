@@ -136,6 +136,33 @@ async def unbuilt_base_commits(commits: Iterable[str], repo_name: str = "mathlib
     return missing
 
 
+def scheduled_task_tokens(run_dir: Path) -> int:
+    """Processed tokens over the run's top-level tasks, from the record every one of them has.
+
+    `OrchestratorResults.total_token_usage` cannot answer this. It sums `task_results`, and a
+    task that paused reaches that list carrying no usage at all: `worker._try_aggregate`
+    synthesises a bare `BaseTaskResult(success=False, error="All samples failed: [...]")`
+    with `token_usage=None` (framework defect #4). Measured on `pr5_elm_qwen_tokencap_probe1`,
+    where 10 of 11 arms stopped on their token ceiling: the orchestrator aggregate reported
+    **27,593** tokens -- the one job that finished -- against a true **385,684**.
+
+    `task_outcome.json` is written for every scheduled task precisely because
+    `task_result.json` is reserved for a legal successful submission, and `TaskOutcome.tokens`
+    sums its samples' attempts whether they paused or not.
+
+    Top level only: `tasks/*` directly under the run root. A lead's children live deeper and
+    are the manifest's `nested_tokens`, counted off the delegation ledger.
+    """
+
+    total = 0
+    for path in sorted(run_dir.glob("tasks/*/task_outcome.json")):
+        try:
+            total += int(json.loads(path.read_text(encoding="utf-8")).get("tokens") or 0)
+        except Exception:  # noqa: BLE001 - an unreadable outcome contributes nothing
+            continue
+    return total
+
+
 def failed_work_unit_ids(run_dir: Path) -> set:
     """Work units whose task result recorded failure in a previous run.
 

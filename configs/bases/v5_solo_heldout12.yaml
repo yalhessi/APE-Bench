@@ -20,6 +20,9 @@ dataset:
   # first model call, which is the cap working rather than a number to raise thoughtlessly.
   # There is no coverage floor to add: solo schedules no work-unit job.
   run_total_cost_cap: 20.00
+  # Token twin at the calibrated 1,200,000 tokens per billed dollar; the two budgets
+  # must authorise the same work or `plan` says so.
+  run_total_token_cap: 24000000
 
   # All 12 reviewed workspaces for this set exist (built 2026-09-12). A run here verifies in
   # them or is refused at preflight -- never quietly against base .oleans. The same rule as

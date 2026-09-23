@@ -1,0 +1,26 @@
+{
+  "carried_artifacts": [
+    "source/events.jsonl",
+    "input/episodes.jsonl",
+    "gold/intervention_views.jsonl",
+    "gold/outcome_observations.jsonl",
+    "gold/pilot_cases.jsonl",
+    "gold/episode_boundaries.jsonl"
+  ],
+  "change_ids_reanchored": 85,
+  "gold_reanchored": [
+    "gold/judgments.jsonl",
+    "gold/intervention_scope_migrations.jsonl"
+  ],
+  "graphs_rebuilt": true,
+  "manifest_sha256": "dbab342a3910a0f5c25d798a347bb2ef4fbb57b94344a20a37dcf9b536533582",
+  "parent": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "prompt_hashes_changed": 101,
+  "prompts": 101,
+  "renderer_version": "candidate-prompt/13",
+  "schema_version": "rerender-release-report1",
+  "units_carrying_paths": 101,
+  "version": "rerender-release/1",
+  "work_unit_ids_changed": 101,
+  "work_units": 101
+}

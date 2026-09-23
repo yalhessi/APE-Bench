@@ -1,0 +1,47 @@
+# The iteration judge: v5 scoring on the locally hosted Qwen, through the ELM gateway.
+#
+# READ THIS BEFORE QUOTING ANY NUMBER THIS PRODUCES.
+#
+# The judge is the measurement instrument. `bases/v5_judge.yaml` pins `gpt_5_mini` precisely
+# so that a recall figure means the same thing across every run in the record, and its header
+# calls changing the model "a real hazard rather than a theoretical one". This file changes
+# it. That is legitimate for one purpose and one only: checking that a pipeline change did
+# something, cheaply, in the loop — did findings come out, did pairing fire, did the stage
+# chain run end to end.
+#
+# It is NOT legitimate for:
+#   * any recall or alignment figure that gets written down, put in a doc, or compared
+#     against a run judged by `gpt_5_mini`;
+#   * deciding whether an intervention worked;
+#   * anything the word "result" would be used for.
+#
+# The two judges do not mix by accident — `judge_identity` keys on `model_name`, so the
+# caches are disjoint and no cached `gpt_5_mini` verdict can be served to a Qwen run or the
+# reverse. The exposure is entirely human: a person reading `semantic_report.json` without
+# checking which model wrote it. So **name every run from this base `iter_<something>`**, and
+# re-judge with `bases/v5_judge.yaml` before believing anything.
+#
+# Unmeasured, and the reason the boundary is drawn this hard rather than softly: the
+# `gpt_5_mini` judge's self-agreement is ~90%, which already sets the noise floor at roughly
+# +-12pp on one obligation at n~8. Qwen's self-agreement on this rubric is simply not known.
+# It could be better or much worse, and until someone runs the paired check it is not a
+# quantity anyone may assume.
+extends: v5_judge.yaml
+
+llm_config:
+  model_name: elm_qwen_3.5
+  # Same reasoning decision as the generation base, for the same measured reasons (~100x
+  # completion tokens, ~23x latency with it on). It matters more here, not less: the judge
+  # runs `sample_count: 3` for a majority vote, so every cost is paid three times per pair.
+  reasoning_effort: none
+
+execution:
+  # The token twin of the inherited `sample_max_cost: 0.10`, which on a model priced 0.0 is
+  # satisfied by anything at all.
+  #
+  # 0.10 x 1,200,000 processed tokens per billed dollar = 120,000. The same rate and the same
+  # arithmetic the generation configs use for their token twins (smoke4's
+  # `per_pr_cost_cap: 2.0` -> `per_pr_token_cap: 2400000`), so the two denominations authorise
+  # the same work. The rate is measured within 4% across arm, solo and judge tasks — 1,152,608
+  # for judge attempts specifically — so this is the least extrapolated of the token ceilings.
+  sample_max_tokens: 120000

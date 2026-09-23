@@ -62,6 +62,7 @@ class BaseRuntime(ABC):
         orchestrator_id: str,
         attempt_path: Path,
         cost_limit: Optional[float] = None,
+        token_limit: Optional[int] = None,
         ) -> Tuple['BaseTaskResult', Optional['ScaffoldTerminationResult']]:
         """Execute a task.
 
@@ -74,6 +75,7 @@ class BaseRuntime(ABC):
             orchestrator_id: Orchestrator identifier (must match orchestrator workspace id)
             attempt_path: Attempt workspace path
             cost_limit: Maximum cost limit
+            token_limit: Maximum processed tokens
 
         Returns:
             Tuple of (BaseTaskResult, ScaffoldTerminationResult)

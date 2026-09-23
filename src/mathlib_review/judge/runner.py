@@ -69,7 +69,7 @@ from src.mathlib_review.judge.semantic_judge import (
     semantic_report,
 )
 from src.mathlib_review.run_config import load_run as _load_run
-from src.mathlib_review.run_state import SCOREABLE, from_manifest
+from src.mathlib_review.run_state import RUN_ARTIFACTS, SCOREABLE, StageInput, from_manifest
 
 
 class JudgeDatasetConfig(BaseModel):
@@ -345,51 +345,55 @@ def collect_pairs(dataset: JudgeDatasetConfig) -> List[Dict]:
     return pairs
 
 
-def assert_source_run_is_complete(dataset: JudgeDatasetConfig, logger) -> Optional[str]:
-    """Refuse to score a run that did not finish covering what it promised.
+def source_run(dataset: JudgeDatasetConfig, logger) -> "StageInput":
+    """The generation run this judge scores, read through the one hand-off.
 
-    `dataset.candidates` points into a generation run's directory, so its manifest is a
-    sibling. Two September runs closed with `completion_status: failed` and were scored
-    anyway, because nothing between the run and the judge ever looked at it; the resulting
-    recall figures were reported and used to decide what to build next.
+    `dataset.candidates` points into a run directory, so the manifest and the agenda report are
+    its siblings -- and they were resolved here by rebuilding those two paths by hand. That is
+    the defect `judge --of` removed for the three paths a judge config used to spell, left in
+    place for the two it reads. `StageInput` resolves both, hashes what is read, and refuses a
+    run whose manifest says it did not cover what it promised.
 
-    Returns the source run's status when one could be read, for the record. Raises unless the
-    run is complete or `allow_partial` is set.
+    Resolved from the directory rather than from the run name because an override is
+    legitimate: rescoring one run's findings into a second audit is a real thing to want, and a
+    hand-assembled candidates file in a temp directory has no run name at all.
     """
 
-    manifest_path = Path(dataset.candidates).parent / "run_manifest.json"
-    if not manifest_path.is_file():
+    from src.mathlib_review.run_state import StageInput
+
+    stage = StageInput.at(
+        Path(dataset.candidates).parent,
+        require=("findings",) if Path(dataset.candidates).name == "findings.jsonl" else (),
+        allow_partial=dataset.allow_partial,
+    )
+    if stage.unchecked:
         # v4 runs and hand-assembled candidate files have no manifest. Say so rather than
         # inventing a verdict about them.
         logger.info("no run manifest beside %s; source-run completeness unchecked",
                     dataset.candidates)
-        return None
+    elif stage.forensic:
+        logger.warning(
+            "%s closed as %s -- scoring anyway because allow_partial is set. These numbers are "
+            "forensic, not a measurement.", stage.run_name,
+            (stage.manifest or {}).get("completion_status"))
+    return stage
 
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    status = manifest.get("completion_status")
-    gaps = manifest.get("coverage_gaps") or []
-    # Through the state machine rather than by comparing to the string "complete". The machine
-    # is the one place that says which states may be scored; a literal here is a second place
-    # that would have to agree with it and would not be checked.
-    if from_manifest(status) in SCOREABLE:
-        return status
 
-    detail = (
-        f"source run {manifest.get('run_name')!r} closed as {status!r}"
-        + (f" with {len(gaps)} coverage gap(s): "
-           + ", ".join(sorted(g.get("invocation_id", "?") for g in gaps)[:6])
-           if gaps else "")
-    )
-    if not dataset.allow_partial:
-        raise ValueError(
-            f"{detail}. Recall from it is measured against work units that were never "
-            "reviewed, so it is not comparable to a complete run. Set "
-            "`dataset.allow_partial: true` to score it anyway — the output is forensic and "
-            "must not be reported as a headline number."
-        )
-    logger.warning("%s — scoring anyway because allow_partial is set. These numbers are "
-                   "forensic, not a measurement.", detail)
-    return status
+def assert_source_run_is_complete(dataset: JudgeDatasetConfig, logger) -> Optional[str]:
+    """Refuse to score a run that did not finish covering what it promised.
+
+    Two September runs closed with `completion_status: failed` and were scored anyway, because
+    nothing between the run and the judge ever looked at it; the resulting recall figures were
+    reported and used to decide what to build next.
+
+    Kept as a named function because that refusal is the guarantee, and it asks `SCOREABLE`
+    rather than comparing the manifest's own word against a string literal -- a second place
+    that would have to agree with the machine, with nothing checking that it did. Returns the
+    source run's status, for the record.
+    """
+
+    stage = source_run(dataset, logger)
+    return (stage.manifest or {}).get("completion_status")
 
 
 def judged_pr_scope(dataset: JudgeDatasetConfig, logger) -> Optional[List[int]]:
@@ -411,7 +415,7 @@ def judged_pr_scope(dataset: JudgeDatasetConfig, logger) -> Optional[List[int]]:
     including them is the whole defect.
     """
 
-    report_path = Path(dataset.candidates).parent / "agenda_report.json"
+    report_path = Path(dataset.candidates).parent / RUN_ARTIFACTS["agenda_report"].filename
     stated = sorted({*dataset.pr_numbers, *dataset.control_pr_numbers}) or None
     if not report_path.is_file():
         # v4 runs and hand-assembled candidate files have no agenda report. Fall back to what
@@ -439,29 +443,34 @@ def judged_pr_scope(dataset: JudgeDatasetConfig, logger) -> Optional[List[int]]:
     return stated
 
 
-#: Where a judge run's own outputs go, derived from the generation run it scores.
-JUDGE_AUDIT_ROOT = Path("results/pr_review_v5/audits")
-
-
-def derive_from_run(run_name: str) -> Dict[str, Any]:
+def derive_from_run(run_name: str, node: str = "judge") -> Dict[str, Any]:
     """The judge paths implied by a generation run.
 
     `candidates`, `out_dir` and `run_name` are three free-form strings that all encode one run
-    identity, with nothing making them agree. They disagree in the tree right now:
-    `pr_review_v5_medium_heldout.yaml` was bumped to `rep2` while its judge config still reads
+    identity, with nothing making them agree. They disagreed in the tree:
+    `pr_review_v5_medium_heldout.yaml` was bumped to `rep2` while its judge config still read
     `rep1/findings.jsonl` into `audits/medium-heldout-rep1`. Running that pair scores the old
     run under the new run's name, and nothing errors.
 
     Deriving them from the one name removes the class of mistake rather than the instance.
+
+    `node` names *which* judgement of that run this is, and the default keeps every existing
+    path exactly as it was. A second node -- a widened pairing tier, a different rubric -- gets
+    its own audit directory and its own orchestrator rather than resuming into the first one's,
+    which is what makes "judge this run twice, differently" expressible at all. A run may
+    legitimately carry several judgements; what it must never do is have two of them
+    indistinguishable.
     """
 
-    from src.mathlib_review.paths import run_dir
+    from src.mathlib_review.paths import AUDITS, run_dir
 
     slug = run_name.replace("pr_review_v5_", "").replace("_", "-")
+    suffix = "" if node == "judge" else f".{node}"
     return {
         "candidates": run_dir(run_name) / "findings.jsonl",
-        "out_dir": JUDGE_AUDIT_ROOT / slug,
-        "run_name": f"pr_review_v5_judge_{run_name.replace('pr_review_v5_', '')}",
+        "out_dir": AUDITS / f"{slug}{suffix}",
+        "run_name": (f"pr_review_v5_judge_{run_name.replace('pr_review_v5_', '')}"
+                     + (f"_{node}" if node != "judge" else "")),
     }
 
 
@@ -486,9 +495,54 @@ def assert_paths_agree(dataset: "JudgeDatasetConfig", run_name: str) -> None:
         )
 
 
+def assert_one_judge_per_audit(dataset: JudgeDatasetConfig, stage, identity: str,
+                               logger) -> None:
+    """Refuse a second judge identity writing into one audit, before anything is spent.
+
+    `judge_identity` hashes the rubric, the model, the sampling and the decode budgets, and R0
+    found two judge arms disagreeing on 4 of 18 pairs from decode budgets alone -- so two
+    identities in one directory are two measurements presented as one. It is caught today only
+    by `write_once` refusing to overwrite `semantic_report.json`, which happens AFTER every
+    pair has been judged and paid for.
+
+    A second judgement is legitimate: a widened pairing tier is a real experiment. It needs its
+    own audit directory and its own orchestrator id, which `derive_from_run(run, node)` gives,
+    or the resume would hand the new identity the old one's cached verdicts.
+    """
+
+    previous = {
+        row.get("identity", {}).get("judge_identity")
+        for row in stage.ledger
+        if row.get("stage") == "judge"
+        and row.get("produced", {}).get("out_dir") == str(dataset.out_dir)
+    }
+    previous.discard(None)
+    if not previous:
+        report = Path(dataset.out_dir) / "semantic_report.json"
+        if report.is_file():
+            recorded = json.loads(report.read_text(encoding="utf-8")).get("judge_identity")
+            if recorded:
+                previous = {recorded}
+    conflicting = sorted(item for item in previous if item != identity)
+    if conflicting:
+        raise ValueError(
+            f"{dataset.out_dir} already holds a judgement under identity {conflicting[0][:12]} "
+            f"and this run is {identity[:12]}. `judge_identity` covers the rubric, the model, "
+            f"the sampling and the decode budgets, so a verdict under one is not comparable to "
+            f"a verdict under another and the two must not share a directory. Judge it as its "
+            f"own node -- `--set dataset.out_dir=<audits/...>` and "
+            f"`--set dataset.run_name=<...>`, which `derive_from_run(run, node)` computes -- or "
+            f"delete the audit if it was a mistake."
+        )
+    if previous:
+        logger.info("this audit was already judged under the same identity %s; resume is the "
+                    "cache and only unjudged pairs will be called", identity[:12])
+
+
 async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
     assert_repo_root()
-    source_run_status = assert_source_run_is_complete(dataset, logger)
+    stage = source_run(dataset, logger)
+    source_run_status = (stage.manifest or {}).get("completion_status")
     # Computed once so the pre- and post-publication reports cannot disagree about what they
     # are dividing by. They did: only the pre-publication call was given a scope.
     pr_scope = judged_pr_scope(dataset, logger)
@@ -509,6 +563,9 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
             sibling_obligations=dataset.include_sibling_claims,
         ),
     )
+    # Before anything is spent, and before the dry run returns: a preflight that cannot say
+    # "this would be refused" is not a preflight.
+    assert_one_judge_per_audit(dataset, stage, identity, logger)
     pairs = collect_pairs(dataset)
     targets = load_targets(dataset.release)
     context = (
@@ -689,8 +746,67 @@ async def run(dataset: JudgeDatasetConfig, scaffold, task_overrides, logger):
             pretty_json_bytes(publication_summary(findings, report, post_report)),
         )
     write_once(dataset.out_dir / "sample_votes.jsonl", jsonl_bytes(votes))
+    _record_stage(dataset, stage, identity, model, logger)
     logger.info("Wrote %d matches to %s", len(matches), dataset.out_dir)
     return dataset.out_dir
+
+
+def _record_stage(dataset: JudgeDatasetConfig, stage, identity: str, model: str,
+                  logger) -> None:
+    """Leave the judge's row in the SOURCE run's ledger.
+
+    In the run's ledger and not the audit's, because "this run has been judged, under this
+    identity, into that directory" is a fact about the run -- it is what `state_of` reads to
+    say `JUDGED`, and what the next judge reads to refuse a second identity before spending.
+    The audit keeps its own outputs; the run keeps the record that they exist.
+
+    Digests and identity only. Gold is hashed as the files the judge loaded, never quoted: the
+    run directory must stay gold-free, and a row carrying an obligation's text would put gold
+    into it by the back door.
+
+    Never fatal, for the reason the generation run's row is not: the verdicts are paid for and
+    written, and a provenance row must not be able to fail the stage it describes.
+    """
+
+    from src.mathlib_review.run_state import (
+        RunState, append_stage, assert_transition, digests_of, stage_record,
+    )
+    from src.mathlib_review.schema.review import EVALUATION_CONTRACT_VERSION
+
+    try:
+        forensic = bool(stage.forensic or dataset.allow_partial and stage.forensic)
+        transition = None
+        state_after = None
+        if not forensic and stage.state is RunState.FINALIZED:
+            assert_transition(RunState.FINALIZED, RunState.JUDGED)
+            state_after = RunState.JUDGED
+            transition = f"{RunState.FINALIZED.value} -> {RunState.JUDGED.value}"
+        produced = digests_of(
+            Path(dataset.out_dir) / name for name in
+            ("semantic_pairs.jsonl", "semantic_matches.jsonl", "semantic_report.json",
+             "publication_report.json", "sample_votes.jsonl"))
+        produced["out_dir"] = str(dataset.out_dir)
+        append_stage(stage.run_dir, stage_record(
+            "judge", run_name=stage.run_name,
+            consumed={**stage.consumed, **digests_of(
+                Path(dataset.release) / name for name in
+                ("gold/judgments.jsonl", "gold/intervention_views.jsonl",
+                 "derived/change_graphs.jsonl", "derived/pr_relations.jsonl"))},
+            produced=produced,
+            identity={
+                "judge_identity": identity,
+                "judge_version": JUDGE_VERSION,
+                "judge_model": model,
+                "pairing_tiers": list(dataset.pairing_tiers),
+                "input_kind": dataset.input_kind,
+            },
+            state_before=stage.state, state_after=state_after, transition=transition,
+            forensic=forensic,
+            evaluation_contract_version=EVALUATION_CONTRACT_VERSION,
+        ))
+    except Exception:  # noqa: BLE001 - see the docstring
+        logger.warning("could not record the judge's stage row; the audit is unaffected",
+                       exc_info=True)
 
 
 def main() -> None:

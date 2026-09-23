@@ -44,3 +44,8 @@ datasets
 leanclient
 lean_lsp_mcp
 pylspclient
+
+# Test suite. `--dist loadfile` in the documented command needs xdist; without it the
+# command fails outright rather than running serially, so both are declared.
+pytest
+pytest-xdist

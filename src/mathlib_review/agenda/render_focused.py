@@ -23,7 +23,7 @@ contract — `change_ids ⊆ unit` — keeps holding unchanged.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Dict, Iterable, List, Optional
 
 from ape.tasks.lean_tasks.formal_math.review.focused_prompts import (
     FOCUSED_PROMPTS, procedure_supplement,
@@ -31,27 +31,20 @@ from ape.tasks.lean_tasks.formal_math.review.focused_prompts import (
 
 from src.mathlib_review.agenda.focused_specs import FocusedAgentSpec, FocusedInvocation
 from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
-from src.mathlib_review.agenda.render_prompts import FACET_CHECKLIST
+from src.mathlib_review.agenda.render_prompts import (
+    FACET_CHECKLIST_ONCE,
+    target_blocks,
+)
 from src.mathlib_review.schema import ChangeGraph, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit
 
-#: Bumped for the hunk/checklist deduplication: every prompt this renderer produces changed,
-#: so runs before and after are not prompt-identical and must not be compared as if they were.
-FOCUSED_RENDERER_VERSION = "focused-prompt/2"
-
-#: The same checklist, emitted once for the whole prompt instead of once per target.
-#:
-#: `render_prompts.FACET_CHECKLIST` keeps its per-target wording and is deliberately left alone:
-#: it is hashed into every frozen `rendered_prompts.jsonl`, so editing it moves every prompt
-#: hash in every release at once. The generalist path therefore still carries the repetition
-#: until a release is re-rendered; only the arms this renderer serves are deduplicated here.
-FOCUSED_FACET_CHECKLIST = FACET_CHECKLIST.replace(
-    "### Maintainer ask checklist for this target\n"
-    "Consider every item, but emit a candidate only for a concrete change you would actually "
-    "request.",
-    "### Maintainer ask checklist\n"
-    "Apply every item to every review target above, but emit a candidate only for a concrete "
-    "change you would actually request.",
-)
+#: `/2` deduplicated the hunk and the checklist within a prompt; `/3` scopes each target's
+#: diff to that target (`render_prompts.target_diff_section`); `/4` tells the arms a compile
+#: can settle that `patch_set` exists, in the contract rather than in one arm's own prose.
+#: Every prompt this renderer produces changed at each bump, so runs across one are not
+#: prompt-identical and must not be compared as if they were -- except at `/4`, where the
+#: seven granted arms' prompts change and the other three are byte-identical, which is
+#: asserted rather than assumed (`test_pr_review_v4_focused_task.py`).
+FOCUSED_RENDERER_VERSION = "focused-prompt/4"
 
 #: The v4 submission envelope, appended after each spec's own instruction.
 #:
@@ -74,7 +67,7 @@ Finish by calling submit_candidates exactly once, using:
 "claim": "specific present problem", "requested_change": "concrete maintainer request",
 "suggested_fix": "optional implementation detail or null", "proposed_edit": {{"path": "...",
 "declaration_name": "...", "new_declaration": "complete replacement"}} or null,
-"model_confidence": 0.0}}]}}. An empty candidates list is valid.
+{patch_set_field}"model_confidence": 0.0}}]}}. An empty candidates list is valid.
 
 Submitting nothing is a correct and common outcome of this check, and nothing below asks you to
 avoid it. It does have to say which outcome it was: when `candidates` is empty, set
@@ -106,56 +99,33 @@ asks for the wrong size of change has not helped.
 
 Say which field your claim is about. If what you have found is that something already exists
 in the library, that is a duplication claim whatever check you are running, and saying so in
-`concern_label` is what lets it be verified against the library rather than taken on trust."""
+`concern_label` is what lets it be verified against the library rather than taken on trust.{patch_set_clause}"""
 
+#: What a granted arm is told about coordinated fixes, in the contract that supersedes the
+#: prompt above it. `family_design` alone carried this, in its own prompt, 2,400 characters
+#: above a template that did not list the field -- so the one arm that could submit one was
+#: told about it by the text the contract overrides. The instruction is the same instruction;
+#: what changes is that it is now where the arm reads its field list, and that every arm whose
+#: fix a compile settles reads it.
+PATCH_SET_FIELD = ('"patch_set": [{"path": "...", "change_id": "change:...",\n'
+                   '"declaration_name": "...", "new_declaration": "complete replacement"}] '
+                   'or null,\n')
 
-def _target_block(target, fragments_section: Optional[str] = None) -> str:
-    base = target.base_code if target.base_code is not None else "(not present)"
-    reviewed = target.reviewed_code if target.reviewed_code is not None else "(not present)"
-    if fragments_section is None:
-        fragments_section = f"```diff\n{''.join(target.diff_fragments)}\n```"
-    return (
-        f"## Review target\nChange ID (copy exactly): `{target.change_id}`\n"
-        f"Path: {target.path}\nKind: {target.kind}\n"
-        f"Primary subject (copy exactly): `{target.declaration_name or target.path}`\n"
-        f"Primary entity IDs (copy one, or null if none): "
-        f"{', '.join(target.reviewed_entity_ids + target.base_entity_ids) or '(none)'}\n"
-        f"### Complete base region\n```lean\n{base}\n```\n"
-        f"### Complete reviewed region\n```lean\n{reviewed}\n```\n"
-        f"### Exact changed fragments\n{fragments_section}"
-    )
+PATCH_SET_CLAUSE = """
 
+## Coordinated fixes
 
-def _target_blocks(targets: Sequence[Any]) -> List[str]:
-    """One block per target, with each distinct diff hunk printed exactly once.
+Where the fix genuinely spans several declarations, submit it as `patch_set` — a list of edits
+applied and compiled TOGETHER, instead of `proposed_edit`. Use it when the halves are
+individually wrong: deleting a generated lemma without adding the attribute that regenerates
+it does not compile, and neither does adding a dual before the lemma it is derived from
+exists. An empty `new_declaration` deletes the declaration.
 
-    A work unit is a group of related changes in one file, so its targets usually share a hunk:
-    measured across smoke4's 143 prompts, the mean was 1.8 distinct hunks against 3.4 targets,
-    and 32% of all prompt text was a hunk verbatim repeated within the same prompt. One
-    `api_reuse` job carried six targets, one unique hunk, and 16,710 duplicate characters out of
-    33,174. Re-reading the same diff five times is paid for on every invocation and crowds out
-    the context the arm was given the slice for.
-
-    The first target to use a hunk prints it; later targets naming the same hunk get a pointer
-    to that target's subject. Nothing else about a target block changes, so the per-target
-    identity fields the submission contract keys on are untouched.
-    """
-
-    first_use: Dict[str, str] = {}
-    blocks: List[str] = []
-    for target in targets:
-        fragments = "".join(target.diff_fragments)
-        subject = target.declaration_name or target.path
-        owner = first_use.get(fragments)
-        if owner is None:
-            first_use[fragments] = subject
-            blocks.append(_target_block(target))
-        else:
-            blocks.append(_target_block(
-                target,
-                f"Identical to the fragments shown for `{owner}` above.",
-            ))
-    return blocks
+Every edit names the `change_id` it is about, and that target must be one your candidate
+claims in `change_ids` — an edit may not rewrite a declaration you are not asking about. The
+whole candidate is refused if any edit escapes its target, if two edits overlap, or if any
+touched file fails to compile, so verify with lean_verify_edit as you go. Where one edit
+suffices, use `proposed_edit` as usual."""
 
 
 def renderer_version_for(procedure_variant: str = "baseline") -> str:
@@ -180,12 +150,17 @@ def focused_system_prompt(spec: FocusedAgentSpec,
     unknown variant raises rather than rendering the baseline under the treatment's name.
     """
 
+    from src.mathlib_review.agenda.registry import patch_set_arms
+
+    coordinated = spec.spec_id in patch_set_arms()
     _tools, system, _user = FOCUSED_PROMPTS[spec.spec_id]
     return system + procedure_supplement(procedure_variant, spec.spec_id) + \
         SUBMISSION_CONTRACT.format(
             concern_family=spec.concern_family,
             issue_kind=spec.issue_kind,
             spec_id=spec.spec_id,
+            patch_set_field=PATCH_SET_FIELD if coordinated else "",
+            patch_set_clause=PATCH_SET_CLAUSE if coordinated else "",
         )
 
 
@@ -207,7 +182,8 @@ def render_focused_invocation(
     # The checklist is identical for every target and was previously appended to each one: 530
     # copies across smoke4's 143 prompts, 13% of all prompt text. It is emitted once, after the
     # targets, so it still reads as applying to all of them.
-    blocks = _target_blocks([targets[change_id] for change_id in invocation.site_change_ids])
+    blocks = target_blocks(
+        [targets[change_id] for change_id in invocation.site_change_ids], scoped=True)
     system = focused_system_prompt(spec, procedure_variant)
     user = (
         f"# PR #{episode.pr_number}: {episode.title.text or ''}\n"
@@ -216,7 +192,7 @@ def render_focused_invocation(
         f"Changed files: {', '.join(episode.changed_files)}\n\n"
         f"You are running the {spec.spec_id} check on the "
         f"{len(blocks)} review target(s) below.\n\n" + "\n\n".join(blocks)
-        + f"\n\n{FOCUSED_FACET_CHECKLIST}"
+        + f"\n\n{FACET_CHECKLIST_ONCE}"
         # Appended *after* the targets, and hashed with them: the slice is part of the
         # sealed prompt, so a run cannot silently differ from the plan it sealed.
         + (context_text or "")

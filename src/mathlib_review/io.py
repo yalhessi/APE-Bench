@@ -188,6 +188,56 @@ def sealed_model(cls, **values):
 COMPILED_TARGET = "<compiled-target>"
 
 
+def append_jsonl(path: Path, row: Any) -> Path:
+    """Add one record to an append-only file, in the canonical form everything else reads.
+
+    The counterpart to `write_once`, and the two are not interchangeable. `write_once` is what
+    makes a run reproducible: a second write with different bytes is refused, so an artifact
+    cannot be quietly revised. That guarantee is exactly wrong for a record written *while*
+    work happens -- a journal, a trace, a stage ledger -- where a crash must leave what already
+    ran still findable, and where the file is complete only when the work is.
+
+    Appending rather than rewriting is also why a truncated final line is survivable: every
+    reader here stops at the first line it cannot parse and keeps everything before it.
+    """
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = row.model_dump(mode="json") if hasattr(row, "model_dump") else row
+    with path.open("ab") as handle:
+        handle.write(canonical_json_bytes(payload) + b"\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return path
+
+
+def appended_rows(path: Path) -> List[Any]:
+    """Read an append-only file, stopping at the first line that will not parse.
+
+    The reader for anything `append_jsonl` writes, and the difference from `jsonl_rows` is the
+    whole point. A write-once artifact is complete or it is a defect, so a line that will not
+    parse there is an error worth raising. An append-only file is written *while* work happens,
+    so a crash mid-write truncates its last line by construction -- and everything before it is
+    intact. Stopping rather than skipping is deliberate: the rows are ordered, so a later one
+    cannot be trusted once one is unreadable.
+
+    The lead's journal and the execution index already do this; they live in `src/ape/` and
+    cannot import this module, which is the package boundary rather than a copy.
+    """
+
+    if not Path(path).is_file():
+        return []
+    rows: List[Any] = []
+    for line in Path(path).read_text(encoding="utf-8").split("\n"):
+        if not line.strip():
+            continue
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            break
+    return rows
+
+
 def write_once(path: Path, content: bytes) -> bool:
     """Atomically create a release artifact; identical regeneration is a no-op."""
     if path.exists():

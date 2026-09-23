@@ -56,6 +56,9 @@ dataset:
   # take the set from 95 units to 203 (+114%) to add 4 obligations (+19%), and its floor alone
   # is $5.90. Add it with `--set dataset.pr_numbers='[...]'` if that trade is wanted.
   run_total_cost_cap: 28.00
+  # Token twin at the calibrated 1,200,000 tokens per billed dollar; the two budgets
+  # must authorise the same work or `plan` says so.
+  run_total_token_cap: 33600000
   pr_numbers:
   - 33117
   - 33145

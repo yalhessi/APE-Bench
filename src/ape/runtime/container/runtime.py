@@ -111,6 +111,7 @@ class ContainerRuntime(BaseRuntime):
         orchestrator_id: str,
         attempt_path: Path,
         cost_limit: Optional[float] = None,
+        token_limit: Optional[int] = None,
     ) -> Tuple['BaseTaskResult', Optional['ScaffoldTerminationResult']]:
         """Execute task within docker container.
 
@@ -167,7 +168,7 @@ class ContainerRuntime(BaseRuntime):
             await self.setup_phase()
 
             # Phase 2: Execute task in container
-            exec_result = await self.execution_phase(scaffold_type, cost_limit)
+            exec_result = await self.execution_phase(scaffold_type, cost_limit, token_limit)
 
             # Phase 3: Sync results back to host
             await self.sync_back_phase()
@@ -263,7 +264,8 @@ class ContainerRuntime(BaseRuntime):
         if self.logger:
             self.logger.info("[ContainerRuntime] Setup phase completed")
 
-    async def execution_phase(self, scaffold_type: str, cost_limit: Optional[float]) -> str:
+    async def execution_phase(self, scaffold_type: str, cost_limit: Optional[float],
+                              token_limit: Optional[int] = None) -> str:
         """Execution phase: run task in container."""
         if self.logger:
             self.logger.info("[ContainerRuntime] Starting execution phase")
@@ -281,6 +283,8 @@ class ContainerRuntime(BaseRuntime):
 
         if cost_limit is not None:
             runner_cmd.extend(["--cost-limit", str(cost_limit)])
+        if token_limit is not None:
+            runner_cmd.extend(["--token-limit", str(token_limit)])
 
         # Execute in container
         exit_code, output = self.container.exec_run(

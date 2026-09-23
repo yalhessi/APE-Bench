@@ -161,12 +161,16 @@ def test_wall_seconds_is_per_tier_so_the_gantt_must_not_use_it():
 
 @requires_run
 @requires_sidecar
-def test_briefs_survive_the_schema_gap():
-    """`DelegationRecord` omits `brief`; reading through it would drop the lead's reasoning."""
+def test_the_lead_s_briefs_reach_the_view():
+    """This used to assert the defect -- `"brief" not in DelegationRecord.model_fields` -- and
+    the view read raw dicts because of it. The model carries the brief now, so what is worth
+    asserting is the thing that was at risk: the lead's own reasoning is in the artifact and
+    arrives intact."""
 
     from src.mathlib_review.schema.review import DelegationRecord
 
-    assert "brief" not in DelegationRecord.model_fields
+    assert {"brief", "delivered_prompt_sha256", "reason_given"} <= set(
+        DelegationRecord.model_fields)
     views = delegation_view.load_lead_views(DIRECTORY)
     briefed = [job for view in views.values() for job in view.delegations if job.brief]
     assert len(briefed) == 36

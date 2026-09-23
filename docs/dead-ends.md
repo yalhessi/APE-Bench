@@ -82,15 +82,45 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   refused an empty submission) took **issue recall 0.20 -> 0.50 and location 0.80 -> 1.00**,
   strictly dominating: 3 forced-only hits, 0 unforced-only. The arms were not short of findings,
   they were withholding them -- forced, `naming` produced `Dense.upperBounds_image`, character
-  for character the rename gold asked for, on an obligation it had abstained on. And the bar is
-  a **volume filter, not a quality filter**: the suppressed candidates align with gold at the
-  same rate as the kept ones (marginal 5 aligned / 130 extra = 0.038, against 0.041 unforced).
-  So `already_correct` was the label on good and bad candidates alike. The cost is why this is
-  still not a design: control emission went 1 -> 36 findings on a PR where maintainers asked for
-  nothing, about 12 spurious control findings per real obligation recovered. **The lever is the
-  bar, not the schedule** -- which is a calibration and downstream-selection problem, and
-  `model_confidence` came back null on every forced finding, so the ranking signal that would
-  make selection possible is not currently captured.
+  for character the rename gold asked for, on an obligation it had abstained on. And the bar was read as
+  a *volume filter, not a quality filter*, on the ground that the suppressed candidates align
+  with gold at the same rate as the kept ones (marginal 5 aligned / 130 extra = 0.038, against
+  0.041 unforced). The cost is why this is still not a design: control emission went 1 -> 36
+  findings on a PR where maintainers asked for nothing, about 12 spurious control findings per
+  real obligation recovered.
+  **Retracted 2026-09-22, the quality half only.** 0.038 is *five candidates*. Fisher exact on
+  2/49 against 5/130 gives p = 1.0, which is no power rather than equivalence; the marginal
+  Wilson interval spans 0.4x to 2.1x the kept rate, and on the adjudicated denominator (only 31
+  of 49 and 65 of 179 candidates were ever paired) the marginal is 2.3x *better*, while under
+  judge unanimity it inverts to 0.015. The subtraction also assumes the forced run nests the
+  unforced one, and they share 3 of 48 (pr, claim) keys. The honest statement is **no evidence
+  either way about the bar's discrimination**, from one unreplicated pair of runs on 4 PRs. The
+  volume and recall halves stand (49 -> 179 candidates, 2 -> 5 obligations on majority, 2 -> 3
+  under unanimity). Two clauses attached to it were also wrong: `model_confidence` is *not*
+  missing -- it is populated on 907 of 907 lead candidates and 179 of 179 forced ones, and is
+  absent only from the *finding* schema and from solo runs -- and its within-PR AUC is
+  0.485 / 0.485 / 0.514, so the ranking signal is captured and does not rank.
+  **And the lever is not only the bar.** Re-scoring the three held-out reps found the admission
+  gate discarding 71-83% of the gold obligations the run had already found (7/5/6 hit -> 2/1/1
+  published), on the axis of whether a collector can warrant the claim's family rather than
+  whether the claim is right: `docs/research/the-admission-gate-2026-09.md`. **Reopens if:** a
+  second `forbid_abstention` rep exists, or the forced run is re-judged under unanimity -- both
+  free of new generation spend, neither done.
+- **Publication as selection** (2026-09-22) — re-scoring the three held-out reps found the
+  admission gate discarding 71-83% of the gold obligations the run had already found (7/5/6 hit →
+  2/1/1 published), filtering on whether a collector can warrant the claim's *family* rather than on
+  whether the claim is right, with a leave-one-PR-out family rule reaching 6 of 7 at zero control
+  emission. Proposed as "the publication rule", which is **selection under another name** — the
+  fifth derivation of a thread `selection-signal.md` already says is kept "so the next session does
+  not re-derive it a fourth time", and the rationalisation that got past the standing refusal was
+  "families, not findings". **The user's ruling, same day:** *"Talking about publishing is talking
+  about selection. We currently don't have a good enough reviewer to start talking about selection.
+  The specialist arms clearly perform much better when they can't abstain, so I don't want to
+  consider anything related to selection at the moment."* The ordering is generator first. **The
+  measurement is kept** — it is a real correction to every pre-gate recall number in the record, and
+  `report buckets --audit` prints the pair — and the *change* is `docs/todo/publication-rule.md`,
+  parked. **Reopens if:** the generator is good enough that what to show becomes the binding
+  question, which is a judgement the user makes, not a number this report can produce.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
@@ -202,6 +232,24 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
 - *Phase-C numbers (~70%)* — leak-inflated; never shown externally.
 
 ## Deferred by choice (not dead)
+
+- **Track 1.C's second half, and the oracle ladder that replaced it** (2026-09-08 → 2026-09-22) —
+  `docs/plans/2026-09-08-review-digestion-and-oracle-ladder.md` §5(i) found that "multi-declaration
+  edits exist and are unreachable" and proposed Track 1.C: group sibling declarations into one work
+  unit **and** extend `patch_set=True` to `proof_idiom`/`proof_golf`. The grouping half landed
+  (`12a3939`, 225 → 121 units). The grant half was never built: Track 1 was replaced by the oracle
+  ladder, whose own self-critique in the same document then found it rested on "one PR, one
+  obligation family, two arms" (33098; **2 of 35 request groups exercised, 7 of 40 obligations**).
+  Neither the dropped track nor the ladder's outcome was recorded here, in `PROJECT-STATUS.md`, in
+  `plans/STATUS.md` or in the todo index — `batching-work-units.md`'s status line ("authority,
+  `patch_set` … still open") was the only trace, so this is unfinished rather than abandoned.
+  **Reopened 2026-09-22** as `docs/plans/2026-09-22-coordinated-emission.md`, under the same plan's
+  own correction (`:1376`, **[verified]**): patch sets are file-confined, not anchor-confined, and
+  every edit must carry an anchor validated against the investigation's targets *before* the grant
+  widens. Two further defects found on reopening and not known in 2026-09: `patchset.apply` splices
+  a declaration by substring replacement of its name, and `_patch_set_workspace` calls
+  `Path(WorkspaceInfo)`.
+
 
 - Recruited Mathlib annotators and the inter-annotator ceiling — not until the agent is worth their time.
 - Phase-D scale-up to 150–200 PRs — affordable about three times ever; needs a stopping point first.

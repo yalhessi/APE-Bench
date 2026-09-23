@@ -45,6 +45,12 @@ def _subject_kind(target: ChangeTarget) -> str:
     return {
         "import": "import",
         "module_doc": "module_doc",
+        # A declaration's own `/-- … -/` is documentation, and its `@[…]` is placement: both
+        # were `command` until `cg1_builder_v3` named them, and an arm reaches a target through
+        # its subject kind, so leaving them to fall through to `unknown` would have scheduled
+        # nothing on 85 of `dev-medium-0.4.0`'s 508 targets.
+        "doc_comment": "doc_comment",
+        "attribute": "attribute",
         "namespace": "namespace_or_section",
         "section": "namespace_or_section",
         "command": "command",
@@ -137,6 +143,7 @@ def _structural_components(target: ChangeTarget, code: Optional[str]) -> Dict[st
     component = {
         "import": "imports",
         "module_doc": "documentation",
+        "doc_comment": "documentation",
         "namespace": "namespace",
         "section": "namespace",
         "whitespace": "layout",

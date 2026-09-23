@@ -3,10 +3,10 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Iterable, List
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once
-from src.mathlib_review.schema import ChangeGraph, ReviewWorkUnit
+from src.mathlib_review.schema import ChangeGraph, ChangeTarget, ReviewWorkUnit
 
 
 WORK_UNIT_VERSION = "work-units/1"
@@ -25,6 +25,82 @@ def _load_graphs(path: Path) -> List[ChangeGraph]:
     return [ChangeGraph.model_validate_json(line) for line in path.read_text().splitlines() if line]
 
 
+def _pack_bundles(graph: ChangeGraph) -> List[List[ChangeTarget]]:
+    """Pack same-file targets, keeping a declaration with its doc-comment and attributes.
+
+    Two defects in the old packer, both measured on `dev-medium-0.3.0`:
+
+    * **A declaration was separated from its own doc-comment.** The sort key is a content hash,
+      so the two landed wherever it put them: the doc-comment for `IsMulIndecomposable.baseOf`
+      went to `wu:d60bad80…` and the declaration to `wu:07d1ab97…`, and 38 of 59 doc-comments
+      sat in a unit holding no declaration at all. Bundling by `attached_to` fixes it at the
+      source, and the bundle is packed whole or not at all.
+
+    * **The budget was charged on text the renderer prints once.** `size` summed every target's
+      `diff_fragments`, but a work unit is related changes in one file, so its targets usually
+      share a hunk and the renderer emits each distinct one once. PR 33145 has exactly one
+      5,196-char fragment on all 12 targets; the packer charged 62,352 and split a six-theorem
+      family across four units whose real content is 10,198 characters — 42% of one unit's
+      budget. Charging a fragment once per unit takes the release from 203 units to 92, and
+      PR 33149 from 108 to 12.
+
+    Gated at `candidate-prompt/13`: `renderer_version` is inside the work-unit identity, so an
+    earlier release re-derives to exactly the units it froze.
+    """
+
+    bundles: Dict[str, List[ChangeTarget]] = {}
+    for target in sorted(graph.targets, key=lambda item: (item.path, item.change_id)):
+        owner = target.attached_to if target.attached_to else target.change_id
+        bundles.setdefault(owner, []).append(target)
+    # An attachment whose owner is in another file, or absent, stands on its own rather than
+    # being dragged across a file boundary.
+    by_id = {item.change_id: item for item in graph.targets}
+    ordered: List[Tuple[str, str, List[ChangeTarget]]] = []
+    for owner, members in bundles.items():
+        head = by_id.get(owner) or members[0]
+        ordered.append((head.path, owner, members))
+
+    def cost(members: Sequence[ChangeTarget], seen: Set[str]) -> Tuple[int, Set[str]]:
+        """What this bundle adds to a unit that has already been charged for `seen`.
+
+        Returns the fresh fragments as well as the size, because the two have to be recomputed
+        together. Deriving one against the old unit's `seen` and then carrying it into a new one
+        is what made PR 33149 pack into 31 units instead of 4: its 108 targets share a single
+        17,303-char hunk, the first unit charged it, every later bundle was correctly charged
+        nothing -- and then the new unit inherited an empty fresh-set, never registered the hunk,
+        and charged it again on the very next bundle.
+        """
+
+        size = 0
+        fresh: Set[str] = set()
+        for target in members:
+            for fragment in target.diff_fragments:
+                if fragment not in seen and fragment not in fresh:
+                    fresh.add(fragment)
+                    size += len(fragment)
+            size += len(target.base_code or "") + len(target.reviewed_code or "") + 500
+        return size, fresh
+
+    groups: List[List[ChangeTarget]] = []
+    current: List[ChangeTarget] = []
+    current_path: Optional[str] = None
+    current_chars = 0
+    seen_fragments: Set[str] = set()
+    for path, _owner, members in sorted(ordered, key=lambda row: (row[0], row[1])):
+        size, fresh = cost(members, seen_fragments)
+        if current and (path != current_path
+                        or current_chars + size > MAX_TARGET_CONTENT_CHARS):
+            groups.append(current)
+            current, current_chars, seen_fragments = [], 0, set()
+            size, fresh = cost(members, seen_fragments)
+        current.extend(members)
+        seen_fragments |= fresh
+        current_path, current_chars = path, current_chars + size
+    if current:
+        groups.append(current)
+    return groups
+
+
 def build_work_units(
     graphs: Iterable[ChangeGraph], renderer_version: str = RENDERER_VERSION,
 ) -> List[ReviewWorkUnit]:
@@ -32,17 +108,21 @@ def build_work_units(
     graphs = list(graphs)
     units = []
     for graph in sorted(graphs, key=lambda item: (item.pr_number, item.round_index)):
-        groups, current, current_path, current_chars = [], [], None, 0
-        for target in sorted(graph.targets, key=lambda item: (item.path, item.change_id)):
-            size = sum(len(item) for item in target.diff_fragments)
-            size += len(target.base_code or "") + len(target.reviewed_code or "") + 500
-            if current and (target.path != current_path or current_chars + size > MAX_TARGET_CONTENT_CHARS):
+        if _renderer_number(renderer_version) >= 13:
+            groups = _pack_bundles(graph)
+        else:
+            groups, current, current_path, current_chars = [], [], None, 0
+            for target in sorted(graph.targets, key=lambda item: (item.path, item.change_id)):
+                size = sum(len(item) for item in target.diff_fragments)
+                size += len(target.base_code or "") + len(target.reviewed_code or "") + 500
+                if current and (target.path != current_path
+                                or current_chars + size > MAX_TARGET_CONTENT_CHARS):
+                    groups.append(current)
+                    current, current_chars = [], 0
+                current.append(target)
+                current_path, current_chars = target.path, current_chars + size
+            if current:
                 groups.append(current)
-                current, current_chars = [], 0
-            current.append(target)
-            current_path, current_chars = target.path, current_chars + size
-        if current:
-            groups.append(current)
         for group in groups:
             change_ids = [target.change_id for target in group]
             identity = {

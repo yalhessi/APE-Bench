@@ -61,6 +61,33 @@ def canonical_action(concern_family: str, requested_change: str) -> str:
     return f"{concern_family}:{_WHITESPACE.sub(' ', requested_change.strip().lower())}"
 
 
+def finding_key(finding) -> str:
+    """The identity of a CLAIM, across runs and across repetitions.
+
+    `finding_id` is the identity of one finding's exact wording, which is what a merge needs
+    and what an adjudication cannot use: a label is about what the system asked for at a site,
+    and free text does not reproduce. Measured on the three committed held-out reps
+    (285 / 318 / 304 findings), 2026-09-21:
+
+        key                                            in all three reps    in >= 2
+        (pr, change, issue_kind, action_key)                    0                2
+        (pr, change, issue_kind)                              127              225
+
+    `canonical_action` normalises case and whitespace of model free text and nothing else --
+    deliberately, since anything cleverer would merge claims we cannot prove equivalent -- so
+    the full key is an identity of the sentence and recurs essentially never. The site-and-kind
+    key recurs for about half of everything emitted, which is what makes labelling it once and
+    carrying the label worth doing at all.
+
+    The cost is a real collision rate: within one rep, 285 findings share 238 keys, so about
+    16% sit on a site and kind some sibling also claims. An adjudication report must say that
+    rate beside its coverage rather than let a label stand silently for two asks. The exemplar's
+    `action_key` is recorded with the label so a reader can see which sentence was judged.
+    """
+
+    return f"{finding.pr_number}|{finding.primary_change_id}|{finding.issue_kind}"
+
+
 def _seal(model, prefix: str, payload: Dict):
     """Seal a record, deriving its ID from its own content hash.
 

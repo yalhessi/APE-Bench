@@ -48,6 +48,11 @@ class OpenAIProvider(BaseProvider):
             "stream": stream,
         }
 
+        # Absent means "the provider's default", which is what every run before this field
+        # did. Sent only when stated, so adding the field changed no existing run.
+        if self.config.reasoning_effort is not None:
+            payload["reasoning_effort"] = self.config.reasoning_effort
+
         if stream:
             # OpenAI only includes token usage in streamed chat-completions responses
             # when stream_options.include_usage is explicitly requested.

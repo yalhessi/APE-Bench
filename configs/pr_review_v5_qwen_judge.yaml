@@ -1,0 +1,26 @@
+# Iteration-tier scoring for the smoke4 set — the Qwen twin of `pr_review_v5_judge.yaml`.
+#
+# Same set as that file: 33057 / 33066 / 33098 scored, 33438 the control. Stated here rather
+# than inherited because this extends the Qwen judge BASE, not `pr_review_v5_judge.yaml` —
+# `extends` takes one parent, and the parent that matters is the one carrying the tier
+# warning and the token ceiling.
+#
+# `bases/v5_judge_qwen.yaml` says what this is and is not for. In one line: a verdict from
+# here tells you the pipeline ran, not whether it worked. Re-judge with
+# `configs/pr_review_v5_judge.yaml` before believing a number.
+#
+# NO PATHS HERE. `candidates`, `out_dir` and `run_name` are derived by `judge --of <run_name>`
+# from the generation run being scored — the same one-source rule the other judge configs
+# carry, after two files disagreed about which rep they were scoring.
+#
+#   ape/bin/python -m src.mathlib_review.review.cli judge \
+#     --config configs/pr_review_v5_qwen_judge.yaml --of iter_smoke4_qwen_rep1 --execute
+extends: bases/v5_judge_qwen.yaml
+
+dataset:
+  pr_numbers:
+  - 33057
+  - 33066
+  - 33098
+  control_pr_numbers:
+  - 33438

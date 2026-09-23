@@ -177,6 +177,7 @@ class TaskOrchestrator:
                     self.config.execution.task_max_retries,
                     self.config.execution.max_turns,
                     self.config.execution.sample_max_cost,
+                    self.config.execution.sample_max_tokens,
                 )
 
             # Skip tasks that were already completed and update progress
@@ -220,6 +221,7 @@ class TaskOrchestrator:
                     self.config.execution.task_max_retries,
                     self.config.execution.max_turns,
                     self.config.execution.sample_max_cost,
+                    self.config.execution.sample_max_tokens,
                 )
 
                 # Check if the sample can be executed
@@ -227,6 +229,7 @@ class TaskOrchestrator:
                     self.config.execution.task_max_retries,
                     self.config.execution.max_turns,
                     self.config.execution.sample_max_cost,
+                    self.config.execution.sample_max_tokens,
                 ):
                     continue
 
@@ -234,7 +237,9 @@ class TaskOrchestrator:
                 sample_jobs.append({
                     "task_global_index": task_id,
                     "task_type": task.task_type,
-                    "task_data": task.data.model_dump(mode="json"),
+                    # Not `task.data.model_dump()`: that drops every key the task model does
+                    # not declare, which is where run-level directives live (see job_data).
+                    "task_data": task.job_data(),
                     "sample_index": sample_idx,
                     "early_stop_mode": self.config.execution.early_stop_mode.value,
                 })

@@ -1,0 +1,4953 @@
+{
+  "33117": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:229fde64ad47ec6a4d10e573#api_reuse",
+        "docs": "wu:229fde64ad47ec6a4d10e573#docs",
+        "generality": "wu:229fde64ad47ec6a4d10e573#generality",
+        "proof_golf": "wu:229fde64ad47ec6a4d10e573#proof_golf",
+        "proof_idiom": "wu:229fde64ad47ec6a4d10e573#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Meromorphic.fun_add",
+        "Meromorphic.fun_iterated_deriv",
+        "Meromorphic.fun_mul",
+        "Meromorphic.fun_sub",
+        "Meromorphic.iterated_deriv",
+        "Meromorphic.sum"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 11 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:229fde64ad47ec6a4d10e573"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:41f7ea76a22549e6890c8bb6#api_reuse",
+        "correctness": "wu:41f7ea76a22549e6890c8bb6#correctness",
+        "docs": "wu:41f7ea76a22549e6890c8bb6#docs",
+        "duplication": "wu:41f7ea76a22549e6890c8bb6#duplication",
+        "family_design": "wu:41f7ea76a22549e6890c8bb6#family_design",
+        "generality": "wu:41f7ea76a22549e6890c8bb6#generality",
+        "proof_golf": "wu:41f7ea76a22549e6890c8bb6#proof_golf",
+        "proof_idiom": "wu:41f7ea76a22549e6890c8bb6#proof_idiom",
+        "style": "wu:41f7ea76a22549e6890c8bb6#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic.div",
+        "Meromorphic.fun_zpow",
+        "Meromorphic.prod",
+        "Meromorphic.sub",
+        "meromorphicOn_univ"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 9 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:41f7ea76a22549e6890c8bb6"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6c8dd8090a8223f477baef2c#api_reuse",
+        "correctness": "wu:6c8dd8090a8223f477baef2c#correctness",
+        "docs": "wu:6c8dd8090a8223f477baef2c#docs",
+        "duplication": "wu:6c8dd8090a8223f477baef2c#duplication",
+        "family_design": "wu:6c8dd8090a8223f477baef2c#family_design",
+        "generality": "wu:6c8dd8090a8223f477baef2c#generality",
+        "proof_golf": "wu:6c8dd8090a8223f477baef2c#proof_golf",
+        "proof_idiom": "wu:6c8dd8090a8223f477baef2c#proof_idiom",
+        "style": "wu:6c8dd8090a8223f477baef2c#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic",
+        "Meromorphic.add",
+        "Meromorphic.fun_deriv",
+        "Meromorphic.fun_neg"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 7 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:6c8dd8090a8223f477baef2c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:276363feeb24802ce9b88527#api_reuse",
+        "correctness": "wu:276363feeb24802ce9b88527#correctness",
+        "docs": "wu:276363feeb24802ce9b88527#docs",
+        "duplication": "wu:276363feeb24802ce9b88527#duplication",
+        "family_design": "wu:276363feeb24802ce9b88527#family_design",
+        "generality": "wu:276363feeb24802ce9b88527#generality",
+        "proof_golf": "wu:276363feeb24802ce9b88527#proof_golf",
+        "proof_idiom": "wu:276363feeb24802ce9b88527#proof_idiom",
+        "style": "wu:276363feeb24802ce9b88527#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic.deriv",
+        "Meromorphic.fun_pow",
+        "Meromorphic.fun_prod",
+        "Meromorphic.fun_sum"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 10 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:276363feeb24802ce9b88527"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:538fe7595c8c3ed56c96607f#api_reuse",
+        "correctness": "wu:538fe7595c8c3ed56c96607f#correctness",
+        "docs": "wu:538fe7595c8c3ed56c96607f#docs",
+        "duplication": "wu:538fe7595c8c3ed56c96607f#duplication",
+        "family_design": "wu:538fe7595c8c3ed56c96607f#family_design",
+        "generality": "wu:538fe7595c8c3ed56c96607f#generality",
+        "proof_golf": "wu:538fe7595c8c3ed56c96607f#proof_golf",
+        "proof_idiom": "wu:538fe7595c8c3ed56c96607f#proof_idiom",
+        "style": "wu:538fe7595c8c3ed56c96607f#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic.fun_div",
+        "Meromorphic.mul",
+        "Meromorphic.neg",
+        "Meromorphic.pow",
+        "Meromorphic.zpow"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 11 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:538fe7595c8c3ed56c96607f"
+    }
+  ],
+  "33145": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:730afd5b892a29885e89fd5c#api_reuse",
+        "correctness": "wu:730afd5b892a29885e89fd5c#correctness",
+        "docs": "wu:730afd5b892a29885e89fd5c#docs",
+        "duplication": "wu:730afd5b892a29885e89fd5c#duplication",
+        "family_design": "wu:730afd5b892a29885e89fd5c#family_design",
+        "generality": "wu:730afd5b892a29885e89fd5c#generality",
+        "naming": "wu:730afd5b892a29885e89fd5c#naming",
+        "proof_golf": "wu:730afd5b892a29885e89fd5c#proof_golf",
+        "proof_idiom": "wu:730afd5b892a29885e89fd5c#proof_idiom",
+        "style": "wu:730afd5b892a29885e89fd5c#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Dense.continuous_sup",
+        "Dense.continuous_sup'",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_sup'` is a chain of 10 low-level tactic steps",
+        "`Dense.continuous_sup` is a chain of 5 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_sup'` is 21 lines",
+        "`Dense.continuous_sup` is 12 lines"
+      ],
+      "work_unit_id": "wu:730afd5b892a29885e89fd5c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:1031e8acbe2db1ea15d6a50e#api_reuse",
+        "docs": "wu:1031e8acbe2db1ea15d6a50e#docs",
+        "generality": "wu:1031e8acbe2db1ea15d6a50e#generality",
+        "proof_golf": "wu:1031e8acbe2db1ea15d6a50e#proof_golf",
+        "proof_idiom": "wu:1031e8acbe2db1ea15d6a50e#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Dense.continuous_lowerBounds",
+        "Dense.continuous_upperBounds",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_upperBounds` is a chain of 5 low-level tactic steps",
+        "`Dense.continuous_lowerBounds` is a chain of 5 low-level tactic steps",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:28601c8d1538799b6c5d4edc#api_reuse",
+        "correctness": "wu:28601c8d1538799b6c5d4edc#correctness",
+        "docs": "wu:28601c8d1538799b6c5d4edc#docs",
+        "duplication": "wu:28601c8d1538799b6c5d4edc#duplication",
+        "family_design": "wu:28601c8d1538799b6c5d4edc#family_design",
+        "generality": "wu:28601c8d1538799b6c5d4edc#generality",
+        "naming": "wu:28601c8d1538799b6c5d4edc#naming",
+        "proof_golf": "wu:28601c8d1538799b6c5d4edc#proof_golf",
+        "proof_idiom": "wu:28601c8d1538799b6c5d4edc#proof_idiom",
+        "style": "wu:28601c8d1538799b6c5d4edc#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Dense.continuous_inf'",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_inf'` is a chain of 10 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_inf'` is 21 lines"
+      ],
+      "work_unit_id": "wu:28601c8d1538799b6c5d4edc"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:7f4540ff384350b046f6deda#api_reuse",
+        "correctness": "wu:7f4540ff384350b046f6deda#correctness",
+        "docs": "wu:7f4540ff384350b046f6deda#docs",
+        "duplication": "wu:7f4540ff384350b046f6deda#duplication",
+        "family_design": "wu:7f4540ff384350b046f6deda#family_design",
+        "generality": "wu:7f4540ff384350b046f6deda#generality",
+        "naming": "wu:7f4540ff384350b046f6deda#naming",
+        "proof_golf": "wu:7f4540ff384350b046f6deda#proof_golf",
+        "proof_idiom": "wu:7f4540ff384350b046f6deda#proof_idiom",
+        "style": "wu:7f4540ff384350b046f6deda#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Dense.continuous_inf",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_inf` is a chain of 5 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_inf` is 12 lines"
+      ],
+      "work_unit_id": "wu:7f4540ff384350b046f6deda"
+    }
+  ],
+  "33149": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:2d93e574cd0303e67d120e96#api_reuse",
+        "correctness": "wu:2d93e574cd0303e67d120e96#correctness",
+        "docs": "wu:2d93e574cd0303e67d120e96#docs",
+        "duplication": "wu:2d93e574cd0303e67d120e96#duplication",
+        "family_design": "wu:2d93e574cd0303e67d120e96#family_design",
+        "generality": "wu:2d93e574cd0303e67d120e96#generality",
+        "naming": "wu:2d93e574cd0303e67d120e96#naming",
+        "proof_golf": "wu:2d93e574cd0303e67d120e96#proof_golf",
+        "proof_idiom": "wu:2d93e574cd0303e67d120e96#proof_idiom",
+        "style": "wu:2d93e574cd0303e67d120e96#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "parseval_orthonormal"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`parseval_orthonormal` introduces an axiom",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2d93e574cd0303e67d120e96"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:3f51acf52f441107eea4bd33#api_reuse",
+        "correctness": "wu:3f51acf52f441107eea4bd33#correctness",
+        "docs": "wu:3f51acf52f441107eea4bd33#docs",
+        "duplication": "wu:3f51acf52f441107eea4bd33#duplication",
+        "family_design": "wu:3f51acf52f441107eea4bd33#family_design",
+        "generality": "wu:3f51acf52f441107eea4bd33#generality",
+        "naming": "wu:3f51acf52f441107eea4bd33#naming",
+        "proof_golf": "wu:3f51acf52f441107eea4bd33#proof_golf",
+        "proof_idiom": "wu:3f51acf52f441107eea4bd33#proof_idiom",
+        "style": "wu:3f51acf52f441107eea4bd33#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "fourierCoeff_summable"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourierCoeff_summable` introduces an axiom",
+        "shares a name family with 12 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:3f51acf52f441107eea4bd33"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4625c7eb1bef75ee70b4d1fc#api_reuse",
+        "correctness": "wu:4625c7eb1bef75ee70b4d1fc#correctness",
+        "docs": "wu:4625c7eb1bef75ee70b4d1fc#docs",
+        "duplication": "wu:4625c7eb1bef75ee70b4d1fc#duplication",
+        "family_design": "wu:4625c7eb1bef75ee70b4d1fc#family_design",
+        "generality": "wu:4625c7eb1bef75ee70b4d1fc#generality",
+        "naming": "wu:4625c7eb1bef75ee70b4d1fc#naming",
+        "proof_golf": "wu:4625c7eb1bef75ee70b4d1fc#proof_golf",
+        "proof_idiom": "wu:4625c7eb1bef75ee70b4d1fc#proof_idiom",
+        "style": "wu:4625c7eb1bef75ee70b4d1fc#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "hs_gronwall_bound"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`hs_gronwall_bound` introduces an axiom",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4625c7eb1bef75ee70b4d1fc"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4cf68a923c87350b81d463ce#api_reuse",
+        "correctness": "wu:4cf68a923c87350b81d463ce#correctness",
+        "docs": "wu:4cf68a923c87350b81d463ce#docs",
+        "duplication": "wu:4cf68a923c87350b81d463ce#duplication",
+        "family_design": "wu:4cf68a923c87350b81d463ce#family_design",
+        "generality": "wu:4cf68a923c87350b81d463ce#generality",
+        "naming": "wu:4cf68a923c87350b81d463ce#naming",
+        "proof_golf": "wu:4cf68a923c87350b81d463ce#proof_golf",
+        "proof_idiom": "wu:4cf68a923c87350b81d463ce#proof_idiom",
+        "style": "wu:4cf68a923c87350b81d463ce#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "cGronwall_pos"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cGronwall_pos` introduces an axiom",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4cf68a923c87350b81d463ce"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:51c273442e3dc6a10fa9b361#api_reuse",
+        "correctness": "wu:51c273442e3dc6a10fa9b361#correctness",
+        "docs": "wu:51c273442e3dc6a10fa9b361#docs",
+        "duplication": "wu:51c273442e3dc6a10fa9b361#duplication",
+        "family_design": "wu:51c273442e3dc6a10fa9b361#family_design",
+        "generality": "wu:51c273442e3dc6a10fa9b361#generality",
+        "naming": "wu:51c273442e3dc6a10fa9b361#naming",
+        "proof_golf": "wu:51c273442e3dc6a10fa9b361#proof_golf",
+        "proof_idiom": "wu:51c273442e3dc6a10fa9b361#proof_idiom",
+        "style": "wu:51c273442e3dc6a10fa9b361#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "cSobolev_pos"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cSobolev_pos` introduces an axiom",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:51c273442e3dc6a10fa9b361"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:83a0ae2a33a2ea35a3ca951d#api_reuse",
+        "correctness": "wu:83a0ae2a33a2ea35a3ca951d#correctness",
+        "docs": "wu:83a0ae2a33a2ea35a3ca951d#docs",
+        "duplication": "wu:83a0ae2a33a2ea35a3ca951d#duplication",
+        "family_design": "wu:83a0ae2a33a2ea35a3ca951d#family_design",
+        "generality": "wu:83a0ae2a33a2ea35a3ca951d#generality",
+        "naming": "wu:83a0ae2a33a2ea35a3ca951d#naming",
+        "proof_golf": "wu:83a0ae2a33a2ea35a3ca951d#proof_golf",
+        "proof_idiom": "wu:83a0ae2a33a2ea35a3ca951d#proof_idiom",
+        "style": "wu:83a0ae2a33a2ea35a3ca951d#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "smooth_initial_hs_finite"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`smooth_initial_hs_finite` introduces an axiom",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:83a0ae2a33a2ea35a3ca951d"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:a604e63de460b3d44a68130f#api_reuse",
+        "correctness": "wu:a604e63de460b3d44a68130f#correctness",
+        "docs": "wu:a604e63de460b3d44a68130f#docs",
+        "duplication": "wu:a604e63de460b3d44a68130f#duplication",
+        "family_design": "wu:a604e63de460b3d44a68130f#family_design",
+        "generality": "wu:a604e63de460b3d44a68130f#generality",
+        "naming": "wu:a604e63de460b3d44a68130f#naming",
+        "proof_golf": "wu:a604e63de460b3d44a68130f#proof_golf",
+        "proof_idiom": "wu:a604e63de460b3d44a68130f#proof_idiom",
+        "style": "wu:a604e63de460b3d44a68130f#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "vorticity_hs_bound"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`vorticity_hs_bound` introduces an axiom",
+        "shares a name family with 5 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a604e63de460b3d44a68130f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c303975dfe1a31187794f0f7#api_reuse",
+        "correctness": "wu:c303975dfe1a31187794f0f7#correctness",
+        "docs": "wu:c303975dfe1a31187794f0f7#docs",
+        "duplication": "wu:c303975dfe1a31187794f0f7#duplication",
+        "family_design": "wu:c303975dfe1a31187794f0f7#family_design",
+        "generality": "wu:c303975dfe1a31187794f0f7#generality",
+        "naming": "wu:c303975dfe1a31187794f0f7#naming",
+        "proof_golf": "wu:c303975dfe1a31187794f0f7#proof_golf",
+        "proof_idiom": "wu:c303975dfe1a31187794f0f7#proof_idiom",
+        "style": "wu:c303975dfe1a31187794f0f7#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "fourier_ortho_integral"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourier_ortho_integral` introduces an axiom",
+        "shares a name family with 13 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:c303975dfe1a31187794f0f7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:cac52df118a74b4a23f1a54d#api_reuse",
+        "correctness": "wu:cac52df118a74b4a23f1a54d#correctness",
+        "docs": "wu:cac52df118a74b4a23f1a54d#docs",
+        "duplication": "wu:cac52df118a74b4a23f1a54d#duplication",
+        "family_design": "wu:cac52df118a74b4a23f1a54d#family_design",
+        "generality": "wu:cac52df118a74b4a23f1a54d#generality",
+        "naming": "wu:cac52df118a74b4a23f1a54d#naming",
+        "proof_golf": "wu:cac52df118a74b4a23f1a54d#proof_golf",
+        "proof_idiom": "wu:cac52df118a74b4a23f1a54d#proof_idiom",
+        "style": "wu:cac52df118a74b4a23f1a54d#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "sobolev_embedding"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`sobolev_embedding` introduces an axiom",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:cac52df118a74b4a23f1a54d"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d0835bbe0496e84a37905465#api_reuse",
+        "correctness": "wu:d0835bbe0496e84a37905465#correctness",
+        "docs": "wu:d0835bbe0496e84a37905465#docs",
+        "duplication": "wu:d0835bbe0496e84a37905465#duplication",
+        "family_design": "wu:d0835bbe0496e84a37905465#family_design",
+        "generality": "wu:d0835bbe0496e84a37905465#generality",
+        "naming": "wu:d0835bbe0496e84a37905465#naming",
+        "proof_golf": "wu:d0835bbe0496e84a37905465#proof_golf",
+        "proof_idiom": "wu:d0835bbe0496e84a37905465#proof_idiom",
+        "style": "wu:d0835bbe0496e84a37905465#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "vorticity_integrable"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`vorticity_integrable` introduces an axiom",
+        "shares a name family with 5 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d0835bbe0496e84a37905465"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d5ece5aef1335150a121bb2a#api_reuse",
+        "correctness": "wu:d5ece5aef1335150a121bb2a#correctness",
+        "docs": "wu:d5ece5aef1335150a121bb2a#docs",
+        "duplication": "wu:d5ece5aef1335150a121bb2a#duplication",
+        "family_design": "wu:d5ece5aef1335150a121bb2a#family_design",
+        "generality": "wu:d5ece5aef1335150a121bb2a#generality",
+        "naming": "wu:d5ece5aef1335150a121bb2a#naming",
+        "proof_golf": "wu:d5ece5aef1335150a121bb2a#proof_golf",
+        "proof_idiom": "wu:d5ece5aef1335150a121bb2a#proof_idiom",
+        "style": "wu:d5ece5aef1335150a121bb2a#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "integral_le_const_mul_length"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`integral_le_const_mul_length` introduces an axiom",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d5ece5aef1335150a121bb2a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:ddd6509614ee86d9026b8431#api_reuse",
+        "correctness": "wu:ddd6509614ee86d9026b8431#correctness",
+        "docs": "wu:ddd6509614ee86d9026b8431#docs",
+        "duplication": "wu:ddd6509614ee86d9026b8431#duplication",
+        "family_design": "wu:ddd6509614ee86d9026b8431#family_design",
+        "generality": "wu:ddd6509614ee86d9026b8431#generality",
+        "naming": "wu:ddd6509614ee86d9026b8431#naming",
+        "proof_golf": "wu:ddd6509614ee86d9026b8431#proof_golf",
+        "proof_idiom": "wu:ddd6509614ee86d9026b8431#proof_idiom",
+        "style": "wu:ddd6509614ee86d9026b8431#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "fourier_inversion"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourier_inversion` introduces an axiom",
+        "shares a name family with 12 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:ddd6509614ee86d9026b8431"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:faa8ddd8d7e21aa6393056c0#api_reuse",
+        "correctness": "wu:faa8ddd8d7e21aa6393056c0#correctness",
+        "docs": "wu:faa8ddd8d7e21aa6393056c0#docs",
+        "duplication": "wu:faa8ddd8d7e21aa6393056c0#duplication",
+        "family_design": "wu:faa8ddd8d7e21aa6393056c0#family_design",
+        "generality": "wu:faa8ddd8d7e21aa6393056c0#generality",
+        "naming": "wu:faa8ddd8d7e21aa6393056c0#naming",
+        "proof_golf": "wu:faa8ddd8d7e21aa6393056c0#proof_golf",
+        "proof_idiom": "wu:faa8ddd8d7e21aa6393056c0#proof_idiom",
+        "style": "wu:faa8ddd8d7e21aa6393056c0#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "cSobolev"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cSobolev` introduces an axiom",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:faa8ddd8d7e21aa6393056c0"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:8c0bffe2d2643d1ce79cc33c#api_reuse",
+        "correctness": "wu:8c0bffe2d2643d1ce79cc33c#correctness",
+        "docs": "wu:8c0bffe2d2643d1ce79cc33c#docs",
+        "duplication": "wu:8c0bffe2d2643d1ce79cc33c#duplication",
+        "family_design": "wu:8c0bffe2d2643d1ce79cc33c#family_design",
+        "generality": "wu:8c0bffe2d2643d1ce79cc33c#generality",
+        "naming": "wu:8c0bffe2d2643d1ce79cc33c#naming",
+        "proof_golf": "wu:8c0bffe2d2643d1ce79cc33c#proof_golf",
+        "proof_idiom": "wu:8c0bffe2d2643d1ce79cc33c#proof_idiom",
+        "style": "wu:8c0bffe2d2643d1ce79cc33c#style"
+      },
+      "rank": 14,
+      "subjects": [
+        "cGronwall"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cGronwall` introduces an axiom",
+        "shares a name family with 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8c0bffe2d2643d1ce79cc33c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:25be5b2967e28635ba4c531b#api_reuse",
+        "correctness": "wu:25be5b2967e28635ba4c531b#correctness",
+        "docs": "wu:25be5b2967e28635ba4c531b#docs",
+        "duplication": "wu:25be5b2967e28635ba4c531b#duplication",
+        "family_design": "wu:25be5b2967e28635ba4c531b#family_design",
+        "generality": "wu:25be5b2967e28635ba4c531b#generality",
+        "naming": "wu:25be5b2967e28635ba4c531b#naming",
+        "proof_golf": "wu:25be5b2967e28635ba4c531b#proof_golf",
+        "proof_idiom": "wu:25be5b2967e28635ba4c531b#proof_idiom",
+        "style": "wu:25be5b2967e28635ba4c531b#style"
+      },
+      "rank": 15,
+      "subjects": [
+        "moser_estimate"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`moser_estimate` introduces an axiom",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:25be5b2967e28635ba4c531b"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:986e2abaf9f8f3e26e9d7de4#api_reuse",
+        "correctness": "wu:986e2abaf9f8f3e26e9d7de4#correctness",
+        "docs": "wu:986e2abaf9f8f3e26e9d7de4#docs",
+        "duplication": "wu:986e2abaf9f8f3e26e9d7de4#duplication",
+        "family_design": "wu:986e2abaf9f8f3e26e9d7de4#family_design",
+        "generality": "wu:986e2abaf9f8f3e26e9d7de4#generality",
+        "naming": "wu:986e2abaf9f8f3e26e9d7de4#naming",
+        "proof_golf": "wu:986e2abaf9f8f3e26e9d7de4#proof_golf",
+        "proof_idiom": "wu:986e2abaf9f8f3e26e9d7de4#proof_idiom",
+        "style": "wu:986e2abaf9f8f3e26e9d7de4#style"
+      },
+      "rank": 16,
+      "subjects": [
+        "bkm_implies_regularity"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`bkm_implies_regularity` introduces an axiom",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:986e2abaf9f8f3e26e9d7de4"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:b751168b9d22ee8710ce1807#api_reuse",
+        "correctness": "wu:b751168b9d22ee8710ce1807#correctness",
+        "docs": "wu:b751168b9d22ee8710ce1807#docs",
+        "duplication": "wu:b751168b9d22ee8710ce1807#duplication",
+        "family_design": "wu:b751168b9d22ee8710ce1807#family_design",
+        "generality": "wu:b751168b9d22ee8710ce1807#generality",
+        "naming": "wu:b751168b9d22ee8710ce1807#naming",
+        "proof_golf": "wu:b751168b9d22ee8710ce1807#proof_golf",
+        "proof_idiom": "wu:b751168b9d22ee8710ce1807#proof_idiom",
+        "style": "wu:b751168b9d22ee8710ce1807#style"
+      },
+      "rank": 17,
+      "subjects": [
+        "fubini_torus3"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fubini_torus3` introduces an axiom",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b751168b9d22ee8710ce1807"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:fe441ebbf5a8be1bce433908#api_reuse",
+        "correctness": "wu:fe441ebbf5a8be1bce433908#correctness",
+        "docs": "wu:fe441ebbf5a8be1bce433908#docs",
+        "duplication": "wu:fe441ebbf5a8be1bce433908#duplication",
+        "family_design": "wu:fe441ebbf5a8be1bce433908#family_design",
+        "generality": "wu:fe441ebbf5a8be1bce433908#generality",
+        "naming": "wu:fe441ebbf5a8be1bce433908#naming",
+        "proof_golf": "wu:fe441ebbf5a8be1bce433908#proof_golf",
+        "proof_idiom": "wu:fe441ebbf5a8be1bce433908#proof_idiom",
+        "style": "wu:fe441ebbf5a8be1bce433908#style"
+      },
+      "rank": 18,
+      "subjects": [
+        "cMoser_pos"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cMoser_pos` introduces an axiom",
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:fe441ebbf5a8be1bce433908"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:a01b76754a684294d260a33f#api_reuse",
+        "correctness": "wu:a01b76754a684294d260a33f#correctness",
+        "docs": "wu:a01b76754a684294d260a33f#docs",
+        "duplication": "wu:a01b76754a684294d260a33f#duplication",
+        "family_design": "wu:a01b76754a684294d260a33f#family_design",
+        "generality": "wu:a01b76754a684294d260a33f#generality",
+        "naming": "wu:a01b76754a684294d260a33f#naming",
+        "proof_golf": "wu:a01b76754a684294d260a33f#proof_golf",
+        "proof_idiom": "wu:a01b76754a684294d260a33f#proof_idiom",
+        "style": "wu:a01b76754a684294d260a33f#style"
+      },
+      "rank": 19,
+      "subjects": [
+        "cMoser"
+      ],
+      "suggested_arms": [
+        "correctness",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`cMoser` introduces an axiom",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a01b76754a684294d260a33f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:66e538434319d6454b75e6ce#api_reuse",
+        "correctness": "wu:66e538434319d6454b75e6ce#correctness",
+        "docs": "wu:66e538434319d6454b75e6ce#docs",
+        "duplication": "wu:66e538434319d6454b75e6ce#duplication",
+        "family_design": "wu:66e538434319d6454b75e6ce#family_design",
+        "generality": "wu:66e538434319d6454b75e6ce#generality",
+        "naming": "wu:66e538434319d6454b75e6ce#naming",
+        "proof_golf": "wu:66e538434319d6454b75e6ce#proof_golf",
+        "proof_idiom": "wu:66e538434319d6454b75e6ce#proof_idiom",
+        "style": "wu:66e538434319d6454b75e6ce#style"
+      },
+      "rank": 20,
+      "subjects": [
+        "uniform_vorticity_bound"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`uniform_vorticity_bound` is a chain of 6 low-level tactic steps",
+        "shares a name family with 5 other changed declaration(s)",
+        "`uniform_vorticity_bound` uses a `calc` block",
+        "introduces a new declaration",
+        "`uniform_vorticity_bound` is 27 lines"
+      ],
+      "work_unit_id": "wu:66e538434319d6454b75e6ce"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:43f02fe1976c7f2b873d0673#api_reuse",
+        "correctness": "wu:43f02fe1976c7f2b873d0673#correctness",
+        "docs": "wu:43f02fe1976c7f2b873d0673#docs",
+        "duplication": "wu:43f02fe1976c7f2b873d0673#duplication",
+        "family_design": "wu:43f02fe1976c7f2b873d0673#family_design",
+        "generality": "wu:43f02fe1976c7f2b873d0673#generality",
+        "proof_golf": "wu:43f02fe1976c7f2b873d0673#proof_golf",
+        "proof_idiom": "wu:43f02fe1976c7f2b873d0673#proof_idiom",
+        "style": "wu:43f02fe1976c7f2b873d0673#style"
+      },
+      "rank": 21,
+      "subjects": [
+        "tau_interval_finite"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`tau_interval_finite` is a chain of 13 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "`tau_interval_finite` uses a `calc` block",
+        "introduces a new declaration",
+        "`tau_interval_finite` is 33 lines"
+      ],
+      "work_unit_id": "wu:43f02fe1976c7f2b873d0673"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:df11884c9e583ad22da2f781#api_reuse",
+        "correctness": "wu:df11884c9e583ad22da2f781#correctness",
+        "docs": "wu:df11884c9e583ad22da2f781#docs",
+        "duplication": "wu:df11884c9e583ad22da2f781#duplication",
+        "family_design": "wu:df11884c9e583ad22da2f781#family_design",
+        "generality": "wu:df11884c9e583ad22da2f781#generality",
+        "naming": "wu:df11884c9e583ad22da2f781#naming",
+        "proof_golf": "wu:df11884c9e583ad22da2f781#proof_golf",
+        "proof_idiom": "wu:df11884c9e583ad22da2f781#proof_idiom",
+        "style": "wu:df11884c9e583ad22da2f781#style"
+      },
+      "rank": 22,
+      "subjects": [
+        "fourier3D_orthogonal"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`fourier3D_orthogonal` is a chain of 15 low-level tactic steps",
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration",
+        "`fourier3D_orthogonal` is 27 lines"
+      ],
+      "work_unit_id": "wu:df11884c9e583ad22da2f781"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:5b5e4c2090abbb07b4a4d646#api_reuse",
+        "correctness": "wu:5b5e4c2090abbb07b4a4d646#correctness",
+        "docs": "wu:5b5e4c2090abbb07b4a4d646#docs",
+        "duplication": "wu:5b5e4c2090abbb07b4a4d646#duplication",
+        "family_design": "wu:5b5e4c2090abbb07b4a4d646#family_design",
+        "generality": "wu:5b5e4c2090abbb07b4a4d646#generality",
+        "naming": "wu:5b5e4c2090abbb07b4a4d646#naming",
+        "proof_golf": "wu:5b5e4c2090abbb07b4a4d646#proof_golf",
+        "proof_idiom": "wu:5b5e4c2090abbb07b4a4d646#proof_idiom",
+        "style": "wu:5b5e4c2090abbb07b4a4d646#style"
+      },
+      "rank": 23,
+      "subjects": [
+        "parseval3D"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`parseval3D` is a chain of 4 low-level tactic steps",
+        "shares a name family with 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:5b5e4c2090abbb07b4a4d646"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:b4886f1b5d49e24af32cd884#api_reuse",
+        "correctness": "wu:b4886f1b5d49e24af32cd884#correctness",
+        "docs": "wu:b4886f1b5d49e24af32cd884#docs",
+        "duplication": "wu:b4886f1b5d49e24af32cd884#duplication",
+        "family_design": "wu:b4886f1b5d49e24af32cd884#family_design",
+        "generality": "wu:b4886f1b5d49e24af32cd884#generality",
+        "naming": "wu:b4886f1b5d49e24af32cd884#naming",
+        "proof_golf": "wu:b4886f1b5d49e24af32cd884#proof_golf",
+        "proof_idiom": "wu:b4886f1b5d49e24af32cd884#proof_idiom",
+        "style": "wu:b4886f1b5d49e24af32cd884#style"
+      },
+      "rank": 24,
+      "subjects": [
+        "bkm_coordinate_invariance"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`bkm_coordinate_invariance` is a chain of 7 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`bkm_coordinate_invariance` is 19 lines"
+      ],
+      "work_unit_id": "wu:b4886f1b5d49e24af32cd884"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:3e0f6df3a573bd3239d1bcd7#api_reuse",
+        "correctness": "wu:3e0f6df3a573bd3239d1bcd7#correctness",
+        "docs": "wu:3e0f6df3a573bd3239d1bcd7#docs",
+        "duplication": "wu:3e0f6df3a573bd3239d1bcd7#duplication",
+        "family_design": "wu:3e0f6df3a573bd3239d1bcd7#family_design",
+        "generality": "wu:3e0f6df3a573bd3239d1bcd7#generality",
+        "naming": "wu:3e0f6df3a573bd3239d1bcd7#naming",
+        "proof_golf": "wu:3e0f6df3a573bd3239d1bcd7#proof_golf",
+        "proof_idiom": "wu:3e0f6df3a573bd3239d1bcd7#proof_idiom",
+        "style": "wu:3e0f6df3a573bd3239d1bcd7#style"
+      },
+      "rank": 25,
+      "subjects": [
+        "bkm_finite_anyT"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`bkm_finite_anyT` is a chain of 7 low-level tactic steps",
+        "`bkm_finite_anyT` uses a `calc` block",
+        "introduces a new declaration",
+        "`bkm_finite_anyT` is 21 lines"
+      ],
+      "work_unit_id": "wu:3e0f6df3a573bd3239d1bcd7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:8bf16db95a55ac64a3081936#api_reuse",
+        "correctness": "wu:8bf16db95a55ac64a3081936#correctness",
+        "docs": "wu:8bf16db95a55ac64a3081936#docs",
+        "duplication": "wu:8bf16db95a55ac64a3081936#duplication",
+        "family_design": "wu:8bf16db95a55ac64a3081936#family_design",
+        "generality": "wu:8bf16db95a55ac64a3081936#generality",
+        "naming": "wu:8bf16db95a55ac64a3081936#naming",
+        "proof_golf": "wu:8bf16db95a55ac64a3081936#proof_golf",
+        "proof_idiom": "wu:8bf16db95a55ac64a3081936#proof_idiom",
+        "style": "wu:8bf16db95a55ac64a3081936#style"
+      },
+      "rank": 26,
+      "subjects": [
+        "VorticityResponse.regularity"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`VorticityResponse.regularity` is a chain of 10 low-level tactic steps",
+        "introduces a new declaration",
+        "`VorticityResponse.regularity` is 21 lines"
+      ],
+      "work_unit_id": "wu:8bf16db95a55ac64a3081936"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:1c5956b98c096a64f567d656#api_reuse",
+        "docs": "wu:1c5956b98c096a64f567d656#docs",
+        "generality": "wu:1c5956b98c096a64f567d656#generality",
+        "proof_golf": "wu:1c5956b98c096a64f567d656#proof_golf",
+        "proof_idiom": "wu:1c5956b98c096a64f567d656#proof_idiom",
+        "style": "wu:1c5956b98c096a64f567d656#style"
+      },
+      "rank": 27,
+      "subjects": [
+        "Vorticity"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1c5956b98c096a64f567d656"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:22119d950e7cbeeaaebd7bb4#api_reuse",
+        "correctness": "wu:22119d950e7cbeeaaebd7bb4#correctness",
+        "docs": "wu:22119d950e7cbeeaaebd7bb4#docs",
+        "duplication": "wu:22119d950e7cbeeaaebd7bb4#duplication",
+        "family_design": "wu:22119d950e7cbeeaaebd7bb4#family_design",
+        "generality": "wu:22119d950e7cbeeaaebd7bb4#generality",
+        "naming": "wu:22119d950e7cbeeaaebd7bb4#naming",
+        "proof_golf": "wu:22119d950e7cbeeaaebd7bb4#proof_golf",
+        "proof_idiom": "wu:22119d950e7cbeeaaebd7bb4#proof_idiom",
+        "style": "wu:22119d950e7cbeeaaebd7bb4#style"
+      },
+      "rank": 28,
+      "subjects": [
+        "FourierCoeff"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:22119d950e7cbeeaaebd7bb4"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:23713f7c8b276d58e44cc201#api_reuse",
+        "correctness": "wu:23713f7c8b276d58e44cc201#correctness",
+        "docs": "wu:23713f7c8b276d58e44cc201#docs",
+        "duplication": "wu:23713f7c8b276d58e44cc201#duplication",
+        "family_design": "wu:23713f7c8b276d58e44cc201#family_design",
+        "generality": "wu:23713f7c8b276d58e44cc201#generality",
+        "naming": "wu:23713f7c8b276d58e44cc201#naming",
+        "proof_golf": "wu:23713f7c8b276d58e44cc201#proof_golf",
+        "proof_idiom": "wu:23713f7c8b276d58e44cc201#proof_idiom",
+        "style": "wu:23713f7c8b276d58e44cc201#style"
+      },
+      "rank": 29,
+      "subjects": [
+        "fourierTransform"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:23713f7c8b276d58e44cc201"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2c36805a55cf61f7b8e2e082#api_reuse",
+        "correctness": "wu:2c36805a55cf61f7b8e2e082#correctness",
+        "docs": "wu:2c36805a55cf61f7b8e2e082#docs",
+        "duplication": "wu:2c36805a55cf61f7b8e2e082#duplication",
+        "family_design": "wu:2c36805a55cf61f7b8e2e082#family_design",
+        "generality": "wu:2c36805a55cf61f7b8e2e082#generality",
+        "naming": "wu:2c36805a55cf61f7b8e2e082#naming",
+        "proof_golf": "wu:2c36805a55cf61f7b8e2e082#proof_golf",
+        "proof_idiom": "wu:2c36805a55cf61f7b8e2e082#proof_idiom",
+        "style": "wu:2c36805a55cf61f7b8e2e082#style"
+      },
+      "rank": 30,
+      "subjects": [
+        "fourierCoeff3D"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2c36805a55cf61f7b8e2e082"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:5db8ae81f0d4fd4db915b45c#api_reuse",
+        "correctness": "wu:5db8ae81f0d4fd4db915b45c#correctness",
+        "docs": "wu:5db8ae81f0d4fd4db915b45c#docs",
+        "duplication": "wu:5db8ae81f0d4fd4db915b45c#duplication",
+        "family_design": "wu:5db8ae81f0d4fd4db915b45c#family_design",
+        "generality": "wu:5db8ae81f0d4fd4db915b45c#generality",
+        "proof_golf": "wu:5db8ae81f0d4fd4db915b45c#proof_golf",
+        "proof_idiom": "wu:5db8ae81f0d4fd4db915b45c#proof_idiom",
+        "style": "wu:5db8ae81f0d4fd4db915b45c#style"
+      },
+      "rank": 31,
+      "subjects": [
+        "spectralNSResidual"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:5db8ae81f0d4fd4db915b45c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:65b4ae8068e27bdc3ce13e31#api_reuse",
+        "correctness": "wu:65b4ae8068e27bdc3ce13e31#correctness",
+        "docs": "wu:65b4ae8068e27bdc3ce13e31#docs",
+        "duplication": "wu:65b4ae8068e27bdc3ce13e31#duplication",
+        "family_design": "wu:65b4ae8068e27bdc3ce13e31#family_design",
+        "generality": "wu:65b4ae8068e27bdc3ce13e31#generality",
+        "naming": "wu:65b4ae8068e27bdc3ce13e31#naming",
+        "proof_golf": "wu:65b4ae8068e27bdc3ce13e31#proof_golf",
+        "proof_idiom": "wu:65b4ae8068e27bdc3ce13e31#proof_idiom",
+        "style": "wu:65b4ae8068e27bdc3ce13e31#style"
+      },
+      "rank": 32,
+      "subjects": [
+        "fourierTruncate"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:65b4ae8068e27bdc3ce13e31"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6ecfa3abd02305bd4b42067e#api_reuse",
+        "correctness": "wu:6ecfa3abd02305bd4b42067e#correctness",
+        "docs": "wu:6ecfa3abd02305bd4b42067e#docs",
+        "duplication": "wu:6ecfa3abd02305bd4b42067e#duplication",
+        "family_design": "wu:6ecfa3abd02305bd4b42067e#family_design",
+        "generality": "wu:6ecfa3abd02305bd4b42067e#generality",
+        "proof_golf": "wu:6ecfa3abd02305bd4b42067e#proof_golf",
+        "proof_idiom": "wu:6ecfa3abd02305bd4b42067e#proof_idiom",
+        "style": "wu:6ecfa3abd02305bd4b42067e#style"
+      },
+      "rank": 33,
+      "subjects": [
+        "LerayProjection"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:6ecfa3abd02305bd4b42067e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:7a551eae0c98f819afe3f61c#api_reuse",
+        "correctness": "wu:7a551eae0c98f819afe3f61c#correctness",
+        "docs": "wu:7a551eae0c98f819afe3f61c#docs",
+        "duplication": "wu:7a551eae0c98f819afe3f61c#duplication",
+        "family_design": "wu:7a551eae0c98f819afe3f61c#family_design",
+        "generality": "wu:7a551eae0c98f819afe3f61c#generality",
+        "naming": "wu:7a551eae0c98f819afe3f61c#naming",
+        "proof_golf": "wu:7a551eae0c98f819afe3f61c#proof_golf",
+        "proof_idiom": "wu:7a551eae0c98f819afe3f61c#proof_idiom",
+        "style": "wu:7a551eae0c98f819afe3f61c#style"
+      },
+      "rank": 34,
+      "subjects": [
+        "SmoothInitial"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7a551eae0c98f819afe3f61c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:8306cd1b6a9ee8d1f6fb7f50#api_reuse",
+        "correctness": "wu:8306cd1b6a9ee8d1f6fb7f50#correctness",
+        "docs": "wu:8306cd1b6a9ee8d1f6fb7f50#docs",
+        "duplication": "wu:8306cd1b6a9ee8d1f6fb7f50#duplication",
+        "family_design": "wu:8306cd1b6a9ee8d1f6fb7f50#family_design",
+        "generality": "wu:8306cd1b6a9ee8d1f6fb7f50#generality",
+        "naming": "wu:8306cd1b6a9ee8d1f6fb7f50#naming",
+        "proof_golf": "wu:8306cd1b6a9ee8d1f6fb7f50#proof_golf",
+        "proof_idiom": "wu:8306cd1b6a9ee8d1f6fb7f50#proof_idiom",
+        "style": "wu:8306cd1b6a9ee8d1f6fb7f50#style"
+      },
+      "rank": 35,
+      "subjects": [
+        "fourier1D"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8306cd1b6a9ee8d1f6fb7f50"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:87293bb10ea22af4f7ba6e88#api_reuse",
+        "correctness": "wu:87293bb10ea22af4f7ba6e88#correctness",
+        "docs": "wu:87293bb10ea22af4f7ba6e88#docs",
+        "duplication": "wu:87293bb10ea22af4f7ba6e88#duplication",
+        "family_design": "wu:87293bb10ea22af4f7ba6e88#family_design",
+        "generality": "wu:87293bb10ea22af4f7ba6e88#generality",
+        "naming": "wu:87293bb10ea22af4f7ba6e88#naming",
+        "proof_golf": "wu:87293bb10ea22af4f7ba6e88#proof_golf",
+        "proof_idiom": "wu:87293bb10ea22af4f7ba6e88#proof_idiom",
+        "style": "wu:87293bb10ea22af4f7ba6e88#style"
+      },
+      "rank": 36,
+      "subjects": [
+        "VorticityResponse"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:87293bb10ea22af4f7ba6e88"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:886b5f80106301c0d37cfe49#api_reuse",
+        "correctness": "wu:886b5f80106301c0d37cfe49#correctness",
+        "docs": "wu:886b5f80106301c0d37cfe49#docs",
+        "duplication": "wu:886b5f80106301c0d37cfe49#duplication",
+        "family_design": "wu:886b5f80106301c0d37cfe49#family_design",
+        "generality": "wu:886b5f80106301c0d37cfe49#generality",
+        "naming": "wu:886b5f80106301c0d37cfe49#naming",
+        "proof_golf": "wu:886b5f80106301c0d37cfe49#proof_golf",
+        "proof_idiom": "wu:886b5f80106301c0d37cfe49#proof_idiom",
+        "style": "wu:886b5f80106301c0d37cfe49#style"
+      },
+      "rank": 37,
+      "subjects": [
+        "galerkin_energy_bound"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:886b5f80106301c0d37cfe49"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:aa0ca1b421f8880ed6e15de9#api_reuse",
+        "correctness": "wu:aa0ca1b421f8880ed6e15de9#correctness",
+        "docs": "wu:aa0ca1b421f8880ed6e15de9#docs",
+        "duplication": "wu:aa0ca1b421f8880ed6e15de9#duplication",
+        "family_design": "wu:aa0ca1b421f8880ed6e15de9#family_design",
+        "generality": "wu:aa0ca1b421f8880ed6e15de9#generality",
+        "naming": "wu:aa0ca1b421f8880ed6e15de9#naming",
+        "proof_golf": "wu:aa0ca1b421f8880ed6e15de9#proof_golf",
+        "proof_idiom": "wu:aa0ca1b421f8880ed6e15de9#proof_idiom",
+        "style": "wu:aa0ca1b421f8880ed6e15de9#style"
+      },
+      "rank": 38,
+      "subjects": [
+        "GalerkinProjection"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 4 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:aa0ca1b421f8880ed6e15de9"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:af88e6f0d1e746d797dee964#api_reuse",
+        "correctness": "wu:af88e6f0d1e746d797dee964#correctness",
+        "docs": "wu:af88e6f0d1e746d797dee964#docs",
+        "duplication": "wu:af88e6f0d1e746d797dee964#duplication",
+        "family_design": "wu:af88e6f0d1e746d797dee964#family_design",
+        "generality": "wu:af88e6f0d1e746d797dee964#generality",
+        "naming": "wu:af88e6f0d1e746d797dee964#naming",
+        "proof_golf": "wu:af88e6f0d1e746d797dee964#proof_golf",
+        "proof_idiom": "wu:af88e6f0d1e746d797dee964#proof_idiom",
+        "style": "wu:af88e6f0d1e746d797dee964#style"
+      },
+      "rank": 39,
+      "subjects": [
+        "fourierDecay"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:af88e6f0d1e746d797dee964"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:b24919a37350e5e39fb7c0fc#api_reuse",
+        "correctness": "wu:b24919a37350e5e39fb7c0fc#correctness",
+        "docs": "wu:b24919a37350e5e39fb7c0fc#docs",
+        "duplication": "wu:b24919a37350e5e39fb7c0fc#duplication",
+        "family_design": "wu:b24919a37350e5e39fb7c0fc#family_design",
+        "generality": "wu:b24919a37350e5e39fb7c0fc#generality",
+        "naming": "wu:b24919a37350e5e39fb7c0fc#naming",
+        "proof_golf": "wu:b24919a37350e5e39fb7c0fc#proof_golf",
+        "proof_idiom": "wu:b24919a37350e5e39fb7c0fc#proof_idiom",
+        "style": "wu:b24919a37350e5e39fb7c0fc#style"
+      },
+      "rank": 40,
+      "subjects": [
+        "fourier3D"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b24919a37350e5e39fb7c0fc"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:bcc2b65a407e62e6c7144355#api_reuse",
+        "correctness": "wu:bcc2b65a407e62e6c7144355#correctness",
+        "docs": "wu:bcc2b65a407e62e6c7144355#docs",
+        "duplication": "wu:bcc2b65a407e62e6c7144355#duplication",
+        "family_design": "wu:bcc2b65a407e62e6c7144355#family_design",
+        "generality": "wu:bcc2b65a407e62e6c7144355#generality",
+        "naming": "wu:bcc2b65a407e62e6c7144355#naming",
+        "proof_golf": "wu:bcc2b65a407e62e6c7144355#proof_golf",
+        "proof_idiom": "wu:bcc2b65a407e62e6c7144355#proof_idiom",
+        "style": "wu:bcc2b65a407e62e6c7144355#style"
+      },
+      "rank": 41,
+      "subjects": [
+        "GalerkinAt"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:bcc2b65a407e62e6c7144355"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:dc61c57124f6ff61e8b3d482#api_reuse",
+        "correctness": "wu:dc61c57124f6ff61e8b3d482#correctness",
+        "docs": "wu:dc61c57124f6ff61e8b3d482#docs",
+        "duplication": "wu:dc61c57124f6ff61e8b3d482#duplication",
+        "family_design": "wu:dc61c57124f6ff61e8b3d482#family_design",
+        "generality": "wu:dc61c57124f6ff61e8b3d482#generality",
+        "naming": "wu:dc61c57124f6ff61e8b3d482#naming",
+        "proof_golf": "wu:dc61c57124f6ff61e8b3d482#proof_golf",
+        "proof_idiom": "wu:dc61c57124f6ff61e8b3d482#proof_idiom",
+        "style": "wu:dc61c57124f6ff61e8b3d482#style"
+      },
+      "rank": 42,
+      "subjects": [
+        "invFourier"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:dc61c57124f6ff61e8b3d482"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:f66db2d13a4565761db08793#api_reuse",
+        "correctness": "wu:f66db2d13a4565761db08793#correctness",
+        "docs": "wu:f66db2d13a4565761db08793#docs",
+        "duplication": "wu:f66db2d13a4565761db08793#duplication",
+        "family_design": "wu:f66db2d13a4565761db08793#family_design",
+        "generality": "wu:f66db2d13a4565761db08793#generality",
+        "naming": "wu:f66db2d13a4565761db08793#naming",
+        "proof_golf": "wu:f66db2d13a4565761db08793#proof_golf",
+        "proof_idiom": "wu:f66db2d13a4565761db08793#proof_idiom",
+        "style": "wu:f66db2d13a4565761db08793#style"
+      },
+      "rank": 43,
+      "subjects": [
+        "spectralCurl"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:f66db2d13a4565761db08793"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:9df4bf5ccd28c461f6368bc2#api_reuse",
+        "correctness": "wu:9df4bf5ccd28c461f6368bc2#correctness",
+        "docs": "wu:9df4bf5ccd28c461f6368bc2#docs",
+        "duplication": "wu:9df4bf5ccd28c461f6368bc2#duplication",
+        "family_design": "wu:9df4bf5ccd28c461f6368bc2#family_design",
+        "generality": "wu:9df4bf5ccd28c461f6368bc2#generality",
+        "naming": "wu:9df4bf5ccd28c461f6368bc2#naming",
+        "proof_golf": "wu:9df4bf5ccd28c461f6368bc2#proof_golf",
+        "proof_idiom": "wu:9df4bf5ccd28c461f6368bc2#proof_idiom",
+        "style": "wu:9df4bf5ccd28c461f6368bc2#style"
+      },
+      "rank": 44,
+      "subjects": [
+        "GalerkinLimit.smooth"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "introduces a new declaration",
+        "`GalerkinLimit.smooth` is 15 lines"
+      ],
+      "work_unit_id": "wu:9df4bf5ccd28c461f6368bc2"
+    },
+    {
+      "available_arms": {
+        "style": "wu:1281753c936a5f8bc0f83bbf#style"
+      },
+      "rank": 45,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1281753c936a5f8bc0f83bbf"
+    },
+    {
+      "available_arms": {
+        "style": "wu:15c8c9f2fff11dc5020bfcd3#style"
+      },
+      "rank": 46,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:15c8c9f2fff11dc5020bfcd3"
+    },
+    {
+      "available_arms": {
+        "style": "wu:1e94e402e9bf04c7094996fd#style"
+      },
+      "rank": 47,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1e94e402e9bf04c7094996fd"
+    },
+    {
+      "available_arms": {
+        "style": "wu:1f2299c7373a66faf51ece8a#style"
+      },
+      "rank": 48,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1f2299c7373a66faf51ece8a"
+    },
+    {
+      "available_arms": {
+        "style": "wu:22fa0ef97fad70cdba2a962b#style"
+      },
+      "rank": 49,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:22fa0ef97fad70cdba2a962b"
+    },
+    {
+      "available_arms": {
+        "style": "wu:2636b0c5e9fda6521abdd5b8#style"
+      },
+      "rank": 50,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2636b0c5e9fda6521abdd5b8"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2fecd5b0afbc4753abb0704d#api_reuse",
+        "correctness": "wu:2fecd5b0afbc4753abb0704d#correctness",
+        "docs": "wu:2fecd5b0afbc4753abb0704d#docs",
+        "duplication": "wu:2fecd5b0afbc4753abb0704d#duplication",
+        "family_design": "wu:2fecd5b0afbc4753abb0704d#family_design",
+        "generality": "wu:2fecd5b0afbc4753abb0704d#generality",
+        "naming": "wu:2fecd5b0afbc4753abb0704d#naming",
+        "proof_golf": "wu:2fecd5b0afbc4753abb0704d#proof_golf",
+        "proof_idiom": "wu:2fecd5b0afbc4753abb0704d#proof_idiom",
+        "style": "wu:2fecd5b0afbc4753abb0704d#style"
+      },
+      "rank": 51,
+      "subjects": [
+        "l2Norm"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2fecd5b0afbc4753abb0704d"
+    },
+    {
+      "available_arms": {
+        "style": "wu:3166c0854ab44acbe0bee40f#style"
+      },
+      "rank": 52,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:3166c0854ab44acbe0bee40f"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:32baa85ad36a17ae4a46f0c2#docs",
+        "style": "wu:32baa85ad36a17ae4a46f0c2#style"
+      },
+      "rank": 53,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:32baa85ad36a17ae4a46f0c2"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:368ef4236b86cac1f99d4db8#api_reuse",
+        "correctness": "wu:368ef4236b86cac1f99d4db8#correctness",
+        "docs": "wu:368ef4236b86cac1f99d4db8#docs",
+        "duplication": "wu:368ef4236b86cac1f99d4db8#duplication",
+        "family_design": "wu:368ef4236b86cac1f99d4db8#family_design",
+        "generality": "wu:368ef4236b86cac1f99d4db8#generality",
+        "naming": "wu:368ef4236b86cac1f99d4db8#naming",
+        "proof_golf": "wu:368ef4236b86cac1f99d4db8#proof_golf",
+        "proof_idiom": "wu:368ef4236b86cac1f99d4db8#proof_idiom",
+        "style": "wu:368ef4236b86cac1f99d4db8#style"
+      },
+      "rank": 54,
+      "subjects": [
+        "hsNorm"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:368ef4236b86cac1f99d4db8"
+    },
+    {
+      "available_arms": {
+        "style": "wu:37df2e7d8dc92b927a35748f#style"
+      },
+      "rank": 55,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:37df2e7d8dc92b927a35748f"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:3b7ce91c0e913e9765d2a5a6#docs",
+        "style": "wu:3b7ce91c0e913e9765d2a5a6#style"
+      },
+      "rank": 56,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:3b7ce91c0e913e9765d2a5a6"
+    },
+    {
+      "available_arms": {
+        "style": "wu:410634b286017a0b8f167831#style"
+      },
+      "rank": 57,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:410634b286017a0b8f167831"
+    },
+    {
+      "available_arms": {
+        "style": "wu:41dac5a71273dda355cebdbb#style"
+      },
+      "rank": 58,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:41dac5a71273dda355cebdbb"
+    },
+    {
+      "available_arms": {
+        "style": "wu:4d1bf936eb807ff5498d9f12#style"
+      },
+      "rank": 59,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4d1bf936eb807ff5498d9f12"
+    },
+    {
+      "available_arms": {
+        "style": "wu:4d47fa6b705471a43cbff87f#style"
+      },
+      "rank": 60,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4d47fa6b705471a43cbff87f"
+    },
+    {
+      "available_arms": {
+        "style": "wu:55c7fed15f700918cc5f844e#style"
+      },
+      "rank": 61,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:55c7fed15f700918cc5f844e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:595db0e56416d183c38bdd72#api_reuse",
+        "correctness": "wu:595db0e56416d183c38bdd72#correctness",
+        "docs": "wu:595db0e56416d183c38bdd72#docs",
+        "duplication": "wu:595db0e56416d183c38bdd72#duplication",
+        "family_design": "wu:595db0e56416d183c38bdd72#family_design",
+        "generality": "wu:595db0e56416d183c38bdd72#generality",
+        "naming": "wu:595db0e56416d183c38bdd72#naming",
+        "proof_golf": "wu:595db0e56416d183c38bdd72#proof_golf",
+        "proof_idiom": "wu:595db0e56416d183c38bdd72#proof_idiom",
+        "style": "wu:595db0e56416d183c38bdd72#style"
+      },
+      "rank": 62,
+      "subjects": [
+        "bkmLifted"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:595db0e56416d183c38bdd72"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:5dcd3b3f67c6836efa46d559#docs",
+        "style": "wu:5dcd3b3f67c6836efa46d559#style"
+      },
+      "rank": 63,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:5dcd3b3f67c6836efa46d559"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:5eb0755e5035770026510c83#api_reuse",
+        "correctness": "wu:5eb0755e5035770026510c83#correctness",
+        "docs": "wu:5eb0755e5035770026510c83#docs",
+        "duplication": "wu:5eb0755e5035770026510c83#duplication",
+        "family_design": "wu:5eb0755e5035770026510c83#family_design",
+        "generality": "wu:5eb0755e5035770026510c83#generality",
+        "naming": "wu:5eb0755e5035770026510c83#naming",
+        "proof_golf": "wu:5eb0755e5035770026510c83#proof_golf",
+        "proof_idiom": "wu:5eb0755e5035770026510c83#proof_idiom",
+        "style": "wu:5eb0755e5035770026510c83#style"
+      },
+      "rank": 64,
+      "subjects": [
+        "TemporalLifting"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:5eb0755e5035770026510c83"
+    },
+    {
+      "available_arms": {
+        "style": "wu:60e088bd99470bd1f61e2157#style"
+      },
+      "rank": 65,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:60e088bd99470bd1f61e2157"
+    },
+    {
+      "available_arms": {
+        "style": "wu:6761ba9dcc1591b001918c49#style"
+      },
+      "rank": 66,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:6761ba9dcc1591b001918c49"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:67cbcec1446d3b94c46a40bc#docs",
+        "style": "wu:67cbcec1446d3b94c46a40bc#style"
+      },
+      "rank": 67,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:67cbcec1446d3b94c46a40bc"
+    },
+    {
+      "available_arms": {
+        "style": "wu:71ee8b10347de05d44e01ac6#style"
+      },
+      "rank": 68,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:71ee8b10347de05d44e01ac6"
+    },
+    {
+      "available_arms": {
+        "style": "wu:7236cf5dee72a30d9e5bc9c8#style"
+      },
+      "rank": 69,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7236cf5dee72a30d9e5bc9c8"
+    },
+    {
+      "available_arms": {
+        "style": "wu:748bdf698249a7c879ab6b56#style"
+      },
+      "rank": 70,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:748bdf698249a7c879ab6b56"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:755192b2bbbab0ec49fe7f83#docs",
+        "style": "wu:755192b2bbbab0ec49fe7f83#style"
+      },
+      "rank": 71,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:755192b2bbbab0ec49fe7f83"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:76794a6321f264bf04d0c393#api_reuse",
+        "correctness": "wu:76794a6321f264bf04d0c393#correctness",
+        "docs": "wu:76794a6321f264bf04d0c393#docs",
+        "duplication": "wu:76794a6321f264bf04d0c393#duplication",
+        "family_design": "wu:76794a6321f264bf04d0c393#family_design",
+        "generality": "wu:76794a6321f264bf04d0c393#generality",
+        "naming": "wu:76794a6321f264bf04d0c393#naming",
+        "proof_golf": "wu:76794a6321f264bf04d0c393#proof_golf",
+        "proof_idiom": "wu:76794a6321f264bf04d0c393#proof_idiom",
+        "style": "wu:76794a6321f264bf04d0c393#style"
+      },
+      "rank": 72,
+      "subjects": [
+        "bkmPhysical"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:76794a6321f264bf04d0c393"
+    },
+    {
+      "available_arms": {
+        "style": "wu:7848b2617dd9a02fef822aaa#style"
+      },
+      "rank": 73,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7848b2617dd9a02fef822aaa"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:7d1e79b57bee3302367d5071#api_reuse",
+        "correctness": "wu:7d1e79b57bee3302367d5071#correctness",
+        "docs": "wu:7d1e79b57bee3302367d5071#docs",
+        "duplication": "wu:7d1e79b57bee3302367d5071#duplication",
+        "family_design": "wu:7d1e79b57bee3302367d5071#family_design",
+        "generality": "wu:7d1e79b57bee3302367d5071#generality",
+        "naming": "wu:7d1e79b57bee3302367d5071#naming",
+        "proof_golf": "wu:7d1e79b57bee3302367d5071#proof_golf",
+        "proof_idiom": "wu:7d1e79b57bee3302367d5071#proof_idiom",
+        "style": "wu:7d1e79b57bee3302367d5071#style"
+      },
+      "rank": 74,
+      "subjects": [
+        "SmoothSpacetime"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7d1e79b57bee3302367d5071"
+    },
+    {
+      "available_arms": {
+        "style": "wu:7d67e7a19378c6b2c0b5bd81#style"
+      },
+      "rank": 75,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7d67e7a19378c6b2c0b5bd81"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:81c3208ffa65dd92d7faaec3#docs",
+        "style": "wu:81c3208ffa65dd92d7faaec3#style"
+      },
+      "rank": 76,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:81c3208ffa65dd92d7faaec3"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:8214de41039b2e48c220bd57#docs",
+        "style": "wu:8214de41039b2e48c220bd57#style"
+      },
+      "rank": 77,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8214de41039b2e48c220bd57"
+    },
+    {
+      "available_arms": {
+        "style": "wu:8328e38ebc8aea3671225959#style"
+      },
+      "rank": 78,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8328e38ebc8aea3671225959"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:86362d23dc87f4b4fda28460#docs",
+        "style": "wu:86362d23dc87f4b4fda28460#style"
+      },
+      "rank": 79,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:86362d23dc87f4b4fda28460"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:8982e61aba906f30baf84be6#docs",
+        "style": "wu:8982e61aba906f30baf84be6#style"
+      },
+      "rank": 80,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8982e61aba906f30baf84be6"
+    },
+    {
+      "available_arms": {
+        "style": "wu:8d298710ab577421c1402dd0#style"
+      },
+      "rank": 81,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8d298710ab577421c1402dd0"
+    },
+    {
+      "available_arms": {
+        "style": "wu:8ecc69e237d48746e7661d4e#style"
+      },
+      "rank": 82,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8ecc69e237d48746e7661d4e"
+    },
+    {
+      "available_arms": {
+        "style": "wu:911e665f2d557637fb01c980#style"
+      },
+      "rank": 83,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:911e665f2d557637fb01c980"
+    },
+    {
+      "available_arms": {
+        "style": "wu:9d5bc01afd28d49e530f5ded#style"
+      },
+      "rank": 84,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:9d5bc01afd28d49e530f5ded"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:9f35e259b32b550e7851184d#docs",
+        "style": "wu:9f35e259b32b550e7851184d#style"
+      },
+      "rank": 85,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:9f35e259b32b550e7851184d"
+    },
+    {
+      "available_arms": {
+        "style": "wu:a136b1e51a7d04ad7bcce4bb#style"
+      },
+      "rank": 86,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a136b1e51a7d04ad7bcce4bb"
+    },
+    {
+      "available_arms": {
+        "style": "wu:a1968e0bdef1b021ba870612#style"
+      },
+      "rank": 87,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a1968e0bdef1b021ba870612"
+    },
+    {
+      "available_arms": {
+        "style": "wu:a907712f645660503a9403a4#style"
+      },
+      "rank": 88,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a907712f645660503a9403a4"
+    },
+    {
+      "available_arms": {
+        "style": "wu:ae0269c5463e0b526fc3b1fc#style"
+      },
+      "rank": 89,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:ae0269c5463e0b526fc3b1fc"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:b5c777777f001b1c17f9ed92#docs",
+        "style": "wu:b5c777777f001b1c17f9ed92#style"
+      },
+      "rank": 90,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b5c777777f001b1c17f9ed92"
+    },
+    {
+      "available_arms": {
+        "style": "wu:b66db013d5e2996c9e35db83#style"
+      },
+      "rank": 91,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b66db013d5e2996c9e35db83"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:b93e797e9bb6158a9d5402e8#docs",
+        "style": "wu:b93e797e9bb6158a9d5402e8#style"
+      },
+      "rank": 92,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b93e797e9bb6158a9d5402e8"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:bbd4d6782d1815a0110de655#api_reuse",
+        "correctness": "wu:bbd4d6782d1815a0110de655#correctness",
+        "docs": "wu:bbd4d6782d1815a0110de655#docs",
+        "duplication": "wu:bbd4d6782d1815a0110de655#duplication",
+        "family_design": "wu:bbd4d6782d1815a0110de655#family_design",
+        "generality": "wu:bbd4d6782d1815a0110de655#generality",
+        "naming": "wu:bbd4d6782d1815a0110de655#naming",
+        "proof_golf": "wu:bbd4d6782d1815a0110de655#proof_golf",
+        "proof_idiom": "wu:bbd4d6782d1815a0110de655#proof_idiom",
+        "style": "wu:bbd4d6782d1815a0110de655#style"
+      },
+      "rank": 93,
+      "subjects": [
+        "T3"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:bbd4d6782d1815a0110de655"
+    },
+    {
+      "available_arms": {
+        "style": "wu:bd9d505338022bcac0acd522#style"
+      },
+      "rank": 94,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:bd9d505338022bcac0acd522"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:bef5dcade2ca1f96b645375a#docs",
+        "style": "wu:bef5dcade2ca1f96b645375a#style"
+      },
+      "rank": 95,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:bef5dcade2ca1f96b645375a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c018f200417c48f97e261819#api_reuse",
+        "correctness": "wu:c018f200417c48f97e261819#correctness",
+        "docs": "wu:c018f200417c48f97e261819#docs",
+        "duplication": "wu:c018f200417c48f97e261819#duplication",
+        "family_design": "wu:c018f200417c48f97e261819#family_design",
+        "generality": "wu:c018f200417c48f97e261819#generality",
+        "naming": "wu:c018f200417c48f97e261819#naming",
+        "proof_golf": "wu:c018f200417c48f97e261819#proof_golf",
+        "proof_idiom": "wu:c018f200417c48f97e261819#proof_idiom",
+        "style": "wu:c018f200417c48f97e261819#style"
+      },
+      "rank": 96,
+      "subjects": [
+        "smoothInTime"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:c018f200417c48f97e261819"
+    },
+    {
+      "available_arms": {
+        "style": "wu:c56b47f0a3a0da96f653895a#style"
+      },
+      "rank": 97,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:c56b47f0a3a0da96f653895a"
+    },
+    {
+      "available_arms": {
+        "style": "wu:c60afb2090b3a22489c4b77c#style"
+      },
+      "rank": 98,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:c60afb2090b3a22489c4b77c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:cc96e17598f96ae43f264a0f#api_reuse",
+        "correctness": "wu:cc96e17598f96ae43f264a0f#correctness",
+        "docs": "wu:cc96e17598f96ae43f264a0f#docs",
+        "duplication": "wu:cc96e17598f96ae43f264a0f#duplication",
+        "family_design": "wu:cc96e17598f96ae43f264a0f#family_design",
+        "generality": "wu:cc96e17598f96ae43f264a0f#generality",
+        "naming": "wu:cc96e17598f96ae43f264a0f#naming",
+        "proof_golf": "wu:cc96e17598f96ae43f264a0f#proof_golf",
+        "proof_idiom": "wu:cc96e17598f96ae43f264a0f#proof_idiom",
+        "style": "wu:cc96e17598f96ae43f264a0f#style"
+      },
+      "rank": 99,
+      "subjects": [
+        "linftyNorm"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:cc96e17598f96ae43f264a0f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d04c6017e6c96103ae450895#api_reuse",
+        "correctness": "wu:d04c6017e6c96103ae450895#correctness",
+        "docs": "wu:d04c6017e6c96103ae450895#docs",
+        "duplication": "wu:d04c6017e6c96103ae450895#duplication",
+        "family_design": "wu:d04c6017e6c96103ae450895#family_design",
+        "generality": "wu:d04c6017e6c96103ae450895#generality",
+        "naming": "wu:d04c6017e6c96103ae450895#naming",
+        "proof_golf": "wu:d04c6017e6c96103ae450895#proof_golf",
+        "proof_idiom": "wu:d04c6017e6c96103ae450895#proof_idiom",
+        "style": "wu:d04c6017e6c96103ae450895#style"
+      },
+      "rank": 100,
+      "subjects": [
+        "BKMFinite"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d04c6017e6c96103ae450895"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d05ebd64ee0d2cc4b65b6329#api_reuse",
+        "correctness": "wu:d05ebd64ee0d2cc4b65b6329#correctness",
+        "docs": "wu:d05ebd64ee0d2cc4b65b6329#docs",
+        "duplication": "wu:d05ebd64ee0d2cc4b65b6329#duplication",
+        "family_design": "wu:d05ebd64ee0d2cc4b65b6329#family_design",
+        "generality": "wu:d05ebd64ee0d2cc4b65b6329#generality",
+        "naming": "wu:d05ebd64ee0d2cc4b65b6329#naming",
+        "proof_golf": "wu:d05ebd64ee0d2cc4b65b6329#proof_golf",
+        "proof_idiom": "wu:d05ebd64ee0d2cc4b65b6329#proof_idiom",
+        "style": "wu:d05ebd64ee0d2cc4b65b6329#style"
+      },
+      "rank": 101,
+      "subjects": [
+        "DivergenceFree"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d05ebd64ee0d2cc4b65b6329"
+    },
+    {
+      "available_arms": {
+        "style": "wu:dc0a5b60cdd4ea6afd2be5dc#style"
+      },
+      "rank": 102,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:dc0a5b60cdd4ea6afd2be5dc"
+    },
+    {
+      "available_arms": {
+        "style": "wu:e739942e4a4a0accdddd012c#style"
+      },
+      "rank": 103,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:e739942e4a4a0accdddd012c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:ea5fe5f4067226dd024665fe#api_reuse",
+        "correctness": "wu:ea5fe5f4067226dd024665fe#correctness",
+        "docs": "wu:ea5fe5f4067226dd024665fe#docs",
+        "duplication": "wu:ea5fe5f4067226dd024665fe#duplication",
+        "family_design": "wu:ea5fe5f4067226dd024665fe#family_design",
+        "generality": "wu:ea5fe5f4067226dd024665fe#generality",
+        "naming": "wu:ea5fe5f4067226dd024665fe#naming",
+        "proof_golf": "wu:ea5fe5f4067226dd024665fe#proof_golf",
+        "proof_idiom": "wu:ea5fe5f4067226dd024665fe#proof_idiom",
+        "style": "wu:ea5fe5f4067226dd024665fe#style"
+      },
+      "rank": 104,
+      "subjects": [
+        "SolvesNavierStokes"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:ea5fe5f4067226dd024665fe"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:eaece2a50ecafbc9e4e91c5b#docs",
+        "style": "wu:eaece2a50ecafbc9e4e91c5b#style"
+      },
+      "rank": 105,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:eaece2a50ecafbc9e4e91c5b"
+    },
+    {
+      "available_arms": {
+        "style": "wu:ec5055af20ee35fe99384634#style"
+      },
+      "rank": 106,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:ec5055af20ee35fe99384634"
+    },
+    {
+      "available_arms": {
+        "style": "wu:f17aa5b70d5c00f71a7127db#style"
+      },
+      "rank": 107,
+      "subjects": [
+        "Mathlib/Analysis/ODE/GalerkinRegularity.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:f17aa5b70d5c00f71a7127db"
+    }
+  ],
+  "33285": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:cb752b23369896524ec0a78c#api_reuse",
+        "correctness": "wu:cb752b23369896524ec0a78c#correctness",
+        "docs": "wu:cb752b23369896524ec0a78c#docs",
+        "duplication": "wu:cb752b23369896524ec0a78c#duplication",
+        "family_design": "wu:cb752b23369896524ec0a78c#family_design",
+        "generality": "wu:cb752b23369896524ec0a78c#generality",
+        "naming": "wu:cb752b23369896524ec0a78c#naming",
+        "proof_golf": "wu:cb752b23369896524ec0a78c#proof_golf",
+        "proof_idiom": "wu:cb752b23369896524ec0a78c#proof_idiom",
+        "style": "wu:cb752b23369896524ec0a78c#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Matrix.rank_eq_finrank_range_toLin"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`Matrix.rank_eq_finrank_range_toLin` is a chain of 10 low-level tactic steps",
+        "shares a name family with 2 other changed declaration(s)",
+        "`Matrix.rank_eq_finrank_range_toLin` is 20 lines"
+      ],
+      "work_unit_id": "wu:cb752b23369896524ec0a78c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:af323086e53d4e66ae9a56af#api_reuse",
+        "correctness": "wu:af323086e53d4e66ae9a56af#correctness",
+        "docs": "wu:af323086e53d4e66ae9a56af#docs",
+        "duplication": "wu:af323086e53d4e66ae9a56af#duplication",
+        "family_design": "wu:af323086e53d4e66ae9a56af#family_design",
+        "generality": "wu:af323086e53d4e66ae9a56af#generality",
+        "naming": "wu:af323086e53d4e66ae9a56af#naming",
+        "proof_golf": "wu:af323086e53d4e66ae9a56af#proof_golf",
+        "proof_idiom": "wu:af323086e53d4e66ae9a56af#proof_idiom",
+        "style": "wu:af323086e53d4e66ae9a56af#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "LinearIsometry.isComplete_image_iff",
+        "LinearIsometry.isComplete_image_iff'"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)"
+      ],
+      "work_unit_id": "wu:af323086e53d4e66ae9a56af"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2afb887aaaa3be6d65529290#api_reuse",
+        "correctness": "wu:2afb887aaaa3be6d65529290#correctness",
+        "docs": "wu:2afb887aaaa3be6d65529290#docs",
+        "duplication": "wu:2afb887aaaa3be6d65529290#duplication",
+        "family_design": "wu:2afb887aaaa3be6d65529290#family_design",
+        "generality": "wu:2afb887aaaa3be6d65529290#generality",
+        "naming": "wu:2afb887aaaa3be6d65529290#naming",
+        "style": "wu:2afb887aaaa3be6d65529290#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Ideal.cotangentEquivIdeal_symm_apply"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`Ideal.cotangentEquivIdeal_symm_apply` is a chain of 3 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:2afb887aaaa3be6d65529290"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:ac8ad58e130bd8498c589b35#api_reuse",
+        "correctness": "wu:ac8ad58e130bd8498c589b35#correctness",
+        "docs": "wu:ac8ad58e130bd8498c589b35#docs",
+        "duplication": "wu:ac8ad58e130bd8498c589b35#duplication",
+        "family_design": "wu:ac8ad58e130bd8498c589b35#family_design",
+        "generality": "wu:ac8ad58e130bd8498c589b35#generality",
+        "naming": "wu:ac8ad58e130bd8498c589b35#naming",
+        "proof_idiom": "wu:ac8ad58e130bd8498c589b35#proof_idiom",
+        "style": "wu:ac8ad58e130bd8498c589b35#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Submodule.inf_comap_le_comap_add"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`Submodule.inf_comap_le_comap_add` is a chain of 4 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:ac8ad58e130bd8498c589b35"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:da4be5e04cff2a1b317be651#api_reuse",
+        "correctness": "wu:da4be5e04cff2a1b317be651#correctness",
+        "docs": "wu:da4be5e04cff2a1b317be651#docs",
+        "duplication": "wu:da4be5e04cff2a1b317be651#duplication",
+        "family_design": "wu:da4be5e04cff2a1b317be651#family_design",
+        "generality": "wu:da4be5e04cff2a1b317be651#generality",
+        "naming": "wu:da4be5e04cff2a1b317be651#naming",
+        "proof_golf": "wu:da4be5e04cff2a1b317be651#proof_golf",
+        "proof_idiom": "wu:da4be5e04cff2a1b317be651#proof_idiom",
+        "style": "wu:da4be5e04cff2a1b317be651#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "LinearEquiv.symm_prodComm"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:da4be5e04cff2a1b317be651"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4bf6d5c5aa914016c57ae8fb#api_reuse",
+        "correctness": "wu:4bf6d5c5aa914016c57ae8fb#correctness",
+        "docs": "wu:4bf6d5c5aa914016c57ae8fb#docs",
+        "duplication": "wu:4bf6d5c5aa914016c57ae8fb#duplication",
+        "family_design": "wu:4bf6d5c5aa914016c57ae8fb#family_design",
+        "generality": "wu:4bf6d5c5aa914016c57ae8fb#generality",
+        "naming": "wu:4bf6d5c5aa914016c57ae8fb#naming"
+      },
+      "rank": 6,
+      "subjects": [
+        "ContinuousLinearMap.antilipschitz_of_injective_of_isClosed_range",
+        "ContinuousLinearMap.equivRange_symm_apply"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:4bf6d5c5aa914016c57ae8fb"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:56cbf75b76d06a41679af3a0#api_reuse",
+        "correctness": "wu:56cbf75b76d06a41679af3a0#correctness",
+        "docs": "wu:56cbf75b76d06a41679af3a0#docs",
+        "duplication": "wu:56cbf75b76d06a41679af3a0#duplication",
+        "family_design": "wu:56cbf75b76d06a41679af3a0#family_design",
+        "generality": "wu:56cbf75b76d06a41679af3a0#generality",
+        "naming": "wu:56cbf75b76d06a41679af3a0#naming",
+        "style": "wu:56cbf75b76d06a41679af3a0#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "IsContDiffImplicitAt.implicitFunctionData"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:56cbf75b76d06a41679af3a0"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:68018f0ebd4a5864081f0018#api_reuse",
+        "correctness": "wu:68018f0ebd4a5864081f0018#correctness",
+        "docs": "wu:68018f0ebd4a5864081f0018#docs",
+        "duplication": "wu:68018f0ebd4a5864081f0018#duplication",
+        "family_design": "wu:68018f0ebd4a5864081f0018#family_design",
+        "generality": "wu:68018f0ebd4a5864081f0018#generality",
+        "naming": "wu:68018f0ebd4a5864081f0018#naming",
+        "style": "wu:68018f0ebd4a5864081f0018#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Submodule.IsOrtho.map"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:68018f0ebd4a5864081f0018"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:ceb8b64b2e7c3bbd2e2749c0#api_reuse",
+        "correctness": "wu:ceb8b64b2e7c3bbd2e2749c0#correctness",
+        "docs": "wu:ceb8b64b2e7c3bbd2e2749c0#docs",
+        "duplication": "wu:ceb8b64b2e7c3bbd2e2749c0#duplication",
+        "family_design": "wu:ceb8b64b2e7c3bbd2e2749c0#family_design",
+        "generality": "wu:ceb8b64b2e7c3bbd2e2749c0#generality",
+        "naming": "wu:ceb8b64b2e7c3bbd2e2749c0#naming",
+        "proof_golf": "wu:ceb8b64b2e7c3bbd2e2749c0#proof_golf",
+        "proof_idiom": "wu:ceb8b64b2e7c3bbd2e2749c0#proof_idiom",
+        "style": "wu:ceb8b64b2e7c3bbd2e2749c0#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "ContinuousLinearEquiv.submoduleMap",
+        "ContinuousLinearMap.iInfKerProjEquiv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:ceb8b64b2e7c3bbd2e2749c0"
+    }
+  ],
+  "33294": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:8d7ca5dd57fae672bcc522c7#api_reuse",
+        "correctness": "wu:8d7ca5dd57fae672bcc522c7#correctness",
+        "docs": "wu:8d7ca5dd57fae672bcc522c7#docs",
+        "duplication": "wu:8d7ca5dd57fae672bcc522c7#duplication",
+        "family_design": "wu:8d7ca5dd57fae672bcc522c7#family_design",
+        "generality": "wu:8d7ca5dd57fae672bcc522c7#generality",
+        "naming": "wu:8d7ca5dd57fae672bcc522c7#naming",
+        "proof_golf": "wu:8d7ca5dd57fae672bcc522c7#proof_golf",
+        "proof_idiom": "wu:8d7ca5dd57fae672bcc522c7#proof_idiom",
+        "style": "wu:8d7ca5dd57fae672bcc522c7#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/FixedPoint.lean",
+        "Ordinal.IsNormal.apply_le_nfp",
+        "Ordinal.IsNormal.nfp_le_apply",
+        "Ordinal.add_eq_right_iff_mul_omega0_le",
+        "Ordinal.apply_lt_nfpFamily_iff",
+        "Ordinal.derivFamily_fp",
+        "Ordinal.deriv_add_eq_mul_omega0_add",
+        "Ordinal.deriv_eq_id_of_nfp_eq_id",
+        "Ordinal.deriv_mul_eq_opow_omega0_mul",
+        "Ordinal.fp_iff_deriv",
+        "Ordinal.le_iff_deriv",
+        "Ordinal.mem_range_deriv",
+        "Ordinal.mul_le_right_iff_opow_omega0_dvd",
+        "Ordinal.nfp_fp",
+        "Ordinal.nfp_le_apply",
+        "Ordinal.nfp_mul_one"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.le_iff_deriv` is a chain of 3 low-level tactic steps",
+        "`Ordinal.deriv_mul_eq_opow_omega0_mul` is a chain of 3 low-level tactic steps",
+        "`Ordinal.derivFamily_fp` is a chain of 10 low-level tactic steps",
+        "`Ordinal.deriv_add_eq_mul_omega0_add` is a chain of 4 low-level tactic steps",
+        "`Ordinal.add_eq_right_iff_mul_omega0_le` is a chain of 4 low-level tactic steps",
+        "was changed alongside 10 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.derivFamily_fp` is 18 lines"
+      ],
+      "work_unit_id": "wu:8d7ca5dd57fae672bcc522c7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:0ea8155f82871c8ba1784990#api_reuse",
+        "docs": "wu:0ea8155f82871c8ba1784990#docs",
+        "generality": "wu:0ea8155f82871c8ba1784990#generality",
+        "proof_golf": "wu:0ea8155f82871c8ba1784990#proof_golf",
+        "proof_idiom": "wu:0ea8155f82871c8ba1784990#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/FixedPoint.lean",
+        "Ordinal.IsNormal.fp_iff_deriv",
+        "Ordinal.IsNormal.le_iff_deriv",
+        "Ordinal.add_le_right_iff_mul_omega0_le",
+        "Ordinal.apply_le_nfp",
+        "Ordinal.apply_le_nfpFamily",
+        "Ordinal.apply_lt_nfp",
+        "Ordinal.deriv_fp",
+        "Ordinal.fp_iff_derivFamily",
+        "Ordinal.le_iff_derivFamily",
+        "Ordinal.nfpFamily_fp",
+        "Ordinal.nfp_add_zero",
+        "Ordinal.nfp_mul_opow_omega0_add"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.apply_le_nfpFamily` is a chain of 3 low-level tactic steps",
+        "`Ordinal.apply_lt_nfp` is a chain of 3 low-level tactic steps",
+        "`Ordinal.nfp_mul_opow_omega0_add` is a chain of 7 low-level tactic steps",
+        "was changed alongside 11 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.nfp_mul_opow_omega0_add` is 18 lines",
+        "`Ordinal.le_iff_derivFamily` is 29 lines"
+      ],
+      "work_unit_id": "wu:0ea8155f82871c8ba1784990"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6c7094583f77ed4e297f0d58#api_reuse",
+        "correctness": "wu:6c7094583f77ed4e297f0d58#correctness",
+        "docs": "wu:6c7094583f77ed4e297f0d58#docs",
+        "duplication": "wu:6c7094583f77ed4e297f0d58#duplication",
+        "family_design": "wu:6c7094583f77ed4e297f0d58#family_design",
+        "generality": "wu:6c7094583f77ed4e297f0d58#generality",
+        "naming": "wu:6c7094583f77ed4e297f0d58#naming",
+        "proof_golf": "wu:6c7094583f77ed4e297f0d58#proof_golf",
+        "proof_idiom": "wu:6c7094583f77ed4e297f0d58#proof_idiom",
+        "style": "wu:6c7094583f77ed4e297f0d58#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Ordinal.add_omega0_opow",
+        "Ordinal.mul_lt_omega0_opow",
+        "Ordinal.op_eq_self_of_principal"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.add_omega0_opow` is a chain of 8 low-level tactic steps",
+        "`Ordinal.mul_lt_omega0_opow` is a chain of 5 low-level tactic steps",
+        "`Ordinal.op_eq_self_of_principal` is a chain of 3 low-level tactic steps",
+        "`Ordinal.add_omega0_opow` uses a `calc` block",
+        "`Ordinal.add_omega0_opow` is 21 lines",
+        "`Ordinal.mul_lt_omega0_opow` is 15 lines"
+      ],
+      "work_unit_id": "wu:6c7094583f77ed4e297f0d58"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:3c3a5f60b7b373a0f29b02ff#api_reuse",
+        "correctness": "wu:3c3a5f60b7b373a0f29b02ff#correctness",
+        "duplication": "wu:3c3a5f60b7b373a0f29b02ff#duplication",
+        "family_design": "wu:3c3a5f60b7b373a0f29b02ff#family_design",
+        "generality": "wu:3c3a5f60b7b373a0f29b02ff#generality",
+        "proof_golf": "wu:3c3a5f60b7b373a0f29b02ff#proof_golf",
+        "proof_idiom": "wu:3c3a5f60b7b373a0f29b02ff#proof_idiom"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Exponential.lean",
+        "Ordinal.iSup_pow_natCast",
+        "Ordinal.isNormal_opow",
+        "Ordinal.isSuccLimit_opow",
+        "Ordinal.opow_add",
+        "Ordinal.opow_le_opow_iff_right",
+        "Ordinal.opow_lt_opow_iff_right",
+        "Ordinal.opow_mul",
+        "Ordinal.opow_right_inj",
+        "Ordinal.right_le_opow"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.opow_add` is a chain of 7 low-level tactic steps",
+        "`Ordinal.opow_mul` is a chain of 5 low-level tactic steps",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.opow_add` is 18 lines",
+        "`Ordinal.opow_mul` is 15 lines"
+      ],
+      "work_unit_id": "wu:3c3a5f60b7b373a0f29b02ff"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:79a780e84006e70cfaa83d57#api_reuse",
+        "correctness": "wu:79a780e84006e70cfaa83d57#correctness",
+        "docs": "wu:79a780e84006e70cfaa83d57#docs",
+        "duplication": "wu:79a780e84006e70cfaa83d57#duplication",
+        "family_design": "wu:79a780e84006e70cfaa83d57#family_design",
+        "generality": "wu:79a780e84006e70cfaa83d57#generality",
+        "naming": "wu:79a780e84006e70cfaa83d57#naming",
+        "proof_golf": "wu:79a780e84006e70cfaa83d57#proof_golf",
+        "proof_idiom": "wu:79a780e84006e70cfaa83d57#proof_idiom",
+        "style": "wu:79a780e84006e70cfaa83d57#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Veblen.lean",
+        "Ordinal.isNormal_veblen",
+        "Ordinal.isNormal_veblenWith_zero",
+        "Ordinal.isNormal_veblen_zero",
+        "Ordinal.mem_range_gamma",
+        "Ordinal.omega0_opow_epsilon",
+        "Ordinal.veblenWith_right_strictMono",
+        "Ordinal.veblenWith_succ",
+        "Ordinal.veblen_gamma_zero"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isNormal_veblenWith_zero` is a chain of 11 low-level tactic steps",
+        "`Ordinal.veblenWith_succ` is a chain of 5 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.isNormal_veblenWith_zero` is 20 lines",
+        "`Ordinal.veblenWith_succ` is 15 lines"
+      ],
+      "work_unit_id": "wu:79a780e84006e70cfaa83d57"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:dd9fa09a998b070e57cc1018#api_reuse",
+        "correctness": "wu:dd9fa09a998b070e57cc1018#correctness",
+        "docs": "wu:dd9fa09a998b070e57cc1018#docs",
+        "duplication": "wu:dd9fa09a998b070e57cc1018#duplication",
+        "family_design": "wu:dd9fa09a998b070e57cc1018#family_design",
+        "generality": "wu:dd9fa09a998b070e57cc1018#generality",
+        "naming": "wu:dd9fa09a998b070e57cc1018#naming",
+        "proof_golf": "wu:dd9fa09a998b070e57cc1018#proof_golf",
+        "proof_idiom": "wu:dd9fa09a998b070e57cc1018#proof_idiom",
+        "style": "wu:dd9fa09a998b070e57cc1018#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/SetTheory/Cardinal/Cofinality.lean",
+        "Ordinal.IsNormal.cof_eq",
+        "Ordinal.IsNormal.cof_le",
+        "Ordinal.cof_add",
+        "Ordinal.cof_eq_of_isNormal",
+        "Ordinal.cof_le_of_isNormal",
+        "Ordinal.cof_omega",
+        "Ordinal.cof_preOmega",
+        "Ordinal.isFundamentalSequence_of_isNormal"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isFundamentalSequence_of_isNormal` is a chain of 15 low-level tactic steps",
+        "`Ordinal.cof_le_of_isNormal` is a chain of 3 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Ordinal.isFundamentalSequence_of_isNormal` is 28 lines"
+      ],
+      "work_unit_id": "wu:dd9fa09a998b070e57cc1018"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:aba43b297af95a20303a77d4#api_reuse",
+        "correctness": "wu:aba43b297af95a20303a77d4#correctness",
+        "docs": "wu:aba43b297af95a20303a77d4#docs",
+        "duplication": "wu:aba43b297af95a20303a77d4#duplication",
+        "family_design": "wu:aba43b297af95a20303a77d4#family_design",
+        "generality": "wu:aba43b297af95a20303a77d4#generality",
+        "naming": "wu:aba43b297af95a20303a77d4#naming",
+        "proof_golf": "wu:aba43b297af95a20303a77d4#proof_golf",
+        "proof_idiom": "wu:aba43b297af95a20303a77d4#proof_idiom",
+        "style": "wu:aba43b297af95a20303a77d4#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Arithmetic.lean",
+        "Ordinal.IsNormal",
+        "Ordinal.IsNormal.id_le",
+        "Ordinal.IsNormal.le_apply",
+        "Ordinal.IsNormal.le_iff_eq",
+        "Ordinal.IsNormal.le_set",
+        "Ordinal.IsNormal.le_set'",
+        "Ordinal.IsNormal.limit_le",
+        "Ordinal.IsNormal.limit_lt",
+        "Ordinal.IsNormal.strictMono",
+        "Ordinal.IsNormal.trans",
+        "Ordinal.isNormal_add_right",
+        "Ordinal.isNormal_mul_right",
+        "Ordinal.isSuccLimit_add",
+        "Ordinal.isSuccLimit_mul"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.IsNormal.le_set` is a chain of 3 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)"
+      ],
+      "work_unit_id": "wu:aba43b297af95a20303a77d4"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:5c7e0dae9da01fad4c6b1ac4#api_reuse",
+        "correctness": "wu:5c7e0dae9da01fad4c6b1ac4#correctness",
+        "docs": "wu:5c7e0dae9da01fad4c6b1ac4#docs",
+        "duplication": "wu:5c7e0dae9da01fad4c6b1ac4#duplication",
+        "family_design": "wu:5c7e0dae9da01fad4c6b1ac4#family_design",
+        "generality": "wu:5c7e0dae9da01fad4c6b1ac4#generality",
+        "proof_golf": "wu:5c7e0dae9da01fad4c6b1ac4#proof_golf",
+        "proof_idiom": "wu:5c7e0dae9da01fad4c6b1ac4#proof_idiom",
+        "style": "wu:5c7e0dae9da01fad4c6b1ac4#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Ordinal.isNormal_enumOrd"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isNormal_enumOrd` is a chain of 3 low-level tactic steps",
+        "`Ordinal.isNormal_enumOrd` is 13 lines"
+      ],
+      "work_unit_id": "wu:5c7e0dae9da01fad4c6b1ac4"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:9b23e7b90e24bb96330c8596#api_reuse",
+        "correctness": "wu:9b23e7b90e24bb96330c8596#correctness",
+        "docs": "wu:9b23e7b90e24bb96330c8596#docs",
+        "duplication": "wu:9b23e7b90e24bb96330c8596#duplication",
+        "family_design": "wu:9b23e7b90e24bb96330c8596#family_design",
+        "generality": "wu:9b23e7b90e24bb96330c8596#generality",
+        "naming": "wu:9b23e7b90e24bb96330c8596#naming",
+        "proof_golf": "wu:9b23e7b90e24bb96330c8596#proof_golf",
+        "proof_idiom": "wu:9b23e7b90e24bb96330c8596#proof_idiom",
+        "style": "wu:9b23e7b90e24bb96330c8596#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Ordinal.enumOrd_isNormal_iff_isClosed"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.enumOrd_isNormal_iff_isClosed` is a chain of 14 low-level tactic steps",
+        "`Ordinal.enumOrd_isNormal_iff_isClosed` is 28 lines"
+      ],
+      "work_unit_id": "wu:9b23e7b90e24bb96330c8596"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c5092321493147e71e6bb2e9#api_reuse",
+        "correctness": "wu:c5092321493147e71e6bb2e9#correctness",
+        "docs": "wu:c5092321493147e71e6bb2e9#docs",
+        "duplication": "wu:c5092321493147e71e6bb2e9#duplication",
+        "family_design": "wu:c5092321493147e71e6bb2e9#family_design",
+        "generality": "wu:c5092321493147e71e6bb2e9#generality",
+        "naming": "wu:c5092321493147e71e6bb2e9#naming",
+        "proof_golf": "wu:c5092321493147e71e6bb2e9#proof_golf",
+        "proof_idiom": "wu:c5092321493147e71e6bb2e9#proof_idiom",
+        "style": "wu:c5092321493147e71e6bb2e9#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Ordinal.isNormal_omega",
+        "Ordinal.isNormal_preOmega",
+        "Ordinal.preOmega_omega0"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "`Ordinal.isNormal_preOmega` is a chain of 6 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:c5092321493147e71e6bb2e9"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4979ac4b9ccafb28bddea7da#api_reuse",
+        "correctness": "wu:4979ac4b9ccafb28bddea7da#correctness",
+        "docs": "wu:4979ac4b9ccafb28bddea7da#docs",
+        "duplication": "wu:4979ac4b9ccafb28bddea7da#duplication",
+        "family_design": "wu:4979ac4b9ccafb28bddea7da#family_design",
+        "generality": "wu:4979ac4b9ccafb28bddea7da#generality",
+        "proof_golf": "wu:4979ac4b9ccafb28bddea7da#proof_golf",
+        "proof_idiom": "wu:4979ac4b9ccafb28bddea7da#proof_idiom",
+        "style": "wu:4979ac4b9ccafb28bddea7da#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Order.IsNormal.monotone"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4979ac4b9ccafb28bddea7da"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:8a543170d6676a89aab2a66f#api_reuse",
+        "correctness": "wu:8a543170d6676a89aab2a66f#correctness",
+        "docs": "wu:8a543170d6676a89aab2a66f#docs",
+        "duplication": "wu:8a543170d6676a89aab2a66f#duplication",
+        "family_design": "wu:8a543170d6676a89aab2a66f#family_design",
+        "generality": "wu:8a543170d6676a89aab2a66f#generality",
+        "naming": "wu:8a543170d6676a89aab2a66f#naming",
+        "proof_golf": "wu:8a543170d6676a89aab2a66f#proof_golf",
+        "proof_idiom": "wu:8a543170d6676a89aab2a66f#proof_idiom",
+        "style": "wu:8a543170d6676a89aab2a66f#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Arithmetic.lean",
+        "Ordinal.IsNormal.inj",
+        "Ordinal.IsNormal.isSuccLimit",
+        "Ordinal.IsNormal.le_iff",
+        "Ordinal.IsNormal.lt_iff",
+        "Ordinal.IsNormal.monotone",
+        "Ordinal.IsNormal.refl",
+        "Ordinal.isNormal_iff_strictMono_limit"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:8a543170d6676a89aab2a66f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d3e2e8ae469b4bb23c482fb5#api_reuse",
+        "correctness": "wu:d3e2e8ae469b4bb23c482fb5#correctness",
+        "docs": "wu:d3e2e8ae469b4bb23c482fb5#docs",
+        "duplication": "wu:d3e2e8ae469b4bb23c482fb5#duplication",
+        "family_design": "wu:d3e2e8ae469b4bb23c482fb5#family_design",
+        "generality": "wu:d3e2e8ae469b4bb23c482fb5#generality",
+        "naming": "wu:d3e2e8ae469b4bb23c482fb5#naming",
+        "proof_golf": "wu:d3e2e8ae469b4bb23c482fb5#proof_golf",
+        "proof_idiom": "wu:d3e2e8ae469b4bb23c482fb5#proof_idiom",
+        "style": "wu:d3e2e8ae469b4bb23c482fb5#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "Mathlib/SetTheory/Ordinal/Family.lean",
+        "Ordinal.IsNormal.apply_of_isSuccLimit",
+        "Ordinal.IsNormal.apply_omega0",
+        "Ordinal.IsNormal.bsup",
+        "Ordinal.IsNormal.eq_iff_zero_and_succ",
+        "Ordinal.IsNormal.map_iSup",
+        "Ordinal.IsNormal.map_iSup_of_bddAbove",
+        "Ordinal.IsNormal.map_sSup",
+        "Ordinal.IsNormal.map_sSup_of_bddAbove",
+        "Ordinal.apply_omega0_of_isNormal",
+        "Ordinal.iSup_add_nat",
+        "Ordinal.iSup_add_natCast",
+        "Ordinal.iSup_mul_nat",
+        "Ordinal.iSup_mul_natCast"
+      ],
+      "suggested_arms": [
+        "api_reuse",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'deprecat'",
+        "the PR describes itself as 'refactor'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d3e2e8ae469b4bb23c482fb5"
+    }
+  ],
+  "33304": [
+    {
+      "available_arms": {
+        "style": "wu:33bd6c5405675489d5c748e1#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/HasLimits.lean"
+      ],
+      "suggested_arms": [
+        "docs",
+        "proof_golf"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'",
+        "`Mathlib/CategoryTheory/Limits/HasLimits.lean` uses a `calc` block"
+      ],
+      "work_unit_id": "wu:33bd6c5405675489d5c748e1"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:52e9de288ab2e7e73067c2e2#api_reuse",
+        "correctness": "wu:52e9de288ab2e7e73067c2e2#correctness",
+        "docs": "wu:52e9de288ab2e7e73067c2e2#docs",
+        "duplication": "wu:52e9de288ab2e7e73067c2e2#duplication",
+        "family_design": "wu:52e9de288ab2e7e73067c2e2#family_design",
+        "generality": "wu:52e9de288ab2e7e73067c2e2#generality",
+        "naming": "wu:52e9de288ab2e7e73067c2e2#naming",
+        "proof_golf": "wu:52e9de288ab2e7e73067c2e2#proof_golf",
+        "proof_idiom": "wu:52e9de288ab2e7e73067c2e2#proof_idiom",
+        "style": "wu:52e9de288ab2e7e73067c2e2#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "CategoryTheory.BundledHom"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:52e9de288ab2e7e73067c2e2"
+    },
+    {
+      "available_arms": {
+        "style": "wu:53babf45b0cfdf9607933ccc#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/CategoryTheory/Monoidal/Mon_.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:53babf45b0cfdf9607933ccc"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:6133339796a0d5cb8e0fceaa#docs",
+        "style": "wu:6133339796a0d5cb8e0fceaa#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/FunctorCategory/Finite.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:6133339796a0d5cb8e0fceaa"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:628e675be3d977744696a495#docs",
+        "style": "wu:628e675be3d977744696a495#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/FunctorCategory/Filtered.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:628e675be3d977744696a495"
+    },
+    {
+      "available_arms": {
+        "style": "wu:6b9f8041da97bba752d41679#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/CategoryTheory/Functor/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:6b9f8041da97bba752d41679"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:876d13fc170b41b3b1061b5d#docs",
+        "style": "wu:876d13fc170b41b3b1061b5d#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/CategoryTheory/Localization/Equivalence.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:876d13fc170b41b3b1061b5d"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:ae2e02386152b8f5fd92d090#api_reuse",
+        "correctness": "wu:ae2e02386152b8f5fd92d090#correctness",
+        "docs": "wu:ae2e02386152b8f5fd92d090#docs",
+        "duplication": "wu:ae2e02386152b8f5fd92d090#duplication",
+        "family_design": "wu:ae2e02386152b8f5fd92d090#family_design",
+        "generality": "wu:ae2e02386152b8f5fd92d090#generality",
+        "naming": "wu:ae2e02386152b8f5fd92d090#naming",
+        "proof_golf": "wu:ae2e02386152b8f5fd92d090#proof_golf",
+        "proof_idiom": "wu:ae2e02386152b8f5fd92d090#proof_idiom",
+        "style": "wu:ae2e02386152b8f5fd92d090#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "CategoryTheory.UnbundledHom"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:ae2e02386152b8f5fd92d090"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:b839210928d3d81621035997#docs",
+        "style": "wu:b839210928d3d81621035997#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/Preserves/Limits.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:b839210928d3d81621035997"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:bcd278e34609440c0142a262#docs",
+        "style": "wu:bcd278e34609440c0142a262#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/CategoryTheory/ConcreteCategory/Bundled.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:bcd278e34609440c0142a262"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:c6e74394c2a6caf5ce1b2727#docs",
+        "style": "wu:c6e74394c2a6caf5ce1b2727#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/CategoryTheory/Groupoid/Subgroupoid.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:c6e74394c2a6caf5ce1b2727"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:cc22d3928202e559a4207e59#docs",
+        "style": "wu:cc22d3928202e559a4207e59#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/CategoryTheory/Limits/Preserves/Over.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:cc22d3928202e559a4207e59"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:e2d5f7aac1025b6604b4e960#docs",
+        "style": "wu:e2d5f7aac1025b6604b4e960#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "Mathlib/CategoryTheory/Bicategory/Functor/StrictPseudofunctor.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:e2d5f7aac1025b6604b4e960"
+    }
+  ],
+  "33305": [
+    {
+      "available_arms": {
+        "style": "wu:08dcee6139bbda73113846c9#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/GroupTheory/FreeGroup/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:08dcee6139bbda73113846c9"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:22b070af40f5d1426a4b1932#docs",
+        "style": "wu:22b070af40f5d1426a4b1932#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/GroupTheory/Submonoid/Inverses.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:22b070af40f5d1426a4b1932"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:6833bb536cca7c98a371ba09#docs",
+        "style": "wu:6833bb536cca7c98a371ba09#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/GroupTheory/GroupExtension/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:6833bb536cca7c98a371ba09"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:c5ace1dfdf279249b87e1495#docs",
+        "style": "wu:c5ace1dfdf279249b87e1495#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/GroupTheory/Perm/Sign.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:c5ace1dfdf279249b87e1495"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:e1cabfeb0c1f24af3c55e572#docs",
+        "style": "wu:e1cabfeb0c1f24af3c55e572#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/GroupTheory/FreeAbelianGroup.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:e1cabfeb0c1f24af3c55e572"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:e740cb25aa0556e0197ca57e#docs",
+        "style": "wu:e740cb25aa0556e0197ca57e#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/GroupTheory/Abelianization/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:e740cb25aa0556e0197ca57e"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:fa221b0d321637de6c627f37#docs",
+        "style": "wu:fa221b0d321637de6c627f37#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:fa221b0d321637de6c627f37"
+    }
+  ],
+  "33315": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:135cb918bb9c26ebb10aa025#api_reuse",
+        "correctness": "wu:135cb918bb9c26ebb10aa025#correctness",
+        "docs": "wu:135cb918bb9c26ebb10aa025#docs",
+        "duplication": "wu:135cb918bb9c26ebb10aa025#duplication",
+        "family_design": "wu:135cb918bb9c26ebb10aa025#family_design",
+        "generality": "wu:135cb918bb9c26ebb10aa025#generality",
+        "naming": "wu:135cb918bb9c26ebb10aa025#naming",
+        "proof_golf": "wu:135cb918bb9c26ebb10aa025#proof_golf",
+        "proof_idiom": "wu:135cb918bb9c26ebb10aa025#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Data/Vector3.lean",
+        "Vector3.unexpandNil"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:135cb918bb9c26ebb10aa025"
+    },
+    {
+      "available_arms": {
+        "style": "wu:2b43bb656d3eeb647de8796f#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Data/Array/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:2b43bb656d3eeb647de8796f"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:43ef830997b5aae01261bf40#docs",
+        "style": "wu:43ef830997b5aae01261bf40#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Data/Option/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:43ef830997b5aae01261bf40"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:4e6398a9f14bbf31ce997fb2#docs",
+        "style": "wu:4e6398a9f14bbf31ce997fb2#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Data/Set/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:4e6398a9f14bbf31ce997fb2"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:5035ec3754f840e343818656#docs",
+        "style": "wu:5035ec3754f840e343818656#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:5035ec3754f840e343818656"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:54117621de110b56bedbfa84#docs",
+        "style": "wu:54117621de110b56bedbfa84#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/Data/List/Lex.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:54117621de110b56bedbfa84"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:5a24da37b205a95a8cf0df1c#docs",
+        "style": "wu:5a24da37b205a95a8cf0df1c#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/Data/Finsupp/MonomialOrder.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:5a24da37b205a95a8cf0df1c"
+    },
+    {
+      "available_arms": {
+        "style": "wu:66705da2716cfa881fc3b13b#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/Data/Nat/Init.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:66705da2716cfa881fc3b13b"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:71de72efe6a7485c179ebaf9#docs",
+        "style": "wu:71de72efe6a7485c179ebaf9#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Data/Matrix/Mul.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:71de72efe6a7485c179ebaf9"
+    },
+    {
+      "available_arms": {
+        "style": "wu:b10d2503878b7e3fb077ab7b#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/Data/Complex/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:b10d2503878b7e3fb077ab7b"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:ec0fb202bc5f3e4dc922957d#docs",
+        "style": "wu:ec0fb202bc5f3e4dc922957d#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/Data/Finset/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:ec0fb202bc5f3e4dc922957d"
+    }
+  ],
+  "33321": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:f4d9d6dc63ebec0a4df35fb7#api_reuse",
+        "correctness": "wu:f4d9d6dc63ebec0a4df35fb7#correctness",
+        "docs": "wu:f4d9d6dc63ebec0a4df35fb7#docs",
+        "duplication": "wu:f4d9d6dc63ebec0a4df35fb7#duplication",
+        "family_design": "wu:f4d9d6dc63ebec0a4df35fb7#family_design",
+        "generality": "wu:f4d9d6dc63ebec0a4df35fb7#generality",
+        "naming": "wu:f4d9d6dc63ebec0a4df35fb7#naming",
+        "proof_golf": "wu:f4d9d6dc63ebec0a4df35fb7#proof_golf",
+        "proof_idiom": "wu:f4d9d6dc63ebec0a4df35fb7#proof_idiom",
+        "style": "wu:f4d9d6dc63ebec0a4df35fb7#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "IsMulIndecomposable.image_baseOf_inv_comp_eq",
+        "IsMulIndecomposable.mem_or_inv_mem_closure_baseOf",
+        "IsMulIndecomposable.pairwise_div_notMem_range",
+        "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+        "Submonoid.closure_image_isMulIndecomposable_baseOf"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`IsMulIndecomposable.image_baseOf_inv_comp_eq` is a chain of 4 low-level tactic steps",
+        "`IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` is a chain of 4 low-level tactic steps",
+        "`Submonoid.closure_image_isMulIndecomposable_baseOf` is a chain of 10 low-level tactic steps",
+        "`IsMulIndecomposable.pairwise_div_notMem_range` is a chain of 7 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 8 other changed declaration(s)",
+        "introduces a new declaration",
+        "`IsMulIndecomposable.image_baseOf_inv_comp_eq` is 23 lines",
+        "`IsMulIndecomposable.mem_or_inv_mem_closure_baseOf` is 14 lines",
+        "`Submonoid.closure_image_isMulIndecomposable_baseOf` is 33 lines",
+        "`IsMulIndecomposable.pairwise_div_notMem_range` is 21 lines"
+      ],
+      "work_unit_id": "wu:f4d9d6dc63ebec0a4df35fb7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:07d1ab9702ad80d61f40bbc9#api_reuse",
+        "docs": "wu:07d1ab9702ad80d61f40bbc9#docs",
+        "generality": "wu:07d1ab9702ad80d61f40bbc9#generality",
+        "proof_golf": "wu:07d1ab9702ad80d61f40bbc9#proof_golf",
+        "proof_idiom": "wu:07d1ab9702ad80d61f40bbc9#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "IsMulIndecomposable.baseOf",
+        "IsMulIndecomposable.baseOf_subset_one_lt",
+        "IsMulIndecomposable.pairwise_baseOf_div_notMem",
+        "IsMulIndecomposable.pairwise_div_notMem_range'",
+        "IsMulIndecomposable.subset",
+        "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`IsMulIndecomposable.pairwise_div_notMem_range'` is a chain of 3 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 6 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:07d1ab9702ad80d61f40bbc9"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6a84048f60934a207dd8bbf7#api_reuse",
+        "correctness": "wu:6a84048f60934a207dd8bbf7#correctness",
+        "docs": "wu:6a84048f60934a207dd8bbf7#docs",
+        "duplication": "wu:6a84048f60934a207dd8bbf7#duplication",
+        "family_design": "wu:6a84048f60934a207dd8bbf7#family_design",
+        "generality": "wu:6a84048f60934a207dd8bbf7#generality",
+        "proof_golf": "wu:6a84048f60934a207dd8bbf7#proof_golf",
+        "proof_idiom": "wu:6a84048f60934a207dd8bbf7#proof_idiom"
+      },
+      "rank": 3,
+      "subjects": [
+        "RootPairing.algebraMap_pairingIn'",
+        "RootPairing.pairingIn_rat"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`RootPairing.algebraMap_pairingIn'` is a chain of 3 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:6a84048f60934a207dd8bbf7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:aac320eeeac7f5d45980b7b3#api_reuse",
+        "correctness": "wu:aac320eeeac7f5d45980b7b3#correctness",
+        "docs": "wu:aac320eeeac7f5d45980b7b3#docs",
+        "duplication": "wu:aac320eeeac7f5d45980b7b3#duplication",
+        "family_design": "wu:aac320eeeac7f5d45980b7b3#family_design",
+        "generality": "wu:aac320eeeac7f5d45980b7b3#generality",
+        "naming": "wu:aac320eeeac7f5d45980b7b3#naming",
+        "proof_golf": "wu:aac320eeeac7f5d45980b7b3#proof_golf",
+        "proof_idiom": "wu:aac320eeeac7f5d45980b7b3#proof_idiom",
+        "style": "wu:aac320eeeac7f5d45980b7b3#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+        "RootPairing.baseOf_pairwise_pairing_le_zero"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`RootPairing.baseOf_pairwise_pairing_le_zero` is a chain of 3 low-level tactic steps",
+        "shares a name family with 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:aac320eeeac7f5d45980b7b3"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:d60bad80a39b1b2756ef6ab3#api_reuse",
+        "correctness": "wu:d60bad80a39b1b2756ef6ab3#correctness",
+        "docs": "wu:d60bad80a39b1b2756ef6ab3#docs",
+        "duplication": "wu:d60bad80a39b1b2756ef6ab3#duplication",
+        "family_design": "wu:d60bad80a39b1b2756ef6ab3#family_design",
+        "generality": "wu:d60bad80a39b1b2756ef6ab3#generality",
+        "naming": "wu:d60bad80a39b1b2756ef6ab3#naming",
+        "proof_golf": "wu:d60bad80a39b1b2756ef6ab3#proof_golf",
+        "proof_idiom": "wu:d60bad80a39b1b2756ef6ab3#proof_idiom",
+        "style": "wu:d60bad80a39b1b2756ef6ab3#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean",
+        "Subgroup.closure_image_isMulIndecomposable_baseOf"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Subgroup.closure_image_isMulIndecomposable_baseOf` is a chain of 12 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Subgroup.closure_image_isMulIndecomposable_baseOf` is 24 lines"
+      ],
+      "work_unit_id": "wu:d60bad80a39b1b2756ef6ab3"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c5d53939e68e214eda1de32a#api_reuse",
+        "correctness": "wu:c5d53939e68e214eda1de32a#correctness",
+        "docs": "wu:c5d53939e68e214eda1de32a#docs",
+        "duplication": "wu:c5d53939e68e214eda1de32a#duplication",
+        "family_design": "wu:c5d53939e68e214eda1de32a#family_design",
+        "generality": "wu:c5d53939e68e214eda1de32a#generality",
+        "proof_golf": "wu:c5d53939e68e214eda1de32a#proof_golf",
+        "proof_idiom": "wu:c5d53939e68e214eda1de32a#proof_idiom",
+        "style": "wu:c5d53939e68e214eda1de32a#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+        "RootPairing.linearIndepOn_root_baseOf"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`RootPairing.linearIndepOn_root_baseOf` is a chain of 16 low-level tactic steps",
+        "introduces a new declaration",
+        "`RootPairing.linearIndepOn_root_baseOf` is 35 lines"
+      ],
+      "work_unit_id": "wu:c5d53939e68e214eda1de32a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:e3cc05fb9cc947f0566ef094#api_reuse",
+        "correctness": "wu:e3cc05fb9cc947f0566ef094#correctness",
+        "docs": "wu:e3cc05fb9cc947f0566ef094#docs",
+        "duplication": "wu:e3cc05fb9cc947f0566ef094#duplication",
+        "family_design": "wu:e3cc05fb9cc947f0566ef094#family_design",
+        "generality": "wu:e3cc05fb9cc947f0566ef094#generality",
+        "naming": "wu:e3cc05fb9cc947f0566ef094#naming",
+        "proof_golf": "wu:e3cc05fb9cc947f0566ef094#proof_golf",
+        "proof_idiom": "wu:e3cc05fb9cc947f0566ef094#proof_idiom",
+        "style": "wu:e3cc05fb9cc947f0566ef094#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean",
+        "RootPairing.linearIndepOn_root_baseOf'"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`RootPairing.linearIndepOn_root_baseOf'` is a chain of 9 low-level tactic steps",
+        "introduces a new declaration",
+        "`RootPairing.linearIndepOn_root_baseOf'` is 24 lines"
+      ],
+      "work_unit_id": "wu:e3cc05fb9cc947f0566ef094"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:f858ebeb600dbafd7cf45ee8#api_reuse",
+        "correctness": "wu:f858ebeb600dbafd7cf45ee8#correctness",
+        "docs": "wu:f858ebeb600dbafd7cf45ee8#docs",
+        "duplication": "wu:f858ebeb600dbafd7cf45ee8#duplication",
+        "family_design": "wu:f858ebeb600dbafd7cf45ee8#family_design",
+        "generality": "wu:f858ebeb600dbafd7cf45ee8#generality",
+        "naming": "wu:f858ebeb600dbafd7cf45ee8#naming",
+        "proof_golf": "wu:f858ebeb600dbafd7cf45ee8#proof_golf",
+        "proof_idiom": "wu:f858ebeb600dbafd7cf45ee8#proof_idiom",
+        "style": "wu:f858ebeb600dbafd7cf45ee8#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "coe_invMonoidHom",
+        "invMonoidHom_apply",
+        "invMonoidHom_comp_invMonoidHom"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 3 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:f858ebeb600dbafd7cf45ee8"
+    },
+    {
+      "available_arms": {
+        "style": "wu:397a91aa8739fe0baaae7b9b#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:397a91aa8739fe0baaae7b9b"
+    },
+    {
+      "available_arms": {
+        "style": "wu:898e4f897d451a4b43f4b9ee#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/LinearAlgebra/RootSystem/BaseExists.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:898e4f897d451a4b43f4b9ee"
+    },
+    {
+      "available_arms": {
+        "style": "wu:9421d062c86afa54f50d3f72#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:9421d062c86afa54f50d3f72"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:a4ab6c619e8535da1dd6b6ae#api_reuse",
+        "correctness": "wu:a4ab6c619e8535da1dd6b6ae#correctness",
+        "docs": "wu:a4ab6c619e8535da1dd6b6ae#docs",
+        "duplication": "wu:a4ab6c619e8535da1dd6b6ae#duplication",
+        "family_design": "wu:a4ab6c619e8535da1dd6b6ae#family_design",
+        "generality": "wu:a4ab6c619e8535da1dd6b6ae#generality",
+        "naming": "wu:a4ab6c619e8535da1dd6b6ae#naming",
+        "proof_golf": "wu:a4ab6c619e8535da1dd6b6ae#proof_golf",
+        "proof_idiom": "wu:a4ab6c619e8535da1dd6b6ae#proof_idiom",
+        "style": "wu:a4ab6c619e8535da1dd6b6ae#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "RootPairing.RootPositiveForm.posForm_apply_root_root_le_zero_iff"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a4ab6c619e8535da1dd6b6ae"
+    }
+  ],
+  "33337": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:ed4ebc2fd8ff4c98194ac766#api_reuse",
+        "correctness": "wu:ed4ebc2fd8ff4c98194ac766#correctness",
+        "docs": "wu:ed4ebc2fd8ff4c98194ac766#docs",
+        "duplication": "wu:ed4ebc2fd8ff4c98194ac766#duplication",
+        "family_design": "wu:ed4ebc2fd8ff4c98194ac766#family_design",
+        "generality": "wu:ed4ebc2fd8ff4c98194ac766#generality",
+        "proof_golf": "wu:ed4ebc2fd8ff4c98194ac766#proof_golf",
+        "proof_idiom": "wu:ed4ebc2fd8ff4c98194ac766#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "LinearMap.IsSymmetricProjection.le_iff_range_le_range",
+        "Submodule.starProjection_le_starProjection_iff"
+      ],
+      "suggested_arms": [
+        "naming",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "`LinearMap.IsSymmetricProjection.le_iff_range_le_range` is a chain of 6 low-level tactic steps",
+        "shares a name family with 5 other changed declaration(s)",
+        "`LinearMap.IsSymmetricProjection.le_iff_range_le_range` is 15 lines"
+      ],
+      "work_unit_id": "wu:ed4ebc2fd8ff4c98194ac766"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:1f9cf7865fe0948dfc6e47f8#api_reuse",
+        "correctness": "wu:1f9cf7865fe0948dfc6e47f8#correctness",
+        "docs": "wu:1f9cf7865fe0948dfc6e47f8#docs",
+        "duplication": "wu:1f9cf7865fe0948dfc6e47f8#duplication",
+        "generality": "wu:1f9cf7865fe0948dfc6e47f8#generality",
+        "proof_golf": "wu:1f9cf7865fe0948dfc6e47f8#proof_golf",
+        "proof_idiom": "wu:1f9cf7865fe0948dfc6e47f8#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+        "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl",
+        "Submodule.coe_starProjection_eq_isComplProjection",
+        "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl",
+        "Submodule.starProjection_coe_eq_isCompl_projection"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "shares a name family with 5 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1f9cf7865fe0948dfc6e47f8"
+    }
+  ],
+  "33362": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:00d1dbc354aa5e2dec375fab#api_reuse",
+        "correctness": "wu:00d1dbc354aa5e2dec375fab#correctness",
+        "docs": "wu:00d1dbc354aa5e2dec375fab#docs",
+        "duplication": "wu:00d1dbc354aa5e2dec375fab#duplication",
+        "proof_golf": "wu:00d1dbc354aa5e2dec375fab#proof_golf",
+        "proof_idiom": "wu:00d1dbc354aa5e2dec375fab#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div",
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div'",
+        "Complex.norm_deriv_le_one_of_mapsTo_ball",
+        "Complex.norm_dslope_le_div_of_mapsTo_ball",
+        "Mathlib/Analysis/Complex/Schwarz.lean"
+      ],
+      "suggested_arms": [
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication"
+      ],
+      "why": [
+        "the PR describes itself as 'generaliz'",
+        "`Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div` is a chain of 7 low-level tactic steps",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` is a chain of 9 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` uses a `calc` block",
+        "introduces a new declaration",
+        "`Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div` is 20 lines",
+        "`Complex.norm_dslope_le_div_of_mapsTo_ball` is 18 lines"
+      ],
+      "work_unit_id": "wu:00d1dbc354aa5e2dec375fab"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:e8e62bee6beba2e12c2838c6#api_reuse",
+        "correctness": "wu:e8e62bee6beba2e12c2838c6#correctness",
+        "duplication": "wu:e8e62bee6beba2e12c2838c6#duplication",
+        "family_design": "wu:e8e62bee6beba2e12c2838c6#family_design",
+        "proof_golf": "wu:e8e62bee6beba2e12c2838c6#proof_golf",
+        "proof_idiom": "wu:e8e62bee6beba2e12c2838c6#proof_idiom",
+        "style": "wu:e8e62bee6beba2e12c2838c6#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Complex.affine_of_mapsTo_ball_of_exists_norm_dslope_eq_div",
+        "Complex.dist_le_dist_of_mapsTo_ball_self",
+        "Complex.dist_le_div_mul_dist_of_mapsTo_ball",
+        "Complex.norm_deriv_le_div_of_mapsTo_ball",
+        "Complex.norm_le_norm_of_mapsTo_ball_self",
+        "Complex.schwarz_aux",
+        "Mathlib/Analysis/Complex/Schwarz.lean"
+      ],
+      "suggested_arms": [
+        "generality",
+        "proof_golf",
+        "proof_idiom",
+        "duplication"
+      ],
+      "why": [
+        "the PR describes itself as 'generaliz'",
+        "`Complex.schwarz_aux` is a chain of 14 low-level tactic steps",
+        "introduces a new declaration",
+        "`Complex.schwarz_aux` is 26 lines"
+      ],
+      "work_unit_id": "wu:e8e62bee6beba2e12c2838c6"
+    }
+  ],
+  "33421": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:cf9de15fc85e90a46d00ab22#api_reuse",
+        "correctness": "wu:cf9de15fc85e90a46d00ab22#correctness",
+        "docs": "wu:cf9de15fc85e90a46d00ab22#docs",
+        "duplication": "wu:cf9de15fc85e90a46d00ab22#duplication",
+        "family_design": "wu:cf9de15fc85e90a46d00ab22#family_design",
+        "generality": "wu:cf9de15fc85e90a46d00ab22#generality",
+        "proof_golf": "wu:cf9de15fc85e90a46d00ab22#proof_golf",
+        "proof_idiom": "wu:cf9de15fc85e90a46d00ab22#proof_idiom",
+        "style": "wu:cf9de15fc85e90a46d00ab22#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "ContinuousOn.comp_fract''",
+        "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "continuousAt_ceil",
+        "continuousAt_floor",
+        "continuousAt_round",
+        "continuousOn_floor",
+        "continuousOn_floor_compl_range",
+        "continuousOn_fract",
+        "continuousOn_round",
+        "tendsto_round_nhdsGE_pure",
+        "tendsto_round_nhdsLT_pure_half_ceil"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`tendsto_round_nhdsGE_pure` is a chain of 6 low-level tactic steps",
+        "`tendsto_round_nhdsLT_pure_half_ceil` is a chain of 5 low-level tactic steps",
+        "`continuousAt_round` is a chain of 3 low-level tactic steps",
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 12 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:cf9de15fc85e90a46d00ab22"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:b6fdbe4f6b668bf8d3f9df3a#api_reuse",
+        "correctness": "wu:b6fdbe4f6b668bf8d3f9df3a#correctness",
+        "docs": "wu:b6fdbe4f6b668bf8d3f9df3a#docs",
+        "duplication": "wu:b6fdbe4f6b668bf8d3f9df3a#duplication",
+        "family_design": "wu:b6fdbe4f6b668bf8d3f9df3a#family_design",
+        "generality": "wu:b6fdbe4f6b668bf8d3f9df3a#generality",
+        "proof_golf": "wu:b6fdbe4f6b668bf8d3f9df3a#proof_golf",
+        "proof_idiom": "wu:b6fdbe4f6b668bf8d3f9df3a#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Algebra/Order/Round.lean",
+        "round_eq",
+        "round_eq'",
+        "round_eq_half_ceil_two_mul",
+        "round_eq_iff",
+        "round_eq_zero_iff",
+        "round_neg_two_inv",
+        "round_two_inv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`round_eq'` is a chain of 4 low-level tactic steps",
+        "`round_eq_half_ceil_two_mul` is a chain of 4 low-level tactic steps",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration",
+        "`round_eq'` is 18 lines"
+      ],
+      "work_unit_id": "wu:b6fdbe4f6b668bf8d3f9df3a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4a8d72b1a276a6e9499bc778#api_reuse",
+        "docs": "wu:4a8d72b1a276a6e9499bc778#docs",
+        "generality": "wu:4a8d72b1a276a6e9499bc778#generality",
+        "proof_golf": "wu:4a8d72b1a276a6e9499bc778#proof_golf",
+        "proof_idiom": "wu:4a8d72b1a276a6e9499bc778#proof_idiom"
+      },
+      "rank": 3,
+      "subjects": [
+        "Int.ceil_intCast_add",
+        "Int.ceil_natCast_add",
+        "Int.ceil_ofNat_add",
+        "Int.ceil_one_add",
+        "Int.two_mul_fract_eq_one_iff_exists_int"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Int.two_mul_fract_eq_one_iff_exists_int` is a chain of 4 low-level tactic steps",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4a8d72b1a276a6e9499bc778"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:60416e71f80c296b586272be#api_reuse",
+        "correctness": "wu:60416e71f80c296b586272be#correctness",
+        "docs": "wu:60416e71f80c296b586272be#docs",
+        "duplication": "wu:60416e71f80c296b586272be#duplication",
+        "family_design": "wu:60416e71f80c296b586272be#family_design",
+        "generality": "wu:60416e71f80c296b586272be#generality",
+        "proof_golf": "wu:60416e71f80c296b586272be#proof_golf",
+        "proof_idiom": "wu:60416e71f80c296b586272be#proof_idiom"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Topology/Algebra/Order/Floor.lean",
+        "continuousAt_fract",
+        "continuousOn_ceil",
+        "continuousOn_ceil_compl_range"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 7 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:60416e71f80c296b586272be"
+    },
+    {
+      "available_arms": {
+        "style": "wu:013e4c99bb4d5494e6bc635d#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/NumberTheory/Transcendental/Liouville/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:013e4c99bb4d5494e6bc635d"
+    },
+    {
+      "available_arms": {
+        "style": "wu:0a791686e6c8b0fb0a9cd3be#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/Order/Filter/AtTopBot/Archimedean.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:0a791686e6c8b0fb0a9cd3be"
+    },
+    {
+      "available_arms": {
+        "style": "wu:0e73c9c496ae3f0168d0fa9b#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/Algebra/AddConstMap/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:0e73c9c496ae3f0168d0fa9b"
+    },
+    {
+      "available_arms": {
+        "style": "wu:3d92115ef57a0cd2e4af82cb#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/Analysis/SpecialFunctions/Complex/Arctan.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:3d92115ef57a0cd2e4af82cb"
+    },
+    {
+      "available_arms": {
+        "style": "wu:5ce24736037b63974f9bda84#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Algebra/Order/ToIntervalMod.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:5ce24736037b63974f9bda84"
+    },
+    {
+      "available_arms": {
+        "style": "wu:7128836315d526e2db8e4694#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7128836315d526e2db8e4694"
+    },
+    {
+      "available_arms": {
+        "style": "wu:737b46bc4de0062cb2941afd#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/Topology/Instances/AddCircle/Defs.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:737b46bc4de0062cb2941afd"
+    },
+    {
+      "available_arms": {
+        "style": "wu:7fb79e6b8198cd2ea6ed6a4d#style"
+      },
+      "rank": 12,
+      "subjects": [
+        "Mathlib/Analysis/CStarAlgebra/ApproximateUnit.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:7fb79e6b8198cd2ea6ed6a4d"
+    },
+    {
+      "available_arms": {
+        "style": "wu:b57bc32427e0f86803e90e9a#style"
+      },
+      "rank": 13,
+      "subjects": [
+        "Mathlib/Algebra/Order/Archimedean/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:b57bc32427e0f86803e90e9a"
+    },
+    {
+      "available_arms": {
+        "style": "wu:d769feea899d12d7a39eb763#style"
+      },
+      "rank": 14,
+      "subjects": [
+        "Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:d769feea899d12d7a39eb763"
+    },
+    {
+      "available_arms": {
+        "style": "wu:df4ebf71421969d84bdbf980#style"
+      },
+      "rank": 15,
+      "subjects": [
+        "Mathlib/GroupTheory/Archimedean.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:df4ebf71421969d84bdbf980"
+    },
+    {
+      "available_arms": {
+        "style": "wu:ff9662e5ffe39fdd766ebceb#style"
+      },
+      "rank": 16,
+      "subjects": [
+        "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:ff9662e5ffe39fdd766ebceb"
+    }
+  ]
+}

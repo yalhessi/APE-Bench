@@ -37,11 +37,18 @@ def test_every_lifecycle_module_exists():
 
 
 def test_the_facade_still_resolves_every_name():
-    """83 modules import `from .schema import X`. The split must not have moved any of them."""
+    """83 modules import `from .schema import X`. The split must not have moved any of them.
+
+    The count is exact rather than a floor, so that a record which quietly stops being exported
+    fails here. It moves only when a record is deliberately added: 129 at the split, 130 with
+    `StageRecord` (2026-09-21), which the stage ledger writes, and 133 with `SilenceLabel` and
+    `silence_key` -- one record and the single spelling of its key, which both the store and
+    the report call rather than formatting it twice.
+    """
 
     from src.mathlib_review import schema
 
-    assert len(schema.__all__) == 129
+    assert len(schema.__all__) == 133
     for name in schema.__all__:
         assert hasattr(schema, name), name
 
@@ -115,4 +122,8 @@ def test_every_class_landed_in_exactly_one_module():
                 assert node.name not in seen, (
                     f"{node.name} defined in both {seen.get(node.name)} and {module}")
                 seen[node.name] = module
-    assert len(seen) == 106
+    # 106 at the split; 111 with what 2026-09-21 added -- `StageRecord`, the three pipeline
+    # records for a declared experiment, and `AdjudicationLabel`; 112 with `SilenceLabel`,
+    # the same record on the other side of the ledger (why an arm said nothing where gold
+    # says a maintainer asked).
+    assert len(seen) == 112

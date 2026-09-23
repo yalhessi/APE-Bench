@@ -148,6 +148,9 @@ def test_the_resumable_set_is_only_about_spending():
 
     assert RESUMABLE_PLAN_FIELDS == {
         "lead_cost_cap", "standard_budget_cap", "per_pr_cost_cap",
+        # The same three ceilings in tokens. A budget is a budget in either denomination,
+        # and a run resumed under a raised one answers the same question.
+        "lead_token_cap", "standard_budget_tokens", "per_pr_token_cap",
         "scaffold_config_sha256", "git_commit", "git_tree_state", "source_sha256",
     }
 

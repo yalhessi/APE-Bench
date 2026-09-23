@@ -50,12 +50,14 @@ _RAN = ("mandatory", "proposed", "agent_added")
 
 
 def _read_jsonl(path: Path) -> List[dict]:
-    """Raw dicts, deliberately not pydantic.
+    """Raw dicts, and now by choice rather than by necessity.
 
-    `DelegationRecord` in `schema.py` lacks `brief`, `delivered_prompt_sha256` and
-    `reason_given`, all three of which `lead.py::_reconcile` writes. Validating through the
-    model would silently drop the lead's stated reasoning, which is the most interesting
-    thing in the file.
+    This said `DelegationRecord` lacked `brief`, `delivered_prompt_sha256` and `reason_given`,
+    all three of which the lead writes, so validating would silently drop the lead's own
+    reasoning. The model carries them now and round-trips every row in the tree byte for byte
+    (`tests/datasets/test_pr_review_v5_row_models.py`). What is left is a reader's reason: a
+    view over a finished run must keep reading a row whose vocabulary has since moved on, and
+    the model is strict on purpose.
     """
 
     if not path.is_file():

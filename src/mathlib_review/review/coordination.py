@@ -156,19 +156,34 @@ def assert_implemented(config: CoordinationConfig) -> None:
     if config.coordination.sibling_view != "none":
         unimplemented.append(
             "coordination.sibling_view='blackboard' — children currently see only their own "
-            "brief; the coordinator-owned append-only artifact does not exist yet")
+            "brief; the coordinator-owned append-only artifact does not exist yet. Three "
+            "files: a typed entry beside `InvestigationBrief` and a `board` on the brief that "
+            "`render` prints (`review/lead.py`), a `BOARD_POSTED` event so a resumed lead "
+            "replays what it posted (`review/journal.py`), and this refusal. A board-bearing "
+            "brief changes the delivered prompt and therefore the child's `global_index`, so "
+            "it cannot collide with a resume of the unbriefed job")
     if config.coordination.parent_view != "summary":
         unimplemented.append(
             f"coordination.parent_view={config.coordination.parent_view!r} — the lead is "
-            "shown JobOutcome.summary() and there is no other projection yet")
+            "shown JobOutcome.summary() and there is no other projection yet. Three files: a "
+            "`view` argument on `JobOutcome.summary` (`review/delegation.py`), the policy "
+            "value passed at the one call site (`review/lead.py`), and this refusal")
     if config.coordination.max_redispatches_per_pair:
         unimplemented.append(
             "coordination.max_redispatches_per_pair > 0 — `delegate` rejects a pair already "
-            "requested, and lifting that needs the re-dispatch path built")
+            "requested, and lifting that needs the re-dispatch path built. Three files: a "
+            "per-pair counter and an `@n` suffix on the invocation id in `review/lead.py` (the "
+            "payload MUST differ — `global_index` is a content hash and the orchestrator "
+            "skips a task whose result exists, so an identical re-dispatch silently resumes "
+            "the first one; the primitive refuses two specs with identical task data for the "
+            "same reason), the suffix stripped before the agenda check in `review/trace.py`, "
+            "and this refusal")
     if config.synthesis.authority == "final_arbiter":
         unimplemented.append(
             "synthesis.authority='final_arbiter' — no rewrite path exists, and a rewritten "
-            "finding cannot inherit the evidence gathered for its previous wording")
+            "finding cannot inherit the evidence gathered for its previous wording. This one "
+            "is not three files: a rewrite makes a new finding revision, so the evidence would "
+            "have to be rebound or re-run before it could be published")
     if unimplemented:
         raise ValueError(
             "coordination policy asks for behaviour that is not implemented:\n  - "

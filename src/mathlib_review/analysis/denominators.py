@@ -34,7 +34,7 @@ DENOMINATOR_CORRECTION_VERSION = "v5-denominator-correction/1"
 
 #: Where the judge writes its audits. Imported lazily in `audit_dir_for` to avoid a cycle
 #: through the judge package, which imports this module's siblings.
-_AUDIT_ROOT = Path("results/pr_review_v5/audits")
+from src.mathlib_review.paths import AUDITS as _AUDIT_ROOT
 
 
 @dataclass

@@ -1,0 +1,122 @@
+{
+  "agent_added": 0,
+  "candidates_total": 10,
+  "completion_status": "partial",
+  "context_calls_total": 164,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "correctness",
+      "invocation_id": "wu:229fde64ad47ec6a4d10e573#correctness",
+      "pr_number": 33117,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:229fde64ad47ec6a4d10e573"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:229fde64ad47ec6a4d10e573#family_design",
+      "pr_number": 33117,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:229fde64ad47ec6a4d10e573"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:229fde64ad47ec6a4d10e573#generalist",
+      "pr_number": 33117,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:229fde64ad47ec6a4d10e573"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:276363feeb24802ce9b88527#generalist",
+      "pr_number": 33117,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:276363feeb24802ce9b88527"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:41f7ea76a22549e6890c8bb6#generalist",
+      "pr_number": 33117,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:41f7ea76a22549e6890c8bb6"
+    },
+    {
+      "arm_id": "duplication",
+      "invocation_id": "wu:1031e8acbe2db1ea15d6a50e#duplication",
+      "pr_number": 33145,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:1031e8acbe2db1ea15d6a50e#family_design",
+      "pr_number": 33145,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:1031e8acbe2db1ea15d6a50e#generalist",
+      "pr_number": 33145,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:1031e8acbe2db1ea15d6a50e#naming",
+      "pr_number": 33145,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "arm_id": "generalist",
+      "invocation_id": "wu:7f4540ff384350b046f6deda#generalist",
+      "pr_number": 33145,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:7f4540ff384350b046f6deda"
+    }
+  ],
+  "delegated": 57,
+  "failed": 0,
+  "issues_total": 10,
+  "mandatory": 36,
+  "paused": 16,
+  "proposals_total": 138,
+  "pruned": 81,
+  "routing_mode": "lead",
+  "run_id": "v5run:pr5_patchset_qwen_3pr_rep1",
+  "run_name": "pr5_patchset_qwen_3pr_rep1",
+  "run_plan_sha256": "bb0e209cd83a2e104f90fccebad8258f55315c64b7ca656373d05c5881eeeb1e",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "d7101ab057795a31ef75ea84b0eefda172b49923960c9cfdbe54f65084bbd084",
+  "succeeded": 41,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 10087825.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 560404.0,
+    "tokens": 10648229.0
+  },
+  "wall_seconds": 1901.535552
+}

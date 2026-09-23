@@ -35,7 +35,7 @@ from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_byt
 
 from src.mathlib_review.agenda.registry import (
     ARM_DEFINITIONS, UNIVERSAL_CONTEXT_TOOLS, checkable_arms, context_grants,
-    MODULE_DOC_KINDS as _MODULE_DOC_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
+    DOCUMENTATION_KINDS as _DOCUMENTATION_KINDS, PLACEMENT_KINDS as _PLACEMENT_KINDS,
 )
 from src.mathlib_review.schema.review import CONTEXT_TOOLS, ReviewArm
 
@@ -58,6 +58,20 @@ GENERALIST_ARM_ID = "generalist"
 #: made every dry-run projection pessimistic by the same factor.
 COST_HINT_PER_WORK_UNIT = 0.05
 
+#: The same hint in processed tokens, for the run-total token ceiling's preflight.
+#:
+#: Measured 2026-09-22 over 2,857 arm attempts on nine v5 runs: median 35,276, mean 47,594,
+#: p90 87,589 (docs/research/2026-09-22-token-budget-calibration.md). 60,000 sits above the
+#: mean by the same ~1.3x the dollar hint sits above its own, so the two projections are
+#: equally conservative and a run that fits in one fits in the other.
+#:
+#: A module constant rather than a field on `ReviewArm` deliberately: `cost_hint` is inside
+#: `arm_sha256_by_id`, so a token twin beside it would re-hash every arm, every agenda and
+#: every sealed plan for a number no arm varies. Both call sites here pass the same value, so
+#: a count times this constant is exactly the sum. If arm hints ever diverge, this has to move
+#: onto the arm and take the re-hash.
+TOKEN_HINT_PER_WORK_UNIT = 60_000
+
 
 
 #: Lifecycles a v5 specialist may be scheduled on.
@@ -79,7 +93,7 @@ V5_SPEC_VERSION = "focused/1-v5"
 
 #: Declared in `arm_registry` with the arms that use them; re-exported because callers here
 #: and in the tests import them from this module.
-MODULE_DOC_KINDS = _MODULE_DOC_KINDS
+DOCUMENTATION_KINDS = _DOCUMENTATION_KINDS
 PLACEMENT_KINDS = _PLACEMENT_KINDS
 
 

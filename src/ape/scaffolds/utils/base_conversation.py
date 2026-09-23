@@ -43,7 +43,8 @@ class BaseConversationManager(ABC):
         task: 'BaseTask',
         cost_limit: Optional[float] = None,
         logger: Optional['logging.LoggerAdapter'] = None,
-        is_cli_mode: bool = False
+        is_cli_mode: bool = False,
+        token_limit: Optional[int] = None
     ):
         """
         Initialize base conversation manager
@@ -54,10 +55,12 @@ class BaseConversationManager(ABC):
             cost_limit: Cost limit
             logger: Logger instance
             is_cli_mode: Whether in CLI mode
+            token_limit: Processed-token ceiling
         """
         self.config = config
         self.task = task
         self.cost_limit = cost_limit
+        self.token_limit = token_limit
         self.logger = logger or task.logger or create_logger()
         self.is_cli_mode = is_cli_mode
 

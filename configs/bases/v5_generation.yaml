@@ -74,3 +74,32 @@ dataset:
   # 10.00 against a measured floor of ~1.35 and worst-case discretionary of 6.00 on the four
   # smoke PRs: room to grow, but not room to run away.
   run_total_cost_cap: 10.00
+
+  # The same five caps in processed tokens, which is the denomination that survives a price
+  # of zero. Every cap above binds BILLED spend, and the four locally hosted elm_* models are
+  # priced 0.0 because that is what they cost — so on those the whole block above is
+  # decorative and these are the only budget the run has. `cli plan` refuses a run on a
+  # zero-priced model that has left them unset.
+  #
+  # Calibrated 2026-09-22 at 1,200,000 processed tokens per billed dollar: measured over 16
+  # v5 runs, median 1,230,650, range 1.01M–1.70M, and agreeing to within 4% across arms
+  # (1,195,402), solo (1,155,912) and judge (1,152,608) tasks.
+  # docs/research/2026-09-22-token-budget-calibration.md has the derivation.
+  #
+  # No exchange rate is applied at runtime — these are literal ceilings, and the rate was used
+  # once to pick them. Their RATIOS are load-bearing: 1,800,000 / 360,000 = 5 is the same five
+  # standard jobs a lead may buy under 1.50 / 0.30, so changing one without the others changes
+  # what the lead does rather than what it is measured in.
+  #
+  # Against the measured distributions: arms p50 35,276 / p90 87,589 / p99 243,736 / max
+  # 558,101, so 360,000 would have cut 6 of 2,857 arms (0.21%) where $0.30 cut none — the
+  # heaviest arms are the cheapest per token, because a long investigation re-sends a cached
+  # prefix at 1/14th the input rate. That gap is an artifact of the cache discount and does
+  # not exist on the models this block is for, which report no cache at all.
+  standard_budget_tokens: 360000
+  lead_token_cap: 1200000
+  per_pr_token_cap: 1800000
+  solo_token_cap: 1800000
+  # 12,000,000 against measured 12-PR run totals of 8.5M–16.7M, the same relation $10.00 has
+  # to the same runs' $7.22–$14.05: a preflight estimate check, not a live ceiling.
+  run_total_token_cap: 12000000

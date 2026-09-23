@@ -34,6 +34,20 @@ paths:
   ranking (filtering a ranked top-k silently shortens it).
 - **Per-arm benches score location + silence only** — a bench hit is necessary, not sufficient, for a
   scored hit. Payloads come from `build_agenda`; never rebuild them, and they carry no gold.
+- **A task-data key the task model does not declare was dropped on the way to the worker
+  (fixed 2026-09-16).** `TaskOrchestrator` built each job's `task_data` from
+  `task.data.model_dump()`, and `BaseTaskData` ignores undeclared keys, so every reserved
+  run-level directive vanished between the caller and the runtime: the lead's
+  `execution_limits` never reached its arms (they ran under the *nested* orchestrator's
+  `sample_max_cost` -- $1.00 -- not the run's `standard_budget_cap` of $0.30, so every v5 arm
+  cap in the record is the looser number), and a decision-turn replay ran the task from its
+  prompt instead, producing submissions that looked exactly like replays. `BaseTask.job_data()`
+  now carries the payload's extra keys alongside the validated dump. **A directive that
+  travels in task data must be asserted at the far end, not at the near one:** the unit test
+  passed `task_data` straight to `main_from_params` and could not see the orchestrator drop it;
+  what caught it was one real one-sample run and the absence of `session_replay.json` in the
+  attempt. Every replay outcome row now carries `replayed_from_prefix`, and `replay_report`
+  refuses a run with any stray row rather than reporting a re-run's variance as a decision's.
 - **Caps bind billed cost, not nominal** (they differ ~2.5× with prompt caching), so a job spends its
   whole cap; every scheduled task writes `task_outcome.json`; `task_result.json` is never synthesised
   for a pause or failure.
@@ -152,6 +166,77 @@ paths:
   `success: true` was wrong however deep the session was, and it fixed a false promise in the
   `correctness` prompt — but as-is endings did *not* fall after it (9 of 17, 53%), so it is not
   the fix for a problem that was mostly not there.
+- **Any proposal about which of the system's findings reach a maintainer is SELECTION, however it
+  is phrased (2026-09-22).** It has now been derived five times under five names: a pointwise
+  selector, a listwise one, an agentic one, a legibility score, and "the publication rule" -- the
+  last of which got past the standing refusal in `dead-ends.md` by being about concern *families*
+  rather than individual findings, which is the same decision at a coarser grain. The tells: a keep
+  rule, a threshold, a ranking, a second channel, a confidence cut, "publish the families that
+  hit". **The ordering rule that comes first: fix the generator.** The user's ruling, 2026-09-22 --
+  *"we currently don't have a good enough reviewer to start talking about selection"* -- and the one
+  intervention that moved issue recall (0.20 -> 0.50) did it by changing what the arms say, not by
+  re-ranking what they had already said. Measuring the gate is fine and the measurement is kept;
+  proposing a different gate is not.
+- **"What the run found" and "what it would tell a maintainer" are different numbers, and only
+  one was ever reported (2026-09-22).** `finalize` publishes a claim only when a deterministic
+  collector can warrant its concern family and keeps the rest as `diagnostic` with `channels: []`.
+  Over the three held-out A reps the run hits **7 / 5 / 6** gold obligations and publishes
+  **2 / 1 / 1**; 21 of rep1's 24 suppressed hit-findings say "no collector can support this
+  claim's concern family". The gate's axis is close to orthogonal to where maintainers ask:
+  `correctness` files 161, hits 39, publishes 2, while `generalization` has never hit and
+  publishes 40%; the generalist holds **64 of 71** hits at 2.8% publication. Quote the pair, never
+  one of them -- `report buckets --audit` prints both in its `gate` block, with control emission
+  beside them, because published control emission is **0/0/0** against 12 pre-gate and the gate is
+  what buys it. `docs/research/the-admission-gate-2026-09.md`.
+- **A capability nothing has ever exercised is a capability nobody has ever tested (2026-09-22).**
+  `patch_set` -- the one way to submit a fix spanning declarations -- was carried by 0 of 3,411
+  candidates across 60 runs, and *five* independent defects were waiting in it: granted to the one
+  arm that never files, `Path(WorkspaceInfo)` raising on first use, `apply` splicing a declaration
+  by `text.replace(name, new, 1)` so a well-formed edit rewrote the first *mention* of the name
+  (its own docstring) and compiled the wreckage, the contract template omitting the field under
+  "This supersedes any field list above", and the finding schema dropping it before the judge. Two
+  of the five had tests written over them that passed: one assigned a string where the runtime
+  passes a `WorkspaceInfo`, and every source in the patch-set tests was a single line whose
+  declaration name occurred exactly once. **Before costing a capability's absence as a finding
+  about the model, exercise it once by hand** -- here that was two local compiles, no spend, and it
+  is the check that separates "the arms decline to use it" from "it never worked".
+- **A gold-site silence is not evidence about an arm unless the ask was in that arm's remit
+  (2026-09-21).** "41 of 45 gold-site specialist silences reproduce under replay" was read for a
+  week as arms withholding findings, and a plan costed three interventions against it. Labelling
+  all 58 silent sessions against the ask each was silent about says otherwise: **37 are an arm
+  correctly quiet about somebody else's concern** (`duplication` at a rename, `naming` at "factor
+  out the repeated argument"), 17 are the right arm declining on stated grounds, and the three
+  mechanisms total four sessions. An on-concern arm was scheduled at **22 of 22** counted
+  obligations, so this is not a coverage gap either. `cli report silences` computes the remit test
+  (`registry.expected_concerns` bridged through `benches.gold_labels_for`); use it before reading
+  any silence count as a fact about a contract, and see
+  `docs/research/specialist-silences-2026-09.md`.
+- **The abstention *reason* is not the diagnosis; the detail is.** Replay produced a different
+  `abstention_reason` on 17 of 45 sessions with the outcome unchanged -- `already_correct` and
+  `could_not_establish` swap freely -- so any split built on the enum (including the 76%
+  `already_correct` figure that motivated the forcing experiment) is measuring a coin flip. Label
+  from `abstention_detail`, which now survives into replay outcome rows and into `report silences`.
+  `finalize` reads neither: it contains no occurrence of `abstention`.
+- **A forced-choice label vocabulary hides the mechanism it was built to count (2026-09-23).**
+  `SilenceLabel` admits one label per cell, and the rubric handed to the reader ranked
+  `decision_noise` above `advisory_suppressed` whenever any replay sample filed. So the two 33337
+  `naming` cells that motivated the advisory-licensing condition -- the arm writing "emerging
+  (`toLinearMap_` 21 vs `coe_` 7) ... so I'm not requesting a rename" while 2 of 5 replays filed
+  the gold rename -- were recorded as `decision_noise` and `evidence_gap`, and the condition was
+  then killed by a `>= 3 advisory_suppressed` gate that its own examples could not reach. An arm
+  that files 2 times in 5 at an `emerging` verdict is advisory-suppressed *and* unstable; the
+  labels are not alternatives. **The reader said so in its note** -- "the quote is a textbook
+  `advisory_suppressed` tell" -- and the note was in the store while the counts were what got
+  acted on. Two rules, both cheap: a label vocabulary for *mechanisms* must be non-exclusive,
+  because mechanisms co-occur and a taxonomy that forces a winner reports the tiebreak rule
+  rather than the system; and **read the notes before the counts**, since a `by_label` histogram
+  cannot say that its second choice was nearly as strong. Same family as the closed-vocabulary
+  trap above, one level up: there a correct registration was dropped by a second list, here a
+  correct observation was dropped by a ranking.
+- **`naming_norm` counts leaf PREFIXES only** (`naming_norm.py:122`, `leaf.split("_", 1)[0]`), so a
+  convention expressed in a suffix is invisible to it at any threshold. PR 33421's gold ask renames
+  `round_eq'` to `round_eq_div`; both are prefix `round`. Separate from the unreachable 0.80 bar
+  already recorded in `docs/todo/specialist-arm-contents.md`.
 - **Control-PR emission is 0-1 per run, not 0.** Measured over every v5 run covering 33315:
   `heldout12_rep1` 0/13 invocations, `heldout11_rep1` 1/11 (generalist), `heldout11_rep2` 1/11
   (generalist), `medium_heldout_rep1` 0/13, `validate_abstention_rep1` 1/18 (docs). The "0 false
@@ -161,3 +246,51 @@ paths:
   A single control candidate is inside the historical range and is not evidence that a change
   regressed precision; it takes reps, and the source says to label it `silent_pr_emission`,
   never a false-finding rate.
+- **Read a nested run's children from what was SCHEDULED, never from `results.task_results`.**
+  The orchestrator aggregates only finished tasks, and a task with a resumable sample writes
+  `task_outcome.json` and returns *before* aggregation — so a job that spent its whole cap and
+  concluded nothing is absent from that list entirely. Both readers this repository had did
+  exactly that; `cli replay` hit it, lost two whole sessions, and worked around it by locating
+  task directories from the tasks it had scheduled. `run_subtasks` is now the one way to nest
+  work and returns a `ChildRun` per spec — the spec, the `TaskOutcome` and the child's own
+  *typed* result — built from the scheduled tasks. `succeeded` means a legal submission came
+  back, never `execution_status == COMPLETED`: a task can complete having concluded nothing,
+  and a failed floor job once counted as coverage on exactly that conflation.
+- **`orchestrator_id` is a constructor argument.** `TaskOrchestrator.__init__` fixes
+  `workspace_path = runs_base_dir / orchestrator_id`, so assigning it afterwards changes
+  nothing except making `OrchestratorResults.orchestrator_id` disagree with the directory —
+  children land under `orchestrator_<timestamp>_<hash>/` and a resumed parent cannot find work
+  it already paid for.
+- **A ledger row has one constructor.** `ArmResponse` and `DelegationRecord`
+  (`schema/review.py`) are the only writers of `arm_responses.jsonl` and `delegations.jsonl`;
+  five dict literals in two files wrote them before, compared only by a test that parsed their
+  own source for quoted keys. `row()` uses `exclude_unset` deliberately: a pruned job carries
+  its outcome keys explicitly null and a rule-dispatched job does not carry them at all, and
+  flattening those makes "considered and declined" indistinguishable from "never considered".
+  Before changing either model, run `tests/datasets/test_pr_review_v5_row_models.py` — it
+  round-trips every row in the tree, byte for byte, which is how a float-typed `turns` gets
+  caught before it rewrites 20,262 rows.
+- **A stage reads a run through `StageInput` and leaves a row in `stages.jsonl`.** Rebuilding a
+  sibling path by hand is the defect `judge --of` fixed once and nothing generalised: the judge
+  still rebuilt `run_manifest.json` and `agenda_report.json` that way, replay re-implemented the
+  whole check, and choosing 45 replay sessions took a scratch join across four files that a
+  named selector reproduces as 58 (it filtered on required gold changes; the selector filters on
+  gold sites). `StageInput.at/of` resolves the artifacts a stage names, hashes exactly those,
+  and refuses a run whose manifest says it did not cover what it promised -- while a run with no
+  manifest stays *unchecked* rather than refused, because v4 runs never wrote one.
+  `run_state.RUN_ARTIFACTS` is where an artifact's filename, its writing stage and its
+  missing-file hint live; add one there, not in a caller.
+- **`write_once` and `append_jsonl` are different guarantees, and mixing them loses one.**
+  `write_once` refuses a second write with different bytes, which is what makes a run
+  reproducible; it must never touch a file written *while* work happens. Those -- the lead
+  journal, the context trace, the execution index, `stages.jsonl` -- are appended, and their
+  reader (`io.appended_rows`) stops at the first line it cannot parse, because a crash truncates
+  the last line by construction. Reading one with the strict reader loses every row before the
+  tear.
+- **A label is not gold and must never become gold.** `cli adjudicate` records judgements about
+  the ~90% of findings gold cannot judge, keyed by `finding_key` (site and kind, which recurs
+  127 times across three reps where the full key recurs 0). Gold's worth is that it is revealed
+  preference -- what maintainers actually asked for. An adjudication label is an opinion about
+  what they did not ask for: it may order a queue and say how much output has been read, and it
+  may not enter recall or be reported as precision. A human row outranks a `task:` row, a
+  correction is a later row rather than an edit, and disagreement is reported, never averaged.

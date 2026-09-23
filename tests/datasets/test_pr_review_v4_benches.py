@@ -228,6 +228,13 @@ def test_an_arm_payload_carries_no_gold():
     release = load_release(dataset)
     bench = build_all(dataset.release, roster(), pr_numbers=[33145])["duplication"]
 
+    # The exposure index off, because this test reads payload *keys* and the index moves only
+    # a priority value: the pool is the same 40 entries either way. `build_agenda` says it is
+    # "the one expensive input ... paid again by every test that builds one", and the base
+    # config turns it on, so this test was paying it -- 125.16s against 0.62s, half of a
+    # 350s suite for one assertion about spelling.
+    dataset = dataset.model_copy(update={"use_exposure_index": False})
+
     payloads = _payloads_for(bench, dataset, release)
     assert payloads
     for payload in payloads.values():

@@ -1,9 +1,10 @@
 """Single production renderer for both prompt previews and task execution."""
 
 import argparse
+import difflib
 import json
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from src.mathlib_review.io import canonical_json_bytes, jsonl_bytes, sha256_bytes, write_once
 from src.mathlib_review.schema import ChangeGraph, PromptPrecedent, RenderedPrompt, ReviewEpisodeInput, ReviewWorkUnit
@@ -91,6 +92,165 @@ Consider every item, but emit a candidate only for a concrete change you would a
 Do not report that an item was checked, does not apply, or is merely worth investigating."""
 
 
+#: The same checklist, addressed to every target at once instead of repeated under each.
+#:
+#: The per-target wording above is hashed into every frozen `rendered_prompts.jsonl`, so it is
+#: never edited in place; a renderer version chooses between them.
+FACET_CHECKLIST_ONCE = FACET_CHECKLIST.replace(
+    "### Maintainer ask checklist for this target\n"
+    "Consider every item, but emit a candidate only for a concrete change you would actually "
+    "request.",
+    "### Maintainer ask checklist\n"
+    "Apply every item to every review target above, but emit a candidate only for a concrete "
+    "change you would actually request.",
+)
+
+
+def _join_regions(chunks: Sequence[str], *, preserve_adjacency: bool) -> str:
+    """Concatenate a declaration's parts the way the file has them.
+
+    `"\n".join` inserts a separator unconditionally, and a region already ends with its own
+    newline, so it fabricated a blank line that is not in the source. On PR 33321 that turned
+    `… -/\n@[to_additive …` -- a doc-comment immediately followed by the attribute it belongs
+    to, which is ordinary Lean -- into `… -/\n\n@[to_additive …`, two floating comments. The
+    reviewer answered the artifact: it asked to remove "an extra adjacent doc comment" and the
+    judge scored the obligation a miss on a run where the site was correctly located.
+
+    `preserve_adjacency` is False only for `candidate-prompt/13`, whose release was built from
+    the fabricated form and must still re-render to the prompts it froze.
+    """
+
+    parts = [chunk for chunk in chunks if chunk]
+    if not preserve_adjacency:
+        return "\n".join(parts)
+    out = ""
+    for chunk in parts:
+        if out and not out.endswith("\n"):
+            out += "\n"
+        out += chunk
+    return out
+
+
+def target_diff_section(target: Any, attachments: Sequence[Any] = (),
+                        *, preserve_adjacency: bool = True) -> str:
+    """The `Exact changed fragments` body for one target, scoped to that target.
+
+    `diff_fragments` holds the raw `@@` hunks covering the target's changed ranges, so a target
+    in a single-hunk file inherits the whole file's diff. On PR 33149 that is one 17,303-char
+    hunk shipped to all 120 jobs, each reviewing one declaration averaging 163 characters — a
+    106:1 ratio of pasted diff to reviewed code — and across a 12-PR lead repetition the section
+    is 43.6% of all rendered prompt characters with 95.5% of its volume a re-send of a block
+    another job for the same PR already carries. Caching does not absorb it: the prompt diverges
+    at the change-id line, which precedes this section.
+
+    A target is by definition not a fragment, so the section is rendered from the target's own
+    two complete regions instead — the choice `analysis/review_overlay._pretty_diff` already
+    makes for the overlay, for the same stated reason.
+
+    Import blocks are the one kind with nothing to diff: `base_code` and `reviewed_code` are
+    built from semantic entities and an import block has none, so they keep the raw hunk, which
+    is the only record of what changed there. Measured over `dev-medium-0.3.0` that exception is
+    17 of 508 targets and 2,195 of 2,583,336 fragment characters. An empty diff falls back the
+    same way, so a target can never be shown a blank change.
+    """
+
+    raw = f"```diff\n{''.join(target.diff_fragments)}\n```"
+    # A declaration's doc-comment and attributes are separate targets but not separate code:
+    # in Lean they precede what they qualify, so they are diffed as part of it. Severing them
+    # cost two obligations on PR 33321 that every baseline repetition had found.
+    ordered = [*attachments, target]
+    base = _join_regions([item.base_code for item in ordered],
+                         preserve_adjacency=preserve_adjacency)
+    reviewed = _join_regions([item.reviewed_code for item in ordered],
+                             preserve_adjacency=preserve_adjacency)
+    if not base and not reviewed:
+        return raw
+    lines = list(difflib.unified_diff(
+        base.splitlines(), reviewed.splitlines(), lineterm="", n=3))
+    # `unified_diff` emits `--- ` / `+++ ` headers even with no file names given; the path is
+    # already in the target block's own header.
+    if lines[:1] and lines[0].startswith("---"):
+        lines = lines[2:] if lines[1:] and lines[1].startswith("+++") else lines[1:]
+    if not lines:
+        return raw
+    return "```diff\n" + "\n".join(lines) + "\n```"
+
+
+def target_block(target: Any, fragments_section: Optional[str] = None) -> str:
+    """One `## Review target` block, shared by the generalist and focused renderers.
+
+    The two renderers emitted this byte-for-byte independently until the fragment scoping
+    landed; it lives here because `render_focused` imports this module and not the reverse.
+    """
+
+    base = target.base_code if target.base_code is not None else "(not present)"
+    reviewed = target.reviewed_code if target.reviewed_code is not None else "(not present)"
+    if fragments_section is None:
+        fragments_section = f"```diff\n{''.join(target.diff_fragments)}\n```"
+    return (
+        f"## Review target\nChange ID (copy exactly): `{target.change_id}`\n"
+        f"Path: {target.path}\nKind: {target.kind}\n"
+        f"Primary subject (copy exactly): `{target.declaration_name or target.path}`\n"
+        f"Primary entity IDs (copy one, or null if none): "
+        f"{', '.join(target.reviewed_entity_ids + target.base_entity_ids) or '(none)'}\n"
+        f"### Complete base region\n```lean\n{base}\n```\n"
+        f"### Complete reviewed region\n```lean\n{reviewed}\n```\n"
+        f"### Exact changed fragments\n{fragments_section}"
+    )
+
+
+def target_blocks(targets: Iterable[Any], *, scoped: bool,
+                  preserve_adjacency: bool = True) -> List[str]:
+    """One block per target, with each distinct fragments section printed exactly once.
+
+    The first target to use a section prints it; a later target whose section is identical gets
+    a pointer to that target's subject. Under `scoped` the sections are per-target diffs and
+    rarely repeat, so the pointer is mostly inert there — it still fires for genuinely identical
+    changes, and it is what collapses a shared hunk when a target falls back to the raw form.
+    """
+
+    targets = list(targets)
+    # Attachments are rendered inside their owner's diff, so they point at it instead of
+    # repeating it. The owner may appear after them in the unit, so the wording does not say
+    # "above".
+    present = {item.change_id: item for item in targets}
+    attached_to_owner: Dict[str, List[Any]] = {}
+    if scoped:
+        for item in targets:
+            owner_id = getattr(item, "attached_to", None)
+            if owner_id and owner_id in present:
+                attached_to_owner.setdefault(owner_id, []).append(item)
+    owner_subject = {
+        owner_id: (present[owner_id].declaration_name or present[owner_id].path)
+        for owner_id in attached_to_owner
+    }
+    shown_with_owner = {
+        item.change_id: owner_id
+        for owner_id, items in attached_to_owner.items() for item in items
+    }
+
+    first_use: Dict[str, str] = {}
+    blocks: List[str] = []
+    for target in targets:
+        if target.change_id in shown_with_owner:
+            blocks.append(target_block(target, "Shown with the changed fragments for "
+                                       f"`{owner_subject[shown_with_owner[target.change_id]]}`."))
+            continue
+        section = target_diff_section(
+            target, attached_to_owner.get(target.change_id, ()),
+            preserve_adjacency=preserve_adjacency) if scoped else (
+            f"```diff\n{''.join(target.diff_fragments)}\n```")
+        subject = target.declaration_name or target.path
+        owner = first_use.get(section)
+        if owner is None:
+            first_use[section] = subject
+            blocks.append(target_block(target, section))
+        else:
+            blocks.append(target_block(
+                target, f"Identical to the fragments shown for `{owner}` above."))
+    return blocks
+
+
 GENERIC_MAINTAINER_EXEMPLARS = """# Synthetic maintainer-request exemplars
 These examples teach specificity and register only. They are not evidence or patterns to copy unless
 the reviewed target independently supports the same request.
@@ -155,36 +315,75 @@ def _index(items: Iterable, attr: str) -> Dict[str, object]:
     return {getattr(item, attr): item for item in items}
 
 
+def generalist_features(renderer_version: str) -> Dict[str, bool]:
+    """Which prompt changes a generalist renderer version selects, one flag each.
+
+    They arrived together at `candidate-prompt/13` and should not have. On
+    `pr5_A_lead_heldout12_rel040_rep1` the generalist's candidates per job fell from 1.24 and
+    1.30 across the two 0.3.0 repetitions to 0.71 -- a 45% drop in the arm that produces most of
+    this system's matched output -- while the focused arms, which none of these three changes
+    touched, held at 0.14/0.20 -> 0.21. Three simultaneous prompt changes and one moved number
+    says nothing about which.
+
+    `/14` therefore keeps the two with measurement behind them and restores the contract, which
+    had the least. It was dropped on the argument that the focused arms do not carry it and
+    review normally -- but the arms emit 0.2 candidates per job against the generalist's 1.3, so
+    they were never the reference class for an instruction whose job is to make the model speak.
+
+    Each flag is separate so a later version can move exactly one and be read.
+    """
+
+    number = renderer_number(renderer_version)
+    return {
+        #: Each target's diff is its own change, not the `@@` hunk it happens to sit in.
+        "scoped_diffs": number >= 13,
+        #: The checklist once below the targets instead of under every one.
+        "checklist_once": number >= 13,
+        #: The contract repeated in the user message, where the model may weight it more than
+        #: the identical system prompt. Dropped at /13, restored at /14, and the difference
+        #: between those two releases is the measurement of whether it was load-bearing.
+        "contract_in_user_message": number < 13 or number >= 14,
+        #: Join a declaration's parts the way the file has them. False only for /13, whose
+        #: release was built from a join that fabricated a blank line.
+        "preserve_adjacency": number >= 14,
+    }
+
+
 def render_work_unit(
     unit: ReviewWorkUnit, episode: ReviewEpisodeInput, graph: ChangeGraph,
     precedents: Iterable[PromptPrecedent] = (),
 ) -> RenderedPrompt:
     targets = _index(graph.targets, "change_id")
-    blocks = []
-    for change_id in unit.change_ids:
-        target = targets[change_id]
-        base = target.base_code if target.base_code is not None else "(not present)"
-        reviewed = target.reviewed_code if target.reviewed_code is not None else "(not present)"
-        blocks.append(
-            f"## Review target\nChange ID (copy exactly): `{change_id}`\n"
-            f"Path: {target.path}\nKind: {target.kind}\n"
-            f"Primary subject (copy exactly): `{target.declaration_name or target.path}`\n"
-            f"Primary entity IDs (copy one, or null if none): "
-            f"{', '.join(target.reviewed_entity_ids + target.base_entity_ids) or '(none)'}\n"
-            f"### Complete base region\n```lean\n{base}\n```\n"
-            f"### Complete reviewed region\n```lean\n{reviewed}\n```\n"
-            f"### Exact changed fragments\n```diff\n{''.join(target.diff_fragments)}\n```"
-            f"\n{FACET_CHECKLIST}"
-        )
+    unit_targets = [targets[change_id] for change_id in unit.change_ids]
+    features = generalist_features(unit.renderer_version)
+    if features["scoped_diffs"]:
+        blocks = target_blocks(
+            unit_targets, scoped=True,
+            preserve_adjacency=features["preserve_adjacency"])
+    else:
+        blocks = [target_block(target) for target in unit_targets]
+    if features["checklist_once"]:
+        blocks = blocks + [FACET_CHECKLIST_ONCE]
+    else:
+        blocks = [f"{block}\n{FACET_CHECKLIST}" for block in blocks]
     treatment = ""
     if unit.renderer_version == "candidate-prompt/9":
         treatment = f"{GENERIC_MAINTAINER_EXEMPLARS}\n\n"
     elif unit.renderer_version == "candidate-prompt/10":
         rendered_precedents = render_precedent_block(precedents)
         treatment = f"{rendered_precedents}\n\n" if rendered_precedents else ""
+    # The contract is the system prompt. Sending it again under `# Review contract` in the user
+    # message put the identical 2,482 characters in front of the model twice on every call —
+    # 203 of 203 generalist prompts in `pr5_A_lead_heldout12_fp3_rep1`, 503,846 characters,
+    # 12.5% of that run's generalist user text — and the copy is the expensive one: user text is
+    # billed at roughly 4.7x a token inside the cached prefix. The focused arms never carried it
+    # (0 of 1,206 in the same run) and review normally, which is the evidence that it is
+    # redundant rather than load-bearing.
+    contract = (
+        f"# Review contract\n{system_prompt_for(unit.renderer_version)}\n\n"
+        if features["contract_in_user_message"] else "")
     user = (
-        "# Review contract\n"
-        f"{system_prompt_for(unit.renderer_version)}\n\n"
+        f"{contract}"
         f"{treatment}"
         f"# PR #{episode.pr_number}: {episode.title.text or ''}\n"
         f"Round: {episode.round_index}\nDescription: {episode.description.text or '(unavailable)'}\n"

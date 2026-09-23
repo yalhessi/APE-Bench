@@ -1,0 +1,58 @@
+{
+  "agent_added": 4,
+  "candidates_total": 6,
+  "completion_status": "partial",
+  "context_calls_total": 20,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "duplication",
+      "invocation_id": "wu:230e4c75daf818c75b024525#duplication",
+      "pr_number": 33438,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    },
+    {
+      "arm_id": "family_design",
+      "invocation_id": "wu:230e4c75daf818c75b024525#family_design",
+      "pr_number": 33438,
+      "reason": "paused_token_limit",
+      "status": "paused_tokens",
+      "work_unit_id": "wu:230e4c75daf818c75b024525"
+    }
+  ],
+  "delegated": 9,
+  "failed": 0,
+  "issues_total": 6,
+  "mandatory": 5,
+  "paused": 3,
+  "proposals_total": 11,
+  "pruned": 2,
+  "routing_mode": "lead",
+  "run_id": "v5run:iter_qwen_plumbing_33438_rep1",
+  "run_name": "iter_qwen_plumbing_33438_rep1",
+  "run_plan_sha256": "0c3281a23b839c5862f6dfc7c3178bea80f5a54100ba3b2be41ecd0e5133539e",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "9d51eed8e39c1916bd53cef59fa1c24368300e564c3ffd5d83f2085368acba7f",
+  "succeeded": 6,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 2570996.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 567725.0,
+    "tokens": 3138721.0
+  },
+  "wall_seconds": 963.051586
+}

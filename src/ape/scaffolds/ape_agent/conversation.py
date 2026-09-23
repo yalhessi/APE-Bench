@@ -79,6 +79,26 @@ def should_stop_conversation(session: 'ConversationSession',
     return False, ""
 
 
+
+def _jsonable(value: Any) -> Any:
+    """A last-resort encoder for the replay record, so tracing can never fail a replay.
+
+    `task_data_seen` echoes whatever the condition overrode, and a task-data value is not
+    always JSON: `target_workspace` is a `WorkspaceInfo`. Without this, writing the record
+    raised `TypeError` inside `_replay_tool_definitions` and killed the attempt -- a
+    diagnostic taking down the run it was meant to make legible, which is the same shape as
+    the defect it was added to catch.
+    """
+
+    dump = getattr(value, "model_dump", None)
+    if callable(dump):
+        try:
+            return dump(mode="json")
+        except Exception:  # noqa: BLE001
+            pass
+    return repr(value)
+
+
 class ApeAgentConversationManager:
     """Conversation manager for APE Agent scaffold.
 
@@ -93,10 +113,12 @@ class ApeAgentConversationManager:
                  task: Optional['BaseTask'] = None, cost_limit: Optional[float] = None,
                  logger: Optional['logging.LoggerAdapter'] = None,
                  interrupt_event: Optional[asyncio.Event] = None,
-                 is_cli_mode: bool = False):
+                 is_cli_mode: bool = False,
+                 token_limit: Optional[int] = None):
         self.config = config
         self.task = task
         self.cost_limit = cost_limit
+        self.token_limit = token_limit
         self.logger = logger or create_logger()
         self.is_cli_mode = is_cli_mode
 
@@ -422,8 +444,106 @@ class ApeAgentConversationManager:
                     self.logger.warning(
                         f"Failed to load session file {latest_session_file.name}, will create a new session"
                     )
+            elif getattr(self.task, "session_replay", None) is not None:
+                return await self._session_from_replay()
 
+        if getattr(self.task, "session_replay", None) is not None:
+            from .replay import ReplayRefused
+
+            raise ReplayRefused(
+                "a replay reached a fresh session (no attempt path, or an unreadable session "
+                "file); refusing to start it from its prompt")
         return await self.create_conversation_session(max_turns, tools)
+
+    async def _session_from_replay(self) -> 'ConversationSession':
+        """Start from the recorded prefix a `session_replay` directive names.
+
+        The conversation then continues exactly as a resume would, through
+        `_create_session_from_existing`. Consulted only when the attempt has no session file,
+        so a paused replay resumes its own file and is never reseeded.
+
+        Two things are deliberately not carried over. The session id is fresh: this is a new
+        conversation, and N resamples of one prefix must not share an identity. And assistant
+        `usage` is dropped, because `_restore_conversation_usage` would otherwise charge the
+        recorded session's spend to this attempt -- against its cost cap and in its reported
+        cost -- when that spend was billed to the run that produced it.
+
+        Every failure raises. A task that was asked to start from a recording and silently
+        started from its prompt would be measured as if it had not.
+        """
+
+        from ape.llm_clients.models import ConversationNode, ConversationSession
+        from .replay import load_prefix
+
+        session = ConversationSession()
+        for row in load_prefix(self.task.session_replay):
+            node = ConversationNode.model_validate(row)
+            if node.type == "assistant":
+                node.message.usage = None
+            session.nodes.append(node)
+        seeded = await self._create_session_from_existing(session)
+        self._restore_conversation_usage(seeded)
+        self.logger.info(
+            f"Replay: started session {seeded.session_id} from a recorded prefix of "
+            f"{len(seeded.nodes)} nodes ({seeded.get_assistant_count()} assistant turns)"
+        )
+        return seeded
+
+    def _replay_tool_definitions(self, registered: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Under a replay, show the recorded tool definitions; calls execute as registered.
+
+        A recorded tool that is no longer registered is refused -- the model would be offered
+        a call that cannot run. A registered tool whose definition differs from the recording
+        is `tool_drift`: the recording is still what is shown, and the attempt says so in
+        `session_replay.json`, because the tool's behaviour is today's.
+        """
+
+        replay = getattr(self.task, "session_replay", None)
+        if replay is None:
+            return registered
+
+        from .replay import (
+            REPLAY_RECORD_FILENAME, ReplayRefused, load_prefix, recorded_tools,
+            tool_definition_sha256,
+        )
+
+        shown = recorded_tools(load_prefix(replay))
+        live = {(tool.get("function") or {}).get("name"): tool for tool in registered}
+        missing = sorted(name for name in ((t.get("function") or {}).get("name") for t in shown)
+                         if name not in live)
+        if missing:
+            raise ReplayRefused(f"replay shows recorded tools that are not registered: {missing}")
+        record = {
+            "prefix_sha256": replay.prefix_sha256,
+            "tool_drift": sorted(
+                name for name, tool in live.items()
+                if name in replay.recorded_tool_sha256
+                and tool_definition_sha256(tool) != replay.recorded_tool_sha256[name]),
+            "registered_not_shown": sorted(set(live) - set(replay.recorded_tool_sha256)),
+            # What the task actually holds for each key the condition overrode, read off the
+            # live task rather than off the directive. A condition that does not arrive is
+            # otherwise indistinguishable from one that changed nothing, and that is the
+            # shape of the defect that made arms run at $1.00 against a $0.30 cap for the
+            # whole of v5: the directive was asserted where it was written, not where it lands.
+            # Read the payload first, then the validated model. A reserved run-level key --
+            # `execution_limits`, `session_replay` -- is deliberately NOT a field on the data
+            # model (`BaseTask.payload`, `ape/tasks/base.py`), so reading only `task.data`
+            # reported `None` for exactly the keys this check exists to catch. That is the
+            # defect it was built for, in the check itself.
+            "task_data_seen": {
+                key: (self.task.payload or {}).get(
+                    key, getattr(getattr(self.task, "data", None), key, None))
+                if getattr(self.task, "payload", None)
+                else getattr(getattr(self.task, "data", None), key, None)
+                for key in getattr(replay, "overridden_keys", [])},
+        }
+        if self.task.attempt_path:
+            (self.task.attempt_path / REPLAY_RECORD_FILENAME).write_text(
+                json.dumps(record, indent=2, default=_jsonable) + "\n", encoding="utf-8")
+        if record["tool_drift"]:
+            self.logger.warning(f"Replay: tool definitions drifted since recording: "
+                                f"{record['tool_drift']}")
+        return shown
     
     async def _create_session_from_existing(self, existing_session: 'ConversationSession') -> 'ConversationSession':
         """
@@ -696,6 +816,7 @@ class ApeAgentConversationManager:
 
         # Fetch available tools so we can record them in the session
         tools_list = await self._get_available_tools(mcp_instance) if mcp_instance else []
+        tools_list = self._replay_tool_definitions(tools_list)
         self.tools = tools_list
 
         # Initialize or resume the session
@@ -777,6 +898,8 @@ class ApeAgentConversationManager:
                 (u.cached_total_cost or u.total_cost) for u in self._conversation_usage
             )
             nominal_cost = sum(u.total_cost for u in self._conversation_usage)
+            current_tokens = sum(
+                u.processed_tokens for u in self._conversation_usage)
 
             # Enforce turn limit
             if current_turns >= max_turns:
@@ -804,12 +927,36 @@ class ApeAgentConversationManager:
                         f"Cost limit exceeded: billed ${current_cost:.6f} >= ${self.cost_limit:.6f} "
                         f"(nominal ${nominal_cost:.6f})"
                     )
+
+            # Enforce the token ceiling, at the same checkpoint and off the same records.
+            #
+            # Not discounted for caching, deliberately and unlike the cost above: a cached
+            # prompt token is still a token the provider processed, and the ceiling exists for
+            # models where nothing is billed and the cache discount therefore does not exist.
+            # Counting billed-equivalent tokens would make the same conversation measure
+            # differently on two providers, which is the one property this ceiling has that
+            # the dollar one does not.
+            if self.token_limit is not None:
+                if current_tokens >= self.token_limit:
+                    from ape.llm_clients.config import TokenBudgetExhaustedError
+                    self.logger.warning(
+                        f"Token limit exceeded: {current_tokens:,} >= limit {self.token_limit:,} "
+                        f"(billed ${current_cost:.6f}) - "
+                        f"last turn's message and tools are saved for potential resume"
+                    )
+                    raise TokenBudgetExhaustedError(
+                        f"Token limit exceeded: {current_tokens:,} >= {self.token_limit:,} "
+                        f"(billed ${current_cost:.6f})"
+                    )
             
             # Log state on the first turn or at regular checkpoints
             if current_turns == 0:
                 cost_str = f"limit ${self.cost_limit:.6f}" if self.cost_limit else "N/A"
+                token_str = f"limit {self.token_limit:,}" if self.token_limit else "N/A"
                 self.logger.info(
-                    f"Starting conversation - turns: {current_turns}/{max_turns}, current_cost: ${current_cost:.6f}, {cost_str}"
+                    f"Starting conversation - turns: {current_turns}/{max_turns}, "
+                    f"current_cost: ${current_cost:.6f}, {cost_str}, "
+                    f"current_tokens: {current_tokens:,}, {token_str}"
                 )
             
             # ================================================================

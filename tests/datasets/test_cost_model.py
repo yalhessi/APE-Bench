@@ -14,7 +14,6 @@ under the legacy model, so switching between them is lossless in both directions
 
 from __future__ import annotations
 
-from types import SimpleNamespace
 
 import pytest
 
@@ -31,8 +30,14 @@ RECORDED_NOMINAL, RECORDED_BILLED = 1.16440975, 0.69994575
 
 
 class _Provider(BaseProvider):
-    def __init__(self, cost_model=DEFAULT_COST_MODEL, model=GPT52):
-        self.config = SimpleNamespace(formal_model_name=model, cost_model=cost_model)
+    def __init__(self, cost_model=DEFAULT_COST_MODEL, model="gpt_5.2"):
+        # A real `LLMConfig`, not a `SimpleNamespace`: pricing now resolves by canonical
+        # name before falling back to the formal one, and a hand-built fake is free to be
+        # missing a field the real class has -- which is how this fixture would have gone
+        # green while `_calculate_cost` raised `AttributeError` in production.
+        # `model` is therefore the canonical key ("gpt_5.2"), not the formal id.
+        self.config = LLMConfig(model_name=model, cost_model=cost_model)
+        assert self.config.formal_model_name == GPT52
 
     def build_request_payload(self, *a, **k): ...
     async def make_request(self, *a, **k): ...

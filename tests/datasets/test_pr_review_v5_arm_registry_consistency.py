@@ -70,11 +70,23 @@ def test_every_arm_keeps_lean_verify_edit():
         assert "lean_verify_edit" in definition.granted_tools(), definition.arm_id
 
 
-def test_a_patch_set_arm_is_one_whose_scope_is_a_group():
-    """Only an arm reviewing a set of declarations has anything to coordinate. Granting it
-    broadly turns a bounded capability into a licence to rewrite whatever the arm was shown."""
+def test_a_patch_set_arm_is_one_a_compile_can_settle_or_one_whose_remit_is_the_group():
+    """A coordinated patch's only warrant is one compile of every file it touches, so the
+    grant is the compile-checkable arms plus `family_design`, whose whole remit is the group.
+    `naming`, `docs` and `style` ask for names, prose and formatting, where the compile is not
+    what makes the ask right, and they have no way to earn the warrant.
 
-    assert arm_registry.patch_set_arms() == {"family_design"}
+    This asserted `== {"family_design"}` until 2026-09-22, on the reasoning that only an arm
+    reviewing a set of declarations has anything to coordinate and that a broad grant is "a
+    licence to rewrite whatever the arm was shown". Both halves moved: since the repack a work
+    unit routinely holds a dozen declarations, so every arm reviews a set, and the licence
+    objection is what `patchset.anchor_problems` removes -- an edit may only touch a target the
+    candidate claimed. The arm that held the capability was the one that never used it: 182
+    responses, 0 candidates.
+    """
+
+    assert arm_registry.patch_set_arms() == arm_registry.checkable_arms() | {"family_design"}
+    assert not (arm_registry.patch_set_arms() & {"naming", "docs", "style"})
 
 
 def test_family_design_has_no_identifier_lookup():
@@ -152,8 +164,23 @@ EXPECTED_SPEC_IDENTITY = {
     # was ever produced for a call with no edit. The prompt now describes what that call
     # actually answers (`compiles`, `errors_already_in_the_file`) and says outright that
     # `compiles: true` is where the work starts. Nine of ten identities are unchanged.
-    "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "0272b478d6e9",
-    "duplication": "dcef56db2ee5", "family_design": "860fd12098a9",
+    # `docs` moved 0272b478d6e9 -> 017bf3f92a5c and `style` d82d80097e5a -> ba219a5656d0 on
+    # 2026-09-14, deliberately and together: `cg1_builder_v3` stopped filing a declaration's
+    # `/-- … -/` and `@[…]` under `command`, so `DOCUMENTATION_KINDS` gained `doc_comment` and
+    # `PLACEMENT_KINDS` gained `attribute`. Without that the two arms chartered for
+    # documentation and placement could be scheduled on none of the 85 such targets in
+    # `dev-medium-0.4.0` -- including the doc-comment PR 33321's two documentation obligations
+    # sit on. Eight of ten identities are unchanged, which is the check that this widened two
+    # arms and not the registry's shape.
+    # `family_design` moved 860fd12098a9 -> 3ea371ffc42c on 2026-09-22, deliberately: its
+    # "## Coordinated fixes" paragraph moved out of its own system prompt and into
+    # SUBMISSION_CONTRACT, which every granted arm now reads. It had been the one arm allowed
+    # to submit a `patch_set` and it was told so 2,400 characters above a JSON template that
+    # did not list the field and that opens "This supersedes any field list above"; 0 of 3,411
+    # candidates across 60 runs ever carried one. Nine of ten identities are unchanged, which
+    # is the check that the instruction moved rather than that ten prompts were reworded.
+    "api_reuse": "cab1c1dd3561", "correctness": "9fe3c13087f2", "docs": "017bf3f92a5c",
+    "duplication": "dcef56db2ee5", "family_design": "3ea371ffc42c",
     # `naming` moved 8dfd2c87af4d -> ee245f077b7e on 2026-09-13, deliberately: the arm was
     # calibrated to "what the local family already does" and stayed silent 13/13 reps on a
     # real naming ask while its tools worked, so the contract now points at the repository's
@@ -161,7 +188,7 @@ EXPECTED_SPEC_IDENTITY = {
     # advisory ask on an emerging one. Nine of ten identities are unchanged, which is the
     # check that this touched one arm and not the registry's shape.
     "generality": "ef5c1b06333a", "naming": "ee245f077b7e", "proof_golf": "854c179f8da7",
-    "proof_idiom": "d0d4b417257d", "style": "d82d80097e5a",
+    "proof_idiom": "d0d4b417257d", "style": "ba219a5656d0",
 }
 
 
@@ -173,15 +200,22 @@ def test_spec_identities_are_unchanged():
 
 
 def test_the_arms_that_may_look_beyond_declarations_still_can():
-    """`docs` reaches module docs; `style` reaches module docs and placement. Every other arm
-    sees declarations only. This is the field that vanished."""
+    """`docs` reaches documentation; `style` reaches documentation and placement. Every other
+    arm sees declarations only. This is the field that vanished.
+
+    `doc_comment` and `attribute` are named here too: a declaration's own docstring is
+    documentation and its attributes are placement, and filing both under `command` is what
+    made them unschedulable.
+    """
 
     from src.mathlib_review.agenda.arms import v5_specs
 
     kinds = {spec.spec_id: spec.subject_kinds for spec in v5_specs()}
-    assert "module_doc" in kinds["docs"]
-    assert {"module_doc", "namespace_or_section", "command", "import"} <= kinds["style"]
+    assert {"module_doc", "doc_comment"} <= kinds["docs"]
+    assert {"module_doc", "doc_comment", "namespace_or_section", "command", "import",
+            "attribute"} <= kinds["style"]
     assert "module_doc" not in kinds["naming"]
+    assert "doc_comment" not in kinds["naming"]
 
 
 def test_nothing_but_the_registry_names_an_arm_when_building_specs():

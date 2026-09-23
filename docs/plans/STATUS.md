@@ -43,7 +43,7 @@ of anything.
 | 12 | Run transitions written as an explicit state machine | **Built** — `mathlib_review/run_state.py`. Wired rather than documented: the judge asks `SCOREABLE` instead of comparing against the literal `"complete"`. The manifest's own `complete`/`partial`/`failed` vocabulary is deliberately not renamed — those strings are in every manifest in the tree. |
 | 13 | Lead state as an append-only event journal | **Built** |
 | 14 | `execution_index.jsonl` mapping semantic ids to physical paths | **Built** |
-| 15 | Isolation contract, stated and tested | **Built** |
+| 15 | Isolation contract, stated and tested | **Built**. Strengthened 2026-09-21: the guard asserted only that each nested call site mentioned `nested_config`, which two of them satisfied while keeping a private orchestrator. It now forbids `TaskOrchestrator(` in all three. |
 | 16 | Kill the prompt redundancy | **Built** — 32% of the arm prompt |
 | 17 | Two one-line bugs | **Built** |
 
@@ -92,11 +92,48 @@ Correction sidecars for the September runs: **built**. Those runs are forensic f
 | 4 | Judging consumes final serialized findings | **Built** |
 | 5 | No broad new style/documentation checkers | **Held** — none added |
 
+## What the subtask contract makes cheap — coordination, 2026-09-21
+
+`CoordinationPolicy` names five decisions that were constants in `lead.py` and `delegation.py`,
+and `assert_implemented` refuses every value the code cannot honour — because a field that is
+read but not implemented makes a run record a policy it did not follow. Three of those refusals
+are now three files each, and the refusal message itself names them:
+
+| Refused value | What it takes |
+|---|---|
+| `sibling_view: blackboard` | a typed entry and a `board` on the brief (`review/lead.py`), a `BOARD_POSTED` event so a resumed lead replays what it posted (`review/journal.py`), the refusal. A board-bearing brief changes the delivered prompt, hence the child's `global_index`, so it cannot collide with a resume of the unbriefed job. |
+| `parent_view: counts \| full` | a `view` argument on `JobOutcome.summary` (`review/delegation.py`), the policy value at its one call site (`review/lead.py`), the refusal. |
+| `max_redispatches_per_pair > 0` | a per-pair counter and an `@n` suffix on the invocation id (`review/lead.py`), the suffix stripped before the agenda check (`review/trace.py`), the refusal. The payload **must** differ: `global_index` is a content hash and the orchestrator skips a task whose result exists, so an identical re-dispatch silently resumes the first — which is why `run_subtasks` refuses two specs with identical task data. |
+| `authority: final_arbiter` | not three files. A rewrite is a new finding revision and claim-scoped evidence does not transfer to it, so the evidence must be rebound or re-run before it could publish. |
+
+None is implemented here. Each changes what a run does and therefore needs its own run name,
+and the experiments themselves are the coordination thread's, not this one's.
+
+## Stage provenance and the declared graph — 2026-09-21
+
+Not from either September plan; it came from `docs/todo/pipeline-stage-chaining.md` and from the
+user asking for an arbitrary number of downstream stages. Branch `stage-provenance`.
+
+| Item | Status |
+|---|---|
+| `StageInput` -- a stage names what it consumes, it is resolved and hashed, the run state is checked | **Built** (`run_state.py`). `judge`, `replay`, `report overlay/score` read through it; `RUN_ARTIFACTS` holds each artifact's filename, writing stage and missing-file hint. A run with no manifest is *unchecked* rather than refused, because v4 runs never wrote one. |
+| The state machine writes, rather than being described | **Built.** `assert_transition` had no caller outside its tests and `FINALIZED`/`JUDGED` had no writer; `run` and `judge` now assert and record. `state_of` derives the rest from the artifacts. |
+| An append-only stage ledger per run | **Built** — `stages.jsonl`, one `StageRecord` per stage with consumed and produced digests, identity, transition and `forensic`. The judge's and the replay's rows go in the SOURCE run's ledger. `report stages` reconciles it against the directory. |
+| One judge identity per audit, refused before spending | **Built.** It was caught only by `write_once` refusing the report, after every pair had been judged and paid for. |
+| Named replay selectors | **Built** — `--select gold-site-abstentions | missed-obligations | arm | invocation_ids`, sealed into the plan with `gold_derived`. The scratch join they replace chose 45 sessions; the named selector chooses 58, because it filtered required gold changes and this filters gold sites. |
+| `report buckets` -- why each obligation ended where it did | **Built**, on miss-decomposition's coarse split (UNTOUCHED judge-independent) and the overlay's fine vocabulary. Per run on the held-out reps: 8/9/9 UNTOUCHED, 7/8/7 LOCATED_MISS, 7/5/6 COVERED, and 86-88% of findings never paired with any obligation. |
+| `cli adjudicate` -- a cross-run label store for off-gold findings | **Built, and empty.** 259 unadjudicated findings over 214 keys on one rep. Human labels only; the LLM adjudicator's socket exists and its rubric is [a todo](../todo/adjudication-rubric.md). |
+| `cli pipeline` -- a declared stage graph | **Built.** One `run` node and the stages that read it, starting as inputs allow, independent ones overlapping under a cap, re-invocation resuming. The graph is sealed into the root run; every node still runs by its own command, and a test asserts the adapters do no path arithmetic of their own. Stage-granular: per-item streaming is [a todo](../todo/pipeline-streaming.md). |
+
+The plan is kept verbatim at `2026-09-21-typed-handoffs.md`. Its workstream A -- one typed
+contract for nested work -- is on branch `subtask-contract` and is recorded in the Stage 0 table
+above.
+
 ## Updated plan — the six steps
 
 | Step | Status |
 |---|---|
-| 1 — `TaskExecutionSpec`, `spawn_subtasks`, retire budget tiers | **Built**. `judgment` and `review_gate` migrated onto it and their tests still pass, which was the plan's own test of whether it is a primitive or a fourth convention. |
+| 1 — `TaskExecutionSpec`, `spawn_subtasks`, retire budget tiers | **Built**, and as of 2026-09-21 actually adopted. This row overstated itself: `judgment` and `review_gate` shared the *directory helper* (`nested_config`) and kept their own orchestrator, their own reader of what the children did, and their own failure test, while `spawn_subtasks` had no caller at all. All three families now go through `run_subtasks` and none of them constructs a `TaskOrchestrator`, which is what the plan's own acceptance test was for. The unused primitive had two defects the first caller would have hit: children were read from `results.task_results`, which omits any task with a paused sample, and `orchestrator_id` was assigned after construction, so the batch landed in a timestamped directory a resumed parent could not find. |
 | 2 — run-total scope, `UsageBreakdown`, lead journal, `execution_index.jsonl` | **Built** |
 | 3 — dual admission channels | **Built** |
 | 4 — provenance instead of a concern gate | **Built** |

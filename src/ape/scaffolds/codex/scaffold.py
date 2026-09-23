@@ -67,7 +67,8 @@ class CodexScaffold(BaseScaffold):
             task=self.task,
             cost_limit=self.cost_limit,
             logger=self.logger,
-            is_cli_mode=self.is_cli_mode
+            is_cli_mode=self.is_cli_mode,
+            token_limit=self.token_limit
         )
 
         # 2. Initialize conversation (start relay and CodexBridge only if model_name is not None)

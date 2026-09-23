@@ -128,51 +128,74 @@ def test_the_reason_survives_into_the_result_model():
 
 # --- the path from the tool to the artifact ------------------------------------------------
 
-#: Every key an `arm_responses.jsonl` row carries. There is no pydantic model for a row, so
-#: this literal is the schema, and the three builders below must agree with it exactly.
-#: Pinned because the failure mode is silent in both directions: a key dropped by one builder
-#: makes an arm's output unreadable, and a key added by one and not the others makes rows from
-#: different routing modes incomparable.
+#: Every key an `arm_responses.jsonl` row carries, stated once here and once as the fields of
+#: `ArmResponse`. Kept as a literal beside the model on purpose: the model is what the writers
+#: use, and this is what the reader expects, so a field added to one and not meant by the other
+#: fails here rather than in a condition that reports zero.
+#:
+#: It was three dict literals in two files, compared only by parsing their own source for
+#: quoted keys. That comparison was worth having -- `abstention` was added to two of the three
+#: and the solo builder went on writing nine keys -- and a shared constructor is the version of
+#: it that cannot drift.
 ARM_RESPONSE_KEYS = {
     "invocation_id", "arm_id", "work_unit_id", "spec_id", "pr_number", "status",
     "candidates", "verification_artifacts", "abstention", "rendered_prompt_sha256",
 }
 
 
-def test_the_lead_builds_a_row_with_exactly_these_keys():
+def test_the_arm_response_model_is_the_row():
+    from src.mathlib_review.schema.review import ArmResponse
+
+    assert set(ArmResponse.model_fields) == ARM_RESPONSE_KEYS
+
+
+def test_no_builder_writes_the_row_by_hand_any_more():
+    """The three literals are gone. A fourth would drift from the other three the way the
+    third did, and nothing outside a source-reading test would say so."""
+
     import inspect
 
     from ape.tasks.lean_tasks.formal_math.review import lead
-
-    source = inspect.getsource(lead)
-    block = source.split('responses.append({', 1)[1].split('})', 1)[0]
-    assert {line.split('"')[1] for line in block.strip().splitlines()
-            if line.strip().startswith('"')} == ARM_RESPONSE_KEYS
-
-
-def test_the_non_lead_builder_agrees_with_the_lead():
-    """Two literal dicts in two files, and nothing compared them. `fanout` and `rules` runs
-    go through this one; `lead` runs never touch it."""
-
-    import inspect
-
     from src.mathlib_review.review import runner
 
-    block = inspect.getsource(runner._responses_from_results)
-    block = block.split('responses.append({', 1)[1].split('})', 1)[0]
-    assert {line.split('"')[1] for line in block.strip().splitlines()
-            if line.strip().startswith('"')} == ARM_RESPONSE_KEYS
+    for module in (lead, runner):
+        source = inspect.getsource(module)
+        assert "responses.append({" not in source, (
+            f"{module.__name__} builds an arm response as a dict literal again; construct "
+            f"`ArmResponse` so every routing mode emits one key set")
 
 
-def test_the_solo_builder_agrees_too():
-    import inspect
+def test_every_builder_emits_exactly_those_keys():
+    """All three routing modes, through the one constructor. The solo baseline is the one that
+    differs -- no rendered work-unit prompt, so `rendered_prompt_sha256` is null and present
+    rather than absent."""
 
-    from src.mathlib_review.review import runner
+    from src.mathlib_review.schema.review import ArmResponse
 
-    block = inspect.getsource(runner._solo_responses)
-    block = block.split('responses.append({', 1)[1].split('})', 1)[0]
-    assert {line.split('"')[1] for line in block.strip().splitlines()
-            if line.strip().startswith('"')} == ARM_RESPONSE_KEYS
+    lead_row = ArmResponse(invocation_id="wu:a#naming", arm_id="naming", work_unit_id="wu:a",
+                           spec_id="naming.v1", pr_number=1, status="success").row()
+    solo_row = ArmResponse(invocation_id="ep:1#solo_agent", arm_id="solo_agent",
+                           work_unit_id="wu:a", spec_id="solo_agent", pr_number=1,
+                           status="success", rendered_prompt_sha256=None).row()
+    assert set(lead_row) == set(solo_row) == ARM_RESPONSE_KEYS
+    assert solo_row["rendered_prompt_sha256"] is None and solo_row["abstention"] is None
+
+
+def test_a_response_with_no_identity_is_refused():
+    """`lead_smoke4_rep2` holds one such row: a failed job synthesised with every identity
+    field null, which reconciliation then read as an orphan response. The runner stopped
+    writing them; the model is what stops them coming back."""
+
+    import pytest
+    from pydantic import ValidationError
+
+    from src.mathlib_review.schema.review import ArmResponse
+
+    with pytest.raises(ValidationError):
+        ArmResponse.model_validate({
+            "invocation_id": None, "arm_id": None, "work_unit_id": None, "spec_id": None,
+            "pr_number": None, "status": "failed", "candidates": [],
+            "verification_artifacts": [], "abstention": None, "rendered_prompt_sha256": None})
 
 
 def test_the_job_outcome_carries_the_reason():

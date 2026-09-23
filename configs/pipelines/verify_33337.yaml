@@ -1,0 +1,33 @@
+# The cheapest paid run that exercises both typed hand-off workstreams end to end.
+#
+#   ape/bin/python -m src.mathlib_review.review.cli pipeline \
+#       --config configs/pipelines/verify_33337.yaml --run-name pr5_verify_typed_handoffs_rep1 --execute
+#
+# One PR (33337), `routing_mode: lead`, so the run really nests arms under a lead through
+# `run_subtasks` -- which is the whole of workstream A. Measured on the twelve historical
+# single-PR lead runs over this PR: 22 proposals, 11-13 delegations, **$0.32-0.38 billed**,
+# 2-4 minutes. The plan's own floor is $0.35 with a $1.85 worst case.
+#
+# 33337 is chosen rather than a smoke PR for three reasons: its reviewed workspace is already
+# built (`plan` says 1 of 1), so verification compiles against the PR's own build products
+# rather than the base commit's; it carries 2 eligible obligations, so the judge node has real
+# pairs to score; and `configs/pr_review_v5_33337_judge.yaml` already scopes exactly it, so
+# `judged_pr_scope` has nothing to refuse.
+#
+# The judge node is what proves workstream B: the run's ledger gains a `judge` row, `state_of`
+# reads `judged`, and a second invocation of this same command reports both nodes `done`
+# without spending -- which is the resume property, and the cheapest thing to check.
+root: run
+max_parallel_stages: 2
+
+stages:
+  run:
+    kind: run
+    config: configs/pr_review_v5_medium_heldout.yaml
+    overrides:
+      dataset.pr_numbers: "[33337]"
+
+  judge:
+    kind: judge
+    config: configs/pr_review_v5_33337_judge.yaml
+    of: run

@@ -68,6 +68,17 @@ CONVENTIONS_TRACKED = Path("inputs/conventions")
 RESULTS = Path("results/pr_review_v5")
 RUNS = RESULTS / "runs"
 
+#: Where a judged run's audit goes. Written here once because it was written twice -- as
+#: `judge.runner.JUDGE_AUDIT_ROOT` and as `analysis.denominators._AUDIT_ROOT` -- and a run's
+#: identity spelled in two places is the class of mistake `judge --of` exists to remove.
+AUDITS = RESULTS / "audits"
+
+#: The cross-run adjudication label store. One file, append-only, keyed by finding rather than
+#: by run: a label is about a claim the system makes, and the same claim recurs across
+#: repetitions. Outside `RUNS` and outside `AUDITS` for that reason -- it belongs to no single
+#: run and must survive every one of them.
+ADJUDICATIONS = RESULTS / "adjudications"
+
 
 def run_dir(run_name: str) -> Path:
     """Every v5 artifact for a run hangs off its `run_name`, and only off its `run_name`.

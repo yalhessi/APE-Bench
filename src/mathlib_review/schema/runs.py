@@ -1,6 +1,6 @@
 """Pre-registration and receipts: what a run promised to do, and what it did."""
 
-from typing import Dict, List, Literal, Optional, get_args
+from typing import Any, Dict, List, Literal, Optional, get_args
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .base import StrictModel
@@ -217,3 +217,154 @@ class RunManifest(StrictModel):
     completion_status: Literal["complete", "failed", "incomplete"]
     created_at: str
     source_sha256: str
+
+
+class StageRecord(StrictModel):
+    """One completed stage of one run: what it read, what it wrote, and under what identity.
+
+    A v5 experiment is several processes chained by a run name, and nothing recorded that the
+    chain happened. Whether a run had been judged was answered by looking for an audit
+    directory; which judge produced it, by reading the report inside; whether a replay came
+    from this run at all, by its name. Each of those is a reconstruction, and the whole class
+    of mistake `judge --of` exists to remove.
+
+    A row is *named provenance*, never a scheduler: it records a hand-off that already
+    happened, digest by digest. That is what keeps the stages separable -- each still runs on
+    its own, from its own command, and writes the same artifacts -- while making the chain
+    checkable after the fact.
+
+    Rows are appended, never rewritten, for the reason the lead's journal is: a stage that
+    crashes between its artifacts and its row must leave the artifacts findable, and a
+    reconciliation that says "manifest present, no row" is more useful than a row that lies.
+    """
+
+    schema_version: Literal["v5-stage1"] = "v5-stage1"
+    #: What kind of stage this was. Plain strings, extended by adding a stage.
+    stage: str
+    #: Which node of a pipeline this was, when it ran inside one. `judge` and `judge_relation`
+    #: are two nodes of the same stage kind, and they are what a run carrying two judgements
+    #: has to be able to say apart.
+    node: Optional[str] = None
+    #: The root run of the pipeline that drove this, when one did. Absent for a stage invoked
+    #: on its own, which every stage must remain able to be.
+    pipeline: Optional[str] = None
+    #: The run this row belongs to -- the generation run, even for stages that read it and
+    #: write elsewhere. A judge's outputs live in an audit directory; the fact that the run was
+    #: judged belongs to the run.
+    run_name: str
+    #: artifact name -> sha256 of what was read. Exactly what the stage asked for.
+    consumed: Dict[str, str] = Field(default_factory=dict)
+    consumed_audit: Dict[str, str] = Field(default_factory=dict)
+    #: repo-relative path -> sha256 of what was written, plus plain strings for what a path
+    #: cannot express (`out_dir`, a replay's own run name).
+    produced: Dict[str, str] = Field(default_factory=dict)
+    #: What makes this stage's output comparable to another's: `judge_identity` for a judge,
+    #: the condition and cut for a replay, the plan hash for a generation run.
+    identity: Dict[str, Any] = Field(default_factory=dict)
+    state_before: Optional[str] = None
+    state_after: Optional[str] = None
+    #: The machine move this stage made, when it made one. `None` is legitimate and common: a
+    #: replay changes no state, and a re-judgement under one identity is a resume.
+    transition: Optional[str] = None
+    #: Output that must never be read as a measurement -- a partial run scored deliberately.
+    forensic: bool = False
+    #: What a recall number from this stage MEANS. `schema_version` says the row parses.
+    evaluation_contract_version: Optional[str] = None
+    git_commit: Optional[str] = None
+    git_tree_state: Optional[Literal["clean", "dirty", "unknown"]] = None
+    written_at: str
+
+
+class PipelineNode(StrictModel):
+    """One stage of a declared experiment: what it is, what it reads, and how it is configured.
+
+    A pipeline is written down because an experiment is several commands and the order between
+    them is part of the design. What it is NOT is a new way to run a stage: every node maps to
+    a command that can still be typed by hand, with the same config and the same artifacts, and
+    the pipeline only decides when to start it.
+    """
+
+    kind: Literal["run", "judge", "replay", "adjudicate", "report.buckets"]
+    #: The config this node runs under. A `run` node needs one; a `judge` node needs one; the
+    #: read-only kinds do not.
+    config: Optional[str] = None
+    #: The node whose run this one reads. Defaults to the pipeline's root.
+    of: Optional[str] = None
+    #: Nodes that must finish first. Usually just `of`, and stated separately because a node can
+    #: depend on work it does not read -- two judges of one run that must not overlap, say.
+    needs: List[str] = Field(default_factory=list)
+    #: `--set`-style overrides for this node alone, so two judge nodes can differ by one key
+    #: without two config files.
+    overrides: Dict[str, Any] = Field(default_factory=dict)
+    #: `replay` only: which recorded sessions to re-decide.
+    select: Optional[str] = None
+    #: `adjudicate` only: a file of human labels to ingest.
+    labels: Optional[str] = None
+
+
+class PipelineSpec(StrictModel):
+    """A declared experiment: one generation run and the stages that read it.
+
+    Exactly one `run` node, because a pipeline is about one run's artifacts; several runs are
+    several pipelines, and pretending otherwise would make `--run-name` ambiguous.
+    """
+
+    schema_version: Literal["v5-pipeline1"] = "v5-pipeline1"
+    #: The node whose run name is the one `--run-name` gives.
+    root: str
+    max_parallel_stages: int = 2
+    stages: Dict[str, PipelineNode]
+
+    @model_validator(mode="after")
+    def _one_root_and_resolvable_edges(self):
+        if self.root not in self.stages:
+            raise ValueError(f"root {self.root!r} is not one of {sorted(self.stages)}")
+        if self.stages[self.root].kind != "run":
+            raise ValueError(f"root {self.root!r} must be a `run` stage, not "
+                             f"{self.stages[self.root].kind!r}")
+        roots = [name for name, node in self.stages.items() if node.kind == "run"]
+        if len(roots) > 1:
+            raise ValueError(
+                f"a pipeline describes one generation run and the stages that read it; "
+                f"{sorted(roots)} are all `run` stages. Several runs are several pipelines.")
+        for name, node in self.stages.items():
+            for need in node.needs:
+                if need not in self.stages:
+                    raise ValueError(f"stage {name!r} waits for unknown stage {need!r}")
+            if node.of is not None and node.of not in self.stages:
+                raise ValueError(f"stage {name!r} reads unknown stage {node.of!r}")
+            if node.of is not None and self.stages[node.of].kind != "run":
+                raise ValueError(
+                    f"stage {name!r} reads {node.of!r}, which is a {self.stages[node.of].kind!r} "
+                    f"stage. A stage reads a generation RUN, not another stage's output.")
+        return self
+
+    def edges(self) -> Dict[str, List[str]]:
+        """Each node's dependencies, with `of` folded in: reading a run implies waiting for it."""
+
+        return {
+            name: sorted(set(node.needs) | ({node.of} if node.of and node.of != name else set())
+                         | ({self.root} if name != self.root and not node.needs and not node.of
+                            else set()))
+            for name, node in self.stages.items()
+        }
+
+
+class PipelinePlan(StrictModel):
+    """What a pipeline invocation resolved to, sealed into the root run before anything spends.
+
+    The graph, each node's config and its digest, and the run name or audit directory each node
+    will write to. Sealed for the reason a run plan is: what was going to happen, recorded
+    before it happened, so the result can be read against it rather than against the config
+    file as it stands today.
+    """
+
+    schema_version: Literal["v5-pipeline-plan1"] = "v5-pipeline-plan1"
+    pipeline_id: str
+    root_run: str
+    spec_sha256: str
+    max_parallel_stages: int
+    #: node -> {kind, config, config_sha256, of, needs, target}
+    stages: Dict[str, Dict[str, Any]]
+    git_commit: Optional[str] = None
+    git_tree_state: Optional[Literal["clean", "dirty", "unknown"]] = None

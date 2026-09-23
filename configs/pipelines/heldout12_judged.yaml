@@ -1,0 +1,44 @@
+# The experiment this repository actually runs, written down: review the twelve held-out PRs,
+# then score them twice.
+#
+#   ape/bin/python -m src.mathlib_review.review.cli pipeline \
+#       --config configs/pipelines/heldout12_judged.yaml --run-name pr5_A_lead_heldout12_v3_rep1
+#
+# Without `--execute` this opens and hashes every node's config, resolves each node's run name
+# and audit directory, prints the graph and writes nothing. That is worth more here than for a
+# single verb: the cost of finding a bad judge config after the generation run is the
+# generation run.
+#
+# Every node still runs by hand. `judge --of <root>` produces the `judge` node's audit exactly;
+# the pipeline decides when it starts, not what it does.
+root: run
+max_parallel_stages: 2
+
+stages:
+  run:
+    kind: run
+    config: configs/pr_review_v5_medium_heldout.yaml
+
+  # The scoring every number in the record is computed under: anchor pairing only.
+  judge:
+    kind: judge
+    config: configs/pr_review_v5_medium_heldout_judge.yaml
+    of: run
+
+  # The same findings, scored under the widening that has never been run. 705 of 705 judge
+  # pairs in the tree are at `anchor`, so an ask that is right about the file and anchored one
+  # change away is not shown to the judge at all (docs/todo/judge-and-measurement.md §1).
+  #
+  # Its own node, so it gets its own audit directory and its own orchestrator: two judge
+  # identities writing into one audit are two measurements presented as one, and the judge
+  # refuses that before it spends. The two run concurrently -- they read the same closed run
+  # and write to different places.
+  #
+  # Widening can only RAISE recall, so a number from here is not comparable to one from
+  # `judge` and must be reported as its own condition.
+  judge_relation:
+    kind: judge
+    config: configs/pr_review_v5_medium_heldout_judge.yaml
+    of: run
+    overrides:
+      dataset.pairing_tiers: "[anchor, relation]"

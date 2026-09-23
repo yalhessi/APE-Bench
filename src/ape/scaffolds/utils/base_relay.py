@@ -54,7 +54,8 @@ class BaseRelaySession(ABC):
         logger: Optional['logging.LoggerAdapter'] = None,
         conversation_trees_path: Optional[Path] = None,
         max_turns: Optional[int] = None,
-        cost_limit: Optional[float] = None
+        cost_limit: Optional[float] = None,
+        token_limit: Optional[int] = None
     ):
         """
         Initialize base relay session
@@ -69,6 +70,7 @@ class BaseRelaySession(ABC):
             conversation_trees_path: Prefix tree JSONL path (optional)
             max_turns: Maximum turns allowed (None means unlimited)
             cost_limit: Maximum cost allowed (None means unlimited)
+            token_limit: Maximum processed tokens allowed (None means unlimited)
         """
         self.port = port
         self.llm_config = llm_config
@@ -78,8 +80,10 @@ class BaseRelaySession(ABC):
         # Limit tracking
         self.max_turns = max_turns
         self.cost_limit = cost_limit
+        self.token_limit = token_limit
         self._turn_limit_reached = False
         self._cost_limit_reached = False
+        self._token_limit_reached = False
         self.last_error: Optional[Exception] = None
 
         # Conversation recording configuration
@@ -199,6 +203,33 @@ class BaseRelaySession(ABC):
                     {
                         "error": {
                             "type": "cost_limit_exceeded",
+                            "message": error_msg
+                        }
+                    },
+                    status_code=429
+                )
+
+        # Check the token ceiling, beside the cost one and off the same usage record. Both
+        # scaffold families check both, so a run cannot acquire a ceiling that binds under one
+        # scaffold and is silently absent under another.
+        if self.token_limit is not None:
+            current_tokens = self.get_token_usage().processed_tokens
+            if current_tokens >= self.token_limit:
+                self._token_limit_reached = True
+                error_msg = (f"Token limit exceeded: {current_tokens:,} >= "
+                             f"{self.token_limit:,}")
+                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
+
+                from ape.llm_clients.config import TokenBudgetExhaustedError
+                self.last_error = TokenBudgetExhaustedError(error_msg)
+
+                if self._server:
+                    self._server.should_exit = True
+
+                return JSONResponse(
+                    {
+                        "error": {
+                            "type": "token_limit_exceeded",
                             "message": error_msg
                         }
                     },

@@ -548,18 +548,7 @@ share a prefix and have nothing to do with each other.
 This check accepts two, because a group's defect takes two shapes: use `duplication` when a
 form that should be generated is written out by hand, and `generalization` when a counterpart is
 missing or a shared parameter is hardcoded. The contract line above names one — declare whichever
-of these two your finding actually is.
-
-## Coordinated fixes
-
-Where the fix genuinely spans several declarations, submit it as `patch_set` — a list of edits
-that are applied and compiled TOGETHER. Use it when the halves are individually wrong: deleting a
-generated lemma without adding the attribute that regenerates it does not compile, and neither
-does adding a dual before the lemma it is derived from exists.
-
-Every edit must touch a file this check was given. The whole candidate is refused if any edit
-falls outside them, if two edits overlap, or if any touched file fails to compile — so verify with
-lean_verify_edit as you go. Where one edit suffices, use `proposed_edit` as usual."""
+of these two your finding actually is."""
 
 FAMILY_DESIGN_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n"""
 

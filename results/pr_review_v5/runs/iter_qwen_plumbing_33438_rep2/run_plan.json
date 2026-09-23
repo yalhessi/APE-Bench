@@ -1,0 +1,86 @@
+{
+  "agenda_sha256": "83447b07d5e33a9b1fd95cb56eeb41af9fa552a8fa2d0e59ae32bc97fb4a651c",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "7682ad4cc34607864be97fda5ec529c45b4bbb1ab5f44635c7b4f6bcea478788",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "ea84bb7e94944eacb231ad7a13578b8292bf1ec9d9e9121ff50fd1c649e9b4dc",
+    "generalist": "af0055979fa0304f38d8766b80cf51de4c2a25ff052956ac333ba74cce30a8e8",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "cd6fd9ef2ee98e2709ee143d676d0b80b18788ae7ba02b111ed4dd879f360eb3",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_index_version": "v5-precedent-index/2",
+    "precedent_meta_version": "v5-precedent-meta/2",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "precedent_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "precedent_rows": "43881",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 60,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 60,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 60
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "76fbd0c27497c0a8d452b87ccd1e7f0a0b634f25",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "lead_token_cap": 1200000,
+  "model_name": "elm_qwen_3.5",
+  "per_pr_cost_cap": 2.0,
+  "per_pr_token_cap": 2400000,
+  "prompt_sha256_by_invocation": {
+    "wu:230e4c75daf818c75b024525#api_reuse": "7801c0024d18577389723759d6e7f29d3fd5ce87c28abeb9d15b5e74ca040a47",
+    "wu:230e4c75daf818c75b024525#correctness": "022e10301ebd960852c54baf3f505d16dc6fe0df61006a03975ff8da9c32c5db",
+    "wu:230e4c75daf818c75b024525#docs": "ae216f83ca4b7d442f13110c6e8b6469b3075dcbca6be539dad3916dbfbcd545",
+    "wu:230e4c75daf818c75b024525#duplication": "e934775a7569178a9fd843159f1dcd0b8ab3de42a591f7a176afc21e3484daed",
+    "wu:230e4c75daf818c75b024525#family_design": "ce901a2d5b425cde8d7422e3ae1123605c54d021ed7141fcfb9730f8c5397708",
+    "wu:230e4c75daf818c75b024525#generalist": "ee5f1255d7d76e4e5f932b4b7ba2b1ed2f625ebaacc6d8828227368f0dce44f5",
+    "wu:230e4c75daf818c75b024525#generality": "8185fff7f2b171886ce326f25c3f3fba0996b92d255db129f33214de5b3d5c91",
+    "wu:230e4c75daf818c75b024525#naming": "a0e4149cc187c9b80a26b91cf54b31d655ddf5d0ed652af686df3f2750fe845b",
+    "wu:230e4c75daf818c75b024525#proof_golf": "aac6329ebb2764379abf347e59f23750757266436c37f92c8137eebd44dea86d",
+    "wu:230e4c75daf818c75b024525#proof_idiom": "962b3165371aee47de64df115edb425a3f2c5b3471b14ca2ab5b9de6d311df53",
+    "wu:230e4c75daf818c75b024525#style": "d508c18e70625648ab06bd78b5095a3c9c2587717a3965f8fd77cfd548a9f310"
+  },
+  "release": "inputs/pr_review_v4/releases/dev-medium-0.3.0",
+  "release_manifest_sha256": null,
+  "routing_mode": "lead",
+  "run_id": "v5run:iter_qwen_plumbing_33438_rep2",
+  "run_name": "iter_qwen_plumbing_33438_rep2",
+  "scaffold_config_sha256": "68e88fa6648e670b8865802f80b232db0910b0347e90795823bb50a60152961c",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "3cf42516b8e3b3f385b43e3971cb996f30ab6234b4d45bdb1d5e5b1741ee3023",
+  "standard_budget_cap": 0.3,
+  "standard_budget_tokens": 360000
+}

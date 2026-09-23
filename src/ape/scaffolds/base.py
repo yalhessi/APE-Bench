@@ -27,6 +27,7 @@ class ScaffoldTerminationReason(str, Enum):
     SUCCESS = "success"
     MAX_TURNS_REACHED = "max_turns_reached"
     COST_EXHAUSTED = "cost_exhausted"
+    TOKENS_EXHAUSTED = "tokens_exhausted"
     CONVERSATION_STOPPED = "conversation_stopped"
     EARLY_STOPPED = "early_stopped"
     INTERRUPTED = "interrupted"
@@ -78,6 +79,8 @@ class BaseScaffold(ABC):
         self.task: Optional['BaseTask'] = None
         self.is_cli_mode: bool = False
         self.cost_limit: Optional[float] = None
+        #: The same ceiling in the other denomination. See `ExecutionLimits`.
+        self.token_limit: Optional[int] = None
         self._termination_reason: Optional[ScaffoldTerminationReason] = None
         self.progress_callback: Optional[Callable[[str], Any]] = None
 
@@ -97,7 +100,8 @@ class BaseScaffold(ABC):
         termination_callback: Callable,
         orchestrator_id: str,
         attempt_path: Optional[Path],
-        cost_limit: Optional[float] = None
+        cost_limit: Optional[float] = None,
+        token_limit: Optional[int] = None
     ) -> None:
         """Execute scaffold workflow: setup -> execute -> cleanup.
 
@@ -107,10 +111,12 @@ class BaseScaffold(ABC):
             orchestrator_id: Orchestrator ID ('cli' for CLI mode).
             attempt_path: Attempt workspace path (if orchestrator pre-created one).
             cost_limit: Cost limit (sample_max_cost).
+            token_limit: Token ceiling (sample_max_tokens).
         """
         self.task = task
         self.is_cli_mode = (orchestrator_id == "cli")
         self.cost_limit = cost_limit
+        self.token_limit = token_limit
 
         try:
             await self._setup(termination_callback, orchestrator_id, attempt_path)
@@ -125,7 +131,8 @@ class BaseScaffold(ABC):
                 self.logger.debug("Task execution cancelled (this is normal during cleanup)")
             raise
         except Exception as e:
-            from ape.llm_clients.config import CostExhaustedError, ContextLengthExceededError
+            from ape.llm_clients.config import (
+                ContextLengthExceededError, CostExhaustedError, TokenBudgetExhaustedError)
 
             if isinstance(e, (MalformedResponseError, ConversationStoppedError, ContextLengthExceededError)):
                 self._termination_reason = ScaffoldTerminationReason.CONVERSATION_STOPPED
@@ -140,6 +147,13 @@ class BaseScaffold(ABC):
                     self.logger.warning(
                         f"Cost exhausted, marking as COST_EXHAUSTED (will not retry):\n"
                         f"{traceback.format_exc()}"
+                    )
+            elif isinstance(e, TokenBudgetExhaustedError):
+                self._termination_reason = ScaffoldTerminationReason.TOKENS_EXHAUSTED
+                if self.logger:
+                    self.logger.warning(
+                        f"Token ceiling exhausted, marking as TOKENS_EXHAUSTED "
+                        f"(will not retry):\n{traceback.format_exc()}"
                     )
             elif isinstance(e, MaxTurnsReachedError):
                 self._termination_reason = ScaffoldTerminationReason.MAX_TURNS_REACHED
@@ -183,11 +197,13 @@ class BaseScaffold(ABC):
 
             mode = 'CLI' if self.is_cli_mode else 'batch'
             cost_str = f"${self.cost_limit:.4f}" if self.cost_limit is not None else "N/A"
+            token_str = f"{self.token_limit:,}" if self.token_limit is not None else "N/A"
             self.logger.info(
                 f"{self.__class__.__name__} starting {mode} mode - "
                 f"task: {self.task.data.task_id}, "
                 f"task_type: {self.task.task_type}, "
-                f"cost_limit: {cost_str}"
+                f"cost_limit: {cost_str}, "
+                f"token_limit: {token_str}"
             )
 
             # 2. Scaffold components setup

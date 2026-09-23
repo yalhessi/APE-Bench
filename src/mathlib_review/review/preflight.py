@@ -131,7 +131,7 @@ def _check_model_credential(scaffold: Any) -> Optional[Unmet]:
     if llm is None or getattr(llm, "model_name", None) is None:
         return None
     if getattr(llm, "api_key", None):
-        return None
+        return _check_credential_survives_worker(llm)
     provider = getattr(getattr(llm, "provider_type", None), "value", "the provider")
     return Unmet(
         name="model credential",
@@ -140,9 +140,46 @@ def _check_model_credential(scaffold: Any) -> Optional[Unmet]:
             "fail on its first call, after the plan is sealed and the run directory written."
         ),
         remedy=(
-            "export the provider's key in the launching shell, or set llm_config.api_key "
-            "in the config."
+            f"export the provider's key in the launching shell ({_key_env_var_hint(llm)}), or "
+            "set llm_config.api_key in the config."
         ),
+    )
+
+
+def _key_env_var_hint(llm: Any) -> str:
+    """The environment variable this provider reads, named so the remedy is actionable."""
+
+    from ape.llm_clients.config import PROVIDER_KEY_ENV_VARS
+
+    names = PROVIDER_KEY_ENV_VARS.get(getattr(llm, "provider_type", None))
+    return " or ".join(names) if names else "the provider's key variable"
+
+
+def _check_credential_survives_worker(llm: Any) -> Optional[Unmet]:
+    """A key that came from YAML rather than the environment dies at the process boundary.
+
+    `LLMConfig.api_key` is `exclude=True`, so it is absent from the `model_dump` that carries
+    the scaffold config to a worker process -- deliberately, because that same dump is the
+    on-disk run snapshot, the container runtime's argv and the `scaffold_config_sha256` input.
+    A worker rebuilds the key by re-resolving the environment variable, which works for every
+    key that came from the environment in the first place and for no other.
+
+    So the YAML case fails in the worker, on the first call, after the plan is sealed. It is
+    cheap to refuse here instead, and the remedy is one line.
+    """
+
+    from ape.llm_clients.config import LLMConfig
+
+    if LLMConfig._resolve_api_key_from_environment(getattr(llm, "provider_type", None)):
+        return None
+    return Unmet(
+        name="model credential source",
+        consequence=(
+            f"llm_config.api_key is set in the config but {_key_env_var_hint(llm)} is not "
+            "exported. The key is deliberately not serialized, so it would not reach the "
+            "worker processes and every task would fail on its first call."
+        ),
+        remedy=f"export {_key_env_var_hint(llm)} in the launching shell instead.",
     )
 
 

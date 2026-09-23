@@ -179,6 +179,9 @@ class BaseTask:
         target_workspace: Target workspace (optional)
         reference_workspaces: Reference workspaces (optional)
         logger: Logger instance (set during setup)
+        session_replay: A `SessionReplay` directive when this attempt starts from a recorded
+            conversation rather than from its prompt; set at the runtime boundary from the
+            task data's `session_replay` key, never by the task (scaffolds/ape_agent/replay.py)
     """
 
     # Class variables to be defined by subclasses
@@ -204,6 +207,11 @@ class BaseTask:
         self.logger: Optional['logging.LoggerAdapter'] = None
         self.termination_callback: Optional[Callable[['BaseTaskResult'], Awaitable[None]]] = None
         self.progress_callback: Optional[Callable[[str], Any]] = None
+        self.session_replay = None
+        #: The dict this task was built from, when it was built from one. Kept because
+        #: `BaseTaskData` ignores keys it does not declare, so a reserved run-level key --
+        #: `execution_limits`, `session_replay` -- exists only here after validation.
+        self.payload: Optional[Dict[str, Any]] = None
 
         if self.data.task_type != self.task_type:
             raise ValueError(
@@ -218,6 +226,23 @@ class BaseTask:
         result = self.progress_callback(message)
         if inspect.isawaitable(result):
             await result
+
+    def job_data(self) -> Dict[str, Any]:
+        """What the orchestrator hands the worker for this task.
+
+        The validated model's dump, plus any key the model ignored. Reserved run-level keys
+        travel in the payload rather than in the task's own schema -- they say how to *run* a
+        task, not what it is -- and `BaseTaskData` drops what it does not declare, so a dump
+        alone loses them. That is not theoretical: it silently discarded every
+        `execution_limits` the lead attached to its arms (so the arms ran under the nested
+        orchestrator's `sample_max_cost`, not the run's `standard_budget_cap`), and it turned
+        a decision-turn replay into an ordinary run from the prompt -- which still produced
+        submissions, and would have been read as replay consistency.
+        """
+
+        dumped = self.data.model_dump(mode="json")
+        extra = {key: value for key, value in (self.payload or {}).items() if key not in dumped}
+        return {**dumped, **extra}
 
     async def setup(
         self,
@@ -442,18 +467,23 @@ class BaseTask:
 
     async def spawn_subtasks(self, specs, *, group: str = "subtasks", logger=None,
                              base=None, concurrency: Optional[int] = None,
-                             execution_overrides: Optional[Dict[str, Any]] = None):
-        """Run child tasks and get one `TaskOutcome` back per spec.
+                             execution_overrides: Optional[Dict[str, Any]] = None,
+                             orchestrator_id: Optional[str] = None):
+        """Run child tasks and get one `ChildRun` back per spec.
 
         The framework primitive for nested work. `TaskOrchestrator(` was constructed directly
         in four files with three different conventions, and the divergent one cost this project
         a class of accounting failures -- paused work booked at $0.00, an enclosing group's
         totals stamped onto every child, a run scored as complete over coverage it never had.
 
-        Directory layout, isolation, per-task limits, bounded concurrency and usage aggregation
-        live in `ape.orchestration.subtasks`, once, for every task family present and future.
+        Directory layout, isolation, per-task limits, bounded concurrency, the execution index
+        and usage aggregation live in `ape.orchestration.subtasks`, once, for every task family
+        present and future.
 
-        Returns `(outcomes_by_spec_id, results)`. Pass `nested_usage(outcomes)` to
+        Returns `({spec_id: ChildRun}, results)`. A `ChildRun` carries the spec, the
+        `TaskOutcome` and the child's own typed result -- including for a child that paused,
+        which the orchestrator never aggregates and which every reader that iterated
+        `results.task_results` therefore lost. Pass `nested_usage(runs)` to
         `create_result(nested_token_usage=...)` so the children's spend reaches the parent's
         own usage -- omitting that is how a lead's ledger and its manifest disagreed.
         """
@@ -461,10 +491,18 @@ class BaseTask:
         from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, run_subtasks
 
         return await run_subtasks(
-            self, specs, group=group, logger=logger or getattr(self, "logger", None),
-            base=base,
+            specs,
+            attempt_path=self.attempt_path,
+            config=base if base is not None else self.config,
+            group=group, logger=logger or getattr(self, "logger", None),
             concurrency=DEFAULT_NESTED_CONCURRENCY if concurrency is None else concurrency,
             execution_overrides=execution_overrides,
+            orchestrator_id=orchestrator_id,
+            # Where this task's children ran, written down rather than inferred from a
+            # directory name later. Both are task-data fields the review family sets; a family
+            # that sets neither simply gets no index and no parent id.
+            index_path=getattr(self.data, "execution_index_path", None),
+            parent_id=getattr(self.data, "episode_id", None) or self.data.task_id,
         )
 
     async def register_task_tools(self, mcp) -> None:
@@ -476,9 +514,32 @@ class BaseTask:
         return ""
 
     def create_result(self, **kwargs) -> BaseTaskResult:
-        """Create task result using the configured task_result_class."""
+        """Create task result using the configured task_result_class.
+
+        **A keyword the result class does not declare is refused, not dropped.**
+        `BaseTaskResult` is pydantic with the default `extra="ignore"`, so an undeclared
+        keyword reached here, vanished, and left the suite green -- which is the producer end
+        of this repository's most expensive bug class. It has cost a field six times:
+        `abstention` on a candidate result, `model_confidence` and `rejected_alternatives`
+        between candidates and findings, `execution_limits` and `session_replay` between the
+        orchestrator and the worker, and `documentation` vs `docs` in the concern vocabulary.
+        Every one of them looked like a working feature until something downstream read zero.
+
+        Only *construction* is strict. Loading a persisted `task_result.json` still goes
+        through `model_validate` (`persistence.py::TaskStorage._normalize_sample`), which stays
+        lenient on purpose: a result written before a field existed must keep loading, or every
+        historical run becomes unreadable.
+        """
         if self.task_result_class is None:
             raise ValueError(f"Task class {self.__class__.__name__} must define task_result_class")
+        undeclared = sorted(set(kwargs) - set(self.task_result_class.model_fields))
+        if undeclared:
+            raise TypeError(
+                f"{type(self).__name__}.create_result() was given "
+                f"{undeclared}, which {self.task_result_class.__name__} does not declare. "
+                f"Pydantic would ignore them and the value would be lost with no error. "
+                f"Declare the field on the result class, or stop passing it."
+            )
         identity_fields = {
             "task_id": self.data.task_id,
             "task_type": self.task_type or self.data.task_type,
@@ -652,7 +713,10 @@ def create_task_from_data(
     task_specific_config = config.model_copy(update={'task_config': task_config}, deep=True)
     task_config.apply_to_scaffold_config(task_specific_config)
 
-    return task_class.from_data(data, task_specific_config)
+    task = task_class.from_data(data, task_specific_config)
+    # So reserved run-level keys survive validation; see `BaseTask.job_data`.
+    task.payload = dict(data)
+    return task
 
 
 def create_task_config_for_type(task_type: str, **overrides) -> 'BaseTaskConfig':

@@ -332,3 +332,64 @@ def test_the_generalist_has_no_concern_filter(submit):
         concern_family="documentation", issue_kind="documentation_gap",
         concern_label="documentation")]))
     assert result["evaluation_result"].success is True
+
+
+# --- the ask whose fix does not compile -----------------------------------------------------
+#
+# `verify_checkable_edits` refuses a candidate in a checkable concern family that carries no
+# `proposed_edit`. Reading the held-out run's gold-site silences on 2026-09-21, that rule is
+# what the largest group of in-remit silences ran into: the arm had the maintainer's answer
+# and could not make it compile. `verify_edits_if_present` is the same policy with that one
+# refusal lifted -- an edit that IS supplied is still compiled, and one that fails is still
+# refused. The unverified ask lands as `diagnostic`, which `finalize` keeps out of `published`.
+
+
+def _submit_under(policy):
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    task = ReviewArmTask(_data(submission_verification_policy=policy), ApeAgentConfig())
+    mcp = FakeMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    return mcp.tools["submit_candidates"]
+
+
+def test_a_checkable_claim_with_no_edit_is_refused_under_the_verifying_policy():
+    """The rule as it stands, pinned so the relaxation cannot be mistaken for a bug fix."""
+
+    submit = _submit_under("verify_checkable_edits")
+    result = asyncio.run(submit(candidates=[_candidate(proposed_edit=None)]))
+    assert result["evaluation_result"].success is False
+    assert "require a structured proposed_edit" in _message(result)
+
+
+def test_the_relaxed_policy_accepts_the_ask_without_the_edit():
+    """And only that. The claim still has to name its subject, stay inside the work unit and
+    say what transformation it wants -- every other rule in the contract is untouched."""
+
+    submit = _submit_under("verify_edits_if_present")
+    result = asyncio.run(submit(candidates=[_candidate(proposed_edit=None)]))
+    assert result["evaluation_result"].success is True
+    # No compile ran, so it carries no warrant, which is what makes it `diagnostic`
+    # downstream rather than a verified finding.
+    assert not result.get("verification_artifacts")
+
+    outside = asyncio.run(submit(candidates=[
+        _candidate(proposed_edit=None, change_ids=["change:z"], primary_change_id="change:z")]))
+    assert outside["evaluation_result"].success is False
+    assert "unknown change_ids" in _message(outside)
+
+
+def test_the_relaxed_policy_is_not_a_request_for_findings():
+    """An empty submission stays exactly as cheap as it was: the mute-abstention refusal is
+    the one that asks for a reason, and it still asks for nothing else. This is the property
+    that keeps the control PRs measurable, and the reason `forbid_abstention` -- which took
+    control emission 1 -> 36 -- is a diagnostic and not a design."""
+
+    submit = _submit_under("verify_edits_if_present")
+    muted = asyncio.run(submit(candidates=[]))
+    assert muted["evaluation_result"].success is False
+    assert "NOT a request to find something" in _message(muted)
+
+    labelled = asyncio.run(submit(candidates=[], abstention_reason="already_correct",
+                                  abstention_detail="checked the three names against the corpus"))
+    assert labelled["evaluation_result"].success is True

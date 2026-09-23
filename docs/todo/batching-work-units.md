@@ -1,10 +1,23 @@
 # Work-unit batching — the partition an arm holds authority over is produced by a hash
 
-**Status** — open, and the highest-value item in this directory
-**Cost** — the diagnosis is done and cost nothing; the fixes are code plus one 3-rep rerun
+**Status** — **the grouping half landed on `batching-work-units` (`12a3939`…`24746b2`), producing
+release `dev-medium-0.4.0`.** Work units 225 → 121, declaration-free units 96/203 → 46/121,
+attached targets split from their declaration 73 → 0. Authority, `patch_set` and the family-claim
+siting are still open.
+**Cost** — the diagnosis cost nothing; the landed fixes cost nothing; a confirming rep is unrun
 **Owner question** — what set of declarations is one unit of review, and who may file about it?
+**Answered for the first half** (the repack); the second is now "who may *emit* a fix that spans
+it", and the entry's own "authority, judging, or emission" question resolves to **emission**.
 
 ## Motivating example
+
+**Stale as of `dev-medium-0.5.0`, and kept because the diagnosis it produced is not.** Under the
+shipped packing PR 33145's family is **one unit of 12 targets**; release-wide, 3 of 42 anchored
+obligations span more than one unit and all three are PR 33149, and 32 of 38 request groups sit
+wholly inside one unit. The authority defect below is fixed. What it uncovered is not: the arm now
+*sees* every target of 12 of the 15 multi-declaration asks and still cannot say them together,
+which moves the diagnosis from authority to **emission** and is the open half of this entry
+(`docs/plans/2026-09-22-coordinated-emission.md`).
 
 PR 33145's six `Dense.continuous_*` theorems all live in one file and are one family. The
 maintainer asked for a coordinated rename plus a dualization across them. They were split across
@@ -75,12 +88,25 @@ crash rather than refuse.
 
 In order, cheapest first:
 
-1. **Fix the packing accounting** — charge a hunk once per unit, not once per target. Halves the
-   unit count and removes ~110 mandatory generalist jobs for free. Changes every `work_unit_id` and
-   therefore every frozen prompt hash: needs `rerender_release` and a renderer-version bump, which
-   is what `rerender_release.py:4-8` exists for.
+1. ~~**Fix the packing accounting**~~ — **done in `12a3939`.** `_pack_bundles` charges a hunk once
+   per unit; 225 → 121 units. It also fixed a defect the entry did not know about: `command` was
+   85% severed declaration parts (59 doc-comments, 26 attributes, 6 real commands), so a
+   declaration's own docstring was scheduled away from it — 38 of 59 doc-comments sat in a unit
+   with no declaration at all. They are now named (`doc_comment`, `attribute`), carry `attached_to`,
+   pack with their declaration, and are diffed with it. That was a *recall* defect, not tidiness:
+   it cost the two PR 33321 obligations every baseline repetition had found.
 2. **Fix `patch_set` and exercise it once** — `.path`, retype the test, add the field to the
    contract template for `PATCH_SET_ARMS`, then force one submission on 33145.
+   **Two more defects found 2026-09-22, neither known when this was written.** (a) `patchset.apply`
+   applies a declaration-mode edit by `text.replace(declaration_name, new_declaration, 1)`
+   (`patchset.py:160-167`) while claiming to do what the single-edit path does; the single-edit path
+   parses with `extract_proof_blocks` and splices `header_span`..`body_span` with prefix handling
+   (`review/base.py:336-354`). So a well-formed declaration edit rewrites the first *occurrence of
+   the name* — possibly in a docstring — and compiles garbage. A test pins the substring semantics.
+   (b) Patch sets are **file-confined, not anchor-confined** (`validate` checks `allowed_paths` and
+   modes; `PatchEdit` has no anchor), which the 2026-09-08 plan already flagged at `:1376` as the
+   precondition for widening the grant. Both are in
+   `docs/plans/2026-09-22-coordinated-emission.md`; the grant widens after them, not before.
 3. **Rank the once-per-PR family claim by component coverage**, not by `work_unit_id`. Three lines
    in `plan_coverage`'s sort.
 4. **Decide the authority question.** `build_file_task_data` (`task_adapter.py:78-114`) already

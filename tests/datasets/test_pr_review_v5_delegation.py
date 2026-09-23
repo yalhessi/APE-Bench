@@ -20,12 +20,17 @@ from types import SimpleNamespace
 import pytest
 
 from ape.orchestration.config import EarlyStopMode
+from ape.orchestration.models import (
+    Attempt, ChildRun, ExecutionStatus, Sample, TaskExecutionSpec, TaskOutcome,
+)
+from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, nested_config
 from ape.tasks.lean_tasks.formal_math.review.delegation import (
     TIER_MULTIPLIERS,
+    WAVE_EXECUTION,
     JobSpec,
-    _normalize_status,
-    _wave_config,
+    ledger_status,
     run_jobs,
+    run_wave,
 )
 from src.mathlib_review.io import sha256_bytes, canonical_json_bytes
 from src.mathlib_review.schema.review import ReviewAgenda, V5RunPlan
@@ -42,9 +47,21 @@ def _parent(tmp_path, cap=0.25):
     return SimpleNamespace(
         config=ApeAgentConfig(),
         attempt_path=tmp_path,
-        data=SimpleNamespace(pr_number=33098),
+        data=SimpleNamespace(pr_number=33098, episode_id="ep:1", execution_index_path=None),
         logger=SimpleNamespace(info=lambda *a, **k: None, error=lambda *a, **k: None),
     )
+
+
+def _wave_config(parent, wave: int):
+    """What a wave asks the shared primitive for.
+
+    `delegation` had its own `_wave_config` and its own nested orchestrator; it now hands
+    `WAVE_EXECUTION` to `nested_config`, so these tests assert the composition the wave
+    actually uses rather than a second implementation of it.
+    """
+
+    return nested_config(parent.attempt_path, parent.config, group=f"wave{wave}",
+                         concurrency=DEFAULT_NESTED_CONCURRENCY, **WAVE_EXECUTION)
 
 
 def test_a_job_carries_its_own_budget_rather_than_being_grouped_by_it():
@@ -159,14 +176,109 @@ def test_an_unknown_tier_falls_back_to_the_standard_cap():
     assert TIER_MULTIPLIERS.get("lavish", 1.0) == 1.0
 
 
+def _child(status: ExecutionStatus, *, succeeded: bool = False, cost: float = 0.0):
+    """A `ChildRun` shaped like one the primitive returns. Built from the real models, because
+    a hand-made stand-in is free to disagree with the class it stands for -- which is how three
+    tests kept passing while the field they exercised did not exist."""
+
+    from datetime import datetime
+
+    outcome = TaskOutcome.from_samples(
+        task_id="t", task_type="lean_pr_review_v5_arm", global_index="0",
+        samples={0: Sample(
+            sample_id="s", task_global_index="0", sample_index=0, status=status,
+            created_at=datetime.now(), updated_at=datetime.now(),
+            attempts=[Attempt(attempt_id=0, path=Path("/tmp/a"), status=status,
+                              created_at=datetime.now(), max_turns=10, cost_limit=0.3,
+                              cost=cost, cached_cost=cost)])},
+        max_retries=0, max_turns=10, sample_max_cost=0.0, has_result=succeeded)
+    return ChildRun(
+        spec=TaskExecutionSpec(spec_id="wu:a#naming", task_type="lean_pr_review_v5_arm",
+                               task_data={}),
+        global_index="0", task_dir="/tmp/0", outcome=outcome,
+        result=SimpleNamespace(candidates=[], verification_artifacts=[], abstention=None)
+        if succeeded else None)
+
+
 def test_a_paused_job_is_reported_as_paused_not_failed():
     """Budget exhaustion is a fact about routing — the thing being measured — so it must be
-    distinguishable from a job that broke."""
+    distinguishable from a job that broke.
 
-    assert _normalize_status("ExecutionStatus.PAUSED_COST_LIMIT", False) == "paused_cost"
-    assert _normalize_status("PAUSED_MAX_TURNS", False) == "paused_turns"
-    assert _normalize_status("FAILED_ERROR", False) == "failed"
-    assert _normalize_status(None, True) == "success"
+    Read off the typed sample status now. The old reader stringified it, cut on a dot, upcased
+    the remainder and looked it up in a table of spellings -- a second vocabulary with nothing
+    checking it against the first."""
+
+    assert ledger_status(_child(ExecutionStatus.PAUSED_COST_LIMIT)) == "paused_cost"
+    assert ledger_status(_child(ExecutionStatus.PAUSED_MAX_TURNS)) == "paused_turns"
+    assert ledger_status(_child(ExecutionStatus.FAILED_ERROR)) == "failed"
+    assert ledger_status(_child(ExecutionStatus.SUCCESS, succeeded=True)) == "success"
+
+
+def test_success_means_a_submission_came_back_not_that_the_task_ended_well():
+    """A task can end `SUCCESS` at the sample level having produced no legal submission -- and
+    the ledger word for that is not `success`."""
+
+    assert ledger_status(_child(ExecutionStatus.SUCCESS, succeeded=False)) == "success"
+    assert ledger_status(_child(ExecutionStatus.FAILED_MODEL, succeeded=True)) == "success"
+
+
+def test_a_job_becomes_a_spec_carrying_its_own_ceiling_and_its_scope():
+    """`JobSpec` describes what the lead asked for; `TaskExecutionSpec` is what the framework
+    runs. The cap is the tier's multiple of the run's standard cap, and the floor declares
+    itself required so a failed mandatory job is a coverage gap rather than a silence."""
+
+    floor = JobSpec("wu:a#generalist", "generalist", "wu:a", 1,
+                    {"task_type": "lean_pr_review_v5_arm", "rendered_user_prompt": "p"},
+                    budget_tier="standard", disposition="mandatory")
+    deep = JobSpec("wu:a#naming", "naming", "wu:a", 1,
+                   {"task_type": "lean_pr_review_v5_arm", "rendered_user_prompt": "p"},
+                   budget_tier="deep", disposition="proposed")
+
+    assert floor.execution_spec(0.30).billed_cost_limit == 0.30
+    assert deep.execution_spec(0.30).billed_cost_limit == 0.60
+    assert (floor.required, floor.budget_scope) == (True, "floor")
+    assert (deep.required, deep.budget_scope) == (False, "discretionary")
+
+
+def test_the_specs_payload_is_the_prompt_the_model_reads():
+    """The brief is composed onto the sealed prompt, and the composed text is what
+    `global_index` hashes -- so two dispatches of one pair with different briefs are two tasks
+    rather than a resume of the first."""
+
+    payload = {"task_type": "lean_pr_review_v5_arm", "rendered_user_prompt": "base"}
+    plain = JobSpec("wu:a#naming", "naming", "wu:a", 1, payload)
+    briefed = JobSpec("wu:a#naming", "naming", "wu:a", 1, payload, brief_text="\n\nASK: why?")
+    assert plain.execution_spec(0.3).task_data["rendered_user_prompt"] == "base"
+    assert briefed.execution_spec(0.3).task_data["rendered_user_prompt"].startswith("base")
+    assert "ASK: why?" in briefed.execution_spec(0.3).task_data["rendered_user_prompt"]
+
+
+def test_the_wave_hands_its_execution_policy_to_the_primitive(tmp_path, monkeypatch):
+    """One attempt per job and early stop disabled are the wave's policy, and they only bind if
+    they reach the orchestrator."""
+
+    import ape.tasks.lean_tasks.formal_math.review.delegation as module
+
+    seen = {}
+
+    async def fake_run_subtasks(specs, **kwargs):
+        seen.update(kwargs)
+        seen["specs"] = list(specs)
+        return {}, None
+
+    monkeypatch.setattr(module, "run_subtasks", fake_run_subtasks)
+    asyncio.run(run_wave(_parent(tmp_path),
+                         [JobSpec("wu:a#naming", "naming", "wu:a", 33098,
+                                  {"task_type": "lean_pr_review_v5_arm"})],
+                         standard_cap=0.3, wave=2,
+                         logger=SimpleNamespace(info=lambda *a, **k: None,
+                                                error=lambda *a, **k: None)))
+    assert seen["execution_overrides"] == WAVE_EXECUTION
+    assert seen["group"] == "wave2"
+    # Deterministic, and load-bearing: the orchestrator fixes its directory from this in
+    # `__init__`, so a resumed lead must name the wave it already paid for.
+    assert seen["orchestrator_id"] == "33098_w2"
+    assert [item.spec_id for item in seen["specs"]] == ["wu:a#naming"]
 
 
 # --------------------------------------------------------------------------------------
@@ -364,18 +476,44 @@ def test_the_routing_report_names_both_degenerate_cases():
 # away while the manifest reported $0.27.
 
 
-def test_cost_attribution_may_fail_without_losing_the_wave():
-    """Zero cost is wrong and visible. No results at all is wrong and silent."""
+def test_a_child_that_cannot_be_read_does_not_lose_the_wave(tmp_path, monkeypatch):
+    """Zero cost is wrong and visible. No results at all is wrong and silent.
 
-    import inspect
+    `pr5_smoke4_rep8` spent $3.13 billed and reported $0.27 because reading the children raised
+    and `delegate` discarded the whole wave. The guarantee now lives in the primitive, per
+    child, and this is the review side of it: a job whose records are unreadable is a failed
+    row beside its siblings' real ones."""
 
-    from ape.tasks.lean_tasks.formal_math.review import delegation
+    import ape.tasks.lean_tasks.formal_math.review.delegation as module
 
-    source = inspect.getsource(delegation.run_wave)
-    attribution = source[source.index("_sample_facts(orchestrator, results)") - 200:]
-    assert "try:" in source[:source.index("_sample_facts(orchestrator, results)")][-300:], (
-        "cost attribution is not guarded; a failure there loses the whole wave")
-    assert "facts = {}" in attribution
+    async def half_broken(specs, **kwargs):
+        runs = {}
+        for spec in specs:
+            broken = spec.spec_id.endswith("#broken")
+            runs[spec.spec_id] = ChildRun(
+                spec=spec, global_index="0", task_dir="/tmp/0",
+                outcome=_child(ExecutionStatus.FAILED_ERROR if broken
+                               else ExecutionStatus.SUCCESS,
+                               succeeded=not broken, cost=0.0 if broken else 0.11).outcome,
+                result=None if broken else SimpleNamespace(
+                    candidates=[], verification_artifacts=[], abstention=None),
+                error="records unreadable: boom" if broken else None)
+        return runs, None
+
+    monkeypatch.setattr(module, "run_subtasks", half_broken)
+    payload = {"task_type": "lean_pr_review_v5_arm"}
+    outcomes = asyncio.run(run_wave(
+        _parent(tmp_path),
+        [JobSpec("wu:a#broken", "broken", "wu:a", 1, payload),
+         JobSpec("wu:a#naming", "naming", "wu:a", 1, payload)],
+        standard_cap=0.3, wave=1,
+        logger=SimpleNamespace(info=lambda *a, **k: None, error=lambda *a, **k: None)))
+
+    by_id = {item.invocation_id: item for item in outcomes}
+    assert sorted(by_id) == ["wu:a#broken", "wu:a#naming"]
+    assert by_id["wu:a#naming"].status == "success" and by_id["wu:a#naming"].cost == 0.11
+    assert by_id["wu:a#broken"].status == "failed"
+    assert "unreadable" in by_id["wu:a#broken"].error
 
 
 def test_the_index_is_recorded_before_attribution_and_cannot_raise():

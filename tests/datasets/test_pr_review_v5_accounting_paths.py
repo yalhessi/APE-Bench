@@ -17,17 +17,32 @@ from pathlib import Path
 import pytest
 
 
-def test_the_patch_set_workspace_resolves_instead_of_raising():
-    """`Path` is imported. Before, any patch_set submission raised NameError."""
+def test_the_patch_set_workspace_resolves_instead_of_raising(tmp_path):
+    """The workspace is a `WorkspaceInfo`, and this test now says so.
+
+    Two defects lived here. `Path` was not imported, so a patch_set submission raised
+    `NameError`; that was fixed. The second survived it: `target_workspace` is a
+    `WorkspaceInfo` (`ape/tasks/base.py`), never a path, so `Path(root)` raises `TypeError`
+    on the first real coordinated patch -- and this test assigned a **string**, so it passed
+    against a type the runtime never produces. A hand-built fake cannot disagree with the
+    class it stands in for; construct the real one.
+    """
 
     from ape.tasks.lean_tasks.formal_math.review.candidates import (
         LeanPRReviewV4CandidateTask,
     )
+    from ape.tasks.models import WorkspaceInfo
 
     task = LeanPRReviewV4CandidateTask.__new__(LeanPRReviewV4CandidateTask)
-    task.target_workspace = "/tmp/reviewed/workspace"
-    assert LeanPRReviewV4CandidateTask._patch_set_workspace(task) == Path(
-        "/tmp/reviewed/workspace")
+    task.target_workspace = WorkspaceInfo(
+        name="target", path=tmp_path, commit_hash="c" * 40,
+        repo_url="https://example.invalid/mathlib4.git", default_target="Mathlib")
+    assert LeanPRReviewV4CandidateTask._patch_set_workspace(task) == tmp_path
+
+    # A workspace that exists but was never set up has no path, and is not a workspace to
+    # compile in -- the same answer as having none at all.
+    task.target_workspace = WorkspaceInfo(name="target")
+    assert LeanPRReviewV4CandidateTask._patch_set_workspace(task) is None
 
     task.target_workspace = None
     assert LeanPRReviewV4CandidateTask._patch_set_workspace(task) is None

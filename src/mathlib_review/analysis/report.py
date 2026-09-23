@@ -17,12 +17,11 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.paths import RESULTS, run_dir
 from src.mathlib_review.review.trace import routing_report
 
 
-def _load_jsonl(path: Path):
-    return [json.loads(x) for x in path.read_text().splitlines() if x.strip()]
 
 
 def retrieval(run_name: str) -> Dict[str, Any]:
@@ -57,7 +56,7 @@ def retrieval(run_name: str) -> Dict[str, Any]:
     so the arms granted it barely use it.
     """
 
-    rows = _load_jsonl(run_dir(run_name) / "context_trace.jsonl")
+    rows = jsonl_rows(run_dir(run_name) / "context_trace.jsonl")
     if not rows:
         return {"run": run_name, "calls": 0}
 
@@ -111,7 +110,7 @@ def _abstentions(run_name: str) -> Dict[str, Any]:
     """
 
     by_arm: Dict[str, Dict[str, int]] = {}
-    for row in _load_jsonl(run_dir(run_name) / "arm_responses.jsonl"):
+    for row in jsonl_rows(run_dir(run_name) / "arm_responses.jsonl"):
         if row.get("candidates"):
             continue
         arm = row.get("arm_id") or str(row.get("invocation_id") or "?").rsplit("#", 1)[-1]
@@ -123,7 +122,7 @@ def _abstentions(run_name: str) -> Dict[str, Any]:
 
 def routing(run_name: str) -> Dict[str, Any]:
     directory = run_dir(run_name)
-    delegations = _load_jsonl(directory / "delegations.jsonl")
+    delegations = jsonl_rows(directory / "delegations.jsonl")
     report = routing_report(delegations)
     manifest_path = directory / "run_manifest.json"
     if manifest_path.is_file():
@@ -153,12 +152,17 @@ def scoped_obligations(run_name: str,
     generation side never touches it.
     """
 
-    agenda_path = run_dir(run_name) / "agenda.json"
-    if not agenda_path.is_file():
+    from src.mathlib_review.run_state import MissingArtifact, StageInput
+
+    try:
+        stage = StageInput.at(run_dir(run_name), run_name=run_name, allow_partial=True)
+        agenda = json.loads(stage.path("agenda").read_text())
+    except (MissingArtifact, FileNotFoundError):
         return None
-    agenda = json.loads(agenda_path.read_text())
     reviewed = {item["pr_number"] for item in agenda.get("proposals", [])}
-    judgments = Path(agenda["release"]) / "gold/judgments.jsonl"
+    if stage.release is None:
+        return None
+    judgments = stage.release / "gold/judgments.jsonl"
     if not judgments.is_file():
         return None
     # Count *eligible* obligations, not raw ones. The judge scores a filtered set — 40 of
@@ -184,7 +188,7 @@ def scoped_obligations(run_name: str,
 
     excluded = excluded_ids()
     audited: Dict[int, int] = {}
-    for row in _load_jsonl(judgments):
+    for row in jsonl_rows(judgments):
         pr = row.get("pr_number")
         if pr not in reviewed:
             continue
@@ -244,10 +248,8 @@ def contamination(release: Path) -> Dict[str, Any]:
     gold: List[str] = []
     path = release / "gold/judgments.jsonl"
     if path.is_file():
-        for line in path.read_text().splitlines():
-            if not line.strip():
-                continue
-            for obligation in (json.loads(line).get("obligations") or []):
+        for row in jsonl_rows(path):
+            for obligation in (row.get("obligations") or []):
                 for field in ("claim", "requested_change", "resolution_criteria"):
                     if obligation.get(field):
                         gold.append(str(obligation[field]))
@@ -423,8 +425,10 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     all line up. Two seams have to be bridged, and both are one-liners rather than reasons
     to fork a 1600-line renderer:
 
-    * The judge writes `semantic_matches.jsonl`; the overlay reads `matches.jsonl`. An
-      alias is created rather than a copy, so there is exactly one file of record.
+    * The judge writes `semantic_matches.jsonl` and v4 audits hold `matches.jsonl`; the
+      renderer reads whichever it finds, in that order. It used to be given an alias planted
+      inside the audit directory -- a read-only report writing into another stage's output,
+      which is the one thing an immutable artifact tree must not allow.
     * Output must not land inside a frozen root, or every render fails the FROZEN.lock gate.
       v5 overlays go to `results/overlays/pr_review_v5/`.
 
@@ -436,23 +440,17 @@ def overlay(run_name: str, audit_dir: Optional[Path] = None,
     from src.mathlib_review.analysis.review_overlay import build_overlay, write_overlay
     from src.mathlib_review.analysis.review_overlay import paths as v4_paths
 
-    directory = run_dir(run_name)
-    agenda_path = directory / "agenda.json"
-    if not agenda_path.is_file():
-        raise FileNotFoundError(
-            f"no agenda at {agenda_path}; the overlay needs the run's release and PR set."
-        )
-    agenda = json.loads(agenda_path.read_text())
-    release = Path(agenda["release"])
+    from src.mathlib_review.run_state import StageInput
+
+    # Read forensically: an overlay of a partial run is exactly what someone wants to look at
+    # when a run went wrong, and the page is not a measurement.
+    stage = StageInput.at(run_dir(run_name), run_name=run_name, allow_partial=True)
+    directory = stage.run_dir
+    agenda = json.loads(stage.path("agenda").read_text())
+    release = stage.release
     pr_numbers = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
 
-    judge = None
-    if audit_dir and audit_dir.is_dir():
-        alias = audit_dir / "matches.jsonl"
-        source = audit_dir / "semantic_matches.jsonl"
-        if source.is_file() and not alias.exists():
-            alias.symlink_to(source.name)
-        judge = audit_dir if alias.exists() else None
+    judge = audit_dir if audit_dir and audit_dir.is_dir() else None
 
     out = out or Path("results/overlays/pr_review_v5") / run_name
     treatment = v4_paths.TREATMENTS / "systematic-opportunities-v3-medium"
@@ -544,6 +542,8 @@ def conditions(runs: Dict[str, Any], release: Optional[Path] = None) -> Dict[str
     for label, names in reps.items():
         loaded[label] = []
         for run_name in names:
+            # Derived the way `judge --of` derives it, so a condition cannot be paired with an
+            # audit that scored a different run.
             audit = derive_from_run(run_name)["out_dir"] / "semantic_report.json"
             if not audit.is_file():
                 raise SystemExit(
@@ -675,7 +675,7 @@ def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
 
     scoped = set(scoped_obligation_ids)
     gold: Counter = Counter()
-    for node in _load_jsonl(release / "gold/judgments.jsonl"):
+    for node in jsonl_rows(release / "gold/judgments.jsonl"):
         weight = sum(1 for ob in node.get("obligations") or []
                      if ob.get("obligation_id") in scoped)
         if not weight:
@@ -693,7 +693,7 @@ def _attention_vs_maintainers(runs: Dict[str, str], release: Path,
         path = run_dir(run_name) / "findings.jsonl"
         if not path.is_file():
             continue
-        raised: Counter = Counter(canon(r["concern_family"]) for r in _load_jsonl(path))
+        raised: Counter = Counter(canon(r["concern_family"]) for r in jsonl_rows(path))
         raised_share = share(raised)
         keys = set(gold_share) | set(raised_share)
         # Half the L1 distance between the two distributions: 0 is identical attention, 1 is
@@ -719,7 +719,7 @@ def _redundancy(run_name: str) -> Optional[Dict[str, Any]]:
     path = run_dir(run_name) / "findings.jsonl"
     if not path.is_file():
         return None
-    rows = list(_load_jsonl(path))
+    rows = list(jsonl_rows(path))
     per_target = Counter((r["pr_number"], r["primary_change_id"]) for r in rows)
     families = Counter(
         len({r["concern_family"] for r in rows
@@ -793,9 +793,9 @@ def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
                         if payload.get(key):
                             searched[pr].add(str(payload[key]))
 
-    episodes = {row["pr_number"]: row for row in _load_jsonl(release / "input/episodes.jsonl")}
+    episodes = {row["pr_number"]: row for row in jsonl_rows(release / "input/episodes.jsonl")}
     out: Dict[str, Any] = {}
-    for row in _load_jsonl(release / "derived/change_graphs.jsonl"):
+    for row in jsonl_rows(release / "derived/change_graphs.jsonl"):
         graph = ChangeGraph.model_validate(row)
         pr = graph.pr_number
         if pr not in tools and pr not in reads:
@@ -830,5 +830,624 @@ def _examination(run_name: str, release: Path) -> Optional[Dict[str, Any]]:
             "tool_calls": dict(sorted(tools.get(pr, {}).items())),
             "diff_chars": len(episode.get("diff") or ""),
             "changed_files": len(episode.get("changed_files") or []),
+        }
+    return out
+
+
+def stages(run_name: str) -> Dict[str, Any]:
+    """What has happened to this run, and what the artifacts say happened.
+
+    Two halves, and the second is the point. The ledger says what each stage recorded; the
+    reconciliation says whether the run directory agrees with it. They can disagree in exactly
+    the ways a crash produces -- a manifest with no row means a run closed and died before
+    recording itself, an audit on disk with no row means it was judged before rows existed (or
+    by hand) -- and naming those is more useful than a ledger that pretends to be complete.
+
+    Read-only, and free.
+    """
+
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.paths import AUDITS
+    from src.mathlib_review.run_state import RUN_ARTIFACTS, ledger, state_of
+
+    directory = run_dir(run_name)
+    rows = ledger(directory)
+    manifest_path = directory / RUN_ARTIFACTS["run_manifest"].filename
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else None
+
+    audits_on_disk = sorted(
+        str(path) for path in AUDITS.glob(f"{derive_from_run(run_name)['out_dir'].name}*")
+        if (path / "semantic_report.json").is_file())
+    audits_in_ledger = {row.get("produced", {}).get("out_dir")
+                        for row in rows if row.get("stage") == "judge"}
+
+    return {
+        "run": run_name,
+        "state": state_of(directory).value,
+        "completion_status": (manifest or {}).get("completion_status"),
+        "stages": [
+            {key: row.get(key) for key in
+             ("stage", "node", "pipeline", "transition", "forensic", "written_at",
+              "git_commit", "git_tree_state", "identity")}
+            for row in rows
+        ],
+        "forensic_rows": [row.get("stage") for row in rows if row.get("forensic")],
+        "reconciliation": {
+            # A run that closed and died before recording itself. The artifacts are intact and
+            # the row is not; that is worth saying rather than papering over.
+            "ledger_missing_run_row": bool(
+                manifest and not any(row.get("stage") == "run" for row in rows)),
+            "audits_without_a_row": [
+                item for item in audits_on_disk if item not in audits_in_ledger],
+            "rows_without_an_audit": sorted(
+                item for item in audits_in_ledger
+                if item and not (Path(item) / "semantic_report.json").is_file()),
+        },
+    }
+
+
+#: The coarse split, and it is miss-decomposition's, unchanged since June 2026.
+#:
+#: `UNTOUCHED` is pure geometry and judge-independent: nothing the system emitted anchors at
+#: this obligation's sites, so no verdict can make it a hit. That is the number the 2026-06
+#: analysis called the robust one, and it is computable before any judge runs.
+#:
+#: `LOCATED_MISS` is the selection gap the whole project turns on -- something *was* emitted
+#: there and it was about something else. Splitting it from `COVERED` needs the judge, which is
+#: why a bucket report without an audit reports `LOCATED_UNJUDGED` rather than guessing.
+COARSE = ("UNTOUCHED", "LOCATED_MISS", "LOCATED_UNJUDGED", "COVERED")
+
+#: Why an obligation sits where it does, one rung finer, in the overlay's own vocabulary.
+#: Deliberately not a new taxonomy: `review_overlay.STATES` already names these states for the
+#: per-target page, and a second vocabulary for the same facts is how `documentation` and
+#: `docs` made an arm unmeasurable for its whole life.
+FINE = ("unscheduled", "pruned", "unavailable", "silent", "candidate", "finding")
+
+
+def _context_quality(calls) -> str:
+    """What retrieval this job actually got back: `none`, `empty`, `partial` or `ok`.
+
+    An ANNOTATION, never a bucket. It answers "did the arm have anything to work from", which
+    is a different question from "what did the arm do", and folding it into the ladder would
+    make a tooling failure and a judgement call the same row.
+
+    It is also incomplete by construction and says so: three tools write no trace row at all
+    (`proof_profile` on every path, `naming_norm` on three failure returns), so `none` means
+    "no row", not "no call". Tool refusals are not recorded anywhere, so they are not offered
+    as a value -- `docs/todo/evidence-tiers-and-traces.md` §4.
+    """
+
+    calls = list(calls or [])
+    if not calls:
+        return "none"
+    empty = sum(1 for call in calls if not call.get("result_count"))
+    if empty == len(calls):
+        return "empty"
+    return "partial" if empty else "ok"
+
+
+def _cell_state(job, anchored_findings, response_status: Optional[str] = None) -> str:
+    """What one scheduled (arm, site) pair did, on the overlay's ladder.
+
+    `response_status` is what the arm itself recorded, and it is consulted only when the
+    delegation row carries no status at all. That is not a rare case: `ArmResponse.row()` uses
+    `exclude_unset` so "considered and declined" stays distinguishable from "never considered",
+    and in a **fanout** run the arms are top-level tasks rather than lead-delegated jobs, so no
+    row carries an outcome. Reading that absence as "ran and did not come back" put every
+    obligation of `pr5_F_fanout_stage1_rep1` in `UNTOUCHED` while the judge scored two of them
+    `hit` -- the report contradicting the audit beside it, on a run whose 173 arm responses all
+    say `success`.
+    """
+
+    if job.disposition == "pruned":
+        return "pruned"
+    status = job.status if job.status is not None else response_status
+    if status != "success":
+        # Ran and did not come back: a coverage gap, not a silence. A failed mandatory job
+        # counted as coverage once, and the run was scored as complete over work nobody did.
+        return "unavailable"
+    if not anchored_findings:
+        return "silent"
+    if any(item.get("admission") == "published" and item.get("channels")
+           for item in anchored_findings):
+        return "finding"
+    return "candidate"
+
+
+def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
+    """Why each gold obligation ended where it did, and what became of every finding.
+
+    The join that has been done by hand in a scratchpad every time someone asked "why did we
+    miss this". It reads the agenda (was anything scheduled here), the delegation ledger (did
+    the lead decline it, did the job run), the arm responses (did the arm abstain, and saying
+    what), the context trace (did its retrieval return anything), `findings.jsonl` (was a claim
+    emitted, and did the gate publish it) and, when there is one, the judge's own report.
+
+    Two levels, and the coarse one is miss-decomposition's: `UNTOUCHED` is judge-independent
+    geometry, and the `COVERED` / `LOCATED_MISS` split needs a verdict. Without an audit the
+    located set is reported as `LOCATED_UNJUDGED` rather than guessed at.
+
+    The fine level is `review_overlay.STATES`, not a new vocabulary -- a second set of words
+    for the same facts is how `documentation` and `docs` made an arm unmeasurable for its whole
+    life. Everything else is an annotation beside the bucket: the abstention's own reason, the
+    retrieval it got, the gate's verdict, the judge's pairing, and whether a replay found the
+    decision stable. Those answer different questions and must not be folded into one ladder.
+
+    Several runs make the per-finding half say `reps_with_key`: how many of them reproduced a
+    claim. It is reported and not ranked on -- cross-rep agreement separates hits in-sample and
+    is recorded as provisional (`docs/todo/selection-signal.md`).
+
+    Costs nothing and calls no model.
+    """
+
+    from src.mathlib_review.agenda.registry import expected_concerns
+    from src.mathlib_review.analysis.benches import gold_labels_for
+    from src.mathlib_review.analysis.delegation_view import load_lead_views
+    from src.mathlib_review.analysis.obligation_exclusions import excluded_ids
+    from src.mathlib_review.analysis.review_overlay import deepest
+    from src.mathlib_review.judge.runner import derive_from_run
+    from src.mathlib_review.review.merge import finding_key
+    from src.mathlib_review.run_state import StageInput
+
+    # An arm's remit as gold spells it. Computed once: `gold_labels_for` bridges the two
+    # concern vocabularies, and asking it per cell would call it a few thousand times.
+    remit = {arm: gold_labels_for(sorted(families))
+             for arm, families in expected_concerns().items()}
+
+    run_names = [runs] if isinstance(runs, str) else list(runs)
+    per_run: Dict[str, Any] = {}
+    key_runs: Dict[str, set] = {}
+
+    for run_name in run_names:
+        stage = StageInput.of(
+            run_name, audit=audit,
+            require=("agenda", "delegations", "arm_responses", "findings"),
+            allow_partial=True)
+        agenda = json.loads(stage.path("agenda").read_text())
+        reviewed = sorted({item["pr_number"] for item in agenda.get("proposals", [])})
+        findings = jsonl_rows(stage.path("findings"))
+        responses = {row["invocation_id"]: row
+                     for row in jsonl_rows(stage.path("arm_responses"))}
+        views = load_lead_views(stage.run_dir)
+        jobs = [job for view in views.values() for job in view.delegations]
+
+        # Findings by the change target they anchor to, which is the join anchor-tier pairing
+        # makes and therefore the only one an obligation can be reached through.
+        by_change: Dict[str, List[Dict[str, Any]]] = {}
+        for finding in findings:
+            for change_id in finding.get("change_ids") or []:
+                by_change.setdefault(change_id, []).append(finding)
+
+        verdict_by_obligation: Dict[str, str] = {}
+        paired_candidates: set = set()
+        matched_candidates: set = set()
+        hit_obligation_by_finding: Dict[str, set] = {}
+        if audit:
+            report = json.loads(stage.audit_path("semantic_report").read_text())
+            verdict_by_obligation = {
+                row["obligation_id"]: row.get("issue_status")
+                for row in report.get("per_obligation") or []}
+            for pair in jsonl_rows(stage.audit_path("semantic_pairs")):
+                if pair.get("role") == "observed":
+                    paired_candidates.add(pair["candidate_id"])
+            for match in jsonl_rows(stage.audit_path("semantic_matches")):
+                if match.get("role") == "observed" and match.get("issue_match"):
+                    matched_candidates.add(match["candidate_id"])
+                    hit_obligation_by_finding.setdefault(
+                        match["candidate_id"], set()).add(match["obligation_id"])
+
+        replay_by_invocation: Dict[str, Dict[str, Any]] = {}
+        if replay:
+            replay_by_invocation = _replay_annotations(replay)
+
+        excluded = excluded_ids()
+        obligations = []
+        # Why this report's denominator differs from the judge's, counted rather than left to
+        # be discovered. Two kinds of row are dropped here that a judge report still scores as
+        # misses, and neither is a fact about the reviewer: one whose gold has no `change_ids`
+        # at all, which anchor-tier pairing can never reach, and one `obligation_exclusions`
+        # names as contradicted by the release's own artifacts. On `heldout12_v2_rep1` the
+        # difference is exactly one audit-excluded row -- 23 in the judge's report, 22 here.
+        skipped = {"not_proposed_atomic": 0, "audit_excluded": 0, "anchorless": 0}
+        for row in jsonl_rows(stage.release / "gold/judgments.jsonl"):
+            if row.get("pr_number") not in reviewed:
+                continue
+            for obligation in row.get("obligations") or []:
+                if obligation.get("status") != "proposed_atomic":
+                    skipped["not_proposed_atomic"] += 1
+                    continue
+                if obligation["obligation_id"] in excluded:
+                    skipped["audit_excluded"] += 1
+                    continue
+                if not (obligation.get("change_ids") or []):
+                    skipped["anchorless"] += 1
+                    continue
+                # The judgment, not just the obligation: `concern_labels` says whose ask this
+                # was and `blocking_force` says how hard. Without them a silence cannot be
+                # told from a correct silence -- 32 of 43 gold-site silences on
+                # `heldout12_v2_rep1` are an arm quiet about somebody else's concern.
+                obligations.append((row["pr_number"], obligation, row))
+
+        rows = []
+        for pr_number, obligation, judgment in obligations:
+            gold_labels = {str(label) for label in judgment.get("concern_labels") or []}
+            sites = set(obligation["change_ids"])
+            cells = [job for job in jobs if sites & set(job.site_change_ids or [])]
+            anchored = [finding for change_id in sites for finding in by_change.get(change_id, [])]
+            anchored_ids = {item["finding_id"] for item in anchored}
+
+            states = []
+            annotations = []
+            for job in cells:
+                job_findings = [
+                    item for item in anchored
+                    if item.get("origin_arm_id") == job.arm_id
+                    or (job.arm_id == "generalist" and not item.get("origin_arm_id"))]
+                response = responses.get(job.invocation_id) or {}
+                state = _cell_state(job, job_findings, response.get("status"))
+                states.append(state)
+                abstention = (response.get("abstention") or {}) if state == "silent" else {}
+                replayed = replay_by_invocation.get(job.invocation_id) or {}
+                annotations.append({
+                    "invocation_id": job.invocation_id,
+                    "arm_id": job.arm_id,
+                    "state": state,
+                    "abstention_reason": abstention.get("reason") or None,
+                    # The sentence the arm wrote, which is the only thing a silence can be
+                    # diagnosed from: the reason *enum* swapped under replay on 17 of 45
+                    # sessions with the outcome unchanged, so it labels nothing on its own.
+                    "abstention_detail": abstention.get("detail") or None,
+                    # Whether the ask was this arm's business at all. `None` for the
+                    # generalist and anything else outside the registry, which has no remit
+                    # to be outside of.
+                    "on_concern": (bool(gold_labels & remit[job.arm_id])
+                                   if job.arm_id in remit else None),
+                    "context": _context_quality(job.context_calls),
+                    "filed_elsewhere_in_unit": bool(
+                        state == "silent" and (job.claims or [])),
+                    "replay_stable": replayed.get("stable"),
+                    "replay_reasons": replayed.get("reasons"),
+                    "replay_details": replayed.get("details"),
+                    "replay_filed": replayed.get("filed"),
+                })
+
+            state = deepest(*states) if states else "unscheduled"
+            located = state in {"candidate", "finding"}
+            if not located:
+                coarse = "UNTOUCHED"
+            elif not audit:
+                coarse = "LOCATED_UNJUDGED"
+            else:
+                coarse = ("COVERED"
+                          if verdict_by_obligation.get(obligation["obligation_id"]) == "hit"
+                          else "LOCATED_MISS")
+            rows.append({
+                "obligation_id": obligation["obligation_id"],
+                "pr_number": pr_number,
+                "coarse": coarse,
+                # What the maintainer actually asked for, beside what happened to it. Reading
+                # a silence means reading the ask, and this report is where the join lives so
+                # that nobody does it in a scratchpad again.
+                "claim": obligation.get("claim"),
+                "required": obligation.get("required"),
+                "concern_labels": sorted(gold_labels),
+                "blocking_force": judgment.get("blocking_force"),
+                "speech_act": judgment.get("speech_act"),
+                # Was an arm whose remit covers this ask scheduled here at all? Gold-free
+                # apart from the ask's own label, and it separates "the right arm declined"
+                # from "the right arm never ran", which are different repairs.
+                "on_concern_arm_scheduled": any(
+                    cell["on_concern"] for cell in annotations),
+                "state": state,
+                "gate": sorted({item.get("admission") for item in anchored}) or None,
+                "judge": verdict_by_obligation.get(obligation["obligation_id"]) if audit else None,
+                "findings_at_site": sorted(anchored_ids),
+                "cells": annotations,
+            })
+
+        finding_rows = []
+        for finding in findings:
+            key = finding_key(_asobj(finding))
+            key_runs.setdefault(key, set()).add(run_name)
+            if not audit:
+                judged = None
+            elif finding["finding_id"] in matched_candidates:
+                judged = "matched"
+            elif finding["finding_id"] in paired_candidates:
+                judged = "paired_unmatched"
+            else:
+                judged = "unpaired"
+            finding_rows.append({
+                "finding_id": finding["finding_id"], "key": key,
+                "pr_number": finding["pr_number"],
+                "admission": finding.get("admission"),
+                "judge": judged,
+            })
+
+        per_run[run_name] = {
+            "gate": _gate_report(findings, hit_obligation_by_finding, reviewed,
+                                 {pr_number for pr_number, _obligation, _judgment
+                                  in obligations},
+                                 audit),
+            "state": stage.state.value,
+            "forensic": stage.forensic,
+            "prs_reviewed": reviewed,
+            "requires": stage.consumed,
+            "obligations_counted": len(obligations),
+            "obligations_not_counted": skipped,
+            "coarse": {name: sum(1 for row in rows if row["coarse"] == name)
+                       for name in COARSE},
+            "fine": {name: sum(1 for row in rows if row["state"] == name) for name in FINE},
+            "obligations": rows,
+            "obligation_ids_by_bucket": {
+                name: sorted(row["obligation_id"] for row in rows if row["coarse"] == name)
+                for name in COARSE},
+            "findings": finding_rows,
+            "findings_by_judge": {
+                name: sum(1 for row in finding_rows if row["judge"] == name)
+                for name in ("matched", "paired_unmatched", "unpaired")},
+        }
+
+    if len(run_names) > 1:
+        for run_name, payload in per_run.items():
+            for row in payload["findings"]:
+                row["reps_with_key"] = len(key_runs.get(row["key"], ()))
+
+    return {
+        "runs": run_names,
+        "judged": bool(audit),
+        "per_run": per_run,
+        "coarse_vocabulary": list(COARSE),
+        "fine_vocabulary": list(FINE),
+        "note": (
+            "UNTOUCHED is judge-independent: nothing the system emitted anchors at the "
+            "obligation's sites, so no verdict could make it a hit. COVERED and LOCATED_MISS "
+            "split the rest by the judge's own per-obligation verdict, and without an audit "
+            "that split is not made. The annotations beside each cell -- abstention reason, "
+            "retrieval, gate, replay stability -- answer different questions and are not "
+            "buckets. `reps_with_key` is reported, never ranked on: cross-rep agreement "
+            "separates hits in-sample and is provisional."),
+    }
+
+
+def silences(run: str, replay: Optional[str] = None, audit: bool = True,
+             labels: Optional[Path] = None) -> Dict[str, Any]:
+    """Every gold-site silence beside the ask it is silent about, and its label.
+
+    The step-0 instrument. `buckets` already computes the join; this flattens it to the unit a
+    reader can actually work through -- one row per (obligation, silent cell) -- and adds the
+    two things a reader needs and an aggregate cannot supply: the arm's own sentence, and
+    whether the ask was that arm's business at all.
+
+    The second one reorders everything. On `heldout12_v2_rep1` only a minority of gold-site
+    silences are an arm declining inside its own remit; the rest are the wrong arm, correctly
+    quiet, and counting them as silences to be fixed is how an intervention aimed at a
+    contract ends up aimed at nothing. `on_concern` is that split, computed through
+    `benches.gold_labels_for` so the two concern vocabularies stay bridged.
+
+    A silence is not a miss and this is not a score. An obligation is missed once, however
+    many arms were quiet at it, and `by_label` below counts *cells*: several belong to one
+    obligation, most of them off-concern. Read `buckets` for the obligation-level number.
+
+    Costs nothing and calls no model.
+    """
+
+    from src.mathlib_review.judge.adjudicate import (
+        SILENCE_LABELS, load_silence_labels, resolve_silences,
+    )
+    from src.mathlib_review.schema import silence_key
+
+    payload = buckets([run], audit=audit, replay=replay)["per_run"][run]
+    store = Path(labels) if labels else SILENCE_LABELS
+    resolved = resolve_silences(load_silence_labels(store)) if store.is_file() else {}
+
+    rows = []
+    for obligation in payload["obligations"]:
+        for cell in obligation["cells"]:
+            if cell["state"] != "silent":
+                continue
+            key = silence_key(cell["invocation_id"], obligation["obligation_id"])
+            verdict = resolved.get(key) or {}
+            rows.append({
+                "key": key,
+                "pr_number": obligation["pr_number"],
+                "obligation_id": obligation["obligation_id"],
+                "claim": obligation["claim"],
+                "concern_labels": obligation["concern_labels"],
+                "blocking_force": obligation["blocking_force"],
+                "coarse": obligation["coarse"],
+                "invocation_id": cell["invocation_id"],
+                "arm_id": cell["arm_id"],
+                "on_concern": cell["on_concern"],
+                "abstention_reason": cell["abstention_reason"],
+                "abstention_detail": cell["abstention_detail"],
+                "context": cell["context"],
+                "filed_elsewhere_in_unit": cell["filed_elsewhere_in_unit"],
+                "replay_stable": cell["replay_stable"],
+                "replay_reasons": cell["replay_reasons"],
+                "replay_details": cell["replay_details"],
+                "replay_filed": cell["replay_filed"],
+                "label": verdict.get("label"),
+                "evidence_gap_tool": verdict.get("evidence_gap_tool"),
+                "labelled_by": verdict.get("labelled_by"),
+                "label_note": verdict.get("note"),
+                "label_from_run": verdict.get("from_run"),
+                # A label made by reading ANOTHER run's silence at this slot. The key recurs
+                # across reps because a work unit is release-derived, but the silence does not
+                # recur for the same reason: across the 59 cells rep1 and rep2 share, the two
+                # `abstention_detail` texts have median similarity 0.16 and the reason enum
+                # agrees 73% of the time. Only `off_concern` is a property of the ask and the
+                # arm's remit rather than of the session, so only it carries; everything else
+                # is borrowed and says so here.
+                "label_borrowed": bool(verdict) and verdict.get("from_run") != run,
+                "contested": verdict.get("contested", False),
+            })
+
+    from collections import Counter
+
+    on_concern = [row for row in rows if row["on_concern"]]
+    labelled = [row for row in rows if row["label"]]
+    borrowed = [row for row in labelled if row["label_borrowed"]]
+    return {
+        "run": run,
+        "replay": replay,
+        "labels_store": str(store),
+        "silent_cells": len(rows),
+        "obligations_with_a_silence": len({row["obligation_id"] for row in rows}),
+        "on_concern_cells": len(on_concern),
+        "off_concern_cells": sum(1 for row in rows if row["on_concern"] is False),
+        "remitless_cells": sum(1 for row in rows if row["on_concern"] is None),
+        # Whether an arm whose remit covers the ask was scheduled at all, per obligation.
+        # `False` is a routing failure and no contract change reaches it.
+        "obligations_without_an_on_concern_arm": sorted(
+            item["obligation_id"] for item in payload["obligations"]
+            if not item["on_concern_arm_scheduled"]),
+        "labelled": len(labelled),
+        "labelled_share": round(len(labelled) / len(rows), 4) if rows else None,
+        # Of the labelled cells, how many were labelled by reading a different run. Reported
+        # rather than filtered: a borrowed `off_concern` is sound and a borrowed
+        # `fix_required` is a guess, and the reader has to be able to tell which they have.
+        "labelled_from_another_run": len(borrowed),
+        "borrowed_by_label": dict(Counter(row["label"] for row in borrowed)),
+        "by_label": dict(Counter(row["label"] for row in labelled)),
+        "by_label_on_concern": dict(
+            Counter(row["label"] for row in labelled if row["on_concern"])),
+        "by_arm": {
+            arm: {
+                "cells": sum(1 for row in rows if row["arm_id"] == arm),
+                "on_concern": sum(1 for row in rows
+                                  if row["arm_id"] == arm and row["on_concern"]),
+            }
+            for arm in sorted({row["arm_id"] for row in rows})},
+        "contested_keys": sorted({row["key"] for row in rows if row["contested"]}),
+        "rows": rows,
+        "note": (
+            "A label whose `label_from_run` is not this run was made by reading another run's "
+            "silence at the same slot, and only `off_concern` carries that way: the ask and "
+            "the arm's remit do not change between repetitions, but the sentence the arm "
+            "writes does (median similarity 0.16 across the cells rep1 and rep2 share). "
+            "One row per (obligation, silent arm), not per obligation: an obligation with "
+            "five quiet arms contributes five. `on_concern` says whether gold's own concern "
+            "label for the ask falls in that arm's `expected_concerns`; where it is false the "
+            "silence is correct and the question is routing, not the contract. A label is a "
+            "reader's diagnosis of a silence -- it orders work and explains a number, and it "
+            "never enters recall."),
+    }
+
+
+def _gate_report(findings, hit_obligation_by_finding, reviewed, prs_with_gold, audit):
+    """What the admission gate did to what the run had already found.
+
+    The last stage between a finding and a maintainer, and the one nothing measured. `finalize`
+    publishes a claim only when a deterministic collector can warrant its concern family; the
+    rest are kept as `diagnostic` with no channel, which is honest about what the system would
+    *say* and is not the same as what it *found*. Both numbers matter and only one was reported.
+
+    On the three held-out A reps this is the largest gold-scored loss in the pipeline: the run
+    hits 7 / 5 / 6 obligations and publishes 2 / 1 / 1 of them. The dominant reason is not that
+    the claim is doubted -- 39 of rep1's 42 suppressed hits are "no collector can support this
+    claim's concern family", which is a statement about available evidence for a KIND of claim,
+    not about this one.
+
+    Read with the other column: published control-PR emission is 0 on all three reps against 3
+    / 4 / 5 pre-gate, so the gate is what buys the control property the project measures
+    precision by. Opening it is therefore a trade, not a free gain, and this block reports both
+    sides so nobody quotes one of them alone.
+    """
+
+    published = [item for item in findings if item.get("admission") == "published"]
+    controls = sorted(set(reviewed) - set(prs_with_gold))
+    payload = {
+        "findings": len(findings),
+        "published": len(published),
+        "suppressed": len(findings) - len(published),
+        # The precision side of the same trade, per PR the release records no obligation for.
+        "control_findings": sum(1 for item in findings if item["pr_number"] in controls),
+        "control_published": sum(1 for item in published if item["pr_number"] in controls),
+        "control_pr_numbers": controls,
+        "note": (
+            "`published` is what the system would say; `findings` is what it found. The gap is "
+            "the admission gate, whose axis is whether a collector can warrant the claim's "
+            "concern family -- not whether the claim is right. Control emission is reported "
+            "beside it because the gate is what keeps it at zero."),
+    }
+    if not audit:
+        return payload
+
+    hit_pre, hit_post = set(), set()
+    reasons: Dict[str, int] = {}
+    by_family: Dict[str, Dict[str, int]] = {}
+    for item in findings:
+        obligations = hit_obligation_by_finding.get(item["finding_id"]) or set()
+        family = item.get("concern_family") or "unknown"
+        row = by_family.setdefault(family, {"findings": 0, "hits": 0, "published": 0})
+        row["findings"] += 1
+        row["hits"] += bool(obligations)
+        row["published"] += item.get("admission") == "published"
+        if not obligations:
+            continue
+        hit_pre |= obligations
+        if item.get("admission") == "published":
+            hit_post |= obligations
+        else:
+            reason = item.get("admission_reason") or "unstated"
+            reasons[reason] = reasons.get(reason, 0) + 1
+    payload.update({
+        "obligations_hit_pre_gate": len(hit_pre),
+        "obligations_hit_post_gate": len(hit_post),
+        "obligations_lost_to_gate": sorted(hit_pre - hit_post),
+        "suppressed_hits_by_reason": dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
+        "by_concern_family": dict(sorted(by_family.items())),
+    })
+    return payload
+
+
+def _asobj(row: Dict[str, Any]):
+    from types import SimpleNamespace
+
+    return SimpleNamespace(**row)
+
+
+def _replay_annotations(replay_run: str) -> Dict[str, Dict[str, Any]]:
+    """Per invocation, what re-deciding from the recorded prefix produced.
+
+    A decision that reproduces is the arm's reading of its contract; one that does not is
+    sampling noise wearing a diagnosis. 41 of 45 gold-site specialist silences were stable.
+
+    `stable` is that question and is what the overlay prints. The rest is for diagnosing the
+    stable ones, which is the harder job: `reasons` because the abstention *label* is less
+    reproducible than the abstention (17 of 45 sessions produced a reason the recording did
+    not), `details` because the label is not the diagnosis and the arm's own sentence is, and
+    `filed` because a silence that files in some samples is a different repair from one that
+    never does. `details` is empty for a replay run written before the outcome rows carried
+    the text; it is reported as absent rather than reconstructed from attempt directories,
+    which belong to the worktree the replay ran in and may not exist.
+    """
+
+    from src.mathlib_review.run_state import StageInput
+
+    stage = StageInput.of(replay_run, require=("replay_outcomes",), allow_partial=True)
+    samples: Dict[str, List[Dict[str, Any]]] = {}
+    for row in jsonl_rows(stage.path("replay_outcomes")):
+        recorded = (row.get("recorded") or {}).get("decision") or {}
+        replayed = (row.get("replay") or {}).get("decision") or {}
+        if not replayed:
+            continue
+        first = replayed.get("first") or {}
+        samples.setdefault(row["invocation_id"], []).append({
+            "agreed": bool((recorded.get("first") or {}).get("filed") == first.get("filed")),
+            "filed": bool(first.get("filed")),
+            "reason": first.get("abstention_reason"),
+            "detail": first.get("abstention_detail"),
+        })
+
+    out: Dict[str, Dict[str, Any]] = {}
+    for invocation, rows in samples.items():
+        out[invocation] = {
+            "stable": all(row["agreed"] for row in rows),
+            "samples": len(rows),
+            "filed": sum(row["filed"] for row in rows),
+            "reasons": sorted({row["reason"] for row in rows if row["reason"]}),
+            "details": [row["detail"] for row in rows if row["detail"]] or None,
         }
     return out

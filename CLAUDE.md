@@ -78,7 +78,7 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
 |---|---|
 | Run a batch of tasks | `TaskOrchestrator` (`src/ape/orchestration/orchestrator.py`): standard layout `.ape/runs/<run>/tasks/<id>/samples/<n>/attempts/`, resumable. Never a loop over `TaskRunner.run_task`. |
 | Nested or delegated work inside a task | `BaseTask.spawn_subtasks` with `orchestration/subtasks.py::nested_config` |
-| Per-task budget | `ExecutionLimits` (task-data key `execution_limits`); caps bind **billed** cost |
+| Per-task budget | `ExecutionLimits` (task-data key `execution_limits`): `billed_cost_limit` binds **billed** cost, `token_limit` binds **processed tokens** (prompt + completion, cache-inclusive). Two fields on one object, enforced at one checkpoint — never a second limiter. A zero-priced model needs the token half; nothing converts between them. Calibration: `docs/research/2026-09-22-token-budget-calibration.md` |
 | Usage and outcome | `UsageBreakdown`, `TaskOutcome / SampleOutcome / AttemptOutcome` in `orchestration/models.py`; `task_result.json` only for a legal successful submission |
 | A new task | subclass `BaseTask` / `BaseLeanTask` under `src/ape/tasks/`. Review tasks build on `src/ape/tasks/lean_tasks/formal_math/review/` (`base.py`, `ReviewArmTask`, `ReviewLeadTask`). `ape/tasks/__init__.py` imports every task package eagerly, so a task class outside that tree cannot import `ape.tasks.base` without a cycle; do not retry moving the base out. |
 | Run configs | the standard scaffold YAML (`llm_config / execution / task_config / scaffold_type`), `extends:`, `extra="forbid"`, overrides as repeated `--set key=value` |
@@ -109,14 +109,48 @@ hand-rolled judge cache was replaced by orchestrator resume, budget tiers by `Ex
   this project's history was really an evidence gap.
 - Read the routing degenerate-check before any recall number. Externally, never show the
   leak-inflated Phase-C numbers (~70%).
+- **`location_recall` is not a quality signal.** It counts obligations where some candidate
+  anchored to the gold `change_id` *without* naming the issue — the agent asking for something
+  else at the right line, which is at best neutral. For coverage use `coverage_gaps` (0 means
+  every gold site had a job, and it is gold-independent); for what the reviewer could express
+  use `issue_recall_reachable`. A 2026-09-15 comparison was nearly read as a regression on a
+  location drop that meant only that a quieter run said fewer off-target things.
+- Gold is a lower bound, so `gold_alignment_rate` is not precision and a candidate absent from
+  gold is unaligned rather than wrong. Nothing in the current evaluation adjudicates the ~90% of
+  findings that are not maintainer obligations; until something does, precision claims in either
+  direction are unsupported.
 
 ## Running
 
 ```
-ape/bin/python -m pytest tests -q                                    # suite
+ape/bin/python -m pytest tests -q -n auto --dist loadfile            # suite, ~45s
 ape/bin/python -m src.mathlib_review.release.verify_frozen verify   # must print ok
 R="ape/bin/python -m src.mathlib_review.review.cli"
 $R plan --config <cfg> --run-name <name>                             # preflight, spends nothing
 ```
 
 Tests that need a built Lean workspace under `data/code_execute/` fail on a fresh clone; expected.
+
+**The suite is parallel, and the flags are not in `pytest.ini` on purpose.** `--dist loadfile`
+keeps a file's tests on one worker, which the module-scoped fixtures need. Leave the flags off a
+targeted run — worker startup costs more than the file does (`tests/orchestration/test_pipeline.py`
+alone: 0.24s serial, 2.38s under `-n auto`) — and off `--pdb`. A bare `pytest tests -q` still
+passes, just serially, so a checkout without `pytest-xdist` degrades rather than breaks.
+
+**A slow test is nearly always repeated work, not coverage.** The suite was 350s in 2026-09-22 and
+88% of that sat in 60 of its 2,213 tests; the three worst were 50% between them and none was
+buying anything. They were, in order: a test asserting payload *key spellings* that built the
+library exposure index first (130s), an AST guard that rebuilt its docstring set once per string
+constant (25s), and a catalogue that read the Mathlib tree four times over (22s). Profile the
+outlier before marking it slow, splitting the suite or reaching for any other machinery — all
+three were plain redundancy, and the fixes took a line each.
+
+**Providers.** `OPENAI_API_KEY` for the `gpt_*` models; `ELM_API_KEY` for the `elm_*` ones, which
+go through the University of Edinburgh gateway. Separate variables on purpose — both are usually
+exported in the same shell and neither may stand in for the other. `elm_*` names are their own
+canonical models, not a `base_url` override, so the run plan records which endpoint produced a run;
+switching one forks the judge cache, so switch at a run boundary. The four open-weight `elm_*`
+models are priced at **0.0**, which makes every dollar cap vacuous; the token block in
+`configs/bases/v5_generation.yaml` is what bounds a run on one, and `cli plan` refuses a
+zero-priced run that has left it unset. Llama 3.3 and EuroLLM are served without tool-calling and
+are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are agent-capable.

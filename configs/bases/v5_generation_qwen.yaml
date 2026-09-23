@@ -1,0 +1,101 @@
+# The iteration tier: v5 generation on the locally hosted Qwen, through the ELM gateway.
+#
+# Two tiers, and which one a run is in is a decision about what its numbers are FOR:
+#
+#   iteration  elm_qwen_3.5  — free, local. For "does this change do anything", pipeline
+#                              debugging, and shaking out a new arm or prompt. Its numbers
+#                              are a signal, not a result, and must never be quoted as one.
+#   keeps      gpt_5.2       — the existing `bases/v5_generation.yaml`, unchanged. For a
+#                              number that gets written down, compared across reps, or shown
+#                              to anyone.
+#
+# Nothing enforces the boundary except the run name and this comment, so: **name every run
+# from this base `iter_<something>`**. The artifacts are self-describing — `V5RunPlan.model_name`
+# records `elm_qwen_3.5` and `judge_identity` keys on the model, so no cache or plan can
+# silently mix the tiers — but a person reading a report is the failure mode, and this
+# project's record already contains an iteration number that was read as a result.
+extends: v5_generation.yaml
+
+llm_config:
+  model_name: elm_qwen_3.5
+
+  # OFF, deliberately, and this is the load-bearing line in the file.
+  #
+  # Qwen reasons when nothing is sent — it is the only ELM model that does, and
+  # `elm_mistral_small_4` is the opposite, so there is no "ELM default" to rely on. Measured
+  # 2026-09-22: reasoning on is ~100x the completion tokens (451 against 4 on one arithmetic
+  # prompt) and ~23x the latency (11.5s against 0.5s).
+  #
+  # Both of those defeat the purpose of this tier. The latency is the direct cost — an
+  # iteration loop that takes 23x longer is not an iteration loop. The token count is worse
+  # than it looks: the ceilings inherited below were calibrated on `gpt_5.2`, whose 2,857 arm
+  # attempts report `reasoning_tokens: 0` in 2,857 of 2,857, so they authorise
+  # NON-reasoning work. Turning reasoning on here would burn them ~100x faster and produce
+  # runs that pause on `PAUSED_TOKEN_LIMIT` for a reason that has nothing to do with the
+  # change under test.
+  #
+  # `high` is the only other value ELM accepts for this model, and it needs its own
+  # calibration rep before it is used for anything — see
+  # docs/todo/reasoning-in-the-arms.md, which is the open question of whether the arms
+  # should be reasoning at all. Do not set it here to "make Qwen better" without re-measuring
+  # the ceilings; that is the same trade this file just declined.
+  reasoning_effort: none
+
+  # NOT restated, and worth knowing why: the parent's `thinking_budget_tokens: 30000` is
+  # inert. Only `BaseProvider` sends it, and the provider table is OpenAI and ELM, both of
+  # which override that method. It is left alone rather than zeroed because ~20 configs carry
+  # it and docs/todo/reasoning-in-the-arms.md owns removing them together; `reasoning_effort`
+  # above is the knob that actually reaches the endpoint.
+
+execution:
+  # Unchanged at 4, and measured rather than inherited. Qwen through ELM: 1 request 9.2s;
+  # 4 concurrent 14.0s wall (median latency 11.2s); 8 concurrent 45.4s wall with a 45.4s
+  # straggler. Four is about the knee.
+  #
+  # CAVEAT: that was measured on trivial prompts. A real arm sends 12k-38k prompt tokens
+  # (p50 12,160 / p90 20,298 / max 38,154 over 554 recorded v5 sessions), so per-request
+  # latency under load will be worse than 9.2s and the knee may be lower. Treat 4 as the
+  # ceiling to verify on the first real rep, not one that has been confirmed under load.
+  # Free tokens are not a reason to raise it: the constraint is a shared cluster, not a bill.
+  max_concurrency: 4
+
+dataset:
+  # The token ceilings do NOT transfer from gpt_5.2, and the reason turned out to be half
+  # tooling rather than half the model. Two measured runs on PR 33438 (the control, 1 work
+  # unit, 9 arms), identical except for the tool fixes in abc17df and cb8594b:
+  #
+  #                        rep1 (before)   rep2 (after)   gpt_5.2 reference
+  #   arm tokens median      341,210         181,259        35,276 (p50, 16 runs)
+  #   arm turns median            24              11        ~6-7 tool calls
+  #   lead tokens            567,725         189,957
+  #   lead turns                  39              14
+  #   tool-call failures     79/155 (51%)    16/140 (11%)   65/644 (10%)
+  #   arms paused on tokens      3/9             1/9
+  #
+  # rep1's 9.7x gap against gpt_5.2 was mostly retry overhead: ELM does not enforce tool
+  # schemas under `tool_choice=auto`, so Qwen emitted the text of a list where an array was
+  # declared and burned turns recovering. With that fixed its tool discipline matches
+  # gpt_5.2's (11% against 10%) and the remaining gap is ~5x, not ~10x.
+  #
+  # 2x, not the 3x first set. rep1's 3x was sized against a distribution inflated by the
+  # tool defect; rep2's is the honest one. Its nine arms ran 93,519 / 119,423 / 159,517 /
+  # 161,638 / 181,259 / 223,737 / 282,500 / 361,927 / 393,171, so 720,000 is 4.0x the
+  # median, 1.83x the observed max, and would have cut none of them. 360,000 still paused
+  # one, so the inherited figure is genuinely too tight for this model.
+  #
+  # 2x rather than 3x because gpt_5.2's ceiling sits at 1.48x its p99 and BELOW its max
+  # (0.65x), cutting 0.21% of arms by design. 3x would have been looser than the regime it
+  # is meant to match; 2x is already generous against it. Ratios preserved (720,000 x 5 =
+  # 3,600,000).
+  #
+  # PROVISIONAL: n=9 arms on ONE control PR, the cheapest in the set, twice. A multi-PR rep
+  # should revise these, and 2x may well be enough once one exists.
+  standard_budget_tokens: 720000
+  per_pr_token_cap: 3600000
+  # Scaled with the others. `_warn_on_denomination_drift` compares RATIOS -- this cap over
+  # `standard_budget_tokens` against `lead_cost_cap` over `standard_budget_cap` -- so a
+  # block scaled 3x with one member left behind is drift, not conservatism. The measured
+  # lead used 567,725 of its 1,200,000, nowhere near the ceiling; this moves to keep the
+  # five-standard-jobs relation intact, not because the lead needed room.
+  lead_token_cap: 2400000
+  run_total_token_cap: 24000000

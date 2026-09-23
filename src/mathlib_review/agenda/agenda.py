@@ -48,7 +48,8 @@ from src.mathlib_review.review.task_adapter import (
     build_focused_task_data,
 )
 
-from src.mathlib_review.agenda.arms import ARM_TASK_TYPE, GENERALIST_ARM_ID, default_arms, specs_by_arm_id
+from src.mathlib_review.agenda.arms import (
+    ARM_TASK_TYPE, GENERALIST_ARM_ID, TOKEN_HINT_PER_WORK_UNIT, default_arms, specs_by_arm_id)
 from src.mathlib_review.agenda.components import build_components, centrality
 from src.mathlib_review.agenda.exposure import LazyExposureScan, exposed_changes
 from src.mathlib_review.agenda.review_map import build_slices, slices_report, with_context
@@ -249,7 +250,18 @@ def build_agenda(
     exposure_cache: Dict[str, Any] = {}
     exposure_by_change: Dict[str, int] = {}
     if use_exposure_index:
+        # Only the episodes this agenda is for. The scan is per base commit and the release
+        # has 14 of them, so an unfiltered loop paid for every PR in the release however few
+        # were asked for: a 3-PR preflight scanned 14 distinct workspaces, 11s each, and
+        # `build_agenda` was 97% of a 164s `plan`. `exposure_by_change` is keyed by
+        # `change_id` and a change belongs to exactly one PR, so dropping the unselected
+        # episodes cannot change the value for a selected one -- asserted by
+        # `test_the_exposure_scan_is_paid_only_for_the_prs_in_the_agenda`, which builds the
+        # agenda both ways and compares the sealed bytes.
+        wanted_prs = set(pr_numbers) if pr_numbers else None
         for graph in graphs:
+            if wanted_prs is not None and getattr(graph, "pr_number", None) not in wanted_prs:
+                continue
             scan = LazyExposureScan(
                 snapshot_workspace(getattr(graph, "base_sha", None)), exposure_cache)
             exposure_by_change.update(exposed_changes(
@@ -469,6 +481,11 @@ def agenda_report(agenda: ReviewAgenda) -> Dict[str, Any]:
         "projected_cost_rules": round(sum(item.cost_hint for item in eligible), 4),
         "mandatory_floor_cost": round(
             sum(item.cost_hint for item in agenda.proposals if item.mandatory), 4),
+        # The same floor in processed tokens, which is the only one of the two that can refuse
+        # anything on a model priced 0.0. A count times the constant, for the reason given at
+        # `TOKEN_HINT_PER_WORK_UNIT`.
+        "mandatory_floor_tokens": TOKEN_HINT_PER_WORK_UNIT * sum(
+            1 for item in agenda.proposals if item.mandatory),
         # What the coverage contract obliges, before the lead sees any of it. Read next to
         # `trace.routing_report`, which says what the lead then did: a contract that requires
         # nothing and a lead that prunes everything produce the same outcome and are entirely

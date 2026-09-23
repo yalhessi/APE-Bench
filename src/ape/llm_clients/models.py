@@ -15,6 +15,30 @@ from typing import Dict, Any, Optional, List, Literal, Union
 from pydantic import BaseModel, Field
 
 
+#: Wire spellings for the model's reasoning trace, in the order they are tried.
+#:
+#: There is no single convention. OpenAI does not return the text at all; DeepSeek and older
+#: vLLM builds call it `reasoning_content`; the vLLM build behind the Edinburgh ELM gateway
+#: (`vllm-0.21.0`) calls it `reasoning`, on both `message` and the streaming `delta`.
+#:
+#: Reading only one spelling is not a degraded reading, it is a silent one: measured
+#: 2026-09-22, `elm_qwen_3.5` at `reasoning_effort=high` returned a 2,551-character `reasoning`
+#: field beside a clean `content`, and this repo kept only the answer -- about 75% of the
+#: completion tokens left no trace in the session record, on a project whose method is reading
+#: what the agent did.
+REASONING_KEYS = ("reasoning_content", "reasoning")
+
+
+def reasoning_text(data: dict) -> str:
+    """The reasoning trace from a message or a streaming delta, whichever spelling it used."""
+
+    for key in REASONING_KEYS:
+        value = data.get(key)
+        if value:
+            return value
+    return ""
+
+
 class TokenUsage(BaseModel):
     """Token usage statistics."""
 
@@ -30,6 +54,32 @@ class TokenUsage(BaseModel):
     def model_post_init(self, __context) -> None:
         if self.total_tokens is None:
             self.total_tokens = self.input_tokens + self.output_tokens
+
+    @property
+    def processed_tokens(self) -> int:
+        """Every token the provider handled for this call: the whole prompt, plus the reply.
+
+        What `ExecutionLimits.token_limit` is enforced against, and the denominator of the
+        token census. Three things it deliberately is not:
+
+        * **Not discounted for caching.** A cached prompt token is still a token the model
+          read. `cached_total_cost` discounts it because the vendor charges less for it; the
+          ceiling exists for models that charge nothing at all, where there is no discount to
+          apply and no cache accounting reported (`prompt_tokens_details` is null on every
+          locally hosted ELM model).
+        * **Not affected by `cost_model`.** `prompt_inclusive` vs `prompt_exclusive` is a
+          disagreement about *pricing* — whether cached tokens are a subset of the prompt or
+          are added to it. `total_tokens` as the provider reports it is prompt + completion
+          either way, so the count does not move when the pricing convention does.
+        * **Not self-plus-nested.** This is one call's usage. A parent's children are counted
+          where their own attempts are recorded; see `TaskOutcome.usage`.
+
+        Falls back to `input + output` because `parse_usage` defaults a missing
+        `total_tokens` to 0 rather than None, so `model_post_init` never backfills it — and a
+        ceiling that reads zero is a ceiling that never binds.
+        """
+
+        return int(self.total_tokens or (self.input_tokens + self.output_tokens))
 
 
 class ContentBlock(BaseModel):

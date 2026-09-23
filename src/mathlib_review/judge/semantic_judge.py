@@ -465,6 +465,17 @@ def semantic_report(judgments: Iterable[JudgmentNode], views: Iterable[Intervent
         "location_recall": (
             sum(location.values()) / count if count else None
         ),
+        # Said in the artifact so a figure lifted out of it carries the caveat, the way
+        # `reachability_report` does for its own.
+        "location_recall_note": (
+            "Counts obligations where SOME candidate anchored to the same change_id, whether "
+            "or not it named the issue. It is not a near-miss rate and not a coverage rate: a "
+            "non-matching candidate at a gold site is the agent asking for something else "
+            "there, which is at best neutral and may be a wrong complaint about the right "
+            "line. For coverage use `coverage_gaps` in the run manifest, which is "
+            "gold-independent; for what the reviewer could express use `issue_recall_"
+            "reachable`. Do not report a change in this number as a change in quality."
+        ),
         "issue_recall": issue_recall,
         "issue_recall_including_ambiguous": rate(issue_status, {"hit", "ambiguous"}),
         "resolution_recall": resolution_recall,

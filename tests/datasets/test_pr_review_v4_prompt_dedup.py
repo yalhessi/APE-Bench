@@ -1,16 +1,20 @@
-"""A rendered prompt says each thing once.
+"""A rendered prompt says each thing once, and says it about the target it is for.
 
-Measured on smoke4's 143 prompts before this change: 44% of all prompt text was a verbatim
-repeat of text already in the same prompt — 32% diff hunks re-pasted once per review target,
-13% the maintainer checklist appended to every target. The mean prompt carried 1.8 distinct
-hunks across 3.4 targets, and one `api_reuse` job carried six targets, one unique hunk, and
-16,710 duplicate characters out of 33,174.
+Two rounds of the same defect. Within one prompt, measured on smoke4's 143 prompts: 44% of all
+prompt text was a verbatim repeat of text already in that prompt — 32% diff hunks re-pasted once
+per review target, 13% the checklist appended to every target. That is not only cost; the
+`family_design` arm on PR 33117 was handed the same 100-line diff five times and ran out of
+budget mid-review.
 
-That is not only cost. The `family_design` arm on PR 33117 was handed the same 100-line diff
-five times and then ran out of budget mid-review.
+Across prompts, measured on the 12-PR held-out lead run: `### Exact changed fragments` was 43.6%
+of all rendered prompt characters and 95.5% of its volume was a re-send of a block another job
+for the same PR already carried, because the section held the raw `@@` hunks and a target in a
+single-hunk file inherits the whole file diff. PR 33149 shipped one 17,303-char hunk to 120 jobs
+that each review one declaration. Scoping the section to the target's own regions removes 94.0%
+of `dev-medium-0.3.0`'s fragment characters and 73.8% of the arm pool's target-block volume.
 
-These tests assert the structural property — each payload appears once — rather than a
-percentage, which would be an incidental number that drifts with the fixture.
+These tests assert the structural properties — each payload appears once, and a target's diff is
+about that target — rather than percentages, which drift with the fixture.
 """
 
 from __future__ import annotations
@@ -20,8 +24,11 @@ from pathlib import Path
 import pytest
 
 from src.mathlib_review.io import load_jsonl
-from src.mathlib_review.agenda.render_focused import _target_blocks
-from src.mathlib_review.agenda.render_focused import FOCUSED_FACET_CHECKLIST
+from src.mathlib_review.agenda.render_prompts import (
+    FACET_CHECKLIST_ONCE,
+    target_blocks,
+    target_diff_section,
+)
 from src.mathlib_review.schema import (
     ChangeGraph, ReviewEpisodeInput, ReviewWorkUnit,
 )
@@ -42,6 +49,7 @@ class _Target:
         self.base_code = None
         self.reviewed_code = f"lemma {subject} : True := trivial"
         self.diff_fragments = [fragments]
+        self.attached_to = None
 
 
 def test_a_shared_hunk_is_printed_once_and_pointed_at_afterwards():
@@ -49,11 +57,11 @@ def test_a_shared_hunk_is_printed_once_and_pointed_at_afterwards():
     hunk."""
 
     hunk = "@@ -1,3 +1,9 @@\n+lemma neg : True := trivial\n+lemma fun_neg : True := trivial\n"
-    blocks = _target_blocks([
+    blocks = target_blocks([
         _Target("c1", "Meromorphic.neg", hunk),
         _Target("c2", "Meromorphic.fun_neg", hunk),
         _Target("c3", "Meromorphic.add", hunk),
-    ])
+    ], scoped=False)
     rendered = "\n\n".join(blocks)
 
     assert rendered.count(hunk) == 1
@@ -68,24 +76,66 @@ def test_a_shared_hunk_is_printed_once_and_pointed_at_afterwards():
 def test_distinct_hunks_are_all_printed():
     """Deduplication must not drop a hunk a target actually needs."""
 
-    blocks = _target_blocks([
+    blocks = target_blocks([
         _Target("c1", "A", "@@ hunk one @@\n"),
         _Target("c2", "B", "@@ hunk two @@\n"),
-    ])
+    ], scoped=False)
     rendered = "\n\n".join(blocks)
     assert "@@ hunk one @@" in rendered
     assert "@@ hunk two @@" in rendered
     assert "Identical to the fragments" not in rendered
 
 
+def test_a_targets_diff_is_about_that_target():
+    """The scoped section shows the target's own change, not the hunk it happens to sit in.
+
+    `_Target` gives every target the same file-wide hunk and its own reviewed region, which is
+    the shape that made this section 43.6% of a run's prompt characters: three targets, one
+    17,000-char-style hunk, three copies.
+    """
+
+    hunk = ("@@ -1,3 +1,9 @@\n+lemma neg : True := trivial\n"
+            "+lemma fun_neg : True := trivial\n+lemma add : True := trivial\n")
+    blocks = target_blocks([
+        _Target("c1", "Meromorphic.neg", hunk),
+        _Target("c2", "Meromorphic.fun_neg", hunk),
+    ], scoped=True)
+    rendered = "\n\n".join(blocks)
+
+    assert hunk not in rendered, "the raw file-wide hunk is still being pasted"
+    # Each target's own reviewed region is what it is shown, as an addition.
+    assert "+lemma Meromorphic.neg : True := trivial" in rendered
+    assert "+lemma Meromorphic.fun_neg : True := trivial" in rendered
+    # Distinct diffs, so neither is deduplicated away.
+    assert "Identical to the fragments" not in rendered
+
+
+def test_a_target_with_no_regions_keeps_its_raw_hunk():
+    """Import blocks carry no semantic entities, so the hunk is the only record of the change.
+
+    Falling through to an empty diff would show the arm a blank change; on
+    `dev-medium-0.3.0` this exception is 17 of 508 targets and 2,195 of 2,583,336 fragment
+    characters.
+    """
+
+    target = _Target("c1", "Mathlib/X.lean", "@@ -1 +1,2 @@\n+import Mathlib.Tactic.ToFun\n")
+    target.kind = "import"
+    target.declaration_name = None
+    target.base_code = None
+    target.reviewed_code = None
+
+    assert "+import Mathlib.Tactic.ToFun" in target_diff_section(target)
+
+
 @pytest.fixture(scope="module")
 def arm_prompts():
     """Every specialist prompt the agenda renders for the smoke4 PRs.
 
-    Only the focused renderer is deduplicated. `render_prompts.FACET_CHECKLIST` and the
-    production target block keep their per-target form on purpose: they are hashed into every
-    frozen `rendered_prompts.jsonl`, so editing them moves every prompt hash in every release at
-    once. The generalist path still carries the repetition until a release is re-rendered.
+    `FACET_CHECKLIST` and the raw-hunk section keep their per-target form for every renderer
+    version that already exists, because they are hashed into every frozen
+    `rendered_prompts.jsonl`. The deduplicated and scoped forms are what the newer versions
+    select — `focused-prompt/3` for the arms this fixture renders, `candidate-prompt/13` for the
+    generalist, which reaches a release only through `rerender_release`.
     """
 
     from src.mathlib_review.schema import ModificationRecord, RenderedPrompt
@@ -116,7 +166,7 @@ def test_every_arm_prompt_carries_exactly_one_checklist(arm_prompts):
     assert arm_prompts, "no specialist prompts were rendered"
     for arm_id, prompt in arm_prompts:
         assert prompt.count("### Maintainer ask checklist") == 1, arm_id
-        assert prompt.count(FOCUSED_FACET_CHECKLIST) == 1, arm_id
+        assert prompt.count(FACET_CHECKLIST_ONCE) == 1, arm_id
 
 
 def test_no_arm_prompt_repeats_a_diff_hunk(arm_prompts):
@@ -133,3 +183,130 @@ def test_no_arm_prompt_repeats_a_diff_hunk(arm_prompts):
             if section.lstrip().startswith("```")
         ]
         assert len(hunks) == len(set(hunks)), f"{arm_id} repeats a hunk"
+
+
+def test_the_contract_is_sent_once_from_candidate_prompt_13():
+    """The system prompt is the contract; the user message must not repeat it.
+
+    Measured on `pr5_A_lead_heldout12_fp3_rep1`: 203 of 203 generalist prompts carried the
+    identical 2,482-character contract twice — once as the system prompt and once under
+    `# Review contract` — for 503,846 characters, 12.5% of that run's generalist user text, and
+    the duplicate is the expensive copy, since user text is billed at roughly 4.7x a token
+    inside the cached prefix. The focused arms never carried it (0 of 1,206 in the same run)
+    and review normally.
+
+    Pinned at the version boundary in both directions: /12 keeps it, because that text is
+    hashed into every frozen `rendered_prompts.jsonl`.
+    """
+
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.agenda.render_prompts import render_work_unit
+    from src.mathlib_review.schema import ChangeGraph, ReviewEpisodeInput, ReviewWorkUnit
+
+    graphs = {item.episode_id: item for item in
+              load_jsonl(RELEASE / "derived/change_graphs.jsonl", ChangeGraph)}
+    episodes = {item.episode_id: item for item in
+                load_jsonl(RELEASE / "input/episodes.jsonl", ReviewEpisodeInput)}
+    unit = load_jsonl(RELEASE / "derived/work_units.jsonl", ReviewWorkUnit)[0]
+    episode, graph = episodes[unit.episode_id], graphs[unit.episode_id]
+
+    old = render_work_unit(unit, episode, graph)
+    assert old.system_prompt in old.user_prompt, "/12 must keep the copy it was frozen with"
+
+    new = render_work_unit(
+        unit.model_copy(update={"renderer_version": "candidate-prompt/13"}), episode, graph)
+    assert new.system_prompt, "the contract still has to be sent as the system prompt"
+    assert new.system_prompt not in new.user_prompt
+    assert "# Review contract" not in new.user_prompt
+    # The review targets themselves are untouched by this.
+    assert "## Review target" in new.user_prompt
+
+
+def test_a_declarations_diff_carries_its_doc_comment():
+    """The doc-comment is part of the declaration, so it is diffed with it.
+
+    This is the repair for the two PR 33321 obligations that scoping lost: the obligation
+    anchors on `IsMulIndecomposable.baseOf`, so the docstring it asks about has to be visible in
+    that target's own section. The doc-comment keeps its block — it is still an anchorable
+    change_id — and points at its owner instead of repeating the diff.
+    """
+
+    decl = _Target("c1", "Meromorphic.baseOf", "@@ -0,0 +1,3 @@\n+def baseOf := 1\n")
+    decl.reviewed_code = "def baseOf := 1"
+    doc = _Target("c2", "Mathlib/X.lean", "@@ -0,0 +1,1 @@\n+/-- The base. -/\n")
+    doc.kind = "doc_comment"
+    doc.declaration_name = None
+    doc.reviewed_code = "/-- The base. -/"
+    doc.attached_to = "c1"
+
+    rendered = "\n\n".join(target_blocks([decl, doc], scoped=True))
+    declaration_block = rendered.split("## Review target")[1]
+
+    assert "+/-- The base. -/" in declaration_block, "the docstring is missing from its declaration"
+    assert "+def baseOf := 1" in declaration_block
+    # The attachment stays a target so it can still be anchored to, but says it once.
+    assert "Shown with the changed fragments for `Meromorphic.baseOf`." in rendered
+    assert rendered.count("+/-- The base. -/") == 1
+
+
+def test_an_unattached_doc_comment_is_still_its_own_site():
+    """A doc-comment with no declaration after it documents nothing, so it keeps its own diff."""
+
+    doc = _Target("c1", "Mathlib/X.lean", "@@ -0,0 +1,1 @@\n+/-- Orphan. -/\n")
+    doc.kind = "doc_comment"
+    doc.reviewed_code = "/-- Orphan. -/"
+    doc.attached_to = None
+
+    rendered = "\n\n".join(target_blocks([doc], scoped=True))
+    assert "+/-- Orphan. -/" in rendered
+    assert "Shown with the changed fragments" not in rendered
+
+
+def test_a_declarations_parts_are_joined_the_way_the_file_has_them():
+    """A region already ends with its own newline, so joining on one fabricates a blank line.
+
+    On PR 33321 that turned `… -/\\n@[to_additive …` -- a doc-comment immediately followed by the
+    attribute it belongs to, which is ordinary Lean -- into two floating comments, and the
+    reviewer answered the artifact: it asked to remove "an extra adjacent doc comment" on an
+    obligation about fixing that docstring's content. Located, and scored a miss.
+    """
+
+    from src.mathlib_review.agenda.render_prompts import target_diff_section
+
+    decl = _Target("c1", "Foo.baseOf", "@@ -0,0 +1,2 @@\n+@[to_additive]\n+def baseOf := 1\n")
+    decl.reviewed_code = "@[to_additive]\ndef baseOf := 1"
+    doc = _Target("c2", "Mathlib/X.lean", "@@ -0,0 +1,1 @@\n+/-- The base. -/\n")
+    doc.kind = "doc_comment"
+    doc.reviewed_code = "/-- The base. -/\n"   # as the parser emits it: trailing newline
+    doc.attached_to = "c1"
+
+    section = target_diff_section(decl, [doc])
+    assert "+/-- The base. -/\n+@[to_additive]" in section, "a blank line was fabricated"
+    assert "+\n+@[to_additive]" not in section
+
+    # /13's release was built from the fabricated form and must still reproduce it.
+    legacy = target_diff_section(decl, [doc], preserve_adjacency=False)
+    assert "+/-- The base. -/\n+\n+@[to_additive]" in legacy
+
+
+def test_the_generalist_prompt_changes_are_separately_selectable():
+    """/13 moved three things at once and the generalist's candidates per job fell 45%.
+
+    1.24 and 1.30 across the two 0.3.0 repetitions against 0.71 on
+    `pr5_A_lead_heldout12_rel040_rep1`, while the focused arms -- which none of the three touched
+    -- held at 0.14/0.20 -> 0.21. Nothing in that says which change did it, so each is a flag and
+    /14 moves exactly one of them back.
+    """
+
+    from src.mathlib_review.agenda.render_prompts import generalist_features
+
+    v12, v13, v14 = (generalist_features(f"candidate-prompt/{n}") for n in (12, 13, 14))
+
+    assert not v12["scoped_diffs"] and v12["contract_in_user_message"]
+    assert v13["scoped_diffs"] and v13["checklist_once"]
+    assert not v13["contract_in_user_message"], "/13 is what the 0.4.0 run measured"
+    # /14 differs from /13 in the contract and the join, and in nothing else.
+    assert v14["scoped_diffs"] and v14["checklist_once"]
+    assert v14["contract_in_user_message"] and v14["preserve_adjacency"]
+    assert {k for k in v13 if v13[k] != v14[k]} == {
+        "contract_in_user_message", "preserve_adjacency"}

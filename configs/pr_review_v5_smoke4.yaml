@@ -27,6 +27,9 @@ dataset:
   - 33098
   - 33438
   per_pr_cost_cap: 2.0
+  # Token twin at the calibrated 1,200,000 tokens per billed dollar; the two budgets
+  # must authorise the same work or `plan` says so.
+  per_pr_token_cap: 2400000
 
   # Preflight refuses a run whose floor plus full discretionary allowance exceeds this, before
   # the first model call. Measured for THIS set: floor $2.35 + 4 x $2.00 = $10.35 worst case.
@@ -36,6 +39,7 @@ dataset:
   # A ceiling, not an estimate: the lead spends what it needs and the worst case assumes it
   # exhausts every per-PR allowance, which no run has done.
   run_total_cost_cap: 12.00
+  run_total_token_cap: 14400000
   # 9 specialist arms x 22 work units = 180 eligible jobs. The base's 25 would let the lead
   # touch a seventh of them, which makes the run a test of its triage rather than of whether
   # the arms can find the gold at all. Discovery first.

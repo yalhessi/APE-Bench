@@ -40,6 +40,8 @@ from ape.tasks.lean_tasks.formal_math.review.base import (
     BasePRReviewTask,
 )
 
+from src.mathlib_review.schema.review import ArmResponse, DelegationRecord
+
 from . import journal
 from .delegation import TIER_MULTIPLIERS, JobOutcome, JobSpec, run_jobs
 from .prompts import LEAD_SYSTEM, LEAD_USER
@@ -220,6 +222,12 @@ class ReviewLeadConfig(BasePRReviewConfig):
     #: because subagents run in their own orchestrator. Without this a 17-work-unit PR could
     #: quietly authorise 60 jobs nobody budgeted for.
     per_pr_cost_cap: float = 2.0
+    #: The same two ceilings in processed tokens. A run on a model priced 0.0 satisfies both
+    #: dollar caps above at any fan-out, so on those these are the only budget the lead has.
+    #: 0 disables one; both disabled on a zero-priced model leaves `max_delegations` alone,
+    #: which preflight refuses.
+    standard_budget_tokens: int = 0
+    per_pr_token_cap: int = 0
 
 
 class ReviewLeadData(BasePRReviewData):
@@ -321,6 +329,12 @@ class ReviewLeadTask(BasePRReviewTask):
                 # Without it the per-PR cap only binds *between* waves, and a single wave can
                 # overshoot it by the product of its job count and their tier caps.
                 "reserved": 0.0,
+                # The same three quantities in processed tokens, kept separately rather than
+                # converted: on a zero-priced model the dollar three are all 0.0 for every
+                # wave, so they cannot stand in for these.
+                "tokens": 0,
+                "delegated_tokens": 0,
+                "reserved_tokens": 0,
                 # The coverage floor runs *through* the lead, as its first wave, but is not
                 # the lead's to skip. Tracking it here is what lets `delegate` inject it and
                 # `submit_routing` refuse to close without it.
@@ -563,6 +577,25 @@ class ReviewLeadTask(BasePRReviewTask):
                         f"committed of ${cap:.2f}, and this {tier} job reserves up to "
                         f"${max_cost:.2f}")})
                     continue
+
+                # The same reservation in tokens, and a separate refusal rather than a
+                # combined one: a job rejected for the wrong reason sends the lead looking for
+                # budget it has. Skipped entirely when `per_pr_token_cap` is 0, which is how a
+                # run says it is governed in dollars only.
+                token_cap = self._task_config().per_pr_token_cap
+                max_tokens = int(
+                    self._task_config().standard_budget_tokens * TIER_MULTIPLIERS[tier])
+                if token_cap:
+                    committed_tokens = (state["delegated_tokens"]
+                                        + state["reserved_tokens"])
+                    if committed_tokens + max_tokens > token_cap:
+                        rejected.append({"job": invocation_id, "reason": (
+                            f"per-PR token cap would be exceeded: {committed_tokens:,} "
+                            f"already committed of {token_cap:,}, and this {tier} job "
+                            f"reserves up to {max_tokens:,}")})
+                        continue
+                    state["reserved_tokens"] += max_tokens
+
                 state["reserved"] += max_cost
 
                 payload = pool[invocation_id]
@@ -639,6 +672,7 @@ class ReviewLeadTask(BasePRReviewTask):
                 outcomes = await run_jobs(
                     self, specs,
                     standard_cap=self._task_config().standard_budget_cap,
+                    standard_tokens=self._task_config().standard_budget_tokens,
                     wave=state["wave"], logger=self.logger,
                 )
             except Exception as exc:  # noqa: BLE001
@@ -656,18 +690,24 @@ class ReviewLeadTask(BasePRReviewTask):
                 # Release the reservations too, or a failed wave permanently consumes budget
                 # for work that never ran.
                 state["reserved"] = 0.0
+                state["reserved_tokens"] = 0
                 return {"success": False, "ran": 0, "rejected": rejected,
                         "error": f"delegation failed: {exc}"}
 
             # Settle: the reservations are replaced by what the wave actually cost.
             state["reserved"] = 0.0
+            state["reserved_tokens"] = 0
             spec_by_id = {spec.invocation_id: spec for spec in specs}
             for outcome in outcomes:
                 spec = spec_by_id[outcome.invocation_id]
                 state["outcomes"][outcome.invocation_id] = (outcome, spec)
                 state["spend"] += outcome.cost
-                if spec.disposition != "mandatory":
+                state["tokens"] += outcome.tokens
+                # The floor is exempt from the discretionary cap, and asking the spec rather
+                # than re-testing the disposition string keeps that rule in one place.
+                if spec.budget_scope == "discretionary":
                     state["delegated_spend"] += outcome.cost
+                    state["delegated_tokens"] += outcome.tokens
                 journal.append(self.data.journal_path, {
                     "event": journal.SETTLED, "wave": state["wave"],
                     "outcome": asdict(outcome),
@@ -683,6 +723,15 @@ class ReviewLeadTask(BasePRReviewTask):
                 "spend_remaining": round(
                     max(0.0, self._task_config().per_pr_cost_cap
                         - state["delegated_spend"]), 4),
+                # Reported only where it binds. A token figure beside a dollar figure on a
+                # paid run is one more number for the lead to reason about and no extra
+                # budget; on a zero-priced run it is the only one that means anything.
+                **({"tokens_so_far": state["tokens"],
+                    "delegated_tokens": state["delegated_tokens"],
+                    "tokens_remaining": max(
+                        0, self._task_config().per_pr_token_cap
+                        - state["delegated_tokens"])}
+                   if self._task_config().per_pr_token_cap else {}),
                 "delegations_used": self._specialist_count(state),
                 "delegations_remaining": max(0, budget - self._specialist_count(state)),
                 "floor_jobs_run": len(floor_specs),
@@ -818,49 +867,48 @@ class ReviewLeadTask(BasePRReviewTask):
         context_calls = self._context_calls()
 
         for invocation_id, (outcome, spec) in sorted(state["outcomes"].items()):
-            records.append({
-                "schema_version": "v5-delegation1",
-                "invocation_id": invocation_id,
-                "proposal_id": spec.proposal_id,
-                "arm_id": outcome.arm_id,
-                "work_unit_id": outcome.work_unit_id,
-                "pr_number": outcome.pr_number,
-                "disposition": spec.disposition,
-                "reason": spec.reason,
-                "budget_tier": outcome.budget_tier,
-                "budget_cap": outcome.budget_cap,
-                "status": outcome.status,
-                "wall_seconds": outcome.wall_seconds,
-                "cost": outcome.cost,
-                "token_usage": outcome.token_usage,
-                "candidate_count": len(outcome.candidates),
-                "verification_artifact_count": len(outcome.verification_artifacts),
-                "result_sha256": outcome.result_sha256,
+            records.append(DelegationRecord(
+                invocation_id=invocation_id,
+                proposal_id=spec.proposal_id,
+                arm_id=outcome.arm_id,
+                work_unit_id=outcome.work_unit_id,
+                pr_number=outcome.pr_number,
+                disposition=spec.disposition,
+                reason=spec.reason,
+                budget_tier=outcome.budget_tier,
+                budget_cap=outcome.budget_cap,
+                status=outcome.status,
+                wall_seconds=outcome.wall_seconds,
+                cost=outcome.cost,
+                token_usage=outcome.token_usage,
+                candidate_count=len(outcome.candidates),
+                verification_artifact_count=len(outcome.verification_artifacts),
+                result_sha256=outcome.result_sha256,
                 # Both halves of what the model actually read: the brief itself, and the hash
                 # of the composed prompt. The sealed plan vouches for the template alone.
-                "brief": spec.brief,
-                "delivered_prompt_sha256": outcome.delivered_prompt_sha256,
-                "context_calls": context_calls.get(invocation_id, []),
-            })
-            responses.append({
-                "invocation_id": invocation_id,
-                "arm_id": outcome.arm_id,
-                "work_unit_id": outcome.work_unit_id,
-                "spec_id": spec.payload.get("spec_id"),
-                "pr_number": outcome.pr_number,
-                "status": outcome.status,
-                "candidates": outcome.candidates,
-                "verification_artifacts": outcome.verification_artifacts,
-                "abstention": outcome.abstention,
-                "rendered_prompt_sha256": spec.payload.get("rendered_prompt_sha256"),
-            })
+                brief=spec.brief,
+                delivered_prompt_sha256=outcome.delivered_prompt_sha256,
+                context_calls=context_calls.get(invocation_id, []),
+            ).row())
+            responses.append(ArmResponse(
+                invocation_id=invocation_id,
+                arm_id=outcome.arm_id,
+                work_unit_id=outcome.work_unit_id,
+                spec_id=spec.payload.get("spec_id"),
+                pr_number=outcome.pr_number,
+                status=outcome.status,
+                candidates=outcome.candidates,
+                verification_artifacts=outcome.verification_artifacts,
+                abstention=outcome.abstention,
+                rendered_prompt_sha256=spec.payload.get("rendered_prompt_sha256"),
+            ).row())
 
         # A mandatory job that RAN and failed is a coverage gap too. The check below only asks
         # whether the invocation is in `outcomes`, and a failed job is — so a floor job that
         # exhausted its budget counted as coverage, and the run reported no gaps at all.
         coverage_gaps: List[Dict[str, Any]] = []
         for invocation_id, (outcome, spec) in sorted(state["outcomes"].items()):
-            if spec.disposition != "mandatory" or outcome.status == "success":
+            if not spec.required or outcome.status == "success":
                 continue
             coverage_gaps.append({
                 "invocation_id": invocation_id,
@@ -890,23 +938,25 @@ class ReviewLeadTask(BasePRReviewTask):
                 })
                 self.logger and self.logger.warning(
                     "mandatory job %s never ran", proposal["invocation_id"])
-            records.append({
-                "schema_version": "v5-delegation1",
-                "invocation_id": proposal["invocation_id"],
-                "proposal_id": proposal_id,
-                "arm_id": proposal["arm_id"],
-                "work_unit_id": proposal["work_unit_id"],
-                "pr_number": proposal["pr_number"],
-                "disposition": "pruned",
+            records.append(DelegationRecord(
+                invocation_id=proposal["invocation_id"],
+                proposal_id=proposal_id,
+                arm_id=proposal["arm_id"],
+                work_unit_id=proposal["work_unit_id"],
+                pr_number=proposal["pr_number"],
+                disposition="pruned",
                 # The lead's own words when it gave them; otherwise a marker that says it
                 # made a choice rather than that the choice went unrecorded.
-                "reason": pruned_by_id.get(proposal_id, "not selected by the lead"),
-                "reason_given": proposal_id in pruned_by_id,
-                "budget_tier": None, "budget_cap": None, "status": None,
-                "wall_seconds": None, "cost": None, "token_usage": None,
-                "candidate_count": None, "verification_artifact_count": None,
-                "result_sha256": None, "context_calls": [],
-            })
+                reason=pruned_by_id.get(proposal_id, "not selected by the lead"),
+                reason_given=proposal_id in pruned_by_id,
+                # Explicitly null, not absent: a pruned job was considered and declined, and a
+                # rule-dispatched one was never considered at all. `row()` keeps them apart
+                # only because these are set here.
+                budget_tier=None, budget_cap=None, status=None,
+                wall_seconds=None, cost=None, token_usage=None,
+                candidate_count=None, verification_artifact_count=None,
+                result_sha256=None, context_calls=[],
+            ).row())
         return records, responses, coverage_gaps
 
     def _context_calls(self) -> Dict[str, List[Dict[str, Any]]]:

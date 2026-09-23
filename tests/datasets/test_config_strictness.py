@@ -23,6 +23,7 @@ import pytest
 from ape.utils.config_loader import load_yaml, parse_cli_args
 from src.mathlib_review.judge.runner import JudgeDatasetConfig
 from src.mathlib_review.opportunities.runner import V4DatasetConfig
+from src.mathlib_review.review.replay import ReplayDatasetConfig
 from src.mathlib_review.review.runner import V5DatasetConfig
 
 
@@ -45,6 +46,9 @@ def _model_for(dataset: dict, path: str):
 
     if path.endswith("_judge.yaml") or "candidates" in dataset:
         return JudgeDatasetConfig
+    # Before the `v5` rule, which would take a replay config for a generation config.
+    if path.endswith("_replay.yaml") or "condition" in dataset:
+        return ReplayDatasetConfig
     if "routing_mode" in dataset or "v5" in path:
         return V5DatasetConfig
     if "arm" in dataset or "v4" in path:
@@ -71,6 +75,9 @@ def test_every_shipped_config_validates(path, model, dataset):
         # `--of` is what completes it; validating it without that would test a form nobody
         # uses and would force the paths back into the file.
         dataset = {**JUDGE_DERIVED, **dataset}
+    if model is ReplayDatasetConfig:
+        # Likewise: which run is replayed is `replay --of`, not part of the config.
+        dataset = {"of_run": "pr5_r", **dataset}
     model.model_validate(dataset)
 
 
