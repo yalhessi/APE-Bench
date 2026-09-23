@@ -170,3 +170,17 @@ shell, then watch the first minutes of the log for completed jobs and for that w
 **Risk:** a gateway that returns 401/403 transiently (a token-refresh race) would now fail a job
 instead of waiting. None is known for OpenAI or ELM; if one appears, a single short retry is the
 narrow version.
+
+## Added 2026-09-23: the tool schemas an arm is shown are sealed nowhere
+
+A plan seals each arm's prompt text (`prompt_sha256`), its tool *names* (`tools_sha256`, over
+`FOCUSED_PROMPTS[arm][0]`), the workspace tools (`scaffold_config_sha256`) and its context grant
+(inside the agenda). It does not seal the tools' **schemas** -- the argument descriptions the model
+reads. So a change to a tool's description reaches every run, control included, with no identity
+moving: the `severity` description on `CandidateSubmission` (unification commit C3) is one; the
+`lean_verify_edit` example naming `Subgroup.closure_pow_le`, PR 33401's gold target
+(`eval-unseen-window.md`), is another that no gate or hash can see. Two runs with byte-identical
+plans can therefore have shown their arms different tool text. The fix is a `tool_schemas_sha256`
+per arm over the rendered JSON schemas of the tools its task registers, sealed beside
+`tools_sha256`; it moves every plan's identity once, so it lands at a run boundary with its own
+dated reason.

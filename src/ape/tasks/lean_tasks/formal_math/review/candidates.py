@@ -182,7 +182,16 @@ class CandidateSubmission(BaseModel):
         "scope_placement", "style_norm_violation",
     ]] = None
     concern_label: str
-    severity: Literal["blocking", "advisory"]
+    #: Described here as well as in the focused contract, because the generalist's prompt is
+    #: frozen in the release and the tool schema is the one text every arm reads. Gold marks 19
+    #: of 24 held-out judgments advisory; the contract had defined `severity` only as the JSON
+    #: literal "blocking|advisory". No sealed field hashes tool-schema text, so this description
+    #: reaches every run without moving an identity (`docs/todo/framework-defects-2026-09.md`).
+    severity: Literal["blocking", "advisory"] = Field(description=(
+        "blocking: a maintainer would hold the PR for this. advisory: you believe a maintainer "
+        "would ask for it and would merge without it -- a convention the repository is adopting "
+        "but has not settled, or an improvement the author could reasonably decline. A claim "
+        "you hold at advisory strength is filed as advisory, not withheld."))
     claim: str
     requested_change: str
     suggested_fix: Optional[str] = None

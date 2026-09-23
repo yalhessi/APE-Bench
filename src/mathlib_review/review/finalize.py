@@ -492,9 +492,10 @@ def finalize(
         )
         if unwarranted:
             logger.warning(
-                "%d specialist candidate(s) were dropped for carrying no successful "
-                "verification artifact (by concern: %s). A specialist claim is published "
-                "only if the compiler agreed.",
+                "%d specialist candidate(s) carry no successful verification artifact and are "
+                "retained as diagnostic, not published (by concern: %s). Under "
+                "`verify_edits_if_present` most are the unverified ask the policy allows, not a "
+                "drop; a specialist claim is published only if the compiler agreed.",
                 len(unwarranted),
                 dict(full["dropped_unverified_by_concern"]),
             )
