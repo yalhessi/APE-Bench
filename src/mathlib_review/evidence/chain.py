@@ -33,6 +33,7 @@ supported a claim on its own.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
 
@@ -43,6 +44,12 @@ from src.mathlib_review.evidence.evidence import (
 )
 from src.mathlib_review.io import jsonl_bytes, write_once, jsonl_rows
 from src.mathlib_review.opportunities.select import select_findings
+
+
+#: How many candidates the evidence chain collects at once. Each mostly waits on a Lean compile
+#: (~4 s, one core, memory-mapped oleans) or on file reads; 16 keeps a 40-candidate run to a
+#: few compile-lengths on a machine shared with other sessions.
+EVIDENCE_WORKERS = 16
 
 
 async def reviewed_workspaces(
@@ -165,8 +172,10 @@ def collect_supported(
     artifacts, assertions, packets = [], [], []
     baseline_compile_cache: Dict[Any, Any] = {}
     population_cache: Dict[str, object] = {}
+    workspace_files: Dict[str, List[Path]] = {}
     skipped: Dict[str, int] = {}
 
+    jobs = []
     for candidate in candidates:
         graph = graph_by_episode.get(candidate.episode_id)
         if graph is None:
@@ -174,17 +183,33 @@ def collect_supported(
             # fabricate the spans every collector localises its diagnostics against.
             skipped["no_change_graph"] = skipped.get("no_change_graph", 0) + 1
             continue
+        base_sha = getattr(graph, "base_sha", None)
         configured = workspace_by_episode.get(candidate.episode_id)
-        workspace = Path(configured) if configured else snapshot_workspace(
-            getattr(graph, "base_sha", None))
+        workspace = Path(configured) if configured else snapshot_workspace(base_sha)
         population = LazyPopulationScan(
-            snapshot_workspace(getattr(graph, "base_sha", None)), population_cache)
-        collected, asserted, packet = collect_candidate(
+            snapshot_workspace(base_sha), population_cache, snapshot_sha=base_sha)
+        jobs.append((candidate, graph, workspace, population))
+
+    # Concurrently, and assembled in candidate order. Each candidate's collection is
+    # independent -- its own claims, its own compiles in its own temp files -- and it was run
+    # serially on a 64-core machine: 692 s for 40 candidates, of which ~345 s was 80 Lean
+    # compiles one after another. Threads rather than processes because the time is in those
+    # subprocesses and in file reads, both of which release the GIL. The shared caches stay
+    # correct under threads: the population is guarded by a lock, and a baseline compile two
+    # threads miss at once is computed twice with the same result. The written files are the
+    # serial run's, byte for byte, because nothing is written until every candidate is done.
+    def collect(job):
+        candidate, graph, workspace, population = job
+        return collect_candidate(
             candidate, graph, workspace, None, None, baseline_compile_cache, population,
-        )
-        artifacts.extend(collected)
-        assertions.extend(asserted)
-        packets.append(packet)
+            workspace_files)
+
+    workers = max(1, min(EVIDENCE_WORKERS, len(jobs)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for collected, asserted, packet in pool.map(collect, jobs):
+            artifacts.extend(collected)
+            assertions.extend(asserted)
+            packets.append(packet)
 
     evidence_dir = out / "evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
