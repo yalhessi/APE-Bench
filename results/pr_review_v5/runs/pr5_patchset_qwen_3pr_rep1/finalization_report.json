@@ -1,0 +1,111 @@
+{
+  "after_merge": 10,
+  "alternatives_not_selected": 0,
+  "by_admission": {
+    "diagnostic": 9,
+    "published": 1
+  },
+  "by_arm": {
+    "deterministic": 0,
+    "file_generalist": 0,
+    "focused_agent": 0,
+    "generalist": 10,
+    "holistic": 0,
+    "merged": 0,
+    "solo_agent": 0
+  },
+  "by_evidence_tier": {
+    "lexical_rule": 0,
+    "model_assertion": 10,
+    "repository_measurement": 0,
+    "verified_compile": 0
+  },
+  "candidate_rejections": 0,
+  "candidates_evidence_specialist": 4,
+  "candidates_generalist": 6,
+  "candidates_specialist": 0,
+  "candidates_specialist_dropped_unverified": 0,
+  "candidates_unwarranted": 0,
+  "channels": {
+    "contradicted": 0,
+    "review": 10,
+    "review_only": 9,
+    "verified": 1
+  },
+  "conflicts": 1,
+  "digest": {
+    "by_aggregation": {
+      "per_pattern": 0,
+      "per_site": 10
+    },
+    "by_arm": {
+      "deterministic": 0,
+      "file_generalist": 0,
+      "focused_agent": 0,
+      "generalist": 10,
+      "holistic": 0,
+      "merged": 0,
+      "solo_agent": 0
+    },
+    "digest_version": "site-to-issue-digest/1",
+    "findings_absorbed": 0,
+    "findings_in": 10,
+    "issues_collapsing_several_findings": 0,
+    "issues_out": 10,
+    "largest_issue_sites": 1,
+    "pr_finding_limit": 20,
+    "published_after_limit": 1,
+    "published_before_limit": 1,
+    "suppressed_by_limit": 0
+  },
+  "dropped_unverified_by_concern": {},
+  "evidence": {
+    "by_status": {
+      "inconclusive": 9,
+      "supported": 1
+    },
+    "completed_collectors": {
+      "issue_kind_verifier": 1,
+      "lean_compile": 4,
+      "local_context": 10,
+      "policy": 7,
+      "repository_search": 10
+    },
+    "packets": 10,
+    "terminal_failures": {}
+  },
+  "execution_release": null,
+  "findings_sha256": "b8572f4ad346eef5887d3a8172cd12cbb531db600ed90b2472144bbbee529ba7",
+  "generalist_evidence_gate": "evidence_chain",
+  "inputs": 10,
+  "issues_published": 1,
+  "issues_sha256": "4004c23380aefb6eebae2fd7d4f1f49a16b16cbd100a2d2ccdc202cd8c68551b",
+  "issues_total": 10,
+  "lead_removed_findings": 0,
+  "lead_synthesis": {
+    "applied": false,
+    "assessments": 10,
+    "by_verdict": {
+      "keep": 10
+    },
+    "note": "recorded, not applied -- every candidate reaches the review. See `V5DatasetConfig.apply_lead_synthesis`."
+  },
+  "merge_version": "arm-neutral-merge/1",
+  "pr_finding_limit": null,
+  "published_after_limit": 1,
+  "published_before_limit": 1,
+  "published_by_concern": {
+    "documentation": 1
+  },
+  "published_prs": [
+    33117
+  ],
+  "routing_mode": "lead",
+  "scoped_pr_numbers": [
+    33117,
+    33145,
+    33315
+  ],
+  "suppressed_by_limit": 0,
+  "verification_artifacts": 6
+}

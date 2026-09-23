@@ -1,0 +1,485 @@
+{
+  "33117": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:229fde64ad47ec6a4d10e573#api_reuse",
+        "docs": "wu:229fde64ad47ec6a4d10e573#docs",
+        "generality": "wu:229fde64ad47ec6a4d10e573#generality",
+        "proof_golf": "wu:229fde64ad47ec6a4d10e573#proof_golf",
+        "proof_idiom": "wu:229fde64ad47ec6a4d10e573#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Meromorphic.fun_add",
+        "Meromorphic.fun_iterated_deriv",
+        "Meromorphic.fun_mul",
+        "Meromorphic.fun_sub",
+        "Meromorphic.iterated_deriv",
+        "Meromorphic.sum"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 11 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:229fde64ad47ec6a4d10e573"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:41f7ea76a22549e6890c8bb6#api_reuse",
+        "correctness": "wu:41f7ea76a22549e6890c8bb6#correctness",
+        "docs": "wu:41f7ea76a22549e6890c8bb6#docs",
+        "duplication": "wu:41f7ea76a22549e6890c8bb6#duplication",
+        "family_design": "wu:41f7ea76a22549e6890c8bb6#family_design",
+        "generality": "wu:41f7ea76a22549e6890c8bb6#generality",
+        "proof_golf": "wu:41f7ea76a22549e6890c8bb6#proof_golf",
+        "proof_idiom": "wu:41f7ea76a22549e6890c8bb6#proof_idiom",
+        "style": "wu:41f7ea76a22549e6890c8bb6#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic.div",
+        "Meromorphic.fun_zpow",
+        "Meromorphic.prod",
+        "Meromorphic.sub",
+        "meromorphicOn_univ"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 9 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:41f7ea76a22549e6890c8bb6"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:6c8dd8090a8223f477baef2c#api_reuse",
+        "correctness": "wu:6c8dd8090a8223f477baef2c#correctness",
+        "docs": "wu:6c8dd8090a8223f477baef2c#docs",
+        "duplication": "wu:6c8dd8090a8223f477baef2c#duplication",
+        "family_design": "wu:6c8dd8090a8223f477baef2c#family_design",
+        "generality": "wu:6c8dd8090a8223f477baef2c#generality",
+        "proof_golf": "wu:6c8dd8090a8223f477baef2c#proof_golf",
+        "proof_idiom": "wu:6c8dd8090a8223f477baef2c#proof_idiom",
+        "style": "wu:6c8dd8090a8223f477baef2c#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic",
+        "Meromorphic.add",
+        "Meromorphic.fun_deriv",
+        "Meromorphic.fun_neg"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 7 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:6c8dd8090a8223f477baef2c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:276363feeb24802ce9b88527#api_reuse",
+        "correctness": "wu:276363feeb24802ce9b88527#correctness",
+        "docs": "wu:276363feeb24802ce9b88527#docs",
+        "duplication": "wu:276363feeb24802ce9b88527#duplication",
+        "family_design": "wu:276363feeb24802ce9b88527#family_design",
+        "generality": "wu:276363feeb24802ce9b88527#generality",
+        "proof_golf": "wu:276363feeb24802ce9b88527#proof_golf",
+        "proof_idiom": "wu:276363feeb24802ce9b88527#proof_idiom",
+        "style": "wu:276363feeb24802ce9b88527#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic.deriv",
+        "Meromorphic.fun_pow",
+        "Meromorphic.fun_prod",
+        "Meromorphic.fun_sum"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 10 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:276363feeb24802ce9b88527"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:538fe7595c8c3ed56c96607f#api_reuse",
+        "correctness": "wu:538fe7595c8c3ed56c96607f#correctness",
+        "docs": "wu:538fe7595c8c3ed56c96607f#docs",
+        "duplication": "wu:538fe7595c8c3ed56c96607f#duplication",
+        "family_design": "wu:538fe7595c8c3ed56c96607f#family_design",
+        "generality": "wu:538fe7595c8c3ed56c96607f#generality",
+        "proof_golf": "wu:538fe7595c8c3ed56c96607f#proof_golf",
+        "proof_idiom": "wu:538fe7595c8c3ed56c96607f#proof_idiom",
+        "style": "wu:538fe7595c8c3ed56c96607f#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Analysis/Meromorphic/Basic.lean",
+        "Meromorphic.fun_div",
+        "Meromorphic.mul",
+        "Meromorphic.neg",
+        "Meromorphic.pow",
+        "Meromorphic.zpow"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 11 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:538fe7595c8c3ed56c96607f"
+    }
+  ],
+  "33145": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:730afd5b892a29885e89fd5c#api_reuse",
+        "correctness": "wu:730afd5b892a29885e89fd5c#correctness",
+        "docs": "wu:730afd5b892a29885e89fd5c#docs",
+        "duplication": "wu:730afd5b892a29885e89fd5c#duplication",
+        "family_design": "wu:730afd5b892a29885e89fd5c#family_design",
+        "generality": "wu:730afd5b892a29885e89fd5c#generality",
+        "naming": "wu:730afd5b892a29885e89fd5c#naming",
+        "proof_golf": "wu:730afd5b892a29885e89fd5c#proof_golf",
+        "proof_idiom": "wu:730afd5b892a29885e89fd5c#proof_idiom",
+        "style": "wu:730afd5b892a29885e89fd5c#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Dense.continuous_sup",
+        "Dense.continuous_sup'",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_sup'` is a chain of 10 low-level tactic steps",
+        "`Dense.continuous_sup` is a chain of 5 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_sup'` is 21 lines",
+        "`Dense.continuous_sup` is 12 lines"
+      ],
+      "work_unit_id": "wu:730afd5b892a29885e89fd5c"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:1031e8acbe2db1ea15d6a50e#api_reuse",
+        "docs": "wu:1031e8acbe2db1ea15d6a50e#docs",
+        "generality": "wu:1031e8acbe2db1ea15d6a50e#generality",
+        "proof_golf": "wu:1031e8acbe2db1ea15d6a50e#proof_golf",
+        "proof_idiom": "wu:1031e8acbe2db1ea15d6a50e#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Dense.continuous_lowerBounds",
+        "Dense.continuous_upperBounds",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_upperBounds` is a chain of 5 low-level tactic steps",
+        "`Dense.continuous_lowerBounds` is a chain of 5 low-level tactic steps",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:28601c8d1538799b6c5d4edc#api_reuse",
+        "correctness": "wu:28601c8d1538799b6c5d4edc#correctness",
+        "docs": "wu:28601c8d1538799b6c5d4edc#docs",
+        "duplication": "wu:28601c8d1538799b6c5d4edc#duplication",
+        "family_design": "wu:28601c8d1538799b6c5d4edc#family_design",
+        "generality": "wu:28601c8d1538799b6c5d4edc#generality",
+        "naming": "wu:28601c8d1538799b6c5d4edc#naming",
+        "proof_golf": "wu:28601c8d1538799b6c5d4edc#proof_golf",
+        "proof_idiom": "wu:28601c8d1538799b6c5d4edc#proof_idiom",
+        "style": "wu:28601c8d1538799b6c5d4edc#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Dense.continuous_inf'",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_inf'` is a chain of 10 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_inf'` is 21 lines"
+      ],
+      "work_unit_id": "wu:28601c8d1538799b6c5d4edc"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:7f4540ff384350b046f6deda#api_reuse",
+        "correctness": "wu:7f4540ff384350b046f6deda#correctness",
+        "docs": "wu:7f4540ff384350b046f6deda#docs",
+        "duplication": "wu:7f4540ff384350b046f6deda#duplication",
+        "family_design": "wu:7f4540ff384350b046f6deda#family_design",
+        "generality": "wu:7f4540ff384350b046f6deda#generality",
+        "naming": "wu:7f4540ff384350b046f6deda#naming",
+        "proof_golf": "wu:7f4540ff384350b046f6deda#proof_golf",
+        "proof_idiom": "wu:7f4540ff384350b046f6deda#proof_idiom",
+        "style": "wu:7f4540ff384350b046f6deda#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Dense.continuous_inf",
+        "Mathlib/Topology/Order/IsLUB.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Dense.continuous_inf` is a chain of 5 low-level tactic steps",
+        "introduces a new declaration",
+        "`Dense.continuous_inf` is 12 lines"
+      ],
+      "work_unit_id": "wu:7f4540ff384350b046f6deda"
+    }
+  ],
+  "33315": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:135cb918bb9c26ebb10aa025#api_reuse",
+        "correctness": "wu:135cb918bb9c26ebb10aa025#correctness",
+        "docs": "wu:135cb918bb9c26ebb10aa025#docs",
+        "duplication": "wu:135cb918bb9c26ebb10aa025#duplication",
+        "family_design": "wu:135cb918bb9c26ebb10aa025#family_design",
+        "generality": "wu:135cb918bb9c26ebb10aa025#generality",
+        "naming": "wu:135cb918bb9c26ebb10aa025#naming",
+        "proof_golf": "wu:135cb918bb9c26ebb10aa025#proof_golf",
+        "proof_idiom": "wu:135cb918bb9c26ebb10aa025#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Data/Vector3.lean",
+        "Vector3.unexpandNil"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:135cb918bb9c26ebb10aa025"
+    },
+    {
+      "available_arms": {
+        "style": "wu:2b43bb656d3eeb647de8796f#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Data/Array/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:2b43bb656d3eeb647de8796f"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:43ef830997b5aae01261bf40#docs",
+        "style": "wu:43ef830997b5aae01261bf40#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Data/Option/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:43ef830997b5aae01261bf40"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:4e6398a9f14bbf31ce997fb2#docs",
+        "style": "wu:4e6398a9f14bbf31ce997fb2#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Data/Set/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:4e6398a9f14bbf31ce997fb2"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:5035ec3754f840e343818656#docs",
+        "style": "wu:5035ec3754f840e343818656#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:5035ec3754f840e343818656"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:54117621de110b56bedbfa84#docs",
+        "style": "wu:54117621de110b56bedbfa84#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Mathlib/Data/List/Lex.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:54117621de110b56bedbfa84"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:5a24da37b205a95a8cf0df1c#docs",
+        "style": "wu:5a24da37b205a95a8cf0df1c#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "Mathlib/Data/Finsupp/MonomialOrder.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:5a24da37b205a95a8cf0df1c"
+    },
+    {
+      "available_arms": {
+        "style": "wu:66705da2716cfa881fc3b13b#style"
+      },
+      "rank": 8,
+      "subjects": [
+        "Mathlib/Data/Nat/Init.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:66705da2716cfa881fc3b13b"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:71de72efe6a7485c179ebaf9#docs",
+        "style": "wu:71de72efe6a7485c179ebaf9#style"
+      },
+      "rank": 9,
+      "subjects": [
+        "Mathlib/Data/Matrix/Mul.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:71de72efe6a7485c179ebaf9"
+    },
+    {
+      "available_arms": {
+        "style": "wu:b10d2503878b7e3fb077ab7b#style"
+      },
+      "rank": 10,
+      "subjects": [
+        "Mathlib/Data/Complex/Basic.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:b10d2503878b7e3fb077ab7b"
+    },
+    {
+      "available_arms": {
+        "docs": "wu:ec0fb202bc5f3e4dc922957d#docs",
+        "style": "wu:ec0fb202bc5f3e4dc922957d#style"
+      },
+      "rank": 11,
+      "subjects": [
+        "Mathlib/Data/Finset/Defs.lean"
+      ],
+      "suggested_arms": [
+        "docs"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'"
+      ],
+      "work_unit_id": "wu:ec0fb202bc5f3e4dc922957d"
+    }
+  ]
+}
