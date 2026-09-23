@@ -676,6 +676,23 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                                        "reason": ""}
         return [verdicts[cid] for cid in expected], None
 
+    def _failed_edit_advice(self) -> str:
+        """What a refused edit leaves the arm free to do, under the run's policy.
+
+        Under `verify_edits_if_present` the ask itself does not need an edit, so a failing edit
+        is no reason to lose the ask -- but "fix the edit or omit the candidate" says it is. On the
+        first contract-ceiling pilot (2026-09-23) a `correctness` arm found a real duplicate on
+        33421, had its coordinated patch refused twice, kept repairing it, and paused on its
+        budget with nothing filed. Every other policy keeps the old sentence, because there an
+        edit is what makes a checkable claim admissible.
+        """
+
+        if self.data.submission_verification_policy == "verify_edits_if_present":
+            return ("Fix the edit, or resubmit the same candidate without `proposed_edit` and "
+                    "`patch_set`: in this run an ask with no edit is accepted and recorded as "
+                    "unverified.")
+        return "Fix the edit or omit the candidate."
+
     @staticmethod
     def _verdict_abstention(verdicts: List[Dict[str, Any]]) -> Dict[str, str]:
         """An empty candidate list under `target_verdicts`: which verdicts, and how many."""
@@ -870,7 +887,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                     score=0.0,
                     message=(
                         f"Candidate {index} failed verification-backed submission: "
-                        f"{verification_error}. Fix the edit or omit the candidate."
+                        f"{verification_error}. {self._failed_edit_advice()}"
                     ),
                 ), "message": "Candidate verification failed"}
             verification_artifacts.extend(artifacts)

@@ -535,3 +535,27 @@ def test_verdicts_do_not_bring_back_the_abstention_refusals():
         _verdict("change:a", "no_issue"), _verdict("change:b", "no_issue")]))
     assert result["evaluation_result"].success is True
     assert recorded[0].candidates == []
+
+
+def test_a_failed_edit_under_the_relaxed_policy_says_the_ask_can_be_filed_without_it():
+    """Under `verify_edits_if_present` a failing edit is no reason to lose the ask. The pilot's
+    `correctness` arm on 33421 kept repairing a refused patch until its budget ran out, because
+    the refusal said only "fix the edit or omit the candidate". Every other policy keeps that
+    sentence: there, the edit is what makes a checkable claim admissible."""
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    for policy, expected in (
+            ("verify_edits_if_present", "resubmit the same candidate without `proposed_edit`"),
+            ("verify_checkable_edits", "Fix the edit or omit the candidate.")):
+        task = ReviewArmTask(_data(submission_verification_policy=policy), ApeAgentConfig())
+
+        async def refuse(_index, _candidate):
+            return [], "the edit does not compile"
+
+        task._verify_candidate_submission = refuse
+        mcp = FakeMCP()
+        asyncio.run(task.register_task_tools(mcp))
+        result = asyncio.run(mcp.tools["submit_candidates"](candidates=[_candidate()]))
+        assert result["evaluation_result"].success is False
+        assert expected in _message(result), (policy, _message(result))
