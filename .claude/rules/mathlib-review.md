@@ -217,6 +217,22 @@ paths:
   `already_correct` figure that motivated the forcing experiment) is measuring a coin flip. Label
   from `abstention_detail`, which now survives into replay outcome rows and into `report silences`.
   `finalize` reads neither: it contains no occurrence of `abstention`.
+- **A forced-choice label vocabulary hides the mechanism it was built to count (2026-09-23).**
+  `SilenceLabel` admits one label per cell, and the rubric handed to the reader ranked
+  `decision_noise` above `advisory_suppressed` whenever any replay sample filed. So the two 33337
+  `naming` cells that motivated the advisory-licensing condition -- the arm writing "emerging
+  (`toLinearMap_` 21 vs `coe_` 7) ... so I'm not requesting a rename" while 2 of 5 replays filed
+  the gold rename -- were recorded as `decision_noise` and `evidence_gap`, and the condition was
+  then killed by a `>= 3 advisory_suppressed` gate that its own examples could not reach. An arm
+  that files 2 times in 5 at an `emerging` verdict is advisory-suppressed *and* unstable; the
+  labels are not alternatives. **The reader said so in its note** -- "the quote is a textbook
+  `advisory_suppressed` tell" -- and the note was in the store while the counts were what got
+  acted on. Two rules, both cheap: a label vocabulary for *mechanisms* must be non-exclusive,
+  because mechanisms co-occur and a taxonomy that forces a winner reports the tiebreak rule
+  rather than the system; and **read the notes before the counts**, since a `by_label` histogram
+  cannot say that its second choice was nearly as strong. Same family as the closed-vocabulary
+  trap above, one level up: there a correct registration was dropped by a second list, here a
+  correct observation was dropped by a ranking.
 - **`naming_norm` counts leaf PREFIXES only** (`naming_norm.py:122`, `leaf.split("_", 1)[0]`), so a
   convention expressed in a suffix is invisible to it at any threshold. PR 33421's gold ask renames
   `round_eq'` to `round_eq_div`; both are prefix `round`. Separate from the unreachable 0.80 bar

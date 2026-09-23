@@ -1,6 +1,9 @@
 # Improving the specialist arms, given that their silence is stable
 
-**Status** — **closed 2026-09-21, unfunded.** Step 0 ran (free) and none of the three mechanisms
+**Status** — **closed 2026-09-21, unfunded; partly reopened 2026-09-23** — the `0`
+advisory-suppressed below is an artifact of a one-label-per-cell vocabulary, and the 17
+`disagreement` cells were never decomposed. Read "Correction, 2026-09-23" at the foot of this file
+before any count here. Step 0 ran (free) and none of the three mechanisms
 clears its gate: labelling all 58 silent gold-site sessions gives **0** advisory-suppressed, **0**
 cross-unit and **1** blocked-by-the-compiling-edit-rule, against **37** wrong-arm-correctly-quiet
 and **17** right-arm-disagrees. Result: `docs/research/specialist-silences-2026-09.md`. Plan and
@@ -237,3 +240,52 @@ decision-turn replay cannot.
 **What is still live and is not this todo.** The judgement residue: 17 sessions where the right arm
 looked at the maintainer's ask and said no. That is a capability and evidence question, and the
 contract, the tools and the prompts do not reach it.
+
+## Correction, 2026-09-23 — the gate that closed this file is a taxonomy artifact
+
+**Reopened as one free item; still $0 spent.** The status line above rests on "**0**
+advisory-suppressed" out of 58 labelled sessions. That zero was produced by the labelling
+instrument, not by the system.
+
+`SilenceLabel` (`src/mathlib_review/schema/scoring.py`) admits **one** label per cell, and the
+rubric the reader was given ranks `decision_noise` above `advisory_suppressed` whenever any replay
+sample filed. The two 33337 `naming` cells that motivated condition 2 — the arm concluding
+"emerging (`toLinearMap_` 21 vs `coe_` 7) … so I'm not requesting a rename" while 2 of 5 replays
+filed the gold rename — were therefore labelled `decision_noise` and `evidence_gap`. The reader's
+own note on the first says so in as many words:
+
+> The nearest alternative is strong and belongs on the record: the quote is a textbook
+> `advisory_suppressed` tell, and `NAMING_SYSTEM` explicitly directs that an `emerging` verdict be
+> reported.
+
+These are not alternatives. An arm that files 2 times in 5 at an `emerging` verdict is *both*
+advisory-suppressed and unstable; forcing the choice hid the first behind the second, and the
+`>= 3 advisory-suppressed` gate in correction 4 above was then read off a count that could not
+reach 3. **The notes carried the conflict and the counts did not; the counts were acted on.**
+
+Two consequences, in order.
+
+**1. Decompose the 17 `disagreement` cells (free, first, and the real population).** 17 is the
+second-largest label and the largest one that is about an arm's own remit; it was closed above as
+"judgement, not plumbing" by assertion, never by a read. The two cells inspected on 2026-09-23
+already split into a *bar* problem and a *tool* problem, and the tool half (`naming_norm`'s empty
+verdict asserting `no_population` when the subject failed to resolve) is fixed on `develop` — so
+"judgement" was wrong for at least one of the two. Read all 17 texts against their asks with the
+label vocabulary treated as **non-exclusive**: record every label that applies plus the reader's
+note, and count each mechanism over the cells it applies to rather than over the cells it won.
+This needs no model and no spend. Until it is done, no number in this file's status line should be
+quoted as a population size.
+
+**2. Then re-read condition 2's gate.** `configs/v5_replay_ask_without_fix.yaml`'s sibling is
+built and priced at **$2.66** gold-site + **$0.07** control, and on the evidence above its gate was
+never fairly evaluated. Whether it runs depends on what (1) returns, not on the artifact count.
+
+**Not reopened:** corrections 1, 3 and 5 stand — the routing majority, mechanism 1's example being
+outside the population, and a whole-task replay being unable to test tool work. Correction 2 (the
+compiling-edit rule) stands and its condition is built.
+
+**One update from elsewhere.** Mechanism 3 above cites `patch_set` as never submitted and raising
+`TypeError` on first use. That is fixed (`docs/research/coordinated-emission-2026-09.md`): five
+defects repaired, two local compiles, and the capability now works. It changed nothing — **0 patch
+sets emitted** on 3 PRs x 2 models, the falsifier stated before spending. So the `family_design`
+half of mechanism 3 is answered and is not evidence for anything left in this file.
