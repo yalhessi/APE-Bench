@@ -226,11 +226,14 @@ class V5DatasetConfig(BaseModel):
     #: `solo`, which has no arm to give it to. `docs/plans/2026-09-23-work-enumeration.md`.
     target_verdicts: bool = False
 
-    #: Overrides every arm's `submission_verification_policy` when set. Focused prompts are
-    #: sealed with `verify_checkable_edits`, which refuses a checkable-family claim with no
-    #: compiling edit; `verify_edits_if_present` still compiles every edit supplied and admits
-    #: the unverified ask as `diagnostic` (`7eef7af`). A payload directive, like the two above,
-    #: so the sealed prompts stay byte-identical; recorded in the plan's evaluation settings.
+    #: Overrides every arm's `submission_verification_policy` when set. Focused prompts default to
+    #: `verify_checkable_edits`, which refuses a checkable-family claim with no compiling edit;
+    #: `verify_edits_if_present` still compiles every edit supplied and admits the unverified ask
+    #: as `diagnostic` (`7eef7af`). Since the 2026-09-23 unification it reaches the prompt as well
+    #: as the tool: `build_agenda` renders the ask-without-fix clause into every specialist's
+    #: contract and names it in the renderer version, so an arm is told what its tool allows.
+    #: Unset, nothing renders and the prompts are byte-identical to a run without it. Recorded in
+    #: the plan's evaluation settings.
     submission_verification_policy: Optional[Literal[
         "none", "verify_checkable_edits", "verify_edits_if_present"]] = None
 
@@ -778,12 +781,15 @@ class CoverageGapAtPlanTime(RuntimeError):
 
 
 def stamp_submission_directives(pool: Dict[str, Dict[str, Any]], dataset, logger) -> None:
-    """Write the run's submission-contract directives onto every arm payload.
+    """Refuse a contract that cannot run, stamp `forbid_abstention`, and check the rest arrived.
 
-    Stamped on the payloads rather than passed through `RenderedPrompt`, because the prompt is
-    sealed and hashed: routing an execution policy through it would move every prompt identity
-    in the run and make the condition incomparable with the runs it exists to explain. Only
-    written when set, so an ordinary run's payloads stay byte-identical to their history. The
+    `target_verdicts` and `submission_verification_policy` are no longer written here. Since the
+    2026-09-23 unification they are `build_agenda` arguments, because they change the text every
+    specialist reads as well as what its tool enforces, and the text is rendered there; stamping
+    them after the fact left the prompt saying one rule while the tool enforced another, and left
+    `cli bench` -- which never reaches this step -- running the default contract. So this checks,
+    at the far end, that every payload carries what the dataset says, and refuses a pool that does
+    not. `forbid_abstention` is a payload directive with no text, and is still stamped here. The
     same values go into the plan through `evaluation_settings`, so a resume cannot silently
     disagree with them.
     """
@@ -805,13 +811,20 @@ def stamp_submission_directives(pool: Dict[str, Dict[str, Any]], dataset, logger
     if dataset.submission_verification_policy:
         logger.info("submission_verification_policy overridden to %s on every arm",
                     dataset.submission_verification_policy)
+    missing = sorted(
+        invocation_id for invocation_id, payload in pool.items()
+        if bool(payload.get("target_verdicts")) != bool(dataset.target_verdicts)
+        or (dataset.submission_verification_policy and payload.get(
+            "submission_verification_policy") != dataset.submission_verification_policy))
+    if missing:
+        raise ValueError(
+            f"{len(missing)} arm payload(s) do not carry the run's submission contract "
+            f"(target_verdicts={dataset.target_verdicts}, submission_verification_policy="
+            f"{dataset.submission_verification_policy}), e.g. {missing[0]}: the pool was built "
+            "without passing them to build_agenda, so the prompt and the tool would disagree")
     for payload in pool.values():
         if dataset.forbid_abstention:
             payload["forbid_abstention"] = True
-        if dataset.target_verdicts:
-            payload["target_verdicts"] = True
-        if dataset.submission_verification_policy:
-            payload["submission_verification_policy"] = dataset.submission_verification_policy
 
 
 def evaluation_settings(dataset) -> Dict[str, Any]:
@@ -1514,6 +1527,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         pr_numbers=selected_prs,
         use_exposure_index=dataset.use_exposure_index,
         generalist_floor=dataset.generalist_floor,
+        submission_verification_policy=dataset.submission_verification_policy,
+        target_verdicts=dataset.target_verdicts,
     )
     stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)

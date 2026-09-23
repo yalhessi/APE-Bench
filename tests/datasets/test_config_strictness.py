@@ -120,6 +120,23 @@ def test_the_working_override_spelling_still_parses():
     assert parse_cli_args(["dataset.dry_run=False"]) == {"dataset": {"dry_run": False}}
 
 
+def test_the_contract_knobs_are_opt_in_and_a_misspelling_is_refused():
+    """Off by default, so the committed controls rebuild byte-identical; set by name for a
+    treatment; a value outside the policy vocabulary refused at load rather than at the tool."""
+
+    required = {"release": "r", "modification_inventory": "m"}
+    default = V5DatasetConfig.model_validate(required)
+    assert default.submission_verification_policy is None and default.target_verdicts is False
+    override = parse_cli_args(["dataset.submission_verification_policy=verify_edits_if_present",
+                               "dataset.target_verdicts=true"])
+    treated = V5DatasetConfig.model_validate({**required, **override["dataset"]})
+    assert treated.submission_verification_policy == "verify_edits_if_present"
+    assert treated.target_verdicts is True
+    with pytest.raises(Exception):
+        V5DatasetConfig.model_validate(
+            {**required, "submission_verification_policy": "verify_edit_if_present"})
+
+
 def test_the_runbook_command_form_is_the_one_that_was_being_dropped():
     """Pins the exact shape from docs/research/medium-end-to-end-runbook.md."""
 

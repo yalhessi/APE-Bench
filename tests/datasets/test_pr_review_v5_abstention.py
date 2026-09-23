@@ -435,19 +435,37 @@ def _dataset(**overrides):
            if not f.is_required()}, **fields})
 
 
-def test_the_verdict_and_policy_directives_are_stamped_on_every_payload():
+def test_a_pool_built_without_the_contract_is_refused_rather_than_stamped():
+    """The verdict and policy directives are `build_agenda` arguments, because the contract text
+    renders there. A pool that does not carry what the dataset says was built without them, and
+    stamping the tool half on afterwards is exactly the told-one-rule, refused-by-another state
+    the unification removed."""
+
     import logging
 
     from src.mathlib_review.review.runner import stamp_submission_directives
 
-    pool = {"wu:a#naming": {"task_id": "a"}, "wu:b#docs": {"task_id": "b"}}
-    stamp_submission_directives(pool, _dataset(
-        target_verdicts=True, submission_verification_policy="verify_edits_if_present"),
-        logging.getLogger("t"))
-    for payload in pool.values():
-        assert payload["target_verdicts"] is True
-        assert payload["submission_verification_policy"] == "verify_edits_if_present"
-        assert "forbid_abstention" not in payload
+    contract = _dataset(target_verdicts=True, submission_verification_policy="verify_edits_if_present")
+    unstamped = {"wu:a#naming": {"task_id": "a"}, "wu:b#docs": {"task_id": "b"}}
+    with pytest.raises(ValueError, match="build_agenda"):
+        stamp_submission_directives(unstamped, contract, logging.getLogger("t"))
+
+    built = {key: {"task_id": key, "target_verdicts": True,
+                   "submission_verification_policy": "verify_edits_if_present"}
+             for key in ("wu:a#naming", "wu:b#docs")}
+    before = {key: dict(value) for key, value in built.items()}
+    stamp_submission_directives(built, contract, logging.getLogger("t"))
+    assert built == before, "a pool that carries the contract is checked, not rewritten"
+
+
+def test_the_runner_hands_the_contract_to_build_agenda():
+    import inspect
+
+    from src.mathlib_review.review import runner
+
+    source = inspect.getsource(runner.run)
+    assert "submission_verification_policy=dataset.submission_verification_policy" in source
+    assert "target_verdicts=dataset.target_verdicts" in source
 
 
 def test_an_ordinary_run_stamps_nothing_and_seals_nothing_new():
