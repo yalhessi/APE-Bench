@@ -33,6 +33,7 @@ supported a claim on its own.
 
 from __future__ import annotations
 
+import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
@@ -46,10 +47,13 @@ from src.mathlib_review.io import jsonl_bytes, write_once, jsonl_rows
 from src.mathlib_review.opportunities.select import select_findings
 
 
-#: How many candidates the evidence chain collects at once. Each mostly waits on a Lean compile
-#: (~4 s, one core, memory-mapped oleans) or on file reads; 16 keeps a 40-candidate run to a
-#: few compile-lengths on a machine shared with other sessions.
-EVIDENCE_WORKERS = 16
+#: How many candidates the evidence chain collects at once: half the machine's cores. Each mostly
+#: waits on a Lean compile (one core, memory-mapped oleans) or on file reads. Measured on a
+#: 40-candidate replay on 64 cores shared with other sessions (load ~30): 16 workers 61.5 s, the
+#: pool the bottleneck (the last candidate started at 38 s); 40 workers 35.3 s, bounded by the
+#: slowest candidate's own walk -> baseline compile -> edited compile. Half the cores leaves the
+#: other sessions theirs.
+EVIDENCE_WORKERS = max(1, (os.cpu_count() or 2) // 2)
 
 
 async def reviewed_workspaces(

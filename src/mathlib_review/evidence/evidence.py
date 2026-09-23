@@ -218,7 +218,31 @@ def snapshot_workspace(base_sha: Optional[str]) -> Optional[Path]:
     return candidate if (candidate / "Mathlib").is_dir() else None
 
 
-_WORKSPACE_FILES_LOCK = threading.Lock()
+_SINGLE_FLIGHT_GUARD = threading.Lock()
+_SINGLE_FLIGHT_LOCKS: Dict[Tuple[int, object], threading.Lock] = {}
+
+
+def single_flight(cache: Optional[Dict], key, compute):
+    """`cache[key]`, computing it at most once however many threads ask at the same moment.
+
+    The evidence chain's worker threads share its caches, and on the first pass they all miss
+    together: without this, every thread that reaches the same file compiles it, or walks the
+    same workspace, at the same time. The first caller computes; the others wait on a per-key
+    lock and read its result. Only a result is stored -- if `compute` raises, the exception
+    reaches that caller and a waiter computes for itself, which is what an uncached failure has
+    always done. `cache=None` means no caching at all.
+    """
+
+    if cache is None:
+        return compute()
+    if key in cache:
+        return cache[key]
+    with _SINGLE_FLIGHT_GUARD:
+        lock = _SINGLE_FLIGHT_LOCKS.setdefault((id(cache), key), threading.Lock())
+    with lock:
+        if key not in cache:
+            cache[key] = compute()
+        return cache[key]
 
 
 def workspace_lean_files(workspace: Path,
@@ -231,20 +255,11 @@ def workspace_lean_files(workspace: Path,
     workspace is a symlink farm over a read-only snapshot, and the compile collector writes its
     edited copy to the system temp directory, never into the workspace. So `collect_supported`
     passes one cache for the whole chain, the way it passes `population_cache`; a caller that
-    passes none walks every time, as before. Safe from the chain's worker threads: two that miss
-    at once both walk, and the first result is kept.
+    passes none walks every time, as before. Single-flight, because a replay measured 17 walks
+    for 3 distinct workspaces when 16 threads started on an empty cache together.
     """
 
-    if cache is None:
-        return sorted(Path(workspace).rglob("*.lean"))
-    key = str(workspace)
-    with _WORKSPACE_FILES_LOCK:
-        files = cache.get(key)
-    if files is None:
-        files = sorted(Path(workspace).rglob("*.lean"))
-        with _WORKSPACE_FILES_LOCK:
-            files = cache.setdefault(key, files)
-    return files
+    return single_flight(cache, str(workspace), lambda: sorted(Path(workspace).rglob("*.lean")))
 
 
 #: Guards the population cache, which the evidence chain's worker threads share: a snapshot is
@@ -440,15 +455,16 @@ def collect_candidate(
                 continue
             source = source_path.read_text()
             cache_key = (str(workspace.resolve()), compile_path)
-            baseline = (baseline_compile_cache or {}).get(cache_key)
-            if baseline is None:
-                try:
-                    baseline = _run(["lake", "env", "lean", str(source_path)], workspace)
-                except (OSError, subprocess.TimeoutExpired) as exc:
-                    failures[collector] = f"lean_process_failed:{type(exc).__name__}"
-                    continue
-                if baseline_compile_cache is not None:
-                    baseline_compile_cache[cache_key] = baseline
+            try:
+                # Single-flight: on the chain's first pass every thread that reaches the same
+                # file misses the cache together, and a replay measured 29 baseline compiles
+                # (316 s) for 7 distinct files -- `IsLUB.lean` nine times.
+                baseline = single_flight(
+                    baseline_compile_cache, cache_key,
+                    lambda: _run(["lake", "env", "lean", str(source_path)], workspace))
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                failures[collector] = f"lean_process_failed:{type(exc).__name__}"
+                continue
             baseline_output = (baseline.stdout + "\n" + baseline.stderr).strip()[-8000:]
             spans = candidate_spans(candidate, graph)
             relevant_failure = baseline.returncode != 0 and _has_target_diagnostic(

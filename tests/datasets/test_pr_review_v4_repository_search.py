@@ -16,6 +16,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from src.mathlib_review.evidence.evidence import declares_identifier, searchable_identifiers
 
 REALISTIC_QUERY = (
@@ -144,3 +146,41 @@ def test_the_prefilter_keeps_a_dotted_identifier_by_its_leaf(tmp_path):
     assert grep_candidate_files(["sum_comm"], paths, use_regex=False) == {str(paths[0])}
     assert grep_candidate_files(["Finset.sum_comm"], paths, use_regex=False) == set(), (
         "searching the dotted name is what the leaf split exists to avoid")
+
+
+def test_single_flight_computes_once_for_concurrent_callers_and_never_caches_a_failure():
+    """The evidence chain's threads share their caches and miss together on the first pass; a
+    replay measured 29 baseline compiles for 7 files and 17 walks for 3 workspaces before this.
+    The first caller computes, the rest wait for its result. A failure is not stored: the caller
+    that raised sees it, and a later caller computes afresh, as an uncached failure always did."""
+
+    import threading
+    import time
+
+    from src.mathlib_review.evidence.evidence import single_flight
+
+    cache, calls, results = {}, [], []
+
+    def slow():
+        calls.append(1)
+        time.sleep(0.2)
+        return "value"
+
+    threads = [threading.Thread(target=lambda: results.append(single_flight(cache, "k", slow)))
+               for _ in range(8)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert len(calls) == 1 and results == ["value"] * 8
+
+    failures = {}
+
+    def boom():
+        raise OSError("no lean")
+
+    with pytest.raises(OSError):
+        single_flight(failures, "k", boom)
+    assert "k" not in failures
+    assert single_flight(failures, "k", lambda: "recovered") == "recovered"
+    assert single_flight(None, "k", lambda: "uncached") == "uncached"
