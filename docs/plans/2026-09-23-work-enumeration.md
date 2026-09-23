@@ -493,3 +493,12 @@ control rep 1 onward on the new.** That is not a difference in condition: the to
 results, and latency spends neither tokens nor dollars. Control rep 1's sealed plan was checked
 against treatment rep 1's before any job ran -- 140 identical invocations and prompt hashes, identical
 arm hashes, caps, model and release; only the two contract settings differ.
+
+## Decision, 2026-09-23 (reps 2-3 skipped)
+
+The user, after treatment rep 1: skip reps 2-3 of both conditions for now, to limit spend -- the
+result is the one expected, and nothing in it yet warrants more. Control rep 1, already running,
+finishes and is judged, so the one pair is read against itself. Everything written from it is
+**one rep per condition, ten obligations (10 pp each), provisional**; the outcome bands of Phase 4
+were defined over three reps and are not applied. Reps 2-3 stay the check that would turn it into a
+rate, and are recorded as the open step rather than dropped.
