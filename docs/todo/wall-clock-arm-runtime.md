@@ -312,3 +312,20 @@ billed cost, one 17,303-char hunk shipped to all 120 jobs, and target-scoping re
 prompt section. That fix also shrinks the **LLM** bucket here, since it shrinks what all 120 arms
 send. Shared root cause: **120 jobs against one oversized PR**, and neither the cost cap nor the
 nested concurrency cap was designed for a PR that size.
+
+## Added 2026-09-23: `declaration_search` was the third whole-tree scan, and now takes the prefilter
+
+Found on the work-enumeration contract ceiling (`pr5_V2_verdicts_fanout4_rep1`), whose 97 finished
+sessions put **model turns at 14%** of attributed job time and local tools at the rest:
+`declaration_search` 174 calls at a **33.7 s** mean (~31%), `lean_verify_edit` 20.5 s, `content_search`
+19.6 s. The tool walked and read every `.lean` file of the base snapshot on every call, synchronously
+inside the async tool, while all four arms of the run shared one process and event loop
+(`num_processes: 0`) -- so each call also stalled the other three (`file_read` averaged 2.0 s), and the
+run process sat at ~23% of one core.
+
+`c1435db` gives it `repository_search`'s leaf prefilter (sound by construction), the async grep driver,
+and a per-process memo of the snapshot's file list. A/B on the run's own queries, old full scan
+against new path, each on its real base snapshot: **60 of 60 identical**, mean **9.09 s -> 4.63 s**
+measured serially beside the running rep. The in-run gain -- the loop no longer blocked -- needs a run
+to measure. What is left per call is grep over NFS (~2-3 s cold); staging snapshot source on local
+tmpfs, measured flat to 64-way above, is still the structural fix.
