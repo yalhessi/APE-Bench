@@ -32,6 +32,38 @@ PR = 33315
 #: Keys `_direct_arm_task_data` adds when it dispatches, which the agenda's pool never holds.
 DISPATCH_KEYS = {"retrieval_cutoff", "trace_path"}
 
+#: Arms whose prompt deliberately changed since the paid control, with the exact text that moved.
+#: The unification's naming correction (spec identity ee245f077b7e -> 1f4b176a45a4) is one: the
+#: bullet said "Submit nothing on naming" for both of `naming_norm`'s empty branches, one of which
+#: is the tool failing to resolve the subject. The rebuilt control is identical on every other arm,
+#: and on this one differs by exactly these replacements -- anything else would be drift.
+MOVED_SINCE_CONTROL = {
+    "naming": [
+        ("    * `insufficient_evidence` — the repository has no opinion here. Submit nothing on naming.",
+         "    * `insufficient_evidence` — the counts do not settle it, and `empty_because` says why.\n"
+         "      `no_population`: the repository has no counted opinion here. `subject_unresolved`: the tool\n"
+         "      could not tell what the declaration is about and never asked the corpus, so naming is\n"
+         "      unmeasured rather than settled -- judge the name on precedent and on the siblings you read."),
+        ("use `coe_`\" is. If the verdict is `insufficient_evidence` and no precedent says otherwise, or the\n"
+         "name already follows the convention, submit nothing — a naming check that finds nothing is a\n"
+         "normal and correct outcome.",
+         "use `coe_`\" is. If the repository has no counted opinion and no precedent says otherwise, or the\n"
+         "name already follows the convention, there is nothing to ask — a naming check that finds nothing\n"
+         "is a normal and correct outcome."),
+    ],
+}
+
+
+def _arm_of(invocation_id: str) -> str:
+    return invocation_id.rsplit("#", 1)[-1]
+
+
+def _as_moved(arm_id: str, text: str) -> str:
+    for old, new in MOVED_SINCE_CONTROL.get(arm_id, []):
+        assert old in text, (arm_id, old[:60])
+        text = text.replace(old, new)
+    return text
+
 pool_exists = pytest.mark.skipif(
     not (CONTROL_RUN / "arm_pool.jsonl").is_file(),
     reason="the paid control's arm_pool.jsonl is gitignored and absent in this checkout")
@@ -80,8 +112,12 @@ def test_the_control_rebuilds_to_the_prompts_the_paid_control_sealed(control):
     sealed = json.loads((CONTROL_RUN / "agenda.json").read_text())
     rebuilt = {item.invocation_id: item.prompt_sha256 for item in agenda.proposals}
     assert rebuilt, "no proposals for the control PR"
-    assert rebuilt == {key: plan["prompt_sha256_by_invocation"][key] for key in rebuilt}
-    assert {arm.arm_id: arm.source_sha256 for arm in agenda.arms} == plan["arm_sha256_by_id"]
+    for key, digest in rebuilt.items():
+        moved = _arm_of(key) in MOVED_SINCE_CONTROL
+        assert (digest == plan["prompt_sha256_by_invocation"][key]) is (not moved), key
+    arms = {arm.arm_id: arm.source_sha256 for arm in agenda.arms}
+    for arm_id, digest in plan["arm_sha256_by_id"].items():
+        assert (arms[arm_id] == digest) is (arm_id not in MOVED_SINCE_CONTROL), arm_id
     assert agenda.renderer_version == sealed["renderer_version"] == (
         "candidate-prompt/12+focused-prompt/4")
 
@@ -96,6 +132,17 @@ def test_the_control_pool_is_the_task_data_the_paid_control_dispatched(control):
     for invocation_id, payload in pool.items():
         sent = {key: value for key, value in dispatched[invocation_id].items()
                 if key not in DISPATCH_KEYS}
+        arm_id = _arm_of(invocation_id)
+        if arm_id in MOVED_SINCE_CONTROL:
+            # The moved arm differs by exactly the recorded text, and so, necessarily, by the
+            # hashes of that text: the prompt hash, and `global_index`, the content hash the
+            # orchestrator resumes on -- which MUST move, or a new run under the new text would
+            # silently resume the paid control's job. Nothing else in its payload moves.
+            assert payload["rendered_system_prompt"] == _as_moved(
+                arm_id, sent["rendered_system_prompt"]), invocation_id
+            for key in ("rendered_system_prompt", "rendered_prompt_sha256", "global_index"):
+                assert payload[key] != sent[key], (invocation_id, key)
+                sent.pop(key), payload.pop(key)
         assert payload == sent, invocation_id
 
 

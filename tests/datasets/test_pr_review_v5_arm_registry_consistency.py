@@ -187,7 +187,12 @@ EXPECTED_SPEC_IDENTITY = {
     # counted population for the conclusion's subject (`naming_norm`) and licenses an
     # advisory ask on an emerging one. Nine of ten identities are unchanged, which is the
     # check that this touched one arm and not the registry's shape.
-    "generality": "ef5c1b06333a", "naming": "ee245f077b7e", "proof_golf": "854c179f8da7",
+    # `naming` moved ee245f077b7e -> 1f4b176a45a4 on 2026-09-23, deliberately: its
+    # `insufficient_evidence` bullet said "Submit nothing on naming" for both of the tool's
+    # empty branches, while `naming_norm` itself now says `subject_unresolved` means "never
+    # asked the corpus ... UNMEASURED rather than settled" (b9acfe3). The prompt was instructing
+    # silence on a tool failure. Nine of ten identities are unchanged.
+    "generality": "ef5c1b06333a", "naming": "1f4b176a45a4", "proof_golf": "854c179f8da7",
     "proof_idiom": "d0d4b417257d", "style": "ba219a5656d0",
 }
 
