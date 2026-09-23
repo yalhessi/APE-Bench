@@ -406,3 +406,107 @@ def test_without_a_target_workspace_the_tool_is_base_only_and_says_so(tmp_path, 
     assert "or in the files this PR changes" not in result["results"]
     rows = [json.loads(line) for line in open(task.data.trace_path) if line.strip()]
     assert rows[-1]["gate"] == "base_snapshot" and rows[-1]["result_ids"] == []
+
+
+# --- declaration_search reads only the files grep says can declare the name -------------------
+#
+# The tool used to read every `.lean` file of the base snapshot, synchronously in the shared
+# event loop: a 33.7 s mean on the contract-ceiling run, with every arm in the process waiting on
+# it. It now takes `repository_search`'s prefilter (02eba94). The property that makes that safe
+# is pinned here, not a timing: the answer is the one the full scan gave.
+
+
+def _snapshot(tmp_path):
+    root = tmp_path / "snap"
+    (root / "Mathlib" / "Order").mkdir(parents=True)
+    (root / "Mathlib" / "Order" / "A.lean").write_text(
+        "namespace Finset\n\ntheorem sum_comm : True := trivial\n\nend Finset\n")
+    (root / "Mathlib" / "Order" / "B.lean").write_text(
+        "-- sum_comm is mentioned here but not declared\nexample : True := trivial\n")
+    (root / "Mathlib" / "C.lean").write_text("@[simp] lemma Finset.sum_comm' : True := trivial\n")
+    (root / "Mathlib" / "D.lean").write_text("theorem Finset.sum_comm : True := trivial\n")
+    return root
+
+
+def _full_scan(root, identifier, limit=5):
+    """The old implementation, kept as the reference the new one must agree with."""
+
+    from src.mathlib_review.evidence.evidence import declares_identifier, searchable_identifiers
+
+    terms, hits = searchable_identifiers(identifier), []
+    for path in sorted(root.rglob("*.lean")):
+        if len(hits) >= limit:
+            break
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for term in terms:
+            if declares_identifier(text, term):
+                hits.append(str(path.relative_to(root)))
+                break
+    return hits
+
+
+def _paths(result):
+    import re
+    return re.findall(r"is declared in `([^`]+)` \(before this PR\)", result["results"])
+
+
+def test_the_prefiltered_search_answers_what_the_full_scan_answered(tmp_path, monkeypatch):
+    """Including the case the prefilter must not lose: `theorem sum_comm` inside `namespace
+    Finset` declares `Finset.sum_comm` without the dotted name appearing, which is why the grep
+    is for the *leaf*. A mention in a comment is not a declaration.
+
+    Not this change's to fix, and pinned so it is visible: `declares_identifier` ends its pattern
+    in `\b`, which sits between `m` and `'`, so `lemma Finset.sum_comm'` counts as declaring
+    `Finset.sum_comm`. The full scan did the same; the prefilter only has to agree with it."""
+
+    import src.mathlib_review.evidence.evidence as evidence
+
+    root = _snapshot(tmp_path)
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: root)
+    tool = _register(_task(tmp_path, ["declaration_search"])).tools["declaration_search"]
+    for identifier in ("Finset.sum_comm", "sum_comm", "Finset.sum_comm'", "Finset.nowhere"):
+        result = asyncio.run(tool(identifier=identifier))
+        assert result["success"], result
+        assert _paths(result) == _full_scan(root, identifier), identifier
+    assert _paths(asyncio.run(tool(identifier="Finset.sum_comm"))) == [
+        "Mathlib/C.lean", "Mathlib/D.lean", "Mathlib/Order/A.lean"]
+
+
+def test_when_grep_does_not_answer_every_file_is_read(tmp_path, monkeypatch):
+    """`None` from the prefilter means "scan everything", never "nothing matched"."""
+
+    import ape.toolkits.file_system.utils as fs_utils
+    import src.mathlib_review.evidence.evidence as evidence
+
+    async def no_answer(*_a, **_k):
+        return None
+
+    root = _snapshot(tmp_path)
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: root)
+    monkeypatch.setattr(fs_utils, "grep_candidate_files_async", no_answer)
+    tool = _register(_task(tmp_path, ["declaration_search"])).tools["declaration_search"]
+    assert _paths(asyncio.run(tool(identifier="Finset.sum_comm"))) == _full_scan(
+        root, "Finset.sum_comm")
+
+
+def test_the_snapshot_is_walked_once_per_process(tmp_path, monkeypatch):
+    """A base snapshot is the shared per-commit checkout nothing writes to during a run, so its
+    file list is fixed; walking it on every call was ~8,500 NFS directory entries each time."""
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+    import src.mathlib_review.evidence.evidence as evidence
+
+    root = _snapshot(tmp_path)
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: root)
+    walks = []
+    real = context_tools.Path.rglob
+
+    def counting(self, pattern):
+        walks.append(str(self))
+        return real(self, pattern)
+
+    monkeypatch.setattr(context_tools.Path, "rglob", counting)
+    tool = _register(_task(tmp_path, ["declaration_search"])).tools["declaration_search"]
+    for identifier in ("Finset.sum_comm", "sum_comm", "Finset.nowhere"):
+        asyncio.run(tool(identifier=identifier))
+    assert walks.count(str(root)) == 1
