@@ -4,8 +4,12 @@
 # Every specialist at every slot, no lead and no generalist, on the four PRs of the fanout pair
 # (33145, 33315 control, 33337, 33421), under the DEFAULT submission contract: the job-level
 # abstention, and each arm's sealed verification policy. `pr_review_v5_verdicts_fanout4.yaml`
-# adds the two contract lines and nothing else, so the two runs differ in the contract alone and
-# share all 140 prompts (the directives are stamped on payloads after `build_agenda`).
+# adds the two contract lines and nothing else. At 0cfb162 the two runs shared all 140 prompts (the
+# directives were stamped on payloads after `build_agenda`); since the 2026-09-23 unification the
+# knobs also render contract text, so the treatment's specialist prompts differ from this control's
+# in the contract section alone. This control still rebuilds byte-identical to
+# pr5_V2_verdicts_fanout4_control_rep1 on nine of ten arms -- naming's prompt moved
+# (tests/datasets/test_pr_review_v5_contract_far_end.py).
 #
 # Why a new control and not pr5_F_fanout_stage1_rep1: that run rendered `focused-prompt/2` and
 # the tree renders `focused-prompt/4` (patch-set contract, per-target diff scoping, the

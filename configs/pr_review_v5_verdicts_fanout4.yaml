@@ -6,11 +6,21 @@
 # pruned (25 of 42) or run and silent (15). The control removes the first by having no lead; this
 # condition tests whether the contract moves the second.
 #
-# All of it lives in the submission tool; the rendered prompts are untouched:
+# The two knobs:
 #   target_verdicts                  -- every target gets `issue`, `no_issue` or
 #                                       `cannot_determine`, with its reason. Not forcing.
 #   submission_verification_policy   -- an edit supplied is compiled; an ask without one is
 #                                       filed as `diagnostic` instead of refused (7eef7af).
+#
+# Two conditions have run under this file, and they are not reps of each other:
+#   pr5_V2_verdicts_fanout4_rep1  (at 0cfb162 and before) -- TOOL-ONLY: the knobs were stamped on
+#       payloads after the agenda was built and the prompts stayed `focused-prompt/4`.
+#   pr5_V3_contract_fanout4_rep*  (from the 2026-09-23 unification) -- the same knobs now also
+#       render the contract text that says what the tool enforces ("When the fix does not
+#       compile", "Account for every target", "Two strengths of ask"), versioned
+#       `focused-prompt/4+ask_without_fix+target_verdicts`, and the naming prompt's
+#       `insufficient_evidence` bullet is corrected. docs/plans/2026-09-23-unify-the-contract-branches.md.
+# A plan sealed under one refuses a resume under the other, since their prompt hashes differ.
 extends: pr_review_v5_verdicts_fanout4_control.yaml
 dataset:
   target_verdicts: true
