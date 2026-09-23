@@ -1,5 +1,6 @@
 # The arms at a gold site are mostly not the ones whose remit covers the ask
 
+**Superseded as the route forward (2026-09-23)** — [`docs/plans/2026-09-23-work-enumeration.md`](../plans/2026-09-23-work-enumeration.md) replaces arm-by-arm repair with questions enumerated from maintainer comments, one verdict per target, and no generalist or lead; there is no remit to mismatch, because each job is one question, applied where its predicate selects a target. The free items here stay open and are not prerequisites.
 **Status** — open, written 2026-09-21 from the step-0 silence read; **no spend to measure further**
 **Cost** — free to measure; a change is one rep ($7.26)
 **Owner question** — the agenda schedules the right arm at every gold site *and* several wrong ones.

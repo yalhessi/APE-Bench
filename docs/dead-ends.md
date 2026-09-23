@@ -58,7 +58,8 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
 - **Specialists as the coverage floor** (2026-09-14) — *"the generalist is the floor and the
   specialists get pruned; force the specialists to be the floor instead"*. Tested at its ceiling
   rather than by tuning: `routing_mode: fanout` on 4 held-out PRs gives every specialist every
-  eligible slot with no lead and no pruning — 140 specialist jobs, 173 total, $14.72 billed. It
+  eligible slot with no lead and no pruning — 140 specialist jobs, 173 total, $14.72 nominal
+  (**$5.07 billed**; the manifest's `usage`, corrected 2026-09-23 — `docs/todo/record-corrections.md`). It
   recovered **2 of 10 obligations, exactly what `lead` recovered on the same PRs, against `solo`'s
   4**, at `gold_alignment_rate` 0.041 (2 of 49 candidates). The mechanism is the point: the
   specialist submit-rate was **16%, against lead's 19%** — unlimited slots did not raise output,
@@ -106,6 +107,12 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   whether the claim is right: `docs/research/the-admission-gate-2026-09.md`. **Reopens if:** a
   second `forbid_abstention` rep exists, or the forced run is re-judged under unanimity -- both
   free of new generation spend, neither done.
+  **Reopened 2026-09-23, under its own condition** ("the reason arms decline changes"):
+  `docs/plans/2026-09-23-work-enumeration.md`. What changes is both the question and the right to
+  decline — each job is one question maintainers ask, enumerated from the PR-store reviewer corpus
+  outside the scored PRs, and must return a verdict per target (`no_issue` is legal, silence is not),
+  with no generalist and no lead. This entry's result stands for the ten current arms; the new run
+  is compared against it and its forced twin on the same four PRs.
 - **Publication as selection** (2026-09-22) — re-scoring the three held-out reps found the
   admission gate discarding 71-83% of the gold obligations the run had already found (7/5/6 hit →
   2/1/1 published), filtering on whether a collector can warrant the claim's *family* rather than on

@@ -35,6 +35,16 @@ nominal and $0.0318 billed — so per job fanout is +1.7% nominal and **−7.9% 
 mechanism is also backwards: fanout's cache hit rate is **80.2% against lead's 71.2%**. Quote both
 figures side by side and drop the caching clause. The entry's conclusion is unaffected — it rests on
 recall, not cost.
+*Applied 2026-09-23, one clause only:* the entry's "$14.72 billed" now reads "$14.72 nominal ($5.07
+billed)". The per-job figures and the caching clause above are still unapplied.
+
+**Solo's "4" in the same entry is a union, not a rep.** "exactly what `lead` recovered on the same
+PRs, against `solo`'s 4" compares one fanout rep against solo's **union of three reps** on the four
+PRs; per rep solo hit 1, 3 and 0 of 10 (mean 0.13) and lead 2, 2, 2 (mean 0.20). Re-derived
+2026-09-23 from the committed `pr5_B_solo_ape_heldout12_v2_rep{1,2,3}` and
+`pr5_A_lead_heldout12_v2_rep{1,2,3}` audits restricted to 33145/33315/33337/33421. The same
+union-against-rep mix is in the table of `docs/plans/2026-09-14-selection-over-coverage.md`
+("solo 0.40"). The entry's conclusion does not depend on it.
 
 **Judge noise.** Add the n=705 v9 measurement (76 split pairs, 10.8%, 89.2% ceiling) beside the
 existing ~11% line, and note that `judge-v8/VERDICT.md`'s 0/18 result does not carry forward to
@@ -69,9 +79,24 @@ the absolute form says the relative form works.
 - The "arms cannot reach design" retraction: add the six-run numbers, the design-vs-local location
   split, and the condition qualifier (holds for lead, fails twice for solo).
 
+- `ab-heldout12-obligation-spine.md`, found 2026-09-23: condition B's "$1.90 billed" per rep is the
+  **nominal** figure (billed $0.74–0.84); "the same prompts and the same submission contract" for B
+  contradicts `src/ape/tasks/lean_tasks/formal_math/review/solo.py`, which has its own prompt and a
+  free-form `submit_findings`; and the obligation prefix `7fef9136` should be `7fef913e`.
+- Outside the tracked record: the untracked `docs/ai4math-convening.md` §8 says the reviewer "sees
+  the complete PR" and the "complete PR diff". No arm is shown the diff — `review_map.py:5-6`, "an
+  arm sees only its own targets plus the PR title and description" — only solo is
+  (`review/base.py:230-239`). That file belongs to another session's work and is noted, not edited.
+
 ## In the code comments
 
 `merge.py:256` and `digest.py:145` say `model_confidence` was "falsified three times as a ranking
 signal" with no citation. The three are `phase-c-corrected-history.md:45-46`,
 `pr-review-v5-principled-design.md:58`, and `pr-review-v4-evidence-pipeline-design.md:768`. Add the
 pointers, and note that what was falsified is the **absolute** form.
+
+`src/ape/tasks/lean_tasks/formal_math/review/judgment.py`'s module docstring says the judgment task
+is run from `judge_runner.py`; that module is now `src/mathlib_review/judge/runner.py`.
+`lead.py:499-500`'s `delegate` description says the mandatory generalist pass "has already run and
+is not requested here"; the code prepends it to the first `delegate` call (`lead.py:621-653`), as
+the system prompt says.

@@ -1,5 +1,6 @@
 # Improving the specialist arms, given that their silence is stable
 
+**Superseded as the route forward (2026-09-23)** — [`docs/plans/2026-09-23-work-enumeration.md`](../plans/2026-09-23-work-enumeration.md) replaces arm-by-arm repair with questions enumerated from maintainer comments, one verdict per target, and no generalist or lead; an arm may not stay silent there, since `no_issue` is a verdict with a reason attached, so the silence taxonomy below describes the design being replaced. The free items here stay open and are not prerequisites.
 **Status** — **closed 2026-09-21, unfunded; partly reopened 2026-09-23** — the `0`
 advisory-suppressed below is an artifact of a one-label-per-cell vocabulary, and the 17
 `disagreement` cells were never decomposed. Read "Correction, 2026-09-23" at the foot of this file

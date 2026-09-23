@@ -1,5 +1,6 @@
 # Specialist arm contents — seven of ten match nothing, for three different reasons
 
+**Superseded as the route forward (2026-09-23)** — [`docs/plans/2026-09-23-work-enumeration.md`](../plans/2026-09-23-work-enumeration.md) replaces arm-by-arm repair with questions enumerated from maintainer comments, one verdict per target, and no generalist or lead; the defects below are what that design does not inherit (one grant for every question, no prefix-only naming oracle as the bar, no golf/idiom overlap). The free items here stay open and are not prerequisites.
 **Status** — open; the audit below is done, the fixes are not
 **Cost** — most checks are re-scoring on committed artifacts; one 12-PR rep to confirm
 
