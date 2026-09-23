@@ -1,9 +1,15 @@
 # Are the arms reasoning at all, and which knob would decide it
 
-**Status** — open; **diagnosis settled 2026-09-23** (see the foot of this file): gpt-5.2 has run
-with reasoning off for the whole record. The test is paid and waits for a matched control on
-current code.
-**Cost** — no spend to diagnose; ~1 rep to re-calibrate if the answer is "no"
+**Status** — open, **parked by the user 2026-09-23 to investigate later**; the specialist thread comes
+first. **Diagnosis settled** (see the foot of this file): gpt-5.2 has run with reasoning off for the
+whole record. **The test, when picked up:** a `--set llm_config.reasoning_effort=low` twin of
+`pr5_V3_contract_fanout4_rep1` (`configs/pr_review_v5_verdicts_fanout4.yaml`, the four fanout PRs), which
+is its matched control on current code -- after the free check of whether the $0.17 per-job cap binds
+once each call reasons, and with `thinking_budget_tokens` retired from the 37 configs in the same commit.
+It answers something no run on disk can: every run in the record had reasoning off. The motivating
+reading is the unified run's residual -- four of seven misses are the right site with a smaller ask, a
+judgement failure a reasoning setting could move.
+**Cost** — no spend to diagnose; the twin is ~$6-10 billed (one rep, provisional), plus ~$0.30 judge
 **Motivating example** — Across **2,857 arm attempts** on nine v5 `gpt_5.2` runs, every single
 one reports `reasoning_tokens: 0`. Not a distribution with a low median — the value is 0 in
 2,857 of 2,857. Meanwhile `configs/bases/v5_generation.yaml` carries
