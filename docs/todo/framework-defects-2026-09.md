@@ -144,3 +144,29 @@ because a task that pauses returns before aggregation.
 **What would close it:** `cli trajectory` on that run reporting 10 conversations, with the
 paused arms' turns present and marked as truncated.
 
+
+## Added 2026-09-23: a missing or rejected API key retries for hours instead of failing
+
+**Motivating example.** The user, before the first paid work-enumeration rep: *"Unless the API key
+is supplied appropriately, the process may be stuck retrying"* -- seen in runs the day before.
+The code agrees. `src/ape/llm_clients/client.py:125-141` retries **every** exception except
+`ContextLengthExceededError`, `MalformedResponseError` and `StreamingInterruptedError`, so an
+authentication or permission failure is retried like a transient one: `retry_max_attempts: 100`
+(`llm_clients/config.py:326`) with exponential waits capped at 60 s plus up to 10 s of jitter is
+roughly **1.5-2 hours per call, per job**, and the only trace is a WARNING, "API call failed,
+retrying ... error_type: AuthenticationError". A run with a bad key looks alive for hours and
+bills nothing, which is the one outcome no cap or preflight catches.
+
+**What would close it:** (1) a provider's authentication and permission errors (HTTP 401/403)
+are not retried -- they are not transient, and the first one ends the attempt with its message;
+(2) `cli run --execute` refuses to start when the provider's key variable is unset in the
+launching environment (`OPENAI_API_KEY` for `gpt_*`, `ELM_API_KEY` for `elm_*`, per `CLAUDE.md`,
+"Providers"), where preflight already refuses other unrunnable configurations. Test both with a
+fake provider raising the real exception class.
+
+**Until then**, `CLAUDE.md` ("Providers") carries the launch check: confirm the key in the launching
+shell, then watch the first minutes of the log for completed jobs and for that warning.
+
+**Risk:** a gateway that returns 401/403 transiently (a token-refresh race) would now fail a job
+instead of waiting. None is known for OpenAI or ELM; if one appears, a single short retry is the
+narrow version.
