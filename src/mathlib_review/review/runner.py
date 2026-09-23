@@ -26,7 +26,7 @@ import asyncio
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import ConfigDict, BaseModel, Field
 
@@ -217,6 +217,22 @@ class V5DatasetConfig(BaseModel):
     #: Put it in the run name as well as here. It changes what the run produces, and a resumed
     #: run that silently disagreed with its own name would be worse than the experiment is worth.
     forbid_abstention: bool = False
+
+    #: One verdict per review target -- `issue`, `no_issue` or `cannot_determine`, each with its
+    #: reason -- in place of the job-level abstention (`candidates.py`, `target_verdicts`). NOT
+    #: forcing: `no_issue` is a legal answer, which is what keeps control PRs readable. Lives in
+    #: the submission tool alone, so the prompts, and every prompt identity, match a run without
+    #: it. Refused together with `forbid_abstention`, which is a different contract, and under
+    #: `solo`, which has no arm to give it to. `docs/plans/2026-09-23-work-enumeration.md`.
+    target_verdicts: bool = False
+
+    #: Overrides every arm's `submission_verification_policy` when set. Focused prompts are
+    #: sealed with `verify_checkable_edits`, which refuses a checkable-family claim with no
+    #: compiling edit; `verify_edits_if_present` still compiles every edit supplied and admits
+    #: the unverified ask as `diagnostic` (`7eef7af`). A payload directive, like the two above,
+    #: so the sealed prompts stay byte-identical; recorded in the plan's evaluation settings.
+    submission_verification_policy: Optional[Literal[
+        "none", "verify_checkable_edits", "verify_edits_if_present"]] = None
 
     #: The whole run's ceiling, in billed dollars. 0 disables it.
     #:
@@ -761,6 +777,70 @@ class CoverageGapAtPlanTime(RuntimeError):
     """The run would leave work units unreviewed, and the numbers would not mean what they say."""
 
 
+def stamp_submission_directives(pool: Dict[str, Dict[str, Any]], dataset, logger) -> None:
+    """Write the run's submission-contract directives onto every arm payload.
+
+    Stamped on the payloads rather than passed through `RenderedPrompt`, because the prompt is
+    sealed and hashed: routing an execution policy through it would move every prompt identity
+    in the run and make the condition incomparable with the runs it exists to explain. Only
+    written when set, so an ordinary run's payloads stay byte-identical to their history. The
+    same values go into the plan through `evaluation_settings`, so a resume cannot silently
+    disagree with them.
+    """
+
+    if dataset.forbid_abstention and dataset.target_verdicts:
+        raise ValueError(
+            "forbid_abstention and target_verdicts are different submission contracts: one "
+            "refuses an empty submission, the other accepts one whose every target says "
+            "`no_issue` or `cannot_determine`. Run them as separate conditions.")
+    if dataset.target_verdicts and dataset.routing_mode == "solo":
+        raise ValueError(
+            "target_verdicts is an arm contract and solo schedules no arm: its whole-PR agent "
+            "submits findings through its own tool.")
+    if dataset.forbid_abstention:
+        logger.warning("forbid_abstention is ON — arms may not abstain. Diagnostic only: "
+                       "control PRs cannot measure precision in this run.")
+    if dataset.target_verdicts:
+        logger.info("target_verdicts is ON — every arm answers every review target it is shown")
+    if dataset.submission_verification_policy:
+        logger.info("submission_verification_policy overridden to %s on every arm",
+                    dataset.submission_verification_policy)
+    for payload in pool.values():
+        if dataset.forbid_abstention:
+            payload["forbid_abstention"] = True
+        if dataset.target_verdicts:
+            payload["target_verdicts"] = True
+        if dataset.submission_verification_policy:
+            payload["submission_verification_policy"] = dataset.submission_verification_policy
+
+
+def evaluation_settings(dataset) -> Dict[str, Any]:
+    """The plan's record of the settings that change what a run produces, beyond its prompts.
+
+    The submission-contract directives are included only when set, for the reason they are
+    stamped only when set: a plan recomputed for a run that never used them stays byte-identical
+    to the one it sealed. `forbid_abstention` was stamped on payloads and recorded nowhere in the
+    plan until 2026-09-23; it now is.
+    """
+
+    settings: Dict[str, Any] = {
+        "execution_release": (str(dataset.execution_release)
+                              if dataset.execution_release else None),
+        "skip_evidence_chain": dataset.skip_evidence_chain,
+        "pr_finding_limit": dataset.pr_finding_limit,
+        "generalist_floor": dataset.generalist_floor,
+        "apply_lead_synthesis": dataset.apply_lead_synthesis,
+        "use_exposure_index": dataset.use_exposure_index,
+    }
+    if dataset.forbid_abstention:
+        settings["forbid_abstention"] = True
+    if dataset.target_verdicts:
+        settings["target_verdicts"] = True
+    if dataset.submission_verification_policy:
+        settings["submission_verification_policy"] = dataset.submission_verification_policy
+    return settings
+
+
 def assert_coverage_is_reachable(dataset, report, logger) -> None:
     """A specialist-only run must not leave a work unit with nothing eligible on it.
 
@@ -1166,15 +1246,7 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
         standard_budget_tokens=dataset.standard_budget_tokens,
         per_pr_token_cap=dataset.per_pr_token_cap,
         coordination=coordination_config(dataset).report(),
-        evaluation_settings={
-            "execution_release": (str(dataset.execution_release)
-                                  if dataset.execution_release else None),
-            "skip_evidence_chain": dataset.skip_evidence_chain,
-            "pr_finding_limit": dataset.pr_finding_limit,
-            "generalist_floor": dataset.generalist_floor,
-            "apply_lead_synthesis": dataset.apply_lead_synthesis,
-            "use_exposure_index": dataset.use_exposure_index,
-        },
+        evaluation_settings=evaluation_settings(dataset),
         git_commit=commit, git_tree_state=tree_state,
         source_sha256="",
     )
@@ -1384,15 +1456,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         use_exposure_index=dataset.use_exposure_index,
         generalist_floor=dataset.generalist_floor,
     )
-    # Stamped on the payloads rather than passed through `RenderedPrompt`, because the prompt is
-    # sealed and hashed: routing an execution policy through it would move every prompt identity
-    # in the run and make this diagnostic incomparable with the runs it exists to explain. Only
-    # written when set, so an ordinary run's payloads stay byte-identical to their history.
-    if dataset.forbid_abstention:
-        logger.warning("forbid_abstention is ON — arms may not abstain. Diagnostic only: "
-                       "control PRs cannot measure precision in this run.")
-        for payload in pool.values():
-            payload["forbid_abstention"] = True
+    stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)
     report = agenda_report(agenda)
 

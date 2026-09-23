@@ -574,9 +574,14 @@ def test_the_setting_is_sealed_in_the_run_plan():
     import inspect
 
     from src.mathlib_review.review import runner
+    from tests.datasets.test_pr_review_v5_abstention import _dataset
 
-    source = inspect.getsource(runner._build_plan)
-    assert '"apply_lead_synthesis": dataset.apply_lead_synthesis' in source
+    # Read off the function the plan builder calls, not off the builder's source text: the
+    # settings dict moved out of `_build_plan` into `evaluation_settings` on 2026-09-23.
+    assert runner.evaluation_settings(_dataset(apply_lead_synthesis=True))["apply_lead_synthesis"]
+    assert not runner.evaluation_settings(_dataset())["apply_lead_synthesis"]
+    assert "evaluation_settings=evaluation_settings(dataset)" in inspect.getsource(
+        runner._build_plan)
 
 
 def test_it_is_off_by_default_while_under_investigation():

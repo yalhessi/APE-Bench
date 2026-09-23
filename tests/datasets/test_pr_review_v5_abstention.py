@@ -402,3 +402,73 @@ def test_the_fanout_path_carries_the_flag():
     assert "dict(pool[proposal.invocation_id])" in src, (
         "the fanout branch must copy the whole pool payload; a hand-built dict here would drop "
         "any field the runner stamps")
+
+
+# --- the submission-contract directives, stamped and sealed --------------------------------------
+
+
+def _dataset(**overrides):
+    from src.mathlib_review.review.runner import V5DatasetConfig
+
+    fields = dict(run_name="t", routing_mode="fanout")
+    fields.update(overrides)
+    return V5DatasetConfig.model_construct(**{
+        **{name: f.default for name, f in V5DatasetConfig.model_fields.items()
+           if not f.is_required()}, **fields})
+
+
+def test_the_verdict_and_policy_directives_are_stamped_on_every_payload():
+    import logging
+
+    from src.mathlib_review.review.runner import stamp_submission_directives
+
+    pool = {"wu:a#naming": {"task_id": "a"}, "wu:b#docs": {"task_id": "b"}}
+    stamp_submission_directives(pool, _dataset(
+        target_verdicts=True, submission_verification_policy="verify_edits_if_present"),
+        logging.getLogger("t"))
+    for payload in pool.values():
+        assert payload["target_verdicts"] is True
+        assert payload["submission_verification_policy"] == "verify_edits_if_present"
+        assert "forbid_abstention" not in payload
+
+
+def test_an_ordinary_run_stamps_nothing_and_seals_nothing_new():
+    """Payloads and the plan of a run that uses none of the directives stay byte-identical to
+    their history: a resume recomputes the plan, and a key that appeared would read as a change."""
+
+    import logging
+
+    from src.mathlib_review.review.runner import evaluation_settings, stamp_submission_directives
+
+    pool = {"wu:a#naming": {"task_id": "a"}}
+    stamp_submission_directives(pool, _dataset(), logging.getLogger("t"))
+    assert pool == {"wu:a#naming": {"task_id": "a"}}
+    assert set(evaluation_settings(_dataset())) == {
+        "execution_release", "skip_evidence_chain", "pr_finding_limit", "generalist_floor",
+        "apply_lead_synthesis", "use_exposure_index"}
+
+
+def test_the_directives_are_sealed_into_the_plan_when_set():
+    """Including `forbid_abstention`, which was stamped on payloads and recorded nowhere in the
+    plan: a knob that changes what a run does belongs in the plan or the run name."""
+
+    from src.mathlib_review.review.runner import evaluation_settings
+
+    settings = evaluation_settings(_dataset(
+        target_verdicts=True, submission_verification_policy="verify_edits_if_present"))
+    assert settings["target_verdicts"] is True
+    assert settings["submission_verification_policy"] == "verify_edits_if_present"
+    assert evaluation_settings(_dataset(forbid_abstention=True))["forbid_abstention"] is True
+
+
+def test_the_two_contracts_are_refused_together_and_verdicts_are_refused_under_solo():
+    import logging
+
+    from src.mathlib_review.review.runner import stamp_submission_directives
+
+    with pytest.raises(ValueError, match="different submission contracts"):
+        stamp_submission_directives({}, _dataset(forbid_abstention=True, target_verdicts=True),
+                                    logging.getLogger("t"))
+    with pytest.raises(ValueError, match="solo schedules no arm"):
+        stamp_submission_directives({}, _dataset(routing_mode="solo", target_verdicts=True),
+                                    logging.getLogger("t"))
