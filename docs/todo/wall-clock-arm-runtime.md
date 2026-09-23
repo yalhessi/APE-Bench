@@ -330,7 +330,7 @@ measured serially beside the running rep. The in-run gain -- the loop no longer 
 to measure. What is left per call is grep over NFS (~2-3 s cold); staging snapshot source on local
 tmpfs, measured flat to 64-way above, is still the structural fix.
 
-## Added 2026-09-23: the finalization chain, 692 s -> 75 s, byte-identical
+## Added 2026-09-23: the finalization chain, 692 s -> 75 s -> 35 s, byte-identical
 
 Measured by replaying the work-enumeration treatment rep 1's evidence chain offline under
 cProfile (40 candidates): **692 s** -- ~345 s in 80 serial Lean compiles, ~213 s rebuilding the
@@ -347,3 +347,17 @@ workspace. The cheap next levers, in order: cache the *baseline* compile on disk
 reviewed file's content hash -- it is identical across every run of an episode, and across a
 treatment and its control -- which removes half of the compiles outright; then precompute the
 walks and baselines at `prebuild --reviewed`, when the workspace is built anyway.
+
+**Then 75 s -> 35 s (`59e7c20`), and stopped there by the user's choice.** Timing every step inside
+the worker threads showed the remainder was mostly duplicated work: threads starting together on
+empty caches compiled the same file repeatedly (29 baseline compiles for 7 files) and walked the
+same workspace repeatedly (17 walks for 3 workspaces). A single-flight cache for both, and a pool of
+half the cores, give **35.3 s** on the same replay, byte-identical, bounded by the slowest
+candidate's own path: **walk 8.8 s -> baseline compile 14.4 s -> edited compile 11 s**.
+
+The two levers left, both measured and not built: a disk cache for the walk and the baseline
+compile, keyed by the reviewed workspace and the file's content hash (identical on every run of the
+same PR state, treatment and control included), which would bring a repeat run to about one edit
+compile (~11-12 s); and reusing the submission-time compile of the same edit, which the arm already
+produced in the same workspace -- a few seconds, but it ends the chain's independence from submission
+and changes its artifacts, so it is a design decision rather than an optimisation.
