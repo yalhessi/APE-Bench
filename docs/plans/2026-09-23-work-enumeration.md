@@ -420,3 +420,14 @@ holding it was **pruned in 25** and **ran and was silent in 15**. The user chose
    briefs": an out-of-sample list cannot be required to beat an in-sample one on the sample.
 
 Outcome bands and the control guard of Phase 4 apply to the contract ceiling unchanged.
+
+## Decision, 2026-09-23 (the contract ceiling's control)
+
+The first decision said the contract run differs from the fanout pair "only in the contract".
+It does not: those runs rendered `focused-prompt/2` and the tree renders `focused-prompt/4`. The
+user chose a **matched control on current code**: `configs/pr_review_v5_verdicts_fanout4_control.yaml`
+(fanout, no generalist, default contract) beside `configs/pr_review_v5_verdicts_fanout4.yaml`
+(the same plus `target_verdicts` and `verify_edits_if_present`), three gpt_5.2 reps each, after a
+free Qwen shakeout. Each run is bound at $23.80 worst case (140 jobs × $0.17); expected ~$4–7 per
+run from the fanout pair's measured per-job spend. The fanout pair stays as history, read only
+with the prompt revision named beside it.
