@@ -14,6 +14,8 @@ candidates of either family.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from src.mathlib_review.evidence.evidence import declares_identifier, searchable_identifiers
 
 REALISTIC_QUERY = (
@@ -89,3 +91,56 @@ def test_camelcase_type_names_are_searchable_but_capitalised_english_is_not():
         assert searchable_identifiers(f"{capitalised_english} the declaration") == [], (
             f"{capitalised_english!r} is an English word, not an identifier"
         )
+
+
+# ---------------------------------------------------------------------------------------
+# The grep prefilter in front of the collector's scan. `declares_identifier` still decides;
+# grep only says which files are worth reading. Measured before it was added: 5.4 s per
+# candidate over 8,504 files, run serially for 200 of a run's 268 candidates.
+
+
+def test_a_leaf_grep_is_a_sound_prefilter_for_declares_identifier(tmp_path):
+    """The property the prefilter rests on: `declares_identifier`'s pattern embeds
+    `re.escape(leaf)`, so text that declares the identifier must contain the leaf literally.
+    A fixed-string grep for the leaf can therefore only ever return too many files."""
+
+    from ape.toolkits.file_system.utils import grep_candidate_files
+
+    files = {
+        "declares.lean": "theorem Finset.sum_comm : True := trivial\n",
+        "declares_private.lean": "private noncomputable def sum_comm : Nat := 0\n",
+        "attribute.lean": "@[simp]\nlemma sum_comm : True := trivial\n",
+        "mentions_only.lean": "-- see Finset.sum_comm for the general case\nimport Mathlib\n",
+        "unrelated.lean": "theorem other_thing : True := trivial\n",
+    }
+    for name, text in files.items():
+        (tmp_path / name).write_text(text)
+    paths = sorted(tmp_path.glob("*.lean"))
+
+    declaring = {str(p) for p in paths
+                 if declares_identifier(p.read_text(), "Finset.sum_comm")}
+    assert {Path(p).name for p in declaring} == {
+        "declares.lean", "declares_private.lean", "attribute.lean"}
+
+    candidates = grep_candidate_files(["sum_comm"], paths, use_regex=False)
+    assert candidates is not None
+    assert declaring <= candidates, (
+        f"prefilter dropped {declaring - candidates}, which declare the identifier")
+    # It is allowed to be generous, and is: the comment-only file survives the prefilter and
+    # is then rejected by `declares_identifier`, which is the whole division of labour.
+    assert str(tmp_path / "mentions_only.lean") in candidates
+    assert str(tmp_path / "unrelated.lean") not in candidates
+
+
+def test_the_prefilter_keeps_a_dotted_identifier_by_its_leaf(tmp_path):
+    """`declares_identifier` matches on the leaf, so the prefilter must search the leaf too.
+    Grepping the dotted name would miss `theorem sum_comm` in a namespaced file."""
+
+    from ape.toolkits.file_system.utils import grep_candidate_files
+
+    (tmp_path / "ns.lean").write_text("namespace Finset\ntheorem sum_comm : True := trivial\nend Finset\n")
+    paths = sorted(tmp_path.glob("*.lean"))
+    assert declares_identifier(paths[0].read_text(), "Finset.sum_comm")
+    assert grep_candidate_files(["sum_comm"], paths, use_regex=False) == {str(paths[0])}
+    assert grep_candidate_files(["Finset.sum_comm"], paths, use_regex=False) == set(), (
+        "searching the dotted name is what the leaf split exists to avoid")

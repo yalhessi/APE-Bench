@@ -340,6 +340,7 @@ def _register_declaration(task, mcp) -> None:
         # `supports` verdict to every duplication claim. A second implementation would be a
         # second chance to reintroduce that. It was `_declares_identifier` until two packages
         # importing it made the underscore a claim that was not true.
+        from ape.toolkits.file_system.utils import grep_candidate_files_async
         from src.mathlib_review.evidence.evidence import (
             declares_identifier, searchable_identifiers, snapshot_workspace,
         )
@@ -360,9 +361,24 @@ def _register_declaration(task, mcp) -> None:
 
         hits: List[Dict[str, Any]] = []
         try:
-            for path in sorted(Path(root).rglob("*.lean")):
+            searchable = await _snapshot_lean_files(root)
+            # The same prefilter `repository_search` uses (02eba94), for the same reason:
+            # `declares_identifier` builds its pattern around `re.escape(leaf)`, so a file that
+            # does not contain a leaf literally cannot declare it, and a fixed-string grep for
+            # the leaves can only hand back too many files. The files are still visited in the
+            # same sorted order and the decision stays with `declares_identifier`, so the result
+            # is the one the full scan gave. `None` means grep did not answer: every file is
+            # read, as before. The whole-tree read it replaces -- ~8,500 files over NFS, run
+            # synchronously inside the shared event loop -- measured a 33.7 s mean on the
+            # contract-ceiling run and stalled every arm sharing the loop while it ran.
+            with_leaf = await grep_candidate_files_async(
+                sorted({term.rsplit(".", 1)[-1] for term in terms}), searchable,
+                use_regex=False)
+            for path in searchable:
                 if len(hits) >= limit:
                     break
+                if with_leaf is not None and str(path) not in with_leaf:
+                    continue
                 try:
                     text = path.read_text(encoding="utf-8", errors="ignore")
                 except OSError:
@@ -435,6 +451,25 @@ def _register_declaration(task, mcp) -> None:
             "searched_terms": terms,
             "results": rendered or empty,
         }
+
+
+#: The sorted `.lean` file list of one base snapshot, per process. A snapshot is the shared,
+#: complete per-commit checkout under `workspaces/<sha>` (`evidence.snapshot_workspace`), and
+#: nothing writes to it during a run, so its list is fixed; walking it was ~8,500 NFS directory
+#: entries on every `declaration_search` call.
+_SNAPSHOT_FILES: Dict[str, List[Path]] = {}
+
+
+async def _snapshot_lean_files(root) -> List[Path]:
+    """`sorted(root.rglob("*.lean"))`, walked once per snapshot per process, off the loop."""
+
+    import asyncio
+
+    key = str(root)
+    if key not in _SNAPSHOT_FILES:
+        _SNAPSHOT_FILES[key] = await asyncio.to_thread(
+            lambda: sorted(Path(root).rglob("*.lean")))
+    return _SNAPSHOT_FILES[key]
 
 
 def _register_proof_profile(task, mcp) -> None:
