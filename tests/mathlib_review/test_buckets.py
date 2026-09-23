@@ -325,3 +325,14 @@ def test_a_lead_runs_buckets_are_unchanged_by_that_fallback(judged):
         "UNTOUCHED": 8, "LOCATED_MISS": 7, "LOCATED_UNJUDGED": 0, "COVERED": 7}
     states = {cell["state"] for row in judged["obligations"] for cell in row["cells"]}
     assert "pruned" in states
+
+
+@runs_exist
+def test_a_run_without_verdicts_carries_none_at_every_cell():
+    """`target_verdicts` is the per-target answer a verdict run records at each obligation's
+    sites. A run that never asked for verdicts must carry `None` there, never an empty list that
+    reads like "answered nothing"."""
+
+    payload = buckets([RUN], audit=True)["per_run"][RUN]
+    cells = [cell for row in payload["obligations"] for cell in row["cells"]]
+    assert cells and all(cell["target_verdicts"] is None for cell in cells)

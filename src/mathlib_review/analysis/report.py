@@ -1097,6 +1097,14 @@ def buckets(runs, audit=False, replay: Optional[str] = None) -> Dict[str, Any]:
                     # diagnosed from: the reason *enum* swapped under replay on 17 of 45
                     # sessions with the outcome unchanged, so it labels nothing on its own.
                     "abstention_detail": abstention.get("detail") or None,
+                    # Under `target_verdicts`, what the job concluded at THIS obligation's
+                    # targets -- `issue`, `no_issue`, `cannot_determine` or the system's
+                    # `unstated`, each with its reason. The job-level detail only counts them;
+                    # this is the per-target answer the contract exists to record. `None` for a
+                    # run without verdicts, and for any state, since an `issue` is here too.
+                    "target_verdicts": [
+                        row for row in response.get("target_verdicts") or []
+                        if row.get("change_id") in sites] or None,
                     # Whether the ask was this arm's business at all. `None` for the
                     # generalist and anything else outside the registry, which has no remit
                     # to be outside of.
@@ -1261,6 +1269,7 @@ def silences(run: str, replay: Optional[str] = None, audit: bool = True,
                 "on_concern": cell["on_concern"],
                 "abstention_reason": cell["abstention_reason"],
                 "abstention_detail": cell["abstention_detail"],
+                "target_verdicts": cell["target_verdicts"],
                 "context": cell["context"],
                 "filed_elsewhere_in_unit": cell["filed_elsewhere_in_unit"],
                 "replay_stable": cell["replay_stable"],
