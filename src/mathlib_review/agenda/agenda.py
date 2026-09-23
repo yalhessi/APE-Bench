@@ -34,7 +34,7 @@ from src.mathlib_review.agenda.focused_specs import (
     schedule_focused,
 )
 from src.mathlib_review.io import canonical_json_bytes, sealed_model, sha256_bytes
-from src.mathlib_review.agenda.render_focused import FOCUSED_RENDERER_VERSION, render_focused_all
+from src.mathlib_review.agenda.render_focused import render_focused_all, renderer_version_for
 from src.mathlib_review.schema.review import CONTEXT_TOOLS
 from src.mathlib_review.schema import (
     ChangeGraph,
@@ -145,6 +145,8 @@ def enumerate_invocations(
 
 def _arm_payload(base_payload: Dict[str, Any], *, arm: ReviewArm, invocation_id: str,
                  procedure_variant: str = "baseline",
+                 submission_verification_policy: Optional[str] = None,
+                 target_verdicts: bool = False,
                  spec_id: Optional[str]) -> Dict[str, Any]:
     """Turn a v4 task-data payload into a v5 arm payload.
 
@@ -168,6 +170,14 @@ def _arm_payload(base_payload: Dict[str, Any], *, arm: ReviewArm, invocation_id:
     granted = set(arm.context_tools) | set(procedure_tool_grant(procedure_variant, arm.arm_id))
     payload["context_tools"] = [item for item in CONTEXT_TOOLS if item in granted]
     payload["task_id"] = "pr5_" + invocation_id.replace(":", "_").replace("#", "__")
+    # The run's submission contract, on every payload -- the generalist's included, whose prompt
+    # is frozen in the release, so its payload is the only place it can be given one. Written
+    # only when set, so an ordinary run's payloads stay byte-identical to their history. For a
+    # specialist the policy already arrived through its rendered prompt; this is the same value.
+    if target_verdicts:
+        payload["target_verdicts"] = True
+    if submission_verification_policy:
+        payload["submission_verification_policy"] = submission_verification_policy
     return payload
 
 
@@ -196,6 +206,13 @@ def build_agenda(
     #: against is unmoved. The name reaches `renderer_version` and the text reaches
     #: `prompt_sha256`, so two variants cannot share a prompt identity.
     procedure_variant: str = "baseline",
+    #: The run's submission contract (`RunDataset.submission_verification_policy`,
+    #: `RunDataset.target_verdicts`). Both reach three places from here and nowhere else: the
+    #: focused contract text, so an arm is told what its tool enforces; every arm payload, the
+    #: generalist's included; and the renderer version, which names the text that rendered. Off,
+    #: the agenda is byte-identical to one built before the knobs existed.
+    submission_verification_policy: Optional[str] = None,
+    target_verdicts: bool = False,
 ) -> Tuple[ReviewAgenda, Dict[str, Dict[str, Any]]]:
     """The sealed agenda, and the pool of arm task payloads keyed by `proposal_id`.
 
@@ -312,6 +329,8 @@ def build_agenda(
             data.model_dump(mode="json"), arm=generalist,
             invocation_id=invocation_id, spec_id=None,
             procedure_variant=procedure_variant,
+            submission_verification_policy=submission_verification_policy,
+            target_verdicts=target_verdicts,
         )
         proposals.append(sealed_model(
             AgendaProposal,
@@ -355,6 +374,8 @@ def build_agenda(
         list(specs.values()), invocations, selected_units, episodes, graphs,
         context_by_invocation=context_text,
         procedure_variant=procedure_variant,
+        submission_verification_policy=submission_verification_policy,
+        target_verdicts=target_verdicts,
     )
     rendered_by_id = {item.invocation_id: item for item in rendered}
     # The contract is allocated over the whole pool at once: "this family needs a naming
@@ -378,6 +399,8 @@ def build_agenda(
             data.model_dump(mode="json"), arm=arm,
             invocation_id=invocation.invocation_id, spec_id=invocation.spec_id,
             procedure_variant=procedure_variant,
+            submission_verification_policy=submission_verification_policy,
+            target_verdicts=target_verdicts,
         )
         decision = decisions[invocation.invocation_id]
         proposals.append(sealed_model(
@@ -416,7 +439,12 @@ def build_agenda(
         arms=arms,
         proposals=proposals,
         scheduler_version=SCHEDULER_VERSION,
-        renderer_version=f"{renderer_version}+{FOCUSED_RENDERER_VERSION}",
+        # The procedure variant is not in the agenda's version and never was (ladder agendas
+        # sealed without it); the contract knobs are, because they change the text every
+        # specialist reads. Both off, this is the bare `/4` it has always been.
+        renderer_version=f"{renderer_version}+" + renderer_version_for(
+            submission_verification_policy=submission_verification_policy,
+            target_verdicts=target_verdicts),
     )
     return agenda, pool
 

@@ -48,10 +48,10 @@ def release():
     }
 
 
-def _build(release, mode="lead", prs=SMOKE_PRS):
+def _build(release, mode="lead", prs=SMOKE_PRS, **knobs):
     return build_agenda(
         run_name="test", routing_mode=mode, release=RELEASE,
-        modification_inventory=INVENTORY, pr_numbers=prs, **release,
+        modification_inventory=INVENTORY, pr_numbers=prs, **knobs, **release,
     )
 
 
@@ -220,6 +220,60 @@ def test_specialist_payloads_demand_verification(release):
     for payload in pool.values():
         if payload["arm_id"] != GENERALIST_ARM_ID:
             assert payload["submission_verification_policy"] == "verify_checkable_edits"
+
+
+CONTRACT = {"submission_verification_policy": "verify_edits_if_present", "target_verdicts": True}
+
+
+def test_the_contract_text_renders_exactly_when_the_tool_enforces_it(release):
+    """The far end of both knobs, on the payload an arm is handed: its system prompt carries the
+    ask-without-fix clause and the two contract sections exactly when its task data carries the
+    policy and the verdict flag that enforce them. An arm told one rule and refused by another
+    follows neither."""
+
+    from src.mathlib_review.agenda.render_focused import (
+        ASK_WITHOUT_FIX_CLAUSE, LEGACY_ABSTENTION_PARAGRAPH, VERDICTS_ABSTENTION_PARAGRAPH,
+    )
+
+    headings = ("## When the fix does not compile", "## Account for every target",
+                "## Two strengths of ask")
+    for knobs, on in ((CONTRACT, True), ({}, False)):
+        _, pool = _build(release, **knobs)
+        specialists = [p for p in pool.values() if p["arm_id"] != GENERALIST_ARM_ID]
+        assert specialists
+        for payload in specialists:
+            system = payload["rendered_system_prompt"]
+            start = system.index("# Submission contract for this run")
+            assert (payload["submission_verification_policy"] == "verify_edits_if_present") is on
+            assert payload["target_verdicts"] is on
+            for heading in headings:
+                assert (heading in system) is on, (payload["invocation_id"], heading)
+                if on:
+                    assert system.index(heading) > start
+            assert (ASK_WITHOUT_FIX_CLAUSE.strip() in system) is on
+            assert (VERDICTS_ABSTENTION_PARAGRAPH in system) is on
+            assert (LEGACY_ABSTENTION_PARAGRAPH in system) is (not on)
+
+
+def test_every_payload_carries_the_contract_the_generalist_included(release):
+    """The generalist's prompt is frozen in the release, so its payload is the only place it can be
+    given the contract; with the knobs off every payload says so too."""
+
+    _, pool = _build(release, **CONTRACT)
+    assert any(p["arm_id"] == GENERALIST_ARM_ID for p in pool.values())
+    assert all(p["target_verdicts"] is True for p in pool.values())
+    assert all(p["submission_verification_policy"] == "verify_edits_if_present"
+               for p in pool.values())
+    _, pool = _build(release)
+    assert all(p["target_verdicts"] is False for p in pool.values())
+
+
+def test_the_agenda_names_the_contract_in_its_renderer_version(release):
+    agenda, _ = _build(release)
+    assert agenda.renderer_version.endswith("+focused-prompt/4")
+    agenda, _ = _build(release, **CONTRACT)
+    assert agenda.renderer_version.endswith(
+        "+focused-prompt/4+ask_without_fix+target_verdicts")
 
 
 def test_specialist_scope_is_narrowed_to_its_own_sites(release):

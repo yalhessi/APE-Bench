@@ -67,6 +67,11 @@ def _payloads_for(bench: ArmBench, dataset, release,
         generalist_floor=False,
         use_exposure_index=dataset.use_exposure_index,
         procedure_variant=procedure_variant,
+        # A bench under a contract config runs the arm under that contract. Before these were
+        # agenda arguments the runner stamped them after the agenda was built, and a bench,
+        # which never reaches that step, silently ran the default contract instead.
+        submission_verification_policy=dataset.submission_verification_policy,
+        target_verdicts=dataset.target_verdicts,
         **release,
     )
     # A pool entry *is* the arm's task data -- `_arm_payload` returns the v4 payload with the
