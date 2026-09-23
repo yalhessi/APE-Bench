@@ -121,3 +121,19 @@ Pruning is 25 of the 42 held-out miss-reps, so the held-out run is **no-pruning*
 - **Treatment far end:** the same pool with both knobs on carries `target_verdicts: true` and the policy on every payload, the generalist's included, and every specialist system prompt carries the ask-without-fix clause and both new sections after `# Submission contract for this run`.
 - `tests/datasets/test_prompt_contamination.py` after every text edit; `test_package_boundaries.py` and `test_pr_review_v4_no_duplicate_helpers.py` counts unchanged or lower (the port deletes a mechanism and adds none).
 - Before Step 3's `--execute`: `cli plan` output, the key check, and `report routing`'s degenerate block read before any recall number; `report buckets --audit` quoted as the pre-gate / published pair with control emission beside it.
+
+---
+
+## Step 3 result, 2026-09-23 (the plan above is kept as approved)
+
+`pr5_V3_contract_fanout4_rep1`: **3 of 10** majority (2 unanimous), resolution 2 / 10, **0** findings on
+the control PR, $5.60 billed, 24 min — against the control's 2 / 1 / 1 and the tool-only treatment's
+3 / 2 / 0. Below the pre-set bar of 5 of 10, so by this plan's own rule the text was not the lever
+either; recorded in `docs/dead-ends.md` ("The submission contract as the recall lever", provisional)
+and `docs/research/unified-contract-fanout4-2026-09.md`. The one new filed hit is 7fef913e at 2 / 3;
+e83e6544 is a compound ask every run filed in per-declaration halves. Every target was answered, and
+the misses are right-site-different-ask (four), naming-evidence limits (two) and the compound ask
+(one). The fanout counter fix worked on its first real run (`paused: 1`, a correctness job at $0.175).
+
+Step 4 (no-pruning on the twelve, ~$50-60) is the plan's next spend. It is not launched from here:
+its price and the Step 3 result go to the user first.

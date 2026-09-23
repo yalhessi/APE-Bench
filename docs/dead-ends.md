@@ -128,6 +128,23 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   `report buckets --audit` prints the pair — and the *change* is `docs/todo/publication-rule.md`,
   parked. **Reopens if:** the generator is good enough that what to show becomes the binding
   question, which is a judgement the user makes, not a number this report can produce.
+- **The submission contract as the recall lever** (2026-09-23, **provisional: one rep per
+  condition**) — make every arm answer every target (`target_verdicts`), let it file an ask whose fix
+  does not compile (`verify_edits_if_present`), and tell it so in the contract text, including what
+  `advisory` means and without "a wrong finding costs this review far more than a silence does". On
+  the four fanout PRs, against a control paid for on the same code: control 2 / 10 (1 unanimous),
+  tool-only verdicts 3 / 10, unified contract 3 / 10 (2 unanimous), control-PR findings 1 / 0 / 0 —
+  under the pre-set bar of 5 / 10. The tool-only gain is a vote flip on a rename all three runs
+  filed; the unified run's one new filed hit (7fef913e, `Dense.ciInf'` via the order dual) is 2 / 3.
+  Every target was answered, so the residual is statements, not silences: design-scale asks nobody's
+  question reaches (four of seven misses), naming evidence the prefix oracle cannot produce (two), a
+  compound ask filed in per-declaration halves (one). `docs/research/unified-contract-fanout4-2026-09.md`.
+  **The contract stays** as opt-in knobs — zero control-PR cost, filing 27% -> 35%, resolution 1 -> 2
+  — it is just not what binds. **Reopens if:** a second rep of the unified contract reaches >= 5, or
+  it moves recall on the twelve held-out PRs under no-pruning (pruning loses 25 of 42 miss-reps
+  there, silence 15). **Untried:** reasoning on (every gpt-5.2 call in the record ran with reasoning
+  off), design-move questions (`work-enumeration` Phase 1), suffix / namespace naming evidence, a
+  compound-ask channel.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an
   injected precedent), transfer failed: 13 vs 11 covered on 41 shared PRs; the first-20 win was noise.
   **Reopens if:** run under the noise-floor protocol with a different use of the precedent (recognition
