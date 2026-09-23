@@ -88,6 +88,17 @@ the absolute form says the relative form works.
   arm sees only its own targets plus the PR title and description" — only solo is
   (`review/base.py:230-239`). That file belongs to another session's work and is noted, not edited.
 
+## In gold (frozen; recorded, not edited)
+
+- `dev-medium-0.3.0` obligation `8d887ce4` (33145) claims "Generalize the dense-set supremum result
+  into a `Dense.ciSup'` lemma with the requested typeclass-polymorphic statement". The maintainer's
+  suggestion is `theorem Dense.ciSup' {α : Type*} [TopologicalSpace α]`, which matches the PR's line
+  except for the name: the ask is the rename `continuous_sup'` → `ciSup'`, and nothing is
+  generalised. Found 2026-09-23 by the adversarial reader in
+  `docs/research/the-question-is-already-asked-2026-09.md`. The judge scores against the claim, so a
+  correct rename can be read as a miss here. `inputs/pr_review_v4/` is a frozen root; a fix is a new
+  release, not an edit.
+
 ## In the code comments
 
 `merge.py:256` and `digest.py:145` say `model_confidence` was "falsified three times as a ranking
