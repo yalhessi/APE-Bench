@@ -1,7 +1,8 @@
 # Are the arms reasoning at all, and which knob would decide it
 
-**Status** — open. Diagnosis is free; a re-measurement of the token caps under reasoning-on
-costs one rep.
+**Status** — open; **diagnosis settled 2026-09-23** (see the foot of this file): gpt-5.2 has run
+with reasoning off for the whole record. The test is paid and waits for a matched control on
+current code.
 **Cost** — no spend to diagnose; ~1 rep to re-calibrate if the answer is "no"
 **Motivating example** — Across **2,857 arm attempts** on nine v5 `gpt_5.2` runs, every single
 one reports `reasoning_tokens: 0`. Not a distribution with a low median — the value is 0 in
@@ -49,3 +50,42 @@ known about reasoning on the local models, including that their token *breakout*
 reported at all — the gateway sends no `completion_tokens_details` — so on those the only
 separable thing is the reasoning **text**, now preserved as a thinking block.
 [Wall clock](wall-clock-arm-runtime.md) is where the latency half of the cost lands.
+
+## Diagnosis settled, 2026-09-23 — every gpt-5.2 number in the record is at reasoning off
+
+Counted over `data/llm_logs` (the provider's own request and response records), deduplicating
+streaming calls, which are logged twice (the final chunk carrying usage, and an aggregated
+`streaming_request` record):
+
+| | gpt-5.2 | gpt-5-mini, same provider and parser |
+|---|---|---|
+| distinct responses | 30,198 | 35,774 |
+| requests carrying `reasoning_effort` | **0** | 0 |
+| responses with `reasoning_tokens > 0` | **0** (explicit 0 on every one) | **35,239 (98.5%)** |
+| mean completion tokens | 283 | ~1,095 reasoning tokens per call |
+
+A second, independent 3,000-file sample agrees: 2,979 gpt-5.2 records carrying `reasoning_tokens`,
+none positive; gpt-5-mini 3,600 of 3,632 positive. So "OpenAI does not report it" is ruled out, and
+the one-call diagnostic above is unnecessary: gpt-5.2's default effort, which nothing overrides, is
+no reasoning. The live `work-enumeration` run's `config.json` carries `reasoning_effort: null` and
+`thinking_budget_tokens: 30000`, so it is in the same regime. **Every v5 recall number, the 7 / 5 / 6
+wall included, was produced by arms that decided without reasoning.**
+
+Why it matters to the wall, and why that is not yet evidence: the record's diagnosis is that the arms
+*hold* answers and withhold them (forcing, 0.20 -> 0.50), which reasoning does not obviously address
+-- more deliberation could as easily add `already_correct` abstentions. But the other half of the
+wall is the ask, not the silence: 8 of 23 held-out obligations were located and asked for the wrong
+thing (`docs/research/ab-heldout12-obligation-spine.md` §4), which is a quality-of-judgement failure a
+reasoning setting could plausibly move. Neither reading is measured.
+
+What the test needs, corrected from the first design: **not** a single `--set` run against the v2
+reps -- those rendered `focused-prompt/2` at `a96b5af`, and the tree has moved 41 review-code commits
+since, so they are not a control. It needs an effort-`none` control on the same code, which after the
+contract branches are unified is the ready-made matched control
+`configs/pr_review_v5_verdicts_fanout4_control.yaml` (on `work-enumeration`), plus a
+`--set llm_config.reasoning_effort=low` twin. Check before spending whether `standard_budget_cap`
+binds: specialists billed a median $0.039 and max $0.117 against $0.30, and at gpt-5-mini's ~1,100
+reasoning tokens per call an arm's 10-20 calls add ~$0.15-0.30. Chat Completions discards reasoning
+between turns, so a null there does not settle reasoning in general. Retire `thinking_budget_tokens`
+from the 37 configs (28 at 8000, 7 at 30000, 2 at 3000) in the same commit that makes the effort
+explicit, so no config reads as thinking when it does not.

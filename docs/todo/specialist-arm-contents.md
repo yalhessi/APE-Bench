@@ -1,7 +1,7 @@
 # Specialist arm contents — seven of ten match nothing, for three different reasons
 
 **Superseded as the route forward (2026-09-23)** — [`docs/plans/2026-09-23-work-enumeration.md`](../plans/2026-09-23-work-enumeration.md) replaces arm-by-arm repair with questions enumerated from maintainer comments, one verdict per target, and no generalist or lead; the defects below are what that design does not inherit (one grant for every question, no prefix-only naming oracle as the bar, no golf/idiom overlap). The free items here stay open and are not prerequisites.
-**Status** — open; the audit below is done, the fixes are not
+**Status** — open; the audit below is done, the fixes are not. *2026-09-23:* item 1's prompt half (the naming prompt no longer says "Submit nothing on naming" when the tool could not resolve the subject) is addressed by `docs/plans/2026-09-23-one-run-to-move-the-wall.md`; the census-driven rewrite of the three convention arms is deferred there until one run shows the contract moves recall
 **Cost** — most checks are re-scoring on committed artifacts; one 12-PR rep to confirm
 
 ## Motivating example
@@ -68,6 +68,11 @@ content_search, lean_verify, get_lean_goal, code_hover, code_goto` plus five con
 linter. PR 33305's single obligation is BLOCKING and is exactly that ("wrap/split the overly long
 doc comment line"); it has **0 pairs and 0 hits in every v5 audit ever run**. `docs` made 0 context
 calls in 39 held-out lead invocations despite holding `precedent_search` and `zulip_search`.
+*2026-09-23:* the linter exists and v5 cannot reach it. `evidence/operators/lint_policy.find_long_lines`
+is reachable only through `execution_release`, which is None in every held-out run; the reviewed
+`Inverses.lean` has exactly one line over 100 characters (line 23, 101 chars), the gold site. A lint
+pass over changed spans would add this obligation deterministically, +1 of 23 in every rep -- and it
+is a V1 lexical hit, so it must be reported as that and never as a better reviewer.
 
 **`api_reuse` is the only arm of eleven with zero mandatory rows.** 107 proposals, 107 eligible, 0
 mandatory, identically in all three held-out reps; 321 pruned across three reps, 0 invocations. Its

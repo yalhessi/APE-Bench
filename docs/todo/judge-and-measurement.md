@@ -19,6 +19,24 @@ anchors to `change:744403789c64b230…`, the obligation to `change:26e35f26fa007
 automatically have made it a hit. That obligation was judged 6 times by candidates that *did* carry
 the gold change_id, and the judge said `issue_match=False` on 4 of them; only solo's two were hits.
 
+**Recounted 2026-09-23:** 998 of 998 pairs across 58 v5 audits are `anchor`. **And the prepared
+widened node fails open.** `dev-medium-0.3.0/derived/` has no `pr_relations.jsonl`, and
+`judge/runner.py::collect_pairs` falls back to `relations = []` when it is missing, so the pipeline's
+`judge_relation` node (`configs/pipelines/heldout12_judged.yaml`) would re-judge the anchor pairs
+under a new identity and label the result widened. Nor would `[anchor, relation]` reach the
+motivating example above: `schwarz_aux`'s namespace ask pairs only at the `file` tier. With relations
+derived in memory (`build_relations`, 1,005), widening adds 75 / 106 / 83 relation and 598 / 591 / 616
+file pairs to lead v2 reps 1-3 (546 of rep1's file pairs are PR 33149); of 16 / 18 / 17 misses, 8 / 9
+/ 9 have no anchor-paired candidate and widening reaches 7 / 7 / 8, but a read of those widened claims
+finds almost none naming the gold issue -- about 0-1 obligations a rep, the 33362 namespace ask the
+plausible one. At $0.0064 a judged pair (554 held-out pairs cost $3.57) the misses-only re-judge is
+~$1.83 for lead v2. Widening can only raise recall, so a widened number is never the "beats 7" claim
+and is reported beside anchor, for baselines and new runs alike. **First, free:** make
+`collect_pairs` refuse a non-anchor tier when the relations file is absent (or derive and hash it),
+with a test. Note `cli judge` without `--execute` returns before any pair is built, so pair counts
+come from calling `build_pairs` directly, and `--of` with the default node writes into the anchor
+audit, whose identity guard would refuse the widened one.
+
 What would close it: re-run `judge` on the three held-out lead reps with
 `pairing_tiers=[anchor, relation]` — the code path exists at `semantic_judge.py:66` — and report how
 many specialist findings move from unpaired to paired-and-matched. Every per-arm recall number in

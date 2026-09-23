@@ -38,7 +38,19 @@ What would close it: the cheapest of the four candidate designs is a per-episode
 Why it matters: this store is the input for the fresh held-out window, which is the only thing that
 can produce a generalization claim after the 12-PR set was consumed by failure analysis.
 
-What would close it: fetch comment 2203417174 from GitHub and say whether the mismatch is a
+**Explained 2026-09-23, from local data, no fetch.** The baseline row is PR 27053, line 98, commit
+`f8a3961`; the store payload has line 81, `commit_id` `8e15dd5`, `original_commit_id` `b5c5fa0`, and
+`created_at == updated_at`, so the comment was never edited. `listing.json` shows the PR still open
+with head `8e15dd5`: GitHub re-anchored a live comment onto the PR's new head. That is an upstream
+change the classifier (`src/datasets/pull_requests/projections/corpus.py` `acceptance()`) has no cause
+for -- it knows association changes and body edits only. The fix is a `reanchored_upstream` cause
+(differing fields ⊆ {line, start_line, commit_id} and `commit_id != original_commit_id`), then
+`index build` and `projections.corpus --acceptance` from the main checkout. Also: the tracked
+provenance pins three different store digests (acceptance b2cd40ef, corpus manifest 1a926d3b,
+tracked manifest f2d2beb6), and rebuilding `reviewer_view.jsonl` changes a file every worktree reads
+through the `data/` link -- do it before `work-enumeration`'s Phase 1 pins a digest.
+
+What would close it (as first written): fetch comment 2203417174 from GitHub and say whether the mismatch is a
 collector bug or an upstream edit. Then commit the store extension — it is currently uncommitted
 work spanning two threads, which is the pattern CLAUDE.md's standing instruction exists to prevent.
 

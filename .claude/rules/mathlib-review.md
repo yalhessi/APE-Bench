@@ -21,7 +21,7 @@ paths:
   sealed artifacts. Bridge through `CONCERN_ALIASES` (`src/mathlib_review/analysis/benches.py`), never rename. This one-word
   mismatch made the docs arm unmeasurable for its whole life.
 - **Judge versions never join or resume into each other** — `judge_version` is in the cache key and
-  the record hash. Active rubric v8; v7.1 sits in `legacy_pipeline` for provenance only, and history
+  the record hash. Active rubric v9 (`judge/protocol.py::JUDGE_VERSION`); v7.1 sits in `legacy_pipeline` for provenance only, and history
   is not re-scored under it. The judge refuses a `partial` run without `allow_partial: true`, and
   `judge` requires `--of <run_name>`: judge configs carry no paths because `candidates` / `out_dir` /
   `run_name` are one identity.

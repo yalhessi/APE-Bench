@@ -30,6 +30,11 @@ many threads, some abandoned. Read the record before proposing anything that sou
   disk first. The `[session]` line printed on
   every prompt carries the compaction count; after any compaction, treat a new thread as a hard
   recommendation rather than a suggestion.
+- **Before planning a thread, read the other worktrees, not only `develop`.** `git worktree list`,
+  then `git log --oneline develop..<branch>` for each; a plan in flight lives on its branch. On
+  2026-09-23 `work-enumeration` and `arms-speak` built per-target verdicts plus ask-without-fix in
+  parallel, and the second found the first only when its paid run was already going. The
+  `[session]` line counts sessions in *this* tree, so it cannot see one in another worktree.
 - **Record a lesson the moment it is learned**, in the strongest place it fits, in this order: a test
   or a refusal in code → a hook → this file → `.claude/rules/<area>.md` → `docs/dead-ends.md`.
   Never only in the conversation: compaction drops it, and the same mistake gets made again.
