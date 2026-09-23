@@ -1,0 +1,32 @@
+# The matched control for the contract ceiling -- docs/plans/2026-09-23-work-enumeration.md,
+# "Decision, 2026-09-23" -- and the base the treatment extends.
+#
+# Every specialist at every slot, no lead and no generalist, on the four PRs of the fanout pair
+# (33145, 33315 control, 33337, 33421), under the DEFAULT submission contract: the job-level
+# abstention, and each arm's sealed verification policy. `pr_review_v5_verdicts_fanout4.yaml`
+# adds the two contract lines and nothing else, so the two runs differ in the contract alone and
+# share all 140 prompts (the directives are stamped on payloads after `build_agenda`).
+#
+# Why a new control and not pr5_F_fanout_stage1_rep1: that run rendered `focused-prompt/2` and
+# the tree renders `focused-prompt/4` (patch-set contract, per-target diff scoping, the
+# differential-audit fixes), so it differs from the treatment in its prompts too.
+#
+# Budget. $25 billed per rep is the user's ceiling, and in `fanout` it binds as jobs x the per-job
+# cap (7d7d7ec): 140 specialist jobs x $0.17 = $23.80. $0.17 is chosen off the measured per-job
+# billed cost of the fanout pair's specialist jobs -- median $0.028 / max $0.103 unforced, median
+# $0.050 / max $0.204 forced -- so it never bound the unforced run and would have bound the top
+# ~3% of the forced one. Tokens at the calibrated 1.2M processed tokens per billed dollar
+# (docs/research/2026-09-22-token-budget-calibration.md).
+extends: pr_review_v5_medium_heldout.yaml
+dataset:
+  pr_numbers:
+  - 33145
+  - 33315
+  - 33337
+  - 33421
+  routing_mode: fanout
+  generalist_floor: false
+  standard_budget_cap: 0.17
+  standard_budget_tokens: 204000
+  run_total_cost_cap: 25.00
+  run_total_token_cap: 30000000

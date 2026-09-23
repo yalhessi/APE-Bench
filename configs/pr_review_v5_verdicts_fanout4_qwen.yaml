@@ -1,0 +1,10 @@
+# Iteration tier for pr_review_v5_verdicts_fanout4.yaml -- NOT for the record (ca0afc9). Free on
+# the ELM gateway; used to shake out the verdict contract (every target answered, tool calls
+# conforming, `repaired_argument_count` watched) and to measure tokens per job before any paid
+# rep. `reasoning_effort: none` is the load-bearing line, as in pr_review_v5_smoke4_qwen.yaml.
+# Token caps are the gpt_5.2 twins unchanged: the prompts are byte-identical and only the
+# completion moves.
+extends: pr_review_v5_verdicts_fanout4.yaml
+llm_config:
+  model_name: elm_qwen_3.5
+  reasoning_effort: none
