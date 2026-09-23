@@ -131,6 +131,11 @@ $R plan --config <cfg> --run-name <name>                             # preflight
 
 Tests that need a built Lean workspace under `data/code_execute/` fail on a fresh clone; expected.
 
+**Never gate a commit on `pytest … | tail`.** A pipeline's status is its last command's, so
+`pytest … | tail -2 && git commit …` commits a red suite (2026-09-23: two failures went in that
+way and the commit had to be amended). Capture pytest's own exit code — redirect to a file and
+check `$?`, or `set -o pipefail` — before the commit step.
+
 **The suite is parallel, and the flags are not in `pytest.ini` on purpose.** `--dist loadfile`
 keeps a file's tests on one worker, which the module-scoped fixtures need. Leave the flags off a
 targeted run — worker startup costs more than the file does (`tests/orchestration/test_pipeline.py`
