@@ -384,3 +384,39 @@ def test_an_unreadable_outcome_contributes_nothing_rather_than_failing(tmp_path)
     (bad / "task_outcome.json").write_text("{ truncated")
 
     assert scheduled_task_tokens(tmp_path) == 100
+
+
+# --- arm modes are priced at jobs x the per-job cap -------------------------------------------
+
+
+def test_fanout_is_priced_at_every_job_times_its_cap_not_at_the_cost_hints():
+    """`fanout` runs every proposal under `standard_budget_cap`, with no lead to stop early and
+    no per-PR allowance. The agenda's hints price a job at $0.05; the cap lets it spend $0.30.
+    Refusing on the hints would let a run commit six times its stated ceiling."""
+
+    from src.mathlib_review.review.runner import _report_budget
+
+    report = {"proposals_enumerated": 100, "proposals_eligible": 40,
+              "projected_cost_fanout": 5.0, "mandatory_floor_cost": 0.0,
+              "mandatory_floor_tokens": 0}
+    fits = _dataset(routing_mode="fanout", standard_budget_cap=0.08, run_total_cost_cap=10.0,
+                    standard_budget_tokens=96_000, run_total_token_cap=12_000_000)
+    _report_budget(fits, report, 4, _logger(), enforce=True)        # 100 x $0.08 = $8
+
+    over = _dataset(routing_mode="fanout", standard_budget_cap=0.30, run_total_cost_cap=10.0,
+                    standard_budget_tokens=96_000, run_total_token_cap=12_000_000)
+    with pytest.raises(BudgetTooSmall, match=r"100 fanout jobs x standard_budget_cap \$0.30"):
+        _report_budget(over, report, 4, _logger(), enforce=True)    # $30 > $10
+
+
+def test_rules_counts_only_the_jobs_it_runs_and_the_token_twin_refuses_too():
+    report = {"proposals_enumerated": 100, "proposals_eligible": 40,
+              "projected_cost_rules": 2.0, "mandatory_floor_cost": 0.0,
+              "mandatory_floor_tokens": 0}
+    _report_token_budget(_dataset(routing_mode="rules", standard_budget_tokens=100_000,
+                                  run_total_token_cap=4_000_000), report, 4, _logger(),
+                         enforce=True)                              # 40 x 100k = 4M, fits
+    with pytest.raises(BudgetTooSmall, match="40 rules jobs x standard_budget_tokens"):
+        _report_token_budget(_dataset(routing_mode="rules", standard_budget_tokens=100_001,
+                                      run_total_token_cap=4_000_000), report, 4, _logger(),
+                             enforce=True)

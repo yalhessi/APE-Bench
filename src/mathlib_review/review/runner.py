@@ -893,6 +893,35 @@ def assert_the_judge_model_is_pinned(dataset, logger) -> None:
             "from this run are not strictness results.")
 
 
+def _arm_mode_jobs(dataset, report) -> Optional[int]:
+    """How many arm jobs a `fanout` or `rules` run schedules, else None.
+
+    In those modes every scheduled job runs, straight, under `standard_budget_cap` (and its
+    token twin) -- there is no lead to stop early and no per-PR allowance, since
+    `per_pr_cost_cap` and `max_delegations` are lead-only. So the committed worst case is this
+    count times the per-job cap, not the agenda's `cost_hint` floor, which prices a job at $0.05
+    while it runs under $0.30.
+    """
+
+    if dataset.routing_mode == "fanout":
+        return int(report.get("proposals_enumerated") or 0)
+    if dataset.routing_mode == "rules":
+        return int(report.get("proposals_eligible") or 0)
+    return None
+
+
+def _refuse_arm_mode_overrun(committed, run_cap, what: str, logger, *, enforce: bool) -> None:
+    if not run_cap or committed <= run_cap:
+        return
+    message = (
+        f"{what}: every job may spend its whole cap and none can be pruned, so this run is "
+        f"committed to more than its run total. Lower the per-job cap, narrow pr_numbers, or "
+        f"raise the run total.")
+    if enforce:
+        raise BudgetTooSmall(message)
+    logger.warning("%s", message)
+
+
 def _report_token_budget(dataset, report, pr_count: int, logger, *,
                          enforce: bool = False) -> None:
     """The dollar budget report's twin, against `run_total_token_cap`.
@@ -920,6 +949,19 @@ def _report_token_budget(dataset, report, pr_count: int, logger, *,
             if enforce:
                 raise BudgetTooSmall(message)
             logger.warning("%s", message)
+        return
+
+    jobs = _arm_mode_jobs(dataset, report)
+    if jobs is not None:
+        committed = jobs * dataset.standard_budget_tokens
+        logger.info("token budget: %d %s jobs x %s = %s worst case, against run_total_token_cap "
+                    "%s", jobs, dataset.routing_mode, f"{dataset.standard_budget_tokens:,}",
+                    f"{committed:,}", f"{run_cap:,}" if run_cap else "(off)")
+        _refuse_arm_mode_overrun(
+            committed, run_cap,
+            f"{jobs} {dataset.routing_mode} jobs x standard_budget_tokens "
+            f"{dataset.standard_budget_tokens:,} = {committed:,} tokens, above the "
+            f"run_total_token_cap of {run_cap:,}", logger, enforce=enforce)
         return
 
     floor = int(report.get("mandatory_floor_tokens") or 0)
@@ -1092,6 +1134,23 @@ def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = Fa
             if enforce:
                 raise BudgetTooSmall(message)
             logger.warning("%s", message)
+        return
+
+    jobs = _arm_mode_jobs(dataset, report)
+    if jobs is not None:
+        committed = jobs * dataset.standard_budget_cap
+        expected_key = "projected_cost_fanout" if dataset.routing_mode == "fanout" else \
+            "projected_cost_rules"
+        logger.info(
+            "budget: %d %s jobs x $%.2f = $%.2f worst case (the agenda's cost hints expect "
+            "$%.2f), against run_total_cost_cap %s", jobs, dataset.routing_mode,
+            dataset.standard_budget_cap, committed, float(report.get(expected_key) or 0.0),
+            f"${run_cap:.2f}" if run_cap else "(off)")
+        _refuse_arm_mode_overrun(
+            committed, run_cap,
+            f"{jobs} {dataset.routing_mode} jobs x standard_budget_cap "
+            f"${dataset.standard_budget_cap:.2f} = ${committed:.2f}, above the "
+            f"run_total_cost_cap of ${run_cap:.2f}", logger, enforce=enforce)
         return
 
     floor = float(report.get("mandatory_floor_cost") or 0.0)
