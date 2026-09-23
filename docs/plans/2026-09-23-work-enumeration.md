@@ -431,3 +431,23 @@ user chose a **matched control on current code**: `configs/pr_review_v5_verdicts
 free Qwen shakeout. Each run is bound at $23.80 worst case (140 jobs × $0.17); expected ~$4–7 per
 run from the fanout pair's measured per-job spend. The fanout pair stays as history, read only
 with the prompt revision named beside it.
+
+## Decision, 2026-09-23 (no Qwen shakeout)
+
+The user dropped the Qwen shakeout: Qwen runs have been taking much longer than paid ones, so
+the iteration tier is not worth putting in front of this experiment for now. The one-PR shakeout
+(`iter_qwen_verdicts_33337_rep1`) was stopped part-way; what it had already shown, read before
+its directories were removed so nothing can resume onto a stopped run:
+
+- all 20 payloads in `arm_pool.jsonl` carried `target_verdicts: true` and
+  `submission_verification_policy: verify_edits_if_present`, and none was a generalist -- the
+  directives reach the task;
+- 8 of the 16 jobs that finished answered **every** target they were shown -- 19 verdicts, all
+  `no_issue`, each with a specific reason -- with 0 consistency refusals and 0 repaired tool
+  arguments, so the nested `target_verdicts` list survived the gateway's unenforced schemas;
+- the other 8 paused at 204–224k processed tokens under the inherited gpt_5.2 cap, which
+  `a5a1979` has since doubled for Qwen.
+
+So the contract is exercised end to end on a real reviewed workspace; the hop into
+`arm_responses.jsonl` is pinned by the far-end tests in `614731c`. The gpt_5.2 reps go ahead:
+treatment rep 1, control rep 1, a read of both, then reps 2–3 of each, one run at a time.
