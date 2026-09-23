@@ -47,8 +47,8 @@ silence.
    in `V5DatasetConfig`, `ReviewLeadConfig`, `_state()`, `journal.py`, `trace.py`; `ExecutionLimits`
    stays the only limiter.
 2. **`parent_view: full`** — `JobOutcome.summary(view=)` with `summary` byte-identical to today and
-   `full` adding the abstention, the per-target `target_abstentions` (declared on `JobOutcome` by the
-   one-run plan), and each context tool's verdict (`naming_norm`'s trace rows carry `result_ids` but
+   `full` adding the abstention, the per-target `target_verdicts` (declared on `JobOutcome` by the
+   verdict contract, `work-enumeration`), and each context tool's verdict (`naming_norm`'s trace rows carry `result_ids` but
    not the verdict word — one key in `context_tools.py`). Waves over 40 jobs collapse silent jobs; a
    `read_results` tool returns the full view on demand. Remove the refusal in
    `src/mathlib_review/review/coordination.py::assert_implemented`; bump `COORDINATION_VERSION`.

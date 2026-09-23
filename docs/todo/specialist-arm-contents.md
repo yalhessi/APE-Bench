@@ -1,7 +1,7 @@
 # Specialist arm contents — seven of ten match nothing, for three different reasons
 
 **Superseded as the route forward (2026-09-23)** — [`docs/plans/2026-09-23-work-enumeration.md`](../plans/2026-09-23-work-enumeration.md) replaces arm-by-arm repair with questions enumerated from maintainer comments, one verdict per target, and no generalist or lead; the defects below are what that design does not inherit (one grant for every question, no prefix-only naming oracle as the bar, no golf/idiom overlap). The free items here stay open and are not prerequisites.
-**Status** — open; the audit below is done, the fixes are not. *2026-09-23:* item 1's prompt half (the naming prompt no longer says "Submit nothing on naming" when the tool could not resolve the subject) is addressed by `docs/plans/2026-09-23-one-run-to-move-the-wall.md`; the census-driven rewrite of the three convention arms is deferred there until one run shows the contract moves recall
+**Status** — open; the audit below is done, the fixes are not. *2026-09-23:* item 1's prompt half (the naming prompt no longer says "Submit nothing on naming" when the tool could not resolve the subject) is addressed in `b7d67cf` (spec identity naming ee245f077b7e -> 1f4b176a45a4); the census-driven rewrite of the three convention arms is deferred there until one run shows the contract moves recall
 **Cost** — most checks are re-scoring on committed artifacts; one 12-PR rep to confirm
 
 ## Motivating example

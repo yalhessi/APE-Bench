@@ -502,3 +502,32 @@ finishes and is judged, so the one pair is read against itself. Everything writt
 **one rep per condition, ten obligations (10 pp each), provisional**; the outcome bands of Phase 4
 were defined over three reps and are not applied. Reps 2-3 stay the check that would turn it into a
 rate, and are recorded as the open step rather than dropped.
+
+## Decision, 2026-09-23 (unified with `arms-speak`)
+
+A second session built the same contract in parallel (`arms-speak`,
+`docs/plans/2026-09-23-one-run-to-move-the-wall.md`) and halted before spending when it found this
+thread's run in flight. `docs/plans/2026-09-23-unify-the-contract-branches.md` merges them: develop is
+fast-forwarded to this branch, `target_verdicts` is the one per-target mechanism, and `arms-speak`'s
+prompt-side pieces are ported onto it as **opt-in** text. So:
+
+- **The pair on disk is the tool-only condition.** `pr5_V2_verdicts_fanout4_rep1` ran the verdict tool
+  under `focused-prompt/4` prompts. The unified code renders contract text under the same two knobs
+  ("When the fix does not compile", "Account for every target" in verdict terms, "Two strengths of
+  ask"), versioned `focused-prompt/4+ask_without_fix+target_verdicts`, so a run of the unified
+  treatment is a new condition, not rep 2 of this one. Reps 2-3 of the tool-only treatment are retired
+  as superseded (user, 2026-09-23). The control config is unchanged and rebuilds byte-identical to
+  `pr5_V2_verdicts_fanout4_control_rep1` on nine of ten arms (`test_pr_review_v5_contract_far_end.py`).
+- **Two changes reach every run from here**, the control included: the `severity` field description on
+  the candidate schema (tool text, sealed nowhere -- recorded in `framework-defects-2026-09.md`) and the
+  naming prompt's `insufficient_evidence` bullet (spec identity `naming` ee245f077b7e -> 1f4b176a45a4),
+  which addresses the pilot read's `subject_unresolved` -> `no_issue` symptom.
+- **The paused-job defect is fixed.** A fanout ledger now carries each job's status and cost, so the
+  manifest counts a pause (`e163523`); this pair's manifest reads `paused: 0` for the docs job on 33421
+  that paused at $0.18 and lost its answer.
+- **The Bookkeeping todos.** The belief scheduler and follow-up question graphs are
+  `docs/todo/routing-lead-iterative-queue.md` (which carries the measured allocation numbers; the
+  Phase 5 curves it would add do not exist yet). The held-out-11 ceiling extension is superseded by the
+  unify plan's Step 4, a no-pruning run on all twelve held-out PRs. No separate entries are written:
+  a todo with no measurement behind it is a wish.
+- Phases 1 and 5 stay open and are sequenced after the unified 4-PR run and the 12-PR run.

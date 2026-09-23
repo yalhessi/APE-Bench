@@ -101,6 +101,10 @@ them, so they are structurally zero however the run went -- eleven jobs delegate
 accounted for is a sum that does not balance, and nothing refuses it. `arm_responses.jsonl`
 had the one successful row. The `solo` mode already carries a note of this shape for
 `context_calls_total` in `review/trace.py`; this is the same gap on the status counters.
+**Fixed 2026-09-23 (`e163523`):** a fanout or rules run reads its scheduled jobs through
+`collect_child_runs` and writes each one's status, cost and counts on its ledger row, and a mandatory
+job that did not succeed is a coverage gap. It hit a paid run first: `pr5_V2_verdicts_fanout4_rep1`
+reads `paused: 0` for a job that paused at $0.18 and lost its answer.
 
 **What would close it:** either stop writing the synthetic result (and let `task_outcome.json`
 carry the failure, which is what it exists for), or amend the rule and the docstring to say a

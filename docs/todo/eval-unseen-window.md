@@ -44,7 +44,7 @@ recall for today's system, against 26% observed on the held-out 12. Per-family r
 - **The 58 obligations have no hittability audit**; the judge treats absent as hittable. Several are
   exact-script asks of the kind the hittability criterion excludes. About an hour, gold-only, done blind
   to agent output and outside design sessions.
-- **Disclose one aggregate prior.** The arms-speak contract (`focused-prompt/6`) motivates its advisory
+- **Disclose one aggregate prior.** The unified contract's "Two strengths of ask" section (`+target_verdicts`) motivates its advisory
   section with "91 of 113 advisory", and 62 of those 113 judgments are the 46. The sentence holds on the
   held-out 12 alone (19 of 24 judgments advisory), so the text needs no change; the motivation is
   disclosed beside any window number.

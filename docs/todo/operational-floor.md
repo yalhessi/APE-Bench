@@ -18,6 +18,12 @@ gap that already nearly cost a run.
 What would close it: delete or rename the directory. Decide deliberately, because the name is the
 only thing standing between it and a resume.
 
+**A second one, 2026-09-23:** `results/pr_review_v5/runs/pr5_V_verdicts_fanout4_rep1/` is the verdict
+contract's stopped pilot (41 of 140 jobs, ~$1.83, never scored). It is committed, with a sealed
+`run_plan.json` and no terminal outputs, so `run --execute` under that name would resume its 41 cached
+jobs. Kept as the record of what the pilot read saw; its gitignored `arm_pool.jsonl` was copied into the
+main checkout at the unification. Never resume it.
+
 ## 2. PR 33057's reviewed state genuinely does not compile, and nothing records that
 
 One `unsolved goals` at `Expand.lean:35`. There is no representation for "this episode's reviewed

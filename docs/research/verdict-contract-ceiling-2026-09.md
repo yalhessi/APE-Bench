@@ -66,3 +66,12 @@ under the contract (`.mpr` → `.2`, `(K := K)`, blank lines between aliases); t
   untouched.
 - A miss decomposition by stage for the seven obligations neither run hit, from the per-target
   verdicts `report buckets` now shows.
+
+**Unified, 2026-09-23.** This treatment ran the verdict tool under unchanged `focused-prompt/4` prompts:
+the tool-only condition. The unified code (`docs/plans/2026-09-23-unify-the-contract-branches.md`) also
+renders contract text under the same knobs and moves the naming prompt, so a run of it is a new
+condition, not rep 2 of this one; reps 2-3 of this treatment are retired as superseded. Two readings
+the artifacts support and this write-up omitted: e83e6544 is a judge-vote flip -- the control's naming
+arm filed nearly the same rename and drew 1 of 3 votes against 2 of 3 -- so by what the arms filed the
+contract gained no obligation; and one treatment job (docs, 33421) paused at $0.18 on its $0.17 cap and
+lost its answer while the manifest read `paused: 0`, a counter defect now fixed (`e163523`).

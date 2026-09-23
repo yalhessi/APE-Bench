@@ -150,3 +150,14 @@ reps lost theirs (`docs/todo/operational-floor.md` §5). The fanout runs write n
 65 non-held-out gold PRs includes all 46 PRs of the unseen window (`docs/todo/eval-unseen-window.md`).
 They can be census input or the window, not both. The advisory section's motivation ("91 of 113") is
 55% those PRs' judgments; the sentence holds on the held-out 12 alone (19 of 24 judgments advisory).
+
+**Unified, 2026-09-23.** Merged with `work-enumeration` by
+`docs/plans/2026-09-23-unify-the-contract-branches.md`. Ported onto that branch's `target_verdicts`
+mechanism, as opt-in knobs: the ask-without-fix clause; "Account for every target", rewritten in verdict
+terms; "Two strengths of ask", verbatim; the `severity` description; the naming prompt correction;
+`hits_by_arm` / `sole_finder` and `filing`. **Not built:** `target_abstentions`,
+`require_target_dispositions`, contract-on-by-default, the unconditional `focused-prompt/6` bump, and the
+`_c6` run naming -- the renderer version is now `focused-prompt/4+ask_without_fix+target_verdicts` when
+both knobs are on. The 12-PR lead run above is replaced by the unify plan's Step 3 (the unified treatment
+on the four fanout PRs against the control already paid for) and Step 4 (a no-pruning run on all twelve,
+because pruning loses 25 of 42 held-out miss-reps).
