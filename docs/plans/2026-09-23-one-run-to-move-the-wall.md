@@ -161,3 +161,6 @@ terms; "Two strengths of ask", verbatim; the `severity` description; the naming 
 both knobs are on. The 12-PR lead run above is replaced by the unify plan's Step 3 (the unified treatment
 on the four fanout PRs against the control already paid for) and Step 4 (a no-pruning run on all twelve,
 because pruning loses 25 of 42 held-out miss-reps).
+
+*Correction, same day:* the unify plan's Step 4 (no-pruning on the twelve) was dropped by the user as too
+expensive for what it could show; Step 3 is the run that replaced the 12-PR lead run here.

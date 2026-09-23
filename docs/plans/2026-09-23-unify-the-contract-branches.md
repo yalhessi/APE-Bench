@@ -137,3 +137,8 @@ the misses are right-site-different-ask (four), naming-evidence limits (two) and
 
 Step 4 (no-pruning on the twelve, ~$50-60) is the plan's next spend. It is not launched from here:
 its price and the Step 3 result go to the user first.
+
+**Step 4 dropped (user, 2026-09-23).** The no-pruning run on the twelve is too expensive for what it
+could show: the four-PR fanout already ran with no pruning, and its residual is statements, not silences; and on the held-out twelve, the lead-pruned on-concern arms that fanout did run filed nothing, 7 of 7 (`docs/todo/routing-remit-and-silence.md`). Step 5's items that named Step 4 as their run -- the reasoning twin's
+control, the generalist-floor-off rep -- take the Step 3 run (`pr5_V3_contract_fanout4_rep1`) instead,
+which is also where the V2 pair already gives the specialist-only reading.

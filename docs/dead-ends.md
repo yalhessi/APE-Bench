@@ -140,9 +140,11 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
   question reaches (four of seven misses), naming evidence the prefix oracle cannot produce (two), a
   compound ask filed in per-declaration halves (one). `docs/research/unified-contract-fanout4-2026-09.md`.
   **The contract stays** as opt-in knobs — zero control-PR cost, filing 27% -> 35%, resolution 1 -> 2
-  — it is just not what binds. **Reopens if:** a second rep of the unified contract reaches >= 5, or
-  it moves recall on the twelve held-out PRs under no-pruning (pruning loses 25 of 42 miss-reps
-  there, silence 15). **Untried:** reasoning on (every gpt-5.2 call in the record ran with reasoning
+  — it is just not what binds. **Reopens if:** a second rep of the unified contract reaches >= 5.
+  **Considered and ruled out (user, 2026-09-23): a no-pruning run on the twelve held-out PRs** —
+  1,307 jobs, ~$52 expected and $392 at the per-job cap, and it would not answer a question worth
+  that: the four-PR fanout already ran with no pruning, and its residual is statements, not silences; and on the held-out twelve, the lead-pruned on-concern arms that fanout did run filed nothing, 7 of 7 (`docs/todo/routing-remit-and-silence.md`). Pruning losing 25 of 42 held-out miss-reps
+  is a statement about which arms ran, not evidence that running them would file. **Untried:** reasoning on (every gpt-5.2 call in the record ran with reasoning
   off), design-move questions (`work-enumeration` Phase 1), suffix / namespace naming evidence, a
   compound-ask channel.
 - **Precedent priming, Mode A** (2026-07-06/07) — delivery worked (47% of primed findings echo an

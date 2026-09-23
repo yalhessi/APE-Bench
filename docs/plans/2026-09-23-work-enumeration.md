@@ -531,3 +531,7 @@ prompt-side pieces are ported onto it as **opt-in** text. So:
   unify plan's Step 4, a no-pruning run on all twelve held-out PRs. No separate entries are written:
   a todo with no measurement behind it is a wish.
 - Phases 1 and 5 stay open and are sequenced after the unified 4-PR run and the 12-PR run.
+
+*Correction, same day:* the unify plan's Step 4 was dropped by the user as too expensive for what it
+could show, so the held-out-11 ceiling extension is not superseded by a run; it stays unwritten, for the
+same reason -- a broader copy of the four-PR fanout, whose residual is already read.

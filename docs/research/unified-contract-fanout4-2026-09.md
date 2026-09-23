@@ -71,11 +71,13 @@ problem.
 
 **Untried, and what this does not rule out:** reasoning on — every gpt-5.2 call in the record ran with
 reasoning off (`docs/todo/reasoning-in-the-arms.md`), and "asks a smaller question at the right site"
-is a judgement failure a reasoning setting could move; a no-pruning run on the twelve held-out PRs,
-where pruning, not silence, loses most obligations (25 of 42 miss-reps); questions that ask for design
+is a judgement failure a reasoning setting could move; questions that ask for design
 moves (introduce a lemma, generalize a constant) — `work-enumeration`'s Phase 1 question list; naming
 evidence for suffix and namespace conventions; a compound-ask channel. And a second rep of any of
 these three conditions, which is what would turn 3 vs 2 into a rate.
+
+**Ruled out, not untried (user, 2026-09-23):** a no-pruning run on the twelve held-out PRs (1,307 jobs,
+~$52 expected, $392 at cap). It would not answer a valuable question: the four-PR fanout already ran with no pruning, and its residual is statements, not silences; and on the held-out twelve, the lead-pruned on-concern arms that fanout did run filed nothing, 7 of 7 (`docs/todo/routing-remit-and-silence.md`).
 
 ## Operational notes
 
