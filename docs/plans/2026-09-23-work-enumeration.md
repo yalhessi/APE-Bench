@@ -476,3 +476,20 @@ where `naming_norm` returned `subject_unresolved` (the arm said `no_issue`), whi
 scheduler's belief state and for the miss decomposition's evidence-gap layer; and advisory
 micro-nits appeared (`.mpr` -> `.2`, `(K := K)`, a blank line between aliases), which the control
 comparison will size.
+
+## Decision, 2026-09-23 (the tools are fixed before the remaining runs)
+
+The user asked whether the runs were parallelised well; they were not. Measured over treatment
+rep 1's sessions, model turns were 14% of job time and local tools the rest -- `declaration_search`
+a 33.7 s mean, synchronously reading the whole base snapshot inside the one event loop all four
+arms of a run share (`num_processes: 0`), so each call stalled the other three. The user chose to
+fix the tools rather than run the reps side by side or fork worker processes.
+
+The fix was mostly built already, unmerged, on `wall-clock` (2026-09-15: a grep prefilter for
+`content_search` and the finalization scan, validated output-identical). `wall-clock` took develop
+(`c0e5cc2`), gained the same prefilter for `declaration_search` (`c1435db`: 60 of 60 real queries
+identical, 9.1 s -> 4.6 s serially) and was merged here. **Treatment rep 1 ran on the old tools;
+control rep 1 onward on the new.** That is not a difference in condition: the tools return the same
+results, and latency spends neither tokens nor dollars. Control rep 1's sealed plan was checked
+against treatment rep 1's before any job ran -- 140 identical invocations and prompt hashes, identical
+arm hashes, caps, model and release; only the two contract settings differ.
