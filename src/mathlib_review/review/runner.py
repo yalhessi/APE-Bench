@@ -32,7 +32,10 @@ from pydantic import ConfigDict, BaseModel, Field
 
 from ape.orchestration import TaskOrchestrator
 from ape.orchestration.execution_index import INDEX_FILENAME as EXECUTION_INDEX_FILENAME
-from ape.orchestration.models import EXECUTION_LIMITS_KEY, execution_limits_payload
+from ape.orchestration.models import (
+    EXECUTION_LIMITS_KEY, TaskExecutionSpec, execution_limits_payload,
+)
+from ape.orchestration.subtasks import collect_child_runs
 from ape.tasks.base import create_task_from_data
 from ape.utils import parse_cli_args
 from ape.llm_clients.config import COST_MODELS
@@ -714,11 +717,59 @@ def _assessments_from_results(results, mode: str) -> List[Dict[str, Any]]:
     return rows
 
 
+async def _direct_children(orchestrator, tasks, data, agenda, config, logger):
+    """What each job of a `fanout` or `rules` run did, read from the tasks that were SCHEDULED.
+
+    The same reader the nested families use (`collect_child_runs`), for the same reason: the
+    orchestrator aggregates only finished tasks, so a job that paused on its cap is absent from
+    `results.task_results`. These runs used to read nothing at all, so their ledger carried no
+    status and their manifest read `succeeded: 0, failed: 0, paused: 0` whatever happened -- on
+    `pr5_V2_verdicts_fanout4_rep1` one job paused at $0.18 against a $0.17 cap, its answer was
+    dropped, and nothing said so. Keyed by invocation id; a mandatory proposal is a required spec.
+    """
+
+    mandatory = {item.invocation_id for item in agenda.proposals if item.mandatory}
+    specs = [TaskExecutionSpec(spec_id=item["invocation_id"], task_type=item.get("task_type", ""),
+                               task_data={}, required=item["invocation_id"] in mandatory)
+             for item in data]
+    return await collect_child_runs(orchestrator, tasks, specs, config, logger=logger)
+
+
+def _direct_coverage_gaps(children, agenda) -> List[Dict[str, Any]]:
+    """Mandatory jobs of a `fanout` or `rules` run that did not succeed, in the lead's row shape.
+
+    The lead has always written these; the model-free modes wrote none, so a mandatory job that
+    paused or failed left the run `complete` and its recall measured against a denominator it
+    did not cover.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.review.delegation import ledger_status
+
+    by_invocation = {item.invocation_id: item for item in agenda.proposals}
+    rows = []
+    for invocation_id, child in sorted((children or {}).items()):
+        if not child.spec.required or child.succeeded:
+            continue
+        proposal = by_invocation[invocation_id]
+        rows.append({
+            "invocation_id": invocation_id, "arm_id": proposal.arm_id,
+            "work_unit_id": proposal.work_unit_id, "pr_number": proposal.pr_number,
+            "status": ledger_status(child),
+            "reason": child.error or child.outcome.reason or "mandatory job did not succeed",
+        })
+    return rows
+
+
 def _delegations_from_results(results, mode: str, agenda,
                               floor_records: Optional[List[Dict[str, Any]]] = None,
+                              children: Optional[Dict[str, Any]] = None,
                               ) -> List[Dict[str, Any]]:
     """Delegation records: the lead's own plus the floor's, or synthesized for the
-    model-free modes, where every job is decided by rule."""
+    model-free modes, where every job is decided by rule.
+
+    For those, `children` (from `_direct_children`) supplies what each job that ran did --
+    status, cost, tokens, turns, counts -- as the lead's rows have always carried. A job the
+    rule did not select keeps the rule-dispatched shape, with no status key at all."""
 
     floor_records = list(floor_records or [])
 
@@ -752,7 +803,31 @@ def _delegations_from_results(results, mode: str, agenda,
             ).row()
             for item in agenda.proposals
         ]
+    from ape.tasks.lean_tasks.formal_math.review.delegation import ledger_status
+
     ran = {item.invocation_id for item in initial_jobs(agenda)}
+    children = children or {}
+
+    def outcome_fields(invocation_id):
+        child = children.get(invocation_id)
+        if child is None:
+            return {}
+        result = child.result
+        return {
+            "status": ledger_status(child),
+            "cost": float(child.outcome.billed_cost or 0.0),
+            "wall_seconds": round(float(child.outcome.wall_seconds or 0.0), 3),
+            "token_usage": {
+                "billed_cost": float(child.outcome.billed_cost or 0.0),
+                "nominal_cost": float(child.outcome.nominal_cost or 0.0),
+                "tokens": int(child.outcome.tokens or 0),
+                "turns": int(child.outcome.turns or 0),
+            },
+            "candidate_count": len(getattr(result, "candidates", None) or []),
+            "verification_artifact_count": len(
+                getattr(result, "verification_artifacts", None) or []),
+        }
+
     return [
         DelegationRecord(
             invocation_id=item.invocation_id,
@@ -767,6 +842,7 @@ def _delegations_from_results(results, mode: str, agenda,
             reason=("" if item.invocation_id in ran else f"not selected in {mode} mode"),
             budget_tier="standard" if item.invocation_id in ran else None,
             context_calls=[],
+            **(outcome_fields(item.invocation_id) if item.invocation_id in ran else {}),
         ).row()
         for item in agenda.proposals
     ]
@@ -1638,6 +1714,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
     orchestrator = TaskOrchestrator(config=scaffold, orchestrator_id=dataset.run_name,
                                     logger=logger)
     results = await orchestrator.run(tasks)
+    children = (await _direct_children(orchestrator, tasks, data, agenda, scaffold, logger)
+                if dataset.routing_mode not in ("lead", "solo") else None)
 
     if dataset.routing_mode == "solo":
         responses, anchor_rows = _solo_responses(
@@ -1655,10 +1733,12 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
             report["by_failure"] or "no failures")
     else:
         responses = _responses_from_results(results, dataset.routing_mode)
-    delegations = _delegations_from_results(results, dataset.routing_mode, agenda)
+    delegations = _delegations_from_results(results, dataset.routing_mode, agenda,
+                                            children=children)
     assessments = _assessments_from_results(results, dataset.routing_mode)
     coverage_gaps = (
         _solo_coverage_gaps(results, data) if dataset.routing_mode == "solo"
+        else _direct_coverage_gaps(children, agenda) if children is not None
         else _coverage_gaps_from_results(results, dataset.routing_mode))
     comprehension = _comprehension_from_results(results, dataset.routing_mode)
     write_once(out / "arm_responses.jsonl", jsonl_bytes(responses))

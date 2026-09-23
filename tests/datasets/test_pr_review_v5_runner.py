@@ -565,3 +565,66 @@ def test_budget_charged_counts_only_what_the_per_pr_cap_counts():
     manifest = _manifest_from(agenda, records, nominal=9.0, billed=4.0)
     assert manifest.usage["budget_charged"] == pytest.approx(0.10 * discretionary)
     assert manifest.usage["budget_charged"] < manifest.usage["billed"]
+
+
+def _child(invocation_id, *, paused=False, required=False, cost=0.05):
+    """A real `ChildRun`, as `collect_child_runs` builds one -- never a stand-in shaped like it."""
+
+    from ape.orchestration.models import (
+        ChildRun, ExecutionStatus, SampleOutcome, TaskExecutionSpec, TaskExecutionStatus,
+        TaskOutcome,
+    )
+
+    status = ExecutionStatus.PAUSED_COST_LIMIT if paused else ExecutionStatus.SUCCESS
+    outcome = TaskOutcome(
+        task_id=invocation_id, task_type="lean_pr_review_v5_arm", global_index="i" + invocation_id,
+        execution_status=(TaskExecutionStatus.PAUSED if paused else TaskExecutionStatus.COMPLETED),
+        has_result=not paused, billed_cost=cost, nominal_cost=cost * 3, tokens=1000, turns=7,
+        wall_seconds=12.5,
+        samples=[SampleOutcome(sample_index=0, status=status, billed_cost=cost)])
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmResult
+
+    result = None if paused else ReviewArmResult(
+        task_id=invocation_id, task_type="lean_pr_review_v5_arm", global_index="i" + invocation_id,
+        success=True, score=1.0, pr_number=1, work_unit_id="wu:a",
+        rendered_prompt_sha256="a" * 64, candidates=[{"claim": "x"}], verification_artifacts=[],
+        findings=[], review_message="")
+    return ChildRun(spec=TaskExecutionSpec(spec_id=invocation_id, task_type="t", task_data={},
+                                           required=required),
+                    global_index="i" + invocation_id, task_dir="/nonexistent", outcome=outcome,
+                    result=result)
+
+
+def test_a_fanout_ledger_says_how_each_job_ended_and_the_manifest_counts_it():
+    """The fanout manifest read `paused: 0` for a job that paused on its cap, because rule-made
+    rows carried no status. Each row that ran now carries status, cost and counts from the
+    scheduled task, and a job the rule did not select keeps no status key at all."""
+
+    from src.mathlib_review.review.runner import _delegations_from_results
+
+    agenda, _pool = _agenda_and_pool()
+    agenda = agenda.model_copy(update={"routing_mode": "fanout"})
+    first, second = agenda.proposals[0].invocation_id, agenda.proposals[1].invocation_id
+    rows = _delegations_from_results(None, "fanout", agenda, children={
+        first: _child(first), second: _child(second, paused=True, cost=0.18)})
+    by_id = {row["invocation_id"]: row for row in rows}
+    assert by_id[first]["status"] == "success" and by_id[first]["candidate_count"] == 1
+    assert by_id[second]["status"] == "paused_cost" and by_id[second]["cost"] == 0.18
+    assert by_id[second]["token_usage"]["turns"] == 7
+    assert isinstance(by_id[second]["token_usage"]["turns"], int)
+    statuses = [row.get("status") for row in rows]
+    assert statuses.count("paused_cost") == 1 and statuses.count("success") == 1
+
+
+def test_a_mandatory_job_that_paused_is_a_coverage_gap_in_fanout_too():
+    from src.mathlib_review.review.runner import _direct_coverage_gaps
+
+    agenda, _pool = _agenda_and_pool()
+    first, second = agenda.proposals[0].invocation_id, agenda.proposals[1].invocation_id
+    gaps = _direct_coverage_gaps({
+        first: _child(first, paused=True, required=True),
+        second: _child(second, paused=True, required=False)}, agenda)
+    assert [gap["invocation_id"] for gap in gaps] == [first]
+    assert gaps[0]["status"] == "paused_cost"
+    assert set(gaps[0]) == {"invocation_id", "arm_id", "work_unit_id", "pr_number", "status",
+                            "reason"}
