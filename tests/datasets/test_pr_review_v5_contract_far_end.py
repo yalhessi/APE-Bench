@@ -1,0 +1,132 @@
+"""The contract knobs, asserted at the far end: on the pool an arm is handed and the plan it seals.
+
+Two things must hold for the unified contract's first run to be read against the control already
+paid for (`pr5_V2_verdicts_fanout4_control_rep1`):
+
+* **The control rebuilds byte-identical.** Built from the control config on today's code, one PR's
+  agenda has the prompt hashes, arm hashes and renderer version the paid run sealed, and each pool
+  payload is the task data that run dispatched, less the two keys the runner adds at dispatch
+  (`retrieval_cutoff`, `trace_path`). If it did not, the "control" would be a third condition.
+* **The treatment carries the whole contract.** Every payload -- the generalist's included --
+  carries both directives, and every specialist's system prompt carries the three sections that
+  say what its tool enforces, and never names an argument the verdict tool does not have.
+
+Built from the configs through `runner.load_run`, as `cli plan` builds them, not from a fixture:
+a fixture would agree with itself and not with the run. One PR (33315, the control PR) keeps it
+to one exposure scan, ~7 s. Skipped where the paid run's gitignored pool is absent.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from src.mathlib_review.io import jsonl_rows
+
+CONTROL_RUN = Path("results/pr_review_v5/runs/pr5_V2_verdicts_fanout4_control_rep1")
+CONTROL_CONFIG = Path("configs/pr_review_v5_verdicts_fanout4_control.yaml")
+TREATMENT_CONFIG = Path("configs/pr_review_v5_verdicts_fanout4.yaml")
+PR = 33315
+#: Keys `_direct_arm_task_data` adds when it dispatches, which the agenda's pool never holds.
+DISPATCH_KEYS = {"retrieval_cutoff", "trace_path"}
+
+pool_exists = pytest.mark.skipif(
+    not (CONTROL_RUN / "arm_pool.jsonl").is_file(),
+    reason="the paid control's arm_pool.jsonl is gitignored and absent in this checkout")
+
+
+def _built(config: Path):
+    import logging
+
+    from src.mathlib_review.agenda.agenda import build_agenda
+    from src.mathlib_review.review.runner import (
+        load_release, load_run, select_units_and_episodes, stamp_submission_directives,
+    )
+
+    dataset, _scaffold, _overrides = load_run(
+        config, {"dataset": {"pr_numbers": [PR], "run_name": "far_end_check"}})
+    release = load_release(dataset)
+    units, episodes = select_units_and_episodes(dataset, release)
+    agenda, pool = build_agenda(
+        run_name=dataset.run_name, routing_mode=dataset.routing_mode, release=dataset.release,
+        modification_inventory=dataset.modification_inventory, units=units, episodes=episodes,
+        graphs=release["graphs"], release_prompts=release["release_prompts"],
+        modifications=release["modifications"], pr_numbers=[PR],
+        use_exposure_index=dataset.use_exposure_index,
+        generalist_floor=dataset.generalist_floor,
+        submission_verification_policy=dataset.submission_verification_policy,
+        target_verdicts=dataset.target_verdicts,
+    )
+    stamp_submission_directives(pool, dataset, logging.getLogger("far_end"))
+    return dataset, agenda, pool
+
+
+@pytest.fixture(scope="module")
+def control():
+    return _built(CONTROL_CONFIG)
+
+
+@pytest.fixture(scope="module")
+def treatment():
+    return _built(TREATMENT_CONFIG)
+
+
+@pool_exists
+def test_the_control_rebuilds_to_the_prompts_the_paid_control_sealed(control):
+    _dataset, agenda, _pool = control
+    plan = json.loads((CONTROL_RUN / "run_plan.json").read_text())
+    sealed = json.loads((CONTROL_RUN / "agenda.json").read_text())
+    rebuilt = {item.invocation_id: item.prompt_sha256 for item in agenda.proposals}
+    assert rebuilt, "no proposals for the control PR"
+    assert rebuilt == {key: plan["prompt_sha256_by_invocation"][key] for key in rebuilt}
+    assert {arm.arm_id: arm.source_sha256 for arm in agenda.arms} == plan["arm_sha256_by_id"]
+    assert agenda.renderer_version == sealed["renderer_version"] == (
+        "candidate-prompt/12+focused-prompt/4")
+
+
+@pool_exists
+def test_the_control_pool_is_the_task_data_the_paid_control_dispatched(control):
+    _dataset, _agenda, pool = control
+    dispatched = {row["invocation_id"]: row["task_data"]
+                  for row in jsonl_rows(CONTROL_RUN / "arm_pool.jsonl")
+                  if row["task_data"]["pr_number"] == PR}
+    assert set(pool) == set(dispatched)
+    for invocation_id, payload in pool.items():
+        sent = {key: value for key, value in dispatched[invocation_id].items()
+                if key not in DISPATCH_KEYS}
+        assert payload == sent, invocation_id
+
+
+@pool_exists
+def test_the_treatment_carries_the_whole_contract_on_every_payload(treatment):
+    dataset, agenda, pool = treatment
+    assert dataset.target_verdicts is True
+    assert dataset.submission_verification_policy == "verify_edits_if_present"
+    assert agenda.renderer_version == (
+        "candidate-prompt/12+focused-prompt/4+ask_without_fix+target_verdicts")
+    # This config runs no generalist; that the generalist is stamped too is
+    # `test_every_payload_carries_the_contract_the_generalist_included` in the agenda tests.
+    for invocation_id, payload in pool.items():
+        assert payload["target_verdicts"] is True, invocation_id
+        assert payload["submission_verification_policy"] == "verify_edits_if_present"
+
+
+@pool_exists
+def test_every_treatment_specialist_reads_what_its_tool_enforces(treatment, control):
+    _dataset, _agenda, pool = treatment
+    _c, _ca, control_pool = control
+    headings = ("## When the fix does not compile", "## Account for every target",
+                "## Two strengths of ask")
+    specialists = [p for p in pool.values() if p["arm_id"] != "generalist"]
+    assert specialists
+    for payload in specialists:
+        system = payload["rendered_system_prompt"]
+        contract = system[system.index("# Submission contract for this run"):]
+        for heading in headings:
+            assert heading in contract, (payload["invocation_id"], heading)
+        assert "abstention_reason" not in contract and "abstention_detail" not in contract
+        # The treatment changes the contract and nothing the arm is shown about the code.
+        assert payload["rendered_user_prompt"] == (
+            control_pool[payload["invocation_id"]]["rendered_user_prompt"])
