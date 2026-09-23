@@ -74,6 +74,34 @@ AbstentionReason = Literal[
 ]
 ABSTENTION_REASONS: Tuple[str, ...] = get_args(AbstentionReason)
 
+#: What a check concluded about one review target, under `target_verdicts`.
+TargetVerdictKind = Literal["issue", "no_issue", "cannot_determine"]
+
+#: Assigned by the system, never offered to the model: a target the arm left without a verdict
+#: after `_FORCED_SUBMISSION_ATTEMPTS` reminders. Kept distinct so "never answered" cannot be
+#: read as `no_issue`, for the same reason `FORCED_EMPTY_REASON` is kept apart from abstention.
+UNSTATED_VERDICT = "unstated"
+
+#: The `abstention` reason a verdict-bearing submission with no candidates is recorded under.
+#: The per-target reasons are in `target_verdicts`; this only says where to look.
+VERDICTS_ABSTENTION_REASON = "per_target_verdicts"
+
+
+class TargetVerdictSubmission(BaseModel):
+    """One target's verdict. `reason` comes before `verdict` on purpose: OCR's session replay
+    found an identifier emitted ahead of its analysis could not be retracted, and this is the
+    same shape -- a frontier model writing tool arguments in order. BitsAI measured the
+    opposite for a fine-tuned classifier, so the order is recorded as a choice
+    (`docs/todo/README.md`, "Reason fields before verdict fields"), not as settled."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    change_id: str = Field(description="The review target, exactly as listed in the prompt")
+    reason: str = Field(description=(
+        "What you checked at this target and what you found. For `cannot_determine`, the "
+        "evidence you needed and could not get."))
+    verdict: TargetVerdictKind
+
 
 class LeanPRReviewV4CandidateResult(BasePRReviewResult):
     work_unit_id: str
@@ -84,6 +112,9 @@ class LeanPRReviewV4CandidateResult(BasePRReviewResult):
     #: here because `BaseTaskResult` is pydantic with the default `extra='ignore'`: an
     #: undeclared keyword reaches `create_result` and is dropped with no error at all.
     abstention: Optional[Dict[str, str]] = None
+    #: One `{change_id, verdict, reason}` per review target under `target_verdicts`, else None.
+    #: Declared for the same reason as `abstention`.
+    target_verdicts: Optional[List[Dict[str, Any]]] = None
 
 
 class ProposedEditSubmission(BaseModel):
@@ -590,8 +621,95 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
         what validation sees and part of what is recorded.
         """
 
+    def _check_target_verdicts(
+        self, submitted: List[TargetVerdictSubmission], raw_candidates: List[Dict[str, Any]],
+        allowed_by_suffix: Dict[str, str],
+    ) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
+        """`(verdicts, None)` when the verdicts are a legal answer, `(None, refusal)` otherwise.
+
+        Every target the job was shown gets exactly one verdict, and the verdicts agree with the
+        candidates: an `issue` is backed by a candidate that names the target, and a candidate's
+        primary target is an `issue`. A contradiction between the two is refused like any other
+        contract violation. A target left out is pressed for a bounded number of times and then
+        recorded as `UNSTATED_VERDICT`, because an unbounded refusal would turn a job that
+        answered most of its targets into a failed job -- a coverage gap -- which is the failure
+        the mute-abstention path was bounded against.
+        """
+
+        expected = list(self.data.change_ids)
+        verdicts: Dict[str, Dict[str, Any]] = {}
+        problems: List[str] = []
+        for item in submitted:
+            change_id = allowed_by_suffix.get(item.change_id, item.change_id)
+            if change_id not in expected:
+                problems.append(f"{item.change_id!r} is not one of this job's review targets")
+            elif change_id in verdicts:
+                problems.append(f"{change_id} has more than one verdict")
+            elif not item.reason.strip():
+                problems.append(f"{change_id}'s verdict has an empty reason")
+            else:
+                verdicts[change_id] = {"change_id": change_id, "verdict": item.verdict,
+                                       "reason": item.reason.strip()}
+        named = {cid for candidate in raw_candidates for cid in candidate.get("change_ids") or []}
+        for change_id, row in verdicts.items():
+            if row["verdict"] == "issue" and change_id not in named:
+                problems.append(f"{change_id} is an `issue` but no candidate names it")
+        for index, candidate in enumerate(raw_candidates):
+            primary = candidate.get("primary_change_id")
+            row = verdicts.get(primary)
+            if row is not None and row["verdict"] != "issue":
+                problems.append(
+                    f"candidate {index} is about {primary}, whose verdict is {row['verdict']!r}")
+        if problems:
+            return None, ("The target verdicts are inconsistent: " + "; ".join(problems)
+                          + ". Fix and resubmit.")
+        missing = [cid for cid in expected if cid not in verdicts]
+        if missing:
+            self._verdict_presses = getattr(self, "_verdict_presses", 0) + 1
+            if self._verdict_presses <= _FORCED_SUBMISSION_ATTEMPTS:
+                return None, (
+                    "Every review target needs a verdict -- `issue`, `no_issue` or "
+                    f"`cannot_determine`, with its reason. Missing: {', '.join(missing)}. "
+                    f"(attempt {self._verdict_presses} of {_FORCED_SUBMISSION_ATTEMPTS})")
+            for change_id in missing:
+                verdicts[change_id] = {"change_id": change_id, "verdict": UNSTATED_VERDICT,
+                                       "reason": ""}
+        return [verdicts[cid] for cid in expected], None
+
+    @staticmethod
+    def _verdict_abstention(verdicts: List[Dict[str, Any]]) -> Dict[str, str]:
+        """An empty candidate list under `target_verdicts`: which verdicts, and how many."""
+
+        counts: Dict[str, int] = {}
+        for row in verdicts:
+            counts[row["verdict"]] = counts.get(row["verdict"], 0) + 1
+        return {"reason": VERDICTS_ABSTENTION_REASON,
+                "detail": ", ".join(f"{n} {kind}" for kind, n in sorted(counts.items()))}
+
     async def register_task_tools(self, mcp) -> None:
         self._register_lean_verify_edit(mcp)
+
+        if getattr(self.data, "target_verdicts", False):
+            @mcp.tool(description=(
+                "Submit this check's verdict on EVERY review target listed in the prompt, and "
+                "one candidate claim for each target you judge to have an issue."))
+            async def submit_candidates(
+                target_verdicts: Annotated[List[TargetVerdictSubmission], Field(description=(
+                    "REQUIRED: exactly one entry per review target listed in the prompt. "
+                    "`issue`: a maintainer would ask for a change at this target under this "
+                    "check -- file it as a candidate whose primary_change_id is this target; an "
+                    "advisory suggestion is an issue with severity `advisory`. `no_issue`: you "
+                    "checked and this target is fine under this check. `cannot_determine`: you "
+                    "could not settle it. Every verdict says in `reason` what you checked."
+                ))],
+                candidates: Annotated[List[CandidateSubmission], Field(description=(
+                    "Candidate objects matching the JSON contract in the prompt, one per issue. "
+                    "Every `issue` verdict needs one, and every candidate's primary_change_id "
+                    "needs an `issue` verdict; [] is valid when no target has an issue."
+                ))] = [],
+            ) -> Dict[str, Any]:
+                return await self._submit_candidates(candidates, None, "", target_verdicts)
+            return
 
         @mcp.tool(description="Submit zero or more candidate claims for this exact work unit.")
         async def submit_candidates(
@@ -620,143 +738,163 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                 )
             )] = "",
         ) -> Dict[str, Any]:
-            from ape.tasks.base import EvaluationResult
+            return await self._submit_candidates(
+                candidates, abstention_reason, abstention_detail, None)
 
-            raw_candidates = [item.model_dump(mode="json") for item in candidates or []]
-            # Silence has to say which silence it is, or it cannot be read afterwards and
-            # cannot be aimed at. Refusing here rather than accepting a mute submission is
-            # the same treatment every other contract violation gets, and it costs one short
-            # round trip with no re-investigation.
-            #
-            # The wording carries real weight and is not decoration. An arm that reads this
-            # as pressure to produce something would destroy the one result this project has
-            # that nothing else replaces: 0 candidates per control PR, per rep. Abstention
-            # must stay exactly as cheap as submitting.
-            #
-            # Asked once, and once only. `termination_callback` fires on the success path
-            # alone, so an arm that keeps omitting the reason would never submit legally: it
-            # would burn its turns and be recorded as a failed job, and a failed *mandatory*
-            # job is a coverage gap. That would convert the cleanest outcome an arm has —
-            # looking properly and finding nothing — into a hole in the run, which is a far
-            # worse error than an unlabelled silence. So the second empty submission is
-            # accepted and labelled `unstated`, which the report already counts and shows.
-            # The diagnostic path. Press for a candidate rather than accept the abstention,
-            # a bounded number of times, and keep "pressed and still nothing" as its own
-            # outcome — collapsing it into `already_correct` would destroy the only signal
-            # that separates a high bar from an arm with nothing to say.
-            if not raw_candidates and getattr(self.data, "forbid_abstention", False):
-                self._forced_presses = getattr(self, "_forced_presses", 0) + 1
-                if self._forced_presses <= _FORCED_SUBMISSION_ATTEMPTS:
-                    return {"evaluation_result": EvaluationResult(
-                        success=False, score=0.0,
-                        message=(
-                            "This run is not accepting abstentions: submit the single best "
-                            "candidate you considered, even if you judged it below your "
-                            "usual bar, and set model_confidence to reflect how weak it is. "
-                            "Say what you would flag if you had to flag exactly one thing. "
-                            f"(attempt {self._forced_presses} of "
-                            f"{_FORCED_SUBMISSION_ATTEMPTS})"
-                        )),
-                        "message": "Abstention not accepted in this run"}
-                abstention_reason = FORCED_EMPTY_REASON
-            if not raw_candidates and abstention_reason is None:
-                self._mute_abstentions = getattr(self, "_mute_abstentions", 0) + 1
-                if self._mute_abstentions == 1:
-                    return {"evaluation_result": EvaluationResult(
-                        success=False, score=0.0,
-                        message=(
-                            "Submitting nothing is a valid and expected outcome, and this is "
-                            "NOT a request to find something — do not add a candidate to "
-                            "satisfy it. Only the label is missing. Call submit_candidates "
-                            "again with the same empty list, plus abstention_reason set to "
-                            f"one of: {', '.join(ABSTENTION_REASONS)}; and one sentence in "
-                            "abstention_detail saying what you considered."
-                        )),
-                        "message": "Abstention recorded without a reason"}
-            allowed = set(self.data.change_ids)
-            allowed_by_suffix = {item.removeprefix("change:"): item for item in allowed}
-            for index, candidate in enumerate(raw_candidates):
-                change_ids = [allowed_by_suffix.get(item, item)
-                              for item in candidate.get("change_ids") or []]
-                candidate["change_ids"] = change_ids
-                primary_change_id = allowed_by_suffix.get(
-                    candidate.get("primary_change_id"), candidate.get("primary_change_id"))
-                candidate["primary_change_id"] = primary_change_id
-                problems = []
-                if not change_ids:
-                    problems.append("change_ids is empty")
-                elif not set(change_ids).issubset(allowed):
-                    problems.append(f"unknown change_ids={sorted(set(change_ids) - allowed)}")
-                if primary_change_id not in change_ids:
-                    problems.append("primary_change_id must be one of change_ids")
-                expected_subject = self.data.primary_subjects_by_change.get(primary_change_id)
-                if candidate.get("primary_subject") != expected_subject:
-                    problems.append(f"primary_subject must equal {expected_subject!r}")
-                allowed_entities = set(self.data.entity_ids_by_change.get(primary_change_id, []))
-                primary_entity_id = candidate.get("primary_entity_id")
-                if allowed_entities and primary_entity_id not in allowed_entities:
-                    problems.append("primary_entity_id is not attached to primary_change_id")
-                if not allowed_entities and primary_entity_id is not None:
-                    problems.append("primary_entity_id must be null for a target without entities")
-                if not str(candidate.get("claim") or "").strip():
-                    problems.append("claim is empty")
-                if not str(candidate.get("requested_change") or "").strip():
-                    problems.append("requested_change is empty")
-                normalize_candidate_edit(
-                    candidate, self.data.changed_files, problems,
-                    self.data.paths_by_change,
-                )
-                self._annotate_candidate(candidate)
-                patch_problem = self._patch_set_error(candidate)
-                if patch_problem:
-                    problems.append(patch_problem)
-                extra = self._extra_candidate_error(candidate)
-                if extra:
-                    problems.append(extra)
-                if expected_subject and "/" not in expected_subject:
-                    short_subject = expected_subject.rsplit(".", 1)[-1]
-                    grounded_text = f"{candidate.get('claim', '')} {candidate.get('requested_change', '')}"
-                    if short_subject not in grounded_text:
-                        problems.append(f"claim/requested_change must name {short_subject!r}")
-                if problems:
-                    return {"evaluation_result": EvaluationResult(
-                        success=False, score=0.0,
-                        message=f"Candidate {index} is invalid: {'; '.join(problems)}. Fix and resubmit."),
-                        "message": "Invalid candidate submission"}
-            verification_artifacts = []
-            for index, candidate in enumerate(raw_candidates):
-                artifacts, verification_error = await self._verify_candidate_submission(
-                    index, candidate
-                )
-                if verification_error:
-                    return {"evaluation_result": EvaluationResult(
-                        success=False,
-                        score=0.0,
-                        message=(
-                            f"Candidate {index} failed verification-backed submission: "
-                            f"{verification_error}. Fix the edit or omit the candidate."
-                        ),
-                    ), "message": "Candidate verification failed"}
-                verification_artifacts.extend(artifacts)
-            result = self.create_result(
-                success=True, score=1.0, pr_number=self.data.pr_number,
-                work_unit_id=self.data.work_unit_id,
-                rendered_prompt_sha256=self.data.rendered_prompt_sha256,
-                candidates=raw_candidates,
-                verification_artifacts=verification_artifacts,
-                abstention=({"reason": abstention_reason or "unstated",
-                             "detail": (abstention_detail or "").strip()}
-                            if not raw_candidates else None),
-                findings=[], review_message="",
-            )
-            if self.termination_callback:
-                await self.termination_callback(result)
-            return {"evaluation_result": EvaluationResult(success=True, score=1.0,
+    async def _submit_candidates(
+        self, candidates, abstention_reason, abstention_detail,
+        target_verdicts: Optional[List[TargetVerdictSubmission]],
+    ) -> Dict[str, Any]:
+        """The one implementation behind both `submit_candidates` signatures."""
+
+        from ape.tasks.base import EvaluationResult
+
+        raw_candidates = [item.model_dump(mode="json") for item in candidates or []]
+        # Silence has to say which silence it is, or it cannot be read afterwards and
+        # cannot be aimed at. Refusing here rather than accepting a mute submission is
+        # the same treatment every other contract violation gets, and it costs one short
+        # round trip with no re-investigation.
+        #
+        # The wording carries real weight and is not decoration. An arm that reads this
+        # as pressure to produce something would destroy the one result this project has
+        # that nothing else replaces: 0 candidates per control PR, per rep. Abstention
+        # must stay exactly as cheap as submitting.
+        #
+        # Asked once, and once only. `termination_callback` fires on the success path
+        # alone, so an arm that keeps omitting the reason would never submit legally: it
+        # would burn its turns and be recorded as a failed job, and a failed *mandatory*
+        # job is a coverage gap. That would convert the cleanest outcome an arm has —
+        # looking properly and finding nothing — into a hole in the run, which is a far
+        # worse error than an unlabelled silence. So the second empty submission is
+        # accepted and labelled `unstated`, which the report already counts and shows.
+        # The diagnostic path. Press for a candidate rather than accept the abstention,
+        # a bounded number of times, and keep "pressed and still nothing" as its own
+        # outcome — collapsing it into `already_correct` would destroy the only signal
+        # that separates a high bar from an arm with nothing to say.
+        if (target_verdicts is None and not raw_candidates
+                and getattr(self.data, "forbid_abstention", False)):
+            self._forced_presses = getattr(self, "_forced_presses", 0) + 1
+            if self._forced_presses <= _FORCED_SUBMISSION_ATTEMPTS:
+                return {"evaluation_result": EvaluationResult(
+                    success=False, score=0.0,
                     message=(
-                        f"Recorded {len(raw_candidates)} candidates and "
-                        f"{len(verification_artifacts)} verification artifacts."
+                        "This run is not accepting abstentions: submit the single best "
+                        "candidate you considered, even if you judged it below your "
+                        "usual bar, and set model_confidence to reflect how weak it is. "
+                        "Say what you would flag if you had to flag exactly one thing. "
+                        f"(attempt {self._forced_presses} of "
+                        f"{_FORCED_SUBMISSION_ATTEMPTS})"
                     )),
-                    "message": "Candidates submitted"}
+                    "message": "Abstention not accepted in this run"}
+            abstention_reason = FORCED_EMPTY_REASON
+        if target_verdicts is None and not raw_candidates and abstention_reason is None:
+            self._mute_abstentions = getattr(self, "_mute_abstentions", 0) + 1
+            if self._mute_abstentions == 1:
+                return {"evaluation_result": EvaluationResult(
+                    success=False, score=0.0,
+                    message=(
+                        "Submitting nothing is a valid and expected outcome, and this is "
+                        "NOT a request to find something — do not add a candidate to "
+                        "satisfy it. Only the label is missing. Call submit_candidates "
+                        "again with the same empty list, plus abstention_reason set to "
+                        f"one of: {', '.join(ABSTENTION_REASONS)}; and one sentence in "
+                        "abstention_detail saying what you considered."
+                    )),
+                    "message": "Abstention recorded without a reason"}
+        allowed = set(self.data.change_ids)
+        allowed_by_suffix = {item.removeprefix("change:"): item for item in allowed}
+        for index, candidate in enumerate(raw_candidates):
+            change_ids = [allowed_by_suffix.get(item, item)
+                          for item in candidate.get("change_ids") or []]
+            candidate["change_ids"] = change_ids
+            primary_change_id = allowed_by_suffix.get(
+                candidate.get("primary_change_id"), candidate.get("primary_change_id"))
+            candidate["primary_change_id"] = primary_change_id
+            problems = []
+            if not change_ids:
+                problems.append("change_ids is empty")
+            elif not set(change_ids).issubset(allowed):
+                problems.append(f"unknown change_ids={sorted(set(change_ids) - allowed)}")
+            if primary_change_id not in change_ids:
+                problems.append("primary_change_id must be one of change_ids")
+            expected_subject = self.data.primary_subjects_by_change.get(primary_change_id)
+            if candidate.get("primary_subject") != expected_subject:
+                problems.append(f"primary_subject must equal {expected_subject!r}")
+            allowed_entities = set(self.data.entity_ids_by_change.get(primary_change_id, []))
+            primary_entity_id = candidate.get("primary_entity_id")
+            if allowed_entities and primary_entity_id not in allowed_entities:
+                problems.append("primary_entity_id is not attached to primary_change_id")
+            if not allowed_entities and primary_entity_id is not None:
+                problems.append("primary_entity_id must be null for a target without entities")
+            if not str(candidate.get("claim") or "").strip():
+                problems.append("claim is empty")
+            if not str(candidate.get("requested_change") or "").strip():
+                problems.append("requested_change is empty")
+            normalize_candidate_edit(
+                candidate, self.data.changed_files, problems,
+                self.data.paths_by_change,
+            )
+            self._annotate_candidate(candidate)
+            patch_problem = self._patch_set_error(candidate)
+            if patch_problem:
+                problems.append(patch_problem)
+            extra = self._extra_candidate_error(candidate)
+            if extra:
+                problems.append(extra)
+            if expected_subject and "/" not in expected_subject:
+                short_subject = expected_subject.rsplit(".", 1)[-1]
+                grounded_text = f"{candidate.get('claim', '')} {candidate.get('requested_change', '')}"
+                if short_subject not in grounded_text:
+                    problems.append(f"claim/requested_change must name {short_subject!r}")
+            if problems:
+                return {"evaluation_result": EvaluationResult(
+                    success=False, score=0.0,
+                    message=f"Candidate {index} is invalid: {'; '.join(problems)}. Fix and resubmit."),
+                    "message": "Invalid candidate submission"}
+        verdicts = None
+        if target_verdicts is not None:
+            verdicts, refusal = self._check_target_verdicts(
+                target_verdicts, raw_candidates, allowed_by_suffix)
+            if refusal is not None:
+                return {"evaluation_result": EvaluationResult(
+                    success=False, score=0.0, message=refusal),
+                    "message": "Invalid target verdicts"}
+        verification_artifacts = []
+        for index, candidate in enumerate(raw_candidates):
+            artifacts, verification_error = await self._verify_candidate_submission(
+                index, candidate
+            )
+            if verification_error:
+                return {"evaluation_result": EvaluationResult(
+                    success=False,
+                    score=0.0,
+                    message=(
+                        f"Candidate {index} failed verification-backed submission: "
+                        f"{verification_error}. Fix the edit or omit the candidate."
+                    ),
+                ), "message": "Candidate verification failed"}
+            verification_artifacts.extend(artifacts)
+        result = self.create_result(
+            success=True, score=1.0, pr_number=self.data.pr_number,
+            work_unit_id=self.data.work_unit_id,
+            rendered_prompt_sha256=self.data.rendered_prompt_sha256,
+            candidates=raw_candidates,
+            verification_artifacts=verification_artifacts,
+            abstention=(None if raw_candidates else
+                        self._verdict_abstention(verdicts) if verdicts is not None else
+                        {"reason": abstention_reason or "unstated",
+                         "detail": (abstention_detail or "").strip()}),
+            target_verdicts=verdicts,
+            findings=[], review_message="",
+        )
+        if self.termination_callback:
+            await self.termination_callback(result)
+        return {"evaluation_result": EvaluationResult(success=True, score=1.0,
+                message=(
+                    f"Recorded {len(raw_candidates)} candidates and "
+                    f"{len(verification_artifacts)} verification artifacts."
+                )),
+                "message": "Candidates submitted"}
 
 
 register_task("lean_pr_review_v4_candidates", LeanPRReviewV4CandidateTask)

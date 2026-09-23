@@ -393,3 +393,145 @@ def test_the_relaxed_policy_is_not_a_request_for_findings():
     labelled = asyncio.run(submit(candidates=[], abstention_reason="already_correct",
                                   abstention_detail="checked the three names against the corpus"))
     assert labelled["evaluation_result"].success is True
+
+
+# --- a verdict on every target ----------------------------------------------------------------
+#
+# `target_verdicts` replaces the job-level abstention with one verdict per review target:
+# `issue` (backed by a candidate), `no_issue` or `cannot_determine`, each with its reason. It is
+# not forcing -- `no_issue` is legal -- and it lives entirely in the submission tool, so the
+# default tool must stay exactly as it was for every run that does not ask for it.
+
+from ape.tasks.lean_tasks.formal_math.review.candidates import (  # noqa: E402
+    TargetVerdictSubmission, UNSTATED_VERDICT, VERDICTS_ABSTENTION_REASON,
+)
+
+
+def _verdict_task(**overrides):
+    """A two-target job under the verdict contract, and the result it records."""
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    data = dict(
+        target_verdicts=True, submission_verification_policy="verify_edits_if_present",
+        change_ids=["change:a", "change:b"],
+        entity_ids_by_change={"change:a": ["entity:1"], "change:b": []},
+        primary_subjects_by_change={"change:a": "Foo.bar", "change:b": "Foo.baz"},
+        paths_by_change={"change:a": "Mathlib/A.lean", "change:b": "Mathlib/A.lean"},
+    )
+    data.update(overrides)
+    task = ReviewArmTask(_data(**data), ApeAgentConfig())
+    recorded = []
+
+    async def keep(result):
+        recorded.append(result)
+
+    task.termination_callback = keep
+    mcp = FakeMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    return mcp.tools["submit_candidates"], recorded
+
+
+def _verdict(change_id, verdict, reason="checked the statement against its neighbours"):
+    return TargetVerdictSubmission(change_id=change_id, verdict=verdict, reason=reason)
+
+
+def test_the_default_tool_is_unchanged_when_verdicts_are_off():
+    """Every run that does not ask for verdicts must see the tool it has always seen: same
+    parameters, same order, no verdict field. A schema change here would move what every arm
+    in every comparison run was shown."""
+
+    import inspect
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    task = ReviewArmTask(_data(), ApeAgentConfig())
+    mcp = FakeMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    params = list(inspect.signature(mcp.tools["submit_candidates"]).parameters)
+    assert params == ["candidates", "abstention_reason", "abstention_detail"]
+
+    verdict_submit, _ = _verdict_task()
+    assert list(inspect.signature(verdict_submit).parameters) == ["target_verdicts", "candidates"]
+
+
+def test_all_no_issue_is_a_legal_answer_and_says_why():
+    """Not forcing: an arm that checked every target and found nothing submits no candidates,
+    and the record keeps a reason per target instead of one sentence for the job."""
+
+    submit, recorded = _verdict_task()
+    result = asyncio.run(submit(target_verdicts=[
+        _verdict("change:a", "no_issue"),
+        _verdict("change:b", "cannot_determine", "needed the base file, which I could not read")]))
+    assert result["evaluation_result"].success is True
+    (row,) = recorded
+    assert row.candidates == []
+    assert [v["verdict"] for v in row.target_verdicts] == ["no_issue", "cannot_determine"]
+    assert row.abstention["reason"] == VERDICTS_ABSTENTION_REASON
+    assert "1 no_issue" in row.abstention["detail"] and "1 cannot_determine" in row.abstention["detail"]
+
+
+def test_an_issue_is_a_candidate_and_a_candidate_is_an_issue():
+    submit, recorded = _verdict_task()
+    ok = asyncio.run(submit(
+        target_verdicts=[_verdict("change:a", "issue"), _verdict("change:b", "no_issue")],
+        candidates=[_candidate(proposed_edit=None)]))
+    assert ok["evaluation_result"].success is True
+    assert recorded[0].abstention is None
+    assert recorded[0].target_verdicts[0] == {
+        "change_id": "change:a", "verdict": "issue",
+        "reason": "checked the statement against its neighbours"}
+
+    submit, _ = _verdict_task()
+    unbacked = asyncio.run(submit(
+        target_verdicts=[_verdict("change:a", "issue"), _verdict("change:b", "no_issue")]))
+    assert unbacked["evaluation_result"].success is False
+    assert "no candidate names it" in _message(unbacked)
+
+    submit, _ = _verdict_task()
+    contradicted = asyncio.run(submit(
+        target_verdicts=[_verdict("change:a", "no_issue"), _verdict("change:b", "no_issue")],
+        candidates=[_candidate(proposed_edit=None)]))
+    assert contradicted["evaluation_result"].success is False
+    assert "whose verdict is 'no_issue'" in _message(contradicted)
+
+
+def test_a_verdict_outside_the_job_or_without_a_reason_is_refused():
+    submit, _ = _verdict_task()
+    stray = asyncio.run(submit(target_verdicts=[
+        _verdict("change:a", "no_issue"), _verdict("change:b", "no_issue"),
+        _verdict("change:z", "no_issue")]))
+    assert "not one of this job's review targets" in _message(stray)
+
+    submit, _ = _verdict_task()
+    mute = asyncio.run(submit(target_verdicts=[
+        _verdict("change:a", "no_issue", reason="  "), _verdict("change:b", "no_issue")]))
+    assert "empty reason" in _message(mute)
+
+
+def test_a_missing_target_is_pressed_then_recorded_as_unstated_never_as_no_issue():
+    """Bounded, so an arm that answers most targets cannot be turned into a failed job -- a
+    coverage gap -- by one it keeps leaving out; and recorded under a system value so
+    "never answered" is not mistaken for "checked and fine"."""
+
+    submit, recorded = _verdict_task()
+    partial = [_verdict("change:a", "no_issue")]
+    for _ in range(3):
+        refused = asyncio.run(submit(target_verdicts=partial))
+        assert refused["evaluation_result"].success is False
+        assert "Missing: change:b" in _message(refused)
+    accepted = asyncio.run(submit(target_verdicts=partial))
+    assert accepted["evaluation_result"].success is True
+    assert recorded[0].target_verdicts[1] == {
+        "change_id": "change:b", "verdict": UNSTATED_VERDICT, "reason": ""}
+
+
+def test_verdicts_do_not_bring_back_the_abstention_refusals():
+    """Under verdicts there is no job-level abstention to label and nothing to press for: the
+    mute-abstention and forced paths belong to the default contract only."""
+
+    submit, recorded = _verdict_task(forbid_abstention=True)
+    result = asyncio.run(submit(target_verdicts=[
+        _verdict("change:a", "no_issue"), _verdict("change:b", "no_issue")]))
+    assert result["evaluation_result"].success is True
+    assert recorded[0].candidates == []

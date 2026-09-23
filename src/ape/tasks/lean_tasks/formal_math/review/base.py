@@ -110,6 +110,15 @@ class BasePRReviewData(BaseLeanTaskData):
     #: coverage gap — the failure d06a144 fixed for the ordinary path.
     forbid_abstention: bool = Field(default=False)
 
+    #: A verdict on every review target instead of one abstention for the whole job:
+    #: `issue` (backed by a candidate), `no_issue` or `cannot_determine`, each with its reason.
+    #: Not forcing -- `no_issue` is a legal answer, so an empty candidate list stays as cheap as
+    #: it was -- but no target can pass unexamined and no silence goes unexplained. The contract
+    #: lives entirely in the `submit_candidates` tool, so the rendered prompt, and with it every
+    #: prompt identity, is unchanged: a run with this on differs from one without in the
+    #: submission tool and nothing else. `docs/plans/2026-09-23-work-enumeration.md`.
+    target_verdicts: bool = Field(default=False)
+
     pr_number: int = Field(..., description="GitHub PR number")
     pr_title: str = Field(default="", description="PR title (model-visible, cleaned)")
     pr_description: str = Field(default="", description="PR description (model-visible, cleaned)")
