@@ -2,9 +2,18 @@
 # the ELM gateway; used to shake out the verdict contract (every target answered, tool calls
 # conforming, `repaired_argument_count` watched) and to measure tokens per job before any paid
 # rep. `reasoning_effort: none` is the load-bearing line, as in pr_review_v5_smoke4_qwen.yaml.
-# Token caps are the gpt_5.2 twins unchanged: the prompts are byte-identical and only the
-# completion moves.
+#
+# Token ceilings at 2x the gpt_5.2 twins, the ratio 7aec9a2 measured for this model (Qwen arms
+# ran a median ~180k processed tokens, and the inherited ceiling paused one in nine). The first
+# shakeout inherited 204,000 unchanged and paused a job at 214,223 tokens after 13 turns, which is
+# that measurement reproduced, not the contract. The lead-only ceilings are doubled too, as
+# 7aec9a2 did, so the two denominations keep authorising the same work.
 extends: pr_review_v5_verdicts_fanout4.yaml
 llm_config:
   model_name: elm_qwen_3.5
   reasoning_effort: none
+dataset:
+  standard_budget_tokens: 408000
+  per_pr_token_cap: 3600000
+  lead_token_cap: 2400000
+  run_total_token_cap: 60000000
