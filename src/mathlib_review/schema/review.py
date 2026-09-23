@@ -271,6 +271,12 @@ class ArmResponse(StrictModel):
     abstention: Optional[Dict[str, Any]] = None
     #: `None` for the solo baseline, which is never handed a rendered work-unit prompt.
     rendered_prompt_sha256: Optional[str] = None
+    #: One `{change_id, verdict, reason}` per review target when the run asked for verdicts
+    #: (`target_verdicts`), else None. The per-target form of `abstention`: `no_issue` and
+    #: `cannot_determine` rows are what a silence at a given target was, and they are the belief
+    #: state a scheduler would read. Last, and null when absent, so rows written before it load
+    #: unchanged apart from the key arriving.
+    target_verdicts: Optional[List[Dict[str, Any]]] = None
 
     def row(self) -> Dict[str, Any]:
         """The JSONL row. Every field, always -- an optional field omitted rather than null

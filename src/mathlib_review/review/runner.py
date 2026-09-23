@@ -509,6 +509,7 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
                 verification_artifacts=raw.get("verification_artifacts") or [],
                 abstention=raw.get("abstention"),
                 rendered_prompt_sha256=raw.get("rendered_prompt_sha256"),
+                target_verdicts=raw.get("target_verdicts"),
             ).row())
     return responses
 

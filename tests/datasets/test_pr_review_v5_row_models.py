@@ -56,9 +56,14 @@ def test_every_delegation_row_in_the_tree_round_trips_byte_for_byte():
     assert len(shapes) >= 3, f"only {len(shapes)} shapes seen; this tree is missing runs"
 
 
+#: Fields added to `ArmResponse` after rows were committed, oldest first. A committed row that
+#: predates one gains it as null on the way back: the field arriving, not a drift.
+_ARRIVED_LATER = ("abstention", "target_verdicts")
+
+
 def test_every_arm_response_written_by_current_code_round_trips():
-    """Rows that predate `abstention` gain it as null, which is the field arriving and not a
-    drift. Everything from the current builders is unchanged."""
+    """Rows that predate a field in `_ARRIVED_LATER` gain it as null, which is the field
+    arriving and not a drift. Everything else round-trips unchanged."""
 
     rows = list(_rows("arm_responses.jsonl"))
     if not rows:
@@ -73,11 +78,14 @@ def test_every_arm_response_written_by_current_code_round_trips():
             orphan += 1
             continue
         rebuilt = ArmResponse.model_validate(row).row()
-        if set(row) == set(rebuilt):
-            assert rebuilt == row
+        arrived = set(rebuilt) - set(row)
+        assert arrived <= set(_ARRIVED_LATER), arrived
+        assert all(rebuilt[key] is None for key in arrived)
+        assert {key: rebuilt[key] for key in row} == row
+        # "Current" is a row that already carries `abstention`: every builder since then.
+        if "abstention" in row:
             current += 1
         else:
-            assert set(rebuilt) - set(row) == {"abstention"}
             older += 1
     assert current > 0 and older > 0, (current, older)
     assert orphan <= 1, orphan
@@ -123,3 +131,28 @@ def test_no_module_writes_a_delegation_row_by_hand():
         assert '"schema_version": "v5-delegation1"' not in source, (
             f"{module.__name__} writes the ledger's schema version as a literal again; "
             f"construct `DelegationRecord`, which is the one place it is spelled")
+
+
+def test_target_verdicts_reach_the_arm_response_row():
+    """Asserted at the far end, not the near one: a verdict the arm recorded must still be on
+    the row `finalize` reads after the direct-arm runner has normalised the result. A field the
+    task records and a later hop does not name is dropped with the suite green -- the failure
+    `abstention` had in one of three writers."""
+
+    from types import SimpleNamespace
+
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmResult
+    from src.mathlib_review.review.runner import _responses_from_results
+
+    verdicts = [{"change_id": "change:a", "verdict": "no_issue", "reason": "checked it"}]
+    result = ReviewArmResult(
+        task_id="pr5_test", task_type="lean_pr_review_v5_arm", global_index="0",
+        success=True, score=1.0, pr_number=33098, work_unit_id="wu:abc",
+        rendered_prompt_sha256="a" * 64, candidates=[], verification_artifacts=[],
+        findings=[], review_message="", invocation_id="wu:abc#naming", arm_id="naming",
+        spec_id="naming", abstention={"reason": "per_target_verdicts", "detail": "1 no_issue"},
+        target_verdicts=verdicts,
+    )
+    (row,) = _responses_from_results(SimpleNamespace(task_results=[result]), mode="fanout")
+    assert row["target_verdicts"] == verdicts
+    assert ArmResponse.model_validate(row).row() == row

@@ -152,6 +152,9 @@ class JobOutcome:
     #: this dataclass is a closed list between the child result and the response row: a field
     #: the tool records and this does not declare is dropped silently, with the suite green.
     abstention: Optional[Dict[str, str]] = None
+    #: One verdict per review target under `target_verdicts`, else None. Declared here for the
+    #: reason `abstention` is: this dataclass drops what it does not name.
+    target_verdicts: Optional[List[Dict[str, Any]]] = None
     result_sha256: Optional[str] = None
     #: sha256 of the user prompt as delivered, including any brief. Differs from the sealed
     #: `rendered_prompt_sha256` exactly when a brief was attached.
@@ -195,6 +198,7 @@ class JobOutcome:
             candidates=candidates,
             verification_artifacts=artifacts,
             abstention=getattr(result, "abstention", None),
+            target_verdicts=getattr(result, "target_verdicts", None),
             result_sha256=_digest(candidates) if candidates else None,
             delivered_prompt_sha256=delivered_prompt_sha256,
             # Say why. "no terminal submission" was recorded for a job that had actually

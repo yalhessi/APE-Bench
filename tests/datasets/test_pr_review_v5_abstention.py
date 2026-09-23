@@ -140,6 +140,8 @@ def test_the_reason_survives_into_the_result_model():
 ARM_RESPONSE_KEYS = {
     "invocation_id", "arm_id", "work_unit_id", "spec_id", "pr_number", "status",
     "candidates", "verification_artifacts", "abstention", "rendered_prompt_sha256",
+    # 2026-09-23: the per-target form of `abstention`, null unless the run asked for verdicts.
+    "target_verdicts",
 }
 
 
@@ -179,6 +181,7 @@ def test_every_builder_emits_exactly_those_keys():
                            status="success", rendered_prompt_sha256=None).row()
     assert set(lead_row) == set(solo_row) == ARM_RESPONSE_KEYS
     assert solo_row["rendered_prompt_sha256"] is None and solo_row["abstention"] is None
+    assert solo_row["target_verdicts"] is None
 
 
 def test_a_response_with_no_identity_is_refused():

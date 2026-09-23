@@ -27,6 +27,7 @@ from ape.orchestration.subtasks import DEFAULT_NESTED_CONCURRENCY, nested_config
 from ape.tasks.lean_tasks.formal_math.review.delegation import (
     TIER_MULTIPLIERS,
     WAVE_EXECUTION,
+    JobOutcome,
     JobSpec,
     ledger_status,
     run_jobs,
@@ -527,3 +528,24 @@ def test_the_index_is_recorded_before_attribution_and_cannot_raise():
     source = inspect.getsource(execution_index.record)
     assert source.count("except Exception") >= 2, (
         "record must not be able to raise into the caller that paid for the work")
+
+
+def test_a_jobs_target_verdicts_survive_into_its_outcome():
+    """`JobOutcome` is a closed list between the child's result and the lead's response row, and
+    a field it does not declare is dropped with the suite green. The result here is the real
+    `ReviewArmResult`, so the test cannot agree with a shape the arm does not produce."""
+
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmResult
+
+    verdicts = [{"change_id": "change:a", "verdict": "cannot_determine",
+                 "reason": "needed the base file"}]
+    child = _child(ExecutionStatus.SUCCESS, succeeded=True)
+    child = child.model_copy(update={"result": ReviewArmResult(
+        task_id="t", task_type="lean_pr_review_v5_arm", global_index="0", success=True,
+        score=1.0, pr_number=1, work_unit_id="wu:a", rendered_prompt_sha256="a" * 64,
+        candidates=[], verification_artifacts=[], findings=[], review_message="",
+        abstention={"reason": "per_target_verdicts", "detail": "1 cannot_determine"},
+        target_verdicts=verdicts)})
+    outcome = JobOutcome.from_run(JobSpec("wu:a#naming", "naming", "wu:a", 1, payload={}),
+                                  child, elapsed=1.0, delivered_prompt_sha256="b" * 64)
+    assert outcome.target_verdicts == verdicts

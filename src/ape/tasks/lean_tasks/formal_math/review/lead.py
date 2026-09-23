@@ -901,6 +901,7 @@ class ReviewLeadTask(BasePRReviewTask):
                 verification_artifacts=outcome.verification_artifacts,
                 abstention=outcome.abstention,
                 rendered_prompt_sha256=spec.payload.get("rendered_prompt_sha256"),
+                target_verdicts=outcome.target_verdicts,
             ).row())
 
         # A mandatory job that RAN and failed is a coverage gap too. The check below only asks
