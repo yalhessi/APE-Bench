@@ -451,3 +451,28 @@ its directories were removed so nothing can resume onto a stopped run:
 So the contract is exercised end to end on a real reviewed workspace; the hop into
 `arm_responses.jsonl` is pinned by the far-end tests in `614731c`. The gpt_5.2 reps go ahead:
 treatment rep 1, control rep 1, a read of both, then reps 2–3 of each, one run at a time.
+
+## Decision, 2026-09-23 (the pilot, stopped; the real reps renamed)
+
+`pr5_V_verdicts_fanout4_rep1` ran 41 of 140 jobs (~$1.83 billed) and was stopped at the user's
+choice after a manual read of the finished jobs. It is a **pilot: never scored, never resumed**;
+its directories stay on disk as the record of what the read saw. The real reps are named
+`pr5_V2_verdicts_fanout4_rep{1,2,3}` and `pr5_V2_verdicts_fanout4_control_rep{1,2,3}`.
+
+What the read found. The contract itself behaved: 112 of 112 targets shown were answered, no
+consistency refusal fired, the control PR drew 7 `no_issue` with specific reasons, and reasons ran
+a median 216 characters naming what was checked. `naming` filed the maintainer's exact 33145
+renames in two jobs, and `proof_idiom` and `api_reuse` both filed the `OrderDual` derivation.
+Two defects were fixed before the real reps (`451eaa8`, `2adf53b`):
+
+1. a per-job token cap in the calibrated ratio paused 2 of 41 jobs that had billed $0.07 and
+   $0.11, deleting their answers -- the token cap now sits above the dollar cap;
+2. a refused edit under `verify_edits_if_present` was answered "fix the edit or omit the
+   candidate", so a `correctness` arm with a real duplicate on 33421 repaired a patch until its
+   budget ran out -- the refusal now says the ask can be filed without the edit.
+
+Recorded, not changed, because neither moves recall: `cannot_determine` was never chosen, even
+where `naming_norm` returned `subject_unresolved` (the arm said `no_issue`), which matters for the
+scheduler's belief state and for the miss decomposition's evidence-gap layer; and advisory
+micro-nits appeared (`.mpr` -> `.2`, `(K := K)`, a blank line between aliases), which the control
+comparison will size.
