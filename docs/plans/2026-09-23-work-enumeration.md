@@ -400,3 +400,23 @@ re-derived from committed artifacts by a read-only join that reproduces the spin
    submission contract" contradicts `solo.py`; its obligation prefix `7fef9136` should be `7fef913e`.
    The untracked `docs/ai4math-convening.md` §8 says the reviewer sees the complete PR diff, which the
    code contradicts. That file belongs to another session and is not edited here.
+
+## Decision, 2026-09-23 (after Phase 0; the plan above is kept as approved)
+
+Phase 0 (`docs/research/the-question-is-already-asked-2026-09.md`) found the current briefs already
+ask 17 of the 23 held-out questions — seven only in text written after earlier runs on these PRs —
+and located the losses: of 42 obligation-reps missed where a brief asks the question, the arm
+holding it was **pruned in 25** and **ran and was silent in 15**. The user chose to resequence:
+
+1. **Contract first.** Build the per-target verdict (Phase 2, step 3) as a run knob that any arm
+   can take, and run it with the **current briefs**: `routing_mode: fanout`, `generalist_floor:
+   false`, `submission_verification_policy: verify_edits_if_present`, the same four PRs. Qwen
+   shakeout, then gpt_5.2 × 3 at ~$5/rep billed (fanout's $5.07). Read against fanout (same briefs,
+   may abstain) and forced fanout (same briefs, must file) — the contract is the only difference
+   from both, which isolates it.
+2. **List second.** Then the corpus-derived question list (Phase 1) and its ceiling as the
+   out-of-sample condition, within the ≤ $25/rep cap.
+3. **The Phase 1 gate** keeps its ≥ 80% coverage clause and **drops** "strictly above the current
+   briefs": an out-of-sample list cannot be required to beat an in-sample one on the sample.
+
+Outcome bands and the control guard of Phase 4 apply to the contract ceiling unchanged.
