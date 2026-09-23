@@ -90,3 +90,23 @@ def test_the_variant_name_reaches_the_renderer_version():
     assert renderer_version_for("baseline") == FOCUSED_RENDERER_VERSION
     assert renderer_version_for() == FOCUSED_RENDERER_VERSION
     assert renderer_version_for("rung3a") == f"{FOCUSED_RENDERER_VERSION}+rung3a"
+
+
+def test_the_contract_knobs_reach_the_renderer_version_and_leave_the_base_alone():
+    """With both knobs off the text is `/4`'s, so the version is too -- which is what keeps a
+    sealed control agenda's `renderer_version` from moving. On, the version names the text that
+    rendered, knobs first, variant last."""
+
+    from src.mathlib_review.agenda.render_focused import renderer_version_for
+
+    assert renderer_version_for(submission_verification_policy=None) == FOCUSED_RENDERER_VERSION
+    assert renderer_version_for(
+        submission_verification_policy="verify_checkable_edits") == FOCUSED_RENDERER_VERSION
+    assert renderer_version_for(submission_verification_policy="verify_edits_if_present") == (
+        f"{FOCUSED_RENDERER_VERSION}+ask_without_fix")
+    assert renderer_version_for(target_verdicts=True) == (
+        f"{FOCUSED_RENDERER_VERSION}+target_verdicts")
+    assert renderer_version_for(
+        "rung3a", submission_verification_policy="verify_edits_if_present",
+        target_verdicts=True) == (
+        f"{FOCUSED_RENDERER_VERSION}+ask_without_fix+target_verdicts+rung3a")

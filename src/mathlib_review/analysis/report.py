@@ -261,7 +261,8 @@ def contamination(release: Path) -> Dict[str, Any]:
 
     from src.mathlib_review.release.contracts import prompt_leaks
     from src.mathlib_review.agenda.render_focused import (
-        SUBMISSION_CONTRACT, focused_system_prompt,
+        ASK_WITHOUT_FIX_CLAUSE, SUBMISSION_CONTRACT, TARGET_SECTIONS,
+        VERDICTS_ABSTENTION_PARAGRAPH, focused_system_prompt,
     )
     from src.mathlib_review.agenda.arms import specs_by_arm_id
 
@@ -274,9 +275,16 @@ def contamination(release: Path) -> Dict[str, Any]:
                     if obligation.get(field):
                         gold.append(str(obligation[field]))
 
-    instructions = {"submission_contract": SUBMISSION_CONTRACT}
+    instructions = {"submission_contract": SUBMISSION_CONTRACT,
+                    "ask_without_fix_clause": ASK_WITHOUT_FIX_CLAUSE,
+                    "verdicts_abstention_paragraph": VERDICTS_ABSTENTION_PARAGRAPH,
+                    "target_sections": TARGET_SECTIONS}
     for arm, spec in specs_by_arm_id().items():
         instructions[arm] = focused_system_prompt(spec)
+        # And what the two contract knobs render, which a default render never shows.
+        instructions[f"{arm}+contract"] = focused_system_prompt(
+            spec, submission_verification_policy="verify_edits_if_present",
+            target_verdicts=True)
     leaks = {name: found for name, found in
              ((name, prompt_leaks(text, gold)) for name, text in sorted(instructions.items()))
              if found}

@@ -26,7 +26,10 @@ import pytest
 from src.mathlib_review.release.contracts import (
     GoldLeakError, assert_prompts_gold_free, prompt_leaks,
 )
-from src.mathlib_review.agenda.render_focused import SUBMISSION_CONTRACT, focused_system_prompt
+from src.mathlib_review.agenda.render_focused import (
+    ASK_WITHOUT_FIX_CLAUSE, SUBMISSION_CONTRACT, TARGET_SECTIONS, VERDICTS_ABSTENTION_PARAGRAPH,
+    focused_system_prompt,
+)
 from src.mathlib_review.agenda.arms import specs_by_arm_id
 
 RELEASES = Path("inputs/pr_review_v4/releases")
@@ -62,8 +65,12 @@ def test_no_arm_instruction_quotes_gold():
     gold = all_gold()
     if not gold:
         pytest.skip("no gold available in this checkout")
+    # Both contracts an arm can be sent: the default, and the one both knobs render.
     offenders = {
         arm: prompt_leaks(focused_system_prompt(spec), gold)
+        + prompt_leaks(focused_system_prompt(
+            spec, submission_verification_policy="verify_edits_if_present",
+            target_verdicts=True), gold)
         for arm, spec in specs_by_arm_id().items()
     }
     offenders = {arm: found for arm, found in offenders.items() if found}
@@ -78,6 +85,8 @@ def test_the_submission_contract_quotes_no_gold():
     if not gold:
         pytest.skip("no gold available in this checkout")
     assert not prompt_leaks(SUBMISSION_CONTRACT, gold)
+    for text in (ASK_WITHOUT_FIX_CLAUSE, VERDICTS_ABSTENTION_PARAGRAPH, TARGET_SECTIONS):
+        assert not prompt_leaks(text, gold)
 
 
 def test_the_lead_instructions_quote_no_gold():

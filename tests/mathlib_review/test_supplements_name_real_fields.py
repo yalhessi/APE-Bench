@@ -73,3 +73,38 @@ def test_a_rejection_cannot_be_recorded_without_a_reason():
     RejectedAlternative(replacement="by grind [foo]", compiled=True, why_not="chose simpa")
     with pytest.raises(pydantic.ValidationError):
         RejectedAlternative(replacement="by grind [foo]", compiled=True)
+
+
+def test_the_verdict_contract_directs_output_only_to_fields_the_tool_has():
+    """The same guard over the contract the two knobs render. It points at `target_verdicts`,
+    `requested_change` and `suggested_fix`; a phantom there would be the `rationale` mistake again,
+    in the one text every arm reads last. And it must never send the arm to `abstention_reason`
+    or `abstention_detail`, which the verdict tool does not have -- the unchanged `/4` paragraph
+    did exactly that on the one paid run that used the verdict tool."""
+
+    import asyncio
+    import inspect
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from ape.tasks.lean_tasks.formal_math.review.arm import ReviewArmTask
+    from ape.tasks.lean_tasks.formal_math.review.candidates import TargetVerdictSubmission
+    from src.mathlib_review.agenda.arms import specs_by_arm_id
+    from src.mathlib_review.agenda.render_focused import focused_system_prompt
+    from tests.datasets.test_pr_review_v5_arm import FakeMCP, _data
+
+    task = ReviewArmTask(_data(target_verdicts=True), ApeAgentConfig())
+    mcp = FakeMCP()
+    asyncio.run(task.register_task_tools(mcp))
+    tool_args = set(inspect.signature(mcp.tools["submit_candidates"]).parameters)
+    assert "target_verdicts" in tool_args and "abstention_reason" not in tool_args
+    writable = WRITABLE | tool_args | set(TargetVerdictSubmission.model_fields)
+
+    for arm, spec in specs_by_arm_id().items():
+        contract = focused_system_prompt(
+            spec, submission_verification_policy="verify_edits_if_present",
+            target_verdicts=True).split("# Submission contract for this run")[1]
+        directed = re.findall(r"(?:in|into) `([a-z_]+)`", contract)
+        assert "target_verdicts" in directed, arm
+        for name in directed:
+            assert name in writable, (arm, name)
+        assert "abstention_reason" not in contract and "abstention_detail" not in contract, arm
