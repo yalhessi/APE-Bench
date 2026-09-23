@@ -135,3 +135,49 @@ vocabulary mismatch with the gold labels rather than an arm failure.
 The `dead-ends.md` 33337 clause says `naming_norm` returned `insufficient_evidence` and that the
 obligation "was never hit by any condition". Both are false, and the true version is a *stronger*
 case for the same conclusion. See [record-corrections.md](record-corrections.md).
+
+## 2026-09-23: four specialist levers measured after the unified contract, and what each can reach
+
+A read-only survey (four assessors, two adversarial verifiers) over every judged v5 run on disk, after
+`pr5_V3_contract_fanout4_rep1` (3 / 10). **At every one of V3's seven misses an on-concern arm ran and
+answered with a considered verdict; no lever below reaches more than one or two obligations on the sets we
+can measure, all in-sample, below the judge's ±12 pp at n = 10.**
+
+- **Design-move questions** (introduce a lemma for a repeated argument; generalize a constant). Reach: two
+  obligations, both on 33421 (38e72250, 55f65304). Both questions are *already* in `family_design`'s brief as
+  sent (11 / 11 jobs in V3), which filed neither; at 55f65304 it considered generalizing beyond `2` and
+  declined, twice, and forcing did not produce either move. The question text is present; the judgement is
+  what fails. Of the four "design-scale" misses, 8d887ce4 is a rename judged against mis-extracted gold and
+  e8e02821 a golf-remit restructure. `generality`'s prompt excludes parameterizing a constant (one in-sample
+  obligation).
+- **Compound asks** (one candidate spanning several targets). The tool and the judge already accept it. 10 of
+  40 obligations have several change_ids (7 genuinely several declarations); 129 of 3,683 candidates ever
+  spanned targets, none covering both targets of any compound obligation it could win. The naming arm split
+  e83e6544 in 15 of 15 sessions, 13 of which never saw the new per-target text, so the split is the model's own
+  decomposition, not the contract's; and the gold's third part (reprove via `OrderDual`) is outside naming's
+  remit and draws 0 / 3 when proof_idiom files it. Reach: one obligation, already hit in 10 of those 15 runs.
+  The free first test is judge-side: merge each run's two naming halves into one candidate and judge it (cents);
+  majority in <= 2 of the 4 missing runs means the lever is dead for recall whatever the arm does.
+- **Naming evidence.** Porting `arm-naming-bar`'s three fixes changes 0 of 6 gold-site verdicts (precision
+  only: 29 of 183 queries answered about a different declaration). The real defect: at both missed naming
+  sites the arm quotes the tool's over-claim -- "does not back a rename. Submit nothing on naming" after
+  measuring only the prefix (round_eq' `round` 22 / 23), and a 39% `→ₗ` coercion bucket read as a convention
+  (d2466bcc `coe_` 48 / 124). Fix: resolve an ascription to its coercion function (or report the mixed bucket
+  unresolved) and scope the counted verdict to the prefix, in tool *and* prompt. Test with `cli bench` on
+  33337 / 33421 / 33315 under the V3 knobs, ~$1-2; the null (three V runs) is on disk. Reach 0-2, in-sample;
+  the d2466bcc positive is near-tautological (the naming prompt quotes that site's counts). Precision exposure
+  is real: where the tool does not say "submit nothing", the arm de-primes non-gold names (comp_fract'' in 3 of
+  3 runs). Suffix and dot-notation censuses fail on free recounts (3,694 of 5,029 primed-with-sibling lemmas
+  state a different conclusion; dot notation 28.9%, population 6 at 33294).
+- **The roster.** A cost lever, not a recall lever. In fanout, removal is a pure subtraction: dropping style,
+  docs, generality, proof_idiom and family_design loses no hit at any vote threshold in 8 runs and halves
+  four-PR arm spend (V3 $5.60 -> $2.75; 140 jobs -> 55) -- in-sample by construction, so say only "no hit lost
+  on these runs", never "as good", and never justify it by control emission (that is selection). The one
+  roster move that could add a hit is an `api_reuse` floor (57bcc9fd, its only sole-finder hit on record):
+  replay its two recorded 33117 sessions whole, ~$0.40, reading rule in the survey. Do not retire `docs`: it
+  has never run at its one counted on-concern obligation.
+
+What this says about where specialist improvement is bounded: by judgement at the right site, which the
+parked reasoning test (`reasoning-in-the-arms.md`) is the only lever on, and by measurement -- the burned
+4-PR and 12-PR sets cannot resolve a one- or two-obligation effect, which the 46-PR unseen window
+(`eval-unseen-window.md`, one flip = 1.7 pp) can.

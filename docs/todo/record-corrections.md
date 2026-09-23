@@ -111,3 +111,8 @@ is run from `judge_runner.py`; that module is now `src/mathlib_review/judge/runn
 `lead.py:499-500`'s `delegate` description says the mandatory generalist pass "has already run and
 is not requested here"; the code prepends it to the first `delegate` call (`lead.py:621-653`), as
 the system prompt says.
+
+- **Gold 8d887ce4 (33145) is mis-extracted** (found 2026-09-23 by the specialist-lever survey): its claim reads
+  as "generalize to `Dense.ciSup'`" while the maintainer's comment is a rename; no design-move ask can match it.
+  It counts in the 4-PR and held-out denominators. Check the source comment before the next gold pass
+  (R1b), and do not read its miss as an arm failure meanwhile.
