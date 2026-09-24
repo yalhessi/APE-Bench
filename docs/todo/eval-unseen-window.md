@@ -1,7 +1,13 @@
 # A 46-PR window no v5 design has touched, to test whatever breaks the wall
 
-**Status** — open, verified 2026-09-23 (one assessor, three adversarial verifiers, none refuted it);
-**needs three decisions from the user before building**, listed below
+**Status** — **not the evaluation set (user, 2026-09-24).** The 46 are biased too, just differently from
+the dev set: they are the residual of the gold-driven selection that made the medium tier (style-heavy,
+25 of 58 obligations; mostly single-file PRs, median 3.5k-char diff), and v2-exposed. There is budget for
+**one** big run, on roughly 50 PRs, so the set it runs on must not share the dev set's bias and must not
+swap it for another; choosing it needs careful consideration, and building it once chosen can be
+parallelized in a few hours. This entry stays as the verified description of one candidate pool and
+of the defects any pool inherits (the tool-schema gold leak, the builder blockers, the missing
+hittability audit). Previously: open, verified 2026-09-23 (one assessor, three adversarial verifiers)
 **Cost** — build is free (about 6-8 hours of work plus 5-11 hours of reviewed-workspace machine time,
 after the live paid runs finish); reading it is a winner plus its own baseline, three reps each, about
 $10-15 per rep in lead shape and about $70-90 per rep in fanout-verdicts shape
