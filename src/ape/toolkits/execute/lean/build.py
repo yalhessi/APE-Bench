@@ -877,6 +877,14 @@ async def run_batch_build(args: argparse.Namespace) -> int:
             use_pr_head_refs=args.prewarm_pr_heads,
         )
         
+        # An input that parsed to no commit built nothing. Before 2026-09-24 that printed "All
+        # builds completed successfully" and exited 0: 59 records without `task_type`/`target_workspace`
+        # were each logged as a WARNING and skipped.
+        if args.input_file and results['total_commits'] == 0:
+            logger.error("No commit could be read from the input file(s); nothing was built. Each record "
+                         "must parse as BaseLeanTaskData (task_type, task_id, target_workspace).")
+            return 1
+
         # Print results
         logger.info("Batch build completed!")
         logger.info(f"Total commits: {results['total_commits']}")

@@ -31,3 +31,11 @@ def test_build_timeout_reaches_the_config_the_workers_build_with(monkeypatch):
     assert config.num_processes == 2
     # The workers receive the config as `model_dump`, so the timeout travels with it.
     assert config.model_dump(mode="json")["build_timeout"] == 5400
+
+
+def test_an_input_file_that_yields_no_commit_is_a_failure_not_a_success(monkeypatch, tmp_path):
+    monkeypatch.setattr(build, "BatchBuilder", _RecordingBuilder)          # reports 0 commits
+    records = tmp_path / "bases.jsonl"
+    records.write_text('{"commit_hash": "abc123"}\n')                     # not BaseLeanTaskData
+    args = build.create_argument_parser().parse_args(["--input_file", str(records)])
+    assert asyncio.run(build.run_batch_build(args)) == 1
