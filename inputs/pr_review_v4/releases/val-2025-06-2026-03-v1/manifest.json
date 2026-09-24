@@ -1,0 +1,179 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-09-24T13:17:02Z",
+  "dataset_id": "mathlib-pr-review-evaluation",
+  "derived_artifacts": [
+    {
+      "path": "derived/funnel.jsonl",
+      "records": 60,
+      "role": "eligibility_funnel",
+      "schema_version": "funnel1",
+      "sha256": "4721cb9090fc9dabcbeded0e08c01a5425950365a61827208b45e71641dc74ec"
+    },
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 60,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "71833f5f6cac9420841ea2edfad731fd4f57dcf9dd993e0216a15dddd3ea14cf"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 425,
+      "role": "candidate_work_units",
+      "schema_version": "work-unit1",
+      "sha256": "df984ee21bc02509b14fec2458985d72386272615a81c8745cd256544d8cb9d8"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 425,
+      "role": "production_prompt_preview",
+      "schema_version": "rendered-prompt1",
+      "sha256": "f036853a7e69b37a8db21d3b6caf9922209addc9de2dab393e5e0fae1e26430e"
+    },
+    {
+      "path": "derived/modification_inventory.jsonl",
+      "records": 1348,
+      "role": "modification_inventory",
+      "schema_version": "modification1",
+      "sha256": "87cbfe383ced6e1e8aa1c8b0047c47a70e2a2c44de29ff976f50b9befb2b13d3"
+    },
+    {
+      "path": "derived/evaluation_strata.jsonl",
+      "records": 60,
+      "role": "strata_and_ai_labels",
+      "schema_version": "evaluation-strata1",
+      "sha256": "a0a111fe59e377e38ab9226108f3b4659bde0f27fef135119328bffb95ca0f2c"
+    }
+  ],
+  "generator_git_commit": "04fcb1ae5b84194cf56e74d50b6c2f961a07ad90",
+  "generator_tree_state": "clean",
+  "generator_versions": {
+    "change_graph": "cg1_builder_v3",
+    "definitions": "pull-request-definitions/2",
+    "episodes": "raw_first_round_v1",
+    "events": "pull_request_store_v1",
+    "frame": "evaluation-frame/1",
+    "funnel": "raw_first_round_v1",
+    "inventory": "modification-inventory/1",
+    "renderer": "candidate-prompt/14",
+    "store": "pull-request-store/1",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [
+    {
+      "path": "gold/episode_boundaries.jsonl",
+      "records": 60,
+      "role": "hidden_episode_boundaries",
+      "schema_version": "episode-boundary1",
+      "sha256": "f78c9a29e5418bb937beac0d18d1c9913c1bc1b5259a644bf988e0489e5adb65"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 60,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "b2cab71fd37f0241d2457ec8202d2df9c94dd728e13a6c5a8a8ff1817547c73d"
+    }
+  ],
+  "pr_numbers": [
+    25938,
+    26083,
+    26185,
+    26210,
+    26484,
+    26718,
+    26755,
+    27124,
+    27557,
+    27650,
+    28036,
+    28098,
+    28576,
+    28649,
+    28922,
+    29069,
+    29204,
+    29339,
+    29413,
+    29511,
+    29842,
+    30108,
+    30173,
+    30458,
+    30641,
+    30714,
+    31079,
+    31295,
+    31477,
+    31554,
+    32006,
+    32080,
+    32299,
+    32440,
+    32668,
+    32875,
+    32943,
+    33185,
+    33716,
+    33818,
+    34091,
+    34577,
+    34638,
+    34790,
+    34906,
+    34935,
+    35422,
+    35571,
+    35599,
+    35636,
+    36071,
+    36493,
+    36637,
+    36645,
+    36648,
+    36784,
+    36822,
+    36923,
+    36969,
+    37352
+  ],
+  "release": "val-2025-06-2026-03-v1",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [
+    {
+      "path": "source/events.jsonl",
+      "records": 4581,
+      "role": "raw_event_index",
+      "schema_version": "event1",
+      "sha256": "43f25f9b0053bafb8d18b15251184a2238088a81c5b4f1466a91fcf70eddff44"
+    }
+  ],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "/research/projects/proofedit/ya475/APE-Bench/data/pull_requests",
+      "records": 60,
+      "role": "pull_request_store",
+      "schema_version": null,
+      "sha256": "958a59da396a642e9f9fd61d56a13b1c8e4b8bd0024bfc5a2620313a26e9e0ac"
+    },
+    {
+      "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+      "records": 64,
+      "role": "reviewer_roster",
+      "schema_version": null,
+      "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+    },
+    {
+      "path": "inputs/pull_requests/evaluation/val-2025-06-2026-03-v1/seal.json",
+      "records": 60,
+      "role": "evaluation_seal",
+      "schema_version": null,
+      "sha256": "8d76a62a9bc7c2c41ec1c1538ee02e8ad1e613ac7bbb7f0f377049b82d639041"
+    }
+  ],
+  "split": "test"
+}

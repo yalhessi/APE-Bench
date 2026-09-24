@@ -1,0 +1,30 @@
+# The VALIDATION set val-2025-06-2026-03-v1. This is the set development steers by: its gold and
+# its runs' output are read freely, and the gold chain is developed on it. It holds 60 PRs drawn by
+# `src.datasets.pull_requests.projections.frame seal-from`, from the TEST set's sealed frame
+# (eval-2025-06-2026-03-v1) minus the test draw. Same rules, caps and strata, a new seed, no PR or
+# base commit in common:
+#   - 50 PRs at the natural rate, proportional by month over 2025-06..2026-03;
+#   - 10 AI-generated PRs, a stratum reported apart.
+# Seal 29e79b8f. Record: docs/todo/eval-set-selection.md, "Two sets, not one".
+#
+# Dataset only. A system config extends this one and its test-set twin
+# (pr_review_v5_eval_2025_06_2026_03_v1.yaml) the same way, so that a validation number predicts
+# a test number.
+
+extends: bases/v5_generation.yaml
+
+dataset:
+  release: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1
+  modification_inventory: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1/derived/modification_inventory.jsonl
+
+  # Preview, then build (no model spend; only while no paid run is live):
+  #   ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --config configs/pr_review_v5_val_2025_06_2026_03_v1.yaml
+  #   ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --execute --config configs/pr_review_v5_val_2025_06_2026_03_v1.yaml
+  require_reviewed_workspaces: true
+
+  # Measured by `plan` with the base's lead caps: mandatory floor $41.20 plus discretionary up to
+  # $90.00 (60 PR x $1.50) = $131.20 worst case, and 157,440,000 processed tokens. That is above
+  # the test set's $122.20, because this draw has 425 work units against 283. Two PRs hold 66 and 59
+  # units, and the largest holds 15.5% of units against 9.2% in test. These are ceilings, not estimates.
+  run_total_cost_cap: 135.00
+  run_total_token_cap: 162000000

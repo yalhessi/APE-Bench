@@ -390,18 +390,32 @@ development and another set that will be reserved for testing only."* Ruled the 
   `develop` (see CLAUDE.md, "The data stores are shared"). So on this branch
   `test_the_real_corpus_resolves_line_level_for_about_seven_in_ten` fails until the merge.
 
+**Validation, same day:**
+- Sealed by `seal-from` (29e79b8f): 9,879 members, being the test frame minus its draw.
+- Drawn in two rounds: 50 main + 10 AI, with no PR or base commit in common with the test set.
+- Released at inputs/pr_review_v4/releases/val-2025-06-2026-03-v1: 425 work units against the test
+  set's 283, because two PRs hold 66 and 59 units. The largest holds 15.5% of units.
+- A drawn validation PR hit the inventory builder's whitespace refusal. It is fixed without moving
+  any frozen id (`04fcb1a`).
+- Config: configs/pr_review_v5_val_2025_06_2026_03_v1.yaml (lead worst case $131.20).
+- With both sets landed, `scored_pr_numbers()` is 258. The shared precedent index is rebuilt to
+  exclude both.
+- Its 57 base builds are queued to start when the test set's finish.
+
 **Next, in order:**
 1. **Merge into `develop`**, as one step:
    - Set aside the main checkout's uncommitted `inputs/pull_requests/{manifest.json, prs.jsonl,
-     collection_report.json, acceptance_report.json}`. They are the 2026-09-12 export, which
-     `299fbf5` commits byte for byte and `d859387` supersedes.
+     collection_report.json, acceptance_report.json}`. They are the 2026-09-12 export, which this
+     branch commits byte for byte (`299fbf5`) and then supersedes.
    - Merge.
    - Run `ape/bin/python -m src.mathlib_review.conventions.review_join --write --end all`
-     (7 s; 43,834 comments).
+     (7 s; 43,834 minus the validation PRs' comments).
    - Run the suite.
-2. `prebuild --reviewed --execute --config configs/pr_review_v5_eval_2025_06_2026_03_v1.yaml`
-   once the 59 base builds finish (running, detached), then the replacement rule.
-3. Seal the reading rule, the gold chain (ruling 7) and the controls definition, before any gold is
-   built. The reading rule needs a PR-cluster bootstrap and a Wilson interval; neither exists in
-   `analysis/`.
-4. Choose the system config, which extends the dataset config.
+2. `prebuild --reviewed --execute` for both configs once their bases are built, then the replacement
+   rule in each.
+3. Gold, developed on validation: the chain reads the PR store (adapter; see the survey's gold
+   section). It is spot-checked by a human and then frozen by commit. The reading rule and the
+   controls definition are sealed before the frozen chain is applied blind to the test set, where the
+   full human confirmation sitting happens. The reading rule needs a PR-cluster bootstrap and a
+   Wilson interval, which do not exist in `analysis/`.
+4. Choose the system config, which extends both dataset configs identically.
