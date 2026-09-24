@@ -179,3 +179,29 @@ def test_the_committed_pre_registration_is_intact_and_says_what_was_ruled():
     assert spec.store_content_sha256.startswith("f2d2beb6")
     assert len(members) == 9939
     assert sum(f.month_quotas(members, spec.main_size).values()) == 50
+
+
+def test_the_committed_draw_is_a_seed_order_walk_of_the_sealed_frame():
+    """Store-free: every accepted PR is a round-1 candidate, each month got exactly its quota, and
+    within a stratum the accepted PRs appear in the seeded order."""
+
+    from pathlib import Path
+
+    spec, members, digest = f.load_sealed("eval-2025-06-2026-03-v1")
+    out = Path("inputs/pull_requests/evaluation/eval-2025-06-2026-03-v1")
+    draw = f.Draw.model_validate_json((out / "draw.json").read_text())
+    assert draw.frame_seal_sha256 == digest and draw.complete
+    candidates = {int(line) for line in (out / "candidates-r1.txt").read_text().split("\n")
+                  if line.strip() and not line.startswith("#")}
+    assert {a.pr_number for a in draw.accepted} <= candidates
+    counts = collections.Counter(a.stratum for a in draw.accepted)
+    assert {k.split(":", 1)[1]: v for k, v in counts.items() if k.startswith("main:")} == \
+        {k: v for k, v in f.month_quotas(members, spec.main_size).items() if v}
+    assert counts["ai"] == spec.ai_size
+    for key, order in f.strata_orders(spec, members).items():
+        position = {m.pr_number: i for i, m in enumerate(order)}
+        taken = [position[a.pr_number] for a in draw.accepted if a.stratum == key]
+        assert taken == sorted(taken)
+    assert max(collections.Counter(a.author for a in draw.accepted).values()) <= spec.per_author_cap
+    assert all(a.targets <= (spec.ai_target_cap if a.stratum == "ai" else spec.main_target_cap)
+               for a in draw.accepted)
