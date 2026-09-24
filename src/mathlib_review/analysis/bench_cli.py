@@ -53,10 +53,18 @@ def roster() -> Dict[str, List[str]]:
 
 
 def _payloads_for(bench: ArmBench, dataset, release,
-                  procedure_variant: str = "baseline") -> Dict[str, Dict[str, Any]]:
-    """The agenda's own arm payload for each case in the fixture, keyed by work unit."""
+                  procedure_variant: str = "baseline",
+                  trace_path: Optional[Path] = None) -> Dict[str, Dict[str, Any]]:
+    """The agenda's own arm payload for each case in the fixture, keyed by work unit.
+
+    `trace_path` is where the context tools append their `ContextCall` rows. Without one
+    `_append_trace` returns immediately, so a bench wrote no trace at all and a tool's own answer
+    survived only inside the session transcript.
+    """
 
     from src.mathlib_review.agenda.agenda import build_agenda
+    from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
+    from src.mathlib_review.schema import ReviewEpisodeInput
 
     pr_numbers = sorted({case.pr_number for case in bench.cases})
     _agenda, pool = build_agenda(
@@ -77,12 +85,27 @@ def _payloads_for(bench: ArmBench, dataset, release,
     # A pool entry *is* the arm's task data -- `_arm_payload` returns the v4 payload with the
     # arm fields added. The nested `task_data` key exists only in the written
     # `arm_pool.jsonl`, which is a different shape.
+    #
+    # `retrieval_cutoff` is NOT in the pool payload: `runner.py` attaches it after `build_agenda`
+    # returns, and this path did not. Without it `_require_cutoff` raises, and it raises *inside*
+    # the tool, which returns `{"success": False, "error": ...}` rather than failing the case --
+    # so `precedent_search` and `zulip_search` were dead in every bench ever run, silently, and
+    # the bench still scored. The naming arm reported it in its own abstention text ("precedent/
+    # zulip searches failed due to missing retrieval cutoff configuration") and nothing read it.
+    # A bench that tests an arm with one of its three evidence tools is not testing that arm.
+    cutoff_by_episode = cutoffs_by_episode(load_jsonl(
+        Path(dataset.release) / "input/episodes.jsonl", ReviewEpisodeInput))
     wanted = {case.work_unit_id for case in bench.cases}
-    return {
-        payload["work_unit_id"]: payload
-        for payload in pool.values()
-        if payload.get("arm_id") == bench.arm_id and payload.get("work_unit_id") in wanted
-    }
+    payloads = {}
+    for payload in pool.values():
+        if payload.get("arm_id") != bench.arm_id or payload.get("work_unit_id") not in wanted:
+            continue
+        payload = dict(payload)
+        payload["retrieval_cutoff"] = cutoff_by_episode.get(payload.get("episode_id"))
+        if trace_path is not None:
+            payload["trace_path"] = str(trace_path)
+        payloads[payload["work_unit_id"]] = payload
+    return payloads
 
 
 async def _run_arm(payloads: Dict[str, Dict[str, Any]], scaffold, run_name: str, logger):
@@ -145,24 +168,28 @@ def bench_run_name(arm_id: str, procedure_variant: str, attempt: int) -> str:
     return f"bench_{arm_id}_{procedure_variant}_a{attempt}"
 
 
-def assert_scratch_is_unused(run_name: str, scaffold, *, resume: bool, logger) -> None:
+def assert_scratch_is_unused(run_name: str, scaffold, *, resume: bool, logger) -> Path:
     """Refuse a bench whose orchestrator state already exists, before spending anything.
 
     The same discipline as `review.runner.guard_run_name`, which documents the hazard this
     path was missing: every attempt that already succeeded is returned from cache, so the
     change under test never executes and the run reports the old behaviour as if it were new.
+
+    Returns the orchestrator's state directory for this run, which is where its context trace
+    belongs.
     """
 
     from src.mathlib_review.review.runner import _scratch_dirs
 
-    existing = [item for item in _scratch_dirs(run_name, scaffold) if item.is_dir()]
+    scratch = _scratch_dirs(run_name, scaffold)
+    existing = [item for item in scratch if item.is_dir()]
     if not existing:
-        return
+        return scratch[0]
     if resume:
         logger.warning(
             "resuming %s from %s -- completed cases will NOT be re-run and this is not an "
             "independent attempt", run_name, ", ".join(str(item) for item in existing))
-        return
+        return scratch[0]
     raise SystemExit(
         f"orchestrator state for {run_name!r} already exists "
         f"({', '.join(str(item) for item in existing)}). That name is a resume key: rerunning "
@@ -242,7 +269,12 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
     judgments = load_jsonl(dataset.release / "gold/judgments.jsonl", JudgmentNode)
     scores = {}
     for arm_id, bench in sorted(benches.items()):
-        payloads = _payloads_for(bench, dataset, release, procedure_variant)
+        run_name = bench_run_name(arm_id, procedure_variant, attempt)
+        # Refused before the 18 s agenda build, and the trace goes beside the orchestrator's own
+        # state for this attempt, so it is keyed by the same resume key as the tasks that wrote it.
+        scratch = assert_scratch_is_unused(run_name, scaffold, resume=resume, logger=logger)
+        trace_path = scratch / "context_trace.jsonl"
+        payloads = _payloads_for(bench, dataset, release, procedure_variant, trace_path)
         missing = {case.work_unit_id for case in bench.cases} - set(payloads)
         if missing:
             # An arm is not eligible everywhere, so a case with no rendered payload is a
@@ -250,8 +282,6 @@ def run_benches(*, config, arms, pr_numbers=None, negatives_per_pr=3, out=None,
             logger.info("%s: %d of %d case(s) have no rendered payload (arm not eligible "
                         "there); scoring the remaining %d",
                         arm_id, len(missing), len(bench.cases), len(payloads))
-        run_name = bench_run_name(arm_id, procedure_variant, attempt)
-        assert_scratch_is_unused(run_name, scaffold, resume=resume, logger=logger)
         anchors, errors, results = asyncio.run(
             _run_arm(payloads, scaffold, run_name, logger))
         score = score_bench(
