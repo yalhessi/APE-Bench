@@ -1,0 +1,34 @@
+{
+  "ai_candidate_factor": 3.5,
+  "ai_size": 10,
+  "ai_target_cap": 150,
+  "created_from": "2025-06-01",
+  "created_to": "2026-03-31",
+  "definitions_version": "pull-request-definitions/2",
+  "frame_from": "eval-2025-06-2026-03-v1@bcf93808a52879d216a873e2d5f810f4d4bb909f62e21d2360e99a56cb50f66f",
+  "frame_version": "evaluation-frame/1",
+  "listing_window": [
+    "2024-03-01",
+    "2026-08-31"
+  ],
+  "main_candidate_factor": 2.0,
+  "main_size": 50,
+  "main_target_cap": 100,
+  "name": "val-2025-06-2026-03-v1",
+  "per_author_cap": 3,
+  "per_base_cap": 2,
+  "roster_path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+  "roster_sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a",
+  "rules": {
+    "ai": "AI-generated PRs are labelled, never excluded. The AI stratum is drawn from fetch-time evidence (label or description) and reported apart from the main stratum.",
+    "censoring": "PRs still open at the 2026-09-11 listing walk are outside the frame.",
+    "closed_unmerged": "Kept, with the count reported. 'Abandoned' cannot be told from 'rejected' or 'superseded' without gold.",
+    "frame_from": "Members are eval-2025-06-2026-03-v1's sealed frame minus the 60 PRs its draw accepted, which are reserved to it; same rules, caps and strata, new seed.",
+    "order": "Within a stratum, candidates are walked in sha256(seed \\0 pr_number) order; the walk stops at the first candidate without tier 2 or base files, and never skips it.",
+    "replacement": "An accepted episode whose reviewed state does not compile (prebuild --reviewed fails on a Lean error in a changed file) is replaced by continuing its stratum's walk, and each replacement is recorded with its error.",
+    "roster": "One dated roster for every month.",
+    "size_gates": "The funnel's final-state gates (1..30 files, 10..800 lines) bound the frame; they are not strata."
+  },
+  "seed": "val-2025-06-2026-03-v1",
+  "store_content_sha256": "f2d2beb6af2b650d36069f55fbeb4a384a7d115df746fac7a123f07145d5c99c"
+}

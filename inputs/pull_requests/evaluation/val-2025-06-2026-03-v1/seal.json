@@ -1,0 +1,10 @@
+{
+  "files": {
+    "dev_used.json": "1313b187480acee60055b85c83d35e6bcf15fd9222129a01846ecea66291d402",
+    "frame.jsonl": "12d2b551489c81154da2636f945c93abdae1831636df596ce2eea0f8e2250c1f",
+    "frame_report.json": "b5f1c5dd05e1dec9633aeee58551e63a9f98dd0979d8f1d87cae510441107afe",
+    "spec.json": "7d55502ea42dd32618c87ad209f1bee6e3a7c7424c1091b5ba9bcd9fe6a60634"
+  },
+  "frame_version": "evaluation-frame/1",
+  "seal_sha256": "29e79b8fdf1194b1ed1cf30e355a6b9c0eabe14a3142803157ff2c974b8b16e0"
+}

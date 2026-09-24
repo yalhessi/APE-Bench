@@ -273,3 +273,20 @@ def test_a_derived_frame_refuses_a_draw_of_another_seal(tmp_path):
     (tmp_path / spec.name / "draw.json").write_text(draw.model_dump_json())
     with pytest.raises(ValueError, match="not of its seal"):
         f.derived_frame(spec.name, root=tmp_path)
+
+
+def test_the_validation_seal_is_the_test_frame_minus_the_test_draw():
+    """val-2025-06-2026-03-v1 (sealed 2026-09-24) directs development; eval-2025-06-2026-03-v1 is the
+    test set. Same frame and rules, a new seed, and not one PR in common."""
+
+    val, val_members, val_digest = f.load_sealed("val-2025-06-2026-03-v1")
+    test, test_members, test_digest = f.load_sealed("eval-2025-06-2026-03-v1")
+    assert val_digest == "29e79b8fdf1194b1ed1cf30e355a6b9c0eabe14a3142803157ff2c974b8b16e0"
+    assert val.frame_from == f"eval-2025-06-2026-03-v1@{test_digest}"
+    assert val.seed != test.seed
+    same = ("created_from", "created_to", "store_content_sha256", "roster_sha256", "definitions_version",
+            "main_size", "ai_size", "main_target_cap", "ai_target_cap", "per_author_cap", "per_base_cap")
+    assert {k: getattr(val, k) for k in same} == {k: getattr(test, k) for k in same}
+    _, _, derived, _, reserved = f.derived_frame("eval-2025-06-2026-03-v1")
+    assert val_members == derived and len(reserved) == 60
+    assert not {m.pr_number for m in val_members} & set(reserved)

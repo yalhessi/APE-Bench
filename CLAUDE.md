@@ -62,6 +62,12 @@ default (user, 2026-09-24).
   WIP commit. The shared venv's editable install pins `ape` to the main checkout, so `pytest.ini`
   and the Claude Code settings put `src` first and `assert_repo_root` refuses a mixed tree; in your
   own shell in a worktree, `export PYTHONPATH=$PWD/src`.
+- **The data stores are shared by every worktree, so a branch never regenerates one that `develop`
+  checks.** `data/` is linked, not copied. On 2026-09-24 a topic branch grew `scored_pr_numbers()`
+  and rewrote `data/pr_review_v5/review_join` to match, and `develop`'s suite went red for every
+  session, because the report no longer counted what `develop`'s source counts. Regenerate such an
+  artifact as a step of the merge, not before it. The precedent index was different: an index that
+  excludes *more* PRs still satisfies `develop`'s check, so it could be rebuilt early.
 - **Small logical commits, always.** One commit is one thing, with the suite green. Message form is
   `<area>: <what changed, and why it is right>`, measurements in the body (see `git log`). Commit at
   each step boundary — a standing instruction (2026-09-11): uncommitted work spanning steps is how the

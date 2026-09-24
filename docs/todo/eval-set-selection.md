@@ -363,19 +363,45 @@ Round 1 is 131 candidates, 107 of them needing tier 2.
 - Base builds for the 59 unbuilt bases are running, detached (`nohup setsid`). The batch builder
   first skipped every record and reported success; it now refuses that (`26f6989`).
 
-**Next, in order:**
-1. **Land the release in the frozen root** (`projections.frame release`, then `verify_frozen
-   build-lock`). This grows `scored_pr_numbers()` from 138 to 198, so in the same step:
-   - rebuild the shared precedent index without the 47 eval-PR comments it holds (local
-     MiniLM, about 26 min);
-   - rerun `conventions.review_join --write`;
-   - make the cutoffs test read store-built releases from the store;
-   - move the 138 pin to 198.
+### Two sets, not one (user, 2026-09-24)
 
-   The index is shared by every worktree and recorded in every run plan, so this waits for a run
-   boundary and the user's go-ahead.
-2. `prebuild --reviewed` once the bases are built, then the replacement rule.
+*"I've been using evaluation to mean both testing and validation. We need a set that can direct
+development and another set that will be reserved for testing only."* Ruled the same day:
+
+- **Test:** `eval-2025-06-2026-03-v1`, the 60 sealed above. They are not read and are run once;
+  the name stays because it sits in the seal's digests.
+- **Validation:** `val-2025-06-2026-03-v1`, 50 main + 10 AI, the same shape as test, so a validation
+  number predicts a test number. It is drawn from the same sealed frame under the same rules and
+  caps, with a new seed and the 60 test PRs excluded. Development reads it freely and runs it
+  repeatedly (three reps per reading; about $30 a rep in lead shape).
+- **Gold:** the gold chain is developed and spot-checked on validation, then frozen by commit and
+  applied blind to test, where the full human confirmation sitting happens. The held-out 12 stop
+  being the yardstick; they stay development material.
+
+**Landed (`e2a04f6`):**
+- The release is frozen at inputs/pr_review_v4/releases/eval-2025-06-2026-03-v1: split test,
+  60 PRs, locked.
+- The dataset config is configs/pr_review_v5_eval_2025_06_2026_03_v1.yaml. `plan` refuses it
+  until all 60 reviewed workspaces exist.
+- `scored_pr_numbers()` is 198 on this branch.
+- The shared precedent index was rebuilt without the 47 eval-PR comments (43,834 rows; the old
+  one is kept as `precedent_index.pre-eval-2026-09-24`). `develop`'s tests pass with it.
+- The shared review_join report was restored to `develop`'s version after rerunning it broke
+  `develop` (see CLAUDE.md, "The data stores are shared"). So on this branch
+  `test_the_real_corpus_resolves_line_level_for_about_seven_in_ten` fails until the merge.
+
+**Next, in order:**
+1. **Merge into `develop`**, as one step:
+   - Set aside the main checkout's uncommitted `inputs/pull_requests/{manifest.json, prs.jsonl,
+     collection_report.json, acceptance_report.json}`. They are the 2026-09-12 export, which
+     `299fbf5` commits byte for byte and `d859387` supersedes.
+   - Merge.
+   - Run `ape/bin/python -m src.mathlib_review.conventions.review_join --write --end all`
+     (7 s; 43,834 comments).
+   - Run the suite.
+2. `prebuild --reviewed --execute --config configs/pr_review_v5_eval_2025_06_2026_03_v1.yaml`
+   once the 59 base builds finish (running, detached), then the replacement rule.
 3. Seal the reading rule, the gold chain (ruling 7) and the controls definition, before any gold is
-   built.
-4. Choose the config. On the trial release a /14 lead config's caps do not fit 60 PRs ($35 cap
-   against a $122 worst case).
+   built. The reading rule needs a PR-cluster bootstrap and a Wilson interval; neither exists in
+   `analysis/`.
+4. Choose the system config, which extends the dataset config.
