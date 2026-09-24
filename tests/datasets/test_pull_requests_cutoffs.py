@@ -17,6 +17,7 @@ import pytest
 from src.datasets.pull_requests.seed import seed_from_legacy
 from src.datasets.pull_requests.store import PullRequestStore
 from src.mathlib_review.agenda.cutoffs import CutoffUnavailable, commit_timestamp, episode_cutoff
+from src.mathlib_review.io import jsonl_rows
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, V4_RELEASES
 from src.mathlib_review.schema import ReviewEpisodeInput
 
@@ -30,23 +31,42 @@ def store(tmp_path_factory):
     return store
 
 
-def _all_release_episodes():
+def _store_built(release: Path) -> bool:
+    manifest = json.loads((release / "manifest.json").read_text())
+    return any(ref.get("role") == "pull_request_store" for ref in manifest.get("sources") or ())
+
+
+def _all_release_episodes(*, store_built: bool):
     seen = {}
     for path in sorted(V4_RELEASES.glob("*/input/episodes.jsonl")):
-        for line in path.read_text().splitlines():
-            if line.strip():
-                row = json.loads(line)
-                seen[(row["pr_number"], row["reviewed_head_sha"])] = row
+        if _store_built(path.parent.parent) != store_built:
+            continue
+        for row in jsonl_rows(path):
+            seen[(row["pr_number"], row["reviewed_head_sha"])] = row
     return seen
 
 
 def test_every_release_episode_has_the_same_cutoff_from_the_store_and_the_cache(store):
-    pairs = _all_release_episodes()
-    assert len(pairs) > 190          # every distinct (PR, reviewed head) across all 32 releases
+    pairs = _all_release_episodes(store_built=False)
+    assert len(pairs) > 190          # every distinct (PR, reviewed head) across the legacy-built releases
     for (number, head) in pairs:
         from_store = commit_timestamp(number, head, store=store, legacy_bundles=None)
         from_cache = commit_timestamp(number, head, store=None)
         assert from_store is not None and from_store == from_cache, (number, head)
+
+
+def test_a_store_built_release_resolves_every_cutoff_from_the_store_alone():
+    """A release drawn from the PR store (eval-2025-06-2026-03-v1) has no legacy cache to agree
+    with; its cutoffs must come from the store, with the cache switched off."""
+
+    pairs = _all_release_episodes(store_built=True)
+    if not pairs:
+        pytest.skip("no store-built release")
+    real = PullRequestStore()
+    if not (real.root / "pr").is_dir():
+        pytest.skip("no PR store")
+    for (number, head) in pairs:
+        assert commit_timestamp(number, head, store=real, legacy_bundles=None) is not None, (number, head)
 
 
 def test_a_collected_pr_resolves_with_no_cache_at_all(store, tmp_path):
@@ -60,7 +80,7 @@ def test_a_collected_pr_resolves_with_no_cache_at_all(store, tmp_path):
 
 
 def test_an_unresolvable_cutoff_names_both_sources_and_the_collector():
-    episode = ReviewEpisodeInput.model_validate(next(iter(_all_release_episodes().values())))
+    episode = ReviewEpisodeInput.model_validate(next(iter(_all_release_episodes(store_built=False).values())))
     broken = episode.model_copy(update={"reviewed_head_sha": "0" * 40})
     with pytest.raises(CutoffUnavailable) as excinfo:
         episode_cutoff(broken)

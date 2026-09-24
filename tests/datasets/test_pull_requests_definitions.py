@@ -232,7 +232,9 @@ def test_the_scored_set_refuses_to_be_empty(tmp_path):
     with pytest.raises(FileNotFoundError) as excinfo:
         d.scored_pr_numbers(root=tmp_path)
     assert "refusing to return an empty exclusion" in str(excinfo.value)
-    assert len(d.scored_pr_numbers()) == 138
+    # 138 dev episodes, plus the 60 of eval-2025-06-2026-03-v1 (landed 2026-09-24): their reviews are
+    # the answer, so every corpus consumer excludes them.
+    assert len(d.scored_pr_numbers()) == 198
 
 
 # --- authorship ----------------------------------------------------------------------------------

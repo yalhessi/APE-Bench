@@ -1,0 +1,179 @@
+{
+  "corpus_cutoff_policy": "No historical review corpus is visible during generation.",
+  "created_at": "2026-09-24T12:05:50Z",
+  "dataset_id": "mathlib-pr-review-evaluation",
+  "derived_artifacts": [
+    {
+      "path": "derived/funnel.jsonl",
+      "records": 60,
+      "role": "eligibility_funnel",
+      "schema_version": "funnel1",
+      "sha256": "0f911b2fccebae4ff53a2a2df797a72bd8cdba890075c00c42741877029fe9c6"
+    },
+    {
+      "path": "derived/change_graphs.jsonl",
+      "records": 60,
+      "role": "complete_change_graphs",
+      "schema_version": "cg1",
+      "sha256": "93fb16e11a5b6c4ce8c389798b82908d842cf6adadfb971b0cb50e4aff1c7de4"
+    },
+    {
+      "path": "derived/work_units.jsonl",
+      "records": 283,
+      "role": "candidate_work_units",
+      "schema_version": "work-unit1",
+      "sha256": "305d516cd5b0183ff99b8298e28d12e67f590ed7195a65f11541bc61efed6583"
+    },
+    {
+      "path": "derived/rendered_prompts.jsonl",
+      "records": 283,
+      "role": "production_prompt_preview",
+      "schema_version": "rendered-prompt1",
+      "sha256": "0a36b8f17aad385a64b5d23bd052bf662c1467743316893238a680792288c382"
+    },
+    {
+      "path": "derived/modification_inventory.jsonl",
+      "records": 1209,
+      "role": "modification_inventory",
+      "schema_version": "modification1",
+      "sha256": "0f81c436471527314e8ab42c868c7d8b4c3f77d7d0f518868f957a2f273ea749"
+    },
+    {
+      "path": "derived/evaluation_strata.jsonl",
+      "records": 60,
+      "role": "strata_and_ai_labels",
+      "schema_version": "evaluation-strata1",
+      "sha256": "1adb203162c360924b759107852548445daa59ae3ae15124da50281718c7acf0"
+    }
+  ],
+  "generator_git_commit": "587da4aa2baaa712b746889eed4020759178bb84",
+  "generator_tree_state": "clean",
+  "generator_versions": {
+    "change_graph": "cg1_builder_v3",
+    "definitions": "pull-request-definitions/2",
+    "episodes": "raw_first_round_v1",
+    "events": "pull_request_store_v1",
+    "frame": "evaluation-frame/1",
+    "funnel": "raw_first_round_v1",
+    "inventory": "modification-inventory/1",
+    "renderer": "candidate-prompt/14",
+    "store": "pull-request-store/1",
+    "work_units": "work-units/1"
+  },
+  "gold_artifacts": [
+    {
+      "path": "gold/episode_boundaries.jsonl",
+      "records": 60,
+      "role": "hidden_episode_boundaries",
+      "schema_version": "episode-boundary1",
+      "sha256": "0b7ab335c7fca44c4c64dba7b8893a340cce54e8fcd0ad2521a84e96594b30a7"
+    }
+  ],
+  "input_artifacts": [
+    {
+      "path": "input/episodes.jsonl",
+      "records": 60,
+      "role": "reviewer_visible_episodes",
+      "schema_version": "episode1",
+      "sha256": "0209e3f85e74ea0f6de75b233b49ebba9dede02822c5aad25283e56f05bb47c0"
+    }
+  ],
+  "pr_numbers": [
+    25475,
+    25593,
+    25833,
+    26102,
+    26401,
+    26659,
+    26744,
+    26946,
+    27006,
+    27532,
+    27622,
+    27958,
+    27969,
+    28272,
+    28290,
+    29044,
+    29076,
+    29562,
+    29645,
+    29731,
+    29737,
+    29898,
+    30080,
+    30113,
+    30247,
+    30592,
+    30777,
+    30856,
+    31173,
+    31239,
+    31257,
+    31455,
+    31859,
+    32173,
+    32345,
+    32604,
+    32899,
+    33416,
+    33652,
+    33682,
+    33854,
+    34121,
+    34412,
+    34772,
+    34920,
+    35152,
+    35187,
+    35622,
+    35745,
+    36112,
+    36119,
+    36199,
+    36254,
+    36596,
+    36683,
+    36697,
+    36717,
+    36889,
+    37094,
+    37295
+  ],
+  "release": "eval-2025-06-2026-03-v1",
+  "schema_version": "pr4-manifest-1",
+  "source_artifacts": [
+    {
+      "path": "source/events.jsonl",
+      "records": 4374,
+      "role": "raw_event_index",
+      "schema_version": "event1",
+      "sha256": "02e724dac0ffbc32970439cc6790889471067b4fd65414b67bd70396ca9117cc"
+    }
+  ],
+  "source_kind": "raw_event_ledger",
+  "sources": [
+    {
+      "path": "/research/projects/proofedit/ya475/APE-Bench/data/pull_requests",
+      "records": 60,
+      "role": "pull_request_store",
+      "schema_version": null,
+      "sha256": "b250a51ae1ee3e47ca6778592143adafbf24160199765aebc333e05f0a39a253"
+    },
+    {
+      "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+      "records": 64,
+      "role": "reviewer_roster",
+      "schema_version": null,
+      "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+    },
+    {
+      "path": "inputs/pull_requests/evaluation/eval-2025-06-2026-03-v1/seal.json",
+      "records": 60,
+      "role": "evaluation_seal",
+      "schema_version": null,
+      "sha256": "2811401d958b18a4d765a8caf85ff4ee28213d4f113bf833686f3f608df4216d"
+    }
+  ],
+  "split": "test"
+}

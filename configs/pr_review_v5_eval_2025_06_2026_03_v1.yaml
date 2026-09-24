@@ -1,0 +1,36 @@
+# The sealed evaluation set eval-2025-06-2026-03-v1. It holds 60 PRs drawn by
+# `src.datasets.pull_requests.projections.frame` from PRs created 2025-06..2026-03:
+#   - 50 PRs at the natural rate, proportional by month;
+#   - 10 AI-generated PRs, a stratum reported apart.
+# The frame was pre-registered (seal bcf93808) before any candidate's tier 2 was read. Record:
+# docs/todo/eval-set-selection.md.
+#
+# This file fixes the DATASET only. The system under test (routing mode, contract knobs, roster,
+# reasoning) is chosen separately, in a config that extends this one. That config is named for the
+# set and sealed before its run. Nothing tuned on this set's output is confirmatory: the holdout
+# is used once.
+#
+# Its PRs are in `scored_pr_numbers()`, so no corpus, index or join shows their reviews to a
+# development run.
+
+extends: bases/v5_generation.yaml
+
+dataset:
+  release: inputs/pr_review_v4/releases/eval-2025-06-2026-03-v1
+  # Built with the release from the same change graphs. The medium treatment's inventory
+  # would schedule no specialist here.
+  modification_inventory: inputs/pr_review_v4/releases/eval-2025-06-2026-03-v1/derived/modification_inventory.jsonl
+
+  # Every episode must verify in its reviewed workspace (base + diff + changed modules rebuilt).
+  # Preview what is missing, then build (no model spend; about 4-17 min each on this NFS, only
+  # while no paid run is live):
+  #   ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --config configs/pr_review_v5_eval_2025_06_2026_03_v1.yaml
+  #   ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --execute --config configs/pr_review_v5_eval_2025_06_2026_03_v1.yaml
+  require_reviewed_workspaces: true
+
+  # Measured by `plan` on this release with the base's lead caps: mandatory floor $32.20 plus
+  # discretionary up to $90.00 (60 PR x $1.50) = $122.20 worst case, and 146,640,000 processed
+  # tokens. These are ceilings, not estimates. The set priced at about $26-35 billed in lead shape,
+  # on its own sizes. A system config with other caps restates both.
+  run_total_cost_cap: 125.00
+  run_total_token_cap: 150000000
