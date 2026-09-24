@@ -1,0 +1,52 @@
+{
+ "failed_prs": [
+  26658,
+  28909,
+  29094
+ ],
+ "all": {
+  "PRs / units / targets": "970 / 4190 / 19652",
+  "units per PR": "med 3 / mean 4.3 / p90 9 / max 76",
+  "PRs over 15 / over 25 units": "41 / 13",
+  "largest PR's share of units": "1.8%",
+  "packer-cliff PRs (a hunk over 24,000 chars) / their units": "2 / 123",
+  "whitespace-only modified declarations": "102 of 3517",
+  "units holding only them": "32 (0.8%)",
+  "declarations added / modified / removed": "6334 / 3517 / 912",
+  "targets on meta paths": 1114,
+  "proposals per PR (lead's view)": "med 20 / mean 33.4 / p90 70 / max 500",
+  "PRs over 184 proposals": 15,
+  "PRs at the required-row cap": "160 of 970",
+  "units with no specialist eligible": 194
+ },
+ "main": {
+  "PRs / units / targets": "847 / 3474 / 17245",
+  "units per PR": "med 2 / mean 4.1 / p90 8 / max 76",
+  "PRs over 15 / over 25 units": "29 / 9",
+  "largest PR's share of units": "2.2%",
+  "packer-cliff PRs (a hunk over 24,000 chars) / their units": "2 / 123",
+  "whitespace-only modified declarations": "94 of 3279",
+  "units holding only them": "24 (0.7%)",
+  "declarations added / modified / removed": "5724 / 3279 / 835",
+  "targets on meta paths": 770,
+  "proposals per PR (lead's view)": "med 20 / mean 34.3 / p90 70 / max 500",
+  "PRs over 184 proposals": 15,
+  "PRs at the required-row cap": "144 of 847",
+  "units with no specialist eligible": 171
+ },
+ "ai": {
+  "PRs / units / targets": "123 / 716 / 2407",
+  "units per PR": "med 3 / mean 5.8 / p90 14 / max 52",
+  "PRs over 15 / over 25 units": "12 / 4",
+  "largest PR's share of units": "7.3%",
+  "packer-cliff PRs (a hunk over 24,000 chars) / their units": "0 / 0",
+  "whitespace-only modified declarations": "8 of 238",
+  "units holding only them": "8 (1.1%)",
+  "declarations added / modified / removed": "610 / 238 / 77",
+  "targets on meta paths": 344,
+  "proposals per PR (lead's view)": "med 20 / mean 27.4 / p90 58 / max 159",
+  "PRs over 184 proposals": 0,
+  "PRs at the required-row cap": "16 of 123",
+  "units with no specialist eligible": 23
+ }
+}

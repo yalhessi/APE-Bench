@@ -39,7 +39,7 @@ label existed (`6bd9cc4`).
 | R7 | the families cover the work | NEW ≤ 10% | 0.3% | holds |
 
 Four of seven fail. As pre-registered, the failures are reported as failures, and the proposal
-changes to follow the larger set (§3).
+changes to follow the larger set (§4).
 
 ## 1. What the larger set says
 
@@ -128,7 +128,86 @@ Naming is overweighted by 3× on dev, not 10×. API design is underweighted on d
 The audit's headline, that the pipeline was shaped by a set unlike review work, stands; its size was
 overstated by the 60-PR sample in the direction of the families it happened to over-sample.
 
-## 3. What changes in the proposal
+## 3. The settings at scale (the audit's Part 3, not pre-registered)
+
+**How it was computed.**
+- The audit's gold-free features were rebuilt for val1000 with the tree's own functions: the
+  release build, `enumerate_invocations`, `build_components` and `plan_coverage`.
+- They cover 970 of the 973 PRs. The other three reorder an import block, which the inventory
+  builder refused. That is fixed in `e0c22f9`, after these numbers were computed.
+- No model was called. Review text was read for one count only, marked below.
+- The per-stratum features are in `knob_features.json`, next to the labels. The structure build
+  itself (release files for 970 PRs) is not kept: it rebuilds from the draw and the store.
+
+| | dev (16) | 60 PRs | val1000 (970) | of which AI (123) |
+|---|---|---|---|---|
+| units per PR, median / max | 5.5 / 15 | 3 / 66 | 3 / 76 | 3 / 52 |
+| PRs over 15 units | 0 | 7 (12%) | 41 (4.2%) | 12 (9.8%) |
+| packer-cliff PRs, and their share of units | 0 | 3, 32% | 2, 2.9% | 0 |
+| whitespace-only `modified` declarations | 0 of 124 | 120 of 344 | 102 of 3,517 (2.9%) | 8 of 238 |
+| units holding only those | 0 | 85 (20%) | 32 (0.8%) | 8 (1.1%) |
+| removed declarations, on how many PRs | 13, 4 | 92, 14 | 912, 205 (21%) | 77 |
+| targets on Tactic, Linter, test or script paths | 0 | 90 | 1,114 (5.7%) | 344 (14.3%) |
+| proposals the lead sees, median / max | – / 143 | – / 649 | 20 / 500 | 20 / 159 |
+| PRs over the 184-proposal agenda `lead_cost_cap` was sized for | 0 | 6 | 15 (1.5%) | 0 |
+| PRs at the required-row cap | 4 (25%) | 12 (20%) | 160 (16.5%) | 16 (13%) |
+
+**The audit's ranked knobs, at scale.**
+
+1. **The packer charge is real but rare.**
+   - Two PRs of 970 have a shared hunk over the 24,000-char budget: 27250 (29,918 chars) and
+     32245 (33,740).
+   - They hold 123 units, 2.9% of the set. At 60 PRs the figure was 32%, because three of the 60
+     were such PRs.
+   - The two are the largest and fourth-largest PRs in the set: 76 units for 89 targets, and 47
+     for 60. So the cliff produces the tail that the size knobs then meet.
+   - Worth fixing, by charging for rendered text, but no longer first.
+2. **Whitespace-only edits are small.**
+   - 2.9% of modified declarations, and 32 units (0.8%).
+   - The 60-PR figure came from two sweep PRs (26718, 33716).
+   - A filter is cheap and correct, and little rides on it.
+3. **The flat lead limits meet a tail of 1.5%.**
+   - 15 PRs exceed the 184-proposal agenda. The median is 20 and the p90 70.
+   - For those 15, the audit's untested question is still open: does a lead stopped at its cap lose
+     its PR's arm output (`runner.py:541-542`)?
+4. **The lifecycle rule holds, and at scale it is the largest knob.**
+   - **The proof arms under both lifecycles.** Eligible on 2,087 main units, against 938 under v4's
+     modified-only rule (2.2×). On AI PRs, 155 units against 38 (4.1×).
+     - 60 PRs: 2.4×, and 26× on AI.
+     - Whether the widening is right is a gold question, so it is a large scheduling choice that
+       nothing has measured.
+   - **No arm is eligible on a removed declaration,** and 21% of PRs remove one (912 declarations
+     on 205 PRs). That is where reviewers ask for a deprecated alias.
+     - 44 asks on 26 PRs mention deprecation, and reader A gives 26 of them no owner. This is the
+       one count that read review text.
+     - Of reader A's 34 unowned redundancy (F5) asks, 28 mention deprecation, renaming or removal.
+       That is a keyword match, not a re-read.
+     - So §1's fourth unowned block, redundancy's 30 asks, is mostly this knob.
+5. **The required-row cap holds, and it binds on one PR in six:** 160 of 970 (60 PRs: 20%).
+   - In those PRs, 724 of 1,484 units with an eligible specialist get a required one (49%).
+   - In the 37 with more than 10 eligible units, the share is 29%.
+   - The worst is 32245: 6 of 76.
+   - Which units get the ten slots is decided by hash order.
+6. **`naming_norm`'s bars:** not recomputed. They are owned by the naming branches.
+7. **The intent keywords:** not recomputed. Their precision needs the PR descriptions read.
+
+**AI PRs, structurally.**
+- **Larger:** p90 14 units against 8, and 9.8% over 15 units against 3.4%.
+- **More meta code:** three times the share on Tactic, Linter, test or script paths, 14.3% of
+  targets against 4.5%.
+- **More new code:** 610 added declarations to 238 modified, against 5,724 to 3,279 on main.
+- **Where the knobs bind:**
+  - Under the both-lifecycles rule, the proof arms reach four times the AI units v4's rule
+    would.
+  - The packer cliff and the 184-proposal tail are main-only.
+  - The cap binds a little less often (13% against 17%).
+- **Consistent with §1:** meta-code asks are 4.9% of AI asks and 0.6% of the rest, and only 25%
+  of them have an owner.
+
+Under the full ten-arm roster, 194 units (4.6%) have no eligible specialist. That is not
+comparable with the audit's 21.6%, which was for the lean five-arm roster.
+
+## 4. What changes in the proposal
 
 The families-first re-division (`registry.FAMILY_DIVISION`, on `arm-division`) was cut to the
 60-PR counts. At scale:
@@ -148,6 +227,13 @@ The families-first re-division (`registry.FAMILY_DIVISION`, on `arm-division`) w
 - **`library_fit` keeps `api_reuse`'s work:** 70 asks, which the merge was right to keep.
 - **Add meta-code quality to `correctness`,** or give it a small arm: simplify or speed up tactic
   and linter code, and is new behaviour tested. It is 1-5% overall and 5% of AI-PR asks.
+- **The knob fixes re-rank (§3).** Two come first:
+  - an arm eligible on removed and renamed declarations, asking whether the old name keeps a
+    deprecated alias, for `library_fit` or `pr_level`;
+  - a required-row cap that spreads its ten slots across units rather than taking them in hash
+    order.
+
+  The packer charge and the whitespace filter stay as cheap hygiene, at 3% and 1% of units.
 
 The measurement the audit fixed still stands: current against re-divided on small12's asks. It
 should now run with the three framework fixes on both sides (`eec8d3a`, `814ed69`, `db07c83`),
@@ -161,5 +247,7 @@ since they changed what every arm reads.
   PR-level asks.
 - **The families are the auditor's construction.** They were fitted on 60 PRs and hold on 1,000
   (0.3% NEW); that is coverage, not proof they are the right cut.
+- **§3 counts structure, not outcome.** It says where a knob binds, not what binding costs in
+  recall.
 - **The AI stratum is 83 PRs with feedback,** and one author dominates AI PRs in this window
   (`docs/todo/eval-set-selection.md`).

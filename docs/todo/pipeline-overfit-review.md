@@ -141,7 +141,9 @@ coverage matrix and thin for per-family rates, so report counts rather than rate
    - the stable set does not shrink;
    - findings rise by at most 1 per rep on the two feedback-free PRs.
 5. The size knobs (packer, lead limits, cap order) are readable only on the full 60: small12
-   excludes PRs over 8 units.
+   excludes PRs over 8 units. *Read on val1000's structure since (replication doc, §3): the packer
+   cliff and the whitespace units shrink to 3% and 1% of units; removed-declaration eligibility
+   and the cap's fill order come first.*
 
 **Coordinate:** the naming worked example and `naming_norm`'s tiers belong to `naming-from-statement`
 and `arm-naming-bar`. That branch's new `naming_statement` description uses `round_eq'`, 33421's
@@ -194,6 +196,16 @@ A claim that fails is reported as failed; the proposal changes to follow the lar
   - the largest unowned family is statement and API design (14.3% of asks, 61% unowned);
   - PR-level asks are 16% of AI-PR asks against 5% of the rest.
 - **Proposal:** `design` becomes the main lever and `pr_level` an AI-PR arm; `interface` shrinks
-  to registration. The
+  to registration.
+- **The settings at scale** (§3, 970 PRs, structure only, not pre-registered):
+  - the packer cliff is 2 PRs and 2.9% of units, against 32% at 60 PRs;
+  - whitespace-only units are 0.8%, against 20%;
+  - 15 PRs (1.5%) exceed the lead's 184-proposal agenda;
+  - the required-row cap binds on 16.5% of PRs, and leaves half their eligible units without a
+    required specialist;
+  - no arm sees the 912 removed declarations on 21% of PRs, which is where the unowned
+    deprecated-alias asks sit.
+
+The
 exploratory readings are not pre-registered: the family ranking, the AI stratum against main, and
 the month-by-month shape. Shares get a 95% interval from a bootstrap over PRs.
