@@ -1,32 +1,32 @@
 {
-  "compares": 4575,
-  "content_sha256": "958a59da396a642e9f9fd61d56a13b1c8e4b8bd0024bfc5a2620313a26e9e0ac",
+  "compares": 7491,
+  "content_sha256": "1ce97250b8fcca214bc9f8d1f90c8816a1bad38a4eeb0b7b1c9dcb0563bc19f3",
   "definitions_version": "pull-request-definitions/2",
   "endpoint_sources": {
-    "github": 143844,
+    "github": 152892,
     "legacy_bundle_cache": 1809
   },
   "export_version": "pull-request-export/1",
-  "exported_at": "2026-09-24T13:11:10Z",
-  "generator_git_commit": "09aa06375ad4456ae1b99c8b841c01a4b545a333",
+  "exported_at": "2026-09-24T17:27:41Z",
+  "generator_git_commit": "6bd9cc469cc0ac96b430084cd28f7f707fcb80bb",
   "generator_tree_state": "clean",
   "prs": 32851,
   "prs_by_complete_tier": {
     "0": 32851,
     "1": 32850,
-    "2": 2375
+    "2": 3883
   },
   "rows_by_endpoint": {
-    "body_edits": 3635,
-    "commits": 23239,
-    "files": 17869,
+    "body_edits": 6113,
+    "commits": 40118,
+    "files": 32659,
     "issue_comments": 171801,
     "listing": 32851,
-    "pr": 2375,
+    "pr": 3883,
     "review_comments": 157867,
-    "review_threads": 8188,
+    "review_threads": 13500,
     "reviews": 120578,
-    "timeline": 74013
+    "timeline": 124064
   },
   "schema_version": "pull-request-store/1"
 }
