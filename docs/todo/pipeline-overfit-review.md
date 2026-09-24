@@ -146,3 +146,37 @@ coverage matrix and thin for per-family rates, so report counts rather than rate
 **Coordinate:** the naming worked example and `naming_norm`'s tiers belong to `naming-from-statement`
 and `arm-naming-bar`. That branch's new `naming_statement` description uses `round_eq'`, 33421's
 gold subject, as its example. Flag it before that merge.
+
+## Replication on a 1,000-PR validation set (pre-registered 2026-09-24, before any label)
+
+The user, after reading the audit: *"Before we commit to this, let's generate a much larger
+validation set and run the same analysis over it."*
+
+**The set.** `val1000-2025-06-2026-03-v1` was sealed in `052a79b`:
+- 850 main + 150 AI PRs;
+- no author cap;
+- a short AI stratum completes with every AI member that passes;
+- disjoint from test and from the 60.
+
+It is an analysis set: no frozen release and no reviewed workspaces.
+
+**The instrument.** Rubric v2, the same as the audit's plus a frozen codebook of the twelve
+families, with `NEW` for anything outside them. Two blind Claude readers per batch.
+- *Calibrated on the audit's 144 comments:* each reader against the auditor's adjudication,
+  κ 0.95 and 0.94; reader against reader, κ 0.99; unowned asks 34 of 107.
+
+**The claims under test**, each read on asks both readers agree are asks:
+
+| | claim from the 60-PR audit | replicates if |
+|---|---|---|
+| R1 | about a third of asks have no owning arm | the unowned share (both readers `primary: none`) lies in [25%, 40%] |
+| R2 | registration (F3) and PR-level (F12) asks exist and no arm owns them | each is at least 5% of asks, and at most 10% of each has a primary owner |
+| R3 | naming is a small share of review work | F8 is at most 6% of asks |
+| R4 | the remits name little of the work explicitly | explicit fits (both readers, same arm) are at most 45% of asks |
+| R5 | a PR-level unit is needed | PR-grain asks (both readers) are at least 8% |
+| R6 | `api_reuse` owns nothing | it is the primary owner of at most 1% of asks |
+| R7 | the families cover the work | `NEW` is at most 10% of asks |
+
+A claim that fails is reported as failed; the proposal changes to follow the larger set. The
+exploratory readings are not pre-registered: the family ranking, the AI stratum against main, and
+the month-by-month shape. Shares get a 95% interval from a bootstrap over PRs.
