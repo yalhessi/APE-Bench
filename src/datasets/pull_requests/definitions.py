@@ -247,6 +247,81 @@ def clean_description(body: Any) -> str:
     return re.sub(r"\n{3,}", "\n\n", "\n".join(kept)).strip()
 
 
+# --- authorship -----------------------------------------------------------------------------
+#
+# AI-generated PRs are the eventual target, so these predicates *label* and never exclude
+# (CLAUDE.md). The evidence is author text only: labels, the title and description, commit
+# messages and commit author identities. It never reads reviewer text.
+#
+# The regexes were frozen 2026-09-24 and checked on the 2,059 tier-2 PRs created in Dec 2025 and
+# Jan 2026: 113 AI-detected. Every one of the 97 description matches read as a genuine disclosure,
+# as did 65 sampled matches from other months, and a broad keyword scan found no miss. The misses
+# nobody can see are undisclosed use.
+
+#: The store's listing vocabulary has one authorship label, `LLM-generated` (809 PRs, earliest
+#: created 2025-06-15). Maintainers apply it, not authors: all 11 in Dec-Jan were applied on or
+#: after 2026-03-16, so it is fetch-time evidence, not review-time.
+AI_GENERATED_LABELS: FrozenSet[str] = frozenset({"llm-generated", "llm_generated", "ai-generated"})
+
+_AI_TOOL = (r"(?:claude|anthropic|chat-?gpt|openai|copilot|codex|gemini|aristotle|alpha-?proof|deepseek"
+            r"|kimina|goedel-prover|seed-prover|gpt-?\d(?:\.\d)?|\bllms?\b|\bgrok\b|\bqwen|\bdevin\b|\baider\b)")
+_AI_COAUTHOR = r"co-authored-by:[^\n]*(?:" + _AI_TOOL + r"|noreply@anthropic\.com|harmonic\.fun)"
+
+AI_TRAILER_RE = re.compile(
+    _AI_COAUTHOR
+    + r"|(?:🤖|:robot:)\s*(?:generated|prepared|written|created)\s+(?:with|by)"
+    r"|\b(?:generated|prepared|written|created)\s+(?:with|by|using)\s+\[?(?:claude|codex|copilot|chatgpt|gemini|cursor|aider|gpt)",
+    re.I)
+AI_COMMIT_IDENTITY_RE = re.compile(
+    r"^(?:copilot|claude|claude\[bot\]|claude-ci-bot|cursoragent|cursor-agent|devin-ai-integration\[bot\]"
+    r"|google-labs-jules\[bot\]|chatgpt-codex-connector\[bot\]|copilot-swe-agent(?:\[bot\])?)$", re.I)
+AI_DISCLOSURE_RE = re.compile(
+    _AI_COAUTHOR
+    + r"|(?:🤖|:robot:)[^\n]{0,20}\b(?:generated|prepared|written|created)\b"
+    r"|\b(?:generated|prepared|written|created|developed|authored|drafted|(?:auto-?)?formali[sz]ed|produced|found"
+    r"|fixed|corrected|adapted|refactored|obtained|done|made|assisted)\b[^.\n]{0,40}\b(?:with|by|using|from|via)\b[^.\n]{0,30}"
+    + _AI_TOOL
+    + r"|\b(?:help|assistance|support|aid)\s+(?:of|from)\s+[^.\n]{0,20}" + _AI_TOOL
+    + r"|\b(?:AI|LLM)[ -](?:generated|assisted|assistance|written|disclosure|use|usage|tools?)\b|\buse of (?:AI|LLMs?)\b"
+    r"|" + _AI_TOOL + r"\s+(?:was|were|is)\s+used|" + _AI_TOOL
+    + r"\s+(?:gave|wrote|generated|produced|provided|suggested|helped|proved|found)\b"
+    r"|\bthanks?\b[^.\n]{0,15}" + _AI_TOOL
+    + r"|\bvibe[- ]?cod",
+    re.I)
+#: GitHub writes this trailer when an author commits a suggestion from Copilot *code review*
+#: ("Apply suggestions from code review"). That is AI in review, not authorship: 10 Dec-Jan PRs.
+COPILOT_SUGGESTION_RE = re.compile(
+    r"co-authored-by:\s*copilot(?: autofix powered by ai)?\s*<175728472\+copilot@users\.noreply\.github\.com>", re.I)
+
+AiEvidence = Literal["label", "description", "trailer"]
+
+
+def ai_authorship_evidence(labels: Iterable[Any], title: Any, body: Any,
+                           commits: Iterable[Mapping[str, Any]] = ()) -> FrozenSet[AiEvidence]:
+    """Which kinds of author-side evidence say this PR was AI-generated; empty means none seen.
+
+    `labels` are GitHub label objects or names; `commits` are GitHub commit objects (tier 2).
+    Without commits this is the evidence visible before tier 2, which is what a draw can stratify
+    on. A Copilot review-suggestion trailer is not authorship and is ignored.
+    """
+
+    found = set()
+    names = {str(label.get("name") if isinstance(label, Mapping) else label).lower() for label in labels}
+    if names & AI_GENERATED_LABELS:
+        found.add("label")
+    if AI_DISCLOSURE_RE.search(str(title or "")) or AI_DISCLOSURE_RE.search(str(body or "")):
+        found.add("description")
+    for commit in commits:
+        message = COPILOT_SUGGESTION_RE.sub("", str((commit.get("commit") or {}).get("message") or ""))
+        identities = ((commit.get("author") or {}).get("login"),
+                      ((commit.get("commit") or {}).get("author") or {}).get("name"))
+        if AI_TRAILER_RE.search(message) or any(
+                AI_COMMIT_IDENTITY_RE.match(str(identity or "").strip()) for identity in identities):
+            found.add("trailer")
+            break
+    return frozenset(found)
+
+
 # --- the scored set ---------------------------------------------------------------------------
 
 def scored_pr_numbers(*, root: Path = PROJECT_ROOT) -> FrozenSet[int]:

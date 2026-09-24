@@ -39,6 +39,7 @@ from src.datasets.pull_requests.definitions import (  # noqa: E402
     BORS_TITLE_PREFIX_RE,
     MAINTAINER_ASSOCIATIONS,
     REVERT_TITLE_RE,
+    AI_GENERATED_LABELS,
     TOOLCHAIN_ONLY_FILES,
     TRIVIAL_FEEDBACK_PATTERNS,
     classify_commenter,
@@ -50,7 +51,6 @@ from src.datasets.pull_requests.definitions import (  # noqa: E402
     strip_trivial_tokens,
 )
 
-AI_GENERATED_LABELS = {"llm-generated", "llm_generated", "ai-generated"}
 AUTOMATED_SWEEP_TITLE_RE = re.compile(
     r"^\s*chore(\(|:)|deprecat(e|ion)s? .*sweep|bump .*(toolchain|dependenc)", re.IGNORECASE
 )
