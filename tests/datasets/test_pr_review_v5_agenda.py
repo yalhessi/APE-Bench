@@ -276,6 +276,44 @@ def test_the_agenda_names_the_contract_in_its_renderer_version(release):
         "+focused-prompt/4+ask_without_fix+target_verdicts")
 
 
+def test_a_roster_enumerates_only_its_arms_and_unset_changes_nothing(release):
+    """The allowlist drops the other specialists before anything is rendered, keeps the
+    generalist to `generalist_floor`, and refuses a name that is not a registered specialist."""
+
+    roster = ["duplication", "naming"]
+    agenda, pool = _build(release, arm_ids=roster)
+    specialists = {item.arm_id for item in agenda.proposals if item.arm_id != GENERALIST_ARM_ID}
+    assert specialists and specialists <= set(roster)
+    assert {p["arm_id"] for p in pool.values()} - {GENERALIST_ARM_ID} <= set(roster)
+    assert any(item.arm_id == GENERALIST_ARM_ID for item in agenda.proposals), (
+        "the generalist follows generalist_floor, not the roster")
+    everything, _ = _build(release)
+    assert {item.proposal_id for item in agenda.proposals} < {
+        item.proposal_id for item in everything.proposals}
+    with pytest.raises(ValueError, match="registered specialists"):
+        _build(release, arm_ids=["naming", "generalist"])
+
+
+def test_a_unit_the_roster_leaves_with_no_proposal_is_reported_not_dropped(release):
+    """With the floor off, a unit only a dropped arm was eligible for has no proposal at all, and
+    the report used to read its units off the proposals -- so the unit vanished instead of being
+    counted as unreviewed, and the coverage guard had nothing to see."""
+
+    agenda, _ = _build(release, generalist_floor=False, arm_ids=["naming"])
+    selected = sorted({unit.work_unit_id for unit in release["units"] if unit.pr_number in SMOKE_PRS})
+    proposed = {item.work_unit_id for item in agenda.proposals}
+    lost = sorted(set(selected) - proposed)
+    assert lost, "this roster should leave some unit with no proposal on the smoke set"
+    blind = agenda_report(agenda)
+    seen = agenda_report(agenda, work_unit_ids=selected)
+    assert not set(lost) & set(blind["units_without_specialist"])
+    assert set(lost) <= set(seen["units_without_specialist"])
+    assert seen["work_units"] == len(selected)
+    # And with every unit proposed the two agree, which is every run before rosters existed.
+    full, _ = _build(release)
+    assert agenda_report(full) == agenda_report(full, work_unit_ids=selected)
+
+
 def test_specialist_scope_is_narrowed_to_its_own_sites(release):
     """The prompt shows only the sites the arm was scheduled on, and the contract must
     accept only those — otherwise an arm can claim about a target it was never shown, and

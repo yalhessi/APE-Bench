@@ -497,6 +497,26 @@ def test_the_directives_are_sealed_into_the_plan_when_set():
     assert evaluation_settings(_dataset(forbid_abstention=True))["forbid_abstention"] is True
 
 
+def test_a_declared_roster_is_sealed_and_relaxes_the_coverage_refusal_only_when_set():
+    """Units only a dropped arm was eligible for are unreviewed by declaration, and the plan says
+    so; without a roster the same gap is still refused, because then nobody chose it."""
+
+    import logging
+
+    from src.mathlib_review.review.runner import (
+        CoverageGapAtPlanTime, assert_coverage_is_reachable, evaluation_settings,
+    )
+
+    report = {"units_without_specialist": ["wu:a", "wu:b"]}
+    with pytest.raises(CoverageGapAtPlanTime):
+        assert_coverage_is_reachable(_dataset(generalist_floor=False), report,
+                                     logging.getLogger("t"))
+    lean = _dataset(generalist_floor=False, arm_ids=["duplication", "naming"])
+    assert_coverage_is_reachable(lean, report, logging.getLogger("t"))
+    assert evaluation_settings(lean)["arm_ids"] == ["duplication", "naming"]
+    assert "arm_ids" not in evaluation_settings(_dataset())
+
+
 def test_the_two_contracts_are_refused_together_and_verdicts_are_refused_under_solo():
     import logging
 

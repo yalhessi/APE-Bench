@@ -120,6 +120,16 @@ def test_the_working_override_spelling_still_parses():
     assert parse_cli_args(["dataset.dry_run=False"]) == {"dataset": {"dry_run": False}}
 
 
+def test_a_roster_names_registered_specialists_or_is_refused_at_load():
+    required = {"release": "r", "modification_inventory": "m"}
+    assert V5DatasetConfig.model_validate(required).arm_ids is None
+    lean = V5DatasetConfig.model_validate({**required, "arm_ids": ["naming", "api_reuse", "naming"]})
+    assert lean.arm_ids == ["api_reuse", "naming"], "sorted and de-duplicated, so the seal is stable"
+    for bad in (["namng"], ["generalist"], []):
+        with pytest.raises(Exception):
+            V5DatasetConfig.model_validate({**required, "arm_ids": bad})
+
+
 def test_the_contract_knobs_are_opt_in_and_a_misspelling_is_refused():
     """Off by default, so the committed controls rebuild byte-identical; set by name for a
     treatment; a value outside the policy vocabulary refused at load rather than at the tool."""

@@ -213,6 +213,9 @@ def build_agenda(
     #: the agenda is byte-identical to one built before the knobs existed.
     submission_verification_policy: Optional[str] = None,
     target_verdicts: bool = False,
+    #: The specialist roster (`RunDataset.arm_ids`); None is every registered arm. Proposals for
+    #: any other specialist are not enumerated at all, so no prompt is rendered or sealed for them.
+    arm_ids: Optional[Sequence[str]] = None,
 ) -> Tuple[ReviewAgenda, Dict[str, Dict[str, Any]]]:
     """The sealed agenda, and the pool of arm task payloads keyed by `proposal_id`.
 
@@ -356,6 +359,13 @@ def build_agenda(
     invocations, eligibility = enumerate_invocations(
         selected_units, modifications, pr_numbers
     )
+    if arm_ids is not None:
+        roster = set(arm_ids)
+        unknown = sorted(roster - set(arms_by_id))
+        if unknown or GENERALIST_ARM_ID in roster:
+            raise ValueError(f"arm_ids must name registered specialists; got {sorted(roster)}")
+        invocations = [item for item in invocations if item.spec_id in roster]
+        eligibility = {item.invocation_id: eligibility[item.invocation_id] for item in invocations}
     # One slice per job, carrying only what bears on that job's own targets: the families
     # it belongs to, its files' structure, the conventions its shape raises. Rendered into
     # the prompt and hashed with it, so the sealed plan records exactly what each reviewer
@@ -474,8 +484,15 @@ def initial_jobs(agenda: ReviewAgenda) -> List[AgendaProposal]:
     )
 
 
-def agenda_report(agenda: ReviewAgenda) -> Dict[str, Any]:
-    """What the agenda would cost and where it would speak — before anything is spent."""
+def agenda_report(agenda: ReviewAgenda,
+                  work_unit_ids: Optional[Iterable[str]] = None) -> Dict[str, Any]:
+    """What the agenda would cost and where it would speak — before anything is spent.
+
+    `work_unit_ids` is the run's selected units. Without it the units are read off the
+    proposals, which cannot see a unit that has none -- and a specialist roster (`arm_ids`)
+    with the floor off produces exactly that, a unit that silently drops out of the report
+    instead of being counted as unreviewed. With every unit proposed the two agree.
+    """
 
     by_arm: Dict[str, Dict[str, Any]] = {}
     for proposal in agenda.proposals:
@@ -490,7 +507,8 @@ def agenda_report(agenda: ReviewAgenda) -> Dict[str, Any]:
     # Which work units no specialist would look at. Irrelevant while the generalist floor
     # runs — it covers every unit by definition — and the single number that decides whether
     # a specialist-only run is measuring arm quality or measuring missing coverage.
-    units = {item.work_unit_id for item in agenda.proposals}
+    units = (set(work_unit_ids) if work_unit_ids is not None
+             else {item.work_unit_id for item in agenda.proposals})
     covered = {item.work_unit_id for item in eligible
                if item.arm_id != GENERALIST_ARM_ID}
     return {

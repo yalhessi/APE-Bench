@@ -28,7 +28,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field, field_validator
 
 from ape.orchestration import TaskOrchestrator
 from ape.orchestration.execution_index import INDEX_FILENAME as EXECUTION_INDEX_FILENAME
@@ -239,6 +239,34 @@ class V5DatasetConfig(BaseModel):
     #: the plan's evaluation settings.
     submission_verification_policy: Optional[Literal[
         "none", "verify_checkable_edits", "verify_edits_if_present"]] = None
+
+    #: The specialist roster for this run, when it is not every registered arm. The generalist is
+    #: governed by `generalist_floor`, never by this list. A COST lever: on the four fanout PRs,
+    #: dropping style, docs, generality, proof_idiom and family_design loses no hit at any vote
+    #: threshold in 8 runs and halves arm spend (140 jobs -> 55) -- a subtraction over runs whose
+    #: gold chose the roster, so it says "no hit lost on these runs", never "as good", and it is
+    #: never justified by control-PR emission, which would be selection. Units that only a dropped
+    #: arm was eligible for are unreviewed by declaration: `assert_coverage_is_reachable` warns
+    #: with their count instead of refusing, and `agenda_report.json` lists them. Sealed into the
+    #: plan's evaluation settings; unset, the agenda is byte-identical to one built before it.
+    arm_ids: Optional[List[str]] = None
+
+    @field_validator("arm_ids")
+    @classmethod
+    def _known_arms_only(cls, value):
+        if value is None:
+            return value
+        from src.mathlib_review.agenda.registry import arm_ids as registered
+
+        known = set(registered())
+        unknown = sorted(set(value) - known)
+        if unknown:
+            raise ValueError(
+                f"arm_ids names arms the registry does not have: {unknown}; known: {sorted(known)}. "
+                "The generalist is not a roster entry -- it is `generalist_floor`.")
+        if not value:
+            raise ValueError("arm_ids is empty; leave it unset for every registered arm")
+        return sorted(set(value))
 
     #: The whole run's ceiling, in billed dollars. 0 disables it.
     #:
@@ -927,6 +955,8 @@ def evaluation_settings(dataset) -> Dict[str, Any]:
         settings["target_verdicts"] = True
     if dataset.submission_verification_policy:
         settings["submission_verification_policy"] = dataset.submission_verification_policy
+    if dataset.arm_ids:
+        settings["arm_ids"] = list(dataset.arm_ids)
     return settings
 
 
@@ -953,6 +983,15 @@ def assert_coverage_is_reachable(dataset, report, logger) -> None:
     uncovered = report.get("units_without_specialist") or []
     if not uncovered:
         logger.info("specialist-only: all work units draw at least one specialist")
+        return
+    if getattr(dataset, "arm_ids", None):
+        # A declared roster, sealed into the plan: these units are outside it by choice, and the
+        # plan and agenda_report say which, so a recall number from this run can be read as
+        # "the roster's remit" rather than mistaken for arms that looked and missed.
+        logger.warning(
+            "specialist-only with roster %s: %d work unit(s) have no eligible arm in the roster "
+            "and are not reviewed (listed in agenda_report.json units_without_specialist)",
+            list(dataset.arm_ids), len(uncovered))
         return
     raise CoverageGapAtPlanTime(
         f"generalist_floor is off and {len(uncovered)} work unit(s) have no eligible "
@@ -1605,10 +1644,11 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         generalist_floor=dataset.generalist_floor,
         submission_verification_policy=dataset.submission_verification_policy,
         target_verdicts=dataset.target_verdicts,
+        arm_ids=dataset.arm_ids,
     )
     stamp_submission_directives(pool, dataset, logger)
     assert_run_is_named(dataset)
-    report = agenda_report(agenda)
+    report = agenda_report(agenda, work_unit_ids=[unit.work_unit_id for unit in units])
 
     if dataset.dry_run:
         logger.info("DRY RUN — nothing is written and no model is called")

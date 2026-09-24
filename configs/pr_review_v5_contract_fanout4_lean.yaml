@@ -1,0 +1,25 @@
+# The unified contract on the four fanout PRs with a five-arm roster -- a COST configuration.
+#
+# docs/todo/specialist-arm-contents.md, "four specialist levers measured": in fanout, removing an arm
+# is a pure subtraction, and dropping style, docs, generality, proof_idiom and family_design loses no
+# hit at any vote threshold in 8 runs while halving arm spend (140 jobs -> 55; V3 $5.60 -> ~$2.75).
+# That roster was chosen on the same gold it is scored on, so read a run of this as "no hit lost on
+# these runs", never as "as good", and never justify the cut by control-PR emission (selection).
+# It exists so three reps of a four-PR condition cost about what one full-roster rep does; score a
+# lean rep against pr5_V3_contract_fanout4_rep1 by subtracting the dropped arms' findings there.
+#
+# NOT a verdict on the dropped arms. These four PRs carry no docs obligation, and docs has never run
+# at its one counted on-concern obligation elsewhere; do not carry this roster to another PR set.
+# 22 of the 33 work units here have only style or docs eligible, so they are unreviewed by
+# declaration: agenda_report.json lists them under units_without_specialist and `plan` warns with
+# the count.
+#
+# Run names: pr5_V3L_contract_fanout4_lean_rep<n>.
+extends: pr_review_v5_verdicts_fanout4.yaml
+dataset:
+  arm_ids:
+  - naming
+  - duplication
+  - proof_golf
+  - correctness
+  - api_reuse
