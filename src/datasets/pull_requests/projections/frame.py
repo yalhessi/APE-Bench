@@ -485,17 +485,25 @@ def load_sealed(name: str, root: Path = EVALUATION_ROOT) -> Tuple[FrameSpec, Lis
 # --- nested subsets -------------------------------------------------------------------------------
 
 def nested_subset(spec: FrameSpec, members: Sequence[FrameMember], draw: Draw, *,
-                  main_size: int, ai_size: int) -> Dict[str, object]:
+                  main_size: int, ai_size: int, units: Optional[Mapping[int, int]] = None,
+                  max_units: Optional[int] = None) -> Dict[str, object]:
     """A smaller version of a completed draw: in every stratum, the first accepted PRs in its seeded
     order. Month quotas are the largest remainder over the full draw's quotas.
 
     It is a prefix of what the full walk accepted, not a fresh smaller walk, so it can never hold a
     PR the full set does not. A fresh walk could: author and base caps bind differently at a
     smaller size. A small-set number is therefore a reading of the same PRs the full set reads.
+
+    `max_units` skips, still in seed order, any PR with more work units than that, per the
+    release's `units`. It exists because one test-set PR held 14 of the first small set's 44 units
+    (2026-09-24). A small set is for testing at a small size, and a single PR should not be most
+    of it.
     """
 
     if not draw.complete or main_size > spec.main_size or ai_size > spec.ai_size:
         raise ValueError("a nested subset needs a complete draw and sizes no larger than it")
+    if max_units is not None and units is None:
+        raise ValueError("max_units needs the release's per-PR work-unit counts")
     full = {month: q for month, q in month_quotas(members, spec.main_size).items() if q}
     quotas = largest_remainder(full, main_size)
     orders = strata_orders(spec, members)
@@ -503,13 +511,19 @@ def nested_subset(spec: FrameSpec, members: Sequence[FrameMember], draw: Draw, *
     for key, order in orders.items():
         position = {m.pr_number: i for i, m in enumerate(order)}
         accepted = sorted((a.pr_number for a in draw.accepted if a.stratum == key), key=position.__getitem__)
+        if max_units is not None:
+            accepted = [n for n in accepted if units[n] <= max_units]
         take = ai_size if key == "ai" else quotas.get(key.split(":", 1)[1], 0)
         if take:
+            if len(accepted) < take:
+                raise ValueError(f"{key}: only {len(accepted)} accepted PRs within the cap, {take} needed")
             chosen[key] = accepted[:take]
-    return {"main_size": main_size, "ai_size": ai_size, "main_quotas": {k: v for k, v in quotas.items() if v},
+    return {"main_size": main_size, "ai_size": ai_size, "max_units": max_units,
+            "main_quotas": {k: v for k, v in quotas.items() if v},
             "by_stratum": chosen, "pr_numbers": sorted(n for prs in chosen.values() for n in prs),
-            "rule": "per stratum, the first accepted PRs of the full draw in seeded order; month quotas "
-                    "by largest remainder over the full draw's"}
+            "rule": "per stratum, the first accepted PRs of the full draw in seeded order"
+                    + (f" with at most {max_units} work units" if max_units is not None else "")
+                    + "; month quotas by largest remainder over the full draw's"}
 
 
 # --- the generation release -------------------------------------------------------------------
@@ -696,6 +710,8 @@ def main() -> None:
     p.add_argument("--label", required=True, help="e.g. small12; names subset-<label>.json")
     p.add_argument("--main-size", type=int, required=True)
     p.add_argument("--ai-size", type=int, required=True)
+    p.add_argument("--max-units", type=int, default=None,
+                   help="skip PRs with more work units than this, per the release at inputs/pr_review_v4/releases/<name>")
     p = sub.add_parser("candidates")
     p.add_argument("--name", required=True)
     p.add_argument("--round", type=int, required=True)
@@ -762,9 +778,15 @@ def main() -> None:
     if args.verb == "subset":
         draw_path = seal_dir(spec.name) / "draw.json"
         draw = Draw.model_validate_json(draw_path.read_text(encoding="utf-8"))
-        chosen = nested_subset(spec, members, draw, main_size=args.main_size, ai_size=args.ai_size)
+        from src.mathlib_review.paths import V4_RELEASES
+
+        units_path = V4_RELEASES / spec.name / "derived/work_units.jsonl"
+        units = collections.Counter(row["pr_number"] for row in jsonl_rows(units_path)) if args.max_units else None
+        chosen = nested_subset(spec, members, draw, main_size=args.main_size, ai_size=args.ai_size,
+                               units=units, max_units=args.max_units)
         record = {"label": args.label, "frame_seal_sha256": seal_sha,
-                  "draw_sha256": sha256_file(draw_path), **chosen}
+                  "draw_sha256": sha256_file(draw_path),
+                  **({"work_units_sha256": sha256_file(units_path)} if args.max_units else {}), **chosen}
         path = seal_dir(spec.name) / f"subset-{args.label}.json"
         write_once(path, pretty_json_bytes(record))
         print(json.dumps({k: record[k] for k in ("main_quotas", "pr_numbers")}), f"-> {path}")

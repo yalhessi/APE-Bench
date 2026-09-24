@@ -366,12 +366,19 @@ def test_the_committed_small12_subset_is_recomputed_from_the_sealed_draw(name):
 
     import yaml
 
+    from src.mathlib_review.io import jsonl_rows
+
     spec, members, digest = f.load_sealed(name)
     out = Path("inputs/pull_requests/evaluation") / name
     draw = f.Draw.model_validate_json((out / "draw.json").read_text())
     record = json.loads((out / "subset-small12.json").read_text())
     assert record["frame_seal_sha256"] == digest
-    assert record["pr_numbers"] == f.nested_subset(spec, members, draw, main_size=10, ai_size=2)["pr_numbers"]
+    units = collections.Counter(row["pr_number"] for row in jsonl_rows(
+        Path("inputs/pr_review_v4/releases") / name / "derived/work_units.jsonl"))
+    assert record["max_units"] == 8
+    assert record["pr_numbers"] == f.nested_subset(spec, members, draw, main_size=10, ai_size=2,
+                                                   units=units, max_units=8)["pr_numbers"]
+    assert max(units[n] for n in record["pr_numbers"]) <= 8
     config = "eval" if name.startswith("eval") else "val"
     small = yaml.safe_load(Path(f"configs/pr_review_v5_{config}_2025_06_2026_03_v1_small12.yaml").read_text())
     assert small["dataset"]["pr_numbers"] == record["pr_numbers"]

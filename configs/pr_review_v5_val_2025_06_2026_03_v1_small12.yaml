@@ -1,7 +1,9 @@
 # The small version of the VALIDATION set val-2025-06-2026-03-v1: 12 of its 60 PRs, for testing at a smaller size.
 # It is nested in the full set: in every stratum, the first PRs the full draw accepted in seeded
-# order, one main PR per month (2025-06..2026-03) plus the first 2 AI-stratum PRs
-# (`projections.frame subset --label small12`; inputs/pull_requests/evaluation/val-2025-06-2026-03-v1/subset-small12.json).
+# order among those with at most 8 work units, one main PR per month (2025-06..2026-03) plus the
+# first 2 AI-stratum PRs. The unit cap keeps one PR from being most of a small run: without it
+# test PR 30777 held 14 of 44 units (2026-09-24).
+# (`projections.frame subset --label small12 --max-units 8`; inputs/pull_requests/evaluation/val-2025-06-2026-03-v1/subset-small12.json).
 # Same release, inventory and reviewed workspaces as the full config it extends. A small-set number
 # is therefore a reading of PRs the full set also reads.
 

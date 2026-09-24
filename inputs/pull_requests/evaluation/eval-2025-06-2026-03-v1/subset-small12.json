@@ -18,7 +18,7 @@
       29731
     ],
     "main:2025-10": [
-      30777
+      30247
     ],
     "main:2025-11": [
       31239
@@ -52,12 +52,13 @@
     "2026-03": 1
   },
   "main_size": 10,
+  "max_units": 8,
   "pr_numbers": [
     25833,
     26946,
     27969,
     29731,
-    30777,
+    30247,
     31239,
     31455,
     32345,
@@ -66,5 +67,6 @@
     36683,
     36717
   ],
-  "rule": "per stratum, the first accepted PRs of the full draw in seeded order; month quotas by largest remainder over the full draw's"
+  "rule": "per stratum, the first accepted PRs of the full draw in seeded order with at most 8 work units; month quotas by largest remainder over the full draw's",
+  "work_units_sha256": "305d516cd5b0183ff99b8298e28d12e67f590ed7195a65f11541bc61efed6583"
 }
