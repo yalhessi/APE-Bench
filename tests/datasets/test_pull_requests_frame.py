@@ -181,17 +181,19 @@ def test_the_committed_pre_registration_is_intact_and_says_what_was_ruled():
     assert sum(f.month_quotas(members, spec.main_size).values()) == 50
 
 
-def test_the_committed_draw_is_a_seed_order_walk_of_the_sealed_frame():
-    """Store-free: every accepted PR is a round-1 candidate, each month got exactly its quota, and
-    within a stratum the accepted PRs appear in the seeded order."""
+@pytest.mark.parametrize("name,rounds", [("eval-2025-06-2026-03-v1", 1), ("val-2025-06-2026-03-v1", 2)])
+def test_the_committed_draw_is_a_seed_order_walk_of_the_sealed_frame(name, rounds):
+    """Store-free: every accepted PR is a candidate of the last round collected, each month got
+    exactly its quota, and within a stratum the accepted PRs appear in the seeded order."""
 
     from pathlib import Path
 
-    spec, members, digest = f.load_sealed("eval-2025-06-2026-03-v1")
-    out = Path("inputs/pull_requests/evaluation/eval-2025-06-2026-03-v1")
+    spec, members, digest = f.load_sealed(name)
+    out = Path("inputs/pull_requests/evaluation") / name
     draw = f.Draw.model_validate_json((out / "draw.json").read_text())
     assert draw.frame_seal_sha256 == digest and draw.complete
-    candidates = {int(line) for line in (out / "candidates-r1.txt").read_text().split("\n")
+    assert not (out / f"candidates-r{rounds + 1}.txt").exists()
+    candidates = {int(line) for line in (out / f"candidates-r{rounds}.txt").read_text().split("\n")
                   if line.strip() and not line.startswith("#")}
     assert {a.pr_number for a in draw.accepted} <= candidates
     counts = collections.Counter(a.stratum for a in draw.accepted)
@@ -290,3 +292,13 @@ def test_the_validation_seal_is_the_test_frame_minus_the_test_draw():
     _, _, derived, _, reserved = f.derived_frame("eval-2025-06-2026-03-v1")
     assert val_members == derived and len(reserved) == 60
     assert not {m.pr_number for m in val_members} & set(reserved)
+
+
+def test_the_validation_and_test_draws_share_no_pr_and_no_base():
+    from pathlib import Path
+
+    draws = [f.Draw.model_validate_json((Path("inputs/pull_requests/evaluation") / n / "draw.json").read_text())
+             for n in ("eval-2025-06-2026-03-v1", "val-2025-06-2026-03-v1")]
+    prs = [{a.pr_number for a in d.accepted} for d in draws]
+    bases = [{a.base_sha for a in d.accepted} for d in draws]
+    assert len(prs[0]) == len(prs[1]) == 60 and not prs[0] & prs[1] and not bases[0] & bases[1]
