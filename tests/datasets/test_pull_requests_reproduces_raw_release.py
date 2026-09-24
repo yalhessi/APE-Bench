@@ -22,12 +22,13 @@ from pathlib import Path
 
 import pytest
 
+from src.datasets.pull_requests import definitions
 from src.datasets.pull_requests.projections.episodes import (
     project_episodes, write_episode_release,
 )
 from src.datasets.pull_requests.seed import seed_from_legacy
 from src.datasets.pull_requests.store import PullRequestStore
-from src.mathlib_review.io import jsonl_bytes, sha256_file
+from src.mathlib_review.io import jsonl_bytes, jsonl_rows, sha256_file
 from src.mathlib_review.paths import LEGACY_V2_BUNDLES, LEGACY_V2_COMPARES, LEGACY_V2_ROSTER
 from src.mathlib_review.release.episode_builder import (
     funnel_and_first_round, load_roster, segment_review_rounds,
@@ -105,15 +106,29 @@ def test_the_rosters_the_releases_pin_are_the_legacy_roster():
 
 @pytest.mark.parametrize("source", ["legacy_cache", "store"])
 @pytest.mark.parametrize("release,all_rounds,counts", CASES, ids=["first-round", "all-rounds"])
-def test_the_frozen_release_reproduces_byte_for_byte(source, release, all_rounds, counts, store, tmp_path):
+def test_the_frozen_release_reproduces_byte_for_byte(source, release, all_rounds, counts, store, tmp_path,
+                                                     monkeypatch):
     if not release.is_dir():
         pytest.skip(f"{release} absent")
+    # The frozen releases predate definitions/2; they reproduce under the bot list they were built with.
+    monkeypatch.setattr(definitions, "BOT_LOGINS", definitions.BOT_LOGINS_BY_VERSION["pull-request-definitions/1"])
     rebuilt = _from_legacy(all_rounds, tmp_path) if source == "legacy_cache" else _from_store(store, all_rounds)
     for relpath, count in counts.items():
         assert len(rebuilt[relpath]) == count, relpath
     for relpath in list(counts) + ["source/events.jsonl"]:
         assert jsonl_bytes(rebuilt[relpath]) == (release / relpath).read_bytes(), (
             f"{relpath} from the {source} no longer matches {release.name}")
+
+
+def test_under_definitions_2_the_frozen_funnel_moves_by_one_reason_and_no_episode(store):
+    if not FIRST_ROUND.is_dir():
+        pytest.skip(f"{FIRST_ROUND} absent")
+    frozen = {row["pr_number"]: row for row in jsonl_rows(FIRST_ROUND / "derived/funnel.jsonl")}
+    rebuilt = _from_store(store, all_rounds=False)
+    now = {row.pr_number: row.model_dump(mode="json") for row in rebuilt["derived/funnel.jsonl"]}
+    moved = {n: (frozen[n].get("reason"), now[n].get("reason")) for n in frozen if frozen[n] != now[n]}
+    assert moved == {33350: ("no_mathlib_lean_file", "bot_author")}
+    assert jsonl_bytes(rebuilt["input/episodes.jsonl"]) == (FIRST_ROUND / "input/episodes.jsonl").read_bytes()
 
 
 def test_a_store_built_release_seals_and_carries_the_same_episodes(store, tmp_path):

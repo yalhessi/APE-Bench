@@ -121,14 +121,26 @@ def test_the_roster_loader_matches_every_old_loader(roster):
     assert set(roster) == set(load_reviewer_roster(LEGACY_V2_ROSTER))
 
 
-def test_is_bot_agrees_on_every_login(bundles):
+def _frozen_logins(bundles):
     logins = {None, "", "bors", "Github-Actions", "mathlib-bot", "dependabot[bot]"}
     for bundle in bundles:
         for _, author, item in _events(bundle):
             logins.add((item.get("user") or {}).get("login"))
             logins.add(author)
-    for login in logins:
+    return logins
+
+
+def test_is_bot_agrees_on_every_login_under_the_definitions_the_frozen_releases_used(bundles, monkeypatch):
+    monkeypatch.setattr(d, "BOT_LOGINS", d.BOT_LOGINS_BY_VERSION["pull-request-definitions/1"])
+    for login in _frozen_logins(bundles):
         assert d.is_bot(login) == _legacy_is_bot(login), login
+
+
+def test_definitions_2_adds_exactly_the_bot_assistant(bundles):
+    assert d.DEFINITIONS_VERSION == "pull-request-definitions/2"
+    changed = {login for login in _frozen_logins(bundles) if d.is_bot(login) != _legacy_is_bot(login)}
+    # 33350's author: the only one of the 201 frozen bundles it touches.
+    assert changed == {"leanprover-community-bot-assistant"}
 
 
 def test_is_reviewer_agrees_with_the_release_builder_on_every_event(bundles, roster):

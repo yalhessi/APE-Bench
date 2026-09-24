@@ -39,16 +39,28 @@ from ape.utils.project import PROJECT_ROOT
 from src.mathlib_review.io import jsonl_rows, sha256_file
 from src.mathlib_review.paths import V2_EVAL_SET, V4_RELEASES
 
-DEFINITIONS_VERSION = "pull-request-definitions/1"
+DEFINITIONS_VERSION = "pull-request-definitions/2"
 
 # --- identity ------------------------------------------------------------------------------
 
 MAINTAINER_ASSOCIATIONS: FrozenSet[str] = frozenset({"MEMBER", "OWNER", "COLLABORATOR"})
 
-#: Bot logins beyond the `[bot]` / `-bot` suffixes. From spec §3.1's explicit denylist.
-BOT_LOGINS: FrozenSet[str] = frozenset({
-    "bors", "github-actions", "leanprover-community-bot", "leanprover-community-mathlib4-bot",
-})
+#: Bot logins beyond the `[bot]` / `-bot` suffixes, by definitions version. /1 is spec §3.1's
+#: explicit denylist, and every frozen release was built under it. /2 adds the one bot the suffix
+#: rules miss. Under /1 it counted as a reviewer through association: it was the only decider on 163
+#: pre-gate passes in 2024-03..2025-07 and the author of 64 PRs (measured 2026-09-24). Among the 201
+#: frozen bundles it touches only 33350's funnel reason (`no_mathlib_lean_file` -> `bot_author`),
+#: which is why the reproduction tests rebuild under /1.
+BOT_LOGINS_BY_VERSION: Mapping[str, FrozenSet[str]] = {
+    "pull-request-definitions/1": frozenset({
+        "bors", "github-actions", "leanprover-community-bot", "leanprover-community-mathlib4-bot",
+    }),
+    "pull-request-definitions/2": frozenset({
+        "bors", "github-actions", "leanprover-community-bot", "leanprover-community-mathlib4-bot",
+        "leanprover-community-bot-assistant",
+    }),
+}
+BOT_LOGINS: FrozenSet[str] = BOT_LOGINS_BY_VERSION[DEFINITIONS_VERSION]
 
 
 def is_bot(login: Optional[str]) -> bool:

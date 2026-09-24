@@ -12,6 +12,11 @@ paths:
   Lean predicates. Never write a new reviewer test; call `classify_commenter`. GitHub's
   `author_association` alone loses most review (maintainers show as CONTRIBUTOR, PR authors pass):
   measured 33% recall / 62% precision against spec §3.1 on the 201 cached bundles.
+- **A predicate change bumps `DEFINITIONS_VERSION`, and frozen releases rebuild under the version
+  they were built with.** `/2` (2026-09-24) added `leanprover-community-bot-assistant` to the bot
+  list. The suffix rules missed it, and it was the only decider on 163 pre-gate passes in
+  2024-03..2025-07. On the 201 frozen bundles it moves 33350's funnel reason and no episode, so the
+  reproduction tests pin `BOT_LOGINS_BY_VERSION["…/1"]`. A test states the exact delta.
 - The store (`data/pull_requests/pr/<n>/`, gitignored) is immutable and neutral: a null may be filled
   once, a value never changes; exclusion happens in projections. Index and projections pin the store
   content digest; the precedent index refuses a corpus-sha mismatch. Provenance is tracked under
