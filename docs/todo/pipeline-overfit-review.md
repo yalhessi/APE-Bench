@@ -177,6 +177,23 @@ families, with `NEW` for anything outside them. Two blind Claude readers per bat
 | R6 | `api_reuse` owns nothing | it is the primary owner of at most 1% of asks |
 | R7 | the families cover the work | `NEW` is at most 10% of asks |
 
-A claim that fails is reported as failed; the proposal changes to follow the larger set. The
+A claim that fails is reported as failed; the proposal changes to follow the larger set.
+
+**Result, 2026-09-24** (`docs/research/pipeline-overfit-2026-09-replication.md`; labels in
+`results/pr_review_v5/adjudications/arm-coverage-val1000-2025-06-2026-03-v1/`).
+- **Failed:**
+  - R1: unowned 21.4% (18.9-24.2);
+  - R2 on F3: registration 4.3%, 14% owned (F12 holds: 6.3%, 1% owned);
+  - R3: naming 9.7%;
+  - R6: `api_reuse` owns 3.8%.
+- **Held:**
+  - R4: explicit 42.0%;
+  - R5: PR grain 9.3%;
+  - R7: NEW 0.3%.
+- **At scale:**
+  - the largest unowned family is statement and API design (14.3% of asks, 61% unowned);
+  - PR-level asks are 16% of AI-PR asks against 5% of the rest.
+- **Proposal:** `design` becomes the main lever and `pr_level` an AI-PR arm; `interface` shrinks
+  to registration. The
 exploratory readings are not pre-registered: the family ranking, the AI stratum against main, and
 the month-by-month shape. Shares get a 95% interval from a bootstrap over PRs.

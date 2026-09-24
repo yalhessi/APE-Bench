@@ -203,14 +203,15 @@ paths:
 - **The dev set is one reviewer's review of four PRs, so check that a dev ask recurs before writing
   it into anything a model sees (2026-09-24).** One reviewer wrote 30 of the dev set's 52 round-1
   comments, on 33066, 33098, 33145 and 33337. 33098 alone is 14 of the 43 dev gold obligations.
-  Naming is 29% of dev asks and 3% of the validation set's 107, where the busiest of 26 reviewers
-  wrote 17%. The prompts carry that fit:
+  Naming is 29% of dev asks, against 9.7% of the 1,833 asks on the 1,000-PR validation set, where
+  the busiest of 80 reviewers wrote 8.5% (the 60-PR set's 3% was a small sample). The prompts carry that fit:
   - the naming example is 33337's counts;
   - `(α := αᵒᵈ)` is 33145's suggestion, verbatim;
   - `family_design`'s five bullets are five dev obligations.
 
-  And the asks the dev set lacked have no owner: attribute registration, PR-level asks and API
-  design are 33 of the 107 validation asks. Before cutting a remit, example or threshold to a dev
+  And the asks the dev set lacked have no owner: on 1,000 validation PRs, API design (122),
+  PR-level asks (111) and attribute registration (62) are most of the 21% that no arm's remit
+  covers. Before cutting a remit, example or threshold to a dev
   obligation, count that ask's family in the validation set's round-1 comments. The families, and
   both readers' labels, are in `results/pr_review_v5/adjudications/arm-coverage-val-2025-06-2026-03-v1/`.
   The audit is `docs/research/pipeline-overfit-2026-09.md`.

@@ -10,6 +10,17 @@ validation release's `pr_numbers` and asserts it shares none with the test relea
 Three parts, as the todo specifies: (1) whether the arm division covers the review work, (2)
 dev-specific text in what the model sees, (3) dev-tuned knobs. Then a proposal.
 
+> **Replicated on 1,000 PRs, 2026-09-24: four of seven pre-registered claims failed**
+> (`pipeline-overfit-2026-09-replication.md`). The shares below are 60-PR counts. At scale:
+> - unowned asks are **21%**, not a third;
+> - naming is **9.7%**, not 3%;
+> - registration is 4.3% and binders 3.3%;
+> - `api_reuse` owns 3.8%.
+>
+> What holds: the remits name only 42% explicitly, and 9% of asks need a PR-level unit. The
+> largest unowned block is statement and API design (14% of asks, 61% unowned). PR-level asks
+> are 16% of the asks on AI-generated PRs. Read the numbers here against that.
+
 ## Conclusion first
 
 **The arm division was shaped by one reviewer's asks on four PRs, and the validation set's review
