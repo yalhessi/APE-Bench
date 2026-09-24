@@ -47,9 +47,9 @@ it for another.
    roster fanout ~$35 (five arms, `configs/pr_review_v5_contract_fanout4_lean.yaml` scaled), lead ~$58, full
    fanout ~$70; judge extra (~$0.006 a pair). The set's size, mix and config trade against each other and
    should be fixed together. *(Survey: these scale small dev means; re-priced on the frame's own sizes below.)*
-8. **Pre-registration.** Frame, strata, seed, exclusions (AI-authored, abandoned, a reviewed state that does
-   not compile -- 33057 round 1 is the example), controls, and the reading rule, frozen with a digest before
-   anyone reads the new gold.
+8. **Pre-registration.** Frame, strata, seed, exclusions (PRs used for development; a reviewed state that
+   does not compile -- 33057 round 1 is the example; AI-generated PRs are labelled, not excluded, per the
+   2026-09-24 ruling), controls, and the reading rule, frozen with a digest before anyone reads the new gold.
 
 ## Start here
 
@@ -212,3 +212,25 @@ session:
 6. **Frame.** January alone, or collect February's tier 2 first.
 7. **Gold.** Who sits the human confirmation; which model builds the gold (not `gpt_5.2` or
    `gpt_5_mini`); and whether it is built before the run.
+
+### The user's rulings, 2026-09-24
+
+- **Accepted:** 1 (natural rate), 2 (keep closed-unmerged, with a disclosed count), 4 (a target cap plus
+  author and base caps -- the cap is now to be re-checked against AI PRs, which run larger), 5 (dated roster).
+- **3, overruled: AI-generated PRs are kept, labelled, and filterable, never excluded.** The system is
+  ultimately for reviewing AI-generated PRs. They are the maintainers' pain point: frequent, and at times
+  much larger. Handling them may later need new features, such as splitting a big PR.
+- **6, overruled: a long span of dates, December 2025 included.** *"You are interpreting leakage too
+  strongly. We will construct a proper test set that we have not used for development, but since we are
+  not training a model, worrying about leakage too much isn't productive at this stage."* The only
+  exclusion is PR-level: PRs used for development, by a mechanical rule. Window-level gates are
+  withdrawn: the Phase 1 corpus pool, the v1-era adjacency list, the precedent-corpus lag and model
+  snapshot dates. A breadth argument backs this too: *"the signal is inherently sparse and looking at a
+  very long span of dates is much more helpful for the development of our system than sticking too
+  closely to looking at a limited set of PRs."*
+- **7: not yet ruled.**
+
+What still binds: the test set is sealed from development once drawn, so the hygiene list above now
+applies to the drawn PRs, not to whole windows. Biases that are not leakage stay disclosed: outcome
+censoring (closed by the listing walk), the funnel's final-state size gates, and the fast-closer shape
+of the dev pool.

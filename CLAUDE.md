@@ -4,6 +4,9 @@ Research fork of APE-Bench (arXiv 2504.19110). The question: given a real Mathli
 already compiles, would a maintainer merge it, and if not, what specifically would they ask
 for? Throughline: *verifiable correctness is not enough.* Exploratory and long-running, with
 many threads, some abandoned. Read the record before proposing anything that sounds new.
+The eventual target is **AI-generated PRs**. They are the maintainers' pain point: frequent, and at
+times much larger. So every dataset labels them and keeps them filterable, and never excludes them by
+default (user, 2026-09-24).
 
 ## Where the truth lives (read before designing)
 
