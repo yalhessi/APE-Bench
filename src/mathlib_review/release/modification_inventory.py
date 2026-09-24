@@ -211,6 +211,20 @@ def _component_rows(
             reviewed_sha256=_hash(reviewed_value),
             classifier=DECLARATION_PARSER,
         ))
+    # A declaration edited only in whitespace that the components strip compares unchanged in
+    # every component, yet it is `modified`, and `validate_inventory` then refused the whole
+    # inventory. That hit 6 of 712 January 2026 episodes, 33081 in v4, and a drawn validation PR
+    # (2026-09-24). Name the change for what it is. Only inputs that were refused are touched, so
+    # every record built before is byte-identical and INVENTORY_VERSION stays.
+    if (target.kind == "declaration" and _lifecycle(target) == "modified" and rows
+            and all(row.status == "unchanged" for row in rows)):
+        rows.append(ModificationComponent(
+            component="layout",
+            status="modified",
+            base_sha256=_hash(target.base_code or ""),
+            reviewed_sha256=_hash(target.reviewed_code or ""),
+            classifier=DECLARATION_PARSER,
+        ))
     if not rows:
         rows.append(ModificationComponent(
             component="unknown",

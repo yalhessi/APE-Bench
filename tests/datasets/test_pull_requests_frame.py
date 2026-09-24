@@ -302,3 +302,33 @@ def test_the_validation_and_test_draws_share_no_pr_and_no_base():
     prs = [{a.pr_number for a in d.accepted} for d in draws]
     bases = [{a.base_sha for a in d.accepted} for d in draws]
     assert len(prs[0]) == len(prs[1]) == 60 and not prs[0] & prs[1] and not bases[0] & bases[1]
+
+
+def test_a_whitespace_only_declaration_edit_is_a_layout_change_not_a_refusal():
+    from pathlib import Path
+
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.release.modification_inventory import build_inventory
+    from src.mathlib_review.schema import ChangeGraph
+
+    graphs = load_jsonl(Path("inputs/pr_review_v4/releases/dev-medium-0.5.0/derived/change_graphs.jsonl"), ChangeGraph)
+    graph = next(g for g in graphs if any(t.kind == "declaration" and t.base_code and t.reviewed_code for t in g.targets))
+    target = next(t for t in graph.targets if t.kind == "declaration" and t.base_code and t.reviewed_code)
+    edited = target.model_copy(update={"reviewed_code": target.base_code + "\n\n"})
+    (record,) = build_inventory([graph.model_copy(update={"targets": [edited]})])
+    assert record.lifecycle == "modified" and record.classification_status == "complete"
+    assert [(c.component, c.status) for c in record.component_deltas if c.status != "unchanged"] == [("layout", "modified")]
+
+
+def test_the_frozen_test_release_inventory_rebuilds_byte_for_byte():
+    """The layout fix touches only inputs the builder used to refuse, so no frozen id moved."""
+
+    from pathlib import Path
+
+    from src.mathlib_review.io import jsonl_bytes, load_jsonl
+    from src.mathlib_review.release.modification_inventory import build_inventory
+    from src.mathlib_review.schema import ChangeGraph
+
+    release = Path("inputs/pr_review_v4/releases/eval-2025-06-2026-03-v1")
+    graphs = load_jsonl(release / "derived/change_graphs.jsonl", ChangeGraph)
+    assert jsonl_bytes(build_inventory(graphs)) == (release / "derived/modification_inventory.jsonl").read_bytes()
