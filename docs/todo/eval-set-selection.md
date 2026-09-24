@@ -306,3 +306,59 @@ need new features, such as splitting a big PR. The motivating numbers are above:
 the gate against 5% of others, and about four large feature PRs, all unmerged. Before any of them can
 be an episode, they need a reviewed-head compare fetch, full file contents where GitHub omitted the
 patch (34481), and a check of 32976's 1,287-file diff.
+
+## Decided and built, 2026-09-24
+
+The user accepted the three recommendations ("Okay let's continue"):
+- span B, 2025-06..2026-03, gated on a pilot build;
+- the narrow dev-used rule (232 PRs);
+- a weighted AI stratum of 10 PRs alongside the natural-rate 50.
+
+Gold (ruling 7) is still open.
+
+**Pilot builds: both pre-module eras build from cache.**
+
+| Base | Date, toolchain | Cache | Result |
+|---|---|---|---|
+| `6ea68a87c1a3` | 2025-06-01, v4.20.0-rc5 (installed) | Azure | 6,763 files served; `lake build` 23 s with nothing compiled; 569 s end to end |
+| `1927b6e6c14b` | 2025-08-25, v4.23.0-rc2 (downloaded) | hardcoded Cloudflare | 7,101 files served; `lake build` 27 s |
+
+The August pilot exposed a framework defect. Its snapshot stored 58,256 of 58,259 files, including
+losing `Mathlib/Data/Set/Basic.olean`, and still reported success. That is fixed in `282df68`:
+storage survives a vanished rename, and a partial snapshot is refused. The snapshot was moved out
+and rebuilt whole (58,259 of 58,259). A scan of all 220 stored base snapshots now finds none missing
+an `.olean`.
+
+**Committed on this branch, in order:**
+
+| Commit | What |
+|---|---|
+| `299fbf5` | the store export at f2d2beb6 |
+| `e83b991` | definitions/2 (the bot assistant) |
+| `aaf17d5` | `collect --prs` |
+| `1486417` | `--build_timeout` applied |
+| `af19af9` | the module flag only for module files |
+| `1e3b4e0` | AI-authorship evidence |
+| `b1aeda1` | `projections/frame.py` |
+| `282df68` | whole snapshots |
+| `c753477` | **the pre-registration**, seal `bcf93808` (see below) |
+| `13dcf71` | round-1 candidates |
+
+The pre-registration fixes:
+- 9,939 frame members;
+- quotas 5 5 6 4 4 5 4 5 5 7;
+- 388 AI members;
+- target caps 100 (main) and 150 (AI), author cap 3, base cap 2;
+- seed `eval-2025-06-2026-03-v1`.
+
+Round 1 is 131 candidates, 107 of them needing tier 2.
+
+**Next, in order:**
+1. `collect --prs` round 1.
+2. `projections.frame walk`. Collect round 2 only if a stratum stops for `needs_collection`; if one
+   stops for `needs_base`, `git fetch` that commit into the clone.
+3. Build a release from the drawn episodes. Store-built releases need `validate_release` and
+   `verify_frozen` to accept store sources, and a CLI around `write_episode_release`; see the
+   blockers above.
+4. `prebuild --reviewed`, then apply the replacement rule.
+5. Seal the reading rule, the gold chain and the controls definition before any gold is built.
