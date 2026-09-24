@@ -136,3 +136,14 @@ def test_frozen_phase3_release_has_complete_production_lineage():
     assert all("gold" not in Path(item.path).parts for item in manifest.derived_artifacts)
     for artifact in manifest.input_artifacts + manifest.derived_artifacts:
         assert sha256_file(DEFAULT_OUT / artifact.path) == artifact.sha256
+
+
+def test_the_lean_check_passes_the_module_flag_only_for_a_module_system_file():
+    from src.mathlib_review.evidence.operators.canonical_api import lean_check_command
+
+    module_file = "/-\nCopyright (c) 2025.\n-/\nmodule\n\npublic import Mathlib.Order.Basic\n"
+    plain_file = "/-\nCopyright (c) 2025.\n-/\nimport Mathlib.Order.Basic\n"
+    assert lean_check_command("lake", module_file, Path("f.lean")) == \
+        ["lake", "env", "lean", "-Dexperimental.module=true", "f.lean"]
+    # Before 2026-09-24 this carried the flag too, which an older toolchain rejects with exit 1.
+    assert lean_check_command("lake", plain_file, Path("f.lean")) == ["lake", "env", "lean", "f.lean"]

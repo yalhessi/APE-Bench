@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Iterable, List, Optional
 
 from ape.toolkits.code.lean.lean_parser import parse_major_declarations
+from ape.toolkits.execute.lean.core.verification import uses_module_system
 
 from src.mathlib_review.release.change_graph import apply_file_patch, parse_unified_diff
 from src.mathlib_review.workspace import tool_env as _tool_env
@@ -274,6 +275,19 @@ def propose_insert_separation_replacement(
     return ReplacementProposal(old_block=old_block, new_block=new_block, description=description)
 
 
+def lean_check_command(lake: str, source: str, path: Path) -> List[str]:
+    """`lake env lean` on a spliced file, with the module flag only for a module-system file.
+
+    The flag was unconditional until 2026-09-24. A toolchain that predates the option rejects `-D`
+    for an unknown option with exit 1, so on an old base every proposal read as "did not compile",
+    with no error raised. The verification engine already made the same choice
+    (`core/verification.py`).
+    """
+
+    flags = ["-Dexperimental.module=true"] if uses_module_system(source) else []
+    return [lake, "env", "lean", *flags, str(path)]
+
+
 def check_applicability(
     workspace: Path,
     episode: ReviewEpisodeInput,
@@ -319,7 +333,7 @@ def check_applicability(
         handle.write(edited)
     try:
         process = subprocess.run(
-            [lake, "env", "lean", "-Dexperimental.module=true", str(temp_path)],
+            lean_check_command(lake, edited, temp_path),
             cwd=workspace,
             env=env,
             text=True,
