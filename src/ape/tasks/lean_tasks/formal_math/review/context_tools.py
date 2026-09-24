@@ -342,7 +342,7 @@ def _register_declaration(task, mcp) -> None:
         # importing it made the underscore a claim that was not true.
         from ape.toolkits.file_system.utils import grep_candidate_files_async
         from src.mathlib_review.evidence.evidence import (
-            declares_identifier, searchable_identifiers, snapshot_workspace,
+            find_declaration, searchable_identifiers, snapshot_workspace,
         )
 
         terms = searchable_identifiers(identifier)
@@ -363,8 +363,8 @@ def _register_declaration(task, mcp) -> None:
         try:
             searchable = await _snapshot_lean_files(root)
             # The same prefilter `repository_search` uses (02eba94), for the same reason:
-            # `declares_identifier` builds its pattern around `re.escape(leaf)`, so a file that
-            # does not contain a leaf literally cannot declare it, and a fixed-string grep for
+            # A declaration of the name has the name's last component on its declaration line, so
+            # a file that does not contain that leaf literally cannot declare it, and a fixed-string grep for
             # the leaves can only hand back too many files. The files are still visited in the
             # same sorted order and the decision stays with `declares_identifier`, so the result
             # is the one the full scan gave. `None` means grep did not answer: every file is
@@ -384,11 +384,12 @@ def _register_declaration(task, mcp) -> None:
                 except OSError:
                     continue
                 for term in terms:
-                    if declares_identifier(text, term):
-                        hits.append({
-                            "path": str(path.relative_to(root)),
-                            "declares": term,
-                        })
+                    found = find_declaration(text, term)
+                    if found:
+                        # The name found, not the name asked for: reporting the query made a
+                        # root `continuous_inf` read as `Dense.continuous_inf`.
+                        hits.append({"path": str(path.relative_to(root)),
+                                     "declares": found[0], "line": found[1]})
                         break
         except Exception as exc:  # noqa: BLE001
             return {"success": False, "error": f"declaration search failed: {exc}"}
@@ -415,14 +416,15 @@ def _register_declaration(task, mcp) -> None:
                 except OSError:
                     continue
                 for term in terms:
-                    if declares_identifier(text, term):
-                        introduced.append({"path": rel, "declares": term})
+                    found = find_declaration(text, term)
+                    if found:
+                        introduced.append({"path": rel, "declares": found[0], "line": found[1]})
                         break
 
-        lines = [f"- `{item['declares']}` is declared in `{item['path']}` (before this PR)"
-                 for item in hits]
-        lines += [f"- `{item['declares']}` is declared in `{item['path']}` (IN THIS PR, as "
-                  "it leaves the file)" for item in introduced]
+        lines = [f"- `{item['declares']}` is declared in `{item['path']}:{item['line']}` "
+                 "(before this PR)" for item in hits]
+        lines += [f"- `{item['declares']}` is declared in `{item['path']}:{item['line']}` "
+                  "(IN THIS PR, as it leaves the file)" for item in introduced]
         rendered, truncated = _truncate("\n".join(lines))
         _append_trace(task, {
             "schema_version": "v5-context-call1",
