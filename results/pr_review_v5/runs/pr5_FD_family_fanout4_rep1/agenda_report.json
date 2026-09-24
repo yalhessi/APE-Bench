@@ -1,0 +1,104 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "correctness": {
+      "cost_hint": 0.5499999999999999,
+      "eligible": 11,
+      "enumerated": 11,
+      "sites": 37
+    },
+    "design": {
+      "cost_hint": 0.5499999999999999,
+      "eligible": 11,
+      "enumerated": 11,
+      "sites": 37
+    },
+    "doc_quality": {
+      "cost_hint": 0.9500000000000003,
+      "eligible": 19,
+      "enumerated": 19,
+      "sites": 45
+    },
+    "formatting": {
+      "cost_hint": 1.6500000000000008,
+      "eligible": 33,
+      "enumerated": 33,
+      "sites": 79
+    },
+    "interface": {
+      "cost_hint": 0.65,
+      "eligible": 13,
+      "enumerated": 13,
+      "sites": 53
+    },
+    "library_fit": {
+      "cost_hint": 0.5499999999999999,
+      "eligible": 11,
+      "enumerated": 11,
+      "sites": 37
+    },
+    "naming": {
+      "cost_hint": 0.5499999999999999,
+      "eligible": 11,
+      "enumerated": 11,
+      "sites": 37
+    },
+    "pr_level": {
+      "cost_hint": 0.2,
+      "eligible": 4,
+      "enumerated": 4,
+      "sites": 14
+    },
+    "proof": {
+      "cost_hint": 0.5499999999999999,
+      "eligible": 10,
+      "enumerated": 11,
+      "sites": 36
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 1,
+      "recommended": 114,
+      "required": 9
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "correctness": 2,
+      "design": 0,
+      "doc_quality": 0,
+      "formatting": 0,
+      "interface": 0,
+      "library_fit": 0,
+      "naming": 7,
+      "pr_level": 0,
+      "proof": 0
+    },
+    "required_by_pr": {
+      "33145": 2,
+      "33337": 2,
+      "33421": 5
+    },
+    "required_reasons": {
+      "these declarations are one API family (family)": 7,
+      "this PR introduces declarations that did not exist before (introduction)": 2
+    }
+  },
+  "mandatory_floor_cost": 0.45,
+  "mandatory_floor_tokens": 540000,
+  "pr_numbers": [
+    33145,
+    33315,
+    33337,
+    33421
+  ],
+  "projected_cost_fanout": 6.2,
+  "projected_cost_rules": 6.15,
+  "proposals_eligible": 123,
+  "proposals_enumerated": 124,
+  "renderer_version": "candidate-prompt/12+focused-prompt/4+ask_without_fix+target_verdicts",
+  "routing_mode": "fanout",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "units_without_specialist": [],
+  "work_units": 33
+}
