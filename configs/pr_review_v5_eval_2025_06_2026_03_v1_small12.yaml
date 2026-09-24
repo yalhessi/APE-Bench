@@ -1,0 +1,28 @@
+# The small version of the TEST set eval-2025-06-2026-03-v1: 12 of its 60 PRs, for testing at a smaller size.
+# It is nested in the full set: in every stratum, the first PRs the full draw accepted in seeded
+# order, one main PR per month (2025-06..2026-03) plus the first 2 AI-stratum PRs
+# (`projections.frame subset --label small12`; inputs/pull_requests/evaluation/eval-2025-06-2026-03-v1/subset-small12.json).
+# Same release, inventory and reviewed workspaces as the full config it extends. A small-set number
+# is therefore a reading of PRs the full set also reads.
+
+extends: pr_review_v5_eval_2025_06_2026_03_v1.yaml
+
+dataset:
+  pr_numbers:
+  - 25833
+  - 26946
+  - 27969
+  - 29731
+  - 30777
+  - 31239
+  - 31455
+  - 32345
+  - 33682
+  - 35187
+  - 36683
+  - 36717
+
+  # Measured by `plan` on these 12 with the base's lead caps: floor $5.45, worst case $23.45 and
+  # 28,140,000 tokens. The full set's ceiling would barely bound a 12-PR run, so this one restates it.
+  run_total_cost_cap: 25.00
+  run_total_token_cap: 30000000

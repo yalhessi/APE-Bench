@@ -358,3 +358,20 @@ def test_a_nested_subset_is_a_seed_order_prefix_of_every_stratum_of_the_draw():
 def test_month_quotas_are_unchanged_by_the_shared_allocator():
     spec, members, _ = f.load_sealed("eval-2025-06-2026-03-v1")
     assert list(f.month_quotas(members, 50).values()) == [5, 5, 6, 4, 4, 5, 4, 5, 5, 7]
+
+
+@pytest.mark.parametrize("name", ["eval-2025-06-2026-03-v1", "val-2025-06-2026-03-v1"])
+def test_the_committed_small12_subset_is_recomputed_from_the_sealed_draw(name):
+    from pathlib import Path
+
+    import yaml
+
+    spec, members, digest = f.load_sealed(name)
+    out = Path("inputs/pull_requests/evaluation") / name
+    draw = f.Draw.model_validate_json((out / "draw.json").read_text())
+    record = json.loads((out / "subset-small12.json").read_text())
+    assert record["frame_seal_sha256"] == digest
+    assert record["pr_numbers"] == f.nested_subset(spec, members, draw, main_size=10, ai_size=2)["pr_numbers"]
+    config = "eval" if name.startswith("eval") else "val"
+    small = yaml.safe_load(Path(f"configs/pr_review_v5_{config}_2025_06_2026_03_v1_small12.yaml").read_text())
+    assert small["dataset"]["pr_numbers"] == record["pr_numbers"]
