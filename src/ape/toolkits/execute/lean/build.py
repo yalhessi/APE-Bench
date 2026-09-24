@@ -843,6 +843,10 @@ async def run_batch_build(args: argparse.Namespace) -> int:
         config = LeanVerifyToolConfig()
         if args.num_processes:
             config.num_processes = args.num_processes
+        # Parsed but never applied before 2026-09-24. A `cache get` miss on an old commit then became
+        # an unbounded full Mathlib compile, with nothing logged but "continue build process".
+        if args.build_timeout:
+            config.build_timeout = args.build_timeout
 
         logger.info("Starting batch build process")
 
