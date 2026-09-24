@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/pr5_V3_contract_fanout4_rep1",
+  "bytes": 3308529,
+  "cost": {
+    "actual_total": 17.154786,
+    "by_disposition": {
+      "mandatory": 2.450508,
+      "proposed": 14.052693
+    },
+    "lead": 0.651586,
+    "manifest_total": 17.15478625,
+    "manifest_understates_by": 0.0
+  },
+  "invocations": 139,
+  "leads": 1,
+  "run_name": "pr5_V3_contract_fanout4_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 2118,
+  "with_transcript": 140
+}

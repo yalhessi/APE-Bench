@@ -1,0 +1,22 @@
+{
+  "ape_present": true,
+  "ape_root": "/research/projects/proofedit/ya475/APE-Bench/.ape/runs/pr5_FD_family_fanout4_rep1",
+  "bytes": 2841662,
+  "cost": {
+    "actual_total": 13.952888,
+    "by_disposition": {
+      "mandatory": 1.118668,
+      "proposed": 12.83422
+    },
+    "lead": 0,
+    "manifest_total": 13.952888249999999,
+    "manifest_understates_by": -0.0
+  },
+  "invocations": 124,
+  "leads": 0,
+  "run_name": "pr5_FD_family_fanout4_rep1",
+  "schema_version": "v5-trajectory/1",
+  "tool_result_cap": 2000,
+  "turn_rows": 1800,
+  "with_transcript": 124
+}
