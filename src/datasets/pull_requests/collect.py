@@ -58,6 +58,7 @@ from src.datasets.pull_requests.github import (
 from src.datasets.pull_requests.store import (
     ImmutableEndpointError, PullRequestStore, write_atomically,
 )
+from src.mathlib_review.io import sha256_file
 from src.mathlib_review.paths import PULL_REQUESTS_ROSTERS, PULL_REQUESTS_TRACKED, assert_repo_root
 
 REPO = "leanprover-community/mathlib4"
@@ -85,6 +86,17 @@ TIER2_REQUESTS_PER_PR = 8
 
 def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def read_pr_list(path: Path) -> List[int]:
+    """PR numbers, one per line; blank lines and `#` comments are skipped. A duplicate is refused:
+    a drawn list that repeats a number was not produced by the sampler it claims to come from."""
+
+    numbers = [int(line.split("#", 1)[0]) for line in Path(path).read_text(encoding="utf-8").split("\n")
+               if line.split("#", 1)[0].strip()]
+    if len(numbers) != len(set(numbers)):
+        raise ValueError(f"{path} lists a PR number more than once")
+    return numbers
 
 
 def _fmt_seconds(seconds: float) -> str:
@@ -272,6 +284,25 @@ class Collector:
                          created_from or "start", created_to or "end")
         return kept
 
+    def select_prs(self, prs: Iterable[int], listed: Iterable[int]) -> List[int]:
+        """PRs from an already-walked window, narrowed to an explicit list, in window order.
+
+        This is how a drawn sample is collected: tier 2 for the drawn candidates only, not for
+        every pre-gate pass in the frame, which is ~8.2 requests a PR (~163k over 2024-03..2026-03).
+        A listed number the window does not hold is refused rather than dropped, because silently
+        collecting fewer PRs than were drawn would change the sample without saying so.
+        """
+
+        wanted = set(listed)
+        prs = list(prs)
+        missing = sorted(wanted - set(prs))
+        if missing:
+            raise ValueError(f"{len(missing)} listed PRs are not in the walked window, "
+                             f"e.g. {missing[:5]}")
+        kept = [n for n in prs if n in wanted]
+        self.logger.info("  select: %d of %d PRs, from an explicit list", len(kept), len(prs))
+        return kept
+
     def _progress(self, label: str, index: int, total: int, number: int, t0: float, done: int) -> None:
         elapsed = max(1e-6, time.monotonic() - t0)
         rate = done / elapsed
@@ -452,6 +483,10 @@ def main() -> None:
                              "listing again")
     parser.add_argument("--created-to", default=None, metavar="YYYY-MM-DD",
                         help="restrict this run to PRs created on or before this day")
+    parser.add_argument("--prs", type=Path, default=None, metavar="FILE",
+                        help="restrict this run to the PR numbers in FILE, one per line ('#' starts a "
+                             "comment), inside the window already walked. How a drawn sample is "
+                             "collected; its path, sha256 and count go into the report")
     parser.add_argument("--roster", type=Path, default=None, help="default: the latest dated roster")
     parser.add_argument("--store", type=Path, default=None)
     args = parser.parse_args()
@@ -469,6 +504,8 @@ def main() -> None:
         prs = collector.window_prs(args.start, args.end)
         logger.info("  tier 0: %d PRs in the window", len(prs))
         prs = collector.slice_prs(prs, args.created_from, args.created_to)
+        if args.prs:
+            prs = collector.select_prs(prs, read_pr_list(args.prs))
         if args.tier == 1:
             result = collector.tier1(prs)
             gate = collector.gate_report(prs)
@@ -480,6 +517,8 @@ def main() -> None:
     manifest = write_tracked_export(store)
     _append_report({"collector_version": COLLECTOR_VERSION, "window": [args.start, args.end],
                     "slice": [args.created_from, args.created_to], "tier": args.tier, "started_at": started, "finished_at": _now(),
+                    **({"pr_list": {"path": str(args.prs), "sha256": sha256_file(args.prs),
+                                    "count": len(read_pr_list(args.prs))}} if args.prs else {}),
                     "requests": collector.requests, "result": result,
                     "pre_gate": {k: v for k, v in gate.items() if k != "passing_prs"},
                     "roster": {"path": str(roster_path), "sha256": roster_sha256(roster_path)},

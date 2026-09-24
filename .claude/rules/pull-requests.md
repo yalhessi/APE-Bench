@@ -39,7 +39,9 @@ paths:
   The window string keys the tier-0 cache, so a new one re-walks the listing -- and a second walk
   over an overlapping window meets rows whose `updated_at` has moved, which the store refuses. The
   walk now keeps the recorded row, but the re-walk is still hundreds of wasted pages. Slicing reads
-  the cached list and spends nothing.
+  the cached list and spends nothing. For a drawn sample, `--prs FILE` narrows the walked window to
+  an explicit list. It refuses a number outside the window, and records the list's sha256 in the
+  report. Tier 2 costs ~8.2 requests a PR.
 - **Tier 1 feeds the corpus; tier 2 feeds episodes.** `project_corpus` gates only on
   `review_comments` -- no tier-2 endpoint anywhere -- so the precedent/conventions thread needs
   only tier 1. `project_episodes` goes through `load_bundle`, which requires tier 2 (diff at the

@@ -317,6 +317,31 @@ def test_a_slice_narrows_the_run_without_touching_tier_0(collected):
     assert january == []
 
 
+def test_an_explicit_list_narrows_the_run_in_window_order_and_spends_nothing(collected):
+    store, fake, collector, prs = collected
+    before = len(fake.requests)
+    chosen = [prs[-1], prs[0]]
+    assert collector.select_prs(prs, chosen) == [prs[0], prs[-1]]   # window order, not list order
+    assert len(fake.requests) == before
+
+
+def test_a_listed_pr_outside_the_window_is_refused_not_dropped(collected):
+    _, _, collector, prs = collected
+    with pytest.raises(ValueError, match="not in the walked window"):
+        collector.select_prs(prs, [prs[0], 999_999])
+
+
+def test_the_pr_list_file_skips_comments_and_refuses_duplicates(tmp_path):
+    from src.datasets.pull_requests.collect import read_pr_list
+
+    path = tmp_path / "candidates.txt"
+    path.write_text("# drawn 2026-09-24\n33149\n\n33337  # reserve\n", encoding="utf-8")
+    assert read_pr_list(path) == [33149, 33337]
+    path.write_text("33149\n33149\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="more than once"):
+        read_pr_list(path)
+
+
 def test_slicing_with_no_bounds_is_the_whole_window(collected):
     _, _, collector, prs = collected
     assert collector.slice_prs(prs, None, None) == prs
