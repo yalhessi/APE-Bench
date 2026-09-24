@@ -215,9 +215,14 @@ def _component_rows(
     # every component, yet it is `modified`, and `validate_inventory` then refused the whole
     # inventory. That hit 6 of 712 January 2026 episodes, 33081 in v4, and a drawn validation PR
     # (2026-09-24). Name the change for what it is. Only inputs that were refused are touched, so
-    # every record built before is byte-identical and INVENTORY_VERSION stays.
-    if (target.kind == "declaration" and _lifecycle(target) == "modified" and rows
+    # every record built before is byte-identical and INVENTORY_VERSION stays. Every target kind,
+    # not only declarations: an import block whose lines are only reordered compares unchanged
+    # too, since its `-` and `+` sides hold the same lines (3 of val1000's 973 PRs: 26658,
+    # 28909, 29094).
+    if (_lifecycle(target) == "modified" and rows
             and all(row.status == "unchanged" for row in rows)):
+        # a `whitespace` target already has an unchanged layout row; one row per component
+        rows = [row for row in rows if row.component != "layout"]
         rows.append(ModificationComponent(
             component="layout",
             status="modified",

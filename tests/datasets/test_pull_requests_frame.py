@@ -358,6 +358,27 @@ def test_a_whitespace_only_declaration_edit_is_a_layout_change_not_a_refusal():
     assert [(c.component, c.status) for c in record.component_deltas if c.status != "unchanged"] == [("layout", "modified")]
 
 
+def test_a_reordered_import_block_is_a_layout_change_not_a_refusal():
+    """val1000's 26658, 28909 and 29094 move import lines and change none."""
+
+    from pathlib import Path
+
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.release.modification_inventory import build_inventory
+    from src.mathlib_review.schema import ChangeGraph
+
+    graphs = load_jsonl(Path("inputs/pr_review_v4/releases/dev-medium-0.5.0/derived/change_graphs.jsonl"), ChangeGraph)
+    graph = next(g for g in graphs if any(t.kind == "import" for t in g.targets))
+    target = next(t for t in graph.targets if t.kind == "import")
+    # 28909's shape: one import moved past unchanged ones, so each side holds the same line
+    hunk = "@@ -3,8 +3,8 @@\n"
+    reordered = target.model_copy(update={"base_code": None, "reviewed_code": None, "diff_fragments": [
+        hunk + "-import Mathlib.A\n", hunk + "+import Mathlib.A\n"]})
+    (record,) = build_inventory([graph.model_copy(update={"targets": [reordered]})])
+    assert record.lifecycle == "modified" and record.classification_status == "complete"
+    assert [(c.component, c.status) for c in record.component_deltas if c.status != "unchanged"] == [("layout", "modified")]
+
+
 def test_the_frozen_test_release_inventory_rebuilds_byte_for_byte():
     """The layout fix touches only inputs the builder used to refuse, so no frozen id moved."""
 
