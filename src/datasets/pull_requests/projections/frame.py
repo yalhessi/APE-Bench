@@ -25,6 +25,8 @@ Verbs, all free except the collection that `candidates` prints and does not run:
   frame       count the frame by month and AI evidence; writes nothing
   seal        write the pre-registration (spec, dev-used list, frame members) under
               inputs/pull_requests/evaluation/<name>/, immutable
+  seal-from   the same for a second set over a sealed frame minus that frame's draw (validation
+              beside test: one distribution, disjoint PRs)
   candidates  write round k's candidate list for `collect --prs` (a prefix of each seeded order)
   walk        apply funnel and caps in seed order; writes draw.json only once every stratum is full
   release     the drawn episodes as a gold-free v5 generation release (inputs/pr_review_v4/releases)
@@ -100,6 +102,9 @@ class FrameSpec(BaseModel):
     ai_candidate_factor: float
     #: The disclosed rules a reader needs and the code does not enforce, in words.
     rules: Dict[str, str]
+    #: `<name>@<seal sha>` when this frame reuses another seal's members minus that seal's draw:
+    #: a validation set drawn beside a sealed test set, from one distribution.
+    frame_from: Optional[str] = None
 
 
 class FrameMember(BaseModel):
@@ -570,6 +575,21 @@ def write_evaluation_release(out: Path, spec: FrameSpec, draw: Draw, *, store: P
     )
 
 
+def derived_frame(parent: str, root: Path = EVALUATION_ROOT):
+    """A sealed frame's members minus its completed draw, with the parent's spec, dev-used record
+    and the reserved PRs. This is how a second set is drawn from the same distribution without
+    touching the first."""
+
+    parent_spec, parent_members, parent_seal = load_sealed(parent, root)
+    draw = Draw.model_validate_json((seal_dir(parent, root) / "draw.json").read_text(encoding="utf-8"))
+    if not draw.complete or draw.frame_seal_sha256 != parent_seal:
+        raise ValueError(f"{parent}'s draw is incomplete or not of its seal")
+    reserved = sorted(a.pr_number for a in draw.accepted)
+    members = [m for m in parent_members if m.pr_number not in set(reserved)]
+    dev_used = json.loads((seal_dir(parent, root) / "dev_used.json").read_text(encoding="utf-8"))
+    return parent_spec, parent_seal, members, dev_used, reserved
+
+
 # --- CLI --------------------------------------------------------------------------------------
 
 def _spec_from_args(args: argparse.Namespace, store: PullRequestStore) -> FrameSpec:
@@ -625,6 +645,15 @@ def main() -> None:
         p.add_argument("--per-base-cap", type=int, default=2)
         p.add_argument("--main-candidate-factor", type=float, default=2.0)
         p.add_argument("--ai-candidate-factor", type=float, default=3.5)
+    p = sub.add_parser("seal-from", help="seal a second set over another seal's frame minus its draw")
+    p.add_argument("--name", required=True)
+    p.add_argument("--from", dest="parent", required=True)
+    p.add_argument("--seed", required=True)
+    p.add_argument("--dry-run", action="store_true")
+    for flag, kind in (("--main-size", int), ("--ai-size", int), ("--main-target-cap", int),
+                       ("--ai-target-cap", int), ("--per-author-cap", int), ("--per-base-cap", int),
+                       ("--main-candidate-factor", float), ("--ai-candidate-factor", float)):
+        p.add_argument(flag, type=kind, default=None, help="default: the parent's")
     p = sub.add_parser("candidates")
     p.add_argument("--name", required=True)
     p.add_argument("--round", type=int, required=True)
@@ -649,6 +678,27 @@ def main() -> None:
                           "collected_not_used": {k: len(v) for k, v in dev_used["collected_not_used"].items()},
                           **report}, indent=1))
         if args.verb == "seal":
+            digest = seal(spec, dev_used, members, report)
+            print(f"sealed {seal_dir(spec.name)} {digest}")
+        return
+
+    if args.verb == "seal-from":
+        parent_spec, parent_seal, members, dev_used, reserved = derived_frame(args.parent)
+        overrides = {key: getattr(args, key) for key in (
+            "main_size", "ai_size", "main_target_cap", "ai_target_cap", "per_author_cap",
+            "per_base_cap", "main_candidate_factor", "ai_candidate_factor") if getattr(args, key) is not None}
+        frame_from = f"{args.parent}@{parent_seal}"
+        spec = parent_spec.model_copy(update={
+            "name": args.name, "seed": args.seed, "frame_from": frame_from, **overrides,
+            "rules": {**parent_spec.rules, "frame_from": (
+                f"Members are {args.parent}'s sealed frame minus the {len(reserved)} PRs its draw "
+                "accepted, which are reserved to it; same rules, caps and strata, new seed.")}})
+        spec = FrameSpec.model_validate(spec.model_dump())
+        report = {"members": len(members), "ai_members": sum(1 for m in members if m.ai_evidence),
+                  "frame_from": frame_from, "reserved_prs": reserved,
+                  "main_quotas": month_quotas(members, spec.main_size)}
+        print(json.dumps({"spec": spec.model_dump(mode="json"), **report}, indent=1))
+        if not args.dry_run:
             digest = seal(spec, dev_used, members, report)
             print(f"sealed {seal_dir(spec.name)} {digest}")
         return

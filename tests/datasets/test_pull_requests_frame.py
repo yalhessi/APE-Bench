@@ -243,3 +243,33 @@ def test_a_store_built_release_verifies_by_the_bundles_its_events_cite(tmp_path)
     (out / "source/events.jsonl").write_bytes(jsonl_bytes(events))
     failures, _ = _verify_store_bundles(out)
     assert [f["problem"] for f in failures] == ["hash_mismatch"]
+
+
+def _accepted(member, stratum):
+    return f.Accepted(pr_number=member.pr_number, stratum=stratum, month=member.month, author=member.author,
+                      episode_id=f"e{member.pr_number}", base_sha="b" * 40, targets=5, ai_evidence=member.ai_evidence)
+
+
+def test_a_derived_frame_is_the_parent_frame_minus_the_parents_draw(tmp_path):
+    spec = _spec(main_size=2, ai_size=0)
+    members = [_member(n) for n in range(10)]
+    digest = f.seal(spec, {"used": [3]}, members, {"members": 10}, root=tmp_path)
+    taken = [members[4], members[7]]
+    draw = f.Draw(frame_seal_sha256=digest, accepted=[_accepted(m, "main:2025-12") for m in taken],
+                  skipped=[], stopped={"main:2025-12": None, "ai": None})
+    (tmp_path / spec.name / "draw.json").write_text(draw.model_dump_json())
+    parent_spec, parent_seal, derived, dev_used, reserved = f.derived_frame(spec.name, root=tmp_path)
+    assert (parent_spec, parent_seal, dev_used) == (spec, digest, {"used": [3]})
+    assert reserved == [4, 7]
+    assert [m.pr_number for m in derived] == [0, 1, 2, 3, 5, 6, 8, 9]
+
+
+def test_a_derived_frame_refuses_a_draw_of_another_seal(tmp_path):
+    spec = _spec(main_size=1, ai_size=0)
+    members = [_member(n) for n in range(3)]
+    f.seal(spec, {"used": []}, members, {"members": 3}, root=tmp_path)
+    draw = f.Draw(frame_seal_sha256="not-this-seal", accepted=[_accepted(members[0], "main:2025-12")],
+                  skipped=[], stopped={"main:2025-12": None, "ai": None})
+    (tmp_path / spec.name / "draw.json").write_text(draw.model_dump_json())
+    with pytest.raises(ValueError, match="not of its seal"):
+        f.derived_frame(spec.name, root=tmp_path)
