@@ -381,7 +381,18 @@ class BasePRReviewTask(BaseLeanTask):
             return None, f"reviewed file not found: {norm}"
         src = fp.read_text(encoding="utf-8")
 
-        if declaration_name and new_declaration:
+        # Half an edit is not an edit. A name with an empty `new_declaration` used to fall through
+        # to "compile the file unedited" while the tool reported the call as a `verified_edit` -- a
+        # green on code nobody changed. 6 calls on the family-division run got one, all of them
+        # arms meaning to delete a declaration. (A span with no `replacement` is a deletion, below.)
+        named, declared = bool((declaration_name or "").strip()), bool((new_declaration or "").strip())
+        if named or declared:
+            if not (named and declared):
+                return None, (
+                    "declaration mode needs both `declaration_name` and a non-empty "
+                    "`new_declaration`. An empty `new_declaration` is not an edit: it would "
+                    "compile the file unchanged. To test removing lines, give `line_start` and "
+                    "`line_end` and omit `replacement`.")
             return splice_declaration(src, declaration_name, new_declaration, label=norm)
 
         lines = src.split("\n")
@@ -389,6 +400,9 @@ class BasePRReviewTask(BaseLeanTask):
             if replacement is not None:
                 return None, "`replacement` needs the span it replaces: give `line_start` and `line_end`"
             return src, ""  # compile the file unedited
+        if line_start is None or line_end is None:
+            return None, ("line mode needs both `line_start` and `line_end`; with one missing nothing "
+                          "would be edited.")
         if not (isinstance(line_start, int) and isinstance(line_end, int)
                 and 1 <= line_start <= line_end <= len(lines)):
             return None, f"line span {line_start}-{line_end} out of range for {norm} ({len(lines)} lines)"

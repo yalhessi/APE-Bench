@@ -696,3 +696,26 @@ def test_whole_file_compiles_run_mathlibs_linters_and_split_the_warnings(task, m
     assert [w["data"] for w in result["warnings_introduced_by_your_edit"]] == ["unused variable `h`"]
     assert result["warnings_already_in_the_file"] == 1
     assert "warnings" not in result
+
+
+def test_half_an_edit_is_refused_rather_than_verified(verify_edit):
+    """A name with an empty `new_declaration` compiled the file unedited and came back
+    `verified_edit` -- 6 false greens on the family-division run. Half a span is refused too; a
+    whole span with no `replacement` is a deletion (`test_a_span_without_a_replacement_is_deleted`)."""
+
+    tool, _compiled, asyncio = verify_edit
+    for kwargs in ({"declaration_name": "Foo.bar", "new_declaration": ""},
+                   {"declaration_name": "Foo.bar", "new_declaration": "   "},
+                   {"new_declaration": "theorem bar : True := trivial"},
+                   {"line_start": 1},
+                   {"line_end": 1, "replacement": "x"},
+                   {"replacement": "x"}):
+        result = asyncio.run(tool(path="Mathlib/A.lean", **kwargs))
+        assert result.get("success") is False and "error" in result, kwargs
+        assert result.get("mode") != "verified_edit", kwargs
+
+
+def test_an_empty_replacement_over_a_span_is_a_deletion_and_is_compiled(verify_edit):
+    tool, _compiled, asyncio = verify_edit
+    result = asyncio.run(tool(path="Mathlib/A.lean", line_start=1, line_end=1, replacement=""))
+    assert result.get("mode") == "verified_edit"
