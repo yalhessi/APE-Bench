@@ -291,6 +291,19 @@ def test_a_derived_frame_is_the_parent_frame_minus_the_parents_draw(tmp_path):
     assert [m.pr_number for m in derived] == [0, 1, 2, 3, 5, 6, 8, 9]
 
 
+def test_a_derived_seal_names_every_setting_it_changed_from_the_parent():
+    parent = _spec()
+    committed = json.load(open("inputs/pull_requests/evaluation/val-2025-06-2026-03-v1/spec.json"))
+    assert f.derived_frame_rule("eval-2025-06-2026-03-v1", 60, parent, {}) == committed["rules"]["frame_from"]
+    assert f.derived_frame_rule("p", 60, parent, {"main_size": parent.main_size}).endswith(
+        "same rules, caps and strata, new seed.")
+    rule = f.derived_frame_rule("p", 60, parent, {"main_size": 850, "per_author_cap": 1000,
+                                                  "ai_shortfall": "take_all"})
+    assert "caps" not in rule.split(";")[1].split("changed")[0]
+    assert "main_size 10 -> 850" in rule and "per_author_cap 3 -> 1000" in rule
+    assert "ai_shortfall incomplete -> take_all" in rule
+
+
 def test_a_derived_frame_refuses_a_draw_of_another_seal(tmp_path):
     spec = _spec(main_size=1, ai_size=0)
     members = [_member(n) for n in range(3)]

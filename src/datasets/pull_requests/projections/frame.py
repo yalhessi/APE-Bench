@@ -655,6 +655,20 @@ def derived_frame(parent: str, root: Path = EVALUATION_ROOT):
     return parent_spec, parent_seal, members, dev_used, reserved
 
 
+def derived_frame_rule(parent: str, reserved: int, parent_spec: FrameSpec,
+                       overrides: Mapping[str, object]) -> str:
+    """The `frame_from` rule of a derived seal. It names every setting that differs from the
+    parent's, so a seal that changed a cap cannot say it kept the parent's caps."""
+
+    changed = {key: value for key, value in overrides.items() if getattr(parent_spec, key) != value}
+    same = ("same rules, caps and strata, new seed." if not changed else
+            "same rules and strata, new seed; changed from the parent: "
+            + ", ".join(f"{key} {getattr(parent_spec, key)} -> {value}" for key, value in changed.items())
+            + ".")
+    return (f"Members are {parent}'s sealed frame minus the {reserved} PRs its draw accepted, "
+            f"which are reserved to it; {same}")
+
+
 # --- CLI --------------------------------------------------------------------------------------
 
 def _spec_from_args(args: argparse.Namespace, store: PullRequestStore) -> FrameSpec:
@@ -765,9 +779,8 @@ def main() -> None:
         frame_from = f"{args.parent}@{parent_seal}"
         spec = parent_spec.model_copy(update={
             "name": args.name, "seed": args.seed, "frame_from": frame_from, **overrides,
-            "rules": {**parent_spec.rules, "frame_from": (
-                f"Members are {args.parent}'s sealed frame minus the {len(reserved)} PRs its draw "
-                "accepted, which are reserved to it; same rules, caps and strata, new seed.")}})
+            "rules": {**parent_spec.rules,
+                      "frame_from": derived_frame_rule(args.parent, len(reserved), parent_spec, overrides)}})
         spec = FrameSpec.model_validate(spec.model_dump())
         report = {"members": len(members), "ai_members": sum(1 for m in members if m.ai_evidence),
                   "frame_from": frame_from, "reserved_prs": reserved,
