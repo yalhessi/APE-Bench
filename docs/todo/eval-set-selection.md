@@ -1,6 +1,6 @@
 # Choosing the evaluation sets -- validation and test -- drawn from a sealed, gold-free frame
 
-**Status** — **sets built, 2026-09-24** (branch `eval-set-selection`, to be merged into develop the same day).
+**Status** — **sets built, 2026-09-24** (branch `eval-set-selection`, merged into develop as a fast-forward at `b62c246`).
 - Test `eval-2025-06-2026-03-v1` and validation `val-2025-06-2026-03-v1`: 60 PRs each, plus a nested
   small12 each, with frozen releases and dataset configs.
 - Open: reviewed workspaces (base builds running), gold developed on validation, then the reading
@@ -415,14 +415,10 @@ size testing"):**
 - Their 17 missing bases are building first, in a separate detached builder.
 
 **Next, in order:**
-1. **Merge into `develop`**, as one step:
-   - Set aside the main checkout's uncommitted `inputs/pull_requests/{manifest.json, prs.jsonl,
-     collection_report.json, acceptance_report.json}`. They are the 2026-09-12 export, which this
-     branch commits byte for byte (`299fbf5`) and then supersedes.
-   - Merge.
-   - Run `ape/bin/python -m src.mathlib_review.conventions.review_join --write --end all`
-     (7 s; 43,834 minus the validation PRs' comments).
-   - Run the suite.
+1. ~~Merge into `develop`~~ **done, 2026-09-24.** Fast-forward to `b62c246`. The main checkout's
+   four stale store-export files were byte-identical to `299fbf5` and were set aside first. Then
+   `review_join --write --end all` ran (43,736 comments), develop's suite passed (2,353) and
+   `verify_frozen` was ok.
 2. `prebuild --reviewed --execute` for both configs once their bases are built, then the replacement
    rule in each.
 3. Gold, developed on validation: the chain reads the PR store (adapter; see the survey's gold
