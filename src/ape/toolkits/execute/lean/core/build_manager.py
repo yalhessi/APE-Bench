@@ -12,7 +12,7 @@ import shutil
 import hashlib
 import inspect
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Iterable, Optional, Sequence, TYPE_CHECKING
+from typing import Any, Awaitable, Callable, Iterable, List, Optional, Sequence, Tuple, TYPE_CHECKING
 from datetime import datetime
 
 import aiofiles.os
@@ -1262,6 +1262,7 @@ class BuildManager(BaseSourceManager):
             
             # 2. Parallel store files to content store
             file_mappings = {}
+            failed: List[Tuple[Path, str]] = []
             semaphore = asyncio.Semaphore(os.cpu_count() // 2)  # Limit concurrency
             
             async def store_single_file(file_path: Path, file_type: str) -> None:
@@ -1278,10 +1279,29 @@ class BuildManager(BaseSourceManager):
                         
                     except Exception as e:
                         self.logger.error(f"Store file failed {relative_path}: {e}")
+                        failed.append((file_path, file_type))
             
             # Parallel store all files
             tasks = [store_single_file(file_path, file_type) for file_path, file_type in file_list]
             await asyncio.gather(*tasks, return_exceptions=True)
+
+            # A partial snapshot restores a workspace with files silently missing -- on 2026-09-24
+            # `Mathlib/Data/Set/Basic.olean` among 3 of 58,259 -- which every later compile reads
+            # as a build error in the PR. Retry the failures once, one at a time, then refuse.
+            for file_path, file_type in failed:
+                relative_path = str(file_path.relative_to(workspace_path))
+                try:
+                    content_hash = await self.content_store.store_file(file_path, file_type)
+                    file_mappings[relative_path] = {"hash": content_hash, "type": file_type}
+                except Exception as e:
+                    self.logger.error(f"Store file failed again {relative_path}: {e}")
+            missing = [str(p.relative_to(workspace_path)) for p, _ in failed
+                       if str(p.relative_to(workspace_path)) not in file_mappings]
+            if missing:
+                raise RuntimeError(
+                    f"[{commit_hash}] {len(missing)} of {total_files} files could not be stored; "
+                    f"refusing a partial snapshot, e.g. {missing[:3]}"
+                )
             
             file_count = len(file_mappings)
             if file_count == 0:

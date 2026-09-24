@@ -202,6 +202,17 @@ class ContentStore:
                 # In concurrent case, already created, clean temporary file
                 if await aiofiles.os.path.exists(temp_path):
                     await aiofiles.os.unlink(temp_path)
+            except FileNotFoundError:
+                # The rename's source vanished (3 of 58,259 files on this NFSv3 store, 2026-09-24),
+                # each time with the object already present. The path *is* the content hash, so an
+                # object that exists with the source's size is this content, stored by another
+                # writer; anything else is a real failure.
+                if not (await aiofiles.os.path.exists(object_path)
+                        and (await aiofiles.os.stat(object_path)).st_size
+                        == (await aiofiles.os.stat(file_path)).st_size):
+                    raise
+                if await aiofiles.os.path.exists(temp_path):
+                    await aiofiles.os.unlink(temp_path)
         
         await self._mirror_object_if_configured(content_hash, object_path)
         return content_hash
