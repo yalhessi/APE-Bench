@@ -68,6 +68,13 @@ paths:
   `data/pull_requests/projections/corpus/reviewer_view.jsonl`, rebuild the precedent index, rerun
   `conventions.review_join --write --end <date>`, re-measure. Until then the index is built from the
   old 33%-recall corpus, and every corpus-derived level understates by roughly 2.5×.
+- **The projection on disk excludes the PRs that were scored when it was written, not the PRs
+  scored now (2026-09-24).** `reviewer_view.jsonl` was projected on 2026-09-12 with
+  `excluded_scored_prs: 138`, and `scored_pr_numbers()` is now 258. So the file holds **198 rows
+  on test-set PRs** (counted by PR number; no text was read). Every reader re-filters with
+  `scored_pr_numbers()` at read time, as `precedent_index.py:284` does. A hand query or a sampler
+  that trusts the file to have done it reads test reviews. Regenerate the projection on `develop`
+  as its own step, never from a topic branch: it is a shared store.
 - **The corpus's end date is no longer a date gate, so state the window.** It stopped at 2025-08-31,
   before every eval PR, so the analysis readers were leak-safe whether or not they gated; collection
   now runs to 2026-08-31. `precedent_bench.load_corpus` and `review_join.load_*` therefore take a

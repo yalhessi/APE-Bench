@@ -535,3 +535,16 @@ prompt-side pieces are ported onto it as **opt-in** text. So:
 *Correction, same day:* the unify plan's Step 4 was dropped by the user as too expensive for what it
 could show, so the held-out-11 ceiling extension is not superseded by a run; it stays unwritten, for the
 same reason -- a broader copy of the four-PR fanout, whose residual is already read.
+
+## Correction, 2026-09-24 (from `docs/research/pipeline-overfit-2026-09.md`)
+
+- **Phase 1's sample source is not pre-filtered any more.** The plan says
+  `reviewer_view.jsonl` has "scored PRs already excluded by `scored_pr_numbers`". The file on disk was
+  projected at 138 scored PRs and holds 198 rows on test-set PRs. A sampler re-filters with
+  `scored_pr_numbers()` at read time, or the projection is regenerated on `develop` first.
+- **Phase 2's open grain question has a measurement.** On the validation set's round-1 asks, 15
+  of 107 (14%) are PR-grain by two readers, so a PR-level unit is needed.
+- **The validation set is a Phase 1 seed.** The audit's twelve question families, with both readers'
+  labels, are in `results/pr_review_v5/adjudications/arm-coverage-val-2025-06-2026-03-v1/`.
+- **Phase 0's conclusion does not carry over.** It found the current briefs ask 17 of 23 held-out
+  questions. On validation the explicit share is 40 of 107.

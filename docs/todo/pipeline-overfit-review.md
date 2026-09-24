@@ -1,6 +1,10 @@
 # What in the v5 pipeline is fitted to the dev set -- reviewed against the validation set
 
-**Status**: open, 2026-09-24, **for a fresh session** in the worktree `pipeline-overfit-review`.
+**Status**: **audit done, 2026-09-24**. It is [`docs/research/pipeline-overfit-2026-09.md`](../research/pipeline-overfit-2026-09.md),
+with its two appendices and the labels in
+`results/pr_review_v5/adjudications/arm-coverage-val-2025-06-2026-03-v1/`. **Open:** the proposal
+(Track A hygiene, Track B re-division) and its measurement, which is blocked on small12's reviewed
+workspaces. See "After the audit" at the foot.
 The user asked for it at the end of the eval-set-selection session:
 
 > *"using the new validation set, could you review the pipeline we have designed so far and identify
@@ -94,3 +98,51 @@ measured on the validation small12 before the full set.
 The validation set becomes in-sample for whatever this audit changes. That is its job, and the test
 set stays clean. Sixty PRs carry about 150 first-round reviewer comments, which is enough for a
 coverage matrix and thin for per-family rates, so report counts rather than rates.
+
+## After the audit (2026-09-24)
+
+**What it found, in one line each** (counts, not rates; model readers):
+- **Coverage.**
+  - 32 to 36 of the validation set's 107 round-1 asks belong to no arm's written remit.
+  - Only 40 fit an arm explicitly, 29 of them the proof arms or `style`'s binder bullet.
+  - No arm owns:
+    - attribute and instance registration (10 asks, 6 PRs);
+    - PR-level asks (15 asks, 11 PRs, and no unit exists at PR grain).
+
+    Statement and API design (8 asks) has no explicit owner.
+- **The dev set is one reviewer.** One person wrote 30 of the dev set's 52 round-1 comments, on 4
+  PRs. Naming is 29% of dev asks and 3% of validation's.
+- **Dev text ships.**
+  - About a dozen dev-derived strings reach a model: the naming example (33337, and wrong on the
+    elaborated corpus), `coe_starProjection_eq_x` and `closure_pow_le` in tool descriptions,
+    33145's `(α := αᵒᵈ)`, and `family_design`'s five dev-obligation bullets.
+  - The contamination gate cannot see any of them.
+  - The lead is told what 4 of its 10 arms are for.
+- **Knobs.**
+  - The packer charges a hunk the renderer no longer prints: 138 of 425 validation units.
+  - Nothing filters whitespace-only changes: 85 units.
+  - Flat per-PR lead limits meet agendas of up to 649 proposals.
+  - The required-row cap fills in hash order.
+
+**Next, in order:**
+1. **Regenerate `reviewer_view.jsonl` on `develop`.** It holds 198 test-set rows (see
+   `.claude/rules/pull-requests.md`). The Start-here line above that reads it is safe only because
+   it filters to the validation PRs. Nothing else is safe without a re-filter.
+2. **Track A** (free, run-boundary hygiene):
+   - dev strings out of tool schemas and served docstrings, and the gate extended to see them;
+   - the checklist contradiction removed from specialist prompts;
+   - all ten arms described to the lead;
+   - the packer charge and a whitespace filter, as a new renderer version.
+3. **`prebuild --reviewed` for small12**, then `cli plan` for both conditions.
+4. **Track B** measurement, with the reading rule fixed in the audit:
+   - current ten arms against the proposed nine, fanout, three reps each;
+   - findings matched by two blind readers to small12's 31 round-1 asks;
+   - **through if** at least 5 more asks are reached on the mean, 3 of them in F2, F3, F6 or F12;
+   - the stable set does not shrink;
+   - findings rise by at most 1 per rep on the two feedback-free PRs.
+5. The size knobs (packer, lead limits, cap order) are readable only on the full 60: small12
+   excludes PRs over 8 units.
+
+**Coordinate:** the naming worked example and `naming_norm`'s tiers belong to `naming-from-statement`
+and `arm-naming-bar`. That branch's new `naming_statement` description uses `round_eq'`, 33421's
+gold subject, as its example. Flag it before that merge.
