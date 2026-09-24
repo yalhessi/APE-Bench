@@ -234,3 +234,75 @@ What still binds: the test set is sealed from development once drawn, so the hyg
 applies to the drawn PRs, not to whole windows. Biases that are not leakage stay disclosed: outcome
 censoring (closed by the listing walk), the funnel's final-state size gates, and the fast-closer shape
 of the dev pool.
+
+## Long-span measurements, 2026-09-24 (read-only, nothing spent)
+
+Four measurers, after the rulings. The scripts are in that session's scratch.
+
+**The span, month by month.**
+- The listing walk is complete from 2024-03, and PRs still open at the walk exceed 10% only from 2026-04
+  (12.0%, then 18.9%, 19.2%, 36.2%, 40.2%). So a span ending at **2026-03** keeps censoring at about
+  8%, the Dec-Feb level.
+- The funnel includes 70.8% of pre-gate passes in Dec and 68.1% in Jan. Estimated fresh included
+  episodes: about 15,400 over 2024-03..2026-03, and about 6,800 over 2025-06..2026-03.
+- The roster covers early 2024: roster members make 95.8% of 2024-H1 decisions.
+- **Defect:** `leanprover-community-bot-assistant` passes `is_bot` (`definitions.py:49-62`). It is the
+  only decider on 163 pre-gate passes in 2024-03..2025-07, up to 44 a month in 2025-02..06. It also
+  authored dev bundle PR 33350, so a fix may move a frozen dev-raw funnel file; check with `verify_frozen`.
+
+**Dev-used, as a union: 427 PRs** (per source in the survey scratch's `dev_used.json`).
+- **232** were run on, or sit in a frozen release, tier or the v2 bundle cache.
+- **195** were only collected: 142 in the June v1 AI dataset (`data/mathlib_pr_review_all_ai*`; 2 of
+  its PRs were run on and are in the 232), and 53 in the upstream APE-Bench drop outside the
+  proof_pr_review sets.
+- The 142 are 137 of the 362 AI-flagged pre-gate passes in 2026-02..04.
+
+**AI-generated PRs.**
+- The label `LLM-generated` is on 809 PRs, the earliest created 2025-06-15. It is applied later by
+  third parties (all 11 in Dec-Jan on or after 2026-03-16), and is the only authorship label in the
+  85-label vocabulary.
+- A frozen disclosure regex over title and description (strict form: 2.5-5% false positives on n = 40)
+  unions with the label to give AI shares of about 5% in Dec-Jan, 9% in Feb-Mar, 15% in April, and
+  11-22% after.
+- Copilot `Co-authored-by` trailers from accepted review suggestions are AI in review, not authorship
+  (10 PRs in Dec-Jan).
+- On all 2,059 Dec-Jan tier-2 PRs, 113 are AI-detected, and 59 of those are one author.
+- The funnel's upper size gates remove **38%** of the AI PRs that pass the rest of the funnel, against
+  5% of other PRs.
+- 22 of the 26 over-gate AI PRs are mechanical sweeps; 15 are one `@[expose]`-removal series. The
+  large AI *feature* PRs number about four, all unmerged, and three have unusable size data.
+- Inside the gates AI PRs are not larger, so a <=100-target cap drops **0** included AI PRs.
+- At the natural rate a 50-PR draw holds about 1.5 AI PRs (Dec-Jan) and about 3 (2025-06..2026-03).
+  No gate setting gives an AI reading; only a separately weighted stratum does.
+
+**Draw, then collect.**
+- The funnel decides per PR: a random 300-PR subset reproduces the full Dec-Jan run exactly.
+- Tier 2 costs about 8.2 requests and 3 s a PR, so 100 candidates take about 5 minutes. The whole
+  span would take about 163k requests, or 33 h.
+- `collect.py` has no explicit-PR-list option. A `--prs FILE` flag (a `select_prs` beside
+  `slice_prs`) is about ten lines plus a test.
+- Size is not known before tier 2, so size caps are skip rules applied in seed order, with
+  replacement. Month, author, `t-*` area labels (79% coverage) and the AI label are available before
+  tier 2.
+
+**Tooling on old bases.**
+- Every workspace ever built sits on a base from 2025-11-21 or later, after Mathlib moved to the
+  module system (2025-11-19, `6a54a80825`). About 64% of the frame's PRs predate that.
+- Known breakages before it:
+  - `canonical_api.py:322` passes `-Dexperimental.module=true` unconditionally, which a toolchain
+    without the option rejects. Every proposal would silently read "did not compile".
+  - `#align` lines (until 2024-07-19) each become a change-graph entity, which inflates targets.
+  - Before v4.20 the `.ilean` key format may make exposure reach read 0 silently.
+  - The cache backend was Azure until 2025-08-15, then a hardcoded Cloudflare window until
+    2025-09-08, which no build here has used.
+  - `build.py` parses `--build_timeout` and never applies it, so a cache miss becomes an unbounded full
+    compile.
+  - A 50-PR draw over the full span needs about 27 toolchains, about 19 of them not installed.
+- Pilot bases: `2a0739561acd` (2024-03-01, v4.6.0; the worst case) and `6ea68a87c1a3` (2025-06-01,
+  v4.20.0-rc5; its toolchain is installed).
+
+**Deferred, not pursued here: large AI PRs as their own case set.** The user expects large AI PRs to
+need new features, such as splitting a big PR. The motivating numbers are above: 38% of AI PRs over
+the gate against 5% of others, and about four large feature PRs, all unmerged. Before any of them can
+be an episode, they need a reviewed-head compare fetch, full file contents where GitHub omitted the
+patch (34481), and a check of 32976's 1,287-file diff.
