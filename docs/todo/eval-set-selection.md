@@ -353,12 +353,29 @@ The pre-registration fixes:
 
 Round 1 is 131 candidates, 107 of them needing tier 2.
 
+**Done since:**
+- Round 1 collected: 107 PRs, 849 requests, no deferrals (`d859387`).
+- The draw is complete in round 1: 50 main and 10 AI (`dd9c450`). It is re-derived store-free by a
+  test.
+- Store-built releases verify by their cited bundles; `projections.frame release` builds the gold-free
+  generation release (`6dedf8e`). The trial build (60 episodes, 283 units at /14, 1,209 inventory
+  records) passes `cli plan`: cutoffs resolve for all 60, and there are 0 reviewed workspaces so far.
+- Base builds for the 59 unbuilt bases are running, detached (`nohup setsid`). The batch builder
+  first skipped every record and reported success; it now refuses that (`26f6989`).
+
 **Next, in order:**
-1. `collect --prs` round 1.
-2. `projections.frame walk`. Collect round 2 only if a stratum stops for `needs_collection`; if one
-   stops for `needs_base`, `git fetch` that commit into the clone.
-3. Build a release from the drawn episodes. Store-built releases need `validate_release` and
-   `verify_frozen` to accept store sources, and a CLI around `write_episode_release`; see the
-   blockers above.
-4. `prebuild --reviewed`, then apply the replacement rule.
-5. Seal the reading rule, the gold chain and the controls definition before any gold is built.
+1. **Land the release in the frozen root** (`projections.frame release`, then `verify_frozen
+   build-lock`). This grows `scored_pr_numbers()` from 138 to 198, so in the same step:
+   - rebuild the shared precedent index without the 47 eval-PR comments it holds (local
+     MiniLM, about 26 min);
+   - rerun `conventions.review_join --write`;
+   - make the cutoffs test read store-built releases from the store;
+   - move the 138 pin to 198.
+
+   The index is shared by every worktree and recorded in every run plan, so this waits for a run
+   boundary and the user's go-ahead.
+2. `prebuild --reviewed` once the bases are built, then the replacement rule.
+3. Seal the reading rule, the gold chain (ruling 7) and the controls definition, before any gold is
+   built.
+4. Choose the config. On the trial release a /14 lead config's caps do not fit 60 PRs ($35 cap
+   against a $122 worst case).
