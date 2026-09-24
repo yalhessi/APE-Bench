@@ -108,9 +108,12 @@ maintainer vs drive-by commenters resolved against the roster.
 *Superseded for new collection by the PR store (§10); this pipeline is the published-paper
 reference and is left as it is.*
 
-**Outstanding:** the window is 2026-01-01 to 2026-03-31 plus the v2 window
-(2025-09-01 to 2025-12-31). Extending it is mechanical (`config.pr_numbers` pins an exact
-list) but every extension re-opens the matcher-validation question below.
+**Outstanding:** the 138 are all 2025 PRs, closed 2025-11-21 to 2025-12-31 -- the v2 fetch
+(`src/datasets/pr_review_v2/fetch.py:55`) took the 200 newest-created `is:closed` PRs, so they are
+fast closers (median 0.9 days open, max 14.2). *(Corrected 2026-09-24: this line used to give the
+window as "2026-01-01 to 2026-03-31", which is the file name of a separate 15-PR v1 set.)*
+Extending it is mechanical (`config.pr_numbers` pins an exact list) but every extension re-opens
+the matcher-validation question below.
 
 ---
 
@@ -388,7 +391,8 @@ cannot silently carry a conclusion.
 
 ## 10. PR data: one store, many projections — September 2026
 
-**Status: built; the full collection is the user's next run.** Three pipelines used to fetch Mathlib
+**Status: built; tier 1 collected over 32,850 PRs (2024-03 to 2026-08), tier 2 only for PRs created
+December 2025 and January 2026 (2,060); the export is uncommitted as of 2026-09-24.** Three pipelines used to fetch Mathlib
 PRs and they disagreed about what a review comment is: the retrieval corpus kept comments by
 `author_association` alone, which is **33 % recall and 62 % precision** against spec §3.1 on the
 201 cached bundles — it drops roster reviewers GitHub calls CONTRIBUTOR and keeps PR authors replying
