@@ -166,3 +166,16 @@ def test_git_hydrated_targets_reproduce_the_frozen_change_graphs(tmp_path):
     graphs = {g["episode_id"]: len(g["targets"]) for g in jsonl_rows(release / "derived/change_graphs.jsonl")}
     episodes = [ReviewEpisodeInput.model_validate(row) for row in jsonl_rows(release / "input/episodes.jsonl")]
     assert {e.episode_id: f.change_targets(e, cache_root=tmp_path) for e in episodes} == graphs   # 16 of 16
+
+
+def test_the_committed_pre_registration_is_intact_and_says_what_was_ruled():
+    """eval-2025-06-2026-03-v1 was sealed 2026-09-24, before any candidate's tier 2 was read."""
+
+    spec, members, digest = f.load_sealed("eval-2025-06-2026-03-v1")    # refuses a moved digest
+    assert digest == "bcf93808a52879d216a873e2d5f810f4d4bb909f62e21d2360e99a56cb50f66f"
+    assert (spec.created_from, spec.created_to) == ("2025-06-01", "2026-03-31")
+    assert (spec.main_size, spec.ai_size, spec.main_target_cap, spec.ai_target_cap) == (50, 10, 100, 150)
+    assert (spec.per_author_cap, spec.per_base_cap) == (3, 2)
+    assert spec.store_content_sha256.startswith("f2d2beb6")
+    assert len(members) == 9939
+    assert sum(f.month_quotas(members, spec.main_size).values()) == 50

@@ -1,0 +1,94 @@
+{
+  "ai_members": 388,
+  "by_month": {
+    "2025-06": {
+      "bot_author": 15,
+      "no_reviewer_decision": 148,
+      "pass": 928,
+      "still_open": 112
+    },
+    "2025-07": {
+      "bot_author": 7,
+      "dev_used": 2,
+      "no_reviewer_decision": 72,
+      "pass": 1036,
+      "still_open": 102
+    },
+    "2025-08": {
+      "bot_author": 18,
+      "no_reviewer_decision": 76,
+      "pass": 1202,
+      "revert": 1,
+      "still_open": 84
+    },
+    "2025-09": {
+      "bot_author": 34,
+      "no_reviewer_decision": 59,
+      "pass": 752,
+      "still_open": 62
+    },
+    "2025-10": {
+      "bot_author": 11,
+      "dev_used": 1,
+      "no_reviewer_decision": 61,
+      "pass": 892,
+      "still_open": 64
+    },
+    "2025-11": {
+      "bot_author": 26,
+      "dev_used": 3,
+      "no_reviewer_decision": 60,
+      "pass": 994,
+      "still_open": 56
+    },
+    "2025-12": {
+      "bot_author": 14,
+      "dev_used": 197,
+      "no_reviewer_decision": 46,
+      "pass": 803,
+      "still_open": 78
+    },
+    "2026-01": {
+      "bot_author": 20,
+      "dev_used": 14,
+      "no_reviewer_decision": 42,
+      "pass": 1031,
+      "still_open": 105
+    },
+    "2026-02": {
+      "bot_author": 29,
+      "dev_used": 1,
+      "no_reviewer_decision": 89,
+      "pass": 1000,
+      "still_open": 107
+    },
+    "2026-03": {
+      "bot_author": 34,
+      "dev_used": 1,
+      "no_reviewer_decision": 90,
+      "pass": 1301,
+      "still_open": 128
+    }
+  },
+  "by_reason": {
+    "bot_author": 208,
+    "dev_used": 219,
+    "no_reviewer_decision": 743,
+    "pass": 9939,
+    "revert": 1,
+    "still_open": 898
+  },
+  "main_quotas": {
+    "2025-06": 5,
+    "2025-07": 5,
+    "2025-08": 6,
+    "2025-09": 4,
+    "2025-10": 4,
+    "2025-11": 5,
+    "2025-12": 4,
+    "2026-01": 5,
+    "2026-02": 5,
+    "2026-03": 7
+  },
+  "members": 9939
+}
