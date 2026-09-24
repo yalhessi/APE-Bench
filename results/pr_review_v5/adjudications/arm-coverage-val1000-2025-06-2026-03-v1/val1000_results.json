@@ -1,0 +1,506 @@
+{
+ "sizes": {
+  "accepted_prs": 973,
+  "no_feedback_prs": 214,
+  "prs_with_feedback": 759,
+  "events": 2306,
+  "asks_both": 1833,
+  "asks_either": 1855,
+  "family_contested": 93
+ },
+ "agreement": {
+  "is_ask": [
+   0.9904596704249783,
+   0.9702254978947973
+  ],
+  "family": [
+   0.9492635024549918,
+   0.9417348003566957
+  ],
+  "primary": [
+   0.9099836333878887,
+   0.8947218742287627
+  ],
+  "owned": [
+   0.9465357337697763,
+   0.8539176173235876
+  ]
+ },
+ "families": {
+  "F1": {
+   "asks": 406,
+   "share": 0.2215,
+   "share_ci": [
+    0.1881,
+    0.2567
+   ],
+   "prs": 179,
+   "owned_both": 397,
+   "explicit": 320,
+   "main": 370,
+   "ai_stratum": 36
+  },
+  "F2": {
+   "asks": 61,
+   "share": 0.0333,
+   "share_ci": [
+    0.0237,
+    0.0435
+   ],
+   "prs": 46,
+   "owned_both": 52,
+   "explicit": 16,
+   "main": 58,
+   "ai_stratum": 3
+  },
+  "F3": {
+   "asks": 79,
+   "share": 0.0431,
+   "share_ci": [
+    0.032,
+    0.0548
+   ],
+   "prs": 57,
+   "owned_both": 11,
+   "explicit": 5,
+   "main": 76,
+   "ai_stratum": 3
+  },
+  "F4": {
+   "asks": 16,
+   "share": 0.0087,
+   "share_ci": [
+    0.0046,
+    0.0133
+   ],
+   "prs": 15,
+   "owned_both": 10,
+   "explicit": 5,
+   "main": 13,
+   "ai_stratum": 3
+  },
+  "F5": {
+   "asks": 78,
+   "share": 0.0426,
+   "share_ci": [
+    0.0315,
+    0.0561
+   ],
+   "prs": 57,
+   "owned_both": 44,
+   "explicit": 12,
+   "main": 73,
+   "ai_stratum": 5
+  },
+  "F6": {
+   "asks": 263,
+   "share": 0.1435,
+   "share_ci": [
+    0.1226,
+    0.1647
+   ],
+   "prs": 171,
+   "owned_both": 103,
+   "explicit": 43,
+   "main": 243,
+   "ai_stratum": 20
+  },
+  "F7": {
+   "asks": 62,
+   "share": 0.0338,
+   "share_ci": [
+    0.0237,
+    0.0438
+   ],
+   "prs": 46,
+   "owned_both": 61,
+   "explicit": 42,
+   "main": 49,
+   "ai_stratum": 13
+  },
+  "F8": {
+   "asks": 178,
+   "share": 0.0971,
+   "share_ci": [
+    0.0795,
+    0.1163
+   ],
+   "prs": 118,
+   "owned_both": 169,
+   "explicit": 140,
+   "main": 167,
+   "ai_stratum": 11
+  },
+  "F9": {
+   "asks": 216,
+   "share": 0.1178,
+   "share_ci": [
+    0.0985,
+    0.1384
+   ],
+   "prs": 132,
+   "owned_both": 202,
+   "explicit": 83,
+   "main": 195,
+   "ai_stratum": 21
+  },
+  "F10": {
+   "asks": 228,
+   "share": 0.1244,
+   "share_ci": [
+    0.1016,
+    0.1474
+   ],
+   "prs": 141,
+   "owned_both": 216,
+   "explicit": 86,
+   "main": 195,
+   "ai_stratum": 33
+  },
+  "F11": {
+   "asks": 20,
+   "share": 0.0109,
+   "share_ci": [
+    0.0055,
+    0.0171
+   ],
+   "prs": 16,
+   "owned_both": 5,
+   "explicit": 0,
+   "main": 10,
+   "ai_stratum": 10
+  },
+  "F12": {
+   "asks": 116,
+   "share": 0.0633,
+   "share_ci": [
+    0.0505,
+    0.0771
+   ],
+   "prs": 99,
+   "owned_both": 1,
+   "explicit": 0,
+   "main": 83,
+   "ai_stratum": 33
+  },
+  "CORR": {
+   "asks": 11,
+   "share": 0.006,
+   "share_ci": [
+    0.0028,
+    0.01
+   ],
+   "prs": 11,
+   "owned_both": 11,
+   "explicit": 10,
+   "main": 8,
+   "ai_stratum": 3
+  },
+  "NEW": {
+   "asks": 6,
+   "share": 0.0033,
+   "share_ci": [
+    0.0,
+    0.0088
+   ],
+   "prs": 3,
+   "owned_both": 1,
+   "explicit": 0,
+   "main": 6,
+   "ai_stratum": 0
+  },
+  "CONTESTED": {
+   "asks": 93,
+   "share": 0.0507,
+   "share_ci": [
+    0.0396,
+    0.0641
+   ],
+   "prs": 74,
+   "owned_both": 59,
+   "explicit": 8,
+   "main": 82,
+   "ai_stratum": 11
+  }
+ },
+ "val60_families": {
+  "F1": 22,
+  "F2": 12,
+  "F3": 10,
+  "F4": 5,
+  "F5": 5,
+  "F6": 8,
+  "F7": 3,
+  "F8": 3,
+  "F9": 8,
+  "F10": 13,
+  "F11": 3,
+  "F12": 15
+ },
+ "dev_families": {
+  "F1": 9,
+  "F4": 4,
+  "F8": 14,
+  "F10": 4,
+  "F9": 3,
+  "F5": 2,
+  "F6": 4,
+  "F7": 1,
+  "F2": 1,
+  "CORR": 2,
+  "F12": 4
+ },
+ "unowned": {
+  "share": 0.2144,
+  "ci": [
+   0.1889,
+   0.242
+  ],
+  "either_reader": 0.2679
+ },
+ "explicit": {
+  "share": 0.4201,
+  "ci": [
+   0.3869,
+   0.4532
+  ]
+ },
+ "pr_grain": {
+  "share": 0.0933,
+  "ci": [
+   0.0795,
+   0.1091
+  ]
+ },
+ "by_arm": {
+  "api_reuse": {
+   "primary_agreed": 70,
+   "explicit": 38
+  },
+  "correctness": {
+   "primary_agreed": 26,
+   "explicit": 14
+  },
+  "docs": {
+   "primary_agreed": 217,
+   "explicit": 88
+  },
+  "duplication": {
+   "primary_agreed": 41,
+   "explicit": 12
+  },
+  "family_design": {
+   "primary_agreed": 53,
+   "explicit": 25
+  },
+  "generality": {
+   "primary_agreed": 69,
+   "explicit": 41
+  },
+  "naming": {
+   "primary_agreed": 175,
+   "explicit": 142
+  },
+  "none": {
+   "primary_agreed": 393,
+   "explicit": 0
+  },
+  "proof_golf": {
+   "primary_agreed": 293,
+   "explicit": 270
+  },
+  "proof_idiom": {
+   "primary_agreed": 59,
+   "explicit": 24
+  },
+  "style": {
+   "primary_agreed": 272,
+   "explicit": 116
+  }
+ },
+ "owners_mentions": {
+  "style": 310,
+  "proof_golf": 380,
+  "docs": 225,
+  "proof_idiom": 146,
+  "correctness": 29,
+  "naming": 190,
+  "api_reuse": 103,
+  "family_design": 60,
+  "duplication": 45,
+  "generality": 81
+ },
+ "grain": {
+  "line": 562,
+  "declaration": 631,
+  "file": 71,
+  "pr": 171,
+  "declaration_group": 146
+ },
+ "code_kind": {
+  "math": 1467,
+  "prose": 287,
+  "meta": 49,
+  "infra": 14
+ },
+ "reviewers": {
+  "n": 80,
+  "top": [
+   [
+    "grunweg",
+    197
+   ],
+   [
+    "j-loreaux",
+    165
+   ],
+   [
+    "YaelDillies",
+    146
+   ],
+   [
+    "erdOne",
+    114
+   ],
+   [
+    "eric-wieser",
+    102
+   ],
+   [
+    "robin-carlier",
+    93
+   ],
+   [
+    "ocfnash",
+    90
+   ],
+   [
+    "vihdzp",
+    87
+   ]
+  ],
+  "top_share": 0.0854
+ },
+ "new_family_questions": [
+  [
+   "v0213",
+   "Is a proof broken into readable, maintainable steps rather than compressed into dense lines?"
+  ],
+  [
+   "v0277",
+   "Does the added code impose an acceptable performance cost on building the library?"
+  ],
+  [
+   "v0619",
+   "Does the change affect build or elaboration performance, and has that been measured and reported?"
+  ],
+  [
+   "v1258",
+   "Does a declaration depend on definitional equalities that fail at reducible transparency, risking failures in automation downstream?"
+  ],
+  [
+   "v1737",
+   "Can tactic, linter or metaprogramming code be written more simply, idiomatically or efficiently without changing its behaviour?"
+  ],
+  [
+   "v1738",
+   "Can tactic, linter or metaprogramming code be written more simply, idiomatically or efficiently without changing its behaviour?"
+  ],
+  [
+   "v1741",
+   "Can tactic, linter or metaprogramming code be written more simply, idiomatically or efficiently without changing its behaviour?"
+  ],
+  [
+   "v1744",
+   "Can tactic, linter or metaprogramming code be written more simply, idiomatically or efficiently without changing its behaviour?"
+  ],
+  [
+   "v1763",
+   "Can tactic, linter or metaprogramming code be written more simply, idiomatically or efficiently without changing its behaviour?"
+  ]
+ ],
+ "strata": {
+  "main": {
+   "asks": 1628,
+   "prs": 559,
+   "unowned": 0.2101,
+   "families": {
+    "F1": 370,
+    "F10": 195,
+    "F9": 195,
+    "F11": 10,
+    "F5": 73,
+    "F12": 83,
+    "CONTESTED": 82,
+    "CORR": 8,
+    "F8": 167,
+    "F6": 243,
+    "F4": 13,
+    "F3": 76,
+    "F2": 58,
+    "F7": 49,
+    "NEW": 6
+   }
+  },
+  "ai": {
+   "asks": 205,
+   "prs": 83,
+   "unowned": 0.2488,
+   "families": {
+    "F10": 33,
+    "F1": 36,
+    "F9": 21,
+    "CONTESTED": 11,
+    "F12": 33,
+    "F7": 13,
+    "F8": 11,
+    "F6": 20,
+    "CORR": 3,
+    "F11": 10,
+    "F5": 5,
+    "F3": 3,
+    "F4": 3,
+    "F2": 3
+   }
+  }
+ },
+ "R": {
+  "R1 unowned in [25%,40%]": [
+   0.2144,
+   false
+  ],
+  "R2 F3 and F12 each >=5%, <=10% owned": [
+   {
+    "F3": [
+     0.0431,
+     0.13924050632911392
+    ],
+    "F12": [
+     0.0633,
+     0.008620689655172414
+    ]
+   },
+   false
+  ],
+  "R3 F8 <=6%": [
+   0.0971,
+   false
+  ],
+  "R4 explicit <=45%": [
+   0.4201,
+   true
+  ],
+  "R5 PR grain >=8%": [
+   0.0933,
+   true
+  ],
+  "R6 api_reuse primary <=1%": [
+   0.0382,
+   false
+  ],
+  "R7 NEW <=10%": [
+   0.0033,
+   true
+  ]
+ }
+}
