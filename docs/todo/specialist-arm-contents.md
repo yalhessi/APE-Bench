@@ -181,3 +181,22 @@ What this says about where specialist improvement is bounded: by judgement at th
 parked reasoning test (`reasoning-in-the-arms.md`) is the only lever on, and by measurement -- the burned
 4-PR and 12-PR sets cannot resolve a one- or two-obligation effect, which the 46-PR unseen window
 (`eval-unseen-window.md`, one flip = 1.7 pp) can.
+
+**Naming-evidence fix, built and measured 2026-09-24 (`adcc7ba`).** The tool's counted verdicts now claim
+only the leading prefix they count, and the naming prompt says so. Measured with `cli bench` (naming arm, PRs
+33337 / 33421, 2 positive units + 4 negatives, the unified contract), three attempts
+(`results/pr_review_v5/benches/naming_prefix_scoped_contract_a{3,4,5}.json`, ~$1.06 nominal together), against
+the null on disk (three V runs, 0 of 3 at each miss site). **Reading rule, fixed before running: a site passes
+at >= 2 of 3 attempts filing a rename there.**
+
+| site | filed | the arm's reason |
+|---|---|---|
+| 6b02b611, `round_eq'` | **0 of 3** | considered the prime, as the new text asks, and judged it fine: "primed names are used widely ... for simple restatements", "many `*_eq'` variants" |
+| ce7b5d2e, the coercion lemma | **0 of 3** | read the plurality wording ("48/124 plurality", "no stronger established rule") and answered `no_issue` |
+| 64e1164f sibling (internal control) | 3 of 3 | the `toLinearMap_` rename, as always |
+| negatives | 0 of 12 | the feared de-prime filings did not appear |
+
+Both sites fail. The over-claim was real and the fix stays -- it costs nothing measured and a question-based
+design inherits the honest text -- but it was not what held those two silences: the arm now engages the
+unmeasured part of the name and decides against the ask. This is the survey's conclusion measured directly
+at the two naming misses: judgement at the right site, not evidence.

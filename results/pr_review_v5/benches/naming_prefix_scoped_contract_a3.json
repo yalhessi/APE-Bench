@@ -1,0 +1,78 @@
+{
+  "naming": {
+    "bench_version": "v5-bench/1",
+    "arm_id": "naming",
+    "fixture_sha256": "737b060ecb10a22d9218e93dfc28e398a4bef588de93f71f5a6caa0c973b70a9",
+    "positives": 2,
+    "negatives": 4,
+    "located": 1,
+    "location_rate": 0.5,
+    "spoke_when_quiet": 0,
+    "gold_silent_speech_rate": 0.0,
+    "false_alarm_rate": null,
+    "negatives_are_adjudicated": false,
+    "abstained_on_positives": 1,
+    "candidates_total": 1,
+    "errors": {},
+    "note": "Location and silence only. A bench hit is a necessary condition for a scored hit, never a sufficient one -- whether the claim is correct is the judge's question and needs a semantic run.",
+    "cases": [
+      {
+        "work_unit_id": "wu:1f9cf7865fe0948dfc6e47f8",
+        "pr_number": 33337,
+        "positive": true,
+        "candidates": 1,
+        "located": true,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:ed4ebc2fd8ff4c98194ac766",
+        "pr_number": 33337,
+        "positive": false,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:0e73c9c496ae3f0168d0fa9b",
+        "pr_number": 33421,
+        "positive": false,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:4a8d72b1a276a6e9499bc778",
+        "pr_number": 33421,
+        "positive": false,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:b57bc32427e0f86803e90e9a",
+        "pr_number": 33421,
+        "positive": false,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      },
+      {
+        "work_unit_id": "wu:b6fdbe4f6b668bf8d3f9df3a",
+        "pr_number": 33421,
+        "positive": true,
+        "candidates": 0,
+        "located": false,
+        "spoke_when_quiet": false
+      }
+    ],
+    "cases_not_eligible": [
+      "wu:0e73c9c496ae3f0168d0fa9b",
+      "wu:b57bc32427e0f86803e90e9a"
+    ],
+    "cost": 0.40289,
+    "procedure_variant": "baseline",
+    "oracle_variant": false,
+    "attempt": 3,
+    "run_name": "bench_naming_baseline_a3"
+  }
+}
