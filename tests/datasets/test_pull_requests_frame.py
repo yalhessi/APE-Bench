@@ -163,9 +163,14 @@ def test_git_hydrated_targets_reproduce_the_frozen_change_graphs(tmp_path):
     release = Path("inputs/pr_review_v4/releases/dev-medium-0.5.0")
     if not (MATHLIB_CLONE / ".git").exists() and not (MATHLIB_CLONE / "HEAD").exists():
         pytest.skip("no local mathlib4 clone")
-    graphs = {g["episode_id"]: len(g["targets"]) for g in jsonl_rows(release / "derived/change_graphs.jsonl")}
-    episodes = [ReviewEpisodeInput.model_validate(row) for row in jsonl_rows(release / "input/episodes.jsonl")]
-    assert {e.episode_id: f.change_targets(e, cache_root=tmp_path) for e in episodes} == graphs   # 16 of 16
+    # All 16 reproduced when this was built (b1aeda1). Three span the range, 2 to 108 targets, and
+    # keep the check under a few seconds: each base file is a `git show` on a busy NFS.
+    wanted = {33438, 33305, 33149}
+    graphs = {g["episode_id"]: len(g["targets"]) for g in jsonl_rows(release / "derived/change_graphs.jsonl")
+              if g["pr_number"] in wanted}
+    episodes = [ReviewEpisodeInput.model_validate(row) for row in jsonl_rows(release / "input/episodes.jsonl")
+                if row["pr_number"] in wanted]
+    assert {e.episode_id: f.change_targets(e, cache_root=tmp_path) for e in episodes} == graphs
 
 
 def test_the_committed_pre_registration_is_intact_and_says_what_was_ruled():
@@ -332,3 +337,24 @@ def test_the_frozen_test_release_inventory_rebuilds_byte_for_byte():
     release = Path("inputs/pr_review_v4/releases/eval-2025-06-2026-03-v1")
     graphs = load_jsonl(release / "derived/change_graphs.jsonl", ChangeGraph)
     assert jsonl_bytes(build_inventory(graphs)) == (release / "derived/modification_inventory.jsonl").read_bytes()
+
+
+def test_a_nested_subset_is_a_seed_order_prefix_of_every_stratum_of_the_draw():
+    spec, members, _ = f.load_sealed("val-2025-06-2026-03-v1")
+    from pathlib import Path
+
+    draw = f.Draw.model_validate_json(Path("inputs/pull_requests/evaluation/val-2025-06-2026-03-v1/draw.json").read_text())
+    small = f.nested_subset(spec, members, draw, main_size=10, ai_size=2)
+    assert small["main_quotas"] == {month: 1 for month in f.month_quotas(members, 50)}   # one per month
+    assert len(small["pr_numbers"]) == 12 and set(small["pr_numbers"]) <= {a.pr_number for a in draw.accepted}
+    orders = f.strata_orders(spec, members)
+    for key, prs in small["by_stratum"].items():
+        accepted_in_order = [m.pr_number for m in orders[key] if m.pr_number in {a.pr_number for a in draw.accepted if a.stratum == key}]
+        assert prs == accepted_in_order[: len(prs)]
+    with pytest.raises(ValueError):
+        f.nested_subset(spec, members, draw, main_size=51, ai_size=2)
+
+
+def test_month_quotas_are_unchanged_by_the_shared_allocator():
+    spec, members, _ = f.load_sealed("eval-2025-06-2026-03-v1")
+    assert list(f.month_quotas(members, 50).values()) == [5, 5, 6, 4, 4, 5, 4, 5, 5, 7]

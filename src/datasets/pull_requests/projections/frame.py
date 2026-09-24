@@ -29,6 +29,7 @@ Verbs, all free except the collection that `candidates` prints and does not run:
               beside test: one distribution, disjoint PRs)
   candidates  write round k's candidate list for `collect --prs` (a prefix of each seeded order)
   walk        apply funnel and caps in seed order; writes draw.json only once every stratum is full
+  subset      a smaller version of a completed draw, nested in it (the first accepted PRs per stratum)
   release     the drawn episodes as a gold-free v5 generation release (inputs/pr_review_v4/releases)
 """
 
@@ -270,17 +271,23 @@ def seeded_order(members: Iterable[FrameMember], seed: str) -> List[FrameMember]
     return sorted(members, key=lambda m: draw_key(seed, m.pr_number))
 
 
-def month_quotas(members: Sequence[FrameMember], size: int) -> Dict[str, int]:
-    """Proportional allocation by largest remainder; ties go to the earlier month."""
+def largest_remainder(counts: Mapping[str, int], size: int) -> Dict[str, int]:
+    """Allocate `size` slots proportionally to `counts` by largest remainder; ties go to the
+    earlier key."""
 
-    counts = collections.Counter(m.month for m in members)
     total = sum(counts.values())
-    exact = {month: size * n / total for month, n in counts.items()}
-    quotas = {month: math.floor(value) for month, value in exact.items()}
-    by_remainder = sorted(exact, key=lambda month: (-(exact[month] - quotas[month]), month))
-    for month in by_remainder[: size - sum(quotas.values())]:
-        quotas[month] += 1
+    exact = {key: size * n / total for key, n in counts.items()}
+    quotas = {key: math.floor(value) for key, value in exact.items()}
+    by_remainder = sorted(exact, key=lambda key: (-(exact[key] - quotas[key]), key))
+    for key in by_remainder[: size - sum(quotas.values())]:
+        quotas[key] += 1
     return dict(sorted(quotas.items()))
+
+
+def month_quotas(members: Sequence[FrameMember], size: int) -> Dict[str, int]:
+    """Proportional allocation over the frame's months by largest remainder."""
+
+    return largest_remainder(collections.Counter(m.month for m in members), size)
 
 
 def strata_orders(spec: FrameSpec, members: Sequence[FrameMember]) -> Dict[str, List[FrameMember]]:
@@ -475,6 +482,36 @@ def load_sealed(name: str, root: Path = EVALUATION_ROOT) -> Tuple[FrameSpec, Lis
     return spec, members, record["seal_sha256"]
 
 
+# --- nested subsets -------------------------------------------------------------------------------
+
+def nested_subset(spec: FrameSpec, members: Sequence[FrameMember], draw: Draw, *,
+                  main_size: int, ai_size: int) -> Dict[str, object]:
+    """A smaller version of a completed draw: in every stratum, the first accepted PRs in its seeded
+    order. Month quotas are the largest remainder over the full draw's quotas.
+
+    It is a prefix of what the full walk accepted, not a fresh smaller walk, so it can never hold a
+    PR the full set does not. A fresh walk could: author and base caps bind differently at a
+    smaller size. A small-set number is therefore a reading of the same PRs the full set reads.
+    """
+
+    if not draw.complete or main_size > spec.main_size or ai_size > spec.ai_size:
+        raise ValueError("a nested subset needs a complete draw and sizes no larger than it")
+    full = {month: q for month, q in month_quotas(members, spec.main_size).items() if q}
+    quotas = largest_remainder(full, main_size)
+    orders = strata_orders(spec, members)
+    chosen: Dict[str, List[int]] = {}
+    for key, order in orders.items():
+        position = {m.pr_number: i for i, m in enumerate(order)}
+        accepted = sorted((a.pr_number for a in draw.accepted if a.stratum == key), key=position.__getitem__)
+        take = ai_size if key == "ai" else quotas.get(key.split(":", 1)[1], 0)
+        if take:
+            chosen[key] = accepted[:take]
+    return {"main_size": main_size, "ai_size": ai_size, "main_quotas": {k: v for k, v in quotas.items() if v},
+            "by_stratum": chosen, "pr_numbers": sorted(n for prs in chosen.values() for n in prs),
+            "rule": "per stratum, the first accepted PRs of the full draw in seeded order; month quotas "
+                    "by largest remainder over the full draw's"}
+
+
 # --- the generation release -------------------------------------------------------------------
 
 EVALUATION_DATASET_ID = "mathlib-pr-review-evaluation"
@@ -654,6 +691,11 @@ def main() -> None:
                        ("--ai-target-cap", int), ("--per-author-cap", int), ("--per-base-cap", int),
                        ("--main-candidate-factor", float), ("--ai-candidate-factor", float)):
         p.add_argument(flag, type=kind, default=None, help="default: the parent's")
+    p = sub.add_parser("subset", help="a smaller nested version of a completed draw")
+    p.add_argument("--name", required=True)
+    p.add_argument("--label", required=True, help="e.g. small12; names subset-<label>.json")
+    p.add_argument("--main-size", type=int, required=True)
+    p.add_argument("--ai-size", type=int, required=True)
     p = sub.add_parser("candidates")
     p.add_argument("--name", required=True)
     p.add_argument("--round", type=int, required=True)
@@ -715,6 +757,17 @@ def main() -> None:
         print("collect with: ape/bin/python -m src.datasets.pull_requests.collect "
               f"--start {spec.listing_window[0]} --end {spec.listing_window[1]} --tier 2 "
               f"--roster {spec.roster_path} --prs {path}")
+        return
+
+    if args.verb == "subset":
+        draw_path = seal_dir(spec.name) / "draw.json"
+        draw = Draw.model_validate_json(draw_path.read_text(encoding="utf-8"))
+        chosen = nested_subset(spec, members, draw, main_size=args.main_size, ai_size=args.ai_size)
+        record = {"label": args.label, "frame_seal_sha256": seal_sha,
+                  "draw_sha256": sha256_file(draw_path), **chosen}
+        path = seal_dir(spec.name) / f"subset-{args.label}.json"
+        write_once(path, pretty_json_bytes(record))
+        print(json.dumps({k: record[k] for k in ("main_quotas", "pr_numbers")}), f"-> {path}")
         return
 
     if args.verb == "release":
