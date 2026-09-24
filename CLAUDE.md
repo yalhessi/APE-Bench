@@ -141,6 +141,12 @@ Tests that need a built Lean workspace under `data/code_execute/` fail on a fres
 way and the commit had to be amended). Capture pytest's own exit code — redirect to a file and
 check `$?`, or `set -o pipefail` — before the commit step.
 
+**An edit and a commit do not share one command line.** In `check && edit; test; commit`, a failing
+check skips the edit while the test and commit after the `;` still run -- on the old files, so the
+suite passes and the commit carries the unfixed code (2026-09-24: a constructor probe failed, the test
+edit it guarded was skipped, and the commit had to be amended). Edit, then test, then commit, each
+gated on the one before.
+
 **The suite is parallel, and the flags are not in `pytest.ini` on purpose.** `--dist loadfile`
 keeps a file's tests on one worker, which the module-scoped fixtures need. Leave the flags off a
 targeted run — worker startup costs more than the file does (`tests/orchestration/test_pipeline.py`

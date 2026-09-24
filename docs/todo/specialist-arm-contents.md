@@ -200,3 +200,9 @@ Both sites fail. The over-claim was real and the fix stays -- it costs nothing m
 design inherits the honest text -- but it was not what held those two silences: the arm now engages the
 unmeasured part of the name and decides against the ask. This is the survey's conclusion measured directly
 at the two naming misses: judgement at the right site, not evidence.
+
+**Roster allowlist, built 2026-09-24 (`e2db044`).** `RunDataset.arm_ids` restricts a run's specialists and is
+sealed into the plan; `configs/pr_review_v5_contract_fanout4_lean.yaml` is the five-arm four-PR config (55 jobs,
+~$2.75 expected against V3's $5.60 billed), for affordable reps of a four-PR condition, not for another set.
+Still open from the lever survey, both cheap and recorded above: the `api_reuse` floor replay (~$0.40) and the
+compound-ask judge check (cents).

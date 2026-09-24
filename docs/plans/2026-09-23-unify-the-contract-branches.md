@@ -142,3 +142,14 @@ its price and the Step 3 result go to the user first.
 could show: the four-PR fanout already ran with no pruning, and its residual is statements, not silences; and on the held-out twelve, the lead-pruned on-concern arms that fanout did run filed nothing, 7 of 7 (`docs/todo/routing-remit-and-silence.md`). Step 5's items that named Step 4 as their run -- the reasoning twin's
 control, the generalist-floor-off rep -- take the Step 3 run (`pr5_V3_contract_fanout4_rep1`) instead,
 which is also where the V2 pair already gives the specialist-only reading.
+
+## Where the session left it, 2026-09-24
+
+Built and on develop: the unification (Steps 0-2), the fanout ledger fix, the far-end control test, the
+prefix-scoped naming tool (`adcc7ba`; benched 0 of 3 at both naming misses, 0 of 12 negatives -- honest, not a
+recall lever), and a per-run specialist roster with a lean four-PR config (`e2db044`). Measured: the unified
+contract, one rep, 3 / 10 with 0 on the control PR (below its bar). Ruled out: the no-pruning twelve-PR run.
+Parked: reasoning (`docs/todo/reasoning-in-the-arms.md`, its test named). Next thread, for a fresh session:
+choosing the one ~50-PR evaluation set (`docs/todo/eval-set-selection.md`). The `work-enumeration` and
+`arms-speak` branches and worktrees remain, tagged `pre-unify/*`; their V2 / V pilot arm pools are copied
+into the main checkout, so removing those worktrees loses nothing.
