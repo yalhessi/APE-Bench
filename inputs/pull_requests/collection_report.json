@@ -1,0 +1,42 @@
+{
+  "runs": [
+    {
+      "collector_version": "pull-request-collector/1",
+      "finished_at": "2026-09-12T10:50:53Z",
+      "pre_gate": {
+        "by_reason": {
+          "bot_author": 28,
+          "no_reviewer_decision": 92,
+          "pass": 2047,
+          "still_open": 183
+        },
+        "passing": 2047,
+        "prs": 2350,
+        "tier2_hours_estimate": 2.2,
+        "tier2_needed": 1399,
+        "tier2_request_estimate": 11192
+      },
+      "requests": 11415,
+      "result": {
+        "compares_fetched": 2863,
+        "prs_deferred": [],
+        "prs_read": 1399
+      },
+      "roster": {
+        "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+        "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+      },
+      "slice": [
+        "2025-12-01",
+        "2026-01-31"
+      ],
+      "started_at": "2026-09-12T09:19:01Z",
+      "store_content_sha256": "f2d2beb6af2b650d36069f55fbeb4a384a7d115df746fac7a123f07145d5c99c",
+      "tier": 2,
+      "window": [
+        "2024-03-01",
+        "2026-08-31"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "added_by_cause": {
+    "author_self_comment": 11357,
+    "non_reviewer_contributor": 367,
+    "roster_reviewer": 42056
+  },
+  "baseline_rows": 43881,
+  "baseline_sha256": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+  "fields_agree": false,
+  "mismatch_failures": [
+    [
+      2203417174,
+      [
+        "line",
+        "commit_id"
+      ]
+    ]
+  ],
+  "missing": {},
+  "missing_failures": [],
+  "old_collection_gap_prs": {},
+  "passed": false,
+  "projection": {
+    "comments_sha256": "7a8cdf191dfb498bfcefb892fc618643ef879fed4a641a4953ef73478ce75228",
+    "roster": {
+      "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+      "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+    },
+    "store_content_sha256": "b2cd40ef1d30508a78c7bc4afb8dfa1717727e33063783452e6c3f9bc1fb9fd2",
+    "window": [
+      "2024-03-01",
+      "2025-12-31"
+    ]
+  },
+  "projection_rows": 97661,
+  "reviewer_view_rows": 69576,
+  "shared_row_mismatches": {
+    "association_changed_upstream": 441,
+    "unexplained": 1
+  },
+  "superset": true
+}
