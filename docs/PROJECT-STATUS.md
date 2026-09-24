@@ -409,6 +409,20 @@ bundles can become a task for the first time. Full record and run order:
 
 ---
 
+**Evaluation sets (2026-09-24).** Two sets are drawn from the store under one sealed protocol, and
+they replace the held-out 12 as the yardstick. The held-out 12 were chosen on gold statistics from
+fast-closing PRs.
+- `val-2025-06-2026-03-v1` is **validation**: read freely and run repeatedly.
+- `eval-2025-06-2026-03-v1` is **test**: sealed, unread, run once.
+- Each holds 60 PRs (50 at the natural rate, proportional by month over 2025-06..2026-03, plus a
+  10-PR AI stratum) and has a nested 12-PR version.
+- Frame, seed, caps and exclusions were pre-registered before any candidate was collected
+  (`src/datasets/pull_requests/projections/frame.py`, `inputs/pull_requests/evaluation/`).
+- Releases are frozen under `inputs/pr_review_v4/releases/`; dataset configs are
+  `configs/pr_review_v5_{eval,val}_2025_06_2026_03_v1[_small12].yaml`.
+- Gold is to be developed on validation and frozen before it touches test.
+- Record: `docs/todo/eval-set-selection.md`.
+
 ## 11. Planned, not started
 
 - **L0 — norm provisioning (`norms/`).** A dated store with

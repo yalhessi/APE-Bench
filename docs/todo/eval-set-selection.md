@@ -1,8 +1,12 @@
-# Choosing the one evaluation set the next big run is spent on
+# Choosing the evaluation sets -- validation and test -- drawn from a sealed, gold-free frame
 
-**Status** — open, 2026-09-24; **surveyed read-only the same day, rulings pending** (branch
-`eval-set-selection`; the survey and the seven rulings the draw needs are at the end). A thread of its own:
-selection design, then a build that parallelizes in a few hours once the set is settled
+**Status** — **sets built, 2026-09-24** (branch `eval-set-selection`, to be merged into develop the same day).
+- Test `eval-2025-06-2026-03-v1` and validation `val-2025-06-2026-03-v1`: 60 PRs each, plus a nested
+  small12 each, with frozen releases and dataset configs.
+- Open: reviewed workspaces (base builds running), gold developed on validation, then the reading
+  rule and controls sealed before test gold, then the system config. Each is best taken in its own
+  session.
+- The survey, the rulings, the build log and the next steps are below, in the order they happened.
 **Cost** — the selection design is free; the build is free apart from gold-stage model calls; the run it
 exists for is the one big run the budget allows, on roughly 50 PRs
 **Motivating example** — every design since August was tuned on the dev set (the 16 medium PRs: the
