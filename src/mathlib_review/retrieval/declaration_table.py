@@ -41,6 +41,7 @@ from ape.toolkits.code.lean.lean_parser import mask_noncode_regions, parse_major
 
 from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
 from src.mathlib_review.io import canonical_json_bytes, sha256_bytes
+from src.mathlib_review.paths import MATHLIB_CLONE
 from src.mathlib_review.tactics import (
     TACTIC_VOCABULARY, TACTIC_VOCABULARY_VERSION, WIDE_TACTIC_VOCABULARY, tactics_used,
 )
@@ -312,7 +313,6 @@ def exemplars(rows: Sequence[DeclarationRow], tactic: str, workspace: Path,
 # could not be. `--before` is also the temporal gate: `rev-list` walks ancestors of the base,
 # so no commit after it is reachable.
 
-MATHLIB_CLONE = Path("data/code_execute/repos/mathlib4/source")
 
 
 def _git(clone: Path, *args: str) -> str:

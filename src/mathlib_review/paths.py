@@ -49,6 +49,10 @@ ZULIP_STORE = Path("data/zulip/corpus/zulip.sqlite3")
 #: The raw store: `pr/<n>/` payloads, `index.sqlite3`, `projections/`. Gitignored.
 PULL_REQUESTS_STORE = Path("data/pull_requests")
 
+#: The local mathlib4 git clone (master to 2026-05-14 as of 2026-09-24). Read with `git show` for
+#: base files and commit dates; never written by review code.
+MATHLIB_CLONE = Path("data/code_execute/repos/mathlib4/source")
+
 #: Tracked provenance for the store: manifest, per-PR endpoint hashes, collection report,
 #: acceptance baseline, dated rosters.
 PULL_REQUESTS_TRACKED = Path("inputs/pull_requests")

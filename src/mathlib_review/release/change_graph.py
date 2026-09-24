@@ -542,6 +542,44 @@ def _attach_to_declarations(
             for item in targets]
 
 
+def hydrate_blob_cache_from_git(
+    episode: ReviewEpisodeInput, *, cache_root: Path, clone: Path,
+) -> Dict[str, int]:
+    """Fill `cache_root/<base_sha>/<path>` with the episode's base Lean files, read from a local git
+    clone with `git show <base_sha>:<path>`: object reads only, offline, gold-free.
+
+    This is the layout `build_change_graph(blob_cache_root=...)` reads, so a file from here gets the
+    `full_blob_cache` status, the same as one fetched by `legacy_pipeline/hydrate_change_sources.py`
+    from raw.githubusercontent. A graph's ids therefore do not depend on which hydrator filled the
+    cache. `cache_root` must never be `data/pr_review_v4/cache/base_files`, which five frozen
+    manifests hash as a tree.
+    Returns counts: `cached`, `fetched`, `missing` (the base commit or path is not in the clone).
+    """
+
+    import subprocess
+
+    counts = {"cached": 0, "fetched": 0, "missing": 0}
+    for diff_file in parse_unified_diff(episode.diff):
+        if not diff_file.path.endswith(".lean") or diff_file.status == "added":
+            continue
+        base_path = diff_file.old_path or diff_file.path
+        dest = cache_root / episode.base_sha / base_path
+        if dest.is_file():
+            counts["cached"] += 1
+            continue
+        shown = subprocess.run(["git", "-C", str(clone), "show", f"{episode.base_sha}:{base_path}"],
+                               capture_output=True)
+        if shown.returncode != 0:
+            counts["missing"] += 1
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        partial = dest.with_suffix(dest.suffix + ".partial")
+        partial.write_bytes(shown.stdout)
+        partial.replace(dest)
+        counts["fetched"] += 1
+    return counts
+
+
 def build_change_graph(
     episode: ReviewEpisodeInput,
     *,
