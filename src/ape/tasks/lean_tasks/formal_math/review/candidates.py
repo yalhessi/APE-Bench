@@ -311,8 +311,17 @@ def normalize_candidate_edit(
 def build_candidate_verification_artifact(
     *, work_unit_id: str, candidate_ordinal: int, stage: Literal["baseline", "proposed_edit"],
     path: str, success: bool, content: str, snapshot_sha: str,
-    edit: Optional[Dict[str, Any]] = None,
+    edit: Optional[Dict[str, Any]] = None, invocation_id: Optional[str] = None,
 ) -> Dict[str, Any]:
+    """One compile, keyed to the candidate that asked for it.
+
+    `invocation_id` joins with `candidate_ordinal`. `(work_unit_id, ordinal)` alone does not name
+    a candidate in v5, where several arms review one unit and each arm's first candidate is
+    ordinal 0: finalization then published an arm's edit-less claim on another arm's compile
+    (7 findings on the family-division run, 5 on its ten-arm twin). Included in the identity
+    only when given, so a caller that has none mints the id it always did.
+    """
+
     edit_sha = None
     if edit is not None:
         encoded_edit = json.dumps(edit, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -328,6 +337,8 @@ def build_candidate_verification_artifact(
         "content": content,
         "snapshot_sha": snapshot_sha,
     }
+    if invocation_id is not None:
+        identity["invocation_id"] = invocation_id
     encoded = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(encoded.encode()).hexdigest()
     return {
@@ -456,6 +467,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             work_unit_id=self.data.work_unit_id, candidate_ordinal=candidate_ordinal,
             patch=patch, success=True, content=report[-4000:],
             snapshot_sha=self.data.snapshot_head_sha or "", touched=touched,
+            invocation_id=getattr(self.data, "invocation_id", None),
         )], None
 
     def _patch_set_workspace(self):
@@ -554,6 +566,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
                 if baseline_success else f"Reviewed file failed compilation: {baseline_detail}"
             ),
             snapshot_sha=self.data.snapshot_head_sha,
+            invocation_id=getattr(self.data, "invocation_id", None),
         )]
         if not edited_result.get("success"):
             return artifacts, (
@@ -569,6 +582,7 @@ class LeanPRReviewV4CandidateTask(BasePRReviewTask):
             content="Reviewed file compiled successfully with the submitted structured edit.",
             snapshot_sha=self.data.snapshot_head_sha,
             edit=edit,
+            invocation_id=getattr(self.data, "invocation_id", None),
         ))
         return artifacts, None
 

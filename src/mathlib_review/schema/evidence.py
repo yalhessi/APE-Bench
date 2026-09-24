@@ -66,6 +66,9 @@ class ResidualCandidateVerificationArtifact(StrictModel):
     artifact_id: str
     work_unit_id: str
     candidate_ordinal: int = Field(ge=0)
+    #: The arm invocation that submitted the candidate; absent on artifacts written before
+    #: 2026-09-24, whose `(work_unit_id, candidate_ordinal)` does not name one candidate in v5.
+    invocation_id: Optional[str] = None
     stage: Literal["baseline", "proposed_edit"]
     kind: Literal["lean_compile"] = "lean_compile"
     success: bool

@@ -213,3 +213,60 @@ def test_the_drop_count_comes_from_the_function_that_drops(tmp_path):
     source = inspect.getsource(module.finalize)
     assert "verified_keys" not in source, "the drop rule is re-derived a second time"
     assert "dropped=unwarranted" in source
+
+
+# --- a compile warrants the candidate that asked for it -----------------------------------------
+
+
+def _artifact_row(ordinal=0, invocation_id=None):
+    from ape.tasks.lean_tasks.formal_math.review.candidates import (
+        build_candidate_verification_artifact,
+    )
+
+    return build_candidate_verification_artifact(
+        work_unit_id="wu:1", candidate_ordinal=ordinal, stage="proposed_edit", path="A.lean",
+        success=True, content="ok", snapshot_sha="s", edit={"x": 1}, invocation_id=invocation_id)
+
+
+def test_two_arms_on_one_unit_do_not_share_a_compile(tmp_path):
+    """The family-division run published an arm's edit-less claim on another arm's compile: both
+    were candidate 0 of unit `wu:1`, and the join had no arm in it (7 findings; 5 in V3)."""
+
+    import json
+
+    from src.mathlib_review.review.conditions import focused_findings
+
+    candidates = tmp_path / "candidates.jsonl"
+    candidates.write_text("".join(
+        json.dumps(_candidate(spec, spec).model_dump(mode="json")) + "\n"
+        for spec in ("duplication", "correctness")), encoding="utf-8")
+    artifacts = tmp_path / "artifacts.jsonl"
+    artifacts.write_text(json.dumps(_artifact_row(invocation_id="wu:1#duplication")) + "\n",
+                         encoding="utf-8")
+    dropped = []
+    findings = focused_findings(candidates, artifacts, dropped=dropped)
+    assert [f.origin_arm_id for f in findings] == ["duplication"]
+    assert [c.spec_id for c in dropped] == ["correctness"], (
+        "the arm with no edit has no compile of its own, and is not verified_compile")
+
+
+def test_artifacts_from_before_the_field_join_as_they_always_did(tmp_path):
+    """A run whose artifacts carry no invocation finalizes as it did when it ran."""
+
+    import json
+
+    from src.mathlib_review.review.conditions import focused_findings
+
+    candidates = tmp_path / "candidates.jsonl"
+    candidates.write_text(json.dumps(_candidate().model_dump(mode="json")) + "\n", encoding="utf-8")
+    artifacts = tmp_path / "artifacts.jsonl"
+    artifacts.write_text(json.dumps(_artifact_row()) + "\n", encoding="utf-8")
+    assert [f.origin_arm_id for f in focused_findings(candidates, artifacts)] == ["duplication"]
+
+
+def test_an_artifact_without_an_invocation_keeps_the_id_it_always_had():
+    legacy, keyed = _artifact_row(), _artifact_row(invocation_id="wu:1#duplication")
+    assert "invocation_id" not in legacy
+    assert keyed["invocation_id"] == "wu:1#duplication"
+    assert keyed["artifact_id"] != legacy["artifact_id"]
+    assert legacy["artifact_id"] == _artifact_row()["artifact_id"]

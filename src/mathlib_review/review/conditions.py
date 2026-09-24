@@ -20,7 +20,9 @@ import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
-from src.mathlib_review.io import jsonl_bytes, load_jsonl, pretty_json_bytes, sha256_bytes, write_once
+from src.mathlib_review.io import (
+    jsonl_bytes, jsonl_rows, load_jsonl, pretty_json_bytes, sha256_bytes, write_once,
+)
 from src.mathlib_review.review.digest import digest_findings
 from src.mathlib_review.review.merge import finding_from_candidate, finding_from_opportunity, merge_findings
 from src.mathlib_review.paths import assert_repo_root
@@ -190,8 +192,8 @@ def focused_findings(candidates_path: Path,
     theorem is unchanged. It does not show the new proof closes the same goal. That is the
     strongest available proxy and it is a proxy.
 
-    Artifacts join on `(work_unit_id, ordinal)`, which is why `CandidateClaim.ordinal` is
-    recorded. A candidate whose artifact is missing is dropped rather than published at a
+    Artifacts join on `(invocation_id, ordinal)` -- on `(work_unit_id, ordinal)` only for runs
+    whose artifacts predate the field -- which is why `CandidateClaim.ordinal` is recorded. A candidate whose artifact is missing is dropped rather than published at a
     tier nothing backs — `FindingSource` refuses a focused source with no evidence, and
     silently downgrading it to `model_assertion` would smuggle an unverified claim into the
     arm whose entire premise is verification.
@@ -205,15 +207,19 @@ def focused_findings(candidates_path: Path,
     """
 
     wanted = set(pr_numbers) if pr_numbers else None
+    # Keyed on the invocation when the artifacts carry it. `(work_unit_id, ordinal)` is kept only
+    # for runs whose artifacts predate the field, so they finalize as they did -- it is not a key
+    # in v5, where every arm's first candidate on a unit is ordinal 0, and it published an arm's
+    # edit-less claim on another arm's compile (7 findings on the family-division run).
     artifacts_by_candidate: Dict[tuple, List[str]] = {}
+    keyed_by_invocation = False
     if verification_artifacts_path and verification_artifacts_path.is_file():
-        for line in verification_artifacts_path.read_text().splitlines():
-            if not line.strip():
-                continue
-            row = json.loads(line)
-            if row.get("stage") != "proposed_edit" or not row.get("success"):
-                continue
-            key = (row.get("work_unit_id"), row.get("candidate_ordinal"))
+        rows = [row for row in jsonl_rows(verification_artifacts_path)
+                if row.get("stage") == "proposed_edit" and row.get("success")]
+        keyed_by_invocation = any(row.get("invocation_id") for row in rows)
+        for row in rows:
+            key = ((row.get("invocation_id"), row.get("candidate_ordinal")) if keyed_by_invocation
+                   else (row.get("work_unit_id"), row.get("candidate_ordinal")))
             artifacts_by_candidate.setdefault(key, []).append(row["artifact_id"])
 
     findings, unverified = [], 0
@@ -226,9 +232,10 @@ def focused_findings(candidates_path: Path,
                 "focused candidate; the focused condition must not silently absorb "
                 "generalist or file-scoped output"
             )
-        artifact_ids = artifacts_by_candidate.get(
-            (candidate.work_unit_id, candidate.ordinal), []
-        )
+        # A v5 invocation id is `<work unit>#<arm>`, and a focused candidate carries both halves.
+        key = ((f"{candidate.work_unit_id}#{candidate.spec_id}", candidate.ordinal)
+               if keyed_by_invocation else (candidate.work_unit_id, candidate.ordinal))
+        artifact_ids = artifacts_by_candidate.get(key, [])
         if not artifact_ids:
             unverified += 1
             if dropped is not None:

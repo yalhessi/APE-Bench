@@ -269,6 +269,7 @@ def apply(patch: PatchSet, read: Any, splice: Any) -> Tuple[Dict[str, str], List
 def verification_artifact(
     *, work_unit_id: str, candidate_ordinal: int, patch: PatchSet, success: bool,
     content: str, snapshot_sha: str, touched: Sequence[str],
+    invocation_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """One artifact for the whole patch, not one per file.
 
@@ -290,6 +291,9 @@ def verification_artifact(
         "content": content,
         "snapshot_sha": snapshot_sha,
     }
+    # Joined with `candidate_ordinal` at finalization; see `build_candidate_verification_artifact`.
+    if invocation_id is not None:
+        identity["invocation_id"] = invocation_id
     encoded = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     digest = hashlib.sha256(encoded.encode()).hexdigest()
     return {
