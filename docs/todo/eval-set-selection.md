@@ -402,6 +402,14 @@ development and another set that will be reserved for testing only."* Ruled the 
   exclude both.
 - Its 57 base builds are queued to start when the test set's finish.
 
+**Small versions (user, 2026-09-24: "a small version (maybe 12) and the full version for different
+size testing"):**
+- Each set has a `small12`: one main-stratum PR per month plus 2 AI.
+- Each is nested in its full set (the first accepted PRs per stratum in seed order, `5d3f372`).
+- Configs: `configs/pr_review_v5_{eval,val}_2025_06_2026_03_v1_small12.yaml`. They share their full
+  set's release and workspaces, with caps of $25 and 30M tokens (worst case $23.45 and $24.05).
+- Their 17 missing bases are building first, in a separate detached builder.
+
 **Next, in order:**
 1. **Merge into `develop`**, as one step:
    - Set aside the main checkout's uncommitted `inputs/pull_requests/{manifest.json, prs.jsonl,
