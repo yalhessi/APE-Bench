@@ -27,6 +27,7 @@ Verbs, all free except the collection that `candidates` prints and does not run:
               inputs/pull_requests/evaluation/<name>/, immutable
   candidates  write round k's candidate list for `collect --prs` (a prefix of each seeded order)
   walk        apply funnel and caps in seed order; writes draw.json only once every stratum is full
+  release     the drawn episodes as a gold-free v5 generation release (inputs/pr_review_v4/releases)
 """
 
 from __future__ import annotations
@@ -469,6 +470,106 @@ def load_sealed(name: str, root: Path = EVALUATION_ROOT) -> Tuple[FrameSpec, Lis
     return spec, members, record["seal_sha256"]
 
 
+# --- the generation release -------------------------------------------------------------------
+
+EVALUATION_DATASET_ID = "mathlib-pr-review-evaluation"
+DEFAULT_RENDERER = "candidate-prompt/14"
+
+
+def write_evaluation_release(out: Path, spec: FrameSpec, draw: Draw, *, store: PullRequestStore,
+                             seal_path: Path, renderer_version: str = DEFAULT_RENDERER,
+                             cache_root: Path = BASE_FILE_CACHE):
+    """The drawn episodes as a release a v5 config can run: episodes, source events, change graphs,
+    work units, rendered prompts, the modification inventory, and the strata labels. No gold.
+
+    Change graphs are built once, from git-hydrated base files and an empty workspace root, so
+    their ids do not depend on which workspaces happen to exist. A child release at another
+    renderer is a `rerender_release` of this one.
+    """
+
+    from datetime import datetime, timezone
+
+    from src.datasets.pull_requests.projections.episodes import REPO
+    from src.mathlib_review.agenda.render_prompts import render_all
+    from src.mathlib_review.io import display_path
+    from src.mathlib_review.release.change_graph import (
+        CHANGE_GRAPH_BUILDER_VERSION, build_change_graph, hydrate_blob_cache_from_git,
+    )
+    from src.mathlib_review.release.episode_builder import RAW_EPISODE_BUILDER_VERSION
+    from src.mathlib_review.release.events import STORE_EVENT_LEDGER_VERSION
+    from src.mathlib_review.release.modification_inventory import (
+        INVENTORY_VERSION, build_inventory, validate_inventory,
+    )
+    from src.mathlib_review.release.releases import ArtifactSpec, build_release
+    from src.mathlib_review.release.work_units import (
+        WORK_UNIT_VERSION, build_work_units, validate_work_unit_coverage,
+    )
+    from src.mathlib_review.schema import ArtifactRef
+    from src.datasets.pull_requests.store import STORE_VERSION
+
+    if not draw.complete:
+        raise ValueError("the draw is not complete; a release is built from a finished walk only")
+    roster_path = Path(spec.roster_path)
+    prs = sorted(a.pr_number for a in draw.accepted)
+    projection = project_episodes(store, roster=load_roster(roster_path), prs=prs, repo=REPO)
+    by_pr = {episode.pr_number: episode for episode in projection.episodes}
+    for accepted in draw.accepted:
+        episode = by_pr.get(accepted.pr_number)
+        if episode is None or episode.episode_id != accepted.episode_id:
+            raise ValueError(f"PR {accepted.pr_number} no longer projects to the drawn episode")
+    graphs = []
+    for episode in projection.episodes:
+        if hydrate_blob_cache_from_git(episode, cache_root=cache_root, clone=MATHLIB_CLONE)["missing"]:
+            raise ValueError(f"PR {episode.pr_number}: base files missing from the clone")
+        graphs.append(build_change_graph(episode, workspace_root=cache_root / "_no_workspaces",
+                                         blob_cache_root=cache_root))
+    units = build_work_units(graphs, renderer_version=renderer_version)
+    validate_work_unit_coverage(graphs, units)
+    prompts = render_all(units, projection.episodes, graphs, [])
+    inventory = build_inventory(graphs)
+    validate_inventory(graphs, inventory)
+    strata = [{"pr_number": a.pr_number, "stratum": a.stratum, "month": a.month, "author": a.author,
+               "ai_evidence": list(a.ai_evidence), "targets": a.targets}
+              for a in sorted(draw.accepted, key=lambda a: a.pr_number)]
+    return build_release(
+        out, dataset_id=EVALUATION_DATASET_ID, release=spec.name, pr_numbers=prs,
+        corpus_cutoff_policy="No historical review corpus is visible during generation.",
+        generator_versions={
+            "frame": FRAME_VERSION, "episodes": RAW_EPISODE_BUILDER_VERSION,
+            "funnel": RAW_EPISODE_BUILDER_VERSION, "events": STORE_EVENT_LEDGER_VERSION,
+            "store": STORE_VERSION, "definitions": spec.definitions_version,
+            "change_graph": CHANGE_GRAPH_BUILDER_VERSION, "work_units": WORK_UNIT_VERSION,
+            "renderer": renderer_version, "inventory": INVENTORY_VERSION,
+        },
+        created_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        sources=[
+            ArtifactRef(path=display_path(store.root), role="pull_request_store",
+                        sha256=store.content_digest(), records=len(prs)),
+            ArtifactRef(path=display_path(roster_path), role="reviewer_roster",
+                        sha256=roster_sha256(roster_path), records=len(load_roster(roster_path))),
+            ArtifactRef(path=display_path(seal_path), role="evaluation_seal",
+                        sha256=sha256_file(seal_path), records=len(draw.accepted)),
+        ],
+        source_artifacts=[ArtifactSpec("source/events.jsonl", projection.events, "event1", "raw_event_index")],
+        input_artifacts=[ArtifactSpec("input/episodes.jsonl", projection.episodes, "episode1",
+                                      "reviewer_visible_episodes")],
+        gold_artifacts=[ArtifactSpec("gold/episode_boundaries.jsonl", projection.boundaries,
+                                     "episode-boundary1", "hidden_episode_boundaries")],
+        derived_artifacts=[
+            ArtifactSpec("derived/funnel.jsonl", projection.funnel, "funnel1", "eligibility_funnel"),
+            ArtifactSpec("derived/change_graphs.jsonl", graphs, "cg1", "complete_change_graphs"),
+            ArtifactSpec("derived/work_units.jsonl", units, "work-unit1", "candidate_work_units"),
+            ArtifactSpec("derived/rendered_prompts.jsonl", prompts, "rendered-prompt1",
+                         "production_prompt_preview"),
+            ArtifactSpec("derived/modification_inventory.jsonl", inventory, "modification1",
+                         "modification_inventory"),
+            ArtifactSpec("derived/evaluation_strata.jsonl", strata, "evaluation-strata1",
+                         "strata_and_ai_labels"),
+        ],
+        split="test",
+    )
+
+
 # --- CLI --------------------------------------------------------------------------------------
 
 def _spec_from_args(args: argparse.Namespace, store: PullRequestStore) -> FrameSpec:
@@ -527,6 +628,10 @@ def main() -> None:
     p = sub.add_parser("candidates")
     p.add_argument("--name", required=True)
     p.add_argument("--round", type=int, required=True)
+    p = sub.add_parser("release")
+    p.add_argument("--name", required=True)
+    p.add_argument("--renderer", default=DEFAULT_RENDERER)
+    p.add_argument("--out", type=Path, default=None, help="default: inputs/pr_review_v4/releases/<name>")
     p = sub.add_parser("walk")
     p.add_argument("--name", required=True)
     p.add_argument("--replaced", type=Path, default=None,
@@ -560,6 +665,18 @@ def main() -> None:
         print("collect with: ape/bin/python -m src.datasets.pull_requests.collect "
               f"--start {spec.listing_window[0]} --end {spec.listing_window[1]} --tier 2 "
               f"--roster {spec.roster_path} --prs {path}")
+        return
+
+    if args.verb == "release":
+        from src.mathlib_review.paths import V4_RELEASES
+
+        draw = Draw.model_validate_json((seal_dir(spec.name) / "draw.json").read_text(encoding="utf-8"))
+        out = args.out or V4_RELEASES / spec.name
+        manifest = write_evaluation_release(out, spec, draw, store=PullRequestStore(),
+                                            seal_path=seal_dir(spec.name) / "seal.json",
+                                            renderer_version=args.renderer)
+        print(json.dumps({"release": str(out), "prs": len(manifest.pr_numbers),
+                          "derived": {ref.path: ref.records for ref in manifest.derived_artifacts}}, indent=1))
         return
 
     store = PullRequestStore()

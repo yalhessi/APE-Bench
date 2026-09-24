@@ -312,6 +312,17 @@ class PullRequestStore:
         return ArtifactRef(path=self.pr_dir(number).as_posix(), role="pull_request_dir",
                            sha256=self.bundle_sha256(number))
 
+    @staticmethod
+    def resolve_pr_dir(path: Path) -> Tuple["PullRequestStore", int]:
+        """The store and PR number a `pull_request_dir` ref (`<store>/pr/<n>`) names. A frozen release
+        cites its collected PRs this way. Their endpoints are immutable, so each bundle's digest
+        stays verifiable however much the store grows; a store-wide digest does not."""
+
+        path = Path(path)
+        if path.parent.name != "pr" or not path.name.isdigit():
+            raise ValueError(f"not a store PR directory: {path}")
+        return PullRequestStore(path.parent.parent), int(path.name)
+
     def content_digest(self) -> str:
         """A deterministic digest of everything in the store: every PR's endpoint and compare
         shas. The index and every projection pin this, so a store that gains or loses one byte

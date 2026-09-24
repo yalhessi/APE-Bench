@@ -205,3 +205,41 @@ def test_the_committed_draw_is_a_seed_order_walk_of_the_sealed_frame():
     assert max(collections.Counter(a.author for a in draw.accepted).values()) <= spec.per_author_cap
     assert all(a.targets <= (spec.ai_target_cap if a.stratum == "ai" else spec.main_target_cap)
                for a in draw.accepted)
+
+
+#: Collected in January 2026, included by the funnel, and not in the sealed test set (checked
+#: 2026-09-24). Copied into a temporary store so the test never scans the shared one.
+COLLECTED_PRS = (34006, 34008)
+
+
+def test_a_store_built_release_verifies_by_the_bundles_its_events_cite(tmp_path):
+    """verify_frozen cannot re-hash a store that grew, so a store-built release is checked PR by
+    PR, and validate_release reads the bundles from the store instead of refusing them."""
+
+    from pathlib import Path
+
+    from src.datasets.pull_requests.projections.episodes import write_episode_release
+    from src.mathlib_review.io import jsonl_bytes, jsonl_rows
+    from src.mathlib_review.release.validate import validate_release
+    from src.mathlib_review.release.verify_frozen import _verify_store_bundles
+
+    import shutil
+
+    real = PullRequestStore()
+    if not all((real.pr_dir(n) / "fetch.json").is_file() for n in COLLECTED_PRS):
+        pytest.skip("the collected PRs are not in this checkout's store")
+    store = PullRequestStore(tmp_path / "store")
+    for number in COLLECTED_PRS:
+        shutil.copytree(real.pr_dir(number), store.pr_dir(number))
+    prs = list(COLLECTED_PRS)
+    out = tmp_path / "release"
+    write_episode_release(out, store, roster_path=Path("inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt"),
+                          dataset_id="pull-requests-test", release="0.0.0-test", prs=prs)
+    failures, checked = _verify_store_bundles(out)
+    assert (failures, checked) == ([], 2)
+    validate_release(out)
+    events = jsonl_rows(out / "source/events.jsonl")
+    events[0]["source_object"]["sha256"] = "0" * 64
+    (out / "source/events.jsonl").write_bytes(jsonl_bytes(events))
+    failures, _ = _verify_store_bundles(out)
+    assert [f["problem"] for f in failures] == ["hash_mismatch"]

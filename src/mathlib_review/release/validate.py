@@ -87,14 +87,25 @@ def validate_release(release_dir: Path) -> Dict[str, int]:
             by_source[event.source_object.path].append(event)
         for source_path, source_events in by_source.items():
             path = Path(source_path)
-            if not path.is_file():
-                raise ValueError(f"event source bundle missing: {source_path}")
             expected_hash = source_events[0].source_object.sha256
-            if sha256_file(path) != expected_hash:
+            if source_events[0].source_object.role == "pull_request_dir":
+                # A collected PR cites its store directory; the bundle is assembled from it.
+                from src.datasets.pull_requests.store import PullRequestStore
+
+                store, number = PullRequestStore.resolve_pr_dir(path)
+                if 2 not in store.tiers(number):
+                    raise ValueError(f"event source bundle missing: {source_path}")
+                actual_hash, bundle = store.bundle_sha256(number), store.load_bundle(number)
+            else:
+                if not path.is_file():
+                    raise ValueError(f"event source bundle missing: {source_path}")
+                actual_hash, bundle = sha256_file(path), None
+            if actual_hash != expected_hash:
                 raise ValueError(f"event source bundle hash mismatch: {source_path}")
             if any(event.source_object.sha256 != expected_hash for event in source_events):
                 raise ValueError(f"inconsistent source bundle hashes: {source_path}")
-            bundle = json.loads(path.read_text())
+            if bundle is None:
+                bundle = json.loads(path.read_text())
             actual_keys = {event.source_key for event in source_events}
             expected_keys = set(expected_source_keys(bundle))
             if actual_keys != expected_keys:

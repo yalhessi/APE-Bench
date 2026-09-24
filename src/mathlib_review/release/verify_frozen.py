@@ -83,6 +83,34 @@ def iter_manifests() -> Iterator[Tuple[str, Path, Path]]:
         yield "run", manifest, manifest.parent
 
 
+def _verify_store_bundles(root: Path) -> Tuple[List[Dict], int]:
+    """Re-derive every PR-store bundle a store-built release's event ledger cites, and compare
+    digests. Store endpoints are immutable, so a bundle that moved means the release no longer
+    describes the data it was built from."""
+
+    from src.datasets.pull_requests.store import PullRequestStore
+    from src.mathlib_review.io import jsonl_rows
+
+    cited: Dict[str, set] = {}
+    for event in jsonl_rows(root / "source/events.jsonl"):
+        source = event.get("source_object") or {}
+        if source.get("role") == "pull_request_dir":
+            cited.setdefault(source["path"], set()).add(source["sha256"])
+    failures = []
+    for path, expected in sorted(cited.items()):
+        try:
+            store, number = PullRequestStore.resolve_pr_dir(Path(path))
+            actual = store.bundle_sha256(number)
+        except Exception as exc:  # noqa: BLE001 -- any unreadable bundle is a failure to report
+            failures.append({"path": path, "problem": "missing", "detail": str(exc)})
+            continue
+        # Every event citing the bundle must carry its digest, not merely the last one read.
+        if expected != {actual}:
+            failures.append({"path": path, "problem": "hash_mismatch", "expected": sorted(expected),
+                             "actual": actual})
+    return failures, len(cited)
+
+
 def verify_manifests() -> Tuple[List[Dict], int]:
     """Re-hash every declared artifact reference. Returns (failures, refs_checked)."""
 
@@ -96,7 +124,13 @@ def verify_manifests() -> Tuple[List[Dict], int]:
             for ref in (payload.get(key) or [])
         ]
         refs += [payload[key] for key in _SINGLETON_REFS if isinstance(payload.get(key), dict)]
+        store_built = False
         for ref in refs:
+            if ref.get("role") == "pull_request_store":
+                # The whole store's digest at build time: provenance, not re-hashable once the
+                # store grows. What a store-built release depends on is checked below, per PR.
+                store_built = True
+                continue
             checked += 1
             target = _resolve(ref["path"], root)
             actual = _hash_any(target)
@@ -116,6 +150,11 @@ def verify_manifests() -> Tuple[List[Dict], int]:
                     "expected": ref["sha256"],
                     "actual": actual,
                 })
+        if store_built:
+            bundle_failures, bundles_checked = _verify_store_bundles(root)
+            checked += bundles_checked
+            failures.extend({"kind": kind, "manifest": manifest_path.as_posix(), **failure}
+                            for failure in bundle_failures)
         # Sealed run manifests additionally name their plan and dataset manifest.
         for path_key, hash_key in (
             ("run_plan_path", "run_plan_sha256"),
