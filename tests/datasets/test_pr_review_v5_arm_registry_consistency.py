@@ -192,7 +192,12 @@ EXPECTED_SPEC_IDENTITY = {
     # empty branches, while `naming_norm` itself now says `subject_unresolved` means "never
     # asked the corpus ... UNMEASURED rather than settled" (b9acfe3). The prompt was instructing
     # silence on a tool failure. Nine of ten identities are unchanged.
-    "generality": "ef5c1b06333a", "naming": "1f4b176a45a4", "proof_golf": "854c179f8da7",
+    # `naming` moved 1f4b176a45a4 -> 29ec1f38acbb on 2026-09-24, deliberately: a bullet saying every
+    # `naming_norm` verdict is about the name's leading prefix only (suffix, prime, argument order
+    # and namespace unmeasured), and the closing "already follows the convention" scoped to "in
+    # every part you can check". At both held-out naming misses the arm's reason for silence was the
+    # tool's prefix-only census read as a verdict on the whole name. Nine of ten unchanged.
+    "generality": "ef5c1b06333a", "naming": "29ec1f38acbb", "proof_golf": "854c179f8da7",
     "proof_idiom": "d0d4b417257d", "style": "ba219a5656d0",
 }
 

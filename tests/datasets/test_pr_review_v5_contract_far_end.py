@@ -35,7 +35,9 @@ DISPATCH_KEYS = {"retrieval_cutoff", "trace_path"}
 #: Arms whose prompt deliberately changed since the paid control, with the exact text that moved.
 #: The unification's naming correction (spec identity ee245f077b7e -> 1f4b176a45a4) is one: the
 #: bullet said "Submit nothing on naming" for both of `naming_norm`'s empty branches, one of which
-#: is the tool failing to resolve the subject. The rebuilt control is identical on every other arm,
+#: is the tool failing to resolve the subject; and (2026-09-24) a bullet scoping every verdict to the
+#: name's leading prefix, with the closing clause scoped to "every part you can check". The rebuilt
+#: control is identical on every other arm,
 #: and on this one differs by exactly these replacements -- anything else would be drift.
 MOVED_SINCE_CONTROL = {
     "naming": [
@@ -43,13 +45,16 @@ MOVED_SINCE_CONTROL = {
          "    * `insufficient_evidence` — the counts do not settle it, and `empty_because` says why.\n"
          "      `no_population`: the repository has no counted opinion here. `subject_unresolved`: the tool\n"
          "      could not tell what the declaration is about and never asked the corpus, so naming is\n"
-         "      unmeasured rather than settled -- judge the name on precedent and on the siblings you read."),
+         "      unmeasured rather than settled -- judge the name on precedent and on the siblings you read.\n"
+         "    * Whatever the verdict, it is about the name's LEADING prefix only. The tool does not measure a\n"
+         "      suffix, a prime, argument order or a namespace; judge those against the siblings you read and\n"
+         "      against precedent."),
         ("use `coe_`\" is. If the verdict is `insufficient_evidence` and no precedent says otherwise, or the\n"
          "name already follows the convention, submit nothing — a naming check that finds nothing is a\n"
          "normal and correct outcome.",
          "use `coe_`\" is. If the repository has no counted opinion and no precedent says otherwise, or the\n"
-         "name already follows the convention, there is nothing to ask — a naming check that finds nothing\n"
-         "is a normal and correct outcome."),
+         "name already follows the convention in every part you can check, there is nothing to ask — a\n"
+         "naming check that finds nothing is a normal and correct outcome."),
     ],
 }
 

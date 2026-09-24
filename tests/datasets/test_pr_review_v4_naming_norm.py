@@ -169,10 +169,14 @@ def test_an_empty_naming_verdict_says_which_of_three_things_happened():
     assert "limit of" in unresolved_text
     assert "Submit nothing" not in unresolved_text
 
-    # The corpus branch keeps both, because there it is true.
+    # The corpus branch says the corpus was counted, and scopes the silence to what was counted:
+    # "Submit nothing on naming" claimed the whole name for a census of leading prefixes
+    # (2026-09-24), the same over-claim the counted branch made at both held-out naming misses.
     corpus_text = source.split('"no_population"', 1)[1]
     assert "holds no counted population" in corpus_text
-    assert "Submit nothing on naming" in corpus_text
+    assert "Submit nothing about the prefix" in corpus_text
+    no_population_text = corpus_text.split("return {", 1)[1].split("}", 1)[0]
+    assert "Submit nothing on naming" not in no_population_text
 
     # And the trace carries the cause, declared on the row model rather than smuggled into a
     # dict -- a trace row that does not validate is how a vocabulary goes unchecked.
@@ -203,3 +207,21 @@ def test_the_tool_description_scopes_the_silence_to_the_cause_that_warrants_it()
     assert "no opinion here and you should submit nothing" not in source
     assert "`no_population`" in source and "`subject_unresolved`" in source
     assert "UNMEASURED rather than settled" in source
+
+
+def test_a_counted_verdict_claims_no_more_than_the_prefix_it_measured():
+    """At both held-out naming misses the arm's stated reason for silence was the tool's sentence
+    "The corpus does not back a rename here. Submit nothing on naming." -- after counting only the
+    leading token (`round_eq'`, whose ask was a suffix change; a coercion lemma whose `coe_` lead was
+    48 of 124). The counted branch now reports which of three things it found and says outright
+    that the rest of the name is unmeasured, and the description scopes every verdict the same way."""
+
+    import inspect
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+
+    source = inspect.getsource(context_tools)
+    assert 'lines.append("The corpus does not back a rename here' not in source
+    assert "counts only each name's LEADING token" in source
+    assert "a plurality (" in source and "is the convention for this subject" in source
+    assert "the name's LEADING prefix only: the tool does not measure a suffix" in source

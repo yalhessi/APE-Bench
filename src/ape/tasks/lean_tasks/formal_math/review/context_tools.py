@@ -602,8 +602,11 @@ def _register_naming_norm(task, mcp) -> None:
             "`verdict` is the answer, not the counts: `established` means the corpus is "
             "lopsided enough to hold a PR to (a blocking ask); `emerging` means one spelling "
             "leads clearly but is not dominant (advisory at most); `insufficient_evidence` "
-            "covers two different things and `empty_because` says which. `no_population`: the "
-            "corpus was consulted and has no opinion here, so submit nothing on naming. "
+            "covers two different things and `empty_because` says which. Every verdict is about "
+            "the name's LEADING prefix only: the tool does not measure a suffix, a prime, "
+            "argument order or a namespace. `no_population`: the corpus was consulted and has no "
+            "counted population for this subject, so there is no prefix convention to hold the "
+            "PR to. "
             "`subject_unresolved`: this tool could not work out what the declaration is about "
             "and never asked the corpus, so naming here is UNMEASURED rather than settled -- "
             "judge it on the evidence you have."
@@ -694,9 +697,11 @@ def _register_naming_norm(task, mcp) -> None:
                     "empty_because": cause,
                     "results": (
                         "The subject resolved to `" + str(subject.token) + "`, and the corpus "
-                        "holds no counted population for it, so there is no convention here to "
-                        "hold the PR to. Submit nothing on naming unless a maintainer precedent "
-                        "says otherwise.")}
+                        "holds no counted population for it, so there is no prefix convention "
+                        "here to hold the PR to. Submit nothing about the prefix unless a "
+                        "maintainer precedent says otherwise. The rest of the name -- a suffix, "
+                        "a prime, argument order, a namespace -- is not measured here; judge it "
+                        "against the siblings you read and against precedent.")}
 
         current = leaf_prefix(declaration.rsplit(".", 1)[-1])
         ranked = population.prefix_counts.most_common()
@@ -725,7 +730,27 @@ def _register_naming_norm(task, mcp) -> None:
             lines.append(f"`{dominant}_` leads {support} to {runner_up} but is not dominant. "
                          "Advisory at most -- say it is the emerging spelling, not the rule.")
         else:
-            lines.append("The corpus does not back a rename here. Submit nothing on naming.")
+            # This said "The corpus does not back a rename here. Submit nothing on naming." for every
+            # counted `insufficient_evidence`, and the census measures one thing: each name's
+            # leading token. At both naming misses on the held-out set the arm quoted that sentence
+            # as its reason: `round_eq'` (`round_` 22 of 23), where the ask was a suffix change no
+            # prefix count can see; and a coercion lemma whose `coe_` lead was 48 of 124, a
+            # plurality read as a convention. Say what was measured, and no more.
+            members = population.members
+            if dominant == current and population.is_strong():
+                lines.append(f"This name's prefix `{current}_` is the convention for this subject "
+                             f"({support}/{members}).")
+            elif dominant == current:
+                lines.append(f"`{current}_`, this name's prefix, is the most common spelling but only "
+                             f"a plurality ({support} of {members}, under the "
+                             f"{MIN_SUPPORT_RATIO:.0%} bar), so the census does not settle the "
+                             "prefix either way.")
+            else:
+                lines.append(f"The counts (`{dominant}_` {support}, the next spelling {runner_up}, of "
+                             f"{members}) do not make a prefix rename a clear ask.")
+            lines.append("This census counts only each name's LEADING token. It says nothing about "
+                         "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
+                         "judge those against the siblings you read and against precedent.")
         if candidates:
             lines.append("Candidate names: " + ", ".join(f"`{name}`" for name in candidates))
         rendered, truncated = _truncate("\n".join(lines))

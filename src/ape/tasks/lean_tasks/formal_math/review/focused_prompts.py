@@ -365,6 +365,9 @@ So DO NOT propose a name from first principles, and do not read a convention off
       `no_population`: the repository has no counted opinion here. `subject_unresolved`: the tool
       could not tell what the declaration is about and never asked the corpus, so naming is
       unmeasured rather than settled -- judge the name on precedent and on the siblings you read.
+    * Whatever the verdict, it is about the name's LEADING prefix only. The tool does not measure a
+      suffix, a prime, argument order or a namespace; judge those against the siblings you read and
+      against precedent.
 - Use `precedent_search` to find what maintainers have actually asked for on similar declarations.
   A past rename request is the strongest evidence available about what will be asked here, and it
   can justify an ask the counts alone would not.
@@ -377,8 +380,8 @@ Report a finding only when the evidence you can point to supports it: quote the 
 `naming_norm` returned, or the precedent, or the discussion. "This name could be clearer" is not a
 finding; "of 121 declarations whose conclusion is about `toLinearMap`, 21 use `toLinearMap_` and 7
 use `coe_`" is. If the repository has no counted opinion and no precedent says otherwise, or the
-name already follows the convention, there is nothing to ask — a naming check that finds nothing
-is a normal and correct outcome."""
+name already follows the convention in every part you can check, there is nothing to ask — a
+naming check that finds nothing is a normal and correct outcome."""
 
 NAMING_USER = """## PR #{pr_number} — {title}\n\n{description}\n\n{diff}\n"""
 
