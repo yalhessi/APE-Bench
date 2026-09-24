@@ -121,6 +121,26 @@ def test_the_ai_stratum_draws_ai_members_the_main_stratum_did_not_take(seeded):
     assert draw.stopped["ai"] is None or draw.stopped["ai"]["reason"] == "order_exhausted"
 
 
+def test_an_ai_stratum_that_runs_out_completes_only_under_take_all(seeded):
+    """A frame with fewer passing AI members than `ai_size`: the default leaves the draw unwritten,
+    `take_all` completes it with every AI member that passed and says how many slots stayed empty."""
+
+    short = _walk(seeded, _spec(ai_size=50))
+    assert short.stopped["ai"]["reason"] == "order_exhausted" and not short.complete
+    assert short.shortfall == {}
+    full = _walk(seeded, _spec(ai_size=50, ai_shortfall="take_all"))
+    taken = sum(1 for a in full.accepted if a.stratum == "ai")
+    assert full.complete and full.stopped["ai"] is None
+    assert full.shortfall == {"ai": 50 - taken} and taken == short.stopped["ai"]["accepted"]
+    assert [a.pr_number for a in full.accepted] == [a.pr_number for a in short.accepted]
+    # An uncollected AI member still stops the walk: running out means every member was read.
+    store, roster, members, _ = seeded
+    ghost = members[0].model_copy(update={"pr_number": 999_999, "ai_evidence": ("description",)})
+    stopped = f.walk(_spec(ai_size=50, ai_shortfall="take_all"), members + [ghost], store=store,
+                     roster=roster, frame_seal_sha256="seal", targets_of=lambda episode: 5)
+    assert stopped.stopped["ai"]["reason"] == "needs_collection" and not stopped.complete
+
+
 def test_the_target_cap_skips_and_the_walk_moves_on(seeded):
     draw = _walk(seeded, _spec(main_target_cap=3, ai_target_cap=3))
     assert not draw.accepted and all(s.reason.startswith(("targets>", "funnel", "in_main")) for s in draw.skipped)
@@ -204,7 +224,7 @@ def test_the_committed_draw_is_a_seed_order_walk_of_the_sealed_frame(name, round
     counts = collections.Counter(a.stratum for a in draw.accepted)
     assert {k.split(":", 1)[1]: v for k, v in counts.items() if k.startswith("main:")} == \
         {k: v for k, v in f.month_quotas(members, spec.main_size).items() if v}
-    assert counts["ai"] == spec.ai_size
+    assert counts["ai"] == spec.ai_size - draw.shortfall.get("ai", 0)
     for key, order in f.strata_orders(spec, members).items():
         position = {m.pr_number: i for i, m in enumerate(order)}
         taken = [position[a.pr_number] for a in draw.accepted if a.stratum == key]

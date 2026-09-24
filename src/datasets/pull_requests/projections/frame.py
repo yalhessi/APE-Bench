@@ -106,6 +106,12 @@ class FrameSpec(BaseModel):
     #: `<name>@<seal sha>` when this frame reuses another seal's members minus that seal's draw:
     #: a validation set drawn beside a sealed test set, from one distribution.
     frame_from: Optional[str] = None
+    #: What an AI stratum whose order runs out before `ai_size` acceptances means. `incomplete`
+    #: leaves the draw unwritten, as every seal before this field did. `take_all` completes it
+    #: with every AI member that passed, and the draw records the shortfall. A 1,000-PR draw
+    #: asks for more AI PRs than the frame may hold: 60 of the first 153 AI members collected pass
+    #: the funnel and caps, which projects to about 130 of 150.
+    ai_shortfall: Literal["incomplete", "take_all"] = "incomplete"
 
 
 class FrameMember(BaseModel):
@@ -345,6 +351,8 @@ class Draw(BaseModel):
     skipped: List[Skipped]
     #: Per stratum: None if full, else why the walk stopped and at which PR.
     stopped: Dict[str, Optional[Dict[str, object]]]
+    #: Per stratum: slots left empty because its order ran out, under `ai_shortfall: take_all`.
+    shortfall: Dict[str, int] = {}
 
     @property
     def complete(self) -> bool:
@@ -379,6 +387,7 @@ def walk(spec: FrameSpec, members: Sequence[FrameMember], *, store: PullRequestS
     accepted: List[Accepted] = []
     skipped: List[Skipped] = []
     stopped: Dict[str, Optional[Dict[str, object]]] = {}
+    shortfall: Dict[str, int] = {}
     per_author: collections.Counter = collections.Counter()
     per_base: collections.Counter = collections.Counter()
 
@@ -438,9 +447,14 @@ def walk(spec: FrameSpec, members: Sequence[FrameMember], *, store: PullRequestS
         else:
             if taken == slots:
                 stopped[key] = None
+            elif key == "ai" and spec.ai_shortfall == "take_all":
+                # The whole order was walked, every member collected: nothing more can pass.
+                stopped[key] = None
+                shortfall[key] = slots - taken
         if stopped[key] is not None:
             stopped[key]["accepted"] = taken
-    return Draw(frame_seal_sha256=frame_seal_sha256, accepted=accepted, skipped=skipped, stopped=stopped)
+    return Draw(frame_seal_sha256=frame_seal_sha256, accepted=accepted, skipped=skipped, stopped=stopped,
+                shortfall=shortfall)
 
 
 # --- the sealed pre-registration ------------------------------------------------------------------
@@ -705,6 +719,8 @@ def main() -> None:
                        ("--ai-target-cap", int), ("--per-author-cap", int), ("--per-base-cap", int),
                        ("--main-candidate-factor", float), ("--ai-candidate-factor", float)):
         p.add_argument(flag, type=kind, default=None, help="default: the parent's")
+    p.add_argument("--ai-shortfall", choices=("incomplete", "take_all"), default=None,
+                   help="default: the parent's")
     p = sub.add_parser("subset", help="a smaller nested version of a completed draw")
     p.add_argument("--name", required=True)
     p.add_argument("--label", required=True, help="e.g. small12; names subset-<label>.json")
@@ -744,7 +760,8 @@ def main() -> None:
         parent_spec, parent_seal, members, dev_used, reserved = derived_frame(args.parent)
         overrides = {key: getattr(args, key) for key in (
             "main_size", "ai_size", "main_target_cap", "ai_target_cap", "per_author_cap",
-            "per_base_cap", "main_candidate_factor", "ai_candidate_factor") if getattr(args, key) is not None}
+            "per_base_cap", "main_candidate_factor", "ai_candidate_factor", "ai_shortfall")
+            if getattr(args, key) is not None}
         frame_from = f"{args.parent}@{parent_seal}"
         spec = parent_spec.model_copy(update={
             "name": args.name, "seed": args.seed, "frame_from": frame_from, **overrides,
