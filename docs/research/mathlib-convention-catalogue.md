@@ -108,7 +108,7 @@ from a fresh read, and the record's dev-set analysis is burned as evaluation dat
 | H3 | dot notation for `of`-lemmas concluding a predicate | naming | no | no | measured: 13.7% of 9,862 in-class; 224 review comments |
 | H4 | don't reprove what exists (`zero_lt_two`, not a reproof) | api_reuse | no | no | commit subjects |
 | H5 | `@[to_additive]` on multiplicative lemmas rather than a hand-written additive twin | api_family | partial (`existingAttributeWarning`) | no | 78 commit subjects |
-| H6 | state lemmas in `simp`-normal form | statement_form | no | no | `simp`-nf linter exists but is not in the standard set |
+| H6 | state lemmas in `simp`-normal form | statement_form | partial (`simpNF`, for `@[simp]` lemmas) | no | `simp`-nf linter exists but is not in the standard set. *Corrected 2026-09-25:* `simpNF` is a Batteries environment linter, on by default, and CI runs it through `lake exe runLinter Mathlib`; this catalogue scanned syntax-linter options only (`review-work-structure-2026-09.md` §1.1) |
 | H7 | put the goal on the `calc` header | proof_style | no | no | record: dev-set group |
 | H8 | term mode when the proof is short | proof_style | no | no | record: dev-set group |
 | H9 | factor a repeated argument into a lemma | api_design | no | no | record: dev-set group |
