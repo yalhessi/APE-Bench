@@ -24,11 +24,19 @@ The 1,000 PRs are then used only to weight the structure and to test it. The ear
 axis on record, the kind of knowledge an ask needs (convention, repository, local judgment;
 `pr-review-v5-principled-design.md` D1), is one of its dimensions.
 
-**Revised the same day (§7).** Grouping by object is not enough, because the same question
+**Revised the same day (§7), and tested (§7.8).** Grouping by object is not enough, because the same question
 ("the right generality?", "already present?") recurs across objects. §7 separates five kinds of
 similarity between questions and finds that an arm must follow how a question is *answered*, its
 reference and warrant, rather than what it looks at. The division in §4 is superseded by §7.6;
 the map in §2 stays, as the layer for scheduling and context.
+
+A pre-registered two-reader relabel of 755 asks found that:
+- the facets are reliable (κ 0.86-0.95);
+- the family division's arms mix how their asks are settled, as `design`'s gate failure did;
+- the warrant depends on the reference and the object *together* (85%).
+
+So a submission contract must be chosen per (reference, object) cell. Generality on a theorem is
+settled by compiling; on a definition, by judgment.
 
 ## 1. Three facts that generate review work
 
@@ -426,14 +434,23 @@ That is on the machine's side of §1.1; the reviewer is reminding the author, no
 
 ### 7.3 Five kinds of similarity, and what each should share
 
-1. **Uniform:** the same operation on a structure every declaration has.
+1. **Uniform:** the same operation on a structure every declaration has, settled the same way.
    - Every Lean declaration is `name : ∀ binders, type := value`, and a structure adds fields.
    - Generality weakens the binder telescope (hypotheses, typeclass arguments, fields) in the same
      way for a theorem, a definition, an instance and a structure.
-   - The procedure is "weaken, then recompile the declaration and its uses", and the warrant, a
-     compile, does not depend on the object.
+   - **But the relabel (§7.8) shows that its warrant is not uniform.** Asks for a better version of
+     a proof, a statement or an instance are settled by compiling. On a definition they are
+     settled by judgment: 8 of 9.
+   - The reason is proof irrelevance again. A theorem's proof certifies that the weaker hypothesis
+     still suffices, so recompiling settles the generalisation. A definition carries no
+     certificate: a more general definition compiles regardless, and whether the theory still
+     holds, and whether the generality is the useful one, is judgment.
+   - So the user's generality example is *analogous* (item 2) across theorems and definitions, and
+     uniform only among the objects a proof certifies.
+   - The measured uniform cases are the library's norms (settled by a count, 90%) and mechanisms
+     (settled by compiling, 90%), across objects.
 
-   **These share an arm across objects.** This is the user's generality example.
+   **These share an arm across objects.**
 2. **Analogous:** the same intent, but the object changes the procedure, because what counts as
    "the same" differs.
    - "Already present" for a theorem is a search by type (unification, as in `exact?` or loogle),
@@ -473,11 +490,14 @@ That is on the machine's side of §1.1; the reviewer is reminding the author, no
 
 ### 7.5 Principles, revised
 
-1. **An arm's questions must share a submission contract.** One gate and one toolset must admit
-   every question an arm asks. The measured failure when they do not is `design`'s gate.
-2. **An arm spans objects when its operation is uniform across them,** like generality over every
-   binder telescope. It spans them with a warrant per object when they are only analogous, like
-   "already present".
+1. **A submission contract belongs to a (reference, object) pair, not to an arm.** In the relabel
+   the pair predicts the warrant on 85% of asks, against 76% for the reference alone and 74% for
+   the object alone (§7.8). One gate must admit every question it is shown. The measured failure
+   when it does not is `design`'s gate.
+2. **An arm may ask across objects when the intent is shared,** as "the right generality?" is for
+   theorems and definitions. It then admits findings with the contract of each pair: compile for a
+   theorem's statement, judgment for a definition's encoding. An arm with one contract spans only
+   the objects on which that contract holds.
 3. **Split a reference by object when its evidence differs by object.** The norms of names (a
    naming census) are not the norms of statements, binders or syntax (the style guide, library
    notes, prevalence).
@@ -493,8 +513,8 @@ It is derived, not measured. The test comes in §7.7.
 | arm | reference | objects | warrant | built from |
 |---|---|---|---|---|
 | `proof` | variant | proofs | compile | `proof` |
-| `generality` | variant, uniform over binders and fields | theorems, definitions, instances, structures | compile, uses included | `design`'s generality half, and generality on definitions |
-| `library` | library, analogous by object; module graph | theorems (by type), instances (by inference), definitions (by concept); files and imports | exhibit, compile or judgment by object | `library_fit`, `design`'s "existing predicate or construction", location |
+| `generality` | variant, analogous across binders and fields | theorems, definitions, instances, structures | **per object:** compile for statements and instances, judgment for definitions and families | `design`'s generality half, and generality on definitions |
+| `library` | library, analogous by object; module graph | theorems (by type), instances (by inference), definitions (by concept); files and imports | **per role:** compile when the library is a tool in a proof, exhibit or compile when it is a precedent for a statement | `library_fit`, `design`'s "existing predicate or construction", location |
 | `siblings` | siblings | families, and the PR's analogues | exhibit or compile | `family_design`'s bullets, missing duals and variants, and the propagation pass |
 | `naming` | norms of names | names | count | `naming` |
 | `form` | norms of statements, binders and syntax | statements, binders, section variables, syntax idioms | count | `interface`'s binder half, `design`'s canonical-form asks, `formatting`'s idioms |
@@ -529,10 +549,110 @@ Relabel a pre-registered sample by facet, with two blind readers, and read four 
 
 Only then does Track B, the paid comparison on small12, compare divisions.
 
-### 7.8 What §7 does not settle
+### 7.8 The relabel: what held and what did not (2026-09-25)
 
-- **One reader labelled the pilot:** the auditor, who also designed the facets. Finding 3 is
-  partly by construction.
+**How it was run.** Pre-registered in `docs/todo/pipeline-overfit-review.md` (`3492432`), with
+the analysis committed before any label (`359dd3f`).
+- **The sample:** 755 asks, the 155 pilot asks plus 600 at random.
+- **The readers:** two blind Claude readers per batch of 151.
+- **Where everything is:**
+  `results/pr_review_v5/adjudications/facet-relabel-val1000-v1/`, holding the rubric, both
+  readers' labels, `analyse.py` and `results.json`.
+
+Readings are on the 600 random asks.
+
+| | claim | result | verdict |
+|---|---|---|---|
+| F | the facets are reliable (κ ≥ 0.60 each) | object **0.95**, reference **0.86**, mechanism **0.91** (32 asks), remedy **0.95**, warrant **0.88** | **holds** for every facet |
+| S1 | `variant`, `library` and `norms` each reach 3 objects at ≥ 10% | `library` 3 and `norms` 3. `variant` has 1: proofs hold 98 of its 170 asks, and the other nine objects hold 2-16 each. | **fails for `variant`**, by proof dominance at population rates, not by absence of crossing |
+| S2 | each mechanism with ≥ 10 asks has ≥ 80% on ≤ 2 objects | registration 93% (15 asks). The other five mechanisms have 1-4 asks each. | **holds where testable.** Mechanism asks are 5% of asks, so the claim is mostly untested. |
+| S3 | the reference's modal warrant covers ≥ 80%, pooled | **75.3%**. Norms → count 90%; mechanism → compile 90%; intent → judgment 78%; process → judgment 74%; siblings → judgment 71%; variant → compile 68%; library → compile **55%** | **fails** |
+| C | the family division's `design` < 70% warrant purity, and ≥ 2 of its arms < 70% | `design` **48%**. `library_fit` 32%, `interface` 49%, `formatting` 55%, `doc_quality` 58%, `pr_level` 68%; above 70% only `proof` 87% and `naming` 79%. | **holds** |
+
+**The pilot against the readers,** on the 155 pilot asks (κ):
+
+| facet | auditor against each reader | reader against reader |
+|---|---|---|
+| object | 0.85 | 0.98 |
+| reference | 0.72-0.73 | 0.89 |
+| remedy | 0.78-0.81 | 0.93 |
+| warrant | **0.61-0.62** | 0.89 |
+
+The auditor's warrant labels were the idiosyncratic ones.
+
+**What predicts the warrant (exploratory).** On the 476 random asks where the readers agree on
+object, reference, remedy and warrant:
+
+| predictor | modal share |
+|---|---|
+| reference alone | 76% |
+| object alone | 74% |
+| remedy alone | 55% |
+| reference × object | **85%** |
+| reference × remedy | 82% |
+| all three | 88% |
+
+Within a reference, the object decides:
+- **`variant`:**
+
+  | object | compile | judgment |
+  |---|---|---|
+  | proofs | 88 | 8 |
+  | statements | 11 | 2 |
+  | instances | 3 | 1 |
+  | definitions | 1 | **8** |
+  | families | 5 | 9 |
+  | prose | 0 | 16 |
+
+  This is proof irrelevance, measured (§7.3, item 1).
+- **`library`:**
+  - in a proof it is a tool: "use `X` here", settled by compiling, 18 of 19;
+  - for a statement it is a precedent: 6 exhibit and 7 compile of 14;
+  - in prose it is a reference: exhibit, 4 of 5.
+
+**Second references (exploratory)** show which comparisons justify each other. Counted over both
+readers' labels:
+- norms + variant: 60;
+- library + variant: 41;
+- siblings + variant: 32;
+- norms + siblings: 30;
+- library + norms: 24.
+
+A "better version" is often justified *by* another reference: the convention, the existing lemma,
+the sibling. That is where its warrant comes from when it is not a compile.
+
+**The AI stratum (exploratory, 81 agreed asks against 453 on main):**
+- norms 35% against 27%, and process 9% against 5%;
+- mechanism 2% against 7%;
+- objects: the PR 10% against 4%, definitions 8% against 4%.
+
+These are directions only at this size.
+
+**What it changes.**
+1. **The facets are a reliable description of review work.** Every facet agrees at κ ≥ 0.86
+   between independent readers. That is as reliable as the families' codebook (κ 0.94 on family),
+   and unlike the codebook they were not fitted to a sample. They can replace the families as the
+   coordinate system for coverage and for designing arms.
+2. **Neither what a question looks at nor what it compares against is enough to group
+   questions.** How an ask is settled depends on the pair. So the unit a submission contract can
+   serve is a (reference, object) cell (§7.5, principle 1, revised). This answers the user's
+   question: generality on theorems and on definitions is one intent, and two contracts.
+3. **The gate failure is structural and predictable from labels.** Every family-division arm
+   except `proof` and `naming` mixes warrants, and `design`'s 48% is the arm whose gate failed.
+   - §7.6's mapping scores 74% against 65%, weighted. But its own gated arms mix too: `library`
+     51%, `generality` 63%. Under a single contract they would fail the way `design` did.
+   - Purity is harmless for arms whose contract does not gate (advisory prose at 47%). It matters
+     for the arms that compile or exhibit.
+4. **What to build next follows from 2 and 3:** a gate chosen per cell, by the finding's object
+   and reference, not per arm. It must be settled before the next division is run. Otherwise
+   Track B measures contracts, not divisions.
+
+### 7.9 What §7 does not settle
+
+- **One reader labelled the pilot:** the auditor, who also designed the facets. The relabel
+  measured the cost: the auditor agrees with the readers at κ 0.62 on warrant, against 0.89
+  between the readers (§7.8). So the pilot's finding 3 overstated how far the reference fixes the
+  warrant.
 - **Stratified counts show structure, not how much work each arm would own.**
 - **Twelve arms is more jobs per unit than nine.** Whether small arms such as `typeclass` and
   `siblings` stand alone, or become knowledge given to a larger arm, is a cost question that

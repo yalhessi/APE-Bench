@@ -303,3 +303,20 @@ reference to the warrant. So C is read on the family division's side.
 **Exploratory, not pre-registered:** which references co-occur as first and second reference; the
 object-by-reference table; the AI stratum against main.
 
+**Result, 2026-09-25** (`review-work-structure-2026-09.md` §7.8; labels, analysis and
+`results.json` in `results/pr_review_v5/adjudications/facet-relabel-val1000-v1/`).
+- **F holds.** κ is 0.95 object, 0.86 reference, 0.91 mechanism (32 asks), 0.95 remedy, 0.88
+  warrant.
+- **S1 fails for `variant`.** Proofs hold 98 of its 170 asks. `library` and `norms` hold.
+- **S2 holds where testable.** Registration reaches 93%; the other mechanisms have fewer than 10
+  asks each.
+- **S3 fails:** 75.3% pooled. Library references split between compile and exhibit at 55/45.
+- **C holds.** `design` is at 48%, and six family-division arms are under 70%.
+- **The auditor's pilot** agrees with the readers at only κ 0.62 on warrant.
+- **Exploratory:** the reference and object together predict the warrant 85% of the time. Asks for
+  a better version of a definition are settled by judgment, 8 of 9, against compiling for
+  statements and proofs.
+
+**Next:** a submission gate chosen per (reference, object) cell before any division is run.
+Otherwise Track B measures contracts, not divisions.
+

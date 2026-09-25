@@ -1,0 +1,574 @@
+{
+ "n_random": 600,
+ "n_pilot": 155,
+ "F_reliability": {
+  "object": {
+   "kappa": 0.952,
+   "n": 600,
+   "agree": 0.958,
+   "usable": true
+  },
+  "reference": {
+   "kappa": 0.859,
+   "n": 600,
+   "agree": 0.89,
+   "usable": true
+  },
+  "mechanism": {
+   "kappa": 0.911,
+   "n": 32,
+   "agree": 0.938,
+   "usable": true
+  },
+  "remedy": {
+   "kappa": 0.951,
+   "n": 600,
+   "agree": 0.967,
+   "usable": true
+  },
+  "warrant": {
+   "kappa": 0.884,
+   "n": 600,
+   "agree": 0.92,
+   "usable": true
+  }
+ },
+ "auditor_vs_readers": {
+  "object": {
+   "auditor_A": 0.854,
+   "auditor_B": 0.854,
+   "A_B_on_pilot": 0.979
+  },
+  "reference": {
+   "auditor_A": 0.717,
+   "auditor_B": 0.731,
+   "A_B_on_pilot": 0.888
+  },
+  "remedy": {
+   "auditor_A": 0.813,
+   "auditor_B": 0.78,
+   "A_B_on_pilot": 0.933
+  },
+  "warrant": {
+   "auditor_A": 0.62,
+   "auditor_B": 0.611,
+   "A_B_on_pilot": 0.888
+  }
+ },
+ "S1": {
+  "variant": {
+   "n": 170,
+   "objects": {
+    "proof": 98,
+    "prose": 16,
+    "family": 16,
+    "statement": 14,
+    "definition": 10,
+    "instance": 5,
+    "layout": 3,
+    "binders": 3,
+    "name": 3,
+    "meta": 2
+   },
+   "objects_at_10pct": 1,
+   "holds": false
+  },
+  "library": {
+   "n": 57,
+   "objects": {
+    "proof": 19,
+    "statement": 16,
+    "definition": 6,
+    "family": 5,
+    "prose": 5,
+    "name": 2,
+    "meta": 2,
+    "instance": 2
+   },
+   "objects_at_10pct": 3,
+   "holds": true
+  },
+  "norms": {
+   "n": 145,
+   "objects": {
+    "name": 48,
+    "layout": 38,
+    "prose": 23,
+    "proof": 9,
+    "family": 7,
+    "binders": 6,
+    "statement": 5,
+    "definition": 4,
+    "location": 3,
+    "pr": 1,
+    "attributes": 1
+   },
+   "objects_at_10pct": 3,
+   "holds": true
+  }
+ },
+ "S2": {
+  "build": {
+   "n": 2,
+   "objects": {
+    "layout": 1,
+    "definition": 1
+   },
+   "top2_share": 1.0,
+   "tested": false,
+   "holds": null
+  },
+  "defeq": {
+   "n": 1,
+   "objects": {
+    "proof": 1
+   },
+   "top2_share": 1.0,
+   "tested": false,
+   "holds": null
+  },
+  "generators": {
+   "n": 3,
+   "objects": {
+    "attributes": 2,
+    "definition": 1
+   },
+   "top2_share": 1.0,
+   "tested": false,
+   "holds": null
+  },
+  "performance": {
+   "n": 4,
+   "objects": {
+    "meta": 2,
+    "attributes": 1,
+    "proof": 1
+   },
+   "top2_share": 0.75,
+   "tested": false,
+   "holds": null
+  },
+  "registration": {
+   "n": 15,
+   "objects": {
+    "attributes": 13,
+    "statement": 1,
+    "family": 1
+   },
+   "top2_share": 0.933,
+   "tested": true,
+   "holds": true
+  },
+  "typeclass": {
+   "n": 4,
+   "objects": {
+    "instance": 4
+   },
+   "top2_share": 1.0,
+   "tested": false,
+   "holds": null
+  }
+ },
+ "S3": {
+  "n": 506,
+  "pooled_modal_share": 0.753,
+  "holds": false,
+  "per_reference": {
+   "norms": {
+    "n": 146,
+    "modal": "count",
+    "share": 0.897,
+    "warrants": {
+     "count": 131,
+     "judgment": 10,
+     "compile": 5
+    }
+   },
+   "library": {
+    "n": 55,
+    "modal": "compile",
+    "share": 0.545,
+    "warrants": {
+     "compile": 30,
+     "exhibit": 17,
+     "judgment": 8
+    }
+   },
+   "variant": {
+    "n": 169,
+    "modal": "compile",
+    "share": 0.68,
+    "warrants": {
+     "compile": 115,
+     "judgment": 54
+    }
+   },
+   "mechanism": {
+    "n": 30,
+    "modal": "compile",
+    "share": 0.9,
+    "warrants": {
+     "compile": 27,
+     "judgment": 3
+    }
+   },
+   "process": {
+    "n": 27,
+    "modal": "judgment",
+    "share": 0.741,
+    "warrants": {
+     "judgment": 20,
+     "count": 4,
+     "exhibit": 2,
+     "compile": 1
+    }
+   },
+   "intent": {
+    "n": 36,
+    "modal": "judgment",
+    "share": 0.778,
+    "warrants": {
+     "exhibit": 5,
+     "judgment": 28,
+     "compile": 3
+    }
+   },
+   "siblings": {
+    "n": 31,
+    "modal": "judgment",
+    "share": 0.71,
+    "warrants": {
+     "judgment": 22,
+     "compile": 6,
+     "exhibit": 1,
+     "count": 2
+    }
+   },
+   "module_graph": {
+    "n": 12,
+    "modal": "judgment",
+    "share": 0.667,
+    "warrants": {
+     "compile": 4,
+     "judgment": 8
+    }
+   }
+  }
+ },
+ "C": {
+  "family_division": {
+   "doc_quality": {
+    "n": 81,
+    "modal": "judgment",
+    "purity": 0.58,
+    "warrants": {
+     "count": 24,
+     "judgment": 47,
+     "exhibit": 9,
+     "compile": 1
+    }
+   },
+   "design": {
+    "n": 95,
+    "modal": "judgment",
+    "purity": 0.484,
+    "warrants": {
+     "compile": 38,
+     "exhibit": 6,
+     "count": 5,
+     "judgment": 46
+    }
+   },
+   "proof": {
+    "n": 137,
+    "modal": "compile",
+    "purity": 0.869,
+    "warrants": {
+     "compile": 119,
+     "count": 10,
+     "exhibit": 1,
+     "judgment": 7
+    }
+   },
+   "naming": {
+    "n": 53,
+    "modal": "count",
+    "purity": 0.792,
+    "warrants": {
+     "compile": 1,
+     "count": 42,
+     "judgment": 10
+    }
+   },
+   "pr_level": {
+    "n": 34,
+    "modal": "judgment",
+    "purity": 0.676,
+    "warrants": {
+     "judgment": 23,
+     "count": 7,
+     "exhibit": 2,
+     "compile": 2
+    }
+   },
+   "formatting": {
+    "n": 67,
+    "modal": "count",
+    "purity": 0.552,
+    "warrants": {
+     "count": 37,
+     "judgment": 13,
+     "compile": 17
+    }
+   },
+   "interface": {
+    "n": 33,
+    "modal": "compile",
+    "purity": 0.485,
+    "warrants": {
+     "judgment": 7,
+     "count": 9,
+     "compile": 16,
+     "exhibit": 1
+    }
+   },
+   "library_fit": {
+    "n": 19,
+    "modal": "exhibit",
+    "purity": 0.316,
+    "warrants": {
+     "exhibit": 6,
+     "compile": 5,
+     "judgment": 5,
+     "count": 3
+    }
+   },
+   "correctness": {
+    "n": 4,
+    "modal": "compile",
+    "purity": 0.5,
+    "warrants": {
+     "compile": 2,
+     "judgment": 1,
+     "exhibit": 1
+    }
+   }
+  },
+  "family_division_weighted_mean": 0.646,
+  "section_7_6": {
+   "prose": {
+    "n": 49,
+    "modal": "judgment",
+    "purity": 0.469,
+    "warrants": {
+     "count": 21,
+     "exhibit": 4,
+     "judgment": 23,
+     "compile": 1
+    }
+   },
+   "library": {
+    "n": 65,
+    "modal": "compile",
+    "purity": 0.508,
+    "warrants": {
+     "compile": 33,
+     "exhibit": 16,
+     "judgment": 16
+    }
+   },
+   "proof": {
+    "n": 96,
+    "modal": "compile",
+    "purity": 0.917,
+    "warrants": {
+     "compile": 88,
+     "judgment": 8
+    }
+   },
+   "automation": {
+    "n": 20,
+    "modal": "compile",
+    "purity": 0.9,
+    "warrants": {
+     "compile": 18,
+     "judgment": 2
+    }
+   },
+   "generality": {
+    "n": 68,
+    "modal": "judgment",
+    "purity": 0.632,
+    "warrants": {
+     "compile": 25,
+     "judgment": 43
+    }
+   },
+   "form": {
+    "n": 34,
+    "modal": "count",
+    "purity": 0.853,
+    "warrants": {
+     "judgment": 4,
+     "count": 29,
+     "compile": 1
+    }
+   },
+   "pr_level": {
+    "n": 26,
+    "modal": "judgment",
+    "purity": 0.769,
+    "warrants": {
+     "judgment": 20,
+     "count": 4,
+     "exhibit": 2
+    }
+   },
+   "naming": {
+    "n": 47,
+    "modal": "count",
+    "purity": 0.915,
+    "warrants": {
+     "count": 43,
+     "judgment": 4
+    }
+   },
+   "layout": {
+    "n": 36,
+    "modal": "count",
+    "purity": 0.889,
+    "warrants": {
+     "count": 32,
+     "compile": 4
+    }
+   },
+   "siblings": {
+    "n": 30,
+    "modal": "judgment",
+    "purity": 0.733,
+    "warrants": {
+     "judgment": 22,
+     "compile": 6,
+     "exhibit": 1,
+     "count": 1
+    }
+   },
+   "typeclass": {
+    "n": 5,
+    "modal": "compile",
+    "purity": 0.8,
+    "warrants": {
+     "compile": 4,
+     "judgment": 1
+    }
+   },
+   "correctness": {
+    "n": 10,
+    "modal": "judgment",
+    "purity": 0.6,
+    "warrants": {
+     "judgment": 6,
+     "compile": 3,
+     "exhibit": 1
+    }
+   }
+  },
+  "section_7_6_weighted_mean": 0.743,
+  "family_arms_under_70pct_with_n_ge_10": [
+   "doc_quality",
+   "design",
+   "pr_level",
+   "formatting",
+   "interface",
+   "library_fit"
+  ],
+  "holds": true
+ },
+ "exploratory_second_reference_pairs": {
+  "norms + variant": 60,
+  "library + variant": 41,
+  "siblings + variant": 32,
+  "norms + siblings": 30,
+  "library + norms": 24,
+  "mechanism + norms": 19,
+  "intent + norms": 16,
+  "mechanism + variant": 15,
+  "library + siblings": 13,
+  "intent + variant": 11,
+  "library + process": 10,
+  "mechanism + siblings": 10
+ },
+ "exploratory_reference_by_object": {
+  "norms": {
+   "name": 48,
+   "layout": 38,
+   "prose": 23,
+   "proof": 9,
+   "family": 7,
+   "binders": 6,
+   "statement": 5,
+   "definition": 4,
+   "location": 3,
+   "pr": 1,
+   "attributes": 1
+  },
+  "library": {
+   "proof": 19,
+   "statement": 16,
+   "definition": 6,
+   "family": 5,
+   "prose": 5,
+   "name": 2,
+   "meta": 2,
+   "instance": 2
+  },
+  "variant": {
+   "proof": 98,
+   "prose": 16,
+   "family": 16,
+   "statement": 14,
+   "definition": 10,
+   "instance": 5,
+   "layout": 3,
+   "binders": 3,
+   "name": 3,
+   "meta": 2
+  },
+  "mechanism": {
+   "attributes": 16,
+   "instance": 4,
+   "statement": 3,
+   "meta": 2,
+   "definition": 2,
+   "proof": 2,
+   "layout": 1,
+   "family": 1
+  },
+  "process": {
+   "pr": 25,
+   "prose": 1,
+   "family": 1
+  },
+  "intent": {
+   "prose": 28,
+   "definition": 2,
+   "meta": 2,
+   "name": 2,
+   "pr": 2,
+   "family": 1
+  },
+  "siblings": {
+   "family": 23,
+   "proof": 3,
+   "instance": 2,
+   "prose": 2,
+   "layout": 2,
+   "location": 1,
+   "definition": 1,
+   "name": 1
+  },
+  "module_graph": {
+   "location": 14
+  }
+ }
+}

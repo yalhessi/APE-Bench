@@ -1,0 +1,755 @@
+{"cid": "v1677", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1569", "object": "instance", "reference": "mechanism", "second_reference": "", "mechanism": "typeclass", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v1831", "object": "prose", "reference": "module_graph", "second_reference": "intent", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "hesitated reference module_graph vs intent; remedy local vs delete"}
+{"cid": "v0773", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0602", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1232", "object": "definition", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "reencode", "warrant": "compile", "note": "hesitated object definition vs attributes (simps! apply)"}
+{"cid": "v1513", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "hesitated reference variant vs siblings; warrant exhibit vs compile"}
+{"cid": "v0484", "object": "proof", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated object proof vs family"}
+{"cid": "v1603", "object": "definition", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated remedy local vs interface"}
+{"cid": "v1461", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1188", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1408", "object": "definition", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "reencode", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v1620", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0695", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0359", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1118", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "hesitated warrant exhibit vs judgment"}
+{"cid": "v2239", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms vs variant"}
+{"cid": "v2297", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1382", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0751", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1191", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object family vs statement"}
+{"cid": "v1680", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0145", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0916", "object": "statement", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms vs library (named design template)"}
+{"cid": "v0852", "object": "definition", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "none", "warrant": "compile", "note": "hesitated mechanism build vs defeq; asks why noncomputable"}
+{"cid": "v1968", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0953", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated reference intent vs norms"}
+{"cid": "v1146", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object layout vs name (namespace block)"}
+{"cid": "v0682", "object": "name", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1071", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object name vs family (also asks for iff lemma)"}
+{"cid": "v1020", "object": "statement", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs exhibit"}
+{"cid": "v1426", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0214", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1175", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0867", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "hesitated remedy delete vs local"}
+{"cid": "v2138", "object": "pr", "reference": "process", "second_reference": "intent", "mechanism": "", "remedy": "pr", "warrant": "exhibit", "note": "hesitated reference process vs intent"}
+{"cid": "v1989", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": "hesitated warrant judgment vs count"}
+{"cid": "v2215", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2022", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": ""}
+{"cid": "v0716", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0197", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0742", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v2151", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0667", "object": "statement", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated remedy local vs interface; warrant count vs exhibit"}
+{"cid": "v1110", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0451", "object": "location", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object location vs layout (import order)"}
+{"cid": "v1763", "object": "meta", "reference": "mechanism", "second_reference": "", "mechanism": "performance", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1183", "object": "statement", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "move", "warrant": "compile", "note": "hesitated object statement vs location; remedy move vs interface"}
+{"cid": "v2001", "object": "instance", "reference": "mechanism", "second_reference": "", "mechanism": "typeclass", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v0324", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated reference library vs norms"}
+{"cid": "v1437", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1248", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0549", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated reference norms vs variant"}
+{"cid": "v1672", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v2047", "object": "build", "reference": "mechanism", "second_reference": "intent", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": "hesitated object build vs prose; also asks to remove commented code"}
+{"cid": "v2197", "object": "location", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "count", "note": "hesitated object location vs attributes (linter option)"}
+{"cid": "v0915", "object": "proof", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1681", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": "hesitated remedy delete vs local"}
+{"cid": "v1392", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0971", "object": "statement", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "hesitated object statement vs family; remedy interface vs delete"}
+{"cid": "v1992", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object family (extract aux def) vs proof"}
+{"cid": "v1004", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1710", "object": "location", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "count", "note": ""}
+{"cid": "v1204", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1653", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated remedy local vs none; object proof vs definition"}
+{"cid": "v0995", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2209", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": ""}
+{"cid": "v2103", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v2278", "object": "instance", "reference": "mechanism", "second_reference": "", "mechanism": "typeclass", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v1073", "object": "definition", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "hesitated remedy none vs reencode"}
+{"cid": "v1516", "object": "layout", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated reference siblings vs norms"}
+{"cid": "v1057", "object": "name", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": ""}
+{"cid": "v2055", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "hesitated warrant exhibit vs judgment"}
+{"cid": "v0394", "object": "proof", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated object proof vs family (factor out lemma)"}
+{"cid": "v0236", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "compile", "note": "hesitated remedy none vs local; warrant compile vs judgment"}
+{"cid": "v1875", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1427", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1729", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1344", "object": "meta", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "hesitated warrant exhibit vs judgment"}
+{"cid": "v1778", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1456", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object family vs definition"}
+{"cid": "v1185", "object": "family", "reference": "library", "second_reference": "process", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "hesitated object family vs pr"}
+{"cid": "v1791", "object": "layout", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated object layout vs statement"}
+{"cid": "v0440", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1539", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0847", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "hesitated warrant exhibit vs compile"}
+{"cid": "v0023", "object": "meta", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "compile", "note": "hesitated object meta vs pr; warrant compile vs judgment"}
+{"cid": "v1195", "object": "statement", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "none", "warrant": "count", "note": "hesitated reference norms vs siblings"}
+{"cid": "v1143", "object": "prose", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated object prose vs pr; suggested content not visible"}
+{"cid": "v2098", "object": "family", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "add", "warrant": "compile", "note": ""}
+{"cid": "v0178", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0856", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1532", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object layout vs statement"}
+{"cid": "v1267", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "compile", "note": ""}
+{"cid": "v1786", "object": "prose", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "hesitated reference library vs intent; remedy local vs delete"}
+{"cid": "v0358", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1852", "object": "attributes", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms vs mechanism generators"}
+{"cid": "v2115", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2230", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated warrant count vs judgment"}
+{"cid": "v0325", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated reference library vs norms"}
+{"cid": "v0575", "object": "family", "reference": "library", "second_reference": "siblings", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated reference library vs siblings (analogous MulAction API)"}
+{"cid": "v2244", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": ""}
+{"cid": "v1920", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0965", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2038", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1029", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0206", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1189", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1325", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2006", "object": "definition", "reference": "siblings", "second_reference": "library", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "hesitated reference siblings vs library (IsCompact, IsLindelof)"}
+{"cid": "v1616", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated warrant compile vs exhibit"}
+{"cid": "v2163", "object": "statement", "reference": "library", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": ""}
+{"cid": "v0201", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1149", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "hesitated object definition vs instance; warrant judgment vs compile"}
+{"cid": "v1737", "object": "meta", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0438", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0964", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": ""}
+{"cid": "v0535", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2081", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v2185", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated reference variant vs intent"}
+{"cid": "v1240", "object": "family", "reference": "mechanism", "second_reference": "siblings", "mechanism": "generators", "remedy": "add", "warrant": "compile", "note": "hesitated warrant compile vs judgment; object family vs attributes"}
+{"cid": "v1739", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0904", "object": "name", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "hesitated object name vs attributes (deprecation)"}
+{"cid": "v0475", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v1907", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": ""}
+{"cid": "v2291", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1043", "object": "family", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "count", "note": "hesitated object family vs statement; reference norms vs library"}
+{"cid": "v2011", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1795", "object": "instance", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "hesitated object instance vs definition"}
+{"cid": "v1379", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2232", "object": "instance", "reference": "mechanism", "second_reference": "siblings", "mechanism": "typeclass", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v0275", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated remedy local vs add"}
+{"cid": "v0919", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object family vs proof"}
+{"cid": "v1674", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2020", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object layout vs proof"}
+{"cid": "v0033", "object": "family", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "hesitated object family vs pr"}
+{"cid": "v1434", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0944", "object": "name", "reference": "intent", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "hesitated reference intent vs norms"}
+{"cid": "v1590", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0665", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object name vs instance"}
+{"cid": "v0028", "object": "pr", "reference": "process", "second_reference": "norms", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0141", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated reference intent vs norms"}
+{"cid": "v0136", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms vs intent"}
+{"cid": "v0175", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1972", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0477", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1512", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0572", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0181", "object": "binders", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated remedy interface vs local"}
+{"cid": "v0049", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0619", "object": "proof", "reference": "mechanism", "second_reference": "", "mechanism": "performance", "remedy": "none", "warrant": "compile", "note": ""}
+{"cid": "v1237", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "Hesitated norms vs siblings: name should say semiconj, matching the new ergodic lemma."}
+{"cid": "v1430", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated variant vs norms: wording preference versus grammar convention."}
+{"cid": "v0160", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1651", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "Hesitated interface vs local: some declarations' explicitness would change."}
+{"cid": "v2266", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated local vs interface: replacing binder update keeps signatures."}
+{"cid": "v0587", "object": "instance", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "Hesitated instance vs definition object, and reencode vs local: new decision algorithm."}
+{"cid": "v2264", "object": "layout", "reference": "mechanism", "second_reference": "norms", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": "Hesitated mechanism vs norms: whether notation parses without the parentheses."}
+{"cid": "v0265", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1479", "object": "instance", "reference": "mechanism", "second_reference": "siblings", "mechanism": "typeclass", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v1615", "object": "statement", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v2225", "object": "family", "reference": "siblings", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated compile vs judgment; also local vs add (comment explaining fast_instance%)."}
+{"cid": "v1112", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated family vs definition: extract a general Generators construction from the lemma."}
+{"cid": "v0430", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1564", "object": "location", "reference": "siblings", "second_reference": "module_graph", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "Hesitated siblings vs module_graph: placement next to related instance."}
+{"cid": "v1450", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated variant vs norms: have-binder syntax idiom avoiding intro."}
+{"cid": "v0000", "object": "proof", "reference": "mechanism", "second_reference": "", "mechanism": "performance", "remedy": "local", "warrant": "compile", "note": "Hesitated local vs none: question whether unsqueezed simp is slower."}
+{"cid": "v1391", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1536", "object": "definition", "reference": "intent", "second_reference": "variant", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "Hesitated intent vs variant: mathematical naturalness versus proposed Pre/class design."}
+{"cid": "v1186", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1297", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated variant vs norms: reviewer prefers original non-grind proofs."}
+{"cid": "v2233", "object": "instance", "reference": "mechanism", "second_reference": "", "mechanism": "typeclass", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v1887", "object": "attributes", "reference": "mechanism", "second_reference": "variant", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "Hesitated compile vs count: simp-worthiness checked by linter; also rfl proof."}
+{"cid": "v1610", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0539", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0838", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0506", "object": "proof", "reference": "siblings", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1166", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated count vs exhibit: correct French title of the cited paper."}
+{"cid": "v1273", "object": "family", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "Hesitated family vs proof: missing lemmas enable golf; also rename matching next_getElem."}
+{"cid": "v0333", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "Hesitated statement vs proof: location of TotalSpace.mk' tweak unclear; local vs interface."}
+{"cid": "v0444", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated variant vs norms; local vs interface: variable moved into declarations."}
+{"cid": "v1104", "object": "proof", "reference": "library", "second_reference": "process", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated proof/compile vs family/judgment: also asks whether the lemma is wanted."}
+{"cid": "v0381", "object": "definition", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "judgment", "note": ""}
+{"cid": "v1948", "object": "proof", "reference": "mechanism", "second_reference": "library", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": "Hesitated mechanism vs library: tsum_ite_eq signature changed; classical per linter."}
+{"cid": "v2289", "object": "proof", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated library vs variant: the field tactic rather than a declaration."}
+{"cid": "v2037", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "Hesitated delete vs reencode; compile vs judgment: define CuspForm directly."}
+{"cid": "v1457", "object": "definition", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": ""}
+{"cid": "v0860", "object": "attributes", "reference": "mechanism", "second_reference": "siblings", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0356", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated variant vs norms: refine pattern style, optional."}
+{"cid": "v1055", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1470", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0538", "object": "family", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "Hesitated family vs statement; interface vs delete: keep existing formulations without R."}
+{"cid": "v1939", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1842", "object": "pr", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "delete", "warrant": "compile", "note": "Hesitated pr vs proof object: merge master then remove set_options if possible."}
+{"cid": "v1896", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1565", "object": "location", "reference": "module_graph", "second_reference": "siblings", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "Hesitated judgment vs compile: import-diff tool would measure import cost."}
+{"cid": "v1685", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1049", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1142", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2153", "object": "meta", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1393", "object": "proof", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated compile vs count: by exact no-op is a style rule."}
+{"cid": "v1441", "object": "family", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated norms vs variant: expected rewriting API for new sSup instance."}
+{"cid": "v0952", "object": "name", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "Hesitated name vs statement: also questions weird Nonempty (R ≃+* ℤ) hypothesis."}
+{"cid": "v2295", "object": "proof", "reference": "variant", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated variant vs mechanism/performance: readable non-grind proofs, slow grind."}
+{"cid": "v1478", "object": "instance", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v2136", "object": "meta", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1388", "object": "meta", "reference": "intent", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated judgment vs compile: whether newTacticPP can fail."}
+{"cid": "v0156", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0771", "object": "layout", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated variant vs norms: personal preference for separating list."}
+{"cid": "v1305", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0481", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1173", "object": "family", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated judgment vs compile: general const/congr API from which the lemma follows."}
+{"cid": "v1765", "object": "layout", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated layout vs statement: eliding a type ascription to fit one line."}
+{"cid": "v0948", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "performance", "remedy": "add", "warrant": "compile", "note": "Hesitated add vs interface: csimp needs an equivalence lemma; runtime not compile time."}
+{"cid": "v1928", "object": "binders", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated norms vs siblings: repeated binders across lemmas into a variable line."}
+{"cid": "v0297", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "Hesitated reencode vs delete: inline the IsSubgraph structure."}
+{"cid": "v1951", "object": "family", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": "Hesitated family vs location; delete vs move: reorder so to_dual generates max_ind."}
+{"cid": "v2223", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "exhibit", "note": ""}
+{"cid": "v1090", "object": "name", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "Hesitated norms vs intent: name says right, C r is on the left."}
+{"cid": "v1006", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "performance", "remedy": "none", "warrant": "compile", "note": "Hesitated none vs local: asks why simps split, maybe merge."}
+{"cid": "v0013", "object": "proof", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0032", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1660", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated layout vs definition: redundant namespace and dot notation in def body."}
+{"cid": "v1945", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v1005", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1562", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1495", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1406", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1440", "object": "layout", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated layout vs proof: where syntax plus golf avoiding case split."}
+{"cid": "v0316", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1291", "object": "layout", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated layout vs binders: type ascription on binder for readability."}
+{"cid": "v1584", "object": "instance", "reference": "mechanism", "second_reference": "", "mechanism": "typeclass", "remedy": "none", "warrant": "compile", "note": "Hesitated compile vs judgment; none vs reencode: possible non-defeq decidable instances."}
+{"cid": "v1785", "object": "pr", "reference": "process", "second_reference": "norms", "mechanism": "", "remedy": "pr", "warrant": "count", "note": "Hesitated count vs judgment: title convention and AI disclosure policy."}
+{"cid": "v1387", "object": "name", "reference": "library", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "Hesitated library vs mechanism/build; exhibit vs compile: alias target differs, breaks downstream."}
+{"cid": "v1239", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated local vs add: module docstring should mention new horn results."}
+{"cid": "v2171", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0595", "object": "meta", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1740", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1644", "object": "prose", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0002", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v2273", "object": "family", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "compile", "note": ""}
+{"cid": "v0177", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2293", "object": "proof", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "Hesitated library vs variant: better proof via the field tactic."}
+{"cid": "v0975", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "Hesitated compile vs count: simp-worthiness checked by simpNF linter."}
+{"cid": "v2252", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2300", "object": "layout", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0515", "object": "layout", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated count vs judgment: tactics on one line is style preference."}
+{"cid": "v0092", "object": "prose", "reference": "variant", "second_reference": "intent", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0050", "object": "attributes", "reference": "mechanism", "second_reference": "norms", "mechanism": "generators", "remedy": "interface", "warrant": "compile", "note": "Hesitated attributes vs name: reassoc plus rename to unit_uniqueUpToIso_inv."}
+{"cid": "v1671", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0878", "object": "location", "reference": "siblings", "second_reference": "module_graph", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "Also asks to add pow to file docstring (prose, add)."}
+{"cid": "v2079", "object": "definition", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "Hesitated norms vs library; count vs compile: terminal category as Discrete PUnit."}
+{"cid": "v0920", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0397", "object": "family", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "Hesitated family vs proof: add simp lemma next to library sibling to shorten proof."}
+{"cid": "v1696", "object": "layout", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated count vs judgment: separate lines readability; refine vs exact."}
+{"cid": "v0309", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "compile", "note": "Hesitated pr vs family; none vs add: road test of API usability."}
+{"cid": "v0755", "object": "name", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "Hesitated name vs statement: swap sides and rename like continuousOn_univ."}
+{"cid": "v0976", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0226", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0849", "object": "statement", "reference": "library", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "Hesitated library vs norms: ObjectProperty.ofObj is intended way; avoids defeq abuse."}
+{"cid": "v1954", "object": "binders", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0830", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated family vs proof: extract subresults from long proof into lemmas."}
+{"cid": "v0303", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "count", "note": "Hesitated name vs family: remove deprecated old lemma."}
+{"cid": "v0147", "object": "prose", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0741", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "judgment", "note": "Hesitated judgment vs exhibit: reversed duplicate of range_toSpanSingleton right above."}
+{"cid": "v0476", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0415", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0977", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1613", "object": "location", "reference": "module_graph", "second_reference": "mechanism", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v1641", "object": "definition", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": ""}
+{"cid": "v1761", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0351", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0229", "object": "statement", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "Hesitated statement vs prose: points to PosSMulMono for generalizing to ordered modules."}
+{"cid": "v1655", "object": "family", "reference": "siblings", "second_reference": "mechanism", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0719", "object": "proof", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": "Hesitated mechanism vs variant: whether aesop works again per adaptation note."}
+{"cid": "v0436", "object": "proof", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0812", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated local vs interface: renaming bound variables phi, mu."}
+{"cid": "v1442", "object": "family", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated family vs layout/proof: same rewriting lemmas, where syntax, simpler proof."}
+{"cid": "v1777", "object": "family", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated family vs proof: unbundled map_id/map_comp lemmas; algebraize to drop letI."}
+{"cid": "v2052", "object": "statement", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "Hesitated count vs judgment: coercion instead of .1 on the right side."}
+{"cid": "v0360", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0012", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1704", "object": "prose", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated local vs add: mention Lean.checkCache as replacement for memoFix."}
+{"cid": "v0392", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v0796", "object": "proof", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2280", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "Hesitated layout vs prose: docstring opening line formatting."}
+{"cid": "v1258", "object": "statement", "reference": "mechanism", "second_reference": "", "mechanism": "defeq", "remedy": "none", "warrant": "compile", "note": "Hesitated statement vs attributes: simp rfl lemma not reducibly true."}
+{"cid": "v1530", "object": "pr", "reference": "process", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "Hesitated process vs norms: uncleaned AI output, unhelpful comments, non-terminal simps."}
+{"cid": "v2010", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1868", "object": "definition", "reference": "variant", "second_reference": "mechanism", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "Hesitated reencode vs none: asks advantages of bundling versus unbundled class."}
+{"cid": "v0814", "object": "pr", "reference": "norms", "second_reference": "process", "mechanism": "", "remedy": "pr", "warrant": "count", "note": ""}
+{"cid": "v0446", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0493", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": ""}
+{"cid": "v2122", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1208", "object": "prose", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated variant vs library: TODO comment about missing ulift/Ext lemma."}
+{"cid": "v1497", "object": "family", "reference": "variant", "second_reference": "intent", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated family vs proof; add vs none: residue field isomorphic to reals."}
+{"cid": "v1889", "object": "instance", "reference": "siblings", "second_reference": "intent", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "Hesitated interface vs none: did you mean to change priority too."}
+{"cid": "v0879", "object": "family", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "Hesitated norms vs process: expected API lemmas for new definitions."}
+{"cid": "v0279", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0289", "object": "meta", "reference": "mechanism", "second_reference": "", "mechanism": "performance", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0507", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0991", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0872", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0675", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "count", "note": "count vs judgment: stating dependencies is a process rule"}
+{"cid": "v0401", "object": "name", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "variant vs norms: shorter name, specificity is taste"}
+{"cid": "v1245", "object": "instance", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "instance vs definition (field value); judgment vs exhibit for consistency"}
+{"cid": "v2123", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "binders vs statement: auto-param default on hypothesis"}
+{"cid": "v1946", "object": "definition", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "compile", "note": "definition vs instance; compile vs judgment"}
+{"cid": "v0286", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v2050", "object": "statement", "reference": "mechanism", "second_reference": "", "mechanism": "defeq", "remedy": "interface", "warrant": "compile", "note": "mechanism defeq vs registration: syntactic coercion form for rw"}
+{"cid": "v1568", "object": "family", "reference": "intent", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "intent vs library: pedagogical equivalence with Laurent polynomials"}
+{"cid": "v0015", "object": "layout", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "judgment vs count: optional style applied elsewhere"}
+{"cid": "v0785", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "remedy add vs interface: replace surjectivity lemma with explicit equation"}
+{"cid": "v0983", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "judgment vs compile: reviewer says it builds, nicer is taste"}
+{"cid": "v1383", "object": "prose", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "library vs norms: actual lowerCamel declaration name"}
+{"cid": "v1154", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1805", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "count", "note": ""}
+{"cid": "v0294", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0102", "object": "name", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "norms vs intent: name should reflect homs not ge"}
+{"cid": "v1597", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "statement vs family; exhibit vs compile; remedy interface vs add"}
+{"cid": "v2100", "object": "family", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "family vs statement: maximal generality plus smaller lemmas"}
+{"cid": "v1859", "object": "attributes", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "remedy local vs delete: remove linter-disabling option"}
+{"cid": "v1520", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "object layout vs location: unused open"}
+{"cid": "v1640", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "referent of 'This too' unclear; object proof vs statement"}
+{"cid": "v0620", "object": "layout", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "variant vs norms: personal preference for alignment"}
+{"cid": "v1598", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "judgment vs compile: reviewer doubts it is an improvement"}
+{"cid": "v1304", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "norms vs variant: garbled docstring grammar"}
+{"cid": "v0047", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "norms vs intent: notation symbol in docstring"}
+{"cid": "v1919", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "family vs statement: generalise to open sets, derive these"}
+{"cid": "v0209", "object": "prose", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "variant vs norms: readability of unicode over LaTeX"}
+{"cid": "v1873", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0788", "object": "family", "reference": "mechanism", "second_reference": "variant", "mechanism": "registration", "remedy": "add", "warrant": "compile", "note": "mechanism vs variant: missing simp lemmas enabling shorter proofs"}
+{"cid": "v1367", "object": "definition", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "exhibit", "note": "remedy reencode vs delete: define via map or drop definition"}
+{"cid": "v0416", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "compile vs count: redundant namespace qualification"}
+{"cid": "v1502", "object": "statement", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "exhibit vs judgment: restate via existing IsBot predicate"}
+{"cid": "v0180", "object": "proof", "reference": "mechanism", "second_reference": "", "mechanism": "defeq", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0497", "object": "family", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "add", "warrant": "count", "note": "norms vs mechanism(defeq): unfold signals missing apply lemmas; count vs compile"}
+{"cid": "v0686", "object": "name", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "norms vs library: keep root name for Odd dot notation; count vs exhibit"}
+{"cid": "v1452", "object": "statement", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1966", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0537", "object": "statement", "reference": "variant", "second_reference": "module_graph", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "remedy interface vs move: generalise then relocate to Basic"}
+{"cid": "v0844", "object": "prose", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "count vs judgment: leave review notes out of code"}
+{"cid": "v1246", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0840", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "object prose vs binders: drop TODO about explicitness"}
+{"cid": "v2017", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "remedy delete vs none: asks whether near-duplicate is normal"}
+{"cid": "v0798", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "layout vs definition: where syntax"}
+{"cid": "v2259", "object": "binders", "reference": "library", "second_reference": "siblings", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "library vs siblings: reuse existing section variables"}
+{"cid": "v1549", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": ""}
+{"cid": "v2177", "object": "name", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "norms vs intent: hypothesis named hb but constrains c"}
+{"cid": "v1750", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "object proof vs statement: suggestion also drops casts in statement"}
+{"cid": "v0098", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v2118", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v1895", "object": "definition", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "none", "warrant": "compile", "note": "remedy none vs interface: question whether to_additive propagates reducibility"}
+{"cid": "v1061", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "exhibit vs judgment: stale doc comment vs new parameter type"}
+{"cid": "v0525", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1264", "object": "definition", "reference": "variant", "second_reference": "module_graph", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": ""}
+{"cid": "v0735", "object": "prose", "reference": "siblings", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "siblings vs library: mention in IsComplement docstring too"}
+{"cid": "v0188", "object": "proof", "reference": "library", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "library vs siblings: lemma is from the same PR"}
+{"cid": "v1874", "object": "proof", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "compile vs judgment: maintainability rationale, reviewer shows it compiles"}
+{"cid": "v0994", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0661", "object": "prose", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "norms vs variant: personal spelling preference"}
+{"cid": "v2076", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2018", "object": "statement", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "exhibit vs count: state via existing =ᵐ notation"}
+{"cid": "v0154", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "binders vs proof: anonymous instance binder with ‹_›"}
+{"cid": "v1047", "object": "family", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "library vs variant: restore old specialised statements as corollaries"}
+{"cid": "v0823", "object": "prose", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "variant vs norms: unicode vs LaTeX in docs is preference"}
+{"cid": "v2033", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "layout vs statement: drop redundant type ascription"}
+{"cid": "v0848", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "exhibit vs compile: existing colimitsOfShape predicate"}
+{"cid": "v1377", "object": "layout", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "layout vs definition: type ascription for readability"}
+{"cid": "v0424", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1515", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "compile vs judgment: alternative proof offered without claiming better"}
+{"cid": "v0137", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v2178", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "proof vs family: \"do we need this\" may question lemma itself"}
+{"cid": "v0085", "object": "location", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "location vs layout: redundant section; remedy delete vs local"}
+{"cid": "v0410", "object": "name", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0395", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0330", "object": "proof", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "library vs norms: use TotalSpace.mk'"}
+{"cid": "v1716", "object": "pr", "reference": "process", "second_reference": "variant", "mechanism": "", "remedy": "pr", "warrant": "count", "note": "count vs judgment: AI disclosure policy; second ask about Zulip version"}
+{"cid": "v2104", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": ""}
+{"cid": "v2019", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "count vs judgment; remedy interface vs local for variable names"}
+{"cid": "v2114", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "binders vs instance: strict-implicit binder inside le field"}
+{"cid": "v2211", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0165", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1180", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "remedy add vs none: asks for a citation, optional"}
+{"cid": "v0887", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2064", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "remedy interface vs add: generalise many lemmas plus add one lemma"}
+{"cid": "v1473", "object": "prose", "reference": "variant", "second_reference": "intent", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "variant vs intent: comments to explain hard proof"}
+{"cid": "v2046", "object": "statement", "reference": "mechanism", "second_reference": "variant", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "mechanism vs variant: simp-friendly form proves this automatically"}
+{"cid": "v0996", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1545", "object": "attributes", "reference": "mechanism", "second_reference": "siblings", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "compile vs count: simp attribute, sibling already simp"}
+{"cid": "v2051", "object": "statement", "reference": "mechanism", "second_reference": "", "mechanism": "defeq", "remedy": "interface", "warrant": "compile", "note": "mechanism defeq vs registration: DFunLike coercion form"}
+{"cid": "v1067", "object": "meta", "reference": "mechanism", "second_reference": "intent", "mechanism": "typeclass", "remedy": "local", "warrant": "compile", "note": "remedy local vs none: pointed question about failing case"}
+{"cid": "v0055", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0566", "object": "prose", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "count", "note": "count vs judgment: remove commented-out code and TODOs everywhere"}
+{"cid": "v0801", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1362", "object": "family", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "norms vs variant: directional aliases for dot notation"}
+{"cid": "v2061", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "layout vs location: unused namespace in open; remedy delete vs local"}
+{"cid": "v0501", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "compile vs judgment: reviewer says small difference"}
+{"cid": "v1538", "object": "pr", "reference": "process", "second_reference": "library", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0247", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0513", "object": "binders", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "binders vs definition: explicit universes for section variables"}
+{"cid": "v1683", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0713", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1509", "object": "prose", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "library vs norms: correct spelling of class name in docstring"}
+{"cid": "v1217", "object": "instance", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "variant vs mechanism(typeclass): extract local fact as instance"}
+{"cid": "v0822", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0521", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "intent vs process: add motivation sentence"}
+{"cid": "v0712", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0687", "object": "pr", "reference": "process", "second_reference": "norms", "mechanism": "", "remedy": "pr", "warrant": "count", "note": "process vs norms: PR title convention"}
+{"cid": "v0828", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "intent vs variant: explain why instances are removed"}
+{"cid": "v1592", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "family vs definition; remedy add vs none: asks opinion, else TODO"}
+{"cid": "v2102", "object": "build", "reference": "mechanism", "second_reference": "", "mechanism": "build", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1642", "object": "prose", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "norms vs intent: section should be a TODO"}
+{"cid": "v0400", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1811", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2180", "object": "pr", "reference": "intent", "second_reference": "process", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "remedy none vs pr: verify links in description"}
+{"cid": "v0198", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1582", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1682", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "judgment vs compile: add congruence variants"}
+{"cid": "v0239", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0184", "object": "definition", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "remedy reencode vs interface; judgment vs compile: generalise to RCLike"}
+{"cid": "v1544", "object": "proof", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "siblings vs norms: consistency within the proof"}
+{"cid": "v0902", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "remedy add vs delete: add generic lemma then deprecate specialised one"}
+{"cid": "v1322", "object": "family", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "remedy none vs delete: asks why untagged unused lemmas exist"}
+{"cid": "v2142", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0835", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v2146", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v2267", "object": "definition", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": ""}
+{"cid": "v1885", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1645", "object": "instance", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "variant vs library: more general existing class"}
+{"cid": "v1711", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v1995", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "statement vs binders: drop CommRing assumption"}
+{"cid": "v0503", "object": "proof", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "compile vs judgment: reviewer hedges on value"}
+{"cid": "v2201", "object": "name", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "count vs judgment: same argument renaming elsewhere"}
+{"cid": "v2066", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "judgment vs compile: extract Φ 0 = 0 lemma"}
+{"cid": "v0193", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "remedy none vs local: questions removing TODO text"}
+{"cid": "v0694", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1001", "object": "family", "reference": "intent", "second_reference": "process", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "intent vs process: missing motivating lemmas"}
+{"cid": "v0820", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "referent of 'same' unclear; reference variant vs norms"}
+{"cid": "v1163", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0809", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "empty suggestion removes monotone' field; proof vs definition"}
+{"cid": "v0278", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "intent vs variant: docstring adds heartbeat caveat"}
+{"cid": "v0890", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": ""}
+{"cid": "v1525", "object": "statement", "reference": "variant", "second_reference": "process", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "remedy none vs interface: asks whether generality is needed"}
+{"cid": "v0600", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "judgment", "note": ""}
+{"cid": "v1397", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "norms vs variant: dot notation"}
+{"cid": "v2097", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "count", "note": ""}
+{"cid": "v0142", "object": "definition", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "remedy reencode vs add: class vs structure version"}
+{"cid": "v1717", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0326", "object": "statement", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "library vs norms: use TotalSpace.mk'"}
+{"cid": "v0388", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "norms vs variant: grammar fix"}
+{"cid": "v0502", "object": "proof", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1501", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "interface", "warrant": "compile", "note": "compile vs judgment: whether to register with to_dual"}
+{"cid": "v0187", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "judgment", "note": "warrant judgment vs count: whether simp can discharge such side conditions is practice"}
+{"cid": "v1698", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2049", "object": "statement", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "\"Same.\" repeats an earlier fix; variant vs siblings"}
+{"cid": "v1547", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "warrant compile vs judgment; restating with existing Pi.single"}
+{"cid": "v2243", "object": "location", "reference": "module_graph", "second_reference": "library", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "object location vs definition; also says existing results simplify/generalize"}
+{"cid": "v1385", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "object definition vs family: a new combined typeclass"}
+{"cid": "v1491", "object": "family", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "warrant compile vs judgment; more general lemma to add first"}
+{"cid": "v1772", "object": "definition", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "object definition vs meta for notation; scoping local notation"}
+{"cid": "v1474", "object": "instance", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1878", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0987", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0194", "object": "prose", "reference": "intent", "second_reference": "library", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "reference intent vs library: attribution rests on a mathlib3 PR"}
+{"cid": "v1630", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": "object attributes vs family: mk_iff generating the iff theorem"}
+{"cid": "v0104", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0597", "object": "family", "reference": "siblings", "second_reference": "variant", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "reference siblings vs variant: new IsOfFinAddOrder variant lemma"}
+{"cid": "v0122", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "object statement vs layout: explicit M instead of hole, same elaborated statement"}
+{"cid": "v0372", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "reference variant vs norms: dot notation"}
+{"cid": "v0540", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": ""}
+{"cid": "v0384", "object": "statement", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1147", "object": "pr", "reference": "intent", "second_reference": "variant", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "reference intent vs process: confirming statement and proof plan"}
+{"cid": "v0367", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1639", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2092", "object": "proof", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "reference variant vs mechanism performance: replacing grind, reason unstated"}
+{"cid": "v0362", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0546", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1871", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1801", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "warrant count vs judgment: reviewer states a preference"}
+{"cid": "v2054", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "reference norms vs intent: name should match statement"}
+{"cid": "v2154", "object": "meta", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "object meta vs layout: trailing space in trace string; warrant count vs judgment"}
+{"cid": "v1150", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": "object pr vs layout: revert whitespace changes from scope"}
+{"cid": "v0210", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "warrant count vs compile: standard proof style"}
+{"cid": "v1359", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2039", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0393", "object": "meta", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "object meta vs location: noshake entry about imports; reason unstated"}
+{"cid": "v1602", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "remedy delete vs none: asks whether the duplicate is needed"}
+{"cid": "v1295", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1087", "object": "family", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "object family vs pr: PR duplicates existing file"}
+{"cid": "v1484", "object": "definition", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "remedy interface vs reencode: def to abbrev per library note"}
+{"cid": "v1178", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "also questions the lemma's existence but does not require removal"}
+{"cid": "v1585", "object": "family", "reference": "siblings", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "exhibit", "note": ""}
+{"cid": "v0408", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0512", "object": "prose", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "warrant judgment vs exhibit: Epi/Mono docstrings do not introduce terms"}
+{"cid": "v2112", "object": "instance", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0701", "object": "location", "reference": "module_graph", "second_reference": "process", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "remedy none vs pr: explain or revert the file move"}
+{"cid": "v1659", "object": "family", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "judgment", "note": "object family vs attributes: deprecating good simp lemmas"}
+{"cid": "v1879", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0347", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "reference variant vs mechanism: removing field likely left to default autoparam"}
+{"cid": "v1024", "object": "statement", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "reference variant vs norms: omit redundant ∈ univ; also floats a Meromorphic predicate"}
+{"cid": "v0202", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v1206", "object": "instance", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": ""}
+{"cid": "v0914", "object": "family", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "object family vs statement: split And conclusion into two lemmas; warrant count vs judgment"}
+{"cid": "v2173", "object": "instance", "reference": "variant", "second_reference": "mechanism", "mechanism": "", "remedy": "pr", "warrant": "compile", "note": "remedy pr vs interface: generalize instance, separate PR to benchmark"}
+{"cid": "v1534", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1600", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0123", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0113", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "object binders vs name: explicit M and protected"}
+{"cid": "v0863", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1072", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0157", "object": "statement", "reference": "library", "second_reference": "module_graph", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "object statement vs location: add import to use QuotSMulTop"}
+{"cid": "v0248", "object": "location", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "reference variant vs intent: file name to avoid confusion with Carl Neumann"}
+{"cid": "v0329", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0473", "object": "binders", "reference": "intent", "second_reference": "process", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "reference intent vs process: sectioning so reviewers see no generality lost"}
+{"cid": "v0766", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "count", "note": "warrant count vs judgment: spelling practice in literature, asks for a reference"}
+{"cid": "v1799", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0869", "object": "location", "reference": "module_graph", "second_reference": "intent", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": ""}
+{"cid": "v0044", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "object proof vs binders: suggestion passes C by name instead of @"}
+{"cid": "v0891", "object": "statement", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0448", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": ""}
+{"cid": "v1405", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0850", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2263", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": ""}
+{"cid": "v0048", "object": "attributes", "reference": "mechanism", "second_reference": "norms", "mechanism": "generators", "remedy": "interface", "warrant": "count", "note": "warrant count vs compile: reassoc on simp lemma is standard practice"}
+{"cid": "v1796", "object": "name", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "reference variant vs norms; also asks whether it should be simp"}
+{"cid": "v2117", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1523", "object": "name", "reference": "variant", "second_reference": "process", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "reference variant vs norms: preferred mathematical term for the concept"}
+{"cid": "v0053", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "remedy reencode vs delete: define corepresentableBy directly, maybe drop the iso"}
+{"cid": "v2186", "object": "prose", "reference": "variant", "second_reference": "intent", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "reference variant vs intent: reverting \"singleton string\" wording"}
+{"cid": "v1451", "object": "statement", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v1459", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "reference variant vs intent: characterizing lemmas for agm via choose_spec"}
+{"cid": "v0417", "object": "layout", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "reference library vs norms: Complex already opened earlier in file"}
+{"cid": "v0622", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "reference variant vs mechanism registration: simp lemma RHS 1 instead of exp 0"}
+{"cid": "v2279", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "removing a variable line; reason unstated"}
+{"cid": "v1922", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "object name vs attributes: making implementation lemma private"}
+{"cid": "v1432", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "warrant count vs compile: root lemmas instead of Nat versions"}
+{"cid": "v1403", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0200", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1412", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1338", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0422", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0462", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "judgment", "note": "warrant judgment vs count: whether to make it simp"}
+{"cid": "v0593", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "remedy none vs pr: asks the benefit, and to state it in future descriptions"}
+{"cid": "v2152", "object": "meta", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "object meta vs layout: trailing space in trace string"}
+{"cid": "v1888", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v1925", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "count", "note": "warrant count vs judgment: AI contribution guidelines"}
+{"cid": "v1929", "object": "definition", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "count", "note": "warrant count vs judgment: reviewer's own practice of no tactics in defs"}
+{"cid": "v0877", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "remedy local vs add: module doc missing a definition entry"}
+{"cid": "v1168", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v1604", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1117", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "warrant exhibit vs judgment: docstring claims a use not yet in library"}
+{"cid": "v0439", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0182", "object": "prose", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "reference variant vs norms: precise section in citation"}
+{"cid": "v1978", "object": "meta", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1854", "object": "prose", "reference": "siblings", "second_reference": "mechanism", "mechanism": "", "remedy": "add", "warrant": "exhibit", "note": "reference siblings vs mechanism generators: to_dual migration dropped a docstring"}
+{"cid": "v0496", "object": "family", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "add", "warrant": "count", "note": "reference norms vs variant; warrant count vs judgment: standard simp API"}
+{"cid": "v2025", "object": "prose", "reference": "process", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "reference process vs library: TODO for a future helper"}
+{"cid": "v0419", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0884", "object": "family", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "delete", "warrant": "count", "note": "warrant count vs judgment: inline auxiliary definition; also doubts usefulness"}
+{"cid": "v1410", "object": "attributes", "reference": "mechanism", "second_reference": "norms", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v0832", "object": "statement", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "object statement vs layout: also asks to fix indentation"}
+{"cid": "v1122", "object": "definition", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": "warrant judgment vs exhibit: duplicates preReflection; also muses on renaming"}
+{"cid": "v2218", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0420", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "object layout vs statement: notation, arrow and qualification in statement text"}
+{"cid": "v2270", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v2002", "object": "instance", "reference": "siblings", "second_reference": "mechanism", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "body is only \"Same.\"; fix inferred from hunk, remedy delete vs local"}
+{"cid": "v0449", "object": "family", "reference": "siblings", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1702", "object": "location", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "object location vs family: deprecating a whole module"}
+{"cid": "v0739", "object": "attributes", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "linter option disabled; fix the non-terminal simps instead"}
+{"cid": "v1466", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "remedy local vs none: also asks why the lemma was not used"}
+{"cid": "v1595", "object": "meta", "reference": "mechanism", "second_reference": "", "mechanism": "defeq", "remedy": "local", "warrant": "judgment", "note": "warrant judgment vs compile: reducible defeq check vs syntactic equality"}
+{"cid": "v1649", "object": "prose", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": ""}
+{"cid": "v0709", "object": "proof", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "compile", "note": "warrant compile vs judgment: reviewer confused by try simp to simp"}
+{"cid": "v1132", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": ""}
+{"cid": "v0466", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "warrant count vs judgment: variable name ε for a space"}
+{"cid": "v2204", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "warrant count vs compile: LaTeX must render"}
+{"cid": "v1331", "object": "meta", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "compile", "note": "object meta vs pr: guard in a tactic test"}
+{"cid": "v1395", "object": "proof", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1963", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0117", "object": "family", "reference": "siblings", "second_reference": "library", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1136", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "object definition vs meta: notation for oplax functors"}
+{"cid": "v1531", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0302", "object": "name", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "reference norms vs variant: deprecated alias from iff instead of lemma"}
+{"cid": "v0547", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0941", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1346", "object": "meta", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2035", "object": "definition", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v2202", "object": "name", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "reference variant vs norms: namespace makes names misleading"}
+{"cid": "v1177", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1279", "object": "location", "reference": "module_graph", "second_reference": "library", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "object location vs definition: move elsewhere and restate as an Exists"}
+{"cid": "v0170", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0642", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0489", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v2167", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "count", "note": "remedy none vs pr: AI disclosure clarification"}
+{"cid": "v1935", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "warrant count vs judgment: descriptive name instead of prime, deprecate old"}
+{"cid": "v0267", "object": "name", "reference": "norms", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "warrant judgment vs exhibit: whether other lemmas would clash without suffix"}
+{"cid": "v0548", "object": "proof", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "warrant count vs compile: refine instead of apply with ?_"}
+{"cid": "v0482", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0208", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": "remedy delete vs add: autogenerate the iso app lemmas"}
+{"cid": "v0039", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2242", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1789", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "object definition vs proof: calc for an equiv built by trans"}
+{"cid": "v1766", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0016", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0617", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated remedy interface vs local; reference variant vs norms"}
+{"cid": "v1418", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1280", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0472", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1341", "object": "meta", "reference": "variant", "second_reference": "intent", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated reference variant vs intent (message consistency)"}
+{"cid": "v1266", "object": "name", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": ""}
+{"cid": "v0999", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated reference norms vs variant; warrant compile vs count"}
+{"cid": "v1256", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0873", "object": "name", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object name vs attributes (to_additive also added)"}
+{"cid": "v2256", "object": "statement", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": ""}
+{"cid": "v1836", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1424", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0747", "object": "proof", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1037", "object": "statement", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated warrant count vs judgment for iff direction"}
+{"cid": "v2068", "object": "family", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object family vs statement; warrant judgment vs compile"}
+{"cid": "v2125", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0567", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated remedy interface vs local"}
+{"cid": "v1097", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": ""}
+{"cid": "v1571", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs count"}
+{"cid": "v1307", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1301", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "judgment", "note": "hesitated object family vs statement"}
+{"cid": "v1422", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v1454", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated warrant compile vs count"}
+{"cid": "v1707", "object": "definition", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": "hesitated remedy reencode vs delete"}
+{"cid": "v1336", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1482", "object": "definition", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms (library note) vs mechanism defeq; remedy interface vs reencode"}
+{"cid": "v1481", "object": "family", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "hesitated object family vs statement; remedy interface vs reencode"}
+{"cid": "v1872", "object": "name", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object name vs definition; remedy add vs interface"}
+{"cid": "v0684", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0774", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated reference variant vs library (uses exists_congr_left)"}
+{"cid": "v1849", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated reference norms vs siblings"}
+{"cid": "v1308", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "exhibit", "note": "hesitated warrant exhibit vs judgment"}
+{"cid": "v1611", "object": "family", "reference": "library", "second_reference": "process", "mechanism": "", "remedy": "none", "warrant": "exhibit", "note": "hesitated reference library vs process"}
+{"cid": "v0020", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0657", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated reference intent vs norms (spelling)"}
+{"cid": "v1368", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v2303", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "none", "warrant": "judgment", "note": ""}
+{"cid": "v2135", "object": "meta", "reference": "variant", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v1535", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": ""}
+{"cid": "v1477", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1933", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0651", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated warrant count vs judgment"}
+{"cid": "v0946", "object": "name", "reference": "norms", "second_reference": "process", "mechanism": "", "remedy": "interface", "warrant": "judgment", "note": "hesitated reference norms vs variant"}
+{"cid": "v1436", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0802", "object": "statement", "reference": "variant", "second_reference": "process", "mechanism": "", "remedy": "delete", "warrant": "judgment", "note": "hesitated remedy delete vs none"}
+{"cid": "v0227", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated reference intent vs variant; remedy add vs local"}
+{"cid": "v1987", "object": "statement", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated object statement vs binders (section variables)"}
+{"cid": "v0282", "object": "meta", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated reference library vs variant"}
+{"cid": "v0064", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "compile", "note": "hesitated remedy delete vs none; warrant compile vs judgment"}
+{"cid": "v1695", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1402", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v2149", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": ""}
+{"cid": "v0045", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1227", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0569", "object": "prose", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated reference siblings (same thing) vs norms"}
+{"cid": "v1380", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "compile", "note": "parent question unknown; hesitated remedy none vs local"}
+{"cid": "v1559", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "judgment", "note": "hesitated remedy delete (deprecate) vs interface"}
+{"cid": "v1820", "object": "location", "reference": "module_graph", "second_reference": "norms", "mechanism": "", "remedy": "move", "warrant": "count", "note": "hesitated reference module_graph vs norms"}
+{"cid": "v1069", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v1215", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object name vs binders (N also made a binder)"}
+{"cid": "v1998", "object": "definition", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "reencode", "warrant": "judgment", "note": ""}
+{"cid": "v0645", "object": "family", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "judgment", "note": "hesitated warrant judgment vs exhibit"}
+{"cid": "v1400", "object": "definition", "reference": "library", "second_reference": "norms", "mechanism": "", "remedy": "reencode", "warrant": "compile", "note": "hesitated reference library (Finsupp.prod) vs norms; remedy reencode vs local"}
+{"cid": "v1468", "object": "proof", "reference": "variant", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0087", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object binders vs layout"}
+{"cid": "v0005", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object layout vs proof"}
+{"cid": "v2159", "object": "meta", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v0871", "object": "meta", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v2048", "object": "proof", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated reference norms vs mechanism defeq"}
+{"cid": "v2283", "object": "name", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated object name (deprecation alias) vs attributes"}
+{"cid": "v0757", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "ditto with unknown referent; hesitated object name vs statement"}
+{"cid": "v1667", "object": "instance", "reference": "mechanism", "second_reference": "norms", "mechanism": "generators", "remedy": "delete", "warrant": "compile", "note": "hesitated object instance vs name (suggestion renames it)"}
+{"cid": "v1399", "object": "proof", "reference": "variant", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1030", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs count"}
+{"cid": "v1557", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1621", "object": "attributes", "reference": "mechanism", "second_reference": "siblings", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs count"}
+{"cid": "v1877", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1340", "object": "meta", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0042", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v1114", "object": "name", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms vs siblings/library (ContinuousMap.coeFnMonoidHom precedent)"}
+{"cid": "v0109", "object": "proof", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1101", "object": "instance", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "referent unknown (same as subsemiring); hesitated object instance vs name"}
+{"cid": "v1311", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v2063", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object layout (blank line) vs location (import block)"}
+{"cid": "v1623", "object": "statement", "reference": "library", "second_reference": "process", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs judgment"}
+{"cid": "v1157", "object": "layout", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated reference norms vs siblings (rest of file)"}
+{"cid": "v0280", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1211", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1860", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0254", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0677", "object": "layout", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "hesitated reference variant (readability) vs norms; warrant judgment vs count"}
+{"cid": "v1021", "object": "location", "reference": "module_graph", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "hesitated warrant judgment vs compile; remedy move vs none"}
+{"cid": "v0078", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0213", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1278", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v0453", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1962", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1764", "object": "proof", "reference": "variant", "second_reference": "module_graph", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1494", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v2137", "object": "meta", "reference": "intent", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": ""}
+{"cid": "v1174", "object": "family", "reference": "variant", "second_reference": "process", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated reference variant vs process"}
+{"cid": "v0312", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "hesitated remedy interface vs none"}
+{"cid": "v0874", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "generators", "remedy": "interface", "warrant": "compile", "note": "hesitated remedy interface vs add"}
+{"cid": "v1250", "object": "proof", "reference": "variant", "second_reference": "module_graph", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1957", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1303", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated reference norms vs variant (garbled sentence)"}
+{"cid": "v0168", "object": "family", "reference": "siblings", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": ""}
+{"cid": "v0670", "object": "instance", "reference": "siblings", "second_reference": "mechanism", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0073", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v1905", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1703", "object": "location", "reference": "norms", "second_reference": "siblings", "mechanism": "", "remedy": "add", "warrant": "count", "note": "hesitated object location vs family; remedy add vs interface"}
+{"cid": "v1552", "object": "name", "reference": "siblings", "second_reference": "norms", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated warrant count vs judgment"}
+{"cid": "v1793", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated warrant count vs judgment"}
+{"cid": "v1814", "object": "binders", "reference": "norms", "second_reference": "variant", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated reference norms vs variant; warrant count vs judgment"}
+{"cid": "v1961", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v0491", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "terse \"siimp?\" read as add @[simp]; hesitated vs simp? proof tactic"}
+{"cid": "v1813", "object": "name", "reference": "norms", "second_reference": "mechanism", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object name vs attributes (simps! added)"}
+{"cid": "v1033", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object prose vs statement"}
+{"cid": "v1135", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v0827", "object": "binders", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object binders vs statement (hypothesis moved before colon)"}
+{"cid": "v1581", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0585", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "exhibit", "note": "hesitated warrant exhibit vs compile"}
+{"cid": "v0818", "object": "prose", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "judgment", "note": "\"same\" with unknown referent; hesitated reference variant vs norms"}
+{"cid": "v0570", "object": "binders", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated remedy interface vs local"}
+{"cid": "v2088", "object": "prose", "reference": "variant", "second_reference": "norms", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated reference variant vs norms"}
+{"cid": "v1517", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "judgment", "note": ""}
+{"cid": "v0058", "object": "family", "reference": "mechanism", "second_reference": "library", "mechanism": "registration", "remedy": "add", "warrant": "compile", "note": "hesitated object family vs proof; remedy add vs reencode of decomp"}
+{"cid": "v1155", "object": "proof", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1514", "object": "family", "reference": "library", "second_reference": "variant", "mechanism": "", "remedy": "delete", "warrant": "exhibit", "note": "hesitated object family vs proof; warrant exhibit vs judgment"}
+{"cid": "v1453", "object": "statement", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0290", "object": "prose", "reference": "intent", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated object prose vs meta"}
+{"cid": "v2271", "object": "statement", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": "hesitated remedy interface vs none"}
+{"cid": "v0727", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v2148", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "move", "warrant": "judgment", "note": "hesitated remedy move vs interface (namespace change)"}
+{"cid": "v2234", "object": "instance", "reference": "mechanism", "second_reference": "", "mechanism": "typeclass", "remedy": "delete", "warrant": "compile", "note": ""}
+{"cid": "v0008", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object layout vs proof"}
+{"cid": "v2000", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "none", "warrant": "exhibit", "note": "hesitated object pr vs definition; reference process vs siblings"}
+{"cid": "v2220", "object": "layout", "reference": "variant", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": "hesitated object layout vs family (section visibility)"}
+{"cid": "v1259", "object": "attributes", "reference": "mechanism", "second_reference": "", "mechanism": "registration", "remedy": "interface", "warrant": "compile", "note": "hesitated warrant compile vs count"}
+{"cid": "v0673", "object": "statement", "reference": "variant", "second_reference": "library", "mechanism": "", "remedy": "interface", "warrant": "compile", "note": ""}
+{"cid": "v0152", "object": "proof", "reference": "library", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1626", "object": "location", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": "hesitated object location vs layout (module keyword)"}
+{"cid": "v0413", "object": "name", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "interface", "warrant": "count", "note": ""}
+{"cid": "v0583", "object": "layout", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "local", "warrant": "count", "note": ""}
+{"cid": "v0913", "object": "instance", "reference": "mechanism", "second_reference": "library", "mechanism": "typeclass", "remedy": "reencode", "warrant": "judgment", "note": "also questions the name; hesitated remedy reencode vs none"}
+{"cid": "v1784", "object": "family", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "delete", "warrant": "count", "note": "hesitated object family vs pr"}
+{"cid": "v0195", "object": "pr", "reference": "process", "second_reference": "", "mechanism": "", "remedy": "pr", "warrant": "judgment", "note": ""}
+{"cid": "v1113", "object": "prose", "reference": "norms", "second_reference": "", "mechanism": "", "remedy": "add", "warrant": "judgment", "note": "hesitated reference norms vs variant"}
+{"cid": "v1886", "object": "proof", "reference": "mechanism", "second_reference": "", "mechanism": "defeq", "remedy": "local", "warrant": "compile", "note": ""}
+{"cid": "v1560", "object": "statement", "reference": "norms", "second_reference": "intent", "mechanism": "", "remedy": "interface", "warrant": "count", "note": "hesitated object statement vs name (deprecated alias)"}
