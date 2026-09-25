@@ -1,0 +1,303 @@
+# Where the arms come from: a structure for Mathlib review work (2026-09-25)
+
+The user, after the 1,000-PR replication:
+
+> *"The arms division seems a bit ad hoc. Is there a greater structure to how the arms are decided?
+> How can we know we aren't missing an arm or there is duplication in the work? Ultimately this
+> should consider the Lean code and the life cycle of a proof development repo such as Mathlib."*
+
+The reading is right.
+- **The ten arms** grew from whatever the development PRs contained
+  (`pr-review-v5-principled-design.md` §1 says so of the method registry).
+- **The family division** (`registry.FAMILY_DIVISION`) was cut from the 60-PR ask counts, one
+  family at a time.
+- **The twelve families** are themselves the auditor's codebook, fitted on those 60 PRs.
+
+Nothing in that chain says what the review work *is*, so nothing can say an arm is missing.
+
+This document derives the work from three things that the sample does not choose:
+- what Lean and Mathlib's CI already check;
+- what each part of a declaration is for, given how Lean treats it;
+- what happens to a declaration after it merges.
+
+The 1,000 PRs are then used only to weight the structure and to test it. The earlier structural
+axis on record, the kind of knowledge an ask needs (convention, repository, local judgment;
+`pr-review-v5-principled-design.md` D1), is one of its dimensions.
+
+## 1. Three facts that generate review work
+
+### 1.1 Review is the complement of what the machine checks, and the boundary moves
+
+**What a Mathlib PR has already passed** before any human reads it:
+- **The kernel:** every proof proves its statement.
+- **The build:** everything compiles.
+- **23 syntax linters.** These are the catalogue's "binding 23", covering layout, `cdot`,
+  `refine`, long lines and files, and non-terminal `simp` (`flexible`).
+- **The environment linters**, run by `lake exe runLinter Mathlib` (Mathlib
+  `.github/workflows/build_template.yml`). The ones on by default in Batteries are:
+  - `docBlame`: docstrings on definitions;
+  - `simpNF`: a simp lemma's left side is in simp normal form;
+  - `simpComm`: no commutativity simp lemmas;
+  - `unusedArguments`;
+  - `impossibleInstance` and `nonClassInstance`;
+  - `synTaut`, `checkType` and `unusedHavesSuffices`.
+
+  Mathlib adds `structureInType`, `deprecatedNoSince` and `tacticDocs`.
+- **Other checks:** a PR-title check, and the benchmark bot when asked.
+
+**Correction to the convention catalogue.** H6 there says the simp-normal-form linter "is not in
+the standard set". That is true of the *syntax* standard set, but `simpNF` runs in CI as an
+environment linter. For lemmas tagged `@[simp]`, simp normal form is machine-checked. The
+catalogue scanned syntax-linter options only.
+
+So review work is whatever remains. The catalogue's reframing ("the conventions worth
+discovering are the complement of what is encodable as a linter") applies to the whole task, not
+only to conventions.
+
+**The complement is not fixed.** A convention is born in review, where one maintainer asks. It
+matures as the ask repeats, gets written down in a library note or the style guide, gets a linter,
+and leaves review. `flexible` took non-terminal `simp` out of review; `deprecatedNoSince` took the
+`since` date of a deprecation. So the review task at any moment has two parts:
+- **judgment no linter can take:** design, generality, encoding;
+- **conventions not yet mechanised:** the `emerging` tier of the norm store (principled design, D2).
+
+A division has to be re-derived when the machine frontier moves. Deriving it from the frontier
+makes that re-derivation a mechanical step, not a new audit.
+
+### 1.2 Proof irrelevance ranks a declaration's parts by what depends on them
+
+In Lean, the proof of a theorem is irrelevant: no later declaration can observe it. It can be
+rewritten at any time without touching anything downstream. What its review protects is:
+- the reader (is it clear and idiomatic);
+- the maintainer (is it robust when what it uses is refactored);
+- the build (is it fast).
+
+Everything else about a theorem is interface, and every use site depends on it:
+- its name;
+- its binders (what a user must supply);
+- its statement (whether it applies, and in what form);
+- its attributes (whether automation uses it).
+
+A definition's body is not irrelevant. It fixes definitional equality, meaning what unfolds, what
+computes, and which instance paths agree. Every downstream proof that unfolds it, rewrites with
+it or relies on `rfl` depends on it. It is the most expensive thing to change later.
+
+This gives a ranking by the cost of changing a part after merge:
+
+| part | who depends on it | cost of changing later |
+|---|---|---|
+| theorem proof | nobody downstream | lowest: one declaration |
+| prose, layout | readers | low |
+| name | every use site and search | a rename, plus a deprecated alias |
+| binders, statement, attributes | every use site, human and automated | every use site |
+| definition body, instances, class hierarchy | every proof that unfolds or synthesises through it | highest; diamonds can block unrelated work |
+
+**The 1,000 PRs show that reviewers treat these differently.** Of 1,610 inline round-1 asks,
+1,472 were joined to the changed declaration they comment on. The join uses the last line of the
+comment's diff hunk, matched against the reviewed code
+(`results/pr_review_v5/adjudications/arm-coverage-val1000-2025-06-2026-03-v1/provenance/situate.py`; its output is `situated_asks.json` in the directory above).
+
+| | theorems | definitions | instances |
+|---|---|---|---|
+| changed declarations | 6,983 | 1,641 | 1,090 |
+| asks per 100 changed | 12.6 | 13.3 | 11.3 |
+| proof asks (F1) | **33%** | **16%** | 28% |
+| statement and API design (F6) | **16%** | **28%** | 20% |
+| documentation (F10) | 3% | 10% | 6% |
+| redundancy (F5) | 4% | 4% | 9% |
+
+Definitions draw as many asks as theorems, but of a different kind. What reviewers ask of a
+definition (§2, row 6) is encoding and its place in the typeclass hierarchy, not its proof.
+
+### 1.3 A declaration's life after merge gives each part its consumers
+
+Mathlib is a monorepo that refactors itself continuously. A merged declaration will be:
+1. **found**, through its name, docstring, file and namespace;
+2. **used by people**, who supply its binders, check its hypotheses and match its form;
+3. **used by automation**, through its attributes, the simp normal form of its statement, its
+   instance arguments and its reducibility;
+4. **maintained** while what it depends on is refactored, so it needs a robust proof, sensible
+   imports and a build cost it deserves, and it must be the one place the fact lives;
+5. **extended** by the next developers of its theory, who need its API to be complete and its
+   encoding to be workable;
+6. **retired**: renamed, generalised, deprecated or removed, with downstream users migrated.
+
+Above the declarations, the PR is also a change the maintainers must accept: wanted, scoped,
+described and tested. Meta code (tactics, linters, scripts) is a program, not a proof. Its body
+is the product, like a definition's, and its review asks what any program review asks: every
+input form handled, tests present, errors clear, speed acceptable.
+
+Each review question is a part, asked about on behalf of one of these consumers. Mathlib's own
+guide lists its categories "approximately from easiest to hardest": style, documentation,
+location, improvements, then library integration, which it says "generally requires months of
+mathlib familiarity" (<https://leanprover-community.github.io/contribute/pr-review.html>). That
+order is the knowledge axis: an ask answerable from the diff, one needing the library's
+conventions, one needing what exists and where, and one needing where the library is going.
+
+## 2. The map: what is reviewed, for whom, from what evidence
+
+One row per object a PR can change, taken from the anatomy of Lean code, not from the asks.
+
+**Column key.**
+- **For whom:** the consumers of §1.3.
+- **Machine:** what CI already settles.
+- **Evidence:** local (the diff), convention (how the library writes it), repository (what exists
+  and where), vision (where the theory is going), execution (build time).
+- **Families:** the codebook families whose asks land in the row.
+
+| # | object | questions, and for whom | machine | evidence | families |
+|---|---|---|---|---|---|
+| 1 | theorem proof | clear and idiomatic (readers); robust, not abusing defeq, fast (maintainers, build); steps an existing lemma states (maintainers) | kernel, `flexible`, `maxHeartbeats` | local, convention, repository | F1 |
+| 2 | name | conventional and predictable, right terminology (finding); namespace enables dot notation (use) | `dupNamespace` | convention | F8 |
+| 3 | binders | explicit or implicit, argument order, section `variable`s (people); instance arguments `{}` or `[]` (automation) | `impossibleInstance`, `unusedArguments`, `unused{Decidable,Fintype}InType` | convention | F2 |
+| 4 | statement form | canonical predicate, coercion not projection, simp normal form, iff or one direction (people and automation at use sites) | `simpNF` for `@[simp]` lemmas only | convention | part of F6 |
+| 5 | registration | `simp`, `ext`, `gcongr`, `fun_prop`, `norm_cast`, priority, scope; generated twins with `to_additive`, `to_dual`, `simps` (automation) | `simpNF`, `simpComm` | convention, repository | F3, F4 |
+| 6 | **definition body and typeclass layer** | encoding (structure or synonym, bundled or unbundled, `extends` or a field, data or `Prop` class), reducibility of instance-supplying definitions, instance scope and priority, non-defeq diamonds, computability, universes; the basic API a new notion owes (every downstream proof, the theory's developers) | `structureInType`, `nonClassInstance` | repository, convention (library notes), vision | parts of F6, F3, F4, F7 |
+| 7 | generality and decomposition | weakest hypotheses and typeclasses; extract a reusable intermediate fact or inline a one-use one; the general result the special one follows from (people, the theory's developers) | none | repository, vision | F7, part of F6 |
+| 8 | the notion's family | siblings, duals and analogues present and consistent; one decision applied across them (the theory's developers) | none | repository | parts of F6, F8, F3 |
+| 9 | library relation and **location** | already exists or derivable (maintainers); the right file, directory and namespace; imports needed, not heavy, and in the right direction; split a file (finding, build) | `longFile`, header and import linters | repository (declarations, module graph) | F5, about 18% of F9 |
+| 10 | prose | docstrings, module docs, comments, references (readers) | `docBlame` for definitions, `style.docString` | local, convention | F10 |
+| 11 | layout | whitespace, breaks, parentheses, redundant qualification (readers) | most of the 23 syntax linters | local, convention | about 82% of F9 |
+| 12 | the change | wanted, one thing, described, AI use disclosed, tested, extended to the other places it applies (maintainers); **retirement**: renames and removals leave deprecated aliases (downstream) | title check, `deprecatedNoSince` | the PR's context, vision | F12, part of F5 |
+| 13 | meta code | handles every input, tested, clear errors, fast, documented (users of the tactic) | `tacticDocs` | local, execution | F11 |
+
+**Statement fidelity** runs across rows 4, 6 and 13: does the statement or definition say what
+is meant? It is `CORR`: the one question the kernel cannot settle and a reviewer must, rare and
+blocking.
+
+**Two questions cut across rows rather than living in one:**
+- **Consistency across siblings:** "Have improvements requested for one declaration been applied
+  to its counterpart declarations?" It appears in F1, F3, F8 and F12. It is the propagation pass
+  of `pr-review-v5-principled-design.md` D5, applied after the rows, not an arm.
+- **Retirement:** row 12's second half, under study in `docs/todo/removed-declarations.md`.
+
+## 3. What the map says about the arms we have
+
+### Duplication: one object, three arms
+
+The readers listed *every* arm whose written remit covers an ask. Two arms on one ask is
+therefore a measured remit overlap: 208 of the 1,833 asks have two or more owners on both
+readers' labels.
+
+| arm | asks owned | owned alone |
+|---|---|---|
+| `proof_idiom` | 146 | **18%** (115 shared with `proof_golf`) |
+| `api_reuse` | 103 | 54% (54 shared with the proof arms, all proof-step asks) |
+| `proof_golf` | 380 | 58% |
+| every other arm | | 82-92% |
+
+Three arms read row 1 and differ only in the flavour of the question: shorter, more idiomatic,
+or through an existing lemma. A maintainer asks one question and makes one edit. The other arms
+split cleanly. So the principle is:
+- **one object, one arm**, unless two questions about it need different evidence;
+- **orthogonal questions are never redundant** (`dead-ends.md`: "the gen checker is redundant
+  with golf").
+
+The family division's `proof` merge follows it.
+
+### Gaps: rows no arm owns
+
+| row | the ten | the family division | what the 1,000 PRs say |
+|---|---|---|---|
+| 6, definitions and the typeclass layer | none | partly: `design` names "encoding", `interface` names "registration" | 123 asks sit on a definition or instance and are design, registration, derivation or generality (F6/F3/F4/F7). That is 6.7% of all asks, more than generality (3.4%) or PR level (6.3%). Read one by one, most are encoding, typeclass or new-API questions; a handful are decomposition (row 7). The four most-cited library notes (`mathlib-convention-catalogue.md`) all sit in this row: reducible non-instances (364), lower instance priority (168), partially-applied ext lemmas (55), implicit instance arguments. So does "diamond instances and definitional equality issues" in Mathlib's guide. |
+| 9, location | none | `formatting` has placement within a file, not "which file" | about 38 of 216 formatting asks by one reading, plus location asks filed under F6 and F12 |
+| 4, statement form at use sites | none | inside `design`, beside generality | part of F6; its evidence is convention, like rows 2 and 3, not repository |
+| 12, retirement | `duplication` names it, but no arm can be scheduled on a removal | the same, through `library_fit` | 912 removed declarations on 21% of PRs; a separate thread |
+| 13, meta code | `correctness`, math only | `correctness`, math only, with meta code proposed | 5% of AI-PR asks; 14% of AI-PR targets are on meta paths |
+
+### Mis-cuts: families that are two rows
+
+The codebook's families were fitted to asks. Several of them hold two objects with different
+evidence:
+- **F9** is layout (row 11: local, mostly linted) plus location (row 9: the module graph).
+- **F6** is statement form (row 4), encoding (row 6), decomposition (row 7) and API completeness
+  (row 8).
+- **F5** is redundancy at introduction (row 9) plus deprecation at retirement (row 12).
+
+A coverage number computed over families therefore hides which half is owned. The 21.4%
+unowned share is a statement about the codebook as much as about the arms.
+
+## 4. Principles for dividing, and the division they give
+
+1. **Cover the complement.** Every row, in every column CI does not settle, has an owner.
+   Re-derive the division when a linter lands.
+2. **One object, one arm, unless the evidence differs.** Two questions about one object that
+   need different tools are two arms; two that need the same tools are one. That is why the
+   three proof arms become one.
+3. **Schedule by the object's change and by what the declaration is.** The inventory already
+   records both: which component changed (`proof`, `statement_or_type`, `attributes`,
+   `value_or_body`, ...) and the lifecycle event (added, modified, removed). Proof irrelevance
+   adds the subject kind: a theorem's proof goes to row 1, and a definition's body goes to row 6,
+   never to a golfing arm.
+4. **An arm's object fixes its grain:**
+   - line or declaration: rows 1-6, 10, 11;
+   - family: row 8;
+   - file: row 9;
+   - PR: row 12.
+5. **Name every consumer's question in the prompt.** An arm with one object and several
+   consumers asks only the questions it is told to. Row 1's robustness question has not been
+   asked by any proof prompt so far.
+
+Applied to the map, these give ten arms. The table marks where each differs from the family
+division.
+
+| arm | rows | scheduled on | against the family division |
+|---|---|---|---|
+| `proof` | 1 | theorem proofs, instance proof fields | unchanged, plus robustness named |
+| `naming` | 2 | declarations with an added or changed name | unchanged |
+| `interface` | 3, 4, 5 | added or changed binders, statement or attributes | **gains statement form** from `design`: use sites, convention evidence |
+| `definitions` | 6 | definitions, structures, classes, instances, abbreviations | **new** |
+| `design` | 7, 8 | theorems, and families of them | loses statement form; keeps generality and adds decomposition |
+| `library_fit` | 9 | added declarations, files and imports | **gains location** from `formatting`; this is Mathlib's own "Location" category |
+| `prose` | 10 | docstrings, module docs, comments | the same as `doc_quality` |
+| `layout` | 11 | changed text, except text-only edits | loses location; much of it is linted, so it may shrink to a deterministic pass |
+| `correctness` | fidelity, 13 | statements, definitions, meta code | meta code named, as the audit proposed |
+| `pr_level` | 12 | once per PR | unchanged; retirement waits for its own thread |
+
+Consistency across siblings runs after the rows as a propagation pass, not as an arm.
+
+## 5. How we know we are not missing an arm, or paying for one twice
+
+Each check below can be re-run, and none depends on a codebook fitted to the sample.
+
+1. **Completeness by construction.** The rows come from Lean's declaration anatomy and the
+   columns from a declaration's life after merge. Every non-machine cell must have an owner. A
+   new linter removes a cell; a new object kind adds a row.
+2. **Triangulation against the maintainers' own guide.** Every category and extra check in
+   Mathlib's review guide maps to a row:
+   - style → rows 2 and 11;
+   - documentation → 10;
+   - location → 9;
+   - improvements → 1, 6 and 7;
+   - library integration → 5, 6, 7 and 8;
+   - universes, instance attributes, lemmas for new definitions, diamonds → 6.
+
+   Both divisions miss what maps to rows 6 and 9.
+3. **Triangulation against the library notes.** The most-cited design notes, a citation-weighted
+   list of what Mathlib wrote down about itself, each map to an owner. Today they all land in
+   row 6, which has none.
+4. **Measured overlap.** Co-ownership from non-exclusive owner labels, per arm pair (§3). Only
+   the proof trio overlaps today.
+5. **Evidence cohesion.** List the tools each arm's questions need. An arm needing two disjoint
+   tool sets is two arms; two arms needing the same set on the same object are one.
+6. **The empirical residual.** Relabel the asks by *row* instead of by family, with a
+   pre-registered rubric and two readers. The unowned share then measures the structure, not a
+   codebook fitted to 60 PRs. NEW asks, meaning ones that fit no row, say where the map is
+   incomplete.
+
+## 6. What this does not settle
+
+- **The map is the auditor's derivation.** It rests on Lean's semantics, Mathlib's CI and
+  Mathlib's written guide, and it is checked against 150 read questions and the situated join.
+  It has not yet been checked by a relabel (check 6); that is the next measurement, and it costs
+  no model spend beyond readers.
+- **Row sizes other than rows 1, 2, 6 and 9 are family counts**, and families straddle rows (§3).
+  "About 123" for row 6 and "about 38" for row 9 come from the situated join and from one reading
+  of 88 keyword hits. They are estimates, not labels.
+- **The situated join covers inline asks only:** 1,472 of 1,610. PR-level and conversation
+  comments have no line to join on.
+- **Whether a derived division reaches more is still the audit's Track B measurement:** small12,
+  fanout, three reps, the fixed reading rule. The map says what to build and how to check its
+  coverage, not whether a model filling each remit will find the asks.
+- **Readers of one model family** produced every label used here. A human reading of rows 6 and 9
+  would outrank them.

@@ -214,3 +214,22 @@ A claim that fails is reported as failed; the proposal changes to follow the lar
 The
 exploratory readings are not pre-registered: the family ranking, the AI stratum against main, and
 the month-by-month shape. Shares get a 95% interval from a bootstrap over PRs.
+
+## The structure behind the division (2026-09-25)
+
+The user found the division ad hoc; it was, since it was cut from ask counts. The structure is in
+`docs/research/review-work-structure-2026-09.md`. It derives the rows of review work from three
+sources, none of them the sample:
+- what CI already checks;
+- proof irrelevance: a theorem's proof is disposable, while a definition's body fixes definitional
+  equality downstream;
+- a declaration's life after merge.
+
+**Found:**
+- **Duplication is only in the proof trio:** `proof_idiom` owns 18% of its asks alone.
+- **Two rows have no owner:** definitions and the typeclass layer (123 asks, 6.7%), and location.
+- **On definitions**, proof asks halve (33% to 16%) and design asks nearly double (16% to 28%).
+
+**Next, free:** relabel the 1,833 asks by the map's rows rather than the fitted families, with a
+pre-registered rubric and two readers. That is §5's check 6.
+
