@@ -420,3 +420,46 @@ ask, reached in rounds 1-2, is exactly the kind of result recall could produce.
 The PR-level result (rounds 1-3) and the run-variance finding (round 2) are between-brief
 comparisons, and stand at that altitude. Rules for future probes are in
 `.claude/rules/mathlib-review.md`.
+
+## What the probes can and cannot say about gold recall (2026-09-25)
+
+The user asked whether the probes support recommendations for reaching more **gold** obligations.
+Three checks against the pipeline's own record say they barely do.
+
+1. **Gold has almost no PR-level obligations.** `dev-medium-0.5.0`'s 43 gold obligations carry
+   these concern labels:
+
+   | label | obligations |
+   |---|---|
+   | style | 19 |
+   | duplication | 8 |
+   | naming | 4 |
+   | correctness | 4 |
+   | docs | 3 |
+   | proof-golf | 3 |
+   | generalization | 1 |
+   | **scope** | **1** |
+
+   The probes' one consistent positive, a PR-level job, cannot move held-out gold recall. It
+   matters for validation-set asks, where F12 is 6% of asks and 16% of AI-PR asks. But no gold
+   exists for those yet, and the gold chain may score fewer PR-level asks.
+2. **More samples do not add gold on the pipeline.** Over the three held-out reps, 7/5/6
+   obligations were hit, and 7 distinct ones across all three
+   (`the-admission-gate-2026-09.md`), the same as the best single rep. Round 2's second-run gain
+   (`X ∪ X′` over `X`) does not appear in the pipeline's gold scoring.
+3. **The whitespace loss in round 1 came from the probe's brief, not the pipeline's prompts.** The
+   current docs prompt skips only over-long lines, which the linter does settle.
+
+**What remains usable from the probes:**
+- **Method:** the `cli tool` loop, two runs per condition, and checking the reviewer's cutoff.
+- **Negative knowledge:**
+  - no support for a facet re-division;
+  - no support for compile access as a reach lever;
+  - no support for tuning precedent search, Zulip or `naming_norm` for reach.
+- **Information gaps:** other open PRs, and the description's links. These sit behind asks that
+  gold rarely holds.
+
+Evidence for gold recall has to come from the pipeline on its own model. The record's one lever on
+*found* gold is still forcing a verdict (0.20 → 0.50 on four PRs). On *published* gold it is the
+admission gate (7 found, 2 published), which is parked as selection by the user's 2026-09-22
+ruling.
