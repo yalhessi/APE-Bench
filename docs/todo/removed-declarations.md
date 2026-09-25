@@ -6,6 +6,16 @@ the task, not a build.
 **Cost:** free. It reads validation reviews and the structure build; no model calls, beyond
 optional readers on validation asks.
 
+**Inputs.** Neither is committed, so rebuild both, from the repo root with
+`PYTHONPATH=$PWD:$PWD/src`. The scripts are kept in
+`results/pr_review_v5/adjudications/arm-coverage-val1000-2025-06-2026-03-v1/provenance/`:
+- `build_structure.py <out_dir>` builds val1000's change graphs, work units and inventory per PR.
+  Since `e0c22f9` it should also build the three PRs that reorder imports;
+- `extract_draw_feedback.py val1000-2025-06-2026-03-v1 <out.json>` gives the round-1 comments with
+  their bodies, and refuses any test-set PR.
+
+The committed `events.jsonl` there has no bodies; its `cid`s match `reader_A` and `reader_B`.
+
 **Motivating example.** No arm can be scheduled on a removed declaration. `_BOTH_LIFECYCLES`
 (`agenda/arms.py:89`) admits `added` and `modified` only. Yet removals are common, and reviewers ask
 about them:
