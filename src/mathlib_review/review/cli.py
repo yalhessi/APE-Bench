@@ -260,6 +260,18 @@ def build_parser() -> argparse.ArgumentParser:
     trajectory.add_argument("--ape-root", type=Path, default=None)
     trajectory.add_argument("--tool-result-cap", type=int, default=None)
 
+    tool = sub.add_parser(
+        "tool", help="call one of the arms' own tools outside a run, for probes; calls no model")
+    tool.add_argument("name", help="a tool name, `list`, or `describe` (each tool as an arm sees it)")
+    tool.add_argument("--episodes", type=Path, required=True,
+                      help="an episodes.jsonl holding the PR (a release's input/ or a probe's)")
+    tool.add_argument("--pr", type=int, required=True)
+    tool.add_argument("--workdir", type=Path, required=True,
+                      help="where the reviewed overlay and the context trace are kept")
+    tool.add_argument("--run-config", type=Path, required=True,
+                      help="the run config whose scaffold (Lean timeouts, axioms) the tools use")
+    tool.add_argument("--arguments", default="", help="the tool's arguments, as a JSON object")
+
     return parser
 
 
@@ -527,6 +539,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
     if args.command == "report":
         return _report(args)
+    if args.command == "tool":
+        from src.mathlib_review.review.toolbox import main as tool_main
+
+        return tool_main(args)
     if args.command == "trajectory":
         from src.mathlib_review.analysis.trajectory import (
             DEFAULT_APE_ROOT, DEFAULT_TOOL_RESULT_CAP, assert_repo_root, write_trajectory,
