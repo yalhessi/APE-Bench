@@ -1,0 +1,50 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The PR has no description at all. It introduces a new core definition, `InformationTheory.entropy`, and makes several design choices that reviewers cannot evaluate without being told about them: it is defined on `PMF` rather than on `Measure`, it is real-valued via `tsum` in nats, and it silently takes the junk value 0 for non-summable (infinite-entropy) distributions. It gives no motivation, names no downstream use, and links no Zulip thread or earlier formalisation that it follows or departs from.",
+    "requested_change": "Write a description that states (a) why Shannon entropy is wanted now and what will build on it, (b) the design choice of `PMF` + `ℝ` + `tsum` and why it was preferred over a measure-based or `ℝ≥0∞`-valued definition, and (c) a link to the Zulip discussion where that choice was agreed, plus any dependent or downstream PRs.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'. The design questions are real ones for this library: the sibling definition `InformationTheory.klDiv` (Mathlib/InformationTheory/KullbackLeibler/Basic.lean:57) is defined on `Measure` with values in `ℝ≥0∞`, and it explains its junk-value choice in an 'Implementation details' section (lines 33-41). This PR explains neither."
+  },
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The PR does not say whether AI assistance was used, and Mathlib's contribution policy requires that disclosure. The text strongly suggests generated code: meta-commentary such as 'The following helper lemmas isolate the fiddly support / `toReal` / `tsum` plumbing so that the main proof reads at a higher level', typographic curly quotes (“remove one term from the entropy sum” trick), step-narration comments ('-- goal is now `card * negMulLog(1/card) = log card`'), and near-duplicate helper proofs.",
+    "requested_change": "Add the AI-use disclosure the policy requires, saying which tools were used and for which parts, so reviewers can calibrate how closely to check the proofs and docstrings.",
+    "severity": "blocking",
+    "evidence": "diff.patch, Mathlib/InformationTheory/Entropy.lean: the section comment above `support_nontrivial_of_not_pure`, the docstring of `negMulLog_ite_nonneg`, and the comments inside `nat_mul_negMulLog_inv_eq_log` and `entropy_uniformOfFintype`. The PR description is empty, so it contains no disclosure."
+  },
+  {
+    "target": "InformationTheory.entropy (Mathlib/InformationTheory/Entropy.lean)",
+    "question": "1",
+    "claim": "Shannon entropy is not yet in Mathlib: the only related definitions are `Real.binEntropy` and `Real.qaryEntropy`, which are functions of a real number, not of a distribution. So the addition is wanted, but its form conflicts with how its neighbour was built. `klDiv` works on measures and returns `∞` when the defining integral does not exist. This PR works on `PMF`, is `ℝ`-valued, and returns 0 when the sum does not converge, so any infinite-entropy distribution gets entropy 0. That is why `entropy_eq_zero_iff` and `entropy_pos_of_not_pure` need `[Finite α]`. The PR also claims the fully generic name `InformationTheory.entropy` (and the file name `InformationTheory/Entropy.lean`) for this PMF-only version, which would leave any later measure- or random-variable-based entropy, or conditional entropy and mutual information, without a natural name. It also gives no link to `klDiv`.",
+    "requested_change": "Settle the definition's form with the InformationTheory maintainers before merging. Either define entropy on (discrete or finitely supported) measures, consistent with `klDiv`, or keep `PMF` but justify the choice, document the `tsum` junk-value behaviour in the docstring, and choose a name and file that leave room for the general notion (e.g. `PMF.entropy` / `InformationTheory/Entropy/PMF.lean`). A bridge lemma to `klDiv` against the uniform distribution would show the two definitions fit together.",
+    "severity": "advisory",
+    "evidence": "mlgrep for '(def|abbrev) [a-zA-Z.]*[eE]ntropy' finds only binEntropy/qaryEntropy (Mathlib/Analysis/SpecialFunctions/BinaryEntropy.lean:63,211) and topological entropy under Mathlib/Dynamics. InformationTheory holds only Hamming.lean and KullbackLeibler/ (Mathlib.lean:4509-4511). klDiv: Mathlib/InformationTheory/KullbackLeibler/Basic.lean:57, `irreducible_def klDiv (μ ν : Measure α) : ℝ≥0∞`."
+  },
+  {
+    "target": "nat_mul_negMulLog_inv_eq_log",
+    "question": "6",
+    "claim": "The PR adds a public lemma in the `InformationTheory` namespace that is really a fact about real numbers, `n * negMulLog n⁻¹ = log n`, with an `ENNReal` cast wrapped around it. Its own docstring calls it 'A helper identity'. Exporting it under this name and namespace makes it undiscoverable where it belongs and leaves it in the API permanently.",
+    "requested_change": "Either make it `private`, or state it purely over `ℝ` (e.g. `Real.natCast_mul_negMulLog_inv`) in Mathlib/Analysis/SpecialFunctions/Log/NegMulLog.lean next to `negMulLog_mul`, and do the `ENNReal.toReal_inv`/`toReal_natCast` rewrite at the two use sites.",
+    "severity": "advisory",
+    "evidence": "diff.patch: `lemma nat_mul_negMulLog_inv_eq_log (n : ℕ) (hn : 0 < n) : (n : ℝ) * Real.negMulLog (((n : ENNReal)⁻¹).toReal) = Real.log n` sits inside `namespace InformationTheory`, and the only callers are entropy_uniformOfFintype and entropy_uniformOfFinset. The PR already edits NegMulLog.lean, where the other negMulLog algebra lives (lines 142-162)."
+  },
+  {
+    "target": "support_nontrivial_of_not_pure, toReal_lt_one_of_mem_support_of_not_pure (private)",
+    "question": "6",
+    "claim": "The private helpers re-prove the same general PMF fact twice with an identical `PMF.ext` argument. That fact is `p a = 1` (equivalently `p.support = {a}`) implies `p = PMF.pure a`, and it is missing from the PMF API. The helpers also re-derive `(p a).toReal ≤ 1` from `PMF.coe_le_one` three separate times. These are facts about PMFs, not about entropy, and hiding them as private lemmas in an InformationTheory file means the next user of PMF will prove them again.",
+    "requested_change": "Add public lemmas to the PMF files, e.g. `PMF.eq_pure_iff : p = pure a ↔ p a = 1` (or `↔ p.support = {a}`) in ProbabilityMassFunction/Monad.lean and `PMF.toReal_le_one` in ProbabilityMassFunction/Basic.lean, then use them in Entropy.lean in place of the private copies.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/ProbabilityMassFunction/Basic.lean:99 has `apply_eq_one_iff : p a = 1 ↔ p.support = {a}` and :120 `coe_le_one`. Monad.lean has only `pure_apply`, `support_pure`, `pure_apply_self`, `pure_apply_of_ne` (lines 48-59), with no characterisation of when `p = pure a`, and no PMF lemma about `toReal` exists (mlgrep over ProbabilityMassFunction). In the diff, the `by_cases hx : x = a0 ... PMF.ext` block appears verbatim in both private lemmas, and the `toReal_le_of_le_ofReal ... coe_le_one` step appears in entropy_nonneg, toReal_lt_one_of_mem_support_of_not_pure and negMulLog_ite_nonneg."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean (### Examples section)",
+    "question": "5",
+    "claim": "The library file ends with four `example`s that are sanity tests. Two of them just restate `entropy_pure`, and the other two restate `entropy_uniformOfFintype` and `entropy_uniformOfFinset`. Library files do not carry such tests: Mathlib/InformationTheory has none, and they cost build time in every downstream import. The docstring of one of them is also wrong: `Fin n` is `{0, ..., n-1}`, not `{0,1, ..., n}`.",
+    "requested_change": "Delete the examples. If any test is worth keeping, for instance to check that `simp` closes `entropy (PMF.pure a) = 0`, move it to a MathlibTest file.",
+    "severity": "advisory",
+    "evidence": "mlcount '^example' Mathlib/InformationTheory = 0. The only three `^example` lines under Mathlib/Probability are a do-notation illustration and two `sorry` lines inside a docstring (Independence/Integration.lean:26-27, ProbabilityMassFunction/Constructions.lean:147), and none of them is a sanity check. MathlibTest is the home for tests (31k lines, searchable) and currently has no PMF/entropy tests."
+  }
+]

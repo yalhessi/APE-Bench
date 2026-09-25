@@ -1,0 +1,42 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty, yet the title claims two separate bug fixes and the diff makes a design choice: it replaces the runtime environment import with a compile-time `linter_sets%` elaborator plus new `ToExpr` instances. Nothing says what was broken, how it showed up, since when, or why the compile-time route was chosen. There is also no AI-assistance statement. The consequence is large. At base, `getLakefileLeanOptions` passes Mathlib's `weak.linter.mathlibStandardSet` through `Lean.LeanOptions.toOptions`, which does not strip `weak.`. So the two default-off checks in that set, `linter.checkInitImports` and `linter.allScriptsDocumented`, appear never to have run in lint-style. This PR switches them on in CI. A maintainer cannot review a fix, or the checks it re-enables, without being told this.",
+    "requested_change": "Write a description that covers five things. (1) The symptom of each bug: the `weak.` prefix was not stripped, and the linter sets did not load at runtime. (2) Which checks were silently off, and that they are now enabled and pass on the current tree. (3) The PR that introduced the regression. It left `toLeanOptions` as dead code when it switched to `Lean.LeanOptions.toOptions`. (4) Why the linter sets are now embedded at compile time instead of loaded at runtime. (5) The AI-assistance disclosure the contribution policy requires.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'. Base scripts/lint-style.lean:42-49 defines `toLeanOptions` (it strips `weak.`) but nothing calls it; line 71 uses `Lean.LeanOptions.toOptions` instead. lakefile.lean:25-40 prefixes `linter.mathlibStandardSet` with `weak`. Mathlib/Init.lean:61-63 puts `linter.allScriptsDocumented` and `linter.checkInitImports` in that set. scripts/lint-style.lean:74 and :128 give both `defValue := false`."
+  },
+  {
+    "target": "Mathlib/Init.lean (linter.mathlibStandardSet)",
+    "question": "5",
+    "claim": "Once `weak.` options are honoured, `linter.mathlibStandardSet` really takes effect in lint-style, and that affects downstream projects too. Mathlib/Init.lean tells downstream projects to put `weak.linter.mathlibStandardSet` in their lakefile. The set contains two checks that only make sense in the Mathlib repository. `missingInitImports` parses `Mathlib.lean`, and `undocumentedScripts` walks `scripts/` and reads `scripts/README.md`. Neither was active before this PR, because the prefix was never stripped. After it, a downstream project that follows the Init.lean advice and runs `lake exe lint-style` (for example through lint-style-action) would get both checks, against files it does not have. The fix is not finished until the set is adjusted to match.",
+    "requested_change": "Take `linter.checkInitImports` and `linter.allScriptsDocumented` out of `linter.mathlibStandardSet`. Enable them only for Mathlib, for example in `mathlibOnlyLinters` in lakefile.lean (which also means updating the `DefinedInScripts` check in Mathlib/Init.lean:88-90). Alternatively, make the two checks skip when the workspace is not Mathlib. At minimum, test the effect on a downstream project and state it in the description.",
+    "severity": "blocking",
+    "evidence": "Mathlib/Init.lean:56-63: the docstring advises downstream projects to add `weak.linter.mathlibStandardSet`, and the set lists `linter.allScriptsDocumented` and `linter.checkInitImports`. scripts/lint-style.lean:86 calls `findImports \"Mathlib.lean\"`; :136-139 walk `scripts` and read `scripts/README.md`. :59-61 read the options from the root package of whichever workspace runs the script. The same lint-style-action is used in .github/workflows/*.yml."
+  },
+  {
+    "target": "scripts/lint-style.lean (lintStyleCli, linter_sets%)",
+    "question": "1",
+    "claim": "The repository already has a way to read environment-extension state in a compiled executable: `unsafe enableInitializersExecution` followed by `withImportModules`. LongestPole uses it in both of its executables. The base lint-style omitted only the `enableInitializersExecution` call. This PR drops that pattern and instead adds a new term elaborator, a generic `ToExpr (NameMap α)` instance and a `ToExpr LinterSets` instance, about 20 lines of new meta code. The compile-time route may well be better, since the script no longer loads an environment at startup. But the PR does not argue for it over the one-line fix that follows the existing convention, so reviewers cannot weigh the two.",
+    "requested_change": "Either say in the description why embedding the sets at compile time is preferable, confirming that the runtime import failed for a reason `enableInitializersExecution` does not fix. Or use the established pattern (`unsafe enableInitializersExecution` before `withImportModules`) and drop the new elaborator and instances.",
+    "severity": "advisory",
+    "evidence": "LongestPole/Main.lean:140-141 and LongestPole/Unused.lean:67-68 call `unsafe enableInitializersExecution` before `withImportModules`. Base scripts/lint-style.lean:155-157 calls `withImportModules` without it. The diff adds `section LinterSetsElab` with two instances and `elab \"linter_sets%\"`."
+  },
+  {
+    "target": "scripts/lint-style.lean (instance [ToExpr α] : ToExpr (NameMap α))",
+    "question": "6",
+    "claim": "The PR declares a general-purpose instance, `ToExpr (NameMap α)` for every α, inside an executable's script, where nothing else can reuse it and nothing tests it. Its `toTypeExpr` is hard-coded to `LinterSets`, so it is correct only for the one α this script uses. Mathlib keeps its general `ToExpr` instances in Mathlib/Tactic/ToExpr.lean and tests them in MathlibTest/DeriveToExpr.lean. `NameMap` itself is a Lean core type, so a generic instance belongs upstream.",
+    "requested_change": "If the instance is only needed here, drop the generic one and declare `ToExpr LinterSets` directly, local to the script. If a generic `ToExpr (NameMap α)` is wanted, write a correct one, with `toTypeExpr` built from `α`. Put it in Mathlib/Tactic/ToExpr.lean or upstream it to Lean core, and add a test.",
+    "severity": "advisory",
+    "evidence": "Diff: `instance [ToExpr α] : ToExpr (NameMap α) where ... toTypeExpr := .const ``LinterSets []`. Mathlib/Tactic/ToExpr.lean:16-54 holds Mathlib's generic ToExpr instances. A repo-wide search finds no other `ToExpr (NameMap ...)` instance in Mathlib."
+  },
+  {
+    "target": "scripts/lint-style.lean (toLeanOptions)",
+    "question": "5",
+    "claim": "Both bugs this PR fixes failed silently: checks were off and nothing reported it. The PR adds no guard against the regression happening again. `toLeanOptions` became dead code once before without anyone noticing, and nothing tests the new `linter_sets%` or the `weak.` stripping. The same approach used for other text-linter code would work here: MathlibTest/ModuleCasing.lean and MathlibTest/ForbiddenWindows.lean unit-test code from Mathlib/Tactic/Linter/TextBased.lean. Tests cannot reach code in scripts/.",
+    "requested_change": "Move `toLeanOptions`, which depends only on `Lean.LeanOptions`, into Mathlib/Tactic/Linter/TextBased.lean and add a MathlibTest unit test that `weak.linter.foo` maps to `linter.foo`. Or add a cheap self-check to `lintStyleCli` that fails loudly when a lakefile option names a linter set missing from `linterSets`.",
+    "severity": "advisory",
+    "evidence": "The base toLeanOptions (scripts/lint-style.lean:42) has no caller anywhere in the repo; its only match is its own definition. MathlibTest/ModuleCasing.lean:1-17 and MathlibTest/ForbiddenWindows.lean:12-14 build `LinterOptions` and test TextBased functions directly. No test in MathlibTest mentions lint-style, toLeanOptions or linterSetsExt."
+  }
+]

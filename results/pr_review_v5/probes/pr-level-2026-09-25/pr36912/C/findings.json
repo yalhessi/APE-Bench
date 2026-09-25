@@ -1,0 +1,37 @@
+[
+  {
+    "target": "push_proofs.sh",
+    "claim": "The PR adds a personal Termux automation script at the repository root; it is not Mathlib content, runs `git add .`, and hard-codes the author's fork branch `batmeezy918:feature/your-proofs`.",
+    "requested_change": "Delete `push_proofs.sh` from the PR; keep local submission scripts out of the repository.",
+    "severity": "blocking",
+    "evidence": "diff: new file push_proofs.sh containing `git checkout -b feature/your-proofs`, `git add .`, `git push -u origin feature/your-proofs`, `gh pr create --base leanprover-community:master --head batmeezy918:feature/your-proofs`."
+  },
+  {
+    "target": "Mathlib/Algebra/MyNewProofs.lean: my_add_comm",
+    "claim": "`my_add_comm` restates core `Nat.add_comm` verbatim (its proof is literally `Nat.add_comm a b`) and is also a special case of the generic `add_comm`, so it adds nothing to the library.",
+    "requested_change": "Remove `my_add_comm` (and with it the file `Mathlib/Algebra/MyNewProofs.lean`); use `Nat.add_comm` or `add_comm` at call sites.",
+    "severity": "blocking",
+    "evidence": "diff: `theorem my_add_comm (a b : Nat) : a + b = b + a := Nat.add_comm a b`. Mathlib already relies on core `Nat.add_comm` (Mathlib/Algebra/Group/Nat/Defs.lean:36 `add_comm := Nat.add_comm`), and the generic additive form of `mul_comm` is declared at Mathlib/Algebra/Group/Defs.lean:225."
+  },
+  {
+    "target": "Mathlib/Algebra/MyNewProofs.lean",
+    "claim": "The new file has no copyright header, no `module` line with `public import`s, and no `/-! ... -/` module docstring, so it fails the Mathlib header linter and does not match the module-system layout every neighbouring file uses.",
+    "requested_change": "If any content is kept, start the file with the standard `/- Copyright (c) YYYY ... Released under Apache 2.0 license ... Authors: ... -/` block, then `module`, `public import`s, and a `/-! # Title ... -/` module docstring describing the file.",
+    "severity": "blocking",
+    "evidence": "diff: file begins directly with `import Mathlib.Algebra.Group.Basic`. Mathlib/Tactic/Linter/Header.lean:173-178 and :425 check the copyright block and report a missing module doc-string; Mathlib/Algebra/Group/Basic.lean:1-21 shows the expected header/`module`/docstring layout (1276 of 1281 copyright-headed files in Mathlib/Algebra/*.lean have `module`)."
+  },
+  {
+    "target": "Mathlib/Algebra/MyNewProofs.lean",
+    "claim": "The new file is not imported from `Mathlib.lean`, so CI's `lake exe mk_all --check` step fails.",
+    "requested_change": "If the file is kept, run `lake exe mk_all` and commit the resulting `public import Mathlib.Algebra.MyNewProofs` line in `Mathlib.lean`.",
+    "severity": "blocking",
+    "evidence": "mlgrep 'MyNewProofs' finds no hit in the base tree and the diff does not touch Mathlib.lean; .github/workflows/build_template.yml:410-416 runs `lake exe mk_all --check` and :543 prints `Please run 'lake exe mk_all' to regenerate the import all files`."
+  },
+  {
+    "target": "Mathlib/Algebra/MyNewProofs.lean: my_add_comm",
+    "claim": "The declaration name `my_add_comm` and the file name `MyNewProofs` are placeholders that say nothing about content and ignore Mathlib naming (a `Nat` lemma belongs in the `Nat` namespace under `Mathlib/Algebra/Group/Nat/` or `Mathlib/Data/Nat/`).",
+    "requested_change": "Drop the `my_` prefix and the `MyNewProofs` file name; name any genuinely new lemma by its statement in the `Nat` namespace and place it in the existing file for that topic.",
+    "severity": "advisory",
+    "evidence": "diff: `theorem my_add_comm (a b : Nat)` in new file `Mathlib/Algebra/MyNewProofs.lean`; the existing Nat additive-structure file is Mathlib/Algebra/Group/Nat/Defs.lean."
+  }
+]

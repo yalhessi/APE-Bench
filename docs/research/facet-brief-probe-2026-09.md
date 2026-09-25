@@ -307,3 +307,90 @@ At probe altitude: 5 PRs, one run per condition, Claude reviewers.
    PR. Every future probe needs at least two runs per condition, or a comparison against a second
    run of the control, as round 2 had. The `cli tool` workbench makes that cheap: a round is about
    20 minutes of Claude time and no pipeline spend.
+
+---
+
+## Round 3: does a PR-level job reach PR-level asks across PRs? (2026-09-25)
+
+**Setup.** The rule was stated before running
+(`results/pr_review_v5/probes/pr-level-2026-09-25/README.md`).
+- **The sample:** ten val1000 PRs with at least 2 agreed PR-level (F12) round-1 asks. All five
+  eligible AI PRs, and 5 of 9 main PRs, drawn with seed 20250926.
+- **The asks:** 23, of which 21 are PR-level.
+- **Conditions:**
+  - **C:** the current brief, one run.
+  - **P:** a PR-level-only brief, two runs.
+- **Tools:** both held the base-pinned search tools; no compile.
+- **Matching and audit:** two blind matchers; the leak audit was clean across 30 transcripts.
+
+| | matcher 1 | matcher 2 |
+|---|---|---|
+| PR-level asks reached (of 21): C | 9 | 6 |
+| P, either run | **14** | **13** |
+| P, both runs (stability) | 12 (0.86) | 11 (0.85) |
+| reach: ≥ 7 ✓, and ≥ 3× C | ✗ (27 needed) | ✗ (18 needed) |
+| findings per PR per P run (≤ 4) | 5.2 ✗ | 5.2 ✗ |
+| **the rule** | **fails** | **fails** |
+| AI PRs (10 asks): C → P | 6 → 7 | 3 → 6 |
+| main PRs (11 asks): C → P | 3 → 7 | 3 → 7 |
+| all 23 asks: C → C ∪ P1 | 11 → 14 | 8 → 13 |
+
+**What it shows.**
+
+**The rule fails.** The current brief already reaches the obvious PR-level asks: "the files are
+unrelated to mathlib, don't test your scripts here", "split this PR", "disclose AI use" (6-9 of 21).
+So the round-1 and round-2 contrast on 29464 (0 against 4-10) does not generalise at that size.
+
+**But a PR-level job reaches about twice the PR-level asks the current brief does, and does it
+stably.**
+- It reaches 13-14 of 21 against 6-9, and agrees with itself across runs on 85%.
+- On main PRs the gain is consistent across matchers, 3 → 7. It is the asks a declaration-by-
+  declaration reviewer skips:
+  - "is there a test that would catch regressions?";
+  - "explain why these changes are beneficial";
+  - "the description should explain why the parameter goes away";
+  - "declare the PR this depends on".
+- It is noisier than the pre-set bound, at 5.2 findings per PR. That was set before running and is
+  not relaxed here.
+
+**Three asks no reviewer reached, each an information gap:**
+- **"The links in your description don't support your point" (36856):** needs the description's
+  links followed.
+- **"This looks to be a duplicate of #36915" (36914):** needs knowledge of the other open PRs.
+  Matcher 1 credited it only because all three reviewers asked to close the PR for other reasons.
+- **"Could a similar thing be done with `to_additive`?" (30650):** a meta-code analogue.
+
+The second is also behind "declare that this PR depends on that one" (28728), which P reached in
+one run only by reading the description.
+
+## What three rounds say
+
+At probe altitude: 20 PRs across the rounds, Claude reviewers, two blind matchers each round, all
+rules stated before running.
+
+1. **No brief-level change has yet passed a rule cleanly on breadth.**
+   - Round 1: the facet brief failed.
+   - Round 2: the complement passed on a gain concentrated in one PR.
+   - Round 3: the PR-level job failed on the ratio and the noise bound.
+
+   "What we tried did not move the needle as far as we required." That is not "these directions
+   are dead".
+2. **The one consistent positive signal is the PR level.**
+   - Across 11 PRs, a reviewer asked the PR-as-a-whole questions reaches about twice the PR-level
+     asks the current brief does, and stably.
+   - It is the family no current arm owns, and 16% of AI-PR asks.
+   - The `pr_level` arm exists opt-in on `arm-division`, with a PR summary (`53161eb`).
+   - The evidence supports building on it, with a precision guard for its ~5 findings per PR.
+     It does not support a whole re-division.
+3. **Single runs are noise at the issue level.**
+   - The same brief reached 1 and 4 of 8 on one PR (round 2).
+   - The PR-level job's two runs agree on 85%, so where a stable effect exists, two runs show it.
+4. **The next information to collect is outside the diff and outside the library,** from the
+   round-3 gaps and round 1's stated drops:
+   - **Other open PRs:** duplicates and dependencies. These are deterministic from the PR store:
+     PRs open at the review time that touch the same files or declarations.
+   - **The description's links.**
+   - **Compile as a probe.** Its value was shown in verifying design points (round 2), not in
+     reach.
+
+   Precedent search, Zulip and the naming census rarely carried a finding's evidence.

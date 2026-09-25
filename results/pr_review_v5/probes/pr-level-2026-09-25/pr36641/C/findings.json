@@ -1,0 +1,79 @@
+[
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.measureReal_le_div",
+    "claim": "Supermartingale.measureReal_le_div is not Ville's inequality. Ville's inequality bounds the probability that the process ever reaches the threshold, μ {ω | ∃ n, λ ≤ f n ω} ≤ 𝔼[f 0] / λ. The theorem as stated, for one fixed n, is only Markov's inequality combined with 𝔼[f n] ≤ 𝔼[f 0]. The name, docstring, module docstring and file name all claim the maximal result.",
+    "requested_change": "Either prove the actual maximal statement (a bound on μ {ω | ∃ n, lam ≤ f n ω}, or first on the sup over k ≤ n via the hitting time `hittingBtwn f {y | lam ≤ y} 0 n` and optional stopping, as `maximal_ineq` does, then take the union over n), or stop calling the current lemma Ville's inequality in its docstring, the module docstring and the file name.",
+    "severity": "blocking",
+    "evidence": "The proof is `mul_meas_ge_le_integral_of_nonneg (ae_of_all μ (hnn n)) (hf.2.2 n) lam` plus `hf.integral_le (Nat.zero_le n)` and then linarith. Nothing in it is maximal. The optional stopping lemma `integral_stoppedValue_le` in the same file, which a real Ville proof would need, is never used."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.measureReal_le_div_forall",
+    "claim": "measureReal_le_div_forall is `fun n => hf.measureReal_le_div hnn hlam n`: the same statement with `∀ n` moved outside, so it adds nothing. Its docstring calls it a 'uniform version ... holding for all n simultaneously', which wrongly suggests a bound on the supremum or the union.",
+    "requested_change": "Delete `measureReal_le_div_forall` and its module-doc entry, or replace it with a genuine uniform bound on `μ.real {ω | ∃ n, lam ≤ f n ω}`.",
+    "severity": "blocking",
+    "evidence": "The body is `fun n => hf.measureReal_le_div hnn hlam n`, and the conclusion `∀ n, μ.real {ω | lam ≤ f n ω} ≤ (∫ ω, f 0 ω ∂μ) / lam` is just `measureReal_le_div` with `n` bound by ∀."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: file header",
+    "claim": "The copyright and `Authors:` lines name 'AI Math Project' rather than the people contributing the code. Mathlib's header convention requires real author names.",
+    "requested_change": "Replace 'AI Math Project' in the Copyright and Authors lines with the names of the human contributor(s) responsible for the PR.",
+    "severity": "blocking",
+    "evidence": "Header reads `Copyright (c) 2026 AI Math Project. All rights reserved.` and `Authors: AI Math Project`. Every sibling file names people, e.g. Basic.lean has `Authors: Rémy Degenne, Kexing Ying` and OptionalStopping.lean has `Authors: Kexing Ying`."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.integral_le",
+    "claim": "Supermartingale.integral_le duplicates the existing `Supermartingale.setIntegral_le` at `s = Set.univ` but re-proves it by hand through `integral_condExp` and `integral_mono_ae`.",
+    "requested_change": "Replace the calc proof with `by simpa using hf.setIntegral_le hij MeasurableSet.univ`.",
+    "severity": "advisory",
+    "evidence": "Martingale/Basic.lean:153 already has `Supermartingale.setIntegral_le ... (hij : i ≤ j) {s} (hs : MeasurableSet[ℱ i] s) : ∫ ω in s, f j ω ∂μ ≤ ∫ ω in s, f i ω ∂μ`, and its proof is the same condExp argument."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.integral_le",
+    "claim": "Supermartingale.integral_le is stated only for index ℕ and values in ℝ, and it sits in a Ville file. It is a basic supermartingale fact that holds at the generality of its sibling `setIntegral_le`: any `[Preorder ι]` and any ordered Banach space `E`.",
+    "requested_change": "Move `integral_le` to Mathlib/Probability/Martingale/Basic.lean next to `Supermartingale.setIntegral_le`, using that file's variables (`ι`, `E` with `[PartialOrder E] [IsOrderedAddMonoid E] [IsOrderedModule ℝ E] [ClosedIciTopology E]`).",
+    "severity": "advisory",
+    "evidence": "The new file's variables fix `{ℱ : Filtration ℕ m0} {f : ℕ → Ω → ℝ}`, but the proof uses nothing about ℕ or ℝ. The sibling at Basic.lean:153 is stated for general ι and E."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.integral_stoppedValue_le",
+    "claim": "Supermartingale.integral_stoppedValue_le is a special case (τ = 0, real-valued) of the supermartingale counterpart of `Submartingale.expected_stoppedValue_mono`. It is also never used in this file, and it is the only reason for the OptionalStopping import.",
+    "requested_change": "State the general lemma in OptionalStopping.lean, right after `Submartingale.expected_stoppedValue_mono`: for a supermartingale with `τ ≤ π` bounded stopping times and general ordered `E`, `μ[stoppedValue f π] ≤ μ[stoppedValue f τ]`. Name it after its sibling (e.g. `Supermartingale.expected_stoppedValue_antitone`) and derive it from `hf.neg.expected_stoppedValue_mono`. Then remove this special case, or keep it only if the Ville proof actually uses it.",
+    "severity": "advisory",
+    "evidence": "Its proof applies `hsub.expected_stoppedValue_mono (isStoppingTime_const ℱ 0) hτ (fun _ => bot_le) hbdd`, and none of `integral_le`, `measureReal_le_div` or `measureReal_le_div_forall` refers to it. The sibling (OptionalStopping.lean:43) uses `μ[·]` notation and the `expected_stoppedValue_*` naming."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.integral_stoppedValue_le",
+    "claim": "The proof of Supermartingale.integral_stoppedValue_le proves the pointwise identity `h_neg`, which holds by definition, and then uses three separate `simp ... at key` steps plus `exact key` to peel off negations.",
+    "requested_change": "Replace the body with a single `simpa [stoppedValue, integral_neg] using hf.neg.expected_stoppedValue_mono (isStoppingTime_const ℱ 0) hτ (fun _ => bot_le) hbdd`, dropping `hsub`, `key` and `h_neg`. Alternatively, add a `rfl` lemma `stoppedValue_neg` to Probability/Process/Stopping.lean and simp with it.",
+    "severity": "advisory",
+    "evidence": "`stoppedValue u τ = fun ω => u (τ ω).untopA ω` (Stopping.lean:801), so `stoppedValue (-f) τ ω` unfolds to `-(f (τ ω).untopA ω)`. `h_neg` is `fun ω => by simp [stoppedValue, Pi.neg_apply]`."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.measureReal_le_div",
+    "claim": "Supermartingale.measureReal_le_div has stronger hypotheses than it uses. The proof needs only `0 ≤ᵐ[μ] f n`, but `hnn : ∀ n ω, 0 ≤ f n ω` asks for everywhere-nonnegativity at every index. `hlam : 0 < lam` is needed only because the bound is written as a division. The multiplicative form `lam * μ.real {..} ≤ ∫ f 0` holds for every `lam`, like `mul_meas_ge_le_integral_of_nonneg`.",
+    "requested_change": "Take `(hnonneg : 0 ≤ᵐ[μ] f n)` instead of `hnn`. State the main lemma as `ε * μ.real {ω | ε ≤ f n ω} ≤ ∫ ω, f 0 ω ∂μ` with no positivity hypothesis, and derive the division form from it if it is wanted at all.",
+    "severity": "advisory",
+    "evidence": "`hnn` is used only as `ae_of_all μ (hnn n)`. `mul_meas_ge_le_integral_of_nonneg {f} (hf_nonneg : 0 ≤ᵐ[μ] f) (hf_int) (ε : ℝ) : ε * μ.real {x | ε ≤ f x} ≤ ∫ x, f x ∂μ` has no sign condition on ε, and `hlam` enters only through `le_div_iff₀ hlam`."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.measureReal_le_div",
+    "claim": "The binder names in Supermartingale.measureReal_le_div (and in measureReal_le_div_forall) do not follow local conventions. `lam` and `hnn` break with the threshold/nonnegativity names used by `maximal_ineq` and Markov's inequality, and the docstrings write `λ` while the variable is `lam`.",
+    "requested_change": "Rename `lam` to `ε` and `hlam` to `hε`, and `hnn` to `hnonneg` (or use `0 ≤ f` as `maximal_ineq` does). Update the docstrings to name the actual variables.",
+    "severity": "advisory",
+    "evidence": "`maximal_ineq ... (hnonneg : 0 ≤ f) {ε : ℝ≥0}` (OptionalStopping.lean:157) and `mul_meas_ge_le_integral_of_nonneg ... (ε : ℝ)`. The docstring reads `μ.real {ω | λ ≤ f n ω} ≤ (∫ ω, f 0 ω ∂μ) / λ`, but the statement uses `lam`."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: MeasureTheory.Supermartingale.measureReal_le_div",
+    "claim": "Supermartingale.measureReal_le_div (and the calc in integral_le) reach into the structure of `Supermartingale` with anonymous projections `hf.2.2 n` and `hf.2.1 i j hij`, although named API exists.",
+    "requested_change": "Replace `hf.2.2 n`/`hf.2.2 i` with `hf.integrable n`/`hf.integrable i`, and `hf.2.1 i j hij` with `hf.condExp_ae_le hij`.",
+    "severity": "advisory",
+    "evidence": "Basic.lean:146 `protected theorem Supermartingale.integrable ... := hf.2.2 i` and Basic.lean:149 `theorem condExp_ae_le ... := hf.2.1 i j hij`."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean: file preamble",
+    "claim": "The file preamble carries boilerplate that does nothing for a theorem-only file. `@[expose]` and `noncomputable section` do nothing because the file has no definitions. `open MeasureTheory` directly before `namespace MeasureTheory` is redundant. The import `Mathlib.MeasureTheory.Integral.Bochner.Basic` is already transitive through `Mathlib.Probability.Martingale.Basic`.",
+    "requested_change": "Use plain `public section` as OptionalStopping.lean, OptionalSampling.lean and Convergence.lean do. Remove `noncomputable section`, `open MeasureTheory` and the Bochner import. Remove the OptionalStopping import as well if `integral_stoppedValue_le` moves out.",
+    "severity": "advisory",
+    "evidence": "The file contains only `theorem`s. Theorem-only siblings OptionalStopping.lean:30, OptionalSampling.lean:33 and Convergence.lean:46 use `public section` without `@[expose]`. Martingale/Basic imports ConditionalExpectation, which is built on the Bochner integral: `integral_condExp` and `integral_mono_ae` are already used through it."
+  }
+]

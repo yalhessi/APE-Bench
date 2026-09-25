@@ -1,0 +1,18 @@
+[
+  {
+    "target": "docs/references.bib (publisher field of the renamed entry)",
+    "question": "2",
+    "claim": "The publisher edit is a purely stylistic preference, not a correction. `{Amsterdam etc.: North-Holland}` is the zbMATH export form ('City: Publisher'), and 15 publisher fields in references.bib use it, including conway1990's `{New York etc.: Springer-Verlag}`. No Mathlib style rule prefers the MathSciNet form `North-Holland Publishing Co., Amsterdam`. Changing one entry leaves the file no more consistent than before, and the entry keeps its other zbMATH fields (fseries/series, language, keywords, zbmath, zbl), so it becomes a hybrid of the two styles.",
+    "requested_change": "Revert the publisher hunk and keep the PR to the author-name/key correction plus the title-to-note move, which does fix the rendered title. If a single publisher convention is wanted, propose it for all 15 'City: Publisher' entries in a separate PR.",
+    "severity": "advisory",
+    "evidence": "mlcount 'publisher += \\{[A-Z][A-Za-z .]+: ' docs/references.bib = 15 (lines 20, 96, 908, 1191, 1341, 1412, 1580, 2373, 2679, 2705, 2941, 4525, 4667, 5175, 5260); 28 entries carry a zbmath field; line 1412 conway1990 has the same `New York etc.:` form and this PR leaves it alone."
+  },
+  {
+    "target": "bib key roigdominguez1992 and the docstrings at Mathlib/Geometry/Manifold/Immersion.lean:277,519",
+    "question": "5",
+    "claim": "The PR's stated goal is canonical author names, and it renames the key to reach it. Yet the new key and the prose it rewrites still name each author by his second (maternal) surname. With the author field now `Margalef Roig, Juan and Outerelo Dom{\\'\\i}nguez, Enrique`, the first surnames are Margalef and Outerelo, so `Roig and Domínguez's [roigdominguez1992]` is still not the canonical short form. Renaming a key breaks external anchors to the references page. Doing it to another non-canonical key invites a second rename later, which is churn.",
+    "requested_change": "Take one of two options. (a) Rename the key once to a key built from the first surnames (e.g. margalefouterelo1992), and write the two docstring sentences as 'Margalef Roig and Outerelo Domínguez's [...]'. Or (b) keep the old key and fix only the spelled names. Either way, the prose on the lines this PR already touches should match the corrected author field.",
+    "severity": "advisory",
+    "evidence": "mlgrep 'Roig|Outerelo|Margalef' finds only Immersion.lean:90,277,519 and references.bib:4659. The diff changes lines 277/519 from 'Roig and Domingues'' to 'Roig and Domínguez's', keeping 'Roig', and sets author = {Margalef Roig, Juan and Outerelo Dom{\\'\\i}nguez, Enrique}."
+  }
+]

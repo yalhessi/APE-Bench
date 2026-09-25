@@ -1,0 +1,34 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The PR has no description at all, although it is a `perf` change that also alters the public signature of `Mathlib.Tactic.addRelatedDecl` and `elementwiseExpr` and changes what the generated `_assoc`/`_apply`/`_app` proofs look like (they now reference the source constant instead of inlining its proof term). A reviewer has to reconstruct the motivation and the safety argument from the diff, and there is no measurement backing the `perf` title.",
+    "requested_change": "Write a description that (a) states the motivation: `addRelatedDecl` passed `info.value!` to `construct`, so every derived lemma re-embedded the source's full proof and the kernel re-checked it; (b) states the design choice: `construct` now receives `.const src levelParams` and infers the type itself, which is why the `type` argument and the `mkExpectedTypeHint` calls go away; (c) reports `!bench` (or equivalent) numbers so the perf claim is measured; (d) flags the breaking change to `addRelatedDecl`'s `construct` signature and `elementwiseExpr`'s arguments for downstream users; (e) says whether AI assistance was used, per the contribution policy.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'. diff: `construct : Expr → Expr → List Name → ...` becomes `Expr → List Name → ...` in Mathlib/Util/AddRelatedDecl.lean:45; `elementwiseExpr (src : Name) (type pf : Expr)` becomes `(src : Name) (pf : Expr)` in Mathlib/Tactic/CategoryTheory/Elementwise.lean:85."
+  },
+  {
+    "target": "Mathlib/Util/AddRelatedDecl.lean (docstring of Mathlib.Tactic.addRelatedDecl)",
+    "question": "5",
+    "claim": "The PR changes the `construct` argument from `type value levels` to `value levels`, and `value` is no longer the declaration's body but the constant itself. The docstring still says `construct type value levels` is 'given the type, value, and universe variables of the original declaration', so the documentation of the changed API is now wrong.",
+    "requested_change": "Update the `construct` bullet to `construct value levels`, saying that `value` is the constant `src` applied to its universe parameters (not its proof term), so implementations should get its type with `inferType` and the new declaration refers to `src` rather than duplicating its proof.",
+    "severity": "blocking",
+    "evidence": "mlshow Mathlib/Util/AddRelatedDecl.lean lines 33-36: '* `construct type value levels : MetaM (Expr × List Name)` given the type, value, and universe variables of the original declaration, ...'. The diff edits lines 45 and 52 of this file but not the docstring."
+  },
+  {
+    "target": "CategoryTheory.reassocExpr / CategoryTheory.reassocExpr' (Mathlib/Tactic/CategoryTheory/Reassoc.lean)",
+    "question": "5",
+    "claim": "After this PR, every caller of `reassocExpr'` passes `type? := none`, so the `type?` parameter of `reassocExpr`/`reassocExpr'` and its `mkExpectedTypeHint` branch are dead code. The PR drops the analogous `type` argument from `elementwiseExpr` but leaves it in place here, so the three attributes end up inconsistent.",
+    "requested_change": "Remove the `type?` parameter from `reassocExpr` and `reassocExpr'` (and the `mkExpectedTypeHint` line 112 and the 'If `type?` is not given' docstring sentence), as the PR already does for `elementwiseExpr`. Alternatively, say in the description why it is being kept.",
+    "severity": "advisory",
+    "evidence": "mlgrep 'reassocExpr' over Mathlib: the only calls are Reassoc.lean:141 (`reassocExpr' value type`, changed by the PR to `reassocExpr' value none`) and Reassoc.lean:155 (`reassocExpr' e none`); line 124 is the internal forward to `reassocExpr`; IsoReassoc.lean only registers a handler."
+  },
+  {
+    "target": "MathlibTest/CategoryTheory/{Reassoc,Elementwise,ToApp}.lean",
+    "question": "5",
+    "claim": "The point of the PR is a property of the generated proof terms: the derived lemma should reference the source constant instead of copying its proof. No existing test checks this. The tests only check that the generated statements elaborate and are usable, so a later refactor could bring back the duplicated proof without anything failing.",
+    "requested_change": "Add a small regression test, e.g. in MathlibTest/CategoryTheory/Reassoc.lean, that checks the value of a generated `foo_assoc` (and `_apply`/`_app`) mentions `foo` and not `foo`'s proof body. `run_meta` with `(← getConstInfo ``foo_assoc).value!.getUsedConstants.contains ``foo` would do, or `#print` under `guard_msgs`.",
+    "severity": "advisory",
+    "evidence": "mlgrep '#print|value' on MathlibTest/CategoryTheory/Reassoc.lean and MathlibTest/CategoryTheory/Elementwise.lean: no hits; MathlibTest/CategoryTheory/ToApp.lean only has `@[to_app]` statement tests; no test mentions addRelatedDecl."
+  }
+]

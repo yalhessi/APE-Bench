@@ -1,0 +1,23 @@
+[
+  {
+    "target": "scripts/lint-style.lean: instance [ToExpr α] : ToExpr (NameMap α)",
+    "claim": "The generic `ToExpr (NameMap α)` instance hard-codes `toTypeExpr := .const ``LinterSets []`, so for any `α` other than the element type of `LinterSets` it reports the wrong type. `toExpr` builds a `Std.TreeMap Name α Name.quickCmp`, but `toTypeExpr` claims it is a `LinterSets`. This breaks the `ToExpr` contract.",
+    "requested_change": "Make the type expression depend on `α`: `toTypeExpr := mkApp (.const ``Lean.NameMap []) (toTypeExpr α)`, and keep `instance : ToExpr LinterSets := inferInstanceAs <| ToExpr (NameMap _)` for the specialisation. Alternatively, drop the generic instance and write one `instance : ToExpr LinterSets` whose `toTypeExpr` is `LinterSets`.",
+    "severity": "blocking",
+    "evidence": "Diff: `toExpr s := mkApp4 (.const ``Std.TreeMap.ofArray [.zero, .zero]) (toTypeExpr Name) (toTypeExpr α) (toExpr s.toArray) (.const ``Lean.Name.quickCmp [])` together with `toTypeExpr := .const ``LinterSets []`. The instance is quantified over every `α` with `[ToExpr α]`, yet its type is constant. Mathlib's own hand-written instances (Mathlib/Tactic/ToExpr.lean, e.g. `PUnit`, `MData`) give `toTypeExpr` the type of the value that `toExpr` builds."
+  },
+  {
+    "target": "scripts/lint-style.lean: instance [ToExpr α] : ToExpr (NameMap α)",
+    "claim": "A general-purpose `ToExpr` instance for the core type `Lean.NameMap` is declared as an orphan inside an executable script, where no other Mathlib code can find or reuse it.",
+    "requested_change": "Move the generic `ToExpr (NameMap α)` instance, once its `toTypeExpr` is fixed, to `Mathlib/Tactic/ToExpr.lean`, Mathlib's home for `ToExpr` instances of core types, or upstream it to Lean core. Keep only the `ToExpr LinterSets` instance and the `linter_sets%` elaborator in the script.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Tactic/ToExpr.lean ('`ToExpr` instances for Mathlib') collects the `ToExpr` instances for core types (`ULift`, `Syntax`, `MData`, `Expr`, ...). No other `ToExpr` instance for `NameMap`/`NameSet`/`LinterSets` exists in Mathlib (mlgrep `ToExpr \\(?(NameMap|NameSet|LinterSets)` returns nothing)."
+  },
+  {
+    "target": "scripts/lint-style.lean: toLeanOptions",
+    "claim": "The docstring of `toLeanOptions` still says it converts 'the options that Lake knows' and does not mention its one reason to exist: it strips the `weak.` prefix, which `Lean.LeanOptions.toOptions` does not. That gap is how the base code came to call `Lean.LeanOptions.toOptions` and leave this helper unused.",
+    "requested_change": "Rewrite the docstring to say that it converts a `Lean.LeanOptions` (as read from the Lakefile) into `Lean.Options`, and that, unlike `Lean.LeanOptions.toOptions`, it strips the `weak.` prefix (e.g. Mathlib's `weak.linter.mathlibStandardSet`), so it must be used instead of the core function. Also fix 'the option that Lean knows' to 'the options'.",
+    "severity": "advisory",
+    "evidence": "Base code: `getLakefileLeanOptions` returned `Lean.LeanOptions.toOptions (rootOpts.appendArray defaultOpts)` while `toLeanOptions` (with the weak-stripping logic) had no caller. lakefile.lean:40 prefixes every entry of `mathlibOnlyLinters` with `weak`. The PR changes the parameter type to `Lean.LeanOptions` but keeps the docstring 'Convert the options that Lake knows into the option that Lean knows.'"
+  }
+]

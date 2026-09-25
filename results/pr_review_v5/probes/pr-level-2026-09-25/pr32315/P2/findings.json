@@ -1,0 +1,26 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description presents this as a new feature and does not say what was broken or how it is fixed. `GRewrite.Config` extends `Rewrite.Config`, so `grw (transparency := ...)` was already accepted. `kabstract` already honoured the setting (Core.lean:108), but the `gcongr` step then got an implication goal that contained the instance found in `e`, not the pattern `lhs`. The reducible discharger (`dischargeMain` / `gcongrForward`) could not close `instance ~ rhs` with `hrel : lhs ~ rhs`, so the option failed silently. The PR changes how the implication goal is built for every `grw` call: the hole annotation moves from `rhs` in `eNew'` to `lhs` in the re-instantiated `e'`, and the `mdataLhs?` argument flips from `!forwardImp` to `forwardImp`. That affects all uses, not just the ones with a non-default transparency. There is no motivating use case, Zulip link or downstream PR, and nothing in Mathlib uses the new mode.",
+    "requested_change": "Rewrite the description. Say that the `transparency` field already existed and failed at the `gcongr` step. Explain the fix in two sentences: build the `gcongr` goal from `eAbst` instantiated with the pattern, so the main goal is exactly `lhs ~ rhs`. Say that this changes how the proof is built for all `grw` calls. Link the discussion or use case that motivated it. Consider retitling as `fix(grw): ...` or saying 'make ... work'.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Tactic/GRewrite/Core.lean:53 (`structure GRewrite.Config extends Rewrite.Config`), :107-108 (kabstract under `withConfig ... config`), :126-131 (old goal `e → eNew'` with the hole on `rhs`). Mathlib/Tactic/GCongr/Core.lean:520-531 (`mdataLhs?` selects which side carries the hole; the discharger runs on the annotated main goal). Mathlib/Tactic/GRewrite/Elab.lean shows no caller uses a non-default transparency."
+  },
+  {
+    "target": "PR (title, description, Elab.lean docstring, MathlibTest/GRewrite.lean)",
+    "question": "4",
+    "claim": "The advertised spelling is `grw (transparency := default)`, with a bare `default`. As far as I know, core declares `TransparencyMode` as `| all | default | reducible | instances deriving Inhabited`, so a bare `default` elaborates to `Inhabited.default`, which is `.all`, not the `.default` constructor. If so, the title, description, docstring and test all advertise a mode that also unfolds `@[irreducible]` definitions. That is stronger than `erw`. The single test passes under either value, so it cannot tell them apart. I could not check the core declaration with the tools, since core Lean is outside the search scope. Mathlib and core's `erw` consistently write `.default`.",
+    "requested_change": "Write `(transparency := .default)` in the title, the description, the `grw` docstring line and the test, matching core's `erw` and existing Mathlib usage. Add a test that pins the semantics: rewriting through an `@[irreducible]` definition should fail with `.default`.",
+    "severity": "advisory",
+    "evidence": "mlgrep 'transparency := \\.default': 8 hits, e.g. Mathlib/Tactic/ErwQuestion.lean:121 (`{ transparency := .default } -- Default transparency turns rw into erw`), Mathlib/Tactic/CongrExclamation.lean:719, Mathlib/Tactic/Convert.lean:120,176. The bare-`default` spelling appears once, as a function argument at Mathlib/Tactic/Generalize.lean:42. MathlibTest has no `(transparency := ...)` uses. The new test (`h : 2 + 1 ≤ (3 : Int)`, goal `1 + 2 ≤ 4`) closes at both `.default` and `.all`."
+  },
+  {
+    "target": "MathlibTest/GRewrite.lean",
+    "question": "5",
+    "claim": "The core change touches both implication directions: which side carries the hole and the `mdataLhs?` flag both depend on `forwardImp`. The single new test only exercises the goal direction (`forwardImp := false`, from `grewriteTarget`). The hypothesis direction (`grw ... at h`, `forwardImp := true`, from `grewriteLocalDecl`) is where the flipped Bool would show a mistake, and it is untested with non-reducible matching. So are `←` (symm) and `nth_grw` with occurrences. The test also does not show that plain `grw [h]` still fails, which is the behaviour that makes the option necessary, and it closes the result with `simp` instead of checking it.",
+    "requested_change": "Add tests: (a) `grw (transparency := .default) [h] at h'` where `h'` contains a default-but-not-reducible defeq instance; (b) a `←` variant; (c) `fail_if_success grw [h]` on the existing example, to document that reducible matching is still the default; (d) `guard_target =ₛ (3 : Int) ≤ 4` before closing, so the test pins the rewritten goal.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Tactic/GRewrite/Elab.lean:38 (`forwardImp := false` for the goal) and :54 (`forwardImp := true` for hypotheses). The diff changes `gcongr (!forwardImp)` to `gcongr forwardImp` in Core.lean:130 and swaps which side of `imp` is annotated. The existing `at` tests (MathlibTest/GRewrite.lean:48, 102, 137, 149, 253, 322) all use reducible matching."
+  }
+]

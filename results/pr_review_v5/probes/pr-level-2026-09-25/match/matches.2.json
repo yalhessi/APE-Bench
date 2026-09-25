@@ -1,0 +1,48 @@
+{
+  "asks": [
+    {"pr": 34773, "ask_id": "v1784", "R1": "reached", "R1_finding": 4, "R2": "reached", "R2_finding": 14, "R3": "reached", "R3_finding": 5, "note": "All three ask to delete the Examples section (or move to MathlibTest)."},
+    {"pr": 34773, "ask_id": "v1785", "R1": "partial", "R1_finding": 1, "R2": "no", "R2_finding": null, "R3": "partial", "R3_finding": 1, "note": "R1/R3 ask for AI disclosure; none asks to fix the PR title."},
+
+    {"pr": 36641, "ask_id": "v2131", "R1": "reached", "R1_finding": 4, "R2": "partial", "R2_finding": 2, "R3": "reached", "R3_finding": 5, "note": "R1 #4+#5 and R3 #5+#0 cover description, AI disclosure, title; R2 only header author names."},
+    {"pr": 36641, "ask_id": "v2132", "R1": "reached", "R1_finding": 0, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "All say fixed-time Markov bound is not Ville's maximal inequality."},
+
+    {"pr": 36856, "ask_id": "v2180", "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null, "R3": "no", "R3_finding": null, "note": "No reviewer checks the description's links or suspects hallucinated sources."},
+    {"pr": 36856, "ask_id": "v2181", "R1": "partial", "R1_finding": 1, "R2": "partial", "R2_finding": 0, "R3": "no", "R3_finding": null, "note": "R1/R2 call publisher edit no correction, revert that hunk only; maintainer closes whole PR."},
+
+    {"pr": 36912, "ask_id": "v2191", "R1": "reached", "R1_finding": 0, "R2": "partial", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "R1/R3 close the PR; R2 removes files piecemeal, never treats PR as unintended."},
+    {"pr": 36912, "ask_id": "v2192", "R1": "reached", "R1_finding": 0, "R2": "partial", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "R3 calls it a test PR, close; R1 close (+#1 personal script); R2 only removes script."},
+
+    {"pr": 36914, "ask_id": "v2193", "R1": "reached", "R1_finding": 0, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "All identify a personal/demo upload and ask to close the PR."},
+    {"pr": 36914, "ask_id": "v2194", "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null, "R3": "no", "R3_finding": null, "note": "No reviewer notes it duplicates another PR (#36915)."},
+
+    {"pr": 27841, "ask_id": "v0536", "R1": "no", "R1_finding": null, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "R2/R3 ask the description to motivate the changes and signature generalisation; R1 silent."},
+    {"pr": 27841, "ask_id": "v0537", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 3, "R3": "reached", "R3_finding": 3, "note": "All: generalise to involutive index, to_additive, move next to Equiv.tprod_eq in Basic.lean."},
+    {"pr": 27841, "ask_id": "v0538", "R1": "partial", "R1_finding": 10, "R2": "partial", "R2_finding": 5, "R3": "partial", "R3_finding": 6, "note": "All ask multiplicative to_additive form of main lemma; none asks to drop the R generalisation."},
+
+    {"pr": 28728, "ask_id": "v0674", "R1": "reached", "R1_finding": 13, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 1, "note": "All ask to split the PR into about three PRs."},
+    {"pr": 28728, "ask_id": "v0675", "R1": "no", "R1_finding": null, "R2": "partial", "R2_finding": 1, "R3": "reached", "R3_finding": 1, "note": "R3 says link the dependency in the description; R2 generically lists dependent PRs."},
+
+    {"pr": 29513, "ask_id": "v0838", "R1": "reached", "R1_finding": 4, "R2": "reached", "R2_finding": 1, "R3": "no", "R3_finding": null, "note": "R1/R2 ask for a regression test of the weak-prefix/linter-set bug; R3 none."},
+    {"pr": 29513, "ask_id": "v0839", "R1": "partial", "R1_finding": 4, "R2": "partial", "R2_finding": 1, "R3": "no", "R3_finding": null, "note": "R1/R2 propose unit tests or #guards, not running lint-style on a MathlibTest module."},
+
+    {"pr": 30650, "ask_id": "v1060", "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null, "R3": "no", "R3_finding": null, "note": "No reviewer suggests applying the same change to to_additive."},
+    {"pr": 30650, "ask_id": "v1061", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 2, "R3": "reached", "R3_finding": 0, "note": "All ask to update the construct docstring for its new signature."},
+    {"pr": 30650, "ask_id": "v1062", "R1": "reached", "R1_finding": 0, "R2": "partial", "R2_finding": 0, "R3": "no", "R3_finding": null, "note": "R1 asks the description to explain why type goes away; R2 only to note it."},
+
+    {"pr": 32315, "ask_id": "v1329", "R1": "no", "R1_finding": null, "R2": "partial", "R2_finding": 1, "R3": "partial", "R3_finding": 0, "note": "R2/R3 ask for motivation; none questions erw-like behaviour as technical debt."},
+    {"pr": 32315, "ask_id": "v1331", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 2, "R3": "reached", "R3_finding": 2, "note": "All ask for guard_target pinning the rewritten goal instead of closing with simp."},
+    {"pr": 32315, "ask_id": "v1332", "R1": "reached", "R1_finding": 2, "R2": "reached", "R2_finding": 2, "R3": "reached", "R3_finding": 2, "note": "All ask for more behaviour tests; R2 #1, R3 #0 also ask to explain the forwardImp flip."}
+  ],
+  "unmatched": {
+    "34773": {"R1": 3, "R2": 15, "R3": 4},
+    "36641": {"R1": 2, "R2": 8, "R3": 4},
+    "36856": {"R1": 1, "R2": 1, "R3": 2},
+    "36912": {"R1": 2, "R2": 4, "R3": 3},
+    "36914": {"R1": 9, "R2": 2, "R3": 6},
+    "27841": {"R1": 7, "R2": 3, "R3": 3},
+    "28728": {"R1": 25, "R2": 8, "R3": 7},
+    "29513": {"R1": 4, "R2": 2, "R3": 3},
+    "30650": {"R1": 2, "R2": 1, "R3": 1},
+    "32315": {"R1": 2, "R2": 0, "R3": 0}
+  }
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "target": "PR",
+    "question": "1",
+    "claim": "The PR adds nothing the library lacks. Everything in it restates something Mathlib or core already has. `my_add_comm` is core `Nat.add_comm`, which Mathlib already uses 88 times, and it is also the general `add_comm`. In MathlibDemo.lean, `id_op`, `comp`, `O_k`, `S` and `Ω` are new names for `ContinuousLinearMap.id` (which equals `1` by `one_def`), `.comp`/`*`, `k • 1`, `-1` and `O * O`. Those are already available through the existing `Ring` and `Algebra` instances on `H →L[ℝ] H`. The inductive `A` is a hand-rolled closure predicate, which `Submonoid.closure` and `Algebra.adjoin` already provide. `ψ_example` is only a `sorry`. The file proves no theorem at all.",
+    "requested_change": "Close the PR. If the author has a real result about operator algebras on Hilbert spaces, it should be stated in terms of the existing `H →L[ℝ] H` algebra and `Algebra.adjoin`/`Submonoid.closure`, and discussed on Zulip first.",
+    "severity": "blocking",
+    "evidence": "Nat.add_comm is not declared in Mathlib (mlfind finds only other namespaces' add_comm), and mlcount 'Nat\\.add_comm' Mathlib = 88. Mathlib/Algebra/Group/Defs.lean:225 `theorem mul_comm` (add_comm via to_additive). Mathlib/Topology/Algebra/Module/LinearMap.lean:343 `ContinuousLinearMap.id`, :351 `one_def : (1 : M₁ →L[R₁] M₁) = .id R₁ M₁`, :936 `instance ring`, :1137 `instance algebra`. Mathlib/Algebra/Group/Submonoid/Basic.lean:113 `Submonoid.closure`, Mathlib/Algebra/Algebra/Subalgebra/Lattice.lean:32 `Algebra.adjoin`. diff: `def ψ_example : H := sorry`."
+  },
+  {
+    "target": "push_proofs.sh",
+    "question": "2",
+    "claim": "This is the author's personal workflow script. It hard-codes their fork and branch (`batmeezy918:feature/your-proofs`), runs `git add .` and `git push`, and opens a PR with `gh pr create`. It has nothing to do with the mathematics and serves no Mathlib user. It sits at the repository root, where no scripts live. Mathlib's maintained tooling is in `scripts/` and has headers and a purpose. Merging it would ship a script that commits and pushes whatever is in the working tree of anyone who runs it.",
+    "requested_change": "Remove push_proofs.sh from the PR.",
+    "severity": "blocking",
+    "evidence": "diff: push_proofs.sh lines `git add .`, `git push -u origin feature/your-proofs`, `gh pr create --base leanprover-community:master --head batmeezy918:feature/your-proofs`. There is no shebang file at the repo root (mlgrep '^#!' ':(glob)*' returns nothing). Existing scripts are under scripts/ (e.g. scripts/add_deprecations.sh, scripts/auto_commit.sh)."
+  },
+  {
+    "target": "PR",
+    "question": "3",
+    "claim": "The PR bundles three unrelated things: a Hilbert-space operator demo (MathlibDemo.lean), a Nat commutativity lemma (MyNewProofs.lean), and a git/gh automation script. The title covers only the first. The script even generates MyNewProofs.lean and would open a *different* PR titled \"Add MyNewProofs\", which suggests the second file and the script got onto this branch by accident through `git add .`.",
+    "requested_change": "Drop MyNewProofs.lean and push_proofs.sh from this branch. Any genuine contribution should come as its own PR, scoped to its title.",
+    "severity": "blocking",
+    "evidence": "Changed files: Mathlib/Algebra/MathlibDemo.lean, Mathlib/Algebra/MyNewProofs.lean, push_proofs.sh. Title: \"feat: Add SNAP-demo Lean file\". push_proofs.sh: `cat > Mathlib/Algebra/MyNewProofs.lean << 'EOF'` ... `--title \"Add MyNewProofs\"`."
+  },
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is one line: \"Automated PR from Termux containing the MathlibDemo SNAP proof file\". It gives no motivation, never says what \"SNAP\" is, and states no design choice. It does not match the diff: there is no proof in the file (only defs and a `sorry`), and it does not mention MyNewProofs.lean or the script. It says the PR is automated but not whether the Lean content was AI-generated. Placeholder comments such as `-- user-defined state` suggest that it was, and Mathlib's contribution policy requires that disclosure. No Zulip discussion or downstream use is linked.",
+    "requested_change": "If the PR is kept at all, rewrite the description. It should state the motivation and what \"SNAP\" refers to, list every changed file, disclose whether and how AI tools produced the code, and link the Zulip thread or downstream project that motivates it.",
+    "severity": "blocking",
+    "evidence": "pr.md Description section, and the diff of MathlibDemo.lean (`def ψ_example : H := sorry  -- user-defined state`; no `theorem`/`lemma` in the file)."
+  },
+  {
+    "target": "Mathlib.lean",
+    "question": "5",
+    "claim": "The PR is not integrated with the library and cannot pass CI. Neither new file is added to Mathlib.lean, and CI runs `lake exe mk_all --check`, which fails on any Mathlib file missing from it. MathlibDemo.lean also imports `Mathlib.LinearAlgebra.LinearMap`, a module that does not exist at the base commit. Neither file follows the tree-wide `module` / `public import` header that every file in the base uses. So the PR was evidently never built against current Mathlib.",
+    "requested_change": "Moot if the PR is closed. Otherwise build it locally against master: add the files to Mathlib.lean (via `lake exe mk_all`), fix the imports, and use the `module`/`public import` header form.",
+    "severity": "blocking",
+    "evidence": ".github/workflows/build_template.yml:410-416 (`lake exe mk_all --check`). mlgrep 'Algebra\\.MathlibDemo|Algebra\\.MyNewProofs' Mathlib.lean finds nothing. mlshow Mathlib/LinearAlgebra/LinearMap.lean: \"path does not exist in 5160b96e\". Mathlib.lean uses `public import` (7796 lines), and Mathlib/Analysis/InnerProductSpace/Basic.lean:6 has `module`."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean",
+    "question": "6",
+    "claim": "Material about operators on a real Hilbert space does not belong in `Mathlib/Algebra/`. Continuous linear endomorphisms and their algebra structure live in `Mathlib/Topology/Algebra/Module/`, and inner-product-space operator theory lives in `Mathlib/Analysis/InnerProductSpace/` (for example the `CStarRing` instance and `IsSelfAdjoint` in Adjoint.lean). A generic \"Demo\" or \"MyNewProofs\" file with top-level unnamespaced names (`A`, `S`, `comp`, `Ω`) does not belong anywhere in Mathlib. Demo material belongs in the author's own project that depends on Mathlib.",
+    "requested_change": "Keep the demo in a downstream project. If any declaration survives review, move it into the relevant existing file under Mathlib/Topology/Algebra/Module/ or Mathlib/Analysis/InnerProductSpace/ with a proper namespace.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Topology/Algebra/Module/LinearMap.lean:936,1137 (Ring/Algebra on `M →L[R] M`). Mathlib/Analysis/InnerProductSpace/Adjoint.lean:282 `instance : CStarRing (E →L[𝕜] E)`, :323 `namespace IsSelfAdjoint`."
+  }
+]

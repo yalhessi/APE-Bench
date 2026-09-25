@@ -1,0 +1,79 @@
+[
+  {
+    "target": "PR",
+    "claim": "The PR is an automated upload from a personal Termux workflow (a demo file, a copy of `Nat.add_comm`, and the shell script that pushed them). It adds no mathematics to Mathlib and does not follow the contribution process.",
+    "requested_change": "Close the PR. If there is a real contribution, open a new PR with a clear description and only the Mathlib files it needs, after discussing it on Zulip.",
+    "severity": "blocking",
+    "evidence": "Description: 'Automated PR from Termux containing the MathlibDemo SNAP proof file'. push_proofs.sh runs `git add .` and `gh pr create ... --head batmeezy918:feature/your-proofs`."
+  },
+  {
+    "target": "push_proofs.sh",
+    "claim": "push_proofs.sh is a personal git/gh automation script at the repository root. It creates a branch, commits, pushes to a fork and opens a PR; it has nothing to do with Mathlib.",
+    "requested_change": "Delete push_proofs.sh from the PR.",
+    "severity": "blocking",
+    "evidence": "The diff adds push_proofs.sh with `git checkout -b feature/your-proofs`, `git add .`, `git push -u origin feature/your-proofs` and `gh pr create --base leanprover-community:master`."
+  },
+  {
+    "target": "Mathlib/Algebra/MyNewProofs.lean: my_add_comm",
+    "claim": "`my_add_comm` restates core `Nat.add_comm`; its whole proof is `Nat.add_comm a b`. The generic `add_comm` covers it too. The file adds no new content.",
+    "requested_change": "Delete Mathlib/Algebra/MyNewProofs.lean and use `Nat.add_comm` or `add_comm` directly.",
+    "severity": "blocking",
+    "evidence": "`theorem my_add_comm (a b : Nat) : a + b = b + a := Nat.add_comm a b`. The imports Mathlib.Algebra.Group.Basic and Mathlib.Algebra.Ring.Basic are not used by the statement."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean: imports",
+    "claim": "The file imports `Mathlib.LinearAlgebra.LinearMap`, which does not exist at the base commit, so the file cannot build.",
+    "requested_change": "Remove the nonexistent import. `Mathlib.Analysis.InnerProductSpace.Basic` already provides `→L[ℝ]`.",
+    "severity": "blocking",
+    "evidence": "mlshow: `path 'Mathlib/LinearAlgebra/LinearMap.lean' does not exist in '5160b96e'`. Mathlib.lean has only e.g. Mathlib.LinearAlgebra.Dimension.LinearMap."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean: A",
+    "claim": "The `id` constructor of inductive `A` is written `A id_op`. `id_op` takes the explicit section variable `(H : Type)`, so this is an elaboration (type mismatch) error. The other constructors pass `H` correctly (`comp H O₁ O₂`, `O_k H k`, `S H`).",
+    "requested_change": "Write `| id : A (id_op H)`, or make `H` implicit throughout.",
+    "severity": "blocking",
+    "evidence": "`variable (H : Type)` ... `def id_op : EndH H := ...` ... `inductive A : EndH H → Prop | id : A id_op`."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean: O_total",
+    "claim": "`O_total` does not elaborate. `comp`, `O_k`, `S` and `id_op` all take `H` explicitly, but `comp (O_k k) (comp S id_op)` passes `O_k k` and `S` where `H` is expected, and passes `k` as `H` to `O_k`.",
+    "requested_change": "Pass the explicit argument: `comp H (O_k H k) (comp H (S H) (id_op H))`. Better, use the ring structure: `(k • 1) * (-1 * 1)`.",
+    "severity": "blocking",
+    "evidence": "`def O_total (k : ℝ) : EndH H := comp (O_k k) (comp S id_op)`, while `def comp (O₁ O₂ : EndH H)` has `H` as an explicit variable."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean: ϕ_example",
+    "claim": "`ϕ_example` is defined as `sorry`. Mathlib does not accept `sorry`, and an arbitrary `H` need not be inhabited.",
+    "requested_change": "Remove `ϕ_example`.",
+    "severity": "blocking",
+    "evidence": "`def ϕ_example : H := sorry  -- user-defined state`."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean: EndH, id_op, comp, O_k, S, Ω",
+    "claim": "These root-namespace definitions duplicate the existing ring and algebra structure on `H →L[ℝ] H`. `id_op` is `1` (`ContinuousLinearMap.one_def`). `comp` is `*` (`ContinuousLinearMap.mul_def : f * g = f.comp g`). `O_k k` is `algebraMap ℝ (H →L[ℝ] H) k`. `S` is `-1`. `Ω O` is `O * O` / `O ^ 2`. Short names such as `A`, `S` and `comp` also pollute the root namespace.",
+    "requested_change": "Delete these definitions and use `H →L[ℝ] H` with `1`, `*`, `algebraMap`/`•`, `-1` and `^ 2` directly.",
+    "severity": "blocking",
+    "evidence": "Mathlib/Topology/Algebra/Module/LinearMap.lean:351 `one_def`, :544 `mul_def`, :1137 `instance algebra : Algebra S (M →L[R] M)`, :1140 `algebraMap_apply ... = r • m`."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean: A",
+    "claim": "The predicate `A`, commented as 'Algebra A', is not an algebra: it has no addition. Every generator (`id`, `k • id`, `-id`) is a scalar multiple of the identity, and that set is closed under composition. So `A O` holds exactly when `O ∈ (⊥ : Subalgebra ℝ (H →L[ℝ] H))`, the range of `algebraMap`. The `omega` constructor is also redundant with `comp`.",
+    "requested_change": "Remove `A`. If the intended object is the algebra generated by some operators, use `Algebra.adjoin ℝ s` or `⊥ : Subalgebra ℝ (H →L[ℝ] H)` and correct the comment.",
+    "severity": "advisory",
+    "evidence": "The constructors are `id`, `comp`, `scalar : ∀ k, A (O_k H k)`, `omega : A O → A (Ω H O)` (Ω O = O.comp O, already covered by `comp`), and `symm : A (S H)` with S = -id."
+  },
+  {
+    "target": "Mathlib/Algebra/MathlibDemo.lean",
+    "claim": "The file has no copyright header, no `module` keyword with `public import`s (every Mathlib file at this base uses the module system), and no `/-! ... -/` module docstring. Its operator-theory content also does not belong under Mathlib/Algebra.",
+    "requested_change": "If any of the file is kept, add the standard copyright/authors header, `module`, `public import`s and a module docstring, and place it under Mathlib/Analysis/InnerProductSpace/.",
+    "severity": "blocking",
+    "evidence": "Mathlib/Algebra/Group/Basic.lean:1-15 shows the required header, `module`, `public import ...` and `/-!` docstring. Mathlib/Tactic/Linter/Header.lean:189 gives 'Malformed or missing copyright header'. Mathlib.lean uses `public import`."
+  },
+  {
+    "target": "PR",
+    "claim": "Neither new file is added to Mathlib.lean, so CI's `lake exe mk_all --check` fails.",
+    "requested_change": "Run `lake exe mk_all` for any new file that stays; after the deletions requested above, no change to Mathlib.lean remains.",
+    "severity": "blocking",
+    "evidence": ".github/workflows/build_template.yml:416 `lake exe mk_all --check`. mlgrep finds no occurrence of MathlibDemo or MyNewProofs anywhere at the base commit."
+  }
+]

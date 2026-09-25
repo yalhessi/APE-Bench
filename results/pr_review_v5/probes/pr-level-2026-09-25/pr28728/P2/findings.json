@@ -1,0 +1,66 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty, and the title does not match the diff. There is no motivation (the Perron-Frobenius roadmap this starts), no statement of the design choices, no link to a Zulip discussion or downstream branch, and no AI-assistance disclosure. The title's scope `PerronFrobenius` is not a Mathlib path, and the title does not mention roughly 320 lines of quiver path-decomposition lemmas or the new `List` lemma.",
+    "requested_change": "Write a description that covers the motivation and links the downstream Perron-Frobenius work and any Zulip thread. Justify the design choices: real matrices only; `IsStronglyConnected` requiring paths of *positive* length, so a one-vertex quiver without a loop is not strongly connected, unlike the reflexive `stronglyConnectedSetoid` in the same file; and the name `Matrix.Irreducible` overlapping `_root_.Irreducible`, which already makes sense for elements of the monoid `Matrix n n ℝ`. State whether AI tools were used. Retitle with a path scope such as `feat(LinearAlgebra/Matrix/Irreducible): ...` that matches whatever remains after splitting.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'; title 'feat(PerronFrobenius): introduce Irreducible and Primitive Matrices and relations to Quiver'. The diff touches Combinatorics/Quiver/Path/Vertices.lean (+318 lines of decomposition lemmas) and Data/List/Basic.lean, and the title mentions neither. Parts of the proofs look machine-generated (long `simp_all only [...]` lists, `rw [propext (sum_pos_iff_of_nonneg h_nonneg)]`, `Filter.frequently_principal.mp` inside a Finset-sum proof, `rw [Eq.symm (add_sum_erase s f ha_mem),  ]`, `erw`), which makes the disclosure question pressing."
+  },
+  {
+    "target": "PR",
+    "question": "3",
+    "claim": "The PR bundles at least three independent changes. The new matrix file uses none of the Vertices.lean decomposition lemmas and none of the strongly-connected-component quotient. (1) The quiver path-decomposition lemmas in Vertices.lean, plus the `List` lemma that only they use. (2) A new StronglyConnected.lean with `IsStronglyConnected` and an SCC quotient. (3) Matrix irreducibility and primitivity. Mixing them makes review slow, and one contested part blocks the others.",
+    "requested_change": "Split into separate PRs: (a) quiver path decomposition at a vertex; (b) strongly connected quivers, keeping the SCC quotient only if it gets API or a use; (c) `Matrix.Irreducible` / `Matrix.IsPrimitive`, depending on (b), with the dependency linked in the description. Drop anything from (a) and (b) that nothing uses yet, or say in the description what downstream use it serves.",
+    "severity": "blocking",
+    "evidence": "Irreducible/Defs.lean imports only Quiver.Path.StronglyConnected and Quiver.Path.Decomposition, and uses only `IsStronglyConnected`, `Path.exists_notMem_mem_hom_path_path_of_notMem_mem` (from Decomposition.lean:24), `Path.eq_of_length_zero` and `Path.length_cons`. Decomposition.lean does not import Vertices.lean (its imports are Algebra.Order.Group.Nat, Quiver.Path and Tactic.Cases), so the matrix file cannot even reach `exists_comp_of_length_le`, `exists_comp_of_mem_vertices`, `split_at_vertices_index`, `exists_decomp_of_mem_vertices_not_mem_tail`, and the rest. Nothing in the PR uses `stronglyConnectedSetoid`, `StronglyConnectedComponent`, `StronglyConnectedComponent.eq` or `List.exists_mem_split`, apart from the one use of the last inside Vertices.lean."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean",
+    "question": "2",
+    "claim": "Several hunks to existing proofs are purely stylistic and unrelated to the PR. They drop the `List.` prefix in about ten existing proofs (the file already has `open List` at line 20, so nothing changes), and they rewrite working `simp only [...]` calls in `vertices_length` into plain `simp`. One hunk makes the file worse: it leaves commented-out debris in the import line.",
+    "requested_change": "Revert all edits to the existing declarations of Vertices.lean (verticesSet_nil, vertices_length, vertices_ne_nil, vertices_head?, vertices_getLast, vertices_comp, vertices_head_eq, end_mem_vertices). Restore `import Mathlib.Combinatorics.Quiver.Path` without the `--.Decomposition` suffix.",
+    "severity": "blocking",
+    "evidence": "diff: `-import Mathlib.Combinatorics.Quiver.Path` / `+import Mathlib.Combinatorics.Quiver.Path--.Decomposition`; hunks such as `List.mem_singleton`→`mem_singleton`, `List.head?_cons`→`head?_cons`, `List.getLast_mem`→`getLast_mem`, `List.dropLast_append_getLast`→`dropLast_append_getLast`. Base file Vertices.lean:20 already has `open List`."
+  },
+  {
+    "target": "List.exists_mem_split (Mathlib/Data/List/Basic.lean)",
+    "question": "1",
+    "claim": "`List.exists_mem_split` (x ∈ l → ∃ l₁ l₂, l = l₁ ++ x :: l₂) duplicates core's `List.append_of_mem`, which Mathlib already uses in exactly this shape; `List.mem_iff_append` also exists. The PR also appends the author to the 2014 Authors line of Data/List/Basic.lean for this one duplicate lemma.",
+    "requested_change": "Delete the lemma and use `List.append_of_mem` at its single use in `exists_comp_of_mem_vertices`. Revert the Authors-line change to Data/List/Basic.lean, so the PR no longer touches that file.",
+    "severity": "blocking",
+    "evidence": "Mathlib/Data/List/Permutation.lean:296 `rcases append_of_mem (...) with ⟨l₁, l₂, e⟩`; Mathlib/Data/Multiset/ZeroCons.lean:376 `rcases append_of_mem m₂ with ⟨r₁, r₂, rfl⟩`; Mathlib/Algebra/BigOperators/Group/List/Lemmas.lean:156; Mathlib/Data/List/Infix.lean:140 uses `List.mem_iff_append`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean (new section 'Path vertices decomposition')",
+    "question": "1",
+    "claim": "Several new lemmas restate declarations already in the same file, or restate each other. `vertices_head_eq_start` is `vertices_head_eq`. `vertices_getLast_eq_end` is `vertices_getLast_eq` / `vertices_getLast`. `end_eq_vertices_get_of_comp_length` is the symmetric form of `vertices_comp_get_length_eq`. `exists_prefix_of_mem_vertices_ne_end` has the same conclusion as the new `exists_comp_of_mem_vertices`, but with an extra hypothesis and `[DecidableEq V]`. `vertices_dropLast_isPrefix_of_vertices_eq` is `h ▸ List.prefix_append _ _` and has no use.",
+    "requested_change": "Remove these five lemmas and use the existing ones. The section also repeats `variable {V : Type*} [Quiver V]` and `open List`, both already in scope from lines 20-22.",
+    "severity": "blocking",
+    "evidence": "Base Vertices.lean:107 `vertices_head_eq ... (h := p.vertices_ne_nil) : p.vertices.head h = a`; :114 `vertices_getLast_eq ... : p.vertices.getLast h = b`; :83 `vertices_getLast`; :118 `vertices_comp_get_length_eq : (p₁.comp p₂).vertices.get ⟨p₁.length, h⟩ = c`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean (private helpers)",
+    "question": "1",
+    "claim": "The private helpers `sum_pos_of_mem` and `exists_mem_of_sum_pos` are the two directions of the existing `Finset.sum_pos_iff_of_nonneg`; the first is also `Finset.sum_pos'`. `sum_pos_of_mem` even rewrites with `sum_pos_iff_of_nonneg` inside its own proof. `mul_pos_iff_of_nonneg` is covered by `pos_and_pos_or_neg_and_neg_of_mul_pos` / `mul_pos_iff_of_pos_left`.",
+    "requested_change": "Delete the private helpers and call `Finset.sum_pos_iff_of_nonneg` (or `Finset.sum_pos'`) and the existing `mul_pos` lemmas directly in `pow_entry_pos_iff_exists_path`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/Order/BigOperators/Group/Finset.lean:153 `@[to_additive sum_pos_iff_of_nonneg] one_lt_prod_iff_of_one_le (hf : ∀ x ∈ s, 1 ≤ f x) : 1 < ∏ ... ↔ ∃ x ∈ s, 1 < f x`; :462 `@[to_additive sum_pos'] one_lt_prod'`; Mathlib/Algebra/Order/GroupWithZero/Unbundled/Basic.lean:43 `mul_pos_iff_of_pos_left`, :201 `pos_and_pos_or_neg_and_neg_of_mul_pos`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/StronglyConnected.lean",
+    "question": "6",
+    "claim": "`stronglyConnectedSetoid` / `StronglyConnectedComponent` (with `mk`, `CoeTC`, `eq`) copy line for line the existing `zigzagSetoid` / `WeaklyConnectedComponent` API, which lives in Combinatorics/Quiver/ConnectedComponent.lean, not under Path/. A connectivity notion placed in the Path/ subdirectory will be hard to find next to its weak counterpart.",
+    "requested_change": "Move the strong-connectivity material into (or beside) Mathlib/Combinatorics/Quiver/ConnectedComponent.lean, e.g. Quiver/StronglyConnected.lean, so the weak and strong notions sit together, and cross-reference them in the module docstrings.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Combinatorics/Quiver/ConnectedComponent.lean:28 `def zigzagSetoid`, :35 `def WeaklyConnectedComponent`, :43 `protected def mk`, :46 `instance : CoeTC V (WeaklyConnectedComponent V)`, :52 `protected theorem eq`. The PR's StronglyConnected.lean reproduces this structure."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean (path splitting lemmas)",
+    "question": "6",
+    "claim": "The new split-at-a-vertex results live in Vertices.lean, but the base already has a file for path decomposition, Path/Decomposition.lean, whose docstring is 'Path Decomposition'. The SimpleGraph analogue, WalkDecomp.lean, provides this as `takeUntil` / `dropUntil` / `take_spec` / `mem_support_iff_exists_append`, not as a family of existential lemmas with `let`-bound indices and `get` equations.",
+    "requested_change": "Put the decomposition lemmas in Path/Decomposition.lean, adding the import of Vertices there, and consider following the WalkDecomp design (define `takeUntil`/`dropUntil` for quiver paths and prove `take_spec`), so the quiver and simple-graph APIs match.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Combinatorics/Quiver/Path/Decomposition.lean:11-16 (module doc 'Path Decomposition and Boundary Crossing'); Mathlib/Combinatorics/SimpleGraph/Connectivity/WalkDecomp.lean:30 `def takeUntil`, :69 `def dropUntil`, :83 `theorem take_spec`, :94 `theorem mem_support_iff_exists_append`."
+  }
+]

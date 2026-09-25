@@ -1,0 +1,114 @@
+[
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy",
+    "claim": "The docstring of `entropy` states `H(X) = ∑_{x ∈ 𝒳} p(x) · log(p(x))`, which is missing the minus sign (that sum is ≤ 0, while the definition uses `negMulLog` and is ≥ 0). It also does not say that for an infinite type with non-summable terms the `tsum` returns the junk value 0.",
+    "requested_change": "Change the formula to `H(X) = -∑ₓ p(x) log p(x)`. Add a sentence saying that when the series is not summable, the definition returns 0 by the `tsum` convention.",
+    "severity": "blocking",
+    "evidence": "Diff lines 80-83: docstring `∑ p(x) · log(p(x))` vs body `∑' a, Real.negMulLog (ENNReal.toReal (p a))`; NegMulLog.lean:142 `negMulLog x = - x * log x`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy",
+    "claim": "`entropy` is defined only for `PMF α`, but the neighbouring information-theory API is stated for measures: `InformationTheory.klDiv (μ ν : Measure α)`. The PMF-only definition takes the generic name `InformationTheory.entropy` and does not connect to the measure-based probability library.",
+    "requested_change": "State the entropy for a (probability) measure on a countable type with measurable singletons, e.g. `∑' a, negMulLog (μ.real {a})`. Recover the PMF version through `p.toMeasure`, or give the PMF version a PMF-specific name (e.g. `PMF.entropy`), so that `InformationTheory.entropy` is left for the measure version.",
+    "severity": "advisory",
+    "evidence": "Mathlib/InformationTheory/KullbackLeibler/Basic.lean:51-57 `namespace InformationTheory ... noncomputable irreducible_def klDiv (μ ν : Measure α)`; diff line 82 `noncomputable def entropy (p : PMF α) : ℝ`."
+  },
+  {
+    "target": "Mathlib/Analysis/SpecialFunctions/Log/NegMulLog.lean: Real.negMulLog_pos_of_pos_lt_one",
+    "claim": "The new lemma `negMulLog_pos_of_pos_lt_one` is the strict version of the sibling `negMulLog_nonneg`, which carries its hypotheses without a `_of_...` suffix. The long name breaks the local convention.",
+    "requested_change": "Rename it to `negMulLog_pos`, with hypotheses `(h0 : 0 < x) (h1 : x < 1)` mirroring `negMulLog_nonneg`. Update the two uses in Entropy.lean.",
+    "severity": "advisory",
+    "evidence": "NegMulLog.lean:152 `lemma negMulLog_nonneg {x : ℝ} (h1 : 0 ≤ x) (h2 : x ≤ 1) : 0 ≤ negMulLog x`; diff line 19 `lemma negMulLog_pos_of_pos_lt_one {x : ℝ} (hx0 : 0 < x) (hx1 : x < 1)`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.toReal_lt_one_of_mem_support_of_not_pure",
+    "claim": "The hypothesis `hx : x ∈ p.support` is never used in the proof, and the statement holds for every `x` (outside the support, `p x = 0 < 1`). The lemma name advertises a hypothesis it does not need.",
+    "requested_change": "Drop `hx` and the `_of_mem_support` part of the name (e.g. `toReal_lt_one_of_not_pure`), and update the call sites in `entropy_eq_zero_iff`.",
+    "severity": "advisory",
+    "evidence": "Diff lines 132-148: the proof uses only `h_not`, `PMF.coe_le_one`, `apply_eq_one_iff` and `apply_eq_zero_iff`; `hx` never occurs after the signature."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.support_nontrivial_of_not_pure",
+    "claim": "The argument \"`p x = 1` (support = {x}) implies `p = PMF.pure x`\" is written out twice, near-verbatim: in `support_nontrivial_of_not_pure` and in `toReal_lt_one_of_mem_support_of_not_pure`. It is a general PMF fact with no existing API lemma, and here it is hidden as `private` inside an information-theory file.",
+    "requested_change": "Add a public lemma to `Mathlib/Probability/ProbabilityMassFunction/Monad.lean`, e.g. `PMF.eq_pure_iff : p = pure a ↔ p a = 1` (or `↔ p.support = {a}`). Use it in both places, and move `support_nontrivial_of_not_pure` (if kept) next to it as public PMF API.",
+    "severity": "advisory",
+    "evidence": "Diff lines 123-128 and 142-147 are the same `PMF.ext fun x => by by_cases ...; subst ...; simpa only [PMF.pure_apply, ↓reduceIte] ...` block; Monad.lean has `support_pure`, `pure_apply_self`, `pure_apply_of_ne` but no `eq_pure_iff`; Basic.lean:99 `apply_eq_one_iff`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_eq_zero_iff",
+    "claim": "The proof builds a two-point support, proves both summands positive, splits off one term with `tsum_eq_add_tsum_ite`, and needs the two helpers `negMulLog_ite_nonneg` and `entropy_tsum_ite_ge`. A single support point with `0 < p a < 1` already gives positivity through the existing `Summable.tsum_pos`.",
+    "requested_change": "Prove `entropy_pos_of_not_pure` directly as `Summable.tsum_pos Summable.of_finite (fun b => negMulLog_nonneg ...) a (negMulLog_pos ...)` for any `a ∈ p.support`. Derive `entropy_eq_zero_iff` from it and `entropy_pure`, and delete `negMulLog_ite_nonneg`, `entropy_tsum_ite_ge` and `support_nontrivial_of_not_pure`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Topology/Algebra/InfiniteSum/Order.lean:228-230 `@[to_additive Summable.tsum_pos] ... (hsum) (hg : ∀ i, 1 ≤ g i) (i) (hi : 1 < g i)`; diff lines 150-197 (h2 and the second support point are only needed for the ite-splitting route)."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_eq_zero_iff",
+    "claim": "The continuation line of the statement of `entropy_eq_zero_iff` is indented by 2 spaces. Mathlib style requires 4 spaces for a statement that continues onto a new line.",
+    "requested_change": "Indent `entropy p = 0 ↔ ∃ a : α, p = PMF.pure a := by` by 4 spaces. While there, remove the stray `;` after `subst hx`/`subst hy` in the helper proofs.",
+    "severity": "advisory",
+    "evidence": "Diff line 177 `  entropy p = 0 ↔ ∃ a : α, p = PMF.pure a := by` (2 spaces); diff lines 125, 144 `· subst hx;`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_eq_zero_iff",
+    "claim": "`[Finite α]` is used only to get summability of the entropy series (`Summable.of_finite`). Both `entropy_eq_zero_iff` and `entropy_pos_of_not_pure` hold for any PMF whose entropy series is summable, for example any PMF with finite support.",
+    "requested_change": "Replace `[Finite α]` with a hypothesis `(hp : Summable fun a => Real.negMulLog (p a).toReal)` in `entropy_eq_zero_iff` and `entropy_pos_of_not_pure`. Optionally keep the `Finite` versions as one-line corollaries.",
+    "severity": "advisory",
+    "evidence": "Diff lines 168-169 and 194-195: the only uses of `Finite α` are `Summable.of_finite`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_pos_of_not_pure",
+    "claim": "The proof of `entropy_pos_of_not_pure` takes five lines of `have`s plus a `simpa [eq_comm]` for what is one term, and it passes a redundant `(α := α)` to `entropy_nonneg`.",
+    "requested_change": "Replace the proof with `(entropy_nonneg p).lt_of_ne' fun h => hp ((entropy_eq_zero_iff p).1 h)`, or prove it directly with `Summable.tsum_pos` as in the restructuring of `entropy_eq_zero_iff`.",
+    "severity": "advisory",
+    "evidence": "Diff lines 205-210."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_bernoulli_eq_binEntropy",
+    "claim": "The proof of `entropy_bernoulli_eq_binEntropy` calls `simp_all [..., ENNReal.toReal]`, which unfolds the definition of `ENNReal.toReal` instead of using its API. That relies on an implementation detail and is fragile. `simp_all` is also unnecessary, since no local hypothesis needs simplifying.",
+    "requested_change": "Rewrite the proof with the API: `simp [entropy, PMF.bernoulli_apply, tsum_bool, ENNReal.toReal_sub_of_le, NNReal.coe_sub h, Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]` or similar. Do not unfold `ENNReal.toReal`.",
+    "severity": "advisory",
+    "evidence": "Diff lines 217-218; Constructions.lean:303 `bernoulli_apply : bernoulli p h b = cond b p (1 - p)`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_bernoulli_eq_binEntropy",
+    "claim": "The other computation lemmas in this file are named after the left-hand side only (`entropy_pure`, `entropy_uniformOfFinset`, `entropy_uniformOfFintype`), but this one repeats the right-hand side in its name.",
+    "requested_change": "Rename `entropy_bernoulli_eq_binEntropy` to `entropy_bernoulli`, and update the module docstring.",
+    "severity": "advisory",
+    "evidence": "Diff lines 88, 215, 242, 255 (names of the sibling lemmas)."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.nat_mul_negMulLog_inv_eq_log",
+    "claim": "`nat_mul_negMulLog_inv_eq_log` is a pure real-analysis identity, stated awkwardly through `((n : ℝ≥0∞)⁻¹).toReal` and exported as public from the `InformationTheory` namespace. The hypothesis `0 < n` is unnecessary: `x * negMulLog x⁻¹ = log x` holds for every real `x`, since `log_inv` holds for all `x` and both sides are 0 at `x = 0`. The 5-step calc is correspondingly long.",
+    "requested_change": "Replace it with `lemma Real.mul_negMulLog_inv (x : ℝ) : x * negMulLog x⁻¹ = log x` in `NegMulLog.lean`, proved by a short `by_cases hx : x = 0 <;> simp [negMulLog, log_inv, hx]`-style proof. Use it in the uniform-distribution lemmas after `ENNReal.toReal_inv, ENNReal.toReal_natCast`.",
+    "severity": "advisory",
+    "evidence": "Diff lines 223-239; Mathlib/Analysis/SpecialFunctions/Log/Basic.lean:142 `theorem log_inv (x : ℝ) : log x⁻¹ = -log x`; `Real.log 0 = 0`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_uniformOfFintype",
+    "claim": "`PMF.uniformOfFintype α` is by definition `uniformOfFinset Finset.univ Finset.univ_nonempty`. `entropy_uniformOfFintype` therefore repeats the computation of `entropy_uniformOfFinset`, and it does so with a non-terminal `simp` followed by `simpa`.",
+    "requested_change": "Prove it as a corollary: `by simpa using entropy_uniformOfFinset (Finset.univ : Finset α) Finset.univ_nonempty` (unfolding `PMF.uniformOfFintype`, with `Finset.card_univ`). Drop the `classical` and the non-terminal `simp`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/Distributions/Uniform.lean:288-289 `def uniformOfFintype ... := uniformOfFinset Finset.univ Finset.univ_nonempty`; diff lines 244-248."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_uniformOfFinset",
+    "claim": "The proof of `entropy_uniformOfFinset` unfolds the definition `PMF.uniformOfFinset` (`simp [p, PMF.uniformOfFinset, ...]`) instead of using its API lemmas. It also wraps a `Finset.sum_congr` inside a nested `have` inside a calc, which makes it much longer than necessary.",
+    "requested_change": "Use `PMF.uniformOfFinset_apply_of_notMem` in the `tsum_eq_sum` side goal and `PMF.uniformOfFinset_apply_of_mem` in a direct `Finset.sum_congr`, then `Finset.sum_const, nsmul_eq_mul` and the (generalized) `mul_negMulLog_inv` lemma. Remove the `set`s and the calc.",
+    "severity": "advisory",
+    "evidence": "Diff lines 258-282; Uniform.lean:238 `uniformOfFinset_apply_of_mem (ha : a ∈ s) : uniformOfFinset s hs a = (s.card : ℝ≥0∞)⁻¹`, Uniform.lean:241 `uniformOfFinset_apply_of_notMem`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: examples section",
+    "claim": "The file ends with four `example`s, which do not belong in a Mathlib library file. The docstring of the `Fin n` example is also wrong: it says the uniform distribution is on `{0,1, ..., n}`, but `Fin n` is `{0, ..., n-1}`.",
+    "requested_change": "Move the examples to a test file under `MathlibTest/`, or delete them, and fix the `Fin n` description to `{0, ..., n - 1}`.",
+    "severity": "advisory",
+    "evidence": "Diff lines 284-299, in particular line 292 `/-- Entropy of the uniform distribution on `{0,1, ..., n}` is `log n`. -/` over `PMF.uniformOfFintype (Fin n)`."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean: InformationTheory.entropy_nonneg",
+    "claim": "`entropy_nonneg` is only exposed as a `@[simp]` lemma, so `positivity` cannot prove goals such as `0 ≤ entropy p` or `0 ≤ c * entropy p`, which are the typical downstream uses of a nonnegative real-valued quantity.",
+    "requested_change": "Add a `positivity` extension for `InformationTheory.entropy` based on `entropy_nonneg`, instead of relying on `@[simp]`.",
+    "severity": "advisory",
+    "evidence": "Diff line 98 `@[simp] lemma entropy_nonneg (p : PMF α) : 0 ≤ entropy p`."
+  }
+]

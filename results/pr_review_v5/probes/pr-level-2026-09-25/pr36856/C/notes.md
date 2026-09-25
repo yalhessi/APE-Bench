@@ -1,0 +1,8 @@
+# PR 36856 notes (condition C)
+
+- `docs/references.bib` (`roigdomingues1992` -> `roigdominguez1992`): the old key appears only in Immersion.lean and the bib, and every citation is updated, so nothing is left dangling. The new key still sorts between `Roby-1965` and `rooij1970` (bibtool `-s`), and the `note` field is aligned. The bib already uses both `\'`-escapes and literal Unicode, so `{\'\i}` is fine. "Translated from ..." notes and "Publisher, City" forms each have many precedents, so no request.
+- `docs/references.bib`, the mixed-provenance point: a MathSciNet-style publisher/note now sits next to zbMATH-only fields (`fseries`, `zbmath`, `zbl`, `keywords`). I thought about asking for one consistent export, but it is a judgement call with precedents both ways, so I did not raise it. I also left alone the key-churn point (renaming breaks external anchors), which is minor.
+- `Immersion.lean` module doc References line: consistent with the new bib author field. No request.
+- `IsImmersionAtOfComplement.map_target_subset_target` / `IsImmersionAt.map_target_subset_target` docstrings: the spelling fix is right, but "Roig and Domínguez" uses only the authors' second surnames. The PR now makes those surnames canonical as "Margalef Roig" / "Outerelo Domínguez", so I asked for the full surnames (advisory, one finding per declaration).
+- Not raised, out of scope for a bib-tidy PR: the same docstrings have older typos on lines this PR does not touch (`(h.domChart.extend J).target` where `codChart` is meant; `(h.codChart.extend I)` where `J` is meant).
+- Process note: I accidentally printed the `$P/bin/mlgrep` wrapper script (one `head`) while checking its default pathspec. It had no bearing on the findings.

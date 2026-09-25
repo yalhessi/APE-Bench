@@ -1,0 +1,26 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty. The title names two bugs but does not say what they broke. It also does not say why the fix swaps runtime loading for a compile-time elaborator. The actual consequence is that the lakefile's `weak.linter.mathlibStandardSet` was never recognised by `lake exe lint-style`, so `linter.checkInitImports` and `linter.allScriptsDocumented` (both default false, enabled only through that set) have been silently off. This PR turns them back on. A maintainer cannot judge the risk or the design without that stated.",
+    "requested_change": "Write a description covering four things. (1) The symptom: which checks were silently disabled, and since when or since which Lean/Lake bump. (2) Confirmation that `lake exe lint-style` on the current tree passes the two re-enabled checks. (3) Why the linter sets are now captured at compile time via `linter_sets%` rather than by fixing the runtime `withImportModules` call (for example with extension loading enabled), and the consequence: only sets visible to `scripts/lint-style.lean`'s imports are seen. (4) Links to the Zulip thread or issue that reported this, plus the AI-assistance statement the contribution policy asks for.",
+    "severity": "blocking",
+    "evidence": "pr.md: '(no description)'. Base scripts/lint-style.lean:42-49 defines `toLeanOptions`, which strips `weak.`, but line 71 calls `Lean.LeanOptions.toOptions` instead, so the helper was dead code. lakefile.lean:27-40 passes the standard set only as `weak.linter.mathlibStandardSet`. Mathlib/Init.lean:61-63 puts `linter.allScriptsDocumented` and `linter.checkInitImports` in that set. scripts/lint-style.lean:74,128 register both with `defValue := false`."
+  },
+  {
+    "target": "scripts/lint-style.lean (toLeanOptions, linter_sets%, ToExpr (NameMap α))",
+    "question": "5",
+    "claim": "The PR fixes a bug that went unnoticed precisely because nothing checks it: a misparsed option simply disables a check without any error. It also adds new meta code: an elaborator and a `ToExpr` instance. None of this is tested, so the same silent regression can recur at the next Lake/Lean bump.",
+    "requested_change": "Add a regression test. Inline `#guard`s in the script are the local precedent. For example, check that `getLinterValue linter.checkInitImports { toOptions := toLeanOptions <LeanOptions with weak.linter.mathlibStandardSet := true>, linterSets := linter_sets% }` is `true`, and that `linter_sets%` contains `linter.mathlibStandardSet`. If the elaborator or instance moves into Mathlib, put the test under MathlibTest next to the existing LinterOptions tests.",
+    "severity": "advisory",
+    "evidence": "scripts/autolabel.lean:206-222 tests a script inline with `#guard getMatchingLabels ...`. MathlibTest/ModuleCasing.lean:12-14 and MathlibTest/ForbiddenWindows.lean:12-14 build `LinterOptions` by hand with `linterSets := {}`, so nothing exercises linter-set resolution from lakefile options. The diff adds no test file or `#guard`."
+  },
+  {
+    "target": "instance [ToExpr α] : ToExpr (NameMap α) (scripts/lint-style.lean)",
+    "question": "6",
+    "claim": "The PR adds a general-purpose orphan `ToExpr` instance for a Lean core type (`NameMap α`) to an executable script. It is generic only in name: its `toTypeExpr` is hard-coded to `LinterSets`, so it is correct only when α = NameSet. Mathlib has a dedicated home for `ToExpr` instances of core types, where a genuinely generic instance would belong and could be tested.",
+    "requested_change": "Either narrow it to what the script needs: a single `ToExpr LinterSets` instance, or a local `def`, kept in the script. Or make it generic for real, with `toTypeExpr` built from `toTypeExpr α`, and move it to `Mathlib/Tactic/ToExpr.lean` (or upstream to core next to `NameMap`) with a test.",
+    "severity": "advisory",
+    "evidence": "The diff has `instance [ToExpr α] : ToExpr (NameMap α) where ... toTypeExpr := .const ``LinterSets []`. Mathlib/Tactic/ToExpr.lean:16-54 already hosts the `ToExpr` instances for core types (ULift, PUnit, Substring, SourceInfo, Syntax, MData, Level, Expr). A search found no existing `ToExpr (NameMap _)`, `ToExpr (Std.TreeMap _)` or `ToExpr (RBMap _)` instance in the repo."
+  }
+]

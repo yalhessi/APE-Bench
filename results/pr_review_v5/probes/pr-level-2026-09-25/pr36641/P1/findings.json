@@ -1,0 +1,58 @@
+[
+  {
+    "target": "PR (title) / MeasureTheory.Supermartingale.measureReal_le_div",
+    "question": "1, 4",
+    "claim": "The PR is titled and documented as Ville's inequality, but it does not prove it. Ville's inequality is a maximal inequality: for a nonnegative supermartingale, lambda * P(sup_n f_n >= lambda) <= E[f_0] (or its finite-horizon form with max_{k<=n} f_k). The PR proves the fixed-time bound mu.real {lam <= f n} <= E[f_0]/lam. That is Markov's inequality (`mul_meas_ge_le_integral_of_nonneg`) combined with E[f_n] <= E[f_0], a two-line corollary that is weaker than the named theorem. If this is merged under the name Ville, the famous name is used up on a trivial statement, and anyone who searches for the real result finds this instead.",
+    "requested_change": "Prove the actual maximal statement, P(exists k <= n, lam <= f k) (or P(sup_n f n >= lam)) <= E[f_0]/lam. Stop at `hittingBtwn f {y | lam <= y} 0 n`, use the supermartingale optional-stopping bound the PR already contains, and use `stoppedValue_hittingBtwn_mem`, the way `maximal_ineq` is proved. Otherwise, drop the name 'Ville' from the title, the docstrings and the file name, and justify why the fixed-n corollary is worth a declaration.",
+    "severity": "blocking",
+    "evidence": "Diff: the proof of `measureReal_le_div` is `mul_meas_ge_le_integral_of_nonneg` plus `hf.integral_le (Nat.zero_le n)` plus `linarith`, with no supremum or hitting time anywhere. The machinery for the real statement already exists: Mathlib/Probability/Martingale/OptionalStopping.lean:119-235 (section Maximal: `smul_le_stoppedValue_hittingBtwn`, `maximal_ineq` via `hittingBtwn`) and Mathlib/Probability/Process/HittingTime.lean:454 (`stoppedValue_hittingBtwn_mem`). `mlgrep '\\bVille\\b'` finds nothing, so the real result is still missing from the library."
+  },
+  {
+    "target": "MeasureTheory.Supermartingale.measureReal_le_div_forall",
+    "question": "1",
+    "claim": "This declaration is `fun n => hf.measureReal_le_div hnn hlam n`. It moves the `n` binder from an explicit argument to a `forall` in the conclusion, so it adds nothing. Its docstring calls it 'the uniform version of Ville's inequality', but it is not uniform: the event is still a single time `n`, not a supremum over time. That misleads readers about what has been proved.",
+    "requested_change": "Delete it. If a uniform-in-time statement is intended, it should bound the measure of {omega | exists n, lam <= f n omega} (see the previous finding).",
+    "severity": "blocking",
+    "evidence": "Diff: the body is `fun n => hf.measureReal_le_div hnn hlam n`, and the statement is identical to `measureReal_le_div` up to where `n` is bound."
+  },
+  {
+    "target": "MeasureTheory.Supermartingale.integral_stoppedValue_le",
+    "question": "2, 3, 6",
+    "claim": "This lemma is general optional-stopping API: the supermartingale counterpart of `Submartingale.expected_stoppedValue_mono`. It is not used anywhere in the PR, since neither Ville statement calls it. It is also stated only for the special case where the earlier time is the constant 0, and it sits in a leaf file that people who work with optional stopping will not import. As written it is an unrelated hunk bundled into a Ville PR.",
+    "requested_change": "Either use it, to prove the maximal Ville inequality, or remove it. In either case, state it in general form: for bounded stopping times tau <= pi, E[f_pi] <= E[f_tau], as the supermartingale counterpart of `Submartingale.expected_stoppedValue_mono`. Put it in Mathlib/Probability/Martingale/OptionalStopping.lean next to that lemma, preferably in its own small PR.",
+    "severity": "blocking",
+    "evidence": "Diff: `integral_stoppedValue_le` is defined but never referenced, because `measureReal_le_div` uses only `integral_le` and Markov. Mathlib/Probability/Martingale/OptionalStopping.lean:43 has `Submartingale.expected_stoppedValue_mono` (general tau <= pi, general ordered E). `mlgrep 'Supermartingale\\.'` over OptionalStopping.lean, OptionalSampling.lean and Convergence.lean finds no supermartingale version, so the general lemma is a real gap that belongs in that file."
+  },
+  {
+    "target": "MeasureTheory.Supermartingale.integral_le",
+    "question": "6",
+    "claim": "Monotonicity of the expectation of a supermartingale is basic API. Its set-integral version, `Supermartingale.setIntegral_le`, lives in Martingale/Basic.lean and is stated for a general index type and a general ordered E. The PR states the whole-space version in Ville.lean, only for index ℕ and values in ℝ. Users would have to import a file about Ville's inequality to get a basic fact, and its generality would not match its sibling's.",
+    "requested_change": "Move it to Mathlib/Probability/Martingale/Basic.lean, directly after `Supermartingale.setIntegral_le`, and state it with that lemma's hypotheses (general ι, `[PartialOrder E] [IsOrderedAddMonoid E] [IsOrderedModule ℝ E] [ClosedIciTopology E]`). It then follows from `setIntegral_le` with `s = univ`.",
+    "severity": "blocking",
+    "evidence": "Mathlib/Probability/Martingale/Basic.lean:153-159 has `Supermartingale.setIntegral_le` (general ι, E). The PR's `integral_le` is fixed to `f : ℕ → Ω → ℝ` by the file-level `variable` and is placed in the new Mathlib/Probability/Martingale/Ville.lean."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Basic.lean (Submartingale / Martingale namespaces)",
+    "question": "5",
+    "claim": "If `Supermartingale.integral_le` is added, its siblings are missing too. Basic.lean already has the set-integral triple `Martingale.setIntegral_eq`, `Supermartingale.setIntegral_le` and `Submartingale.setIntegral_le`, but no whole-space versions. Adding only the supermartingale one leaves the API asymmetric.",
+    "requested_change": "Add `Submartingale.integral_le` (E[f_i] <= E[f_j] for i <= j) and `Martingale.integral_eq` next to the existing set-integral lemmas, in the same generality.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/Martingale/Basic.lean:98 (`Martingale.setIntegral_eq`), :153 (`Supermartingale.setIntegral_le`), :217 (`Submartingale.setIntegral_le`). A search for `theorem ...(integral_eq|integral_le)` under Mathlib/Probability/Martingale finds no whole-space versions."
+  },
+  {
+    "target": "PR description",
+    "question": "4",
+    "claim": "The description is empty. It gives no motivation, no downstream use and no account of design choices, such as why the result is stated with `measureReal` and `lam : ℝ` rather than in `ℝ≥0∞`/`ℝ≥0` like the neighbouring `maximal_ineq`, or why it gets a separate file. There is also no AI-assistance disclosure. The file header gives 'AI Math Project' as both copyright holder and sole author, with no human named, which strongly suggests AI generation. Mathlib's contribution policy requires disclosure, and maintainers need a named human who is accountable for the code.",
+    "requested_change": "Write a description that states the motivation (what downstream work needs Ville's inequality), the design choices, and how AI tools were used. List a human author, or authors, responsible for the contribution in the Authors line. Existing files list an AI tool only alongside human authors.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'. Diff header: 'Copyright (c) 2026 AI Math Project ... Authors: AI Math Project'. Precedent: Mathlib/Analysis/Complex/Poisson.lean:4 and Mathlib/Analysis/Complex/Polynomial/GaussLucas.lean:4 list 'Aristotle AI' together with named humans. Mathlib/NumberTheory/ModularForms/EisensteinSeries/E2/MDifferentiable.lean:4 does the same with 'Gauss AI (Math Inc)'."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean",
+    "question": "6",
+    "claim": "Once the two general API lemmas move to Basic.lean and OptionalStopping.lean, the new file holds a single corollary. The existing maximal inequality for submartingales lives in OptionalStopping.lean, section Maximal, and a supermartingale maximal inequality is its natural neighbour.",
+    "requested_change": "Consider putting Ville's inequality in section Maximal of Mathlib/Probability/Martingale/OptionalStopping.lean, next to `maximal_ineq`. Keep a separate Ville.lean only if it will grow, for example with the infinite-horizon form, time-uniform concentration corollaries, or continuous time.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/Martingale/OptionalStopping.lean:18-26, 119-235 (Doob's maximal inequality `maximal_ineq`, stated in `ℝ≥0∞` with `ε : ℝ≥0`)."
+  }
+]

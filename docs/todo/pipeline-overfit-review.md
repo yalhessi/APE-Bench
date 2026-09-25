@@ -358,3 +358,15 @@ current brief.
 **Next:** breadth for the PR-level job. About 10 PRs with PR-level asks, AI and main, two runs
 each.
 
+**Round 3** (the PR-level job on 10 PRs with PR-level asks, 5 AI and 5 main):
+- **The rule fails on both matchers.** P reaches 14/13 of 21 PR-level asks against C's 9/6, short
+  of the 3× bound; its noise is 5.2 findings per PR against ≤ 4. Stability is 0.85.
+- **The consistent signal:** about 2× the PR-level asks, stably. Main PRs go 3 → 7 on both
+  matchers: tests, motivation, the description, dependencies.
+- **Unreached, each an information gap:** other open PRs (a duplicate), the description's links,
+  and a meta-code analogue.
+
+**Across three rounds,** no brief-level change passed on breadth. The PR level is the one
+consistent positive, so build on the opt-in `pr_level` arm with a precision guard, not a
+re-division. The information to collect next is other open PRs, from the PR store.
+

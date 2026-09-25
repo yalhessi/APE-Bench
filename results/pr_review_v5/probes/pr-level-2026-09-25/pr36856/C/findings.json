@@ -1,0 +1,16 @@
+[
+  {
+    "target": "Mathlib/Geometry/Manifold/Immersion.lean: IsImmersionAtOfComplement.map_target_subset_target",
+    "claim": "The docstring of `IsImmersionAtOfComplement.map_target_subset_target` now says \"Roig and Domínguez's [roigdominguez1992] definition\". The PR itself makes the canonical surnames \"Margalef Roig\" and \"Outerelo Domínguez\" (unhyphenated Spanish double surnames), so \"Roig and Domínguez\" names each author only by their second (maternal) surname. That is not a correct short form of either name, so the PR's name normalisation is left half-done here.",
+    "requested_change": "Refer to the authors by their surnames as given in the entry, e.g. \"Margalef Roig and Outerelo Domínguez's [roigdominguez1992] definition of immersions ...\" (or cite just \"[roigdominguez1992]'s definition\").",
+    "severity": "advisory",
+    "evidence": "Diff hunk @@ -274 changes line 277 to 'Roig and Domínguez's [roigdominguez1992]'. The same PR changes the bib author field to '{Margalef Roig, Juan and Outerelo Dom{\\'\\i}nguez, Enrique}' and the module References line to 'Juan Margalef Roig and Enrique Outerelo Domínguez', where the full surnames are 'Margalef Roig' and 'Outerelo Domínguez'."
+  },
+  {
+    "target": "Mathlib/Geometry/Manifold/Immersion.lean: IsImmersionAt.map_target_subset_target",
+    "claim": "The docstring of `IsImmersionAt.map_target_subset_target` has the same problem: it calls the authors \"Roig and Domínguez\", using only their second surnames. That conflicts with the canonical names 'Margalef Roig' and 'Outerelo Domínguez' this PR introduces.",
+    "requested_change": "Change \"Roig and Domínguez's [roigdominguez1992]\" to \"Margalef Roig and Outerelo Domínguez's [roigdominguez1992]\", matching the wording chosen for the `IsImmersionAtOfComplement` docstring.",
+    "severity": "advisory",
+    "evidence": "Diff hunk @@ -516 changes line 519 to 'Roig and Domínguez's [roigdominguez1992]', while the bib entry and module References line in the same diff give the surnames as 'Margalef Roig' and 'Outerelo Domínguez'."
+  }
+]

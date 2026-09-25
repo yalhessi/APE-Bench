@@ -1,0 +1,8 @@
+# PR 36641 review notes: Ville's inequality, AI-authored
+
+- **Mathlib.lean**: a single import line, in alphabetical order after `Upcrossing`. Nothing to ask for.
+- **Ville.lean header and preamble**: "AI Math Project" as author breaks the real-names convention (blocking). The preamble has `@[expose]`, a `noncomputable section` and an `open` that all do nothing, plus a Bochner import already pulled in through Martingale/Basic. Checked against the theorem-only siblings in Probability/Martingale.
+- **Supermartingale.integral_le**: this is `Supermartingale.setIntegral_le` (Basic.lean:153) at `univ`, so the proof reduces to `simpa`. It is stated only for ℕ and ℝ, while the sibling works for general ι and E, so it belongs in Basic.lean.
+- **Supermartingale.integral_stoppedValue_le**: never used by the rest of the file. It is the τ=0 special case of a missing supermartingale counterpart to `Submartingale.expected_stoppedValue_mono`, so that general lemma should go in OptionalStopping. `h_neg` holds by definition (`stoppedValue` at Stopping.lean:801), so the three simp-at steps collapse into one `simpa`.
+- **Supermartingale.measureReal_le_div**: the main issue. The proof is Markov (`mul_meas_ge_le_integral_of_nonneg`) plus `integral_le`, with no maximal step, so it is not Ville's inequality, which is about sup/∃ n (blocking). The hypotheses are too strong: it needs only `0 ≤ᵐ f n`, and `hlam` exists only for the division form. `lam`/`hnn` binders and `hf.2.x` projections go against local API and naming.
+- **Supermartingale.measureReal_le_div_forall**: literally `fun n => measureReal_le_div ... n`, and its "uniform version" wording is misleading. Remove it (blocking).

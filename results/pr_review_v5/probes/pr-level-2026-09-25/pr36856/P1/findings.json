@@ -1,0 +1,18 @@
+[
+  {
+    "target": "docs/references.bib: key roigdominguez1992, and its citations in Mathlib/Geometry/Manifold/Immersion.lean",
+    "question": "5",
+    "claim": "The PR's stated purpose is canonical author names, but the renamed key and the in-text attribution are still built only from the maternal surnames (Roig, Domínguez). The PR's own author field treats 'Margalef Roig' and 'Outerelo Domínguez' as compound surnames, so 'Roig and Domínguez's' misattributes the book, and 'roigdominguez1992' is still not a canonical key. Renaming the key now and again later is churn.",
+    "requested_change": "Rename the key once, to the compound-surname form following precedent (e.g. `margalefroigouterelodominguez1992`), and write 'Margalef Roig and Outerelo Domínguez's' at Immersion.lean lines 277 and 519. Alternatively, leave the key as it is and fix only the displayed names.",
+    "severity": "advisory",
+    "evidence": "Precedent for Spanish compound surnames: docs/references.bib:896-898 `cabreragarciarodriguezpalacios2014` with author `{Cabrera Garc\\'ia} and {Rodr\\'iguez Palacios}`, cited in prose as 'Cabrera García and Rodríguez Palacios' (Mathlib/Algebra/Jordan/Basic.lean:69, Mathlib/GroupTheory/Subsemigroup/Center.lean:24). The key is cited only in Mathlib/Geometry/Manifold/Immersion.lean (lines 90, 277, 519), so a one-time rename to the right form costs nothing more."
+  },
+  {
+    "target": "docs/references.bib: publisher field of roigdomingues1992",
+    "question": "2",
+    "claim": "Changing 'Amsterdam etc.: North-Holland' to 'North-Holland Publishing Co., Amsterdam' corrects no error. It swaps the zbMATH export format for the MathSciNet one, and references.bib has no convention for this field. The PR's reason, that the old value is 'imported catalog-style', holds just as well for 22 other entries it leaves alone, so after the PR the entry is one more inconsistent case, not a step toward a standard.",
+    "requested_change": "Revert the publisher line. If maintainers want one publisher style, propose it in a separate bib-wide PR.",
+    "severity": "advisory",
+    "evidence": "23 of the 254 `publisher` lines in docs/references.bib use the zbMATH 'City: Publisher' form, e.g. line 1412 (conway1990) `{New York etc.: Springer-Verlag}`, the same 'etc.' shape; also lines 20, 96, 147, 908, 5348, 5609. The entry keeps its other zbMATH-export fields (fseries, keywords, zbmath, zbl), so only the publisher field would change style."
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "target": "PR",
+    "question": "3",
+    "claim": "The PR bundles four independent changes: a new List lemma, roughly 320 lines of path-vertex decomposition lemmas in Vertices.lean (plus style edits to its existing proofs), a new strong-connectivity file for quivers, and the matrix irreducibility/primitivity file. The matrix file, which is what the title announces, uses none of the new Vertices.lean lemmas or the List lemma.",
+    "requested_change": "Split the PR. Drop the List lemma (see the separate finding). Send the Vertices.lean decomposition lemmas as their own PR, with a stated use. Keep this PR to StronglyConnected.lean and Irreducible/Defs.lean, or split those two as well so the quiver API can be reviewed by Combinatorics reviewers separately from the matrix API.",
+    "severity": "blocking",
+    "evidence": "Irreducible/Defs.lean imports Quiver.Path.StronglyConnected (which imports only Quiver.Path) and the existing Quiver.Path.Decomposition, and never imports Vertices.lean. Its only path lemmas are Path.exists_notMem_mem_hom_path_path_of_notMem_mem (existing, Mathlib/Combinatorics/Quiver/Path/Decomposition.lean:24), eq_of_length_zero and length_cons. List.exists_mem_split is used only by Path.exists_comp_of_mem_vertices in Vertices.lean."
+  },
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty, and the title does not match the diff. There is no motivation, no design rationale, no link to the Perron-Frobenius work the title names, and no AI-assistance statement. The title scope 'PerronFrobenius' is not a Mathlib path, and the title leaves out the List and Vertices.lean changes. Several design choices need a stated reason: the development is limited to Matrix n n R over ℝ; the matrix graph is a Quiver rather than Digraph/SimpleGraph; and IsStronglyConnected requires positive-length paths, so a one-vertex quiver with no loop is not strongly connected, while stronglyConnectedSetoid in the same file allows nil paths.",
+    "requested_change": "Write a description that states the motivation (the downstream Perron-Frobenius development, linked), the design choices above and why they were made, any Zulip discussion, and any dependent or follow-up PRs. Include the AI-assistance disclosure that Mathlib's contribution policy requires. Retitle with a real path scope, e.g. feat(LinearAlgebra/Matrix/Irreducible): ..., and make the title match whatever remains after the split.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'. No Mathlib path contains PerronFrobenius; the only in-library mention is a TODO at Mathlib/LinearAlgebra/RootSystem/GeckConstruction/Semisimple.lean:346 ('may be proved via Perron-Frobenius'), which would make a good motivating link. diff: IsStronglyConnected := ∀ i j, Nonempty {p : Path i j // p.length > 0}, whereas stronglyConnectedSetoid uses Nonempty (Path a b) ∧ Nonempty (Path b a)."
+  },
+  {
+    "target": "Mathlib/Data/List/Basic.lean: List.exists_mem_split",
+    "question": "1",
+    "claim": "The lemma duplicates core's List.append_of_mem (a ∈ l → ∃ s t, l = s ++ a :: t), which Mathlib already uses, and List.mem_iff_append. The same hunk also adds the PR author to the Authors line of Data/List/Basic.lean for this one duplicate lemma.",
+    "requested_change": "Delete List.exists_mem_split and the new 'split' section, use List.append_of_mem at the single call site (Path.exists_comp_of_mem_vertices), and revert the Authors-line change.",
+    "severity": "blocking",
+    "evidence": "Existing uses of append_of_mem: Mathlib/Data/List/Permutation.lean:296 ('rcases append_of_mem ...'), Mathlib/Algebra/BigOperators/Group/List/Lemmas.lean:156 ('let ⟨s, t, h⟩ := append_of_mem ha'). List.mem_iff_append is used at Mathlib/Data/List/Infix.lean:140."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean (new decomposition section)",
+    "question": "1",
+    "claim": "Several of the new lemmas restate declarations that already exist in the same file, or other lemmas this PR adds: vertices_head_eq_start restates vertices_head_eq; vertices_getLast_eq_end restates vertices_getLast_eq and vertices_getLast; end_eq_vertices_get_of_comp_length is the symmetric form of vertices_comp_get_length_eq. Within the PR, exists_prefix_of_mem_vertices_ne_end has the same conclusion as exists_comp_of_mem_vertices under extra hypotheses (c ≠ b, DecidableEq V). split_at_vertices_index is exists_comp_of_length_le with the index moved to vertices. vertices_dropLast_isPrefix_of_vertices_eq is `h ▸ prefix_append _ _`.",
+    "requested_change": "Remove the duplicates and the lemma that another subsumes, keeping only lemmas with a demonstrated use in the follow-up PR.",
+    "severity": "blocking",
+    "evidence": "Existing lemmas in the base file: vertices_head_eq (Vertices.lean:107, `p.vertices.head h = a` with h defaulting to p.vertices_ne_nil), vertices_getLast (:83), vertices_getLast_eq (:114), vertices_comp_get_length_eq (:118, `(p₁.comp p₂).vertices.get ⟨p₁.length, h⟩ = c`)."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean (existing proofs, lines 50-164)",
+    "question": "2",
+    "claim": "About ten hunks only drop `List.` qualifiers (List.mem_singleton → mem_singleton, List.head_cons → head_cons, List.getLast_mem → getLast_mem, ...) or replace `simp only [...]` with `simp` in proofs that already compiled. This is a style preference that is not in the style guide, it is unrelated to the PR's purpose, and it adds noise to the diff and to blame.",
+    "requested_change": "Revert the style-only edits to the existing proofs in Vertices.lean.",
+    "severity": "advisory",
+    "evidence": "diff hunks @@ -48,29 +48,29 @@, @@ -83,14 +83,14 @@, @@ -107,8 +107,8 @@, @@ -160,7 +160,7 @@. The file already has `open List` (Vertices.lean:20), so the qualified names were valid."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean (import line)",
+    "question": "2",
+    "claim": "The import `Mathlib.Combinatorics.Quiver.Path` was rewritten as `import Mathlib.Combinatorics.Quiver.Path--.Decomposition`, which leaves commented-out code from an abandoned change on an import line.",
+    "requested_change": "Restore the original import line.",
+    "severity": "blocking",
+    "evidence": "diff: '-import Mathlib.Combinatorics.Quiver.Path' / '+import Mathlib.Combinatorics.Quiver.Path--.Decomposition'."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/StronglyConnected.lean",
+    "question": "1",
+    "claim": "isStronglyConnected_iff_forall_exists_pos_length_path, exists_pos_length_path_of_isStronglyConnected and exists_pos_length_cycle_of_isStronglyConnected each unfold an abbrev through nonempty_subtype, and none of them is used in the PR: Irreducible/Defs.lean destructures h_irr.2 i j directly. stronglyConnectedSetoid and StronglyConnectedComponent are also unused, and no lemma connects them to IsStronglyConnected.",
+    "requested_change": "Drop the wrapper lemmas, or define IsStronglyConnected directly in the ∃-form and keep a single lemma. Either remove StronglyConnectedComponent from this PR or add the API that links it to IsStronglyConnected, e.g. strong connectivity iff all vertices are in one component, stated under whichever length convention is chosen.",
+    "severity": "advisory",
+    "evidence": "Irreducible/Defs.lean uses `h_irr.2 i j` with rcases (irreducible_no_zero_row, irreducible_iff_exists_pow_pos) and never names these lemmas or StronglyConnectedComponent."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/StronglyConnected.lean: StronglyConnectedComponent",
+    "question": "6",
+    "claim": "stronglyConnectedSetoid, StronglyConnectedComponent, .mk, the CoeTC instance and .eq copy the zigzagSetoid / WeaklyConnectedComponent construction line for line. That construction lives in Quiver/ConnectedComponent.lean, not under Quiver/Path/.",
+    "requested_change": "Put the strongly connected component construction next to WeaklyConnectedComponent in Mathlib/Combinatorics/Quiver/ConnectedComponent.lean, or put the whole StronglyConnected file at Mathlib/Combinatorics/Quiver/StronglyConnected.lean beside it, rather than under Path/.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Combinatorics/Quiver/ConnectedComponent.lean:28 def zigzagSetoid, :35 def WeaklyConnectedComponent, :43 protected def mk, :46 instance : CoeTC V (WeaklyConnectedComponent V)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean (private helpers)",
+    "question": "1",
+    "claim": "The private lemmas sum_pos_of_mem and exists_mem_of_sum_pos are the two directions of the existing Finset.sum_pos_iff_of_nonneg, which sum_pos_of_mem already invokes in its own proof. The private @[simp] pow_nonneg is a general fact about entrywise-nonnegative matrices, and hiding it as private prevents reuse downstream.",
+    "requested_change": "Use Finset.sum_pos_iff_of_nonneg directly and delete the two sum helpers. Either make the matrix power nonnegativity lemma public with a proper name and generality, or inline it.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/Order/BigOperators/Group/Finset.lean:153-155: `@[to_additive sum_pos_iff_of_nonneg] lemma one_lt_prod_iff_of_one_le (hf : ∀ x ∈ s, 1 ≤ f x) : 1 < ∏ x ∈ s, f x ↔ ∃ x ∈ s, 1 < f x`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean (imports)",
+    "question": "6",
+    "claim": "The file imports Mathlib.Analysis.RCLike.Basic but uses only ℝ as an ordered field, Finset sums and quiver paths. That adds a heavy Analysis dependency to a LinearAlgebra/Matrix Defs file, for definitions that the comparable nonnegative-matrix development states over a generic ordered semiring.",
+    "requested_change": "Minimise the imports (e.g. Mathlib.Data.Real.Basic, or no ℝ at all if the definitions are stated over an ordered semiring). Keep a Defs file free of Analysis imports.",
+    "severity": "advisory",
+    "evidence": "Irreducible/Defs.lean imports Mathlib.Analysis.RCLike.Basic, yet nothing in it refers to RCLike, 𝕜, or any norm or topology. The other Analysis imports under Mathlib/LinearAlgebra/Matrix (6 files) are in genuinely analytic files (Hermitian.lean, Spectrum.lean, LDL.lean, Gershgorin.lean, ...). Mathlib/Data/Matrix/DoublyStochastic.lean:39 states entrywise nonnegativity over [Semiring R] [PartialOrder R] [IsOrderedRing R]; it imports Analysis.Convex.Basic only because it uses convexity."
+  }
+]

@@ -1,0 +1,184 @@
+[
+  {
+    "target": "Mathlib/Data/List/Basic.lean List.exists_mem_split",
+    "claim": "`List.exists_mem_split` duplicates the core lemma `List.append_of_mem : a ∈ l → ∃ s t, l = s ++ a :: t`, which Mathlib already uses (e.g. Data/List/Sort.lean:117, Data/Multiset/ZeroCons.lean:184); the PR also adds its author to the Data/List/Basic.lean header for this one lemma.",
+    "requested_change": "Delete `exists_mem_split` and its `section split`, use `List.append_of_mem h` in `Quiver.Path.exists_comp_of_mem_vertices`, and revert the author-line change in Data/List/Basic.lean.",
+    "severity": "blocking",
+    "evidence": "mlgrep shows `append_of_mem` used in Mathlib/Data/List/Sort.lean:117 and Mathlib/Data/List/Permutation.lean:296 with exactly the statement `∃ s t, l = s ++ a :: t`; `List.mem_iff_append` is also available (Data/List/Infix.lean:140)."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.vertices_head_eq_start",
+    "claim": "`vertices_head_eq_start` restates the existing simp lemma `vertices_head_eq` (same file, line 107), whose `h` argument already defaults to `p.vertices_ne_nil`.",
+    "requested_change": "Delete `vertices_head_eq_start` and use `vertices_head_eq p` wherever it is needed.",
+    "severity": "blocking",
+    "evidence": "Base Vertices.lean:107 `lemma vertices_head_eq {a b : V} (p : Path a b) (h : p.vertices ≠ [] := p.vertices_ne_nil) : p.vertices.head h = a`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.vertices_getLast_eq_end",
+    "claim": "`vertices_getLast_eq_end` is the existing `vertices_getLast` / `vertices_getLast_eq` (both already in this file with the default `h := p.vertices_ne_nil`); its `by simp` proof just closes it with that simp lemma.",
+    "requested_change": "Delete `vertices_getLast_eq_end`; use `vertices_getLast p` instead.",
+    "severity": "blocking",
+    "evidence": "Base Vertices.lean:83 `vertices_getLast (p) (h := p.vertices_ne_nil) : p.vertices.getLast h = b` and Vertices.lean:114 `vertices_getLast_eq` with the same statement."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.end_eq_vertices_get_of_comp_length",
+    "claim": "`end_eq_vertices_get_of_comp_length` is the symmetric form of the existing `vertices_comp_get_length_eq` (Vertices.lean:118).",
+    "requested_change": "Delete it and use `(vertices_comp_get_length_eq p₁ p₂).symm`.",
+    "severity": "blocking",
+    "evidence": "Base Vertices.lean:118-121 `lemma vertices_comp_get_length_eq (p₁ : Path a c) (p₂ : Path c b) (h ...) : (p₁.comp p₂).vertices.get ⟨p₁.length, h⟩ = c`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.exists_prefix_of_mem_vertices_ne_end",
+    "claim": "`exists_prefix_of_mem_vertices_ne_end` has the same conclusion, `∃ p₁ p₂, p = p₁.comp p₂`, as `exists_comp_of_mem_vertices` from this PR, but adds the hypotheses `h_ne : c ≠ b` and `[DecidableEq V]`, so it is a strictly weaker duplicate. Its docstring also promises a 'proper prefix', which the statement does not say.",
+    "requested_change": "Delete `exists_prefix_of_mem_vertices_ne_end` (and `mem_vertices_eq_end_or_mem_dropLast` if nothing else uses it); use `exists_comp_of_mem_vertices p h`.",
+    "severity": "blocking",
+    "evidence": "Diff: `exists_comp_of_mem_vertices {a b v : V} (p : Path a b) (h : v ∈ p.vertices) : ∃ (p₁ : Path a v) (p₂ : Path v b), p = p₁.comp p₂` against `exists_prefix_of_mem_vertices_ne_end [DecidableEq V] ... (h : c ∈ p.vertices) (h_ne : c ≠ b) : ∃ (p₁ : Path a c) (p₂ : Path c b), p = p₁.comp p₂`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.vertices_dropLast_isPrefix_of_vertices_eq",
+    "claim": "`vertices_dropLast_isPrefix_of_vertices_eq` is `List.prefix_append` after rewriting with the hypothesis, so it adds no path content. It also redeclares `{V : Type*} [Quiver V]`, which the section variables already provide.",
+    "requested_change": "Delete the lemma and write `h ▸ List.prefix_append _ _` at its use sites.",
+    "severity": "advisory",
+    "evidence": "Diff: the proof is `rw [h]; exact prefix_append p₁.vertices.dropLast p₂.vertices`, and the binder list repeats `{V : Type*} [Quiver V]` inside a section that has `variable {V : Type*} [Quiver V]`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.split_at_vertices_index",
+    "claim": "`split_at_vertices_index` does not follow Mathlib naming (a `split_at` verb phrase instead of a conclusion-describing `exists_..._of_...` name). Its docstring names a nonexistent `split_at_vertex`, and it uses `List.get ⟨i, hi⟩` instead of `getElem`. It is also just `exists_comp_of_length_le` combined with `vertices_comp_get_length_eq`.",
+    "requested_change": "Either remove it in favour of `exists_comp_of_length_le` + `vertices_comp_get_length_eq`, or rename it to something like `exists_eq_comp_of_lt_length_vertices`, state the last conjunct as `v = p.vertices[i]`, and fix the docstring.",
+    "severity": "advisory",
+    "evidence": "Diff: docstring \"`split_at_vertex` decomposes a path ...\" on `theorem split_at_vertices_index`; its proof is `exists_comp_of_length_le p hi_le_len` followed by `simp [hlen]`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.not_mem_vertices_dropLast_of_split_at_vertex",
+    "claim": "The name uses the retired `not_mem` spelling (Mathlib now uses `notMem`, e.g. `exists_notMem_mem_hom_path_path_of_notMem_mem` in Path/Decomposition.lean and the 2025-05-23 `nil_notMem_splitBy` deprecations) and refers to a nonexistent `split_at_vertex`. The statement also puts `let i := ...; let hi := ...` and universally quantified hypotheses after the colon.",
+    "requested_change": "Rename to e.g. `notMem_dropLast_vertices_of_eq_comp`. Move `c p_prefix p_suffix` and the three hypotheses before the colon, write the index condition as `p_prefix.length = p.vertices.idxOf v` without `let`, and delete the dead `have`s (`h_prefix_in_p` and its inner `this`, `h_eq_idx`) from the proof.",
+    "severity": "advisory",
+    "evidence": "Diff: statement `let i := p.vertices.idxOf v; let hi := ...; ∀ (c : V) (p_prefix ...) (_ : p = ...) ..., v ∉ p_prefix.vertices.dropLast`. mlgrep: Mathlib/Data/List/SplitBy.lean:66 `@[deprecated (since := \"2025-05-23\")] alias nil_not_mem_splitByLoop := nil_notMem_splitByLoop`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.mem_tail_vertices_suffix_of_two_le_count",
+    "claim": "The hypothesis `h_v_in_p : v ∈ p.vertices` is redundant because it follows from `h_v_count : p.vertices.count v ≥ 2`. The lemma also uses `≥` in a hypothesis, the same `let`/∀-after-colon statement shape as its sibling, and a long case analysis with `simp_all` and `decide`.",
+    "requested_change": "Drop `h_v_in_p` and derive it inside the proof via `List.count_pos_iff`. Write the count hypothesis as `2 ≤ p.vertices.count v`, move the binders before the colon, and shorten the proof: the suffix's vertex list is `v :: tail` and has count ≥ 2, so `v ∈ tail` by `List.count_pos_iff`.",
+    "severity": "advisory",
+    "evidence": "Diff: `(h_v_in_p : v ∈ p.vertices) (h_v_count : p.vertices.count v ≥ 2)` and a 40-line proof with nested `by_contra`/`simp_all only [..., Nat.reduceLeDiff]`. `List.count_pos_iff` is used in Mathlib (SimpleGraph/Hamiltonian.lean:49)."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.exists_decomp_of_mem_vertices_not_mem_tail",
+    "claim": "The name uses the `not_mem` spelling and `decomp`, where current Mathlib uses `notMem` and names the conclusion (`exists_eq_comp_...`). The statement takes `[DecidableEq V]` although neither the statement nor the proof needs it: the proof opens with `classical`.",
+    "requested_change": "Rename to e.g. `exists_eq_comp_and_notMem_tail_vertices_of_mem`, drop the `[DecidableEq V]` binder (keep `classical` in the proof), and fold the `h_case₁`/`h_case₂` scaffolding into direct `rcases`/`by_cases` branches.",
+    "severity": "advisory",
+    "evidence": "Diff: `theorem exists_decomp_of_mem_vertices_not_mem_tail [DecidableEq V] ... := by classical ...`; the conclusion `p = p₁.comp p₂ ∧ x ∉ p₂.vertices.tail` has no decidability content."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean Quiver.Path.exists_comp_of_length_le",
+    "claim": "The `cons` branch of `exists_comp_of_length_le` uses a non-terminal `simp; rw [hp]` and an auto-bound `rename_i c`, both against Mathlib style. The lemma is also about path length, not vertices.",
+    "requested_change": "Replace `simp; rw [hp]` with `simp [hp]` (or `subst hp; simp`), name the implicit vertex in the `cons` pattern (`| @cons c _ p' e ih`) instead of `rename_i`, and move the lemma into the `Decomposition` section of Mathlib/Combinatorics/Quiver/Path.lean next to `eq_toPath_comp_of_length_eq_succ`.",
+    "severity": "advisory",
+    "evidence": "Diff lines: `refine ⟨d, p₁, p₂.cons e, ?_, hl⟩` / `simp; rw [hp]` and `rename_i c`. Base Path.lean:151-195 holds `eq_toPath_comp_of_length_eq_succ`, `length_ne_zero_iff_eq_comp` and `length_ne_zero_iff_eq_cons` in a `section Decomposition`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean",
+    "claim": "The import line was changed to `import Mathlib.Combinatorics.Quiver.Path--.Decomposition`, a leftover commented-out suffix.",
+    "requested_change": "Restore the line to `import Mathlib.Combinatorics.Quiver.Path` (or import `Mathlib.Combinatorics.Quiver.Path.Decomposition` properly if it is needed).",
+    "severity": "blocking",
+    "evidence": "Diff hunk `-import Mathlib.Combinatorics.Quiver.Path` / `+import Mathlib.Combinatorics.Quiver.Path--.Decomposition`."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/Vertices.lean",
+    "claim": "The PR rewrites existing proofs for no functional reason: it strips `List.` prefixes in `verticesSet_nil`, `vertices_head?`, `vertices_getLast`, `vertices_comp`, `vertices_head_eq` and `end_mem_vertices`, and turns `vertices_length`'s `simp only` calls into bare `simp`. The new section also re-opens `List` and redeclares `variable {V : Type*} [Quiver V]`, although the file already has both at the top.",
+    "requested_change": "Revert the edits to pre-existing declarations and remove the duplicated `variable {V : Type*} [Quiver V]` / `open List` from the new section.",
+    "severity": "advisory",
+    "evidence": "Base Vertices.lean:20-22 already has `open List` and `variable {V : Type*} [Quiver V]`; the diff's hunks at lines 48-163 change only qualifiers and `simp only` → `simp`."
+  },
+  {
+    "target": "PR",
+    "claim": "About 320 lines of path-vertex decomposition lemmas in Vertices.lean, plus `List.exists_mem_split`, are unrelated to the PR's topic: `Matrix/Irreducible/Defs.lean` imports neither Vertices.lean nor uses any of those lemmas. The PR also has no description, and its title prefix `PerronFrobenius` is not a Mathlib path.",
+    "requested_change": "Split the PR into (1) the Vertices.lean decomposition lemmas, (2) the strongly-connected quiver file, and (3) the matrix irreducibility file. Add a description to each, and use path-based title prefixes such as `feat(Combinatorics/Quiver/Path)` and `feat(LinearAlgebra/Matrix/Irreducible)`.",
+    "severity": "blocking",
+    "evidence": "Defs.lean imports `Mathlib.Analysis.RCLike.Basic`, `...Quiver.Path.StronglyConnected`, `Mathlib.Data.Matrix.Basic`, `...Quiver.Path.Decomposition` only; pr.md 'Description: (no description)'."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/StronglyConnected.lean Quiver.StronglyConnectedComponent",
+    "claim": "`stronglyConnectedSetoid` and `StronglyConnectedComponent` belong beside `zigzagSetoid` and `WeaklyConnectedComponent` in Combinatorics/Quiver/ConnectedComponent.lean, whose module docstring still says 'Strongly connected components have not yet been defined'. They are also unused in this PR.",
+    "requested_change": "Move `stronglyConnectedSetoid`, `StronglyConnectedComponent` and its API into ConnectedComponent.lean and update that module docstring, or drop them from this PR. Also fix the `fun ?_ =>` binder to `fun _ ↦` and indent the continuation lines of `StronglyConnectedComponent.eq`'s statement by 4 spaces.",
+    "severity": "advisory",
+    "evidence": "Base ConnectedComponent.lean:17 'Strongly connected components have not yet been defined.' and lines 28-54 give the parallel `zigzagSetoid`/`WeaklyConnectedComponent.mk`/`.eq` API that the new code copies."
+  },
+  {
+    "target": "Mathlib/Combinatorics/Quiver/Path/StronglyConnected.lean Quiver.IsStronglyConnected",
+    "claim": "`IsStronglyConnected` is an `abbrev` phrased through `Nonempty` of a subtype. That forces the boilerplate iff lemma `isStronglyConnected_iff_forall_exists_pos_length_path`, and `exists_pos_length_path_of_isStronglyConnected` is then only `h i j`. Its positive-length requirement for `i = j` (every vertex lies on a cycle) differs from the usual definition of strong connectivity, and neither the declaration docstring nor the module docstring (`/-! # Strongly-connected Quivers-/`) says so.",
+    "requested_change": "Make it a `def` stated as `∀ i j : V, ∃ p : Path i j, 0 < p.length`. Delete `isStronglyConnected_iff_forall_exists_pos_length_path` and `exists_pos_length_path_of_isStronglyConnected`, keeping at most the cycle lemma. Document the positive-length convention in the docstring, and write a real module docstring listing the main definitions.",
+    "severity": "advisory",
+    "evidence": "Diff: `abbrev IsStronglyConnected (V) [Quiver V] : Prop := ∀ i j : V, Nonempty { p : Path i j // p.length > 0 }`, then a 10-line `constructor/rcases` proof converting to `∃ p, 0 < p.length`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.Irreducible",
+    "claim": "`Matrix.Irreducible` clashes with `_root_.Irreducible` (Algebra/Group/Irreducible/Defs.lean:40). That notion already applies to `A : Matrix n n ℝ` as an element of a monoid and means something different, so inside `namespace Matrix` `Irreducible A` silently changes meaning. The name is also inconsistent with its sibling `IsPrimitive`.",
+    "requested_change": "Rename `Matrix.Irreducible` to `Matrix.IsIrreducible` and update the dependent names (`irreducible_iff_exists_pow_pos` → `isIrreducible_iff_exists_pow_pos`, `Irreducible.transpose` → `IsIrreducible.transpose`, ...).",
+    "severity": "blocking",
+    "evidence": "mlfind: `structure Irreducible (p : M) : Prop` at Mathlib/Algebra/Group/Irreducible/Defs.lean:40; `Matrix n n ℝ` is a monoid under `[DecidableEq n] [Fintype n]`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.irreducible_no_zero_row",
+    "claim": "The hypothesis `h_dim : 1 < Fintype.card n` is unnecessary. Because `IsStronglyConnected` demands a positive-length path from `i` to `i`, the first edge of that cycle already gives `0 < A i c`, so the boundary-crossing argument through `Path.Decomposition` is not needed.",
+    "requested_change": "Drop `h_dim`. Prove the lemma by `obtain ⟨⟨p, hp⟩⟩ := h_irr.2 i i` followed by `Path.length_ne_zero_iff_eq_comp` (or `eq_toPath_comp_of_length_eq_succ`) to extract `e : i ⟶ c`, which is `0 < A i c`. Then remove the now-unused `Mathlib.Combinatorics.Quiver.Path.Decomposition` import.",
+    "severity": "advisory",
+    "evidence": "Diff: `obtain ⟨j, hij⟩ := Fintype.exists_ne_of_one_lt_card h_dim i` ... `Path.exists_notMem_mem_hom_path_path_of_notMem_mem`. Base Path.lean:171 `length_ne_zero_iff_eq_comp : p.length ≠ 0 ↔ ∃ c (e : a ⟶ c) p', p = e.toPath.comp p' ∧ ...`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.irreducible_no_zero_row",
+    "claim": "The name `irreducible_no_zero_row` does not describe the conclusion `∃ j, 0 < A i j` in Mathlib style, and `A` is explicit even though `h_irr` determines it, so dot notation is unavailable.",
+    "requested_change": "Rename to `IsIrreducible.exists_pos` (or `Irreducible.exists_pos_apply` if the def keeps its name), make `A` implicit, and put `h_irr` first so `h_irr.exists_pos i` works.",
+    "severity": "advisory",
+    "evidence": "Diff: `lemma irreducible_no_zero_row (A : Matrix n n ℝ) (h_irr : Irreducible A) (h_dim : ...) (i : n) : ∃ j, 0 < A i j`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.IsPrimitive.to_Irreducible",
+    "claim": "The name `IsPrimitive.to_Irreducible` is non-standard: Mathlib names such projections with the lowerCamel conclusion, e.g. `IsPrimitive.irreducible`, with no `to_` and no capital letter.",
+    "requested_change": "Rename to `IsPrimitive.isIrreducible` (after renaming the def) or `IsPrimitive.irreducible`, and write the proof as `(isIrreducible_iff_exists_pow_pos h.1).2 fun i j ↦ ⟨k, hk, hk_all i j⟩`.",
+    "severity": "advisory",
+    "evidence": "Diff: `theorem IsPrimitive.to_Irreducible [DecidableEq n] (h_prim : IsPrimitive A) : Irreducible A`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.Irreducible.transpose",
+    "claim": "`Irreducible.transpose` takes `hA_nonneg : ∀ i j, 0 ≤ A i j`, but that is already `hA.1` because irreducibility includes nonnegativity. The statement also needs no `[DecidableEq n]`, and the proof uses `erw`.",
+    "requested_change": "Remove `hA_nonneg` and use `hA.1`. Drop `[DecidableEq n]` from the statement and use `classical` in the proof. Replace `erw [← transpose_pow]; exact hk` with `rw [← transpose_pow, transpose_apply]; exact hk` (or `simpa [← transpose_pow] using hk`).",
+    "severity": "advisory",
+    "evidence": "Diff: `theorem Irreducible.transpose [DecidableEq n] (hA_nonneg : ∀ i j, 0 ≤ A i j) (hA : Irreducible A) : Irreducible Aᵀ` with `def Irreducible A := (∀ i j, 0 ≤ A i j) ∧ ...`; `Matrix.transpose_pow` at Data/Matrix/Basic.lean:840."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.sum_pos_of_mem",
+    "claim": "The private `sum_pos_of_mem` duplicates `Finset.sum_pos'`. Its proof is dead code: it rewrites with `add_sum_erase` and back, builds an unused `h_erase_nonneg`, contains a trailing-comma `rw` and a `propext` rewrite, and finally calls `sum_pos_iff_of_nonneg` anyway.",
+    "requested_change": "Delete `sum_pos_of_mem` and use `Finset.sum_pos' (fun x _ ↦ ...) ⟨b, mem_univ b, h_prod⟩` in `pow_entry_pos_iff_exists_path`.",
+    "severity": "blocking",
+    "evidence": "Base Algebra/Order/BigOperators/Group/Finset.lean:462 `@[to_additive sum_pos'] theorem one_lt_prod' (h : ∀ i ∈ s, 1 ≤ f i) (hs : ∃ i ∈ s, 1 < f i)`, i.e. `sum_pos' : (∀ i ∈ s, 0 ≤ f i) → (∃ i ∈ s, 0 < f i) → 0 < ∑ i ∈ s, f i`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.exists_mem_of_sum_pos",
+    "claim": "The private `exists_mem_of_sum_pos` is the forward direction of the existing `Finset.sum_pos_iff_of_nonneg`.",
+    "requested_change": "Delete it and use `(Finset.sum_pos_iff_of_nonneg h_nonneg).1 h_pos`.",
+    "severity": "blocking",
+    "evidence": "Base Algebra/Order/BigOperators/Group/Finset.lean:153 `@[to_additive sum_pos_iff_of_nonneg] lemma one_lt_prod_iff_of_one_le (hf : ∀ x ∈ s, 1 ≤ f x) : 1 < ∏ x ∈ s, f x ↔ ∃ x ∈ s, 1 < f x`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.pow_nonneg",
+    "claim": "The private helper is tagged `@[simp]` although its conclusion is a `∀ i j` statement guarded by a hypothesis simp cannot discharge, and its name shadows `_root_.pow_nonneg` inside `namespace Matrix`. Entrywise nonnegativity of powers is also generally useful API, so it should not be private.",
+    "requested_change": "Remove `@[simp]`, make it public as `Matrix.pow_apply_nonneg` with statement `(hA : ∀ i j, 0 ≤ A i j) (k : ℕ) (i j : n) : 0 ≤ (A ^ k) i j`, and replace the non-terminal `simp [one_apply]; by_cases` in the zero case with `simp only [pow_zero, one_apply]; split_ifs <;> norm_num`.",
+    "severity": "advisory",
+    "evidence": "Diff: `@[simp] private lemma pow_nonneg [DecidableEq n] {A} (hA : ∀ i j, 0 ≤ A i j) (k : ℕ) : ∀ i j, 0 ≤ (A ^ k) i j` with `| zero => intro i j; simp [one_apply]; by_cases h : i = j <;> simp [h]`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.pow_entry_pos_iff_exists_path",
+    "claim": "The proof of `pow_entry_pos_iff_exists_path` is padded: `let h_A_pos := e`, a closing `simp_all only [..., mul_pos_iff_of_pos_left, exists_apply_eq_apply, ...]` to show `p.length + 1 = m + 1`, and three private helpers where library lemmas suffice. The name also says `entry` where matrix lemmas say `apply`.",
+    "requested_change": "Rename to `pow_apply_pos_iff_nonempty_path`. In the `succ` case rewrite with `Finset.sum_pos_iff_of_nonneg` and positivity of products of nonnegatives, close the length goal with `by simp [hp_len]`, and use `e` directly in place of `h_A_pos`.",
+    "severity": "advisory",
+    "evidence": "Diff lines: `exact ⟨letI := toQuiver A; p.cons h_A, by subst hp_len; simp_all only [mem_univ, nonempty_subtype, mul_pos_iff_of_pos_left, exists_apply_eq_apply, Path.length_cons]⟩` and `let h_A_pos := e`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/Matrix/Irreducible/Defs.lean Matrix.toQuiver",
+    "claim": "`toQuiver`, `Irreducible` and `IsPrimitive` are hard-coded to `ℝ`, although `toQuiver` only needs `[Zero R] [LT R]` and the other results only use ordered-semiring facts (`mul_nonneg`, `mul_pos`, `sum_nonneg`, `sum_pos_iff_of_nonneg`). The ℝ specialisation is also why the heavy import `Mathlib.Analysis.RCLike.Basic` is there.",
+    "requested_change": "State the file over `{R : Type*} [Semiring R] [PartialOrder R] [IsOrderedRing R]` (or a linearly ordered semiring where the positivity iff needs it), with `toQuiver` requiring only `[Zero R] [LT R]`. Replace `import Mathlib.Analysis.RCLike.Basic` with the minimal order and big-operator imports.",
+    "severity": "advisory",
+    "evidence": "Diff: `def toQuiver (A : Matrix n n ℝ) : Quiver n := ⟨fun i j => 0 < A i j⟩`. The module doc itself says 'Many statements would generalize to linearly ordered semifields ... left as TODO'. Nothing in the file uses RCLike."
+  }
+]

@@ -1,0 +1,66 @@
+{
+ "1": {
+  "F12_total": 21,
+  "C_F12": 9,
+  "P_any_F12": 14,
+  "P_both_F12": 12,
+  "stability": 0.86,
+  "findings": {
+   "C": 93,
+   "P1": 52,
+   "P2": 52
+  },
+  "findings_per_pr_per_P_run": 5.2,
+  "reach_ok": false,
+  "supported": false,
+  "split": {
+   "ai": {
+    "F12": 10,
+    "C": 6,
+    "P_any": 7
+   },
+   "main": {
+    "F12": 11,
+    "C": 3,
+    "P_any": 7
+   }
+  },
+  "all_asks": {
+   "C": 11,
+   "C_or_P1": 14,
+   "total": 23
+  }
+ },
+ "2": {
+  "F12_total": 21,
+  "C_F12": 6,
+  "P_any_F12": 13,
+  "P_both_F12": 11,
+  "stability": 0.85,
+  "findings": {
+   "C": 93,
+   "P1": 52,
+   "P2": 52
+  },
+  "findings_per_pr_per_P_run": 5.2,
+  "reach_ok": false,
+  "supported": false,
+  "split": {
+   "ai": {
+    "F12": 10,
+    "C": 3,
+    "P_any": 6
+   },
+   "main": {
+    "F12": 11,
+    "C": 3,
+    "P_any": 7
+   }
+  },
+  "all_asks": {
+   "C": 8,
+   "C_or_P1": 13,
+   "total": 23
+  }
+ }
+}

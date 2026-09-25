@@ -1,0 +1,26 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The PR has no description. It is a perf PR, and it gives neither the mechanism nor any measurement. It also changes two public meta APIs without saying so: the `construct` callback of `Mathlib.Tactic.addRelatedDecl` loses its `type` argument and now receives the source constant instead of its proof term, and `elementwiseExpr` loses its `type` parameter.",
+    "requested_change": "Add a description. It should say that `addRelatedDecl` used to pass `info.value!`, so each `_assoc`/`_apply`/`_app` lemma inlined the source lemma's whole proof and the kernel re-checked it, and that the generated lemma now refers to the source constant. Include the `!bench` result for the speedup (about 2.8k attribute uses in Mathlib are affected), and note the signature changes to `addRelatedDecl` and `elementwiseExpr` for downstream meta code. The squash commit message is built from this text.",
+    "severity": "advisory",
+    "evidence": "pr.md: 'Description: (no description)'. diff: Mathlib/Util/AddRelatedDecl.lean changes `construct : Expr → Expr → List Name → ...` to `Expr → List Name → ...`, and `construct info.type info.value! ...` becomes `.const src (info.levelParams.map mkLevelParam)`. mlcount '@\\[.*(reassoc|elementwise|to_app)' Mathlib = 2842 lines."
+  },
+  {
+    "target": "Mathlib/Tactic/CategoryTheory/Reassoc.lean: reassocExpr / reassocExpr'",
+    "question": "5",
+    "claim": "The PR drops the now-redundant `type` parameter from `elementwiseExpr` but not the matching `type? : Option Expr` parameter of `reassocExpr`/`reassocExpr'`. After this PR every caller in Mathlib passes `none`, so the `mkExpectedTypeHint` branch of `reassocExpr` is dead.",
+    "requested_change": "Remove the `type?` parameter from `reassocExpr` and `reassocExpr'`, together with its type-hint branch and docstring sentence, as was done for `elementwiseExpr`. If it is kept for downstream users, say so in the description.",
+    "severity": "advisory",
+    "evidence": "mlgrep 'reassocExpr' shows only two callers: Reassoc.lean:141 (`reassocExpr' value type`, which becomes `reassocExpr' value none` in the diff) and Reassoc.lean:155 (`reassocExpr' e none`). Reassoc.lean:112 is `let pf ← if let some type := type? then mkExpectedTypeHint pf type else pure pf`, and Reassoc.lean:107 reads 'If `type?` is not given, it is assumed to be the type of `pf`.'"
+  },
+  {
+    "target": "Mathlib/Util/AddRelatedDecl.lean: addRelatedDecl docstring",
+    "question": "5",
+    "claim": "The signature of `construct` changed, but its docstring was not updated. It still documents `construct type value levels` as 'given the type, value, and universe variables of the original declaration'. The callback now gets the constant `src` applied to its universe parameters, not the proof term. The same docstring also lists only `reassoc` and `elementwise` as users, although `to_app` uses it as well.",
+    "requested_change": "Update the `construct` bullet to say the callback receives the original declaration as a constant, applied to its universe parameters, plus its level names. Add `to_app` to the list of users.",
+    "severity": "advisory",
+    "evidence": "mlshow Mathlib/Util/AddRelatedDecl.lean: lines 20 and 33-36 are untouched by the diff. mlgrep 'addRelatedDecl' shows the callers Elementwise.lean:216, Reassoc.lean:139 and ToApp.lean:125."
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "target": "MeasureTheory.Supermartingale.measureReal_le_div (and the PR title)",
+    "question": "1",
+    "claim": "The PR says it proves Ville's inequality, but it does not. Ville's inequality is a maximal inequality, μ {ω | ∃ n, λ ≤ f n ω} ≤ 𝔼[f 0] / λ (or a bound on sup_{k ≤ n} f k). What the PR proves is the bound at one fixed time n: Markov's inequality (`mul_meas_ge_le_integral_of_nonneg`) combined with 𝔼[f n] ≤ 𝔼[f 0], three lines in all. The name would send users who look up Ville's inequality to a weaker statement. `integral_stoppedValue_le` is exactly the ingredient the real maximal proof needs, yet nothing in the file uses it.",
+    "requested_change": "Either prove the maximal statement or drop the name. The maximal statement would first be the finite-horizon λ·μ{λ ≤ (range (n+1)).sup' … f k} ≤ 𝔼[f 0], using the hitting time `hittingBtwn f {y | λ ≤ y} 0 n` together with `integral_stoppedValue_le`, mirroring `smul_le_stoppedValue_hittingBtwn`/`maximal_ineq`; then the bound over all n by a monotone limit. If that is out of scope, retitle the PR and rename the docstrings so the fixed-time Markov corollary is not called Ville's inequality.",
+    "severity": "blocking",
+    "evidence": "Mathlib/Probability/Martingale/OptionalStopping.lean:119-160 (section Maximal: `smul_le_stoppedValue_hittingBtwn`, `maximal_ineq` for nonnegative submartingales, stated on sup' over range (n+1)); Mathlib/MeasureTheory/Integral/Bochner/Basic.lean:1151 (`mul_meas_ge_le_integral_of_nonneg`); the diff's proof of `measureReal_le_div` is `h_markov` + `h_mono` + `linarith`, and `integral_stoppedValue_le` has no use site in the diff."
+  },
+  {
+    "target": "MeasureTheory.Supermartingale.measureReal_le_div_forall",
+    "question": "1",
+    "claim": "This theorem is `fun n => hf.measureReal_le_div hnn hlam n`, the previous theorem with its last argument moved behind a ∀. It adds no content. Its docstring calls it 'the uniform version of Ville's inequality, holding for all n simultaneously', but it bounds each n separately, not the supremum, so the docstring misleads.",
+    "requested_change": "Delete the declaration and its entry in the module docstring's Main results.",
+    "severity": "blocking",
+    "evidence": "Diff, Ville.lean: the body of `measureReal_le_div_forall` is `fun n => hf.measureReal_le_div hnn hlam n`."
+  },
+  {
+    "target": "MeasureTheory.Supermartingale.integral_le",
+    "question": "6",
+    "claim": "This is the special case s = univ of the existing `Supermartingale.setIntegral_le`. The PR states it in a new file, only for ℕ-indexed real processes, while `setIntegral_le` is stated in Martingale/Basic.lean for any index type ι and any ordered E. Kept in Ville.lean, it is hard to find and less general than its neighbours. Its counterparts for submartingales and martingales are also missing.",
+    "requested_change": "Move it to Mathlib/Probability/Martingale/Basic.lean right after `Supermartingale.setIntegral_le`, with the same generality (ι, E), proved from `setIntegral_le` at `MeasurableSet.univ`. Add the matching `Submartingale.integral_le` after Basic.lean:217 (and the martingale equality if wanted).",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/Martingale/Basic.lean:153-159 (`Supermartingale.setIntegral_le`, general ι/E), :217-222 (`Submartingale.setIntegral_le`); no integral-level (s = univ) version exists (mlgrep for `(Super|Sub)martingale.*integral` finds only setIntegral_le, expected_stoppedValue_mono, and the upcrossing lemmas)."
+  },
+  {
+    "target": "Mathlib/Probability/Martingale/Ville.lean",
+    "question": "6",
+    "claim": "The new file holds four short lemmas, and each belongs in an existing file. `integral_stoppedValue_le` is the supermartingale, τ₁ = 0 case of `Submartingale.expected_stoppedValue_mono`, so it belongs beside that lemma. A supermartingale maximal inequality belongs in the `Maximal` section of OptionalStopping.lean, next to Doob's `maximal_ineq`, which it mirrors. That file currently has no supermartingale results at all.",
+    "requested_change": "Put `integral_stoppedValue_le` in OptionalStopping.lean, preferably as a general `Supermartingale.expected_stoppedValue_mono` (τ ≤ π, general E, proved by negation). Put the (maximal) Ville inequality in that file's `Maximal` section, and do not add a new file.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/Martingale/OptionalStopping.lean:43-47 (`Submartingale.expected_stoppedValue_mono`), :119-160 (section Maximal); mlcount 'Supermartingale' in OptionalStopping.lean = 0 and in OptionalSampling.lean = 0."
+  },
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty. It gives no motivation (what downstream work needs this), no discussion link, and no account of the design choices. The main choice is stating the bound with `μ.real` and `lam : ℝ`, whereas the neighbouring `maximal_ineq` uses ENNReal measures and `ε : ℝ≥0`. The title is truncated ('nonneg supermart…'). A reviewer cannot tell whether the fixed-time statement was intended or is a stepping stone.",
+    "requested_change": "Write a description that states the motivation, links any Zulip discussion or downstream use, explains the choice of statement form, and says whether the maximal version is planned.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'."
+  },
+  {
+    "target": "PR (file header of Mathlib/Probability/Martingale/Ville.lean)",
+    "question": "4",
+    "claim": "The header reads 'Copyright (c) 2026 AI Math Project … Authors: AI Math Project'. No human author is named, and the PR does not disclose AI assistance, which Mathlib's contribution policy requires. Where Mathlib credits AI tools, it lists them next to named humans. Maintainers need a person who is accountable for the code and can respond to review.",
+    "requested_change": "Name the human author(s) in the Copyright and Authors lines. Disclose in the PR description which AI tools were used and how.",
+    "severity": "blocking",
+    "evidence": "Diff lines 1-4 of Ville.lean; precedents: Mathlib/Analysis/Complex/Poisson.lean:4 ('Mihai Iancu, …, Aristotle AI'), Mathlib/Analysis/Complex/Polynomial/GaussLucas.lean:4 ('Yury Kudryashov, Aristotle AI'), Mathlib/NumberTheory/ModularForms/EisensteinSeries/E2/MDifferentiable.lean:4 ('Chris Birkbeck, Gauss AI (Math Inc)')."
+  }
+]

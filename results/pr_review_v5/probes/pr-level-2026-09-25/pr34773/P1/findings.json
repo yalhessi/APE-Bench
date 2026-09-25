@@ -1,0 +1,42 @@
+[
+  {
+    "target": "PR",
+    "question": "1",
+    "claim": "The change is wanted (Mathlib has no Shannon entropy of a distribution; the only entropies are Real.binEntropy/qaryEntropy and topological entropy), but the form it takes pre-empts the library's design. It claims the generic name InformationTheory.entropy and the generic path Mathlib/InformationTheory/Entropy.lean for a PMF-only, real-valued definition, while the rest of Mathlib's information theory and probability is built on Measure. The real codomain also creates a junk value: tsum of a non-summable family is 0, so any PMF with infinite entropy on an infinite type gets entropy 0. That is why entropy_eq_zero_iff and entropy_pos_of_not_pure need [Finite α]. klDiv avoids this by taking values in ℝ≥0∞, with ∞ as the default.",
+    "requested_change": "Settle the design with the probability maintainers before merging, and link the discussion. Either (a) define entropy for a measure on a countable or discrete type, so it composes with klDiv, independence and conditioning (which conditional entropy and mutual information will need), and derive the PMF statement from it through PMF.toMeasure; or (b) keep the PMF definition but scope it as PMF.entropy in Mathlib/Probability/ProbabilityMassFunction/ (or InformationTheory/Entropy/PMF.lean), so the generic name and path stay free. In either case choose the codomain on purpose (ℝ≥0∞, or ℝ with the junk-0 convention documented) and explain the choice in the module docstring.",
+    "severity": "blocking",
+    "evidence": "mlgrep for '(def|abbrev) .*[eE]ntropy' finds only BinaryEntropy.lean:63,211 and Dynamics/TopologicalEntropy/*. InformationTheory/KullbackLeibler/Basic.lean:57 defines `klDiv (μ ν : Measure α) : ℝ≥0∞` in the same InformationTheory namespace. 'PMF' occurs 0 times in Mathlib/InformationTheory and 0 times in Probability/Kernel, Independence and Moments. PMF.toMeasure exists (ProbabilityMassFunction/Basic.lean:236). The definition in the diff is `∑' a, Real.negMulLog (p a).toReal`, and every positivity or zero result carries [Finite α]."
+  },
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty. It gives no motivation or downstream use, does not explain the design choices above (PMF rather than Measure, ℝ with tsum rather than ℝ≥0∞, the namespace), links no Zulip discussion, and does not mention the NegMulLog lemma the PR also adds. It has no AI-assistance statement, although the file reads as machine-assisted, and Mathlib's contribution policy requires disclosure.",
+    "requested_change": "Write a description that states why the definition is needed and what will build on it, justifies the design choices, links the Zulip thread or project that motivates it, lists the supporting NegMulLog lemma, and states whether and how AI tools were used.",
+    "severity": "blocking",
+    "evidence": "pr.md: 'Description: (no description)'. Signs of machine assistance in Entropy.lean: typographic curly quotes in a docstring (“remove one term from the entropy sum”); running commentary such as '-- goal is now `card * negMulLog(1/card) = log card`', '-- set up positivity / nonzero facts for coercions' and 'isolate the fiddly support / `toReal` / `tsum` plumbing'; and the same PMF.ext proof block pasted twice (support_nontrivial_of_not_pure and toReal_lt_one_of_mem_support_of_not_pure)."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean (support_nontrivial_of_not_pure, toReal_lt_one_of_mem_support_of_not_pure)",
+    "question": "6",
+    "claim": "Both private helpers re-prove the general PMF fact `p a = 1 → p = PMF.pure a` with the same ext argument, copied verbatim. They also re-derive `(p a).toReal ≤ 1` inline three times. These are statements about PMF, not about entropy, and the PMF API lacks them.",
+    "requested_change": "Add the missing API lemma to Mathlib/Probability/ProbabilityMassFunction/Monad.lean next to support_pure, e.g. `PMF.eq_pure_iff : p = pure a ↔ p a = 1` (and optionally `↔ p.support = {a}`). Then derive both helpers from it, or drop them, instead of keeping private copies in the entropy file.",
+    "severity": "advisory",
+    "evidence": "mlgrep for '= (PMF\\.)?pure [a-z]' in Mathlib/Probability finds only map_const and Measure.dirac ... toPMF, so no characterisation of `p = pure a` exists. The nearest lemma is PMF.apply_eq_one_iff (ProbabilityMassFunction/Basic.lean:99: `p a = 1 ↔ p.support = {a}`), which the PR uses and then extends by hand twice."
+  },
+  {
+    "target": "InformationTheory.nat_mul_negMulLog_inv_eq_log",
+    "question": "6",
+    "claim": "A public lemma in the InformationTheory namespace states a fact about Real.negMulLog, phrased through ENNReal coercions. Nothing about it is information theory. As public API it is in the wrong namespace and file, and it is stated in an awkward form.",
+    "requested_change": "Either make it private (it serves only the two uniform-distribution proofs), or move it to Mathlib/Analysis/SpecialFunctions/Log/NegMulLog.lean as a real-valued Real lemma, e.g. `x * negMulLog x⁻¹ = log x`. That identity holds for every real x, because both sides are 0 at x = 0. Do the ENNReal.toReal step at the use site.",
+    "severity": "advisory",
+    "evidence": "Diff: `lemma nat_mul_negMulLog_inv_eq_log (n : ℕ) (hn : 0 < n) : (n : ℝ) * Real.negMulLog (((n : ENNReal)⁻¹).toReal) = Real.log n` sits inside `namespace InformationTheory`. Its only callers are entropy_uniformOfFintype and entropy_uniformOfFinset. NegMulLog.lean (namespace Real) already holds the sibling facts negMulLog_mul, negMulLog_nonneg and, from this PR, negMulLog_pos_of_pos_lt_one."
+  },
+  {
+    "target": "Mathlib/InformationTheory/Entropy.lean (section Examples)",
+    "question": "6",
+    "claim": "The four closing examples restate lemmas the file has just proved: entropy_pure for PMF.pure () and for PMF.pure true, and the two uniform lemmas at particular types. They test nothing new, cost build time in a library file, and one docstring is wrong: it says Fin n is `{0,1, ..., n}`.",
+    "requested_change": "Delete the Examples section. If regression tests are wanted, move them to MathlibTest/.",
+    "severity": "advisory",
+    "evidence": "Diff: `example : entropy (PMF.pure ()) = 0 := by simp only [entropy_pure]` and `example : entropy (PMF.pure true) = 0 := by simp only [entropy_pure]`; the docstring 'Entropy of the uniform distribution on `{0,1, ..., n}` is `log n`' sits on `PMF.uniformOfFintype (Fin n)`. mlgrep finds no `example` blocks in Mathlib/InformationTheory or Mathlib/Probability/ProbabilityMassFunction, and a '/-! ### Examples -/' section header in only one Mathlib file (NumberTheory/Bernoulli.lean:91)."
+  }
+]

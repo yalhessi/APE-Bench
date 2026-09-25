@@ -1,0 +1,26 @@
+[
+  {
+    "target": "PR (title, description, grw docstring in Mathlib/Tactic/GRewrite/Elab.lean, test in MathlibTest/GRewrite.lean)",
+    "question": "4",
+    "claim": "The title, description, docstring and test all spell the option `grw (transparency := default)` with a bare `default`. A config value is elaborated as a term, so a bare `default` is `Inhabited.default`, not the constructor `TransparencyMode.default`. Core's `TransparencyMode` derives `Inhabited`, so its default value is its first constructor, which is probably `.all` (that can unfold `@[irreducible]` definitions), not the `erw`-like `.default` that the PR promises. The new test cannot tell the two apart: `1 + 2` versus `2 + 1` over `Int` is closed under either mode. So the PR advertises a spelling that probably does not do what the text says.",
+    "requested_change": "Spell it `grw (transparency := .default)` in the title, description, docstring and test, as the rest of Mathlib does. Add a test that separates `.default` from `.all`, for example one where an `@[irreducible]` definition must not be unfolded.",
+    "severity": "blocking",
+    "evidence": "Every other tactic-config use in Mathlib writes the dotted form (8 sites, and no tactic config uses a bare `default`): Mathlib/Tactic/CongrExclamation.lean:719 docstring `congr! (transparency := .default) 2`; Mathlib/Tactic/Convert.lean:120,176; Mathlib/Tactic/ErwQuestion.lean:121 `{ transparency := .default } -- Default transparency turns rw into erw`; Mathlib/NumberTheory/ClassNumber/AdmissibleAbsoluteValue.lean:65; Mathlib/Topology/Sets/Opens.lean:315. The only bare-`default` hit is a Lean function argument at Mathlib/Tactic/Generalize.lean:42. That the derived instance is `.all` comes from Lean core's definition of `TransparencyMode`, which the tools here cannot show, so it is inferred, not checked."
+  },
+  {
+    "target": "PR description",
+    "question": "4",
+    "claim": "The description explains only why there is no `egrw`. It gives no motivation: no use case that needs `erw`-like `grw`, and no link to a discussion. It also does not say that the Core.lean hunk changes how every `grw` call builds its proof, not only calls that set the option. The PR moves the hole annotation from the rewritten side (`eNew'` built from `rhs`) to the original side (`e'` built from `lhs`), flips gcongr's side flag from `!forwardImp` to `forwardImp`, and `impProof` now has type `e' → eNew`, where `e'` is only default-defeq to the goal `e`. This path runs on every one of the roughly 488 grw/nth_grw/apply_rw/grewrite lines in Mathlib, so reviewers need to be told why it is safe and cheap at reducible transparency.",
+    "requested_change": "Add the motivating example or a Zulip link. Describe the design change to the shared path and why it preserves behaviour at the default reducible setting, and post a `!bench` result showing no slowdown across Mathlib's uses of grw.",
+    "severity": "advisory",
+    "evidence": "Base Mathlib/Tactic/GRewrite/Core.lean:125-131 (the old `mkImp e eNew'` with `gcongr (!forwardImp)`) against the diff (`mkImp e' eNew` with `gcongr forwardImp`). There is no config branch, so the default path changes too. mlcount '\\b(grw|nth_grw|apply_rw|grewrite)\\b' Mathlib = 488."
+  },
+  {
+    "target": "MathlibTest/GRewrite.lean",
+    "question": "5",
+    "claim": "The PR flips the gcongr side for both implication directions, but the only new test rewrites the goal (the `forwardImp := false` path taken by `grewriteTarget`). It never runs `at h` (the `forwardImp := true` path taken by `grewriteLocalDecl`), where `impProof : e' → eNew` is applied to a hypothesis of type `e`. The test also closes with `simp`, which hides what the rewritten goal is, and it does not show that plain `grw` fails on the same input. As written it would still pass if the option had no effect on the match.",
+    "requested_change": "Add an `at h` example that also needs non-reducible matching. Add a `#guard_msgs` check that plain `grw [h]` fails on the same goal. Replace the closing `simp` with `guard_target` (or `guard_hyp`) on the rewritten expression, following the file's existing style.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Tactic/GRewrite/Elab.lean:38 (target, forwardImp := false) and :54-56 (hypothesis, forwardImp := true, `.app r.impProof (.fvar fvarId)`). MathlibTest/GRewrite.lean already uses guard_target/guard_hyp/#guard_msgs on 31 lines. The diff adds a single goal-only example that ends in `simp`."
+  }
+]

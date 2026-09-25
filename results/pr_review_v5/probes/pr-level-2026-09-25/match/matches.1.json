@@ -1,0 +1,39 @@
+{
+  "asks": [
+    {"pr": 34773, "ask_id": "v1784", "R1": "reached", "R1_finding": 4, "R2": "reached", "R2_finding": 14, "R3": "reached", "R3_finding": 5, "note": "All three ask to delete the Examples section or move it to MathlibTest."},
+    {"pr": 34773, "ask_id": "v1785", "R1": "partial", "R1_finding": 1, "R2": "no", "R2_finding": null, "R3": "partial", "R3_finding": 1, "note": "R1 and R3 request AI-use disclosure; no reviewer asks to fix the PR title."},
+    {"pr": 36641, "ask_id": "v2131", "R1": "reached", "R1_finding": 4, "R2": "no", "R2_finding": null, "R3": "reached", "R3_finding": 5, "note": "R1[4]+[5] and R3[5]+[0] cover description, AI disclosure, retitle; R2 only flags header author names."},
+    {"pr": 36641, "ask_id": "v2132", "R1": "reached", "R1_finding": 0, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "All three say the fixed-time Markov bound is not Ville's maximal inequality."},
+    {"pr": 36856, "ask_id": "v2180", "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null, "R3": "no", "R3_finding": null, "note": "No finding questions whether the PR description's cited links support its claims."},
+    {"pr": 36856, "ask_id": "v2181", "R1": "partial", "R1_finding": 1, "R2": "partial", "R2_finding": 0, "R3": "no", "R3_finding": null, "note": "R1/R2 call the publisher edit non-corrective and revert only it; none asks to close the PR."},
+    {"pr": 36912, "ask_id": "v2191", "R1": "reached", "R1_finding": 0, "R2": "reached", "R2_finding": 1, "R3": "reached", "R3_finding": 0, "note": "R1/R3 ask to close the PR; R2 asks to delete both the script and the file."},
+    {"pr": 36912, "ask_id": "v2192", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "All three ask to remove the personal push script; R3[0] calls it a test PR."},
+    {"pr": 36914, "ask_id": "v2193", "R1": "reached", "R1_finding": 0, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "All three identify a personal test/demo upload and ask to close the PR."},
+    {"pr": 36914, "ask_id": "v2194", "R1": "reached", "R1_finding": 0, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "All ask to close the PR, but for other reasons; none notices the duplicate #36915."},
+    {"pr": 27841, "ask_id": "v0536", "R1": "partial", "R1_finding": 3, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 0, "note": "R2/R3 ask to explain motivation and signature changes; R1 only objects to making f implicit."},
+    {"pr": 27841, "ask_id": "v0537", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 3, "R3": "reached", "R3_finding": 3, "note": "All propose a general to_additive lemma over involutive index, next to Equiv.tprod_eq in Basic.lean."},
+    {"pr": 27841, "ask_id": "v0538", "R1": "partial", "R1_finding": 10, "R2": "partial", "R2_finding": 5, "R3": "partial", "R3_finding": 6, "note": "All restate the lemma multiplicatively like the maintainer's code, but none drops the R generalisation."},
+    {"pr": 28728, "ask_id": "v0674", "R1": "reached", "R1_finding": 13, "R2": "reached", "R2_finding": 0, "R3": "reached", "R3_finding": 1, "note": "All three ask to split into at least three PRs along the same lines."},
+    {"pr": 28728, "ask_id": "v0675", "R1": "no", "R1_finding": null, "R2": "partial", "R2_finding": 1, "R3": "reached", "R3_finding": 1, "note": "R3 asks to link the dependency in the description; R2 only generically lists dependent PRs."},
+    {"pr": 29513, "ask_id": "v0838", "R1": "reached", "R1_finding": 4, "R2": "reached", "R2_finding": 1, "R3": "no", "R3_finding": null, "note": "R1 and R2 ask for a regression test; R3 has no test finding."},
+    {"pr": 29513, "ask_id": "v0839", "R1": "partial", "R1_finding": 4, "R2": "partial", "R2_finding": 1, "R3": "no", "R3_finding": null, "note": "Maintainer wants lint-style run on a MathlibTest file; R1 proposes a unit test, R2 inline #guards."},
+    {"pr": 30650, "ask_id": "v1060", "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null, "R3": "no", "R3_finding": null, "note": "No finding suggests applying the same change to to_additive."},
+    {"pr": 30650, "ask_id": "v1061", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 2, "R3": "reached", "R3_finding": 0, "note": "All three ask to update the construct bullet of the addRelatedDecl docstring."},
+    {"pr": 30650, "ask_id": "v1062", "R1": "reached", "R1_finding": 0, "R2": "partial", "R2_finding": 0, "R3": "no", "R3_finding": null, "note": "R1 explains why the type argument goes away; R2 only asks to note the signature change."},
+    {"pr": 32315, "ask_id": "v1329", "R1": "no", "R1_finding": null, "R2": "partial", "R2_finding": 1, "R3": "partial", "R3_finding": 0, "note": "R2/R3 ask for a motivating use case; none raises erw as tracked technical debt."},
+    {"pr": 32315, "ask_id": "v1331", "R1": "reached", "R1_finding": 1, "R2": "reached", "R2_finding": 2, "R3": "reached", "R3_finding": 2, "note": "All three ask for guard_target (3 : Int) ≤ 4 after the rewrite."},
+    {"pr": 32315, "ask_id": "v1332", "R1": "reached", "R1_finding": 2, "R2": "reached", "R2_finding": 2, "R3": "reached", "R3_finding": 2, "note": "All ask for more behavior tests; R2[1]/R3[0] also ask to explain the forwardImp flip."}
+  ],
+  "unmatched": {
+    "34773": {"R1": 3, "R2": 15, "R3": 4},
+    "36641": {"R1": 2, "R2": 9, "R3": 4},
+    "36856": {"R1": 1, "R2": 1, "R3": 2},
+    "36912": {"R1": 2, "R2": 3, "R3": 3},
+    "36914": {"R1": 9, "R2": 3, "R3": 7},
+    "27841": {"R1": 6, "R2": 1, "R3": 1},
+    "28728": {"R1": 25, "R2": 8, "R3": 7},
+    "29513": {"R1": 4, "R2": 2, "R3": 3},
+    "30650": {"R1": 2, "R2": 1, "R3": 1},
+    "32315": {"R1": 2, "R2": 0, "R3": 0}
+  }
+}

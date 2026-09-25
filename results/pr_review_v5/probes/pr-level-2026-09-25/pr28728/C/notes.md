@@ -1,0 +1,21 @@
+# PR 28728 review notes
+
+- **Mathlib.lean**: import additions are sorted correctly; nothing to request.
+- **Data/List/Basic.lean `exists_mem_split`**: searched for `append_of_mem`, found the core lemma with an identical statement already used across Mathlib. Duplicate, so the author-line change should go too.
+- **Vertices.lean, the file as a whole**: the file already had `open List` and the section variables, so dropping `List.` prefixes is churn. The import line carries a leftover `--.Decomposition` comment. The matrix file never imports Vertices.lean, so the 320 new lines belong in a separate PR.
+- **`vertices_head_eq_start`, `vertices_getLast_eq_end`, `end_eq_vertices_get_of_comp_length`**: compared with the base file. Each matches an existing lemma (`vertices_head_eq`, `vertices_getLast`/`vertices_getLast_eq`, `vertices_comp_get_length_eq`).
+- **`exists_comp_of_length_le`**: the content is fine. It has a non-terminal `simp; rw`, and since it is a pure length lemma it belongs next to `eq_toPath_comp_of_length_eq_succ` in Path.lean.
+- **`exists_comp_of_mem_vertices`**: fine apart from swapping in `List.append_of_mem`, which is covered by the List finding.
+- **`split_at_vertices_index`**: a naming problem, a docstring that names the wrong declaration, and `List.get`. It is just two existing lemmas combined.
+- **`not_mem_vertices_dropLast_of_split_at_vertex` / `mem_tail_vertices_suffix_of_two_le_count`**: `let` and ∀ binders sit after the colon, and the names use `not_mem` where Mathlib now says `notMem` (checked the deprecation aliases at base). In the count lemma, the membership hypothesis already follows from the count hypothesis.
+- **`vertices_dropLast_isPrefix_of_vertices_eq`**: only `prefix_append` after a rewrite, and it redeclares `V`. Suggested removal.
+- **`mem_vertices_eq_end_or_mem_dropLast` / `exists_prefix_of_mem_vertices_ne_end`**: the second has the same conclusion as `exists_comp_of_mem_vertices` with extra hypotheses, so both can go.
+- **`exists_decomp_of_mem_vertices_not_mem_tail`**: `[DecidableEq V]` is redundant alongside `classical`, and the name uses `not_mem`/`decomp`. Correctness looks fine.
+- **StronglyConnected.lean `IsStronglyConnected` + iff lemmas**: the Nonempty-subtype `abbrev` forces boilerplate. The positive-length-at-`i = i` convention is nonstandard and undocumented, though it suits matrix irreducibility.
+- **`stronglyConnectedSetoid` / `StronglyConnectedComponent`**: this mirrors `WeaklyConnectedComponent` in ConnectedComponent.lean, whose docstring says strongly connected components are missing. Should move there, and the PR does not use them.
+- **Matrix `Irreducible`**: clashes with root `Irreducible`, which does apply to matrices as monoid elements. Renaming to `IsIrreducible` also matches `IsPrimitive`. `IsPrimitive` needs `DecidableEq` for `A ^ k`, which is legitimate.
+- **`irreducible_no_zero_row`**: strong connectivity with positive length at `i = i` gives an out-edge directly, so `h_dim` and the Decomposition import are unnecessary. The name and the explicit `A` are also off.
+- **`pow_nonneg`, `sum_pos_of_mem`, `exists_mem_of_sum_pos`, `mul_pos_iff_of_nonneg`**: the first two sum helpers duplicate `Finset.sum_pos'` and `Finset.sum_pos_iff_of_nonneg`. `pow_nonneg` should be public API without `@[simp]`. I found no exact library replacement for `mul_pos_iff_of_nonneg`, so no finding.
+- **`pow_entry_pos_iff_exists_path` / `irreducible_iff_exists_pow_pos`**: both are mathematically right. The first has a padded proof and an off-convention name. The second is acceptable.
+- **`IsPrimitive.to_Irreducible`, `Irreducible.transpose`**: the first has a non-standard name. The second takes a nonnegativity hypothesis that `hA.1` already provides, has an unneeded `DecidableEq`, and uses `erw`.
+- **Whole matrix file**: everything is stated over ℝ with an RCLike import it does not use. Generalization is advisory, since the module doc already defers it to a TODO.

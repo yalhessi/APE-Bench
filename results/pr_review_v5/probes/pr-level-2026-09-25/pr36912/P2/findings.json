@@ -1,0 +1,34 @@
+[
+  {
+    "target": "PR",
+    "question": "1",
+    "claim": "The only mathematical content, `my_add_comm (a b : Nat) : a + b = b + a`, restates `Nat.add_comm` (Lean core), which its own proof term is, and is a special case of the generic `add_comm` that Mathlib already derives via `to_additive` from `mul_comm`. It adds nothing the library lacks and would only give users a second, non-conventionally named alias to find and maintain.",
+    "requested_change": "Close the PR. If the author wants to contribute, point them to the contribution guide and Zulip to find a genuinely missing result.",
+    "severity": "blocking",
+    "evidence": "Proof is literally `Nat.add_comm a b`; `Nat.add_comm` is used on 88 lines across Mathlib (e.g. Mathlib/Algebra/Group/Basic.lean:155, Mathlib/Algebra/Group/Defs.lean:402); generic `mul_comm` at Mathlib/Algebra/Group/Defs.lean:225 whose additive version is `add_comm`. No other occurrence of `my_add_comm` or `MyNewProofs` in Mathlib."
+  },
+  {
+    "target": "push_proofs.sh",
+    "question": "2",
+    "claim": "This is the author's personal automation script (regenerates the .lean file via heredoc, `git checkout -b feature/your-proofs`, `git add .`, pushes to the author's fork `batmeezy918`, runs `gh pr create`). It has nothing to do with the library, hard-codes a personal fork and branch, and a repo-root script that runs `git add .` and pushes is harmful for anyone who runs it from a Mathlib checkout. It also duplicates the .lean file's content, so the two copies would drift.",
+    "requested_change": "Remove `push_proofs.sh` from the PR entirely; personal workflow scripts stay local.",
+    "severity": "blocking",
+    "evidence": "diff.patch: new root-level file push_proofs.sh (24 lines) containing `git add .`, `git push -u origin feature/your-proofs`, `gh pr create --head batmeezy918:feature/your-proofs`. Mathlib's maintained scripts live under scripts/ and are documented in scripts/README.md (e.g. scripts/auto_commit.sh at line 155)."
+  },
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description ('Automated PR from Termux using EOF-generated file') describes the tooling used to open the PR, not the change: no motivation, no design choice, no link to discussion or downstream use. The title 'Add MyNewProofs' does not follow the `feat(Area): ...` convention (the title becomes the squash-commit message) and says nothing about content. The description also calls the PR 'automated' without saying what generated the proof content, so a reviewer cannot tell whether AI tools were involved as the contribution policy requires disclosing.",
+    "requested_change": "If any part of the PR survives, retitle it in `feat(...)`: form describing the result, write a description stating what is added and why it is needed, and state explicitly whether AI tools were used.",
+    "severity": "blocking",
+    "evidence": "pr.md title and body; .github/PULL_REQUEST_TEMPLATE.md:3 notes the title becomes the first line of the commit message."
+  },
+  {
+    "target": "Mathlib/Algebra/MyNewProofs.lean",
+    "question": "6",
+    "claim": "A lemma about `Nat` addition does not belong in a new top-level file under `Mathlib/Algebra/`, and the file name `MyNewProofs` names the author's activity rather than the subject, which is not how Mathlib organises files. The new module is also not added to `Mathlib.lean`, so it would fail the `mk_all` import-completeness check and not be built as part of `import Mathlib`.",
+    "requested_change": "Delete the file (see the duplication finding). Any genuinely new `Nat` fact should go into the existing file for that subject (e.g. under Mathlib/Data/Nat/ or Mathlib/Algebra/Order/...), not a personally named file, and every new module must be registered in Mathlib.lean via `lake exe mk_all`.",
+    "severity": "blocking",
+    "evidence": "Mathlib.lean imports every module (e.g. Mathlib.lean:364 `public import Mathlib.Algebra.Group.Basic`) and has no entry for Mathlib.Algebra.MyNewProofs; scripts/README.md:137-139 documents `mk_all` regenerating Mathlib.lean."
+  }
+]

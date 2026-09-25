@@ -1,0 +1,5 @@
+# PR 36912 notes
+
+- `push_proofs.sh`: a personal Termux script (git add ., push to the author's fork, gh pr create) committed at the repo root. Not library content, so asking for it to be removed is the clearest request.
+- `my_add_comm`: its proof term is `Nat.add_comm a b`, so the statement is exactly core `Nat.add_comm` (which Mathlib already uses in Algebra/Group/Nat/Defs.lean:36), and a special case of generic `add_comm`. Pure duplication, so remove it. The `my_` name and `MyNewProofs` file name are placeholders (advisory, and moot once removed). Proof golf and generalisation do not apply: it is already a one-term proof of a special case.
+- `Mathlib/Algebra/MyNewProofs.lean` (file level): it has no copyright block, `module`/`public import`, or module docstring (the header linter checks these; compare Group/Basic.lean), and no `Mathlib.lean` entry (CI's mk_all --check fails). Both would bite only if any content were kept. I left out the unused imports (Nat.add_comm is core) as moot. Overall this looks like a test or spam PR that a maintainer would close.

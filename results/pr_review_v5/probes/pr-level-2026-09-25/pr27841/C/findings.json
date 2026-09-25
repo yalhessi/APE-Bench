@@ -1,0 +1,86 @@
+[
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tsum_int_eq_tsum_neg",
+    "claim": "`tsum_int_eq_tsum_neg` is proved by a `rw [show ... by ext; simp]` into a composition followed by `apply`, although the statement is literally an instance of `Equiv.tsum_eq` for `Equiv.neg ℤ` (the coercion of `Equiv.neg ℤ` is definitionally `Neg.neg`).",
+    "requested_change": "Replace the tactic block with the term proof `(Equiv.neg ℤ).tsum_eq f`.",
+    "severity": "advisory",
+    "evidence": "`Equiv.tprod_eq (e : γ ≃ β) (f : β → α) : ∏' c, f (e c) = ∏' b, f b` (InfiniteSum/Basic.lean:456, additive `Equiv.tsum_eq`); `Equiv.neg` is `neg_involutive.toPerm _` (Algebra/Group/Equiv/Basic.lean:271). The PR's own `apply (Equiv.neg ℤ).tsum_eq` already relies on this defeq."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tsum_int_eq_tsum_neg",
+    "claim": "`tsum_int_eq_tsum_neg` is stated only for `ℤ` and only additively, with its own `{α} [AddCommMonoid α] [TopologicalSpace α]` binders and no `@[to_additive]`, although nothing about `ℤ` is used: it holds for any domain with an involutive negation and any commutative topological monoid, and every other lemma in this file is stated multiplicatively.",
+    "requested_change": "State it multiplicatively for `{β : Type*} [InvolutiveInv β] (f : β → M)` as `∏' d, f d⁻¹ = ∏' d, f d := (Equiv.inv β).tprod_eq f` with `@[to_additive]` (giving the additive version for any `[InvolutiveNeg β]`), and place it next to `Equiv.tprod_eq` in `InfiniteSum/Basic.lean` instead of in the `ℤ` section of `NatInt.lean`.",
+    "severity": "advisory",
+    "evidence": "`Equiv.inv`/`Equiv.neg` need only `[InvolutiveInv G]` / `[InvolutiveNeg G]` (Algebra/Group/Equiv/Basic.lean:266-272, `to_additive` pair); the proof uses only `(Equiv.neg ℤ).tsum_eq`; the file declares `variable {M : Type*} [CommMonoid M] [TopologicalSpace M]` at line 26 and all its lemmas carry `@[to_additive]`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tsum_int_eq_tsum_neg",
+    "claim": "The name `tsum_int_eq_tsum_neg` reads as `∑' d, f d = ∑' d, f (-d)`, the reverse of the statement `∑' d, f (-d) = ∑' d, f d`; Mathlib names describe the left-hand side first, and the analogous integral lemma is `integral_comp_neg`.",
+    "requested_change": "Rename to `tsum_comp_neg` (multiplicative `tprod_comp_inv` if generalised as above), a name not yet used in Mathlib.",
+    "severity": "advisory",
+    "evidence": "Statement in the diff: `∑' d, f (-d) = ∑' d, f d`. Precedent: `integral_comp_neg : (∫ x in a..b, f (-x)) = ...` (MeasureTheory/Integral/IntervalIntegral/Basic.lean:974). `mlgrep` finds no existing `tsum_comp_neg`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tprod_pnat_eq_tprod_succ",
+    "claim": "`tprod_pnat_eq_tprod_succ` / `tsum_pnat_eq_tsum_succ` silently change `f` from explicit to implicit. After the generalisation `f` cannot be recovered by `rw` through the coercion `(n : ℕ+) → R`, so every call site must now write `(f := ...)`; the only existing caller, `cot_series_rep`, had to be rewritten for this reason.",
+    "requested_change": "Keep `f` explicit, `theorem tprod_pnat_eq_tprod_succ (f : R → α) : ...`, as in the original lemma and in `Equiv.tprod_eq`, and restore the positional call `tsum_pnat_eq_tsum_succ fun n ↦ ...` in `cot_series_rep`.",
+    "severity": "advisory",
+    "evidence": "Base: `theorem tprod_pnat_eq_tprod_succ ... (f : ℕ → α)` (NatInt.lean:542); PR: `{f : R → α}`. Cotangent.lean diff changes `tsum_pnat_eq_tsum_succ fun n ↦ ...` to `tsum_pnat_eq_tsum_succ (f := fun n ↦ ...)`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean section pnat (variable block)",
+    "claim": "The new `variable {α R : Type*} [TopologicalSpace α] [CommMonoid α] [AddMonoidWithOne R]` duplicates the file-level `M`, and it is then shadowed: `tprod_zero_pnat_eq_tprod_nat` and `tsum_nat_eq_zero_two_pnat` each re-bind `{α : Type*}` with other classes (`CommGroup`, `Ring`), so one name refers to two different types in one section.",
+    "requested_change": "Use the file-level variables (`M` with `[CommMonoid M] [TopologicalSpace M]` for the pnat lemmas, `G` with `[CommGroup G]` for `tprod_zero_pnat_eq_tprod_nat`), and declare only `variable {R : Type*} [AddMonoidWithOne R]`. Give the additive-ring lemma a distinct type name instead of re-binding `α`.",
+    "severity": "advisory",
+    "evidence": "NatInt.lean:26 `variable {M : Type*} [CommMonoid M] [TopologicalSpace M]`, :28 `variable {G : Type*} [CommGroup G]`; the diff re-binds `{α : Type*} [TopologicalSpace α] [CommGroup α]` and `{α : Type*} [UniformSpace α] [Ring α]` under the section's `variable {α ...}`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean section pnat",
+    "claim": "The new `variable` line is followed by two blank lines.",
+    "requested_change": "Delete one of the two consecutive blank lines after `variable {α R : Type*} ...`.",
+    "severity": "advisory",
+    "evidence": "The diff adds `+variable {α R : Type*} ...` followed by `+` and `+` (two empty added lines) before `@[to_additive (dont_translate := R)]`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tprod_zero_pnat_eq_tprod_nat",
+    "claim": "`tprod_zero_pnat_eq_tprod_nat` takes a `Multipliable f` hypothesis but is not in the `Multipliable` namespace, and its orientation is the reverse of its sibling `Multipliable.tprod_eq_zero_mul`. Its additive name `tsum_zero_pnat_eq_tsum_nat` also drops the `add` that the statement `f 0 + ∑' ...` contains.",
+    "requested_change": "Flip the statement to `∏' n, f n = f 0 * ∏' n : ℕ+, f n` and make it `protected theorem Multipliable.tprod_eq_zero_mul_tprod_pnat` (additive `Summable.tsum_eq_zero_add_tsum_pnat`), so that it reads `hf.tprod_eq_zero_mul_tprod_pnat` and matches `Multipliable.tprod_eq_zero_mul`.",
+    "severity": "advisory",
+    "evidence": "Sibling at NatInt.lean:244: `protected theorem Multipliable.tprod_eq_zero_mul [T2Space G] {f : ℕ → G} (hf : Multipliable f) : ∏' b, f b = f 0 * ∏' b, f (b + 1)`; the PR's lemma proves exactly this, with the tail rewritten by `tprod_pnat_eq_tprod_succ`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tprod_zero_pnat_eq_tprod_nat",
+    "claim": "`tprod_zero_pnat_eq_tprod_nat` requires `[CommGroup α] [IsTopologicalGroup α]` and `Multipliable f`, but the identity holds in any `[CommMonoid M] [ContinuousMul M] [T2Space M]` given only multipliability of the tail, which is how the file's monoid sibling `tprod_eq_zero_mul'` is stated.",
+    "requested_change": "Add (or replace it by) a monoid version: `[T2Space M] [ContinuousMul M] {f : ℕ → M} (hf : Multipliable fun n : ℕ+ ↦ f n) : ∏' n, f n = f 0 * ∏' n : ℕ+, f n`, proved from `tprod_eq_zero_mul' (pnat_multipliable_iff_multipliable_succ.mp hf)` and `tprod_pnat_eq_tprod_succ`. Keep the group statement as a corollary via `multipliable_nat_add_iff`.",
+    "severity": "advisory",
+    "evidence": "NatInt.lean:194 `theorem tprod_eq_zero_mul' {f : ℕ → M} (hf : Multipliable (fun n ↦ f (n + 1))) : ∏' b, f b = f 0 * ∏' b, f (b + 1)` in the `[T2Space M] [ContinuousMul M]` section; the PR proves `pnat_multipliable_iff_multipliable_succ` for any `CommMonoid`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tsum_nat_eq_zero_two_pnat",
+    "claim": "The name `tsum_nat_eq_zero_two_pnat` is wrong: the left-hand side is a sum over `ℤ` (`f : ℤ → α`, `∑' n, f n`), not over `ℕ`, and the name leaves out the `add`/`mul` structure of `f 0 + 2 * ∑' n : ℕ+, f n`.",
+    "requested_change": "Rename to `tsum_int_eq_zero_add_two_mul_tsum_pnat`.",
+    "severity": "blocking",
+    "evidence": "Diff: `theorem tsum_nat_eq_zero_two_pnat ... {f : ℤ → α} ... : ∑' n, f n = f 0 + 2 * ∑' n : ℕ+, f n`; the ℤ lemmas in the same file use `int` in their names (e.g. `summable_int_iff_summable_nat_and_neg`, `tprod_int_rec`)."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tsum_nat_eq_zero_two_pnat",
+    "claim": "The evenness hypothesis `hf : ∀ n : ℤ, f n = f (-n)` is oriented against Mathlib's `Function.Even` (`∀ a, f (-a) = f a`). That orientation makes it unusable as a simp lemma, which is why the proof needs a `conv => enter [1,2,1,n]; rw [hf]` block that introduces a double negation and then removes it with `neg_neg`.",
+    "requested_change": "State the hypothesis as `hf : ∀ n : ℤ, f (-n) = f n` (or `hf : f.Even`), and replace the `conv` block by adding `hf` to the following `simp only [...]` call (dropping `neg_neg`/`Int.reduceNeg` if no longer needed).",
+    "severity": "advisory",
+    "evidence": "`protected def Function.Even (f : α → β) : Prop := ∀ a, f (-a) = f a` (Algebra/Group/EvenFunction.lean:26); proof in the diff: `conv => enter [1,2,1,n]; rw [hf]` then `simp only [neg_add_rev, Int.reduceNeg, neg_neg, ...]`."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean tsum_nat_eq_zero_two_pnat",
+    "claim": "`tsum_nat_eq_zero_two_pnat` assumes `[Ring α]` only to write `2 * _`, and is the one new lemma without a multiplicative counterpart. The argument (`tsum_of_add_one_of_neg_add_one`, `two_mul`, `abel`) works in any complete uniform additive group.",
+    "requested_change": "State it for the file's `G` (`[UniformSpace G] [IsUniformGroup G] [CompleteSpace G] [T2Space G]`) as `∏' n, f n = f 0 * (∏' n : ℕ+, f n) ^ 2` with `@[to_additive]`, so that the additive version reads `f 0 + 2 • ∑' n : ℕ+, f n`. If the `Ring` form is wanted for downstream use, derive it from the `nsmul` form with `nsmul_eq_mul`.",
+    "severity": "advisory",
+    "evidence": "Only `two_mul` and `abel` use the ring structure. The summability steps use `summable_int_iff_summable_nat_and_neg` and `summable_nat_add_iff`, which are stated for `[UniformSpace G] [IsUniformGroup G] [CompleteSpace G]` and `[IsTopologicalGroup G]` (NatInt.lean:512, :222)."
+  },
+  {
+    "target": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Cotangent.lean cot_series_rep",
+    "claim": "In `cot_series_rep`, the new `rw [one_div] at *` does nothing useful. Every `1 / _` in `h0` and inside the sums sits under a binder, so `rw` can only turn the goal's `1 / x` into `x⁻¹`, and the closing `ring` does not need that. The `have h0` is also used only once.",
+    "requested_change": "Drop `rw [one_div] at *` and inline `h0`: `rw [tsum_pnat_eq_tsum_succ (f := fun n ↦ 1 / (x - n) + 1 / (x + n)), ← cot_series_rep' hz]` followed by `ring`.",
+    "severity": "advisory",
+    "evidence": "Goal `π * cot (π * x) = 1 / x + ∑' n : ℕ+, (1 / (x - n) + 1 / (x + n))`. `cot_series_rep'` (Cotangent.lean:210) has right-hand side `∑' n : ℕ, (1 / (x - (n + 1)) + 1 / (x + (n + 1)))`, which matches the generalised `tsum_pnat_eq_tsum_succ`'s right-hand side `f (↑n + 1)` with `R = ℂ` without any `one_div` normalisation."
+  }
+]

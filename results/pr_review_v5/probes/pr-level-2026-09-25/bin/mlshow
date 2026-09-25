@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# mlshow <pr> <path> [first-line] [last-line]  -- a Mathlib file as it was at the PR's base commit, with line numbers
+source "$(dirname "$0")/_base.sh" "$1" || exit 2
+git -C "$CLONE" show "$BASE:$2" | cat -n | sed -n "${3:-1},${4:-400}p"

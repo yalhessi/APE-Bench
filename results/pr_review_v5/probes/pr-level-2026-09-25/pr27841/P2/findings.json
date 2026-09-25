@@ -1,0 +1,58 @@
+[
+  {
+    "target": "PR",
+    "question": "4",
+    "claim": "The description is empty. It gives no motivation, although none of the three new lemmas (tsum_int_eq_tsum_neg, tprod_zero_pnat_eq_tprod_nat, tsum_nat_eq_zero_two_pnat) is used anywhere in the PR or at the base commit. It does not mention that two existing lemmas change signature. It links no downstream work or discussion and carries no statement about AI assistance. The title ('add more pnat tsum lemmas') also misses the generalisation of existing API and the new lemma about ℤ.",
+    "requested_change": "Write a description that (a) says what downstream development needs these lemmas (link the branch, PR or Zulip thread), (b) lists the API change: tprod_pnat_eq_tprod_succ / tsum_pnat_eq_tsum_succ and pnat_multipliable_iff_multipliable_succ now take f : R → α for any AddMonoidWithOne R instead of ℕ → α, and f is now implicit instead of explicit, (c) contains the AI-use disclosure the contribution policy requires. Retitle to cover the generalisation, e.g. 'feat(Topology/Algebra/InfiniteSum/NatInt): generalise pnat tsum lemmas and add ℤ/pnat sum lemmas'.",
+    "severity": "blocking",
+    "evidence": "pr.md: '(no description)'. mlgrep for tsum_pnat_eq_tsum_succ|tprod_pnat_eq_tprod_succ|pnat_summable_iff_summable_succ|pnat_multipliable_iff_multipliable_succ finds exactly one external user, Mathlib/Analysis/SpecialFunctions/Trigonometric/Cotangent.lean:219, which passes f explicitly and so has to be edited by this PR. Nothing at the base commit would use the new lemmas: the only (∑'|∏') n : ℕ+ sums in Mathlib are in Cotangent.lean and NatInt.lean."
+  },
+  {
+    "target": "tprod_pnat_eq_tprod_succ / tsum_pnat_eq_tsum_succ",
+    "question": "2",
+    "claim": "The PR makes the function argument implicit ((f : ℕ → α) becomes {f : R → α}). The generalisation to R does not need this, and it breaks callers that pass f positionally. The one such caller in Mathlib (Cotangent.lean) has to be rewritten to (f := ...). The API change is also undocumented.",
+    "requested_change": "Keep f explicit as before (it is explicit in the lemma this is proved from, Equiv.tprod_eq), so that the only change to the existing API is the added generality. If implicit is really wanted, justify it in the description. Then shrink the Cotangent.lean hunk to the change the generalisation forces.",
+    "severity": "advisory",
+    "evidence": "diff: old 'theorem tprod_pnat_eq_tprod_succ ... (f : ℕ → α)', new '{f : R → α}'. Cotangent.lean:219 changes from 'tsum_pnat_eq_tsum_succ fun n ↦ ...' to 'tsum_pnat_eq_tsum_succ (f := fun n ↦ ...)'. Equiv.tprod_eq (e : γ ≃ β) (f : β → α) takes f explicitly (Mathlib/Topology/Algebra/InfiniteSum/Basic.lean:456)."
+  },
+  {
+    "target": "PR",
+    "question": "3",
+    "claim": "The PR bundles two changes. One generalises existing lemmas, changing their signatures and forcing an edit in Analysis/SpecialFunctions/Trigonometric/Cotangent.lean. The other adds new lemmas, one of them (tsum_int_eq_tsum_neg) about ℤ and not about ℕ+ as the title says. The API change is the part that needs careful review, and it is hidden under an 'add lemmas' title.",
+    "requested_change": "Either split the generalisation of pnat_multipliable_iff_multipliable_succ / tprod_pnat_eq_tprod_succ, together with the Cotangent.lean adaptation, into its own PR, or retitle and describe this PR so that it states both changes (see the question 4 finding).",
+    "severity": "advisory",
+    "evidence": "diff: hunk 1 (Cotangent.lean) exists only because of the signature change in NatInt.lean. tsum_int_eq_tsum_neg is added in 'section Int' before 'end Int', outside 'section pnat'."
+  },
+  {
+    "target": "tsum_int_eq_tsum_neg",
+    "question": "1",
+    "claim": "This is just (Equiv.neg ℤ).tsum_eq f: Equiv.neg ℤ d unfolds to -d. It is not used in the PR, and Mathlib's one existing use of this reindexing applies the Equiv lemma inline. As stated it is also needlessly specialised to ℤ, additive only, and placed in NatInt.lean, while the general fact belongs next to Equiv.tprod_eq.",
+    "requested_change": "Drop it and use (Equiv.neg ℤ).tsum_eq at the use site. If a named lemma is wanted, state it multiplicatively with @[to_additive], for any index type with InvolutiveInv / InvolutiveNeg (e.g. tprod_comp_inv / tsum_comp_neg), and put it in Mathlib/Topology/Algebra/InfiniteSum/Basic.lean beside Equiv.tprod_eq.",
+    "severity": "advisory",
+    "evidence": "Equiv.tprod_eq (e : γ ≃ β) (f : β → α) : ∏' c, f (e c) = ∏' b, f b at Mathlib/Topology/Algebra/InfiniteSum/Basic.lean:456. Existing inline use: Mathlib/NumberTheory/ModularForms/JacobiTheta/TwoVariable.lean:445 'rw [..., ← tsum_neg, ← (Equiv.neg ℤ).tsum_eq]'. No other lemma in the diff uses tsum_int_eq_tsum_neg."
+  },
+  {
+    "target": "tprod_zero_pnat_eq_tprod_nat",
+    "question": "1",
+    "claim": "The lemma just composes two existing lemmas, tprod_pnat_eq_tprod_succ and Multipliable.tprod_eq_zero_mul, and nothing uses it: neither this PR (tsum_nat_eq_zero_two_pnat does not call it) nor anything at the base commit.",
+    "requested_change": "Drop it unless the description links a downstream use where the combined form saves real work. If it stays, follow the file's 2025-04-12 convention of putting lemmas that take (hf : Multipliable f) in the Multipliable namespace.",
+    "severity": "advisory",
+    "evidence": "Multipliable.tprod_eq_zero_mul at Mathlib/Topology/Algebra/InfiniteSum/NatInt.lean:244. The unprefixed name was deprecated to it at NatInt.lean:249 ('deprecated (since := \"2025-04-12\")'). The PR's proof is 'simpa [Multipliable.tprod_eq_zero_mul hf] using tprod_pnat_eq_tprod_succ (f := f)'."
+  },
+  {
+    "target": "tsum_nat_eq_zero_two_pnat",
+    "question": "1",
+    "claim": "The hypothesis hf : ∀ n : ℤ, f n = f (-n) restates the library's existing predicate Function.Even with the two sides swapped, instead of using it.",
+    "requested_change": "State the hypothesis as (hf : Function.Even f), so the lemma can take the evenness facts Mathlib already proves about functions.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/Group/EvenFunction.lean:26 'protected def Even (f : α → β) : Prop := ∀ a, f (-a) = f a'. It is already used in analysis/number theory, e.g. Mathlib/Analysis/Fourier/ZMod.lean:185 and Mathlib/NumberTheory/DirichletCharacter/Basic.lean:332."
+  },
+  {
+    "target": "tsum_nat_eq_zero_two_pnat",
+    "question": "5",
+    "claim": "The lemma exists only as a tsum over a Ring. Every other ℤ-indexed lemma in NatInt.lean is stated multiplicatively with @[to_additive] and comes as a HasProd / Multipliable / tprod triple. Without a HasSum form, the one place in Mathlib that performs this even-function split still has to do it by hand.",
+    "requested_change": "Add the HasProd / HasSum form (and the Multipliable form if useful), and derive the tprod/tsum statement from it. State it multiplicatively as ∏' n : ℤ, f n = f 0 * (∏' n : ℕ+, f n) ^ 2 with @[to_additive], whose additive form uses 2 • and drops the Ring assumption. Then use the HasSum version in hasSum_nat_jacobiTheta, or say in the description why not.",
+    "severity": "advisory",
+    "evidence": "NatInt.lean 'section Int': every declaration at lines 328-527 carries @[to_additive], and results come as triples, e.g. HasProd.nat_mul_neg_add_one / Multipliable.nat_mul_neg_add_one / tprod_nat_mul_neg_add_one (lines 328-351) and HasProd.of_add_one_of_neg_add_one / Multipliable... / tprod_of_add_one_of_neg_add_one (lines 460-473). Mathlib/NumberTheory/ModularForms/JacobiTheta/OneVariable.lean:67-78 (hasSum_nat_jacobiTheta) splits the even ℤ-sum for theta at HasSum level by hand via this.nat_add_neg, hasSum_nat_add_iff' 1 and neg_sq."
+  }
+]

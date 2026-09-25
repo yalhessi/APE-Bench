@@ -1,0 +1,16 @@
+[
+  {
+    "target": "Mathlib/Util/AddRelatedDecl.lean addRelatedDecl",
+    "claim": "The docstring of `addRelatedDecl` still describes the old callback: it documents `construct type value levels` as receiving \"the type, value, and universe variables of the original declaration\", but after this PR `construct` takes only two arguments, and the `Expr` it receives is the constant `src` applied to its universe parameters, not the declaration's value.",
+    "requested_change": "Rewrite the `construct` bullet to say `construct value levels : MetaM (Expr × List Name)`, where `value` is the constant `src` applied to its universe parameters (a proof or term of the original declaration's type, not its body) and `levels` are those parameters. While there, add `to_app` to the list of attributes that use this helper.",
+    "severity": "blocking",
+    "evidence": "AddRelatedDecl.lean lines 33-36 (unchanged by the diff): \"* `construct type value levels : MetaM (Expr × List Name)` given the type, value, and universe variables of the original declaration\". The diff changes the signature at line 45 to `(construct : Expr → List Name → MetaM (Expr × List Name))` and the call at line 52 to `construct value info.levelParams` with `value := .const src (info.levelParams.map mkLevelParam)`. Line 20 names only `reassoc` and `elementwise`, but ToApp.lean line 125 also calls addRelatedDecl."
+  },
+  {
+    "target": "Mathlib/Tactic/CategoryTheory/Reassoc.lean reassocExpr",
+    "claim": "After this PR, no caller passes `some _` for the `type?` argument of `reassocExpr` / `reassocExpr'`. Both remaining callers (the `reassoc` attribute and `reassoc_of%`) pass `none`, so the `mkExpectedTypeHint` branch is dead. This is also inconsistent with `elementwiseExpr`, whose `type` argument the same PR removed.",
+    "requested_change": "Drop the `type?` parameter from `reassocExpr` and `reassocExpr'`: remove the `mkExpectedTypeHint` line, change the calls to `reassocExpr' value` and `reassocExpr' e`, and update the `reassocExpr` docstring, which currently talks about `type?`.",
+    "severity": "advisory",
+    "evidence": "Reassoc.lean line 112: `let pf ← if let some type := type? then mkExpectedTypeHint pf type else pure pf`. The docstring at lines 105-107 refers to `type?`. Callers: line 141 (now `reassocExpr' value none` in the diff) and line 155 `reassocExpr' e none`. mlgrep for `reassocExpr` across Mathlib and MathlibTest finds no other callers. The diff drops the analogous `type` parameter from `elementwiseExpr`."
+  }
+]

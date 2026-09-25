@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# mlcount <pr> <extended-regex> [pathspec, default Mathlib]  -- number of matching lines in Mathlib at the PR's base commit
+source "$(dirname "$0")/_base.sh" "$1" || exit 2
+git -C "$CLONE" grep -c -E -e "$2" "$BASE" -- "${3:-Mathlib}" | awk -F: '{s+=$NF} END {print s+0}'

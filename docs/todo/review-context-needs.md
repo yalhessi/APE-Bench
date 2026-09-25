@@ -47,6 +47,17 @@ other proof ideas, because it could not compile.
   its reference and object together, at 85%. That gives each cell the *kind* of evidence it needs,
   not how to get it.
 
+**Added from probe rounds 2-3 (2026-09-25,** `facet-brief-probe-2026-09.md`):
+- **Two information kinds no tool supplies:**
+  - **Other open PRs.** "This looks to be a duplicate of #36915", and "declare that this PR depends
+    on that one". It is deterministic from the PR store: PRs open at the review time that touch the
+    same files or declarations.
+  - **The description's links.** "The links in your description don't support your point."
+- **Compile, used as a probe,** verified design points: a `#check` exposed a universe restriction,
+  a weaker typeclass was tried, unused imports were dropped. It did not raise reach.
+- **Precedent search, Zulip and `naming_norm` rarely carried a finding's evidence:** 0-11% of
+  findings.
+
 ## What to find out first
 
 1. **The information each kind of ask rests on.**

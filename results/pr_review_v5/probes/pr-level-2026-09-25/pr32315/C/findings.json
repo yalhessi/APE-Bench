@@ -1,0 +1,37 @@
+[
+  {
+    "target": "Mathlib/Tactic/GRewrite/Elab.lean grwSeq (docstring)",
+    "claim": "The new `grw` docstring tells users to write `grw (transparency := default)`. Inside a tactic config, a bare `default` elaborates as `Inhabited.default : TransparencyMode`, not as the constructor `TransparencyMode.default`. The derived `Inhabited` instance picks the first constructor, `.all`, so the documented spelling asks for `.all` transparency (which also unfolds irreducible definitions) instead of the `erw`-like `.default` it describes.",
+    "requested_change": "Write `grw (transparency := .default)` with the leading dot, in the docstring, in the PR title and description, and in the new test.",
+    "severity": "blocking",
+    "evidence": "Every tactic-config use of this option in Mathlib is written `.default`: `congr! (transparency := .default)` (CongrExclamation.lean:719), `convert (config := {transparency := .default})` (Convert.lean:120, Topology/Sets/Opens.lean:315), and `{ transparency := .default }` in ErwQuestion.lean:121, commented 'Default transparency turns `rw` into `erw`'. The new test passes whichever mode it gets, because `.all` also unfolds `2 + 1`, so it cannot catch the difference."
+  },
+  {
+    "target": "MathlibTest/GRewrite.lean (new `erw`-style example)",
+    "claim": "The new example closes the goal with `simp` and never checks what `grw` rewrote to. Every other `grw` test in this file asserts the result with `guard_target =ₛ` or `guard_hyp :ₛ`, so this test would still pass if the rewrite produced some other goal that `simp` can close.",
+    "requested_change": "After `grw (transparency := .default) [h]`, add `guard_target =ₛ (3 : Int) ≤ 4`, then close the goal (e.g. with `norm_num`), so the test pins the rewritten goal.",
+    "severity": "advisory",
+    "evidence": "The file has 18 `guard_target` checks, e.g. lines 27-56: `grw [h₁, h₂]` followed by `guard_target =ₛ c + 5 ≤ c + 6` and `guard_hyp h₁ :ₛ a + e ≤ d + e`. The new test ends with a bare `simp`."
+  },
+  {
+    "target": "MathlibTest/GRewrite.lean (new `erw`-style example)",
+    "claim": "The Core change affects both branches of `Lean.MVarId.grewrite`: the implication is now `e' → eNew` or `eNew → e'`, and `mdataLhs?` changed from `!forwardImp` to `forwardImp`. Only the goal branch (`forwardImp := false`, reached from `grewriteTarget`) is tested. The hypothesis branch (`forwardImp := true`, reached from `grewriteLocalDecl`) is never run with non-reducible matching.",
+    "requested_change": "Add a test that rewrites a hypothesis at default transparency, e.g. `example (h : 2 + 1 ≤ (3 : Int)) (h' : (5 : Int) ≤ 1 + 2) : (5 : Int) ≤ 3 := by grw (transparency := .default) [h] at h'; guard_hyp h' :ₛ (5 : Int) ≤ 3; exact h'`.",
+    "severity": "advisory",
+    "evidence": "In the diff, `let imp := if forwardImp then mkImp e' eNew else mkImp eNew e'` and `gcongr forwardImp []` change both directions. Elab.lean:54 calls `grewrite ... (forwardImp := true)` for `at h`. The only new test rewrites the goal."
+  },
+  {
+    "target": "MathlibTest/GRewrite.lean (new `erw`-style example)",
+    "claim": "No test shows that plain `grw [h]` (reducible transparency) still refuses this rewrite. So nothing pins that the new behaviour is opt-in through the config and that the default did not change.",
+    "requested_change": "Add a negative test next to the new example, e.g. `example (h : 2 + 1 ≤ (3 : Int)) : 1 + 2 ≤ (4 : Int) := by fail_if_success grw [h]; exact test_sorry` (or a `#guard_msgs` block with the expected 'did not find instance of the pattern' error).",
+    "severity": "advisory",
+    "evidence": "Core.lean:107-111: `kabstract` runs under the config's transparency and throws 'did not find instance of the pattern' when nothing matches. The PR presents the `erw`-like behaviour as opt-in (`grw (transparency := ...)`), but the only new test is positive. The file already uses `#guard_msgs` twice."
+  },
+  {
+    "target": "Mathlib/Tactic/GRewrite/Core.lean Lean.MVarId.grewrite",
+    "claim": "The docstrings of `Lean.MVarId.grewrite` ('we prove that `e → eNew`; otherwise `eNew → e`') and `GRewriteResult.impProof` promise an implication about `e`. After this change the proof is built for `e' → eNew` (resp. `eNew → e'`), where `e'` carries a `gcongrHole` annotation and is definitionally equal to `e` only at the configured transparency. The stated contract is therefore no longer what the returned term's type says.",
+    "requested_change": "Either give the result its documented type with `mkExpectedTypeHint` (the hint type being `mkImp e eNew` or `mkImp eNew e`, per `forwardImp`), or update both docstrings to say the implication holds only up to definitional equality at the configured transparency.",
+    "severity": "advisory",
+    "evidence": "Diff: `let e' := eAbst.instantiate1 (GCongr.mkHoleAnnotation lhs)` and `let imp := if forwardImp then mkImp e' eNew else mkImp eNew e'`, then `impProof := ← instantiateMVars gcongrGoal`. The callers use it without re-checking: `goal.assign (mkApp r.impProof mvarNew)` (Elab.lean:40) and `.app r.impProof (.fvar fvarId)` (Elab.lean:55)."
+  }
+]

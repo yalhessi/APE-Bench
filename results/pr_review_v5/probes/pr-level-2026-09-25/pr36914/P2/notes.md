@@ -1,0 +1,8 @@
+# PR #36914 — PR-level review notes
+
+1. **Wanted / worth having?** No. MathlibDemo.lean duplicates the Ring/Algebra structure on `H →L[ℝ] H` (Topology/Algebra/Module/LinearMap.lean:936, 1137, one_def :351, mul_def :544). Its predicate `A` is exactly membership in the range of algebraMap, i.e. `⊥ : Subalgebra` (Subalgebra/Lattice.lean:233). `my_add_comm` is `Nat.add_comm` / `add_comm` (Group/Defs.lean:200). Recommend closing.
+2. **Every hunk an improvement?** No. push_proofs.sh is the author's personal git/gh push-and-open-PR script (with `git add .` and a fork-specific `--head`) and has nothing to do with the library.
+3. **One thing?** No. The PR bundles a Hilbert-operator demo, a Nat lemma and a shell script, while the title names one "SNAP-demo" file.
+4. **Description?** A single line with no motivation or design, and "SNAP" is never explained. It mentions one file, but the diff adds three. No discussion is linked. AI use is not disclosed, although the content (a ψ placeholder `:= sorry`, template branch names) suggests generated code.
+5. **Finishes the job?** The files are not in Mathlib.lean, so the `mk_all --check` CI step fails (build_template.yml:410-416). One file imports a module that does not exist at base (`Mathlib.LinearAlgebra.LinearMap`), there is a `sorry`, and the files lack the `module` / `public import` header. No analogous places apply, since nothing here should land. The only automation is the personal script, which should be removed rather than tested.
+6. **Right place?** No. The operator material sits in Mathlib/Algebra/ with a "Demo" name, but it belongs, if anywhere, beside Topology/Algebra/Module/LinearMap.lean or Analysis/InnerProductSpace/. A root-level push script does not belong in the repository.
