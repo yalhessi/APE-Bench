@@ -394,3 +394,29 @@ rules stated before running.
      reach.
 
    Precedent search, Zulip and the naming census rarely carried a finding's evidence.
+
+---
+
+## Caveat added after the three rounds: the reviewer model may have seen these PRs (2026-09-25)
+
+The user asked whether these PRs had ever been run through the pipeline.
+
+**None of the 20 has.** All 83 runs under `results/pr_review_v5/runs/` are on the 16 dev PRs.
+
+Answering that surfaced a caveat that should have been stated when the probes were designed. Every
+probe reviewer and matcher was a Claude model with a stated knowledge cutoff of June 2026. Every
+probe PR was created between 2025-06 and 2026-03, and merged by then. So the reviewer may have seen
+a PR's merged code, or its review discussion, during training. The central `ConvexSpace` design
+ask, reached in rounds 1-2, is exactly the kind of result recall could produce.
+
+**What this does to the three rounds:**
+- **Absolute reach numbers:** unusable as a statement about reviewing ability.
+- **Claude-against-pipeline comparisons:** not meaningful. The pipeline's model has its own cutoff,
+  and the eval windows were chosen against it.
+- **Comparisons between briefs on the same model:** less affected, since both conditions have the
+  same memory. But not immune: a brief that asks about design could cue recall that a proof-focused
+  brief does not.
+
+The PR-level result (rounds 1-3) and the run-variance finding (round 2) are between-brief
+comparisons, and stand at that altitude. Rules for future probes are in
+`.claude/rules/mathlib-review.md`.

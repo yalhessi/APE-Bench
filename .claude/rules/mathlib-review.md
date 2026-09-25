@@ -318,3 +318,16 @@ paths:
   what they did not ask for: it may order a queue and say how much output has been read, and it
   may not enter recall or be reported as precision. A human row outranks a `task:` row, a
   correction is a later row rather than an edit, and disagreement is reported, never averaged.
+- **A probe reviewer must not have been trained on the PRs it reviews (2026-09-25).** The
+  facet-brief probes (`docs/research/facet-brief-probe-2026-09.md`) ran Claude reviewers, knowledge
+  cutoff June 2026, on PRs from 2025-06..2026-03, every one merged before that cutoff. A reviewer
+  can then recall the merged code or the maintainers' discussion. So reach is not reviewing, and
+  Claude-vs-pipeline numbers are not comparable. The between-brief comparisons survive only because
+  both arms share the same memory. **Before any probe, compare the reviewer model's cutoff with the
+  PR window**, and pick one of three:
+  - PRs created after the cutoff;
+  - the pipeline's own model through `cli run` (the solo scaffold holds the same tools);
+  - an explicit statement that only between-brief comparisons are being read.
+
+  Blind matchers are not affected: they judge text they are shown.
+
