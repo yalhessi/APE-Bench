@@ -27,8 +27,8 @@ read:
 Zulip reads are gated exactly as a run gates them.
 
 **Refused without a compiled base.** A `lean_verify_edit` against a missing base would report
-every import as an error. So the workbench refuses to open without one, and says how to build it
-(`ape.toolkits.execute.lean.build`).
+every import as an error. A built base is restored on first use, as a task restores it. One that
+was never built is refused, with how to build it (`ape.toolkits.execute.lean.build`).
 """
 
 from __future__ import annotations
@@ -101,7 +101,7 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
     from src.mathlib_review.evidence.evidence import snapshot_workspace
     from src.mathlib_review.review.runner import load_run
 
-    base = snapshot_workspace(episode.base_sha)
+    base = snapshot_workspace(episode.base_sha) or _restore(episode.base_sha)
     if base is None:
         raise RuntimeError(
             f"no compiled base workspace for {episode.base_sha}. Build it first: a row "
@@ -143,6 +143,29 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
     FileSystemToolsProvider(task=task, config=scaffold, logger=task.logger).register_tools(
         mcp, FILE_TOOLS)
     return mcp
+
+
+def _restore(commit_hash: str) -> Optional[Path]:
+    """Restore a built base into `workspaces/<sha>` as a task would on first use, or None when
+    it was never built. A build stores a snapshot; a run restores it only when a task needs it."""
+
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+    from ape.toolkits.execute.lean.core.restore_manager import RestoreManager
+    from ape.utils.logging import create_logger
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
+
+    config = LeanVerifyToolConfig()
+    _name, url = config.resolve_repo(None)
+    manager = RestoreManager(config, create_logger(to_console=False), url)
+    if asyncio.run(manager._requires_build_first(commit_hash)):
+        return None
+    try:
+        asyncio.run(manager.get_workspace(commit_hash))
+    except RuntimeError:
+        # Seen once, on a snapshot whose build had just finished: the first restore fails and
+        # the second completes it.
+        asyncio.run(manager.get_workspace(commit_hash))
+    return snapshot_workspace(commit_hash)
 
 
 def call(tools: Dict[str, Callable], name: str, arguments: Dict[str, Any]) -> Any:
