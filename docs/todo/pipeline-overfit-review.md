@@ -244,3 +244,62 @@ at.
 **Next, free:** the facet relabel of §7.7. Two readers, pre-registered: κ per facet, the three
 structural claims, and the contract fit per proposed arm, from labels alone.
 
+## Facet relabel (pre-registered 2026-09-25, before any label)
+
+The test of `docs/research/review-work-structure-2026-09.md` §7.7, which the user approved.
+
+**Sample:** 755 val1000 asks.
+- The 155 asks of the auditor's pilot.
+- 600 more drawn at random, with seed 20250925, from the 1,678 other asks both val1000 readers
+  agree are asks.
+- Shuffled into five batches.
+
+**Readers:** two blind Claude readers per batch, with the rubric
+`results/pr_review_v5/adjudications/facet-relabel-val1000-v1/reader_rubric_facets_v1.md`.
+- **They see:** the comment, its diff hunk, the PR title and path, the parent comment if it is a
+  reply, and the kind of declaration the comment sits on (from the hunk-tail join).
+- **They do not see:** the family, the owners, the earlier generic question, or the pilot's labels.
+
+**Facets.** Each reader gives every ask one value per facet:
+- object;
+- reference, plus an optional second reference;
+- mechanism, for mechanism asks;
+- remedy;
+- warrant.
+
+**Where each reading comes from.** Rates and claims are read on the 600 random asks. The 155
+pilot asks give auditor-against-reader agreement.
+
+**The claims, and when each holds:**
+
+| | claim | holds if |
+|---|---|---|
+| F | the facets are reliable | Cohen's κ between readers per facet (object, reference, mechanism among mechanism asks, remedy, warrant). A facet under **0.60** is reported as no usable basis for dividing arms. |
+| S1 | references cross objects | each of `variant`, `library` and `norms` spreads over at least 3 objects, each holding at least 10% of that reference's asks. Read on asks where both readers agree on reference and object. |
+| S2 | mechanisms stay on their own objects | each mechanism with at least 10 agreed asks has at least 80% of them on at most 2 objects |
+| S3 | the reference predicts the warrant | on asks where both readers agree on reference and warrant, each reference's modal warrant covers at least 80% of its asks, pooled |
+| C | the gate failure is a warrant mix | warrant purity per arm (the share of an arm's agreed-warrant asks that carry its modal warrant) under the family division. It replicates `design`'s gate failure if `design` is under 70% and at least two family-division arms are under 70%. |
+
+**The family division's arms, for C,** come from the val1000 family labels, with the audit's
+mapping: F1 → `proof`; F2 and F3 → `interface`; F4 and F5 → `library_fit`; F6 and F7 → `design`;
+F8 → `naming`; F9 → `formatting`; F10 → `doc_quality`; F11 and `CORR` → `correctness`;
+F12 → `pr_level`.
+
+**§7.6's arms are reported beside them,** from the facet labels, with these rules applied in order:
+1. `variant` on a proof → `proof`; `variant` on anything else → `generality`;
+2. `library` or `module_graph` → `library`;
+3. `siblings` → `siblings`;
+4. `norms` on a name → `naming`; on layout → `layout`; on prose → `prose`; otherwise → `form`;
+5. `mechanism`, by mechanism:
+   - registration, generators or performance → `automation`;
+   - typeclass or defeq → `typeclass`;
+   - build → `correctness`;
+6. `intent` on prose → `prose`; otherwise → `correctness`;
+7. `process` → `pr_level`.
+
+§7.6 is partly favoured by construction, since its mapping reads the reference and S3 ties the
+reference to the warrant. So C is read on the family division's side.
+
+**Exploratory, not pre-registered:** which references co-occur as first and second reference; the
+object-by-reference table; the AI stratum against main.
+
