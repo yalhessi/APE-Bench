@@ -1,0 +1,83 @@
+[
+ {
+  "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.unitEmbedding_norm_eq_inv_abs_norm (also unitEmbedding_norm_apply, unitEmbedding_norm_apply_eq_finprod_finitePlace)",
+  "question": "Siblings (consistency across siblings) / Generality of a theorem statement",
+  "evidence_kind": "compile",
+  "claim": "The headline result is stated for x : Kˣ with LHS ‖(unitEmbedding (𝓞 K) K x).1‖. That LHS is not in simp-normal form, because IsDedekindDomain.FiniteAdeleRing.unitEmbedding_apply is @[simp] and rewrites ↑(unitEmbedding R K k) to algebraMap K 𝔸ᶠ[R, K] ↑k. So after any simp the lemma no longer applies. Both analogous library results are stated through the ring map on all of K: InfiniteAdeleRing.coe_norm_eq_abs_norm (x : K) : ‖algebraMap K K∞ x‖ = |Algebra.norm ℚ x|, and @[simp] mixedEmbedding.norm_eq_norm (x : K).",
+  "requested_change": "State the finite-adelic result like its infinite sibling: `theorem coe_norm_eq_inv_abs_norm {x : K} (hx : x ≠ 0) : ‖algebraMap K 𝔸ᶠ[K] x‖ = |Algebra.norm ℚ x|⁻¹ := unitEmbedding_norm_eq_inv_abs_norm (Units.mk0 x hx)`. Then either drop the unitEmbedding-phrased versions, make them private, or restate the finprod intermediates with algebraMap too. The x ≠ 0 hypothesis can go once Nonempty (HeightOneSpectrum (𝓞 K)) is available: at x = 0 both sides are 0 (0 is a non-unit, and |N 0|⁻¹ = 0 in ℝ). Mathlib has no such instance today; I searched for Nonempty/Nontrivial HeightOneSpectrum instances and found none.",
+  "severity": "advisory",
+  "evidence": "Exhibit: Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:193 `@[simp] theorem unitEmbedding_apply (k : Kˣ) : unitEmbedding R K k = algebraMap K 𝔸ᶠ[R, K] k := rfl`; Mathlib/NumberTheory/NumberField/InfiniteAdeleRing.lean:128 `coe_norm_eq_abs_norm (x : K) : ‖algebraMap K K∞ x‖ = |Algebra.norm ℚ x|`; Mathlib/NumberTheory/NumberField/CanonicalEmbedding/Basic.lean:452-454 `@[simp] theorem norm_eq_norm (x : K) : mixedEmbedding.norm (mixedEmbedding K x) = |Algebra.norm ℚ x|`. Compile: I added the coe_norm_eq_inv_abs_norm above to the new file with lean_verify_edit, line mode over lines 73-117. Result: 'Your edit introduced no new errors'. The 8 errors reported were all listed as errors_already_in_the_file. They come from the tool environment, which resolves imports against base build products and therefore lacks the PR's new declarations in other files (Valued.toNormedField.norm_eq_one_iff, finite_valued_one_lt, FinitePlace.two_le_norm_of_one_lt_norm). None of the 8 is on the added lemma."
+ },
+ {
+  "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.norm_def and the Norm 𝔸ᶠ[K] instance (also tprod_norm_of_isUnit, tprod_eq_zero_of_not_isUnit)",
+  "question": "Siblings (consistency across siblings)",
+  "evidence_kind": "compile",
+  "claim": "The Norm instance and norm_def are written as ∏' v, ‖x.1 v‖, where x.1 is Subtype.val of the underlying restricted product. The rest of the API uses the DFunLike coercion `x v` that FiniteAdeleRing provides: algebraMap_apply, isUnit_iff, ext, and the PR's own hasProd_zero_of_not_isUnit and finite_valued_one_lt. The K∞ sibling's norm_def also uses `x v`. So once a user unfolds ‖x‖ with norm_def, the library's simp lemmas no longer fire. The file already mixes both spellings; for example, the proof of hasProd_zero_of_not_isUnit needs `‖x.1 v‖` in `h` to match.",
+  "requested_change": "Write the instance as `norm x := ∏' v, ‖x v‖`, with `norm_def (x : 𝔸ᶠ[K]) : ‖x‖ = ∏' v, ‖x v‖ := rfl`. Use `x v` in tprod_norm_of_isUnit, tprod_eq_zero_of_not_isUnit and the `h` inside hasProd_zero_of_not_isUnit.",
+  "severity": "advisory",
+  "evidence": "Exhibit: Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:103-105 (the DFunLike instance), :141 `algebraMap_apply ... : algebraMap K 𝔸ᶠ[R, K] k v = k`, :169 isUnit_iff; Mathlib/NumberTheory/NumberField/InfiniteAdeleRing.lean:117 `norm_def (x : K∞) : ‖x‖ = ∏ v, ‖x v‖ ^ v.mult`. Compile, PR form: I appended `example (x : K) : True := by have h := norm_def (algebraMap K 𝔸ᶠ[K] x); simp only [IsDedekindDomain.FiniteAdeleRing.algebraMap_apply] at h; trivial` to the file as the PR leaves it. Lean warned 'This simp argument is unused: IsDedekindDomain.FiniteAdeleRing.algebraMap_apply', so the lemma cannot fire on the `x.1 v` form. Compile, revised form: I replaced lines 73-117 with the `x v` version plus the same example. Result: no errors introduced by the edit and no warnings, so algebraMap_apply now fires. Caveat: the aesop line of hasProd_zero_of_not_isUnit could not be checked in this environment. It references the PR's cross-file Valued.toNormedField.norm_eq_one_iff and fails as a pre-existing error both before and after my edit."
+ },
+ {
+  "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.tprod_norm_of_isUnit / tprod_norm_of_unit / norm_def_unit / tprod_eq_zero_of_not_isUnit",
+  "question": "Siblings: do two declarations say the same thing?",
+  "evidence_kind": "exhibit",
+  "claim": "norm_def holds by rfl, so each tprod_* lemma is a norm lemma with the definition unfolded. tprod_norm_of_unit is `tprod_norm_of_isUnit x.isUnit`. norm_def_unit is `tprod_norm_of_unit x`, i.e. the same statement again. norm_eq_zero_of_not_isUnit is literally `tprod_eq_zero_of_not_isUnit hx`. That makes three names for the finprod fact and two for the vanishing fact. The analogous K∞ norm ships only norm_def and norm_eq_zero_of_not_isUnit.",
+  "requested_change": "Move the Norm instance above these lemmas and state each fact once in ‖x‖ form: one IsUnit-hypothesis version such as `‖x‖ = ∏ᶠ v, ‖x v‖` for `(hx : IsUnit x)` (a unit is covered via `x.isUnit`), plus norm_eq_zero_of_not_isUnit. Drop tprod_norm_of_unit, and drop tprod_norm_of_isUnit and tprod_eq_zero_of_not_isUnit or make them private.",
+  "severity": "advisory",
+  "evidence": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean (as the PR leaves it) lines 83-104: `tprod_norm_of_unit ... := tprod_norm_of_isUnit x.isUnit` (88-89), `norm_def ... := rfl` (98), `norm_def_unit ... := tprod_norm_of_unit x` (100-101), `norm_eq_zero_of_not_isUnit ... := tprod_eq_zero_of_not_isUnit hx` (103-104). Sibling API: Mathlib/NumberTheory/NumberField/InfiniteAdeleRing.lean:113-130 (instance, norm_def, norm_eq_zero_of_not_isUnit, coe_norm_eq_abs_norm only)."
+ },
+ {
+  "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean Norm 𝔸ᶠ[K] instance (the adelic content)",
+  "question": "A definition: encoding / its API",
+  "evidence_kind": "judgment",
+  "claim": "The new notion is the product of normalised absolute values. Its defining properties are that it is multiplicative and vanishes exactly on non-units. The PR gives it only as bare `Norm` data, with one direction of the zero characterisation and no multiplicativity. The closest analogue in Mathlib, the same product-of-places construction on the mixed space, is bundled as `mixedEmbedding.norm : mixedSpace K →*₀ ℝ`, with norm_eq_zero_iff, norm_ne_zero_iff and norm_nonneg. Without norm_mul/norm_one, later work (the idele norm as a hom to ℝ>0, the adelic product formula ‖x‖∞·‖x‖f = 1) must reprove multiplicativity from the tprod each time. The instance is also not a norm in any normed-ring sense (it kills every non-unit and has no triangle inequality), and the ‖·‖ notation invites that confusion.",
+  "requested_change": "Add norm_mul and norm_one, and the iff `norm_eq_zero_iff : ‖x‖ = 0 ↔ ¬IsUnit x`. The PR has every ingredient: for units the finprod has finite mulSupport and nonzero factors, and for non-units both sides are 0. Alternatively, bundle the content as a `𝔸ᶠ[K] →*₀ ℝ` following mixedEmbedding.norm, and keep the ‖·‖ spelling only if consistency with K∞ is preferred.",
+  "severity": "advisory",
+  "evidence": "Analogous API: Mathlib/NumberTheory/NumberField/CanonicalEmbedding/Basic.lean:415 `protected def norm : (mixedSpace K) →*₀ ℝ`, :424 norm_nonneg, :427 norm_eq_zero_iff, :432 norm_ne_zero_iff, :453 norm_eq_norm. The K∞ sibling (InfiniteAdeleRing.lean:113-130) has the same thin Norm-only API, so the same gap exists there too. That is why this is advisory."
+ },
+ {
+  "target": "Mathlib/Topology/Algebra/Valued/NormedValued.lean Valued.toNormedField.norm_eq_one_iff",
+  "question": "Siblings / Automation (@[simp])",
+  "evidence_kind": "compile",
+  "claim": "The new iff has no @[simp], but all six of its siblings in the same toNormedField section carry @[simp]: norm_le_iff, norm_lt_iff, norm_le_one_iff, norm_lt_one_iff, one_le_norm_iff and one_lt_norm_iff. The PR itself has to pass it to simp/aesop by hand (mulSupport_finite, hasProd_zero_of_not_isUnit).",
+  "requested_change": "Tag it `@[simp] theorem norm_eq_one_iff : ‖x‖ = 1 ↔ val.v x = 1`.",
+  "severity": "advisory",
+  "evidence": "Exhibit: Mathlib/Topology/Algebra/Valued/NormedValued.lean:229-257, where each of the six sibling iffs is preceded by @[simp]. Compile: lean_verify_edit replacing Valued.toNormedField.norm_eq_one_iff with the @[simp]-tagged version returned 'Lean verification completed successfully' with no errors or warnings."
+ },
+ {
+  "target": "Mathlib/NumberTheory/NumberField/AdeleRing.lean (removed 𝔸ᶠ[K] notation) and Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean (scoped notation 𝔸ᶠ[K])",
+  "question": "Location",
+  "evidence_kind": "judgment",
+  "claim": "The PR moves the scoped notation `𝔸ᶠ[K]` out of AdeleRing.lean, where `𝔸[K]` and `𝔸[R, K]` live in the same scope NumberField.AdeleRing, into the new file. AdeleRing.lean does not import the new file. After the PR, code that imports AdeleRing.lean and writes `open scoped NumberField.AdeleRing` gets `𝔸[K]` but no longer `𝔸ᶠ[K]`. A notation cannot carry a deprecation, so downstream users (no file in Mathlib itself uses `𝔸ᶠ[K]`) get a parse error with no pointer.",
+  "requested_change": "Make NumberField/AdeleRing.lean import Mathlib.NumberTheory.NumberField.FiniteAdeleRing, so the whole NumberField.AdeleRing notation scope stays available from AdeleRing.lean. There is no cycle: the new file imports Completion.FinitePlace, DedekindDomain.FiniteAdeleRing, NormedValued and ProductFormula, and ProductFormula imports only FinitePlace, InfinitePlace.Basic and Flat.TorsionFree. That file is also where a full-adele norm ‖x.1‖·‖x.2‖ would go. At minimum, say in the description that the notation moved.",
+  "severity": "advisory",
+  "evidence": "content_search for `𝔸ᶠ` over Mathlib finds only RingTheory/DedekindDomain/FiniteAdeleRing.lean (the 𝔸ᶠ[R, K] notation) and the new NumberField/FiniteAdeleRing.lean. AdeleRing.lean imports (lines 8-9): InfiniteAdeleRing and RingTheory.DedekindDomain.FiniteAdeleRing only. ProductFormula.lean lines 8-10 give its imports."
+ },
+ {
+  "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean imports",
+  "question": "Location: are new imports needed?",
+  "evidence_kind": "exhibit",
+  "claim": "Two of the new file's four public imports are redundant. `Mathlib.NumberTheory.NumberField.ProductFormula` already publicly imports `Mathlib.NumberTheory.NumberField.Completion.FinitePlace`, and FinitePlace publicly imports `Mathlib.Topology.Algebra.Valued.NormedValued`.",
+  "requested_change": "Drop `public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace` and `public import Mathlib.Topology.Algebra.Valued.NormedValued` from the new file.",
+  "severity": "advisory",
+  "evidence": "Mathlib/NumberTheory/NumberField/ProductFormula.lean:8 `public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace`; Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean as the PR leaves it keeps `public import Mathlib.Topology.Algebra.Valued.NormedValued` (diff hunk @@ -6,17 +6,15 @@)."
+ },
+ {
+  "target": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean imports",
+  "question": "The PR as a whole: is it one thing / churn",
+  "evidence_kind": "judgment",
+  "claim": "The PR also reshuffles FinitePlace.lean's imports. It removes LinearAlgebra.FreeModule.IdealQuotient, RingTheory.DedekindDomain.AdicValuation and RingTheory.Valuation.Discrete.RankOne, moves RamificationInertia.Inertia, and leaves a double blank line. None of this is needed for the two lemmas added to that file or for the adelic norm. It is an unrelated cleanup, it widens the review surface, and removing public imports can break downstream (non-Mathlib) files that relied on them transitively.",
+  "requested_change": "Split the import cleanup into its own PR, or at least justify it in the description. Here, keep FinitePlace.lean's import block as it was apart from what the new lemmas need.",
+  "severity": "advisory",
+  "evidence": "diff.patch hunk `@@ -6,17 +6,15 @@` of Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean. The two lemmas the PR adds there (two_le_absNorm_nnreal, FinitePlace.two_le_norm_of_one_lt_norm) need no import changes: they build on one_lt_absNorm, FinitePlace.norm_def and Valued.toNormedField.one_lt_norm_iff, and every import they use is still present."
+ },
+ {
+  "target": "PR",
+  "question": "The PR as a whole: description",
+  "evidence_kind": "judgment",
+  "claim": "The description contains only 'depends on: #35820'. It gives no motivation (who uses the finite-adele norm; its role with InfiniteAdeleRing's norm in an adelic product formula), no design rationale (a Norm instance rather than a bundled multiplicative map, and ∏' over all places), no mention that the 𝔸ᶠ[K] notation moved files, and no AI-use disclosure either way. A reviewer cannot tell from it whether the design was chosen deliberately.",
+  "requested_change": "Add a few sentences: the intended downstream use, why a `Norm` instance (mirroring InfiniteAdeleRing's) was chosen, that the notation moved, the unrelated import cleanup if it stays, and the AI-use statement.",
+  "severity": "advisory",
+  "evidence": "pr.md, Description section."
+ }
+]

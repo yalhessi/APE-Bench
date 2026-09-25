@@ -1,0 +1,58 @@
+[
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean ConvexSpace",
+    "claim": "The axioms of `ConvexSpace` (`assoc`, `single`, `ext`) do not imply idempotence, so the class admits instances that are not convex spaces, and `proof_wanted convexCombo₂_same` is false in general and can never be proved. Counter-model: R = M = ℝ with `convexCombination f xs := ∑ i ∈ f.support, f i * xs i + H f`, where `H f = -∑ f i * log (f i)` is Shannon entropy. `single` holds because H of a point mass is 0; `ext` holds because nothing depends on xs off the support; `assoc` holds by the entropy chain rule H (f.comp g) = H f + ∑ k, f k * H (g k). Yet `convexCombo₂ (1/2) (1/2) _ _ _ x x = x + log 2 ≠ x`. (The same works over ℚ with F(q) = q * padicValRat 2 q in place of q log q.) What is missing is naturality in the index type: `convexCombination` depends on the indexing and not only on the pushed-forward distribution on M.",
+    "requested_change": "Replace the `ext` field with a naturality axiom: for `e : ι → ι'`, `convexCombination (f.map e) xs = convexCombination f (xs ∘ e)`, with `FiniteProbability.map` defined via `Finsupp.mapDomain`. This axiom implies `ext` (restrict to the support subtype) and idempotence (map to `Unit`, then `single`), which also settles the TODO on whether `ext` is needed. Alternatively, make `convexCombination` take a `FiniteProbability R M`, i.e. an algebra for the finitely supported distribution monad. Also delete the inline `-- Perhaps this follows from assoc` comment.",
+    "severity": "blocking",
+    "evidence": "Read from the diff: the class has exactly the three fields `assoc`, `single` and `ext`, and `ext` only lets `xs` vary for a fixed `f`. No field relates combinations over different index types, and the entropy chain rule satisfies `assoc` exactly as `FiniteProbability.comp` is defined (weights f k * g k i on ⟨k, i⟩). This is a pen-and-paper counter-model, not machine-checked; building it in-file would need Real.log imports. zulip_search found no prior discussion of these axioms."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean ConvexSpace",
+    "claim": "`ConvexSpace`, the `FiniteProbability` API section and `convexCombo₂` all assume `[IsStrictOrderedRing R]`, but nothing uses strictness. `IsOrderedRing R` is enough, and it lets semirings that are only non-strictly ordered, such as `ℝ≥0∞`, carry convex-space structures.",
+    "requested_change": "Replace `[IsStrictOrderedRing R]` with `[IsOrderedRing R]` in the `FiniteProbability` `variable` line, in the `class ConvexSpace` binders, and in the `variable` line before `convexCombo₂`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on lines 55-148 with every `IsStrictOrderedRing` replaced by `IsOrderedRing`: success, no errors and no warnings. The whole file, including `single`, `duple`, `comp` (with `bound`) and the class, compiles."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean (imports)",
+    "claim": "The file imports `Mathlib.Data.ZMod.Defs`, which nothing uses (there is no `ZMod` anywhere in the file), and `Mathlib.Algebra.Module.Defs`, which is also unused.",
+    "requested_change": "Delete `public import Mathlib.Data.ZMod.Defs` and `public import Mathlib.Algebra.Module.Defs`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing import lines 8-12 with only the BigOperators.Group.Finset, Order.Ring.Defs and Finsupp.SMulWithZero imports: success. To check the verifier was really compiling, I first replaced the import with a misspelled module (`ZMod.Defz`), which failed with a missing-olean error."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean FiniteProbability.comp",
+    "claim": "The `total` proof of `FiniteProbability.comp` is a 25-line machine-generated proof (\"minimally cleaned up from a proof by Aristotle\"). It restates `f` as `f.sum single`, uses three intermediate `have`s, and closes with `convert … using 1`, `simp_all` and `aesop`. It is only `Finsupp.sum_sum_index` followed by the fact that each inner sum equals its outer weight.",
+    "requested_change": "Replace the `total` proof with:\n    have hg (m : κ) (r : R) : (r • (g m).weights).sum (fun _ r => r) = r := by\n      have := (g m).total\n      rw [Finsupp.sum] at this\n      rw [Finsupp.sum_of_support_subset _ Finsupp.support_smul _ (fun _ _ => rfl)]\n      simp only [Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, ← Finset.mul_sum, this, mul_one]\n    rw [Finsupp.sum_sum_index (fun _ => rfl) (fun _ _ _ => rfl)]\n    simp only [Finsupp.sum_embDomain, hg]\n    exact f.total\nand drop the Aristotle comment.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (declaration FiniteProbability.comp) with this `total` proof: success. A first attempt using `Finsupp.sum_smul_index` failed with Unknown constant. declaration_search places that lemma in Mathlib/Data/Finsupp/SMul.lean, which this file does not import, so the proof uses `Finsupp.sum_of_support_subset` and `Finsupp.support_smul` instead."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean FiniteProbability.single",
+    "claim": "`FiniteProbability.single` uses `open Classical in` on a `def` only to get decidability for one rewrite in a proof field. It then closes the two branches by hand, using `grind` for `0 ≤ 0`.",
+    "requested_change": "Drop `open Classical in` and write the field as `nonneg m := by classical; rw [Finsupp.single_apply]; split <;> simp` (with `classical` on its own line).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on lines 58-67 with `open Classical in` removed and `nonneg m := by\\n classical\\n rw [Finsupp.single_apply]\\n split <;> simp`: success."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean FiniteProbability.duple",
+    "claim": "The `nonneg` field of `FiniteProbability.duple` is a non-terminal bare `simp` followed by `grind`, which is fragile under simp-set changes.",
+    "requested_change": "Replace it with `nonneg := by simp [Fin.forall_fin_two, hs, ht]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on lines 73-75 with `  nonneg := by simp [Fin.forall_fin_two, hs, ht]`: success."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean FiniteProbability.duple",
+    "claim": "The docstring of `FiniteProbability.duple` says \"with weights `x` and `y`\", but the weights are the parameters `s` and `t`. The declaration also carries an open question as a code comment (`-- Is it useful to generalize this to x y : ι?`).",
+    "requested_change": "Change the docstring to \"A probability distribution on `Fin 2` with weights `s` and `t`.\" Delete the question comment, or turn it into a TODO in the module docstring.",
+    "severity": "advisory",
+    "evidence": "Read from the diff: `def duple {s t : R} (hs : 0 ≤ s) (ht : 0 ≤ t) (h : s + t = 1)` with weights `Finsupp.single 0 s + Finsupp.single 1 t`. No `x` or `y` appears in the declaration."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean ConvexSpace.ext",
+    "claim": "The field `ConvexSpace.ext` states a congruence property of `convexCombination` (points agreeing on the support give equal combinations), not extensionality of `ConvexSpace` structures. In Mathlib, `Foo.ext` is reserved for extensionality of `Foo` itself (the name an `@[ext]` attribute on the class would generate), so this name is misleading and will collide.",
+    "requested_change": "If the field is kept (see the naturality finding), rename it to describe what it says, e.g. `convexCombination_congr`.",
+    "severity": "advisory",
+    "evidence": "Read from the diff: `ext {ι} (f) (xs xs') (h : ∀ i, i ∈ f.support → xs i = xs' i) : convexCombination f xs = convexCombination f xs'`. naming_norm could not resolve a subject for this PR's declarations, so the naming is unmeasured by the tool and judged on convention."
+  }
+]

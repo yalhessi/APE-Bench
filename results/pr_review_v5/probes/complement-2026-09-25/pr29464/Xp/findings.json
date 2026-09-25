@@ -1,0 +1,58 @@
+[
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, section docstring \"Smoothing function\" (before smoothingFn)",
+    "claim": "The rewritten section doc says the smoothing function is used as a factor of `$1 \\pm \\varepsilon\\,n$`, which renders as 1 ± ε·n (multiplication by n). In the Lean source `ε n` is function application, `smoothingFn n = 1 / log n`, so the new LaTeX misstates the factor that the proofs use (`1 - ε n`, `1 + ε n`).",
+    "requested_change": "Replace `$1 \\pm \\varepsilon\\,n$` with `` `1 ± ε n` `` (as the lemma docstrings in AkraBazzi.lean write it) or with `$1 \\pm \\varepsilon(n)$`.",
+    "severity": "blocking",
+    "evidence": "file_read SumTransform.lean l.254-255 and l.268 (`noncomputable def smoothingFn (n : ℝ) : ℝ := 1 / log n`, `local notation \"ε\" => smoothingFn`); AkraBazzi.lean l.457 and l.605 docstrings write the factor as `1 - ε n` / `1 + ε n`. lean_verify_edit with the backticked replacement compiles (success, no errors)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, T_isBigO_smoothingFn_mul_asympBound (comment above base_max)",
+    "claim": "The rewritten comment now uses Lean syntax, `T n / asympBound g a b n` over `n ∈ [b' * n₀, n₀)`, but `base_max` is the sup of `T n / ((1 - ε n) * asympBound g a b n)` over `Finset.Ico ⌊b' * n₀⌋₊ n₀`. The comment looks exact and does not match the code.",
+    "requested_change": "Change the comment to `-- Max of the ratio `T n / ((1 - ε n) * asympBound g a b n)` over the base case` / `-- `n ∈ Finset.Ico ⌊b' * n₀⌋₊ n₀``, or else keep it informal instead of Lean-looking.",
+    "severity": "advisory",
+    "evidence": "file_read AkraBazzi.lean l.496-500: the comment is followed by `(Finset.Ico (⌊b' * n₀⌋₊) n₀).sup' h_base_nonempty fun n => T n / ((1 - ε n) * asympBound g a b n)`. lean_verify_edit replacing l.496 with the corrected two-line comment compiles."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, smoothingFn_mul_asympBound_isBigO_T (comments above base_min and C)",
+    "claim": "Same problem as in the upper-bound proof. The comment `T n / asympBound g a b n` leaves out the `(1 + ε n)` factor that `base_min` uses, and the next comment still says `g(n)`, even though the PR changed the matching upper-bound comment to `` `g n` ``.",
+    "requested_change": "Write the ratio as `T n / ((1 + ε n) * asympBound g a b n)` over `Finset.Ico ⌊b' * n₀⌋₊ n₀`, and change `out the g(n) term` to ``out the `g n` term`` so it matches the upper-bound proof.",
+    "severity": "advisory",
+    "evidence": "file_read AkraBazzi.lean l.649-654: comment at l.649; l.651-652 define `base_min` via `inf'` of `T n / ((1 + ε n) * asympBound g a b n)`; l.654 reads `-- out the g(n) term`, whereas l.502 (changed in this PR) reads ``cancel out the `g n` term``."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, file (after `open scoped Topology`)",
+    "claim": "Deleting the stale \"Definition of Akra-Bazzi recurrences\" comment left three blank lines in a row between `open scoped Topology` and `namespace AkraBazziRecurrence`.",
+    "requested_change": "Reduce the three blank lines at lines 63-65 to one.",
+    "severity": "advisory",
+    "evidence": "file_read AkraBazzi.lean l.61-66: l.63, 64 and 65 are empty, then `namespace AkraBazziRecurrence` at l.66. The diff shows the removed block sat between the existing blank lines."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, module docstring",
+    "claim": "The rewritten module docstring puts valid Lean in LaTeX (`$T : ℕ → ℝ$`), while the same docstring backticks `T : ℝ → ℝ` and `ℕ → ℝ` in the Implementation section. It also switches between `\\sum` (l.16, l.32) and Unicode `∑` inside `$…$` (l.33). The reflowed first paragraph has a short line (\"These / recurrences arise primarily in the / analysis …\", l.20-22).",
+    "requested_change": "Write `T : ℕ → ℝ` in backticks. Use `\\sum` throughout the LaTeX, or `∑` throughout (for example `$\\sum a_i b_i^p = 1$` on l.33, as SumTransform.lean l.480 already does). Re-wrap l.19-22 to the 100-column width.",
+    "severity": "advisory",
+    "evidence": "file_read AkraBazzi.lean l.14-44. zulip_search (maintainers): Eric Wieser, 'LaTeX in docstrings' (2024-01-31): 'use unicode (in backticks) if it's (almost) valid lean syntax, otherwise use latex'."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, module docstring (Main definitions and results)",
+    "claim": "The rewritten bullet list still says the parameters `g`, `a`, `b`, `r` are 'as above', but this module docstring describes none of them above that point. The new `smoothingFn` and `p` bullets end in fragments, '(with derivative/asymptotic facts)' and '(existence/uniqueness and related properties)', that do not form sentences.",
+    "requested_change": "Replace 'as above' with a self-contained description (for example 'where `T n = ∑ i, a i * T (r i n) + g n` for large `n`') or point to the section docstring below. Rewrite the two parentheticals as prose, e.g. '`smoothingFn`: the smoothing function `ε x = 1 / log x`, used as a factor `1 ± ε n` in the induction' and '`p`: the unique real number with `∑ i, a i * b i ^ p = 1` (see `sumCoeffsExp_p_eq_one`)'.",
+    "severity": "advisory",
+    "evidence": "file_read SumTransform.lean l.12-37: the module doc opens with 'We develop further preliminaries…' and never introduces g, a, b, r before the bullet at l.19-20. The fragments are at l.21-24. `sumCoeffsExp_p_eq_one` is at l.533."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean, module docstring",
+    "claim": "The new LaTeX module docstring reads as an exact statement, but it drops the quantifier structure of `GrowsPolynomially`: for each `b ∈ (0,1)` there exist `c₁, c₂ > 0` (depending on `b`) such that the bound holds for all sufficiently large `x`. As written, it does not say where `c₁` and `c₂` come from and does not say the condition is eventual. The declaration docstring at least says 'roughly'.",
+    "requested_change": "State it as: 'for every $b \\in (0,1)$ there are constants $c_1, c_2 > 0$ such that, for all sufficiently large $n$ and all $u \\in [b n, n]$, $c_1 g(n) \\le g(u) \\le c_2 g(n)$'.",
+    "severity": "advisory",
+    "evidence": "file_read GrowsPolynomially.lean l.15-18 (module doc) against l.37-39 (`∀ b ∈ Set.Ioo 0 1, ∃ c₁ > 0, ∃ c₂ > 0, ∀ᶠ x in atTop, ∀ u ∈ Set.Icc (b * x) x, f u ∈ Set.Icc (c₁ * (f x)) (c₂ * f x)`)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, AkraBazziRecurrence (field docstrings)",
+    "claim": "The PR rewrote some field docstrings of `AkraBazziRecurrence` as full sentences with a closing period (`n₀_gt_zero`, `a_pos`, `b_pos`, `b_lt_one`, `r_lt_n`, `dist_r_b`) but left the others without one (`n₀`, `g_nonneg`, `g_grows_poly`, `h_rec`, `T_gt_zero'`). The structure's docstrings are now inconsistent with each other.",
+    "requested_change": "End every field docstring of `AkraBazziRecurrence` with a period: 'Point below which the recurrence is in the base case.', '`g` is nonnegative.', '`g` grows polynomially.', 'The actual recurrence.', 'Base case: `0 < T n` whenever `n < n₀`.'",
+    "severity": "advisory",
+    "evidence": "file_read SumTransform.lean l.55-75: the fields at l.55, 65, 67, 69 and 71 have no period; l.57, 59, 61, 63, 73 and 75 end with one."
+  }
+]

@@ -343,3 +343,18 @@ reviewers, one run each, on 5 val1000 PRs, with 53 maintainer asks matched by tw
 hard-cells-only job H, and compare `X ∪ H` against `X ∪ X′`, where X′ is a second run of the
 current brief.
 
+**Round 2** (the complement probe, with the pipeline's own tools through `cli tool`):
+- **The rule holds on both matchers:** `X ∪ H` against `X ∪ X′` is 41 vs 32 and 39 vs 31, with
+  10-11 gains and 2 losses.
+- **But 9-10 of the gains are one PR-level finding on 29464.** On the other four PRs it is +1 and
+  -2.
+- **What replicates across rounds:** the current brief reached 0 of 29464's 10 PR-level asks in
+  both runs; Y and H reached 4-10.
+- **Correction to round 1:** the current brief reached the `ConvexSpace` design ask in its second
+  run (4 of 8, against 1 of 8), so that round-1 gain was run variance.
+- **Tools:** compile and repository search carry the evidence (X′ 53% and 47%, H 37% and 69%);
+  precedent search, Zulip and `naming_norm` rarely do. Compile raised verification, not reach.
+
+**Next:** breadth for the PR-level job. About 10 PRs with PR-level asks, AI and main, two runs
+each.
+

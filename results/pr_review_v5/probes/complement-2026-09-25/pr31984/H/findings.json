@@ -1,0 +1,83 @@
+[
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: convexCombo₂ (with ConvexSpace.convexCombination and FiniteProbability.duple)",
+    "question": "A definition: Generality / Encoding (index universe tied to the universe of M)",
+    "evidence_kind": "compile",
+    "claim": "Because the field `convexCombination {ι : Type v}` takes index types in the same universe as `M : Type v`, and `duple` is fixed to `Fin 2 : Type`, `convexCombo₂` silently elaborates with `{M : Type}`. It, and the three `proof_wanted` lemmas about it, cannot be used for any convex space in a higher universe.",
+    "requested_change": "Generalize `duple` to any index type, `def duple {ι : Type v} (i j : ι) {s t : R} (hs : 0 ≤ s) (ht : 0 ≤ t) (h : s + t = 1) : FiniteProbability R ι` with weights `Finsupp.single i s + Finsupp.single j t`, and define `convexCombo₂ s t hs ht h x y := convexCombination (.duple x y hs ht h) id`. This also settles the author's inline question 'Is it useful to generalize this to `x y : ι`?'. The alternative is the re-encoding in the next finding.",
+    "severity": "blocking",
+    "evidence": "lean_verify_edit on the PR file with `#check @convexCombo₂` added prints `{R : Type u_1} → {M : Type} → ...`. Adding `example {M' : Type 1} [ConvexSpace R M'] (x y : M') : M' := convexCombo₂ (1 : R) 0 (by simp) (by simp) (by simp) x y` fails with 'Type mismatch ... of sort `Type` but is expected to have type M' of sort `Type 1`'. With the generalized `duple` (nonneg proved by `classical; simp only [Finsupp.coe_add, Pi.add_apply, Finsupp.single_apply]; split_ifs <;> simp [hs, ht, add_nonneg]`, total by `rw [Finsupp.sum_add_index' (fun _ => rfl) (fun _ _ _ => rfl)]; simpa [Finsupp.sum_single_index] using h`) and `convexCombo₂ := convexCombination (.duple x y hs ht h) id`, the whole file compiles (success: true, no errors). `#check` then gives `{M : Type u_2}`, and the `Type 1` example compiles."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace",
+    "question": "A definition: Encoding (an indexed family or a map out of a distribution; would a different encoding make a field redundant?)",
+    "evidence_kind": "judgment",
+    "claim": "The class is encoded as an operation on arbitrary indexed families `{ι : Type v} → FiniteProbability R ι → (ι → M) → M`. This causes three problems. (a) It needs the extra `ext` axiom, which the author says they are unsure is necessary (inline comment, and a module TODO). (b) It ties index types to M's universe (see the previous finding). (c) The class quantifies over `Type v`, so `ConvexSpace R M` lives in `Type (max u (v+1))`. The standard encoding is an algebra for the finitely supported distribution monad, with structure map `FiniteProbability R M → M`. It avoids all three.",
+    "requested_change": "Consider making the primitive field `convexCombination : FiniteProbability R M → M`, with axioms for `single` (unit) and `comp`/join (associativity). Recover the indexed operation as a definition, `convexCombination (f.map xs)`, where `FiniteProbability.map` is the push-forward along `Finsupp.mapDomain`. The `ext` field then becomes a lemma, via `Finsupp.mapDomain_congr`. There is no universe tie, and the class stays in `Type (max u v)`. At minimum, settle whether `ext` is needed before a class with that field is merged, because instances written later would have to discharge it.",
+    "severity": "advisory",
+    "evidence": "`Finsupp.mapDomain_congr` (Mathlib/Data/Finsupp/Basic.lean:306) states `(∀ x ∈ v.support, f x = g x) → v.mapDomain f = v.mapDomain g`, which is exactly the content of the `ext` field once combinations are pushed forward to M. `stdSimplex.map` / `map_comp_apply` / `map_vertex` (Mathlib/Analysis/Convex/StdSimplex.lean:274-301) show the functorial API that the push-forward would follow. The `stdSimplex` docstring (same file, line 35) already describes the construction as 'the free object in the category of convex spaces', which is the monad-algebra view. The universe consequence is shown by the compile in the previous finding."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace, FiniteProbability.{single,duple,comp}, convexCombo₂ (typeclass hypotheses)",
+    "question": "A theorem or definition: Generality (weaken a typeclass) / The typeclass layer",
+    "evidence_kind": "compile",
+    "claim": "`[IsStrictOrderedRing R]` is stronger than anything in the file needs, and it is a parameter of the class itself. It excludes ordered but non-cancellative scalar semirings such as `ℝ≥0∞`, for which strict additive monotonicity fails (⊤ + 0 = ⊤ + 1). Mathlib's own convexity notions assume only `IsOrderedRing`.",
+    "requested_change": "Replace `[IsStrictOrderedRing R]` with `[IsOrderedRing R]` in the `FiniteProbability` namespace variables, in the `ConvexSpace` class binders and in the final `variable` line.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing lines 53-164 with the same text, `IsStrictOrderedRing` → `IsOrderedRing` in all three places: success, no errors or warnings. Precedent for the weaker assumption: `convex_stdSimplex [IsOrderedRing 𝕜]`, with the file's base variables only `[Semiring 𝕜] [PartialOrder 𝕜]` (Mathlib/Analysis/Convex/StdSimplex.lean:32,43)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability",
+    "question": "A definition: Its API",
+    "evidence_kind": "exhibit",
+    "claim": "`FiniteProbability` is introduced with no API. It has no coercion to functions, no `@[ext]` lemma, no simp lemmas for its fields, no push-forward `map` with functoriality, and no simp lemmas computing the weights of `single`, `duple` or `comp`. Without them, even the `proof_wanted` statements about `convexCombo₂` will have to unfold `duple` and `Finsupp` by hand.",
+    "requested_change": "Add the basic API that the analogous `stdSimplex` type has: a `FunLike (FiniteProbability R ι) ι R` instance (or `CoeFun`), `@[ext]` (from equality of `weights`), `@[simp]` lemmas `nonneg`/`total` in applied form, `map` along `f : ι → κ` with `map_id`/`map_comp`/`map_single`, and `@[simp]` `single_weights`, `duple_weights`, `comp_weights` (or `comp_apply`).",
+    "severity": "advisory",
+    "evidence": "Analogous API for the Fintype version: `stdSimplex` has `instance : FunLike (stdSimplex S X) X S`, `@[ext high] lemma ext`, `@[simp] zero_le`, `@[simp] sum_eq_one`, `map`, `map_coe`, `map_id_apply`, `map_comp_apply`, `vertex` (the point mass, the counterpart of `single`), `vertex_coe` and `map_vertex` (Mathlib/Analysis/Convex/StdSimplex.lean:235-301). The discrete-probability analogue `PMF` has `instFunLike`, `support` and `mem_support_iff` (Mathlib/Probability/ProbabilityMassFunction/Basic.lean:50-82), and `pure`/`bind` (Mathlib/Probability/ProbabilityMassFunction/Monad.lean:41,105), which correspond to `single`/`comp`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability",
+    "question": "A definition: The library (an existing construction it should be linked to)",
+    "evidence_kind": "exhibit",
+    "claim": "For a finite index type, `FiniteProbability R ι` is the same object as the existing `stdSimplex R ι`. The PR neither mentions nor relates the two, so the library ends up with two unconnected encodings of 'probability vectors'.",
+    "requested_change": "Mention `stdSimplex` in the module docstring and state the relationship. Add the equivalence `FiniteProbability R ι ≃ stdSimplex R ι` for `[Fintype ι]` (sending `single` to `stdSimplex.vertex`), or at least record it as a TODO next to the existing ones.",
+    "severity": "advisory",
+    "evidence": "`def stdSimplex : Set (ι → 𝕜) := { f | (∀ x, 0 ≤ f x) ∧ ∑ x, f x = 1 }` for `[Fintype ι]`, documented as 'the free object in the category of convex spaces' (Mathlib/Analysis/Convex/StdSimplex.lean:34-37), with its own subtype API and `vertex` at lines 230-301."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.total",
+    "question": "A theorem or lemma's statement: The library (stated with the existing function rather than an unfolded form)",
+    "evidence_kind": "exhibit",
+    "claim": "The field `total : weights.sum (fun _ r => r) = 1` spells out by hand the existing `Finsupp.degree`, which is `∑ i ∈ d.support, d i` over any `AddCommMonoid`. Because of that, the existing simp lemmas do not fire, and `single`/`duple` reprove sum-of-single and sum-of-add each time (`simpa [Finsupp.sum_add_index]`).",
+    "requested_change": "State the field as `total : weights.degree = 1`. The two sides are definitionally equal, so the `comp` proof carries over with an unfold. `single.total` and `duple.total` then follow from `degree_single` and `degree_add`.",
+    "severity": "advisory",
+    "evidence": "`def degree (d : σ →₀ R) : R := ∑ i ∈ d.support, d i` under `[AddCommMonoid R]`, with `@[simp] degree_add`, `@[simp] degree_single`, `@[simp] degree_zero` and `degree_eq_sum [Fintype σ]` (Mathlib/Data/Finsupp/Weight.lean:205-222)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean (file location)",
+    "question": "Location",
+    "evidence_kind": "exhibit",
+    "claim": "Convexity that needs no norm or inner product has a designated home, and it is not `LinearAlgebra/`. `ConvexSpace` is purely algebraic convexity, so `Mathlib/LinearAlgebra/ConvexSpace.lean` is the wrong directory.",
+    "requested_change": "Move the file to `Mathlib/Geometry/Convex/` (e.g. `Mathlib/Geometry/Convex/ConvexSpace.lean`, or `.../Space.lean`), update the `Mathlib.lean` import, and add 'Convex spaces' to the topics list in that folder's README.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Geometry/Convex/README.md: 'This subfolder is destined to contain convexity results that do not require a norm nor an inner product.' Mathlib/Analysis/Convex/README.md points non-normed convexity there. No other convexity file exists under Mathlib/LinearAlgebra/ (file_search `*Convex*` over the tree returns only this PR's file there)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean (imports)",
+    "question": "Location (are new imports needed?)",
+    "evidence_kind": "compile",
+    "claim": "Two of the seven new imports, `Mathlib.Data.ZMod.Defs` and `Mathlib.Algebra.Module.Defs`, are not needed by the file.",
+    "requested_change": "Drop `public import Mathlib.Data.ZMod.Defs` and `public import Mathlib.Algebra.Module.Defs`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing the import block (lines 7-13) with the other five imports only: success, no errors."
+  },
+  {
+    "target": "PR",
+    "question": "The PR as a whole (description: motivation, design, AI disclosure, related work)",
+    "evidence_kind": "judgment",
+    "claim": "The description is empty, but this PR adds a new algebraic hierarchy whose axioms the author is not settled on. The source carries open questions as code comments ('Is it useful to generalize this to `x y : ι`?', 'Perhaps this follows from `assoc`, but I don't see how'). AI assistance is disclosed only inside a proof comment ('minimally cleaned up from a proof by Aristotle'). The Zulip thread 'extending a finitely support function over a sigma?' (Is-there-code-for-X, 2025-11-22) and the companion PR #31923 it produced are not linked. Reviewers therefore cannot judge the design choices (indexed family vs monad algebra, the `ext` axiom, the relation to `stdSimplex`/`Convex`) without reconstructing them.",
+    "requested_change": "Write a description covering the motivation and intended instances (modules/affine spaces, per the TODO), the chosen encoding and the open `ext` question. Disclose the Aristotle use in the description, and link #31923 and the Zulip thread. Move the open questions out of code comments into the description or the module TODO.",
+    "severity": "advisory",
+    "evidence": "pr.md: 'Description: (no description)'. diff.patch: comments at the `duple` and `ext` declarations, and in the `comp.total` proof. zulip_search: Kim Morrison, 2025-11-22, 'I'm using this in a proposed formalisation of abstract convex spaces' and 'I've made #31923 in the meantime.'"
+  }
+]

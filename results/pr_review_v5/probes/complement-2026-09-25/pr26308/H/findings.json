@@ -1,0 +1,56 @@
+[
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean (imports)",
+    "question": "Location: are new imports needed, and not heavy?",
+    "evidence_kind": "compile",
+    "claim": "The file imports `Mathlib.Analysis.RCLike.Basic` but uses nothing from `RCLike`. Everything in it is about real normed spaces. `RCLike.Basic` pulls in `Analysis.CStarAlgebra.Basic`, `Algebra.BigOperators.Balance`, `Algebra.Order.BigOperators.Expect`, `Data.Real.Sqrt` and more, so every downstream user of this small file takes that import cone.",
+    "requested_change": "Replace `import Mathlib.Analysis.RCLike.Basic` with `import Mathlib.Analysis.Normed.Module.Basic`. That is the import used by the sibling files on real normed spaces, `Mathlib/Analysis/NormedSpace/Real.lean` and `Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean`. Alternatively, put the declarations into `Mathlib/Analysis/NormedSpace/Real.lean`, whose `Seminormed` section already holds `inv_norm_smul_mem_unitClosedBall` about the same term `‖x‖⁻¹ • x`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing line 6 with `import Mathlib.Analysis.Normed.Module.Basic`: success, no errors or warnings. The imports of target/Mathlib/Analysis/RCLike/Basic.lean are at lines 6-13. The sibling files target/Mathlib/Analysis/NormedSpace/Real.lean and SphereNormEquiv.lean both import only `Mathlib.Analysis.Normed.Module.Basic` and `Mathlib.LinearAlgebra.Basis.VectorSpace`."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized (and all lemmas except norm_normalized_eq_one_iff)",
+    "question": "Generality: can a typeclass be weakened?",
+    "evidence_kind": "compile",
+    "claim": "The definition and every lemma except `norm_normalized_eq_one_iff` hold for `SeminormedAddCommGroup V`. The PR assumes `NormedAddCommGroup V`. The library's existing statements about `‖x‖⁻¹ • x` are already at seminormed generality.",
+    "requested_change": "Use `variable [SeminormedAddCommGroup V] [NormedSpace ℝ V]`. Add `normalized_of_norm_eq_zero (hx : ‖x‖ = 0) : normalized x = 0` and `norm_normalized_eq_one_iff' : ‖normalized x‖ = 1 ↔ ‖x‖ ≠ 0`. Case-split the proofs on `‖x‖ = 0` rather than `x = 0`. Keep `norm_normalized_eq_one_iff` (with `x ≠ 0`) in a `NormedAddCommGroup` section, proved by `simp [norm_normalized_eq_one_iff']`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing lines 16-64 with that seminormed version (def, zero, eq_self_of_norm_eq_one, normalized_normalized, smul_of_pos, neg, smul_of_neg under Seminormed; the x ≠ 0 iff under NormedAddCommGroup): success, no errors or warnings. Precedents at seminormed generality: `inv_norm_smul_mem_unitClosedBall` in target/Mathlib/Analysis/NormedSpace/Real.lean (section Seminormed, line 35) and `sameRay_iff_inv_norm_smul_eq` in target/Mathlib/Analysis/Normed/Module/Ray.lean (line 20: `[SeminormedAddCommGroup E] [NormedSpace ℝ E]`)."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized",
+    "question": "Its API: what basic lemmas does a new notion owe?",
+    "evidence_kind": "compile",
+    "claim": "The new notion lacks its most basic API. There is no reconstruction lemma `‖x‖ • normalized x = x`, which is the whole point of a polar decomposition and is what `homeomorphUnitSphereProd` uses (`smul_inv_smul₀`) for its `left_inv`. There is also no `normalized x = 0 ↔ x = 0`, no norm bound, and no membership in the unit sphere or ball. The library already proves the last two for the unfolded term: `inv_norm_smul_mem_unitClosedBall` for the ball, and `homeomorphUnitSphereProd`'s `toFun` for the sphere.",
+    "requested_change": "Add `norm_smul_normalized (x : V) : ‖x‖ • normalized x = x`, `@[simp] normalized_eq_zero_iff : normalized x = 0 ↔ x = 0`, `norm_normalized_le_one (x : V) : ‖normalized x‖ ≤ 1`, and `normalized_mem_sphere (hx : x ≠ 0) : normalized x ∈ Metric.sphere (0 : V) 1`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit appending those four lemmas after line 64 (proofs: `rcases eq_or_ne x 0 with rfl | hx; simp; exact smul_inv_smul₀ (norm_ne_zero_iff.2 hx) x`; `(norm_normalized_eq_one_iff.2 hx).le`; `rw [← norm_smul_normalized x, h, smul_zero]`; `simpa using hx`): success, no errors. The analogous API for the unfolded form is `inv_norm_smul_mem_unitClosedBall` (target/Mathlib/Analysis/NormedSpace/Real.lean:37), the sphere-membership proof and `left_inv` in `homeomorphUnitSphereProd` (target/Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:29-35), and `norm_smul_inv_norm` (target/Mathlib/Analysis/NormedSpace/RCLike.lean:40)."
+  },
+  {
+    "target": "PR (normalized vs the existing unfolded-form API)",
+    "question": "The library / consistency across siblings",
+    "evidence_kind": "exhibit",
+    "claim": "The library already works with this concept in its unfolded form `‖x‖⁻¹ • x`: 11 files use it, and several stated results depend on it. The PR adds a named definition but connects it to none of them and uses it nowhere. That leaves two spellings of one concept with no bridge. A user holding `normalized x` cannot apply `sameRay_iff_inv_norm_smul_eq`, `inv_norm_smul_mem_unitClosedBall`, `norm_smul_inv_norm` or `homeomorphUnitSphereProd_apply_fst_coe` without first unfolding.",
+    "requested_change": "Add bridging lemmas at least for the ray and sphere results. Examples: `sameRay_iff_normalized_eq : SameRay ℝ x y ↔ x = 0 ∨ y = 0 ∨ normalized x = normalized y`, with the `_of_ne` variant, and `((homeomorphUnitSphereProd E x).1 : E) = normalized x`. Put each where its subject lives or state it in terms of `normalized` there. Alternatively, restate those results with `normalized`, or explain in the description why a separate def is wanted without that integration.",
+    "severity": "advisory",
+    "evidence": "content_search for `‖[a-z]‖⁻¹ • [a-z]` found 11 files, including target/Mathlib/Analysis/Normed/Module/Ray.lean:72,81 (`sameRay_iff_inv_norm_smul_eq_of_ne`, `sameRay_iff_inv_norm_smul_eq`; used in Analysis/Convex/StrictConvexSpace.lean:168), target/Mathlib/Analysis/NormedSpace/Real.lean:37 (`inv_norm_smul_mem_unitClosedBall`), target/Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:29 (`homeomorphUnitSphereProd`, forward map `‖x‖⁻¹ • x`, used in MeasureTheory/Constructions/HaarToSphere.lean), target/Mathlib/Analysis/NormedSpace/RCLike.lean:40 (`norm_smul_inv_norm`), and ad-hoc `fun x ↦ ‖x‖⁻¹ • x` in Analysis/Complex/Tietze.lean:57. The PR changes only Mathlib.lean and the new file, so nothing outside the new file uses `normalized`."
+  },
+  {
+    "target": "PR",
+    "question": "The PR as a whole: does the description explain motivation and design, disclose AI use, and link related work?",
+    "evidence_kind": "judgment",
+    "claim": "The PR has no description. It gives no motivation or downstream use for a new root-level definition that Mathlib does not yet use. It does not explain its design choices: the junk value `normalized 0 = 0`, and ℝ scalars rather than the `RCLike 𝕜` form of the existing `norm_smul_inv_norm`. It makes no AI-use statement. The header's copyright year of 2020 and its two authors suggest the code comes from an earlier project, which is not linked. Without this, a reviewer cannot judge whether the def is wanted or at the right generality.",
+    "requested_change": "Write a description that covers four things: the intended use, for example which follow-up PR or project needs `normalized`; why a named def is preferable to the unfolded `‖x‖⁻¹ • x` already used across the library; the choice of junk value and scalar field; and a link to the source project, if any, with the AI-use disclosure.",
+    "severity": "advisory",
+    "evidence": "pr.md: 'Description: (no description)'. Diff header: 'Copyright (c) 2020 Ilmārs Cīrulis ... Authors: Ilmārs Cīrulis, Alex Meiburg'. Zulip search for normalized/unit-vector discussion returned no thread about this definition."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized_neg",
+    "question": "Automation: should it carry @[simp]?",
+    "evidence_kind": "judgment",
+    "claim": "`normalized_neg : normalized (-x) = -normalized x` is an unconditional lemma that pushes negation out, which is the library's simp-normal direction (`smul_neg`, `norm_neg` are simp). It is the only unconditional equational lemma in the file without `@[simp]`, while `normalized_normalized` and `normalized_zero_eq_zero` carry it. As things stand, `simp` cannot simplify `normalized (-x)`.",
+    "requested_change": "Mark `normalized_neg` `@[simp]`.",
+    "severity": "advisory",
+    "evidence": "diff.patch: `@[simp]` on normalized_zero_eq_zero, norm_normalized_eq_one_iff, normalized_eq_self_of_norm_eq_one and normalized_normalized, but not on normalized_neg."
+  }
+]

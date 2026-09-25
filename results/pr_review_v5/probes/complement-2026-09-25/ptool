@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# ptool <pr> <tool> ['<json arguments>']  -- one call to the pipeline's own review tools, as an arm would make it.
+# ptool <pr> describe                      -- every tool's description and arguments.
+# Run from anywhere inside the repo; PROBE is a directory holding episodes.jsonl for the probe PRs.
+PROBE="${PROBE:?set PROBE to a directory holding episodes.jsonl for the probe PRs}"
+cd "$(git rev-parse --show-toplevel)" && export PYTHONPATH="$PWD/src" PATH="$HOME/.elan/bin:$PATH"
+exec ape/bin/python -m src.mathlib_review.review.cli tool "$2" --episodes "$PROBE/episodes.jsonl" --pr "$1" \
+  --workdir "$PROBE/work/pr$1" --run-config configs/pr_review_v5_verdicts_fanout4.yaml --arguments "${3:-}"

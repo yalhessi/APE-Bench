@@ -174,3 +174,136 @@ The cost is ten reviewer runs and two matcher runs, on Claude.
     findings were already complete, and a resume hit the same error.
   - Matcher 2 listed file names in the probe directory while deleting a helper script. It reports
     opening nothing outside its inputs.
+
+---
+
+## Round 2: a hard-cells job beside the current brief, with the pipeline's own tools (2026-09-25)
+
+**What was run** (the next probe stated above; its rule was restated in
+`results/pr_review_v5/probes/complement-2026-09-25/README.md` before any reviewer ran):
+
+**Conditions,** on the same five PRs and 53 asks:
+- **X′:** a second run of the current brief.
+- **H:** a job for only the cells round 1 showed the current brief missing:
+  - the library;
+  - definition design;
+  - the typeclass layer;
+  - a new notion's API;
+  - siblings;
+  - location;
+  - the PR as a whole;
+  - retirement.
+
+  A finding a compile can settle must be verified before it is filed.
+
+**Tools.** Both held the pipeline's own review tools through `cli tool` (`07b4dfc`, `e30be07`).
+That includes `lean_verify_edit` against each PR's base, built for the probe
+(`ape.toolkits.execute.lean.build`, 78 min for five commits). Round 1's X held only `git grep`
+wrappers.
+
+**Matching.** Two blind matchers, with X, X′ and H shuffled per PR, matched in one pass each.
+
+**Integrity:**
+- **Leak audit:** clean. Every `cat` outside the brief and packet read a reviewer's own temporary
+  output.
+- **Safeguard failures:** X′ on 31984 failed twice on an API safeguard error with nothing written,
+  and completed on the third launch of the identical prompt.
+
+### Result
+
+| | matcher 1 | matcher 2 |
+|---|---|---|
+| asks reached: X / X′ / H | 26 / 29 / 24 | 25 / 26 / 19 |
+| `X ∪ H` against `X ∪ X′` | **41 vs 32** | **39 vs 31** |
+| gains; in F3/F4/F6/F7/F12; losses | 11; 10; 2 | 10; 9; 2 |
+| findings: H / X′ | 35 / 53 | same |
+| **the rule** (≥ +4, ≥ 2 unowned, H ≤ X′ findings) | **holds** | **holds** |
+
+**Per PR, asks reached, X / X′ / H:**
+
+| PR | matcher 1 | matcher 2 |
+|---|---|---|
+| 31984 | 1 / 4 / 5 | 1 / 4 / 5 |
+| 27099 | 5 / 6 / 0 | 5 / 6 / 0 |
+| 36275 | 15 / 14 / 7 | 14 / 11 / 4 |
+| 26308 | 5 / 5 / 2 | 5 / 5 / 1 |
+| 29464 | 0 / 0 / 10 | 0 / 0 / 9 |
+
+### What the pass does and does not mean
+
+**The gain is one PR.**
+- **On 29464:** 9-10 of the 10-11 gains are there, where H's one PR-level finding ("revert the
+  purely stylistic changes") reaches most of the maintainers' passage-level asks.
+- **On the other four PRs:** the complement gained 1 ask (a design ask on 31984) and lost 2 that X′
+  found and H did not: a proof golf, and "is there really no way around using `@`?".
+
+The rule was stated as a total and holds as one, but it does not show a broad complement.
+
+**What replicates across both rounds is that single effect.** On the LLM-edited documentation PR
+(29464), the current brief reached 0 of 10 asks in both of its runs, X and X′. The briefs that ask
+about the PR as a whole reached 4-9 (Y) and 9-10 (H). It is one PR, and the one kind of ask no
+current arm owns, `pr_level`. It is also the kind the audit found most common on AI-generated PRs:
+16% of their asks.
+
+**Correction to round 1.** Round 1 credited the facet framing with the central `ConvexSpace` design
+ask, reached by Y and missed by X. In round 2 the *current* brief reached it too: X′, 4 of 8, by
+reading the class's axioms, not by compiling ("Read from the diff"). H reached it as well, 5 of 8.
+The same brief reached 1 of 8 in one run and 4 of 8 in another. So round 1's X/Y difference on that
+PR was at least partly run-to-run variance. At one run per condition, an issue-level difference on
+one PR is not evidence about a brief.
+
+**H on its own is weak outside the PR level:**
+- 0 asks on 27099;
+- 4-7 of 17 on 36275, against 14-15 for X;
+- it missed design asks there that X′ found.
+
+The hard-cells questions do not reliably surface the design asks maintainers make.
+
+### What the tools contributed
+
+This is a regex over each finding's evidence text, so it is indicative only:
+
+| evidence cited | X′ (53 findings) | H (35 findings) |
+|---|---|---|
+| a compile | 53% | 37% |
+| declaration or content search | 47% | 69% |
+| Zulip | 4% | 11% |
+| precedent search | 4% | 0% |
+| `naming_norm` | 6% | 0% |
+
+**Compile turned judgments into checked facts.** H on 31984 used `lean_verify_edit` as a probe, not
+only as a check:
+- **The universe problem, verified.** A `#check @convexCombo₂` inserted into a compile showed the
+  definition silently fixed to `{M : Type}`, and an `example` at `Type 1` failed. The central design
+  problem became verified evidence.
+- **The weaker typeclass, verified.** `IsStrictOrderedRing → IsOrderedRing` compiled.
+- **Unused imports, shown by compiling without them.** Round 1's reviewers had said: "I could not
+  show that any import is unused without compiling".
+
+**Compile did not raise reach.** X reached 26/25 asks and X′ 29/26, within run variance. It made
+findings verified; it did not make them more numerous.
+
+**Precedent search, Zulip and the naming census rarely supplied a finding's evidence.**
+
+## What the two rounds say about how to proceed
+
+At probe altitude: 5 PRs, one run per condition, Claude reviewers.
+
+1. **A PR-level job is the one change with a replicated effect,** on one PR in two rounds, and it
+   targets the AI-generated PRs that are this project's target. The next evidence is breadth: a
+   PR-level job on about 10 val1000 PRs with PR-level round-1 asks, stratified AI and main, against
+   the current brief. Two runs each, since one run is not enough (point 4).
+2. **The other gains claimed for a facet or hard-cells division are within single-run variance.**
+   The design asks the facet framing seemed to unlock were reached by the current brief in its
+   second run. No arm division should be rebuilt around them on this evidence.
+3. **Compile and repository search carry the evidence; precedent search, Zulip and the naming
+   census rarely do.**
+   - Access to compile raised verification, not reach.
+   - Where the arms already hold `lean_verify_edit`, the cheap lever is using it as a probe:
+     `#check` a universe, try the weaker typeclass, drop an import. That is a brief change, not new
+     machinery.
+   - Improving the three retrieval tools is not where the next gain is, on this evidence.
+4. **Run-to-run variance is large at the issue level.** The same brief reached 1 and 4 of 8 on one
+   PR. Every future probe needs at least two runs per condition, or a comparison against a second
+   run of the control, as round 2 had. The `cli tool` workbench makes that cheap: a round is about
+   20 minutes of Claude time and no pipeline spend.

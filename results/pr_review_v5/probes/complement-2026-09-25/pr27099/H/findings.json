@@ -1,0 +1,56 @@
+[
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: instance : presburger.Structure M (for [Zero M] [One M] [Add M])",
+    "question": "The typeclass layer / consistency across siblings (an instance: could it create a diamond? is it a class where it should be a structure, or the reverse?)",
+    "evidence_kind": "exhibit",
+    "claim": "The PR makes every type with Zero, One and Add a presburger.Structure through a global instance. Every other language in Mathlib/ModelTheory gives its canonical structure as a def, and two of them say in the docstring why it is not an instance. `orderStructure` (Mathlib/ModelTheory/Order.lean:202-204) says: \"This is not an instance, because sometimes the `Language.order.Structure` is defined first.\" `compatibleRingOfRing` (Mathlib/ModelTheory/Algebra/Ring/Basic.lean:203-218) says: \"This is a `def` and not an `instance`, because the path `Ring` => `Language.ring.Structure` => `Ring` cannot be made to commute by definition\". `SimpleGraph.structure` (Mathlib/ModelTheory/Graph.lean:51-52) and `emptyStructure` (Mathlib/ModelTheory/Basic.lean:775) are defs as well. The same failure happens here. Once the theory in the TODO exists, a model is given as a presburger.Structure first, and its + / 0 / 1 are derived from funMap (as `addOfRingStructure` etc. do for rings). At that point this instance produces a second presburger.Structure that is not definitionally the original. Separately, every realize_* lemma here is stated only for this canonical instance, so none of them applies to a structure given first.",
+    "requested_change": "Follow the ring and order pattern. Make the canonical structure a `def`, or at most a scoped instance. Add a compatibility class analogous to `FirstOrder.Ring.CompatibleRing` / `Language.OrderedStructure`, with `[Zero M] [One M] [Add M]` and funMap_zero/one/add as fields, and state realize_zero/one/add/succ/natCast/nsmul/finsum under that class, so they hold for any structure that agrees with the operations.",
+    "severity": "blocking",
+    "evidence": "Exhibits: Mathlib/ModelTheory/Order.lean:202-209 (`def orderStructure` with the not-an-instance docstring; `class OrderedStructure`); Mathlib/ModelTheory/Algebra/Ring/Basic.lean:143-231 (`class CompatibleRing`, `def compatibleRingOfRing` with the not-an-instance docstring) and 252-290 (`addOfRingStructure` etc., the reverse path); Mathlib/ModelTheory/Graph.lean:51-52 (`def SimpleGraph.structure`). Compile: I appended `example (f : ∀ {n}, presburgerFunc n → (Fin n → M) → M) (x : Fin 2 → M) : letI : Zero M := ⟨f .zero ![]⟩; letI : One M := ⟨f .one ![]⟩; letI : Add M := ⟨fun a b => f .add ![a, b]⟩; @Structure.funMap presburger M _ _ presburgerFunc.add x = f presburgerFunc.add x` with the body `fail_if_success exact rfl; sorry`. The `fail_if_success exact rfl` line passed, so `exact rfl` fails and the round trip is not a defeq. The only error reported was the checker's sorry policy on the placeholder."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.finsum",
+    "question": "Design of definitions: encoding (and generality of realize_finsum)",
+    "evidence_kind": "compile",
+    "claim": "`finsum` sums over a Fintype by going through `Finset.univ.toList`. The docstring admits the result depends on choice, so the term is noncomputable, its syntactic shape is unspecified, and realizing it needs commutativity. If the term operation is indexed by a `List`, it is computable and determined, and its realize lemma needs no commutativity: `realize (listSum l) = (l.map (realize v)).sum` holds in any `[AddMonoid M] [One M]`. The Fintype version then becomes a one-line wrapper, and its realize lemma follows from `Finset.sum_map_toList` in two lines instead of the current 9-line induction.",
+    "requested_change": "Add a List-indexed sum of terms (the name is up to the author) with `realize_<sum> [AddMonoid M] [One M] : Term.realize v (sum l) = (l.map (Term.realize v)).sum`. Define the Fintype-indexed version from it, or replace it with a `Fin n`/List-indexed one that avoids choice altogether.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing lines 66-134 compiled with success, no errors or warnings. The edit had `def listSum (l : List (presburger.Term α)) := l.foldr (· + ·) 0`, `finsum f := listSum ((Finset.univ : Finset β).toList.map f)`, `theorem realize_listSum [AddMonoid M] [One M] : Term.realize v (listSum l) = (l.map (Term.realize v)).sum` (proved by induction with rw [realize_add, ih, List.map_cons, List.sum_cons]), and realize_finsum proved by `simp only [presburger.finsum, realize_listSum, List.map_map]; exact Finset.sum_map_toList _ _`."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.realize_nsmul, FirstOrder.Language.presburger.realize_finsum",
+    "question": "Generality (theorem statement: can a typeclass be weakened?)",
+    "evidence_kind": "compile",
+    "claim": "Neither lemma uses the natCast part of AddMonoidWithOne / AddCommMonoidWithOne. realize_nsmul holds for `[AddMonoid M] [One M]`, and realize_finsum for `[AddCommMonoid M] [One M]`. The One is needed only to build the structure. This matters because the module TODO says the author wants to generalize these very notions.",
+    "requested_change": "Weaken `[AddMonoidWithOne M]` to `[AddMonoid M] [One M]` in realize_nsmul, and `[AddCommMonoidWithOne M]` to `[AddCommMonoid M] [One M]` in realize_finsum. realize_natCast legitimately keeps AddMonoidWithOne.",
+    "severity": "advisory",
+    "evidence": "The same lean_verify_edit as the finsum finding (lines 66-134) compiled with success. It contained `realize_nsmul [AddMonoid M] [One M]` with the PR's unchanged proof `induction n with simp [*, add_nsmul]`, and `realize_finsum [AddCommMonoid M] [One M]`."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.realize_natCast (missing ofNat companion)",
+    "question": "Its API (the lemmas a new notion owes: simp lemmas)",
+    "evidence_kind": "compile",
+    "claim": "The new `NatCast (presburger.Term α)` instance, together with Mathlib's `instOfNat`, makes numerals like `(2 : presburger.Term α)` elaborate as `OfNat.ofNat 2`, not as `Nat.cast`. realize_natCast then never fires, and simp cannot evaluate `Term.realize v (2 : presburger.Term α)` at all. The library convention is to pair a natCast simp lemma with an ofNat one using `no_index`, as `Nat.cast_ofNat` does.",
+    "requested_change": "Add `@[simp] theorem realize_ofNat [AddMonoidWithOne M] {n : ℕ} [n.AtLeastTwo] : Term.realize v (no_index (OfNat.ofNat n) : presburger.Term α) = OfNat.ofNat n := realize_natCast (n := n)`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on lines 112-114 compiled with success. It added the lemma above and `example [AddMonoidWithOne M] : Term.realize v (2 : presburger.Term α) = (2 : M) := by fail_if_success (simp [-realize_ofNat]; done); simp`. The linter reported the inner `done` as never executed, which means `simp` without the new lemma made no progress. With it, `simp` closes the goal. A first attempt without `no_index` failed with 'simp made no progress', so the `no_index` is needed."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.zero_nsmul, succ_nsmul, finsum",
+    "question": "The library (declarations that duplicate existing root declarations)",
+    "evidence_kind": "exhibit",
+    "claim": "Three declarations reuse root names. zero_nsmul and succ_nsmul have the same names and the same statements as the root lemmas `zero_nsmul` (to_additive of `pow_zero`, Mathlib/Algebra/Group/Defs.lean:578) and `succ_nsmul` (to_additive of `pow_succ`, Mathlib/Algebra/Group/Defs.lean:582). `finsum` takes the name of the root `finsum` (Mathlib/Algebra/BigOperators/Finprod.lean:96), which means something different: a sum with possibly infinite support. None of the three is `protected`, so under `open FirstOrder.Language.presburger` the root lemmas become ambiguous or are shadowed for users who also do monoid algebra. This is not a rename request; that is the naming reviewer's call.",
+    "requested_change": "Mark `zero_nsmul`, `succ_nsmul` and `finsum` `protected`, and refer to the last as `presburger.finsum` in realize_finsum.",
+    "severity": "advisory",
+    "evidence": "Root declarations: Mathlib/Algebra/Group/Defs.lean:578 `@[to_additive (attr := simp high) zero_nsmul] theorem pow_zero`, :582 `@[to_additive succ_nsmul] theorem pow_succ`; Mathlib/Algebra/BigOperators/Finprod.lean:96 `noncomputable irreducible_def finsum`. Compile: the lines 66-134 lean_verify_edit (see the finsum finding) used `@[simp] protected theorem zero_nsmul`, `@[simp] protected theorem succ_nsmul` and `protected noncomputable def finsum`, and compiled with success. The PR's realize_nsmul proof still goes through, because the simp attribute is unaffected."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: instances Zero/One/Add (presburger.Term α)",
+    "question": "Consistency across siblings / its API",
+    "evidence_kind": "exhibit",
+    "claim": "The sibling language of rings pairs each term-level notation instance with a characterizing lemma: `zero_def`, `one_def`, `add_def` (Mathlib/ModelTheory/Algebra/Ring/Basic.lean:97, 102, 107-108), e.g. `t₁ + t₂ = addFunc.apply₂ t₁ t₂`. This PR states no such lemma. The only way to reduce `t₁ + t₂`, `0` or `1` to `Functions.apply₂` / `Constants.term` is therefore by defeq (`show`/`rfl`), and that reduction is what one needs to apply the generic Term API (relabel, subst, varFinset), which is stated for `func`.",
+    "requested_change": "Add `zero_def : (0 : presburger.Term α) = Constants.term .zero`, `one_def`, and `add_def : t₁ + t₂ = Functions.apply₂ .add t₁ t₂` (all `rfl`), as in Ring/Basic.lean.",
+    "severity": "advisory",
+    "evidence": "Mathlib/ModelTheory/Algebra/Ring/Basic.lean:94-120, where each of the `Zero`, `One`, `Add`, `Mul`, `Neg` instances on `Language.ring.Term α` is immediately followed by its `_def` lemma. The PR file (lines ~47-56) has none."
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.finsum",
+    "claim": "`presburger.finsum` reuses the name of Mathlib's `_root_.finsum` (the `∑ᶠ` sum over the finite support of a function), but it is a `Finset.sum`-style sum: `realize_finsum` equates it with `∑ i, …`. Inside the namespace it also shadows the root `finsum`.",
+    "requested_change": "Rename `presburger.finsum` to `presburger.sum` and `realize_finsum` to `realize_sum`, and update the module TODO and the docstring cross-reference.",
+    "severity": "advisory",
+    "evidence": "content_search: `finprod`/`finsum` is defined in Mathlib/Algebra/BigOperators/Finprod.lean:100-104 as the product/sum over the finite `mulSupport`, with `∑ᶠ` notation. The PR's `realize_finsum` RHS is `∑ i, Term.realize v (f i)`, which is `Finset.sum` over `univ`. The renamed version compiled (lean_verify_edit, lines 59-132 replaced)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.finsum",
+    "claim": "`finsum` only sums over `Finset.univ` of a `[Fintype β]`, although the construction (`toList`, then fold) works for any `Finset`. Its body `foldr (· + ·) 0` is `List.sum` written out by hand.",
+    "requested_change": "Generalize to `noncomputable def sum {β : Type*} (s : Finset β) (f : β → presburger.Term α) : presburger.Term α := (s.toList.map f).sum`, and state the realize lemma as `Term.realize v (sum s f) = ∑ i ∈ s, Term.realize v (f i)`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with exactly this definition and `realize_sum` stated over `s : Finset β` compiled with no errors (the whole file, including every other lemma). `List.sum` elaborates directly on `presburger.Term α` using the PR's `Zero`/`Add` instances."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.realize_finsum",
+    "claim": "`realize_finsum` has a 9-line manual proof: `classical`, `Finset.sum_eq_fold`, a `conv` rewrite with `toList_toFinset`, threading `nodup_toList`, and `Finset.fold_insert` with explicit `(β := M) (op := ...)`. The existing `Finset.sum_map_toList` reduces it to list induction. The proof also writes `←Finset…` / `←List…` without the space Mathlib style requires.",
+    "requested_change": "Replace the proof with `rw [sum, ← Finset.sum_map_toList]; generalize s.toList = l; induction l with simp [*]` (with `finsum`/`Finset.univ` in place of `sum`/`s` if the definition is not generalized).",
+    "severity": "advisory",
+    "evidence": "content_search: `Finset.prod_toList` at Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean:399-402 is proved by `s.prod_map_toList id`, so the additive `Finset.sum_map_toList` exists. lean_verify_edit: the 3-line proof compiled for `realize_sum` over `s : Finset β`."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.zero_nsmul",
+    "claim": "`presburger.zero_nsmul` and `presburger.succ_nsmul` have the same names as the root monoid lemmas `zero_nsmul` and `succ_nsmul`. Inside the namespace they shadow the root lemmas, and they become ambiguous wherever the namespace is opened.",
+    "requested_change": "Mark `zero_nsmul` and `succ_nsmul` as `protected`, and refer to them as `presburger.zero_nsmul` / `presburger.succ_nsmul` where needed.",
+    "severity": "advisory",
+    "evidence": "content_search Mathlib/Algebra/Group/Defs.lean:578 `@[to_additive (attr := simp high) zero_nsmul] theorem pow_zero` and :582 `@[to_additive succ_nsmul] theorem pow_succ`. declaration_search missed them because they are `to_additive`-generated. lean_verify_edit with both marked `protected` compiled."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.succ_nsmul",
+    "claim": "`@[simp]` on `presburger.succ_nsmul` makes simp unfold numeral multiples: `3 • t` becomes `t + t + t` before `realize_nsmul` can fire. As a result `simp` cannot prove `Term.realize v (3 • t) = 3 • Term.realize v t`. The root `succ_nsmul` is deliberately not a simp lemma.",
+    "requested_change": "Drop `@[simp]` from `succ_nsmul`, and pass it explicitly in `realize_nsmul`'s proof: `induction n with simp [*, add_nsmul, presburger.succ_nsmul]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit: with `@[simp] succ_nsmul`, `example [AddMonoidWithOne M] : Term.realize v (3 • t) = 3 • Term.realize v t := by simp` failed with the unsolved goal `Term.realize v t + Term.realize v t + Term.realize v t = 3 • Term.realize v t`. With `@[simp]` removed and the proof of `realize_nsmul` adjusted, the file and the same example compiled. Mathlib/Algebra/Group/Defs.lean:582 declares the root `succ_nsmul` without simp."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.realize_natCast",
+    "claim": "The simp set has no lemma for numeral literals (`OfNat` via `NatCast`) in `presburger.Term`. `Nat.cast_ofNat` first rewrites `((2 : ℕ) : presburger.Term α)` to `(2 : presburger.Term α)`, so `realize_natCast` never fires on a literal cast and `simp` gets stuck.",
+    "requested_change": "Add `@[simp] theorem realize_ofNat [AddMonoidWithOne M] {n : ℕ} [n.AtLeastTwo] : Term.realize v (ofNat(n) : presburger.Term α) = ofNat(n) := realize_natCast` next to `realize_natCast`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on the PR file: `example [AddMonoidWithOne M] : Term.realize v ((2 : ℕ) : presburger.Term α) = 2 := by simp` left the goal `Term.realize v 2 = 2`, and the `(2 : presburger.Term α)` version gave 'simp made no progress'. With `realize_ofNat` added as above, the file compiled and the first example closed by `simp`."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.natCast_succ",
+    "claim": "`natCast_zero` and `natCast_succ` are stated with the raw projection `NatCast.natCast` instead of the `Nat.cast` coercion, which is how they will actually be used. `natCast_succ` also makes `n` implicit, unlike `Nat.cast_succ`.",
+    "requested_change": "Restate them as `((0 : ℕ) : presburger.Term α) = 0` and `natCast_succ (n : ℕ) : ((n + 1 : ℕ) : presburger.Term α) = n + 1`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with these statements (both still `rfl` and `@[simp]`) compiled, and `realize_natCast`'s `induction n with simp [*]` still closed."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.funMap_zero",
+    "claim": "`funMap_zero`, `funMap_one` and `funMap_add` are stated with fully explicit `@Structure.funMap presburger M _ _ presburgerFunc.zero v`, which is hard to read and brittle to argument-order changes.",
+    "requested_change": "Use named arguments instead: `Structure.funMap (L := presburger) (M := M) presburgerFunc.zero v = 0` (and likewise for `one` and `add`).",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit with the named-argument forms of all three lemmas compiled (still `rfl`)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean instance presburger.Structure M",
+    "claim": "The `funMap` match binds an unused variable in `| .one, v => 1`, while the `.zero` arm right above uses `_`.",
+    "requested_change": "Write `| .one, _ => 1`.",
+    "severity": "advisory",
+    "evidence": "Code reading. lean_verify_edit with `| .one, _ => 1` compiled."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean instance presburger.Structure M",
+    "claim": "The PR makes `presburger.Structure M` a global instance for every `[Zero M] [One M] [Add M]`. The sibling languages deliberately avoid this: `Language.orderStructure` is a `def` 'because sometimes the `Language.order.Structure` is defined first', and `Ring.compatibleRingOfRing` is a `def` because the path cannot commute by definition. Neither the instance nor the module doc explains why a global instance is safe here.",
+    "requested_change": "Add an `## Implementation notes` paragraph (or an instance docstring) justifying the global instance relative to `orderStructure` / `compatibleRingOfRing`, or demote it to a `def` used via `letI` in line with them.",
+    "severity": "advisory",
+    "evidence": "content_search Mathlib/ModelTheory/Order.lean:202-204 (`def orderStructure`, 'This is not an instance, because sometimes the `Language.order.Structure` is defined first'). file_read Mathlib/ModelTheory/Algebra/Ring/Basic.lean:203-218 (`compatibleRingOfRing` is a `def`, 'because the path ... cannot be made to commute by definition')."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean FirstOrder.Language.presburger.finsum",
+    "claim": "The continuation lines of the `finsum` docstring are indented by two spaces. Mathlib docstrings do not indent continuation lines; compare the sibling docstrings in `ModelTheory/Algebra/Ring/Basic.lean`.",
+    "requested_change": "Remove the two-space indent from the second paragraph of the docstring ('It is defined via choice, ...').",
+    "severity": "advisory",
+    "evidence": "Diff lines 73-76. The docstrings in Mathlib/ModelTheory/Algebra/Ring/Basic.lean (e.g. lines 143-148, 203-217) start continuation lines at column 0."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean PR",
+    "claim": "`import Mathlib.Algebra.Group.Basic` is redundant: the file builds with only `Mathlib.ModelTheory.Semantics`.",
+    "requested_change": "Delete the `import Mathlib.Algebra.Group.Basic` line.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit replacing line 6 (the import) with an empty line: the whole file compiled with no errors."
+  }
+]

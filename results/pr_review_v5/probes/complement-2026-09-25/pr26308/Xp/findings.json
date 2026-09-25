@@ -1,0 +1,72 @@
+[
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean (imports)",
+  "claim": "The new file imports `Mathlib.Analysis.RCLike.Basic`, a much heavier module than the file needs: nothing in it uses `RCLike`, only `NormedSpace ℝ V`, `norm_smul` and basic tactics.",
+  "requested_change": "Replace `import Mathlib.Analysis.RCLike.Basic` with `import Mathlib.Analysis.Normed.Module.Basic`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing line 6 with `import Mathlib.Analysis.Normed.Module.Basic` compiled the whole file unchanged (success, no errors). RCLike.Basic pulls in CStarAlgebra.Basic, Operator.ContinuousLinearMap, BigOperators, etc. (file_read of its header)."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean (copyright header)",
+  "claim": "The header says `Copyright (c) 2020`, but the file is new in this PR (2025).",
+  "requested_change": "Change the copyright year to 2025.",
+  "severity": "advisory",
+  "evidence": "diff creates the file from /dev/null; the header line reads `Copyright (c) 2020 Ilmārs Cīrulis`."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean normalized_zero_eq_zero",
+  "claim": "`normalized_zero_eq_zero` does not follow the usual `f_zero : f 0 = 0` naming; the `_eq_zero` suffix is redundant.",
+  "requested_change": "Rename `normalized_zero_eq_zero` to `normalized_zero`.",
+  "severity": "advisory",
+  "evidence": "The closest sibling `normalize_zero : normalize (0 : α) = 0` (Algebra/GCDMonoid/Basic.lean) and `norm_zero` use the short form. A content_search for `*_zero_eq_zero` found only a handful of such names, mostly where the name has to tell apart an argument that is zero. naming_norm reported no_population for the prefix, so this comes from sibling convention, not a census."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean norm_normalized_eq_one_iff",
+  "claim": "The proof of `norm_normalized_eq_one_iff` is roundabout: `constructor` / `contrapose!` / `rintro rfl`, plus a `show ‖x‖ ≠ 0 by simp [h]` side fact.",
+  "requested_change": "Replace the proof with `rcases eq_or_ne x 0 with rfl | hx` / `· simp` / `· simp [normalized, norm_smul, hx]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with that proof compiled (success, no errors)."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean normalized_normalized",
+  "claim": "`normalized_normalized` rewrites the hypothesis backwards (`rw [← ne_eq, ← norm_normalized_eq_one_iff] at hx`) when the simp set already closes both cases.",
+  "requested_change": "Replace the proof with `by_cases hx : x = 0 <;> simp [hx]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with `by_cases hx : x = 0 <;> simp [hx]` compiled (success). simp uses `normalized_eq_self_of_norm_eq_one` and discharges its side condition with `norm_normalized_eq_one_iff`."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean normalized_smul_of_pos",
+  "claim": "The proof of `normalized_smul_of_pos` needs no case split, `rw` chain, `congr` and `field_simp`; one simp call closes it.",
+  "requested_change": "Replace the proof with `simp [normalized, norm_smul, smul_smul, abs_of_pos hr, hr.ne']`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with that one-line proof compiled (success, no errors)."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean normalized_neg",
+  "claim": "`normalized_neg` has an unnecessary `by_cases hx : x = 0` split (the plain `simp [normalized]` handles x = 0 too). It is not tagged `@[simp]` although it is a natural simp lemma like `norm_neg`, and it writes `(- x)` / `- normalized x` with a space after unary minus.",
+  "requested_change": "State it as `@[simp] theorem normalized_neg (x : V) : normalized (-x) = -normalized x := by simp [normalized]` (and write `-normalized x` in `normalized_smul_of_neg` as well).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with the @[simp]-tagged one-line version compiled, and the rest of the file, including `normalized_smul_of_neg`, still compiled with it in the simp set (success)."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean normalized_smul_of_neg",
+  "claim": "`normalized_smul_of_neg` finishes with `field_simp` to prove `normalized (r • x) = normalized (-r • -x)`. There is no field arithmetic in that goal; it is just `neg_smul_neg`. The `(r := - r) (by linarith) (- x)` plumbing is also heavier than needed.",
+  "requested_change": "Replace the proof with `rw [← normalized_neg, ← neg_smul_neg, normalized_smul_of_pos (neg_pos.2 hr)]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with that proof compiled (success). `neg_smul_neg : -r • -x = r • x` is in Algebra/Module/Defs.lean. `simpa [normalized_neg] using normalized_smul_of_pos (neg_pos.2 hr) (-x)` also compiled."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean normalized",
+  "claim": "The API for `normalized` lacks the basic reconstruction identity `‖x‖ • normalized x = x`. Users need it to decompose a vector into its norm and direction.",
+  "requested_change": "Add `theorem norm_smul_normalized (x : V) : ‖x‖ • normalized x = x` (proof: `rcases eq_or_ne x 0 with rfl | hx` / `· simp` / `· simp [normalized, smul_smul, hx]`).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit appending this lemma at the end of the file compiled (success). Nothing in the PR relates `normalized x` back to `x`."
+ },
+ {
+  "target": "Mathlib/Analysis/NormedSpace/Normalized.lean (module docstring)",
+  "claim": "The module docstring (\"Function that calculates unit length vector from a vector ... or returns zero vector\") drops articles and never names the definition it documents.",
+  "requested_change": "Rewrite it to name the definition, e.g. \"This file defines `normalized x = ‖x‖⁻¹ • x`, the unit vector in the direction of a nonzero vector `x` of a real normed space, with the junk value `normalized 0 = 0`.\"",
+  "severity": "advisory",
+  "evidence": "Read from the diff. The sibling precedent (FieldTheory/NormalizedTrace.lean via precedent_search) names the definition in a `## Main definitions` section."
+ }
+]
