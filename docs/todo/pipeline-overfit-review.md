@@ -230,6 +230,17 @@ sources, none of them the sample:
 - **Two rows have no owner:** definitions and the typeclass layer (123 asks, 6.7%), and location.
 - **On definitions**, proof asks halve (33% to 16%) and design asks nearly double (16% to 28%).
 
-**Next, free:** relabel the 1,833 asks by the map's rows rather than the fitted families, with a
-pre-registered rubric and two readers. That is §5's check 6.
+**Revised the same day** (§7): an arm must follow how a question is answered, not what it looks
+at.
+- **The pilot:** 155 asks, facet-labelled by the auditor.
+- **References cross objects:** "a better variant" spans 7 objects.
+- **Mechanisms stay on their own objects:** typeclass inference, 5 of 5 on instances.
+- **The families are cut on four different axes:** generality is 12 of 12 one reference;
+  redundancy is five references and one remedy.
+- **The measured failure:** `design`'s gate, which refused asks in 7 of 11 jobs.
+- **§7.6 replaces the object-first table:** `generality` and `library` span theorems, definitions
+  and instances; `typeclass` and `automation` are mechanism arms.
+
+**Next, free:** the facet relabel of §7.7. Two readers, pre-registered: κ per facet, the three
+structural claims, and the contract fit per proposed arm, from labels alone.
 

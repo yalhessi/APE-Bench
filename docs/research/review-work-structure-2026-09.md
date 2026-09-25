@@ -24,6 +24,12 @@ The 1,000 PRs are then used only to weight the structure and to test it. The ear
 axis on record, the kind of knowledge an ask needs (convention, repository, local judgment;
 `pr-review-v5-principled-design.md` D1), is one of its dimensions.
 
+**Revised the same day (§7).** Grouping by object is not enough, because the same question
+("the right generality?", "already present?") recurs across objects. §7 separates five kinds of
+similarity between questions and finds that an arm must follow how a question is *answered*, its
+reference and warrant, rather than what it looks at. The division in §4 is superseded by §7.6;
+the map in §2 stays, as the layer for scheduling and context.
+
 ## 1. Three facts that generate review work
 
 ### 1.1 Review is the complement of what the machine checks, and the boundary moves
@@ -217,7 +223,14 @@ evidence:
 A coverage number computed over families therefore hides which half is owned. The 21.4%
 unowned share is a statement about the codebook as much as about the arms.
 
-## 4. Principles for dividing, and the division they give
+## 4. Principles for dividing, and the division they give (the division is superseded by §7)
+
+*Revised the same day.* Principle 2 and the table below group the work by **object**. The user's
+follow-up showed why that is not enough: "right generality" and "already present" are the same
+questions on a theorem and on a definition. §7 inspects the kinds of similarity between questions,
+and a measured failure (`design`'s gate) shows that an arm's questions must share a warrant, not an
+object. Principles 1 and 3-5 stand. Principle 2 and the table are kept as first written, for the
+record.
 
 1. **Cover the complement.** Every row, in every column CI does not settle, has an owner.
    Re-derive the division when a linter lands.
@@ -280,10 +293,10 @@ Each check below can be re-run, and none depends on a codebook fitted to the sam
    the proof trio overlaps today.
 5. **Evidence cohesion.** List the tools each arm's questions need. An arm needing two disjoint
    tool sets is two arms; two arms needing the same set on the same object are one.
-6. **The empirical residual.** Relabel the asks by *row* instead of by family, with a
-   pre-registered rubric and two readers. The unowned share then measures the structure, not a
-   codebook fitted to 60 PRs. NEW asks, meaning ones that fit no row, say where the map is
-   incomplete.
+6. **The empirical residual.** Relabel the asks by *facet* (§7: object, reference, mechanism,
+   remedy, warrant) instead of by family, with a pre-registered rubric and two readers. The
+   unowned share then measures the structure, not a codebook fitted to 60 PRs. NEW asks, meaning
+   ones that fit no facet value, say where the map is incomplete.
 
 ## 6. What this does not settle
 
@@ -301,3 +314,226 @@ Each check below can be re-run, and none depends on a codebook fitted to the sam
   coverage, not whether a model filling each remit will find the asks.
 - **Readers of one model family** produced every label used here. A human reading of rows 6 and 9
   would outrank them.
+
+## 7. Kinds of similarity between review questions (revision, same day)
+
+The user, on §4:
+
+> *"Many of the arms share different themes. Thinking about definitions and theorems is clearly
+> similar. Are both formalized at the right generality, are they already present, etc. So there are
+> some similarity in the concerns of these arms even if they are about different objects. But there
+> are different types of similarities as well."*
+
+§2 cut the work by object. That fixes what a question looks at, not how it is answered, and two
+questions can be alike in one way and unlike in another. This section names the facets a question
+has, checks them on a labelled sample, and derives the division from the facet that decides how
+an arm works.
+
+### 7.1 The facets of a review question
+
+Each facet's values come from Lean and Mathlib, not from the sample.
+
+- **Object:** what the question looks at, from §2's rows.
+- **Reference:** what the object is compared against.
+
+  | code | reference |
+  |---|---|
+  | `var` | a better variant of itself: weaker hypotheses, a shorter proof, a simpler encoding |
+  | `lib` | a specific library declaration: a duplicate, a general version, an existing predicate or construction |
+  | `pop` | the library's norms: naming, forms, syntax idioms, layout, spelling |
+  | `sib` | its siblings in the PR or family |
+  | `mec` | a Lean mechanism's behaviour |
+  | `mod` | the module graph |
+  | `int` | the author's intent |
+  | `pro` | the maintainers' process and vision |
+
+- **Mechanism,** when the reference is one:
+  - registration automation (`simp`, `gcongr`, `fun_prop`);
+  - generators (`simps`, `to_additive`, `to_dual`, `reassoc`);
+  - typeclass inference;
+  - definitional equality and reducibility;
+  - build and performance.
+- **Remedy:** the shape of the fix.
+  - a local rewrite;
+  - an interface change, which ripples to every use site;
+  - delete, then redirect or generate;
+  - add declarations;
+  - re-encode a definition;
+  - move;
+  - a PR-level change.
+- **Warrant:** what settles the ask.
+  - it compiles;
+  - an existing declaration is exhibited;
+  - a count of the library's population;
+  - judgment.
+
+**How this relates to the record.**
+- **D1** in `pr-review-v5-principled-design.md` (convention, repository, judgment) is three
+  references.
+- **`work-enumeration`'s `q:*` arms** are the finest grain: one question per arm. The facets say
+  how such questions can be bundled without losing any.
+- **Not the `dead-ends.md` "facet-keyed review join".** That joined maintainer requests to
+  declarations by the *declaration's* shape, for retrieval. These facets describe the *question*.
+
+### 7.2 A labelled pilot
+
+**The sample.** 155 asks, 12 per family (all 11 for `CORR`), drawn at random from asks where both
+readers agree on the family.
+
+**The labelling.** One reader, the auditor, with the facet values fixed before reading. The
+labels are in
+`results/pr_review_v5/adjudications/arm-coverage-val1000-2025-06-2026-03-v1/facet_pilot.json`.
+
+The sample is stratified, so the counts describe structure, not rates.
+
+**Four findings.**
+
+1. **Most references cross objects.**
+   - `pop` spans 9 objects, `var` and `mec` 7 each, `pro` 6, `lib` 4.
+   - "A better variant of itself" appears on statements (10), proofs (8), definitions (3),
+     instances (2) and families (2).
+   - That is the user's observation, measured.
+2. **Mechanisms stay on their own objects.**
+   - Typeclass inference: instances only (5 of 5).
+   - Registration automation: attributes (6 of 7).
+   - Generators: families, definitions and the attributes that carry them.
+   - The build: the build.
+3. **The reference nearly fixes the warrant.**
+   - `pop` is settled by a count in 37 of 41.
+   - `lib` by exhibiting the declaration in 8 of 8.
+   - `int` by judgment in 13 of 13, and `pro` in 14 of 16.
+   - `var` compiles in 19 of 27.
+
+   This is partly true by construction, since a library reference is settled by showing the
+   declaration. Findings 1, 2 and 4 are not.
+4. **The codebook's families are cut on four different axes.**
+
+   | axis | families | how pure |
+   |---|---|---|
+   | reference | generality (F7) | 12 of 12 `var` |
+   | | naming (F8) | 10 of 12 `pop` |
+   | | PR level (F12) | 10 of 12 `pro` |
+   | mechanism | registration (F3), derivation (F4) | 11 of 12 each |
+   | remedy | redundancy (F5) | mostly one remedy (deletion, 9 of 12), from five references: siblings, the library, typeclass inference, the norms, "not worth having" |
+   | object | statement and API design (F6) | mixes `lib`, `var`, `sib`, `pro` |
+   | | documentation (F10), meta code (F11) | each mixes `int` and `pop` |
+
+   **This is why the division feels ad hoc.** Its categories live on different axes, so no single
+   principle can say where a new question goes.
+
+One more observation: 9 of the 11 `CORR` asks are about the build, 8 of them "does the PR build?".
+That is on the machine's side of §1.1; the reviewer is reminding the author, not judging.
+
+### 7.3 Five kinds of similarity, and what each should share
+
+1. **Uniform:** the same operation on a structure every declaration has.
+   - Every Lean declaration is `name : ∀ binders, type := value`, and a structure adds fields.
+   - Generality weakens the binder telescope (hypotheses, typeclass arguments, fields) in the same
+     way for a theorem, a definition, an instance and a structure.
+   - The procedure is "weaken, then recompile the declaration and its uses", and the warrant, a
+     compile, does not depend on the object.
+
+   **These share an arm across objects.** This is the user's generality example.
+2. **Analogous:** the same intent, but the object changes the procedure, because what counts as
+   "the same" differs.
+   - "Already present" for a theorem is a search by type (unification, as in `exact?` or loogle),
+     settled by exhibiting the match.
+   - For an instance it is inference: `inferInstance` succeeds, which a compile settles. Three of
+     the pilot's four instance-redundancy asks were this.
+   - For a definition, many definitions share a type, so presence is a question of concept and
+     equivalence, settled by judgment.
+
+   **These share an arm and an intent, but the contract must accept a warrant per object,** or it
+   will refuse the asks of the objects it was not fitted to.
+3. **Mechanistic:** questions that need one Lean subsystem's behaviour, whatever family they were
+   filed under. The subsystems are registration automation, the generators, typeclass inference,
+   and definitional equality with reducibility. Each binds to specific objects.
+
+   **These share a mechanism arm**, or else that knowledge goes to every arm scheduled on the
+   objects that carry it.
+4. **Remedial:** different questions with the same fix. Redundancy (F5) is the example: "delete
+   it and point to what exists" is reached from five references.
+
+   **These share verification machinery, not an arm.** A redirect must compile at every use site,
+   whichever question asked for it.
+5. **Positional:** different questions about the same object read the same things: the
+   declaration, its uses, its siblings, its nearest library neighbours.
+
+   **These share a dossier built once, not an arm.**
+
+### 7.4 What our runs already show about mixing warrants
+
+- **Grouping by object.** The family division's `design` held variant, sibling and extraction
+  questions under one gate, fitted to one warrant: a changed statement that compiles
+  (`family-division-fanout4-review-2026-09.md` §2, on `arm-division`). The gate refused asks in 7
+  of 11 jobs, turned the gold answer (a compiled order-dual derivation) into `no_issue`, and
+  stopped nothing false.
+- **Splitting one block by flavour.** The ten's proof trio is the converse: one reference and one
+  object split three ways, so 82% of `proof_idiom`'s asks are also `proof_golf`'s (§3).
+
+### 7.5 Principles, revised
+
+1. **An arm's questions must share a submission contract.** One gate and one toolset must admit
+   every question an arm asks. The measured failure when they do not is `design`'s gate.
+2. **An arm spans objects when its operation is uniform across them,** like generality over every
+   binder telescope. It spans them with a warrant per object when they are only analogous, like
+   "already present".
+3. **Split a reference by object when its evidence differs by object.** The norms of names (a
+   naming census) are not the norms of statements, binders or syntax (the style guide, library
+   notes, prevalence).
+4. **Mechanism knowledge goes where the mechanism lives:** arms by subsystem, scheduled on the
+   objects that carry it.
+5. **Objects decide scheduling and context; remedies decide verification.** Neither decides the
+   arms. §2's map stays as the scheduling and dossier layer, and §4's principles 3-5 stand.
+
+### 7.6 The division these give (replaces §4's table)
+
+It is derived, not measured. The test comes in §7.7.
+
+| arm | reference | objects | warrant | built from |
+|---|---|---|---|---|
+| `proof` | variant | proofs | compile | `proof` |
+| `generality` | variant, uniform over binders and fields | theorems, definitions, instances, structures | compile, uses included | `design`'s generality half, and generality on definitions |
+| `library` | library, analogous by object; module graph | theorems (by type), instances (by inference), definitions (by concept); files and imports | exhibit, compile or judgment by object | `library_fit`, `design`'s "existing predicate or construction", location |
+| `siblings` | siblings | families, and the PR's analogues | exhibit or compile | `family_design`'s bullets, missing duals and variants, and the propagation pass |
+| `naming` | norms of names | names | count | `naming` |
+| `form` | norms of statements, binders and syntax | statements, binders, section variables, syntax idioms | count | `interface`'s binder half, `design`'s canonical-form asks, `formatting`'s idioms |
+| `prose` | intent and norms of text | docstrings, module docs, comments | advisory, one contract | `doc_quality` |
+| `layout` | norms of layout | whitespace, breaks, parentheses | count; mostly linted | `formatting`, narrowed |
+| `automation` | mechanism: registration and generators | attributes, families, definitions with `simps` or `to_additive` | compile or judgment | `interface`'s registration half, `library_fit`'s derivation half |
+| `typeclass` | mechanism: inference and definitional equality | instances, instance-supplying definitions, classes | compile or judgment | new |
+| `correctness` | intent | statements, definitions, meta code | judgment | `correctness`, with meta code named |
+| `pr_level` | process and vision | the PR | judgment | `pr_level` |
+
+**Location sits in `library`**, where Mathlib's guide puts it: its "Location" category includes
+"whether results already exist". Its evidence, the module graph, differs from the rest of the
+arm, so it is the first split to try if `library`'s contract strains.
+
+**Retirement** (`docs/todo/removed-declarations.md`) will enter as an object with its own
+references: a variant (the replacement), the library (what supersedes it) and the process (the
+deprecation norm). It is not an arm yet.
+
+### 7.7 How to test it before any run
+
+Relabel a pre-registered sample by facet, with two blind readers, and read four things:
+
+1. **Facet reliability.** κ per facet. A facet the readers cannot agree on is no basis for arms.
+2. **The pilot's structural claims:**
+   - `var`, `lib` and `pop` each span at least 3 objects;
+   - each mechanism puts at least 80% of its asks on at most 2 objects;
+   - the reference predicts the warrant on at least 80% of asks.
+3. **Contract fit per proposed arm.** The share of an arm's asks whose warrant its contract
+   admits, computed from labels alone. This is `design`'s gate failure measured before a run, for
+   both this division and the family division.
+4. **Overlap and residual.** Co-ownership (§3) and asks that no arm owns, under each division.
+
+Only then does Track B, the paid comparison on small12, compare divisions.
+
+### 7.8 What §7 does not settle
+
+- **One reader labelled the pilot:** the auditor, who also designed the facets. Finding 3 is
+  partly by construction.
+- **Stratified counts show structure, not how much work each arm would own.**
+- **Twelve arms is more jobs per unit than nine.** Whether small arms such as `typeclass` and
+  `siblings` stand alone, or become knowledge given to a larger arm, is a cost question that
+  principle 1 constrains but does not answer.

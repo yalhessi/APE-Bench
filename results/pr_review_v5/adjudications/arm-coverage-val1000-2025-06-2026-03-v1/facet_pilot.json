@@ -1,0 +1,1584 @@
+{
+ "reader": "auditor (one reader), 2026-09-25",
+ "sample": "12 per family at random (seed 2025) from asks both readers agree on; CORR has 11, all taken",
+ "facets": {
+  "reference": {
+   "var": "a better variant of itself",
+   "lib": "a specific library declaration",
+   "pop": "the library's norms",
+   "sib": "siblings in the PR or family",
+   "mec": "a Lean mechanism",
+   "mod": "the module graph",
+   "int": "the author's intent",
+   "pro": "process and vision"
+  },
+  "remedy": {
+   "loc": "local rewrite",
+   "ifc": "interface change",
+   "del": "delete, redirect or generate",
+   "add": "add declarations",
+   "enc": "re-encode a definition",
+   "mov": "move",
+   "pr": "PR-level",
+   "none": "no edit"
+  },
+  "warrant": {
+   "cmp": "compile",
+   "exh": "exhibit",
+   "cnt": "count",
+   "jud": "judgment"
+  }
+ },
+ "labels": [
+  {
+   "cid": "v1640",
+   "family": "F1",
+   "question": "Can an auxiliary fact in a proof be closed by a single standard tactic call and inlined where it is used?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0236",
+   "family": "F1",
+   "question": "Why did this proof become much longer, and can it be shortened?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1877",
+   "family": "F1",
+   "question": "Can several preliminary facts be obtained in one automation call and the auxiliary lemma applied directly?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1412",
+   "family": "F1",
+   "question": "Can proof terms use dot notation to be more direct?",
+   "object": "prf",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0502",
+   "family": "F1",
+   "question": "Can the rewrites be folded into a single simp call?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1514",
+   "family": "F1",
+   "question": "Can a short lemma be proved by a one-line term, or inlined at its use sites?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0000",
+   "family": "F1",
+   "question": "Can a squeezed `simp only` call be replaced by the shorter unsqueezed form without a performance cost?",
+   "object": "prf",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "perf"
+  },
+  {
+   "cid": "v1029",
+   "family": "F1",
+   "question": "Can the proof be restructured with better-chosen lemmas to avoid needless case splits and side goals?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1055",
+   "family": "F1",
+   "question": "Is a golfed proof still readable, with intermediate facts given explicit type ascriptions?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1680",
+   "family": "F1",
+   "question": "Are the longest proofs readable enough for a reviewer to follow?",
+   "object": "prf",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0709",
+   "family": "F1",
+   "question": "Is each change to a proof step justified and understandable?",
+   "object": "prf",
+   "reference": "pro",
+   "remedy": "none",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0180",
+   "family": "F1",
+   "question": "Does the proof avoid closing goals by definitional-unfolding rfl where a rewrite would be more robust?",
+   "object": "prf",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": "defeq"
+  },
+  {
+   "cid": "v0848",
+   "family": "F2",
+   "question": "Is the hypothesis stated with the dedicated existing predicate rather than an equivalent unfolded form?",
+   "object": "stm",
+   "reference": "lib",
+   "remedy": "ifc",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0983",
+   "family": "F2",
+   "question": "Is a hypothesis spelled in the simplest form, e.g. using pointwise operations instead of an explicit lambda?",
+   "object": "stm",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0444",
+   "family": "F2",
+   "question": "Should an assumption shared by only a few declarations be a section variable or stated on each declaration?",
+   "object": "sig",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0154",
+   "family": "F2",
+   "question": "Is an instance binder named when it could be anonymous and referred to by an anonymous-constructor term?",
+   "object": "sig",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0472",
+   "family": "F2",
+   "question": "Are variable omissions scoped to single declarations as the convention requires?",
+   "object": "sig",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1954",
+   "family": "F2",
+   "question": "Should binders repeated across several declarations be moved into a section variable line?",
+   "object": "sig",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0567",
+   "family": "F2",
+   "question": "Should commented-out section scaffolding become a real section with shared variables?",
+   "object": "sig",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2279",
+   "family": "F2",
+   "question": "Is a variable declaration redundant with one already in scope?",
+   "object": "sig",
+   "reference": "sib",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2259",
+   "family": "F2",
+   "question": "Does the PR introduce new section variables that duplicate ones already declared in the file?",
+   "object": "sig",
+   "reference": "sib",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1024",
+   "family": "F2",
+   "question": "Are hypotheses written without vacuous restrictions such as membership in the universal set?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0181",
+   "family": "F2",
+   "question": "Are typeclass binders spelled consistently with the file's convention, including universe-polymorphic forms?",
+   "object": "sig",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1513",
+   "family": "F2",
+   "question": "Is any instance argument bound twice, both in section variables and on the declaration?",
+   "object": "sig",
+   "reference": "sib",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0187",
+   "family": "F3",
+   "question": "Should a lemma with a side condition simp rarely discharges carry the simp attribute?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v1889",
+   "family": "F3",
+   "question": "Is a change to instance priority intended?",
+   "object": "ins",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "tc"
+  },
+  {
+   "cid": "v1842",
+   "family": "F3",
+   "question": "Are option overrides still necessary on current master, and removed if not?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "perf"
+  },
+  {
+   "cid": "v0462",
+   "family": "F3",
+   "question": "Should the new lemma be tagged as a simp lemma?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v0860",
+   "family": "F3",
+   "question": "Should lemmas repeatedly passed to simp be registered as simp lemmas?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v2146",
+   "family": "F3",
+   "question": "Should a monotonicity lemma be tagged for the relevant automation?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v2303",
+   "family": "F3",
+   "question": "Is it justified to tag a lemma with hypotheses as a simp lemma?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v0948",
+   "family": "F3",
+   "question": "If the new definition is slower at runtime, should a compiler-substitution lemma be registered?",
+   "object": "def",
+   "reference": "mec",
+   "remedy": "add",
+   "warrant": "jud",
+   "mechanism": "perf"
+  },
+  {
+   "cid": "v1482",
+   "family": "F3",
+   "question": "Should a definition meant to supply instances be reducible?",
+   "object": "def",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "defeq"
+  },
+  {
+   "cid": "v1584",
+   "family": "F3",
+   "question": "Could the new instances create non-defeq instance diamonds?",
+   "object": "ins",
+   "reference": "mec",
+   "remedy": "none",
+   "warrant": "jud",
+   "mechanism": "tc"
+  },
+  {
+   "cid": "v1259",
+   "family": "F3",
+   "question": "Should this iff lemma be tagged `@[simp]`?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v1859",
+   "family": "F3",
+   "question": "Is a linter suppression justified, or should the code follow the style rule instead?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0048",
+   "family": "F4",
+   "question": "Should a lemma about composition carry `reassoc` so the associated variant is generated?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1410",
+   "family": "F4",
+   "question": "Should projection lemmas be generated by an attribute rather than written by hand, with conventional names?",
+   "object": "fam",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v0208",
+   "family": "F4",
+   "question": "Can these component lemmas be generated automatically rather than written by hand?",
+   "object": "fam",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1240",
+   "family": "F4",
+   "question": "Do auto-generated simp lemmas have usable right-hand sides, or should separate per-case lemmas be stated?",
+   "object": "def",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v0874",
+   "family": "F4",
+   "question": "Should the declaration generate its additive counterpart via an attribute?",
+   "object": "def",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1630",
+   "family": "F4",
+   "question": "Could an attribute generate this lemma instead of writing it by hand?",
+   "object": "fam",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1888",
+   "family": "F4",
+   "question": "Can hand-written projection lemmas be generated by simps?",
+   "object": "fam",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1501",
+   "family": "F4",
+   "question": "Should this declaration be registered with the duality-translation attribute so its dual is generated?",
+   "object": "def",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1951",
+   "family": "F4",
+   "question": "Can the dual declaration be generated automatically from its counterpart, instead of being written out?",
+   "object": "fam",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1232",
+   "family": "F4",
+   "question": "Does the `simps` configuration generate usefully applied lemmas with the intended types?",
+   "object": "def",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v1896",
+   "family": "F4",
+   "question": "Is an attribute passed through the translation attribute so the generated counterpart receives it?",
+   "object": "att",
+   "reference": "mec",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": "gen"
+  },
+  {
+   "cid": "v0915",
+   "family": "F4",
+   "question": "Is this dual statement derived from its counterpart through the order dual instead of being proved from scratch?",
+   "object": "fam",
+   "reference": "sib",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1479",
+   "family": "F5",
+   "question": "Is a declaration made redundant by another in the same PR?",
+   "object": "ins",
+   "reference": "sib",
+   "remedy": "del",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0381",
+   "family": "F5",
+   "question": "Is a trivial new definition actually useful, or is it unnecessary?",
+   "object": "def",
+   "reference": "pro",
+   "remedy": "del",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2234",
+   "family": "F5",
+   "question": "Is the instance redundant because typeclass inference already finds it?",
+   "object": "ins",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "tc"
+  },
+  {
+   "cid": "v1703",
+   "family": "F5",
+   "question": "When everything in a module is deprecated, is the module itself deprecated?",
+   "object": "loc",
+   "reference": "pop",
+   "remedy": "add",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1185",
+   "family": "F5",
+   "question": "Do the new declarations restate existing results phrased with a different but equivalent class?",
+   "object": "fam",
+   "reference": "lib",
+   "remedy": "del",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1659",
+   "family": "F5",
+   "question": "Should lemmas that remain good simp lemmas be deprecated rather than kept?",
+   "object": "fam",
+   "reference": "mec",
+   "remedy": "none",
+   "warrant": "jud",
+   "mechanism": "auto"
+  },
+  {
+   "cid": "v0867",
+   "family": "F5",
+   "question": "Are there unused variables declared that can be removed?",
+   "object": "sig",
+   "reference": "sib",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1322",
+   "family": "F5",
+   "question": "Are added lemmas that are neither used nor registered with automation needed at all?",
+   "object": "fam",
+   "reference": "pro",
+   "remedy": "del",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2017",
+   "family": "F5",
+   "question": "Do two declarations in the PR state the same thing up to binder explicitness?",
+   "object": "fam",
+   "reference": "sib",
+   "remedy": "del",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1702",
+   "family": "F5",
+   "question": "When everything in a module is deprecated, is the module itself deprecated?",
+   "object": "loc",
+   "reference": "pop",
+   "remedy": "add",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2233",
+   "family": "F5",
+   "question": "Is the instance redundant because typeclass inference already finds it?",
+   "object": "ins",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "tc"
+  },
+  {
+   "cid": "v1569",
+   "family": "F5",
+   "question": "Are shortcut instances needed, or are they already found by inference?",
+   "object": "ins",
+   "reference": "mec",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": "tc"
+  },
+  {
+   "cid": "v0367",
+   "family": "F6",
+   "question": "Is a closely related variant of the new lemma, such as a set-restricted form, missing?",
+   "object": "fam",
+   "reference": "sib",
+   "remedy": "add",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1998",
+   "family": "F6",
+   "question": "Should a specialized construction be replaced by a more general definition of which it is an instance?",
+   "object": "def",
+   "reference": "lib",
+   "remedy": "enc",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0142",
+   "family": "F6",
+   "question": "Is making the notion a typeclass the right encoding, or is an unbundled version also needed?",
+   "object": "def",
+   "reference": "pro",
+   "remedy": "enc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1497",
+   "family": "F6",
+   "question": "Would a different construction or a known isomorphism give these results more directly?",
+   "object": "stm",
+   "reference": "lib",
+   "remedy": "loc",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1112",
+   "family": "F6",
+   "question": "Should an auxiliary result be extracted as a general construction independent of the context it is used in?",
+   "object": "fam",
+   "reference": "var",
+   "remedy": "add",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1547",
+   "family": "F6",
+   "question": "Is the statement written with the canonical existing function rather than an ad hoc expression?",
+   "object": "stm",
+   "reference": "lib",
+   "remedy": "ifc",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1043",
+   "family": "F6",
+   "question": "Should a monotonicity lemma also be stated using the library's order-theoretic monotonicity predicate?",
+   "object": "stm",
+   "reference": "lib",
+   "remedy": "add",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1442",
+   "family": "F6",
+   "question": "Does a new instance come with its rewriting lemmas, preferred syntax and a simplified proof?",
+   "object": "fam",
+   "reference": "pop",
+   "remedy": "add",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0802",
+   "family": "F6",
+   "question": "Is this lemma the right API, or would a better general characterization make it unnecessary?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "del",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1267",
+   "family": "F6",
+   "question": "Does a changed encoding make a class axiom derivable, so that it should become a theorem?",
+   "object": "def",
+   "reference": "var",
+   "remedy": "enc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1308",
+   "family": "F6",
+   "question": "Is the result stated with the library's dedicated predicate for the concept rather than an equivalent formulation?",
+   "object": "stm",
+   "reference": "lib",
+   "remedy": "ifc",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1592",
+   "family": "F6",
+   "question": "Should an intermediate construction be extracted as its own definition, or left as a TODO?",
+   "object": "def",
+   "reference": "var",
+   "remedy": "add",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0316",
+   "family": "F7",
+   "question": "Can the typeclass assumptions be weakened to the minimal structure the result actually needs?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1453",
+   "family": "F7",
+   "question": "Is the hypothesis the conventional and weakest form used in this part of the library?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0537",
+   "family": "F7",
+   "question": "Can the lemma be stated for any type with the relevant structure rather than a concrete one?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1600",
+   "family": "F7",
+   "question": "Does the lemma hold for every object of the type rather than only a specific one?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2064",
+   "family": "F7",
+   "question": "Can a group of results be stated for a more general base ring than the one assumed?",
+   "object": "fam",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0902",
+   "family": "F7",
+   "question": "Should this specialised result be stated in the general setting and the specialised version deprecated?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1451",
+   "family": "F7",
+   "question": "Is the result stated for a general class of spaces rather than a concrete one?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2173",
+   "family": "F7",
+   "question": "Does the instance hold under more general hypotheses, and should the general form be added separately?",
+   "object": "ins",
+   "reference": "var",
+   "remedy": "add",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1474",
+   "family": "F7",
+   "question": "Can an instance be stated in a more general setting that includes this case?",
+   "object": "ins",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1525",
+   "family": "F7",
+   "question": "Is the extra generality of the statement actually needed, or would a simpler statement suffice?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2270",
+   "family": "F7",
+   "question": "Is this hypothesis actually needed for the statement to hold?",
+   "object": "stm",
+   "reference": "var",
+   "remedy": "ifc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0184",
+   "family": "F7",
+   "question": "Can the definition be stated over a general scalar field class rather than a concrete one?",
+   "object": "def",
+   "reference": "var",
+   "remedy": "enc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0952",
+   "family": "F8",
+   "question": "Does the name follow the current spelling convention for negated membership, and is each hypothesis sensible?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2054",
+   "family": "F8",
+   "question": "Does the order relation in the name match the statement?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1710",
+   "family": "F8",
+   "question": "Are new file and directory names singular, following the library's convention?",
+   "object": "loc",
+   "reference": "pop",
+   "remedy": "mov",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1813",
+   "family": "F8",
+   "question": "Is a data-valued definition named in lowerCamelCase?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1685",
+   "family": "F8",
+   "question": "Does the lemma name describe its conclusion and hypotheses in the conventional way?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1717",
+   "family": "F8",
+   "question": "Does the name describe the conclusion's relation correctly?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1799",
+   "family": "F8",
+   "question": "Does the name mention every notion appearing in the conclusion?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0410",
+   "family": "F8",
+   "question": "Does the declaration's name describe its statement according to the naming convention?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1523",
+   "family": "F8",
+   "question": "Is the concept named with the terminology the community prefers, and has the choice been discussed?",
+   "object": "nam",
+   "reference": "pro",
+   "remedy": "ifc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1090",
+   "family": "F8",
+   "question": "Does the left/right suffix in the name match which argument is specialized?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0946",
+   "family": "F8",
+   "question": "Does the definition's name describe what it does, following the name of the analogous existing operation?",
+   "object": "nam",
+   "reference": "lib",
+   "remedy": "ifc",
+   "warrant": "exh",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1610",
+   "family": "F8",
+   "question": "Does the lemma name describe what the statement asserts?",
+   "object": "nam",
+   "reference": "pop",
+   "remedy": "ifc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0475",
+   "family": "F9",
+   "question": "Do the new lemmas live in the most appropriate files given their imports and subject?",
+   "object": "loc",
+   "reference": "mod",
+   "remedy": "mov",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0798",
+   "family": "F9",
+   "question": "Does the definition use the currently standard structure-instance syntax?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1603",
+   "family": "F9",
+   "question": "Is the idiomatic keyword used instead of an equivalent attribute on a definition?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0020",
+   "family": "F9",
+   "question": "Does the code use the repository's conventional `\u21a6` rather than `=>` in lambda expressions?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1422",
+   "family": "F9",
+   "question": "Are there unnecessary imports?",
+   "object": "loc",
+   "reference": "mod",
+   "remedy": "del",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1565",
+   "family": "F9",
+   "question": "Does the new definition live in the file where it belongs, and is it provided for all analogous structures?",
+   "object": "loc",
+   "reference": "mod",
+   "remedy": "mov",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1143",
+   "family": "F9",
+   "question": "Do lines stay within the length limit?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1860",
+   "family": "F9",
+   "question": "Are there stray blank lines inside a declaration?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0039",
+   "family": "F9",
+   "question": "Is a name written with a redundant namespace qualification inside that namespace?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0400",
+   "family": "F9",
+   "question": "Is there a space after each comma in anonymous constructors?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0417",
+   "family": "F9",
+   "question": "Is a namespace opened again when it is already open in the file?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0214",
+   "family": "F9",
+   "question": "Does the code follow the library's whitespace and spacing conventions?",
+   "object": "lay",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1494",
+   "family": "F10",
+   "question": "Does a comment inside a proof use the same names and roles as the code it describes?",
+   "object": "txt",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1117",
+   "family": "F10",
+   "question": "Does the module doc claim anything the code does not yet do?",
+   "object": "txt",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2186",
+   "family": "F10",
+   "question": "Is each change to the prose an improvement?",
+   "object": "txt",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1359",
+   "family": "F10",
+   "question": "Is documentation prose free of spelling and capitalization errors?",
+   "object": "txt",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1831",
+   "family": "F10",
+   "question": "Does a file's module documentation stop claiming definitions that have moved elsewhere?",
+   "object": "txt",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0280",
+   "family": "F10",
+   "question": "Does the docstring specify what information the function uses rather than saying it vaguely?",
+   "object": "txt",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0566",
+   "family": "F10",
+   "question": "Do docstrings describe the declaration rather than record where it was adapted from?",
+   "object": "txt",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1208",
+   "family": "F10",
+   "question": "Should a proof whose awkwardness comes from missing library infrastructure carry a TODO comment saying so?",
+   "object": "txt",
+   "reference": "pro",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0047",
+   "family": "F10",
+   "question": "Is the docstring free of typos and wrong symbols?",
+   "object": "txt",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0182",
+   "family": "F10",
+   "question": "Does a citation point to the specific section of the reference?",
+   "object": "txt",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1426",
+   "family": "F10",
+   "question": "Is documentation markup, such as list continuation indentation, correctly formatted?",
+   "object": "txt",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1113",
+   "family": "F10",
+   "question": "Is a notable result or approach documented in the module docstring?",
+   "object": "txt",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1340",
+   "family": "F11",
+   "question": "Does tooling code handle every input kind it may receive, failing loudly rather than producing silently wrong output?",
+   "object": "met",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0871",
+   "family": "F11",
+   "question": "Does a tool's user-facing suggestion message follow the standard clickable suggestion format?",
+   "object": "met",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1067",
+   "family": "F11",
+   "question": "Does a new command work for all common instances, including types where elaboration needs the expected type?",
+   "object": "met",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1341",
+   "family": "F11",
+   "question": "Are the messages a linter or tactic emits consistent and well-formed across all its outputs?",
+   "object": "met",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1388",
+   "family": "F11",
+   "question": "Is every fallible step in meta code guarded consistently against failure?",
+   "object": "met",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2159",
+   "family": "F11",
+   "question": "Does the metaprogram use the standard expression-matching construct where it can?",
+   "object": "met",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2135",
+   "family": "F11",
+   "question": "Does the metaprogram use the most robust mechanism to achieve its intended check?",
+   "object": "met",
+   "reference": "var",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0595",
+   "family": "F11",
+   "question": "Does the modified meta code preserve the previous behaviour on every input, including corner cases?",
+   "object": "met",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1595",
+   "family": "F11",
+   "question": "Does the metaprogram compare expressions robustly, such as up to reducible defeq rather than syntactically?",
+   "object": "met",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": "defeq"
+  },
+  {
+   "cid": "v1978",
+   "family": "F11",
+   "question": "Does a pattern match over a message or syntax type enumerate the cases it ignores rather than using a catch-all?",
+   "object": "met",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2137",
+   "family": "F11",
+   "question": "Does the metaprogramming check still cover all the cases it should when a special mode is enabled?",
+   "object": "met",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1346",
+   "family": "F11",
+   "question": "Does metaprogramming code call the underlying library functions directly rather than elaborating and running tactic syntax?",
+   "object": "met",
+   "reference": "pop",
+   "remedy": "loc",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0593",
+   "family": "F12",
+   "question": "Does the PR description state the motivation and benefit of the change?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1150",
+   "family": "F12",
+   "question": "Does the PR avoid unrelated whitespace changes?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2201",
+   "family": "F12",
+   "question": "Is a change applied consistently to all analogous declarations?",
+   "object": "fam",
+   "reference": "sib",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0727",
+   "family": "F12",
+   "question": "Is the change worthwhile overall, or does it make the code less maintainable?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1716",
+   "family": "F12",
+   "question": "Does the PR description disclose AI assistance and explain why a previously discussed approach was not used?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2097",
+   "family": "F12",
+   "question": "Does the PR disclose whether and how AI tools were used, as the contribution policy requires?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1311",
+   "family": "F12",
+   "question": "Does the PR add or update tests for the changed behaviour?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "add",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2138",
+   "family": "F12",
+   "question": "Does the PR title accurately describe the diff?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0675",
+   "family": "F12",
+   "question": "Does the PR description declare its dependencies on other PRs in the required format?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "cnt",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0446",
+   "family": "F12",
+   "question": "Does the commit message state the motivation for the change, ideally with a demonstrating example?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v1517",
+   "family": "F12",
+   "question": "Is the downstream work motivating this PR available for reviewers to see?",
+   "object": "pr",
+   "reference": "pro",
+   "remedy": "pr",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0766",
+   "family": "F12",
+   "question": "Is a proposed terminology or spelling change in documentation supported by standard usage in the literature?",
+   "object": "txt",
+   "reference": "int",
+   "remedy": "loc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2102",
+   "family": "CORR",
+   "question": "Does the PR build?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1204",
+   "family": "CORR",
+   "question": "Does the PR build?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1142",
+   "family": "CORR",
+   "question": "Does the PR build?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1073",
+   "family": "CORR",
+   "question": "Does a generalized definition still match the mathematical meaning of the concept it is named after?",
+   "object": "def",
+   "reference": "int",
+   "remedy": "enc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v0032",
+   "family": "CORR",
+   "question": "Does the PR build without errors?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1049",
+   "family": "CORR",
+   "question": "Does the PR build?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1110",
+   "family": "CORR",
+   "question": "Does the PR build?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1948",
+   "family": "CORR",
+   "question": "Does the proof still compile against the current signatures of the lemmas it calls?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v0294",
+   "family": "CORR",
+   "question": "Does the PR build?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  },
+  {
+   "cid": "v1707",
+   "family": "CORR",
+   "question": "Does a definition compute the quantity its name and docstring claim in every case?",
+   "object": "def",
+   "reference": "int",
+   "remedy": "enc",
+   "warrant": "jud",
+   "mechanism": ""
+  },
+  {
+   "cid": "v2047",
+   "family": "CORR",
+   "question": "Does the PR build, with leftover commented-out code removed?",
+   "object": "bld",
+   "reference": "mec",
+   "remedy": "loc",
+   "warrant": "cmp",
+   "mechanism": "build"
+  }
+ ]
+}
