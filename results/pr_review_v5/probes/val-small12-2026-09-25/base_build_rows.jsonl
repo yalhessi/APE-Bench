@@ -1,0 +1,1 @@
+{"task_type": "probe_base_build", "task_id": "probe-258b485d4252", "target_workspace": {"name": "mathlib4", "commit_hash": "258b485d4252a0cb5049ee25e87107830f13b7d1", "repo_url": "https://github.com/leanprover-community/mathlib4.git", "toolchain": "leanprover/lean4:v4.25.0-rc1"}}

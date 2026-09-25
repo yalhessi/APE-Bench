@@ -1,0 +1,35 @@
+{
+ "checked_at": "2026-09-25T11:47:39",
+ "calls": [
+  {
+   "effort": null,
+   "seconds": 6.0,
+   "input_tokens": 79,
+   "output_tokens": 228,
+   "reasoning_tokens": null,
+   "cost": 0.00333
+  },
+  {
+   "effort": "low",
+   "seconds": 5.7,
+   "input_tokens": 79,
+   "output_tokens": 262,
+   "reasoning_tokens": null,
+   "cost": 0.00381
+  },
+  {
+   "effort": "medium",
+   "seconds": 5.4,
+   "input_tokens": 79,
+   "output_tokens": 234,
+   "reasoning_tokens": null,
+   "cost": 0.00341
+  }
+ ],
+ "accepted_efforts": [
+  "low",
+  "medium"
+ ],
+ "chosen_effort": "low",
+ "verdict": "effort accepted but no reasoning tokens reported"
+}
