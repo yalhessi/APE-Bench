@@ -1,0 +1,79 @@
+[
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, section doc \"Smoothing function\"",
+    "claim": "The rewrite of `1 ± ε n` into `$1 \\pm \\varepsilon\\,n$` changes the meaning: `ε n` is the smoothing function applied to `n`, but the LaTeX typesets a product of a constant ε and n.",
+    "requested_change": "Restore the Lean expression in backticks (`1 ± ε n`), or write it as function application, e.g. `$1 \\pm \\varepsilon(n)$`.",
+    "severity": "blocking",
+    "evidence": "SumTransform.lean:265 `noncomputable def smoothingFn (n : ℝ) : ℝ := 1 / log n` with `local notation \"ε\" => smoothingFn` at :267; every use is application, e.g. AkraBazzi.lean:464 docstring `1 - ε n` and :467 `(1 - ε n) * asympBound g a b n`. `\\varepsilon` does not occur anywhere else in Mathlib (mlcount = 0)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, module docstring",
+    "claim": "The module doc now typesets a Lean type ascription as LaTeX (`$T : ℕ → ℝ$`) while the Implementation section of the same docstring keeps `T : ℝ → ℝ` and `ℕ → ℝ` in backticks, and it writes `$∑ a_i b_i^p = 1$` with a Unicode `∑` inside math right after using `\\sum` in the display formula.",
+    "requested_change": "Keep Lean expressions such as `T : ℕ → ℝ` in backticks, and use `\\sum` consistently inside `$...$` (e.g. `$\\sum_i a_i b_i^p = 1$`).",
+    "severity": "advisory",
+    "evidence": "Diff hunk at AkraBazzi.lean:11-50 (new text: \"function $T : ℕ → ℝ$\", \"such that $∑ a_i b_i^p = 1$\", Implementation: \"`T : ℝ → ℝ` case before moving on to `ℕ → ℝ`\"). Other Mathlib files that use LaTeX in docs use `\\sum` (e.g. Mathlib/Algebra/Field/GeomSum.lean:12)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, between `open scoped Topology` and `namespace AkraBazziRecurrence`",
+    "claim": "Deleting the duplicated \"Definition of Akra-Bazzi recurrences\" block leaves three consecutive blank lines.",
+    "requested_change": "Collapse the blank lines left by the deletion to a single blank line.",
+    "severity": "advisory",
+    "evidence": "Base AkraBazzi.lean:61-73: `open scoped Topology`, blank :62, deleted block :63-70, blank :71, blank :72, `namespace AkraBazziRecurrence` :73; the diff removes only :63-70."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, T_isBigO_smoothingFn_mul_asympBound",
+    "claim": "The comment the PR edits still misstates the ratio: it says the base-case maximum is of `T n / asympBound g a b n`, but `base_max` is the sup of `T n / ((1 - ε n) * asympBound g a b n)`.",
+    "requested_change": "Change the comment to \"Max of the ratio `T n / ((1 - ε n) * asympBound g a b n)` over the base case `n ∈ [⌊b' * n₀⌋₊, n₀)`\".",
+    "severity": "advisory",
+    "evidence": "AkraBazzi.lean:503 (comment) versus :505-507 `let base_max : ℝ := (Finset.Ico (⌊b' * n₀⌋₊) n₀).sup' h_base_nonempty fun n => T n / ((1 - ε n) * asympBound g a b n)`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, smoothingFn_mul_asympBound_isBigO_T",
+    "claim": "The rewritten comment omits the `(1 + ε n)` factor that `base_min` divides by, and the next comment still says `g(n)` without backticks, although the matching comment in the upper-bound proof was changed to `g n`.",
+    "requested_change": "Write the ratio as `T n / ((1 + ε n) * asympBound g a b n)`, and change \"out the g(n) term\" (line 661) to \"out the `g n` term\" to match the upper-bound proof.",
+    "severity": "advisory",
+    "evidence": "AkraBazzi.lean:656 (comment) versus :657-659 `set base_min : ℝ := ... (fun n => T n / ((1 + ε n) * asympBound g a b n))`; :660-661 \"-- out the g(n) term in the calculation below\" is not in the diff, while the upper-bound counterpart at :509 is changed to `g n`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, module docstring (`AkraBazziRecurrence` bullet)",
+    "claim": "The bullet the PR rewraps still says the parameters `g`, `a`, `b` and `r` are \"as above\", but nothing earlier in this file describes them. That explanation is in AkraBazzi.lean, which imports this file.",
+    "requested_change": "Replace \"as above\" with a short statement of the recurrence `T n = (∑ i, a i * T (r i n)) + g n`, or refer to the `AkraBazziRecurrence` docstring.",
+    "severity": "advisory",
+    "evidence": "SumTransform.lean:12-26: the module doc opens with \"We develop further required preliminaries...\" and has no description of `g, a, b, r` before the bullet at :19-20. The recurrence is described in AkraBazzi.lean:14-26, and AkraBazzi.lean:7 imports SumTransform."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, section doc \"The sum transform\"",
+    "claim": "The section doc the PR edits defines the sum transform as `∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`, which leaves out the `n ^ p *` factor that `sumTransform` and its docstring include.",
+    "requested_change": "Change the formula in the section doc to `n ^ p * ∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`.",
+    "severity": "advisory",
+    "evidence": "SumTransform.lean:537-538 (section doc) versus :544-547 `noncomputable def sumTransform (p : ℝ) (g : ℝ → ℝ) (n₀ n : ℕ) := n ^ p * ∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, module docstring (new `smoothingFn` and `p` bullets)",
+    "claim": "The new bullets carry vague parentheticals, \"(with derivative/asymptotic facts)\" and \"(existence/uniqueness and related properties)\", which name no declaration and read as generated filler.",
+    "requested_change": "Drop the parentheticals, or replace them with the actual results, e.g. `sumCoeffsExp_p_eq_one` and `injective_sumCoeffsExp` for `p`.",
+    "severity": "advisory",
+    "evidence": "Diff to SumTransform.lean:19-28. The relevant results exist by name: SumTransform.lean:519 `injective_sumCoeffsExp`, :530 `sumCoeffsExp_p_eq_one`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/GrowsPolynomially.lean, GrowsPolynomially",
+    "claim": "The rewritten docstring describes the condition in terms of `g` and `n`, but the definition's argument is `f` and its bound variable is `x`, so the docstring does not match the statement it documents.",
+    "requested_change": "Phrase the docstring in terms of the binder: \"...the function `f` must satisfy... `c₁ f(x) ≤ f(u) ≤ c₂ f(x)` for `u` between `b * x` and `x`...\".",
+    "severity": "advisory",
+    "evidence": "GrowsPolynomially.lean:34-39: `def GrowsPolynomially (f : ℝ → ℝ) : Prop := ∀ b ∈ Set.Ioo 0 1, ∃ c₁ > 0, ∃ c₂ > 0, ∀ᶠ x in atTop, ∀ u ∈ Set.Icc (b * x) x, f u ∈ Set.Icc (c₁ * (f x)) (c₂ * f x)`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, AkraBazziRecurrence (field docstrings)",
+    "claim": "The PR rewrites some field docstrings as full sentences with a final period and leaves others as fragments without one. The untouched `g_nonneg` docstring still says \"`g` is nonnegative\", although the field only asserts this for `x ≥ 0`.",
+    "requested_change": "Make the field docstrings uniform, all with a final period, and change the `g_nonneg` docstring to \"`g` is nonnegative on nonnegative reals.\"",
+    "severity": "advisory",
+    "evidence": "SumTransform.lean:52-73 after the diff: \"`n₀` is positive.\", \"Each `b i` is less than 1.\", \"The functions `r i` always reduce `n`.\" versus \"Point below which the recurrence is in the base case\", \"`g` is nonnegative\", \"`g` grows polynomially\", \"The actual recurrence\", \"Base case: `0 < T n` whenever `n < n₀`\". Field :63 `g_nonneg : ∀ x ≥ 0, 0 ≤ g x`."
+  },
+  {
+    "target": "PR",
+    "claim": "The PR has no description. Its title says only that the doc changes are LLM-generated, so a reviewer must find the few substantive corrections among a wholesale rewording.",
+    "requested_change": "Add a PR description listing the substantive corrections separately from the stylistic ones: `g(n)` changed to `g(u)` in the main formula, `a`/`b` \"nonzero\" changed to \"positive\", the duplicated section doc and misplaced bullets (`asympBound`, `GrowsPolynomially`) moved to the file that defines them, and the move to LaTeX and en dashes. State that it was checked by a human.",
+    "severity": "advisory",
+    "evidence": "pr.md: \"Description: (no description)\"; title \"doc(AkraBazzi): corrections to docs by way of LLM\". The real fixes are at AkraBazzi.lean:29,37 (`g(n)` in `∑ ... g(n) / u^{p+1}`) and SumTransform.lean:56,58 (\"The `a`'s are nonzero\" for `a_pos : ∀ i, 0 < a i`)."
+  }
+]

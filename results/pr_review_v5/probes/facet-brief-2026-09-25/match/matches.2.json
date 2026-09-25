@@ -1,0 +1,503 @@
+{
+ "asks": [
+  {
+   "pr": 31984,
+   "ask_id": "v1260",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 proposes convexCombination : FiniteProbability R M -> M, the maintainer's exact suggestion."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1261",
+   "R1": "partial",
+   "R1_finding": 4,
+   "R2": "partial",
+   "R2_finding": 9,
+   "note": "Both weaken order hypothesis (strict to non-strict); none drops nonnegativity for affine generality."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1263",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 names index-universe coupling and proposes distributions on M itself."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1264",
+   "R1": "partial",
+   "R1_finding": 4,
+   "R2": "partial",
+   "R2_finding": 9,
+   "note": "Same as v1261: generalize assumptions, but neither drops the order/nonneg condition."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1265",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Nobody suggests expressing the total field via Finsupp.degree."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1266",
+   "R1": "reached",
+   "R1_finding": 6,
+   "R2": "reached",
+   "R2_finding": 2,
+   "note": "Both propose renaming FiniteProbability to StdSimplex."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1267",
+   "R1": "partial",
+   "R1_finding": 5,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 says monad form makes ext automatic; R1 only renames the ext field."
+  },
+  {
+   "pr": 31984,
+   "ask_id": "v1268",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 recommends FiniteProbability R M -> M monad-algebra definition."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0377",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding on presburgerFunc naming."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0378",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 4,
+   "note": "Both restate with the coercion; norm_cast attribute not mentioned."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0379",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding on binary vs unary cast."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0380",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 4,
+   "note": "Both restate natCast_succ with the coercion; norm_cast not mentioned."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0381",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding questions whether succ is needed; R2-8 only adds a result type."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0382",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "Both rename finsum to sum."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0383",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 1,
+   "note": "Both take s : Finset and define via List.sum (R2-2 also)."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0384",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding on the @ in funMap lemmas."
+  },
+  {
+   "pr": 27099,
+   "ask_id": "v0385",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 3,
+   "note": "R2 flags missing space after the left arrow."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2048",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 2,
+   "note": "R2 deletes the lemma, replacing it with multipliable.hasProd; the have-Fintype line disappears (moots ask)."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2049",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "Both ask for x v instead of x.1 v, including norm_def."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2050",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "Both ask for the DFunLike coercion x v throughout."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2051",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "Both ask for the DFunLike coercion x v throughout."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2052",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "Both ask for (x : A) v on units."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2053",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 1,
+   "note": "Both note the swapped lt_one/one_lt names."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2054",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 1,
+   "note": "Both note the swapped lt_one/one_lt names."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2055",
+   "R1": "reached",
+   "R1_finding": 13,
+   "R2": "reached",
+   "R2_finding": 6,
+   "note": "Both say the module doc wrongly mentions Dedekind domain R."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2056",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "x v plus instance docstring and Main definitions covered (R1-13; R2-4, R2-6)."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2057",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "x v covered; moving the lemma to a more basic file not raised."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2058",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "Both rename to hasFiniteMulSupport_norm."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2059",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 3,
+   "note": "Both propose norm_eq_finprod_of_isUnit with x v."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2060",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 18,
+   "note": "R2 flags the double space."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2061",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding on the unused HeightOneSpectrum open."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2062",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 13,
+   "note": "R2 asks to drop the rebound v binder and use the section variable."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2063",
+   "R1": "reached",
+   "R1_finding": 12,
+   "R2": "reached",
+   "R2_finding": 12,
+   "note": "R2 deletes the extra blank line; R1's revert of import changes removes it too."
+  },
+  {
+   "pr": 36275,
+   "ask_id": "v2064",
+   "R1": "partial",
+   "R1_finding": 2,
+   "R2": "reached",
+   "R2_finding": 10,
+   "note": "R2-10 generalizes to R, R2-7 adds algebraMap product formula; R1 only the formula."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0184",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "partial",
+   "R2_finding": 8,
+   "note": "R2 generalizes to Seminormed, not to RCLike scalars; R1 even drops the RCLike import."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0185",
+   "R1": "reached",
+   "R1_finding": 13,
+   "R2": "reached",
+   "R2_finding": 4,
+   "note": "Both propose norm_smul_normalized."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0186",
+   "R1": "reached",
+   "R1_finding": 12,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "R1 golfs the same proof comparably; R2 silent."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0187",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Nobody removes @[simp]; R1-11 even relies on it."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0188",
+   "R1": "reached",
+   "R1_finding": 11,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "R1 uses normalized_eq_self_of_norm_eq_one explicitly in normalized_normalized."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0189",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding on the normalized_smul_of_pos proof."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0190",
+   "R1": "reached",
+   "R1_finding": 9,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "R1-8/9 cover proof, spacing, simp; R2-5/6 cover proof and simp, not spacing."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0191",
+   "R1": "reached",
+   "R1_finding": 10,
+   "R2": "reached",
+   "R2_finding": 7,
+   "note": "Both replace linarith/field_simp with a short proof via normalized_smul_of_pos."
+  },
+  {
+   "pr": 26308,
+   "ask_id": "v0192",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "partial",
+   "R2_finding": 0,
+   "note": "Both propose renaming to normalize, not seeking Zulip consensus."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0814",
+   "R1": "partial",
+   "R1_finding": 10,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 asks to drop typographic churn; R1 only asks to separate it in the description."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0815",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 drops backtick-to-LaTeX rewrites; R1 reverts LaTeX only for Lean expressions."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0816",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "partial",
+   "R2_finding": 0,
+   "note": "R2 calls rewording churn but asks to drop only typographic changes."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0817",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "partial",
+   "R2_finding": 0,
+   "note": "Formula restyling not among R2's named churn (en-dashes, LaTeX)."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0818",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "partial",
+   "R2_finding": 0,
+   "note": "Heading level and rewording not among R2's named churn."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0819",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2's drop of en-dash churn covers Akra-Bazzi dash; heading level not named."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0820",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "Edit is typographic (en-dash) churn R2 asks to drop."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0821",
+   "R1": "partial",
+   "R1_finding": 9,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "R1 wants uniform field docstrings; R2 treats nonzero-to-positive as a correction to keep."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0822",
+   "R1": "partial",
+   "R1_finding": 10,
+   "R2": "partial",
+   "R2_finding": 0,
+   "note": "R2 drops churn but keeps edits it deems corrections; R1 only asks for a description."
+  },
+  {
+   "pr": 29464,
+   "ask_id": "v0823",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "partial",
+   "R2_finding": 5,
+   "note": "Both restore T : N -> R backticks but push LaTeX macros, not Unicode like a_i."
+  }
+ ],
+ "unmatched": {
+  "31984": {
+   "R1": 9,
+   "R2": 12
+  },
+  "27099": {
+   "R1": 3,
+   "R2": 5
+  },
+  "36275": {
+   "R1": 9,
+   "R2": 7
+  },
+  "26308": {
+   "R1": 9,
+   "R2": 7
+  },
+  "29464": {
+   "R1": 11,
+   "R2": 6
+  }
+ }
+}

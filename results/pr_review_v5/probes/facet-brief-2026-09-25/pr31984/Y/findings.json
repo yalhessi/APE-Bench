@@ -1,0 +1,142 @@
+[
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace (class)",
+    "object": "class ConvexSpace",
+    "reference": "a better version",
+    "warrant": "judgment",
+    "claim": "The axiomatisation indexes convex combinations by an arbitrary `ι : Type v` tied to the universe of `M`. That coupling is forced by `assoc` (which needs `Σ k, ι k : Type v`), and it is also why the extra `ext` axiom is needed: the same point can appear at several indices or at zero-weight indices. The author's own comments say it is not known whether `ext` is independent, and the basic facts (weight 0 or 1, idempotence) are left as `proof_wanted`. So the axioms have not been checked against even the binary laws. Every future instance has to supply these fields, so changing them after merge breaks every instance.",
+    "requested_change": "Use the standard monad-algebra formulation: `convexCombination : FiniteProbability R M → M` (distributions on `M` itself), with `single x ↦ x` and `assoc : convexCombination (f.map convexCombination) = convexCombination f.join` for `f : FiniteProbability R (FiniteProbability R M)`. That makes `ext` automatic and removes the index-universe coupling. Alternatively, derive the three `proof_wanted` facts from the current axioms before merging.",
+    "severity": "blocking",
+    "evidence": "Diff: field `convexCombination {ι : Type v}` with `M : Type v`. Comment on `ext`: \"Perhaps this follows from `assoc`, but I don't see how.\" The module TODO says \"Decide if the `ext` axiom is necessary\". The three `proof_wanted`s are convexCombo₂_zero/_one/_same. The library already treats the simplex as the free convex space: Mathlib/Analysis/Convex/StdSimplex.lean:35 docstring, \"This is the free object in the category of convex spaces\"."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: convexCombo₂ (with FiniteProbability.duple)",
+    "object": "def convexCombo₂",
+    "reference": "a better version",
+    "warrant": "judgment",
+    "claim": "`convexCombo₂` feeds `FiniteProbability.duple : FiniteProbability R (Fin 2)` into `convexCombination {ι : Type v}`. Since `Fin 2 : Type`, elaborating the body unifies `v := 0`, so `convexCombo₂` and the three `proof_wanted` lemmas exist only for `M : Type`, not for `M : Type u`. Users with a convex space in a higher universe get no binary combination.",
+    "requested_change": "Take up the in-code question and generalise `duple` to two points `i j : ι` of an arbitrary index type (`Finsupp.single i s + Finsupp.single j t`, which needs no `i ≠ j`). Then define `convexCombo₂` at an index type in universe `v`, for example `ι := M` with `xs := id`, or `ULift (Fin 2)`. Check with `#check @convexCombo₂`, which should show `{M : Type u_2}` and not `{M : Type}`.",
+    "severity": "blocking",
+    "evidence": "Diff: `def duple ... : FiniteProbability R (Fin 2)`, `def convexCombo₂ ... := convexCombination (.duple hs ht h) (fun | 0 => x | 1 => y)`, and the class field `convexCombination {ι : Type v} ... (xs : ι → M)` with `ConvexSpace (R : Type u) (M : Type v)`. The comment above `duple` reads \"-- Is it useful to generalize this to `x y : ι`?\""
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability (structure)",
+    "object": "structure FiniteProbability",
+    "reference": "the library",
+    "warrant": "exhibit",
+    "claim": "Mathlib already has this concept for finite `ι`: `stdSimplex 𝕜 ι`, the non-negative vectors summing to 1, documented as the free convex space. `FiniteProbability R ι` is its finitely supported generalisation. It gets an unrelated name, and neither file mentions the other.",
+    "requested_change": "Name it after the existing concept (for example `StdSimplex R ι`, the finitely supported standard simplex), or at least cross-reference `stdSimplex` in the docstring and module doc and add a TODO or equivalence relating the two for `[Fintype ι]`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Analysis/Convex/StdSimplex.lean:36 `def stdSimplex : Set (ι → 𝕜) := { f | (∀ x, 0 ≤ f x) ∧ ∑ x, f x = 1 }`. Its docstring (line 35) reads \"This is the free object in the category of convex spaces.\" The same file has `stdSimplex.map` at line 274."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability, FiniteProbability.single, FiniteProbability.comp",
+    "object": "structure FiniteProbability and its constructors",
+    "reference": "its API",
+    "warrant": "exhibit",
+    "claim": "The new structure has no API. It has no `@[ext]` lemma, no simp lemmas for the weights of `single`, `duple` or `comp`, no support lemmas, no `map`, and no unit or associativity laws for `comp`. Any proof about `ConvexSpace` (including the three `proof_wanted`s) needs exactly these. The analogous probability-mass construction supplies all of them.",
+    "requested_change": "Add `@[ext]` (or `FiniteProbability.ext`), `@[simps]` or explicit `single_weights`, `duple_weights` and `comp_weights` apply lemmas, `support_single`, a `map` along functions, and the unit and associativity laws for `comp`, modelled on the `PMF` monad API.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/ProbabilityMassFunction/Basic.lean:55 `protected theorem ext`. Mathlib/Probability/ProbabilityMassFunction/Monad.lean: `pure` (41), `pure_apply` (48), `support_pure` (51), `bind` (105), `bind_apply` (113), `support_bind` (116), `pure_bind` (124), `bind_pure` (129), `bind_bind` (139). Mathlib/Probability/ProbabilityMassFunction/Constructions.lean:44 `map`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.comp",
+    "object": "def FiniteProbability.comp",
+    "reference": "the norms",
+    "warrant": "exhibit",
+    "claim": "In Mathlib's probability library, `comp` names the composition that marginalises onto the second space. The construction that keeps the joint distribution on pairs is `compProd`. This `comp` returns the joint distribution on `Σ k, ι k`, so its name suggests the other operation.",
+    "requested_change": "Rename to reflect the joint or dependent-pair output, for example `sigma` or `compProd`, or `bind` if it is redefined to marginalise as in the monad-algebra design.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Probability/Kernel/Composition/Comp.lean:48 `def comp (η : Kernel β γ) (κ : Kernel α β) : Kernel α γ` (marginalises). Mathlib/Probability/Kernel/Composition/CompProd.lean:69 `compProd ... : Kernel α (β × γ)` and Mathlib/Probability/Kernel/Composition/MeasureCompProd.lean:43 `Measure.compProd ... : Measure (α × β)` (keep the pair)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace.ext (class field)",
+    "object": "class ConvexSpace, field ext",
+    "reference": "the norms",
+    "warrant": "count",
+    "claim": "The field `ext` is a congruence statement: combinations agree if the families agree on the support. In Mathlib that shape is named `*_congr`. `ConvexSpace.ext` is also the name `@[ext]` would generate for equality of two `ConvexSpace` structures, so the field name collides with the conventional extensionality lemma.",
+    "requested_change": "Rename the field to `convexCombination_congr` (or `congr`).",
+    "severity": "advisory",
+    "evidence": "Same-shape precedents: Mathlib/Algebra/BigOperators/Finsupp/Basic.lean:175 `prod_congr {f : α →₀ M} ... (h : ∀ x ∈ f.support, g1 x (f x) = g2 x (f x))` (with its `to_additive` `Finsupp.sum_congr`), and Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean:108 `Finset.prod_congr ... (∀ x ∈ s₂, f x = g x) → ...`. Library-wide, `mlcount '^  ext \\{'` finds 0 class or structure fields named `ext` of this shape."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.comp (total proof)",
+    "object": "def FiniteProbability.comp, field total",
+    "reference": "the library, as a tool",
+    "warrant": "compile",
+    "claim": "The 25-line `total` proof, which a comment says was \"minimally cleaned up from a proof by Aristotle\", works through `h_total`, `h_sum` and `h_final` plus `convert` and `aesop`. It is a chain of four existing `Finsupp.sum` lemmas.",
+    "requested_change": "Replace it with `total := by simp [Finsupp.sum_sum_index, Finsupp.sum_embDomain, Finsupp.sum_smul_index, ← Finsupp.mul_sum, FiniteProbability.total]`, or the same chain as `rw [Finsupp.sum_sum_index (fun _ => rfl) (fun _ _ _ => rfl)]` followed by `simp only [...]`, and drop the provenance comment. To verify by compiling.",
+    "severity": "advisory",
+    "evidence": "Each step is one lemma. `Finsupp.sum_sum_index` (to_additive of Mathlib/Algebra/BigOperators/Finsupp/Basic.lean:468 `prod_sum_index`, whose side goals are the `rfl`s the current proof already discharges) splits the outer sum. `Finsupp.sum_embDomain` (to_additive of line 455 `prod_embDomain`) removes `embDomain`. Mathlib/Data/Finsupp/SMul.lean:177 `sum_smul_index` turns `(b • g).sum h` into `g.sum fun i a => h i (b * a)`. Mathlib/Algebra/BigOperators/Finsupp/Basic.lean:610 `Finsupp.mul_sum` factors `b` out. Then `(g m).total`, `mul_one` and `f.total` close it."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.comp (nonneg proof)",
+    "object": "def FiniteProbability.comp, field nonneg",
+    "reference": "robustness",
+    "warrant": "judgment",
+    "claim": "The proof runs a non-terminal `simp [Finsupp.embDomain]`, which unfolds the definition of `embDomain` instead of using its API, and then calls `bound` on whatever that leaves. Any change to `embDomain`'s implementation breaks it. It is also the only reason the file imports `Mathlib.Tactic.Bound` (which pulls in Linarith and Aesop). `bound` is used nowhere in Mathlib/Algebra or Mathlib/LinearAlgebra.",
+    "requested_change": "Evaluate the summand with `Finsupp.embDomain_apply` or `Finsupp.embDomain_notin_range` (split on whether the index lies in `k`'s fibre), close with `mul_nonneg (f.nonneg _) ((g _).nonneg _)` or `positivity`, and drop the `Mathlib.Tactic.Bound` import.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Data/Finsupp/Defs.lean:423 `embDomain_apply` and :431 `embDomain_notin_range`. Mathlib/Tactic/Bound.lean imports Aesop and Mathlib.Tactic.Linarith.Frontend. `mlcount '^\\s*bound\\b' Mathlib/Algebra Mathlib/LinearAlgebra` = 0."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.single",
+    "object": "def FiniteProbability.single",
+    "reference": "a better version",
+    "warrant": "compile",
+    "claim": "`open Classical in` is put on the whole definition although decidability is needed only inside the `nonneg` proof, for `Finsupp.single_apply`. The manual `split` then `zero_le_one'` then `grind` duplicates an existing lemma.",
+    "requested_change": "Drop `open Classical in` and write `nonneg m := by classical rw [Finsupp.single_apply]; split_ifs <;> simp`. If Mathlib.Data.Finsupp.Order is acceptable as an import, `nonneg := fun m => Finsupp.single_nonneg.2 zero_le_one m` also works. To verify by compiling.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Data/Finsupp/Order.lean:69 `@[simp] lemma single_nonneg : 0 ≤ single i a ↔ 0 ≤ a`. Library practice: `mlcount` gives 2356 proof-local `classical` against 246 `open Classical in`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability namespace variables and ConvexSpace",
+    "object": "class ConvexSpace / FiniteProbability.* hypotheses",
+    "reference": "a better version",
+    "warrant": "compile",
+    "claim": "Everything assumes `[IsStrictOrderedRing R]`, but the proofs use only `zero_le_one` (in `single`), non-negativity of sums (in `duple`) and `mul_nonneg` (in `comp`). All three hold under `[IsOrderedRing R]`, the hypothesis the neighbouring `stdSimplex` and `convex_stdSimplex` use. Requiring strictness excludes ordered semirings that are not strict.",
+    "requested_change": "Weaken `[IsStrictOrderedRing R]` to `[IsOrderedRing R]` in the `FiniteProbability` section, the class `ConvexSpace` and the final `variable` line. To verify by compiling; the `grind` in `duple.nonneg` is the step to watch.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Analysis/Convex/StdSimplex.lean:43 `theorem convex_stdSimplex [IsOrderedRing 𝕜]` and :82 `variable [IsOrderedRing 𝕜]`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: variable lines and class ConvexSpace binders",
+    "object": "typeclass argument order",
+    "reference": "the norms",
+    "warrant": "count",
+    "claim": "The PR writes `[PartialOrder R] [Semiring R] [IsStrictOrderedRing R]`. Mathlib's convention after the ordered-ring unbundling puts the algebra first: `[Semiring R] [PartialOrder R] [Is…OrderedRing R]`.",
+    "requested_change": "Reorder to `[Semiring R] [PartialOrder R] [IsOrderedRing R]` in all three places (the FiniteProbability section, the class, and the final `variable`).",
+    "severity": "advisory",
+    "evidence": "`mlcount '\\[Semiring [^]]+\\] \\[PartialOrder '` = 186 against `mlcount '\\[PartialOrder [^]]+\\] \\[Semiring '` = 1, and that one (Mathlib/RingTheory/HahnSeries/Addition.lean:463) is about two different types. Examples: Mathlib/Analysis/Convex/Basic.lean:40 and Mathlib/Analysis/Convex/StdSimplex.lean:32."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.duple (docstring)",
+    "object": "doc_comment on FiniteProbability.duple",
+    "reference": "intent",
+    "warrant": "judgment",
+    "claim": "The docstring says \"weights `x` and `y`\", but the weights are `s` and `t`. In this file `x` and `y` are the points in `convexCombo₂`, so the docstring points readers at the wrong variables.",
+    "requested_change": "Change it to \"A probability distribution on `Fin 2` with weights `s` and `t`.\" and move the question comment `-- Is it useful to generalize this to x y : ι?` out of the source, either into the TODO or answered by the generalisation.",
+    "severity": "advisory",
+    "evidence": "Diff: `/-- A probability distribution on `Fin 2` with weights `x` and `y`. -/` above `def duple {s t : R} (hs : 0 ≤ s) (ht : 0 ≤ t) (h : s + t = 1)`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace (instances)",
+    "object": "class ConvexSpace",
+    "reference": "its API",
+    "warrant": "judgment",
+    "claim": "The class arrives with no instance at all, not even the motivating one where `M` is an `R`-module and `convexCombination f xs = f.sum (fun i r => r • xs i)`. Nothing in the PR shows the axioms (`assoc`, `single`, `ext`) are satisfied by the intended examples, or that the universe choice `ι : Type v` is workable for them. The TODO defers even this.",
+    "requested_change": "Add at least the `Module R M → ConvexSpace R M` instance (or the affine-space one in the TODO) in this PR, so the axioms are checked against the main example.",
+    "severity": "advisory",
+    "evidence": "Diff: the file declares `class ConvexSpace` and no `instance`. Module TODO: \"Show that an `AffineSpace` is a `ConvexSpace`.\""
+  },
+  {
+    "target": "PR",
+    "object": "PR as a whole",
+    "reference": "process",
+    "warrant": "judgment",
+    "claim": "The PR has no description. It gives no motivation for a synthetic convex-space class next to the existing `Convex`/`stdSimplex` theory and no literature reference for the axioms (convex spaces as algebras of the finite-distribution monad). The AI provenance is disclosed only in a source comment. Open design questions sit in source comments (`-- Perhaps this follows from assoc, but I don't see how.`) instead of the description.",
+    "requested_change": "Write a description covering motivation, the intended applications, the chosen axioms with a reference, the open question about `ext`, and the disclosure that `comp.total` was produced by Aristotle. Remove the provenance and question comments from the source, or turn them into TODO items.",
+    "severity": "advisory",
+    "evidence": "pr.md: \"(no description)\". Diff comments: \"-- This proof was minimally cleaned up from a proof by Aristotle.\", \"-- Perhaps this follows from `assoc`, but I don't see how.\", \"-- Is it useful to generalize this to `x y : ι`?\""
+  }
+]

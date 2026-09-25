@@ -1,0 +1,72 @@
+[
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.finsum",
+    "claim": "The name `presburger.finsum` reuses Mathlib's `finsum` (the `∑ᶠ` sum over functions with finite support), but this definition is a sum over a `Fintype`/`Finset`, i.e. the syntactic counterpart of `Finset.sum`; `realize_finsum` even states its value as `∑ i, ...`, not `∑ᶠ`.",
+    "requested_change": "Rename `finsum` to `sum` (and `realize_finsum` to `realize_sum`), updating the docstring reference and the module-doc TODO that mentions `presburger.finsum`.",
+    "severity": "blocking",
+    "evidence": "Root `finsum` is `noncomputable irreducible_def finsum ... [AddCommMonoid M] (f : α → M)` in Mathlib/Algebra/BigOperators/Finprod.lean:96; the PR's lemma RHS is `∑ i, Term.realize v (f i)` (Finset.sum over univ)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.finsum",
+    "claim": "`finsum` is hard-wired to `Finset.univ` of a `Fintype β`, which is needlessly restrictive: the construction (`toList`, `map`, fold) works for any `Finset`.",
+    "requested_change": "Take `(s : Finset β)` instead of `[Fintype β]` and define it as `(s.toList.map f)` summed; state `realize_finsum` as `Term.realize v (sum s f) = ∑ i ∈ s, Term.realize v (f i)` (the univ version is then the special case `s := Finset.univ`).",
+    "severity": "advisory",
+    "evidence": "`Finset.nodup_toList (s : Finset α)` and `Finset.toList_toFinset (s : Finset α)` (Mathlib/Data/Finset/Dedup.lean:162,175), the only facts the proof uses about univ, hold for an arbitrary finset."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.realize_finsum",
+    "claim": "The definition hand-rolls `List.foldr (· + ·) 0`, which is literally `List.sum` (available with only `[Add] [Zero]`), and the proof then goes through `Finset.sum_eq_fold`, `toList_toFinset`, a `Nodup` hypothesis, `Finset.fold_insert` and `classical`, re-proving what `Finset.sum_map_toList` already gives.",
+    "requested_change": "Define the sum as `(s.toList.map f).sum` and prove the realize lemma as `rw [sum, ← Finset.sum_map_toList]; induction s.toList with simp [*]` (dropping `classical`, `hnodup`, the `conv`, and `Finset.fold_insert`).",
+    "severity": "advisory",
+    "evidence": "`List.sum_*` are the `to_additive existing` counterparts of `List.prod_nil`/`prod_cons` stated under `[Mul M] [One M]` in Mathlib/Algebra/BigOperators/Group/List/Defs.lean:45-52, and `prod_eq_foldr ... = foldr (· * ·) 1 l := rfl` (line 93) shows the definitional match; `Finset.prod_map_toList (s) (f) : (s.toList.map f).prod = s.prod f` in Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean:393 (additive `sum_map_toList`, cf. the deprecated alias at line 397)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.realize_finsum",
+    "claim": "The proof uses `rw [←Finset.toList_toFinset ...]` / `rw [List.nodup_cons, ←List.mem_toFinset]` without the space after `←`, and `conv => rhs; rw [...]`, against Mathlib style.",
+    "requested_change": "Write `← Finset.toList_toFinset` and `← List.mem_toFinset` with a space after `←`, and replace `conv => rhs; rw [...]` by `conv_rhs => rw [...]` (if the proof is not golfed away entirely).",
+    "severity": "advisory",
+    "evidence": "mlcount over Mathlib: `[← ` with a space 26840 lines vs `[←x` without 10; `conv_rhs =>` 485 lines vs `conv => rhs;` 16."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.natCast_zero, natCast_succ",
+    "claim": "The simp lemmas are stated with the raw projection `NatCast.natCast 0` / `NatCast.natCast (n + 1)` instead of the coercion `Nat.cast`, which is the form terms appear in (and which `natCast_succ`'s own RHS `(n : presburger.Term α)` uses).",
+    "requested_change": "State them as `((0 : ℕ) : presburger.Term α) = 0` and `((n + 1 : ℕ) : presburger.Term α) = n + 1`.",
+    "severity": "advisory",
+    "evidence": "Sibling convention: `theorem natCast_zero : ((0 : ℕ) : R) = 0` in Mathlib/Tactic/Ring/Basic.lean:500 and `theorem natCast_succ (n : ℕ) : ↑n.succ = ...` in Mathlib/SetTheory/Ordinal/Basic.lean:887 both use the coercion."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: instance presburger.Structure M",
+    "claim": "The `.one` alternative binds `v` and never uses it (the `.zero` alternative already uses `_`), which the unused-variables linter flags.",
+    "requested_change": "Replace `| .one, v => 1` with `| .one, _ => 1`.",
+    "severity": "advisory",
+    "evidence": "Diff lines of the `funMap` match: `| .zero, _ => 0`, `| .one, v => 1`, `| .add, v => v 0 + v 1`; the ring analogue `compatibleRingOfRing` uses `fun _ => 1` (Mathlib/ModelTheory/Algebra/Ring/Basic.lean:226)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: instance presburger.Structure M",
+    "claim": "A global instance `[Zero M] [One M] [Add M] → presburger.Structure M` departs from the existing ModelTheory convention: the corresponding structures for the order and ring languages are deliberately `def`s, because a `Language.*.Structure` is sometimes given first (e.g. by a model of a theory) and the global instance would then create a non-defeq diamond. The TODO here (defining the theory of Presburger arithmetic and its models) is exactly that situation.",
+    "requested_change": "Make it a named `def` (e.g. `presburgerStructure`, used with `letI`), optionally with a compatibility class as for `CompatibleRing`, or else add an implementation note justifying why a global instance is safe here.",
+    "severity": "advisory",
+    "evidence": "Mathlib/ModelTheory/Order.lean:202-204: `def orderStructure [LE M] ...` documented 'This is not an instance, because sometimes the `Language.order.Structure` is defined first.'; Mathlib/ModelTheory/Algebra/Ring/Basic.lean:214-218: `compatibleRingOfRing` 'is a `def` and not an `instance`, because the path ... cannot be made to commute by definition'."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.realize_nsmul, realize_finsum",
+    "claim": "`realize_nsmul` assumes `AddMonoidWithOne M` and `realize_finsum` assumes `AddCommMonoidWithOne M`, but neither statement nor proof involves the `NatCast` part; `One M` is only needed to build the structure instance.",
+    "requested_change": "Weaken the hypotheses to `[AddMonoid M] [One M]` for `realize_nsmul` and `[AddCommMonoid M] [One M]` for `realize_finsum`.",
+    "severity": "advisory",
+    "evidence": "The proofs use only `add_nsmul`/`zero_nsmul`/`succ_nsmul` (Mathlib/Algebra/Group/Defs.lean:582,619, AddMonoid-level) and `Finset.sum_eq_fold`/`fold_insert` (AddCommMonoid-level); only `realize_natCast` genuinely needs `AddMonoidWithOne`."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.succ",
+    "claim": "`def succ (t : presburger.Term α) := t + 1` omits its result type.",
+    "requested_change": "Write `def succ (t : presburger.Term α) : presburger.Term α := t + 1`.",
+    "severity": "advisory",
+    "evidence": "All other defs in the file and the ring sibling (Mathlib/ModelTheory/Algebra/Ring/Basic.lean:76-92) give explicit result types."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: module docstring",
+    "claim": "The module docstring's 'Main Definitions' lists only `FirstOrder.Language.presburger`, but the file also defines the `Zero`/`One`/`Add`/`NatCast`/`SMul ℕ` instances on terms, `presburger.succ`, the finite sum, and the canonical `presburger.Structure` on any type with `0`, `1`, `+`.",
+    "requested_change": "Extend the module docstring to mention the term instances, `succ`, the finite sum, and the structure instance on types with `Zero`, `One`, `Add` (as the ring file's header mentions its term instances).",
+    "severity": "advisory",
+    "evidence": "Mathlib/ModelTheory/Algebra/Ring/Basic.lean:14-24 documents 'as well as defining instance of `Add`, `Mul`, etc. on terms' and lists the structure-building def `compatibleRingOfRing`."
+  }
+]

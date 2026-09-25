@@ -320,3 +320,26 @@ object-by-reference table; the AI stratum against main.
 **Next:** a submission gate chosen per (reference, object) cell before any division is run.
 Otherwise Track B measures contracts, not divisions.
 
+## Ad hoc probe of the facet brief (2026-09-25)
+
+The user asked for ad hoc evidence before any pipeline change. The write-up is
+`docs/research/facet-brief-probe-2026-09.md`; the artifacts are in
+`results/pr_review_v5/probes/facet-brief-2026-09-25/`.
+
+**Setup:** the current generalist brief (X) against the facet brief with a dossier (Y). Claude
+reviewers, one run each, on 5 val1000 PRs, with 53 maintainer asks matched by two blind matchers.
+
+**Result:** fails the pre-stated rule on both matchers.
+- Reached, X / Y: 26/32 and 27/28.
+- 7 losses each, against at most 1 allowed.
+
+**What moved:**
+- **Gains are all in the families no arm owns.** They include the central design ask on
+  `ConvexSpace` (31984: 1 → 5 of 8 on both matchers) and the LLM-churn asks (29464: 0 → 4-9 of 10).
+- **Losses are local:** three whitespace asks, caused by the brief's wrong "skip whitespace: CI
+  settles it"; `variable {v} in`; and two proof golfs on the control PR.
+
+**Next (stated in the write-up before running):** the complement probe. Keep X, add a
+hard-cells-only job H, and compare `X ∪ H` against `X ∪ X′`, where X′ is a second run of the
+current brief.
+

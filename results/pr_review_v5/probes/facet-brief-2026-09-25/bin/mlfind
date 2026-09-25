@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# mlfind <pr> <name>  -- where a declaration with this (last component of the) name is declared, at the PR's base commit
+source "$(dirname "$0")/_base.sh" "$1" || exit 2
+n="${2##*.}"
+git -C "$CLONE" grep -n -E -e "^\s*(@\[[^]]*\]\s*)?(protected |private |noncomputable |nonrec )*(theorem|lemma|def|abbrev|instance|structure|class|inductive)\s+(\S*\.)?${n}(\s|$)" "$BASE" -- Mathlib | sed "s|^$BASE:||" | head -30

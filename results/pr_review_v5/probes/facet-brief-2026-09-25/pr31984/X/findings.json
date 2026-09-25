@@ -1,0 +1,72 @@
+[
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.duple",
+    "claim": "The docstring of `FiniteProbability.duple` says the distribution has \"weights `x` and `y`\", but the weights are the arguments `s` and `t`; `x`/`y` are the names used for points in `convexCombo₂`. An open-question comment (`-- Is it useful to generalize this to x y : ι?`) also sits between the docstring and the declaration.",
+    "requested_change": "Change the docstring to \"A probability distribution on `Fin 2` with weight `s` on `0` and weight `t` on `1`.\" Delete the in-code question comment, or move it to the module `## TODO` list.",
+    "severity": "advisory",
+    "evidence": "diff.patch: `/-- A probability distribution on `Fin 2` with weights `x` and `y`. -/` directly above `def duple {s t : R} (hs : 0 ≤ s) (ht : 0 ≤ t) (h : s + t = 1)`; `convexCombo₂ ... (x y : M)` uses x, y for points."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.comp (field `total`)",
+    "claim": "The `total` proof of `FiniteProbability.comp` is a roughly 25-line machine-generated proof, marked `-- This proof was minimally cleaned up from a proof by Aristotle`. It uses three auxiliary `have`s, `simp_all only`, several `aesop` calls, a trailing `;` after `rw`, and two nested `convert ... using 1`. The fact is a direct rewrite chain with existing Finsupp sum lemmas.",
+    "requested_change": "Replace the proof with a short rewrite chain and delete the attribution comment, e.g. `rw [Finsupp.sum_sum_index (fun _ => rfl) (fun _ _ _ => rfl)]; simp [Finsupp.sum_embDomain, Finsupp.sum_smul_index, ← Finsupp.mul_sum, FiniteProbability.total, f.total]`. That goes from sum-of-sums, to the sum over each embedded `r • (g m).weights`, to `r * (g m).weights.sum _`, to `r * 1`, and finally to `f.total`. Add the `Mathlib.Data.Finsupp.SMul` import if `sum_smul_index` is not already available.",
+    "severity": "blocking",
+    "evidence": "Finsupp.sum_smul_index at Mathlib/Data/Finsupp/SMul.lean:177 (`(b • g).sum h = g.sum fun i a => h i (b * a)`); Finsupp.mul_sum at Mathlib/Algebra/BigOperators/Finsupp/Basic.lean:610; prod_embDomain / prod_sum_index (additive versions sum_embDomain / sum_sum_index) at Mathlib/Algebra/BigOperators/Finsupp/Basic.lean:455,468. The PR proof already uses sum_embDomain and sum_sum_index, only indirectly."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.comp (field `nonneg`)",
+    "claim": "The `nonneg` proof of `FiniteProbability.comp` unfolds the definition with a non-terminal `simp [Finsupp.embDomain]`. It then introduces anonymous `have := f.nonneg; have := (g k).nonneg` only so that `bound` can see them.",
+    "requested_change": "Do not unfold `Finsupp.embDomain`. Split on whether the index lies in the range of `.sigmaMk k`: use `Finsupp.embDomain_apply` in one case and `Finsupp.embDomain_notin_range` in the other, then close with `mul_nonneg`. At minimum, make the `simp` a `simp only` and write `bound [f.nonneg _, (g _).nonneg _]` instead of the two anonymous `have`s.",
+    "severity": "advisory",
+    "evidence": "Finsupp.embDomain_apply at Mathlib/Data/Finsupp/Defs.lean:423 and Finsupp.embDomain_notin_range at Mathlib/Data/Finsupp/Defs.lean:431 are the API for evaluating embDomain; `bound [` with extra hypotheses occurs 34 times in Mathlib (mlcount)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability.single",
+    "claim": "`FiniteProbability.single` is wrapped in `open Classical in` only so that a proof field can `rw [Finsupp.single_apply]`. The `nonneg` proof then does a manual `split` with `zero_le_one' R` and `grind`, although `Finsupp.single_nonneg` already states `0 ≤ single i a ↔ 0 ≤ a`, and `0 ≤ weights` in the Finsupp order is by definition `∀ i, 0 ≤ weights i`.",
+    "requested_change": "Drop `open Classical in` and write `nonneg m := Finsupp.single_nonneg.2 zero_le_one m`, importing `Mathlib.Data.Finsupp.Order`. Alternatively, keep the current import and use `nonneg m := by classical rw [Finsupp.single_apply]; split_ifs <;> simp`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Data/Finsupp/Order.lean:69 `@[simp] lemma single_nonneg : 0 ≤ single i a ↔ 0 ≤ a`; Mathlib/Order/Preorder/Finsupp.lean:30-32 `instance instLE ... le f g := ∀ i, f i ≤ g i`, `le_def ... := .rfl`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace (and the FiniteProbability section / convexCombo₂ variables)",
+    "claim": "`ConvexSpace`, the `FiniteProbability` API and `convexCombo₂` all assume `[IsStrictOrderedRing R]`. Nothing here uses strictness, cancellation or nontriviality: only `0 ≤ 1` and `mul_nonneg` are needed. This excludes ordered semirings that are not strict, notably `ℝ≥0∞`, which is only an `IsOrderedRing`. The binders are also written `[PartialOrder R] [Semiring R]`, reversing Mathlib's `[Semiring R] [PartialOrder R]` order.",
+    "requested_change": "Weaken the assumption to `[Semiring R] [PartialOrder R] [IsOrderedRing R]` throughout (on the class, the `FiniteProbability` section variables, and the `convexCombo₂` variables). The `grind` steps may currently rely on the `Lean.Grind.OrderedRing` instance that only `IsStrictOrderedRing` supplies; where one does, replace it with `simp`/`add_nonneg`/`split_ifs`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/Order/Ring/Defs.lean:121-133: IsOrderedRing extends IsOrderedAddMonoid, ZeroLEOneClass, PosMulMono, MulPosMono (enough for zero_le_one' and mul_nonneg); :141 the Grind.OrderedRing instance is only for IsStrictOrderedRing. Mathlib/Data/ENNReal/Basic.lean:126 has only `instance : IsOrderedRing ℝ≥0∞` (no strict instance). Mathlib/Analysis/Convex/StdSimplex.lean:32,43 and Analysis/Convex/Basic.lean:40,163 use `[Semiring 𝕜] [PartialOrder 𝕜]` with `[IsOrderedRing 𝕜]`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: ConvexSpace.ext",
+    "claim": "The class field `ConvexSpace.ext` is not an extensionality lemma for `ConvexSpace`. It is a congruence property of `convexCombination` (only points with non-zero weight matter). It also takes the name `ConvexSpace.ext`, which `@[ext]` would generate and which Mathlib uses for 'two instances are equal'. The field also carries a comment (`-- Perhaps this follows from assoc, but I don't see how.`) that repeats the module TODO.",
+    "requested_change": "Rename the field to `convexCombination_congr` (or `congr`) and update the module TODO that refers to 'the `ext` axiom'. Delete the duplicated in-field comment, since the module `## TODO` already records the open question.",
+    "severity": "advisory",
+    "evidence": "diff.patch: field `ext {ι : Type v} (f : FiniteProbability R ι) (xs xs' : ι → M) (h : ∀ i, i ∈ f.support → xs i = xs' i) : convexCombination f xs = convexCombination f xs'`; the module TODO reads 'Decide if the `ext` axiom is necessary'."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: FiniteProbability",
+    "claim": "`FiniteProbability R ι` is the finitely supported version of Mathlib's standard simplex, which Mathlib already documents as the free convex space. The name `FiniteProbability` suggests measure-theoretic probability (`ProbabilityMeasure`, `PMF`) rather than this algebraic object, and the file never links it to `stdSimplex`.",
+    "requested_change": "Rename `FiniteProbability` to `StdSimplex`, or at least a name aligned with `stdSimplex`. In the docstring, state its relation to `stdSimplex` (which requires `Fintype ι` and is a `Set (ι → R)`).",
+    "severity": "advisory",
+    "evidence": "Mathlib/Analysis/Convex/StdSimplex.lean:34-37: `stdSimplex` docstring 'the set of vectors with non-negative coordinates with total sum `1`. This is the free object in the category of convex spaces.'; Mathlib/Probability/ProbabilityMassFunction/Basic.lean:45 `def PMF`."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: convexCombo₂",
+    "claim": "`convexCombo₂` builds its `Fin 2`-indexed family with an anonymous pattern-matching lambda `fun | 0 => x | 1 => y`. Mathlib's idiom for such a family is vector notation.",
+    "requested_change": "Write `convexCombination (.duple hs ht h) ![x, y]`, importing `Mathlib.Data.Fin.VecNotation` if needed.",
+    "severity": "advisory",
+    "evidence": "mlgrep: `fun | 0 => _ | 1 =>` occurs only twice in Mathlib (AlgebraicTopology/SimplexCategory/Basic.lean:117,159), while `![a, b]`-style vectors of single-letter variables occur 122 times (mlcount)."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: `variable {R M} ...` before convexCombo₂",
+    "claim": "The earlier `R` was declared inside `namespace FiniteProbability`, which has ended, and `M` is never declared. So `variable {R M} [PartialOrder R] ...` introduces fresh binders with no type, where elsewhere in Mathlib `variable {R M}` only updates binders of already-declared variables.",
+    "requested_change": "Declare the variables with explicit types: `variable {R : Type u} {M : Type v} [Semiring R] [PartialOrder R] [IsOrderedRing R] [ConvexSpace R M]`.",
+    "severity": "advisory",
+    "evidence": "diff.patch: `variable {R : Type u} ...` is inside `namespace FiniteProbability ... end FiniteProbability`; after `open ConvexSpace` comes `variable {R M} [PartialOrder R] ...`. mlgrep shows Mathlib's `variable {R M}` / `{R A}` lines (e.g. Mathlib/Algebra/Algebra/Basic.lean:201) are binder updates of variables declared earlier."
+  },
+  {
+    "target": "Mathlib/LinearAlgebra/ConvexSpace.lean: module docstring",
+    "claim": "The module docstring does not connect the new notion to existing Mathlib material that explicitly anticipates it, and cites no reference for the axiomatisation. `Finset.expect`'s implementation note says 'We don't yet have general convex spaces', and `stdSimplex` is described as the free convex space.",
+    "requested_change": "Add an `## Implementation notes` or `## References` section. It should cite a source for the axioms (for example the literature on barycentric algebras / convex spaces) and point to `stdSimplex` and `Finset.expect`. Update the note in `Mathlib/Algebra/BigOperators/Expect.lean` so it no longer says convex spaces are missing.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/BigOperators/Expect.lean:34-40 ('We don't yet have general convex spaces ... When convex spaces are finally defined, we should redefine `Finset.expect` in terms of that convex combination operator.'); Mathlib/Analysis/Convex/StdSimplex.lean:35; Mathlib/MeasureTheory/Measure/ProbabilityMeasure.lean:55 TODO 'Probability measures form a convex space.'"
+  }
+]

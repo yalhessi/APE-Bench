@@ -1,0 +1,52 @@
+[
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: instance : presburger.Structure M (from [Zero M] [One M] [Add M])",
+    "object": "instance : presburger.Structure M where funMap | .zero, _ => 0 | .one, v => 1 | .add, v => v 0 + v 1",
+    "reference": "the typeclass layer",
+    "warrant": "judgment",
+    "claim": "A global instance turning every type with Zero/One/Add into a presburger.Structure goes against how the library treats both existing analogous languages. `Language.ring` provides the structure as the def `compatibleRingOfRing` (\"This is a `def` and not an `instance`, because the path `Ring` => `Language.ring.Structure` => `Ring` cannot be made to commute by definition\") and `Language.order` provides it as the def `orderStructure` (\"This is not an instance, because sometimes the `Language.order.Structure` is defined first\"). The module doc's own TODO is to define the theory of Presburger arithmetic and its models. Once that exists, a model whose presburger.Structure is given first, then has Zero/One/Add read back from it, meets a second structure through this instance, and the two are not definitionally equal. That is the diamond the ring file documents.",
+    "requested_change": "Turn the instance into a named def (e.g. `presburgerStructure`) that callers bring in with `letI`/`attribute [local instance]`, as `compatibleRingOfRing` and `orderStructure` are. Better, follow `CompatibleRing`: add a class saying that a given `presburger.Structure M` agrees with Zero/One/Add on M, and state `funMap_*` and `realize_*` under it. At minimum make the instance `scoped` and give it a name.",
+    "severity": "advisory",
+    "evidence": "Mathlib/ModelTheory/Algebra/Ring/Basic.lean:203-231 (compatibleRingOfRing is a def, with the rationale in its docstring) and :143-168 (the CompatibleRing class); Mathlib/ModelTheory/Order.lean:202-205 (orderStructure is a def, 'not an instance, because sometimes the Language.order.Structure is defined first'). Both are used via letI, e.g. Mathlib/FieldTheory/AxGrothendieck.lean:174, Mathlib/ModelTheory/Algebra/Ring/FreeCommRing.lean:30, Mathlib/ModelTheory/Order.lean:490."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.finsum",
+    "object": "noncomputable def finsum {β} [Fintype β] (f : β → presburger.Term α) := ((Finset.univ : Finset β).toList.map f).foldr (· + ·) 0",
+    "reference": "the library",
+    "warrant": "exhibit",
+    "claim": "The name `finsum` is taken in Mathlib by `_root_.finsum` (`∑ᶠ`), the sum over the support of a function with finite support. This definition is instead a sum over `Finset.univ` of a Fintype, the thing the library calls `Finset.sum` / `∑ i, f i`. Inside the opened namespace the two names shadow each other and the name misstates the concept. The body `(l.map f).foldr (· + ·) 0` is also `List.sum` written out by hand. List.sum needs only `[Add] [Zero]`, which presburger.Term has.",
+    "requested_change": "Rename to `presburger.sum` (and `realize_finsum` to `realize_sum`). Take `(s : Finset β)` rather than `[Fintype β]` over `univ`, since `univ` is the special case. Define it as `(s.toList.map f).sum`. Update the TODO in the module doc that mentions `presburger.finsum`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/BigOperators/Finprod.lean:96 (`noncomputable irreducible_def finsum ... [AddCommMonoid M] (f : α → M) : M`, documented at :34 as the sum over the support if finite; notation `∑ᶠ` at :115). Mathlib/Algebra/BigOperators/Group/List/Defs.lean:24-26 (`List.prod := foldr (· * ·) 1`, `to_additive existing`, so `List.sum` is `foldr (· + ·) 0` under `[Add] [Zero]`)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.realize_finsum (proof)",
+    "object": "proof of realize_finsum (classical; Finset.sum_eq_fold; toList_toFinset; nodup_toList; generalize; induction with Finset.fold_insert)",
+    "reference": "the library, as a tool",
+    "warrant": "compile",
+    "claim": "The Nodup/`Finset.fold_insert` detour rebuilds a library lemma by hand. `Finset.sum_map_toList : (s.toList.map f).sum = s.sum f` turns the right-hand side into a list sum over the same `toList`. After that, a plain list induction closes the goal with `realize_zero`/`realize_add`, and neither `classical` nor the nodup bookkeeping is needed.",
+    "requested_change": "With `sum s f := (s.toList.map f).sum` (or with the current body, which is definitionally `List.sum`): `rw [sum, ← Finset.sum_map_toList]; generalize s.toList = l; induction l <;> simp [*]`. The nil case uses List.map_nil / List.sum_nil / realize_zero, and the cons case uses List.map_cons / List.sum_cons / realize_add / the IH. To verify by compiling.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean:392-394 (`@[to_additive (attr := simp)] theorem prod_map_toList (s : Finset ι) (f : ι → M) : (s.toList.map f).prod = s.prod f`, whose additive form is `Finset.sum_map_toList`); List.sum_cons / List.sum_nil are `rfl` simp lemmas (Mathlib/Algebra/BigOperators/Group/List/Defs.lean:47-52, `to_additive existing`)."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.natCast_zero, natCast_succ",
+    "object": "@[simp] theorem natCast_zero : NatCast.natCast 0 = (0 : presburger.Term α); @[simp] theorem natCast_succ : NatCast.natCast (n + 1) = (n : presburger.Term α) + 1",
+    "reference": "the norms",
+    "warrant": "count",
+    "claim": "Both lemmas state their left-hand side with the raw projection `NatCast.natCast` rather than the coercion `((k : ℕ) : presburger.Term α)`. In `natCast_succ` this even mixes the projection on the left with the coercion `(n : presburger.Term α)` on the right. No Mathlib lemma statement uses `NatCast.natCast`, and the library's cast lemmas are all stated with the coercion.",
+    "requested_change": "State them as `((0 : ℕ) : presburger.Term α) = 0` and `((n + 1 : ℕ) : presburger.Term α) = n + 1`, in the form of `Nat.cast_zero` / `Nat.cast_add_one`.",
+    "severity": "advisory",
+    "evidence": "mlcount '(theorem|lemma) .*NatCast\\.natCast' Mathlib = 0. All 5 occurrences of `NatCast.natCast` in Mathlib are in proofs or meta code (Mathlib/Algebra/DirectSum/Ring.lean:253,255; Mathlib/Algebra/Ring/Ext.lean:106; Mathlib/Tactic/ComputeDegree.lean:350; Mathlib/Tactic/NormNum/Basic.lean:108). The coercion form is used in Mathlib/Data/Nat/Cast/Defs.lean:115 (`cast_zero : ((0 : ℕ) : R) = 0`), :125 (`cast_add_one : ((n + 1 : ℕ) : R) = n + 1`), Mathlib/Tactic/Ring/Basic.lean:500 (`natCast_zero : ((0 : ℕ) : R) = 0`) and Mathlib/Data/ENat/Basic.lean:72."
+  },
+  {
+    "target": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean: FirstOrder.Language.presburger.natCast_succ, succ_nsmul (@[simp] attribute)",
+    "object": "@[simp] natCast_succ : ... (n + 1) = n + 1; @[simp] succ_nsmul : (n + 1) • t = n • t + t",
+    "reference": "automation",
+    "warrant": "judgment",
+    "claim": "A simp lemma whose left-hand side has an `n + 1` pattern also matches numerals, through Nat offset unification. With these two lemmas in the default simp set, `simp` will unfold `5 • t` (and a cast numeral `((5 : ℕ) : presburger.Term α)`) into a chain `0 + t + t + t + t + t`. Because simp rewrites subterms first, `simp` on `Term.realize v (5 • t)` then ends at `realize v t + … + realize v t` instead of `5 • realize v t`, even though `realize_nsmul` exists. The library keeps the analogous lemmas out of the simp set for exactly this reason: `Nat.cast_succ` carries the comment that `Nat.succ _` matches `1`, `3`, `x+1`, and `Nat.cast_add_one` and the root `succ_nsmul` are not simp. The root `zero_nsmul` is.",
+    "requested_change": "Drop `@[simp]` from `natCast_succ` and `succ_nsmul` and keep it on `natCast_zero`/`zero_nsmul`. Pass them explicitly in the two inductions: `induction n with simp [*, natCast_succ]` in `realize_natCast` and `induction n with simp [*, presburger.succ_nsmul, add_nsmul]` in `realize_nsmul`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Data/Nat/Cast/Defs.lean:118-126 (comment 'Lemmas about `Nat.succ` need to get a low priority ... `Nat.succ _` matches `1`, `3`, `x+1`, etc. Rewriting would then produce really wrong terms'; `cast_succ` is `@[norm_cast 500]` and not simp; `cast_add_one` has no attribute). Mathlib/Algebra/Group/Defs.lean:578-584 (`pow_zero`/`zero_nsmul` is `simp high`; `pow_succ`/`succ_nsmul` is not simp)."
+  }
+]

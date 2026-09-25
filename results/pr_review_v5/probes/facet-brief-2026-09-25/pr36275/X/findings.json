@@ -1,0 +1,135 @@
+[
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.mulSupport_finite",
+    "claim": "`mulSupport_finite` uses a naming and statement form that was deprecated in this same area. FinitePlace.lean deprecated `FinitePlace.mulSupport_finite` in favour of `hasFiniteMulSupport` (2026-03-03). The name also does not say that the function is the norm.",
+    "requested_change": "Restate it as `(fun v ↦ ‖x v‖).HasFiniteMulSupport` and rename it `hasFiniteMulSupport_norm`, following `FinitePlace.hasFiniteMulSupport`. `tprod_eq_finprod` already takes `HasFiniteMulSupport f`.",
+    "severity": "blocking",
+    "evidence": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean:434 and :445 have `@[deprecated (since := \"2026-03-03\")] alias mulSupport_finite := hasFiniteMulSupport`. The theorems at :420 and :437 are stated with `.HasFiniteMulSupport`. Mathlib/Topology/Algebra/InfiniteSum/Basic.lean:447 has `tprod_eq_finprod ... (hf : HasFiniteMulSupport f)`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.hasProd_zero_subset_one_lt_valued",
+    "claim": "The two private lemmas have each other's names. `hasProd_zero_subset_one_lt_valued` is about `{v | Valued.v (x v) < 1}`, and `hasProd_subset_valued_lt_one` is about `{v | 1 < Valued.v (x v)}`.",
+    "requested_change": "Rename the lemma about `{v | Valued.v (x v) < 1}` to `hasProd_zero_subset_valued_lt_one`. Rename the one about `{v | 1 < Valued.v (x v)}` to `..._one_lt_valued`, or delete it (see the next finding).",
+    "severity": "advisory",
+    "evidence": "Seen in the diff. The name-to-set mismatch follows the order of `1 < Valued.v` and `< 1` in the two statements."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.hasProd_subset_valued_lt_one",
+    "claim": "The private lemma `hasProd_subset_valued_lt_one` rebuilds, by hand, a HasProd over a finite set. Its only use is to feed `HasProd.mul_disjoint`, where the value it computes is multiplied by 0 anyway.",
+    "requested_change": "Delete the lemma. In `hasProd_zero_of_not_isUnit`, use `((finite_valued_one_lt x).multipliable fun v ↦ ‖x v‖).hasProd` in its place.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Topology/Algebra/InfiniteSum/Basic.lean:134 has `protected theorem Set.Finite.multipliable {s : Set β} (hs : s.Finite) (f : β → α) : Multipliable (f ∘ (↑) : s → α)`. The PR adds `finite_valued_one_lt` in Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.tprod_norm_of_unit",
+    "claim": "The file adds several restatements of the same facts. `tprod_norm_of_unit` is just `tprod_norm_of_isUnit x.isUnit`. `tprod_eq_zero_of_not_isUnit` is `norm_eq_zero_of_not_isUnit` up to `rfl`. `norm_def_unit` is `tprod_norm_of_unit` again under a `norm_def`-style name, although it does not unfold a definition.",
+    "requested_change": "Keep only norm-level API. Keep `norm_eq_zero_of_not_isUnit`, proved as `(hasProd_zero_of_not_isUnit hx).tprod_eq`. Add one lemma `norm_eq_finprod_of_isUnit (hx : IsUnit x) : ‖x‖ = ∏ᶠ v, ‖x v‖`. Delete `tprod_norm_of_unit`, `tprod_eq_zero_of_not_isUnit` and `norm_def_unit`, or turn them into private helpers.",
+    "severity": "advisory",
+    "evidence": "Seen in the diff: `tprod_norm_of_unit x := tprod_norm_of_isUnit x.isUnit`, `norm_def_unit x := tprod_norm_of_unit x` and `norm_eq_zero_of_not_isUnit hx := tprod_eq_zero_of_not_isUnit hx`. The infinite-place analogue exposes only `norm_def` and `norm_eq_zero_of_not_isUnit` (Mathlib/NumberTheory/NumberField/InfiniteAdeleRing.lean:117-124)."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean instance : Norm 𝔸ᶠ[K]",
+    "claim": "The `Norm` instance has no docstring. The matching `Norm` instance on the infinite adele ring documents what the norm is.",
+    "requested_change": "Add a docstring to the instance. It should say that the norm is the product of the normalised local norms over all finite places, and that it is 0 on non-units, in the style of the `Norm K∞` docstring.",
+    "severity": "advisory",
+    "evidence": "Mathlib/NumberTheory/NumberField/InfiniteAdeleRing.lean:110-113: `/-- The norm on the infinite adele ring is given by the product of the normalized norms across infinite places. ... -/ instance [NumberField K] : Norm K∞`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean instance : Norm 𝔸ᶠ[K]",
+    "claim": "The instance and most lemmas write `x.1 v`, which is the raw subtype projection of the restricted product, and `(unitEmbedding ..).1` / `x.1` for `Units.val`. The private lemmas in the same file use the `DFunLike` coercion `x v`, which is how `FiniteAdeleRing` is meant to be applied.",
+    "requested_change": "Define `norm x := ∏' v, ‖x v‖`. Throughout the file, write `x v` in place of `x.1 v`, and `(x : 𝔸ᶠ[K])` / `(x : K)` in place of `.1` on units.",
+    "severity": "advisory",
+    "evidence": "Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:103-105 defines `DFunLike (FiniteAdeleRing R K) ...`, and existing lemmas there (`algebraMap_apply`, `isUnit_iff`) use `a v`. The PR mixes `‖x.1 v‖` (instance, `mulSupport_finite`, `tprod_*`) with `‖x v‖` (private lemmas)."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean module docstring",
+    "claim": "The module docstring says the file concerns 'the finite adele ring of a Dedekind domain `R` and its field of fractions'. In fact everything is stated for `𝓞 K`. The docstring also has no Main definitions / Main results section, so it never mentions the new norm or the product formula.",
+    "requested_change": "Rewrite the docstring to describe what the file contains. Add a `## Main definitions` / `## Main results` list naming the `Norm` instance on `𝔸ᶠ[K]`, `norm_eq_zero_of_not_isUnit` and the finite-adelic product formula. Add a `## References` entry, as the sibling adele files have.",
+    "severity": "advisory",
+    "evidence": "Compare with the headers of Mathlib/NumberTheory/NumberField/AdeleRing.lean:11-27 and Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:13-31, which both have Main definitions and References."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.unitEmbedding_norm_eq_inv_abs_norm",
+    "claim": "The finite-adelic product formula is stated only for `x : Kˣ` via `(unitEmbedding (𝓞 K) K x).1`. The identity `‖algebraMap K 𝔸ᶠ[K] x‖ = |Algebra.norm ℚ x|⁻¹` also holds for `x = 0`, where both sides are 0. The infinite analogue is stated for all `x : K` through `algebraMap`. The lemma also has no docstring.",
+    "requested_change": "Restate it as `theorem coe_norm_eq_inv_abs_norm (x : K) : ‖algebraMap K 𝔸ᶠ[K] x‖ = |Algebra.norm ℚ x|⁻¹`, handling `x = 0` through `norm_eq_zero_of_not_isUnit`. This mirrors `InfiniteAdeleRing.coe_norm_eq_abs_norm`. Add a docstring calling it the product formula for the finite adele ring, pointing to `FinitePlace.prod_eq_inv_abs_norm`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/NumberTheory/NumberField/InfiniteAdeleRing.lean:126-130: `/-- The product formula for the infinite adele ring. ... -/ theorem coe_norm_eq_abs_norm [NumberField K] (x : K) : ‖algebraMap K K∞ x‖ = |Algebra.norm ℚ x|`. Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:183 has the `@[simp] unitEmbedding_apply` rewrite to `algebraMap`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.unitEmbedding_norm_apply",
+    "claim": "The LHS `‖(unitEmbedding (𝓞 K) K x).1‖` of `unitEmbedding_norm_apply` and `unitEmbedding_norm_apply_eq_finprod_finitePlace` is not in simp-normal form, because `@[simp] unitEmbedding_apply` rewrites it to `algebraMap`. The `_apply` suffix is also a misnomer: it is a norm statement, not an application lemma.",
+    "requested_change": "State both in terms of `‖algebraMap K 𝔸ᶠ[K] x‖` with `(hx : x ≠ 0)`. Rename them to, for example, `norm_algebraMap_eq_finprod` and `norm_algebraMap_eq_finprod_finitePlace`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:183: `@[simp] theorem unitEmbedding_apply (k : Kˣ) : unitEmbedding R K k = algebraMap K 𝔸ᶠ[R, K] k := rfl`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.unitEmbedding_norm_apply_eq_finprod_finitePlace",
+    "claim": "The proof reindexes by hand, with `finprod_comp FinitePlace.equivHeightOneSpectrum.invFun FinitePlace.equivHeightOneSpectrum.symm.bijective` followed by `finprod_congr fun _ ↦ rfl`. The equivalence version already exists and is what ProductFormula uses for exactly this reindexing.",
+    "requested_change": "Prove it as `(unitEmbedding_norm_apply x).trans (finprod_comp_equiv FinitePlace.equivHeightOneSpectrum.symm)`, or with `rw [..., finprod_comp_equiv FinitePlace.equivHeightOneSpectrum.symm]`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Algebra/BigOperators/Finprod.lean:978 `finprod_comp_equiv (e : α ≃ β) {f : β → M} : (∏ᶠ i, f (e i)) = ∏ᶠ i', f i'`. It is used at Mathlib/NumberTheory/NumberField/ProductFormula.lean:48 with `equivHeightOneSpectrum.symm`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean PR (norm on FiniteAdeleRing)",
+    "claim": "The norm and every lemma except the product formula are specialised to `FiniteAdeleRing (𝓞 K) K` with `[NumberField K]`, but nothing in them uses `𝓞 K`. The local norm on `v.adicCompletion K`, and the new `FinitePlace.two_le_norm_of_one_lt_norm`, are available for any Dedekind `R` with `[Ring.HasFiniteQuotients R] [Infinite R]`. The adele ring API is deliberately general in `R` so that `ℤ`/`ℚ` can be used.",
+    "requested_change": "State the `Norm` instance on `FiniteAdeleRing R K` under `[Ring.HasFiniteQuotients R] [Infinite R]`. Do the same for `mulSupport_finite`, `hasProd_zero_of_not_isUnit`, `norm_def` and `norm_eq_zero_of_not_isUnit`. Specialise to `𝔸ᶠ[K]` only for the product-formula lemmas that go through `FinitePlace K`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean:93-94 and :116 set the variables `{R} [IsDedekindDomain R] [IsFractionRing R K] [Ring.HasFiniteQuotients R] [Infinite R]`, and :163 defines `instNormedFieldValuedAdicCompletion` in that generality. Mathlib/NumberTheory/NumberField/AdeleRing.lean:42-47: 'More generally `AdeleRing R K` can be used ... This enables use of rings like `AdeleRing ℤ ℚ`'."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean imports",
+    "claim": "The imports are unsorted (`ProductFormula` comes after `Topology...`), and two are redundant. `ProductFormula` publicly imports `Completion.FinitePlace`, which publicly imports `Topology.Algebra.Valued.NormedValued`.",
+    "requested_change": "Reduce the imports to `Mathlib.NumberTheory.NumberField.ProductFormula` and `Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing`, in sorted order.",
+    "severity": "advisory",
+    "evidence": "Mathlib/NumberTheory/NumberField/ProductFormula.lean:8 `public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace`. Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean:16 `public import Mathlib.Topology.Algebra.Valued.NormedValued`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean imports",
+    "claim": "The PR drops three existing imports that are unrelated to the new norm: `LinearAlgebra.FreeModule.IdealQuotient`, `RingTheory.DedekindDomain.AdicValuation` and `RingTheory.Valuation.Discrete.RankOne`. It also leaves two consecutive blank lines after `import Mathlib.Algebra.FiniteSupport.Basic`.",
+    "requested_change": "Revert the unrelated import removals, or move them to a separate import-cleanup PR, keeping only the reordering of `RamificationInertia.Inertia` if wanted. Delete the extra blank line before the module docstring.",
+    "severity": "advisory",
+    "evidence": "The base file Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean:8-19 has these imports. The diff removes them and replaces line 19 with an empty line, which gives a double blank line before `/-!`."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean NumberField.FinitePlace.two_le_norm_of_one_lt_norm",
+    "claim": "`two_le_norm_of_one_lt_norm` is inserted after `variable (K)` (line 278), so `K` is an explicit argument even though `x : v.adicCompletion K` determines it. It also re-binds `{v : HeightOneSpectrum R}`, shadowing the section variable `v`. It sits among the lemmas about `embedding v (algebraMap _ K x)` rather than beside `FinitePlace.norm_def`, the lemma about norms of completion elements. It has no docstring, although every neighbouring lemma has one.",
+    "requested_change": "Move it directly after `FinitePlace.norm_def` (before `variable (K)`) so that `K` is implicit, drop the redundant `{v : HeightOneSpectrum R}` binder, and add a docstring.",
+    "severity": "advisory",
+    "evidence": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean:94 declares `(v : HeightOneSpectrum R)` as a section variable, :261 is `FinitePlace.norm_def (x : v.adicCompletion K)`, and :278 is `variable (K)`. The diff hunk inserts the lemma after :307."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean NumberField.FinitePlace.two_le_norm_of_one_lt_norm",
+    "claim": "The lemma is weaker than what its proof establishes. The proof first shows `absNorm v.asIdeal ≤ absNorm v.asIdeal ^ n` with `n ≥ 1`, and only then weakens this to `2 ≤ ·`. The reusable fact is `(absNorm v.asIdeal : ℝ) ≤ ‖x‖` whenever `1 < ‖x‖`.",
+    "requested_change": "Add `absNorm_le_norm_of_one_lt_norm (h : 1 < ‖x‖) : (absNorm v.asIdeal : ℝ) ≤ ‖x‖` as the main lemma. Derive `two_le_norm_of_one_lt_norm` from it and `two_le_absNorm_nnreal` in one line.",
+    "severity": "advisory",
+    "evidence": "In the diff, the proof's last three steps are `apply (two_le_absNorm_nnreal v).trans; conv_lhs => rw [← zpow_one ...]; apply zpow_le_zpow_right₀ ...`. mlgrep found no existing `absNorm ... ≤ ‖·‖` lemma in Mathlib/NumberTheory, Mathlib/RingTheory/DedekindDomain or Mathlib/RingTheory/Valuation."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean NumberField.HeightOneSpectrum.two_le_absNorm_nnreal",
+    "claim": "`two_le_absNorm_nnreal` has no docstring, whereas its siblings `one_lt_absNorm`, `one_lt_absNorm_nnreal` and `absNorm_ne_zero` all have one.",
+    "requested_change": "Add a docstring, for example `/-- The norm of a maximal ideal as an element of `ℝ≥0` is `≥ 2` -/`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/NumberTheory/NumberField/Completion/FinitePlace.lean:120, :130 and :133 each have a docstring on the neighbouring lemma."
+  },
+  {
+    "target": "Mathlib/Topology/Algebra/Valued/NormedValued.lean Valued.toNormedField.norm_eq_one_iff",
+    "claim": "`norm_eq_one_iff` is the only lemma in its family without `@[simp]`: the six neighbouring `norm_le_iff`, `norm_lt_iff`, `norm_le_one_iff`, `norm_lt_one_iff`, `one_le_norm_iff` and `one_lt_norm_iff` all carry it. Its proof also departs from the siblings' shared `rw [← map_one val.v, ← v.restrict_…]; simpa only [map_one] using! (strictMono …)` shape.",
+    "requested_change": "Tag it `@[simp]`. Write the proof in the sibling pattern, using `(Valuation.RankOne.strictMono val.v).injective.eq_iff`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Topology/Algebra/Valued/NormedValued.lean:229-257: all six neighbouring lemmas are `@[simp]` and share the same proof shape."
+  },
+  {
+    "target": "Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean IsDedekindDomain.FiniteAdeleRing.cofinite_mem_adicCompletionIntegers",
+    "claim": "`cofinite_mem_adicCompletionIntegers` restates `RestrictedProduct.eventually` (`x.2`) for `FiniteAdeleRing`. Its name does not follow Mathlib's `eventually_*` convention for `∀ᶠ` statements. It is used once, and existing code in the same file just writes `a.2`.",
+    "requested_change": "Rename it to `eventually_mem_adicCompletionIntegers`, following `RestrictedProduct.eventually`. Alternatively, delete it and use `a.2` in `finite_valued_one_lt`, as `isUnit_iff` already does.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Topology/Algebra/RestrictedProduct/Basic.lean:124 `@[simp] lemma eventually (x : Πʳ i, [R i, A i]_[𝓕]) : ∀ᶠ i in 𝓕, x i ∈ A i := x.2`. Mathlib/RingTheory/DedekindDomain/FiniteAdeleRing.lean:164 uses `a.2` directly."
+  },
+  {
+    "target": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean NumberField.FiniteAdeleRing.hasProd_zero_subset_one_lt_valued",
+    "claim": "There is a double space before `:=` in `have (v : _) (h : v ∈ S) : 2 ≤ ‖(x v)⁻¹‖  := by`, and `tprod_eq_zero_of_not_isUnit` writes `¬ IsUnit` where the rest of the file writes `¬IsUnit`.",
+    "requested_change": "Remove the extra space, and write `¬IsUnit x` consistently.",
+    "severity": "advisory",
+    "evidence": "Seen in the diff of the new file."
+  }
+]

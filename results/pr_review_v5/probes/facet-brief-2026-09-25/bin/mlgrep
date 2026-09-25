@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# mlgrep <pr> <extended-regex> [pathspec, default Mathlib]  -- search Mathlib as it was at the PR's base commit (first 60 hits)
+source "$(dirname "$0")/_base.sh" "$1" || exit 2
+git -C "$CLONE" grep -n -E -e "$2" "$BASE" -- "${3:-Mathlib}" | sed "s|^$BASE:||" | head -60

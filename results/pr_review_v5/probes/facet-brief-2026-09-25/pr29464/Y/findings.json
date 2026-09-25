@@ -1,0 +1,72 @@
+[
+  {
+    "target": "PR",
+    "object": "the PR as a whole",
+    "reference": "process",
+    "warrant": "judgment",
+    "claim": "The description is empty, and the title says only that the edits came from an LLM. The diff mixes real corrections with cosmetic churn. The corrections: the main statement's summand `g(n)` becomes `g(u)`; `a_pos`/`b_pos` said 'nonzero' but mean 'positive'; the duplicated 'Definition of Akra-Bazzi recurrences' section is removed from AkraBazzi.lean; `asympBound`/`GrowsPolynomially` are dropped from the 'Main definitions' lists of files that do not define them; the stale 'defines `R.asympBound`' sentence is fixed. The churn: hyphen to en-dash, backticks to LaTeX with `\\bigl`, rewording. With no list of what was corrected and no statement that each LLM edit was checked against the code, a reviewer must re-verify every changed line. Several edited lines still misstate the code (see the other findings), which shows the edits were not all checked.",
+    "requested_change": "Write a description that lists the substantive corrections and states that the author checked each changed sentence against the Lean code. Consider dropping the purely typographic churn (en-dashes, the backtick-to-LaTeX rewrites), or moving it to a separate PR, so that the corrections can be reviewed on their own.",
+    "severity": "advisory",
+    "evidence": "pr.md: title 'doc(AkraBazzi): corrections to docs by way of LLM', description '(no description)'. diff.patch: substantive hunks at AkraBazzi.lean module doc (g(n)->g(u)), SumTransform.lean structure fields a_pos/b_pos, removal of AkraBazzi.lean:63-70 (duplicate of SumTransform.lean:39-45); cosmetic hunks everywhere else."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, section doc 'The sum transform' (before sumTransform)",
+    "object": "module_doc (section header) in SumTransform.lean",
+    "reference": "intent",
+    "warrant": "judgment",
+    "claim": "The PR rewrote the line that defines the sum transform as `∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`, but `sumTransform` is `n ^ p * ∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`. The `n ^ p` factor is missing. The docstring just below, and the module-doc bullet the PR also edited, both include it. So the section doc contradicts the definition it introduces, and a 'corrections' PR that touched this exact line kept the error.",
+    "requested_change": "Write the section doc as `n ^ p * ∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`, matching the `sumTransform` docstring and definition.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Computability/AkraBazzi/SumTransform.lean:537-538 (section doc, edited by the PR only for spacing) vs :544-547 (`sumTransform` docstring and body `n ^ p * ∑ u ∈ Finset.Ico n₀ n, g u / u ^ (p + 1)`)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, section doc 'Smoothing function'",
+    "object": "module_doc (section header) in SumTransform.lean",
+    "reference": "intent",
+    "warrant": "judgment",
+    "claim": "The PR changes the Lean expression `1 ± ε n` to the LaTeX `$1 \\pm \\varepsilon\\,n$`. In Lean, `ε n` is the application `smoothingFn n = 1 / log n`. In math mode, `\\varepsilon\\,n` reads as the product ε·n, so the rendered doc now describes a different factor. The sentence just before it keeps `ε` in backticks as the local notation, so readers see the same symbol as a function and then as a scalar.",
+    "requested_change": "Keep the Lean form in backticks (`1 ± ε n`), or write `$1 \\pm \\varepsilon(n)$`.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Computability/AkraBazzi/SumTransform.lean:251-252 (edited line), :265 `noncomputable def smoothingFn (n : ℝ) : ℝ := 1 / log n`, :267 `local notation \"ε\" => smoothingFn`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, T_isBigO_smoothingFn_mul_asympBound and smoothingFn_mul_asympBound_isBigO_T (proof comments)",
+    "object": "theorem proofs (comment lines changed)",
+    "reference": "intent",
+    "warrant": "judgment",
+    "claim": "The PR rewrote both base-case comments to 'Max/Min of the ratio `T n / asympBound g a b n` over the base case `n ∈ [b' * n₀, n₀)`'. But `base_max`/`base_min` range over `T n / ((1 ∓ ε n) * asympBound g a b n)`. The smoothing factor, which the docstrings above say is the whole reason these lemmas exist, is left out, and the range is really `Finset.Ico ⌊b' * n₀⌋₊ n₀`. The rewritten comments are still inaccurate, now in Lean syntax that looks exact.",
+    "requested_change": "Write the ratio as `T n / ((1 - ε n) * asympBound g a b n)` in the upper-bound proof and `T n / ((1 + ε n) * asympBound g a b n)` in the lower-bound proof, and write the range as `n ∈ [⌊b' * n₀⌋₊, n₀)` (or 'Finset.Ico ⌊b' * n₀⌋₊ n₀').",
+    "severity": "advisory",
+    "evidence": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean:503 (comment) vs :505-507 (`sup' ... fun n => T n / ((1 - ε n) * asympBound g a b n)`); :656 (comment) vs :657-659 (`inf' ... T n / ((1 + ε n) * asympBound g a b n)`)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean, smoothingFn_mul_asympBound_isBigO_T (proof comment)",
+    "object": "theorem proof (comment lines)",
+    "reference": "its siblings",
+    "warrant": "exhibit",
+    "claim": "In the upper-bound proof the PR changed the comment 'cancel out the `g(n)` term' to 'cancel out the `g n` term'. The same comment in the lower-bound twin was not changed and still reads 'cancel out the g(n) term', without backticks. The fix was applied to one sibling but not the other.",
+    "requested_change": "Make the same edit in smoothingFn_mul_asympBound_isBigO_T: 'cancel out the `g n` term in the calculation below'.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Computability/AkraBazzi/AkraBazzi.lean:508-509 (upper bound, edited by the PR) vs :660-661 (lower bound, `-- out the g(n) term in the calculation below`, untouched; not in diff.patch)."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/{AkraBazzi,GrowsPolynomially,SumTransform}.lean (module docs and docstrings)",
+    "object": "declarations as a group (prose)",
+    "reference": "its siblings",
+    "warrant": "exhibit",
+    "claim": "The switch from backticks to LaTeX is applied to some siblings and not others, sometimes for the same formula in the same file. In GrowsPolynomially.lean the module doc now reads `$c_1\\, g(n) \\le g(u) \\le c_2\\, g(n)$`, while the `GrowsPolynomially` docstring a few lines below keeps `` `c₁ g(n) ≤ g(u) ≤ c₂ g(n)` ``. The Lean typing `T : ℕ → ℝ` is put in math mode in the AkraBazzi.lean module doc (`$T : ℕ → ℝ$`) but stays in backticks in the SumTransform.lean module doc. In the SumTransform list, `sumTransform` stays in Lean code while `asympBound` becomes LaTeX. The AkraBazzi.lean module doc uses `\\sum` in its display formula and a Unicode `$∑ a_i b_i^p = 1$` a few lines later, while SumTransform.lean writes the same identity as `$\\sum a_i b_i^p = 1$`.",
+    "requested_change": "Choose one convention and apply it throughout. Lean expressions (typings such as `T : ℕ → ℝ`, applications such as `ε n`) stay in backticks; mathematical formulas go in LaTeX with LaTeX macros (`\\sum`, `\\le`), not Unicode. Alternatively, revert the notation changes and keep only the wording corrections.",
+    "severity": "advisory",
+    "evidence": "diff.patch hunks: GrowsPolynomially.lean module doc (LaTeX) vs GrowsPolynomially.lean:34-36 docstring (backticks); AkraBazzi.lean module doc `$T : ℕ → ℝ$` and `$∑ a_i b_i^p = 1$` vs SumTransform.lean module doc `` `T : ℕ → ℝ` `` and SumTransform section 'Akra–Bazzi exponent `p`' `$\\sum a_i b_i^p = 1$`."
+  },
+  {
+    "target": "Mathlib/Computability/AkraBazzi/SumTransform.lean, module doc bullet for AkraBazziRecurrence",
+    "object": "module_doc in SumTransform.lean",
+    "reference": "intent",
+    "warrant": "judgment",
+    "claim": "The PR reflowed this bullet but kept two inaccuracies. First, `AkraBazziRecurrence` is called 'the predicate', but it is a structure with a data field (`n₀ : ℕ`), so it lives in `Type`, not `Prop`. Second, the parameters are described 'as above', but nothing above in this file explains them. That explanation is in the AkraBazzi.lean module doc, a downstream file that imports this one. The SumTransform page therefore points readers at text that is not on it.",
+    "requested_change": "Say 'the structure bundling the data and hypotheses stating that `T : ℕ → ℝ` satisfies an Akra–Bazzi recurrence', and replace 'as above' with a pointer to the structure's docstring or to `Mathlib.Computability.AkraBazzi.AkraBazzi` (or state the recurrence inline). Make the same 'predicate' fix in the section doc 'Definition of Akra–Bazzi recurrences'.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Computability/AkraBazzi/SumTransform.lean:19-20 (bullet, edited by the PR); :39-45 (section doc 'This section defines the predicate'); structure fields in diff.patch starting `n₀ : ℕ`; Mathlib/Computability/AkraBazzi/AkraBazzi.lean imports the SumTransform file and carries the parameter explanation in its module doc (lines 12-30)."
+  }
+]

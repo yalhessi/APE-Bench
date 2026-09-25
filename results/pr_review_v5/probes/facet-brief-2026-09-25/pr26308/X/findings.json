@@ -1,0 +1,107 @@
+[
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized",
+    "claim": "`normalized` and all of its lemmas are declared in the root namespace under a very generic name, right next to the unrelated root-namespace `normalize`, `normalize_zero`, `normalize_idem`, `normalize_eq_zero` from GCDMonoid.",
+    "requested_change": "Put the definition and every lemma in the file inside `namespace NormedSpace` (so the definition becomes `NormedSpace.normalized`, or `NormedSpace.normalize` after the rename requested separately).",
+    "severity": "blocking",
+    "evidence": "Mathlib/Algebra/GCDMonoid/Basic.lean:91 defines root `normalize : α →*₀ α`, with root lemmas `normalize_zero` (l.120), `normalize_eq_zero` (l.128), `normalize_idem` (l.143). Other normalisation maps are namespaced: Mathlib/MeasureTheory/Measure/ProbabilityMeasure.lean:377 and Mathlib/Probability/ProbabilityMassFunction/Constructions.lean:244 (`PMF.normalize`). mlfind finds no existing `normalized`."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized",
+    "claim": "The function is named with an adjective, `normalized`. Mathlib names the analogous normalisation operations with the verb `normalize`.",
+    "requested_change": "Rename the definition to `normalize`, which inside the namespace becomes `NormedSpace.normalize`. Rename the lemmas to match (`normalize_zero`, `norm_normalize_eq_one_iff`, `normalize_normalize`, `normalize_smul_of_pos`, `normalize_neg`, `normalize_smul_of_neg`, ...) and the file to `Normalize.lean`.",
+    "severity": "advisory",
+    "evidence": "`def normalize` at Mathlib/Algebra/GCDMonoid/Basic.lean:91, Mathlib/MeasureTheory/Measure/ProbabilityMeasure.lean:377, Mathlib/Probability/ProbabilityMassFunction/Constructions.lean:244; mlgrep 'def normaliz' finds no adjective-named normalisation function."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized_zero_eq_zero",
+    "claim": "`normalized_zero_eq_zero` does not follow the Mathlib naming convention for `f 0 = 0` lemmas, which is `f_zero`.",
+    "requested_change": "Rename `normalized_zero_eq_zero` to `normalized_zero` (or `normalize_zero` after the rename).",
+    "severity": "advisory",
+    "evidence": "Sibling `normalize_zero : normalize (0 : α) = 0` at Mathlib/Algebra/GCDMonoid/Basic.lean:120. mlcount: 1315 theorem/lemma lines named `..._zero :` against 8 named `..._zero_eq_zero`."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: imports",
+    "claim": "The file imports `Mathlib.Analysis.RCLike.Basic` but uses no `RCLike` material: everything is over `ℝ` with `[NormedSpace ℝ V]`. That import pulls in `Analysis.CStarAlgebra.Basic`, `Normed.Operator.ContinuousLinearMap`, `Data.Real.Sqrt` and more.",
+    "requested_change": "Replace `import Mathlib.Analysis.RCLike.Basic` with `import Mathlib.Analysis.Normed.Module.Basic` (the file that defines `NormedSpace`), adding only what the proofs actually need.",
+    "severity": "advisory",
+    "evidence": "Mathlib/Analysis/RCLike/Basic.lean:6-13 imports; Mathlib/Analysis/NormedSpace/RCLike.lean:26 says that file 'exists mainly to avoid importing `RCLike` in the main normed space theory files'; Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:6 builds the same `‖x‖⁻¹ • x` map over `[NormedSpace ℝ E]` importing only `Mathlib.Analysis.Normed.Module.Basic`; `NormedSpace` is defined at Mathlib/Analysis/Normed/Module/Basic.lean:40."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean",
+    "claim": "The new file is placed in the legacy `Mathlib/Analysis/NormedSpace/` directory, although basic normed-module material now lives in `Mathlib/Analysis/Normed/Module/`.",
+    "requested_change": "Move the file to `Mathlib/Analysis/Normed/Module/Normalize.lean` (updating the `Mathlib.lean` import line accordingly).",
+    "severity": "advisory",
+    "evidence": "The `NormedSpace` class is defined in Mathlib/Analysis/Normed/Module/Basic.lean:40. The closely related unit-vector lemmas `sameRay_iff_inv_norm_smul_eq` are in Mathlib/Analysis/Normed/Module/Ray.lean:72-84. Mathlib.lean:1687-1695 list the Normed.Module files."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: copyright header",
+    "claim": "This new file's header says `Copyright (c) 2020`, but the PR's base is from mid-2025.",
+    "requested_change": "Change the copyright year to 2025.",
+    "severity": "advisory",
+    "evidence": "The base tree already contains `@[deprecated (since := \"2025-06-18\")]` (Mathlib/Algebra/Module/Submodule/Map.lean:693), and mlcount finds 1241 deprecations dated 2025-05/06."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: module docstring",
+    "claim": "The module docstring is ungrammatical ('Function that calculates unit length vector from a vector (if the given vector is nonzero vector) ...'). It does not name the definition or say which direction the unit vector points.",
+    "requested_change": "Rewrite the module docstring, e.g. 'We define `NormedSpace.normalize x = ‖x‖⁻¹ • x`, the unit vector pointing in the same direction as a nonzero vector `x` (and `0` for `x = 0`), and prove basic lemmas about it.' Add a `## Main definitions` entry naming the definition. Reword the definition's docstring the same way ('the unit vector in the direction of `x`').",
+    "severity": "advisory",
+    "evidence": "Diff lines 8-14 of the new file. Comparable headers: Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:9-15 and Mathlib/Analysis/NormedSpace/RCLike.lean:10-27, which has `## Main definitions`."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: variable block",
+    "claim": "The variables are split over three separate `variable` commands.",
+    "requested_change": "Merge them into one line: `variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]`.",
+    "severity": "advisory",
+    "evidence": "One-line form used at Mathlib/Analysis/Calculus/Deriv/Abs.lean:23, Mathlib/Analysis/BoxIntegral/Partition/Additive.lean:164, Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:17."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized_neg",
+    "claim": "The proof of `normalized_neg` splits on `x = 0` for no reason: after unfolding, `norm_neg` and `smul_neg` close the goal for every `x`.",
+    "requested_change": "Replace the proof with `by simp [normalized]`.",
+    "severity": "advisory",
+    "evidence": "Unfolded goal `‖-x‖⁻¹ • -x = -(‖x‖⁻¹ • x)` is closed by the simp lemmas `norm_neg` and `smul_neg` with no nonzero hypothesis; the zero branch `simp [hx]` is redundant."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized_neg",
+    "claim": "`normalized_neg` writes `(- x)` and `- normalized x` with a space after unary minus, and it lacks `@[simp]` although it is an unconditional push-through rewrite like its sibling lemmas.",
+    "requested_change": "Write `normalized (-x) = -normalized x` (also `(-x)` and `-r` in `normalized_smul_of_neg`), and tag `normalized_neg` with `@[simp]`.",
+    "severity": "advisory",
+    "evidence": "Diff: `theorem normalized_neg (x : V) : normalized (- x) = - normalized x` and `(r := - r) ... (- x)` in `normalized_smul_of_neg`. Mathlib style is `-x`, e.g. `neg_smul_neg : -r • -x = r • x` at Mathlib/Algebra/Module/Defs.lean:138."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized_smul_of_neg",
+    "claim": "The proof of `normalized_smul_of_neg` uses `linarith` to prove `0 < -r` and a terminal `field_simp` to close the purely module-theoretic goal `normalized (r • x) = normalized (-r • -x)`.",
+    "requested_change": "Use the direct lemmas: `rw [← normalized_neg, ← normalized_smul_of_pos (neg_pos.2 hr) (-x), neg_smul_neg]`.",
+    "severity": "advisory",
+    "evidence": "`neg_smul_neg : -r • -x = r • x` at Mathlib/Algebra/Module/Defs.lean:138. The goal left before the diff's `field_simp` is exactly `normalized (r • x) = normalized (-r • -x)`."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized_normalized",
+    "claim": "The proof of `normalized_normalized` rewrites the hypothesis backwards (`rw [← ne_eq, ← norm_normalized_eq_one_iff] at hx`) just to feed `simp`, when the two lemmas just proved compose directly.",
+    "requested_change": "Write it as `rcases eq_or_ne x 0 with rfl | hx; · simp; exact normalized_eq_self_of_norm_eq_one (norm_normalized_eq_one_iff.2 hx)`, or as `by_cases hx : x = 0 <;> simp [hx]`, which lets the simp lemmas `normalized_eq_self_of_norm_eq_one` and `norm_normalized_eq_one_iff` discharge the side condition.",
+    "severity": "advisory",
+    "evidence": "Both `normalized_eq_self_of_norm_eq_one` and `norm_normalized_eq_one_iff` are introduced as `@[simp]` just above in the diff. The `rcases eq_or_ne x 0 with rfl | hx` idiom is used at Mathlib/Analysis/Normed/Module/Ray.lean:82-83 and Mathlib/Algebra/GCDMonoid/Basic.lean:138."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: norm_normalized_eq_one_iff",
+    "claim": "The proof of `norm_normalized_eq_one_iff` goes through `constructor` / `contrapose!` / `rintro rfl` and an inline `show ‖x‖ ≠ 0 by simp [h]` where a plain case split and an existing lemma suffice.",
+    "requested_change": "Restructure it as `rcases eq_or_ne x 0 with rfl | hx` with `simp` in the zero case and `simp [normalized, norm_smul, hx]` otherwise. Where the fact is needed, use `norm_ne_zero_iff.2 h` instead of `show ‖x‖ ≠ 0 by simp [h]`.",
+    "severity": "advisory",
+    "evidence": "`norm_ne_zero_iff` is used for exactly this at Mathlib/Analysis/Normed/Module/Ray.lean:75 and Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:33. The case-split idiom is at Ray.lean:82-83."
+  },
+  {
+    "target": "Mathlib/Analysis/NormedSpace/Normalized.lean: normalized",
+    "claim": "The new definition is missing its most basic API: the characterisation of when it vanishes, the reconstruction `‖x‖ • normalized x = x`, and the bound `‖normalized x‖ ≤ 1`. Without these it is not usable at the sites that currently write `‖x‖⁻¹ • x` by hand.",
+    "requested_change": "Add `@[simp] normalized_eq_zero_iff : normalized x = 0 ↔ x = 0`, `norm_smul_normalized (x : V) : ‖x‖ • normalized x = x` and `norm_normalized_le_one (x : V) : ‖normalized x‖ ≤ 1` (the analogue of `inv_norm_smul_mem_unitClosedBall`).",
+    "severity": "advisory",
+    "evidence": "Sibling API `normalize_eq_zero` at Mathlib/Algebra/GCDMonoid/Basic.lean:128. `inv_norm_smul_mem_unitClosedBall` at Mathlib/Analysis/NormedSpace/Real.lean:37. `homeomorphUnitSphereProd` inverts `‖x‖⁻¹ • x` by `r • x` at Mathlib/Analysis/NormedSpace/SphereNormEquiv.lean:24-35. Hand-written `‖x‖⁻¹ • x` appears in Analysis/Convex/Uniform.lean:69-79, Analysis/Calculus/Rademacher.lean:292 and Analysis/NormedSpace/OperatorNorm/Basic.lean:251."
+  },
+  {
+    "target": "PR",
+    "claim": "The PR has no description, so reviewers cannot tell why this definition is wanted or where it will be used.",
+    "requested_change": "Add a PR description stating the motivation and the intended downstream use of the definition.",
+    "severity": "advisory",
+    "evidence": "pr.md: 'Description: (no description)'."
+  }
+]
