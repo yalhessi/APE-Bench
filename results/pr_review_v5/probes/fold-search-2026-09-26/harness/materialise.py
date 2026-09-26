@@ -68,6 +68,27 @@ def pick_base(created, review_at):
     cands = [(norm(date), sha, tc) for sha, (date, tc) in bases.items() if lo <= norm(date) <= hi]
     if not cands: return None
     d, sha, tc = max(cands); return (d.isoformat(), sha, tc)
+import functools
+IMPORT = re.compile(r"^(?:public\s+)?import\s+(Mathlib(?:\.[\w']+)+)\s*$", re.M)
+@functools.lru_cache(maxsize=None)
+def import_graph(ws):
+    """module -> set of imported Mathlib modules, over the base workspace's Mathlib tree."""
+    root = Path(ws) / "Mathlib"; g = {}
+    for f in root.rglob("*.lean"):
+        mod = "Mathlib." + ".".join(f.relative_to(root).with_suffix("").parts)
+        try: g[mod] = set(IMPORT.findall(f.read_text(errors="replace")))
+        except Exception: g[mod] = set()
+    return g
+def dependents(g, mod):
+    rev = {}
+    for a, deps in g.items():
+        for d in deps: rev.setdefault(d, set()).add(a)
+    out, todo = set(), [mod]
+    while todo:
+        x = todo.pop()
+        for y in rev.get(x, ()):
+            if y not in out: out.add(y); todo.append(y)
+    return out
 index, skipped = [], Counter()
 for a in asks:
     if a["findable"] == ["pr_internal"] or not a["path"] or a["kind"] != "review_comment":
@@ -97,20 +118,26 @@ for a in asks:
     while j < len(lines) and (lines[j].startswith("import ") or lines[j].startswith("public import ") or lines[j].strip() in ("module", "") or lines[j].startswith("/-") or lines[j].startswith("-/") or lines[j].startswith("Copyright") or lines[j].startswith("Released") or lines[j].startswith("Authors") or lines[j].startswith("Author")): j += 1
     last_import = max((i for i in range(j) if lines[i].startswith("import ") or lines[i].startswith("public import ")), default=None)
     if last_import is None: skipped["no import line"] += 1; continue
-    # the whole library at the chosen base, and the file's own declarations under a fresh namespace
-    # so they never clash with the base's copy of this module
+    # the whole library at the chosen base, minus this file's own module and everything depending on it
+    g = import_graph(str(WS / chosen[1]))
+    own = "Mathlib." + ".".join(Path(a["path"]).with_suffix("").parts[1:])
+    excluded = {own} | dependents(g, own)
+    extra = sorted(mod for mod in g if mod not in excluded)
+    own_imports = set(IMPORT.findall("\n".join(lines[:last_import + 1])))
+    missing_own = [x for x in own_imports if x not in g]
+    if missing_own: skipped["own import absent at base"] += 1; continue
     ismod = any(l.strip() == "module" for l in lines[:12])
-    out = lines[:last_import + 1] + [("public import Mathlib" if ismod else "import Mathlib"), "import Fold"]
-    rest = lines[last_import + 1:]
-    # keep a leading module docstring / `@[expose] public section` prologue outside the namespace? no: inside is fine
-    out += ["", "set_option maxHeartbeats 4000000", "", "namespace HarnessProbe", ""] + rest
+    kw = "public import" if ismod else "import"
+    # an own import that, at this base, depends on the file's own module would pull the base's copy in
+    header = [l for l in lines[:last_import + 1] if not (IMPORT.match(l) and IMPORT.match(l).group(1) in excluded)]
+    dropped_own = [x for x in own_imports if x in excluded]
+    out = header + [f"{kw} {mod}" for mod in extra if mod not in own_imports] + ["import Fold"] + lines[last_import + 1:]
     out += ["", "set_option maxHeartbeats 4000000", ""]
     for i, k, n, f in sorted(added_full):
-        out.append(f"#fold_decl HarnessProbe.{f}   -- line {i + 1}{'  SITE' if f == site_full else ''}")
-    out += ["", "end HarnessProbe"]
+        out.append(f"#fold_decl {f}   -- line {i + 1}{'  SITE' if f == site_full else ''}")
     fn = H / f"{a['cid']}.lean"; fn.write_text("\n".join(out) + "\n")
     index.append(dict(a, commit=commit, base=base, line=line, site_decl=site_full, added=[f for _, _, _, f in sorted(added_full)], file=str(fn), month=(b["pr"].get("created_at") or "")[:7],
-                      workspace=str(WS / chosen[1]), workspace_date=chosen[0][:10], toolchain=chosen[2], review_at=(rc.get("created_at") or "")[:10], is_module=lines[0:8].count("module") > 0 or any(l.strip() == "module" for l in lines[:12])))
+                      workspace=str(WS / chosen[1]), workspace_date=chosen[0][:10], excluded_modules=len(excluded), imported_modules=len(extra), dropped_own_imports=dropped_own, toolchain=chosen[2], review_at=(rc.get("created_at") or "")[:10], is_module=lines[0:8].count("module") > 0 or any(l.strip() == "module" for l in lines[:12])))
 json.dump(index, open(H / "index.json", "w"), indent=1, ensure_ascii=False)
 print("asks", len(asks), "materialised", len(index), "skipped", dict(skipped))
 print("by sample:", Counter(x["sample"] for x in index), "site decl found:", sum(1 for x in index if x["site_decl"]), "added decls total:", sum(len(x["added"]) for x in index))

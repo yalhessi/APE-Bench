@@ -13,7 +13,7 @@ PY
 while read -r cid W tc ismod; do
   D=$S/fold2_${tc}_$ismod
   if [ ! -f "$D/Fold.olean" ]; then
-    mkdir -p "$D"; if [ "$ismod" = "1" ]; then cp "$S/v6h2/Fold.lean" "$D/Fold.lean"; else cp "$S/v6h2/FoldPlain.lean" "$D/Fold.lean"; fi
+    mkdir -p "$D"; if [ "$ismod" = "1" ]; then cp "$S/v6h4/Fold.lean" "$D/Fold.lean"; else cp "$S/v6h4/FoldPlain.lean" "$D/Fold.lean"; fi
     ( cd "$W" && lake env lean -Dexperimental.module=true --root="$D" -o "$D/Fold.olean" -i "$D/Fold.ilean" "$D/Fold.lean" > "$D/compile.out" 2>&1 \
       || lake env lean --root="$D" -o "$D/Fold.olean" -i "$D/Fold.ilean" "$D/Fold.lean" > "$D/compile.out" 2>&1 )
     echo "Fold for $tc module=$ismod: $( [ -f "$D/Fold.olean" ] && echo ok || echo FAILED ) $(grep -c ': error' "$D/compile.out") errors $(grep -m1 ': error' "$D/compile.out" | cut -c1-160 | sed 's|/tmp/claude[^ ]*fold_||')"

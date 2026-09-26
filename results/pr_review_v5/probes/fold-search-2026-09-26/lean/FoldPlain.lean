@@ -148,8 +148,9 @@ def entriesOf (env : Environment) (n : Name) (ci : ConstantInfo) : MetaM (Array 
         if h.toString.endsWith "match_1" || (`casesOn).isSuffixOf h || (`rec).isSuffixOf h then return #[]
       if !body.hasExprMVar || patternLike body then return #[]
       return keyed (← DiscrTree.mkPath body) { const := n, via := n, kind := .defBody }
-    | .thmInfo t =>
-      let (_, _, body) ← forallMetaTelescope t.type
+    | .thmInfo _ | .axiomInfo _ | .opaqueInfo _ =>
+      -- under the module system an imported theorem whose proof is not exposed is not a `thmInfo`
+      let (_, _, body) ← forallMetaTelescope ci.type
       let sides? : Option (Expr × Expr) := match body.iff?, body.eq? with
         | some (a, b), _ => some (a, b) | _, some (_, a, b) => some (a, b) | _, _ => none
       let some (a, b) := sides? | return #[]
@@ -175,7 +176,13 @@ def buildTree : MetaM (DiscrTree Entry) := do
   let mut tree : DiscrTree Entry := DiscrTree.empty
   let mut nDef := 0; let mut nCls := 0; let mut nLem := 0; let mut nErr := 0
   let t0 ← IO.monoMsNow
-  for (n, ci) in env.constants.toList do
+  -- imported constants through the module data (under the module system `env.constants` does not
+  -- enumerate imported theorems), then the file's own constants
+  let mut all : Array (Name × ConstantInfo) := #[]
+  for mod in env.header.moduleData do
+    for ci in mod.constants do all := all.push (ci.name, ci)
+  for (n, ci) in env.constants.map₂.toList do all := all.push (n, ci)
+  for (n, ci) in all do
     if skipName n then continue
     let es ← try entriesOf env n ci catch _ => (do pure #[])
     if es.isEmpty && !(ci matches .defnInfo _ | .thmInfo _ | .inductInfo _) then continue
@@ -195,7 +202,11 @@ elab "#fold_build" : command => runTermElabM fun _ => do
   let env ← getEnv
   let t0 ← IO.monoMsNow
   let mut n := 0
-  for (c, ci) in env.constants.toList do
+  let mut all : Array (Name × ConstantInfo) := #[]
+  for mod in env.header.moduleData do
+    for ci in mod.constants do all := all.push (ci.name, ci)
+  for (c, ci) in env.constants.map₂.toList do all := all.push (c, ci)
+  for (c, ci) in all do
     if skipName c then continue
     let es ← try entriesOf env c ci catch _ => pure #[]
     for e in es do
@@ -271,6 +282,23 @@ def properParts (s : Expr) : Array Expr := Id.run do
     else if a.isApp && a.nat?.isNone && !a.isAppOf `OfNat.ofNat then out := out.push a
   return out
 
+/-- A naming fold: the head is a non-generic constant and every argument is an atom (variable,
+constant, literal, sort), an instance, or a part of some query level. Anything else is a rewrite of
+the subterm into another shape rather than a name for it. -/
+def isNamingFold (fold : Expr) (levels : Array Expr) : MetaM Bool := do
+  let some h := headConst? fold | return false
+  if isGeneric h then return false
+  for a in fold.getAppArgs do
+    if a.isFVar || a.isConst || a.isSort || a.isLit || a.nat?.isSome || a.isAppOf `OfNat.ofNat then continue
+    if a.isMVar then return false
+    if a.isLambda && !a.bindingBody!.hasLooseBVars then continue   -- a constant type family
+    let ty ← try inferType a catch _ => return false
+    if ty.isSort then continue                                       -- a type argument
+    if (← isClass? ty).isSome then continue                          -- an instance
+    if levels.any (fun l => (l.find? (· == a)).isSome) then continue -- a part of the query
+    return false
+  return true
+
 /-- Fold one subterm `s`, sitting under the bound variables `xs`, and log every kept hit. -/
 def foldSub (tree : DiscrTree Entry) (s : Expr) (xs : Array Expr) (seen : IO.Ref (Std.HashSet String)) : MetaM Unit := do
   if (← isClass? (← inferType s)).isSome then return   -- an instance term is not a fold subject
@@ -298,7 +326,8 @@ def foldSub (tree : DiscrTree Entry) (s : Expr) (xs : Array Expr) (seen : IO.Ref
     let key := s!"{en.const}|{← ppExpr fold}"
     if (← seen.get).contains key then continue
     seen.modify (·.insert key)
-    let mut msg := m!"#fold {s} ⇒ {fold}   [{en.const}, via {en.via}, {kindStr en.kind}]"
+    let naming ← isNamingFold fold levels
+    let mut msg := m!"#fold {s} ⇒ {fold}   [{en.const}, via {en.via}, {kindStr en.kind}, {if naming then "naming" else "rewrite"}]"
     if let some x := xs.back? then
       if fold.isApp && fold.appArg! == x && !(fold.appFn!.containsFVar x.fvarId!) then
         msg := msg ++ m!"\n      as a function of {x}: {fold.appFn!}"
