@@ -218,3 +218,44 @@ three obligations. It claims that the loss is at the decision, that the decision
 maintainers' reference, that the corpus holds it, and that a bench exists on which a change of
 20% is visible. If C3 fails its gate on that bench, the corpus-at-the-decision design is closed
 with a measurement, which the record does not yet have.
+
+## Revision, 2026-09-26: precedent recognition demoted; the mechanical two thirds first
+
+**What the two validation runs added.** The current pipeline reaches 8 of 30 validation asks (27%),
+the solo reviewer 2 of 30; neither reaches any of the 14 asks in interface, registration, PR level
+and naming (`results/pr_review_v5/probes/val-small12-2026-09-25/README.md`). The reasoning twin
+is parked (2 of 10 at 3.8× cost, 29 jobs cap-paused).
+
+**The user's objection to Phase C2** (precedent recognition at the decision): it assumes the
+reviewer can tell which past situations are similar to the one under review, and that is the deep
+Mathlib knowledge the reviewer lacks. The record agrees twice: the hunk-embedded index is
+chance-level for naming, and the shape-keyed join fitted 4-8% of asks ("reviewers ask about a
+pattern in the code, not the declaration's shape"). Surface similarity finds code that looks
+alike; a maintainer recognises code that plays the same role. **C2 is demoted to an offline
+check, not a build.**
+
+**The reframing.** Of what settles a validation ask (`review-work-structure-2026-09.md` §7.8):
+compile 39%, count 25%, exhibit 5%, judgment 31%; the dev gold has the same shape. About two thirds
+of asks are settled by something Lean or a census computes, with no notion of situation. The
+pipeline reaches 27%. The recall is lost in the mechanical two thirds, where the dev silences also
+sit (an arm that could have compiled the weaker hypothesis and did not try).
+
+**Where similarity is needed, use the kind Lean computes:**
+- *existence* is a type question: `exact?` / `apply?` / Loogle-style search at the base commit, not
+  a name search (231 of the lead run's 350 tool calls were `declaration_search`);
+- *consistency with siblings* is structural, from the change graph and inventory: the family's
+  attributes, binders and forms against this declaration's;
+- *norms* are counts over the library's text, the naming census extended to statement forms,
+  binders and suffixes.
+
+**The judgment third** (design, API completeness, location) is not reachable without the
+knowledge, and a guess filed there is control-PR emission. Leave it to the maintainer until a
+reviewer carries the knowledge.
+
+**Sequence, replacing Phase C2/C3:**
+1. Free: label the 22 dev misses and the 22 validation misses by what settles them.
+2. Build type-directed existence search and the sibling-consistency check as tools; the contract
+   files a compile-settled ask only when it compiled and an exists-ask only when the search
+   returned it -- forcing restricted to the mechanical asks, which is the calibration forcing
+   lacked (0.50 with 36 control findings).
+3. Two runs per set against the baselines that now exist on both.
