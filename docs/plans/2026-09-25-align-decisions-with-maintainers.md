@@ -280,3 +280,35 @@ call. **The premise holds on the actual misses of both sets:** the loss is in as
 census settles, and the largest single lever is trying the edit -- `simpa`, `positivity`,
 `gcongr`, "does the old proof still work" -- and compiling it, then the census beyond name
 prefixes. Type search is one miss, smaller than the revision above guessed.
+
+## Revision, 2026-09-26: finding is not settling -- exhaustive attempt by Lean, not recognition by the model
+
+The user, on the miss labels: what settles an ask says nothing about how the reviewer *finds* the
+candidate. A duplicate is trivial to confirm once named; the problem is naming it. `positivity`
+closes the goal; something has to think of trying it. The record already has this failure: the
+June idiom checker looked for tells in proof text and fired on 2 of 6 golfs -- "a legible
+non-idiomatic proof carries no internal tell" (`dead-ends.md`). And `exact?`/Loogle are named in
+`stratum-rubric.md` and `review-task-spec.md` as the duplication instrument, but no such tool was
+ever built; the arms search by name.
+
+**The mechanism: for the mechanical asks the candidate space is finite, and Lean walks it.**
+- duplicates: `exact?` and `apply?` on every new theorem's statement at the base commit -- a
+  unification search over the whole library, and exactly the maintainer's "already exists, or
+  follows in one step";
+- golfs and idioms: a fixed closer battery on every new proof, compiled (`simp`, `simpa`,
+  `positivity`, `gcongr`, `omega`, `linarith`, `aesop`, `grind`, `fun_prop`, `norm_num`, `ring`,
+  `exact?`); five validation misses are literally these asks;
+- generality: drop each hypothesis and weaken each typeclass, recompile;
+- registration and siblings: enumerate the family's attributes and forms from the change graph;
+- names and forms: the census over the whole library.
+
+These run the candidate; v4's deterministic operators (5 of 40) matched its signature. The model
+reads a complete candidate list and decides what a maintainer would raise, with a mechanical
+filter first (a golf only when materially shorter, a duplicate only when the found lemma states
+the same thing) and control-PR emission as the check on the rest.
+
+**Step 1b, free (compute only):** run the sweeps offline over every new theorem and proof in the
+23 PRs of both sets, whose reviewed workspaces now all exist, and count how many of the 38
+misses' sites they surface. Through if `exact?` finds the Parseval duplicate and the battery
+finds the `positivity`/`gcongr`/`simpa` proofs. Then Step 2 puts the sweep results in front of
+the arms before they decide.
