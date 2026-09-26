@@ -50,3 +50,23 @@ change settles it; else `count`; else `judgment`.
 
 Validate your file (every id once, valid JSON, values spelled exactly as given) and reply only with
 the counts by `warrant`, by `tool`, and by `knowledge`.
+
+## Finding mechanism (added 2026-09-26, one reader, provisional)
+
+`finding_mechanism.jsonl` labels each miss with the *exhaustive procedure that would surface the
+ask without a reviewer noticing anything*, run over every object of the named kind. It answers a
+different question from `tool` (which settles the ask once raised): what enumerates it.
+- `closer_battery`: a fixed tactic list tried on every new or changed proof and proof step
+  (`simp`, `simpa using`, `positivity`, `gcongr`, `omega`, `grind`, `exact?`).
+- `old_proof_replay`: for every modified declaration, the pre-PR proof compiled under the new
+  statement.
+- `binder_sweep`: every instance argument weakened, every class-typed explicit hypothesis made
+  instance-implicit, every `noncomputable` dropped, each followed by a compile.
+- `library_shape_search`: the same file, then the family, then the library, matched on hypothesis
+  and conclusion shape (a duplicate, a one-liner, a missing dual).
+- `name_lint`, `diff_lint`, `census`: deterministic from the source, the diff, or a count.
+- `generalisation_heuristic`: a literal constant in a statement, a fragment repeated across proofs.
+- `none`: judgment or PR-level; no procedure surfaces it.
+
+One reader labelled it in the session that designed the battery, so it carries no kappa and is a
+planning label, not a measurement. The battery itself (`battery/`) is the measurement.

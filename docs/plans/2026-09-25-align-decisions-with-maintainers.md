@@ -332,3 +332,19 @@ name tokens -- the sibling comparison of the revision above, which this case pro
 library-wide pattern search (Loogle-style) on hypothesis and conclusion shapes. The reviewer is
 then handed "this file already has a lemma taking exactly your hypotheses" and settles it by
 compiling. Step 1b's sweep should implement all three and score each against the 38 misses.
+
+**Battery on the misses, 2026-09-26** (`results/pr_review_v5/probes/closer-battery-2026-09-26/`).
+Each of the 38 misses was labelled with the exhaustive procedure that would surface it
+(`finding_mechanism.jsonl`, one reader): 31 have one, 7 are judgment. Fifteen were then tried as
+one-edit compiles in the PRs' reviewed workspaces, 6-40 s each. Nine are produced outright by a
+procedure with no false-positive mode: the pre-PR proofs of 30458 compile under the new variables
+("does the old proof not work?"); all four `noncomputable`s of 26755 compile away; 36822's dropped
+`@[simp]` is a diff lint and `(attr := simp)` compiles; 33294's dot-notation rewrite compiles;
+33145's `inf` lemmas follow from the `sup` ones by `(α := αᵒᵈ)`. Three maintainer questions are
+answered "no" (`positivity`, `gcongr`, `simpa using` verbatim). And the two duplicates are found by
+shape and by name, not by unification: `exact?` misses the pigeonhole one-liner with the lemma in
+scope, and misses Parseval behind custom definitions, while the same-hypotheses match and a
+docstring word search find both. Step 1b therefore builds the sweep as: old-proof replay,
+`noncomputable` and binder sweeps, attribute-diff lint, dual application, the closer list with the
+proof's own lemmas, and the three-radius existence search; run blind over every object of the 23
+PRs, and scored for hits against the 38 and for non-gold output.

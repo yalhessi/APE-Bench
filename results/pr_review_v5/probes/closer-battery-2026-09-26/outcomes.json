@@ -1,0 +1,290 @@
+[
+ {
+  "case": "168d80d11d79_parseval_exactq",
+  "exit": 1,
+  "seconds": 37.6,
+  "errors": [
+   "192: `exact?` could not close the goal. Try `apply?` to see partial suggestions."
+  ],
+  "suggestions": 0,
+  "edit": "--- old\naxiom parseval_orthonormal (c : (Fin 3 → ℤ) → ℂ) (hc : Summable (fun k => ‖c k‖^2)) :\n    ∫ x : T3, ‖∑' k, c k * fourier3D k x‖^2 = ∑' k, ‖c k‖^2\n\n--- new\ntheorem parseval_orthonormal (c : (Fin 3 → ℤ) → ℂ) (hc : Summable (fun k => ‖c k‖^2)) :\n    ∫ x : T3, ‖∑' k, c k * fourier3D k x‖^2 = ∑' k, ‖c k‖^2 := by\n  exact?\n"
+ },
+ {
+  "case": "63fdc033749f_inf'_via_dual",
+  "exit": 0,
+  "seconds": 7.5,
+  "errors": [],
+  "suggestions": 0,
+  "edit": "--- old\n  rw [← sInf_range, ← sInf_range]\n  obtain (_ | _) := isEmpty_or_nonempty γ\n  · simp [Set.range_eq_empty]\n  by_cases h1 : BddBelow (range f)\n  · refine (isGLB_csInf (range_nonempty f) h1).unique ?_\n    refine (isGLB_congr (hS.continuous_lowerBounds hf)).mp (isGLB_ciInf_set ?_ hS.nonempty)\n    exact h1.mono (by grind)\n  · have h2 : ¬ BddBelow (range (fun s : S => f (Subtype.val s))) := by\n      intro h\n      have := range_comp' f (Subtype.val : S → γ)\n      simp_all only [Subtype.range_coe_subtype, setOf_mem_eq]\n      have := h.closure.mono (image_closure_subset_closure_image hf)\n      simp only [hS.closure_eq, image_univ] at this\n      exact h1 this\n    simp [csInf_of_not_bddBelow h1, csInf_of_not_bddBelow h2]\n\n--- new\n  exact hS.continuous_sup' (α := αᵒᵈ) hf\n"
+ },
+ {
+  "case": "63fdc033749f_inf_via_dual",
+  "exit": 0,
+  "seconds": 7.4,
+  "errors": [],
+  "suggestions": 0,
+  "edit": "--- old\n  rw [← sInf_range, ← sInf_range]\n  obtain (_ | _) := isEmpty_or_nonempty γ\n  · simp [Set.range_eq_empty]\n  refine (isGLB_csInf (range_nonempty f) h).unique ?_\n  refine (isGLB_congr (hS.continuous_lowerBounds hf)).mp (isGLB_ciInf_set ?_ hS.nonempty)\n  exact h.mono (by grind)\n\n--- new\n  exact hS.continuous_sup (α := αᵒᵈ) hf h\n"
+ },
+ {
+  "case": "95eb6cac0fc0_dot_rewrite",
+  "exit": 0,
+  "seconds": 8.3,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "b12613af1b38_simp",
+  "exit": 1,
+  "seconds": 13.4,
+  "errors": [
+   "155: unsolved goals"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "b12613af1b38_simp_suggested",
+  "exit": 0,
+  "seconds": 12.5,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_DJ",
+  "exit": 0,
+  "seconds": 6.6,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_NC",
+  "exit": 0,
+  "seconds": 8.4,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_PH",
+  "exit": 0,
+  "seconds": 6.9,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_PI",
+  "exit": 0,
+  "seconds": 2.7,
+  "errors": [
+   "(with -Dexperimental.module=true) ok"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_POS",
+  "exit": 0,
+  "seconds": 7.7,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_PW",
+  "exit": 0,
+  "seconds": 10.3,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "control_RAT",
+  "exit": 0,
+  "seconds": 2.2,
+  "errors": [
+   "(with -Dexperimental.module=true) ok"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0016_computable_coeMonoidHom",
+  "exit": 0,
+  "seconds": 10.0,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0016_computable_commMonoid",
+  "exit": 0,
+  "seconds": 9.3,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0016_computable_divisionCommMonoid",
+  "exit": 0,
+  "seconds": 9.2,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0016_computable_divisionMonoid",
+  "exit": 0,
+  "seconds": 9.3,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0062_v0063_old_proofs",
+  "exit": 0,
+  "seconds": 37.2,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0067_positivity",
+  "exit": 1,
+  "seconds": 38.6,
+  "errors": [
+   "192: not a positivity goal"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0067b_mem_Ici_positivity",
+  "exit": 1,
+  "seconds": 9.4,
+  "errors": [
+   "192: failed to prove positivity/nonnegativity/nonzeroness"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0067c_simp_mem_Ici_positivity",
+  "exit": 1,
+  "seconds": 8.5,
+  "errors": [
+   "193: failed to prove positivity/nonnegativity/nonzeroness"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0068_exact_positivity",
+  "exit": 1,
+  "seconds": 38.6,
+  "errors": [
+   "191: not a positivity goal"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0068_gcongr_a",
+  "exit": 1,
+  "seconds": 38.6,
+  "errors": [
+   "190: gcongr did not make progress"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0068_gcongr_b",
+  "exit": 1,
+  "seconds": 39.5,
+  "errors": [
+   "191: gcongr did not make progress"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0068_gcongr_c",
+  "exit": 1,
+  "seconds": 38.6,
+  "errors": [
+   "191: gcongr did not make progress"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0092_simpa",
+  "exit": 1,
+  "seconds": 12.1,
+  "errors": [
+   "461: typeclass instance problem is stuck\n  CommMonoid ?m.123"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0092_simpa_only",
+  "exit": 1,
+  "seconds": 16.8,
+  "errors": [
+   "461: typeclass instance problem is stuck\n  CommMonoid ?m.123"
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0105_applyq_after_simp",
+  "exit": 0,
+  "seconds": 6.6,
+  "errors": [],
+  "suggestions": 7,
+  "edit": null
+ },
+ {
+  "case": "v0105_exactq_after_simp",
+  "exit": 1,
+  "seconds": 5.5,
+  "errors": [
+   "83: `exact?` could not close the goal. Try `apply?` to see partial suggestions."
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0105_exactq_fiber",
+  "exit": 1,
+  "seconds": 8.9,
+  "errors": [
+   "82: `exact?` could not close the goal. Try `apply?` to see partial suggestions."
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0105_exactq_prime",
+  "exit": 1,
+  "seconds": 5.5,
+  "errors": [
+   "91: `exact?` could not close the goal. Try `apply?` to see partial suggestions."
+  ],
+  "suggestions": 0,
+  "edit": null
+ },
+ {
+  "case": "v0131_v0132_attr_simp",
+  "exit": 0,
+  "seconds": 36.0,
+  "errors": [],
+  "suggestions": 0,
+  "edit": null
+ }
+]
