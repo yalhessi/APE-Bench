@@ -1,0 +1,241 @@
+{"cid": "o0726", "ask_kind": "design_variant"}
+{"cid": "o0727", "ask_kind": "other"}
+{"cid": "o0728", "ask_kind": "other"}
+{"cid": "o0729", "ask_kind": "other"}
+{"cid": "o0730", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "CategoryTheory.Adhesive.isPullback_of_isPushout_of_mono_left", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0731", "ask_kind": "not_an_ask"}
+{"cid": "o0732", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "fast_instance% elaborator for shortcut instances", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0733", "ask_kind": "other"}
+{"cid": "o0734", "ask_kind": "not_an_ask"}
+{"cid": "o0735", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "binary direct sum `prod` (V × W) twin of the indexed direct sum", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0736", "ask_kind": "other"}
+{"cid": "o0737", "ask_kind": "other"}
+{"cid": "o0738", "ask_kind": "other"}
+{"cid": "o0739", "ask_kind": "not_an_ask"}
+{"cid": "o0740", "ask_kind": "other"}
+{"cid": "o0741", "ask_kind": "other"}
+{"cid": "o0742", "ask_kind": "other"}
+{"cid": "o0743", "ask_kind": "not_an_ask"}
+{"cid": "o0744", "ask_kind": "not_an_ask"}
+{"cid": "o0745", "ask_kind": "not_an_ask"}
+{"cid": "o0746", "ask_kind": "other"}
+{"cid": "o0747", "ask_kind": "other"}
+{"cid": "o0748", "ask_kind": "other"}
+{"cid": "o0749", "ask_kind": "not_an_ask"}
+{"cid": "o0750", "ask_kind": "not_an_ask"}
+{"cid": "o0751", "ask_kind": "other"}
+{"cid": "o0752", "ask_kind": "other"}
+{"cid": "o0753", "ask_kind": "not_an_ask"}
+{"cid": "o0754", "ask_kind": "not_an_ask"}
+{"cid": "o0755", "ask_kind": "other"}
+{"cid": "o0756", "ask_kind": "other"}
+{"cid": "o0757", "ask_kind": "other"}
+{"cid": "o0758", "ask_kind": "other"}
+{"cid": "o0759", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "Function.Injective version of the two Mono postcomp lemmas", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0760", "ask_kind": "other"}
+{"cid": "o0761", "ask_kind": "not_an_ask"}
+{"cid": "o0762", "ask_kind": "not_an_ask"}
+{"cid": "o0763", "ask_kind": "not_an_ask"}
+{"cid": "o0764", "ask_kind": "other"}
+{"cid": "o0765", "ask_kind": "other"}
+{"cid": "o0766", "ask_kind": "other"}
+{"cid": "o0767", "ask_kind": "other"}
+{"cid": "o0768", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "ContinuousLinearEquiv.arrowCongr (conjugation x ↦ U ∘L x ∘L U.symm as an equiv / algebra hom)", "findable_by": "role", "wrong_analogue_plausible": "yes", "note": "decoy: LinearEquiv.arrowCongr / LinearEquiv.conj, the non-continuous versions the docstring already points at"}
+{"cid": "o0769", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "Trans instance for IsThetaTVS/IsThetaTVS alongside the other Trans instances", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0770", "ask_kind": "other"}
+{"cid": "o0771", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "IsThetaTVS reflexivity lemmas alongside symm and trans", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0772", "ask_kind": "not_an_ask"}
+{"cid": "o0773", "ask_kind": "other"}
+{"cid": "o0774", "ask_kind": "other"}
+{"cid": "o0775", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "singletonEquiv subsumes ofSingleton and ofSingleton_bijective", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0776", "ask_kind": "other"}
+{"cid": "o0777", "ask_kind": "other"}
+{"cid": "o0778", "ask_kind": "other"}
+{"cid": "o0779", "ask_kind": "design_variant"}
+{"cid": "o0780", "ask_kind": "other"}
+{"cid": "o0781", "ask_kind": "other"}
+{"cid": "o0782", "ask_kind": "design_variant"}
+{"cid": "o0783", "ask_kind": "design_variant"}
+{"cid": "o0784", "ask_kind": "other"}
+{"cid": "o0785", "ask_kind": "other"}
+{"cid": "o0786", "ask_kind": "not_an_ask"}
+{"cid": "o0787", "ask_kind": "not_an_ask"}
+{"cid": "o0788", "ask_kind": "other"}
+{"cid": "o0789", "ask_kind": "not_an_ask"}
+{"cid": "o0790", "ask_kind": "other"}
+{"cid": "o0791", "ask_kind": "other"}
+{"cid": "o0792", "ask_kind": "other"}
+{"cid": "o0793", "ask_kind": "other"}
+{"cid": "o0794", "ask_kind": "other"}
+{"cid": "o0795", "ask_kind": "design_other"}
+{"cid": "o0796", "ask_kind": "design_library", "analogue_named": "implied", "analogue": "an existing proof of absNorm_eq_pow_inertiaDeg elsewhere (unspecified)", "findable_by": "unclear", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0797", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Ideal.relNorm_eq_pow_of_isMaximal (relNorm twin of the absNorm statement)", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0798", "ask_kind": "design_library", "analogue_named": "implied", "analogue": "the same result in some other form (unspecified)", "findable_by": "unclear", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0799", "ask_kind": "not_an_ask"}
+{"cid": "o0800", "ask_kind": "other"}
+{"cid": "o0801", "ask_kind": "other"}
+{"cid": "o0802", "ask_kind": "other"}
+{"cid": "o0803", "ask_kind": "other"}
+{"cid": "o0804", "ask_kind": "other"}
+{"cid": "o0805", "ask_kind": "other"}
+{"cid": "o0806", "ask_kind": "other"}
+{"cid": "o0807", "ask_kind": "other"}
+{"cid": "o0808", "ask_kind": "other"}
+{"cid": "o0809", "ask_kind": "other"}
+{"cid": "o0810", "ask_kind": "other"}
+{"cid": "o0811", "ask_kind": "other"}
+{"cid": "o0812", "ask_kind": "other"}
+{"cid": "o0813", "ask_kind": "not_an_ask"}
+{"cid": "o0814", "ask_kind": "not_an_ask"}
+{"cid": "o0815", "ask_kind": "other"}
+{"cid": "o0816", "ask_kind": "other"}
+{"cid": "o0817", "ask_kind": "other"}
+{"cid": "o0818", "ask_kind": "not_an_ask"}
+{"cid": "o0819", "ask_kind": "other"}
+{"cid": "o0820", "ask_kind": "other"}
+{"cid": "o0821", "ask_kind": "other"}
+{"cid": "o0822", "ask_kind": "other"}
+{"cid": "o0823", "ask_kind": "other"}
+{"cid": "o0824", "ask_kind": "other"}
+{"cid": "o0825", "ask_kind": "other"}
+{"cid": "o0826", "ask_kind": "other"}
+{"cid": "o0827", "ask_kind": "other"}
+{"cid": "o0828", "ask_kind": "other"}
+{"cid": "o0829", "ask_kind": "other"}
+{"cid": "o0830", "ask_kind": "other"}
+{"cid": "o0831", "ask_kind": "other"}
+{"cid": "o0832", "ask_kind": "other"}
+{"cid": "o0833", "ask_kind": "not_an_ask"}
+{"cid": "o0834", "ask_kind": "other"}
+{"cid": "o0835", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "MorphismProperty.IsMultiplicative lemma alongside the IsStableUnderComposition one", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0836", "ask_kind": "other"}
+{"cid": "o0837", "ask_kind": "other"}
+{"cid": "o0838", "ask_kind": "not_an_ask"}
+{"cid": "o0839", "ask_kind": "other"}
+{"cid": "o0840", "ask_kind": "other"}
+{"cid": "o0841", "ask_kind": "other"}
+{"cid": "o0842", "ask_kind": "other"}
+{"cid": "o0843", "ask_kind": "other"}
+{"cid": "o0844", "ask_kind": "other"}
+{"cid": "o0845", "ask_kind": "not_an_ask"}
+{"cid": "o0846", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Finset.filter_card_add_filter_neg_card_eq_card", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0847", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Finset.filter_card_add_filter_neg_card_eq_card", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0848", "ask_kind": "other"}
+{"cid": "o0849", "ask_kind": "other"}
+{"cid": "o0850", "ask_kind": "other"}
+{"cid": "o0851", "ask_kind": "other"}
+{"cid": "o0852", "ask_kind": "other"}
+{"cid": "o0853", "ask_kind": "other"}
+{"cid": "o0854", "ask_kind": "other"}
+{"cid": "o0855", "ask_kind": "other"}
+{"cid": "o0856", "ask_kind": "not_an_ask"}
+{"cid": "o0857", "ask_kind": "other"}
+{"cid": "o0858", "ask_kind": "other"}
+{"cid": "o0859", "ask_kind": "other"}
+{"cid": "o0860", "ask_kind": "other"}
+{"cid": "o0861", "ask_kind": "other"}
+{"cid": "o0862", "ask_kind": "other"}
+{"cid": "o0863", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "iSup (⨆ t, ...) in place of sSup of a setOf-exists", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0864", "ask_kind": "other"}
+{"cid": "o0865", "ask_kind": "other"}
+{"cid": "o0866", "ask_kind": "other"}
+{"cid": "o0867", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Set.range g in place of {a | ∃ t, a = g t}", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0868", "ask_kind": "not_an_ask"}
+{"cid": "o0869", "ask_kind": "design_other"}
+{"cid": "o0870", "ask_kind": "other"}
+{"cid": "o0871", "ask_kind": "other"}
+{"cid": "o0872", "ask_kind": "other"}
+{"cid": "o0873", "ask_kind": "other"}
+{"cid": "o0874", "ask_kind": "other"}
+{"cid": "o0875", "ask_kind": "other"}
+{"cid": "o0876", "ask_kind": "other"}
+{"cid": "o0877", "ask_kind": "not_an_ask"}
+{"cid": "o0878", "ask_kind": "not_an_ask"}
+{"cid": "o0879", "ask_kind": "not_an_ask"}
+{"cid": "o0880", "ask_kind": "other"}
+{"cid": "o0881", "ask_kind": "not_an_ask"}
+{"cid": "o0882", "ask_kind": "other"}
+{"cid": "o0883", "ask_kind": "other"}
+{"cid": "o0884", "ask_kind": "design_other"}
+{"cid": "o0885", "ask_kind": "design_other"}
+{"cid": "o0886", "ask_kind": "other"}
+{"cid": "o0887", "ask_kind": "not_an_ask"}
+{"cid": "o0888", "ask_kind": "other"}
+{"cid": "o0889", "ask_kind": "design_variant"}
+{"cid": "o0890", "ask_kind": "other"}
+{"cid": "o0891", "ask_kind": "other"}
+{"cid": "o0892", "ask_kind": "not_an_ask"}
+{"cid": "o0893", "ask_kind": "other"}
+{"cid": "o0894", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "eq_C_of_degree_le_zero composed with a missing degree ≤ 0 → leadingCoeff = coeff 0 lemma", "findable_by": "neighbourhood", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0895", "ask_kind": "design_library", "analogue_named": "implied", "analogue": "natDegree twin of eq_C_of_degree_le_zero / eq_C_of_degree_eq_zero in the coeff p 0 form", "findable_by": "neighbourhood", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0896", "ask_kind": "design_other"}
+{"cid": "o0897", "ask_kind": "other"}
+{"cid": "o0898", "ask_kind": "design_other"}
+{"cid": "o0899", "ask_kind": "design_other"}
+{"cid": "o0900", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Option α as the canonical add-one-element type instead of α ⊕ Unit", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0901", "ask_kind": "design_other"}
+{"cid": "o0902", "ask_kind": "other"}
+{"cid": "o0903", "ask_kind": "other"}
+{"cid": "o0904", "ask_kind": "other"}
+{"cid": "o0905", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Set.preimage notation F ⁻¹' S in place of {v | F v ∈ S}", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0906", "ask_kind": "other"}
+{"cid": "o0907", "ask_kind": "not_an_ask"}
+{"cid": "o0908", "ask_kind": "not_an_ask"}
+{"cid": "o0909", "ask_kind": "not_an_ask"}
+{"cid": "o0910", "ask_kind": "not_an_ask"}
+{"cid": "o0911", "ask_kind": "other"}
+{"cid": "o0912", "ask_kind": "design_other"}
+{"cid": "o0913", "ask_kind": "other"}
+{"cid": "o0914", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Function.comp_def, which makes the getLeft?_comp_inl-style lemmas unnecessary", "findable_by": "unclear", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0915", "ask_kind": "other"}
+{"cid": "o0916", "ask_kind": "not_an_ask"}
+{"cid": "o0917", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "CategoryTheory.Epi for CommRingCat morphisms (categorical predicate)", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0918", "ask_kind": "other"}
+{"cid": "o0919", "ask_kind": "other"}
+{"cid": "o0920", "ask_kind": "other"}
+{"cid": "o0921", "ask_kind": "other"}
+{"cid": "o0922", "ask_kind": "not_an_ask"}
+{"cid": "o0923", "ask_kind": "other"}
+{"cid": "o0924", "ask_kind": "other"}
+{"cid": "o0925", "ask_kind": "design_other"}
+{"cid": "o0926", "ask_kind": "not_an_ask"}
+{"cid": "o0927", "ask_kind": "design_other"}
+{"cid": "o0928", "ask_kind": "other"}
+{"cid": "o0929", "ask_kind": "other"}
+{"cid": "o0930", "ask_kind": "other"}
+{"cid": "o0931", "ask_kind": "other"}
+{"cid": "o0932", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "trace versions derived from the norm versions via to_additive", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0933", "ask_kind": "other"}
+{"cid": "o0934", "ask_kind": "not_an_ask"}
+{"cid": "o0935", "ask_kind": "other"}
+{"cid": "o0936", "ask_kind": "other"}
+{"cid": "o0937", "ask_kind": "not_an_ask"}
+{"cid": "o0938", "ask_kind": "other"}
+{"cid": "o0939", "ask_kind": "other"}
+{"cid": "o0940", "ask_kind": "other"}
+{"cid": "o0941", "ask_kind": "not_an_ask"}
+{"cid": "o0942", "ask_kind": "other"}
+{"cid": "o0943", "ask_kind": "other"}
+{"cid": "o0944", "ask_kind": "other"}
+{"cid": "o0945", "ask_kind": "not_an_ask"}
+{"cid": "o0946", "ask_kind": "design_norm"}
+{"cid": "o0947", "ask_kind": "other"}
+{"cid": "o0948", "ask_kind": "other"}
+{"cid": "o0949", "ask_kind": "other"}
+{"cid": "o0950", "ask_kind": "other"}
+{"cid": "o0951", "ask_kind": "other"}
+{"cid": "o0952", "ask_kind": "other"}
+{"cid": "o0953", "ask_kind": "other"}
+{"cid": "o0954", "ask_kind": "design_variant"}
+{"cid": "o0955", "ask_kind": "other"}
+{"cid": "o0956", "ask_kind": "design_variant"}
+{"cid": "o0957", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "iff version singularValues = 0 ↔ T = 0 of singularValues_zero", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0958", "ask_kind": "design_variant"}
+{"cid": "o0959", "ask_kind": "other"}
+{"cid": "o0960", "ask_kind": "other"}
+{"cid": "o0961", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "iff version of singularValues_pos_of_lt_rank (its content is support_singularValues)", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "o0962", "ask_kind": "other"}
+{"cid": "o0963", "ask_kind": "other"}
+{"cid": "o0964", "ask_kind": "other"}
+{"cid": "o0965", "ask_kind": "other"}
+{"cid": "o0966", "ask_kind": "other"}

@@ -1,0 +1,279 @@
+{
+ "n": {
+  "B": 967,
+  "C": 967,
+  "both": 967,
+  "packet": 967
+ },
+ "stage1": {
+  "kappa": 0.913,
+  "agreement": 0.95,
+  "B": {
+   "other": 604,
+   "not_an_ask": 161,
+   "design_other": 74,
+   "design_library": 54,
+   "design_variant": 35,
+   "design_siblings": 24,
+   "design_norm": 15
+  },
+  "C": {
+   "other": 604,
+   "not_an_ask": 160,
+   "design_other": 69,
+   "design_library": 54,
+   "design_variant": 36,
+   "design_siblings": 28,
+   "design_norm": 16
+  },
+  "agreed": {
+   "other": 592,
+   "not_an_ask": 155,
+   "design_other": 63,
+   "design_library": 48,
+   "design_variant": 27,
+   "design_siblings": 23,
+   "design_norm": 11
+  }
+ },
+ "stage1_coarse": {
+  "kappa": 0.937,
+  "agreed": {
+   "other": 592,
+   "not_an_ask": 155,
+   "design": 113,
+   "compare": 73
+  },
+  "split": 34
+ },
+ "prevalence": {
+  "asks_agreed": 801,
+  "asks_B": 806,
+  "asks_C": 807,
+  "design_agreed_over_asks_agreed": {
+   "k": 194,
+   "n": 801,
+   "share": 0.2422,
+   "ci95": [
+    0.2138,
+    0.2731
+   ]
+  },
+  "compare_agreed_over_asks_agreed": {
+   "k": 73,
+   "n": 801,
+   "share": 0.0911,
+   "ci95": [
+    0.0731,
+    0.1131
+   ]
+  },
+  "compare_either_over_asks_either": {
+   "k": 87,
+   "n": 812,
+   "share": 0.1071,
+   "ci95": [
+    0.0877,
+    0.1303
+   ]
+  },
+  "prs_with_compare_agreed": 49,
+  "prs_in_sample": 300,
+  "compare_agreed_by_ai": {
+   "human": 73
+  },
+  "asks_agreed_by_ai": {
+   "human": 794,
+   "ai": 7
+  },
+  "compare_agreed_by_month": {
+   "2025-07": 3,
+   "2025-11": 4,
+   "2025-12": 26,
+   "2026-01": 37,
+   "2026-02": 2,
+   "2026-03": 1
+  },
+  "asks_agreed_by_month": {
+   "2025-06": 10,
+   "2025-07": 17,
+   "2025-08": 6,
+   "2025-09": 25,
+   "2025-10": 6,
+   "2025-11": 56,
+   "2025-12": 249,
+   "2026-01": 372,
+   "2026-02": 29,
+   "2026-03": 31
+  }
+ },
+ "stage2_on_agreed_compare": {
+  "analogue_named": {
+   "n": 73,
+   "kappa": 0.58,
+   "agreed": {
+    "yes": 59,
+    "implied": 6
+   },
+   "split": 8,
+   "B": {
+    "yes": 64,
+    "implied": 9
+   },
+   "C": {
+    "yes": 60,
+    "implied": 11,
+    "no": 2
+   }
+  },
+  "findable_by": {
+   "n": 73,
+   "kappa": 0.785,
+   "agreed": {
+    "pr_internal": 21,
+    "api_shape": 20,
+    "name": 8,
+    "role": 6,
+    "neighbourhood": 6
+   },
+   "split": 12,
+   "B": {
+    "api_shape": 24,
+    "pr_internal": 21,
+    "role": 9,
+    "name": 9,
+    "neighbourhood": 7,
+    "unclear": 3
+   },
+   "C": {
+    "pr_internal": 23,
+    "api_shape": 23,
+    "role": 11,
+    "name": 9,
+    "neighbourhood": 7
+   }
+  },
+  "wrong_analogue_plausible": {
+   "n": 73,
+   "kappa": 0.713,
+   "agreed": {
+    "no": 54,
+    "yes": 12
+   },
+   "split": 7,
+   "B": {
+    "no": 58,
+    "yes": 15
+   },
+   "C": {
+    "no": 57,
+    "yes": 16
+   }
+  }
+ },
+ "stage2_findable_either": {
+  "api_shape": 51,
+  "pr_internal": 48,
+  "role": 23,
+  "name": 19,
+  "neighbourhood": 16,
+  "unclear": 3
+ },
+ "wrong_analogue_yes_either": [
+  "o0069",
+  "o0116",
+  "o0140",
+  "o0176",
+  "o0369",
+  "o0388",
+  "o0439",
+  "o0446",
+  "o0488",
+  "o0498",
+  "o0500",
+  "o0502",
+  "o0550",
+  "o0575",
+  "o0578",
+  "o0580",
+  "o0581",
+  "o0707",
+  "o0716",
+  "o0768"
+ ],
+ "compare_agreed_cids": [
+  "o0023",
+  "o0038",
+  "o0048",
+  "o0053",
+  "o0069",
+  "o0076",
+  "o0077",
+  "o0081",
+  "o0083",
+  "o0085",
+  "o0116",
+  "o0128",
+  "o0140",
+  "o0170",
+  "o0176",
+  "o0189",
+  "o0268",
+  "o0274",
+  "o0300",
+  "o0315",
+  "o0318",
+  "o0337",
+  "o0345",
+  "o0347",
+  "o0388",
+  "o0428",
+  "o0430",
+  "o0431",
+  "o0439",
+  "o0446",
+  "o0450",
+  "o0475",
+  "o0488",
+  "o0498",
+  "o0500",
+  "o0502",
+  "o0550",
+  "o0553",
+  "o0556",
+  "o0575",
+  "o0578",
+  "o0580",
+  "o0581",
+  "o0604",
+  "o0605",
+  "o0620",
+  "o0645",
+  "o0707",
+  "o0716",
+  "o0730",
+  "o0735",
+  "o0759",
+  "o0768",
+  "o0769",
+  "o0771",
+  "o0775",
+  "o0796",
+  "o0797",
+  "o0798",
+  "o0835",
+  "o0846",
+  "o0847",
+  "o0863",
+  "o0867",
+  "o0894",
+  "o0895",
+  "o0900",
+  "o0905",
+  "o0914",
+  "o0917",
+  "o0932",
+  "o0957",
+  "o0961"
+ ]
+}
