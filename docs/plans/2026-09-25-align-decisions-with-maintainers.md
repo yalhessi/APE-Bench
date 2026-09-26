@@ -336,8 +336,9 @@ compiling. Step 1b's sweep should implement all three and score each against the
 **Battery on the misses, 2026-09-26** (`results/pr_review_v5/probes/closer-battery-2026-09-26/`).
 Each of the 38 misses was labelled with the exhaustive procedure that would surface it
 (`finding_mechanism.jsonl`, one reader): 31 have one, 7 are judgment. Fifteen were then tried as
-one-edit compiles in the PRs' reviewed workspaces, 6-40 s each. Nine are produced outright by a
-procedure with no false-positive mode: the pre-PR proofs of 30458 compile under the new variables
+one-edit compiles in the PRs' reviewed workspaces, 6-40 s each. Eight are produced outright by a
+procedure with no false-positive mode, and a ninth (33285's single `simp`) by the closer list seeded
+with the proof's own lemmas: the pre-PR proofs of 30458 compile under the new variables
 ("does the old proof not work?"); all four `noncomputable`s of 26755 compile away; 36822's dropped
 `@[simp]` is a diff lint and `(attr := simp)` compiles; 33294's dot-notation rewrite compiles;
 33145's `inf` lemmas follow from the `sup` ones by `(α := αᵒᵈ)`. Three maintainer questions are

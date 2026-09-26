@@ -34,8 +34,8 @@ its non-gold output, is the next step, not this one.
 
 ## Reading
 
-- **Nine of the fifteen asks tried are produced outright** by a procedure that has no
-  false-positive mode: an old proof that compiles, a `noncomputable` that compiles away, a dropped
+- **Eight of the fifteen asks tried are produced outright** by a procedure that has no
+  false-positive mode, and a ninth by the closer list seeded with the proof's own lemmas: an old proof that compiles, a `noncomputable` that compiles away, a dropped
   attribute, a dot-notation rewrite that compiles, a dual that compiles, a fix for a removed
   `@[simp]` that compiles. Each such output *is* a maintainer ask, so the exhaustive run can file
   every hit.
