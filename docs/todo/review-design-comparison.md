@@ -65,9 +65,19 @@ ten for 0 of 43**, and its top hits are lookalikes: the wrong-sibling risk lives
 in judgment. The exemplar that defeats shape matching: v2006, where the PR wrote the sequential
 form and the maintainer asked for the filter form used by `IsCompact` and `IsLindelof`.
 
-**Next: shape-match retrieval.** Match the PR's hypotheses and definition bodies against the
-bodies of the library's definitions and classes up to renaming; test on the 43 for recall and decoy
-rate, v2006 included; then role retrieval for the remainder.
+**Shape search through Loogle, tried the same day** (`provenance/loogle_shape_test.md`): with one
+fixed derivation rule (bound identifiers to `_`), the analogue ranks first in **1 of 15** and is
+absent in 13, because the PR's spelling differs from the library's (`Ideal.span` against
+`Submodule.span`, a literal `1` where `Pi.single_apply` has a variable), because the analogue is a
+definition body that only unfolding reaches (`MulAction.orbit`, `QuotSMulTop`), or because the
+analogue is a role (`FunLike`, `Module.Invertible`, `IsCompact`) and has no shape.
+
+**Next: unification against definitions, inside Lean.** For each hypothesis and definition body
+the PR writes, search the library's definitions, classes and `_apply`/`_def` lemmas for one whose
+body unifies with it modulo reducible unfolding and generalisation of literals (an `exact?`-shaped
+search whose targets are definitions, not the goal). Test on the 43 for recall and decoy rate; v2006
+must come out as "no analogue by shape", never as `IsSeqCompact`. Role retrieval, for the remainder,
+after that.
 
 **What would close it.** Retrieval returns the maintainer's analogue on at least two thirds of the
 43 with a wrong-analogue rate at or below one in five; then a judged test with the analogues in the

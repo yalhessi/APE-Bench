@@ -1,0 +1,284 @@
+[
+ {
+  "cid": "v0157",
+  "expression": "Subsingleton (M ⧸ x • (⊤ : Submodule R M))",
+  "pattern": "_ ⧸ (_ • ⊤ : Submodule _ _)",
+  "analogue_keys": [
+   "QuotSMulTop"
+  ],
+  "count": 151,
+  "error": null,
+  "rank": 89,
+  "top10": [
+   "Ideal.powQuotPowSuccEquivMapMkPowSuccPow",
+   "Ideal.powQuotPowSuccLinearEquivMapMkPowSuccPow",
+   "TensorProduct.quotTensorEquivQuotSMul",
+   "TensorProduct.tensorQuotEquivQuotSMul",
+   "TensorProduct.quotTensorEquivQuotSMul_mk_one_tmul",
+   "TensorProduct.quotTensorEquivQuotSMul_comp_mkQ_rTensor",
+   "TensorProduct.tensorQuotEquivQuotSMul_comp_mkQ_lTensor",
+   "TensorProduct.quotTensorEquivQuotSMul_mk_tmul",
+   "TensorProduct.tensorQuotEquivQuotSMul_tmul_mk",
+   "TensorProduct.quotTensorEquivQuotSMul_symm_mk"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v0324",
+  "expression": "(TotalSpace.mk x (s_loc i x) : TotalSpace F_fiber V)",
+  "pattern": "Bundle.TotalSpace.mk _ _",
+  "analogue_keys": [
+   "TotalSpace.mk'"
+  ],
+  "count": 121,
+  "error": null,
+  "rank": null,
+  "top10": [
+   "Bundle.TotalSpace.eta",
+   "Bundle.TotalSpace.exists",
+   "Bundle.Pullback.lift_mk",
+   "Bundle.TotalSpace.mk_cast",
+   "Bundle.Pretrivialization.coe_coe_fst",
+   "Bundle.Trivialization.coe_coe_fst",
+   "Bundle.Pretrivialization.symm_apply_apply_mk",
+   "Bundle.Pretrivialization.apply_mk_symm",
+   "Bundle.Pretrivialization.coe_mem_source",
+   "Bundle.Trivialization.symm_apply_apply_mk"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v0849",
+  "expression": "(Set.range G : ObjectProperty C)",
+  "pattern": "(Set.range _ : CategoryTheory.ObjectProperty _)",
+  "analogue_keys": [
+   "ObjectProperty.ofObj"
+  ],
+  "count": 3414,
+  "error": null,
+  "rank": null,
+  "top10": [
+   "Set.rangeFactorization",
+   "Set.rangeSplitting",
+   "Set.rangeFactorization_surjective",
+   "Set.mem_range_self",
+   "Set.rangeFactorization_bijective",
+   "Set.rangeFactorization_injective",
+   "Set.mem_range",
+   "Set.rangeFactorization_eq_rangeFactorization_iff",
+   "Set.apply_rangeSplitting",
+   "Set.Subtype.range_coind"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v1097",
+  "expression": "(pthRootMonoidHom M p).comp (powMonoidHom p) = .id _",
+  "pattern": "MonoidHom.comp _ _ = MonoidHom.id _",
+  "analogue_keys": [
+   "LeftInverse",
+   "RightInverse"
+  ],
+  "count": 17,
+  "error": null,
+  "rank": null,
+  "top10": [
+   "MonoidHom.toMulEquiv",
+   "MonoidHom.toMulEquiv_apply",
+   "MonoidHom.toMulEquiv_symm_apply",
+   "MulEquiv.coe_monoidHom_comp_coe_monoidHom_symm",
+   "MulEquiv.coe_monoidHom_symm_comp_coe_monoidHom",
+   "MulEquiv.toMonoidHom_comp_toMonoidHom_symm",
+   "MulEquiv.toMonoidHom_symm_comp_toMonoidHom",
+   "invMonoidHom_comp_invMonoidHom",
+   "MonoidHom.fst_comp_inl",
+   "MonoidHom.snd_comp_inr"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v1308",
+  "expression": "G.Colorable 2",
+  "pattern": "SimpleGraph.Colorable _ 2",
+  "analogue_keys": [
+   "IsBipartite"
+  ],
+  "count": 3,
+  "error": null,
+  "rank": null,
+  "top10": [
+   "SimpleGraph.IsAcyclic.colorable_two",
+   "SimpleGraph.IsTree.colorable_two",
+   "SimpleGraph.two_colorable_iff_forall_loop_even"
+  ],
+  "pr_contaminated_in_top10": [
+   "SimpleGraph.IsAcyclic.colorable_two",
+   "SimpleGraph.IsTree.colorable_two"
+  ]
+ },
+ {
+  "cid": "v1400",
+  "expression": "∏ i : t.support, c i ^ t i",
+  "pattern": "∏ i ∈ Finsupp.support _, _ ^ _ i",
+  "analogue_keys": [
+   "Finsupp.prod"
+  ],
+  "count": null,
+  "error": "A placeholder `_` cannot be used where a function is expected",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v1502",
+  "expression": "(hx : ∀ x', x ≤ x')",
+  "pattern": "∀ y, _ ≤ y",
+  "analogue_keys": [
+   "IsBot"
+  ],
+  "count": null,
+  "error": "(deterministic) timeout at `isDefEq`, maximum number of heartbeats (200000) has been reached\n\nNote: Use `set_option maxHeartbeats <num>` to set the limit.(invalid MessageData.lazy, missing context)",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v1547",
+  "expression": "if n = k then 1 else 0",
+  "pattern": "if _ = _ then 1 else 0",
+  "analogue_keys": [
+   "Pi.single"
+  ],
+  "count": 151,
+  "error": null,
+  "rank": null,
+  "top10": [
+   "Nat.one_sub",
+   "List.countP_singleton",
+   "List.count_singleton",
+   "List.countP_cons",
+   "List.count_cons",
+   "List.count_erase",
+   "List.count_tail",
+   "List.boole_getElem_le_countP",
+   "List.boole_getElem_le_count",
+   "List.count_insert"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v1795",
+  "expression": "CoeFun (FunSpace t₀ x₀ r L) fun _ ↦ Icc tmin tmax → E",
+  "pattern": "CoeFun _ fun _ => _ → _",
+  "analogue_keys": [
+   "FunLike"
+  ],
+  "count": 63,
+  "error": null,
+  "rank": null,
+  "top10": [
+   "Setoid.instCoeFunForallForallProp_mathlib",
+   "AddEquiv.instCoeFunForall",
+   "MulEquiv.instCoeFunForall",
+   "PrincipalSeg.instCoeFunForall",
+   "LowerAdjoint.instCoeFunForall",
+   "RelSeries.instCoeFunForallFinHAddNatLengthOfNat",
+   "LinearPMap.instCoeFunForallSubtypeMemSubmoduleDomain",
+   "CategoryTheory.ConcreteCategory.instCoeFunHomForallToType",
+   "ModuleCat.CoextendScalars.instCoeFunCarrierObjCoextendScalarsForall",
+   "WithConv.instCoeFunForall"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v1946",
+  "expression": "(a - b) + (b - a) with a b : ℝ≥0∞",
+  "pattern": "((_ : ENNReal) - _) + (_ - _)",
+  "analogue_keys": [
+   "edist",
+   "EMetricSpace"
+  ],
+  "count": 0,
+  "error": "Found 37 declarations mentioning ENNReal.instAdd, HSub.hSub, instHAdd, instHSub, HAdd.hAdd, ENNReal, and ENNReal.instSub.\nOf these, 0 match your pattern(s).\n",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v2022",
+  "expression": "B.index ≠ 0",
+  "pattern": "Subgroup.index _ ≠ 0",
+  "analogue_keys": [
+   "FiniteIndex"
+  ],
+  "count": 13,
+  "error": null,
+  "rank": 1,
+  "top10": [
+   "Subgroup.FiniteIndex.index_ne_zero",
+   "Subgroup.FiniteIndex.mk",
+   "Subgroup.finiteIndex_iff",
+   "Subgroup.fintypeOfIndexNeZero",
+   "Subgroup.index_ne_zero_of_finite",
+   "Subgroup.index_ne_zero_iff_finite",
+   "Subgroup.index_iInf_ne_zero",
+   "Subgroup.index_inf_ne_zero",
+   "Subgroup.finite_quotient_of_finite_quotient_of_index_ne_zero",
+   "Subgroup.exists_pow_mem_of_index_ne_zero"
+  ],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v2163",
+  "expression": "∃ x : R, I = Ideal.span {x}",
+  "pattern": "∃ x, _ = Ideal.span {x}",
+  "analogue_keys": [
+   "IsPrincipal"
+  ],
+  "count": 0,
+  "error": "Found 36 declarations mentioning Exists, Set.instSingletonSet, Ideal, Ideal.span, Singleton.singleton, Eq, and Set.\nOf these, 0 match your pattern(s).\n",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v2244",
+  "expression": "LocalizedModule.AtPrime m M ≃ₗ[Localization.AtPrime m] Localization.AtPrime m",
+  "pattern": "LocalizedModule.AtPrime _ _ ≃ₗ[_] Localization.AtPrime _",
+  "analogue_keys": [
+   "Module.Invertible"
+  ],
+  "count": 0,
+  "error": "Found 0 declarations mentioning CommSemiring.toSemiring, Localization.AtPrime, LocalizedModule.AtPrime, OreLocalization.oreSetComm, RingHomInvPair.ids, CommSemiring.toCommMonoid, LinearEquiv, Semiring.toMonoid, Module.toDistribMulAction, Ideal.primeCompl, OreLocalization.instAddCommMonoidOreLocalization, RingHom.id, and Semiring.toNonAssocSemiring.\nOf these, 0 match your pattern(s).\n",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v2006",
+  "expression": "∀ x : ℕ → E, (∀ n, x n ∈ A) → ∃ a ∈ A, MapClusterPt a atTop x",
+  "pattern": "∀ x : ℕ → _, (∀ n, x n ∈ _) → ∃ a ∈ _, MapClusterPt a Filter.atTop x",
+  "analogue_keys": [
+   "IsCompact",
+   "IsLindelof"
+  ],
+  "count": 0,
+  "error": "Found 3 declarations mentioning Membership.mem, Exists, Filter.atTop, And, Nat.instPreorder, Nat, and MapClusterPt.\nOf these, 0 match your pattern(s).\n",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ },
+ {
+  "cid": "v0575",
+  "expression": "{y | ∃ t : τ, ϕ t x = y}",
+  "pattern": "{y | ∃ t, _ t _ = y}",
+  "analogue_keys": [
+   "MulAction.orbit"
+  ],
+  "count": null,
+  "error": "A placeholder `_` cannot be used where a function is expected",
+  "rank": null,
+  "top10": [],
+  "pr_contaminated_in_top10": []
+ }
+]
