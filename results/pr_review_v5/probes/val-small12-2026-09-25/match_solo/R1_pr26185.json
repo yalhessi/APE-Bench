@@ -1,0 +1,30 @@
+[
+ {
+  "i": 0,
+  "target": "unitInterval.instTietzeExtension",
+  "claim": "`instance unitInterval.instTietzeExtension : TietzeExtension unitInterval` duplicates an existing instance: `unitInterval.instTietzeExtension` is already defined in `Mathlib/Topology/TietzeExtension.lean` (and also appears already in this file before the PR according to `declaration_search`). Duplicating instances risks diamond/priority problems and breaks coherence.",
+  "requested_change": "Remove this instance entirely if an instance already exists. If the goal is to provide it, move it to the canonical file (`Mathlib/Topology/TietzeExtension.lean`) and ensure there is exactly one global instance (possibly with `[simp]` lemmas instead). If there is a reason to prefer this proof, replace the existing one rather than adding a second, and add a comment about why.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Counterexamples/PeanoCurve.lean",
+  "claim": "Module docstring has typos: \u2018existsence\u2019 and \u2018sujrective\u2019. This is user-facing documentation in `Counterexamples` and should be polished.",
+  "requested_change": "Fix spelling: \u2018existence\u2019 and \u2018surjective\u2019. Potentially rephrase to \u2018a continuous surjection from `unitInterval` onto `unitInterval \u00d7 unitInterval`\u2019 (matching the PR description).",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "ContinuousMap.coe_restrict",
+  "claim": "Change to `ContinuousMap.coe_restrict` from `f \u2218 ((\u2191) : s \u2192 \u03b1)` to `s.restrict f` relies on `Set.restrict`. This is fine, but note that `Set.restrict` is not the most common spelling in mathlib for function restriction; this may reduce readability for users unfamiliar with it.",
+  "requested_change": "Consider keeping the previous RHS `f \u2218 ((\u2191) : s \u2192 \u03b1)` (which is explicit and common in topology files), or add a short comment/lemma nearby introducing `Set.restrict` as notation for `fun x : s => f x`. If kept, ensure downstream simp proofs (like `liftCover_restrict`) consistently use `restrict_apply`/`DFunLike.ext` as you already adjusted.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "unitInterval.eq_closedBall",
+  "claim": "`theorem eq_closedBall : I = Metric.closedBall 2\u207b\u00b9 2\u207b\u00b9` is very generic/ambiguous as a lemma name (many things can be \u2018eq_closedBall\u2019), and it lives in the `unitInterval` namespace only via `open scoped unitInterval` conventions (`I` is notation).",
+  "requested_change": "Rename to something like `unitInterval_eq_closedBall` or `_root_.unitInterval.eq_closedBall` with a clearer name such as `unitInterval_eq_closedBall_half` / `unitInterval_eq_closedBall` but with explicit center/radius in the statement, or make it a `[simp]` lemma `unitInterval.eq_closedBall` in the `unitInterval` namespace with explicit parameters. Also consider adding a short docstring explaining why the center/radius are `1/2`.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,51 @@
+{
+  "asks": [
+    {"pr": 26755, "ask_id": "v0016", "R1": "no", "R1_finding": null, "note": "R1 has no findings; noncomputable/coeMonoidHom question unaddressed."},
+
+    {"pr": 28649, "ask_id": "v0029", "R1": "no", "R1_finding": null, "note": "R1 has no findings."},
+    {"pr": 28649, "ask_id": "v0030", "R1": "no", "R1_finding": null, "note": "R1 has no findings."},
+    {"pr": 28649, "ask_id": "v0031", "R1": "no", "R1_finding": null, "note": "R1 has no findings."},
+
+    {"pr": 29842, "ask_id": "v0053", "R1": "no", "R1_finding": null, "note": "Nothing on #24163 interaction or PR-description rationale."},
+    {"pr": 29842, "ask_id": "v0055", "R1": "partial", "R1_finding": 1, "note": "Same proof lines, style tweak; R1 wants have hc' (longer), maintainer wants compaction keeping rw at hc."},
+    {"pr": 29842, "ask_id": "v0056", "R1": "no", "R1_finding": null, "note": "Nothing about PR description."},
+
+    {"pr": 30458, "ask_id": "v0060", "R1": "partial", "R1_finding": 4, "note": "R1 flags the LeftCancel/RightCancel split but proposes moving/adding lemmas, not variable ... in."},
+    {"pr": 30458, "ask_id": "v0061", "R1": "partial", "R1_finding": 4, "note": "Same finding covers card_le_card_div_right's subsection; different fix, sections kept."},
+    {"pr": 30458, "ask_id": "v0062", "R1": "no", "R1_finding": null, "note": "Findings 2-3 are about div_left_injective/div_left_inj proofs, not card_le_card_div_left."},
+    {"pr": 30458, "ask_id": "v0063", "R1": "no", "R1_finding": null, "note": "Nothing about reverting card_le_card_div_right to the old proof."},
+
+    {"pr": 30641, "ask_id": "v0064", "R1": "no", "R1_finding": null, "note": "Finding 1 is posLog_pow's docstring, not the variable name a vs x."},
+    {"pr": 30641, "ask_id": "v0065", "R1": "no", "R1_finding": null, "note": "Nothing about hypothesis name h2a vs ha."},
+    {"pr": 30641, "ask_id": "v0066", "R1": "no", "R1_finding": null, "note": "Nothing about proving the le version directly."},
+    {"pr": 30641, "ask_id": "v0067", "R1": "no", "R1_finding": null, "note": "Finding 0 is the lemma's name; nothing about positivity."},
+    {"pr": 30641, "ask_id": "v0068", "R1": "no", "R1_finding": null, "note": "Nothing about gcongr."},
+
+    {"pr": 32875, "ask_id": "v0090", "R1": "partial", "R1_finding": 0, "note": "Same grind proof, but R1 wants grind removed; maintainer wants lemmas @[grind]-tagged. Opposite direction."},
+    {"pr": 32875, "ask_id": "v0091", "R1": "partial", "R1_finding": 1, "note": "Same proof; R1 wants grind replaced, maintainer wants den_inv/num_intCast grind-tagged. Opposite direction."},
+    {"pr": 32875, "ask_id": "v0092", "R1": "no", "R1_finding": null, "note": "No finding on Constructions/Pi.lean."},
+    {"pr": 32875, "ask_id": "v0093", "R1": "no", "R1_finding": null, "note": "No finding on Portmanteau.lean."},
+    {"pr": 32875, "ask_id": "v0094", "R1": "no", "R1_finding": null, "note": "No finding on Disintegration/Integral.lean."},
+    {"pr": 32875, "ask_id": "v0095", "R1": "no", "R1_finding": null, "note": "No finding on Disintegration/Integral.lean."},
+
+    {"pr": 34091, "ask_id": "v0105", "R1": "no", "R1_finding": null, "note": "Nothing about shortening exists_infinite_fiber's proof."},
+    {"pr": 34091, "ask_id": "v0106", "R1": "no", "R1_finding": null, "note": "Finding 2 mentions the Infinite beta hypothesis only re the docstring, not instance-argument form."},
+    {"pr": 34091, "ask_id": "v0107", "R1": "no", "R1_finding": null, "note": "Nothing about [Uncountable beta] as an instance argument."},
+    {"pr": 34091, "ask_id": "v0108", "R1": "no", "R1_finding": null, "note": "Nothing about [Infinite alpha] as an instance argument."},
+    {"pr": 34091, "ask_id": "v0109", "R1": "reached", "R1_finding": 2, "note": "Finding 2 asks to fix exists_infinite_fiber's domain/domain docstring to domain vs codomain."},
+    {"pr": 34091, "ask_id": "v0110", "R1": "reached", "R1_finding": 1, "note": "Finding 1 (and 0) fix the same domain/codomain mistake in the other docstrings."},
+
+    {"pr": 36822, "ask_id": "v0131", "R1": "no", "R1_finding": null, "note": "R1 has no findings; simp removal unaddressed."},
+    {"pr": 36822, "ask_id": "v0132", "R1": "no", "R1_finding": null, "note": "R1 has no findings; simp removal unaddressed."}
+  ],
+  "unmatched": {
+    "26755": {"R1": 0},
+    "28649": {"R1": 0},
+    "29842": {"R1": 1},
+    "30458": {"R1": 4},
+    "30641": {"R1": 3},
+    "32875": {"R1": 0},
+    "34091": {"R1": 2},
+    "36822": {"R1": 0}
+  }
+}

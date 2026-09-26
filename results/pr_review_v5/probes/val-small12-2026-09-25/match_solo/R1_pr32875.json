@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Finset.mem_map_equiv",
+  "claim": "`Finset.mem_map_equiv` uses `grind` for a very small lemma, which may be considered non-idiomatic and can be less predictable than a short `constructor`/`rcases` proof.",
+  "requested_change": "Prefer an explicit proof without `grind`, e.g. `constructor; \u00b7 rintro \u27e8a,ha,rfl\u27e9; simpa; \u00b7 intro hb; exact \u27e8f.symm b, hb, by simp\u27e9` after `simp [Finset.mem_map, Equiv.coe_toEmbedding]` (or keep the previous proof).",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "`Rat.inv_intCast_den_of_pos` is now proved by `simp` + `grind`. While it compiles, maintainers sometimes prefer not to introduce `grind` into arithmetic-heavy files unless it brings clear robustness, because it can be harder to maintain/debug than a small `simp`/`nlinarith` proof.",
+  "requested_change": "If possible, replace `grind` with a targeted lemma chain: unfold `den_inv`/`num_intCast` and close with `simp` plus an explicit lemma about `Int.natAbs_ofNat`/`Int.natAbs_of_nonneg` under `ha0.le` (or keep the old proof if that is clearer).",
+  "severity": "advisory"
+ }
+]

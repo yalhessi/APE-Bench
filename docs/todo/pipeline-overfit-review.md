@@ -377,4 +377,7 @@ documentation, **0 of 14** in interface, registration, PR level and naming; 13-1
 match an ask, 13 sit on the two no-ask PRs. The dev set's ~30% reproduces on unseen PRs, and the
 misses are the audit's unowned families. The reasoning twin (Result 1) is parked: 2 of 10 with 29
 jobs cap-paused, 3.8x the cost.
+- **Solo on the same PRs (Result 3):** 2 of 30 against the lead's 8, $1.20 against $6.78, 40 tool
+  calls against 350, never near its cap. The division buys reach in proof and docs; neither
+  system reaches the 14 asks in interface, registration, PR level or naming.
 

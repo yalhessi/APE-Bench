@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Algebra/Group/Basic.lean",
+  "claim": "New sections `RightCancelDivInvMonoid` / `LeftCancelDivisionMonoid` introduce lemmas with the same names (`div_eq_inv_self`, `div_left_injective`, `div_left_inj`, `div_eq_self`, `div_right_injective`, `div_right_inj`) as existing Group lemmas, but now with different typeclass assumptions. This kind of generalization is fine, but it changes the meaning/TC search behavior at the same name in a non-local way and will confuse users/porting unless it is handled carefully (e.g. by keeping the old lemmas as specialized versions, or by ensuring the generalized lemma is definitionally the same and in the same section hierarchy).",
+  "requested_change": "Prefer to *keep* the lemmas in the existing `section Group` but weaken assumptions there via `[DivisionMonoid]`/`[DivInvMonoid]` + cancel typeclasses, so there is only one declaration per name. Alternatively, if you want to keep separate sections, rename the generalized lemmas (e.g. `div_left_injective_of_rightCancel` etc.) and then add `theorem` aliases in the Group section for backwards compatibility.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Algebra/Group/Pointwise/Set/Finite.lean",
+  "claim": "`finite_div`/`infinite_div` are now generalized to `[DivisionMonoid]` plus both `IsLeftCancelMul` and `IsRightCancelMul`. In a `DivisionMonoid`, left/right cancellation are often derivable from existing typeclasses (e.g. `CancelMonoid`/`Group`), so requiring both explicitly may be heavier than necessary for typical use.",
+  "requested_change": "Consider whether one can replace the assumptions with a single standard typeclass (`CancelMonoid`/`CancelSemigroup`) or prove local instances `IsLeftCancelMul`/`IsRightCancelMul` from existing assumptions in the lemma statement via `letI`/`infer_instance`, so the public signature stays simple. If not, at least add a short comment/docstring explaining why both cancel assumptions are needed.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "div_left_injective",
+  "claim": "`div_left_injective` proof is more verbose than necessary: it rewrites to `* b\u207b\u00b9` then manually applies `mul_right_cancel`. The library already has injectivity lemmas for right-multiplication under the appropriate cancel typeclass, and there is also a simp-friendly `mul_right_cancel` lemma, so this can likely be shortened/idiomatized.",
+  "requested_change": "Try `simp [div_eq_mul_inv]` + `exact (mul_right_cancel_... )` style, or directly use `Function.Injective` from `mul_right_cancel`/`mul_right_injective` if available for `IsRightCancelMul`. (My attempted rewrite using `mul_right_injective` failed because that lemma expects `IsLeftCancelMul`, so pick the correct cancel-side lemma.)",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "div_left_inj",
+  "claim": "`div_left_inj` can be shorter/cleaner: it duplicates the `div_left_injective` argument and manually constructs a \u2194. There is also a canonical pattern `((div_left_injective (b:=a)).eq_iff)` as used for `div_right_inj` below.",
+  "requested_change": "Replace proof with `((div_left_injective (b := a)).eq_iff)` (and a `simp [div_eq_mul_inv]` if needed). Or at least express via `.eq_iff` to avoid duplicated cancellation code.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+  "claim": "The section nesting in `section DivisionMonoid` splits `card_le_card_div_left` and `card_le_card_div_right` into separate LeftCancel/RightCancel subsections, but then `card_le_card_div_self` only assumes `[IsLeftCancelMul \u03b1]` even though its simp proof references `card_le_card_div_left` only. This makes the API slightly asymmetric: there is no lemma in this section that gives `#s \u2264 #(s / s)` from right-cancellation, and the name `DivisionMonoid` section suggests both sides might be available.",
+  "requested_change": "Either (a) add the right-cancel analogue `card_le_card_div_self'` under `[IsRightCancelMul \u03b1]`, or (b) move `card_le_card_div_self` into the `LeftCancel` subsection so users see it is specifically left-cancel.",
+  "severity": "advisory"
+ }
+]

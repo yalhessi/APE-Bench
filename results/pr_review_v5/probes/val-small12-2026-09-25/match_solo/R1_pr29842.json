@@ -1,0 +1,16 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/Analysis/Calculus/TangentCone.lean",
+  "claim": "`tangentConeAt.lim_zero` is now stated under `[ContinuousSMul \ud835\udd5c E]` (TVS section). This is good, but the lemma actually uses only continuity of `fun a : \ud835\udd5c => a\u207b\u00b9` at infinity (via `tendsto_inv\u2080_cobounded`) and continuity of scalar multiplication. Consider whether the weakest assumption is `[TopologicalSpace E] [AddCommGroup E] [Module \ud835\udd5c E] [ContinuousSMul \ud835\udd5c E]` (as written) but also whether the field assumption on `\ud835\udd5c` should be made explicit in the section header (it currently relies on the file-level `[NontriviallyNormedField \ud835\udd5c]`).",
+  "requested_change": "Either (a) leave as-is but add a brief comment/docstring noting it relies on `\ud835\udd5c` being a `NontriviallyNormedField`, or (b) restate the lemma with an explicit `{\ud835\udd5c}` argument and typeclass `[NontriviallyNormedField \ud835\udd5c]` if you intend it to be reusable outside this file/section context.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "tangentConeAt.lim_zero",
+  "claim": "Proof of `tangentConeAt.lim_zero` uses `rw [tendsto_norm_atTop_iff_cobounded] at hc` mid-proof. This mutates a hypothesis and can be slightly non-idiomatic/readability-reducing in Mathlib when a local `have hc' := ...` would suffice.",
+  "requested_change": "Replace `rw ... at hc` with `have hc' : Tendsto (fun n \u21a6 \u2016c n\u2016) l (cobounded \ud835\udd5c) := by simpa [tendsto_norm_atTop_iff_cobounded] using hc` (or similar), and use `hc'` in the last line.",
+  "severity": "advisory"
+ }
+]

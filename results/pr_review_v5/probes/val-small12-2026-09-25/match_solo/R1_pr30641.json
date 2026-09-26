@@ -1,0 +1,23 @@
+[
+ {
+  "i": 0,
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "`Real.posLog_norm_sum_le` name is slightly non-idiomatic for a lemma about a finset sum. In Mathlib, such lemmas are often named with `Finset`/`sum` adjacency and/or `posLog_norm_sum` without the trailing `_le` when the statement already ends in `\u2264` (both conventions exist, but `_le` is more often used when contrasting with `_ge` or when the LHS/RHS are not obviously ordered).",
+  "requested_change": "Consider renaming to something like `Real.posLog_norm_sum` or `Real.posLog_norm_sum`/`Real.posLog_norm_sum_le` aligned with existing lemma naming nearby (e.g. `posLog_sum`). If keeping name, consider adding `theorem` instead of `lemma` for consistency with surrounding API (optional).",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+  "claim": "`Real.posLog_pow` docstring is a bit misleading: it says \u201ccommutes with taking powers\u201d, but the lemma is really a formula `log\u207a (a^n) = n * log\u207a a` (using `n` as a scalar), i.e. `log\u207a` turns powers into multiplication by `n` on the output. \u201cCommutes\u201d usually suggests `log\u207a (a^n) = (log\u207a a)^n`, which is false.",
+  "requested_change": "Rephrase docstring to something like \u201c`log\u207a (a^n)` simplifies to `n * log\u207a a`.\u201d or \u201c`log\u207a` of a power is `n` times `log\u207a`.\u201d",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Real.posLog_zero",
+  "claim": "`Real.posLog_zero` and `Real.posLog_one` are `[simp]` lemmas proved by `simp [posLog]`, but there is already `posLog_def` as `rfl`; using `[simp]` might be fine, but these could be golfed/standardized to `by simp [Real.posLog]` or even `by simp [Real.posLog, Real.posLog_def]` consistently with the file\u2019s style (the file alternates between `posLog` and `posLog_def`).",
+  "requested_change": "Optionally make the proofs follow the file\u2019s preferred unfolding lemma (`posLog_def`) or add a short comment grouping them as simp-lemmas; no functional change needed.",
+  "severity": "advisory"
+ }
+]

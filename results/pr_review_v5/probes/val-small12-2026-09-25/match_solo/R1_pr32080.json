@@ -1,0 +1,58 @@
+[
+ {
+  "i": 0,
+  "target": "CompletelyRegularSpace.of_exists_uniformSpace",
+  "claim": "The file starts with a bare `module` command (line 6) instead of `import ...`. In Mathlib, `module` headers are not used in ordinary source files; this is non-idiomatic and will be flagged in review.",
+  "requested_change": "Remove the standalone `module` line, and start the file with `import Mathlib.Topology.Separation.CompletelyRegular` etc. If you want reexporting, keep `import` and add `/-!` docstring; use `import` not `public import` unless you really intend to reexport from this file.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "urysohns_main",
+  "claim": "`theorem urysohns_main` is a private lemma in spirit but is declared as a public theorem with a non-idiomatic name. Names in Mathlib should be either precise API names or marked `private` if internal.",
+  "requested_change": "Mark it `private theorem` and/or rename to something scoped and descriptive like `private theorem exists_open_between_of_P` or `private theorem urysohns_step` within a `namespace`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "UniformSpace.toCompletelyRegularSpace",
+  "claim": "`public instance UniformSpace.toCompletelyRegularSpace : CompletelyRegularSpace \u03b1` is very likely duplicating existing Mathlib instance(s): uniform spaces are classically known to be completely regular and Mathlib already has many such separation instances. Introducing a new `public` instance risks instance conflicts/loops or redundant API.",
+  "requested_change": "Search for an existing instance like `UniformSpace.completelyRegularSpace` / `UniformSpace.instCompletelyRegularSpace` and reuse it. If one exists, delete this instance and use `by infer_instance` in downstream results. If none exists, keep it but add a docstring and consider placing it in the canonical file (probably `Topology/Separation/CompletelyRegular` or `Topology/UniformSpace/Basic`).",
+  "severity": "blocking"
+ },
+ {
+  "i": 3,
+  "target": "P",
+  "claim": "`def P` is an extremely non-descriptive, unnamespaced helper definition at top level. Single-letter names are not acceptable for exported constants and also hurt readability even if private.",
+  "requested_change": "Make this helper `private` (or `local`) and give it a descriptive name, e.g. `private def UrysohnsP (c u : Set \u03b1) : Prop := ...`, or put it in a namespace (e.g. `namespace Uniformizable`) and mark it `private`.",
+  "severity": "blocking"
+ },
+ {
+  "i": 4,
+  "target": "CompletelyRegularSpace.exists_uniformSpace",
+  "claim": "`CompletelyRegularSpace.exists_uniformSpace` states existence of `u : UniformSpace \u03b1` with `u.toTopologicalSpace = t`. Usually the canonical statement is existence of a `UniformSpace` structure *compatible* with the topology, phrased as `\u2203 u, by letI := u; exact \u2039...\u203a` or `Compatible`-style, avoiding explicit equality with a named `t` parameter.",
+  "requested_change": "Consider rephrasing to avoid the explicit `[t : TopologicalSpace \u03b1]` argument and equality, e.g. `theorem CompletelyRegularSpace.uniformizable (\u03b1) [TopologicalSpace \u03b1] [CompletelyRegularSpace \u03b1] : \u2203 u : UniformSpace \u03b1, u.toTopologicalSpace = \u2039_\u203a` with `t` implicit, or introduce/ reuse a predicate `UniformizableSpace` if Mathlib has one.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "SetRel.IsRefl.comp",
+  "claim": "`instance IsRefl.comp [R\u2081.IsRefl] [R\u2082.IsRefl] : (R\u2081.comp R\u2082).IsRefl` may already exist under a different name or more general lemma (e.g. for unbundled relations). Adding a new instance in `SetRel` might be fine, but should be checked against existing instances to avoid duplication and potential instance search slowdowns.",
+  "requested_change": "Before merging, search for an existing lemma/instance giving reflexivity of relation composition (possibly `Relation.Comp` or `RelComp`). If it exists, reuse or prove a lemma and register it as `[simp?]` rather than a new global instance if not needed by typeclass inference.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "completelyRegularSpace_iff_exists_uniformSpace",
+  "claim": "`completelyRegularSpace_iff_exists_uniformSpace` is not namespaced and uses a long, slightly awkward name. If this is meant as the main characterization, a more idiomatic name would be `completelyRegularSpace_iff_uniformizable` or similar, matching established style (`..._iff...`).",
+  "requested_change": "Rename to a shorter/canonical lemma name, potentially introducing a predicate `UniformizableSpace` or at least `ExistsUniformSpace` to shorten. Also consider making it `theorem` in the `CompletelyRegularSpace` namespace or `TopologicalSpace` namespace.",
+  "severity": "advisory"
+ },
+ {
+  "i": 7,
+  "target": "Mathlib/Topology/UniformSpace/Uniformizable.lean",
+  "claim": "Module docstring contains `TODO: Explain proofs` and gives no real explanation of the construction/proof strategy; maintainers typically request removing TODOs and adding at least a brief explanation of key ingredients.",
+  "requested_change": "Replace the TODO with 2\u20135 sentences explaining: (1) uniform spaces are completely regular via Urysohn lemma on entourages; (2) completely regular spaces are uniformizable via the Stone\u2013\u010cech embedding and `uniformSpaceOfCompactR1.comap`.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "claim": "Docstring for `Cardinal.infinite_pigeonhole_card_lt` is incorrect/garbled: it says \u201cdomain's cardinality is infinite but strictly greater than its domain's\u201d (domain vs codomain mixup) and has typos (\u201cgreat\u201d).",
+  "requested_change": "Fix the prose to match the statement, e.g. \u201cA function whose domain has infinite cardinality and strictly larger cardinality than its codomain has a fiber of cardinality strictly larger than the codomain.\u201d (and correct \u201cgreater\u201d).",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "claim": "Docstring for new `Cardinal.exists_uncountable_fiber` has the same domain/domain typo and is misleading.",
+  "requested_change": "Rewrite as \u201cIf `#\u03b1 < #\u03b2` and `\u03b2` is uncountable, then some fiber is uncountable.\u201d",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "claim": "Docstring for `Cardinal.exists_infinite_fiber` repeats the same domain/domain mistake (\u201cstrictly greater than its domain's\u201d) and is misleading about the hypotheses (it now assumes `Infinite \u03b2`, not `Infinite \u03b1`).",
+  "requested_change": "Correct the docstring to refer to codomain vs domain and to the actual assumptions, e.g. \u201cIf `#\u03b1 < #\u03b2` and `\u03b2` is infinite, then some fiber is infinite.\u201d",
+  "severity": "blocking"
+ },
+ {
+  "i": 3,
+  "target": "Cardinal.le_range_of_union_finset_eq_univ",
+  "claim": "`le_range_of_union_finset_eq_univ`\u2019s argument `w` is written as `\u22c3 a, (f a : Set \u03b2) = Set.univ`; idiomatically this is usually `iUnion` (`\u22c3 a, ...`) but the proof uses `w.ge` in a way that relies on `Eq` as `LE`. This is a bit non-idiomatic and fragile.",
+  "requested_change": "Consider rewriting the start as `have : \u2200 b, \u2203 a, b \u2208 f a := by intro b; have : b \u2208 \u22c3 a, (f a : Set \u03b2) := by simpa [w]; simpa [Set.mem_iUnion] using this` (or similar), avoiding `w.ge : _ \u2264 _`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "claim": "The deprecation on `le_range_of_union_finset_eq_top` uses a fixed date string `since := \"2026-01-17\"`. Mathlib deprecations usually use the PR date/version when merged, but hardcoding a future date is suspicious and may violate policy.",
+  "requested_change": "Use the current date (merge date) or omit `since` if unsure; alternatively use the next tagged release version per Mathlib convention.",
+  "severity": "advisory"
+ }
+]
