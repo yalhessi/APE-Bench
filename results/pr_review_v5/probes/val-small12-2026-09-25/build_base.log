@@ -1,0 +1,166 @@
+2026-09-25 13:32:50 | INFO     | main:920 - Lean verification service batch builder
+2026-09-25 13:32:50 | INFO     | run_batch_build:851 - Starting batch build process
+2026-09-25 13:32:50 | INFO     | run_batch_build:861 - Input file: ['/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/val-small12-2026-09-25/base_build_rows.jsonl']
+2026-09-25 13:32:50 | INFO     | run_batch_build:862 - Commit ID key name: commit_hash
+2026-09-25 13:32:50 | INFO     | run_batch_build:866 - Number of processes: 1
+2026-09-25 13:32:50 | INFO     | __init__:153 - Batch builder initialized
+2026-09-25 13:32:50 | INFO     | build_from_file:540 - Starting batch build from 1 files
+2026-09-25 13:32:50 | INFO     | build_from_file:543 - Loading file: /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/val-small12-2026-09-25/base_build_rows.jsonl
+2026-09-25 13:32:50 | INFO     | build_from_file:551 -   Loaded 1 commits and 1 toolchains from /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/val-small12-2026-09-25/base_build_rows.jsonl
+2026-09-25 13:32:50 | INFO     | build_from_file:569 - Total 1 commits and 1 toolchains found
+2026-09-25 13:32:50 | INFO     | build_commits:646 - Checking and cloning required Git repositories...
+2026-09-25 13:32:50 | INFO     | _ensure_repositories_cloned:245 - Checking 1 repositories...
+2026-09-25 13:32:50 | INFO     | ensure_one_repo:253 - Repository exists: mathlib4
+2026-09-25 13:32:50 | INFO     | _ensure_repositories_cloned:300 - Repository check completed: 1/1 ready
+2026-09-25 13:32:50 | INFO     | build_commits:658 - Installing 1 toolchains...
+2026-09-25 13:32:50 | INFO     | _install_toolchains:176 - Installing 1 toolchains...
+2026-09-25 13:32:50 | INFO     | install_one_toolchain:186 - Installing toolchain: leanprover/lean4:v4.25.0-rc1 (attempt 1)
+2026-09-25 13:32:50 | INFO     | run_command:241 - [command] Starting execution: elan toolchain install leanprover/lean4:v4.25.0-rc1
+2026-09-25 13:32:50 | INFO     | read_stream:296 - [command] stderr: error: 'leanprover/lean4:v4.25.0-rc1' is already installed
+2026-09-25 13:32:50 | INFO     | install_one_toolchain:196 - Successfully installed toolchain: leanprover/lean4:v4.25.0-rc1
+2026-09-25 13:32:50 | INFO     | _install_toolchains:225 - Toolchain installation completed: 1/1 successful
+2026-09-25 13:32:50 | INFO     | build_commits:667 - Concurrent build 1 commits, using 1 processes
+2026-09-25 13:32:50 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-09-25 13:32:50 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-25 13:32:50 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-09-25 13:32:50 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-25 13:32:50 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-09-25 13:32:50 | INFO     | build_workspace:314 - Start building workspace: 258b485d4252a0cb5049ee25e87107830f13b7d1
+2026-09-25 13:32:50 | INFO     | build_workspace:335 - Execute build: 258b485d4252a0cb5049ee25e87107830f13b7d1
+2026-09-25 13:32:50 | INFO     | _ensure_repository_cloned_unlocked:103 - Repository already exists: mathlib4
+2026-09-25 13:33:06 | INFO     | create_worktree:222 - Created worktree: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f
+2026-09-25 13:33:06 | INFO     | _get_cache_for_workspace:1195 - Waiting for shared Lean cache lock mathlib4 for 258b485d4252a0cb5049ee25e87107830f13b7d1
+2026-09-25 13:40:11 | INFO     | run_command:241 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] Starting execution: lake exe cache get
+2026-09-25 13:40:11 | INFO     | run_command:243 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] Working directory: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f
+2026-09-25 13:40:15 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: plausible: cloning https://github.com/leanprover-community/plausible
+2026-09-25 13:40:15 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: plausible: checking out revision '7607162f5a1c1eb23c23027629a418b3a160670e'
+2026-09-25 13:40:15 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: LeanSearchClient: cloning https://github.com/leanprover-community/LeanSearchClient
+2026-09-25 13:40:16 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: LeanSearchClient: checking out revision '2ed4ba69b6127de8f5c2af83cccacd3c988b06bf'
+2026-09-25 13:40:16 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: importGraph: cloning https://github.com/leanprover-community/import-graph
+2026-09-25 13:40:16 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: importGraph: checking out revision 'e5c37730d22634ee0169c164f25dac49918ed951'
+2026-09-25 13:40:17 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: proofwidgets: cloning https://github.com/leanprover-community/ProofWidgets4
+2026-09-25 13:40:21 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: proofwidgets: checking out revision 'fb8ed0a85a96e3176f6e94b20d413ea72d92576d'
+2026-09-25 13:40:21 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: aesop: cloning https://github.com/leanprover-community/aesop
+2026-09-25 13:40:22 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: aesop: checking out revision 'cbe864cd5177966c9e005418cfdc1fb36db62e13'
+2026-09-25 13:40:23 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: Qq: cloning https://github.com/leanprover-community/quote4
+2026-09-25 13:40:23 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: Qq: checking out revision '593aa51c4aa07ee81e9233b53e1f61a5b4d9f761'
+2026-09-25 13:40:23 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: batteries: cloning https://github.com/leanprover-community/batteries
+2026-09-25 13:40:26 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: batteries: checking out revision '5bd478197f2e5d2a4fde527cf3581d83f49baa9b'
+2026-09-25 13:40:27 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: Cli: cloning https://github.com/leanprover/lean4-cli
+2026-09-25 13:40:27 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: info: Cli: checking out revision 'f75f4926aff7ba19949e16c19094d7298806b1a6'
+2026-09-25 13:40:29 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [4/20] Built Cache.Lean (1.5s)
+2026-09-25 13:40:29 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [5/20] Built Cache.Lean:c.o (106ms)
+2026-09-25 13:40:29 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [6/20] Built Batteries.Data.String.Basic (1.3s)
+2026-09-25 13:40:29 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [7/20] Built Batteries.Data.String.Basic:c.o (91ms)
+2026-09-25 13:40:29 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [8/20] Built Batteries.Data.Array.Match (1.7s)
+2026-09-25 13:40:30 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [9/20] Built Batteries.Data.Array.Match:c.o (192ms)
+2026-09-25 13:40:31 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [10/20] Built Batteries.Data.String.Matcher (1.2s)
+2026-09-25 13:40:31 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [11/20] Built Batteries.Data.String.Matcher:c.o (166ms)
+2026-09-25 13:40:31 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [12/20] Built Cache.IO (2.1s)
+2026-09-25 13:40:32 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [13/20] Built Cache.IO:c.o (1.2s)
+2026-09-25 13:40:33 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [14/20] Built Cache.Hashing (1.9s)
+2026-09-25 13:40:33 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [15/20] Built Cache.Hashing:c.o (386ms)
+2026-09-25 13:40:35 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [16/20] Built Cache.Requests (2.5s)
+2026-09-25 13:40:36 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [17/20] Built Cache.Requests:c.o (954ms)
+2026-09-25 13:40:37 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [18/20] Built Cache.Main (1.9s)
+2026-09-25 13:40:38 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [19/20] Built Cache.Main:c.o (421ms)
+2026-09-25 13:40:41 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: ✔ [20/20] Built cache:exe (3.5s)
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Fetching ProofWidgets cloud release... done!
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Current branch: HEAD
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Using cache (Azure) from origin: leanprover-community/mathlib4
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: No files to download
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Decompressing 7372 file(s)
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Unpacked in 6903 ms
+2026-09-25 13:41:01 | INFO     | read_stream:296 - [lake cache get 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Completed successfully!
+2026-09-25 13:41:01 | DEBUG    | _get_cache_for_workspace:1230 - Cache get successful
+2026-09-25 13:41:01 | INFO     | _run_lake_build:1022 - Successfully get workspace cache: 258b485d4252a0cb5049ee25e87107830f13b7d1
+2026-09-25 13:41:01 | INFO     | run_command:241 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] Starting execution: lake build
+2026-09-25 13:41:01 | INFO     | run_command:243 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] Working directory: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [19/61] Replaying ImportGraph.RequiredModules
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/importGraph/.lake/build/lib/lean/ImportGraph/RequiredModules.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [35/100] Replaying Qq.ForLean.ReduceEval
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/Qq/.lake/build/lib/lean/Qq/ForLean/ReduceEval.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [36/100] Replaying Qq.ForLean.ToExpr
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/Qq/.lake/build/lib/lean/Qq/ForLean/ToExpr.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [37/100] Replaying Qq.Typ
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/Qq/.lake/build/lib/lean/Qq/Typ.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [42/100] Replaying Qq.ForLean.Do
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/Qq/.lake/build/lib/lean/Qq/ForLean/Do.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [43/100] Replaying Qq.SortLocalDecls
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/Qq/.lake/build/lib/lean/Qq/SortLocalDecls.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [168/569] Replaying ProofWidgets.Compat
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/proofwidgets/.lake/build/lib/lean/ProofWidgets/Compat.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [171/569] Replaying ProofWidgets.Util
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/proofwidgets/.lake/build/lib/lean/ProofWidgets/Util.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [176/569] Replaying Plausible.Random
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/plausible/.lake/build/lib/lean/Plausible/Random.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [182/569] Replaying Plausible.Attr
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/plausible/.lake/build/lib/lean/Plausible/Attr.ir
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: ✖ [190/688] Replaying LeanSearchClient.Basic
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: error: no such file or directory (error code: 2)
+2026-09-25 13:41:41 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout:   file: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f/.lake/packages/LeanSearchClient/.lake/build/lib/lean/LeanSearchClient/Basic.ir
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: Some required targets logged failures:
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - ImportGraph.RequiredModules
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Qq.ForLean.ReduceEval
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Qq.ForLean.ToExpr
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Qq.Typ
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Qq.ForLean.Do
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Qq.SortLocalDecls
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - ProofWidgets.Compat
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - ProofWidgets.Util
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Plausible.Random
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - Plausible.Attr
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stdout: - LeanSearchClient.Basic
+2026-09-25 13:42:00 | INFO     | read_stream:296 - [lake build 258b485d4252a0cb5049ee25e87107830f13b7d1] stderr: error: build failed
+2026-09-25 13:42:01 | ERROR    | _run_lake_build:1043 - Lake build failed 258b485d4252a0cb5049ee25e87107830f13b7d1: Lake build failed: error: build failed
+2026-09-25 13:43:31 | DEBUG    | cleanup_worktree:300 - Cleaned up worktree: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/build_workspaces/258b485d4252a0cb5049ee25e87107830f13b7d1_3746110_39a83b9f
+2026-09-25 13:43:31 | ERROR    | build_workspace:371 - Build exception 258b485d4252a0cb5049ee25e87107830f13b7d1: [258b485d4252a0cb5049ee25e87107830f13b7d1] Lake build failed: error: build failed
+2026-09-25 13:43:31 | INFO     | complete_build:360 - Build operation completed: 258b485d4252a0cb5049ee25e87107830f13b7d1, success: False
+2026-09-25 13:43:31 | ERROR    | build_single_commit_worker:135 - Build failed for mathlib4@258b485d4252a0cb5049ee25e87107830f13b7d1: Traceback (most recent call last):
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/ape/toolkits/execute/lean/build.py", line 99, in build_single_commit_worker
+    result = asyncio.run(async_build())
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/ape/toolkits/execute/lean/build.py", line 94, in async_build
+    return await build_manager.build_workspace(commit_hash)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/ape/toolkits/execute/lean/core/build_manager.py", line 336, in build_workspace
+    file_count = await self._execute_build(commit_hash)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/ape/toolkits/execute/lean/core/build_manager.py", line 927, in _execute_build
+    await self._run_lake_build(
+    ...<3 lines>...
+    )
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/ape/toolkits/execute/lean/core/build_manager.py", line 1044, in _run_lake_build
+    raise RuntimeError(f"[{commit_hash}] {error_message}")
+RuntimeError: [258b485d4252a0cb5049ee25e87107830f13b7d1] Lake build failed: error: build failed
+
+2026-09-25 13:43:31 | INFO     | _print_progress:511 - [1m[96mProgress:[0m [92m1[0m/[94m1[0m ([92m100.0%[0m) | [1m[96mSuccess:[0m [92m0[0m/[94m1[0m ([92m0.0%[0m) | [1m[96mFailed:[0m [91m1[0m | [1m[96mETA:[0m [93mN/A[0m
+2026-09-25 13:43:31 | INFO     | _print_progress:511 - [1m[96mProgress:[0m [92m1[0m/[94m1[0m ([92m100.0%[0m) | [1m[96mSuccess:[0m [92m0[0m/[94m1[0m ([92m0.0%[0m) | [1m[96mFailed:[0m [91m1[0m | [1m[96mETA:[0m [93mN/A[0m
+2026-09-25 13:43:31 | INFO     | build_commits:733 - 
+2026-09-25 13:43:31 | INFO     | build_commits:735 - Concurrent build completed
+2026-09-25 13:43:31 | INFO     | build_commits:741 - Build results: successful 0, failed 1, success rate 0.00%
+2026-09-25 13:43:31 | INFO     | run_batch_build:889 - Batch build completed!
+2026-09-25 13:43:31 | INFO     | run_batch_build:890 - Total commits: 1
+2026-09-25 13:43:31 | INFO     | run_batch_build:891 - Successful builds: 0
+2026-09-25 13:43:31 | INFO     | run_batch_build:892 - Failed builds: 1
+2026-09-25 13:43:31 | INFO     | run_batch_build:893 - Success rate: 0.00%
+2026-09-25 13:43:31 | INFO     | run_batch_build:896 - Total duration: 641.45 seconds
+2026-09-25 13:43:31 | WARNING  | run_batch_build:900 - 1 builds failed

@@ -1,0 +1,33 @@
+2026-09-25 13:32:48 | INFO     | _judge:355 - --execute overrides `dataset.dry_run: true` from the config
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/cli.py", line 564, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/cli.py", line 522, in main
+    return _judge(args, overrides, logger)
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/cli.py", line 358, in _judge
+    out = asyncio.run(run(dataset, scaffold, task_overrides, logger))
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/judge/runner.py", line 544, in run
+    stage = source_run(dataset, logger)
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/judge/runner.py", line 364, in source_run
+    stage = StageInput.at(
+        Path(dataset.candidates).parent,
+        require=("findings",) if Path(dataset.candidates).name == "findings.jsonl" else (),
+        allow_partial=dataset.allow_partial,
+    )
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/run_state.py", line 337, in at
+    raise ValueError(
+    ...<9 lines>...
+    )
+ValueError: source run 'pr5_V3r_contract_fanout4_medium_cap030_rep1' closed as 'partial' with 6 coverage gap(s): wu:1031e8acbe2db1ea15d6a50e#naming, wu:1f9cf7865fe0948dfc6e47f8#naming, wu:1f9cf7865fe0948dfc6e47f8#style, wu:4a8d72b1a276a6e9499bc778#correctness, wu:4a8d72b1a276a6e9499bc778#duplication, wu:4a8d72b1a276a6e9499bc778#naming. Recall from it is measured against work units that were never reviewed, so it is not comparable to a complete run. Set `dataset.allow_partial: true` to score it anyway -- the output is forensic and must not be reported as a headline number.

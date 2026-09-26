@@ -1,0 +1,90 @@
+{
+  "agent_added": 0,
+  "candidates_total": 42,
+  "completion_status": "partial",
+  "context_calls_total": 0,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 21.385122,
+    "nested_nominal": 44.619554
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:1031e8acbe2db1ea15d6a50e#naming",
+      "pr_number": 33145,
+      "reason": "All samples failed: ['paused_cost_limit']",
+      "status": "paused_cost",
+      "work_unit_id": "wu:1031e8acbe2db1ea15d6a50e"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:1f9cf7865fe0948dfc6e47f8#naming",
+      "pr_number": 33337,
+      "reason": "All samples failed: ['paused_cost_limit']",
+      "status": "paused_cost",
+      "work_unit_id": "wu:1f9cf7865fe0948dfc6e47f8"
+    },
+    {
+      "arm_id": "style",
+      "invocation_id": "wu:1f9cf7865fe0948dfc6e47f8#style",
+      "pr_number": 33337,
+      "reason": "All samples failed: ['paused_cost_limit']",
+      "status": "paused_cost",
+      "work_unit_id": "wu:1f9cf7865fe0948dfc6e47f8"
+    },
+    {
+      "arm_id": "correctness",
+      "invocation_id": "wu:4a8d72b1a276a6e9499bc778#correctness",
+      "pr_number": 33421,
+      "reason": "All samples failed: ['paused_cost_limit']",
+      "status": "paused_cost",
+      "work_unit_id": "wu:4a8d72b1a276a6e9499bc778"
+    },
+    {
+      "arm_id": "duplication",
+      "invocation_id": "wu:4a8d72b1a276a6e9499bc778#duplication",
+      "pr_number": 33421,
+      "reason": "All samples failed: ['paused_cost_limit']",
+      "status": "paused_cost",
+      "work_unit_id": "wu:4a8d72b1a276a6e9499bc778"
+    },
+    {
+      "arm_id": "naming",
+      "invocation_id": "wu:4a8d72b1a276a6e9499bc778#naming",
+      "pr_number": 33421,
+      "reason": "All samples failed: ['paused_cost_limit']",
+      "status": "paused_cost",
+      "work_unit_id": "wu:4a8d72b1a276a6e9499bc778"
+    }
+  ],
+  "delegated": 140,
+  "failed": 0,
+  "issues_total": 42,
+  "mandatory": 22,
+  "paused": 29,
+  "proposals_total": 140,
+  "pruned": 0,
+  "routing_mode": "fanout",
+  "run_id": "v5run:pr5_V3r_contract_fanout4_medium_cap030_rep1",
+  "run_name": "pr5_V3r_contract_fanout4_medium_cap030_rep1",
+  "run_plan_sha256": "03e6d8cafe18ebbb22e7bc5fd14f27cd24c77b1f543d9188accde1907ee9d556",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "85f757b659e2aa4c065388245bc8ce9b8b85922ddf5d59d8b220c037fd4eae6d",
+  "succeeded": 111,
+  "total_cost": 44.619554,
+  "usage": {
+    "billed": 21.385122,
+    "budget_charged": 17.675732,
+    "nested_billed": 21.385122,
+    "nested_nominal": 44.619554,
+    "nested_tokens": 17954563.0,
+    "nominal": 44.619554,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 17954563.0,
+    "tokens": 35909126.0
+  },
+  "wall_seconds": 5171.176918
+}

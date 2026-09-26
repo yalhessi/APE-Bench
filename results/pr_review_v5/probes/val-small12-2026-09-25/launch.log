@@ -1,0 +1,13 @@
+2026-09-25 12:05:08 start: twin effort=medium job_cap=0.30 run_cap=42; validation run=pr5_val_small12_lead_rep1
+2026-09-25 12:05:08 twin: plan pr5_V3r_contract_fanout4_medium_cap030_rep1
+2026-09-25 12:05:36 twin: run pr5_V3r_contract_fanout4_medium_cap030_rep1
+2026-09-25 13:32:46 twin: run exit 0; completed: 111; retry warnings: 0
+2026-09-25 13:32:46 twin: judge
+2026-09-25 13:32:48 twin: judge exit 1
+2026-09-25 13:32:48 build: base workspace for PR 30714's commit
+2026-09-25 13:43:32 build: base exit 1
+2026-09-25 13:43:32 build: reviewed workspaces for small12
+2026-09-25 13:43:35 build: reviewed exit 1
+2026-09-25 13:43:35 validation: plan pr5_val_small12_lead_rep1
+2026-09-25 13:43:38 validation: plan refused (workspaces unbuilt?); see val_plan.log. NOT run.
+2026-09-25 13:43:38 DONE

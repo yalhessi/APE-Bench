@@ -1,0 +1,127 @@
+2026-09-25 12:05:10 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-25 12:05:35 | INFO     | stamp_submission_directives:914 - target_verdicts is ON — every arm answers every review target it is shown
+2026-09-25 12:05:35 | INFO     | stamp_submission_directives:916 - submission_verification_policy overridden to verify_edits_if_present on every arm
+2026-09-25 12:05:35 | INFO     | run:1654 - DRY RUN — nothing is written and no model is called
+2026-09-25 12:05:35 | INFO     | run:1659 - {
+  "agenda_version": "v5-agenda/1",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "renderer_version": "candidate-prompt/12+focused-prompt/4+ask_without_fix+target_verdicts",
+  "routing_mode": "fanout",
+  "work_units": 33,
+  "units_without_specialist": [],
+  "pr_numbers": [
+    33145,
+    33315,
+    33337,
+    33421
+  ],
+  "proposals_enumerated": 140,
+  "proposals_eligible": 138,
+  "by_arm": {
+    "style": {
+      "enumerated": 33,
+      "eligible": 33,
+      "sites": 79,
+      "cost_hint": 1.6500000000000008
+    },
+    "api_reuse": {
+      "enumerated": 11,
+      "eligible": 11,
+      "sites": 37,
+      "cost_hint": 0.5499999999999999
+    },
+    "correctness": {
+      "enumerated": 11,
+      "eligible": 11,
+      "sites": 37,
+      "cost_hint": 0.5499999999999999
+    },
+    "docs": {
+      "enumerated": 19,
+      "eligible": 19,
+      "sites": 45,
+      "cost_hint": 0.9500000000000003
+    },
+    "duplication": {
+      "enumerated": 11,
+      "eligible": 11,
+      "sites": 37,
+      "cost_hint": 0.5499999999999999
+    },
+    "family_design": {
+      "enumerated": 11,
+      "eligible": 11,
+      "sites": 37,
+      "cost_hint": 0.5499999999999999
+    },
+    "generality": {
+      "enumerated": 11,
+      "eligible": 11,
+      "sites": 37,
+      "cost_hint": 0.5499999999999999
+    },
+    "naming": {
+      "enumerated": 11,
+      "eligible": 11,
+      "sites": 37,
+      "cost_hint": 0.5499999999999999
+    },
+    "proof_golf": {
+      "enumerated": 11,
+      "eligible": 10,
+      "sites": 36,
+      "cost_hint": 0.5499999999999999
+    },
+    "proof_idiom": {
+      "enumerated": 11,
+      "eligible": 10,
+      "sites": 36,
+      "cost_hint": 0.5499999999999999
+    }
+  },
+  "projected_cost_fanout": 7.0,
+  "projected_cost_rules": 6.9,
+  "mandatory_floor_cost": 1.1,
+  "mandatory_floor_tokens": 1320000,
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 2,
+      "recommended": 116,
+      "required": 22
+    },
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 2,
+      "docs": 1,
+      "duplication": 2,
+      "family_design": 3,
+      "generality": 0,
+      "naming": 7,
+      "proof_golf": 0,
+      "proof_idiom": 0,
+      "style": 7
+    },
+    "required_by_pr": {
+      "33145": 5,
+      "33315": 2,
+      "33337": 5,
+      "33421": 10
+    },
+    "required_reasons": {
+      "these declarations are one API family (family)": 10,
+      "namespace placement and module docs are properties of the file (file)": 7,
+      "this PR introduces declarations that did not exist before (introduction)": 4,
+      "this PR changes module documentation (site)": 1
+    },
+    "prs_with_no_required_work": []
+  }
+}
+2026-09-25 12:05:35 | WARNING  | _warn_on_denomination_drift:1152 - per_pr_cost_cap buys 5.0 standard jobs but per_pr_token_cap buys 8.8: the two denominations no longer authorise the same work. A config that retunes one block should retune the other, or this run is a different experiment on a priced model than on a free one.
+2026-09-25 12:05:35 | WARNING  | _warn_on_denomination_drift:1152 - lead_cost_cap buys 3.3 standard jobs but lead_token_cap buys 5.9: the two denominations no longer authorise the same work. A config that retunes one block should retune the other, or this run is a different experiment on a priced model than on a free one.
+2026-09-25 12:05:35 | INFO     | _report_token_budget:1085 - token budget: 140 fanout jobs x 600,000 = 84,000,000 worst case, against run_total_token_cap 84,000,000
+2026-09-25 12:05:35 | INFO     | _report_budget:1272 - budget: 140 fanout jobs x $0.30 = $42.00 worst case (the agenda's cost hints expect $7.00), against run_total_cost_cap $42.00
+2026-09-25 12:05:35 | INFO     | assert_coverage_is_reachable:985 - specialist-only: all work units draw at least one specialist
+2026-09-25 12:05:35 | INFO     | run:1666 - retrieval cutoffs resolve for all 4 episode(s)
+2026-09-25 12:05:35 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-25 12:05:35 | INFO     | run:1671 - reviewed workspaces: 4 of 4 episode(s) prebuilt
+2026-09-25 12:05:36 | INFO     | run:1675 - run plan seals (agenda 2dca46830373, 140 prompt hashes) — not written
