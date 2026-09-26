@@ -1,0 +1,108 @@
+{
+ "sources": {
+  "validation": "the 22 of 30 small12 asks neither blind matcher credited to pr5_val_small12_minus30714_lead_rep1",
+  "dev": "the 16 of 23 counted held-out obligations no rep of pr5_A_lead_heldout12_v2 hit"
+ },
+ "kappa": {
+  "warrant": 0.83,
+  "tool": 0.63,
+  "knowledge": 0.79
+ },
+ "validation": {
+  "n": 22,
+  "warrant": {
+   "agreed": {
+    "count": 7,
+    "compile": 10,
+    "judgment": 3
+   },
+   "split": 2
+  },
+  "tool": {
+   "agreed": {
+    "census": 4,
+    "compile_edit": 10,
+    "sibling_compare": 1,
+    "none": 1,
+    "read_pr": 1
+   },
+   "split": 5
+  },
+  "knowledge": {
+   "agreed": {
+    "partly": 3,
+    "no": 15,
+    "yes": 1
+   },
+   "split": 3
+  },
+  "mechanically_settled_agreed": 17,
+  "no_deep_knowledge_agreed": 15
+ },
+ "dev": {
+  "n": 16,
+  "warrant": {
+   "agreed": {
+    "compile": 5,
+    "judgment": 1,
+    "exhibit": 1,
+    "count": 7
+   },
+   "split": 2
+  },
+  "tool": {
+   "agreed": {
+    "compile_edit": 4,
+    "read_pr": 1,
+    "type_search": 1,
+    "census": 3,
+    "linter": 1,
+    "sibling_compare": 1
+   },
+   "split": 5
+  },
+  "knowledge": {
+   "agreed": {
+    "partly": 8,
+    "no": 7
+   },
+   "split": 1
+  },
+  "mechanically_settled_agreed": 13,
+  "no_deep_knowledge_agreed": 7
+ },
+ "all": {
+  "n": 38,
+  "warrant": {
+   "agreed": {
+    "count": 14,
+    "compile": 15,
+    "judgment": 4,
+    "exhibit": 1
+   },
+   "split": 4
+  },
+  "tool": {
+   "agreed": {
+    "compile_edit": 14,
+    "read_pr": 2,
+    "census": 7,
+    "type_search": 1,
+    "sibling_compare": 2,
+    "none": 1,
+    "linter": 1
+   },
+   "split": 10
+  },
+  "knowledge": {
+   "agreed": {
+    "partly": 11,
+    "no": 22,
+    "yes": 1
+   },
+   "split": 4
+  },
+  "mechanically_settled_agreed": 30,
+  "no_deep_knowledge_agreed": 22
+ }
+}

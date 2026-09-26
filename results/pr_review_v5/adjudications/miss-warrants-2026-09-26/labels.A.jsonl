@@ -1,0 +1,38 @@
+{"id": "v0061", "warrant": "count", "tool": "census", "knowledge": "partly", "note": "Layout: `variable ... in` over nested sections; prevailing idiom, not sibling file"}
+{"id": "ec6b1463cc18", "warrant": "compile", "tool": "compile_edit", "knowledge": "partly", "note": "Specific proof route; builds or not. Choosing the route needs lemma familiarity"}
+{"id": "57e1c259d559", "warrant": "judgment", "tool": "read_pr", "knowledge": "partly", "note": "Explain proof-vs-statement mismatch in module doc; Implementation-details section is convention"}
+{"id": "v0064", "warrant": "count", "tool": "census", "knowledge": "no", "note": "Variable name x vs a for reals; optional; file itself mixed"}
+{"id": "168d80d11d79", "warrant": "exhibit", "tool": "type_search", "knowledge": "no", "note": "Existing Parseval lemma found by statement shape; duplicate obvious once shown"}
+{"id": "v0092", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Try `simpa using`; compiles or not"}
+{"id": "v0108", "warrant": "count", "tool": "census", "knowledge": "no", "note": "Instance binder for Infinite; library-wide practice, file's own siblings used explicit"}
+{"id": "v0067", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Try `positivity`; untested by maintainer too"}
+{"id": "5bfd4bcb3e14", "warrant": "count", "tool": "census", "knowledge": "partly", "note": "Set-builder over predicate-as-set defeq abuse; convention"}
+{"id": "42a1a3948b63", "warrant": "count", "tool": "sibling_compare", "knowledge": "no", "note": "Dot-notation name matching the IsFundamentalSequence family"}
+{"id": "v0068", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Try `gcongr`; compiles or not"}
+{"id": "v0016", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Drop `noncomputable` and rebuild"}
+{"id": "63fdc033749f", "warrant": "count", "tool": "census", "knowledge": "partly", "note": "Provide ciInf twin via OrderDual; prevailing dual-lemma practice"}
+{"id": "v0091", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "`Same here` refers to unseen sibling comment; presumably proof simplification"}
+{"id": "v0066", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Prove the inequality directly; compiles or not"}
+{"id": "v0132", "warrant": "count", "tool": "sibling_compare", "knowledge": "no", "note": "simp attribute dropped when adding to_dual; compare attributes before/after"}
+{"id": "1c71d01c03a4", "warrant": "compile", "tool": "compile_edit", "knowledge": "partly", "note": "Dedupe inf via OrderDual proof; naming and duality trick are conventions"}
+{"id": "7269c8ad0e9b", "warrant": "count", "tool": "census", "knowledge": "partly", "note": "toLinearMap_ prefix for coercion equalities; which coercion convention applies needs sense"}
+{"id": "95eb6cac0fc0", "warrant": "count", "tool": "census", "knowledge": "no", "note": "Dot-notation call `h.map_iSup`; style"}
+{"id": "v0106", "warrant": "count", "tool": "census", "knowledge": "no", "note": "Instance binder for Infinite; library-wide practice"}
+{"id": "ff81bf55a336", "warrant": "count", "tool": "census", "knowledge": "no", "note": "Primed name to descriptive `round_eq_div`; naming convention"}
+{"id": "v0063", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Restore old term-mode proof and build"}
+{"id": "d412439e70f7", "warrant": "compile", "tool": "compile_edit", "knowledge": "partly", "note": "Generalize to typeclass-polymorphic statement; builds or not; generality target is convention"}
+{"id": "3dd40b34f783", "warrant": "compile", "tool": "compile_edit", "knowledge": "partly", "note": "Generalize 2 to k with hk; builds or not; generalize-by-default is convention"}
+{"id": "v0090", "warrant": "count", "tool": "sibling_compare", "knowledge": "partly", "note": "grind tags on mem lemmas; depends on whether siblings already carry them"}
+{"id": "v0053", "warrant": "judgment", "tool": "none", "knowledge": "yes", "note": "Interaction with other PRs and prior consensus; maintainers' history"}
+{"id": "f312afe3dc97", "warrant": "count", "tool": "linter", "knowledge": "no", "note": "Long line; style linter flags it"}
+{"id": "b12613af1b38", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Replace proof tail with simp; compiles or not"}
+{"id": "v0105", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "One-liner via infinite_pigeonhole_card_lt; try it"}
+{"id": "v0029", "warrant": "judgment", "tool": "none", "knowledge": "yes", "note": "Hyphenation taste; revert; no tool leads there"}
+{"id": "v0107", "warrant": "count", "tool": "census", "knowledge": "no", "note": "Instance binder for Uncountable; library-wide practice"}
+{"id": "96d44425458e", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Factor repeated Tendsto argument into lemma; repetition visible, factored lemma builds"}
+{"id": "v0062", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Restore old term-mode proof and build"}
+{"id": "v0060", "warrant": "count", "tool": "census", "knowledge": "partly", "note": "Keep one section, `variable ... in` per lemma; layout idiom"}
+{"id": "v0056", "warrant": "judgment", "tool": "read_pr", "knowledge": "yes", "note": "Record generalization plan in PR description; plan came from discussion"}
+{"id": "19f73d6b3cef", "warrant": "count", "tool": "sibling_compare", "knowledge": "no", "note": "Lemmas belong inside namespace Complex like their siblings"}
+{"id": "v0065", "warrant": "compile", "tool": "compile_edit", "knowledge": "no", "note": "Rename h₂a to ha; rename and build shows no clash"}
+{"id": "v0131", "warrant": "count", "tool": "sibling_compare", "knowledge": "no", "note": "simp attribute dropped when adding to_dual; compare attributes before/after"}

@@ -259,3 +259,24 @@ reviewer carries the knowledge.
    returned it -- forcing restricted to the mechanical asks, which is the calibration forcing
    lacked (0.50 with 36 control findings).
 3. Two runs per set against the baselines that now exist on both.
+
+**Step 1 done, 2026-09-26** (`results/pr_review_v5/adjudications/miss-warrants-2026-09-26/`). The
+38 misses -- the 22 validation asks neither matcher credited and the 16 held-out obligations no
+rep hit -- labelled by two blind readers for what settles them (κ 0.83), which tool would produce
+it (0.63) and whether deep Mathlib knowledge is needed (0.79):
+
+| | validation (22) | dev (16) | all (38) |
+|---|---|---|---|
+| settled by compile / count / exhibit (agreed) | 17 | 13 | **30** |
+| settled by judgment (agreed) | 3 | 1 | 4 |
+| no deep knowledge needed (agreed) | 15 | 7 | **22** |
+| partly | 3 | 8 | 11 |
+| deep knowledge needed | 1 | 0 | 1 |
+
+By tool (agreed): compiling a proposed edit 14, a census 7, sibling comparison 2, reading the PR
+2, a type search 1, a linter 1, none 1; 10 split. The dev misses need "some sense of the
+convention" more often (8 partly): a census narrows the rename but choosing it is a convention
+call. **The premise holds on the actual misses of both sets:** the loss is in asks Lean or a
+census settles, and the largest single lever is trying the edit -- `simpa`, `positivity`,
+`gcongr`, "does the old proof still work" -- and compiling it, then the census beyond name
+prefixes. Type search is one miss, smaller than the revision above guessed.
