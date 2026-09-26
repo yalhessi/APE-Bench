@@ -1,0 +1,41 @@
+import FoldIndex
+set_option maxHeartbeats 4000000
+
+#fold_stats
+
+section
+variable {A : Type*} [Group A] (B : Subgroup A)
+-- v2022: analogue Subgroup.FiniteIndex
+#fold B.index ≠ 0
+end
+
+section
+variable {R : Type*} [CommRing R] (I : Ideal R)
+-- v2163: analogue Submodule.IsPrincipal (one-field class)
+#fold ∃ x : R, I = Ideal.span {x}
+end
+
+section
+variable (k : ℤ)
+-- v1547: analogue Pi.single, with the carrier family as decoys; expect the function-level fold
+#fold fun n : ℤ => if n = k then (1 : ℂ) else 0
+end
+
+section
+open scoped Pointwise in
+variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] (x : R)
+-- v0157: analogue QuotSMulTop (a definition body)
+#fold M ⧸ x • (⊤ : Submodule R M)
+end
+
+section
+variable {τ α : Type*} [AddMonoid τ] [TopologicalSpace τ] [ContinuousAdd τ] [TopologicalSpace α] (ϕ : Flow τ α) (x : α)
+-- v0575: MulAction.orbit is a role analogue; expect no shape fold
+#fold {y | ∃ t : τ, ϕ t x = y}
+end
+
+section
+variable {E : Type*} [TopologicalSpace E] (A : Set E)
+-- v2006, the guard exemplar: the sequential form must NOT fold into IsSeqCompact-as-the-answer silently; report what it folds to
+#fold ∀ x : ℕ → E, (∀ n, x n ∈ A) → ∃ a ∈ A, MapClusterPt a Filter.atTop x
+end
