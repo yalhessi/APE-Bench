@@ -1,0 +1,325 @@
+2026-09-26 06:09:29 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-26 06:09:31 | INFO     | run:1654 - DRY RUN — nothing is written and no model is called
+2026-09-26 06:09:31 | INFO     | run:1659 - {
+  "agenda_version": "v5-agenda/1",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "renderer_version": "candidate-prompt/14+focused-prompt/4",
+  "routing_mode": "lead",
+  "work_units": 36,
+  "units_without_specialist": [],
+  "pr_numbers": [
+    26185,
+    26755,
+    28649,
+    29842,
+    30458,
+    30641,
+    32080,
+    32875,
+    34091,
+    34935,
+    36822
+  ],
+  "proposals_enumerated": 322,
+  "proposals_eligible": 314,
+  "by_arm": {
+    "api_reuse": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "correctness": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "docs": {
+      "enumerated": 34,
+      "eligible": 34,
+      "sites": 133,
+      "cost_hint": 1.7000000000000008
+    },
+    "duplication": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "family_design": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "generalist": {
+      "enumerated": 36,
+      "eligible": 36,
+      "sites": 204,
+      "cost_hint": 1.800000000000001
+    },
+    "generality": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "naming": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "proof_golf": {
+      "enumerated": 27,
+      "eligible": 23,
+      "sites": 80,
+      "cost_hint": 1.3500000000000005
+    },
+    "proof_idiom": {
+      "enumerated": 27,
+      "eligible": 23,
+      "sites": 80,
+      "cost_hint": 1.3500000000000005
+    },
+    "style": {
+      "enumerated": 36,
+      "eligible": 36,
+      "sites": 179,
+      "cost_hint": 1.800000000000001
+    }
+  },
+  "projected_cost_fanout": 16.1,
+  "projected_cost_rules": 15.7,
+  "mandatory_floor_cost": 5.5,
+  "mandatory_floor_tokens": 6600000,
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 6,
+      "recommended": 206,
+      "required": 110
+    },
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 8,
+      "docs": 5,
+      "duplication": 8,
+      "family_design": 9,
+      "generalist": 36,
+      "generality": 7,
+      "naming": 13,
+      "proof_golf": 5,
+      "proof_idiom": 4,
+      "style": 15
+    },
+    "required_by_pr": {
+      "26185": 11,
+      "26755": 6,
+      "28649": 10,
+      "29842": 7,
+      "30458": 13,
+      "30641": 7,
+      "32080": 9,
+      "32875": 17,
+      "34091": 12,
+      "34935": 10,
+      "36822": 8
+    },
+    "required_reasons": {
+      "the per-unit broad pass, which no specialist replaces": 36,
+      "these declarations are one API family (family)": 22,
+      "the PR states this is what it is doing (pr_intent)": 16,
+      "this PR introduces declarations that did not exist before (introduction)": 16,
+      "namespace placement and module docs are properties of the file (file)": 15,
+      "this PR changes module documentation (site)": 5
+    },
+    "prs_with_no_required_work": []
+  }
+}
+2026-09-26 06:09:31 | INFO     | _report_token_budget:1097 - token budget: mandatory floor 6,600,000 (uncapped per PR by design) + discretionary up to 19,800,000 (11 PR x 1,800,000)
+2026-09-26 06:09:31 | INFO     | _report_token_budget:1105 - run_total_token_cap 30,000,000 vs worst case 26,400,000 (floor + discretionary) - fits
+2026-09-26 06:09:31 | INFO     | _report_budget:1287 - budget: mandatory floor $5.50 (uncapped per PR by design) + discretionary up to $16.50 (11 PR x $1.50)
+2026-09-26 06:09:31 | INFO     | _report_budget:1300 - run_total_cost_cap $25.00 vs worst case $22.00 (floor + discretionary) — fits
+2026-09-26 06:09:31 | INFO     | run:1666 - retrieval cutoffs resolve for all 11 episode(s)
+2026-09-26 06:09:31 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:09:31 | WARNING  | assert_reviewed_workspaces_prebuilt:275 - 11 episode(s) have no reviewed workspace (PRs [26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]); verification would resolve imports against the base commit's build products
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/cli.py", line 564, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/cli.py", line 518, in main
+    return _plan(args.config, overrides, logger)
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/cli.py", line 285, in _plan
+    asyncio.run(run(dataset, scaffold, task_overrides, logger))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/common/home/ya475/miniconda3/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/runner.py", line 1669, in run
+    missing = await assert_reviewed_workspaces_prebuilt(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        episodes, required=dataset.require_reviewed_workspaces, logger=logger)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/src/mathlib_review/review/preflight.py", line 281, in assert_reviewed_workspaces_prebuilt
+    raise PreflightError(
+    ...<5 lines>...
+    )
+src.mathlib_review.review.preflight.PreflightError: 11 reviewed workspace(s) are not prebuilt (PRs [26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]). A run against the base commit's build products reads the PR's own renames as unknown constants. Build them first:
+  ./ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --config <this run config>
+or set `dataset.require_reviewed_workspaces: false` to accept that environment.
+2026-09-26 08:13:50 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-26 08:15:17 | INFO     | run:1654 - DRY RUN — nothing is written and no model is called
+2026-09-26 08:15:17 | INFO     | run:1659 - {
+  "agenda_version": "v5-agenda/1",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "renderer_version": "candidate-prompt/14+focused-prompt/4",
+  "routing_mode": "lead",
+  "work_units": 36,
+  "units_without_specialist": [],
+  "pr_numbers": [
+    26185,
+    26755,
+    28649,
+    29842,
+    30458,
+    30641,
+    32080,
+    32875,
+    34091,
+    34935,
+    36822
+  ],
+  "proposals_enumerated": 322,
+  "proposals_eligible": 314,
+  "by_arm": {
+    "api_reuse": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "correctness": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "docs": {
+      "enumerated": 34,
+      "eligible": 34,
+      "sites": 133,
+      "cost_hint": 1.7000000000000008
+    },
+    "duplication": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "family_design": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "generalist": {
+      "enumerated": 36,
+      "eligible": 36,
+      "sites": 204,
+      "cost_hint": 1.800000000000001
+    },
+    "generality": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "naming": {
+      "enumerated": 27,
+      "eligible": 27,
+      "sites": 103,
+      "cost_hint": 1.3500000000000005
+    },
+    "proof_golf": {
+      "enumerated": 27,
+      "eligible": 23,
+      "sites": 80,
+      "cost_hint": 1.3500000000000005
+    },
+    "proof_idiom": {
+      "enumerated": 27,
+      "eligible": 23,
+      "sites": 80,
+      "cost_hint": 1.3500000000000005
+    },
+    "style": {
+      "enumerated": 36,
+      "eligible": 36,
+      "sites": 179,
+      "cost_hint": 1.800000000000001
+    }
+  },
+  "projected_cost_fanout": 16.1,
+  "projected_cost_rules": 15.7,
+  "mandatory_floor_cost": 5.5,
+  "mandatory_floor_tokens": 6600000,
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 6,
+      "recommended": 206,
+      "required": 110
+    },
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 8,
+      "docs": 5,
+      "duplication": 8,
+      "family_design": 9,
+      "generalist": 36,
+      "generality": 7,
+      "naming": 13,
+      "proof_golf": 5,
+      "proof_idiom": 4,
+      "style": 15
+    },
+    "required_by_pr": {
+      "26185": 11,
+      "26755": 6,
+      "28649": 10,
+      "29842": 7,
+      "30458": 13,
+      "30641": 7,
+      "32080": 9,
+      "32875": 17,
+      "34091": 12,
+      "34935": 10,
+      "36822": 8
+    },
+    "required_reasons": {
+      "the per-unit broad pass, which no specialist replaces": 36,
+      "these declarations are one API family (family)": 22,
+      "the PR states this is what it is doing (pr_intent)": 16,
+      "this PR introduces declarations that did not exist before (introduction)": 16,
+      "namespace placement and module docs are properties of the file (file)": 15,
+      "this PR changes module documentation (site)": 5
+    },
+    "prs_with_no_required_work": []
+  }
+}
+2026-09-26 08:15:17 | INFO     | _report_token_budget:1097 - token budget: mandatory floor 6,600,000 (uncapped per PR by design) + discretionary up to 19,800,000 (11 PR x 1,800,000)
+2026-09-26 08:15:17 | INFO     | _report_token_budget:1105 - run_total_token_cap 30,000,000 vs worst case 26,400,000 (floor + discretionary) - fits
+2026-09-26 08:15:17 | INFO     | _report_budget:1287 - budget: mandatory floor $5.50 (uncapped per PR by design) + discretionary up to $16.50 (11 PR x $1.50)
+2026-09-26 08:15:17 | INFO     | _report_budget:1300 - run_total_cost_cap $25.00 vs worst case $22.00 (floor + discretionary) — fits
+2026-09-26 08:15:17 | INFO     | run:1666 - retrieval cutoffs resolve for all 11 episode(s)
+2026-09-26 08:15:17 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 08:15:17 | INFO     | run:1671 - reviewed workspaces: 11 of 11 episode(s) prebuilt
+2026-09-26 08:15:17 | INFO     | run:1675 - run plan seals (agenda a8e9a899d832, 322 prompt hashes) — not written

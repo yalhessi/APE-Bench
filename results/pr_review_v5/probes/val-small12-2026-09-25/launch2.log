@@ -1,0 +1,8 @@
+2026-09-26 06:10:27 restore: 11 base workspaces from their snapshots
+2026-09-26 06:15:44 restore: exit 0 (11 restored)
+2026-09-26 06:15:44 build: reviewed workspaces for the 11
+2026-09-26 08:13:49 build: reviewed exit 0 (11 succeeded)
+2026-09-26 08:13:49 validation: plan pr5_val_small12_minus30714_lead_rep1
+2026-09-26 08:15:17 validation: run pr5_val_small12_minus30714_lead_rep1
+2026-09-26 08:36:42 validation: run exit 0; completed: 11; retry warnings: 0; paused: 0
+2026-09-26 08:36:42 DONE2

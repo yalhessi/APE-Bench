@@ -1,0 +1,178 @@
+2026-09-26 06:09:28 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:09:28 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+reviewed workspaces for 12 episode(s): 0 ready, 11 to build, 1 base not built
+  PR 26185  d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061  to build  (5 changed files)
+  PR 26755  241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585  to build  (2 changed files)
+  PR 28649  26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265  to build  (7 changed files)
+  PR 29842  b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01  to build  (1 changed files)
+  PR 30458  586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262  to build  (3 changed files)
+  PR 30641  a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2  to build  (1 changed files)
+  PR 30714  258b485d4252a0cb5049ee25e87107830f13b7d1+997f8d3ad6a0  base not built  (7 changed files)
+  PR 32080  a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53  to build  (3 changed files)
+  PR 32875  26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc  to build  (7 changed files)
+  PR 34091  7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b  to build  (3 changed files)
+  PR 34935  e83debb937567bc01317d97384986db815657afd+35900e93696b  to build  (2 changed files)
+  PR 36822  4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad  to build  (2 changed files)
+2026-09-26 06:09:28 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-26 06:09:28 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-09-26 06:09:28 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:09:28 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-09-26 06:09:28 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:09:28 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 26185: building reviewed workspace d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 (5 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 (base d05defbd00f934e85df3c9e4befcecc2bfb6b272)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061: [d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061] base workspace d05defbd00f934e85df3c9e4befcecc2bfb6b272 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/d05defbd00f934e85df3c9e4befcecc2bfb6b272; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 26185: reviewed workspace d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 FAILED: [d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061] base workspace d05defbd00f934e85df3c9e4befcecc2bfb6b272 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/d05defbd00f934e85df3c9e4befcecc2bfb6b272; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 26755: building reviewed workspace 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 (2 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 (base 241db1e2c678f6002dcc570f314b9d5b30a1dcf6)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585: [241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585] base workspace 241db1e2c678f6002dcc570f314b9d5b30a1dcf6 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/241db1e2c678f6002dcc570f314b9d5b30a1dcf6; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 26755: reviewed workspace 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 FAILED: [241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585] base workspace 241db1e2c678f6002dcc570f314b9d5b30a1dcf6 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/241db1e2c678f6002dcc570f314b9d5b30a1dcf6; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 28649: building reviewed workspace 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 (7 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 (base 26144eba0dcb7621dbe5a6adfcebe26f719d696b)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265: [26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265] base workspace 26144eba0dcb7621dbe5a6adfcebe26f719d696b is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/26144eba0dcb7621dbe5a6adfcebe26f719d696b; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 28649: reviewed workspace 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 FAILED: [26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265] base workspace 26144eba0dcb7621dbe5a6adfcebe26f719d696b is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/26144eba0dcb7621dbe5a6adfcebe26f719d696b; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 29842: building reviewed workspace b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 (1 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 (base b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01: [b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01] base workspace b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 29842: reviewed workspace b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 FAILED: [b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01] base workspace b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 30458: building reviewed workspace 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 (3 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 (base 586e9c386274d740624bd33abe9a67f7365a92fc)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262: [586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262] base workspace 586e9c386274d740624bd33abe9a67f7365a92fc is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/586e9c386274d740624bd33abe9a67f7365a92fc; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 30458: reviewed workspace 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 FAILED: [586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262] base workspace 586e9c386274d740624bd33abe9a67f7365a92fc is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/586e9c386274d740624bd33abe9a67f7365a92fc; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 30641: building reviewed workspace a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 (1 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 (base a77a0aeac5e8e691c32a65b878b02574930b5f90)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2: [a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2] base workspace a77a0aeac5e8e691c32a65b878b02574930b5f90 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/a77a0aeac5e8e691c32a65b878b02574930b5f90; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 30641: reviewed workspace a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 FAILED: [a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2] base workspace a77a0aeac5e8e691c32a65b878b02574930b5f90 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/a77a0aeac5e8e691c32a65b878b02574930b5f90; build the base commit first
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:128 - PR 30714: reviewed workspace 258b485d4252a0cb5049ee25e87107830f13b7d1+997f8d3ad6a0 needs base 258b485d4252a0cb5049ee25e87107830f13b7d1, which is not built; build the base first (prebuild without --reviewed, then ape.toolkits.execute.lean.build)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 32080: building reviewed workspace a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 (3 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 (base a73de4ba4b59f748f4d79b55f3a26487c62d6b84)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53: [a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53] base workspace a73de4ba4b59f748f4d79b55f3a26487c62d6b84 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 32080: reviewed workspace a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 FAILED: [a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53] base workspace a73de4ba4b59f748f4d79b55f3a26487c62d6b84 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 32875: building reviewed workspace 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc (7 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc (base 26fffffcccd7299b26cf63fac902165bc553fd56)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc: [26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc] base workspace 26fffffcccd7299b26cf63fac902165bc553fd56 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/26fffffcccd7299b26cf63fac902165bc553fd56; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 32875: reviewed workspace 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc FAILED: [26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc] base workspace 26fffffcccd7299b26cf63fac902165bc553fd56 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/26fffffcccd7299b26cf63fac902165bc553fd56; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 34091: building reviewed workspace 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b (3 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b (base 7ee74e7d3f87077723e124e2e62a6dd1a9509c13)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b: [7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b] base workspace 7ee74e7d3f87077723e124e2e62a6dd1a9509c13 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 34091: reviewed workspace 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b FAILED: [7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b] base workspace 7ee74e7d3f87077723e124e2e62a6dd1a9509c13 is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 34935: building reviewed workspace e83debb937567bc01317d97384986db815657afd+35900e93696b (2 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: e83debb937567bc01317d97384986db815657afd+35900e93696b (base e83debb937567bc01317d97384986db815657afd)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed e83debb937567bc01317d97384986db815657afd+35900e93696b: [e83debb937567bc01317d97384986db815657afd+35900e93696b] base workspace e83debb937567bc01317d97384986db815657afd is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/e83debb937567bc01317d97384986db815657afd; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: e83debb937567bc01317d97384986db815657afd+35900e93696b, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 34935: reviewed workspace e83debb937567bc01317d97384986db815657afd+35900e93696b FAILED: [e83debb937567bc01317d97384986db815657afd+35900e93696b] base workspace e83debb937567bc01317d97384986db815657afd is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/e83debb937567bc01317d97384986db815657afd; build the base commit first
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspaces:136 - PR 36822: building reviewed workspace 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad (2 changed files)
+2026-09-26 06:09:28 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad (base 4b627f0349938c16df37afa592c456b0a7a74fef)
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspace:439 - Reviewed workspace build failed 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad: [4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad] base workspace 4b627f0349938c16df37afa592c456b0a7a74fef is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef; build the base commit first
+2026-09-26 06:09:28 | INFO     | complete_build:360 - Build operation completed: 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad, success: False
+2026-09-26 06:09:28 | ERROR    | build_reviewed_workspaces:149 - PR 36822: reviewed workspace 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad FAILED: [4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad] base workspace 4b627f0349938c16df37afa592c456b0a7a74fef is not built at /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef; build the base commit first
+built 0 of 11 reviewed workspace(s); FAILED: ['d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061', '241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585', '26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265', 'b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01', '586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262', 'a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2', 'a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53', '26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc', '7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b', 'e83debb937567bc01317d97384986db815657afd+35900e93696b', '4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad']
+2026-09-26 06:15:45 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:15:45 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+reviewed workspaces for 12 episode(s): 0 ready, 11 to build, 1 base not built
+  PR 26185  d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061  to build  (5 changed files)
+  PR 26755  241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585  to build  (2 changed files)
+  PR 28649  26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265  to build  (7 changed files)
+  PR 29842  b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01  to build  (1 changed files)
+  PR 30458  586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262  to build  (3 changed files)
+  PR 30641  a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2  to build  (1 changed files)
+  PR 30714  258b485d4252a0cb5049ee25e87107830f13b7d1+997f8d3ad6a0  base not built  (7 changed files)
+  PR 32080  a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53  to build  (3 changed files)
+  PR 32875  26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc  to build  (7 changed files)
+  PR 34091  7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b  to build  (3 changed files)
+  PR 34935  e83debb937567bc01317d97384986db815657afd+35900e93696b  to build  (2 changed files)
+  PR 36822  4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad  to build  (2 changed files)
+2026-09-26 06:15:45 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-26 06:15:45 | INFO     | __init__:60 - BaseSourceManager initialized: repo=mathlib4
+2026-09-26 06:15:45 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:15:45 | INFO     | __init__:41 - Content storage initialized: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/storage
+2026-09-26 06:15:45 | INFO     | __init__:45 - Snapshot manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 06:15:45 | INFO     | __init__:203 - Lean BuildManager initialized [mathlib4]
+2026-09-26 06:15:45 | INFO     | build_reviewed_workspaces:136 - PR 26185: building reviewed workspace d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 (5 changed files)
+2026-09-26 06:15:45 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 (base d05defbd00f934e85df3c9e4befcecc2bfb6b272)
+2026-09-26 06:31:30 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 96179 items (94000 files, 2179 directories)
+2026-09-26 06:31:36 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 96179/96179 processed
+2026-09-26 06:31:38 | INFO     | complete_build:360 - Build operation completed: d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061, success: True
+2026-09-26 06:31:38 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 in 952.9s
+2026-09-26 06:31:38 | INFO     | build_reviewed_workspaces:147 - PR 26185: built d05defbd00f934e85df3c9e4befcecc2bfb6b272+2da1497f8061 in 953s
+2026-09-26 06:31:38 | INFO     | build_reviewed_workspaces:136 - PR 26755: building reviewed workspace 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 (2 changed files)
+2026-09-26 06:31:38 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 (base 241db1e2c678f6002dcc570f314b9d5b30a1dcf6)
+2026-09-26 06:39:06 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 48249 items (46205 files, 2044 directories)
+2026-09-26 06:39:08 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 48249/48249 processed
+2026-09-26 06:39:10 | INFO     | complete_build:360 - Build operation completed: 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585, success: True
+2026-09-26 06:39:10 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 in 451.5s
+2026-09-26 06:39:10 | INFO     | build_reviewed_workspaces:147 - PR 26755: built 241db1e2c678f6002dcc570f314b9d5b30a1dcf6+c5e601604585 in 451s
+2026-09-26 06:39:10 | INFO     | build_reviewed_workspaces:136 - PR 28649: building reviewed workspace 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 (7 changed files)
+2026-09-26 06:39:10 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 (base 26144eba0dcb7621dbe5a6adfcebe26f719d696b)
+2026-09-26 06:47:09 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 49373 items (47350 files, 2023 directories)
+2026-09-26 06:47:12 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 49373/49373 processed
+2026-09-26 06:47:13 | INFO     | complete_build:360 - Build operation completed: 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265, success: True
+2026-09-26 06:47:13 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 in 483.7s
+2026-09-26 06:47:13 | INFO     | build_reviewed_workspaces:147 - PR 28649: built 26144eba0dcb7621dbe5a6adfcebe26f719d696b+36d704ea3265 in 484s
+2026-09-26 06:47:13 | INFO     | build_reviewed_workspaces:136 - PR 29842: building reviewed workspace b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 (1 changed files)
+2026-09-26 06:47:13 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 (base b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d)
+2026-09-26 06:55:31 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 50404 items (48324 files, 2080 directories)
+2026-09-26 06:55:34 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 50404/50404 processed
+2026-09-26 06:55:35 | INFO     | complete_build:360 - Build operation completed: b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01, success: True
+2026-09-26 06:55:35 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 in 501.8s
+2026-09-26 06:55:35 | INFO     | build_reviewed_workspaces:147 - PR 29842: built b7a282216f7b7b00ad709ea1ea3a3f7c2a58f32d+c3b2e5616d01 in 502s
+2026-09-26 06:55:35 | INFO     | build_reviewed_workspaces:136 - PR 30458: building reviewed workspace 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 (3 changed files)
+2026-09-26 06:55:35 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 (base 586e9c386274d740624bd33abe9a67f7365a92fc)
+2026-09-26 07:00:47 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 50957 items (48833 files, 2124 directories)
+2026-09-26 07:00:50 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 50957/50957 processed
+2026-09-26 07:00:51 | INFO     | complete_build:360 - Build operation completed: 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262, success: True
+2026-09-26 07:00:51 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 in 316.2s
+2026-09-26 07:00:51 | INFO     | build_reviewed_workspaces:147 - PR 30458: built 586e9c386274d740624bd33abe9a67f7365a92fc+499cdbb44262 in 316s
+2026-09-26 07:00:51 | INFO     | build_reviewed_workspaces:136 - PR 30641: building reviewed workspace a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 (1 changed files)
+2026-09-26 07:00:51 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 (base a77a0aeac5e8e691c32a65b878b02574930b5f90)
+2026-09-26 07:06:42 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 51411 items (49294 files, 2117 directories)
+2026-09-26 07:06:44 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 51411/51411 processed
+2026-09-26 07:06:46 | INFO     | complete_build:360 - Build operation completed: a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2, success: True
+2026-09-26 07:06:46 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 in 354.6s
+2026-09-26 07:06:46 | INFO     | build_reviewed_workspaces:147 - PR 30641: built a77a0aeac5e8e691c32a65b878b02574930b5f90+304744da43f2 in 355s
+2026-09-26 07:06:46 | ERROR    | build_reviewed_workspaces:128 - PR 30714: reviewed workspace 258b485d4252a0cb5049ee25e87107830f13b7d1+997f8d3ad6a0 needs base 258b485d4252a0cb5049ee25e87107830f13b7d1, which is not built; build the base first (prebuild without --reviewed, then ape.toolkits.execute.lean.build)
+2026-09-26 07:06:46 | INFO     | build_reviewed_workspaces:136 - PR 32080: building reviewed workspace a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 (3 changed files)
+2026-09-26 07:06:46 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 (base a73de4ba4b59f748f4d79b55f3a26487c62d6b84)
+2026-09-26 07:12:48 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 96971 items (94756 files, 2215 directories)
+2026-09-26 07:12:54 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 96971/96971 processed
+2026-09-26 07:12:56 | INFO     | complete_build:360 - Build operation completed: a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53, success: True
+2026-09-26 07:12:56 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 in 370.1s
+2026-09-26 07:12:56 | INFO     | build_reviewed_workspaces:147 - PR 32080: built a73de4ba4b59f748f4d79b55f3a26487c62d6b84+a739e9482d53 in 370s
+2026-09-26 07:12:56 | INFO     | build_reviewed_workspaces:136 - PR 32875: building reviewed workspace 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc (7 changed files)
+2026-09-26 07:12:56 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc (base 26fffffcccd7299b26cf63fac902165bc553fd56)
+2026-09-26 07:34:39 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 99496 items (97196 files, 2300 directories)
+2026-09-26 07:34:45 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 99496/99496 processed
+2026-09-26 07:34:47 | INFO     | complete_build:360 - Build operation completed: 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc, success: True
+2026-09-26 07:34:47 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc in 1310.9s
+2026-09-26 07:34:47 | INFO     | build_reviewed_workspaces:147 - PR 32875: built 26fffffcccd7299b26cf63fac902165bc553fd56+102dba721ebc in 1311s
+2026-09-26 07:34:47 | INFO     | build_reviewed_workspaces:136 - PR 34091: building reviewed workspace 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b (3 changed files)
+2026-09-26 07:34:47 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b (base 7ee74e7d3f87077723e124e2e62a6dd1a9509c13)
+2026-09-26 07:41:19 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 99695 items (97473 files, 2222 directories)
+2026-09-26 07:41:24 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 99695/99695 processed
+2026-09-26 07:41:26 | INFO     | complete_build:360 - Build operation completed: 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b, success: True
+2026-09-26 07:41:26 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b in 399.3s
+2026-09-26 07:41:26 | INFO     | build_reviewed_workspaces:147 - PR 34091: built 7ee74e7d3f87077723e124e2e62a6dd1a9509c13+f4a3c7b0726b in 399s
+2026-09-26 07:41:26 | INFO     | build_reviewed_workspaces:136 - PR 34935: building reviewed workspace e83debb937567bc01317d97384986db815657afd+35900e93696b (2 changed files)
+2026-09-26 07:41:26 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: e83debb937567bc01317d97384986db815657afd+35900e93696b (base e83debb937567bc01317d97384986db815657afd)
+2026-09-26 07:57:37 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 100994 items (98781 files, 2213 directories)
+2026-09-26 07:57:43 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 100994/100994 processed
+2026-09-26 07:57:46 | INFO     | complete_build:360 - Build operation completed: e83debb937567bc01317d97384986db815657afd+35900e93696b, success: True
+2026-09-26 07:57:46 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: e83debb937567bc01317d97384986db815657afd+35900e93696b in 979.1s
+2026-09-26 07:57:46 | INFO     | build_reviewed_workspaces:147 - PR 34935: built e83debb937567bc01317d97384986db815657afd+35900e93696b in 979s
+2026-09-26 07:57:46 | INFO     | build_reviewed_workspaces:136 - PR 36822: building reviewed workspace 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad (2 changed files)
+2026-09-26 07:57:46 | INFO     | build_reviewed_workspace:415 - Start building reviewed workspace: 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad (base 4b627f0349938c16df37afa592c456b0a7a74fef)
+2026-09-26 08:13:40 | INFO     | set_workspace_readonly:497 - Start setting readonly permissions: 103981 items (101685 files, 2296 directories)
+2026-09-26 08:13:46 | INFO     | set_workspace_readonly:598 - Readonly permission setting completed: 103981/103981 processed
+2026-09-26 08:13:49 | INFO     | complete_build:360 - Build operation completed: 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad, success: True
+2026-09-26 08:13:49 | INFO     | build_reviewed_workspace:429 - Reviewed workspace built: 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad in 963.1s
+2026-09-26 08:13:49 | INFO     | build_reviewed_workspaces:147 - PR 36822: built 4b627f0349938c16df37afa592c456b0a7a74fef+6d111510fcad in 963s
+built 11 of 11 reviewed workspace(s)

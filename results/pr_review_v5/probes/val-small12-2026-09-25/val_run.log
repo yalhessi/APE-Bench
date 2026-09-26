@@ -1,0 +1,1601 @@
+2026-09-26 08:15:19 | INFO     | _run:305 - cost model: prompt_inclusive
+2026-09-26 08:15:19 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-26 08:16:40 | INFO     | _report_token_budget:1097 - token budget: mandatory floor 6,600,000 (uncapped per PR by design) + discretionary up to 19,800,000 (11 PR x 1,800,000)
+2026-09-26 08:16:40 | INFO     | _report_token_budget:1105 - run_total_token_cap 30,000,000 vs worst case 26,400,000 (floor + discretionary) - fits
+2026-09-26 08:16:40 | INFO     | _report_budget:1287 - budget: mandatory floor $5.50 (uncapped per PR by design) + discretionary up to $16.50 (11 PR x $1.50)
+2026-09-26 08:16:40 | INFO     | _report_budget:1300 - run_total_cost_cap $25.00 vs worst case $22.00 (floor + discretionary) — fits
+2026-09-26 08:16:42 | INFO     | run:1712 - census: 36 work unit(s) ranked across 11 PR(s)
+2026-09-26 08:16:42 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 08:16:42 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 08:16:42 | INFO     | run:1750 - routing_mode=lead tasks=11 prs=[26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]
+2026-09-26 08:16:42 | INFO     | run:108 - Starting orchestrator pr5_val_small12_minus30714_lead_rep1 | tasks=11 | mode=sample-async(concurrency=4, samples=1) | sample_count=1 | sample_max_cost=1.0 | early_stop=disabled
+2026-09-26 08:16:42 | INFO     | _prepare_jobs:257 - Shuffled 11 samples with seed=42
+2026-09-26 08:16:42 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m0/11[0m, SUCCESS:[31m0 (0.0%)[0m | [36m[TASKS][0m [1m0/11[0m, SUCCESS:[31m0/- (0.0%)[0m, PASS:[31m0/- (0.0%)[0m/[31m0/11 (0.0%)[0m | [36m[STATUS][0m Pending:[33m11[0m, Running:[33m0[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.00→$0.00[0m, Cached:[32m$0.00→$0.00[0m, ELAPSED:[33m0s[0m, ETA:[33mN/A[0m
+2026-09-26 08:16:42 | INFO     | _execute_in_main_process:321 - Running in main process with 4 coroutines
+2026-09-26 08:16:42 | INFO     | execute_sample:128 - Sample f1b5736da489009b77a675cee8e727093bb1bb63248281572f8889b79411831c_0: starting attempt #1
+2026-09-26 08:16:42 | INFO     | execute_sample:128 - Sample 7a44bae798f383d43544232b48606046c975a4e7af895aab8d6b1ffb1bf6a097_0: starting attempt #1
+2026-09-26 08:16:42 | INFO     | execute_sample:128 - Sample 65b6bb1aa54dd6c37de177140abbc0a4ee3d307efa52a756011f21c75ec36167_0: starting attempt #1
+2026-09-26 08:16:43 | INFO     | execute_sample:128 - Sample 6438de399f167e8470ca41d20821363caecfbee70180bc07aea14e051ce11802_0: starting attempt #1
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 12382.86it/s]
+2026-09-26 08:20:14 | INFO     | execute_sample:239 - Sample f1b5736da489009b77a675cee8e727093bb1bb63248281572f8889b79411831c_0: completed with success (cost=$0.5836, tokens=41,046, turns=4)
+2026-09-26 08:20:14 | INFO     | _try_aggregate:713 - Task f1b5736da489009b77a675cee8e727093bb1bb63248281572f8889b79411831c: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:20:14 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m4/11[0m, SUCCESS:[31m1 (25.0%)[0m | [36m[TASKS][0m [1m1/11[0m, SUCCESS:[32m1/1 (100.0%)[0m, PASS:[32m1/1 (100.0%)[0m/[31m1/11 (9.1%)[0m | [36m[STATUS][0m Pending:[33m7[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.58→$6.42[0m, Cached:[32m$0.31→$3.36[0m, ELAPSED:[33m3m32s[0m, ETA:[33m35m22s[0m
+2026-09-26 08:20:14 | INFO     | execute_sample:128 - Sample abb0870c483d39f46dac95b4c327b28876a2cca3e30db429a116a3343d12320e_0: starting attempt #1
+[09/26/26 08:20:40] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:41] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:42] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:43] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:44] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:45] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:46] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:49] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:53] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:54] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:20:58] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:01] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:05] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:08] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:09] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:10] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:12] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:13] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:14] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:15] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:17] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:18] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:54] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:57] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:58] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:21:59] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:05] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:08] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:10] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:11] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:13] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:14] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:15] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:16] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:19] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:21] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:22] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:24] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:26] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:27] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:29] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:31] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:32] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:35] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:40] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:42] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:22:43 | INFO     | execute_sample:239 - Sample 7a44bae798f383d43544232b48606046c975a4e7af895aab8d6b1ffb1bf6a097_0: completed with success (cost=$1.3702, tokens=58,671, turns=5)
+2026-09-26 08:22:43 | INFO     | _try_aggregate:713 - Task 7a44bae798f383d43544232b48606046c975a4e7af895aab8d6b1ffb1bf6a097: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:22:43 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m5/11[0m, SUCCESS:[31m2 (40.0%)[0m | [36m[TASKS][0m [1m2/11[0m, SUCCESS:[32m2/2 (100.0%)[0m, PASS:[32m2/2 (100.0%)[0m/[31m2/11 (18.2%)[0m | [36m[STATUS][0m Pending:[33m6[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$1.95→$10.75[0m, Cached:[32m$0.94→$5.17[0m, ELAPSED:[33m6m0s[0m, ETA:[33m27m2s[0m
+2026-09-26 08:22:43 | INFO     | execute_sample:128 - Sample 1c69903bf15cac20c3bad523f4b56d5ecf44b3846121373d2a957b4c2372ef53_0: starting attempt #1
+[09/26/26 08:22:44] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:45] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:22:45 | INFO     | execute_sample:239 - Sample 65b6bb1aa54dd6c37de177140abbc0a4ee3d307efa52a756011f21c75ec36167_0: completed with success (cost=$1.0264, tokens=54,842, turns=4)
+2026-09-26 08:22:45 | INFO     | _try_aggregate:713 - Task 65b6bb1aa54dd6c37de177140abbc0a4ee3d307efa52a756011f21c75ec36167: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:22:45 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m6/11[0m, SUCCESS:[33m3 (50.0%)[0m | [36m[TASKS][0m [1m3/11[0m, SUCCESS:[32m3/3 (100.0%)[0m, PASS:[32m3/3 (100.0%)[0m/[31m3/11 (27.3%)[0m | [36m[STATUS][0m Pending:[33m5[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$2.98→$10.93[0m, Cached:[32m$1.41→$5.16[0m, ELAPSED:[33m6m3s[0m, ETA:[33m16m9s[0m
+2026-09-26 08:22:45 | INFO     | execute_sample:128 - Sample 7d1825ebcc627f4d94856e319bdddc5438a2cf12e4f25b6ce8ac0b4612400861_0: starting attempt #1
+[09/26/26 08:22:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:50] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:22:52] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:23:01] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:23:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:23:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:23:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:23:40] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 34.38it/s]
+[09/26/26 08:24:36] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:39] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 37.66it/s]
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:41] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:46] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:49] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:50] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:52] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:24:55] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:01] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:09] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 19.21it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 18.87it/s]
+[09/26/26 08:25:11] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 158.42it/s]
+[09/26/26 08:25:13] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:14] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:19] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:20] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:22] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 138.90it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 16.53it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 14.09it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 12.59it/s]
+[09/26/26 08:25:24] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:25] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:26] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:27] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:28] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:30] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:34] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:37] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:39] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:41] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:25:41 | INFO     | execute_sample:239 - Sample abb0870c483d39f46dac95b4c327b28876a2cca3e30db429a116a3343d12320e_0: completed with success (cost=$0.9358, tokens=58,211, turns=5)
+2026-09-26 08:25:41 | INFO     | _try_aggregate:713 - Task abb0870c483d39f46dac95b4c327b28876a2cca3e30db429a116a3343d12320e: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:25:41 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m7/11[0m, SUCCESS:[33m4 (57.1%)[0m | [36m[TASKS][0m [1m4/11[0m, SUCCESS:[32m4/4 (100.0%)[0m, PASS:[32m4/4 (100.0%)[0m/[31m4/11 (36.4%)[0m | [36m[STATUS][0m Pending:[33m4[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$3.92→$10.77[0m, Cached:[32m$1.83→$5.02[0m, ELAPSED:[33m8m59s[0m, ETA:[33m15m43s[0m
+2026-09-26 08:25:41 | INFO     | execute_sample:128 - Sample 04d3a770be6b326d6ec33af669ec397a5a1edd6f6549929fb64617d6026408f5_0: starting attempt #1
+[09/26/26 08:25:42] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:43] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:44] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:50] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:52] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:53] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:54] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:55] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:56] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:57] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:25:59] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:01] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:05] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:45] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 31.64it/s]
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:49] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:53] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:56] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:58] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:26:59] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:01] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:09] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:10] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:12] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:14] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:15] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:17] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:18] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:19] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:20] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:21] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:25] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:29] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:30] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:32] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:37] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:38] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:39] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:40] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:27:40 | INFO     | execute_sample:239 - Sample 6438de399f167e8470ca41d20821363caecfbee70180bc07aea14e051ce11802_0: completed with success (cost=$2.0230, tokens=43,093, turns=3)
+2026-09-26 08:27:41 | INFO     | _try_aggregate:713 - Task 6438de399f167e8470ca41d20821363caecfbee70180bc07aea14e051ce11802: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:27:41 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m8/11[0m, SUCCESS:[33m5 (62.5%)[0m | [36m[TASKS][0m [1m5/11[0m, SUCCESS:[32m5/5 (100.0%)[0m, PASS:[32m5/5 (100.0%)[0m/[31m5/11 (45.5%)[0m | [36m[STATUS][0m Pending:[33m3[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$5.94→$13.07[0m, Cached:[32m$2.64→$5.80[0m, ELAPSED:[33m10m58s[0m, ETA:[33m13m10s[0m
+2026-09-26 08:27:41 | INFO     | execute_sample:128 - Sample d8e0a9a530bed47f15b16d1e2d3da9816cef7952831f513a8debc04b3b98b09f_0: starting attempt #1
+[09/26/26 08:27:42] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:45] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:46] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:50] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:53] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:55] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:27:56] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:05] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:08] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:10] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:11] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:49] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:50] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:52] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:55] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:58] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:28:59] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:08] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:09] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:11] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:13] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:15] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:16] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:18] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:20] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:22] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:24] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 38.79it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 16.86it/s]
+[09/26/26 08:29:25] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:26] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:27] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:28] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:29] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:30] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:31] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:32] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:33] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:35] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:37] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:39] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:29:39 | INFO     | execute_sample:239 - Sample 7d1825ebcc627f4d94856e319bdddc5438a2cf12e4f25b6ce8ac0b4612400861_0: completed with success (cost=$1.5201, tokens=66,743, turns=5)
+2026-09-26 08:29:40 | INFO     | _try_aggregate:713 - Task 7d1825ebcc627f4d94856e319bdddc5438a2cf12e4f25b6ce8ac0b4612400861: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:29:40 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m9/11[0m, SUCCESS:[33m6 (66.7%)[0m | [36m[TASKS][0m [1m6/11[0m, SUCCESS:[32m6/6 (100.0%)[0m, PASS:[32m6/6 (100.0%)[0m/[33m6/11 (54.5%)[0m | [36m[STATUS][0m Pending:[33m2[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$7.46→$13.68[0m, Cached:[32m$3.32→$6.08[0m, ELAPSED:[33m12m57s[0m, ETA:[33m10m47s[0m
+2026-09-26 08:29:40 | INFO     | execute_sample:128 - Sample 663440f562a6d596e51a0cc6ee4df84942a50b5be78c6ee9f5a43e009dac3c5d_0: starting attempt #1
+[09/26/26 08:29:42] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:44] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:46] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:29:49] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:51] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:52] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:53] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:54] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:57] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:58] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:30:59] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:01] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 37.46it/s]
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 13.30it/s]
+[09/26/26 08:31:07] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:08] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:09] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:31:09 | INFO     | execute_sample:239 - Sample 1c69903bf15cac20c3bad523f4b56d5ecf44b3846121373d2a957b4c2372ef53_0: completed with success (cost=$1.5424, tokens=66,189, turns=5)
+2026-09-26 08:31:09 | INFO     | _try_aggregate:713 - Task 1c69903bf15cac20c3bad523f4b56d5ecf44b3846121373d2a957b4c2372ef53: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:31:09 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m10/11[0m, SUCCESS:[32m7 (70.0%)[0m | [36m[TASKS][0m [1m7/11[0m, SUCCESS:[32m7/7 (100.0%)[0m, PASS:[32m7/7 (100.0%)[0m/[33m7/11 (63.6%)[0m | [36m[STATUS][0m Pending:[33m1[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$9.00→$14.15[0m, Cached:[32m$3.93→$6.18[0m, ELAPSED:[33m14m26s[0m, ETA:[33m8m15s[0m
+2026-09-26 08:31:09 | INFO     | execute_sample:128 - Sample 75088dd74203289bbb0a0ad1e99ea34057b60c0e40bd0b96f54567837730f50a_0: starting attempt #1
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:10] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:11] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:13] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:15] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:16] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:17] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:19] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:20] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:21] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:22] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:24] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:31] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:33] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:35] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:31:36] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:20] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:22] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:24] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:25] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:27] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:28] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:29] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:30] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:31] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:33] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:34] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:35] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:36] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:37] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:39] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:40] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:41] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:42] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:43] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:33:43 | INFO     | execute_sample:239 - Sample 04d3a770be6b326d6ec33af669ec397a5a1edd6f6549929fb64617d6026408f5_0: completed with success (cost=$1.5588, tokens=42,244, turns=4)
+2026-09-26 08:33:43 | INFO     | _try_aggregate:713 - Task 04d3a770be6b326d6ec33af669ec397a5a1edd6f6549929fb64617d6026408f5: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:33:43 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m8 (72.7%)[0m | [36m[TASKS][0m [1m8/11[0m, SUCCESS:[32m8/8 (100.0%)[0m, PASS:[32m8/8 (100.0%)[0m/[32m8/11 (72.7%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$10.56→$14.52[0m, Cached:[32m$4.50→$6.18[0m, ELAPSED:[33m17m0s[0m, ETA:[33m6m22s[0m
+2026-09-26 08:33:43 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:44] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:46] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:47] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:48] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:52] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:53] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:54] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:33:54 | INFO     | execute_sample:239 - Sample 663440f562a6d596e51a0cc6ee4df84942a50b5be78c6ee9f5a43e009dac3c5d_0: completed with success (cost=$0.6574, tokens=46,737, turns=4)
+2026-09-26 08:33:54 | INFO     | _try_aggregate:713 - Task 663440f562a6d596e51a0cc6ee4df84942a50b5be78c6ee9f5a43e009dac3c5d: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:33:54 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m9 (81.8%)[0m | [36m[TASKS][0m [1m9/11[0m, SUCCESS:[32m9/9 (100.0%)[0m, PASS:[32m9/9 (100.0%)[0m/[32m9/11 (81.8%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m2[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$11.22→$13.71[0m, Cached:[32m$4.79→$5.86[0m, ELAPSED:[33m17m12s[0m, ETA:[33m3m49s[0m
+2026-09-26 08:33:54 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+[09/26/26 08:33:55] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:56] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:58] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:33:59] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:02] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 35.53it/s]
+[09/26/26 08:34:04] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:05] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:08] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:09] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:10] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:11] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:13] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:14] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:20] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:25] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:26] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:27] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:29] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:34] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:36] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:41] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:50] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:34:55] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+                    INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:00] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:03] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:05] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:06] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:14] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:15] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:19] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:23] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:32] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:35:32 | INFO     | execute_sample:239 - Sample 75088dd74203289bbb0a0ad1e99ea34057b60c0e40bd0b96f54567837730f50a_0: completed with success (cost=$1.3613, tokens=113,281, turns=7)
+2026-09-26 08:35:32 | INFO     | _try_aggregate:713 - Task 75088dd74203289bbb0a0ad1e99ea34057b60c0e40bd0b96f54567837730f50a: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:35:32 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m10 (90.9%)[0m | [36m[TASKS][0m [1m10/11[0m, SUCCESS:[32m10/10 (100.0%)[0m, PASS:[32m10/10 (100.0%)[0m/[32m10/11 (90.9%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m1[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$12.58→$13.84[0m, Cached:[32m$5.38→$5.92[0m, ELAPSED:[33m18m49s[0m, ETA:[33m1m52s[0m
+2026-09-26 08:35:32 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+[09/26/26 08:35:38] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+[09/26/26 08:35:57] INFO     HTTP Request: POST                  _client.py:1740
+                             https://api.openai.com/v1/chat/comp                
+                             letions "HTTP/1.1 200 OK"                          
+2026-09-26 08:35:57 | INFO     | execute_sample:239 - Sample d8e0a9a530bed47f15b16d1e2d3da9816cef7952831f513a8debc04b3b98b09f_0: completed with success (cost=$1.9511, tokens=66,491, turns=5)
+2026-09-26 08:35:57 | INFO     | _try_aggregate:713 - Task d8e0a9a530bed47f15b16d1e2d3da9816cef7952831f513a8debc04b3b98b09f: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 08:35:57 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m11 (100.0%)[0m | [36m[TASKS][0m [1m11/11[0m, SUCCESS:[32m11/11 (100.0%)[0m, PASS:[32m11/11 (100.0%)[0m/[32m11/11 (100.0%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m0[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$14.53→$14.53[0m, Cached:[32m$6.07→$6.07[0m, ELAPSED:[33m19m15s[0m, ETA:[33mN/A[0m
+2026-09-26 08:35:57 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+2026-09-26 08:35:57 | INFO     | run:336 - Worker 0: all coroutines completed
+2026-09-26 08:35:57 | INFO     | _execute_in_main_process:355 - All samples completed in main process
+2026-09-26 08:35:57 | INFO     | _aggregate_final_results:490 - Loaded 11 aggregated records (11 unique task results)
+2026-09-26 08:35:57 | INFO     | print_summary:409 - 
+[1m[36m======================================================================[0m
+[1m[36mORCHESTRATOR RESULTS SUMMARY[0m
+[1m[36m======================================================================[0m
+[1mOrchestrator ID:[0m  [34mpr5_val_small12_minus30714_lead_rep1[0m
+[1mScaffold:[0m      [34mape_agent[0m
+[36m──────────────────────────────────────────────────────────────────────[0m
+[1mTasks:[0m         [32m11/11[0m ([32m100.0%[0m completed)
+[1mSuccess:[0m       [32m11/11[0m ([32m100.0%[0m of completed)
+[1mPass:[0m          [32m11/11[0m ([32m100.0%[0m of completed), [32m11/11[0m ([32m100.0%[0m of total)
+[1mAvg Score:[0m     [32m1.000[0m
+[36m──────────────────────────────────────────────────────────────────────[0m
+[1mTotal Cost:[0m    Cost: $[33m14.5301[0m, Cached: $[32m6.0695[0m
+[36m──────────────────────────────────────────────────────────────────────[0m
+[1mWall Time:[0m     [33m19m15s[0m
+[1mWorkspace:[0m     /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/.ape/runs/pr5_val_small12_minus30714_lead_rep1
+[1m[36m======================================================================[0m
+2026-09-26 08:35:58 | INFO     | finalize:341 - lead synthesis recorded but NOT applied: 63 assessment(s)
+2026-09-26 08:36:37 | INFO     | collect_supported:232 - evidence chain: 38 candidate(s) -> packets {'inconclusive': 34, 'supported': 4} -> 4 supported (0 collapsed as compile cascades)
+2026-09-26 08:36:37 | INFO     | finalize:488 - finalized: 63 candidates -> 63 findings -> 63 issues (26 published)
+2026-09-26 08:36:38 | INFO     | run:1836 - run dir: results/pr_review_v5/runs/pr5_val_small12_minus30714_lead_rep1
+2026-09-26 08:36:38 | INFO     | run:1837 - completion_status=complete issues=63 cost=$14.53
+results/pr_review_v5/runs/pr5_val_small12_minus30714_lead_rep1
