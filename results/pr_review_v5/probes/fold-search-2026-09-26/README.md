@@ -43,3 +43,44 @@ module, and `#fold_decl` on every declaration the PR added. The declaration unde
 the SITE; the others measure noise. Eight toolchains from 4.22 to 4.29; the search is compiled once
 per toolchain and variant. Scored by `score_harness.py`: whether the site declaration exists at that
 base, the site's folds against the readers' analogue, folds per non-site declaration.
+
+## Results (2026-09-26, `harness/scores.json`, `harness/folds.json`, `harness/run.log`)
+
+66 asks materialised (142 labelled comparison asks, minus 51 whose analogue is one of the PR's own
+siblings, 14 with no built base at or before the review, 8 with no site, file or importable header,
+3 whose own imports are absent at the base); the site declaration exists at its base in **50**
+(the other 16 fail to elaborate: unknown constants from the PR's other files, or drift). Median 49 s
+per file, maximum 161 s, on one core each.
+
+| | count |
+|---|---|
+| sites present | 50 |
+| sites with at least one fold | 33 (32 in the naming tier) |
+| sites where a fold is the readers' analogue | **6**, all naming tier: `QuotSMulTop`, `SimpleGraph.IsBipartite`, `Pi.single`, `Subgroup.FiniteIndex`, `Submodule.IsPrincipal`, `Set.preimage` |
+| among the 30 present sites labelled findable by API shape | 4 hits |
+| fold family at a hit | 2 to 4 folds, 1 to 3 in the naming tier |
+| non-site added declarations | 176, every one with a fold: 4.97 folds each, **2.12 in the naming tier** |
+
+**Reading.**
+- **The mechanism is real and narrow.** When the PR wrote out the body of a named concept, the
+  search returns that concept with a small typed family around it, and the six hits are exactly
+  that class. Six of 50 is the size of that class among the asks the readers labelled "API shape",
+  not a failure of the search: the readers' label also covers primed constructor variants
+  (`TotalSpace.mk'`, 5 asks), a structure literal that should go through a smart constructor
+  (`Fork.ofι`, `Cofork.ofπ`), missing twins (`Set.EqOn` variants, `app_sub`, the `lt` twin), and
+  two-step relations (`Finsupp.prod` against a subtype product), none of which is a one-step fold.
+  Each of those is a different mechanical route: name-twin enumeration, a smart-constructor check
+  on structure literals of a type that has `T.of*`, the twin check, and rewrite chains.
+- **Binder order defeats unification.** `∀ i j, j ≤ i → p i → p j` is `Antitone p` with the binders
+  swapped, and no permutation is tried; two or three binders could be.
+- **Noise is the cost.** Two naming folds per added declaration is what the arm would have to read;
+  most are true synonyms fired by common subterms (`Option α` into `WithBot`/`WithTop`/`WithOne`,
+  `Set.Icc` into `uIcc`, `algebraMap R R`), which a per-constant blacklist or a frequency cap would
+  cut, at the risk of the carrier-axis twins the decoy reading asked for.
+- **Drift bounds the harness, not the search.** Sixteen sites of 66 did not elaborate at a base up
+  to 30 days before the review; the search never ran on them.
+
+**Against the todo's closing criterion** (two thirds of the 43 validation analogues with at most
+one wrong in five): not met, and not the right criterion for this route. The route settles the
+"wrote out the body of a named concept" class at high precision and small families; the remaining
+comparison asks need the other routes above or role retrieval.

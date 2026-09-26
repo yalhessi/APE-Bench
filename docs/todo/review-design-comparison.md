@@ -91,6 +91,20 @@ search whose targets are definitions, not the goal). Test on the 43 for recall a
 must come out as "no analogue by shape", never as `IsSeqCompact`. Role retrieval, for the remainder,
 after that.
 
+**Retrieval built and measured, 2026-09-26** (`results/pr_review_v5/probes/fold-search-2026-09-26/`).
+A Lean metaprogram that unifies a declaration's subterms, hypotheses included, at three spellings
+against definition bodies, one-field class fields and rewrite-lemma sides, keeping folds that
+replace the subterm's distinctive constants by a new named concept, tiered into naming folds and
+rewrites, and dropping folds that reverse a simp lemma. On the labelled comparison asks, each PR's
+file at its review commit against the latest built base at or before the review with the base's
+whole library imported: **50 sites present, 33 folded, 6 hits** (`QuotSMulTop`, `IsBipartite`,
+`Pi.single`, `FiniteIndex`, `IsPrincipal`, `Set.preimage`), all in the naming tier with families of
+2 to 4; **2.1 naming folds per non-site declaration**. The six are the "wrote out the body of a
+named concept" class; the rest of what the readers called API shape is primed constructor
+variants, structure literals owed a smart constructor, missing twins, and two-step relations, each
+a different mechanical route. Binder order defeats unification (`Antitone` written with swapped
+binders). The closing criterion below is not met by this route and is not its measure.
+
 **What would close it.** Retrieval returns the maintainer's analogue on at least two thirds of the
 43 with a wrong-analogue rate at or below one in five; then a judged test with the analogues in the
 arms' context. **The small12 validation set holds no design asks** (its 30 asks are F1 11, F10 5,

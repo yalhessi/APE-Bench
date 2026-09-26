@@ -322,6 +322,9 @@ def foldSub (tree : DiscrTree Entry) (s : Expr) (xs : Array Expr) (seen : IO.Ref
         else pure none
       catch _ => pure none
     let some fold := r? | continue
+    -- matching a simp lemma's right-hand side and producing its left-hand side un-simps the term
+    if en.kind == .lemmaRhs then
+      if (← getSimpTheorems).isLemma (.decl en.via) then continue
     if heads.any (hasConst fold ·) then continue
     if sigS.toList.any (hasConst fold ·) then continue
     if !((← sigM fold).toList.any fun c => !sigAll.contains c) then continue
@@ -344,8 +347,12 @@ partial def visit (tree : DiscrTree Entry) (e : Expr) (xs : Array Expr) (seen : 
   | .app .. =>
     for a in e.getAppArgs do visit tree a xs seen
     visit tree e.getAppFn xs seen
-  | .lam .. => lambdaBoundedTelescope e 1 fun ys body => visit tree body (xs ++ ys) seen
-  | .forallE .. => forallBoundedTelescope e (some 1) fun ys body => visit tree body (xs ++ ys) seen
+  | .lam .. =>
+    visit tree e.bindingDomain! xs seen
+    lambdaBoundedTelescope e 1 fun ys body => visit tree body (xs ++ ys) seen
+  | .forallE .. =>
+    visit tree e.bindingDomain! xs seen   -- a hypothesis is a fold subject too
+    forallBoundedTelescope e (some 1) fun ys body => visit tree body (xs ++ ys) seen
   | .mdata _ b => visit tree b xs seen
   | _ => pure ()
 

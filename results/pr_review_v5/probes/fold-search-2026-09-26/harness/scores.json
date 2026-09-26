@@ -1,0 +1,1936 @@
+[
+ {
+  "cid": "v0157",
+  "sample": "val",
+  "pr": 26219,
+  "findable": [
+   "name"
+  ],
+  "month": "2025-06",
+  "site": "Module.subsingleton_of_subsingleton_quotSMulTop",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 3,
+  "site_folds": 3,
+  "site_naming": 2,
+  "hit": true,
+  "hit_naming": true,
+  "hit_consts": [
+   "QuotSMulTop"
+  ],
+  "site_consts": [
+   "Finite",
+   "QuotSMulTop",
+   "SimpleGraph.Preconnected"
+  ],
+  "analogue_keys": [
+   "Mathlib.RingTheory.QuotSMulTop",
+   "QuotSMulTop"
+  ],
+  "other_decls": 1,
+  "other_folds": 2,
+  "other_naming": 2,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "v0324",
+  "sample": "val",
+  "pr": 26875,
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "month": "2025-07",
+  "site": "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 5,
+  "site_naming": 2,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Set.iUnion",
+   "SimpleGraph.center",
+   "TrivSqZeroExt",
+   "Unitization"
+  ],
+  "analogue_keys": [
+   "TotalSpace.mk"
+  ],
+  "other_decls": 2,
+  "other_folds": 26,
+  "other_naming": 8,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "v0325",
+  "sample": "val",
+  "pr": 26875,
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "month": "2025-07",
+  "site": "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 5,
+  "site_naming": 2,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Set.iUnion",
+   "SimpleGraph.center",
+   "TrivSqZeroExt",
+   "Unitization"
+  ],
+  "analogue_keys": [
+   "TotalSpace.mk"
+  ],
+  "other_decls": 2,
+  "other_folds": 26,
+  "other_naming": 8,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "v0326",
+  "sample": "val",
+  "pr": 26875,
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "month": "2025-07",
+  "site": "exists_contMDiffOn_section_forall_mem_convex_of_local",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 13,
+  "site_naming": 4,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Filter.principal",
+   "Finite",
+   "IsClosed",
+   "IsSigmaCompact",
+   "Max.max",
+   "Pairwise",
+   "T0Space",
+   "TrivSqZeroExt",
+   "Unitization",
+   "iInf"
+  ],
+  "analogue_keys": [
+   "TotalSpace.mk"
+  ],
+  "other_decls": 2,
+  "other_folds": 18,
+  "other_naming": 6,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "v0330",
+  "sample": "val",
+  "pr": 26875,
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "month": "2025-07",
+  "site": "exists_contMDiffOn_section_forall_mem_convex_of_local",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 13,
+  "site_naming": 4,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Filter.principal",
+   "Finite",
+   "IsClosed",
+   "IsSigmaCompact",
+   "Max.max",
+   "Pairwise",
+   "T0Space",
+   "TrivSqZeroExt",
+   "Unitization",
+   "iInf"
+  ],
+  "analogue_keys": [
+   "TotalSpace.mk"
+  ],
+  "other_decls": 2,
+  "other_folds": 18,
+  "other_naming": 6,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "v0575",
+  "sample": "val",
+  "pr": 28000,
+  "findable": [
+   "name",
+   "role"
+  ],
+  "month": "2025-08",
+  "site": "Flow.orbit",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "MulAction.orbit",
+   "mem_orbit",
+   "mem_orbit_iff"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "v1097",
+  "sample": "val",
+  "pr": 31007,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-10",
+  "site": "Perfection.powMonoidHom_pthRootMonoidHom",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 8,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Function.LeftInverse",
+   "Function.RightInverse",
+   "RightInverse",
+   "f.comp"
+  ],
+  "other_decls": 23,
+  "other_folds": 48,
+  "other_naming": 21,
+  "other_decls_with_folds": 23
+ },
+ {
+  "cid": "v1308",
+  "sample": "val",
+  "pr": 32185,
+  "findable": [
+   "name"
+  ],
+  "month": "2025-11",
+  "site": "SimpleGraph.IsTree.colorable_two",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 1,
+  "site_folds": 4,
+  "site_naming": 3,
+  "hit": true,
+  "hit_naming": true,
+  "hit_consts": [
+   "SimpleGraph.IsBipartite"
+  ],
+  "site_consts": [
+   "Minimal",
+   "SimpleGraph.IsBipartite",
+   "SimpleGraph.IsCompleteMultipartite",
+   "SimpleGraph.Partitionable"
+  ],
+  "analogue_keys": [
+   "Colorable",
+   "SimpleGraph.IsBipartite"
+  ],
+  "other_decls": 3,
+  "other_folds": 7,
+  "other_naming": 0,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "v1400",
+  "sample": "val",
+  "pr": 32692,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "convergenceSet",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 2,
+  "site_folds": 2,
+  "site_naming": 2,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "AddMonoidAlgebra",
+   "MonoidAlgebra"
+  ],
+  "analogue_keys": [
+   "Finsupp.prod",
+   "t.prod",
+   "t.support"
+  ],
+  "other_decls": 4,
+  "other_folds": 28,
+  "other_naming": 7,
+  "other_decls_with_folds": 4
+ },
+ {
+  "cid": "v1547",
+  "sample": "val",
+  "pr": 33507,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "Polynomial.fourierCoeffOn_cexp",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 3,
+  "site_naming": 2,
+  "hit": true,
+  "hit_naming": true,
+  "hit_consts": [
+   "Pi.single"
+  ],
+  "site_consts": [
+   "Complex.mk",
+   "Pi.single",
+   "SkewMonoidAlgebra.coeff"
+  ],
+  "analogue_keys": [
+   "Pi.single"
+  ],
+  "other_decls": 3,
+  "other_folds": 14,
+  "other_naming": 5,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "v1597",
+  "sample": "val",
+  "pr": 33838,
+  "findable": [
+   "name",
+   "role"
+  ],
+  "month": "2026-01",
+  "site": "Nat.unitaryDivisorSum_mul",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 12,
+  "site_naming": 3,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Dvd.dvd",
+   "HEq",
+   "HasSubset.Subset",
+   "IsCyclic",
+   "IsIdempotentElem",
+   "IsRelPrime",
+   "IsUnit",
+   "Nat.Prime",
+   "Subsingleton",
+   "Sym2.IsDiag"
+  ],
+  "analogue_keys": [
+   "ArithmeticFunction.IsMultiplicative"
+  ],
+  "other_decls": 14,
+  "other_folds": 177,
+  "other_naming": 53,
+  "other_decls_with_folds": 14
+ },
+ {
+  "cid": "v1795",
+  "sample": "val",
+  "pr": 34861,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-02",
+  "site": "ODE.FunSpace.ext",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 5,
+  "site_folds": 10,
+  "site_naming": 2,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Inter.inter",
+   "Metric.closedBall",
+   "ODE.FunSpace.compProj",
+   "Set.uIcc",
+   "Union.union"
+  ],
+  "analogue_keys": [
+   "CoeFun",
+   "FunLike"
+  ],
+  "other_decls": 6,
+  "other_folds": 59,
+  "other_naming": 16,
+  "other_decls_with_folds": 6
+ },
+ {
+  "cid": "v1946",
+  "sample": "val",
+  "pr": 35826,
+  "findable": [
+   "role"
+  ],
+  "month": "2026-02",
+  "site": "ENNReal.absDiff",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "EMetricSpace"
+  ],
+  "other_decls": 1,
+  "other_folds": 2,
+  "other_naming": 0,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "v2022",
+  "sample": "val",
+  "pr": 36227,
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "month": "2026-03",
+  "site": "Subgroup.index_ne_zero_of_range_powMonoidHom_le",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 2,
+  "site_naming": 2,
+  "hit": true,
+  "hit_naming": true,
+  "hit_consts": [
+   "Subgroup.FiniteIndex"
+  ],
+  "site_consts": [
+   "Finite",
+   "Subgroup.FiniteIndex"
+  ],
+  "analogue_keys": [
+   "B.index",
+   "Subgroup.FiniteIndex"
+  ],
+  "other_decls": 2,
+  "other_folds": 6,
+  "other_naming": 6,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "v2098",
+  "sample": "val",
+  "pr": 36421,
+  "findable": [
+   "name"
+  ],
+  "month": "2026-03",
+  "site": "minpoly.natDegree_le'",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Finite"
+  ],
+  "analogue_keys": [
+   "LinearMap.aeval_self_charpoly"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "v2163",
+  "sample": "val",
+  "pr": 36781,
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "month": "2026-03",
+  "site": "UniqueFactorizationMonoid.iff_height_one_prime_principal",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 2,
+  "site_naming": 1,
+  "hit": true,
+  "hit_naming": true,
+  "hit_consts": [
+   "Submodule.IsPrincipal"
+  ],
+  "site_consts": [
+   "Ideal.FG",
+   "Submodule.IsPrincipal"
+  ],
+  "analogue_keys": [
+   "Submodule.IsPrincipal"
+  ],
+  "other_decls": 5,
+  "other_folds": 14,
+  "other_naming": 11,
+  "other_decls_with_folds": 5
+ },
+ {
+  "cid": "v0200",
+  "sample": "val",
+  "pr": 26350,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-06",
+  "site": "coe_rootsOfUnity_to_nthRootsFinset",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "nthRootsFinset_toSet"
+  ],
+  "other_decls": 2,
+  "other_folds": 10,
+  "other_naming": 1,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "v0367",
+  "sample": "val",
+  "pr": 26995,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-07",
+  "site": "ContinousWithinAt.eq_const_of_mem_closure",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 322,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "ContinuousWithinAt.eq_const_of_mem_closure",
+   "Set.EqOn"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "v0438",
+  "sample": "val",
+  "pr": 27257,
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "month": "2025-07",
+  "site": "lineMap_le_lineMap_iff_of_lt'",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 3,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Relation.ReflTransGen",
+   "Relation.TransGen",
+   "WCovBy"
+  ],
+  "analogue_keys": [
+   "lineMap_lt_lineMap_iff_of_lt"
+  ],
+  "other_decls": 4,
+  "other_folds": 12,
+  "other_naming": 4,
+  "other_decls_with_folds": 4
+ },
+ {
+  "cid": "v1069",
+  "sample": "val",
+  "pr": 30774,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-10",
+  "site": "WithTop.untop₀_neg",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 6,
+  "site_naming": 6,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "CategoryTheory.Limits.WidePullbackShape",
+   "CategoryTheory.Limits.WidePushoutShape",
+   "OnePoint",
+   "WithBot",
+   "WithOne",
+   "WithZero"
+  ],
+  "analogue_keys": [
+   "GroupWithZero",
+   "untop₀_inv",
+   "untop₀_neg"
+  ],
+  "other_decls": 6,
+  "other_folds": 40,
+  "other_naming": 40,
+  "other_decls_with_folds": 6
+ },
+ {
+  "cid": "v1186",
+  "sample": "val",
+  "pr": 31525,
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "month": "2025-11",
+  "site": "Set.Icc.convexCombo_assoc",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 87,
+  "site_folds": 9,
+  "site_naming": 2,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Inter.inter",
+   "Metric.closedBall",
+   "Multiset.prod",
+   "Set.uIcc",
+   "Union.union"
+  ],
+  "analogue_keys": [
+   "convexCombo_assoc"
+  ],
+  "other_decls": 10,
+  "other_folds": 80,
+  "other_naming": 20,
+  "other_decls_with_folds": 10
+ },
+ {
+  "cid": "v1256",
+  "sample": "val",
+  "pr": 31968,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-11",
+  "site": "CategoryTheory.CatCenter.app_add",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "app_add",
+   "app_neg",
+   "app_sub",
+   "app_zero"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "v1280",
+  "sample": "val",
+  "pr": 32093,
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "month": "2025-11",
+  "site": "CochainComplex.HomComplex.Cocycle.equivHomShift",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 1,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "v1682",
+  "sample": "val",
+  "pr": 34302,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "meromorphicOn_congr_codiscreteWithin",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 2,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Meromorphic.congr_codiscrete",
+   "MeromorphicOn",
+   "Within",
+   "meromorphic_congr_codiscrete"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "v2006",
+  "sample": "val",
+  "pr": 36174,
+  "findable": [
+   "name",
+   "role"
+  ],
+  "month": "2026-03",
+  "site": "IsCountablyCompact",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 2,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "IsCompact",
+   "IsLindelof"
+  ],
+  "other_decls": 18,
+  "other_folds": 63,
+  "other_naming": 33,
+  "other_decls_with_folds": 18
+ },
+ {
+  "cid": "v2104",
+  "sample": "val",
+  "pr": 36459,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-03",
+  "site": "CategoryTheory.Adjunction.bijective_map_comp_iff",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 87,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "bijective_map_comp_iff"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0038",
+  "sample": "outside.b",
+  "pr": 32800,
+  "findable": [
+   "role"
+  ],
+  "month": "2025-12",
+  "site": "ArchimedeanClass.top_ne_zero",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 5,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "NeZero",
+   "Nontrivial"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0048",
+  "sample": "outside.b",
+  "pr": 32567,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2025-12",
+  "site": "Pi.Lex.inf",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 12,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Lex",
+   "Pi.Lex"
+  ],
+  "other_decls": 11,
+  "other_folds": 11,
+  "other_naming": 11,
+  "other_decls_with_folds": 11
+ },
+ {
+  "cid": "o0053",
+  "sample": "outside.b",
+  "pr": 32567,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2025-12",
+  "site": "Pi.Lex.inf",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 12,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [],
+  "other_decls": 11,
+  "other_folds": 11,
+  "other_naming": 11,
+  "other_decls_with_folds": 11
+ },
+ {
+  "cid": "o0069",
+  "sample": "outside.b",
+  "pr": 34353,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "Fin.lt_card_iff_apply_of_imp",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 9,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Fin.toNat"
+  ],
+  "analogue_keys": [
+   "Antitone"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0076",
+  "sample": "outside.b",
+  "pr": 34012,
+  "findable": [
+   "name"
+  ],
+  "month": "2026-01",
+  "site": "Nat.orderOf",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Quandle.Dihedral"
+  ],
+  "analogue_keys": [
+   "Nat.orderOf",
+   "ZMod"
+  ],
+  "other_decls": 3,
+  "other_folds": 33,
+  "other_naming": 9,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "o0116",
+  "sample": "outside.b",
+  "pr": 33532,
+  "findable": [
+   "role"
+  ],
+  "month": "2026-01",
+  "site": "ValuativeRel.veq_comm",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "IsSymm"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0140",
+  "sample": "outside.b",
+  "pr": 33785,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2026-01",
+  "site": "MulArchimedeanClass.mk_le_mk_of_mul_left",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 1,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Multiset.prod"
+  ],
+  "analogue_keys": [
+   "mk_le_mk_of_mul_left",
+   "mk_left_le_mk_mul"
+  ],
+  "other_decls": 1,
+  "other_folds": 1,
+  "other_naming": 0,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "o0176",
+  "sample": "outside.b",
+  "pr": 33458,
+  "findable": [
+   "role"
+  ],
+  "month": "2026-01",
+  "site": "FirstOrder.Language.Embedding.withConstantsStructure",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "RestrictScalars",
+   "Structure"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0189",
+  "sample": "outside.b",
+  "pr": 34308,
+  "findable": [
+   "name"
+  ],
+  "month": "2026-01",
+  "site": "Equiv.Perm.cycleType_swap_mul_swap_of_nodup",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 1,
+  "site_folds": 3,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "DecidableRel",
+   "Multiset.replicate",
+   "Vector.toList"
+  ],
+  "analogue_keys": [
+   "Multiset.Nodup",
+   "Nodup"
+  ],
+  "other_decls": 4,
+  "other_folds": 5,
+  "other_naming": 0,
+  "other_decls_with_folds": 4
+ },
+ {
+  "cid": "o0274",
+  "sample": "outside.b",
+  "pr": 33718,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "Algebra.QuasiFiniteAt.of_surjectiveOnStalks",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 9,
+  "site_folds": 4,
+  "site_naming": 4,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Module.Finite",
+   "autoParam"
+  ],
+  "analogue_keys": [
+   "Algebra",
+   "Ideal.LiesOver",
+   "q.comap"
+  ],
+  "other_decls": 8,
+  "other_folds": 31,
+  "other_naming": 29,
+  "other_decls_with_folds": 8
+ },
+ {
+  "cid": "o0300",
+  "sample": "outside.b",
+  "pr": 31733,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-11",
+  "site": "Affine.Simplex.ExcenterExists.affineSpan_faceOpposite_eq_orthRadius",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 3,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "CategoryTheory.Bundled.α",
+   "Set.univ"
+  ],
+  "analogue_keys": [
+   "Affine.Simplex.range_faceOpposite_points"
+  ],
+  "other_decls": 3,
+  "other_folds": 5,
+  "other_naming": 1,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "o0315",
+  "sample": "outside.b",
+  "pr": 33636,
+  "findable": [
+   "name"
+  ],
+  "month": "2026-01",
+  "site": "LineDeriv.laplacian",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 24,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Finite"
+  ],
+  "analogue_keys": [
+   "InnerProductSpace.Laplacian"
+  ],
+  "other_decls": 6,
+  "other_folds": 8,
+  "other_naming": 8,
+  "other_decls_with_folds": 6
+ },
+ {
+  "cid": "o0318",
+  "sample": "outside.b",
+  "pr": 35300,
+  "findable": [
+   "role"
+  ],
+  "month": "2026-02",
+  "site": "LieAlgebra.SemiDirectSum",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "SemiDirectProduct",
+   "SemidirectProduct"
+  ],
+  "other_decls": 2,
+  "other_folds": 6,
+  "other_naming": 6,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "o0428",
+  "sample": "outside.b",
+  "pr": 32891,
+  "findable": [
+   "name"
+  ],
+  "month": "2025-12",
+  "site": "EMetric.mem_ball",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "EMetric.ball",
+   "Metric.ball"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0439",
+  "sample": "outside.b",
+  "pr": 32891,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "WeakPseudoEMetricSpace.induced",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Topology.IsInducing"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0446",
+  "sample": "outside.b",
+  "pr": 32891,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "WeakEMetricSpace.induced",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Topology.IsEmbedding"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0450",
+  "sample": "outside.b",
+  "pr": 32891,
+  "findable": [
+   "neighbourhood",
+   "pr_internal"
+  ],
+  "month": "2025-12",
+  "site": "WeakEMetric.OnePoint.ball_infty_of_pos",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 35,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "EMetric.closedBall"
+  ],
+  "other_decls": 9,
+  "other_folds": 66,
+  "other_naming": 62,
+  "other_decls_with_folds": 9
+ },
+ {
+  "cid": "o0488",
+  "sample": "outside.b",
+  "pr": 34209,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "SchauderBasis",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 8,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Pi.single"
+  ],
+  "other_decls": 10,
+  "other_folds": 22,
+  "other_naming": 11,
+  "other_decls_with_folds": 10
+ },
+ {
+  "cid": "o0500",
+  "sample": "outside.b",
+  "pr": 34209,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "SchauderBasis",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 8,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "HasSum"
+  ],
+  "other_decls": 10,
+  "other_folds": 22,
+  "other_naming": 11,
+  "other_decls_with_folds": 10
+ },
+ {
+  "cid": "o0502",
+  "sample": "outside.b",
+  "pr": 34209,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "SchauderBasis",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 8,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Pi.single"
+  ],
+  "other_decls": 10,
+  "other_folds": 22,
+  "other_naming": 11,
+  "other_decls_with_folds": 10
+ },
+ {
+  "cid": "o0575",
+  "sample": "outside.b",
+  "pr": 34401,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "equivShrink_lt_equivShrink_iff",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Function.Injective.partialOrder"
+  ],
+  "other_decls": 1,
+  "other_folds": 2,
+  "other_naming": 1,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "o0578",
+  "sample": "outside.b",
+  "pr": 36962,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-03",
+  "site": "primorial_mono",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Monotone"
+  ],
+  "other_decls": 4,
+  "other_folds": 18,
+  "other_naming": 2,
+  "other_decls_with_folds": 4
+ },
+ {
+  "cid": "o0580",
+  "sample": "outside.b",
+  "pr": 32576,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "CategoryTheory.Limits.Multifork.toPiFork",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Fork.ofι"
+  ],
+  "other_decls": 7,
+  "other_folds": 10,
+  "other_naming": 5,
+  "other_decls_with_folds": 7
+ },
+ {
+  "cid": "o0581",
+  "sample": "outside.b",
+  "pr": 32576,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "CategoryTheory.Limits.Multicofork.toSigmaCofork",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Cofork.ofπ"
+  ],
+  "other_decls": 7,
+  "other_folds": 10,
+  "other_naming": 5,
+  "other_decls_with_folds": 7
+ },
+ {
+  "cid": "o0604",
+  "sample": "outside.b",
+  "pr": 33604,
+  "findable": [
+   "api_shape",
+   "neighbourhood"
+  ],
+  "month": "2026-01",
+  "site": "Valuation.IsEquiv.neq_one_iff_neq_one",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Iff.ne",
+   "IsEquiv.eq_one_iff_eq_one",
+   "eq_one_iff_eq_one"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0605",
+  "sample": "outside.b",
+  "pr": 33604,
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "month": "2026-01",
+  "site": "Valuation.IsEquiv.ne_zero",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Iff.ne",
+   "eq_zero",
+   "ne_zero",
+   "not_congr"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0707",
+  "sample": "outside.b",
+  "pr": 34316,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2026-01",
+  "site": "MulAction.smul_fixedPoints_eq_of_quotient_eq",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "Set.univ"
+  ],
+  "analogue_keys": [
+   "MulAction.toPermHom",
+   "Quotient.out",
+   "QuotientGroup.lift"
+  ],
+  "other_decls": 1,
+  "other_folds": 1,
+  "other_naming": 1,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "o0716",
+  "sample": "outside.b",
+  "pr": 32492,
+  "findable": [
+   "role"
+  ],
+  "month": "2025-12",
+  "site": "TensorProduct.eq_sum_basis_tmul_dualBasis_apply",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 24,
+  "site_folds": 2,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "DecidableRel",
+   "algebraMap"
+  ],
+  "analogue_keys": [
+   "Basis.coord",
+   "Basis.dualBasis"
+  ],
+  "other_decls": 1,
+  "other_folds": 3,
+  "other_naming": 2,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "o0730",
+  "sample": "outside.b",
+  "pr": 32180,
+  "findable": [
+   "name"
+  ],
+  "month": "2025-11",
+  "site": "CategoryTheory.Limits.Types.isPullback_of_isPushout",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 9,
+  "site_folds": 4,
+  "site_naming": 4,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "CategoryTheory.Conv"
+  ],
+  "analogue_keys": [
+   "CategoryTheory.Adhesive.isPullback_of_isPushout_of_mono_left"
+  ],
+  "other_decls": 5,
+  "other_folds": 58,
+  "other_naming": 30,
+  "other_decls_with_folds": 5
+ },
+ {
+  "cid": "o0768",
+  "sample": "outside.b",
+  "pr": 33017,
+  "findable": [
+   "api_shape",
+   "role"
+  ],
+  "month": "2025-12",
+  "site": "ContinuousAlgEquiv.coe_eq_continuousLinearEquiv_conjugate",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 2,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "algebraMap"
+  ],
+  "analogue_keys": [
+   "ContinuousLinearEquiv.arrowCongr",
+   "U.symm"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0835",
+  "sample": "outside.b",
+  "pr": 33045,
+  "findable": [
+   "api_shape",
+   "role"
+  ],
+  "month": "2025-12",
+  "site": "CategoryTheory.MorphismProperty.IsStableUnderComposition.ind_of_preIndSpreads",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 1,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "CategoryTheory.Limits.HasFiniteWidePushouts"
+  ],
+  "analogue_keys": [
+   "IsMultiplicative.ind_of_preIndSpreads",
+   "IsStableUnderComposition",
+   "IsStableUnderComposition.ind_of_preIndSpreads",
+   "MorphismProperty.IsMultiplicative"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0846",
+  "sample": "outside.b",
+  "pr": 32582,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "Finset.card_filter_add_card_filter_not",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Finset.filter_card_add_filter_neg_card_eq_card"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0894",
+  "sample": "outside.b",
+  "pr": 33972,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2026-01",
+  "site": "Polynomial.eq_C_leadingCoeff_of_degree_le_zero",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "eq_C_of_degree_le_zero"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0895",
+  "sample": "outside.b",
+  "pr": 33972,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2026-01",
+  "site": "Polynomial.eq_C_leadingCoeff_of_natDegree_eq_zero",
+  "compiled": false,
+  "site_present": false,
+  "n_errors": 101,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "eq_C_of_degree_",
+   "eq_C_of_degree_eq_zero",
+   "eq_C_of_degree_le_zero"
+  ],
+  "other_decls": 0,
+  "other_folds": 0,
+  "other_naming": 0,
+  "other_decls_with_folds": 0
+ },
+ {
+  "cid": "o0900",
+  "sample": "outside.b",
+  "pr": 32744,
+  "findable": [
+   "api_shape",
+   "role"
+  ],
+  "month": "2025-12",
+  "site": "FirstOrder.Language.DefinableFun",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 0,
+  "site_naming": 0,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [],
+  "analogue_keys": [
+   "Option",
+   "Unit"
+  ],
+  "other_decls": 3,
+  "other_folds": 7,
+  "other_naming": 5,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "o0905",
+  "sample": "outside.b",
+  "pr": 32744,
+  "findable": [
+   "api_shape"
+  ],
+  "month": "2025-12",
+  "site": "FirstOrder.Language.DefinableFun.definable_preimage_of_definableMap",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 2,
+  "site_naming": 1,
+  "hit": true,
+  "hit_naming": true,
+  "hit_consts": [
+   "Set.preimage"
+  ],
+  "site_consts": [
+   "Set.Finite",
+   "Set.preimage"
+  ],
+  "analogue_keys": [
+   "Set.preimage"
+  ],
+  "other_decls": 2,
+  "other_folds": 5,
+  "other_naming": 4,
+  "other_decls_with_folds": 2
+ },
+ {
+  "cid": "o0914",
+  "sample": "outside.b",
+  "pr": 32367,
+  "findable": [
+   "role",
+   "unclear"
+  ],
+  "month": "2025-12",
+  "site": "Sum.getLeft?_comp_inl",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 54,
+  "site_folds": 4,
+  "site_naming": 4,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "WithBot",
+   "WithOne",
+   "WithTop",
+   "WithZero"
+  ],
+  "analogue_keys": [
+   "Function.comp_def",
+   "getLeft?_comp_inl"
+  ],
+  "other_decls": 3,
+  "other_folds": 14,
+  "other_naming": 12,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "w0065",
+  "sample": "outside.w",
+  "pr": 40269,
+  "findable": [
+   "name"
+  ],
+  "month": "2026-06",
+  "site": "SimpleGraph.neighborSet_top",
+  "compiled": true,
+  "site_present": true,
+  "n_errors": 0,
+  "site_folds": 1,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "SimpleGraph.completeGraph"
+  ],
+  "analogue_keys": [
+   "Mathlib",
+   "neighborSet_bot",
+   "neighborSet_top"
+  ],
+  "other_decls": 3,
+  "other_folds": 4,
+  "other_naming": 3,
+  "other_decls_with_folds": 3
+ },
+ {
+  "cid": "w0219",
+  "sample": "outside.w",
+  "pr": 40272,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2026-06",
+  "site": "Matrix.l2_opNorm_eq_pi_norm",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 9,
+  "site_folds": 2,
+  "site_naming": 1,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "CStarMatrix",
+   "DecidableRel"
+  ],
+  "analogue_keys": [
+   "Matrix.Norms.L2Operator"
+  ],
+  "other_decls": 1,
+  "other_folds": 3,
+  "other_naming": 2,
+  "other_decls_with_folds": 1
+ },
+ {
+  "cid": "w0318",
+  "sample": "outside.w",
+  "pr": 38533,
+  "findable": [
+   "neighbourhood"
+  ],
+  "month": "2026-04",
+  "site": "perfectlyNormalSpace_iff_forall_isClosed_preimage_zero",
+  "compiled": false,
+  "site_present": true,
+  "n_errors": 2,
+  "site_folds": 14,
+  "site_naming": 5,
+  "hit": false,
+  "hit_naming": false,
+  "hit_consts": [],
+  "site_consts": [
+   "HasSubset.Subset",
+   "Inter.inter",
+   "IsSeqClosed",
+   "Metric.closedBall",
+   "SequentialSpace",
+   "Set.uIcc",
+   "Set.univ",
+   "Union.union"
+  ],
+  "analogue_keys": [
+   "Icc",
+   "exists_continuous_zero_one_of_isClosed"
+  ],
+  "other_decls": 1,
+  "other_folds": 1,
+  "other_naming": 1,
+  "other_decls_with_folds": 1
+ }
+]

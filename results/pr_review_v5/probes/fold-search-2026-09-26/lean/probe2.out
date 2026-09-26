@@ -1,0 +1,193 @@
+fold index: 33640 definition bodies, 650 one-field classes, 160335 lemma sides, 0 errors, 30s
+tree ready
+#fold B.index ≠ 0 ⇒ Finite (A ⧸ B)   [Finite, via Subgroup.index_ne_zero_iff_finite, lemma←, naming]
+#fold B.index ≠ 0 ⇒ B.FiniteIndex   [Subgroup.FiniteIndex, via Subgroup.finiteIndex_iff, lemma→, naming]
+#fold B.index ⇒ Nat.card (A ⧸ B)   [Nat.card, via Subgroup.index_eq_card, lemma←, naming]
+#fold B.index ⇒ B.relIndex ⊤   [Subgroup.relIndex, via Subgroup.relindex_top_right, lemma→, rewrite]
+@Submodule.IsPrincipal.principal : ∀ {R : Type u_2} {M : Type u_3} {inst : Semiring R} {inst_1 : AddCommMonoid M}
+  {inst_2 : Module R M} (S : Submodule R M) [self : S.IsPrincipal], ∃ a, S = R ∙ a
+@Submodule.isPrincipal_iff : ∀ {R : Type u_2} {M : Type u_3} [inst : Semiring R] [inst_1 : AddCommMonoid M]
+  [inst_2 : Module R M] (S : Submodule R M), S.IsPrincipal ↔ ∃ a, S = R ∙ a
+#fold_cands ∃ x, I = Ideal.span {x}  levels: [∃ x, I = Ideal.span {x}, ∃ x, I = R ∙ x]
+  418 candidates for ∃ x,
+  I =
+    Ideal.span
+      {x}: [existsUnique_iff_exists,
+ iSup_Prop_eq,
+ Filter.frequently_top,
+ SatisfiesM,
+ IsAddCyclic.exists_zsmul_surjective,
+ IsCyclic.exists_zpow_surjective,
+ ExistsUnique,
+ nontrivial_iff_exists_ne,
+ nontrivial_iff,
+ Nontrivial.exists_pair_ne,
+ isEmpty_pi,
+ Relation.Map,
+ Relation.Join,
+ Relation.TransGen.head'_iff,
+ Relation.TransGen.tail'_iff,
+ Relation.Comp,
+ Relation.map_apply,
+ DenselyOrdered.dense,
+ Set.Bounded,
+ CanLift.prf,
+ Set.inter_nonempty,
+ Set.inter_nonempty_iff_exists_left,
+ Set.ssubset_iff_of_subset,
+ Set.inter_nonempty_iff_exists_right,
+ Set.ssubset_iff_insert,
+ Set.nontrivial_iff_exists_ne,
+ Set.nontrivial_iff_pair_subset,
+ Set.nontrivial_iff_exists_lt,
+ Set.Nontrivial,
+ Set.ssubset_iff_sdiff_singleton,
+ Set.disjoint_pi,
+ Set.disjoint_univ_pi,
+ isAddUnit_iff_exists_neg',
+ isAddUnit_iff_exists_neg,
+ isUnit_iff_exists_inv,
+ isUnit_iff_exists,
+ isUnit_iff_exists_inv',
+ isAddUnit_iff_exists,
+ IsSquare,
+ isSquare_iff_exists_mul_self]
+    existsUnique_iff_exists: unifies
+    iSup_Prop_eq: unifies
+    Filter.frequently_top: unifies
+    SatisfiesM: fails: ∃ x', Subtype.val <$> x' = ?x
+    IsAddCyclic.exists_zsmul_surjective: fails: ∃ g, Function.Surjective fun x => x • g
+    IsCyclic.exists_zpow_surjective: fails: ∃ g, Function.Surjective fun x => g ^ x
+    ExistsUnique: fails: ∃ x, ?p x ∧ ∀ (y : ?α), ?p y → y = x
+    nontrivial_iff_exists_ne: fails: ∃ y, y ≠ ?x
+    nontrivial_iff: fails: ∃ x y, x ≠ y
+    Nontrivial.exists_pair_ne: fails: ∃ x y, x ≠ y
+    isEmpty_pi: fails: ∃ a, IsEmpty (?π a)
+    Relation.Map: fails: ∃ a b, ?r a b ∧ ?f a = ?a✝ ∧ ?g b = ?a✝
+    Relation.Join: fails: ∃ c, ?r ?a✝ c ∧ ?r ?a✝ c
+    Relation.TransGen.head'_iff: fails: ∃ b, ?r ?a b ∧ Relation.ReflTransGen ?r b ?c
+    Relation.TransGen.tail'_iff: fails: ∃ b, Relation.ReflTransGen ?r ?a b ∧ ?r b ?c
+    Relation.Comp: fails: ∃ b, ?r ?a b ∧ ?p b ?c
+    Relation.map_apply: fails: ∃ a b, ?r a b ∧ ?f a = ?c ∧ ?g b = ?d
+    DenselyOrdered.dense: fails: ∃ a, ?a₁ < a ∧ a < ?a₂
+    Set.Bounded: fails: ∃ a, ∀ b ∈ ?s, ?r b a
+    CanLift.prf: fails: ∃ y, ?coe y = ?x
+    Set.inter_nonempty: fails: ∃ x ∈ ?s, x ∈ ?t
+    Set.inter_nonempty_iff_exists_left: fails: ∃ x ∈ ?s, x ∈ ?t
+    Set.ssubset_iff_of_subset: fails: ∃ x ∈ ?t, x ∉ ?s
+    Set.inter_nonempty_iff_exists_right: fails: ∃ x ∈ ?t, x ∈ ?s
+    Set.ssubset_iff_insert: fails: ∃ a ∉ ?s, insert a ?s ⊆ ?t
+    Set.nontrivial_iff_exists_ne: fails: ∃ y ∈ ?s, y ≠ ?x
+    Set.nontrivial_iff_pair_subset: fails: ∃ x y, x ≠ y ∧ {x, y} ⊆ ?s
+    Set.nontrivial_iff_exists_lt: fails: ∃ x ∈ ?s, ∃ y ∈ ?s, x < y
+    Set.Nontrivial: fails: ∃ x ∈ ?s, ∃ y ∈ ?s, x ≠ y
+    Set.ssubset_iff_sdiff_singleton: fails: ∃ a ∈ ?t, ?s ⊆ ?t \ {a}
+    Set.disjoint_pi: fails: ∃ i ∈ ?s, Disjoint (?t₁ i) (?t₂ i)
+    Set.disjoint_univ_pi: fails: ∃ i, Disjoint (?t₁ i) (?t₂ i)
+    isAddUnit_iff_exists_neg': fails: ∃ b, b + ?a = 0
+    isAddUnit_iff_exists_neg: fails: ∃ b, ?a + b = 0
+    isUnit_iff_exists_inv: fails: ∃ b, ?a * b = 1
+    isUnit_iff_exists: fails: ∃ b, ?x * b = 1 ∧ b * ?x = 1
+    isUnit_iff_exists_inv': fails: ∃ b, b * ?a = 1
+    isAddUnit_iff_exists: fails: ∃ b, ?x + b = 0 ∧ b + ?x = 0
+    IsSquare: fails: ∃ r, ?a = r * r
+    isSquare_iff_exists_mul_self: fails: ∃ r, ?a = r * r
+  418 candidates for ∃ x,
+  I =
+    R ∙
+      x: [existsUnique_iff_exists,
+ iSup_Prop_eq,
+ Filter.frequently_top,
+ SatisfiesM,
+ IsAddCyclic.exists_zsmul_surjective,
+ IsCyclic.exists_zpow_surjective,
+ ExistsUnique,
+ nontrivial_iff_exists_ne,
+ nontrivial_iff,
+ Nontrivial.exists_pair_ne,
+ isEmpty_pi,
+ Relation.Map,
+ Relation.Join,
+ Relation.TransGen.head'_iff,
+ Relation.TransGen.tail'_iff,
+ Relation.Comp,
+ Relation.map_apply,
+ DenselyOrdered.dense,
+ Set.Bounded,
+ CanLift.prf,
+ Set.inter_nonempty,
+ Set.inter_nonempty_iff_exists_left,
+ Set.ssubset_iff_of_subset,
+ Set.inter_nonempty_iff_exists_right,
+ Set.ssubset_iff_insert,
+ Set.nontrivial_iff_exists_ne,
+ Set.nontrivial_iff_pair_subset,
+ Set.nontrivial_iff_exists_lt,
+ Set.Nontrivial,
+ Set.ssubset_iff_sdiff_singleton,
+ Set.disjoint_pi,
+ Set.disjoint_univ_pi,
+ isAddUnit_iff_exists_neg',
+ isAddUnit_iff_exists_neg,
+ isUnit_iff_exists_inv,
+ isUnit_iff_exists,
+ isUnit_iff_exists_inv',
+ isAddUnit_iff_exists,
+ IsSquare,
+ isSquare_iff_exists_mul_self]
+    existsUnique_iff_exists: unifies
+    iSup_Prop_eq: unifies
+    Filter.frequently_top: unifies
+    SatisfiesM: fails: ∃ x', Subtype.val <$> x' = ?x
+    IsAddCyclic.exists_zsmul_surjective: fails: ∃ g, Function.Surjective fun x => x • g
+    IsCyclic.exists_zpow_surjective: fails: ∃ g, Function.Surjective fun x => g ^ x
+    ExistsUnique: fails: ∃ x, ?p x ∧ ∀ (y : ?α), ?p y → y = x
+    nontrivial_iff_exists_ne: fails: ∃ y, y ≠ ?x
+    nontrivial_iff: fails: ∃ x y, x ≠ y
+    Nontrivial.exists_pair_ne: fails: ∃ x y, x ≠ y
+    isEmpty_pi: fails: ∃ a, IsEmpty (?π a)
+    Relation.Map: fails: ∃ a b, ?r a b ∧ ?f a = ?a✝ ∧ ?g b = ?a✝
+    Relation.Join: fails: ∃ c, ?r ?a✝ c ∧ ?r ?a✝ c
+    Relation.TransGen.head'_iff: fails: ∃ b, ?r ?a b ∧ Relation.ReflTransGen ?r b ?c
+    Relation.TransGen.tail'_iff: fails: ∃ b, Relation.ReflTransGen ?r ?a b ∧ ?r b ?c
+    Relation.Comp: fails: ∃ b, ?r ?a b ∧ ?p b ?c
+    Relation.map_apply: fails: ∃ a b, ?r a b ∧ ?f a = ?c ∧ ?g b = ?d
+    DenselyOrdered.dense: fails: ∃ a, ?a₁ < a ∧ a < ?a₂
+    Set.Bounded: fails: ∃ a, ∀ b ∈ ?s, ?r b a
+    CanLift.prf: fails: ∃ y, ?coe y = ?x
+    Set.inter_nonempty: fails: ∃ x ∈ ?s, x ∈ ?t
+    Set.inter_nonempty_iff_exists_left: fails: ∃ x ∈ ?s, x ∈ ?t
+    Set.ssubset_iff_of_subset: fails: ∃ x ∈ ?t, x ∉ ?s
+    Set.inter_nonempty_iff_exists_right: fails: ∃ x ∈ ?t, x ∈ ?s
+    Set.ssubset_iff_insert: fails: ∃ a ∉ ?s, insert a ?s ⊆ ?t
+    Set.nontrivial_iff_exists_ne: fails: ∃ y ∈ ?s, y ≠ ?x
+    Set.nontrivial_iff_pair_subset: fails: ∃ x y, x ≠ y ∧ {x, y} ⊆ ?s
+    Set.nontrivial_iff_exists_lt: fails: ∃ x ∈ ?s, ∃ y ∈ ?s, x < y
+    Set.Nontrivial: fails: ∃ x ∈ ?s, ∃ y ∈ ?s, x ≠ y
+    Set.ssubset_iff_sdiff_singleton: fails: ∃ a ∈ ?t, ?s ⊆ ?t \ {a}
+    Set.disjoint_pi: fails: ∃ i ∈ ?s, Disjoint (?t₁ i) (?t₂ i)
+    Set.disjoint_univ_pi: fails: ∃ i, Disjoint (?t₁ i) (?t₂ i)
+    isAddUnit_iff_exists_neg': fails: ∃ b, b + ?a = 0
+    isAddUnit_iff_exists_neg: fails: ∃ b, ?a + b = 0
+    isUnit_iff_exists_inv: fails: ∃ b, ?a * b = 1
+    isUnit_iff_exists: fails: ∃ b, ?x * b = 1 ∧ b * ?x = 1
+    isUnit_iff_exists_inv': fails: ∃ b, b * ?a = 1
+    isAddUnit_iff_exists: fails: ∃ b, ?x + b = 0 ∧ b + ?x = 0
+    IsSquare: fails: ∃ r, ?a = r * r
+    isSquare_iff_exists_mul_self: fails: ∃ r, ?a = r * r
+#fold ∃ x,
+  I = Ideal.span {x} ⇒ Submodule.IsPrincipal I   [Submodule.IsPrincipal, via Submodule.isPrincipal_iff, lemma→, naming]
+#fold ∃ x, I = R ∙ x ⇒ Submodule.IsPrincipal I   [Submodule.IsPrincipal, via Submodule.isPrincipal_iff, lemma→, naming]
+#fold if n = k then 1 else 0 ⇒ Pi.single k 1 n   [Pi.single, via Pi.single_apply, lemma→, naming]
+      as a function of n: Pi.single k 1
+#fold if n = k then 1
+else
+  0 ⇒ (SkewMonoidAlgebra.single n 1).coeff
+  k   [SkewMonoidAlgebra.coeff, via SkewMonoidAlgebra.coeff_single_apply, lemma→, rewrite]
+      (pointwise only, under [n])
+#fold M ⧸ x • ⊤ ⇒ QuotSMulTop x M   [QuotSMulTop, via QuotSMulTop, def, naming]
+#fold {y | ∃ t, ϕ.toFun t x = y}: no fold
+#fold ∀ (x : ℕ → E), (∀ (n : ℕ), x n ∈ A) → ∃ a ∈ A, MapClusterPt a Filter.atTop x: no fold
+#fold ∀ (i j : Fin n), j ≤ i → p i → p j: no fold
+#fold x ^ k ⇒ (fun x_1 => x_1 * x)^[k] 1   [Nat.iterate, via mul_right_iterate_apply_one, lemma→, rewrite]
+#fold x ^ k ⇒ (fun x_1 => x * x_1)^[k] 1   [Nat.iterate, via mul_left_iterate_apply_one, lemma→, rewrite]

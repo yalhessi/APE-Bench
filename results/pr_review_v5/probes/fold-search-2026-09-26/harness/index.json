@@ -1,0 +1,2596 @@
+[
+ {
+  "cid": "v0157",
+  "sample": "val",
+  "pr": 26219,
+  "path": "Mathlib/RingTheory/Nakayama.lean",
+  "gh_id": 2231738510,
+  "kind": "review_comment",
+  "analogues": [
+   "the `QuotSMulTop` synonym",
+   "`QuotSMulTop` type synonym for `M \u29f8 x \u2022 \u22a4` (file `Mathlib.RingTheory.QuotSMulTop`)"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "b158b691d53bad1cd5b9649ec635707956ad45a2",
+  "base": "b6a8f16bde164ac2761dbe04a7ee1f362cbd8a55",
+  "line": 194,
+  "site_decl": "Module.subsingleton_of_subsingleton_quotSMulTop",
+  "added": [
+   "Module.subsingleton_of_subsingleton_quotSMulTop",
+   "Module.nontrivial_quotSMulTop_of_mem_annihilator_jacobson"
+  ],
+  "month": "2025-06",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 96,
+  "imported_modules": 6515,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-07-25",
+  "is_module": false
+ },
+ {
+  "cid": "v0324",
+  "sample": "val",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "gh_id": 2257448146,
+  "kind": "review_comment",
+  "analogues": [
+   "`TotalSpace.mk'`",
+   "`TotalSpace.mk'` (constructor with explicit fibre type) in place of `TotalSpace.mk` + type ascription"
+  ],
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "commit": "a12e6ee9e7590bcbc43d45ed0afa76b9750c53db",
+  "base": "29cc0b6ba073d98652f002bef7fdb522e80a82ae",
+  "line": 590,
+  "site_decl": "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+  "added": [
+   "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+   "exists_contMDiffOn_section_forall_mem_convex_of_local",
+   "exists_smooth_section_forall_mem_convex_of_local"
+  ],
+  "month": "2025-07",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 4,
+  "imported_modules": 6607,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-08-06",
+  "is_module": false
+ },
+ {
+  "cid": "v0325",
+  "sample": "val",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "gh_id": 2257448725,
+  "kind": "review_comment",
+  "analogues": [
+   "`TotalSpace.mk'`",
+   "`TotalSpace.mk'` (constructor with explicit fibre type) in place of `TotalSpace.mk` + type ascription"
+  ],
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "commit": "a12e6ee9e7590bcbc43d45ed0afa76b9750c53db",
+  "base": "29cc0b6ba073d98652f002bef7fdb522e80a82ae",
+  "line": 592,
+  "site_decl": "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+  "added": [
+   "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+   "exists_contMDiffOn_section_forall_mem_convex_of_local",
+   "exists_smooth_section_forall_mem_convex_of_local"
+  ],
+  "month": "2025-07",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 4,
+  "imported_modules": 6607,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-08-06",
+  "is_module": false
+ },
+ {
+  "cid": "v0326",
+  "sample": "val",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "gh_id": 2257449830,
+  "kind": "review_comment",
+  "analogues": [
+   "`TotalSpace.mk'`",
+   "`TotalSpace.mk'` (constructor with explicit fibre type) in place of anonymous constructor + type ascription"
+  ],
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "commit": "a12e6ee9e7590bcbc43d45ed0afa76b9750c53db",
+  "base": "29cc0b6ba073d98652f002bef7fdb522e80a82ae",
+  "line": 630,
+  "site_decl": "exists_contMDiffOn_section_forall_mem_convex_of_local",
+  "added": [
+   "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+   "exists_contMDiffOn_section_forall_mem_convex_of_local",
+   "exists_smooth_section_forall_mem_convex_of_local"
+  ],
+  "month": "2025-07",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 4,
+  "imported_modules": 6607,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-08-06",
+  "is_module": false
+ },
+ {
+  "cid": "v0330",
+  "sample": "val",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "gh_id": 2257455617,
+  "kind": "review_comment",
+  "analogues": [
+   "`TotalSpace.mk'`",
+   "`TotalSpace.mk'` (constructor with explicit fibre type) in place of `TotalSpace.mk` + type ascription"
+  ],
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "commit": "a12e6ee9e7590bcbc43d45ed0afa76b9750c53db",
+  "base": "29cc0b6ba073d98652f002bef7fdb522e80a82ae",
+  "line": 650,
+  "site_decl": "exists_contMDiffOn_section_forall_mem_convex_of_local",
+  "added": [
+   "SmoothPartitionOfUnity.contMDiff_totalSpace_weighted_sum_of_local_sections",
+   "exists_contMDiffOn_section_forall_mem_convex_of_local",
+   "exists_smooth_section_forall_mem_convex_of_local"
+  ],
+  "month": "2025-07",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 4,
+  "imported_modules": 6607,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-08-06",
+  "is_module": false
+ },
+ {
+  "cid": "v0575",
+  "sample": "val",
+  "pr": 28000,
+  "path": "Mathlib/Dynamics/Flow.lean",
+  "gh_id": 2275879549,
+  "kind": "review_comment",
+  "analogues": [
+   "the `MulAction.orbit` API",
+   "`MulAction.orbit` API (`mem_orbit_iff`, `mem_orbit`)"
+  ],
+  "findable": [
+   "name",
+   "role"
+  ],
+  "commit": "b78655026ba5165af944f4014fcd2c3d9999a7dd",
+  "base": "e074407cc7fb20fb1f72ea4eac6979a09a2a431c",
+  "line": 139,
+  "site_decl": "Flow.orbit",
+  "added": [
+   "Flow.orbit",
+   "Flow.IsFactorOf"
+  ],
+  "month": "2025-08",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 2,
+  "imported_modules": 6609,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-08-14",
+  "is_module": false
+ },
+ {
+  "cid": "v1097",
+  "sample": "val",
+  "pr": 31007,
+  "path": "Mathlib/RingTheory/Perfection.lean",
+  "gh_id": 2469801983,
+  "kind": "review_comment",
+  "analogues": [
+   "`Function.LeftInverse`/`RightInverse`",
+   "`Function.LeftInverse` / `Function.RightInverse` (unbundled) for `f.comp g = .id`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "0f53af621e4bdcb7c9016cb5f2c599b4553cde53",
+  "base": "ed54e0989389bf7f9e14657648aec1d89ccd94ce",
+  "line": 113,
+  "site_decl": "Perfection.powMonoidHom_pthRootMonoidHom",
+  "added": [
+   "Perfection",
+   "Perfection.submonoid",
+   "Perfection.coeffMonoidHom",
+   "Perfection.pthRootMonoidHom",
+   "Perfection.ext'",
+   "Perfection.coeffMonoidHom_mk",
+   "Perfection.coeffMonoidHom_pthRootMonoidHom",
+   "Perfection.coeffMonoidHom_pow_p",
+   "Perfection.coeffMonoidHom_pow_p'",
+   "Perfection.coeffMonoidHom_pow_p_pow",
+   "Perfection.coeffMonoidHom_powMonoidHom",
+   "Perfection.coeffMonoidHom_iterate_powMonoidHom",
+   "Perfection.coeffMonoidHom_iterate_powMonoidHom'",
+   "Perfection.pthRootMonoidHom_powMonoidHom",
+   "Perfection.powMonoidHom_pthRootMonoidHom",
+   "Perfection.liftMonoidHom",
+   "Perfection.mapMonoidHom",
+   "Perfection.subsemiring",
+   "Perfection.coeff",
+   "Perfection.pthRoot",
+   "Perfection.coeffMonoidHom_eq_coeff",
+   "Perfection.pthRootMonoidHom_eq_pthRoot",
+   "Perfection.ext",
+   "Perfection.coeff_pthRoot",
+   "Perfection.coeff_pow_p",
+   "Perfection.coeff_pow_p'",
+   "Perfection.coeff_frobenius",
+   "Perfection.coeff_iterate_frobenius",
+   "Perfection.coeff_iterate_frobenius'",
+   "Perfection.coeff_add_ne_zero",
+   "Perfection.coeff_ne_zero_of_le",
+   "Perfection.map",
+   "Perfection.coeff_map",
+   "Perfection.subring",
+   "PerfectionMap.mk'",
+   "PerfectionMap.equiv",
+   "PerfectionMap.comp_symm_equiv",
+   "PerfectionMap.map"
+  ],
+  "month": "2025-10",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a77a0aeac5e8e691c32a65b878b02574930b5f90",
+  "workspace_date": "2025-10-17",
+  "excluded_modules": 2,
+  "imported_modules": 7021,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.24.0",
+  "review_at": "2025-10-28",
+  "is_module": false
+ },
+ {
+  "cid": "v1308",
+  "sample": "val",
+  "pr": 32185,
+  "path": "Mathlib/Combinatorics/SimpleGraph/Acyclic.lean",
+  "gh_id": 2572023755,
+  "kind": "review_comment",
+  "analogues": [
+   "`SimpleGraph.IsBipartite`",
+   "`SimpleGraph.IsBipartite` predicate (instead of `Colorable 2`)"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "f36214b73034a71bba8507d26b6395efa8f9271a",
+  "base": "4b2f10cb279c1830e7970ee253f2e32b1cbd39d7",
+  "line": 459,
+  "site_decl": "SimpleGraph.IsTree.colorable_two",
+  "added": [
+   "SimpleGraph.IsTree.diff_dist_adj",
+   "SimpleGraph.IsTree.coloring_two_of_elem",
+   "SimpleGraph.IsTree.coloring_two",
+   "SimpleGraph.IsTree.colorable_two"
+  ],
+  "month": "2025-11",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 2,
+  "imported_modules": 7262,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-11-28",
+  "is_module": true
+ },
+ {
+  "cid": "v1400",
+  "sample": "val",
+  "pr": 32692,
+  "path": "Mathlib/RingTheory/MvPowerSeries/Restricted.lean",
+  "gh_id": 2616586394,
+  "kind": "review_comment",
+  "analogues": [
+   "`Finsupp.prod`",
+   "`Finsupp.prod` (`t.prod (c \u00b7 ^ \u00b7)`) for `\u220f i \u2208 t.support, c i ^ t i`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "4cb1c316c31ae59b6577b9bd52ab797f4fa4749a",
+  "base": "43dc3a9ad0d2902f82223fceec426bdccdc662d6",
+  "line": 42,
+  "site_decl": "convergenceSet",
+  "added": [
+   "IsRestricted",
+   "isRestricted_iff_abs",
+   "zero",
+   "convergenceSet",
+   "monomial",
+   "one",
+   "C",
+   "add",
+   "neg",
+   "smul",
+   "nsmul",
+   "zsmul",
+   "tendsto_antidiagonal",
+   "mul_extracted",
+   "mul"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 1,
+  "imported_modules": 7264,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-13",
+  "is_module": true
+ },
+ {
+  "cid": "v1547",
+  "sample": "val",
+  "pr": 33507,
+  "path": "Mathlib/Analysis/Polynomial/Fourier.lean",
+  "gh_id": 2658754121,
+  "kind": "review_comment",
+  "analogues": [
+   "`Pi.single`",
+   "`Pi.single k 1` for `fun n \u21a6 if n = k then 1 else 0`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "cabcd4aacaca889cefbc1882966a61a44b54f9d6",
+  "base": "73fe7bad3ed4ceb5a1c90416c8d89e4f80582fcf",
+  "line": 40,
+  "site_decl": "Polynomial.fourierCoeffOn_cexp",
+  "added": [
+   "Polynomial.fourierCoeffOn_cexp",
+   "Polynomial.fourierCoeffOn_circleMap",
+   "Polynomial.fourierCoeff_zero",
+   "Polynomial.sum_sq_norm_coeff_eq_circleAverage"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/78ce48549f1a43acb7fb364910afa04206f408ea",
+  "workspace_date": "2025-12-31",
+  "excluded_modules": 1,
+  "imported_modules": 7430,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-03",
+  "is_module": true
+ },
+ {
+  "cid": "v1597",
+  "sample": "val",
+  "pr": 33838,
+  "path": "Mathlib/NumberTheory/UnitaryDivisor.lean",
+  "gh_id": 2679551308,
+  "kind": "review_comment",
+  "analogues": [
+   "`ArithmeticFunction.IsMultiplicative`",
+   "`ArithmeticFunction.IsMultiplicative` predicate"
+  ],
+  "findable": [
+   "name",
+   "role"
+  ],
+  "commit": "e27131d8a2604b981b1dc6d952ebea5b54af878e",
+  "base": "76f94b4301bfee05262fc59d7d7899381057558e",
+  "line": 189,
+  "site_decl": "Nat.unitaryDivisorSum_mul",
+  "added": [
+   "Nat.UnitaryDivisor",
+   "Nat.unitaryDivisors",
+   "Nat.unitaryDivisorSum",
+   "Nat.unitaryDivisor_one",
+   "Nat.unitaryDivisor_self",
+   "Nat.mem_unitaryDivisors",
+   "Nat.one_mem_unitaryDivisors",
+   "Nat.self_mem_unitaryDivisors",
+   "Nat.divisor_coprime_decompose",
+   "Nat.coprime_of_dvd_coprime",
+   "Nat.unitary_divisor_eq_gcd_mul_gcd",
+   "Nat.unitary_divisor_quotient_split",
+   "Nat.gcd_unitaryDivisor_left",
+   "Nat.gcd_unitaryDivisor_right",
+   "Nat.unitaryDivisor_mul_of_coprime",
+   "Nat.unitaryDivisorSum_mul",
+   "Nat.gcd_pow_self",
+   "Nat.not_unitaryDivisor_prime_pow_intermediate",
+   "Nat.divisor_of_prime_pow",
+   "Nat.unitaryDivisors_prime_pow",
+   "Nat.unitaryDivisorSum_prime_pow",
+   "Nat.unitaryDivisorSum_one"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/5660741ecff0113b0491ce137a33ad03a8ff8cbd",
+  "workspace_date": "2026-01-11",
+  "excluded_modules": 1,
+  "imported_modules": 7459,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-11",
+  "is_module": true
+ },
+ {
+  "cid": "v1795",
+  "sample": "val",
+  "pr": 34861,
+  "path": "Mathlib/Analysis/ODE/PicardLindelof.lean",
+  "gh_id": 2811029380,
+  "kind": "review_comment",
+  "analogues": [
+   "`FunLike`",
+   "`FunLike` instance replacing `CoeFun` + hand-written `ext`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "817d8c2a2ff10de16e69dd2dbfbc80953a623862",
+  "base": "c70a3c4816d09ff1a2f65a5f53615f466508acc7",
+  "line": 171,
+  "site_decl": "ODE.FunSpace.ext",
+  "added": [
+   "ODE.FunSpace.ext",
+   "ODE.FunSpace.apply_of_zero",
+   "ODE.FunSpace.isFixedPt_next_iff",
+   "IsPicardLindelof.shrink",
+   "IsPicardLindelof.shrink_time",
+   "IsPicardLindelof.weaken_lipschitz",
+   "IsPicardLindelof.exists_shrink_radius"
+  ],
+  "month": "2026-02",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/e83debb937567bc01317d97384986db815657afd",
+  "workspace_date": "2026-02-06",
+  "excluded_modules": 3,
+  "imported_modules": 7584,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.28.0-rc1",
+  "review_at": "2026-02-16",
+  "is_module": true
+ },
+ {
+  "cid": "v1946",
+  "sample": "val",
+  "pr": 35826,
+  "path": "Mathlib/Data/ENNReal/AbsDiff.lean",
+  "gh_id": 2862252234,
+  "kind": "review_comment",
+  "analogues": [
+   "`edist` / `EMetricSpace`",
+   "`EMetricSpace` / `edist` on `\u211d\u22650\u221e`"
+  ],
+  "findable": [
+   "role"
+  ],
+  "commit": "fdf603ee8675fd182babd200325d45a4e79d7c89",
+  "base": "1f308dd68d960b6befde25e3c90346789bbb18b6",
+  "line": 37,
+  "site_decl": "ENNReal.absDiff",
+  "added": [
+   "ENNReal.absDiff",
+   "ENNReal.absDiff_self",
+   "ENNReal.absDiff_comm",
+   "ENNReal.absDiff_le_add",
+   "ENNReal.tsub_le_tsub_add_tsub",
+   "ENNReal.absDiff_triangle",
+   "ENNReal.absDiff_toReal",
+   "ENNReal.absDiff_tsub_tsub",
+   "ENNReal.absDiff_eq_zero",
+   "ENNReal.tsub_mul_le",
+   "ENNReal.absDiff_mul_right_le"
+  ],
+  "month": "2026-02",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/e83debb937567bc01317d97384986db815657afd",
+  "workspace_date": "2026-02-06",
+  "excluded_modules": 1,
+  "imported_modules": 7587,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.28.0-rc1",
+  "review_at": "2026-02-27",
+  "is_module": false
+ },
+ {
+  "cid": "v2022",
+  "sample": "val",
+  "pr": 36227,
+  "path": "Mathlib/GroupTheory/FiniteAbelian/Basic.lean",
+  "gh_id": 2894805212,
+  "kind": "review_comment",
+  "analogues": [
+   "`Subgroup.FiniteIndex`",
+   "`Subgroup.FiniteIndex` class (for `B.index \u2260 0`)"
+  ],
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "commit": "01f35d093ad2188bc034654ff8e6fa461909d9ce",
+  "base": "d494882066849ecb345e6467365c902f77c6b317",
+  "line": 204,
+  "site_decl": "Subgroup.index_ne_zero_of_range_powMonoidHom_le",
+  "added": [
+   "Subgroup.index_ne_zero_of_range_powMonoidHom_le",
+   "Subgroup.relIndex_ne_zero_of_range_powMonoidHom_le",
+   "Submodule.relIndex_ne_zero_of_map_linearMapMulLeft_le"
+  ],
+  "month": "2026-03",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/b72c03457b221ba87896ffcb09b91929aaebb809",
+  "workspace_date": "2026-03-04",
+  "excluded_modules": 6,
+  "imported_modules": 7698,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc3",
+  "review_at": "2026-03-06",
+  "is_module": true
+ },
+ {
+  "cid": "v2098",
+  "sample": "val",
+  "pr": 36421,
+  "path": "Mathlib/FieldTheory/Minpoly/Basic.lean",
+  "gh_id": 3037360274,
+  "kind": "review_comment",
+  "analogues": [
+   "`LinearMap.aeval_self_charpoly`",
+   "`LinearMap.aeval_self_charpoly` (basis-free Cayley-Hamilton)"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "19a085a005d2e61ad69eba2d84390ef680702716",
+  "base": "034c50cbf6b3c35f2c6ea61e6bc552fcfeaafa19",
+  "line": 253,
+  "site_decl": "minpoly.natDegree_le'",
+  "added": [
+   "minpoly.natDegree_le'"
+  ],
+  "month": "2026-03",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef",
+  "workspace_date": "2026-03-18",
+  "excluded_modules": 1009,
+  "imported_modules": 6792,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc6",
+  "review_at": "2026-04-05",
+  "is_module": true
+ },
+ {
+  "cid": "v2163",
+  "sample": "val",
+  "pr": 36781,
+  "path": "Mathlib/RingTheory/UniqueFactorizationDomain/Kaplansky.lean",
+  "gh_id": 2964395510,
+  "kind": "review_comment",
+  "analogues": [
+   "`Submodule.IsPrincipal`",
+   "`Submodule.IsPrincipal` predicate for `\u2203 x, I = span {x}`"
+  ],
+  "findable": [
+   "api_shape",
+   "name"
+  ],
+  "commit": "0e9e7e0819fe8b878c9058acd570eee96253cd70",
+  "base": "316a0377d012f127d9d30fa5e14c1e4b12287ea9",
+  "line": 210,
+  "site_decl": "UniqueFactorizationMonoid.iff_height_one_prime_principal",
+  "added": [
+   "UniqueFactorizationMonoid.exists_height_one_le_of_finite_height",
+   "UniqueFactorizationMonoid.ne_bot_of_height_one",
+   "UniqueFactorizationMonoid.height_ge_one_of_prime_ne_bot",
+   "UniqueFactorizationMonoid.height_one_prime_principal",
+   "UniqueFactorizationMonoid.of_height_one_prime_principal",
+   "UniqueFactorizationMonoid.iff_height_one_prime_principal"
+  ],
+  "month": "2026-03",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef",
+  "workspace_date": "2026-03-18",
+  "excluded_modules": 2,
+  "imported_modules": 7799,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc6",
+  "review_at": "2026-03-20",
+  "is_module": true
+ },
+ {
+  "cid": "v0200",
+  "sample": "val",
+  "pr": 26350,
+  "path": "Mathlib/RingTheory/RootsOfUnity/Basic.lean",
+  "gh_id": 2273410057,
+  "kind": "review_comment",
+  "analogues": [
+   "a `toFinset` counterpart",
+   "`toFinset` counterpart of the parent's proposed `nthRootsFinset_toSet`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "dfde268ae0c44eb0ccebf25f2967e213d2ba8b2e",
+  "base": "34120efeac1cb5eb96761e811263fc2c0b0fb26a",
+  "line": 239,
+  "site_decl": "coe_rootsOfUnity_to_nthRootsFinset",
+  "added": [
+   "coe_rootsOfUnity_to_set",
+   "rootsOfUnity_one_set",
+   "rootsOfUnity_two_set",
+   "coe_rootsOfUnity_to_nthRootsFinset"
+  ],
+  "month": "2025-06",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 197,
+  "imported_modules": 6414,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-08-13",
+  "is_module": false
+ },
+ {
+  "cid": "v0367",
+  "sample": "val",
+  "pr": 26995,
+  "path": "Mathlib/Topology/Separation/Basic.lean",
+  "gh_id": 2200820529,
+  "kind": "review_comment",
+  "analogues": [
+   "a `Set.EqOn` variant",
+   "`Set.EqOn` variant of `ContinuousWithinAt.eq_const_of_mem_closure`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "77d30119d92aa6348e8fee342fdf82222a7e5239",
+  "base": "1c779427ab23b1bc6378f79c4a3aab73cc4e8db8",
+  "line": 729,
+  "site_decl": "ContinousWithinAt.eq_const_of_mem_closure",
+  "added": [
+   "ContinousWithinAt.eq_const_of_mem_closure"
+  ],
+  "month": "2025-07",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/241db1e2c678f6002dcc570f314b9d5b30a1dcf6",
+  "workspace_date": "2025-07-04",
+  "excluded_modules": 2071,
+  "imported_modules": 4507,
+  "dropped_own_imports": [
+   "Mathlib.Topology.Separation.SeparatedNhds",
+   "Mathlib.Topology.Inseparable",
+   "Mathlib.Topology.Bases",
+   "Mathlib.Topology.Piecewise",
+   "Mathlib.Topology.Compactness.LocallyCompact"
+  ],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-07-11",
+  "is_module": false
+ },
+ {
+  "cid": "v0438",
+  "sample": "val",
+  "pr": 27257,
+  "path": "Mathlib/LinearAlgebra/AffineSpace/Ordered.lean",
+  "gh_id": 2230610471,
+  "kind": "review_comment",
+  "analogues": [
+   "the `lt` twin and the four siblings",
+   "`lineMap_lt_lineMap_iff_of_lt'` (`lt` sibling of the `le` lemma) and the other four combinations"
+  ],
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "commit": "059eb7fae14f5deb8a2b477c2b4a40ef8f34f17e",
+  "base": "4940ad6e544f720dc6773ac00d8e92e162c7ff21",
+  "line": 148,
+  "site_decl": "lineMap_le_lineMap_iff_of_lt'",
+  "added": [
+   "lineMap_le_lineMap_iff_of_lt'",
+   "left_le_lineMap_iff_nonneg",
+   "lineMap_le_left_iff_nonpos",
+   "lineMap_le_right_iff_le_one",
+   "right_le_lineMap_iff_one_le"
+  ],
+  "month": "2025-07",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/27ba7f0e60a510735b839c640837d1b484e4db09",
+  "workspace_date": "2025-07-13",
+  "excluded_modules": 192,
+  "imported_modules": 6419,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.22.0-rc3",
+  "review_at": "2025-07-25",
+  "is_module": false
+ },
+ {
+  "cid": "v1069",
+  "sample": "val",
+  "pr": 30774,
+  "path": "Mathlib/Algebra/Order/WithTop/Untop0.lean",
+  "gh_id": 2451795570,
+  "kind": "review_comment",
+  "analogues": [
+   "`untop\u2080_inv`, the multiplicative twin",
+   "`untop\u2080_inv` (multiplicative `GroupWithZero` sibling of `untop\u2080_neg`)"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "8e37acf760b31c8084e3798d707a570a079f9804",
+  "base": "1bbe77d5a913212a4038ce2d2d3f4ae1ff1cafab",
+  "line": 69,
+  "site_decl": "WithTop.untop\u2080_neg",
+  "added": [
+   "WithTop.untop\u2080",
+   "WithTop.untop\u2080_neg",
+   "WithTop.untop\u2080_nonneg",
+   "WithTop.le_of_untop\u2080_le_untop\u2080",
+   "WithTop.untop\u2080_le_untop\u2080_of_le",
+   "WithTop.untop\u2080_max",
+   "WithTop.untop\u2080_min"
+  ],
+  "month": "2025-10",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a77a0aeac5e8e691c32a65b878b02574930b5f90",
+  "workspace_date": "2025-10-17",
+  "excluded_modules": 16,
+  "imported_modules": 7007,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.24.0",
+  "review_at": "2025-10-22",
+  "is_module": false
+ },
+ {
+  "cid": "v1186",
+  "sample": "val",
+  "pr": 31525,
+  "path": "Mathlib/Topology/UnitInterval.lean",
+  "gh_id": 2546257709,
+  "kind": "review_comment",
+  "analogues": [
+   "the symmetric rewriting direction",
+   "reverse-direction variant of the PR's `convexCombo_assoc` (coefficients on the left)"
+  ],
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "commit": "60ca4b77ffb362f1542c9075565f71ad27f44162",
+  "base": "c6398e9257d1a3c6611c5a3460369a5b4442c7d1",
+  "line": 360,
+  "site_decl": "Set.Icc.convexCombo_assoc",
+  "added": [
+   "Set.Icc.convexCombo",
+   "Set.Icc.coe_convexCombo",
+   "Set.Icc.convexCombo_zero",
+   "Set.Icc.convexCombo_one",
+   "Set.Icc.convexCombo_symm",
+   "Set.Icc.le_convexCombo",
+   "Set.Icc.convexCombo_le",
+   "Set.Icc.convexCombo_assoc_coeff\u2081",
+   "Set.Icc.convexCombo_assoc_coeff\u2082",
+   "Set.Icc.convexCombo_assoc",
+   "Set.Icc.eq_convexCombo.zero_le",
+   "Set.Icc.eq_convexCombo.le_one",
+   "Set.Icc.eq_convexCombo"
+  ],
+  "month": "2025-11",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/d05defbd00f934e85df3c9e4befcecc2bfb6b272",
+  "workspace_date": "2025-11-19",
+  "excluded_modules": 1133,
+  "imported_modules": 6070,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc1",
+  "review_at": "2025-11-20",
+  "is_module": false
+ },
+ {
+  "cid": "v1256",
+  "sample": "val",
+  "pr": 31968,
+  "path": "Mathlib/CategoryTheory/Center/Preadditive.lean",
+  "gh_id": 2553393456,
+  "kind": "review_comment",
+  "analogues": [
+   "the additive-hom lemma family (`app_zero`, `app_sub`)",
+   "`app_sub`, `app_zero` (and `app_neg`) siblings of `app_add`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "fb0a2cce07563b7de767cad2ea7bdfe7abfcc84b",
+  "base": "49c3430ada09daeac47e0e70cc87047a288d0bda",
+  "line": 28,
+  "site_decl": "CategoryTheory.CatCenter.app_add",
+  "added": [
+   "CategoryTheory.CatCenter.app_add"
+  ],
+  "month": "2025-11",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/36a2b22f66b8bb2434674cace18feb371e29c8f7",
+  "workspace_date": "2025-11-21",
+  "excluded_modules": 1,
+  "imported_modules": 7214,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc1",
+  "review_at": "2025-11-22",
+  "is_module": true
+ },
+ {
+  "cid": "v1280",
+  "sample": "val",
+  "pr": 32093,
+  "path": "Mathlib/Algebra/Homology/HomotopyCategory/HomComplexShift.lean",
+  "gh_id": 2572130355,
+  "kind": "review_comment",
+  "analogues": [
+   "the other-side equivalence",
+   "`leftShiftAddEquiv` / `equivHomShift'` mirror of `rightShiftAddEquiv` / `equivHomShift`, via existing `leftShift`/`leftUnshift`"
+  ],
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "commit": "6da92ab550b855203a2882ef4c77b8f9307b340d",
+  "base": "5b3c4296089fc9c50148c21afccb8ed5f51722c1",
+  "line": 556,
+  "site_decl": "CochainComplex.HomComplex.Cocycle.equivHomShift",
+  "added": [
+   "CochainComplex.HomComplex.Cochain.rightShiftAddEquiv",
+   "CochainComplex.HomComplex.Cocycle.rightShiftAddEquiv",
+   "CochainComplex.HomComplex.Cocycle.equivHomShift"
+  ],
+  "month": "2025-11",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 24,
+  "imported_modules": 7240,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-11-28",
+  "is_module": true
+ },
+ {
+  "cid": "v1682",
+  "sample": "val",
+  "pr": 34302,
+  "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+  "gh_id": 2733675763,
+  "kind": "review_comment",
+  "analogues": [
+   "the non-`Within` twins",
+   "`Meromorphic.congr_codiscrete` / `meromorphic_congr_codiscrete`, global siblings of the `MeromorphicOn`/`codiscreteWithin` lemmas"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "17807445d5516f9d42442b0d1b8361f81ab4061e",
+  "base": "a6f73ae6d7bd66ba925c772ad04c7a59fa9fe55d",
+  "line": 473,
+  "site_decl": "meromorphicOn_congr_codiscreteWithin",
+  "added": [
+   "meromorphicOn_congr_codiscreteWithin"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 19,
+  "imported_modules": 7464,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-27",
+  "is_module": true
+ },
+ {
+  "cid": "v2006",
+  "sample": "val",
+  "pr": 36174,
+  "path": "Mathlib/Topology/Compactness/CountablyCompact.lean",
+  "gh_id": 2890077881,
+  "kind": "review_comment",
+  "analogues": [
+   "`IsCompact`/`IsLindelof` (filter form)",
+   "`IsCompact` / `IsLindelof` definitions (filter cluster-point form)"
+  ],
+  "findable": [
+   "name",
+   "role"
+  ],
+  "commit": "c8679f323644c2d896f454a64c91d0c237b72b42",
+  "base": "45362d78eddfcd02b361cfbfdb4d7c2384e885e2",
+  "line": 58,
+  "site_decl": "IsCountablyCompact",
+  "added": [
+   "IsCountablyCompact",
+   "isCountablyCompact_empty",
+   "isCountablyCompact_singleton",
+   "IsCountablyCompact.of_isClosed_subset",
+   "isCountablyCompact_iff_clusterPt_countably_generated_filter",
+   "IsCountablyCompact.elim_finite_subcover",
+   "isCountablyCompact_iff_countable_open_cover",
+   "IsCountablyCompact.elim_finite_subcover_image",
+   "isCountablyCompact_iff_countable_open_cover'",
+   "IsCompact.IsCountablyCompact",
+   "IsSeqCompact.IsCountablyCompact",
+   "IsCountablyCompact.isSeqCompact",
+   "IsCountablyCompact.exists_accPt_of_infinite",
+   "isCountablyCompact_iff_infinite_subset_has_accPt",
+   "IsLindelof.isCompact",
+   "IsCountablyCompact.isCompact",
+   "IsCountablyCompact.image",
+   "IsCountablyCompact.union",
+   "Finset.isCountablyCompact_biUnion",
+   "Set.Finite.isCountablyCompact_biUnion",
+   "Set.Finite.isCountablyCompact_sUnion",
+   "isCountablyCompact_iUnion"
+  ],
+  "month": "2026-03",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/b72c03457b221ba87896ffcb09b91929aaebb809",
+  "workspace_date": "2026-03-04",
+  "excluded_modules": 1,
+  "imported_modules": 7704,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc3",
+  "review_at": "2026-03-05",
+  "is_module": true
+ },
+ {
+  "cid": "v2104",
+  "sample": "val",
+  "pr": 36459,
+  "path": "Mathlib/CategoryTheory/Adjunction/Basic.lean",
+  "gh_id": 2936515800,
+  "kind": "review_comment",
+  "analogues": [
+   "the dual adjunction statement",
+   "`bijective_map_comp_iff'`, the `G`-side dual of the PR's `bijective_map_comp_iff`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "6163104ac304e21ded32bb5b6d88ad9392c11b3a",
+  "base": "dbf63643eeefcd8e29d710c265af434f8e8343e9",
+  "line": 703,
+  "site_decl": "CategoryTheory.Adjunction.bijective_map_comp_iff",
+  "added": [
+   "CategoryTheory.Adjunction.bijective_map_comp_iff"
+  ],
+  "month": "2026-03",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/b72c03457b221ba87896ffcb09b91929aaebb809",
+  "workspace_date": "2026-03-04",
+  "excluded_modules": 1643,
+  "imported_modules": 6061,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc3",
+  "review_at": "2026-03-15",
+  "is_module": true
+ },
+ {
+  "cid": "o0038",
+  "sample": "outside.b",
+  "pr": 32800,
+  "path": "Mathlib/Algebra/Order/Ring/Archimedean.lean",
+  "gh_id": 2614868801,
+  "kind": "review_comment",
+  "analogues": [
+   "Nontrivial R in place of NeZero (1 : R)",
+   "`Nontrivial R` typeclass in place of `NeZero (1 : R)`"
+  ],
+  "findable": [
+   "role"
+  ],
+  "commit": "693b40d7be42494ec0d0abfb2e469e1fb7adb712",
+  "base": "4d3317200498df0e4852e99d09728b257857d066",
+  "line": 58,
+  "site_decl": "ArchimedeanClass.top_ne_zero",
+  "added": [
+   "ArchimedeanClass.top_ne_zero",
+   "ArchimedeanClass.zero_ne_top",
+   "ArchimedeanClass.mk_natCast"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 1,
+  "imported_modules": 7263,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-12",
+  "is_module": true
+ },
+ {
+  "cid": "o0048",
+  "sample": "outside.b",
+  "pr": 32567,
+  "path": "Mathlib/Order/CompleteLattice/PiLex.lean",
+  "gh_id": 2639972682,
+  "kind": "review_comment",
+  "analogues": [
+   "\u03a0\u2097 i, \u03b1 i notation for Pi.Lex",
+   "`\u03a0\u2097 i, \u03b1 i` notation for `Lex ((i : \u03b9) \u2192 \u03b1 i)` from Mathlib.Order.PiLex"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "fd3ff5d2b1c17aa00beca949bcc58f2ae4cf5e98",
+  "base": "a2c6b11ab0d0f7bece23efaa48e415248d79e54c",
+  "line": 30,
+  "site_decl": "Pi.Lex.inf",
+  "added": [
+   "Pi.Lex.inf",
+   "Pi.Lex.sInf_apply",
+   "Pi.Lex.sInf_apply_le",
+   "Pi.Lex.le_sInf_apply",
+   "Pi.Lex.sInf_le",
+   "Pi.Lex.le_sInf",
+   "Pi.Lex.sSup_apply",
+   "Pi.Lex.le_sSup_apply",
+   "Pi.Lex.sSup_apply_le",
+   "Pi.Lex.le_sSup",
+   "Pi.Lex.sSup_le",
+   "Pi.Colex.sInf_apply",
+   "Pi.Colex.sInf_apply_le",
+   "Pi.Colex.le_sInf_apply",
+   "Pi.Colex.sSup_apply",
+   "Pi.Colex.le_sSup_apply",
+   "Pi.Colex.sSup_apply_le"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/61d1f8fbef0793e1f7077d63b4af6c919f59b4b6",
+  "workspace_date": "2025-12-22",
+  "excluded_modules": 1,
+  "imported_modules": 7424,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2025-12-22",
+  "is_module": true
+ },
+ {
+  "cid": "o0053",
+  "sample": "outside.b",
+  "pr": 32567,
+  "path": "Mathlib/Order/CompleteLattice/PiLex.lean",
+  "gh_id": 2640080082,
+  "kind": "review_comment",
+  "analogues": [
+   "the existing \u03a0\u2097 notation (from the parent comment)",
+   "the existing `\u03a0\u2097` notation (named in the parent suggestion)"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "fd3ff5d2b1c17aa00beca949bcc58f2ae4cf5e98",
+  "base": "a2c6b11ab0d0f7bece23efaa48e415248d79e54c",
+  "line": 30,
+  "site_decl": "Pi.Lex.inf",
+  "added": [
+   "Pi.Lex.inf",
+   "Pi.Lex.sInf_apply",
+   "Pi.Lex.sInf_apply_le",
+   "Pi.Lex.le_sInf_apply",
+   "Pi.Lex.sInf_le",
+   "Pi.Lex.le_sInf",
+   "Pi.Lex.sSup_apply",
+   "Pi.Lex.le_sSup_apply",
+   "Pi.Lex.sSup_apply_le",
+   "Pi.Lex.le_sSup",
+   "Pi.Lex.sSup_le",
+   "Pi.Colex.sInf_apply",
+   "Pi.Colex.sInf_apply_le",
+   "Pi.Colex.le_sInf_apply",
+   "Pi.Colex.sSup_apply",
+   "Pi.Colex.le_sSup_apply",
+   "Pi.Colex.sSup_apply_le"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/61d1f8fbef0793e1f7077d63b4af6c919f59b4b6",
+  "workspace_date": "2025-12-22",
+  "excluded_modules": 1,
+  "imported_modules": 7424,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2025-12-22",
+  "is_module": true
+ },
+ {
+  "cid": "o0069",
+  "sample": "outside.b",
+  "pr": 34353,
+  "path": "Mathlib/Data/Fintype/Fin.lean",
+  "gh_id": 2728889988,
+  "kind": "review_comment",
+  "analogues": [
+   "Antitone p for the hypothesis \u2200 i j, j \u2264 i \u2192 p i \u2192 p j",
+   "`Antitone p` in place of `\u2200 i j, j \u2264 i \u2192 p i \u2192 p j`"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "6629e8123467e082594890222007a10ef39926bc",
+  "base": "58d8468384df017604272605bb0ec709826199e7",
+  "line": 71,
+  "site_decl": "Fin.lt_card_iff_apply_of_imp",
+  "added": [
+   "Fin.lt_card_iff_apply_of_imp"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 2527,
+  "imported_modules": 4956,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-26",
+  "is_module": true
+ },
+ {
+  "cid": "o0076",
+  "sample": "outside.b",
+  "pr": 34012,
+  "path": "Mathlib/Data/Nat/OrderOf.lean",
+  "gh_id": 2721361018,
+  "kind": "review_comment",
+  "analogues": [
+   "orderOf (a : ZMod n), which the new Nat.orderOf unfolds to",
+   "`orderOf (a : ZMod n)`, which the PR's `Nat.orderOf` merely wraps"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "d82d53cd072c5083b7fc436970800f5bfa3c575f",
+  "base": "2f3db78bffe7143c23aa5509847896a5d6137e79",
+  "line": 27,
+  "site_decl": "Nat.orderOf",
+  "added": [
+   "Nat.orderOf",
+   "Nat.orderOf_coe",
+   "Nat.orderOf_dvd_totient",
+   "Nat.orderOf_le_totient"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1,
+  "imported_modules": 7483,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-23",
+  "is_module": true
+ },
+ {
+  "cid": "o0116",
+  "sample": "outside.b",
+  "pr": 33532,
+  "path": "Mathlib/RingTheory/Valuation/ValuativeRel/Basic.lean",
+  "gh_id": 2678734621,
+  "kind": "review_comment",
+  "analogues": [
+   "IsSymm typeclass instance for =\u1d65",
+   "`IsSymm` typeclass instance for the new `=\u1d65` relation"
+  ],
+  "findable": [
+   "role"
+  ],
+  "commit": "6e7aaea779ed5b96ba4337018247e56ab8d89d5b",
+  "base": "08d60a80c5f591ef7354a9e2d26060af6c4027d3",
+  "line": 147,
+  "site_decl": "ValuativeRel.veq_comm",
+  "added": [
+   "ValuativeRel.veq",
+   "ValuativeRel.veq_def",
+   "ValuativeRel.veq_comm",
+   "ValuativeRel.vle_of_veq",
+   "ValuativeRel.vle_of_veq'",
+   "ValuativeRel.not_vlt_of_veq",
+   "ValuativeRel.not_vlt_of_veq'",
+   "ValuativeRel.vle_refl",
+   "ValuativeRel.vle_rfl",
+   "ValuativeRel.veq_refl",
+   "ValuativeRel.veq_rfl",
+   "ValuativeRel.veq_trans",
+   "ValuativeRel.mul_vle_mul",
+   "ValuativeRel.mul_veq_mul",
+   "Valuation.veq_iff_eq",
+   "ValuativeRel.zero_veq_iff",
+   "ValuativeRel.veq_zero_iff"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/772b00fbaaca6a1cff2c5cc0494d03a49f389e4c",
+  "workspace_date": "2026-01-07",
+  "excluded_modules": 73,
+  "imported_modules": 7378,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-10",
+  "is_module": true
+ },
+ {
+  "cid": "o0140",
+  "sample": "outside.b",
+  "pr": 33785,
+  "path": "Mathlib/Algebra/Order/Archimedean/Class.lean",
+  "gh_id": 2676312086,
+  "kind": "review_comment",
+  "analogues": [
+   "mk_left_le_mk_mul (converse, same file)",
+   "`mk_left_le_mk_mul`, the converse of the PR's `mk_le_mk_of_mul_left`; iff version wanted"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "1e2fd9756274f73772ac25890a3af08cb6a72594",
+  "base": "4d9d3c50dad0a85e5a36a476ea2847a375a9996e",
+  "line": 383,
+  "site_decl": "MulArchimedeanClass.mk_le_mk_of_mul_left",
+  "added": [
+   "MulArchimedeanClass.mk_le_mk_of_mul_left",
+   "MulArchimedeanClass.mk_le_mk_of_mul_right",
+   "MulArchimedeanClass.mk_le_mk_of_div_left",
+   "MulArchimedeanClass.mk_le_mk_of_div_right"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/772b00fbaaca6a1cff2c5cc0494d03a49f389e4c",
+  "workspace_date": "2026-01-07",
+  "excluded_modules": 8,
+  "imported_modules": 7443,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-09",
+  "is_module": true
+ },
+ {
+  "cid": "o0176",
+  "sample": "outside.b",
+  "pr": 33458,
+  "path": "Mathlib/ModelTheory/LanguageMap.lean",
+  "gh_id": 2857957365,
+  "kind": "review_comment",
+  "analogues": [
+   "RestrictScalars: a type synonym carrying the transported instance",
+   "`RestrictScalars`-style type synonym carrying the transported `Structure` instance"
+  ],
+  "findable": [
+   "role"
+  ],
+  "commit": "9b2233d785e1bdf12778a6ea0167a30dd0e30ae5",
+  "base": "59850a9701781fb375242f83885fb625fe281f6e",
+  "line": 505,
+  "site_decl": "FirstOrder.Language.Embedding.withConstantsStructure",
+  "added": [
+   "FirstOrder.Language.Embedding.withConstantsStructure",
+   "FirstOrder.Language.Embedding.liftWithConstants"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/e83debb937567bc01317d97384986db815657afd",
+  "workspace_date": "2026-02-06",
+  "excluded_modules": 31,
+  "imported_modules": 7556,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.28.0-rc1",
+  "review_at": "2026-02-26",
+  "is_module": true
+ },
+ {
+  "cid": "o0189",
+  "sample": "outside.b",
+  "pr": 34308,
+  "path": "Mathlib/GroupTheory/Perm/Cycle/Type.lean",
+  "gh_id": 2721560161,
+  "kind": "review_comment",
+  "analogues": [
+   "Multiset.Nodup {x, y, z, t} in place of [x, y, z, t].Nodup",
+   "`Multiset.Nodup` on `{x, y, z, t}` in place of `[x, y, z, t].Nodup`"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "333bdb4cf765ae5f778d2a325242629ea43bbad6",
+  "base": "21cf59b03bf509630df2c3e0f8b52d94c2725d1b",
+  "line": 780,
+  "site_decl": "Equiv.Perm.cycleType_swap_mul_swap_of_nodup",
+  "added": [
+   "Equiv.Perm.IsThreeCycle.support_eq_iff_mem_support",
+   "Equiv.Perm.IsThreeCycle.nodup_iff_mem_support",
+   "Equiv.Perm.IsThreeCycle.eq_swap_mul_swap_iff_mem_support",
+   "Equiv.Perm.cycleType_swap_mul_swap_of_nodup",
+   "Equiv.Perm.sign_swap_mul_swap_of_nodup"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1322,
+  "imported_modules": 6161,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-23",
+  "is_module": true
+ },
+ {
+  "cid": "o0274",
+  "sample": "outside.b",
+  "pr": 33718,
+  "path": "Mathlib/RingTheory/QuasiFinite/Basic.lean",
+  "gh_id": 2683523898,
+  "kind": "review_comment",
+  "analogues": [
+   "Ideal.LiesOver / Algebra S T formulation in place of hq : p = q.comap f",
+   "Ideal.LiesOver (with an Algebra S T tower) in place of hq : p = q.comap f"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "db67c34eea48bb135f4a0cae4cbe3f4bd9764493",
+  "base": "c1d772d6329adbf19893119c31cea6c4127420e7",
+  "line": 365,
+  "site_decl": "Algebra.QuasiFiniteAt.of_surjectiveOnStalks",
+  "added": [
+   "Algebra.QuasiFiniteAt",
+   "Algebra.QuasiFiniteAt.baseChange",
+   "Algebra.QuasiFiniteAt.of_surjectiveOnStalks",
+   "Algebra.QuasiFiniteAt.of_le",
+   "Algebra.QuasiFiniteAt.eq_of_le_of_under_eq",
+   "Algebra.QuasiFiniteAt.exists_basicOpen_eq_singleton",
+   "Algebra.QuasiFiniteAt.isClopen_singleton",
+   "Ideal.exists_not_mem_forall_mem_of_ne_of_liesOver",
+   "Polynomial.not_quasiFiniteAt",
+   "Polynomial.map_under_lt_comap_of_quasiFiniteAt",
+   "Polynomial.ker_le_map_C_of_surjective_of_quasiFiniteAt"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/c1d772d6329adbf19893119c31cea6c4127420e7",
+  "workspace_date": "2026-01-12",
+  "excluded_modules": 1,
+  "imported_modules": 7461,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-12",
+  "is_module": true
+ },
+ {
+  "cid": "o0300",
+  "sample": "outside.b",
+  "pr": 31733,
+  "path": "Mathlib/Geometry/Euclidean/Incenter.lean",
+  "gh_id": 2607777488,
+  "kind": "review_comment",
+  "analogues": [
+   "Affine.Simplex.range_faceOpposite_points (simp lemma rewriting the LHS subterm)",
+   "Affine.Simplex.range_faceOpposite_points (simp lemma rewriting the LHS)"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "e9521243a8953b04e22d4e9a96b7090bfe1fd0fd",
+  "base": "b07a5845d537815d066fa683fe94b1cbdd08ac24",
+  "line": 665,
+  "site_decl": "Affine.Simplex.ExcenterExists.affineSpan_faceOpposite_eq_orthRadius",
+  "added": [
+   "Affine.Simplex.ExcenterExists.affineSpan_faceOpposite_eq_orthRadius",
+   "Affine.Simplex.affineSpan_faceOpposite_eq_orthRadius_insphere",
+   "Affine.Triangle.affineSpan_pair_eq_orthRadius",
+   "Affine.Triangle.affineSpan_pair_eq_orthRadius_insphere"
+  ],
+  "month": "2025-11",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 1,
+  "imported_modules": 7263,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-10",
+  "is_module": true
+ },
+ {
+  "cid": "o0315",
+  "sample": "outside.b",
+  "pr": 33636,
+  "path": "Mathlib/Analysis/Distribution/Laplacian.lean",
+  "gh_id": 2688030471,
+  "kind": "review_comment",
+  "analogues": [
+   "InnerProductSpace.Laplacian (basis-independence already proved there)",
+   "InnerProductSpace.Laplacian (basis-independence already proved there)"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "00ea330770d428f2a82ca7d912ed4715b30640e0",
+  "base": "31c0612ab7f577e7a8858f83329e6ad10da14ea0",
+  "line": 51,
+  "site_decl": "LineDeriv.laplacian",
+  "added": [
+   "LineDeriv.laplacian",
+   "LineDeriv.laplacianCLM",
+   "LineDeriv.laplacianCLM_apply",
+   "SchwartzMap.laplacian_eq",
+   "SchwartzMap.laplacian_eq_sum'",
+   "SchwartzMap.coe_laplacian_eq_sum",
+   "SchwartzMap.laplacian_apply",
+   "SchwartzMap.laplacian_eq_sum",
+   "SchwartzMap.integral_bilinear_laplacian_right_eq_left",
+   "SchwartzMap.integral_mul_laplacian_right_eq_left",
+   "SchwartzMap.integral_smul_laplacian_right_eq_left",
+   "SchwartzMap.integral_clm_comp_laplacian_right_eq_left"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/3fb836b6e78f8c8c312a344f19fb169f70de776c",
+  "workspace_date": "2026-01-12",
+  "excluded_modules": 1,
+  "imported_modules": 7462,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-13",
+  "is_module": true
+ },
+ {
+  "cid": "o0318",
+  "sample": "outside.b",
+  "pr": 35300,
+  "path": "Mathlib/Algebra/Lie/SemiDirect.lean",
+  "gh_id": 2858832851,
+  "kind": "review_comment",
+  "analogues": [
+   "SemiDirectProduct for groups, a structure with left/right accessors",
+   "SemidirectProduct for groups (a structure with left/right accessors)"
+  ],
+  "findable": [
+   "role"
+  ],
+  "commit": "3987286c05c7edf09af4fd481a43722b6bfb18c7",
+  "base": "a5f6d7722029b2c483374d52b9601cdeffcb9faa",
+  "line": 39,
+  "site_decl": "LieAlgebra.SemiDirectSum",
+  "added": [
+   "LieAlgebra.SemiDirectSum",
+   "LieAlgebra.SemiDirectSum.inclusion",
+   "LieAlgebra.SemiDirectSum.projection"
+  ],
+  "month": "2026-02",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/e83debb937567bc01317d97384986db815657afd",
+  "workspace_date": "2026-02-06",
+  "excluded_modules": 1,
+  "imported_modules": 7587,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.28.0-rc1",
+  "review_at": "2026-02-26",
+  "is_module": true
+ },
+ {
+  "cid": "o0428",
+  "sample": "outside.b",
+  "pr": 32891,
+  "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+  "gh_id": 2709552381,
+  "kind": "review_comment",
+  "analogues": [
+   "the existing EMetric.ball (and the Metric.ball pattern)",
+   "EMetric.ball (already exists) and the Metric.ball pattern"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "8ce478ba4fe3e6f5d06e5a926312a506d652880c",
+  "base": "2c8f930e22b59d75a71706fa8bb18645a1a9e9db",
+  "line": 68,
+  "site_decl": "EMetric.mem_ball",
+  "added": [
+   "EMetric.ball",
+   "EMetric.mem_ball",
+   "pseudoEMetricSpaceOfEDist",
+   "pseudoEMetricSpaceOfEDist'",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist'",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist_congr'",
+   "EMetric.Uniformity_eq",
+   "WeakPseudoEMetricSpace.ext",
+   "PseudoEMetricSpace.toWeakPseudoEMetricSpace",
+   "WeakPseudoEMetricSpace.toPseudoEMetricSpace",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist_congr",
+   "WeakPseudoEMetricSpace.induced",
+   "WeakEMetricSpace.ext",
+   "EMetricSpace.toWeakEMetricSpace",
+   "WeakEMetricSpace.toEMetricSpace",
+   "WeakEMetricSpace.induced",
+   "weakedist_self"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 7443,
+  "imported_modules": 40,
+  "dropped_own_imports": [
+   "Mathlib.Topology.UniformSpace.OfFun",
+   "Mathlib.Data.ENNReal.Inv",
+   "Mathlib.Topology.UniformSpace.Basic"
+  ],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-20",
+  "is_module": true
+ },
+ {
+  "cid": "o0439",
+  "sample": "outside.b",
+  "pr": 32891,
+  "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+  "gh_id": 2709760140,
+  "kind": "review_comment",
+  "analogues": [
+   "Topology.IsInducing",
+   "Topology.IsInducing"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "8ce478ba4fe3e6f5d06e5a926312a506d652880c",
+  "base": "2c8f930e22b59d75a71706fa8bb18645a1a9e9db",
+  "line": 864,
+  "site_decl": "WeakPseudoEMetricSpace.induced",
+  "added": [
+   "EMetric.ball",
+   "EMetric.mem_ball",
+   "pseudoEMetricSpaceOfEDist",
+   "pseudoEMetricSpaceOfEDist'",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist'",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist_congr'",
+   "EMetric.Uniformity_eq",
+   "WeakPseudoEMetricSpace.ext",
+   "PseudoEMetricSpace.toWeakPseudoEMetricSpace",
+   "WeakPseudoEMetricSpace.toPseudoEMetricSpace",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist_congr",
+   "WeakPseudoEMetricSpace.induced",
+   "WeakEMetricSpace.ext",
+   "EMetricSpace.toWeakEMetricSpace",
+   "WeakEMetricSpace.toEMetricSpace",
+   "WeakEMetricSpace.induced",
+   "weakedist_self"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 7443,
+  "imported_modules": 40,
+  "dropped_own_imports": [
+   "Mathlib.Topology.UniformSpace.OfFun",
+   "Mathlib.Data.ENNReal.Inv",
+   "Mathlib.Topology.UniformSpace.Basic"
+  ],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-20",
+  "is_module": true
+ },
+ {
+  "cid": "o0446",
+  "sample": "outside.b",
+  "pr": 32891,
+  "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+  "gh_id": 2709782138,
+  "kind": "review_comment",
+  "analogues": [
+   "Topology.IsEmbedding",
+   "Topology.IsEmbedding"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "8ce478ba4fe3e6f5d06e5a926312a506d652880c",
+  "base": "2c8f930e22b59d75a71706fa8bb18645a1a9e9db",
+  "line": 954,
+  "site_decl": "WeakEMetricSpace.induced",
+  "added": [
+   "EMetric.ball",
+   "EMetric.mem_ball",
+   "pseudoEMetricSpaceOfEDist",
+   "pseudoEMetricSpaceOfEDist'",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist'",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist_congr'",
+   "EMetric.Uniformity_eq",
+   "WeakPseudoEMetricSpace.ext",
+   "PseudoEMetricSpace.toWeakPseudoEMetricSpace",
+   "WeakPseudoEMetricSpace.toPseudoEMetricSpace",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist",
+   "toPseudoEMetricSpaceToUniformSpace_uniformSpaceOfEDist_congr",
+   "WeakPseudoEMetricSpace.induced",
+   "WeakEMetricSpace.ext",
+   "EMetricSpace.toWeakEMetricSpace",
+   "WeakEMetricSpace.toEMetricSpace",
+   "WeakEMetricSpace.induced",
+   "weakedist_self"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 7443,
+  "imported_modules": 40,
+  "dropped_own_imports": [
+   "Mathlib.Topology.UniformSpace.OfFun",
+   "Mathlib.Data.ENNReal.Inv",
+   "Mathlib.Topology.UniformSpace.Basic"
+  ],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-20",
+  "is_module": true
+ },
+ {
+  "cid": "o0450",
+  "sample": "outside.b",
+  "pr": 32891,
+  "path": "Mathlib/Topology/EMetricSpace/Weak.lean",
+  "gh_id": 2709796347,
+  "kind": "review_comment",
+  "analogues": [
+   "EMetric.closedBall counterpart of the ball treatment",
+   "EMetric.closedBall twins of the PR's ball lemmas"
+  ],
+  "findable": [
+   "neighbourhood",
+   "pr_internal"
+  ],
+  "commit": "8ce478ba4fe3e6f5d06e5a926312a506d652880c",
+  "base": "2c8f930e22b59d75a71706fa8bb18645a1a9e9db",
+  "line": 79,
+  "site_decl": "WeakEMetric.OnePoint.ball_infty_of_pos",
+  "added": [
+   "WeakEMetric.OnePoint.edist_top_top",
+   "WeakEMetric.OnePoint.edist_top_left",
+   "WeakEMetric.OnePoint.edist_top_right",
+   "WeakEMetric.OnePoint.edist_cast_cast",
+   "WeakEMetric.OnePoint.im_ball",
+   "WeakEMetric.OnePoint.ball_infty_of_pos",
+   "WeakEMetric.OnePoint.infty_not_mem_ball",
+   "WeakEMetric.OnePoint.edist_self'",
+   "WeakEMetric.OnePoint.edist_comm'",
+   "WeakEMetric.OnePoint.edist_triangle'",
+   "WeakEMetric.OnePoint.eq_of_edist_eq_zero'",
+   "WeakEMetric.OnePoint.prod_open_iff"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1,
+  "imported_modules": 7483,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-20",
+  "is_module": true
+ },
+ {
+  "cid": "o0488",
+  "sample": "outside.b",
+  "pr": 34209,
+  "path": "Mathlib/Analysis/Normed/Module/Bases.lean",
+  "gh_id": 2712702539,
+  "kind": "review_comment",
+  "analogues": [
+   "Pi.single",
+   "Pi.single"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "49b9d119004976012ed92d008202de4c171da64f",
+  "base": "fdddb3ea2c8c35de4455e033bc2a5df4d3a391ee",
+  "line": 32,
+  "site_decl": "SchauderBasis",
+  "added": [
+   "SchauderBasis.linearIndependent",
+   "SchauderBasis.proj",
+   "SchauderBasis.proj_apply",
+   "SchauderBasis.proj_basis_element",
+   "SchauderBasis.range_proj",
+   "SchauderBasis.dim_range_proj",
+   "SchauderBasis.proj_tendsto_id",
+   "SchauderBasis.proj_uniform_bound",
+   "SchauderBasis.basis_constant",
+   "SchauderBasis.Q",
+   "SchauderBasis.Q_sum",
+   "SchauderBasis.Q_ortho",
+   "SchauderBasis.Q_rank_one",
+   "SchauderBasis.basis_of_canonical_projections"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1,
+  "imported_modules": 7483,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-21",
+  "is_module": true
+ },
+ {
+  "cid": "o0500",
+  "sample": "outside.b",
+  "pr": 34209,
+  "path": "Mathlib/Analysis/Normed/Module/Bases.lean",
+  "gh_id": 2712845141,
+  "kind": "review_comment",
+  "analogues": [
+   "HasSum",
+   "HasSum"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "49b9d119004976012ed92d008202de4c171da64f",
+  "base": "fdddb3ea2c8c35de4455e033bc2a5df4d3a391ee",
+  "line": 35,
+  "site_decl": "SchauderBasis",
+  "added": [
+   "SchauderBasis.linearIndependent",
+   "SchauderBasis.proj",
+   "SchauderBasis.proj_apply",
+   "SchauderBasis.proj_basis_element",
+   "SchauderBasis.range_proj",
+   "SchauderBasis.dim_range_proj",
+   "SchauderBasis.proj_tendsto_id",
+   "SchauderBasis.proj_uniform_bound",
+   "SchauderBasis.basis_constant",
+   "SchauderBasis.Q",
+   "SchauderBasis.Q_sum",
+   "SchauderBasis.Q_ortho",
+   "SchauderBasis.Q_rank_one",
+   "SchauderBasis.basis_of_canonical_projections"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1,
+  "imported_modules": 7483,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-21",
+  "is_module": true
+ },
+ {
+  "cid": "o0502",
+  "sample": "outside.b",
+  "pr": 34209,
+  "path": "Mathlib/Analysis/Normed/Module/Bases.lean",
+  "gh_id": 2713140513,
+  "kind": "review_comment",
+  "analogues": [
+   "Pi.single",
+   "Pi.single"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "49b9d119004976012ed92d008202de4c171da64f",
+  "base": "fdddb3ea2c8c35de4455e033bc2a5df4d3a391ee",
+  "line": 32,
+  "site_decl": "SchauderBasis",
+  "added": [
+   "SchauderBasis.linearIndependent",
+   "SchauderBasis.proj",
+   "SchauderBasis.proj_apply",
+   "SchauderBasis.proj_basis_element",
+   "SchauderBasis.range_proj",
+   "SchauderBasis.dim_range_proj",
+   "SchauderBasis.proj_tendsto_id",
+   "SchauderBasis.proj_uniform_bound",
+   "SchauderBasis.basis_constant",
+   "SchauderBasis.Q",
+   "SchauderBasis.Q_sum",
+   "SchauderBasis.Q_ortho",
+   "SchauderBasis.Q_rank_one",
+   "SchauderBasis.basis_of_canonical_projections"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1,
+  "imported_modules": 7483,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-21",
+  "is_module": true
+ },
+ {
+  "cid": "o0575",
+  "sample": "outside.b",
+  "pr": 34401,
+  "path": "Mathlib/Order/Shrink.lean",
+  "gh_id": 2751331050,
+  "kind": "review_comment",
+  "analogues": [
+   "Function.Injective.partialOrder",
+   "Function.Injective.partialOrder"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "3ae814bef117940568ee50c6df03020154d6419a",
+  "base": "64c76eabb64d58848cd5a272f58dfa31f3d1e3ea",
+  "line": 93,
+  "site_decl": "equivShrink_lt_equivShrink_iff",
+  "added": [
+   "equivShrink_bot",
+   "equivShrink_symm_bot",
+   "orderIsoShrink",
+   "orderIsoShrink_apply",
+   "orderIsoShrink_symm_apply",
+   "equivShrink_le_equivShrink_iff",
+   "equivShrink_lt_equivShrink_iff"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 19,
+  "imported_modules": 7464,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-02-01",
+  "is_module": true
+ },
+ {
+  "cid": "o0578",
+  "sample": "outside.b",
+  "pr": 36962,
+  "path": "Mathlib/NumberTheory/Primorial.lean",
+  "gh_id": 2982629050,
+  "kind": "review_comment",
+  "analogues": [
+   "Monotone",
+   "Monotone"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "2c4949d9f22c2a4e1a43f8b489ff9ad6bf14cacf",
+  "base": "84442bd12f99fd2e2485114afaccc724e18fb510",
+  "line": 49,
+  "site_decl": "primorial_mono",
+  "added": [
+   "primorial_zero",
+   "primorial_one",
+   "primorial_two",
+   "primorial_mono",
+   "primorial_dvd_primorial",
+   "Nat.Prime.dvd_primorial_iff",
+   "Nat.Prime.dvd_primorial",
+   "lt_primorial_self",
+   "le_primorial_self",
+   "primorial_lt_four_pow",
+   "primorial_le_four_pow"
+  ],
+  "month": "2026-03",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef",
+  "workspace_date": "2026-03-18",
+  "excluded_modules": 3,
+  "imported_modules": 7798,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc6",
+  "review_at": "2026-03-24",
+  "is_module": true
+ },
+ {
+  "cid": "o0580",
+  "sample": "outside.b",
+  "pr": 32576,
+  "path": "Mathlib/CategoryTheory/Limits/Shapes/Multiequalizer.lean",
+  "gh_id": 2599231243,
+  "kind": "review_comment",
+  "analogues": [
+   "Fork.of\u03b9",
+   "Fork.of\u03b9"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "06f736be29034a07072d3ca6afb4b294ecc4cf6b",
+  "base": "12128c4b4c31619d976fe6bd52c86f8b3b60adcb",
+  "line": 568,
+  "site_decl": "CategoryTheory.Limits.Multifork.toPiFork",
+  "added": [
+   "CategoryTheory.Limits.MulticospanIndex.fstPiMapOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.sndPiMapOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.fstPiMapOfIsLimit_proj",
+   "CategoryTheory.Limits.MulticospanIndex.sndPiMapOfIsLimit_proj",
+   "CategoryTheory.Limits.MulticospanIndex.parallelPairDiagramOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.fstPiMap_\u03c0",
+   "CategoryTheory.Limits.MulticospanIndex.sndPiMap_\u03c0",
+   "CategoryTheory.Limits.MultispanIndex.fstSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.sndSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.inj_fstSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.inj_sndSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.parallelPairDiagramOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.\u03b9_fstSigmaMap",
+   "CategoryTheory.Limits.MultispanIndex.\u03b9_sndSigmaMap",
+   "CategoryTheory.Limits.Multifork.pi_condition",
+   "CategoryTheory.Limits.Multifork.toPiFork",
+   "CategoryTheory.Limits.Multifork.toPiFork_\u03c0_app_zero",
+   "CategoryTheory.Limits.Multifork.toPiFork_\u03c0_app_one",
+   "CategoryTheory.Limits.Multifork.ofPiFork",
+   "CategoryTheory.Limits.Multifork.ofPiFork_\u03b9",
+   "CategoryTheory.Limits.Multifork.ofPiFork_\u03c0_app_right",
+   "CategoryTheory.Limits.MulticospanIndex.toPiForkFunctor",
+   "CategoryTheory.Limits.MulticospanIndex.ofPiForkFunctor",
+   "CategoryTheory.Limits.MulticospanIndex.multiforkEquivPiForkOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.multiforkEquivPiFork",
+   "CategoryTheory.Limits.Multicofork.sigma_condition",
+   "CategoryTheory.Limits.Multicofork.toSigmaCofork",
+   "CategoryTheory.Limits.Multicofork.toSigmaCofork_\u03c0",
+   "CategoryTheory.Limits.Multicofork.ofSigmaCofork",
+   "CategoryTheory.Limits.Multicofork.ofSigmaCofork_\u03b9_app_left",
+   "CategoryTheory.Limits.Multicofork.ofSigmaCofork_\u03c0",
+   "CategoryTheory.Limits.MultispanIndex.toSigmaCoforkFunctor",
+   "CategoryTheory.Limits.MultispanIndex.ofSigmaCoforkFunctor",
+   "CategoryTheory.Limits.MultispanIndex.multicoforkEquivSigmaCoforkOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.multicoforkEquivSigmaCofork"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 298,
+  "imported_modules": 6966,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-08",
+  "is_module": true
+ },
+ {
+  "cid": "o0581",
+  "sample": "outside.b",
+  "pr": 32576,
+  "path": "Mathlib/CategoryTheory/Limits/Shapes/Multiequalizer.lean",
+  "gh_id": 2599235013,
+  "kind": "review_comment",
+  "analogues": [
+   "Cofork.of\u03c0",
+   "Cofork.of\u03c0"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "06f736be29034a07072d3ca6afb4b294ecc4cf6b",
+  "base": "12128c4b4c31619d976fe6bd52c86f8b3b60adcb",
+  "line": 784,
+  "site_decl": "CategoryTheory.Limits.Multicofork.toSigmaCofork",
+  "added": [
+   "CategoryTheory.Limits.MulticospanIndex.fstPiMapOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.sndPiMapOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.fstPiMapOfIsLimit_proj",
+   "CategoryTheory.Limits.MulticospanIndex.sndPiMapOfIsLimit_proj",
+   "CategoryTheory.Limits.MulticospanIndex.parallelPairDiagramOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.fstPiMap_\u03c0",
+   "CategoryTheory.Limits.MulticospanIndex.sndPiMap_\u03c0",
+   "CategoryTheory.Limits.MultispanIndex.fstSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.sndSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.inj_fstSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.inj_sndSigmaMapOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.parallelPairDiagramOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.\u03b9_fstSigmaMap",
+   "CategoryTheory.Limits.MultispanIndex.\u03b9_sndSigmaMap",
+   "CategoryTheory.Limits.Multifork.pi_condition",
+   "CategoryTheory.Limits.Multifork.toPiFork",
+   "CategoryTheory.Limits.Multifork.toPiFork_\u03c0_app_zero",
+   "CategoryTheory.Limits.Multifork.toPiFork_\u03c0_app_one",
+   "CategoryTheory.Limits.Multifork.ofPiFork",
+   "CategoryTheory.Limits.Multifork.ofPiFork_\u03b9",
+   "CategoryTheory.Limits.Multifork.ofPiFork_\u03c0_app_right",
+   "CategoryTheory.Limits.MulticospanIndex.toPiForkFunctor",
+   "CategoryTheory.Limits.MulticospanIndex.ofPiForkFunctor",
+   "CategoryTheory.Limits.MulticospanIndex.multiforkEquivPiForkOfIsLimit",
+   "CategoryTheory.Limits.MulticospanIndex.multiforkEquivPiFork",
+   "CategoryTheory.Limits.Multicofork.sigma_condition",
+   "CategoryTheory.Limits.Multicofork.toSigmaCofork",
+   "CategoryTheory.Limits.Multicofork.toSigmaCofork_\u03c0",
+   "CategoryTheory.Limits.Multicofork.ofSigmaCofork",
+   "CategoryTheory.Limits.Multicofork.ofSigmaCofork_\u03b9_app_left",
+   "CategoryTheory.Limits.Multicofork.ofSigmaCofork_\u03c0",
+   "CategoryTheory.Limits.MultispanIndex.toSigmaCoforkFunctor",
+   "CategoryTheory.Limits.MultispanIndex.ofSigmaCoforkFunctor",
+   "CategoryTheory.Limits.MultispanIndex.multicoforkEquivSigmaCoforkOfIsColimit",
+   "CategoryTheory.Limits.MultispanIndex.multicoforkEquivSigmaCofork"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 298,
+  "imported_modules": 6966,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-08",
+  "is_module": true
+ },
+ {
+  "cid": "o0604",
+  "sample": "outside.b",
+  "pr": 33604,
+  "path": "Mathlib/RingTheory/Valuation/Basic.lean",
+  "gh_id": 2662657931,
+  "kind": "review_comment",
+  "analogues": [
+   "Iff.ne applied to the PR's eq_one_iff_eq_one",
+   "IsEquiv.eq_one_iff_eq_one (via .ne)"
+  ],
+  "findable": [
+   "api_shape",
+   "neighbourhood"
+  ],
+  "commit": "357fbf7040cd7582fd5e3c0b6b5bb54207b96522",
+  "base": "959c85291ad2a288da37a83d54b7b2266a1c59e2",
+  "line": 607,
+  "site_decl": "Valuation.IsEquiv.neq_one_iff_neq_one",
+  "added": [
+   "Valuation.pos_iff",
+   "Valuation.IsEquiv.eq_zero",
+   "Valuation.IsEquiv.ne_zero",
+   "Valuation.IsEquiv.pos_iff",
+   "Valuation.IsEquiv.one_le_iff_one_le",
+   "Valuation.IsEquiv.neq_one_iff_neq_one",
+   "Valuation.IsEquiv.one_lt_iff_one_lt",
+   "Valuation.isEquiv_of_map_strictMono",
+   "Valuation.isEquiv_iff_val_lt_val",
+   "Valuation.isNontrivial_of_isEquiv",
+   "Valuation.isNontrivial_iff_isEquiv_isNontrivial",
+   "Valuation.isEquiv_of_val_le_one",
+   "Valuation.isEquiv_iff_val_le_one",
+   "Valuation.isEquiv_iff_val_eq_one",
+   "Valuation.isEquiv_iff_val_lt_one",
+   "Valuation.isEquiv_iff_val_sub_one_lt_one",
+   "Valuation.isEquiv_tfae"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/78ce48549f1a43acb7fb364910afa04206f408ea",
+  "workspace_date": "2025-12-31",
+  "excluded_modules": 160,
+  "imported_modules": 7270,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-05",
+  "is_module": true
+ },
+ {
+  "cid": "o0605",
+  "sample": "outside.b",
+  "pr": 33604,
+  "path": "Mathlib/RingTheory/Valuation/Basic.lean",
+  "gh_id": 2662658256,
+  "kind": "review_comment",
+  "analogues": [
+   "Iff.ne / not_congr on the PR's eq_zero",
+   "the PR's own eq_zero (ne_zero is just its not_congr)"
+  ],
+  "findable": [
+   "api_shape",
+   "pr_internal"
+  ],
+  "commit": "357fbf7040cd7582fd5e3c0b6b5bb54207b96522",
+  "base": "959c85291ad2a288da37a83d54b7b2266a1c59e2",
+  "line": 584,
+  "site_decl": "Valuation.IsEquiv.ne_zero",
+  "added": [
+   "Valuation.pos_iff",
+   "Valuation.IsEquiv.eq_zero",
+   "Valuation.IsEquiv.ne_zero",
+   "Valuation.IsEquiv.pos_iff",
+   "Valuation.IsEquiv.one_le_iff_one_le",
+   "Valuation.IsEquiv.neq_one_iff_neq_one",
+   "Valuation.IsEquiv.one_lt_iff_one_lt",
+   "Valuation.isEquiv_of_map_strictMono",
+   "Valuation.isEquiv_iff_val_lt_val",
+   "Valuation.isNontrivial_of_isEquiv",
+   "Valuation.isNontrivial_iff_isEquiv_isNontrivial",
+   "Valuation.isEquiv_of_val_le_one",
+   "Valuation.isEquiv_iff_val_le_one",
+   "Valuation.isEquiv_iff_val_eq_one",
+   "Valuation.isEquiv_iff_val_lt_one",
+   "Valuation.isEquiv_iff_val_sub_one_lt_one",
+   "Valuation.isEquiv_tfae"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/78ce48549f1a43acb7fb364910afa04206f408ea",
+  "workspace_date": "2025-12-31",
+  "excluded_modules": 160,
+  "imported_modules": 7270,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-05",
+  "is_module": true
+ },
+ {
+  "cid": "o0707",
+  "sample": "outside.b",
+  "pr": 34316,
+  "path": "Mathlib/GroupTheory/GroupAction/OfQuotient.lean",
+  "gh_id": 2722079281,
+  "kind": "review_comment",
+  "analogues": [
+   "QuotientGroup.lift (with MulAction.toPermHom) in place of Quotient.out",
+   "QuotientGroup.lift with MulAction.toPermHom"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "ff09958daf9b48abde1d73e1033534058aeb9cbc",
+  "base": "f760e25ec70bae816086c65e47146be6c394a7bd",
+  "line": 35,
+  "site_decl": "MulAction.smul_fixedPoints_eq_of_quotient_eq",
+  "added": [
+   "MulAction.smul_fixedPoints_eq_of_quotient_eq",
+   "MulAction.coe_quotient_smul_fixedPoints"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/7ee74e7d3f87077723e124e2e62a6dd1a9509c13",
+  "workspace_date": "2026-01-16",
+  "excluded_modules": 1,
+  "imported_modules": 7483,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-23",
+  "is_module": true
+ },
+ {
+  "cid": "o0716",
+  "sample": "outside.b",
+  "pr": 32492,
+  "path": "Mathlib/LinearAlgebra/TensorProduct/Basis.lean",
+  "gh_id": 2594194235,
+  "kind": "review_comment",
+  "analogues": [
+   "Basis.coord in place of Basis.dualBasis",
+   "Basis.coord"
+  ],
+  "findable": [
+   "role"
+  ],
+  "commit": "f53ef1db6363d6a532a56f2dd046b2a34073f38c",
+  "base": "fe7877b4f9aa7304643c9a499da663c71069dea0",
+  "line": 176,
+  "site_decl": "TensorProduct.eq_sum_basis_tmul_dualBasis_apply",
+  "added": [
+   "TensorProduct.eq_sum_basis_tmul_dualBasis_apply",
+   "TensorProduct.eq_sum_dualBasis_apply_tmul_basis"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 1599,
+  "imported_modules": 5665,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-05",
+  "is_module": true
+ },
+ {
+  "cid": "o0730",
+  "sample": "outside.b",
+  "pr": 32180,
+  "path": "Mathlib/CategoryTheory/Limits/Types/Pushouts.lean",
+  "gh_id": 2572264943,
+  "kind": "review_comment",
+  "analogues": [
+   "CategoryTheory.Adhesive.isPullback_of_isPushout_of_mono_left",
+   "CategoryTheory.Adhesive.isPullback_of_isPushout_of_mono_left"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "cd5156f9b25f7eb5dabcc24a406e4c38def0cff4",
+  "base": "5b3c4296089fc9c50148c21afccb8ed5f51722c1",
+  "line": 277,
+  "site_decl": "CategoryTheory.Limits.Types.isPullback_of_isPushout",
+  "added": [
+   "CategoryTheory.Limits.Types.eq_or_eq_of_isPushout",
+   "CategoryTheory.Limits.Types.eq_or_eq_of_isPushout'",
+   "CategoryTheory.Limits.Types.isPullback_of_isPushout",
+   "CategoryTheory.Limits.Types.mono_of_isPushout_of_isPullback",
+   "CategoryTheory.Limits.Types.isPushout_of_isPullback_of_mono",
+   "CategoryTheory.Limits.Types.isPushout_of_isPullback_of_mono'"
+  ],
+  "month": "2025-11",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 3,
+  "imported_modules": 7261,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-11-28",
+  "is_module": true
+ },
+ {
+  "cid": "o0768",
+  "sample": "outside.b",
+  "pr": 33017,
+  "path": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+  "gh_id": 2643635167,
+  "kind": "review_comment",
+  "analogues": [
+   "ContinuousLinearEquiv.arrowCongr (conjugation x \u21a6 U \u2218L x \u2218L U.symm as an equiv / algebra hom)",
+   "ContinuousLinearEquiv.arrowCongr (conjugation U \u2218L x \u2218L U.symm as a bundled map)"
+  ],
+  "findable": [
+   "api_shape",
+   "role"
+  ],
+  "commit": "02b0e1883abb9457d5e56a5b60eceb2632bb1e54",
+  "base": "1ba359a5224b907d17bc42436366e87c48365ff7",
+  "line": 27,
+  "site_decl": "ContinuousAlgEquiv.coe_eq_continuousLinearEquiv_conjugate",
+  "added": [
+   "ContinuousAlgEquiv.coe_eq_continuousLinearEquiv_conjugate"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/21f7dcba68e7532c8c291f71767cb5032b1526e1",
+  "workspace_date": "2025-12-23",
+  "excluded_modules": 1,
+  "imported_modules": 7428,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2025-12-23",
+  "is_module": true
+ },
+ {
+  "cid": "o0835",
+  "sample": "outside.b",
+  "pr": 33045,
+  "path": "Mathlib/CategoryTheory/MorphismProperty/Ind.lean",
+  "gh_id": 2673487023,
+  "kind": "review_comment",
+  "analogues": [
+   "MorphismProperty.IsMultiplicative lemma alongside the IsStableUnderComposition one",
+   "IsMultiplicative.ind_of_preIndSpreads, companion of the PR's IsStableUnderComposition.ind_of_preIndSpreads"
+  ],
+  "findable": [
+   "api_shape",
+   "role"
+  ],
+  "commit": "4852a5656ecb5b96e9db89ec80907b3cc725d295",
+  "base": "67516cd1f9066fbffceab5ae57af43699efddb9a",
+  "line": 184,
+  "site_decl": "CategoryTheory.MorphismProperty.IsStableUnderComposition.ind_of_preIndSpreads",
+  "added": [
+   "CategoryTheory.MorphismProperty.IsStableUnderComposition.ind_of_preIndSpreads"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/772b00fbaaca6a1cff2c5cc0494d03a49f389e4c",
+  "workspace_date": "2026-01-07",
+  "excluded_modules": 1,
+  "imported_modules": 7450,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-08",
+  "is_module": true
+ },
+ {
+  "cid": "o0846",
+  "sample": "outside.b",
+  "pr": 32582,
+  "path": "Mathlib/Data/Finset/Card.lean",
+  "gh_id": 2607391383,
+  "kind": "review_comment",
+  "analogues": [
+   "Finset.filter_card_add_filter_neg_card_eq_card",
+   "Finset.filter_card_add_filter_neg_card_eq_card"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "d2ead01e5283ab09848b2b9365bfb0da4afdc0ea",
+  "base": "dc33de0ba2e95c1fb59ee982a18e9fda8c8bc4dc",
+  "line": 574,
+  "site_decl": "Finset.card_filter_add_card_filter_not",
+  "added": [
+   "Finset.card_filter_add_card_filter_not"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 5135,
+  "imported_modules": 2129,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-10",
+  "is_module": true
+ },
+ {
+  "cid": "o0894",
+  "sample": "outside.b",
+  "pr": 33972,
+  "path": "Mathlib/Algebra/Polynomial/Degree/Operations.lean",
+  "gh_id": 2692074021,
+  "kind": "review_comment",
+  "analogues": [
+   "eq_C_of_degree_le_zero composed with a missing degree \u2264 0 \u2192 leadingCoeff = coeff 0 lemma",
+   "eq_C_of_degree_le_zero composed with a missing degree\u22640 \u2192 leadingCoeff = coeff 0 lemma"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "4b6a89aea7919770f8238da6902146eb24317609",
+  "base": "25d72f3b6bdf46a7140699ffa03af1766eeb391b",
+  "line": 177,
+  "site_decl": "Polynomial.eq_C_leadingCoeff_of_degree_le_zero",
+  "added": [
+   "Polynomial.eq_C_leadingCoeff_of_degree_eq_zero",
+   "Polynomial.eq_C_leadingCoeff_of_degree_le_zero",
+   "Polynomial.eq_C_leadingCoeff_of_natDegree_eq_zero"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/3fb836b6e78f8c8c312a344f19fb169f70de776c",
+  "workspace_date": "2026-01-12",
+  "excluded_modules": 1882,
+  "imported_modules": 5580,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-14",
+  "is_module": true
+ },
+ {
+  "cid": "o0895",
+  "sample": "outside.b",
+  "pr": 33972,
+  "path": "Mathlib/Algebra/Polynomial/Degree/Operations.lean",
+  "gh_id": 2692076892,
+  "kind": "review_comment",
+  "analogues": [
+   "natDegree twin of eq_C_of_degree_le_zero / eq_C_of_degree_eq_zero in the coeff p 0 form",
+   "coeff p 0 form, matching the adjacent eq_C_of_degree_* lemmas"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "4b6a89aea7919770f8238da6902146eb24317609",
+  "base": "25d72f3b6bdf46a7140699ffa03af1766eeb391b",
+  "line": 184,
+  "site_decl": "Polynomial.eq_C_leadingCoeff_of_natDegree_eq_zero",
+  "added": [
+   "Polynomial.eq_C_leadingCoeff_of_degree_eq_zero",
+   "Polynomial.eq_C_leadingCoeff_of_degree_le_zero",
+   "Polynomial.eq_C_leadingCoeff_of_natDegree_eq_zero"
+  ],
+  "month": "2026-01",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/3fb836b6e78f8c8c312a344f19fb169f70de776c",
+  "workspace_date": "2026-01-12",
+  "excluded_modules": 1882,
+  "imported_modules": 5580,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-14",
+  "is_module": true
+ },
+ {
+  "cid": "o0900",
+  "sample": "outside.b",
+  "pr": 32744,
+  "path": "Mathlib/ModelTheory/Definability.lean",
+  "gh_id": 2615998773,
+  "kind": "review_comment",
+  "analogues": [
+   "Option \u03b1 as the canonical add-one-element type instead of \u03b1 \u2295 Unit",
+   "Option \u03b1 as the canonical \u03b1-plus-one-element type"
+  ],
+  "findable": [
+   "api_shape",
+   "role"
+  ],
+  "commit": "fd9a36b73a6265753821d0c21ca05fefde93a1d8",
+  "base": "32831aa92ac7f3794abfc83057e1df265f85ba12",
+  "line": 420,
+  "site_decl": "FirstOrder.Language.DefinableFun",
+  "added": [
+   "Set.Definable.exists_fintype",
+   "Set.Definable.singleton",
+   "Set.Definable.diagonal",
+   "FirstOrder.Language.DefinableFun",
+   "FirstOrder.Language.DefinableFun.definable_fun_of_fun_symbol",
+   "FirstOrder.Language.DefinableFun.definable_fun_of_term",
+   "FirstOrder.Language.DefinableFun.definable_fun_of_const_fun",
+   "FirstOrder.Language.DefinableFun.DefinableMap",
+   "FirstOrder.Language.DefinableFun.definable_preimage_of_definableMap",
+   "FirstOrder.Language.DefinableFun.definable_equalizer",
+   "FirstOrder.Language.DefinableFun.definable_fiber"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 3,
+  "imported_modules": 7261,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-13",
+  "is_module": true
+ },
+ {
+  "cid": "o0905",
+  "sample": "outside.b",
+  "pr": 32744,
+  "path": "Mathlib/ModelTheory/Definability.lean",
+  "gh_id": 2616002023,
+  "kind": "review_comment",
+  "analogues": [
+   "Set.preimage notation F \u207b\u00b9' S in place of {v | F v \u2208 S}",
+   "Set.preimage notation F \u207b\u00b9' S for {v | F v \u2208 S}"
+  ],
+  "findable": [
+   "api_shape"
+  ],
+  "commit": "fd9a36b73a6265753821d0c21ca05fefde93a1d8",
+  "base": "32831aa92ac7f3794abfc83057e1df265f85ba12",
+  "line": 467,
+  "site_decl": "FirstOrder.Language.DefinableFun.definable_preimage_of_definableMap",
+  "added": [
+   "Set.Definable.exists_fintype",
+   "Set.Definable.singleton",
+   "Set.Definable.diagonal",
+   "FirstOrder.Language.DefinableFun",
+   "FirstOrder.Language.DefinableFun.definable_fun_of_fun_symbol",
+   "FirstOrder.Language.DefinableFun.definable_fun_of_term",
+   "FirstOrder.Language.DefinableFun.definable_fun_of_const_fun",
+   "FirstOrder.Language.DefinableFun.DefinableMap",
+   "FirstOrder.Language.DefinableFun.definable_preimage_of_definableMap",
+   "FirstOrder.Language.DefinableFun.definable_equalizer",
+   "FirstOrder.Language.DefinableFun.definable_fiber"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/a73de4ba4b59f748f4d79b55f3a26487c62d6b84",
+  "workspace_date": "2025-11-24",
+  "excluded_modules": 3,
+  "imported_modules": 7261,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.26.0-rc2",
+  "review_at": "2025-12-13",
+  "is_module": true
+ },
+ {
+  "cid": "o0914",
+  "sample": "outside.b",
+  "pr": 32367,
+  "path": "Mathlib/Data/Sum/Basic.lean",
+  "gh_id": 2691640191,
+  "kind": "review_comment",
+  "analogues": [
+   "Function.comp_def, which makes the getLeft?_comp_inl-style lemmas unnecessary",
+   "Function.comp_def instead of new getLeft?_comp_inl-style simp lemmas"
+  ],
+  "findable": [
+   "role",
+   "unclear"
+  ],
+  "commit": "088475c3ab5bc1604aa33f8463ac5bacec4dd89a",
+  "base": "9e76ccd3698f53053ffb80be27ff224f85dbaf79",
+  "line": 75,
+  "site_decl": "Sum.getLeft?_comp_inl",
+  "added": [
+   "Sum.getLeft?_comp_inl",
+   "Sum.getLeft?_comp_inr",
+   "Sum.getRight?_comp_inl",
+   "Sum.getRight?_comp_inr"
+  ],
+  "month": "2025-12",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/3fb836b6e78f8c8c312a344f19fb169f70de776c",
+  "workspace_date": "2026-01-12",
+  "excluded_modules": 7422,
+  "imported_modules": 40,
+  "dropped_own_imports": [
+   "Mathlib.Logic.Function.Basic",
+   "Mathlib.Tactic.MkIffOfInductiveProp"
+  ],
+  "toolchain": "leanprover/lean4:v4.27.0-rc1",
+  "review_at": "2026-01-14",
+  "is_module": true
+ },
+ {
+  "cid": "w0065",
+  "sample": "outside.w",
+  "pr": 40269,
+  "path": "Mathlib/Combinatorics/SimpleGraph/Basic.lean",
+  "gh_id": 3431616119,
+  "kind": "review_comment",
+  "analogues": [
+   "neighborSet_bot / neighborSet_top, merged into Mathlib by #38747",
+   "neighborSet_bot / neighborSet_top, already merged to master in #38747 under the same names"
+  ],
+  "findable": [
+   "name"
+  ],
+  "commit": "18947cad556540d531f6bf34acb2cd7b00a20173",
+  "base": "28908c09b504f5d7b6603a1cad9b75389d247873",
+  "line": 761,
+  "site_decl": "SimpleGraph.neighborSet_top",
+  "added": [
+   "SimpleGraph.Adj.mem_support_left",
+   "SimpleGraph.Adj.mem_support_right",
+   "SimpleGraph.edgeSet_subset_sym2_iff",
+   "SimpleGraph.neighborSet_bot",
+   "SimpleGraph.neighborSet_top",
+   "SimpleGraph.neighborSet_sup",
+   "SimpleGraph.neighborSet_inf",
+   "SimpleGraph.neighborSet_iSup",
+   "SimpleGraph.neighborSet_iInf",
+   "SimpleGraph.neighborSet_disjoint"
+  ],
+  "month": "2026-06",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef",
+  "workspace_date": "2026-03-18",
+  "excluded_modules": 73,
+  "imported_modules": 7728,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc6",
+  "review_at": "2026-06-17",
+  "is_module": true
+ },
+ {
+  "cid": "w0219",
+  "sample": "outside.w",
+  "pr": 40272,
+  "path": "Mathlib/Analysis/CStarAlgebra/Matrix.lean",
+  "gh_id": 3373229205,
+  "kind": "review_comment",
+  "analogues": [
+   "scoped matrix norm instances (Matrix.Norms.L2Operator); no global metric on matrices",
+   "scoped matrix norm instances (Matrix.Norms.L2Operator scope)"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "71409b18c7be2fff55b463342850d9d7eb63e466",
+  "base": "28908c09b504f5d7b6603a1cad9b75389d247873",
+  "line": 320,
+  "site_decl": "Matrix.l2_opNorm_eq_pi_norm",
+  "added": [
+   "Matrix.l2_opNorm_unitary_conj",
+   "Matrix.l2_opNorm_eq_pi_norm"
+  ],
+  "month": "2026-06",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef",
+  "workspace_date": "2026-03-18",
+  "excluded_modules": 7,
+  "imported_modules": 7794,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc6",
+  "review_at": "2026-06-08",
+  "is_module": true
+ },
+ {
+  "cid": "w0318",
+  "sample": "outside.w",
+  "pr": 38533,
+  "path": "Mathlib/Topology/Separation/PerfectlyNormal.lean",
+  "gh_id": 3143727063,
+  "kind": "review_comment",
+  "analogues": [
+   "Urysohn's lemma (`exists_continuous_zero_one_of_isClosed`), whose range condition is spelled `\u2200 x, f x \u2208 Icc (0:\u211d) 1` rather than `range f \u2286 Icc 0 1`",
+   "Urysohn's lemma (`exists_continuous_zero_one_of_isClosed`) spells the range condition as `\u2200 x, f x \u2208 Icc (0:\u211d) 1`, not `range f \u2286 Icc 0 1`"
+  ],
+  "findable": [
+   "neighbourhood"
+  ],
+  "commit": "876a35f893a557c285ec6e2c54ffb54d58315aec",
+  "base": "80a6231dcf1d3a8fa73740f6266d77f68c7ff596",
+  "line": 32,
+  "site_decl": "perfectlyNormalSpace_iff_forall_isClosed_preimage_zero",
+  "added": [
+   "perfectlyNormalSpace_iff_forall_isClosed_preimage_zero",
+   "Topology.IsEmbedding.perfectlyNormalSpace"
+  ],
+  "month": "2026-04",
+  "workspace": "data/code_execute/repos/mathlib4/workspaces/4b627f0349938c16df37afa592c456b0a7a74fef",
+  "workspace_date": "2026-03-18",
+  "excluded_modules": 1,
+  "imported_modules": 7801,
+  "dropped_own_imports": [],
+  "toolchain": "leanprover/lean4:v4.29.0-rc6",
+  "review_at": "2026-04-26",
+  "is_module": true
+ }
+]

@@ -1,0 +1,14 @@
+fold index: 33045 definition bodies, 650 one-field classes, 160330 lemma sides, 0 errors, 30s
+#fold B.index ≠ 0 ⇒ B.FiniteIndex   [Subgroup.FiniteIndex, via Subgroup.FiniteIndex.index_ne_zero, class, naming]
+#fold B.index ≠ 0 ⇒ Finite (A ⧸ B)   [Finite, via Subgroup.index_ne_zero_iff_finite, lemma←, naming]
+#fold B.index ⇒ Nat.card (A ⧸ B)   [Nat.card, via Subgroup.index_eq_card, lemma←, naming]
+#fold B.index ⇒ B.relIndex ⊤   [Subgroup.relIndex, via Subgroup.relindex_top_right, lemma→, rewrite]
+#fold if n = k then 1 else 0 ⇒ Pi.single k 1 n   [Pi.single, via Pi.single_apply, lemma→, naming]
+      as a function of n: Pi.single k 1
+#fold if n = k then 1
+else
+  0 ⇒ (SkewMonoidAlgebra.single n 1).coeff
+  k   [SkewMonoidAlgebra.coeff, via SkewMonoidAlgebra.coeff_single_apply, lemma→, rewrite]
+      (pointwise only, under [n])
+#fold ∃ x,
+  I = Ideal.span {x} ⇒ Submodule.IsPrincipal I   [Submodule.IsPrincipal, via Submodule.isPrincipal_iff, lemma→, naming]

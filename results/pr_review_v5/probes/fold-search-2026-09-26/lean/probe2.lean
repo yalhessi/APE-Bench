@@ -47,6 +47,13 @@ end
 
 
 section
-variable {R : Type*} [CommRing R] (I : Ideal R)
-#fold_try Submodule.isPrincipal_iff : "rhs" (∃ x : R, I = Ideal.span {x})
+-- o0069: the hypothesis shape of `Antitone` on a predicate
+variable {n : ℕ} (p : Fin n → Prop)
+#fold ∀ i j : Fin n, j ≤ i → p i → p j
+end
+
+section
+-- 34091: a hypothesis whose type is a class; and an un-simp that must not appear
+variable {α : Type*} [Monoid α] (x : α) (k : ℕ)
+#fold x ^ k
 end
