@@ -1,12 +1,17 @@
-"""Prevalence and agreement for the outside-sets reading. Run from the repo root."""
-import json, glob, math
+"""Prevalence and agreement for the outside-sets reading. Run from the repo root.
+usage: analyse.py [b|w]  -- b: same window (packet_manifest.json, reader_*.b*.jsonl, results.json);
+                          w: outside the window (packet_manifest_window.json, reader_*.w*.jsonl, results_window.json)"""
+import json, glob, math, sys
+TAG = sys.argv[1] if len(sys.argv) > 1 else "b"
+MANIFEST = "packet_manifest.json" if TAG == "b" else "packet_manifest_window.json"
+RESULTS = "results.json" if TAG == "b" else "results_window.json"
 from collections import Counter, defaultdict
 from pathlib import Path
 D = Path(__file__).parent
-man = json.load(open(D / "packet_manifest.json")); meta = {r["cid"]: r for r in man["rows"]}
+man = json.load(open(D / MANIFEST)); meta = {r["cid"]: r for r in man["rows"]}
 def load(reader):
     out = {}
-    for f in sorted(glob.glob(str(D / f"reader_{reader}.b*.jsonl"))):
+    for f in sorted(glob.glob(str(D / f"reader_{reader}.{TAG}*.jsonl"))):
         for l in open(f):
             l = l.strip()
             if l: r = json.loads(l); out[r["cid"]] = r
@@ -61,5 +66,5 @@ out["stage2_on_agreed_compare"] = s2
 out["stage2_findable_either"] = dict(Counter(x.get("findable_by") for c in comp_either for x in (B[c], C[c]) if x.get("findable_by")).most_common())
 out["wrong_analogue_yes_either"] = sorted(c for c in comp_either if B[c].get("wrong_analogue_plausible") == "yes" or C[c].get("wrong_analogue_plausible") == "yes")
 out["compare_agreed_cids"] = comp_agreed
-json.dump(out, open(D / "results.json", "w"), indent=1, ensure_ascii=False)
+json.dump(out, open(D / RESULTS, "w"), indent=1, ensure_ascii=False)
 print(json.dumps({k: v for k, v in out.items() if k not in ("compare_agreed_cids",)}, indent=1, ensure_ascii=False))

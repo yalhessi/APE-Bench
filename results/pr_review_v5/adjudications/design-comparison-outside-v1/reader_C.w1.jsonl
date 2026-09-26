@@ -1,0 +1,88 @@
+{"cid": "w0088", "ask_kind": "other"}
+{"cid": "w0089", "ask_kind": "other"}
+{"cid": "w0090", "ask_kind": "other"}
+{"cid": "w0091", "ask_kind": "other"}
+{"cid": "w0092", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "RingHomClass / RingEquivClass in place of R →+* S", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": "generalise the bundled-hom arguments to the hom classes; second half is a naming nit"}
+{"cid": "w0093", "ask_kind": "other"}
+{"cid": "w0094", "ask_kind": "not_an_ask"}
+{"cid": "w0095", "ask_kind": "not_an_ask"}
+{"cid": "w0096", "ask_kind": "not_an_ask"}
+{"cid": "w0097", "ask_kind": "design_other"}
+{"cid": "w0098", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "N₁.comap N₂.subtype in place of LinearMap.range (Submodule.inclusion h)", "findable_by": "api_shape", "wrong_analogue_plausible": "yes", "note": "decoy: Submodule.map N₂.subtype (wrong direction) or Submodule.inclusion itself"}
+{"cid": "w0099", "ask_kind": "design_other"}
+{"cid": "w0100", "ask_kind": "other"}
+{"cid": "w0101", "ask_kind": "not_an_ask"}
+{"cid": "w0102", "ask_kind": "not_an_ask"}
+{"cid": "w0103", "ask_kind": "other"}
+{"cid": "w0104", "ask_kind": "other"}
+{"cid": "w0105", "ask_kind": "other"}
+{"cid": "w0106", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "ext_base (∀ ⦃I⦄ binder style), renamed in this PR", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": "binder inconsistency between ext_indep and ext_base"}
+{"cid": "w0107", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "ext_iff_base, the iff twin of ext_base (ext_indep has one)", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": "missing iff twin"}
+{"cid": "w0108", "ask_kind": "other"}
+{"cid": "w0109", "ask_kind": "design_variant"}
+{"cid": "w0110", "ask_kind": "design_other"}
+{"cid": "w0111", "ask_kind": "design_other"}
+{"cid": "w0112", "ask_kind": "other"}
+{"cid": "w0113", "ask_kind": "not_an_ask"}
+{"cid": "w0114", "ask_kind": "other"}
+{"cid": "w0115", "ask_kind": "other"}
+{"cid": "w0116", "ask_kind": "other"}
+{"cid": "w0117", "ask_kind": "not_an_ask"}
+{"cid": "w0118", "ask_kind": "other"}
+{"cid": "w0119", "ask_kind": "other"}
+{"cid": "w0120", "ask_kind": "other"}
+{"cid": "w0121", "ask_kind": "design_siblings", "analogue_named": "implied", "analogue": "the *_right_eq twins, from which the left versions follow by OrderDual", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": "duplicated proof across left/right twins"}
+{"cid": "w0122", "ask_kind": "not_an_ask"}
+{"cid": "w0123", "ask_kind": "design_variant"}
+{"cid": "w0124", "ask_kind": "other"}
+{"cid": "w0125", "ask_kind": "other"}
+{"cid": "w0126", "ask_kind": "other"}
+{"cid": "w0127", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "algebraMap_eq_one_iff, the one-twin of algebraMap_eq_zero_iff", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": "missing zero/one twin; also asks to fix downstream failures"}
+{"cid": "w0128", "ask_kind": "other"}
+{"cid": "w0129", "ask_kind": "design_other"}
+{"cid": "w0130", "ask_kind": "not_an_ask"}
+{"cid": "w0131", "ask_kind": "other"}
+{"cid": "w0132", "ask_kind": "other"}
+{"cid": "w0133", "ask_kind": "design_variant"}
+{"cid": "w0134", "ask_kind": "design_other"}
+{"cid": "w0135", "ask_kind": "other"}
+{"cid": "w0136", "ask_kind": "other"}
+{"cid": "w0137", "ask_kind": "other"}
+{"cid": "w0138", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Algebra.botEquivOfInjective + Subalgebra.equivOfEq in place of a bespoke ofBijective equiv", "findable_by": "api_shape", "wrong_analogue_plausible": "yes", "note": "decoy: Algebra.botEquiv (field/nontrivial variant) instead of botEquivOfInjective"}
+{"cid": "w0139", "ask_kind": "not_an_ask"}
+{"cid": "w0140", "ask_kind": "not_an_ask"}
+{"cid": "w0141", "ask_kind": "other"}
+{"cid": "w0142", "ask_kind": "other"}
+{"cid": "w0143", "ask_kind": "not_an_ask"}
+{"cid": "w0144", "ask_kind": "not_an_ask"}
+{"cid": "w0145", "ask_kind": "not_an_ask"}
+{"cid": "w0146", "ask_kind": "other"}
+{"cid": "w0147", "ask_kind": "design_other"}
+{"cid": "w0148", "ask_kind": "not_an_ask"}
+{"cid": "w0149", "ask_kind": "other"}
+{"cid": "w0150", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "SMul instance in place of HSMul", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": "an HSMul A B B instance is the shape of SMul A B"}
+{"cid": "w0151", "ask_kind": "other"}
+{"cid": "w0152", "ask_kind": "other"}
+{"cid": "w0153", "ask_kind": "design_other"}
+{"cid": "w0154", "ask_kind": "other"}
+{"cid": "w0155", "ask_kind": "other"}
+{"cid": "w0156", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "GaloisConnection packaging of the ≤-iff", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": "F r ≤ s ↔ r ≤ G s is the Galois connection shape"}
+{"cid": "w0157", "ask_kind": "other"}
+{"cid": "w0158", "ask_kind": "not_an_ask"}
+{"cid": "w0159", "ask_kind": "not_an_ask"}
+{"cid": "w0160", "ask_kind": "not_an_ask"}
+{"cid": "w0161", "ask_kind": "other"}
+{"cid": "w0162", "ask_kind": "not_an_ask"}
+{"cid": "w0163", "ask_kind": "not_an_ask"}
+{"cid": "w0164", "ask_kind": "not_an_ask"}
+{"cid": "w0165", "ask_kind": "not_an_ask"}
+{"cid": "w0166", "ask_kind": "other"}
+{"cid": "w0167", "ask_kind": "other"}
+{"cid": "w0168", "ask_kind": "other"}
+{"cid": "w0169", "ask_kind": "other"}
+{"cid": "w0170", "ask_kind": "not_an_ask"}
+{"cid": "w0171", "ask_kind": "not_an_ask"}
+{"cid": "w0172", "ask_kind": "not_an_ask"}
+{"cid": "w0173", "ask_kind": "other"}
+{"cid": "w0174", "ask_kind": "other"}
+{"cid": "w0175", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "RelCWComplex fields (unprotected) in the same file", "findable_by": "neighbourhood", "wrong_analogue_plausible": "no", "note": "protected on CWComplex fields but not on the RelCWComplex counterparts"}

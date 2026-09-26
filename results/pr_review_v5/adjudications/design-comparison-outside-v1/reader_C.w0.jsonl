@@ -1,0 +1,88 @@
+{"cid": "w0000", "ask_kind": "other"}
+{"cid": "w0001", "ask_kind": "other"}
+{"cid": "w0002", "ask_kind": "other"}
+{"cid": "w0003", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "PreservesColimitsOfShape (Discrete WalkingPair) (tensorLeft X): the existing limit/colimit-preservation API", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0004", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "preservation-of-colimits API: PreservesColimitsOfShape / PreservesColimitPair.iso, tensorLeft as left adjoint", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0005", "ask_kind": "other"}
+{"cid": "w0006", "ask_kind": "other"}
+{"cid": "w0007", "ask_kind": "other"}
+{"cid": "w0008", "ask_kind": "other"}
+{"cid": "w0009", "ask_kind": "other"}
+{"cid": "w0010", "ask_kind": "other"}
+{"cid": "w0011", "ask_kind": "other"}
+{"cid": "w0012", "ask_kind": "other"}
+{"cid": "w0013", "ask_kind": "other"}
+{"cid": "w0014", "ask_kind": "other"}
+{"cid": "w0015", "ask_kind": "other"}
+{"cid": "w0016", "ask_kind": "other"}
+{"cid": "w0017", "ask_kind": "not_an_ask"}
+{"cid": "w0018", "ask_kind": "other"}
+{"cid": "w0019", "ask_kind": "other"}
+{"cid": "w0020", "ask_kind": "not_an_ask"}
+{"cid": "w0021", "ask_kind": "other"}
+{"cid": "w0022", "ask_kind": "other"}
+{"cid": "w0023", "ask_kind": "other"}
+{"cid": "w0024", "ask_kind": "not_an_ask"}
+{"cid": "w0025", "ask_kind": "design_other"}
+{"cid": "w0026", "ask_kind": "design_other"}
+{"cid": "w0027", "ask_kind": "other"}
+{"cid": "w0028", "ask_kind": "other"}
+{"cid": "w0029", "ask_kind": "other"}
+{"cid": "w0030", "ask_kind": "other"}
+{"cid": "w0031", "ask_kind": "other"}
+{"cid": "w0032", "ask_kind": "other"}
+{"cid": "w0033", "ask_kind": "other"}
+{"cid": "w0034", "ask_kind": "other"}
+{"cid": "w0035", "ask_kind": "other"}
+{"cid": "w0036", "ask_kind": "other"}
+{"cid": "w0037", "ask_kind": "other"}
+{"cid": "w0038", "ask_kind": "other"}
+{"cid": "w0039", "ask_kind": "other"}
+{"cid": "w0040", "ask_kind": "other"}
+{"cid": "w0041", "ask_kind": "not_an_ask"}
+{"cid": "w0042", "ask_kind": "not_an_ask"}
+{"cid": "w0043", "ask_kind": "other"}
+{"cid": "w0044", "ask_kind": "other"}
+{"cid": "w0045", "ask_kind": "not_an_ask"}
+{"cid": "w0046", "ask_kind": "other"}
+{"cid": "w0047", "ask_kind": "not_an_ask"}
+{"cid": "w0048", "ask_kind": "not_an_ask"}
+{"cid": "w0049", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "add_sub_add_comm, the PR's own lemma directly above; add_sub_add is a special case of it", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0050", "ask_kind": "other"}
+{"cid": "w0051", "ask_kind": "other"}
+{"cid": "w0052", "ask_kind": "design_other"}
+{"cid": "w0053", "ask_kind": "design_other"}
+{"cid": "w0054", "ask_kind": "other"}
+{"cid": "w0055", "ask_kind": "design_variant"}
+{"cid": "w0056", "ask_kind": "design_norm"}
+{"cid": "w0057", "ask_kind": "design_other"}
+{"cid": "w0058", "ask_kind": "other"}
+{"cid": "w0059", "ask_kind": "not_an_ask"}
+{"cid": "w0060", "ask_kind": "other"}
+{"cid": "w0061", "ask_kind": "other"}
+{"cid": "w0062", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "Unitization.LE.le.inr / LE.le.of_inr, existing aliases of inr_nonneg_iff a few lines below in the same file", "findable_by": "neighbourhood", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0063", "ask_kind": "other"}
+{"cid": "w0064", "ask_kind": "other"}
+{"cid": "w0065", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "neighborSet_bot / neighborSet_top, already merged to master in #38747 under the same names", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0066", "ask_kind": "other"}
+{"cid": "w0067", "ask_kind": "other"}
+{"cid": "w0068", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "sup_idem (and inf_idem), same statement, same file Order/Lattice.lean", "findable_by": "neighbourhood", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0069", "ask_kind": "not_an_ask"}
+{"cid": "w0070", "ask_kind": "not_an_ask"}
+{"cid": "w0071", "ask_kind": "not_an_ask"}
+{"cid": "w0072", "ask_kind": "not_an_ask"}
+{"cid": "w0073", "ask_kind": "other"}
+{"cid": "w0074", "ask_kind": "other"}
+{"cid": "w0075", "ask_kind": "other"}
+{"cid": "w0076", "ask_kind": "other"}
+{"cid": "w0077", "ask_kind": "not_an_ask"}
+{"cid": "w0078", "ask_kind": "other"}
+{"cid": "w0079", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "the c.supp idiom with the existing mem_supp_iff directly above; the new mem_supp_iff' is unnecessary", "findable_by": "neighbourhood", "wrong_analogue_plausible": "yes", "note": "decoy: the SetLike instance on ConnectedComponent (v ∈ C), which exists and the PR used, but is not the idiom"}
+{"cid": "w0080", "ask_kind": "design_library", "analogue_named": "yes", "analogue": "G.induce c.supp (SimpleGraph.induce on the component's support) instead of a new ConnectedComponent.Graph", "findable_by": "role", "wrong_analogue_plausible": "yes", "note": "decoy: SimpleGraph.Subgraph.induce / Subgraph.coe, subgraph-valued near-miss for the same role"}
+{"cid": "w0081", "ask_kind": "not_an_ask"}
+{"cid": "w0082", "ask_kind": "design_other"}
+{"cid": "w0083", "ask_kind": "design_siblings", "analogue_named": "yes", "analogue": "toLinearMap_id, the PR's own lemma right below, duplicated by the simps toLinearMap projection on id", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0084", "ask_kind": "design_library", "analogue_named": "implied", "analogue": "the MulOpposite.op*/unop* bundled-map family (opLinearEquiv, opAddEquiv, ...) with their comp = id and toLinearMap API", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "w0085", "ask_kind": "design_other"}
+{"cid": "w0086", "ask_kind": "other"}
+{"cid": "w0087", "ask_kind": "other"}
