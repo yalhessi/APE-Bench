@@ -1,0 +1,97 @@
+2026-09-26 10:00:02 | INFO     | _run:305 - cost model: prompt_inclusive
+2026-09-26 10:00:02 | INFO     | _check_toolchain:119 - lean toolchain: /research/projects/proofedit/ya475/.elan/bin/lake
+2026-09-26 10:01:16 | INFO     | _report_token_budget:1069 - token budget: up to 19,800,000 (11 PR x 1,800,000)
+2026-09-26 10:01:16 | INFO     | _report_budget:1250 - budget: no coverage floor (solo schedules no work-unit job) + up to $16.50 (11 PR x $1.50 billed)
+2026-09-26 10:01:16 | INFO     | _report_budget:1256 - run_total_cost_cap $17.00 vs worst case $16.50 — fits
+2026-09-26 10:01:16 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 10:01:16 | INFO     | __init__:42 - Workspace state manager initialized [mathlib4]: /research/projects/proofedit/ya475/APE-Bench/data/code_execute/repos/mathlib4/snapshots
+2026-09-26 10:01:16 | INFO     | run:1750 - routing_mode=solo tasks=11 prs=[26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]
+2026-09-26 10:01:16 | INFO     | run:108 - Starting orchestrator pr5_val_small12_minus30714_solo_ape_rep1 | tasks=11 | mode=sample-async(concurrency=4, samples=1) | sample_count=1 | sample_max_cost=1.5 | early_stop=disabled
+2026-09-26 10:01:16 | INFO     | _prepare_jobs:257 - Shuffled 11 samples with seed=42
+2026-09-26 10:01:16 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m0/11[0m, SUCCESS:[31m0 (0.0%)[0m | [36m[TASKS][0m [1m0/11[0m, SUCCESS:[31m0/- (0.0%)[0m, PASS:[31m0/- (0.0%)[0m/[31m0/11 (0.0%)[0m | [36m[STATUS][0m Pending:[33m11[0m, Running:[33m0[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.00→$0.00[0m, Cached:[32m$0.00→$0.00[0m, ELAPSED:[33m0s[0m, ETA:[33mN/A[0m
+2026-09-26 10:01:16 | INFO     | _execute_in_main_process:321 - Running in main process with 4 coroutines
+2026-09-26 10:01:16 | INFO     | execute_sample:128 - Sample 846ccc7ed9df363f0f98db53094c52fac34bf5c9cb1006e2e260567e7497c8c7_0: starting attempt #1
+2026-09-26 10:01:16 | INFO     | execute_sample:128 - Sample af49d795f45e1aa553c140880609512f51e6cd6588a1a6209772d1f2906abc16_0: starting attempt #1
+2026-09-26 10:01:16 | INFO     | execute_sample:128 - Sample a9257cf27f192e921c401561e6092ec03c259d23b6177cf34b441b52384ef680_0: starting attempt #1
+2026-09-26 10:01:16 | INFO     | execute_sample:128 - Sample 850106ddcce54d2cdceb5702d55c4e5ec2633a5fa49baa3ca92248aeb2e06487_0: starting attempt #1
+2026-09-26 10:01:22 | INFO     | execute_sample:239 - Sample af49d795f45e1aa553c140880609512f51e6cd6588a1a6209772d1f2906abc16_0: completed with success (cost=$0.0729, tokens=39,214, turns=2)
+2026-09-26 10:01:22 | INFO     | _try_aggregate:713 - Task af49d795f45e1aa553c140880609512f51e6cd6588a1a6209772d1f2906abc16: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:01:22 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m4/11[0m, SUCCESS:[31m1 (25.0%)[0m | [36m[TASKS][0m [1m1/11[0m, SUCCESS:[32m1/1 (100.0%)[0m, PASS:[32m1/1 (100.0%)[0m/[31m1/11 (9.1%)[0m | [36m[STATUS][0m Pending:[33m7[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.07→$0.80[0m, Cached:[32m$0.06→$0.70[0m, ELAPSED:[33m6s[0m, ETA:[33m1m0s[0m
+2026-09-26 10:01:22 | INFO     | execute_sample:128 - Sample 16487a48250cf7197d775eb5fba4b0708d790635704311cac161618f3f66bf80_0: starting attempt #1
+2026-09-26 10:01:38 | INFO     | execute_sample:239 - Sample 850106ddcce54d2cdceb5702d55c4e5ec2633a5fa49baa3ca92248aeb2e06487_0: completed with success (cost=$0.0764, tokens=36,639, turns=3)
+2026-09-26 10:01:38 | INFO     | _try_aggregate:713 - Task 850106ddcce54d2cdceb5702d55c4e5ec2633a5fa49baa3ca92248aeb2e06487: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:01:38 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m5/11[0m, SUCCESS:[31m2 (40.0%)[0m | [36m[TASKS][0m [1m2/11[0m, SUCCESS:[32m2/2 (100.0%)[0m, PASS:[32m2/2 (100.0%)[0m/[31m2/11 (18.2%)[0m | [36m[STATUS][0m Pending:[33m6[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.15→$0.82[0m, Cached:[32m$0.11→$0.58[0m, ELAPSED:[33m22s[0m, ETA:[33m1m39s[0m
+2026-09-26 10:01:38 | INFO     | execute_sample:128 - Sample 5f84de308b804f29cd68771a3fa161cb8f7d54e9ee3d99c949aa3886ffdacba0_0: starting attempt #1
+2026-09-26 10:01:42 | INFO     | execute_sample:239 - Sample 846ccc7ed9df363f0f98db53094c52fac34bf5c9cb1006e2e260567e7497c8c7_0: completed with success (cost=$0.0815, tokens=38,329, turns=3)
+2026-09-26 10:01:42 | INFO     | _try_aggregate:713 - Task 846ccc7ed9df363f0f98db53094c52fac34bf5c9cb1006e2e260567e7497c8c7: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:01:42 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m6/11[0m, SUCCESS:[33m3 (50.0%)[0m | [36m[TASKS][0m [1m3/11[0m, SUCCESS:[32m3/3 (100.0%)[0m, PASS:[32m3/3 (100.0%)[0m/[31m3/11 (27.3%)[0m | [36m[STATUS][0m Pending:[33m5[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.23→$0.85[0m, Cached:[32m$0.15→$0.56[0m, ELAPSED:[33m26s[0m, ETA:[33m1m9s[0m
+2026-09-26 10:01:42 | INFO     | execute_sample:128 - Sample bbc5d86283ef0dd1e3a3c52addfc392c74a73a62d7ea7c0c417b9ae8775cc258_0: starting attempt #1
+2026-09-26 10:01:55 | INFO     | execute_sample:239 - Sample 16487a48250cf7197d775eb5fba4b0708d790635704311cac161618f3f66bf80_0: completed with success (cost=$0.1183, tokens=59,356, turns=6)
+2026-09-26 10:01:56 | INFO     | _try_aggregate:713 - Task 16487a48250cf7197d775eb5fba4b0708d790635704311cac161618f3f66bf80: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:01:56 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m7/11[0m, SUCCESS:[33m4 (57.1%)[0m | [36m[TASKS][0m [1m4/11[0m, SUCCESS:[32m4/4 (100.0%)[0m, PASS:[32m4/4 (100.0%)[0m/[31m4/11 (36.4%)[0m | [36m[STATUS][0m Pending:[33m4[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.35→$0.96[0m, Cached:[32m$0.19→$0.53[0m, ELAPSED:[33m39s[0m, ETA:[33m1m9s[0m
+2026-09-26 10:01:56 | INFO     | execute_sample:128 - Sample 88be1958958ad60652815b2ba8d01fcbfeb12419f762d23d612b53a9081c9318_0: starting attempt #1
+2026-09-26 10:02:17 | INFO     | execute_sample:239 - Sample a9257cf27f192e921c401561e6092ec03c259d23b6177cf34b441b52384ef680_0: completed with success (cost=$0.1233, tokens=59,993, turns=4)
+2026-09-26 10:02:17 | INFO     | _try_aggregate:713 - Task a9257cf27f192e921c401561e6092ec03c259d23b6177cf34b441b52384ef680: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:02:17 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m8/11[0m, SUCCESS:[33m5 (62.5%)[0m | [36m[TASKS][0m [1m5/11[0m, SUCCESS:[32m5/5 (100.0%)[0m, PASS:[32m5/5 (100.0%)[0m/[31m5/11 (45.5%)[0m | [36m[STATUS][0m Pending:[33m3[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.47→$1.04[0m, Cached:[32m$0.25→$0.55[0m, ELAPSED:[33m1m1s[0m, ETA:[33m1m13s[0m
+2026-09-26 10:02:17 | INFO     | execute_sample:128 - Sample 26c099024087174acf6843e4de4bccfe66651b9218a434310b16faad9ec64ec9_0: starting attempt #1
+2026-09-26 10:02:20 | INFO     | execute_sample:239 - Sample bbc5d86283ef0dd1e3a3c52addfc392c74a73a62d7ea7c0c417b9ae8775cc258_0: completed with success (cost=$0.1364, tokens=64,520, turns=4)
+2026-09-26 10:02:20 | INFO     | _try_aggregate:713 - Task bbc5d86283ef0dd1e3a3c52addfc392c74a73a62d7ea7c0c417b9ae8775cc258: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:02:20 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m9/11[0m, SUCCESS:[33m6 (66.7%)[0m | [36m[TASKS][0m [1m6/11[0m, SUCCESS:[32m6/6 (100.0%)[0m, PASS:[32m6/6 (100.0%)[0m/[33m6/11 (54.5%)[0m | [36m[STATUS][0m Pending:[33m2[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.61→$1.12[0m, Cached:[32m$0.32→$0.58[0m, ELAPSED:[33m1m4s[0m, ETA:[33m53s[0m
+2026-09-26 10:02:20 | INFO     | execute_sample:128 - Sample 09982d908e1df37e5861cadc2e35f652dbe1bc128ee3834070d0bc9ef673f4e1_0: starting attempt #1
+2026-09-26 10:02:21 | INFO     | execute_sample:239 - Sample 5f84de308b804f29cd68771a3fa161cb8f7d54e9ee3d99c949aa3886ffdacba0_0: completed with success (cost=$0.1234, tokens=56,531, turns=4)
+2026-09-26 10:02:21 | INFO     | _try_aggregate:713 - Task 5f84de308b804f29cd68771a3fa161cb8f7d54e9ee3d99c949aa3886ffdacba0: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:02:21 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m10/11[0m, SUCCESS:[32m7 (70.0%)[0m | [36m[TASKS][0m [1m7/11[0m, SUCCESS:[32m7/7 (100.0%)[0m, PASS:[32m7/7 (100.0%)[0m/[33m7/11 (63.6%)[0m | [36m[STATUS][0m Pending:[33m1[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.73→$1.15[0m, Cached:[32m$0.38→$0.60[0m, ELAPSED:[33m1m5s[0m, ETA:[33m37s[0m
+2026-09-26 10:02:21 | INFO     | execute_sample:128 - Sample 87248bcee711aaf066ed5cd43e4ee1467a32e63093954b77bd0139cbc0c0b09b_0: starting attempt #1
+2026-09-26 10:02:39 | INFO     | execute_sample:239 - Sample 09982d908e1df37e5861cadc2e35f652dbe1bc128ee3834070d0bc9ef673f4e1_0: completed with success (cost=$0.0701, tokens=35,356, turns=3)
+2026-09-26 10:02:39 | INFO     | _try_aggregate:713 - Task 09982d908e1df37e5861cadc2e35f652dbe1bc128ee3834070d0bc9ef673f4e1: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:02:39 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m8 (72.7%)[0m | [36m[TASKS][0m [1m8/11[0m, SUCCESS:[32m8/8 (100.0%)[0m, PASS:[32m8/8 (100.0%)[0m/[32m8/11 (72.7%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m3[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.80→$1.10[0m, Cached:[32m$0.42→$0.58[0m, ELAPSED:[33m1m22s[0m, ETA:[33m31s[0m
+2026-09-26 10:02:39 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+2026-09-26 10:02:42 | INFO     | execute_sample:239 - Sample 87248bcee711aaf066ed5cd43e4ee1467a32e63093954b77bd0139cbc0c0b09b_0: completed with success (cost=$0.0647, tokens=33,625, turns=3)
+2026-09-26 10:02:42 | INFO     | _try_aggregate:713 - Task 87248bcee711aaf066ed5cd43e4ee1467a32e63093954b77bd0139cbc0c0b09b: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:02:42 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m9 (81.8%)[0m | [36m[TASKS][0m [1m9/11[0m, SUCCESS:[32m9/9 (100.0%)[0m, PASS:[32m9/9 (100.0%)[0m/[32m9/11 (81.8%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m2[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$0.87→$1.06[0m, Cached:[32m$0.45→$0.55[0m, ELAPSED:[33m1m26s[0m, ETA:[33m19s[0m
+2026-09-26 10:02:43 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+2026-09-26 10:02:55 | INFO     | execute_sample:239 - Sample 26c099024087174acf6843e4de4bccfe66651b9218a434310b16faad9ec64ec9_0: completed with success (cost=$0.2003, tokens=104,284, turns=9)
+2026-09-26 10:02:55 | INFO     | _try_aggregate:713 - Task 26c099024087174acf6843e4de4bccfe66651b9218a434310b16faad9ec64ec9: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:02:55 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m10 (90.9%)[0m | [36m[TASKS][0m [1m10/11[0m, SUCCESS:[32m10/10 (100.0%)[0m, PASS:[32m10/10 (100.0%)[0m/[32m10/11 (90.9%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m1[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$1.07→$1.17[0m, Cached:[32m$0.51→$0.56[0m, ELAPSED:[33m1m39s[0m, ETA:[33m9s[0m
+2026-09-26 10:02:56 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+2026-09-26 10:03:05 | INFO     | execute_sample:239 - Sample 88be1958958ad60652815b2ba8d01fcbfeb12419f762d23d612b53a9081c9318_0: completed with success (cost=$0.1350, tokens=61,652, turns=4)
+2026-09-26 10:03:05 | INFO     | _try_aggregate:713 - Task 88be1958958ad60652815b2ba8d01fcbfeb12419f762d23d612b53a9081c9318: aggregated (success=True, score=1.00, samples=1/1)
+2026-09-26 10:03:05 | INFO     | print_progress:346 - [36m[sample-async(concurrency=4, samples=1)][0m [36m[SAMPLES][0m [1m11/11[0m, SUCCESS:[32m11 (100.0%)[0m | [36m[TASKS][0m [1m11/11[0m, SUCCESS:[32m11/11 (100.0%)[0m, PASS:[32m11/11 (100.0%)[0m/[32m11/11 (100.0%)[0m | [36m[STATUS][0m Pending:[33m0[0m, Running:[33m0[0m, Retryable:[33m0[0m, Resumable:[33m0[0m, Failed:[31m0[0m | [36m[COST][0m Cost:[33m$1.20→$1.20[0m, Cached:[32m$0.59→$0.59[0m, ELAPSED:[33m1m48s[0m, ETA:[33mN/A[0m
+2026-09-26 10:03:05 | DEBUG    | fetch_and_execute:309 - Worker 0: queue empty, exiting
+2026-09-26 10:03:05 | INFO     | run:336 - Worker 0: all coroutines completed
+2026-09-26 10:03:05 | INFO     | _execute_in_main_process:355 - All samples completed in main process
+2026-09-26 10:03:05 | INFO     | _aggregate_final_results:490 - Loaded 11 aggregated records (11 unique task results)
+2026-09-26 10:03:05 | INFO     | print_summary:409 - 
+[1m[36m======================================================================[0m
+[1m[36mORCHESTRATOR RESULTS SUMMARY[0m
+[1m[36m======================================================================[0m
+[1mOrchestrator ID:[0m  [34mpr5_val_small12_minus30714_solo_ape_rep1[0m
+[1mScaffold:[0m      [34mape_agent[0m
+[36m──────────────────────────────────────────────────────────────────────[0m
+[1mTasks:[0m         [32m11/11[0m ([32m100.0%[0m completed)
+[1mSuccess:[0m       [32m11/11[0m ([32m100.0%[0m of completed)
+[1mPass:[0m          [32m11/11[0m ([32m100.0%[0m of completed), [32m11/11[0m ([32m100.0%[0m of total)
+[1mAvg Score:[0m     [32m1.000[0m
+[36m──────────────────────────────────────────────────────────────────────[0m
+[1mTotal Cost:[0m    Cost: $[33m1.2023[0m, Cached: $[32m0.5908[0m
+[36m──────────────────────────────────────────────────────────────────────[0m
+[1mWall Time:[0m     [33m1m49s[0m
+[1mWorkspace:[0m     /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/.ape/runs/pr5_val_small12_minus30714_solo_ape_rep1
+[1m[36m======================================================================[0m
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 4/4 findings reached a work unit across 4 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 0/0 findings reached a work unit across 0 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 0/0 findings reached a work unit across 0 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 2/2 findings reached a work unit across 1 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 5/5 findings reached a work unit across 3 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 3/3 findings reached a work unit across 1 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 8/8 findings reached a work unit across 2 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 2/2 findings reached a work unit across 2 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 5/5 findings reached a work unit across 1 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 5/5 findings reached a work unit across 2 unit(s)
+2026-09-26 10:03:05 | INFO     | anchor_submitted_findings:574 - anchoring: 0/0 findings reached a work unit across 0 unit(s)
+2026-09-26 10:03:05 | INFO     | run:1770 - anchoring: 34/34 findings anchored (0.0% lost) across 16 work unit(s); no failures
+2026-09-26 10:03:21 | INFO     | collect_supported:232 - evidence chain: 34 candidate(s) -> packets {'contradicted': 2, 'inconclusive': 25, 'supported': 7} -> 7 supported (0 collapsed as compile cascades)
+2026-09-26 10:03:21 | INFO     | finalize:488 - finalized: 34 candidates -> 34 findings -> 34 issues (7 published)
+2026-09-26 10:03:21 | INFO     | run:1836 - run dir: results/pr_review_v5/runs/pr5_val_small12_minus30714_solo_ape_rep1
+2026-09-26 10:03:21 | INFO     | run:1837 - completion_status=complete issues=34 cost=$1.20
+results/pr_review_v5/runs/pr5_val_small12_minus30714_solo_ape_rep1
