@@ -1,0 +1,31 @@
+{"cid": "v0053", "principle_A": "Build a definition from the constructor that takes the data already at hand rather than through an intermediate isomorphism, and do not keep both.", "written": "no", "source": "", "rule": ""}
+{"cid": "v0297", "principle_A": "A relation that only serves as the `≤` instance is inlined into the instance, not given its own structure.", "written": "no", "source": "", "rule": ""}
+{"cid": "v0384", "principle_A": "Statements should elaborate without explicit `@` application.", "written": "no", "source": "", "rule": ""}
+{"cid": "v0540", "principle_A": "A constructor with many fields takes a structure of its data, so users get a skeleton from code actions.", "written": "partial", "source": "pr-review", "rule": "convenient constructors for a new type in common use cases"}
+{"cid": "v0587", "principle_A": "A Decidable instance should evaluate efficiently, not re-evaluate the predicate quadratically.", "written": "partial", "source": "values", "rule": "code performance: avoid slow elaboration"}
+{"cid": "v0622", "principle_A": "State results in simp-normal form (`1`, not `exp 0`).", "written": "yes", "source": "style", "rule": "normal forms: settle on a standard form and register simp lemmas towards it"}
+{"cid": "v0802", "principle_A": "Prefer a characterisation of `range (map f g)` over a specialised monotonicity consequence.", "written": "partial", "source": "values", "rule": "strong conclusions"}
+{"cid": "v0830", "principle_A": "Long proofs are split, with the interesting estimates as their own lemmas.", "written": "yes", "source": "pr-review", "rule": "long proofs split into supporting lemmas or definitions"}
+{"cid": "v0891", "principle_A": "State a result as an iff when the converse holds.", "written": "partial", "source": "values", "rule": "strong conclusions (the iff form is not itself stated)"}
+{"cid": "v0919", "principle_A": "Factor a reusable step into a general dot-notation lemma.", "written": "yes", "source": "pr-review", "rule": "split into supporting lemmas"}
+{"cid": "v1112", "principle_A": "Separate a construction from its application: define the general operation on generators and derive the special case.", "written": "partial", "source": "values", "rule": "general definitions"}
+{"cid": "v1149", "principle_A": "Prefer a direct computation over a bounded search when one exists.", "written": "no", "source": "", "rule": ""}
+{"cid": "v1173", "principle_A": "Provide the basic API (`const`, `congr`) from which specialised lemmas follow, and reserve the canonical names for the basic ones.", "written": "yes", "source": "pr-review / values", "rule": "new definitions come with lemmas; API for new definitions"}
+{"cid": "v1174", "principle_A": "Develop general API rather than a specialised lemma.", "written": "yes", "source": "pr-review / values", "rule": "new definitions come with lemmas; API for new definitions"}
+{"cid": "v1191", "principle_A": "State results as characterisations independent of a particular instance construction.", "written": "no", "source": "", "rule": ""}
+{"cid": "v1267", "principle_A": "Do not quantify over a universe of index types inside a class; then extensionality is a theorem, not a field.", "written": "no", "source": "", "rule": ""}
+{"cid": "v1456", "principle_A": "Formalise the recurring mathematical concept (adjacent sequences) rather than the ad hoc instance.", "written": "partial", "source": "values", "rule": "general definitions"}
+{"cid": "v1457", "principle_A": "Define the object you will reason about (the iterated sequence) directly, not only one step.", "written": "no", "source": "", "rule": ""}
+{"cid": "v1459", "principle_A": "A definition made with `choose` comes with lemmas exposing its `choose_spec` properties.", "written": "partial", "source": "style / pr-review", "rule": "results using choice become definitions; definitions come with lemmas"}
+{"cid": "v1497", "principle_A": "State the strongest natural consequence (an isomorphism) rather than partial facts.", "written": "yes", "source": "values", "rule": "strong conclusions"}
+{"cid": "v1549", "principle_A": "State lemmas with expanded functions rather than compositions.", "written": "no", "source": "", "rule": ""}
+{"cid": "v1592", "principle_A": "Introduce a definition at its most general level, with API, or leave a TODO.", "written": "partial", "source": "values", "rule": "general definitions; API for new definitions"}
+{"cid": "v1645", "principle_A": "Provide the universe-polymorphic `OfSize` form of a preservation instance.", "written": "partial", "source": "library note", "rule": "category theory universes"}
+{"cid": "v1907", "principle_A": "Express a property of objects as an `ObjectProperty` and state conditions with `IsIso`, not bespoke structures.", "written": "no", "source": "", "rule": ""}
+{"cid": "v1992", "principle_A": "Extract an inline construction into an auxiliary definition.", "written": "yes", "source": "pr-review", "rule": "split into supporting lemmas or definitions"}
+{"cid": "v1998", "principle_A": "Define the general functorial object (iteration as a functor) instead of ad hoc recursive definitions.", "written": "partial", "source": "values", "rule": "general definitions"}
+{"cid": "v2037", "principle_A": "When a structure extends another, define the extended one directly rather than in two stages.", "written": "no", "source": "", "rule": ""}
+{"cid": "v2066", "principle_A": "A fact used inside a proof is its own lemma.", "written": "yes", "source": "pr-review", "rule": "split into supporting lemmas"}
+{"cid": "v2112", "principle_A": "Give a default instance by its canonical construction, not through a general helper.", "written": "no", "source": "", "rule": ""}
+{"cid": "v2117", "principle_A": "State a result as an iff when the converse holds.", "written": "partial", "source": "values", "rule": "strong conclusions (the iff form is not itself stated)"}
+{"cid": "v2263", "principle_A": "Generalise the core of a proof to a lemma about the underlying general construction.", "written": "partial", "source": "pr-review / values", "rule": "a different proof structure using existing lemmas; generality"}

@@ -1,0 +1,571 @@
+[
+ {
+  "cid": "v0157",
+  "findable_by": "name",
+  "analogue": "the `QuotSMulTop` synonym",
+  "query_decls": [
+   "subsingleton_of_subsingleton_quotSMulTop"
+  ],
+  "target_in_index": true,
+  "rank": 19,
+  "top3": [
+   "supportDim_quotSMulTop_succ_le_of_notMem_minimalPrimes",
+   "supportDim_quotSMulTop_succ_eq_of_notMem_minimalPrimes_of_mem_maximalIdeal",
+   "supportDim_quotSMulTop_succ_eq_of_notMem_minimalPrimes_of_mem_jacobson"
+  ]
+ },
+ {
+  "cid": "v0324",
+  "findable_by": "name",
+  "analogue": "`TotalSpace.mk'`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0325",
+  "findable_by": "name",
+  "analogue": "`TotalSpace.mk'`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0326",
+  "findable_by": "name",
+  "analogue": "`TotalSpace.mk'`",
+  "query_decls": [
+   "exists_contMDiffOn_section_forall_mem_convex_of_local"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "exists_contMDiffSection_forall_mem_convex_of_local",
+   "exists_contMDiffMap_forall_mem_convex_of_local_const",
+   "exists_contMDiffMap_forall_mem_convex_of_local"
+  ]
+ },
+ {
+  "cid": "v0330",
+  "findable_by": "name",
+  "analogue": "`TotalSpace.mk'`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0333",
+  "findable_by": "name",
+  "analogue": "`TotalSpace.mk'`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0575",
+  "findable_by": "role",
+  "analogue": "the `MulAction.orbit` API",
+  "query_decls": [
+   "orbit"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "val_preimage_orbit",
+   "val_image_orbit",
+   "univ_eq_iUnion_orbit"
+  ]
+ },
+ {
+  "cid": "v0849",
+  "findable_by": "api_shape",
+  "analogue": "`ObjectProperty.ofObj`",
+  "query_decls": [
+   "isStrongGenerator"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "isStrongGenerator_of_isDense",
+   "isStrongGenerator_iff_exists_extremalEpi",
+   "isStrongGenerator_iff"
+  ]
+ },
+ {
+  "cid": "v1047",
+  "findable_by": "pr_internal",
+  "analogue": "the pre-PR statements",
+  "query_decls": [],
+  "target_in_index": false,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v1097",
+  "findable_by": "api_shape",
+  "analogue": "`Function.LeftInverse`/`RightInverse`",
+  "query_decls": [
+   "pthRootMonoidHom_powMonoidHom",
+   "powMonoidHom_pthRootMonoidHom"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "pthRoot_frobenius",
+   "pthRoot",
+   "frobenius_pthRoot"
+  ]
+ },
+ {
+  "cid": "v1308",
+  "findable_by": "name",
+  "analogue": "`SimpleGraph.IsBipartite`",
+  "query_decls": [
+   "IsTree.coloring_two",
+   "IsTree.colorable_two"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "IsTree.coloringTwoOfVert",
+   "IsTree.coloringTwo",
+   "colorable_iff_exists_bdd_nat_coloring"
+  ]
+ },
+ {
+  "cid": "v1400",
+  "findable_by": "api_shape",
+  "analogue": "`Finsupp.prod`",
+  "query_decls": [
+   "zero",
+   "convergenceSet"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "tendsto_setToFun_of_dominated_convergence",
+   "tendsto_setToFun_filter_of_dominated_convergence",
+   "convergenceSet_BddAbove"
+  ]
+ },
+ {
+  "cid": "v1502",
+  "findable_by": "api_shape",
+  "analogue": "`IsBot`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v1547",
+  "findable_by": "api_shape",
+  "analogue": "`Pi.single`",
+  "query_decls": [
+   "fourierCoeffOn_cexp"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "tsum_sq_fourierCoeffOn",
+   "hasSum_sq_fourierCoeffOn",
+   "fourierCoeffOn_of_hasDeriv_right"
+  ]
+ },
+ {
+  "cid": "v1597",
+  "findable_by": "role",
+  "analogue": "`ArithmeticFunction.IsMultiplicative`",
+  "query_decls": [
+   "unitaryDivisorSum_mul"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "CStarAlgebra.exists_sum_four_unitary",
+   "eq_unit_mul_divisor",
+   "divisor_mul"
+  ]
+ },
+ {
+  "cid": "v1795",
+  "findable_by": "api_shape",
+  "analogue": "`FunLike`",
+  "query_decls": [
+   "ext"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "zero_morphism_ext'",
+   "zero_morphism_ext",
+   "yonedaPairingExt"
+  ]
+ },
+ {
+  "cid": "v1946",
+  "findable_by": "role",
+  "analogue": "`edist` / `EMetricSpace`",
+  "query_decls": [
+   "absDiff"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "contDiffWithinAt_abs",
+   "contDiffOn_abs",
+   "contDiffAt_abs"
+  ]
+ },
+ {
+  "cid": "v2022",
+  "findable_by": "api_shape",
+  "analogue": "`Subgroup.FiniteIndex`",
+  "query_decls": [
+   "index_ne_zero_of_range_powMonoidHom_le"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "IsCyclic.index_powMonoidHom_range",
+   "pow_mem_of_relIndex_ne_zero_of_dvd",
+   "pow_mem_of_index_ne_zero_of_dvd"
+  ]
+ },
+ {
+  "cid": "v2035",
+  "findable_by": "neighbourhood",
+  "analogue": "the `𝒮ℒ` notation",
+  "query_decls": [
+   "discriminantSIF"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "isBoundedAtImInfty_eisensteinSeries_SIF",
+   "eisensteinSeries_SIF_apply",
+   "eisensteinSeries_SIF_MDifferentiable"
+  ]
+ },
+ {
+  "cid": "v2098",
+  "findable_by": "name",
+  "analogue": "`LinearMap.aeval_self_charpoly`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v2163",
+  "findable_by": "api_shape",
+  "analogue": "`Submodule.IsPrincipal`",
+  "query_decls": [
+   "iff_height_one_prime_principal"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "finprod_heightOneSpectrum_factorization_principal_fraction",
+   "finprod_heightOneSpectrum_factorization_principal",
+   "IsPrincipalIdealRing.height_eq_one_of_isMaximal"
+  ]
+ },
+ {
+  "cid": "v2244",
+  "findable_by": "role",
+  "analogue": "`Module.Invertible`",
+  "query_decls": [
+   "Module.free_of_isStablyFree_of_localized_eq_ring"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "isStablyFiniteRing_iff_isDedekindFiniteMonoid_moduleEnd",
+   "Module.lift_rank_of_isLocalizedModule_of_free",
+   "Module.free_of_isLocalizedModule"
+  ]
+ },
+ {
+  "cid": "v0117",
+  "findable_by": "role",
+  "analogue": "`IsIdempotentElem.add_sub_mul_of_commute`",
+  "query_decls": [
+   "IsStarProjection.add"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "starProjection_add_starProjection_orthogonal",
+   "norm_sq_eq_add_norm_sq_starProjection",
+   "toLinearMap_starProjection_eq_isComplProjection"
+  ]
+ },
+ {
+  "cid": "v0145",
+  "findable_by": "api_shape",
+  "analogue": "the `IsPullback` form",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0168",
+  "findable_by": "pr_internal",
+  "analogue": "`sum_sq_norm_inner` (the sibling above)",
+  "query_decls": [
+   "sum_sq_inner_right",
+   "sum_sq_inner_left"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "sum_sq_norm_inner_right",
+   "sum_sq_inner_right",
+   "sum_sq_norm_inner_left"
+  ]
+ },
+ {
+  "cid": "v0200",
+  "findable_by": "api_shape",
+  "analogue": "a `toFinset` counterpart",
+  "query_decls": [
+   "coe_rootsOfUnity_to_nthRootsFinset"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "rootsOfUnityEquivNthRoots_symm_apply",
+   "rootsOfUnityEquivNthRoots_apply",
+   "rootsOfUnityEquivNthRoots"
+  ]
+ },
+ {
+  "cid": "v0367",
+  "findable_by": "api_shape",
+  "analogue": "a `Set.EqOn` variant",
+  "query_decls": [
+   "ContinousWithinAt.eq_const_of_mem_closure"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "ContinuousWithinAt.eq_const_of_mem_closure",
+   "ContinuousWithinAt.eqOn_const_closure",
+   "continuousWithinAt_right_of_monotoneOn_of_closure_image_mem_nhdsWithin"
+  ]
+ },
+ {
+  "cid": "v0438",
+  "findable_by": "pr_internal",
+  "analogue": "the `lt` twin and the four siblings",
+  "query_decls": [
+   "lineMap_le_lineMap_iff_of_lt'"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "lineMap_le_lineMap_iff_of_lt'",
+   "lineMap_le_lineMap_iff_of_lt",
+   "lineMap_lt_lineMap_iff_of_lt'"
+  ]
+ },
+ {
+  "cid": "v0449",
+  "findable_by": "name",
+  "analogue": "`Function.Injective.isLeftCancelMulZero`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0507",
+  "findable_by": "api_shape",
+  "analogue": "the order duals",
+  "query_decls": [],
+  "target_in_index": false,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v0785",
+  "findable_by": "pr_internal",
+  "analogue": "`coeAddEquiv`",
+  "query_decls": [
+   "coeAddMonoidHom_injective",
+   "mk_left_surjective"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "coe_toAddMonoidHom_injective",
+   "coe_addMonoidHom_injective",
+   "coeFnAddMonoidHom_injective"
+  ]
+ },
+ {
+  "cid": "v1069",
+  "findable_by": "api_shape",
+  "analogue": "`untop₀_inv`, the multiplicative twin",
+  "query_decls": [
+   "untop₀_neg"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "untop₀_neg",
+   "untop₀_zero",
+   "untop₀_top"
+  ]
+ },
+ {
+  "cid": "v1132",
+  "findable_by": "pr_internal",
+  "analogue": "the two near-identical instance proofs",
+  "query_decls": [],
+  "target_in_index": false,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v1186",
+  "findable_by": "pr_internal",
+  "analogue": "the symmetric rewriting direction",
+  "query_decls": [
+   "convexCombo_assoc_coeff₂",
+   "convexCombo_assoc"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "convexCombo_assoc_coeff₂'",
+   "convexCombo_assoc_coeff₂",
+   "convexCombo_assoc_coeff₁'"
+  ]
+ },
+ {
+  "cid": "v1256",
+  "findable_by": "api_shape",
+  "analogue": "the additive-hom lemma family (`app_zero`, `app_sub`)",
+  "query_decls": [
+   "app_add"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "zero_add_inv_app",
+   "shift_shiftFunctorCompIsoId_neg_add_cancel_inv_app",
+   "shift_shiftFunctorCompIsoId_neg_add_cancel_hom_app"
+  ]
+ },
+ {
+  "cid": "v1280",
+  "findable_by": "pr_internal",
+  "analogue": "the other-side equivalence",
+  "query_decls": [
+   "rightShiftAddEquiv",
+   "equivHomShift"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "rightShiftAddEquiv",
+   "AddMonoidHom.toMultiplicativeRightAddEquiv",
+   "shift_opShiftFunctorEquivalenceSymmHomEquiv_unop"
+  ]
+ },
+ {
+  "cid": "v1442",
+  "findable_by": "pr_internal",
+  "analogue": "the sibling instance that got the same comment",
+  "query_decls": [],
+  "target_in_index": false,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v1562",
+  "findable_by": "name",
+  "analogue": "`prodMap_comap_prod`",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v1585",
+  "findable_by": "api_shape",
+  "analogue": "the `bot`/`top` lemmas",
+  "query_decls": [],
+  "target_in_index": true,
+  "rank": null,
+  "top3": []
+ },
+ {
+  "cid": "v1655",
+  "findable_by": "pr_internal",
+  "analogue": "`sigNeg := sigPos (-Q)`",
+  "query_decls": [
+   "sigPos_isGreatest",
+   "sigNeg"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "greatestFib_pos",
+   "findGreatest_pos",
+   "log_pos_of_isRat_neg"
+  ]
+ },
+ {
+  "cid": "v1682",
+  "findable_by": "api_shape",
+  "analogue": "the non-`Within` twins",
+  "query_decls": [
+   "_root_.meromorphicOn_congr_codiscreteWithin"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "MeromorphicOn.meromorphicNFAt_mem_codiscreteWithin",
+   "divisor_congr_codiscreteWithin_of_eqOn_compl",
+   "congr_codiscreteWithin_of_eqOn_compl"
+  ]
+ },
+ {
+  "cid": "v2006",
+  "findable_by": "role",
+  "analogue": "`IsCompact`/`IsLindelof` (filter form)",
+  "query_decls": [
+   "IsCountablyCompact"
+  ],
+  "target_in_index": true,
+  "rank": null,
+  "top3": [
+   "prod.isCountablyGenerated",
+   "pi.isCountablyGenerated",
+   "map.isCountablyGenerated"
+  ]
+ },
+ {
+  "cid": "v2104",
+  "findable_by": "api_shape",
+  "analogue": "the dual adjunction statement",
+  "query_decls": [
+   "bijective_map_comp_iff"
+  ],
+  "target_in_index": false,
+  "rank": null,
+  "top3": [
+   "bijective_lift_piRingHom_algebraMap_comp_piEvalRingHom",
+   "bijective_comp_algebraMap",
+   "LinearMap.linearProjOfIsCompl_comp_bijective_of_exact"
+  ]
+ }
+]

@@ -1,0 +1,667 @@
+[
+ {
+  "cid": "v0053",
+  "reference": "variant",
+  "pr": 25755,
+  "path": "Mathlib/CategoryTheory/Monoidal/DayConvolution.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0058",
+  "reference": "mechanism",
+  "pr": 25768,
+  "path": "Mathlib/Analysis/Calculus/AddTorsor/AffineMap.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0117",
+  "reference": "siblings",
+  "pr": 26052,
+  "path": "Mathlib/Algebra/Star/StarProjection.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0145",
+  "reference": "siblings",
+  "pr": 26186,
+  "path": "Mathlib/CategoryTheory/Limits/VanKampen.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0157",
+  "reference": "library",
+  "pr": 26219,
+  "path": "Mathlib/RingTheory/Nakayama.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0168",
+  "reference": "siblings",
+  "pr": 26276,
+  "path": "Mathlib/Analysis/InnerProductSpace/PiL2.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0200",
+  "reference": "siblings",
+  "pr": 26350,
+  "path": "Mathlib/RingTheory/RootsOfUnity/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0297",
+  "reference": "variant",
+  "pr": 26770,
+  "path": "Mathlib/Combinatorics/Graph/Subgraph.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0309",
+  "reference": "process",
+  "pr": 26811,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v0324",
+  "reference": "library",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0325",
+  "reference": "library",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0326",
+  "reference": "library",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0330",
+  "reference": "library",
+  "pr": 26875,
+  "path": "Mathlib/Geometry/Manifold/PartitionOfUnity.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0333",
+  "reference": "library",
+  "pr": 26875,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v0367",
+  "reference": "siblings",
+  "pr": 26995,
+  "path": "Mathlib/Topology/Separation/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0384",
+  "reference": "variant",
+  "pr": 27099,
+  "path": "Mathlib/ModelTheory/Arithmetic/Presburger/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0438",
+  "reference": "siblings",
+  "pr": 27257,
+  "path": "Mathlib/LinearAlgebra/AffineSpace/Ordered.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0449",
+  "reference": "siblings",
+  "pr": 27318,
+  "path": "Mathlib/Algebra/Group/Hom/Instances.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0496",
+  "reference": "norms",
+  "pr": 27636,
+  "path": "Mathlib/Algebra/Polynomial/Bivariate.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0497",
+  "reference": "norms",
+  "pr": 27636,
+  "path": "Mathlib/Algebra/Polynomial/Bivariate.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0507",
+  "reference": "siblings",
+  "pr": 27703,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v0540",
+  "reference": "variant",
+  "pr": 27849,
+  "path": "Mathlib/CategoryTheory/Bicategory/Functor/StrictlyUnitary.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0575",
+  "reference": "library",
+  "pr": 28000,
+  "path": "Mathlib/Dynamics/Flow.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0587",
+  "reference": "variant",
+  "pr": 28105,
+  "path": "Mathlib/Logic/ExistsUnique.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0622",
+  "reference": "variant",
+  "pr": 28283,
+  "path": "Mathlib/NumberTheory/FunctionField.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0785",
+  "reference": "siblings",
+  "pr": 29275,
+  "path": "Mathlib/GroupTheory/DivisibleHull.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0802",
+  "reference": "variant",
+  "pr": 29343,
+  "path": "Mathlib/LinearAlgebra/TensorProduct/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0830",
+  "reference": "variant",
+  "pr": 29507,
+  "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/DerivIntegrable.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0849",
+  "reference": "library",
+  "pr": 29543,
+  "path": "Mathlib/CategoryTheory/Presentable/CardinalFilteredPresentation.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0879",
+  "reference": "norms",
+  "pr": 29734,
+  "path": "Mathlib/Probability/Kernel/Irreducible.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0891",
+  "reference": "variant",
+  "pr": 29857,
+  "path": "Mathlib/Topology/Algebra/InfiniteSum/Ring.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0914",
+  "reference": "norms",
+  "pr": 29955,
+  "path": "Mathlib/Data/Set/Subsingleton.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0916",
+  "reference": "norms",
+  "pr": 29976,
+  "path": "Mathlib/Topology/Semicontinuous.lean",
+  "ai": false
+ },
+ {
+  "cid": "v0919",
+  "reference": "variant",
+  "pr": 29976,
+  "path": "Mathlib/Topology/Semicontinuous.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1001",
+  "reference": "intent",
+  "pr": 30349,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v1037",
+  "reference": "norms",
+  "pr": 30542,
+  "path": "Mathlib/Data/Sym/Sym2.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1047",
+  "reference": "library",
+  "pr": 30594,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v1069",
+  "reference": "siblings",
+  "pr": 30774,
+  "path": "Mathlib/Algebra/Order/WithTop/Untop0.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1097",
+  "reference": "library",
+  "pr": 31007,
+  "path": "Mathlib/RingTheory/Perfection.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1112",
+  "reference": "variant",
+  "pr": 31081,
+  "path": "Mathlib/RingTheory/Extension/Cotangent/Free.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1132",
+  "reference": "siblings",
+  "pr": 31187,
+  "path": "Mathlib/NumberTheory/ModularForms/ArithmeticSubgroups.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1149",
+  "reference": "variant",
+  "pr": 31362,
+  "path": "Mathlib/Combinatorics/Enumerative/PentagonalNumbers.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1173",
+  "reference": "variant",
+  "pr": 31451,
+  "path": "Mathlib/Analysis/Convex/Combination.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1174",
+  "reference": "variant",
+  "pr": 31451,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v1186",
+  "reference": "siblings",
+  "pr": 31525,
+  "path": "Mathlib/Topology/UnitInterval.lean",
+  "ai": true
+ },
+ {
+  "cid": "v1191",
+  "reference": "variant",
+  "pr": 31555,
+  "path": "Mathlib/Topology/MetricSpace/Pseudo/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1256",
+  "reference": "siblings",
+  "pr": 31968,
+  "path": "Mathlib/CategoryTheory/Center/Preadditive.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1267",
+  "reference": "variant",
+  "pr": 31984,
+  "path": "Mathlib/LinearAlgebra/ConvexSpace.lean",
+  "ai": true
+ },
+ {
+  "cid": "v1279",
+  "reference": "module_graph",
+  "pr": 32064,
+  "path": "Mathlib/RingTheory/Smooth/Flat.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1280",
+  "reference": "siblings",
+  "pr": 32093,
+  "path": "Mathlib/Algebra/Homology/HomotopyCategory/HomComplexShift.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1308",
+  "reference": "library",
+  "pr": 32185,
+  "path": "Mathlib/Combinatorics/SimpleGraph/Acyclic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1400",
+  "reference": "library",
+  "pr": 32692,
+  "path": "Mathlib/RingTheory/MvPowerSeries/Restricted.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1441",
+  "reference": "norms",
+  "pr": 32841,
+  "path": "Mathlib/Analysis/Normed/Group/Seminorm.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1442",
+  "reference": "siblings",
+  "pr": 32841,
+  "path": "Mathlib/Analysis/Normed/Group/Seminorm.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1456",
+  "reference": "variant",
+  "pr": 32892,
+  "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1457",
+  "reference": "variant",
+  "pr": 32892,
+  "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1459",
+  "reference": "variant",
+  "pr": 32892,
+  "path": "Mathlib/Analysis/SpecialFunctions/AGM.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1481",
+  "reference": "norms",
+  "pr": 32942,
+  "path": "Mathlib/CategoryTheory/Monoidal/Rigid/Basic.lean",
+  "ai": true
+ },
+ {
+  "cid": "v1497",
+  "reference": "variant",
+  "pr": 33007,
+  "path": "Mathlib/Algebra/Order/Ring/StandardPart.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1502",
+  "reference": "library",
+  "pr": 33036,
+  "path": "Mathlib/Order/Hom/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1536",
+  "reference": "intent",
+  "pr": 33364,
+  "path": "Mathlib/Analysis/Convex/SimplicialComplex/Basic.lean",
+  "ai": true
+ },
+ {
+  "cid": "v1547",
+  "reference": "library",
+  "pr": 33507,
+  "path": "Mathlib/Analysis/Polynomial/Fourier.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1549",
+  "reference": "variant",
+  "pr": 33507,
+  "path": "Mathlib/Analysis/Polynomial/Fourier.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1562",
+  "reference": "siblings",
+  "pr": 33585,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v1585",
+  "reference": "siblings",
+  "pr": 33761,
+  "path": null,
+  "ai": false
+ },
+ {
+  "cid": "v1592",
+  "reference": "variant",
+  "pr": 33812,
+  "path": "Mathlib/Data/Finset/Prod.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1597",
+  "reference": "library",
+  "pr": 33838,
+  "path": "Mathlib/NumberTheory/UnitaryDivisor.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1645",
+  "reference": "variant",
+  "pr": 34145,
+  "path": "Mathlib/CategoryTheory/Sites/Subcanonical.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1655",
+  "reference": "siblings",
+  "pr": 34204,
+  "path": "Mathlib/LinearAlgebra/QuadraticForm/Signature.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1682",
+  "reference": "siblings",
+  "pr": 34302,
+  "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1795",
+  "reference": "library",
+  "pr": 34861,
+  "path": "Mathlib/Analysis/ODE/PicardLindelof.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1872",
+  "reference": "norms",
+  "pr": 35399,
+  "path": "Mathlib/Analysis/Complex/Poisson.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1907",
+  "reference": "variant",
+  "pr": 35586,
+  "path": "Mathlib/CategoryTheory/Abelian/Preradical/Radical.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1922",
+  "reference": "norms",
+  "pr": 35661,
+  "path": "Mathlib/Geometry/Manifold/Sheaf/LocallyRingedSpace.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1946",
+  "reference": "library",
+  "pr": 35826,
+  "path": "Mathlib/Data/ENNReal/AbsDiff.lean",
+  "ai": true
+ },
+ {
+  "cid": "v1992",
+  "reference": "variant",
+  "pr": 36092,
+  "path": "Mathlib/CategoryTheory/Monoidal/Cartesian/Grp_.lean",
+  "ai": false
+ },
+ {
+  "cid": "v1998",
+  "reference": "variant",
+  "pr": 36104,
+  "path": "Mathlib/CategoryTheory/Endofunctor/Algebra/InitialChain.lean",
+  "ai": true
+ },
+ {
+  "cid": "v2006",
+  "reference": "siblings",
+  "pr": 36174,
+  "path": "Mathlib/Topology/Compactness/CountablyCompact.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2022",
+  "reference": "library",
+  "pr": 36227,
+  "path": "Mathlib/GroupTheory/FiniteAbelian/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2035",
+  "reference": "library",
+  "pr": 36262,
+  "path": "Mathlib/NumberTheory/ModularForms/Discriminant.lean",
+  "ai": true
+ },
+ {
+  "cid": "v2037",
+  "reference": "variant",
+  "pr": 36262,
+  "path": "Mathlib/NumberTheory/ModularForms/Discriminant.lean",
+  "ai": true
+ },
+ {
+  "cid": "v2046",
+  "reference": "mechanism",
+  "pr": 36268,
+  "path": "Mathlib/Order/Hom/Set.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2050",
+  "reference": "mechanism",
+  "pr": 36275,
+  "path": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2051",
+  "reference": "mechanism",
+  "pr": 36275,
+  "path": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2052",
+  "reference": "norms",
+  "pr": 36275,
+  "path": "Mathlib/NumberTheory/NumberField/FiniteAdeleRing.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2066",
+  "reference": "variant",
+  "pr": 36277,
+  "path": "Mathlib/Geometry/Manifold/VectorBundle/Tensoriality.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2079",
+  "reference": "norms",
+  "pr": 36339,
+  "path": "Mathlib/CategoryTheory/Comma/Over/StrictInitial.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2098",
+  "reference": "library",
+  "pr": 36421,
+  "path": "Mathlib/FieldTheory/Minpoly/Basic.lean",
+  "ai": true
+ },
+ {
+  "cid": "v2104",
+  "reference": "siblings",
+  "pr": 36459,
+  "path": "Mathlib/CategoryTheory/Adjunction/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2112",
+  "reference": "variant",
+  "pr": 36574,
+  "path": "Mathlib/Order/Partition/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2117",
+  "reference": "variant",
+  "pr": 36574,
+  "path": "Mathlib/Order/Partition/Basic.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2163",
+  "reference": "library",
+  "pr": 36781,
+  "path": "Mathlib/RingTheory/UniqueFactorizationDomain/Kaplansky.lean",
+  "ai": true
+ },
+ {
+  "cid": "v2243",
+  "reference": "module_graph",
+  "pr": 37216,
+  "path": "Mathlib/Algebra/Module/StablyFree/FreeOfLocalizedEq.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2244",
+  "reference": "library",
+  "pr": 37216,
+  "path": "Mathlib/Algebra/Module/StablyFree/FreeOfLocalizedEq.lean",
+  "ai": false
+ },
+ {
+  "cid": "v2263",
+  "reference": "variant",
+  "pr": 37376,
+  "path": "Mathlib/Topology/CantorBendixson.lean",
+  "ai": true
+ }
+]

@@ -1,0 +1,74 @@
+{"cid": "v0053", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Build a definition from the constructor that takes the data already at hand rather than through an intermediate isomorphism, and do not keep both."}
+{"cid": "v0297", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "A relation that only serves as the `≤` instance is inlined into the instance, not given its own structure."}
+{"cid": "v0384", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Statements should elaborate without explicit `@` application."}
+{"cid": "v0540", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "A constructor with many fields takes a structure of its data, so users get a skeleton from code actions."}
+{"cid": "v0587", "group": "A", "principle_stated": "implicit", "principle_source": "tacit", "principle": "A Decidable instance should evaluate efficiently, not re-evaluate the predicate quadratically."}
+{"cid": "v0622", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "State results in simp-normal form (`1`, not `exp 0`)."}
+{"cid": "v0802", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Prefer a characterisation of `range (map f g)` over a specialised monotonicity consequence."}
+{"cid": "v0830", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Long proofs are split, with the interesting estimates as their own lemmas."}
+{"cid": "v0891", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "State a result as an iff when the converse holds."}
+{"cid": "v0919", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Factor a reusable step into a general dot-notation lemma."}
+{"cid": "v1112", "group": "A", "principle_stated": "explicit", "principle_source": "mathematical", "principle": "Separate a construction from its application: define the general operation on generators and derive the special case."}
+{"cid": "v1149", "group": "A", "principle_stated": "implicit", "principle_source": "mathematical", "principle": "Prefer a direct computation over a bounded search when one exists."}
+{"cid": "v1173", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Provide the basic API (`const`, `congr`) from which specialised lemmas follow, and reserve the canonical names for the basic ones."}
+{"cid": "v1174", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Develop general API rather than a specialised lemma."}
+{"cid": "v1191", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "State results as characterisations independent of a particular instance construction."}
+{"cid": "v1267", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Do not quantify over a universe of index types inside a class; then extensionality is a theorem, not a field."}
+{"cid": "v1456", "group": "A", "principle_stated": "explicit", "principle_source": "mathematical", "principle": "Formalise the recurring mathematical concept (adjacent sequences) rather than the ad hoc instance."}
+{"cid": "v1457", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Define the object you will reason about (the iterated sequence) directly, not only one step."}
+{"cid": "v1459", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "A definition made with `choose` comes with lemmas exposing its `choose_spec` properties."}
+{"cid": "v1497", "group": "A", "principle_stated": "implicit", "principle_source": "mathematical", "principle": "State the strongest natural consequence (an isomorphism) rather than partial facts."}
+{"cid": "v1549", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "State lemmas with expanded functions rather than compositions."}
+{"cid": "v1592", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Introduce a definition at its most general level, with API, or leave a TODO."}
+{"cid": "v1645", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Provide the universe-polymorphic `OfSize` form of a preservation instance."}
+{"cid": "v1907", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Express a property of objects as an `ObjectProperty` and state conditions with `IsIso`, not bespoke structures."}
+{"cid": "v1992", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Extract an inline construction into an auxiliary definition."}
+{"cid": "v1998", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Define the general functorial object (iteration as a functor) instead of ad hoc recursive definitions."}
+{"cid": "v2037", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "When a structure extends another, define the extended one directly rather than in two stages."}
+{"cid": "v2066", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "A fact used inside a proof is its own lemma."}
+{"cid": "v2112", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "Give a default instance by its canonical construction, not through a general helper."}
+{"cid": "v2117", "group": "A", "principle_stated": "implicit", "principle_source": "library_practice", "principle": "State a result as an iff when the converse holds."}
+{"cid": "v2263", "group": "A", "principle_stated": "explicit", "principle_source": "library_practice", "principle": "Generalise the core of a proof to a lemma about the underlying general construction."}
+{"cid": "v0157", "group": "B", "analogue_named": "yes", "analogue": "the `QuotSMulTop` synonym", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0324", "group": "B", "analogue_named": "yes", "analogue": "`TotalSpace.mk'`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0325", "group": "B", "analogue_named": "yes", "analogue": "`TotalSpace.mk'`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0326", "group": "B", "analogue_named": "yes", "analogue": "`TotalSpace.mk'`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0330", "group": "B", "analogue_named": "yes", "analogue": "`TotalSpace.mk'`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0333", "group": "B", "analogue_named": "yes", "analogue": "`TotalSpace.mk'`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0575", "group": "B", "analogue_named": "yes", "analogue": "the `MulAction.orbit` API", "findable_by": "role", "wrong_analogue_plausible": "no", "note": "also by name: `orbit`"}
+{"cid": "v0849", "group": "B", "analogue_named": "yes", "analogue": "`ObjectProperty.ofObj`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1047", "group": "B", "analogue_named": "implied", "analogue": "the pre-PR statements", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1097", "group": "B", "analogue_named": "yes", "analogue": "`Function.LeftInverse`/`RightInverse`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1308", "group": "B", "analogue_named": "yes", "analogue": "`SimpleGraph.IsBipartite`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1400", "group": "B", "analogue_named": "implied", "analogue": "`Finsupp.prod`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1502", "group": "B", "analogue_named": "yes", "analogue": "`IsBot`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1547", "group": "B", "analogue_named": "yes", "analogue": "`Pi.single`", "findable_by": "api_shape", "wrong_analogue_plausible": "yes", "note": "decoy `Finsupp.single`/`Set.indicator` for the same `if n = k then 1 else 0` shape"}
+{"cid": "v1597", "group": "B", "analogue_named": "yes", "analogue": "`ArithmeticFunction.IsMultiplicative`", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1795", "group": "B", "analogue_named": "yes", "analogue": "`FunLike`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1946", "group": "B", "analogue_named": "yes", "analogue": "`edist` / `EMetricSpace`", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v2022", "group": "B", "analogue_named": "yes", "analogue": "`Subgroup.FiniteIndex`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v2035", "group": "B", "analogue_named": "yes", "analogue": "the `𝒮ℒ` notation", "findable_by": "neighbourhood", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v2098", "group": "B", "analogue_named": "yes", "analogue": "`LinearMap.aeval_self_charpoly`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v2163", "group": "B", "analogue_named": "yes", "analogue": "`Submodule.IsPrincipal`", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v2244", "group": "B", "analogue_named": "yes", "analogue": "`Module.Invertible`", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0117", "group": "B", "analogue_named": "yes", "analogue": "`IsIdempotentElem.add_sub_mul_of_commute`", "findable_by": "role", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0145", "group": "B", "analogue_named": "implied", "analogue": "the `IsPullback` form", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0168", "group": "B", "analogue_named": "yes", "analogue": "`sum_sq_norm_inner` (the sibling above)", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0200", "group": "B", "analogue_named": "implied", "analogue": "a `toFinset` counterpart", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0367", "group": "B", "analogue_named": "implied", "analogue": "a `Set.EqOn` variant", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0438", "group": "B", "analogue_named": "yes", "analogue": "the `lt` twin and the four siblings", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0449", "group": "B", "analogue_named": "yes", "analogue": "`Function.Injective.isLeftCancelMulZero`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0507", "group": "B", "analogue_named": "implied", "analogue": "the order duals", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v0785", "group": "B", "analogue_named": "yes", "analogue": "`coeAddEquiv`", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1069", "group": "B", "analogue_named": "implied", "analogue": "`untop₀_inv`, the multiplicative twin", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1132", "group": "B", "analogue_named": "implied", "analogue": "the two near-identical instance proofs", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1186", "group": "B", "analogue_named": "implied", "analogue": "the symmetric rewriting direction", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1256", "group": "B", "analogue_named": "implied", "analogue": "the additive-hom lemma family (`app_zero`, `app_sub`)", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1280", "group": "B", "analogue_named": "implied", "analogue": "the other-side equivalence", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1442", "group": "B", "analogue_named": "implied", "analogue": "the sibling instance that got the same comment", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1562", "group": "B", "analogue_named": "yes", "analogue": "`prodMap_comap_prod`", "findable_by": "name", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1585", "group": "B", "analogue_named": "implied", "analogue": "the `bot`/`top` lemmas", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1655", "group": "B", "analogue_named": "implied", "analogue": "`sigNeg := sigPos (-Q)`", "findable_by": "pr_internal", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v1682", "group": "B", "analogue_named": "implied", "analogue": "the non-`Within` twins", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
+{"cid": "v2006", "group": "B", "analogue_named": "yes", "analogue": "`IsCompact`/`IsLindelof` (filter form)", "findable_by": "role", "wrong_analogue_plausible": "yes", "note": "decoy `IsSeqCompact`, whose sequential definition matches the PR's form"}
+{"cid": "v2104", "group": "B", "analogue_named": "implied", "analogue": "the dual adjunction statement", "findable_by": "api_shape", "wrong_analogue_plausible": "no", "note": ""}
