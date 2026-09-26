@@ -1,0 +1,31 @@
+# The solo (whole-PR, single-agent) baseline on the VALIDATION small12 set, condition B's
+# harness (`ape_agent`), cost-matched to the lead as bases/v5_solo.yaml explains.
+#
+# Written 2026-09-26 to read the solo reviewer on the same 11 PRs, asks and matchers as
+# pr5_val_small12_minus30714_lead_rep1 (results/pr_review_v5/probes/val-small12-2026-09-25/).
+# PR 30714 is absent for the same reason: its base fails inside `lake build`. The dataset block
+# mirrors pr_review_v5_val_2025_06_2026_03_v1(_small12).yaml, which a solo config cannot
+# `extends` because it needs bases/v5_solo.yaml's routing and caps.
+extends: bases/v5_solo.yaml
+
+scaffold_type: ape_agent
+
+dataset:
+  release: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1
+  modification_inventory: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1/derived/modification_inventory.jsonl
+  require_reviewed_workspaces: true
+  pr_numbers:
+  - 26185
+  - 26755
+  - 28649
+  - 29842
+  - 30458
+  - 30641
+  - 32080
+  - 32875
+  - 34091
+  - 34935
+  - 36822
+  # 11 PRs x solo_cost_cap $1.50 = $16.50 worst case; the lead run on the same PRs billed $6.78.
+  run_total_cost_cap: 17.00
+  run_total_token_cap: 20400000
