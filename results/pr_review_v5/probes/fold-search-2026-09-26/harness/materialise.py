@@ -9,7 +9,7 @@ from collections import Counter
 from src.datasets.pull_requests.store import PullRequestStore
 S = Path("/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/b9848b08-eb04-43a7-9e77-0f87417755b6/scratchpad")
 R = Path("results/pr_review_v5/adjudications"); CLONE = "data/code_execute/repos/mathlib4/source"
-H = S / "fold/harness"
+H = S / "fold/harness2"
 def readers(d, pattern):
     out = {}
     for f in sorted(glob.glob(str(d / pattern))):
@@ -50,6 +50,24 @@ def qualified(lines):
             full = name[len("_root_."):] if name.startswith("_root_.") else ".".join(stack + [name]) if stack else name
             out[i] = (m.group(1), name, full)
     return out
+import datetime as dt
+WS = Path("data/code_execute/repos/mathlib4/workspaces")
+bases = {}
+for d in WS.iterdir():
+    if re.fullmatch(r"[0-9a-f]{40}", d.name) and (d / "lean-toolchain").exists():
+        r = subprocess.run(["git", "-C", CLONE, "log", "-1", "--format=%cI", d.name], capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout.strip():
+            bases[d.name] = (r.stdout.strip(), (d / "lean-toolchain").read_text().strip())
+print("built bases with dates:", len(bases))
+def norm(t): return dt.datetime.fromisoformat(t.replace("Z", "+00:00")).astimezone(dt.timezone.utc)
+def pick_base(created, review_at):
+    """The latest built base dated at or before the review comment (the library the maintainer saw),
+    and not more than 90 days before the PR was opened."""
+    if not review_at: return None
+    lo = norm(created) - dt.timedelta(days=90); hi = norm(review_at)
+    cands = [(norm(date), sha, tc) for sha, (date, tc) in bases.items() if lo <= norm(date) <= hi]
+    if not cands: return None
+    d, sha, tc = max(cands); return (d.isoformat(), sha, tc)
 index, skipped = [], Counter()
 for a in asks:
     if a["findable"] == ["pr_internal"] or not a["path"] or a["kind"] != "review_comment":
@@ -65,6 +83,8 @@ for a in asks:
     if not text: skipped["file not at commit"] += 1; continue
     base = subprocess.run(["git", "-C", CLONE, "merge-base", "origin/master", commit], capture_output=True, text=True).stdout.strip()
     if not base: skipped["no merge base"] += 1; continue
+    pr = b["pr"]; chosen = pick_base(pr.get("created_at") or "", rc.get("created_at") or "")
+    if not chosen: skipped["no built base at or before the review"] += 1; continue
     added = added_decls(base, commit, a["path"])
     lines = text.splitlines(); decls = qualified(lines)
     added_full = [(i, k, n, f) for i, (k, n, f) in decls.items() if n in added and k in ("theorem", "lemma", "def", "abbrev")]
@@ -77,13 +97,23 @@ for a in asks:
     while j < len(lines) and (lines[j].startswith("import ") or lines[j].startswith("public import ") or lines[j].strip() in ("module", "") or lines[j].startswith("/-") or lines[j].startswith("-/") or lines[j].startswith("Copyright") or lines[j].startswith("Released") or lines[j].startswith("Authors") or lines[j].startswith("Author")): j += 1
     last_import = max((i for i in range(j) if lines[i].startswith("import ") or lines[i].startswith("public import ")), default=None)
     if last_import is None: skipped["no import line"] += 1; continue
-    out = lines[:last_import + 1] + ["import FoldIndex"] + lines[last_import + 1:]
+    # the whole library at the chosen base, and the file's own declarations under a fresh namespace
+    # so they never clash with the base's copy of this module
+    ismod = any(l.strip() == "module" for l in lines[:12])
+    out = lines[:last_import + 1] + [("public import Mathlib" if ismod else "import Mathlib"), "import Fold"]
+    rest = lines[last_import + 1:]
+    # keep a leading module docstring / `@[expose] public section` prologue outside the namespace? no: inside is fine
+    out += ["", "set_option maxHeartbeats 4000000", "", "namespace HarnessProbe", ""] + rest
     out += ["", "set_option maxHeartbeats 4000000", ""]
     for i, k, n, f in sorted(added_full):
-        out.append(f"#fold_decl {f}   -- line {i + 1}{'  SITE' if f == site_full else ''}")
+        out.append(f"#fold_decl HarnessProbe.{f}   -- line {i + 1}{'  SITE' if f == site_full else ''}")
+    out += ["", "end HarnessProbe"]
     fn = H / f"{a['cid']}.lean"; fn.write_text("\n".join(out) + "\n")
-    index.append(dict(a, commit=commit, base=base, line=line, site_decl=site_full, added=[f for _, _, _, f in sorted(added_full)], file=str(fn), month=(b["pr"].get("created_at") or "")[:7]))
+    index.append(dict(a, commit=commit, base=base, line=line, site_decl=site_full, added=[f for _, _, _, f in sorted(added_full)], file=str(fn), month=(b["pr"].get("created_at") or "")[:7],
+                      workspace=str(WS / chosen[1]), workspace_date=chosen[0][:10], toolchain=chosen[2], review_at=(rc.get("created_at") or "")[:10], is_module=lines[0:8].count("module") > 0 or any(l.strip() == "module" for l in lines[:12])))
 json.dump(index, open(H / "index.json", "w"), indent=1, ensure_ascii=False)
 print("asks", len(asks), "materialised", len(index), "skipped", dict(skipped))
 print("by sample:", Counter(x["sample"] for x in index), "site decl found:", sum(1 for x in index if x["site_decl"]), "added decls total:", sum(len(x["added"]) for x in index))
 print("months:", dict(sorted(Counter(x["month"] for x in index).items())))
+print("toolchains:", Counter(x["toolchain"] for x in index), "module files:", sum(1 for x in index if x["is_module"]))
+print("base gap (days from base to review, binned by 30):", sorted(Counter((dt.date.fromisoformat(x["review_at"]) - dt.date.fromisoformat(x["workspace_date"])).days // 30 * 30 for x in index).items()))

@@ -1,4 +1,7 @@
-import Mathlib
+module
+
+public import Lean
+
 /-! `#fold e` : the library concepts that `e`, or a subterm of it, is an unfolded instance of.
 
 Three kinds of fold target in one discrimination tree:
@@ -12,6 +15,8 @@ introduces a non-generic constant the subterm lacks. Under a binder `x`, a fold 
 and absent from `F …` is also reported as the function-level fold `F …`. -/
 open Lean Meta Elab Command
 
+@[expose] public meta section
+
 namespace Fold
 
 inductive Kind | defBody | classField | lemmaLhs | lemmaRhs
@@ -23,14 +28,14 @@ structure Entry where
   kind  : Kind
   deriving BEq, Inhabited
 
-def genericList : List Name := [``Eq, ``Ne, ``Not, ``And, ``Or, ``Iff, ``Exists, ``ite, ``dite, ``OfNat.ofNat,
-  ``Zero.zero, ``One.one, ``HAdd.hAdd, ``HMul.hMul, ``HSub.hSub, ``HDiv.hDiv, ``HPow.hPow, ``Neg.neg, ``Inv.inv,
-  ``LE.le, ``LT.lt, ``GE.ge, ``GT.gt, ``Membership.mem, ``setOf, ``Set, ``Function.comp, ``id, ``True, ``False,
-  ``Nat, ``Int, ``Real, ``Complex, ``Singleton.singleton, ``Insert.insert, ``EmptyCollection.emptyCollection,
-  ``Decidable.decide, ``Subtype, ``Prod, ``Sum, ``Sigma, ``PSigma, ``PProd, ``Nonempty, ``Inhabited, ``sorryAx,
-  ``DFunLike.coe, ``FunLike, ``HSMul.hSMul, ``SMul.smul, ``Top.top, ``Bot.bot, ``Subtype.val, ``Prod.fst, ``Prod.snd,
-  ``Function.Injective, ``Function.Surjective, ``propext, ``Nat.cast, ``Int.cast, ``NatCast.natCast, ``IntCast.intCast,
-  ``One.toOfNat1, ``Zero.toOfNat0, ``instOfNat, ``instOfNatNat, ``Filter.atTop, ``Filter.atBot]
+def genericList : List Name := [`Eq, `Ne, `Not, `And, `Or, `Iff, `Exists, `ite, `dite, `OfNat.ofNat,
+  `Zero.zero, `One.one, `HAdd.hAdd, `HMul.hMul, `HSub.hSub, `HDiv.hDiv, `HPow.hPow, `Neg.neg, `Inv.inv,
+  `LE.le, `LT.lt, `GE.ge, `GT.gt, `Membership.mem, `setOf, `Set, `Function.comp, `id, `True, `False,
+  `Nat, `Int, `Real, `Complex, `Singleton.singleton, `Insert.insert, `EmptyCollection.emptyCollection,
+  `Decidable.decide, `Subtype, `Prod, `Sum, `Sigma, `PSigma, `PProd, `Nonempty, `Inhabited, `sorryAx,
+  `DFunLike.coe, `FunLike, `HSMul.hSMul, `SMul.smul, `Top.top, `Bot.bot, `Subtype.val, `Prod.fst, `Prod.snd,
+  `Function.Injective, `Function.Surjective, `propext, `Nat.cast, `Int.cast, `NatCast.natCast, `IntCast.intCast,
+  `One.toOfNat1, `Zero.toOfNat0, `instOfNat, `instOfNatNat, `Filter.atTop, `Filter.atBot]
 
 def genericConsts : NameSet := genericList.foldl (fun s n => s.insert n) {}
 
@@ -43,6 +48,33 @@ def sig (e : Expr) : NameSet :=
   e.foldConsts {} fun n acc => if isGeneric n then acc else acc.insert n
 
 def hasConst (e : Expr) (n : Name) : Bool := (e.find? fun s => s.isConstOf n).isSome
+
+initialize instLikeCache : IO.Ref (Std.HashMap Name Bool) ← IO.mkRef {}
+
+/-- An instance, or a constant whose result type is a class (`CommRing.toCommSemiring`,
+`Semiring.toModule`, `Algebra.id`): glue, never a concept. -/
+def isInstanceLike (n : Name) : MetaM Bool := do
+  if let some b := (← instLikeCache.get).get? n then return b
+  let env ← getEnv
+  let b ← (do
+    if isInstanceCore env n then return true
+    let some ci := env.find? n | return false
+    try
+      forallTelescopeReducing ci.type fun _ ty => do
+        if ty.isSort then return false
+        return (← isClass? ty).isSome
+    catch _ => return false)
+  instLikeCache.modify (·.insert n b)
+  return b
+
+/-- The constants of `e` that carry meaning, instance glue excluded. -/
+def sigM (e : Expr) : MetaM NameSet := do
+  let mut acc : NameSet := {}
+  for n in e.foldConsts ([] : List Name) (fun n l => n :: l) do
+    if isGeneric n then continue
+    if ← isInstanceLike n then continue
+    acc := acc.insert n
+  return acc
 
 def skipName (n : Name) : Bool :=
   n.isInternal || n.isInternalDetail || n.hasMacroScopes ||
@@ -95,6 +127,17 @@ def instantiateEntry (en : Entry) : MetaM (Option (Expr × Expr)) := do
     let some (a, b) := sides? | return none
     return some (if en.kind == .lemmaLhs then (a, b) else (b, a))
 
+/-- A side that is a hole, or a binder telescope over a hole application: matches anything. -/
+def patternLike (e : Expr) : Bool := Id.run do
+  let mut b := e
+  while b.isForall || b.isLambda do b := b.bindingBody!
+  return b.getAppFn.isMVar
+
+def keyed (keys : Array DiscrTree.Key) (en : Entry) : Array (Array DiscrTree.Key × Entry) :=
+  if keys.isEmpty then #[] else match keys[0]! with
+    | .star => #[]
+    | _ => #[(keys, en)]
+
 /-- The keys of one constant's entries, computed in a scope whose metavariables are discarded. -/
 def entriesOf (env : Environment) (n : Name) (ci : ConstantInfo) : MetaM (Array (Array DiscrTree.Key × Entry)) :=
   withoutModifyingState <| withReducible do
@@ -106,8 +149,8 @@ def entriesOf (env : Environment) (n : Name) (ci : ConstantInfo) : MetaM (Array 
       if body.getAppFn.isMVar || body.isSort then return #[]
       if let some h := headConst? body then
         if h.toString.endsWith "match_1" || (`casesOn).isSuffixOf h || (`rec).isSuffixOf h then return #[]
-      if !body.hasExprMVar then return #[]
-      return #[(← DiscrTree.mkPath body, { const := n, via := n, kind := .defBody })]
+      if !body.hasExprMVar || patternLike body then return #[]
+      return keyed (← DiscrTree.mkPath body) { const := n, via := n, kind := .defBody }
     | .thmInfo t =>
       let (_, _, body) ← forallMetaTelescope t.type
       let sides? : Option (Expr × Expr) := match body.iff?, body.eq? with
@@ -115,9 +158,9 @@ def entriesOf (env : Environment) (n : Name) (ci : ConstantInfo) : MetaM (Array 
       let some (a, b) := sides? | return #[]
       let mut out := #[]
       if let some hb := headConst? b then
-        if !isGeneric hb && a.hasExprMVar then out := out.push (← DiscrTree.mkPath a, { const := hb, via := n, kind := .lemmaLhs })
+        if !isGeneric hb && a.hasExprMVar && !patternLike a then out := out ++ keyed (← DiscrTree.mkPath a) { const := hb, via := n, kind := .lemmaLhs }
       if let some ha := headConst? a then
-        if !isGeneric ha && b.hasExprMVar then out := out.push (← DiscrTree.mkPath b, { const := ha, via := n, kind := .lemmaRhs })
+        if !isGeneric ha && b.hasExprMVar && !patternLike b then out := out ++ keyed (← DiscrTree.mkPath b) { const := ha, via := n, kind := .lemmaRhs }
       return out
     | .inductInfo _ =>
       if !isStructure env n then return #[]
@@ -126,8 +169,8 @@ def entriesOf (env : Environment) (n : Name) (ci : ConstantInfo) : MetaM (Array 
       let proj := n ++ fields[0]!
       if !env.contains proj then return #[]
       let some (body, _) ← instantiateEntry { const := n, via := proj, kind := .classField } | return #[]
-      if !(← isProp body) then return #[]
-      return #[(← DiscrTree.mkPath body, { const := n, via := proj, kind := .classField })]
+      if !(← isProp body) || patternLike body then return #[]
+      return keyed (← DiscrTree.mkPath body) { const := n, via := proj, kind := .classField }
     | _ => return #[]
 
 def buildTree : MetaM (DiscrTree Entry) := do
@@ -183,41 +226,67 @@ def isAlias (env : Environment) (n : Name) : MetaM Bool := do
   if isInstanceCore env n then return false
   lambdaTelescope d.value fun _ body => do
     let f := body.getAppFn
-    return f.isConst && body.getAppArgs.all fun a => a.isFVar || a.isConst || a.isSort || a.isApp && a.getAppFn.isConst && a.getAppArgs.all (·.isFVar)
+    if !f.isConst || f.isConstOf n then return false
+    for a in body.getAppArgs do
+      if a.isFVar || a.isConst || a.isSort || a.isLit then continue
+      if a.hasLooseBVars || a.isLambda then return false
+      -- an instance argument is fine, anything else makes this a real definition
+      let ty ← try inferType a catch _ => return false
+      if (← isClass? ty).isNone then return false
+    return true
 
+/-- Unfold every alias head in `e` once (no re-unfolding of the result's head). -/
 def unfoldAliases (e : Expr) : MetaM Expr :=
   Meta.transform e (pre := fun s => do
-    if let .const n _ := s.getAppFn then
-      if ← isAlias (← getEnv) n then
-        if let some s' ← unfoldDefinition? s then return .visit (← Core.betaReduce s')
+    if s.isApp then
+      if let .const n _ := s.getAppFn then
+        if ← isAlias (← getEnv) n then
+          if let some s' ← unfoldDefinition? s then return .continue (some s'.headBeta)
     return .continue)
+
+/-- `e`, then up to two successive one-level unfoldings, distinct. -/
+def unfoldLevels (e : Expr) : MetaM (Array Expr) := do
+  let mut out := #[e]
+  let mut cur := e
+  for _ in [0, 1] do
+    let nxt ← unfoldAliases cur
+    if nxt == cur then break
+    out := out.push nxt; cur := nxt
+  return out
 
 /-- A subterm worth folding: an application whose head is a shape or that carries a non-generic constant. -/
 def worthFolding (s : Expr) : Bool :=
-  s.isApp && s.nat?.isNone && !s.isAppOf ``OfNat.ofNat && !s.isAppOf ``Nat.cast && !s.isAppOf ``Int.cast && (match headConst? s with
-    | some h => h == ``ite || h == ``dite || h == ``Exists || h == ``setOf || !(sig s).isEmpty
-    | none => false)
+  ((s.isForall || s.isLambda) && !(sig s).isEmpty) ||
+  (s.isApp && s.nat?.isNone && !s.isAppOf `OfNat.ofNat && !s.isAppOf `Nat.cast && !s.isAppOf `Int.cast && (match headConst? s with
+    | some h => h == `ite || h == `dite || h == `Exists || h == `setOf || !(sig s).isEmpty
+    | none => false))
 
 def kindStr : Kind → String
   | .defBody => "def" | .classField => "class" | .lemmaLhs => "lemma←" | .lemmaRhs => "lemma→"
 
-/-- The non-atomic proper subterms of `s` with no loose bound variables. -/
-def properApps (s : Expr) : Array Expr := Id.run do
+/-- The non-atomic proper parts of `s`: its application arguments that are applications, and the
+bodies of its binders and of its lambda arguments (compared structurally, bound variables included). -/
+def properParts (s : Expr) : Array Expr := Id.run do
   let mut out := #[]
+  if s.isForall || s.isLambda then out := out.push s.bindingBody!
   for a in s.getAppArgs do
-    if a.isApp && !a.hasLooseBVars && a.nat?.isNone && !a.isAppOf ``OfNat.ofNat then out := out.push a
+    if a.isLambda then out := out.push a.bindingBody!
+    else if a.isApp && a.nat?.isNone && !a.isAppOf `OfNat.ofNat then out := out.push a
   return out
 
 /-- Fold one subterm `s`, sitting under the bound variables `xs`, and log every kept hit. -/
 def foldSub (tree : DiscrTree Entry) (s : Expr) (xs : Array Expr) (seen : IO.Ref (Std.HashSet String)) : MetaM Unit := do
-  let sigS := sig s
-  let headS := headConst? s
-  let survivors := properApps s
-  let s' ← unfoldAliases s
-  let queries := if s' == s then #[s] else #[s, s']
-  for q in queries do
+  if (← isClass? (← inferType s)).isSome then return   -- an instance term is not a fold subject
+  let levels ← unfoldLevels s
+  let sigS ← sigM s
+  let mut sigAll : NameSet := {}
+  for l in levels do
+    for n in (← sigM l).toList do sigAll := sigAll.insert n
+  let heads := levels.filterMap headConst? |>.filter (!isGeneric ·)
+  let survivors := levels.foldl (fun acc l => acc ++ properParts l) #[]
+  for q in levels do
   for en in ← tree.getUnify q do
-    let r? ← try withoutModifyingState <| withTransparency .default do
+    let r? ← try withoutModifyingState <| withTransparency .instances do
         let some (pat, fold) ← instantiateEntry en | pure none
         if ← isDefEq pat q then
           let f ← instantiateMVars fold
@@ -225,9 +294,9 @@ def foldSub (tree : DiscrTree Entry) (s : Expr) (xs : Array Expr) (seen : IO.Ref
         else pure none
       catch _ => pure none
     let some fold := r? | continue
-    if headS.any (hasConst fold ·) then continue
+    if heads.any (hasConst fold ·) then continue
     if sigS.toList.any (hasConst fold ·) then continue
-    if !((sig fold).toList.any fun c => !sigS.contains c) then continue
+    if !((← sigM fold).toList.any fun c => !sigAll.contains c) then continue
     if survivors.any (fun a => (fold.find? (· == a)).isSome) then continue
     let key := s!"{en.const}|{← ppExpr fold}"
     if (← seen.get).contains key then continue
@@ -273,8 +342,69 @@ elab "#fold_decl " n:ident : command => runTermElabM fun _ => do
       visit tree v #[] seen
   if (← seen.get).isEmpty then logInfo m!"#fold_decl {c}: no fold"
 
+elab "#fold_cands " t:term : command => runTermElabM fun _ => do
+  let e ← Term.elabTerm t none
+  Term.synthesizeSyntheticMVarsNoPostponing
+  let e ← instantiateMVars e
+  let tree ← getTree
+  let levels ← unfoldLevels e
+  logInfo m!"#fold_cands {e}  levels: {levels.toList}"
+  for q in levels do
+    let cands ← tree.getUnify q
+    logInfo m!"  {cands.size} candidates for {q}: {cands.toList.take 40 |>.map (·.via)}"
+    for en in cands.toList.take 40 do
+      let ok ← try withoutModifyingState <| withTransparency .instances do
+          let some (pat, _) ← instantiateEntry en | pure "no pattern"
+          let u ← isDefEq pat q
+          let pp ← ppExpr pat
+          pure (if u then "unifies" else s!"fails: {pp}")
+        catch ex => do
+          let m ← ex.toMessageData.toString
+          pure s!"error: {m}"
+      if ok != "no pattern" then logInfo m!"    {en.via}: {ok}"
+
+/-- Try one named entry against a term: is it in the tree's candidates, and does it unify at each level? -/
+elab "#fold_try " n:ident " : " k:str t:term : command => runTermElabM fun _ => do
+  let via ← realizeGlobalConstNoOverloadWithInfo n
+  let kind : Kind := match k.getString with
+    | "def" => .defBody | "class" => .classField | "lhs" => .lemmaLhs | _ => .lemmaRhs
+  let e ← Term.elabTerm t none
+  Term.synthesizeSyntheticMVarsNoPostponing
+  let e ← instantiateMVars e
+  let tree ← getTree
+  let en : Entry := { const := via, via := via, kind := kind }
+  for q in ← unfoldLevels e do
+    let cands ← tree.getUnify q
+    let inTree := cands.any (·.via == via)
+    let keysQ ← withReducible <| DiscrTree.mkPath q
+    let r ← try withoutModifyingState <| withTransparency .instances do
+        let some (pat, fold) ← instantiateEntry en | pure "no pattern from the entry"
+        let keysP ← withReducible <| DiscrTree.mkPath pat
+        let ok ← isDefEq pat q
+        let pp ← ppExpr pat
+        let fold ← instantiateMVars fold
+        let pf ← ppExpr fold
+        let levels ← unfoldLevels e
+        let sigS ← sigM e
+        let mut sigAll : NameSet := {}
+        for l in levels do
+          for n in (← sigM l).toList do sigAll := sigAll.insert n
+        let heads := levels.filterMap headConst? |>.filter (!isGeneric ·)
+        let survivors := levels.foldl (fun acc l => acc ++ properParts l) #[]
+        let f1 := heads.any (hasConst fold ·)
+        let f2 := sigS.toList.any (hasConst fold ·)
+        let f3 := !((← sigM fold).toList.any fun c => !sigAll.contains c)
+        let f4 := survivors.any (fun a => (fold.find? (· == a)).isSome)
+        let f5 := fold.hasExprMVar
+        let cls ← isClass? (← inferType q)
+        pure s!"pattern {pp}\n    keys pattern {format keysP}\n    keys query   {format keysQ}\n    unifies: {ok}{if ok then s!"  fold: {pf}" else ""}\n    filters: head-survives={f1} sig-survives={f2} nothing-new={f3} part-survives={f4} mvars={f5} query-is-instance={cls.isSome} worth={worthFolding q}\n    sig(q)={sigS.toList} sig(fold)={(← sigM fold).toList} heads={heads}"
+      catch ex => do let m ← ex.toMessageData.toString; pure s!"error: {m}"
+    logInfo m!"#fold_try {via} against {q}: in candidates = {inTree} ({cands.size} candidates)\n    {r}"
+
 elab "#fold_stats" : command => runTermElabM fun _ => do
   let _ ← getTree
   logInfo m!"tree ready"
 
 end Fold
+
+end
