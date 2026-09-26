@@ -72,6 +72,18 @@ absent in 13, because the PR's spelling differs from the library's (`Ideal.span`
 definition body that only unfolding reaches (`MulAction.orbit`, `QuotSMulTop`), or because the
 analogue is a role (`FunLike`, `Module.Invertible`, `IsCompact`) and has no shape.
 
+**Generalisation check, 2026-09-26** (`results/pr_review_v5/adjudications/design-comparison-outside-v1/results.md`).
+The user asked whether this matters outside our immediate focus before any build. Two new samples,
+two blind readers each, stage-1 kappa 0.91 and 0.95: 300 PRs in no set from the same window (801
+asks) and 129 PRs from 2024-05..2025-05 and 2026-04..2026-08 (269 asks, tier 2 collected for the
+purpose). Comparison asks are **9.1% (CI 7.3-11.3) and 9.7% (CI 6.7-13.8)** of round-1 asks, against
+8.5% on the validation set, on one PR in six; design asks are 23-24% everywhere. The decoy rate is
+higher than the first reading showed: **18 agreed of 99** comparison asks have a plausible wrong
+analogue, every one a twin of the right object along one axis (direction, dual, strength, bundling,
+carrier, continuity, scope, idiom). Findable by the PR's own siblings 29, API shape 25, neighbourhood
+10, role 9, name 9. Prevalence is settled; the build is warranted on that count, with the family
+return along the decoy axes as a requirement.
+
 **Next: unification against definitions, inside Lean.** For each hypothesis and definition body
 the PR writes, search the library's definitions, classes and `_apply`/`_def` lemmas for one whose
 body unifies with it modulo reducible unfolding and generalisation of literals (an `exact?`-shaped
