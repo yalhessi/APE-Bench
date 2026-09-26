@@ -1,6 +1,6 @@
 """Lead pipeline vs solo on the same 30 validation asks, both matchers."""
 import json, collections
-SP="/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/b9848b08-eb04-43a7-9e77-0f87417755b6/scratchpad/val11"
+SP="."  # run from this directory: ask_families_SEALED.json, match/ and match_solo/ sit beside it
 fam={c:f for pr,d in json.load(open(f"{SP}/ask_families_SEALED.json"))["families"].items() for c,f in d.items()}
 def load(d,m): return {a["ask_id"]:a["R1"] for a in json.load(open(f"{SP}/{d}/matches.{m}.json"))["asks"]}
 L={m:load("match",m) for m in ("1","2")}; S={m:load("match_solo",m) for m in ("1","2")}
