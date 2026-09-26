@@ -95,3 +95,53 @@ otherwise refuses it, which is why `launch.sh`'s judge step failed. Audit:
 
 First launch of `launch2.sh` died on an import path (`restore_bases.py` runs as a file, so the
 repo root must be on `PYTHONPATH`); `launch2.attempt1.log` is that attempt. The second is live.
+
+## Result 2: the current pipeline on 11 validation PRs, read at ask level (2026-09-26)
+
+`pr5_val_small12_minus30714_lead_rep1`: lead mode, ten arms, `gpt_5.2`, reasoning off. Complete:
+143 arm jobs run and 179 pruned by the lead, no coverage gaps, no paused jobs, 21 minutes,
+**$6.78** billed. **63 findings** (generalist 38, specialists 25). The two no-ask PRs (26185,
+34935) drew **13** of them.
+
+**The reference set:** the 30 round-1 asks on the other 8 PRs that both 60-PR-audit readers called
+asks (30714 dropped with its PR), with the auditor's families. **Two blind matchers**, one anonymous
+reviewer, the probe rubric; they agree on 29 of 30 asks.
+
+| | matcher 1 | matcher 2 |
+|---|---|---|
+| asks reached, of 30 | **8** | **8** |
+| partial | 2 | 3 |
+| findings on ask-bearing PRs that match no ask | 28 of 41 | 26 of 41 |
+| findings on the two no-ask PRs | 13 | 13 |
+
+**By family** (asks / reached, both matchers):
+
+| family | asks | reached |
+|---|---|---|
+| proof (F1) | 11 | 4 |
+| documentation (F10) | 5 | 4 |
+| interface and binders (F2) | 5 | **0** |
+| registration (F3) | 4 | **0** |
+| PR level (F12) | 3 | **0** |
+| naming (F8) | 2 | **0** |
+
+**Reading, the pair as the rule requires:**
+- **Reach: 27%** of what maintainers asked, on PRs no design was tuned on. That is the dev set's
+  gold picture (7 of 22 found) reproduced on unseen PRs at ask level, so the dev number was not
+  an artifact of the burned set.
+- **Emission: about three quarters of what it says matches no maintainer ask.** 13-15 of 63
+  findings match one; 26-28 on ask-bearing PRs and 13 on no-ask PRs match none. Some of those
+  are plausible and unrequested (two docstring typos, a duplicated instance name); the reporting
+  rule keeps them unaligned, not wrong.
+- **What it reaches is what the arms were built for:** proof golf and docstrings. **What it
+  reaches nothing of** is the families the audit found unowned or mis-owned: binders and
+  interface (5 asks), registration (4), PR level (3), naming (2). Fourteen of the 22 misses are
+  there.
+- **Matcher notes worth keeping:** seven findings on 32875 ask to *remove* `grind` from proofs
+  where the maintainer asked to *add* the `@[grind]` attribute; that is the registration family,
+  and the arm read the tactic where the maintainer read the attribute.
+
+**What this is and is not.** One run, 30 asks, ask-level, Claude matchers: a difference of two
+asks is noise. It is the first measurement of the current system against maintainers on PRs it
+was never developed on, and every later condition is read against it, on these PRs, with these
+matchers.

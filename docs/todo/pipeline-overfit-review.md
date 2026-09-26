@@ -370,3 +370,11 @@ each.
 consistent positive, so build on the opt-in `pr_level` arm with a precision guard, not a
 re-division. The information to collect next is other open PRs, from the PR store.
 
+**Validation baseline, 2026-09-26** (`results/pr_review_v5/probes/val-small12-2026-09-25/README.md`,
+Result 2): the current pipeline on 11 validation PRs, $6.78, read at ask level by two blind
+matchers agreeing on 29 of 30 asks: **8 of 30 asks reached (27%)**, 4 of 11 proof and 4 of 5
+documentation, **0 of 14** in interface, registration, PR level and naming; 13-15 of 63 findings
+match an ask, 13 sit on the two no-ask PRs. The dev set's ~30% reproduces on unseen PRs, and the
+misses are the audit's unowned families. The reasoning twin (Result 1) is parked: 2 of 10 with 29
+jobs cap-paused, 3.8x the cost.
+

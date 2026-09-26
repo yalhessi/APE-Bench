@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "tangentConeAt.lim_zero",
+  "claim": "In `tangentConeAt.lim_zero`, the proof can be shortened by avoiding an intermediate `have` equality and `apply Tendsto.congr' this`, instead using `eventually_ne_of_tendsto_norm_atTop` directly in `Tendsto.congr'` and `simpa [smul_smul]` for the main tendsto step.",
+  "requested_change": "Replace the body of `tangentConeAt.lim_zero` with the shorter proof that uses `hne.mono` directly inside `Tendsto.congr'` and a single `simpa [smul_smul]` after forming `(tendsto_inv\u2080_cobounded.comp hc).smul hd`.",
+  "severity": "advisory"
+ }
+]

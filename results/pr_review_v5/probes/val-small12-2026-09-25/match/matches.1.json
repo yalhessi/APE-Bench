@@ -1,0 +1,51 @@
+{
+  "asks": [
+    {"pr": 26755, "ask_id": "v0016", "R1": "no", "R1_finding": null, "note": "Only finding is Set.involutiveInv proof style; nothing about noncomputable markers or coeMonoidHom."},
+
+    {"pr": 28649, "ask_id": "v0029", "R1": "no", "R1_finding": null, "note": "No finding touches Upcrossing.lean or the left-hand-side hyphenation."},
+    {"pr": 28649, "ask_id": "v0030", "R1": "reached", "R1_finding": 2, "note": "Finding 2 offers spelling out moment generating functions as an alternative; finding 1 only lowercases."},
+    {"pr": 28649, "ask_id": "v0031", "R1": "reached", "R1_finding": 0, "note": "Findings 0 and 3 both revert variances to singular variance."},
+
+    {"pr": 29842, "ask_id": "v0053", "R1": "no", "R1_finding": null, "note": "PR-description question about #24163 and #21065; no finding."},
+    {"pr": 29842, "ask_id": "v0055", "R1": "reached", "R1_finding": 0, "note": "Compacts the same lim_zero proof (folds Tendsto.congr' into simpa, drops the have); satisfies the optional ask."},
+    {"pr": 29842, "ask_id": "v0056", "R1": "no", "R1_finding": null, "note": "PR-description request; no finding."},
+
+    {"pr": 30458, "ask_id": "v0060", "R1": "no", "R1_finding": null, "note": "Findings 0/1 restate Set lemma binders; nothing on Finset section layout or variable ... in."},
+    {"pr": 30458, "ask_id": "v0061", "R1": "no", "R1_finding": null, "note": "No finding on the Finset RightCancel section structure."},
+    {"pr": 30458, "ask_id": "v0062", "R1": "no", "R1_finding": null, "note": "No finding on card_le_card_div_left's proof or restoring the old one."},
+    {"pr": 30458, "ask_id": "v0063", "R1": "no", "R1_finding": null, "note": "No finding on card_le_card_div_right's proof."},
+
+    {"pr": 30641, "ask_id": "v0064", "R1": "no", "R1_finding": null, "note": "No finding on renaming a to x in posLog_pow."},
+    {"pr": 30641, "ask_id": "v0065", "R1": "no", "R1_finding": null, "note": "Finding 1 adds a separate ha but keeps h2a; not the rename."},
+    {"pr": 30641, "ask_id": "v0066", "R1": "no", "R1_finding": null, "note": "Findings 1/3 keep the strict 1 < |a^n| step; no direct le version."},
+    {"pr": 30641, "ask_id": "v0067", "R1": "partial", "R1_finding": 0, "note": "Finding 0 reworks the same side-condition discharge (refine plus simp), does not propose positivity."},
+    {"pr": 30641, "ask_id": "v0068", "R1": "partial", "R1_finding": 0, "note": "Finding 0 restructures the same monotonicity step (refine), does not propose gcongr."},
+
+    {"pr": 32875, "ask_id": "v0090", "R1": "no", "R1_finding": null, "note": "Findings 0/3/4/9 want grind removed from the proof; ask is the @[grind] attribute."},
+    {"pr": 32875, "ask_id": "v0091", "R1": "no", "R1_finding": null, "note": "Findings 1/5/6 want grind removed from the proof; ask is the @[grind] attribute."},
+    {"pr": 32875, "ask_id": "v0092", "R1": "no", "R1_finding": null, "note": "No finding on the Pi.lean pi_pi proof."},
+    {"pr": 32875, "ask_id": "v0093", "R1": "reached", "R1_finding": 2, "note": "Findings 2 and 8 replace simp at h with simpa using h fed to the lemma."},
+    {"pr": 32875, "ask_id": "v0094", "R1": "reached", "R1_finding": 10, "note": "Finding 10 gives exactly simpa [this] using (Kernel.compProd_apply_prod hs ht).symm."},
+    {"pr": 32875, "ask_id": "v0095", "R1": "reached", "R1_finding": 7, "note": "Finding 7 merges simp only / exact into one simpa [this] using line."},
+
+    {"pr": 34091, "ask_id": "v0105", "R1": "no", "R1_finding": null, "note": "No finding shortens exists_infinite_fiber's proof; 0/2 concern the primed lemma."},
+    {"pr": 34091, "ask_id": "v0106", "R1": "no", "R1_finding": null, "note": "No finding on making Infinite beta an instance argument."},
+    {"pr": 34091, "ask_id": "v0107", "R1": "no", "R1_finding": null, "note": "No finding on making Uncountable beta an instance argument."},
+    {"pr": 34091, "ask_id": "v0108", "R1": "no", "R1_finding": null, "note": "Findings 0/2/6 address exists_infinite_fiber' proof style and name, not the binder kind."},
+    {"pr": 34091, "ask_id": "v0109", "R1": "reached", "R1_finding": 5, "note": "Finding 5 fixes exists_infinite_fiber docstring to domain vs codomain; finding 4 duplicates it."},
+    {"pr": 34091, "ask_id": "v0110", "R1": "reached", "R1_finding": 3, "note": "Finding 3 fixes the same domain/domain error in exists_uncountable_fiber's docstring."},
+
+    {"pr": 36822, "ask_id": "v0131", "R1": "no", "R1_finding": null, "note": "No finding on restoring @[simp] for Ioi_disjoint_Iio_same."},
+    {"pr": 36822, "ask_id": "v0132", "R1": "no", "R1_finding": null, "note": "No finding on restoring @[simp] for Ioi_disjoint_Iio_iff."}
+  ],
+  "unmatched": {
+    "26755": {"R1": 1},
+    "28649": {"R1": 0},
+    "29842": {"R1": 0},
+    "30458": {"R1": 5},
+    "30641": {"R1": 5},
+    "32875": {"R1": 7},
+    "34091": {"R1": 4},
+    "36822": {"R1": 6}
+  }
+}

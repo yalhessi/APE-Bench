@@ -1,0 +1,51 @@
+[
+ {
+  "i": 0,
+  "target": "Cardinal.exists_infinite_fiber'",
+  "claim": "In `Cardinal.exists_infinite_fiber'`, the proof uses a term-style `:= exists_infinite_fiber f h (by ...)` block that can be shortened/idiomatically written with `by` + `refine`.",
+  "requested_change": "Rewrite `Cardinal.exists_infinite_fiber'` to use a `by` proof with `refine exists_infinite_fiber f h ?_` and then discharge the instance inequality goal; keep the same argument structure.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Cardinal.le_range_of_union_finset_eq_univ",
+  "claim": "In `Cardinal.le_range_of_union_finset_eq_univ`, the sub-proof `v'` can be shortened by collapsing the `rw` step into a single `simpa` using `choose_spec`; also `u` can be a `have` and `classical` can be introduced once.",
+  "requested_change": "Replace the body of `Cardinal.le_range_of_union_finset_eq_univ` with a slightly shorter version using `classical`, `have u : \u2200 b, \u2203 a, b \u2208 f a`, and a `simpa`-based proof of `v'`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Cardinal.exists_infinite_fiber'",
+  "claim": "In `Cardinal.exists_infinite_fiber'`, the proof manually rewrites `Cardinal.infinite_iff` on both `h\u03b1` and the goal using `rw ... at h\u03b1 \u22a2` and then `exact ...`. This can be expressed more canonically as a single `simpa [Cardinal.infinite_iff] using ...` to produce the needed `Infinite \u03b2` argument for `exists_infinite_fiber`.",
+  "requested_change": "Rewrite `Cardinal.exists_infinite_fiber'` to use `simpa [Cardinal.infinite_iff]` rather than a local `rw [Cardinal.infinite_iff] at h\u03b1 \u22a2; exact ...` block.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Cardinal.exists_uncountable_fiber",
+  "claim": "The docstring for `Cardinal.exists_uncountable_fiber` has the same mistake as the others: it says the domain is \"strictly greater than its domain's\" (domain twice) and uses incorrect English. This misstates the theorem\u2019s hypotheses (`#\u03b1 < #\u03b2`, `Uncountable \u03b2`).",
+  "requested_change": "Rewrite the docstring for `Cardinal.exists_uncountable_fiber` to correctly mention codomain vs domain and fix grammar.",
+  "severity": "blocking"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+  "claim": "The docstring immediately above `Cardinal.infinite_pigeonhole_card_lt` is incorrect: it says \"domain's cardinality is infinite but strictly greater than its domain's\" (domain twice) and has grammatical errors (\"great\"). This misdocuments the theorem\u2019s hypotheses/conclusion.",
+  "requested_change": "Fix the docstring above `Cardinal.infinite_pigeonhole_card_lt` to refer to the codomain vs domain correctly and use correct English (\"greater\").",
+  "severity": "blocking"
+ },
+ {
+  "i": 5,
+  "target": "Cardinal.exists_infinite_fiber",
+  "claim": "The docstring for `Cardinal.exists_infinite_fiber` repeats \"domain\" where it should contrast domain and codomain (\"domain's cardinality is infinite but strictly greater than its domain's\"), so it does not correctly describe the statement `#\u03b1 < #\u03b2` with `Infinite \u03b2`.",
+  "requested_change": "Correct the docstring of `Cardinal.exists_infinite_fiber` to state that the domain is infinite and has strictly larger cardinality than the codomain, and fix \"great\" \u2192 \"greater\".",
+  "severity": "blocking"
+ },
+ {
+  "i": 6,
+  "target": "Cardinal.exists_infinite_fiber'",
+  "claim": "The new lemma `Cardinal.exists_infinite_fiber'` introduces a primed name solely to express a hypothesis variant (assuming `Infinite \u03b1` rather than `Infinite \u03b2`). In Mathlib this is typically requested to be a descriptive name rather than adding a primed API entry.",
+  "requested_change": "Rename `Cardinal.exists_infinite_fiber'` to a descriptive name reflecting the changed hypothesis (e.g. `Cardinal.exists_infinite_fiber_of_infinite_codomain` or similar), and keep the docstring aligned with the new name.",
+  "severity": "advisory"
+ }
+]

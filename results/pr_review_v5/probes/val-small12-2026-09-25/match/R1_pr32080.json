@@ -1,0 +1,65 @@
+[
+ {
+  "i": 0,
+  "target": "CompletelyRegularSpace.of_exists_uniformSpace",
+  "claim": "In `CompletelyRegularSpace.of_exists_uniformSpace`, the proof can be slightly shorter by using `rcases` directly to destruct the existential.",
+  "requested_change": "Replace `obtain \u27e8u, rfl\u27e9 := h` with `rcases h with \u27e8u, rfl\u27e9` in the proof of `CompletelyRegularSpace.of_exists_uniformSpace`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "CompletelyRegularSpace.exists_uniformSpace",
+  "claim": "`CompletelyRegularSpace.exists_uniformSpace` is a one-line term proof; rewriting it as a `by` proof with `refine`/`simpa` can be slightly clearer and keeps the equality proof robust to definitional changes.",
+  "requested_change": "Change the proof of `CompletelyRegularSpace.exists_uniformSpace` to a `by` block using `refine \u27e8..., ?_\u27e9; simpa using ...`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Mathlib/Topology/UniformSpace/Uniformizable.lean",
+  "claim": "In the module docstring for `Mathlib/Topology/UniformSpace/Uniformizable.lean`, the prose is incomplete due to the literal line `TODO: Explain proofs`, and the \u201cImplementation Details\u201d sentence references a non-existent/incorrect name: `UniformSpace.completelyRegularSpace` (the file defines `UniformSpace.toCompletelyRegularSpace`).",
+  "requested_change": "Edit the module docstring to remove the TODO and replace the incorrect cross-reference `UniformSpace.completelyRegularSpace` with `UniformSpace.toCompletelyRegularSpace`, rewriting the paragraph to briefly explain that the construction reuses Urysohn\u2019s lemma.",
+  "severity": "blocking"
+ },
+ {
+  "i": 3,
+  "target": "completelyRegularSpace_iff_exists_uniformSpace",
+  "claim": "In `completelyRegularSpace_iff_exists_uniformSpace`, the declaration is written as `public theorem ...`; Mathlib style generally does not use `public` on declarations.",
+  "requested_change": "Remove the `public` modifier from `completelyRegularSpace_iff_exists_uniformSpace`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "P",
+  "claim": "The declaration `P` is a global, non-descriptive name in `Mathlib/Topology/UniformSpace/Uniformizable.lean`; it is used only as an internal predicate for the Urysohn construction, and such single-letter names are against Mathlib style outside very local sections.",
+  "requested_change": "Rename `P` to a descriptive, namespaced definition (e.g. `UniformSpace.Uniformizable.urysohnPredicate` or `UniformSpace.Uniformizable.P`) and update all references accordingly.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "CompletelyRegularSpace.of_exists_uniformSpace",
+  "claim": "In `CompletelyRegularSpace.of_exists_uniformSpace`, the declaration is written as `public theorem ...`; this is unusual formatting in Mathlib and inconsistent with typical files that use `theorem`/`instance` without `public`.",
+  "requested_change": "Remove the `public` modifier from `CompletelyRegularSpace.of_exists_uniformSpace` (and similarly from other `public` declarations in this file).",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "CompletelyRegularSpace.exists_uniformSpace",
+  "claim": "In `CompletelyRegularSpace.exists_uniformSpace`, the declaration is written as `public theorem ...`, but this file otherwise uses plain `theorem`/`instance` style; the extra `public` is nonstandard formatting and clutters the signature.",
+  "requested_change": "Remove the `public` modifier from `CompletelyRegularSpace.exists_uniformSpace`, `CompletelyRegularSpace.of_exists_uniformSpace`, `completelyRegularSpace_iff_exists_uniformSpace`, and `UniformSpace.toCompletelyRegularSpace`, using plain `theorem`/`instance` declarations.",
+  "severity": "advisory"
+ },
+ {
+  "i": 7,
+  "target": "UniformSpace.toCompletelyRegularSpace",
+  "claim": "In `UniformSpace.toCompletelyRegularSpace`, the declaration is written as `public instance ...`; this is atypical style in Mathlib and makes the header noisier than needed.",
+  "requested_change": "Remove the `public` modifier from `UniformSpace.toCompletelyRegularSpace`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 8,
+  "target": "Mathlib/Topology/UniformSpace/Uniformizable.lean",
+  "claim": "The module docstring contains the placeholder line `TODO: Explain proofs`, which is not acceptable in merged Mathlib documentation.",
+  "requested_change": "Remove the `TODO` from the module doc, replacing it with either a short proof sketch paragraph (1\u20133 sentences) or omitting the section entirely.",
+  "severity": "advisory"
+ }
+]

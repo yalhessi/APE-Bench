@@ -1,0 +1,58 @@
+[
+ {
+  "i": 0,
+  "target": "exists_long_peano_curve",
+  "claim": "In `exists_long_peano_curve`, the final `simp only [Set.surjOn_iff_surjective, \u2190 ContinuousMap.coe_restrict, hf, hg']` is a bit non-idiomatic: it relies on a directed rewrite `hf` that doesn't fire under `simp` without massaging, and it mixes coercions/`SurjOn` conversion in one `simp only` block.",
+  "requested_change": "Rewrite the restriction equality in the convenient direction first (e.g. `have hf' : g' = ContinuousMap.restrict cantorSet f := hf.symm`) and then use `simpa` to transfer surjectivity of `g'` to surjectivity of the restriction, followed by `simpa [Set.surjOn_iff_surjective, \u2190 ContinuousMap.coe_restrict]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "ContinuousMap.liftCover_restrict",
+  "claim": "In `ContinuousMap.liftCover_restrict`, the proof uses `ext; simp only [restrict_apply, liftCover_coe]`. This is a bit manual; the idiomatic pattern is `ext x; simp [liftCover_coe]`, letting simp pick `restrict_apply` itself.",
+  "requested_change": "Rewrite the proof of `ContinuousMap.liftCover_restrict` to `ext x; simp [liftCover_coe]` (or `simpa [liftCover_coe]`), avoiding the explicit `simp only` list.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Counterexamples/PeanoCurve.lean",
+  "claim": "In the module docstring in `Counterexamples/PeanoCurve.lean`, the prose contains typos: \"existsence\" and \"sujrective\"; this is user-facing documentation and should be corrected.",
+  "requested_change": "Replace the module docstring lines\n\"This file proves the existsence of a Peano curve -- continuous sujrective map from the interval\n`[0, 1]` onto the square `[0, 1] \u00d7 [0, 1]`.\"\nwith corrected spelling and slightly clearer punctuation.",
+  "severity": "blocking"
+ },
+ {
+  "i": 3,
+  "target": "unitInterval.instTietzeExtension",
+  "claim": "`unitInterval.instTietzeExtension` is already declared in `Mathlib/Topology/TietzeExtension.lean`, so adding another instance with the same name in `Mathlib/Analysis/Complex/Tietze.lean` creates a duplicate declaration and will break the build or cause ambiguous instance selection.",
+  "requested_change": "Remove this instance from `Mathlib/Analysis/Complex/Tietze.lean` and use the existing `unitInterval.instTietzeExtension` from `Mathlib/Topology/TietzeExtension.lean` (or, if the intent is to move it, relocate it by deleting the old one and keeping a single definition in the appropriate file).",
+  "severity": "blocking"
+ },
+ {
+  "i": 4,
+  "target": "unitInterval.eq_closedBall",
+  "claim": "In `unitInterval.eq_closedBall`, the proof uses `norm_num [unitInterval, Real.Icc_eq_closedBall]`, which is heavier than necessary and obscures that this is just `Real.Icc_eq_closedBall` specialized to `a=0, b=1`; maintainers typically prefer a `simp`/`by simpa` proof for such definitional rewrites.",
+  "requested_change": "Rewrite `unitInterval.eq_closedBall` to be a `simp`-style specialization of `Real.Icc_eq_closedBall` (and use explicit `(1/2 : \u211d)` rather than `2\u207b\u00b9` if simplification becomes clearer).",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "ContinuousMap.coe_restrict",
+  "claim": "`ContinuousMap.coe_restrict` is a redundant simp lemma: after rewriting the RHS to `s.restrict f`, it becomes a direct restatement of `Set.restrict_eq` specialized to `f : C(\u03b1, \u03b2)` (and the coercion `C(\u03b1,\u03b2) \u2192 \u03b1 \u2192 \u03b2`). Keeping both lemmas adds maintenance surface with no additional API value.",
+  "requested_change": "Delete `ContinuousMap.coe_restrict` and replace its uses with `Set.restrict_eq` (or `by simpa [Set.restrict_eq]`/`by simpa using (Set.restrict_eq (f := (f : \u03b1 \u2192 \u03b2)) s)`), keeping `restrict_apply` as the simp lemma for evaluation.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Counterexamples/PeanoCurve.lean",
+  "claim": "The module docstring in `Counterexamples/PeanoCurve.lean` contains spelling mistakes (\"existsence\", \"sujrective\") and could be phrased in standard mathlib style (\"continuous surjective map\").",
+  "requested_change": "Fix the typos and rewrite the module docstring to standard phrasing (e.g. \"existence\", \"surjective\").",
+  "severity": "advisory"
+ },
+ {
+  "i": 7,
+  "target": "Counterexamples/PeanoCurve.lean",
+  "claim": "In `Counterexamples/PeanoCurve.lean` module doc, the `/-!` header is immediately followed by text; surrounding files typically leave a blank line after the section header line, and the paragraph contains typos (\"existsence\", \"sujrective\") that reduce readability.",
+  "requested_change": "In the module doc, insert a blank line after `# Peano curve` and reflow to a standard paragraph; fix spelling of \u201cexistence\u201d and \u201csurjective\u201d.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "AlgebraicGeometry.Scheme.zeroLocus_mul",
+  "claim": "The new declaration `AlgebraicGeometry.Scheme.zeroLocus_mul` duplicates the existing global theorem name `zeroLocus_mul` (already in `Mathlib/RingTheory/Spectrum/Prime/Basic.lean`) and introduces an additional *qualified* name `AlgebraicGeometry.Scheme.zeroLocus_mul` that can create confusing `open AlgebraicGeometry` name resolution and makes search results ambiguous.",
+  "requested_change": "Rename `AlgebraicGeometry.Scheme.zeroLocus_mul` to a Scheme-specific name (e.g. `Scheme.zeroLocus_ideal_mul` or `Scheme.zeroLocus_mul_ideal`) and update its uses accordingly.",
+  "severity": "blocking"
+ },
+ {
+  "i": 1,
+  "target": "Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean",
+  "claim": "The declaration `instance : IsOrderedRing X.IdealSheafData where` in `Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean` has no fields provided in the reviewed region, so as written it cannot elaborate/compile.",
+  "requested_change": "Either complete the `IsOrderedRing` instance by providing all required fields, or remove this incomplete instance from the PR if it was introduced accidentally.",
+  "severity": "blocking"
+ },
+ {
+  "i": 2,
+  "target": "AlgebraicGeometry.Scheme.IdealSheafData.mul_inf",
+  "claim": "In `AlgebraicGeometry.Scheme.IdealSheafData.mul_inf` (and similarly `inf_mul`), the proof is written as a one-liner `by ext U : 2; exact ...`, which is inconsistent with the surrounding multi-line structured proofs in this section and makes formatting fragile.",
+  "requested_change": "Rewrite the proofs of `mul_inf` and `inf_mul` as multi-line `by` blocks with line breaks after `by`, placing `ext` and the final `simpa`/`exact` on their own lines.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean",
+  "claim": "In `Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean`, the module doc sentence \u201cWe follow `Ideal` and set the simp normal form to be `\u22a5` and `\u22a4` and `\u2294`.\u201d is slightly ungrammatical/awkward (repeated \u201cand\u201d).",
+  "requested_change": "Edit the module doc line to use commas before the final \u201cand\u201d, i.e. `\u22a5`, `\u22a4`, and `\u2294`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Mathlib/AlgebraicGeometry/Scheme.lean",
+  "claim": "In `Mathlib/AlgebraicGeometry/Scheme.lean`, the PR introduces two consecutive `open scoped Pointwise in` lines (before `AlgebraicGeometry.Scheme.zeroLocus_setMul` and again before `AlgebraicGeometry.Scheme.zeroLocus_mul`). This is non-idiomatic formatting; when several consecutive declarations need the same scoped notation, the file typically opens the scope once for the block rather than repeating `... in`.",
+  "requested_change": "Replace the two consecutive `open scoped Pointwise in` lines with a single `open scoped Pointwise` placed once before `zeroLocus_setMul`, covering both lemmas.",
+  "severity": "advisory"
+ }
+]

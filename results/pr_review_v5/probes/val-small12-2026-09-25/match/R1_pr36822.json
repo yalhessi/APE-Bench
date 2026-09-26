@@ -1,0 +1,44 @@
+[
+ {
+  "i": 0,
+  "target": "Filter.disjoint_atTop_principal_Iic",
+  "claim": "In `Filter.disjoint_atTop_principal_Iic`, the proof is a single term and can be expressed more idiomatically as `by simpa using ...`.",
+  "requested_change": "Rewrite the proof of `Filter.disjoint_atTop_principal_Iic` as a `by simpa using disjoint_of_disjoint_of_mem ...` block.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Filter.disjoint_pure_atTop",
+  "claim": "In `Filter.disjoint_pure_atTop`, the proof is a single long term; wrapping it in `by simpa using ...` makes it shorter/clearer idiomatically without changing content.",
+  "requested_change": "Change the proof of `Filter.disjoint_pure_atTop` from a chained term with `<|` to a `by simpa using (...)` block.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Set.Ioi_disjoint_Iio_of_not_lt",
+  "claim": "In `Set.Ioi_disjoint_Iio_of_not_lt`, the proof uses `disjoint_left.mpr fun _ hx hy \u21a6 ...`; this can be shortened/idiomatized by `simpa [Set.disjoint_left]`.",
+  "requested_change": "Replace the body of `Set.Ioi_disjoint_Iio_of_not_lt` with a `by simpa [Set.disjoint_left]` proof.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Filter.disjoint_atBot_principal_Ioi",
+  "claim": "In `Filter.disjoint_atBot_principal_Ioi`, the proof is a single term and can be written more idiomatically as a short `by simpa using ...` block.",
+  "requested_change": "Replace the term proof of `Filter.disjoint_atBot_principal_Ioi` with a `by simpa using ...` proof block (no change in assumptions or statement).",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Set.Ioi_disjoint_Iio_of_le",
+  "claim": "`Set.Ioi_disjoint_Iio_of_le` has the wrong statement: it claims `Disjoint (Ioi b) (Iio a)` from `h : a \u2264 b`, but the lemma name and previous API (used by `Ioi_disjoint_Iio_same`) require `Disjoint (Ioi a) (Iio b)`; the current statement makes `Ioi_disjoint_Iio_same` prove `Disjoint (Ioi a) (Iio a)` via a mismatched inequality direction.",
+  "requested_change": "Change `Set.Ioi_disjoint_Iio_of_le` to take `h : a \u2264 b` and conclude `Disjoint (Ioi a) (Iio b)` (and keep the `@[to_dual Iio_disjoint_Ioi_of_le]` attribute on that corrected lemma).",
+  "severity": "blocking"
+ },
+ {
+  "i": 5,
+  "target": "Filter.disjoint_atBot_atTop",
+  "claim": "In `Filter.disjoint_atBot_atTop`, the assumptions `[PartialOrder \u03b1] [Nontrivial \u03b1]` are stronger than needed: the proof only uses `\u2264` and strict comparison via `lt_of_ne` and `not_ge`, so it should work under `[Preorder \u03b1] [Nontrivial \u03b1]` (or at least not require antisymmetry).",
+  "requested_change": "Weaken the typeclass assumptions of `Filter.disjoint_atBot_atTop` from `[PartialOrder \u03b1]` to `[Preorder \u03b1]` (keeping `Nontrivial \u03b1`) and adjust the proof if needed.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,37 @@
+[
+ {
+  "i": 0,
+  "target": "Set.finite_div",
+  "claim": "`Set.finite_div` is proved without using any section-local binder specifics beyond the typeclass assumptions; it can be stated more generally by making `\u03b1` and `{s t}` explicit arguments, instead of relying on the surrounding `section DivisionMonoid` variables.",
+  "requested_change": "Change the statement of `Set.finite_div` to `lemma finite_div {\u03b1} [DivisionMonoid \u03b1] [IsLeftCancelMul \u03b1] [IsRightCancelMul \u03b1] {s t : Set \u03b1} : ...` keeping the same proof term.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Set.infinite_div",
+  "claim": "`Set.infinite_div` is proved without using any section-local binder specifics beyond the typeclass assumptions; it can be stated more generally by making `\u03b1` and `{s t}` explicit arguments, instead of relying on the surrounding `section DivisionMonoid` variables.",
+  "requested_change": "Change the statement of `Set.infinite_div` to `lemma infinite_div {\u03b1} [DivisionMonoid \u03b1] [IsLeftCancelMul \u03b1] [IsRightCancelMul \u03b1] {s t : Set \u03b1} : ...` keeping the same proof term.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Set.infinite_div",
+  "claim": "In `Set.infinite_div`, the second argument to `infinite_image2` is written on the next line without parentheses:\n`infinite_image2 (fun b _ \u21a6 (div_left_injective (b := b)).injOn)\n    fun a _ \u21a6 (div_right_injective (b := a)).injOn`\nElsewhere in this file, continued arguments in multi-line applications are typically parenthesized for clarity.",
+  "requested_change": "Wrap the second argument to `infinite_image2` in parentheses.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "div_left_inj",
+  "claim": "In `div_left_inj` the proof manually constructs a cancellation argument via `mul_right_cancel` after rewriting by `div_eq_mul_inv`, but `mul_left_inj` together with simp can prove this in one line; the current proof is longer and less idiomatic.",
+  "requested_change": "Replace the body of `div_left_inj` with a shorter proof using `simp [div_eq_mul_inv, mul_left_inj]`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Set.finite_div",
+  "claim": "In `Set.finite_div`, the second argument to `finite_image2` is written on the next line without parentheses, relying on application precedence:\n`finite_image2 (fun b _ \u21a6 (div_left_injective (b := b)).injOn)\n    fun a _ \u21a6 (div_right_injective (b := a)).injOn`\nIn this file, multi-line function applications are typically formatted with explicit parentheses around a continued argument to make the structure clear.",
+  "requested_change": "Wrap the second argument to `finite_image2` in parentheses so the multi-line application is clearly delimited.",
+  "severity": "advisory"
+ }
+]

@@ -1,0 +1,79 @@
+[
+ {
+  "i": 0,
+  "target": "Finset.mem_map_equiv",
+  "claim": "In `Finset.mem_map_equiv`, the new proof uses `grind` after a `simp only`, which is heavier than needed for this simple equivalence.",
+  "requested_change": "Replace the `simp only` + `grind` proof of `Finset.mem_map_equiv` with a smaller proof using `simpa [Finset.mem_map]` and a short `constructor` argument.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "In `Rat.inv_intCast_den_of_pos`, the new proof relies on `grind` after `simp only [den_inv, num_intCast]`. This is potentially fragile/slow in a foundational lemma; a deterministic `simp` proof works once `a \u2260 0` is supplied (needed by `den_inv`).",
+  "requested_change": "Replace the `grind`-based proof of `Rat.inv_intCast_den_of_pos` with an explicit proof that avoids `grind` by introducing `ha0' : a \u2260 0 := ne_of_gt ha0` and finishing with `simp` (using `Int.natAbs_of_nonneg`).",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+  "claim": "In `MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'`, the new proof rewrites the hypothesis in-place via `simp ... at h`, which is a non-canonical idiom (it mutates the binder and can be harder to read/maintain). The same simplification can be expressed more idiomatically using `simpa ... using h` to define a new hypothesis, then applying `tendsto_of_forall_isClosed_limsup_le`.",
+  "requested_change": "Replace `simp ... at h; exact ... h` with a `have h' : ... := by simpa [...] using h` followed by `exact tendsto_of_forall_isClosed_limsup_le h'`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Finset.mem_map_equiv",
+  "claim": "In `Finset.mem_map_equiv`, the new proof uses `grind` after a simp-normalization step; this is not the canonical/idiomatic style for such a basic equivalence about `mem_map` of an equivalence, and it may incur unnecessary overhead/opacity compared to a short structured proof.",
+  "requested_change": "Replace the `grind` proof with a small `constructor` proof using `simp only [mem_map, Equiv.coe_toEmbedding]` and `rintro \u27e8a, ha, rfl\u27e9` / `\u27e8f.symm b, hb, by simp\u27e9`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Finset.mem_map_equiv",
+  "claim": "In `Finset.mem_map_equiv`, the new proof uses `grind` after `simp only`. Since this lemma is tagged `[simp 1100]` and used widely, the tactic-based proof may add avoidable elaboration/simp overhead and is harder to reason about for performance stability. A small explicit proof compiles and should keep simp behavior identical.",
+  "requested_change": "Replace the `simp only ...; grind` proof of `Finset.mem_map_equiv` with an explicit term/tactic proof (no `grind`) establishing each direction via `mem_map.1`/`mem_map.2` and `simp`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "In `Rat.inv_intCast_den_of_pos`, the current proof uses `grind` after a simp step; this can be replaced by a short explicit `simp` using `Int.natAbs_of_nonneg` and `a \u2260 0` from positivity.",
+  "requested_change": "Replace the `grind`-based proof of `Rat.inv_intCast_den_of_pos` with a direct `simp` proof that discharges the remaining goal via `Int.natAbs_of_nonneg (le_of_lt ha0)`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 6,
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "`Rat.inv_intCast_den_of_pos` is now proved using `grind` after a `simp only`, which is a heavy/unstable automation choice for a core arithmetic lemma and makes the proof less maintainable compared to the previous structured proof.",
+  "requested_change": "Replace the `grind` proof in `Rat.inv_intCast_den_of_pos` with a small explicit proof (e.g. using `rw`/`simp` and existing lemmas about `den_div_eq_of_coprime` or rewriting `a.natAbs` under `0 < a`), avoiding `grind` here.",
+  "severity": "advisory"
+ },
+ {
+  "i": 7,
+  "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "In `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod`, the proof tail is split as\n```\n  simp only [this]\n  exact (compProd_apply_prod hs ht).symm\n```\nThis is a single-step simplification followed by `exact`, which is typically formatted as a `simpa` line in Mathlib.",
+  "requested_change": "Replace the two lines `simp only [this]` / `exact ...` with a single `simpa [this] using ...` line.",
+  "severity": "advisory"
+ },
+ {
+  "i": 8,
+  "target": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+  "claim": "In `MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'`, the proof uses `simp ... at h`, rewriting the hypothesis `h` in-place. This is a non-idiomatic style in Mathlib because it mutates a named assumption and can make it harder to read/maintain, especially for later refactors.",
+  "requested_change": "Rewrite the proof to avoid `simp ... at h`; instead, apply `tendsto_of_forall_isClosed_limsup_le` and `simpa` when using `h F hF`, leaving `h` unchanged.",
+  "severity": "advisory"
+ },
+ {
+  "i": 9,
+  "target": "Finset.mem_map_equiv",
+  "claim": "In `Finset.mem_map_equiv`, the proof uses `grind` after a `simp only`, which is non-idiomatic for a small simp lemma and can add unpredictable elaboration/maintenance cost; a direct `constructor` proof (as in the pre-PR version) is clearer and keeps the simp-normal-form stable.",
+  "requested_change": "Replace the `grind`-based proof of `Finset.mem_map_equiv` with an explicit `constructor` proof (or the previous structured proof), keeping it as a small simp proof without `grind`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 10,
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, the proof tail is split as\n```\n  simp only [this]\n  exact (Kernel.compProd_apply_prod hs ht).symm\n```\nThis is a one-liner and is conventionally formatted as `simpa` in Mathlib.",
+  "requested_change": "Replace the two lines `simp only [this]` / `exact ...` with `simpa [this] using (Kernel.compProd_apply_prod hs ht).symm`.",
+  "severity": "advisory"
+ }
+]

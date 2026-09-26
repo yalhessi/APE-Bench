@@ -1,0 +1,9 @@
+[
+ {
+  "i": 0,
+  "target": "Set.involutiveInv",
+  "claim": "In `Set.involutiveInv`, the `inv_inv` field uses a low-level `simp only` rewrite chain with `preimage_preimage`/`preimage_id'`, rather than the more idiomatic pointwise extensionality proof.",
+  "requested_change": "Rewrite the `inv_inv` field proof to `ext a; simp` (or `by ext a; simp`), letting `simp` unfold `Set.inv`/`Set.mem_inv` and close the goal directly.",
+  "severity": "advisory"
+ }
+]

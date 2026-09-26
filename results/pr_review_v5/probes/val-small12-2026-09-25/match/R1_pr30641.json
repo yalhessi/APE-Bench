@@ -1,0 +1,44 @@
+[
+ {
+  "i": 0,
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "In `Real.posLog_norm_sum_le`, the proof ends with `posLog_sum s (\u2016f \u00b7\u2016)` and earlier uses `apply monotoneOn_posLog (by simp) _ ...` + separate `simp` to discharge the domain condition; this can be written more idiomatically as a `refine` of `Real.monotoneOn_posLog` with both side-conditions proved by `simp`, and the final step as `simpa using Real.posLog_sum s (fun t => \u2016f t\u2016)`.",
+  "requested_change": "Rewrite the proof of `Real.posLog_norm_sum_le` to use `refine (Real.monotoneOn_posLog _ _ (norm_sum_le s f))` with both hypotheses solved by `simp`, and replace the last line by `simpa using (Real.posLog_sum s (fun t => \u2016f t\u2016))`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 1,
+  "target": "Real.posLog_pow",
+  "claim": "In `Real.posLog_pow`, after `by_cases h\u2082a : |a| \u2264 1` the proof does `rw [not_le] at h\u2082a` to turn it into a strict inequality; it is more idiomatic to keep the `\u2264`-case name and define `ha : 1 < |a| := lt_of_not_ge h\u2082a` for use in `one_lt_pow\u2080`.",
+  "requested_change": "Rewrite the last branch of `Real.posLog_pow` to replace `rw [not_le] at h\u2082a` with `have ha : 1 < |a| := lt_of_not_ge h\u2082a`, then proceed with `have hpow : 1 < |a ^ n| := by simp [one_lt_pow\u2080 ha hn]` and the final `simp` line unchanged modulo these names.",
+  "severity": "advisory"
+ },
+ {
+  "i": 2,
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "`Real.posLog_norm_sum_le` is stated for `[NormedAddCommGroup E]`, but the proof only uses the triangle inequality and nonnegativity of norms via `norm_sum_le`/`norm_nonneg`, so it compiles with the weaker assumption `[SeminormedAddCommGroup E]`.",
+  "requested_change": "Change the typeclass assumption in `Real.posLog_norm_sum_le` from `[NormedAddCommGroup E]` to `[SeminormedAddCommGroup E]`, keeping the proof unchanged.",
+  "severity": "advisory"
+ },
+ {
+  "i": 3,
+  "target": "Real.posLog_pow",
+  "claim": "In `Real.posLog_pow`, the proof can be shortened/cleaned up by avoiding `rw [not_le]` and using `lt_of_not_ge` plus `abs_pow` to set up the `one_lt_pow\u2080` argument, with a single `simp` at the end.",
+  "requested_change": "Replace the proof of `Real.posLog_pow` with a shorter version that (1) handles the `|a| \u2264 1` case by explicitly setting `have : log\u207a a = 0 := (posLog_eq_zero_iff a).2 h\u2082a` and simp, and (2) handles the `|a| > 1` case via `ha : 1 < |a| := lt_of_not_ge h\u2082a` and `hpow : 1 < |a ^ n|` using `one_lt_pow\u2080` and `abs_pow`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 4,
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "In the docstring for `Real.posLog_norm_sum_le`, the text \u201cVariant of `posLog_sum` \u2026\u201d refers to `posLog_sum` without the `Real.` namespace, even though the preceding docstring in the file uses fully qualified references like `Real.posLog_sum`/`Real.posLog_add`. This can be confusing in rendered docs and is less robust to name clashes.",
+  "requested_change": "In the docstring of `Real.posLog_norm_sum_le`, change the backticked reference from `posLog_sum` to `Real.posLog_sum`.",
+  "severity": "advisory"
+ },
+ {
+  "i": 5,
+  "target": "Real.posLog_norm_sum_le",
+  "claim": "The docstring for `Real.posLog_norm_sum_le` refers to `posLog_sum` without the `Real.` namespace, which is inconsistent with nearby docstrings in this file that use `Real.posLog_sum` and makes the cross-reference less robust.",
+  "requested_change": "Update the docstring of `Real.posLog_norm_sum_le` to refer to `Real.posLog_sum` (and similarly any other referenced declarations) using the fully qualified name.",
+  "severity": "advisory"
+ }
+]
