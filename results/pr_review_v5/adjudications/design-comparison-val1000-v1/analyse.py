@@ -30,3 +30,20 @@ json.dump(out, open(D / "results.json", "w"), indent=1, ensure_ascii=False)
 for f, v in out["fields"].items():
     print(f"{f:26} n={v['n']:3} kappa={v['kappa']}  agreed={v['agreed']}  split={v['split']}")
 print("wrong analogue named by either:", out["wrong_analogue_named_by_either"])
+
+# Same comparison object? Both readers' `analogue` fields, compared on the declaration names they
+# carry (backticked, last component), else on shared content words.
+import re
+def keys(s):
+    names = {n.split(".")[-1].strip("'`") for n in re.findall(r"`([^`]+)`", s)}
+    words = {w for w in re.findall(r"[A-Za-z][A-Za-z0-9']{3,}", s)} - {"predicate", "lemma", "existing", "version", "variant", "form", "family", "definition", "definitions", "instance", "with", "that", "from", "this", "the", "should", "direction", "notation", "scoped", "constructor", "statement", "sibling", "siblings", "above", "twin", "other", "same", "counterpart", "duals", "dual", "lemmas"}
+    return names, words
+same = {}
+for c in sorted(A):
+    if A[c]["group"] != "B" or c not in B: continue
+    na, wa = keys(A[c]["analogue"]); nb, wb = keys(B[c]["analogue"])
+    same[c] = bool(na & nb) or (not na and not nb and bool(wa & wb)) or (bool(na) != bool(nb) and bool((na | wa) & (nb | wb)))
+out["same_analogue"] = {"n": len(same), "same": sum(same.values()), "differ": [c for c, v in same.items() if not v]}
+out["principle_written_by_both"] = sum(1 for c in A if A[c]["group"] == "A" and c in B and A[c]["principle"] and B[c].get("principle") and B[c].get("principle_stated") != "none")
+json.dump(out, open(D / "results.json", "w"), indent=1, ensure_ascii=False)
+print("same analogue:", out["same_analogue"]); print("principle written by both:", out["principle_written_by_both"], "of 31")

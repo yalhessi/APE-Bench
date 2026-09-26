@@ -1,0 +1,262 @@
+{
+ "n": {
+  "A": 74,
+  "B": 74,
+  "both": 74
+ },
+ "fields": {
+  "principle_stated": {
+   "n": 31,
+   "kappa": 0.334,
+   "agreement": 0.71,
+   "agreed": {
+    "implicit": 18,
+    "explicit": 4
+   },
+   "split": 9,
+   "A": {
+    "implicit": 19,
+    "explicit": 12
+   },
+   "B": {
+    "implicit": 26,
+    "explicit": 4,
+    "none": 1
+   }
+  },
+  "principle_source": {
+   "n": 31,
+   "kappa": 0.312,
+   "agreement": 0.613,
+   "agreed": {
+    "library_practice": 15,
+    "mathematical": 3,
+    "tacit": 1
+   },
+   "split": 12,
+   "A": {
+    "library_practice": 26,
+    "mathematical": 4,
+    "tacit": 1
+   },
+   "B": {
+    "library_practice": 15,
+    "tacit": 10,
+    "mathematical": 5,
+    "written": 1
+   }
+  },
+  "analogue_named": {
+   "n": 43,
+   "kappa": 0.43,
+   "agreement": 0.767,
+   "agreed": {
+    "yes": 27,
+    "implied": 6
+   },
+   "split": 10,
+   "A": {
+    "yes": 27,
+    "implied": 16
+   },
+   "B": {
+    "yes": 37,
+    "implied": 6
+   }
+  },
+  "findable_by": {
+   "n": 43,
+   "kappa": 0.368,
+   "agreement": 0.558,
+   "agreed": {
+    "api_shape": 13,
+    "pr_internal": 5,
+    "name": 3,
+    "role": 3
+   },
+   "split": 19,
+   "A": {
+    "api_shape": 17,
+    "name": 10,
+    "pr_internal": 9,
+    "role": 6,
+    "neighbourhood": 1
+   },
+   "B": {
+    "api_shape": 23,
+    "name": 9,
+    "pr_internal": 5,
+    "role": 5,
+    "neighbourhood": 1
+   }
+  },
+  "wrong_analogue_plausible": {
+   "n": 43,
+   "kappa": 0.401,
+   "agreement": 0.884,
+   "agreed": {
+    "no": 36,
+    "yes": 2
+   },
+   "split": 5,
+   "A": {
+    "no": 41,
+    "yes": 2
+   },
+   "B": {
+    "no": 36,
+    "yes": 7
+   }
+  }
+ },
+ "wrong_analogue_named_by_either": [
+  "v1502",
+  "v1547",
+  "v1946",
+  "v2006",
+  "v2035",
+  "v2163",
+  "v2244"
+ ],
+ "principles": {
+  "v0053": {
+   "A": "Build a definition from the constructor that takes the data already at hand rather than through an intermediate isomorphism, and do not keep both.",
+   "B": "Build a universal-property object directly from the data its constructor takes (a family of equivalences) rather than via an intermediate isomorphism, and drop the intermediate if nothing else uses it."
+  },
+  "v0297": {
+   "A": "A relation that only serves as the `≤` instance is inlined into the instance, not given its own structure.",
+   "B": "A predicate introduced only to state a single instance or definition should be inlined there rather than given its own named structure."
+  },
+  "v0384": {
+   "A": "Statements should elaborate without explicit `@` application.",
+   "B": "Lemma statements should not use `@` explicit-argument syntax; find a phrasing in which the implicit and instance arguments elaborate on their own."
+  },
+  "v0540": {
+   "A": "A constructor with many fields takes a structure of its data, so users get a skeleton from code actions.",
+   "B": "A constructor taking many data fields and hypotheses should take a single structure bundling them, so users can build the argument with structure-skeleton code actions."
+  },
+  "v0587": {
+   "A": "A Decidable instance should evaluate efficiently, not re-evaluate the predicate quadratically.",
+   "B": "A `Decidable` instance should evaluate its predicate and equality tests as few times as needed (linearly, by recursion on the list) rather than quadratically via a reformulated existential."
+  },
+  "v0622": {
+   "A": "State results in simp-normal form (`1`, not `exp 0`).",
+   "B": "The right-hand side of a simp lemma must be in simp-normal form: write `1`, not `exp 0`."
+  },
+  "v0802": {
+   "A": "Prefer a characterisation of `range (map f g)` over a specialised monotonicity consequence.",
+   "B": "Prefer a lemma characterising the object (`range (map f g) = ...`) over a specialised consequence of it; the consequence should follow from the characterisation rather than be proved on its own."
+  },
+  "v0830": {
+   "A": "Long proofs are split, with the interesting estimates as their own lemmas.",
+   "B": "A long proof should be split into lemmas, extracting each independently interesting estimate as its own statement."
+  },
+  "v0891": {
+   "A": "State a result as an iff when the converse holds.",
+   "B": "When an implication holds in both directions, state and prove it as an `iff`."
+  },
+  "v0919": {
+   "A": "Factor a reusable step into a general dot-notation lemma.",
+   "B": "A general fact used as a step inside a proof (a minimiser gives a lower bound) should be its own lemma, so the proof reduces to applying it."
+  },
+  "v1112": {
+   "A": "Separate a construction from its application: define the general operation on generators and derive the special case.",
+   "B": "A construction should be stated at the generality of what it uses: a step that does not depend on the differential module should be a standalone construction on generators, without that hypothesis."
+  },
+  "v1149": {
+   "A": "Prefer a direct computation over a bounded search when one exists.",
+   "B": "A decidability instance should compute its witness directly (solve the equation) rather than search a bounded window."
+  },
+  "v1173": {
+   "A": "Provide the basic API (`const`, `congr`) from which specialised lemmas follow, and reserve the canonical names for the basic ones.",
+   "B": "Develop the general API (`_const`, `_congr` lemmas) and derive a specialised statement from it rather than proving the specialised statement directly; reserve the `_const` name for the genuinely constant case."
+  },
+  "v1174": {
+   "A": "Develop general API rather than a specialised lemma.",
+   "B": "Prefer general API to a specialised lemma; a specialised statement should come with, or be replaced by, the general lemmas it follows from."
+  },
+  "v1191": {
+   "A": "State results as characterisations independent of a particular instance construction.",
+   "B": "State a fact as a characterisation (`boundedSpace_iff_edist`) in terms of existing structure rather than as a lemma whose statement builds a particular instance with `letI`."
+  },
+  "v1267": {
+   "A": "Do not quantify over a universe of index types inside a class; then extensionality is a theorem, not a field.",
+   "B": "A structure field that is provable from the other fields (here by `funext`) should be a theorem, not a field."
+  },
+  "v1456": {
+   "A": "Formalise the recurring mathematical concept (adjacent sequences) rather than the ad hoc instance.",
+   "B": "Name the general mathematical notion underlying the argument (adjacent sequences: one increasing, one decreasing, same limit) and prove the result through it rather than inline."
+  },
+  "v1457": {
+   "A": "Define the object you will reason about (the iterated sequence) directly, not only one step.",
+   "B": "Define the object actually studied (the sequence of iterates, or the pair of sequences) rather than only its one-step generator, so lemmas are stated about the sequence directly."
+  },
+  "v1459": {
+   "A": "A definition made with `choose` comes with lemmas exposing its `choose_spec` properties.",
+   "B": "A definition made by `Classical.choose` should come with lemmas exposing its defining property (`choose_spec`), so users never unfold the choice."
+  },
+  "v1497": {
+   "A": "State the strongest natural consequence (an isomorphism) rather than partial facts.",
+   "B": "When a stronger structural fact (an isomorphism of the residue field with the reals) holds under the same hypotheses, establish it and derive the piecemeal lemmas from it."
+  },
+  "v1549": {
+   "A": "State lemmas with expanded functions rather than compositions.",
+   "B": "In statements, write an explicit lambda rather than a chain of function compositions; it is more readable and easier to rewrite."
+  },
+  "v1592": {
+   "A": "Introduce a definition at its most general level, with API, or leave a TODO.",
+   "B": "A `Finset` operation built from a `List` operation should pass through a `Multiset` version, following the List -> Multiset -> Finset layering, and each layer needs its own API (or a TODO)."
+  },
+  "v1645": {
+   "A": "Provide the universe-polymorphic `OfSize` form of a preservation instance.",
+   "B": "Provide the most general instance available (`PreservesLimitsOfSize`) rather than the per-shape one, since the general instance yields the specific ones."
+  },
+  "v1907": {
+   "A": "Express a property of objects as an `ObjectProperty` and state conditions with `IsIso`, not bespoke structures.",
+   "B": "State a property of objects with the library's standard predicates (`IsIso`) and package the subcategory with `ObjectProperty`/`FullSubcategory` (or a typeclass) rather than a bespoke structure."
+  },
+  "v1992": {
+   "A": "Extract an inline construction into an auxiliary definition.",
+   "B": "A large term built inline inside a proof (`letI G : Grp C := {...}`) should be a named auxiliary definition, so it can be stated, reused and its proof obligations tidied separately."
+  },
+  "v1998": {
+   "A": "Define the general functorial object (iteration as a functor) instead of ad hoc recursive definitions.",
+   "B": "Define the general construction (the iterates of an endofunctor as a functor `ℕ ⥤ C ⥤ C`) and obtain the special case (iterates applied at the initial object) from it."
+  },
+  "v2037": {
+   "A": "When a structure extends another, define the extended one directly rather than in two stages.",
+   "B": "When the target structure extends an intermediate one, define the target directly rather than building the intermediate first and upgrading it."
+  },
+  "v2066": {
+   "A": "A fact used inside a proof is its own lemma.",
+   "B": "An independently meaningful fact proved inline inside a case of a proof (`Φ 0 = 0`) should be its own lemma."
+  },
+  "v2112": {
+   "A": "Give a default instance by its canonical construction, not through a general helper.",
+   "B": "Construct a canonical element (the empty partition) directly rather than through a roundabout construction, so its definitional unfolding is the obvious one."
+  },
+  "v2117": {
+   "A": "State a result as an iff when the converse holds.",
+   "B": "When an implication holds in both directions, state it as an `iff`."
+  },
+  "v2263": {
+   "A": "Generalise the core of a proof to a lemma about the underlying general construction.",
+   "B": "Prove the general statement (about `gfpApprox f x` when `f x = x`) as a lemma and derive the specific instance from it."
+  }
+ },
+ "same_analogue": {
+  "n": 43,
+  "same": 35,
+  "differ": [
+   "v1132",
+   "v1186",
+   "v1280",
+   "v1547",
+   "v1585",
+   "v1655",
+   "v1682",
+   "v2104"
+  ]
+ },
+ "principle_written_by_both": 30
+}

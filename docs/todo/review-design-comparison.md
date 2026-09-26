@@ -1,7 +1,9 @@
 # A reviewer that compares designs against the library's analogues
 
-**Status** — open, 2026-09-26, **for a fresh session in a worktree**. It is the main line the user
-chose over the mechanical sweeps (`review-mechanical-sweeps.md`), with one named risk.
+**Status** — **in progress**, 2026-09-26: the two free readings are done
+(`results/pr_review_v5/adjudications/design-comparison-val1000-v1/results.md`); next is the
+shape-match retrieval and its test on the 43. It is the main line the user chose over the
+mechanical sweeps (`review-mechanical-sweeps.md`), with one named risk.
 **Cost** — free to scope (two readings of labelled asks, then a retrieval test against them); a
 judged probe of the `facet-brief-probe` shape after that, or one validation run.
 
@@ -50,6 +52,22 @@ because it's being compared to the wrong sibling."* Three guards, all before any
 - For the 43 library- and sibling-reference asks, how was the analogue findable: by name, by role,
   by API shape, by import neighbourhood?
 - Build retrieval for the findable kinds and test on those 43: analogue recall and wrong-analogue rate.
+
+**Results of the two readings (2026-09-26, two blind readers).** The taste is articulable: both
+readers wrote the principle as a one-sentence rule for **30 of 31** variant asks. It is mostly
+unwritten: checked against the style guide, review guide, values page, naming page and the 33
+library notes, **8 are written, 12 covered by a maxim only, 11 nowhere**, the eleven being the
+encoding choices. The comparison object is unambiguous: the readers named the **same analogue in
+43 of 43**. It is reachable by API shape in 17-23 of 43 (the PR wrote out the body of something the
+library names), by name in 3-10, by role in 3-6. A wrong analogue is plausible in 2 (agreed) to 7
+(either) of 43. A **name-token search from the PR's own declarations finds the analogue in the top
+ten for 0 of 43**, and its top hits are lookalikes: the wrong-sibling risk lives in retrieval, not
+in judgment. The exemplar that defeats shape matching: v2006, where the PR wrote the sequential
+form and the maintainer asked for the filter form used by `IsCompact` and `IsLindelof`.
+
+**Next: shape-match retrieval.** Match the PR's hypotheses and definition bodies against the
+bodies of the library's definitions and classes up to renaming; test on the 43 for recall and decoy
+rate, v2006 included; then role retrieval for the remainder.
 
 **What would close it.** Retrieval returns the maintainer's analogue on at least two thirds of the
 43 with a wrong-analogue rate at or below one in five; then a judged test with the analogues in the
