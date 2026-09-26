@@ -312,3 +312,23 @@ the same thing) and control-PR emission as the check on the rest.
 misses' sites they surface. Through if `exact?` finds the Parseval duplicate and the battery
 finds the `positivity`/`gcongr`/`simpa` proofs. Then Step 2 puts the sweep results in front of
 the arms before they decide.
+
+**Finding probe on a real miss, 2026-09-26.** Validation PR 34091 adds
+`Cardinal.exists_infinite_fiber' (f : β → α) (h : #α < #β) (hα : Infinite α) : ∃ a, Infinite (f ⁻¹' {a})`;
+the maintainer asked "Surely this is a one-liner using `infinite_pigeonhole_card_lt`?", and no arm
+reached it. In the reviewed workspace, against the file's own imports (`lake env lean`, 6 s for
+two calls):
+- `exact?` on the statement: could not close the goal;
+- `apply?`: seven generic partial matches (`Exists.intro`, `exists_range_iff`, …), none the lemma;
+- the lemma the maintainer named sits **40 lines above the new theorem in the same file**, with
+  the **same hypotheses** `(f : β → α) (h : #α < #β)` and conclusion `∃ a, #α < #(f ⁻¹' {a})`, from
+  which the new statement follows by one bridging step (`Infinite` from a cardinal bound). Only 4
+  lemmas in `SetTheory` and `Data/Fintype` carry a `#_ < #_` hypothesis at all.
+
+So unification on the goal misses it and a **hypothesis-shape search over the file and family**
+finds it at once. The comprehensive search that works here has three radii, all mechanical:
+(1) `exact?`/`apply?` on the goal; (2) the same file and family, matched on hypothesis shape and
+name tokens -- the sibling comparison of the revision above, which this case promotes; (3) a
+library-wide pattern search (Loogle-style) on hypothesis and conclusion shapes. The reviewer is
+then handed "this file already has a lemma taking exactly your hypotheses" and settles it by
+compiling. Step 1b's sweep should implement all three and score each against the 38 misses.
