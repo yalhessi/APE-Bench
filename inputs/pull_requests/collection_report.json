@@ -197,6 +197,46 @@
         "2024-03-01",
         "2026-08-31"
       ]
+    },
+    {
+      "collector_version": "pull-request-collector/1",
+      "finished_at": "2026-09-26T15:59:02Z",
+      "pr_list": {
+        "count": 250,
+        "path": "/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/b9848b08-eb04-43a7-9e77-0f87417755b6/scratchpad/wide/outside_window_prs.txt",
+        "sha256": "97b42c83662ee2ddcf04b024a2fda66f8acb420233af8fb217b35f49a1d92c1e"
+      },
+      "pre_gate": {
+        "by_reason": {
+          "pass": 250
+        },
+        "passing": 250,
+        "prs": 250,
+        "tier2_hours_estimate": 0.4,
+        "tier2_needed": 250,
+        "tier2_request_estimate": 2000
+      },
+      "requests": 2031,
+      "result": {
+        "compares_fetched": 515,
+        "prs_deferred": [],
+        "prs_read": 250
+      },
+      "roster": {
+        "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+        "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+      },
+      "slice": [
+        null,
+        null
+      ],
+      "started_at": "2026-09-26T15:43:14Z",
+      "store_content_sha256": "894e5b9355978b67b64b36ac84ab34308caf306839ff754f4e06d6fe358f1055",
+      "tier": 2,
+      "window": [
+        "2024-03-01",
+        "2026-08-31"
+      ]
     }
   ]
 }

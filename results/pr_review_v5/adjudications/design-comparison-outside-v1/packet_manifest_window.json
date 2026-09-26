@@ -1,0 +1,3670 @@
+{
+ "seed": "outside-window-2026-09-26",
+ "walked": 250,
+ "no_feedback": 121,
+ "prs": [
+  12667,
+  12668,
+  12673,
+  12677,
+  12899,
+  13790,
+  14081,
+  14329,
+  14858,
+  15487,
+  15669,
+  15702,
+  15708,
+  15791,
+  16159,
+  16205,
+  16582,
+  16679,
+  16771,
+  17040,
+  17243,
+  17455,
+  17685,
+  17787,
+  17832,
+  17863,
+  17899,
+  18001,
+  18175,
+  18275,
+  18433,
+  18667,
+  19052,
+  19293,
+  19604,
+  19664,
+  19684,
+  19955,
+  20129,
+  20182,
+  20230,
+  20331,
+  20380,
+  20428,
+  20620,
+  20630,
+  20810,
+  21167,
+  21212,
+  21292,
+  21295,
+  21505,
+  21583,
+  21726,
+  21828,
+  22085,
+  22222,
+  22259,
+  22281,
+  22463,
+  22877,
+  22913,
+  22929,
+  23086,
+  23144,
+  23164,
+  23557,
+  23559,
+  23684,
+  23936,
+  24017,
+  24044,
+  24056,
+  24242,
+  24279,
+  24476,
+  24686,
+  24712,
+  25249,
+  37696,
+  37791,
+  38028,
+  38105,
+  38114,
+  38165,
+  38232,
+  38352,
+  38432,
+  38510,
+  38514,
+  38533,
+  38556,
+  38727,
+  38785,
+  38827,
+  38846,
+  38962,
+  39317,
+  39506,
+  39633,
+  39789,
+  39815,
+  40126,
+  40180,
+  40188,
+  40269,
+  40272,
+  40492,
+  40622,
+  40760,
+  40792,
+  40797,
+  40895,
+  40976,
+  41002,
+  41035,
+  41054,
+  41246,
+  41369,
+  41491,
+  41663,
+  41971,
+  42048,
+  42129,
+  42248,
+  42522,
+  42545,
+  42633,
+  42889
+ ],
+ "ai_prs": [
+  38352,
+  38514,
+  40976,
+  41491,
+  41663,
+  42248,
+  42889
+ ],
+ "rows": [
+  {
+   "cid": "w0000",
+   "pr": 23559,
+   "kind": "review_comment",
+   "path": "Mathlib/Tactic/ToAdditive/Frontend.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:556bf5fb3e60b3c4df937531"
+  },
+  {
+   "cid": "w0001",
+   "pr": 23559,
+   "kind": "review_comment",
+   "path": "Mathlib/Tactic/ToAdditive/Frontend.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:203b150477d0abe325bf3ab9"
+  },
+  {
+   "cid": "w0002",
+   "pr": 23559,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:34a05a52eb5448788b43ce84"
+  },
+  {
+   "cid": "w0003",
+   "pr": 20182,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Distributive/Monoidal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:0be3f57f23b4e1f23b115027"
+  },
+  {
+   "cid": "w0004",
+   "pr": 20182,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Distributive/Monoidal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:42a47b7839cbabcac342bf0e"
+  },
+  {
+   "cid": "w0005",
+   "pr": 25249,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Category/FGModuleCat/EssentiallySmall.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:0ffbfe117f4f7715c8f5cf63"
+  },
+  {
+   "cid": "w0006",
+   "pr": 25249,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Category/FGModuleCat/EssentiallySmall.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:d57c214427090e7c5693c7b3"
+  },
+  {
+   "cid": "w0007",
+   "pr": 25249,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Finiteness/Cardinality.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:159e52f6df4aefd2c1049ee7"
+  },
+  {
+   "cid": "w0008",
+   "pr": 17863,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicGeometry/Morphisms/Proper.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:14dbe57b69a9263061244d06"
+  },
+  {
+   "cid": "w0009",
+   "pr": 17863,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:670af02523a9bbf27c5f918e"
+  },
+  {
+   "cid": "w0010",
+   "pr": 17863,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicGeometry/Morphisms/Proper.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:eef153f28ca35c3843c76595"
+  },
+  {
+   "cid": "w0011",
+   "pr": 40760,
+   "kind": "review_comment",
+   "path": "Mathlib/Tactic/Push.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:352d1eebc0c7b8e8ef6923c0"
+  },
+  {
+   "cid": "w0012",
+   "pr": 16205,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:4cce8163ef927c6b52246af8"
+  },
+  {
+   "cid": "w0013",
+   "pr": 15669,
+   "kind": "review_comment",
+   "path": "Mathlib/Geometry/Manifold/LocalInvariantProperties.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:3d0fd782e97dbac4c4124621"
+  },
+  {
+   "cid": "w0014",
+   "pr": 24056,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:8b0fb4b47699a2fb8aedfe3a"
+  },
+  {
+   "cid": "w0015",
+   "pr": 22463,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Order/LeftRightNhds.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:c160d37f15951e8bc1a3a98a"
+  },
+  {
+   "cid": "w0016",
+   "pr": 22463,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Order/Group.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:05eb5cc8214d9b772860c165"
+  },
+  {
+   "cid": "w0017",
+   "pr": 22463,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:e3c389f8232ed9594266a912"
+  },
+  {
+   "cid": "w0018",
+   "pr": 42889,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/ExteriorPower/BilinForm.lean",
+   "ai": true,
+   "ai_evidence": [
+    "label"
+   ],
+   "month": "2026-08",
+   "event_id": "event:8af9b665c3274483d7cb3a55"
+  },
+  {
+   "cid": "w0019",
+   "pr": 19052,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Complex/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-11",
+   "event_id": "event:267951475585aa658c8e0c2b"
+  },
+  {
+   "cid": "w0020",
+   "pr": 15791,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:001fd4097fddf974160f1b85"
+  },
+  {
+   "cid": "w0021",
+   "pr": 17243,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Matrix/RowCol.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:38374b4960b23c52ae1103f7"
+  },
+  {
+   "cid": "w0022",
+   "pr": 17243,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:8c20c888bd5000b5c00a4728"
+  },
+  {
+   "cid": "w0023",
+   "pr": 17243,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Matrix/RowCol.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:17f1249f5b9dc931d2ca781c"
+  },
+  {
+   "cid": "w0024",
+   "pr": 20620,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:15f691dcc8f42ad0933c0173"
+  },
+  {
+   "cid": "w0025",
+   "pr": 20620,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Order/Group/CompleteLattice.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:8d648e416f4abf6c04dfcc7b"
+  },
+  {
+   "cid": "w0026",
+   "pr": 20620,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Order/Group/CompleteLattice.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:537e2b7e20d76bf8d6862d25"
+  },
+  {
+   "cid": "w0027",
+   "pr": 17787,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/ApproximateUnit.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:7c80e3c42c4fb1ed9a649600"
+  },
+  {
+   "cid": "w0028",
+   "pr": 17787,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/ApproximateUnit.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:5a6e71ece30bf6ebf2fd04f8"
+  },
+  {
+   "cid": "w0029",
+   "pr": 17787,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/ApproximateUnit.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:cdc56075f515a3951d39f5ca"
+  },
+  {
+   "cid": "w0030",
+   "pr": 19684,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Shapes/Grothendieck.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:1a4ad1d3e89ca73baa3f1d48"
+  },
+  {
+   "cid": "w0031",
+   "pr": 19684,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Shapes/Grothendieck.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:68bfd5e4a542a656c795d3b8"
+  },
+  {
+   "cid": "w0032",
+   "pr": 19684,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Filtered/CostructuredArrow.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:03dc5094d5643fad240a0b7c"
+  },
+  {
+   "cid": "w0033",
+   "pr": 19684,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Shapes/Grothendieck.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:7422e29f074cfcfba7256e28"
+  },
+  {
+   "cid": "w0034",
+   "pr": 19684,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Shapes/Grothendieck.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:39ff7862e154572db43833d7"
+  },
+  {
+   "cid": "w0035",
+   "pr": 38514,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/Limits.lean",
+   "ai": true,
+   "ai_evidence": [
+    "label"
+   ],
+   "month": "2026-04",
+   "event_id": "event:5b3fd86b9c083fc810b0e427"
+  },
+  {
+   "cid": "w0036",
+   "pr": 38514,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Category/ModuleCat/Presheaf/Limits.lean",
+   "ai": true,
+   "ai_evidence": [
+    "label"
+   ],
+   "month": "2026-04",
+   "event_id": "event:f1c43552999b959ffa321b70"
+  },
+  {
+   "cid": "w0037",
+   "pr": 23936,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:71337d4a7e40c323563f5259"
+  },
+  {
+   "cid": "w0038",
+   "pr": 38785,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:2c2796fea93aa4b01979e3f5"
+  },
+  {
+   "cid": "w0039",
+   "pr": 38785,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:7ab9926442521efa3a5a037e"
+  },
+  {
+   "cid": "w0040",
+   "pr": 38785,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:e77ad51ac55633c8f974c616"
+  },
+  {
+   "cid": "w0041",
+   "pr": 38785,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:0b80014ae7a24446a19dcb2e"
+  },
+  {
+   "cid": "w0042",
+   "pr": 38785,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:9270aa2f5c131c878a1201db"
+  },
+  {
+   "cid": "w0043",
+   "pr": 38785,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:9ba3b5111446d31bf94e4c88"
+  },
+  {
+   "cid": "w0044",
+   "pr": 19293,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Function/LpSeminorm/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-11",
+   "event_id": "event:74b30113942271c2b512cd6f"
+  },
+  {
+   "cid": "w0045",
+   "pr": 23164,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:80cdd4ca71fb5efe28f416d5"
+  },
+  {
+   "cid": "w0046",
+   "pr": 20630,
+   "kind": "review_comment",
+   "path": "Mathlib/FieldTheory/IntermediateField/Adjoin/Algebra.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:07ac1f4ac570aa2874ef667c"
+  },
+  {
+   "cid": "w0047",
+   "pr": 20630,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:2748e3abedff69518cfdb1e3"
+  },
+  {
+   "cid": "w0048",
+   "pr": 20630,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:900def4d84c5355d7203c162"
+  },
+  {
+   "cid": "w0049",
+   "pr": 41246,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/EReal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:c7576d6a9e747829ff34c571"
+  },
+  {
+   "cid": "w0050",
+   "pr": 41246,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/EReal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:baa9dd315f4ff17734718c76"
+  },
+  {
+   "cid": "w0051",
+   "pr": 41246,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/EReal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:3c8e0e010780b699e7430016"
+  },
+  {
+   "cid": "w0052",
+   "pr": 41246,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/EReal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:695556fd64695d6457cd3be3"
+  },
+  {
+   "cid": "w0053",
+   "pr": 41246,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/EReal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:bbd29d2a1dd44db830215863"
+  },
+  {
+   "cid": "w0054",
+   "pr": 17455,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Polynomial/Pochhammer.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:15847a97d0def2294110cca8"
+  },
+  {
+   "cid": "w0055",
+   "pr": 17455,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Polynomial/Pochhammer.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:355be75259aba7e7fc238771"
+  },
+  {
+   "cid": "w0056",
+   "pr": 17455,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Polynomial/Pochhammer.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:69edaa03b8e4c3a08c67b068"
+  },
+  {
+   "cid": "w0057",
+   "pr": 17455,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Polynomial/Pochhammer.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:bfb4947b19bad7c31fc41cfd"
+  },
+  {
+   "cid": "w0058",
+   "pr": 12677,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/List/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:217f53278734fe65f11131b4"
+  },
+  {
+   "cid": "w0059",
+   "pr": 42545,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:8e95ac6437af1924ff279735"
+  },
+  {
+   "cid": "w0060",
+   "pr": 42545,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:e87b13a2fc2486056cb40991"
+  },
+  {
+   "cid": "w0061",
+   "pr": 42545,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:85b235742925070b21cceafc"
+  },
+  {
+   "cid": "w0062",
+   "pr": 42545,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:c9cd596b2fe1ecac3322f402"
+  },
+  {
+   "cid": "w0063",
+   "pr": 42545,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:d3ba7d2b07ea15ee7f415cd4"
+  },
+  {
+   "cid": "w0064",
+   "pr": 40269,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:391c72bf64c0a1ef1dbb2668"
+  },
+  {
+   "cid": "w0065",
+   "pr": 40269,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:5ee25217b96d4a2655e2c766"
+  },
+  {
+   "cid": "w0066",
+   "pr": 40269,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:30687fc56a7515d6871ef9f3"
+  },
+  {
+   "cid": "w0067",
+   "pr": 40269,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Finite.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:a3a2102b76cb4d03af616dca"
+  },
+  {
+   "cid": "w0068",
+   "pr": 22913,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Lattice.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:406e474f9c4289a1df9e129b"
+  },
+  {
+   "cid": "w0069",
+   "pr": 22913,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:fb61e04ea839eced5d94eb3e"
+  },
+  {
+   "cid": "w0070",
+   "pr": 21505,
+   "kind": "review_comment",
+   "path": "Mathlib/Tactic/MinImports.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:a7b449d8261b4c33da73a4fe"
+  },
+  {
+   "cid": "w0071",
+   "pr": 21505,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:29a4c46217b4ed0f912eaa3e"
+  },
+  {
+   "cid": "w0072",
+   "pr": 22259,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Fin/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:12a6a2a95dd99844a110ac54"
+  },
+  {
+   "cid": "w0073",
+   "pr": 18275,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:e355f3ae03e5e85e24710289"
+  },
+  {
+   "cid": "w0074",
+   "pr": 38352,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/SpecialFunctions/Log/Monotone.lean",
+   "ai": true,
+   "ai_evidence": [
+    "label"
+   ],
+   "month": "2026-04",
+   "event_id": "event:d60f8f705fa206a1696db555"
+  },
+  {
+   "cid": "w0075",
+   "pr": 41054,
+   "kind": "review_comment",
+   "path": "Mathlib/RepresentationTheory/Rep/Res.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:06a974d2f42667ddde6fabea"
+  },
+  {
+   "cid": "w0076",
+   "pr": 41054,
+   "kind": "review_comment",
+   "path": "Mathlib/RepresentationTheory/Rep/Res.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:71d62166135f9b10e0a85986"
+  },
+  {
+   "cid": "w0077",
+   "pr": 41054,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:dc69c44e417e0ec104d0e3d2"
+  },
+  {
+   "cid": "w0078",
+   "pr": 41054,
+   "kind": "review_comment",
+   "path": "Mathlib/RepresentationTheory/Rep/Res.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:f809d7d3bcee653e85a8a913"
+  },
+  {
+   "cid": "w0079",
+   "pr": 22085,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Path.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:321dad846bafa52d845b3862"
+  },
+  {
+   "cid": "w0080",
+   "pr": 22085,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Path.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:361de189eac9f5f33310a6ac"
+  },
+  {
+   "cid": "w0081",
+   "pr": 22085,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:c1fc49ed2ecb5551bd245f3f"
+  },
+  {
+   "cid": "w0082",
+   "pr": 22085,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Path.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:336515f59d91964b9fa0a510"
+  },
+  {
+   "cid": "w0083",
+   "pr": 40492,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Order/Module/PositiveLinearMap.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:0c9c5bda461197c7b383011a"
+  },
+  {
+   "cid": "w0084",
+   "pr": 40492,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Order/Module/PositiveLinearMap.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:99048c4eecf718797f0cb08e"
+  },
+  {
+   "cid": "w0085",
+   "pr": 12667,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CompactOpen.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:4087076c88fe8e9a0b9f2e7c"
+  },
+  {
+   "cid": "w0086",
+   "pr": 12667,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CompactOpen.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:31822d1bddb1bf1e7280438d"
+  },
+  {
+   "cid": "w0087",
+   "pr": 12667,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:17e2538d5987cf0eca39d798"
+  },
+  {
+   "cid": "w0088",
+   "pr": 14858,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/FreeProduct/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-07",
+   "event_id": "event:46e3e41c771cb8384ec4d7ad"
+  },
+  {
+   "cid": "w0089",
+   "pr": 14858,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/FreeProduct/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-07",
+   "event_id": "event:ece1407768f43281ed8f3484"
+  },
+  {
+   "cid": "w0090",
+   "pr": 14858,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/FreeProduct/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-07",
+   "event_id": "event:9b15ef6e0f0bf37bfa2513cf"
+  },
+  {
+   "cid": "w0091",
+   "pr": 18433,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Algebraic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:a807ca956bf74b60fb59ba36"
+  },
+  {
+   "cid": "w0092",
+   "pr": 18433,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Algebraic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:5df553c35ba8f1777aa00456"
+  },
+  {
+   "cid": "w0093",
+   "pr": 18433,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Algebraic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:f5439e6e358c271666a23665"
+  },
+  {
+   "cid": "w0094",
+   "pr": 18433,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Algebraic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:abcb3d63ec3ad3fa398707be"
+  },
+  {
+   "cid": "w0095",
+   "pr": 18433,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Algebraic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:079b6767ed5412643929be58"
+  },
+  {
+   "cid": "w0096",
+   "pr": 24242,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:dc94b1433fdb606f51a7fb28"
+  },
+  {
+   "cid": "w0097",
+   "pr": 24242,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Ideal/AssociatedPrime/Finiteness.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:77fc5b821de4c353a7cc446c"
+  },
+  {
+   "cid": "w0098",
+   "pr": 24242,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Ideal/AssociatedPrime/Finiteness.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:b73192c46c095edab932a8be"
+  },
+  {
+   "cid": "w0099",
+   "pr": 24242,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Ideal/AssociatedPrime/Finiteness.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:d8e25ca212b91635ee1a59c2"
+  },
+  {
+   "cid": "w0100",
+   "pr": 21726,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/GCDMonoid/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:f47613ae42c64692f23bfbef"
+  },
+  {
+   "cid": "w0101",
+   "pr": 21726,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:41ac8189b60cc36de8c24ed5"
+  },
+  {
+   "cid": "w0102",
+   "pr": 38232,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:605e15823babbc98002fc400"
+  },
+  {
+   "cid": "w0103",
+   "pr": 38232,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:d81c0a8d8e85a501c2b73650"
+  },
+  {
+   "cid": "w0104",
+   "pr": 38232,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:a0a48798a8b9f1aedcc0d79e"
+  },
+  {
+   "cid": "w0105",
+   "pr": 38232,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:2dc087010b6771ba387195b6"
+  },
+  {
+   "cid": "w0106",
+   "pr": 19664,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Matroid/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:6a275721a9f7e106f6fcfaa8"
+  },
+  {
+   "cid": "w0107",
+   "pr": 19664,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Matroid/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:054bdcdde4417f7d700cb5f0"
+  },
+  {
+   "cid": "w0108",
+   "pr": 21828,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:63c22d3561804f94da8588e7"
+  },
+  {
+   "cid": "w0109",
+   "pr": 21828,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:0616ac0fa2913e7e4620747c"
+  },
+  {
+   "cid": "w0110",
+   "pr": 21828,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:f7e693a97471a087db141adf"
+  },
+  {
+   "cid": "w0111",
+   "pr": 19604,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Abelian/ProjectiveDimension.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-11",
+   "event_id": "event:31827406293e026b6df60ae5"
+  },
+  {
+   "cid": "w0112",
+   "pr": 21167,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/InnerProductSpace/Adjoint.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:d5821648d8493855700bfe5a"
+  },
+  {
+   "cid": "w0113",
+   "pr": 21167,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:d38da42d5b1340793761ed9f"
+  },
+  {
+   "cid": "w0114",
+   "pr": 23086,
+   "kind": "review_comment",
+   "path": "Mathlib/Dynamics/PeriodicPts/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:ce35d870d2cd2b1ff6c69150"
+  },
+  {
+   "cid": "w0115",
+   "pr": 41971,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Lie/Basis/Prod.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:1eabbd2d2a530423bac21ef7"
+  },
+  {
+   "cid": "w0116",
+   "pr": 41971,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Lie/Basis/Prod.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:71cf7cb63b1c2debef7d51b0"
+  },
+  {
+   "cid": "w0117",
+   "pr": 41971,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:08549803143a6f2c6e336469"
+  },
+  {
+   "cid": "w0118",
+   "pr": 23557,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Matroid/Minor/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:7545a979b2ad10ecd33d9023"
+  },
+  {
+   "cid": "w0119",
+   "pr": 22929,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Cover.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:733648eeb07352b1ed9e1cf8"
+  },
+  {
+   "cid": "w0120",
+   "pr": 22929,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Cover.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:dfb8e5f59a6f99cd12afbefc"
+  },
+  {
+   "cid": "w0121",
+   "pr": 22929,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Cover.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:ffa79f15d52aa132af206962"
+  },
+  {
+   "cid": "w0122",
+   "pr": 22929,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:b9a0f5ed2020261f010fbd7b"
+  },
+  {
+   "cid": "w0123",
+   "pr": 24686,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Preserves/Bifunctor.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:7e3062d0493d0c648217ab82"
+  },
+  {
+   "cid": "w0124",
+   "pr": 15487,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Cover.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:a9e7b786da2f3f9d95e6a27a"
+  },
+  {
+   "cid": "w0125",
+   "pr": 15487,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Interval/Set/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:b8ccad0db80f253941756f08"
+  },
+  {
+   "cid": "w0126",
+   "pr": 20129,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/SpecialFunctions/Trigonometric/Chebyshev.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:e663b9b5cd017223a7b7d031"
+  },
+  {
+   "cid": "w0127",
+   "pr": 16582,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:059e55ce209cca6ef99566a0"
+  },
+  {
+   "cid": "w0128",
+   "pr": 13790,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Module/LocalizedModule.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:bafb767a098ab3828609b0c5"
+  },
+  {
+   "cid": "w0129",
+   "pr": 13790,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Module/LocalizedModule.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:e8962a5218f68232a973119c"
+  },
+  {
+   "cid": "w0130",
+   "pr": 40792,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:ca290a32ce4603f3afd2afb4"
+  },
+  {
+   "cid": "w0131",
+   "pr": 39506,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:2e3caf576ad0b91ba431b382"
+  },
+  {
+   "cid": "w0132",
+   "pr": 39506,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:8f210769e65cbbf6ce4cbe85"
+  },
+  {
+   "cid": "w0133",
+   "pr": 39506,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Complex/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:a3eded58847eefe412054636"
+  },
+  {
+   "cid": "w0134",
+   "pr": 39506,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Complex/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:288cc7052a64e90a34846ed0"
+  },
+  {
+   "cid": "w0135",
+   "pr": 39506,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Complex/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:38581d7a20c03edf0e076cc1"
+  },
+  {
+   "cid": "w0136",
+   "pr": 24279,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/DedekindDomain/SInteger.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:3a33454a90a73300f633dc60"
+  },
+  {
+   "cid": "w0137",
+   "pr": 24279,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/DedekindDomain/SInteger.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:f13f33197c75814cd4b91829"
+  },
+  {
+   "cid": "w0138",
+   "pr": 24279,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/DedekindDomain/SInteger.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:8258f4dacbbafddeeb0b25c2"
+  },
+  {
+   "cid": "w0139",
+   "pr": 12668,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:61dacb228982ce55052f4a8e"
+  },
+  {
+   "cid": "w0140",
+   "pr": 12668,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Constructions/Pi.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:49d1a293bd1ded50c384a558"
+  },
+  {
+   "cid": "w0141",
+   "pr": 12668,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Measure/Haar/Quotient.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:dc01993ffae40a599d3b08ec"
+  },
+  {
+   "cid": "w0142",
+   "pr": 12668,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:9a0dd8f1e827e0b574672b8f"
+  },
+  {
+   "cid": "w0143",
+   "pr": 12668,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:5212602b14b21c7b6e9575a4"
+  },
+  {
+   "cid": "w0144",
+   "pr": 42129,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Lie/Weights/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:fb7b42a4d3bb4a82e3fcfa3e"
+  },
+  {
+   "cid": "w0145",
+   "pr": 42129,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:f8e5c2520681397583168d40"
+  },
+  {
+   "cid": "w0146",
+   "pr": 22222,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Abelian/FreydMitchell.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:8e556ab5fc405caa417748be"
+  },
+  {
+   "cid": "w0147",
+   "pr": 12673,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/Calculus/ContDiff/RCLike.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:39580681e6b4d13ce333cd6e"
+  },
+  {
+   "cid": "w0148",
+   "pr": 17832,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:4c9ce50f61a37ba9d513d9c8"
+  },
+  {
+   "cid": "w0149",
+   "pr": 16159,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/Matrix/FixedDetMatrices.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:f0c243c8f913cbee6049c7b3"
+  },
+  {
+   "cid": "w0150",
+   "pr": 16159,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/Matrix/FixedDetMatrices.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:bd0d673be24e8fbfd42c1578"
+  },
+  {
+   "cid": "w0151",
+   "pr": 16159,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/Matrix/FixedDetMatrices.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:41800135bcd0d8da44e8e273"
+  },
+  {
+   "cid": "w0152",
+   "pr": 16159,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/Matrix/SpecialLinearGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:ac06fc4fdfffc8d58825a4fb"
+  },
+  {
+   "cid": "w0153",
+   "pr": 42048,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Ideal/Norm/AbsNorm.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:0183cc2a99a05833131daa6e"
+  },
+  {
+   "cid": "w0154",
+   "pr": 18667,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/Goursat.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-11",
+   "event_id": "event:d799253fdd5d87fc419f71bf"
+  },
+  {
+   "cid": "w0155",
+   "pr": 18667,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Group/Graph.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-11",
+   "event_id": "event:3197fda5cd8b67ac0d99fb19"
+  },
+  {
+   "cid": "w0156",
+   "pr": 38432,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:3df3cf2e9a17b53c2b17adac"
+  },
+  {
+   "cid": "w0157",
+   "pr": 21212,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/GroupWithZero/Hom.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:5a81f4c53951925912919e5f"
+  },
+  {
+   "cid": "w0158",
+   "pr": 21212,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Nat/Log.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:a32245a1f8a9ff60af5673f8"
+  },
+  {
+   "cid": "w0159",
+   "pr": 21212,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:5e30e025600a329d7a32c116"
+  },
+  {
+   "cid": "w0160",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:fddb98525991fc33ed4b2dec"
+  },
+  {
+   "cid": "w0161",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:41f96572102c33cda62eac0d"
+  },
+  {
+   "cid": "w0162",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:5437cb1875a42eff42365301"
+  },
+  {
+   "cid": "w0163",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:922f402e60c5fb1854c911e4"
+  },
+  {
+   "cid": "w0164",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:b069cfb444bf96e24a75d12d"
+  },
+  {
+   "cid": "w0165",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:388ac54e4ea89fea117bfe3f"
+  },
+  {
+   "cid": "w0166",
+   "pr": 14081,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-06",
+   "event_id": "event:d7e5986e333c5e33a372be8b"
+  },
+  {
+   "cid": "w0167",
+   "pr": 24017,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/CompletelyRegular.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:1ef9c582b33cebf2ab263859"
+  },
+  {
+   "cid": "w0168",
+   "pr": 24017,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/CompletelyRegular.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:693428174500a8efbef04b24"
+  },
+  {
+   "cid": "w0169",
+   "pr": 24017,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/CompletelyRegular.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:57e88436344800f7f739f38a"
+  },
+  {
+   "cid": "w0170",
+   "pr": 24017,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:4cb22f2d470de4cfe7a30065"
+  },
+  {
+   "cid": "w0171",
+   "pr": 24017,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/CompletelyRegular.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:72abb69a89c82add6c68461d"
+  },
+  {
+   "cid": "w0172",
+   "pr": 24017,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/CompletelyRegular.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:835d3f0905843b730c6070ca"
+  },
+  {
+   "cid": "w0173",
+   "pr": 24712,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:265e7f7d255d2a8cc0ab2fea"
+  },
+  {
+   "cid": "w0174",
+   "pr": 24712,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:bfeedc86c8dbcf3c3c204a3a"
+  },
+  {
+   "cid": "w0175",
+   "pr": 24712,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:f34ef188d58f833db74f1f5b"
+  },
+  {
+   "cid": "w0176",
+   "pr": 24712,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/CWComplex/Classical/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:2751f437c3092a5caab32254"
+  },
+  {
+   "cid": "w0177",
+   "pr": 24712,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-05",
+   "event_id": "event:c771ed84194656d2e7a01408"
+  },
+  {
+   "cid": "w0178",
+   "pr": 17040,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Group/Equiv/TypeTags.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:8f65c8e835354d3836f35f59"
+  },
+  {
+   "cid": "w0179",
+   "pr": 17040,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Group/Equiv/TypeTags.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:e2884a0bdb954431fb1acecd"
+  },
+  {
+   "cid": "w0180",
+   "pr": 17040,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Group/Equiv/TypeTags.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:0ec4c0461f6218404e57872d"
+  },
+  {
+   "cid": "w0181",
+   "pr": 17040,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Group/Equiv/TypeTags.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:47fbcc08d9edf011a86abee2"
+  },
+  {
+   "cid": "w0182",
+   "pr": 17040,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:027c57e2ff33e86810c25ef5"
+  },
+  {
+   "cid": "w0183",
+   "pr": 14329,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Instances/EReal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-07",
+   "event_id": "event:558e3e433431f9b9c0fea84b"
+  },
+  {
+   "cid": "w0184",
+   "pr": 14329,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-07",
+   "event_id": "event:064b8a62173cd218a734ae0e"
+  },
+  {
+   "cid": "w0185",
+   "pr": 37696,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:c05c2e6332d0a02ff65e9019"
+  },
+  {
+   "cid": "w0186",
+   "pr": 37696,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Compactification/OnePoint/ProjectiveLine.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:afd92eab83f740de491a7daf"
+  },
+  {
+   "cid": "w0187",
+   "pr": 37696,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:5b159c0c32f30417646f3933"
+  },
+  {
+   "cid": "w0188",
+   "pr": 20331,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Nat/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:af37c17c659f46cd1d3f8e9a"
+  },
+  {
+   "cid": "w0189",
+   "pr": 15702,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:d54b71f5a59c30208471e399"
+  },
+  {
+   "cid": "w0190",
+   "pr": 15702,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:5636ac2d5579cafeeaaaeb8e"
+  },
+  {
+   "cid": "w0191",
+   "pr": 15702,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:103cb57a3259b8aa204b4b8a"
+  },
+  {
+   "cid": "w0192",
+   "pr": 15702,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:906fbc08814637b4ea11ed62"
+  },
+  {
+   "cid": "w0193",
+   "pr": 15702,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:963d993bd2593c60d586b36f"
+  },
+  {
+   "cid": "w0194",
+   "pr": 15702,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:e3dcd4cf0f85a7f334419def"
+  },
+  {
+   "cid": "w0195",
+   "pr": 16679,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:e08963a24c7bec20ce93b94e"
+  },
+  {
+   "cid": "w0196",
+   "pr": 42633,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:cd305ab8ab46f79dba02ab3f"
+  },
+  {
+   "cid": "w0197",
+   "pr": 40622,
+   "kind": "review_comment",
+   "path": "Mathlib/Combinatorics/SimpleGraph/Copy.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:d623e7621fa854e100599e9d"
+  },
+  {
+   "cid": "w0198",
+   "pr": 41035,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/PiLex.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:03e9a581dde57b19a24e38eb"
+  },
+  {
+   "cid": "w0199",
+   "pr": 41035,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/PiLex.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:1e13a2cdfc833530b68dcf7d"
+  },
+  {
+   "cid": "w0200",
+   "pr": 20380,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/NormedSpace/MStructure.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:733da36589e1418ced3e1389"
+  },
+  {
+   "cid": "w0201",
+   "pr": 20810,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/ConcreteCategory/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:6566b87f8e1e18932541bd5f"
+  },
+  {
+   "cid": "w0202",
+   "pr": 20810,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/ConcreteCategory/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:86323231f1c9277b9241b40b"
+  },
+  {
+   "cid": "w0203",
+   "pr": 20810,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/ConcreteCategory/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:604fd557e7e02ab68b47757a"
+  },
+  {
+   "cid": "w0204",
+   "pr": 20810,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/ConcreteCategory/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:fc062517b0813e3d9f6ad74c"
+  },
+  {
+   "cid": "w0205",
+   "pr": 21292,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/TwoSidedIdeal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:47d939474601a147de8f09ee"
+  },
+  {
+   "cid": "w0206",
+   "pr": 21292,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/TwoSidedIdeal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:444725ad5c2a34a07a567610"
+  },
+  {
+   "cid": "w0207",
+   "pr": 21292,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/TwoSidedIdeal/Operations.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:83936d0d6ad66fcddf99d1a3"
+  },
+  {
+   "cid": "w0208",
+   "pr": 19955,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Presentable/Limits.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:ac2d6f0035f19e752107cc96"
+  },
+  {
+   "cid": "w0209",
+   "pr": 19955,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:bdbb8b96647fa365bec2e6a1"
+  },
+  {
+   "cid": "w0210",
+   "pr": 38556,
+   "kind": "review_comment",
+   "path": "Mathlib/Tactic/GCongr/Core.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:066142b6eb5b2116fd8c6b60"
+  },
+  {
+   "cid": "w0211",
+   "pr": 38556,
+   "kind": "review_comment",
+   "path": "Mathlib/Tactic/GCongr/CoreAttrs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:cd02bd3f0200b4a8563b42af"
+  },
+  {
+   "cid": "w0212",
+   "pr": 38556,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:82ee6b2fc641c31580f2491b"
+  },
+  {
+   "cid": "w0213",
+   "pr": 23684,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Group/Invertible/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:3bfcc3115eededd5e2099e44"
+  },
+  {
+   "cid": "w0214",
+   "pr": 23684,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/IntegralClosure/IsIntegralClosure/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:767de82eb5f88ba525435039"
+  },
+  {
+   "cid": "w0215",
+   "pr": 22281,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/DiscreteCategory/SumsProducts.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:cf066e313f55fbcba62fe2ca"
+  },
+  {
+   "cid": "w0216",
+   "pr": 22281,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:d435ea015ae7b45bb009d197"
+  },
+  {
+   "cid": "w0217",
+   "pr": 22281,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/DiscreteCategory/SumsProducts.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:ad94e6963e752bee10e09cc4"
+  },
+  {
+   "cid": "w0218",
+   "pr": 22281,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/DiscreteCategory/SumsProducts.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:2d9d2ae405d326234d1fd5d6"
+  },
+  {
+   "cid": "w0219",
+   "pr": 40272,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/CStarAlgebra/Matrix.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:4306e93646508c2c57c4f644"
+  },
+  {
+   "cid": "w0220",
+   "pr": 20230,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:f0afc80c7e41e4f30aff64cc"
+  },
+  {
+   "cid": "w0221",
+   "pr": 20230,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Homology/GrothendieckAbelian.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:cd60d00607b0f0bbc69d1d75"
+  },
+  {
+   "cid": "w0222",
+   "pr": 20230,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Homology/GrothendieckAbelian.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-12",
+   "event_id": "event:654208b6ebd3f197f7b013e2"
+  },
+  {
+   "cid": "w0223",
+   "pr": 24476,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/IsValuedIn.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:f4080b3096c46c3d16db7e99"
+  },
+  {
+   "cid": "w0224",
+   "pr": 24476,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Reduced.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:603b3372b5a8ae535327d6e5"
+  },
+  {
+   "cid": "w0225",
+   "pr": 24476,
+   "kind": "review_comment",
+   "path": "Mathlib/LinearAlgebra/RootSystem/Reduced.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:ae77792980682f37105ae049"
+  },
+  {
+   "cid": "w0226",
+   "pr": 40180,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Spectral/ConstructibleTopology.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:4c9cf380c7131130a8be04a8"
+  },
+  {
+   "cid": "w0227",
+   "pr": 40180,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:105b676ccb2553c754791d79"
+  },
+  {
+   "cid": "w0228",
+   "pr": 17685,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/CommSq.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:af006741332fc77c0148b14d"
+  },
+  {
+   "cid": "w0229",
+   "pr": 41491,
+   "kind": "review",
+   "path": null,
+   "ai": true,
+   "ai_evidence": [
+    "description"
+   ],
+   "month": "2026-07",
+   "event_id": "event:f55ecc97167f29ea6100d112"
+  },
+  {
+   "cid": "w0230",
+   "pr": 41491,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": true,
+   "ai_evidence": [
+    "description"
+   ],
+   "month": "2026-07",
+   "event_id": "event:e3261c3bbc141f6c0035ba11"
+  },
+  {
+   "cid": "w0231",
+   "pr": 20428,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Sign.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:33118ab596cc8965bf1a0a54"
+  },
+  {
+   "cid": "w0232",
+   "pr": 20428,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Sign.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:afbef6617b9d6864a6d290dc"
+  },
+  {
+   "cid": "w0233",
+   "pr": 12899,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:4661ef28aa270d9950b265ed"
+  },
+  {
+   "cid": "w0234",
+   "pr": 12899,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-05",
+   "event_id": "event:995de2d1d3d04992806e793f"
+  },
+  {
+   "cid": "w0235",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:fe60a45b9ba9d7b7f848772b"
+  },
+  {
+   "cid": "w0236",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:c63cb9f3118c4a3dd2e5cee5"
+  },
+  {
+   "cid": "w0237",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:83406d992cff25f45ce6af21"
+  },
+  {
+   "cid": "w0238",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:867b2d6b267315887e15888f"
+  },
+  {
+   "cid": "w0239",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:14dc09de66ca655826f942fb"
+  },
+  {
+   "cid": "w0240",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:515e17b24863e39975d89eeb"
+  },
+  {
+   "cid": "w0241",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:e73ffd51aef62b8bd05dc796"
+  },
+  {
+   "cid": "w0242",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:015f8368e3a828ad598006f7"
+  },
+  {
+   "cid": "w0243",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:e983e511464a9fcfcab51d57"
+  },
+  {
+   "cid": "w0244",
+   "pr": 38114,
+   "kind": "review_comment",
+   "path": "Mathlib/GroupTheory/FinitelyPresentedGroup.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:d4a57dfa2c2ef1f7e3ef1b6e"
+  },
+  {
+   "cid": "w0245",
+   "pr": 17899,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:1cfa932ae2573c8a6988d9c3"
+  },
+  {
+   "cid": "w0246",
+   "pr": 21583,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:47bfea5a8b1cb40b7b091fd1"
+  },
+  {
+   "cid": "w0247",
+   "pr": 21583,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Function/Holder.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:eeb5fad42f645523fb6a9edd"
+  },
+  {
+   "cid": "w0248",
+   "pr": 21583,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Function/Holder.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-02",
+   "event_id": "event:535dc2a3c9f78d89432301c4"
+  },
+  {
+   "cid": "w0249",
+   "pr": 15708,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-08",
+   "event_id": "event:2a57ef680e66e868d723e1dc"
+  },
+  {
+   "cid": "w0250",
+   "pr": 22877,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:0787a4f00b0f95b170a3cb24"
+  },
+  {
+   "cid": "w0251",
+   "pr": 16771,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-09",
+   "event_id": "event:1cdf25481eb4c307c4d59384"
+  },
+  {
+   "cid": "w0252",
+   "pr": 24044,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-04",
+   "event_id": "event:bc686bcee6c90708d4f73686"
+  },
+  {
+   "cid": "w0253",
+   "pr": 23144,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-03",
+   "event_id": "event:634ebfe03bc6de6cebac1212"
+  },
+  {
+   "cid": "w0254",
+   "pr": 21295,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/WittVector/Complete.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2025-01",
+   "event_id": "event:4e65fee3bd2fd03560f7cea7"
+  },
+  {
+   "cid": "w0255",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:d15639cb770eb32c7b34a390"
+  },
+  {
+   "cid": "w0256",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:3f970bb2b2402a0799cf3edd"
+  },
+  {
+   "cid": "w0257",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:84389c15a9dc9c7fedc240d3"
+  },
+  {
+   "cid": "w0258",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:ff60b4d6d3a3808c275fb26d"
+  },
+  {
+   "cid": "w0259",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:5ea5ba3fd1a4b8e6bddcc8e4"
+  },
+  {
+   "cid": "w0260",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Idempotent.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:b82454d90628090c9b97dabc"
+  },
+  {
+   "cid": "w0261",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:f7fb432e5d9f755f143a38ac"
+  },
+  {
+   "cid": "w0262",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:5b31bfbeec4e0493b7eaae72"
+  },
+  {
+   "cid": "w0263",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:20ce36a6634dd843c7b37e29"
+  },
+  {
+   "cid": "w0264",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:10189b78d015b37ff3608b7e"
+  },
+  {
+   "cid": "w0265",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:e76ca1f1f8ea7b131308c292"
+  },
+  {
+   "cid": "w0266",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Idempotent.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:b6051e2bf8bb979f6e43d930"
+  },
+  {
+   "cid": "w0267",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/PiProd.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:7814ae1778995fd8e68aca68"
+  },
+  {
+   "cid": "w0268",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/PiProd.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:75b2856a16f8bb1c2b6773ce"
+  },
+  {
+   "cid": "w0269",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Quotient.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:428983df93b38ef05eb58bff"
+  },
+  {
+   "cid": "w0270",
+   "pr": 39633,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Restrict.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:c960121dbb430c18efbdddd2"
+  },
+  {
+   "cid": "w0271",
+   "pr": 39633,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:3122099db4a545568433cca9"
+  },
+  {
+   "cid": "w0272",
+   "pr": 18175,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Enriched/Ordinary.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:e34f316b37fd279288047c66"
+  },
+  {
+   "cid": "w0273",
+   "pr": 18175,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Enriched/Ordinary.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:4e00a9dd4455c366ab902148"
+  },
+  {
+   "cid": "w0274",
+   "pr": 18175,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicTopology/SimplicialCategory/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:faf6e3f4bd3f5e72890d0703"
+  },
+  {
+   "cid": "w0275",
+   "pr": 18175,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:48fbc7ab3c66e15b92cd2786"
+  },
+  {
+   "cid": "w0276",
+   "pr": 18175,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:1caba47392cab3e200b6eb19"
+  },
+  {
+   "cid": "w0277",
+   "pr": 18001,
+   "kind": "review_comment",
+   "path": "Mathlib/FieldTheory/RatFunc/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2024-10",
+   "event_id": "event:f91f914f88efb45381cbd775"
+  },
+  {
+   "cid": "w0278",
+   "pr": 41369,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Jacobson/Ring.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-07",
+   "event_id": "event:595427004231a57ce6da837a"
+  },
+  {
+   "cid": "w0279",
+   "pr": 38510,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:b527bac67fdaff4475d34a5c"
+  },
+  {
+   "cid": "w0280",
+   "pr": 38727,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicTopology/DoldKan/Homotopies.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:a8756f54f7eee79c5c43af55"
+  },
+  {
+   "cid": "w0281",
+   "pr": 38727,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicTopology/DoldKan/Homotopies.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:59969044d27425d8ee223535"
+  },
+  {
+   "cid": "w0282",
+   "pr": 38727,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:be9b96dcbb0e07d9582e1b98"
+  },
+  {
+   "cid": "w0283",
+   "pr": 38846,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Types/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:a351b59d4699501e46a08ba5"
+  },
+  {
+   "cid": "w0284",
+   "pr": 38846,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Types/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:d8003cf1ad1e7c04fa9210b0"
+  },
+  {
+   "cid": "w0285",
+   "pr": 38846,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Types/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:f62a6aa4a3b6ff6f92960387"
+  },
+  {
+   "cid": "w0286",
+   "pr": 38846,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Types/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:9a900e28c6390bbf95a15161"
+  },
+  {
+   "cid": "w0287",
+   "pr": 38846,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:609b89f6880d4a4edf00b319"
+  },
+  {
+   "cid": "w0288",
+   "pr": 38827,
+   "kind": "review_comment",
+   "path": "Mathlib/Order/Defs/Unbundled.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:f9cf4dbf471f7b7e64848210"
+  },
+  {
+   "cid": "w0289",
+   "pr": 38827,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:877e8441834f01d3e11a8125"
+  },
+  {
+   "cid": "w0290",
+   "pr": 40976,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/LebesgueDifferentiationThm.lean",
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "label"
+   ],
+   "month": "2026-06",
+   "event_id": "event:d6fa207c5055fa22a7c3d4f5"
+  },
+  {
+   "cid": "w0291",
+   "pr": 40976,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Integral/IntervalIntegral/LebesgueDifferentiationThm.lean",
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "label"
+   ],
+   "month": "2026-06",
+   "event_id": "event:5726002be646c368b4b27acb"
+  },
+  {
+   "cid": "w0292",
+   "pr": 39815,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/Normed/Module/Complemented.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:4c0cc379cde52da479a5a15f"
+  },
+  {
+   "cid": "w0293",
+   "pr": 39815,
+   "kind": "review_comment",
+   "path": "Mathlib/Analysis/Normed/Module/Complemented.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:71b4ae0707eb97abfbef9fa5"
+  },
+  {
+   "cid": "w0294",
+   "pr": 40126,
+   "kind": "review_comment",
+   "path": "Mathlib/NumberTheory/RamificationInertia/HilbertTheory.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:314eb0c8e5a337f9465bff19"
+  },
+  {
+   "cid": "w0295",
+   "pr": 40126,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:b8828a56242c32c8411e3a85"
+  },
+  {
+   "cid": "w0296",
+   "pr": 40126,
+   "kind": "review_comment",
+   "path": "Mathlib/NumberTheory/RamificationInertia/Galois.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:b2e9f5dfa3a27f10c725358f"
+  },
+  {
+   "cid": "w0297",
+   "pr": 40126,
+   "kind": "review_comment",
+   "path": "Mathlib/NumberTheory/RamificationInertia/Galois.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:f41bce032bb8bfefa0051f90"
+  },
+  {
+   "cid": "w0298",
+   "pr": 38165,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:d18b06658e5e7f113185108c"
+  },
+  {
+   "cid": "w0299",
+   "pr": 38165,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Order/Group/Unbundled/Abs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:b562365c42103166ad3d663e"
+  },
+  {
+   "cid": "w0300",
+   "pr": 37791,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/MvPolynomial/Variables.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:323692794e27ed5e558a72c0"
+  },
+  {
+   "cid": "w0301",
+   "pr": 42248,
+   "kind": "review_comment",
+   "path": "Mathlib/Geometry/Manifold/MFDeriv/SpecificFunctions.lean",
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "trailer"
+   ],
+   "month": "2026-07",
+   "event_id": "event:dc7172493f44461e5f238ca7"
+  },
+  {
+   "cid": "w0302",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:876c1467283473af80bc93b6"
+  },
+  {
+   "cid": "w0303",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:3dc3e1843b68e37b607b1cdb"
+  },
+  {
+   "cid": "w0304",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:48ea5facd28e5b65d441c9b9"
+  },
+  {
+   "cid": "w0305",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:9075002ea52e88a02abd1adc"
+  },
+  {
+   "cid": "w0306",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:cabc9b6834665263b01bc6e4"
+  },
+  {
+   "cid": "w0307",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:2e1a97ea87f7d2c8a0426c4f"
+  },
+  {
+   "cid": "w0308",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:647f567572e213778772110b"
+  },
+  {
+   "cid": "w0309",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:69495cda23f031dbfbbffbd9"
+  },
+  {
+   "cid": "w0310",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:e589b2817908f89334c20a45"
+  },
+  {
+   "cid": "w0311",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:b6644c1fadd3d83f6b5dabf5"
+  },
+  {
+   "cid": "w0312",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Instances/ENNReal/Lemmas.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:547ddc20e049c785f5829620"
+  },
+  {
+   "cid": "w0313",
+   "pr": 38105,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/EMetricSpace/Defs.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:e033a275dced7808139deae0"
+  },
+  {
+   "cid": "w0314",
+   "pr": 38105,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:83bb89fe4938ba949c5c3e85"
+  },
+  {
+   "cid": "w0315",
+   "pr": 40797,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Shapes/Pullback/PullbackObjObj.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:9550bb89ee9e9f0b71c495d8"
+  },
+  {
+   "cid": "w0316",
+   "pr": 40797,
+   "kind": "review_comment",
+   "path": "Mathlib/CategoryTheory/Limits/Shapes/Pullback/PullbackObjObj.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:80c97fe6c9035915db15dfc2"
+  },
+  {
+   "cid": "w0317",
+   "pr": 38533,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/Hausdorff.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:eb3b99a2a561eb5ce1bdc9d3"
+  },
+  {
+   "cid": "w0318",
+   "pr": 38533,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/PerfectlyNormal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:023d22cfb6fe03e1d99004eb"
+  },
+  {
+   "cid": "w0319",
+   "pr": 38533,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/PerfectlyNormal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:59f96b4de8411c4c50411d14"
+  },
+  {
+   "cid": "w0320",
+   "pr": 38533,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/PerfectlyNormal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:9a6419f050be72d44dc0db06"
+  },
+  {
+   "cid": "w0321",
+   "pr": 38533,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Separation/PerfectlyNormal.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:32a65f6791dfa98f1604cbfb"
+  },
+  {
+   "cid": "w0322",
+   "pr": 38533,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:43b08f1d0b020f10ad437331"
+  },
+  {
+   "cid": "w0323",
+   "pr": 38533,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:1b6ea2fc65b54dedbc2cae2a"
+  },
+  {
+   "cid": "w0324",
+   "pr": 41002,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Category/MonCat/Limits.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:9d65bbdc049119c01b7ee98d"
+  },
+  {
+   "cid": "w0325",
+   "pr": 41002,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/MonoidAlgebra/Module.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:481666f966d13bbf435aae8f"
+  },
+  {
+   "cid": "w0326",
+   "pr": 41002,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:cd7be911e255788f13066676"
+  },
+  {
+   "cid": "w0327",
+   "pr": 38028,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Depth/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:b8ce15500ecfef2cdc627066"
+  },
+  {
+   "cid": "w0328",
+   "pr": 38028,
+   "kind": "review_comment",
+   "path": "Mathlib/RingTheory/Depth/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-04",
+   "event_id": "event:7f4486249cd6198f2841cfff"
+  },
+  {
+   "cid": "w0329",
+   "pr": 38962,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:10c6ba50ec6405848ec975b1"
+  },
+  {
+   "cid": "w0330",
+   "pr": 38962,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/LinearMap.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:fe64c7333b809c785d598412"
+  },
+  {
+   "cid": "w0331",
+   "pr": 38962,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/LinearMap.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:39944db6dc2829916c5ca3f3"
+  },
+  {
+   "cid": "w0332",
+   "pr": 38962,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Algebra/Module/LinearMap.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:b52eaf6600065d375434f05d"
+  },
+  {
+   "cid": "w0333",
+   "pr": 41663,
+   "kind": "review_comment",
+   "path": "Mathlib/Topology/Connected/LocallyConnected.lean",
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "label"
+   ],
+   "month": "2026-07",
+   "event_id": "event:bf740e2b678dba90762ea1ca"
+  },
+  {
+   "cid": "w0334",
+   "pr": 41663,
+   "kind": "review",
+   "path": null,
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "label"
+   ],
+   "month": "2026-07",
+   "event_id": "event:2c2cef90a6cdf2aa271dcfc9"
+  },
+  {
+   "cid": "w0335",
+   "pr": 41663,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "label"
+   ],
+   "month": "2026-07",
+   "event_id": "event:8e5d8596868d019e13e48952"
+  },
+  {
+   "cid": "w0336",
+   "pr": 41663,
+   "kind": "issue_comment",
+   "path": null,
+   "ai": true,
+   "ai_evidence": [
+    "description",
+    "label"
+   ],
+   "month": "2026-07",
+   "event_id": "event:dc0f41ff01a0d6be525dbee4"
+  },
+  {
+   "cid": "w0337",
+   "pr": 39789,
+   "kind": "review_comment",
+   "path": "Mathlib/SetTheory/Ordinal/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:d7dc6b23159e10b3476fa444"
+  },
+  {
+   "cid": "w0338",
+   "pr": 42522,
+   "kind": "review_comment",
+   "path": "Mathlib/Data/Finset/Powerset.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-08",
+   "event_id": "event:306c6e4c4aed832f23fc23d1"
+  },
+  {
+   "cid": "w0339",
+   "pr": 39317,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicGeometry/Birational/Dominant.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:07cc4bce6958b2a08c6f2ca1"
+  },
+  {
+   "cid": "w0340",
+   "pr": 39317,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicGeometry/Birational/Dominant.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:acba81e0b7991b1e804c5a44"
+  },
+  {
+   "cid": "w0341",
+   "pr": 39317,
+   "kind": "review_comment",
+   "path": "Mathlib/AlgebraicGeometry/Birational/Dominant.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-05",
+   "event_id": "event:3636c784559bb5e4faf73f1b"
+  },
+  {
+   "cid": "w0342",
+   "pr": 40188,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/Measure/PreVariation.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:338a3f40d4ff812d25303984"
+  },
+  {
+   "cid": "w0343",
+   "pr": 40188,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/VectorMeasure/Variation/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:469fac8822a5960b3f383e90"
+  },
+  {
+   "cid": "w0344",
+   "pr": 40188,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/VectorMeasure/Variation/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:eb637f576a75f6ec8c35bba6"
+  },
+  {
+   "cid": "w0345",
+   "pr": 40188,
+   "kind": "review_comment",
+   "path": "Mathlib/MeasureTheory/VectorMeasure/Variation/Basic.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:021985986effd74814b11daa"
+  },
+  {
+   "cid": "w0346",
+   "pr": 40188,
+   "kind": "review",
+   "path": null,
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:cf49af4e6d2decf3771ebbc7"
+  },
+  {
+   "cid": "w0347",
+   "pr": 40895,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Homology/Additive.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:688eb1eacf47db98934ada46"
+  },
+  {
+   "cid": "w0348",
+   "pr": 40895,
+   "kind": "review_comment",
+   "path": "Mathlib/Algebra/Homology/HomotopyCategory.lean",
+   "ai": false,
+   "ai_evidence": [],
+   "month": "2026-06",
+   "event_id": "event:b962a727a8da768bc43d13c9"
+  }
+ ]
+}
