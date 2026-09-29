@@ -131,3 +131,10 @@ substantive asks.
 The order of work changes. Settle the reviewer first (`reviewer-model-gap.md`, tests (c) and (d)).
 Then test the design's own claims (family closure on sibling-class misses, the shared model) on the
 reviewer that will run them.
+
+**The arms condition (2026-09-29).** The pipeline's own structure, on the same six unseen PRs, reaches
+what `gpt_5.2` solo reaches (0.12) and no substantive ask
+(`results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md`). That is the current
+coordination, measured on the current reviewer. It recovers none of the gap to Claude's 0.47. So any
+coordination design, this one included, has to be measured on a reviewer that reaches substantive asks
+at all. The reviewer comes first (`reviewer-model-gap.md`).

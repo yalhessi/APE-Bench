@@ -128,3 +128,25 @@ in the README.
 
 The test (b) paragraph above says "the same tools". That is corrected there: Claude had `file_search`
 in place of the Lean navigation tools, and the gap survives without it.
+
+## The arms condition (2026-09-29): the pipeline's structure adds nothing on unseen PRs
+
+The pipeline in lead mode (ten arms, work units, the generalist floor) ran twice on the same six PRs,
+at $5.90 and $5.88. Two blind matchers agree on all 96 cells:
+- Its reach is 0.12, the same as `gpt_5.2` solo (0.12), against Claude's 0.47.
+- On the substantive asks it is 0.00, with no partial either.
+- It reached only the unused import and the title's missing word. The gate published neither.
+
+By the pre-registered rule the structure does not help here, and the model dominates. The context
+traces add one thing the solo inspection could not show. Some arms did retrieve the comparison object,
+the parent's `isoMk` and `finprod_nonneg`, and asked only their own arm's question of it. So retrieval
+breadth alone is not the lever.
+
+The test (b) matcher inputs had lost every `gpt_5.2` finding's location. Re-matched on corrected inputs,
+test (b)'s numbers are unchanged. The fix and a refusal are in `build_match_inputs.py`.
+
+**Where this leaves the entry.** On unseen PRs the binding constraint on substantive asks is the
+reviewer. It is neither the brief, the construction protocol nor the pipeline's structure. The one
+untested lever on the pipeline's own model is reasoning: test (d), stated with its threshold in the
+probe README, about $3. Claude inside the pipeline's structure is the other untested cell. It needs an
+Anthropic provider the clients do not have.
