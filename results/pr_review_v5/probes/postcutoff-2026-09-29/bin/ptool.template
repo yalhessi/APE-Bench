@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# ptool <tool>|list|describe ['<json arguments>'] -- one call to the pipeline's own review tools for
+# this PR, as an arm makes it (`cli tool`). The wrapper, not the reviewer, logs every call.
+set -o pipefail
+PR=__PR__; OUT=__OUT__; WORK=__WORK__; RAW=__RAW__
+cd __ROOT__ && export PYTHONPATH="$PWD/src" PATH="$HOME/.elan/bin:$PATH"
+stamp=$(date +%s%N)-$$
+mkdir -p "$RAW"
+ape/bin/python -m src.mathlib_review.review.cli tool "$1" \
+  --episodes inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl --pr "$PR" \
+  --workdir "$WORK" --run-config configs/pr_review_v5_probe_2026_07_08_v1.yaml \
+  --arguments "${2:-}" > "$RAW/$stamp.out" 2> "$RAW/$stamp.err"
+status=$?
+ape/bin/python __ROOT__/results/pr_review_v5/probes/construction-demo-2026-09-29/bin/log_call.py "$OUT/calls.jsonl" "$stamp" "$1" "${2:-}" "$RAW/$stamp.out" "$status"
+cat "$RAW/$stamp.out"
+[ $status -eq 0 ] || tail -5 "$RAW/$stamp.err" >&2
+exit $status

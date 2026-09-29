@@ -7,11 +7,14 @@ functions (`release.pr_relations.build_relations`, `agenda.components.build_comp
 design's pass 0 also holds and is not built (library candidates, the twin-pattern and area
 censuses, open-PR overlap) is left out and said so in the rendered model.
 
-Run from the repo root: `PYTHONPATH=$PWD:$PWD/src ape/bin/python <this file>`.
+Run from the repo root: `PYTHONPATH=$PWD:$PWD/src ape/bin/python <this file>`. With no arguments it
+builds the demonstration's three models; `<this file> <release> <out_dir> <pr> [<pr> ...]` builds
+another release's (the post-cutoff probe, 2026-09-29), byte-identically in form.
 """
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 from src.mathlib_review.agenda.components import build_components
@@ -19,9 +22,9 @@ from src.mathlib_review.io import load_jsonl
 from src.mathlib_review.release.pr_relations import build_relations
 from src.mathlib_review.schema import ChangeGraph, ReviewEpisodeInput
 
-RELEASE = Path("inputs/pr_review_v4/releases/val-2025-06-2026-03-v1")
-PRS = (34091, 30458, 32875)
-OUT = Path(__file__).parent
+RELEASE = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("inputs/pr_review_v4/releases/val-2025-06-2026-03-v1")
+OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(__file__).parent
+PRS = tuple(int(n) for n in sys.argv[3:]) or (34091, 30458, 32875)
 
 episodes = {e.pr_number: e for e in load_jsonl(RELEASE / "input/episodes.jsonl", ReviewEpisodeInput)
             if e.pr_number in PRS}
