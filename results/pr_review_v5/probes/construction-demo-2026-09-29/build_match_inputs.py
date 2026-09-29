@@ -16,6 +16,20 @@ asks = json.load(open(P / "asks_SEALED.json"))
 rows = {r["cid"]: r for r in feedback["rows"]}
 KEEP = ("target", "claim", "requested_change", "severity")
 
+#: K findings cite their constructions by id ("as pass 3's c13 compiled"), which would tell a
+#: matcher which reviewer is K. Redacted for every reviewer, mechanically, after the reviewer
+#: outputs were committed (2bd0d96) and before any matcher ran. Mathlib paths are untouched.
+import re
+_REDACT = [(re.compile(r"\bpass \d(?:'s)?\s+"), ""), (re.compile(r"\bc\d{1,3}\b"), "a compiled check")]
+
+
+def redact(text):
+    if not isinstance(text, str):
+        return text
+    for pattern, repl in _REDACT:
+        text = pattern.sub(repl, text)
+    return text
+
 
 def findings(session):
     path = P / f"pr{pr}" / session / "findings.json"
@@ -37,7 +51,7 @@ for pr, labels in seal.items():
             items = [("X", i, f) for i, f in enumerate(findings(cond))]
         else:
             items = [(p, i, f) for p in ("p3", "p4") for i, f in enumerate(findings(cond + p))]
-        stripped = [{"i": n, **{k: f.get(k) for k in KEEP}} for n, (_, _, f) in enumerate(items)]
+        stripped = [{"i": n, **{k: redact(f.get(k)) for k in KEEP}} for n, (_, _, f) in enumerate(items)]
         json.dump(stripped, open(out / f"{label}_pr{pr}.json", "w"), indent=1, ensure_ascii=False)
         k_index.setdefault(pr, {})[label] = [[p, i] for p, i, _ in items]
 json.dump(k_index, open(out / "k_index.json", "w"), indent=1)
