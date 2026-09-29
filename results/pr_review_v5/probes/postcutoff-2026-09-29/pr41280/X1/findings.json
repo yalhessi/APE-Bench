@@ -1,0 +1,23 @@
+[
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "`Bundle.Trivialization.contMDiffAt_symmL` (and `Bundle.Trivialization.contMDiffOn_symmL`, which only forwards to it) assumes `[IsManifold IB n B]`, but neither proof needs it: the proof only uses `contMDiffAt_totalSpace`, `contMDiffAt_id` and `contMDiffAt_coordChangeL`, none of which requires `IsManifold`. The extra instance argument needlessly restricts where the lemmas apply.",
+  "requested_change": "Delete the `[IsManifold IB n B]` binder from `Bundle.Trivialization.contMDiffAt_symmL`, and likewise from `Bundle.Trivialization.contMDiffOn_symmL`, so both lemmas start `lemma Bundle.Trivialization.contMDiff{At,On}_symmL [ContMDiffVectorBundle n F₁ E₁ IB] (e : ...) [MemTrivializationAtlas e] ...`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/Geometry/Manifold/VectorBundle/Hom.lean, replacing contMDiffAt_symmL with the same statement and proof minus `[IsManifold IB n B]`: success, no errors or warnings. A second lean_verify_edit replacing lines 145-172 with both lemmas without `[IsManifold IB n B]` (and with `π F₁ E₁`) also succeeds. contMDiffAt_coordChangeL (VectorBundle/Basic.lean:328) needs only `[ContMDiffVectorBundle n F E IB]` and the atlas memberships. The Zulip thread 'Trivialization smoothness' (Patrick Massot's original request, and Jack McCarthy's MWE) carried `[IsManifold IB k B]`, and the PR kept it. A `#lint only unusedArguments` probe proved nothing, because under the module system it did not even flag an obviously unused explicit hypothesis."
+ },
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "The new lemmas write the trivialization type as `Trivialization F₁ (TotalSpace.proj : TotalSpace F₁ E₁ → B)`. Elsewhere Hom.lean writes it with the `π` notation (`{e₁ e₁' : Trivialization F₁ (π F₁ E₁)}`, line 46), and the long form pushes the signature lines to the 97-100 character limit.",
+  "requested_change": "In `Bundle.Trivialization.contMDiffAt_symmL` and `Bundle.Trivialization.contMDiffOn_symmL`, write `(e : Trivialization F₁ (π F₁ E₁))`. For example: `(e : Trivialization F₁ (π F₁ E₁)) [MemTrivializationAtlas e] {x : B} (hx : x ∈ e.baseSet) :` on one line.",
+  "severity": "advisory",
+  "evidence": "file_read of Hom.lean: line 46 declares `{e₁ e₁' : Trivialization F₁ (π F₁ E₁)}` and line 47 `{e₂ e₂' : Trivialization F₂ (π F₂ E₂)}`. The added lines 148 and 166 are exactly 100 characters and line 167 is 97. lean_verify_edit of lines 145-172 rewritten with `(e : Trivialization F₁ (π F₁ E₁))` for both lemmas: success. Restating them with the `CMDiffAt`/`T%` notation used elsewhere in the file does NOT work here: `T%` finds no `FiberBundle` instance on `fun b ↦ F₁ →L[𝕜] E₁ b`, so the explicit `ContMDiffAt IB (IB.prod ...)` form is justified and this finding does not ask for that change."
+ },
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "The docstrings of `Bundle.Trivialization.contMDiffAt_symmL` and `Bundle.Trivialization.contMDiffOn_symmL` read 'Let `e` be a trivialization of a `C^n` vector bundle `E₁` ... this section is `C^n`'. The lemmas hold only for trivializations in the bundle's atlas (`[MemTrivializationAtlas e]`); for an arbitrary continuous trivialization the stated conclusion can fail, so the prose claims more than the lemmas prove.",
+  "requested_change": "Change the first sentence of both docstrings to 'Let `e` be a trivialization in the atlas of a `C^n` vector bundle `E₁` over `B`.' (or 'Let `e` be a trivialization of a `C^n` vector bundle `E₁` over `B`, belonging to its trivialization atlas.').",
+  "severity": "advisory",
+  "evidence": "diff.patch / file_read Hom.lean lines 145-147 and 163-165: neither docstring mentions the atlas, but both statements take `[MemTrivializationAtlas e]`. The proof needs it: it calls `contMDiffAt_coordChangeL hx hx'`, and the `ContMDiffVectorBundle` class (VectorBundle/Basic.lean:280-284) guarantees smooth coordinate changes only for `e e'` with `[MemTrivializationAtlas e] [MemTrivializationAtlas e']`."
+ }
+]

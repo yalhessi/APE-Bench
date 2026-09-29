@@ -1,0 +1,44 @@
+[
+ {
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+  "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in that file uses commutators; the only related change there is the rename to `inf_normalizer_le_normalizer_sup`, which now lives in `Mathlib/Algebra/Group/Subgroup/Basic.lean`, already imported. So the import only adds a new dependency: Pointwise.lean did not see `Mathlib.GroupTheory.Commutator.Basic` (or the `QuotientGroup.Defs` it imports) before this PR.",
+  "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+  "severity": "blocking",
+  "evidence": "content_search for `commutator|⁅|Commutator` in Pointwise.lean matches only the import line (13). lean_verify_edit on Pointwise.lean with line 13 replaced by an empty line: success, no errors or warnings. The verifier does apply import edits: replacing the line with a nonexistent module fails with a missing-olean error. Probe with the import removed: `#check @Subgroup.commutator_comm` and `#check @Subgroup.commutator_le_right` fail with 'Unknown constant', so Commutator.Basic is not already imported transitively and the PR's import is a real new dependency."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "`Subgroup.commutator_sup_left` (with its private helper `commutator_sup_left'`) and `Subgroup.commutator_sup_right` have no `@[to_additive]`. Every neighbouring lemma in this `Subgroup` block has it (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...), as do the PR's own new lemmas `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`. So the additive versions are silently missing, even though the proofs translate as written.",
+  "requested_change": "Add `@[to_additive]` to `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right`. This produces `AddSubgroup.addCommutator_sup_left` and `AddSubgroup.addCommutator_sup_right`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/GroupTheory/Commutator/Basic.lean, lines 326-358, replaced by the same three declarations each prefixed with `@[to_additive]`, plus `#check @AddSubgroup.addCommutator_sup_left` and `#check @AddSubgroup.addCommutator_sup_right`: success. It reports `AddSubgroup.addCommutator_sup_left : ∀ {G} [AddGroup G] (H K N : AddSubgroup G) [N.Normal], ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆` and the matching `_right` statement. No proof changes are needed; `QuotientGroup.ker_mk'` and `map_commutator` translate."
+ },
+ {
+  "target": "Subgroup.commutator_mono_left",
+  "claim": "The PR puts `@[gcongr]` on the one-sided `commutator_mono_left` and `commutator_mono_right` but not on the two-sided `Subgroup.commutator_mono`. As a result `gcongr` cannot close a goal where both arguments of `⁅·, ·⁆` change, such as `⁅H₁, K₁⁆ ≤ ⁅H₂, K₂⁆`. A `@[gcongr]` tag on `commutator_mono` alone already covers the one-sided goals, so the one-sided tags do not help.",
+  "requested_change": "Tag `commutator_mono` with `@[to_additive (attr := gcongr)]` and drop `(attr := gcongr)` from `commutator_mono_left` and `commutator_mono_right`, keeping those two as plain `@[to_additive]` lemmas. This is the setup `LieSubmodule.mono_lie`, `mono_lie_left` and `mono_lie_right` already use in `Mathlib/Algebra/Lie/IdealOperations.lean`.",
+  "severity": "advisory",
+  "evidence": "With the PR's attributes, adding `example (h : H₁ ≤ H₂) (h' : K₁ ≤ K₂) : ⁅H₁, K₁⁆ ≤ ⁅H₂, K₂⁆ := by gcongr` gives 'gcongr did not make progress' (lean_verify_edit, lines 158-160). With `gcongr` moved to `commutator_mono` and removed from the left/right lemmas (lines 150-160 replaced), gcongr closes the two-sided goal and both one-sided goals (`⁅H₁, K⁆ ≤ ⁅H₂, K⁆`, `⁅H, K₁⁆ ≤ ⁅H, K₂⁆`), and the whole file still compiles, including the `grw` steps in `commutator_sup_left`. In IdealOperations.lean `@[gcongr]` is on `mono_lie` (line 160), and `mono_lie_left`/`mono_lie_right` are untagged."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "`Subgroup.commutator_sup_left` assumes `[N.Normal]`, but the proof uses normality only once: in `hHKN`, to get `⁅H, N⁆ ≤ N` and `⁅K, N⁆ ≤ N` from `commutator_le_right`. Both follow from `H ≤ normalizer N` and `K ≤ normalizer N` by `le_normalizer_iff_commutator_le_right`, so the lemma is stated under a stronger hypothesis than it needs. The quotient step already works inside `M = H ⊔ K ⊔ N`, where `N` does not have to be normal in `G`.",
+  "requested_change": "State the general version, e.g. `theorem commutator_sup_left_of_le_normalizer {H K N : Subgroup G} (hH : H ≤ normalizer N) (hK : K ≤ normalizer N) : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`, with the current proof and `hHKN := sup_le (le_normalizer_iff_commutator_le_right.mp hH) (le_normalizer_iff_commutator_le_right.mp hK)`. Derive the `[N.Normal]` statement as `commutator_sup_left_of_le_normalizer le_normalizer_of_normal le_normalizer_of_normal`, and treat `commutator_sup_right` the same way.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Commutator/Basic.lean, lines 337-355, replaced by `commutator_sup_left_of_le_normalizer` (the PR's proof with only `hHKN` changed as above) and `commutator_sup_left (H K N) [N.Normal] := commutator_sup_left_of_le_normalizer le_normalizer_of_normal le_normalizer_of_normal`: success, and the rest of the file, including `commutator_sup_right`, still compiles. Prior practice: precedent_search returns the PR #22650 review of the second isomorphism theorem, where `[N.Normal]` was generalised to `H ≤ N.normalizer`."
+ },
+ {
+  "target": "Subgroup.normalizer_inf_normalizer_le_normalizer_sup",
+  "claim": "The two deprecated aliases added in `Mathlib/Algebra/Group/Subgroup/Basic.lean` spell out the multiplicative and additive versions by hand, including a `_root_.AddSubgroup...` alias. A single `to_additive` alias generates both.",
+  "requested_change": "Replace the two alias blocks with `@[to_additive (attr := deprecated (since := \"2026-08-27\"))] alias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Subgroup/Basic.lean, lines 530-535, replaced by that one alias plus a test `example` using `AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup H K`: success. The only warning is the expected one: '`AddSubgroup.normalizer_inf_normalizer_le_normalizer_sup` has been deprecated: Use `AddSubgroup.inf_normalizer_le_normalizer_sup` instead'. The same one-line form is already used, e.g. `Mathlib/Algebra/Group/Pi/Lemmas.lean:75` `@[to_additive (attr := deprecated (since := \"2026-05-29\"))] alias Pi.mulHom := MulHom.pi`. Both forms occur in the library, so this is a simplification rather than a correction."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left'",
+  "claim": "`commutator_sup_left'` and `commutator_sup_left` sit inside `namespace Subgroup` but still write `Subgroup.map_eq_bot_iff`, `Subgroup.commutator_eq_bot_iff_le_centralizer` and `Subgroup.normal_subgroupOf_of_le_normalizer`. The prefixes are redundant; unqualified, the names resolve without ambiguity.",
+  "requested_change": "Drop the `Subgroup.` prefixes: write `← map_eq_bot_iff` and `commutator_eq_bot_iff_le_centralizer` in the `rw` of `commutator_sup_left'`, and `convert normal_subgroupOf_of_le_normalizer this` in `commutator_sup_left`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Commutator/Basic.lean, lines 326-358, with all three prefixes removed (together with the `@[to_additive]` additions): success, no errors. The helper alone with the prefixes removed also compiles (declaration mode, `Subgroup.commutator_sup_left'`)."
+ }
+]

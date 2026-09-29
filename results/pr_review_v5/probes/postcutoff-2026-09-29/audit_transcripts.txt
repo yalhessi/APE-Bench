@@ -1,0 +1,17 @@
+# Leak audit of the post-cutoff probe's reviewer transcripts (2026-09-29)
+
+24 transcripts: 20 sessions (X1, X2 on 10 PRs) and the 4 attempts the API rate limit aborted
+(41930 X1/X2, 43167 X1/X2), which were rerun from a clean packet; the aborted attempts' partial call
+logs are kept in the session scratchpad, not here. 593 tool calls in all.
+
+Checked for: the web, git, the workspace store, the in-window match inputs and feedback that sat in
+the scratchpad (`cdemo-match`, `val60`, `asks_pr`), the construction demonstration's directory,
+other sessions' packets, workdirs and raw outputs, agent transcripts, reader or matcher files.
+Round-1 asks for the post-cutoff PRs did not exist during the run: they are extracted after this
+audit.
+
+Flags: 2, both benign on reading.
+- pr41280/X1 listed its own session's raw tool outputs (scratchpad/postcutoff/raw/pr41280/X1).
+- pr43167/X2: the string "0 matches." in its own finding text.
+
+All 20 workdirs link to the PR's reviewed workspace (checked per session before launch and after).
