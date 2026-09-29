@@ -164,3 +164,48 @@ Only high concluded: it reached both `cat_disch` asks. Neither effort retrieved 
 searched with the PR's own spelling. So on this PR the reasoning setting, not the model, carries most of
 the gap. That is provisional on one PR, and it comes at about 30 times the reasoning-off cost. The
 six-PR runs (about $20-25 for two) would test it. The details are in the probe README.
+
+## Reproducing the experiment on other sets (the user, 2026-09-29; for a fresh session)
+
+*"We ideally want to be able to reproduce this experiment on a number of different sets: the dev set
+from Dec 2025, 12 validation from Jan 2026, and any other interesting sets."* Every result above rests
+on `probe-2026-07-08-v1`: 6 PRs and 16 asks. That set is a sealed draw of 10 from a frame of 1,075
+eligible PRs created 2026-07..08, so it is not the remainder of anything. The PR store ends on
+2026-08-31, so July and August 2026 are all the post-cutoff months held.
+
+| set | created | PRs | what exists for this experiment |
+|---|---|---|---|
+| dev (`dev-medium-0.3.0`) | 2025-12-18..31 | 16 | pipeline runs throughout; v4 gold, not asks; tuned on |
+| validation small12 (`val-2025-06-2026-03-v1`) | 2025-06..2026-03, about one a month | 12 (11 build) | lead and solo runs, 30 asks matched; Claude sessions on 3 PRs |
+| test small12 (`eval-2025-06-2026-03-v1`) | same window | 12 | sealed and run once, so not a probe set |
+| post-cutoff frame, not yet drawn | 2026-07..08 | 1,065 | a second sealed draw, excluding the first 10 |
+
+The validation set is not a January 2026 set. January was the first window considered in
+`eval-set-selection.md`; the sets were drawn over ten months instead.
+
+**Leakage.** Only the post-cutoff frame is unseen by Claude, whose cutoff is June 2026. On the dev
+and validation sets Claude may have seen the PRs and the comments. Test (a) found its reach there is
+not mainly recall (79-107% of the post-cutoff rate), so those sets stay informative with that caveat.
+`gpt_5.2`'s training cutoff is not recorded here, and it has to be stated before any comparison on
+2025 PRs (`docs/plans/2026-09-25-align-decisions-with-maintainers.md`).
+
+**What the tooling lacks.** `results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/` is hard-coded
+to one set:
+- the PR list, the release, the ask manifest and the Claude session directory are constants;
+- Claude's sessions are driven by hand, as subagents with the `cli tool` wrapper, from a chat session;
+- the asks come from two readers per set. The dev set has gold obligations instead, in another form.
+
+A set-parametrised harness needs:
+- one set spec: release, PRs, ask manifest;
+- per-set gpt configs, which are two-line `extends` files;
+- a scripted Claude driver, possibly Claude Code's headless mode;
+- matching and unblinding that take the spec.
+
+**Cost per 12-PR set, from this probe:**
+
+| condition | cost |
+|---|---|
+| `gpt_5.2`, reasoning off | about $0.6 billed a run |
+| lead mode | about $5 a run |
+| high effort | about $20 a run |
+| Claude sessions and matchers | session time only |
