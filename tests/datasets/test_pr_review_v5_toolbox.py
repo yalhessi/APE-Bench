@@ -48,3 +48,45 @@ def test_it_holds_every_tool_an_arm_can_hold(tmp_path):
     from src.mathlib_review.agenda.cutoffs import episode_cutoff
 
     assert mcp.tools and episode_cutoff(episode)
+
+
+VAL_EPISODES = Path("inputs/pr_review_v4/releases/val-2025-06-2026-03-v1/input/episodes.jsonl")
+VAL_CONFIG = Path("configs/pr_review_v5_val_2025_06_2026_03_v1_small12.yaml")
+
+
+def test_it_compiles_against_the_reviewed_workspace_when_one_is_built(tmp_path):
+    """PR 30458 generalises `div_right_injective` in `Algebra/Group/Basic.lean` and uses it in
+    `Pointwise/Finset/Basic.lean`. Against the source-only overlay the second file reported
+    `failed to synthesize Group α` (2026-09-29); against the reviewed workspace it compiles, and
+    the result says which environment it had."""
+
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
+    from src.mathlib_review.review.toolbox import call, workbench
+
+    episode = next(e for e in load_jsonl(VAL_EPISODES, ReviewEpisodeInput) if e.pr_number == 30458)
+    if snapshot_workspace(reviewed_workspace_key(episode.base_sha, episode.diff)) is None:
+        pytest.skip("needs PR 30458's reviewed workspace under data/code_execute/")
+    mcp = workbench(episode, tmp_path / "work", VAL_CONFIG)
+    result = call(mcp.tools, "lean_verify_edit",
+                  {"path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean"})
+    assert result["compiles"] is True, result
+    assert result["errors_already_in_the_file"] == []
+    assert result["environment"].startswith("Verified against the reviewed workspace")
+    # a second call on the same workdir finds the link, not a stale overlay
+    assert call(mcp.tools, "lean_verify_edit", {
+        "path": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean"})["compiles"] is True
+
+
+def test_it_refuses_a_stale_overlay_where_a_reviewed_workspace_exists(tmp_path):
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
+    from src.mathlib_review.review.toolbox import workbench
+
+    episode = next(e for e in load_jsonl(VAL_EPISODES, ReviewEpisodeInput) if e.pr_number == 30458)
+    if snapshot_workspace(reviewed_workspace_key(episode.base_sha, episode.diff)) is None:
+        pytest.skip("needs PR 30458's reviewed workspace under data/code_execute/")
+    (tmp_path / "work" / "target").mkdir(parents=True)
+    with pytest.raises(RuntimeError, match="source-only overlay from an earlier call"):
+        workbench(episode, tmp_path / "work", VAL_CONFIG)
+
