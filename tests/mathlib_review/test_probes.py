@@ -246,3 +246,12 @@ def test_a_set_can_name_its_own_modification_inventory():
     models = probes.render_models(dev.release, [33337], dev.inventory)
     assert models[33337].startswith("# The PR model for #33337 (pass 0)")
     assert POST.inventory == POST.release / "derived/modification_inventory.jsonl"
+
+
+def test_the_matcher_rubric_is_rendered_for_the_counts_and_unchanged_for_six():
+    assert probes.matcher_rubric(6, 6) == probes.MATCHER_RUBRIC.read_text()
+    five = probes.matcher_rubric(5, 8)
+    assert "on eight Mathlib pull requests. Five anonymous reviewers, `R1` to `R5`" in five
+    assert "R6" not in five
+    one = probes.matcher_rubric(6, 1)
+    assert "on one Mathlib pull request. Six anonymous reviewers" in one

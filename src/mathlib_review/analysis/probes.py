@@ -695,7 +695,27 @@ def unfinished_sessions(spec: ProbeSet, sessions: List[str]) -> List[str]:
             if not (spec.session_dir(pr, s) / "findings.json").exists()]
 
 
-def judge_folders(root: Path, n: int, files: List[Path], rubric: Path) -> List[Path]:
+_NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight",
+            9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
+
+
+def matcher_rubric(reviewers: int, prs: int) -> str:
+    """The matcher rubric for this many reviewers and PRs. It was written for six and six, and
+    for those it is returned unchanged."""
+
+    text = MATCHER_RUBRIC.read_text()
+    word = lambda n: _NUMBERS.get(n, str(n))
+    pr_phrase = "one Mathlib pull request" if prs == 1 else f"{word(prs)} Mathlib pull requests"
+    text = text.replace("on six Mathlib pull requests. Six anonymous reviewers, `R1` to `R6`",
+                        f"on {pr_phrase}. {word(reviewers).capitalize()} anonymous reviewers, "
+                        f"`R1` to `R{reviewers}`")
+    text = text.replace("`R6_pr<N>.json`", f"`R{reviewers}_pr<N>.json`")
+    text = text.replace('"R6": ..., "R6_finding": ...', f'"R{reviewers}": ..., "R{reviewers}_finding": ...')
+    return text.replace('"R6": <count>', f'"R{reviewers}": <count>')
+
+
+def judge_folders(root: Path, n: int, files: List[Path], rubric: Path,
+                  rubric_text: Optional[str] = None) -> List[Path]:
     """`n` isolated folders for blind readers or matchers: the inputs, the rubric, a `tmp/`."""
     import shutil
 
@@ -707,7 +727,10 @@ def judge_folders(root: Path, n: int, files: List[Path], rubric: Path) -> List[P
         (d / "tmp").mkdir(parents=True)
         for f in files:
             shutil.copy(f, d / f.name)
-        shutil.copy(rubric, d / rubric.name)
+        if rubric_text is None:
+            shutil.copy(rubric, d / rubric.name)
+        else:
+            (d / rubric.name).write_text(rubric_text)
         folders.append(d)
     return folders
 

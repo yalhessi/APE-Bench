@@ -610,7 +610,12 @@ def _probe(args, logger) -> int:
                                     json.loads(spec.asks_file.read_text()),
                                     json.loads(args.seal.read_text()), sources, inputs)
         files = sorted(p for p in inputs.iterdir() if p.name != "session_stats.json")
-        for d in probes.judge_folders(args.out, 2, files, probes.MATCHER_RUBRIC):
+        seal = json.loads(args.seal.read_text())
+        reviewers = {len(labels) for labels in seal.values()}
+        if len(reviewers) != 1:
+            raise SystemExit(f"every sealed PR needs the same number of reviewers, got {sorted(reviewers)}")
+        rubric = probes.matcher_rubric(reviewers.pop(), len(seal))
+        for d in probes.judge_folders(args.out, 2, files, probes.MATCHER_RUBRIC, rubric_text=rubric):
             print(json.dumps({"folder": str(d.resolve()),
                               "prompt": probes.MATCHER_PROMPT.format(dir=d.resolve())}))
         print(json.dumps({"prs": len(stats), "inputs": str(inputs)}))
