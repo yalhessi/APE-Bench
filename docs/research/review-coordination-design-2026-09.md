@@ -430,6 +430,12 @@ least 3 of those PRs' unreached validation asks in both runs, with the compiled 
 evidence. Fewer, and the design is written into `dead-ends.md` with the untried constructions
 listed.
 
+**Amended before it ran (2026-09-29).** As first stated the demonstration has no control, and the
+reviewer model may have seen these PRs, so absolute reach cannot show that a construction produced
+an ask. It runs as a comparison instead: passes 3 and 4, two runs, against the current brief in two
+compute-matched replicates, on the same pass-0 model and tools, with the rule stated in
+`results/pr_review_v5/probes/construction-demo-2026-09-29/README.md` before any reviewer ran.
+
 **After building (paid, small):** validation small12 minus 30714, the PRs
 `pr5_val_small12_minus30714_lead_rep1` reviewed (8 of 30 asks reached, $6.78) and the solo
 baseline (2 of 30, $1.20). Three reps, reported as mean / union / stable, found and published

@@ -83,3 +83,9 @@ by hand for three validation small12 PRs holding pass-3/4 misses, passes 3 and 4
 `cli tool`, two runs, two blind matchers; threshold ≥ 3 unreached asks produced in both runs with the
 compiled artifact as evidence. Then the minimal native build (§9 of the design) and three reps on
 small12 against `pr5_val_small12_minus30714_lead_rep1` under the §10 thresholds.
+
+**The demonstration, pre-registered (2026-09-29):** `results/pr_review_v5/probes/construction-demo-2026-09-29/`.
+PRs 34091, 30458 and 32875 by a stated rule, 11 unreached asks; K (passes 3 and 4, two runs)
+against X (the current brief, four runs paired into two replicates), same model and tools, two blind
+matchers. Prerequisite found and fixed on the way: the `cli tool` workbench compiled against a
+source-only overlay (`5dbc173`, `19c8c4b`).
