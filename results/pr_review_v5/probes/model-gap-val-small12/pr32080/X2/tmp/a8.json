@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean", "line_start": 82, "line_end": 82, "replacement": "public instance (priority := 100) UniformSpace.toCompletelyRegularSpace :\n    CompletelyRegularSpace \u03b1 where"}

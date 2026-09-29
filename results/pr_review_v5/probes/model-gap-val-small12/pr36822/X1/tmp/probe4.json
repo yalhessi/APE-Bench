@@ -1,0 +1,1 @@
+{"path": "Mathlib/Order/Filter/AtTopBot/Disjoint.lean", "line_start": 50, "line_end": 50, "replacement": "end Filter\n\n#check @Filter.disjoint_atTop_principal_Iio\n#check @Filter.disjoint_atBot_principal_Ici\n#check @Filter.disjoint_pure_atBot\n#check @Filter.disjoint_atTop_atBot"}

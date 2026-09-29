@@ -1,0 +1,162 @@
+[
+ {
+  "pr": 26185,
+  "session": "X1",
+  "calls": 34,
+  "findings": 7,
+  "flagged": []
+ },
+ {
+  "pr": 26755,
+  "session": "X1",
+  "calls": 27,
+  "findings": 3,
+  "flagged": []
+ },
+ {
+  "pr": 28649,
+  "session": "X1",
+  "calls": 34,
+  "findings": 4,
+  "flagged": []
+ },
+ {
+  "pr": 29842,
+  "session": "X1",
+  "calls": 22,
+  "findings": 3,
+  "flagged": []
+ },
+ {
+  "pr": 30641,
+  "session": "X1",
+  "calls": 26,
+  "findings": 5,
+  "flagged": []
+ },
+ {
+  "pr": 32080,
+  "session": "X1",
+  "calls": 35,
+  "findings": 10,
+  "flagged": []
+ },
+ {
+  "pr": 34935,
+  "session": "X1",
+  "calls": 40,
+  "findings": 4,
+  "flagged": []
+ },
+ {
+  "pr": 36822,
+  "session": "X1",
+  "calls": 26,
+  "findings": 2,
+  "flagged": [
+   {
+    "tool": "Read",
+    "why": [
+     "file tool outside",
+     "outside -Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/b3o67x93z.txt"
+    ],
+    "input": "/common/home/ya475/.claude/projects/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/b3o67x93z.txt"
+   }
+  ]
+ },
+ {
+  "pr": 30641,
+  "session": "X2",
+  "calls": 27,
+  "findings": 5,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/findings.json <<'EOF'\n[\n  {\n    \"target\": \"Real.posLog_pow\",\n    \"claim\": \"The docstring of `Real.posLog_pow` says \\\"`log⁺` commutes with taki"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/notes.md <<'EOF'\n# Review notes: PR #30641 (`log⁺` elementary lemmas)\n\n## Method\n- Read brief.md, pr.md, model.md and diff.patch.\n- Read the w"
+   }
+  ]
+ },
+ {
+  "pr": 26755,
+  "session": "X2",
+  "calls": 29,
+  "findings": 3,
+  "flagged": []
+ },
+ {
+  "pr": 29842,
+  "session": "X2",
+  "calls": 20,
+  "findings": 1,
+  "flagged": []
+ },
+ {
+  "pr": 36822,
+  "session": "X2",
+  "calls": 38,
+  "findings": 4,
+  "flagged": [
+   {
+    "tool": "Read",
+    "why": [
+     "file tool outside",
+     "outside -Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/bpdyx4jpa.txt"
+    ],
+    "input": "/common/home/ya475/.claude/projects/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/bpdyx4jpa.txt"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside roofedit/ya475/APE-Bench/.ape/probe_scratch/val_small12/raw/pr36822/X2"
+    ],
+    "input": "P=<dir>/ptool; $P content_search '{\"content_pattern\":\"Ioi_disjoint_Iio\",\"path\":\"Mathlib/Order/Interval/Set/Disjoint.lean\"}'; cat /research/projects/proofedit/ya"
+   }
+  ]
+ },
+ {
+  "pr": 28649,
+  "session": "X2",
+  "calls": 42,
+  "findings": 9,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "cat > <dir>/tmp/make_findings.py <<'EOF'\nimport json\nD = \"<dir>/\"\nF = [\n {\n  \"target\": \"Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module doc"
+   }
+  ]
+ },
+ {
+  "pr": 32080,
+  "session": "X2",
+  "calls": 48,
+  "findings": 13,
+  "flagged": []
+ },
+ {
+  "pr": 26185,
+  "session": "X2",
+  "calls": 33,
+  "findings": 8,
+  "flagged": []
+ },
+ {
+  "pr": 34935,
+  "session": "X2",
+  "calls": 31,
+  "findings": 4,
+  "flagged": []
+ }
+]

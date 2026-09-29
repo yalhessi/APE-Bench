@@ -1,0 +1,3 @@
+{"path": "Mathlib/Data/Rel.lean",
+ "declaration_name": "SetRel.IsRefl.comp",
+ "new_declaration": "instance isRefl_comp [R₁.IsRefl] [R₂.IsRefl] : (R₁ ○ R₂).IsRefl where\n  refl _ := ⟨_, R₁.rfl, R₂.rfl⟩\n\nexample [R₁.IsRefl] [R₂.IsRefl] : (R₁.comp R₂).IsRefl := inferInstance"}

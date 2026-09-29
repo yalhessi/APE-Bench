@@ -1,0 +1,27 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/Topology/ContinuousMap/Basic.lean",
+   "matches": [
+    {
+     "line_number": 284,
+     "content": "   284|theorem coe_restrict (f : C(α, β)) : ⇑(f.restrict s) = s.restrict f :="
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/ContinuousMap/Bounded/Basic.lean",
+   "matches": [
+    {
+     "line_number": 353,
+     "content": "   353|theorem coe_restrict (f : α →ᵇ β) (s : Set α) : ⇑(f.restrict s) = f ∘ (↑) := rfl"
+    }
+   ]
+  }
+ ],
+ "files_available": 596,
+ "files_scanned": 596,
+ "files_with_matches": 2,
+ "truncated": false
+}

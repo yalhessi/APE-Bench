@@ -1,0 +1,118 @@
+{
+ "success": true,
+ "errors": [],
+ "warnings": [],
+ "infos": [
+  {
+   "severity": "information",
+   "data": "@Iio_disjoint_Ioi_of_not_lt : ∀ {α : Type u_1} [inst : Preorder α] {a b : α}, ¬b < a → Disjoint (Iio a) (Ioi b)",
+   "code_line": "#check @Set.Iio_disjoint_Ioi_of_not_lt",
+   "pos": {
+    "column": 0,
+    "line": 114
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Iio_disjoint_Ioi_of_le : ∀ {α : Type u_1} [inst : Preorder α] {a b : α}, b ≤ a → Disjoint (Iio b) (Ioi a)",
+   "code_line": "#check @Set.Iio_disjoint_Ioi_of_le",
+   "pos": {
+    "column": 0,
+    "line": 115
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Iio_disjoint_Ioi_iff : ∀ {α : Type u_1} [inst : Preorder α] {a b : α} [DenselyOrdered α],\n  Disjoint (Iio a) (Ioi b) ↔ ¬b < a",
+   "code_line": "#check @Set.Iio_disjoint_Ioi_iff",
+   "pos": {
+    "column": 0,
+    "line": 116
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Iic_disjoint_Ici : ∀ {α : Type u_1} [inst : Preorder α] {a b : α}, Disjoint (Iic a) (Ici b) ↔ ¬b ≤ a",
+   "code_line": "#check @Set.Iic_disjoint_Ici",
+   "pos": {
+    "column": 0,
+    "line": 117
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Ici_disjoint_Iio : ∀ {α : Type u_1} [inst : Preorder α] {a b : α}, b ≤ a → Disjoint (Ici a) (Iio b)",
+   "code_line": "#check @Set.Ici_disjoint_Iio",
+   "pos": {
+    "column": 0,
+    "line": 118
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Ioi_disjoint_Iic : ∀ {α : Type u_1} [inst : Preorder α] {a b : α}, b ≤ a → Disjoint (Ioi a) (Iic b)",
+   "code_line": "#check @Set.Ioi_disjoint_Iic",
+   "pos": {
+    "column": 0,
+    "line": 119
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@iUnion_Ici : ∀ {α : Type u_1} [inst : Preorder α], ⋃ a, Ici a = univ",
+   "code_line": "#check @Set.iUnion_Ici",
+   "pos": {
+    "column": 0,
+    "line": 120
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@iUnion_Ioi : ∀ {α : Type u_1} [inst : Preorder α] [NoMinOrder α], ⋃ a, Ioi a = univ",
+   "code_line": "#check @Set.iUnion_Ioi",
+   "pos": {
+    "column": 0,
+    "line": 121
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@iUnion_Icc_left : ∀ {α : Type u_1} [inst : Preorder α] (a : α), ⋃ b, Icc b a = Iic a",
+   "code_line": "#check @Set.iUnion_Icc_left",
+   "pos": {
+    "column": 0,
+    "line": 122
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@iUnion_Ico_left : ∀ {α : Type u_1} [inst : Preorder α] (a : α), ⋃ b, Ico b a = Iio a",
+   "code_line": "#check @Set.iUnion_Ico_left",
+   "pos": {
+    "column": 0,
+    "line": 123
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@iUnion_Ioc_left : ∀ {α : Type u_1} [inst : Preorder α] [NoMinOrder α] (a : α), ⋃ b, Ioc b a = Iic a",
+   "code_line": "#check @Set.iUnion_Ioc_left",
+   "pos": {
+    "column": 0,
+    "line": 124
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@iUnion_Ioo_left : ∀ {α : Type u_1} [inst : Preorder α] [NoMinOrder α] (a : α), ⋃ b, Ioo b a = Iio a",
+   "code_line": "#check @Set.iUnion_Ioo_left",
+   "pos": {
+    "column": 0,
+    "line": 125
+   }
+  }
+ ],
+ "axioms": [],
+ "message": "Lean verification completed successfully",
+ "mode": "verified_edit"
+}

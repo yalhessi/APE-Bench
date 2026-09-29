@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/GroupWithZero/Action/Pointwise/Finset.lean", "line_start": 38, "line_end": 38, "replacement": "noncomputable def testNCBase : Monoid (Set \u2115) := Classical.choice \u27e8Set.monoid\u27e9\n\ndef testNCDep : Monoid (Set \u2115) := testNCBase\n\nprotected def distribMulAction [Monoid \u03b1] [AddMonoid \u03b2] [DistribMulAction \u03b1 \u03b2] :"}

@@ -1,0 +1,9 @@
+{
+ "success": true,
+ "errors": [],
+ "warnings": [],
+ "infos": [],
+ "axioms": [],
+ "message": "Lean verification completed successfully",
+ "mode": "verified_edit"
+}

@@ -1,0 +1,1 @@
+{"code":"variable [t : TopologicalSpace α] [CompletelyRegularSpace α]\n\npublic theorem CompletelyRegularSpace.exists_uniformSpace :\n    ∃ (u : UniformSpace α), u.toTopologicalSpace = t :=\n  ⟨uniformSpaceOfCompactR1.comap stoneCechUnit, isInducing_stoneCechUnit.eq_induced.symm⟩","limit":6}

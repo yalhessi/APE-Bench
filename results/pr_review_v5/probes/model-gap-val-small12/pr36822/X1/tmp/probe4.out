@@ -1,0 +1,46 @@
+{
+ "success": true,
+ "errors": [],
+ "warnings": [],
+ "infos": [
+  {
+   "severity": "information",
+   "data": "@Filter.disjoint_atTop_principal_Iio : ∀ {α : Type u_6} [inst : Preorder α] (x : α),\n  Disjoint Filter.atTop (Filter.principal (Iio x))",
+   "code_line": "#check @Filter.disjoint_atTop_principal_Iio",
+   "pos": {
+    "column": 0,
+    "line": 52
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Filter.disjoint_atBot_principal_Ici : ∀ {α : Type u_6} [inst : Preorder α] [NoBotOrder α] (x : α),\n  Disjoint Filter.atBot (Filter.principal (Ici x))",
+   "code_line": "#check @Filter.disjoint_atBot_principal_Ici",
+   "pos": {
+    "column": 0,
+    "line": 53
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Filter.disjoint_pure_atBot : ∀ {α : Type u_6} [inst : Preorder α] [NoBotOrder α] (x : α),\n  Disjoint (pure x) Filter.atBot",
+   "code_line": "#check @Filter.disjoint_pure_atBot",
+   "pos": {
+    "column": 0,
+    "line": 54
+   }
+  },
+  {
+   "severity": "information",
+   "data": "@Filter.disjoint_atTop_atBot : ∀ {α : Type u_6} [inst : PartialOrder α] [Nontrivial α],\n  Disjoint Filter.atTop Filter.atBot",
+   "code_line": "#check @Filter.disjoint_atTop_atBot",
+   "pos": {
+    "column": 0,
+    "line": 55
+   }
+  }
+ ],
+ "axioms": [],
+ "message": "Lean verification completed successfully",
+ "mode": "verified_edit"
+}

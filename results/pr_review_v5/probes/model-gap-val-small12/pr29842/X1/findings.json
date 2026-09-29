@@ -1,0 +1,23 @@
+[
+  {
+    "target": "UniqueDiffWithinAt.mono",
+    "claim": "The PR moves `UniqueDiffWithinAt.mono` into the TVS section below `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and keeps the proof `h.mono_nhds <| nhdsWithin_mono _ st`. So the lemma now takes both continuity instances, but the statement does not need them: `tangentConeAt_mono` and `closure_mono` hold in any topological module, and `tangentConeAt_mono` already sits in the continuity-free part of the TVS section.",
+    "requested_change": "Put `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (just after `UniqueDiffWithinAt.congr_pt`) and prove it directly:\n```lean\ntheorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) :\n    UniqueDiffWithinAt 𝕜 t x :=\n  ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩\n```\nThen `UniqueDiffWithinAt.mono_nhds` and the other lemmas follow the variable line as before.",
+    "severity": "advisory",
+    "evidence": "`lean_verify_edit` in line mode replaced lines 433-443 (the `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` line through the end of `UniqueDiffWithinAt.mono`). The replacement puts `mono`, with the direct proof above, before the variable line, then the variable line, then `mono_nhds` unchanged. Result: success true, no errors or warnings, whole file recompiled. So `mono` elaborates with only `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]`. `content_search` found no `@UniqueDiffWithinAt.` explicit applications in `target/Mathlib`, so dropping the instance arguments breaks no caller."
+  },
+  {
+    "target": "tangentConeAt.lim_zero",
+    "claim": "The new proof of `tangentConeAt.lim_zero` builds the eventual equality from `eventually_ne_of_tendsto_norm_atTop` before rewriting `hc` to `cobounded`. It then uses `apply Tendsto.congr' this` and a separate `simpa`. Once `hc` is rewritten to `cobounded`, `hc.eventually_ne_cobounded 0` gives the side condition directly and the proof fits in three lines.",
+    "requested_change": "Rewrite `hc` first and fold the eventual equality into a `filter_upwards`:\n```lean\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  refine .congr' ?_ (by simpa using (tendsto_inv₀_cobounded.comp hc).smul hd)\n  filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _\n```",
+    "severity": "advisory",
+    "evidence": "`lean_verify_edit` with `declaration_name = tangentConeAt.lim_zero` and the three-line proof above: success true, no errors or warnings. `declaration_search` confirms `Filter.Tendsto.eventually_ne_cobounded` exists before this PR (`Mathlib/Topology/Bornology/Basic.lean`). `precedent_search` on the proof returned a comment by ADedecker on PR #21065 (same file, same lemma, TVS attempt), which suggests exactly this shape: `rw [tendsto_norm_atTop_iff_cobounded] at hc`, then `filter_upwards [hc.eventually_ne_cobounded 0] with n hn using inv_smul_smul₀ hn _`, then a single `simpa`."
+  },
+  {
+    "target": "mem_tangentConeAt_of_openSegment_subset",
+    "claim": "The PR re-partitions `TangentCone.lean` into TVS and Normed sections but leaves `mem_tangentConeAt_of_openSegment_subset` and `mem_tangentConeAt_of_segment_subset` in the Normed section, over `[NormedAddCommGroup G] [NormedSpace ℝ G]`. Their proofs use only `mem_tangentConeAt_of_pow_smul` (already TVS) and the algebra of `openSegment` and `segment`, with no norm or continuity on `G`.",
+    "requested_change": "Move `mem_tangentConeAt_of_openSegment_subset` and `mem_tangentConeAt_of_segment_subset` into the continuity-free part of the TVS section (next to `mem_tangentConeAt_of_pow_smul` / `tangentConeAt_mono`), stated for `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G]`, with the proofs unchanged. Keep the deprecated aliases next to them.",
+    "severity": "advisory",
+    "evidence": "`lean_verify_edit` in line mode inserted primed copies at line 108, before `variable [ContinuousSMul 𝕜 E]`. The copies are stated with `[AddCommGroup G] [Module ℝ G] [TopologicalSpace G]` and keep the proofs verbatim (`mem_tangentConeAt_of_pow_smul one_half_pos.ne' ...`, `openSegment_eq_image`, `abel`; the segment version via `openSegment_subset_segment`). Result: success true, no errors or warnings."
+  }
+]

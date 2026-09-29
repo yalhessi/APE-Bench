@@ -1,0 +1,30 @@
+[
+ {
+  "target": "module_doc in Mathlib/Probability/Martingale/Upcrossing.lean (section 'Variant of the upcrossing estimate')",
+  "claim": "The paragraph this PR edits (it hyphenates 'left-hand side' on line 698) still states a wrong identity: line 703 reads $U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}$, which sums the same indicator N times, and line 705 says $\\{U_N(a, b) < N\\}$ is measurable 'since $U_N(a, b)$ is a stopping time'. $U_N(a, b)$ is the upcrossing count, not a stopping time. What the code proves (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) is a sum of indicators of $\\{\\tau_i < N\\}$ over the upper crossing times $\\tau_i$ (`upperCrossingTime a b f N i`), which are the stopping times.",
+  "requested_change": "Replace lines 702-706 with: \"$$\\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\\n$$\\n$U_N(a, b)$ is measurable as each $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a\\nstopping time.\" ($\\tau_n$ is the notation the file's own module doc sets up at lines 73-83.)",
+  "severity": "advisory",
+  "evidence": "file_read of target/Mathlib/Probability/Martingale/Upcrossing.lean lines 684-760: line 703 has the wrong formula. `upcrossingsBefore_eq_sum` (line 711) states `upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`, and `Adapted.measurable_upcrossingsBefore` (line 736) gets measurability from `hf.isStoppingTime_upperCrossingTime.measurableSet_lt_of_pred N`. content_search for \\\\tau|\\\\sigma|U_N: lines 73-83 define the stopping times $\\sigma_n, \\tau_n$ and $U_N(a, b) := \\sup \\{n \\mid \\tau_n < N\\}$. lean_verify_edit in line mode (path Mathlib/Probability/Martingale/Upcrossing.lean, lines 702-706 replaced by the text above) returned success true with no errors or warnings."
+ },
+ {
+  "target": "module_doc in Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean ('Main statements')",
+  "claim": "The PR fixes 'measurablity' in this module doc, but the same doc's Main statements entry for the composition is wrong in two ways. It names `ProbabilityTheory.integral_comp`, but the lemma is declared inside `namespace Kernel` (line 359), so its name is `ProbabilityTheory.Kernel.integral_comp`. And it writes the statement with the lintegral `∫⁻`, although this file is about the Bochner integral and the lemma (line 417-418) states `∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`.",
+  "requested_change": "Change lines 30-31 to \"* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.\"",
+  "severity": "advisory",
+  "evidence": "file_read of target/Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean lines 1-58 shows the doc entry at lines 30-31 with `∫⁻`. content_search for namespace/end and theorem heads: `namespace ProbabilityTheory` (56) contains `theorem integral_compProd` (246), so line 27's `ProbabilityTheory.integral_compProd` is correct. `namespace Kernel` (359) through `end Kernel` (445) contains `theorem integral_comp` (417), whose statement uses the Bochner `∫`. lean_verify_edit in line mode (lines 30-31 replaced by the text above) returned success true with no errors or warnings."
+ },
+ {
+  "target": "module_doc in Mathlib/Probability/Moments/Basic.lean ('Main results')",
+  "claim": "The PR capitalizes 'mgfs'/'cgfs' to 'MGFs'/'CGFs' in two bullets (lines 25 and 27), but the next bullet in the same list still reads 'For `t` nonnegative such that the cgf exists' (line 30). The Main results list now uses two spellings of the same abbreviation.",
+  "requested_change": "On line 30 change 'such that\\n  the cgf exists' to 'such that\\n  the CGF exists', so the list uses one spelling.",
+  "severity": "advisory",
+  "evidence": "file_read of target/Mathlib/Probability/Moments/Basic.lean lines 1-45: lines 25 and 27 read 'MGFs'/'CGFs', and line 30 reads 'the cgf exists'. A content_search for prose mgf/cgf in the file found line 30 as the only remaining lowercase prose use; the other hits are code identifiers in backticks or declarations. Context: other files in the area use lowercase 'the mgf' in prose (ComplexMGF.lean lines 18-21 and 32, MGFAnalytic.lean line 20, SubGaussian.lean lines 32, 44, 107 and 110). So reverting the two capitalizations would be an equally consistent fix, and this ask is only about the inconsistency inside one list. lean_verify_edit in line mode (line 30 replaced) returned success true."
+ },
+ {
+  "target": "tendsto_of_uncrossing_lt_top (docstring, Mathlib/Probability/Martingale/Convergence.lean)",
+  "claim": "Replacing 'liminfs' with 'limit inferiors' does not fix a typo. 'liminfs' is Mathlib's own term: the defining file's title is '# liminfs and limsups of functions and filters' (Order/LiminfLimsup.lean), and BorelSpace/Order.lean also uses it. 'limit inferiors' is also not the standard English plural, which is 'limits inferior'.",
+  "requested_change": "Revert line 133 to '/-- A realization of a stochastic process with bounded upcrossings and bounded liminfs is'.",
+  "severity": "advisory",
+  "evidence": "Census by content_search over target/Mathlib. 'liminfs' appears in Mathlib/Order/LiminfLimsup.lean:11 ('# liminfs and limsups of functions and filters') and Mathlib/MeasureTheory/Constructions/BorelSpace/Order.lean:34. 'limit inferiors' appears only at this PR's line (Convergence.lean:133). 'limits inferior' appears 0 times. 'limit superiors' appears once (Topology/MetricSpace/HausdorffDimension.lean:244 and 257), so the PR's spelling has one precedent. The hypothesis `hf₁ : liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞` is itself written with `liminf`. lean_verify_edit in line mode (line 133 reverted) returned success true."
+ }
+]

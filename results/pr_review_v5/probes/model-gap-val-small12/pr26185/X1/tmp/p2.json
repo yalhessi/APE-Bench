@@ -1,0 +1,1 @@
+{"path": "Counterexamples/PeanoCurve.lean", "declaration_name": "exists_peano_curve", "new_declaration": "theorem exists_peano_curve :\n    \u2203 f : C(I, I \u00d7 I), Function.Surjective f :=\n  let \u27e8f, hf\u27e9 := exists_long_peano_curve\n  \u27e8f.restrict I, Set.surjOn_iff_surjective.mp (hf.mono cantorSet_subset_unitInterval subset_rfl)\u27e9"}

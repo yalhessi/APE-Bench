@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean", "line_start": 40, "line_end": 40, "replacement": "open Filter Set Uniformity SetRel\n\nattribute [-instance] SetRel.IsRefl.comp\n"}

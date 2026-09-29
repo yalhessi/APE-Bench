@@ -1,0 +1,3 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean",
+ "declaration_name": "UniformSpace.toCompletelyRegularSpace",
+ "new_declaration": "#check @UniformSpace.completelyRegularSpace\nexample : CompletelyRegularSpace α := inferInstance\n#check @UniformSpace.ball\n#print SetRel.comp\n#check @comp3_mem_uniformity\n#check @comp_open_symm_mem_uniformity_sets\n#check @isOpen_iff_isOpen_ball_subset\n#check @mem_uniformity_isClosed\npublic instance UniformSpace.toCompletelyRegularSpace : CompletelyRegularSpace α := sorry"}

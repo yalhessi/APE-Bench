@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Moments/Basic.lean", "line_start": 30, "line_end": 30, "replacement": "  the CGF exists, `ℙ(ε ≤ X) ≤ exp(- t*ε + cgf X ℙ t)`. See also"}

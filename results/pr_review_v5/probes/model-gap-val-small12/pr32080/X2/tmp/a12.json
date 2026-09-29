@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean", "line_start": 106, "line_end": 107, "replacement": "    exact \u27e8fun x \u21a6 \u27e8c.lim x, c.lim_mem_Icc x\u27e9, c.continuous_lim.subtype_mk c.lim_mem_Icc,\n      Subtype.ext (c.lim_of_mem_C x hxc), fun y hy \u21a6 Subtype.ext (c.lim_of_notMem_U y (hyo hy))\u27e9"}

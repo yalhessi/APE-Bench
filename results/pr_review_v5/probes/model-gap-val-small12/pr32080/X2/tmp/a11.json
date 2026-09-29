@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean", "line_start": 10, "line_end": 11, "replacement": "import Mathlib.Topology.UniformSpace.OfCompactT2"}

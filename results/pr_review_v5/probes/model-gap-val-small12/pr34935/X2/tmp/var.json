@@ -1,0 +1,1 @@
+{"path": "Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean", "line_start": 396, "line_end": 396, "replacement": "variable (J K : X.IdealSheafData)"}

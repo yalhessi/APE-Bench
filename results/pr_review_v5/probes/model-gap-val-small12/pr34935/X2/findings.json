@@ -1,0 +1,30 @@
+[
+  {
+    "target": "AlgebraicGeometry.Scheme.IdealSheafData.mul_inf",
+    "claim": "`mul_inf` states `I * (J ⊔ K) = I * J ⊔ I * K`, which is distributivity over the supremum `⊔`, not the infimum. The name says `inf`, so it contradicts the statement and the naming convention (`⊔` is `sup`). The name also breaks with the `Ideal` API this section says it follows: `Ideal.mul_sup : I * (J ⊔ K) = I * J ⊔ I * K`.",
+    "requested_change": "Rename `mul_inf` to `mul_sup`, keeping the statement and proof: `lemma mul_sup : I * (J ⊔ K) = I * J ⊔ I * K := by ext U : 2; exact mul_add _ _ _`. Update `left_distrib := mul_sup` in the `IdemCommSemiring X.IdealSheafData` instance.",
+    "severity": "blocking",
+    "evidence": "content_search in Mathlib/RingTheory/Ideal/Operations.lean: line 335 `theorem mul_sup : I * (J ⊔ K) = I * J ⊔ I * K` and line 338 `theorem sup_mul : (I ⊔ J) * K = I * K ⊔ J * K`, the same statements under `sup` names. The PR's comment `We follow Ideal and set the simp normal form to be ⊥ and ⊤ and ⊔` names Ideal as its model. lean_verify_edit (line mode, lines 423-442) with the lemmas renamed `mul_sup`/`sup_mul` and the instance fields updated: success, no errors, no warnings. naming_norm only measures the leading prefix (`mul_`), so it does not bear on the `inf`/`sup` suffix."
+  },
+  {
+    "target": "AlgebraicGeometry.Scheme.IdealSheafData.inf_mul",
+    "claim": "`inf_mul` states `(I ⊔ J) * K = I * K ⊔ J * K`, which is about the supremum `⊔`, so the `inf` in its name is wrong. `Ideal.sup_mul` has this exact statement under the `sup` name.",
+    "requested_change": "Rename `inf_mul` to `sup_mul`, keeping the statement and proof: `lemma sup_mul : (I ⊔ J) * K = I * K ⊔ J * K := by ext U : 2; exact add_mul _ _ _`. Update `right_distrib := sup_mul` in the `IdemCommSemiring X.IdealSheafData` instance.",
+    "severity": "blocking",
+    "evidence": "Mathlib/RingTheory/Ideal/Operations.lean line 338: `theorem sup_mul : (I ⊔ J) * K = I * K ⊔ J * K := Submodule.sup_smul I J K`. lean_verify_edit (line mode, lines 423-442) with both renames and the instance's `left_distrib`/`right_distrib` updated: success, no errors, no warnings."
+  },
+  {
+    "target": "AlgebraicGeometry.Scheme.IdealSheafData.equivOfIsAffine",
+    "claim": "The PR strengthens `equivOfIsAffine` from an order isomorphism `≃o` to an ordered-semiring isomorphism `≃+*o`, but its docstring (and the matching entry in the module header's `Main definition` list) still says only that ideal sheaves are 'in bijection with' ideals of the global sections. The documentation no longer describes the structure the declaration provides.",
+    "requested_change": "Update the docstring to state the new structure, e.g. `/-- Over affine schemes, ideal sheaves are in bijection with ideals of the global sections. This bijection is an isomorphism of ordered semirings. -/`. Make the same update to the `equivOfIsAffine` bullet in the module docstring.",
+    "severity": "advisory",
+    "evidence": "diff.patch: `-def equivOfIsAffine [IsAffine X] : IdealSheafData X ≃o Ideal Γ(X, ⊤)` becomes `+def equivOfIsAffine [IsAffine X] : IdealSheafData X ≃+*o Ideal Γ(X, ⊤)` with new `map_mul'`/`map_add'` fields, and the docstring at file line 477 is unchanged. The module header at lines 24-25 has the same 'in bijection' wording. lean_verify_edit (line mode 477-485) with the extended docstring: success, no warnings."
+  },
+  {
+    "target": "Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean",
+    "claim": "`section Semiring` opens with `variable (I J K : X.IdealSheafData)`, but `I` is already declared as the explicit namespace-level variable `variable (I : IdealSheafData X)` at line 204, which is still in scope. The new binder only shadows it.",
+    "requested_change": "Declare only the new variables: replace `variable (I J K : X.IdealSheafData)` with `variable (J K : X.IdealSheafData)`.",
+    "severity": "advisory",
+    "evidence": "file_read of target/Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean: line 204 `variable (I : IdealSheafData X)` sits at namespace level before `section map_ideal`, and no enclosing section ends before line 396. lean_verify_edit replacing line 396 with `variable (J K : X.IdealSheafData)`: success, no errors, no warnings. Every lemma in the section still elaborates with the same explicit `I`."
+  }
+]

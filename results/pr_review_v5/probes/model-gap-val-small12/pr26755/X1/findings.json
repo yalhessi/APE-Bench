@@ -1,0 +1,23 @@
+[
+  {
+    "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+    "claim": "The PR makes `Finset.monoid` computable but leaves `noncomputable` on the sibling pointwise structures in the same file: `Finset.commMonoid` (l. 939), `Finset.divisionMonoid` (l. 964), `Finset.divisionCommMonoid` (l. 1020) and `Finset.coeMonoidHom` (l. 770). Those modifiers existed only because `Set.monoid`/`Set.divisionMonoid` were noncomputable. With the PR's changes they are no longer needed, so the PR is incomplete against its own title (\"remove `noncomputable` from Set/Finset Monoid instances\").",
+    "requested_change": "Remove `noncomputable` from `Finset.commMonoid`, `Finset.divisionMonoid`, `Finset.divisionCommMonoid` and `Finset.coeMonoidHom` in this file (e.g. `protected def commMonoid : CommMonoid (Finset α) :=`, `protected def divisionMonoid : DivisionMonoid (Finset α) :=`, `protected def divisionCommMonoid [DivisionCommMonoid α] :`, `def coeMonoidHom : Finset α →* Set α where`).",
+    "severity": "advisory",
+    "evidence": "content_search for `noncomputable` in target/Mathlib/Algebra/Group/Pointwise found exactly these four remaining in Finset/Basic.lean and none in Set/Basic.lean. lean_verify_edit (line mode) removing `noncomputable` from each one separately: success, no errors. A single span edit over lines 768-1024 removing all four at once: success, no errors. Control: inserting `def testNoncompProbe : Nat := Classical.choice ⟨0⟩` into the same file makes the tool report `axiom 'Classical.choice' not supported by code generator; consider marking definition as 'noncomputable'`, so the tool does catch missing `noncomputable`."
+  },
+  {
+    "target": "Finset.mulAction",
+    "claim": "`Finset.mulAction` in `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean` (l. 76-87) still carries the same `#adaptation_note /-- nightly-2025-04-07 ... because of its dependence on Set.monoid ... -/` that this PR deletes from `Finset.monoid`, and is still `protected noncomputable def`. After this PR the note is false, since `Set.monoid` and `Finset.monoid` are computable. It is the only remaining copy of this lean4#7824 adaptation note in Mathlib.",
+    "requested_change": "In `Mathlib/Algebra/Group/Action/Pointwise/Finset.lean`, delete the `#adaptation_note /-- nightly-2025-04-07 ... -/` block above `Finset.mulAction` and change `protected noncomputable def mulAction` to `protected def mulAction [DecidableEq α] [Monoid α] [MulAction α β] :`.",
+    "severity": "advisory",
+    "evidence": "content_search for `lean4/pull/7824|because of its dependence on` across target/Mathlib: the only hit is Action/Pointwise/Finset.lean l. 76-80. lean_verify_edit on Mathlib/Algebra/Group/Action/Pointwise/Finset.lean, replacing lines 76-87 with the docstring and attribute followed by `protected def mulAction ...` (note removed, no `noncomputable`): success, no errors. Probe in the same file, `def probeMonoidComputable : Monoid (Finset ℕ) := Finset.monoid` and `def probeSetMonoidComputable : Monoid (Set ℕ) := Set.monoid`: success. This confirms the file is checked against the PR's now-computable `Set.monoid`/`Finset.monoid`, not the base versions."
+  },
+  {
+    "target": "Set.mulAction",
+    "claim": "Downstream pointwise structures that were noncomputable only because of the declarations this PR fixes are still marked `noncomputable`: `Set.mulAction` (Mathlib/Algebra/Group/Action/Pointwise/Set/Basic.lean l. 173, depends on `Set.monoid`), `Set.hasDistribNeg` (Mathlib/Algebra/Ring/Pointwise/Set.lean l. 30, built from `Set.involutiveNeg`) and `Finset.distribNeg` (Mathlib/Algebra/Ring/Pointwise/Finset.lean l. 29). Each compiles without the modifier once this PR is applied.",
+    "requested_change": "Drop `noncomputable` from `Set.mulAction` (`protected def mulAction [Monoid α] [MulAction α β] : MulAction (Set α) (Set β) where`), `Set.hasDistribNeg` and `Finset.distribNeg`, either in this PR or in an immediate follow-up that the PR description names.",
+    "severity": "advisory",
+    "evidence": "content_search `noncomputable` in target/Mathlib/Algebra/Group/Action/Pointwise and target/Mathlib/Algebra/Ring/Pointwise found these three. lean_verify_edit (line mode) removing `noncomputable` from each: Action/Pointwise/Set/Basic.lean l. 173 success; Ring/Pointwise/Set.lean l. 30 success; Ring/Pointwise/Finset.lean l. 29 success, all with no errors."
+  }
+]

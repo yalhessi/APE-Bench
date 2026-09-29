@@ -1,0 +1,3 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean",
+ "declaration_name": "completelyRegularSpace_iff_exists_uniformSpace",
+ "new_declaration": "public theorem completelyRegularSpace_iff_exists_uniformSpace :\n    CompletelyRegularSpace α ↔ ∃ (u : UniformSpace α), u.toTopologicalSpace = t :=\n  ⟨@CompletelyRegularSpace.exists_uniformSpace α t, CompletelyRegularSpace.of_exists_uniformSpace⟩\n\n#check @CompletelyRegularSpace.of_exists_uniformSpace\n#check @completelyRegularSpace_iff_exists_uniformSpace\n#check @CompletelyRegularSpace.exists_uniformSpace\nexample : False := by\n  have := @completelyRegularSpace_iff_exists_uniformSpace\n  trivial"}
