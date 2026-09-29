@@ -27,7 +27,11 @@ POST = Path("results/pr_review_v5/probes/postcutoff-2026-09-29")
 RUNS = {"G1": "probe_postcutoff_gpt52_G_rep1", "G2": "probe_postcutoff_gpt52_G_rep2",
         "K1": "probe_postcutoff_gpt52_K_rep1", "K2": "probe_postcutoff_gpt52_K_rep2",
         # test (d): G with reasoning_effort=high
-        "Gr1": "probe_postcutoff_gpt52_Gr_rep1", "Gr2": "probe_postcutoff_gpt52_Gr_rep2"}
+        "Gr1": "probe_postcutoff_gpt52_Gr_rep1", "Gr2": "probe_postcutoff_gpt52_Gr_rep2",
+        # test (d)'s calibration sessions, 43192 only: high effort (resumed after a kill) and medium
+        "Hc": "probe_postcutoff_gpt52_Gr_calib2", "Mc": "probe_postcutoff_gpt52_Gm_calib"}
+#: one-PR sessions, never averaged into a condition's per-session means
+CALIBRATION = ("Hc", "Mc")
 LEAD_RUNS = {"L1": "probe_postcutoff_lead_rep1", "L2": "probe_postcutoff_lead_rep2"}
 RELEASE = Path("inputs/probes/probe-2026-07-08-v1/input/episodes.jsonl")
 GRAPHS = Path("inputs/probes/probe-2026-07-08-v1/derived/change_graphs.jsonl")

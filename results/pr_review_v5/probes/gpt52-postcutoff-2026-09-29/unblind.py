@@ -108,6 +108,25 @@ def reasoning_reading():
     json.dump(out, open(G / out_name, "w"), indent=1)
 
 
+def calibration_table():
+    """Test (d)'s calibration: read, not ruled. Every ask by every session, and reach per session."""
+    out = {}
+    for m in MATCHERS:
+        cells = load(m)
+        sessions = sorted({s for labels in seal.values() for s in labels.values()})
+        out[m] = {"cells": {f"{cid} {s}": cells.get((pr, cid, s), (None, None))[0]
+                            for pr, cid in asks for s in sessions},
+                  "reach": {s: reach(cells, (s,), asks) for s in sessions}}
+        print(f"matcher {m}: " + "  ".join(f"{s} {r:.2f}" for s, r in out[m]["reach"].items()))
+        for pr, cid in asks:
+            print(f"   {cid}: " + "  ".join(f"{s} {cells.get((pr, cid, s), ('?',))[0]}" for s in sessions))
+    json.dump(out, open(G / out_name, "w"), indent=1)
+
+
+if any(s in ("Hc", "Mc") for labels in seal.values() for s in labels.values()):
+    calibration_table()
+    sys.exit(0)
+
 if any(s.startswith("Gr") for labels in seal.values() for s in labels.values()):
     reasoning_reading()
     sys.exit(0)

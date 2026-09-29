@@ -3,6 +3,7 @@
 gpt sessions are read through `analysis.trajectory.extract`; Claude sessions through the probe
 wrapper's `calls.jsonl` (every review-tool call, with a compile's outcome) and `findings.json`.
 Usage (repo root, PYTHONPATH=$PWD:$PWD/src): python inspect_sessions.py
+                                   or: python inspect_sessions.py <pr> <session> ...
 """
 import collections, json, re
 from pathlib import Path
@@ -11,10 +12,10 @@ from src.mathlib_review.analysis.trajectory import extract
 
 PRS = [41930, 42184, 42814, 43024, 43167, 43192]
 POST = Path("results/pr_review_v5/probes/postcutoff-2026-09-29")
-from build_match_inputs import RUNS  # the solo runs, one table for both scripts
+from build_match_inputs import CALIBRATION, RUNS  # the solo runs, one table for both scripts
 
-#: the solo sessions whose runs exist, then Claude's; a condition is a label without its digit
-GPT = [s for s in RUNS if (Path(".ape/runs") / RUNS[s]).exists()]
+#: the six-PR solo sessions whose runs exist, then Claude's; a condition is a label without its digit
+GPT = [s for s in RUNS if (Path(".ape/runs") / RUNS[s]).exists() and s not in CALIBRATION]
 SESSIONS = GPT + ["X1", "X2"]
 
 
@@ -226,5 +227,25 @@ def main():
     lookups_and_compiles()
 
 
+def one_pr(pr, sessions):
+    """Per session on one PR: review calls, lookups by side, compiles by kind."""
+    post = post_images()[pr]
+    print(f"PR {pr}: session  calls  lookups PR / own names / library  compiles own / usage / variant")
+    for s in sessions:
+        c = collections.Counter()
+        for tool, args in session_calls(s, pr):
+            c["calls"] += tool in REVIEW_TOOLS
+            if tool in SEARCH:
+                c["lookup_" + lookup_side(tool, args, post)] += 1
+            if tool in COMPILE:
+                c["compile_" + compile_kind(tool, args, post)] += 1
+        print(f"  {s:>4}  {c['calls']:5}  {c['lookup_pr']:3} / {c['lookup_own_names']:3} / {c['lookup_library']:3}"
+              f"   {c['compile_own']:3} / {c['compile_usage']:3} / {c['compile_variant']:3}")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) > 2:  # inspect_sessions.py <pr> <session> ...: one PR, the named sessions
+        one_pr(int(sys.argv[1]), sys.argv[2:])
+    else:
+        main()
