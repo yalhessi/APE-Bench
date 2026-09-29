@@ -237,6 +237,46 @@
         "2024-03-01",
         "2026-08-31"
       ]
+    },
+    {
+      "collector_version": "pull-request-collector/1",
+      "finished_at": "2026-09-29T12:49:36Z",
+      "pr_list": {
+        "count": 21,
+        "path": "inputs/pull_requests/evaluation/probe-2026-07-08-v1/candidates-r1.txt",
+        "sha256": "501b3aa4ad0fad5e3dc59f409f6d8a1c95fd3d390714d0eabb9f3b962f85e6f0"
+      },
+      "pre_gate": {
+        "by_reason": {
+          "pass": 21
+        },
+        "passing": 21,
+        "prs": 21,
+        "tier2_hours_estimate": 0.0,
+        "tier2_needed": 21,
+        "tier2_request_estimate": 168
+      },
+      "requests": 166,
+      "result": {
+        "compares_fetched": 29,
+        "prs_deferred": [],
+        "prs_read": 21
+      },
+      "roster": {
+        "path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+        "sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a"
+      },
+      "slice": [
+        null,
+        null
+      ],
+      "started_at": "2026-09-29T12:47:32Z",
+      "store_content_sha256": "947cea3f4b9deb4d549e32865a70722889985f768be00336fedb674922bdba1a",
+      "tier": 2,
+      "window": [
+        "2024-03-01",
+        "2026-08-31"
+      ]
     }
   ]
 }
