@@ -185,3 +185,58 @@ def extract_feedback(spec: ProbeSet, roster_path: Path = DEFAULT_ROSTER) -> Dict
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=1))
+
+
+# --- Readers and asks ---------------------------------------------------------------------------
+#: The rubric both post-cutoff readers used: is it an ask, its val1000 family, its grain.
+READER_RUBRIC = Path("results/pr_review_v5/probes/postcutoff-2026-09-29/reader_rubric.md")
+READER_FIELDS = ("cid", "pr", "pr_title", "kind", "state", "author", "path", "line", "reply_to_cid",
+                 "diff_hunk", "body")
+
+
+def reader_batch(feedback: Dict[str, Any], prs: Optional[List[int]] = None) -> List[Dict[str, Any]]:
+    """What a reader labels: every round-1 comment on the set's PRs, with its reply context."""
+
+    keep = set(prs) if prs is not None else None
+    return [{k: r[k] for k in READER_FIELDS} for r in feedback["rows"]
+            if keep is None or r["pr"] in keep]
+
+
+def load_labels(path: Path) -> Dict[str, Dict[str, Any]]:
+    return {r["cid"]: r for r in (json.loads(l) for l in Path(path).read_text().splitlines() if l.strip())}
+
+
+def relabel_by_event(labels: Dict[str, Dict[str, Any]], events: List[Dict[str, Any]],
+                     feedback: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Labels keyed by another study's comment ids, re-keyed to this feedback's ids by event id.
+
+    The validation audit numbered its comments `c000…` in its own `events.jsonl`; the feedback
+    numbers the same events `v0000…`. An event the feedback does not hold is dropped.
+    """
+
+    by_event = {r["event_id"]: r["cid"] for r in feedback["rows"]}
+    out = {}
+    for e in events:
+        cid = by_event.get(e["event_id"])
+        if cid is not None and e["cid"] in labels:
+            out[cid] = {**labels[e["cid"]], "cid": cid}
+    return out
+
+
+def agreed_asks(feedback: Dict[str, Any], labels_a: Dict[str, Dict[str, Any]],
+                labels_b: Dict[str, Dict[str, Any]], prs: List[int],
+                families: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """The asks both readers call asks, on the set's PRs; the rest of those PRs are controls.
+
+    A family is the readers' shared one, or "split" when they differ, unless an adjudicated
+    `families` map (by this feedback's ids) is given, as the validation audit's is.
+    """
+
+    rows = {r["cid"]: r for r in feedback["rows"]}
+    agreed = sorted(c for c in rows if labels_a.get(c, {}).get("is_ask") == "ask"
+                    and labels_b.get(c, {}).get("is_ask") == "ask")
+    asks = {str(pr): [c for c in agreed if rows[c]["pr"] == pr] for pr in prs}
+    fam = {c: (families[c] if families is not None else
+               labels_a[c]["family"] if labels_a[c]["family"] == labels_b[c]["family"] else "split")
+           for c in agreed if rows[c]["pr"] in set(prs)}
+    return {"asks": asks, "families": fam, "controls": [pr for pr in prs if not asks[str(pr)]]}
