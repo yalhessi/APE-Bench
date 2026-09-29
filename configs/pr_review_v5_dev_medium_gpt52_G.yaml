@@ -1,0 +1,7 @@
+# Condition G on the dev set: the post-cutoff probe's control brief, and each PR's pass-0 model after
+# its diff (results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/model_context.jsonl).
+extends: pr_review_v5_dev_medium_gpt52.yaml
+
+task_config:
+  system_prompt_file: results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/brief_G.md
+  context_file: results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/model_context.jsonl
