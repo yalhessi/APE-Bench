@@ -34,6 +34,8 @@ recall measures the evidence gate rather than either reviewer. Recorded here so 
 limitation rather than a surprise found while reading a result.
 """
 
+import json
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 from pydantic import Field
@@ -131,6 +133,19 @@ class SoloReviewConfig(BasePRReviewConfig):
     #: rather than a control.
     finding_budget: int = 20
 
+    #: A brief in place of `SOLO_SYSTEM`, read from a file. Added 2026-09-29 so a probe's
+    #: brief can run on the pipeline's own model through this task, with the brief kept beside
+    #: the probe rather than in this module (`results/pr_review_v5/probes/gpt52-postcutoff-*`).
+    #: The path is part of the scaffold config, so `scaffold_config_sha256` in the run plan
+    #: changes with it; the file's content is pinned by the run plan's git commit.
+    system_prompt_file: Optional[Path] = None
+
+    #: Per-PR sections appended to the user prompt: JSONL rows
+    #: `{"pr_number": N, "sections": [{"title": ..., "text": ...}]}`. How a probe hands the
+    #: reviewer what its Claude conditions read from a packet (the pass-0 PR model). A PR the
+    #: file does not hold is refused, not reviewed without its context.
+    context_file: Optional[Path] = None
+
 
 class SoloReviewData(BasePRReviewData):
     task_type: str = SOLO_TASK_TYPE
@@ -182,6 +197,34 @@ class SoloReviewResult(BasePRReviewResult):
     invocation_id: str = ""
 
 
+def solo_system_prompt(config: SoloReviewConfig) -> str:
+    """`SOLO_SYSTEM`, or the brief `config.system_prompt_file` names -- never a silent default
+    when a file was named and is missing."""
+
+    if config.system_prompt_file is None:
+        return SOLO_SYSTEM
+    path = Path(config.system_prompt_file)
+    if not path.is_file():
+        raise FileNotFoundError(f"system_prompt_file {path} does not exist")
+    return path.read_text(encoding="utf-8")
+
+
+def solo_context_block(config: SoloReviewConfig, pr_number: int) -> str:
+    """The sections `config.context_file` holds for this PR, or "" when no file is set."""
+
+    if config.context_file is None:
+        return ""
+    path = Path(config.context_file)
+    with path.open(encoding="utf-8") as handle:
+        rows = [json.loads(line) for line in handle if line.strip()]
+    row = next((item for item in rows if item.get("pr_number") == pr_number), None)
+    if row is None:
+        raise KeyError(f"context_file {path} holds no row for PR {pr_number}")
+    sections = "\n\n".join(f"## {item['title']}\n\n{item['text'].rstrip()}"
+                             for item in row["sections"])
+    return "\n\n---\n\n" + sections + "\n"
+
+
 class SoloReviewTask(BasePRReviewTask):
     task_type = SOLO_TASK_TYPE
     data_class = SoloReviewData
@@ -189,7 +232,11 @@ class SoloReviewTask(BasePRReviewTask):
     task_result_class = SoloReviewResult
 
     def _get_prompts(self, version: str) -> Tuple[str, str]:
-        return SOLO_SYSTEM, SOLO_USER
+        return solo_system_prompt(self.config.task_config), SOLO_USER
+
+    async def create_user_prompt(self) -> str:
+        return (await super().create_user_prompt()
+                + solo_context_block(self.config.task_config, self.data.pr_number))
 
     async def register_task_tools(self, mcp) -> None:
         # The base grant first -- `lean_verify_edit` and `submit_findings` -- then exactly the

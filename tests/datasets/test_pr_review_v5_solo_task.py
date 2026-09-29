@@ -177,3 +177,40 @@ def test_the_retrieval_grant_is_traceable_or_it_cannot_be_audited():
 
     fields = SoloReviewData.model_fields
     assert "trace_path" in fields and "retrieval_cutoff" in fields
+
+
+def test_the_default_config_keeps_the_solo_prompt_and_adds_no_context():
+    from ape.tasks.lean_tasks.formal_math.review.solo import (
+        SOLO_SYSTEM, SoloReviewConfig, solo_context_block, solo_system_prompt,
+    )
+
+    config = SoloReviewConfig()
+    assert solo_system_prompt(config) == SOLO_SYSTEM
+    assert solo_context_block(config, 33098) == ""
+
+
+def test_a_named_brief_replaces_the_system_prompt_and_a_missing_one_is_refused(tmp_path):
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_system_prompt
+
+    brief = tmp_path / "brief.md"
+    brief.write_text("Act as a probe's reviewer.")
+    assert solo_system_prompt(SoloReviewConfig(system_prompt_file=brief)) == "Act as a probe's reviewer."
+    with pytest.raises(FileNotFoundError):
+        solo_system_prompt(SoloReviewConfig(system_prompt_file=tmp_path / "absent.md"))
+
+
+def test_the_context_file_appends_this_prs_sections_and_refuses_a_pr_it_lacks(tmp_path):
+    import json
+
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_context_block
+
+    context = tmp_path / "context.jsonl"
+    context.write_text("\n".join(json.dumps(row) for row in (
+        {"pr_number": 1, "sections": [{"title": "The PR model", "text": "MODEL-ONE"}]},
+        {"pr_number": 2, "sections": [{"title": "The PR model", "text": "MODEL-TWO"}]})) + "\n")
+    config = SoloReviewConfig(context_file=context)
+    block = solo_context_block(config, 1)
+    assert "## The PR model" in block and "MODEL-ONE" in block and "MODEL-TWO" not in block
+    with pytest.raises(KeyError):
+        solo_context_block(config, 3)
+
