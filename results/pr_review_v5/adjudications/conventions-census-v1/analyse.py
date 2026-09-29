@@ -19,7 +19,7 @@ LAST3 = VAL_BATCHES[-3:]
 
 def load_reader(d):
     cb = {e["id"]: e for e in json.load(open(d / "codebook.json"))} if (d / "codebook.json").exists() else {}
-    labels = [json.loads(l) for l in open(d / "labels.jsonl")] if (d / "labels.jsonl").exists() else []
+    labels = [json.loads(l) for f in sorted(d.glob("labels_*.jsonl")) for l in open(f) if l.strip()]
     return cb, labels
 
 def summarise(name, cb, labels):
