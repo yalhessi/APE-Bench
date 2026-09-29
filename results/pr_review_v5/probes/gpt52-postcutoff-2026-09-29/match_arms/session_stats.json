@@ -1,0 +1,236 @@
+{
+ "41930": {
+  "X2": {
+   "findings": 0,
+   "compiles": 1
+  },
+  "L1": {
+   "findings": 3,
+   "published": [
+    0,
+    1
+   ]
+  },
+  "G1": {
+   "findings": 0,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 0,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "L2": {
+   "findings": 2,
+   "published": [
+    0
+   ]
+  },
+  "X1": {
+   "findings": 0,
+   "compiles": 1
+  }
+ },
+ "42184": {
+  "L1": {
+   "findings": 3,
+   "published": [
+    1
+   ]
+  },
+  "L2": {
+   "findings": 1,
+   "published": [
+    0
+   ]
+  },
+  "G2": {
+   "findings": 2,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  },
+  "G1": {
+   "findings": 1,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 2,
+   "compiles": 3
+  },
+  "X1": {
+   "findings": 3,
+   "compiles": 3
+  }
+ },
+ "42814": {
+  "X1": {
+   "findings": 7,
+   "compiles": 18
+  },
+  "X2": {
+   "findings": 6,
+   "compiles": 11
+  },
+  "L2": {
+   "findings": 5,
+   "published": [
+    0
+   ]
+  },
+  "G1": {
+   "findings": 7,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 3
+   }
+  },
+  "L1": {
+   "findings": 7,
+   "published": [
+    0
+   ]
+  },
+  "G2": {
+   "findings": 7,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  }
+ },
+ "43024": {
+  "L1": {
+   "findings": 6,
+   "published": [
+    0,
+    1,
+    2
+   ]
+  },
+  "L2": {
+   "findings": 4,
+   "published": [
+    0
+   ]
+  },
+  "X2": {
+   "findings": 1,
+   "compiles": 3
+  },
+  "X1": {
+   "findings": 1,
+   "compiles": 4
+  },
+  "G2": {
+   "findings": 2,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 1
+   }
+  },
+  "G1": {
+   "findings": 1,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  }
+ },
+ "43167": {
+  "X2": {
+   "findings": 6,
+   "compiles": 10
+  },
+  "L1": {
+   "findings": 7,
+   "published": [
+    0,
+    1,
+    2
+   ]
+  },
+  "X1": {
+   "findings": 6,
+   "compiles": 15
+  },
+  "G2": {
+   "findings": 5,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "L2": {
+   "findings": 6,
+   "published": [
+    0,
+    1
+   ]
+  },
+  "G1": {
+   "findings": 5,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 1
+   }
+  }
+ },
+ "43192": {
+  "L2": {
+   "findings": 5,
+   "published": [
+    4
+   ]
+  },
+  "X1": {
+   "findings": 8,
+   "compiles": 15
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 13
+  },
+  "G2": {
+   "findings": 8,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 4
+   }
+  },
+  "G1": {
+   "findings": 8,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 3
+   }
+  },
+  "L1": {
+   "findings": 4,
+   "published": [
+    0
+   ]
+  }
+ }
+}

@@ -245,3 +245,64 @@ Claude Code, not Claude in the pipeline. It has never run on reviews, and its ow
 paths that are not closed. The pipeline's clients have no Anthropic provider. Test (c) is held until
 the transcript comparison of G against X shows whether the gap is process (turns, tool errors,
 truncation) or judgment.
+
+---
+
+## The re-match's result (2026-09-29): the defect did not change test (b)
+
+Two new blind matchers judged the corrected inputs. They read only their own folders
+(`audit_matchers.txt`) and agree on all 96 cells (`match_rematch/`, `unblinded_rematch.json`).
+
+- The reach is unchanged: G 0.12, K 0.06, Claude 0.47, so `q = 0.27` on both matchers.
+- The construction brief is still not supported.
+- One cell changed on each matcher. On the `mkHom` follow-up ask, a G session went from partial to
+  no once its finding carried a location.
+
+So the result of test (b) above stands as written.
+
+## The arms condition's result (2026-09-29): the pipeline's structure recovers none of the gap
+
+Two blind matchers, six sets per PR (L1, L2, G1, G2, X1, X2) under `blinding_arms_SEALED.json`. They
+read only their own folders and agree on all 96 cells (`match_arms/`, `unblinded_arms.json`). The two
+lead runs cost $5.90 and $5.88, against $1.69 for all four solo runs.
+
+| per-session reach, both matchers | all 16 asks | 9 asks in pass-3/4 scope |
+|---|---|---|
+| **the pipeline, lead mode (L)** | **0.12** | **0.00** |
+| the pipeline, published findings only | 0.00 | 0.00 |
+| `gpt_5.2` solo, plain brief (G) | 0.12 | 0.00 |
+| Claude, plain brief (X) | 0.47 | 0.44 |
+
+**By the rule, L's reach is at most 0.18, so the structure does not help on unseen PRs, and the
+model dominates.** The lead runs filed 4.4 findings per PR per run, against G's 3.8 and Claude's 4.1.
+The gate published 1.5 of them.
+
+**Per ask.** L reached exactly the two surface asks G reached, the unused import and the title's missing
+word, in both runs. It did not even partially reach a substantive ask, where G was partial on `_anti`
+and on the `cat_disch` defaults. The gate published neither of L's hits:
+- the import removal was dropped because no evidence collector supports its concern family;
+- the title fix was found twice in one run, and the two findings at one anchor were treated as a
+  conflict.
+
+**The arms looked, and asked only their own question.** The lead runs' context traces show:
+- On 43192, the naming arm and the generalist looked up the parent API's `PresheafOfModules.isoMk`
+  seven times a run. They found it consistent with the PR's `isoMk`, and never checked the PR's `mkHom`
+  against the parent's `homMk`.
+- On 42184, the duplication arm looked up `finprod_nonneg`, asked whether the PR duplicates it, and
+  did not raise dropping `NeBot`, which the maintainer cited that lemma for.
+
+So retrieval breadth alone is not the lever. A reviewer can hold the comparison object and still ask the
+wrong question of it. This is the inference half of the inspection above, narrowed by each arm's remit.
+
+**What it means, at probe altitude** (6 PRs, 16 asks, two runs a condition, matchers in full agreement):
+- On PRs neither model has seen, the pipeline's structure adds nothing over the pipeline's model run
+  whole-PR. Both reach only the surface asks, while Claude with a plain brief reaches about four times as
+  much.
+- Every substantive ask Claude reached, the pipeline missed in both runs.
+- The in-window result, where the structure beat solo by 8 asks to 2 on validation, does not carry over
+  here. The asks here are mostly naming and design, and there they were mostly proof and documentation.
+
+**Untried, so this is not a verdict on the structure in general:**
+- the structure on a reviewer that reaches substantive asks (Claude, or `gpt_5.2` with reasoning);
+- `gpt_5.2` with reasoning, whole-PR (test (d));
+- a larger set.
