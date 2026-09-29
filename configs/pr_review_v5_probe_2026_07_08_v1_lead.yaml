@@ -1,0 +1,10 @@
+# The pipeline as it runs (lead mode, the ten arms, gpt_5.2) on the 6 probe-2026-07-08-v1 PRs with
+# round-1 asks: the arms condition of results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md.
+extends: pr_review_v5_probe_2026_07_08_v1.yaml
+
+dataset:
+  pr_numbers: [41930, 42184, 42814, 43024, 43167, 43192]
+  # `plan`: mandatory floor $2.30 + discretionary 6 PR x $1.50 = $11.30 worst case, and 13,560,000
+  # processed tokens; the base's $10 and 12M caps do not fit it.
+  run_total_cost_cap: 11.50
+  run_total_token_cap: 13600000

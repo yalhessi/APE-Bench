@@ -131,3 +131,39 @@ agreement):
 - **Reasoning:** `gpt_5.2` ran as the pipeline runs it, and the in-window reasoning twin showed no gain
   at 3.8x the cost. It is untested here.
 - **Size:** 16 asks. The gap is large (0.12 against 0.47, 96/96 matcher agreement) but rests on 6 PRs.
+
+---
+
+## The arms condition (pre-registered 2026-09-29, before its runs)
+
+**The question.** Does the pipeline's structure (lead, work units, the ten arms, a generalist pass on
+every unit) recover part of the gap on unseen PRs? On in-window validation PRs it beat the `gpt_5.2`
+solo baseline, 8 of 30 asks against 2.
+
+**The runs.** `configs/pr_review_v5_probe_2026_07_08_v1_lead.yaml`: lead mode as configured, `gpt_5.2`,
+the same 6 PRs. Two runs, L1 and L2 (`probe_postcutoff_lead_rep{1,2}`). The runs get the pipeline's own
+work-unit prompts; there is no pass-0 model and no probe brief.
+
+**Matching.** Two new blind matchers. Per PR, six sets: L1, L2, and again G1, G2, X1, X2, so every
+comparison is within one matcher. A lead finding is taken from the run's `findings.jsonl`, all
+channels. That is the found set, since the admission gate discards most found hits.
+
+**Reading rule**, on per-session reach over the 16 asks, on both matchers:
+
+| L's reach | reading |
+|---|---|
+| ≥ 0.30 | the structure recovers at least half the gap between `gpt_5.2` solo (0.12) and Claude (0.47) |
+| ≤ 0.18 | the structure does not help on unseen PRs; the model dominates |
+| between | partial |
+
+**Also read:**
+- reach counting only published findings (the best-matching finding's admission);
+- reach on the 9 asks in pass-3/4 scope;
+- findings per PR.
+
+**Test (c), revised.** The solo task's `claude_code` scaffold is a harness, not a model: it runs the
+Claude Code SDK against a relay to the configured model, `gpt_5.2`. So it would give `gpt_5.2` in
+Claude Code, not Claude in the pipeline. It has never run on reviews, and its own config records leak
+paths that are not closed. The pipeline's clients have no Anthropic provider. Test (c) is held until
+the transcript comparison of G against X shows whether the gap is process (turns, tool errors,
+truncation) or judgment.
