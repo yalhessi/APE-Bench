@@ -774,3 +774,38 @@ def model_context(spec: ProbeSet, prs: List[int]) -> str:
     return "".join(json.dumps({"pr_number": pr, "sections": [{"title": "The PR model (pass 0)",
                                                               "text": models[pr]}]},
                               ensure_ascii=False) + "\n" for pr in prs)
+
+
+def restore_bases(spec: ProbeSet, prs: Optional[List[int]] = None) -> Dict[str, str]:
+    """Restore each PR's built base snapshot into its workspace, which a reviewed build needs and the
+    prebuild planner does not check (the validation and post-cutoff probes' `restore_bases.py`).
+
+    Run it only while no build of those commits is running: a restore beside a finishing build
+    marked the state failed (`.claude/rules/mathlib-review.md`, 2026-09-29).
+    """
+
+    import asyncio
+
+    from ape.toolkits.execute.lean.config import LeanVerifyToolConfig
+    from ape.toolkits.execute.lean.core.restore_manager import RestoreManager
+    from ape.utils.logging import create_logger
+
+    wanted = set(prs or spec.pr_numbers)
+    shas = sorted({json.loads(l)["base_sha"] for l in (spec.release / "input/episodes.jsonl").read_text().splitlines()
+                   if json.loads(l)["pr_number"] in wanted})
+    cfg = LeanVerifyToolConfig()
+    _, url = cfg.resolve_repo(None)
+    manager = RestoreManager(cfg, create_logger(to_console=False), url)
+    status = {}
+    for sha in shas:
+        if asyncio.run(manager._requires_build_first(sha)):
+            status[sha] = "not built"
+            continue
+        for attempt in (1, 2):
+            try:
+                asyncio.run(manager.get_workspace(sha))
+                status[sha] = "restored"
+                break
+            except Exception as exc:  # noqa: BLE001 - reported, and retried once
+                status[sha] = f"failed: {type(exc).__name__}: {str(exc)[:120]}"
+    return status

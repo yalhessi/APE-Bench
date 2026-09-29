@@ -141,6 +141,7 @@ def build_parser() -> argparse.ArgumentParser:
         "match-inputs": "blind matcher inputs and matcher folders under a seal",
         "unblind": "reach per session and condition from the matchers' outputs",
         "audit": "check a transcript stayed in its folder",
+        "restore-bases": "restore the PRs' built base snapshots, before a reviewed build",
     }
     parsers = {name: probe_sub.add_parser(name, help=text) for name, text in step.items()}
     for name, sp in parsers.items():
@@ -148,7 +149,7 @@ def build_parser() -> argparse.ArgumentParser:
             sp.add_argument("--set", required=True, type=Path, help="configs/probe_sets/<name>.yaml")
     for name in ("packets", "prompts", "feedback"):
         parsers[name].add_argument("--sessions", nargs="+", default=["X1", "X2"])
-    for name in ("packets", "prompts"):
+    for name in ("packets", "prompts", "restore-bases"):
         parsers[name].add_argument("--prs", nargs="+", type=int)
     parsers["packets"].add_argument("--scratch", required=True, type=Path,
                                     help="where each session's tool workdir and raw outputs go")
@@ -613,6 +614,10 @@ def _probe(args, logger) -> int:
             print(json.dumps({"folder": str(d.resolve()),
                               "prompt": probes.MATCHER_PROMPT.format(dir=d.resolve())}))
         print(json.dumps({"prs": len(stats), "inputs": str(inputs)}))
+    elif args.probe_command == "restore-bases":
+        status = probes.restore_bases(spec, args.prs)
+        print(json.dumps(status, indent=1))
+        return 0 if all(v == "restored" for v in status.values()) else 1
     elif args.probe_command == "unblind":
         matches = {m: json.loads((args.matches / f"matches.{m}.json").read_text()) for m in ("1", "2")}
         stats = json.loads((args.matches / "session_stats.json").read_text())

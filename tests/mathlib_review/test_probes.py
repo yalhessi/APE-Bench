@@ -195,13 +195,19 @@ def test_a_session_without_a_source_is_refused(tmp_path):
 
 
 def test_feedback_is_not_written_while_a_session_is_unfinished(tmp_path):
+    import yaml
+
     from src.mathlib_review.review import cli
 
-    spec = probes.load_probe_set(SETS / "val_small12.yaml")
-    assert len(probes.unfinished_sessions(spec, ["X1", "X2"])) == 16  # 8 PRs without sessions
+    # The post-cutoff set with an empty probe directory: every session is unfinished.
+    spec = POST.model_copy(update={"probe_dir": tmp_path / "probe"})
+    assert len(probes.unfinished_sessions(spec, ["X1", "X2"])) == 20
+    path = tmp_path / "set.yaml"
+    path.write_text(yaml.safe_dump(json.loads(spec.model_dump_json())))
     with pytest.raises(SystemExit, match="only after every session"):
-        cli.main(["probe", "feedback", "--set", str(SETS / "val_small12.yaml"), "--write"])
+        cli.main(["probe", "feedback", "--set", str(path), "--write"])
     assert not spec.feedback_file.exists()
+    assert probes.unfinished_sessions(POST, ["X1", "X2"]) == []  # the real set is complete
 
 
 def test_the_cli_unblinds_as_the_function_does(capsys):
