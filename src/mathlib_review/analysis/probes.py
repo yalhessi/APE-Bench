@@ -652,7 +652,8 @@ def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict
     cells_by = {}
     for m, d in matches.items():
         cells = {(str(a["pr"]), a["ask_id"], s): (a.get(label), a.get(f"{label}_finding"))
-                 for a in d["asks"] for label, s in seal[str(a["pr"])].items()}
+                 for a in d["asks"] if str(a["pr"]) in seal
+                 for label, s in seal[str(a["pr"])].items()}
         cells_by[m] = cells
 
         def hit(pr, cid, s, published=False):
@@ -767,6 +768,14 @@ def _own_tmp(folder: Path, name: str) -> bool:
     return tmp.is_dir() and any(f.name == name or f.name.startswith(name) for f in tmp.iterdir())
 
 
+def _blocks(line: str) -> List[Dict[str, Any]]:
+    try:
+        content = (json.loads(line).get("message") or {}).get("content")
+    except ValueError:
+        return []
+    return [b for b in content if isinstance(b, dict)] if isinstance(content, list) else []
+
+
 def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
     """Every tool call a reader, matcher or reviewer made, checked against its own folder: an
     absolute path outside it, git, the web, or a file tool pointed elsewhere is flagged. Flags are
@@ -774,7 +783,13 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
 
     folder = str(Path(folder).resolve())
     calls, flagged = 0, []
-    for line in Path(transcript).read_text().splitlines():
+    lines = Path(transcript).read_text().splitlines()
+    # The harness saves a large tool output to tool-results/<id>.txt and names it in that call's
+    # result; reading it back is reading the session's own output (8 of 8 matcher flags on the dev
+    # set, 4 reviewer flags, each named in no other transcript, 2026-09-29).
+    results_text = " ".join(json.dumps(b.get("content"), ensure_ascii=False)
+                            for line in lines for b in _blocks(line) if b.get("type") == "tool_result")
+    for line in lines:
         try:
             row = json.loads(line)
         except ValueError:
@@ -800,7 +815,10 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
                     # sessions' 36 flags were this, each checked by hand (2026-09-29).
                     continue
                 why.append("outside " + p[-70:])
-            if b.get("name") in ("Read", "Write", "Edit") and not str(inp.get("file_path", "")).startswith(folder):
+            own_output = [p for p in _ABS.findall(text) if "/tool-results/" in p and p in results_text]
+            why = [w for w in why if not any(w == "outside " + p[-70:] for p in own_output)]
+            if (b.get("name") in ("Read", "Write", "Edit") and not str(inp.get("file_path", "")).startswith(folder)
+                    and str(inp.get("file_path", "")) not in own_output):
                 why.append("file tool outside")
             if why:
                 flagged.append({"tool": b.get("name"), "why": sorted(set(why)),

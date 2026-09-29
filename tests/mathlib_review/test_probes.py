@@ -271,3 +271,25 @@ def test_a_packet_relative_tmp_path_is_not_flagged_but_a_real_one_is(tmp_path):
     transcript.write_text("\n".join(json.dumps({"message": {"content": [c]}}) for c in calls))
     report = probes.audit_transcript(folder, transcript)
     assert [f["why"] for f in report["flagged"]] == [["outside /tmp/other.json"]]
+
+
+def test_a_sessions_own_overflow_file_is_not_flagged_but_anothers_is(tmp_path):
+    folder = tmp_path / "m1"
+    folder.mkdir()
+    own, other = "/common/x/tool-results/b111.txt", "/common/x/tool-results/b222.txt"
+    rows = [{"message": {"content": [{"type": "tool_result", "content": f"Output saved to {own}"}]}},
+            {"message": {"content": [{"type": "tool_use", "name": "Read", "input": {"file_path": own}}]}},
+            {"message": {"content": [{"type": "tool_use", "name": "Read", "input": {"file_path": other}}]}}]
+    transcript = tmp_path / "t.jsonl"
+    transcript.write_text("\n".join(json.dumps(r) for r in rows))
+    report = probes.audit_transcript(folder, transcript)
+    assert len(report["flagged"]) == 1 and report["flagged"][0]["input"] == other
+
+
+def test_unblinding_may_leave_a_matched_pr_out_of_the_seal():
+    asks = json.loads(POST.asks_file.read_text())
+    seal = json.loads((G52_DIR / "blinding_SEALED.json").read_text())
+    matches = {m: json.loads((G52_DIR / "match_rematch" / f"matches.{m}.json").read_text()) for m in ("1", "2")}
+    stats = json.loads((G52_DIR / "match_rematch/session_stats.json").read_text())
+    without = probes.unblind(asks, {k: v for k, v in seal.items() if k != "43192"}, matches, stats)
+    assert without["asks"] == 16 - 4
