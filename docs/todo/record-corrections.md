@@ -137,3 +137,10 @@ Applied the same day, as amendments that keep the first text visible.
     and in none of the file's;
   - "twins 8 of 10, family closure found nothing": in fact 11 of 15 twins compiled, and 5 findings
     rest on twins, unaligned with gold.
+
+- **"The gap sits at the arm's decision to construct" (the construction demonstration's second
+  reading, same day).** Test (b) contradicts it. `gpt_5.2` given a construction brief compiled about as
+  often as Claude does unprompted, and reached no substantive ask. The gap is in what the reviewer
+  concludes and asks, not in whether it constructs. *Applied:* test (b)'s write-up and the
+  reviewer-model-gap, coordination and remaining-misses entries. The second reading's other
+  corrections stand.

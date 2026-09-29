@@ -120,3 +120,14 @@ reading holds the details. Next, in order:
 reviewed workspaces built). On it, Claude's reach with the plain brief is not mainly recall
 (`reviewer-model-gap.md`, test (a)). A Claude probe on those PRs therefore carries no recall caveat.
 Next is test (b) there: the construction briefs on `gpt_5.2`, the reviewer that did not construct.
+
+**Test (b) (2026-09-29): the construction brief does not help the pipeline's model, and the model is
+the constraint.** On six post-cutoff PRs, `gpt_5.2` given the construction brief compiled about three
+times as often and reached no substantive ask. With the plain brief it reached 0.12 per session
+against Claude's 0.47. So the design's construction protocol is not the lever for the pipeline's
+current reviewer, and no coordination design can be judged on a reviewer that misses nearly all
+substantive asks.
+
+The order of work changes. Settle the reviewer first (`reviewer-model-gap.md`, tests (c) and (d)).
+Then test the design's own claims (family closure on sibling-class misses, the shared model) on the
+reviewer that will run them.

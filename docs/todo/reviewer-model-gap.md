@@ -86,3 +86,26 @@ So the five asks the pipeline missed and every Claude set reached are more likel
 harness or packet than memory. **Test (b) is now the open step, and the post-cutoff set is where to
 run it:** neither model can have seen those PRs, so `gpt_5.2` against Claude there is a clean model
 comparison.
+
+## Test (b) done (2026-09-29): the model gap is real, and a construction brief does not close it
+
+`results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/`. Six post-cutoff PRs, 16 asks, two blind
+matchers in full agreement. With the same brief, pass-0 model and tools:
+- Claude reached 0.47 per session, and `gpt_5.2` (as the pipeline runs it) reached 0.12, so
+  `q = 0.27`: markedly less.
+- On the 9 substantive asks in the construction passes' scope, Claude reached 0.44 and `gpt_5.2`
+  0.00.
+- The construction brief tripled `gpt_5.2`'s compiles (2.2 to about 6.5 a session, against Claude's
+  about 8) and reached 0.06. So the gap is in what the reviewer concludes and asks, not in whether it
+  compiles.
+- $1.69 billed.
+
+**What would close this entry:**
+- **(c) Model against harness.** Run the solo task under the `claude_code` scaffold (the existing
+  B/C pair) on the post-cutoff set. That is Claude through the pipeline's own task, submission contract
+  and tools. If it reaches like the Claude probe sessions, the harness is not the constraint and the
+  model is.
+- **(d) Reasoning.** `gpt_5.2` with reasoning on, on the same set. The in-window twin showed no gain
+  at 3.8x the cost.
+
+Both are single-digit dollars.

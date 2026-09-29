@@ -61,3 +61,9 @@ The residue is not construction-shaped:
 - one, the sibling one-liner, may be unsatisfiable as stated.
 
 The first two belong to `conventions-nature.md`.
+
+**Test (b) (2026-09-29).** For `gpt_5.2` the hypothesis fails in the other direction too. Changing the
+task (a construction brief) made it construct three times as often and reach no more asks. So these
+asks are absent from `gpt_5.2`'s output under both the plain and the constructing task. They are
+present in Claude's under the plain task. What remains is a property of the reviewer, not of the
+task (`reviewer-model-gap.md`).
