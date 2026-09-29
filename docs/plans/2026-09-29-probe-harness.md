@@ -1,5 +1,7 @@
 # Plan: one probe harness for the reviewer-model experiment, on three sets (2026-09-29)
 
+**Status: built and run, 2026-09-29.** Steps 1-5 are in `src/mathlib_review/analysis/probes.py` and `cli probe`, each held to the post-cutoff set's committed artifacts by `tests/mathlib_review/test_probes.py`. Validation small12 and dev ran as planned; the dev set is 15 PRs (33057 has no reviewed workspace). The results are in `docs/todo/reviewer-model-gap.md`, "The experiment on three sets".
+
 **Why.** Every reviewer-model result rests on one set, `probe-2026-07-08-v1`: 6 PRs and 16 asks.
 The user asked for the same experiment on the dev set, validation small12 and that post-cutoff set.
 The procedure is in `docs/todo/reviewer-model-gap.md`. Its scripts hard-code one set, its feedback

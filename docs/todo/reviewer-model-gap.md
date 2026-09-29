@@ -239,3 +239,29 @@ A set-parametrised harness needs:
 
 Steps 2-6 hard-code the probe's release and paths. Step 4's extractor needs a sealed draw, so the dev
 set, a v4 release, needs a by-PR-list variant. Step 3 is reproducible as a procedure, not as a script.
+
+## The experiment on three sets (2026-09-29, through the probe harness)
+
+`docs/plans/2026-09-29-probe-harness.md`; each set's README has its rule, stated before matching, and
+its result. Per-session reach, the two matchers' values:
+
+| set | PRs created | asks | Claude (X) | `gpt_5.2` solo (G) | pipeline (L) | `q = G/X` | `L - G` |
+|---|---|---|---|---|---|---|---|
+| post-cutoff `probe-2026-07-08-v1` | 2026-07..08, unseen by Claude | 16 on 6 PRs | 0.47 | 0.12 | 0.12 | 0.27 | 0.00 |
+| validation small12 | 2025-06..2026-03 | 30 on 8 | 0.48 / 0.50 | 0.13 | 0.27 | 0.28 / 0.27 | +0.13 |
+| dev `dev-medium-0.3.0` | 2025-12 | 47 on 12 | 0.67 / 0.61 | 0.13 / 0.18 | 0.29 (31 asks) | 0.19 / 0.30 | +0.15 / +0.08 |
+
+- **The model gap replicates on every set.** `gpt_5.2` with reasoning off reaches a fifth to a third
+  of what Claude reaches with the same brief, packet and tools: markedly less by test (b)'s rule,
+  on both matchers, three times.
+- **The structure's contribution follows the ask mix.** It is nothing on the post-cutoff set, whose
+  asks are naming and design. It is +0.13 on validation, all from proof asks. On dev it is +0.08 to
+  +0.15, from naming and documentation, where the naming arm was tuned. The gate publishes almost
+  none of it (0.00-0.07).
+- **Claude's reach rises into the window:** 0.47 post-cutoff, about 0.49 on validation, about 0.64 on
+  dev. The dev set is also the one the record knows best, so recall and ask mix are not separated.
+
+**What this leaves open.** High reasoning effort on `gpt_5.2` reached 0.75 of four asks against
+0.25 on one post-cutoff PR (test (d)'s calibration). That is the one lever measured to move the
+model half. It costs about $3.74 billed per session on a large PR, so one high-effort run per set is
+about $20-60. It has run on one PR only, and it needs the user's go-ahead.
