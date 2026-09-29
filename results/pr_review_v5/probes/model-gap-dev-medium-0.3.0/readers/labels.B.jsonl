@@ -1,0 +1,51 @@
+{"cid": "d0001", "is_ask": "ask", "family": "F10", "grain": "line", "note": "docstring wording fix"}
+{"cid": "d0002", "is_ask": "ask", "family": "F5", "grain": "declaration", "note": "def duplicates existing ContinuousAlgEquiv.mk constructor"}
+{"cid": "d0003", "is_ask": "ask", "family": "F6", "grain": "declaration", "note": "restate as Function.Surjective"}
+{"cid": "d0004", "is_ask": "ask", "family": "F10", "grain": "declaration", "note": "intersperse proof-sketch comments through the code"}
+{"cid": "d0005", "is_ask": "ask", "family": "F9", "grain": "line", "note": "blank line after section"}
+{"cid": "d0006", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "improve names of haves"}
+{"cid": "d0007", "is_ask": "ask", "family": "F9", "grain": "file", "note": "questions import increase justification"}
+{"cid": "d0008", "is_ask": "ask", "family": "F1", "grain": "declaration_group", "note": "prove lemmas with grind"}
+{"cid": "d0009", "is_ask": "ask", "family": "F1", "grain": "declaration_group", "note": "prove lemmas with grind"}
+{"cid": "d0010", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "card to encard rename"}
+{"cid": "d0011", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "card to encard rename"}
+{"cid": "d0012", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "card to encard rename"}
+{"cid": "d0013", "is_ask": "ask", "family": "F1", "grain": "declaration", "note": "golf using isSeparated_insert_of_notMem"}
+{"cid": "d0014", "is_ask": "ask", "family": "F1", "grain": "declaration", "note": "use by_cases! and existing lemma"}
+{"cid": "d0015", "is_ask": "ask", "family": "F1", "grain": "line", "note": "rfl pattern in rcases"}
+{"cid": "d0016", "is_ask": "ask", "family": "F9", "grain": "line", "note": "calc layout per style guidelines"}
+{"cid": "d0017", "is_ask": "not_ask", "family": "n/a", "grain": "n/a", "note": "review summary, thanks"}
+{"cid": "d0018", "is_ask": "ask", "family": "F4", "grain": "declaration_group", "note": "use to_fun to generate fun_ variants"}
+{"cid": "d0019", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename"}
+{"cid": "d0020", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename"}
+{"cid": "d0021", "is_ask": "ask", "family": "F4", "grain": "declaration", "note": "derive from dual via OrderDual"}
+{"cid": "d0022", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename"}
+{"cid": "d0023", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename"}
+{"cid": "d0024", "is_ask": "ask", "family": "F4", "grain": "declaration", "note": "derive from dual via OrderDual"}
+{"cid": "d0025", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename"}
+{"cid": "d0026", "is_ask": "ask", "family": "F1", "grain": "declaration", "note": "simpler case split golf"}
+{"cid": "d0027", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename"}
+{"cid": "d0028", "is_ask": "ask", "family": "F4", "grain": "declaration", "note": "derive from dual via OrderDual"}
+{"cid": "d0029", "is_ask": "ask", "family": "F6", "grain": "declaration_group", "note": "flip equation direction of iSup/iInf lemmas"}
+{"cid": "d0030", "is_ask": "ask", "family": "CORR", "grain": "line", "note": "new axiom introduced"}
+{"cid": "d0031", "is_ask": "ask", "family": "F5", "grain": "declaration", "note": "Parseval already exists in Mathlib"}
+{"cid": "d0032", "is_ask": "ask", "family": "F12", "grain": "pr", "note": "disclose AI use in description; axioms; missing API"}
+{"cid": "d0033", "is_ask": "ask", "family": "F12", "grain": "pr", "note": "closes PR; needs complete rewrite"}
+{"cid": "d0034", "is_ask": "ask", "family": "CORR", "grain": "pr", "note": "axioms and vacuously true definitions; inline aliases"}
+{"cid": "d0035", "is_ask": "ask", "family": "F1", "grain": "declaration", "note": "term-mode golf"}
+{"cid": "d0036", "is_ask": "ask", "family": "F1", "grain": "declaration", "note": "alternative golfs"}
+{"cid": "d0037", "is_ask": "not_ask", "family": "n/a", "grain": "n/a", "note": "approval, maintainer delegate"}
+{"cid": "d0038", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename to dot-style name"}
+{"cid": "d0039", "is_ask": "ask", "family": "F1", "grain": "line", "note": "use dot notation h.map_iSup"}
+{"cid": "d0040", "is_ask": "not_ask", "family": "n/a", "grain": "n/a", "note": "thanks, maintainer delegate"}
+{"cid": "d0041", "is_ask": "ask", "family": "F9", "grain": "line", "note": "bors r-; line too long"}
+{"cid": "d0042", "is_ask": "ask", "family": "F10", "grain": "line", "note": "docstring typo"}
+{"cid": "d0043", "is_ask": "ask", "family": "F6", "grain": "declaration", "note": "set-predicate defeq abuse in definition encoding"}
+{"cid": "d0044", "is_ask": "ask", "family": "F10", "grain": "line", "note": "module doc wording"}
+{"cid": "d0045", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename coe to toLinearMap"}
+{"cid": "d0046", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename coe to toLinearMap"}
+{"cid": "d0047", "is_ask": "ask", "family": "F9", "grain": "declaration_group", "note": "move into Complex namespace"}
+{"cid": "d0048", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename to round_eq_div"}
+{"cid": "d0049", "is_ask": "ask", "family": "F6", "grain": "declaration_group", "note": "extract general helper lemma"}
+{"cid": "d0050", "is_ask": "not_ask", "family": "n/a", "grain": "n/a", "note": "approval, maintainer delegate"}
+{"cid": "d0051", "is_ask": "ask", "family": "F7", "grain": "declaration", "note": "generalize 2 to k"}
