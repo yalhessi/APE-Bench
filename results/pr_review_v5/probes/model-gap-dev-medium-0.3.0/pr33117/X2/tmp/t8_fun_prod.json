@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Meromorphic/Basic.lean", "declaration_name": "Meromorphic.fun_prod", "new_declaration": "@[fun_prop]\ntheorem fun_prod (h : ∀ σ, Meromorphic (F σ)) :\n    Meromorphic (fun x ↦ ∏ n ∈ s, F n x) :=\n  fun x ↦ MeromorphicAt.fun_prod (h · x)"}

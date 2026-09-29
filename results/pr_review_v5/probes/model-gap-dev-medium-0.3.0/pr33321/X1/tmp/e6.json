@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean", "declaration_name": "IsMulIndecomposable.subset", "new_declaration": "@[to_additive]\nprotected lemma IsMulIndecomposable.subset (v : \u03b9 \u2192 M) (s : Set \u03b9) :\n    {i | IsMulIndecomposable v s i} \u2286 s :=\n  fun _ h \u21a6 h.1"}

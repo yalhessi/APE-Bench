@@ -1,0 +1,221 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "unsolved goals\ncase h.e'_2\nn m : ℤ\nh :\n  ∫ (x : AddCircle 1), (fourier n) x * (starRingEnd ℂ) ((fourier m) x) ∂AddCircle.haarAddCircle = if m = n then 1 else 0\n⊢ ∫ (x : AddCircle 1), ↑(n • x).toCircle * (starRingEnd ℂ) ↑(m • x).toCircle ∂AddCircle.haarAddCircle =\n    ∫ (x : UnitAddCircle), (starRingEnd ℂ) ↑(m • x).toCircle * ↑(n • x).toCircle ∂AddCircle.haarAddCircle\n\ncase h.e'_3\nn m : ℤ\nh :\n  ∫ (x : AddCircle 1), (fourier n) x * (starRingEnd ℂ) ((fourier m) x) ∂AddCircle.haarAddCircle = if m = n then 1 else 0\n⊢ (if n = m then 1 else 0) = if m = n then 1 else 0",
+   "code_line": "    ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by",
+   "pos": {
+    "column": 86,
+    "line": 468
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  intervalIntegrable_const enorm_ne_top\nhas type\n  IntervalIntegrable (fun x => ?m.21) ?m.16 ?m.14 ?m.15\nbut is expected to have type\n  IntervalIntegrable (fun t => linftyNorm fun x => Vorticity (GalerkinProjection N u₀) x t) MeasureTheory.volume 0 T",
+   "code_line": "      MeasureTheory.volume 0 T := intervalIntegrable_const enorm_ne_top",
+   "pos": {
+    "column": 34,
+    "line": 479
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  h\nhas type\n  ⟪UnitAddTorus.mFourierLp 2 k', UnitAddTorus.mFourierLp 2 k⟫_ℂ = if k' = k then 1 else 0\nbut is expected to have type\n  ∫ (x : T3), fourier3D k x * star (fourier3D k' x) = if k = k' then 1 else 0",
+   "code_line": "  exact h",
+   "pos": {
+    "column": 2,
+    "line": 484
+   }
+  }
+ ],
+ "warnings": [
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 18,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 39,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 55,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `n`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 67,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `C`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 75,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ν`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 24,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 32,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 57,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 65,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 81,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `p`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def SolvesNavierStokes (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (p : T3 → ℝ → ℝ) : Prop :=",
+   "pos": {
+    "column": 57,
+    "line": 142
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `N`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "noncomputable def GalerkinProjection (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) : T3 → ℝ → Fin 3 → ℝ :=",
+   "pos": {
+    "column": 38,
+    "line": 150
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "  fun x t j => u₀ x j",
+   "pos": {
+    "column": 8,
+    "line": 151
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ht`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma galerkin_energy_bound (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) (t : ℝ) (ht : 0 ≤ t) :",
+   "pos": {
+    "column": 67,
+    "line": 306
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `h_divfree`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (h_divfree : DivergenceFree u₀) (T : ℝ) (hT : 0 < T) :",
+   "pos": {
+    "column": 5,
+    "line": 316
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (T : ℝ) (hT : 0 ≤ T) (τ_T : ℝ) (hτ : L.φ τ_T = T) :",
+   "pos": {
+    "column": 13,
+    "line": 355
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `Φ`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma bkm_finite_anyT (Φ : VorticityResponse) (u₀ : T3 → Fin 3 → ℝ)",
+   "pos": {
+    "column": 23,
+    "line": 407
+   }
+  }
+ ],
+ "infos": [],
+ "axioms": [],
+ "message": "Lean verification failed",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "unsolved goals\ncase h.e'_2\nn m : ℤ\nh :\n  ∫ (x : AddCircle 1), (fourier n) x * (starRingEnd ℂ) ((fourier m) x) ∂AddCircle.haarAddCircle = if m = n then 1 else 0\n⊢ ∫ (x : AddCircle 1), ↑(n • x).toCircle * (starRingEnd ℂ) ↑(m • x).toCircle ∂AddCircle.haarAddCircle =\n    ∫ (x : UnitAddCircle), (starRingEnd ℂ) ↑(m • x).toCircle * ↑(n • x).toCircle ∂AddCircle.haarAddCircle\n\ncase h.e'_3\nn m : ℤ\nh :\n  ∫ (x : AddCircle 1), (fourier n) x * (starRingEnd ℂ) ((fourier m) x) ∂AddCircle.haarAddCircle = if m = n then 1 else 0\n⊢ (if n = m then 1 else 0) = if m = n then 1 else 0",
+   "code_line": "    ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by",
+   "pos": {
+    "column": 86,
+    "line": 468
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  intervalIntegrable_const enorm_ne_top\nhas type\n  IntervalIntegrable (fun x => ?m.21) ?m.16 ?m.14 ?m.15\nbut is expected to have type\n  IntervalIntegrable (fun t => linftyNorm fun x => Vorticity (GalerkinProjection N u₀) x t) MeasureTheory.volume 0 T",
+   "code_line": "      MeasureTheory.volume 0 T := intervalIntegrable_const enorm_ne_top",
+   "pos": {
+    "column": 34,
+    "line": 479
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  h\nhas type\n  ⟪UnitAddTorus.mFourierLp 2 k', UnitAddTorus.mFourierLp 2 k⟫_ℂ = if k' = k then 1 else 0\nbut is expected to have type\n  ∫ (x : T3), fourier3D k x * star (fourier3D k' x) = if k = k' then 1 else 0",
+   "code_line": "  exact h",
+   "pos": {
+    "column": 2,
+    "line": 484
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

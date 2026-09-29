@@ -1,0 +1,239 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "typeclass instance problem is stuck\n  NNNorm ?m.21\n\nNote: Lean will not try to resolve this typeclass instance problem because the type argument to `NNNorm` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.\n\nHint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.",
+   "code_line": "  exact intervalIntegrable_const enorm_ne_top",
+   "pos": {
+    "column": 33,
+    "line": 487
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unsolved goals\nN : ℕ\nu₀ : T3 → Fin 3 → ℝ\nT : ℝ\n⊢ IntervalIntegrable\n    (fun t => linftyNorm fun x => invFourier (spectralCurl (fourierTransform fun x => GalerkinProjection N u₀ x t)) x)\n    MeasureTheory.volume 0 T",
+   "code_line": "      MeasureTheory.volume 0 T := by",
+   "pos": {
+    "column": 34,
+    "line": 492
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch: After simplification, term\n  h\n has type\n  (if k = k' then 1 else 0) =\n    ∫ (x : UnitAddTorus (Fin 3)),\n      (UnitAddTorus.mFourier k) x *\n        (starRingEnd ℂ)\n          ((UnitAddTorus.mFourier k')\n            x) ∂@MeasureTheory.volume (UnitAddTorus (Fin 3))\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          instMeasureSpaceUnitAddCircle)\nbut is expected to have type\n  (if k = k' then 1 else 0) =\n    ∫ (x : T3),\n      fourier3D k x *\n        (starRingEnd ℂ)\n          (fourier3D k'\n            x) ∂@MeasureTheory.volume T3\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          AddCircle.measureSpace 1)",
+   "code_line": "  simpa [eq_comm] using h",
+   "pos": {
+    "column": 2,
+    "line": 500
+   }
+  }
+ ],
+ "warnings": [
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 18,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 39,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 55,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `n`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 67,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `C`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 75,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ν`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 24,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 32,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 57,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 65,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 81,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `p`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def SolvesNavierStokes (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (p : T3 → ℝ → ℝ) : Prop :=",
+   "pos": {
+    "column": 57,
+    "line": 142
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `N`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "noncomputable def GalerkinProjection (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) : T3 → ℝ → Fin 3 → ℝ :=",
+   "pos": {
+    "column": 38,
+    "line": 150
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "  fun x t j => u₀ x j",
+   "pos": {
+    "column": 8,
+    "line": 151
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ht`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma galerkin_energy_bound (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) (t : ℝ) (ht : 0 ≤ t) :",
+   "pos": {
+    "column": 67,
+    "line": 306
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `h_divfree`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (h_divfree : DivergenceFree u₀) (T : ℝ) (hT : 0 < T) :",
+   "pos": {
+    "column": 5,
+    "line": 316
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (T : ℝ) (hT : 0 ≤ T) (τ_T : ℝ) (hτ : L.φ τ_T = T) :",
+   "pos": {
+    "column": 13,
+    "line": 355
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `Φ`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma bkm_finite_anyT (Φ : VorticityResponse) (u₀ : T3 → Fin 3 → ℝ)",
+   "pos": {
+    "column": 23,
+    "line": 407
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "This simp argument is unused:\n  GalerkinProjection\n\nHint: Omit it from the simp argument list.\n  simp only [Vorticity,̵ ̵G̵a̵l̵e̵r̵k̵i̵n̵P̵r̵o̵j̵e̵c̵t̵i̵o̵n̵]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+   "code_line": "  simp only [Vorticity, GalerkinProjection]",
+   "pos": {
+    "column": 24,
+    "line": 486
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "This simp argument is unused:\n  GalerkinProjection\n\nHint: Omit it from the simp argument list.\n  simp [Vorticity,̵ ̵G̵a̵l̵e̵r̵k̵i̵n̵P̵r̵o̵j̵e̵c̵t̵i̵o̵n̵]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+   "code_line": "  simp [Vorticity, GalerkinProjection]",
+   "pos": {
+    "column": 19,
+    "line": 493
+   }
+  }
+ ],
+ "infos": [],
+ "axioms": [],
+ "message": "Lean verification failed",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "typeclass instance problem is stuck\n  NNNorm ?m.21\n\nNote: Lean will not try to resolve this typeclass instance problem because the type argument to `NNNorm` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.\n\nHint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.",
+   "code_line": "  exact intervalIntegrable_const enorm_ne_top",
+   "pos": {
+    "column": 33,
+    "line": 487
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unsolved goals\nN : ℕ\nu₀ : T3 → Fin 3 → ℝ\nT : ℝ\n⊢ IntervalIntegrable\n    (fun t => linftyNorm fun x => invFourier (spectralCurl (fourierTransform fun x => GalerkinProjection N u₀ x t)) x)\n    MeasureTheory.volume 0 T",
+   "code_line": "      MeasureTheory.volume 0 T := by",
+   "pos": {
+    "column": 34,
+    "line": 492
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch: After simplification, term\n  h\n has type\n  (if k = k' then 1 else 0) =\n    ∫ (x : UnitAddTorus (Fin 3)),\n      (UnitAddTorus.mFourier k) x *\n        (starRingEnd ℂ)\n          ((UnitAddTorus.mFourier k')\n            x) ∂@MeasureTheory.volume (UnitAddTorus (Fin 3))\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          instMeasureSpaceUnitAddCircle)\nbut is expected to have type\n  (if k = k' then 1 else 0) =\n    ∫ (x : T3),\n      fourier3D k x *\n        (starRingEnd ℂ)\n          (fourier3D k'\n            x) ∂@MeasureTheory.volume T3\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          AddCircle.measureSpace 1)",
+   "code_line": "  simpa [eq_comm] using h",
+   "pos": {
+    "column": 2,
+    "line": 500
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

@@ -1,0 +1,168 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/GroupTheory/FreeAbelianGroup.lean",
+   "matches": [
+    {
+     "line_number": 25,
+     "content": "    25|`Mathlib/Algebra/Category/Grp/Adjunctions.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Coxeter/Inversion.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|`B` by the Coxeter relations given by the matrix `M`. See `Mathlib/GroupTheory/Coxeter/Basic.lean`"
+    },
+    {
+     "line_number": 26,
+     "content": "    26|(see `Mathlib/GroupTheory/Coxeter/Length.lean`)."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Coxeter/Length.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|`B` by the Coxeter relations given by the matrix `M`. See `Mathlib/GroupTheory/Coxeter/Basic.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/MonoidLocalization/Finite.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|If `Mathlib/GroupTheory/Finiteness.lean` wasn't so heavy, this could move earlier."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Submonoid/Inverses.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|`Mathlib/Algebra/Group/Submonoid/Pointwise.lean`."
+    },
+    {
+     "line_number": 23,
+     "content": "    23|in `N`. See the implementation notes of `Mathlib/Algebra/Group/Submonoid/Units.lean` for more details"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Perm/Basic.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|Most of the content of this file was moved to `Mathlib/Algebra/Group/End.lean` in"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Perm/Finite.lean",
+   "matches": [
+    {
+     "line_number": 17,
+     "content": "    17|of those in `Mathlib/Logic/Equiv/Basic.lean` and other files in `Mathlib/GroupTheory/Perm/*`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Perm/Sign.lean",
+   "matches": [
+    {
+     "line_number": 28,
+     "content": "    28|Other lemmas have been moved to `Mathlib/GroupTheory/Perm/Finite.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/GroupExtension/Basic.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|For the main definitions, see `Mathlib/GroupTheory/GroupExtension/Defs.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/GroupExtension/Defs.lean",
+   "matches": [
+    {
+     "line_number": 49,
+     "content": "    49|  (which will be available in the planned file `Mathlib/GroupTheory/GroupExtension/Abelian.lean` to"
+    },
+    {
+     "line_number": 52,
+     "content": "    52|  (which is also stated as a TODO in `Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean`)."
+    },
+    {
+     "line_number": 93,
+     "content": "    93|  Use `AddGroupExtension.Equiv.ofMonoidHom` in `Mathlib/GroupTheory/GroupExtension/Basic.lean` to"
+    },
+    {
+     "line_number": 153,
+     "content": "   153|  Use `GroupExtension.Equiv.ofMonoidHom` in `Mathlib/GroupTheory/GroupExtension/Basic.lean` to"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/Abelianization/Defs.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|groups, which can be found in `Mathlib/Algebra/Category/Grp/Adjunctions.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/GroupAction/FixedPoints.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|that don't directly belong to `Mathlib/GroupTheory/GroupAction/Basic.lean`,"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/GroupAction/CardCommute.lean",
+   "matches": [
+    {
+     "line_number": 22,
+     "content": "    22|See `Mathlib/GroupTheory/GroupAction/Quotient.lean` for the construction of isomorphisms used to"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/GroupAction/DomAct/ActionHom.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|Add left actions of, e.g., `M` on `α →[N] β` to `Mathlib/Algebra/Group/Action/Hom.lean` and"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/GroupTheory/FreeGroup/Basic.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|functor from groups to types, see `Mathlib/Algebra/Category/Grp/Adjunctions.lean`."
+    },
+    {
+     "line_number": 789,
+     "content": "   789|The converse can be found in `Mathlib/GroupTheory/FreeGroup/GeneratorEquiv.lean`, as"
+    }
+   ]
+  }
+ ],
+ "files_available": 149,
+ "files_scanned": 149,
+ "files_with_matches": 15,
+ "truncated": false
+}

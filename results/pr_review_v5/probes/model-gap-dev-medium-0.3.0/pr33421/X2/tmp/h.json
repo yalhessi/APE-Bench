@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Order/Round.lean","line_start":48,"line_end":50,"replacement":"-- TODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`.\n/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring. -/"}

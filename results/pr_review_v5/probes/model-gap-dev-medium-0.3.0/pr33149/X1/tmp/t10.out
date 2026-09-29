@@ -1,0 +1,115 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Type mismatch: After simplification, term\n  h\n has type\n  (if k = k' then 1 else 0) =\n    ∫ (x : UnitAddTorus (Fin 3)),\n      (UnitAddTorus.mFourier k) x *\n        (starRingEnd ℂ)\n          ((UnitAddTorus.mFourier k')\n            x) ∂@MeasureTheory.volume (UnitAddTorus (Fin 3))\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          instMeasureSpaceUnitAddCircle)\nbut is expected to have type\n  (if k = k' then 1 else 0) =\n    ∫ (x : UnitAddTorus (Fin 3)),\n      (UnitAddTorus.mFourier k) x *\n        (starRingEnd ℂ)\n          ((UnitAddTorus.mFourier k')\n            x) ∂@MeasureTheory.volume (UnitAddTorus (Fin 3))\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          AddCircle.measureSpace 1)",
+   "code_line": "  simpa [eq_comm] using h",
+   "pos": {
+    "column": 2,
+    "line": 473
+   }
+  }
+ ],
+ "warnings": [
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 18,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 39,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 55,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `n`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 67,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `C`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 75,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ν`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 24,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 32,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 57,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 65,
+    "line": 137
+   }
+  }
+ ],
+ "infos": [],
+ "axioms": [],
+ "messages_truncated": true,
+ "total_messages_before_truncation": 18,
+ "message": "Lean verification failed",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Type mismatch: After simplification, term\n  h\n has type\n  (if k = k' then 1 else 0) =\n    ∫ (x : UnitAddTorus (Fin 3)),\n      (UnitAddTorus.mFourier k) x *\n        (starRingEnd ℂ)\n          ((UnitAddTorus.mFourier k')\n            x) ∂@MeasureTheory.volume (UnitAddTorus (Fin 3))\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          instMeasureSpaceUnitAddCircle)\nbut is expected to have type\n  (if k = k' then 1 else 0) =\n    ∫ (x : UnitAddTorus (Fin 3)),\n      (UnitAddTorus.mFourier k) x *\n        (starRingEnd ℂ)\n          ((UnitAddTorus.mFourier k')\n            x) ∂@MeasureTheory.volume (UnitAddTorus (Fin 3))\n        (@MeasureTheory.MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun a => UnitAddCircle) fun i =>\n          AddCircle.measureSpace 1)",
+   "code_line": "  simpa [eq_comm] using h",
+   "pos": {
+    "column": 2,
+    "line": 473
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

@@ -1,0 +1,3 @@
+/-- The **Schwarz Lemma**: if `f : ℂ → E` sends an open disk with center `c` to the closed ball
+with center `f c` and the same radius, then for any point `z` of this disk we have
+`dist (f z) (f c) ≤ dist z c`. -/

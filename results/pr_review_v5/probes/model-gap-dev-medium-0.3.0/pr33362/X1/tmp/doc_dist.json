@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Complex/Schwarz.lean", "line_start": 160, "line_end": 161, "replacement": "/-- The **Schwarz Lemma**: if `f : ℂ → E` sends an open disk with center `c` to the closed ball\nwith center `f c` and the same radius, then for any point `z` of this disk we have\n`dist (f z) (f c) ≤ dist z c`. -/"}

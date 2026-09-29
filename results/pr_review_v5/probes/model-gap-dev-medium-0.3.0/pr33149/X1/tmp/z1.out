@@ -1,0 +1,15 @@
+{
+ "success": true,
+ "count": 5,
+ "as_of": "2025-12-21T03:05:49Z",
+ "excluded_pr": 33149,
+ "results": "#Is-there-code-for-X? > Is `Nat.noConfusionType` in Lean 4 Circular Reasoning When P\n  Kevin Buzzard [maintainer] — 2025-03-08T08:21:23Z\n  No it's definitely not circular reasoning -- that is not allowed in lean. The axiom of recursion says that you can define a function on natural numbers by saying what to do with zero and what to do with successors, and you're just noticing that this axiom is enough to imply noConfusion.\n  https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X%3F/topic/Is.20.60Nat.2EnoConfusionType.60.20in.20Lean.204.20Circular.20Reasoning.20When.20P/near/504249698\n\n#general > Lean in the wild\n  Kevin Buzzard [maintainer] — 2025-12-07T23:03:34Z\n  Axiom claiming 8/12 on yesterday's Putnam in Lean within the time limit and 9/12 if allowed more time: https://www.linkedin.com/posts/axiommath_yesterday-thousands-of-bright-undergrads-activity-7403482884361093120---sC\n  https://leanprover.zulipchat.com/#narrow/channel/113488-general/topic/Lean.20in.20the.20wild/near/562367603\n\n#mathlib4 > not allowed to import modules starting with Mathlib.Geometry\n  Jon Eugster [maintainer] — 2025-04-08T18:22:48Z\n  This is a very new linter and there should be a file somewhere where the \"allowed\" dependencies of mathlib subdirectories can be adjusted.\n  https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/not.20allowed.20to.20import.20modules.20starting.20with.20Mathlib.2EGeometry/near/510999714\n\n#lean4 > Why Are Trailing Commas Not Allowed in Array Literals?\n  Kim Morrison [maintainer] — 2025-02-12T23:27:16Z\n  @Asei Inoue, there's still quite a bit you need to do on that PR, let me know if you don't understand what's being asked (CI, Mathlib CI, add tests).\n  https://leanprover.zulipchat.com/#narrow/channel/270676-lean4/topic/Why.20Are.20Trailing.20Commas.20Not.20Allowed.20in.20Array.20Literals.3F/near/499347874\n\n#nightly-testing > Mathlib status updates\n  Kim Morrison [maintainer] — 2024-04-02T11:01:51Z\n  the <- is not allowed in that position anymore, because it will always lift outside the if\n  https://leanprover.zulipchat.com/#narrow/channel/428973-nightly-testing/topic/Mathlib.20status.20updates/near/430764047",
+ "terms_matched": [
+  "axiom",
+  "not",
+  "allowed",
+  "in",
+  "Mathlib",
+  "PR"
+ ]
+}

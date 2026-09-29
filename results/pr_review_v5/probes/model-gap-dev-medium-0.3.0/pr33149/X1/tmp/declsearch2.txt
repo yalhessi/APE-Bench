@@ -1,0 +1,26 @@
+=== UnitAddTorus.hasSum_sq_mFourierCoeff
+- `UnitAddTorus.hasSum_sq_mFourierCoeff` is declared in `Mathlib/Analysis/Fourier/AddCircleMulti.lean` (before this PR)
+=== UnitAddTorus.mFourierBasis
+- `UnitAddTorus.mFourierBasis` is declared in `Mathlib/Analysis/Fourier/AddCircleMulti.lean` (before this PR)
+=== UnitAddTorus.hasSum_mFourier_series_of_summable
+- `UnitAddTorus.hasSum_mFourier_series_of_summable` is declared in `Mathlib/Analysis/Fourier/AddCircleMulti.lean` (before this PR)
+=== UnitAddTorus.mFourierLp
+- `UnitAddTorus.mFourierLp` is declared in `Mathlib/Analysis/Fourier/AddCircleMulti.lean` (before this PR)
+=== ContDiff.analyticOnNhd
+- `ContDiff.analyticOnNhd` is declared in `Mathlib/Analysis/Analytic/CPolynomial.lean` (before this PR)
+- `ContDiff.analyticOnNhd` is declared in `Mathlib/Analysis/Analytic/CPolynomialDef.lean` (before this PR)
+- `ContDiff.analyticOnNhd` is declared in `Mathlib/Analysis/Analytic/ChangeOrigin.lean` (before this PR)
+=== contDiffOn_omega_iff_analyticOnNhd
+No declaration of 'contDiffOn_omega_iff_analyticOnNhd' exists at the base commit or in the files this PR changes. This is a finding, not a failed lookup. Re-querying will return the same answer.
+=== ContDiffAt.analyticAt
+- `ContDiffAt.analyticAt` is declared in `Mathlib/Analysis/Analytic/Basic.lean` (before this PR)
+- `ContDiffAt.analyticAt` is declared in `Mathlib/Analysis/Analytic/CPolynomial.lean` (before this PR)
+- `ContDiffAt.analyticAt` is declared in `Mathlib/Analysis/Analytic/CPolynomialDef.lean` (before this PR)
+=== fourierCoeff_toLp
+- `fourierCoeff_toLp` is declared in `Mathlib/Analysis/Fourier/AddCircle.lean` (before this PR)
+=== intervalIntegral.integral_const_mul
+- `intervalIntegral.integral_const_mul` is declared in `Mathlib/MeasureTheory/Integral/Bochner/Basic.lean` (before this PR)
+- `intervalIntegral.integral_const_mul` is declared in `Mathlib/MeasureTheory/Integral/CircleIntegral.lean` (before this PR)
+- `intervalIntegral.integral_const_mul` is declared in `Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean` (before this PR)
+=== integral_mono_on
+- `integral_mono_on` is declared in `Mathlib/MeasureTheory/Integral/IntervalIntegral/Basic.lean` (before this PR)

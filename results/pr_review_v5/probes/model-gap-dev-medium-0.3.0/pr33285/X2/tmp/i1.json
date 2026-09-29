@@ -1,0 +1,1 @@
+{"path": "Mathlib/LinearAlgebra/Prod.lean", "declaration_name": "LinearEquiv.symm_prodComm", "new_declaration": "@[simp]\ntheorem prodComm_symm : (prodComm R M M\u2082).symm = prodComm R M\u2082 M := rfl"}

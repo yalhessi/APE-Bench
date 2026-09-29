@@ -1,0 +1,1 @@
+{"path": "Mathlib/SetTheory/Ordinal/Arithmetic.lean", "line_start": 374, "line_end": 377, "replacement": "@[deprecated Order.IsNormal.monotone (since := \"2025-12-25\")]\ntheorem IsNormal.monotone {f} (H : Ordinal.IsNormal f) : Monotone f :=\n  H.strictMono.monotone"}

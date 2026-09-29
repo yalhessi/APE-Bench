@@ -1,0 +1,1 @@
+{"code":"/-- Formula for `round` in terms of `Int.floor`, a version that works over any ring.\n\nTODO: decide if we want to use this as a definition. It may be slightly faster over `ℚ`. -/\ntheorem round_eq' (x : α) : round x = (⌊2 * x⌋ + 1) / 2 := by","limit":5}

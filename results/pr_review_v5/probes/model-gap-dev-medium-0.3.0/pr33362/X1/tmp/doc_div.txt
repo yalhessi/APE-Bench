@@ -1,0 +1,3 @@
+/-- The **Schwarz Lemma**: if `f : ℂ → E` sends an open disk with center `c` and a positive radius
+`R₁` to a closed ball with center `f c` and radius `R₂`, then the norm of the derivative of
+`f` at `c` is at most the ratio `R₂ / R₁`. -/

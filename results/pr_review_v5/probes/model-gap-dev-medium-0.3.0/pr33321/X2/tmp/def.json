@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean", "declaration_name": "IsMulIndecomposable.baseOf", "new_declaration": "def IsMulIndecomposable.baseOf [Monoid S] (v : \u03b9 \u2192 M) (f : M \u2192* S) : Set \u03b9 :=\n  {i | IsMulIndecomposable v {j | 1 < f (v j)} i}"}

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Complex/Schwarz.lean", "line_start": 134, "line_end": 136, "replacement": "/-- The **Schwarz Lemma**: if `f : ℂ → E` sends an open disk with center `c` and a positive radius\n`R₁` to a closed ball with center `f c` and radius `R₂`, then the norm of the derivative of\n`f` at `c` is at most the ratio `R₂ / R₁`. -/"}

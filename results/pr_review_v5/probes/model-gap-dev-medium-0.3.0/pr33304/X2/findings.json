@@ -1,0 +1,9 @@
+[
+  {
+    "target": "Mathlib/CategoryTheory/Functor/Basic.lean",
+    "claim": "This PR fixes file references in `Mathlib/CategoryTheory/Functor/Basic.lean` (line 65) but leaves a stale one in the same file. Line 130, the comment above `Functor.comp_id` / `Functor.id_comp`, reads `-- Natural isomorphisms are also provided in `Whiskering.lean`.` That is a short, non-`Mathlib/...` path, which the PR converts to full form everywhere else. It also points to the wrong file: the natural isomorphisms that correspond to `comp_id` / `id_comp` (`Functor.leftUnitor`, `Functor.rightUnitor`, and also `Functor.associator`) are defined in `Mathlib/CategoryTheory/Functor/Category.lean`. `Mathlib/CategoryTheory/Whiskering.lean` only proves the triangle and pentagon identities for them.",
+    "requested_change": "Replace line 130 of `Mathlib/CategoryTheory/Functor/Basic.lean` with `-- The corresponding natural isomorphisms `Functor.leftUnitor` and `Functor.rightUnitor` are` / `-- provided in `Mathlib/CategoryTheory/Functor/Category.lean`.` so that the comment uses the full path and names the file that defines the isomorphisms.",
+    "severity": "advisory",
+    "evidence": "content_search for `.lean` references in every changed file: the only short-path reference left in the 13 touched files is Functor/Basic.lean:130 `Whiskering.lean`. content_search for `def (leftUnitor|rightUnitor|associator) (F` under CategoryTheory finds them at Mathlib/CategoryTheory/Functor/Category.lean:158/166/177. That file's module doc says 'At the end of the file, we provide the left and right unitors, and the associator, for functor composition.' Whiskering.lean contains no such def; its module doc says 'We show the associator and unitor natural isomorphisms satisfy the triangle and pentagon identities.' lean_verify_edit (line mode, line 130 replaced by the two-line comment above) on Mathlib/CategoryTheory/Functor/Basic.lean returned success, with no errors or warnings."
+  }
+]

@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/SpecialFunctions/Trigonometric/Arctan.lean","line_start":218,"line_end":218,"replacement":"\nexample : arctan (√3)⁻¹ = π / 6 := by\n  simp? [-arctan_inv_sqrt_three]\n  sorry\n\nexample : arctan (√3) = π / 3 := by\n  simp? [-arctan_sqrt_three]\n  sorry\n\nexample : arctan (1 / √3) = π / 6 := by simp\n\nexample : arctan (√3 / 3) = π / 6 := by simp\n"}

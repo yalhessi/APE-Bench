@@ -1,0 +1,86 @@
+[
+ {
+  "target": "auxIsometry",
+  "claim": "The private section `auxiliaryDefs` (`auxContinuousLinearEquiv`, `coe_auxContinuousLinearEquiv`, `auxIsometry`, `coe_auxIsometry`, `coe_symm_auxIsometry`, 48 lines) builds a scalar multiple of `y` as a linear isometric equivalence by hand. Existing library constructions already do this: `LinearEquiv.smulOfNeZero` gives the scalar-multiple equivalence, and `LinearEquiv.isometryOfInner` turns an inner-product-preserving linear equivalence into a `≃ₗᵢ`. `Mathlib/Analysis/InnerProductSpace/ConformalLinearMap.lean` (`isConformalMap_iff`) uses the same `c⁻¹ • f |>.isometryOfInner` pattern. The aux API is only used once, inside `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`.",
+  "requested_change": "Delete `section auxiliaryDefs` (lines 92-139) and build the isometry inline in `StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`: `let U : V ≃ₗᵢ[𝕜] W := (y.toLinearEquiv.trans (.smulOfNeZero 𝕜 W _ (inv_ne_zero hs'))).isometryOfInner fun a b ↦ by simp [inner_smul_left, inner_smul_right, key]; field_simp`. Here `key : inner 𝕜 (y a) (y b) = (s * s : ℝ) * inner 𝕜 a b` is proved by `rw [← ContinuousLinearEquiv.coe_coe, ← adjoint_inner_right, ← comp_apply, ← hα]; simp [inner_smul_right]`. Then close with `refine ⟨U, StarAlgEquiv.ext fun x ↦ ContinuousLinearMap.ext fun w ↦ ?_⟩; obtain ⟨v, rfl⟩ := U.surjective w; have hfx : f x (y v) = y (x v) := by simpa using congr($(congr_fun hy x) (y v)); rw [LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, U.symm_apply_apply]; simp [U, hfx]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit in line mode on Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean replaced lines 92-217 (the aux section, `open ComplexOrder`, the docstring and the main theorem, 126 lines) with a 59-line version that has no aux section. Result: success, no errors, no warnings, whole file recompiled, including the downstream `OrderIsoClass` instance. The main theorem alone, with the aux defs left in place but unused, also verified. content_search found `LinearEquiv.smulOfNeZero` in Mathlib/Algebra/Module/Equiv/Basic.lean:742, `LinearEquiv.isometryOfInner` in Mathlib/Analysis/InnerProductSpace/LinearMap.lean:139, and the precedent at ConformalLinearMap.lean:41. Verified tail of the proof:\n  have hα0 : α ≠ 0 := by\n    have : IsUnit (adjoint y.toContinuousLinearMap ∘L y) :=\n      isUnit_iff_exists.mpr ⟨y.symm ∘L adjoint y.symm.toContinuousLinearMap, by\n        simp [mul_def, ← comp_assoc, comp_assoc _ _ (adjoint y.toContinuousLinearMap),\n          ← adjoint_comp, one_def, comp_assoc _ y.toContinuousLinearMap]⟩\n    rintro rfl\n    simp [← hα] at this\n  have hpos : 0 ≤ α := by\n    have := isPositive_adjoint_comp_self y.toContinuousLinearMap\n    rw [← hα, ← isPositive_toLinearMap_iff] at this\n    exact (LinearMap.isPositive_one.isPositive_smul_iff (one_ne_zero' (V →ₗ[𝕜] V))).mp this\n  obtain ⟨r, hr, rfl⟩ := RCLike.pos_iff_exists_ofReal.mp (hpos.lt_of_ne' hα0)\n  obtain ⟨s, hs, rfl⟩ : ∃ s : ℝ, 0 < s ∧ s * s = r :=\n    ⟨√r, Real.sqrt_pos.2 hr, Real.mul_self_sqrt hr.le⟩\n  have hs' : (s : 𝕜) ≠ 0 := RCLike.ofReal_ne_zero.mpr hs.ne'\n  have key (a b : V) : inner 𝕜 (y a) (y b) = (s * s : ℝ) * inner 𝕜 a b := by\n    rw [← ContinuousLinearEquiv.coe_coe, ← adjoint_inner_right, ← comp_apply, ← hα]\n    simp [inner_smul_right]\n  let U : V ≃ₗᵢ[𝕜] W :=\n    (y.toLinearEquiv.trans (.smulOfNeZero 𝕜 W _ (inv_ne_zero hs'))).isometryOfInner fun a b ↦ by\n      simp [inner_smul_left, inner_smul_right, key]\n      field_simp\n  refine ⟨U, StarAlgEquiv.ext fun x ↦ ContinuousLinearMap.ext fun w ↦ ?_⟩\n  obtain ⟨v, rfl⟩ := U.surjective w\n  have hfx : f x (y v) = y (x v) := by simpa using congr($(congr_fun hy x) (y v))\n  rw [LinearIsometryEquiv.conjStarAlgEquiv_apply_apply, U.symm_apply_apply]\n  simp [U, hfx]"
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The scalar bookkeeping in the proof is roundabout. `thisα : α = RCLike.re α` is proved separately through `IsSelfAdjoint.adjoint_conj` and `smul_left_injective`. `this2 : 0 ≤ α` goes through two `▸` rewrites along `thisα`. The normalising scalar is written `((re α : ℝ) ^ (-(1 / 2 : ℝ)) : 𝕜)` with `Real.rpow`, which needs `Real.rpow_add`, `Real.rpow_neg_one` and a four-line `la` via `Real.rpow_eq_zero`. That is `1/√(re α)`, as the proof's own comment says. Positivity in `ComplexOrder` already implies that α is real, so `thisα` is unnecessary.",
+  "requested_change": "Get `0 ≤ α` directly: `have := isPositive_adjoint_comp_self y.toContinuousLinearMap; rw [← hα, ← isPositive_toLinearMap_iff] at this; exact (LinearMap.isPositive_one.isPositive_smul_iff (one_ne_zero' (V →ₗ[𝕜] V))).mp this`. Then take α real and a square: `obtain ⟨r, hr, rfl⟩ := RCLike.pos_iff_exists_ofReal.mp (hpos.lt_of_ne' hα0)` and `obtain ⟨s, hs, rfl⟩ : ∃ s : ℝ, 0 < s ∧ s * s = r := ⟨√r, Real.sqrt_pos.2 hr, Real.mul_self_sqrt hr.le⟩`, and scale by `(s : 𝕜)⁻¹`. This drops `thisα`, `this2`, `thisU`, `αa`, `αa2` and `la`, and gives the remaining hypotheses descriptive names (`hα0`, `hpos`) in place of `this1`/`this2`/`this10`/`thisα'`. If the aux defs are kept, the minimal version is `set αa := (((√(RCLike.re α))⁻¹ : ℝ) : 𝕜)`, `αa2` by `rw [thisα]; simp [αa, ← RCLike.ofReal_mul, ← mul_inv, Real.mul_self_sqrt this2.le]`, and `la := inv_mul_cancel₀ (by simp [αa, (Real.sqrt_pos.2 this2).ne'])`.",
+  "severity": "advisory",
+  "evidence": "Two lean_verify_edit runs with `declaration_name` = StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv both returned success. (a) The full rewrite (positivity via `isPositive_smul_iff`, `RCLike.pos_iff_exists_ofReal`, `√`) verified, and also verified as a line splice with the aux section deleted. (b) The minimal `√` version (rpow replaced by `Real.sqrt`, `la` as a one-liner, rest unchanged) verified. The first attempt at (b) failed only on a missing cast; the second on `¬√(re α) = 0`, fixed with `(Real.sqrt_pos.2 this2).ne'`. The PR description itself asks for golfs ('Please feel free to golf!')."
+ },
+ {
+  "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+  "claim": "Two of the imports the PR adds are redundant. `public import Mathlib.Analysis.InnerProductSpace.Adjoint` is already implied by `public import Mathlib.Analysis.InnerProductSpace.Positive`. `import Mathlib.Analysis.SpecialFunctions.Pow.Real` is already available transitively, and it is only used for `Real.rpow` in a proof step that `√` does just as well.",
+  "requested_change": "Remove `public import Mathlib.Analysis.InnerProductSpace.Adjoint` and `import Mathlib.Analysis.SpecialFunctions.Pow.Real`. The import block becomes the four existing public imports plus `public import Mathlib.Analysis.InnerProductSpace.Positive` and `import Mathlib.Algebra.Central.Basic`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode, lines 8-15 of ContinuousAlgEquiv.lean replaced with the block without those two imports: success, no errors, with the PR's rpow-based proof unchanged. Removing only the Pow.Real import (lines 14-15) also succeeded. As a control, removing `import Mathlib.Algebra.Central.Basic` failed with `Unknown constant Algebra.IsCentral.center_eq_bot`, so that import is genuinely needed. Positive.lean publicly imports InnerProductSpace.Spectrum, Matrix.Hermitian and Matrix.PosDef."
+ },
+ {
+  "target": "Mathlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean",
+  "claim": "The PR puts Hilbert-space material (`StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv`, the `OrderIsoClass` instance and the aux section) into a file under `Analysis/Normed/Operator/` about normed spaces with separating duals. To do so it adds `public import`s of `Analysis.InnerProductSpace.Adjoint` and `Analysis.InnerProductSpace.Positive`, so every user of the normed-space result `ContinuousAlgEquiv.eq_continuousLinearEquivConjContinuousAlgEquiv` now pulls in the inner product space and positivity theory.",
+  "requested_change": "Move the star-algebra part (everything from the `RCLike`/`InnerProductSpace` `variable` line to the end of the file) into a new file under `Mathlib/Analysis/InnerProductSpace/` (e.g. `.../InnerProductSpace/StarAlgEquiv.lean`) that imports `Mathlib.Analysis.Normed.Operator.ContinuousAlgEquiv`. Revert that file's imports and module docstring to the normed-space-only version.",
+  "severity": "advisory",
+  "evidence": "content_search for `import Mathlib.Analysis.InnerProductSpace` over target/Mathlib/Analysis/Normed (141 files) matched only this file (lines 8-9). No other file under Analysis/Normed depends on InnerProductSpace, so the PR introduces the only such edge in that directory. Not compiled as a new file, because the tools cannot create files."
+ },
+ {
+  "target": "declaration in ContinuousAlgEquiv.lean (OrderIsoClass instance)",
+  "claim": "The new `public instance (priority := 100) ... : OrderIsoClass F _ _` is anonymous, so it gets a long auto-generated name. The instance it is meant to be replaced by, `StarRingEquivClass.instOrderIsoClass` (Algebra/Order/Star/Basic.lean:458), and its sibling `StarRingHomClass.instOrderHomClass` are both explicitly named.",
+  "requested_change": "Give the instance an explicit name, e.g. `public instance (priority := 100) ContinuousLinearMap.instOrderIsoClass {F : Type*} ...`, and put the usual `-- see Note [lower instance priority]` comment above it.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode, lines 219-229 replaced with the named instance `ContinuousLinearMap.instOrderIsoClass` plus the note comment: success. precedent_search on the instance header returned review comments asking for explicit, lower-case/`inst`-prefixed instance names (PR #18689, kbuzzard; PR #19466, eric-wieser)."
+ },
+ {
+  "target": "LinearIsometryEquiv.conjStarAlgEquiv",
+  "claim": "The docstring says 'An isometry linear equivalence of two Hilbert spaces'. Mathlib's term for `≃ₗᵢ` is 'linear isometric equivalence', and 'isometry linear equivalence' appears nowhere else in the library. The same wording is repeated in the `auxIsometry` docstring.",
+  "requested_change": "Reword to `/-- A linear isometric equivalence of two Hilbert spaces induces an equivalence of ⋆-algebras of their endomorphisms. -/` (and likewise in `auxIsometry`'s docstring if that declaration is kept).",
+  "severity": "advisory",
+  "evidence": "content_search: 'isometry linear equivalence' matches only Adjoint.lean:689 and ContinuousAlgEquiv.lean:116 (both added by this PR). 'linear isometric equivalence' matches 14 files, including LinearIsometry.lean:21 and the `LinearEquiv.isometryOfInner` docstring in InnerProductSpace/LinearMap.lean:138."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "The proof-sketch comment has a typo, 'endormorphisms', and names a nonexistent API: it says `f = y.conjAlgEquiv`, but `y : V ≃L[𝕜] W` and the result used is `y.conjContinuousAlgEquiv`. It also has a grammar slip: 'the algebra of endomorphisms are central'.",
+  "requested_change": "In the comment, change 'endormorphisms' to 'endomorphisms', `f = y.conjAlgEquiv` to `f = y.conjContinuousAlgEquiv`, and 'the algebra of endomorphisms are central' to 'the algebra of endomorphisms is central'.",
+  "severity": "advisory",
+  "evidence": "content_search for 'endormorphism' over target/Mathlib: one hit, ContinuousAlgEquiv.lean:156 (this PR). The file's own sibling theorem is stated with `U.conjContinuousAlgEquiv` (line 39), and `conjContinuousAlgEquiv` is the `ContinuousLinearEquiv` API in Topology/Algebra/Module/StrongTopology.lean:807."
+ },
+ {
+  "target": "module_doc in ContinuousAlgEquiv.lean",
+  "claim": "The PR changes the module docstring's `# TODO:` heading to `### TODO:`. Mathlib module docs use a level-2 `## TODO` heading without a colon.",
+  "requested_change": "Replace `### TODO:` with `## TODO`.",
+  "severity": "advisory",
+  "evidence": "content_search: '### TODO' occurs in 5 files (including this one); '## TODO' in 200+ files (result capped at 200)."
+ },
+ {
+  "target": "ContinuousAlgEquiv.ofAlgEquiv",
+  "claim": "The docstring 'Interpret an algebra equivalence as a continuous algebra equivalence when it is continuous.' understates the hypotheses: the definition also requires `he' : Continuous e.symm`, and continuity of `e` alone does not give a `≃A[R]`.",
+  "requested_change": "Change the docstring to `/-- Interpret an algebra equivalence as a continuous algebra equivalence when it and its inverse are continuous. -/`.",
+  "severity": "advisory",
+  "evidence": "Read Mathlib/Topology/Algebra/Algebra/Equiv.lean:305-307: `def ofAlgEquiv (e : A ≃ₐ[R] B) (he : Continuous e) (he' : Continuous e.symm)`. The reworded docstring was included in the verified splice of lines 291-322 (success)."
+ },
+ {
+  "target": "ContinuousAlgEquiv.ofAlgEquiv",
+  "claim": "`ofAlgEquiv` is added right after `_root_.AlgEquiv.isUniformEmbedding`, which builds the same object inline as `{ e with continuous_toFun := h₁, continuous_invFun := by dsimp; fun_prop }`. The file thus keeps an ad-hoc copy of the new constructor two lines above it.",
+  "requested_change": "Move the `ofAlgEquiv` block (the def and its five lemmas) above `ContinuousAlgEquiv.isUniformEmbedding`, and prove `_root_.AlgEquiv.isUniformEmbedding` as `(ofAlgEquiv e h₁ h₂).isUniformEmbedding`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode, Mathlib/Topology/Algebra/Algebra/Equiv.lean lines 291-322 replaced with the `ofAlgEquiv` block first, then `ContinuousAlgEquiv.isUniformEmbedding` unchanged, then `AlgEquiv.isUniformEmbedding ... := (ofAlgEquiv e h₁ h₂).isUniformEmbedding`: success, no errors."
+ },
+ {
+  "target": "LinearIsometryEquiv.conjStarAlgEquiv_trans",
+  "claim": "`conjStarAlgEquiv_trans` re-binds `{G : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]`, which shadows the file-level `variable {𝕜 E F G : Type*} ... [NormedAddCommGroup G] ... [InnerProductSpace 𝕜 G]` (Adjoint.lean:51-53). Only `CompleteSpace G` is actually missing.",
+  "requested_change": "State it as `theorem conjStarAlgEquiv_trans [CompleteSpace G] (e : H ≃ₗᵢ[𝕜] K) (f : K ≃ₗᵢ[𝕜] G) : (e.trans f).conjStarAlgEquiv = e.conjStarAlgEquiv.trans f.conjStarAlgEquiv := rfl`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit with declaration_name LinearIsometryEquiv.conjStarAlgEquiv_trans and the two-line version above: success. The file header (lines 51-53) declares `G` with `NormedAddCommGroup` and `InnerProductSpace 𝕜 G`."
+ },
+ {
+  "target": "StarAlgEquiv.eq_linearIsometryEquivConjStarAlgEquiv",
+  "claim": "Line 173 has a double space inside the `simp_rw` list: `conjContinuousAlgEquiv_apply,  adjoint_comp] at this`.",
+  "requested_change": "Change it to `conjContinuousAlgEquiv_apply, adjoint_comp] at this`.",
+  "severity": "advisory",
+  "evidence": "file_read of ContinuousAlgEquiv.lean lines 172-173 as the PR leaves them. The single-space form is part of the verified rewrites (both g1 and g2 compiled with it)."
+ }
+]
