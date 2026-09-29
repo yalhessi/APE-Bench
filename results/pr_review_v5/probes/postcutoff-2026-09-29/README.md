@@ -85,3 +85,80 @@ reported as well.
 - **Store coverage:** the precedent and Zulip corpora may hold little after mid-2026, which changes
   what the context tools return. Tool calls are logged, and the amount of precedent and Zulip evidence
   is reported.
+
+---
+
+## Result (2026-09-29): not mainly recall, on both matchers
+
+The run, in order, each step committed before the next:
+- the draw, release and build rows (`ea3f7d3`);
+- the 20 sessions (`2ace505`);
+- then the asks were extracted, labelled by two readers (`readers/`) and matched by two matchers
+  (`match/`);
+- `unblind.py` applies the rule above.
+
+**The asks.** Six of the ten PRs drew round-1 feedback, 17 comments in all. The other four (41271,
+41280, 41314, 42238) are controls.
+- The readers agree on `is_ask` and family for all 17 and on grain for 16. They agree on 16 asks.
+- The post-cutoff mix is naming 4, interface 3, statement design 2, generality 2, derivation 2, and
+  layout, documentation and PR level one each.
+- It holds no proof and no registration asks. The in-window reference is proof 7, interface 5,
+  registration 2 and documentation 2.
+
+| | matcher 1 | matcher 2 |
+|---|---|---|
+| in-window per-session reach (16 asks × 4 sessions) | 28/64 = 0.44 | 38/64 = 0.59 |
+| post-cutoff per-session reach (16 asks × 2 sessions) | 15/32 = 0.47 | 15/32 = 0.47 |
+| `r = post / in` | **1.07** | **0.79** |
+| reading (`r ≥ 0.6` on both) | **not mainly recall** | **not mainly recall** |
+
+- **The restricted `r`** (proof, interface and registration only) is not computed: the post-cutoff set
+  holds 3 such asks, under the pre-set 8.
+- **The families both sets hold:**
+  - interface: 12/20 in-window against 4/6 post-cutoff;
+  - documentation: 8/8 against 2/2.
+- **Post-cutoff reach by family:**
+  - layout 2/2 and documentation 2/2;
+  - interface 4/6;
+  - derivation 2/4 and generality 2/4;
+  - naming 3/8;
+  - statement design 0/4 and PR level 0/2.
+- **Stability:** of the 8 post-cutoff asks either session reached, both sessions reached 7.
+- **Controls:** findings per session on the four no-feedback PRs are 1/1, 3/4, 3/2 and 2/0 (mean
+  2.0), against a mean of 4.1 on the six PRs with asks.
+
+**Matching is reproducible.** These matchers re-judged the construction demonstration's in-window
+cells and agree with that probe's matchers on reached-or-not in 64 of 64. Labels differ in one cell
+(matcher 1) and two cells (matcher 2), each between partial and no. The two new matchers agree on all
+32 post-cutoff cells. So the in-window totals here equal the first matching's (28 and 38) because the
+matching is stable, not by construction. Their one systematic disagreement is again 32875's golf asks:
+whether a different tactic that closes the goal reaches a `simpa` ask.
+
+**What it means, at probe altitude** (6 PRs with asks, 16 asks, 2 sessions, 2 matchers):
+1. **Claude's reach on in-window PRs is not mainly recall.** On PRs created after its cutoff, the same
+   reviewer with the same brief, packet and tools reaches asks at 79-107% of its in-window rate. The
+   five asks the pipeline missed and Claude reached are therefore more likely capability or harness
+   than memory. This is the confound `docs/todo/reviewer-model-gap.md` named.
+2. **The mix differs, and that limits the comparison.** The post-cutoff asks are naming and design,
+   the in-window ones proof and interface. Where the families overlap (interface, documentation), the
+   rates agree. A family-matched comparison needs more post-cutoff proof asks than 6 PRs supplied.
+3. **Where the reviewer is weak on unseen PRs is where the record says it is:** statement design
+   (0/4), PR level (0/2) and naming (3/8). Mechanical and local asks were reached.
+
+**Designs not yet tried:** a larger post-cutoff draw, family-matched to the in-window reference; the
+pipeline's model on this set (test (b)), where neither model can have seen the PRs.
+
+## Deviations during the run, recorded
+
+- **Four sessions were aborted by the API rate limit** (41930 X1/X2 and 43167 X1/X2), after 10-15
+  tool calls and before any finding. They were rerun from a clean packet, and their partial call logs
+  are kept in scratch.
+- **Reviewed workspaces for seven PRs were built while earlier sessions ran.** Each PR's sessions
+  launched only after its own reviewed workspace existed.
+- **One base restore collided with its own build's completion** and marked the workspace failed. It
+  was rebuilt and restored after the build had exited.
+- **Leak audit** (`audit_transcripts.txt`): 593 tool calls in 24 transcripts, with 2 flags, both
+  benign. After extraction, no tool result in any session contains a phrase from its own PR's
+  round-1 comments. The only phrase found anywhere is a generic Mathlib docs URL, cited by a comment on
+  42184 and seen in other PRs' sessions.
+- **The matchers** read only their own folders.

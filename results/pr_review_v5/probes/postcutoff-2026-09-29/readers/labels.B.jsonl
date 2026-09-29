@@ -1,0 +1,17 @@
+{"cid": "p0000", "is_ask": "ask", "family": "F12", "grain": "pr", "note": "asks the author to justify the rename (PR rationale / link discussion)"}
+{"cid": "p0001", "is_ask": "not_ask", "family": "n/a", "grain": "n/a", "note": "thanks, reluctant approval, bors merge"}
+{"cid": "p0002", "is_ask": "ask", "family": "F7", "grain": "declaration", "note": "drop the L.NeBot typeclass via by_cases"}
+{"cid": "p0003", "is_ask": "ask", "family": "F6", "grain": "declaration", "note": "add a HasProd version per file convention"}
+{"cid": "p0004", "is_ask": "ask", "family": "F6", "grain": "declaration", "note": "add alias for one direction or drop the iff"}
+{"cid": "p0005", "is_ask": "ask", "family": "F7", "grain": "declaration", "note": "state for any UFD / normalization monoid"}
+{"cid": "p0006", "is_ask": "ask", "family": "F4", "grain": "declaration", "note": "generate the def lemma with mk_iff"}
+{"cid": "p0007", "is_ask": "ask", "family": "F2", "grain": "declaration_group", "note": "section variable {D : ℤ} instead of per-declaration binders"}
+{"cid": "p0008", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename _mono to _anti"}
+{"cid": "p0009", "is_ask": "ask", "family": "F9", "grain": "file", "note": "remove the added import"}
+{"cid": "p0010", "is_ask": "ask", "family": "F8", "grain": "declaration_group", "note": "left/right naming swapped relative to convention"}
+{"cid": "p0011", "is_ask": "ask", "family": "F4", "grain": "declaration_group", "note": "add to_additive on three declarations"}
+{"cid": "p0012", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "descriptive name instead of prime"}
+{"cid": "p0013", "is_ask": "ask", "family": "F10", "grain": "line", "note": "module doc title typo"}
+{"cid": "p0014", "is_ask": "ask", "family": "F2", "grain": "declaration", "note": "default autoParam by cat_disch for proof fields"}
+{"cid": "p0015", "is_ask": "ask", "family": "F2", "grain": "declaration_group", "note": "extends default-tactic request to other definitions"}
+{"cid": "p0016", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "rename mkHom to homMk"}

@@ -1,0 +1,17 @@
+{"cid": "p0000", "is_ask": "ask", "family": "F12", "grain": "pr", "note": "Asks author to justify the rename; questions the PR premise/description."}
+{"cid": "p0001", "is_ask": "not_ask", "family": "n/a", "grain": "n/a", "note": "Thanks and bors merge."}
+{"cid": "p0002", "is_ask": "ask", "family": "F7", "grain": "declaration", "note": "Drop the L.NeBot typeclass via by_cases; generalize finprod_nonneg."}
+{"cid": "p0003", "is_ask": "ask", "family": "F6", "grain": "declaration", "note": "Add a HasProd version per file convention."}
+{"cid": "p0004", "is_ask": "ask", "family": "F6", "grain": "declaration", "note": "Add alias for reverse implication, or drop the iff lemma."}
+{"cid": "p0005", "is_ask": "ask", "family": "F7", "grain": "declaration", "note": "State for any UFD / normalization monoid rather than Int only."}
+{"cid": "p0006", "is_ask": "ask", "family": "F4", "grain": "declaration", "note": "Generate the def lemma with mk_iff."}
+{"cid": "p0007", "is_ask": "ask", "family": "F2", "grain": "declaration_group", "note": "Use section variable {D : ℤ} instead of per-declaration binders."}
+{"cid": "p0008", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "Rename isMulCommutative_mono to isMulCommutative_anti."}
+{"cid": "p0009", "is_ask": "ask", "family": "F9", "grain": "line", "note": "Remove the added import."}
+{"cid": "p0010", "is_ask": "ask", "family": "F8", "grain": "declaration_group", "note": "left/right suffixes swapped relative to library convention."}
+{"cid": "p0011", "is_ask": "ask", "family": "F4", "grain": "declaration_group", "note": "Add to_additive to both lemmas and the private lemma."}
+{"cid": "p0012", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "Name private lemma ..._of_normal instead of a prime."}
+{"cid": "p0013", "is_ask": "ask", "family": "F10", "grain": "line", "note": "Module doc title typo fix."}
+{"cid": "p0014", "is_ask": "ask", "family": "F2", "grain": "declaration", "note": "Give map_id/map_comp arguments a by cat_disch default."}
+{"cid": "p0015", "is_ask": "ask", "family": "F2", "grain": "declaration_group", "note": "Extends the cat_disch default request to later definitions."}
+{"cid": "p0016", "is_ask": "ask", "family": "F8", "grain": "declaration", "note": "Rename mkHom to homMk."}

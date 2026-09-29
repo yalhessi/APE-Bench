@@ -1,0 +1,400 @@
+{
+ "asks": [
+  {
+   "pr": 30458,
+   "ask_id": "v0060",
+   "R1": "partial",
+   "R1_finding": 6,
+   "R2": "partial",
+   "R2_finding": 7,
+   "R3": "partial",
+   "R3_finding": 8,
+   "R4": "partial",
+   "R4_finding": 9,
+   "note": "All flag redundant section/variable structure; none drops the subsections for `variable [...] in` as asked. R2/R3 do collect common variables."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0061",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "partial",
+   "R2_finding": 7,
+   "R3": "partial",
+   "R3_finding": 8,
+   "R4": "partial",
+   "R4_finding": 9,
+   "note": "Same as v0060 for the right-cancel section; R1 only moves the trailing block, and its DivInvMonoid finding is a different issue."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0062",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 4,
+   "R3": "reached",
+   "R3_finding": 4,
+   "R4": "reached",
+   "R4_finding": 6,
+   "note": "All say the original term proof of card_le_card_div_left still compiles; revert."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0063",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 5,
+   "R3": "reached",
+   "R3_finding": 5,
+   "R4": "reached",
+   "R4_finding": 7,
+   "note": "All say the original proof of card_le_card_div_right still compiles; revert."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0090",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "Ask is a @[grind] attribute; findings only replace the grind proof for speed."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0091",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "Ask is a @[grind] attribute on inv_intCast_den_of_pos; findings only rewrite its proof."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0092",
+   "R1": "partial",
+   "R1_finding": 2,
+   "R2": "partial",
+   "R2_finding": 2,
+   "R3": "partial",
+   "R3_finding": 2,
+   "R4": "partial",
+   "R4_finding": 2,
+   "note": "Findings rework the simp only/exact tail (rw chains, full rewrite), not into `simpa using`."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0093",
+   "R1": "partial",
+   "R1_finding": 6,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "R1 targets the same simp-at-h/exact step but adds coe_le_coe instead of `simpa using h`; others silent on Portmanteau."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0094",
+   "R1": "partial",
+   "R1_finding": 5,
+   "R2": "partial",
+   "R2_finding": 3,
+   "R3": "partial",
+   "R3_finding": 3,
+   "R4": "partial",
+   "R4_finding": 4,
+   "note": "All replace the have/simp only/exact with rw or conv chains, not the suggested `simpa [this] using`."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0095",
+   "R1": "partial",
+   "R1_finding": 4,
+   "R2": "partial",
+   "R2_finding": 4,
+   "R3": "partial",
+   "R3_finding": 4,
+   "R4": "partial",
+   "R4_finding": 3,
+   "note": "Measure version: same as v0094, rw chains rather than simpa."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0105",
+   "R1": "partial",
+   "R1_finding": 5,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "R1 shortens exists_infinite_fiber via a new regular-cardinal lemma, not a one-liner from infinite_pigeonhole_card_lt; others golf other lemmas."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0106",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 5,
+   "R3": "reached",
+   "R3_finding": 3,
+   "R4": "reached",
+   "R4_finding": 5,
+   "note": "All ask for `[Infinite β]` instance binder on exists_infinite_fiber."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0107",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 5,
+   "R3": "reached",
+   "R3_finding": 4,
+   "R4": "reached",
+   "R4_finding": 5,
+   "note": "All ask for `[Uncountable β]` instance binder on exists_uncountable_fiber."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0108",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 5,
+   "R3": "reached",
+   "R3_finding": 3,
+   "R4": "reached",
+   "R4_finding": 5,
+   "note": "All ask for `[Infinite α]` instance binder on exists_infinite_fiber'."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0109",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "R3": "reached",
+   "R3_finding": 0,
+   "R4": "reached",
+   "R4_finding": 0,
+   "note": "All fix 'domain's' to 'codomain's' in infinite_pigeonhole_card_lt docstring; R1/R3 keep 'but' rather than 'and'."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0110",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 1,
+   "R3": "reached",
+   "R3_finding": 1,
+   "R4": "reached",
+   "R4_finding": 1,
+   "note": "All fix the same error in exists_infinite_fiber and exists_uncountable_fiber docstrings (findings 1 and 2)."
+  },
+  {
+   "pr": 41930,
+   "ask_id": "p0000",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Both reviewers returned no findings."
+  },
+  {
+   "pr": 42184,
+   "ask_id": "p0002",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "Both drop [L.NeBot] by splitting on L.NeBot, handling bot via tprod_bot and finprod_induction."
+  },
+  {
+   "pr": 42184,
+   "ask_id": "p0003",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding asks for a HasProd version."
+  },
+  {
+   "pr": 42814,
+   "ask_id": "p0004",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Findings only golf the proof; none asks for an alias of the reverse implication."
+  },
+  {
+   "pr": 42814,
+   "ask_id": "p0005",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "Findings only golf the proof; none asks for a UFD/normalization-monoid generalisation."
+  },
+  {
+   "pr": 42814,
+   "ask_id": "p0006",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding mentions mk_iff for isFundamentalDiscr_def."
+  },
+  {
+   "pr": 42814,
+   "ask_id": "p0007",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding asks for a `variable {D : ℤ}` section variable."
+  },
+  {
+   "pr": 43024,
+   "ask_id": "p0008",
+   "R1": "partial",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "R2 renames to isMulCommutative_anti; R1 agrees _mono is wrong but proposes isMulCommutative_of_le."
+  },
+  {
+   "pr": 43167,
+   "ask_id": "p0009",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "note": "Both delete the unused Commutator.Basic import from Pointwise.lean."
+  },
+  {
+   "pr": 43167,
+   "ask_id": "p0010",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding says left/right are swapped in commutator_sup_left/right names."
+  },
+  {
+   "pr": 43167,
+   "ask_id": "p0011",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 1,
+   "note": "Both add @[to_additive] to commutator_sup_left, the private helper and commutator_sup_right (R1 via findings 1 and 2)."
+  },
+  {
+   "pr": 43167,
+   "ask_id": "p0012",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "note": "No finding renames the primed helper; R1 deletes it via a new proof, R2 generalises the main lemma."
+  },
+  {
+   "pr": 43192,
+   "ask_id": "p0013",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 6,
+   "note": "Both add the missing 'of' in the module docstring title."
+  },
+  {
+   "pr": 43192,
+   "ask_id": "p0014",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 5,
+   "note": "Both add `:= by cat_disch` defaults to map_id and map_comp of mk."
+  },
+  {
+   "pr": 43192,
+   "ask_id": "p0015",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "reached",
+   "R2_finding": 4,
+   "note": "Both add the cat_disch default to mkHom's naturality argument, a definition below."
+  },
+  {
+   "pr": 43192,
+   "ask_id": "p0016",
+   "R1": "reached",
+   "R1_finding": 2,
+   "R2": "reached",
+   "R2_finding": 3,
+   "note": "Both rename mkHom to homMk."
+  }
+ ],
+ "unmatched": {
+  "30458": {
+   "R1": 8,
+   "R2": 8,
+   "R3": 8,
+   "R4": 10
+  },
+  "32875": {
+   "R1": 7,
+   "R2": 6,
+   "R3": 5,
+   "R4": 5
+  },
+  "34091": {
+   "R1": 2,
+   "R2": 5,
+   "R3": 4,
+   "R4": 2
+  },
+  "41930": {
+   "R1": 0,
+   "R2": 0
+  },
+  "42184": {
+   "R1": 1,
+   "R2": 2
+  },
+  "42814": {
+   "R1": 7,
+   "R2": 6
+  },
+  "43024": {
+   "R1": 1,
+   "R2": 0
+  },
+  "43167": {
+   "R1": 3,
+   "R2": 4
+  },
+  "43192": {
+   "R1": 5,
+   "R2": 4
+  }
+ }
+}
