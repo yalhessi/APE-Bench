@@ -136,13 +136,15 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
         work_unit_id=probe, change_ids=[], entity_ids_by_change={},
         primary_subjects_by_change={}, rendered_system_prompt="", rendered_user_prompt="",
         rendered_prompt_sha256="")
-    task.target_workspace = _target_workspace(task.data, overlay, base, episode)
+    # Before the workspace is resolved: the restore manager logs through it, and without one it
+    # prints to stdout, which is where `cli tool` writes its JSON.
+    task.logger = create_logger(log_file=workdir / "toolbox.log", to_console=False)
+    task.target_workspace = _target_workspace(task.data, overlay, base, episode, task.logger)
     task.scratch_workspace = None
     # The file tools resolve `target/...` against the directory that holds the workspaces, as
     # an attempt directory holds `target/` in a run.
     task.workspaces_dir = workdir
     task.config = scaffold
-    task.logger = create_logger(log_file=workdir / "toolbox.log", to_console=False)
 
     mcp = _CapturingMCP()
     register_context_tools(task, mcp)
@@ -153,7 +155,7 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
 
 
 def _target_workspace(data: Any, overlay: Path, base: Path,
-                      episode: ReviewEpisodeInput) -> Any:
+                      episode: ReviewEpisodeInput, logger: Any) -> Any:
     """The reviewed workspace linked at `overlay` when one is built, else the source-only overlay.
 
     The same call `review/base.py::setup_attempt` makes, so a probe compiles where an arm would.
@@ -169,13 +171,15 @@ def _target_workspace(data: Any, overlay: Path, base: Path,
     if stale:
         spec = data.target_workspace.model_copy(
             update={"commit_hash": reviewed_workspace_key(episode.base_sha, episode.diff)})
-        if asyncio.run(ReviewPRCoreTask._maybe_resolve_cached_workspace(spec)) is not None:
+        if asyncio.run(ReviewPRCoreTask._maybe_resolve_cached_workspace(
+                spec, logger=logger)) is not None:
             raise RuntimeError(
                 f"{overlay} is a source-only overlay from an earlier call, and a reviewed "
                 f"workspace ({spec.commit_hash}) exists for PR {episode.pr_number}. Use a new "
                 "--workdir, so the tools compile against the reviewed workspace.")
         return data.target_workspace
-    reviewed = asyncio.run(ReviewPRCoreTask._maybe_setup_reviewed_target_workspace(data, overlay))
+    reviewed = asyncio.run(ReviewPRCoreTask._maybe_setup_reviewed_target_workspace(
+        data, overlay, logger=logger))
     if reviewed is not None:
         return reviewed
     asyncio.run(ReviewPRCoreTask.prepare_reviewed_sources(

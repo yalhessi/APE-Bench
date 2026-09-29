@@ -90,3 +90,28 @@ def test_it_refuses_a_stale_overlay_where_a_reviewed_workspace_exists(tmp_path):
     with pytest.raises(RuntimeError, match="source-only overlay from an earlier call"):
         workbench(episode, tmp_path / "work", VAL_CONFIG)
 
+
+def test_the_cli_prints_only_its_json_when_it_resolves_a_reviewed_workspace(tmp_path):
+    """The far end a probe reads is `cli tool`'s stdout. Resolving the reviewed workspace with no
+    logger printed the restore manager's INFO lines there, ahead of the JSON (2026-09-29)."""
+
+    import json
+    import os
+    import subprocess
+    import sys
+
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
+
+    episode = next(e for e in load_jsonl(VAL_EPISODES, ReviewEpisodeInput) if e.pr_number == 30458)
+    if snapshot_workspace(reviewed_workspace_key(episode.base_sha, episode.diff)) is None:
+        pytest.skip("needs PR 30458's reviewed workspace under data/code_execute/")
+    out = subprocess.run(
+        [sys.executable, "-m", "src.mathlib_review.review.cli", "tool", "list",
+         "--episodes", str(VAL_EPISODES), "--pr", "30458", "--workdir", str(tmp_path / "work"),
+         "--run-config", str(VAL_CONFIG)],
+        capture_output=True, text=True, check=True,
+        env={**os.environ, "PYTHONPATH": os.pathsep.join(["src", os.environ.get("PYTHONPATH", "")])})
+    assert "lean_verify_edit" in json.loads(out.stdout)
+    assert (tmp_path / "work" / "target").is_symlink()
+
