@@ -17,6 +17,7 @@ extractor refuses a test-set PR, as the one it replaces did.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
@@ -442,3 +443,239 @@ def log_call(log: Path, stamp: str, tool: str, args: str, out: Path, status: int
         row["result_chars"] = len(json.dumps(result, ensure_ascii=False))
     with open(log, "a") as fh:
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+# --- Matching -----------------------------------------------------------------------------------
+#: A matcher sees a finding as these four fields and nothing else.
+KEEP = ("target", "claim", "requested_change", "severity")
+_REDACT = [(re.compile(r"\bpass \d(?:'s)?\s+"), ""), (re.compile(r"\bc\d{1,3}\b"), "a compiled check")]
+MATCHER_RUBRIC = Path("results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/matcher_rubric.md")
+
+
+def redact(text):
+    """Remove the construction conditions' cues ("pass 3's", "c12") from a finding's text."""
+    if not isinstance(text, str):
+        return text
+    for pattern, repl in _REDACT:
+        text = pattern.sub(repl, text)
+    return text
+
+
+class Source(BaseModel):
+    """Where one session label's findings come from.
+
+    `claude`: a packet's `findings.json` (the label is the session directory's name);
+    `solo`: a `cli run` solo run's task results; `lead`: a lead run's `findings.jsonl`, all channels.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["claude", "solo", "lead"]
+    run: Optional[str] = None
+
+
+def _claude(spec: ProbeSet, pr: int, session: str):
+    d = spec.session_dir(pr, session)
+    found = json.loads((d / "findings.json").read_text())
+    calls = [json.loads(l) for l in (d / "calls.jsonl").read_text().splitlines() if l.strip()]
+    return found, {"findings": len(found), "compiles": sum(c["tool"] == "lean_verify_edit" for c in calls)}
+
+
+def _solo_compiles(run: str) -> Dict[int, Dict[str, int]]:
+    """Compile calls per PR from the trajectory reader. The solo grant holds `lean_verify` beside
+    `lean_verify_edit`, and both count; the split is kept."""
+
+    from src.mathlib_review.analysis.trajectory import extract
+
+    calls = {}
+    for inv in extract(run)["invocations"]:
+        row = inv if isinstance(inv, dict) else inv.__dict__
+        counts = row.get("tool_calls") or {}
+        calls[int(row["pr_number"])] = {
+            "lean_verify_edit": sum(v for k, v in counts.items() if k.endswith("lean_verify_edit")),
+            "lean_verify": sum(v for k, v in counts.items() if k.endswith("lean_verify"))}
+    return calls
+
+
+def _solo(run: str) -> Dict[int, tuple]:
+    import asyncio
+
+    from ape.orchestration.persistence import TaskStorage
+
+    compiles = _solo_compiles(run)
+
+    async def load():
+        out = {}
+        tasks = Path(".ape/runs") / run / "tasks"
+        for task_dir in sorted(p for p in tasks.iterdir() if p.is_dir()):
+            storage = TaskStorage(task_dir, task_dir.name)
+            samples = await storage.load_all_samples()
+            result = await storage.load_task_result()
+            for _i, sample in sorted(samples.items()):
+                if sample.successful_attempt is None or not result or not result.get("success"):
+                    continue
+                pr = int(result["pr_number"])
+                found = [{"target": f"{(f.get('anchor') or {}).get('path')}:{(f.get('anchor') or {}).get('line_start')}",
+                          "claim": f.get("claim"), "requested_change": f.get("suggested_fix"),
+                          "severity": f.get("severity")} for f in result.get("findings") or []]
+                split = compiles.get(pr, {"lean_verify_edit": -1, "lean_verify": -1})
+                out[pr] = (found, {"findings": len(found),
+                                   "compiles": split["lean_verify_edit"] + split["lean_verify"],
+                                   "compile_split": split})
+                break
+        return out
+
+    return asyncio.run(load())
+
+
+def change_locations(spec: ProbeSet, pr: int) -> Dict[str, str]:
+    """{change_id: "path:line"}: the reviewed span of a change's first range, where the pipeline
+    anchors a finding."""
+
+    for line in (spec.release / "derived/change_graphs.jsonl").read_text().splitlines():
+        g = json.loads(line)
+        if g["pr_number"] != pr:
+            continue
+        ranges = {r["range_id"]: r for r in g["changed_ranges"]}
+        return {t["change_id"]: f"{ranges[t['changed_range_ids'][0]]['path']}:"
+                                f"{(ranges[t['changed_range_ids'][0]].get('reviewed_span') or {}).get('line_start')}"
+                for t in g["targets"]}
+    return {}
+
+
+def _lead(spec: ProbeSet, run: str) -> Dict[int, tuple]:
+    by_pr: Dict[int, List[Dict[str, Any]]] = {}
+    for l in (Path("results/pr_review_v5/runs") / run / "findings.jsonl").read_text().splitlines():
+        if l.strip():
+            by_pr.setdefault(json.loads(l)["pr_number"], []).append(json.loads(l))
+    out = {}
+    for pr in spec.pr_numbers:
+        where = change_locations(spec, pr)
+        found, published = [], []
+        for n, f in enumerate(by_pr.get(pr, [])):
+            found.append({"target": where[f["primary_change_id"]], "claim": f.get("claim"),
+                          "requested_change": f.get("requested_change"), "severity": f.get("severity")})
+            if f.get("admission") == "published":
+                published.append(n)
+        out[pr] = (found, {"findings": len(found), "published": published})
+    return out
+
+
+def ask_packet(feedback: Dict[str, Any], cids: List[str]) -> List[Dict[str, Any]]:
+    """What a matcher sees of each ask: the comment, the code it is attached to, what it answers."""
+
+    rows = {r["cid"]: r for r in feedback["rows"]}
+    packet = []
+    for cid in cids:
+        r = rows[cid]
+        parent = rows.get(r["reply_to_cid"]) if r.get("reply_to_cid") else None
+        packet.append({"ask_id": cid, "path": r["path"], "code_at_comment": r["diff_hunk"],
+                       "comment": r["body"], "replies_to": parent["body"] if parent else None})
+    return packet
+
+
+def seal_labels(prs: List[int], sessions: List[str]) -> Dict[str, Dict[str, str]]:
+    """A fresh blinding: per PR, the sessions shuffled to R1..Rn."""
+
+    import secrets
+
+    seal = {}
+    for pr in prs:
+        pool, order = list(sessions), []
+        while pool:
+            order.append(pool.pop(secrets.randbelow(len(pool))))
+        seal[str(pr)] = {f"R{i + 1}": s for i, s in enumerate(order)}
+    return seal
+
+
+def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
+                 seal: Dict[str, Dict[str, str]], sources: Dict[str, Source], out: Path) -> Dict[str, Any]:
+    """Blind inputs: per sealed PR, its asks and every session's findings under its shuffled label.
+
+    Findings are stripped to `KEEP` with cues redacted. A finding without a target is refused, since
+    a matcher would judge it without a location (test (b)'s solo findings reached the matchers as
+    `None:None` until 2026-09-29).
+    """
+
+    out.mkdir(parents=True, exist_ok=True)
+    used = {s for labels in seal.values() for s in labels.values()}
+    missing = used - set(sources)
+    if missing:
+        raise ValueError(f"no source for sessions {sorted(missing)}")
+    loaded = {s: (_solo(sources[s].run) if sources[s].kind == "solo" else _lead(spec, sources[s].run))
+              for s in used if sources[s].kind != "claude"}
+    stats: Dict[str, Dict[str, Any]] = {}
+    for pr, labels in seal.items():
+        write_json(out / f"asks_pr{pr}.json", ask_packet(feedback, asks["asks"][pr]))
+        for label, session in labels.items():
+            if sources[session].kind == "claude":
+                found, st = _claude(spec, int(pr), session)
+            else:
+                if int(pr) not in loaded[session]:
+                    raise ValueError(f"{session} has no successful session for PR {pr}")
+                found, st = loaded[session][int(pr)]
+            stats.setdefault(pr, {})[session] = st
+            stripped = [{"i": n, **{k: redact(f.get(k)) for k in KEEP}} for n, f in enumerate(found)]
+            lost = [f["i"] for f in stripped if not f["target"] or str(f["target"]).startswith("None")]
+            if lost:
+                raise ValueError(f"{session} on PR {pr}: findings {lost} have no target")
+            write_json(out / f"{label}_pr{pr}.json", stripped)
+    write_json(out / "session_stats.json", stats)
+    return stats
+
+
+def condition(session: str) -> str:
+    """A session label's condition: the label without its trailing digits (X1 -> X, Gr2 -> Gr)."""
+    return session.rstrip("0123456789")
+
+
+def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict[str, Dict[str, Any]],
+            stats: Dict[str, Any], scope: Optional[set] = None) -> Dict[str, Any]:
+    """Per matcher: each session's reach (asks reached / asks), each condition's mean, the asks every
+    session of a condition reached (stable) and any reached (union), a lead session's reach counting
+    only published findings, and the per-ask table; and the matchers' agreement.
+
+    `scope`, a set of families, restricts every figure to the asks in them. Reading rules are
+    each probe's own, stated in its README before its runs; this computes what they read.
+    """
+
+    items = [(pr, cid) for pr in seal for cid in asks["asks"][pr]
+             if scope is None or asks["families"].get(cid) in scope]
+    sessions = sorted({s for labels in seal.values() for s in labels.values()})
+    out: Dict[str, Any] = {"asks": len(items)}
+    cells_by = {}
+    for m, d in matches.items():
+        cells = {(str(a["pr"]), a["ask_id"], s): (a.get(label), a.get(f"{label}_finding"))
+                 for a in d["asks"] for label, s in seal[str(a["pr"])].items()}
+        cells_by[m] = cells
+
+        def hit(pr, cid, s, published=False):
+            value, i = cells.get((pr, cid, s), (None, None))
+            return value == "reached" and (not published or i in stats[pr][s].get("published", []))
+
+        reach = {s: (sum(hit(pr, cid, s) for pr, cid in items) / len(items)) if items else None
+                 for s in sessions}
+        conds: Dict[str, List[str]] = {}
+        for s in sessions:
+            conds.setdefault(condition(s), []).append(s)
+        out[m] = {
+            "reach": reach,
+            "condition_reach": {c: sum(reach[s] for s in ss) / len(ss) for c, ss in conds.items()},
+            "stable": {c: sorted(cid for pr, cid in items if all(hit(pr, cid, s) for s in ss))
+                       for c, ss in conds.items()},
+            "union": {c: sorted(cid for pr, cid in items if any(hit(pr, cid, s) for s in ss))
+                      for c, ss in conds.items()},
+            "published_reach": {s: sum(hit(pr, cid, s, True) for pr, cid in items) / len(items)
+                                for s in sessions if items and any("published" in stats[pr].get(s, {})
+                                                                   for pr in seal)},
+            "table": {cid: {s: cells.get((pr, cid, s), (None,))[0] for s in sessions}
+                      for pr, cid in items},
+        }
+    names = list(matches)
+    if len(names) == 2:
+        a, b = cells_by[names[0]], cells_by[names[1]]
+        keys = [(pr, cid, s) for pr, cid in items for s in sessions]
+        out["agreement"] = {"cells": len(keys),
+                            "three_valued": sum(a.get(k, (None,))[0] == b.get(k, (None,))[0] for k in keys),
+                            "reached_or_not": sum((a.get(k, (None,))[0] == "reached") == (b.get(k, (None,))[0] == "reached")
+                                                  for k in keys)}
+    return out

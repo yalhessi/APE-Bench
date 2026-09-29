@@ -133,3 +133,62 @@ def test_the_logger_writes_the_row_the_old_script_did(tmp_path):
     subprocess.run([sys.executable, str(DEMO_DIR / "bin/log_call.py"), str(tmp_path / "old.jsonl"),
                     "1-2", "lean_verify_edit", '{"path": "x"}', str(out), "1"], check=True)
     assert (tmp_path / "new.jsonl").read_bytes() == (tmp_path / "old.jsonl").read_bytes()
+
+
+G52_DIR = Path("results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29")
+#: Digests of the matcher inputs the committed matchings judged, rebuilt by this harness and checked
+#: byte-for-byte against those inputs on 2026-09-29.
+MATCH_INPUT_DIGESTS = {
+"blinding_SEALED.json": "6b3086faec3e65c8e393e602d8a60f677f35d5db3cf308ee546002f58168bb55",
+"blinding_arms_SEALED.json": "14b4794fa6255a2cbc482b436e71564d720f1d1836db114b5db9b71741b72fdc",
+"blinding_calib_SEALED.json": "d3ab7faadd7800772125d1adcb08db3dc7920a24eea73935f2f5a2ffe2ead98c",
+}
+PASS34 = {"F1", "F2", "F3", "F4", "F5", "F6", "F7"}
+
+
+def _sources():
+    solo = lambda run: probes.Source(kind="solo", run=run)
+    return {"G1": solo("probe_postcutoff_gpt52_G_rep1"), "G2": solo("probe_postcutoff_gpt52_G_rep2"),
+            "K1": solo("probe_postcutoff_gpt52_K_rep1"), "K2": solo("probe_postcutoff_gpt52_K_rep2"),
+            "X1": probes.Source(kind="claude"), "X2": probes.Source(kind="claude"),
+            "L1": probes.Source(kind="lead", run="probe_postcutoff_lead_rep1"),
+            "L2": probes.Source(kind="lead", run="probe_postcutoff_lead_rep2"),
+            "Hc": solo("probe_postcutoff_gpt52_Gr_calib2"), "Mc": solo("probe_postcutoff_gpt52_Gm_calib")}
+
+
+@pytest.mark.parametrize("seal_name", sorted(MATCH_INPUT_DIGESTS))
+def test_the_committed_matchings_inputs_rebuild(seal_name, tmp_path):
+    feedback, asks = json.loads(POST.feedback_file.read_text()), json.loads(POST.asks_file.read_text())
+    probes.match_inputs(POST, feedback, asks, json.loads((G52_DIR / seal_name).read_text()), _sources(), tmp_path)
+    h = hashlib.sha256()
+    for p in sorted(tmp_path.iterdir()):
+        h.update(p.name.encode())
+        h.update(p.read_bytes())
+    assert h.hexdigest() == MATCH_INPUT_DIGESTS[seal_name]
+
+
+@pytest.mark.parametrize("seal_name, match_dir, expected, published", [
+    ("blinding_SEALED.json", "match_rematch", {"G": 0.125, "K": 0.0625, "X": 0.46875}, {}),
+    ("blinding_arms_SEALED.json", "match_arms", {"G": 0.125, "L": 0.125, "X": 0.46875},
+     {"L1": 0.0, "L2": 0.0}),
+    ("blinding_calib_SEALED.json", "match_calib", {"G": 0.25, "Hc": 0.75, "Mc": 0.25, "X": 1.0}, {}),
+])
+def test_the_committed_readings_recompute(seal_name, match_dir, expected, published):
+    asks = json.loads(POST.asks_file.read_text())
+    seal = json.loads((G52_DIR / seal_name).read_text())
+    matches = {m: json.loads((G52_DIR / match_dir / f"matches.{m}.json").read_text()) for m in ("1", "2")}
+    stats = json.loads((G52_DIR / match_dir / "session_stats.json").read_text())
+    got = probes.unblind(asks, seal, matches, stats)
+    for m in ("1", "2"):
+        assert got[m]["condition_reach"] == pytest.approx(expected)
+        assert got[m]["published_reach"] == published
+    assert got["agreement"]["three_valued"] == got["agreement"]["cells"]
+    in_scope = probes.unblind(asks, seal, matches, stats, scope=PASS34)
+    if seal_name == "blinding_SEALED.json":
+        assert in_scope["asks"] == 9 and in_scope["1"]["condition_reach"]["X"] == pytest.approx(4 / 9)
+
+
+def test_a_session_without_a_source_is_refused(tmp_path):
+    seal = {"43192": {"R1": "Z1"}}
+    with pytest.raises(ValueError, match="no source"):
+        probes.match_inputs(POST, {"rows": []}, {"asks": {"43192": []}}, seal, {}, tmp_path)
