@@ -27,31 +27,42 @@ def redact(text):
     return text
 
 
-def compile_calls(attempt: Path) -> int:
-    """lean_verify_edit calls in the attempt's last (cumulative) conversation file."""
-    files = sorted((attempt / "conversations").glob("*.json")) if (attempt / "conversations").is_dir() else []
-    if not files:
-        return -1
-    text = files[-1].read_text(encoding="utf-8")
-    return len(re.findall(r'"name":\s*"[^"]*lean_verify_edit"', text))
+def compile_calls(run: str) -> dict:
+    """{pr_number: compile calls} for a run, from the project's trajectory reader. The solo grant
+    holds `lean_verify` (compile given Lean text) beside `lean_verify_edit`; Claude's harness held
+    only the latter, so both count as a compile here, and the split is reported separately."""
+    from src.mathlib_review.analysis.trajectory import extract
+
+    calls = {}
+    for inv in extract(run)["invocations"]:
+        row = inv if isinstance(inv, dict) else inv.__dict__
+        counts = row.get("tool_calls") or {}
+        calls[int(row["pr_number"])] = {
+            "lean_verify_edit": sum(v for k, v in counts.items() if k.endswith("lean_verify_edit")),
+            "lean_verify": sum(v for k, v in counts.items() if k.endswith("lean_verify"))}
+    return calls
 
 
 async def solo_sessions(run: str):
     """{pr_number: (findings as the matcher sees them, stats)} for one solo run."""
     out = {}
+    compiles = compile_calls(run)
     tasks = Path(".ape/runs") / run / "tasks"
     for task_dir in sorted(p for p in tasks.iterdir() if p.is_dir()):
-        samples = await TaskStorage(task_dir, task_dir.name).load_all_samples()
+        storage = TaskStorage(task_dir, task_dir.name)
+        samples = await storage.load_all_samples()
+        result = await storage.load_task_result()
         for _i, sample in sorted(samples.items()):
             attempt = sample.successful_attempt
-            if attempt is None:
+            if attempt is None or not result or not result.get("success"):
                 continue
-            result = json.loads((Path(attempt.path) / "task_result.json").read_text(encoding="utf-8"))
             pr = int(result["pr_number"])
             found = [{"target": f"{f.get('path')}:{f.get('line_start')}", "claim": f.get("claim"),
                       "requested_change": f.get("suggested_fix"), "severity": f.get("severity")}
                      for f in result.get("findings") or []]
-            out[pr] = (found, {"findings": len(found), "compiles": compile_calls(Path(attempt.path))})
+            split = compiles.get(pr, {"lean_verify_edit": -1, "lean_verify": -1})
+            out[pr] = (found, {"findings": len(found), "compiles": split["lean_verify_edit"] + split["lean_verify"],
+                               "compile_split": split})
             break
     return out
 
