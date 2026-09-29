@@ -1,0 +1,10 @@
+# The dev set: the 16 PRs of dev-medium-0.3.0, created 2025-12-18..31. Every v5 design was tuned on
+# it, so pipeline numbers here are in-sample; Claude may have seen these PRs. It is not a sealed draw,
+# so its round-1 episodes come from the release's own episode list.
+name: dev_medium_0_3_0
+release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+dataset_config: configs/pr_review_v5_dev_medium_0_3_0.yaml
+pr_numbers: [33057, 33066, 33098, 33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421, 33438]
+feedback: {prs_of_release: true}
+cid_prefix: d
+probe_dir: results/pr_review_v5/probes/model-gap-dev-medium-0.3.0

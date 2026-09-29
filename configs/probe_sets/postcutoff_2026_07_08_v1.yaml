@@ -1,0 +1,10 @@
+# The post-cutoff set: 10 PRs created 2026-07..08, after both reviewers' training data. The probe was
+# run here first (results/pr_review_v5/probes/postcutoff-2026-09-29), so its committed artifacts are
+# the harness's regression target.
+name: postcutoff_2026_07_08_v1
+release: inputs/probes/probe-2026-07-08-v1
+dataset_config: configs/pr_review_v5_probe_2026_07_08_v1.yaml
+pr_numbers: [41271, 41280, 41314, 41930, 42184, 42238, 42814, 43024, 43167, 43192]
+feedback: {draw: probe-2026-07-08-v1}
+cid_prefix: p
+probe_dir: results/pr_review_v5/probes/postcutoff-2026-09-29
