@@ -1,0 +1,34 @@
+{
+  "ai_candidate_factor": 3.5,
+  "ai_shortfall": "incomplete",
+  "ai_size": 2,
+  "ai_target_cap": 60,
+  "created_from": "2026-07-01",
+  "created_to": "2026-08-31",
+  "definitions_version": "pull-request-definitions/2",
+  "frame_from": null,
+  "frame_version": "evaluation-frame/1",
+  "listing_window": [
+    "2024-03-01",
+    "2026-08-31"
+  ],
+  "main_candidate_factor": 2.0,
+  "main_size": 8,
+  "main_target_cap": 40,
+  "name": "probe-2026-07-08-v1",
+  "per_author_cap": 1,
+  "per_base_cap": 2,
+  "roster_path": "inputs/pull_requests/rosters/mathlib_roster_2026-09-11.txt",
+  "roster_sha256": "d7e9ea126ac22ca3a0179b93a0068285585b6120005cfcaae92bede449576b1a",
+  "rules": {
+    "ai": "AI-generated PRs are labelled, never excluded. The AI stratum is drawn from fetch-time evidence (label or description) and reported apart from the main stratum.",
+    "censoring": "PRs still open at the 2026-09-11 listing walk are outside the frame.",
+    "closed_unmerged": "Kept, with the count reported. 'Abandoned' cannot be told from 'rejected' or 'superseded' without gold.",
+    "order": "Within a stratum, candidates are walked in sha256(seed \\0 pr_number) order; the walk stops at the first candidate without tier 2 or base files, and never skips it.",
+    "replacement": "An accepted episode whose reviewed state does not compile (prebuild --reviewed fails on a Lean error in a changed file) is replaced by continuing its stratum's walk, and each replacement is recorded with its error.",
+    "roster": "One dated roster for every month.",
+    "size_gates": "The funnel's final-state gates (1..30 files, 10..800 lines) bound the frame; they are not strata."
+  },
+  "seed": "probe-2026-07-08-v1",
+  "store_content_sha256": "894e5b9355978b67b64b36ac84ab34308caf306839ff754f4e06d6fe358f1055"
+}
