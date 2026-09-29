@@ -240,3 +240,205 @@ def agreed_asks(feedback: Dict[str, Any], labels_a: Dict[str, Dict[str, Any]],
                labels_a[c]["family"] if labels_a[c]["family"] == labels_b[c]["family"] else "split")
            for c in agreed if rows[c]["pr"] in set(prs)}
     return {"asks": asks, "families": fam, "controls": [pr for pr in prs if not asks[str(pr)]]}
+
+
+# --- Packets ------------------------------------------------------------------------------------
+#: The generalist checklist brief every Claude control session has had (the construction
+#: demonstration's X condition, `SYSTEM_PROMPT_V12`'s checklist).
+BRIEF_X = Path("results/pr_review_v5/probes/construction-demo-2026-09-29/brief_X.md")
+PTOOL_TEMPLATE = """#!/usr/bin/env bash
+# ptool <tool>|list|describe ['<json arguments>'] -- one call to the pipeline's own review tools for
+# this PR, as an arm makes it (`cli tool`). The wrapper, not the reviewer, logs every call.
+set -o pipefail
+PR=__PR__; OUT=__OUT__; WORK=__WORK__; RAW=__RAW__
+cd __ROOT__ && export PYTHONPATH="$PWD/src" PATH="$HOME/.elan/bin:$PATH"
+stamp=$(date +%s%N)-$$
+mkdir -p "$RAW"
+ape/bin/python -m src.mathlib_review.review.cli tool "$1" \\
+  --episodes __EPISODES__ --pr "$PR" \\
+  --workdir "$WORK" --run-config __RUN_CONFIG__ \\
+  --arguments "${2:-}" > "$RAW/$stamp.out" 2> "$RAW/$stamp.err"
+status=$?
+ape/bin/python -m src.mathlib_review.review.cli probe log-call "$OUT/calls.jsonl" "$stamp" "$1" "${2:-}" "$RAW/$stamp.out" "$status"
+cat "$RAW/$stamp.out"
+[ $status -eq 0 ] || tail -5 "$RAW/$stamp.err" >&2
+exit $status
+"""
+#: What every Claude reviewer session has been told, verbatim; `{dir}` is its packet.
+SESSION_PROMPT = """You are one reviewer in a research study of Mathlib code review. Your working directory is `{dir}`.
+
+1. Read `brief.md` in that directory and do what it says. Its other inputs (`pr.md`, `model.md`, `diff.patch`) are in the same directory.
+2. Rules, which the study depends on:
+   - Read only files inside your working directory. Put any temporary file you need (a snippet, an arguments file) in `tmp/` inside your working directory, never in a shared scratch or temp folder.
+   - Call the review tools only through the `ptool` script in your working directory (start with `<dir>/ptool describe`). It handles its own paths, so run it by its absolute path from anywhere.
+   - Do not run git. Do not read or search any other path in the repository or on disk, including any Mathlib checkout. Do not use web search or web fetch. The tools show the PR as it stood at review time; anything else may show its future and would invalidate the study.
+   - Do not look for or read other reviewers' output.
+3. Write your outputs into your working directory as the brief specifies, as valid JSON, and check that each JSON file parses.
+
+When done, reply with one line: the number of findings you wrote."""
+
+
+def session_prompt(packet: Path) -> str:
+    return SESSION_PROMPT.format(dir=Path(packet).resolve())
+
+
+def render_models(release: Path, prs: List[int]) -> Dict[int, str]:
+    """Pass 0: each PR's model, from the release's input and derived files only, never gold.
+
+    `construction-demo-2026-09-29/build_model.py` as a function; it renders the same bytes.
+    """
+
+    from src.mathlib_review.agenda.components import build_components
+    from src.mathlib_review.io import load_jsonl
+    from src.mathlib_review.release.pr_relations import build_relations
+    from src.mathlib_review.schema import ChangeGraph, ReviewEpisodeInput
+
+    wanted = set(prs)
+    episodes = {e.pr_number: e for e in load_jsonl(release / "input/episodes.jsonl", ReviewEpisodeInput)
+                if e.pr_number in wanted}
+    graphs = [g for g in load_jsonl(release / "derived/change_graphs.jsonl", ChangeGraph)
+              if g.pr_number in wanted]
+    inventory = {}
+    for line in (release / "derived/modification_inventory.jsonl").read_text().splitlines():
+        row = json.loads(line)
+        if row["pr_number"] in wanted:
+            inventory[row["primary_change_id"]] = row
+    relations, _evidence = build_relations(graphs)
+    components = build_components(graphs, relations, episodes.values())
+
+    def text(value) -> str:
+        return (getattr(value, "text", None) or "") if value is not None else ""
+
+    def short(change_id: str) -> str:
+        return change_id.split(":", 1)[-1][:10]
+
+    out = {}
+    for graph in graphs:
+        pr = graph.pr_number
+        episode = episodes[pr]
+        name = {t.change_id: (t.declaration_name or f"{t.kind} in {t.path.split('/')[-1]}")
+                for t in graph.targets}
+        lines = [
+            f"# The PR model for #{pr} (pass 0)",
+            "",
+            "Built deterministically from the diff and the change graph, with no review text. Every "
+            "entry is a **fact** unless marked `hypothesis`; a hypothesis is a question to check, "
+            "not a premise. Not built, so not here: library candidates, the area's twin patterns "
+            "and conventions, and other open PRs. Construct what you need of those with the tools.",
+            "",
+            "## The PR",
+            "",
+            f"- title: {text(episode.title)}",
+            f"- description: {text(episode.description) or '(not recoverable at review start)'}",
+            f"- changed files: {', '.join(episode.changed_files)}",
+            "",
+            "## Objects",
+            "",
+        ]
+        removed = []
+        for t in sorted(graph.targets, key=lambda t: (t.path, t.change_id)):
+            inv = inventory.get(t.change_id, {})
+            lifecycle = inv.get("lifecycle") or ("added" if not (t.base_code or "").strip()
+                                                 else "removed" if not (t.reviewed_code or "").strip()
+                                                 else "modified")
+            changed = ", ".join(f"{d['component']}:{d['status']}" for d in inv.get("component_deltas", [])
+                                if d.get("status") != "unchanged") or "-"
+            kind = t.declaration_kind or t.kind
+            lines.append(f"### `{name[t.change_id]}` ({kind}, {lifecycle}) [{short(t.change_id)}]")
+            lines.append(f"- file: `{t.path}`; changed: {changed}")
+            if lifecycle == "removed":
+                removed.append(name[t.change_id])
+            if t.kind in ("declaration",) or lifecycle != "unchanged_context":
+                if (t.base_code or "").strip():
+                    lines += ["- before the PR:", "```lean", t.base_code.rstrip(), "```"]
+                if (t.reviewed_code or "").strip():
+                    lines += ["- as the PR leaves it:", "```lean", t.reviewed_code.rstrip(), "```"]
+            lines.append("")
+        lines += ["## Removed or renamed", ""]
+        lines += [f"- `{n}`" for n in removed] or ["- none"]
+        lines += ["", "## Families (declarations that may be one decision)", ""]
+        fams = [c for c in components if c.pr_number == pr and c.grain == "family"]
+        for c in fams:
+            lines.append(f"- [{c.evidence}] " + ", ".join(f"`{s}`" for s in c.subjects) + f" -- {c.reason}")
+        if not fams:
+            lines.append("- none found by the change graph")
+        lines += ["", "## Relations between changed declarations", ""]
+        rels = [r for r in relations if r.pr_number == pr]
+        for r in sorted(rels, key=lambda r: (r.relation_kind, name[r.source_change_id])):
+            related = ", ".join(f"`{name[c]}`" for c in r.related_change_ids if c in name)
+            lines.append(f"- {r.relation_kind} [{r.confidence}]: `{name[r.source_change_id]}` -> {related}")
+        if not rels:
+            lines.append("- none")
+        out[pr] = "\n".join(lines) + "\n"
+    return out
+
+
+def pr_markdown(episode: Dict[str, Any]) -> str:
+    title = episode["title"]["text"] if isinstance(episode["title"], dict) else episode["title"]
+    desc = (episode.get("description") or {}).get("text") or "(not recoverable at review start)"
+    return (f"# PR #{episode['pr_number']}: {title}\n\n## Description\n\n{desc}\n\n## Changed files\n\n"
+            + "\n".join(f"- `{c}`" for c in episode["changed_files"]) + "\n")
+
+
+def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optional[List[int]] = None,
+                  brief: Path = BRIEF_X, root: Optional[Path] = None) -> List[Path]:
+    """One packet per (PR, session): brief, PR text, diff, pass-0 model and the logging `ptool`.
+
+    A packet that already holds findings is refused: it is a finished session, and rewriting its
+    inputs would detach them from what it read.
+    """
+
+    root = Path(root or Path.cwd())
+    prs = list(prs or spec.pr_numbers)
+    models = render_models(spec.release, prs)
+    episodes = {json.loads(l)["pr_number"]: json.loads(l)
+                for l in (spec.release / "input/episodes.jsonl").read_text().splitlines()}
+    written = []
+    for pr in prs:
+        for session in sessions:
+            d = spec.probe_dir / f"pr{pr}" / session
+            if (d / "findings.json").exists():
+                raise FileExistsError(f"{d} is a finished session")
+            (d / "tmp").mkdir(parents=True, exist_ok=True)
+            (d / "brief.md").write_bytes(brief.read_bytes())
+            (d / "model.md").write_text(models[pr])
+            (d / "pr.md").write_text(pr_markdown(episodes[pr]))
+            (d / "diff.patch").write_text(episodes[pr]["diff"])
+            wrapper = (PTOOL_TEMPLATE.replace("__PR__", str(pr)).replace("__OUT__", str(root / d))
+                       .replace("__WORK__", str(scratch / f"work/pr{pr}/{session}"))
+                       .replace("__RAW__", str(scratch / f"raw/pr{pr}/{session}"))
+                       .replace("__ROOT__", str(root))
+                       .replace("__EPISODES__", str(spec.release / "input/episodes.jsonl"))
+                       .replace("__RUN_CONFIG__", str(spec.dataset_config)))
+            (d / "ptool").write_text(wrapper)
+            (d / "ptool").chmod(0o755)
+            written.append(d)
+    return written
+
+
+def log_call(log: Path, stamp: str, tool: str, args: str, out: Path, status: int) -> None:
+    """One compact row per tool call, written by the wrapper: what was asked and, for a compile,
+    what it returned. The raw output stays in the scratch directory.
+
+    `construction-demo-2026-09-29/bin/log_call.py`, as a function.
+    """
+
+    row: Dict[str, Any] = {"stamp": stamp, "tool": tool, "exit": int(status)}
+    try:
+        row["arguments"] = json.loads(args) if args else None
+    except ValueError:
+        row["arguments"] = args
+    try:
+        result = json.loads(Path(out).read_text())
+    except (ValueError, OSError):
+        result = None
+    if tool == "lean_verify_edit" and isinstance(result, dict):
+        row["result"] = {k: result.get(k) for k in ("mode", "success", "compiles") if k in result}
+        row["result"]["errors_introduced"] = len(result.get("errors_introduced_by_your_edit") or [])
+        row["result"]["errors_already"] = len(result.get("errors_already_in_the_file") or [])
+        row["result"]["environment_reviewed"] = str(result.get("environment", "")).startswith(
+            "Verified against the reviewed")
+    elif result is not None:
+        row["result_chars"] = len(json.dumps(result, ensure_ascii=False))
+    with open(log, "a") as fh:
+        fh.write(json.dumps(row, ensure_ascii=False) + "\n")

@@ -126,6 +126,12 @@ def build_parser() -> argparse.ArgumentParser:
                      help="how to read provider token accounting when pricing calls")
     _add_execute(run)
 
+    probe = sub.add_parser("probe", help="the reviewer-model probe on a set (analysis/probes.py)")
+    probe_sub = probe.add_subparsers(dest="probe_command", required=True)
+    log = probe_sub.add_parser("log-call", help="(the packet wrapper's) record one tool call")
+    for name in ("log", "stamp", "tool", "arguments", "out", "status"):
+        log.add_argument(name)
+
     judge = sub.add_parser("judge", help="score a generation run against gold")
     judge.add_argument("--config", type=Path, required=True)
     _add_set(judge)
@@ -505,6 +511,18 @@ def _report(args) -> int:
     return 0
 
 
+def _probe(args, logger) -> int:
+    from src.mathlib_review.analysis import probes
+
+    if args.probe_command == "log-call":
+        # Called by a packet's `ptool` after every tool call; its stdout is the reviewer's
+        # terminal, so it prints nothing.
+        probes.log_call(Path(args.log), args.stamp, args.tool, args.arguments, Path(args.out),
+                        int(args.status))
+        return 0
+    raise AssertionError(args.probe_command)
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     from ape.utils.config_loader import parse_cli_args
     from ape.utils.logging import create_logger
@@ -543,6 +561,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
     if args.command == "report":
         return _report(args)
+    if args.command == "probe":
+        return _probe(args, logger)
     if args.command == "tool":
         from src.mathlib_review.review.toolbox import main as tool_main
 
