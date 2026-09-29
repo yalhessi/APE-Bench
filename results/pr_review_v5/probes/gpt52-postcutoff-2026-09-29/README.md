@@ -132,6 +132,66 @@ agreement):
   at 3.8x the cost. It is untested here.
 - **Size:** 16 asks. The gap is large (0.12 against 0.47, 96/96 matcher agreement) but rests on 6 PRs.
 
+
+## Inspection (2026-09-29): where the difference comes from
+
+Read after the result, not pre-registered. `inspect_sessions.py` reproduces every count here.
+
+**A correction to the result above.** The tools were nearly the same, not the same. Claude's sessions
+had `file_search` (54 calls) and lacked `lean_verify`, `get_lean_goal`, `code_hover` and `code_goto`.
+The gap below survives removing `file_search` from Claude's counts.
+
+**The process, per session (mean over 12 sessions a condition).** A lookup is PR-side when it reads or
+searches a changed file or looks up a name the diff adds. A compile is a re-verification when 90% of
+its lines are the PR's own, a usage when it writes an `example`, and a variant otherwise.
+
+| | `gpt_5.2`, plain (G) | `gpt_5.2`, construction (K) | Claude (X) |
+|---|---|---|---|
+| review-tool calls | 10.9 | 14.2 | 38.1 |
+| PR-side lookups | 4.8 | 4.2 | 6.7 |
+| library-wide searches for the PR's own new names | 1.3 | 1.5 | 1.6 |
+| **lookups of anything else in the library** | **2.3** | **1.9** | **21.7** (17.2 without `file_search`) |
+| compiles: re-verification / usage / variant | 0.0 / 1.5 / 0.8 | 0.4 / 2.5 / 3.6 | 0.5 / 2.9 / 4.7 |
+
+1. **The largest difference is lookups of comparison objects: about ten to one, on every one of the six
+   PRs.** PR-side reading is about the same. The construction brief brought `gpt_5.2`'s variant
+   compiles close to Claude's (3.6 against 4.7) and left its library lookups where they were (1.9).
+2. **Per substantive ask, the misses are of two kinds.** The question is whether the comparison
+   evidence the maintainer cited ever reached `gpt_5.2`'s context (four sessions, G1, G2, K1, K2):
+   - *Never retrieved.* The `cat_disch` default arguments of the parent `PresheafOfModules` API
+     (`p0014`, `p0015`) and the `_anti` naming (`p0008`) reached no session. Claude read the parent
+     file, searched Zulip for the naming and compiled both variants.
+   - *In view and not raised.* The new lemmas' neighbours all carry `@[to_additive]` (`p0011`), in
+     view in 4 of 4 sessions. The PR's own file names the iso `isoMk` beside the hom `mkHom`
+     (`p0016`), in view in 3 of 4. A sibling lemma in the same file removes the filter's `NeBot` by
+     exactly the case split the maintainer asked for (`p0002`), in view in 2 of 4.
+3. **Every session stopped on its own.** All 24 submitted, at a median of 61-88 seconds and
+   $0.13-0.25 against the $1.50 cap. No cap bound.
+4. **`gpt_5.2` wrote no text between tool calls.** Every turn is a bare call, and the request carried
+   no reasoning effort, so it did not reason (`docs/todo/reasoning-in-the-arms.md`). Claude
+   (`claude-opus-5-5`) reasons between calls.
+5. **Tool misuse is a small loss.** Half of G's compiles were `lean_verify` on a path outside the
+   workspace. K made no such error and reached less.
+
+**What this says the sources are, ranked by the evidence:**
+- **Retrieval breadth.** `gpt_5.2` reviews the PR against itself and its immediate neighbours, and
+  Claude reviews it against the library. This alone accounts for the never-retrieved asks.
+- **Inference from what is in view.** With the regularity on screen, `gpt_5.2` still did not raise
+  the deviation. This accounts for the rest.
+- **Not the sources:** the construction step (K constructs at near Claude's rate), the budget (no cap
+  bound), tool errors (K had none) and the `file_search` tool (the gap survives without it).
+
+Both sources fit a reviewer that does not deliberate: no reasoning, no text between calls, and an early
+voluntary stop. They fit a less capable model equally well, and this inspection cannot separate the
+two. The in-window reasoning twin (`c4e08d2`) does not settle it. It ran the arms, not a whole-PR
+session, at medium effort, with 29 of 140 jobs paused at the cost cap.
+
+**What would separate them (test (d), paid, held for approval).** G again with
+`reasoning_effort=high`, two runs on the same six PRs, about $3. G's most expensive session was
+$0.28, so about four times that fits the $1.50 cap. Stated before any run: reasoning is the lever if
+G-with-reasoning makes at least 8 comparison lookups a session and reaches at least 0.30 on both
+matchers. If lookups rise and reach does not, the inference half is the model's.
+
 ---
 
 ## The arms condition (pre-registered 2026-09-29, before its runs)

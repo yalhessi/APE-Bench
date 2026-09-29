@@ -109,3 +109,22 @@ matchers in full agreement. With the same brief, pass-0 model and tools:
   at 3.8x the cost.
 
 Both are single-digit dollars.
+
+## Where test (b)'s difference comes from (2026-09-29, transcript inspection)
+
+The inspection section of `results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md` has the
+counts. The gap sits in what the reviewer compares the PR against:
+- Claude made about 22 lookups of comparison objects a session, and `gpt_5.2` about 2, on all six PRs.
+  PR-side reading was about equal.
+- Of the substantive asks `gpt_5.2` missed, three never had their evidence retrieved (`cat_disch`
+  defaults on two definitions, the `_anti` name). Three had it in view in at least half the sessions
+  and were not raised (`@[to_additive]`, `homMk`, the `NeBot` case split).
+- The construction brief raised variant compiles to near Claude's rate and left lookups at 2.
+- Every `gpt_5.2` session stopped on its own, well under its cap, and wrote no text between calls.
+
+So the sources are retrieval breadth and inference from context. Both fit reasoning off and a weaker
+model equally well. Test (d), `reasoning_effort=high` on G, separates them, with its threshold stated
+in the README.
+
+The test (b) paragraph above says "the same tools". That is corrected there: Claude had `file_search`
+in place of the Lean navigation tools, and the gap survives without it.
