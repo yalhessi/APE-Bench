@@ -354,4 +354,9 @@ paths:
 
   The probe's `audit_transcripts.py` flags reads outside the packet, foreign scratch files, the
   study's scratch, agent transcripts and the web. It was checked against planted violations.
+- **While probe sessions run, commit packets by file, never the probe directory (2026-09-29).**
+  Sessions write `calls.jsonl`, `tmp/` and then `findings.json` into their packets as they work, so
+  `git add <probe_dir>` mid-run committed 21 half-written session files with the validation
+  packets (amended out before any push). Commit a session's outputs only after its transcript is
+  audited. The harness for all of this is `analysis/probes.py` and `cli probe`.
 
