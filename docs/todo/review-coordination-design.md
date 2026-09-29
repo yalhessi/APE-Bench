@@ -115,3 +115,8 @@ reading holds the details. Next, in order:
 - a post-cutoff probe set, so a Claude probe carries no recall caveat;
 - the construction briefs on `gpt_5.2` through the solo scaffold (`reviewer-model-gap.md`);
 - family closure on sibling-class misses.
+
+**Step 1 done (2026-09-29).** The post-cutoff probe set exists (`probe-2026-07-08-v1`, 10 PRs,
+reviewed workspaces built). On it, Claude's reach with the plain brief is not mainly recall
+(`reviewer-model-gap.md`, test (a)). A Claude probe on those PRs therefore carries no recall caveat.
+Next is test (b) there: the construction briefs on `gpt_5.2`, the reviewer that did not construct.

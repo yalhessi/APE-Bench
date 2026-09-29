@@ -70,3 +70,19 @@ and (1) does not, the design's construction protocol is worth building for the p
 
 **Test (a) first.** Test (a) builds a post-cutoff probe set, so that a Claude probe carries no recall
 caveat.
+
+## Test (a) done (2026-09-29): Claude's in-window reach is not mainly recall
+
+`results/pr_review_v5/probes/postcutoff-2026-09-29/` ran on 10 PRs created 2026-07..08 (sealed as
+`probe-2026-07-08-v1`), 6 of them with round-1 asks. The construction demonstration's control, the
+same brief, packet and tools, reached asks at 0.47 per session, against 0.44 and 0.59 in-window
+under the same two matchers. So `r` is 1.07 and 0.79, and the pre-set reading is "not mainly recall"
+on both. Matching was stable: 64 of 64 in-window cells were re-judged the same reached-or-not.
+
+Two limits. The mixes differ: post-cutoff asks are naming and design, in-window ones proof and
+interface. And the set is small: 16 asks.
+
+So the five asks the pipeline missed and every Claude set reached are more likely capability,
+harness or packet than memory. **Test (b) is now the open step, and the post-cutoff set is where to
+run it:** neither model can have seen those PRs, so `gpt_5.2` against Claude there is a clean model
+comparison.

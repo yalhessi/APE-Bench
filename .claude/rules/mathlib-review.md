@@ -330,6 +330,18 @@ paths:
   - an explicit statement that only between-brief comparisons are being read.
 
   Blind matchers are not affected: they judge text they are shown.
+
+  *Measured 2026-09-29* (`results/pr_review_v5/probes/postcutoff-2026-09-29/`): on 10 PRs created
+  after the cutoff, the same Claude reviewer reached asks at 79-107% of its in-window rate. So
+  in-window reach is not mainly recall, at probe altitude and with a different ask mix. The
+  post-cutoff set `probe-2026-07-08-v1` (config `configs/pr_review_v5_probe_2026_07_08_v1.yaml`) has
+  reviewed workspaces built, and is the first option above, ready to use.
+- **Restore a built base only after its build process has exited (2026-09-29).** A restore started
+  as the build was finishing its snapshot (under a second after `build_completed_at`) failed with
+  "Restore file failed" and left the state `failed`, "need to rebuild". Recovery was a rebuild of that
+  one commit, then a restore. A restore run on commits whose builds are done is safe beside builds of
+  other commits. So is `prebuild --reviewed` on a config restricted with `dataset.pr_numbers`, and an
+  absolute `extends:` path lets that config live in scratch.
 - **Probe subagents share the session scratchpad; keep what a reviewer must not see out of it
   (2026-09-29).** In the construction demonstration, reviewers wrote snippet files into the session
   scratchpad, two sessions collided on a folder name, and the round-1 feedback file with the
