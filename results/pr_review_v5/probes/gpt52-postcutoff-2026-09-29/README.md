@@ -192,6 +192,24 @@ $0.28, so about four times that fits the $1.50 cap. Stated before any run: reaso
 G-with-reasoning makes at least 8 comparison lookups a session and reaches at least 0.30 on both
 matchers. If lookups rise and reach does not, the inference half is the model's.
 
+
+## A defect in test (b)'s matcher inputs, and the re-match (found 2026-09-29, before any re-match)
+
+**The defect.** The solo task stores a finding's location under `anchor`, and
+`build_match_inputs.py` read it from the top level. So all 73 of `gpt_5.2`'s findings reached the
+matchers with the target `None:None`, while all 49 of Claude's carried a file and a declaration. A
+matcher had to identify a `gpt_5.2` finding's object from its claim alone. That may have cost `gpt_5.2`
+reached or partial cells, and it let the matchers tell the two systems apart, though not which was
+which.
+
+**The fix.** The builder reads `anchor`, and it now refuses any finding without a target.
+
+**The re-match, stated before it runs.** Two new blind matchers get the same six sets under the same
+seal (`blinding_SEALED.json`), with the same rubric and asks, on the corrected inputs. The reading
+rule above is applied unchanged. The re-match supersedes the original reading, and the number of cells
+that changed is reported by condition.
+
+
 ---
 
 ## The arms condition (pre-registered 2026-09-29, before its runs)
