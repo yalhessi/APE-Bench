@@ -255,3 +255,19 @@ def test_the_matcher_rubric_is_rendered_for_the_counts_and_unchanged_for_six():
     assert "R6" not in five
     one = probes.matcher_rubric(6, 1)
     assert "on one Mathlib pull request. Six anonymous reviewers" in one
+
+
+def test_a_packet_relative_tmp_path_is_not_flagged_but_a_real_one_is(tmp_path):
+    folder = tmp_path / "pr1" / "X1"
+    (folder / "tmp").mkdir(parents=True)
+    (folder / "tmp" / "a3.json").write_text("{}")
+    (folder / "tmp" / "b0.json").write_text("{}")
+    calls = [{"type": "tool_use", "name": "Bash",
+              "input": {"command": f"D={folder}; python3 -c \"open(D+'/tmp/a3.json')\""}},
+             {"type": "tool_use", "name": "Bash",
+              "input": {"command": f"D={folder}; python3 -c \"open(D+f'/tmp/b{{i}}.json')\""}},
+             {"type": "tool_use", "name": "Bash", "input": {"command": "cat '/tmp/other.json'"}}]
+    transcript = tmp_path / "t.jsonl"
+    transcript.write_text("\n".join(json.dumps({"message": {"content": [c]}}) for c in calls))
+    report = probes.audit_transcript(folder, transcript)
+    assert [f["why"] for f in report["flagged"]] == [["outside /tmp/other.json"]]

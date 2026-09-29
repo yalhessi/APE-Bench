@@ -761,6 +761,12 @@ Validate `labels.jsonl` (every cid once, valid JSON, every key present), then re
 _ABS = re.compile(r"(?:^|(?<=[\s'\"=(<>|;:]))(/(?:research|common|home|tmp|opt|usr|etc|mnt|data|scratch|root|var|nfs|proc)(?:/[\w.\-+]+)*)")
 
 
+def _own_tmp(folder: Path, name: str) -> bool:
+    """Whether `name` (or a file it is the stem of) exists in the packet's own `tmp/`."""
+    tmp = folder / "tmp"
+    return tmp.is_dir() and any(f.name == name or f.name.startswith(name) for f in tmp.iterdir())
+
+
 def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
     """Every tool call a reader, matcher or reviewer made, checked against its own folder: an
     absolute path outside it, git, the web, or a file tool pointed elsewhere is flagged. Flags are
@@ -786,8 +792,14 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
             if re.search(r"\bgit\b", text):
                 why.append("git")
             for p in _ABS.findall(text):
-                if not (p.startswith(folder) or p in ("/dev/null", "/tmp") or p.startswith("/usr/bin")):
-                    why.append("outside " + p[-70:])
+                if p.startswith(folder) or p in ("/dev/null", "/tmp") or p.startswith("/usr/bin"):
+                    continue
+                if p.startswith("/tmp/") and _own_tmp(Path(folder), p[len("/tmp/"):]):
+                    # `D + '/tmp/a3.json'`, `"$D"/tmp/b{i}.json`: the packet's own tmp/, written
+                    # after a variable, which the pattern reads as a root path. 25 of the dev
+                    # sessions' 36 flags were this, each checked by hand (2026-09-29).
+                    continue
+                why.append("outside " + p[-70:])
             if b.get("name") in ("Read", "Write", "Edit") and not str(inp.get("file_path", "")).startswith(folder):
                 why.append("file tool outside")
             if why:
