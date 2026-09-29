@@ -39,3 +39,46 @@ Per-session reach is asks reached over asks, on each matcher.
    the record's pipeline against the model it ran on, not as a test of the current one.
 
 **Also read:** reach by family, published-only reach for L, and findings per PR.
+
+---
+
+## Result (2026-09-29): the model gap holds; the structure reading splits across matchers
+
+Four blind matchers, two per seal. All six judges, the readers included, read only their own folders
+(`audit_judges.json`). Agreement: seal A 168 of 186 cells (90%), seal B 63 of 64.
+
+| per-session reach | matcher 1 | matcher 2 |
+|---|---|---|
+| **Claude (X)**, pooled over 47 asks | **0.67** | **0.61** |
+| `gpt_5.2` solo (G), pooled | 0.13 | 0.18 |
+| `q = G/X` | 0.19 | 0.30 |
+| seal A (31 asks): X / G / L | 0.69 / 0.15 / 0.29 | 0.60 / 0.21 / 0.29 |
+| `L - G` on seal A | +0.15 | +0.08 |
+| L, published findings only | 0.00 | 0.00 |
+| without 33149 (42 asks pooled; 26 in A): `q`, `L - G` | 0.13, +0.13 | 0.17, +0.10 |
+
+1. **The model gap:** `q = 0.19` and `0.30`, so **markedly less** by test (b)'s rule on both matchers.
+2. **The structure:** `+0.15` and `+0.08`, so **partial**: one matcher over the 0.10 line, one under.
+   Without 33149 it is `+0.13` and `+0.10`, adds reach on both. 33149 is an AI-generated PR with
+   axioms and bundled asks, which every reviewer reached through its axiom part. The lead runs are the
+   record's, on older code and in-sample.
+
+**By family** (matcher 1; reached / session-ask cells):
+
+| family | asks | X | G | L |
+|---|---|---|---|---|
+| naming (F8) | 14 | 21/28 | 1/28 | 6/20 |
+| proof (F1) | 9 | 13/18 | 2/18 | 0/8 |
+| F9 | 5 | 7/10 | 0/10 | 1/4 |
+| derive (F4) | 4 | 6/8 | 0/8 | 0/8 |
+| F6 | 4 | 2/8 | 0/8 | 0/6 |
+| documentation (F10) | 4 | 6/8 | 3/8 | 4/4 |
+| correctness (CORR) | 2 | 4/4 | 2/4 | 4/4 |
+| F5, F12, F7 | 5 | 4/10 | 4/10 | 3/8 |
+
+**What it means, at probe altitude** (12 ask PRs, 47 asks, two runs a condition):
+- Claude reaches about two thirds of the dev asks, and `gpt_5.2` whole-PR about a sixth. The gap is
+  the widest of the three sets, but Claude's reach here is in its training window and on the set the
+  record knows best.
+- The lead runs' gain over `gpt_5.2` is naming (6 of 20 cells) and documentation. The naming arm was
+  tuned on these PRs, so that gain is in-sample. The gate published none of the lead's hits.

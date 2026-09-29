@@ -1,0 +1,54 @@
+{
+ "33066": {
+  "G2": {
+   "findings": 7,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "X1": {
+   "findings": 12,
+   "compiles": 14
+  },
+  "G1": {
+   "findings": 4,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 12,
+   "compiles": 17
+  }
+ },
+ "33098": {
+  "G1": {
+   "findings": 8,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 5,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 3
+   }
+  },
+  "X2": {
+   "findings": 19,
+   "compiles": 21
+  },
+  "X1": {
+   "findings": 15,
+   "compiles": 17
+  }
+ }
+}
