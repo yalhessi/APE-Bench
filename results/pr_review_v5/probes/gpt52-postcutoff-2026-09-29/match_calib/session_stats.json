@@ -1,0 +1,44 @@
+{
+ "43192": {
+  "Mc": {
+   "findings": 5,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 1
+   }
+  },
+  "G2": {
+   "findings": 8,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 4
+   }
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 13
+  },
+  "X1": {
+   "findings": 8,
+   "compiles": 15
+  },
+  "G1": {
+   "findings": 8,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 3
+   }
+  },
+  "Hc": {
+   "findings": 4,
+   "compiles": 21,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 13
+   }
+  }
+ }
+}

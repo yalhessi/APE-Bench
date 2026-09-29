@@ -366,3 +366,36 @@ comparison objects the maintainers cited, which it never did with reasoning off:
 
 That is the looking half of the inspection's two sources, moved by reasoning, on one session. Whether
 the concluding half moves is not known, because the session never submitted.
+
+**The calibration, finished (2026-09-29): on one PR, high effort reaches what reasoning off does not,
+and medium effort looks without concluding.** The high-effort session was killed at turn 28 when the
+controlling process ended, and resumed with `cli run --resume` (added for this, `7e871b0`). It
+submitted after 43 turns. A medium-effort session ran beside it (`configs/..._gpt52_Gm.yaml`). Two
+blind matchers judged six sets on 43192's four asks (`match_calib/`, `blinding_calib_SEALED.json`,
+`unblinded_calib.json`). They read only their own folders and agree on all 24 cells.
+
+| on 43192 | reach, 4 asks | comparison lookups | billed |
+|---|---|---|---|
+| `gpt_5.2`, reasoning off (G1, G2) | 0.25, 0.25 | 3, 3 | about $0.1 each |
+| `gpt_5.2`, medium effort | 0.25 | 28 | $1.58 |
+| `gpt_5.2`, high effort | **0.75** | 31 | $3.74 |
+| Claude (X1, X2) | 1.00, 1.00 | 33, 20 | — |
+
+- **High effort reached both `cat_disch` asks**, on `mk` and on `mkHom`, citing the parent's defaults.
+  Reasoning off reached neither, with a partial on `mk`.
+- **Medium effort looked as much as Claude and concluded nothing new.** It proposed dropping `mk`, which
+  the matchers scored as no.
+- **The `homMk` rename stayed unreached** under both efforts. Neither session ever had `homMk` in view:
+  both looked up `PresheafOfModules.mkHom`, the PR's own spelling applied to the parent. Claude searched
+  the library for `homMk`.
+
+**At the altitude this supports** (one PR, four asks, one session per effort):
+- Reasoning is what makes `gpt_5.2` look outward: 28 to 31 comparison lookups against 3.
+- Looking is not enough: medium looked and did not conclude.
+- High effort concluded on two of the three substantive asks here.
+
+That fits the 2×2 rule's first row for high and its third row for medium, on one PR. It is provisional
+until the six-PR runs. The cost is the constraint. The high session billed about 30 times the
+reasoning-off session on this PR and took 43 turns. Two full high-effort runs would bill roughly
+$20-25 and take about 1.5 hours each. That is outside the entry's single-digit budget, so it is the
+user's decision.

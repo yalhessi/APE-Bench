@@ -108,3 +108,11 @@ Reasoning tokens per call grew from about 500 to 8,500 as the session went on. S
 wall-clock figure calibrated at reasoning off binds at high effort. A reasoning run needs its caps set
 from a reasoning session, not scaled from the old ones. The same session looked up the comparison
 objects that the reasoning-off sessions never did.
+
+**Finished, and at medium too (2026-09-29).** Resumed with room, the high-effort session on 43192
+submitted after 43 turns, billing $3.74 ($6.77 nominal). A medium-effort session on the same PR billed
+$1.58 in 33 turns. Both looked up the comparison objects as often as Claude does. Only high reached the
+maintainers' asks the reasoning-off sessions missed: 0.75 of four against 0.25
+(`results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md`). So the effort level matters, not
+only whether reasoning is on. A caps recalibration for reasoning runs should start from these two
+sessions.

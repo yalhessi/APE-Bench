@@ -1,0 +1,74 @@
+{
+ "1": {
+  "cells": {
+   "p0013 G1": "reached",
+   "p0013 G2": "reached",
+   "p0013 Hc": "reached",
+   "p0013 Mc": "reached",
+   "p0013 X1": "reached",
+   "p0013 X2": "reached",
+   "p0014 G1": "partial",
+   "p0014 G2": "partial",
+   "p0014 Hc": "reached",
+   "p0014 Mc": "no",
+   "p0014 X1": "reached",
+   "p0014 X2": "reached",
+   "p0015 G1": "no",
+   "p0015 G2": "no",
+   "p0015 Hc": "reached",
+   "p0015 Mc": "no",
+   "p0015 X1": "reached",
+   "p0015 X2": "reached",
+   "p0016 G1": "no",
+   "p0016 G2": "no",
+   "p0016 Hc": "no",
+   "p0016 Mc": "no",
+   "p0016 X1": "reached",
+   "p0016 X2": "reached"
+  },
+  "reach": {
+   "G1": 0.25,
+   "G2": 0.25,
+   "Hc": 0.75,
+   "Mc": 0.25,
+   "X1": 1.0,
+   "X2": 1.0
+  }
+ },
+ "2": {
+  "cells": {
+   "p0013 G1": "reached",
+   "p0013 G2": "reached",
+   "p0013 Hc": "reached",
+   "p0013 Mc": "reached",
+   "p0013 X1": "reached",
+   "p0013 X2": "reached",
+   "p0014 G1": "partial",
+   "p0014 G2": "partial",
+   "p0014 Hc": "reached",
+   "p0014 Mc": "no",
+   "p0014 X1": "reached",
+   "p0014 X2": "reached",
+   "p0015 G1": "no",
+   "p0015 G2": "no",
+   "p0015 Hc": "reached",
+   "p0015 Mc": "no",
+   "p0015 X1": "reached",
+   "p0015 X2": "reached",
+   "p0016 G1": "no",
+   "p0016 G2": "no",
+   "p0016 Hc": "no",
+   "p0016 Mc": "no",
+   "p0016 X1": "reached",
+   "p0016 X2": "reached"
+  },
+  "reach": {
+   "G1": 0.25,
+   "G2": 0.25,
+   "Hc": 0.75,
+   "Mc": 0.25,
+   "X1": 1.0,
+   "X2": 1.0
+  }
+ }
+}

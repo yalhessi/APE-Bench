@@ -150,3 +150,17 @@ reviewer. It is neither the brief, the construction protocol nor the pipeline's 
 untested lever on the pipeline's own model is reasoning: test (d), stated with its threshold in the
 probe README, about $3. Claude inside the pipeline's structure is the other untested cell. It needs an
 Anthropic provider the clients do not have.
+
+## Test (d)'s calibration (2026-09-29): on one PR, high effort closes most of the gap there
+
+On 43192 (four asks), one session per effort, two blind matchers in full agreement:
+- reasoning off reached 0.25;
+- medium reached 0.25;
+- high reached 0.75;
+- Claude reached 1.00.
+
+Medium and high both looked outward as much as Claude, with 28 and 31 comparison lookups against 3.
+Only high concluded: it reached both `cat_disch` asks. Neither effort retrieved `homMk`, because each
+searched with the PR's own spelling. So on this PR the reasoning setting, not the model, carries most of
+the gap. That is provisional on one PR, and it comes at about 30 times the reasoning-off cost. The
+six-PR runs (about $20-25 for two) would test it. The details are in the probe README.
