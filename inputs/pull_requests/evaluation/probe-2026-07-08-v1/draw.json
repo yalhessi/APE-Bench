@@ -1,0 +1,180 @@
+{
+  "accepted": [
+    {
+      "ai_evidence": [],
+      "author": "Scarlett-le",
+      "base_sha": "a98f92c4fcb4fd3d59ebedb7d1efb9b5bb7a2695",
+      "episode_id": "leanprover-community/mathlib4:41314:round1:eeb03e9f353beeb20c7d07d173093476a1137a68",
+      "month": "2026-07",
+      "pr_number": 41314,
+      "stratum": "main:2026-07",
+      "targets": 4
+    },
+    {
+      "ai_evidence": [],
+      "author": "wwylele",
+      "base_sha": "5b3f719bf129e3cf48daf6ff76a2ec5cb6e9b1e3",
+      "episode_id": "leanprover-community/mathlib4:42184:round1:c5474cb4a68a515228b49225b38a2507264f91f7",
+      "month": "2026-07",
+      "pr_number": 42184,
+      "stratum": "main:2026-07",
+      "targets": 3
+    },
+    {
+      "ai_evidence": [],
+      "author": "plp127",
+      "base_sha": "c81c5cbb1cbf71482901fd2f72ab66909ac54fe1",
+      "episode_id": "leanprover-community/mathlib4:41930:round1:ec56eae52c28b70ec6cc92f1a295973c193353a0",
+      "month": "2026-07",
+      "pr_number": 41930,
+      "stratum": "main:2026-07",
+      "targets": 2
+    },
+    {
+      "ai_evidence": [
+        "description",
+        "trailer"
+      ],
+      "author": "Deicyde",
+      "base_sha": "2af912edc30e3960c7cf95558a834746d840dcb8",
+      "episode_id": "leanprover-community/mathlib4:41280:round1:958efe92eb46848b55d3d1d3dd99d60cbe30518e",
+      "month": "2026-07",
+      "pr_number": 41280,
+      "stratum": "main:2026-07",
+      "targets": 7
+    },
+    {
+      "ai_evidence": [],
+      "author": "tb65536",
+      "base_sha": "3ed2ddca3d874aa6644072e61ec97bfef3ce8ae3",
+      "episode_id": "leanprover-community/mathlib4:43167:round1:2ed521f8a5b75b9ef3c49f8ca452a9b3ea0071fc",
+      "month": "2026-08",
+      "pr_number": 43167,
+      "stratum": "main:2026-08",
+      "targets": 13
+    },
+    {
+      "ai_evidence": [],
+      "author": "Brian-Nugent",
+      "base_sha": "39c86ed8eb69c9ef854f1f2de1b7b7bd171fef15",
+      "episode_id": "leanprover-community/mathlib4:43192:round1:58c43089f511407469ec50d4cefef19918b31d0c",
+      "month": "2026-08",
+      "pr_number": 43192,
+      "stratum": "main:2026-08",
+      "targets": 38
+    },
+    {
+      "ai_evidence": [],
+      "author": "j-loreaux",
+      "base_sha": "cb1fba23a0ada0f8eb0513c5d07cd45d165ad8a6",
+      "episode_id": "leanprover-community/mathlib4:43024:round1:4ca3b3a3786057e12b25f11238167c3a879374bb",
+      "month": "2026-08",
+      "pr_number": 43024,
+      "stratum": "main:2026-08",
+      "targets": 3
+    },
+    {
+      "ai_evidence": [
+        "description"
+      ],
+      "author": "xroblot",
+      "base_sha": "dc30148764c51703bf88996506d6731c04393b85",
+      "episode_id": "leanprover-community/mathlib4:42814:round1:1041c7cf227bc1c38162509b940559320973e669",
+      "month": "2026-08",
+      "pr_number": 42814,
+      "stratum": "main:2026-08",
+      "targets": 23
+    },
+    {
+      "ai_evidence": [
+        "description",
+        "trailer"
+      ],
+      "author": "marcelolynch",
+      "base_sha": "3b5417e200cc24e3bc4cc40fcf752d052d7af128",
+      "episode_id": "leanprover-community/mathlib4:42238:round1:77b625f990d877e5fdc5a1662c34a29a7b144ff1",
+      "month": "2026-07",
+      "pr_number": 42238,
+      "stratum": "ai",
+      "targets": 5
+    },
+    {
+      "ai_evidence": [
+        "description",
+        "label",
+        "trailer"
+      ],
+      "author": "kim-em",
+      "base_sha": "88d006abbcd1f157f567bd21c7a33c271df9b83b",
+      "episode_id": "leanprover-community/mathlib4:41271:round1:b22d8c0b1b1d782931caead2529a876bd56b500a",
+      "month": "2026-07",
+      "pr_number": 41271,
+      "stratum": "ai",
+      "targets": 5
+    }
+  ],
+  "frame_seal_sha256": "9a6ebe64fc0dc316b639ceab06a38cc909b342d2570a10d9e90f264ae01af433",
+  "shortfall": {},
+  "skipped": [
+    {
+      "pr_number": 42065,
+      "reason": "funnel:diff_lines=2",
+      "stratum": "main:2026-07"
+    },
+    {
+      "pr_number": 43244,
+      "reason": "funnel:diff_lines=2",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 42619,
+      "reason": "funnel:changed_files=731",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 42404,
+      "reason": "funnel:no_mathlib_lean_file",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 42558,
+      "reason": "funnel:diff_lines=1065",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 43126,
+      "reason": "funnel:no_commit_before_review",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 42408,
+      "reason": "targets>40",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 42552,
+      "reason": "funnel:diff_lines=4",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 42697,
+      "reason": "targets>40",
+      "stratum": "main:2026-08"
+    },
+    {
+      "pr_number": 41280,
+      "reason": "in_main",
+      "stratum": "ai"
+    },
+    {
+      "pr_number": 43126,
+      "reason": "funnel:no_commit_before_review",
+      "stratum": "ai"
+    }
+  ],
+  "stopped": {
+    "ai": null,
+    "main:2026-07": null,
+    "main:2026-08": null
+  }
+}

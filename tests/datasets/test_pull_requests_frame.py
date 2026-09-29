@@ -452,3 +452,8 @@ def test_the_post_cutoff_probe_seal_is_intact_and_lies_after_the_reviewers_cutof
     assert (spec.main_size, spec.ai_size, spec.main_target_cap, spec.ai_target_cap) == (8, 2, 40, 60)
     assert (spec.per_author_cap, spec.per_base_cap) == (1, 2)
     assert len(members) == 1075
+    draw = f.Draw.model_validate_json((f.seal_dir("probe-2026-07-08-v1") / "draw.json").read_text())
+    assert draw.complete and draw.frame_seal_sha256 == digest and len(draw.accepted) == 10
+    from src.datasets.pull_requests.definitions import scored_pr_numbers
+
+    assert not {a.pr_number for a in draw.accepted} & scored_pr_numbers()
