@@ -24,6 +24,18 @@ import aiofiles.os
 from contextlib import asynccontextmanager
 import asyncio
 
+def _lock_backoff(attempt: int) -> float:
+    """The base wait before retry `attempt`: 0.05s doubling, capped at 3.0s.
+
+    The exponent is capped too. `min(0.05 * (2 ** attempt), 3.0)` raised OverflowError ("int too
+    large to convert to float") once `attempt` passed 1,024, which is about 51 minutes of waiting at
+    3s a retry. A cache fetch waiting behind a queue of builds hit exactly that (2026-09-29, a
+    ten-commit base build: 09:03 to 09:54), and the caller's retry started the count again.
+    """
+
+    return min(0.05 * (2 ** min(attempt, 6)), 3.0)
+
+
 def _sync_acquire_lock(file_path: Path, timeout: float, shared: bool, blocking: bool = True):
     """Synchronously acquire a file lock (internal helper).
 
@@ -78,8 +90,8 @@ def _sync_acquire_lock(file_path: Path, timeout: float, shared: bool, blocking: 
                     raise TimeoutError(f"Failed to acquire {lock_name} within {timeout}s: {file_path}")
                 
                 # Exponential backoff with random jitter to avoid thundering herd issues
-                # base: 0.05s -> 0.1s -> 0.2s -> 0.4s -> 0.8s -> 1.6s -> 3.2s
-                base_wait = min(0.05 * (2 ** attempt), 3.0)
+                # base: 0.05s -> 0.1s -> 0.2s -> 0.4s -> 0.8s -> 1.6s -> 3.0s
+                base_wait = _lock_backoff(attempt)
                 
                 # Add ±50% jitter so processes do not retry in sync
                 jitter = random.uniform(base_wait * 0.5, base_wait * 1.5)
