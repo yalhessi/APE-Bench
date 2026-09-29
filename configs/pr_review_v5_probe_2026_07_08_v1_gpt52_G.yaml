@@ -1,0 +1,7 @@
+# Condition G of results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md: the solo
+# task's system prompt is the probe's brief_G.md, and each PR's pass-0 model follows its diff.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52.yaml
+
+task_config:
+  system_prompt_file: results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/brief_G.md
+  context_file: results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/model_context.jsonl
