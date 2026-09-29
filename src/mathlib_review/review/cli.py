@@ -131,6 +131,44 @@ def build_parser() -> argparse.ArgumentParser:
     log = probe_sub.add_parser("log-call", help="(the packet wrapper's) record one tool call")
     for name in ("log", "stamp", "tool", "arguments", "out", "status"):
         log.add_argument(name)
+    step = {
+        "packets": "write reviewer packets (brief, PR, diff, pass-0 model, ptool)",
+        "prompts": "print each packet's reviewer prompt",
+        "feedback": "extract round-1 feedback; --write refuses while a session is unfinished",
+        "readers": "reader folders (batch, rubric) and their prompts",
+        "asks": "the agreed asks from two readers' labels",
+        "seal": "a fresh blinding of the named sessions",
+        "match-inputs": "blind matcher inputs and matcher folders under a seal",
+        "unblind": "reach per session and condition from the matchers' outputs",
+        "audit": "check a transcript stayed in its folder",
+    }
+    parsers = {name: probe_sub.add_parser(name, help=text) for name, text in step.items()}
+    for name, sp in parsers.items():
+        if name != "audit":
+            sp.add_argument("--set", required=True, type=Path, help="configs/probe_sets/<name>.yaml")
+    for name in ("packets", "prompts", "feedback"):
+        parsers[name].add_argument("--sessions", nargs="+", default=["X1", "X2"])
+    for name in ("packets", "prompts"):
+        parsers[name].add_argument("--prs", nargs="+", type=int)
+    parsers["packets"].add_argument("--scratch", required=True, type=Path,
+                                    help="where each session's tool workdir and raw outputs go")
+    parsers["feedback"].add_argument("--write", action="store_true")
+    for name in ("readers", "match-inputs"):
+        parsers[name].add_argument("--out", required=True, type=Path)
+    parsers["asks"].add_argument("--labels", nargs=2, required=True, type=Path)
+    parsers["seal"].add_argument("--sessions", nargs="+", required=True)
+    parsers["seal"].add_argument("--prs", nargs="+", type=int,
+                                 help="default: the set's PRs that have asks")
+    parsers["seal"].add_argument("--out", required=True, type=Path)
+    for name in ("match-inputs", "unblind"):
+        parsers[name].add_argument("--seal", required=True, type=Path)
+    parsers["match-inputs"].add_argument("--sources", required=True, type=Path,
+                                         help='JSON {session: {"kind": "claude|solo|lead", "run": ...}}')
+    parsers["unblind"].add_argument("--matches", required=True, type=Path,
+                                    help="a directory with matches.1.json, matches.2.json, session_stats.json")
+    parsers["unblind"].add_argument("--scope", nargs="+", help="families to restrict to")
+    parsers["audit"].add_argument("--folder", required=True, type=Path)
+    parsers["audit"].add_argument("--transcript", required=True, type=Path)
 
     judge = sub.add_parser("judge", help="score a generation run against gold")
     judge.add_argument("--config", type=Path, required=True)
@@ -520,7 +558,68 @@ def _probe(args, logger) -> int:
         probes.log_call(Path(args.log), args.stamp, args.tool, args.arguments, Path(args.out),
                         int(args.status))
         return 0
-    raise AssertionError(args.probe_command)
+    if args.probe_command == "audit":
+        report = probes.audit_transcript(args.folder, args.transcript)
+        print(json.dumps(report, indent=1))
+        return 1 if report["flagged"] else 0
+    spec = probes.load_probe_set(args.set)
+    if args.probe_command == "packets":
+        written = probes.write_packets(spec, args.sessions, args.scratch.resolve(), prs=args.prs)
+        print(json.dumps([str(d) for d in written], indent=1))
+    elif args.probe_command == "prompts":
+        for pr in args.prs or spec.pr_numbers:
+            for session in args.sessions:
+                print(json.dumps({"pr": pr, "session": session,
+                                  "prompt": probes.session_prompt(spec.session_dir(pr, session))}))
+    elif args.probe_command == "feedback":
+        feedback = probes.extract_feedback(spec)
+        if args.write:
+            waiting = probes.unfinished_sessions(spec, args.sessions)
+            if waiting:
+                raise SystemExit(f"feedback is extracted only after every session has finished; "
+                                 f"{len(waiting)} have not: {waiting[:6]}")
+            probes.write_json(spec.feedback_file, feedback)
+        print(json.dumps({"rows": len(feedback["rows"]), "no_feedback": feedback["no_feedback"],
+                          "written": bool(args.write)}))
+    elif args.probe_command == "readers":
+        batch = probes.reader_batch(json.loads(spec.feedback_file.read_text()), spec.pr_numbers)
+        args.out.mkdir(parents=True, exist_ok=True)
+        batch_file = args.out / "batch.jsonl"
+        batch_file.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in batch))
+        for d in probes.judge_folders(args.out, 2, [batch_file], probes.READER_RUBRIC):
+            print(json.dumps({"folder": str(d.resolve()),
+                              "prompt": probes.READER_PROMPT.format(dir=d.resolve())}))
+    elif args.probe_command == "asks":
+        feedback = json.loads(spec.feedback_file.read_text())
+        a, b = (probes.load_labels(p) for p in args.labels)
+        asks = probes.agreed_asks(feedback, a, b, spec.pr_numbers)
+        probes.write_json(spec.asks_file, {**asks, "source": f"{args.labels[0]} and {args.labels[1]} agreeing"})
+        print(json.dumps({"asks": sum(map(len, asks["asks"].values())), "controls": asks["controls"]}))
+    elif args.probe_command == "seal":
+        if args.out.exists():
+            raise SystemExit(f"{args.out} exists; a seal is written once")
+        asks = json.loads(spec.asks_file.read_text())["asks"]
+        prs = args.prs or [int(pr) for pr, ids in asks.items() if ids]
+        probes.write_json(args.out, probes.seal_labels(prs, args.sessions))
+        print(json.dumps({"sealed": str(args.out), "prs": len(prs), "sessions": args.sessions}))
+    elif args.probe_command == "match-inputs":
+        sources = {k: probes.Source.model_validate(v) for k, v in json.loads(args.sources.read_text()).items()}
+        inputs = args.out / "inputs"
+        stats = probes.match_inputs(spec, json.loads(spec.feedback_file.read_text()),
+                                    json.loads(spec.asks_file.read_text()),
+                                    json.loads(args.seal.read_text()), sources, inputs)
+        files = sorted(p for p in inputs.iterdir() if p.name != "session_stats.json")
+        for d in probes.judge_folders(args.out, 2, files, probes.MATCHER_RUBRIC):
+            print(json.dumps({"folder": str(d.resolve()),
+                              "prompt": probes.MATCHER_PROMPT.format(dir=d.resolve())}))
+        print(json.dumps({"prs": len(stats), "inputs": str(inputs)}))
+    elif args.probe_command == "unblind":
+        matches = {m: json.loads((args.matches / f"matches.{m}.json").read_text()) for m in ("1", "2")}
+        stats = json.loads((args.matches / "session_stats.json").read_text())
+        print(json.dumps(probes.unblind(json.loads(spec.asks_file.read_text()),
+                                        json.loads(args.seal.read_text()), matches, stats,
+                                        scope=set(args.scope) if args.scope else None), indent=1))
+    return 0
 
 
 def main(argv: Optional[List[str]] = None) -> int:

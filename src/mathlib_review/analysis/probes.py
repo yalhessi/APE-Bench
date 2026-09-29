@@ -679,3 +679,88 @@ def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict
                             "reached_or_not": sum((a.get(k, (None,))[0] == "reached") == (b.get(k, (None,))[0] == "reached")
                                                   for k in keys)}
     return out
+
+
+# --- Order, folders and audits ------------------------------------------------------------------
+def unfinished_sessions(spec: ProbeSet, sessions: List[str]) -> List[str]:
+    """The (PR, session) packets on the set that hold no findings yet."""
+    return [f"pr{pr}/{s}" for pr in spec.pr_numbers for s in sessions
+            if not (spec.session_dir(pr, s) / "findings.json").exists()]
+
+
+def judge_folders(root: Path, n: int, files: List[Path], rubric: Path) -> List[Path]:
+    """`n` isolated folders for blind readers or matchers: the inputs, the rubric, a `tmp/`."""
+    import shutil
+
+    folders = []
+    for i in range(1, n + 1):
+        d = Path(root) / f"m{i}"
+        if d.exists():
+            shutil.rmtree(d)
+        (d / "tmp").mkdir(parents=True)
+        for f in files:
+            shutil.copy(f, d / f.name)
+        shutil.copy(rubric, d / rubric.name)
+        folders.append(d)
+    return folders
+
+
+MATCHER_PROMPT = """You are a blind judge in a research study on code review of Mathlib (Lean 4) pull requests.
+
+Your working folder is:
+{dir}
+
+Rules:
+- Read `matcher_rubric.md` in that folder first and follow it exactly.
+- Read only files inside that folder. Do not open, list or search anything outside it, do not use git, and do not use the web.
+- If you need scratch files (for example a helper script), put them in the folder's `tmp/` subfolder.
+- Judge every ask for every reviewer yourself, by reading the findings. A script may help you assemble the JSON, but the judgments must be yours.
+- Write `matches.json` in the working folder, in the format the rubric gives.
+
+When done, reply with what the rubric asks for: per reviewer label pooled over PRs, the counts of `reached` and `partial`."""
+READER_PROMPT = """You are a labeller in a research study of Mathlib code review. Your working directory is `{dir}`.
+
+Read `reader_rubric.md` there and label every comment in `batch.jsonl` as it says. Write your output to `labels.jsonl` in that directory.
+
+Rules, which the study depends on:
+- Read only the two files named above. Do not read anything else on disk, do not run git, and do not use web search or web fetch.
+- Keep any temporary file inside your working directory.
+
+Validate `labels.jsonl` (every cid once, valid JSON, every key present), then reply as the rubric asks."""
+
+_ABS = re.compile(r"(?:^|(?<=[\s'\"=(<>|;:]))(/(?:research|common|home|tmp|opt|usr|etc|mnt|data|scratch|root|var|nfs|proc)(?:/[\w.\-+]+)*)")
+
+
+def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
+    """Every tool call a reader, matcher or reviewer made, checked against its own folder: an
+    absolute path outside it, git, the web, or a file tool pointed elsewhere is flagged. Flags are
+    read by hand; a flag is not a verdict (a reviewer's `ptool` is inside its folder)."""
+
+    folder = str(Path(folder).resolve())
+    calls, flagged = 0, []
+    for line in Path(transcript).read_text().splitlines():
+        try:
+            row = json.loads(line)
+        except ValueError:
+            continue
+        content = (row.get("message") or {}).get("content")
+        for b in content if isinstance(content, list) else []:
+            if not (isinstance(b, dict) and b.get("type") == "tool_use"):
+                continue
+            calls += 1
+            inp = b.get("input") or {}
+            text = " ".join(str(v) for v in inp.values())
+            why = []
+            if b.get("name") in ("WebFetch", "WebSearch"):
+                why.append("web")
+            if re.search(r"\bgit\b", text):
+                why.append("git")
+            for p in _ABS.findall(text):
+                if not (p.startswith(folder) or p in ("/dev/null", "/tmp") or p.startswith("/usr/bin")):
+                    why.append("outside " + p[-70:])
+            if b.get("name") in ("Read", "Write", "Edit") and not str(inp.get("file_path", "")).startswith(folder):
+                why.append("file tool outside")
+            if why:
+                flagged.append({"tool": b.get("name"), "why": sorted(set(why)),
+                                "input": text.replace(folder, "<dir>")[:160]})
+    return {"folder": folder, "calls": calls, "flagged": flagged}

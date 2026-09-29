@@ -192,3 +192,38 @@ def test_a_session_without_a_source_is_refused(tmp_path):
     seal = {"43192": {"R1": "Z1"}}
     with pytest.raises(ValueError, match="no source"):
         probes.match_inputs(POST, {"rows": []}, {"asks": {"43192": []}}, seal, {}, tmp_path)
+
+
+def test_feedback_is_not_written_while_a_session_is_unfinished(tmp_path):
+    from src.mathlib_review.review import cli
+
+    spec = probes.load_probe_set(SETS / "val_small12.yaml")
+    assert len(probes.unfinished_sessions(spec, ["X1", "X2"])) == 16  # 8 PRs without sessions
+    with pytest.raises(SystemExit, match="only after every session"):
+        cli.main(["probe", "feedback", "--set", str(SETS / "val_small12.yaml"), "--write"])
+    assert not spec.feedback_file.exists()
+
+
+def test_the_cli_unblinds_as_the_function_does(capsys):
+    from src.mathlib_review.review import cli
+
+    assert cli.main(["probe", "unblind", "--set", str(SETS / "postcutoff_2026_07_08_v1.yaml"),
+                     "--seal", str(G52_DIR / "blinding_arms_SEALED.json"),
+                     "--matches", str(G52_DIR / "match_arms")]) == 0
+    got = json.loads(capsys.readouterr().out)
+    assert got["1"]["condition_reach"]["L"] == pytest.approx(0.125)
+
+
+def test_the_audit_flags_what_leaves_the_folder(tmp_path):
+    folder = tmp_path / "m1"
+    folder.mkdir()
+    calls = [{"type": "tool_use", "name": "Read", "input": {"file_path": str(folder / "asks.json")}},
+             {"type": "tool_use", "name": "Read", "input": {"file_path": "/research/elsewhere/x.json"}},
+             {"type": "tool_use", "name": "Bash", "input": {"command": f"cd {folder} && git log"}},
+             {"type": "tool_use", "name": "WebSearch", "input": {"query": "mathlib"}}]
+    transcript = tmp_path / "t.jsonl"
+    transcript.write_text("\n".join(json.dumps({"message": {"content": [c]}}) for c in calls))
+    report = probes.audit_transcript(folder, transcript)
+    assert report["calls"] == 4
+    assert [f["why"] for f in report["flagged"]] == [
+        ["file tool outside", "outside /research/elsewhere/x.json"], ["git"], ["web"]]
