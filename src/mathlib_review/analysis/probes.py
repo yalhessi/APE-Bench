@@ -63,6 +63,13 @@ class ProbeSet(BaseModel):
     probe_dir: Path
     #: Claude sessions made before this harness, by PR: {pr: directory holding pr<N>/<session>/}.
     sessions_from: Dict[int, Path] = {}
+    #: The modification inventory the pass-0 model reads, when the release does not hold its own
+    #: (the dev release's is a treatment's, as `configs/bases/v5_generation.yaml` names it).
+    modification_inventory: Optional[Path] = None
+
+    @property
+    def inventory(self) -> Path:
+        return self.modification_inventory or self.release / "derived/modification_inventory.jsonl"
 
     @property
     def feedback_file(self) -> Path:
@@ -283,7 +290,7 @@ def session_prompt(packet: Path) -> str:
     return SESSION_PROMPT.format(dir=Path(packet).resolve())
 
 
-def render_models(release: Path, prs: List[int]) -> Dict[int, str]:
+def render_models(release: Path, prs: List[int], inventory_path: Optional[Path] = None) -> Dict[int, str]:
     """Pass 0: each PR's model, from the release's input and derived files only, never gold.
 
     `construction-demo-2026-09-29/build_model.py` as a function; it renders the same bytes.
@@ -300,7 +307,7 @@ def render_models(release: Path, prs: List[int]) -> Dict[int, str]:
     graphs = [g for g in load_jsonl(release / "derived/change_graphs.jsonl", ChangeGraph)
               if g.pr_number in wanted]
     inventory = {}
-    for line in (release / "derived/modification_inventory.jsonl").read_text().splitlines():
+    for line in Path(inventory_path or release / "derived/modification_inventory.jsonl").read_text().splitlines():
         row = json.loads(line)
         if row["pr_number"] in wanted:
             inventory[row["primary_change_id"]] = row
@@ -391,7 +398,7 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
 
     root = Path(root or Path.cwd())
     prs = list(prs or spec.pr_numbers)
-    models = render_models(spec.release, prs)
+    models = render_models(spec.release, prs, spec.inventory)
     episodes = {json.loads(l)["pr_number"]: json.loads(l)
                 for l in (spec.release / "input/episodes.jsonl").read_text().splitlines()}
     written = []
@@ -770,7 +777,7 @@ def model_context(spec: ProbeSet, prs: List[int]) -> str:
     """The solo task's `context_file`: each PR's pass-0 model as one section, JSON lines, so a
     `gpt_5.2` session reads the same model a Claude session's `model.md` holds."""
 
-    models = render_models(spec.release, prs)
+    models = render_models(spec.release, prs, spec.inventory)
     return "".join(json.dumps({"pr_number": pr, "sections": [{"title": "The PR model (pass 0)",
                                                               "text": models[pr]}]},
                               ensure_ascii=False) + "\n" for pr in prs)

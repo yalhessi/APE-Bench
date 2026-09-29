@@ -238,3 +238,11 @@ def test_the_audit_flags_what_leaves_the_folder(tmp_path):
 def test_the_solo_context_file_is_the_one_test_b_used():
     ref = (G52_DIR / "model_context.jsonl").read_text()
     assert probes.model_context(POST, [41930, 42184, 42814, 43024, 43167, 43192]) == ref
+
+
+def test_a_set_can_name_its_own_modification_inventory():
+    dev = probes.load_probe_set(SETS / "dev_medium_0_3_0.yaml")
+    assert dev.inventory != dev.release / "derived/modification_inventory.jsonl"
+    models = probes.render_models(dev.release, [33337], dev.inventory)
+    assert models[33337].startswith("# The PR model for #33337 (pass 0)")
+    assert POST.inventory == POST.release / "derived/modification_inventory.jsonl"
