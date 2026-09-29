@@ -1,0 +1,17 @@
+# The reviewer-model probe's gpt_5.2 solo conditions on validation small12 less 30714
+# (docs/plans/2026-09-29-probe-harness.md, configs/probe_sets/val_small12.yaml). The post-cutoff
+# set's pair (configs/pr_review_v5_probe_2026_07_08_v1_gpt52.yaml) with this set's release.
+extends: bases/v5_solo.yaml
+
+scaffold_type: ape_agent
+
+dataset:
+  release: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1
+  modification_inventory: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1/derived/modification_inventory.jsonl
+  require_reviewed_workspaces: true
+  pr_numbers: [26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]
+  # The five context tools the Claude sessions hold through `cli tool` (toolbox.CONTEXT_TOOLS).
+  solo_context_tools: [zulip_search, precedent_search, declaration_search, naming_norm, proof_profile]
+  # 11 PRs x solo_cost_cap $1.50 = $16.50 worst case a run.
+  run_total_cost_cap: 17.00
+  run_total_token_cap: 19900000

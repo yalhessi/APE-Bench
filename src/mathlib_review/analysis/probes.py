@@ -764,3 +764,13 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
                 flagged.append({"tool": b.get("name"), "why": sorted(set(why)),
                                 "input": text.replace(folder, "<dir>")[:160]})
     return {"folder": folder, "calls": calls, "flagged": flagged}
+
+
+def model_context(spec: ProbeSet, prs: List[int]) -> str:
+    """The solo task's `context_file`: each PR's pass-0 model as one section, JSON lines, so a
+    `gpt_5.2` session reads the same model a Claude session's `model.md` holds."""
+
+    models = render_models(spec.release, prs)
+    return "".join(json.dumps({"pr_number": pr, "sections": [{"title": "The PR model (pass 0)",
+                                                              "text": models[pr]}]},
+                              ensure_ascii=False) + "\n" for pr in prs)

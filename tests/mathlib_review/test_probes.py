@@ -227,3 +227,8 @@ def test_the_audit_flags_what_leaves_the_folder(tmp_path):
     assert report["calls"] == 4
     assert [f["why"] for f in report["flagged"]] == [
         ["file tool outside", "outside /research/elsewhere/x.json"], ["git"], ["web"]]
+
+
+def test_the_solo_context_file_is_the_one_test_b_used():
+    ref = (G52_DIR / "model_context.jsonl").read_text()
+    assert probes.model_context(POST, [41930, 42184, 42814, 43024, 43167, 43192]) == ref
