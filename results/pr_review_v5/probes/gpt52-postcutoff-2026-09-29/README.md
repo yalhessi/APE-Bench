@@ -342,3 +342,25 @@ rubric, the asks and the input builder are the same as for the arms condition.
 
 **Also read:** reach on the 9 asks in pass-3/4 scope; the six substantive asks one by one, against the
 two kinds of miss in the inspection; findings per PR; cost per session.
+
+**The calibration's result (2026-09-29): the gate fails, and the decision is the user's.** The one
+session on 43192 stopped at its $3.00 billed cap after 36 turns and 48 minutes, without submitting.
+
+| on 43192 | G, reasoning off | calibration, reasoning high |
+|---|---|---|
+| cost | $0.28 nominal | $3.06 billed, $5.72 nominal |
+| turns | 26 at most | 36, stopped by the cap |
+| call latency | seconds | median 65 s, longest 230 s |
+| reasoning tokens | 0 | 102,196 by turn 23 |
+
+Two full runs therefore project well above $9, likely $15 or more, so by the rule above they wait for
+the user.
+
+**The process changed, though no finding exists to match.** With reasoning on, `gpt_5.2` looked up the
+comparison objects the maintainers cited, which it never did with reasoning off:
+- it read the parent `Presheaf.lean` and looked up `PresheafOfModules.mk`, `mkHom` and `isoMk`;
+- it searched for where `cat_disch` is defined;
+- it compiled a variant of `mk`.
+
+That is the looking half of the inspection's two sources, moved by reasoning, on one session. Whether
+the concluding half moves is not known, because the session never submitted.
