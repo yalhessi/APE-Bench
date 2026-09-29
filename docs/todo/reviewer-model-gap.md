@@ -209,3 +209,33 @@ A set-parametrised harness needs:
 | lead mode | about $5 a run |
 | high effort | about $20 a run |
 | Claude sessions and matchers | session time only |
+
+**The procedure as run on the post-cutoff set, step by step** (each step was committed before the next):
+1. **The set.** A sealed draw (`projections.frame`), and a release outside
+   `inputs/pr_review_v4/releases/` so it stays out of `scored_pr_numbers()`. Restore the base snapshots
+   (`restore_bases.py`) before building the reviewed workspaces.
+2. **Packets** (`make_packets.py`), one per session:
+   - `brief_X.md`, verbatim from the construction demonstration;
+   - `pr.md` and `diff.patch`;
+   - `model.md`, from `build_model.py <release> <out_dir> <prs>`, which reads input and derived files
+     only;
+   - `./ptool`, from `bin/ptool.template`, which calls `cli tool` against the reviewed workspace and
+     logs every call through `log_call.py`.
+3. **Claude sessions.** Two per PR, each a `claude-opus-5-5` subagent spawned from a chat session.
+   The rules are instructions, checked afterwards by `audit_transcripts.py`: read only the packet,
+   call tools only through `./ptool`, keep temporary files in `tmp/`, no git and no web. Each session
+   writes `findings.json`.
+4. **Asks, only after every session ends.**
+   - `extract_draw_feedback.py <draw>` extracts round-1 feedback; it refuses test-set PRs.
+   - Two blind readers label it with `reader_rubric.md`: is it an ask, its val1000 family, its grain.
+   - Only the asks both readers agree on go into `match/ask_manifest.json`.
+5. **`gpt_5.2` conditions.** `cli run` solo with `task_config.system_prompt_file` (`brief_G.md`) and
+   `context_file` (the pass-0 models), plus lead runs. `--resume` continues an interrupted run.
+6. **Matching.**
+   - `build_match_inputs.py` strips findings to target, claim, change and severity, redacts cues and
+     shuffles labels under a sealed blinding.
+   - Two blind matcher subagents judge, and `audit_matchers.py` checks they stayed in their folders.
+   - `unblind.py` applies the rule stated before the runs.
+
+Steps 2-6 hard-code the probe's release and paths. Step 4's extractor needs a sealed draw, so the dev
+set, a v4 release, needs a by-PR-list variant. Step 3 is reproducible as a procedure, not as a script.
