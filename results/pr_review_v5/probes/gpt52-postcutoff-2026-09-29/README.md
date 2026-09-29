@@ -166,7 +166,7 @@ its lines are the PR's own, a usage when it writes an `example`, and a variant o
      (`p0016`), in view in 3 of 4. A sibling lemma in the same file removes the filter's `NeBot` by
      exactly the case split the maintainer asked for (`p0002`), in view in 2 of 4.
 3. **Every session stopped on its own.** All 24 submitted, at a median of 61-88 seconds and
-   $0.13-0.25 against the $1.50 cap. No cap bound.
+   $0.13-0.25 nominal, which is less billed, against the $1.50 billed cap. No cap bound.
 4. **`gpt_5.2` wrote no text between tool calls.** Every turn is a bare call, and the request carried
    no reasoning effort, so it did not reason (`docs/todo/reasoning-in-the-arms.md`). Claude
    (`claude-opus-5-5`) reasons between calls.
@@ -264,7 +264,9 @@ So the result of test (b) above stands as written.
 
 Two blind matchers, six sets per PR (L1, L2, G1, G2, X1, X2) under `blinding_arms_SEALED.json`. They
 read only their own folders and agree on all 96 cells (`match_arms/`, `unblinded_arms.json`). The two
-lead runs cost $5.90 and $5.88, against $1.69 for all four solo runs.
+lead runs billed $2.81 and $2.52, against $1.69 billed for all four solo runs. (Corrected 2026-09-29:
+this first said $5.90 and $5.88, which are the runs' nominal cost; the orchestrator summary printed
+nominal as "Cost" and billed as "Cached", and now prints "Billed" and "nominal".)
 
 | per-session reach, both matchers | all 16 asks | 9 asks in pass-3/4 scope |
 |---|---|---|

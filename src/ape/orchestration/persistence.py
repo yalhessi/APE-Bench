@@ -397,9 +397,13 @@ async def print_summary(results: OrchestratorResults, tasks_dir: Path, logger):
         f"({colored(f'{results.pass_rate_global*100:.1f}%', 'green')} of total)",
         f"{colored('Avg Score:', bold=True)}     {colored(f'{results.average_score:.3f}', 'green')}",
         separator,
+        # An attempt's `cached_cost` is its BILLED cost (cache discount applied, what every cap
+        # binds) and `cost` its nominal cost. Printed as "Cost / Cached" until 2026-09-29, which
+        # read as "the cost, of which cached": two lead runs were reported at their nominal
+        # $5.90 and $5.88 when they billed $2.81 and $2.52.
         f"{colored('Total Cost:', bold=True)}    "
-        f"Cost: ${colored(f'{total_cost:.4f}', 'yellow')}, "
-        f"Cached: ${colored(f'{total_cached_cost:.4f}', 'green')}",
+        f"Billed: ${colored(f'{total_cached_cost:.4f}', 'yellow')} "
+        f"(nominal ${colored(f'{total_cost:.4f}', 'green')})",
         separator,
         f"{colored('Wall Time:', bold=True)}     {colored(format_time_duration(results.wall_clock_time), 'yellow')}",
         f"{colored('Workspace:', bold=True)}     {results.workspace_path}",

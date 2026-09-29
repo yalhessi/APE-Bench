@@ -132,7 +132,7 @@ in place of the Lean navigation tools, and the gap survives without it.
 ## The arms condition (2026-09-29): the pipeline's structure adds nothing on unseen PRs
 
 The pipeline in lead mode (ten arms, work units, the generalist floor) ran twice on the same six PRs,
-at $5.90 and $5.88. Two blind matchers agree on all 96 cells:
+billing $2.81 and $2.52 ($5.90 and $5.88 nominal). Two blind matchers agree on all 96 cells:
 - Its reach is 0.12, the same as `gpt_5.2` solo (0.12), against Claude's 0.47.
 - On the substantive asks it is 0.00, with no partial either.
 - It reached only the unused import and the title's missing word. The gate published neither.
