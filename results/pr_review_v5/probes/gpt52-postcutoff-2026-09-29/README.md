@@ -306,3 +306,39 @@ wrong question of it. This is the inference half of the inspection above, narrow
 - the structure on a reviewer that reaches substantive asks (Claude, or `gpt_5.2` with reasoning);
 - `gpt_5.2` with reasoning, whole-PR (test (d));
 - a larger set.
+
+---
+
+## Test (d), pre-registered (2026-09-29, before its runs): `gpt_5.2` with reasoning on
+
+**The question.** Is the gap to Claude the reasoning setting or the model? Every `gpt_5.2` session so
+far ran with reasoning off: the request carried no reasoning effort, and the model wrote no text
+between tool calls.
+
+**The runs.** `configs/pr_review_v5_probe_2026_07_08_v1_gpt52_Gr.yaml`: condition G exactly, plus
+`reasoning_effort: high`. Two runs, Gr1 and Gr2 (`probe_postcutoff_gpt52_Gr_rep{1,2}`), on the same
+six PRs.
+- **The caps are doubled so they cannot bind:** $3.00 and 3,600,000 tokens a session. A session that
+  reaches its cap stops with no findings. That confounded the in-window reasoning twin, which lost 29 of
+  140 jobs to the cap. The inspection section above estimated four times G's cost, which would fit the
+  old cap. High effort may cost more than that.
+- **A calibration session comes first:** one PR, 43192, G's most expensive, under its own run name
+  (`probe_postcutoff_gpt52_Gr_calib`). It is not counted in the rule. The two runs go ahead if the
+  calibration projects both runs at $9 or less, the entry's single-digit budget. Otherwise the user
+  decides.
+
+**Matching.** Two new blind matchers, six sets per PR: Gr1, Gr2, G1, G2, X1, X2, under a new seal. The
+rubric, the asks and the input builder are the same as for the arms condition.
+
+**Reading rule**, on both matchers, with the process from `inspect_sessions.py`:
+
+| Gr's reach over 16 asks | Gr's comparison lookups a session | reading |
+|---|---|---|
+| ≥ 0.30 | ≥ 8 | reasoning is the lever: it restores both the looking and the reaching |
+| ≥ 0.30 | < 8 | reasoning is the lever, by inference from what is in view rather than by looking |
+| ≤ 0.18 | ≥ 8 | reasoning makes it look, and the model still does not conclude; the inference half is the model's |
+| ≤ 0.18 | < 8 | reasoning does not move this reviewer; the gap is the model |
+| otherwise | | partial |
+
+**Also read:** reach on the 9 asks in pass-3/4 scope; the six substantive asks one by one, against the
+two kinds of miss in the inspection; findings per PR; cost per session.
