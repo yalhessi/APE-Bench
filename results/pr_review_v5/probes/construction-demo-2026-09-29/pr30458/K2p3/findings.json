@@ -1,0 +1,55 @@
+[
+ {
+  "target": "Finset.card_le_card_div_right (Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, `section RightCancel` variable line 1256)",
+  "claim": "`card_le_card_div_right` is stated under `[DivisionMonoid α] [IsRightCancelMul α]`, but its proof goes through `div_left_injective`, which this PR itself states under `[DivInvMonoid G] [IsRightCancelMul G]`. The Finset lemma stops one class short of the generality the PR gives its own ingredient.",
+  "requested_change": "Change the right-cancel section's variable line to `variable [DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}`. The proof is unchanged. Keep `[DivisionMonoid α] [IsLeftCancelMul α]` for `card_le_card_div_left`, which does need it.",
+  "severity": "advisory",
+  "evidence": "With only the variable line changed, the whole file compiles, including `card_le_card_div_right` with its existing proof (c23). Weakening the left-cancel section the same way fails with `failed to synthesize DivisionMonoid α` at `div_right_injective` (c24). So the right member is the only over-assumed one, and the asymmetry would then match Basic.lean's `RightCancelDivInvMonoid` / `LeftCancelDivisionMonoid` sections.",
+  "construction": [
+   "c23",
+   "c24"
+  ]
+ },
+ {
+  "target": "Finset.card_le_card_div_self (missing right-cancel twin `Finset.card_le_card_div_self'`)",
+  "claim": "The PR splits the Finset div lemmas by cancellation side, but only the left-cancel form of `#s ≤ #(s / s)` exists (`[DivisionMonoid α] [IsLeftCancelMul α]`). The mul family right above it (lines 1172-1213) has both `card_le_card_mul_self` (IsLeftCancelMul) and `card_le_card_mul_self'` (IsRightCancelMul), with docstrings pointing at each other. A `[DivInvMonoid α] [IsRightCancelMul α]` client, where `card_le_card_div_right` applies, has no `_self` lemma.",
+  "requested_change": "In the right-cancel section add `@[to_additive] lemma card_le_card_div_self' : #s ≤ #(s / s) := by cases s.eq_empty_or_nonempty <;> simp [card_le_card_div_right, *]`, and give it and `card_le_card_div_self` docstrings that point at each other, as `card_le_card_mul_self` / `card_le_card_mul_self'` do.",
+  "severity": "advisory",
+  "evidence": "`card_le_card_div_self'` compiles at `[DivInvMonoid α] [IsRightCancelMul α]` with the one-line proof, and its additive twin `card_le_card_sub_self'` is generated and closes a `[SubNegMonoid R] [IsRightCancelAdd R]` example (c25). The mul family has both members and the div family has one (c26).",
+  "construction": [
+   "c25",
+   "c26",
+   "c23"
+  ]
+ },
+ {
+  "target": "Section structure around Finset.card_le_card_div_left / card_le_card_div_right / card_le_card_div_self (Finset/Basic.lean 1244-1270)",
+  "claim": "The PR wraps the three lemmas in `section DivisionMonoid`, nests `section LeftCancel` and `section RightCancel` inside it, and then opens a third `variable [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α]` line (split over two lines) for `card_le_card_div_self`. The same context is stated three times, and the outer section carries no variables. The file's own cancel lemmas use two flat sections, `section IsLeftCancelMul` and `section IsRightCancelMul`, with one variable line each (1147-1215).",
+  "requested_change": "Replace lines 1244-1270 with two flat sections, each with a single variable line: a left-cancel section (`[DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α}`) holding `card_le_card_div_left` and `card_le_card_div_self`, and a right-cancel section (`[DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}`) holding `card_le_card_div_right` and the twin from the previous finding. Name them after the mixins, as the file does, or after Basic.lean's new `LeftCancelDivisionMonoid` / `RightCancelDivInvMonoid`.",
+  "severity": "advisory",
+  "evidence": "The section and variable census of the file is in c28. c23 and c25 compile the right-cancel section at `DivInvMonoid` alongside an unchanged left-cancel block, so the two-section layout typechecks.",
+  "construction": [
+   "c28",
+   "c23",
+   "c25"
+  ]
+ },
+ {
+  "target": "Set.finite_div, Set.infinite_div (`variable [DivisionMonoid α] [IsLeftCancelMul α] [IsRightCancelMul α]`, Set/Finite.lean 139), and the DivisionMonoid-level div lemmas generally",
+  "claim": "In a `DivisionMonoid`, left and right cancellation are equivalent: inversion reverses products and is injective. So `finite_div` / `infinite_div` assume a redundant second mixin. Meanwhile a client holding one mixin cannot use them, nor `card_le_card_div_right`, nor the simp lemma `div_left_inj`, although every one of these statements holds for it. Neither the PR nor the base has a lemma bridging the two mixins in this setting. `Defs.lean` has the analogous bridge for the commutative case.",
+  "requested_change": "Add, next to `div_right_inj` in Basic.lean, `@[to_additive] lemma DivisionMonoid.IsLeftCancelMul.toIsRightCancelMul (G) [DivisionMonoid G] [IsLeftCancelMul G] : IsRightCancelMul G` and its converse. Model them on `CommMagma.IsLeftCancelMul.toIsRightCancelMul` (lemmas, not instances). Then state `Set.finite_div` / `Set.infinite_div` under the single mixin `[DivisionMonoid α] [IsLeftCancelMul α]`, deriving the other through the bridge. If the bridge is not wanted, at least assume the bundled `[IsCancelMul α]`.",
+  "severity": "advisory",
+  "evidence": "Both bridge directions compile in four lines each, and each left/right partner of the Basic.lean family is derivable from the other under the opposite mixin (c12). With the bridge, `finite_div` and `infinite_div` compile under `[DivisionMonoid R] [IsLeftCancelMul R]` alone (c34). Without it, the existing proof fails for that context (c32), and a one-mixin client fails on `infinite_div` (c31), on `card_le_card_div_right` (c27) and on `simpa` via `div_left_inj` (c13); supplying the bridge by `haveI` fixes the latter (c14). The CommMagma precedent is in c37, and the binder census (pair spelling 2 uses, both in this file; `[IsCancelMul _]` 26 uses in 21 files) is in c35.",
+  "construction": [
+   "c12",
+   "c13",
+   "c14",
+   "c27",
+   "c31",
+   "c32",
+   "c34",
+   "c35",
+   "c37"
+  ]
+ }
+]

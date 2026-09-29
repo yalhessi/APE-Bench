@@ -1,0 +1,54 @@
+[
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "The statement of `pi_map_piCongrLeft e μ` is exactly `(measurePreserving_piCongrLeft μ e).map_eq`, from the same file (l.720). So the file proves one fact twice: the PR golfs a 13-line proof at l.450-462, and the same equation already has a two-step proof at l.724-727.",
+  "requested_change": "Prove the fact once. Give `pi_map_piCongrLeft` the two-step proof its twin uses: `refine (pi_eq fun s _ => ?_).symm; rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e, Equiv.piCongrLeft_preimage_univ_pi, pi_pi _ _, e.prod_comp (fun i => μ i (s i))]`. That compiles where the lemma stands now. Then define `measurePreserving_piCongrLeft` with `map_eq := Measure.pi_map_piCongrLeft f μ`. The reverse also works: move the lemma below the MeasurePreserving section and prove it as `(measurePreserving_piCongrLeft μ e).map_eq`.",
+  "severity": "advisory",
+  "evidence": "`(measurePreserving_piCongrLeft ν e).map_eq` proves the statement of `pi_map_piCongrLeft` (c19). `measurePreserving_piCongrLeft` compiles with `map_eq := Measure.pi_map_piCongrLeft f μ` (c20). The twin's two-step `rw` proof compiles for `pi_map_piCongrLeft` at l.446 without reordering (c21). The three downstream `rw [← pi_map_piCongrLeft …]` uses in ProductMeasure.lean are unaffected, because the statement does not change (c18, c24).",
+  "construction": [
+   "c19",
+   "c20",
+   "c21",
+   "c18",
+   "c24"
+  ]
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "The instance binder is named, `[hι' : Fintype ι']`, but the name `hι'` is used neither in the proof nor anywhere else. It is the only named `Fintype` instance binder in Mathlib/MeasureTheory, and the same file writes `variable [Fintype ι']` (l.701).",
+  "requested_change": "Write the binder anonymously, as `[Fintype ι']`.",
+  "severity": "advisory",
+  "evidence": "With `[Fintype ι']`, the declaration compiles with the PR's proof, and so does the whole file (c22). A search for named Fintype instance binders in MeasureTheory finds only this one (c23).",
+  "construction": [
+   "c22",
+   "c23"
+  ]
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+  "claim": "The lemma rebinds `{L : Filter ι} [L.IsCountablyGenerated]` inside `section Closed`, which already declares both as section variables (l.606). The rebinding shadows the section's `L`. The section's other three lemmas use the section variables; this lemma alone repeats them.",
+  "requested_change": "Delete `{L : Filter ι} [L.IsCountablyGenerated]` from the signature and use the section variables. The signature seen by callers stays the same.",
+  "severity": "advisory",
+  "evidence": "Without the rebinding, the declaration compiles with the PR's proof. So does its caller `tendsto_iff_forall_lipschitz_integral_tendsto` (l.679), which uses it at a different index type (c26). The section structure and the census of `L : Filter` binders show that lemmas bind `L` themselves only in sections that have no `L` variable (c27).",
+  "construction": [
+   "c26",
+   "c27"
+  ]
+ },
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "The PR now proves `mem_map_equiv` with `grind`. But `grind` cannot use the lemma: it is registered only as `@[simp 1100]`. `grind` fails both on the statement and on a client goal `b ∈ t.map e.toEmbedding` given `e.symm b ∈ t`. The cause is that `mem_map` (`grind =`) yields `e.toEmbedding w = b`, and `grind` never rewrites `e.toEmbedding w` to `e w`. That gap is also why the proof needs `simp only [mem_map, Equiv.coe_toEmbedding]` before `grind`.",
+  "requested_change": "Register the lemma for grind as `@[simp 1100, grind =] theorem mem_map_equiv …`, in the form its `mem_map` neighbour already uses. The root fix, outside this PR's files, is a grind annotation on `Equiv.toEmbedding_apply`: with it, a bare `grind` would prove the statement.",
+  "severity": "advisory",
+  "evidence": "`grind` fails on the statement (c3) and on the client goal (c4). With `attribute [local grind =] mem_map_equiv`, `grind` closes that client goal and the forward goal `e a ∈ t.map e.toEmbedding` (c5). `grind [Equiv.toEmbedding_apply]` proves the statement in one call (c6). In Image.lean the 4 basic `mem_*` characterisations are `@[simp, grind =]`, and the `simp 1100` specialisations carry no grind attribute (c7). Simp users are already served (c1, c2).",
+  "construction": [
+   "c3",
+   "c4",
+   "c5",
+   "c6",
+   "c7",
+   "c1",
+   "c2"
+  ]
+ }
+]

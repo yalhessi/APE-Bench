@@ -1,0 +1,69 @@
+[
+ {
+  "target": "Set.finite_div, Set.infinite_div",
+  "claim": "The section asks for `[DivisionMonoid α] [IsLeftCancelMul α] [IsRightCancelMul α]`, but at DivisionMonoid each one-sided hypothesis implies the other, so one of the two is redundant. A client holding only one side cannot use either lemma, although both hold for that client.",
+  "requested_change": "Declare the section with one cancellation hypothesis, e.g. `variable [DivisionMonoid α] [IsLeftCancelMul α] {s t : Set α}`, and get the other side inside the proofs from the implication lemma of the next finding. This is the more concise way to state the assumptions that the PR description asks about.",
+  "severity": "advisory",
+  "evidence": "c5 proves IsLeftCancelMul → IsRightCancelMul and the converse for any DivisionMonoid. c27 compiles both lemmas under `[DivisionMonoid M] [IsLeftCancelMul M]` alone. c26: a left-cancel client's `finite_div.2 ...` fails with 'failed to synthesize IsRightCancelMul M'. c30: DivisionMonoid itself cannot be weakened to DivInvMonoid. c31: the split pair appears in Mathlib only here and in the file's own `section Cancel`, against 26 uses of `[IsCancelMul _]`.",
+  "construction": [
+   "c5",
+   "c26",
+   "c27",
+   "c30",
+   "c31"
+  ]
+ },
+ {
+  "target": "div_left_injective, div_left_inj, div_eq_inv_self, div_right_injective, div_right_inj, div_eq_self (the RightCancelDivInvMonoid and LeftCancelDivisionMonoid sections of Mathlib/Algebra/Group/Basic.lean)",
+  "claim": "The PR splits the DivisionMonoid-level family by cancellation side but gives no implication between the sides, which are equivalent at DivisionMonoid. A `[DivisionMonoid M] [IsLeftCancelMul M]` client cannot use div_left_inj, div_left_injective or div_eq_inv_self, by term or by simp. A right-cancel client cannot use div_right_inj, div_right_injective or div_eq_self. Every one of these statements holds for both clients.",
+  "requested_change": "Add `DivisionMonoid.IsLeftCancelMul.toIsRightCancelMul` and `DivisionMonoid.IsRightCancelMul.toIsLeftCancelMul`, with to_additive and docstrings, beside the new sections. Model them on `CommMagma.IsLeftCancelMul.toIsRightCancelMul` / `CommMagma.IsRightCancelMul.toIsLeftCancelMul` in Mathlib/Algebra/Group/Defs.lean; the six-line proof is c5. Then use them in the Set and Finset consumers so each takes a single cancellation hypothesis.",
+  "severity": "advisory",
+  "evidence": "c3 and c4: 'failed to synthesize IsRightCancelMul M' / 'IsLeftCancelMul M' for one-sided clients. c16: bare simp makes no progress on a / c = b / c for a left-cancel client. c5 compiles both implications. c6 and c7 compile each injectivity lemma under the opposite side. c12 recovers all four iff members for both one-sided clients once c5 is in scope. c35: the area's precedent is the four CommMagma lemmas, which are lemmas rather than instances; there is no DivisionMonoid analogue.",
+  "construction": [
+   "c3",
+   "c4",
+   "c5",
+   "c6",
+   "c7",
+   "c12",
+   "c16",
+   "c35"
+  ]
+ },
+ {
+  "target": "Finset.card_le_card_div_self",
+  "claim": "The file pairs each self bound with its twin: card_le_card_mul_self (left cancel) and card_le_card_mul_self' (right cancel). The PR splits the div bounds into LeftCancel and RightCancel sections but gives only the left-cancel self bound, so a `[DivisionMonoid M] [IsRightCancelMul M]` client cannot obtain #s ≤ #(s / s).",
+  "requested_change": "Add `@[to_additive] lemma card_le_card_div_self' : #s ≤ #(s / s) := by cases s.eq_empty_or_nonempty <;> simp [card_le_card_div_right, *]` in section RightCancel, mirroring card_le_card_mul_self' and its docstring. The alternative is to state the div bounds with one hypothesis via the implication lemma (finding 2), in which case a single self lemma serves both.",
+  "severity": "advisory",
+  "evidence": "c34: the mul pattern is left/right/self/self'; the div family lacks self'. c22: `card_le_card_div_self` fails for a right-cancel client with 'failed to synthesize IsLeftCancelMul M'. c19: the twin compiles in the PR's RightCancel section. c29: it even holds at [DivInvMonoid M] [IsRightCancelMul M].",
+  "construction": [
+   "c19",
+   "c22",
+   "c29",
+   "c34"
+  ]
+ },
+ {
+  "target": "Finset.card_le_card_div_right",
+  "claim": "The lemma is stated at `[DivisionMonoid α] [IsRightCancelMul α]`, but its proof uses only div_left_injective. The PR states div_left_injective at `[DivInvMonoid G] [IsRightCancelMul G]`, so the consumer is less general than the lemma it rests on.",
+  "requested_change": "In section RightCancel, declare `variable [DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}` so the lemma (and its self' twin, if added) sit at the generality of div_left_injective. The LeftCancel side keeps DivisionMonoid, which it needs.",
+  "severity": "advisory",
+  "evidence": "c20: card_le_card_div_right compiles at [DivInvMonoid M] [IsRightCancelMul M] with its proof and @[to_additive] unchanged. c28: the left-cancel bound fails there with 'failed to synthesize DivisionMonoid M', so only the right side can drop to DivInvMonoid. c10: [DivInvMonoid] [IsRightCancelMul] is minimal for div_left_injective's section.",
+  "construction": [
+   "c10",
+   "c20",
+   "c28"
+  ]
+ },
+ {
+  "target": "Finset.card_le_card_div_self (section structure of the DivisionMonoid block in Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean)",
+  "claim": "After `end RightCancel` the PR repeats `variable [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α}`, the LeftCancel section's variable line split over two lines, for a single lemma that uses only the left-cancel bound. The file's sibling card_le_card_mul_self sits inside section IsLeftCancelMul, with no repeated variable line.",
+  "requested_change": "Move card_le_card_div_self into section LeftCancel after card_le_card_div_left, and delete the third variable line.",
+  "severity": "advisory",
+  "evidence": "c33: the restructured block (self inside LeftCancel, trailing variable deleted) compiles with the whole file. c34: card_le_card_mul_self and card_le_card_mul_self' each sit inside their side's section.",
+  "construction": [
+   "c33",
+   "c34"
+  ]
+ }
+]

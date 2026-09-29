@@ -1,0 +1,342 @@
+[
+ {
+  "id": "c1",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_injective\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  -- FIXME this could be by `simpa`, but it fails. This is probably a bug in `simpa`.\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ mul_left_injective b⁻¹ h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof (simp only [div_eq_mul_inv]; exact mul_left_injective b⁻¹ h) compiles unchanged at the PR's [DivInvMonoid G] [IsRightCancelMul G]: mul_left_injective lives in Defs.lean's IsRightCancelMul section, so the generalisation needed no proof change."
+ },
+ {
+  "id": "c2",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_injective\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The one-line `simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹` that the pre-PR FIXME said 'fails' now compiles. The FIXME the PR deleted is resolved by this proof, not by the PR's three-line proof."
+ },
+ {
+  "id": "c3",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_injective\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b :=\n  fun _ _ h ↦ mul_right_cancel (b := b⁻¹) <| by simpa only [div_eq_mul_inv] using h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "A term proof in the shape of the sibling mul_left_injective (fun _ _ h ↦ mul_right_cancel ...) compiles with one named argument and simp only."
+ },
+ {
+  "id": "c4",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_injective\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b :=\n  fun _ _ h ↦ by simpa [div_eq_mul_inv] using h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "`fun _ _ h ↦ by simpa [div_eq_mul_inv] using h` also closes it (simp's mul_left_inj does the cancelling); the PR's intro/have/simpa sequence is not needed."
+ },
+ {
+  "id": "c5",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_injective\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  intro a₁ a₂ h\n  have h' : a₁ * b⁻¹ = a₂ * b⁻¹ := by simpa [div_eq_mul_inv] using h\n  exact mul_right_cancel h'",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "In the PR's own proof the three named arguments (a := a₁) (b := b⁻¹) (c := a₂) on mul_right_cancel and the closing `simpa using` are unnecessary: `exact mul_right_cancel h'` compiles."
+ },
+ {
+  "id": "c6",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_left_inj"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_inj\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := by\n  rw [div_eq_mul_inv, div_eq_mul_inv]\n  exact mul_left_inj _",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof of div_left_inj (rw [div_eq_mul_inv, div_eq_mul_inv]; exact mul_left_inj _) compiles unchanged at the PR's generality: mul_left_inj is in Defs.lean's IsRightCancelMul section."
+ },
+ {
+  "id": "c7",
+  "kind": "extraction",
+  "objects": [
+   "div_left_inj",
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_inj\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c :=\n  div_left_injective.eq_iff",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The fragment the PR repeats in div_left_injective and div_left_inj (have h' ... simpa [div_eq_mul_inv] using h; simpa using mul_right_cancel ... h') is already the lemma div_left_injective: div_left_inj := div_left_injective.eq_iff compiles in place, the pattern of mul_left_inj := (mul_left_injective a).eq_iff and of the PR's own div_right_inj."
+ },
+ {
+  "id": "c8",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_inj"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_inj\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := by\n  simp [div_eq_mul_inv]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "`by simp [div_eq_mul_inv]` also closes div_left_inj; the constructor/intro/rintro proof is not needed."
+ },
+ {
+  "id": "c9",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_inj"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_inj\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := by\n  constructor\n  · intro h\n    have h' : b * a⁻¹ = c * a⁻¹ := by simpa [div_eq_mul_inv] using h\n    exact mul_right_cancel h'\n  · rintro rfl; rfl",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "Keeping the PR's structure, the named arguments on mul_right_cancel and the closing simpa are unnecessary (`exact mul_right_cancel h'`)."
+ },
+ {
+  "id": "c10",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_right_injective\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  -- FIXME see above\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ inv_injective (mul_right_injective b h)",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof of div_right_injective, FIXME included, compiles at [DivisionMonoid G] [IsLeftCancelMul G]; the PR's proof is this one with the FIXME comment deleted."
+ },
+ {
+  "id": "c11",
+  "kind": "library_tool",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_right_injective\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The simpa one-liner the FIXME asked for compiles: `simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective`. The FIXME is resolvable for div_right_injective too, yet the PR deleted it and kept the two-step proof."
+ },
+ {
+  "id": "c12",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_right_injective\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x :=\n  fun _ _ h ↦ by simpa [div_eq_mul_inv] using h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "`fun _ _ h ↦ by simpa [div_eq_mul_inv] using h` closes div_right_injective (simp's mul_right_inj and inv_inj)."
+ },
+ {
+  "id": "c13",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_right_injective\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x :=\n  fun _ _ h ↦ inv_injective <| mul_right_injective b <| by simpa only [div_eq_mul_inv] using h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "A term proof inv_injective <| mul_right_injective b <| by simpa only ... compiles; no advantage over c11."
+ },
+ {
+  "id": "c14",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_right_inj"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_right_inj\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c :=\n  div_right_injective.eq_iff",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof `div_right_injective.eq_iff` compiles at the PR's generality; the PR's `(G := G) (b := a)` named arguments are unnecessary."
+ },
+ {
+  "id": "c15",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_eq_inv_self"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_eq_inv_self\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof of div_eq_inv_self compiles at [DivInvMonoid G] [IsRightCancelMul G]; the PR's proof is the same tactic line. Nothing to change in the proof."
+ },
+ {
+  "id": "c16",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_eq_self"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_eq_self\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof of div_eq_self compiles at [DivisionMonoid G] [IsLeftCancelMul G]; the PR's proof is the same tactic line. Nothing to change in the proof."
+ },
+ {
+  "id": "c17",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_eq_inv_self"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_eq_inv_self\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by simp [div_eq_mul_inv]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "`by simp [div_eq_mul_inv]` also closes div_eq_inv_self; the explicit rw proof is equally short and does not depend on the simp set, so no change."
+ },
+ {
+  "id": "c18",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_eq_self"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_eq_self\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := by simp [div_eq_mul_inv]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "`by simp [div_eq_mul_inv]` also closes div_eq_self; the rw proof is kept, no change."
+ },
+ {
+  "id": "c19",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_left_injective\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_right_injective b⁻¹",
+  "compiled": false,
+  "result": "error: failed to synthesize IsLeftCancelMul G (at mul_right_injective b⁻¹); declaration uses 'sorry'",
+  "shows": "Control: the tool rejects a wrong proof in this section (mul_right_injective needs IsLeftCancelMul), so the successful compiles above are real."
+ },
+ {
+  "id": "c20",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Finset.card_le_card_div_left"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, declaration_name Finset.card_le_card_div_left\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR term proof (have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective) compiles in the PR's LeftCancel section; the obtain/exact rewrite and (b := a) are not needed."
+ },
+ {
+  "id": "c21",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, declaration_name Finset.card_le_card_div_right\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR term proof compiles in the PR's RightCancel section; the obtain/exact rewrite and (b := b) are not needed."
+ },
+ {
+  "id": "c22",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Set.finite_div"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, declaration_name Set.finite_div\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof of Set.finite_div (div_left_injective.injOn with no named arguments) compiles in place (replicates pass 3 c24)."
+ },
+ {
+  "id": "c23",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Set.infinite_div"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, declaration_name Set.infinite_div\n@[to_additive]\nlemma infinite_div : (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty :=\n  infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The pre-PR proof of Set.infinite_div compiles in place; the (b := b)/(b := a) named arguments are not needed."
+ },
+ {
+  "id": "c24",
+  "kind": "library_tool",
+  "objects": [
+   "Finset.card_le_card_div_left"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, declaration_name Finset.card_le_card_div_left\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) := by\n  simpa [div_eq_mul_inv] using card_le_card_mul_left (t := t⁻¹) hs",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "card_le_card_div_left also follows from the file's card_le_card_mul_left applied to t⁻¹; same hypotheses and simp-dependent, so the direct image₂ proof stays. No change."
+ },
+ {
+  "id": "c25",
+  "kind": "library_tool",
+  "objects": [
+   "Set.finite_div"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, declaration_name Set.finite_div\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ := by\n  simpa [div_eq_mul_inv] using finite_mul (s := s) (t := t⁻¹)",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "Set.finite_div also follows from the file's finite_mul applied to t⁻¹; same hypotheses and simp-dependent, while the image2 proof mirrors finite_mul's own. No change."
+ },
+ {
+  "id": "c26",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_eq_inv_self",
+   "div_left_injective",
+   "div_left_inj",
+   "div_eq_self",
+   "div_right_injective",
+   "div_right_inj"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, lines 631-672 replaced\nsection RightCancelDivInvMonoid\n\nvariable [DivInvMonoid G] [IsRightCancelMul G] {a b c : G}\n\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]\n\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹\n\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := div_left_injective.eq_iff\n\nend RightCancelDivInvMonoid\n\nsection LeftCancelDivisionMonoid\n\nvariable [DivisionMonoid G] [IsLeftCancelMul G] {a b c : G}\n\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]\n\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective\n\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c := div_right_injective.eq_iff\n\nend LeftCancelDivisionMonoid",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The whole family rewritten together compiles: the rw one-liners unchanged, both injectivity lemmas as the simpa one-liners the FIXMEs asked for, both iff lemmas as `.eq_iff` with no named arguments. Six proofs, eight lines of proof text, no named arguments."
+ },
+ {
+  "id": "c27",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, lines 141-149 replaced\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn\n\n@[to_additive]\nlemma infinite_div : (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty :=\n  infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "Both Set lemmas with their pre-PR proofs compile together in the PR's DivisionMonoid section: the proof lines of this file need not change at all."
+ },
+ {
+  "id": "c28",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, lines 1246-1262 replaced\nsection LeftCancel\nvariable [DivisionMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α}\n\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective\n\nend LeftCancel\n\nsection RightCancel\nvariable [DivisionMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}\n\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective\n\nend RightCancel",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "Both Finset lemmas with their pre-PR term proofs compile together in the PR's LeftCancel/RightCancel sections, in the form of the siblings card_le_card_mul_left/right."
+ },
+ {
+  "id": "c29",
+  "kind": "extraction",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, lines 141-149 replaced\n@[to_additive]\nprivate lemma injOn_div_aux :\n    (∀ b ∈ t, InjOn (fun a ↦ a / b) s) ∧ ∀ a ∈ s, InjOn (fun b ↦ a / b) t :=\n  ⟨fun _ _ ↦ div_left_injective.injOn, fun _ _ ↦ div_right_injective.injOn⟩\n\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 injOn_div_aux.1 injOn_div_aux.2\n\n@[to_additive]\nlemma infinite_div : (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty :=\n  infinite_image2 injOn_div_aux.1 injOn_div_aux.2",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "The injectivity pair repeated in finite_div and infinite_div can be extracted into a private lemma, but it adds lines and departs from finite_mul/infinite_mul, which repeat the pair inline. No change."
+ },
+ {
+  "id": "c30",
+  "kind": "derivation",
+  "objects": [
+   "div_right_injective",
+   "div_left_injective"
+  ],
+  "lean": "-- lean_verify_edit Mathlib/Algebra/Group/Basic.lean, declaration_name div_right_injective\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := fun x y h ↦\n  haveI : IsRightCancelMul G := ⟨fun a b c h ↦ inv_injective <| mul_left_cancel (a := a⁻¹) <| by\n    change b * a = c * a at h\n    rw [← mul_inv_rev, ← mul_inv_rev, h]⟩\n  div_left_injective (b := b) (by simpa only [inv_div] using congrArg (·⁻¹) h)",
+  "compiled": true,
+  "result": "Lean verification completed successfully (no errors, no warnings)",
+  "shows": "div_right_injective can be derived from its dual div_left_injective via inv_div once IsRightCancelMul is derived locally (pass 3 c5), but it takes a local instance and five lines. The direct proof (c11) is better. No change."
+ }
+]

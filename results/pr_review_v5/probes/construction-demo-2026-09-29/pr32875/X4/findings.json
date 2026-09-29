@@ -1,0 +1,44 @@
+[
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "The new proof of `Finset.mem_map_equiv` (`simp only [mem_map, Equiv.coe_toEmbedding]; grind`) is a de-golf in running time: the PR's own profile reports it going from <10 ms to 25 ms. `grind` is only needed here to turn `f a = b` into `a = f.symm b`, which a single simp lemma does.",
+  "requested_change": "Replace the proof body with the one-liner `by simp [Equiv.apply_eq_iff_eq_symm_apply]` (or keep the original term proof), dropping the `simp only [...]; grind` pair.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Finset/Image.lean with `theorem mem_map_equiv ... := by simp [Equiv.apply_eq_iff_eq_symm_apply]`: success, no warnings. Bare `grind` fails (grind cannot relate `f.toEmbedding w = b` to `f.symm b`). Profiled with `set_option profiler true` / `profiler.threshold 0` via lean_verify_edit line mode, summed reported times over 2 reps: PR proof 43.9 / 40.8 ms, `simp [Equiv.apply_eq_iff_eq_symm_apply]` 24.8 / 21.9 ms, the original rintro/simpa proof 19.4 / 15.7 ms. So the requested proof is shorter than both and roughly halves the PR's cost. Precedent_search surfaced eric-wieser on PR #30313 preferring an explicit proof over a `grind` replacement."
+ },
+ {
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]; grind`) is slower than the proof it replaces (PR profile: <10 ms before, 17 ms after). After `simp only` the goal is just `↑(if a = 0 then 1 else a.natAbs) = a`, and `simp` closes it outright once given `ha0.ne'` and `Int.natAbs_of_nonneg ha0.le`, in the same style as its sibling `inv_intCast_num_of_pos := by simp [*]`.",
+  "requested_change": "Replace the proof body with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Rat/Lemmas.lean, declaration Rat.inv_intCast_den_of_pos, body `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`: success, no warnings. `simp [ha0.ne', ha0.le]` leaves `↑a.natAbs = a` (and `ha0.le` flagged unused); `abs_of_pos` is not available in this file. trace_state after `simp only [den_inv, num_intCast]` shows `⊢ ↑(if a = 0 then 1 else a.natAbs) = a`. Profiler (2 reps, summed ms): PR `simp only; grind` 35.3 / 44.1, requested `simp [...]` 6.4 / 8.9, original rw chain 9.7 / 10.0, `simp only; lia` 45.0 / 43.2. The requested proof is the fastest of the four and a single line."
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "The golfed `pi_map_piCongrLeft` still carries the ad hoc `let e_meas`, `let s'` and a 6-line `have` about the preimage, and it now ends in the opaque `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`. The same statement is already closed in this file by `measurePreserving_piCongrLeft`'s `map_eq` field, with a single rewrite chain through the existing `Equiv.piCongrLeft_preimage_univ_pi` and `Equiv.prod_comp`. So the preimage `have` re-derives a library lemma.",
+  "requested_change": "Replace the whole proof of `pi_map_piCongrLeft` with the rewrite chain used by `measurePreserving_piCongrLeft`:\n```\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n```\nThis drops `e_meas`, `s'`, the preimage `have` and the `congrFun rfl` term.",
+  "severity": "advisory",
+  "evidence": "Read Mathlib/MeasureTheory/Constructions/Pi.lean lines 446-462 (PR's proof) and 720-727 (`measurePreserving_piCongrLeft`, whose `map_eq` is the same equation up to renaming ι/ι' and α/β). lean_verify_edit with the requested proof (both the `=>`/`pi_pi _ _` and the `↦`/`pi_pi` spellings): success, no warnings. Dropping the explicit function argument (`e.prod_comp`) fails with a rewrite motive error, so the argument is needed. Profiler (2 reps, summed ms): PR proof 63.3 / 64.8, requested rw chain 19.0 / 22.9, keeping the scaffolding with only `rw [this, pi_pi]; exact Fintype.prod_equiv e _ _ fun _ ↦ rfl` 65.3 / 66.1. So the rewrite chain is about 3x faster than the PR's version and 12 lines shorter. Uses of the lemma in Probability/ProductMeasure.lean are rewrites by name and are unaffected."
+ },
+ {
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "The golfed proof keeps a `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`, then uses `simp only [this]` to perform one rewrite and closes with `exact (...).symm`. The whole statement is two rewrites.",
+  "requested_change": "Replace the proof body with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`, removing the `have`, the `simp only [this]` and the `exact`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, declaration ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod: `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` succeeds, as do the variant `κ.disintegrate κ.condKernel` and the file's own idiom `conv_rhs => rw [← κ.disintegrate κ.condKernel]; rw [Kernel.compProd_apply_prod hs ht]` (used by the sibling lemmas `lintegral_condKernel`, `setLIntegral_condKernel`). Profiler (2 reps, summed ms): PR proof 28.4 / 33.9, requested one-liner 14.2 / 14.6. Sibling of the `Measure` version below; the same change applies there."
+ },
+ {
+  "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "This proof has the same shape as the kernel version: a `have` rewriting `ρ` as `ρ.fst ⊗ₘ ρ.condKernel`, then `simp only [this]` used as a single rewrite, then `exact (compProd_apply_prod hs ht).symm`. Two rewrites suffice.",
+  "requested_change": "Replace the proof body with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, declaration MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod: `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` succeeds, and so do `ρ.disintegrate ρ.condKernel` and the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]; rw [compProd_apply_prod hs ht]` idiom. Profiler (2 reps, summed ms): PR proof 36.3 / 38.0, requested one-liner 24.9 / 28.6. Most of the remaining cost is `SFinite` instance search, which both versions share."
+ },
+ {
+  "target": "limsup_finset_sup'",
+  "claim": "The PR golfs the first `le_antisymm` branch of `limsup_finset_sup'` but leaves the second branch proving `F i a ≤ sup' s hs (fun i ↦ F i a)` by hand, with `simp only [le_sup'_iff]; use i, i_s`. That goal is exactly `Finset.le_sup'`.",
+  "requested_change": "Replace the second bullet with\n```\n  · refine Finset.sup'_le hs _ fun i i_s ↦ ?_\n    exact limsup_le_limsup (.of_forall fun a ↦ le_sup' (fun i ↦ F i a) i_s) (h₁ i i_s) bddsup\n```",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Order/LiminfLimsup.lean, declaration limsup_finset_sup', with the PR's first branch kept verbatim and the second bullet replaced as above: success, no warnings. Also verified: replacing the 4-line `h₃` block by the term `let ⟨i, hi⟩ := hs; ⟨i, hi, h₁ i hi⟩` compiles, an optional further golf. `liminf_finset_inf'` is derived from this lemma by `OrderDual`, so it needs no parallel change."
+ }
+]

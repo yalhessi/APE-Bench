@@ -1,0 +1,65 @@
+[
+  {
+    "target": "Cardinal.infinite_pigeonhole_card_lt",
+    "claim": "The docstring of `infinite_pigeonhole_card_lt` as the PR leaves it says the domain's cardinality is \"strictly greater than its domain's\", which is vacuous and does not match the hypothesis `h : #α < #β`. The PR changed both occurrences of \"codomain's\" to \"domain's\", but only the first should have changed (to match the new `hβ : ℵ₀ ≤ #β`). The existing typo \"strictly great than\" is still there.",
+    "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has a fiber with cardinality strictly greater than the codomain's.\"",
+    "severity": "blocking",
+    "evidence": "file_read of target/Mathlib/SetTheory/Cardinal/Pigeonhole.lean lines 67-70: `/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\\nhas a fiber with cardinality strictly great than the codomain. -/` over `(h : #α < #β) (hβ : ℵ₀ ≤ #β)`. The diff shows the old text said \"codomain's ... strictly smaller than its domain's\", and the PR flipped both nouns. lean_verify_edit with the corrected docstring (part of a splice of lines 67-105) compiled: success."
+  },
+  {
+    "target": "Cardinal.exists_infinite_fiber",
+    "claim": "The docstring of `exists_infinite_fiber` has the same error: \"infinite but strictly greater than its domain's\" should compare against the codomain, since the hypothesis is `h : #α < #β` with `f : β → α`.",
+    "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is infinite and strictly greater than its codomain's has an infinite fiber.\"",
+    "severity": "blocking",
+    "evidence": "file_read of Pigeonhole.lean lines 78-80: `/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\\nhas an infinite fiber. -/` over `(h : #α < #β) (hβ : Infinite β)`. The diff shows the pre-PR text was \"codomain's ... strictly smaller than its domain's\", so the second noun was flipped by mistake. The corrected docstring compiled in the lines 67-105 splice (lean_verify_edit success)."
+  },
+  {
+    "target": "Cardinal.exists_uncountable_fiber",
+    "claim": "The docstring of the new `exists_uncountable_fiber` copies the same error: \"uncountable but strictly greater than its domain's\". It should compare against the codomain (`h : #α < #β`, `f : β → α`).",
+    "requested_change": "Replace the docstring with: \"A function whose domain's cardinality is uncountable and strictly greater than its codomain's has an uncountable fiber.\"",
+    "severity": "blocking",
+    "evidence": "file_read of Pigeonhole.lean lines 95-97: `/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's\\nhas an uncountable fiber. -/`. The corrected docstring compiled in the lines 67-105 splice (lean_verify_edit success)."
+  },
+  {
+    "target": "Cardinal.infinite_pigeonhole_card_lt",
+    "claim": "The new proof of `infinite_pigeonhole_card_lt` splits on `#α < ℵ₀` and goes through `infinite_pigeonhole_card` and regularity (`isRegular_aleph0`, `isRegular_succ`) in both branches. With the generalized hypothesis `ℵ₀ ≤ #β`, the statement follows directly from the existing lemmas `mk_le_mk_mul_of_mk_preimage_le` and `mul_lt_of_lt`: if every fiber has cardinality at most `#α`, then `#β ≤ #α * #α < #β`.",
+    "requested_change": "Replace the proof with:\n```\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ h h)\n```\n(This also removes the `simp_rw [← succ_le_iff]` and the case split.)",
+    "severity": "advisory",
+    "evidence": "declaration_search: `Cardinal.mk_le_mk_mul_of_mk_preimage_le` (SetTheory/Cardinal/Order.lean: `(hf : ∀ b, #(f ⁻¹' {b}) ≤ c) : #α ≤ #β * c`) and `Cardinal.mul_lt_of_lt` (SetTheory/Cardinal/Arithmetic.lean: `ℵ₀ ≤ c → a < c → b < c → a * b < c`) both exist before this PR. lean_verify_edit on Mathlib/SetTheory/Cardinal/Pigeonhole.lean, replacing `Cardinal.infinite_pigeonhole_card_lt` with this two-line proof: success, no errors or warnings. The whole file recompiled, including the downstream `exists_infinite_fiber`, `exists_uncountable_fiber` and `le_range_of_union_finset_eq_univ`. A variant also compiled (lean_verify_edit success on the lines 67-105 splice): the same two lines stated for an arbitrary `c < #β`, with both this lemma and `exists_uncountable_fiber` as one-line corollaries."
+  },
+  {
+    "target": "Cardinal.exists_uncountable_fiber",
+    "claim": "The proof of the new `exists_uncountable_fiber` goes through `succ_aleph0`/`ℵ₁`, a case split, `isRegular_aleph_one` and a `succ_le_succ_iff` rewrite. The statement is one application of `mk_le_mk_mul_of_mk_preimage_le` plus `mul_lt_of_lt`: if every fiber has cardinality at most `ℵ₀`, then `#β ≤ #α * ℵ₀ < #β`. The proof also writes `Cardinal.aleph0_lt_mk_iff`, `Order.succ_le_iff` and `Order.succ_le_succ_iff`, but the file is inside `namespace Cardinal` with `open Order`, so the prefixes are redundant.",
+    "requested_change": "Replace the proof with:\n```\n  simp_rw [← aleph0_lt_mk_iff] at hβ ⊢\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ.le h hβ)\n```",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Pigeonhole.lean, replacing `Cardinal.exists_uncountable_fiber` with this proof and keeping the PR's statement: success, no errors or warnings. `mk_le_mk_mul_of_mk_preimage_le` and `mul_lt_of_lt` both exist at the base commit (declaration_search). The file header (file_read lines 23-27) has `open Order Ordinal Set` and `namespace Cardinal`."
+  },
+  {
+    "target": "Cardinal.exists_infinite_fiber",
+    "claim": "The PR re-signs `exists_infinite_fiber` with an explicit typeclass hypothesis `(hβ : Infinite β)`, and adds `exists_infinite_fiber'` with explicit `(hα : Infinite α)` and `exists_uncountable_fiber` with explicit `(hβ : Uncountable β)`. Both in-tree call sites fill the argument with `(by infer_instance)`: `le_range_of_union_finset_eq_univ` (Pigeonhole.lean:121) and `linearIndependent_le_infinite_basis` (StrongRankCondition.lean:250). The finite sibling `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`. The PR changes this signature anyway, so this is the point to fix the binder.",
+    "requested_change": "Make the class hypotheses instance-implicit: `[Infinite β]` in `exists_infinite_fiber`, `[Infinite α]` in `exists_infinite_fiber'`, and `[Uncountable β]` in `exists_uncountable_fiber`. Obtain the cardinal fact inside the proofs with `have hβ := Cardinal.infinite_iff.mp ‹Infinite β›` (resp. `aleph0_lt_mk_iff.mpr ‹Uncountable β›`). Prove `exists_infinite_fiber'` as `have : Infinite β := Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp ‹_›).trans h.le); exists_infinite_fiber f h`. Drop the `(by infer_instance)` arguments at the two call sites.",
+    "severity": "advisory",
+    "evidence": "content_search for `exists_infinite_fiber|...` over target/Mathlib: the only callers are Pigeonhole.lean:121 `exists_infinite_fiber u' h (by infer_instance)` and StrongRankCondition.lean:250 `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)`. `Finite.exists_infinite_fiber [Infinite α] [Finite β]` is at Data/Fintype/Pigeonhole.lean:86. lean_verify_edit splicing Pigeonhole.lean lines 78-122 with the instance-implicit versions of all three lemmas and `exists_infinite_fiber u' h` at the call site: success, no errors or warnings. The StrongRankCondition call site could not be verified jointly, because the tool compiles one file against the PR's Pigeonhole. The original `(by infer_instance)` there already resolves `Infinite (Finset ι)`, so the instance is available. precedent_search surfaced jcommelin on PR #32975 asking about an explicit class-typed hypothesis (\"you want `h` to be explicit, instead of instance implicit?\")."
+  },
+  {
+    "target": "Cardinal.le_range_of_union_finset_eq_univ",
+    "claim": "The PR renames the lemma (with a deprecation) to carry out the old TODO, but the new name still says `union` for the indexed union `⋃ a, (f a : Set β) = Set.univ`. Mathlib names that hypothesis shape `iUnion ... eq_univ` (e.g. `MeasureTheory.Measure.ext_iff_of_iUnion_eq_univ`, `Set.injective_iff_injective_of_iUnion_eq_univ`, `Subspace.exists_eq_top_of_iUnion_eq_univ`). Because the rename is paid for now, it should land on the conventional name.",
+    "requested_change": "Rename `le_range_of_union_finset_eq_univ` to `le_range_of_iUnion_finset_eq_univ`. Point the deprecated alias `le_range_of_union_finset_eq_top` at the new name, and update the use in `infinite_basis_le_maximal_linearIndependent'` (LinearAlgebra/Basis/Cardinality.lean:119).",
+    "severity": "advisory",
+    "evidence": "content_search for `theorem ...(of_iUnion_eq_univ|of_union_eq_univ|iUnion_finset|union_finset)...` over target/Mathlib. `of_iUnion_eq_univ` hits: Measure/Restrict.lean:419, Data/Set/Lattice/Image.lean:190/197/205, GroupTheory/CosetCover.lean:393. No `of_union_eq_univ` hits. The only other `union_finset` name is the older `Set.union_finset_finite_of_range_finite`. naming_norm returned subject_unresolved (unmeasured). lean_verify_edit splicing Pigeonhole.lean lines 110-125 with the renamed theorem and the retargeted alias: success. An attempt that also wrote `univ` for `Set.univ` failed, because `univ` resolves to `Cardinal.univ` inside `namespace Cardinal`, so `Set.univ` must stay."
+  },
+  {
+    "target": "Cardinal.exists_infinite_fiber'",
+    "claim": "The docstring of the new `exists_infinite_fiber'` reads \"that requires codomain to be infinite\" and is missing the article.",
+    "requested_change": "Change the docstring to \"A weaker version of `exists_infinite_fiber` that requires the codomain to be infinite.\"",
+    "severity": "advisory",
+    "evidence": "file_read of Pigeonhole.lean line 88. The corrected docstring compiled as part of the lines 78-122 splice (lean_verify_edit success)."
+  },
+  {
+    "target": "Mathlib/SetTheory/Cardinal/Pigeonhole.lean",
+    "claim": "The PR deletes the only use of `Set.union_finset_finite_of_range_finite` (and of `infinite_coe_iff`/`infinite_univ`) from this file. The file compiles without its `public import Mathlib.Data.Set.Finite.Lattice`, and that module is where `union_finset_finite_of_range_finite` is declared. `Pigeonhole.lean` was that lemma's only user in Mathlib.",
+    "requested_change": "Remove the now-unneeded `public import Mathlib.Data.Set.Finite.Lattice` from `Mathlib/SetTheory/Cardinal/Pigeonhole.lean`.",
+    "severity": "advisory",
+    "evidence": "declaration_search: `Set.union_finset_finite_of_range_finite` is declared in Mathlib/Data/Set/Finite/Lattice.lean. content_search over target/Mathlib finds no other occurrence of it after the PR. lean_verify_edit replacing lines 8-9 with only `public import Mathlib.SetTheory.Cardinal.Regular`: success, no errors or warnings. I did not check whether the module is still reached transitively through `Cardinal.Regular`, so this is a direct-import cleanup only."
+  }
+]

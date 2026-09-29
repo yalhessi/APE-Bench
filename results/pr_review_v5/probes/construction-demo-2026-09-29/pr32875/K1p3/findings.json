@@ -1,0 +1,37 @@
+[
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft (Mathlib/MeasureTheory/Constructions/Pi.lean:446)",
+  "claim": "`pi_map_piCongrLeft` states exactly the `map_eq` field of `measurePreserving_piCongrLeft` (same file, line 720), under the same hypotheses (Fintype on both index types, SigmaFinite factors). The two copies are proved independently. The PR golfs the 12-line proof of one copy while the file already proves the same equation in 3 lines.",
+  "requested_change": "Prove one statement from the other rather than twice. One way: give `pi_map_piCongrLeft` the sibling's 3-line proof (`refine (pi_eq fun s _ => ?_).symm; rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e, Equiv.piCongrLeft_preimage_univ_pi, pi_pi _ _, e.prod_comp (fun i => μ i (s i))]`), then set `map_eq := Measure.pi_map_piCongrLeft f μ` in `measurePreserving_piCongrLeft`. Another way is to move `pi_map_piCongrLeft` below the sibling and prove it as `(measurePreserving_piCongrLeft μ e).map_eq`.",
+  "severity": "advisory",
+  "evidence": "`(measurePreserving_piCongrLeft ν e).map_eq` proves the `pi_map_piCongrLeft` statement (c27). `map_eq := Measure.pi_map_piCongrLeft f μ` proves `measurePreserving_piCongrLeft` (c28). The lemma alone gives the `MeasurePreserving` statement in one line (c23). The sibling's 3-line `rw` proof compiles in place of the PR's proof at line 446 (c29). The duplication predates the PR, which changes only this lemma's proof.",
+  "construction": [
+   "c23",
+   "c27",
+   "c28",
+   "c29"
+  ]
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le' (Mathlib/MeasureTheory/Measure/Portmanteau.lean:645)",
+  "claim": "The lemma re-binds `{L : Filter ι} [L.IsCountablyGenerated]`, which `section Closed` already declares as `variable`s (line 606). Its siblings in that section (`tendsto_of_forall_isClosed_limsup_le'`, `tendsto_of_forall_isClosed_limsup_le`) use the section binders. The re-binding shadows the section's `L` and adds nothing.",
+  "requested_change": "Drop `{L : Filter ι} [L.IsCountablyGenerated]` from the signature, so it reads `lemma tendsto_of_forall_isClosed_limsup_real_le' (h : ∀ F : Set Ω, IsClosed F → limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) : Tendsto μs L (𝓝 μ)`.",
+  "severity": "advisory",
+  "evidence": "The copy without the re-bound binders compiles with the PR's proof, and `@copy = @tendsto_of_forall_isClosed_limsup_real_le' := rfl` compiles, so the type is identical (c35). It is the only one of the four members of section Closed that re-declares the section's filter binders (c36). This predates the PR; the PR touches only the proof.",
+  "construction": [
+   "c35",
+   "c36"
+  ]
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft (Mathlib/MeasureTheory/Constructions/Pi.lean:446)",
+  "claim": "The instance binder is named, `[hι' : Fintype ι']`, but the name is used neither in the statement nor in the PR's new proof (nor in the old one). It is the only named `Fintype` binder in `Mathlib/MeasureTheory/Constructions`; the file's own `variable [Fintype ι']` (line 701) is anonymous.",
+  "requested_change": "Write the binder anonymously, as `[Fintype ι']`.",
+  "severity": "advisory",
+  "evidence": "The anonymous-binder copy has the same type: `@copy = @pi_map_piCongrLeft := rfl` compiles (c25). The directory census finds 1 named `Fintype` binder (this one) against 13 anonymous `[Fintype …]` (c26). This predates the PR.",
+  "construction": [
+   "c25",
+   "c26"
+  ]
+ }
+]

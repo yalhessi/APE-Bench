@@ -1,0 +1,34 @@
+[
+ {
+  "target": "Cardinal.exists_infinite_fiber, Cardinal.exists_uncountable_fiber (Mathlib/SetTheory/Cardinal/Pigeonhole.lean)",
+  "claim": "The two new fiber proofs repeat one argument with θ = ℵ₀ and θ = ℵ₁. Each splits on `lt_or_ge #α θ`, closes the small-codomain branch with `infinite_pigeonhole_card f θ … (by rw/rwa [….cof_eq] …)` and the large-codomain branch with `infinite_pigeonhole_card_lt`. The ℵ₀ line in exists_infinite_fiber is also a verbatim copy of the first branch of infinite_pigeonhole_card_lt. A maintainer keeping these proofs alive through a Cardinal refactor has to fix the same case split in three places.",
+  "requested_change": "Extract the argument once, for a regular θ: `theorem exists_le_mk_fiber_of_isRegular {β α : Type u} (f : β → α) (h : #α < #β) {θ : Cardinal} (hθ : θ.IsRegular) (hθβ : θ ≤ #β) : ∃ a : α, θ ≤ #(f ⁻¹' {a})`, proved by `rcases lt_or_ge #α θ with hα | hα; · exact infinite_pigeonhole_card f θ hθβ hθ.aleph0_le (by rwa [hθ.cof_eq]); · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hθ.aleph0_le.trans hθβ); exact ⟨a, hα.trans ha.le⟩`. Then prove exists_infinite_fiber as `simp_rw [infinite_iff] at hβ ⊢; exact exists_le_mk_fiber_of_isRegular f h isRegular_aleph0 hβ`, and exists_uncountable_fiber as `simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0] at hβ ⊢; exact exists_le_mk_fiber_of_isRegular f h isRegular_aleph_one hβ`.",
+  "severity": "advisory",
+  "evidence": "c12: lines 78-105 of Pigeonhole.lean replaced by the extracted lemma plus the two 2-line derivations (exists_infinite_fiber' in its c1 one-line form). The whole file compiles with no errors or warnings, including le_range_of_union_finset_eq_univ downstream. The two fiber proofs drop from 5 and 7 lines to 2 each, for one 4-line lemma. Pass 3's c11 had compiled the same statement as a free-standing example. c13: the lemma can also be the sole primitive, with infinite_pigeonhole_card_lt derived from it, but that does not shorten infinite_pigeonhole_card_lt, so c12's placement is the smaller change.",
+  "construction": ["c12", "c13"]
+ },
+ {
+  "target": "Cardinal.exists_uncountable_fiber, second branch (Pigeonhole.lean lines 99 and 103-105)",
+  "claim": "The last two lines rewrite a hypothesis in place (`rw [← Order.succ_le_succ_iff, succ_aleph0] at hα`) to feed one `trans`. The step is a single term. The proof also qualifies `Cardinal.aleph0_lt_mk_iff` and `Order.succ_le_iff`, although the file is inside `namespace Cardinal` with `open Order`, and `infinite_pigeonhole_card_lt` two declarations above writes bare `succ_le_iff`.",
+  "requested_change": "Replace lines 104-105 with `exact ⟨a, succ_aleph0 ▸ succ_le_of_lt (hα.trans_lt ha)⟩` and write line 99 as `simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0] at hβ ⊢`. This is moot if the extraction in the first finding is taken.",
+  "severity": "advisory",
+  "evidence": "c10: the declaration with these two changes compiles with no errors or warnings, and the proof goes from 7 lines to 6. c11: a variant with no ℵ₁ arithmetic, using Set.Countable.of_preimage_singleton for the countable case, also compiles but is no shorter, so it is not requested.",
+  "construction": ["c10"]
+ },
+ {
+  "target": "Cardinal.exists_infinite_fiber' (Pigeonhole.lean lines 91-93)",
+  "claim": "The term-mode proof embeds a three-line tactic block, `(by rw [Cardinal.infinite_iff] at hα ⊢; exact hα.trans h.le)`, to build `Infinite β`. The fact is a one-line term.",
+  "requested_change": "Write the proof as `exists_infinite_fiber f h (infinite_iff.2 ((infinite_iff.1 hα).trans h.le))`.",
+  "severity": "advisory",
+  "evidence": "c1: the declaration with this one-line term proof compiles with no errors or warnings. Pass 3's c17 used the same term shape at the only consumer (StrongRankCondition.lean:250).",
+  "construction": ["c1"]
+ },
+ {
+  "target": "Cardinal.le_range_of_union_finset_eq_univ (Pigeonhole.lean lines 112-122)",
+  "claim": "The PR rewrites this proof (it drops the `have k` block and changes the fiber call). The proof it leaves still is not in the library's idiom. It uses `by_contra h; simp only [not_le] at h` where `by_contra!` is the idiom (the same file's `infinite_pigeonhole` uses it). It uses `let` for a Prop-valued `u` and threads `.choose`/`.choose_spec` by hand where `choose` and `Set.iUnion_eq_univ_iff` do it. It closes with an explicit-argument `@Infinite.of_injective _ _ p (inclusion …)` where `Set.Finite.subset` states the finiteness directly. The new instance argument `(by infer_instance)` has `[Infinite β]` in scope and could be `‹_›`. This is optional: apart from the instance argument, these lines predate the PR.",
+  "requested_change": "Optionally replace the body with: `by_contra! h; choose g hg using iUnion_eq_univ_iff.1 w; obtain ⟨⟨-, a, rfl⟩, p⟩ := exists_infinite_fiber (fun b => (⟨f (g b), mem_range_self _⟩ : range f)) h ‹_›; refine infinite_coe_iff.1 p ((f a).finite_toSet.subset fun b hb => ?_); simp only [mem_preimage, mem_singleton_iff, Subtype.mk.injEq] at hb; exact hb ▸ hg b`.",
+  "severity": "advisory",
+  "evidence": "c14: the rewritten declaration compiles with no errors or warnings, 7 lines against the PR's 11. c4 and c5 confirm that the PR's own change here is right. The pre-PR proof no longer compiles (`k : Infinite ↑(range f)` given where `Infinite β` is expected). Keeping it via exists_infinite_fiber' works but retains the 5-line `have k` block that the PR correctly removes.",
+  "construction": ["c14", "c4", "c5"]
+ }
+]

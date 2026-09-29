@@ -1,0 +1,213 @@
+[
+ {
+  "id": "c1",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Cardinal.exists_infinite_fiber'"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, declaration Cardinal.exists_infinite_fiber' replaced by:\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber f h (infinite_iff.2 ((infinite_iff.1 hα).trans h.le))",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The primed lemma's hypothesis argument, written in the PR as a `by rw [Cardinal.infinite_iff] at hα ⊢; exact hα.trans h.le` block, closes as the one-line term `infinite_iff.2 ((infinite_iff.1 hα).trans h.le)`, making the whole proof a single term."
+ },
+ {
+  "id": "c2",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Cardinal.infinite_pigeonhole_card_lt"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, pre-PR proof (hypotheses renamed w→h, w'→hβ) against the PR's statement:\ntheorem infinite_pigeonhole_card_lt {β α : Type u} (f : β → α) (h : #α < #β) (hβ : ℵ₀ ≤ #β) :\n    ∃ a : α, #α < #(f ⁻¹' {a}) := by\n  simp_rw [← succ_le_iff]\n  exact infinite_pigeonhole_card f (succ #α) (succ_le_of_lt h) (hβ.trans (lt_succ _).le)\n    ((lt_succ _).trans_le (isRegular_succ hβ).2.ge)",
+  "compiled": false,
+  "result": "Two application type mismatches: `hβ.trans (lt_succ _).le` needs `#β ≤ succ #α`; `(isRegular_succ hβ).2.ge` is about `succ #β`, not `succ #α`.",
+  "shows": "The pre-PR one-line proof does not survive moving the infinitude hypothesis from `#α` to `#β`; the PR's case split on `#α < ℵ₀` is required by the new statement, not decoration."
+ },
+ {
+  "id": "c3",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Cardinal.exists_infinite_fiber"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, pre-PR proof (w→h, w'→hβ) against the PR's statement:\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ\n  exact ⟨a, hβ.trans ha.le⟩",
+  "compiled": false,
+  "result": "Application type mismatch in `hβ.trans ha.le`: `ha.le : #α ≤ #fiber`, expected `#β ≤ #fiber`.",
+  "shows": "The pre-PR proof relied on `ℵ₀ ≤ #α`; under `Infinite β` it cannot conclude, so the PR's finite-codomain branch is required."
+ },
+ {
+  "id": "c4",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Cardinal.le_range_of_union_finset_eq_univ"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, pre-PR proof of le_range_of_union_finset_eq_top (with `have k`) against the renamed statement:\ntheorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n  have k : _root_.Infinite (range f) := by\n    rw [infinite_coe_iff]\n    apply mt (union_finset_finite_of_range_finite f)\n    rw [w]\n    exact infinite_univ\n  by_contra h\n  simp only [not_le] at h\n  let u : ∀ b, ∃ a, b ∈ f a := fun b => by simpa using (w.ge :) (Set.mem_univ b)\n  let u' : β → range f := fun b => ⟨f (u b).choose, by simp⟩\n  have v' : ∀ a, u' ⁻¹' {⟨f a, by simp⟩} ≤ f a := by\n    rintro a p m\n    have m : f (u p).choose = f a := by simpa [u'] using m\n    rw [← m]\n    apply fun b => (u b).choose_spec\n  obtain ⟨⟨-, ⟨a, rfl⟩⟩, p⟩ := exists_infinite_fiber u' h k\n  exact (@Infinite.of_injective _ _ p (inclusion (v' a)) (inclusion_injective _)).false",
+  "compiled": false,
+  "result": "Application type mismatch: `k : Infinite ↑(range f)` given where `Infinite β` is expected in `exists_infinite_fiber u' h k`.",
+  "shows": "The pre-PR proof does not compile against the new `exists_infinite_fiber`; its 5-line `have k` block existed only to feed the old codomain hypothesis."
+ },
+ {
+  "id": "c5",
+  "kind": "library_tool",
+  "objects": [
+   "Cardinal.le_range_of_union_finset_eq_univ",
+   "Cardinal.exists_infinite_fiber'"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, as c4 but the last call is `exists_infinite_fiber' u' h k`:\ntheorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n  have k : _root_.Infinite (range f) := by\n    rw [infinite_coe_iff]\n    apply mt (union_finset_finite_of_range_finite f)\n    rw [w]\n    exact infinite_univ\n  by_contra h\n  simp only [not_le] at h\n  let u : ∀ b, ∃ a, b ∈ f a := fun b => by simpa using (w.ge :) (Set.mem_univ b)\n  let u' : β → range f := fun b => ⟨f (u b).choose, by simp⟩\n  have v' : ∀ a, u' ⁻¹' {⟨f a, by simp⟩} ≤ f a := by\n    rintro a p m\n    have m : f (u p).choose = f a := by simpa [u'] using m\n    rw [← m]\n    apply fun b => (u b).choose_spec\n  obtain ⟨⟨-, ⟨a, rfl⟩⟩, p⟩ := exists_infinite_fiber' u' h k\n  exact (@Infinite.of_injective _ _ p (inclusion (v' a)) (inclusion_injective _)).false",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The pre-PR proof survives unchanged if it calls the PR's primed lemma, but the PR's route (unprimed lemma with the `[Infinite β]` instance) is 5 lines shorter because the `have k` block becomes unnecessary; the PR's choice is the better one."
+ },
+ {
+  "id": "c6",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "linearIndependent_le_infinite_basis"
+  ],
+  "lean": "-- Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean, pre-PR proof (calls the unprimed lemma):\ntheorem linearIndependent_le_infinite_basis {ι : Type w} (b : Basis ι R M) [Infinite ι] {κ : Type w}\n    (v : κ → M) (i : LinearIndependent R v) : #κ ≤ #ι := by\n  classical\n  by_contra h\n  rw [not_le, ← Cardinal.mk_finset_of_infinite ι] at h\n  let Φ := fun k : κ => (b.repr (v k)).support\n  obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber Φ h (by infer_instance)\n  let v' := fun k : Φ ⁻¹' {s} => v k\n  have i' : LinearIndependent R v' := i.comp _ Subtype.val_injective\n  have w' : Finite (Φ ⁻¹' {s}) := by\n    apply i'.finite_of_le_span_finite v' (s.image b)\n    rintro m ⟨⟨p, ⟨rfl⟩⟩, rfl⟩\n    simp only [SetLike.mem_coe, Finset.coe_image]\n    apply Basis.mem_span_repr_support\n  exact w.false",
+  "compiled": false,
+  "result": "failed to synthesize instance of type class `Infinite κ` at `(by infer_instance)`.",
+  "shows": "The pre-PR proof breaks under the new `exists_infinite_fiber` (it would need `Infinite κ`, which is not an instance here); the PR's switch to `exists_infinite_fiber'` is the minimal fix."
+ },
+ {
+  "id": "c7",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "infinite_basis_le_maximal_linearIndependent'"
+  ],
+  "lean": "-- Mathlib/LinearAlgebra/Basis/Cardinality.lean, pre-PR proof (calls le_range_of_union_finset_eq_top):\ntheorem infinite_basis_le_maximal_linearIndependent' {ι : Type w} (b : Basis ι R M) [Infinite ι]\n    {κ : Type w'} (v : κ → M) (i : LinearIndependent R v) (m : i.Maximal) :\n    Cardinal.lift.{w'} #ι ≤ Cardinal.lift.{w} #κ := by\n  let Φ := fun k : κ => (b.repr (v k)).support\n  have w₁ : #ι ≤ #(Set.range Φ) := by\n    apply Cardinal.le_range_of_union_finset_eq_top\n    exact union_support_maximal_linearIndependent_eq_range_basis b v i m\n  have w₂ : Cardinal.lift.{w'} #(Set.range Φ) ≤ Cardinal.lift.{w} #κ := Cardinal.mk_range_le_lift\n  exact (Cardinal.lift_le.mpr w₁).trans w₂",
+  "compiled": true,
+  "result": "Compiles with one warning: `Cardinal.le_range_of_union_finset_eq_top` has been deprecated: Use `Cardinal.le_range_of_union_finset_eq_univ` instead.",
+  "shows": "The deprecated alias keeps the old proof working; the PR's rename of the call is exactly what removes the deprecation warning, and nothing else in this proof needs to change."
+ },
+ {
+  "id": "c8",
+  "kind": "library_tool",
+  "objects": [
+   "Cardinal.exists_infinite_fiber"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, declaration Cardinal.exists_infinite_fiber replaced by (finite case from the library's finite pigeonhole):\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  rcases finite_or_infinite α with hα | hα\n  · exact Finite.exists_infinite_fiber f\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (infinite_iff.1 hβ)\n    exact ⟨a, infinite_iff.2 ((infinite_iff.1 hα).trans ha.le)⟩",
+  "compiled": false,
+  "result": "Unknown constant `Finite.exists_infinite_fiber`.",
+  "shows": "The library's finite-codomain twin `Finite.exists_infinite_fiber` (Mathlib/Data/Fintype/Pigeonhole.lean) is not imported by Cardinal/Pigeonhole.lean, so it is not available as a tool here as the file stands."
+ },
+ {
+  "id": "c9",
+  "kind": "derivation",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, lines 8-93 replaced: imports become\npublic import Mathlib.Data.Fintype.Pigeonhole\npublic import Mathlib.Data.Set.Finite.Lattice\npublic import Mathlib.SetTheory.Cardinal.Regular\n-- (original lines 10-77 unchanged), then:\n/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  simp_rw [Cardinal.infinite_iff] at hα ⊢\n  obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hα.trans h.le)\n  exact ⟨a, hα.trans ha.le⟩\n\n/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\nhas an infinite fiber. -/\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  rcases finite_or_infinite α with hα | hα\n  · exact Finite.exists_infinite_fiber f\n  · exact exists_infinite_fiber' f h hα",
+  "compiled": true,
+  "result": "lean_verify_edit (line mode 8-93): success, no errors, no warnings.",
+  "shows": "With `public import Mathlib.Data.Fintype.Pigeonhole` added, the order can be reversed: `exists_infinite_fiber'` keeps its pre-PR proof (only `w'` becomes `hα.trans h.le`) and `exists_infinite_fiber` is `Finite.exists_infinite_fiber` / `exists_infinite_fiber'` on `finite_or_infinite α`. It costs a new import for about one line of savings, so it does not beat the PR's in-file route."
+ },
+ {
+  "id": "c10",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Cardinal.exists_uncountable_fiber"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, declaration Cardinal.exists_uncountable_fiber replaced by:\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0] at hβ ⊢\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hβ.trans' aleph0_lt_aleph_one.le)\n    exact ⟨a, succ_aleph0 ▸ succ_le_of_lt (hα.trans_lt ha)⟩",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The second branch's `rw [← Order.succ_le_succ_iff, succ_aleph0] at hα` + `exact ⟨a, hα.trans (succ_le_of_lt ha)⟩` collapses to `exact ⟨a, succ_aleph0 ▸ succ_le_of_lt (hα.trans_lt ha)⟩`, and the `Cardinal.`/`Order.` qualifiers are redundant (the file is in `namespace Cardinal` with `open Order`, and `infinite_pigeonhole_card_lt` already writes bare `succ_le_iff`)."
+ },
+ {
+  "id": "c11",
+  "kind": "library_tool",
+  "objects": [
+   "Cardinal.exists_uncountable_fiber"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, declaration Cardinal.exists_uncountable_fiber replaced by (countable case via Set.Countable.of_preimage_singleton):\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  rcases le_or_gt #α ℵ₀ with hα | hα\n  · have := mk_le_aleph0_iff.1 hα\n    by_contra H\n    simp only [not_exists, not_uncountable_iff, countable_coe_iff] at H\n    exact not_countable (Set.Countable.of_preimage_singleton H)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (aleph0_lt_mk_iff.2 hβ).le\n    exact ⟨a, aleph0_lt_mk_iff.1 (hα.trans ha)⟩",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "A proof with no ℵ₁ arithmetic compiles: countable codomain from the base lemma `Set.Countable.of_preimage_singleton`, uncountable codomain from `infinite_pigeonhole_card_lt` and `aleph0_lt_mk_iff`. It is the same length as the PR's proof (7 lines), so it is an alternative, not an improvement."
+ },
+ {
+  "id": "c12",
+  "kind": "extraction",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'",
+   "Cardinal.exists_uncountable_fiber",
+   "Cardinal.infinite_pigeonhole_card_lt"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, lines 78-105 replaced by:\n/-- If `#α < #β`, then for every regular cardinal `θ ≤ #β`, some fiber of `f : β → α` has\ncardinality at least `θ`. -/\ntheorem exists_le_mk_fiber_of_isRegular {β α : Type u} (f : β → α) (h : #α < #β) {θ : Cardinal}\n    (hθ : θ.IsRegular) (hθβ : θ ≤ #β) : ∃ a : α, θ ≤ #(f ⁻¹' {a}) := by\n  rcases lt_or_ge #α θ with hα | hα\n  · exact infinite_pigeonhole_card f θ hθβ hθ.aleph0_le (by rwa [hθ.cof_eq])\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hθ.aleph0_le.trans hθβ)\n    exact ⟨a, hα.trans ha.le⟩\n\n/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\nhas an infinite fiber. -/\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  simp_rw [infinite_iff] at hβ ⊢\n  exact exists_le_mk_fiber_of_isRegular f h isRegular_aleph0 hβ\n\n/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber f h (infinite_iff.2 ((infinite_iff.1 hα).trans h.le))\n\n/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's\nhas an uncountable fiber. -/\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0] at hβ ⊢\n  exact exists_le_mk_fiber_of_isRegular f h isRegular_aleph_one hβ",
+  "compiled": true,
+  "result": "lean_verify_edit (line mode 78-105): success, no errors, no warnings; the rest of the file, including le_range_of_union_finset_eq_univ, compiles against it.",
+  "shows": "The case split repeated in exists_infinite_fiber and exists_uncountable_fiber (`rcases lt_or_ge #α θ`, then `infinite_pigeonhole_card f θ … (by rwa [hθ.cof_eq])` or `infinite_pigeonhole_card_lt`) extracts into one 4-line lemma for a regular θ; the two fiber lemmas then become 2-line proofs (θ = ℵ₀, θ = ℵ₁), in the file, with nothing downstream changed."
+ },
+ {
+  "id": "c13",
+  "kind": "extraction",
+  "objects": [
+   "Cardinal.infinite_pigeonhole_card_lt",
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'",
+   "Cardinal.exists_uncountable_fiber"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, lines 67-105 replaced by:\n/-- If `#α < #β`, then for every regular cardinal `θ ≤ #β`, some fiber of `f : β → α` has\ncardinality at least `θ`. -/\ntheorem exists_le_mk_fiber_of_isRegular {β α : Type u} (f : β → α) (h : #α < #β) {θ : Cardinal}\n    (hθ : θ.IsRegular) (hθβ : θ ≤ #β) : ∃ a : α, θ ≤ #(f ⁻¹' {a}) := by\n  rcases lt_or_ge #α θ with hα | hα\n  · exact infinite_pigeonhole_card f θ hθβ hθ.aleph0_le (by rwa [hθ.cof_eq])\n  · have hα' := hθ.aleph0_le.trans hα\n    obtain ⟨a, ha⟩ := infinite_pigeonhole_card f (succ #α) (succ_le_of_lt h)\n      (hα'.trans (le_succ _)) ((lt_succ _).trans_le (isRegular_succ hα').2)\n    exact ⟨a, hα.trans ((le_succ _).trans ha)⟩\n\n/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\nhas a fiber with cardinality strictly great than the codomain. -/\ntheorem infinite_pigeonhole_card_lt {β α : Type u} (f : β → α) (h : #α < #β) (hβ : ℵ₀ ≤ #β) :\n    ∃ a : α, #α < #(f ⁻¹' {a}) := by\n  simp_rw [← succ_le_iff]\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · obtain ⟨a, ha⟩ := exists_le_mk_fiber_of_isRegular f h isRegular_aleph0 hβ\n    exact ⟨a, (succ_le_of_lt hα).trans ha⟩\n  · exact exists_le_mk_fiber_of_isRegular f h (isRegular_succ hα) (succ_le_of_lt h)\n\n/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\nhas an infinite fiber. -/\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  simp_rw [infinite_iff] at hβ ⊢\n  exact exists_le_mk_fiber_of_isRegular f h isRegular_aleph0 hβ\n\n/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber f h (infinite_iff.2 ((infinite_iff.1 hα).trans h.le))\n\n/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's\nhas an uncountable fiber. -/\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  simp_rw [← aleph0_lt_mk_iff, ← succ_le_iff, succ_aleph0] at hβ ⊢\n  exact exists_le_mk_fiber_of_isRegular f h isRegular_aleph_one hβ",
+  "compiled": true,
+  "result": "lean_verify_edit (line mode 67-105): success, no errors, no warnings.",
+  "shows": "The extracted lemma can also be proved from `infinite_pigeonhole_card` alone, with `infinite_pigeonhole_card_lt` then derived from it (θ = ℵ₀ or θ = succ #α). All four family members compile off one primitive, but `infinite_pigeonhole_card_lt` gets no shorter (5 vs 6 lines), so c12's order, which leaves the PR's `infinite_pigeonhole_card_lt` alone, is the smaller change."
+ },
+ {
+  "id": "c14",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Cardinal.le_range_of_union_finset_eq_univ"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, declaration Cardinal.le_range_of_union_finset_eq_univ replaced by:\ntheorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n  by_contra! h\n  choose g hg using iUnion_eq_univ_iff.1 w\n  obtain ⟨⟨-, a, rfl⟩, p⟩ :=\n    exists_infinite_fiber (fun b => (⟨f (g b), mem_range_self _⟩ : range f)) h ‹_›\n  refine infinite_coe_iff.1 p ((f a).finite_toSet.subset fun b hb => ?_)\n  simp only [mem_preimage, mem_singleton_iff, Subtype.mk.injEq] at hb\n  exact hb ▸ hg b",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The proof closes in 7 lines instead of 11 with `by_contra!`, `choose … using iUnion_eq_univ_iff.1 w` and `Set.Finite.subset`, with no `let` of a Prop, no `.choose`/`.choose_spec` and no `@Infinite.of_injective _ _` call. The instance argument is `‹_›` rather than `(by infer_instance)`."
+ },
+ {
+  "id": "c15",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "infinite_basis_le_maximal_linearIndependent'",
+   "Cardinal.le_range_of_union_finset_eq_univ"
+  ],
+  "lean": "-- Mathlib/LinearAlgebra/Basis/Cardinality.lean, declaration replaced by:\ntheorem infinite_basis_le_maximal_linearIndependent' {ι : Type w} (b : Basis ι R M) [Infinite ι]\n    {κ : Type w'} (v : κ → M) (i : LinearIndependent R v) (m : i.Maximal) :\n    Cardinal.lift.{w'} #ι ≤ Cardinal.lift.{w} #κ :=\n  (Cardinal.lift_le.mpr (Cardinal.le_range_of_union_finset_eq_univ _\n    (union_support_maximal_linearIndependent_eq_range_basis b v i m))).trans\n    Cardinal.mk_range_le_lift",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The proof is a single term, but its tactic structure predates the PR, which changes only the name of the lemma it calls. Nothing is asked for."
+ },
+ {
+  "id": "c16",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Cardinal.infinite_pigeonhole_card_lt"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, declaration Cardinal.infinite_pigeonhole_card_lt replaced by:\ntheorem infinite_pigeonhole_card_lt {β α : Type u} (f : β → α) (h : #α < #β) (hβ : ℵ₀ ≤ #β) :\n    ∃ a : α, #α < #(f ⁻¹' {a}) := by\n  simp_rw [← succ_le_iff]\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card f ℵ₀ hβ le_rfl (hα.trans_le isRegular_aleph0.2)\n    exact ⟨a, (succ_le_of_lt hα).trans ha⟩\n  · exact infinite_pigeonhole_card f (succ #α) (succ_le_of_lt h) (hα.trans (le_succ _))\n      ((lt_succ _).trans_le (isRegular_succ hα).2)",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The PR's `(by rwa [isRegular_aleph0.cof_eq])` could be the term `hα.trans_le isRegular_aleph0.2`, matching the term style of the other branch. Otherwise the PR's proof is already the library's shape, so nothing is asked for."
+ },
+ {
+  "id": "c17",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "linearIndependent_le_infinite_basis",
+   "Cardinal.exists_infinite_fiber'"
+  ],
+  "lean": "-- Mathlib/LinearAlgebra/Dimension/StrongRankCondition.lean, declaration replaced by (`inferInstance` for `(by infer_instance)`):\ntheorem linearIndependent_le_infinite_basis {ι : Type w} (b : Basis ι R M) [Infinite ι] {κ : Type w}\n    (v : κ → M) (i : LinearIndependent R v) : #κ ≤ #ι := by\n  classical\n  by_contra h\n  rw [not_le, ← Cardinal.mk_finset_of_infinite ι] at h\n  let Φ := fun k : κ => (b.repr (v k)).support\n  obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber' Φ h inferInstance\n  let v' := fun k : Φ ⁻¹' {s} => v k\n  have i' : LinearIndependent R v' := i.comp _ Subtype.val_injective\n  have w' : Finite (Φ ⁻¹' {s}) := by\n    apply i'.finite_of_le_span_finite v' (s.image b)\n    rintro m ⟨⟨p, ⟨rfl⟩⟩, rfl⟩\n    simp only [SetLike.mem_coe, Finset.coe_image]\n    apply Basis.mem_span_repr_support\n  exact w.false",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings.",
+  "shows": "The changed line needs nothing beyond the PR's switch to the primed lemma. The instance argument could be `inferInstance`, but `(by infer_instance)` was already there, so nothing is asked for."
+ },
+ {
+  "id": "c18",
+  "kind": "derivation",
+  "objects": [
+   "Cardinal.infinite_pigeonhole_card_lt",
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_uncountable_fiber",
+   "Cardinal.exists_infinite_fiber'"
+  ],
+  "lean": "-- Mathlib/SetTheory/Cardinal/Pigeonhole.lean, lines 69-105 replaced by (pre-PR statement and proof of infinite_pigeonhole_card_lt; the callers pass their branch's `hα : ℵ₀ ≤ #α`):\ntheorem infinite_pigeonhole_card_lt {β α : Type u} (f : β → α) (w : #α < #β) (w' : ℵ₀ ≤ #α) :\n    ∃ a : α, #α < #(f ⁻¹' {a}) := by\n  simp_rw [← succ_le_iff]\n  exact infinite_pigeonhole_card f (succ #α) (succ_le_of_lt w) (w'.trans (lt_succ _).le)\n    ((lt_succ _).trans_le (isRegular_succ w').2.ge)\n\ntheorem exists_infinite_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Infinite β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq])\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hα\n    exact ⟨a, hα.trans ha.le⟩\n\ntheorem exists_infinite_fiber' {β α : Type u} (f : β → α) (h : #α < #β) (hα : Infinite α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber f h (by\n    rw [Cardinal.infinite_iff] at hα ⊢\n    exact hα.trans h.le)\n\ntheorem exists_uncountable_fiber {β α : Type u} (f : β → α) (h : #α < #β) (hβ : Uncountable β) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  simp_rw [← Cardinal.aleph0_lt_mk_iff, ← Order.succ_le_iff, succ_aleph0] at hβ ⊢\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hα\n    rw [← Order.succ_le_succ_iff, succ_aleph0] at hα\n    exact ⟨a, hα.trans (succ_le_of_lt ha)⟩",
+  "compiled": true,
+  "result": "lean_verify_edit (line mode 69-105): success, no errors, no warnings.",
+  "shows": "Every call to `infinite_pigeonhole_card_lt` in the PR sits in a branch that already has `ℵ₀ ≤ #α`, so all of the PR's proofs compile against the pre-PR `infinite_pigeonhole_card_lt` (in exists_uncountable_fiber the argument becomes plain `hα` instead of `hβ.trans' aleph0_lt_aleph_one.le`). No proof in the tree uses the new `#α < ℵ₀` branch of `infinite_pigeonhole_card_lt`."
+ }
+]

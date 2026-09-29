@@ -1,0 +1,67 @@
+[
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "The new proof takes two steps (a non-terminal `simp only [mem_map, Equiv.coe_toEmbedding]` whose only job is to set up `grind`) where one terminal `simp` with a library lemma closes the statement. By the PR's own trace this declaration got slower (<10 ms before, 25 ms after), so the golf does not pay for itself.",
+  "requested_change": "Prove it with `by simp [Equiv.apply_eq_iff_eq_symm_apply]`, or keep the pre-PR proof. If `grind` is wanted, use the single call `grind [Equiv.toEmbedding_apply]`, not `simp only` followed by `grind`.",
+  "severity": "advisory",
+  "evidence": "c1: `simp [Equiv.apply_eq_iff_eq_symm_apply]` compiles as the whole proof (one profiler run: simp 5.2 ms, against 2.8 ms simp + 7.1 ms grind + 1.7 ms type checking for the PR's proof). c2: `grind [Equiv.toEmbedding_apply]` compiles in one call. c3: the pre-PR proof still compiles and was cheapest in the same run (about 4 ms). Pass 3 c3/c6 showed that the `simp only` exists only because `grind` cannot see `Equiv.toEmbedding_apply`.",
+  "construction": [
+   "c1",
+   "c2",
+   "c3"
+  ]
+ },
+ {
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "`simp only [den_inv, num_intCast]; grind` uses `grind` to discharge `↑(if a = 0 then 1 else a.natAbs) = a`, which one library lemma (`Int.natAbs_of_nonneg`) closes. The resulting proof term is heavy, and by the PR's own trace the declaration got slower (<10 ms before, 17 ms after). Its siblings are all closed by a single `simp [...]`.",
+  "requested_change": "Replace the proof with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, which matches the siblings `inv_intCast_num_of_pos` (`simp [*]`) and `inv_ofNat_den` (`simp [den_inv, Int.natAbs_eq_iff]`). An equivalent is `rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]`. Otherwise keep the pre-PR proof.",
+  "severity": "advisory",
+  "evidence": "c7 compiles (profiler: simp 2.6 ms + 1.4 ms, no type-checking entry); c8 compiles (rewriteSeq 1.9 ms). The PR's proof in the same setup: simp 3.2 ms + grind 10.8 ms + type checking 8.4 ms. c11: the pre-PR proof compiles at 2.3 ms. c4-c6: plain `simp [*]`-style calls and the `abs` route fail in this file, so the `Int.natAbs_of_nonneg` argument is needed. c9: `omega` in place of `grind` is no better.",
+  "construction": [
+   "c4",
+   "c5",
+   "c6",
+   "c7",
+   "c8",
+   "c9",
+   "c11"
+  ]
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "The file proves this equation twice: here, and again as `measurePreserving_piCongrLeft.map_eq` (l.724-727) in two steps. The PR golfs only the last six lines of the long copy and keeps its `let e_meas`, `let s'`, `ext` and local `have`. The library's two-step proof works at this position, so after the PR there are still two proofs of one fact and the longer one is kept.",
+  "requested_change": "Replace the proof with the one `measurePreserving_piCongrLeft` already uses: `refine (pi_eq fun s _ ↦ ?_).symm; rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e, Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]`. Then derive `measurePreserving_piCongrLeft`'s field as `map_eq := Measure.pi_map_piCongrLeft f μ`, so the fact is proved once.",
+  "severity": "advisory",
+  "evidence": "c15: the two-step proof compiles at l.446 (profiler: rewriteSeq 7.3 ms + type checking 4.4 ms, with none of the four 5-6 ms CoeT searches and two ~5 ms simps that the PR's `have` block costs). c17: that proof together with `map_eq := Measure.pi_map_piCongrLeft f μ` compiles as a single edit over l.446-727. Pass 3 c19 showed that the statement is exactly `(measurePreserving_piCongrLeft ν e).map_eq`.",
+  "construction": [
+   "c15",
+   "c17"
+  ]
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "If the PR's structure is kept, the closing `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` is an obscure spelling. `congrFun rfl` stands for `fun _ ↦ rfl`, and the equivalence `_` is left to higher-order unification against the goal, which is fragile when the goal's shape changes. The step is literally `Equiv.prod_comp`.",
+  "requested_change": "Write `exact e.prod_comp fun i ↦ μ i (s i)` (or `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`). This request is moot if the previous finding is taken.",
+  "severity": "advisory",
+  "evidence": "c13: `exact e.prod_comp fun i ↦ μ i (s i)` compiles; c12: `Fintype.prod_equiv e _ _ fun _ ↦ rfl` compiles; c14: a pure `rw` ending does not work because of the `let s'`.",
+  "construction": [
+   "c12",
+   "c13",
+   "c14"
+  ]
+ },
+ {
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod, MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "Both new proofs keep the `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm` scaffolding and then `simp only [this]` with that local equation. Every other lemma in this file makes the same move as `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by one `rw`, and a plain `rw` would do here in any case. Once `compProd_apply_prod` is the tool, the proof is one or two rewrites.",
+  "requested_change": "Use the file's idiom: `conv_rhs => rw [← κ.disintegrate κ.condKernel]; rw [Kernel.compProd_apply_prod hs ht]` for the kernel version and `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]; rw [compProd_apply_prod hs ht]` for the measure version. The one-liners `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` / `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` also work. At minimum, `simp only [this]` should be `rw [this, …]`.",
+  "severity": "advisory",
+  "evidence": "c25/c30: the conv_rhs idiom compiles for both versions (kernel profiler: 1.2 + 1.7 ms + 1.5 ms type checking); c27/c31: the one-line `rw` compiles for both; c26: `rw [this, Kernel.compProd_apply_prod hs ht]` compiles, so `simp only` is not needed. The idiom is used at l.46, 59, 66, 97, 105 (kernel) and l.137, 151, 158, 188, 195 (measure).",
+  "construction": [
+   "c25",
+   "c26",
+   "c27",
+   "c30",
+   "c31"
+  ]
+ }
+]

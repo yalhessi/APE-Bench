@@ -1,0 +1,51 @@
+[
+  {
+    "target": "Rat.inv_intCast_den_of_pos",
+    "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]` then `grind`) slows the lemma down: the PR's own table reports <10 ms before and 17 ms after. After the `simp only` the goal is `↑(if a = 0 then 1 else a.natAbs) = a`, which a short rewrite chain closes directly, so `grind` costs time and buys nothing.",
+    "requested_change": "Replace the two-line proof with the single line `rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Data/Rat/Lemmas.lean, declaration Rat.inv_intCast_den_of_pos with the rw chain: success, no warnings. I profiled both proofs twice with `set_option profiler true` and `profiler.threshold 1`. The PR proof took simp ~2 ms + grind ~4-5 ms + grind tactic execution 10-30 ms + kernel type checking 7-10 ms. The rw chain took rewriteSeq 1.7-3.5 ms and no type-checking line above threshold. `#check`: `den_inv : a⁻¹.den = if a.num = 0 then 1 else a.num.natAbs`, `num_intCast : (↑a).num = a`. A `simp [den_inv, ha0.ne', Int.natAbs_of_nonneg ha0.le]` one-liner also compiles."
+  },
+  {
+    "target": "Finset.mem_map_equiv",
+    "claim": "Replacing the old proof of `Finset.mem_map_equiv` with `simp only [mem_map, Equiv.coe_toEmbedding]` plus `grind` makes this basic `@[simp]` lemma slower (the PR's own table: <10 ms before, 25 ms after). The residual goal `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s` closes with `simp` lemmas alone.",
+    "requested_change": "Replace the two-line proof with `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`. The shorter `simp [Equiv.apply_eq_iff_eq_symm_apply]` also works.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (line mode, lines 73-76 of Mathlib/Data/Finset/Image.lean, `@[simp 1100]` kept): both the `simp only [..., Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]` version and the `simp [Equiv.apply_eq_iff_eq_symm_apply]` version compile, and the whole file succeeds. Profiler, threshold 1 ms: PR proof simp 2.1-2.7 ms + grind simp 2x ~1.4 ms + grind 6-7.5 ms, about 12 ms of tactic time. `simp only` alternative: simp 3.4 + 1.4 ms, about 5 ms. The original proof took about 4 ms. `simp [...]` took 5.6-9 ms. Attribute application (6-21 ms) was noisy and is the same for every version."
+  },
+  {
+    "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "claim": "The new closing step `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` in `pi_map_piCongrLeft` is an opaque spelling. `congrFun rfl` is a roundabout `fun _ ↦ rfl`, and all three explicit arguments are left to unification, so the reader cannot see which equivalence reindexes the product. The preceding `simp only [pi_pi, this]` uses `simp` just to rewrite with a local equation.",
+    "requested_change": "Replace the last two lines with `rw [this, pi_pi]` followed by `exact e.prod_comp fun i ↦ μ i (s i)`. At minimum, write `fun _ ↦ rfl` instead of `congrFun rfl`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/MeasureTheory/Constructions/Pi.lean, declaration MeasureTheory.Measure.pi_map_piCongrLeft. Three variants succeed: (a) `rw [this, pi_pi]` + `exact e.prod_comp fun i ↦ μ i (s i)`; (b) the PR's `simp only [pi_pi, this]` + `exact Fintype.prod_equiv _ _ _ fun _ ↦ rfl`; (c) `rw [this, pi_pi]` + `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`."
+  },
+  {
+    "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "claim": "The `have : e_meas ⁻¹' pi univ s = pi univ s'` block in `pi_map_piCongrLeft`, with its `e_meas` and `s'` `let`s, re-proves the existing library lemma `Equiv.piCongrLeft_preimage_univ_pi`. The PR golfs only the tail of this proof and keeps the manual block.",
+    "requested_change": "Replace the proof after the statement with: `refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm`, then `rw [(MeasurableEquiv.piCongrLeft (fun i ↦ β i) e).measurableEmbedding.map_apply, MeasurableEquiv.coe_piCongrLeft, Equiv.piCongrLeft_preimage_univ_pi, pi_pi]`, then `exact e.prod_comp fun i ↦ μ i (s i)`. This drops both `let`s and the `have`.",
+    "severity": "advisory",
+    "evidence": "declaration_search: `Equiv.piCongrLeft_preimage_univ_pi` is declared in Mathlib/Data/Set/Prod.lean before this PR. `#check`: `Equiv.piCongrLeft_preimage_univ_pi (f : ι' ≃ ι) (t : ∀ i, Set (α i)) : ⇑(Equiv.piCongrLeft α f) ⁻¹' univ.pi t = univ.pi fun i => t (f i)` and `MeasurableEquiv.coe_piCongrLeft : ⇑(MeasurableEquiv.piCongrLeft π f) = ⇑(Equiv.piCongrLeft π f)`. lean_verify_edit of the three-line proof on declaration MeasureTheory.Measure.pi_map_piCongrLeft: success, no warnings. Profiler (line mode, lines 446-462): the PR proof shows 4 CoeT instance searches at 4-5 ms each, two simp calls at ~4.5 ms and type checking at 4.7 ms. The replacement shows rewriteSeq 6.3 ms and type checking 4.1 ms."
+  },
+  {
+    "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+    "claim": "The golfed proof of `Measure.setLIntegral_condKernel_eq_measure_prod` still carries a `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then rewrites with it through `simp only [this]` before `exact (compProd_apply_prod hs ht).symm`. The `have` and the `simp` step are unnecessary: the statement is `compProd_apply_prod` read backwards followed by `disintegrate`.",
+    "requested_change": "Replace the whole proof with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, declaration MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod. `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` succeeds, and so does the variant `rw [← compProd_apply_prod hs ht, disintegrate]`. `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` + exact also succeeds, as does the PR's own structure with `rw [this]` in place of `simp only [this]`."
+  },
+  {
+    "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+    "claim": "The kernel version `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` has the same leftover scaffolding as its measure sibling. The `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm` is followed by `simp only [this]` and `exact (Kernel.compProd_apply_prod hs ht).symm`, where a single rewrite chain suffices.",
+    "requested_change": "Replace the whole proof with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Keep it parallel with the `Measure` version.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, declaration ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod: `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` succeeds with no warnings. The PR structure with `rw [this]` replacing `simp only [this]` also succeeds."
+  },
+  {
+    "target": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+    "claim": "In `tendsto_of_forall_isClosed_limsup_real_le'`, `exact tendsto_of_forall_isClosed_limsup_le h` only checks by definitional unfolding. After the PR's `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h`, `h` states `↑(limsup (fun i ↦ μs i F) L) ≤ ↑(μ F)` in ℝ. `tendsto_of_forall_isClosed_limsup_le` expects `limsup (fun i ↦ μs i F) L ≤ μ F` in ℝ≥0, so the `exact` relies on NNReal's `≤` unfolding to the coerced real `≤`.",
+    "requested_change": "Add `NNReal.coe_le_coe` to the `simp only` so that `h` has the lemma's hypothesis form syntactically: `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup, NNReal.coe_le_coe] at h`, keeping `exact tendsto_of_forall_isClosed_limsup_le h`.",
+    "severity": "advisory",
+    "evidence": "`#check`: `tendsto_of_forall_isClosed_limsup_le : (∀ F, IsClosed F → limsup (fun i => (μs i) F) L ≤ μ F) → Tendsto μs L (𝓝 μ)` with ℝ≥0-valued `μs i F`; `NNReal.toReal_limsup : limsup (fun i => ↑(u i)) f = ↑(limsup u f)`; `ProbabilityMeasure.measureReal_eq_coe_coeFn : (↑ν).real s = ↑(ν s)`. lean_verify_edit on Mathlib/MeasureTheory/Measure/Portmanteau.lean, declaration MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le', with `NNReal.coe_le_coe` added: success. The unused-simp-argument linter gave no warning, so the lemma fires and `h` did carry coerced reals. A term-mode variant `tendsto_of_forall_isClosed_limsup_le fun F hF ↦ by simpa [...] using h F hF` also succeeds."
+  }
+]

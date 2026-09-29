@@ -1,0 +1,93 @@
+[
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "The new proof `simp only [mem_map, Equiv.coe_toEmbedding]; grind` is slower than the proof it replaces. That matters because this is a `@[simp 1100]` lemma low in the import graph, and the PR's own trace shows <10 ms before and 25 ms after. It is also not the shortest proof: one `simp [Equiv.apply_eq_iff_eq_symm_apply]` closes the lemma in a single line, at about half the PR's cost.",
+  "requested_change": "Replace the two-line proof with `simp [Equiv.apply_eq_iff_eq_symm_apply]`, or with the squeezed `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`. Otherwise, drop this hunk from the golf.",
+  "severity": "advisory",
+  "evidence": "Timings are from the profiler, compiled in place. The one-line simp takes 6.8 / 7.1 / 6.8 ms over 3 runs (c2), and the squeezed `simp only` 5.0 / 5.8 / 4.3 ms (c3). The PR's proof takes 12.3 / 15.3 / 12.6 ms, and the pre-PR proof 5.5 ms (c1). The `simp only` is load-bearing: `grind [Equiv.coe_toEmbedding]` alone fails (c4). So the proof is a squeezed simp feeding grind, a pattern with an open maintainers' Zulip thread ('`simp only` + `grind` failure', Nov-Dec 2025).",
+  "construction": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ]
+ },
+ {
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "`simp only [den_inv, num_intCast]; grind` makes this lemma about 8-10x slower than before; the PR's own trace shows <10 ms before and 17 ms after. `grind` is doing two small jobs here. It splits an `if a = 0` that `ha0.ne'` already decides, and it closes `↑a.natAbs = a`, which is `Int.natAbs_of_nonneg`. A one-line simp in the file's sibling style (`inv_intCast_num_of_pos` and `den_inv_of_ne_zero` are `simp [*]`) is shorter and 5-8x cheaper.",
+  "requested_change": "Use `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or the deterministic `rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]`. Otherwise, keep the pre-PR proof.",
+  "severity": "advisory",
+  "evidence": "The one-line simp compiles in place at 5.1 / 3.3 / 3.3 ms (c9), and the rw chain at 1.8 / 1.9 / 2.1 ms (c10). The PR's proof takes 28.7 / 24.5 / 28.3 ms and the pre-PR proof ~3 ms (c8). The goal the PR hands to grind is `↑(if a = 0 then 1 else a.natAbs) = a` (c17). Folding the `simp only` into `grind [den_inv, num_intCast]` is slower still, at ~75 ms (c16).",
+  "construction": [
+   "c8",
+   "c9",
+   "c10",
+   "c16",
+   "c17"
+  ]
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "The PR golfs only the two-line tail and keeps the ten-line preamble: `let e_meas`, `let s'`, and a `have` proved by `ext`/`simp only`/`e.forall_congr`/`rw`. The preamble is where the cost is. That `have` is exactly the library lemma `Equiv.piCongrLeft_preimage_univ_pi`. The same file's `measurePreserving_piCongrLeft` already proves this equation in 3 lines, and that proof compiles here unchanged at about a quarter of the cost.",
+  "requested_change": "Replace the body with `refine (pi_eq fun s _ => ?_).symm` / `rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e, Equiv.piCongrLeft_preimage_univ_pi, pi_pi _ _, e.prod_comp (fun i => μ i (s i))]`. Then let `measurePreserving_piCongrLeft`'s `map_eq` be `pi_map_piCongrLeft f μ`, so the equation is proved once. If the current structure is kept, at least write the tail as `rw [this, pi_pi]` / `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`. The current tail rewrites with a local equation through `simp only`, and its `(congrFun rfl)` is a roundabout `fun _ ↦ rfl`.",
+  "severity": "advisory",
+  "evidence": "The 3-line proof compiles in place at 9.9 / 11.3 / 12.8 ms, against the PR's 41 / 48 / 45 ms (c22). The `have` alone is replaced by `Equiv.piCongrLeft_preimage_univ_pi e s` (c21). `measurePreserving_piCongrLeft` with `map_eq := pi_map_piCongrLeft f μ` compiles, at ~6 ms against ~13 ms for its own proof (c23). The idiomatic tail compiles (c19). The pre-PR proof takes ~52 ms (c18), so the PR saved only the `congr` step.",
+  "construction": [
+   "c18",
+   "c19",
+   "c21",
+   "c22",
+   "c23"
+  ]
+ },
+ {
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "The new proof keeps a `have` that restates `κ.disintegrate`, proved by `congr; exact (κ.disintegrate _).symm`. It rewrites with it through `simp only [this]` and closes with `exact (Kernel.compProd_apply_prod hs ht).symm`. That is not how this file writes the step. `lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`, `integral_condKernel` and `setIntegral_condKernel` all do `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by one `rw`. In that form this proof is 2 lines and about 2.5x cheaper.",
+  "requested_change": "Use `conv_rhs => rw [← κ.disintegrate κ.condKernel]` / `rw [Kernel.compProd_apply_prod hs ht]`, or the one-liner `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`.",
+  "severity": "advisory",
+  "evidence": "The conv form compiles in place at 6.4 / 5.0 / 5.6 ms, against the PR's 13.3 / 16.0 / 16.2 ms (c33). The one-liner compiles at 5.5 / 8.2 / 7.0 ms (c34). With the `have` kept, `simp only [this]; exact (...).symm` is just `rw [this, Kernel.compProd_apply_prod hs ht]` (c35). The restated fragment is closed by `rw [κ.disintegrate]`, so no helper lemma is warranted (c36).",
+  "construction": [
+   "c33",
+   "c34",
+   "c35",
+   "c36"
+  ]
+ },
+ {
+  "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "The Measure member has the same shape as the Kernel member: a `have` restating `ρ.disintegrate`, then `simp only [this]` and `exact (compProd_apply_prod hs ht).symm`. Its siblings `lintegral_condKernel_mem`, `lintegral_condKernel` and `setLIntegral_condKernel` use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` and one `rw`, and that 2-line form compiles here too. The gain in this member is length and consistency with the pair and the file, not time, because a ~17-25 ms SFinite instance search dominates every variant.",
+  "requested_change": "Use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` / `rw [compProd_apply_prod hs ht]`, or `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`, changed together with the Kernel member.",
+  "severity": "advisory",
+  "evidence": "The conv form compiles in place at ~21 ms, against the PR's ~27 ms (c39). The one-line rw compiles at ~31 ms (c40), with most of the time in the same instance search. The fragment is `rw [ρ.disintegrate]` (c41).",
+  "construction": [
+   "c39",
+   "c40",
+   "c41"
+  ]
+ },
+ {
+  "target": "limsup_finset_sup'",
+  "claim": "The PR's golf of the `limsup ≤ sup'` step is already idiomatic; the alternative in c29 is no better. The proof around it is not the library's form, though. The four-line `h₃` is `hs.imp fun i hi ↦ ⟨hi, h₁ i hi⟩`. The four-line `≥` half ending in `simp only [le_sup'_iff]; use i, i_s` is `le_sup'` inside one `exact`, the way the sibling `limsup_max` closes its `≥` half with `le_max_left`/`le_max_right`. The rewritten proof is 7 lines against 13, at the same cost.",
+  "requested_change": "While golfing this proof, replace `h₃` with `hs.imp fun i hi ↦ ⟨hi, h₁ i hi⟩`. Replace the second bullet with `exact Finset.sup'_le hs _ fun i i_s ↦ limsup_le_limsup (.of_forall fun a ↦ le_sup' (fun i ↦ F i a) i_s) (h₁ i i_s) bddsup`.",
+  "severity": "advisory",
+  "evidence": "The rewrite compiles in place, whole file included, at ~56 ms against the PR's ~61 ms (one run each, within noise) (c30). The alternative middle step is no improvement (c29). The pre-PR proof takes ~57 ms (c28). The dual `liminf_finset_inf'` and `limsup_finset_sup` still derive from it (c31).",
+  "construction": [
+   "c28",
+   "c29",
+   "c30",
+   "c31"
+  ]
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+  "claim": "Deriving this lemma from the ℝ≥0 member `tendsto_of_forall_isClosed_limsup_le` is the right proof, and it removes ~410 ms. But the last step accepts `h : ∀ F, IsClosed F → ↑(limsup (fun i => μs i F) L) ≤ ↑(μ F)`, an inequality in ℝ, as the ℝ≥0 hypothesis only because `exact` unfolds the ℝ≥0 order to the ℝ order on the casts. Adding `NNReal.coe_le_coe` to the same `simp only` turns that cross-type defeq into a rewrite, at no cost.",
+  "requested_change": "Use `simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup, NNReal.coe_le_coe] at h` before `exact tendsto_of_forall_isClosed_limsup_le h`.",
+  "severity": "advisory",
+  "evidence": "`trace_state` after the PR's `simp only` shows h as an ℝ inequality between ℝ≥0 casts (c25). With `NNReal.coe_le_coe` added, the proof compiles in place and its steps cost 6.9 ms against the PR's 6.3 ms (c26). The pre-PR proof takes ~420 ms, 332 ms of it in `finiteness` (c24).",
+  "construction": [
+   "c24",
+   "c25",
+   "c26"
+  ]
+ }
+]

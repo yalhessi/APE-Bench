@@ -1,0 +1,100 @@
+# Leak audit of the 24 reviewer transcripts (audit_transcripts.py), 2026-09-29
+
+Also checked: no tool result in any session contains text from the 16 asks (six distinctive phrases); no session mentions another session's directory; all 24 workdirs link to a reviewed workspace.
+
+pr34091/X1: 29 calls, 0 flagged
+pr34091/X2: 30 calls, 7 flagged
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; ca'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; ca'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; ca'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; ca'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; se'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; ca'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; ca'
+pr34091/X3: 33 calls, 0 flagged
+pr34091/X4: 30 calls, 0 flagged
+pr30458/X1: 32 calls, 7 flagged
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/v.'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cd $S; pyth'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cd $S; pyth'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cd $S; F=Ma'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cd $S; F=Ma'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cd $S; cat '
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cd $S; F=Ma'
+pr30458/X2: 28 calls, 6 flagged
+    Bash [scratchpad root listed or read]: 'D=<dir>; cd $D\nS=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+    Bash [scratchpad root listed or read]: 'D=<dir>; cd $D\nS=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+    Bash [scratchpad root listed or read]: 'D=<dir>; cd $D\nS=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+    Bash [scratchpad root listed or read]: 'D=<dir>; cd $D\nS=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+    Bash [scratchpad root listed or read]: 'D=<dir>; cd $D\nS=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+    Bash [scratchpad root listed or read]: 'D=<dir>; cd $D\nS=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+pr30458/X3: 33 calls, 0 flagged
+pr30458/X4: 30 calls, 3 flagged
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>; mk'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>\ncat'
+    Bash [scratchpad root listed or read]: 'D=<dir>; S=<scratchpad>\ncat'
+pr32875/X1: 34 calls, 0 flagged
+pr32875/X2: 43 calls, 0 flagged
+pr32875/X3: 30 calls, 8 flagged
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; cat > $S/x3'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; ape=/resear'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; ape=/resear'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; cat > $S/x3'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; ape=/resear'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; ape=/resear'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; ape=/resear'
+    Bash [scratchpad root listed or read; outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>; ape=/resear'
+pr32875/X4: 42 calls, 0 flagged
+pr34091/K1p3: 41 calls, 22 flagged
+    Bash [scratchpad root listed or read]: 'P=<dir>/ptool; S=/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/scratchp'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/cs'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; python3 $S/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/cn'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; P=<dir>/pto'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/in'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/c/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/c/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; python3 $S/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; python3 $S/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; \ncat > $S/c'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; python3 $S/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; python3 $S/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; cat > $S/c/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; python3 $S/'
+    Bash [scratchpad root listed or read]: 'S=<scratchpad>; OUT=<dir>; '
+pr34091/K2p3: 44 calls, 1 flagged
+    Bash [pattern 'mathlib4']: 'P=<dir>/ptool; $P file_search \'{"pattern":"*.lean","directory_path":".","limit":5}\'; for d in target reviewed mathlib4 workspace s'
+pr30458/K1p3: 54 calls, 0 flagged
+pr30458/K2p3: 50 calls, 6 flagged
+    Bash [scratchpad root listed or read]: 'B=<scratchpad>; U=$B/pr3045'
+    Bash [foreign scratch pr30458-K2p3-mine-3764826]: 'U=<scratchpad>/pr30458-K2p3'
+    Bash [foreign scratch pr30458-K2p3-mine-3764826]: 'U=<scratchpad>/pr30458-K2p3'
+    Bash [foreign scratch pr30458-K2p3-mine-3764826]: 'U=<scratchpad>/pr30458-K2p3'
+    Bash [foreign scratch pr30458-K2p3-mine-3764826]: 'U=<scratchpad>/pr30458-K2p3'
+    Bash [foreign scratch pr30458-K2p3-mine-3764826]: 'U=<scratchpad>/pr30458-K2p3'
+pr32875/K1p3: 54 calls, 1 flagged
+    Bash [pattern 'mathlib4']: 'D=<dir>; for p in target/Mathlib/MeasureTheory/Measure/Portmanteau.lean mathlib4/Mathlib/MeasureTheory/Measure/Portmanteau.lean re'
+pr32875/K2p3: 59 calls, 0 flagged
+pr34091/K1p4: 32 calls, 6 flagged
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'D=<dir>; S=<scratchpad>/k1p'
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>/k1p4\ncat > $'
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>/k1p4\ncat > $'
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'S=<scratchpad>/k1p4\nD=<dir>'
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'D=<dir>\nPY=/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/ape/bin/python\ncat > $D/findings'
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: "D=<dir>\nPY=/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/ape/bin/python\nsed -i 's/plus th"
+pr34091/K2p4: 50 calls, 0 flagged
+pr30458/K1p4: 28 calls, 1 flagged
+    Bash [outside /tmp]: 'D=<dir>; cat > $D/tmp/build.py <<\'EOF\'\nimport json\nD = "<dir>"\nT = D + "/tmp/"\ndef L(f, where):\n    return where + "\\n" + open(T +'
+pr30458/K2p4: 30 calls, 1 flagged
+    Bash [pattern '../']: 'D=<dir>; cd $D/tmp && python3 - <<\'EOF\'\nimport json\ndef L(f):\n    d=json.load(open(f+".json"))\n    if "declaration_name" in d:\n   '
+pr32875/K1p4: 53 calls, 2 flagged
+    Bash [outside /research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipelin]: 'D=/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/construction-'
+    Bash [outside /tmp]: 'D=<dir>; cat > $D/tmp/build.py <<\'PYEOF\'\nimport json, re, os\nD = "<dir>"\nT = D + "/tmp/"\ndef rd(name):\n    s = open(T + name).read'
+pr32875/K2p4: 50 calls, 1 flagged
+    Bash [pattern 'mathlib4']: 'D=<dir>; for p in "target/Mathlib/Data/Finset/Image.lean" "mathlib4/Mathlib/Data/Finset/Image.lean" "reviewed/Mathlib/Data/Finset/'
