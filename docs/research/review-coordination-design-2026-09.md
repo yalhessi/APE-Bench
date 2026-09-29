@@ -436,6 +436,12 @@ an ask. It runs as a comparison instead: passes 3 and 4, two runs, against the c
 compute-matched replicates, on the same pass-0 model and tools, with the rule stated in
 `results/pr_review_v5/probes/construction-demo-2026-09-29/README.md` before any reviewer ran.
 
+**Result (2026-09-29): the rule failed.** The constructions reached 5 and 6 of the 11 asks stably,
+and so did the current brief with the same model and tools, so criterion 2 fails on both matchers.
+Claude with the plain brief reached asks that `gpt_5.2` missed in both lead and solo configurations,
+which points the next step at the reviewer model (`docs/todo/reviewer-model-gap.md`) before any
+build. The paid step below waits on it.
+
 **After building (paid, small):** validation small12 minus 30714, the PRs
 `pr5_val_small12_minus30714_lead_rep1` reviewed (8 of 30 asks reached, $6.78) and the solo
 baseline (2 of 30, $1.20). Three reps, reported as mean / union / stable, found and published

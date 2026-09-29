@@ -330,4 +330,16 @@ paths:
   - an explicit statement that only between-brief comparisons are being read.
 
   Blind matchers are not affected: they judge text they are shown.
+- **Probe subagents share the session scratchpad; keep what a reviewer must not see out of it
+  (2026-09-29).** In the construction demonstration, reviewers wrote snippet files into the session
+  scratchpad, two sessions collided on a folder name, and the round-1 feedback file with the
+  maintainers' asks sat in the same scratchpad until the first collision was reported. So:
+  - generate asks, gold or unblinded indices only after every reviewer has finished;
+  - tell every reviewer to keep temporary files in a `tmp/` inside its own packet directory;
+  - log every tool call in the wrapper, not by the reviewer;
+  - audit the transcripts (tool calls and tool results) before matching;
+  - redact condition cues, such as a K reviewer's construction ids, from matcher inputs.
+
+  The probe's `audit_transcripts.py` flags reads outside the packet, foreign scratch files, the
+  study's scratch, agent transcripts and the web. It was checked against planted violations.
 

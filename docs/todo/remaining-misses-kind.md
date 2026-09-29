@@ -34,3 +34,14 @@ kappa; the two-reader study below supersedes them.
 
 **What would close it.** The labelled table, and for the largest artifact class a demonstration on
 three misses that constructing the artifact by hand exposes the ask, before any pipeline change.
+
+**Contradicted in part (2026-09-29).** The hypothesis says these asks are absent from the model's
+output distribution until the input or the task changes. For a Claude reviewer with the plain
+generalist brief, that is false for 5 or 6 of the 11 misses on three validation PRs. The asks were
+reached in every replicate, with no construction at all
+(`results/pr_review_v5/probes/construction-demo-2026-09-29/`). They are absent from `gpt_5.2`'s
+output distribution in both the lead and solo configurations, or present in Claude's by recall;
+`reviewer-model-gap.md` separates the two. The constructions reached nothing the plain brief did
+not. What remains unreached by any condition is 4-5 asks: a one-liner from a sibling lemma, section
+layout (two asks) and `grind` tagging (two asks). That residue is where this hypothesis can still
+be tested.

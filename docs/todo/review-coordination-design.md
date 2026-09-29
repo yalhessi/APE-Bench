@@ -2,8 +2,9 @@
 
 **Status** — **design written, 2026-09-29**:
 [`docs/research/review-coordination-design-2026-09.md`](../research/review-coordination-design-2026-09.md),
-checked against the labelled asks (see "The design" at the foot). Open: the by-hand demonstration
-that a construction produces a miss (`remaining-misses-kind.md`), then the build decision. No run.
+checked against the labelled asks (see "The design" at the foot). **The by-hand demonstration ran the
+same day and its rule failed** (below). The build is not warranted on it; the reviewer-model gap it
+exposed (`reviewer-model-gap.md`) comes first.
 **Cost** — no spend so far; the demonstration is free (`cli tool`); the first paid measurement is
 three reps on validation small12, priced by `cli plan` before anything runs.
 
@@ -89,3 +90,14 @@ PRs 34091, 30458 and 32875 by a stated rule, 11 unreached asks; K (passes 3 and 
 against X (the current brief, four runs paired into two replicates), same model and tools, two blind
 matchers. Prerequisite found and fixed on the way: the `cli tool` workbench compiled against a
 source-only overlay (`5dbc173`, `19c8c4b`).
+
+**The demonstration's result (2026-09-29).** The rule fails on criterion 2 on both matchers. The
+constructions (passes 3 and 4) reached 5 and 6 of the 11 asks stably, and the current brief with the
+same model and tools reached 5 and 6 as well, so the difference is 0. K filed 54 findings against
+X's 94 and compiled more (340 against 264). The larger fact is the control: Claude with the plain
+brief reached five of the asks the pipeline missed, in every set. The pipeline's own solo baseline,
+with no work units and no pruning, missed them too. So on these PRs the misses are the reviewer's,
+or recall, not coordination's. What neither condition reached (a sibling one-liner, section layout,
+`grind` tagging) is the residue the constructions were written for. Untried: after-cutoff PRs, the
+pipeline's own model, X without the pass-0 model, passes 1, 2, 5 and 6.
+`results/pr_review_v5/probes/construction-demo-2026-09-29/README.md`.
