@@ -74,3 +74,60 @@ On each matcher, per-session reach is the asks `reached`, summed over sessions, 
 - `OPENAI_API_KEY` is sourced in the launching command.
 - In the first minutes, `completed with success` lines must appear, and "API call failed, retrying"
   must not.
+
+---
+
+## Result (2026-09-29): the pipeline's model reaches about a quarter of Claude's, and the construction brief does not close it
+
+The runs were committed before any matcher input was built (`7757e55`): 24 sessions, all successful,
+$1.69 billed. The two blind matchers agree on all 96 cells and read only their own folders.
+
+| per-session reach | on all 16 asks | on the 9 asks in pass-3/4 scope |
+|---|---|---|
+| **Claude, the plain brief** (X, the post-cutoff sessions) | **0.47** | **0.44** |
+| `gpt_5.2`, the plain brief (G) | 0.12 | 0.00 |
+| `gpt_5.2`, the construction brief (K) | 0.06 | 0.00 |
+
+1. **The model gap:** `q = 0.12 / 0.47 = 0.27` on both matchers, so **markedly less** by the rule
+   (`q ≤ 0.5`).
+2. **The construction brief on `gpt_5.2`: not supported.** No ask in scope was reached by both runs,
+   under either condition. K filed fewer findings (2.2 against 3.8 per PR per run).
+3. **Mechanism (read, not ruled):**
+
+   | condition | compiles per session |
+   |---|---|
+   | `gpt_5.2`, plain brief | 2.2 and 2.5 |
+   | `gpt_5.2`, construction brief | 6.2 and 6.8 |
+   | Claude, plain brief | 9.3 and 6.8 |
+
+   The brief made `gpt_5.2` construct almost as often as Claude does unprompted, and it still
+   reached none of the substantive asks.
+
+**Per ask.** `gpt_5.2` reached only the two surface asks: the unused import (every set) and the
+title's missing word (G). Claude also reached:
+- dropping an unneeded `[L.NeBot]`;
+- a missing `@[to_additive]`;
+- `cat_disch` defaults on `mk` and `mkHom`;
+- the rename to `homMk`;
+- in one run, the `_anti` rename.
+
+**What it means, at probe altitude** (6 PRs, 16 asks, 2 runs a condition, matchers in full
+agreement):
+1. **On PRs neither model has seen, with the same brief, the same pass-0 model and the same tools,
+   the pipeline's reviewer (`gpt_5.2` as the pipeline runs it) reaches about a quarter of what Claude
+   reaches, and none of the substantive asks.** The binding constraint on these asks is the reviewer,
+   not the brief, the packet or the coordination.
+2. **Making it construct does not help.** The construction brief tripled `gpt_5.2`'s compiles and
+   reached less. The gap is in what the reviewer concludes and chooses to ask, not in whether it
+   compiles. That corrects the reading of the construction demonstration, which put the pipeline's
+   loss on "the arm's initiative to construct".
+3. **Every design comparison measured on `gpt_5.2` with reasoning off was measured on a reviewer
+   that misses nearly all substantive asks here.** A null there says little about the design.
+
+**Not separated here, and the next tests:**
+- **Model against harness:** `ape_agent` and a submission tool, against a Claude agent writing a file.
+  The solo task also runs under the `claude_code` scaffold (the B/C pair). Claude through the
+  pipeline's own task and contract on this set separates the two.
+- **Reasoning:** `gpt_5.2` ran as the pipeline runs it, and the in-window reasoning twin showed no gain
+  at 3.8x the cost. It is untested here.
+- **Size:** 16 asks. The gap is large (0.12 against 0.47, 96/96 matcher agreement) but rests on 6 PRs.
