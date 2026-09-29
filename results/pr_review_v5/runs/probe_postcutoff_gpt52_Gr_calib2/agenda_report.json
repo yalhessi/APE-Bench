@@ -1,0 +1,116 @@
+{
+  "agenda_version": "v5-agenda/1",
+  "by_arm": {
+    "api_reuse": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "correctness": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "docs": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 25
+    },
+    "duplication": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "family_design": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "generalist": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 38
+    },
+    "generality": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "naming": {
+      "cost_hint": 0.1,
+      "eligible": 2,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "proof_golf": {
+      "cost_hint": 0.1,
+      "eligible": 0,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "proof_idiom": {
+      "cost_hint": 0.1,
+      "eligible": 0,
+      "enumerated": 2,
+      "sites": 12
+    },
+    "style": {
+      "cost_hint": 0.15000000000000002,
+      "eligible": 3,
+      "enumerated": 3,
+      "sites": 38
+    }
+  },
+  "coverage_contract": {
+    "by_priority": {
+      "optional": 2,
+      "recommended": 13,
+      "required": 9
+    },
+    "prs_with_no_required_work": [],
+    "required_by_arm": {
+      "api_reuse": 0,
+      "correctness": 1,
+      "docs": 1,
+      "duplication": 1,
+      "family_design": 1,
+      "generalist": 3,
+      "generality": 0,
+      "naming": 1,
+      "proof_golf": 0,
+      "proof_idiom": 0,
+      "style": 1
+    },
+    "required_by_pr": {
+      "43192": 9
+    },
+    "required_reasons": {
+      "namespace placement and module docs are properties of the file (file)": 1,
+      "the per-unit broad pass, which no specialist replaces": 3,
+      "these declarations are one API family (family)": 2,
+      "this PR changes module documentation (site)": 1,
+      "this PR introduces declarations that did not exist before (introduction)": 2
+    }
+  },
+  "mandatory_floor_cost": 0.45,
+  "mandatory_floor_tokens": 540000,
+  "pr_numbers": [
+    43192
+  ],
+  "projected_cost_fanout": 1.2,
+  "projected_cost_rules": 1.0,
+  "proposals_eligible": 20,
+  "proposals_enumerated": 24,
+  "renderer_version": "candidate-prompt/14+focused-prompt/4",
+  "routing_mode": "solo",
+  "scheduler_version": "focused-agent-scheduler/1",
+  "units_without_specialist": [],
+  "work_units": 3
+}
