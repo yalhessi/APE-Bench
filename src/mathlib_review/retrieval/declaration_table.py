@@ -364,7 +364,11 @@ def trajectory(pattern: str, base_sha: str, dates: Sequence[str],
             f"no Mathlib clone at {clone}; trajectory needs history, not a snapshot")
     out: List[Dict[str, Any]] = []
     for date in dates:
-        commit = _git(clone, "rev-list", "-1", f"--before={date}", base_sha).strip()
+        # A bare date is midnight UTC. Git reads `--before=2025-07-01` as that day at the current
+        # clock time, so the commit picked -- and the share -- moved with the time the suite ran:
+        # 0.0009 at midnight against 0.0023 at 17:00 on 2026-09-29, failing the test's bound.
+        boundary = f"{date} 00:00:00 +0000" if len(date) == 10 else date
+        commit = _git(clone, "rev-list", "-1", f"--before={boundary}", base_sha).strip()
         if not commit:
             continue
         files = _git(clone, "ls-tree", "-r", "--name-only", commit, "--", subdir)
