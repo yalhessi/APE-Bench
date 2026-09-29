@@ -101,3 +101,17 @@ or recall, not coordination's. What neither condition reached (a sibling one-lin
 `grind` tagging) is the residue the constructions were written for. Untried: after-cutoff PRs, the
 pipeline's own model, X without the pass-0 model, passes 1, 2, 5 and 6.
 `results/pr_review_v5/probes/construction-demo-2026-09-29/README.md`.
+
+**Corrected, second reading (2026-09-29).** The paragraph above over-claims. "The misses are the
+reviewer's, or recall, not coordination's" does not follow, because the experiment did not vary
+coordination. Both conditions had the pass-0 model, the whole PR and no pruning. The control also
+constructed unprompted: it compiled the pre-PR proofs and the instance-binder versions, so briefing
+the constructions was redundant for Claude. In the pipeline, all five of those asks were lost at an
+arm's decision (the arms that ran held compile and did not construct), with lead pruning an added loss
+at two. The design's family closure ran and found missing twins that no maintainer asked for, but the
+PRs held no sibling-class ask to test it on. So the design is untested where it applies: on the
+reviewer that does not construct (`gpt_5.2`), and on sibling-class misses. The probe README's second
+reading holds the details. Next, in order:
+- a post-cutoff probe set, so a Claude probe carries no recall caveat;
+- the construction briefs on `gpt_5.2` through the solo scaffold (`reviewer-model-gap.md`);
+- family closure on sibling-class misses.

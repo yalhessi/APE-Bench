@@ -55,3 +55,16 @@ their anchors). That list is the input to `review-coordination-design.md`.
 **Risk.** Readers who are language models on merged PRs; principles written after the fact
 rationalise. The guard is the corpus: a principle that is not a regularity in the library or the
 asks is a wish.
+
+**Two worked cases from the construction demonstration (2026-09-29).** No reviewer condition reached
+either, and each is one of the studies above in miniature.
+- **Scope conflict (study 3).** On 30458 the maintainer asked for `variable [IsLeftCancelMul α] in`
+  in place of the PR's subsections: "just keep things the same as before, collect the common
+  variables". At the base commit the idiom is in 1,129 of 6,947 Mathlib files (2,695 lines), 20 of 141
+  in `Algebra/Group`, 1 of 13 in `Algebra/Group/Pointwise`, and 0 in the file itself. Library practice
+  won over local practice, together with a minimal-diff rationale. A census at file scope gives the
+  wrong answer, and one at library scope gives the right one.
+- **Maturity (study 4).** On 32875 the maintainer asked to tag two lemmas `grind`. At base,
+  `Data/Finset/Image.lean` holds 18 `grind` uses, `Data/Rat/Lemmas.lean` none, and 137 files
+  library-wide. The first ask has a file regularity behind it, and the construction pass reached it in
+  one of two runs. The second has only the migration behind it, and nothing reached it.

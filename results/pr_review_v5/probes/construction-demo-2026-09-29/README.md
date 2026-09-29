@@ -129,7 +129,7 @@ matching (`2bd0d96`), and `unblind.py` applies the rule above to `match/matches.
 - K reached fewer of all 16 asks per replicate (5-9 against 7-10), because it reviews no prose, and
   both docstring asks on 34091 are prose.
 
-## What it means, at probe altitude
+## What it means, at probe altitude (first reading; superseded by the second reading below)
 
 1. **The constructions, as briefed, produced these misses no more often than the current brief did,
    with the same model and tools.** That is the rule's reading. It is one comparison: three PRs, two
@@ -172,3 +172,82 @@ matching (`2bd0d96`), and `unblind.py` applies the rule above to `match/matches.
   redacted mechanically for every reviewer before matching (`build_match_inputs.py`).
 - **The matchers** each wrote a helper script in the shared parent directory. Neither read the
   other's directory, the index or the seal.
+
+## Second reading (2026-09-29), with corrections
+
+A second review of the first reading's conclusions against the artifacts: the lead run's delegations
+and abstentions on the two units, the solo run's findings, the K construction logs, and what the X
+sessions did. Both the first reading and the first draft of this critique over-claimed. Corrections
+to each are marked.
+
+**What the experiment varied.** Both conditions had the pass-0 model, the whole PR, the arms' tools
+and no pruning. The experiment varied only the construction brief and the pass split. It did not vary
+coordination, so it cannot say whether coordination is a bottleneck for the pipeline.
+
+**The control constructed unprompted.** The X sessions made 264 compiles across 12 sessions.
+- X1 on 30458 reached the pre-PR-proof asks by compiling each original proof against the new
+  statement. That is pass 4's `pre_pr_proof` construction, unbriefed.
+- X1 on 34091 reached the binder asks with a caller search and a compile of the instance-binder
+  versions of all three lemmas. That is pass 3's usage and binder check.
+- So the rule compared briefed construction against spontaneous construction by a model that already
+  does it. It cannot show whether constructing helps. It shows the brief is redundant for this model.
+
+**The headroom was set against a different reviewer.** "Unreached" meant unreached by `gpt_5.2`'s lead
+run. Claude with the plain brief reached 5-6 of the 11 stably, so criterion 2 had to be met on the
+remaining 5-6, most of which are not visible from the file at base (below).
+
+**Where the pipeline lost the five asks every Claude set reached.** *Corrected: the first draft of this
+critique put two of them on pruning.* All five were lost at an arm's decision:
+- 34091, the binder asks: `generality` and `style` ran and declined. `style` checked line breaks,
+  indentation and `by` blocks, and the generalist filed four other findings on the unit.
+- 30458, the pre-PR-proof asks: the lead pruned `proof_golf` and `proof_idiom`. But the generalist ran
+  there and declined ("the new proofs are already in the concise, idiomatic `obtain` style"), and
+  `generality` and `style` declined too.
+- Every arm that ran held `lean_verify_edit`, and none replayed a proof or compiled a binder change.
+
+So pruning added a loss at two of the five. The cause is the arm's initiative to construct, which is
+what the align-decisions plan already located. The first reading's "the misses are the reviewer
+model's, not coordination's" does not follow: model, harness, packet and recall are confounded with
+it, and coordination was not varied.
+
+**The design's family closure did run and did find things.** *Corrected: the first draft of this
+critique said it found nothing, from a miscount.*
+- Pass 3 stated 15 twins and 11 compiled. Five pass-3 findings rest on a twin. On 30458, both K runs
+  found the right-cancel form of `#s ≤ #(s / s)` missing.
+- None of the five matches a round-1 ask. Gold is a lower bound, so they are unaligned, not wrong.
+- Pass 4 cited pass 3's constructions in 13 of its constructions. No rule hit rested on that.
+- The selection rule chose PRs whose rule asks were binders, registration and proofs. So the sibling
+  class, 27 of the 31 labelled sibling asks and the design's main target, was not in the rule.
+
+**The residue no condition reached is of two other kinds.** *Corrected: the first draft of this critique
+called the layout ask a preference with no regularity.*
+- **The layout asks (v0060, v0061)** ask for `variable … in` over subsections. At 30458's base that
+  idiom is in 1,129 of 6,947 Mathlib files (2,695 lines), 20 of 141 in `Algebra/Group`, 1 of 13 in
+  `Algebra/Group/Pointwise`, and 0 in the file. It is a library idiom against the file's local
+  practice: a scope conflict, which the maintainer resolved for the library. K2's pass 3 flagged the
+  nesting and was matched partial.
+- **The `grind` asks (v0090, v0091):** `Data/Finset/Image.lean` holds 18 `grind` uses at base and
+  `Data/Rat/Lemmas.lean` none, against 137 files library-wide. This is an emerging migration: the
+  first ask has a file regularity behind it and was reached once, and the second has none.
+- **The sibling one-liner (v0105):** K's pass 4 found the pre-PR proof fails on the new statement, and
+  the library's `Finite.exists_infinite_fiber` needs an import. The ask may not be satisfiable as
+  stated. That is unverified.
+
+**Recall.** Where the maintainers' suggestion was specific (the `variable … in` form, `simpa using`,
+the named lemma), no Claude session reproduced it. The reached asks are the generic ones. That fits
+capability better than memory. It is not proof.
+
+**The corrected reading, at probe altitude** (three PRs, two replicates, Claude reviewers):
+1. With a capable agent that holds compile and the whole PR, briefing the constructions and splitting
+   the passes added no reach on these 11 asks, and filed 43% fewer findings.
+2. Whether coordination is a bottleneck for the pipeline is untested here.
+3. The gap between Claude and the pipeline on the mechanical asks is real. It sits at the arm's
+   decision to construct, and its causes (model, harness, packet, recall) are confounded.
+4. The unreached residue is a scope conflict and an emerging migration. That is convention knowledge
+   (`docs/todo/conventions-nature.md`), not construction.
+
+**What would test the design where it applies:**
+- the construction briefs on `gpt_5.2`, the reviewer that did not construct;
+- family closure on PRs whose misses are sibling-class;
+- a reviewer whose training does not cover the PRs.
+

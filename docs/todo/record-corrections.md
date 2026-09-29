@@ -116,3 +116,24 @@ the system prompt says.
   as "generalize to `Dense.ciSup'`" while the maintainer's comment is a rename; no design-move ask can match it.
   It counts in the 4-PR and held-out denominators. Check the source comment before the next gold pass
   (R1b), and do not read its miss as an arm failure meanwhile.
+
+## In this session's record (2026-09-29, construction demonstration)
+
+Applied the same day, as amendments that keep the first text visible.
+
+- **"The misses were the pipeline model's, not coordination's."** The claim appeared in the todo index
+  row, the coordination todo, the probe README, the design doc and `reviewer-model-gap.md`. The
+  demonstration did not vary coordination, since both conditions had the pass-0 model, the whole PR and
+  no pruning. Its control constructed unprompted. The conclusion that survives: briefing the
+  constructions added nothing for Claude. The stated cause does not survive. *Applied:* a second
+  reading in each place.
+- **`remaining-misses-kind` "contradicted in part".** It is model-dependent: the hypothesis holds for
+  `gpt_5.2` and fails for Claude. *Applied.*
+- **Errors in the second reading's own first draft,** corrected before they were written into the
+  record:
+  - "two of five lost to pruning": in fact all five were lost at an arm's decision, with pruning an
+    added loss at two;
+  - "`variable … in` has no regularity at base": in fact it is in 1,129 of 6,947 files library-wide
+    and in none of the file's;
+  - "twins 8 of 10, family closure found nothing": in fact 11 of 15 twins compiled, and 5 findings
+    rest on twins, unaligned with gold.

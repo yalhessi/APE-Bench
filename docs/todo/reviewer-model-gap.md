@@ -1,8 +1,7 @@
 # The reviewer-model gap: is the binding constraint the model, not the coordination?
 
-**Status** — open, 2026-09-29. Two cheap tests, below.
-**Cost** — (a) free: Claude session time plus a few reviewed-workspace builds; (b) about $1 on
-`gpt_5.2`.
+**Status** — open, 2026-09-29; **corrected the same day** (second reading, below). Two cheap tests.
+**Cost** — (a) free: Claude session time plus reviewed-workspace builds; (b) about $3 on `gpt_5.2`.
 
 **Motivating example.** `results/pr_review_v5/probes/construction-demo-2026-09-29/`. On three
 validation small12 PRs (34091, 30458, 32875), Claude reviewers with the pipeline generalist's own
@@ -43,3 +42,31 @@ these asks is the whole distance.
 window, with two runs a cell. The next generator change should then be decided by which factor
 carries the gap. If it is the model, coordination designs should be measured on the model that will
 run them, before any more are built.
+
+## Corrected, second reading (2026-09-29)
+
+**Where the pipeline lost the five asks.** Every one was lost at an arm's decision, not by a missing
+arm:
+- On 34091, `generality` and `style` ran on the unit and declined. `style` checked line breaks and `by`
+  blocks.
+- On 30458, the generalist, `generality` and `style` ran and declined, and the lead pruned the two
+  proof arms.
+- Every arm that ran held `lean_verify_edit`, and none replayed a proof or compiled a binder change.
+- Claude sessions did both unprompted.
+
+So the gap is the reviewer's initiative to construct. That is a property of the model and harness,
+with the packet as a possible factor. The title's "not the coordination" was not tested: coordination
+did not vary in the probe.
+
+**Test (b), restated.** Run `gpt_5.2` through the solo scaffold on the three PRs under three prompts,
+two runs each:
+1. the plain brief;
+2. the plain brief with the pass-0 model;
+3. the construction briefs, pass 3 then pass 4.
+
+Use the same matchers and the 11 asks. This separates the packet from the model, and it tests the
+constructions on the reviewer that does not construct. If (3) reaches the binder and pre-PR-proof asks
+and (1) does not, the design's construction protocol is worth building for the pipeline's model.
+
+**Test (a) first.** Test (a) builds a post-cutoff probe set, so that a Claude probe carries no recall
+caveat.

@@ -442,6 +442,12 @@ Claude with the plain brief reached asks that `gpt_5.2` missed in both lead and 
 which points the next step at the reviewer model (`docs/todo/reviewer-model-gap.md`) before any
 build. The paid step below waits on it.
 
+*Corrected, second reading (same day):* the demonstration varied the construction brief and the pass
+split, not coordination. Its control constructed unprompted, so the brief was redundant for Claude. The
+design is therefore untested on the reviewer that does not construct (`gpt_5.2`), and on sibling-class
+misses, which these PRs did not hold. Family closure ran: it compiled 11 of 15 twins and filed missing
+twins that no maintainer asked for. See the probe README's second reading.
+
 **After building (paid, small):** validation small12 minus 30714, the PRs
 `pr5_val_small12_minus30714_lead_rep1` reviewed (8 of 30 asks reached, $6.78) and the solo
 baseline (2 of 30, $1.20). Three reps, reported as mean / union / stable, found and published

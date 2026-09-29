@@ -45,3 +45,19 @@ output distribution in both the lead and solo configurations, or present in Clau
 not. What remains unreached by any condition is 4-5 asks: a one-liner from a sibling lemma, section
 layout (two asks) and `grind` tagging (two asks). That residue is where this hypothesis can still
 be tested.
+
+**Corrected, second reading (2026-09-29): model-dependent, not contradicted.** The hypothesis holds
+for `gpt_5.2`. Its arms held compile at these sites and did not construct. It fails for Claude, which
+constructs unprompted: the plain-brief sessions compiled the pre-PR proofs and the instance-binder
+versions on their own. So "absent from the output distribution" is a property of the reviewer. The
+test of this hypothesis is the construction briefs on `gpt_5.2`. Claude with the brief shows nothing,
+since Claude does not need it.
+
+The residue is not construction-shaped:
+- two asks are a scope conflict. `variable … in` is in 1,129 of 6,947 Mathlib files at base, 1 of 13
+  in the directory, and 0 in the file;
+- two are an emerging `grind` migration: 18 uses in one file, 0 in the other, 137 files
+  library-wide;
+- one, the sibling one-liner, may be unsatisfiable as stated.
+
+The first two belong to `conventions-nature.md`.
