@@ -94,13 +94,15 @@ def test_run_with_execute_does_not_force_dry_run(monkeypatch):
 
     import src.mathlib_review.review.runner as runner
 
-    async def _async(dataset, scaffold, task_overrides, logger):
+    async def _async(dataset, scaffold, task_overrides, logger, *, resume=False):
         seen["dry_run"] = dataset.dry_run
+        seen["resume"] = resume
         return None
 
     monkeypatch.setattr(runner, "run", _async)
     assert cli.main(["run", "--config", str(CONFIG), "--execute"]) == 0
     assert seen["dry_run"] is False
+    assert seen["resume"] is False  # only `--resume` continues a spent run name
 
 
 def test_judge_without_execute_resolves_paths_and_stops(monkeypatch, capsys):

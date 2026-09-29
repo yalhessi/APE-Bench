@@ -1488,7 +1488,7 @@ def assert_run_is_named(dataset: V5DatasetConfig) -> None:
 
 
 def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
-                   *, fatal: bool = True) -> None:
+                   *, fatal: bool = True, resume: bool = False) -> None:
     """Refuse to reuse a run name that already produced results, BEFORE spending anything.
 
     Two separate things go wrong when a name is reused after a code change, and neither
@@ -1509,6 +1509,28 @@ def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
     directory = run_dir(dataset.run_name)
     existing = [name for name in _TERMINAL_OUTPUTS if (directory / name).is_file()]
     scratch = [item for item in _scratch_dirs(dataset.run_name, scaffold) if item.is_dir()]
+    if resume:
+        # `--resume` continues a run that was interrupted before it wrote its outputs: a
+        # killed process, a lost session. That is the orchestrator's own resume, and the one
+        # case the hazard above does not cover, because nothing finished and nothing was
+        # reported. Two things stay refused. A finished run has written its outputs once, so
+        # resuming it would rewrite them; and a change to what the run measures is still
+        # refused by `seal_or_revise_plan`. (2026-09-29: a $1.69 high-effort session killed at
+        # turn 28 of 80 could only be discarded or paid for again.)
+        problem = (
+            f"--resume continues an interrupted run, and {dataset.run_name!r} finished "
+            f"(outputs: {', '.join(existing)}); bump the name or pass --redo" if existing else
+            f"--resume found no orchestrator state for {dataset.run_name!r}; there is nothing "
+            "to resume" if not scratch else None)
+        if problem is None:
+            logger.warning(
+                "resuming %r from its orchestrator state: attempts that succeeded are returned "
+                "from cache and unfinished ones continue", dataset.run_name)
+            return
+        if not fatal:
+            logger.warning("%s", problem)
+            return
+        raise RuntimeError(problem)
     if not existing and not scratch:
         return
     if not fatal:
@@ -1624,7 +1646,7 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
                        exc_info=True)
 
 
-async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
+async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
     assert_ready(scaffold, logger, enforce=not dataset.dry_run)
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
@@ -1655,7 +1677,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
         # Warn, don't raise: a dry run must be able to say the real run would refuse this
         # name. The check used to sit *after* this block, so the one command whose job is to
         # tell you what the real run would do could not tell you it would not start.
-        guard_run_name(dataset, logger, scaffold, fatal=False)
+        guard_run_name(dataset, logger, scaffold, fatal=False, resume=resume)
         logger.info("%s", json.dumps(report, indent=2))
         _report_budget(dataset, report, len(selected_prs), logger, scaffold=scaffold)
         assert_coverage_is_reachable(dataset, report, logger)
@@ -1680,7 +1702,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger):
                    scaffold=scaffold)
     assert_coverage_is_reachable(dataset, report, logger)
     assert_the_judge_model_is_pinned(dataset, logger)
-    guard_run_name(dataset, logger, scaffold)
+    guard_run_name(dataset, logger, scaffold, resume=resume)
     out = run_dir(dataset.run_name)
     out.mkdir(parents=True, exist_ok=True)
     cutoff_by_episode = cutoffs_by_episode(episodes)

@@ -116,8 +116,12 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--config", type=Path, required=True)
     _add_run_name(run)
     _add_set(run)
-    run.add_argument("--redo", action="store_true",
-                     help="discard this run_name's results and state, then run it again")
+    again = run.add_mutually_exclusive_group()
+    again.add_argument("--redo", action="store_true",
+                       help="discard this run_name's results and state, then run it again")
+    again.add_argument("--resume", action="store_true",
+                       help="continue this run_name after an interruption; refused once it "
+                            "has written its outputs")
     run.add_argument("--cost-model", default=None,
                      help="how to read provider token accounting when pricing calls")
     _add_execute(run)
@@ -305,7 +309,7 @@ def _run(args, overrides, logger) -> int:
     logger.info("cost model: %s", scaffold.llm_config.cost_model)
     if args.redo:
         redo_run(dataset, logger, scaffold)
-    result = asyncio.run(run(dataset, scaffold, task_overrides, logger))
+    result = asyncio.run(run(dataset, scaffold, task_overrides, logger, resume=args.resume))
     if result:
         print(result)
     return 0
