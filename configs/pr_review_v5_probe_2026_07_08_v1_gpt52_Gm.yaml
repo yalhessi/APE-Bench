@@ -1,0 +1,6 @@
+# Test (d) at medium effort: the reasoning condition exactly, with reasoning_effort medium in place of
+# high. Medium was the in-window reasoning twin's setting (c4e08d2).
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_Gr.yaml
+
+llm_config:
+  reasoning_effort: medium
