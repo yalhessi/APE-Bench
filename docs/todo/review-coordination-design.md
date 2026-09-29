@@ -1,7 +1,11 @@
 # Coordination: a principled design for how the review reads a PR
 
-**Status** — open, 2026-09-29, **for a fresh session**; design and labelling, no runs.
-**Cost** — no spend until a design exists.
+**Status** — **design written, 2026-09-29**:
+[`docs/research/review-coordination-design-2026-09.md`](../research/review-coordination-design-2026-09.md),
+checked against the labelled asks (see "The design" at the foot). Open: the by-hand demonstration
+that a construction produces a miss (`remaining-misses-kind.md`), then the build decision. No run.
+**Cost** — no spend so far; the demonstration is free (`cli tool`); the first paid measurement is
+three reps on validation small12, priced by `cli plan` before anything runs.
 
 **The user (2026-09-29).** *"Having overfocused work units isn't optimal, but the principled design
 is to come up with a way to chain context together. A per-PR pass seemed useful but didn't move the
@@ -48,3 +52,34 @@ produce it, with the labelled asks as the check. Only then a run.
 
 **Risk.** Designing again from the datapoints in front of us; the guard is that every element of
 the design must be justified by the reading protocol or the inspection literature, not by a miss.
+
+## The design (2026-09-29)
+
+**One PR model, six perspectives that construct, six passes that enrich it.** The model holds what
+the reference facet says a reviewer compares against (objects, families with their twin pattern,
+relations, library candidates as a family along the decoy axes, the area's regularities, intent,
+open-PR overlap), every entry tagged `fact`, `construction` or `hypothesis`; a later pass may rely on
+the first two and may only *ask* the third. The perspectives are the consumers of a merged
+declaration (user, automation, maintainer, next developer, finder, gatekeeper), each building the
+artifact its consumer would (a usage, automation's view, the proof re-done in the idiom, the
+generalised statement and the family closure, the name and docstring from the code, the PR's story);
+asks are what the construction cannot do, which is perspective-based reading's mechanism. The passes
+run in cost-of-change order (intent, definitions and the typeclass layer, statements and the family,
+proofs, names/prose/layout/location, the change), every applicable object receives every pass and
+returns a verdict, and the family, not a hash-packed unit, is the unit of passes 3 and 4. Findings
+are never shared between passes; facts and constructions are. The lead becomes the model's owner and
+the passes' sequencer, which is the `sibling_view = "blackboard"` value `CoordinationPolicy` names
+and refuses today.
+
+**The check** (`results/pr_review_v5/adjudications/coordination-design-check-2026-09-29/`, one
+reader, planning labels): on the 516 agreed reference × object asks, passes 3 and 4 hold 48%, pass 5
+37%, pass 6 6%, pass 2 7%. All 31 agreed sibling asks of the outside reading land in passes 2–4,
+27 of them in pass 3's family closure (19 are a twin the pattern expects). The 38 misses land 25 in
+passes 3–4 against 48% of the population; of the 14 with a battery result, 11 were produced by the
+construction. The design names no PR; the check does.
+
+**What would close the next step.** The demonstration in `remaining-misses-kind.md`: the model built
+by hand for three validation small12 PRs holding pass-3/4 misses, passes 3 and 4 run by hand through
+`cli tool`, two runs, two blind matchers; threshold ≥ 3 unreached asks produced in both runs with the
+compiled artifact as evidence. Then the minimal native build (§9 of the design) and three reps on
+small12 against `pr5_val_small12_minus30714_lead_rep1` under the §10 thresholds.

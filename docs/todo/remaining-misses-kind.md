@@ -27,5 +27,10 @@ regularity, a reading of the whole PR, or none. Two readers, pre-registered voca
 family. The result decides which perspectives in `review-coordination-design.md` are worth
 constructing and which conventions in `conventions-nature.md` they need.
 
+**A starting point (2026-09-29).** One reader's pass and construction labels for the 38 misses and
+the 31 sibling asks are in `results/pr_review_v5/adjudications/coordination-design-check-2026-09-29/`
+(vocabulary: the constructions of `review-coordination-design-2026-09.md` §4). Planning labels, no
+kappa; the two-reader study below supersedes them.
+
 **What would close it.** The labelled table, and for the largest artifact class a demonstration on
 three misses that constructing the artifact by hand exposes the ask, before any pipeline change.
