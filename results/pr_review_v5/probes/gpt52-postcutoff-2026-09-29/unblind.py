@@ -3,7 +3,8 @@
 Usage: python3 unblind.py [--seal <file>] [--out <file>] <match_dir> <matcher id> [<matcher id> ...]
 `match_dir` holds matches.<id>.json and session_stats.json (from build_match_inputs.py). The default
 seal is test (b)'s `blinding_SEALED.json` and the default output `unblinded.json`. A seal holding the
-lead runs (L1, L2) is the arms condition, read by its own pre-registered rule.
+lead runs (L1, L2) is the arms condition, and one holding Gr1, Gr2 is test (d), each read by its own
+pre-registered rule.
 """
 import json, sys
 from pathlib import Path
@@ -67,6 +68,49 @@ def arms_reading():
     json.dump(out, open(G / out_name, "w"), indent=1)
 
 
+def comparison_lookups(sessions):
+    """Mean library lookups of comparison objects per session, by inspect_sessions' classification."""
+    sys.path.insert(0, str(G))
+    import inspect_sessions as I
+    posts = I.post_images()
+    n = hits = 0
+    for pr in I.PRS:
+        for s in sessions:
+            n += 1
+            hits += sum(1 for tool, args in I.session_calls(s, pr)
+                        if tool in I.SEARCH and I.lookup_side(tool, args, posts[pr]) == "library")
+    return hits / n
+
+
+def reasoning_reading():
+    """Test (d): reach crossed with comparison lookups, the rule in README.md."""
+    looks = comparison_lookups(("Gr1", "Gr2"))
+    out = {"Gr_comparison_lookups_per_session": looks}
+    for m in MATCHERS:
+        cells = load(m)
+        r = {k: reach(cells, (f"{k}1", f"{k}2"), asks) for k in ("Gr", "G", "X")}
+        high, low = r["Gr"] >= 0.30, r["Gr"] <= 0.18
+        reading = ("partial" if not (high or low) else
+                   "reasoning is the lever: it restores both the looking and the reaching" if high and looks >= 8 else
+                   "reasoning is the lever, by inference from what is in view" if high else
+                   "reasoning makes it look and the model still does not conclude" if looks >= 8 else
+                   "reasoning does not move this reviewer; the gap is the model")
+        out[m] = {"reach_all16": r, "reach_scope": {k: reach(cells, (f"{k}1", f"{k}2"), scope) for k in ("Gr", "G", "X")},
+                  "findings_per_pr_per_run": {k: sum(stats[pr][s]["findings"] for pr in seal for s in (f"{k}1", f"{k}2"))
+                                              / (2 * len(seal)) for k in ("Gr", "G", "X")},
+                  "reading": reading}
+        print(f"matcher {m}: reach(16) Gr {r['Gr']:.2f} G {r['G']:.2f} X {r['X']:.2f}; scope({len(scope)}) "
+              + " ".join(f"{k} {v:.2f}" for k, v in out[m]["reach_scope"].items())
+              + f"; Gr comparison lookups {looks:.1f} | {reading}")
+    readings = {out[m]["reading"] for m in MATCHERS}
+    out["reasoning_reading"] = readings.pop() if len(readings) == 1 else "the matchers disagree"
+    print("test (d):", out["reasoning_reading"])
+    json.dump(out, open(G / out_name, "w"), indent=1)
+
+
+if any(s.startswith("Gr") for labels in seal.values() for s in labels.values()):
+    reasoning_reading()
+    sys.exit(0)
 if any(s.startswith("L") for labels in seal.values() for s in labels.values()):
     arms_reading()
     sys.exit(0)

@@ -11,8 +11,15 @@ from src.mathlib_review.analysis.trajectory import extract
 
 PRS = [41930, 42184, 42814, 43024, 43167, 43192]
 POST = Path("results/pr_review_v5/probes/postcutoff-2026-09-29")
-RUNS = {"G1": "probe_postcutoff_gpt52_G_rep1", "G2": "probe_postcutoff_gpt52_G_rep2",
-        "K1": "probe_postcutoff_gpt52_K_rep1", "K2": "probe_postcutoff_gpt52_K_rep2"}
+from build_match_inputs import RUNS  # the solo runs, one table for both scripts
+
+#: the solo sessions whose runs exist, then Claude's; a condition is a label without its digit
+GPT = [s for s in RUNS if (Path(".ape/runs") / RUNS[s]).exists()]
+SESSIONS = GPT + ["X1", "X2"]
+
+
+def condition(session):
+    return session.rstrip("0123456789")
 REVIEW_TOOLS = {"file_read", "content_search", "file_search", "declaration_search", "naming_norm",
                 "precedent_search", "zulip_search", "proof_profile", "lean_verify", "lean_verify_edit",
                 "get_lean_goal", "code_hover", "code_goto"}
@@ -173,8 +180,8 @@ def lookups_and_compiles():
     posts = post_images()
     agg = collections.defaultdict(collections.Counter)
     for pr in PRS:
-        for s in ("G1", "G2", "K1", "K2", "X1", "X2"):
-            c = agg[s[0]]
+        for s in SESSIONS:
+            c = agg[condition(s)]
             c["sessions"] += 1
             for tool, args in session_calls(s, pr):
                 if tool in SEARCH:
@@ -182,7 +189,7 @@ def lookups_and_compiles():
                 if tool in COMPILE:
                     c["compile_" + compile_kind(tool, args, posts[pr])] += 1
     print("\nper session, mean: lookups (PR-side / own names library-wide / library) and compiles (own / usage / variant)")
-    for k in ("G", "K", "X"):
+    for k in dict.fromkeys(map(condition, SESSIONS)):
         c, n = agg[k], agg[k]["sessions"]
         print(f"  {k}: lookups {c['lookup_pr']/n:.1f} / {c['lookup_own_names']/n:.1f} / {c['lookup_library']/n:.1f}   "
               f"compiles {c['compile_own']/n:.1f} / {c['compile_usage']/n:.1f} / {c['compile_variant']/n:.1f}")
@@ -190,10 +197,10 @@ def lookups_and_compiles():
 
 
 def main():
-    gpt = {s: gpt_profiles(run) for s, run in RUNS.items()}
+    gpt = {s: gpt_profiles(RUNS[s]) for s in GPT}
     rows = []
     for pr in PRS:
-        for s in ("G1", "G2", "K1", "K2"):
+        for s in GPT:
             p = gpt[s].get(pr, {})
             rows.append((pr, s, p.get("turns"), p.get("review_calls"), p.get("compiles"), p.get("compiles_ok"),
                          p.get("files_read"), p.get("tool_errors_seen"), round(p.get("seconds") or 0),
@@ -207,7 +214,7 @@ def main():
         print(f"{r[0]} {r[1]:>4} {str(r[2]):>5} {str(r[3]):>12} {str(r[4]):>8} {str(r[5]):>2} {str(r[6]):>5} {str(r[7]):>4} {str(r[8]):>5}  {r[9]}")
     agg = collections.defaultdict(lambda: collections.Counter())
     for r in rows:
-        c = r[1][0]
+        c = condition(r[1])
         agg[c]["sessions"] += 1
         for i, k in ((3, "review_calls"), (4, "compiles"), (5, "compiles_ok"), (6, "files_read")):
             agg[c][k] += r[i] or 0
