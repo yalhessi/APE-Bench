@@ -11,6 +11,24 @@ function tools, use /v1/responses or set reasoning_effort to 'none'." Every revi
 so on gpt-5.4 and gpt-5.5 the pipeline can only run with reasoning off. gpt-5.2 accepts the
 combination, which is why its high-effort runs worked.
 
+## Setting up the fresh session
+
+This entry, and the model-table change it builds on, live on `pipeline-overfit-review`, which has
+not been merged into `develop`. From the main checkout:
+
+```
+git worktree add -b openai-responses-provider .claude/worktrees/openai-responses-provider develop
+.claude/worktree-setup.sh .claude/worktrees/openai-responses-provider
+cd .claude/worktrees/openai-responses-provider
+git cherry-pick a2b501e    # gpt_5.4's real rates and the gpt_5.5 entry; applies cleanly to develop
+git checkout pipeline-overfit-review -- docs/todo/llm-openai-responses-provider.md
+```
+
+Then copy the section "A rejected request is retried like a transient one" from
+`pipeline-overfit-review`'s `docs/todo/framework-defects-2026-09.md` into develop's copy. Its commit,
+998468c, does not cherry-pick cleanly, because `reviewer-model-gap.md` is not on `develop`. Add this
+entry's row to develop's `docs/todo/README.md`.
+
 ## What the probes settled (2026-09-30, one tiny call each)
 
 - **The ELM gateway is no way round.** Its `/v1/chat/completions` returns the same 400, so it
