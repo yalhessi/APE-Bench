@@ -399,3 +399,18 @@ until the six-PR runs. The cost is the constraint. The high session billed about
 reasoning-off session on this PR and took 43 turns. Two full high-effort runs would bill roughly
 $20-25 and take about 1.5 hours each. That is outside the entry's single-digit budget, so it is the
 user's decision.
+
+---
+
+## Test (d), run (2026-09-30): one run first, the reading as pre-registered
+
+The user approved high-effort runs on all three sets. On this set that is `probe_postcutoff_gpt52_Gr_rep1`
+(`configs/pr_review_v5_probe_2026_07_08_v1_gpt52_Gr.yaml`, $6.00 and 80 turns a session). The
+pre-registration above named two runs, Gr1 and Gr2. **One run is made first**; the rule is read on it,
+marked provisional, and Gr2 follows only if the user asks.
+
+Matching follows the three-set design, not the arms-condition seal: X1, X2, G1, G2 and Gr1 on the six
+ask PRs (`blinding_reasoning_SEALED.json`), with two new blind matchers. Test (d)'s rule is applied
+with Gr1 in place of the Gr pair: reach against 0.30 and 0.18, and comparison lookups against 8 a
+session, from `inspect_sessions.py`. The three-set rule `q_r = reach(Gr1) / reach(X)` is read beside
+it: at least 0.8 means the gap closes, at most 0.5 means it remains.

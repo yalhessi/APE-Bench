@@ -87,3 +87,26 @@ Two blind matchers, 150 cells. They read only their own folders and agree on 147
 
 **Caveats:** inside Claude's training window; one lead run; 8 PRs. Findings per session per PR:
 X 5.4, G 1.9, L 5.1.
+
+---
+
+## Reasoning on (pre-registered 2026-09-30, before its run)
+
+**The run.** Condition G with `reasoning_effort: high`, one run, `probe_val_small12_gpt52_Gr_rep1` (`configs/pr_review_v5_val_small12_gpt52_Gr.yaml`).
+The caps are $6.00 and 80 turns a session, so they cannot bind. The calibration session on 43192
+billed $3.74 over 43 turns.
+
+**Matching.** A new seal over X1, X2, G1, G2 and Gr1 on the ask PRs (`blinding_reasoning_SEALED.json`,
+`sources_reasoning.json`), two new blind matchers, the harness's rubric. X and G are re-judged in the
+same pass, so the ratio is computed within one matcher.
+
+**Reading rule**, on both matchers: `q_r = reach(Gr1) / reach(X)`.
+
+| on both matchers | reading |
+|---|---|
+| `q_r ≥ 0.8` | reasoning closes the model gap on this set |
+| `q_r ≤ 0.5` | the gap remains with reasoning on |
+| otherwise | partial |
+
+Also read: `reach(Gr1) - reach(G)`, per-family reach, findings per PR, cost per session, and any
+capped session (a cap that binds is reported, not hidden). One run, so provisional.
