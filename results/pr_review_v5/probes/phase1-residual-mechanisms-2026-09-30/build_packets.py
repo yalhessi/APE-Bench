@@ -73,6 +73,8 @@ def build(out_dir: Path):
     splits = {}
     for set_name, (set_cfg, run) in SETS.items():
         spec = probes.load_probe_set(Path(set_cfg))
+        episodes = {json.loads(l)["pr_number"]: json.loads(l)
+                    for l in (spec.release / "input/episodes.jsonl").read_text().splitlines() if l.strip()}
         rows = {a: r for a, r in pop[set_name]["rows"].items() if r["class"] in CLASSES}
         prs = sorted({r["pr"] for r in rows.values()})
         halves = [prs] if set_name != "dev" else [prs[: len(prs) // 2], prs[len(prs) // 2:]]
@@ -87,12 +89,11 @@ def build(out_dir: Path):
                 json.dump([{"ask_id": a, "text": r["text"], "family": r["family"], "family_definition": FAMILIES.get(r["family"]),
                             "class": r["class"], "reached_by": r["reached_by_both_matchers"]} for a, r in sorted(pr_asks.items())],
                           open(d / "asks.json", "w"), indent=1, ensure_ascii=False)
-                # the PR as the reviewers saw it, from a Claude packet (pr.md, diff.patch)
-                x1 = spec.session_dir(pr, "X1"); packet = x1.parent
-                for name in ("pr.md", "diff.patch"):
-                    src = packet / name
-                    if src.exists():
-                        shutil.copy(src, d / name)
+                # the PR as the reviewers saw it, rendered as write_packets renders it: the sets keep
+                # pr.md and diff.patch in different places (inside each session on validation and
+                # dev, nowhere committed on post-cutoff), and the release episode is the one source.
+                (d / "pr.md").write_text(probes.pr_markdown(episodes[pr]))
+                (d / "diff.patch").write_text(episodes[pr]["diff"])
                 for sess in ("X1", "X2"):
                     sd = spec.session_dir(pr, sess); (d / sess).mkdir(exist_ok=True)
                     for name in ("findings.json", "notes.md", "calls.jsonl"):
