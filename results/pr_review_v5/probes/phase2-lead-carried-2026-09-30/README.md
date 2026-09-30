@@ -40,3 +40,25 @@ gate published 11 -- reported here only as a shape, from two PRs.
 **Main-run caps from this** (about 2x the calibration's maxima, in step at 1.2M tokens a dollar): arm
 job $1.50 / 1.8M, lead $3.00 / 3.6M, per PR $8.00 / 9.6M. Expected cost a validation rep (11 PRs, 36
 work units): about $25-35.
+
+## Post hoc, exploratory: the two calibration PRs matched (2026-09-30, at the user's request)
+
+Not Phase 2's result, which is pre-registered for the main runs; two PRs, 11 asks, one ask is 0.09.
+Seal acf2e521 (X1 X2 Grc1 Lc), two blind matchers audited clean (4 and 6 calls), agreeing on 37 of
+44 cells.
+
+| reviewer | asks reached (matcher 1 / 2) | findings |
+|---|---|---|
+| Claude X1 / X2 | 6 / 4, 5 / 3 | 10, 12 |
+| gpt_5.2 solo carried (Grc1) | 2 / 2 | 3 |
+| gpt_5.2 lead carried (Lc) | 3 / 2 | 21 |
+| Lc, gate-published findings only | 3 / 2 | 11 |
+
+- The lead reaches what solo reaches, within one ask, with seven times the findings: it gains `simpa
+  using` on 32875 (v0092) and, on one matcher, the `gcongr` step (v0068), and loses the `ha` naming
+  (v0065) that solo reached incidentally.
+- Every ask the lead reached, the gate published: under reasoning, the gate did not suppress hits here.
+- About half the lead's findings are the same claim from two to five arms (`posLog_pow` four times,
+  `grind` five times).
+- Both lead and solo asked to remove `grind` where the maintainer asked for `@[grind]` tags
+  (v0090, v0091): decomposition carries the same convention gap Phase 1 labelled.
