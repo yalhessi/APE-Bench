@@ -122,7 +122,9 @@ class BaseProvider:
                     if self.llm_logger:
                         await self.llm_logger.log_response(response_data, "response")
 
-                    if 'error' in response_data:
+                    # Truthiness, not presence: a Responses body always carries `error`,
+                    # as null on success.
+                    if response_data.get('error'):
                         self.logger.warning(f"Response contains error field despite HTTP 200 status")
                         error_msg = self.parse_error_response(response_data)
                         raise ProviderError(f"API returned error: {error_msg}")

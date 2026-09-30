@@ -1,0 +1,123 @@
+{
+  "id": "resp_0679847742d92f07016abcd833ff5c87d2a39cf081aecf4dae",
+  "object": "response",
+  "created_at": 1790761012,
+  "status": "completed",
+  "access_programs": null,
+  "background": false,
+  "billing": {
+    "payer": "developer"
+  },
+  "completed_at": 1790761014,
+  "error": null,
+  "frequency_penalty": 0.0,
+  "incomplete_details": null,
+  "instructions": "You are terse.",
+  "max_output_tokens": 4000,
+  "max_tool_calls": null,
+  "model": "gpt-5.4-2026-03-05",
+  "moderation": null,
+  "output": [
+    {
+      "id": "rs_0679847742d92f07016abcd8349c4887d283c92247fcfcc1f1",
+      "type": "reasoning",
+      "content": [],
+      "encrypted_content": "gAAAAABqvNg2XDD6gjeNgL7Me3duWOjzjSzCt6hpBAKaFLYIjjYm9OgivoZdDN1Uih5lDZT4Lp5j9jQJQ4Z8RrUs4y8rzHm2DWbfbzpdxXuvzuEZAx8XBGJi8K1mQq5ZyF24Tr2uQBQnba6uWHdqNKe5KUUTPCmqaZ3K89zpZOBSJpojzngekVqxMy-8EZucxqrRPMlzpWDJftCC148OhHmeaS1Pm70VZDD7VvdMKaA93VdVKJg_kCSiId3MW9YpQJfRUC4jY6EaOtXWLTjAAcYBcH_37VTN6q8_5r3dsI-340cQYHZ9WA5EsHbe1CsviUwz45nIRMPTUvqmL4oRYexLXa33U_zs7Bn2IAgRsmv_Tb7DhZrfk6NEzQbxWMF3LecFbfBMxiT4h-pgmtbVQHcuYIO2ksPduYHcrGjWqQB64LN-Z-gTgwTiu3TR3emPfvQMcg3aHkOVvtDhjXPN48uXnfxT4MSKGgp2AgPaI2i_gTxyMvGWM01LO9LncBYqwvsGLcisNCeQ67mk4Rv9pDY52xc1LDS97OfDy4qeZ7MiWUu2IC6gTWNj2ObDOHMo1EiH8qjWLCRomhClpzwk4ipw9FO-V7lIzHHRZSQdLWJWFnNymwBb5oMP9Gwg3Nr6m4XPQ9qs8uXnvTvqUHkV7sEMau_JWAZE5ZnO8nP5-iykD6mMuoHYBa7-6Zxsau6giEedcPiHCrrbs_iiB6MEN-_3Vd-EoB_ABdunfq3CrqzeelEfTVc3xPQz3fn-lyL-7C12IHHhi-oZFmf0afBgpkG_UUOXbWuK_mxS6KJVkH7l-C0oVYC_iJ60-TAhMiF53V4DsNKVaCMQYSrWoSIpvqe40xeD9u_YEIRK4mjfnFn2pnLIy0DBcIrGgnYG7Tm0d-ovOn0WsB6mzCmCE4AQq1JMTnGY3ULec2lThDnfUF5YZajYKaoRx9MGhPT-aONGAcqj3Of9w3tJRN5aj-J2GGMjYScIAJ3Hdga_f0Cjmg1FN1xlInBpPsgzs9gehpyUfsM7sIub0FdXMVIISVFN6C2Olzjwxpsp8d623cZ325Lmi1m7MKJDQc74_2IK3mB7JnIoNYNPcJEtDASzOoJPJ6uSa4NqJBDEyU6R6LLL3zWEFBA-k43g_RMdP4ZaxdTyYOUszeotvTQXf9YyCgYWulY7NPi3I6OdT67ofOwKeR8pUxGm88n8ywk7Kk2M5x--gJpbRvfx2W3HCygh-Jce0_Lt0Mq7eJFADMTaFKzQVmFUBIcvsGNCK2pGHSevD0QYfvnRcPo_-GXSUKLJFzMZ1eEuEy3d9AJXdcwXPqnp8w6vumIb1qS0IaQCCpNYafI_KoEYRG3v-Vkz01jX4wbERErhnnHiLuDVuKbouHHHbWsyaQD5T_RXRdSQ1JHWSh0B0KOAXOyao3dlPnxrWC2Y26ijD0l2GAkoVK_rGi4PVdoj_-4ZCaqgTNzjGzq8T12BWXQfz211yBEDFOi_IbUTcLPAMg8_1Tx81-tglYBco-ZZ6Mp8cJ__LEOdAC6fkdwBcxa6jvLm0E6iVZKhlv70hCuNOGk-ZgIpEXzhIdSiPfLvaWVRit9oM6qVY1wn7POcY2vIYGEItzLDf0ft6E9epqJTNaNM06QbN--CEuMo5WgF-gwwuUm2mbkvZ35ijXd6I_zC9GrhXow7Qt8Np5n_ev8_YavMon41b3Tf9kTLyi2t2DT9Uml1HIw=",
+      "summary": []
+    },
+    {
+      "id": "fc_0679847742d92f07016abcd835f76487d29275696c11095d7b",
+      "type": "function_call",
+      "status": "completed",
+      "arguments": "{\"city\":\"Paris\"}",
+      "call_id": "call_Ek1Doh5KKLDdXRhpTKxrGAGy",
+      "name": "get_weather"
+    },
+    {
+      "id": "fc_0679847742d92f07016abcd835f77887d2b3add99b51d77d5b",
+      "type": "function_call",
+      "status": "completed",
+      "arguments": "{\"city\":\"Rome\"}",
+      "call_id": "call_gbeTsKnFM1upcOVOjzcKt2pZ",
+      "name": "get_weather"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "presence_penalty": 0.0,
+  "previous_response_id": null,
+  "prompt_cache_key": null,
+  "prompt_cache_retention": "in_memory",
+  "reasoning": {
+    "context": "current_turn",
+    "effort": "high",
+    "mode": "standard",
+    "summary": null
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "store": false,
+  "temperature": 1.0,
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "tool_choice": "auto",
+  "tool_usage": {
+    "image_gen": {
+      "input_tokens": 0,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "total_tokens": 0
+    },
+    "web_search": {
+      "num_requests": 0
+    }
+  },
+  "tools": [
+    {
+      "type": "function",
+      "description": "Weather for a city",
+      "name": "get_weather",
+      "output_schema": null,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ],
+        "additionalProperties": false
+      },
+      "strict": true
+    }
+  ],
+  "top_logprobs": 0,
+  "top_p": 0.98,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 62,
+    "input_tokens_details": {
+      "cache_write_tokens": 0,
+      "cached_tokens": 0
+    },
+    "output_tokens": 127,
+    "output_tokens_details": {
+      "reasoning_tokens": 77
+    },
+    "total_tokens": 189
+  },
+  "user": null,
+  "metadata": {}
+}

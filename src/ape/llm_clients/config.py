@@ -384,6 +384,18 @@ class LLMConfig(BaseModel):
     #: against the measured row rather than letting either outcome happen at runtime.
     reasoning_effort: Optional[str] = None
 
+    #: Which OpenAI API a direct OpenAI model is called through. `chat_completions` is what
+    #: every run before this field used. `responses` exists because gpt-5.4 and gpt-5.5
+    #: reject tools with a reasoning effort on Chat Completions (HTTP 400, 2026-09-30), and
+    #: every review task sends tools; see `OpenAIResponsesProvider`. A field rather than an
+    #: inference from the model, so the run's config says which endpoint produced it.
+    openai_api: Literal["chat_completions", "responses"] = "chat_completions"
+
+    #: Responses only: carry each turn's encrypted reasoning items into the next request.
+    #: Off drops them, as Chat Completions does, which keeps a run comparable with the Chat
+    #: Completions runs; on is what OpenAI recommends for tool use, and a separate condition.
+    openai_responses_reasoning_carryover: bool = False
+
     def model_post_init(self, __context: Any) -> None:
         """Auto-configure immediately after initialization."""
         # If model_name is None, skip auto-configuration (use official models)
@@ -398,6 +410,16 @@ class LLMConfig(BaseModel):
         self.provider_type = self.detect_provider_type(self.model_name)
         if not self.api_key:
             self.api_key = self._resolve_api_key_from_environment(self.provider_type)
+        # Refused rather than ignored: a knob the run records and nothing honours.
+        if self.openai_api == "responses" and self.provider_type is not LLMProvider.OPENAI:
+            raise ConfigurationError(
+                f"openai_api: responses is for direct OpenAI models, and {self.model_name} is "
+                f"{self.provider_type.value}. The ELM gateway answers on /v1/responses too, "
+                "but it is untested here.")
+        if self.openai_responses_reasoning_carryover and self.openai_api != "responses":
+            raise ConfigurationError(
+                "openai_responses_reasoning_carryover needs openai_api: responses; Chat "
+                "Completions returns no reasoning items to carry.")
     
     @staticmethod
     def detect_provider_type(model_name: str) -> LLMProvider:

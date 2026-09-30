@@ -18,7 +18,7 @@ from .config import (
     RequestRejectedError)
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
 from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
-from .providers import BaseProvider, ElmProvider, OpenAIProvider
+from .providers import BaseProvider, ElmProvider, OpenAIProvider, OpenAIResponsesProvider
 from .logger import LLMLogger
 
 if TYPE_CHECKING:
@@ -50,16 +50,27 @@ class LLMClient:
         LLMProvider.ELM: (ElmProvider, OpenAIMessageFormatter),
     }
 
+    def _implementation(self):
+        """The provider class and message formatter for this config.
+
+        `openai_api: responses` takes the plain `MessageFormatter`, which keeps an assistant
+        message's `signature` -- where carried-over reasoning items travel -- and which
+        `OpenAIMessageFormatter` drops. `LLMConfig` refuses the field for any provider but
+        OpenAI.
+        """
+        if self.config.openai_api == "responses":
+            return OpenAIResponsesProvider, MessageFormatter
+        return self._PROVIDER_IMPLEMENTATIONS.get(
+            self.config.provider_type, (BaseProvider, MessageFormatter))
+
     def _create_provider(self):
         """Create provider instance based on configuration."""
-        provider_class, _ = self._PROVIDER_IMPLEMENTATIONS.get(
-            self.config.provider_type, (BaseProvider, MessageFormatter))
+        provider_class, _ = self._implementation()
         return provider_class(self.config, self.logger, self.llm_logger)
 
     def _create_message_formatter(self):
         """Create message formatter instance based on configuration."""
-        _, formatter_class = self._PROVIDER_IMPLEMENTATIONS.get(
-            self.config.provider_type, (BaseProvider, MessageFormatter))
+        _, formatter_class = self._implementation()
         return formatter_class()
 
     async def __aenter__(self):
