@@ -211,6 +211,10 @@ carry-over changes process, not reach. So:
    post-cutoff (0.19-0.44) makes a one-rep lead result unreadable against ≤ 0.03 / ≥ 0.10.
 Replicating gpt-5.4 and 5.5 unchanged is not run: it would re-measure a known defect.
 
+**3.1 result (same day, `results/pr_review_v5/probes/filing-bar-2026-09-30/`):** not the mechanism on
+validation (−0.033 and 0.000); the in-sample post-cutoff gain was one PR. The newer models' deficit
+out of sample is aim, as gpt_5.2's is against Claude. Phase 3 waits on Phase 1's table.
+
 ## 8. Execution
 
 - A fresh session in a new worktree. `pipeline-overfit-review` (167 commits past `develop`, suite

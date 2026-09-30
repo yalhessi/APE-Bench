@@ -455,6 +455,14 @@ the 0.93 did not replicate.** Three carried reps on post-cutoff and one each on 
 - **The residual population**: of 93 asks, 37 (40%) are reached by nobody and 30 (32%) only by Claude.
   Phase 1 labels both (`phase1_population.json`).
 
+**Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
+`SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
+(in-sample) gpt-5.5 files the three 43192 asks it had withheld, q 0.67 → 0.93. **On validation it
+is not the mechanism**: gpt-5.4 0.233 → 0.200, gpt-5.5 0.200 → 0.200, although the bar cut unfiled
+verified edits from 9 and 8 to 4 and 6 and nearly doubled gpt-5.5's findings. The newer models verify
+2-4x the edits gpt_5.2 does and reach fewer asks: their validation deficit is aim, not filing.
+gpt_5.2 carried stays the reference gpt reviewer (0.267, $5.60).
+
 **Why gpt-5.4 and gpt-5.5 reach less than gpt_5.2 (2026-09-30, read by hand, about $0.90;
 `results/pr_review_v5/probes/model-inspection-2026-09-30/`).**
 - **They verify more and file less.** Against gpt_5.2: 10 compiled edits each against 7, and 6
