@@ -1,0 +1,78 @@
+{
+  "agent_added": 0,
+  "candidates_total": 39,
+  "completion_status": "partial",
+  "context_calls_total": 191,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 111.011024,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:33066:round1:f86871aace6e6e1f2937758400f4a2376516feaf",
+      "pr_number": 33066,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:33145:round1:0cc61512b8bfc37b04027a009f57f25419ee5890",
+      "pr_number": 33145,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:33285:round1:dead96530ecdaac8ce47c5a7af0f07a5e044acd7",
+      "pr_number": 33285,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:33294:round1:94fd253383514d1902fa5a9e6f8d40450630569e",
+      "pr_number": 33294,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:33321:round1:cf82a8fb8fdf1825a4fcee45b4faa7561146277f",
+      "pr_number": 33321,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:33421:round1:02adb3757d729e929c52452fee14158f61c95f3a",
+      "pr_number": 33421,
+      "reason": "the whole-PR review did not reach a submission"
+    }
+  ],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 38,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 1605,
+  "pruned": 1605,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_dev_gpt52_Gr_rep1",
+  "run_name": "probe_dev_gpt52_Gr_rep1",
+  "run_plan_sha256": "576a8387af7560a09491c13a9e26a8286cd0562404b889d8487e450337c92b0c",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "b9522524735b245336742968fee0abd411e56b04e1c7f00c44c8de455c57a479",
+  "succeeded": 0,
+  "total_cost": 111.01102425,
+  "usage": {
+    "billed": 35.647632,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 111.011024,
+    "self_billed": 35.647632,
+    "self_nominal": 111.011024,
+    "self_tokens": 49774693.0,
+    "tokens": 49774693.0
+  },
+  "wall_seconds": 6687.229228
+}
