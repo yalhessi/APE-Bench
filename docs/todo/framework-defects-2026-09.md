@@ -229,12 +229,23 @@ which inherit the same status. The fix is a semantic plan field over the llm_con
 what a run measures (`reasoning_effort`, `openai_api`, the carry-over, `temperature`; `model_name`
 already is one). It moves every plan's identity once, so it lands at a run boundary.
 
-## The `codex` and `claude_code` scaffolds cannot run a review as they stand (found 2026-09-30)
+## Codex has drifted from the relay, and Claude on a subscription bypasses it (found 2026-09-30)
 
 Found by reading, while asking what running the reviewer through Codex, or through Claude on a
 subscription, would need. Neither scaffold has run a review (`e6541bc`).
 
-**Codex.** The relay serves only `/chat/completions` (`codex/relay.py`), and the installed
+**None of this is in the task.** The solo review task runs unchanged under every scaffold, as the
+proof-engineering tasks did upstream. The paper's scaffold comparison put the same models (GPT-5.2,
+Gemini 3 Pro and Flash) through all three scaffolds on identical tasks, with each harness's model
+calls going through its relay to APE's client. Budget, usage and transcripts live in that relay,
+so they are the same in every harness. The paper reports "APE-Agent outperforms Claude Code and
+Codex by 15-23 percentage points across models". Upstream's registry has no Anthropic model, so
+Claude the model was never in that comparison. On the relay path `claude_code` needs no code
+change for a review, only the leak audit.
+
+**Codex.** Upstream pinned both CLIs as binaries under `data/resources/` (`claude-2.0.37-linux-x64`,
+`codex-x86_64-unknown-linux-musl`, in `get_required_resources`); that directory is not in this
+checkout. The relay serves only `/chat/completions` (`codex/relay.py`), and the installed
 `codex-cli 0.144.5` refuses it: its binary carries "`wire_api = \"chat\"` is no longer supported ...
 set `wire_api = \"responses\"`". Batch mode also needs `codexbridge/`, a git submodule of a
 third-party repo pinned to a 2025 commit, which is not checked out (the directory is empty).
@@ -252,7 +263,10 @@ Code uses its own login. Four things break without the relay:
 A spent subscription usage limit also needs handling as a failed attempt, or it reads as an
 empty review.
 
-**What would close it:** a `/responses` route on the Codex relay, or no relay, and the bridge
-replaced; for Claude, usage and the session id read from the SDK's own messages, the model
+**What would close it:** for Codex, an older pinned CLI or a `/responses` route on the relay,
+and the bridge checked out or replaced. For Claude there are two routes. An Anthropic provider in
+`llm_clients` and an API key would keep the design and reach all three harnesses, `ape_agent`
+included. A subscription reaches only Claude Code, and needs usage and the session id read from the
+SDK's own messages, the model
 pinned and recorded, and the usage-limit error mapped to a failure. Both still need the leak
 audit that the `solo_claude` configs' headers require.
