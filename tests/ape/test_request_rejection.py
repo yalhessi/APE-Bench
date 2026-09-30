@@ -130,3 +130,56 @@ def test_a_provider_refusal_before_sending_is_not_retried(model, overrides):
 
     assert isinstance(error, RequestRejectedError)
     assert requests == []
+
+
+# --- the known rejection is refused before it is sent -------------------------------------
+#
+# `MODEL_MAPPINGS[...]["chat_completions_tools_with_reasoning"]` records the measured 400;
+# `chat_completions_refusal` is the one check, used by the provider and by `cli plan`.
+
+@pytest.mark.parametrize("model", ["gpt_5.4", "gpt_5.5", "elm_gpt_5.4"])
+def test_tools_with_reasoning_on_chat_completions_are_refused_unsent(model):
+    error, requests = call(config(model, reasoning_effort="high"), 200, {})
+
+    assert isinstance(error, RequestRejectedError)
+    assert requests == []
+    assert "openai_api: responses" in str(error)
+
+
+@pytest.mark.parametrize("model,effort,tools", [
+    ("gpt_5.4", "none", (TOOL,)),     # reasoning off: what test (e)'s first half ran
+    ("gpt_5.4", None, (TOOL,)),       # nothing sent; accepted (gpt-5.5 too, measured)
+    ("gpt_5.4", "high", ()),          # no tools: the 400 is about the combination
+    ("gpt_5.2", "high", (TOOL,)),     # gpt-5.2 accepts it; its high-effort runs worked
+])
+def test_what_chat_completions_accepts_is_sent(model, effort, tools):
+    ok = {"choices": [{"message": {"role": "assistant", "content": "hi"}}],
+          "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}}
+    error, requests = call(config(model, reasoning_effort=effort), 200, ok, tools=tools)
+
+    assert error is None
+    assert len(requests) == 1
+
+
+def test_the_responses_api_is_not_refused():
+    from ape.llm_clients.providers.openai_provider import chat_completions_refusal
+
+    cfg = config("gpt_5.4", reasoning_effort="high", openai_api="responses")
+    assert chat_completions_refusal(cfg, sends_tools=True) is None
+
+
+def test_cli_plan_refuses_the_run_before_building_anything():
+    """Every review task sends tools, so the run could not make one call. The refusal comes
+    before the agenda build, which is the slow part of a plan."""
+
+    from src.mathlib_review.review.runner import load_run, run
+
+    dataset, scaffold, overrides = load_run(
+        Path("configs/pr_review_v5_specialist4.yaml"),
+        {"llm_config": {"model_name": "gpt_5.4", "reasoning_effort": "high"}})
+    dataset.dry_run = True
+    quiet = mock.Mock()
+    with mock.patch("src.mathlib_review.review.runner.load_release",
+                    side_effect=AssertionError("reached the agenda build")):
+        with pytest.raises(ValueError, match="openai_api: responses"):
+            asyncio.run(run(dataset, scaffold, overrides, quiet))

@@ -94,7 +94,11 @@ MODEL_MAPPINGS = {
         "output_per_1M": 15.00,
         "cached_input_per_1M_usd": 0.25,
         # OpenAI reports no cache-write tokens, so this rate is never applied.
-        "cache_creation_per_1M_usd": None
+        "cache_creation_per_1M_usd": None,
+        #: HTTP 400 on /v1/chat/completions for tools with any reasoning_effort but "none",
+        #: measured 2026-09-30; gpt-5.2 accepts the combination. Absent means accepted.
+        #: `chat_completions_refusal` reads it; `openai_api: responses` is the way round.
+        "chat_completions_tools_with_reasoning": False,
     },
     "gpt_5.5": {
         # Standard tier, short context (<= 272K), same source and date as gpt_5.4.
@@ -106,7 +110,9 @@ MODEL_MAPPINGS = {
         "input_per_1M": 5.00,
         "output_per_1M": 30.00,
         "cached_input_per_1M_usd": 0.50,
-        "cache_creation_per_1M_usd": None
+        "cache_creation_per_1M_usd": None,
+        # Same 400 as gpt_5.4, measured the same day.
+        "chat_completions_tools_with_reasoning": False,
     },
     "gpt_5.2": {
         "model_name": "gpt-5.2-2025-12-11",
@@ -183,6 +189,8 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.125,
         "cache_creation_per_1M_usd": 1.25,
         "supports_tools": True,
+        # The gateway forwards OpenAI's 400 for this combination (2026-09-30).
+        "chat_completions_tools_with_reasoning": False,
     },
     "elm_gpt_5_mini": {
         "model_name": "gpt-5-mini",

@@ -7,7 +7,36 @@ import json
 import uuid
 
 from .base import BaseProvider
-from ..config import ProviderError
+from ..config import MODEL_MAPPINGS, LLMProvider, ProviderError, RequestRejectedError
+
+
+def chat_completions_refusal(config, *, sends_tools: bool) -> Optional[str]:
+    """Why Chat Completions would reject this request, or None if it would not.
+
+    One check with two callers: `OpenAIProvider` refuses the request before sending it, and
+    `cli plan` refuses the run before any spend. Without it, gpt-5.4 and gpt-5.5 at
+    `reasoning_effort: high` failed every call of `probe_postcutoff_gpt5{4,5}_Gr_rep1` with
+    HTTP 400, and the first sign was the retry log. The measured fact lives in
+    `MODEL_MAPPINGS` (`chat_completions_tools_with_reasoning`); a model without the key is
+    assumed to accept the combination, as gpt-5.2 does.
+    """
+
+    if not sends_tools or getattr(config, "openai_api", "chat_completions") != "chat_completions":
+        return None
+    if config.reasoning_effort in (None, "none"):
+        return None
+    entry = MODEL_MAPPINGS.get(config.model_name) or next(
+        (row for row in MODEL_MAPPINGS.values()
+         if row["model_name"] == config.formal_model_name), {})
+    if entry.get("chat_completions_tools_with_reasoning", True):
+        return None
+    remedy = ("set llm_config.openai_api: responses"
+              if entry.get("provider") is LLMProvider.OPENAI else
+              "use the direct OpenAI model with llm_config.openai_api: responses")
+    return (
+        f"{config.model_name} rejects tools with reasoning_effort={config.reasoning_effort!r} "
+        f"on Chat Completions (HTTP 400, measured 2026-09-30), and this request sends tools. "
+        f"To reason with tools, {remedy}; or set reasoning_effort: none.")
 
 
 class OpenAIProvider(BaseProvider):
@@ -41,6 +70,9 @@ class OpenAIProvider(BaseProvider):
         stream: bool = False,
     ) -> Dict[str, Any]:
         """Build OpenAI Chat Completions payload."""
+        refusal = chat_completions_refusal(self.config, sends_tools=bool(tools))
+        if refusal:
+            raise RequestRejectedError(refusal)
         payload: Dict[str, Any] = {
             "model": self.config.formal_model_name,
             "messages": messages,
