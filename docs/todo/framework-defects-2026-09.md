@@ -243,6 +243,16 @@ Codex by 15-23 percentage points across models". Upstream's registry has no Anth
 Claude the model was never in that comparison. On the relay path `claude_code` needs no code
 change for a review, only the leak audit.
 
+**Except the task's system prompt, which neither `claude_code` nor `codex` delivers.** `ape_agent`
+appends `task.create_system_prompt()` to its workspace preamble (`1d32ef7`,
+`ape_agent/conversation.py::_task_system_prompt`); the other two build only the preamble and never
+call it. The solo task's `SOLO_SYSTEM`, or the brief `system_prompt_file` names (`brief_G.md` on
+the post-cutoff set), reaches the model through that method alone. So under either scaffold the
+reviewer would run with no brief, and a harness comparison would also be a prompt comparison.
+`cli plan` cannot see it: plan passes for the G config with `--set scaffold_type=claude_code` and
+with `codex`, because it never starts a scaffold. Fix before any C or Codex run: move
+`_task_system_prompt` somewhere all three scaffolds share, and pin it with a test.
+
 **Codex.** Upstream pinned both CLIs as binaries under `data/resources/` (`claude-2.0.37-linux-x64`,
 `codex-x86_64-unknown-linux-musl`, in `get_required_resources`); that directory is not in this
 checkout. The relay serves only `/chat/completions` (`codex/relay.py`), and the installed
