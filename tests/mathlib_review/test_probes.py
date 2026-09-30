@@ -103,10 +103,31 @@ def test_the_pass0_models_render_byte_identically_on_both_sets():
     assert all(demo[pr] == (DEMO_DIR / f"model_pr{pr}.md").read_text() for pr in demo)
 
 
+def _old_packet(tmp_path, pr=43192, session="X1"):
+    """The packet the committed `make_packets.py` writes, rebuilt in `tmp_path`.
+
+    The copies it wrote under the probe dir are gitignored as regenerable, so reading them made
+    this test fail on every fresh checkout. The script writes beside itself and reads committed
+    inputs, so a copy of it with its model files and wrapper template rebuilds the same bytes.
+    """
+
+    import shutil, subprocess, sys
+
+    old = tmp_path / "old"
+    (old / "bin").mkdir(parents=True)
+    shutil.copy(POST_DIR / "make_packets.py", old)
+    shutil.copy(POST_DIR / "bin/ptool.template", old / "bin")
+    for model in POST_DIR.glob("model_pr*.md"):
+        shutil.copy(model, old)
+    subprocess.run([sys.executable, str(old / "make_packets.py"), str(tmp_path / "old_scratch")],
+                   check=True, capture_output=True)
+    return old / f"pr{pr}" / session
+
+
 def test_a_packet_is_the_committed_one_but_for_its_paths_and_logger(tmp_path):
     spec = POST.model_copy(update={"probe_dir": tmp_path / "probe"})
     (d,) = probes.write_packets(spec, ["X1"], tmp_path / "scratch", prs=[43192])
-    old = POST_DIR / "pr43192/X1"
+    old = _old_packet(tmp_path)
     for name in ("brief.md", "pr.md", "model.md", "diff.patch"):
         assert (d / name).read_bytes() == (old / name).read_bytes(), name
     new_lines, old_lines = (d / "ptool").read_text().splitlines(), (old / "ptool").read_text().splitlines()
