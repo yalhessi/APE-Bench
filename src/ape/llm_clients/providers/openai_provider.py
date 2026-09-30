@@ -131,6 +131,11 @@ class OpenAIResponsesProvider(OpenAIProvider):
     `signature` (the slot `ConversationMessage` keeps for opaque provider reasoning state) and
     go back as `reasoning` input items, in their original order: the API rejects a reasoning
     item passed without the item that followed it.
+
+    No `reasoning.context` is sent. The default, `current_turn`, keeps carried reasoning since the
+    last user message or text-only answer, and a review session has neither after its task prompt
+    (0 in 33 high-effort sessions, measured 2026-09-30), so it keeps all of it. `all_turns` would
+    change nothing there, and gpt-5.2 refuses it.
     """
 
     DEFAULT_BASE_URL = "https://api.openai.com/v1/responses"

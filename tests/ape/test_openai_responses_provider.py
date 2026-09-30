@@ -320,3 +320,13 @@ def test_carryover_off_sends_no_reasoning_even_if_a_signature_exists():
         fixture("responses_gpt54_high_two_tool_calls.json"), carryover=True)["choices"][0]["message"]
     _, items = responses_input([message], carryover=False)
     assert [item["type"] for item in items] == ["function_call", "function_call"]
+
+
+def test_carryover_sends_no_reasoning_context():
+    """`current_turn`, the default, already keeps every carried item in an unbroken tool loop, as
+    a review session is. gpt-5.2 answers `all_turns` with a 400 ("Supported values are: 'auto' and
+    'current_turn'"), so sending it would refuse the gpt_5.2 carry-over condition."""
+
+    payload = payload_for(config(reasoning_effort="high", openai_responses_reasoning_carryover=True),
+                          session_with(user("x")))
+    assert payload["reasoning"] == {"effort": "high"}
