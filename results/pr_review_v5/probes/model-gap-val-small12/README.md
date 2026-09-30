@@ -110,3 +110,20 @@ same pass, so the ratio is computed within one matcher.
 
 Also read: `reach(Gr1) - reach(G)`, per-family reach, findings per PR, cost per session, and any
 capped session (a cap that binds is reported, not hidden). One run, so provisional.
+
+**Result (2026-09-30).** Two new blind matchers, audited clean, agreeing on 147 of 150 cells
+(`match_reasoning/`, `unblinded_reasoning.json`). None of Gr1's three capped sessions is on an ask PR.
+
+| per-session reach, 30 asks | matcher 1 | matcher 2 |
+|---|---|---|
+| Claude (X) | 0.50 | 0.47 |
+| `gpt_5.2`, reasoning off (G) | 0.13 | 0.13 |
+| **`gpt_5.2`, reasoning high (Gr1)** | **0.30** | **0.27** |
+| `q_r = Gr1 / X` | 0.60 | 0.57 |
+
+**Partial on both matchers.** Reasoning roughly doubles `gpt_5.2`'s reach and closes about a third of
+the gap to Claude.
+
+By family (matcher 1, reached / cells): proof X 11/22, G 0/22, Gr 3/11; interface 6/10, 2/10, 0/5;
+registration 4/8, 0/8, 2/4; naming 3/4, 0/4, 1/2; documentation 4/10, 6/10, 2/5; PR level 2/6, 0/6,
+1/3. Reasoning gains proof, registration and naming asks and none in interface.
