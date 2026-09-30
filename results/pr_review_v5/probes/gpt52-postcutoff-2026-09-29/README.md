@@ -437,3 +437,39 @@ folders and agree on all 80 cells (`match_reasoning/`, `unblinded_reasoning.json
 
 One run, provisional. Across the two high-effort sessions on 43192, the `cat_disch` asks were reached
 in one and not the other.
+
+---
+
+## Test (e), pre-registered (2026-09-30, before its runs): gpt-5.4 and gpt-5.5
+
+**The question.** Is the gap to Claude gpt-5.2's, or does a newer gpt model close it, with reasoning off
+and with it on? The user asked to repeat the test with gpt-5.4 and gpt-5.5, perhaps not on every set.
+This set comes first: its PRs were created after both models' snapshots, 2026-03-05 and 2026-04-23,
+so none of the reviewers can have seen them.
+
+**The runs**, condition G's brief and pass-0 model throughout:
+
+| label | model | reasoning | runs | config |
+|---|---|---|---|---|
+| Ga1, Ga2 | `gpt_5.4` | none | 2 | `..._gpt54_G.yaml` |
+| Ha1 | `gpt_5.4` | high | 1 | `..._gpt54_Gr.yaml` |
+| Gb1, Gb2 | `gpt_5.5` | none, sent explicitly (it reasons by default) | 2 | `..._gpt55_G.yaml` |
+| Hb1 | `gpt_5.5` | high | 1 | `..._gpt55_Gr.yaml` |
+
+High effort runs at 160 turns, 14.4M tokens, and $12 (5.4) or $20 (5.5) a session, past what bound
+gpt-5.2's high-effort sessions. The expected cost is about $75, mostly the two high-effort runs.
+
+**Matching.** One new seal of nine reviewers on the six ask PRs: X1, X2, Ga1, Ga2, Ha1, Gb1, Gb2, Hb1,
+and gpt-5.2's Gr1 as an anchor. Two new blind matchers.
+
+**Reading rule**, on both matchers, for each condition c: `q = reach(c) / reach(X)`.
+
+| on both matchers | reading |
+|---|---|
+| `q ≥ 0.8` | c closes the gap to Claude |
+| `q ≤ 0.5` | the gap remains |
+| otherwise | partial |
+
+**Also read:** each model against gpt-5.2 (Gr1 within these matchers; G at 0.125 from test (b)),
+comparison lookups a session, cost per session, and any capped session. Two runs of G, one of H, so H
+is provisional.

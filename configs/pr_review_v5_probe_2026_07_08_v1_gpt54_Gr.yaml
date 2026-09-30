@@ -1,0 +1,18 @@
+# Test (e): condition G on the post-cutoff set with gpt-5.4 at reasoning_effort high. The caps are
+# raised past gpt-5.2's high-effort runs, where 10 of 32 sessions stopped at 80 turns or 7.2M tokens
+# still searching; a capped session submits nothing.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml
+
+llm_config:
+  model_name: gpt_5.4
+  reasoning_effort: high
+
+execution:
+  max_turns: 160
+
+dataset:
+  solo_cost_cap: 12.00
+  solo_token_cap: 14400000
+  # 6 PRs x $12.00 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 72.50
+  run_total_token_cap: 86500000
