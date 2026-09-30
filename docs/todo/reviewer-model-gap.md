@@ -390,3 +390,22 @@ clean test of the working-memory reading, if it runs with `gpt_5.2` high as a co
 model and effort as Gr1, with only persistence changed. The K brief's null does not answer this. It
 ran with reasoning off, where findings rarely hit, and it briefed constructions, not coverage of
 every object.
+
+**The carry-over switch, run as a coherence test (2026-09-30, $9.18,
+`results/pr_review_v5/probes/carryover-coherence-2026-09-30/`).** gpt_5.2 high through Responses, on
+the three Gr1 sessions that looped most (42814, 32080, 33145):
+
+| | far repeats /100 calls | negative repeats /100 turns | submitted before the cap |
+|---|---|---|---|
+| carry-over off | 6.7 | 6.8 | 1 of 3 |
+| carry-over on | 2.0 | 0.0 | 3 of 3 |
+
+- The on sessions used about a third of the reasoning tokens, at $2.46 against $6.72.
+- By the rule, carry-over improves coherence, and the provider carries reasoning end to end.
+- Length-matched, post hoc, the far-repeat ratio is 0.59. So the effect is mainly that sessions
+  conclude instead of repeating to the cap. That is the working-memory reading's prediction, at
+  process altitude.
+- Reach is not measured: 42814's on session filed no findings (no reviewer has reached its four
+  asks), and 33145 filed 7 against off's 10.
+- The next measurement is gpt_5.2 high with carry-over on across the six post-cutoff ask PRs,
+  matched in one seal with Gr1.

@@ -154,6 +154,18 @@ So the provider **translates at its own boundary**, and nothing downstream chang
    Completions high-effort run to compare against. Merge `eec8d3a` (`declaration_search`) before
    either run: every run so far used its false-duplicate defect.
 
+   **Run 2026-09-30, as a coherence test** (`results/pr_review_v5/probes/carryover-coherence-2026-09-30/`,
+   $9.18). The test was gpt_5.2 high through Responses, carry-over off against on, on the three Gr1
+   sessions that looped most. `eec8d3a` was held out, as for every run in the thread.
+   - Carry-over works end to end: every turn that reasoned carried its encrypted items, and the next
+     turn's input grew by the previous turn's reasoning (coefficient 0.99-1.01, against −0.01-0.01
+     off).
+   - On submitted 3 of 3 before the cap, against 1 of 3 off.
+   - Pooled on over off: 0.30 on far repeats and 0.00 on negative repeats, so it improves coherence
+     by the rule. Length-matched, post hoc, the ratio is 0.59: mostly, sessions conclude instead of
+     repeating to the cap.
+   - Reach is not measured. One session a cell, so provisional.
+
 ## Evidence
 
 - The 400: `.ape/probe_scratch/test_e/probe_postcutoff_gpt54_Gr_rep1.log` and the attempt's scaffold
