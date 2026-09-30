@@ -85,3 +85,16 @@ solo. Caveats: dev is inside Claude's training window; the imported findings car
 **Next, not done:** re-judge Grc1 with families set to `other` (a control for the label); the
 pre-registered main Phase 2 runs (awaiting the user's go-ahead on cost); route B (judge gold for
 post-cutoff, the only set clean for Claude).
+
+## gpt-5.4 and gpt-5.5 on dev, for the judge (pre-registered 2026-09-30, before the runs)
+
+`probe_dev_gpt5{4,5}_Grc_rep1`: `configs/pr_review_v5_dev_medium_gpt5{4,5}_Grc.yaml`, solo, brief G,
+high effort, Responses, reasoning carried, the models' carried caps (160 turns; $12 / 14.4M, $20 /
+24M), the 15 dev PRs. No carried run of either model had touched dev, so neither could be judged.
+Expected about $10 and $18 billed.
+
+Read, on the held-out 12 gold with `configs/pr_review_v5_medium_heldout_judge.yaml`: issue recall
+and reachable recall beside Claude X1 / X2 (0.478 / 0.583), gpt_5.2 carried (0.130 / 0.250) and the
+historical reasoning-off lead (0.22-0.30 / 0.33-0.42). One run each, 23 obligations: provisional,
+and read as a level against those references, not as a ranking between the two models. The runs
+also join the dev probe seal later, so both measures can be read on the same reviewers.
