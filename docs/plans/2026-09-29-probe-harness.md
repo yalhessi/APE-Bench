@@ -75,3 +75,5 @@ README holds its reading rule, stated before the run.
    - copy `matches.{1,2}.json` and `session_stats.json` into `<probe_dir>/match_reasoning/`;
    - run `cli probe unblind`, and apply the README's rule.
 4. **Write the results** into each README and the three-set table in `docs/todo/reviewer-model-gap.md`.
+
+**Hand-off completed 2026-09-30** in a resumed session: all three runs committed, matched, unblinded and written up (`docs/todo/reviewer-model-gap.md`, "Reasoning on, all three sets").

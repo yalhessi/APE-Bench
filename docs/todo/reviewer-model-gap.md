@@ -265,3 +265,27 @@ its result. Per-session reach, the two matchers' values:
 0.25 on one post-cutoff PR (test (d)'s calibration). That is the one lever measured to move the
 model half. It costs about $3.74 billed per session on a large PR, so one high-effort run per set is
 about $20-60. It has run on one PR only, and it needs the user's go-ahead.
+
+## Reasoning on, all three sets (2026-09-30): it closes part of the gap
+
+One high-effort run per set (`reasoning_effort: high`, condition G's brief and pass-0 model),
+$77.05 billed in all. Two new blind matchers per set re-judged X, G and Gr1 together. Per-session
+reach, the two matchers' values:
+
+| set | asks | Claude (X) | off (G) | **high (Gr1)** | `q_r = Gr1/X` | reading |
+|---|---|---|---|---|---|---|
+| post-cutoff | 16 | 0.47 | 0.125 | **0.31** | 0.67 | partial |
+| validation small12 | 30 | 0.50 / 0.47 | 0.13 | **0.30 / 0.27** | 0.60 / 0.57 | partial |
+| dev | 47 | 0.69 / 0.67 | 0.18 / 0.12 | **0.21 / 0.19** | 0.31 / 0.29 | gap remains* |
+
+\*Dev's Gr1 stopped at its turn or token cap on 6 of 12 ask PRs (28 of 47 asks). On the PRs where it
+finished, `q_r` is 0.71 / 0.69 (0.56 without the AI-generated 33149), post hoc.
+
+- **Reasoning roughly doubles `gpt_5.2`'s reach and closes about a third to a half of the gap to
+  Claude.** It does not close it on any set.
+- **It restores the looking and more:** comparison lookups a session on post-cutoff are 45.7 at high
+  effort, against 22 for Claude and 2-3 with reasoning off. So what remains is concluding from what is
+  looked up, not finding it.
+- **High effort outgrows the caps set for it:** 10 of 32 sessions stopped at 80 turns or 7.2M tokens,
+  still searching. A clean full-set reading, dev above all, needs those sessions rerun with higher
+  caps. Rerunning dev's six would cost roughly $30-60.

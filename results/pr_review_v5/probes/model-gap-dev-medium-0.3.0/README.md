@@ -105,3 +105,21 @@ same pass, so the ratio is computed within one matcher.
 
 Also read: `reach(Gr1) - reach(G)`, per-family reach, findings per PR, cost per session, and any
 capped session (a cap that binds is reported, not hidden). One run, so provisional.
+
+**Result (2026-09-30).** Two new blind matchers, audited clean, agreeing on 224 of 235 cells
+(`match_reasoning/`, `unblinded_reasoning.json`). Gr1 stopped at its cap on 6 of the 12 ask PRs:
+33066, 33145, 33285, 33294, 33321 and 33421. Those PRs hold 28 of the 47 asks and enter as zero
+findings.
+
+| per-session reach | asks | X | G | Gr1 | `q_r` |
+|---|---|---|---|---|---|
+| all ask PRs (the pre-registered reading) | 47 | 0.69 / 0.67 | 0.18 / 0.12 | 0.21 / 0.19 | **0.31 / 0.29** |
+| PRs where Gr1 finished (post hoc) | 19 | 0.74 / 0.68 | 0.34 / 0.16 | 0.53 / 0.47 | 0.71 / 0.69 |
+| the same, without 33149 (post hoc) | 14 | 0.64 / 0.64 | 0.14 / 0.04 | 0.36 / 0.36 | 0.56 / 0.56 |
+
+- **By the rule, the gap remains with reasoning on** (`q_r ≤ 0.5` on both matchers). That reading is
+  mostly the caps: half the ask PRs have no Gr1 findings at all.
+- **Where Gr1 finished, `q_r` is 0.56-0.71**, the post-cutoff and validation range. That subset is
+  selected by the session finishing, so it is not an estimate of the full set.
+- A fair reading of the dev set needs the six capped PRs rerun with higher caps: 80 turns and 7.2M
+  tokens bind at high effort, and those were the biggest PRs.

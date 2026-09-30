@@ -1,0 +1,392 @@
+{
+ "33066": {
+  "G2": {
+   "findings": 7,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "X1": {
+   "findings": 12,
+   "compiles": 14
+  },
+  "G1": {
+   "findings": 4,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 12,
+   "compiles": 17
+  }
+ },
+ "33098": {
+  "G2": {
+   "findings": 5,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 3
+   }
+  },
+  "G1": {
+   "findings": 8,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "Gr1": {
+   "findings": 9,
+   "compiles": 25,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 17
+   }
+  },
+  "X1": {
+   "findings": 15,
+   "compiles": 17
+  },
+  "X2": {
+   "findings": 19,
+   "compiles": 21
+  }
+ },
+ "33117": {
+  "Gr1": {
+   "findings": 7,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 2
+   }
+  },
+  "G2": {
+   "findings": 4,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "G1": {
+   "findings": 3,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 1
+   }
+  },
+  "X1": {
+   "findings": 11,
+   "compiles": 4
+  },
+  "X2": {
+   "findings": 10,
+   "compiles": 19
+  }
+ },
+ "33145": {
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_token_limit"
+  },
+  "X1": {
+   "findings": 9,
+   "compiles": 13
+  },
+  "X2": {
+   "findings": 10,
+   "compiles": 10
+  },
+  "G2": {
+   "findings": 4,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "G1": {
+   "findings": 8,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 1
+   }
+  }
+ },
+ "33149": {
+  "G1": {
+   "findings": 10,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 1
+   }
+  },
+  "X2": {
+   "findings": 33,
+   "compiles": 13
+  },
+  "Gr1": {
+   "findings": 16,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 2
+   }
+  },
+  "G2": {
+   "findings": 10,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "X1": {
+   "findings": 30,
+   "compiles": 16
+  }
+ },
+ "33285": {
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "G1": {
+   "findings": 0,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 9,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 8,
+   "compiles": 21
+  },
+  "X1": {
+   "findings": 9,
+   "compiles": 22
+  },
+  "G2": {
+   "findings": 2,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 1
+   }
+  }
+ },
+ "33294": {
+  "G1": {
+   "findings": 4,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 1
+   }
+  },
+  "G2": {
+   "findings": 5,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 3
+   }
+  },
+  "X1": {
+   "findings": 12,
+   "compiles": 18
+  },
+  "X2": {
+   "findings": 11,
+   "compiles": 13
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_token_limit"
+  }
+ },
+ "33305": {
+  "G2": {
+   "findings": 0,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 7
+   }
+  },
+  "X2": {
+   "findings": 3,
+   "compiles": 6
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": 14,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 7
+   }
+  },
+  "X1": {
+   "findings": 4,
+   "compiles": 7
+  },
+  "G1": {
+   "findings": 0,
+   "compiles": 14,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 14
+   }
+  }
+ },
+ "33321": {
+  "X1": {
+   "findings": 11,
+   "compiles": 19
+  },
+  "X2": {
+   "findings": 18,
+   "compiles": 40
+  },
+  "G2": {
+   "findings": 5,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "G1": {
+   "findings": 5,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 6
+   }
+  }
+ },
+ "33337": {
+  "X1": {
+   "findings": 2,
+   "compiles": 4
+  },
+  "X2": {
+   "findings": 1,
+   "compiles": 3
+  },
+  "G2": {
+   "findings": 2,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "G1": {
+   "findings": 1,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  },
+  "Gr1": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  }
+ },
+ "33362": {
+  "G1": {
+   "findings": 5,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "X2": {
+   "findings": 8,
+   "compiles": 6
+  },
+  "G2": {
+   "findings": 6,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 1
+   }
+  },
+  "Gr1": {
+   "findings": 6,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 4
+   }
+  },
+  "X1": {
+   "findings": 7,
+   "compiles": 8
+  }
+ },
+ "33421": {
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "X1": {
+   "findings": 10,
+   "compiles": 11
+  },
+  "G2": {
+   "findings": 6,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "G1": {
+   "findings": 4,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 2
+   }
+  },
+  "X2": {
+   "findings": 10,
+   "compiles": 13
+  }
+ }
+}
