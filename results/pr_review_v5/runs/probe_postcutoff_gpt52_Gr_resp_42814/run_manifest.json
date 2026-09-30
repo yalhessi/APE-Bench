@@ -1,0 +1,48 @@
+{
+  "agent_added": 0,
+  "candidates_total": 0,
+  "completion_status": "partial",
+  "context_calls_total": 30,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 11.547811,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:42814:round1:1041c7cf227bc1c38162509b940559320973e669",
+      "pr_number": 42814,
+      "reason": "the whole-PR review did not reach a submission"
+    }
+  ],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 0,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 46,
+  "pruned": 46,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_postcutoff_gpt52_Gr_resp_42814",
+  "run_name": "probe_postcutoff_gpt52_Gr_resp_42814",
+  "run_plan_sha256": "c5ca29501ea4d32b473eae8caf7fe7f17d3d3caf050fb8be2a3c3f85cc0d2bd7",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "1cbb1f88336e694185c9a79867765f161f1536d17bf9880462996ff9f3d89629",
+  "succeeded": 0,
+  "total_cost": 11.54781075,
+  "usage": {
+    "billed": 2.517907,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 11.547811,
+    "self_billed": 2.517907,
+    "self_nominal": 11.547811,
+    "self_tokens": 5819383.0,
+    "tokens": 5819383.0
+  },
+  "wall_seconds": 1505.813218
+}
