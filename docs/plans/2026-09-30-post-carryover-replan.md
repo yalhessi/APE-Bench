@@ -194,6 +194,23 @@ they are; the new PRs are the held-out half for anything Section 5 designs.
 Phases 0, 6 and the free half of 1 can start together. Phase 2 and 3.1 start after Phase 0's
 post-cutoff reps are matched. Everything else waits for Phase 1's table.
 
+## 7b. Order decided after Phase 0 (2026-09-30)
+
+Phase 0 verified that the carried runs reasoned at high effort and carried it (3a3138f2), and that
+carry-over changes process, not reach. So:
+1. **Phase 1 now, free**: label the 67 residual asks (37 nobody, 30 Claude-only) by non-exclusive
+   mechanism, two blind readers, with the carried gpt sessions replayed and asked why, Claude's
+   `notes.md` read for what it checked and dismissed, and **the arms' remit test over the same asks**
+   (the validation audit put 21% of asks outside every arm's remit; if most residual asks are, the
+   arms cannot help by construction and Phase 2 is a formality).
+2. **Phase 3.1 in parallel, about $45**: the filing bar on gpt-5.4 and gpt-5.5 with reasoning
+   carried, since its mechanism is already observed. Fixed on post-cutoff (in-sample; the unfixed
+   runs exist) and validation, with unfixed validation controls. Rule before the run.
+3. **Phase 2 after Phase 1's table**, with two lead reps on validation, only if coverage is a top
+   mechanism or the remit pre-check leaves the arms in play. Within-condition variance on
+   post-cutoff (0.19-0.44) makes a one-rep lead result unreadable against ≤ 0.03 / ≥ 0.10.
+Replicating gpt-5.4 and 5.5 unchanged is not run: it would re-measure a known defect.
+
 ## 8. Execution
 
 - A fresh session in a new worktree. `pipeline-overfit-review` (167 commits past `develop`, suite
