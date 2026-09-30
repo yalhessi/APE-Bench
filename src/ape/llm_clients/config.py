@@ -82,22 +82,41 @@ MODEL_MAPPINGS = {
         "cache_creation_per_1M_usd": 0.03
     },
     "gpt_5.4": {
-        # Bare alias resolves to the latest gpt-5.4 snapshot; swap to a dated id
-        # (e.g. "gpt-5.4-YYYY-MM-DD") if the endpoint requires a pinned snapshot.
+        # The bare alias, which elm_gpt_5.4 shares (test_elm_provider); on 2026-09-30 the
+        # account listed one gpt-5.4 snapshot, gpt-5.4-2026-03-05, so the alias resolves to it.
+        # Prices are OpenAI's standard tier, short context (<= 272K), read from
+        # developers.openai.com/api/docs/pricing on 2026-09-30; they replace a placeholder copied
+        # from gpt-5.2. Reasoning is OFF when no reasoning_effort is sent (0 reasoning tokens,
+        # measured 2026-09-30).
         "model_name": "gpt-5.4",
         "provider": LLMProvider.OPENAI,
-        # PLACEHOLDER pricing copied from gpt-5.2 — update with real gpt-5.4 rates;
-        # only affects cost_usd reporting, not model behavior.
-        "input_per_1M": 1.75,
-        "output_per_1M": 14.00,
-        "cached_input_per_1M_usd": 0.125,
-        "cache_creation_per_1M_usd": 1.25
+        "input_per_1M": 2.50,
+        "output_per_1M": 15.00,
+        "cached_input_per_1M_usd": 0.25,
+        # OpenAI reports no cache-write tokens, so this rate is never applied.
+        "cache_creation_per_1M_usd": None
+    },
+    "gpt_5.5": {
+        # Standard tier, short context (<= 272K), same source and date as gpt_5.4.
+        # Unlike gpt-5.2 and gpt-5.4, gpt-5.5 REASONS when no reasoning_effort is sent
+        # (13 reasoning tokens on a one-line arithmetic prompt, 0 with "none", measured
+        # 2026-09-30), so a reasoning-off condition must send reasoning_effort: none.
+        "model_name": "gpt-5.5-2026-04-23",
+        "provider": LLMProvider.OPENAI,
+        "input_per_1M": 5.00,
+        "output_per_1M": 30.00,
+        "cached_input_per_1M_usd": 0.50,
+        "cache_creation_per_1M_usd": None
     },
     "gpt_5.2": {
         "model_name": "gpt-5.2-2025-12-11",
         "provider": LLMProvider.OPENAI,
         "input_per_1M": 1.75,
         "output_per_1M": 14.00,
+        # OpenAI's pricing page gives 0.175 (2026-09-30); 0.125 is gpt-5's rate. Kept, because
+        # tests/datasets/test_cost_model.py reproduces the record's billed figures at 0.125:
+        # every gpt_5.2 billed figure understates cached input by $0.05 per 1M. Tracked in
+        # docs/todo/framework-defects-2026-09.md.
         "cached_input_per_1M_usd": 0.125,
         "cache_creation_per_1M_usd": 1.25
     },
