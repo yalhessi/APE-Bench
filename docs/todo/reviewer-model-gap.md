@@ -308,3 +308,16 @@ reaches 0.22 (`q = 0.47`), gpt-5.4 0.06 (0.13), gpt-5.2 0.125 (0.27, test (b)), 
 effort 0.31 (0.67), against Claude's 0.47. With reasoning off the gap remains for every gpt model,
 gpt-5.5 closest; gpt-5.4 is the weakest reviewer measured. Both newer models file under one finding
 a PR, against Claude's four. Their high-effort half waits on a Responses-API provider.
+
+**The Responses-API route, probed (2026-09-30, one tiny call each; for the session that builds it):**
+- The ELM gateway's `/v1/chat/completions` returns the same HTTP 400 for gpt-5.4 and gpt-5.5, so it
+  forwards to OpenAI and is no way round. It does answer on `/v1/responses` (HTTP 200).
+- OpenAI `/v1/responses` with a function tool, `reasoning: {effort: high}`, `store: false` and
+  `include: ["reasoning.encrypted_content"]` works for both models. gpt-5.4 returned a `reasoning`
+  item carrying `encrypted_content`, then a `function_call` item.
+- Usage keys are `input_tokens`, `input_tokens_details.cached_tokens`, `output_tokens` and
+  `output_tokens_details.reasoning_tokens`, not Chat Completions' names.
+- The client is Chat-Completions-shaped end to end: `OpenAIMessageFormatter` emits `messages`,
+  `ResponseProcessor` reads `choices[0].message`, `StreamingProcessor` merges `delta` chunks, and
+  `parse_usage` reads `prompt_tokens`. The narrowest seam is a provider that translates at its own
+  boundary, so nothing downstream changes.
