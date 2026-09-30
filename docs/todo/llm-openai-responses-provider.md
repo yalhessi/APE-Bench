@@ -210,9 +210,9 @@ rep each way, so this shows comparability within noise, not equivalence.
 capped at $4): succeeded in 10 turns with 26 tool calls and 7,714 reasoning tokens, $0.254 billed, no
 retries. It submitted 0 findings on 41930, as gpt-5.2's high-effort Gr1 session did there.
 
-Both ran from a throwaway detached worktree, `.claude/worktrees/responses-livecheck`, which holds
-`pipeline-overfit-review` with this branch merged in. Their result folders are there, untracked. The
-logs are in `.ape/probe_scratch/responses_livecheck/`. The rehearsal merge conflicts in four files:
+Both ran from a throwaway detached worktree holding `pipeline-overfit-review` with this branch
+merged in. Their result folders are committed on `pipeline-overfit-review` (a582826), and the
+worktree is removed. The logs are in `.ape/probe_scratch/responses_livecheck/`. The rehearsal merge conflicts in four files:
 `config.py` and `framework-defects-2026-09.md` take this branch's side, and `docs/todo/README.md` and
 this entry take the other branch's. The branch's suite has one failure there that the merge does not
 cause: `test_probes.py::test_a_packet_is_the_committed_one_but_for_its_paths_and_logger` reads a

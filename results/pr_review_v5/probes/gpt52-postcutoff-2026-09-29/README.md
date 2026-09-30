@@ -505,3 +505,59 @@ Gr1, seven reviewers, with the same rule per condition.
 
 **Not measured:** gpt-5.4 and gpt-5.5 at high effort, which needs a Responses-API provider (see the
 amendment above).
+
+## Test (e)'s high-effort half, pre-registered (2026-09-30, before its runs)
+
+The Responses-API provider is built and merged (2636bf7;
+`docs/todo/llm-openai-responses-provider.md`). Ha1 and Hb1 run as pre-registered above, with one
+change: they go through `llm_config.openai_api: responses`.
+
+**The endpoint.** Responses with carry-over off (`openai_responses_reasoning_carryover: false`) is the
+condition equivalent to Chat Completions. Each turn's reasoning is dropped, as on Chat Completions.
+Tools are sent non-strict, and nothing is stored server-side. The evidence is live check 1,
+`probe_postcutoff_gpt54_G_resp_rep1`, which is G at `none` through Responses. Against the two Chat
+runs, Ga1 and Ga2, it is inside their spread on turns, calls, tokens, cache hits and findings
+(4 against 5 and 4). Billed is $0.468, 6% over the higher run. That is one run each way. It was run
+before this section as a provider check, and it has been read only for those counts.
+
+**The runs.**
+
+| label | run | model | reasoning | endpoint | config |
+|---|---|---|---|---|---|
+| Ha1 | `probe_postcutoff_gpt54_Gr_resp_rep1` | `gpt_5.4` | high | Responses | `..._gpt54_Gr.yaml` |
+| Hb1 | `probe_postcutoff_gpt55_Gr_resp_rep1` | `gpt_5.5` | high | Responses | `..._gpt55_Gr.yaml` |
+| Ga3 | `probe_postcutoff_gpt54_G_resp_rep1` | `gpt_5.4` | none | Responses | `..._gpt54_G.yaml` + `openai_api=responses` (done) |
+| Gb3 | `probe_postcutoff_gpt55_G_resp_rep1` | `gpt_5.5` | none | Responses | `..._gpt55_G_resp.yaml` |
+
+Ga3 and Gb3 are the endpoint controls. They let each model's off-versus-high comparison run on one
+endpoint, and they check the endpoint at `none` against Ga1, Ga2, Gb1 and Gb2.
+
+**Calibration first**: one high-effort session per model on 43192,
+`probe_postcutoff_gpt5{4,5}_Gr_resp_calib`, under the configs' caps: 160 turns, and 14.4M tokens and
+$12 (5.4) or 24M tokens and $20 (5.5). A calibration session that stops at a cap is reported, and the
+user decides whether to raise that cap before the runs, as in test (d). The calibration sessions are
+not in the seal.
+
+**Held fixed.** The `declaration_search` fix (eec8d3a, on `arm-division`) is not merged for this test.
+Every reviewer in the seal used the same tool: Claude through `cli tool`, and every gpt run through the
+solo task. So the models are compared within one harness. The fix lands at the next run boundary.
+Carry-over on is not run here (see the Responses entry for its token cost).
+
+**Matching.** A new seal of seven reviewers on the six ask PRs: X1, X2, Ha1, Hb1, Ga3, Gb3, and
+gpt-5.2's Gr1 as the anchor to the earlier matchers. Two new blind matchers, audited, then unblinded.
+
+**Reading rule**, unchanged, on both matchers, for each c: `q = reach(c) / reach(X)`; `q ≥ 0.8`
+closes the gap, `q ≤ 0.5` leaves it, and anything between is partial.
+
+**Also read:**
+- Ha1 against Ga3, and Hb1 against Gb3: what reasoning adds on one endpoint.
+- Ga3 against Ga1 and Ga2, and Gb3 against Gb1 and Gb2: the endpoint at `none`. If a control falls
+  outside its two Chat runs' range, the endpoint is named as a confound, and the high-effort reading
+  stands only against the same-endpoint control.
+- Gr1's reach against its earlier matching, as the anchor check.
+- Comparison lookups a session, reasoning tokens, cost a session, and any capped session.
+
+One run each of H, Ga3 and Gb3, so the high-effort reading is provisional.
+
+**Cost.** Calibration is roughly $6-12, Gb3 under $1, and Ha1 and Hb1 about $70 together (the
+entry's estimate). The ceilings are $72 and $120.

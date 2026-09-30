@@ -6,6 +6,10 @@ extends: pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml
 llm_config:
   model_name: gpt_5.4
   reasoning_effort: high
+  # Chat Completions rejects tools with a reasoning effort on this model (HTTP 400, 2026-09-30), so
+  # the Responses API, with carry-over off (the default): the Chat-equivalent condition (live check 1 in
+  # docs/todo/llm-openai-responses-provider.md). The first run name, ..._Gr_rep1, is spent.
+  openai_api: responses
 
 execution:
   max_turns: 160

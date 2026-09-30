@@ -1,0 +1,8 @@
+# Test (e)'s endpoint control for gpt-5.5: condition G with reasoning off, as ..._gpt55_G.yaml, but
+# through the Responses API (carry-over off, the default), so gpt-5.5's off-versus-high comparison
+# does not cross endpoints. gpt-5.4's twin is probe_postcutoff_gpt54_G_resp_rep1 (..._gpt54_G.yaml
+# with this same override).
+extends: pr_review_v5_probe_2026_07_08_v1_gpt55_G.yaml
+
+llm_config:
+  openai_api: responses
