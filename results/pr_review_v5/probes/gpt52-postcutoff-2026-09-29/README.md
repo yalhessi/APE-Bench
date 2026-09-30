@@ -561,3 +561,69 @@ One run each of H, Ga3 and Gb3, so the high-effort reading is provisional.
 
 **Cost.** Calibration is roughly $6-12, Gb3 under $1, and Ha1 and Hb1 about $70 together (the
 entry's estimate). The ceilings are $72 and $120.
+
+## Test (e)'s high-effort half, amended (2026-09-30, before its runs): reasoning carried across turns, and a gpt_5.2 carry-over condition
+
+**Why.** The carry-over coherence test (`../carryover-coherence-2026-09-30/`, a4a128c) ran gpt_5.2
+at high effort through Responses on Gr1's three worst-looping PRs.
+- Carried reasoning reaches the next turn: coefficient 0.99-1.01.
+- With it, the model concluded 3 of 3 before the cap, against 1 of 3 without.
+- Repeats fell to 0.30 (far) and 0.00 (negative) of the carry-over-off sessions.
+- It did not measure reach.
+
+So carry-over off, the Chat-equivalent condition pre-registered above, is no longer the obvious
+setting for an OpenAI reasoning model. The user chose (2026-09-30) to run every high-effort
+condition with carry-over on, and to add gpt_5.2 with carry-over on, so that carry-over's effect on
+reach is measured against Gr1. **Ha1 and Hb1 (carry-over off) are not run.**
+
+**The runs.**
+
+| label | run | model | reasoning | endpoint | carry-over | config |
+|---|---|---|---|---|---|---|
+| Grc | `probe_postcutoff_gpt52_Grc_rep1` | `gpt_5.2` | high | Responses | on | `..._gpt52_Grc.yaml` |
+| Hac | `probe_postcutoff_gpt54_Grc_rep1` | `gpt_5.4` | high | Responses | on | `..._gpt54_Grc.yaml` |
+| Hbc | `probe_postcutoff_gpt55_Grc_rep1` | `gpt_5.5` | high | Responses | on | `..._gpt55_Grc.yaml` |
+
+- Grc differs from Gr1 only in endpoint and persistence: same brief, tools and 80 turns. Its token
+  cap is the coherence test's 16.08M, because carried reasoning adds processed tokens that Gr1's 7.2M
+  would stop on. Its dollar cap, $13.40, is in step with that.
+- Hac and Hbc are the pre-registered Ha1 and Hb1 configs, with carry-over on. Their caps are the
+  same: 160 turns, and $12 / 14.4M (5.4) or $20 / 24M (5.5).
+- **Calibration** is replaced by an implementation check on each run's first turns, then on the
+  whole run, with the coherence test's criterion: every turn that reasons carries encrypted items,
+  and the coefficient is in [0.8, 1.2]. The off calibrations on 43192 already concluded in 19-22
+  turns, far inside every cap. Carry-over was checked end to end only on gpt_5.2. A refused carry
+  fails at once (`RequestRejectedError`), not after retries.
+
+**Matching.** A new seal of eight reviewers on the six PRs:
+- X1 and X2 (Claude);
+- Gr1 (gpt_5.2 high on Chat), the anchor to the earlier matchers;
+- Grc, Hac and Hbc;
+- Ga3 and Gb3, the endpoint controls at `none`.
+
+Two new blind matchers, audited, then unblinded.
+
+**Reading rule.**
+- For each c, unchanged: `q = reach(c) / reach(X)`. `q ≥ 0.8` closes the gap, `q ≤ 0.5` leaves it,
+  and anything between is partial, on both matchers.
+- **Carry-over's effect on reach**, Grc − Gr1 in per-session reach on both matchers, uses the
+  structure rule's thresholds. At least 0.10 adds reach, at most 0.03 adds nothing, and between is
+  partial.
+- **What reasoning adds** on one endpoint: Hac against Ga3, Hbc against Gb3.
+
+**Also read:**
+- Gr1's reach against its earlier matchings, as the anchor check.
+- Hits per finding against X's, so that a gain from more findings is not read as a gain in aim.
+- Coherence (`../carryover-coherence-2026-09-30/coherence.py`) on all three runs, and any capped
+  session.
+
+One run of each, so every reading is provisional.
+
+**Held fixed.** `eec8d3a` (`declaration_search`) is not merged, as for every reviewer in the seal.
+
+**Cost.**
+- Gr1 billed $14.85 on the six PRs. Grc is expected at a half to a third of that, as in the
+  coherence test.
+- The gpt-5.4 and gpt-5.5 off calibrations billed $1.04 and $1.70 on 43192.
+- Expected about $20-35 in all. The ceilings, $80.50, $72.50 and $120.50, are ceilings, not
+  forecasts.
