@@ -1,0 +1,17 @@
+# Phase 3.1's unfixed control on validation small12: gpt_5.5 at high effort through the Responses API
+# with reasoning carried, the post-cutoff gpt_5.5 carried config's caps, on the 11 PRs. Extends the
+# gpt_5.2 carried config for the set; only the model and its caps change.
+extends: pr_review_v5_val_small12_gpt52_Grc.yaml
+
+llm_config:
+  model_name: gpt_5.5
+
+execution:
+  max_turns: 160
+
+dataset:
+  solo_cost_cap: 20.00
+  solo_token_cap: 24000000
+  # 11 PRs x $20.00 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 220.50
+  run_total_token_cap: 264600000

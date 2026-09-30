@@ -149,6 +149,21 @@ class BasePRReviewResult(BaseTaskResult):
     review_message: str = ""
 
 
+def submission_mandate(submit_tool_name: str, filing_bar: str = "merge") -> str:
+    """The closing instruction that forces a `submit_findings` call.
+
+    Agents that conclude "nothing to flag" sometimes end with a text-only reply and never call
+    the tool, which the harness records as an empty failure rather than a clean review, so the
+    empty-review path is explicit and mandatory. Under the "request" filing bar the empty call
+    carries no `merge_ready_as_is`, since that tool variant has no such field.
+    """
+    empty = ("call it with an empty `findings` list and `merge_ready_as_is: true`" if filing_bar == "merge"
+             else "call it with an empty `findings` list")
+    return (f"\n\nYou MUST finish by calling `{submit_tool_name}` exactly once — even if you find "
+            f"nothing. If there is nothing to change, {empty}. A text-only reply does not count and "
+            "fails the task.")
+
+
 class BasePRReviewTask(BaseLeanTask):
     """Shared, read-only, externally-scored review task. Not registered; subclass
     it, set `task_type`, and implement `_get_prompts`."""
@@ -250,15 +265,12 @@ class BasePRReviewTask(BaseLeanTask):
             submit_tool_name=submit_tool_name,
             budget=self.config.task_config.finding_budget,
         )
-        # Force a submission: agents that conclude "nothing to flag" sometimes end with a text-only
-        # reply and never call submit_findings, which the harness records as an empty failure rather
-        # than a clean review. Make the empty-review path explicit and mandatory.
-        mandate = (
-            f"\n\nYou MUST finish by calling `{submit_tool_name}` exactly once — even if you find "
-            "nothing. If there is nothing to change, call it with an empty `findings` list and "
-            "`merge_ready_as_is: true`. A text-only reply does not count and fails the task."
-        )
+        mandate = submission_mandate(submit_tool_name, self._filing_bar())
         return base + mandate + self._precedent_block()
+
+    def _filing_bar(self) -> str:
+        """`task_config.filing_bar` where the task declares it (the solo task), else "merge"."""
+        return getattr(self.config.task_config, "filing_bar", "merge")
 
     def _precedent_block(self) -> str:
         """Stage-2 Mode A: append retrieved past-maintainer precedents for THIS PR, if primed.
@@ -560,28 +572,24 @@ class BasePRReviewTask(BaseLeanTask):
 
         self._register_lean_verify_edit(mcp)
 
-        @mcp.tool(
+        FINDINGS = Annotated[List[Dict[str, Any]], Field(
             description=(
-                "Submit your final review findings for this PR. Call this exactly once when done. "
-                "This records the review and ends the conversation. A text-only response is INVALID."
+                "List of findings (<= budget). Each: {path?, line_start?, line_end?, "
+                "severity: 'blocking'|'advisory', claim, suggested_fix?, evidence?}. "
+                "`evidence` is the verified artifact backing the finding (the existing "
+                "declaration's name for a duplicate; the stronger statement for a generality "
+                "issue). Empty list = nothing to change."
             )
+        )]
+        CONFIDENCE = Annotated[Optional[float], Field(description="0.0-1.0")]
+        MESSAGE = Annotated[str, Field(description="Optional summary of the review.", default="")]
+        DESCRIPTION = (
+            "Submit your final review findings for this PR. Call this exactly once when done. "
+            "This records the review and ends the conversation. A text-only response is INVALID."
         )
-        async def submit_findings(
-            findings: Annotated[List[Dict[str, Any]], Field(
-                description=(
-                    "List of findings (<= budget). Each: {path?, line_start?, line_end?, "
-                    "severity: 'blocking'|'advisory', claim, suggested_fix?, evidence?}. "
-                    "`evidence` is the verified artifact backing the finding (the existing "
-                    "declaration's name for a duplicate; the stronger statement for a generality "
-                    "issue). Empty list = nothing to change."
-                )
-            )] = [],
-            merge_ready_as_is: Annotated[Optional[bool], Field(
-                description="True if a maintainer would merge without requesting changes."
-            )] = None,
-            confidence: Annotated[Optional[float], Field(description="0.0-1.0")] = None,
-            message: Annotated[str, Field(description="Optional summary of the review.", default="")] = "",
-        ) -> Dict[str, Any]:
+
+        async def record(findings, merge_ready_as_is, confidence, message) -> Dict[str, Any]:
+            """Record a `submit_findings` call: normalise, build the result, fire termination."""
             self.logger.info("submit_findings: %d findings, merge_ready=%s", len(findings or []), merge_ready_as_is)
             try:
                 normalized = self._normalize_findings(findings or [])
@@ -612,6 +620,28 @@ class BasePRReviewTask(BaseLeanTask):
                     "evaluation_result": EvaluationResult(success=False, score=0.0, message=traceback.format_exc()),
                     "message": "Submit failed",
                 }
+
+        if self._filing_bar() == "request":
+            # The filing-bar condition: no merge verdict anywhere in the submission, so the
+            # reviewer is never asked whether a maintainer would merge, only what it would request.
+            @mcp.tool(description=DESCRIPTION)
+            async def submit_findings(
+                findings: FINDINGS = [],
+                confidence: CONFIDENCE = None,
+                message: MESSAGE = "",
+            ) -> Dict[str, Any]:
+                return await record(findings, None, confidence, message)
+        else:
+            @mcp.tool(description=DESCRIPTION)
+            async def submit_findings(
+                findings: FINDINGS = [],
+                merge_ready_as_is: Annotated[Optional[bool], Field(
+                    description="True if a maintainer would merge without requesting changes."
+                )] = None,
+                confidence: CONFIDENCE = None,
+                message: MESSAGE = "",
+            ) -> Dict[str, Any]:
+                return await record(findings, merge_ready_as_is, confidence, message)
 
     def _normalize_findings(self, findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Coerce raw tool input into the PredictionRecord finding shape; drop empties,

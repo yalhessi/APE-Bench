@@ -36,7 +36,7 @@ limitation rather than a surprise found while reading a result.
 
 import json
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 from pydantic import Field
 
@@ -114,7 +114,7 @@ Then call `{submit_tool_name}` exactly once with at most {budget} findings. For 
 located. Give the line of the declaration your claim is about.
 - `claim` -- name the declaration and say what is wrong with it.
 - `suggested_fix` -- what to do instead.
-- `severity` -- `blocking` if a maintainer would withhold merge over it, else `advisory`.
+{severity_line}
 - `concern_family` -- one of: `correctness`, `proof-golf`, `duplication`, `naming`, \
 `generalization`, `documentation`, `style`, `scope`, `other`.
 - `issue_kind` -- one of: `broken_build`, `correctness_policy`, `documentation_gap`, \
@@ -125,6 +125,24 @@ located. Give the line of the declaration your claim is about.
 Label a finding with what it actually is. The labels route it to the right check; they are not \
 a guess at what the grader wants, and a wrong one is worse than the honest nearest fit.
 """
+
+
+#: The two spellings of the severity line, chosen by `SoloReviewConfig.filing_bar`. "merge" is the
+#: wording every run before 2026-09-30 saw. "request" is the filing-bar condition of
+#: results/pr_review_v5/probes/filing-bar-2026-09-30: gpt-5.4 and gpt-5.5 verified the
+#: maintainers' asks and withheld them as "not something a maintainer would require", and this
+#: line, the submission mandate and the submit tool's `merge_ready_as_is` were the three places
+#: the task framed a finding as a merge verdict.
+SEVERITY_LINES = {
+    "merge": "- `severity` -- `blocking` if a maintainer would withhold merge over it, else `advisory`.",
+    "request": ("- `severity` -- `blocking` if the change is needed for correctness or policy; `advisory` "
+                "for every other change you would request. Advisory findings count in full."),
+}
+
+
+def solo_user_template(filing_bar: str = "merge") -> str:
+    """`SOLO_USER` with its severity line spelled for this filing bar."""
+    return SOLO_USER.replace("{severity_line}", SEVERITY_LINES[filing_bar])
 
 
 class SoloReviewConfig(BasePRReviewConfig):
@@ -145,6 +163,13 @@ class SoloReviewConfig(BasePRReviewConfig):
     #: reviewer what its Claude conditions read from a packet (the pass-0 PR model). A PR the
     #: file does not hold is refused, not reviewed without its context.
     context_file: Optional[Path] = None
+
+    #: How the task frames what a finding is. "merge": the severity line, the mandate and the
+    #: submit tool speak of withholding merge and of `merge_ready_as_is` (every run before
+    #: 2026-09-30). "request": a finding is a change the reviewer would request, `advisory` when
+    #: not insisted on; the mandate and the tool carry no merge verdict. Only this task
+    #: implements the field, so it lives here and not on the arms' base config.
+    filing_bar: Literal["merge", "request"] = "merge"
 
 
 class SoloReviewData(BasePRReviewData):
@@ -232,7 +257,8 @@ class SoloReviewTask(BasePRReviewTask):
     task_result_class = SoloReviewResult
 
     def _get_prompts(self, version: str) -> Tuple[str, str]:
-        return solo_system_prompt(self.config.task_config), SOLO_USER
+        return (solo_system_prompt(self.config.task_config),
+                solo_user_template(self.config.task_config.filing_bar))
 
     async def create_user_prompt(self) -> str:
         return (await super().create_user_prompt()

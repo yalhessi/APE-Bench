@@ -64,13 +64,14 @@ def test_the_prompt_names_the_pr_the_diff_and_the_submit_tool():
     """`create_user_prompt` fills a fixed set of placeholders; a template naming one it does
     not supply raises at run time, on a paid run, after the workspace is built."""
 
-    from ape.tasks.lean_tasks.formal_math.review.solo import SOLO_SYSTEM, SOLO_USER
+    from ape.tasks.lean_tasks.formal_math.review.solo import SOLO_SYSTEM, solo_user_template
 
-    rendered = SOLO_USER.format(
-        pr_number=1, title="t", description="d", diff="DIFFBODY", changed_files="  - `a`",
-        tool_summary="none (diff only)", submit_tool_name="submit_findings", budget=20,
-    )
-    assert "DIFFBODY" in rendered and "submit_findings" in rendered
+    for bar in ("merge", "request"):
+        rendered = solo_user_template(bar).format(
+            pr_number=1, title="t", description="d", diff="DIFFBODY", changed_files="  - `a`",
+            tool_summary="none (diff only)", submit_tool_name="submit_findings", budget=20,
+        )
+        assert "DIFFBODY" in rendered and "submit_findings" in rendered
     assert "maintainer" in SOLO_SYSTEM
 
 
@@ -214,3 +215,64 @@ def test_the_context_file_appends_this_prs_sections_and_refuses_a_pr_it_lacks(tm
     with pytest.raises(KeyError):
         solo_context_block(config, 3)
 
+
+
+# --- the filing bar (results/pr_review_v5/probes/filing-bar-2026-09-30) ---------------------
+
+def test_the_default_filing_bar_is_the_wording_every_earlier_run_saw():
+    """"merge" must render byte-for-byte what runs before 2026-09-30 read, or every sealed
+    plan's prompt changes under a name that says nothing changed."""
+
+    from ape.tasks.lean_tasks.formal_math.review.base import submission_mandate
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, solo_user_template
+
+    assert SoloReviewConfig().filing_bar == "merge"
+    assert "`blocking` if a maintainer would withhold merge over it, else `advisory`" in solo_user_template("merge")
+    assert "{severity_line}" not in solo_user_template("merge")
+    assert "`merge_ready_as_is: true`" in submission_mandate("submit_findings", "merge")
+
+
+def test_the_request_filing_bar_removes_every_merge_verdict_from_the_task():
+    """The three places the task framed a finding as a merge verdict: the severity line, the
+    mandate, and the submit tool's `merge_ready_as_is`. Under "request" none of them survives."""
+
+    import inspect
+    from types import SimpleNamespace
+
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask, submission_mandate
+    from ape.tasks.lean_tasks.formal_math.review.solo import solo_user_template
+
+    template = solo_user_template("request")
+    assert "withhold merge" not in template and "would request" in template
+    assert "{severity_line}" not in template
+    assert "merge_ready_as_is" not in submission_mandate("submit_findings", "request")
+
+    class FakeMCP:
+        def __init__(self):
+            self.tools = {}
+
+        def tool(self, **_kwargs):
+            def decorate(fn):
+                self.tools[fn.__name__] = fn
+                return fn
+            return decorate
+
+    def registered(bar):
+        mcp = FakeMCP()
+        fake = SimpleNamespace(_register_lean_verify_edit=lambda mcp: None, _filing_bar=lambda: bar)
+        import asyncio
+        asyncio.run(BasePRReviewTask.register_task_tools(fake, mcp))
+        return set(inspect.signature(mcp.tools["submit_findings"]).parameters)
+
+    assert "merge_ready_as_is" in registered("merge")
+    assert "merge_ready_as_is" not in registered("request")
+    assert registered("request") == {"findings", "confidence", "message"}
+
+
+def test_the_filing_bar_is_a_closed_choice():
+    import pytest
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig
+
+    assert SoloReviewConfig(filing_bar="request").filing_bar == "request"
+    with pytest.raises(Exception):
+        SoloReviewConfig(filing_bar="lenient")
