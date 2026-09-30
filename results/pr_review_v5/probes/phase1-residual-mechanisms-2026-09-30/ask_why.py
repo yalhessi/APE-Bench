@@ -6,6 +6,14 @@ Usage, from the repo root, with OPENAI_API_KEY set:
 
 The answers are the model's own account after the fact; the readers label from them and the
 transcript together, never from the answers alone.
+
+Known defect (2026-09-30, found after the readers had these files): with tools defined and
+`tool_choice: none`, gpt-5.2 wrote tool calls as text instead of answering. 17 of 23 answers open
+with pseudo tool-call JSON (`{"tool_uses": ...}`), one fabricates a tool result, and three are
+unusable: val 29842 (no answer), post 43167 (garbled), post 42814 (3 of 4 answers before the
+6,000-token cap). They were not regenerated, because both readers of a split must see the same
+inputs. Next time: send no `tools` (function_call history items do not need them), say in the
+question that tools are unavailable, and check each answer for its numbered items before use.
 """
 import glob
 import importlib.util

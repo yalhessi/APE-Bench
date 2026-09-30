@@ -84,3 +84,16 @@ verifies") or something else.
 - `labels/<split>.<reader>.jsonl`: the readers' outputs, copied in after their transcripts are
   audited.
 - `mechanisms.md`: the table, written after both readers finish.
+
+## Defect in the ask-why inputs (found 2026-09-30, after the post-cutoff and one validation reader had them)
+
+With tools defined and `tool_choice: none`, gpt-5.2 wrote tool calls as text: 17 of 23 answers
+open with pseudo tool-call JSON before the numbered answers, one (dev 33421) fabricates a tool
+result, and three are unusable: validation 29842 (no answer), post-cutoff 43167 (garbled) and
+post-cutoff 42814 (3 of 4 answers before the cap). They were not regenerated, because both readers
+of a split must see the same inputs; on those three PRs the gpt pairs rest on the transcript alone,
+which the rubric already makes primary. The fix is in `ask_why.py`'s docstring.
+
+**Reader models.** The first post-cutoff pair and validation reader 2 ran on `claude-fable-5-1`; a
+session limit ended the other five, which were rerun into cleared folders on `claude-opus-5-5`.
+Validation's two readers are therefore different models; every other split has one model for both.
