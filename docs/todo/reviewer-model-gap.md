@@ -433,3 +433,21 @@ matchers agree on all 128 cells. q is each reviewer's reach over Claude's (X = 0
 - replicate Grc;
 - a carry-over-off gpt_5.2 run on these six PRs, to separate the endpoint from persistence;
 - Grc on the validation and dev sets, where Gr1 reached 0.57-0.60 and 0.29-0.31 of Claude.
+
+**Why gpt-5.4 and gpt-5.5 reach less than gpt_5.2 (2026-09-30, read by hand, about $0.90;
+`results/pr_review_v5/probes/model-inspection-2026-09-30/`).**
+- **They verify more and file less.** Against gpt_5.2: 10 compiled edits each against 7, and 6
+  findings against 9. They left 4 of 10 (gpt-5.5) and 2 of 10 (gpt-5.4) verified edits unfiled,
+  against 0 of 7.
+- **gpt-5.5's whole deficit is 43192.** It compiled the maintainers' `cat_disch` defaults and the
+  `homMk` rename, which no gpt reviewer had reached, then filed only the typo, calling the PR
+  merge-ready.
+- **gpt-5.4 withheld the verified typo fix**, and filed the opposite design: delete the wrappers the
+  maintainers asked to improve.
+- **Asked why**, each replayed with its carried reasoning: the edits were "not something I would
+  expect a maintainer to require", "optional ergonomic improvement", "minor docstring polish".
+- **The explanation.** The newer models read the brief's "would plausibly request", the severity
+  line and `merge_ready_as_is` as "would require". They drop verified polish, which is what these
+  maintainers asked for.
+- **Not yet measured:** how much reach the bar costs across sets. Any brief change designed from
+  this is in-sample on the post-cutoff set.
