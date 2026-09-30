@@ -850,6 +850,143 @@ def model_context(spec: ProbeSet, prs: List[int]) -> str:
                               ensure_ascii=False) + "\n" for pr in prs)
 
 
+# --- A probe session as a scoreable run --------------------------------------------------------
+#: The `issue_kind` every imported probe finding carries. The candidate validator refuses a finding
+#: without one on any release rendered at candidate-prompt/12 or later, a probe reviewer was never
+#: asked for one, and the judge's prompt does not show it -- it shows the concern family, which the
+#: import sets to `other` for the same reason. With no evidence chain the import's gate is closed, so
+#: this routes nothing; it is a placeholder, not a label.
+IMPORT_ISSUE_KIND = "style_norm_violation"
+
+
+def resolve_target(target: str, graph) -> tuple:
+    """`(path, line, method)` for a probe finding's free-text `target`, off the change graph.
+
+    A probe reviewer names what it asks about (`Dense.ciSup`, `Mathlib/X.lean`, `import in
+    Foo.lean`); the solo anchoring takes a path and the line of the declaration, which is what the
+    solo prompt asks gpt for. A declaration resolves to its reviewed-side entity's first line, by
+    full name, then by a unique dotted suffix (as `open` allows), then by a unique short name. A
+    file-level target resolves to the first changed line in that file. Anything else is
+    `unresolved`: the finding is still imported and anchors nowhere, as an unanchored solo finding
+    does.
+    """
+
+    t = str(target or "").strip().strip("`").strip()
+    reviewed = [e for e in graph.entities if e.side == "reviewed" and e.fullname]
+
+    def one(entities, method):
+        spots = sorted({(e.path, e.span.line_start) for e in entities})
+        return (spots[0][0], spots[0][1], method) if len(spots) == 1 else None
+
+    parts = re.split(r",\s*|\s+and\s+", t)
+    # A target that lists several declarations anchors on the first it names.
+    for candidate in [t] + ([parts[0].strip()] if len(parts) > 1 else []):
+        for found in (one([e for e in reviewed if e.fullname == candidate], "fullname"),
+                      one([e for e in reviewed if e.fullname.endswith("." + candidate)], "fullname_suffix"),
+                      one([e for e in reviewed if e.name == candidate], "name")):
+            if found:
+                return found
+    first_changed = {}
+    for r in graph.changed_ranges:
+        if r.reviewed_span is not None:
+            first_changed[r.path] = min(first_changed.get(r.path, r.reviewed_span.line_start),
+                                        r.reviewed_span.line_start)
+    by_file = [path for path in first_changed
+               if t == path or t.endswith(path) or re.search(r"(^|[\s/])" + re.escape(Path(path).name) + r"\b", t)]
+    if len(by_file) == 1:
+        return by_file[0], first_changed[by_file[0]], "file"
+    return None, None, "unresolved"
+
+
+def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -> Dict[str, Any]:
+    """Write one probe session's findings as a solo run's scoreable artifacts.
+
+    Through the solo runner's own tail, so a Claude session reaches the judge by the path a gpt
+    solo session does: each finding in `_normalize_findings`' shape, then `solo_responses` (the
+    same anchoring onto change targets and work units), then `finalize`, which writes the
+    `findings.jsonl` the judge scores. What differs, and is recorded in `probe_import.json`: the
+    location comes from `resolve_target` rather than the model, the concern family is `other` and
+    `issue_kind` a placeholder, and no evidence chain runs, so admission and publication are not
+    comparable to a solo run's. No run manifest is written: the judge reads the source run as
+    `unchecked`, which is what it is.
+    """
+
+    import collections
+    import hashlib
+    from types import SimpleNamespace
+
+    from src.mathlib_review.io import jsonl_bytes, write_once
+    from src.mathlib_review.review.candidates import anchoring_report
+    from src.mathlib_review.review.finalize import finalize
+    from src.mathlib_review.review.runner import (solo_responses, load_release, load_run,
+                                                  select_units_and_episodes)
+
+    missing = [pr for pr in spec.pr_numbers if not (spec.session_dir(pr, session) / "findings.json").is_file()]
+    if missing:
+        raise FileNotFoundError(f"{session} has no findings.json for PR(s) {missing}")
+    out = Path(out)
+    if out.exists():
+        raise FileExistsError(f"{out} exists; an import writes a run directory once")
+    dataset, _scaffold, _ = load_run(Path(spec.dataset_config),
+                                     overrides={"dataset": {"pr_numbers": list(spec.pr_numbers)}})
+    release = load_release(dataset)
+    units, episodes = select_units_and_episodes(dataset, release)
+    graph_by_pr = {g.pr_number: g for g in release["graphs"] if ":round1:" in g.episode_id}
+    episode_by_pr = {e.pr_number: e for e in episodes if ":round1:" in e.episode_id}
+    budget = 20  # SoloReviewConfig.finding_budget: the cap a solo submission is cut to
+
+    rows, methods, packets = [], collections.Counter(), {}
+    for pr in spec.pr_numbers:
+        path = spec.session_dir(pr, session) / "findings.json"
+        packets[str(pr)] = hashlib.sha256(path.read_bytes()).hexdigest()
+        normalized = []
+        for raw in json.loads(path.read_text())[:budget]:
+            claim = str(raw.get("claim") or "").strip()
+            if not claim:
+                continue
+            file, line, method = resolve_target(raw.get("target"), graph_by_pr[pr])
+            methods[method] += 1
+            severity = str(raw.get("severity") or "").lower()
+            normalized.append({
+                "anchor": {"path": file, "line_start": line, "line_end": line} if file else None,
+                "severity": severity if severity in ("blocking", "advisory") else "advisory",
+                "claim": claim,
+                "concern_family": "other",
+                "issue_kind": IMPORT_ISSUE_KIND,
+                "suggested_fix": (str(raw["requested_change"]) if raw.get("requested_change") else None),
+                "evidence": (str(raw["evidence"]) if raw.get("evidence") else None),
+                "verified": None,
+                "confidence": None,
+            })
+        rows.append({"success": True, "episode_id": episode_by_pr[pr].episode_id, "pr_number": pr,
+                     "findings": normalized})
+
+    responses, anchor_rows = solo_responses(SimpleNamespace(task_results=rows), release["graphs"],
+                                             units, logger)
+    out.mkdir(parents=True)
+    report = anchoring_report(anchor_rows)
+    write_once(out / "anchoring.jsonl", jsonl_bytes(anchor_rows))
+    write_json(out / "anchoring_report.json", report)
+    summary = finalize(
+        out, units=units, responses=responses, routing_mode="solo",
+        execution_release=dataset.execution_release, exclude_methods=dataset.exclude_methods,
+        pr_numbers=list(spec.pr_numbers), candidate_assessments=[],
+        apply_lead_synthesis=dataset.apply_lead_synthesis, collect_supported=None,
+        pr_finding_limit=dataset.pr_finding_limit, logger=logger)
+    provenance = {
+        "source": "probe session", "set": spec.name, "session": session,
+        "packets_findings_sha256": packets, "target_resolution": dict(methods),
+        "anchoring": report, "concern_family": "other", "issue_kind_placeholder": IMPORT_ISSUE_KIND,
+        "evidence_chain": "not run: the gate is closed, so admission and publication are not "
+                          "comparable to a solo run's; the judge's issue recall reads every finding",
+        "run_manifest": "not written: the judge reads this source as unchecked",
+    }
+    write_json(out / "probe_import.json", provenance)
+    return {"findings_in": sum(len(r["findings"]) for r in rows), "resolution": dict(methods),
+            "anchored": report.get("anchored"), "unanchored_rate": report.get("unanchored_rate"),
+            "issues_total": summary.get("issues_total")}
+
+
 def restore_bases(spec: ProbeSet, prs: Optional[List[int]] = None) -> Dict[str, str]:
     """Restore each PR's built base snapshot into its workspace, which a reviewed build needs and the
     prebuild planner does not check (the validation and post-cutoff probes' `restore_bases.py`).

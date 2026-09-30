@@ -272,6 +272,53 @@ def test_grepping_the_packets_diff_headers_is_not_git(tmp_path):
     assert "git log" in report["flagged"][0]["input"]
 
 
+DEV = probes.load_probe_set(SETS / "dev_medium_0_3_0.yaml")
+
+
+def _dev_graph(pr):
+    from src.mathlib_review.io import jsonl_rows
+    from src.mathlib_review.schema import ChangeGraph
+    for row in jsonl_rows(DEV.release / "derived/change_graphs.jsonl"):
+        if row["pr_number"] == pr and ":round1:" in row["episode_id"]:
+            return ChangeGraph.model_validate(row)
+
+
+def test_a_probe_target_resolves_to_the_declaration_line_the_solo_prompt_asks_for():
+    """Real graph. A full name, a unique dotted suffix and a unique short name each land on the
+    reviewed entity's first line; a file lands on its first changed line; prose lands nowhere."""
+    graph = _dev_graph(33337)
+    entity = next(e for e in graph.entities if e.side == "reviewed" and e.fullname and "." in e.fullname
+                  and sum(x.fullname == e.fullname for x in graph.entities if x.side == "reviewed") == 1)
+    spot = (entity.path, entity.span.line_start)
+    assert probes.resolve_target(entity.fullname, graph) == (*spot, "fullname")
+    assert probes.resolve_target(f"`{entity.fullname}`", graph) == (*spot, "fullname")
+    assert probes.resolve_target(f"{entity.fullname}, Some.other_decl", graph) == (*spot, "fullname")
+    changed = sorted(r.reviewed_span.line_start for r in graph.changed_ranges
+                     if r.reviewed_span and r.path == entity.path)
+    assert probes.resolve_target(entity.path, graph) == (entity.path, changed[0], "file")
+    assert probes.resolve_target("the PR description", graph) == (None, None, "unresolved")
+
+
+def test_a_probe_session_imports_through_the_solo_tail(tmp_path):
+    """Two committed Claude sessions' PRs, through `solo_responses` and `finalize`: every
+    finding either anchors or is counted as lost, every row the judge will read carries its
+    change targets, and the import says what it did not do."""
+    spec = DEV.model_copy(update={"pr_numbers": [33337, 33421]})
+    report = probes.import_probe_session(spec, "X1", tmp_path / "run")
+    assert report["findings_in"] == report["anchored"] + round(report["unanchored_rate"] * report["findings_in"])
+    rows = [json.loads(line) for line in (tmp_path / "run" / "findings.jsonl").read_text().splitlines() if line]
+    assert rows and all(r["change_ids"] and r["arm"] == "solo_agent" for r in rows)
+    assert {r["pr_number"] for r in rows} <= {33337, 33421}
+    provenance = json.loads((tmp_path / "run" / "probe_import.json").read_text())
+    assert provenance["session"] == "X1" and provenance["issue_kind_placeholder"] == probes.IMPORT_ISSUE_KIND
+    assert set(provenance["packets_findings_sha256"]) == {"33337", "33421"}
+    assert not (tmp_path / "run" / "run_manifest.json").exists()
+    with pytest.raises(FileExistsError):
+        probes.import_probe_session(spec, "X1", tmp_path / "run")
+    with pytest.raises(FileNotFoundError, match="no findings.json"):
+        probes.import_probe_session(spec, "X9", tmp_path / "other")
+
+
 def test_the_solo_context_file_is_the_one_test_b_used():
     ref = (G52_DIR / "model_context.jsonl").read_text()
     assert probes.model_context(POST, [41930, 42184, 42814, 43024, 43167, 43192]) == ref
