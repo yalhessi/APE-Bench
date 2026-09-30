@@ -31,7 +31,7 @@ leaves reasoning ON and reports nothing -- measured, not assumed.
 import json
 from typing import Any, Dict, List, Optional
 
-from ..config import MODEL_MAPPINGS, ProviderError
+from ..config import MODEL_MAPPINGS, RequestRejectedError
 from .openai_provider import OpenAIProvider
 
 
@@ -78,7 +78,7 @@ class ElmProvider(OpenAIProvider):
         """
 
         if tools and not self.supports_tools():
-            raise ProviderError(
+            raise RequestRejectedError(
                 f"{self.config.formal_model_name} is served by ELM without tool-calling "
                 f"enabled, but {len(tools)} tool(s) were supplied. Agentic scaffolds need "
                 f"tools: use a tool-capable model (the OpenAI models, or "
@@ -112,7 +112,7 @@ class ElmProvider(OpenAIProvider):
             supported = entry["reasoning_efforts"]
             if effort in supported:
                 return
-            raise ProviderError(
+            raise RequestRejectedError(
                 f"reasoning_effort={effort!r} is not honoured by "
                 f"{self.config.formal_model_name}: "
                 + (f"ELM accepts only {sorted(supported)} for it."

@@ -13,10 +13,12 @@ from tenacity import retry, stop_after_attempt, wait_exponential, wait_random, w
 
 from ape.utils.logging import create_logger
 
-from .config import LLMConfig, LLMProvider, ProviderError, ContextLengthExceededError, MalformedResponseError
+from .config import (
+    LLMConfig, LLMProvider, ProviderError, ContextLengthExceededError, MalformedResponseError,
+    RequestRejectedError)
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
 from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
-from .providers import BaseProvider, ElmProvider, OpenAIProvider
+from .providers import BaseProvider, ElmProvider, OpenAIProvider, OpenAIResponsesProvider
 from .logger import LLMLogger
 
 if TYPE_CHECKING:
@@ -48,16 +50,27 @@ class LLMClient:
         LLMProvider.ELM: (ElmProvider, OpenAIMessageFormatter),
     }
 
+    def _implementation(self):
+        """The provider class and message formatter for this config.
+
+        `openai_api: responses` takes the plain `MessageFormatter`, which keeps an assistant
+        message's `signature` -- where carried-over reasoning items travel -- and which
+        `OpenAIMessageFormatter` drops. `LLMConfig` refuses the field for any provider but
+        OpenAI.
+        """
+        if self.config.openai_api == "responses":
+            return OpenAIResponsesProvider, MessageFormatter
+        return self._PROVIDER_IMPLEMENTATIONS.get(
+            self.config.provider_type, (BaseProvider, MessageFormatter))
+
     def _create_provider(self):
         """Create provider instance based on configuration."""
-        provider_class, _ = self._PROVIDER_IMPLEMENTATIONS.get(
-            self.config.provider_type, (BaseProvider, MessageFormatter))
+        provider_class, _ = self._implementation()
         return provider_class(self.config, self.logger, self.llm_logger)
 
     def _create_message_formatter(self):
         """Create message formatter instance based on configuration."""
-        _, formatter_class = self._PROVIDER_IMPLEMENTATIONS.get(
-            self.config.provider_type, (BaseProvider, MessageFormatter))
+        _, formatter_class = self._implementation()
         return formatter_class()
 
     async def __aenter__(self):
@@ -134,7 +147,8 @@ class LLMClient:
                     retry_state.outcome.exception() and (
                         isinstance(retry_state.outcome.exception(), ContextLengthExceededError) or
                         isinstance(retry_state.outcome.exception(), MalformedResponseError) or
-                        isinstance(retry_state.outcome.exception(), StreamingInterruptedError)
+                        isinstance(retry_state.outcome.exception(), StreamingInterruptedError) or
+                        isinstance(retry_state.outcome.exception(), RequestRejectedError)
                     )
                 ) else True
             ),
@@ -188,10 +202,18 @@ class LLMClient:
                 )
                 return nodes, usage, raw_response
                     
-            except (MalformedResponseError, ContextLengthExceededError, StreamingInterruptedError) as e:
+            except (MalformedResponseError, ContextLengthExceededError, StreamingInterruptedError,
+                    RequestRejectedError) as e:
                 elapsed_time = time.time() - start_time
 
-                if isinstance(e, StreamingInterruptedError):
+                if isinstance(e, RequestRejectedError):
+                    self.logger.error(
+                        f"RequestRejectedError occurred - "
+                        f"elapsed: {elapsed_time:.2f}s, "
+                        f"error: {str(e)} "
+                        f"(will not retry)"
+                    )
+                elif isinstance(e, StreamingInterruptedError):
                     self.logger.info(
                         f"Streaming interrupted by user - "
                         f"elapsed: {elapsed_time:.2f}s"

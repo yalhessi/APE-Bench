@@ -207,3 +207,24 @@ function tools, use /v1/responses or set reasoning_effort to 'none'." The client
 25 times in the first ten minutes (`probe_postcutoff_gpt5{4,5}_Gr_rep1`), billing nothing, until the
 runs were stopped by hand. A 400 whose message names an unsupported parameter can never succeed, so
 the fix is to refuse 400s, not only authentication errors, and to surface the provider's message.
+
+**Fixed 2026-09-30, for 400s** (`openai-responses-provider`). `RequestRejectedError`, a subclass of
+`ProviderError`, is never retried. The provider raises it for an HTTP 400 whose body names a
+parameter (`error.param`), and ELM's own pre-send refusals raise it too. Those refusals (tools on
+Llama/EuroLLM, an effort the gateway refuses) had been plain `ProviderError`s inside the retried call,
+so each was repeated a hundred times. A 400 that names no parameter is still retried: the only other
+400 in the run logs, "Could not finish the message because max_tokens or model output limit was
+reached", succeeded on retry (`pr_review_v4_judge_r0pinned_rep1`). The 401/403 half of the
+2026-09-23 entry above is still open. Pinned by `tests/ape/test_request_rejection.py`.
+
+## `reasoning_effort` and `openai_api` change what a run measures, and a resume may change them (found 2026-09-30)
+
+Both live only inside `scaffold_config_sha256`, and `RESUMABLE_PLAN_FIELDS`
+(`src/mathlib_review/review/runner.py`) lets a resume change that hash, because it also carries
+retries and timeouts. So `cli run --resume` with `reasoning_effort` raised from `none` to `high`, or
+`openai_api` switched, only writes `run_plan_revision_N.json` and a warning. The run's finished tasks
+keep the first condition, and the rest run under the second. Not seen happening. The motivating
+example is the code path, found while adding `openai_api` and `openai_responses_reasoning_carryover`,
+which inherit the same status. The fix is a semantic plan field over the llm_config keys that change
+what a run measures (`reasoning_effort`, `openai_api`, the carry-over, `temperature`; `model_name`
+already is one). It moves every plan's identity once, so it lands at a run boundary.

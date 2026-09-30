@@ -1,7 +1,8 @@
 # An OpenAI Responses-API provider, so gpt-5.4 and gpt-5.5 can reason with tools
 
-**Status** — open, 2026-09-30. For a **fresh session in a worktree off `develop`**. Build, merge into
-`develop`, then return to `pipeline-overfit-review` to run the blocked runs (last section).
+**Status** — **built 2026-09-30** on `openai-responses-provider`, merged into `develop`, both live
+checks passed (section "Built", at the end). Open: the blocked runs, back on `pipeline-overfit-review`
+(section "Then, back on `pipeline-overfit-review`").
 **Cost** — the build spends only its live checks, a few dollars. The blocked runs afterwards are
 about $70 billed at the estimated rates, plus about $10 of calibration.
 **Motivating example** — test (e) of `reviewer-model-gap.md` could not run its high-effort half.
@@ -169,3 +170,114 @@ So the provider **translates at its own boundary**, and nothing downstream chang
   docs alone.
 - **Scope creep.** The ELM gateway's `/v1/responses` and the carry-over-on condition are follow-ups,
   not part of closing this.
+
+## Built (2026-09-30)
+
+Commits on `openai-responses-provider`: 232bf38 (no retry), 331fae7 (the provider), c706ef9 (the
+refusal). Where the build departs from the design above, it is from a measurement:
+
+- **Tools are sent `strict: false`.** Responses makes a tool strict by default when its schema
+  qualifies (a probe tool came back `additionalProperties: false, strict: true`), and Chat
+  Completions never does. Strict is constrained decoding, which would be a different condition.
+- **Temperature is sent as configured.** 1.0 is accepted with reasoning on, and 0.7 is a 400 naming
+  `temperature`. Nothing is dropped silently, and a bad value fails at once.
+- **No-retry is keyed on `error.param`, not on the message.** All three parameter 400s recorded carry
+  it. The judge's "Could not finish the message because max_tokens ..." 400 succeeded on retry in
+  `pr_review_v4_judge_r0pinned_rep1` and stays retried. That error was not reproduced, so whether its
+  body names a parameter is unverified. ELM's pre-send refusals are now not retried either; they had
+  been retried a hundred times each.
+- **Carry-over keeps each reasoning item's position** among the calls, since the API rejects a
+  reasoning item passed without the item that followed it. The items ride in
+  `ConversationMessage.signature`.
+- **`cli plan` refuses first thing in `run()`**, in a dry run too, before the agenda build.
+
+**Live check 1** (`probe_postcutoff_gpt54_G_resp_rep1`, gpt-5.4, effort `none`, all six post-cutoff
+PRs): 6 of 6 succeeded, $0.468 billed. Against the two Chat Completions reps:
+
+| | Chat rep1 | Chat rep2 | Responses |
+|---|---|---|---|
+| turns | 23 | 24 | 23 |
+| tool calls | 89 | 90 | 83 |
+| tokens | 355K | 403K | 401K |
+| cache hit | 66% | 75% | 68% |
+| billed | $0.441 | $0.424 | $0.468 |
+| findings | 5 | 4 | 4 |
+
+Everything but billed is inside the spread of the two reps, and billed is 6% over the higher one. One
+rep each way, so this shows comparability within noise, not equivalence.
+
+**Live check 2** (`probe_postcutoff_gpt54_Gr_resp_check41930`, gpt-5.4, effort `high`, PR 41930,
+capped at $4): succeeded in 10 turns with 26 tool calls and 7,714 reasoning tokens, $0.254 billed, no
+retries. It submitted 0 findings on 41930, as gpt-5.2's high-effort Gr1 session did there.
+
+Both ran from a throwaway detached worktree, `.claude/worktrees/responses-livecheck`, which holds
+`pipeline-overfit-review` with this branch merged in. Their result folders are there, untracked. The
+logs are in `.ape/probe_scratch/responses_livecheck/`. The rehearsal merge conflicts in four files:
+`config.py` and `framework-defects-2026-09.md` take this branch's side, and `docs/todo/README.md` and
+this entry take the other branch's. The branch's suite has one failure there that the merge does not
+cause: `test_probes.py::test_a_packet_is_the_committed_one_but_for_its_paths_and_logger` reads a
+gitignored per-session `brief.md`, so it fails on any fresh checkout of that branch.
+
+**`store`, measured the same day** (gpt-5.4 at high effort, one two-turn tool conversation with a
+5.1K-token prefix, turn 2's usage):
+
+| turn 2 | input | cached | note |
+|---|---|---|---|
+| `store: false`, no carry-over (as built) | 5,186 | 4,608 | |
+| `store: false`, encrypted carry-over | 5,265 | 4,608 | +79, about turn 1's 77 reasoning tokens |
+| `store: true`, `previous_response_id` | -- | -- | HTTP 400: "Previous response cannot be used for this organization due to Zero Data Retention" |
+
+So the account is Zero Data Retention, and stored-state chaining is not available at all.
+`store: false` with encrypted carry-over is the only way to carry reasoning. Earlier turns are billed
+as input either way, and carried reasoning is billed again as input. Separately, the API has
+`reasoning.context` (`auto`, `current_turn`, `all_turns`), and every response so far echoed
+`current_turn`, carry-over included. In a review session every call after the task prompt is a
+tool continuation, so a "turn" probably spans the session. Where the scaffold adds a user message
+(a retry prompt), `current_turn` may drop the reasoning carried from before it. Settled below: it
+does, and our sessions have no such message.
+
+**`reasoning.context`, settled the same day.** The same carried history was cut at each point and
+sent three ways (gpt-5.4, input tokens):
+
+| history ends | no items | `current_turn` | `all_turns` |
+|---|---|---|---|
+| mid-loop, only tool outputs since the task prompt | 236 | 360, all 4 kept | 360 |
+| mid-loop, with a text note beside every call | 322 | 453, all 3 kept | 453 |
+| after the model's text-only answer | 281 | 281, all dropped | 405 |
+| after a user message inserted mid-loop | 248 | 284, only items after it | 372 |
+
+So a turn is ended by a user message or a text-only answer, and not by tool outputs or notes beside
+calls. `auto` and the default both resolve to `current_turn`. **gpt-5.2 rejects `all_turns`**
+("Supported values are: 'auto' and 'current_turn'"); gpt-5.4 and gpt-5.5 accept it.
+
+Our sessions have no boundary at all. In gpt-5.2's 33 high-effort solo sessions (the three Gr1 runs
+plus check 2), median 45 turns and max 80, there is no mid-session user message and no text-only
+answer. So under the default, carry-over keeps every reasoning item of a session. The provider
+therefore sends no `context`: sending `all_turns` would change nothing in these sessions, and it would
+refuse gpt_5.2, which d23fbde's clean persistence test needs. If a scaffold retry prompt ever appears
+(`_create_empty_response_prompt`, after a malformed response), reasoning before it is dropped. Count
+such prompts before reading a carry-over run; there were 0 in 33.
+
+**What carry-over costs over tens of turns** (projected from those 32 gpt-5.2 sessions, each call's
+prompt plus every earlier reasoning item; carry-over may shorten the reasoning, which this ignores):
+
+| | as run | all reasoning carried |
+|---|---|---|
+| processed tokens per session, median | 2.2M | 5.2M (2.0x) |
+| sessions over the 7.2M token cap (gpt-5.2 Gr) | 2 | 14 |
+| peak prompt, median / max | 60K / 145K | 183K / 400K |
+| sessions whose peak prompt passes 272K | 0 | 7 of 33 |
+
+The token cap is what binds, because carried tokens are mostly cached: about $1 more a session at
+gpt-5.4's rates, and double that at gpt-5.5's. A carry-over condition therefore needs its token cap
+recalibrated, not copied from the Chat runs, or it will be read through truncation. A capped session
+submits nothing. Above 272K, the `MODEL_MAPPINGS` rates (short-context) understate cost, and the
+largest prompts approach the context window, so check the window before a gpt_5.2 carry-over run.
+gpt-5.4 reasons far less than gpt-5.2: 7.7K reasoning tokens in 10 turns on 41930, against 31K in 15.
+So the growth there should be smaller. The projection is gpt-5.2's.
+
+Also seen: with no effort sent, gpt-5.5 on Responses runs at `medium` (the response echoes it).
+
+Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the 401/403 half of the
+retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
+(`framework-defects-2026-09.md`).
