@@ -1,0 +1,45 @@
+{
+ "source": "probe session",
+ "set": "dev_medium_0_3_0",
+ "session": "X2",
+ "packets_findings_sha256": {
+  "33066": "df62167feea4ebc42bb549a249418e5f24ded58bcef35f541214bfdeacc9df20",
+  "33098": "3ef73cae897d125add7c4bf8d43ab190e3bc587d9ef211ac9fd66e7f6b1c670f",
+  "33117": "418ed0404d49e4ef574edb806a437c050210cb83214ad953c1fdf1a1f3a74b93",
+  "33145": "dabb35f811d4dac464cccbffd029b540677deff1ad4a1c47229dec3256dea851",
+  "33149": "5e5e08ca1198f7fcc8678255ef2cc0e34498ad26880fe4b2a7a481c29f89914b",
+  "33285": "926eabdfec3e45778e5b80b3d7e35e0382daccc0e1404ce8437c6e72f262a1c2",
+  "33294": "2e10bbd59133fb80607203cab62c1b9860f7fed40480c953984cd5ac677eb31e",
+  "33304": "c17a746f1d91f4f8294c3b5d8e86067e2185900236d68bd8c0fb707d25808f7d",
+  "33305": "f884bc9d5af97c7d63c419f0607d495b21f45455977c12e1128edaf54c48b00f",
+  "33315": "90e59f92b7c686032d7dfb7b8fc224134c0d97a1145ca4c452ee098aea9ffe6a",
+  "33321": "837ac0f2858e0397d5d9ba5f2f88cf0d259e3f3d5c57b2f1492f649ce33b7054",
+  "33337": "825d711195ce5d28c784999d5faa0aab31aba7da9dcf6f78813a21c00c815a86",
+  "33362": "a53d78f4697d08e12c7cc02ce4e1df5e3d0282f0deb81795aeb22f0466000b1b",
+  "33421": "eb10e208dbaa9775f83e3863209426f088dacfa2621cb572fa3bda3388a7e4fa",
+  "33438": "b27b62f6073a51f7bc6c098d53e683226198312cf10ecd14f96660a1e04fa9c4"
+ },
+ "target_resolution": {
+  "fullname": 109,
+  "file": 25,
+  "unresolved": 4
+ },
+ "anchoring": {
+  "findings_in": 138,
+  "anchored": 134,
+  "unanchored": 4,
+  "unanchored_rate": 0.029,
+  "work_units_reached": 71,
+  "by_method": {
+   "review_line_entity": 123,
+   "review_line_range": 11
+  },
+  "by_failure": {
+   "no_location": 4
+  }
+ },
+ "concern_family": "other",
+ "issue_kind_placeholder": "style_norm_violation",
+ "evidence_chain": "not run: the gate is closed, so admission and publication are not comparable to a solo run's; the judge's issue recall reads every finding",
+ "run_manifest": "not written: the judge reads this source as unchecked"
+}

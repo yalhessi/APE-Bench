@@ -62,3 +62,26 @@ Seal acf2e521 (X1 X2 Grc1 Lc), two blind matchers audited clean (4 and 6 calls),
   `grind` five times).
 - Both lead and solo asked to remove `grind` where the maintainer asked for `@[grind]` tags
   (v0090, v0091): decomposition carries the same convention gap Phase 1 labelled.
+
+## Claude through the judge (2026-09-30), on the held-out 12 gold
+
+`cli probe import` (9603b6f7) wrote each dev Claude probe session as a solo-shaped run
+(`probe_dev_claude_X{1,2}`), through the solo runner's own anchoring and finalize; then `cli judge`
+with `configs/pr_review_v5_medium_heldout_judge.yaml`, the gold and judge behind the historical wall
+(23 obligations, 12 reachable). Anchoring lost 4.7% / 2.9% of Claude findings, against 4.2% for gpt.
+
+| reviewer (dev held-out 12, judge v9) | issue recall | reachable | hits (reachable + other) |
+|---|---|---|---|
+| **Claude X1** (probe session) | **0.478** | **0.583** | 7 + 4 |
+| **Claude X2** (probe session) | **0.478** | **0.583** | 7 + 4 |
+| historical lead, reasoning off (v2 reps) | 0.22-0.30 | 0.33-0.42 | |
+| historical solo, reasoning off (v2 reps) | 0.04-0.17 | 0.00-0.25 | |
+| gpt_5.2 solo, reasoning carried (Grc1) | 0.130 | 0.250 | 3 + 0 |
+| gpt_5.2 solo, reasoning off (G_rep1) | 0.174 | 0.083 | 1 + 3 |
+
+On the judge, Claude is about 1.6x the best historical pipeline run and about 3.7x carried gpt_5.2
+solo. Caveats: dev is inside Claude's training window; the imported findings carry concern family
+`other` (the judge's prompt shows the family; gpt's carry its own) and no evidence chain; n is 23.
+**Next, not done:** re-judge Grc1 with families set to `other` (a control for the label); the
+pre-registered main Phase 2 runs (awaiting the user's go-ahead on cost); route B (judge gold for
+post-cutoff, the only set clean for Claude).
