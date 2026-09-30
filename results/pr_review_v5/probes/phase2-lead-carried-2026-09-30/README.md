@@ -98,3 +98,21 @@ and reachable recall beside Claude X1 / X2 (0.478 / 0.583), gpt_5.2 carried (0.1
 historical reasoning-off lead (0.22-0.30 / 0.33-0.42). One run each, 23 obligations: provisional,
 and read as a level against those references, not as a ranking between the two models. The runs
 also join the dev probe seal later, so both measures can be read on the same reviewers.
+
+### Result (2026-09-30): gpt-5.4 and gpt-5.5 carried on the judge
+
+Both runs complete, 30 of 30 sessions, $9.02 and $18.42 billed; judged with the held-out 12 config.
+
+| reviewer (dev held-out 12, judge v9, 23 obligations) | issue recall | reachable (12) | obligations issue-matched |
+|---|---|---|---|
+| Claude X1 / X2 (probe sessions, imported) | 0.478 / 0.478 | 0.583 / 0.583 | 11 / 11 (each hits one the other misses) |
+| gpt-5.5, reasoning carried | 0.130 | 0.167 | 3 |
+| gpt_5.2, reasoning carried | 0.130 | 0.250 | 3 |
+| gpt-5.4, reasoning carried | 0.087 | 0.000 | 2 |
+| gpt_5.2, reasoning off | 0.174 | 0.083 | 4 |
+| historical lead, reasoning off (v2 reps) | 0.22-0.30 | 0.33-0.42 | |
+
+All four gpt solo conditions sit between 0.09 and 0.17, inside the historical solo spread (0.04-0.17)
+and below the historical reasoning-off lead; Claude is about three times any of them. The gpt runs'
+union is 10 obligations, Claude's 12. One run each, so the order among the gpt conditions (one or two
+obligations apart) is noise; the gap to Claude is not.
