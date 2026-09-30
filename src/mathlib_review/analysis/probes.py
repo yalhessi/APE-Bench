@@ -816,7 +816,9 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
             why = []
             if b.get("name") in ("WebFetch", "WebSearch"):
                 why.append("web")
-            if re.search(r"\bgit\b", text):
+            # `diff --git` is the header line of the packet's own diff.patch, grepped for by name
+            # (2 of 44 calls of a Phase 1 reader, 2026-09-30); it runs no git.
+            if re.search(r"\bgit\b", text.replace("diff --git", "")):
                 why.append("git")
             for p in _ABS.findall(text):
                 if p.startswith(folder) or p in ("/dev/null", "/tmp") or p.startswith("/usr/bin"):

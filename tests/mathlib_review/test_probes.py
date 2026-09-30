@@ -256,6 +256,22 @@ def test_the_audit_flags_what_leaves_the_folder(tmp_path):
         ["file tool outside", "outside /research/elsewhere/x.json"], ["git"], ["web"]]
 
 
+def test_grepping_the_packets_diff_headers_is_not_git(tmp_path):
+    """A reader outlining diff.patch greps for its `diff --git` header lines; that runs no git.
+    Running git itself, even in the same command, is still flagged."""
+    folder = tmp_path / "m1"
+    folder.mkdir()
+    calls = [{"type": "tool_use", "name": "Bash",
+              "input": {"command": f"cd {folder}/pr1; grep -n \"^diff --git\\|^@@\" diff.patch"}},
+             {"type": "tool_use", "name": "Bash",
+              "input": {"command": f"cd {folder}; grep -c 'diff --git' diff.patch; git log -1"}}]
+    transcript = tmp_path / "t.jsonl"
+    transcript.write_text("\n".join(json.dumps({"message": {"content": [c]}}) for c in calls))
+    report = probes.audit_transcript(folder, transcript)
+    assert [f["why"] for f in report["flagged"]] == [["git"]]
+    assert "git log" in report["flagged"][0]["input"]
+
+
 def test_the_solo_context_file_is_the_one_test_b_used():
     ref = (G52_DIR / "model_context.jsonl").read_text()
     assert probes.model_context(POST, [41930, 42184, 42814, 43024, 43167, 43192]) == ref
