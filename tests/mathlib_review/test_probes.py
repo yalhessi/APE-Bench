@@ -293,3 +293,10 @@ def test_unblinding_may_leave_a_matched_pr_out_of_the_seal():
     stats = json.loads((G52_DIR / "match_rematch/session_stats.json").read_text())
     without = probes.unblind(asks, {k: v for k, v in seal.items() if k != "43192"}, matches, stats)
     assert without["asks"] == 16 - 4
+
+
+def test_a_capped_session_is_matched_as_submitting_nothing():
+    runs = probes._solo("probe_postcutoff_gpt52_Gr_rep1")
+    found, stats = runs[42814]
+    assert found == [] and stats["capped"] == "paused_max_turns"
+    assert all("capped" not in st for pr, (_f, st) in runs.items() if pr != 42814)

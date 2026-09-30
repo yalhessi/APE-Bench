@@ -529,6 +529,18 @@ def _solo(run: str) -> Dict[int, tuple]:
                                    "compiles": split["lean_verify_edit"] + split["lean_verify"],
                                    "compile_split": split})
                 break
+            else:
+                # No legal submission: a session stopped at its turn, token or cost cap submitted
+                # nothing, and that is what a matcher must see -- an empty list, marked. The PR is in
+                # the task id (`pr5solo_<repo>_<pr>_round1_<sha>`). Seen first on the high-effort
+                # runs, 10 of 32 sessions (2026-09-30).
+                outcome = json.loads((task_dir / "task_outcome.json").read_text())
+                m = re.search(r"mathlib4_(\d+)_round", outcome["task_id"])
+                statuses = [str(getattr(s.current_attempt, "status", "")) for s in samples.values()
+                            if s.current_attempt is not None]
+                if m and statuses:
+                    out[int(m.group(1))] = ([], {"findings": 0, "compiles": None,
+                                                 "capped": statuses[0].split(".")[-1].lower()})
         return out
 
     return asyncio.run(load())
