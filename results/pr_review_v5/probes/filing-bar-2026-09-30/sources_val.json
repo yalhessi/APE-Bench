@@ -1,0 +1,6 @@
+{"X1": {"kind": "claude"}, "X2": {"kind": "claude"},
+ "Grc1": {"kind": "solo", "run": "probe_val_small12_gpt52_Grc_rep1"},
+ "Va": {"kind": "solo", "run": "probe_val_small12_gpt54_Grc_rep1"},
+ "Vb": {"kind": "solo", "run": "probe_val_small12_gpt55_Grc_rep1"},
+ "Va_bar": {"kind": "solo", "run": "probe_val_small12_gpt54_Grc_bar_rep1"},
+ "Vb_bar": {"kind": "solo", "run": "probe_val_small12_gpt55_Grc_bar_rep1"}}
