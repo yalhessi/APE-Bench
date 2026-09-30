@@ -215,6 +215,13 @@ Replicating gpt-5.4 and 5.5 unchanged is not run: it would re-measure a known de
 validation (−0.033 and 0.000); the in-sample post-cutoff gain was one PR. The newer models' deficit
 out of sample is aim, as gpt_5.2's is against Claude. Phase 3 waits on Phase 1's table.
 
+**Phase 1 result (same day, `results/pr_review_v5/probes/phase1-residual-mechanisms-2026-09-30/mechanisms.md`):**
+of the 67 residual asks, the reviewers had attended the object in 63; `never_attempted` is 4 asks
+and `verified_withheld` 2. The misses are judgement on attended objects (concluded fine 60%,
+changed differently 37%), explained mostly by `knowledge_convention` (25 asks) and
+`try_it_not_tried` (19). **Phase 2 is not funded** (coverage is not a top mechanism). **Next is
+Phase 3.2, try-it**, then 3.3, conventions, with the `naming_norm` prefix defect fixed first.
+
 ## 8. Execution
 
 - A fresh session in a new worktree. `pipeline-overfit-review` (167 commits past `develop`, suite

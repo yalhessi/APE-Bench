@@ -463,6 +463,14 @@ verified edits from 9 and 8 to 4 and 6 and nearly doubled gpt-5.5's findings. Th
 2-4x the edits gpt_5.2 does and reach fewer asks: their validation deficit is aim, not filing.
 gpt_5.2 carried stays the reference gpt reviewer (0.267, $5.60).
 
+**Phase 1, the residual asks by mechanism (2026-09-30; `phase1-residual-mechanisms-2026-09-30/mechanisms.md`).**
+Two blind readers, 141 pairs, no disjoint label set. Of 67 residual asks: the object was attended
+in 63 (`never_attempted` 4), withheld after verifying 2; the misses are judgement, concluded fine
+(40 asks) or changed differently (25), explained by `knowledge_convention` (25: `to_fun`, `mk_iff`,
+`grind` tags, `_left`/`_right`, namespace short names, `naming_norm` misleading on d0045) and
+`try_it_not_tried` (19: `positivity`, `gcongr`, `simpa`, "does the old proof work"). Same shape for
+Claude and gpt. Phase 2 not funded; Phase 3.2 (try-it) next, then 3.3 (conventions).
+
 **Why gpt-5.4 and gpt-5.5 reach less than gpt_5.2 (2026-09-30, read by hand, about $0.90;
 `results/pr_review_v5/probes/model-inspection-2026-09-30/`).**
 - **They verify more and file less.** Against gpt_5.2: 10 compiled edits each against 7, and 6
