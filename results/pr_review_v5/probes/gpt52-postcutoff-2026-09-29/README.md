@@ -481,3 +481,27 @@ The run names `probe_postcutoff_gpt5{4,5}_Gr_rep1` are spent, with no sessions.
 
 Test (e) is therefore the reasoning-off half. The seal is X1, X2, Ga1, Ga2, Gb1, Gb2 and gpt-5.2's
 Gr1, seven reviewers, with the same rule per condition.
+
+**Result (2026-09-30).** Two new blind matchers, audited clean, agreeing on all 112 cells
+(`match_models/`, `unblinded_models.json`).
+
+| reviewer (reasoning off unless stated) | reach, 16 asks | `q = reach / X` | findings a PR | billed a run |
+|---|---|---|---|---|
+| Claude (X1, X2) | 0.47 | 1.00 | 4.1 | — |
+| `gpt-5.5` (Gb1, Gb2) | 0.22 | 0.47 | 0.9 | $0.79 |
+| `gpt-5.2`, high effort (Gr1, anchor) | 0.31 | 0.67 | 1.8 | $14.84 |
+| `gpt-5.2` (test (b), other matchers) | 0.125 | 0.27 | 1.9 | $0.30 |
+| `gpt-5.4` (Ga1, Ga2) | 0.06 | 0.13 | 0.75 | $0.43 |
+
+- **By the rule, the gap remains for both newer models with reasoning off:** gpt-5.5 at `q = 0.47`,
+  just under the 0.5 line, and gpt-5.4 at 0.13.
+- **gpt-5.5 without reasoning is better than gpt-5.2 without it**, at about 0.22 against 0.125. It
+  reached the `NeBot` case split and the `_anti` rename, which before only one Claude session had
+  reached, and the two surface asks. It is still below gpt-5.2 at high effort.
+- **gpt-5.4 without reasoning is the weakest reviewer measured,** reaching only the title's missing word.
+- **Both newer models file under one finding a PR,** against Claude's four. Much of the gap is
+  reviewers that say little.
+- The anchor reproduces its earlier matching exactly (0.3125), so these matchers score like the last.
+
+**Not measured:** gpt-5.4 and gpt-5.5 at high effort, which needs a Responses-API provider (see the
+amendment above).

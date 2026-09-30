@@ -302,3 +302,9 @@ Running high effort on the newer models needs an OpenAI Responses-API provider i
 tools, function-call items, and reasoning items carried between turns. That is a framework build, and
 it changes the condition. Responses keeps a turn's reasoning available to the next, which Chat
 Completions discards, so gpt-5.2's high-effort runs would not be a like-for-like comparison.
+
+**Test (e)'s result, reasoning off (post-cutoff, 16 asks, two matchers agreeing 112/112):** gpt-5.5
+reaches 0.22 (`q = 0.47`), gpt-5.4 0.06 (0.13), gpt-5.2 0.125 (0.27, test (b)), and gpt-5.2 at high
+effort 0.31 (0.67), against Claude's 0.47. With reasoning off the gap remains for every gpt model,
+gpt-5.5 closest; gpt-5.4 is the weakest reviewer measured. Both newer models file under one finding
+a PR, against Claude's four. Their high-effort half waits on a Responses-API provider.
