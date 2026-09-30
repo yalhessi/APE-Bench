@@ -83,8 +83,9 @@ S3-backed remote artifact store with bundle acceleration, and the PR-head cache 
 
 **Outstanding**
 
-- `gpt_5.4` pricing in `MODEL_MAPPINGS` is a placeholder copied from `gpt_5.2`. It affects
-  reported `cost_usd` only, never behaviour, and is flagged in the mapping.
+- `gpt_5.4` and `gpt_5.5` carry OpenAI's published rates (read 2026-09-30); `gpt_5.4`'s had been a
+  placeholder copied from `gpt_5.2`. `gpt_5.2`'s own cached-input rate is gpt-5's ($0.125 against
+  $0.175) and is kept so recorded figures reproduce (`docs/todo/framework-defects-2026-09.md`).
 - The `prompt_inclusive` cost model is the default on the strength of this project's own
   logs, not a vendor invoice. If a bill disagrees,
   `llm_config.cost_model=prompt_exclusive` reproduces every historical figure exactly.

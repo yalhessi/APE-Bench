@@ -188,3 +188,12 @@ plans can therefore have shown their arms different tool text. The fix is a `too
 per arm over the rendered JSON schemas of the tools its task registers, sealed beside
 `tools_sha256`; it moves every plan's identity once, so it lands at a run boundary with its own
 dated reason.
+
+## gpt_5.2's cached-input rate is gpt-5's (found 2026-09-30)
+
+`MODEL_MAPPINGS["gpt_5.2"]` prices cached input at $0.125 per 1M. OpenAI's pricing page gives $0.175
+(read 2026-09-30); $0.125 is gpt-5's rate. So every gpt_5.2 billed figure in the record understates
+cached input by $0.05 per 1M. That is a few percent of a run: cached input is most of the prompt
+tokens, and the whole billed cost is mostly output. It is not fixed in place, because
+`tests/datasets/test_cost_model.py` reproduces the record's figures exactly at $0.125. A fix needs a
+dated price history, so an old figure keeps its rate and a new run gets the real one.
