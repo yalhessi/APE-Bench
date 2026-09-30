@@ -1,0 +1,1383 @@
+{
+ "method": "Traces from SP/sessions.pkl (extract.py); metrics.py, memloss.py, phantom.py, last25.py. 'near' repeat = same file with overlapping read range, or search whose identifier-token set is a subset/superset of an earlier one, or declaration_search of the same name, or #check subset. Phantom = declaration_search 'before this PR' hit whose file does not declare <Prefix>.<leaf> (approximate check against a base snapshot; exact sha where known). follow = later read/grep/goto/hover of a phantom file. Turn classes (last 25): construct > phantom_follow > repeat > tool_error > new_lookup, first match wins. follow counts are an upper bound: a phantom file can also be read for a legitimate reason (e.g. 33285's LinearIsometry.lean is a changed file; 34935's T74-79).",
+ "sessions": [
+  {
+   "pr": 42814,
+   "set": "postcutoff",
+   "run": "probe_postcutoff_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "5 files, 23 changed objects",
+   "turns": 80,
+   "calls": 149,
+   "calls_per_turn": 1.86,
+   "calls_per_turn_by_quarter": [
+    2.85,
+    1.85,
+    1.45,
+    1.3
+   ],
+   "phases": [
+    "T1-2: read all 4 changed files, declaration_search on every new name, as-is compile of each file",
+    "T3-35: duplicate hunt for the new coprimality lemmas; declaration_search puts `Odd.isCoprime` in FieldTheory/Separable.lean and PrincipalIdealDomain.lean and `IsCoprime.dvd_mul_left/right` in Algebra/Divisibility/{Basic,Units}.lean (leaf-only matches: `Separable.isCoprime`, root `dvd_mul_left`); greps of those files return 0",
+    "T36-58: squarefree API (Int.squarefree_natAbs, Nat.squarefree_iff_prime_squarefree), natAbs lemmas, re-greps of the same phantom files",
+    "T59-80: same phantom greps again (T60, T70-73, T77 twice in one turn), Int.mul_ediv_cancel_left lookups (T65, T69 identical 'No declaration' twice), no edits"
+   ],
+   "last25_pattern": "Re-verifying phantom duplicates and repeating lookups: 8 turns follow phantom hits, 9 are pure repeats, 8 touch something new; zero edits all session.",
+   "last25_turn_classes": {
+    "phantom_follow": 8,
+    "new_lookup": 8,
+    "repeat": 9
+   },
+   "repeats": {
+    "exact_repeat_calls": 23,
+    "exact_repeats_of_negative_answers": 8,
+    "last25_calls": 40,
+    "last25_exact": 13,
+    "last25_near": 16,
+    "last25_new": 11,
+    "examples_repeat_of_negative": [
+     [
+      7,
+      12,
+      "content_search",
+      "{\"path\": \"target/Mathlib/FieldTheory/Separable.lean\", \"content_pattern\": \"Odd\\\\.isCoprime\""
+     ],
+     [
+      7,
+      12,
+      "content_search",
+      "{\"path\": \"target/Mathlib/RingTheory/PrincipalIdealDomain.lean\", \"content_pattern\": \"Odd\\\\."
+     ],
+     [
+      46,
+      48,
+      "declaration_search",
+      "{\"identifier\": \"Int.coe_natAbs\"}"
+     ],
+     [
+      65,
+      69,
+      "declaration_search",
+      "{\"identifier\": \"Int.mul_ediv_cancel_left\"}"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 19,
+    "phantom_files": 21,
+    "follow_calls": 48,
+    "turns_with_follow": 24,
+    "snapshot_exact": false,
+    "sample_queries": [
+     "Int.squarefree_iff",
+     "IsCoprime.dvd_mul",
+     "IsCoprime.dvd_mul_left",
+     "IsCoprime.dvd_mul_right",
+     "IsCoprime.mul_left_cancel"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 4,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "medium",
+     "what": "`Odd.isCoprime_two` (new, general R) overlaps the existing @[simp] `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m` in RingTheory/Int/Basic.lean; in context since T2 (content_search isCoprime_two), never pursued"
+    },
+    {
+     "strength": "weak",
+     "what": "`Int.squarefree_iff_prime_sq_not_dvd` derivable from `Int.squarefree_natAbs` + the Nat lemma (T36-38, T52-56); unverified"
+    },
+    {
+     "strength": "risk",
+     "what": "phantom duplicates (`Odd.isCoprime` in Separable.lean, `IsCoprime.dvd_mul_left` in Divisibility/Basic.lean) would have been filed as false duplication findings"
+    }
+   ],
+   "dev_asks": [],
+   "context_end": {
+    "prompt_tokens_first": 12468,
+    "prompt_tokens_last": 103429,
+    "processed_tokens_total": 5441215,
+    "processed_after_turn40": 3651804,
+    "reasoning_first10": 11092,
+    "reasoning_last10": 20637,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 5,
+    "zero_reasoning_frac_session": 0.46,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1000,
+      "zero_r": 2,
+      "calls_per_turn": 2.85
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 490,
+      "zero_r": 12,
+      "calls_per_turn": 1.85
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 763,
+      "zero_r": 13,
+      "calls_per_turn": 1.45
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 1460,
+      "zero_r": 10,
+      "calls_per_turn": 1.3
+     }
+    ]
+   },
+   "notes": "No dev asks: post-cutoff PR."
+  },
+  {
+   "pr": 26185,
+   "set": "val_small12",
+   "run": "probe_val_small12_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "5 files, 11 changed objects (Peano curve counterexample)",
+   "turns": 80,
+   "calls": 143,
+   "calls_per_turn": 1.79,
+   "calls_per_turn_by_quarter": [
+    2.45,
+    2.15,
+    1.15,
+    1.4
+   ],
+   "phases": [
+    "T1-2: read the changed files, declaration_search, as-is compile of all 5 files",
+    "T3-24: where does `unitInterval.instTietzeExtension` live? declaration_search also lists Topology/TietzeExtension.lean (leaf-only); ~15 greps of that file for the instance, 0 hits",
+    "T25-50: coe_restrict usage, Set.SurjOn.mono (T7, T29, T30 identical), import graph of Topology.UnitInterval over ~10 files",
+    "T51-80: reading other Counterexamples headers and more import sweeps; Set.SurjOn.mono signature re-checked (T74, T76, T77); namespace Counterexample check (T72-75)"
+   ],
+   "last25_pattern": "Import-graph sweeps and re-checks: 11 of 25 turns are repeats (Set.SurjOn.mono signature for the 4th-6th time, the same 'imports UnitInterval?' grep over new files), 12 new-but-peripheral file reads.",
+   "last25_turn_classes": {
+    "repeat": 11,
+    "new_lookup": 12,
+    "phantom_follow": 1,
+    "tool_error": 1
+   },
+   "repeats": {
+    "exact_repeat_calls": 2,
+    "exact_repeats_of_negative_answers": 2,
+    "last25_calls": 33,
+    "last25_exact": 1,
+    "last25_near": 19,
+    "last25_new": 13,
+    "examples_repeat_of_negative": [
+     [
+      28,
+      34,
+      "content_search",
+      "{\"path\": \"target/Mathlib\", \"content_pattern\": \"instTietzeExtension.*Icc|TietzeExtension.*I"
+     ],
+     [
+      36,
+      60,
+      "declaration_search",
+      "{\"identifier\": \"cantorSetHomeomorphNatToBool\", \"limit\": 5}"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 4,
+    "phantom_files": 15,
+    "follow_calls": 28,
+    "turns_with_follow": 16,
+    "snapshot_exact": true,
+    "sample_queries": [
+     "Set.SurjOn.mono",
+     "unitInterval.instTietzeExtension",
+     "unitInterval.instTopologicalSpace"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 5,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "medium",
+     "what": "Counterexamples/PeanoCurve.lean opens no `namespace Counterexample`, unlike MapFloor, SorgenfreyLine, Girard, DirectSumIsInternal, Pseudoelement (established T72-75, at the cap)"
+    },
+    {
+     "strength": "weak",
+     "what": "scope/import cost of moving `unitInterval.instTietzeExtension` (T31-T70 import sweeps, unresolved)"
+    },
+    {
+     "strength": "weak",
+     "what": "`Set.SurjOn.mono` signature verified (T76-77) for an unstated golf in PeanoCurve; nothing constructed"
+    }
+   ],
+   "dev_asks": [],
+   "context_end": {
+    "prompt_tokens_first": 7879,
+    "prompt_tokens_last": 76834,
+    "processed_tokens_total": 4237058,
+    "processed_after_turn40": 2781630,
+    "reasoning_first10": 27725,
+    "reasoning_last10": 35880,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 4,
+    "zero_reasoning_frac_session": 0.2,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 2593,
+      "zero_r": 1,
+      "calls_per_turn": 2.45
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 4225,
+      "zero_r": 4,
+      "calls_per_turn": 2.15
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 4308,
+      "zero_r": 7,
+      "calls_per_turn": 1.15
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 4510,
+      "zero_r": 4,
+      "calls_per_turn": 1.4
+     }
+    ]
+   },
+   "notes": "No dev asks: validation PR."
+  },
+  {
+   "pr": 32080,
+   "set": "val_small12",
+   "run": "probe_val_small12_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "3 files, 15 changed objects",
+   "turns": 80,
+   "calls": 146,
+   "calls_per_turn": 1.82,
+   "calls_per_turn_by_quarter": [
+    2.7,
+    1.3,
+    1.75,
+    1.55
+   ],
+   "phases": [
+    "T1-3: read, declaration_search of new names, as-is compile",
+    "T2-16: `SetRel.IsRefl.comp` reported as declared before the PR in Algebra/AddConstMap/Basic.lean, Algebra/Algebra/Hom.lean, aesop and plausible packages (leaf `comp`); greps those files for IsRefl.comp / namespace SetRel",
+    "T19-38: is there already a `UniformSpace -> CompletelyRegularSpace` instance? declaration_search says CompletelyRegular.lean; #synth fails (T35), #check unknown (T36): resolved negative, then re-asked (T46, T62)",
+    "T39-80: zulip, naming_norm (all insufficient), Stone-Cech proof re-derivation by #check (T52, T66-T71, T76, T78), SetRel phantom sweeps again (T42, T55, T74, T75), new phantom `SetRel.IsSymm.comp` at T79"
+   ],
+   "last25_pattern": "Mixed: a failed attempt to re-derive the main proof via #check probes, plus the 5th and 6th sweep of the same phantom files; 11 exact repeats of calls whose earlier answer was negative over the session.",
+   "last25_turn_classes": {
+    "new_lookup": 14,
+    "repeat": 8,
+    "tool_error": 1,
+    "phantom_follow": 2
+   },
+   "repeats": {
+    "exact_repeat_calls": 16,
+    "exact_repeats_of_negative_answers": 11,
+    "last25_calls": 41,
+    "last25_exact": 5,
+    "last25_near": 17,
+    "last25_new": 19,
+    "examples_repeat_of_negative": [
+     [
+      8,
+      16,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Algebra/Algebra/Hom.lean\", \"content_pattern\": \"IsRefl\\\\.comp\", \"u"
+     ],
+     [
+      16,
+      53,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Algebra/AddConstMap/Basic.lean\", \"content_pattern\": \"IsRefl\\\\.com"
+     ],
+     [
+      42,
+      55,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Algebra/AddConstMap/Basic.lean\", \"content_pattern\": \"namespace\\\\s"
+     ],
+     [
+      42,
+      55,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Algebra/Algebra/Hom.lean\", \"content_pattern\": \"namespace\\\\s+SetRe"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 8,
+    "phantom_files": 17,
+    "follow_calls": 45,
+    "turns_with_follow": 20,
+    "snapshot_exact": true,
+    "sample_queries": [
+     "IsRefl.comp",
+     "SetRel.IsRefl.comp",
+     "SetRel.IsSymm.comp",
+     "StoneCech.instUniformSpace",
+     "UniformSpace.completelyRegularSpace"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 3,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "medium",
+     "what": "a top-level one-letter `def P` added in Uniformizable.lean (PR model lists `P` as added); touched once at T44"
+    },
+    {
+     "strength": "weak",
+     "what": "shorter proof of `CompletelyRegularSpace.exists_uniformSpace` via `uniformSpaceOfCompactR1.comap stoneCechUnit` and `isInducing_stoneCechUnit.eq_induced` (T52, T66-71); the one attempt failed (T70)"
+    },
+    {
+     "strength": "weak",
+     "what": "`SetRel.IsRefl.comp` should be an instance / lacks IsSymm/IsTrans siblings (T58-59)"
+    }
+   ],
+   "dev_asks": [],
+   "context_end": {
+    "prompt_tokens_first": 10114,
+    "prompt_tokens_last": 70764,
+    "processed_tokens_total": 3739715,
+    "processed_after_turn40": 2459738,
+    "reasoning_first10": 13507,
+    "reasoning_last10": 36331,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 3,
+    "zero_reasoning_frac_session": 0.33,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1137,
+      "zero_r": 2,
+      "calls_per_turn": 2.7
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 358,
+      "zero_r": 8,
+      "calls_per_turn": 1.3
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 1389,
+      "zero_r": 8,
+      "calls_per_turn": 1.75
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 2781,
+      "zero_r": 8,
+      "calls_per_turn": 1.55
+     }
+    ]
+   },
+   "notes": "No dev asks: validation PR."
+  },
+  {
+   "pr": 34935,
+   "set": "val_small12",
+   "run": "probe_val_small12_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "2 files, 34 changed objects (semiring structure on ideal sheaves)",
+   "turns": 80,
+   "calls": 123,
+   "calls_per_turn": 1.54,
+   "calls_per_turn_by_quarter": [
+    2.25,
+    1.3,
+    1.5,
+    1.1
+   ],
+   "phases": [
+    "T1-3: read, declaration_search on new names, as-is compile",
+    "T2-30: `AlgebraicGeometry.Scheme.zeroLocus_mul` reported as declared before the PR in RingTheory/Spectrum/Prime/Basic.lean (it is `PrimeSpectrum.zeroLocus_mul`); ~17 turns of greps/#checks for namespaces, aliases and exports in that file",
+    "T31-60: Closeds lattice instances, IdemCommSemiring/Kleene, IsOrderedRing / CanonicallyOrderedAdd instance hunt",
+    "T61-80: [simps] precedent for ≃+*o (T62-66), phantom revisits (T69-70, T72-73), 6 consecutive single-grep zero-reasoning turns on Ideal/Operations.lean (T74-79)"
+   ],
+   "last25_pattern": "Instance hunt by regex variation (T74-79: six single-grep turns on Ideal/Operations.lean, zero reasoning; counted as phantom_follow by the heuristic only because that file was also a phantom hit) plus the phantom `zeroLocus_mul` (T69-70); 14 of the last 20 turns have zero reasoning tokens.",
+   "last25_turn_classes": {
+    "new_lookup": 12,
+    "repeat": 4,
+    "phantom_follow": 8,
+    "tool_error": 1
+   },
+   "repeats": {
+    "exact_repeat_calls": 2,
+    "exact_repeats_of_negative_answers": 1,
+    "last25_calls": 29,
+    "last25_exact": 1,
+    "last25_near": 12,
+    "last25_new": 16,
+    "examples_repeat_of_negative": [
+     [
+      58,
+      59,
+      "content_search",
+      "{\"path\": \"target/Mathlib/AlgebraicGeometry/IdealSheaf/Basic.lean\", \"content_pattern\": \"Can"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 18,
+    "phantom_files": 47,
+    "follow_calls": 29,
+    "turns_with_follow": 22,
+    "snapshot_exact": false,
+    "sample_queries": [
+     "AlgebraicGeometry.Scheme.zeroLocus_mul",
+     "CanonicallyOrderedAdd.toIsOrderedRing",
+     "Ideal.mul_add",
+     "Ideal.mul_iSup",
+     "Ideal.mul_sup"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 2,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "weak",
+     "what": "hand-written `equivOfIsAffine_apply`/`_symm_apply` vs `@[simps]` (T62-66); no precedent found"
+    },
+    {
+     "strength": "weak",
+     "what": "missing `IsOrderedRing`/`CanonicallyOrderedAdd` instances for IdealSheafData by analogy with Ideal (T41-44, T54-59, T74-80); the deciding #synth was the call cut off by the cap"
+    },
+    {
+     "strength": "risk",
+     "what": "phantom 'Scheme.zeroLocus_mul already exists in the PrimeSpectrum file' would have been filed as a false duplicate"
+    }
+   ],
+   "dev_asks": [],
+   "context_end": {
+    "prompt_tokens_first": 14256,
+    "prompt_tokens_last": 59960,
+    "processed_tokens_total": 3601182,
+    "processed_after_turn40": 2182632,
+    "reasoning_first10": 13181,
+    "reasoning_last10": 12864,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 8,
+    "zero_reasoning_frac_session": 0.39,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1148,
+      "zero_r": 1,
+      "calls_per_turn": 2.25
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 1690,
+      "zero_r": 6,
+      "calls_per_turn": 1.3
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 1976,
+      "zero_r": 10,
+      "calls_per_turn": 1.5
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 2213,
+      "zero_r": 14,
+      "calls_per_turn": 1.1
+     }
+    ]
+   },
+   "notes": "No dev asks: validation PR."
+  },
+  {
+   "pr": 33066,
+   "set": "dev",
+   "run": "probe_dev_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "4 files, 35 changed objects",
+   "turns": 80,
+   "calls": 138,
+   "calls_per_turn": 1.73,
+   "calls_per_turn_by_quarter": [
+    2.75,
+    1.6,
+    1.4,
+    1.15
+   ],
+   "phases": [
+    "T1: read the 4 changed files (the diff's docstrings and have-names are all in view here)",
+    "T2-21: `ContinuousAlgEquiv.ofAlgEquiv` reported as declared before the PR in StarAlgHom.lean, AdicCompletion/Algebra.lean, Bialgebra/Equiv.lean, Extension/*.lean (leaf `ofAlgEquiv`); reads and greps of each, 0 hits",
+    "T22-59: one call per turn: conjContinuousAlgEquiv (a real sibling, StrongTopology.lean), ofSubsingleton, instOrderIsoClass, smul/smulRight (more leaf phantoms), grind/inv_mul_cancel₀",
+    "T60-80: 5-file phantom sweep again (T60 = T32), continuous_symm hunt (T64-70), Zero-instance greps (T72 = T22), 7 declaration_searches (T73-79)"
+   ],
+   "last25_pattern": "One call per turn, 18 of the last 25 turns with zero reasoning; lookups on scattered names (17 'new' by the heuristic, mostly one-off declaration_search), a repeat of the T32 phantom sweep; no edit in 80 turns.",
+   "last25_turn_classes": {
+    "repeat": 5,
+    "new_lookup": 17,
+    "phantom_follow": 3
+   },
+   "repeats": {
+    "exact_repeat_calls": 5,
+    "exact_repeats_of_negative_answers": 1,
+    "last25_calls": 32,
+    "last25_exact": 1,
+    "last25_near": 14,
+    "last25_new": 17,
+    "examples_repeat_of_negative": [
+     [
+      5,
+      32,
+      "content_search",
+      "{\"path\": \"target/Mathlib/RingTheory/Extension/Generators.lean\", \"content_pattern\": \"namesp"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 14,
+    "phantom_files": 46,
+    "follow_calls": 45,
+    "turns_with_follow": 20,
+    "snapshot_exact": false,
+    "sample_queries": [
+     "AdicCompletion.ofAlgEquiv",
+     "AlgEquiv.toLinearEquiv",
+     "ContinuousAlgEquiv.isUniformEmbedding",
+     "ContinuousAlgEquiv.mk",
+     "ContinuousAlgEquiv.ofAlgEquiv"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 4,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "weak",
+     "what": "`LinearIsometryEquiv.conjStarAlgEquiv` parallels the existing `ContinuousLinearEquiv.conjContinuousAlgEquiv` (T23-26, T45, T79); no request formed"
+    },
+    {
+     "strength": "weak",
+     "what": "the PR's `instOrderIsoClass` instance vs the one in Algebra/Order/Star/Basic.lean (T48-53)"
+    },
+    {
+     "strength": "risk",
+     "what": "phantom `ContinuousAlgEquiv.ofAlgEquiv` duplicates in 5 unrelated files"
+    }
+   ],
+   "dev_asks": [
+    {
+     "ask_id": "d0001",
+     "ask": "docstring: 'isometry linear equivalence' -> 'isometric linear equivalence'",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "docstring read at T1 and in the diff; no call targets wording"
+    },
+    {
+     "ask_id": "d0006",
+     "ask": "rename the `have`s (this, thisα, ...) in the ContinuousAlgEquiv proof",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "proof read at T1; no call on have-names"
+    },
+    {
+     "ask_id": "d0007",
+     "ask": "import increase / split the Hilbert-space part into a leaf file",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "the import change is in the diff; no import-related call in 80 turns"
+    }
+   ],
+   "context_end": {
+    "prompt_tokens_first": 20631,
+    "prompt_tokens_last": 109262,
+    "processed_tokens_total": 6758677,
+    "processed_after_turn40": 4047479,
+    "reasoning_first10": 11737,
+    "reasoning_last10": 4932,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 8,
+    "zero_reasoning_frac_session": 0.55,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1178,
+      "zero_r": 2,
+      "calls_per_turn": 2.75
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 926,
+      "zero_r": 11,
+      "calls_per_turn": 1.6
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 643,
+      "zero_r": 17,
+      "calls_per_turn": 1.4
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 661,
+      "zero_r": 14,
+      "calls_per_turn": 1.15
+     }
+    ]
+   },
+   "notes": ""
+  },
+  {
+   "pr": 33145,
+   "set": "dev",
+   "run": "probe_dev_gpt52_Gr_rep1",
+   "ended_by": "token_limit (7.2M processed) at turn 76",
+   "pr_shape": "1 file, 6 theorems (smallest PR in the capped set)",
+   "turns": 76,
+   "calls": 221,
+   "calls_per_turn": 2.91,
+   "calls_per_turn_by_quarter": [
+    4.42,
+    2.32,
+    2.47,
+    2.42
+   ],
+   "phases": [
+    "T1: read IsLUB.lean, declaration_search each new name. Result: `Dense.continuous_sup`/`continuous_inf` 'declared in Mathlib/Topology/Order/Lattice.lean (before this PR)', which is the unrelated root `continuous_sup` (x ⊔ y continuity)",
+    "T2-24: hunting `Dense.continuous_sup` in Lattice.lean: over the session 58 calls on that file in 21 turns (21 reads, 11 of them of its tail at different offsets; 37 greps, 34 with 0 matches)",
+    "T23-44: `Set.Dense` (also a phantom, T28-35 on Closure.lean), #check probes; T26 shows `Dense.continuous_sup` is unknown when only Lattice is imported, which does not end the hunt",
+    "T45-63: naming_norm on all 6 (upper/lowerBounds: established, candidate `Dense.upperBounds_image`); ciSup/csSup name probes",
+    "T64-76: Lattice.lean tail reread (T64, T70, T74), 2 verified edits (T65, T73), ciSup regex sweeps"
+   ],
+   "last25_pattern": "Still on the phantom: declaration_search `Dense.continuous_sup` for the 4th time (T53), Lattice.lean tail read for the 9th-11th time; #check probes of ciSup/csSup names; 2 verified edits. 10 exact repeats of calls whose earlier answer was negative.",
+   "last25_turn_classes": {
+    "new_lookup": 9,
+    "repeat": 9,
+    "phantom_follow": 4,
+    "construct": 2,
+    "tool_error": 1
+   },
+   "repeats": {
+    "exact_repeat_calls": 19,
+    "exact_repeats_of_negative_answers": 10,
+    "last25_calls": 63,
+    "last25_exact": 7,
+    "last25_near": 33,
+    "last25_new": 23,
+    "examples_repeat_of_negative": [
+     [
+      4,
+      4,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Topology/Order/Lattice.lean\", \"content_pattern\": \"Dense\\\\.continu"
+     ],
+     [
+      3,
+      10,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Topology/Order/Lattice.lean\", \"content_pattern\": \"Dense\\\\.continu"
+     ],
+     [
+      8,
+      18,
+      "content_search",
+      "{\"path\": \"target/Mathlib\", \"content_pattern\": \"Set\\\\.Dense\\\\.continuous_sup\", \"use_regex\":"
+     ],
+     [
+      6,
+      22,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Topology/Order/Lattice.lean\", \"content_pattern\": \"namespace Dense"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 13,
+    "phantom_files": 15,
+    "follow_calls": 76,
+    "turns_with_follow": 29,
+    "snapshot_exact": true,
+    "sample_queries": [
+     "BddAbove.range",
+     "Dense.continuous_inf",
+     "Dense.continuous_inf'",
+     "Dense.continuous_sup",
+     "Dense.continuous_sup'"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 1,
+    "edit_attempts": 2,
+    "compiled": 2
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "strong",
+     "what": "rename `Dense.continuous_upperBounds` -> `Dense.upperBounds_image` and `Dense.continuous_lowerBounds` -> `Dense.lowerBounds_image` (naming_norm T45: established 27/27 and 25/25, names supplied; T47/T57 confirm the names are free)"
+    },
+    {
+     "strength": "medium",
+     "what": "T73 verified `Dense.continuous_sup` with `by grind` replaced by `h.mono (Set.image_subset_range f S)`"
+    },
+    {
+     "strength": "medium",
+     "what": "T65 verified an alternative `upperBounds_mono_set`+closure proof of continuous_upperBounds (compiles; not shorter)"
+    },
+    {
+     "strength": "risk",
+     "what": "the phantom 'already declared in Lattice.lean' would likely have been filed as a name-clash/duplicate claim (G2 filed exactly that and got 'partial' on d0022/d0023)"
+    }
+   ],
+   "dev_asks": [
+    {
+     "ask_id": "d0019",
+     "ask": "rename to Dense.upperBounds_image",
+     "class": "EXAMINED",
+     "would_file": "likely",
+     "why": "naming_norm verdict established with this exact candidate name (T45)"
+    },
+    {
+     "ask_id": "d0020",
+     "ask": "rename to Dense.lowerBounds_image",
+     "class": "EXAMINED",
+     "would_file": "likely",
+     "why": "same (T45)"
+    },
+    {
+     "ask_id": "d0021",
+     "ask": "prove lowerBounds version via OrderDual",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "the `(α := αᵒᵈ)` pattern is in the file (Dense.isGLB_inter_iff, read T1); no call mentions OrderDual/ᵒᵈ"
+    },
+    {
+     "ask_id": "d0022",
+     "ask": "rename continuous_sup -> Dense.ciSup",
+     "class": "EXAMINED",
+     "would_file": "partial at best",
+     "why": "ciSup name probes T51-61; naming_norm insufficient; the phantom points to a 'name clash' framing"
+    },
+    {
+     "ask_id": "d0023",
+     "ask": "rename continuous_inf -> Dense.ciInf",
+     "class": "EXAMINED",
+     "would_file": "partial at best",
+     "why": "as d0022"
+    },
+    {
+     "ask_id": "d0024",
+     "ask": "prove continuous_inf via OrderDual",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "no OrderDual call"
+    },
+    {
+     "ask_id": "d0025",
+     "ask": "rename continuous_sup' -> Dense.ciSup'",
+     "class": "EXAMINED",
+     "would_file": "partial at best",
+     "why": "as d0022"
+    },
+    {
+     "ask_id": "d0026",
+     "ask": "shorter continuous_sup' proof: case split on the subtype range",
+     "class": "EXAMINED",
+     "would_file": "unlikely",
+     "why": "looked up csSup_of_not_bddAbove/BddAbove range ingredients (T46, T62-63); no edit on continuous_sup'"
+    },
+    {
+     "ask_id": "d0027",
+     "ask": "rename continuous_inf' -> Dense.ciInf'",
+     "class": "EXAMINED",
+     "would_file": "partial at best",
+     "why": "as d0022"
+    },
+    {
+     "ask_id": "d0028",
+     "ask": "prove continuous_inf' via OrderDual",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "no OrderDual call"
+    }
+   ],
+   "context_end": {
+    "prompt_tokens_first": 9698,
+    "prompt_tokens_last": 135326,
+    "processed_tokens_total": 7200292,
+    "processed_after_turn40": 4402767,
+    "reasoning_first10": 10619,
+    "reasoning_last10": 48804,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 2,
+    "zero_reasoning_frac_session": 0.12,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1415,
+      "zero_r": 0,
+      "calls_per_turn": 4.25
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 1750,
+      "zero_r": 3,
+      "calls_per_turn": 2.45
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 3068,
+      "zero_r": 3,
+      "calls_per_turn": 2.2
+     },
+     {
+      "turns": "61-76",
+      "mean_reasoning": 4831,
+      "zero_r": 3,
+      "calls_per_turn": 2.69
+     }
+    ]
+   },
+   "notes": "Claude sessions on this PR: 51-57 logged calls, 10-13 lean_verify_edit each, including the OrderDual one-liners."
+  },
+  {
+   "pr": 33285,
+   "set": "dev",
+   "run": "probe_dev_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "9 files, 13 changed objects (golf + missing lemmas)",
+   "turns": 80,
+   "calls": 109,
+   "calls_per_turn": 1.36,
+   "calls_per_turn_by_quarter": [
+    2.1,
+    1.3,
+    1.05,
+    1
+   ],
+   "phases": [
+    "T1: 9 file reads + 4 declaration_search + greps (15 calls)",
+    "T2-35: `symm_prodComm` vs `prodComm_symm` naming; declaration_search reports `LinearEquiv.prodComm_symm` in Diffeomorph.lean, AffineEquiv.lean, Logic/Equiv/Prod.lean (leaf); ~15 turns of greps for namespaces in Prod.lean / LinearIsometry.lean",
+    "T36-48: inf_comap_le_comap_add, isComplete_image_iff, antilipschitz, equivRange lookups",
+    "T49-55: construction burst: 7 lean_verify_edit, 6 compile",
+    "T56-80: prodComm naming re-litigated (T58-62, T65-67, T70, T76, T79), lean_verify examples that fail on binder setup (T64, T69, T80), failed rename edit (T63), verified submoduleMap edit (T78)"
+   ],
+   "last25_pattern": "Back to an already-settled naming question (prodComm_symm, checked since T1) plus failing scratch examples; 8 repeats, 5 phantom-follow turns, 2 edits.",
+   "last25_turn_classes": {
+    "repeat": 8,
+    "phantom_follow": 5,
+    "new_lookup": 9,
+    "construct": 2,
+    "tool_error": 1
+   },
+   "repeats": {
+    "exact_repeat_calls": 8,
+    "exact_repeats_of_negative_answers": 6,
+    "last25_calls": 25,
+    "last25_exact": 2,
+    "last25_near": 8,
+    "last25_new": 15,
+    "examples_repeat_of_negative": [
+     [
+      14,
+      25,
+      "content_search",
+      "{\"path\": \"target/Mathlib/LinearAlgebra/Prod.lean\", \"content_pattern\": \"namespace LinearIso"
+     ],
+     [
+      26,
+      28,
+      "content_search",
+      "{\"path\": \"target/Mathlib\", \"content_pattern\": \"LinearEquiv\\\\.prodComm_symm\", \"use_regex\": "
+     ],
+     [
+      14,
+      31,
+      "content_search",
+      "{\"path\": \"target/Mathlib/LinearAlgebra/Prod.lean\", \"content_pattern\": \"namespace LinearIso"
+     ],
+     [
+      16,
+      32,
+      "content_search",
+      "{\"path\": \"target/Mathlib/LinearAlgebra/Prod.lean\", \"content_pattern\": \"LinearIsometryEquiv"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 12,
+    "phantom_files": 18,
+    "follow_calls": 23,
+    "turns_with_follow": 21,
+    "snapshot_exact": true,
+    "sample_queries": [
+     "ContinuousLinearEquiv.prodComm_symm",
+     "ContinuousLinearEquiv.symm_apply_eq",
+     "LinearEquiv.prodComm",
+     "LinearEquiv.prodComm_symm",
+     "LinearEquiv.symm_prodComm"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 0,
+    "edit_attempts": 8,
+    "compiled": 6
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "strong",
+     "what": "rename `LinearEquiv.symm_prodComm` -> `prodComm_symm` to match `ContinuousLinearEquiv.prodComm_symm` (T23/T26 found it; T50 verified compile)"
+    },
+    {
+     "strength": "strong",
+     "what": "generalize `LinearIsometry.isComplete_image_iff` to `[SemilinearIsometryClass 𝓕 σ₁₂ E E₂] (f : 𝓕)` (T53 verified) with a deprecated alias for the primed version (T54 verified)"
+    },
+    {
+     "strength": "medium",
+     "what": "`ContinuousLinearEquiv.submoduleMap` built from `LinearEquiv.submoduleMap` via `__ :=` (T78 verified)"
+    },
+    {
+     "strength": "medium",
+     "what": "alternative proofs of `Submodule.IsOrtho.map` (T49) and `Matrix.rank_eq_finrank_range_toLin` (T55), both verified; not clearly shorter"
+    },
+    {
+     "strength": "weak",
+     "what": "rename `inf_comap_le_comap_add` -> `comap_inf_le_comap_add` (naming_norm established; T63 failed only because a use site kept the old name)"
+    }
+   ],
+   "dev_asks": [
+    {
+     "ask_id": "d0035",
+     "ask": "term proof `fun _ h ↦ mem_comap.mpr <| add_mem h.1 h.2`",
+     "class": "EXAMINED",
+     "would_file": "no",
+     "why": "declaration targeted (T19, T36-37, T63, T73-74), but the T63 edit keeps the PR's tactic proof verbatim and only renames"
+    },
+    {
+     "ask_id": "d0036",
+     "ask": "one-line proof of cotangentEquivIdeal_symm_apply",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "Cotangent.lean read once at T1; no later call on it"
+    }
+   ],
+   "context_end": {
+    "prompt_tokens_first": 14440,
+    "prompt_tokens_last": 77183,
+    "processed_tokens_total": 4807128,
+    "processed_after_turn40": 2845622,
+    "reasoning_first10": 21988,
+    "reasoning_last10": 44827,
+    "zero_reasoning_turns_first10": 1,
+    "zero_reasoning_turns_last10": 1,
+    "zero_reasoning_frac_session": 0.31,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1648,
+      "zero_r": 2,
+      "calls_per_turn": 2.1
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 974,
+      "zero_r": 4,
+      "calls_per_turn": 1.3
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 1080,
+      "zero_r": 15,
+      "calls_per_turn": 1.05
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 3592,
+      "zero_r": 4,
+      "calls_per_turn": 1
+     }
+    ]
+   },
+   "notes": "The only capped session with a real construction phase: 8 edit attempts, 6 compiled."
+  },
+  {
+   "pr": 33294,
+   "set": "dev",
+   "run": "probe_dev_gpt52_Gr_rep1",
+   "ended_by": "token_limit (7.2M processed) at turn 58",
+   "pr_shape": "11 files, 99 changed objects; first prompt 60.6k tokens",
+   "turns": 58,
+   "calls": 131,
+   "calls_per_turn": 2.26,
+   "calls_per_turn_by_quarter": [
+    4.57,
+    2.29,
+    1.36,
+    1
+   ],
+   "phases": [
+    "T1-2: 6 file reads, 11 as-is compile checks (every changed file)",
+    "T3-11: `Order.IsNormal.monotone` reported as declared before the PR in lpSpace.lean, SmoothTransition.lean, TranslationNumber.lean, Category/Preorder.lean... (leaf `monotone`); ~35 greps and reads of those files",
+    "T12-39: which `IsNormal` is in scope under `open Ordinal` (hover, #check, T18-T29), more phantom sweeps (T21, T24, T26, T28)",
+    "T40-58: file headers (Arithmetic, Aleph, Cofinality, NaturalOps), a toy `protected def` test (T50), deprecated aliases found at T55-57"
+   ],
+   "last25_pattern": "Namespace-resolution questions and header reading, one call per turn; 10 repeats, 3 phantom-follow; token cap reached because each turn re-sends ~140k tokens.",
+   "last25_turn_classes": {
+    "repeat": 10,
+    "new_lookup": 11,
+    "phantom_follow": 3,
+    "tool_error": 1
+   },
+   "repeats": {
+    "exact_repeat_calls": 1,
+    "exact_repeats_of_negative_answers": 0,
+    "last25_calls": 30,
+    "last25_exact": 1,
+    "last25_near": 16,
+    "last25_new": 13,
+    "examples_repeat_of_negative": []
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 4,
+    "phantom_files": 13,
+    "follow_calls": 58,
+    "turns_with_follow": 18,
+    "snapshot_exact": false,
+    "sample_queries": [
+     "Order.IsNormal",
+     "Order.IsNormal.monotone",
+     "Ordinal.mem_range_deriv"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 11,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "weak",
+     "what": "`Order.IsNormal.monotone` is `h.strictMono.monotone` (T29 #print); possible 'inline it' request"
+    },
+    {
+     "strength": "none",
+     "what": "the last three turns confirmed that deprecated aliases exist for the renamed lemmas (a negative, no finding)"
+    }
+   ],
+   "dev_asks": [
+    {
+     "ask_id": "d0039",
+     "ask": "`rw [h.map_iSup (bddAbove_of_small _)]` in enumOrd_isNormal_iff_isClosed",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "no",
+     "why": "the dot-notation form appears in the same PR's FixedPoint.lean hunks; Topology.lean touched only by the T2 as-is compile; `map_iSup` grep at T17 was in Order/IsNormal.lean"
+    }
+   ],
+   "context_end": {
+    "prompt_tokens_first": 60649,
+    "prompt_tokens_last": 144662,
+    "processed_tokens_total": 7234351,
+    "processed_after_turn40": 2553140,
+    "reasoning_first10": 36033,
+    "reasoning_last10": 16256,
+    "zero_reasoning_turns_first10": 0,
+    "zero_reasoning_turns_last10": 6,
+    "zero_reasoning_frac_session": 0.22,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 3662,
+      "zero_r": 1,
+      "calls_per_turn": 3.7
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 2585,
+      "zero_r": 3,
+      "calls_per_turn": 1.95
+     },
+     {
+      "turns": "41-58",
+      "mean_reasoning": 2420,
+      "zero_r": 9,
+      "calls_per_turn": 1
+     }
+    ]
+   },
+   "notes": "Largest diff in the set (166k chars in the first message)."
+  },
+  {
+   "pr": 33321,
+   "set": "dev",
+   "run": "probe_dev_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "6 files, 35 changed objects",
+   "turns": 80,
+   "calls": 102,
+   "calls_per_turn": 1.27,
+   "calls_per_turn_by_quarter": [
+    1.95,
+    1.15,
+    1,
+    1
+   ],
+   "phases": [
+    "T1-4: read the 5 changed files; lean_verify with file_path x5 (errors: unsupported), then as-is compiles; declaration_search x7",
+    "T5-36: one call per turn: invMonoidHom_comp_invMonoidHom and its additive twin, baseOf, algebraMap_pairingIn', closure_inv, comp_neg",
+    "T37-52: naming_norm (4x insufficient), Fintype.ofFinite, pairwise_*, the crystallographic typo search (T46)",
+    "T53-80: `negAddMonoidHom` (declaration_search refused as 'not identifier-shaped' at T49, T60, T66: the same failing call 3x), algebraMap_pairingIn' #checks, posRootForm, simp checks (T78-80)"
+   ],
+   "last25_pattern": "Scattered one-off lookups plus a loop on a question the tool cannot answer (`negAddMonoidHom` refused 3x; settled by #check only at T75).",
+   "last25_turn_classes": {
+    "new_lookup": 16,
+    "repeat": 6,
+    "tool_error": 2,
+    "phantom_follow": 1
+   },
+   "repeats": {
+    "exact_repeat_calls": 3,
+    "exact_repeats_of_negative_answers": 3,
+    "last25_calls": 25,
+    "last25_exact": 1,
+    "last25_near": 5,
+    "last25_new": 19,
+    "examples_repeat_of_negative": [
+     [
+      22,
+      32,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Algebra/Group/Hom/Basic.lean\", \"content_pattern\": \"negAddMonoidHo"
+     ],
+     [
+      29,
+      34,
+      "content_search",
+      "{\"path\": \"target/Mathlib\", \"content_pattern\": \"invMonoidHom.*invol\", \"use_regex\": true, \"l"
+     ],
+     [
+      22,
+      65,
+      "content_search",
+      "{\"path\": \"target/Mathlib/Algebra/Group/Hom/Basic.lean\", \"content_pattern\": \"negAddMonoidHo"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 3,
+    "phantom_files": 10,
+    "follow_calls": 2,
+    "turns_with_follow": 2,
+    "snapshot_exact": true,
+    "sample_queries": [
+     "MonoidHom.inv_comp",
+     "RootPairing.IsValuedIn.trans",
+     "RootPairing.algebraMap_pairingIn'"
+    ]
+   },
+   "edits": {
+    "as_is_checks": 6,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "strong",
+     "what": "typo 'crystallogrphic' in the `IsMulIndecomposable.baseOf` docstring; T46's grep returned the misspelling (l.47) next to the correct spelling (l.88)"
+    },
+    {
+     "strength": "medium",
+     "what": "`invMonoidHom_comp_invMonoidHom` closes by `ext; simp` (T78), so it could be @[simp] or proved that way"
+    },
+    {
+     "strength": "none",
+     "what": "to_additive twin `negAddMonoidHom_comp_negAddMonoidHom` exists (T75), so no 'missing additive version' finding"
+    }
+   ],
+   "dev_asks": [
+    {
+     "ask_id": "d0042",
+     "ask": "typo crystallogrphic",
+     "class": "EXAMINED",
+     "would_file": "likely",
+     "why": "T46's search surfaced both spellings side by side"
+    },
+    {
+     "ask_id": "d0043",
+     "ask": "baseOf as set-builder, not Set/predicate defeq",
+     "class": "EXAMINED",
+     "would_file": "no",
+     "why": "baseOf targeted 9 times (T4-T64: decl search, naming_norm, hover), never its body's Set-vs-predicate issue"
+    },
+    {
+     "ask_id": "d0044",
+     "ask": "'existence ultimate statement' word order in the BaseExists module doc",
+     "class": "IN_VIEW_UNTARGETED",
+     "would_file": "unlikely",
+     "why": "BaseExists.lean read in full at T1 and T15; no call on the module doc"
+    }
+   ],
+   "context_end": {
+    "prompt_tokens_first": 23305,
+    "prompt_tokens_last": 101432,
+    "processed_tokens_total": 5779736,
+    "processed_after_turn40": 3538922,
+    "reasoning_first10": 23405,
+    "reasoning_last10": 26008,
+    "zero_reasoning_turns_first10": 1,
+    "zero_reasoning_turns_last10": 3,
+    "zero_reasoning_frac_session": 0.4,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 1370,
+      "zero_r": 6,
+      "calls_per_turn": 1.95
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 1438,
+      "zero_r": 7,
+      "calls_per_turn": 1.15
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 1508,
+      "zero_r": 13,
+      "calls_per_turn": 1
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 2149,
+      "zero_r": 6,
+      "calls_per_turn": 1
+     }
+    ]
+   },
+   "notes": ""
+  },
+  {
+   "pr": 33421,
+   "set": "dev",
+   "run": "probe_dev_gpt52_Gr_rep1",
+   "ended_by": "max_turns (80)",
+   "pr_shape": "15 files, 44 changed objects (round API review)",
+   "turns": 80,
+   "calls": 138,
+   "calls_per_turn": 1.73,
+   "calls_per_turn_by_quarter": [
+    2.5,
+    1.65,
+    1.4,
+    1.35
+   ],
+   "phases": [
+    "T1-11: read Round/Floor files, declaration_search on new names, hovers",
+    "T12-30: 12 file-header reads of the import-touched files (T12), interval lemmas, continuity lemmas, naming_norm (all insufficient)",
+    "T31-63: fract/round lookups; 7 sweeps of IntervalIntegral/Basic.lean for `add_mem_I|sub_mem_I` (T30, T42-44, T53, T63, T67)",
+    "T57-61: 5 consecutive regex attempts to find `def fract` (zero reasoning)",
+    "T64-80: continuity lemma lookups, #check probes"
+   ],
+   "last25_pattern": "Regex re-sweeps of the same file for the same pattern family, and #check probes; 12 of 25 repeats, no phantom involvement, no edits.",
+   "last25_turn_classes": {
+    "new_lookup": 13,
+    "repeat": 12
+   },
+   "repeats": {
+    "exact_repeat_calls": 2,
+    "exact_repeats_of_negative_answers": 1,
+    "last25_calls": 32,
+    "last25_exact": 0,
+    "last25_near": 14,
+    "last25_new": 18,
+    "examples_repeat_of_negative": [
+     [
+      6,
+      6,
+      "declaration_search",
+      "{\"identifier\": \"continuous_intCast\"}"
+     ]
+    ]
+   },
+   "phantom": {
+    "queries_returning_leaf_only_hits": 0,
+    "phantom_files": 0,
+    "follow_calls": 0,
+    "turns_with_follow": 0,
+    "snapshot_exact": true,
+    "sample_queries": []
+   },
+   "edits": {
+    "as_is_checks": 3,
+    "edit_attempts": 0,
+    "compiled": 0
+   },
+   "thrown_away_candidates": [
+    {
+     "strength": "weak",
+     "what": "whether manual interval arithmetic in the import-touched files could use `Set.add_mem_Icc_iff_left` etc. (T20; 7 sweeps, unresolved)"
+    },
+    {
+     "strength": "weak",
+     "what": "T79 flagged the `round_eq'` rewrite in `tendsto_round_nhdsGE_pure` as suspicious; not checked"
+    }
+   ],
+   "dev_asks": [],
+   "context_end": {
+    "prompt_tokens_first": 18978,
+    "prompt_tokens_last": 99723,
+    "processed_tokens_total": 6268951,
+    "processed_after_turn40": 3830645,
+    "reasoning_first10": 21662,
+    "reasoning_last10": 55177,
+    "zero_reasoning_turns_first10": 1,
+    "zero_reasoning_turns_last10": 3,
+    "zero_reasoning_frac_session": 0.24,
+    "by_20_turns": [
+     {
+      "turns": "1-20",
+      "mean_reasoning": 3156,
+      "zero_r": 3,
+      "calls_per_turn": 2.5
+     },
+     {
+      "turns": "21-40",
+      "mean_reasoning": 2402,
+      "zero_r": 6,
+      "calls_per_turn": 1.65
+     },
+     {
+      "turns": "41-60",
+      "mean_reasoning": 5340,
+      "zero_r": 6,
+      "calls_per_turn": 1.4
+     },
+     {
+      "turns": "61-80",
+      "mean_reasoning": 4787,
+      "zero_r": 4,
+      "calls_per_turn": 1.35
+     }
+    ]
+   },
+   "notes": "No gap asks on this PR. The only capped session with no phantom involvement: a 15-file PR worked one grep at a time."
+  }
+ ]
+}
