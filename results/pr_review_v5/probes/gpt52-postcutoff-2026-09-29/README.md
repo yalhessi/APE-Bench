@@ -473,3 +473,11 @@ and gpt-5.2's Gr1 as an anchor. Two new blind matchers.
 **Also read:** each model against gpt-5.2 (Gr1 within these matchers; G at 0.125 from test (b)),
 comparison lookups a session, cost per session, and any capped session. Two runs of G, one of H, so H
 is provisional.
+
+**Amended 2026-09-30, before any matcher input: the high-effort runs did not run.** Ha1 and Hb1 failed
+every call with HTTP 400: function tools with a reasoning effort are not supported for gpt-5.4 or
+gpt-5.5 on Chat Completions. They were stopped after about 25 retries each, having billed nothing.
+The run names `probe_postcutoff_gpt5{4,5}_Gr_rep1` are spent, with no sessions.
+
+Test (e) is therefore the reasoning-off half. The seal is X1, X2, Ga1, Ga2, Gb1, Gb2 and gpt-5.2's
+Gr1, seven reviewers, with the same rule per condition.

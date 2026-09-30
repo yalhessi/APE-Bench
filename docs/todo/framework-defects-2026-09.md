@@ -197,3 +197,13 @@ cached input by $0.05 per 1M. That is a few percent of a run: cached input is mo
 tokens, and the whole billed cost is mostly output. It is not fixed in place, because
 `tests/datasets/test_cost_model.py` reproduces the record's figures exactly at $0.125. A fix needs a
 dated price history, so an old figure keeps its rate and a new run gets the real one.
+
+## A rejected request is retried like a transient one (seen again 2026-09-30)
+
+The known retry defect (`llm_clients/client.py` retries every exception but three), with a second
+cause. `gpt-5.4` and `gpt-5.5` at `reasoning_effort: high` return HTTP 400 on Chat Completions:
+"Function tools with reasoning_effort are not supported for gpt-5.4 in /v1/chat/completions. To use
+function tools, use /v1/responses or set reasoning_effort to 'none'." The client retried it 27 and
+25 times in the first ten minutes (`probe_postcutoff_gpt5{4,5}_Gr_rep1`), billing nothing, until the
+runs were stopped by hand. A 400 whose message names an unsupported parameter can never succeed, so
+the fix is to refuse 400s, not only authentication errors, and to surface the provider's message.

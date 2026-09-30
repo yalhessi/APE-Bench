@@ -289,3 +289,16 @@ finished, `q_r` is 0.71 / 0.69 (0.56 without the AI-generated 33149), post hoc.
 - **High effort outgrows the caps set for it:** 10 of 32 sessions stopped at 80 turns or 7.2M tokens,
   still searching. A clean full-set reading, dev above all, needs those sessions rerun with higher
   caps. Rerunning dev's six would cost roughly $30-60.
+
+## gpt-5.4 and gpt-5.5 (test (e), 2026-09-30): high effort needs a Responses-API provider
+
+The user asked for the test with gpt-5.4 and gpt-5.5. Reasoning off runs, with `reasoning_effort: none`
+sent explicitly, because gpt-5.5 reasons by default. **High effort cannot run through the pipeline as
+it stands.** On Chat Completions both models reject function tools combined with a reasoning effort
+(HTTP 400), and `OpenAIProvider` speaks only Chat Completions. gpt-5.2 accepts the combination, which
+is why its high-effort runs worked.
+
+Running high effort on the newer models needs an OpenAI Responses-API provider in `src/ape/llm_clients/`:
+tools, function-call items, and reasoning items carried between turns. That is a framework build, and
+it changes the condition. Responses keeps a turn's reasoning available to the next, which Chat
+Completions discards, so gpt-5.2's high-effort runs would not be a like-for-like comparison.
