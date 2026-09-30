@@ -321,3 +321,5 @@ a PR, against Claude's four. Their high-effort half waits on a Responses-API pro
   `ResponseProcessor` reads `choices[0].message`, `StreamingProcessor` merges `delta` chunks, and
   `parse_usage` reads `prompt_tokens`. The narrowest seam is a provider that translates at its own
   boundary, so nothing downstream changes.
+
+The build, and the steps to rerun the blocked runs afterwards, are in `llm-openai-responses-provider.md`.
