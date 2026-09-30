@@ -218,6 +218,24 @@ this entry take the other branch's. The branch's suite has one failure there tha
 cause: `test_probes.py::test_a_packet_is_the_committed_one_but_for_its_paths_and_logger` reads a
 gitignored per-session `brief.md`, so it fails on any fresh checkout of that branch.
 
+**`store`, measured the same day** (gpt-5.4 at high effort, one two-turn tool conversation with a
+5.1K-token prefix, turn 2's usage):
+
+| turn 2 | input | cached | note |
+|---|---|---|---|
+| `store: false`, no carry-over (as built) | 5,186 | 4,608 | |
+| `store: false`, encrypted carry-over | 5,265 | 4,608 | +79, about turn 1's 77 reasoning tokens |
+| `store: true`, `previous_response_id` | -- | -- | HTTP 400: "Previous response cannot be used for this organization due to Zero Data Retention" |
+
+So the account is Zero Data Retention, and stored-state chaining is not available at all.
+`store: false` with encrypted carry-over is the only way to carry reasoning. Earlier turns are billed
+as input either way, and carried reasoning is billed again as input. Separately, the API has
+`reasoning.context` (`auto`, `current_turn`, `all_turns`), and every response so far echoed
+`current_turn`, carry-over included. In a review session every call after the task prompt is a
+tool continuation, so a "turn" probably spans the session. Where the scaffold adds a user message
+(a retry prompt), `current_turn` may drop the reasoning carried from before it. Check that, or send
+`all_turns`, before reading the carry-over condition.
+
 Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the 401/403 half of the
 retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
 (`framework-defects-2026-09.md`).
