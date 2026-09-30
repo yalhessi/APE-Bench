@@ -1,7 +1,13 @@
 # After carry-over: what to re-measure, what to keep, and what the residual wall is made of (plan, 2026-09-30)
 
-**Status** — plan, written on `pipeline-overfit-review` at bc65c1d, for a fresh session in a new
-worktree. Nothing here has run. The user's framing (2026-09-30): the wall this project has run into
+**Status** — plan, written on `pipeline-overfit-review` at bc65c1d. **Phase 0 ran 2026-09-30** on
+`post-carryover-replan` (`results/pr_review_v5/probes/phase0-carried-baseline-2026-09-30/`, $20):
+carry-over does not close the model gap (q 0.71 mean / 0.57 / 0.33-0.38 on the three sets, against
+Chat's 0.67 / 0.57-0.64 / 0.29-0.30) and is adopted as the standard condition on process grounds
+(every session concludes, a fifth of the cost, no loss of reach). Section 1's "closed on one set"
+is superseded by that. The residual population is 93 asks: 37 reached by nobody, 30 only by
+Claude — `phase1_population.json`. **Phase 1 is next**, in a fresh session in that worktree; the
+carry-over default flip (Phase 0 step 2) is deferred to it, since `LLMConfig` needs a tri-state. The user's framing (2026-09-30): the wall this project has run into
 for most of its life is plausibly explained by reasoning being off, and by reasoning not carrying
 across turns. Both are now fixed for the OpenAI models. So the diagnoses built on the old runs are
 outdated, the built system must be re-evaluated against the new reviewer, and the question is what

@@ -434,6 +434,27 @@ matchers agree on all 128 cells. q is each reviewer's reach over Claude's (X = 0
 - a carry-over-off gpt_5.2 run on these six PRs, to separate the endpoint from persistence;
 - Grc on the validation and dev sets, where Gr1 reached 0.57-0.60 and 0.29-0.31 of Claude.
 
+**Phase 0 of the re-plan (2026-09-30, $20; `results/pr_review_v5/probes/phase0-carried-baseline-2026-09-30/`):
+the 0.93 did not replicate.** Three carried reps on post-cutoff and one each on validation and dev,
+`declaration_search` fixed, six audited matchings:
+
+| set | asks | q(Chat) | q(carried) |
+|---|---|---|---|
+| post-cutoff | 16 | 0.67 | 0.44 / 0.375 / 0.19 → **mean 0.71**, union 0.93, stable 0.40 |
+| validation | 30 | 0.57-0.64 | **0.57** |
+| dev | 47 | 0.29-0.30 | **0.33-0.38** |
+
+- **Carry-over does not close the model gap.** Against Chat it is +0.02 / 0.00 / +0.02-0.04 absolute.
+  The gap stands at q 0.33-0.71 across sets.
+- **It is adopted as the standard condition anyway**, on process grounds that hold on every set and
+  rep: every session concludes (44 of 44 against 22 of 32), repeats fall about tenfold, and cost
+  falls to a fifth, with no loss of reach.
+- **Dev's cap losses were not the cap or the tool.** Uncapped and tool-fixed, the carried run gained
+  two dev asks. This corrects d23fbde's "mostly a `declaration_search` defect".
+- **gpt_5.2 files what it verifies** (1 of 56 unfiled). Its misses are in what it attempts.
+- **The residual population**: of 93 asks, 37 (40%) are reached by nobody and 30 (32%) only by Claude.
+  Phase 1 labels both (`phase1_population.json`).
+
 **Why gpt-5.4 and gpt-5.5 reach less than gpt_5.2 (2026-09-30, read by hand, about $0.90;
 `results/pr_review_v5/probes/model-inspection-2026-09-30/`).**
 - **They verify more and file less.** Against gpt_5.2: 10 compiled edits each against 7, and 6
