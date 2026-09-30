@@ -414,3 +414,26 @@ ask PRs (`blinding_reasoning_SEALED.json`), with two new blind matchers. Test (d
 with Gr1 in place of the Gr pair: reach against 0.30 and 0.18, and comparison lookups against 8 a
 session, from `inspect_sessions.py`. The three-set rule `q_r = reach(Gr1) / reach(X)` is read beside
 it: at least 0.8 means the gap closes, at most 0.5 means it remains.
+
+**Result (2026-09-30).** Two new blind matchers judged the reasoning seal. They read only their own
+folders and agree on all 80 cells (`match_reasoning/`, `unblinded_reasoning.json`).
+
+| per-session reach, 16 asks (both matchers) | reach | comparison lookups a session |
+|---|---|---|
+| Claude (X1, X2) | 0.47 | 22.8, 20.5 |
+| `gpt_5.2`, reasoning off (G1, G2) | 0.125 | 1.5, 3.2 |
+| **`gpt_5.2`, reasoning high (Gr1)** | **0.31** | **45.7** |
+
+- **Test (d)'s rule reads "reasoning is the lever".** Reach is at least 0.30 and lookups at least 8.
+  But reach is 0.3125, 5 of 16 asks, one ask over the line.
+- **The three-set rule reads partial:** `q_r = 0.31 / 0.47 = 0.67`.
+- **Per ask.** Gr1 reached the `NeBot` case split (`p0002`), the missing `@[to_additive]` (`p0011`)
+  and the primed helper's rename (`p0012`), which no condition had reached before, plus the two
+  surface asks. It missed the `cat_disch` defaults (`p0014`, `p0015`), which the calibration session
+  on the same PR reached, and it missed `homMk` and `_anti`. Its 42814 session stopped at 80 turns;
+  no condition reached that PR's asks.
+- **The looking is restored and exceeded:** reasoning makes `gpt_5.2` look up comparison objects twice
+  as often as Claude, and it still concludes on fewer of them.
+
+One run, provisional. Across the two high-effort sessions on 43192, the `cat_disch` asks were reached
+in one and not the other.
