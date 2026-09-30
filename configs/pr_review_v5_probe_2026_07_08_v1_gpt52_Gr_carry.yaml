@@ -1,0 +1,6 @@
+# The carry-over coherence test's treatment: pr_review_v5_probe_2026_07_08_v1_gpt52_Gr_resp.yaml with each turn's
+# encrypted reasoning items sent back on every later turn. Only persistence differs.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_Gr_resp.yaml
+
+llm_config:
+  openai_responses_reasoning_carryover: true
