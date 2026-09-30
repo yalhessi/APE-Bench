@@ -78,3 +78,43 @@ that moves reaches Claude's level (q ≥ 0.8), which would make it the base mode
 
 One run per cell, so every reading is provisional. Two matchers, and the anchors, are the check on
 the matching.
+
+## Result (2026-09-30): the bar releases the withheld edits, and out of sample they are not the maintainers' asks
+
+Four audited matchings (post-cutoff 112/112 cells, validation 207/210), $47.64 for the six runs.
+
+| set | model | merge | request (bar) | bar − merge | asks per finding, merge → bar |
+|---|---|---|---|---|---|
+| post-cutoff (in-sample) | gpt-5.4 | 0.1875 | 0.25 | +0.0625 | 0.50 → 0.33 |
+| post-cutoff (in-sample) | gpt-5.5 | 0.3125 | 0.4375 | +0.125 | 0.83 → 0.58 |
+| **validation** | gpt-5.4 | 0.233 | 0.200 | **−0.033** | 0.27 → 0.23 |
+| **validation** | gpt-5.5 | 0.200 | 0.200 | **0.000** | 0.33 → 0.18 |
+
+References on validation: gpt_5.2 carried 0.267 (0.47 per finding), Claude 0.467 (0.32).
+
+**By the pre-registered rule, on validation, the filing bar is not the mechanism for either model**
+(difference ≤ 0.03 on both matchers). On post-cutoff the fix did what it was built to do: gpt-5.5
+filed the three 43192 asks it had verified and withheld (the two `cat_disch` defaults and
+`mkHom` → `homMk`), q 0.67 → 0.93. That set is in-sample; the change was designed from it.
+
+**The mechanism was present on validation, and the fix acted on it:**
+
+| validation run | edits verified | verified, not filed | findings | billed |
+|---|---|---|---|---|
+| gpt_5.2 carried | 14 | 0 | 26 | $5.60 |
+| gpt-5.4 merge → request | 38 → 37 | 9 → 4 | 34 → 38 | $6.30 → $6.24 |
+| gpt-5.5 merge → request | 41 → 53 | 8 → 6 | 24 → 43 | $11.59 → $10.51 |
+
+So the bar released most of what was withheld, and what it released was not what these
+maintainers asked for: gpt-5.5's findings nearly doubled and its asks reached did not move. The
+newer models verify two to four times as many edits as gpt_5.2 and reach fewer asks; their
+validation deficit is in what they choose to work on, like gpt_5.2's against Claude, not in what
+they file. The post-cutoff gain was one PR where the withheld edits happened to be the asks.
+
+**Consequences.**
+- `filing_bar: request` stays available and is not adopted as the default; gpt_5.2 carried remains
+  the gpt reviewer with the best reach and aim on validation, at half gpt-5.5's cost.
+- The "verified, withheld" row of Phase 1 should be read with this: withholding is real and
+  measurable, and on validation it is not where the asks are.
+- One run per cell, so provisional; the direction on validation is the same for both models and
+  both matchers.

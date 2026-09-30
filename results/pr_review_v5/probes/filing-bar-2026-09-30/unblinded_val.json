@@ -1,0 +1,836 @@
+{
+ "asks": 30,
+ "1": {
+  "reach": {
+   "Grc1": 0.26666666666666666,
+   "Va": 0.23333333333333334,
+   "Va_bar": 0.2,
+   "Vb": 0.2,
+   "Vb_bar": 0.2,
+   "X1": 0.5,
+   "X2": 0.43333333333333335
+  },
+  "condition_reach": {
+   "Grc": 0.26666666666666666,
+   "Va": 0.23333333333333334,
+   "Va_bar": 0.2,
+   "Vb": 0.2,
+   "Vb_bar": 0.2,
+   "X": 0.4666666666666667
+  },
+  "stable": {
+   "Grc": [
+    "v0016",
+    "v0030",
+    "v0065",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va": [
+    "v0016",
+    "v0031",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va_bar": [
+    "v0016",
+    "v0055",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb_bar": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0062",
+    "v0063",
+    "v0066",
+    "v0094",
+    "v0095",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "union": {
+   "Grc": [
+    "v0016",
+    "v0030",
+    "v0065",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va": [
+    "v0016",
+    "v0031",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va_bar": [
+    "v0016",
+    "v0055",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb_bar": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0055",
+    "v0062",
+    "v0063",
+    "v0064",
+    "v0066",
+    "v0094",
+    "v0095",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "v0016": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0029": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0030": {
+    "Grc1": "reached",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0031": {
+    "Grc1": "no",
+    "Va": "reached",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0053": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0055": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "reached",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0056": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0060": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0061": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "no"
+   },
+   "v0062": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "partial",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0063": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "partial",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0064": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0065": {
+    "Grc1": "reached",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0066": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "partial",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0067": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0068": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0090": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0091": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0092": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0093": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0094": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "partial",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0095": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "partial",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0105": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0106": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0107": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0108": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0109": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0110": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0131": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0132": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "2": {
+  "reach": {
+   "Grc1": 0.26666666666666666,
+   "Va": 0.23333333333333334,
+   "Va_bar": 0.2,
+   "Vb": 0.2,
+   "Vb_bar": 0.2,
+   "X1": 0.5,
+   "X2": 0.43333333333333335
+  },
+  "condition_reach": {
+   "Grc": 0.26666666666666666,
+   "Va": 0.23333333333333334,
+   "Va_bar": 0.2,
+   "Vb": 0.2,
+   "Vb_bar": 0.2,
+   "X": 0.4666666666666667
+  },
+  "stable": {
+   "Grc": [
+    "v0016",
+    "v0030",
+    "v0065",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va": [
+    "v0016",
+    "v0031",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va_bar": [
+    "v0016",
+    "v0055",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb_bar": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0062",
+    "v0063",
+    "v0066",
+    "v0094",
+    "v0095",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "union": {
+   "Grc": [
+    "v0016",
+    "v0030",
+    "v0065",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va": [
+    "v0016",
+    "v0031",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Va_bar": [
+    "v0016",
+    "v0055",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "Vb_bar": [
+    "v0016",
+    "v0066",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0055",
+    "v0062",
+    "v0063",
+    "v0064",
+    "v0066",
+    "v0094",
+    "v0095",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "v0016": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0029": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0030": {
+    "Grc1": "reached",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0031": {
+    "Grc1": "no",
+    "Va": "reached",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0053": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0055": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "reached",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0056": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0060": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0061": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "no"
+   },
+   "v0062": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "partial",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0063": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "partial",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0064": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0065": {
+    "Grc1": "reached",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0066": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "partial",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0067": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0068": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0090": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0091": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0092": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "partial",
+    "Vb_bar": "partial",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0093": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "partial"
+   },
+   "v0094": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "partial",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0095": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "partial",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0105": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0106": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0107": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0108": {
+    "Grc1": "no",
+    "Va": "no",
+    "Va_bar": "no",
+    "Vb": "no",
+    "Vb_bar": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0109": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0110": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0131": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0132": {
+    "Grc1": "reached",
+    "Va": "reached",
+    "Va_bar": "reached",
+    "Vb": "reached",
+    "Vb_bar": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "agreement": {
+  "cells": 210,
+  "three_valued": 207,
+  "reached_or_not": 210
+ }
+}
