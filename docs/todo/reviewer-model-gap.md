@@ -323,3 +323,70 @@ a PR, against Claude's four. Their high-effort half waits on a Responses-API pro
   boundary, so nothing downstream changes.
 
 The build, and the steps to rerun the blocked runs afterwards, are in `llm-openai-responses-provider.md`.
+
+## Why high effort still reaches less: transcript inspection (2026-09-30, no spend)
+
+`results/pr_review_v5/probes/transcript-inspection-2026-09-30/README.md`, which has the tables.
+`process_profile.py` there reproduces the counts, and three reader subagents classified the misses.
+It rests on one Gr1 run per set, so it is provisional.
+
+- **Gr1 does not conclude worse; it concludes on fewer objects.** Its findings hit asks as often
+  as Claude's:
+
+  | set | Gr1 hits per finding | Claude hits per finding |
+  |---|---|---|
+  | post-cutoff | 0.45 | 0.29-0.32 |
+  | validation | 0.36 | 0.30-0.40 |
+  | dev | 0.26 | 0.23-0.24 |
+
+  But it files 1.8-3.3 findings a PR, against Claude's 4-12. gpt-5.5 with reasoning off is the
+  extreme case: 0.60-0.67 hits per finding, at under one finding a PR. Reasoning-off gpt_5.2 is the
+  opposite failure: it files about as many findings as Gr1 or more, and they rarely hit. Hits per
+  finding is not precision, because gold is a lower bound.
+- **Retrieval is not the gap.** Of the 16 asks Gr1 missed on PRs where it submitted, the evidence
+  was in its context for 15. The exception is `homMk`, searched under the PR's own spelling. The
+  misses are in which objects and aspects get an attempt:
+  - Gr1 builds edits on 1.9-2.3 targets a session, against Claude's 4.6-6.6.
+  - It favours the first declarations in the diff, and proofs over signatures.
+  - It stops after one failed variant. calib2 reached the `cat_disch` asks by `#check`ing the
+    parent constructor and compiling the printed form.
+- **Working memory, by inference.** None of the 120 gpt sessions profiled wrote any visible text.
+  Chat Completions discards the reasoning, and `OpenAIMessageFormatter` drops `reasoning_content`
+  for every provider, so gpt reviews from bare call history. Claude's thinking persists across its
+  tool loop. Two signatures of forgetting are highest in the 10 capped sessions:
+  - repeated negative lookups: 5.6 against 2.9 per 100 turns;
+  - zero-reasoning turns: 32% against 10%.
+- **The cap losses (19 of dev's 24 gap asks) are mostly a tool defect, not the budget.**
+  `declaration_search` reports leaf-only matches as the queried name. For example, it says
+  `Dense.continuous_sup` is declared in Lattice.lean. Capped sessions spent 22% of their turns
+  chasing such false duplicates, and 8 of the 10 built no edit at all. Submitting at the cap would
+  have reached about 3 of the 19 asks. The fix exists twice, `be65387` on `arm-naming-bar` and
+  `eec8d3a` on `arm-division`, and is on neither `develop` nor this branch. **Every run in this
+  thread used the defective tool.**
+- **Two more asymmetries the record had not named:**
+  - brief G dropped X's `notes.md`, the object-by-object account including objects checked and
+    cleared;
+  - the ape_agent preamble says "TEXT ALONE ... accomplishes NOTHING" and "batch ALL tool calls".
+
+  Claude also had a shell and a linter; `lean_verify_edit` runs without Mathlib's linters, which hid
+  d0041.
+- **Not supported:** bigger caps, since the late capped turns do not build; resampling, since the
+  union of two gpt-5.5 runs reaches the same 4 asks as one; and more retrieval breadth.
+
+**Next, proposed, not run.** One condition that removes the harness asymmetries together, so the wall
+moves or does not before any ablation:
+1. merge `eec8d3a`;
+2. an object ledger in `submit_findings`: every changed declaration, its proof and its signature,
+   what was compiled, what was compared, and the verdict;
+3. visible notes beside each call, and the preamble's anti-text and batching lines dropped for this
+   task.
+
+Run it on gpt_5.2 high and on gpt-5.5 off, post-cutoff first, against Gr1 and Gb. State the rule
+before any run: reach on both matchers, with hits per finding at or above X's, so that a gain is not
+padding.
+
+Separately, the Responses provider's carry-over switch (`llm-openai-responses-provider.md`) is the
+clean test of the working-memory reading, if it runs with `gpt_5.2` high as a condition: the same
+model and effort as Gr1, with only persistence changed. The K brief's null does not answer this. It
+ran with reasoning off, where findings rarely hit, and it briefed constructions, not coverage of
+every object.

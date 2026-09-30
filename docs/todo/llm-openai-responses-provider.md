@@ -144,6 +144,15 @@ So the provider **translates at its own boundary**, and nothing downstream chang
 7. **Optional, second:** the carry-over-on condition, the same runs with
    `openai_responses_reasoning_carryover: true`.
 
+   **Added 2026-09-30, from the transcript inspection** (`reviewer-model-gap.md`, "Why high effort
+   still reaches less"). Carry-over may be the more informative condition, and it needs a `gpt_5.2`
+   arm. None of gpt_5.2's 120 profiled sessions wrote any visible text, and its reasoning is discarded
+   each turn. Its forgetting signatures are highest in the sessions that wandered to the cap. `gpt_5.2`
+   at high effort through `responses` with carry-over on, against Gr1 on Chat Completions, varies
+   only persistence. gpt-5.4 and gpt-5.5 cannot give that comparison, because they have no Chat
+   Completions high-effort run to compare against. Merge `eec8d3a` (`declaration_search`) before
+   either run: every run so far used its false-duplicate defect.
+
 ## Evidence
 
 - The 400: `.ape/probe_scratch/test_e/probe_postcutoff_gpt54_Gr_rep1.log` and the attempt's scaffold
