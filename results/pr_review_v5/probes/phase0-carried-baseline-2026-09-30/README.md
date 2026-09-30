@@ -136,3 +136,27 @@ mechanism; the file holds each ask's text, family code, class and which reviewer
 comparable to the earlier one. The process result is the same on every set and every rep and is
 not provisional. The reach result is: the direction (no gain) is consistent across sets, the size is
 inside one-rep noise on each.
+
+## Verification (2026-09-30): the carried runs did reason at high effort, and did carry it
+
+Asked because the carried reach resembles the Chat runs'. Checked from the artifacts, not the
+configs:
+
+- **Requests.** `data/llm_logs/2026-09-30/09/` holds 672 Responses requests in the Phase 0 window,
+  exactly the four runs' 116 + 109 + 165 + 282 turns, all to `gpt-5.2-2025-12-11` with
+  `reasoning.effort: high`, `include: [reasoning.encrypted_content]`, `store: false`. 634 carry at
+  least one encrypted reasoning item (median 9, max 44); the 38 that carry none are the 38 sessions'
+  first turns.
+- **Responses.** Every raw turn has a `resp_` id; 98-99% of turns spent reasoning tokens (the
+  reasoning-off runs: 0 on every turn); every reasoning turn's assistant message holds encrypted
+  items; and the next turn's input grows by the previous turn's reasoning at 0.99-1.05, against
+  0.00 on every Chat run.
+- **Plans.** Each sealed plan's `scaffold_config_sha256` equals the digest recomputed from its
+  config today; with carry-over off or effort unset the digest differs.
+
+**Against reasoning off**, where the comparison exists: validation 0.10 / 0.17 off, 0.267 carried,
+0.267 / 0.300 Chat-high; post-cutoff 0.12 off, 0.33 carried mean, 0.31 Chat-high. Carried equals
+Chat-high and is about twice off. The resemblance is to Chat-high, which on validation and dev is
+itself low. Carried sessions spend fewer reasoning tokens a turn (median 470-1,010 against
+Chat-high's 1,280-1,790), as the coherence test found at matched effort: the model does not
+re-derive its state each turn.
