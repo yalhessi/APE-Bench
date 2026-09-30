@@ -216,3 +216,15 @@ so each was repeated a hundred times. A 400 that names no parameter is still ret
 400 in the run logs, "Could not finish the message because max_tokens or model output limit was
 reached", succeeded on retry (`pr_review_v4_judge_r0pinned_rep1`). The 401/403 half of the
 2026-09-23 entry above is still open. Pinned by `tests/ape/test_request_rejection.py`.
+
+## `reasoning_effort` and `openai_api` change what a run measures, and a resume may change them (found 2026-09-30)
+
+Both live only inside `scaffold_config_sha256`, and `RESUMABLE_PLAN_FIELDS`
+(`src/mathlib_review/review/runner.py`) lets a resume change that hash, because it also carries
+retries and timeouts. So `cli run --resume` with `reasoning_effort` raised from `none` to `high`, or
+`openai_api` switched, only writes `run_plan_revision_N.json` and a warning. The run's finished tasks
+keep the first condition, and the rest run under the second. Not seen happening. The motivating
+example is the code path, found while adding `openai_api` and `openai_responses_reasoning_carryover`,
+which inherit the same status. The fix is a semantic plan field over the llm_config keys that change
+what a run measures (`reasoning_effort`, `openai_api`, the carry-over, `temperature`; `model_name`
+already is one). It moves every plan's identity once, so it lands at a run boundary.

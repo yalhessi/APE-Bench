@@ -78,7 +78,7 @@ looking at first:
   without `experimental.module`, which the package build supplies and in-file verification
   did not. In-file verification was dead for ~33 of 138 evaluation PRs.
 
-Also: an OpenAI provider, the unified `ape` CLI, managed agent skills, task variants, the
+Also: an OpenAI provider (Chat Completions, and the Responses API behind `llm_config.openai_api`), the unified `ape` CLI, managed agent skills, task variants, the
 S3-backed remote artifact store with bundle acceleration, and the PR-head cache fast path.
 
 **Outstanding**

@@ -1,7 +1,8 @@
 # An OpenAI Responses-API provider, so gpt-5.4 and gpt-5.5 can reason with tools
 
-**Status** — open, 2026-09-30. For a **fresh session in a worktree off `develop`**. Build, merge into
-`develop`, then return to `pipeline-overfit-review` to run the blocked runs (last section).
+**Status** — **built 2026-09-30** on `openai-responses-provider`, merged into `develop`, both live
+checks passed (section "Built", at the end). Open: the blocked runs, back on `pipeline-overfit-review`
+(section "Then, back on `pipeline-overfit-review`").
 **Cost** — the build spends only its live checks, a few dollars. The blocked runs afterwards are
 about $70 billed at the estimated rates, plus about $10 of calibration.
 **Motivating example** — test (e) of `reviewer-model-gap.md` could not run its high-effort half.
@@ -144,6 +145,15 @@ So the provider **translates at its own boundary**, and nothing downstream chang
 7. **Optional, second:** the carry-over-on condition, the same runs with
    `openai_responses_reasoning_carryover: true`.
 
+   **Added 2026-09-30, from the transcript inspection** (`reviewer-model-gap.md`, "Why high effort
+   still reaches less"). Carry-over may be the more informative condition, and it needs a `gpt_5.2`
+   arm. None of gpt_5.2's 120 profiled sessions wrote any visible text, and its reasoning is discarded
+   each turn. Its forgetting signatures are highest in the sessions that wandered to the cap. `gpt_5.2`
+   at high effort through `responses` with carry-over on, against Gr1 on Chat Completions, varies
+   only persistence. gpt-5.4 and gpt-5.5 cannot give that comparison, because they have no Chat
+   Completions high-effort run to compare against. Merge `eec8d3a` (`declaration_search`) before
+   either run: every run so far used its false-duplicate defect.
+
 ## Evidence
 
 - The 400: `.ape/probe_scratch/test_e/probe_postcutoff_gpt54_Gr_rep1.log` and the attempt's scaffold
@@ -160,3 +170,54 @@ So the provider **translates at its own boundary**, and nothing downstream chang
   docs alone.
 - **Scope creep.** The ELM gateway's `/v1/responses` and the carry-over-on condition are follow-ups,
   not part of closing this.
+
+## Built (2026-09-30)
+
+Commits on `openai-responses-provider`: 232bf38 (no retry), 331fae7 (the provider), c706ef9 (the
+refusal). Where the build departs from the design above, it is from a measurement:
+
+- **Tools are sent `strict: false`.** Responses makes a tool strict by default when its schema
+  qualifies (a probe tool came back `additionalProperties: false, strict: true`), and Chat
+  Completions never does. Strict is constrained decoding, which would be a different condition.
+- **Temperature is sent as configured.** 1.0 is accepted with reasoning on, and 0.7 is a 400 naming
+  `temperature`. Nothing is dropped silently, and a bad value fails at once.
+- **No-retry is keyed on `error.param`, not on the message.** All three parameter 400s recorded carry
+  it. The judge's "Could not finish the message because max_tokens ..." 400 succeeded on retry in
+  `pr_review_v4_judge_r0pinned_rep1` and stays retried. That error was not reproduced, so whether its
+  body names a parameter is unverified. ELM's pre-send refusals are now not retried either; they had
+  been retried a hundred times each.
+- **Carry-over keeps each reasoning item's position** among the calls, since the API rejects a
+  reasoning item passed without the item that followed it. The items ride in
+  `ConversationMessage.signature`.
+- **`cli plan` refuses first thing in `run()`**, in a dry run too, before the agenda build.
+
+**Live check 1** (`probe_postcutoff_gpt54_G_resp_rep1`, gpt-5.4, effort `none`, all six post-cutoff
+PRs): 6 of 6 succeeded, $0.468 billed. Against the two Chat Completions reps:
+
+| | Chat rep1 | Chat rep2 | Responses |
+|---|---|---|---|
+| turns | 23 | 24 | 23 |
+| tool calls | 89 | 90 | 83 |
+| tokens | 355K | 403K | 401K |
+| cache hit | 66% | 75% | 68% |
+| billed | $0.441 | $0.424 | $0.468 |
+| findings | 5 | 4 | 4 |
+
+Everything but billed is inside the spread of the two reps, and billed is 6% over the higher one. One
+rep each way, so this shows comparability within noise, not equivalence.
+
+**Live check 2** (`probe_postcutoff_gpt54_Gr_resp_check41930`, gpt-5.4, effort `high`, PR 41930,
+capped at $4): succeeded in 10 turns with 26 tool calls and 7,714 reasoning tokens, $0.254 billed, no
+retries. It submitted 0 findings on 41930, as gpt-5.2's high-effort Gr1 session did there.
+
+Both ran from a throwaway detached worktree, `.claude/worktrees/responses-livecheck`, which holds
+`pipeline-overfit-review` with this branch merged in. Their result folders are there, untracked. The
+logs are in `.ape/probe_scratch/responses_livecheck/`. The rehearsal merge conflicts in four files:
+`config.py` and `framework-defects-2026-09.md` take this branch's side, and `docs/todo/README.md` and
+this entry take the other branch's. The branch's suite has one failure there that the merge does not
+cause: `test_probes.py::test_a_packet_is_the_committed_one_but_for_its_paths_and_logger` reads a
+gitignored per-session `brief.md`, so it fails on any fresh checkout of that branch.
+
+Still open, and not part of closing this: the ELM gateway's `/v1/responses`; the 401/403 half of the
+retry defect; and `openai_api` and the carry-over, like `reasoning_effort`, can be changed by a resume
+(`framework-defects-2026-09.md`).
