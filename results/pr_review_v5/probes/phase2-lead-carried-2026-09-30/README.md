@@ -21,3 +21,22 @@ every cap in the base was calibrated at reasoning off (arm jobs p50 $0.034 / 35K
 per-arm-job and per-PR billed and tokens, turns, any paused job, and the lead's delegation count.
 The main runs' caps are set from these, and the main design and its cost go to the user before any
 main run starts. Nothing here is scored.
+
+## Calibration result (2026-09-30, $5.94, `probe_val_small12_lead_carried_calib`)
+
+Both PRs completed, 33 arm jobs, all `success`, none capped; every lead and arm turn a Responses call
+with reasoning, every conversation carrying its encrypted items.
+
+| PR | work units | lead + arms billed | lead turns | arm jobs (waves) | arm job billed p50 / max | arm tokens p50 / max |
+|---|---|---|---|---|---|---|
+| 30641 | 1 | $2.03 | 7 | 11 (7 / 3 / 1) | $0.173 / $0.370 | 102K / 250K |
+| 32875 | 7 | $3.91 | 5 | 22 (17 / 5) | $0.143 / $0.690 | 108K / 674K |
+
+Against the reasoning-off lead (post-cutoff, 69 arm jobs): arm jobs cost about 4x at the median
+($0.034 → $0.15) and 8x at the max ($0.085 → $0.69), and 3x the tokens at the median (35K → 102K).
+The base's arm caps ($0.30 / 360K) would have bound on the largest jobs. Findings: 21, of which the
+gate published 11 -- reported here only as a shape, from two PRs.
+
+**Main-run caps from this** (about 2x the calibration's maxima, in step at 1.2M tokens a dollar): arm
+job $1.50 / 1.8M, lead $3.00 / 3.6M, per PR $8.00 / 9.6M. Expected cost a validation rep (11 PRs, 36
+work units): about $25-35.
