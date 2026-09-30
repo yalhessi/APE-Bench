@@ -1,0 +1,7 @@
+{"X1": {"kind": "claude"}, "X2": {"kind": "claude"},
+ "Gr1": {"kind": "solo", "run": "probe_postcutoff_gpt52_Gr_rep1"},
+ "Grc": {"kind": "solo", "run": "probe_postcutoff_gpt52_Grc_rep1"},
+ "Hac": {"kind": "solo", "run": "probe_postcutoff_gpt54_Grc_rep1"},
+ "Hbc": {"kind": "solo", "run": "probe_postcutoff_gpt55_Grc_rep1"},
+ "Ga3": {"kind": "solo", "run": "probe_postcutoff_gpt54_G_resp_rep1"},
+ "Gb3": {"kind": "solo", "run": "probe_postcutoff_gpt55_G_resp_rep1"}}
