@@ -228,3 +228,31 @@ example is the code path, found while adding `openai_api` and `openai_responses_
 which inherit the same status. The fix is a semantic plan field over the llm_config keys that change
 what a run measures (`reasoning_effort`, `openai_api`, the carry-over, `temperature`; `model_name`
 already is one). It moves every plan's identity once, so it lands at a run boundary.
+
+## The `codex` and `claude_code` scaffolds cannot run a review as they stand (found 2026-09-30)
+
+Found by reading, while asking what running the reviewer through Codex, or through Claude on a
+subscription, would need. Neither scaffold has run a review (`e6541bc`).
+
+**Codex.** The relay serves only `/chat/completions` (`codex/relay.py`), and the installed
+`codex-cli 0.144.5` refuses it: its binary carries "`wire_api = \"chat\"` is no longer supported ...
+set `wire_api = \"responses\"`". Batch mode also needs `codexbridge/`, a git submodule of a
+third-party repo pinned to a 2025 commit, which is not checked out (the directory is empty).
+`codex exec --json` with `codex exec resume` would replace it with no Node service. The scaffold
+defaults to `sandbox_mode: danger-full-access`. No review config and no containment test exist.
+
+**Claude on a subscription.** Setting `llm_config.model_name: null` skips the relay, so Claude
+Code uses its own login. Four things break without the relay:
+- `HOME` is set to the attempt's `workspaces/`, so `~/.claude/.credentials.json` is not found. A
+  `CLAUDE_CODE_OAUTH_TOKEN` from `claude setup-token` does reach the CLI, because the SDK passes
+  the parent environment through (`subprocess_cli.py:430`).
+- `get_token_usage` delegates to the relay, so there is no usage and no `ExecutionLimits`.
+- `get_claude_code_session_id` reads the relay, so no transcript hardlink is written.
+- `model=None` means the CLI's default model, which the run plan does not record.
+A spent subscription usage limit also needs handling as a failed attempt, or it reads as an
+empty review.
+
+**What would close it:** a `/responses` route on the Codex relay, or no relay, and the bridge
+replaced; for Claude, usage and the session id read from the SDK's own messages, the model
+pinned and recorded, and the usage-limit error mapped to a failure. Both still need the leak
+audit that the `solo_claude` configs' headers require.
