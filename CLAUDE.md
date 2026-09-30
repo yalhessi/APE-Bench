@@ -181,8 +181,9 @@ zero-priced run that has left it unset. Llama 3.3 and EuroLLM are served without
 are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are agent-capable.
 
 **A missing or rejected key does not fail; it retries for hours.** `llm_clients/client.py` retries
-every exception except three, authentication included: 100 attempts, waits up to 60 s plus jitter,
-~1.5-2 h per call per job, logged only as a WARNING "API call failed, retrying". A run with a bad key
+every exception except four, authentication included: 100 attempts, waits up to 60 s plus jitter,
+~1.5-2 h per call per job, logged only as a WARNING "API call failed, retrying". (A 400 whose body
+names a parameter is the fourth, `RequestRejectedError`, and fails at once.) A run with a bad key
 looks alive and bills nothing. Before `--execute`, confirm the provider's variable is set in the
 launching shell (`source ~/.config/secrets/env.zsh` in the same command); in the first minutes,
 confirm `completed with success` lines appear and "API call failed, retrying" does not. The fix is

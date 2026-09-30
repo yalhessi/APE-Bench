@@ -457,6 +457,18 @@ class ProviderError(LLMError):
     pass
 
 
+class RequestRejectedError(ProviderError):
+    """A request that cannot succeed as sent, so it is never retried.
+
+    Raised when the provider answers HTTP 400 naming a parameter, or when a provider refuses
+    a request before sending it. The same payload is rebuilt on every retry, so a retry can
+    only repeat the rejection: `gpt-5.4` and `gpt-5.5` at `reasoning_effort: high` were
+    rejected 27 and 25 times in ten minutes (`probe_postcutoff_gpt5{4,5}_Gr_rep1`,
+    2026-09-30), billing nothing, until the runs were stopped by hand.
+    """
+    pass
+
+
 class ContextLengthExceededError(LLMError):
     """Context length exceeded error."""
     pass

@@ -13,7 +13,9 @@ from tenacity import retry, stop_after_attempt, wait_exponential, wait_random, w
 
 from ape.utils.logging import create_logger
 
-from .config import LLMConfig, LLMProvider, ProviderError, ContextLengthExceededError, MalformedResponseError
+from .config import (
+    LLMConfig, LLMProvider, ProviderError, ContextLengthExceededError, MalformedResponseError,
+    RequestRejectedError)
 from .models import ConversationSession, ConversationNode, TokenUsage, ContentBlock
 from .adapters import ResponseProcessor, StreamingProcessor, MessageFormatter, OpenAIMessageFormatter
 from .providers import BaseProvider, ElmProvider, OpenAIProvider
@@ -134,7 +136,8 @@ class LLMClient:
                     retry_state.outcome.exception() and (
                         isinstance(retry_state.outcome.exception(), ContextLengthExceededError) or
                         isinstance(retry_state.outcome.exception(), MalformedResponseError) or
-                        isinstance(retry_state.outcome.exception(), StreamingInterruptedError)
+                        isinstance(retry_state.outcome.exception(), StreamingInterruptedError) or
+                        isinstance(retry_state.outcome.exception(), RequestRejectedError)
                     )
                 ) else True
             ),
@@ -188,10 +191,18 @@ class LLMClient:
                 )
                 return nodes, usage, raw_response
                     
-            except (MalformedResponseError, ContextLengthExceededError, StreamingInterruptedError) as e:
+            except (MalformedResponseError, ContextLengthExceededError, StreamingInterruptedError,
+                    RequestRejectedError) as e:
                 elapsed_time = time.time() - start_time
 
-                if isinstance(e, StreamingInterruptedError):
+                if isinstance(e, RequestRejectedError):
+                    self.logger.error(
+                        f"RequestRejectedError occurred - "
+                        f"elapsed: {elapsed_time:.2f}s, "
+                        f"error: {str(e)} "
+                        f"(will not retry)"
+                    )
+                elif isinstance(e, StreamingInterruptedError):
                     self.logger.info(
                         f"Streaming interrupted by user - "
                         f"elapsed: {elapsed_time:.2f}s"

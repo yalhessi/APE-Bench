@@ -207,3 +207,12 @@ function tools, use /v1/responses or set reasoning_effort to 'none'." The client
 25 times in the first ten minutes (`probe_postcutoff_gpt5{4,5}_Gr_rep1`), billing nothing, until the
 runs were stopped by hand. A 400 whose message names an unsupported parameter can never succeed, so
 the fix is to refuse 400s, not only authentication errors, and to surface the provider's message.
+
+**Fixed 2026-09-30, for 400s** (`openai-responses-provider`). `RequestRejectedError`, a subclass of
+`ProviderError`, is never retried. The provider raises it for an HTTP 400 whose body names a
+parameter (`error.param`), and ELM's own pre-send refusals raise it too. Those refusals (tools on
+Llama/EuroLLM, an effort the gateway refuses) had been plain `ProviderError`s inside the retried call,
+so each was repeated a hundred times. A 400 that names no parameter is still retried: the only other
+400 in the run logs, "Could not finish the message because max_tokens or model output limit was
+reached", succeeded on retry (`pr_review_v4_judge_r0pinned_rep1`). The 401/403 half of the
+2026-09-23 entry above is still open. Pinned by `tests/ape/test_request_rejection.py`.
