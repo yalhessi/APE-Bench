@@ -627,3 +627,53 @@ One run of each, so every reading is provisional.
 - The gpt-5.4 and gpt-5.5 off calibrations billed $1.04 and $1.70 on 43192.
 - Expected about $20-35 in all. The ceilings, $80.50, $72.50 and $120.50, are ceilings, not
   forecasts.
+
+## Test (e)'s amended high-effort half, result (2026-09-30): with its reasoning carried, gpt_5.2 reaches 0.93 of Claude
+
+Runs f7bd8db, seal db8bf49; two blind matchers, both audited clean (8 calls each, 0 flagged). The
+matchers agree on all 128 cells. `match_carry/`, `unblinded_carry.json`. 16 asks on six PRs; one ask
+is 0.0625 of reach.
+
+| reviewer | model, setting | reach | q = c / X | findings | asks reached per finding | billed |
+|---|---|---|---|---|---|---|
+| X1, X2 | Claude | 0.50, 0.44 (X 0.47) | 1 | 25, 24 | 0.32, 0.29 | -- |
+| Gr1 | gpt_5.2 high, Chat | 0.3125 | 0.67 | 11 (1 capped) | 0.45 | $14.85 |
+| **Grc** | **gpt_5.2 high, Responses, reasoning carried** | **0.4375** | **0.93** | 9 | 0.78 | $2.70 |
+| Hac | gpt-5.4 high, carried | 0.1875 | 0.40 | 6 | 0.50 | $3.22 |
+| Hbc | gpt-5.5 high, carried | 0.3125 | 0.67 | 6 | 0.83 | $5.14 |
+| Ga3 | gpt-5.4 none, Responses | 0.125 | 0.27 | 4 | 0.50 | $0.47 |
+| Gb3 | gpt-5.5 none, Responses | 0.25 | 0.53 | 5 | 0.80 | $0.95 |
+
+**By the rules, on both matchers:**
+- **Anchor.** Gr1 reproduces its earlier matchings exactly (0.3125).
+- **Grc closes the gap** (q 0.93 ≥ 0.8), and **carry-over adds reach**: Grc − Gr1 = +0.125 ≥ 0.10.
+  It files fewer findings than Gr1 (9 against 11) and hits more asks per finding (0.78 against
+  0.45, and X's 0.29-0.32), so the gain is not padding.
+- **Hac leaves the gap** (q 0.40). **Hbc is partial** (q 0.67). Hbc's reading is conditional: its
+  implementation coefficient, 0.70 ± 0.29, is below the pre-registered 0.8. Every turn of Hbc that
+  reasoned did carry encrypted items, and on its low-noise turns input grew by 0.96 of the reasoning
+  (post hoc; see f7bd8db).
+- **What reasoning adds** on one endpoint: +0.0625 for both, Hac against Ga3 and Hbc against Gb3,
+  one ask each. No threshold was pre-stated for this.
+
+**Where Grc moved against Gr1**, three asks gained and one lost:
+- **Gained on 43192:** both `cat_disch` default asks (p0014, p0015). Before, only Claude and test
+  (d)'s calib2 session had reached them.
+- **Gained on 43024:** the `_mono` → `_anti` rename (p0008), which Gr1 reached only in part.
+- **Lost on 43167:** the rename of the private primed helper (p0012). Grc proposed deleting the
+  helper instead, which the matchers scored as a different change.
+
+Grc reaches every ask X reaches except 43192's `mkHom` → `homMk` rename (p0016), which no gpt
+reviewer has reached in any seal. 42814's four asks, 42184's `HasProd` version and 43167's swapped
+names are reached by no one, Claude included.
+
+**Process.** Grc concluded all six sessions in 83 turns, against Gr1's 284, with 117K reasoning
+tokens against 817K, and at a fifth of the cost. Repeats were 0.0-7.1 far repeats per 100 calls,
+and no negative repeats (`../carryover-coherence-2026-09-30/coherence.py`).
+
+**Altitude.** One run per condition, and the carry-over gain is two asks net. So the gap result is
+provisional until replicated (three reps is the project's minimum). Grc − Gr1 also changes the
+endpoint along with persistence. The coherence test's carry-over-off Responses sessions looped as
+Chat did, which points at persistence, but no carry-over-off gpt_5.2 run has been matched on these
+six PRs. What the result does support: with its reasoning carried, gpt_5.2 at high effort reached
+0.93 of Claude on unseen PRs, at a fifth of its Chat cost, and neither newer model did better here.

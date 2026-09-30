@@ -1,8 +1,11 @@
 # An OpenAI Responses-API provider, so gpt-5.4 and gpt-5.5 can reason with tools
 
 **Status** — **built 2026-09-30** on `openai-responses-provider`, merged into `develop`, both live
-checks passed (section "Built", at the end). Open: the blocked runs, back on `pipeline-overfit-review`
-(section "Then, back on `pipeline-overfit-review`").
+checks passed (section "Built", at the end). **The blocked runs ran 2026-09-30** on
+`pipeline-overfit-review`, with reasoning carried (the user's choice, after the carry-over coherence
+test). gpt_5.2 high with carry-over reached 0.93 of Claude, against 0.67 on Chat
+(`reviewer-model-gap.md`). Open: whether carry-over should become the default for OpenAI reasoning
+models in the pipeline, and the ELM gateway's `/v1/responses`.
 **Cost** — the build spends only its live checks, a few dollars. The blocked runs afterwards are
 about $70 billed at the estimated rates, plus about $10 of calibration.
 **Motivating example** — test (e) of `reviewer-model-gap.md` could not run its high-effort half.

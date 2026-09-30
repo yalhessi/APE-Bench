@@ -409,3 +409,27 @@ the three Gr1 sessions that looped most (42814, 32080, 33145):
   asks), and 33145 filed 7 against off's 10.
 - The next measurement is gpt_5.2 high with carry-over on across the six post-cutoff ask PRs,
   matched in one seal with Gr1.
+
+**Carry-over's reach, test (e) amended (2026-09-30, $11.06; `gpt52-postcutoff-2026-09-29/README.md`,
+the last section).** The seal held eight reviewers on the six post-cutoff PRs (16 asks). The two
+matchers agree on all 128 cells. q is each reviewer's reach over Claude's (X = 0.47):
+
+| reviewer | reach | q |
+|---|---|---|
+| gpt_5.2 high, Chat (Gr1) | 0.31 | 0.67 |
+| **gpt_5.2 high, reasoning carried (Grc)** | **0.44** | **0.93** |
+| gpt-5.4 high, carried | 0.19 | 0.40 |
+| gpt-5.5 high, carried | 0.31 | 0.67 |
+
+- **By the rules, Grc closes the gap and carry-over adds reach** (+0.125, two asks net).
+- **The gain is aim, not volume.** Grc filed fewer findings (9 against 11) and hit more asks per
+  finding (0.78 against 0.45).
+- **It is cheaper.** Grc used 83 turns against 284, for $2.70 against $14.85.
+- **The newer models do not beat it here.** gpt-5.5's reading is conditional on an underpowered
+  implementation check.
+- **Provisional.** One run each, and the endpoint changed along with persistence.
+
+**Next:**
+- replicate Grc;
+- a carry-over-off gpt_5.2 run on these six PRs, to separate the endpoint from persistence;
+- Grc on the validation and dev sets, where Gr1 reached 0.57-0.60 and 0.29-0.31 of Claude.
