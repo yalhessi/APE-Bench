@@ -273,6 +273,29 @@ Code uses its own login. Four things break without the relay:
 A spent subscription usage limit also needs handling as a failed attempt, or it reads as an
 empty review.
 
+**A subscription can also go through the relay, as a pass-through (measured 2026-10-01, no
+spend).** The check was a local listener that answers and never forwards. With
+`CLAUDE_CODE_OAUTH_TOKEN` set, `HOME` elsewhere and `ANTHROPIC_BASE_URL` pointed at the listener,
+CLI 2.1.269 sends the subscription bearer to that URL (`Authorization: Bearer sk-ant-oat…`, and
+`oauth-2025-04-20` in `anthropic-beta`). With `ANTHROPIC_AUTH_TOKEN=relay_token` also set, as
+`_get_env_vars` sets it, the CLI sends `relay_token` and drops the oauth beta, because that variable
+outranks the token. The CLI's default model also moved with the credential: `claude-sonnet-5` under
+the token, `claude-opus-5[1m]` under `relay_token`. So a relay mode that forwards Claude Code's own
+request unchanged to `api.anthropic.com` would keep usage, the token half of `ExecutionLimits` and
+transcripts. The relay never holds the token: the CLI attaches it and the relay passes headers on as
+received. The subscription bills nothing per token, so it needs a zero-priced registry entry, as the
+`elm_*` models have. The token must not go into `llm_clients`. The Agent SDK docs bar third parties
+from offering claude.ai login, and press reports (2026-02) describe server-side refusal of
+subscription tokens outside Claude Code. An Anthropic provider for `ape_agent` therefore needs an
+API key. The gateway docs say nothing about OAuth through a gateway, and no request has been
+forwarded yet.
+
+**The relay's session id is broken on the installed CLI, whatever the credential.**
+`_extract_session_id` looks for `__session_<uuid>` in `metadata.user_id`. CLI 2.1.269 sends a JSON
+string there, `{"device_id":…,"account_uuid":"","session_id":"…"}` (the same capture), so
+`claude_code_session_id` stays `None`. No transcript hardlink is written on the ordinary relay path
+either.
+
 **What would close it:** for Codex, an older pinned CLI or a `/responses` route on the relay,
 and the bridge checked out or replaced. For Claude there are two routes. An Anthropic provider in
 `llm_clients` and an API key would keep the design and reach all three harnesses, `ape_agent`
