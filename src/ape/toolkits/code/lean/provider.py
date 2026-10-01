@@ -84,13 +84,25 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
         if ".." in file_path.parts:
             raise ValueError(
                 f"Parent directory references (..) are not allowed: {file_path}")
-        return (Path(self._workspace_root) / file_path).resolve()
+        root = Path(self._workspace_root)
+        resolved = (root / file_path).resolve()
+        if resolved.exists() or not (root / "target").exists():
+            return resolved
+        # A path spelled from the reviewed project's root, `Mathlib/.../X.lean`, which is how
+        # `lean_verify_edit` takes one and how the diff names every file. These tools took
+        # `target/Mathlib/...` and nothing else, so a reviewer using one spelling for both
+        # failed here with "Cannot find Lean project": 7 of 9 hover, goto and goal calls in
+        # three dev runs (2026-10-01). Same file, second spelling.
+        under_target = (root / "target" / file_path).resolve()
+        return under_target if under_target.exists() else resolved
 
     def _ensure_client(self, file_path: Path) -> LeanLSPClient:
         """Ensure LSP client is initialized"""
         project_path = find_project_path(file_path)
         if not project_path:
-            raise ValueError(f"Cannot find Lean project for {file_path}")
+            raise FileNotFoundError(
+                f"No Lean project contains {file_path}. A reviewed file is `Mathlib/.../X.lean` "
+                "(or `target/Mathlib/.../X.lean`); your own files are `scratch/...`.")
 
         if self._project_path != project_path:
             if self._client:
@@ -277,7 +289,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean hover error: {e}")
-            return {"success": False, "error": str(e), "outcome": "tool_error"}
+            return {"success": False, "error": str(e),
+                    "outcome": "invalid_request" if isinstance(e, (FileNotFoundError, ValueError)) else "tool_error"}
 
     async def goto(
         self,
@@ -338,7 +351,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean goto error: {e}")
-            return {"success": False, "error": str(e), "outcome": "tool_error"}
+            return {"success": False, "error": str(e),
+                    "outcome": "invalid_request" if isinstance(e, (FileNotFoundError, ValueError)) else "tool_error"}
 
     async def diagnostics(self, file_path: Path) -> Dict[str, Any]:
         """Implement diagnostics interface"""
@@ -365,7 +379,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean diagnostics error: {e}")
-            return {"success": False, "error": str(e), "outcome": "tool_error"}
+            return {"success": False, "error": str(e),
+                    "outcome": "invalid_request" if isinstance(e, (FileNotFoundError, ValueError)) else "tool_error"}
 
     # async def references(
     #     self,
@@ -478,7 +493,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean get_goal error: {e}")
-            return {"success": False, "error": str(e), "outcome": "tool_error"}
+            return {"success": False, "error": str(e),
+                    "outcome": "invalid_request" if isinstance(e, (FileNotFoundError, ValueError)) else "tool_error"}
 
     # ========== Register Lean-specific tools ==========
 
@@ -494,7 +510,9 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
 **Returns**: Current proof state (goals list)""")
             async def get_lean_goal(
-                file_path: Annotated[str, Field(description="Workspace file path (e.g., scratch/theorem.lean)")],
+                file_path: Annotated[str, Field(description=(
+                    "The file: a reviewed file as `Mathlib/.../X.lean` (the same spelling "
+                    "`lean_verify_edit` takes), or one of your own as `scratch/...`"))],
                 line: Annotated[int, Field(description="Line number (1-indexed)", ge=1)],
                 content: Annotated[
                     Optional[str],

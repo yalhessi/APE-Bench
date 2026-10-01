@@ -176,7 +176,9 @@ class BaseCodeToolsProvider(BaseToolsProvider):
 
 **Returns**: Type information, documentation, diagnostics at position""")
             async def code_hover(
-                file_path: Annotated[str, Field(description="Workspace file path (e.g., scratch/file.lean)")],
+                file_path: Annotated[str, Field(description=(
+                    "The file: a reviewed file as `Mathlib/.../X.lean` (the same spelling "
+                    "`lean_verify_edit` takes), or one of your own as `scratch/...`"))],
                 line: Annotated[int, Field(description="Line number (1-indexed)", ge=1)],
                 content: Annotated[str, Field(description="Unique content snippet on that line to identify position")]
             ) -> Dict[str, Any]:
@@ -192,7 +194,7 @@ class BaseCodeToolsProvider(BaseToolsProvider):
                     return result
                 except Exception as e:
                     self.logger.error(f"code_hover error: {e}")
-                    return {"success": False, "error": str(e)}
+                    return {"success": False, "error": str(e), "outcome": "tool_error"}
 
         if "code_goto" in enabled_tools:
             @mcp.tool(description=f"""Jump to definition of a symbol.
@@ -201,7 +203,9 @@ class BaseCodeToolsProvider(BaseToolsProvider):
 
 **Returns**: Definition locations with file path, line, content""")
             async def code_goto(
-                file_path: Annotated[str, Field(description="Workspace file path")],
+                file_path: Annotated[str, Field(description=(
+                    "The file: a reviewed file as `Mathlib/.../X.lean` (the same spelling "
+                    "`lean_verify_edit` takes), or one of your own as `scratch/...`"))],
                 line: Annotated[int, Field(description="Line number where symbol appears (1-indexed)", ge=1)],
                 content: Annotated[str, Field(description="Symbol name or unique snippet to identify")]
             ) -> Dict[str, Any]:
@@ -217,7 +221,7 @@ class BaseCodeToolsProvider(BaseToolsProvider):
                     return result
                 except Exception as e:
                     self.logger.error(f"code_goto error: {e}")
-                    return {"success": False, "error": str(e)}
+                    return {"success": False, "error": str(e), "outcome": "tool_error"}
 
 #         if "code_check" in enabled_tools:
 #             @mcp.tool(description=f"""Check file for errors and warnings.
