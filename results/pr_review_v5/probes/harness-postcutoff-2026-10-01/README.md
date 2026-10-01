@@ -88,3 +88,24 @@ Code's own tools and its bare-path `lean_verify` refusals. Not tried: reasoning 
 reached 0.31-0.44 under APE-Agent), Claude as the model in both harnesses (it needs an Anthropic
 provider), Codex, and the validation and dev sets. The gap to X stays the model's, as tests (b) and
 (e) found.
+
+## Second comparison: reasoning on, carried (pre-registered 2026-10-01, before its matchers)
+
+The same question, with the model at its strongest setting on this set: `gpt_5.2` at high effort
+through the Responses API, with each turn's encrypted reasoning carried to the next (Grc). Under
+APE-Agent that reached 0.44 a session in test (e) amended, one run, before the `lean_verify` fix.
+Through Claude Code nothing was carried until `e064ae0`: the relay rebuilt each request without
+the turn's reasoning state. A one-PR check after the fix (`pr5_probe0708_gpt52_Grc_claude_smoke1`,
+43024, 17 requests): every request carried every earlier turn's reasoning.
+
+| label | source | harness |
+|---|---|---|
+| A1, A2, A3 | `probe_postcutoff_gpt52_Grc_lvfix_rep{1,2,3}` | `ape_agent`, `configs/pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml` |
+| C1, C2, C3 | `probe_postcutoff_gpt52_Grc_claude_rep{1,2,3}` | `claude_code`, `configs/pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_claude.yaml` |
+| X1, X2 | Claude's post-cutoff sessions | the reference |
+
+Seal `blinding_carried_SEALED.json`, sources `sources_carried.json`, matcher outputs in
+`match_carried/`. Matching and the reading rule are as above: `d = reach(C) - reach(A)` on both
+matchers, with `|d| <= 0.05` comparable, `d >= 0.10` Claude Code more, `d <= -0.10` APE-Agent
+more, and anything else inconclusive. A session that stopped at its cap without submitting is
+matched as an empty review, marked, and counted.
