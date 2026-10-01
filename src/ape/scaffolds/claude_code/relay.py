@@ -44,6 +44,41 @@ def strip_billing_header(text: str) -> str:
     return _BILLING_HEADER.sub("", text, count=1)
 
 
+def anthropic_event_stream(message: Dict[str, Any]) -> str:
+    """A complete Anthropic message as the server-sent events of a streamed one.
+
+    Claude Code asks for every turn with `stream: true`. Answered with plain JSON, it discards the
+    reply and asks again without streaming (captured against a local server, 2026-10-01), so every
+    turn reached the backend twice and was billed twice: 128 main-model requests for 64 turns over
+    the three G-under-Claude-Code repetitions. The backend call stays one non-streaming call, so
+    usage and limits are counted as before; only the reply's framing changes.
+    """
+    events: List[str] = []
+
+    def emit(name: str, data: Dict[str, Any]) -> None:
+        events.append(f"event: {name}\ndata: {json.dumps(data)}\n\n")
+
+    usage = message.get("usage") or {}
+    emit("message_start", {"type": "message_start", "message": {
+        **message, "content": [], "stop_reason": None, "stop_sequence": None,
+        "usage": {"input_tokens": usage.get("input_tokens", 0), "output_tokens": 0}}})
+    for index, block in enumerate(message.get("content") or []):
+        if block.get("type") == "tool_use":
+            start = {**{k: v for k, v in block.items() if k != "input"}, "input": {}}
+            delta = {"type": "input_json_delta", "partial_json": json.dumps(block.get("input") or {})}
+        else:
+            start = {"type": "text", "text": ""}
+            delta = {"type": "text_delta", "text": block.get("text", "")}
+        emit("content_block_start", {"type": "content_block_start", "index": index, "content_block": start})
+        emit("content_block_delta", {"type": "content_block_delta", "index": index, "delta": delta})
+        emit("content_block_stop", {"type": "content_block_stop", "index": index})
+    emit("message_delta", {"type": "message_delta",
+                           "delta": {"stop_reason": message.get("stop_reason"), "stop_sequence": None},
+                           "usage": {"output_tokens": usage.get("output_tokens", 0)}})
+    emit("message_stop", {"type": "message_stop"})
+    return "".join(events)
+
+
 class ClaudeCodeRelaySession(BaseRelaySession):
     """Claude Code relay session - Anthropic API implementation"""
 
@@ -244,6 +279,9 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             )
 
             self.logger.info(f"Response completed: {client_requested_model}")
+            if anthropic_request.get("stream"):
+                return Response(content=anthropic_event_stream(anthropic_response),
+                                media_type="text/event-stream")
             return JSONResponse(anthropic_response)
 
         except asyncio.CancelledError:

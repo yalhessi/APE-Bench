@@ -451,3 +451,60 @@ def test_the_header_is_stripped_only_where_it_opens_a_block():
     assert strip_billing_header("x-anthropic-billing-header: cch=1;\nYou are...") == "You are..."
     kept = "Quote: x-anthropic-billing-header: cch=1;"
     assert strip_billing_header(kept) == kept
+
+
+# --- a streamed request gets a streamed reply, or the CLI asks for every turn twice ------------
+
+
+def _replay(stream_text):
+    """Rebuild a message from its events, the way a streaming client accumulates them."""
+
+    import json
+
+    message, blocks, partial = None, {}, {}
+    for chunk in stream_text.strip().split("\n\n"):
+        name_line, data_line = chunk.split("\n")
+        assert name_line.startswith("event: ") and data_line.startswith("data: ")
+        event = json.loads(data_line[len("data: "):])
+        assert event["type"] == name_line[len("event: "):]
+        if event["type"] == "message_start":
+            message = event["message"]
+        elif event["type"] == "content_block_start":
+            blocks[event["index"]] = dict(event["content_block"])
+        elif event["type"] == "content_block_delta":
+            delta = event["delta"]
+            if delta["type"] == "text_delta":
+                blocks[event["index"]]["text"] += delta["text"]
+            else:
+                partial[event["index"]] = partial.get(event["index"], "") + delta["partial_json"]
+        elif event["type"] == "message_delta":
+            message["stop_reason"] = event["delta"]["stop_reason"]
+            message["usage"]["output_tokens"] = event["usage"]["output_tokens"]
+    for index, text in partial.items():
+        blocks[index]["input"] = json.loads(text)
+    message["content"] = [blocks[i] for i in sorted(blocks)]
+    return message
+
+
+def test_the_event_stream_rebuilds_the_message_it_replays():
+    """Claude Code sends every turn with stream: true. Answered with JSON it discarded the reply
+    and asked again without streaming: 128 main-model requests for 64 turns, each billed twice."""
+
+    from ape.scaffolds.claude_code.relay import anthropic_event_stream
+
+    message = {"id": "msg_1", "type": "message", "role": "assistant", "model": "gpt_5.2",
+               "content": [{"type": "text", "text": "Reading the file."},
+                           {"type": "tool_use", "id": "toolu_1", "name": "mcp__core__lean_verify",
+                            "input": {"file_path": "target/Mathlib/A.lean", "max_messages": 20}}],
+               "stop_reason": "tool_use", "stop_sequence": None,
+               "usage": {"input_tokens": 16011, "output_tokens": 642}}
+    assert _replay(anthropic_event_stream(message)) == message
+
+
+def test_a_streamed_request_is_answered_as_a_stream():
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    source = inspect.getsource(ClaudeCodeRelaySession._handle_messages)
+    assert 'anthropic_request.get("stream")' in source
+    assert "anthropic_event_stream(anthropic_response)" in source
+    assert 'media_type="text/event-stream"' in source
