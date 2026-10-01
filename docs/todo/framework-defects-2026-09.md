@@ -389,10 +389,17 @@ failed at once with no tokens, and the run finished `partial` with its outputs w
 there `--resume` is refused, because it is meant for a run that was interrupted before writing
 its outputs, and the orchestrator lists the two as Failed, not Resumable. So the only way to
 complete it is `--redo`. That re-runs the 13 good sessions, about 21M tokens of subscription quota
-spent again. Two things would close it: a resume path for a partial run whose failures are all
-environmental (a spent limit), which re-opens only those tasks and rewrites the outputs; and a
-scheduler that starts no new session once the CLI reports `allowed_warning`. The second was
-done by hand that day: the chain was stopped before rep 3 at the first warning.
+spent again.
+
+**The resume half is fixed (`ebee26c`, `9ceba2a`).** `run --resume` now reopens a partial run. In
+each of its orchestrators it requeues the samples that failed on system errors with their
+retries spent, keeps every success, and lets unfinished samples continue. It clears the closed
+outputs but keeps the plan, the agenda and the append-only logs, and it records the reopen in
+`stages.jsonl` (partial -> running). It refuses when nothing failed on errors, because then the
+partial is the result, and it refuses lead runs, whose failures sit in nested orchestrators. On
+rep 2 the dry run reads "would requeue 2 session(s)". **Still open:** a scheduler that starts no
+new session once the CLI reports `allowed_warning`. That was done by hand that day: the chain
+was stopped before rep 3 at the first warning.
 
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
