@@ -174,3 +174,38 @@ is running and closes the cell (mean / union / stable).
   interactive use.
 - **One run per cell except H-claude.** CLAUDE.md asks for three repetitions before a reading
   stands. M-5 and M-4.8 have one each.
+
+## Run-to-run consistency of the solo reviewer (2026-10-01, `consistency.py`, no spend)
+
+Read for `docs/plans/2026-10-01-beyond-the-solo-baseline.md` from the committed audits and runs.
+`consistency.py` prints the per-obligation spine for every dev cell, the union and stable sets,
+the change targets two cells share, control emission, and (from the uncommitted `.ape/runs`) the
+sessions' visible text and budget truncations.
+
+| cells on the dev held-out 12 | hit per cell | union | stable |
+|---|---|---|---|
+| the same configuration twice (H-claude reps 1, 2) | 7, 7 | 8 (0.35) | 6 |
+| the six Opus 5.x cells (X1, X2, swap, H-claude r1, r2, M-5) | 11, 11, 10, 7, 7, 8 | **13 (0.57)** | 6 |
+| every cell, gpt included | as above, 3, 3, 2 | 13 | 2 |
+
+- **A single pass reaches about two thirds of what the family of passes reaches.** Ten
+  obligations are reached by no Opus cell; the thirteen reached are reached by at most six cells
+  and six of them by every one.
+- **Reps revisit the same targets and ask different things there.** Two reps of one
+  configuration share 56 of 86 change targets (Jaccard 0.65); Opus 5 against Opus 5.5 0.53-0.59;
+  Claude against gpt 0.24-0.29. At 33321's `baseOf`, rep 1 filed the docstring typo and rep 2 the
+  set comprehension, one gold obligation each; at 33149's Parseval axiom, rep 1 found the Mathlib
+  lemma by search and rep 2 did not.
+- **The never-reached ten are knowledge at an attended site**: the `toLinearMap_` rename (all
+  three project cells asked a different rename there, Opus 5 citing `coe_`'s global count), the
+  `@[to_fun]` mechanism (3-6 findings at the site, none the attribute), dot notation (no finding at
+  the site in any cell), and the 33145 `ciSup'` cluster, where the exact `by_cases` restructure and
+  the exact `(α := αᵒᵈ)` dual proof were filed in both reps and scored `loc`.
+- **Harness defects seen in the sessions**: the first message names a read-write scratch
+  workspace "for creating and editing files" while `Write`, `Edit` and `Bash` are disallowed, so
+  the sessions write 1-13 visible text blocks (84-1,738 characters) and keep their account only in
+  the final call; `finding_budget: 20` dropped 2 and 4 findings on 33149 in reps 1 and 2 (the
+  scaffold log's only trace); `proof_profile` is granted and dead on dev; two absolute roots name
+  the same attempt.
+- **Control emission**: Opus 5.5 under the project harness 1.0 per control PR, Opus 5 and the swap
+  4.0, X1/X2 1.0-1.5, gpt 0-0.5.
