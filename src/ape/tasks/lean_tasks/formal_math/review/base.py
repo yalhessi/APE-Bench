@@ -150,18 +150,22 @@ class BasePRReviewResult(BaseTaskResult):
 
 
 def submission_mandate(submit_tool_name: str, filing_bar: str = "merge",
-                       review_notes: bool = False) -> str:
+                       review_notes: bool = False, plain: bool = False) -> str:
     """The closing instruction that forces a `submit_findings` call.
 
     Agents that conclude "nothing to flag" sometimes end with a text-only reply and never call
     the tool, which the harness records as an empty failure rather than a clean review, so the
     empty-review path is explicit and mandatory. Under the "request" filing bar the empty call
     carries no `merge_ready_as_is`, since that tool variant has no such field; with
-    `review_notes` it still carries the notes, which the tool requires.
+    `review_notes` it still carries the notes, which the tool requires. `plain` (the solo task's
+    `user_prompt: v2`) keeps the empty-review path and drops "MUST" and "fails the task", the same
+    register as the batch preamble's "TEXT ALONE accomplishes NOTHING".
     """
     empty = ("call it with an empty `findings` list and `merge_ready_as_is: true`" if filing_bar == "merge"
              else "call it with an empty `findings` list and your `notes`" if review_notes
              else "call it with an empty `findings` list")
+    if plain:
+        return f"\n\nFinish by calling `{submit_tool_name}` once. If there is nothing to ask, {empty}."
     return (f"\n\nYou MUST finish by calling `{submit_tool_name}` exactly once — even if you find "
             f"nothing. If there is nothing to change, {empty}. A text-only reply does not count and "
             "fails the task.")
@@ -270,7 +274,8 @@ class BasePRReviewTask(BaseLeanTask):
             submit_tool_name=submit_tool_name,
             budget=self.config.task_config.finding_budget,
         )
-        mandate = submission_mandate(submit_tool_name, self._filing_bar(), self._review_notes())
+        mandate = submission_mandate(submit_tool_name, self._filing_bar(), self._review_notes(),
+                                     self._plain_contract())
         return base + mandate + self._precedent_block()
 
     def _filing_bar(self) -> str:
@@ -280,6 +285,10 @@ class BasePRReviewTask(BaseLeanTask):
     def _review_notes(self) -> bool:
         """`task_config.review_notes` where the task declares it (the solo task), else False."""
         return getattr(self.config.task_config, "review_notes", False)
+
+    def _plain_contract(self) -> bool:
+        """The solo task's `user_prompt: v2`: mandate and submit tool without the imperatives."""
+        return getattr(self.config.task_config, "user_prompt", "v1") == "v2"
 
     def _precedent_block(self) -> str:
         """Stage-2 Mode A: append retrieved past-maintainer precedents for THIS PR, if primed.
@@ -606,6 +615,9 @@ class BasePRReviewTask(BaseLeanTask):
         CONFIDENCE = Annotated[Optional[float], Field(description="0.0-1.0")]
         MESSAGE = Annotated[str, Field(description="Optional summary of the review.", default="")]
         DESCRIPTION = (
+            "Submit your review of this PR. Call it once, when you have finished: it records the "
+            "review and ends the session."
+        ) if self._plain_contract() else (
             "Submit your final review findings for this PR. Call this exactly once when done. "
             "This records the review and ends the conversation. A text-only response is INVALID."
         )
@@ -697,6 +709,10 @@ class BasePRReviewTask(BaseLeanTask):
         """Coerce raw tool input into the PredictionRecord finding shape; drop empties,
         clamp severity, enforce the budget, keep optional evidence."""
         budget = self.config.task_config.finding_budget
+        if 0 < budget < len(findings) and self.logger:
+            # Cut silently, a finding past the budget looks like one never filed.
+            self.logger.warning("submit_findings: %d findings past the budget of %d not recorded",
+                                len(findings) - budget, budget)
         out: List[Dict[str, Any]] = []
         for raw in findings[: budget if budget > 0 else len(findings)]:
             if not isinstance(raw, dict):

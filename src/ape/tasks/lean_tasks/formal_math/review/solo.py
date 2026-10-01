@@ -148,11 +148,73 @@ Also give `notes`: what you did, object by object, including what you checked an
 wrong with. Every changed object gets an entry, closed with what you concluded about it."""
 
 
-def solo_user_template(filing_bar: str = "merge", review_notes: bool = False) -> str:
-    """`SOLO_USER` with its severity line spelled for this filing bar, and the notes line when
-    the submission requires notes."""
-    return (SOLO_USER.replace("{severity_line}", SEVERITY_LINES[filing_bar])
-            .replace("{notes_line}", NOTES_LINE if review_notes else ""))
+#: `SoloReviewConfig.notes_form: per_object_family`: the account in the shape the Claude reviewers'
+#: `notes.md` actually took -- declaration by declaration, each taken through the concerns that apply
+#: to it and closed with a verdict. Under the per-object line, gpt's notes named 37% of the PR model's
+#: changed declarations (Claude 73-78%) and mentioned naming on 50% of PRs and generality on 17%
+#: (Claude 92-100% and 75-83%); results/pr_review_v5/probes/contract-2026-10-01/.
+NOTES_LINE_FAMILY = """
+Also give `notes`: your account of the review, with an entry for every changed declaration in the \
+PR model (declarations of one family may share an entry). In each entry, say what you checked for \
+that declaration under each concern that applies to it -- its proof, its statement and how general \
+it is, whether the library already has it, its name, its docstring, its attributes and placement -- \
+and close it with what you concluded, "nothing to ask" included."""
+
+#: `SoloReviewConfig.user_prompt: v2`. What v1 says that the Claude reviewers' contract never did is
+#: gone, and nothing is added (results/pr_review_v5/probes/contract-2026-10-01/README.md):
+#: - the PR model comes before the diff, in Claude's reading order, not after the instructions;
+#: - no "Investigate ... look for existing declarations that overlap, check whether a proof could be
+#:   shorter" (two of the brief's eight families, from the first solo prompt, 28d40719);
+#: - no `concern_family` / `issue_kind` lists: the task stamps the pair an imported Claude finding
+#:   carries, since the candidate validator needs an `issue_kind` and the judge shows the family;
+#: - no "at most N findings": the budget is enforced in code, and it never bound.
+#: `{context_block}` is filled before `format` runs, with its braces escaped.
+SOLO_USER_V2 = """\
+# Pull request #{pr_number}
+
+**Title:** {title}
+
+**Description:**
+{description}
+
+**Changed files:**
+{changed_files}
+
+**Tools available:** {tool_summary}
+{context_block}
+---
+
+## The diff
+
+```diff
+{diff}
+```
+
+---
+
+When you have reviewed the PR as the brief asks, call `{submit_tool_name}`. For each finding, give:
+
+- `path` and `line_start` -- where in the reviewed file the problem is, so the finding can be \
+located. Give the line of the declaration your claim is about.
+- `claim` -- name the declaration and say what is wrong with it.
+- `suggested_fix` -- what to do instead.
+{severity_line}
+{notes_line}"""
+
+
+def solo_user_template(filing_bar: str = "merge", review_notes: bool = False,
+                       user_prompt: str = "v1", notes_form: str = "per_object",
+                       context_block: str = "") -> str:
+    """The user template for this condition, before `format`.
+
+    v1 is `SOLO_USER` with its severity line and, when the submission requires notes, the notes
+    line; the PR model is appended after it by the task. v2 is `SOLO_USER_V2` with the PR model
+    in place before the diff (`context_block`, braces escaped so `format` leaves Lean alone).
+    """
+    notes = "" if not review_notes else NOTES_LINE_FAMILY if notes_form == "per_object_family" else NOTES_LINE
+    template = SOLO_USER if user_prompt == "v1" else SOLO_USER_V2.replace(
+        "{context_block}", context_block.replace("{", "{{").replace("}", "}}"))
+    return template.replace("{severity_line}", SEVERITY_LINES[filing_bar]).replace("{notes_line}", notes)
 
 
 class SoloReviewConfig(BasePRReviewConfig):
@@ -187,10 +249,22 @@ class SoloReviewConfig(BasePRReviewConfig):
     #: condition nothing has asked for.
     review_notes: bool = False
 
+    #: What the notes are asked to cover: "per_object" (`NOTES_LINE`, the contract run of
+    #: 2026-10-01) or "per_object_family" (`NOTES_LINE_FAMILY`). Needs `review_notes`.
+    notes_form: Literal["per_object", "per_object_family"] = "per_object"
+
+    #: "v1": `SOLO_USER`, every run before 2026-10-01. "v2": `SOLO_USER_V2` -- the PR model before the
+    #: diff, no steering line, no label lists, no finding count -- with the mandate and the submit
+    #: tool's description stated without "fails the task" / "INVALID", and the unlabelled pair stamped
+    #: on every finding.
+    user_prompt: Literal["v1", "v2"] = "v1"
+
     @model_validator(mode="after")
     def _notes_need_the_request_bar(self) -> "SoloReviewConfig":
         if self.review_notes and self.filing_bar != "request":
             raise ValueError("review_notes is implemented for filing_bar: request only")
+        if self.notes_form != "per_object" and not self.review_notes:
+            raise ValueError("notes_form needs review_notes: true")
         return self
 
 
@@ -281,13 +355,29 @@ class SoloReviewTask(BasePRReviewTask):
     task_result_class = SoloReviewResult
 
     def _get_prompts(self, version: str) -> Tuple[str, str]:
-        return (solo_system_prompt(self.config.task_config),
-                solo_user_template(self.config.task_config.filing_bar,
-                                   self.config.task_config.review_notes))
+        config = self.config.task_config
+        return (solo_system_prompt(config),
+                solo_user_template(config.filing_bar, config.review_notes, config.user_prompt,
+                                   config.notes_form,
+                                   solo_context_block(config, self.data.pr_number)
+                                   if config.user_prompt == "v2" else ""))
 
     async def create_user_prompt(self) -> str:
-        return (await super().create_user_prompt()
-                + solo_context_block(self.config.task_config, self.data.pr_number))
+        # v1 appends the PR model after the instructions; v2 has already placed it before the diff.
+        prompt = await super().create_user_prompt()
+        if self.config.task_config.user_prompt == "v1":
+            prompt += solo_context_block(self.config.task_config, self.data.pr_number)
+        return prompt
+
+    def _normalize_findings(self, findings):
+        normalized = super()._normalize_findings(findings)
+        if self.config.task_config.user_prompt == "v2":
+            # Not asked for, so not the model's: the pair an imported Claude finding carries.
+            from src.mathlib_review.analysis.probes import IMPORT_ISSUE_KIND, UNLABELLED_FAMILY
+
+            for finding in normalized:
+                finding["concern_family"], finding["issue_kind"] = UNLABELLED_FAMILY, IMPORT_ISSUE_KIND
+        return normalized
 
     async def register_task_tools(self, mcp) -> None:
         # The base grant first -- `lean_verify_edit` and `submit_findings` -- then exactly the

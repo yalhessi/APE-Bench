@@ -854,9 +854,12 @@ def model_context(spec: ProbeSet, prs: List[int]) -> str:
 #: The `issue_kind` every imported probe finding carries. The candidate validator refuses a finding
 #: without one on any release rendered at candidate-prompt/12 or later, a probe reviewer was never
 #: asked for one, and the judge's prompt does not show it -- it shows the concern family, which the
-#: import sets to `other` for the same reason. With no evidence chain the import's gate is closed, so
-#: this routes nothing; it is a placeholder, not a label.
+#: import sets to `UNLABELLED_FAMILY` for the same reason. With no evidence chain the import's gate is
+#: closed, so this routes nothing; it is a placeholder, not a label. The solo task's `user_prompt: v2`
+#: stamps the same pair on every finding, so a gpt reviewer that is not asked for labels reaches the
+#: judge exactly as an imported Claude finding does.
 IMPORT_ISSUE_KIND = "style_norm_violation"
+UNLABELLED_FAMILY = "other"
 
 
 def resolve_target(target: str, graph) -> tuple:
@@ -951,7 +954,7 @@ def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -
                 "anchor": {"path": file, "line_start": line, "line_end": line} if file else None,
                 "severity": severity if severity in ("blocking", "advisory") else "advisory",
                 "claim": claim,
-                "concern_family": "other",
+                "concern_family": UNLABELLED_FAMILY,
                 "issue_kind": IMPORT_ISSUE_KIND,
                 "suggested_fix": (str(raw["requested_change"]) if raw.get("requested_change") else None),
                 "evidence": (str(raw["evidence"]) if raw.get("evidence") else None),
@@ -976,7 +979,7 @@ def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -
     provenance = {
         "source": "probe session", "set": spec.name, "session": session,
         "packets_findings_sha256": packets, "target_resolution": dict(methods),
-        "anchoring": report, "concern_family": "other", "issue_kind_placeholder": IMPORT_ISSUE_KIND,
+        "anchoring": report, "concern_family": UNLABELLED_FAMILY, "issue_kind_placeholder": IMPORT_ISSUE_KIND,
         "evidence_chain": "not run: the gate is closed, so admission and publication are not "
                           "comparable to a solo run's; the judge's issue recall reads every finding",
         "run_manifest": "not written: the judge reads this source as unchecked",
