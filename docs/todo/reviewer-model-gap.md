@@ -455,6 +455,33 @@ the 0.93 did not replicate.** Three carried reps on post-cutoff and one each on 
 - **The residual population**: of 93 asks, 37 (40%) are reached by nobody and 30 (32%) only by Claude.
   Phase 1 labels both (`phase1_population.json`).
 
+**Why every gpt condition looks alike on the judge (2026-10-01, no spend; dev held-out 12, judge v9).**
+Hits per finding are the same for every reviewer, Claude included; what differs is how much each says
+and about how many objects:
+
+| reviewer | findings per PR | change targets with a finding (of 432) | obligations hit per finding |
+|---|---|---|---|
+| Claude X1 / X2 | 7.5 / 8.1 | 76 / 83 | 0.12 / 0.11 |
+| gpt_5.2 off / carried | 3.2 / 2.6 | 35 / 30 | 0.11 / 0.10 |
+| gpt-5.5 / gpt-5.4 carried | 2.8 / 2.1 | 32 / 25 | 0.09 / 0.08 |
+
+Inputs are identical (full diff, PR text, pass-0 model in every gpt prompt) and the tools work
+(`lean_verify` failures are the model's own unknown names and proof errors; `proof_profile` is dead
+on dev: no declaration tables were built). The common factor is the harness and contract, which every
+gpt condition shares and Claude's packet does not:
+- Claude's brief X requires `notes.md`, "what you did, object by object, including what you checked
+  and found nothing wrong with" -- median 22 object entries a PR, each closed with a verdict. Brief G
+  drops it; gpt's only output is the final `submit_findings` call.
+- the `ape_agent` preamble: every response must be tool calls, "TEXT ALONE ... accomplishes NOTHING",
+  batch all calls, submit only when "COMPLETED and VALIDATED"; Claude Code imposes none of it.
+- turn caps and a submit tool with a finding budget and merge framing, against an uncapped session
+  (Claude: 57 tool calls a session at the median; gpt: 37-49 calls in 18 turns); and gpt's grant lacks
+  `file_search`, which Claude called 102 times on post-cutoff.
+Not the whole story: on validation the filing bar widened gpt-5.5 from 20 to 37 targets and reach
+stayed at 0.20, so breadth without the per-object pass did not help. The untried design is the
+contract itself -- an object-by-object ledger in the submission, the preamble's anti-text and
+batching lines dropped, `file_search` granted -- on gpt_5.2 carried, judged on the held-out 12.
+
 **Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
 `SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
 (in-sample) gpt-5.5 files the three 43192 asks it had withheld, q 0.67 → 0.93. **On validation it
