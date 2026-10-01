@@ -109,3 +109,33 @@ Seal `blinding_carried_SEALED.json`, sources `sources_carried.json`, matcher out
 matchers, with `|d| <= 0.05` comparable, `d >= 0.10` Claude Code more, `d <= -0.10` APE-Agent
 more, and anything else inconclusive. A session that stopped at its cap without submitting is
 matched as an empty review, marked, and counted.
+
+### Result, reasoning carried (matched 2026-10-01)
+
+Two blind matchers on the seal `b7a7ca4`, both audited clean (7 calls each, none flagged), agreeing
+on all 128 cells.
+
+| reach over 16 asks | A1 | A2 | A3 | **A** | C1 | C2 | C3 | **C** | X | **d = C - A** |
+|---|---|---|---|---|---|---|---|---|---|---|
+| both matchers | .3125 | .125 | .1875 | **.208** | .25 | .25 | .25 | **.250** | **.469** | **+0.042** |
+
+**By the rule: comparable** (`|d| <= 0.05`). With reasoning carried, too, the APE-Agent harness is
+not what limits `gpt_5.2` against Claude Code. `q`: A 0.44, C 0.53.
+
+- **Which asks.** C's three sessions each reach the same 4 asks: the unused import, the title's
+  "of", dropping `[L.NeBot]`, and `@[to_additive]`. A's union is 5 asks, those 4 plus the
+  `cat_disch` default on `mk` (A1 only), but only the import and the title are stable across A's
+  sessions. Neither condition reaches `homMk`, the `mkHom` default, or the `_anti` rename.
+- **Against reasoning off** (this folder's first comparison), carried reasoning raises reach for
+  both harnesses: A 0.146-0.167 to 0.208, C 0.125 to 0.250. Findings fall from 15-19 a session to
+  6-8, and asks per finding rise from 0.13-0.14 to 0.52-0.56. Read across two seals and two matcher
+  pairs, not pre-registered.
+- **Cost.** Billed for three repetitions: A $7.81, C $10.19.
+
+**Grc's earlier 0.44 does not replicate here.** Test (e) amended matched one Grc run (before the
+`lean_verify` fix) at 0.4375, q 0.93, and read it as closing the gap. Three runs of the same
+configuration, with the fix, reach 0.31, 0.125 and 0.19, mean 0.21, q 0.44. Both sets of matchers
+put X at 0.469, so the shift is in the A sessions, not the matching. A one-run reading moved by
+regression toward the mean is the plainest account. The fix is the one difference in setup, and
+its effect is not separated here. The record's "carry-over closes the gap" should be read as
+"carry-over raises reach to about half of Claude's" until more runs settle it.
