@@ -118,7 +118,7 @@ or probe. Recall follows how much the reviewer files. That repeats what the cont
 reviewer decides to ask for. Opus 5 and 5.5 under the project harness file about 75 held-out
 findings, Opus 4.8 and gpt about 30. One run per cell, with H-claude's repetitions still to come.
 
-## H-claude rep 2, first attempt: cut short by the subscription limit, to be redone
+## H-claude rep 2, first attempt: cut short by the subscription limit, then reopened
 
 `probe_dev_opus55_contract2_claude_sub_rep2` ran 13 of 15 sessions before the subscription's
 five_hour limit was spent at 10:00. 33321 (held out) and 33066 failed mid-session on
@@ -128,3 +128,22 @@ rep 1, so it is redone after the reset under the same name. One of its sessions 
 `bb11a540`) audited `clean=False` on a call to `zulip_search`, a tool that does not exist (the
 real one is `mcp__core__zulip_search`), which the CLI refused before anything ran. Re-audited
 under `e5de5f0`, it is clean (17 calls, 1 nonexistent, 0 leaked).
+
+**Reopened, not redone (2026-10-01 10:36).** `run --resume` (`9ceba2a`) requeued exactly the two
+lost sessions, ran them on a second account's token (checked first as allowed), and kept the 13
+successes. Both succeeded on attempt 5, and the run closed complete (`e9f88b2`). Two
+subscriptions served it, with the same model, CLI and effort. All 15 sessions audit clean and
+usable under `e5de5f0`.
+
+## H-claude rep 2, dev: 7 of 23 again (judge v9, $0.20)
+
+Audit `probe-dev-opus55-contract2-claude-sub-rep2`: issue recall 0.304, reachable 0.417.
+
+| H-claude, Opus 5.5 | rep 1 | rep 2 | union | stable |
+|---|---|---|---|---|
+| obligations of 23 | 7 | 7 | 8 | 6 |
+
+Against the swap's 10: 7 of the swap's obligations are in H-claude's union and 3 are not, and 1
+of H-claude's is not the swap's. Two repetitions agree to the obligation count and on 6 of 7
+obligations, so the gap to the swap is not a low draw: it is 3, the boundary of the rule. Rep 3
+is running and closes the cell (mean / union / stable).
