@@ -243,3 +243,48 @@ The two readings that matter:
   about the model under this instruction, not a test of the ledger.
 
 One run, so provisional either way.
+
+### Result (2026-10-01): the ledger was carried over, and it is not the lever
+
+The run completed 15 of 15 sessions for $8.36 billed. No API retries, no budget truncations, no
+capped session (max 41 of 160 turns). Judge v9 on the held-out 12, $0.08, audit
+`probe-dev-gpt52-Grc-contract2-rep1`.
+
+| reviewer | issue recall | reachable | findings | targets | hits / finding | notes cover declarations (median) | notes mention naming / generality | tool calls | edits compiled | library lookups |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Claude X1 / X2 | 0.478 | 0.583 | 90 / 97 | 76 / 83 | 0.12 / 0.11 | 73% / 78% | 100% / 92%, 83% / 75% | 58 / 57 | 9.5 / 11.5 | 17 / 19.5 |
+| **contract v2** | **0.087** | 0.167 | 34 | 34 | 0.059 | **73%** | **83%, 58%** | 30 | 2 (+1 snippet) | 2.5 |
+| contract v1 | 0.130 | 0.167 | 42 | 40 | 0.071 | 37% | 50%, 17% | 32 | 1.5 (+4) | 1.5 |
+| Grc1 | 0.130 | 0.250 | 31 | 30 | 0.097 | - | - | 39 | 3.5 (+3) | 3.5 |
+
+**By the pre-registered rule, not a lever**: 2 obligations, the two 33149 axiom asks every gpt
+run reaches. That is one fewer than v1 and Grc1, inside the noise.
+
+**The first of the two pre-stated readings is the one that holds.** The ledger was carried over.
+The notes now name as many of the PR model's declarations as Claude's do: 71-78% on the four
+large PRs, against v1's 25-46%. They mention naming on 83% of PRs and generality on 58%. Recall
+did not move. What remains, by the stated reading, is the model or the harness.
+
+**What the ledger changed is what gpt writes, not what it does.** Tool calls did not rise (30 a
+session, against Claude's 57-58), and neither did candidate edits compiled (2 against 9.5-11.5)
+or library lookups (2.5 against 17-19.5). Claude's per-declaration entries are backed by a
+compile or a search. gpt's v2 entries mostly assert a check from reading ("checked ...; nothing
+to ask"). Where maintainers asked, the notes now show the decision outright:
+- 33294: `isFundamentalSequence_of_isNormal`, which the maintainer asked to rename to dot
+  notation: "just renamed/unprotected; no generality issues."
+- 33285: `inf_comap_le_comap_add`, asked to golf to a direct lambda: "proof golfed to `simp` +
+  `add_mem`; ... nothing to ask."
+- 33421: `two_mul_fract_eq_one_iff_exists_int`, asked to generalize: "checked statement for
+  correctness and usefulness ... No duplication found." The session asked to move it instead.
+
+**Untried, and which question each answers:**
+1. **The swap**: Claude given this prompt verbatim, same tools and output. It separates the model
+   from the harness; the prompt is now as close to Claude's as these runs can make it.
+2. **An evidence-backed ledger**: each "nothing to ask" names the call that checked it. This
+   tests whether the missing investigation, not the missing account, is the lever. It is a forcing
+   design beyond Claude's contract.
+3. **v2 on gpt-5.5**, which verifies two to four times as many edits as gpt_5.2
+   (`../filing-bar-2026-09-30/`).
+4. **gpt in a Claude Code-like harness** (codex; blocked).
+
+One run, 23 obligations: provisional.

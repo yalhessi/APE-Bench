@@ -499,6 +499,14 @@ times as much in every family: 9.5-11.5 candidate edits compiled a session again
 instruction gave Claude a family-by-object pass (naming on 92-100% of PRs) and gpt none (50%).
 The open test that separates model and harness from prompt is the swap: Claude given gpt's rendered
 prompt verbatim.
+**Contract v2 (2026-10-01, $8.36).** It removes every item of gpt-only prompt text and asks for
+Claude's per-declaration ledger. Issue recall is 0.087 (2 of 23): **not a lever**. The ledger was
+carried over. The notes name 73% of the PR model's declarations, as Claude's do (v1: 37%), and
+mention naming on 83% of PRs. But gpt's investigation did not grow: 30 tool calls a session, 2
+edits compiled and 2.5 library lookups, against Claude's 57, 10 and 18. So its entries assert
+checks it did not run, and the misses read as "nothing to ask" on the very declarations the
+maintainers asked about. The prompt is now as close to Claude's as these runs make it. **Next is
+the swap**, which says whether the remainder is the model or the harness.
 
 **Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
 `SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
