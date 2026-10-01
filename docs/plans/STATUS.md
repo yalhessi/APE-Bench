@@ -196,3 +196,13 @@ verified end to end offline — all four live configs seal, finalization replays
 run's arm responses, the judge parses what finalization writes — and every September run is a
 forensic fixture. What is missing is **one complete run to read**, which the original plan
 names as the new reference baseline.
+
+## Added 2026-10-01 (on `post-carryover-replan`)
+
+* `2026-09-30-post-carryover-replan.md` is **partial**. Done: Phase 0 (carried baseline), Phase 1
+  (residual mechanisms), Phase 3.1 (the filing bar) and the Phase 2 calibration. Not run: the main
+  Phase 2 runs. It grew a contract thread, `results/pr_review_v5/probes/contract-2026-10-01/`:
+  contract v1 and v2 on gpt_5.2, v2 on gpt-5.5, and the swap. The swap places gpt's gap in the
+  model or harness, not the prompt.
+* `2026-10-01-claude-models-under-the-harness.md` is **not built**. It needs `claude-code-harness`
+  merged and the six subscription-route fixes it lists, before any run.

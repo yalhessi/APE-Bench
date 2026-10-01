@@ -517,6 +517,9 @@ against 41, 9.5 and 6. Across every condition run, recall tracks how many change
 decides to ask for. Coverage, attention, compiles and lookups do not move it. Not separated:
 model from harness, and judgement from memory of these in-window PRs. The clean check is the swap
 on the post-cutoff set, by blind matchers.
+**Next: `docs/plans/2026-10-01-claude-models-under-the-harness.md`** (user, 2026-10-01). It crosses
+harness and model: gpt and Opus 5.5 under the project's Claude Code harness, and Opus 5 and 4.8 on
+the subscription. It is read on the dev judge and the post-cutoff matchers, after the harness merge.
 
 **Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
 `SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
