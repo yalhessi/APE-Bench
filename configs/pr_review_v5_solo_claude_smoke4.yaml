@@ -23,5 +23,6 @@ setting_sources: []
 strict_mcp_config: true
 tools: [Read, Grep, Glob, TodoWrite]
 disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+contain_to_workspace: true
 dataset:
   pr_numbers: [33057, 33066, 33098, 33438]   # 33438 is the CONTROL

@@ -22,8 +22,12 @@ from ape.utils.config_loader import load_yaml
 PAIRS = [("pr_review_v5_solo_ape_smoke4.yaml", "pr_review_v5_solo_claude_smoke4.yaml"),
          ("pr_review_v5_solo_ape_heldout12.yaml", "pr_review_v5_solo_claude_heldout12.yaml")]
 
+#: Pairs on sets scored by blind matchers rather than the judge, so outside the judge-scope check.
+PROBE_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_G_claude.yaml")]
 
-@pytest.mark.parametrize("ape_name,claude_name", PAIRS)
+
+@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS)
 def test_the_two_solo_conditions_differ_only_in_their_scaffold(ape_name, claude_name):
     ape = load_yaml(Path("configs") / ape_name)
     claude = load_yaml(Path("configs") / claude_name)
@@ -37,7 +41,7 @@ def test_the_two_solo_conditions_differ_only_in_their_scaffold(ape_name, claude_
     assert claude["scaffold_type"] == "claude_code"
 
 
-@pytest.mark.parametrize("ape_name,claude_name", PAIRS)
+@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS)
 def test_both_conditions_carry_the_same_pr_set_and_cost_cap(ape_name, claude_name):
     ape = load_yaml(Path("configs") / ape_name)["dataset"]
     claude = load_yaml(Path("configs") / claude_name)["dataset"]
@@ -47,7 +51,7 @@ def test_both_conditions_carry_the_same_pr_set_and_cost_cap(ape_name, claude_nam
     assert ape["routing_mode"] == claude["routing_mode"] == "solo"
 
 
-@pytest.mark.parametrize("name", [p[1] for p in PAIRS])
+@pytest.mark.parametrize("name", [p[1] for p in PAIRS + PROBE_PAIRS])
 def test_the_external_condition_is_contained_before_it_is_ever_run(name):
     """Every channel here was verified reachable from a review workspace under the scaffold's
     defaults, which refuse exactly one tool while auto-approving the rest. A config that ships
@@ -62,6 +66,10 @@ def test_the_external_condition_is_contained_before_it_is_ever_run(name):
     assert config["strict_mcp_config"] is True
     for tool in ("Bash", "WebFetch", "WebSearch", "Task"):
         assert tool in config["disallowed_tools"], tool
+    # The grant says which tools exist, not where they reach: Read takes any absolute path.
+    assert config["tools"] == ["Read", "Grep", "Glob", "TodoWrite"]
+    assert config["contain_to_workspace"] is True, (
+        "without it nothing bounds Read to the workspace and no attempt carries an audit")
 
 
 @pytest.mark.parametrize("name", [p[0] for p in PAIRS] + [p[1] for p in PAIRS])
