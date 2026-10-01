@@ -294,7 +294,11 @@ forwarded yet.
 `_extract_session_id` looks for `__session_<uuid>` in `metadata.user_id`. CLI 2.1.269 sends a JSON
 string there, `{"device_id":…,"account_uuid":"","session_id":"…"}` (the same capture), so
 `claude_code_session_id` stays `None`. No transcript hardlink is written on the ordinary relay path
-either.
+either. *Fixed on `claude-code-harness` (`d7f84ae`), merged with it: `_extract_session_id` reads the
+JSON `session_id` as well as the old suffix, pinned by
+`test_the_relay_reads_the_session_id_of_either_cli_generation`. This paragraph was measured on
+`develop` before that merge. The subscription route (`75d85bd`) takes its session id from the SDK's
+init message and needs neither.*
 
 **What would close it:** for Codex, an older pinned CLI or a `/responses` route on the relay,
 and the bridge checked out or replaced. For Claude there are two routes. An Anthropic provider in
