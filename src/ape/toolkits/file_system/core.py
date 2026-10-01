@@ -348,9 +348,15 @@ class FileSystemProvider:
             files_to_search = await self._files_under(search_path, recursive)
 
             if not files_to_search:
+                # A bad path, not a search that matched nothing: say so, or the two negatives
+                # read alike (2026-09-30: at least 13 such calls on six gpt runs, beside 187
+                # searches that ran and matched nothing).
                 return {
                     "success": False,
-                    "error": f"No files found for path: {search_path}"
+                    "outcome": "invalid_request",
+                    "error": (f"Nothing was searched: no files under `{search_path}` in the "
+                              "workspace. Check the path; this is not a search that found no "
+                              "matches.")
                 }
             
             results = []

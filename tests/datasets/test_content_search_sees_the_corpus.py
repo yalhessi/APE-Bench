@@ -122,6 +122,20 @@ def test_a_complete_search_reports_its_coverage(searcher):
     assert "note" not in result
 
 
+def test_a_bad_path_is_not_a_search_that_found_nothing(searcher):
+    """Two negatives, told apart: a path with no files under it searched nothing (a bad request),
+    while a real path with no match ran and found nothing. "No files found for path" read as the
+    second; at least 13 calls on six gpt runs (2026-09-30) were the first."""
+
+    bad = asyncio.run(searcher.content_search(
+        content_pattern="toLinearMap", search_path=Path("target/Mathlib/NoSuchDir")))
+    assert bad["success"] is False and bad["outcome"] == "invalid_request"
+    assert "Nothing was searched" in bad["error"]
+    empty = asyncio.run(searcher.content_search(
+        content_pattern="noSuchIdentifierAnywhere", search_path=Path("target/Mathlib")))
+    assert empty["success"] is True and empty["results"] == [] and "outcome" not in empty
+
+
 def test_a_truncated_search_says_it_is_a_sample(searcher):
     """The failure this exists to stop: a capped search reading as an absence, or as a count."""
 
