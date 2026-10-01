@@ -295,6 +295,21 @@ at the shared turn limit. That was wrong: the valid runs show the same 12, two a
 session being stopped at submission. The valid runs are `probe_postcutoff_gpt52_G_claude_v2_rep{1,2,3}`
 (`d682c71`), 18 of 18 attempts audited clean and usable.
 
+**The cost gap was the relay's, not the harness's (2026-10-01).** The three repetitions billed
+$0.258 a session against APE-Agent's $0.051. Two relay defects explain most of it, and the system
+prompt little: Claude Code's first-request prompt is 12.7K tokens against 9.1K.
+- Claude Code opens its system prompt with a per-request `x-anthropic-billing-header` (a new `cch`
+  each request). Forwarded, it broke the prefix at character 92, so OpenAI cached 0 tokens, against
+  79% of input under APE-Agent (`5037f57`).
+- Claude Code asks for every turn as a stream. Given JSON, it discards the reply and asks again:
+  128 main-model requests for 64 turns, each billed twice (`04484fa`).
+With both fixed, PR 43192 ran in 3 requests for 3 turns, mostly cached, for $0.050, against G's
+$0.07 and $0.06 there. The findings of `probe_postcutoff_gpt52_G_claude_v2_rep{1,2,3}` stand,
+since each turn used one normal reply. Their cost figures do not, and the relay's 40-turn limit
+had been counting each turn twice. Residual per session, estimated with caching: 1.6x the requests
+and 2.4x the output of APE-Agent, about $0.09 against $0.05. That is the harness's own difference,
+from one set of runs.
+
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
 `toolkits/execute/lean/tools.py` resolves `workspaces_dir / file_path` and then requires the result
