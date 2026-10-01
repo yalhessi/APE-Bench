@@ -10,7 +10,6 @@ Run from the repo root: `ape/bin/python results/pr_review_v5/probes/contract-202
 """
 
 import collections
-import glob
 import json
 import re
 import statistics
@@ -39,12 +38,28 @@ def notes_bullets(label, run):
         counts = [len(BULLET.findall(Path(CLAUDE_NOTES.format(pr=pr, who=who)).read_text()))
                   for pr in HELD_OUT if Path(CLAUDE_NOTES.format(pr=pr, who=who)).is_file()]
     else:
-        counts = []
-        for path in glob.glob(f".ape/runs/{run}/tasks/*/samples/*/attempts/*/task_result.json"):
-            result = json.loads(Path(path).read_text())
-            if result.get("pr_number") in HELD_OUT and result.get("review_notes"):
-                counts.append(len(BULLET.findall(result["review_notes"])))
+        counts = [len(BULLET.findall(result["review_notes"])) for result in _task_results(run)
+                  if result.get("pr_number") in HELD_OUT and result.get("review_notes")]
     return statistics.median(counts) if counts else None
+
+
+def _task_results(run):
+    """Each task's successful result through `TaskStorage`, as `analysis.probes._solo` reads them."""
+
+    import asyncio
+
+    from ape.orchestration.persistence import TaskStorage
+
+    async def load():
+        out = []
+        tasks = Path(".ape/runs") / run / "tasks"
+        for task_dir in sorted(p for p in tasks.iterdir() if p.is_dir()) if tasks.is_dir() else []:
+            result = await TaskStorage(task_dir, task_dir.name).load_task_result()
+            if result and result.get("success"):
+                out.append(result)
+        return out
+
+    return asyncio.run(load())
 
 
 def main():
