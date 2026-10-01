@@ -384,3 +384,37 @@ def test_the_audit_reports_calls_the_cli_itself_refused(tmp_path):
     report = audit_transcript(transcript, provisioned_roots(workspaces), str(workspaces))
     assert report["clean"] is True
     assert report["refused_by_cli"] == [{"id": "s1", "tool_name": "mcp__core__submit_findings"}]
+
+
+# --- one relay per session: its address goes to its own CLI, never the process ---------------
+
+
+def test_two_relays_in_one_process_stay_separate(monkeypatch):
+    """probe_postcutoff_gpt52_G_claude_rep1 (2026-10-01): each relay wrote ANTHROPIC_BASE_URL
+    into os.environ when it started, and tasks run as coroutines in one process, so the CLIs
+    inherited whichever relay started last -- three of six relays saw no request, one saw 39
+    from four sessions sharing its turn limit, budget and transcript record."""
+
+    import os
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    monkeypatch.delenv("ANTHROPIC_BASE_URL", raising=False)
+    monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
+    first, second = (ClaudeCodeRelaySession(port=port, llm_config=LLMConfig(model_name="gpt_5.2"))
+                     for port in (41001, 41002))
+    first.configure_environment()
+    second.configure_environment()
+
+    assert "ANTHROPIC_BASE_URL" not in os.environ
+    assert "ANTHROPIC_AUTH_TOKEN" not in os.environ, "it would outrank a subscription login too"
+    assert first.client_environment()["ANTHROPIC_BASE_URL"].endswith(":41001")
+    assert second.client_environment()["ANTHROPIC_BASE_URL"].endswith(":41002")
+
+
+def test_each_cli_process_is_given_its_own_relay():
+    from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
+
+    assert "**self._relay_environment()" in inspect.getsource(ClaudeCodeScaffold._run_batch_mode)
+    assert "**self._relay_environment()" in inspect.getsource(ClaudeCodeScaffold._run_cli_mode)

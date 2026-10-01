@@ -75,8 +75,6 @@ class ClaudeCodeRelaySession(BaseRelaySession):
         self.fast_llm_config = fast_llm_config or llm_config
         # Claude Code specific: session ID extraction
         self.claude_code_session_id: Optional[str] = None
-        # Environment variable backup for restoration
-        self._env_backup: Dict[str, str] = {}
 
     def _setup_routes(self) -> None:
         """Setup Anthropic API routes"""
@@ -104,51 +102,29 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             'CLAUDE_CODE_SUBAGENT_MODEL': fast_model_with_tag,
         }
 
+    def client_environment(self) -> Dict[str, str]:
+        """What this session's Claude Code CLI needs to reach this relay, and only this one.
+
+        Handed to the CLI's own process (`ClaudeAgentOptions.env`, or the CLI-mode subprocess),
+        never written into `os.environ`. It used to be: every relay set `ANTHROPIC_BASE_URL` in
+        the process-wide environment when it started, so with tasks running as coroutines in one
+        process each CLI inherited whichever relay had started last. In
+        probe_postcutoff_gpt52_G_claude_rep1 three of six relays saw no request and one saw 39
+        from four sessions, which then shared one turn limit, one budget and one transcript
+        record. Proxies are cleared because the CLI must reach the relay on localhost directly.
+        """
+        return {
+            **self._get_env_vars(),
+            'HTTP_PROXY': '',
+            'http_proxy': '',
+            'https_proxy': '',
+            'no_proxy': 'localhost',
+        }
+
     def configure_environment(self) -> None:
-        """Configure environment variables and clear proxy settings for Claude Code SDK"""
-        # Backup original environment variables
-        env_vars_to_backup = list(self._get_env_vars().keys()) + [
-            'HTTP_PROXY', 'http_proxy', 'https_proxy', 'no_proxy'
-        ]
-
-        for var in env_vars_to_backup:
-            if var in os.environ:
-                self._env_backup[var] = os.environ[var]
-
-        # Set Anthropic environment variables
-        for key, value in self._get_env_vars().items():
-            os.environ[key] = value
-
-        # Clear proxy environment variables (Claude Code SDK needs direct localhost connection)
-        os.environ['HTTP_PROXY'] = ''
-        os.environ['http_proxy'] = ''
-        os.environ['https_proxy'] = ''
-        os.environ['no_proxy'] = 'localhost'
-
-        # Log configuration
-        env_info = '\n'.join([f'export {k}={v}' for k, v in self._get_env_vars().items()])
-        self.logger.info(
-            f'\n{env_info}\n'
-            f'export HTTP_PROXY=\'\'\n'
-            f'export http_proxy=\'\'\n'
-            f'export https_proxy=\'\'\n'
-            f'export no_proxy=localhost'
-        )
-
-    def restore_environment(self) -> None:
-        """Restore original environment variables"""
-        all_vars = list(self._get_env_vars().keys()) + [
-            'HTTP_PROXY', 'http_proxy', 'https_proxy', 'no_proxy'
-        ]
-
-        for var in all_vars:
-            if var in self._env_backup:
-                os.environ[var] = self._env_backup[var]
-            elif var in os.environ:
-                del os.environ[var]
-
-        self._env_backup.clear()
-        self.logger.info("Environment variables restored")
+        """Log how the CLI reaches this relay. Nothing is set process-wide (`client_environment`)."""
+        env_info = '\n'.join(f'export {k}={v}' for k, v in self.client_environment().items())
+        self.logger.info(f'\n{env_info}')
 
     async def _handle_request(self, request: Request) -> JSONResponse:
         """Main Anthropic API request handler"""

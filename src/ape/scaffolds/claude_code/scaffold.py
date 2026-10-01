@@ -153,6 +153,11 @@ class ClaudeCodeScaffold(BaseScaffold):
         task_user_prompt = await self.task.create_user_prompt()
         return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
 
+    def _relay_environment(self) -> Dict[str, str]:
+        """This task's relay address for its own CLI process; empty when no relay runs."""
+        relay = self.conversation_manager._relay_session if self.conversation_manager else None
+        return relay.client_environment() if relay is not None else {}
+
     def _pre_approved_tools(self) -> List[str]:
         """APE's own MCP server, and the configured grant, approved without asking.
 
@@ -265,7 +270,8 @@ class ClaudeCodeScaffold(BaseScaffold):
             fork_session=True if resume_session_id else False,
             env={
                 'HOME': str(claude_home.resolve()),
-                'CLAUDE_CODE_DISABLE_COMMAND_INJECTION_CHECK': '1'
+                'CLAUDE_CODE_DISABLE_COMMAND_INJECTION_CHECK': '1',
+                **self._relay_environment(),
             }
         )
 
@@ -322,9 +328,8 @@ class ClaudeCodeScaffold(BaseScaffold):
             if extra_args:
                 claude_args.extend(extra_args)
 
-            # Reuse conversation_manager's internal relay (started in _setup_components)
-            # relay has been set environment variables through configure_environment()
-            # external claude command will automatically use these environment variables
+            # Reuse conversation_manager's internal relay (started in _setup_components), whose
+            # address goes to this subprocess alone (`_relay_environment`).
 
             # Run claude command
             # Note: In CLI mode, we don't set HOME
@@ -335,6 +340,7 @@ class ClaudeCodeScaffold(BaseScaffold):
             proc = await asyncio.create_subprocess_exec(
                 *claude_args,
                 cwd=str(cwd),
+                env={**os.environ, **self._relay_environment()},
                 stdin=sys.stdin,
                 stdout=sys.stdout,
                 stderr=sys.stderr
