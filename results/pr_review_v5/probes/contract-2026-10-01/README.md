@@ -193,3 +193,12 @@ Claude session given gpt's rendered contract-condition prompt verbatim (system a
 tools, and a `submit_findings`-shaped output, judged the same way. Claude near 0.48 would mean the
 remaining gap is model or harness. Claude near 0.13 would mean it is in the prompt text gpt still
 gets. It costs Claude-session time, not API spend.
+
+**Object coverage of the notes (2026-10-01).** This is the share of the PR model's changed
+declarations (`## Objects`, commands excluded) that a session's notes name, in full or by leaf name.
+The median over the held-out 12 is Claude X1 73%, X2 78%, gpt contract 37%. The gap is all on the
+large PRs: 33117 (24 declarations) 71-75% against 25%, 33294 (20) 75% against 25%, 33321 (18) 83%
+against 28%, 33421 (39) 64% against 46%. Below 14 declarations the coverage is the same. gpt
+summarises by file ("reviewed new lemma X and new simp lemmas A, B, C, D ... no conflicts")
+where Claude goes declaration by declaration. In gpt's prompt the object list comes last, after
+the diff and the submission instructions. Claude read it second, before the diff. Untested as a cause.
