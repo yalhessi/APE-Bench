@@ -286,8 +286,32 @@ SESSION_PROMPT = """You are one reviewer in a research study of Mathlib code rev
 When done, reply with one line: the number of findings you wrote."""
 
 
+#: A swap packet's session: the reviewer is given another reviewer's delivered messages as its
+#: instructions (`write_swap_packets`) and submits what that reviewer's submission tool would take.
+#: The rules are SESSION_PROMPT's, which the leak audit depends on.
+SWAP_SESSION_PROMPT = """You are one reviewer in a research study of Mathlib code review. Your working directory is `{dir}`.
+
+1. `system.md` and `user.md` in that directory are your instructions: the system and user messages another reviewer was given, verbatim except the user message's "Tools available" line. Read both, then do what they say.
+2. Where they say to call `submit_findings`, write `submission.json` in your working directory instead: one JSON object holding exactly the arguments you would pass, `{{"notes": "...", "findings": [...]}}`, each finding with the fields the user message lists. Check that it parses. Write it once, when you have finished.
+3. Rules, which the study depends on:
+   - Read only files inside your working directory. Put any temporary file you need (a snippet, an arguments file) in `tmp/` inside your working directory, never in a shared scratch or temp folder.
+   - Call the tools only through the `ptool` script in your working directory (start with `<dir>/ptool describe`). Paths such as `target/Mathlib/...` in your instructions are the paths its file tools take. It handles its own paths, so run it by its absolute path from anywhere.
+   - Do not run git. Do not read or search any other path in the repository or on disk, including any Mathlib checkout. Do not use web search or web fetch. The tools show the PR as it stood at review time; anything else may show its future and would invalidate the study.
+   - Do not look for or read other reviewers' output.
+
+When done, reply with one line: the number of findings you submitted."""
+
+#: What marks a packet finished: brief X's `findings.json`, or a swap session's `submission.json`.
+SESSION_OUTPUTS = ("findings.json", "submission.json")
+
+
+def finished(packet: Path) -> bool:
+    return any((Path(packet) / name).exists() for name in SESSION_OUTPUTS)
+
+
 def session_prompt(packet: Path) -> str:
-    return SESSION_PROMPT.format(dir=Path(packet).resolve())
+    template = SWAP_SESSION_PROMPT if (Path(packet) / "user.md").exists() else SESSION_PROMPT
+    return template.format(dir=Path(packet).resolve())
 
 
 def render_models(release: Path, prs: List[int], inventory_path: Optional[Path] = None) -> Dict[int, str]:
@@ -405,22 +429,111 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
     for pr in prs:
         for session in sessions:
             d = spec.probe_dir / f"pr{pr}" / session
-            if (d / "findings.json").exists():
+            if finished(d):
                 raise FileExistsError(f"{d} is a finished session")
             (d / "tmp").mkdir(parents=True, exist_ok=True)
             (d / "brief.md").write_bytes(brief.read_bytes())
             (d / "model.md").write_text(models[pr])
             (d / "pr.md").write_text(pr_markdown(episodes[pr]))
             (d / "diff.patch").write_text(episodes[pr]["diff"])
-            wrapper = (PTOOL_TEMPLATE.replace("__PR__", str(pr)).replace("__OUT__", str(root / d))
-                       .replace("__WORK__", str(scratch / f"work/pr{pr}/{session}"))
-                       .replace("__RAW__", str(scratch / f"raw/pr{pr}/{session}"))
-                       .replace("__ROOT__", str(root))
-                       .replace("__EPISODES__", str(spec.release / "input/episodes.jsonl"))
-                       .replace("__RUN_CONFIG__", str(spec.dataset_config)))
-            (d / "ptool").write_text(wrapper)
-            (d / "ptool").chmod(0o755)
+            _write_ptool(spec, d, pr, session, scratch, root)
             written.append(d)
+    return written
+
+
+def _write_ptool(spec: ProbeSet, d: Path, pr: int, session: str, scratch: Path, root: Path) -> None:
+    wrapper = (PTOOL_TEMPLATE.replace("__PR__", str(pr)).replace("__OUT__", str(root / d))
+               .replace("__WORK__", str(scratch / f"work/pr{pr}/{session}"))
+               .replace("__RAW__", str(scratch / f"raw/pr{pr}/{session}"))
+               .replace("__ROOT__", str(root))
+               .replace("__EPISODES__", str(spec.release / "input/episodes.jsonl"))
+               .replace("__RUN_CONFIG__", str(spec.dataset_config)))
+    (d / "ptool").write_text(wrapper)
+    (d / "ptool").chmod(0o755)
+
+
+#: The solo prompt's tool line names `lean_verify` and hover/goto, which `ptool` does not hold; a
+#: swap packet's user message says what the session can call instead. Its only edit.
+PTOOL_TOOLS_LINE = ("**Tools available:** read files, grep the repo (content_search), find files by "
+                    "name (file_search), compile your edit against the reviewed workspace "
+                    "(lean_verify_edit)")
+
+
+def delivered_messages(task_dir: Path) -> tuple:
+    """`(system, user)`: the first system and user messages of the task's session, as sent.
+
+    From the last per-turn file, which holds the whole session (the files are cumulative), and
+    never a `_raw` file.
+    """
+
+    turns = [c for c in sorted(Path(task_dir).glob("samples/0/attempts/*/conversations/*.jsonl"))
+             if not c.name.endswith("_raw.jsonl")]
+    if not turns:
+        raise FileNotFoundError(f"{task_dir} has no conversation")
+    found = {}
+    for line in turns[-1].read_text(encoding="utf-8").splitlines():
+        node = json.loads(line) if line.strip() else {}
+        kind = node.get("type")
+        if kind in ("system", "user") and kind not in found:
+            content = (node.get("message") or {}).get("content")
+            found[kind] = ("".join(b.get("text", "") for b in content if isinstance(b, dict))
+                           if isinstance(content, list) else str(content or ""))
+    return found["system"], found["user"]
+
+
+def swap_user_message(user: str) -> str:
+    """The delivered user message with its tool line rewritten to what `ptool` provides."""
+
+    lines = user.split("\n")
+    hits = [i for i, line in enumerate(lines) if line.startswith("**Tools available:**")]
+    if len(hits) != 1:
+        raise ValueError(f"expected one 'Tools available' line, found {len(hits)}")
+    lines[hits[0]] = PTOOL_TOOLS_LINE
+    return "\n".join(lines)
+
+
+def write_swap_packets(spec: ProbeSet, session: str, scratch: Path, source_run: str,
+                       prs: Optional[List[int]] = None, root: Optional[Path] = None) -> List[Path]:
+    """One packet per PR holding the messages `source_run`'s session on that PR was given.
+
+    The swap: another model given a solo run's prompt verbatim (`system.md`, `user.md`), with the
+    probe's own tools and rules, submitting what `submit_findings` would take (`submission.json`).
+    A finished packet is refused, as in `write_packets`.
+    """
+
+    import asyncio
+
+    from ape.orchestration.persistence import TaskStorage
+
+    root = Path(root or Path.cwd())
+    prs = list(prs or spec.pr_numbers)
+
+    async def task_dirs():
+        out = {}
+        tasks = Path(".ape/runs") / source_run / "tasks"
+        for task in sorted(p for p in tasks.iterdir() if p.is_dir()):
+            result = await TaskStorage(task, task.name).load_task_result()
+            if result and result.get("success"):
+                out[int(result["pr_number"])] = task
+        return out
+
+    by_pr = asyncio.run(task_dirs())
+    missing = [pr for pr in prs if pr not in by_pr]
+    if missing:
+        raise KeyError(f"{source_run} has no successful session for PR(s) {missing}")
+    written = []
+    for pr in prs:
+        d = spec.probe_dir / f"pr{pr}" / session
+        if finished(d):
+            raise FileExistsError(f"{d} is a finished session")
+        system, user = delivered_messages(by_pr[pr])
+        (d / "tmp").mkdir(parents=True, exist_ok=True)
+        (d / "system.md").write_text(system, encoding="utf-8")
+        (d / "user.md").write_text(swap_user_message(user), encoding="utf-8")
+        (d / "source.json").write_text(json.dumps({"source_run": source_run, "task": by_pr[pr].name},
+                                                  indent=1) + "\n")
+        _write_ptool(spec, d, pr, session, scratch, root)
+        written.append(d)
     return written
 
 
@@ -705,7 +818,7 @@ def unblind(asks: Dict[str, Any], seal: Dict[str, Dict[str, str]], matches: Dict
 def unfinished_sessions(spec: ProbeSet, sessions: List[str]) -> List[str]:
     """The (PR, session) packets on the set that hold no findings yet."""
     return [f"pr{pr}/{s}" for pr in spec.pr_numbers for s in sessions
-            if not (spec.session_dir(pr, s) / "findings.json").exists()]
+            if not finished(spec.session_dir(pr, s))]
 
 
 _NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight",
@@ -924,9 +1037,9 @@ def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -
     from src.mathlib_review.review.runner import (solo_responses, load_release, load_run,
                                                   select_units_and_episodes)
 
-    missing = [pr for pr in spec.pr_numbers if not (spec.session_dir(pr, session) / "findings.json").is_file()]
+    missing = [pr for pr in spec.pr_numbers if not finished(spec.session_dir(pr, session))]
     if missing:
-        raise FileNotFoundError(f"{session} has no findings.json for PR(s) {missing}")
+        raise FileNotFoundError(f"{session} has no findings.json or submission.json for PR(s) {missing}")
     out = Path(out)
     if out.exists():
         raise FileExistsError(f"{out} exists; an import writes a run directory once")
@@ -938,16 +1051,27 @@ def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -
     episode_by_pr = {e.pr_number: e for e in episodes if ":round1:" in e.episode_id}
     budget = 20  # SoloReviewConfig.finding_budget: the cap a solo submission is cut to
 
-    rows, methods, packets = [], collections.Counter(), {}
+    rows, methods, packets, cut = [], collections.Counter(), {}, {}
     for pr in spec.pr_numbers:
-        path = spec.session_dir(pr, session) / "findings.json"
+        # A swap session submits `submit_findings`' arguments, located by `path` and line as a solo
+        # session's are; a brief-X session names a `target`, which `resolve_target` locates.
+        submission = spec.session_dir(pr, session) / "submission.json"
+        path = submission if submission.is_file() else spec.session_dir(pr, session) / "findings.json"
         packets[str(pr)] = hashlib.sha256(path.read_bytes()).hexdigest()
+        payload = json.loads(path.read_text())
+        submitted = payload["findings"] if submission.is_file() else payload
+        if len(submitted) > budget:
+            cut[str(pr)] = len(submitted) - budget
         normalized = []
-        for raw in json.loads(path.read_text())[:budget]:
+        for raw in submitted[:budget]:
             claim = str(raw.get("claim") or "").strip()
             if not claim:
                 continue
-            file, line, method = resolve_target(raw.get("target"), graph_by_pr[pr])
+            if submission.is_file():
+                line = raw.get("line_start") if isinstance(raw.get("line_start"), int) else None
+                file, method = (str(raw["path"]), "path_and_line") if raw.get("path") else (None, "unresolved")
+            else:
+                file, line, method = resolve_target(raw.get("target"), graph_by_pr[pr])
             methods[method] += 1
             severity = str(raw.get("severity") or "").lower()
             normalized.append({
@@ -956,7 +1080,8 @@ def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -
                 "claim": claim,
                 "concern_family": UNLABELLED_FAMILY,
                 "issue_kind": IMPORT_ISSUE_KIND,
-                "suggested_fix": (str(raw["requested_change"]) if raw.get("requested_change") else None),
+                "suggested_fix": (str(raw.get("requested_change") or raw.get("suggested_fix"))
+                                  if (raw.get("requested_change") or raw.get("suggested_fix")) else None),
                 "evidence": (str(raw["evidence"]) if raw.get("evidence") else None),
                 "verified": None,
                 "confidence": None,
@@ -979,6 +1104,7 @@ def import_probe_session(spec: ProbeSet, session: str, out: Path, logger=None) -
     provenance = {
         "source": "probe session", "set": spec.name, "session": session,
         "packets_findings_sha256": packets, "target_resolution": dict(methods),
+        "findings_past_the_budget": cut,
         "anchoring": report, "concern_family": UNLABELLED_FAMILY, "issue_kind_placeholder": IMPORT_ISSUE_KIND,
         "evidence_chain": "not run: the gate is closed, so admission and publication are not "
                           "comparable to a solo run's; the judge's issue recall reads every finding",

@@ -154,6 +154,9 @@ def build_parser() -> argparse.ArgumentParser:
         parsers[name].add_argument("--prs", nargs="+", type=int)
     parsers["packets"].add_argument("--scratch", required=True, type=Path,
                                     help="where each session's tool workdir and raw outputs go")
+    parsers["packets"].add_argument("--swap-from", metavar="RUN",
+                                    help="swap packets: each PR's delivered messages from this solo run, "
+                                         "for one session (write_swap_packets)")
     parsers["feedback"].add_argument("--write", action="store_true")
     for name in ("readers", "match-inputs"):
         parsers[name].add_argument("--out", required=True, type=Path)
@@ -568,7 +571,13 @@ def _probe(args, logger) -> int:
         print(json.dumps(report, indent=1))
         return 1 if report["flagged"] else 0
     spec = probes.load_probe_set(args.set)
-    if args.probe_command == "packets":
+    if args.probe_command == "packets" and args.swap_from:
+        if len(args.sessions) != 1:
+            raise SystemExit("--swap-from writes one session's packets; name it with --sessions")
+        written = probes.write_swap_packets(spec, args.sessions[0], args.scratch.resolve(),
+                                            args.swap_from, prs=args.prs)
+        print(json.dumps([str(d) for d in written], indent=1))
+    elif args.probe_command == "packets":
         written = probes.write_packets(spec, args.sessions, args.scratch.resolve(), prs=args.prs)
         print(json.dumps([str(d) for d in written], indent=1))
     elif args.probe_command == "prompts":

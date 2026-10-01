@@ -384,3 +384,71 @@ def test_a_capped_session_is_matched_as_submitting_nothing():
     found, stats = runs[42814]
     assert found == [] and stats["capped"] == "paused_max_turns"
     assert all("capped" not in st for pr, (_f, st) in runs.items() if pr != 42814)
+
+
+def test_a_swap_packet_holds_the_delivered_messages_with_only_the_tool_line_changed(tmp_path):
+    """The swap gives another reviewer a solo session's messages as its instructions. They are read
+    from the session's last, cumulative turn file (never a `_raw` one), and only the tool line is
+    rewritten to what `ptool` holds."""
+
+    turn = tmp_path / "task" / "samples/0/attempts/attempt_1/conversations"
+    turn.mkdir(parents=True)
+    user = "# Pull request #1\n\n**Tools available:** read files, compile/verify Lean code (lean_verify)\n\nReview."
+    nodes = [{"type": "system", "message": {"content": [{"type": "text", "text": "SYSTEM"}]}},
+             {"type": "tool_definitions", "message": {"content": []}},
+             {"type": "user", "message": {"content": [{"type": "text", "text": user}]}},
+             {"type": "user", "message": {"content": [{"type": "text", "text": "a later tool result"}]}}]
+    (turn / "20261001_000001__turn_1__a.jsonl").write_text(json.dumps(nodes[0]) + "\n")
+    (turn / "20261001_000002__turn_2__b.jsonl").write_text("".join(json.dumps(n) + "\n" for n in nodes))
+    (turn / "20261001_000002__turn_2__b_raw.jsonl").write_text("not json\n")
+    system, delivered = probes.delivered_messages(tmp_path / "task")
+    assert (system, delivered) == ("SYSTEM", user)
+    swapped = probes.swap_user_message(delivered)
+    assert swapped.split("\n")[2] == probes.PTOOL_TOOLS_LINE and "lean_verify)" not in swapped
+    assert swapped.replace(probes.PTOOL_TOOLS_LINE, "") == user.replace(user.split("\n")[2], "")
+    with pytest.raises(ValueError, match="one 'Tools available' line"):
+        probes.swap_user_message("no tool line")
+
+
+def test_a_swap_session_keeps_the_rules_and_submits_the_tools_arguments(tmp_path):
+    """Every rule X's sessions ran under is in the swap prompt, word for word but for the `ptool`
+    line, which also says the instructions' `target/...` paths are its paths."""
+
+    (tmp_path / "x").mkdir()
+    (tmp_path / "s").mkdir()
+    (tmp_path / "s" / "user.md").write_text("u")
+    assert "brief.md" in probes.session_prompt(tmp_path / "x")
+    swap = probes.session_prompt(tmp_path / "s")
+    assert "submission.json" in swap and '{"notes": "...", "findings": [...]}' in swap
+    rules = [line.strip() for line in probes.SESSION_PROMPT.splitlines() if line.strip().startswith("- ")]
+    for rule in rules:
+        if "ptool" not in rule:
+            assert rule in swap, rule
+    assert probes.finished(tmp_path / "s") is False
+    (tmp_path / "s" / "submission.json").write_text("{}")
+    assert probes.finished(tmp_path / "s") is True
+
+
+def test_a_swap_submission_imports_located_by_path_and_line(tmp_path):
+    """A swap session's findings carry `path` and `line_start`, as gpt's do, and are anchored on
+    them by the solo tail, not re-resolved from a name."""
+
+    graph = _dev_graph(33337)
+    by_id = {e.entity_id: e for e in graph.entities}
+    # A change target's own reviewed declaration: a location the anchoring pass can map.
+    entity = next(by_id[t.reviewed_entity_ids[0]] for t in graph.targets
+                  if t.declaration_name and t.reviewed_entity_ids and t.reviewed_entity_ids[0] in by_id)
+    spec = DEV.model_copy(update={"pr_numbers": [33337], "probe_dir": tmp_path / "probe"})
+    packet = tmp_path / "probe" / "pr33337" / "S9"
+    packet.mkdir(parents=True)
+    submission = {"notes": "- one entry", "findings": [
+        {"path": entity.path, "line_start": entity.span.line_start, "severity": "advisory",
+         "claim": f"`{entity.fullname}` should be renamed.", "suggested_fix": "Rename it."}]
+        + [{"claim": f"filler {i}"} for i in range(21)]}
+    (packet / "submission.json").write_text(json.dumps(submission))
+    report = probes.import_probe_session(spec, "S9", tmp_path / "run")
+    assert report["resolution"]["path_and_line"] == 1 and report["anchored"] >= 1
+    provenance = json.loads((tmp_path / "run" / "probe_import.json").read_text())
+    assert provenance["findings_past_the_budget"] == {"33337": 2}
+    rows = [json.loads(l) for l in (tmp_path / "run" / "findings.jsonl").read_text().splitlines() if l]
+    assert any(r["requested_change"] == "Rename it." for r in rows)
