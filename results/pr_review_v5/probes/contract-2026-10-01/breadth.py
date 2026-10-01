@@ -13,7 +13,11 @@ import collections
 import json
 import re
 import statistics
+import sys
 from pathlib import Path
+
+# Run by path, the script's own directory is on sys.path and the repo root is not.
+sys.path[:0] = [".", "src"]
 
 HELD_OUT = [33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421]
 #: label -> (run under results/pr_review_v5/runs, judge audit under results/pr_review_v5/audits)
