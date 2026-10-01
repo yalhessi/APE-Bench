@@ -381,6 +381,19 @@ four runs: one APE-Agent, two Claude Code on the relay, and the calibration. In 
 dev cells it recurred in `code_goto` (H-claude rep 1) and `get_lean_goal` (H-claude rep 2). It is minor, but it
 is the same family as the `lean_verify` path defect below.
 
+**A run that the subscription limit cut short can only be redone, not resumed (2026-10-01).**
+`probe_dev_opus55_contract2_claude_sub_rep2` reached the five_hour limit at 10:00. Of 15 sessions,
+13 had succeeded. Two (33321 and 33066) failed mid-session after 32-34 replies and about 2.4M
+tokens each, on `ClaudeSessionError` ("usage limit is spent"), as designed. Their three retries
+failed at once with no tokens, and the run finished `partial` with its outputs written. From
+there `--resume` is refused, because it is meant for a run that was interrupted before writing
+its outputs, and the orchestrator lists the two as Failed, not Resumable. So the only way to
+complete it is `--redo`. That re-runs the 13 good sessions, about 21M tokens of subscription quota
+spent again. Two things would close it: a resume path for a partial run whose failures are all
+environmental (a spent limit), which re-opens only those tasks and rewrites the outputs; and a
+scheduler that starts no new session once the CLI reports `allowed_warning`. The second was
+done by hand that day: the chain was stopped before rep 3 at the first warning.
+
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
 `toolkits/execute/lean/tools.py` resolves `workspaces_dir / file_path` and then requires the result

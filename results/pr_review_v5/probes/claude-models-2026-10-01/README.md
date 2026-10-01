@@ -117,3 +117,14 @@ or probe. Recall follows how much the reviewer files. That repeats what the cont
 (`../contract-2026-10-01/README.md`): the variable that moves recall is how many changes the
 reviewer decides to ask for. Opus 5 and 5.5 under the project harness file about 75 held-out
 findings, Opus 4.8 and gpt about 30. One run per cell, with H-claude's repetitions still to come.
+
+## H-claude rep 2, first attempt: cut short by the subscription limit, to be redone
+
+`probe_dev_opus55_contract2_claude_sub_rep2` ran 13 of 15 sessions before the subscription's
+five_hour limit was spent at 10:00. 33321 (held out) and 33066 failed mid-session on
+`ClaudeSessionError`, as designed. They failed as attempts and did not read as short reviews.
+A partial run cannot be resumed (see the ledger), and missing 33321 it cannot be judged beside
+rep 1, so it is redone after the reset under the same name. One of its sessions (33149's task
+`bb11a540`) audited `clean=False` on a call to `zulip_search`, a tool that does not exist (the
+real one is `mcp__core__zulip_search`), which the CLI refused before anything ran. Re-audited
+under `e5de5f0`, it is clean (17 calls, 1 nonexistent, 0 leaked).
