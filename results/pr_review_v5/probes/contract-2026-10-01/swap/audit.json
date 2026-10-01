@@ -24,5 +24,10 @@
  "33337": {
   "calls": 12,
   "flagged": 0
+ },
+ "33362": {
+  "calls": 16,
+  "flagged": 5,
+  "adjudication": "five flags, all the venv's python running the session's own tmp/edit{1-4}.py and tmp/build.py, which write ptool argument files into tmp/ and submission.json; no open() outside the folder. Kept."
  }
 }
