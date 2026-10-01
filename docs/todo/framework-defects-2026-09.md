@@ -353,8 +353,32 @@ xhigh, with `apiKeySource: none` on the setup token. Its audit was clean and usa
 calls), and it used 84,797 tokens over 5 replies, billing nothing. It filed no findings, as both
 G runs did there. The launch needs `PYTHONPATH=$PWD/src` in a worktree. Without it, the first
 attempt failed on four validation errors, and `load_run` now refuses that mix by name
-(`4369298`). **Still open:** whether the inherited caps (40 replies, 1.8M tokens) bind on a large
-PR. The probe harness ran Claude uncapped at 35-58 tool calls a session.
+(`4369298`).
+
+**Calibrated on a large dev PR, uncapped.** `probe_dev_opus55_G_claude_sub_calib1` ran PR 33149
+under G with max_turns 400 and a 20M token cap. The session took 16 replies, 29 tool calls and 8
+minutes, and used 1,179,025 processed tokens: 1,077,673 cache reads, 15,882 output, 10,421 of
+them thinking. Its audit was clean and usable. It submitted 21 findings, which became 18 issues,
+1 of them published. The gpt-era caps (40 replies, 1.8M) would not have stopped this session, but
+it used 65% of the token cap. A prompt averaged 74K tokens here and grows with each reply, so a
+session much longer than 16 replies would likely pass 1.8M. That is an estimate from one session;
+the swap made 41 calls on this PR, under another prompt. For the plan's Claude cells, set the
+caps to stop only a runaway (on the order of 10M tokens and 200 replies). Keep the run totals in
+step: `test_every_shipped_config_keeps_its_two_blocks_in_step` refuses otherwise.
+
+**The session record has no result in a submitted session.** The scaffold stops the session at
+submission, before the CLI's final result message arrives. In both runs above,
+`claude_code_session.json` therefore has an empty `results`: no notional API cost, and no
+per-model usage. Its usage is the main model's stream count, without the CLI's Haiku
+housekeeping calls (about 1K tokens a query in the probes, under 0.1% here). A failed or
+turn-limited session does get its result. To recover the notional cost, price the recorded
+tokens.
+
+`code_hover` and `code_goto` take `file_path` relative to `workspaces/`, while
+`lean_verify_edit` takes `path` relative to the reviewed target. A reviewer that uses one
+convention for both fails the hover with "Cannot find Lean project". It happened once in each of
+four runs: one APE-Agent, two Claude Code on the relay, and the calibration. It is minor, but it
+is the same family as the `lean_verify` path defect below.
 
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
