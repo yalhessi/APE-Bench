@@ -521,9 +521,12 @@ def verify_edit(task, monkeypatch):
             pass
 
         async def execute(self, code, max_messages=20):
+            # The real `execute` returns an `outcome` (tools.verification_outcome); a stand-in
+            # without one would let the as-is report go on reading an empty error list as a pass.
             errors = compiled["errors"]
-            return {"success": not errors, "errors": list(errors), "warnings": [],
-                    "message": "Lean verification completed successfully"}
+            outcome = compiled.get("outcome") or ("compile_errors" if errors else "compiled")
+            return {"success": outcome == "compiled", "errors": list(errors), "warnings": [],
+                    "outcome": outcome, "message": "Lean ran."}
 
     import ape.toolkits.execute.lean.tools as tools_module
     monkeypatch.setattr(tools_module, "LeanVerifyToolsProvider", FakeLean)
@@ -574,6 +577,46 @@ def test_a_red_file_is_reported_as_red_with_every_error_pre_existing(verify_edit
     assert [e["data"] for e in result["errors_already_in_the_file"]] == [
         "unsolved goals at expand_apply"]
     assert result["errors_introduced_by_your_edit"] == []
+
+
+def test_a_no_edit_call_that_never_ran_does_not_say_the_file_compiles(verify_edit):
+    """The false green this fixes: Lean failed before producing any diagnostic, so the error
+    list was empty, and `compiles: not errors` reported the file as compiling."""
+
+    tool, compiled, asyncio = verify_edit
+    compiled["outcome"] = "environment_failure"
+    result = asyncio.run(tool(path="Mathlib/A.lean"))
+    assert result["outcome"] == "environment_failure"
+    assert result["compiles"] is None
+
+
+def test_the_outcome_separates_an_answer_from_no_answer():
+    """Real `VerificationResult`s. Errors are Lean's answer; no diagnostics at all is a check
+    that did not happen; -15 is the engine's timeout."""
+
+    from ape.toolkits.execute.lean.models import LeanMessage, VerificationResult
+    from ape.toolkits.execute.lean.tools import verification_outcome
+
+    def result(success, errors=(), messages=None, code=0):
+        errors = list(errors)
+        return VerificationResult(success=success, messages=errors if messages is None else messages,
+                                  errors=errors, warnings=[], infos=[], axioms=[], raw_output="",
+                                  raw_stderr="", return_code=code)
+
+    unknown = LeanMessage.model_validate(
+        {"severity": "error", "data": "Unknown constant `Foo.bar`", "code_line": "#check Foo.bar", "pos": None})
+    assert verification_outcome(result(True)) == "compiled"
+    assert verification_outcome(result(False, [unknown], code=1)) == "compile_errors"
+    assert verification_outcome(result(False, [], messages=[], code=137)) == "environment_failure"
+    assert verification_outcome(result(False, [], messages=[], code=-15)) == "timeout"
+
+
+def test_every_refusal_of_lean_verify_edit_names_its_outcome(verify_edit):
+    tool, _compiled, asyncio = verify_edit
+    result = asyncio.run(tool(path="Mathlib/A.lean", declaration_name="no_such_declaration",
+                              new_declaration="theorem no_such_declaration : True := trivial"))
+    assert result["success"] is False and "error" in result, result
+    assert result["outcome"] == "invalid_request"
 
 
 def test_an_edit_call_still_reports_success_and_is_labelled_a_verified_edit(verify_edit):

@@ -468,6 +468,8 @@ class BasePRReviewTask(BaseLeanTask):
         compiles in context before reporting it."""
         from typing import Annotated
 
+        from ape.toolkits.execute.lean.tools import OUTCOME_NOTE
+
         @mcp.tool(
             description=(
                 "Test an in-file edit, recompiling the WHOLE file and returning the compile result. "
@@ -484,7 +486,7 @@ class BasePRReviewTask(BaseLeanTask):
                 "weighing. Errors come back split into "
                 "`errors_introduced_by_your_edit` and `errors_already_in_the_file` — fix only "
                 "the former; line numbers refer to the whole spliced file, so use `code_line` "
-                "to locate them."
+                "to locate them. " + OUTCOME_NOTE
             )
         )
         async def lean_verify_edit(
@@ -505,13 +507,13 @@ class BasePRReviewTask(BaseLeanTask):
                 path, line_start, line_end, replacement,
                 declaration_name=declaration_name, new_declaration=new_declaration)
             if code is None:
-                return {"success": False, "error": err}
+                return {"success": False, "outcome": "invalid_request", "error": err}
             from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
             lean_tool = LeanVerifyToolsProvider(task=self, config=self.config, logger=self.logger)
             try:
                 result = await lean_tool.execute(code=code, max_messages=max_messages)
             except Exception as exc:  # noqa: BLE001
-                return {"success": False, "error": f"verify raised: {exc}"}
+                return {"success": False, "outcome": "tool_error", "error": f"verify raised: {exc}"}
             # Which of these errors are actually the caller's fault?
             #
             # Compiling the whole file means the report mixes three things: errors the edit
@@ -549,9 +551,13 @@ class BasePRReviewTask(BaseLeanTask):
             if not isinstance(result, dict):
                 return result
             errors = list(result.get("errors") or [])
-            return {
+            outcome = result.get("outcome")
+            report = {
                 "mode": "as_is_compile_check",
-                "compiles": not errors,
+                "outcome": outcome,
+                # From the outcome, not from an empty error list: a compile that never ran has no
+                # errors either, and `not errors` reported it as `compiles: true`.
+                "compiles": outcome == "compiled",
                 # Every error is pre-existing by definition when no edit was applied, so this
                 # needs no baseline compile — and it makes the `correctness` prompt's promise
                 # of a split true for the first time, which it never was on this path.
@@ -566,6 +572,13 @@ class BasePRReviewTask(BaseLeanTask):
                     "a change, call again with `declaration_name` + `new_declaration`."
                 ),
             }
+            if outcome not in ("compiled", "compile_errors"):
+                # Did not finish or never ran: no verdict on the file, so say so in its words.
+                report["compiles"] = None
+                report["message"] = result.get("message")
+                if result.get("diagnosis"):
+                    report["diagnosis"] = result["diagnosis"]
+            return report
 
     async def register_task_tools(self, mcp) -> None:
         from typing import Annotated
