@@ -288,3 +288,51 @@ to ask"). Where maintainers asked, the notes now show the decision outright:
 4. **gpt in a Claude Code-like harness** (codex; blocked).
 
 One run, 23 obligations: provisional.
+
+## Contract v2 on gpt-5.5, and the swap (pre-registered 2026-10-01, before their runs)
+
+Two runs, at the user's request, on the question contract v2 left open. The prompt is now as close
+to Claude's as these runs can make it, and gpt_5.2 still files from reading rather than from
+investigation. Is the remainder the model?
+
+### gpt-5.5 under contract v2
+
+`configs/pr_review_v5_dev_medium_gpt55_Grc_contract2.yaml` is contract v2 with only the model and
+its caps changed, as the gpt-5.5 carried config changes them from Grc1 ($20 / 24M a session, 160
+turns). The run is `probe_dev_gpt55_Grc_contract2_rep1`, on the 15 dev PRs. Expected about $18:
+gpt-5.5 carried billed $18.42 here. gpt-5.5 compiles two to four times as many edits as gpt_5.2
+did on validation. Under brief G it reached 0.130 on this gold, and it is the only gpt that hit
+33285's two proof-golf asks.
+
+Rule, on the held-out 12 gold (23 obligations): ≥ 0.26 (6) is a lever for this model; ≤ 0.174 (4)
+is not; 5 is undecided. Read beside it: edits compiled and library lookups per session (gpt_5.2
+v2: 2 and 2.5; Claude: 9.5-11.5 and 17-19.5), notes coverage, findings and targets.
+
+### The swap: Claude under gpt's prompt
+
+A Claude session (`claude-opus-5-5`, as X1 and X2) gets gpt's contract-v2 prompt verbatim. For each
+PR the system and user messages are taken from that PR's session in
+`probe_dev_gpt52_Grc_contract2_rep1`, so it is the text gpt read. The session runs through the probe
+harness (`analysis/probes.py`) under the same rules and audit as X1 and X2. It writes the arguments
+of `submit_findings` (`notes`, and findings with `path` and `line_start`) to `submission.json`.
+`probe import` anchors those by `path` and line, as the solo runner anchors gpt's, and stamps the
+same labels. Then the judge runs on the held-out 12. That is 12 PRs, one session each (`S1`).
+
+What is held fixed against X1 and X2: the model, the probe harness and its rules, the tools (the
+`ptool` set Claude held: five context tools, `lean_verify_edit` and the three file tools). What
+changes: the prompt, from brief X and packet files to gpt's v2 messages. The one edit to gpt's
+text is the user prompt's "Tools available" line. It names `lean_verify` and hover/goto, which
+`ptool` does not provide, so it is rewritten to the `ptool` set. Against gpt, the model and the
+harness change together, so this run can attribute the remainder to the prompt or not, but not
+split model from harness.
+
+Rule, against X1 / X2 (11 of 23 obligations each, 0.478):
+- **≥ 0.35 (8 obligations): the prompt text is not what holds gpt back.** Claude reaches about its
+  own level from gpt's prompt, so the remainder is the model, or the model with its harness.
+- **≤ 0.217 (5): gpt's prompt accounts for most of the gap.** Something in the text still lowers a
+  reviewer that reaches 0.48 from brief X.
+- 6-7: partial.
+Read beside it: Claude's tool calls, edits compiled, lookups and notes coverage under this prompt,
+against its own under brief X.
+
+One run each, so provisional.
