@@ -120,8 +120,9 @@ def build_parser() -> argparse.ArgumentParser:
     again.add_argument("--redo", action="store_true",
                        help="discard this run_name's results and state, then run it again")
     again.add_argument("--resume", action="store_true",
-                       help="continue this run_name after an interruption; refused once it "
-                            "has written its outputs")
+                       help="continue this run_name after an interruption, or reopen it if it "
+                            "closed partial: sessions that failed on errors are requeued and "
+                            "successes kept; refused once a complete run has written its outputs")
     run.add_argument("--cost-model", default=None,
                      help="how to read provider token accounting when pricing calls")
     _add_execute(run)
@@ -331,14 +332,19 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _plan(config: Path, overrides, logger) -> int:
-    """Render, price and check the budget. Writes nothing and calls nothing."""
+def _plan(config: Path, overrides, logger, *, resume: bool = False) -> int:
+    """Render, price and check the budget. Writes nothing and calls nothing.
+
+    `resume` is `run --resume` without `--execute`: the dry run then says what the resume
+    would do (continue, or reopen a partial run and requeue which sessions) rather than that
+    the name is spent.
+    """
 
     from src.mathlib_review.review.runner import load_run, run
 
     dataset, scaffold, task_overrides = load_run(config, overrides)
     dataset.dry_run = True
-    asyncio.run(run(dataset, scaffold, task_overrides, logger))
+    asyncio.run(run(dataset, scaffold, task_overrides, logger, resume=resume))
     return 0
 
 
@@ -348,7 +354,7 @@ def _run(args, overrides, logger) -> int:
     if not args.execute:
         _say_nothing_ran("run", {"config": str(args.config),
                                  "run name": getattr(args, "run_name", None) or "(from config)"})
-        return _plan(args.config, overrides, logger)
+        return _plan(args.config, overrides, logger, resume=args.resume)
 
     dataset, scaffold, task_overrides = load_run(args.config, overrides)
     if dataset.dry_run:

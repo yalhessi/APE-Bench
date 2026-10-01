@@ -1544,9 +1544,19 @@ def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
         # resuming it would rewrite them; and a change to what the run measures is still
         # refused by `seal_or_revise_plan`. (2026-09-29: a $1.69 high-effort session killed at
         # turn 28 of 80 could only be discarded or paid for again.)
+        from src.mathlib_review.run_state import RunState, state_of
+
+        if existing and state_of(directory) is RunState.PARTIAL:
+            # A partial run is reopened instead (`reopen_partial_run`): its sessions that failed
+            # on errors are requeued and its successes kept. 2026-10-01: two sessions lost to a
+            # spent subscription limit otherwise cost a --redo of the 13 that had succeeded.
+            logger.warning("reopening partial run %r: sessions that failed on errors are "
+                           "requeued, successes are kept", dataset.run_name)
+            return
         problem = (
-            f"--resume continues an interrupted run, and {dataset.run_name!r} finished "
-            f"(outputs: {', '.join(existing)}); bump the name or pass --redo" if existing else
+            f"--resume continues an interrupted run or reopens a partial one, and "
+            f"{dataset.run_name!r} finished (outputs: {', '.join(existing)}); bump the name or "
+            "pass --redo" if existing else
             f"--resume found no orchestrator state for {dataset.run_name!r}; there is nothing "
             "to resume" if not scratch else None)
         if problem is None:
@@ -1583,6 +1593,79 @@ def guard_run_name(dataset: V5DatasetConfig, logger, scaffold=None,
         "  - pass --redo to discard this run's results and orchestrator state and execute "
         "it again from scratch."
     )
+
+
+#: What a reopened run keeps of its closed outputs: the append-only logs, so what already ran
+#: stays findable; the sealed plan and its revisions, which the resume extends; and the agenda,
+#: which the resume regenerates byte for byte. Everything else is derived from the
+#: orchestrator's state and is rebuilt; `write_once` would refuse it otherwise.
+_REOPEN_KEEPS = frozenset({"run_plan.json", "agenda.json", "agenda_report.json", "census.json"})
+
+
+async def reopen_partial_run(dataset: V5DatasetConfig, scaffold, logger, *,
+                             dry_run: bool = False) -> List[Dict[str, Any]]:
+    """Reopen a run that closed `partial` because sessions failed on errors: requeue them.
+
+    `--resume` on a partial run. Each of its orchestrators requeues the samples that failed on
+    system errors with their retries spent (`requeue_failed_samples`); every success is kept
+    and returned from cache, and unfinished samples continue as on any resume. The run's
+    closed outputs are cleared, except `_REOPEN_KEEPS` and the append-only logs, and the
+    reopen is a row in the stage ledger (partial -> running) naming what was requeued and
+    what was cleared. Refused when nothing failed on errors, since then the partial is the
+    run's result and not an outage. Refused for a lead run, whose failed jobs sit in nested
+    orchestrators that this does not reach.
+
+    Returns the requeued rows; with `dry_run`, what would be requeued, and nothing written.
+    """
+
+    import shutil
+
+    from ape.orchestration.persistence import requeue_failed_samples
+    from src.mathlib_review.run_state import (
+        RUN_ARTIFACTS, RunState, append_stage, assert_transition, stage_record, state_of)
+
+    directory = run_dir(dataset.run_name)
+    if state_of(directory) is not RunState.PARTIAL:
+        return []
+    if dataset.routing_mode == "lead":
+        raise RuntimeError(
+            f"--resume reopens a partial solo or fanout run; {dataset.run_name!r} is a lead run, "
+            "whose failed jobs sit in nested orchestrators that a reopen does not requeue. "
+            "Pass --redo.")
+    assert_transition(RunState.PARTIAL, RunState.RUNNING)
+    max_retries = scaffold.execution.task_max_retries
+    requeued: List[Dict[str, Any]] = []
+    for scratch in _scratch_dirs(dataset.run_name, scaffold):
+        rows = await requeue_failed_samples(
+            scratch / "tasks", max_retries, "partial run reopened with --resume",
+            dry_run=dry_run)
+        requeued += [{**row, "orchestrator": scratch.name} for row in rows]
+    if not requeued:
+        raise RuntimeError(
+            f"{dataset.run_name!r} is partial, but no session failed on errors with its retries "
+            "spent, so there is nothing to requeue: the partial is the run's result (a model "
+            "failure, or a coverage gap). Pass --redo to run it again from scratch.")
+    logger.info("%s %d session(s) of %r: %s", "would requeue" if dry_run else "requeued",
+                len(requeued), dataset.run_name,
+                ", ".join(f"{row['task'][:8]} ({row['attempts']} attempts)" for row in requeued))
+    if dry_run:
+        return requeued
+
+    keeps = _REOPEN_KEEPS | {spec.filename for spec in RUN_ARTIFACTS.values()
+                             if spec.append_only}
+    cleared = []
+    for entry in sorted(directory.iterdir()):
+        if entry.name in keeps or entry.name.startswith("run_plan_revision_"):
+            continue
+        shutil.rmtree(entry) if entry.is_dir() else entry.unlink()
+        cleared.append(entry.name)
+    append_stage(directory, stage_record(
+        "reopen", run_name=dataset.run_name,
+        identity={"requeued": requeued, "cleared": cleared},
+        state_before=RunState.PARTIAL, state_after=RunState.RUNNING,
+        transition=f"{RunState.PARTIAL.value} -> {RunState.RUNNING.value}"))
+    logger.info("reopened %r: cleared %s", dataset.run_name, ", ".join(cleared))
+    return requeued
 
 
 def redo_run(dataset: V5DatasetConfig, logger, scaffold=None) -> None:
@@ -1706,6 +1789,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         # name. The check used to sit *after* this block, so the one command whose job is to
         # tell you what the real run would do could not tell you it would not start.
         guard_run_name(dataset, logger, scaffold, fatal=False, resume=resume)
+        if resume:
+            await reopen_partial_run(dataset, scaffold, logger, dry_run=True)
         logger.info("%s", json.dumps(report, indent=2))
         _report_budget(dataset, report, len(selected_prs), logger, scaffold=scaffold)
         assert_coverage_is_reachable(dataset, report, logger)
@@ -1731,6 +1816,8 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
     assert_coverage_is_reachable(dataset, report, logger)
     assert_the_judge_model_is_pinned(dataset, logger)
     guard_run_name(dataset, logger, scaffold, resume=resume)
+    if resume:
+        await reopen_partial_run(dataset, scaffold, logger)
     out = run_dir(dataset.run_name)
     out.mkdir(parents=True, exist_ok=True)
     cutoff_by_episode = cutoffs_by_episode(episodes)
