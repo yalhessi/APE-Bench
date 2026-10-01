@@ -159,6 +159,52 @@ class SubjectPopulation:
         )
 
 
+#: The fewest declarations a directory needs before its leading spelling counts as the area's.
+MIN_LOCAL_SUPPORT = 3
+
+
+def scoped_verdict(
+    library: SubjectPopulation,
+    local: Optional[SubjectPopulation],
+    verdict: str,
+    empty_because: Optional[str],
+    current: str,
+    directory: Optional[str],
+) -> Tuple[str, Optional[str], List[str], Optional[str]]:
+    """The library's verdict, read against the reviewed file's own directory.
+
+    Returns `(verdict, empty_because, lines, area_prefix)`. `lines` always report the directory's
+    counts (or that it holds no declaration with this subject). `area_prefix` is set, and the
+    verdict becomes `insufficient_evidence` / `scope_conflict`, when the directory has at least
+    `MIN_LOCAL_SUPPORT` declarations with this subject and leads with a prefix other than the one
+    the library's verdict rests on: a `coe_` norm the library holds and the area does not is not
+    a convention to hold a PR in that area to.
+    """
+
+    if local is None or local.members == 0:
+        where = f" (`{directory}`)" if directory else ""
+        return verdict, empty_because, [
+            f"In this file's directory{where} no declaration shares this subject, so the area has "
+            "no count of its own; the counts above are the library's."], None
+    ranked = local.prefix_counts.most_common()
+    local_dominant, local_support = ranked[0]
+    counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
+    lines = [f"In this file's directory (`{directory}`), {local.members} declaration(s) share this "
+             f"subject: {counted}."]
+    if local.members < MIN_LOCAL_SUPPORT:
+        return verdict, empty_because, lines, None
+    anchor = library.dominant_prefix if verdict in ("established", "emerging") else (
+        current if verdict == "conforms" else None)
+    if anchor is None or local_dominant == anchor:
+        return verdict, empty_because, lines, None
+    lines.append(
+        f"The area disagrees with the library: `{local_dominant}_` leads here "
+        f"({local_support}/{local.members}) where `{anchor}_` is what the library's verdict rests "
+        "on. A library-wide count is not a convention to hold this PR to; judge the name against "
+        "its neighbours, and treat the area's spelling as the one to match.")
+    return "insufficient_evidence", "scope_conflict", lines, local_dominant
+
+
 def norm_verdict(population: SubjectPopulation, current: str) -> Tuple[str, Optional[str]]:
     """`(verdict, empty_because)` for a name whose leading prefix is `current`.
 
@@ -212,17 +258,26 @@ class PopulationScan:
         return self.parsed_files >= MIN_CORPUS_FILES
 
 
-def scan_population(workspace: Path, snapshot_sha: str) -> PopulationScan:
+def scan_population(workspace: Path, snapshot_sha: str, within: Optional[Path] = None) -> PopulationScan:
     """One pass over the snapshot, bucketing every direct-LHS lemma by its subject.
 
     The frozen operator makes the same pass but discards everything that is not `encard`.
     Keeping all subjects is what makes the rule general; the cost is one Counter per
     subject rather than one list.
+
+    `within` restricts the pass to one directory of the snapshot (`Mathlib/Analysis/...`): the
+    population of an area, read beside the library's. A prefix convention is a regularity at a
+    scope, and the library-wide count misled three reviewers on 33337, where `coe_` led the
+    library and `toLinearMap_` the file's own neighbourhood (2026-10-01).
     """
 
     mathlib = workspace / "Mathlib"
     if not mathlib.is_dir():
         raise FileNotFoundError(f"Mathlib source tree is unavailable: {mathlib}")
+    if within is not None:
+        mathlib = workspace / within
+        if not mathlib.is_dir():
+            raise FileNotFoundError(f"no such directory in the snapshot: {within}")
 
     buckets: Dict[str, Counter] = defaultdict(Counter)
     notation: Dict[str, str] = {}

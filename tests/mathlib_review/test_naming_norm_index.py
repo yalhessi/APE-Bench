@@ -14,6 +14,8 @@ question, while a run that dies because a snapshot is absent is not.
 
 from __future__ import annotations
 
+import pytest
+
 from src.mathlib_review.evidence.operators.naming_norm import (
     NORM_INDEX_VERSION, norm_for, norm_index,
 )
@@ -78,3 +80,50 @@ def test_a_population_is_rebuilt_from_the_index(tmp_path):
     assert population.support == 2
     assert norm_for(index, "nosuchsubject") is None
     assert norm_for(None, "encard") is None
+
+
+def test_a_scan_can_be_confined_to_one_directory(tmp_path):
+    """A prefix convention is a regularity at a scope. On 33337 the library-wide count said
+    `coe_` and the file's neighbourhood said `toLinearMap_`, and the library-wide count is what
+    three reviewers were told (2026-10-01)."""
+
+    from pathlib import Path
+
+    from src.mathlib_review.evidence.operators.naming_norm import scan_population
+
+    snap = _snapshot(tmp_path)
+    sub = snap / "Mathlib" / "Sub"
+    sub.mkdir()
+    (sub / "B.lean").write_text(
+        "theorem card_four (s : Set α) : (f s).encard = 4 := by simp\n"
+        "theorem card_five (s : Set α) : (g s).encard = 5 := by simp\n")
+    whole = scan_population(snap, "sha1").population("encard")
+    local = scan_population(snap, "sha1", within=Path("Mathlib/Sub")).population("encard")
+    assert whole.prefix_counts == {"encard": 2, "card": 3}
+    assert local.prefix_counts == {"card": 2} and local.members == 2
+    with pytest.raises(FileNotFoundError):
+        scan_population(snap, "sha1", within=Path("Mathlib/Absent"))
+
+
+def test_the_area_can_overrule_the_librarys_verdict():
+    from collections import Counter
+
+    from src.mathlib_review.evidence.operators.naming_norm import (
+        MIN_LOCAL_SUPPORT, SubjectPopulation, scoped_verdict,
+    )
+
+    library = SubjectPopulation("encard", Counter({"coe": 48, "toLinearMap": 9}), 57)
+    area = SubjectPopulation("encard", Counter({"toLinearMap": 5, "coe": 1}), 6)
+    verdict, because, lines, prefix = scoped_verdict(library, area, "established", None, "coe", "Mathlib/X")
+    assert (verdict, because, prefix) == ("insufficient_evidence", "scope_conflict", "toLinearMap")
+    assert any("disagrees with the library" in line for line in lines)
+    assert any("`toLinearMap_` 5, `coe_` 1" in line for line in lines)
+    # Agreement, a too-small area, and no area at all leave the library's verdict alone.
+    agree = SubjectPopulation("encard", Counter({"coe": 4}), 4)
+    assert scoped_verdict(library, agree, "established", None, "coe", "Mathlib/X")[:2] == ("established", None)
+    small = SubjectPopulation("encard", Counter({"toLinearMap": MIN_LOCAL_SUPPORT - 1}), MIN_LOCAL_SUPPORT - 1)
+    assert scoped_verdict(library, small, "established", None, "coe", "Mathlib/X")[:2] == ("established", None)
+    verdict, because, lines, prefix = scoped_verdict(library, None, "conforms", None, "coe", "Mathlib/X")
+    assert (verdict, prefix) == ("conforms", None) and "no declaration shares this subject" in lines[0]
+    # `conforms` to the library but not to the area is a conflict too.
+    assert scoped_verdict(library, area, "conforms", None, "coe", "Mathlib/X")[1] == "scope_conflict"
