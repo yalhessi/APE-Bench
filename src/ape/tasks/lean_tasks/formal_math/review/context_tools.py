@@ -24,6 +24,7 @@ convention for a task that needs dataset code is a function-local import, as in
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Optional
 
@@ -35,6 +36,10 @@ from pydantic import Field
 MAX_HITS = 8
 MAX_RESULT_CHARS = 6000
 MAX_SNIPPET = 400
+
+#: One token that could be a Lean declaration name, as `declaration_search` accepts it when the
+#: prose filter finds nothing (`Meromorphic`, `Fintype`, `abelianizeAdj`, `foo'`, `ne_zero!`).
+_ONE_IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_'!?.]*")
 
 
 def _append_trace(task, row: Dict[str, Any]) -> None:
@@ -346,6 +351,13 @@ def _register_declaration(task, mcp) -> None:
         )
 
         terms = searchable_identifiers(identifier)
+        if not terms and _ONE_IDENTIFIER_RE.fullmatch((identifier or "").strip()):
+            # `searchable_identifiers` filters a candidate's *prose* (its stoplist and its
+            # dotted-or-snake-cased rule exist because "the" matched 193 of 200 files). A tool
+            # argument is not prose: one token that could name a declaration is the name asked
+            # for, and `Meromorphic`, `Fintype` and `abelianizeAdj` were refused as "not
+            # identifier-shaped" on 15 of 249 calls in three dev runs (2026-10-01).
+            terms = [(identifier or "").strip()]
         if not terms:
             return {"success": False, "error": (
                 f"{identifier!r} is not identifier-shaped. Give a declaration name such as "

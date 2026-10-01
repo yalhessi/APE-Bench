@@ -515,3 +515,26 @@ def test_the_snapshot_is_walked_once_per_process(tmp_path, monkeypatch):
     for identifier in ("Finset.sum_comm", "sum_comm", "Finset.nowhere"):
         asyncio.run(tool(identifier=identifier))
     assert walks.count(str(root)) == 1
+
+
+def test_a_single_token_name_is_searched_as_given(tmp_path, monkeypatch):
+    """The prose filter exists for a candidate's free text; a tool argument is a name. `Fintype`,
+    `Meromorphic` and `abelianizeAdj` were refused as "not identifier-shaped" on 15 of 249 calls
+    in three dev runs (2026-10-01)."""
+
+    import src.mathlib_review.evidence.evidence as evidence
+
+    task, base_root = _task_with_overlay(
+        tmp_path,
+        base_text="def Meromorphic (f : Nat → Nat) : Prop := True\n",
+        reviewed_text="def Meromorphic (f : Nat → Nat) : Prop := True\n")
+    monkeypatch.setattr(evidence, "snapshot_workspace", lambda sha: base_root)
+    tool = _register(task).tools["declaration_search"]
+
+    result = asyncio.run(tool(identifier="Meromorphic"))
+    assert result["success"] and result["searched_terms"] == ["Meromorphic"]
+    assert result["declared_before_this_pr"] == 1
+    # Prose is still prose.
+    refused = asyncio.run(tool(identifier="the new declaration should be removed"))
+    assert not refused.get("success") or all(
+        term not in {"the", "new", "should", "be"} for term in refused["searched_terms"])
