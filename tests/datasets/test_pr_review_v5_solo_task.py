@@ -453,8 +453,55 @@ def test_user_prompt_v2_stamps_the_imported_claude_pair_on_every_finding(tmp_pat
     findings = [{"claim": "`Foo.bar` should be `Foo.baz`.", "concern_family": "naming",
                  "issue_kind": "naming_convention_violation", "path": "Mathlib/A.lean", "line_start": 3},
                 {"claim": "`Foo.qux` duplicates `Bar.qux`."}, {"claim": "a third, past the budget"}]
-    asyncio.run(submit(notes="- `Foo.bar`: renamed; nothing else.", findings=findings))
+    # Past the budget is refused, not truncated (2026-10-01); within it, every finding is stamped.
+    refused = asyncio.run(submit(notes="- `Foo.bar`: renamed; nothing else.", findings=findings))
+    assert refused["outcome"] == "invalid_request" and ended == []
+    asyncio.run(submit(notes="- `Foo.bar`: renamed; nothing else.", findings=findings[:2]))
     recorded = ended[0].findings
     assert len(recorded) == 2
     assert {(f["concern_family"], f["issue_kind"]) for f in recorded} == {(UNLABELLED_FAMILY, IMPORT_ISSUE_KIND)}
     assert "user_prompt" in inspect.getsource(type(task)._normalize_findings)
+
+
+def test_a_submission_past_the_budget_is_refused_not_truncated():
+    """`_normalize_findings` cut the tail and warned in the log, so a finding past the budget
+    vanished with nothing said to the reviewer: 2 and 4 findings on 33149 in two dev reps
+    (2026-10-01). Now the call is refused and the reviewer chooses what to drop."""
+
+    import asyncio
+    import logging
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig
+
+    task = SoloReviewTask(_data(), ApeAgentConfig(task_config=SoloReviewConfig(finding_budget=2)))
+    task.logger = logging.getLogger("solo-budget")
+    task._register_lean_verify_edit = lambda mcp: None
+
+    class FakeMCP:
+        def __init__(self):
+            self.tools = {}
+
+        def tool(self, **_kwargs):
+            def decorate(fn):
+                self.tools[fn.__name__] = fn
+                return fn
+            return decorate
+
+    mcp = FakeMCP()
+    asyncio.run(BasePRReviewTask.register_task_tools(task, mcp))
+    submit = mcp.tools["submit_findings"]
+    ended = []
+
+    async def terminate(result):
+        ended.append(result)
+
+    task.termination_callback = terminate
+    three = [{"path": "Mathlib/A.lean", "line_start": n, "claim": f"`f{n}` is wrong"} for n in (1, 2, 3)]
+    refused = asyncio.run(submit(findings=three))
+    assert refused["success"] is False and refused["outcome"] == "invalid_request"
+    assert "3 findings exceed" in refused["error"] and "at most 2" in refused["error"]
+    assert ended == []
+    asyncio.run(submit(findings=three[:2]))
+    assert len(ended) == 1 and len(ended[0].findings) == 2

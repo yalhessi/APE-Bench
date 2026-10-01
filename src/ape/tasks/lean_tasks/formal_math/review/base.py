@@ -684,6 +684,18 @@ class BasePRReviewTask(BaseLeanTask):
                     findings=normalized, review_message=message or "", **extra,
                 )
                 if self.termination_callback:
+            budget = self.config.task_config.finding_budget
+            if 0 < budget < len(findings or []):
+                # Refused, not truncated. `_normalize_findings` used to cut the tail and warn in
+                # the log, so a finding past the budget vanished with nothing said to the
+                # reviewer: 2 and 4 findings on 33149 in two dev reps (2026-10-01). The reviewer
+                # chooses what to drop.
+                return {
+                    "success": False, "outcome": "invalid_request",
+                    "error": (f"Not recorded: {len(findings)} findings exceed this review's budget "
+                              f"of {budget}. Call again with at most {budget}, keeping the changes "
+                              "you would most insist on; mention the rest in `message`."),
+                }
                     try:
                         await self.termination_callback(result)
                     except Exception as exc:  # noqa: BLE001
