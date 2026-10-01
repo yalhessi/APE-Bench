@@ -32,7 +32,11 @@ PROBE_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
 CODEX_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
                 "pr_review_v5_probe_2026_07_08_v1_gpt52_G_codex.yaml"),
                ("pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml",
-                "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_codex.yaml")]
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_codex.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt54_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt54_Grc_codex.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt55_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml")]
 
 
 @pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS + CODEX_PAIRS)
