@@ -192,7 +192,12 @@ delivering them as packet sections rather than arms, so any model under any scaf
 - **a mechanism catalogue**: the attributes and generators that replace hand-written families
   (`to_additive`, `to_fun`, `mk_iff`, `simps`, `fun_prop`, `deprecated alias`, `variable … in`),
   each with its one-line applicability test, as a brief section;
-- **scoped naming evidence** (Layer 0 item 3, plus the Zulip hits the `toLinearMap_` push has).
+- **scoped naming evidence** (Layer 0 item 3, plus the Zulip hits the `toLinearMap_` push has);
+- **the static analysis pass** (`docs/todo/static-analysis-pass.md`, the user's direction of
+  2026-10-01, next up after Layer 0's re-baseline): what Mathlib's own linters, the tacticAnalysis
+  set, `#lint` and `shake` say about the reviewed state and about every edit, as a packet section
+  restricted to the diff, a gate on `lean_verify_edit`, and a finder for the mechanical subset.
+  The standard linter set is already on every whole-file compile (`0a3d7d33`).
 
 The census codebook on `conventions-nature` is the source for the catalogue; its PRs must be
 disjoint from every evaluation set (the PR-level leakage rule).
