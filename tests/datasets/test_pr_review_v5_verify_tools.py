@@ -350,7 +350,7 @@ def test_errors_are_split_by_whether_the_edit_caused_them(task, monkeypatch):
         def __init__(self, **kwargs):
             pass
 
-        async def execute(self, code, max_messages=20):
+        async def execute(self, code, max_messages=20, **_kwargs):
             calls["n"] += 1
             if "by trivial" in code:          # the edited compile
                 return {"success": False, "errors": [
@@ -383,7 +383,7 @@ def test_an_already_broken_file_is_named_as_such(task, monkeypatch):
         def __init__(self, **kwargs):
             pass
 
-        async def execute(self, code, max_messages=20):
+        async def execute(self, code, max_messages=20, **_kwargs):
             return {"success": False, "errors": [{"data": "unsolved goals at expand_apply"}]}
 
     import ape.toolkits.execute.lean.tools as tools_module
@@ -407,7 +407,7 @@ def test_the_baseline_is_compiled_once_per_file(task, monkeypatch):
         def __init__(self, **kwargs):
             pass
 
-        async def execute(self, code, max_messages=20):
+        async def execute(self, code, max_messages=20, **_kwargs):
             calls["n"] += 1
             return {"success": True, "errors": []}
 
@@ -444,7 +444,7 @@ def test_a_pre_existing_error_is_never_reported_as_the_pr_failing_to_build(task,
         def __init__(self, **kwargs):
             pass
 
-        async def execute(self, code, max_messages=20):
+        async def execute(self, code, max_messages=20, **_kwargs):
             return {"success": False, "errors": [
                 {"data": "Unknown constant `Submodule.coe_starProjection_eq_isComplProjection`"}]}
 
@@ -471,7 +471,7 @@ def test_the_environment_note_is_absent_when_every_error_is_the_edits_own(task, 
         def __init__(self, **kwargs):
             pass
 
-        async def execute(self, code, max_messages=20):
+        async def execute(self, code, max_messages=20, **_kwargs):
             return {"success": True, "errors": []}
 
     import ape.toolkits.execute.lean.tools as tools_module
@@ -520,7 +520,7 @@ def verify_edit(task, monkeypatch):
         def __init__(self, **kwargs):
             pass
 
-        async def execute(self, code, max_messages=20):
+        async def execute(self, code, max_messages=20, **_kwargs):
             # The real `execute` returns an `outcome` (tools.verification_outcome); a stand-in
             # without one would let the as-is report go on reading an empty error list as a pass.
             errors = compiled["errors"]
@@ -643,3 +643,56 @@ def test_the_two_modes_are_not_confusable(verify_edit):
     assert set(as_is) != set(verified)
     assert "success" in verified and "success" not in as_is
     assert "warrants" in as_is and "warrants" not in verified
+
+
+def test_a_span_without_a_replacement_is_deleted(task):
+    """The model's way of saying "delete these lines" was `"replacement": }`, malformed JSON the
+    CLI refused before the tool saw it, 7 times in three dev runs (2026-10-01). Omitting the
+    replacement now means deletion; a replacement with no span is refused, not compiled as-is."""
+
+    code, err = task._edited_file_code("Mathlib/A.lean", 1, 1, None)
+    assert err == ""
+    assert code == "\n".join(SRC.split("\n")[1:])
+    code, err = task._edited_file_code("Mathlib/A.lean", 1, 1, "")
+    assert err == "" and code == "\n".join(SRC.split("\n")[1:])
+    code, err = task._edited_file_code("Mathlib/A.lean", None, None, "theorem x : True := trivial")
+    assert code is None and "line_start" in err
+
+
+def test_whole_file_compiles_run_mathlibs_linters_and_split_the_warnings(task, monkeypatch):
+    """`lean_verify_edit` reported `warnings: []` on a 101-character line the maintainers asked
+    to wrap (d0041), because `lake env lean` on a standalone file reads none of the lakefile's
+    `leanOptions`. The whole-file compiles now pass the standard linter set (as the package build
+    and CI apply it, prefixed `weak.`), and the warnings are split like the errors, so a long
+    file's pre-existing warnings do not arrive with every edit."""
+
+    import asyncio
+
+    from ape.tasks.lean_tasks.formal_math.review.base import WHOLE_FILE_OPTIONS
+
+    seen = []
+
+    class FakeLean:
+        def __init__(self, **kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20, **kwargs):
+            seen.append(kwargs.get("options"))
+            warnings = [{"data": "This line exceeds the 100 character limit"}]
+            if "by trivial" in code:          # the edited compile
+                warnings.append({"data": "unused variable `h`"})
+            return {"success": True, "errors": [], "warnings": warnings, "outcome": "compiled"}
+
+    import ape.toolkits.execute.lean.tools as tools_module
+
+    monkeypatch.setattr(tools_module, "LeanVerifyToolsProvider", FakeLean)
+    mcp = _FakeMCP()
+    task._register_lean_verify_edit(mcp)
+    result = asyncio.run(mcp.tools["lean_verify_edit"](
+        path="Mathlib/A.lean", declaration_name="Foo.bar",
+        new_declaration="theorem bar : True := by trivial"))
+    assert seen and all(options == WHOLE_FILE_OPTIONS for options in seen), seen
+    assert WHOLE_FILE_OPTIONS == {"weak.linter.mathlibStandardSet": "true"}
+    assert [w["data"] for w in result["warnings_introduced_by_your_edit"]] == ["unused variable `h`"]
+    assert result["warnings_already_in_the_file"] == 1
+    assert "warnings" not in result

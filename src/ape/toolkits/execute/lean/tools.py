@@ -93,6 +93,9 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
 
     def register_tools(self, mcp: FastMCP, enabled_tools: set[str]):
         """Register Lean verification tool to MCP server"""
+        if "lean_verify" in enabled_tools and getattr(self.task, "lean_verify_snippet_only", False):
+            self._register_snippet_probe(mcp)
+            return
         if "lean_verify" in enabled_tools:
             # Check if file editing tools with execute capability are enabled
             file_edit_tools = {"file_write", "file_edit", "file_multi_edit"}
@@ -225,12 +228,47 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                         "error": traceback.format_exc()
                     }
 
-    async def execute(self, code: str, max_messages: Optional[int] = 20) -> Dict[str, Any]:
+    def _register_snippet_probe(self, mcp: FastMCP) -> None:
+        """`lean_verify` for a task that has no scratch file to compile: the snippet probe.
+
+        A review task opts in with `lean_verify_snippet_only`. Under the general registration
+        the tool is described as "Verify Lean code for correctness" and takes a `file_path`,
+        and a reviewer used it for something else entirely: of 84 calls in three dev runs
+        (2026-10-01), 55 were `#check`, `example` or `exact?` probes against the library and 0
+        gave a file path. Meanwhile the description blurred it with `lean_verify_edit`, the
+        tool that compiles the reviewed file with an edit. So this registration says what the
+        tool is for and takes only the snippet.
+        """
+
+        @mcp.tool(description=(
+            "Compile a self-contained Lean SNIPPET against the library at this PR's reviewed "
+            "state: a `#check`, an `example`, an `exact?`, a candidate lemma statement. Give the "
+            "`import` lines it needs; the PR's own changed modules are importable. This answers "
+            "questions about the library, not about the reviewed file: to test a change to a "
+            "reviewed file, use `lean_verify_edit`. " + OUTCOME_NOTE))
+        async def lean_verify(
+            code: Annotated[str, Field(description="The snippet, with its imports")],
+            max_messages: Annotated[Optional[int], Field(
+                description="Max messages to return (prioritized: error > warning > info)")] = 20,
+        ) -> Dict[str, Any]:
+            if not code or not code.strip():
+                return {"success": False, "outcome": "invalid_request", "error": "The snippet is empty."}
+            try:
+                return await self.execute(code, max_messages=max_messages)
+            except Exception:  # noqa: BLE001
+                self.logger.error(f"Verification failed: {traceback.format_exc()}")
+                return {"success": False, "outcome": "tool_error", "error": traceback.format_exc()}
+
+    async def execute(self, code: str, max_messages: Optional[int] = 20,
+                      options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Execute service layer: core verification interface
 
         Args:
             code: Lean code string to verify (already passed through tool layer validation and processing)
             max_messages: Maximum message number limit (None means no limit)
+            options: Lean `-D` options for this compile, over the tool config's. A whole-file
+                compile of a Mathlib file passes the standard linter set here, so that a
+                compile reports what the package build (and CI) would.
 
         Returns:
             Dict: Verification result
@@ -289,6 +327,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
             allow_sorries=self.tool_config.allow_sorries,
             accepted_axioms=self.tool_config.accepted_axioms,
             nproc=self.tool_config.nproc,
+            options=options or None,
         )
         
         # Format messages
