@@ -128,3 +128,26 @@ def test_a_missing_event_log_is_unauditable(tmp_path):
 
     report = audit_events(tmp_path / "absent.jsonl", _config())
     assert report["clean"] is False and "error" in report
+
+
+def test_a_tool_result_longer_than_asyncios_default_line_is_read(tmp_path):
+    """One event line carries a whole tool result; the default 64 KiB limit crashed a session."""
+
+    import asyncio
+    import inspect
+    import sys
+
+    from ape.scaffolds.codex import conversation
+
+    assert "limit=EVENT_LINE_LIMIT" in inspect.getsource(conversation.CodexConversationManager._execute_turn)
+
+    async def read_one_long_line():
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, "-c", "print('{\"pad\": \"' + 'a' * 300000 + '\"}')",
+            stdout=asyncio.subprocess.PIPE, limit=conversation.EVENT_LINE_LIMIT)
+        lines = [line async for line in proc.stdout]
+        await proc.wait()
+        return lines
+
+    (line,) = asyncio.run(read_one_long_line())
+    assert len(json.loads(line)["pad"]) == 300000

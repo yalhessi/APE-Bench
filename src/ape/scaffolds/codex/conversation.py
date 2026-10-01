@@ -19,6 +19,11 @@ from typing import List, Optional, TYPE_CHECKING
 
 from ape.scaffolds.utils.base_conversation import BaseConversationManager
 
+#: The longest event line read from the CLI. One `item.completed` carries a whole tool result on one
+#: line, and asyncio's default (64 KiB) ended a session on a `content_search` result
+#: (probe_postcutoff_gpt52_Grc_codex_rep2, LimitOverrunError; the orchestrator's retry ran clean).
+EVENT_LINE_LIMIT = 64 * 1024 * 1024
+
 if TYPE_CHECKING:
     import logging
     from .relay import CodexRelaySession
@@ -93,7 +98,7 @@ class CodexConversationManager(BaseConversationManager):
             self._proc = await asyncio.create_subprocess_exec(
                 *self.exec_command(prompt), cwd=str(self.task.workspaces_dir.resolve()),
                 env=self._environment(), stdin=asyncio.subprocess.DEVNULL,
-                stdout=asyncio.subprocess.PIPE, stderr=stderr)
+                stdout=asyncio.subprocess.PIPE, stderr=stderr, limit=EVENT_LINE_LIMIT)
             stop_watch = asyncio.create_task(self._stop_when_submitted())
             try:
                 with open(events_path, "a", encoding="utf-8") as events:
