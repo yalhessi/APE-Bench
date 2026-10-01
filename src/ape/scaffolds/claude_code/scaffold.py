@@ -153,6 +153,21 @@ class ClaudeCodeScaffold(BaseScaffold):
         task_user_prompt = await self.task.create_user_prompt()
         return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
 
+    def _pre_approved_tools(self) -> List[str]:
+        """APE's own MCP server, and the configured grant, approved without asking.
+
+        `dontAsk` refuses every tool not pre-approved, APE's own included: in the first contained
+        smoke run (pr5_probe0708_gpt52_G_claude_smoke2) it refused 7 of 8 calls -- Read,
+        lean_verify, declaration_search and all three submit_findings -- so the reviewer read
+        nothing and could not submit. The grant says which tools exist and `contain_to_workspace`
+        bounds where they reach; approval is the third, separate thing, and without it the first
+        two describe a session that cannot act.
+        """
+        config = self.task.config
+        approved = [config.mcp_server_name.rstrip("_")]  # "mcp__core": every tool on APE's server
+        approved.extend(config.tools or [])
+        return approved
+
     async def _run_batch_mode(self) -> None:
         """Run batch mode using Claude SDK"""
         config = self.task.config
@@ -242,6 +257,7 @@ class ClaudeCodeScaffold(BaseScaffold):
             cwd=cwd,
             add_dirs=add_dirs,
             permission_mode=config.permission_mode,
+            allowed_tools=self._pre_approved_tools(),
             disallowed_tools=disallowed_tools,
             **optional_containment,
             include_partial_messages=True,
@@ -408,15 +424,19 @@ class ClaudeCodeScaffold(BaseScaffold):
             "refused_by_hook": self.containment_refusals,
             "transcripts": audits,
             "clean": bool(audits) and all(a["clean"] for a in audits),
+            # The grant actually usable: no call turned down by Claude Code's permission mode.
+            "usable": bool(audits) and not any(a["refused_by_cli"] for a in audits),
         }
         if not audits:
             report["error"] = "no session transcript in the attempt directory; nothing was audited"
         (attempt_path / "containment_audit.json").write_text(json.dumps(report, indent=2))
         leaks = sum(len(a["leaks"]) for a in audits)
-        log = self.logger.info if report["clean"] else self.logger.error
-        log("[ClaudeCodeScaffold] containment audit: clean=%s, %d tool calls, %d refused, %d leaked%s",
-            report["clean"], sum(a["tool_calls"] for a in audits),
-            len(self.containment_refusals), leaks,
+        cli_refused = sum(len(a["refused_by_cli"]) for a in audits)
+        log = self.logger.info if report["clean"] and report["usable"] else self.logger.error
+        log("[ClaudeCodeScaffold] containment audit: clean=%s usable=%s, %d tool calls, "
+            "%d refused by containment, %d leaked, %d refused by the CLI's permission mode%s",
+            report["clean"], report["usable"], sum(a["tool_calls"] for a in audits),
+            len(self.containment_refusals), leaks, cli_refused,
             "" if audits else " (no transcript)")
 
     async def _cleanup_components(self) -> None:

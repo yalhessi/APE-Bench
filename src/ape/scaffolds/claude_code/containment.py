@@ -49,6 +49,10 @@ NO_PATH = frozenset({"TodoWrite"})
 #: Opens every refusal, so the audit can tell a refused call from one that ran.
 REFUSAL_MARK = "[ape containment]"
 
+#: How Claude Code words a refusal by its own permission mode ("Permission to use Read has been
+#: denied because Claude Code is running in don't ask mode", 2.1.139).
+CLI_REFUSAL_MARKS = ("Permission to use", "has been denied")
+
 
 def provisioned_roots(workspaces_dir: Path, extra: Iterable[Path] = ()) -> List[str]:
     """The directories a session may touch: its workspace, and where the workspace's links lead.
@@ -146,10 +150,13 @@ def audit_transcript(transcript: Path, roots: Sequence[str], cwd: str) -> Dict[s
 
     `leaks` are calls that left the workspace and were not refused; `refused` are those the
     hook stopped. A run with any leak is not readable, and nor is one whose transcript is gone.
+    `refused_by_cli` are calls Claude Code's own permission mode turned down, which leak nothing
+    but mean the session could not do what it was granted.
     """
 
     calls: List[Dict[str, Any]] = []
     refused_ids = set()
+    cli_refused_ids = set()
     with open(transcript, encoding="utf-8") as fh:
         for line in fh:
             try:
@@ -166,9 +173,12 @@ def audit_transcript(transcript: Path, roots: Sequence[str], cwd: str) -> Dict[s
                 if block.get("type") == "tool_use":
                     calls.append({"id": block.get("id"), "tool_name": block.get("name", ""),
                                   "tool_input": block.get("input") or {}})
-                elif (block.get("type") == "tool_result" and block.get("is_error")
-                      and REFUSAL_MARK in _result_text(block.get("content"))):
-                    refused_ids.add(block.get("tool_use_id"))
+                elif block.get("type") == "tool_result" and block.get("is_error"):
+                    text = _result_text(block.get("content"))
+                    if REFUSAL_MARK in text:
+                        refused_ids.add(block.get("tool_use_id"))
+                    elif all(mark in text for mark in CLI_REFUSAL_MARKS):
+                        cli_refused_ids.add(block.get("tool_use_id"))
 
     leaks, refused = [], []
     for call in calls:
@@ -180,5 +190,10 @@ def audit_transcript(transcript: Path, roots: Sequence[str], cwd: str) -> Dict[s
     by_tool: Dict[str, int] = {}
     for call in calls:
         by_tool[call["tool_name"]] = by_tool.get(call["tool_name"], 0) + 1
+    # Refused by Claude Code itself: not a leak, but a session that could not act, whose empty
+    # review would otherwise read as the reviewer's (smoke2: 7 of 8 calls).
+    refused_by_cli = [{"id": c["id"], "tool_name": c["tool_name"]}
+                      for c in calls if c["id"] in cli_refused_ids]
     return {"transcript": str(transcript), "tool_calls": len(calls), "by_tool": by_tool,
-            "refused": refused, "leaks": leaks, "clean": not leaks}
+            "refused": refused, "leaks": leaks, "clean": not leaks,
+            "refused_by_cli": refused_by_cli}

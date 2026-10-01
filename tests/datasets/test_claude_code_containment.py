@@ -337,3 +337,50 @@ def test_the_session_file_is_found_by_name_not_by_a_rederived_directory(tmp_path
     find = ClaudeCodeConversationManager.find_session_file
     assert find(tmp_path, "10f86fe9") == session
     assert find(tmp_path, "absent") is None
+
+
+# --- the grant must be usable: dontAsk refuses whatever is not pre-approved -----------------
+
+
+def test_ape_tools_and_the_grant_are_pre_approved():
+    """smoke2 (2026-10-01): under dontAsk with no approvals, 7 of 8 calls were refused --
+    Read, lean_verify, declaration_search and all three submit_findings -- so the reviewer read
+    nothing and its review could not land."""
+
+    from types import SimpleNamespace
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
+
+    scaffold = object.__new__(ClaudeCodeScaffold)
+    scaffold.task = SimpleNamespace(config=ClaudeCodeConfig(
+        llm_config=LLMConfig(model_name="gpt_5.2"), tools=["Read", "Grep", "Glob", "TodoWrite"]))
+    assert scaffold._pre_approved_tools() == ["mcp__core", "Read", "Grep", "Glob", "TodoWrite"]
+    assert "allowed_tools=self._pre_approved_tools()" in inspect.getsource(
+        ClaudeCodeScaffold._run_batch_mode)
+
+
+def test_the_audit_reports_calls_the_cli_itself_refused(tmp_path):
+    """Not a leak, but a session that could not act: an empty review from it is not the
+    reviewer's. The wording is the bundled 2.1.139 CLI's, from smoke2's transcript."""
+
+    import json
+
+    from ape.scaffolds.claude_code.containment import audit_transcript, provisioned_roots
+
+    workspaces, _base, _later, _gold = _review_layout(tmp_path)
+    denied = ("Permission to use mcp__core__submit_findings has been denied because Claude Code "
+              "is running in don't ask mode.")
+    lines = [
+        {"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "id": "s1", "name": "mcp__core__submit_findings",
+             "input": {"findings": []}}]}},
+        {"type": "user", "message": {"content": [
+            {"type": "tool_result", "tool_use_id": "s1", "is_error": True, "content": denied}]}},
+    ]
+    transcript = tmp_path / "s.jsonl"
+    transcript.write_text("".join(json.dumps(line) + "\n" for line in lines))
+
+    report = audit_transcript(transcript, provisioned_roots(workspaces), str(workspaces))
+    assert report["clean"] is True
+    assert report["refused_by_cli"] == [{"id": "s1", "tool_name": "mcp__core__submit_findings"}]
