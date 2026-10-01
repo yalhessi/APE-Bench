@@ -56,3 +56,35 @@ per session; asks reached per finding.
   (the tool asks for `target/`). That belongs to the harness as it stands, and is not separated here.
 - Earlier references on this set are not re-read here: G before the `lean_verify` fix reached 0.12
   a session, X 0.47 (test (b)).
+
+## Result (matched 2026-10-01)
+
+Two blind matchers on the seal `60be343`. Both transcripts were audited clean (11 calls each, none
+flagged). They agree on 126 of 128 cells, and on 127 of 128 when reading only reached or not.
+
+| reach over 16 asks | A1 | A2 | A3 | **A** | C1 | C2 | C3 | **C** | X1 | X2 | **X** | **d = C - A** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| matcher 1 | .1875 | .1875 | .125 | **.167** | .0625 | .125 | .1875 | **.125** | .50 | .4375 | **.469** | **-0.042** |
+| matcher 2 | .1875 | .1875 | .0625 | **.146** | .0625 | .125 | .1875 | **.125** | .50 | .4375 | **.469** | **-0.021** |
+
+**By the rule: comparable.** `|d| <= 0.05` on both matchers. On this set, with `gpt_5.2` and
+reasoning off, the APE-Agent harness is not what limits the reviewer compared with Claude Code.
+`q = reach / X`: A 0.31-0.36, C 0.27.
+
+- **Which asks.** Each condition's union is 3 asks, two of them shared: removing the unused import
+  on 43167 (every session) and the missing "of" in 43192's title. A's third is the
+  `commutator_sup_left_of_normal` rename on 43167, reached by all three A sessions; C's is the
+  `_anti` rename on 43024, by C3 only. Neither reaches any of the six asks X reaches beyond those:
+  dropping `[L.NeBot]`, `@[to_additive]`, the two `cat_disch` defaults, and `homMk`.
+- **Per finding.** Asks reached per finding (matcher 1): A 0.138, C 0.130, X 0.31. Findings per
+  session: A 19.3, C 15.3, X 24.5.
+- **Spread.** C's sessions range from 1 to 3 asks, and its findings per run from 9 to 22; A's from
+  1 to 3, and 18 to 20.
+- **Cost.** Billed for three repetitions: A $0.82, C $1.22.
+
+**Read at this altitude.** One model with reasoning off, and 16 asks, so one ask moves a condition
+mean by about 0.02. The comparability holds for this harness pair as configured, including Claude
+Code's own tools and its bare-path `lean_verify` refusals. Not tried: reasoning on (where `gpt_5.2`
+reached 0.31-0.44 under APE-Agent), Claude as the model in both harnesses (it needs an Anthropic
+provider), Codex, and the validation and dev sets. The gap to X stays the model's, as tests (b) and
+(e) found.
