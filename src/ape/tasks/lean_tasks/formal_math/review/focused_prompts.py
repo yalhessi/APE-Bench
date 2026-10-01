@@ -361,9 +361,13 @@ So DO NOT propose a name from first principles, and do not read a convention off
     * `established` — the corpus is lopsided enough to hold a PR to. A rename is a fair ask.
     * `emerging` — one spelling leads clearly but does not dominate. Say so as an ADVISORY
       suggestion, naming it as the emerging spelling rather than the rule.
+    * `conforms` — the corpus has a convention and this name already follows it. There is no
+      prefix change to ask for.
     * `insufficient_evidence` — the counts do not settle it, and `empty_because` says why.
-      `no_population`: the repository has no counted opinion here. `subject_unresolved`: the tool
-      could not tell what the declaration is about and never asked the corpus, so naming is
+      `no_population`: the repository has no counted opinion here. `population_too_small`: the
+      leading spelling has too few declarations to call a convention. `no_dominant_prefix`: no
+      spelling clears the bar. `subject_unresolved`: the tool could not tell what the declaration
+      is about and never asked the corpus. In every case but `no_population` the prefix is
       unmeasured rather than settled -- judge the name on precedent and on the siblings you read.
     * Whatever the verdict, it is about the name's LEADING prefix only. The tool does not measure a
       suffix, a prime, argument order or a namespace; judge those against the siblings you read and

@@ -590,6 +590,10 @@ def _register_proof_profile(task, mcp) -> None:
 
 
 def _register_naming_norm(task, mcp) -> None:
+    # The description quotes the census thresholds, so they are read here, at registration --
+    # not only inside the call, where the rest of the operator's names are imported.
+    from src.mathlib_review.evidence.operators.naming_norm import MIN_SUPPORT, MIN_SUPPORT_RATIO
+
     @mcp.tool(
         description=(
             "What this repository CALLS lemmas like this one, counted over the whole base "
@@ -603,15 +607,20 @@ def _register_naming_norm(task, mcp) -> None:
             "names are not counted into the norm they are being judged against.\n\n"
             "`verdict` is the answer, not the counts: `established` means the corpus is "
             "lopsided enough to hold a PR to (a blocking ask); `emerging` means one spelling "
-            "leads clearly but is not dominant (advisory at most); `insufficient_evidence` "
-            "covers two different things and `empty_because` says which. Every verdict is about "
+            "leads clearly but is not dominant (advisory at most); `conforms` means the corpus has "
+            "a convention and this name already uses it, so there is no prefix change to ask for; "
+            "`insufficient_evidence` means the census settles nothing, and `empty_because` always "
+            "says why. Every verdict is about "
             "the name's LEADING prefix only: the tool does not measure a suffix, a prime, "
             "argument order or a namespace. `no_population`: the corpus was consulted and has no "
             "counted population for this subject, so there is no prefix convention to hold the "
             "PR to. "
             "`subject_unresolved`: this tool could not work out what the declaration is about "
             "and never asked the corpus, so naming here is UNMEASURED rather than settled -- "
-            "judge it on the evidence you have."
+            "judge it on the evidence you have. `population_too_small`: the leading spelling "
+            f"has fewer than {MIN_SUPPORT} declarations, too few to call a convention. "
+            "`no_dominant_prefix`: the leading spelling is under the "
+            f"{MIN_SUPPORT_RATIO:.0%} bar, so no prefix is the convention."
         )
     )
     async def naming_norm(
@@ -622,8 +631,8 @@ def _register_naming_norm(task, mcp) -> None:
         from src.mathlib_review.evidence.evidence import snapshot_workspace
         from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
         from src.mathlib_review.evidence.operators.naming_norm import (
-            MAX_CONFLICT_RATIO, MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix,
-            norm_for, norm_index, rename_candidates,
+            MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix, norm_for,
+            norm_index, norm_verdict, rename_candidates,
         )
 
         base = task.data.snapshot_base_sha
@@ -709,15 +718,16 @@ def _register_naming_norm(task, mcp) -> None:
         ranked = population.prefix_counts.most_common()
         dominant, support = ranked[0]
         runner_up = ranked[1][1] if len(ranked) > 1 else 0
-        established = population.is_strong() and population.conflict_ratio(current) <= MAX_CONFLICT_RATIO
-        emerging = (support >= MIN_SUPPORT and support >= 3 * max(runner_up, 1)
-                    and population.prefix_counts.get(current, 0) < support)
-        verdict = ("established" if established and dominant != current
-                   else "emerging" if emerging and dominant != current
-                   else "insufficient_evidence")
+        # `conforms` is an answer, and every `insufficient_evidence` says why (`norm_verdict`).
+        # Of 43 counted `insufficient_evidence` verdicts over six gpt runs (2026-09-30), replayed:
+        # 15 were a name already following its convention ("`dist_` is the convention for this
+        # subject (397/424)" under a verdict saying the census settled nothing), 8 had a leader
+        # too small to count (4 of 4 was reported as a plurality "under the 80% bar"), and 20
+        # had no dominant prefix.
+        verdict, empty_because = norm_verdict(population, current)
         candidates = (rename_candidates(declaration, dominant, subject.expression,
                                         index.get("notation"))
-                      if verdict != "insufficient_evidence" else [])
+                      if verdict in ("established", "emerging") else [])
         counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
         lines = [
             f"Subject of the conclusion: `{subject.token}` (from {subject.kind}).",
@@ -731,6 +741,13 @@ def _register_naming_norm(task, mcp) -> None:
         elif verdict == "emerging":
             lines.append(f"`{dominant}_` leads {support} to {runner_up} but is not dominant. "
                          "Advisory at most -- say it is the emerging spelling, not the rule.")
+        elif verdict == "conforms":
+            lines.append(f"This name's prefix `{current}_` is the convention for this subject "
+                         f"({support}/{population.members}, over the {MIN_SUPPORT_RATIO:.0%} bar), "
+                         "and the name follows it: there is no prefix change to ask for.")
+            lines.append("This census counts only each name's LEADING token. It says nothing about "
+                         "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
+                         "judge those against the siblings you read and against precedent.")
         else:
             # This said "The corpus does not back a rename here. Submit nothing on naming." for every
             # counted `insufficient_evidence`, and the census measures one thing: each name's
@@ -739,9 +756,10 @@ def _register_naming_norm(task, mcp) -> None:
             # prefix count can see; and a coercion lemma whose `coe_` lead was 48 of 124, a
             # plurality read as a convention. Say what was measured, and no more.
             members = population.members
-            if dominant == current and population.is_strong():
-                lines.append(f"This name's prefix `{current}_` is the convention for this subject "
-                             f"({support}/{members}).")
+            if empty_because == "population_too_small":
+                lines.append(f"The leading spelling `{dominant}_` has {support} of the {members} "
+                             f"declaration(s) sharing this subject: under the {MIN_SUPPORT} needed to "
+                             "call a convention, so the prefix is unmeasured here, not settled.")
             elif dominant == current:
                 lines.append(f"`{current}_`, this name's prefix, is the most common spelling but only "
                              f"a plurality ({support} of {members}, under the "
@@ -765,8 +783,10 @@ def _register_naming_norm(task, mcp) -> None:
             "as_of": None, "exclude_pr": None, "corpus_sha256": base,
             "result_ids": [f"{subject.token}:{dominant}:{support}/{population.members}"],
             "result_count": population.members, "truncated": truncated,
+            "empty_because": empty_because,
         })
         return {"success": True, "verdict": verdict, "subject": subject.token,
+                "empty_because": empty_because,
                 "members": population.members, "counts": dict(ranked[:8]),
                 "candidates": candidates, "results": rendered}
 

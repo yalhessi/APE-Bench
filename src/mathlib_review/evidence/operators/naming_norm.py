@@ -159,6 +159,35 @@ class SubjectPopulation:
         )
 
 
+def norm_verdict(population: SubjectPopulation, current: str) -> Tuple[str, Optional[str]]:
+    """`(verdict, empty_because)` for a name whose leading prefix is `current`.
+
+    `established` and `emerging` say a rename is warranted; `conforms` says the corpus has a
+    convention and the name already follows it, which used to fall through to
+    `insufficient_evidence` under a sentence saying the opposite. An `insufficient_evidence`
+    always carries its reason, and two exhaust it: `population_too_small` (the leading spelling
+    has fewer than `MIN_SUPPORT`) or `no_dominant_prefix` (it is under `MIN_SUPPORT_RATIO`). A
+    strong population leaves no third case: the name either follows the leader (`conforms`) or
+    is outnumbered at least four to one, which is `emerging` at the least. `empty_because` is
+    `None` for the three verdicts that are answers.
+    """
+
+    ranked = population.prefix_counts.most_common()
+    dominant, support = ranked[0]
+    runner_up = ranked[1][1] if len(ranked) > 1 else 0
+    established = population.is_strong() and population.conflict_ratio(current) <= MAX_CONFLICT_RATIO
+    emerging = (support >= MIN_SUPPORT and support >= 3 * max(runner_up, 1)
+                and population.prefix_counts.get(current, 0) < support)
+    verdict = ("established" if established and dominant != current
+               else "emerging" if emerging and dominant != current
+               else "conforms" if dominant == current and population.is_strong()
+               else "insufficient_evidence")
+    empty_because = (None if verdict != "insufficient_evidence"
+                     else "population_too_small" if support < MIN_SUPPORT
+                     else "no_dominant_prefix")
+    return verdict, empty_because
+
+
 @dataclass(frozen=True)
 class PopulationScan:
     by_subject: Dict[str, SubjectPopulation]

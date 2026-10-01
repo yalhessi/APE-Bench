@@ -209,9 +209,13 @@ class ContextCall(StrictModel):
     #: corpus has no counted opinion" -- so a subject its own parser could not resolve was
     #: reported to the arm as the repository having no convention, with an instruction to
     #: submit nothing. 477 of 632 calls across the three held-out reps came back empty and the
-    #: trace could not say which cause fired. Null on a call that returned something, and on
-    #: every row written before the split.
-    empty_because: Optional[Literal["subject_unresolved", "no_population"]] = None
+    #: trace could not say which cause fired. A counted population that settles nothing says
+    #: why as well (`population_too_small`, `no_dominant_prefix`): 43 calls over six gpt runs
+    #: came back `insufficient_evidence` with no reason, 15 of them on a name that already
+    #: followed its convention (now `conforms`).
+    #: Null on a call that returned an answer, and on every row written before the split.
+    empty_because: Optional[Literal["subject_unresolved", "no_population", "population_too_small",
+                                     "no_dominant_prefix"]] = None
 
 
 class CandidateAssessment(StrictModel):
