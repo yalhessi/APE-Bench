@@ -108,7 +108,7 @@ often (0.071 per finding, the lowest of any reviewer). The ledger was written fo
 with a median of 8.5 bullets per PR against Claude's 23.5-33.5. It names each changed object and
 closes each with a conclusion about the object's proof or docs. In the sessions read it does not
 take an object through the concern families:
-- 33145: eight findings, all proof golf or docstrings, with 28 compiles. The notes never mention
+- 33145: eight findings, all proof golf or docstrings, with 14 compiles. The notes never mention
   names, and Grc1's naming finding (the maintainers' rename) is gone.
 - 33421: on the lemma the maintainer asked to generalize, the notes say "searched for duplicates
   by name and didn't find any conflicts". That is `attempted_concluded_fine`, Phase 1's dominant
@@ -133,3 +133,63 @@ not carry over.
 
 So the four contract differences together, as built here, do not close the gap on this set. They
 widen gpt's output somewhat without raising what it reaches.
+
+## Is gpt a proof reviewer where Claude reviews broadly? (2026-10-01, no spend; `focus.py`)
+
+The question was raised from the 33145 session read. One keyword classifier was applied to every
+reviewer's findings, notes and the gold asks on the held-out 12. Tool calls were parsed from the
+conversations, not regex-counted: a regex over the turn file counts each call twice, which put two
+figures in the early read at double.
+
+**By share, no.** Proof-related findings are 28-33% of Claude's, 16% of Grc1's, 21% of the contract
+run's and 27-29% of gpt-5.5's and gpt-off's. Grc1 leans more on naming than Claude (23% against
+16-18%), and the contract moved it away from naming (10%). **By count, Claude files about three times
+as much in every family:** naming 14-17 against 4-7, proof 25-32 against 5-11, generality 15-21 against
+1-5, API design 23-26 against 4-10. Claude is also better at proof asks: it hits both proof-golf asks
+(33285), which gpt_5.2 misses in every condition. gpt-5.5 carried hits both too.
+
+**The difference is how much is done per object, across every family:**
+
+| per session, median | Claude X1 / X2 | gpt Grc1 | gpt contract |
+|---|---|---|---|
+| tool calls (all) | 58 / 57 | 39 | 32 |
+| candidate edits compiled (`lean_verify_edit`) | 9.5 / 11.5 | 3.5 | 1.5 (+4 `lean_verify` snippets) |
+| library lookups (`declaration_search` + `file_search` + `naming_norm`) | 17 / 19.5 | 3.5 | 1.5 |
+| file reads + greps | 14.5 / 16 | 19.5 | 16.5 |
+
+| PRs whose notes mention the family | naming | generality | duplication | API design | placement |
+|---|---|---|---|---|---|
+| Claude X1 / X2 | 100% / 92% | 83% / 75% | 92% / 75% | 92% / 92% | 92% / 92% |
+| gpt contract | 50% | 17% | 50% | 58% | 50% |
+
+gpt reads and greps as much as Claude. It compiles a third as many candidate edits and looks the
+library up a fifth as often, and it stops: no gpt session came near its caps (max 46 of 160 turns).
+The notes instruction was the same text for both. Claude's is "what you did, object by object,
+including what you checked and found nothing wrong with", and gpt got that plus "every changed
+object gets an entry". Under it, Claude's notes take objects through the families and gpt's do not.
+
+**Differences between the two contracts that remain after this build.** All are untested:
+- gpt only, in the user prompt: "Investigate ... open the files, look for existing declarations that
+  overlap, check whether a proof could be shorter" (it names two activities); the finding schema
+  with path and line, the `concern_family` and `issue_kind` taxonomies, and "Label a finding with
+  what it actually is"; "at most 20 findings"; "You MUST finish ... a text-only reply ... fails the
+  task"; and the order PR, diff, instructions, then the PR model. Claude read pr, model, diff.
+- gpt only, in the system prompt: the workspace and `<environment>` sections (scratch and target).
+- Output: gpt makes one final call. Claude writes `findings.json` and `notes.md` as files, so it can
+  rewrite them and read them while it works.
+- Tools: gpt also holds `lean_verify` (snippet compiles, 3-4 a session), `get_lean_goal` and
+  hover/goto, called natively. Claude held the `ptool` set, called through a shell script after one
+  `ptool describe`.
+- Harness: Claude ran as a Claude Code subagent under that harness's own system prompt and the
+  probe's session prompt, uncapped. gpt runs in the `ape_agent` loop with turn and cost caps, none
+  of which bound.
+- Model: `claude-opus-5-5` against gpt_5.2 at high effort with reasoning carried. Dev is inside
+  Claude's training window; the post-cutoff test found in-window reach is not mainly recall.
+
+**What these runs cannot separate.** The same notes instruction produced a family-by-object pass in
+one reviewer and not the other. That points at the model or the harness rather than the brief's
+text, but no run here holds everything but the model fixed. The design that does is the swap: a
+Claude session given gpt's rendered contract-condition prompt verbatim (system and user), the same
+tools, and a `submit_findings`-shaped output, judged the same way. Claude near 0.48 would mean the
+remaining gap is model or harness. Claude near 0.13 would mean it is in the prompt text gpt still
+gets. It costs Claude-session time, not API spend.

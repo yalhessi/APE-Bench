@@ -492,6 +492,13 @@ not take objects through the concern families, as Claude's "concern families che
 to request" does. In the sessions read, the misses are still `attempted_concluded_fine`. Untried,
 listed there: a family-by-object ledger, the account written during the session, a Claude
 Code-like harness, the contract on gpt-5.5, identical grants. One run; provisional.
+**gpt is not a proof specialist** (`focus.py`). Its proof share is no higher than Claude's (16-21%
+against 28-33%), and gpt_5.2 misses both proof-golf asks, which Claude hits. Claude does about three
+times as much in every family: 9.5-11.5 candidate edits compiled a session against 1.5-3.5, and
+17-19.5 library lookups against 1.5-3.5, with the same reading and grepping. The same notes
+instruction gave Claude a family-by-object pass (naming on 92-100% of PRs) and gpt none (50%).
+The open test that separates model and harness from prompt is the swap: Claude given gpt's rendered
+prompt verbatim.
 
 **Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
 `SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
