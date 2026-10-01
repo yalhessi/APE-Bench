@@ -239,3 +239,23 @@ carried), so the matchings agree with each other.
 **Read at this altitude.** One model, 16 asks, three runs a condition. Codex's reasoning-off reading
 holds by the rule. It is a statement about this configuration, not about Codex with reasoning,
 where it is the strongest of the three without clearing the threshold.
+
+## Codex with gpt-5.4 and gpt-5.5, reasoning carried (pre-registered 2026-10-01, while the runs go)
+
+One run each, by the user's choice. Codex is told each model's own name (both are in its catalog).
+
+| label | source | harness |
+|---|---|---|
+| Ka1 | `probe_postcutoff_gpt54_Grc_codex_rep1` | Codex, gpt-5.4 |
+| Kb1 | `probe_postcutoff_gpt55_Grc_codex_rep1` | Codex, gpt-5.5 |
+| Ha1 | `probe_postcutoff_gpt54_Grc_rep1` (test (e)'s Hac) | APE-Agent, gpt-5.4 |
+| Hb1 | `probe_postcutoff_gpt55_Grc_rep1` (test (e)'s Hbc) | APE-Agent, gpt-5.5 |
+| X1, X2 | Claude's sessions | the reference |
+
+Seal `blinding_codex_gpt545_SEALED.json`, sources `sources_codex_gpt545.json`, matchers in
+`match_codex_gpt545/`. Six reviewers a PR.
+
+**Reading rule.** One run a cell, and gpt_5.2's carried runs spread at SD 0.12 a run, so a single
+difference `Ka1 - Ha1` or `Kb1 - Hb1` under 0.25 (four asks) is no evidence of a harness
+difference. 0.25 or more is suggestive, to be replicated before it is read. The APE-Agent runs
+predate the `lean_verify` fix, so that difference is in the comparison too.

@@ -1,0 +1,5 @@
+{"X1": {"kind": "claude"}, "X2": {"kind": "claude"},
+ "Ha1": {"kind": "solo", "run": "probe_postcutoff_gpt54_Grc_rep1"},
+ "Hb1": {"kind": "solo", "run": "probe_postcutoff_gpt55_Grc_rep1"},
+ "Ka1": {"kind": "solo", "run": "probe_postcutoff_gpt54_Grc_codex_rep1"},
+ "Kb1": {"kind": "solo", "run": "probe_postcutoff_gpt55_Grc_codex_rep1"}}
