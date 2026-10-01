@@ -330,3 +330,32 @@ set carries this difference as well as the harness's own. **What would close it:
 root, and allow the task's provisioned workspaces (the same roots as
 `claude_code/containment.provisioned_roots`). It changes what every review condition can do, so it
 lands at a run boundary, with G re-run beside whatever is compared against it.
+
+## Codex: the plan, with what Claude Code taught (2026-10-01)
+
+Not started. Every step below is what the Claude Code half needed, or what the installed CLI
+(`codex-cli 0.144.5`) now makes possible.
+
+1. **Wire API.** The CLI speaks only Responses (`wire_api = "chat"` is refused), and always streams.
+   The relay needs a Responses server route that answers as a Responses event stream: an answer in
+   the wrong framing made Claude Code ask every turn twice (`04484fa`). Carried reasoning must
+   survive the round trip. Codex sends reasoning items back natively, so the relay must map them to
+   and from the message signature that `openai_provider` carries (`e064ae0`).
+2. **No bridge.** Replace the unchecked-out CodexBridge submodule with `codex exec --json`, and
+   `codex exec resume <id>` for the loop's nudges.
+3. **Containment as a condition, not a patch.** `--disable shell_tool --disable unified_exec` leaves
+   Codex no shell, so its tools are APE's MCP tools, the same grant as APE-Agent. Also disable
+   `browser_use`, `computer_use`, `image_generation`, `apps`, `plugins`, `multi_agent`, `memories` and
+   web search, and pass `--ignore-user-config --ignore-rules -s read-only`. Codex's own `hooks` may
+   allow a PreToolUse refusal like `contain_to_workspace`. Audit the session rollout (in
+   `CODEX_HOME/sessions/`) as `containment.audit_transcript` audits Claude Code's.
+4. **Check before paying**, against a local recording server as in the Claude Code work (no model,
+   no spend): the request's framing, any per-request field that breaks the prompt prefix (Claude
+   Code's `x-anthropic-billing-header` cost 80% of its bill, `5037f57`), whether each turn is asked
+   once, and that every task's process reaches its own relay (`196d948`).
+5. **The task's contract is already delivered** (`4816cd2`), but `_initial_prompt` still appends the
+   absolute-shell-path paragraph, which is wrong with the shell disabled.
+6. **Comparable runs exist.** G and Grc under APE-Agent and Claude Code, three repetitions each, are
+   matched (`a23892d`, `2dac2e0`) on `develop`'s tools, without the `declaration_search` fix. Codex
+   runs on the same tools join that comparison with no re-runs. The fix (`5e215ff`) would make it
+   a new baseline.
