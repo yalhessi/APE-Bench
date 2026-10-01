@@ -593,3 +593,39 @@ def test_a_call_to_a_tool_that_does_not_exist_ran_nothing(tmp_path):
     report = audit_transcript(transcript, roots, str(workspaces))
     assert [c["id"] for c in report["nonexistent"]] == ["a"]
     assert [c["id"] for c in report["leaks"]] == ["b", "c"]
+
+
+def test_a_write_may_land_in_scratch_and_nowhere_else(tmp_path):
+    """The review configs refused Write and Edit outright while the first message called
+    `scratch/` "your workspace (read-write) ... for creating and editing files" (2026-10-01).
+    Granting them needs this rule: `target/` is a link into the shared reviewed-workspace
+    store, so a write there edits the environment of every other session on the same PR."""
+
+    check, workspaces, base, _later, _gold = _rules(tmp_path)
+    assert check("Write", file_path="scratch/notes.md") is None
+    assert check("Write", file_path=f"{workspaces}/scratch/notes.md") is None
+    assert check("Edit", file_path="scratch/notes.md") is None
+    for tool in ("Write", "Edit", "MultiEdit", "NotebookEdit"):
+        key = "notebook_path" if tool == "NotebookEdit" else "file_path"
+        reason = check(tool, **{key: "target/Mathlib/Foo.lean"})
+        assert reason and "writes outside scratch/" in reason, (tool, reason)
+    assert "writes outside scratch/" in check("Edit", file_path=f"{base}/Mathlib/Foo.lean")
+    assert "leaves this review's workspace" in check("Write", file_path="/etc/notes.md")
+    assert check("Read", file_path="target/Mathlib/Foo.lean") is None     # reads are unchanged
+
+
+def test_the_session_cwd_is_one_resolved_spelling(tmp_path):
+    """Under a linked `.ape/` the first message named two roots for one attempt, the unresolved
+    one as the working directory and the resolved one in `<WORKSPACE_PATHS>` (2026-10-01)."""
+
+    from types import SimpleNamespace
+
+    from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
+
+    real = tmp_path / "real" / "workspaces"
+    real.mkdir(parents=True)
+    link = tmp_path / "link"
+    link.symlink_to(tmp_path / "real")
+    scaffold = object.__new__(ClaudeCodeScaffold)
+    scaffold.task = SimpleNamespace(workspaces_dir=link / "workspaces")
+    assert scaffold._session_cwd() == real.resolve()

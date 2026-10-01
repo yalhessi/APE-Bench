@@ -48,6 +48,16 @@ PATH_KEYS: Dict[str, tuple] = {
 #: Built-in tools with no filesystem reach.
 NO_PATH = frozenset({"TodoWrite"})
 
+#: Built-in tools that change a file. They may touch `scratch/` and nothing else: `target/` is a
+#: link into the shared reviewed-workspace store, so a write there would edit the environment of
+#: every other session reviewing the same PR. Before this rule the review configs refused these
+#: tools outright, while the first message still called `scratch/` "your workspace (read-write)
+#: ... for creating and editing files" (2026-10-01, `docs/plans/2026-10-01-beyond-the-solo-baseline.md` §2.4).
+WRITE_TOOLS = frozenset({"Write", "Edit", "MultiEdit", "NotebookEdit"})
+
+#: The one directory a write may land in, relative to the attempt's `workspaces/`.
+WRITABLE = "scratch"
+
 #: Opens every refusal, so the audit can tell a refused call from one that ran.
 REFUSAL_MARK = "[ape containment]"
 
@@ -81,7 +91,15 @@ def violation(tool_name: str, tool_input: Dict[str, Any], roots: Sequence[str],
         joined = os.path.join(base if key == "pattern" else cwd, value)
         if not within_roots(os.path.normpath(joined), roots):
             return f"{tool_name}.{key} leaves this review's workspace: {value}"
+        if tool_name in WRITE_TOOLS and not within_roots(os.path.normpath(joined), writable_roots(cwd)):
+            return f"{tool_name}.{key} writes outside {WRITABLE}/: {value}"
     return None
+
+
+def writable_roots(cwd: str) -> List[str]:
+    """Where a built-in write may land: `scratch/` under the workspace, by either spelling."""
+
+    return [os.path.join(cwd, WRITABLE), os.path.join(os.path.realpath(cwd), WRITABLE)]
 
 
 def pre_tool_use_hook(roots: Sequence[str], cwd: str, refusals: List[Dict[str, Any]],
