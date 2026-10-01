@@ -418,3 +418,36 @@ def test_each_cli_process_is_given_its_own_relay():
 
     assert "**self._relay_environment()" in inspect.getsource(ClaudeCodeScaffold._run_batch_mode)
     assert "**self._relay_environment()" in inspect.getsource(ClaudeCodeScaffold._run_cli_mode)
+
+
+# --- the relayed prompt must keep a stable prefix, or the provider's cache never hits ----------
+
+
+def _relayed_system_text(cch):
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    relay = ClaudeCodeRelaySession(port=41004, llm_config=LLMConfig(model_name="gpt_5.2"))
+    request = {"system": [
+        {"type": "text", "text": f"x-anthropic-billing-header: cc_version=2.1.139.f8a; cc_entrypoint=sdk-py; cch={cch};"},
+        {"type": "text", "text": "You are Claude Code, Anthropic's official CLI."}],
+        "messages": [{"role": "user", "content": "Review PR 1."}]}
+    session = relay._convert_anthropic_to_session(request, None)
+    return [b.text for b in session.nodes[0].message.content]
+
+
+def test_claude_codes_per_request_billing_header_does_not_reach_the_backend():
+    """2.1.139 opens its system prompt with an attribution line whose `cch` changes on every
+    request. Forwarded, it put a different string at character 92 of every prompt: 0 cached
+    tokens across three repetitions, $0.258 a session against about $0.089 cached."""
+
+    first, second = _relayed_system_text("d726d"), _relayed_system_text("16be4")
+    assert first == second == ["You are Claude Code, Anthropic's official CLI."]
+
+
+def test_the_header_is_stripped_only_where_it_opens_a_block():
+    from ape.scaffolds.claude_code.relay import strip_billing_header
+
+    assert strip_billing_header("x-anthropic-billing-header: cch=1;\nYou are...") == "You are..."
+    kept = "Quote: x-anthropic-billing-header: cch=1;"
+    assert strip_billing_header(kept) == kept

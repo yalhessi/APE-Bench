@@ -26,6 +26,24 @@ if TYPE_CHECKING:
     import logging
 
 
+#: Claude Code's per-request attribution line ("x-anthropic-billing-header: cc_version=2.1.139.f8a;
+#: cc_entrypoint=sdk-py; cch=d726d;"), which opens its system prompt and changes on every request.
+_BILLING_HEADER = re.compile(r"^x-anthropic-billing-header:[^\n]*(\n|$)")
+
+
+def strip_billing_header(text: str) -> str:
+    """`text` without Claude Code's billing header: transport metadata for Anthropic's API, not
+    instructions, and the one thing that broke the prompt prefix between requests.
+
+    Forwarded, it put a different string at character 92 of every request, so OpenAI's prefix cache
+    never hit: 0 cached tokens over the three G-under-Claude-Code repetitions, against 79% of
+    input for the same model under APE-Agent. Billed $0.258 a session where the same tokens cached
+    would have cost about $0.089. With it removed, every one of the 110 consecutive request pairs in
+    those runs extends the previous prompt exactly.
+    """
+    return _BILLING_HEADER.sub("", text, count=1)
+
+
 class ClaudeCodeRelaySession(BaseRelaySession):
     """Claude Code relay session - Anthropic API implementation"""
 
@@ -334,14 +352,13 @@ class ClaudeCodeRelaySession(BaseRelaySession):
         system_content = request.get("system")
         if system_content:
             if isinstance(system_content, str):
-                content_blocks = [ContentBlock.text_block(system_content)]
+                texts = [system_content]
             elif isinstance(system_content, list):
-                content_blocks = [
-                    ContentBlock.text_block(block.get("text", ""))
-                    for block in system_content if block.get("type") == "text"
-                ]
+                texts = [block.get("text", "") for block in system_content if block.get("type") == "text"]
             else:
-                content_blocks = []
+                texts = []
+            texts = [t for t in (strip_billing_header(t) for t in texts) if t]
+            content_blocks = [ContentBlock.text_block(t) for t in texts]
 
             if content_blocks:
                 session.add_system_message(content_blocks, cwd)
