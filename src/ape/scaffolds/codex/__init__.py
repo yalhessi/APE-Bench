@@ -1,16 +1,14 @@
 """
 Codex Scaffold - OpenAI Codex CLI Integration
 
-Prerequisites:
-- CodexBridge must be installed at: src/ape/scaffolds/codex/codexbridge/
-- Install from: https://github.com/begonia599/CodexBridge
-- Clone or download the repository to the path above
+Prerequisites: the `codex` CLI on PATH (checked with `codex-cli` 0.144.5, which speaks only the
+Responses API).
 
-Based on Codex CLI scaffold implementation:
 1. Follows core Scaffold protocol
-2. Uses Codex CLI with subprocess control
-3. Configures MCP servers through ~/.codex/config.toml
-4. Uses relay to intercept API calls and record conversations
+2. Runs `codex exec --json` per turn, resumed by thread id (`conversation.py`)
+3. Configures the relay, the MCP server and the features through an attempt-local
+   `workspaces/.codex/config.toml` (`scaffold.codex_config`)
+4. Uses the relay to serve the CLI's Responses calls from APE's client and record them
 5. Supports both batch and CLI modes
 """
 

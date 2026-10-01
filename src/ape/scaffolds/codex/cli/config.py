@@ -11,7 +11,7 @@ class CodexCLIConfig(CodexConfig):
     Codex CLI configuration
     
     Inherits CodexConfig, adds CLI-specific configuration.
-    Note: CLI mode does not use CodexBridge, directly calls `codex` command.
+    Note: CLI mode runs the interactive `codex` command; batch mode runs `codex exec`.
     """
     # Log control
     log_level: str = "WARNING"

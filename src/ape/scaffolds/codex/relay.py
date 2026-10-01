@@ -67,8 +67,12 @@ def response_event_stream(response: Dict[str, Any]) -> str:
 class CodexRelaySession(BaseRelaySession):
     """Codex relay session - the Responses API, served from APE's client."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, relayed_builtin_tools: Optional[List[str]] = None, **kwargs):
         super().__init__(*args, **kwargs)
+        # Codex's own function tools that reach the model; None passes all. Namespace (MCP)
+        # tools always pass.
+        self.relayed_builtin_tools = (None if relayed_builtin_tools is None
+                                      else frozenset(relayed_builtin_tools))
         # flat backend name -> (namespace, tool name), from the tools Codex offers
         self._namespaced: Dict[str, Tuple[str, str]] = {}
         # encrypted reasoning content -> the item id this relay sent with it
@@ -101,7 +105,8 @@ class CodexRelaySession(BaseRelaySession):
         for tool in tools:
             kind = tool.get("type")
             if kind == "function":
-                out.append(function(tool["name"], tool))
+                if self.relayed_builtin_tools is None or tool["name"] in self.relayed_builtin_tools:
+                    out.append(function(tool["name"], tool))
             elif kind == "namespace":
                 for child in tool.get("tools") or []:
                     if child.get("type") == "function":

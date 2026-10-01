@@ -175,6 +175,7 @@ def test_claude_code_and_codex_deliver_the_task_contract(scaffold_path, monkeypa
 
     class Task:
         scratch_workspace = target_workspace = reference_workspaces = None
+        config = SimpleNamespace(disabled_features=[])
 
         async def create_system_prompt(self):
             return "BRIEF: compare against what Mathlib already has."
@@ -191,3 +192,31 @@ def test_claude_code_and_codex_deliver_the_task_contract(scaffold_path, monkeypa
     assert sent.count("BRIEF: compare against what Mathlib already has.") == 1
     assert sent.index("PREAMBLE") < sent.index("BRIEF:") < sent.index("Review PR 1.")
     assert "Your current working directory is `/ws`" in sent
+
+
+def test_codex_is_told_about_shell_paths_only_when_it_has_a_shell(monkeypatch):
+    """The paragraph tells the model to call /bin/ls by absolute path; a review disables the shell."""
+
+    from ape.scaffolds import prompts
+    from ape.scaffolds.codex.scaffold import CodexScaffold
+
+    async def preamble(**_kwargs):
+        return "PREAMBLE"
+
+    monkeypatch.setattr(prompts, "build_system_prompt", preamble)
+
+    def sent(disabled):
+        class Task:
+            scratch_workspace = target_workspace = reference_workspaces = None
+            config = SimpleNamespace(disabled_features=disabled)
+
+            async def create_user_prompt(self):
+                return "Review PR 1."
+
+        scaffold = object.__new__(CodexScaffold)
+        scaffold.task = Task()
+        scaffold.logger = _QUIET
+        return asyncio.run(scaffold._initial_prompt("/ws"))
+
+    assert "Shell Command Requirements" in sent([])
+    assert "Shell Command Requirements" not in sent(["shell_tool", "unified_exec"])
