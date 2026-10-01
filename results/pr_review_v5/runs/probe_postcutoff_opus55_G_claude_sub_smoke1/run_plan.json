@@ -1,0 +1,86 @@
+{
+  "agenda_sha256": "472b38d9fd8e76f088cf8b1d9361cc26407f0babbbf13ca2585db9fe26129870",
+  "arm_sha256_by_id": {
+    "api_reuse": "e557def7f0736ee2020bd238228cab27c5e7820ca569ec64ec7a07f3f6b3ae20",
+    "correctness": "7682ad4cc34607864be97fda5ec529c45b4bbb1ab5f44635c7b4f6bcea478788",
+    "docs": "c7f02484407c458d979bf3b98816c71d42aa1e914d58ba06795a1924c19e5e70",
+    "duplication": "21095f08ee69680f77dd6cdb924e335b7322a801e4c528427a65ab7c5a2f60c2",
+    "family_design": "5bc52988f129e93e4a0337e11ade7dad384df8e2e5e0bd9cd758fc65a6f3d2df",
+    "generalist": "b9469e8bd80d20ede958386604423a3181b48bccef0ac3ed51a3157776e415e7",
+    "generality": "feb41d6a0155230f28992995cec87a5d98ed9b00d8ca66434d4cfb727f577cf6",
+    "naming": "b9163160769767cc59a12151d44f9c2d8a66256b37a21eb35baf70f1c57a313d",
+    "proof_golf": "2c67d81c6bb437711bc4542f3b484ee198dec8791150886e2972d1c204bf1bbd",
+    "proof_idiom": "82e814b7f37a825bdc15b82a66b1b4afc71a921278498625dee9af05e2c162b2",
+    "style": "460b559b79696b77ba4260f8280da27e1c7fe5c576ba569f5885c453e115dde5"
+  },
+  "context_index_sha256": {
+    "precedent_corpus": "b4c465fd9a274abef56e4677e3dd061e98854696a64c4f275f5f4f8f16386478",
+    "precedent_index_version": "v5-precedent-index/2",
+    "precedent_meta_version": "v5-precedent-meta/2",
+    "precedent_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "precedent_model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "precedent_rows": "43736",
+    "zulip_corpus": "b0d013afb6bf9661ea9cdcbbc97ed4ca71348640fae45a50ee3af6aa10a9f8bd"
+  },
+  "coordination": {
+    "bounds": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2
+    },
+    "coordination": {
+      "max_jobs": 25,
+      "max_redispatches_per_pair": 0,
+      "max_rounds": 2,
+      "parent_view": "summary",
+      "schema_version": "v5-coordination1",
+      "sibling_view": "none"
+    },
+    "coordination_version": "v5-coordination/1",
+    "synthesis": {
+      "authority": "subtractive",
+      "schema_version": "v5-synthesis-policy1"
+    },
+    "worst_case_jobs": 25
+  },
+  "deterministic_release_sha256": null,
+  "evaluation_contract_version": "v5-evaluation/2",
+  "evaluation_settings": {
+    "apply_lead_synthesis": false,
+    "execution_release": null,
+    "generalist_floor": true,
+    "pr_finding_limit": 20,
+    "skip_evidence_chain": false,
+    "use_exposure_index": true
+  },
+  "git_commit": "43692988d514dc29544485909254eecb7190b4b2",
+  "git_tree_state": "dirty",
+  "lead_cost_cap": 1.0,
+  "lead_token_cap": 1200000,
+  "model_name": "claude-opus-5-5",
+  "per_pr_cost_cap": 1.5,
+  "per_pr_token_cap": 1800000,
+  "prompt_sha256_by_invocation": {
+    "wu:146e77889c7ee58f8603a8e3#api_reuse": "5acc4b9116ff924ddbe8725fc4d267d20d0ded211a49feb45182a467c19c9a6f",
+    "wu:146e77889c7ee58f8603a8e3#correctness": "28f8a6ff2a9b8f5569372337474b152cf20ba816ca115d2ae7ff3030dc0a0147",
+    "wu:146e77889c7ee58f8603a8e3#docs": "9bd92a4e5a908a58977dc610817cfcb8dd4ad2c05a3e961a37a5359a01c0f8f7",
+    "wu:146e77889c7ee58f8603a8e3#duplication": "5009fb530f094816c22d6d70c85f47f8bcd54b87ade920643be8498a6a076e00",
+    "wu:146e77889c7ee58f8603a8e3#family_design": "8bb1155e9ac903be8e30ed3362555b80bc36466ab9532dc7c72f543220b0822f",
+    "wu:146e77889c7ee58f8603a8e3#generalist": "396f9288eb69fba0ed0a0ac1baa9cd28b0a5fa7bd1a7dc31dce6c2c280ba04a8",
+    "wu:146e77889c7ee58f8603a8e3#generality": "5c0c87dab5e612ee6009dd7988b3ca724b1792c1ffddaa8e601888c7a723a5ed",
+    "wu:146e77889c7ee58f8603a8e3#naming": "89befdc75b9d85ce6b0da8095c2b195f1187cc241ed1a57f60b0ceca3d2fdc18",
+    "wu:146e77889c7ee58f8603a8e3#proof_golf": "65f38f7026c319e50c7b7fa00eee751c9f4efc47e3405af35383a0c25923ffd2",
+    "wu:146e77889c7ee58f8603a8e3#proof_idiom": "d41b8e619ff7983a9dcd16cc73b5e6ac1e7253beee65bb74060297805670e1fe",
+    "wu:146e77889c7ee58f8603a8e3#style": "fa00afcbed8f19df3fb8d03272b7bf405e90baaad93e1fab02c7257bcc5aa8ac"
+  },
+  "release": "inputs/probes/probe-2026-07-08-v1",
+  "release_manifest_sha256": null,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_postcutoff_opus55_G_claude_sub_smoke1",
+  "run_name": "probe_postcutoff_opus55_G_claude_sub_smoke1",
+  "scaffold_config_sha256": "5c8207d17ba0009e9d4a0b54f96f8614c697492652ae135fd68ed6d2d20cf683",
+  "schema_version": "v5-run-plan1",
+  "source_sha256": "7892272321113fd76c7d21b32c8af2418719942d9d20ad09a695e8583d50eb68",
+  "standard_budget_cap": 0.3,
+  "standard_budget_tokens": 360000
+}
