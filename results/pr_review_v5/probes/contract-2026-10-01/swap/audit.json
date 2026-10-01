@@ -12,5 +12,9 @@
   "flagged": 1,
   "adjudication": "one flag: the session ran the venv's python on its own tmp/build.py, which writes submission.json from literals and opens no other file; an interpreter, not a read outside the folder. Kept.",
   "attempt_1": "stopped by the API's safety classifier after one ptool call (describe); its calls.jsonl moved to the scratch, the session re-run once with the same prompt."
+ },
+ "33321": {
+  "calls": 27,
+  "flagged": 0
  }
 }
