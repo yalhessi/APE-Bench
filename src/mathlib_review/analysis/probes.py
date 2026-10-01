@@ -468,6 +468,24 @@ def redact(text):
     return text
 
 
+#: A workspace prefix on a finding's path: `target/` or `scratch/`, or a resolved
+#: `.../workspaces/<commit>/`. Which one a reviewer writes depends on its harness, not on the code.
+_WORKSPACE_PREFIX = re.compile(r"^(?:.*/workspaces/[^/]+/|(?:target|scratch)/)")
+
+
+def repo_target(target):
+    """A finding's target as a repository path, so its spelling does not say which harness wrote it.
+
+    Seen on the harness comparison (2026-10-01): APE-Agent sessions wrote `target/Mathlib/...`,
+    Claude Code sessions sometimes the absolute store path `.../workspaces/<commit>+<pr>/Mathlib/...`,
+    and Claude's packets `Mathlib/...`. The same location, three cues. A target with no path (a
+    declaration name) is left as it is.
+    """
+    if not isinstance(target, str):
+        return target
+    return _WORKSPACE_PREFIX.sub("", target, count=1)
+
+
 class Source(BaseModel):
     """Where one session label's findings come from.
 
@@ -633,7 +651,8 @@ def match_inputs(spec: ProbeSet, feedback: Dict[str, Any], asks: Dict[str, Any],
                     raise ValueError(f"{session} has no successful session for PR {pr}")
                 found, st = loaded[session][int(pr)]
             stats.setdefault(pr, {})[session] = st
-            stripped = [{"i": n, **{k: redact(f.get(k)) for k in KEEP}} for n, f in enumerate(found)]
+            stripped = [{"i": n, **{k: repo_target(f.get(k)) if k == "target" else redact(f.get(k))
+                                    for k in KEEP}} for n, f in enumerate(found)]
             lost = [f["i"] for f in stripped if not f["target"] or str(f["target"]).startswith("None")]
             if lost:
                 raise ValueError(f"{session} on PR {pr}: findings {lost} have no target")
