@@ -1,7 +1,7 @@
 """A whole-PR review, from submitted findings to the file the judge scores.
 
 `plan` proves the front half of a solo run -- agenda, budget, cutoffs, sealing. This is the
-back half, which nothing else exercises: `_solo_responses` anchors the free-form findings, then
+back half, which nothing else exercises: `solo_responses` anchors the free-form findings, then
 `finalize` ingests them, merges, assigns channels, digests and writes `findings.jsonl`.
 
 Every piece has unit tests. The seam between them does not, and it is where a solo run differs
@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 
 from src.mathlib_review.io import jsonl_rows, load_jsonl
-from src.mathlib_review.review.runner import SOLO_ARM_ID, _solo_responses
+from src.mathlib_review.review.runner import SOLO_ARM_ID, solo_responses
 from src.mathlib_review.review.finalize import finalize
 from src.mathlib_review.schema import ChangeGraph, ReviewWorkUnit
 
@@ -85,7 +85,7 @@ def test_a_submitted_finding_becomes_a_scorable_finding_on_disk(episode, tmp_pat
     end, attributed to the right arm."""
 
     graph, units, target, line = episode
-    responses, anchor_rows = _solo_responses(
+    responses, anchor_rows = solo_responses(
         _Results([_submission(graph, target.path, line)]), [graph], units)
 
     assert responses, "the anchoring produced no response to finalize"
@@ -109,7 +109,7 @@ def test_it_is_filed_under_its_own_arm_and_not_the_generalists(episode, tmp_path
     breakdown, and the comparison would silently have one arm."""
 
     graph, units, target, line = episode
-    responses, _rows = _solo_responses(
+    responses, _rows = solo_responses(
         _Results([_submission(graph, target.path, line)]), [graph], units)
     finalize(tmp_path / "run", units=list(units), routing_mode="solo", responses=responses)
 
@@ -124,7 +124,7 @@ def test_it_lands_in_the_review_channel_though_the_evidence_gate_stays_shut(epis
     reviewer. `channels` is what separates the two, and the comparison is read on `review`."""
 
     graph, units, target, line = episode
-    responses, _rows = _solo_responses(
+    responses, _rows = solo_responses(
         _Results([_submission(graph, target.path, line)]), [graph], units)
     finalize(tmp_path / "run", units=list(units), routing_mode="solo", responses=responses)
 
@@ -140,7 +140,7 @@ def test_a_finding_with_no_issue_kind_is_refused_rather_than_mislabelled(episode
     reads as silent for a reason nobody can see."""
 
     graph, units, target, line = episode
-    responses, _rows = _solo_responses(
+    responses, _rows = solo_responses(
         _Results([_submission(graph, target.path, line, issue_kind=None)]), [graph], units)
     report = finalize(tmp_path / "run", units=list(units), routing_mode="solo",
                       responses=responses)
@@ -156,7 +156,7 @@ def test_an_unanchorable_finding_reaches_no_work_unit_and_is_counted(episode, tm
     free precision gain on the control PR plus a recall penalty, and hide its own loss rate."""
 
     graph, units, _target, _line = episode
-    responses, rows = _solo_responses(
+    responses, rows = solo_responses(
         _Results([_submission(graph, "Mathlib/NotInThisPR.lean", 5)]), [graph], units)
 
     assert responses == []

@@ -20,6 +20,38 @@ if TYPE_CHECKING:
     from ape.tasks.base import BaseTask
     from ape.toolkits.base import BaseToolsProvider
 
+#: What happened when a Lean check was asked for. `success` alone cannot say it: it means "compiled
+#: clean", so a snippet Lean rejected, a process that never ran and a request the tool refused all
+#: came back as `success: false` -- and "the code is wrong" (an answer) read exactly like "the check
+#: did not happen" (no answer), to the agent and to every analysis of its transcripts. 86-96% of
+#: gpt_5.2's `lean_verify` calls on the dev set were counted "failed" that way; nearly all were
+#: Lean answering `Unknown constant` to a name the model was probing for.
+OUTCOMES = ("compiled", "compile_errors", "timeout", "environment_failure", "blocked",
+            "invalid_request", "tool_error")
+OUTCOME_NOTE = (
+    "`outcome` says whether Lean answered: `compiled` (no errors) and `compile_errors` (Lean ran and "
+    "the code has the errors listed -- an answer about the code, not a tool failure) are answers; "
+    "`timeout` and `environment_failure` mean the check did not complete, which says nothing about "
+    "the code; `invalid_request` means the call's arguments were refused.")
+
+
+def verification_outcome(result) -> str:
+    """The outcome of one `VerificationEngine.verify` result: one of `OUTCOMES`' first four.
+
+    A timeout is the engine's return code -15. Otherwise Lean answered when it produced error
+    diagnostics, and did not when it failed without producing any: then the process, the toolchain
+    or the working directory failed, and the code was never judged.
+    """
+
+    if result.return_code == -15:
+        return "timeout"
+    if result.success:
+        return "compiled"
+    if result.errors:
+        return "compile_errors"
+    return "environment_failure"
+
+
 class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
     """Lean verification tool - simplified tool interface based on new architecture"""
 
@@ -76,7 +108,8 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
 
 **USE THIS TOOL ONLY FOR**: Temporary code snippets or one-time verification without file persistence."""
             else:
-                tool_description = "Verify Lean code for correctness and provide detailed feedback."
+                tool_description = ("Verify Lean code for correctness and provide detailed feedback. "
+                                    + OUTCOME_NOTE)
 
             @mcp.tool(
                 description=tool_description
@@ -100,13 +133,13 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                 
                 if not has_code and not has_file_path:
                     return {
-                        "success": False,
+                        "success": False, "outcome": "invalid_request",
                         "error": "Either code or file_path must be provided"
                     }
                 
                 if has_code and has_file_path:
                     return {
-                        "success": False,
+                        "success": False, "outcome": "invalid_request",
                         "error": "Cannot provide both code and file_path, choose one"
                     }
                 
@@ -123,7 +156,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                     from ape.utils.file_ops import provisioned_roots, within_roots
                     if not within_roots(full_file_path, provisioned_roots(self.task.workspaces_dir)):
                         return {
-                            "success": False,
+                            "success": False, "outcome": "invalid_request",
                             "error": f"File path outside workspaces directory: {file_path}"
                         }
 
@@ -147,7 +180,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                             hint = (" Reviewed files live under `target/`; to test a change to "
                                     "one, use lean_verify_edit.")
                         return {
-                            "success": False,
+                            "success": False, "outcome": "invalid_request",
                             "error": (
                                 f"lean_verify can only read files under "
                                 f"{', '.join(root.name for root in allowed_roots)}; got: {file_path}."
@@ -158,7 +191,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                     # 4. Check file existence
                     if not full_file_path.exists():
                         return {
-                            "success": False,
+                            "success": False, "outcome": "invalid_request",
                             "error": f"File not found: {file_path}"
                         }
 
@@ -168,14 +201,14 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                             code = await f.read()
                     except Exception as e:
                         return {
-                            "success": False,
+                            "success": False, "outcome": "tool_error",
                             "error": f"Failed to read file {file_path}: {e}"
                         }
 
                     # 6. Verify file content is not empty
                     if not code or not code.strip():
                         return {
-                            "success": False,
+                            "success": False, "outcome": "invalid_request",
                             "error": f"File is empty: {file_path}"
                         }
                 
@@ -188,7 +221,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                     # System error: return full traceback for debugging
                     self.logger.error(f"Verification failed: {traceback.format_exc()}")
                     return {
-                        "success": False,
+                        "success": False, "outcome": "tool_error",
                         "error": traceback.format_exc()
                     }
 
@@ -243,6 +276,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                     "warnings": [],
                     "infos": [],
                     "axioms": [],
+                    "outcome": "blocked",
                     "message": "Verification blocked: code depends on blocked paths"
                 }
 
@@ -326,17 +360,18 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
             response["messages_truncated"] = True
             response["total_messages_before_truncation"] = original_total_messages
         
-        # Check if timeout
-        is_timeout = result.return_code == -15
-        if is_timeout:
+        response["outcome"] = outcome = verification_outcome(result)
+        if outcome == "timeout":
             response["timeout"] = True
-            response["message"] = f"Lean verification timed out after {self.tool_config.timeout}s. Collected {len(result.messages)} messages before timeout."
-        else:
-            # Set message field
-            if result.success:
-                response["message"] = "Lean verification completed successfully"
-            else:
-                response["message"] = "Lean verification failed"
+            response["message"] = (
+                f"Lean did not finish within {self.tool_config.timeout}s: inconclusive, not a verdict "
+                f"on the code. {len(result.messages)} message(s) collected before the timeout.")
+        elif outcome == "compiled":
+            response["message"] = "Lean ran: the code compiles with no errors."
+        elif outcome == "compile_errors":
+            response["message"] = (
+                f"Lean ran: the code has {len(result.errors)} error(s), listed in `errors`. This is "
+                "Lean's answer about the code, not a tool failure.")
 
         # A failure that produced no Lean diagnostics did not come from the code — the
         # compiler never got far enough to complain about it. Something outside the snippet
@@ -349,7 +384,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
         # verify it, got an empty refusal, and correctly abstained — and the abstention was
         # indistinguishable from "found nothing worth reporting" in every artifact
         # downstream. Diagnostics are cheap; a silent failure costs a run.
-        if not result.success and not result.messages:
+        if outcome == "environment_failure":
             response["diagnosis"] = {
                 "return_code": result.return_code,
                 "killed_by_signal": (result.return_code or 0) < 0,
@@ -358,8 +393,8 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                 "stdout_tail": (result.raw_output or "")[-400:],
             }
             response["message"] = (
-                "Lean verification failed before producing any diagnostics — this is an "
-                "environment or process failure, not a problem with the code you submitted. "
+                "Lean failed before producing any error message: an environment or process "
+                "failure, not a problem with the code you submitted. "
                 "See `diagnosis`. Do not rewrite the edit in response to this; report it or "
                 "abstain, and say that verification was unavailable."
             )

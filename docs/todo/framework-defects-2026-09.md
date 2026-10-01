@@ -429,3 +429,22 @@ Not started. Every step below is what the Claude Code half needed, or what the i
    matched (`a23892d`, `2dac2e0`) on `develop`'s tools, without the `declaration_search` fix. Codex
    runs on the same tools join that comparison with no re-runs. The fix (`5e215ff`) would make it
    a new baseline.
+
+## The solo grant carries `proof_profile`, and its store holds one table (found 2026-10-01)
+
+`configs/bases/v5_solo.yaml` grants `solo_context_tools: [..., proof_profile]`, and
+`proof_profile` reads a declaration table per base commit (`data/pr_review_v5/declaration_tables/`).
+One table is on disk (`af239326`). So on every other base the tool answers "no declaration table
+for X; build it with `python -m src.mathlib_review.retrieval.declaration_table --commit X`", which
+the reviewer cannot run. Over six gpt runs (2026-09-30 audit: dev gpt-5.2 G/Grc, gpt-5.4/5.5 Grc,
+validation and post-cutoff gpt-5.2 Grc) that was 13 of the 14 `proof_profile` calls made. The
+message is honest: it is an environment failure and says so. The defect is the grant. The reviewer
+is shown a tool that cannot answer on almost every PR it reviews, and the Claude reviewers it is compared with
+never had it.
+
+What would close it: either build the tables for every base in a run's episode set (a local build,
+no spend) and have `cli plan` refuse a run whose granted context tool has no backing store for an
+episode; or take `proof_profile` out of the solo grant. That second option is the parity fix for any
+gpt-vs-Claude comparison, and it moves every solo plan's identity, so it lands at a run boundary.
+The rule this repeats is `.claude/rules/mathlib-review.md`'s "assert the capability reaches the
+task". It was written for a tool filtered out of a grant. Here the tool is granted and dead.

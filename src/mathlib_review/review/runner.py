@@ -572,7 +572,7 @@ def _responses_from_results(results, mode: str) -> List[Dict[str, Any]]:
 from src.mathlib_review.review.finalize import SOLO_ARM_ID  # noqa: E402
 
 
-def _solo_responses(results, graphs, units, logger=None):
+def solo_responses(results, graphs, units, logger=None):
     """Anchor each whole-PR review and project it onto work units.
 
     Returns `(responses, anchor_rows)`. The responses are shaped exactly like an arm's, so
@@ -1808,7 +1808,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
                 if dataset.routing_mode not in ("lead", "solo") else None)
 
     if dataset.routing_mode == "solo":
-        responses, anchor_rows = _solo_responses(
+        responses, anchor_rows = solo_responses(
             results, release["graphs"], units, logger)
         write_once(out / "anchoring.jsonl", jsonl_bytes(anchor_rows))
         report = anchoring_report(anchor_rows)

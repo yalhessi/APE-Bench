@@ -149,6 +149,28 @@ class BasePRReviewResult(BaseTaskResult):
     review_message: str = ""
 
 
+def submission_mandate(submit_tool_name: str, filing_bar: str = "merge",
+                       review_notes: bool = False, plain: bool = False) -> str:
+    """The closing instruction that forces a `submit_findings` call.
+
+    Agents that conclude "nothing to flag" sometimes end with a text-only reply and never call
+    the tool, which the harness records as an empty failure rather than a clean review, so the
+    empty-review path is explicit and mandatory. Under the "request" filing bar the empty call
+    carries no `merge_ready_as_is`, since that tool variant has no such field; with
+    `review_notes` it still carries the notes, which the tool requires. `plain` (the solo task's
+    `user_prompt: v2`) keeps the empty-review path and drops "MUST" and "fails the task", the same
+    register as the batch preamble's "TEXT ALONE accomplishes NOTHING".
+    """
+    empty = ("call it with an empty `findings` list and `merge_ready_as_is: true`" if filing_bar == "merge"
+             else "call it with an empty `findings` list and your `notes`" if review_notes
+             else "call it with an empty `findings` list")
+    if plain:
+        return f"\n\nFinish by calling `{submit_tool_name}` once. If there is nothing to ask, {empty}."
+    return (f"\n\nYou MUST finish by calling `{submit_tool_name}` exactly once — even if you find "
+            f"nothing. If there is nothing to change, {empty}. A text-only reply does not count and "
+            "fails the task.")
+
+
 class BasePRReviewTask(BaseLeanTask):
     """Shared, read-only, externally-scored review task. Not registered; subclass
     it, set `task_type`, and implement `_get_prompts`."""
@@ -224,6 +246,8 @@ class BasePRReviewTask(BaseLeanTask):
             parts.append("read files")
         if has("content_search"):
             parts.append("grep the repo (content_search)")
+        if has("file_search"):
+            parts.append("find files by name (file_search)")
         if has("lean_retrieve"):
             parts.append("semantic library search (lean_retrieve)")
         if has("lean_verify"):
@@ -250,15 +274,21 @@ class BasePRReviewTask(BaseLeanTask):
             submit_tool_name=submit_tool_name,
             budget=self.config.task_config.finding_budget,
         )
-        # Force a submission: agents that conclude "nothing to flag" sometimes end with a text-only
-        # reply and never call submit_findings, which the harness records as an empty failure rather
-        # than a clean review. Make the empty-review path explicit and mandatory.
-        mandate = (
-            f"\n\nYou MUST finish by calling `{submit_tool_name}` exactly once — even if you find "
-            "nothing. If there is nothing to change, call it with an empty `findings` list and "
-            "`merge_ready_as_is: true`. A text-only reply does not count and fails the task."
-        )
+        mandate = submission_mandate(submit_tool_name, self._filing_bar(), self._review_notes(),
+                                     self._plain_contract())
         return base + mandate + self._precedent_block()
+
+    def _filing_bar(self) -> str:
+        """`task_config.filing_bar` where the task declares it (the solo task), else "merge"."""
+        return getattr(self.config.task_config, "filing_bar", "merge")
+
+    def _review_notes(self) -> bool:
+        """`task_config.review_notes` where the task declares it (the solo task), else False."""
+        return getattr(self.config.task_config, "review_notes", False)
+
+    def _plain_contract(self) -> bool:
+        """The solo task's `user_prompt: v2`: mandate and submit tool without the imperatives."""
+        return getattr(self.config.task_config, "user_prompt", "v1") == "v2"
 
     def _precedent_block(self) -> str:
         """Stage-2 Mode A: append retrieved past-maintainer precedents for THIS PR, if primed.
@@ -456,6 +486,8 @@ class BasePRReviewTask(BaseLeanTask):
         compiles in context before reporting it."""
         from typing import Annotated
 
+        from ape.toolkits.execute.lean.tools import OUTCOME_NOTE
+
         @mcp.tool(
             description=(
                 "Test an in-file edit, recompiling the WHOLE file and returning the compile result. "
@@ -472,7 +504,7 @@ class BasePRReviewTask(BaseLeanTask):
                 "weighing. Errors come back split into "
                 "`errors_introduced_by_your_edit` and `errors_already_in_the_file` — fix only "
                 "the former; line numbers refer to the whole spliced file, so use `code_line` "
-                "to locate them."
+                "to locate them. " + OUTCOME_NOTE
             )
         )
         async def lean_verify_edit(
@@ -493,13 +525,13 @@ class BasePRReviewTask(BaseLeanTask):
                 path, line_start, line_end, replacement,
                 declaration_name=declaration_name, new_declaration=new_declaration)
             if code is None:
-                return {"success": False, "error": err}
+                return {"success": False, "outcome": "invalid_request", "error": err}
             from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
             lean_tool = LeanVerifyToolsProvider(task=self, config=self.config, logger=self.logger)
             try:
                 result = await lean_tool.execute(code=code, max_messages=max_messages)
             except Exception as exc:  # noqa: BLE001
-                return {"success": False, "error": f"verify raised: {exc}"}
+                return {"success": False, "outcome": "tool_error", "error": f"verify raised: {exc}"}
             # Which of these errors are actually the caller's fault?
             #
             # Compiling the whole file means the report mixes three things: errors the edit
@@ -537,9 +569,13 @@ class BasePRReviewTask(BaseLeanTask):
             if not isinstance(result, dict):
                 return result
             errors = list(result.get("errors") or [])
-            return {
+            outcome = result.get("outcome")
+            report = {
                 "mode": "as_is_compile_check",
-                "compiles": not errors,
+                "outcome": outcome,
+                # From the outcome, not from an empty error list: a compile that never ran has no
+                # errors either, and `not errors` reported it as `compiles: true`.
+                "compiles": outcome == "compiled",
                 # Every error is pre-existing by definition when no edit was applied, so this
                 # needs no baseline compile — and it makes the `correctness` prompt's promise
                 # of a split true for the first time, which it never was on this path.
@@ -554,35 +590,55 @@ class BasePRReviewTask(BaseLeanTask):
                     "a change, call again with `declaration_name` + `new_declaration`."
                 ),
             }
+            if outcome not in ("compiled", "compile_errors"):
+                # Did not finish or never ran: no verdict on the file, so say so in its words.
+                report["compiles"] = None
+                report["message"] = result.get("message")
+                if result.get("diagnosis"):
+                    report["diagnosis"] = result["diagnosis"]
+            return report
 
     async def register_task_tools(self, mcp) -> None:
         from typing import Annotated
 
         self._register_lean_verify_edit(mcp)
 
-        @mcp.tool(
+        FINDINGS = Annotated[List[Dict[str, Any]], Field(
             description=(
-                "Submit your final review findings for this PR. Call this exactly once when done. "
-                "This records the review and ends the conversation. A text-only response is INVALID."
+                "List of findings (<= budget). Each: {path?, line_start?, line_end?, "
+                "severity: 'blocking'|'advisory', claim, suggested_fix?, evidence?}. "
+                "`evidence` is the verified artifact backing the finding (the existing "
+                "declaration's name for a duplicate; the stronger statement for a generality "
+                "issue). Empty list = nothing to change."
             )
+        )]
+        CONFIDENCE = Annotated[Optional[float], Field(description="0.0-1.0")]
+        MESSAGE = Annotated[str, Field(description="Optional summary of the review.", default="")]
+        DESCRIPTION = (
+            "Submit your review of this PR. Call it once, when you have finished: it records the "
+            "review and ends the session."
+        ) if self._plain_contract() else (
+            "Submit your final review findings for this PR. Call this exactly once when done. "
+            "This records the review and ends the conversation. A text-only response is INVALID."
         )
-        async def submit_findings(
-            findings: Annotated[List[Dict[str, Any]], Field(
-                description=(
-                    "List of findings (<= budget). Each: {path?, line_start?, line_end?, "
-                    "severity: 'blocking'|'advisory', claim, suggested_fix?, evidence?}. "
-                    "`evidence` is the verified artifact backing the finding (the existing "
-                    "declaration's name for a duplicate; the stronger statement for a generality "
-                    "issue). Empty list = nothing to change."
-                )
-            )] = [],
-            merge_ready_as_is: Annotated[Optional[bool], Field(
-                description="True if a maintainer would merge without requesting changes."
-            )] = None,
-            confidence: Annotated[Optional[float], Field(description="0.0-1.0")] = None,
-            message: Annotated[str, Field(description="Optional summary of the review.", default="")] = "",
-        ) -> Dict[str, Any]:
+
+        async def record(findings, merge_ready_as_is, confidence, message,
+                         notes: Optional[str] = None) -> Dict[str, Any]:
+            """Record a `submit_findings` call: normalise, build the result, fire termination.
+
+            `notes` is None unless the task asks for the object-by-object account
+            (`review_notes`); then a blank one is refused and the session goes on, since the
+            account is what the condition exists to require.
+            """
             self.logger.info("submit_findings: %d findings, merge_ready=%s", len(findings or []), merge_ready_as_is)
+            if notes is not None and not notes.strip():
+                return {
+                    "success": False, "outcome": "invalid_request",
+                    "error": ("Not recorded: `notes` is empty. Give your account of the review, "
+                              "object by object, including what you checked and found nothing "
+                              "wrong with, then call this tool again."),
+                }
+            extra = {} if notes is None else {"review_notes": notes}
             try:
                 normalized = self._normalize_findings(findings or [])
                 # A verdict-less submission is still a valid review: infer it from the findings
@@ -592,7 +648,7 @@ class BasePRReviewTask(BaseLeanTask):
                 result = self.create_result(
                     success=True, score=1.0, pr_number=self.data.pr_number,
                     merge_ready_as_is=merge_ready_as_is, confidence=confidence,
-                    findings=normalized, review_message=message or "",
+                    findings=normalized, review_message=message or "", **extra,
                 )
                 if self.termination_callback:
                     try:
@@ -613,10 +669,50 @@ class BasePRReviewTask(BaseLeanTask):
                     "message": "Submit failed",
                 }
 
+        if self._review_notes():
+            # The contract condition: the request bar, plus the object-by-object account the
+            # Claude reviewers wrote as `notes.md` (brief X), here a required field of the one
+            # call that ends the session. `SoloReviewConfig` refuses it under the merge bar.
+            @mcp.tool(description=DESCRIPTION)
+            async def submit_findings(
+                notes: Annotated[str, Field(description=(
+                    "What you did, object by object, including what you checked and found "
+                    "nothing wrong with. Required, also when `findings` is empty."))],
+                findings: FINDINGS = [],
+                confidence: CONFIDENCE = None,
+                message: MESSAGE = "",
+            ) -> Dict[str, Any]:
+                return await record(findings, None, confidence, message, notes=notes)
+        elif self._filing_bar() == "request":
+            # The filing-bar condition: no merge verdict anywhere in the submission, so the
+            # reviewer is never asked whether a maintainer would merge, only what it would request.
+            @mcp.tool(description=DESCRIPTION)
+            async def submit_findings(
+                findings: FINDINGS = [],
+                confidence: CONFIDENCE = None,
+                message: MESSAGE = "",
+            ) -> Dict[str, Any]:
+                return await record(findings, None, confidence, message)
+        else:
+            @mcp.tool(description=DESCRIPTION)
+            async def submit_findings(
+                findings: FINDINGS = [],
+                merge_ready_as_is: Annotated[Optional[bool], Field(
+                    description="True if a maintainer would merge without requesting changes."
+                )] = None,
+                confidence: CONFIDENCE = None,
+                message: MESSAGE = "",
+            ) -> Dict[str, Any]:
+                return await record(findings, merge_ready_as_is, confidence, message)
+
     def _normalize_findings(self, findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Coerce raw tool input into the PredictionRecord finding shape; drop empties,
         clamp severity, enforce the budget, keep optional evidence."""
         budget = self.config.task_config.finding_budget
+        if 0 < budget < len(findings) and self.logger:
+            # Cut silently, a finding past the budget looks like one never filed.
+            self.logger.warning("submit_findings: %d findings past the budget of %d not recorded",
+                                len(findings) - budget, budget)
         out: List[Dict[str, Any]] = []
         for raw in findings[: budget if budget > 0 else len(findings)]:
             if not isinstance(raw, dict):

@@ -1,0 +1,15 @@
+# Contract v2 (results/pr_review_v5/probes/contract-2026-10-01/README.md, "Contract v2"): the
+# contract condition with the rest of the gpt-only prompt text removed, and Claude's ledger.
+# - user_prompt: v2: the PR model before the diff; no "Investigate ... overlap ... shorter" line;
+#   no label lists (the imported-Claude pair is stamped); no finding count; no "MUST ... fails";
+# - brief_G2.md: brief G with the reading order changed to PR, model, diff;
+# - workspace_environment: false: no <environment> section ("rapid iteration and experimentation");
+# - notes_form: per_object_family: an entry per changed declaration, each through its concerns.
+extends: pr_review_v5_dev_medium_gpt52_Grc_contract.yaml
+
+workspace_environment: false
+
+task_config:
+  system_prompt_file: results/pr_review_v5/probes/contract-2026-10-01/brief_G2.md
+  user_prompt: v2
+  notes_form: per_object_family

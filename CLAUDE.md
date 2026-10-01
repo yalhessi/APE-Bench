@@ -148,7 +148,9 @@ Tests that need a built Lean workspace under `data/code_execute/` fail on a fres
 **Never gate a commit on `pytest … | tail`.** A pipeline's status is its last command's, so
 `pytest … | tail -2 && git commit …` commits a red suite (2026-09-23: two failures went in that
 way and the commit had to be amended). Capture pytest's own exit code — redirect to a file and
-check `$?`, or `set -o pipefail` — before the commit step.
+check `$?`, or `set -o pipefail` — before the commit step. The prose did not stop it (2026-10-01:
+a failing script, `| tail -3 && git commit`), so `guard.sh` now refuses a commit whose `&&`-chain
+holds a pipe, unless `pipefail` is set (`tests/cli/test_guard_hook.py`).
 
 **An edit and a commit do not share one command line.** In `check && edit; test; commit`, a failing
 check skips the edit while the test and commit after the `;` still run -- on the old files, so the

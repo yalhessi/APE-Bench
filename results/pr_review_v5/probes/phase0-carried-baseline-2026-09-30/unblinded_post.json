@@ -1,0 +1,402 @@
+{
+ "asks": 16,
+ "1": {
+  "reach": {
+   "Gr1": 0.3125,
+   "Grc1": 0.4375,
+   "Grc2": 0.375,
+   "Grc3": 0.1875,
+   "X1": 0.5,
+   "X2": 0.4375
+  },
+  "condition_reach": {
+   "Gr": 0.3125,
+   "Grc": 0.3333333333333333,
+   "X": 0.46875
+  },
+  "stable": {
+   "Gr": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013"
+   ],
+   "Grc": [
+    "p0002",
+    "p0009",
+    "p0013"
+   ],
+   "X": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "union": {
+   "Gr": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013"
+   ],
+   "Grc": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "X": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "p0000": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0002": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0003": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0004": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0005": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0006": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0007": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0008": {
+    "Gr1": "partial",
+    "Grc1": "reached",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "partial"
+   },
+   "p0009": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0010": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0011": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0012": {
+    "Gr1": "reached",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "partial"
+   },
+   "p0013": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0014": {
+    "Gr1": "no",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0015": {
+    "Gr1": "no",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0016": {
+    "Gr1": "partial",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "2": {
+  "reach": {
+   "Gr1": 0.3125,
+   "Grc1": 0.4375,
+   "Grc2": 0.375,
+   "Grc3": 0.1875,
+   "X1": 0.5,
+   "X2": 0.4375
+  },
+  "condition_reach": {
+   "Gr": 0.3125,
+   "Grc": 0.3333333333333333,
+   "X": 0.46875
+  },
+  "stable": {
+   "Gr": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013"
+   ],
+   "Grc": [
+    "p0002",
+    "p0009",
+    "p0013"
+   ],
+   "X": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "union": {
+   "Gr": [
+    "p0002",
+    "p0009",
+    "p0011",
+    "p0012",
+    "p0013"
+   ],
+   "Grc": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015"
+   ],
+   "X": [
+    "p0002",
+    "p0008",
+    "p0009",
+    "p0011",
+    "p0013",
+    "p0014",
+    "p0015",
+    "p0016"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "p0000": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0002": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0003": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0004": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0005": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0006": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0007": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0008": {
+    "Gr1": "partial",
+    "Grc1": "reached",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "partial"
+   },
+   "p0009": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0010": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0011": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0012": {
+    "Gr1": "reached",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "p0013": {
+    "Gr1": "reached",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0014": {
+    "Gr1": "no",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0015": {
+    "Gr1": "no",
+    "Grc1": "reached",
+    "Grc2": "reached",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "p0016": {
+    "Gr1": "no",
+    "Grc1": "no",
+    "Grc2": "no",
+    "Grc3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "agreement": {
+  "cells": 96,
+  "three_valued": 94,
+  "reached_or_not": 96
+ }
+}

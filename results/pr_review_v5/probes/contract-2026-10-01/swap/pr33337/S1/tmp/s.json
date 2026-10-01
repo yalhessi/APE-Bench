@@ -1,0 +1,44 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/Analysis/InnerProductSpace/Projection/Basic.lean",
+   "matches": [
+    {
+     "line_number": 184,
+     "content": "   184|lemma coe_orthogonalProjection_apply (U : Submodule 𝕜 E) [U.HasOrthogonalProjection] (v : E) :"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+   "matches": [
+    {
+     "line_number": 198,
+     "content": "   198|theorem coe_orthogonalProjection_eq_linearProjOfIsCompl [K.HasOrthogonalProjection] :"
+    },
+    {
+     "line_number": 209,
+     "content": "   209|theorem coe_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Geometry/Euclidean/Projection.lean",
+   "matches": [
+    {
+     "line_number": 205,
+     "content": "   205|lemma coe_orthogonalProjection_eq_iff_mem {s : AffineSubspace 𝕜 P} [Nonempty s]"
+    },
+    {
+     "line_number": 610,
+     "content": "   610|theorem coe_orthogonalProjection_vadd_smul_vsub_orthogonalProjection {n : ℕ} {r₁ : 𝕜}"
+    }
+   ]
+  }
+ ],
+ "files_available": 7453,
+ "files_scanned": 7453,
+ "files_with_matches": 3,
+ "truncated": false
+}

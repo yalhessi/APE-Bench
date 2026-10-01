@@ -13,9 +13,11 @@ import pytest
 
 from src.mathlib_review.evidence.operators.naming_norm import (
     MIN_SUPPORT,
+    MIN_SUPPORT_RATIO,
     SubjectPopulation,
     conclusion_subject,
     leaf_prefix,
+    norm_verdict,
     propose_rename,
 )
 
@@ -225,3 +227,75 @@ def test_a_counted_verdict_claims_no_more_than_the_prefix_it_measured():
     assert "counts only each name's LEADING token" in source
     assert "a plurality (" in source and "is the convention for this subject" in source
     assert "the name's LEADING prefix only: the tool does not measure a suffix" in source
+
+
+# Populations as the tool returned them on the 2026-09-30 gpt runs (`counts`, `members`).
+DIST = {"dist": 397, "mul": 10, "prod": 5, "aposteriori": 1, "apriori": 1, "embeddingOfSubset": 1,
+        "eq": 1, "finite": 1, "other": 7}
+OF_ALG_EQUIV = {"ofAlgEquiv": 4}
+
+
+def test_a_name_that_follows_its_convention_is_an_answer_not_missing_evidence():
+    """`dist_` 397 of 424 came back `insufficient_evidence` beside a sentence saying `dist_` is the
+    convention, so the verdict told the reviewer the census settled nothing while the text said it
+    settled everything. Replayed over the 43 counted empty verdicts of six gpt runs, 15 were this."""
+
+    assert norm_verdict(_population(DIST, "dist"), "dist") == ("conforms", None)
+    # The same population still asks for the rename when the name does not follow it.
+    assert norm_verdict(_population(DIST, "dist"), "mul")[0] in ("established", "emerging")
+
+
+def test_every_counted_empty_verdict_says_which_of_two_things_it_found():
+    """`ofAlgEquiv_` 4 of 4 was reported as "only a plurality (4 of 4, under the 80% bar)": the
+    census had too few to count, not a divided corpus. An `insufficient_evidence` now carries
+    `population_too_small` or `no_dominant_prefix`, and an answer carries no reason."""
+
+    assert norm_verdict(_population(OF_ALG_EQUIV, "ofAlgEquiv"), "ofAlgEquiv") == (
+        "insufficient_evidence", "population_too_small")
+    # The coercion lemma whose `coe_` lead was 48 of 124: a plurality, under the bar.
+    coercion = {"coe": 48, "toLinearMap": 40, "apply": 36}
+    assert norm_verdict(_population(coercion, "toLinearMap"), "coe") == (
+        "insufficient_evidence", "no_dominant_prefix")
+
+    # Exhaustively over small two-spelling populations: the reason is set exactly when the verdict
+    # is empty, and the two reasons are the whole vocabulary (a strong population always answers).
+    seen = set()
+    for lead in range(1, 2 * MIN_SUPPORT + 1):
+        for other in range(0, lead + 1):
+            for current in ("a", "b", "c"):
+                counts = {"a": lead, "b": other} if other else {"a": lead}
+                verdict, because = norm_verdict(_population(counts), current)
+                assert (verdict == "insufficient_evidence") == (because is not None)
+                seen.add(because)
+                if because == "population_too_small":
+                    assert lead < MIN_SUPPORT
+                if because == "no_dominant_prefix":
+                    assert lead >= MIN_SUPPORT and lead / (lead + other) < MIN_SUPPORT_RATIO
+    assert seen == {None, "population_too_small", "no_dominant_prefix"}
+
+
+def test_the_registered_description_names_every_verdict_and_reason():
+    """The description quotes the thresholds, and they were imported inside the call, after the
+    decorator had already run: registration raised `NameError` before any test built it. Build it."""
+
+    from typing import get_args
+
+    from ape.tasks.lean_tasks.formal_math.review import context_tools
+    from src.mathlib_review.schema.review import ContextCall
+
+    captured = {}
+
+    class CapturingMCP:
+        def tool(self, **kwargs):
+            def decorate(fn):
+                captured[fn.__name__] = kwargs
+                return fn
+            return decorate
+
+    context_tools._register_naming_norm(None, CapturingMCP())
+    description = captured["naming_norm"]["description"]
+    reasons = [r for r in get_args(get_args(ContextCall.model_fields["empty_because"].annotation)[0])]
+    for word in ["established", "emerging", "conforms", "insufficient_evidence", *reasons]:
+        assert f"`{word}`" in description, word
+    assert f"fewer than {MIN_SUPPORT} declarations" in description
+    assert f"{MIN_SUPPORT_RATIO:.0%} bar" in description

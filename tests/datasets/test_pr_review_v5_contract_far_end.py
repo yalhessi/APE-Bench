@@ -36,15 +36,21 @@ DISPATCH_KEYS = {"retrieval_cutoff", "trace_path"}
 #: The unification's naming correction (spec identity ee245f077b7e -> 1f4b176a45a4) is one: the
 #: bullet said "Submit nothing on naming" for both of `naming_norm`'s empty branches, one of which
 #: is the tool failing to resolve the subject; and (2026-09-24) a bullet scoping every verdict to the
-#: name's leading prefix, with the closing clause scoped to "every part you can check". The rebuilt
+#: name's leading prefix, with the closing clause scoped to "every part you can check"; and
+#: (2026-10-01) the `conforms` verdict and the two counted `empty_because` reasons, which the tool
+#: now returns where it used to say `insufficient_evidence` with no reason. The rebuilt
 #: control is identical on every other arm,
 #: and on this one differs by exactly these replacements -- anything else would be drift.
 MOVED_SINCE_CONTROL = {
     "naming": [
         ("    * `insufficient_evidence` — the repository has no opinion here. Submit nothing on naming.",
+         "    * `conforms` — the corpus has a convention and this name already follows it. There is no\n"
+         "      prefix change to ask for.\n"
          "    * `insufficient_evidence` — the counts do not settle it, and `empty_because` says why.\n"
-         "      `no_population`: the repository has no counted opinion here. `subject_unresolved`: the tool\n"
-         "      could not tell what the declaration is about and never asked the corpus, so naming is\n"
+         "      `no_population`: the repository has no counted opinion here. `population_too_small`: the\n"
+         "      leading spelling has too few declarations to call a convention. `no_dominant_prefix`: no\n"
+         "      spelling clears the bar. `subject_unresolved`: the tool could not tell what the declaration\n"
+         "      is about and never asked the corpus. In every case but `no_population` the prefix is\n"
          "      unmeasured rather than settled -- judge the name on precedent and on the siblings you read.\n"
          "    * Whatever the verdict, it is about the name's LEADING prefix only. The tool does not measure a\n"
          "      suffix, a prime, argument order or a namespace; judge those against the siblings you read and\n"

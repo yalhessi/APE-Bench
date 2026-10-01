@@ -1,0 +1,19 @@
+# gpt-5.4 / gpt-5.5 on the dev set for the judge (results/pr_review_v5/probes/phase2-lead-carried-2026-09-30/,
+# "gpt-5.4 and gpt-5.5 on dev"): gpt_5.4 at high effort through the Responses API with reasoning carried,
+# the post-cutoff and validation carried configs' caps, on the 15 dev PRs -- which cover the held-out
+# 12, the only PRs with judge gold. Extends the gpt_5.2 carried config for the set; only the model and
+# its caps change.
+extends: pr_review_v5_dev_medium_gpt52_Grc.yaml
+
+llm_config:
+  model_name: gpt_5.4
+
+execution:
+  max_turns: 160
+
+dataset:
+  solo_cost_cap: 12.00
+  solo_token_cap: 14400000
+  # 15 PRs x $12.00 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 180.50
+  run_total_token_cap: 216600000

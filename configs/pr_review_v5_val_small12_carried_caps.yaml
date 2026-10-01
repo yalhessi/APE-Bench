@@ -1,0 +1,15 @@
+# The lead's caps under reasoning carried, calibrated on validation small12
+# (results/pr_review_v5/probes/phase2-lead-carried-2026-09-30/): every cap in the base was set on
+# sessions that never reasoned (arm jobs p50 $0.034 / 35K tokens). These are loose so they cannot
+# bind; the main runs set theirs from the calibration. In step at 1.2M tokens a dollar.
+extends: pr_review_v5_val_2025_06_2026_03_v1_small12.yaml
+
+dataset:
+  standard_budget_cap: 2.00
+  standard_budget_tokens: 2400000
+  lead_cost_cap: 6.00
+  lead_token_cap: 7200000
+  per_pr_cost_cap: 20.00
+  per_pr_token_cap: 24000000
+  run_total_cost_cap: 300.00
+  run_total_token_cap: 360000000
