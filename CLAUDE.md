@@ -182,6 +182,17 @@ models are priced at **0.0**, which makes every dollar cap vacuous; the token bl
 zero-priced run that has left it unset. Llama 3.3 and EuroLLM are served without tool-calling and
 are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are agent-capable.
 
+**Claude models run on the Claude Code subscription route**, not through `llm_clients`. Set
+`llm_config.model_name: null` with `claude_model` (a full name), `cli_version` (a binary at
+`data/resources/claude-<v>-linux-x64`; the SDK's bundled CLI cannot run Opus 5.5) and `effort`.
+The login is `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`, in `env.zsh`), and the preflight
+refuses a run without it. A subscription bills nothing per token. Its five_hour window held about
+one dev run (20-24M processed tokens), and that window is shared with interactive use. So check the
+token before a run: a one-line `claude -p` with `HOME` set elsewhere reports its `rate_limit_event`.
+A spent limit fails the sessions it reaches, never as a short review, and `run --resume` then
+requeues exactly those. Configs: `configs/pr_review_v5_dev_medium_*_claude_sub.yaml`. Readings:
+`results/pr_review_v5/probes/claude-models-2026-10-01/`.
+
 **A missing or rejected key does not fail; it retries for hours.** `llm_clients/client.py` retries
 every exception except four, authentication included: 100 attempts, waits up to 60 s plus jitter,
 ~1.5-2 h per call per job, logged only as a WARNING "API call failed, retrying". (A 400 whose body
