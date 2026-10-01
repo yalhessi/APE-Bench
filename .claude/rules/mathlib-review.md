@@ -360,3 +360,17 @@ paths:
   packets (amended out before any push). Commit a session's outputs only after its transcript is
   audited. The harness for all of this is `analysis/probes.py` and `cli probe`.
 
+- **Count what every tool call came back with before reading a run's tool use as the model's
+  (2026-10-01).** Over the three Opus subscription runs on the dev set (47 sessions), read with
+  `results/pr_review_v5/probes/claude-models-2026-10-01/tool_outcomes.py`: hover, goto and goal
+  were refused on 7 of 9 calls (the `Mathlib/...` spelling, which every other tool takes),
+  `declaration_search` refused 15 of 249 real names as "not identifier-shaped", 7
+  `lean_verify_edit` calls never ran because the model wrote `"replacement": }` to delete a span,
+  `proof_profile` had no table, and `lean_verify` was used 55 times in 84 as a `#check`/`example`
+  probe while described as "verify ... correctness" with a `file_path`. None of that was visible in
+  a tool-call histogram, and a reviewer's "investigation" numbers counted every refused call. The
+  interface rule the hygiene layer settled on: a reviewed file is `Mathlib/.../X.lean` for every
+  tool; a tool that asks for `target/...` or `scratch/...` is the trap; one tool per question
+  (`lean_verify` compiles a snippet against the library, `lean_verify_edit` compiles the reviewed
+  file with an edit); a refusal says which spellings exist; and a tool a run cannot answer with
+  is out of the grant, not in the prompt.

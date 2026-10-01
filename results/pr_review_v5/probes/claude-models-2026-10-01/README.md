@@ -209,3 +209,47 @@ sessions' visible text and budget truncations.
   the same attempt.
 - **Control emission**: Opus 5.5 under the project harness 1.0 per control PR, Opus 5 and the swap
   4.0, X1/X2 1.0-1.5, gpt 0-0.5.
+
+## What the tool calls came back with (2026-10-01, `tool_outcomes.py`, no spend)
+
+Every tool call in the three Opus subscription runs' transcripts (47 sessions), classified by
+what the result was: an answer, a negative (the tool ran and found nothing), a refusal of the
+call's arguments, an error (the call never ran), or an environment failure. The measurement
+behind the hygiene layer (`docs/plans/2026-10-01-beyond-the-solo-baseline.md` §4).
+
+| tool | calls | answered | negative | refused | error | env |
+|---|---|---|---|---|---|---|
+| `Grep` | 334 | 281 | 52 | 0 | 1 | 0 |
+| `lean_verify_edit` | 313 | 234 | 72 | 0 | 7 | 0 |
+| `declaration_search` | 249 | 178 | 56 | 15 | 0 | 0 |
+| `Read` | 231 | 230 | 0 | 0 | 1 | 0 |
+| `Glob` | 161 | 80 | 75 | 0 | 6 | 0 |
+| `lean_verify` | 84 | 49 | 35 | 0 | 0 | 0 |
+| `naming_norm` | 43 | 16 | 27 | 0 | 0 | 0 |
+| `precedent_search` | 23 | 23 | 0 | 0 | 0 | 0 |
+| `zulip_search` | 21 | 21 | 0 | 0 | 0 | 0 |
+| `code_goto` | 4 | 1 | 0 | 0 | 3 | 0 |
+| `code_hover` | 3 | 0 | 0 | 0 | 3 | 0 |
+| `get_lean_goal` | 2 | 1 | 0 | 0 | 1 | 0 |
+| `proof_profile` | 2 | 1 | 0 | 0 | 0 | 1 |
+| `zulip_search` by a bare or miscased name | 2 | 0 | 0 | 0 | 2 | 0 |
+
+- **The LSP tools were dead**: 7 of 9 hover, goto and goal calls failed with "Cannot find Lean
+  project", every one on the `Mathlib/...` spelling that `lean_verify_edit` and the diff use.
+- **`declaration_search` refused real names**: `Fintype`, `Meromorphic`, `abelianizeAdj`,
+  `conjStarAlgEquiv`, as "not identifier-shaped" (15 of 249).
+- **`lean_verify_edit` never saw 7 calls**: the model wrote `"replacement": }` to delete a span,
+  which the CLI refused as malformed JSON.
+- **`lean_verify` is a probe**: 55 of its 84 calls were `#check`, `example` or `exact?` snippets
+  and none gave a file path, while its description said "verify ... correctness" with a
+  `file_path`. 33 `lean_verify_edit` calls carried no edit (the as-is compile).
+- **`proof_profile`** had no table on dev; **`Glob`** was passed a `head_limit` parameter the
+  installed CLI (2.1.285) lacks three times, and twice pointed at the store root, which
+  containment refused as designed.
+- `submit_findings` reads as "rejected" in every transcript because the scaffold ends the session
+  at submission; every session's `task_result.json` holds the submission.
+
+Each row above that is a defect has a commit on `hygiene-layer` (2026-10-01): `01b09ce7` (one
+path spelling for the LSP tools), `0a3d7d33` (snippet probe, deletion, Mathlib's linters on
+whole-file compiles), `f8a65df5` (single-token names), `786f00a1` (`proof_profile` out of the
+grant), `332631a4` (the tool line names `mcp__core__` and Read, Grep and Glob).

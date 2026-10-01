@@ -408,6 +408,12 @@ four runs: one APE-Agent, two Claude Code on the relay, and the calibration. In 
 dev cells it recurred in `code_goto` (H-claude rep 1) and `get_lean_goal` (H-claude rep 2). It is minor, but it
 is the same family as the `lean_verify` path defect below.
 
+**Not minor, and fixed (hygiene layer, `01b09ce7`, 2026-10-01).** Counted over the three Opus
+subscription runs' transcripts (`results/pr_review_v5/probes/claude-models-2026-10-01/tool_outcomes.py`):
+7 of 9 hover, goto and goal calls were refused this way, every one on the `Mathlib/...` spelling,
+so the three tools were dead under Claude Code. The provider now tries a relative path under
+`workspaces/target/` when it is not under `workspaces/`, and the refusal names both spellings.
+
 **A run that the subscription limit cut short can only be redone, not resumed (2026-10-01).**
 `probe_dev_opus55_contract2_claude_sub_rep2` reached the five_hour limit at 10:00. Of 15 sessions,
 13 had succeeded. Two (33321 and 33066) failed mid-session after 32-34 replies and about 2.4M
@@ -448,6 +454,12 @@ set carries this difference as well as the harness's own. **What would close it:
 root, and allow the task's provisioned workspaces (the same roots as
 `claude_code/containment.provisioned_roots`). It changes what every review condition can do, so it
 lands at a run boundary, with G re-run beside whatever is compared against it.
+
+**Closed.** The check compares against `provisioned_roots` (`tests/ape/test_lean_verify_paths.py`),
+and since the hygiene layer (`0a3d7d33`, 2026-10-01) a review task registers `lean_verify` as the
+snippet probe with no `file_path` at all: of 84 calls in the three Opus dev runs, 55 were
+`#check`, `example` or `exact?` snippets and 0 gave a file path, and the reviewed file is
+compiled through `lean_verify_edit`. proof_engineering's `file_path` registration is unchanged.
 
 ## Codex: the plan, with what Claude Code taught (2026-10-01)
 
@@ -496,3 +508,7 @@ episode; or take `proof_profile` out of the solo grant. That second option is th
 gpt-vs-Claude comparison, and it moves every solo plan's identity, so it lands at a run boundary.
 The rule this repeats is `.claude/rules/mathlib-review.md`'s "assert the capability reaches the
 task". It was written for a tool filtered out of a grant. Here the tool is granted and dead.
+
+**Closed by the second option** (hygiene layer, `786f00a1`, 2026-10-01): `proof_profile` is out of
+`configs/bases/v5_solo.yaml`'s grant. The Opus dev runs had added 1 refusal in 2 calls to the count.
+The first option, a `cli plan` refusal for a granted tool with no backing store, is not built.
