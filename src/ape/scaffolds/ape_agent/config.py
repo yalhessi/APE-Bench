@@ -27,6 +27,11 @@ class ApeAgentConfig(BaseScaffoldConfig):
     #: a task whose own contract says how to work. Part of the scaffold config, so of the plan.
     batch_preamble: Literal["standard", "plain"] = "standard"
 
+    #: False drops the system prompt's `<environment>` section (scratch as a place for "rapid
+    #: iteration and experimentation", target as the verification library) unless it carries
+    #: blocked-path notes. True, the default, is every run before 2026-10-01.
+    workspace_environment: bool = True
+
     def model_post_init(self, __context) -> None:
         """Apply streaming configuration to llm_config."""
         self.llm_config.streaming = self.enable_streaming

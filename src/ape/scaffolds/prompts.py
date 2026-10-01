@@ -307,6 +307,7 @@ async def build_system_prompt(
     managed_skills: Optional[Sequence["MaterializedSkill"]] = None,
     logger: Optional['logging.LoggerAdapter'] = None,
     batch_preamble: str = "standard",
+    workspace_environment: bool = True,
 ) -> str:
     """
     Build complete system prompt for any scaffold.
@@ -319,6 +320,8 @@ async def build_system_prompt(
         use_absolute_paths: Whether to use absolute paths instead of relative paths
         logger: Logger for debug info
         batch_preamble: Which `BATCH_PREAMBLES` entry opens a batch-mode prompt
+        workspace_environment: False drops the `<environment>` section unless it carries
+            blocked-path notes, which are never dropped
 
     Returns:
         Complete system prompt string
@@ -338,6 +341,12 @@ async def build_system_prompt(
         is_cli_mode,
         logger
     )
+    # The section describes scratch as "your primary development environment ... rapid iteration
+    # and experimentation" -- written for tasks that build code. A review edits nothing, and the
+    # paths section already says which tree is which. Blocked-path notes live in the same section
+    # and are the one part a task depends on, so a section carrying them is kept.
+    if not workspace_environment and "Blocked Paths" not in content_section:
+        content_section = ""
 
     # Assemble final prompt - select base prompt based on mode
     base_prompt = CLI_MODE_SYSTEM_PROMPT if is_cli_mode else BATCH_PREAMBLES[batch_preamble]

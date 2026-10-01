@@ -180,3 +180,21 @@ def test_the_plain_preamble_drops_the_imperatives_and_the_default_is_unchanged()
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"), batch_preamble="terse")
     source = inspect.getsource(conversation.ApeAgentConversationManager.create_conversation_session)
     assert "batch_preamble=self.config.batch_preamble" in source
+
+
+def test_workspace_environment_off_drops_the_section_but_never_a_blocked_path_note():
+    from ape.scaffolds import prompts
+    from ape.tasks.models import WorkspaceInfo
+
+    target = WorkspaceInfo(name="target", commit_hash="c" * 40, repo_url="x",
+                           read_only_path_patterns=["**/*"])
+    scratch = WorkspaceInfo(name="scratch", commit_hash="c" * 40, repo_url="x")
+    standard = asyncio.run(prompts.build_system_prompt(scratch, target, None))
+    plain = asyncio.run(prompts.build_system_prompt(scratch, target, None, workspace_environment=False))
+    assert "<environment>" in standard and "rapid iteration" in standard
+    assert "<environment>" not in plain and "rapid iteration" not in plain
+    assert "<WORKSPACE_PATHS>" in plain
+    blocked = WorkspaceInfo(name="target", commit_hash="c" * 40, repo_url="x",
+                            blocked_path_patterns=["Mathlib/Secret.lean"])
+    kept = asyncio.run(prompts.build_system_prompt(scratch, blocked, None, workspace_environment=False))
+    assert "Blocked Paths" in kept
