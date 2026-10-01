@@ -292,3 +292,16 @@ was called 38 times as the snippet probe, 19 answers and 19 negatives, as descri
 **Not read:** recall. The judge was not run (about $0.20 on `gpt_5_mini`); reps 2 and 3 after
 the weekly window resets (2026-10-02 10:00) complete the re-baseline, and the three are judged
 together as mean / union / stable against H-claude's 7, 7.
+
+**Judged (2026-10-01, judge v9, $0.22, audit `probe-dev-opus55-contract2-hygiene-claude-sub-rep1`):
+9 of 23, issue recall 0.391**, reachable 0.500, resolution 0.304, control emission 1.0 per PR,
+gold alignment 0.118 (H-claude: 0.091, 0.093). One run, so provisional, and within the judge's
+noise of H-claude's 7, 7; on the right side of it. The spine (`consistency.py`, which now carries
+the cell as `Hyg1`): the six obligations every Opus 5.x cell hits, plus `5ffba48e` (33321's set
+comprehension, H-claude rep 2's), `695ae9fd` (33362's namespace layout, Opus 5's) and
+`585e5e0b` (33285's one-term golf), which no project-harness cell had reached before; `61f68eed`
+(the Parseval lemma, H-claude rep 1's) is the one it loses. Union with the two H-claude reps:
+10 of 23; the Opus 5.x family's union stays 13, its stable set 6. Both new hits are judgement,
+not the linters: the term proof `I.cotangentEquivIdeal.symm_apply_eq.mpr rfl` and "keep the
+original layout". The linters' visible work in that session was the edit gate: a long-line
+warning on the reviewer's own proposed edit.
