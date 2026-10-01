@@ -447,7 +447,8 @@ def _full_scan(root, identifier, limit=5):
 
 def _paths(result):
     import re
-    return re.findall(r"is declared in `([^`]+)` \(before this PR\)", result["results"])
+    # Results read `path:line` since 2026-09-24; the path is what the prefilter decides.
+    return re.findall(r"is declared in `([^`:]+)(?::\d+)?` \(before this PR\)", result["results"])
 
 
 def test_the_prefiltered_search_answers_what_the_full_scan_answered(tmp_path, monkeypatch):
@@ -455,9 +456,9 @@ def test_the_prefiltered_search_answers_what_the_full_scan_answered(tmp_path, mo
     Finset` declares `Finset.sum_comm` without the dotted name appearing, which is why the grep
     is for the *leaf*. A mention in a comment is not a declaration.
 
-    Not this change's to fix, and pinned so it is visible: `declares_identifier` ends its pattern
-    in `\b`, which sits between `m` and `'`, so `lemma Finset.sum_comm'` counts as declaring
-    `Finset.sum_comm`. The full scan did the same; the prefilter only has to agree with it."""
+    `lemma Finset.sum_comm'` does not declare `Finset.sum_comm`. It did until 2026-09-24, when the
+    pattern ended in `\b` (a boundary between `m` and `'`) and queries had their primes stripped;
+    that is fixed in `find_declaration`, and this pin moved with it."""
 
     import src.mathlib_review.evidence.evidence as evidence
 
@@ -469,7 +470,11 @@ def test_the_prefiltered_search_answers_what_the_full_scan_answered(tmp_path, mo
         assert result["success"], result
         assert _paths(result) == _full_scan(root, identifier), identifier
     assert _paths(asyncio.run(tool(identifier="Finset.sum_comm"))) == [
-        "Mathlib/C.lean", "Mathlib/D.lean", "Mathlib/Order/A.lean"]
+        "Mathlib/D.lean", "Mathlib/Order/A.lean"]
+    assert _paths(asyncio.run(tool(identifier="Finset.sum_comm'"))) == ["Mathlib/C.lean"]
+    rendered = asyncio.run(tool(identifier="sum_comm"))["results"]
+    assert "`Finset.sum_comm` is declared in `Mathlib/Order/A.lean:3`" in rendered, (
+        "the result names the declaration it found, with its line")
 
 
 def test_when_grep_does_not_answer_every_file_is_read(tmp_path, monkeypatch):

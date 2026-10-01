@@ -122,6 +122,41 @@ def test_a_complete_search_reports_its_coverage(searcher):
     assert "note" not in result
 
 
+def test_a_bad_path_is_not_a_search_that_found_nothing(searcher):
+    """Two negatives, told apart: a path with no files under it searched nothing (a bad request),
+    while a real path with no match ran and found nothing. "No files found for path" read as the
+    second; at least 13 calls on six gpt runs (2026-09-30) were the first."""
+
+    bad = asyncio.run(searcher.content_search(
+        content_pattern="toLinearMap", search_path=Path("target/Mathlib/NoSuchDir")))
+    assert bad["success"] is False and bad["outcome"] == "invalid_request"
+    assert "Nothing was searched" in bad["error"]
+    empty = asyncio.run(searcher.content_search(
+        content_pattern="noSuchIdentifierAnywhere", search_path=Path("target/Mathlib")))
+    assert empty["success"] is True and empty["results"] == [] and "outcome" not in empty
+
+
+def test_file_search_finds_a_file_by_its_name_through_the_overlay(searcher):
+    """No test had ever called `file_search`. It matched the pattern against the workspace path
+    only, so `Far.lean` -- a file name, as the tool's own examples suggest -- found nothing, as an
+    ordinary empty result. It is granted to the contract condition, so it is exercised here."""
+
+    by_name = asyncio.run(searcher.file_search(pattern="Far.lean", directory_path=Path("target")))
+    assert by_name["success"] and [r["path"] for r in by_name["results"]] == [
+        "target/Mathlib/Analysis/Far.lean"]
+    assert by_name["truncated"] is False
+    glob = asyncio.run(searcher.file_search(pattern="*.lean", directory_path=Path("target/Mathlib")))
+    assert sorted(r["path"].rsplit("/", 1)[-1] for r in glob["results"]) == [
+        "Edited.lean", "Far.lean", "Other.lean"]
+    capped = asyncio.run(searcher.file_search(pattern="*.lean", directory_path=Path("target"),
+                                              max_results=2))
+    assert len(capped["results"]) == 2 and capped["truncated"] is True and "note" in capped
+    missing = asyncio.run(searcher.file_search(pattern="*.lean", directory_path=Path("target/Nope")))
+    assert missing["success"] is False and missing["outcome"] == "invalid_request"
+    nothing = asyncio.run(searcher.file_search(pattern="NoSuch*.lean", directory_path=Path("target")))
+    assert nothing["success"] is True and nothing["results"] == [] and "outcome" not in nothing
+
+
 def test_a_truncated_search_says_it_is_a_sample(searcher):
     """The failure this exists to stop: a capped search reading as an absence, or as a count."""
 

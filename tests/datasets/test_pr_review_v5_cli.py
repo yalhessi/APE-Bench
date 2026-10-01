@@ -75,7 +75,7 @@ def test_run_without_execute_calls_no_model(monkeypatch):
 
     seen = {}
 
-    def _fake_run(dataset, scaffold, task_overrides, logger):
+    def _fake_run(dataset, scaffold, task_overrides, logger, *, resume=False):
         seen["dry_run"] = dataset.dry_run
         return None
 
@@ -417,7 +417,7 @@ def test_a_preflight_cannot_be_mistaken_for_a_completed_run(capsys):
 def test_run_says_it_the_same_way(capsys, monkeypatch):
     import src.mathlib_review.review.runner as runner
 
-    async def _noop(dataset, scaffold, task_overrides, logger):
+    async def _noop(dataset, scaffold, task_overrides, logger, *, resume=False):
         return None
 
     monkeypatch.setattr(runner, "run", _noop)

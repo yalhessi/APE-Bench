@@ -175,7 +175,7 @@ def test_claude_code_and_codex_deliver_the_task_contract(scaffold_path, monkeypa
 
     class Task:
         scratch_workspace = target_workspace = reference_workspaces = None
-        config = SimpleNamespace(disabled_features=[])
+        config = SimpleNamespace(disabled_features=[], batch_preamble="standard", workspace_environment=True)
 
         async def create_system_prompt(self):
             return "BRIEF: compare against what Mathlib already has."
@@ -208,7 +208,8 @@ def test_codex_is_told_about_shell_paths_only_when_it_has_a_shell(monkeypatch):
     def sent(disabled):
         class Task:
             scratch_workspace = target_workspace = reference_workspaces = None
-            config = SimpleNamespace(disabled_features=disabled)
+            config = SimpleNamespace(disabled_features=disabled, batch_preamble="standard",
+                                     workspace_environment=True)
 
             async def create_user_prompt(self):
                 return "Review PR 1."
@@ -220,3 +221,106 @@ def test_codex_is_told_about_shell_paths_only_when_it_has_a_shell(monkeypatch):
 
     assert "Shell Command Requirements" in sent([])
     assert "Shell Command Requirements" not in sent(["shell_tool", "unified_exec"])
+
+
+def test_the_plain_preamble_drops_the_imperatives_and_the_default_is_unchanged():
+    """`batch_preamble: plain` is the contract condition's preamble: the Claude reviewers gpt is
+    compared with never saw "TEXT ALONE ... accomplishes NOTHING", "batch ALL tool calls" or
+    "COMPLETED and VALIDATED". The default must render every earlier run's preamble byte for byte,
+    and the scaffold must pass its config's choice, not a default."""
+
+    import inspect
+
+    from pydantic import ValidationError
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds import prompts
+    from ape.scaffolds.ape_agent import conversation
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    standard = asyncio.run(prompts.build_system_prompt(None, None, None))
+    plain = asyncio.run(prompts.build_system_prompt(None, None, None, batch_preamble="plain"))
+    assert standard.startswith(prompts.BATCH_MODE_SYSTEM_PROMPT)
+    for imperative in ("TEXT ALONE", "batch ALL tool calls", "COMPLETED and VALIDATED",
+                       "MUST include TOOL CALLS"):
+        assert imperative in standard and imperative not in plain, imperative
+    assert "submission tool" in plain
+
+    assert ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")).batch_preamble == "standard"
+    assert ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"),
+                          batch_preamble="plain").batch_preamble == "plain"
+    with pytest.raises(ValidationError):
+        ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"), batch_preamble="terse")
+    source = inspect.getsource(conversation.ApeAgentConversationManager.create_conversation_session)
+    assert "batch_preamble=self.config.batch_preamble" in source
+
+
+def test_workspace_environment_off_drops_the_section_but_never_a_blocked_path_note():
+    from ape.scaffolds import prompts
+    from ape.tasks.models import WorkspaceInfo
+
+    target = WorkspaceInfo(name="target", commit_hash="c" * 40, repo_url="x",
+                           read_only_path_patterns=["**/*"])
+    scratch = WorkspaceInfo(name="scratch", commit_hash="c" * 40, repo_url="x")
+    standard = asyncio.run(prompts.build_system_prompt(scratch, target, None))
+    plain = asyncio.run(prompts.build_system_prompt(scratch, target, None, workspace_environment=False))
+    assert "<environment>" in standard and "rapid iteration" in standard
+    assert "<environment>" not in plain and "rapid iteration" not in plain
+    assert "<WORKSPACE_PATHS>" in plain
+    blocked = WorkspaceInfo(name="target", commit_hash="c" * 40, repo_url="x",
+                            blocked_path_patterns=["Mathlib/Secret.lean"])
+    kept = asyncio.run(prompts.build_system_prompt(scratch, blocked, None, workspace_environment=False))
+    assert "Blocked Paths" in kept
+
+
+@pytest.mark.parametrize("scaffold_path", [
+    "ape.scaffolds.claude_code.scaffold:ClaudeCodeScaffold",
+    "ape.scaffolds.codex.scaffold:CodexScaffold",
+])
+def test_the_contract_preamble_knobs_reach_claude_code_and_codex(scaffold_path, monkeypatch):
+    """Contract v2 sets `batch_preamble: plain` and `workspace_environment: false`. They were
+    APE-Agent's fields, so under Claude Code the config was refused, and the first message kept
+    the standard preamble. A harness comparison under "the same prompt" would then not have
+    had one. Now on the base config, and passed by every scaffold."""
+
+    import importlib
+
+    from ape.scaffolds import prompts
+
+    seen = {}
+
+    async def preamble(**kwargs):
+        seen.update(kwargs)
+        return "PREAMBLE"
+
+    monkeypatch.setattr(prompts, "build_system_prompt", preamble)
+
+    class Task:
+        scratch_workspace = target_workspace = reference_workspaces = None
+        config = SimpleNamespace(batch_preamble="plain", workspace_environment=False,
+                                 disabled_features=[])
+
+        async def create_system_prompt(self):
+            return "BRIEF"
+
+        async def create_user_prompt(self):
+            return "Review PR 1."
+
+    module_name, class_name = scaffold_path.split(":")
+    scaffold = object.__new__(getattr(importlib.import_module(module_name), class_name))
+    scaffold.task = Task()
+    scaffold.logger = _QUIET
+    asyncio.run(scaffold._initial_prompt("/ws"))
+    assert seen["batch_preamble"] == "plain"
+    assert seen["workspace_environment"] is False
+
+
+def test_every_scaffold_config_accepts_the_contract_preamble_knobs():
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.claude_code.config import ClaudeCodeConfig
+    from ape.scaffolds.codex.config import CodexConfig
+
+    for config_class in (ClaudeCodeConfig, CodexConfig):
+        config = config_class(llm_config=LLMConfig(model_name="gpt_5.2"),
+                              batch_preamble="plain", workspace_environment=False)
+        assert (config.batch_preamble, config.workspace_environment) == ("plain", False)

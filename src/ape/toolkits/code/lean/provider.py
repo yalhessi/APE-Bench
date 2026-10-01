@@ -237,16 +237,22 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
             if not position:
                 return {
                     "success": False,
-                    "error": f"Cannot find '{content_snippet}' at line {line}"
+                    "error": f"Cannot find '{content_snippet}' at line {line}",
+                    "outcome": "invalid_request",
                 }
 
             line_idx, char_idx = position
             hover_result = client.get_hover(rel_path, line_idx, char_idx)
 
             if not hover_result or not hover_result.get("contents"):
+                # The server answered, with nothing: not a failure of the tool, and the agent
+                # has to be able to tell the two apart.
                 return {
                     "success": False,
-                    "error": "No hover information available"
+                    "outcome": "no_result",
+                    "error": ("Lean ran and has no hover information at this position (often a "
+                              "keyword, whitespace or a comment). This is not a tool failure; "
+                              "try the identifier itself as the snippet.")
                 }
 
             hover_info = hover_result["contents"].get("value", "")
@@ -271,7 +277,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean hover error: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "outcome": "tool_error"}
 
     async def goto(
         self,
@@ -292,7 +298,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
             if not position:
                 return {
                     "success": False,
-                    "error": f"Cannot find '{content_snippet}' at line {line}"
+                    "error": f"Cannot find '{content_snippet}' at line {line}",
+                    "outcome": "invalid_request",
                 }
 
             line_idx, char_idx = position
@@ -331,7 +338,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean goto error: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "outcome": "tool_error"}
 
     async def diagnostics(self, file_path: Path) -> Dict[str, Any]:
         """Implement diagnostics interface"""
@@ -358,7 +365,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean diagnostics error: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "outcome": "tool_error"}
 
     # async def references(
     #     self,
@@ -430,7 +437,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
             lines = file_content.splitlines()
 
             if line < 1 or line > len(lines):
-                return {"success": False, "error": f"Line {line} out of range"}
+                return {"success": False, "error": f"Line {line} out of range",
+                        "outcome": "invalid_request"}
 
             line_idx = line - 1
             line_context = lines[line_idx]
@@ -441,7 +449,8 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
                 if not position:
                     return {
                         "success": False,
-                        "error": f"Cannot find '{content_snippet}' at line {line}"
+                        "error": f"Cannot find '{content_snippet}' at line {line}",
+                        "outcome": "invalid_request",
                     }
 
                 _, char_idx = position
@@ -469,7 +478,7 @@ class LeanCodeToolsProvider(BaseToolsProvider, LanguageProviderInterface):
 
         except Exception as e:
             self.logger.error(f"Lean get_goal error: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "outcome": "tool_error"}
 
     # ========== Register Lean-specific tools ==========
 

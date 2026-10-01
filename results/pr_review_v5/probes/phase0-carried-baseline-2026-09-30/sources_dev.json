@@ -1,0 +1,3 @@
+{"X1": {"kind": "claude"}, "X2": {"kind": "claude"},
+ "Gr1": {"kind": "solo", "run": "probe_dev_gpt52_Gr_rep1"},
+ "Grc1": {"kind": "solo", "run": "probe_dev_gpt52_Grc_rep1"}}

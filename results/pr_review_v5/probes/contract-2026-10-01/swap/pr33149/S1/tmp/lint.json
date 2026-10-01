@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/ODE/GalerkinRegularity.lean", "line_start": 37, "line_end": 37, "replacement": "set_option linter.style.commandStart true\nset_option linter.style.header true\nset_option linter.hashCommand true\nset_option linter.style.longLine true\nset_option linter.docPrime true\nset_option linter.style.setOption true"}

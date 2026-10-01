@@ -1,0 +1,218 @@
+{
+  "30641": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:688fdfc51e5de63aa227a972#api_reuse",
+        "generality": "wu:688fdfc51e5de63aa227a972#generality",
+        "proof_golf": "wu:688fdfc51e5de63aa227a972#proof_golf",
+        "proof_idiom": "wu:688fdfc51e5de63aa227a972#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean",
+        "Real.posLog_norm_sum_le",
+        "Real.posLog_one",
+        "Real.posLog_pow",
+        "Real.posLog_zero"
+      ],
+      "suggested_arms": [
+        "docs",
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'",
+        "`Real.posLog_pow` is a chain of 3 low-level tactic steps",
+        "was changed alongside 2 other changed declaration(s)",
+        "`Real.posLog_norm_sum_le` uses a `calc` block",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:688fdfc51e5de63aa227a972"
+    }
+  ],
+  "32875": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:73e26d326a048e30c93e68c3#api_reuse",
+        "correctness": "wu:73e26d326a048e30c93e68c3#correctness",
+        "docs": "wu:73e26d326a048e30c93e68c3#docs",
+        "duplication": "wu:73e26d326a048e30c93e68c3#duplication",
+        "family_design": "wu:73e26d326a048e30c93e68c3#family_design",
+        "generality": "wu:73e26d326a048e30c93e68c3#generality",
+        "naming": "wu:73e26d326a048e30c93e68c3#naming"
+      },
+      "rank": 1,
+      "subjects": [
+        "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+        "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` is a chain of 3 low-level tactic steps",
+        "`ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` is a chain of 3 low-level tactic steps"
+      ],
+      "work_unit_id": "wu:73e26d326a048e30c93e68c3"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2ed3ef3ebd06b092c3f8a1e7#api_reuse",
+        "correctness": "wu:2ed3ef3ebd06b092c3f8a1e7#correctness",
+        "docs": "wu:2ed3ef3ebd06b092c3f8a1e7#docs",
+        "duplication": "wu:2ed3ef3ebd06b092c3f8a1e7#duplication",
+        "family_design": "wu:2ed3ef3ebd06b092c3f8a1e7#family_design",
+        "generality": "wu:2ed3ef3ebd06b092c3f8a1e7#generality",
+        "naming": "wu:2ed3ef3ebd06b092c3f8a1e7#naming",
+        "style": "wu:2ed3ef3ebd06b092c3f8a1e7#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "limsup_finset_sup'"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`limsup_finset_sup'` is a chain of 11 low-level tactic steps",
+        "`limsup_finset_sup'` is 21 lines"
+      ],
+      "work_unit_id": "wu:2ed3ef3ebd06b092c3f8a1e7"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:c25afa89c2ad00b15de82559#api_reuse",
+        "correctness": "wu:c25afa89c2ad00b15de82559#correctness",
+        "docs": "wu:c25afa89c2ad00b15de82559#docs",
+        "duplication": "wu:c25afa89c2ad00b15de82559#duplication",
+        "family_design": "wu:c25afa89c2ad00b15de82559#family_design",
+        "generality": "wu:c25afa89c2ad00b15de82559#generality",
+        "naming": "wu:c25afa89c2ad00b15de82559#naming",
+        "proof_golf": "wu:c25afa89c2ad00b15de82559#proof_golf",
+        "proof_idiom": "wu:c25afa89c2ad00b15de82559#proof_idiom",
+        "style": "wu:c25afa89c2ad00b15de82559#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "MeasureTheory.Measure.pi_map_piCongrLeft"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'",
+        "`MeasureTheory.Measure.pi_map_piCongrLeft` is a chain of 10 low-level tactic steps",
+        "`MeasureTheory.Measure.pi_map_piCongrLeft` is 19 lines"
+      ],
+      "work_unit_id": "wu:c25afa89c2ad00b15de82559"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:30ceb29e90611a769724a0d6#api_reuse",
+        "correctness": "wu:30ceb29e90611a769724a0d6#correctness",
+        "docs": "wu:30ceb29e90611a769724a0d6#docs",
+        "duplication": "wu:30ceb29e90611a769724a0d6#duplication",
+        "family_design": "wu:30ceb29e90611a769724a0d6#family_design",
+        "generality": "wu:30ceb29e90611a769724a0d6#generality",
+        "naming": "wu:30ceb29e90611a769724a0d6#naming",
+        "style": "wu:30ceb29e90611a769724a0d6#style"
+      },
+      "rank": 4,
+      "subjects": [
+        "Rat.inv_intCast_den_of_pos"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:30ceb29e90611a769724a0d6"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:33b5c40a8b393cf49cb66006#api_reuse",
+        "correctness": "wu:33b5c40a8b393cf49cb66006#correctness",
+        "docs": "wu:33b5c40a8b393cf49cb66006#docs",
+        "duplication": "wu:33b5c40a8b393cf49cb66006#duplication",
+        "family_design": "wu:33b5c40a8b393cf49cb66006#family_design",
+        "generality": "wu:33b5c40a8b393cf49cb66006#generality",
+        "naming": "wu:33b5c40a8b393cf49cb66006#naming",
+        "style": "wu:33b5c40a8b393cf49cb66006#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Finset.mem_map_equiv"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:33b5c40a8b393cf49cb66006"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:8ffe7c1a56c92161c5c98638#api_reuse",
+        "correctness": "wu:8ffe7c1a56c92161c5c98638#correctness",
+        "docs": "wu:8ffe7c1a56c92161c5c98638#docs",
+        "duplication": "wu:8ffe7c1a56c92161c5c98638#duplication",
+        "family_design": "wu:8ffe7c1a56c92161c5c98638#family_design",
+        "generality": "wu:8ffe7c1a56c92161c5c98638#generality",
+        "naming": "wu:8ffe7c1a56c92161c5c98638#naming",
+        "proof_idiom": "wu:8ffe7c1a56c92161c5c98638#proof_idiom",
+        "style": "wu:8ffe7c1a56c92161c5c98638#style"
+      },
+      "rank": 6,
+      "subjects": [
+        "Metric.exists_lt_mem_ball_of_mem_ball"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:8ffe7c1a56c92161c5c98638"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:985987724de0928ef67dcbdf#api_reuse",
+        "correctness": "wu:985987724de0928ef67dcbdf#correctness",
+        "docs": "wu:985987724de0928ef67dcbdf#docs",
+        "duplication": "wu:985987724de0928ef67dcbdf#duplication",
+        "family_design": "wu:985987724de0928ef67dcbdf#family_design",
+        "generality": "wu:985987724de0928ef67dcbdf#generality",
+        "naming": "wu:985987724de0928ef67dcbdf#naming",
+        "proof_golf": "wu:985987724de0928ef67dcbdf#proof_golf",
+        "proof_idiom": "wu:985987724de0928ef67dcbdf#proof_idiom",
+        "style": "wu:985987724de0928ef67dcbdf#style"
+      },
+      "rank": 7,
+      "subjects": [
+        "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "the PR describes itself as 'golf'"
+      ],
+      "work_unit_id": "wu:985987724de0928ef67dcbdf"
+    }
+  ]
+}

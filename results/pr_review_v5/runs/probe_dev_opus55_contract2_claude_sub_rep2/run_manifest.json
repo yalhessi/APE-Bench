@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 100,
+  "completion_status": "complete",
+  "context_calls_total": 138,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 97,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 1605,
+  "pruned": 1605,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_dev_opus55_contract2_claude_sub_rep2",
+  "run_name": "probe_dev_opus55_contract2_claude_sub_rep2",
+  "run_plan_sha256": "306af3e849f8d66939b69b56b2baa588f4f3a4adab877f67a1380f81d2e9b981",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "6481bbe27a709b8d3d247a727b9266a9e2dcf5c345d4c38f66d594c7dd4f4328",
+  "succeeded": 0,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 24366446.0,
+    "tokens": 24366446.0
+  },
+  "wall_seconds": 703.907502
+}

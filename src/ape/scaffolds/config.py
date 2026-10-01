@@ -4,7 +4,7 @@ Base Scaffold Configuration Module.
 Provides Pydantic configuration models for all scaffold types.
 """
 
-from typing import Any, Optional, Dict
+from typing import Any, Dict, Literal, Optional
 from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from ape.orchestration.config import ExecutionConfig
@@ -73,6 +73,21 @@ class BaseScaffoldConfig(BaseModel):
 
     # LLM configuration
     llm_config: LLMConfig = Field(default_factory=LLMConfig)
+
+    #: The preamble a batch session opens with (`ape.scaffolds.prompts.BATCH_PREAMBLES`).
+    #: "standard" is what every run before 2026-10-01 saw; "plain" drops its imperatives (text
+    #: "accomplishes NOTHING", batch every call, submit only when "COMPLETED and VALIDATED") for
+    #: a task whose own contract says how to work. Part of the scaffold config, so of the plan.
+    #: On the base, with `workspace_environment`, since 2026-10-01: every scaffold builds
+    #: its first message from the same preamble (APE-Agent as its system message, Claude
+    #: Code and Codex in their first user message), so a contract condition that sets
+    #: them means the same text under each harness.
+    batch_preamble: Literal["standard", "plain"] = "standard"
+
+    #: False drops the system prompt's `<environment>` section (scratch as a place for "rapid
+    #: iteration and experimentation", target as the verification library) unless it carries
+    #: blocked-path notes. True, the default, is every run before 2026-10-01.
+    workspace_environment: bool = True
 
     # Tools configuration
     tools_config: BaseToolsConfig = Field(default_factory=BaseToolsConfig)

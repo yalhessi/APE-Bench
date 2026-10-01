@@ -18,7 +18,9 @@ from pathlib import Path
 
 import pytest
 
-from src.mathlib_review.evidence.evidence import declares_identifier, searchable_identifiers
+from src.mathlib_review.evidence.evidence import (
+    declared_names, declares_identifier, find_declaration, searchable_identifiers,
+)
 
 REALISTIC_QUERY = (
     "primary=Finset.sum_comm; requested_change=Replace the new declaration with the "
@@ -44,7 +46,8 @@ def test_a_declaration_is_matched_but_a_mention_is_not():
 
     declared = "theorem Finset.sum_comm (s : Finset α) : True := trivial"
     assert declares_identifier(declared, "Finset.sum_comm")
-    assert declares_identifier("lemma sum_comm : True := trivial", "Finset.sum_comm")
+    assert declares_identifier(
+        "namespace Finset\nlemma sum_comm : True := trivial\nend Finset", "Finset.sum_comm")
     assert declares_identifier(
         "@[simp]\nprotected theorem Finset.sum_comm : True := trivial", "Finset.sum_comm"
     )
@@ -70,9 +73,11 @@ def test_the_rule_still_finds_real_mathlib_declarations():
         "EquitableOn ∅ f := fun a _ ha => absurd ha (Set.not_mem_empty a)\n"
     )
     assert declares_identifier(source, "equitableOn_empty")
-    assert declares_identifier(source, "Finset.equitableOn_empty"), (
-        "a qualified claim must match the declaration's leaf name"
-    )
+    assert declares_identifier(f"namespace Finset\n{source}end Finset\n", "Finset.equitableOn_empty")
+    # A qualified claim names a declaration in that namespace. This asserted the opposite until
+    # 2026-09-24 -- "a qualified claim must match the declaration's leaf name" -- which is how a
+    # root `continuous_inf` was reported as `Dense.continuous_inf`.
+    assert not declares_identifier(source, "Finset.equitableOn_empty")
 
 
 def test_camelcase_type_names_are_searchable_but_capitalised_english_is_not():
@@ -102,16 +107,17 @@ def test_camelcase_type_names_are_searchable_but_capitalised_english_is_not():
 
 
 def test_a_leaf_grep_is_a_sound_prefilter_for_declares_identifier(tmp_path):
-    """The property the prefilter rests on: `declares_identifier`'s pattern embeds
-    `re.escape(leaf)`, so text that declares the identifier must contain the leaf literally.
+    """The property the prefilter rests on: a declaration of the identifier has its last
+    component on the declaration line, so text that declares it contains the leaf literally.
     A fixed-string grep for the leaf can therefore only ever return too many files."""
 
     from ape.toolkits.file_system.utils import grep_candidate_files
 
     files = {
         "declares.lean": "theorem Finset.sum_comm : True := trivial\n",
-        "declares_private.lean": "private noncomputable def sum_comm : Nat := 0\n",
-        "attribute.lean": "@[simp]\nlemma sum_comm : True := trivial\n",
+        "declares_private.lean": "namespace Finset\nprivate noncomputable def sum_comm : Nat := 0\nend Finset\n",
+        "attribute.lean": "namespace Finset\n@[simp]\nlemma sum_comm : True := trivial\nend Finset\n",
+        "root_leaf_only.lean": "theorem sum_comm : True := trivial\n",
         "mentions_only.lean": "-- see Finset.sum_comm for the general case\nimport Mathlib\n",
         "unrelated.lean": "theorem other_thing : True := trivial\n",
     }
@@ -131,6 +137,7 @@ def test_a_leaf_grep_is_a_sound_prefilter_for_declares_identifier(tmp_path):
     # It is allowed to be generous, and is: the comment-only file survives the prefilter and
     # is then rejected by `declares_identifier`, which is the whole division of labour.
     assert str(tmp_path / "mentions_only.lean") in candidates
+    assert str(tmp_path / "root_leaf_only.lean") in candidates   # generous, then rejected
     assert str(tmp_path / "unrelated.lean") not in candidates
 
 
@@ -184,3 +191,64 @@ def test_single_flight_computes_once_for_concurrent_callers_and_never_caches_a_f
     assert "k" not in failures
     assert single_flight(failures, "k", lambda: "recovered") == "recovered"
     assert single_flight(None, "k", lambda: "uncached") == "uncached"
+
+
+# ---------------------------------------------------------------------------------------
+# The two false positives the family-division review found (2026-09-24), and what the fix
+# must keep. docs/research/family-division-fanout4-review-2026-09.md.
+
+LATTICE_AT_BASE = """\
+section SupInf
+theorem continuous_inf [Min L] [ContinuousInf L] : Continuous fun p : L × L => p.1 ⊓ p.2 :=
+  ContinuousInf.continuous_inf
+end SupInf
+namespace Filter.Tendsto
+theorem sup_nhds : True := trivial
+end Filter.Tendsto
+"""
+
+EXTENDED_AT_BASE = """\
+namespace ENat
+@[simp] lemma ceil_natCast_add (r : ℝ≥0∞) (n : ℕ) : True := trivial
+end ENat
+"""
+
+
+def test_a_root_declaration_is_not_a_namespaced_one():
+    """`Dense.continuous_inf` does not exist because a root `continuous_inf` does."""
+
+    assert not declares_identifier(LATTICE_AT_BASE, "Dense.continuous_inf")
+    assert find_declaration(LATTICE_AT_BASE, "continuous_inf") == ("continuous_inf", 2)
+    assert declares_identifier(LATTICE_AT_BASE, "Filter.Tendsto.sup_nhds")
+    assert declares_identifier(LATTICE_AT_BASE, "Tendsto.sup_nhds"), "a dotted suffix, as `open` allows"
+    assert not declares_identifier(LATTICE_AT_BASE, "Dense.sup_nhds")
+
+
+def test_a_declaration_in_one_namespace_is_not_the_same_leaf_in_another():
+    assert not declares_identifier(EXTENDED_AT_BASE, "Int.ceil_natCast_add")
+    assert find_declaration(EXTENDED_AT_BASE, "ENat.ceil_natCast_add") == ("ENat.ceil_natCast_add", 2)
+    assert find_declaration(EXTENDED_AT_BASE, "ceil_natCast_add") == ("ENat.ceil_natCast_add", 2), (
+        "an unqualified query finds it, and says which declaration it found")
+
+
+def test_a_prime_is_part_of_the_name():
+    source = "theorem Dense.continuous_inf' : True := trivial\n"
+    assert searchable_identifiers("is `Dense.continuous_inf'` a duplicate?") == ["Dense.continuous_inf'"]
+    assert declares_identifier(source, "Dense.continuous_inf'")
+    assert not declares_identifier(source, "Dense.continuous_inf")
+    assert not declares_identifier("theorem Dense.continuous_inf : True := trivial\n",
+                                   "Dense.continuous_inf'")
+
+
+def test_scopes_root_and_modifiers_give_the_qualified_name():
+    source = """\
+namespace A.B
+noncomputable section
+protected theorem c : True := trivial
+end
+theorem _root_.top : True := trivial
+meta def m : Nat := 0
+end A.B
+theorem after : True := trivial
+"""
+    assert declared_names(source) == [("A.B.c", 3), ("top", 5), ("A.B.m", 6), ("after", 8)]

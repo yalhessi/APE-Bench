@@ -161,7 +161,10 @@ def searchable_identifiers(query: str) -> List[str]:
 
     found = []
     for raw in re.findall(r"[A-Za-z_][A-Za-z0-9_'.]*", query or ""):
-        cleaned = raw.strip(".'_")
+        # A trailing prime is part of a Lean name: `Dense.continuous_inf'` and
+        # `Dense.continuous_inf` are different declarations. Stripping it searched for the
+        # unprimed one and reported it as the primed one.
+        cleaned = raw.strip("._").lstrip("'")
         if not cleaned or cleaned.lower() in _SEARCH_STOPWORDS:
             continue
         if _is_identifier_shaped(cleaned):
@@ -169,21 +172,91 @@ def searchable_identifiers(query: str) -> List[str]:
     return sorted(set(found))
 
 
+#: A declaration line: optional attributes and modifiers, a keyword, and the name as written.
+_DECLARATION_LINE = re.compile(
+    r"^\s*(?:@\[[^\]]*\]\s*)*"
+    r"(?:(?:private|protected|noncomputable|public|nonrec|unsafe|partial|meta)\s+)*"
+    r"(?:theorem|lemma|def|abbrev|instance|structure|class|inductive)\s+"
+    r"(?P<name>[A-Za-z_][A-Za-z0-9_'.!?]*)"
+)
+#: `namespace X`, `section [X]` (possibly `noncomputable`/`public`), `end [X]`.
+_SCOPE_LINE = re.compile(
+    r"^\s*(?:(?:noncomputable|public)\s+)*(?P<kind>namespace|section|end)\b[ \t]*"
+    r"(?P<name>[A-Za-z_][A-Za-z0-9_'.]*)?"
+)
+
+
+def declared_names(text: str) -> List[Tuple[str, int]]:
+    """`(fully qualified name, line)` for each declaration in a Lean source, in order.
+
+    The qualified name follows the enclosing `namespace` blocks, an explicit `A.b` prefix and a
+    leading `_root_.`. Sections add nothing to a name. Split on `\n` rather than
+    `splitlines()`, which also breaks on U+2028 and similar and would shift every line number
+    after one.
+    """
+
+    stack: List[Tuple[str, List[str]]] = []
+    out: List[Tuple[str, int]] = []
+    for number, line in enumerate(text.split("\n"), start=1):
+        scope = _SCOPE_LINE.match(line)
+        if scope:
+            kind, name = scope.group("kind"), scope.group("name")
+            if kind == "namespace" and name:
+                stack.append(("namespace", name.split(".")))
+            elif kind == "section":
+                stack.append(("section", []))
+            elif kind == "end" and stack:
+                stack.pop()
+            continue
+        declared = _DECLARATION_LINE.match(line)
+        if not declared:
+            continue
+        name = declared.group("name")
+        if name.startswith("_root_."):
+            full = name[len("_root_."):]
+        else:
+            full = ".".join([part for _, parts in stack for part in parts] + [name])
+        out.append((full, number))
+    return out
+
+
+def _names_match(full: str, identifier: str) -> bool:
+    """An unqualified query matches any declaration with that last component; a qualified one
+    matches the full name or a dotted suffix of it, as `open` would let a caller write it."""
+
+    query = identifier[len("_root_."):] if identifier.startswith("_root_.") else identifier
+    if "." not in query:
+        return full.rsplit(".", 1)[-1] == query
+    return full == query or full.endswith("." + query)
+
+
+def find_declaration(text: str, identifier: str) -> Optional[Tuple[str, int]]:
+    """The first declaration in `text` that `identifier` names, as `(full name, line)`.
+
+    This replaced a pattern that matched the identifier's last component under any prefix and
+    ignored `namespace` blocks. `declaration_search` then reported the *queried* name as found,
+    so `Dense.continuous_inf` "was declared in Lattice.lean", where the file holds the root
+    `continuous_inf`, and `Int.ceil_natCast_add` "existed", which was `ENat.ceil_natCast_add`.
+    On the family-division run 12 of 74 findings, 9 of them published, were false "already
+    exists" claims built on that (docs/research/family-division-fanout4-review-2026-09.md).
+    The name returned is the one found, so a caller can say what it found.
+    """
+
+    for full, line in declared_names(text):
+        if _names_match(full, identifier):
+            return full, line
+    return None
+
+
 def declares_identifier(text: str, identifier: str) -> bool:
     """True when `text` *declares* the identifier, not merely mentions it.
 
     A substring test matched a name inside a comment, an import, or another name that
     happens to contain it. A duplication claim is about an existing declaration, so the
-    evidence has to be a declaration.
+    evidence has to be a declaration -- and a declaration of that name, namespace included.
     """
 
-    leaf = identifier.rsplit(".", 1)[-1]
-    pattern = (
-        r"^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|noncomputable\s+|public\s+)*"
-        r"(?:theorem|lemma|def|abbrev|instance|structure|class|inductive)\s+"
-        rf"(?:[A-Za-z_][A-Za-z0-9_'.]*\.)?{re.escape(leaf)}\b"
-    )
-    return re.search(pattern, text, re.MULTILINE) is not None
+    return find_declaration(text, identifier) is not None
 
 
 def snapshot_workspace(base_sha: Optional[str]) -> Optional[Path]:
@@ -394,8 +467,8 @@ def collect_candidate(
             hits = []
             target_paths = {targets[cid].path for cid in candidate.change_ids}
             searchable = workspace_lean_files(workspace, workspace_files)
-            # `declares_identifier` builds its pattern around `re.escape(leaf)`, so a file
-            # that does not contain the leaf literally cannot possibly declare it. That makes
+            # A declaration of the name has its last component on the declaration line, so a
+            # file that does not contain the leaf literally cannot possibly declare it. That makes
             # a fixed-string grep a sound prefilter -- it can only ever hand back too many
             # files -- and it is why the decision stays with `declares_identifier` below
             # rather than moving into the regex. `None` means grep did not answer, and then

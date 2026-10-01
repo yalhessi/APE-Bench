@@ -1,0 +1,75 @@
+{
+ "notes": "Review of PR #33145 (Mathlib/Topology/Order/IsLUB.lean, six new theorems with their docstrings). I read the whole file around the insertion and searched the library for closure/bounds and conditional-iSup API. Every replacement proof proposed below was compiled with lean_verify_edit against the reviewed workspace.\n\nDense.continuous_upperBounds (with its docstring command): Proof: a hand-rolled closure argument (mem_closure_iff_frequently, Frequently.mem_of_closed isClosed_Iic) that re-derives `upperBounds_closure` (Topology/Order/OrderClosed.lean). The two-line term proof built from upperBounds_closure, upperBounds_mono_set, range_subset_closure_image_dense and image_subset_range compiles. Asked. Statement and generality: Preorder plus ClosedIicTopology is the minimal setting, and only continuity and density are used. Nothing to ask. Duplication: the library has no lemma with this statement (searches for upperBounds_image, bddAbove_closure and similar found only unrelated results). The content is close to the proof of isLUB_iff_of_subset_of_subset_closure, but as a set equation it is new. Nothing beyond the golf. Naming: `continuous_upperBounds` misdescribes an equation of bound sets. Asked. Docstring: \"is equal\" with a plural subject, and \"range of the universe\". Asked. Placement: next to Dense.isLUB_inter_iff, in a section whose LinearOrder/OrderTopology variables are shadowed by the local `{α : Type*}` binder, like its neighbours. Fine. Binder order `{f : γ → α} [TopologicalSpace γ]` is slightly unusual, but not worth an ask.\n\nDense.continuous_lowerBounds (with its docstring command): a copy of the upper version with Ici. Ask: derive it by duality, `hS.continuous_upperBounds (α := αᵒᵈ) hf` (compiles), following the file's convention. The naming and docstring asks are the same as for the upper version, and the docstring ask is filed separately. Statement is fine.\n\nDense.continuous_sup (with its docstring command): Proof: the `← sSup_range` rewrites and `by grind` are a detour. isLUB_ciSup plus isLUB_ciSup_set with `h.mono (image_subset_range f S)` gives a shorter proof that compiles. Asked. Statement: in a general conditionally complete lattice the BddAbove hypothesis is needed, because sSup of an unbounded set is junk, so it cannot be dropped. Phrasing the hypothesis as BddAbove (f '' S), which is equivalent by the bounds lemma, might be friendlier, but I am not asking for it. Duplication: no existing iSup-over-dense-subset lemma (searched for names combining Dense/closure with iSup/ciSup/sSup). Naming: `sup` is the binary-sup token, `continuous_` is misleading, and the statement is about ciSup. Asked, as one decision for the whole family. Docstring: acceptable (\"supremum on the universe\" is loose but understandable). Nothing to ask.\n\nDense.continuous_inf (with its docstring command): a verbatim dual copy. Ask: `hS.continuous_sup (α := αᵒᵈ) hf h` (compiles). Naming is covered by the family rename. Docstring fine.\n\nDense.continuous_sup' (with its docstring command): Proof: the bounded branch duplicates Dense.continuous_sup. The unbounded branch uses range_comp', a non-terminal simp_all only and a closure argument, when Dense.continuous_upperBounds already gives the BddAbove equivalence. A five-line proof reusing both PR lemmas compiles (the empty case is absorbed by the bounded branch). Asked. Statement: correct. In a conditionally complete linear order both unbounded sides equal sSup ∅. Nothing to ask. Docstring: correct, and it states why BddAbove is dropped. It needs only the updated cross-reference if the family is renamed. Naming: covered by the family rename.\n\nDense.continuous_inf' (with its docstring command): a verbatim dual copy of sup'. Ask: `hS.continuous_sup' (α := αᵒᵈ) hf` (compiles). Everything else as for sup'.\n\nCorrectness/build: no semantic or build errors were found. Every proposed edit compiles. Scope: all additions fit this file. Nothing to move.",
+ "findings": [
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 171,
+   "claim": "`Dense.continuous_upperBounds` re-proves by hand (via `mem_closure_iff_frequently` and `Frequently.mem_of_closed`) the fact that upper bounds are insensitive to closure, which the library already has as `upperBounds_closure`; the neighbouring `isLUB_iff_of_subset_of_subset_closure` uses exactly that combination.",
+   "suggested_fix": "Replace the tactic proof with the term proof (checked with lean_verify_edit):\n```\n  (upperBounds_closure (f '' S) ▸\n    upperBounds_mono_set (hf.range_subset_closure_image_dense hS)).antisymm <|\n    upperBounds_mono_set (image_subset_range f S)\n```",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 183,
+   "claim": "`Dense.continuous_lowerBounds` copies the proof of `Dense.continuous_upperBounds` line for line with `Ici` in place of `Iic`, instead of deriving it by order duality the way every other `GLB`/`lowerBounds` lemma in this file is derived (e.g. `isGLB_iff_of_subset_of_subset_closure`, `Dense.isGLB_inter_iff`).",
+   "suggested_fix": "Prove it from the upper-bound version by duality: `lowerBounds (f '' S) = lowerBounds (range f) :=\n  hS.continuous_upperBounds (α := αᵒᵈ) hf` (compiles).",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 195,
+   "claim": "`Dense.continuous_sup`'s proof takes a detour: it rewrites both sides to `sSup (range _)` with `← sSup_range` only so that it can use `isLUB_csSup`, and it closes `range (fun s : S => f s) ⊆ range f` with `by grind` when `image_subset_range` gives the needed `BddAbove (f '' S)` directly. `isLUB_ciSup` already states the `IsLUB` fact for `⨆ i, f i`.",
+   "suggested_fix": "Shorten the proof to (checked with lean_verify_edit):\n```\n  cases isEmpty_or_nonempty γ\n  · simp [iSup, range_eq_empty]\n  exact (isLUB_ciSup h).unique <| (isLUB_congr (hS.continuous_upperBounds hf)).1 <|\n    isLUB_ciSup_set (h.mono (image_subset_range f S)) hS.nonempty\n```",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 208,
+   "claim": "`Dense.continuous_inf` duplicates the proof of `Dense.continuous_sup` with every `LUB`/`Sup` replaced by `GLB`/`Inf`, instead of being derived by order duality as the file's other `inf`/`GLB` lemmas are.",
+   "suggested_fix": "Replace the proof with `hS.continuous_sup (α := αᵒᵈ) hf h` (compiles).",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 221,
+   "claim": "`Dense.continuous_sup'` re-proves `Dense.continuous_sup` inside its `BddAbove` branch: the empty-type split and the three-line `refine` are copied. Its unbounded branch builds `h2` through `range_comp'`, a non-terminal `simp_all only` and `image_closure_subset_closure_image`, when the PR's own `Dense.continuous_upperBounds` already says that `f '' S` and `range f` have the same upper bounds, and so are bounded above together.",
+   "suggested_fix": "Reuse the PR's own lemmas (checked with lean_verify_edit):\n```\n  by_cases h : BddAbove (range f)\n  · exact hS.continuous_sup hf h\n  have h' : ¬ BddAbove (range fun s : S ↦ f s) := by\n    rwa [← image_eq_range, BddAbove, hS.continuous_upperBounds hf]\n  rw [iSup, iSup, csSup_of_not_bddAbove h, csSup_of_not_bddAbove h']\n```",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 243,
+   "claim": "`Dense.continuous_inf'` is a verbatim dual copy of the 15-line proof of `Dense.continuous_sup'` (including the `simp_all only` block), instead of being derived by order duality.",
+   "suggested_fix": "Replace the proof with `hS.continuous_sup' (α := αᵒᵈ) hf` (compiles).",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 171,
+   "claim": "The name `Dense.continuous_upperBounds` (and its dual `Dense.continuous_lowerBounds`) does not describe the statement. By Mathlib naming it reads as a claim that `upperBounds` is continuous, but the conclusion is the equation `upperBounds (f '' S) = upperBounds (range f)`. Continuity is a hypothesis and should not lead the name.",
+   "suggested_fix": "Rename after the conclusion, e.g. `Dense.upperBounds_image` and `Dense.lowerBounds_image` (by analogy with `upperBounds_closure`), so that `hS.upperBounds_image hf` reads as the statement.",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 195,
+   "claim": "`Dense.continuous_sup` (and `Dense.continuous_inf`, `Dense.continuous_sup'`, `Dense.continuous_inf'`) uses `sup`/`inf`, which in Mathlib names mean the binary `⊔`/`⊓`. The statement is about the indexed supremum `⨆` in a conditionally complete lattice, which is spelled `ciSup`/`ciInf`. The `continuous_` prefix also wrongly suggests a continuity conclusion.",
+   "suggested_fix": "Rename the four lemmas with `ciSup`/`ciInf` names that describe the equation, e.g. `Dense.ciSup_eq_ciSup_subtype` and `Dense.ciInf_eq_ciInf_subtype`, with the linear-order variants named consistently from those. Update the cross-references in the docstrings of the primed lemmas.",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 171,
+   "claim": "The docstring of `Dense.continuous_upperBounds` is ungrammatical (\"The upper bounds ... is equal\") and says \"the range of the universe\", which means nothing. The statement compares the upper bounds of `f '' S` with those of `range f`.",
+   "suggested_fix": "Reword, e.g.: \"The upper bounds of the image of a dense set under a continuous function are the upper bounds of its range.\"",
+   "severity": "advisory"
+  },
+  {
+   "path": "Mathlib/Topology/Order/IsLUB.lean",
+   "line_start": 183,
+   "claim": "The docstring of `Dense.continuous_lowerBounds` repeats the same errors: \"The lower bounds ... is equal\" and \"the lower bounds of the range of the universe\".",
+   "suggested_fix": "Reword, e.g.: \"The lower bounds of the image of a dense set under a continuous function are the lower bounds of its range.\"",
+   "severity": "advisory"
+  }
+ ]
+}

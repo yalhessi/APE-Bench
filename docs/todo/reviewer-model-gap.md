@@ -434,6 +434,109 @@ matchers agree on all 128 cells. q is each reviewer's reach over Claude's (X = 0
 - a carry-over-off gpt_5.2 run on these six PRs, to separate the endpoint from persistence;
 - Grc on the validation and dev sets, where Gr1 reached 0.57-0.60 and 0.29-0.31 of Claude.
 
+**Phase 0 of the re-plan (2026-09-30, $20; `results/pr_review_v5/probes/phase0-carried-baseline-2026-09-30/`):
+the 0.93 did not replicate.** Three carried reps on post-cutoff and one each on validation and dev,
+`declaration_search` fixed, six audited matchings:
+
+| set | asks | q(Chat) | q(carried) |
+|---|---|---|---|
+| post-cutoff | 16 | 0.67 | 0.44 / 0.375 / 0.19 → **mean 0.71**, union 0.93, stable 0.40 |
+| validation | 30 | 0.57-0.64 | **0.57** |
+| dev | 47 | 0.29-0.30 | **0.33-0.38** |
+
+- **Carry-over does not close the model gap.** Against Chat it is +0.02 / 0.00 / +0.02-0.04 absolute.
+  The gap stands at q 0.33-0.71 across sets.
+- **It is adopted as the standard condition anyway**, on process grounds that hold on every set and
+  rep: every session concludes (44 of 44 against 22 of 32), repeats fall about tenfold, and cost
+  falls to a fifth, with no loss of reach.
+- **Dev's cap losses were not the cap or the tool.** Uncapped and tool-fixed, the carried run gained
+  two dev asks. This corrects d23fbde's "mostly a `declaration_search` defect".
+- **gpt_5.2 files what it verifies** (1 of 56 unfiled). Its misses are in what it attempts.
+- **The residual population**: of 93 asks, 37 (40%) are reached by nobody and 30 (32%) only by Claude.
+  Phase 1 labels both (`phase1_population.json`).
+
+**Why every gpt condition looks alike on the judge (2026-10-01, no spend; dev held-out 12, judge v9).**
+Hits per finding are the same for every reviewer, Claude included; what differs is how much each says
+and about how many objects:
+
+| reviewer | findings per PR | change targets with a finding (of 432) | obligations hit per finding |
+|---|---|---|---|
+| Claude X1 / X2 | 7.5 / 8.1 | 76 / 83 | 0.12 / 0.11 |
+| gpt_5.2 off / carried | 3.2 / 2.6 | 35 / 30 | 0.11 / 0.10 |
+| gpt-5.5 / gpt-5.4 carried | 2.8 / 2.1 | 32 / 25 | 0.09 / 0.08 |
+
+Inputs are identical (full diff, PR text, pass-0 model in every gpt prompt) and the tools work
+(`lean_verify` failures are the model's own unknown names and proof errors; `proof_profile` is dead
+on dev: no declaration tables were built). The common factor is the harness and contract, which every
+gpt condition shares and Claude's packet does not:
+- Claude's brief X requires `notes.md`, "what you did, object by object, including what you checked
+  and found nothing wrong with" -- median 22 object entries a PR, each closed with a verdict. Brief G
+  drops it; gpt's only output is the final `submit_findings` call.
+- the `ape_agent` preamble: every response must be tool calls, "TEXT ALONE ... accomplishes NOTHING",
+  batch all calls, submit only when "COMPLETED and VALIDATED"; Claude Code imposes none of it.
+- turn caps and a submit tool with a finding budget and merge framing, against an uncapped session
+  (Claude: 57 tool calls a session at the median; gpt: 37-49 calls in 18 turns); and gpt's grant lacks
+  `file_search`, which Claude called 102 times on post-cutoff.
+Not the whole story: on validation the filing bar widened gpt-5.5 from 20 to 37 targets and reach
+stayed at 0.20, so breadth without the per-object pass did not help. The untried design is the
+contract itself -- an object-by-object ledger in the submission, the preamble's anti-text and
+batching lines dropped, `file_search` granted -- on gpt_5.2 carried, judged on the held-out 12.
+
+**The contract condition, as built (2026-10-01, $9.36; `results/pr_review_v5/probes/contract-2026-10-01/`).**
+It has all four differences: `review_notes`, `filing_bar: request`, `batch_preamble: plain` and
+`file_search`. Issue recall is 0.130 (3 of 23, reachable 0.167), the same count as Grc1, so by the
+pre-registered rule it is **not a lever as built**. gpt said a third more (42 findings on 40
+targets, against 31 on 30) and hit less per finding (0.071). Its ledger, a median of 8.5 bullets
+per PR against Claude's 23.5-33.5, names each object and concludes about its proof or docs. It does
+not take objects through the concern families, as Claude's "concern families checked with nothing
+to request" does. In the sessions read, the misses are still `attempted_concluded_fine`. Untried,
+listed there: a family-by-object ledger, the account written during the session, a Claude
+Code-like harness, the contract on gpt-5.5, identical grants. One run; provisional.
+**gpt is not a proof specialist** (`focus.py`). Its proof share is no higher than Claude's (16-21%
+against 28-33%), and gpt_5.2 misses both proof-golf asks, which Claude hits. Claude does about three
+times as much in every family: 9.5-11.5 candidate edits compiled a session against 1.5-3.5, and
+17-19.5 library lookups against 1.5-3.5, with the same reading and grepping. The same notes
+instruction gave Claude a family-by-object pass (naming on 92-100% of PRs) and gpt none (50%).
+The open test that separates model and harness from prompt is the swap: Claude given gpt's rendered
+prompt verbatim.
+**Contract v2 (2026-10-01, $8.36).** It removes every item of gpt-only prompt text and asks for
+Claude's per-declaration ledger. Issue recall is 0.087 (2 of 23): **not a lever**. The ledger was
+carried over. The notes name 73% of the PR model's declarations, as Claude's do (v1: 37%), and
+mention naming on 83% of PRs. But gpt's investigation did not grow: 30 tool calls a session, 2
+edits compiled and 2.5 library lookups, against Claude's 57, 10 and 18. So its entries assert
+checks it did not run, and the misses read as "nothing to ask" on the very declarations the
+maintainers asked about. The prompt is now as close to Claude's as these runs make it. **Next is
+the swap**, which says whether the remainder is the model or the harness.
+**Contract v2 on gpt-5.5, and the swap (2026-10-01).** gpt-5.5 under v2 reached 0.130 (3 of 23),
+not a lever, but it closes every input-side gap: its notes cover 82% of declarations, they mention
+naming and generality on 100% and 92% of PRs, and it compiles 9.5 edits a session, Claude's level.
+It files 30 findings to Claude's 90-97. **The swap**, Claude given gpt's v2 messages verbatim,
+reaches 0.435 (10 of 23; X 11), so by the rule the prompt is not what holds gpt back. It got there
+with fewer tool calls, compiles and lookups than gpt-5.5 made under the same prompt: 35, 6 and 2.5
+against 41, 9.5 and 6. Across every condition run, recall tracks how many changes the reviewer
+decides to ask for. Coverage, attention, compiles and lookups do not move it. Not separated:
+model from harness, and judgement from memory of these in-window PRs. The clean check is the swap
+on the post-cutoff set, by blind matchers.
+**Next: `docs/plans/2026-10-01-claude-models-under-the-harness.md`** (user, 2026-10-01). It crosses
+harness and model: gpt and Opus 5.5 under the project's Claude Code harness, and Opus 5 and 4.8 on
+the subscription. It is read on the dev judge and the post-cutoff matchers, after the harness merge.
+
+**Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
+`SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
+(in-sample) gpt-5.5 files the three 43192 asks it had withheld, q 0.67 → 0.93. **On validation it
+is not the mechanism**: gpt-5.4 0.233 → 0.200, gpt-5.5 0.200 → 0.200, although the bar cut unfiled
+verified edits from 9 and 8 to 4 and 6 and nearly doubled gpt-5.5's findings. The newer models verify
+2-4x the edits gpt_5.2 does and reach fewer asks: their validation deficit is aim, not filing.
+gpt_5.2 carried stays the reference gpt reviewer (0.267, $5.60).
+
+**Phase 1, the residual asks by mechanism (2026-09-30; `phase1-residual-mechanisms-2026-09-30/mechanisms.md`).**
+Two blind readers, 141 pairs, no disjoint label set. Of 67 residual asks: the object was attended
+in 63 (`never_attempted` 4), withheld after verifying 2; the misses are judgement, concluded fine
+(40 asks) or changed differently (25), explained by `knowledge_convention` (25: `to_fun`, `mk_iff`,
+`grind` tags, `_left`/`_right`, namespace short names, `naming_norm` misleading on d0045) and
+`try_it_not_tried` (19: `positivity`, `gcongr`, `simpa`, "does the old proof work"). Same shape for
+Claude and gpt. Phase 2 not funded; Phase 3.2 (try-it) next, then 3.3 (conventions).
+
 **Why gpt-5.4 and gpt-5.5 reach less than gpt_5.2 (2026-09-30, read by hand, about $0.90;
 `results/pr_review_v5/probes/model-inspection-2026-09-30/`).**
 - **They verify more and file less.** Against gpt_5.2: 10 compiled edits each against 7, and 6

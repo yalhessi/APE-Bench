@@ -1,0 +1,296 @@
+{
+ "33066": {
+  "Grc1": {
+   "findings": 3,
+   "compiles": 11,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 4
+   }
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "X1": {
+   "findings": 12,
+   "compiles": 14
+  },
+  "X2": {
+   "findings": 12,
+   "compiles": 17
+  }
+ },
+ "33098": {
+  "X2": {
+   "findings": 19,
+   "compiles": 21
+  },
+  "Gr1": {
+   "findings": 9,
+   "compiles": 25,
+   "compile_split": {
+    "lean_verify_edit": 8,
+    "lean_verify": 17
+   }
+  },
+  "X1": {
+   "findings": 15,
+   "compiles": 17
+  },
+  "Grc1": {
+   "findings": 9,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 3
+   }
+  }
+ },
+ "33117": {
+  "Gr1": {
+   "findings": 7,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 2
+   }
+  },
+  "Grc1": {
+   "findings": 2,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 1
+   }
+  },
+  "X1": {
+   "findings": 11,
+   "compiles": 4
+  },
+  "X2": {
+   "findings": 10,
+   "compiles": 19
+  }
+ },
+ "33145": {
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_token_limit"
+  },
+  "X2": {
+   "findings": 10,
+   "compiles": 10
+  },
+  "Grc1": {
+   "findings": 4,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 9,
+    "lean_verify": 0
+   }
+  },
+  "X1": {
+   "findings": 9,
+   "compiles": 13
+  }
+ },
+ "33149": {
+  "X1": {
+   "findings": 30,
+   "compiles": 16
+  },
+  "X2": {
+   "findings": 33,
+   "compiles": 13
+  },
+  "Gr1": {
+   "findings": 16,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 2
+   }
+  },
+  "Grc1": {
+   "findings": 10,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 4
+   }
+  }
+ },
+ "33285": {
+  "X2": {
+   "findings": 8,
+   "compiles": 21
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "X1": {
+   "findings": 9,
+   "compiles": 22
+  },
+  "Grc1": {
+   "findings": 1,
+   "compiles": 9,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 4
+   }
+  }
+ },
+ "33294": {
+  "Grc1": {
+   "findings": 3,
+   "compiles": 24,
+   "compile_split": {
+    "lean_verify_edit": 10,
+    "lean_verify": 14
+   }
+  },
+  "X1": {
+   "findings": 12,
+   "compiles": 18
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_token_limit"
+  },
+  "X2": {
+   "findings": 11,
+   "compiles": 13
+  }
+ },
+ "33305": {
+  "Grc1": {
+   "findings": 0,
+   "compiles": 0,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 0
+   }
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": 14,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 7
+   }
+  },
+  "X2": {
+   "findings": 3,
+   "compiles": 6
+  },
+  "X1": {
+   "findings": 4,
+   "compiles": 7
+  }
+ },
+ "33321": {
+  "X1": {
+   "findings": 11,
+   "compiles": 19
+  },
+  "X2": {
+   "findings": 18,
+   "compiles": 40
+  },
+  "Grc1": {
+   "findings": 4,
+   "compiles": 21,
+   "compile_split": {
+    "lean_verify_edit": 14,
+    "lean_verify": 7
+   }
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  }
+ },
+ "33337": {
+  "X2": {
+   "findings": 1,
+   "compiles": 3
+  },
+  "Grc1": {
+   "findings": 1,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 2
+   }
+  },
+  "Gr1": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  },
+  "X1": {
+   "findings": 2,
+   "compiles": 4
+  }
+ },
+ "33362": {
+  "X1": {
+   "findings": 7,
+   "compiles": 8
+  },
+  "Gr1": {
+   "findings": 6,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 4,
+    "lean_verify": 4
+   }
+  },
+  "X2": {
+   "findings": 8,
+   "compiles": 6
+  },
+  "Grc1": {
+   "findings": 5,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 1
+   }
+  }
+ },
+ "33421": {
+  "Grc1": {
+   "findings": 4,
+   "compiles": 13,
+   "compile_split": {
+    "lean_verify_edit": 10,
+    "lean_verify": 3
+   }
+  },
+  "X2": {
+   "findings": 10,
+   "compiles": 13
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": null,
+   "capped": "paused_max_turns"
+  },
+  "X1": {
+   "findings": 10,
+   "compiles": 11
+  }
+ }
+}

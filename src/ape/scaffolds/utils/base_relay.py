@@ -152,94 +152,44 @@ class BaseRelaySession(ABC):
 
     async def _check_limits_and_shutdown_if_needed(self) -> Optional[Response]:
         """
-        Check turn and cost limits before processing request.
+        Check turn, cost and token limits before processing request.
         If limit reached, shutdown uvicorn server and return error response.
+
+        The cost and token ceilings are read off the same usage record, and both scaffold
+        families check both, so a run cannot acquire a ceiling that binds under one scaffold
+        and is silently absent under another. What counts as reached is `limit_error`'s,
+        shared with the subscription route, which has no relay.
 
         Returns:
             None if within limits, error Response if limit exceeded
         """
-        # Check turn limit
-        if self.max_turns is not None:
-            current_turns = self.get_current_turns()
-            if current_turns >= self.max_turns:
-                self._turn_limit_reached = True
-                error_msg = f"Turn limit reached: {current_turns}/{self.max_turns}"
-                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
+        from ape.llm_clients.config import CostExhaustedError
+        from ape.scaffolds.base import MaxTurnsReachedError
+        from .base_conversation import limit_error
 
-                # Store error for propagation
-                from ape.scaffolds.base import MaxTurnsReachedError
-                self.last_error = MaxTurnsReachedError(error_msg)
+        error = limit_error(self.get_token_usage(), self.get_current_turns(),
+                            max_turns=self.max_turns, cost_limit=self.cost_limit,
+                            token_limit=self.token_limit)
+        if error is None:
+            return None
+        if isinstance(error, MaxTurnsReachedError):
+            self._turn_limit_reached = True
+            kind = "turn_limit_exceeded"
+        elif isinstance(error, CostExhaustedError):
+            self._cost_limit_reached = True
+            kind = "cost_limit_exceeded"
+        else:
+            self._token_limit_reached = True
+            kind = "token_limit_exceeded"
+        self.logger.warning(f"[BaseRelay] {error} - shutting down server")
 
-                # Trigger server shutdown
-                if self._server:
-                    self._server.should_exit = True
+        # Store error for propagation, and trigger server shutdown
+        self.last_error = error
+        if self._server:
+            self._server.should_exit = True
 
-                # Return error response before shutdown completes
-                return JSONResponse(
-                    {
-                        "error": {
-                            "type": "turn_limit_exceeded",
-                            "message": error_msg
-                        }
-                    },
-                    status_code=429
-                )
-
-        # Check cost limit
-        if self.cost_limit is not None:
-            current_cost = self.get_token_usage().total_cost
-            if current_cost >= self.cost_limit:
-                self._cost_limit_reached = True
-                error_msg = f"Cost limit exceeded: ${current_cost:.6f} >= ${self.cost_limit:.6f}"
-                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
-
-                # Store error for propagation
-                from ape.llm_clients.config import CostExhaustedError
-                self.last_error = CostExhaustedError(error_msg)
-
-                # Trigger server shutdown
-                if self._server:
-                    self._server.should_exit = True
-
-                # Return error response before shutdown completes
-                return JSONResponse(
-                    {
-                        "error": {
-                            "type": "cost_limit_exceeded",
-                            "message": error_msg
-                        }
-                    },
-                    status_code=429
-                )
-
-        # Check the token ceiling, beside the cost one and off the same usage record. Both
-        # scaffold families check both, so a run cannot acquire a ceiling that binds under one
-        # scaffold and is silently absent under another.
-        if self.token_limit is not None:
-            current_tokens = self.get_token_usage().processed_tokens
-            if current_tokens >= self.token_limit:
-                self._token_limit_reached = True
-                error_msg = (f"Token limit exceeded: {current_tokens:,} >= "
-                             f"{self.token_limit:,}")
-                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
-
-                from ape.llm_clients.config import TokenBudgetExhaustedError
-                self.last_error = TokenBudgetExhaustedError(error_msg)
-
-                if self._server:
-                    self._server.should_exit = True
-
-                return JSONResponse(
-                    {
-                        "error": {
-                            "type": "token_limit_exceeded",
-                            "message": error_msg
-                        }
-                    },
-                    status_code=429
-                )
-
-        return None
+        # Return error response before shutdown completes
+        return JSONResponse({"error": {"type": kind, "message": str(error)}}, status_code=429)
 
     @abstractmethod
     def _get_env_vars(self) -> Dict[str, str]:

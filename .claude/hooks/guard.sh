@@ -39,6 +39,15 @@ case "$tool" in
       if [ "$branch" = "main" ]; then
         deny "Refused: 'git commit' on main. main is the upstream APE-Bench drop; nothing is committed there. Commit on develop or a topic branch (git switch develop)."
       fi
+      # 5. A commit gated on a pipeline: in `check | tail && git commit` the commit waits on
+      #    tail's status, not the check's. CLAUDE.md said so after 2026-09-23 and it happened
+      #    again on 2026-10-01 (a failing script, `| tail -3 && git add && git commit`). Only
+      #    the &&-chain that reaches the commit is read -- the text before `git commit`, after
+      #    its last `;` or newline -- so a pipe in the message or an earlier statement is fine.
+      before="${cmd%%git commit*}"; chain="${before##*;}"; chain="${chain##*$'\n'}"
+      if printf '%s' "$chain" | grep -qE '(^|[^|])\|([^|]|$)' && ! printf '%s' "$cmd" | grep -q 'pipefail'; then
+        deny "Refused: this 'git commit' is chained after a pipeline, so it is gated on the pipeline's last stage (e.g. tail), not on the check. Redirect the check to a file and test \$? first, or set -o pipefail in the same command (CLAUDE.md, 'Never gate a commit on pytest ... | tail')."
+      fi
     fi
     case "$cmd" in *CLAUDE_ALLOW_TREE_SWITCH=1*) exit 0 ;; esac
     if printf '%s' "$cmd" | grep -qE "${GIT}(switch|checkout|rebase|clean)([[:space:]]|$)|${GIT}reset[[:space:]]+[^;&|]*--(hard|merge)"; then

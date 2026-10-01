@@ -127,6 +127,8 @@ def _check_model_credential(scaffold: Any) -> Optional[Unmet]:
     `api_key`, so this reads the resolved value and stays provider-agnostic.
     """
 
+    if getattr(scaffold, "claude_model", None):
+        return _check_claude_login()
     llm = getattr(scaffold, "llm_config", None)
     if llm is None or getattr(llm, "model_name", None) is None:
         return None
@@ -143,6 +145,24 @@ def _check_model_credential(scaffold: Any) -> Optional[Unmet]:
             f"export the provider's key in the launching shell ({_key_env_var_hint(llm)}), or "
             "set llm_config.api_key in the config."
         ),
+    )
+
+
+def _check_claude_login() -> Optional[Unmet]:
+    """Claude Code on a subscription logs in with `CLAUDE_CODE_OAUTH_TOKEN`, or not at all.
+
+    The CLI runs with `HOME` at the attempt's `workspaces/`, so the login in `~/.claude/` is
+    never found; the scaffold refuses a session without the token, but only once each attempt
+    has started.
+    """
+
+    if os.environ.get("CLAUDE_CODE_OAUTH_TOKEN"):
+        return None
+    return Unmet(
+        name="Claude login",
+        consequence=("claude_model is set (Claude Code on the subscription) and "
+                     "CLAUDE_CODE_OAUTH_TOKEN is not exported. Every attempt would fail at start."),
+        remedy="run `claude setup-token` and export its token in the launching shell.",
     )
 
 

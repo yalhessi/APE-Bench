@@ -148,7 +148,9 @@ Tests that need a built Lean workspace under `data/code_execute/` fail on a fres
 **Never gate a commit on `pytest … | tail`.** A pipeline's status is its last command's, so
 `pytest … | tail -2 && git commit …` commits a red suite (2026-09-23: two failures went in that
 way and the commit had to be amended). Capture pytest's own exit code — redirect to a file and
-check `$?`, or `set -o pipefail` — before the commit step.
+check `$?`, or `set -o pipefail` — before the commit step. The prose did not stop it (2026-10-01:
+a failing script, `| tail -3 && git commit`), so `guard.sh` now refuses a commit whose `&&`-chain
+holds a pipe, unless `pipefail` is set (`tests/cli/test_guard_hook.py`).
 
 **An edit and a commit do not share one command line.** In `check && edit; test; commit`, a failing
 check skips the edit while the test and commit after the `;` still run -- on the old files, so the
@@ -179,6 +181,17 @@ models are priced at **0.0**, which makes every dollar cap vacuous; the token bl
 `configs/bases/v5_generation.yaml` is what bounds a run on one, and `cli plan` refuses a
 zero-priced run that has left it unset. Llama 3.3 and EuroLLM are served without tool-calling and
 are refused by name if a scaffold sends tools; Qwen3.5 and Mistral-Small-4 are agent-capable.
+
+**Claude models run on the Claude Code subscription route**, not through `llm_clients`. Set
+`llm_config.model_name: null` with `claude_model` (a full name), `cli_version` (a binary at
+`data/resources/claude-<v>-linux-x64`; the SDK's bundled CLI cannot run Opus 5.5) and `effort`.
+The login is `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`, in `env.zsh`), and the preflight
+refuses a run without it. A subscription bills nothing per token. Its five_hour window held about
+one dev run (20-24M processed tokens), and that window is shared with interactive use. So check the
+token before a run: a one-line `claude -p` with `HOME` set elsewhere reports its `rate_limit_event`.
+A spent limit fails the sessions it reaches, never as a short review, and `run --resume` then
+requeues exactly those. Configs: `configs/pr_review_v5_dev_medium_*_claude_sub.yaml`. Readings:
+`results/pr_review_v5/probes/claude-models-2026-10-01/`.
 
 **A missing or rejected key does not fail; it retries for hours.** `llm_clients/client.py` retries
 every exception except four, authentication included: 100 attempts, waits up to 60 s plus jitter,

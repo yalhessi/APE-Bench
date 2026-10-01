@@ -682,7 +682,9 @@ class ApeAgentConversationManager:
                 reference_workspaces=self.task.reference_workspaces,
                 is_cli_mode=self.is_cli_mode,
                 managed_skills=None if managed_skills is None else managed_skills.skills,
-                logger=self.logger
+                logger=self.logger,
+                batch_preamble=self.config.batch_preamble,
+                workspace_environment=self.config.workspace_environment,
             )
             # A task may contribute its own system-level contract on top of the workspace
             # preamble. Nothing used to call `create_system_prompt()`: it is defined on seven

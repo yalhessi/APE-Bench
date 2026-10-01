@@ -4,10 +4,16 @@ Claude Code Scaffold Configuration Models
 Claude Code Scaffold configuration models, inherit from BaseScaffoldConfig and add specific configurations.
 """
 
-from typing import List, Optional
-from pydantic import Field
+import re
+from pathlib import Path
+from typing import List, Literal, Optional
+from pydantic import Field, model_validator
 from ape.scaffolds.config import BaseScaffoldConfig
 from ape.llm_clients.config import LLMConfig
+
+#: A Claude model's full API name. An alias (`opus`, `sonnet`, `opus[1m]`, `best`) resolves to
+#: whatever the CLI release maps it to, so a run pinned by one names no model.
+CLAUDE_MODEL_NAME = re.compile(r"^claude-[a-z]+-\d+(-\d+)*$")
 
 
 class ClaudeCodeConfig(BaseScaffoldConfig):
@@ -73,6 +79,76 @@ class ClaudeCodeConfig(BaseScaffoldConfig):
     #: (`containment.py`). The grant above names which tools exist; this bounds where they
     #: reach, which `dontAsk` was never shown to do. Batch mode only.
     contain_to_workspace: bool = False
+
+    # --- the subscription route ------------------------------------------------------------
+    #
+    # With `llm_config.model_name: null` no relay starts, and the CLI reaches Anthropic on its
+    # own login. These three name what that session is, so they sit in the scaffold config and
+    # therefore in the run plan's digest. On the relay route all three stay unset: the model
+    # and its reasoning are `llm_config`'s, served by the relay.
+
+    #: The Claude model the CLI runs, by its full name. Required on the subscription route,
+    #: where the CLI's default model would otherwise be whatever its release ships with.
+    claude_model: Optional[str] = None
+
+    #: The CLI release, run from `data/resources/claude-<version>-linux-x64`. Unset means the
+    #: SDK's bundled CLI (2.1.139 with claude-agent-sdk 0.1.81), which refuses claude-opus-5-5
+    #: ("version 2.1.280 or newer is required") and takes Opus 5 and 4.8 for 200K-context
+    #: models when they are 1M, so it compacts a long session early.
+    cli_version: Optional[str] = None
+
+    #: The CLI's `--effort`. A launching Claude Code session exports its own `CLAUDE_EFFORT`,
+    #: which the SDK passes to the child; this pins the reviewer's instead.
+    effort: Optional[Literal["low", "medium", "high", "xhigh", "max"]] = None
+
+    @property
+    def subscription_route(self) -> bool:
+        """Whether this session runs a Claude model on the CLI's own login, with no relay."""
+        return self.claude_model is not None
+
+    def resolved_cli_path(self) -> Optional[Path]:
+        """The pinned CLI binary, or None for the SDK's bundled one."""
+        if self.cli_version is None:
+            return None
+        from ape.utils.project import PROJECT_ROOT
+
+        return PROJECT_ROOT / "data" / "resources" / f"claude-{self.cli_version}-linux-x64"
+
+    @model_validator(mode="after")
+    def _a_subscription_session_names_itself(self) -> "ClaudeCodeConfig":
+        """Refuse a subscription-route config that leaves what the session is to the CLI."""
+        if self.claude_model is None:
+            if self.effort is not None:
+                raise ValueError(
+                    "effort is the Claude model's on the subscription route; on the relay route "
+                    "the backend's reasoning is set in llm_config")
+            return self
+        problems = []
+        if self.llm_config.model_name is not None:
+            problems.append(
+                f"llm_config.model_name is {self.llm_config.model_name!r}, which starts the "
+                "relay and serves that model instead; set it to null")
+        if not CLAUDE_MODEL_NAME.match(self.claude_model):
+            problems.append(f"claude_model {self.claude_model!r} is not a full model name "
+                            "(an alias moves with the CLI release)")
+        if self.cli_version is None:
+            problems.append("cli_version is unset, so the SDK's bundled CLI would run")
+        if self.effort is None:
+            problems.append("effort is unset, so the launching shell's CLAUDE_EFFORT or the "
+                            "CLI's default would decide it")
+        if not self.contain_to_workspace:
+            problems.append("contain_to_workspace is off, so nothing bounds or audits where "
+                            "the built-in tools reach")
+        if self.setting_sources != []:
+            problems.append("setting_sources is not [], so on-disk settings, CLAUDE.md and "
+                            "hooks would load into the session")
+        if not self.strict_mcp_config:
+            problems.append("strict_mcp_config is off, so the login's claude.ai connectors "
+                            "attach and announce themselves into the reviewer's context")
+        if problems:
+            raise ValueError("claude_model set (the subscription route), but: "
+                             + "; ".join(problems))
+        return self
 
     # LLM streaming configuration
     # default disable streaming to ensure token usage statistics correct

@@ -164,19 +164,32 @@ def assert_repo_root() -> None:
             "running from elsewhere writes unreproducible provenance."
         )
 
-    # A worktree shares the main checkout's venv, and that venv's editable install pins
-    # `ape` to the main checkout's src/. Everything under `src.` would then come from this
-    # tree while the framework came from another -- refuse the mixed state.
+    assert_one_tree()
+
+
+def assert_one_tree() -> None:
+    """Refuse a process whose framework comes from another tree than this pipeline.
+
+    A worktree shares the main checkout's venv, and that venv's editable install pins `ape`
+    to the main checkout's src/. Everything under `src.` would then come from this tree while
+    the framework came from another. A config written for this tree then fails on fields the
+    other tree's scaffold does not have: on 2026-10-01 the first subscription smoke, launched
+    without PYTHONPATH, stopped on four `extra_forbidden` errors for fields defined here.
+    Compared against this file's own tree, not the working directory, so it holds wherever
+    the process runs.
+    """
+
     import ape
 
     origin = getattr(ape, "__file__", None)
-    if origin is not None:
-        framework = Path(origin).resolve().parent
-        expected = (Path.cwd() / "src" / "ape").resolve()
-        if framework != expected:
-            raise RuntimeError(
-                f"`ape` is imported from {framework}, not from this tree's {expected}. In a "
-                "worktree the shared venv's editable install points at the main checkout; run "
-                "with PYTHONPATH=src (pytest.ini and the Claude Code settings already do) so the "
-                "framework and the pipeline come from the same tree."
-            )
+    if origin is None:
+        return
+    framework = Path(origin).resolve().parent
+    expected = (Path(__file__).resolve().parents[1] / "ape").resolve()
+    if framework != expected:
+        raise RuntimeError(
+            f"`ape` is imported from {framework}, not from this tree's {expected}. In a "
+            "worktree the shared venv's editable install points at the main checkout; run "
+            "with PYTHONPATH=src (pytest.ini and the Claude Code settings already do) so the "
+            "framework and the pipeline come from the same tree."
+        )

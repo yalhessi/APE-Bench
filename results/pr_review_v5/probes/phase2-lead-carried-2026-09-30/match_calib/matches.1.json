@@ -1,0 +1,161 @@
+{
+ "asks": [
+  {
+   "pr": 30641,
+   "ask_id": "v0064",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "reached",
+   "R4_finding": 1,
+   "note": "R4's requested signature renames a to x (as in log_pow); R1 makes binders explicit but keeps a."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0065",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "reached",
+   "R3_finding": 0,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "R3's replacement proof names the hypothesis ha. Others delete the case split, mooting the name without addressing it."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0066",
+   "R1": "reached",
+   "R1_finding": 2,
+   "R2": "reached",
+   "R2_finding": 1,
+   "R3": "reached",
+   "R3_finding": 0,
+   "R4": "reached",
+   "R4_finding": 0,
+   "note": "R3 uses 1 <= |a^n| via one_le_pow0, dropping the n=0 split; others replace the whole proof with a one-liner."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0067",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "partial",
+   "R2_finding": 4,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "reached",
+   "R4_finding": 4,
+   "note": "R1/R4 term proof supplies the nonnegativity goal directly, removing the simp; R2 chains via .trans without saying how side goals go."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0068",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 4,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "reached",
+   "R4_finding": 4,
+   "note": "Term proof via .trans replaces the apply-with-placeholders monotonicity step; not gcongr, but a strictly simpler proof of the step."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0090",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "Ask is to add @[grind] attributes; findings only ask to remove grind from the proof, a different issue."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0091",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "no",
+   "R4_finding": null,
+   "note": "Same grind-tagging ask on Rat lemma; findings only replace the grind proof step."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0092",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "reached",
+   "R2_finding": 5,
+   "R3": "partial",
+   "R3_finding": 2,
+   "R4": "partial",
+   "R4_finding": 2,
+   "note": "R2 collapses simp only + exact into one simpa; R3/R4 propose rw + exact, still two steps."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0093",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "R4": "partial",
+   "R4_finding": 6,
+   "note": "R4 targets the same simp only at h / exact tail but keeps it, adding coe_le_coe instead of simpa."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0094",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "reached",
+   "R3_finding": 3,
+   "R4": "reached",
+   "R4_finding": 5,
+   "note": "R3/R4 replace the have + simp only + exact with a one-line rw chain, a stronger golf than simpa."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0095",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "reached",
+   "R3_finding": 4,
+   "R4": "reached",
+   "R4_finding": 4,
+   "note": "R3/R4 replace the proof with rw [<- compProd_apply_prod hs ht, rho.disintegrate], subsuming the simpa golf."
+  }
+ ],
+ "unmatched": {
+  "30641": {
+   "R1": 3,
+   "R2": 6,
+   "R3": 0,
+   "R4": 2
+  },
+  "32875": {
+   "R1": 2,
+   "R2": 8,
+   "R3": 3,
+   "R4": 5
+  }
+ }
+}

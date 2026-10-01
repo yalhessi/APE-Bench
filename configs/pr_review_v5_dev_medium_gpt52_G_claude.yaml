@@ -1,0 +1,18 @@
+# CONDITION C on the dev set: the G condition, unchanged, under Claude Code.
+#
+# The dev twin of pr_review_v5_probe_2026_07_08_v1_gpt52_G_claude.yaml: gpt_5.2 through the
+# scaffold's relay, brief G, APE's tools, the cutoff gate and the budget all G's; only the
+# harness differs. Also the base the dev subscription configs extend, which change the route.
+extends: pr_review_v5_dev_medium_gpt52_G.yaml
+
+scaffold_type: claude_code
+
+# Containment. See pr_review_v5_solo_claude_heldout12.yaml for why each knob is here. No number
+# from this condition is read from an attempt whose containment_audit.json is not both `clean`
+# and `usable`.
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob, TodoWrite]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+contain_to_workspace: true

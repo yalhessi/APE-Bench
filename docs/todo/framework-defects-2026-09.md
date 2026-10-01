@@ -273,6 +273,33 @@ Code uses its own login. Four things break without the relay:
 A spent subscription usage limit also needs handling as a failed attempt, or it reads as an
 empty review.
 
+**A subscription can also go through the relay, as a pass-through (measured 2026-10-01, no
+spend).** The check was a local listener that answers and never forwards. With
+`CLAUDE_CODE_OAUTH_TOKEN` set, `HOME` elsewhere and `ANTHROPIC_BASE_URL` pointed at the listener,
+CLI 2.1.269 sends the subscription bearer to that URL (`Authorization: Bearer sk-ant-oat…`, and
+`oauth-2025-04-20` in `anthropic-beta`). With `ANTHROPIC_AUTH_TOKEN=relay_token` also set, as
+`_get_env_vars` sets it, the CLI sends `relay_token` and drops the oauth beta, because that variable
+outranks the token. The CLI's default model also moved with the credential: `claude-sonnet-5` under
+the token, `claude-opus-5[1m]` under `relay_token`. So a relay mode that forwards Claude Code's own
+request unchanged to `api.anthropic.com` would keep usage, the token half of `ExecutionLimits` and
+transcripts. The relay never holds the token: the CLI attaches it and the relay passes headers on as
+received. The subscription bills nothing per token, so it needs a zero-priced registry entry, as the
+`elm_*` models have. The token must not go into `llm_clients`. The Agent SDK docs bar third parties
+from offering claude.ai login, and press reports (2026-02) describe server-side refusal of
+subscription tokens outside Claude Code. An Anthropic provider for `ape_agent` therefore needs an
+API key. The gateway docs say nothing about OAuth through a gateway, and no request has been
+forwarded yet.
+
+**The relay's session id is broken on the installed CLI, whatever the credential.**
+`_extract_session_id` looks for `__session_<uuid>` in `metadata.user_id`. CLI 2.1.269 sends a JSON
+string there, `{"device_id":…,"account_uuid":"","session_id":"…"}` (the same capture), so
+`claude_code_session_id` stays `None`. No transcript hardlink is written on the ordinary relay path
+either. *Fixed on `claude-code-harness` (`d7f84ae`), merged with it: `_extract_session_id` reads the
+JSON `session_id` as well as the old suffix, pinned by
+`test_the_relay_reads_the_session_id_of_either_cli_generation`. This paragraph was measured on
+`develop` before that merge. The subscription route (`75d85bd`) takes its session id from the SDK's
+init message and needs neither.*
+
 **What would close it:** for Codex, an older pinned CLI or a `/responses` route on the relay,
 and the bridge checked out or replaced. For Claude there are two routes. An Anthropic provider in
 `llm_clients` and an API key would keep the design and reach all three harnesses, `ape_agent`
@@ -309,6 +336,97 @@ since each turn used one normal reply. Their cost figures do not, and the relay'
 had been counting each turn twice. Residual per session, estimated with caching: 1.6x the requests
 and 2.4x the output of APE-Agent, about $0.09 against $0.05. That is the harness's own difference,
 from one set of runs.
+
+**Claude on a subscription: built on `claude-subscription` (2026-10-01), and run end to end once.**
+Each item above has a fix and a test (`bcdf81e`, `75d85bd`). The scaffold config pins
+`claude_model`, `cli_version` and `effort`. The login travels as `CLAUDE_CODE_OAUTH_TOKEN`, and
+both the preflight and the scaffold refuse a run without it. Usage comes from the stream's
+per-reply events, then from the result's cumulative `model_usage`, and the relay's limit
+checkpoint (`limit_error`) runs before each reply. The session id comes from the init message. A
+spent limit, an error reply or result, a fallback model or a safety refusal fails the attempt.
+The live probes behind it (the user's login, seven short sessions):
+- **The bundled CLI cannot run Opus 5.5.** SDK 0.1.81's 2.1.139 refuses `claude-opus-5-5` with
+  "version 2.1.280 or newer is required". It also takes Opus 5 and 4.8 for 200K / 32K models when
+  they are 1M / 128K, so it would compact a long session early. 2.1.285 is pinned at
+  `data/resources/claude-2.1.285-linux-x64`, copied from the VS Code extension; its sha256 is beside
+  it. The relay route still runs 2.1.139, so a relay cell and a subscription cell differ in CLI
+  release as well as model.
+- **The refusal reads as a success to a check on `subtype`.** It arrives with `subtype: success`,
+  `is_error: true` and status 400, so `is_error` is what the scaffold reads.
+- **The login brings its claude.ai connectors.** Without `strict_mcp_config`, the model's second
+  reply quoted a notice injected mid-session ("several claude.ai connectors aren't authorized
+  yet: Asana, ..."). With it, nothing appeared. The route requires it, and also sets
+  `ENABLE_CLAUDEAI_MCP_SERVERS=false` and `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`.
+- **A launching Claude Code session leaks into its child.** The SDK passes the parent
+  environment through, including `CLAUDE_EFFORT=xhigh`, the parent's session id and its
+  messaging socket. The route blanks every inherited `CLAUDE*` variable except the token.
+
+For the model cells of `docs/plans/2026-10-01-claude-models-under-the-harness.md` (on
+`post-carryover-replan`), from Anthropic's model pages, read 2026-10-01:
+
+| model | id | training-data cutoff | dev PRs (created 2025-12-18..31) | post-cutoff set (2026-07-08 on) |
+|---|---|---|---|---|
+| Opus 5.5 | `claude-opus-5-5` | Jun 2026 | inside | after |
+| Opus 5 | `claude-opus-5` | May 2026 | inside | after |
+| Opus 4.8 | `claude-opus-4-8` | Jan 2026 | at the edge: a PR's review and merge can fall after it | after |
+
+All three are dateless IDs, each a pinned snapshot. The probe harness recorded no effort for its
+Claude sessions. They ran as subagents of a Claude Code session, and today's sessions export
+`CLAUDE_EFFORT=xhigh`, but nothing shows what the swap ran at. So the H-claude cell carries an
+effort guess against the swap, and should say so.
+
+**Run end to end (`fd971ce`).** The smoke ran on PR 41930: claude-opus-5-5 on CLI 2.1.285 at
+xhigh, with `apiKeySource: none` on the setup token. Its audit was clean and usable (8 tool
+calls), and it used 84,797 tokens over 5 replies, billing nothing. It filed no findings, as both
+G runs did there. The launch needs `PYTHONPATH=$PWD/src` in a worktree. Without it, the first
+attempt failed on four validation errors, and `load_run` now refuses that mix by name
+(`4369298`).
+
+**Calibrated on a large dev PR, uncapped.** `probe_dev_opus55_G_claude_sub_calib1` ran PR 33149
+under G with max_turns 400 and a 20M token cap. The session took 16 replies, 29 tool calls and 8
+minutes, and used 1,179,025 processed tokens: 1,077,673 cache reads, 15,882 output, 10,421 of
+them thinking. Its audit was clean and usable. It submitted 21 findings, which became 18 issues,
+1 of them published. The gpt-era caps (40 replies, 1.8M) would not have stopped this session, but
+it used 65% of the token cap. A prompt averaged 74K tokens here and grows with each reply, so a
+session much longer than 16 replies would likely pass 1.8M. That is an estimate from one session;
+the swap made 41 calls on this PR, under another prompt. For the plan's Claude cells, set the
+caps to stop only a runaway (on the order of 10M tokens and 200 replies). Keep the run totals in
+step: `test_every_shipped_config_keeps_its_two_blocks_in_step` refuses otherwise.
+
+**The session record has no result in a submitted session.** The scaffold stops the session at
+submission, before the CLI's final result message arrives. In both runs above,
+`claude_code_session.json` therefore has an empty `results`: no notional API cost, and no
+per-model usage. Its usage is the main model's stream count, without the CLI's Haiku
+housekeeping calls (about 1K tokens a query in the probes, under 0.1% here). A failed or
+turn-limited session does get its result. To recover the notional cost, price the recorded
+tokens.
+
+`code_hover`, `code_goto` and `get_lean_goal` take `file_path` relative to `workspaces/`, while
+`lean_verify_edit` takes `path` relative to the reviewed target. A reviewer that uses one
+convention for both fails the hover with "Cannot find Lean project". It happened once in each of
+four runs: one APE-Agent, two Claude Code on the relay, and the calibration. In the plan's
+dev cells it recurred in `code_goto` (H-claude rep 1) and `get_lean_goal` (H-claude rep 2). It is minor, but it
+is the same family as the `lean_verify` path defect below.
+
+**A run that the subscription limit cut short can only be redone, not resumed (2026-10-01).**
+`probe_dev_opus55_contract2_claude_sub_rep2` reached the five_hour limit at 10:00. Of 15 sessions,
+13 had succeeded. Two (33321 and 33066) failed mid-session after 32-34 replies and about 2.4M
+tokens each, on `ClaudeSessionError` ("usage limit is spent"), as designed. Their three retries
+failed at once with no tokens, and the run finished `partial` with its outputs written. From
+there `--resume` is refused, because it is meant for a run that was interrupted before writing
+its outputs, and the orchestrator lists the two as Failed, not Resumable. So the only way to
+complete it is `--redo`. That re-runs the 13 good sessions, about 21M tokens of subscription quota
+spent again.
+
+**The resume half is fixed (`ebee26c`, `9ceba2a`).** `run --resume` now reopens a partial run. In
+each of its orchestrators it requeues the samples that failed on system errors with their
+retries spent, keeps every success, and lets unfinished samples continue. It clears the closed
+outputs but keeps the plan, the agenda and the append-only logs, and it records the reopen in
+`stages.jsonl` (partial -> running). It refuses when nothing failed on errors, because then the
+partial is the result, and it refuses lead runs, whose failures sit in nested orchestrators. On
+rep 2 the dry run reads "would requeue 2 session(s)". **Still open:** a scheduler that starts no
+new session once the CLI reports `allowed_warning`. That was done by hand that day: the chain
+was stopped before rep 3 at the first warning.
 
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
@@ -359,3 +477,22 @@ Not started. Every step below is what the Claude Code half needed, or what the i
    matched (`a23892d`, `2dac2e0`) on `develop`'s tools, without the `declaration_search` fix. Codex
    runs on the same tools join that comparison with no re-runs. The fix (`5e215ff`) would make it
    a new baseline.
+
+## The solo grant carries `proof_profile`, and its store holds one table (found 2026-10-01)
+
+`configs/bases/v5_solo.yaml` grants `solo_context_tools: [..., proof_profile]`, and
+`proof_profile` reads a declaration table per base commit (`data/pr_review_v5/declaration_tables/`).
+One table is on disk (`af239326`). So on every other base the tool answers "no declaration table
+for X; build it with `python -m src.mathlib_review.retrieval.declaration_table --commit X`", which
+the reviewer cannot run. Over six gpt runs (2026-09-30 audit: dev gpt-5.2 G/Grc, gpt-5.4/5.5 Grc,
+validation and post-cutoff gpt-5.2 Grc) that was 13 of the 14 `proof_profile` calls made. The
+message is honest: it is an environment failure and says so. The defect is the grant. The reviewer
+is shown a tool that cannot answer on almost every PR it reviews, and the Claude reviewers it is compared with
+never had it.
+
+What would close it: either build the tables for every base in a run's episode set (a local build,
+no spend) and have `cli plan` refuse a run whose granted context tool has no backing store for an
+episode; or take `proof_profile` out of the solo grant. That second option is the parity fix for any
+gpt-vs-Claude comparison, and it moves every solo plan's identity, so it lands at a run boundary.
+The rule this repeats is `.claude/rules/mathlib-review.md`'s "assert the capability reaches the
+task". It was written for a tool filtered out of a grant. Here the tool is granted and dead.

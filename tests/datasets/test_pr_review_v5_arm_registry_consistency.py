@@ -197,7 +197,12 @@ EXPECTED_SPEC_IDENTITY = {
     # and namespace unmeasured), and the closing "already follows the convention" scoped to "in
     # every part you can check". At both held-out naming misses the arm's reason for silence was the
     # tool's prefix-only census read as a verdict on the whole name. Nine of ten unchanged.
-    "generality": "ef5c1b06333a", "naming": "29ec1f38acbb", "proof_golf": "854c179f8da7",
+    # `naming` moved 29ec1f38acbb -> 2300a4a07071 on 2026-10-01, deliberately: bullets for the
+    # tool's new `conforms` verdict and its `population_too_small` / `no_dominant_prefix` reasons.
+    # 15 of 43 counted `insufficient_evidence` calls over six gpt runs were a name already
+    # following its convention, under a verdict saying the census settled nothing. Nine of ten
+    # unchanged.
+    "generality": "ef5c1b06333a", "naming": "2300a4a07071", "proof_golf": "854c179f8da7",
     "proof_idiom": "d0d4b417257d", "style": "ba219a5656d0",
 }
 
