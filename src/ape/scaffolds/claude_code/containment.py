@@ -55,6 +55,10 @@ REFUSAL_MARK = "[ape containment]"
 #: denied because Claude Code is running in don't ask mode", 2.1.139).
 CLI_REFUSAL_MARKS = ("Permission to use", "has been denied")
 
+#: How Claude Code answers a call to a tool that does not exist, by that tool's name (2.1.285:
+#: "<tool_use_error>Error: No such tool available: zulip_search</tool_use_error>").
+NO_SUCH_TOOL = "No such tool available: {name}"
+
 
 def violation(tool_name: str, tool_input: Dict[str, Any], roots: Sequence[str],
               cwd: str) -> Optional[str]:
@@ -127,6 +131,7 @@ def audit_transcript(transcript: Path, roots: Sequence[str], cwd: str) -> Dict[s
     calls: List[Dict[str, Any]] = []
     refused_ids = set()
     cli_refused_ids = set()
+    error_texts: Dict[str, str] = {}
     with open(transcript, encoding="utf-8") as fh:
         for line in fh:
             try:
@@ -145,13 +150,21 @@ def audit_transcript(transcript: Path, roots: Sequence[str], cwd: str) -> Dict[s
                                   "tool_input": block.get("input") or {}})
                 elif block.get("type") == "tool_result" and block.get("is_error"):
                     text = _result_text(block.get("content"))
+                    error_texts[block.get("tool_use_id")] = text
                     if REFUSAL_MARK in text:
                         refused_ids.add(block.get("tool_use_id"))
                     elif all(mark in text for mark in CLI_REFUSAL_MARKS):
                         cli_refused_ids.add(block.get("tool_use_id"))
 
+    # A call to a tool that does not exist ran nothing: the CLI answered it with its own error,
+    # naming that tool. H-claude rep 2 (2026-10-01) called `zulip_search` for
+    # `mcp__core__zulip_search` once; read as a leak, it made a session unreadable.
+    nonexistent_ids = {c["id"] for c in calls if NO_SUCH_TOOL.format(name=c["tool_name"])
+                       in error_texts.get(c["id"], "")}
     leaks, refused = [], []
     for call in calls:
+        if call["id"] in nonexistent_ids:
+            continue
         reason = violation(call["tool_name"], call["tool_input"], roots, cwd)
         if reason is None:
             continue
@@ -164,6 +177,8 @@ def audit_transcript(transcript: Path, roots: Sequence[str], cwd: str) -> Dict[s
     # review would otherwise read as the reviewer's (smoke2: 7 of 8 calls).
     refused_by_cli = [{"id": c["id"], "tool_name": c["tool_name"]}
                       for c in calls if c["id"] in cli_refused_ids]
+    nonexistent = [{"id": c["id"], "tool_name": c["tool_name"]}
+                   for c in calls if c["id"] in nonexistent_ids]
     return {"transcript": str(transcript), "tool_calls": len(calls), "by_tool": by_tool,
             "refused": refused, "leaks": leaks, "clean": not leaks,
-            "refused_by_cli": refused_by_cli}
+            "refused_by_cli": refused_by_cli, "nonexistent": nonexistent}

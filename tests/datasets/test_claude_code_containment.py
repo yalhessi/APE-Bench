@@ -563,3 +563,33 @@ def test_a_turn_without_carried_reasoning_gains_none():
         {"role": "assistant", "content": [{"type": "text", "text": "Nothing to flag."}]}]}
     session = relay._convert_anthropic_to_session(request, None)
     assert all(n.message.signature is None for n in session.nodes if n.type == "assistant")
+
+
+def test_a_call_to_a_tool_that_does_not_exist_ran_nothing(tmp_path):
+    """H-claude rep 2 called `zulip_search` for `mcp__core__zulip_search`, and the CLI answered
+    "No such tool available". Nothing ran, so it is not a leak; an unclassifiable call without
+    that answer, naming that tool, still is."""
+
+    import json
+
+    from ape.scaffolds.claude_code.containment import audit_transcript, provisioned_roots
+
+    workspaces, _base, _later, _gold = _review_layout(tmp_path)
+    roots = provisioned_roots(workspaces)
+    lines = []
+    for call_id, name, answer in (
+            ("a", "zulip_search", "<tool_use_error>Error: No such tool available: zulip_search"
+                                  "</tool_use_error>"),
+            ("b", "zulip_search", "some result"),
+            ("c", "other_tool", "<tool_use_error>Error: No such tool available: zulip_search"
+                                "</tool_use_error>")):
+        lines.append({"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "id": call_id, "name": name, "input": {"query": "q"}}]}})
+        lines.append({"type": "user", "message": {"content": [
+            {"type": "tool_result", "tool_use_id": call_id, "is_error": True, "content": answer}]}})
+    transcript = tmp_path / "s.jsonl"
+    transcript.write_text("".join(json.dumps(line) + "\n" for line in lines))
+
+    report = audit_transcript(transcript, roots, str(workspaces))
+    assert [c["id"] for c in report["nonexistent"]] == ["a"]
+    assert [c["id"] for c in report["leaks"]] == ["b", "c"]
