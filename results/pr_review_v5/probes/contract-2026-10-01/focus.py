@@ -49,10 +49,17 @@ RUNS = {  # label -> (run, judge audit, Claude packet reviewer or None)
     "gpt55 contract2": ("probe_dev_gpt55_Grc_contract2_rep1", "probe-dev-gpt55-Grc-contract2-rep1", None),
     "gpt-5.5 carried": ("probe_dev_gpt55_Grc_rep1", "probe-dev-gpt55-Grc-rep1", None),
     "gpt off": ("probe_dev_gpt52_G_rep1", "probe-dev-gpt52-G-rep1", None),
+    # docs/plans/2026-10-01-claude-models-under-the-harness.md: contract v2 under Claude Code.
+    "H-claude": ("probe_dev_opus55_contract2_claude_sub_rep1",
+                 "probe-dev-opus55-contract2-claude-sub-rep1", None),
+    "M-5": ("probe_dev_opus5_contract2_claude_sub_rep1",
+            "probe-dev-opus5-contract2-claude-sub-rep1", None),
 }
 PACKET = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{who}"
 #: The swap's packets: Claude under gpt's contract-v2 messages; its notes are in `submission.json`.
 SWAP_PACKET = "results/pr_review_v5/probes/contract-2026-10-01/swap/pr{pr}/{who}"
+#: Claude Code's built-ins under the APE tool each stands in for, so one table counts both harnesses.
+CLAUDE_CODE_TOOLS = {"Read": "file_read", "Grep": "content_search", "Glob": "file_search"}
 TOOLS = ["file_read", "content_search", "file_search", "declaration_search", "naming_norm",
          "precedent_search", "zulip_search", "lean_verify_edit", "lean_verify"]
 
@@ -74,12 +81,17 @@ def gpt_sessions(run):
                 continue
             turns = [c for c in sorted(glob.glob(f"{task}/samples/0/attempts/*/conversations/*.jsonl"))
                      if not c.endswith("_raw.jsonl")]
+            # Claude Code on a subscription has no relay, so no conversation record: its own
+            # transcript has the same assistant/tool_use shape, under Claude Code's tool names.
+            turns = turns or sorted(glob.glob(
+                f"{task}/samples/0/attempts/*/claude_code_conversation_*.jsonl"))
             calls = collections.Counter()
             for node in (json.loads(l) for l in open(turns[-1]) if l.strip()):
                 content = (node.get("message") or {}).get("content")
                 if node.get("type") == "assistant" and isinstance(content, list):
-                    calls.update(b.get("name") for b in content
-                                 if isinstance(b, dict) and b.get("type") == "tool_use")
+                    calls.update(CLAUDE_CODE_TOOLS.get(name, name.removeprefix("mcp__core__"))
+                                 for name in (b.get("name") for b in content
+                                              if isinstance(b, dict) and b.get("type") == "tool_use"))
             out[result["pr_number"]] = (calls, result.get("review_notes", ""))
         return out
 
@@ -143,7 +155,7 @@ def main():
     sessions = {label: (claude_sessions(who) if who else gpt_sessions(run))
                 for label, (run, _audit, who) in RUNS.items() if label in
                 ("Claude X1", "Claude X2", "Claude swap", "gpt Grc1", "gpt contract", "gpt contract2",
-                 "gpt55 contract2")
+                 "gpt55 contract2", "H-claude", "M-5")
                 and (who or (Path(".ape/runs") / run / "tasks").is_dir())}
     print("\nC. tool calls per session, median")
     print(f"{'':14}" + "".join(f"{t[:10]:>11}" for t in TOOLS) + f"{'all':>6}")
