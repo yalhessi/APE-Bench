@@ -391,3 +391,19 @@ def test_the_preflight_refuses_a_subscription_run_with_no_login(monkeypatch):
     assert unmet is not None and "claude setup-token" in unmet.remedy
     monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "sk-ant-oat01-test")
     assert _check_model_credential(_config()) is None
+
+
+def test_a_near_limit_warning_is_logged_once_per_state(caplog):
+    from claude_agent_sdk import RateLimitEvent
+    from claude_agent_sdk.types import RateLimitInfo
+
+    def event(status):
+        return RateLimitEvent(rate_limit_info=RateLimitInfo(
+            status=status, resets_at=1, rate_limit_type="five_hour"), uuid="u", session_id="s")
+
+    manager = _manager()
+    with caplog.at_level(logging.WARNING):
+        _feed(manager, [_init(), event("allowed_warning"), event("allowed_warning"),
+                        event("allowed_warning")])
+    assert sum("near its five_hour limit" in r.message for r in caplog.records) == 1
+    assert [s["status"] for s in manager.session_record["rate_limits"]] == ["allowed_warning"]

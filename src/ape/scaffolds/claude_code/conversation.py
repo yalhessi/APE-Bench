@@ -316,15 +316,19 @@ class ClaudeCodeConversationManager(BaseConversationManager):
     def _check_rate_limit(self, info: Any) -> None:
         state = {"status": info.status, "type": info.rate_limit_type,
                  "resets_at": info.resets_at}
-        if not self.session_record["rate_limits"] or self.session_record["rate_limits"][-1] != state:
+        # The CLI repeats the state with every request; record and warn on a change only (the
+        # first dev repetition logged the same warning several times a minute per session).
+        changed = (not self.session_record["rate_limits"]
+                   or self.session_record["rate_limits"][-1] != state)
+        if changed:
             self.session_record["rate_limits"].append(state)
         if info.status == "rejected":
             raise ClaudeSessionError(
                 f"the subscription's {info.rate_limit_type} usage limit is spent "
                 f"(resets at {info.resets_at})")
-        if info.status == "allowed_warning":
+        if info.status == "allowed_warning" and changed:
             self.logger.warning("[ClaudeCodeConversationManager] subscription usage near its "
-                                "%s limit", info.rate_limit_type)
+                                "%s limit (resets at %s)", info.rate_limit_type, info.resets_at)
 
     def _read_result(self, message: Any) -> None:
         self._sdk_session_id = message.session_id
