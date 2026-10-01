@@ -175,6 +175,8 @@ class CodexScaffold(BaseScaffold):
             target_workspace=self.task.target_workspace,
             reference_workspaces=self.task.reference_workspaces,
             use_absolute_paths=True,
+            batch_preamble=self.task.config.batch_preamble,
+            workspace_environment=self.task.config.workspace_environment,
             logger=self.logger
         )
         system_prompt += (

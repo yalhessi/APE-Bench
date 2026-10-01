@@ -175,6 +175,7 @@ def test_claude_code_and_codex_deliver_the_task_contract(scaffold_path, monkeypa
 
     class Task:
         scratch_workspace = target_workspace = reference_workspaces = None
+        config = SimpleNamespace(batch_preamble="standard", workspace_environment=True)
 
         async def create_system_prompt(self):
             return "BRIEF: compare against what Mathlib already has."
@@ -241,3 +242,55 @@ def test_workspace_environment_off_drops_the_section_but_never_a_blocked_path_no
                             blocked_path_patterns=["Mathlib/Secret.lean"])
     kept = asyncio.run(prompts.build_system_prompt(scratch, blocked, None, workspace_environment=False))
     assert "Blocked Paths" in kept
+
+
+@pytest.mark.parametrize("scaffold_path", [
+    "ape.scaffolds.claude_code.scaffold:ClaudeCodeScaffold",
+    "ape.scaffolds.codex.scaffold:CodexScaffold",
+])
+def test_the_contract_preamble_knobs_reach_claude_code_and_codex(scaffold_path, monkeypatch):
+    """Contract v2 sets `batch_preamble: plain` and `workspace_environment: false`. They were
+    APE-Agent's fields, so under Claude Code the config was refused, and the first message kept
+    the standard preamble. A harness comparison under "the same prompt" would then not have
+    had one. Now on the base config, and passed by every scaffold."""
+
+    import importlib
+
+    from ape.scaffolds import prompts
+
+    seen = {}
+
+    async def preamble(**kwargs):
+        seen.update(kwargs)
+        return "PREAMBLE"
+
+    monkeypatch.setattr(prompts, "build_system_prompt", preamble)
+
+    class Task:
+        scratch_workspace = target_workspace = reference_workspaces = None
+        config = SimpleNamespace(batch_preamble="plain", workspace_environment=False)
+
+        async def create_system_prompt(self):
+            return "BRIEF"
+
+        async def create_user_prompt(self):
+            return "Review PR 1."
+
+    module_name, class_name = scaffold_path.split(":")
+    scaffold = object.__new__(getattr(importlib.import_module(module_name), class_name))
+    scaffold.task = Task()
+    scaffold.logger = _QUIET
+    asyncio.run(scaffold._initial_prompt("/ws"))
+    assert seen["batch_preamble"] == "plain"
+    assert seen["workspace_environment"] is False
+
+
+def test_every_scaffold_config_accepts_the_contract_preamble_knobs():
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.claude_code.config import ClaudeCodeConfig
+    from ape.scaffolds.codex.config import CodexConfig
+
+    for config_class in (ClaudeCodeConfig, CodexConfig):
+        config = config_class(llm_config=LLMConfig(model_name="gpt_5.2"),
+                              batch_preamble="plain", workspace_environment=False)
+        assert (config.batch_preamble, config.workspace_environment) == ("plain", False)
