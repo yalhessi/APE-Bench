@@ -30,9 +30,16 @@ dataset:
   # though it equals the base's value, so the pair moves together when this is retuned.
   solo_token_cap: 1800000
 
-  # The generalist arm's grant. The scheduled design's own control keeps all four "because
-  # that is the point of a control"; this is a control too, so a narrower grant would make an
-  # information difference read as an architecture difference. Every one is cutoff-gated, and
-  # every call lands in `context_trace.jsonl` -- which is both how the grant is shown to have
-  # been real and what the leak audit reads.
-  solo_context_tools: [zulip_search, precedent_search, declaration_search, proof_profile]
+  # The generalist arm's grant, less `proof_profile`. The scheduled design's own control keeps
+  # all four "because that is the point of a control"; this is a control too, so a narrower
+  # grant would make an information difference read as an architecture difference. Every one
+  # is cutoff-gated, and every call lands in `context_trace.jsonl` -- which is both how the
+  # grant is shown to have been real and what the leak audit reads.
+  #
+  # `proof_profile` is out (2026-10-01): it reads a declaration table per base commit, one
+  # table exists (`af239326`), so on every other base it answered "no declaration table" --
+  # 13 of 14 calls over six gpt runs, 1 of 2 in the Opus runs. A tool that cannot answer on the
+  # PR it is granted for is noise in the grant, and the Claude reviewers the solo path is
+  # compared with never held it (`docs/todo/framework-defects-2026-09.md`, "The solo grant
+  # carries `proof_profile`").
+  solo_context_tools: [zulip_search, precedent_search, declaration_search]
