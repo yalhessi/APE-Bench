@@ -1179,13 +1179,16 @@ def _model_is_free(scaffold) -> bool:
     """Whether this run's model is priced at zero, so no dollar cap can bind it.
 
     True for the four locally hosted `elm_*` models, which cost the project nothing per token
-    and say so. Unknown models are treated as paid: a model with no row cannot be asserted to
-    be free, and guessing "free" would turn the refusal below into a false alarm on every new
-    model name.
+    and say so, and for Claude Code on a subscription (`claude_model`), which bills nothing
+    per token either. Unknown models are treated as paid: a model with no row cannot be
+    asserted to be free, and guessing "free" would turn the refusal below into a false alarm
+    on every new model name.
     """
 
     from ape.llm_clients.config import MODEL_MAPPINGS
 
+    if getattr(scaffold, "claude_model", None):
+        return True
     entry = MODEL_MAPPINGS.get(getattr(getattr(scaffold, "llm_config", None),
                                        "model_name", None))
     if entry is None:
@@ -1221,7 +1224,7 @@ def _assert_a_ceiling_binds(dataset, scaffold, logger, *, enforce: bool) -> None
     if bound:
         return
     message = (
-        f"{scaffold.llm_config.model_name} is priced at 0.0 per token, so every dollar cap in "
+        f"{_plan_model_name(scaffold)} is priced at 0.0 per token, so every dollar cap in "
         f"this config is satisfied by any run whatsoever -- standard_budget_cap, "
         f"lead_cost_cap, per_pr_cost_cap and run_total_cost_cap all bind billed spend and "
         f"there is none. With {knob} unset, the only bounds left are max_turns "
@@ -1232,6 +1235,12 @@ def _assert_a_ceiling_binds(dataset, scaffold, logger, *, enforce: bool) -> None
     if enforce:
         raise BudgetTooSmall(message)
     logger.warning("%s", message)
+
+
+def _plan_model_name(scaffold) -> Optional[str]:
+    """The model a run's plan records: `llm_config`'s, or on Claude Code's subscription route,
+    where `llm_config.model_name` is null so that no relay starts, the pinned `claude_model`."""
+    return scaffold.llm_config.model_name or getattr(scaffold, "claude_model", None)
 
 
 def _report_budget(dataset, report, pr_count: int, logger, *, enforce: bool = False,
@@ -1422,7 +1431,7 @@ def _build_plan(dataset: V5DatasetConfig, scaffold, agenda) -> V5RunPlan:
     run unable to catch exactly the errors it exists to catch cheaply.
     """
 
-    model_name = scaffold.llm_config.model_name
+    model_name = _plan_model_name(scaffold)
     if not model_name:
         raise ValueError(
             "llm_config.model_name is not set. The sealed plan records which model produced "

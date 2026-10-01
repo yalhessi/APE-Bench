@@ -158,6 +158,61 @@ class ClaudeCodeScaffold(BaseScaffold):
         relay = self.conversation_manager._relay_session if self.conversation_manager else None
         return relay.client_environment() if relay is not None else {}
 
+    #: The launching shell's Claude variables the subscription route passes on: the login, and
+    #: the two the SDK sets itself.
+    SUBSCRIPTION_ENV_KEPT = frozenset(
+        {"CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_AGENT_SDK_VERSION"})
+
+    def _subscription_environment(self) -> Dict[str, str]:
+        """The CLI's environment on the subscription route: the login, and nothing else of
+        the shell that launched the run.
+
+        The SDK passes the parent environment through, and `options.env` can override a
+        variable but not remove one. A run launched from a Claude Code session inherits its
+        `CLAUDE_EFFORT`, session id and messaging socket, so each is blanked. `HOME` is the
+        attempt's `workspaces/`, so `~/.claude/.credentials.json` is never found and the
+        login travels as `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`). An inherited
+        `ANTHROPIC_*` variable is refused rather than blanked: an API key or base URL there
+        would bill or route the session somewhere the run plan does not say.
+        """
+        if not self.task.config.subscription_route:
+            return {}
+        token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")
+        if not token:
+            raise RuntimeError(
+                "claude_model is set (the subscription route) but CLAUDE_CODE_OAUTH_TOKEN is "
+                "not: the CLI runs with HOME at the attempt's workspaces/, so it cannot read "
+                "the login from ~/.claude/. Create a token with `claude setup-token` and "
+                "export it in the launching shell.")
+        routed = sorted(key for key in os.environ if key.startswith("ANTHROPIC_"))
+        if routed:
+            raise RuntimeError(
+                f"the subscription route refuses an inherited {routed}: the CLI would bill an "
+                "API key or reach another endpoint instead of the login. Unset them for the run.")
+        env = {key: "" for key in os.environ
+               if key.startswith("CLAUDE") and key not in self.SUBSCRIPTION_ENV_KEPT}
+        env.update({
+            "CLAUDE_CODE_OAUTH_TOKEN": token,
+            # The login's claude.ai connectors (Gmail, Drive, Slack, ...): without
+            # strict_mcp_config, a probe session was told about them mid-conversation.
+            "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+            # No memory directory: nothing a session writes reaches the next PR's.
+            "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+        })
+        return env
+
+    def _pinned_cli_path(self) -> Optional[str]:
+        """The configured CLI binary, refused if absent rather than replaced by the bundled one."""
+        path = self.task.config.resolved_cli_path()
+        if path is None:
+            return None
+        if not path.is_file():
+            raise RuntimeError(
+                f"cli_version {self.task.config.cli_version!r} names {path}, which does not "
+                "exist. Place that release there (the session refuses a CLI whose reported "
+                "version differs).")
+        return str(path)
+
     def _pre_approved_tools(self) -> List[str]:
         """APE's own MCP server, and the configured grant, approved without asking.
 
@@ -256,7 +311,11 @@ class ClaudeCodeScaffold(BaseScaffold):
             self.logger.info("[ClaudeCodeScaffold] contained to %s", self.containment_roots)
 
         options = ClaudeAgentOptions(
-            model=config.llm_config.model_name,
+            # The relay serves llm_config's model whatever name the CLI sends; without one,
+            # the CLI runs the pinned Claude model on its own login.
+            model=config.claude_model or config.llm_config.model_name,
+            cli_path=self._pinned_cli_path(),
+            effort=config.effort,
             max_turns=config.execution.max_turns,
             mcp_servers=mcp_servers,
             cwd=cwd,
@@ -269,6 +328,7 @@ class ClaudeCodeScaffold(BaseScaffold):
             resume=resume_session_id,
             fork_session=True if resume_session_id else False,
             env={
+                **self._subscription_environment(),
                 'HOME': str(claude_home.resolve()),
                 'CLAUDE_CODE_DISABLE_COMMAND_INJECTION_CHECK': '1',
                 **self._relay_environment(),
@@ -445,6 +505,23 @@ class ClaudeCodeScaffold(BaseScaffold):
             len(self.containment_refusals), leaks, cli_refused,
             "" if audits else " (no transcript)")
 
+    def _write_session_record(self) -> None:
+        """On the subscription route, what the CLI said the session was and what it used:
+        its identity at start, every rate-limit state, and each result's model usage and
+        notional API cost. The relay's logs hold the same for the relay route."""
+        import json
+
+        record = {
+            "claude_model": self.task.config.claude_model,
+            "cli_version": self.task.config.cli_version,
+            "effort": self.task.config.effort,
+            "usage": self.conversation_manager.get_token_usage().model_dump(),
+            "turns": self.conversation_manager.get_current_turns(),
+            **self.conversation_manager.session_record,
+        }
+        (self.task.attempt_path / "claude_code_session.json").write_text(
+            json.dumps(record, indent=2, default=str))
+
     async def _cleanup_components(self) -> None:
         """Cleanup components"""
         if self.containment_roots is not None and self.task.attempt_path:
@@ -452,6 +529,12 @@ class ClaudeCodeScaffold(BaseScaffold):
                 self._write_containment_audit()
             except Exception:
                 self.logger.error(f"containment audit failed:\n{traceback.format_exc()}")
+        if (self.conversation_manager and self.task.attempt_path
+                and self.task.config.subscription_route):
+            try:
+                self._write_session_record()
+            except Exception:
+                self.logger.error(f"session record failed:\n{traceback.format_exc()}")
 
         # 1. Cleanup conversation
         if self.conversation_manager:
