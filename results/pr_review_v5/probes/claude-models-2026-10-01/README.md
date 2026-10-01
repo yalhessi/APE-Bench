@@ -253,3 +253,42 @@ Each row above that is a defect has a commit on `hygiene-layer` (2026-10-01): `0
 path spelling for the LSP tools), `0a3d7d33` (snippet probe, deletion, Mathlib's linters on
 whole-file compiles), `f8a65df5` (single-token names), `786f00a1` (`proof_profile` out of the
 grant), `332631a4` (the tool line names `mcp__core__` and Read, Grep and Glob).
+
+## Hygiene rep 1: Layer 0's reading (2026-10-01, `hygiene_reading.py`)
+
+`probe_dev_opus55_contract2_hygiene_claude_sub_rep1`: H-claude on the hygiene layer's tools
+(`configs/pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml`: `Write` and `Edit`
+granted and contained to `scratch/`, solo budget 40, `proof_profile` out of the grant; the tool
+commits `01b09ce7`..`786f00a1`). 15 of 15 sessions, every containment audit clean and usable,
+19.3M processed tokens (max session 4.2M), nothing billed; `completion_status=complete`, 93
+findings. Launched 14:23, closed 14:50.
+
+**The rule** (plan §5, Layer 0: no recall rule; the truncation and the contradiction gone, and
+held-out findings not below 77):
+
+| | H-claude reps 1, 2 | hygiene rep 1 |
+|---|---|---|
+| held-out findings | 77, 77 | **75** |
+| control-PR findings (33304, 33315) | 1, 1 | 1, 1 |
+| first message names one root | no (two) | yes, 15 of 15 |
+| budget truncations | 1, 1 (silent) | 0 (33149 filed 18 of 40) |
+| tool calls refused, errored or unanswerable | 7 LSP, 15 `declaration_search`, 7 malformed deletions, 1 `proof_profile`, 2 misnamed | **1** (`declaration_search` on prose) in 372 calls |
+| hover / goto / goal | 7 of 9 refused | 2 goal calls, both answered |
+| `lean_verify_edit` results carrying the linter split | 0 | 71 of 82 |
+| built-in writes | not granted | granted, **used 0 times** |
+
+**By the rule: not met, by two findings.** 75 against the 77 bar, with one run on each side;
+H-claude's two reps spread 99 to 97 total candidates, so two held-out findings is inside one
+run's noise and is not evidence of a volume cost. The two structural conditions are met: no
+truncation, one root. What the layer was built for is visible in the tools column: the refusals
+and errors that cost 30 turns across the three Opus runs are gone, and the goal tool answered
+for the first time in the record under Claude Code.
+
+**Two things the run says that the rule did not ask.** The reviewer did not write a single file
+although it could; the account still lives only in the final `notes`, so the "running notes"
+condition is unmeasured by this run and needs an instruction, not a grant. And `lean_verify`
+was called 38 times as the snippet probe, 19 answers and 19 negatives, as described.
+
+**Not read:** recall. The judge was not run (about $0.20 on `gpt_5_mini`); reps 2 and 3 after
+the weekly window resets (2026-10-02 10:00) complete the re-baseline, and the three are judged
+together as mean / union / stable against H-claude's 7, 7.
