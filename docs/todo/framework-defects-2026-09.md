@@ -310,7 +310,7 @@ had been counting each turn twice. Residual per session, estimated with caching:
 and 2.4x the output of APE-Agent, about $0.09 against $0.05. That is the harness's own difference,
 from one set of runs.
 
-**Claude on a subscription: built on `claude-subscription` (2026-10-01), not yet run end to end.**
+**Claude on a subscription: built on `claude-subscription` (2026-10-01), and run end to end once.**
 Each item above has a fix and a test (`bcdf81e`, `75d85bd`). The scaffold config pins
 `claude_model`, `cli_version` and `effort`. The login travels as `CLAUDE_CODE_OAUTH_TOKEN`, and
 both the preflight and the scaffold refuse a run without it. Usage comes from the stream's
@@ -348,10 +348,13 @@ Claude sessions. They ran as subagents of a Claude Code session, and today's ses
 `CLAUDE_EFFORT=xhigh`, but nothing shows what the swap ran at. So the H-claude cell carries an
 effort guess against the swap, and should say so.
 
-**What would close it:** a token from `claude setup-token`, exported in the launching shell; then
-one smoke on a small post-cutoff PR (41930 or 43192, as the relay smokes were), audited clean and
-usable, with `claude_code_session.json` showing the pinned model, version and `apiKeySource:
-none` (the check refuses anything else, and nothing has shown what the setup token reports).
+**Run end to end (`fd971ce`).** The smoke ran on PR 41930: claude-opus-5-5 on CLI 2.1.285 at
+xhigh, with `apiKeySource: none` on the setup token. Its audit was clean and usable (8 tool
+calls), and it used 84,797 tokens over 5 replies, billing nothing. It filed no findings, as both
+G runs did there. The launch needs `PYTHONPATH=$PWD/src` in a worktree. Without it, the first
+attempt failed on four validation errors, and `load_run` now refuses that mix by name
+(`4369298`). **Still open:** whether the inherited caps (40 replies, 1.8M tokens) bind on a large
+PR. The probe harness ran Claude uncapped at 35-58 tool calls a session.
 
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
