@@ -482,6 +482,17 @@ stayed at 0.20, so breadth without the per-object pass did not help. The untried
 contract itself -- an object-by-object ledger in the submission, the preamble's anti-text and
 batching lines dropped, `file_search` granted -- on gpt_5.2 carried, judged on the held-out 12.
 
+**The contract condition, as built (2026-10-01, $9.36; `results/pr_review_v5/probes/contract-2026-10-01/`).**
+It has all four differences: `review_notes`, `filing_bar: request`, `batch_preamble: plain` and
+`file_search`. Issue recall is 0.130 (3 of 23, reachable 0.167), the same count as Grc1, so by the
+pre-registered rule it is **not a lever as built**. gpt said a third more (42 findings on 40
+targets, against 31 on 30) and hit less per finding (0.071). Its ledger, a median of 8.5 bullets
+per PR against Claude's 23.5-33.5, names each object and concludes about its proof or docs. It does
+not take objects through the concern families, as Claude's "concern families checked with nothing
+to request" does. In the sessions read, the misses are still `attempted_concluded_fine`. Untried,
+listed there: a family-by-object ledger, the account written during the session, a Claude
+Code-like harness, the contract on gpt-5.5, identical grants. One run; provisional.
+
 **Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
 `SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
 (in-sample) gpt-5.5 files the three 43192 asks it had withheld, q 0.67 → 0.93. **On validation it
