@@ -45,6 +45,7 @@ RUNS = {  # label -> (run, judge audit, Claude packet reviewer or None)
     "gpt Grc1": ("probe_dev_gpt52_Grc_rep1", "probe-dev-gpt52-Grc-rep1", None),
     "gpt contract": ("probe_dev_gpt52_Grc_contract_rep1", "probe-dev-gpt52-Grc-contract-rep1", None),
     "gpt contract2": ("probe_dev_gpt52_Grc_contract2_rep1", "probe-dev-gpt52-Grc-contract2-rep1", None),
+    "gpt55 contract2": ("probe_dev_gpt55_Grc_contract2_rep1", "probe-dev-gpt55-Grc-contract2-rep1", None),
     "gpt-5.5 carried": ("probe_dev_gpt55_Grc_rep1", "probe-dev-gpt55-Grc-rep1", None),
     "gpt off": ("probe_dev_gpt52_G_rep1", "probe-dev-gpt52-G-rep1", None),
 }
@@ -133,7 +134,7 @@ def main():
 
     sessions = {label: (claude_sessions(who) if who else gpt_sessions(run))
                 for label, (run, _audit, who) in RUNS.items() if label in
-                ("Claude X1", "Claude X2", "gpt Grc1", "gpt contract", "gpt contract2")
+                ("Claude X1", "Claude X2", "gpt Grc1", "gpt contract", "gpt contract2", "gpt55 contract2")
                 and (who or (Path(".ape/runs") / run / "tasks").is_dir())}
     print("\nC. tool calls per session, median")
     print(f"{'':14}" + "".join(f"{t[:10]:>11}" for t in TOOLS) + f"{'all':>6}")

@@ -336,3 +336,28 @@ Read beside it: Claude's tool calls, edits compiled, lookups and notes coverage 
 against its own under brief X.
 
 One run each, so provisional.
+
+### Result, gpt-5.5 under contract v2 (2026-10-01): it investigates like Claude, and files a third as much
+
+The run completed 15 of 15 sessions for $19.52 billed: no retries, no truncations, max 40 of 160
+turns. Judge v9, audit `probe-dev-gpt55-Grc-contract2-rep1`.
+
+| (held-out 12) | issue recall | reachable | findings | targets | hits / finding | notes cover declarations | notes mention naming / generality | tool calls | edits compiled | library lookups |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Claude X1 / X2 | 0.478 | 0.583 | 90 / 97 | 76 / 83 | 0.12 / 0.11 | 73% / 78% | 100% / 92%, 83% / 75% | 58 / 57 | 9.5 / 11.5 | 17 / 19.5 |
+| **gpt-5.5, contract v2** | **0.130** | 0.250 | 30 | 29 | 0.100 | **82%** | **100%, 92%** | 41 | **9.5** (+3.5 snippets) | 6 |
+| gpt_5.2, contract v2 | 0.087 | 0.167 | 34 | 34 | 0.059 | 73% | 83%, 58% | 30 | 2 (+1) | 2.5 |
+| gpt-5.5 carried, brief G | 0.130 | 0.167 | 33 | 32 | 0.091 | - | - | | | |
+
+**By the pre-registered rule, not a lever for this model**: 3 obligations (the two 33149 axiom
+asks and one proof-golf ask), the same count as gpt-5.5 under brief G.
+
+What gpt-5.5 under v2 now matches, or passes, in Claude's work: the declarations its notes cover,
+the concerns they take each one through, and the candidate edits it compiles. What it does not
+match: library lookups (6 against 17-19.5) and, above all, how much it files. That is 2.5
+findings a PR against 7.5-8, at about Claude's hits per finding. So, on this model, the remaining
+gap is not attention, the contract or investigation by compile. It is the decision to file, plus
+library search. The model looks at what Claude looks at, compiles what Claude compiles, and
+concludes "nothing to ask" two times in three where Claude asks.
+
+One run, 23 obligations: provisional.
