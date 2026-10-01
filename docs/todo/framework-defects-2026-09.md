@@ -374,10 +374,11 @@ housekeeping calls (about 1K tokens a query in the probes, under 0.1% here). A f
 turn-limited session does get its result. To recover the notional cost, price the recorded
 tokens.
 
-`code_hover` and `code_goto` take `file_path` relative to `workspaces/`, while
+`code_hover`, `code_goto` and `get_lean_goal` take `file_path` relative to `workspaces/`, while
 `lean_verify_edit` takes `path` relative to the reviewed target. A reviewer that uses one
 convention for both fails the hover with "Cannot find Lean project". It happened once in each of
-four runs: one APE-Agent, two Claude Code on the relay, and the calibration. It is minor, but it
+four runs: one APE-Agent, two Claude Code on the relay, and the calibration. In the plan's
+dev cells it recurred in `code_goto` (H-claude rep 1) and `get_lean_goal` (H-claude rep 2). It is minor, but it
 is the same family as the `lean_verify` path defect below.
 
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
