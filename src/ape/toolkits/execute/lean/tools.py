@@ -115,8 +115,13 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
                     # 1. Resolve full path
                     full_file_path = (self.task.workspaces_dir / file_path).resolve()
 
-                    # 2. Security check: ensure path is within workspaces_dir
-                    if not full_file_path.is_relative_to(self.task.workspaces_dir):
+                    # 2. Security check: the file must resolve inside this task's workspace or a
+                    #    workspace it links to (`provisioned_roots`); step 3 narrows that to scratch
+                    #    and target. It compared the resolved path with the unresolved directory, so
+                    #    every target/ file, which resolves into the shared store, was refused here:
+                    #    13 of 18 calls under ape_agent and 29 of 32 under claude_code (2026-10-01).
+                    from ape.utils.file_ops import provisioned_roots, within_roots
+                    if not within_roots(full_file_path, provisioned_roots(self.task.workspaces_dir)):
                         return {
                             "success": False,
                             "error": f"File path outside workspaces directory: {file_path}"

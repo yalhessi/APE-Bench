@@ -12,7 +12,7 @@ import tempfile
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any, Tuple, Union, List
+from typing import Optional, Dict, Any, Iterable, Sequence, Tuple, Union, List
 from contextlib import contextmanager
 
 import aiofiles
@@ -481,3 +481,42 @@ def normalize_repo_url(repo_url: str) -> str:
         raise ValueError(f"Cannot extract repo name from URL: {repo_url}")
 
     return repo_name
+
+
+# =============================================================================
+# Where a task's workspace reaches
+# =============================================================================
+
+def provisioned_roots(workspaces_dir: Path, extra: Iterable[Path] = ()) -> List[str]:
+    """The directories a task's workspace reaches: itself, and where its links lead.
+
+    Each link directly in the workspace (`target`, `reference/<name>`) adds its resolved home,
+    and each link directly in that home adds the directory it resolves into: for a reviewed
+    workspace, the base checkout it is built on. Nothing else in the shared store is reachable.
+    One rule for both of its readers: lean_verify's path check and Claude Code's containment.
+    """
+
+    workspaces_dir = Path(os.path.abspath(workspaces_dir))
+    # The resolved spelling too: a process's working directory is resolved, so under a linked
+    # `.ape/` (every worktree) Claude Code reports workspace files by their resolved paths.
+    roots = {str(workspaces_dir), os.path.realpath(workspaces_dir)}
+    roots.update(os.path.abspath(p) for p in extra)
+    links = [p for p in workspaces_dir.iterdir() if p.is_symlink()]
+    reference = workspaces_dir / "reference"
+    if reference.is_dir() and not reference.is_symlink():
+        links.extend(p for p in reference.iterdir() if p.is_symlink())
+    for link in links:
+        home = Path(os.path.realpath(link))
+        if not home.is_dir():
+            continue
+        roots.add(str(home))
+        for entry in home.iterdir():
+            if entry.is_symlink():
+                roots.add(os.path.dirname(os.path.realpath(entry)))
+    return sorted(roots)
+
+
+def within_roots(path, roots: Sequence[str]) -> bool:
+    """Whether `path`, compared as given, sits under one of `roots`."""
+    path = str(path)
+    return any(path == root or path.startswith(root.rstrip(os.sep) + os.sep) for root in roots)

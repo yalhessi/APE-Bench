@@ -28,7 +28,9 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
+
+from ape.utils.file_ops import provisioned_roots, within_roots
 
 #: Built-in tool -> the input keys that name a filesystem location.
 PATH_KEYS: Dict[str, tuple] = {
@@ -54,38 +56,6 @@ REFUSAL_MARK = "[ape containment]"
 CLI_REFUSAL_MARKS = ("Permission to use", "has been denied")
 
 
-def provisioned_roots(workspaces_dir: Path, extra: Iterable[Path] = ()) -> List[str]:
-    """The directories a session may touch: its workspace, and where the workspace's links lead.
-
-    Each link directly in the workspace (`target`, `reference/<name>`) adds its resolved home,
-    and each link directly in that home adds the directory it resolves into: for a reviewed
-    workspace, the base checkout it is built on. Nothing else in the shared store is reachable.
-    """
-
-    workspaces_dir = Path(os.path.abspath(workspaces_dir))
-    # The resolved spelling too: a process's working directory is resolved, so under a linked
-    # `.ape/` (every worktree) Claude Code reports workspace files by their resolved paths.
-    roots = {str(workspaces_dir), os.path.realpath(workspaces_dir)}
-    roots.update(os.path.abspath(p) for p in extra)
-    links = [p for p in workspaces_dir.iterdir() if p.is_symlink()]
-    reference = workspaces_dir / "reference"
-    if reference.is_dir() and not reference.is_symlink():
-        links.extend(p for p in reference.iterdir() if p.is_symlink())
-    for link in links:
-        home = Path(os.path.realpath(link))
-        if not home.is_dir():
-            continue
-        roots.add(str(home))
-        for entry in home.iterdir():
-            if entry.is_symlink():
-                roots.add(os.path.dirname(os.path.realpath(entry)))
-    return sorted(roots)
-
-
-def _inside(path: str, roots: Sequence[str]) -> bool:
-    return any(path == root or path.startswith(root.rstrip(os.sep) + os.sep) for root in roots)
-
-
 def violation(tool_name: str, tool_input: Dict[str, Any], roots: Sequence[str],
               cwd: str) -> Optional[str]:
     """Why this call leaves the workspace, or None when it stays inside."""
@@ -105,7 +75,7 @@ def violation(tool_name: str, tool_input: Dict[str, Any], roots: Sequence[str],
             return f"{tool_name}.{key} is not a path"
         # A Glob pattern is joined to its base; normpath collapses `..` lexically, wildcards and all.
         joined = os.path.join(base if key == "pattern" else cwd, value)
-        if not _inside(os.path.normpath(joined), roots):
+        if not within_roots(os.path.normpath(joined), roots):
             return f"{tool_name}.{key} leaves this review's workspace: {value}"
     return None
 
