@@ -202,3 +202,44 @@ against 28%, 33421 (39) 64% against 46%. Below 14 declarations the coverage is t
 summarises by file ("reviewed new lemma X and new simp lemmas A, B, C, D ... no conflicts")
 where Claude goes declaration by declaration. In gpt's prompt the object list comes last, after
 the diff and the submission instructions. Claude read it second, before the diff. Untested as a cause.
+
+## Contract v2 (pre-registered 2026-10-01, before its run)
+
+This adds the prompt audit's changes to the contract condition: every item of gpt-only prompt text,
+traced to its origin, either removed or made like Claude's, plus Claude's ledger. It is
+`configs/pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml`, which extends the contract config:
+
+| item | origin | in v2 |
+|---|---|---|
+| "Investigate ... look for existing declarations that overlap, check whether a proof could be shorter" | first solo prompt, 28d40719 | dropped (`user_prompt: v2`) |
+| the `concern_family` / `issue_kind` lists, "Label a finding" | candidate-validator plumbing, ee44dee3 | not asked; the imported-Claude pair (`other`, `style_norm_violation`) stamped on every finding, so both reach the judge alike |
+| "at most 20 findings" | the lead's ceiling, 28d40719 | not shown; the cap stays in code (it never bound) and now warns when it truncates |
+| "You MUST ... fails the task", "A text-only response is INVALID" | 2026-08-25 | the empty-review path kept, the threat dropped |
+| the PR model after the diff and the instructions | the probe's append mechanism | before the diff; brief_G2.md reorders brief G's one sentence to match |
+| the `<environment>` section ("rapid iteration and experimentation") | APE framework boilerplate | dropped (`workspace_environment: false`) |
+| notes "an entry per object" | contract build, 7a004d71 | `notes_form: per_object_family`: an entry per changed declaration, each taken through the concerns that apply (proof, statement and generality, library duplicate, name, docstring, attributes and placement), closed with a verdict |
+
+Kept: `path` and `line_start` (the anchoring pass keys on them), `filing_bar: request`, the plain
+preamble, `file_search`, Grc1's model, effort, carry-over, tools and caps. Built in 59147706 and
+eac39d40; the defaults render every earlier prompt byte for byte. `cli plan`: 15 of 15 reviewed
+workspaces, worst case $201.00 under $201.50. The run is `probe_dev_gpt52_Grc_contract2_rep1`, and
+about $10 is expected (the contract run billed $9.36).
+
+**Reading rule, unchanged.** On the held-out 12 gold (23 obligations; Grc1 and the contract both
+3): issue recall ≥ 0.26 (6 obligations) is a lever; ≤ 0.174 (4) is not, as built; 5 is undecided.
+
+Read beside it, from `breadth.py` and `focus.py`:
+- notes coverage of the PR model's declarations (contract 37%, Claude 73-78%) and notes family
+  mentions (naming 50%, generality 17%; Claude 92-100% and 75-83%);
+- findings, targets (40; Claude 76-83), hits per finding (0.071; Claude about 0.12);
+- candidate edits compiled and library lookups per session (contract 1.5 and 1.5; Claude
+  9.5-11.5 and 17-19.5).
+
+The two readings that matter:
+- Coverage and family mentions near Claude's with recall still about 3 would mean the ledger was
+  carried over and is not the lever. What remains is the model or the harness, and the swap
+  (Claude under gpt's prompt) is the test that says which.
+- Coverage still near 37% would mean gpt does not follow the ledger as written. That is a fact
+  about the model under this instruction, not a test of the ledger.
+
+One run, so provisional either way.

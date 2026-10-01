@@ -29,6 +29,7 @@ RUNS = {
     "gpt-5.5 carried": ("probe_dev_gpt55_Grc_rep1", "probe-dev-gpt55-Grc-rep1"),
     "gpt-5.4 carried": ("probe_dev_gpt54_Grc_rep1", "probe-dev-gpt54-Grc-rep1"),
     "gpt-5.2 contract": ("probe_dev_gpt52_Grc_contract_rep1", "probe-dev-gpt52-Grc-contract-rep1"),
+    "gpt-5.2 contract2": ("probe_dev_gpt52_Grc_contract2_rep1", "probe-dev-gpt52-Grc-contract2-rep1"),
 }
 BULLET = re.compile(r"^\s*[-*]\s+", re.M)
 CLAUDE_NOTES = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{who}/notes.md"

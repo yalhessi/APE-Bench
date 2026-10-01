@@ -5,7 +5,9 @@ A. findings per concern family: share and count, multi-label, from one keyword c
 B. gold asks hit, by the ask's `concern_labels`;
 C. tool calls per session, parsed from the conversation (`tool_use` blocks in the last, cumulative
    turn file) for gpt and from `calls.jsonl` (the `ptool` log) for Claude;
-D. share of PRs whose notes mention each family.
+D. share of PRs whose notes mention each family;
+E. share of the PR model's changed declarations (`## Objects`, commands excluded) the notes name,
+   in full or by leaf name, per PR and median.
 
 The classifier is coarse and shared, so read A for differences between reviewers, not as labels.
 Run from the repo root: `ape/bin/python results/pr_review_v5/probes/contract-2026-10-01/focus.py`.
@@ -42,6 +44,7 @@ RUNS = {  # label -> (run, judge audit, Claude packet reviewer or None)
     "Claude X2": ("probe_dev_claude_X2", "probe-dev-claude-X2", "X2"),
     "gpt Grc1": ("probe_dev_gpt52_Grc_rep1", "probe-dev-gpt52-Grc-rep1", None),
     "gpt contract": ("probe_dev_gpt52_Grc_contract_rep1", "probe-dev-gpt52-Grc-contract-rep1", None),
+    "gpt contract2": ("probe_dev_gpt52_Grc_contract2_rep1", "probe-dev-gpt52-Grc-contract2-rep1", None),
     "gpt-5.5 carried": ("probe_dev_gpt55_Grc_rep1", "probe-dev-gpt55-Grc-rep1", None),
     "gpt off": ("probe_dev_gpt52_G_rep1", "probe-dev-gpt52-G-rep1", None),
 }
@@ -100,6 +103,9 @@ def main():
     print("A. findings touching each family: share (count), multi-label")
     print(f"{'':16}" + "".join(f"{k[:11]:>13}" for k in FAM) + f"{'n':>5}")
     for label, (run, _audit, _who) in RUNS.items():
+        if not Path(f"results/pr_review_v5/runs/{run}/findings.jsonl").is_file():
+            print(f"{label:16} (no run yet)")
+            continue
         rows = [json.loads(l) for l in open(f"results/pr_review_v5/runs/{run}/findings.jsonl") if l.strip()]
         rows = [r for r in rows if r["pr_number"] in HO]
         counts = collections.Counter(f for r in rows for f in families(
@@ -117,6 +123,9 @@ def main():
     print(f"{'':16}" + "".join(f"{n[:10]:>11}" for n in names))
     print(f"{'gold':16}" + "".join(f"{list(label_of.values()).count(n):11}" for n in names))
     for label, (_run, audit, _who) in RUNS.items():
+        if not Path(f"results/pr_review_v5/audits/{audit}/semantic_matches.jsonl").is_file():
+            print(f"{label:16} (not judged yet)")
+            continue
         hit = {json.loads(l)["obligation_id"]
                for l in open(f"results/pr_review_v5/audits/{audit}/semantic_matches.jsonl")
                if json.loads(l).get("issue_match")}
@@ -124,7 +133,8 @@ def main():
 
     sessions = {label: (claude_sessions(who) if who else gpt_sessions(run))
                 for label, (run, _audit, who) in RUNS.items() if label in
-                ("Claude X1", "Claude X2", "gpt Grc1", "gpt contract")}
+                ("Claude X1", "Claude X2", "gpt Grc1", "gpt contract", "gpt contract2")
+                and (who or (Path(".ape/runs") / run / "tasks").is_dir())}
     print("\nC. tool calls per session, median")
     print(f"{'':14}" + "".join(f"{t[:10]:>11}" for t in TOOLS) + f"{'all':>6}")
     for label, prs in sessions.items():
@@ -143,6 +153,40 @@ def main():
                 for p in FAM.values()) + f"   (n={len(notes)})")
         else:
             print(f"{label:14} (no notes asked for)")
+
+    print("\nE. the PR model's changed declarations the notes name")
+    labels = [label for label, prs in sessions.items() if any(n for _, n in prs.values())]
+    print(f"{'PR':6} {'decls':>5}" + "".join(f"{label[-10:]:>13}" for label in labels))
+    rates = collections.defaultdict(list)
+    for pr in HO:
+        declarations = model_declarations(pr)
+        if not declarations:
+            continue
+        row = []
+        for label in labels:
+            notes = sessions[label].get(pr, (None, ""))[1]
+            rate = sum(notes_name(d, notes) for d in declarations) / len(declarations)
+            rates[label].append(rate)
+            row.append(rate)
+        print(f"{pr:6} {len(declarations):5}" + "".join(f"{r:13.0%}" for r in row))
+    print(f"{'median':12}" + "".join(f"{statistics.median(rates[label]):13.0%}" for label in labels))
+
+
+def model_declarations(pr):
+    """The changed declarations the PR model lists, commands excluded."""
+
+    model = Path(PACKET.format(pr=pr, who="X1")) / "model.md"
+    section = model.read_text().split("## Objects", 1)[1].split("\n## ", 1)[0]
+    return [name for name, kind in re.findall(r"^### `([^`]+)` \(([^,]+), ", section, re.M)
+            if kind != "command"]
+
+
+def notes_name(declaration, notes):
+    """Whether the notes name the declaration, in full or by a leaf name of four or more characters."""
+
+    leaf = declaration.rsplit(".", 1)[-1]
+    return declaration in notes or (len(leaf) > 3 and re.search(
+        r"(?<![\w.'])" + re.escape(leaf) + r"(?![\w'])", notes) is not None)
 
 
 if __name__ == "__main__":
