@@ -534,6 +534,9 @@ def test_a_single_token_name_is_searched_as_given(tmp_path, monkeypatch):
     result = asyncio.run(tool(identifier="Meromorphic"))
     assert result["success"] and result["searched_terms"] == ["Meromorphic"]
     assert result["declared_before_this_pr"] == 1
+    # A Lean name carries Greek letters and subscripts; `tensorμ` was the hygiene rep's one refusal.
+    for name in ("tensorμ", "α₁_le", "Measure.μ'"):
+        assert asyncio.run(tool(identifier=name))["searched_terms"] == [name], name
     # Prose is still prose.
     refused = asyncio.run(tool(identifier="the new declaration should be removed"))
     assert not refused.get("success") or all(

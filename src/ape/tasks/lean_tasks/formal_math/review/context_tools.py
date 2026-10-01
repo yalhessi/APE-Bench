@@ -39,7 +39,9 @@ MAX_SNIPPET = 400
 
 #: One token that could be a Lean declaration name, as `declaration_search` accepts it when the
 #: prose filter finds nothing (`Meromorphic`, `Fintype`, `abelianizeAdj`, `foo'`, `ne_zero!`).
-_ONE_IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_'!?.]*")
+#: Unicode letters and subscripts are part of a Lean name: the ASCII form of this rule refused
+#: `tensorμ`, the one refused call of the hygiene rep (2026-10-01).
+_ONE_IDENTIFIER_RE = re.compile(r"[^\W\d][\w'!?.₀-₉]*")
 
 
 def _append_trace(task, row: Dict[str, Any]) -> None:
