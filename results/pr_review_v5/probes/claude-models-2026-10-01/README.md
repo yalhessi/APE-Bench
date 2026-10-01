@@ -7,8 +7,15 @@ per-invocation prompts are identical to the ape_agent contract-v2 run's: 1605 of
 in the first user message) and then the model.
 
 Route: Claude Code on the subscription (`claude-subscription`: `75d85bd`, `ea47258`), CLI 2.1.285,
-effort xhigh. xhigh is a guess, since the probe harness recorded none. Caps are contract v2's
-(160 replies, 16.08M tokens a session).
+effort xhigh. Caps are contract v2's (160 replies, 16.08M tokens a session).
+
+**The swap ran at the same effort, on the same CLI, as the same model.** The probe harness wrote
+no effort into its packets, but Claude Code 2.1.285 writes `effort` into every transcript entry.
+The swap's 13 subagent transcripts (session `029323d7`, `~/.claude/projects/`) read `xhigh`,
+`2.1.285` and `claude-opus-5-5` on every assistant entry. The one `<synthetic>` entry is the 33294
+attempt the safety classifier stopped. H-claude's own transcripts read `xhigh` / `2.1.285`. So
+H-claude against the swap varies the harness alone: the probe harness's subagent against the
+project's Claude Code session, with its preamble, MCP tools and containment.
 
 ## H-claude, dev: 7 of 23, at the rule's boundary (one run, provisional)
 
