@@ -28,8 +28,14 @@ PROBE_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
                ("pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml",
                 "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_claude.yaml")]
 
+#: The same conditions under Codex, held to the same identity.
+CODEX_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_G_codex.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_codex.yaml")]
 
-@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS)
+
+@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS + CODEX_PAIRS)
 def test_the_two_solo_conditions_differ_only_in_their_scaffold(ape_name, claude_name):
     ape = load_yaml(Path("configs") / ape_name)
     claude = load_yaml(Path("configs") / claude_name)
@@ -40,10 +46,11 @@ def test_the_two_solo_conditions_differ_only_in_their_scaffold(ape_name, claude_
     assert ape.get("llm_config") == claude.get("llm_config"), (
         "same model, or the contrast is a model comparison")
     assert ape["scaffold_type"] == "ape_agent"
-    assert claude["scaffold_type"] == "claude_code"
+    assert claude["scaffold_type"] == ("codex" if (ape_name, claude_name) in CODEX_PAIRS else "claude_code")
+    assert ape.get("execution") == claude.get("execution"), "the turn limit is part of the condition"
 
 
-@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS)
+@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS + CODEX_PAIRS)
 def test_both_conditions_carry_the_same_pr_set_and_cost_cap(ape_name, claude_name):
     ape = load_yaml(Path("configs") / ape_name)["dataset"]
     claude = load_yaml(Path("configs") / claude_name)["dataset"]
@@ -89,3 +96,17 @@ def test_the_solo_conditions_scope_the_prs_their_judge_config_scores(name):
 
     scored = set(judge["pr_numbers"]) | set(judge.get("control_pr_numbers") or [])
     assert scored == set(config["pr_numbers"]), sorted(scored ^ set(config["pr_numbers"]))
+
+
+@pytest.mark.parametrize("name", [p[1] for p in CODEX_PAIRS])
+def test_the_codex_condition_has_no_shell_and_only_apes_tools(name):
+    """With a shell, Codex reads anything on disk: this repository's gold, the future mathlib clone.
+    A read-only sandbox stops writes, not reads, so the shell itself is what goes."""
+
+    config = load_yaml(Path("configs") / name)
+    assert {"shell_tool", "unified_exec"} <= set(config["disabled_features"])
+    assert {"browser_use", "computer_use", "apps", "plugins", "multi_agent"} <= set(config["disabled_features"])
+    assert config["sandbox_mode"] == "read-only"
+    assert config["web_search"] is False
+    assert config["relayed_builtin_tools"] == ["update_plan"]
+    assert config["list_mcp_tools_upfront"] is True

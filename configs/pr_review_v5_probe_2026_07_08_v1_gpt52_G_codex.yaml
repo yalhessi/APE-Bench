@@ -1,0 +1,20 @@
+# CONDITION X (Codex) on the post-cutoff set: the G condition, unchanged, under Codex.
+#
+# gpt_5.2 reaches Codex through the scaffold's Responses relay; everything the model is held to --
+# its settings, brief_G.md, the packet, APE's tools, the cutoff gate, the turn limit and the session
+# cap -- is G's, held equal by test_pr_review_v5_solo_conditions. Codex is told the model is
+# gpt-5.2, so it uses its own prompt for that model, with the MCP tools listed up front.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml
+
+scaffold_type: codex
+
+# Containment. No shell (shell_tool, unified_exec), no edits that land (a read-only sandbox), no web,
+# none of the built-ins a review has no use for, and of Codex's own tools only update_plan (Claude
+# Code's TodoWrite): its tools are APE's, the same grant as APE-Agent. Every attempt carries
+# containment_audit.json from its event log; none is read unless it is clean and usable.
+sandbox_mode: read-only
+approval_policy: never
+web_search: false
+disabled_features: [shell_tool, unified_exec, browser_use, computer_use, image_generation, apps, plugins, multi_agent, memories, goals]
+relayed_builtin_tools: [update_plan]
+list_mcp_tools_upfront: true
