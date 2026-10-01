@@ -42,6 +42,7 @@ FAM = {
 RUNS = {  # label -> (run, judge audit, Claude packet reviewer or None)
     "Claude X1": ("probe_dev_claude_X1", "probe-dev-claude-X1", "X1"),
     "Claude X2": ("probe_dev_claude_X2", "probe-dev-claude-X2", "X2"),
+    "Claude swap": ("probe_dev_claude_swap_S1", "probe-dev-claude-swap-S1", "swap:S1"),
     "gpt Grc1": ("probe_dev_gpt52_Grc_rep1", "probe-dev-gpt52-Grc-rep1", None),
     "gpt contract": ("probe_dev_gpt52_Grc_contract_rep1", "probe-dev-gpt52-Grc-contract-rep1", None),
     "gpt contract2": ("probe_dev_gpt52_Grc_contract2_rep1", "probe-dev-gpt52-Grc-contract2-rep1", None),
@@ -50,6 +51,8 @@ RUNS = {  # label -> (run, judge audit, Claude packet reviewer or None)
     "gpt off": ("probe_dev_gpt52_G_rep1", "probe-dev-gpt52-G-rep1", None),
 }
 PACKET = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{who}"
+#: The swap's packets: Claude under gpt's contract-v2 messages; its notes are in `submission.json`.
+SWAP_PACKET = "results/pr_review_v5/probes/contract-2026-10-01/swap/pr{pr}/{who}"
 TOOLS = ["file_read", "content_search", "file_search", "declaration_search", "naming_norm",
          "precedent_search", "zulip_search", "lean_verify_edit", "lean_verify"]
 
@@ -85,12 +88,17 @@ def gpt_sessions(run):
 
 def claude_sessions(who):
     out = {}
+    swap = who.startswith("swap:")
     for pr in HO:
-        base = Path(PACKET.format(pr=pr, who=who))
+        base = Path((SWAP_PACKET if swap else PACKET).format(pr=pr, who=who.split(":")[-1]))
         if (base / "calls.jsonl").is_file():
             calls = collections.Counter(json.loads(l).get("tool") for l in (base / "calls.jsonl").open()
                                         if l.strip())
-            out[pr] = (calls, (base / "notes.md").read_text() if (base / "notes.md").is_file() else "")
+            if swap:
+                notes = json.loads((base / "submission.json").read_text()).get("notes", "")
+            else:
+                notes = (base / "notes.md").read_text() if (base / "notes.md").is_file() else ""
+            out[pr] = (calls, notes)
     return out
 
 
@@ -134,7 +142,8 @@ def main():
 
     sessions = {label: (claude_sessions(who) if who else gpt_sessions(run))
                 for label, (run, _audit, who) in RUNS.items() if label in
-                ("Claude X1", "Claude X2", "gpt Grc1", "gpt contract", "gpt contract2", "gpt55 contract2")
+                ("Claude X1", "Claude X2", "Claude swap", "gpt Grc1", "gpt contract", "gpt contract2",
+                 "gpt55 contract2")
                 and (who or (Path(".ape/runs") / run / "tasks").is_dir())}
     print("\nC. tool calls per session, median")
     print(f"{'':14}" + "".join(f"{t[:10]:>11}" for t in TOOLS) + f"{'all':>6}")

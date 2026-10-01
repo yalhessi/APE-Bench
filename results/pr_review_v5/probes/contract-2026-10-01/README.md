@@ -361,3 +361,47 @@ library search. The model looks at what Claude looks at, compiles what Claude co
 concludes "nothing to ask" two times in three where Claude asks.
 
 One run, 23 obligations: provisional.
+
+### Result, the swap (2026-10-01): Claude under gpt's prompt reaches its own level
+
+There were 12 sessions (`claude-opus-5-5`), every transcript audited:
+- seven were clean;
+- five had flags, all adjudicated benign in `swap/audit.json`. Four were the venv's Python running
+  the session's own `tmp/` scripts, which write tool arguments and the submission. One was an `ls`
+  of the session's own `ptool` raw-output directory;
+- the first 33294 attempt was stopped by the API's safety classifier after one call, and re-run
+  unchanged.
+
+`probe import` read 103 findings by `path` and line. 33149 had 28 past the 20 budget, as X1 and
+X2 had there (30 and 33). It anchored 99 (3.9% lost; gpt 4.2%). Judge v9 on the held-out 12, audit
+`probe-dev-claude-swap-S1`.
+
+| (held-out 12) | issue recall | reachable | findings | targets | hits / finding | notes cover | notes: naming / generality | tool calls | edits compiled | library lookups |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Claude X1 / X2, brief X | 0.478 | 0.583 | 90 / 97 | 76 / 83 | 0.12 / 0.11 | 73% / 78% | 100% / 92%, 83% / 75% | 58 / 57 | 9.5 / 11.5 | 17 / 19.5 |
+| **Claude, gpt's v2 prompt** | **0.435** | **0.500** | 99 | 84 | 0.101 | 82% | 100%, 83% | **35** | **6** | **2.5** |
+| gpt-5.5, the same prompt | 0.130 | 0.250 | 30 | 29 | 0.100 | 82% | 100%, 92% | 41 | 9.5 | 6 |
+| gpt_5.2, the same prompt | 0.087 | 0.167 | 34 | 34 | 0.059 | 73% | 83%, 58% | 30 | 2 | 2.5 |
+
+**By the pre-registered rule, the prompt text is not what holds gpt back.** That is 10
+obligations against X's 11 (≥ 8), and the hits fall in the same families as X's (correctness 2,
+duplication 2, proof-golf 2, style 2, docs 1, scope 1). Given the exact messages gpt read, Claude
+files what it files under brief X: 99 findings on 84 targets.
+
+**Nor is it investigation.** Under this prompt Claude did less than under brief X: 35 tool calls
+against 57-58, 6 edits compiled against 9.5-11.5, 2.5 lookups against 17-19.5. That is less than
+gpt-5.5 did under the same prompt. Yet it filed three times as much and reached three times the
+asks, at the same hits per finding as gpt-5.5. Across these runs, the variable that moves recall
+is how many changes the reviewer decides to ask for from what it has seen. Coverage, family
+attention, compiles and lookups do not move it.
+
+**What this does not separate:**
+- **Model from harness.** Claude ran as a Claude Code subagent and gpt in the `ape_agent` loop.
+- **Judgement from recall.** Dev is inside Claude's training window. Reaching its own level with
+  a third of its usual lookups and two thirds of its compiles is what memory of these PRs would
+  also produce. The post-cutoff measurement (2026-09-29: in-window reach 79-107% of its
+  post-cutoff rate) argues against recall being most of it, but at probe altitude and with a
+  different ask mix. The clean check is the swap on the post-cutoff set, scored by its blind
+  matchers. There is no judge gold there.
+
+One session per PR, 23 obligations: provisional.

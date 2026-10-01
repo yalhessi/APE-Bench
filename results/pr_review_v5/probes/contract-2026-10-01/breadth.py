@@ -24,6 +24,7 @@ HELD_OUT = [33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337
 RUNS = {
     "Claude X1": ("probe_dev_claude_X1", "probe-dev-claude-X1"),
     "Claude X2": ("probe_dev_claude_X2", "probe-dev-claude-X2"),
+    "Claude swap": ("probe_dev_claude_swap_S1", "probe-dev-claude-swap-S1"),
     "gpt-5.2 off": ("probe_dev_gpt52_G_rep1", "probe-dev-gpt52-G-rep1"),
     "gpt-5.2 carried": ("probe_dev_gpt52_Grc_rep1", "probe-dev-gpt52-Grc-rep1"),
     "gpt-5.5 carried": ("probe_dev_gpt55_Grc_rep1", "probe-dev-gpt55-Grc-rep1"),
@@ -39,7 +40,13 @@ CLAUDE_NOTES = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{w
 def notes_bullets(label, run):
     """Median bullet lines per held-out PR in the reviewer's account, or None without one."""
 
-    if label.startswith("Claude"):
+    if label == "Claude swap":
+        counts = []
+        for pr in HELD_OUT:
+            path = Path(f"results/pr_review_v5/probes/contract-2026-10-01/swap/pr{pr}/S1/submission.json")
+            if path.is_file():
+                counts.append(len(BULLET.findall(json.loads(path.read_text()).get("notes", ""))))
+    elif label.startswith("Claude"):
         who = label.split()[-1]
         counts = [len(BULLET.findall(Path(CLAUDE_NOTES.format(pr=pr, who=who)).read_text()))
                   for pr in HELD_OUT if Path(CLAUDE_NOTES.format(pr=pr, who=who)).is_file()]

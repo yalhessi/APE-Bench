@@ -507,6 +507,16 @@ edits compiled and 2.5 library lookups, against Claude's 57, 10 and 18. So its e
 checks it did not run, and the misses read as "nothing to ask" on the very declarations the
 maintainers asked about. The prompt is now as close to Claude's as these runs make it. **Next is
 the swap**, which says whether the remainder is the model or the harness.
+**Contract v2 on gpt-5.5, and the swap (2026-10-01).** gpt-5.5 under v2 reached 0.130 (3 of 23),
+not a lever, but it closes every input-side gap: its notes cover 82% of declarations, they mention
+naming and generality on 100% and 92% of PRs, and it compiles 9.5 edits a session, Claude's level.
+It files 30 findings to Claude's 90-97. **The swap**, Claude given gpt's v2 messages verbatim,
+reaches 0.435 (10 of 23; X 11), so by the rule the prompt is not what holds gpt back. It got there
+with fewer tool calls, compiles and lookups than gpt-5.5 made under the same prompt: 35, 6 and 2.5
+against 41, 9.5 and 6. Across every condition run, recall tracks how many changes the reviewer
+decides to ask for. Coverage, attention, compiles and lookups do not move it. Not separated:
+model from harness, and judgement from memory of these in-window PRs. The clean check is the swap
+on the post-cutoff set, by blind matchers.
 
 **Phase 3.1, the filing bar (2026-09-30, $47.64; `results/pr_review_v5/probes/filing-bar-2026-09-30/`).**
 `SoloReviewConfig.filing_bar: request` removes every merge verdict from the task. On post-cutoff
