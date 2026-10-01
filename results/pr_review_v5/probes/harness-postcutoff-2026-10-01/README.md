@@ -109,3 +109,73 @@ Seal `blinding_carried_SEALED.json`, sources `sources_carried.json`, matcher out
 matchers, with `|d| <= 0.05` comparable, `d >= 0.10` Claude Code more, `d <= -0.10` APE-Agent
 more, and anything else inconclusive. A session that stopped at its cap without submitting is
 matched as an empty review, marked, and counted.
+
+### Result, reasoning carried (matched 2026-10-01)
+
+Two blind matchers on the seal `b7a7ca4`, both audited clean (7 calls each, none flagged), agreeing
+on all 128 cells.
+
+| reach over 16 asks | A1 | A2 | A3 | **A** | C1 | C2 | C3 | **C** | X | **d = C - A** |
+|---|---|---|---|---|---|---|---|---|---|---|
+| both matchers | .3125 | .125 | .1875 | **.208** | .25 | .25 | .25 | **.250** | **.469** | **+0.042** |
+
+**By the rule: comparable** (`|d| <= 0.05`). With reasoning carried, too, the APE-Agent harness is
+not what limits `gpt_5.2` against Claude Code. `q`: A 0.44, C 0.53.
+
+- **Which asks.** C's three sessions each reach the same 4 asks: the unused import, the title's
+  "of", dropping `[L.NeBot]`, and `@[to_additive]`. A's union is 5 asks, those 4 plus the
+  `cat_disch` default on `mk` (A1 only), but only the import and the title are stable across A's
+  sessions. Neither condition reaches `homMk`, the `mkHom` default, or the `_anti` rename.
+- **Against reasoning off** (this folder's first comparison), carried reasoning raises reach for
+  both harnesses: A 0.146-0.167 to 0.208, C 0.125 to 0.250. Findings fall from 15-19 a session to
+  6-8, and asks per finding rise from 0.13-0.14 to 0.52-0.56. Read across two seals and two matcher
+  pairs, not pre-registered.
+- **Cost.** Billed for three repetitions: A $7.81, C $10.19.
+
+**Grc's earlier 0.44 does not replicate here.** Test (e) amended matched one Grc run (before the
+`lean_verify` fix) at 0.4375, q 0.93, and read it as closing the gap. Three runs of the same
+configuration, with the fix, reach 0.31, 0.125 and 0.19, mean 0.21, q 0.44. Both sets of matchers
+put X at 0.469, so the shift is in the A sessions, not the matching. A one-run reading moved by
+regression toward the mean is the plainest account. The fix is the one difference in setup, and
+its effect is not separated here. The record's "carry-over closes the gap" should be read as
+"carry-over raises reach to about half of Claude's" until more runs settle it.
+
+## Test (e) reinvestigated: did anything change between the 0.44 run and its repetitions? (2026-10-01)
+
+Asked because no carried run since test (e) has repeated its reach. Checked from the request logs
+(`data/llm_logs`, every payload APE sent), not from configs. `carry_check.py` repeats the scan.
+
+The six APE-Agent runs of the same configuration (Grc: gpt_5.2 high, Responses, reasoning carried)
+on these six PRs:
+
+| run | when | `declaration_search` fix | `lean_verify` fix | reach |
+|---|---|---|---|---|
+| Grc1 = test (e)'s Grc (`probe_postcutoff_gpt52_Grc_rep1`) | 30 Sep 08:03 | no | no | 0.4375 |
+| Grc2, Grc3 (Phase 0, `post-carryover-replan`) | 30 Sep 09:05 | yes (`5e215ff`) | no | 0.375, 0.1875 |
+| A1-A3 (this folder) | 1 Oct 06:25 | no | yes | 0.3125, 0.125, 0.1875 |
+
+- **What the model was sent is unchanged.** The first request of every session is byte-identical
+  across the three groups, PR by PR: system instructions, every tool's name, description and
+  schema, the task prompt, and the settings (`reasoning.effort: high`,
+  `include: [reasoning.encrypted_content]`, `store: false`). The model is `gpt-5.2-2025-12-11`
+  throughout, and every response completed.
+- **Carry-over worked in every group.** Every later request carried encrypted reasoning: Grc1 77 of
+  77, Grc2-3 213 of 213, A 313 of 313. They covered 98-99% of earlier turns (the rest had none to
+  carry), and each turn's input grew by at least the previous turn's reasoning in every consecutive
+  pair (75, 209, 301). Through Claude Code, after `e064ae0`, 373 of 373 did.
+- **The tools behaved the same, apart from the two fixes.** For identical calls (same tool and
+  arguments) in two groups, outputs match, except `declaration_search` between Grc1 and Grc2-3
+  (16 of 16, the fix) and `lean_verify` between Grc1 and A (8 of 8: refused before, compiled now).
+  `file_read`, `content_search`, `naming_norm`, `code_hover` and `zulip_search` agree in every pair,
+  so the shared indexes did not move.
+- **So nothing subtle broke.** The 0.4375 is the top of the distribution: six runs, mean 0.27,
+  SD 0.12. Grc2 and Grc3 ran the same code side by side and differ by three asks. Grc1's sessions
+  were shorter (13.8 turns against 18.4-18.8) and reasoned more a turn on average (1,409 tokens
+  against 941-1,001, medians 599 against 468-514). That is one run of six sessions.
+- **What carry-over does, read across these runs:** about 0.27, against 0.31 for the one Chat-high
+  run (Gr1) and 0.13-0.17 with reasoning off. It is not distinguishable from high effort without
+  carry-over, as Phase 0 concluded (`14200808`). Its process gains (sessions conclude, fewer repeated
+  calls) are Phase 0's and are not re-measured here.
+- **Still open.** `develop` and this branch lack the `declaration_search` fix (`eec8d3a`, ported as
+  `5e215ff` only to `post-carryover-replan`), so every run here, both harnesses, used the defective
+  tool. With n = 2-3 per group, whether either fix moves reach is not separable from the spread.
