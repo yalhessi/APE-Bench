@@ -1,0 +1,19 @@
+# CONDITION C with reasoning carried: the Grc condition, unchanged, under Claude Code.
+#
+# Grc is gpt_5.2 at high effort through the Responses API with each turn's encrypted reasoning
+# carried to the next. Through Claude Code the relay keeps that state across the client's round
+# trip (base_relay._cache_turn_signatures); before it did, nothing was carried. Everything else is
+# Grc's, held equal by test_pr_review_v5_solo_conditions: brief_G.md, the packet, APE's tools, the
+# cutoff gate, the 80-turn limit and the $13.40 session cap.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml
+
+scaffold_type: claude_code
+
+# Containment, as in pr_review_v5_probe_2026_07_08_v1_gpt52_G_claude.yaml. No number from this
+# condition is read from an attempt whose audit is not both `clean` and `usable`.
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob, TodoWrite]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+contain_to_workspace: true

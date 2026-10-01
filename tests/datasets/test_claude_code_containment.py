@@ -508,3 +508,58 @@ def test_a_streamed_request_is_answered_as_a_stream():
     assert 'anthropic_request.get("stream")' in source
     assert "anthropic_event_stream(anthropic_response)" in source
     assert 'media_type="text/event-stream"' in source
+
+
+# --- carried reasoning must survive the round trip through the client ---------------------------
+
+
+def test_a_turns_carried_reasoning_returns_with_it():
+    """Responses carry-over keeps a turn's encrypted reasoning items in its message `signature`.
+    Claude Code holds the conversation in Anthropic's format, which has no slot for that, so the
+    relay rebuilt every request without it and nothing was carried. The relay now keeps it and
+    puts it back when the turn comes home, and the provider turns it into reasoning input."""
+
+    import json
+
+    from ape.llm_clients.adapters.message_formatter import MessageFormatter
+    from ape.llm_clients.config import LLMConfig
+    from ape.llm_clients.models import ContentBlock, ConversationSession
+    from ape.llm_clients.providers.openai_provider import responses_input
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    relay = ClaudeCodeRelaySession(port=41005, llm_config=LLMConfig(model_name="gpt_5.2"))
+    carried = json.dumps({"responses_output": [
+        {"type": "reasoning", "id": "rs_1", "encrypted_content": "gAAAA-opaque", "summary": []},
+        {"type": "function_call", "call_id": "call_1"}]})
+    response = ConversationSession()
+    node = response.add_assistant_message(
+        [ContentBlock.tool_use_block("call_1", "mcp__core__declaration_search", {"identifier": "Foo"})], "/w")
+    node.message.signature = carried
+    relay._cache_turn_signatures([node])
+
+    request = {"system": [{"type": "text", "text": "You are Claude Code."}], "messages": [
+        {"role": "user", "content": "Review PR 1."},
+        {"role": "assistant", "content": [{"type": "tool_use", "id": "call_1",
+                                           "name": "mcp__core__declaration_search",
+                                           "input": {"identifier": "Foo"}}]},
+        {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "call_1", "content": "found"}]}]}
+    session = relay._convert_anthropic_to_session(request, None)
+    assistant = [n for n in session.nodes if n.type == "assistant"]
+    assert [n.message.signature for n in assistant] == [carried]
+
+    _instructions, items = responses_input(MessageFormatter().format_for_api(session), carryover=True)
+    kinds = [i.get("type") for i in items]
+    assert kinds.index("reasoning") == kinds.index("function_call") - 1
+    assert next(i for i in items if i.get("type") == "reasoning")["encrypted_content"] == "gAAAA-opaque"
+
+
+def test_a_turn_without_carried_reasoning_gains_none():
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    relay = ClaudeCodeRelaySession(port=41006, llm_config=LLMConfig(model_name="gpt_5.2"))
+    request = {"messages": [
+        {"role": "user", "content": "Review PR 1."},
+        {"role": "assistant", "content": [{"type": "text", "text": "Nothing to flag."}]}]}
+    session = relay._convert_anthropic_to_session(request, None)
+    assert all(n.message.signature is None for n in session.nodes if n.type == "assistant")

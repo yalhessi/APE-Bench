@@ -24,7 +24,9 @@ PAIRS = [("pr_review_v5_solo_ape_smoke4.yaml", "pr_review_v5_solo_claude_smoke4.
 
 #: Pairs on sets scored by blind matchers rather than the judge, so outside the judge-scope check.
 PROBE_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
-                "pr_review_v5_probe_2026_07_08_v1_gpt52_G_claude.yaml")]
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_G_claude.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_claude.yaml")]
 
 
 @pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS)
@@ -47,7 +49,9 @@ def test_both_conditions_carry_the_same_pr_set_and_cost_cap(ape_name, claude_nam
     claude = load_yaml(Path("configs") / claude_name)["dataset"]
 
     assert ape["pr_numbers"] == claude["pr_numbers"]
-    assert ape["solo_cost_cap"] == claude["solo_cost_cap"] == 1.50
+    assert ape["solo_cost_cap"] == claude["solo_cost_cap"]
+    if (ape_name, claude_name) in PAIRS:
+        assert ape["solo_cost_cap"] == 1.50
     assert ape["routing_mode"] == claude["routing_mode"] == "solo"
 
 

@@ -121,6 +121,9 @@ class BaseRelaySession(ABC):
         # Signature cache: Map (tool_name, arguments_str) -> signature
         # Only enabled when Gemini returns signatures (thinking mode)
         self._signature_cache: Dict[Tuple[str, str], str] = {}
+        # A whole turn's opaque reasoning state (`ConversationMessage.signature`), keyed by
+        # `_turn_key` (see `_cache_turn_signatures`).
+        self._turn_signatures: Dict[str, str] = {}
         self._signature_cache_enabled: bool = False
 
     @abstractmethod
@@ -618,6 +621,38 @@ class BaseRelaySession(ABC):
         if has_signature and not self._signature_cache_enabled:
             self._signature_cache_enabled = True
             self.logger.info("Signature cache enabled (Gemini thinking mode detected)")
+
+    @staticmethod
+    def _turn_key(blocks: List[ContentBlock]) -> Optional[str]:
+        """What identifies an assistant turn when the client sends it back: its first tool call's
+        id, or, for a turn with none, its text."""
+        for block in blocks:
+            if block.type == "tool_use" and block.id:
+                return f"tool:{block.id}"
+        text = "".join(block.text or "" for block in blocks if block.type == "text").strip()
+        return f"text:{text}" if text else None
+
+    def _cache_turn_signatures(self, nodes: List[ConversationNode]) -> None:
+        """Keep each response turn's message-level signature for when the client returns it.
+
+        The client (Claude Code) holds the conversation in its own format, which has no slot for
+        a message's opaque state, so the relay rebuilds every request without it. That is where
+        Responses carry-over keeps its encrypted reasoning items (`openai_provider`), so through
+        the relay none was ever carried: each turn reasoned from nothing.
+        """
+        for node in nodes:
+            if node.type == "assistant" and node.message.signature:
+                key = self._turn_key(node.message.content)
+                if key:
+                    self._turn_signatures[key] = node.message.signature
+
+    def _restore_turn_signature(self, node: ConversationNode) -> None:
+        """Re-attach a returned assistant turn's cached signature, if it had one."""
+        if node.message.signature:
+            return
+        key = self._turn_key(node.message.content)
+        if key and key in self._turn_signatures:
+            node.message.signature = self._turn_signatures[key]
 
     def _restore_signatures_to_blocks(self, blocks: List[ContentBlock]) -> None:
         """Restore signatures to tool_use blocks from cache (client SDK lost them)"""

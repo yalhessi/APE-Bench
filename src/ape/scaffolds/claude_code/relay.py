@@ -272,6 +272,7 @@ class ClaudeCodeRelaySession(BaseRelaySession):
 
             # Cache signatures from response (before SDK loses them)
             self._cache_signatures_from_nodes(response_nodes)
+            self._cache_turn_signatures(response_nodes)
 
             # Convert response to Anthropic format
             anthropic_response = self._convert_nodes_to_anthropic(
@@ -442,7 +443,7 @@ class ClaudeCodeRelaySession(BaseRelaySession):
                 blocks = self._convert_content_to_blocks(message)
                 # Restore signatures that Claude SDK lost
                 self._restore_signatures_to_blocks(blocks)
-                session.add_assistant_message(blocks, cwd)
+                self._restore_turn_signature(session.add_assistant_message(blocks, cwd))
 
         return session
 
