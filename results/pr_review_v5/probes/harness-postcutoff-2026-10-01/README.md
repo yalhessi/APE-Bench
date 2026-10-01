@@ -259,3 +259,24 @@ Seal `blinding_codex_gpt545_SEALED.json`, sources `sources_codex_gpt545.json`, m
 difference `Ka1 - Ha1` or `Kb1 - Hb1` under 0.25 (four asks) is no evidence of a harness
 difference. 0.25 or more is suggestive, to be replicated before it is read. The APE-Agent runs
 predate the `lean_verify` fix, so that difference is in the comparison too.
+
+### Result, gpt-5.4 and gpt-5.5 (matched 2026-10-01)
+
+Two blind matchers on the seal `b5a80b6`, both audited clean (6 and 7 calls, none flagged),
+agreeing on 96 of 96 cells. They put Ha1 and Hb1 where test (e)'s matchers did (0.1875, 0.3125).
+
+| reach over 16 asks | APE-Agent | Codex | Codex - APE-Agent |
+|---|---|---|---|
+| gpt-5.4 | 0.1875 (Ha1) | 0.3125 (Ka1) | +0.125 |
+| gpt-5.5 | 0.3125 (Hb1) | 0.25 (Kb1) | -0.0625 |
+| X (Claude) | | | 0.469 |
+
+**By the rule: no evidence either way** for either model. Both differences are under 0.25, two asks
+and one ask, inside the one-run spread. The differences also point opposite ways. Codex reaches the
+same core asks with every model (`[L.NeBot]`, the import, `@[to_additive]`, the title's "of"): gpt-5.4
+adds a `HasProd` version, and gpt-5.5 misses the `_anti` rename that APE-Agent's gpt-5.5 run found.
+Asks per finding: Codex 0.71 and 0.57, APE-Agent 0.50 and 0.83. Billed: Codex gpt-5.4 $3.23, gpt-5.5
+$5.36 (APE-Agent's runs: $3.21, $5.15).
+
+Across the models with reasoning carried, Codex reaches 0.29 (gpt_5.2, mean of three), 0.31 (gpt-5.4)
+and 0.25 (gpt-5.5), all within the spread of one another.
