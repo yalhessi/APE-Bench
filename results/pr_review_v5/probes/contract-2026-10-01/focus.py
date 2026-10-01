@@ -54,6 +54,8 @@ RUNS = {  # label -> (run, judge audit, Claude packet reviewer or None)
                  "probe-dev-opus55-contract2-claude-sub-rep1", None),
     "M-5": ("probe_dev_opus5_contract2_claude_sub_rep1",
             "probe-dev-opus5-contract2-claude-sub-rep1", None),
+    "M-4.8": ("probe_dev_opus48_contract2_claude_sub_rep1",
+              "probe-dev-opus48-contract2-claude-sub-rep1", None),
 }
 PACKET = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{who}"
 #: The swap's packets: Claude under gpt's contract-v2 messages; its notes are in `submission.json`.
@@ -155,7 +157,7 @@ def main():
     sessions = {label: (claude_sessions(who) if who else gpt_sessions(run))
                 for label, (run, _audit, who) in RUNS.items() if label in
                 ("Claude X1", "Claude X2", "Claude swap", "gpt Grc1", "gpt contract", "gpt contract2",
-                 "gpt55 contract2", "H-claude", "M-5")
+                 "gpt55 contract2", "H-claude", "M-5", "M-4.8")
                 and (who or (Path(".ape/runs") / run / "tasks").is_dir())}
     print("\nC. tool calls per session, median")
     print(f"{'':14}" + "".join(f"{t[:10]:>11}" for t in TOOLS) + f"{'all':>6}")

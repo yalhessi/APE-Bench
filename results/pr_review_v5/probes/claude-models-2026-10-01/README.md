@@ -72,3 +72,41 @@ noise. It files about the same (73 against 77 findings, 72 against 71 targets) a
 better (0.110 against 0.091 hits per finding). It also compiles and looks up about twice as
 much, and its notes cover the PR's declarations as completely. One run each. H-claude's two
 further repetitions come next in the queue.
+
+## M-4.8, dev: 3 of 23, where gpt-5.5 is under the same prompt (one run, provisional)
+
+`probe_dev_opus48_contract2_claude_sub_rep1`: H-claude with `claude_model: claude-opus-4-8`.
+15 of 15 sessions ran, every audit was clean and usable, every init named claude-opus-4-8, and
+nothing was billed. Judge v9, $0.09, audit `probe-dev-opus48-contract2-claude-sub-rep1`.
+
+| reviewer (dev held-out 12) | issue recall | findings | targets | hits / finding | tool calls | edits compiled (+ snippets) | declaration lookups | notes name the PR's declarations |
+|---|---|---|---|---|---|---|---|---|
+| H-claude, Opus 5.5 | 0.304 (7) | 77 | 71 | 0.091 | 29 | 3.5 (+0) | 2.5 | 92% |
+| M-5, Opus 5 | 0.348 (8) | 73 | 72 | 0.110 | 34 | 7.0 (+2.5) | 5.0 | 92% |
+| **M-4.8, Opus 4.8** | **0.130 (3)** | 29 | 28 | 0.103 | 16 | 1.0 (+0) | 2.0 | 82% |
+| gpt-5.5 contract v2 (ape_agent) | 0.130 (3) | 30 | 29 | 0.100 | 41 | 9.5 (+3.5) | 3.5 | 82% |
+
+**By the rule** (5 or fewer does not replicate), Opus 4.8 does not replicate Opus 5.5. Against
+H-claude under the same harness it is 4 obligations below.
+
+**Beside it:** the gap is again volume, not aim. Opus 4.8 filed 29 held-out findings against
+73-77 for the two Opus 5 models, at the same hits per finding (0.103). Its sessions were short:
+16 tool calls and 1 compiled edit at the median, 3-26 replies, 9.9M tokens over the run against
+23-24M. Its notes still name 82% of the PR's declarations, so it looked at the objects and filed
+less about them. In volume and recall it sits where gpt-5.5 did under the same prompt, though
+gpt-5.5 compiled and looked up far more on its way there.
+
+**What this dev reading cannot separate.** Opus 4.8's training cutoff (Jan 2026) is at the edge of
+the dev PRs' review window: they were created 2025-12-18..31, and their reviews and merges ran
+later. Opus 5 (May 2026) and Opus 5.5 (Jun 2026) trained past all of it. So on dev, the
+4.8-against-5.x gap could be memory of these PRs as well as the model generation. The
+post-cutoff set, after all three cutoffs, is the test that separates them. That is the plan's
+second half, still to run.
+
+## Across the three models so far
+
+Every reviewer here aims about equally well: hits per finding 0.09-0.11, Claude or gpt, harness
+or probe. Recall follows how much the reviewer files. That repeats what the contract probes found
+(`../contract-2026-10-01/README.md`): the variable that moves recall is how many changes the
+reviewer decides to ask for. Opus 5 and 5.5 under the project harness file about 75 held-out
+findings, Opus 4.8 and gpt about 30. One run per cell, with H-claude's repetitions still to come.

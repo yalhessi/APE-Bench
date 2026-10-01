@@ -37,6 +37,8 @@ RUNS = {
                         "probe-dev-opus55-contract2-claude-sub-rep1"),
     "M-5 opus5": ("probe_dev_opus5_contract2_claude_sub_rep1",
                   "probe-dev-opus5-contract2-claude-sub-rep1"),
+    "M-4.8 opus48": ("probe_dev_opus48_contract2_claude_sub_rep1",
+                     "probe-dev-opus48-contract2-claude-sub-rep1"),
 }
 BULLET = re.compile(r"^\s*[-*]\s+", re.M)
 CLAUDE_NOTES = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{who}/notes.md"
