@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Meromorphic/Basic.lean", "declaration_name": "Meromorphic.deriv", "new_declaration": "@[fun_prop]\nprotected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) :=\n  fun x \u21a6 (hf x).deriv"}
