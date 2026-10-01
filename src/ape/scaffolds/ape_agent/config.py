@@ -4,7 +4,7 @@ APE Agent Scaffold Configuration Module.
 Provides configuration models for the APE Agent scaffold.
 """
 
-from typing import Optional
+from typing import Literal, Optional
 from ape.scaffolds.config import BaseScaffoldConfig
 
 
@@ -20,6 +20,12 @@ class ApeAgentConfig(BaseScaffoldConfig):
     # Intelligent stop detection thresholds
     consecutive_retries_threshold: Optional[int] = 3
     total_retries_threshold: Optional[int] = None
+
+    #: The preamble a batch session opens with (`ape.scaffolds.prompts.BATCH_PREAMBLES`).
+    #: "standard" is what every run before 2026-10-01 saw; "plain" drops its imperatives (text
+    #: "accomplishes NOTHING", batch every call, submit only when "COMPLETED and VALIDATED") for
+    #: a task whose own contract says how to work. Part of the scaffold config, so of the plan.
+    batch_preamble: Literal["standard", "plain"] = "standard"
 
     def model_post_init(self, __context) -> None:
         """Apply streaming configuration to llm_config."""

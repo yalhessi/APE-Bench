@@ -44,6 +44,17 @@ Default behavior: batch ALL tool calls together in each response. Tools execute 
 </PARALLEL_TOOL_CALLS>
 """
 
+#: The batch preamble without its imperatives, for a task whose own contract says how to work and
+#: when to submit. `BATCH_MODE_SYSTEM_PROMPT` tells a model that text "accomplishes NOTHING", to
+#: batch every call into each response and to submit only when "COMPLETED and VALIDATED"; the
+#: Claude reviewers this project compares gpt against ran under none of it
+#: (docs/todo/reviewer-model-gap.md, 2026-10-01). A text-only reply is still answered by the
+#: loop's no-tool-call prompt either way; only what the model is told up front differs.
+PLAIN_BATCH_SYSTEM_PROMPT = """You work through tools: they are how you read, search, compile and check anything in the workspace. The task's submission tool records your result and ends the session. Call it once, when you have finished."""
+
+#: `ApeAgentConfig.batch_preamble` -> the preamble a batch-mode session opens with.
+BATCH_PREAMBLES = {"standard": BATCH_MODE_SYSTEM_PROMPT, "plain": PLAIN_BATCH_SYSTEM_PROMPT}
+
 CLI_MODE_SYSTEM_PROMPT = """You are a helpful assistant. You must **strictly** follow the user's instructions, and you mustn't do anything the user didn't ask you to do.
 
 <TOOL_USAGE>
@@ -294,7 +305,8 @@ async def build_system_prompt(
     is_cli_mode: bool = False,
     use_absolute_paths: bool = False,
     managed_skills: Optional[Sequence["MaterializedSkill"]] = None,
-    logger: Optional['logging.LoggerAdapter'] = None
+    logger: Optional['logging.LoggerAdapter'] = None,
+    batch_preamble: str = "standard",
 ) -> str:
     """
     Build complete system prompt for any scaffold.
@@ -306,6 +318,7 @@ async def build_system_prompt(
         is_cli_mode: Whether in CLI interactive mode
         use_absolute_paths: Whether to use absolute paths instead of relative paths
         logger: Logger for debug info
+        batch_preamble: Which `BATCH_PREAMBLES` entry opens a batch-mode prompt
 
     Returns:
         Complete system prompt string
@@ -327,7 +340,7 @@ async def build_system_prompt(
     )
 
     # Assemble final prompt - select base prompt based on mode
-    base_prompt = CLI_MODE_SYSTEM_PROMPT if is_cli_mode else BATCH_MODE_SYSTEM_PROMPT
+    base_prompt = CLI_MODE_SYSTEM_PROMPT if is_cli_mode else BATCH_PREAMBLES[batch_preamble]
     prompt_parts = [base_prompt]
 
     if paths_section:

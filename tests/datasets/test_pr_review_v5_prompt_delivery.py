@@ -148,3 +148,35 @@ def test_the_scaffold_actually_appends_it():
     assert "_task_system_prompt()" in source
     # Appended, never substituted — the workspace/tool preamble is what the harness needs.
     assert "system_prompt = f\"{system_prompt}" in source
+
+
+def test_the_plain_preamble_drops_the_imperatives_and_the_default_is_unchanged():
+    """`batch_preamble: plain` is the contract condition's preamble: the Claude reviewers gpt is
+    compared with never saw "TEXT ALONE ... accomplishes NOTHING", "batch ALL tool calls" or
+    "COMPLETED and VALIDATED". The default must render every earlier run's preamble byte for byte,
+    and the scaffold must pass its config's choice, not a default."""
+
+    import inspect
+
+    from pydantic import ValidationError
+
+    from ape.llm_clients.config import LLMConfig
+    from ape.scaffolds import prompts
+    from ape.scaffolds.ape_agent import conversation
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+
+    standard = asyncio.run(prompts.build_system_prompt(None, None, None))
+    plain = asyncio.run(prompts.build_system_prompt(None, None, None, batch_preamble="plain"))
+    assert standard.startswith(prompts.BATCH_MODE_SYSTEM_PROMPT)
+    for imperative in ("TEXT ALONE", "batch ALL tool calls", "COMPLETED and VALIDATED",
+                       "MUST include TOOL CALLS"):
+        assert imperative in standard and imperative not in plain, imperative
+    assert "submission tool" in plain
+
+    assert ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")).batch_preamble == "standard"
+    assert ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"),
+                          batch_preamble="plain").batch_preamble == "plain"
+    with pytest.raises(ValidationError):
+        ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2"), batch_preamble="terse")
+    source = inspect.getsource(conversation.ApeAgentConversationManager.create_conversation_session)
+    assert "batch_preamble=self.config.batch_preamble" in source
