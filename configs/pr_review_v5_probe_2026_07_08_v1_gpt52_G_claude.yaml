@@ -14,7 +14,8 @@ scaffold_type: claude_code
 # Containment. See pr_review_v5_solo_claude_heldout12.yaml for why each knob is here. The grant
 # names which built-in tools exist; `contain_to_workspace` bounds where they reach, refusing any
 # path outside the attempt's workspace and writing containment_audit.json into every attempt.
-# No number from this condition is read from an attempt whose audit is not clean.
+# No number from this condition is read from an attempt whose audit is not both `clean` (nothing
+# left the workspace) and `usable` (no granted call refused by the CLI's permission mode).
 permission_mode: dontAsk
 setting_sources: []
 strict_mcp_config: true

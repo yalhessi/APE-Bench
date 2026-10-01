@@ -280,3 +280,29 @@ included. A subscription reaches only Claude Code, and needs usage and the sessi
 SDK's own messages, the model
 pinned and recorded, and the usage-limit error mapped to a failure. Both still need the leak
 audit that the `solo_claude` configs' headers require.
+
+**Claude Code, on the relay path: fixed on `claude-code-harness` (2026-10-01).** The task's system
+prompt now reaches the model under every scaffold (`4816cd2`). `contain_to_workspace` adds a
+PreToolUse refusal and a per-attempt transcript audit (`bf26b5e`). The relay reads the bundled
+2.1.139 CLI's session ID, and the transcript is found by name (`d7f84ae`). APE's MCP server and the
+grant are pre-approved, because `dontAsk` refused 7 of 8 calls otherwise (`8dbcf9c`). Smoke 3 (PR
+41930, $0.14, 26 s) ran end to end: brief delivered, audit clean and usable, one submission landed,
+no findings, as with both G runs on that PR. Smokes 1 and 2 ($0.00 and $0.38) are the two failures
+those commits name.
+
+## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
+
+`toolkits/execute/lean/tools.py` resolves `workspaces_dir / file_path` and then requires the result
+`is_relative_to(workspaces_dir)`. `target/` is a symlink into the shared reviewed-workspace store,
+so every `target/...` file resolves outside the workspace. `scratch/Review.lean` fails as well,
+which suggests `workspaces_dir` is itself unresolved, though that is unchecked. Measured in
+`probe_postcutoff_gpt52_G_rep1` and `_rep2` (ape_agent): 0-3 "File path outside workspaces
+directory" errors a session, on `target/` and on `scratch/` paths. Smoke 3 under Claude Code hit
+it twice and stopped compiling. `lean_verify_edit` is unaffected, because it reads
+`target_workspace.path` directly.
+
+It does not bias the harness comparison, since G and G-under-Claude-Code share it. It does cost both
+of them the plain compile check. **What would close it:** compare resolved paths with a resolved
+root, and allow the task's provisioned workspaces (the same roots as
+`claude_code/containment.provisioned_roots`). It changes what every review condition can do, so it
+lands at a run boundary, with G re-run beside whatever is compared against it.
