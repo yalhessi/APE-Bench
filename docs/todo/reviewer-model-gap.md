@@ -554,3 +554,31 @@ Claude and gpt. Phase 2 not funded; Phase 3.2 (try-it) next, then 3.3 (conventio
   maintainers asked for.
 - **Not yet measured:** how much reach the bar costs across sets. Any brief change designed from
   this is in-sample on the post-cutoff set.
+
+## The harness, with the model held (2026-10-01): test (c), run in its harness form
+
+`results/pr_review_v5/probes/harness-postcutoff-2026-10-01/` (pre-registered rules, blind matchers,
+three runs a cell). On the six post-cutoff PRs, with the model held fixed and only the scaffold
+varied, APE-Agent, Claude Code and Codex reach about the same:
+
+| reach over 16 asks | APE-Agent | Claude Code | Codex | Claude (X) |
+|---|---|---|---|---|
+| gpt_5.2, reasoning off | 0.15-0.17 | 0.125 | **0.021** | 0.469 |
+| gpt_5.2, carried | 0.21 | 0.25 | 0.29 | 0.469 |
+| gpt-5.4 / gpt-5.5, carried, one run each | 0.19 / 0.31 | | 0.31 / 0.25 | |
+
+By the rules: Claude Code against APE-Agent is comparable at both settings, replicated in a second
+matching. Codex against APE-Agent: APE-Agent reaches more with reasoning off; carried, Codex is
+highest but inconclusive (+0.08); with gpt-5.4 and gpt-5.5, no evidence either way. **So the
+harness is not the binding constraint**, and the gap to X stays the model's at every setting
+tried. Not tried: Claude as the model inside APE-Agent (it needs an Anthropic provider), and other
+sets.
+
+Also from that folder:
+- **Test (e)'s 0.44 is the top of a six-run spread.** Carried runs reach a mean of 0.27, SD 0.12;
+  the request logs show nothing changed but two tool fixes, and carry-over worked in every run.
+- **Run-to-run variance is large and partly complementary.** Codex's three carried runs reach 7
+  distinct asks against 4.7 each, and Phase 0's union is q 0.93 against a mean of 0.71. With the
+  cross-rep agreement signal (`selection-signal.md`, AUC 0.71 / 0.63 in-sample), that is the
+  measured case for an ensemble harness: decorrelated runs, union, agreement-ranked. Untested as a
+  design.
