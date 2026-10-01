@@ -179,3 +179,30 @@ on these six PRs:
 - **Still open.** `develop` and this branch lack the `declaration_search` fix (`eec8d3a`, ported as
   `5e215ff` only to `post-carryover-replan`), so every run here, both harnesses, used the defective
   tool. With n = 2-3 per group, whether either fix moves reach is not separable from the spread.
+
+## Third harness: Codex (pre-registered 2026-10-01, before its runs)
+
+The same question for Codex (`codex-cli` 0.144.5). The scaffold drives `codex exec` through a
+Responses relay to APE's client (`61b3e08`, `cbffcb5`). Codex is told the model is `gpt-5.2`, so it
+uses its own prompt for that model, with the MCP tools listed up front. It has no shell
+(`shell_tool`, `unified_exec` off), a read-only sandbox, no web search, and of its own tools only
+`update_plan`. So its tools are APE's: the same 6 toolkit tools as APE-Agent plus the task's own
+(checked on `pr5_probe0708_gpt52_G_codex_smoke2`). Configs:
+`configs/pr_review_v5_probe_2026_07_08_v1_gpt52_{G,Grc}_codex.yaml`, held equal to their APE-Agent
+conditions.
+
+| label | source |
+|---|---|
+| Cx1-Cx3 | `probe_postcutoff_gpt52_G_codex_rep{1,2,3}` (reasoning off) / `probe_postcutoff_gpt52_Grc_codex_rep{1,2,3}` (carried) |
+| A1-A3, C1-C3, X1, X2 | as in the two comparisons above, the same runs |
+
+**Matched three ways**, so every harness is read within one matcher pair. Seals
+`blinding_codex_off_SEALED.json` (with the reasoning-off A and C) and
+`blinding_codex_carried_SEALED.json` (with the carried A and C), eleven reviewers a PR, and
+matchers in `match_codex_off/` and `match_codex_carried/`. Per PR the eleven sets are shuffled as
+`R1` to `R11`.
+
+**Reading rule**, on both matchers and for each seal, `d = reach(Cx) - reach(A)`: `|d| <= 0.05`
+comparable, `d >= 0.10` Codex reaches more, `d <= -0.10` APE-Agent reaches more, otherwise
+inconclusive. `reach(C) - reach(A)` is read again in the same matchings, as a replication of the
+two comparisons above. A different reading there is reported, not reconciled.
