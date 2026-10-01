@@ -284,6 +284,51 @@ def build_skills_section(
 
 
 # =============================================================================
+# The task's own contract
+# =============================================================================
+
+async def task_system_prompt(task, logger: Optional['logging.LoggerAdapter'] = None) -> Optional[str]:
+    """The task's own system-level contract, when it defines one.
+
+    Optional by design: most tasks put everything in the user prompt, and `BaseTask` does
+    not declare this method at all. A task that raises or returns nothing is treated as
+    having no contract rather than failing the run — a missing prompt should degrade the
+    review, not abort it.
+
+    Shared by every scaffold because it once was not: `ape_agent` delivered it from 2026-08-25
+    (`1d32ef7`), while `claude_code` and `codex` never called it, so a task run under either
+    lost its contract — the solo reviewer its whole brief — and nothing said so.
+    """
+
+    builder = getattr(task, "create_system_prompt", None)
+    if builder is None:
+        return None
+    try:
+        text = await builder()
+    except NotImplementedError:
+        return None
+    except Exception as exc:  # noqa: BLE001
+        if logger is not None:
+            logger.warning("task system prompt unavailable: %s", exc)
+        return None
+    return (text or "").strip() or None
+
+
+async def with_task_system_prompt(
+    preamble: str, task, logger: Optional['logging.LoggerAdapter'] = None,
+) -> str:
+    """`preamble` with the task's contract appended, or unchanged when it has none.
+
+    Appended, never substituted: the workspace and tool preamble is what the harness depends on.
+    """
+
+    contract = await task_system_prompt(task, logger)
+    if not contract:
+        return preamble
+    return f"{preamble}\n\n{'=' * 80}\n\n{contract}"
+
+
+# =============================================================================
 # Main System Prompt Builder
 # =============================================================================
 

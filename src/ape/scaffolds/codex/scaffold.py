@@ -162,18 +162,14 @@ class CodexScaffold(BaseScaffold):
         except Exception as e:
             self.logger.warning(f"[CodexScaffold] Failed to configure Codex TOML: {e}")
 
-    async def _run_batch_mode(self) -> None:
-        """Run batch mode using subprocess"""
-        # Use workspaces directory directly (like ape_agent)
-        if not self.task.scratch_workspace:
-            raise RuntimeError("Scratch workspace not initialized for Codex scaffold")
+    async def _initial_prompt(self, cwd) -> str:
+        """The first message: the workspace preamble, the task's own contract, then the task.
 
-        # Use workspaces directory directly
-        cwd = str(self.task.workspaces_dir)
-        task_user_prompt = await self.task.create_user_prompt()
+        Codex keeps its own system prompt, so APE's preamble goes in the first user message with
+        the task's contract after it, as in `claude_code`. Batch and CLI modes send the same text.
+        """
+        from ape.scaffolds.prompts import build_system_prompt, with_task_system_prompt
 
-        # Build system prompt with absolute paths and merge into first user prompt (Claude Code style)
-        from ape.scaffolds.prompts import build_system_prompt
         system_prompt = await build_system_prompt(
             scratch_workspace=self.task.scratch_workspace,
             target_workspace=self.task.target_workspace,
@@ -194,7 +190,19 @@ class CodexScaffold(BaseScaffold):
             f"  - /bin/bash, /bin/sh, /usr/bin/find, /usr/bin/git, /usr/bin/python\n"
             f"This is required because PATH environment variable is not available in the shell environment.\n"
         )
-        initial_prompt = f"{system_prompt}\n\n{'='*80}\n\n{task_user_prompt}"
+        system_prompt = await with_task_system_prompt(system_prompt, self.task, self.logger)
+        task_user_prompt = await self.task.create_user_prompt()
+        return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+
+    async def _run_batch_mode(self) -> None:
+        """Run batch mode using subprocess"""
+        # Use workspaces directory directly (like ape_agent)
+        if not self.task.scratch_workspace:
+            raise RuntimeError("Scratch workspace not initialized for Codex scaffold")
+
+        # Use workspaces directory directly
+        cwd = str(self.task.workspaces_dir)
+        initial_prompt = await self._initial_prompt(cwd)
 
         self.logger.info(f"[CodexScaffold] Starting batch conversation (cwd: {cwd})")
 
@@ -304,32 +312,7 @@ class CodexScaffold(BaseScaffold):
                     raise RuntimeError("Task workspaces are not initialized for Codex CLI mode")
 
                 cwd_path = self.task.workspaces_dir
-                cwd = str(cwd_path)
-
-                from ape.scaffolds.prompts import build_system_prompt
-
-                system_prompt = await build_system_prompt(
-                    scratch_workspace=self.task.scratch_workspace,
-                    target_workspace=self.task.target_workspace,
-                    reference_workspaces=self.task.reference_workspaces,
-                    use_absolute_paths=True,
-                    logger=self.logger
-                )
-                system_prompt += (
-                    f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
-                    f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
-                    f"\n"
-                    f"CRITICAL - Shell Command Requirements:\n"
-                    f"When using shell/bash tools, you MUST use absolute paths for ALL commands:\n"
-                    f"  - Correct: /bin/ls, /bin/cat, /bin/grep, /usr/bin/git, /bin/sh\n"
-                    f"  - Wrong: ls, cat, grep, git, sh\n"
-                    f"Common command paths:\n"
-                    f"  - /bin/ls, /bin/cat, /bin/grep, /bin/sed, /bin/awk, /bin/rm, /bin/cp, /bin/mv\n"
-                    f"  - /bin/bash, /bin/sh, /usr/bin/find, /usr/bin/git, /usr/bin/python\n"
-                    f"This is required because PATH environment variable is not available in the shell environment.\n"
-                )
-                task_user_prompt = await self.task.create_user_prompt()
-                task_prompt = f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+                task_prompt = await self._initial_prompt(cwd_path)
                 initial_prompt = merge_task_prompt(task_prompt, prompt)
 
             cwd = str(cwd_path)

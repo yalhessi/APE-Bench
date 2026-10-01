@@ -126,6 +126,30 @@ class ClaudeCodeScaffold(BaseScaffold):
             self.task.attempt_path
         )
 
+    async def _initial_prompt(self, cwd) -> str:
+        """The first message: the workspace preamble, the task's own contract, then the task.
+
+        Claude Code keeps its own system prompt, so this scaffold has always sent APE's preamble
+        in the first user message; the task's contract travels with it, in the order `ape_agent`
+        gives the two in its system message. Batch and CLI modes send the same text.
+        """
+        from ape.scaffolds.prompts import build_system_prompt, with_task_system_prompt
+
+        system_prompt = await build_system_prompt(
+            scratch_workspace=self.task.scratch_workspace,
+            target_workspace=self.task.target_workspace,
+            reference_workspaces=self.task.reference_workspaces,
+            use_absolute_paths=True,
+            logger=self.logger
+        )
+        system_prompt += (
+            f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
+            f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
+        )
+        system_prompt = await with_task_system_prompt(system_prompt, self.task, self.logger)
+        task_user_prompt = await self.task.create_user_prompt()
+        return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+
     async def _run_batch_mode(self) -> None:
         """Run batch mode using Claude SDK"""
         config = self.task.config
@@ -178,18 +202,7 @@ class ClaudeCodeScaffold(BaseScaffold):
         # Get resume session ID
         resume_session_id = self.conversation_manager.resume_session_id
 
-        # Build system prompt with absolute paths for Claude Code
-        from ape.scaffolds.prompts import build_system_prompt
-        system_prompt = await build_system_prompt(
-            scratch_workspace=self.task.scratch_workspace,
-            target_workspace=self.task.target_workspace,
-            reference_workspaces=self.task.reference_workspaces,
-            use_absolute_paths=True,
-            logger=self.logger
-        )
-
-        # Add cwd information to system prompt
-        system_prompt += f"\n\nIMPORTANT: Your current working directory is `{cwd}`. Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
+        initial_prompt = await self._initial_prompt(cwd)
 
         # Configure HOME environment variable for SDK
         # Set HOME to workspaces/ directory so SDK creates session files there
@@ -231,13 +244,6 @@ class ClaudeCodeScaffold(BaseScaffold):
 
         # Create SDK client and run conversation
         async with ClaudeSDKClient(options) as client:
-            # Get task user prompt
-            task_user_prompt = await self.task.create_user_prompt()
-
-            # Merge system prompt and user prompt
-            # For Claude Code, we put system prompt as part of user prompt
-            initial_prompt = f"{system_prompt}\n\n{'='*80}\n\n{task_user_prompt}"
-
             await self.conversation_manager.run_conversation(
                 claude_client=client,
                 initial_prompt=initial_prompt
@@ -266,24 +272,7 @@ class ClaudeCodeScaffold(BaseScaffold):
                     raise RuntimeError("Task workspaces are not initialized for Claude Code CLI mode")
 
                 cwd_path = self.task.workspaces_dir
-                cwd = str(cwd_path)
-
-                from ape.scaffolds.prompts import build_system_prompt
-
-                system_prompt = await build_system_prompt(
-                    scratch_workspace=self.task.scratch_workspace,
-                    target_workspace=self.task.target_workspace,
-                    reference_workspaces=self.task.reference_workspaces,
-                    use_absolute_paths=True,
-                    logger=self.logger
-                )
-                system_prompt += (
-                    f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
-                    f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
-                )
-
-                task_user_prompt = await self.task.create_user_prompt()
-                task_prompt = f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+                task_prompt = await self._initial_prompt(cwd_path)
                 initial_prompt = merge_task_prompt(task_prompt, prompt)
 
             cwd = str(cwd_path)

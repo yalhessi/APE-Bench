@@ -652,31 +652,10 @@ class ApeAgentConversationManager:
                 f"total cost: ${total_cost:.6f}"
             )
     
-    async def _task_system_prompt(self) -> Optional[str]:
-        """The task's own system-level contract, when it defines one.
-
-        Optional by design: most tasks put everything in the user prompt, and `BaseTask` does
-        not declare this method at all. A task that raises or returns nothing is treated as
-        having no contract rather than failing the run — a missing prompt should degrade the
-        review, not abort it.
-        """
-
-        builder = getattr(self.task, "create_system_prompt", None)
-        if builder is None:
-            return None
-        try:
-            text = await builder()
-        except NotImplementedError:
-            return None
-        except Exception as exc:  # noqa: BLE001
-            self.logger.warning("task system prompt unavailable: %s", exc)
-            return None
-        return (text or "").strip() or None
-
     async def create_conversation_session(self, max_turns: int = None, tools: Optional[List[Dict[str, Any]]] = None) -> 'ConversationSession':
         """Create a new conversation session."""
         from ape.llm_clients.models import ConversationSession
-        from ape.scaffolds.prompts import build_system_prompt
+        from ape.scaffolds.prompts import build_system_prompt, with_task_system_prompt
         from ape.scaffolds.skills import get_task_managed_skills
 
         if max_turns is None:
@@ -712,9 +691,7 @@ class ApeAgentConversationManager:
             # v4 candidate prompts, the v5 lead's routing policy — was silently discarded and
             # only the user prompt reached the model. Appending rather than replacing keeps
             # the workspace/tool preamble the harness depends on.
-            task_system_prompt = await self._task_system_prompt()
-            if task_system_prompt:
-                system_prompt = f"{system_prompt}\n\n{'=' * 80}\n\n{task_system_prompt}"
+            system_prompt = await with_task_system_prompt(system_prompt, self.task, self.logger)
             session.add_system_message(
                 content_blocks=[ContentBlock.text_block(system_prompt)],
                 cwd=cwd

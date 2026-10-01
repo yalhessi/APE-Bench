@@ -24,23 +24,13 @@ from types import SimpleNamespace
 import pytest
 
 
-class _Recorder:
-    """Stands in for the conversation manager's collaborators."""
-
-    def __init__(self, task):
-        self.task = task
-        self.logger = SimpleNamespace(warning=lambda *a, **k: None,
-                                      info=lambda *a, **k: None)
+_QUIET = SimpleNamespace(warning=lambda *a, **k: None, info=lambda *a, **k: None)
 
 
-def _manager_for(task):
-    from ape.scaffolds.ape_agent.conversation import ApeAgentConversationManager
+def _collected(task):
+    from ape.scaffolds.prompts import task_system_prompt
 
-    manager = object.__new__(ApeAgentConversationManager)
-    manager.task = task
-    manager.logger = SimpleNamespace(warning=lambda *a, **k: None,
-                                     info=lambda *a, **k: None)
-    return manager
+    return asyncio.run(task_system_prompt(task, _QUIET))
 
 
 def test_a_task_system_prompt_is_collected():
@@ -48,14 +38,14 @@ def test_a_task_system_prompt_is_collected():
         async def create_system_prompt(self):
             return "ARM CONTRACT: report duplication findings only."
 
-    text = asyncio.run(_manager_for(Task())._task_system_prompt())
+    text = _collected(Task())
     assert text == "ARM CONTRACT: report duplication findings only."
 
 
 def test_a_task_without_one_contributes_nothing():
     """`BaseTask` does not declare the method; most tasks put everything in the user prompt."""
 
-    assert asyncio.run(_manager_for(SimpleNamespace())._task_system_prompt()) is None
+    assert _collected(SimpleNamespace()) is None
 
 
 def test_an_empty_prompt_is_treated_as_absent():
@@ -63,7 +53,7 @@ def test_an_empty_prompt_is_treated_as_absent():
         async def create_system_prompt(self):
             return "   \n  "
 
-    assert asyncio.run(_manager_for(Task())._task_system_prompt()) is None
+    assert _collected(Task()) is None
 
 
 def test_a_failing_prompt_degrades_rather_than_aborts():
@@ -73,7 +63,7 @@ def test_a_failing_prompt_degrades_rather_than_aborts():
         async def create_system_prompt(self):
             raise RuntimeError("renderer exploded")
 
-    assert asyncio.run(_manager_for(Task())._task_system_prompt()) is None
+    assert _collected(Task()) is None
 
 
 def test_not_implemented_is_absence_not_an_error():
@@ -81,7 +71,7 @@ def test_not_implemented_is_absence_not_an_error():
         async def create_system_prompt(self):
             raise NotImplementedError
 
-    assert asyncio.run(_manager_for(Task())._task_system_prompt()) is None
+    assert _collected(Task()) is None
 
 
 def test_the_lead_contributes_its_routing_policy():
@@ -102,7 +92,7 @@ def test_the_lead_contributes_its_routing_policy():
                               "repo_url": "https://e.invalid/m.git",
                               "default_target": "Mathlib"}),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
-    text = asyncio.run(_manager_for(task)._task_system_prompt())
+    text = _collected(task)
     assert text
     # The two policies the lead demonstrably never received.
     assert "cheap" in text and "never right" in text
@@ -133,7 +123,7 @@ def test_an_arm_contributes_its_rendered_contract():
                               "repo_url": "https://e.invalid/m.git",
                               "default_target": "Mathlib"}),
         ApeAgentConfig(llm_config=LLMConfig(model_name="gpt_5.2")))
-    text = asyncio.run(_manager_for(task)._task_system_prompt())
+    text = _collected(task)
     assert text == "DUPLICATION CONTRACT: only duplication findings."
 
 
@@ -145,6 +135,59 @@ def test_the_scaffold_actually_appends_it():
     from ape.scaffolds.ape_agent import conversation
 
     source = inspect.getsource(conversation.ApeAgentConversationManager.create_conversation_session)
-    assert "_task_system_prompt()" in source
-    # Appended, never substituted — the workspace/tool preamble is what the harness needs.
-    assert "system_prompt = f\"{system_prompt}" in source
+    assert "with_task_system_prompt(system_prompt, self.task" in source
+
+
+def test_appending_keeps_the_preamble_and_the_old_separator():
+    """Appended, never substituted, with the separator `ape_agent` always used, so its
+    delivered text does not move."""
+
+    from ape.scaffolds.prompts import with_task_system_prompt
+
+    class Task:
+        async def create_system_prompt(self):
+            return "CONTRACT"
+
+    assert asyncio.run(with_task_system_prompt("PREAMBLE", Task(), _QUIET)) == (
+        f"PREAMBLE\n\n{'=' * 80}\n\nCONTRACT")
+    assert asyncio.run(with_task_system_prompt("PREAMBLE", SimpleNamespace(), _QUIET)) == "PREAMBLE"
+
+
+@pytest.mark.parametrize("scaffold_path", [
+    "ape.scaffolds.claude_code.scaffold:ClaudeCodeScaffold",
+    "ape.scaffolds.codex.scaffold:CodexScaffold",
+])
+def test_claude_code_and_codex_deliver_the_task_contract(scaffold_path, monkeypatch):
+    """Until 2026-10-01 neither did: the solo reviewer ran under them with no brief at all.
+
+    Asserted on the first message the scaffold sends, which is where both put APE's prompt
+    (each harness keeps its own system prompt): preamble, then the contract, then the task.
+    """
+
+    import importlib
+
+    from ape.scaffolds import prompts
+
+    async def preamble(**_kwargs):
+        return "PREAMBLE"
+
+    monkeypatch.setattr(prompts, "build_system_prompt", preamble)
+
+    class Task:
+        scratch_workspace = target_workspace = reference_workspaces = None
+
+        async def create_system_prompt(self):
+            return "BRIEF: compare against what Mathlib already has."
+
+        async def create_user_prompt(self):
+            return "Review PR 1."
+
+    module_name, class_name = scaffold_path.split(":")
+    scaffold = object.__new__(getattr(importlib.import_module(module_name), class_name))
+    scaffold.task = Task()
+    scaffold.logger = _QUIET
+
+    sent = asyncio.run(scaffold._initial_prompt("/ws"))
+    assert sent.count("BRIEF: compare against what Mathlib already has.") == 1
+    assert sent.index("PREAMBLE") < sent.index("BRIEF:") < sent.index("Review PR 1.")
+    assert "Your current working directory is `/ws`" in sent
