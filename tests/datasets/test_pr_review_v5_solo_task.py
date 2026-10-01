@@ -259,7 +259,8 @@ def test_the_request_filing_bar_removes_every_merge_verdict_from_the_task():
 
     def registered(bar):
         mcp = FakeMCP()
-        fake = SimpleNamespace(_register_lean_verify_edit=lambda mcp: None, _filing_bar=lambda: bar)
+        fake = SimpleNamespace(_register_lean_verify_edit=lambda mcp: None, _filing_bar=lambda: bar,
+                               _review_notes=lambda: False)
         import asyncio
         asyncio.run(BasePRReviewTask.register_task_tools(fake, mcp))
         return set(inspect.signature(mcp.tools["submit_findings"]).parameters)
@@ -276,3 +277,81 @@ def test_the_filing_bar_is_a_closed_choice():
     assert SoloReviewConfig(filing_bar="request").filing_bar == "request"
     with pytest.raises(Exception):
         SoloReviewConfig(filing_bar="lenient")
+
+
+def test_review_notes_off_renders_every_earlier_prompt_byte_for_byte():
+    from ape.tasks.lean_tasks.formal_math.review.base import submission_mandate
+    from ape.tasks.lean_tasks.formal_math.review.solo import (
+        SOLO_USER, SEVERITY_LINES, SoloReviewConfig, solo_user_template,
+    )
+
+    assert SoloReviewConfig().review_notes is False
+    for bar in ("merge", "request"):
+        rendered = solo_user_template(bar)
+        assert "{notes_line}" not in rendered and "`notes`" not in rendered
+        assert rendered == SOLO_USER.replace("{severity_line}", SEVERITY_LINES[bar]).replace(
+            "{notes_line}", "")
+        assert submission_mandate("submit_findings", bar) == submission_mandate(
+            "submit_findings", bar, False)
+    assert "`notes`" in solo_user_template("request", True)
+    assert "and your `notes`" in submission_mandate("submit_findings", "request", True)
+
+
+def test_review_notes_is_refused_under_the_merge_bar():
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig
+
+    assert SoloReviewConfig(filing_bar="request", review_notes=True).review_notes
+    with pytest.raises(ValueError, match="filing_bar: request only"):
+        SoloReviewConfig(review_notes=True)
+
+
+def test_the_notes_submission_refuses_a_blank_account_and_records_a_real_one():
+    """Brief X's `notes.md` -- "what you did, object by object, including what you checked and
+    found nothing wrong with" -- was written by every Claude reviewer and asked of no gpt
+    condition. Here it is a required field of the call that ends the session, on a real task:
+    a blank one is refused without ending the session, and a real one reaches the result."""
+
+    import asyncio
+    import inspect
+    import logging
+
+    from ape.scaffolds.ape_agent.config import ApeAgentConfig
+    from ape.tasks.lean_tasks.formal_math.review.base import BasePRReviewTask
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig, SoloReviewResult
+
+    task = SoloReviewTask(_data(), ApeAgentConfig(
+        task_config=SoloReviewConfig(filing_bar="request", review_notes=True)))
+    task.logger = logging.getLogger("solo-notes")
+    task._register_lean_verify_edit = lambda mcp: None
+
+    class FakeMCP:
+        def __init__(self):
+            self.tools = {}
+
+        def tool(self, **_kwargs):
+            def decorate(fn):
+                self.tools[fn.__name__] = fn
+                return fn
+            return decorate
+
+    mcp = FakeMCP()
+    asyncio.run(BasePRReviewTask.register_task_tools(task, mcp))
+    submit = mcp.tools["submit_findings"]
+    params = inspect.signature(submit).parameters
+    assert set(params) == {"notes", "findings", "confidence", "message"}
+    assert params["notes"].default is inspect.Parameter.empty
+
+    ended = []
+
+    async def terminate(result):
+        ended.append(result)
+
+    task.termination_callback = terminate
+    refused = asyncio.run(submit(notes="  \n", findings=[]))
+    assert refused["success"] is False and refused["outcome"] == "invalid_request"
+    assert ended == []
+    notes = "- `Foo.bar`: read it and its siblings; nothing to ask."
+    asyncio.run(submit(notes=notes, findings=[]))
+    assert len(ended) == 1 and isinstance(ended[0], SoloReviewResult)
+    assert ended[0].review_notes == notes
+    assert "`notes`" in asyncio.run(task.create_user_prompt())

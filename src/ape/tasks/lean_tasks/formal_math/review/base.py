@@ -149,15 +149,18 @@ class BasePRReviewResult(BaseTaskResult):
     review_message: str = ""
 
 
-def submission_mandate(submit_tool_name: str, filing_bar: str = "merge") -> str:
+def submission_mandate(submit_tool_name: str, filing_bar: str = "merge",
+                       review_notes: bool = False) -> str:
     """The closing instruction that forces a `submit_findings` call.
 
     Agents that conclude "nothing to flag" sometimes end with a text-only reply and never call
     the tool, which the harness records as an empty failure rather than a clean review, so the
     empty-review path is explicit and mandatory. Under the "request" filing bar the empty call
-    carries no `merge_ready_as_is`, since that tool variant has no such field.
+    carries no `merge_ready_as_is`, since that tool variant has no such field; with
+    `review_notes` it still carries the notes, which the tool requires.
     """
     empty = ("call it with an empty `findings` list and `merge_ready_as_is: true`" if filing_bar == "merge"
+             else "call it with an empty `findings` list and your `notes`" if review_notes
              else "call it with an empty `findings` list")
     return (f"\n\nYou MUST finish by calling `{submit_tool_name}` exactly once — even if you find "
             f"nothing. If there is nothing to change, {empty}. A text-only reply does not count and "
@@ -239,6 +242,8 @@ class BasePRReviewTask(BaseLeanTask):
             parts.append("read files")
         if has("content_search"):
             parts.append("grep the repo (content_search)")
+        if has("file_search"):
+            parts.append("find files by name (file_search)")
         if has("lean_retrieve"):
             parts.append("semantic library search (lean_retrieve)")
         if has("lean_verify"):
@@ -265,12 +270,16 @@ class BasePRReviewTask(BaseLeanTask):
             submit_tool_name=submit_tool_name,
             budget=self.config.task_config.finding_budget,
         )
-        mandate = submission_mandate(submit_tool_name, self._filing_bar())
+        mandate = submission_mandate(submit_tool_name, self._filing_bar(), self._review_notes())
         return base + mandate + self._precedent_block()
 
     def _filing_bar(self) -> str:
         """`task_config.filing_bar` where the task declares it (the solo task), else "merge"."""
         return getattr(self.config.task_config, "filing_bar", "merge")
+
+    def _review_notes(self) -> bool:
+        """`task_config.review_notes` where the task declares it (the solo task), else False."""
+        return getattr(self.config.task_config, "review_notes", False)
 
     def _precedent_block(self) -> str:
         """Stage-2 Mode A: append retrieved past-maintainer precedents for THIS PR, if primed.
@@ -601,9 +610,23 @@ class BasePRReviewTask(BaseLeanTask):
             "This records the review and ends the conversation. A text-only response is INVALID."
         )
 
-        async def record(findings, merge_ready_as_is, confidence, message) -> Dict[str, Any]:
-            """Record a `submit_findings` call: normalise, build the result, fire termination."""
+        async def record(findings, merge_ready_as_is, confidence, message,
+                         notes: Optional[str] = None) -> Dict[str, Any]:
+            """Record a `submit_findings` call: normalise, build the result, fire termination.
+
+            `notes` is None unless the task asks for the object-by-object account
+            (`review_notes`); then a blank one is refused and the session goes on, since the
+            account is what the condition exists to require.
+            """
             self.logger.info("submit_findings: %d findings, merge_ready=%s", len(findings or []), merge_ready_as_is)
+            if notes is not None and not notes.strip():
+                return {
+                    "success": False, "outcome": "invalid_request",
+                    "error": ("Not recorded: `notes` is empty. Give your account of the review, "
+                              "object by object, including what you checked and found nothing "
+                              "wrong with, then call this tool again."),
+                }
+            extra = {} if notes is None else {"review_notes": notes}
             try:
                 normalized = self._normalize_findings(findings or [])
                 # A verdict-less submission is still a valid review: infer it from the findings
@@ -613,7 +636,7 @@ class BasePRReviewTask(BaseLeanTask):
                 result = self.create_result(
                     success=True, score=1.0, pr_number=self.data.pr_number,
                     merge_ready_as_is=merge_ready_as_is, confidence=confidence,
-                    findings=normalized, review_message=message or "",
+                    findings=normalized, review_message=message or "", **extra,
                 )
                 if self.termination_callback:
                     try:
@@ -634,7 +657,21 @@ class BasePRReviewTask(BaseLeanTask):
                     "message": "Submit failed",
                 }
 
-        if self._filing_bar() == "request":
+        if self._review_notes():
+            # The contract condition: the request bar, plus the object-by-object account the
+            # Claude reviewers wrote as `notes.md` (brief X), here a required field of the one
+            # call that ends the session. `SoloReviewConfig` refuses it under the merge bar.
+            @mcp.tool(description=DESCRIPTION)
+            async def submit_findings(
+                notes: Annotated[str, Field(description=(
+                    "What you did, object by object, including what you checked and found "
+                    "nothing wrong with. Required, also when `findings` is empty."))],
+                findings: FINDINGS = [],
+                confidence: CONFIDENCE = None,
+                message: MESSAGE = "",
+            ) -> Dict[str, Any]:
+                return await record(findings, None, confidence, message, notes=notes)
+        elif self._filing_bar() == "request":
             # The filing-bar condition: no merge verdict anywhere in the submission, so the
             # reviewer is never asked whether a maintainer would merge, only what it would request.
             @mcp.tool(description=DESCRIPTION)

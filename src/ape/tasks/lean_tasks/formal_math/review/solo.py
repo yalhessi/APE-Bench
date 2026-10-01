@@ -38,7 +38,7 @@ import json
 from pathlib import Path
 from typing import List, Literal, Optional, Tuple
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from ape.tasks.base import register_task
 
@@ -124,7 +124,7 @@ located. Give the line of the declaration your claim is about.
 
 Label a finding with what it actually is. The labels route it to the right check; they are not \
 a guess at what the grader wants, and a wrong one is worse than the honest nearest fit.
-"""
+{notes_line}"""
 
 
 #: The two spellings of the severity line, chosen by `SoloReviewConfig.filing_bar`. "merge" is the
@@ -140,9 +140,19 @@ SEVERITY_LINES = {
 }
 
 
-def solo_user_template(filing_bar: str = "merge") -> str:
-    """`SOLO_USER` with its severity line spelled for this filing bar."""
-    return SOLO_USER.replace("{severity_line}", SEVERITY_LINES[filing_bar])
+#: `SoloReviewConfig.review_notes`: brief X's `notes.md`, which every Claude reviewer wrote and no
+#: gpt condition was asked for (docs/todo/reviewer-model-gap.md, 2026-10-01), as a field of the
+#: submission. Empty when the field is off, so every earlier prompt renders byte for byte.
+NOTES_LINE = """
+Also give `notes`: what you did, object by object, including what you checked and found nothing \
+wrong with. Every changed object gets an entry, closed with what you concluded about it."""
+
+
+def solo_user_template(filing_bar: str = "merge", review_notes: bool = False) -> str:
+    """`SOLO_USER` with its severity line spelled for this filing bar, and the notes line when
+    the submission requires notes."""
+    return (SOLO_USER.replace("{severity_line}", SEVERITY_LINES[filing_bar])
+            .replace("{notes_line}", NOTES_LINE if review_notes else ""))
 
 
 class SoloReviewConfig(BasePRReviewConfig):
@@ -170,6 +180,18 @@ class SoloReviewConfig(BasePRReviewConfig):
     #: not insisted on; the mandate and the tool carry no merge verdict. Only this task
     #: implements the field, so it lives here and not on the arms' base config.
     filing_bar: Literal["merge", "request"] = "merge"
+
+    #: The submission requires `notes`, the object-by-object account brief X asked Claude for
+    #: (`NOTES_LINE`), and a blank one is refused. Implemented for the request bar only: the
+    #: merge bar's tool carries `merge_ready_as_is`, and a third variant of it would be a
+    #: condition nothing has asked for.
+    review_notes: bool = False
+
+    @model_validator(mode="after")
+    def _notes_need_the_request_bar(self) -> "SoloReviewConfig":
+        if self.review_notes and self.filing_bar != "request":
+            raise ValueError("review_notes is implemented for filing_bar: request only")
+        return self
 
 
 class SoloReviewData(BasePRReviewData):
@@ -220,6 +242,8 @@ class SoloReviewResult(BasePRReviewResult):
     #: top-level result by whether it carries an `invocation_id`; without it the whole-PR
     #: review was filed as a lead, and its transcript could be found but not attributed.
     invocation_id: str = ""
+    #: The reviewer's object-by-object account, when `review_notes` asked for one; "" otherwise.
+    review_notes: str = ""
 
 
 def solo_system_prompt(config: SoloReviewConfig) -> str:
@@ -258,7 +282,8 @@ class SoloReviewTask(BasePRReviewTask):
 
     def _get_prompts(self, version: str) -> Tuple[str, str]:
         return (solo_system_prompt(self.config.task_config),
-                solo_user_template(self.config.task_config.filing_bar))
+                solo_user_template(self.config.task_config.filing_bar,
+                                   self.config.task_config.review_notes))
 
     async def create_user_prompt(self) -> str:
         return (await super().create_user_prompt()
