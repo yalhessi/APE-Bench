@@ -19,6 +19,30 @@ if TYPE_CHECKING:
     from .base_relay import BaseRelaySession
 
 
+def limit_error(usage: 'TokenUsage', turns: int, *, max_turns: Optional[int],
+                cost_limit: Optional[float], token_limit: Optional[int]) -> Optional[Exception]:
+    """The limit that `usage` over `turns` completed requests has reached, as the error that
+    ends the task; None while all three are within bounds.
+
+    The one checkpoint of a CLI scaffold's `ExecutionLimits`, read before each request: the
+    relay calls it before forwarding one, and Claude Code on a subscription, which has no
+    relay, when the SDK reports the next one starting. Checked before rather than after, so
+    the reply that reaches a limit still has its tool calls run, a submission among them.
+    """
+    from ape.llm_clients.config import CostExhaustedError, TokenBudgetExhaustedError
+    from ape.scaffolds.base import MaxTurnsReachedError
+
+    if max_turns is not None and turns >= max_turns:
+        return MaxTurnsReachedError(f"Turn limit reached: {turns}/{max_turns}")
+    if cost_limit is not None and usage.total_cost >= cost_limit:
+        return CostExhaustedError(
+            f"Cost limit exceeded: ${usage.total_cost:.6f} >= ${cost_limit:.6f}")
+    if token_limit is not None and usage.processed_tokens >= token_limit:
+        return TokenBudgetExhaustedError(
+            f"Token limit exceeded: {usage.processed_tokens:,} >= {token_limit:,}")
+    return None
+
+
 class BaseConversationManager(ABC):
     """
     Base Conversation Manager - Abstract conversation control
