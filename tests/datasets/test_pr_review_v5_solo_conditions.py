@@ -110,3 +110,6 @@ def test_the_codex_condition_has_no_shell_and_only_apes_tools(name):
     assert config["web_search"] is False
     assert config["relayed_builtin_tools"] == ["update_plan"]
     assert config["list_mcp_tools_upfront"] is True
+    # Without APE's file tools a shell-less Codex cannot read a file: the first smoke run
+    # (pr5_probe0708_gpt52_G_codex_smoke1) was offered no file_read or content_search.
+    assert config["use_native_tools"] is True

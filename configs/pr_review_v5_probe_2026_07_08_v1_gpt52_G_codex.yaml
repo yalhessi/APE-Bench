@@ -17,4 +17,8 @@ approval_policy: never
 web_search: false
 disabled_features: [shell_tool, unified_exec, browser_use, computer_use, image_generation, apps, plugins, multi_agent, memories, goals]
 relayed_builtin_tools: [update_plan]
+# APE's own file tools (file_read, content_search), which a harness with its own file tools goes without.
+# With no shell, they are Codex's only way to read the PR; the task's tool list still governs the set,
+# so it is APE-Agent's.
+use_native_tools: true
 list_mcp_tools_upfront: true
