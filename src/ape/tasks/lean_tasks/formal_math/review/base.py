@@ -249,16 +249,26 @@ class BasePRReviewTask(BaseLeanTask):
         tools = self.config.task_config.enabled_tools or []
         has = lambda t: t in tools  # noqa: E731
         parts = []
-        if has("file_read"):
+        if getattr(self.config, "scaffold_type", "") == "claude_code":
+            # Claude Code keeps its own file tools and APE's are not registered there, so the
+            # line below named three tools the session did not have (`file_read`,
+            # `content_search`, `file_search`), and a reviewer called `zulip_search` by its bare
+            # name twice where the harness spells it `mcp__core__zulip_search` (2026-10-01).
+            parts.append("read and search files with Read, Grep and Glob")
+            parts.append("every other tool below is spelled `"
+                         f"{self.config.mcp_server_name}<name>`")
+        if has("file_read") and not parts:
             parts.append("read files")
-        if has("content_search"):
+        if has("content_search") and getattr(self.config, "scaffold_type", "") != "claude_code":
             parts.append("grep the repo (content_search)")
-        if has("file_search"):
+        if has("file_search") and getattr(self.config, "scaffold_type", "") != "claude_code":
             parts.append("find files by name (file_search)")
         if has("lean_retrieve"):
             parts.append("semantic library search (lean_retrieve)")
         if has("lean_verify"):
-            parts.append("compile/verify Lean code (lean_verify)")
+            parts.append("compile a snippet against the library (lean_verify)"
+                         if getattr(self, "lean_verify_snippet_only", False)
+                         else "compile/verify Lean code (lean_verify)")
         if has("get_lean_goal"):
             parts.append("inspect goals")
         if any(has(t) for t in ("code_hover", "code_goto")):
@@ -416,9 +426,10 @@ class BasePRReviewTask(BaseLeanTask):
         key = _strip_ws_prefix(path)
         if key in cache:
             return cache[key]
+        empty = {"errors": set(), "warnings": set()}
         code, err = self._edited_file_code(path)
         if code is None:
-            cache[key] = set()
+            cache[key] = empty
             return cache[key]
         from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
 
@@ -426,18 +437,21 @@ class BasePRReviewTask(BaseLeanTask):
         try:
             baseline = await lean_tool.execute(code=code, max_messages=50, options=WHOLE_FILE_OPTIONS)
         except Exception:  # noqa: BLE001
-            cache[key] = set()
+            cache[key] = empty
             return cache[key]
         cache[key] = {
-            self._error_key(item) for item in (baseline.get("errors") or [])
+            "errors": {self._error_key(item) for item in (baseline.get("errors") or [])},
+            "warnings": {self._error_key(item) for item in (baseline.get("warnings") or [])},
         }
         return cache[key]
 
     async def _attribute_errors(self, path: Optional[str], result: Dict[str, Any]) -> Dict[str, Any]:
-        """Split a compile result into errors this edit introduced and errors already present."""
+        """Split a compile result into the errors and warnings this edit introduced and those
+        already present."""
 
         errors = list(result.get("errors") or [])
-        if not errors:
+        warnings = list(result.get("warnings") or [])
+        if not errors and not warnings:
             return result
         baseline = await self._baseline_diagnostics(path)
         enriched = dict(result)
@@ -455,7 +469,6 @@ class BasePRReviewTask(BaseLeanTask):
         baseline = baseline["errors"]
         introduced = [item for item in errors if self._error_key(item) not in baseline]
         pre_existing = [item for item in errors if self._error_key(item) in baseline]
-        enriched = dict(result)
         enriched["errors_introduced_by_your_edit"] = introduced
         enriched["errors_already_in_the_file"] = pre_existing
         # The note states what was measured and nothing more. It used to end "The file does
@@ -671,6 +684,18 @@ class BasePRReviewTask(BaseLeanTask):
                               "object by object, including what you checked and found nothing "
                               "wrong with, then call this tool again."),
                 }
+            budget = self.config.task_config.finding_budget
+            if 0 < budget < len(findings or []):
+                # Refused, not truncated. `_normalize_findings` used to cut the tail and warn in
+                # the log, so a finding past the budget vanished with nothing said to the
+                # reviewer: 2 and 4 findings on 33149 in two dev reps (2026-10-01). The reviewer
+                # chooses what to drop.
+                return {
+                    "success": False, "outcome": "invalid_request",
+                    "error": (f"Not recorded: {len(findings)} findings exceed this review's budget "
+                              f"of {budget}. Call again with at most {budget}, keeping the changes "
+                              "you would most insist on; mention the rest in `message`."),
+                }
             extra = {} if notes is None else {"review_notes": notes}
             try:
                 normalized = self._normalize_findings(findings or [])
@@ -684,18 +709,6 @@ class BasePRReviewTask(BaseLeanTask):
                     findings=normalized, review_message=message or "", **extra,
                 )
                 if self.termination_callback:
-            budget = self.config.task_config.finding_budget
-            if 0 < budget < len(findings or []):
-                # Refused, not truncated. `_normalize_findings` used to cut the tail and warn in
-                # the log, so a finding past the budget vanished with nothing said to the
-                # reviewer: 2 and 4 findings on 33149 in two dev reps (2026-10-01). The reviewer
-                # chooses what to drop.
-                return {
-                    "success": False, "outcome": "invalid_request",
-                    "error": (f"Not recorded: {len(findings)} findings exceed this review's budget "
-                              f"of {budget}. Call again with at most {budget}, keeping the changes "
-                              "you would most insist on; mention the rest in `message`."),
-                }
                     try:
                         await self.termination_callback(result)
                     except Exception as exc:  # noqa: BLE001
@@ -833,6 +846,16 @@ _VERIFY_CONCURRENCY = 3
 # tree is rooted at target_workspace.path with repo-relative paths (Mathlib/…).
 _WS_PREFIX_RE = re.compile(r"^(?:target/|reference/[^/]+/|scratch/|a/|b/|\./|/)+")
 
+#: `-D` options for compiling a whole reviewed Mathlib file: the standard linter set, as the
+#: package build and CI apply it (`lakefile.lean`, `mathlibLeanOptions`, each name prefixed
+#: `weak.` so that a file compiled outside the package accepts it). Without it a whole-file
+#: compile reported `warnings: []` on a 101-character line the maintainers asked to wrap
+#: (d0041; `transcript-inspection-2026-09-30`), and the one reviewer that found it compiled a
+#: snippet with the linter switched on by hand. Checked 2026-10-01 in a reviewed workspace:
+#: the long-line linter fires on a standalone compile with this option and not without it.
+#: Snippet probes (`lean_verify`) do not get it: the header linter would flag every snippet.
+WHOLE_FILE_OPTIONS = {"weak.linter.mathlibStandardSet": "true"}
+
 
 def splice_declaration(
     src: str, declaration_name: str, new_declaration: str, *, label: str = "the file",
@@ -858,16 +881,6 @@ def splice_declaration(
     except Exception as exc:  # noqa: BLE001
         return None, f"could not parse {label} to locate `{declaration_name}`: {exc}"
     matches = [d for d in decls if declaration_name in (d.name, d.fullname)
-#: `-D` options for compiling a whole reviewed Mathlib file: the standard linter set, as the
-#: package build and CI apply it (`lakefile.lean`, `mathlibLeanOptions`, each name prefixed
-#: `weak.` so that a file compiled outside the package accepts it). Without it a whole-file
-#: compile reported `warnings: []` on a 101-character line the maintainers asked to wrap
-#: (d0041; `transcript-inspection-2026-09-30`), and the one reviewer that found it compiled a
-#: snippet with the linter switched on by hand. Checked 2026-10-01 in a reviewed workspace:
-#: the long-line linter fires on a standalone compile with this option and not without it.
-#: Snippet probes (`lean_verify`) do not get it: the header linter would flag every snippet.
-WHOLE_FILE_OPTIONS = {"weak.linter.mathlibStandardSet": "true"}
-
                or (d.fullname and d.fullname.endswith("." + declaration_name))]
     if not matches:
         return None, f"declaration `{declaration_name}` not found in {label}"
