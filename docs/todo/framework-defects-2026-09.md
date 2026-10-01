@@ -288,7 +288,12 @@ PreToolUse refusal and a per-attempt transcript audit (`bf26b5e`). The relay rea
 grant are pre-approved, because `dontAsk` refused 7 of 8 calls otherwise (`8dbcf9c`). Smoke 3 (PR
 41930, $0.14, 26 s) ran end to end: brief delivered, audit clean and usable, one submission landed,
 no findings, as with both G runs on that PR. Smokes 1 and 2 ($0.00 and $0.38) are the two failures
-those commits name.
+those commits name. Each session's CLI now reaches its own relay (`196d948`): in
+`probe_postcutoff_gpt52_G_claude_rep1` four of six sessions shared one, so that run is spent and is
+not a measurement. Its commit guessed that the 12 `CancelledError` tracebacks meant sessions cut off
+at the shared turn limit. That was wrong: the valid runs show the same 12, two a session, from the
+session being stopped at submission. The valid runs are `probe_postcutoff_gpt52_G_claude_v2_rep{1,2,3}`
+(`d682c71`), 18 of 18 attempts audited clean and usable.
 
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
@@ -301,8 +306,12 @@ directory" errors a session, on `target/` and on `scratch/` paths. Smoke 3 under
 it twice and stopped compiling. `lean_verify_edit` is unaffected, because it reads
 `target_workspace.path` directly.
 
-It does not bias the harness comparison, since G and G-under-Claude-Code share it. It does cost both
-of them the plain compile check. **What would close it:** compare resolved paths with a resolved
+**It is not neutral between harnesses** (corrected the same day, from the three-repetition run
+`d682c71`). Under Claude Code it refused 29 of 32 `lean_verify` calls, against 13 of 18 under
+APE-Agent. Claude Code's preamble is built with absolute paths (`use_absolute_paths=True`, from
+`.resolve()`), so it advertises the store paths, which the check always rejects. APE-Agent's
+relative `target/` paths fail too, but less often. So the harness comparison on the post-cutoff
+set carries this difference as well as the harness's own. **What would close it:** compare resolved paths with a resolved
 root, and allow the task's provisioned workspaces (the same roots as
 `claude_code/containment.provisioned_roots`). It changes what every review condition can do, so it
 lands at a run boundary, with G re-run beside whatever is compared against it.
