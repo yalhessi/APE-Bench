@@ -310,6 +310,49 @@ had been counting each turn twice. Residual per session, estimated with caching:
 and 2.4x the output of APE-Agent, about $0.09 against $0.05. That is the harness's own difference,
 from one set of runs.
 
+**Claude on a subscription: built on `claude-subscription` (2026-10-01), not yet run end to end.**
+Each item above has a fix and a test (`bcdf81e`, `75d85bd`). The scaffold config pins
+`claude_model`, `cli_version` and `effort`. The login travels as `CLAUDE_CODE_OAUTH_TOKEN`, and
+both the preflight and the scaffold refuse a run without it. Usage comes from the stream's
+per-reply events, then from the result's cumulative `model_usage`, and the relay's limit
+checkpoint (`limit_error`) runs before each reply. The session id comes from the init message. A
+spent limit, an error reply or result, a fallback model or a safety refusal fails the attempt.
+The live probes behind it (the user's login, seven short sessions):
+- **The bundled CLI cannot run Opus 5.5.** SDK 0.1.81's 2.1.139 refuses `claude-opus-5-5` with
+  "version 2.1.280 or newer is required". It also takes Opus 5 and 4.8 for 200K / 32K models when
+  they are 1M / 128K, so it would compact a long session early. 2.1.285 is pinned at
+  `data/resources/claude-2.1.285-linux-x64`, copied from the VS Code extension; its sha256 is beside
+  it. The relay route still runs 2.1.139, so a relay cell and a subscription cell differ in CLI
+  release as well as model.
+- **The refusal reads as a success to a check on `subtype`.** It arrives with `subtype: success`,
+  `is_error: true` and status 400, so `is_error` is what the scaffold reads.
+- **The login brings its claude.ai connectors.** Without `strict_mcp_config`, the model's second
+  reply quoted a notice injected mid-session ("several claude.ai connectors aren't authorized
+  yet: Asana, ..."). With it, nothing appeared. The route requires it, and also sets
+  `ENABLE_CLAUDEAI_MCP_SERVERS=false` and `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`.
+- **A launching Claude Code session leaks into its child.** The SDK passes the parent
+  environment through, including `CLAUDE_EFFORT=xhigh`, the parent's session id and its
+  messaging socket. The route blanks every inherited `CLAUDE*` variable except the token.
+
+For the model cells of `docs/plans/2026-10-01-claude-models-under-the-harness.md` (on
+`post-carryover-replan`), from Anthropic's model pages, read 2026-10-01:
+
+| model | id | training-data cutoff | dev PRs (created 2025-12-18..31) | post-cutoff set (2026-07-08 on) |
+|---|---|---|---|---|
+| Opus 5.5 | `claude-opus-5-5` | Jun 2026 | inside | after |
+| Opus 5 | `claude-opus-5` | May 2026 | inside | after |
+| Opus 4.8 | `claude-opus-4-8` | Jan 2026 | at the edge: a PR's review and merge can fall after it | after |
+
+All three are dateless IDs, each a pinned snapshot. The probe harness recorded no effort for its
+Claude sessions. They ran as subagents of a Claude Code session, and today's sessions export
+`CLAUDE_EFFORT=xhigh`, but nothing shows what the swap ran at. So the H-claude cell carries an
+effort guess against the swap, and should say so.
+
+**What would close it:** a token from `claude setup-token`, exported in the launching shell; then
+one smoke on a small post-cutoff PR (41930 or 43192, as the relay smokes were), audited clean and
+usable, with `claude_code_session.json` showing the pinned model, version and `apiKeySource:
+none` (the check refuses anything else, and nothing has shown what the setup token reports).
+
 ## `lean_verify` with a `file_path` refuses every path, under every scaffold (found 2026-10-01)
 
 `toolkits/execute/lean/tools.py` resolves `workspaces_dir / file_path` and then requires the result
