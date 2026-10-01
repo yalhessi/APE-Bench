@@ -206,3 +206,36 @@ matchers in `match_codex_off/` and `match_codex_carried/`. Per PR the eleven set
 comparable, `d >= 0.10` Codex reaches more, `d <= -0.10` APE-Agent reaches more, otherwise
 inconclusive. `reach(C) - reach(A)` is read again in the same matchings, as a replication of the
 two comparisons above. A different reading there is reported, not reconciled.
+
+### Result, three harnesses (matched 2026-10-01)
+
+Four blind matchers, two per seal (`40a9274`), eleven reviewers a PR. Audits: 13, 11, 9 and 8 calls.
+The three flags are a matcher running its own `tmp/build.py` with the repository's interpreter,
+the benign pattern adjudicated before. Agreement: 174 of 176 cells with reasoning off, 176 of 176
+carried.
+
+| reach over 16 asks | A (APE-Agent) | C (Claude Code) | Cx (Codex) | X (Claude) | **Cx - A** | C - A |
+|---|---|---|---|---|---|---|
+| reasoning off, matcher 1 | 0.167 | 0.125 | 0.021 | 0.469 | **-0.146** | -0.042 |
+| reasoning off, matcher 2 | 0.146 | 0.125 | 0.021 | 0.469 | **-0.125** | -0.021 |
+| carried, both matchers | 0.208 | 0.250 | 0.292 | 0.469 | **+0.083** | +0.042 |
+
+**By the rule.** Reasoning off: `Cx - A <= -0.10` on both matchers, so **APE-Agent reaches more than
+Codex**. Codex's sessions reach 0, 1 and 0 asks (0.03 per finding, against A's 0.14). Carried:
+`Cx - A = +0.083` on both, between the thresholds: **inconclusive**. Codex is highest in mean
+(0.29), in union (7 asks, against A 5 and C 4) and per finding (0.74, against 0.52-0.56), with 3
+stable asks. `C - A` repeats the two comparisons above exactly (-0.042 / -0.021 off, +0.042
+carried), so the matchings agree with each other.
+
+- **Codex at reasoning off made no comparison lookup at all**: 0.0 a session, against APE-Agent's
+  3.4 and Claude Code's 0.6. It used only `content_search` (148) and `file_read` (85). Carried, it
+  made 7.7, the most of the three, with 2.8 `lean_verify_edit` a session.
+- **A possible cause, not tested:** Codex is told the model is `gpt-5.2`, so it sends its own prompt
+  for a reasoning model run at medium effort. With reasoning off, the relay runs the model without
+  reasoning under that prompt. The other two harnesses' prompts assume no reasoning setting.
+- **Cost**, three repetitions: reasoning off A $0.84, C $1.22, Cx $1.06; carried A $7.81, C
+  $10.19, Cx $9.40.
+
+**Read at this altitude.** One model, 16 asks, three runs a condition. Codex's reasoning-off reading
+holds by the rule. It is a statement about this configuration, not about Codex with reasoning,
+where it is the strongest of the three without clearing the threshold.
