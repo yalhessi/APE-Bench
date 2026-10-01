@@ -186,6 +186,18 @@ class ClaudeCodeConversationManager(BaseConversationManager):
 
         return None
 
+    @staticmethod
+    def find_session_file(claude_home: Path, session_id: str) -> Optional[Path]:
+        """Claude Code's own transcript of `session_id`, under `claude_home/.claude/projects/`.
+
+        Found by its name rather than by re-deriving the project directory. That directory is
+        the CLI's working directory (`workspaces/`) with every non-alphanumeric character turned
+        to `-`; this used to encode the `scratch/` path and only `/`, `.` and `_`, so the file
+        was never found, no transcript reached the attempt, and nothing could audit the session.
+        """
+        found = sorted((Path(claude_home) / ".claude" / "projects").glob(f"*/{session_id}.jsonl"))
+        return found[0] if found else None
+
     async def _try_create_hardlink(self) -> None:
         """
         Try to create hardlink for SDK conversation file (only once)
@@ -202,21 +214,10 @@ class ClaudeCodeConversationManager(BaseConversationManager):
             return
 
         try:
-            if not self.task.scratch_workspace or not self.task.attempt_path:
+            if not self.task.workspaces_dir or not self.task.attempt_path:
                 raise RuntimeError("Task workspace not initialized for Claude conversation")
-            # Encode cwd as project directory name
-            cwd = str(self.task.scratch_workspace.path.resolve())
-            encoded_cwd = cwd.replace("/", "-").replace(".", "-").replace("_", "-")
-
-            # SDK session file path (using HOME=workspaces/)
-            # HOME is now workspaces/, so ~/.claude/ is workspaces/.claude/
-            workspaces_dir = self.task.workspaces_dir
-            claude_home = workspaces_dir / ".claude"
-            claude_projects_dir = claude_home / "projects"
-            project_dir = claude_projects_dir / encoded_cwd
-            sdk_session_file = project_dir / f"{session_id}.jsonl"
-
-            if not sdk_session_file.exists():
+            sdk_session_file = self.find_session_file(self.task.workspaces_dir, session_id)
+            if sdk_session_file is None:
                 return
 
             # Create hardlink

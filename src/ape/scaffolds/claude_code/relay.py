@@ -194,10 +194,10 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             self.logger.info(f"Received request: {client_requested_model} (turn {self.get_current_turns() + 1}/{self.max_turns or '∞'})")
 
             # Extract and save Claude Code session ID
-            user_id = anthropic_request.get('metadata', {}).get('user_id')
-            if user_id:
-                session_id = self._extract_session_id(user_id)
-                if session_id and not self.claude_code_session_id:
+            user_id = (anthropic_request.get('metadata') or {}).get('user_id')
+            session_id = self._extract_session_id(user_id, request.headers)
+            if session_id:
+                if not self.claude_code_session_id:
                     self.claude_code_session_id = session_id
                     self.logger.info(f"Extracted Claude Code session ID: {session_id}")
 
@@ -274,10 +274,28 @@ class ClaudeCodeRelaySession(BaseRelaySession):
                 status_code=500
             )
 
-    def _extract_session_id(self, user_id: str) -> Optional[str]:
-        """Extract Claude Code session ID from user_id"""
+    @staticmethod
+    def _extract_session_id(user_id: Optional[str], headers=None) -> Optional[str]:
+        """Claude Code's session ID, from wherever this CLI version puts it.
+
+        2.0.x put it in `metadata.user_id` as `..._account_<uuid>__session_<uuid>`. 2.1.x (2.1.139
+        is the one claude-agent-sdk 0.1.81 bundles) sends an `X-Claude-Code-Session-Id` header and
+        makes `user_id` a JSON string with a `session_id` key. Read only the old way, every request
+        under 2.1.x failed building its session, before any model call, and the CLI retried.
+        """
+        if headers is not None:
+            header = headers.get("x-claude-code-session-id")
+            if header:
+                return header
         if not user_id:
             return None
+        if user_id.lstrip().startswith("{"):
+            try:
+                session_id = json.loads(user_id).get("session_id")
+            except (ValueError, AttributeError):
+                session_id = None
+            if session_id:
+                return str(session_id)
         match = re.search(r'__session_([a-f0-9\-]+)', user_id)
         return match.group(1) if match else None
 
@@ -331,7 +349,9 @@ class ClaudeCodeRelaySession(BaseRelaySession):
         tools: Optional[List[Dict[str, Any]]] = None
     ) -> ConversationSession:
         """Convert Anthropic request to ConversationSession"""
-        session = ConversationSession(session_id=self.claude_code_session_id)
+        # Keyed by Claude Code's own session when known; a request is never refused for lacking it.
+        session = (ConversationSession(session_id=self.claude_code_session_id)
+                   if self.claude_code_session_id else ConversationSession())
         cwd = self.cwd
 
         # Handle system message

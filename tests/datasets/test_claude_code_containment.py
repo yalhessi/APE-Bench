@@ -298,3 +298,42 @@ def test_a_workspace_under_a_linked_run_root_is_reachable_by_either_spelling(tmp
     assert violation("Read", {"file_path": f"{workspaces}/scratch/notes.md"}, roots, cwd) is None
     assert violation("Read", {"file_path": f"{cwd}/scratch/notes.md"}, roots, cwd) is None
     assert violation("Read", {"file_path": str(gold)}, roots, cwd)
+
+
+# --- the transcript must reach the attempt, or nothing can audit it ------------------------
+
+
+@pytest.mark.parametrize("user_id,headers,expected", [
+    # 2.1.x, as captured from the bundled CLI (2.1.139) on 2026-10-01: a header, and JSON user_id
+    ('{"device_id":"d","account_uuid":"","session_id":"10f86fe9-9fb0-41a4-91bc-66d07775aa84"}',
+     {"x-claude-code-session-id": "10f86fe9-9fb0-41a4-91bc-66d07775aa84"},
+     "10f86fe9-9fb0-41a4-91bc-66d07775aa84"),
+    ('{"device_id":"d","account_uuid":"","session_id":"10f86fe9-9fb0-41a4-91bc-66d07775aa84"}',
+     None, "10f86fe9-9fb0-41a4-91bc-66d07775aa84"),
+    # 2.0.x
+    ("user_abc_account_1234__session_7e2f-aa01", None, "7e2f-aa01"),
+    (None, None, None),
+])
+def test_the_relay_reads_the_session_id_of_either_cli_generation(user_id, headers, expected):
+    """Read only the 2.0.x way, every request under the bundled 2.1.139 CLI failed building its
+    session before any model call (the first smoke run, 2026-10-01: 12 of 12)."""
+
+    from ape.scaffolds.claude_code.relay import ClaudeCodeRelaySession
+
+    assert ClaudeCodeRelaySession._extract_session_id(user_id, headers) == expected
+
+
+def test_the_session_file_is_found_by_name_not_by_a_rederived_directory(tmp_path):
+    """The CLI names its project directory after its cwd with every non-alphanumeric character
+    turned to `-` (`probe_cwd` -> `probe-cwd`); the old lookup re-derived it from `scratch/`."""
+
+    from ape.scaffolds.claude_code.conversation import ClaudeCodeConversationManager
+
+    project = tmp_path / ".claude" / "projects" / "-tmp-attempt-1-workspaces"
+    project.mkdir(parents=True)
+    session = project / "10f86fe9.jsonl"
+    session.write_text("{}\n")
+
+    find = ClaudeCodeConversationManager.find_session_file
+    assert find(tmp_path, "10f86fe9") == session
+    assert find(tmp_path, "absent") is None
