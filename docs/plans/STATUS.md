@@ -204,5 +204,13 @@ names as the new reference baseline.
   Phase 2 runs. It grew a contract thread, `results/pr_review_v5/probes/contract-2026-10-01/`:
   contract v1 and v2 on gpt_5.2, v2 on gpt-5.5, and the swap. The swap places gpt's gap in the
   model or harness, not the prompt.
-* `2026-10-01-claude-models-under-the-harness.md` is **not built**. It needs `claude-code-harness`
-  merged and the six subscription-route fixes it lists, before any run.
+* `2026-10-01-claude-models-under-the-harness.md` is **partial** (on `claude-subscription`,
+  merged 2026-10-01). Built: all six subscription-route fixes (`75d85bd`, with the CLI pinned at
+  2.1.285 and effort at xhigh), the contract-v2 preamble knobs on every scaffold (`ea47258`), and
+  the five dev cell configs (`a075e26`). Run on dev: H-claude reps 1 and 2 (7, 7), M-5 (8) and
+  M-4.8 (3), all judged. Rep 3 is partial (8 of 15) and uncommitted. Not run: H-gpt (held by the
+  user, paid), and the whole post-cutoff half. Readings:
+  `results/pr_review_v5/probes/claude-models-2026-10-01/README.md`.
+* Built beside it: `run --resume` reopens a partial run, requeueing the sessions that failed on
+  errors and keeping the successes (`ebee26c`, `9ceba2a`). Still open: a scheduler that starts no
+  new session at the subscription's `allowed_warning`.

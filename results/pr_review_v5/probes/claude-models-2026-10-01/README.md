@@ -147,3 +147,30 @@ Against the swap's 10: 7 of the swap's obligations are in H-claude's union and 3
 of H-claude's is not the swap's. Two repetitions agree to the obligation count and on 6 of 7
 obligations, so the gap to the swap is not a low draw: it is 3, the boundary of the rule. Rep 3
 is running and closes the cell (mean / union / stable).
+
+## Where this stands (2026-10-01, handed to a planning session)
+
+| cell (dev, contract v2, Claude Code) | runs | obligations of 23 | held-out findings | hits / finding |
+|---|---|---|---|---|
+| H-claude, Opus 5.5 | rep 1, rep 2 (rep 3 partial) | 7, 7 (union 8, stable 6) | 77, - | 0.091 |
+| M-5, Opus 5 | rep 1 | 8 | 73 | 0.110 |
+| M-4.8, Opus 4.8 | rep 1 | 3 | 29 | 0.103 |
+| (swap, probe harness, Opus 5.5) | - | 10 | 99 | 0.101 |
+| (gpt-5.5, ape_agent, same prompt) | - | 3 | 30 | 0.100 |
+
+- **H-claude rep 3** (`probe_dev_opus55_contract2_claude_sub_rep3`) is partial and uncommitted. It
+  ran 8 of 15 sessions (7 of the held-out 12). 33066, 33098, 33145, 33149, 33285, 33321 and 33337
+  failed when a third subscription's limit was spent. `run --resume` on a token with headroom
+  requeues exactly those. Reps 1 and 2 spent 12-16M tokens on these seven PRs. Its orchestrator
+  state is in `.ape/runs/` (shared), and its results directory is untracked in the
+  `claude-subscription` worktree.
+- **Not run:** the H-gpt cells (`configs/pr_review_v5_dev_medium_gpt5{2,5}_Grc_contract2_claude.yaml`,
+  paid, held by the user) and the whole post-cutoff half. The post-cutoff half is the one test of
+  whether Opus 4.8's gap is generation or memory, and of whether the Opus 5 models' dev reach is
+  review.
+- **Quota:** each five_hour window held about one dev run (20-24M processed tokens, mostly cache
+  reads). Check a token before a run (a one-line `claude -p` with `HOME` elsewhere reports the
+  `rate_limit_event`), and stop at the first `allowed_warning` if the account is also in
+  interactive use.
+- **One run per cell except H-claude.** CLAUDE.md asks for three repetitions before a reading
+  stands. M-5 and M-4.8 have one each.
