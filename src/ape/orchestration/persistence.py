@@ -19,7 +19,7 @@ from ape.utils.file_ops import file_lock, read_json, write_json
 from ape.tasks.base import BaseTaskResult, get_task_class
 
 from .models import (
-    Sample, OrchestratorProgress, SampleProgress,
+    Sample, SampleRequeue, OrchestratorProgress, SampleProgress,
     ExecutionStatus, OrchestratorResults, make_sample_id
 )
 
@@ -128,6 +128,48 @@ class TaskStorage:
 
         return sample
 
+
+
+async def requeue_failed_samples(tasks_dir: Path, max_retries: int, reason: str, *,
+                                 dry_run: bool = False) -> List[Dict[str, Any]]:
+    """Put back in the queue every sample that failed on system errors with its retries spent.
+
+    The samples a partial run lost to its environment -- a spent subscription limit, a dead
+    connection -- and nothing else. A requeued sample keeps its attempts and what they spent,
+    and its retry count restarts after them (`Sample.requeues`). Its task's aggregate,
+    `task_result.json` and `task_outcome.json`, is removed, because the orchestrator skips any
+    task that has one; the worker writes both again when the sample next finishes. Left alone:
+    a task already aggregated as a success, every successful sample, every model failure
+    (`Sample.is_failed_on_errors` says why), and any sample that can still run as it is.
+
+    Returns one row per sample put back (or that would be, with `dry_run`).
+    """
+
+    requeued: List[Dict[str, Any]] = []
+    if not tasks_dir.is_dir():
+        return requeued
+    for task_dir in sorted(p for p in tasks_dir.iterdir() if p.is_dir()):
+        storage = TaskStorage(task_dir, task_dir.name)
+        result = await storage.load_task_result()
+        if result and result.get("success"):
+            continue
+        failed = [sample for _, sample in sorted((await storage.load_all_samples()).items())
+                  if sample.is_failed_on_errors(max_retries)]
+        for sample in failed:
+            requeued.append({"task": task_dir.name, "sample_index": sample.sample_index,
+                             "attempts": len(sample.attempts),
+                             "errors": sample.get_error_count()})
+            if dry_run:
+                continue
+            now = datetime.now()
+            sample.requeues.append(SampleRequeue(
+                at=now, after_attempt=len(sample.attempts), reason=reason))
+            sample.updated_at = now
+            await storage.save_sample(sample)
+        if failed and not dry_run:
+            for name in ("task_result.json", "task_outcome.json"):
+                (task_dir / name).unlink(missing_ok=True)
+    return requeued
 
 # ============================================================================
 # Progress Management

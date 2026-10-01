@@ -92,6 +92,16 @@ class Attempt(BaseModel):
     tokens: int = 0
 
 
+class SampleRequeue(BaseModel):
+    """A failed sample put back in the queue, and where its retry count restarts."""
+
+    at: datetime
+    #: How many attempts the sample had when it was requeued. Its retry budget counts system
+    #: errors after this point only; the earlier attempts stay, with what they spent.
+    after_attempt: int
+    reason: str
+
+
 # ============================================================================
 # Sample - Sample execution record
 # ============================================================================
@@ -104,6 +114,10 @@ class Sample(BaseModel):
     task_global_index: str
 
     attempts: List[Attempt] = Field(default_factory=list)
+
+    #: Every time the sample was requeued after its retries ran out (`requeue_failed_samples`).
+    #: Defaulted, so sample records written before requeueing existed still load.
+    requeues: List[SampleRequeue] = Field(default_factory=list)
 
     created_at: datetime
     updated_at: datetime
@@ -185,8 +199,17 @@ class Sample(BaseModel):
         return 0
 
     def get_error_count(self) -> int:
-        """Get system error count."""
-        return sum(1 for a in self.attempts if a.status.is_system_error())
+        """System errors since the sample was last requeued: what its retry budget counts."""
+        since = self.requeues[-1].after_attempt if self.requeues else 0
+        return sum(1 for a in self.attempts[since:] if a.status.is_system_error())
+
+    def is_failed_on_errors(self, max_retries: int) -> bool:
+        """Failed on system errors with its retries spent: what a requeue puts back.
+
+        Not a model's failure (`failed_model`, `failed_early_stop`): those are the outcome the
+        run measures, and re-running them would choose which sessions count.
+        """
+        return self.status.is_system_error() and self.get_error_count() > max_retries
 
     def get_attempt_count(self) -> int:
         """Get total attempt count."""
