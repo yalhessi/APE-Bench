@@ -34,5 +34,9 @@
   "calls": 29,
   "flagged": 1,
   "adjudication": "one flag: after reading its own ptool script it ran `ls` on that script's raw-output directory (.ape/probe_scratch/swap/raw/pr33305/S1), which holds only this session's own tool outputs. A read outside the folder in letter; no other reviewer's output and nothing of the PR's future. Kept."
+ },
+ "33304": {
+  "calls": 27,
+  "flagged": 0
  }
 }
