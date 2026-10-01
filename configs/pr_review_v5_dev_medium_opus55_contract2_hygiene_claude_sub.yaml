@@ -1,0 +1,23 @@
+# Layer 0 of docs/plans/2026-10-01-beyond-the-solo-baseline.md: H-claude (contract v2 under Claude
+# Code, claude-opus-5-5 on the subscription) on the hygiene layer's tools, with the two knobs the
+# layer's own measurements asked for:
+# - `Write` and `Edit` granted, so that the first message's "scratch/ ... your workspace
+#   (read-write) ... for creating and editing files" is true; containment refuses either outside
+#   `scratch/` (claude_code/containment.py, `WRITE_TOOLS`), so nothing reaches the shared
+#   reviewed-workspace store;
+# - the solo finding budget at 40: 20 bound on 33149 in both H-claude reps (22 and 24 filed), and
+#   a call past the budget is now refused rather than truncated, so the bound is the reviewer's.
+# Everything else is H-claude's: brief G2, user prompt v2, the per-declaration ledger, the request
+# filing bar, the five context tools (less `proof_profile`, which left the base grant), CLI 2.1.285
+# at xhigh, contract v2's caps.
+#
+# Reading rule (plan §5, Layer 0): no recall rule. The layer passes if the truncation and the
+# contradiction are gone and held-out findings per rep are not below H-claude's 77; then three
+# reps re-baseline, read as mean / union / stable against H-claude's 7, 7 (union 8, stable 6).
+extends: pr_review_v5_dev_medium_opus55_contract2_claude_sub.yaml
+
+tools: [Read, Grep, Glob, TodoWrite, Write, Edit]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, MultiEdit, NotebookEdit]
+
+task_config:
+  finding_budget: 40
