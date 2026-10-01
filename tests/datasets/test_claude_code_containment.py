@@ -133,3 +133,168 @@ def test_a_review_workspace_resolves_git_upward_into_this_repository():
         f"`.ape/` resolved to an unrelated work tree: {resolved}")
     assert (resolved / "inputs/pr_review_v4/releases").is_dir(), (
         "the upward work tree is the one holding gold")
+
+
+# --- the refusal and the audit (`containment.py`) -----------------------------------------
+
+
+def _review_layout(tmp_path):
+    """The real shape, small: `workspaces/target` links to a reviewed workspace in a shared
+    store, whose entries link into the base checkout; the store also holds a later commit's
+    workspace, and the repository beside it holds gold."""
+
+    store = tmp_path / "store"
+    base = store / "base"
+    (base / "Mathlib").mkdir(parents=True)
+    (base / "Mathlib" / "Foo.lean").write_text("theorem foo : True := trivial\n")
+    reviewed = store / "base+pr"
+    reviewed.mkdir()
+    (reviewed / "Mathlib").symlink_to(base / "Mathlib")
+    later = store / "later"
+    later.mkdir()
+    (later / "Merged.lean").write_text("the merged form of the PR under review\n")
+    gold = tmp_path / "repo" / "inputs" / "gold.json"
+    gold.parent.mkdir(parents=True)
+    gold.write_text("{}")
+    workspaces = tmp_path / "attempt" / "workspaces"
+    (workspaces / "scratch").mkdir(parents=True)
+    (workspaces / "target").symlink_to(reviewed)
+    return workspaces, base, later, gold
+
+
+def _rules(tmp_path):
+    from ape.scaffolds.claude_code.containment import provisioned_roots, violation
+
+    workspaces, base, later, gold = _review_layout(tmp_path)
+    roots = provisioned_roots(workspaces)
+    cwd = str(workspaces)
+    return (lambda name, **tool_input: violation(name, tool_input, roots, cwd)), workspaces, base, later, gold
+
+
+def test_the_workspace_and_its_provisioned_links_are_reachable(tmp_path):
+    check, workspaces, base, _later, _gold = _rules(tmp_path)
+    assert check("Read", file_path=f"{workspaces}/target/Mathlib/Foo.lean") is None
+    assert check("Read", file_path="target/Mathlib/Foo.lean") is None
+    # A tool may report a file by its resolved path; the base checkout is provisioned.
+    assert check("Read", file_path=f"{base}/Mathlib/Foo.lean") is None
+    assert check("Grep", pattern="theorem") is None          # defaults to cwd
+    assert check("Glob", pattern="**/*.lean") is None
+    assert check("Glob", pattern="*.lean", path="target/Mathlib") is None
+    assert check("TodoWrite", todos=[]) is None
+    assert check("mcp__core__file_read", path="/anywhere") is None  # scoped by APE
+
+
+def test_planted_lures_outside_the_workspace_are_refused(tmp_path):
+    check, workspaces, _base, later, gold = _rules(tmp_path)
+    assert check("Read", file_path=str(gold))                         # this repository's gold
+    assert check("Read", file_path=f"{later}/Merged.lean")            # a later commit's workspace
+    assert check("Read", file_path=f"{workspaces}/../../repo/inputs/gold.json")
+    assert check("Grep", pattern="obligation", path=str(gold.parent))
+    assert check("Glob", pattern=f"{gold.parent}/*.json")             # absolute pattern
+    assert check("Glob", pattern="../../repo/**/*.json")              # escaping pattern
+    assert check("Bash", command="git show HEAD:inputs/gold.json")    # never granted
+
+
+def test_the_hook_denies_with_a_marked_reason_and_records_it(tmp_path):
+    import asyncio
+
+    from ape.scaffolds.claude_code.containment import (
+        REFUSAL_MARK, pre_tool_use_hook, provisioned_roots)
+
+    workspaces, _base, _later, gold = _review_layout(tmp_path)
+    refusals = []
+    hook = pre_tool_use_hook(provisioned_roots(workspaces), str(workspaces), refusals)
+
+    out = asyncio.run(hook({"tool_name": "Read", "tool_input": {"file_path": str(gold)}}, "t1", None))
+    decision = out["hookSpecificOutput"]
+    assert decision["permissionDecision"] == "deny"
+    assert decision["permissionDecisionReason"].startswith(REFUSAL_MARK)
+    assert [r["tool_use_id"] for r in refusals] == ["t1"]
+
+    inside = {"tool_name": "Read", "tool_input": {"file_path": f"{workspaces}/target/Mathlib/Foo.lean"}}
+    assert asyncio.run(hook(inside, "t2", None)) == {}   # no decision: dontAsk still applies
+    assert len(refusals) == 1
+
+
+def _transcript(path, calls, refused=()):
+    """A session transcript in Claude Code's own JSONL shape."""
+
+    import json
+
+    from ape.scaffolds.claude_code.containment import REFUSAL_MARK
+
+    lines = []
+    for call_id, name, tool_input in calls:
+        lines.append({"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "id": call_id, "name": name, "input": tool_input}]}})
+        text = f"{REFUSAL_MARK} refused" if call_id in refused else "ok"
+        lines.append({"type": "user", "message": {"content": [
+            {"type": "tool_result", "tool_use_id": call_id, "is_error": call_id in refused,
+             "content": text}]}})
+    path.write_text("".join(json.dumps(line) + "\n" for line in lines))
+    return path
+
+
+def test_the_audit_fires_on_a_planted_lure_that_was_not_refused(tmp_path):
+    """The condition the solo_claude configs' headers set before any number is read."""
+
+    from ape.scaffolds.claude_code.containment import audit_transcript, provisioned_roots
+
+    workspaces, _base, later, gold = _review_layout(tmp_path)
+    roots = provisioned_roots(workspaces)
+    transcript = _transcript(tmp_path / "s.jsonl", [
+        ("a", "Read", {"file_path": f"{workspaces}/target/Mathlib/Foo.lean"}),
+        ("b", "Read", {"file_path": str(gold)}),
+        ("c", "Read", {"file_path": f"{later}/Merged.lean"}),
+        ("d", "mcp__core__submit_findings", {"findings": []}),
+    ], refused={"b"})
+
+    report = audit_transcript(transcript, roots, str(workspaces))
+    assert report["tool_calls"] == 4
+    assert [r["id"] for r in report["refused"]] == ["b"]
+    assert [r["id"] for r in report["leaks"]] == ["c"]
+    assert report["clean"] is False
+
+
+def test_the_audit_passes_a_contained_session(tmp_path):
+    from ape.scaffolds.claude_code.containment import audit_transcript, provisioned_roots
+
+    workspaces, _base, _later, gold = _review_layout(tmp_path)
+    transcript = _transcript(tmp_path / "s.jsonl", [
+        ("a", "Grep", {"pattern": "theorem", "path": "target"}),
+        ("b", "Read", {"file_path": str(gold)}),
+    ], refused={"b"})
+    report = audit_transcript(transcript, provisioned_roots(workspaces), str(workspaces))
+    assert report["clean"] is True and not report["leaks"]
+    assert report["by_tool"] == {"Grep": 1, "Read": 1}
+
+
+def test_contain_to_workspace_reaches_the_sdk_options():
+    import dataclasses
+
+    from claude_agent_sdk import ClaudeAgentOptions
+
+    from ape.scaffolds.claude_code.scaffold import ClaudeCodeScaffold
+
+    assert "hooks" in {f.name for f in dataclasses.fields(ClaudeAgentOptions)}
+    assert ClaudeCodeConfig().contain_to_workspace is False
+    source = inspect.getsource(ClaudeCodeScaffold._run_batch_mode)
+    assert "config.contain_to_workspace" in source
+    assert 'optional_containment["hooks"]' in source
+    assert "_write_containment_audit()" in inspect.getsource(ClaudeCodeScaffold._cleanup_components)
+
+
+def test_a_workspace_under_a_linked_run_root_is_reachable_by_either_spelling(tmp_path):
+    """In a worktree `.ape/` is a link to the main checkout's store, and a process's working
+    directory is resolved, so the same file arrives under two spellings."""
+
+    from ape.scaffolds.claude_code.containment import provisioned_roots, violation
+
+    workspaces, _base, _later, gold = _review_layout(tmp_path)
+    linked = tmp_path / "linked_attempt"
+    linked.symlink_to(workspaces.parent)
+    roots = provisioned_roots(linked / "workspaces")
+    cwd = str(linked / "workspaces")
+    assert violation("Read", {"file_path": f"{workspaces}/scratch/notes.md"}, roots, cwd) is None
+    assert violation("Read", {"file_path": f"{cwd}/scratch/notes.md"}, roots, cwd) is None
+    assert violation("Read", {"file_path": str(gold)}, roots, cwd)

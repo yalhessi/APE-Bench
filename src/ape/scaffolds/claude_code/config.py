@@ -68,6 +68,12 @@ class ClaudeCodeConfig(BaseScaffoldConfig):
     #: Ignore any MCP server not passed programmatically.
     strict_mcp_config: bool = False
 
+    #: Refuse, by a PreToolUse hook, any built-in tool call whose path leaves the attempt's
+    #: workspace, and write `containment_audit.json` from the session transcript after it
+    #: (`containment.py`). The grant above names which tools exist; this bounds where they
+    #: reach, which `dontAsk` was never shown to do. Batch mode only.
+    contain_to_workspace: bool = False
+
     # LLM streaming configuration
     # default disable streaming to ensure token usage statistics correct
     # in streaming mode, some provider's token usage may not return correctly, resulting in cost statistics of 0

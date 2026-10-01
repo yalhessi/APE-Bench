@@ -14,7 +14,7 @@ import warnings
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING, List, Dict, Any
 
-from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, HookMatcher
 from ape.cli.task_session import is_internal_cli_task, merge_task_prompt
 from ape.scaffolds.base import BaseScaffold
 from ape.scaffolds.skills import (
@@ -43,6 +43,9 @@ class ClaudeCodeScaffold(BaseScaffold):
         self.mcp_manager: Optional[MCPManager] = None
         self.managed_skills = None
         self.skill_overlay_root: Optional[Path] = None
+        # Set when batch mode runs contained: what the session may touch, and what it was refused.
+        self.containment_roots: Optional[List[str]] = None
+        self.containment_refusals: List[Dict[str, Any]] = []
 
     def _setup_asyncio_exception_handler(self) -> None:
         """Configure asyncio exception handler"""
@@ -221,6 +224,16 @@ class ClaudeCodeScaffold(BaseScaffold):
             optional_containment["setting_sources"] = list(config.setting_sources)
         if config.strict_mcp_config:
             optional_containment["strict_mcp_config"] = True
+        if config.contain_to_workspace:
+            from .containment import pre_tool_use_hook, provisioned_roots
+
+            self.containment_roots = provisioned_roots(
+                cwd, extra=[Path(d) for d in add_dirs])
+            optional_containment["hooks"] = {"PreToolUse": [HookMatcher(
+                matcher=None,
+                hooks=[pre_tool_use_hook(self.containment_roots, os.path.abspath(cwd),
+                                         self.containment_refusals, self.logger)])]}
+            self.logger.info("[ClaudeCodeScaffold] contained to %s", self.containment_roots)
 
         options = ClaudeAgentOptions(
             model=config.llm_config.model_name,
@@ -376,8 +389,44 @@ class ClaudeCodeScaffold(BaseScaffold):
         await self.conversation_manager.request_stop()
         self.logger.info("[ClaudeCodeScaffold] Interrupt signal sent")
 
+    def _write_containment_audit(self) -> None:
+        """Audit the session transcript against the containment, into the attempt directory.
+
+        Written whatever happened, so a reader finds a verdict beside every contained attempt:
+        a missing transcript is recorded as unauditable, not skipped.
+        """
+        import json
+
+        from .containment import audit_transcript
+
+        attempt_path = self.task.attempt_path
+        transcripts = sorted(attempt_path.glob("claude_code_conversation_*__*.jsonl"))
+        cwd = os.path.abspath(self.task.workspaces_dir)
+        audits = [audit_transcript(t, self.containment_roots, cwd) for t in transcripts]
+        report = {
+            "roots": self.containment_roots,
+            "refused_by_hook": self.containment_refusals,
+            "transcripts": audits,
+            "clean": bool(audits) and all(a["clean"] for a in audits),
+        }
+        if not audits:
+            report["error"] = "no session transcript in the attempt directory; nothing was audited"
+        (attempt_path / "containment_audit.json").write_text(json.dumps(report, indent=2))
+        leaks = sum(len(a["leaks"]) for a in audits)
+        log = self.logger.info if report["clean"] else self.logger.error
+        log("[ClaudeCodeScaffold] containment audit: clean=%s, %d tool calls, %d refused, %d leaked%s",
+            report["clean"], sum(a["tool_calls"] for a in audits),
+            len(self.containment_refusals), leaks,
+            "" if audits else " (no transcript)")
+
     async def _cleanup_components(self) -> None:
         """Cleanup components"""
+        if self.containment_roots is not None and self.task.attempt_path:
+            try:
+                self._write_containment_audit()
+            except Exception:
+                self.logger.error(f"containment audit failed:\n{traceback.format_exc()}")
+
         # 1. Cleanup conversation
         if self.conversation_manager:
             await self.conversation_manager.cleanup()
