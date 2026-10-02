@@ -43,13 +43,16 @@ STAGE_DIR = Path(__file__).resolve().parent / "stage_structured"
 ATTEMPT = ROOT / ".ape/runs/review_designs_smoke_structured/tasks/0/samples/0/attempts/smoke"
 
 
-def _ledger(names, would_change):
-    """One entry per declaration: six cells, each with its own reason."""
-    return [{"declaration": name,
-             **{concern: {"reason": f"smoke: {concern} of {name.rsplit('.', 1)[-1]} checked by hand",
-                          "verdict": "would_change" if (name, concern) in would_change else "no_issue"}
-                for concern in ("proof", "statement", "library", "name", "docstring", "placement")}}
-            for name in names]
+def _ledger(names, files, would_change):
+    """One entry per declaration (six cells) and per changed file (three), each cell with its own
+    reason."""
+    def cells(subject, concerns):
+        return {concern: {"reason": f"smoke: {concern} of {subject.rsplit('/', 1)[-1].rsplit('.', 1)[-1]} checked by hand",
+                          "verdict": "would_change" if (subject, concern) in would_change else "no_issue"}
+                for concern in concerns}
+    return ([{"declaration": name, **cells(name, ("proof", "statement", "library", "name", "docstring", "placement"))}
+             for name in names]
+            + [{"file": path, **cells(path, ("module_doc", "style", "organization"))} for path in files])
 
 
 async def main() -> int:
@@ -114,7 +117,7 @@ async def main() -> int:
     rename = "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl"
     docs = "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl"
     would_change = {(identity, "proof"), (broken, "proof"), (dup, "library"), (rename, "name"),
-                    (docs, "docstring")}
+                    (docs, "docstring"), (sub, "module_doc")}
 
     def findings(*, keep_rename: bool):
         items = [
@@ -142,18 +145,31 @@ async def main() -> int:
             {"declaration": docs, "concern": "docstring", "path": sub, "line_start": 1,
              "claim": f"{docs}: the docstring should say which projection (nothing can check this).",
              "suggested_fix": "reword the docstring", "severity": "blocking"},
+            {"declaration": sub, "concern": "module_doc", "path": sub, "line_start": 1,
+             "claim": f"{sub}: the module doc should name the renamed lemmas (a file-level change).",
+             "suggested_fix": "update the module doc", "severity": "advisory"},
         ]
         return [StructuredFinding(**item) for item in items]
 
-    entries = _ledger(names, would_change)
+    files = sorted(payload["changed_files"])
+    entries = _ledger(names, files, would_change)
     # The first three declarations through the registered tool, as a reviewer records them as it
-    # goes; the rest in the submission itself.
+    # goes; the rest, and the two files, in the submission itself.
     reply = await mcp.call_tool("record_ledger", {"entries": entries[:3]})
     record["record_ledger_reply"] = json.loads(reply[0][0].text if isinstance(reply, tuple) else reply[0].text)
     log.info("record_ledger: %s", record["record_ledger_reply"])
-    from ape.tasks.lean_tasks.formal_math.review.structured import DeclarationVerdicts
+    from ape.tasks.lean_tasks.formal_math.review.structured import DeclarationVerdicts, FileVerdicts
 
-    rest = [DeclarationVerdicts(**entry) for entry in entries[3:]]
+    rest = [FileVerdicts(**e) if "file" in e else DeclarationVerdicts(**e) for e in entries[3:]]
+    # The reviewer compiles the identity edit itself first; the submission must reuse that compile.
+    identity_edit = {"path": pos, "declaration_name": identity.rsplit(".", 1)[-1],
+                     "new_declaration": by_name[identity]["reviewed_code"].strip()}
+    started = time.monotonic()
+    reply = await mcp.call_tool("lean_verify_edit", identity_edit)
+    record["reviewer_compile_seconds"] = round(time.monotonic() - started, 1)
+    record["reviewer_compile_remembered"] = len(task._edit_compiles())
+    log.info("reviewer's own compile of the identity edit: %.0fs, %d remembered",
+             record["reviewer_compile_seconds"], record["reviewer_compile_remembered"])
 
     started = time.monotonic()
     first = await task._submit(findings(keep_rename=True), rest, None, "smoke submission 1")

@@ -1096,7 +1096,11 @@ def evaluation_settings(dataset) -> Dict[str, Any]:
     if dataset.arm_ids:
         settings["arm_ids"] = list(dataset.arm_ids)
     if dataset.design != "solo":
+        from ape.tasks.lean_tasks.formal_math.review import DESIGNS
+
         settings["design"] = dataset.design
+        if DESIGNS[dataset.design].design_version:
+            settings["design_version"] = DESIGNS[dataset.design].design_version
     if dataset.stage_input_run:
         settings["stage_input_run"] = dataset.stage_input_run
     return settings

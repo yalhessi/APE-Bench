@@ -275,3 +275,26 @@ The prompt splits as PR model 60% (after-blocks 20%, before-blocks 11%, relation
 D1's contract 9%, brief 4%. Only the last row is pure repetition the reviewer never sees: it is cut
 (the next commits). The packet-level cuts change what the frozen baseline is compared on and are
 the user's decision; the gain they could buy is about 8% of a window per run.
+
+## The fixes before D1's next reps (2026-10-02, the user: "Let's make the fixes first")
+
+- **End-of-file linter artifact** (ac6cc10c): `execute` keeps the file's final newline; the
+  whole-file compile of 33337's `Projection/Submodule.lean` now reports 0 warnings through it.
+- **Compile reuse at submission** (7f16d971): an edit the reviewer compiled with `lean_verify_edit`
+  in the attempt is not compiled again. Smoke: the identity edit compiled by the reviewer in 10 s,
+  then reused by the submission (`"reused"` in its evidence); the handed-back submission took 12 s
+  against 27 s before.
+- **File-level ledger cells** (`structured/3`): one entry per changed file with `module_doc`,
+  `style` and `organization`; a change to a file as a whole sits on its file's cell. Smoke on
+  33337: 36 cells (30 + 6), a module-doc change filed on its file's cell. `plan` on the dev set:
+  33305 21 cells (was 0), 33294 549, 33149 339, and the control PRs 33304 51 and 33315 39 -- most of
+  them file cells on module-doc edits, the risk recorded in `docs/todo/review-designs-file-cells.md`.
+- **D2's union** (`structured_critic/2`): several first-stage findings at one cell are all kept
+  (keying by cell kept only the last); file positions when the first stage has file cells; the
+  site fold only for file changes a stage without file cells could not place.
+- **Design versions** sealed into the run plan (`design_version`), so a run cannot resume into a
+  changed contract. D1 rep 1 was `structured/2`; the next runs are `structured/3` and should be
+  named for it, e.g. `probe_dev_structured3_hygiene_claude_sub_rep1`.
+
+Packet-level cuts (the PR model's "before" blocks, mirrored relation lines) are not made: they
+change what the frozen baseline is compared on (see the waste reading above).

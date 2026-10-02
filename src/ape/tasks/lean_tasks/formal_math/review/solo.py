@@ -360,6 +360,10 @@ class SoloReviewTask(BasePRReviewTask):
     #: is what a design adds to the baseline's task data; the baseline adds nothing, so every
     #: solo payload is byte-identical to one built before the hooks existed.
     reads_stage = False
+    #: What a design's contract is, sealed into the run plan beside `design` (`runner.evaluation_
+    #: settings`). Bumped by a design whenever what it asks or records changes, so a resumed run
+    #: cannot silently be a different contract. The baseline has none: its plans stay as sealed.
+    design_version: Optional[str] = None
 
     @classmethod
     def design_payload(cls, *, episode, graph, dataset, stage) -> Dict[str, Any]:

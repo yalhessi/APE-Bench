@@ -104,14 +104,20 @@ def _rebuttals(positions=None, names=None):
     return entries
 
 
+def _typed(entry):
+    from ape.tasks.lean_tasks.formal_math.review.structured_critic import FilePositions
+
+    return FilePositions(**entry) if "file" in entry else DeclarationPositions(**entry)
+
+
 def _record(task, entries):
-    return task._record_entries([DeclarationPositions(**entry) for entry in entries])
+    return task._record_entries([_typed(entry) for entry in entries])
 
 
 def _submit(task, entries, findings=()):
     """`submit_findings` with the positions passed in the submission itself."""
     return asyncio.run(task._submit_critique([StructuredFinding(**item) for item in findings],
-                                             [DeclarationPositions(**entry) for entry in entries], None, ""))
+                                             [_typed(entry) for entry in entries], None, ""))
 
 
 def _captured(task):
@@ -248,8 +254,8 @@ def test_the_union_carries_the_first_stages_findings_with_the_critics_position_a
         "the critic's change went through the same verification: a rename is unverifiable")
     assert len(result.findings) == 2
     rebuttal = next(r for r in result.rebuttals if r["declaration"] == "Submodule.foo_bar" and r["concern"] == "proof")
-    assert rebuttal == {"declaration": "Submodule.foo_bar", "concern": "proof", "verdict": "would_change",
-                        "position": "refute", "reason": "critic: proof re-checked"}
+    assert rebuttal == {"declaration": "Submodule.foo_bar", "kind": "declaration", "concern": "proof",
+                        "verdict": "would_change", "position": "refute", "reason": "critic: proof re-checked"}
     cell = next(c for c in result.ledger if c["declaration"] == "Submodule.baz" and c["concern"] == "name")
     assert cell["position"] == "overturn" and cell["outcome"] == "unverified"
 
@@ -326,3 +332,62 @@ def test_the_runner_builds_the_critics_payload_from_the_stage_rows():
     assert [row["name"] for row in payload["declarations"]] == ["Ns.first", "Ns.second", "Other.x"]
     with pytest.raises(ValueError, match="no first-stage ledger"):
         _solo_task_data(_agenda([33337]), [_episode(33337)], dataset, {}, Path("t"), graphs=[graph], stage_rows={})
+
+
+
+# --- a first stage with file cells, and several findings at one cell -----------------------------
+
+
+def _stage_with_files(extra_findings=()):
+    from ape.tasks.lean_tasks.formal_math.review.structured import FILE_CONCERNS
+
+    cells = [{**c, "kind": "declaration"} for c in _stage_cells({("Submodule.foo_bar", "proof")})]
+    cells += [{"declaration": "Mathlib/A.lean", "kind": "file", "concern": c, "verdict": "no_issue",
+               "reason": f"stage 1 checked the file's {c}"} for c in FILE_CONCERNS]
+    return {**STAGE, "ledger": cells, "findings": [_stage_finding(), *extra_findings]}
+
+
+def _file_positions(position="concede", overrides=None):
+    from ape.tasks.lean_tasks.formal_math.review.structured import FILE_CONCERNS
+
+    overrides = overrides or {}
+    return {"file": "Mathlib/A.lean", **{c: {"reason": f"critic: file {c}", "position": overrides.get(c, position)}
+                                         for c in FILE_CONCERNS}}
+
+
+def test_with_file_cells_the_critic_takes_a_position_on_each_and_files_only_on_an_overturn(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.structured_critic import FilePositions
+
+    task = _task(stage=_stage_with_files())
+    assert ("Mathlib/A.lean", "file", ("module_doc", "style", "organization")) in task._subjects()
+    _fake_checks(task, monkeypatch)
+    captured = _captured(task)
+    # The file's cells are subjects: leaving them out is pressed, like a declaration.
+    _record(task, _rebuttals())
+    cells, refusal = task._check_rebuttals([])
+    assert cells is None and "Mathlib/A.lean" in refusal
+    style = _finding(declaration="Mathlib/A.lean", concern="style", claim="Line 12 is 104 characters long.",
+                     suggested_fix="Wrap it.")
+    # A whole-file change on a conceded file cell is refused; on an overturned one it is filed.
+    task._record_entries([FilePositions(**_file_positions())])
+    _, refusal = task._check_rebuttals([StructuredFinding(**style)])
+    assert "not `overturn`" in refusal
+    out = _submit(task, [_file_positions(overrides={"style": "overturn"})], [style])
+    assert out["evaluation_result"].success, out
+    added = next(f for f in captured["result"].findings if f["stage"] == STAGE_2)
+    assert added["declaration"] == "Mathlib/A.lean" and added["concern"] == "style"
+    cell = next(c for c in captured["result"].ledger if c["declaration"] == "Mathlib/A.lean" and c["concern"] == "style")
+    assert cell["kind"] == "file" and cell["position"] == "overturn"
+
+
+def test_several_first_stage_findings_at_one_cell_all_survive_the_union():
+    """Keying the union by cell kept only the last finding at a cell; D1 may file several there."""
+
+    second = _stage_finding(claim="foo_bar's second proof issue: the `have` is unused.",
+                            anchor={"path": "Mathlib/A.lean", "line_start": 12, "line_end": 12})
+    task = _task(stage={**STAGE, "findings": [_stage_finding(), second]})
+    captured = _captured(task)
+    assert _submit(task, _rebuttals())["evaluation_result"].success
+    claims = [f["claim"] for f in captured["result"].findings]
+    assert len(claims) == 2 and second["claim"] in claims
+    assert all(f["critic"] == "confirm" for f in captured["result"].findings)

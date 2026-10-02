@@ -28,14 +28,16 @@ exists. Whether nesting works on the subscription stays an open question, and no
 prevents a nested variant later: the union, the rebuttal contract and the verification are the
 same code either way.
 
-**The union key.** The critic may file only at a cell it overturns, and a cell D1 filed at is
-confirmed, refuted or left undecided, never overturned -- so within the ledger a (declaration,
-concern) cell holds the ask of at most one stage, and the two stages' findings never collide at
-a cell. A change to a file as a whole (its `declaration` is the file's path) has no cell; two
-file-level findings at one (path, concern, line) fold into one, carrying both stages. The
-ensemble-union reading (2026-10-02) found that an exact-ask key folds 6 of 381 findings while a
-paraphrase of one ask at one site survives as several, which is why the fold here is by site and
-concern and never by the ask's wording.
+**The union.** The critic may file only at a cell it overturns, and a cell D1 filed at is
+confirmed, refuted or left undecided, never overturned -- so a (subject, concern) cell holds the
+asks of at most one stage, and the union is the two stages' findings side by side, every one kept
+(a cell may hold several; keying the union by cell once dropped all but the last of them). The
+subjects are the first stage's: its declarations and, from the file-cell contract on, its changed
+files. A first stage recorded before file cells existed has none, so a change to a file as a whole
+there has no cell; two such findings at one (path, concern, line) fold into one, carrying both
+stages. The ensemble-union reading (2026-10-02) found that an exact-ask key folds 6 of 381 findings
+while a paraphrase of one ask at one site survives as several, which is why that fold is by site
+and concern and never by the ask's wording.
 """
 
 import json
@@ -47,8 +49,9 @@ from ape.tasks.base import EvaluationResult, register_task
 
 from .candidates import UNSTATED_VERDICT
 from .structured import (
-    CONCERNS, LEDGER_PRESSES, REFUTED, VERIFIED, StructuredFinding, StructuredReviewConfig,
-    StructuredReviewData, StructuredReviewResult, StructuredReviewTask, resolve_declaration,
+    CONCERNS, FILE_CONCERNS, LEDGER_PRESSES, REFUTED, VERIFIED, StructuredFinding,
+    StructuredReviewConfig,
+    StructuredReviewData, StructuredReviewResult, StructuredReviewTask,
 )
 
 CRITIC_TASK_TYPE = "lean_pr_review_v5_structured_critic"
@@ -88,6 +91,17 @@ class DeclarationPositions(BaseModel):
     name: PositionCell
     docstring: PositionCell
     placement: PositionCell
+
+
+class FilePositions(BaseModel):
+    """One changed file's positions, a cell per file concern, when the first stage had file cells."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    file: str = Field(description="A changed file of the first stage's ledger, by path")
+    module_doc: PositionCell
+    style: PositionCell
+    organization: PositionCell
 
 
 CRITIC_CONTRACT = """
@@ -152,22 +166,15 @@ class StructuredCriticResult(StructuredReviewResult):
     rebuttals: List[Dict[str, Any]] = Field(default_factory=list)
 
 
-def union_key(finding: Dict[str, Any], paths) -> Tuple:
-    """Where a finding sits for the union: its cell, or for a file-level change its line."""
-
-    declaration, concern = finding.get("declaration"), finding.get("concern")
-    if declaration in paths:
-        anchor = finding.get("anchor") or {}
-        return ("file", declaration, concern, anchor.get("line_start"))
-    return ("cell", declaration, concern)
-
-
 class StructuredCriticTask(StructuredReviewTask):
     task_type = CRITIC_TASK_TYPE
     data_class = StructuredCriticData
     task_config_class = StructuredCriticConfig
     task_result_class = StructuredCriticResult
     reads_stage = True
+    #: 1: positions per declaration, union keyed by cell; 2: plus file positions, and every
+    #: finding kept in the union.
+    design_version = "structured_critic/2"
 
     # --- the design hooks ---------------------------------------------------------------------
 
@@ -229,8 +236,8 @@ class StructuredCriticTask(StructuredReviewTask):
                         f"{finding.get('severity', 'advisory')}) at `{anchor.get('path')}:"
                         f"{anchor.get('line_start')}`: {finding.get('claim', '')} -> "
                         f"{finding.get('suggested_fix', '')}")
-        file_level = [f for f in self._stage_findings()
-                      if f.get("declaration") in set(self.data.changed_files or [])]
+        cell_less = set(self.data.changed_files or []) - set(by_declaration)
+        file_level = [f for f in self._stage_findings() if f.get("declaration") in cell_less]
         if file_level:
             lines += ["", "### Filed about a file as a whole", ""]
             for finding in file_level:
@@ -247,9 +254,11 @@ class StructuredCriticTask(StructuredReviewTask):
         return "\n".join(lines)
 
     def contract_text(self) -> str:
-        from .structured import CONCERN_TEXT
+        from .structured import CONCERN_TEXT, FILE_CONCERN_TEXT
 
-        concerns = "\n".join(f"- `{name}`: {CONCERN_TEXT[name]}." for name in CONCERNS)
+        concerns = "\n".join([f"- `{name}`: {CONCERN_TEXT[name]}." for name in CONCERNS]
+                             + [f"- `{name}` (of a file): {FILE_CONCERN_TEXT[name]}."
+                                for name in FILE_CONCERNS])
         return CRITIC_CONTRACT.format(
             concerns=concerns, ledger=self.render_stage(),
             record_tool_name=f"{self.config.mcp_server_name}{self.RECORD_TOOL}",
@@ -262,7 +271,25 @@ class StructuredCriticTask(StructuredReviewTask):
 
     def _declaration_names(self) -> List[str]:
         # The first stage's declarations, in its ledger's order: the cells being argued with.
-        return list(dict.fromkeys(cell["declaration"] for cell in self._stage_cells()))
+        return [name for name, kind, _ in self._subjects() if kind == "declaration"]
+
+    def _subjects(self) -> List[Tuple[str, str, Tuple[str, ...]]]:
+        """The first stage's subjects, in its ledger's order, each with the concerns it has cells
+        for. A stage recorded before file cells has declarations only."""
+        order: Dict[str, Tuple[str, List[str]]] = {}
+        for cell in self._stage_cells():
+            kind = cell.get("kind") or "declaration"
+            order.setdefault(cell["declaration"], (kind, []))[1].append(cell["concern"])
+        return [(name, kind, tuple(concerns)) for name, (kind, concerns) in order.items()]
+
+    def _cell_less_file(self, given: str) -> bool:
+        """A changed file the first stage has no cells for: a change to it as a whole is filed
+        without a cell, as before file cells existed."""
+        from .base import _strip_ws_prefix
+
+        path = _strip_ws_prefix(given)
+        return path in set(self.data.changed_files or []) and path not in {
+            name for name, kind, _ in self._subjects() if kind == "file"}
 
     def _stage_verdicts(self) -> Dict[Tuple[str, str], str]:
         return {(cell["declaration"], cell["concern"]): cell["verdict"] for cell in self._stage_cells()}
@@ -286,15 +313,18 @@ class StructuredCriticTask(StructuredReviewTask):
         register_context_tools(self, mcp)
 
         @mcp.tool(description=(
-            "Record positions on the first stage's ledger: for each declaration, a position with "
-            "its evidence under every concern. Call it as you go, with one or several "
-            "declarations; a later entry for a declaration replaces the earlier one. Returns "
-            "which declarations are still to record."))
+            "Record positions on the first stage's ledger: for each declaration, and each changed "
+            "file it has cells for, a position with its evidence under every concern. Call it as "
+            "you go, with one or several; a later entry replaces the earlier one. Returns what is "
+            "still to record."))
         async def record_positions(
             entries: Annotated[List[DeclarationPositions], Field(description=(
-                "One entry per declaration, each with all six concern cells."))],
+                "One entry per declaration, each with all six concern cells."))] = [],
+            files: Annotated[List[FilePositions], Field(description=(
+                "One entry per changed file the first stage has cells for, each with its three "
+                "file-concern cells."))] = [],
         ) -> Dict[str, Any]:
-            return self._record_reply(entries)
+            return self._record_reply(list(entries) + list(files))
 
         @mcp.tool(description=(
             "Submit your critique of the first stage's review: one finding per `overturn`, and "
@@ -305,11 +335,14 @@ class StructuredCriticTask(StructuredReviewTask):
                 "One per `overturn` cell, naming its declaration and concern; [] when nothing is "
                 "overturned."))] = [],
             positions: Annotated[List[DeclarationPositions], Field(description=(
-                "Position entries not yet recorded with record_positions; [] when all are."))] = [],
+                "Declaration entries not yet recorded with record_positions; [] when all are."))] = [],
+            files: Annotated[List[FilePositions], Field(description=(
+                "File entries not yet recorded with record_positions; [] when all are."))] = [],
             confidence: Annotated[Optional[float], Field(description="0.0-1.0")] = None,
             message: Annotated[str, Field(description="Optional summary of the critique.")] = "",
         ) -> Dict[str, Any]:
-            return await self._submit_critique(findings, positions, confidence, message)
+            return await self._submit_critique(findings, list(positions) + list(files),
+                                               confidence, message)
 
     def _check_rebuttals(self, findings: List[StructuredFinding],
                          ) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
@@ -323,18 +356,21 @@ class StructuredCriticTask(StructuredReviewTask):
         """
 
         stage_cells = self._stage_cells()
-        names = self._declaration_names()
         recorded = self._recorded()
-        paths = set(self.data.changed_files or [])
         problems: List[str] = []
         filed: Dict[Tuple[str, str], int] = {}
         for index, finding in enumerate(findings):
-            if finding.declaration in paths:
-                continue
-            declaration = resolve_declaration(finding.declaration, names)
-            if declaration is None:
+            subject = self._resolve_subject(finding.declaration)
+            if subject is None and self._cell_less_file(finding.declaration):
+                continue  # a first stage without file cells: no cell to agree with
+            if subject is None:
                 problems.append(f"finding {index} names {finding.declaration!r}, which is neither "
-                                "a declaration of the ledger nor a changed file's path")
+                                "a declaration nor a file of the ledger")
+                continue
+            declaration, kind, concerns = subject
+            if finding.concern not in concerns:
+                problems.append(f"finding {index} is about the {kind} {declaration} under "
+                                f"{finding.concern!r}, which is not one of its concerns {list(concerns)}")
                 continue
             cell = (recorded.get(declaration) or {}).get(finding.concern)
             if cell is None or cell["position"] != "overturn":
@@ -348,17 +384,17 @@ class StructuredCriticTask(StructuredReviewTask):
                     problems.append(f"({declaration}, {concern}) is an `overturn` with no finding")
         if problems:
             return None, "The positions are inconsistent: " + "; ".join(problems) + ". Fix and resubmit."
-        missing = [name for name in names if name not in recorded]
+        missing = [name for name, _kind, _concerns in self._subjects() if name not in recorded]
         if missing:
             self._rebuttal_presses = getattr(self, "_rebuttal_presses", 0) + 1
             if self._rebuttal_presses <= LEDGER_PRESSES:
                 shown = ", ".join(missing[:12])
                 more = f" and {len(missing) - 12} more" if len(missing) > 12 else ""
                 return None, (
-                    "Every declaration of the first stage's ledger needs an entry, a position with "
-                    f"its evidence under every concern. Not recorded: {shown}{more}. Record them "
-                    f"with {self.RECORD_TOOL}, or pass them as `positions` here. "
-                    f"(attempt {self._rebuttal_presses} of {LEDGER_PRESSES})")
+                    "Every declaration and file of the first stage's ledger needs an entry, a "
+                    f"position with its evidence under every concern. Not recorded: {shown}{more}. "
+                    f"Record them with {self.RECORD_TOOL}, or pass them as `positions` and `files` "
+                    f"here. (attempt {self._rebuttal_presses} of {LEDGER_PRESSES})")
         out = []
         for cell in stage_cells:
             mine = (recorded.get(cell["declaration"]) or {}).get(cell["concern"])
@@ -402,13 +438,11 @@ class StructuredCriticTask(StructuredReviewTask):
                     f"and not filed. (attempt {self._refutation_presses} of {LEDGER_PRESSES})")),
                     "message": "Refuted changes"}
 
-        paths = set(self.data.changed_files or [])
-        names = list(dict.fromkeys(cell["declaration"] for cell in cells))
         critic_raw, refuted_rows = [], []
         outcome_by_cell: Dict[Tuple[str, str], str] = {}
         for finding, (outcome, evidence) in zip(findings, verified):
-            key = (resolve_declaration(finding.declaration, names) or finding.declaration,
-                   finding.concern)
+            subject = self._resolve_subject(finding.declaration)
+            key = (subject[0] if subject else finding.declaration, finding.concern)
             rank = {VERIFIED: 2, "unverified": 1, REFUTED: 0}
             if rank[outcome] >= rank.get(outcome_by_cell.get(key, REFUTED), 0):
                 outcome_by_cell[key] = outcome
@@ -421,19 +455,27 @@ class StructuredCriticTask(StructuredReviewTask):
             if cell["position"] == "overturn":
                 cell["outcome"] = outcome_by_cell.get((cell["declaration"], cell["concern"]))
 
-        # The union: the first stage's findings as they were, each with the critic's position
-        # on its cell; then the critic's, folded onto a first-stage finding only at a file-level
-        # site (a cell holds one stage's ask by construction).
-        union: Dict[Tuple, Dict[str, Any]] = {}
+        # The union: the first stage's findings as they were, each with the critic's position on
+        # its cell, then the critic's, every one kept. Only a change to a file the first stage has
+        # no cells for (a stage from before file cells) can meet another stage's at one site;
+        # those fold by (file, concern, line).
+        def site(row):
+            return (row.get("declaration"), row.get("concern"), (row.get("anchor") or {}).get("line_start"))
+
+        findings_out: List[Dict[str, Any]] = []
+        cell_less_at: Dict[Tuple, int] = {}
         for finding in self._stage_findings():
             row = dict(finding)
-            position = position_of.get((row.get("declaration"), row.get("concern")))
+            cell_less = self._cell_less_file(row.get("declaration") or "")
+            position = None if cell_less else position_of.get((row.get("declaration"), row.get("concern")))
             row["stage"] = STAGE_1
             row["stages"] = [STAGE_1]
-            row["critic"] = position if row.get("declaration") not in paths else None
+            row["critic"] = position
             # Agreement is a label with three values: confirmed, refuted, or neither said.
             row["agreed"] = {"confirm": True, "refute": False}.get(position)
-            union[union_key(row, paths)] = row
+            if cell_less:
+                cell_less_at.setdefault(site(row), len(findings_out))
+            findings_out.append(row)
         try:
             critic_rows = self._normalize_findings(critic_raw)
         except Exception:  # noqa: BLE001
@@ -445,19 +487,19 @@ class StructuredCriticTask(StructuredReviewTask):
                     "message": "Submit failed"}
         folded = 0
         for row in critic_rows:
-            key = union_key(row, paths)
-            if key in union:
-                union[key]["stages"] = sorted(set(union[key]["stages"]) | {STAGE_2})
-                union[key]["agreed"] = True
+            at = cell_less_at.get(site(row)) if self._cell_less_file(row.get("declaration") or "") else None
+            if at is not None:
+                findings_out[at]["stages"] = sorted(set(findings_out[at]["stages"]) | {STAGE_2})
+                findings_out[at]["agreed"] = True
                 folded += 1
                 continue
             row["stage"] = STAGE_2
             row["stages"] = [STAGE_2]
             row["critic"] = "overturn"
             row["agreed"] = False
-            union[key] = row
-        findings_out = list(union.values())
-        rebuttal_rows = [{"declaration": cell["declaration"], "concern": cell["concern"],
+            findings_out.append(row)
+        rebuttal_rows = [{"declaration": cell["declaration"], "kind": cell.get("kind") or "declaration",
+                          "concern": cell["concern"],
                           "verdict": cell["verdict"], "position": cell["position"],
                           "reason": cell["position_reason"]} for cell in cells]
         try:

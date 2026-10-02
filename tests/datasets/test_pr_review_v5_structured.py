@@ -23,9 +23,9 @@ from ape.tasks.base import EvaluationResult, get_task_class
 from ape.tasks.models import WorkspaceInfo
 from ape.tasks.lean_tasks.formal_math.review import DESIGNS
 from ape.tasks.lean_tasks.formal_math.review.structured import (
-    CONCERNS, LEDGER_PRESSES, REFUTED, STRUCTURED_TASK_TYPE, UNVERIFIED, VERIFIED,
-    DeclarationVerdicts, StructuredFinding, StructuredReviewData, StructuredReviewResult,
-    StructuredReviewTask, declarations_of, resolve_declaration,
+    CONCERNS, FILE_CONCERNS, LEDGER_PRESSES, REFUTED, STRUCTURED_TASK_TYPE, UNVERIFIED, VERIFIED,
+    DeclarationVerdicts, FileVerdicts, StructuredFinding, StructuredReviewData,
+    StructuredReviewResult, StructuredReviewTask, declarations_of, resolve_declaration,
 )
 from ape.tasks.lean_tasks.formal_math.review.candidates import UNSTATED_VERDICT
 
@@ -65,10 +65,17 @@ def _task(**data_overrides):
     return task
 
 
+FILE = "Mathlib/A.lean"
+
+
+def _typed(entry):
+    return FileVerdicts(**entry) if "file" in entry else DeclarationVerdicts(**entry)
+
+
 def _submit(task, ledger, findings=(), **kwargs):
     """`submit_findings` with the ledger passed in the submission itself."""
     return asyncio.run(task._submit([StructuredFinding(**item) for item in findings],
-                                    [DeclarationVerdicts(**entry) for entry in ledger],
+                                    [_typed(entry) for entry in ledger],
                                     kwargs.get("confidence"), kwargs.get("message", "")))
 
 
@@ -79,17 +86,29 @@ def _entry(name, verdicts=None):
                                     for concern in CONCERNS}}
 
 
+def _file_entry(path=FILE, verdicts=None):
+    verdicts = verdicts or {}
+    return {"file": path, **{concern: {"reason": f"checked the file's {concern}",
+                                       "verdict": verdicts.get(concern, "no_issue")}
+                             for concern in FILE_CONCERNS}}
+
+
 def _full_ledger(verdicts=None):
-    """One entry per declaration, every cell `no_issue` except the pairs in `verdicts`."""
+    """One entry per declaration and per changed file, every cell `no_issue` except the pairs in
+    `verdicts`."""
 
     verdicts = verdicts or {}
-    return [_entry(decl["name"], {concern: verdict for (name, concern), verdict in verdicts.items()
-                                  if name == decl["name"]})
-            for decl in DECLARATIONS]
+    def mine(name):
+        return {concern: verdict for (subject, concern), verdict in verdicts.items() if subject == name}
+    return ([_entry(decl["name"], mine(decl["name"])) for decl in DECLARATIONS]
+            + [_file_entry(FILE, mine(FILE))])
+
+
+CELLS = len(DECLARATIONS) * len(CONCERNS) + len(FILE_CONCERNS)
 
 
 def _record(task, ledger):
-    return task._record_entries([DeclarationVerdicts(**entry) for entry in ledger])
+    return task._record_entries([_typed(entry) for entry in ledger])
 
 
 def _finding(**overrides):
@@ -148,7 +167,8 @@ def test_the_payload_lists_the_declarations_the_pr_leaves_in_place_in_the_pr_mod
         episode=SimpleNamespace(episode_id="ep:1"), graph=_graph(), dataset=None, stage=None)
     assert [row["name"] for row in payload["declarations"]] == ["Ns.first", "Ns.second", "Other.x"]
     assert payload["declarations"][0]["kind"] == "theorem"
-    assert "3 declaration(s) x 6 concerns = 18 ledger cells" == \
+    payload["changed_files"] = ["Mathlib/A.lean", "Mathlib/B.lean"]
+    assert "3 declaration(s) x 6 concerns + 2 file(s) x 3 = 24 ledger cells" == \
         StructuredReviewTask.describe_design_payload(payload)
 
 
@@ -197,8 +217,9 @@ def test_the_prompt_is_the_solos_without_the_notes_line_plus_the_contract():
     assert "## The ledger" in prompt
     for decl in DECLARATIONS:
         assert f"`{decl['name']}`" in prompt
-    for concern in CONCERNS:
+    for concern in CONCERNS + FILE_CONCERNS:
         assert f"`{concern}`" in prompt
+    assert "Files this PR changes" in prompt and f"- `{FILE}`" in prompt
     assert "submit_findings" in prompt and "record_ledger" in prompt
     assert "Each concern is its own decision" in prompt
     assert "Nothing ranks or withholds" in prompt
@@ -241,8 +262,8 @@ def test_the_submission_schema_has_no_properties_less_object():
     schemas = _schemas(_task())
     for name in ("record_ledger", "submit_findings"):
         assert _freeform_objects(schemas[name]) == [], name
-    assert "ledger" in schemas["submit_findings"]["properties"]
-    assert "entries" in schemas["record_ledger"]["required"]
+    assert {"ledger", "files"} <= set(schemas["submit_findings"]["properties"])
+    assert {"entries", "files"} <= set(schemas["record_ledger"]["properties"])
 
 
 # --- the ledger: entries, recording, the check ------------------------------------------------
@@ -255,6 +276,9 @@ def test_an_entry_has_a_cell_per_concern_in_the_vocabularys_order_and_each_is_re
     fields = [name for name in DeclarationVerdicts.model_fields if name != "declaration"]
     assert tuple(fields) == CONCERNS
     assert all(DeclarationVerdicts.model_fields[name].is_required() for name in fields)
+    file_fields = [name for name in FileVerdicts.model_fields if name != "file"]
+    assert tuple(file_fields) == FILE_CONCERNS
+    assert all(FileVerdicts.model_fields[name].is_required() for name in file_fields)
     with pytest.raises(Exception):
         DeclarationVerdicts(declaration="Submodule.foo_bar",
                             proof={"reason": "r", "verdict": "no_issue"})
@@ -263,12 +287,14 @@ def test_an_entry_has_a_cell_per_concern_in_the_vocabularys_order_and_each_is_re
 def test_a_complete_consistent_ledger_flattens_to_one_cell_per_declaration_and_concern():
     task = _task()
     recorded, problems = _record(task, _full_ledger({("Submodule.foo_bar", "proof"): "would_change"}))
-    assert problems == [] and recorded == ["Submodule.foo_bar", "Submodule.baz"]
+    assert problems == [] and recorded == ["Submodule.foo_bar", "Submodule.baz", FILE]
     cells, refusal = task._check_ledger([StructuredFinding(**_finding())])
     assert refusal is None
-    assert len(cells) == len(DECLARATIONS) * len(CONCERNS)
-    assert cells[0] == {"declaration": "Submodule.foo_bar", "concern": "proof",
+    assert len(cells) == CELLS
+    assert cells[0] == {"declaration": "Submodule.foo_bar", "kind": "declaration", "concern": "proof",
                         "verdict": "would_change", "reason": "checked proof"}
+    assert cells[-1] == {"declaration": FILE, "kind": "file", "concern": "organization",
+                         "verdict": "no_issue", "reason": "checked the file's organization"}
 
 
 def test_recording_is_all_or_nothing_and_a_later_entry_replaces_an_earlier_one():
@@ -291,7 +317,8 @@ def test_the_record_tool_reports_what_is_still_to_record(tmp_path):
     task.attempt_path = tmp_path
     reply = task._record_reply([DeclarationVerdicts(**_entry("Submodule.foo_bar"))])
     assert reply["success"] and reply["recorded"] == ["Submodule.foo_bar"]
-    assert reply["progress"] == "1 of 2 declarations recorded" and reply["remaining"] == ["Submodule.baz"]
+    assert reply["progress"] == "1 of 3 declarations and files recorded"
+    assert reply["remaining"] == ["Submodule.baz", FILE]
     saved = json.loads((tmp_path / "ledger_progress.json").read_text())
     assert saved["Submodule.foo_bar"]["docstring"] == {"verdict": "no_issue", "reason": "checked docstring"}
     refused = task._record_reply([DeclarationVerdicts(**_entry("Nope"))])
@@ -312,24 +339,49 @@ def test_an_inconsistent_ledger_is_refused_by_name():
 
 def test_missing_declarations_are_asked_for_a_bounded_number_of_times_then_recorded_unstated():
     task = _task()
-    _record(task, _full_ledger()[:1])  # baz never recorded
+    _record(task, _full_ledger()[:1])  # baz and the file never recorded
     for attempt in range(1, LEDGER_PRESSES + 1):
         cells, refusal = task._check_ledger([])
         assert cells is None and f"(attempt {attempt} of {LEDGER_PRESSES})" in refusal
-        assert "Not recorded: Submodule.baz" in refusal and "record_ledger" in refusal
+        assert f"Not recorded: Submodule.baz, {FILE}" in refusal and "record_ledger" in refusal
     cells, refusal = task._check_ledger([])
     assert refusal is None
     unstated = [cell for cell in cells if cell["verdict"] == UNSTATED_VERDICT]
-    assert [(c["declaration"], c["concern"]) for c in unstated] == [("Submodule.baz", c) for c in CONCERNS]
+    assert [(c["declaration"], c["concern"]) for c in unstated] == (
+        [("Submodule.baz", c) for c in CONCERNS] + [(FILE, c) for c in FILE_CONCERNS])
 
 
-def test_a_file_level_change_names_the_path_and_needs_no_cell():
+def test_a_change_to_a_file_as_a_whole_sits_on_its_files_cell_under_a_file_concern():
+    """33305 leaves no declaration in place, and D1 rep 1 lost the one ask all three hygiene reps
+    hit there (a line wrap) because a file had no cell (2026-10-02)."""
+
     task = _task()
+    module_doc = _finding(declaration=FILE, concern="module_doc", claim="The module doc names the wrong file.")
+    _record(task, _full_ledger({(FILE, "module_doc"): "would_change"}))
+    cells, refusal = task._check_ledger([StructuredFinding(**module_doc)])
+    assert refusal is None and len(cells) == CELLS
+    # Through `target/`, as a reviewer may spell it.
+    cells, refusal = task._check_ledger([StructuredFinding(**{**module_doc, "declaration": f"target/{FILE}"})])
+    assert refusal is None
+    # A declaration concern does not apply to a file, nor a file concern to a declaration.
+    _, refusal = task._check_ledger([StructuredFinding(**{**module_doc, "concern": "docstring"})])
+    assert "not one of its concerns" in refusal
+    _, refusal = task._check_ledger([StructuredFinding(**_finding(concern="style"))])
+    assert "not one of its concerns" in refusal
+    # And the file's cell must be the `would_change`.
     _record(task, _full_ledger())
-    cells, refusal = task._check_ledger(
-        [StructuredFinding(**_finding(declaration="Mathlib/A.lean", concern="docstring",
-                                      claim="The module doc names the wrong file."))])
-    assert refusal is None and len(cells) == 12
+    _, refusal = task._check_ledger([StructuredFinding(**module_doc)])
+    assert "not `would_change`" in refusal
+
+
+def test_a_pr_that_leaves_no_declaration_still_has_its_files_cells():
+    task = _task(declarations=[])
+    cells, refusal = task._check_ledger([])
+    assert cells is None and f"Not recorded: {FILE}" in refusal
+    _record(task, [_file_entry(FILE, {"style": "would_change"})])
+    style = _finding(declaration=FILE, concern="style", claim="Line 12 is 104 characters long.")
+    cells, refusal = task._check_ledger([StructuredFinding(**style)])
+    assert refusal is None and [c["concern"] for c in cells] == list(FILE_CONCERNS)
 
 
 def test_entries_recorded_as_the_review_goes_and_entries_in_the_submission_combine(monkeypatch):
@@ -339,7 +391,7 @@ def test_entries_recorded_as_the_review_goes_and_entries_in_the_submission_combi
     _record(task, _full_ledger()[:1])
     out = _submit(task, _full_ledger()[1:])
     assert out["evaluation_result"].success
-    assert len(captured["result"].ledger) == 12
+    assert len(captured["result"].ledger) == CELLS
 
 
 # --- verification and recording -------------------------------------------------------------

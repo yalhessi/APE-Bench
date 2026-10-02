@@ -90,6 +90,26 @@ CONCERN_TEXT = {
                  "section it sits in",
 }
 
+#: The concerns of a changed file as a whole, one ledger entry per changed file. Added after D1's
+#: first Claude dev rep lost the one ask all three hygiene reps hit -- wrapping a line on 33305,
+#: a PR that leaves no declaration in place and so had no cell at all
+#: (`docs/todo/review-designs-file-cells.md`).
+FileConcern = Literal["module_doc", "style", "organization"]
+FILE_CONCERNS: Tuple[str, ...] = get_args(FileConcern)
+
+FILE_CONCERN_TEXT = {
+    "module_doc": "the module docstring and the file's comments -- missing, stale, or out of step "
+                  "with what the file now declares",
+    "style": "formatting and the linters -- line length, spacing, deprecated syntax, `set_option`s",
+    "organization": "imports, sections and namespaces, and whether each declaration sits in the "
+                    "right file and section",
+}
+
+#: Either kind of concern, as a finding names it.
+AnyConcern = Literal["proof", "statement", "library", "name", "docstring", "placement",
+                     "module_doc", "style", "organization"]
+assert set(get_args(AnyConcern)) == set(CONCERNS) | set(FILE_CONCERNS)
+
 LedgerVerdict = Literal["no_issue", "would_change", "cannot_determine"]
 
 #: How many times a submission missing ledger cells, or carrying refuted changes, is handed back
@@ -129,6 +149,17 @@ class DeclarationVerdicts(BaseModel):
     placement: Cell
 
 
+class FileVerdicts(BaseModel):
+    """One changed file's ledger entry: a cell per file concern, in `FILE_CONCERNS` order."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    file: str = Field(description="A changed file from the list in the prompt, by path")
+    module_doc: Cell
+    style: Cell
+    organization: Cell
+
+
 class StructuredEdit(BaseModel):
     """An edit to the reviewed file, in `lean_verify_edit`'s two spellings."""
 
@@ -151,8 +182,8 @@ class StructuredFinding(BaseModel):
 
     declaration: str = Field(description=(
         "The declaration this change is about, from the list in the prompt; or a changed file's "
-        "path for a change to the file as a whole (its module doc, imports, sections)"))
-    concern: Concern
+        "path for a change to the file as a whole, under a file concern"))
+    concern: AnyConcern
     path: str = Field(description="The reviewed file, e.g. Mathlib/.../X.lean")
     line_start: int = Field(description="The line of the declaration the claim is about")
     claim: str = Field(description="Name the declaration and say what is wrong with it")
@@ -183,15 +214,22 @@ This review decides per declaration and per concern, and files the changes it de
 Declarations in this PR, as it leaves them -- every one needs a verdict under every concern:
 {declarations}
 
-The concerns:
+The concerns of a declaration:
 {concerns}
 
-Record the ledger with `{record_tool_name}`, as you go: one entry per declaration, one or several \
-declarations per call, and a later entry for a declaration replaces the earlier one. An entry has \
-a field per concern, each with its own `reason` and `verdict`: `no_issue` (you checked and have \
-nothing to ask -- say what you checked under that concern), `would_change` (a change you would \
-request; it needs a finding), or `cannot_determine` (what you needed and could not get). Each \
-concern is its own decision: say what you checked for that concern, not for the declaration.
+Files this PR changes -- every one needs a verdict under every file concern:
+{files}
+
+The concerns of a file as a whole:
+{file_concerns}
+
+Record the ledger with `{record_tool_name}`, as you go: one entry per declaration (`entries`) and \
+one per changed file (`files`), one or several per call, and a later entry for a declaration or a \
+file replaces the earlier one. An entry has a field per concern, each with its own `reason` and \
+`verdict`: `no_issue` (you checked and have nothing to ask -- say what you checked under that \
+concern), `would_change` (a change you would request; it needs a finding), or `cannot_determine` \
+(what you needed and could not get). Each concern is its own decision: say what you checked for \
+that concern, not for the declaration or the file.
 
 When you have reviewed the PR, call `{submit_tool_name}` once with:
 
@@ -200,11 +238,13 @@ When you have reviewed the PR, call `{submit_tool_name}` once with:
 `severity`. Where the change is an edit to the reviewed file, give it as `edit` \
 (`declaration_name` + `new_declaration`, or `line_start`/`line_end` + `replacement`); where it \
 says the library already has something, give that name as `duplicate_of`; where it is a rename, \
-give the new name as `rename_to`. A change to a file as a whole -- its module doc, its imports, \
-its sections -- names the file's path as its `declaration` and needs no ledger entry.
-- `ledger`: any entries not yet recorded (optional; the whole ledger may go here on a small PR).
+give the new name as `rename_to`. A change to a file as a whole -- its module doc, its \
+formatting, its imports or sections -- names the file's path as its `declaration` and one of the \
+file concerns, and sits on that file's `would_change` cell.
+- `ledger` and `files`: any entries not yet recorded (optional; the whole ledger may go here on a \
+small PR).
 
-A declaration without an entry is asked for again: silence is not a verdict.
+A declaration or a file without an entry is asked for again: silence is not a verdict.
 
 At submission, this task -- not you -- compiles every `edit` in the reviewed file with Mathlib's \
 linters on and looks up every `duplicate_of` and `rename_to`. A change the tools contradict (an \
@@ -269,6 +309,10 @@ class StructuredReviewTask(SoloReviewTask):
     data_class = StructuredReviewData
     task_config_class = StructuredReviewConfig
     task_result_class = StructuredReviewResult
+    #: 1: multi-concern rows (the first gpt-5.2 test only); 2: one entry per declaration with six
+    #: fixed cells, through `record_ledger` (c3f24639; every dev rep up to 2026-10-02 noon);
+    #: 3: plus one entry per changed file with three file-concern cells.
+    design_version = "structured/3"
 
     # --- the design hooks ---------------------------------------------------------------------
 
@@ -283,7 +327,10 @@ class StructuredReviewTask(SoloReviewTask):
     @classmethod
     def describe_design_payload(cls, payload: Dict[str, Any]) -> str:
         count = len(payload.get("declarations") or [])
-        return f"{count} declaration(s) x {len(CONCERNS)} concerns = {count * len(CONCERNS)} ledger cells"
+        files = len(payload.get("changed_files") or [])
+        cells = count * len(CONCERNS) + files * len(FILE_CONCERNS)
+        return (f"{count} declaration(s) x {len(CONCERNS)} concerns + {files} file(s) x "
+                f"{len(FILE_CONCERNS)} = {cells} ledger cells")
 
     # --- prompts -----------------------------------------------------------------------------
 
@@ -301,13 +348,36 @@ class StructuredReviewTask(SoloReviewTask):
     def _declaration_names(self) -> List[str]:
         return [row["name"] for row in self.data.declarations]
 
+    def _subjects(self) -> List[Tuple[str, str, Tuple[str, ...]]]:
+        """`(name, kind, concerns)` for every subject of the ledger, in its order: the PR's
+        declarations, then its changed files."""
+        return ([(name, "declaration", CONCERNS) for name in self._declaration_names()]
+                + [(path, "file", FILE_CONCERNS) for path in (self.data.changed_files or [])])
+
+    def _resolve_subject(self, given: str) -> Optional[Tuple[str, str, Tuple[str, ...]]]:
+        """The subject `given` names: a changed file by its path (any `target/` prefix dropped),
+        else a declaration by its full name or a unique dotted suffix."""
+        from .base import _strip_ws_prefix
+
+        subjects = self._subjects()
+        path = _strip_ws_prefix(given)
+        for subject in subjects:
+            if subject[1] == "file" and subject[0] == path:
+                return subject
+        declarations = [subject[0] for subject in subjects if subject[1] == "declaration"]
+        name = resolve_declaration(given, declarations)
+        return next((subject for subject in subjects if subject[1] == "declaration"
+                     and subject[0] == name), None) if name else None
+
     def contract_text(self) -> str:
         declarations = "\n".join(
             f"- `{row['name']}` ({row['kind']}, `{row['path']}`)" for row in self.data.declarations
-        ) or "- (none: this PR leaves no declaration in place; the ledger is empty)"
+        ) or "- (none: this PR leaves no declaration in place)"
         concerns = "\n".join(f"- `{name}`: {CONCERN_TEXT[name]}." for name in CONCERNS)
+        files = "\n".join(f"- `{path}`" for path in self.data.changed_files or []) or "- (none)"
+        file_concerns = "\n".join(f"- `{name}`: {FILE_CONCERN_TEXT[name]}." for name in FILE_CONCERNS)
         return STRUCTURED_CONTRACT.format(
-            declarations=declarations, concerns=concerns,
+            declarations=declarations, concerns=concerns, files=files, file_concerns=file_concerns,
             record_tool_name=f"{self.config.mcp_server_name}{self.RECORD_TOOL}",
             submit_tool_name=f"{self.config.mcp_server_name}submit_findings")
 
@@ -322,7 +392,8 @@ class StructuredReviewTask(SoloReviewTask):
     RECORD_TOOL = "record_ledger"
 
     def _recorded(self) -> Dict[str, Dict[str, Dict[str, str]]]:
-        """declaration -> concern -> {CELL_VALUE, reason}, for every entry recorded so far."""
+        """subject (a declaration's name or a file's path) -> concern -> {CELL_VALUE, reason}, for
+        every entry recorded so far."""
         if not hasattr(self, "_recorded_cells"):
             self._recorded_cells = {}
         return self._recorded_cells
@@ -336,19 +407,22 @@ class StructuredReviewTask(SoloReviewTask):
         none of its entries, so a half-applied call cannot leave the ledger in a state the
         reviewer did not write."""
 
-        names = self._declaration_names()
         staged: Dict[str, Dict[str, Dict[str, str]]] = {}
         problems: List[str] = []
         for entry in entries:
-            declaration = resolve_declaration(entry.declaration, names)
-            if declaration is None:
-                problems.append(f"{entry.declaration!r} is not one of this PR's listed declarations")
+            given = getattr(entry, "file", None) or getattr(entry, "declaration", None)
+            subject = self._resolve_subject(given)
+            expected = "file" if hasattr(entry, "file") else "declaration"
+            if subject is None or subject[1] != expected:
+                problems.append(f"{given!r} is not one of this PR's listed "
+                                f"{'changed files' if expected == 'file' else 'declarations'}")
                 continue
+            declaration, _kind, concerns = subject
             if declaration in staged:
                 problems.append(f"{declaration} has two entries in one call")
                 continue
             cells = {}
-            for concern in CONCERNS:
+            for concern in concerns:
                 cell = getattr(entry, concern)
                 value = getattr(cell, self.CELL_VALUE)
                 if not cell.reason.strip():
@@ -381,10 +455,10 @@ class StructuredReviewTask(SoloReviewTask):
         if problems:
             return {"success": False, "outcome": "invalid_request", "error": (
                 "Nothing recorded: " + "; ".join(problems) + ". Fix and call again.")}
-        names = self._declaration_names()
+        names = [subject[0] for subject in self._subjects()]
         remaining = [name for name in names if name not in self._recorded()]
         return {"success": True, "recorded": recorded,
-                "progress": f"{len(names) - len(remaining)} of {len(names)} declarations recorded",
+                "progress": f"{len(names) - len(remaining)} of {len(names)} declarations and files recorded",
                 "remaining": remaining[:20] + ([f"... and {len(remaining) - 20} more"]
                                                if len(remaining) > 20 else [])}
 
@@ -400,14 +474,16 @@ class StructuredReviewTask(SoloReviewTask):
         register_context_tools(self, mcp)
 
         @mcp.tool(description=(
-            "Record ledger entries: for each declaration, a verdict and its reason under every "
-            "concern. Call it as you go, with one or several declarations; a later entry for a "
-            "declaration replaces the earlier one. Returns which declarations are still to record."))
+            "Record ledger entries: for each declaration, and for each changed file, a verdict and "
+            "its reason under every one of its concerns. Call it as you go, with one or several; a "
+            "later entry replaces the earlier one. Returns what is still to record."))
         async def record_ledger(
             entries: Annotated[List[DeclarationVerdicts], Field(description=(
-                "One entry per declaration, each with all six concern cells."))],
+                "One entry per declaration, each with all six concern cells."))] = [],
+            files: Annotated[List[FileVerdicts], Field(description=(
+                "One entry per changed file, each with its three file-concern cells."))] = [],
         ) -> Dict[str, Any]:
-            return self._record_reply(entries)
+            return self._record_reply(list(entries) + list(files))
 
         @mcp.tool(description=(
             "Submit your review of this PR: one finding per `would_change` cell of the ledger, "
@@ -418,35 +494,39 @@ class StructuredReviewTask(SoloReviewTask):
                 "One per `would_change` cell, naming its declaration and concern; [] when no cell "
                 "is a `would_change`."))] = [],
             ledger: Annotated[List[DeclarationVerdicts], Field(description=(
-                "Ledger entries not yet recorded with record_ledger; [] when all are."))] = [],
+                "Declaration entries not yet recorded with record_ledger; [] when all are."))] = [],
+            files: Annotated[List[FileVerdicts], Field(description=(
+                "File entries not yet recorded with record_ledger; [] when all are."))] = [],
             confidence: Annotated[Optional[float], Field(description="0.0-1.0")] = None,
             message: Annotated[str, Field(description="Optional summary of the review.")] = "",
         ) -> Dict[str, Any]:
-            return await self._submit(findings, ledger, confidence, message)
+            return await self._submit(findings, list(ledger) + list(files), confidence, message)
 
     def _check_ledger(self, findings: List[StructuredFinding],
                       ) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
         """`(cells, None)` when the recorded ledger is a legal answer, `(None, refusal)` otherwise.
 
-        One cell per (declaration, concern), from the recorded entries. Every `would_change`
-        cell has a finding and every finding at a declaration sits on a `would_change` cell; a
-        contradiction is refused like any other contract violation. A declaration with no entry
-        is asked for `LEDGER_PRESSES` times and then recorded `UNSTATED_VERDICT` under every
-        concern, so "never answered" cannot read as `no_issue`.
+        One cell per (subject, concern), from the recorded entries, subjects being the PR's
+        declarations and its changed files. Every `would_change` cell has a finding and every
+        finding sits on a `would_change` cell of its subject, under a concern that subject has; a
+        contradiction is refused like any other contract violation. A subject with no entry is
+        asked for `LEDGER_PRESSES` times and then recorded `UNSTATED_VERDICT` under every concern,
+        so "never answered" cannot read as `no_issue`.
         """
 
-        names = self._declaration_names()
-        paths = set(self.data.changed_files or [])
         recorded = self._recorded()
         problems: List[str] = []
         filed: Dict[Tuple[str, str], int] = {}
         for index, finding in enumerate(findings):
-            if finding.declaration in paths:
-                continue  # a file-level change: no cell to agree with
-            declaration = resolve_declaration(finding.declaration, names)
-            if declaration is None:
+            subject = self._resolve_subject(finding.declaration)
+            if subject is None:
                 problems.append(f"finding {index} names {finding.declaration!r}, which is neither "
                                 "a listed declaration nor a changed file's path")
+                continue
+            declaration, kind, concerns = subject
+            if finding.concern not in concerns:
+                problems.append(f"finding {index} is about the {kind} {declaration} under "
+                                f"{finding.concern!r}, which is not one of its concerns {list(concerns)}")
                 continue
             cell = (recorded.get(declaration) or {}).get(finding.concern)
             if cell is None or cell["verdict"] != "would_change":
@@ -460,22 +540,22 @@ class StructuredReviewTask(SoloReviewTask):
                     problems.append(f"({declaration}, {concern}) is a `would_change` with no finding")
         if problems:
             return None, "The ledger is inconsistent: " + "; ".join(problems) + ". Fix and resubmit."
-        missing = [name for name in names if name not in recorded]
+        missing = [name for name, _kind, _concerns in self._subjects() if name not in recorded]
         if missing:
             self._ledger_presses = getattr(self, "_ledger_presses", 0) + 1
             if self._ledger_presses <= LEDGER_PRESSES:
                 shown = ", ".join(missing[:12])
                 more = f" and {len(missing) - 12} more" if len(missing) > 12 else ""
                 return None, (
-                    "Every declaration needs a ledger entry, a verdict with its reason under every "
-                    f"concern, before the review is submitted. Not recorded: {shown}{more}. Record "
-                    f"them with {self.RECORD_TOOL}, or pass them as `ledger` here. "
-                    f"(attempt {self._ledger_presses} of {LEDGER_PRESSES})")
+                    "Every declaration and every changed file needs a ledger entry, a verdict with "
+                    f"its reason under each of its concerns, before the review is submitted. Not "
+                    f"recorded: {shown}{more}. Record them with {self.RECORD_TOOL}, or pass them as "
+                    f"`ledger` and `files` here. (attempt {self._ledger_presses} of {LEDGER_PRESSES})")
         cells = []
-        for name in names:
-            for concern in CONCERNS:
+        for name, kind, concerns in self._subjects():
+            for concern in concerns:
                 cell = (recorded.get(name) or {}).get(concern)
-                cells.append({"declaration": name, "concern": concern,
+                cells.append({"declaration": name, "kind": kind, "concern": concern,
                               "verdict": cell["verdict"] if cell else UNSTATED_VERDICT,
                               "reason": cell["reason"] if cell else ""})
         return cells, None
@@ -594,7 +674,10 @@ class StructuredReviewTask(SoloReviewTask):
             "claim": finding.claim, "suggested_fix": finding.suggested_fix,
             "evidence": json.dumps(evidence, ensure_ascii=False) if evidence else None,
             "verified": outcome == VERIFIED,
-            "declaration": finding.declaration, "concern": finding.concern,
+            # The subject as the ledger names it, so a `target/`-prefixed path or a dotted suffix
+            # meets its cell again in the critic stage.
+            "declaration": (self._resolve_subject(finding.declaration) or (finding.declaration,))[0],
+            "concern": finding.concern,
             "verification": outcome,
         }
 
@@ -647,10 +730,9 @@ class StructuredReviewTask(SoloReviewTask):
 
         filed_raw, refuted_rows = [], []
         outcome_by_cell: Dict[Tuple[str, str], str] = {}
-        names = self._declaration_names()
         for finding, (outcome, evidence) in zip(findings, verified):
-            key = (resolve_declaration(finding.declaration, names) or finding.declaration,
-                   finding.concern)
+            subject = self._resolve_subject(finding.declaration)
+            key = (subject[0] if subject else finding.declaration, finding.concern)
             # The cell's outcome: the strongest filed state wins over a refuted sibling.
             rank = {VERIFIED: 2, UNVERIFIED: 1, REFUTED: 0}
             if rank[outcome] >= rank.get(outcome_by_cell.get(key, REFUTED), 0):

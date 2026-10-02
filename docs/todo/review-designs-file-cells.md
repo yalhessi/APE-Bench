@@ -1,6 +1,7 @@
 # The structured reviewer's ledger covers declarations only, so a PR's file-level asks have no cell
 
-**Status** — open, 2026-10-02 (`review-designs`).
+**Status** — built, not measured (2026-10-02, `review-designs`, design `structured/3`: one ledger entry
+per changed file with `module_doc`, `style` and `organization`). Closes with the next D1 reps on Claude.
 **Cost** — no spend to build; one Claude subscription window per dev rep to measure.
 
 **Motivating example.** D1 `structured` on Claude Opus 5.5, dev rep 1

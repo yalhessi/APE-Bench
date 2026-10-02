@@ -242,7 +242,10 @@ names as the new reference baseline.
   The first test also changed D1's contract to six fixed concern cells per declaration, after the
   multi-concern rows collapsed to one decision per object. On Claude Opus 5.5 (subscription), D1
   dev rep 1: 10 of 23 against the hygiene reps' 9, 9, 7, control emission 1.5 per control PR --
-  plan §5's lever threshold, met at the boundary, one rep. Not run: D1 reps 2 and 3, D2 on Claude.
+  plan §5's lever threshold, met at the boundary, one rep. Then, by the user's decision, fixes
+  before the reps: the end-of-file linter artifact (framework), compile reuse at submission, file
+  ledger cells (`structured/3`), D2's union keeping every finding, and design versions sealed into
+  the plan. Not run: `structured/3` on Claude (three reps), D2 on Claude.
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan
   §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
   in turns and tokens on the large PRs.

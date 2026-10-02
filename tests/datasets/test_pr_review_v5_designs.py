@@ -119,6 +119,10 @@ def test_a_solo_plan_records_no_design_and_a_design_is_sealed_when_it_is_not_sol
     if design is not None:
         settings = evaluation_settings(_dataset(design=design, stage_input_run="stage_a"))
         assert settings["design"] == design and settings["stage_input_run"] == "stage_a"
+        # The contract's version is sealed too, so a run cannot resume into a changed contract.
+        assert settings["design_version"] == DESIGNS[design].design_version
+    assert DESIGNS["solo"].design_version is None
+    assert DESIGNS["structured"].design_version == "structured/3"
 
 
 def _episode(pr: int):

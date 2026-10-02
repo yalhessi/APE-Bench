@@ -123,11 +123,14 @@ async def main() -> int:
     entries = {}
     for cell in payload["stage"]["ledger"]:
         key = (cell["declaration"], cell["concern"])
-        position = (positions_for_filed[key] if cell["verdict"] == "would_change"
+        position = (positions_for_filed.get(key, "confirm") if cell["verdict"] == "would_change"
                     else "overturn" if key in overturned else "concede")
-        entries.setdefault(key[0], {"declaration": key[0]})[key[1]] = {
+        head = {"file": key[0]} if cell.get("kind") == "file" else {"declaration": key[0]}
+        entries.setdefault(key[0], head)[key[1]] = {
             "reason": f"smoke: {position} on {key[1]}", "position": position}
-    reply = await mcp.call_tool("record_positions", {"entries": list(entries.values())})
+    reply = await mcp.call_tool("record_positions", {
+        "entries": [e for e in entries.values() if "declaration" in e],
+        "files": [e for e in entries.values() if "file" in e]})
     record["record_positions_reply"] = json.loads(reply[0][0].text if isinstance(reply, tuple) else reply[0].text)
     log.info("record_positions: %s", record["record_positions_reply"])
 
