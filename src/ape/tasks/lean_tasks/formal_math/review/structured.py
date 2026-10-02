@@ -44,7 +44,12 @@ list, which the runner writes to `ledgers.jsonl` for the critic stage (`structur
 and for the reading. Downstream of the result nothing changes: findings carry the solo's keys,
 are anchored by path and line, and are stamped with the unlabelled pair the solo's v2 contract
 stamps, so the review channel reads this design exactly as it reads the baseline. The design's
-concern travels as `concern_label` (into `concern_tags`), never as the gating `concern_family`.
+concern travels as the candidate's `concern_label` (`arm_responses.jsonl`,
+`candidates_discovered.jsonl`), never as the gating `concern_family`. It does NOT reach
+`findings.jsonl`: `merge.finding_from_candidate` builds `concern_tags` from the candidate's tags
+and family only, and adding the label there would move every arm finding's sealed id. A reading
+by concern takes it from `ledgers.jsonl`, whose findings carry `declaration` and `concern`
+(corrected 2026-10-02; the D1 commit, 64ad99a0, said it reached `concern_tags`).
 """
 
 import asyncio

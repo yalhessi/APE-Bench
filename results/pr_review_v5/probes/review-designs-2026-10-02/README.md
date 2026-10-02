@@ -121,3 +121,38 @@ Read against its own baseline, gpt-5.2 contract v2 (`probe_dev_gpt52_Grc_contrac
   PRs (33149: 56 declarations, 33294: 86) recorded their ledgers.
 - One rep on dev is provisional whatever it shows, and says nothing yet about Claude: the
   Claude rule (plan §5) is read on the subscription runs.
+
+## D1 on gpt-5.2, dev rep 1: read against the rule
+
+`probe_dev_structured_gpt52_Grc_contract2_rep1`: 15 of 15 sessions, $35.80 billed, judged for
+$0.08 (audit `probe-dev-structured-gpt52-Grc-contract2-rep1`).
+
+| | g52v2 (baseline) | D1 on gpt-5.2 |
+|---|---|---|
+| held-out obligations hit, of 23 | 2 | **2** (the same two: `3dacf72e`, `f54010d8`) |
+| findings | 44 | 46 (51 filed before merging) |
+| paired with gold | 11 | 11 |
+| control-PR findings | 0 | 0 |
+| change targets shared (Jaccard) | | 0.45 |
+
+**Not, as built, on gpt-5.2** (rule: at most 3 of 23). The contract was kept everywhere: 1,698
+cells, every declaration with six distinct reasons, nothing `unstated`, nothing refuted, the
+86-declaration ledger of 33294 recorded. But 1,660 cells (98%) are `no_issue`, and the 38
+`would_change` cells produce the baseline's volume, on the baseline's PRs. What gpt-5.2 lacks
+here is not an occasion to decide; it decides "nothing to ask" one cell at a time. Filed by
+concern: proof 16, docstring 10, placement 12, statement 8, name 5; 29 verified by a compile or a
+lookup, 22 unverified. Six filings are the end-of-file linter artifact.
+
+Altitude: one rep, one model, the design as built. Untried before anything is concluded: D1 on
+Claude (the model the plan measured the inconsistency on, `configs/designs/structured_dev_claude_sub.yaml`),
+D1 on gpt-5.5, D2 on this run (its job is exactly the 1,660 `no_issue` cells), and reps.
+
+## D2 on gpt-5.2, dev rep 1: the reading rule, stated before the run
+
+Run `probe_dev_structured_critic_gpt52_Grc_contract2_rep1`, `--of probe_dev_structured_gpt52_Grc_contract2_rep1`,
+judged the same way. Plan §5's D2 rule, against D1's 2 of 23 at 0.0 control emission:
+- **A lever:** at least 4 of 23 (D1 plus 2) with control emission at most 2.0 per control PR.
+- **Not, as built:** at most 2 of 23, or the critic's additions on the control PRs refuted or
+  above 2.0 per control PR. Three is provisional.
+- Read beside it: positions by kind (`overturn` / `concede` / `confirm` / `refute`), the critic's
+  filings and their verification, and which obligations an `overturn` reached.
