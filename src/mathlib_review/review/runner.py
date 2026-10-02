@@ -588,17 +588,29 @@ def stage_rows_for(dataset, selected_prs: List[int], logger, *, dry_run: bool = 
     return rows
 
 
-def _design_preflight(data: List[Dict[str, Any]], dataset, logger) -> None:
+def _design_preflight(agenda, episodes, dataset, cutoff_by_episode, trace_path, graphs,
+                      stage_rows, logger) -> None:
     """What `plan` says about a design's task data, since `plan` never builds a task.
 
     "Before spending on a run that tests a new capability, assert the capability reaches the
     task" (`.claude/rules/mathlib-review.md`): the payload is what the task will be handed, so
-    the per-PR line each design describes is the cheapest honest preflight of it.
+    the per-PR line each design describes is the cheapest honest preflight of it. A chained
+    design planned without its stage run has no payload to build -- its task data needs the
+    first stage's rows -- so the preflight says how many PRs would read one and stops there.
     """
 
     from ape.tasks.lean_tasks.formal_math.review import DESIGNS
 
     design_cls = DESIGNS[dataset.design]
+    if design_cls.reads_stage and stage_rows is None:
+        wanted = {item.episode_id for item in agenda.proposals}
+        logger.info("design=%s task_type=%s: %d PR(s) would each read a first-stage ledger; "
+                    "the task data is built once --of names the stage run",
+                    dataset.design, design_cls.task_type,
+                    sum(1 for episode in episodes if episode.episode_id in wanted))
+        return
+    data = _solo_task_data(agenda, episodes, dataset, cutoff_by_episode, trace_path,
+                           graphs=graphs, stage_rows=stage_rows)
     logger.info("design=%s task_type=%s tasks=%d", dataset.design, design_cls.task_type,
                 len(data))
     for payload in data:
@@ -613,13 +625,15 @@ def _ledger_rows(results, design: str) -> List[Dict[str, Any]]:
     The design's own record of a PR -- the ledger, what it refuted, what a later stage said --
     kept beside `findings.jsonl` rather than only in the uncommitted `.ape` tree, because a
     chained design reads it and the reading of a design is made from it. Every key the result
-    declares beyond the base review result travels; the base keys (the findings, the message)
-    are already in the run's other artifacts.
+    declares beyond the base review result travels, and so do the filed `findings` as the task
+    recorded them (before anchoring and merging), which is what a critic stage argues against;
+    the rest of the base keys (the message, the verdict, the bookkeeping) are in the run's
+    other artifacts.
     """
 
     from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewResult
 
-    base_keys = set(SoloReviewResult.model_fields)
+    base_keys = set(SoloReviewResult.model_fields) - {"findings"}
     rows = []
     for result in results.task_results:
         raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
@@ -1929,10 +1943,9 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         cutoff_by_episode = cutoffs_by_episode(episodes)
         logger.info("retrieval cutoffs resolve for all %d episode(s)", len(episodes))
         if dataset.routing_mode == "solo":
-            _design_preflight(_solo_task_data(
-                agenda, episodes, dataset, cutoff_by_episode,
-                run_dir(dataset.run_name) / "context_trace.jsonl",
-                graphs=release["graphs"], stage_rows=stage_rows), dataset, logger)
+            _design_preflight(agenda, episodes, dataset, cutoff_by_episode,
+                              run_dir(dataset.run_name) / "context_trace.jsonl",
+                              release["graphs"], stage_rows, logger)
         # Same for the verification environment: a dry run must say whether the real run
         # would verify against the PR's own build products or the base commit's.
         missing = await assert_reviewed_workspaces_prebuilt(

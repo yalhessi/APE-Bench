@@ -191,6 +191,32 @@ def test_a_chained_design_without_its_stage_is_refused_and_plan_reports_it(monke
     assert "--of" in caplog.text and "refused" in caplog.text
 
 
+def test_plan_describes_a_chained_design_without_its_stage_instead_of_building_it(monkeypatch, caplog):
+    """The dry run builds the design's task data to describe it; a critic's task data needs the
+    first stage's rows, so without `--of` the preflight says so and does not raise (2026-10-02:
+    the first D2 `plan` died in `design_payload` with "has no first-stage ledger")."""
+
+    import ape.tasks.lean_tasks.formal_math.review as review_pkg
+    from src.mathlib_review.review import runner
+
+    class _Chained(_ChainedForTest):
+        @classmethod
+        def design_payload(cls, *, episode, graph, dataset, stage):
+            raise AssertionError("must not be built without a stage")
+
+    monkeypatch.setitem(review_pkg.DESIGNS, "chained_for_test", _Chained)
+    with caplog.at_level(logging.INFO, logger="t"):
+        runner._design_preflight(_agenda([33337]), [_episode(33337)], _dataset(design="chained_for_test"),
+                                 {}, Path("trace.jsonl"), [], None, logging.getLogger("t"))
+    assert "1 PR(s) would each read a first-stage ledger" in caplog.text
+    # And with rows it builds and describes the data as for any design.
+    monkeypatch.setitem(review_pkg.DESIGNS, "chained_for_test", _ChainedForTest)
+    with caplog.at_level(logging.INFO, logger="t"):
+        runner._design_preflight(_agenda([33337]), [_episode(33337)], _dataset(design="chained_for_test"),
+                                 {}, Path("trace.jsonl"), [], {"ep:33337": {}}, logging.getLogger("t"))
+    assert "tasks=1" in caplog.text
+
+
 def test_a_chained_design_reads_the_ledgers_and_refuses_an_uncovered_pr(monkeypatch, tmp_path):
     import ape.tasks.lean_tasks.formal_math.review as review_pkg
     from src.mathlib_review.review import runner
@@ -237,7 +263,8 @@ def test_ledger_rows_carry_only_results_with_a_ledger_and_their_design_keys():
     rows = _ledger_rows(results, "structured")
     assert [row["episode_id"] for row in rows] == ["ep:1"]
     assert rows[0]["design"] == "structured" and rows[0]["ledger"] == [{"declaration": "x"}]
-    assert "findings" not in rows[0], "the base result's keys are in the run's other artifacts"
+    assert rows[0]["findings"] == [{"claim": "c"}], "the critic stage argues against these"
+    assert "review_message" not in rows[0], "the rest of the base keys are in the run's other artifacts"
 
 
 # --- configs/designs: a design config differs from its baseline in the design alone -------------
