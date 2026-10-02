@@ -582,3 +582,34 @@ Also from that folder:
   cross-rep agreement signal (`selection-signal.md`, AUC 0.71 / 0.63 in-sample), that is the
   measured case for an ensemble harness: decorrelated runs, union, agreement-ranked. Untested as a
   design.
+
+## Is the effort we ask for the effort OpenAI runs? Yes; and `xhigh` exists (2026-10-02, $0.25)
+
+**Checked from OpenAI's side, not from our configs.** A Responses body echoes the settings the server
+applied (`reasoning: {effort, context, mode, summary}`) and the snapshot it served. `data/llm_logs`
+holds that body unparsed: `providers/base.py` logs `response.json()` before any conversion, and logs
+the same `payload` object it posts. Pairing every request with its response from 2026-09-29 to
+2026-10-02, about 6,300 Responses calls on gpt_5.2, gpt-5.4 and gpt-5.5: the effort sent and the
+effort served agree in every one, and every served model is the requested snapshot. Chat Completions
+echoes no effort, so there the check is `reasoning_tokens`: 0 in all 1,319 gpt_5.2 calls that sent
+none (its default is off), a median of 1,460-3,870 at high.
+
+**Direct calls, no APE code in the path** (`httpx` to `/v1/responses`, one arithmetic prompt, store
+off), gpt-5.5-2026-04-23:
+
+| effort | none | low | medium | high | xhigh |
+|---|---|---|---|---|---|
+| reasoning tokens (two calls) | 0 | 1,552 / 1,026-1,497 | 1,552 / 1,783-2,453 | 2,426 / 2,383 | 3,073 / 2,783 |
+| answer (correct: 322) | 172 | 322 | 322 | 322 | 322 |
+
+`minimal` is refused: "Supported values are: 'none', 'low', 'medium', 'high', and 'xhigh'." So the
+effort setting is honoured and scales, and it is not the subtle bug.
+
+**The untried setting this shows.** Every gpt-5.5 run in the record ran at `high`, one below its
+top level. The Opus cells ran at `xhigh`, which is also one below Claude Code's top (`max`), so by
+rank the two are matched and this is not an asymmetry in our setup. It is still a setting nobody has
+run. On contract v2 (`probe_dev_gpt55_Grc_contract2_rep1`) gpt-5.5 spent a median of 135 reasoning tokens
+a turn and 1.9-13.5K a session. `text.verbosity` is also never sent (grep of `src/`). **What would
+close it:** gpt-5.5 contract v2 on dev at `xhigh`, three reps, read against its 3 of 23 with the bar
+stated before the run (6 of 23 a lever, 4 or fewer not). Expected $10-20 a rep under the existing
+$20 / 24M cap.
