@@ -512,3 +512,14 @@ task". It was written for a tool filtered out of a grant. Here the tool is grant
 **Closed by the second option** (hygiene layer, `786f00a1`, 2026-10-01): `proof_profile` is out of
 `configs/bases/v5_solo.yaml`'s grant. The Opus dev runs had added 1 refusal in 2 calls to the count.
 The first option, a `cli plan` refusal for a granted tool with no backing store, is not built.
+
+**Correction (2026-10-02, `review-designs`): the close reached the base and not the dev set.**
+`configs/pr_review_v5_dev_medium_gpt52.yaml` restates `solo_context_tools` with `proof_profile`
+in it, and a child's list replaces the parent's, so every dev config extending it still grants the
+tool: the hygiene baseline resolves to `[zulip_search, precedent_search, declaration_search,
+naming_norm, proof_profile]`, against its own header ("less `proof_profile`, which left the base
+grant"), and the D1 smoke registered it. Hygiene rep 1 never called it (trace: declaration_search
+49, naming_norm 8, zulip_search 7, precedent_search 6), so no measured number moved. The baseline
+is frozen and the designs extend it, so the designs hold the same grant and the design comparison
+is at parity; the fix belongs to the next baseline, not to this one. What would close it: drop the
+tool from the dev gpt52 config's list when a new baseline is cut, or build the first option.
