@@ -32,7 +32,9 @@ default (user, 2026-09-24).
   fresh **worktree** if this tree stays in use (see Git) — and offer to write any unsaved lesson to
   disk first. The `[session]` line printed on
   every prompt carries the compaction count; after any compaction, treat a new thread as a hard
-  recommendation rather than a suggestion.
+  recommendation rather than a suggestion. To start that session instead of recommending it --
+  a topic worktree, a brief on disk, `claude --bg`, model and effort inherited -- use the
+  `spawn-session` skill (`.claude/skills/spawn-session/`).
 - **Before planning a thread, read the other worktrees, not only `develop`.** `git worktree list`,
   then `git log --oneline develop..<branch>` for each; a plan in flight lives on its branch. On
   2026-09-23 `work-enumeration` and `arms-speak` built per-target verdicts plus ask-without-fix in
