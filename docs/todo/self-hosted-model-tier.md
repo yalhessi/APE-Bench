@@ -2,6 +2,18 @@
 
 **Status** — open, 2026-10-02. Nothing built. The user's requirement (2026-10-02): if this route is
 taken, prompt caching must be handled, not assumed.
+
+**Hand test, 2026-10-02** (`results/pr_review_v5/probes/local-vllm-2026-10-02/`). Stage 1 used
+`Qwen3.5-35B-A3B-FP8` on one GPU, through vLLM 0.30 outside the repo.
+- Every check passed: 9 of 9 warm calls hit the cache and report `cached_tokens`;
+  `reasoning_effort: none` turns thinking off; 29 of 29 tool calls are schema-valid under `auto`.
+- Replaying all 123 logged ELM sessions at concurrency 12 served **89.2%** of prompt tokens from
+  cache, at a median 2.26 s against ELM's 5.53 s on the same requests. That is a smaller model, so
+  it shows what serving can do, not what the 397B will do.
+- Starting it needed `VLLM_USE_DEEP_GEMM=0 VLLM_MOE_USE_DEEP_GEMM=0` and
+  `VLLM_USE_FLASHINFER_SAMPLER=0` (`serve.sbatch` there).
+- NFS reads cap near 75 MB/s, so a cold 397B load is about 90 minutes and saturates the share.
+- Stage 2, the 397B on 8 GPUs, is not run.
 **Cost** — no spend for generation: GPU time on the `first` partition. Judging the calibration runs
 is the only bill.
 
