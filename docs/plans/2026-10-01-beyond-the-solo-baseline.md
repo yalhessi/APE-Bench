@@ -74,7 +74,7 @@ The reps do not differ much in *where* they look. Two reps of one configuration 
 
 | obligation | what every Claude cell did at the site |
 |---|---|
-| `64e1164f`, `ce7b5d2e` (33337, rename `coe_…` to `toLinearMap_…`) | all three project cells asked for a *different* rename at the site (`isComplProjection` to `isCompl_projection`); Opus 5 wrote "keep the `coe_` fronting", which is `naming_norm`'s global count (`coe_` 48 to 9) speaking. X1 reached it under brief X. |
+| `64e1164f`, `ce7b5d2e` (33337, rename `coe_…` to `toLinearMap_…`) | all three project cells asked for a *different* rename at the site (`isComplProjection` to `isCompl_projection`); Opus 5 wrote "keep the `coe_` fronting". X1 reached it under brief X; hygiene rep 2 did too (2026-10-02). *Corrected 2026-10-02:* the tool did not mislead here. On 33337 `naming_norm` told every Opus cell `emerging`, `toLinearMap_` 21 to `coe_` 7, with `toLinearMap_` candidate names, before and after the hygiene change; the reviewers chose another name. The `coe_` 48-to-9 miscount is validation PR d0045 (Phase 1). So 33337 is a decision miss with the right evidence in hand. |
 | `57bcc9fd` (33117, `@[to_fun]` in place of hand-written `fun_*` lemmas) | 3-6 findings at the site in every cell (`fun_prop` lemmas, explicit `n`, `protected deriv`); none names the attribute. |
 | `7f098f6a`, `8e276803` (33294, dot notation in a name and in a `rw`) | no finding at either site in any cell. |
 | `8d887ce4`, `7fef913e`, `e8e02821` (33145, `ciSup'`/`ciInf'` by duality, the `by_cases` restructure) | the exact `by_cases h : BddAbove (range f)` restructure and the exact `(α := αᵒᵈ)` dual proof were filed in both reps and scored `loc`; Opus 5's wording of the same restructure scored a hit. |
@@ -103,7 +103,8 @@ Read from the sessions (`.ape/runs/probe_dev_opus55_contract2_claude_sub_rep*`):
    4 in rep 2 on 33149, the AI-generated PR with 4 obligations (`_normalize_findings` warns in the
    log and nowhere else).
 3. **`naming_norm` counts a prefix globally** and told three reviewers the wrong convention on
-   33337 (§2.3; Phase 1's d0045, "fix first").
+   validation PR d0045 (Phase 1, "fix first"). *Corrected 2026-10-02:* this said 33337, where the
+   tool was right (`emerging`, `toLinearMap_` 21 to `coe_` 7) and the reviewers did not follow it.
 4. **`proof_profile` is in the grant and dead on dev** (no declaration tables), and the first
    message names two different absolute roots for the same attempt (the worktree's `.ape/runs`
    and the main checkout's).
@@ -163,7 +164,7 @@ each item became:
 | 7 `lean_verify_edit` calls never ran: `"replacement": }` to delete a span | a span without a replacement is a deletion (`0a3d7d33`) |
 | whole-file compiles reported `warnings: []` on the 101-character line maintainers asked to wrap (d0041) | edit and as-is compiles run Mathlib's standard linter set, as CI does; warnings split like errors (`0a3d7d33`) |
 | `declaration_search` refused `Fintype`, `Meromorphic`, `abelianizeAdj` as "not identifier-shaped" (15 of 249) | one identifier-shaped token is searched as given; prose is still refused (`f8a65df5`) |
-| `naming_norm`'s one global count misled three reviewers on 33337 | the reviewed file's directory is counted beside the library and overrules a verdict it contradicts (`scope_conflict`, `7d39d0d7`) |
+| `naming_norm`'s one global count misled three reviewers on validation PR d0045 (this row said 33337, where the tool was right: corrected 2026-10-02) | the reviewed file's directory is counted beside the library and overrules a verdict it contradicts (`scope_conflict`, `7d39d0d7`) |
 | `finding_budget: 20` dropped 2 and 4 findings on 33149 with a log line as the only trace | the call is refused with the count and the budget; the reviewer chooses (`50742516`) |
 | the first message promised a read-write `scratch/` "for creating and editing files" with `Write` and `Edit` disallowed; two roots named for one attempt | built-in writes may land in `scratch/` and nowhere else, so the hygiene config grants `Write` and `Edit`; one resolved root (`669c217d`) |
 | `proof_profile` granted and dead on every base but one | out of the solo grant (`786f00a1`) |

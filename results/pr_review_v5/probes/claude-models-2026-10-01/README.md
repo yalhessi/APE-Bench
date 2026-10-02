@@ -197,7 +197,9 @@ sessions' visible text and budget truncations.
   set comprehension, one gold obligation each; at 33149's Parseval axiom, rep 1 found the Mathlib
   lemma by search and rep 2 did not.
 - **The never-reached ten are knowledge at an attended site**: the `toLinearMap_` rename (all
-  three project cells asked a different rename there, Opus 5 citing `coe_`'s global count), the
+  three project cells asked a different rename there, although `naming_norm` had told each of them
+  `emerging`, `toLinearMap_` 21 to `coe_` 7, with the `toLinearMap_` names as candidates; corrected
+  2026-10-02 from "Opus 5 citing `coe_`'s global count", which was validation PR d0045's), the
   `@[to_fun]` mechanism (3-6 findings at the site, none the attribute), dot notation (no finding at
   the site in any cell), and the 33145 `ciSup'` cluster, where the exact `by_cases` restructure and
   the exact `(α := αᵒᵈ)` dual proof were filed in both reps and scored `loc`.
