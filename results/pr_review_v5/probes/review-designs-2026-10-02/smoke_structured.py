@@ -17,7 +17,9 @@ and tokens. That takes the first paid rep.
 
 Run from the repository root, spending nothing:
     PYTHONPATH=$PWD/src ape/bin/python results/pr_review_v5/probes/review-designs-2026-10-02/smoke_structured.py
-Writes smoke_structured.json beside this file.
+Writes smoke_structured.json beside this file, and stage_structured/ledgers.jsonl -- the row the
+runner's `_ledger_rows` would write for this PR -- which smoke_structured_critic.py reads as D2's
+first stage.
 """
 
 from __future__ import annotations
@@ -37,6 +39,7 @@ sys.path.insert(0, str(ROOT / "src"))
 PR = 33337
 CONFIG = ROOT / "configs/designs/structured_dev_claude_sub.yaml"
 OUT = Path(__file__).resolve().parent / "smoke_structured.json"
+STAGE_DIR = Path(__file__).resolve().parent / "stage_structured"
 ATTEMPT = ROOT / ".ape/runs/review_designs_smoke_structured/tasks/0/samples/0/attempts/smoke"
 
 
@@ -57,8 +60,9 @@ async def main() -> int:
     )
     from mcp.server.fastmcp import FastMCP
     from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
+    from src.mathlib_review.io import jsonl_bytes
     from src.mathlib_review.review.runner import (
-        _solo_task_data, load_release, load_run, select_units_and_episodes,
+        _ledger_rows, _solo_task_data, load_release, load_run, select_units_and_episodes,
     )
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -189,7 +193,11 @@ async def main() -> int:
                      "evidence": r["evidence"]} for r in raw["refuted"]],
     }
     OUT.write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n")
-    log.info("wrote %s", OUT)
+    # The runner's own writer, so the critic smoke reads what a real D1 run would leave.
+    STAGE_DIR.mkdir(exist_ok=True)
+    (STAGE_DIR / "ledgers.jsonl").write_bytes(
+        jsonl_bytes(_ledger_rows(SimpleNamespace(task_results=[result]), "structured")))
+    log.info("wrote %s and %s", OUT, STAGE_DIR / "ledgers.jsonl")
     print(json.dumps(record["result"], indent=2, ensure_ascii=False))
     return 0
 

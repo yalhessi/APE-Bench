@@ -37,10 +37,36 @@ writes the typed `ledger` and `findings` in one `submit_findings` call, and what
 in turns and tokens on the large PRs -- `plan` reports 336 cells on 33149 and 516 on 33294
 (86 declarations), which a row deciding several concerns at once brings down to at least 86 rows.
 
-## D2 `structured_critic`
+## D2 `structured_critic` on PR 33337 (`smoke_structured_critic.py`, `smoke_structured_critic.json`)
 
-Built as a chained stage (`cli run … --of <structured run>`), reading D1's `ledgers.jsonl`
-through `StageInput`; see the module docstring for why, and the session report for the open
-question (nesting a critic session inside a Claude Code session on the subscription is untested,
-and the chained form needs no nesting). Its smoke is the unit tests with the verification faked:
-no stage-1 run exists yet to read.
+D1's smoke now also writes `stage_structured/ledgers.jsonl`, the row the runner's `_ledger_rows`
+writes for the PR (it was re-run for this: the same outcomes, 26 s and 12 s). The critic smoke
+reads that row as its first stage through the runner's own `stage_rows_for` -- `StageInput`
+pointed at the directory beside the script, since the smoke's stage is not under
+`results/pr_review_v5/runs/` -- builds the task as `cli run --of <run>` would from
+`configs/designs/structured_critic_dev_claude_sub.yaml`, sets it up on the same reviewed
+workspace, and drives its submission by hand. The payload line `plan` would print:
+"stage review_designs_smoke_structured: 30 cells, 5 would_change, 4 finding(s) filed, 1 refuted".
+The prompt (25,927 characters) renders D1's ledger, its filed changes and its refuted change.
+
+Positions: 23 `concede`, 2 `overturn`, 2 `confirm`, 2 `refute`, 1 `undecided`. The first
+submission was handed back in 18 s: the critic's rename of `le_iff_range_le_range` onto
+`Submodule.starProjection` is already declared at `Projection/Basic.lean`. Resubmitted without
+the name, it was accepted in 9 s: "30 cells, 6 findings in the union (2 the critic's), 0 refuted".
+
+| in the union | stage | critic's position | agreed | verification |
+|---|---|---|---|---|
+| `starProjection_le_starProjection_iff`, proof | structured | refute | false | verified |
+| `le_iff_range_le_range`, library | structured | confirm | true | verified |
+| `coe_orthogonalProjection_eq_linearProjOfIsCompl`, name | structured | undecided | none | unverified |
+| `orthogonalProjection_apply_eq_linearProjOfIsCompl`, docstring | structured | confirm | true | unverified |
+| `coe_orthogonalProjection_eq_linearProjOfIsCompl`, proof | critic | overturn | false | verified (identity edit compiles) |
+| `le_iff_range_le_range`, name | critic | overturn | false | unverified (the clashing name dropped) |
+
+The critic's `refute` of D1's verified identity edit is a label: the finding stays, carried as D1
+filed it. D1's change the tools refuted at its own submission is in neither stage's findings.
+
+What this smoke cannot settle: whether a Claude Code session argues with a ledger in this form,
+and what a critic session costs. That is D2's first paid rep, after D1's. Nesting the critic
+inside D1's session (the plan's first choice) was not built and not smoked: any test of it is a
+live Claude Code session on the subscription, and the chained form needs no nesting.

@@ -231,7 +231,8 @@ names as the new reference baseline.
   `structured_critic` (`structured_critic.py`) as the plan's **chained-stage fallback**, not
   nested: it reads D1's `ledgers.jsonl` through `StageInput`, every cell gets a position
   (`overturn`/`concede`, `confirm`/`refute`/`undecided`), the critic's changes go through D1's
-  verification, and the output is the union with stage and position labels. Both designs
+  verification, and the output is the union with stage and position labels; smoked on 33337
+  the same way, reading D1's smoke as its stage through the runner's `stage_rows_for`. Both designs
   `plan` clean on the 15 dev PRs; `plan` reports D1's ledger at 336 cells on 33149 and 516 on
   33294. Not run: D1 rep 1, D2 rep 1 (the user's subscription windows, after the hygiene reps).
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan

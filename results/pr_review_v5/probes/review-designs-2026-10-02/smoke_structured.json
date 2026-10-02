@@ -4,13 +4,13 @@
   "steps": [
     {
       "submission": 1,
-      "seconds": 26.9,
+      "seconds": 25.5,
       "accepted": false,
       "message": "2 change(s) are contradicted by the tools:\n- (Submodule.coe_starProjection_eq_isComplProjection, proof) 'Submodule.coe_starProjection_eq_isComplProjection: a proof by a lemma that does ': the edit introduces 1 error(s); the first: Unknown identifier `nonexistent_lemma_for_the_smoke`\n- (Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl, name) 'Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl: rename onto a name th': 'Submodule.starProjection' is already declared at the base commit: - `Submodule.starProjection` is declared in `Mathlib/Analysis/InnerProductSpace/Projection/Basic.lean:177` (before this PR)\nCorrect the edit or the name, resubmit the finding without it (it is then filed unverified), or drop it; keep every other row and finding. After attempt 3 the contradicted changes are recorded as refuted and not filed. (attempt 1 of 3)"
     },
     {
       "submission": 2,
-      "seconds": 10.7,
+      "seconds": 12.1,
       "accepted": true,
       "message": "Review recorded: 30 ledger cells, 4 findings filed, 1 refuted."
     }

@@ -397,7 +397,8 @@ class StructuredCriticTask(StructuredReviewTask):
             row["stage"] = STAGE_1
             row["stages"] = [STAGE_1]
             row["critic"] = position if row.get("declaration") not in paths else None
-            row["agreed"] = position == "confirm" if position else None
+            # Agreement is a label with three values: confirmed, refuted, or neither said.
+            row["agreed"] = {"confirm": True, "refute": False}.get(position)
             union[union_key(row, paths)] = row
         try:
             critic_rows = self._normalize_findings(critic_raw)

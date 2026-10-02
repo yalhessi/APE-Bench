@@ -242,13 +242,18 @@ def test_the_union_carries_the_first_stages_findings_with_the_critics_position_a
     assert cell["position"] == "overturn" and cell["outcome"] == "unverified"
 
 
-def test_a_confirmed_first_stage_finding_is_labelled_agreed():
+def test_a_confirmed_first_stage_finding_is_labelled_agreed_and_an_undecided_one_neither():
     task = _task()
     captured = _captured(task)
     out = _submit(task, _rebuttals())
     assert out["evaluation_result"].success
     [carried] = captured["result"].findings
     assert carried["critic"] == "confirm" and carried["agreed"] is True and carried["stages"] == [STAGE_1]
+    task = _task()
+    captured = _captured(task)
+    assert _submit(task, _rebuttals({("Submodule.foo_bar", "proof"): "undecided"}))["evaluation_result"].success
+    [carried] = captured["result"].findings
+    assert carried["critic"] == "undecided" and carried["agreed"] is None
 
 
 def test_the_critics_refuted_change_is_handed_back_then_recorded_and_not_in_the_union(monkeypatch):
