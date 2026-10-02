@@ -773,7 +773,8 @@ def _solo_candidate(finding: Dict[str, Any], unit) -> Dict[str, Any]:
         # The free-text label beside the closed family. An arm's is its spec's own phrasing;
         # a whole-PR reviewer has no spec, so the family is the most it can honestly say and
         # inventing a richer label here would be this module putting words in its mouth.
-        "concern_label": finding.get("concern_family") or "other",
+        "concern_label": (finding.get("concern_label") or finding.get("concern_family")
+                          or "other"),
         "issue_kind": finding.get("issue_kind"),
         "severity": finding.get("severity") or "advisory",
         "claim": finding.get("claim") or "",
@@ -1880,16 +1881,15 @@ def _record_stage(out: Path, dataset, plan, manifest, summary, logger) -> None:
 
 
 async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, resume: bool = False):
-    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
-    assert_the_endpoint_accepts_tools(scaffold)
     if dataset.routing_mode not in ROUTING_MODES:
         raise ValueError(
             f"unknown routing_mode {dataset.routing_mode!r}; expected one of {ROUTING_MODES}")
-
     if dataset.design != "solo" and dataset.routing_mode != "solo":
         raise ValueError(
             f"design {dataset.design!r} is a per-PR reviewer and runs under routing_mode: "
             f"solo; this config says {dataset.routing_mode!r}")
+    assert_ready(scaffold, logger, enforce=not dataset.dry_run)
+    assert_the_endpoint_accepts_tools(scaffold)
 
     release = load_release(dataset)
     units, episodes = select_units_and_episodes(dataset, release)

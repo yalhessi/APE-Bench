@@ -238,3 +238,73 @@ def test_ledger_rows_carry_only_results_with_a_ledger_and_their_design_keys():
     assert [row["episode_id"] for row in rows] == ["ep:1"]
     assert rows[0]["design"] == "structured" and rows[0]["ledger"] == [{"declaration": "x"}]
     assert "findings" not in rows[0], "the base result's keys are in the run's other artifacts"
+
+
+# --- configs/designs: a design config differs from its baseline in the design alone -------------
+
+
+DESIGN_CONFIGS = sorted(Path("configs/designs").glob("*.yaml"))
+
+
+def _resolved(path: Path) -> dict:
+    from ape.utils.config_loader import load_yaml
+
+    return load_yaml(path)
+
+
+def _baseline_of(path: Path) -> Path:
+    import yaml
+
+    raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return (path.parent / raw["extends"]).resolve()
+
+
+def _flatten(node, prefix=""):
+    if isinstance(node, dict):
+        out = {}
+        for key, value in node.items():
+            out.update(_flatten(value, f"{prefix}{key}."))
+        return out
+    return {prefix[:-1]: node}
+
+
+def test_there_is_a_config_per_registered_design_and_each_names_its_design():
+    designs = {name for name in DESIGNS if name != "solo"}
+    named = {_resolved(path)["dataset"]["design"] for path in DESIGN_CONFIGS}
+    assert designs <= named, sorted(designs - named)
+    for path in DESIGN_CONFIGS:
+        assert path.name.startswith(_resolved(path)["dataset"]["design"] + "_"), path
+
+
+@pytest.mark.parametrize("path", DESIGN_CONFIGS, ids=lambda p: p.name)
+def test_a_design_config_differs_from_its_baseline_in_the_design_and_its_own_knobs_alone(path):
+    """The pattern of `test_the_two_solo_conditions_differ_only_in_their_scaffold`: a design
+    result read against the baseline must not also be a policy, model, tool-grant or cap
+    contrast. The design's own task knobs -- fields its config class declares and the solo's
+    does not -- are the one allowed addition, since they exist for no other task."""
+
+    from ape.tasks.lean_tasks.formal_math.review import SoloReviewConfig
+
+    design = _resolved(path)
+    baseline = _resolved(_baseline_of(path))
+    name = design["dataset"]["design"]
+    own_knobs = {f"task_config.{field}"
+                 for field in DESIGNS[name].task_config_class.model_fields
+                 if field not in SoloReviewConfig.model_fields}
+    flat_design, flat_base = _flatten(design), _flatten(baseline)
+    changed = {key for key in set(flat_design) | set(flat_base)
+               if flat_design.get(key, "<absent>") != flat_base.get(key, "<absent>")}
+    assert changed - {"dataset.design"} <= own_knobs, sorted(changed - {"dataset.design"})
+    assert "dataset.design" in changed and baseline["dataset"].get("design", "solo") == "solo"
+    assert design["dataset"]["routing_mode"] == "solo"
+
+
+@pytest.mark.parametrize("path", DESIGN_CONFIGS, ids=lambda p: p.name)
+def test_a_design_config_loads_under_the_run_models(path):
+    """`test_config_strictness` globs `configs/*.yaml` only; the designs directory validates here."""
+
+    from src.mathlib_review.review.runner import load_run
+
+    dataset, scaffold, _overrides = load_run(path, {"dataset": {"run_name": "design_test"}})
+    assert dataset.design in DESIGNS and dataset.routing_mode == "solo"
+    assert scaffold.scaffold_type == "claude_code"

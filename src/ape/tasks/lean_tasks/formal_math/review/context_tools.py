@@ -321,6 +321,142 @@ def _reviewed_overlay_root(task):
     return Path(path) if path else None
 
 
+async def lookup_declaration(task, identifier: str, limit: int = 5, *, trace: bool = True,
+                             ) -> Dict[str, Any]:
+    """The `declaration_search` answer: where `identifier` is declared at the base commit and in
+    the files this PR changes. The tool below is this with `trace=True`; a design that looks a
+    claimed duplicate or a new name up at submission (`structured.py`) calls it with
+    `trace=False`, because the trace is the record of the *reviewer's* retrieval and the
+    submission's lookups are recorded in the ledger instead."""
+    # `declares_identifier` lives with v4's evidence collector and is used here
+    # deliberately rather than copied: it is the fix for a measured defect — a substring
+    # search matched prose terms like "the" in 193 of 200 sampled files and handed a
+    # `supports` verdict to every duplication claim. A second implementation would be a
+    # second chance to reintroduce that. It was `_declares_identifier` until two packages
+    # importing it made the underscore a claim that was not true.
+    from ape.toolkits.file_system.utils import grep_candidate_files_async
+    from src.mathlib_review.evidence.evidence import (
+        find_declaration, searchable_identifiers, snapshot_workspace,
+    )
+
+    terms = searchable_identifiers(identifier)
+    if not terms and _ONE_IDENTIFIER_RE.fullmatch((identifier or "").strip()):
+        # `searchable_identifiers` filters a candidate's *prose* (its stoplist and its
+        # dotted-or-snake-cased rule exist because "the" matched 193 of 200 files). A tool
+        # argument is not prose: one token that could name a declaration is the name asked
+        # for, and `Meromorphic`, `Fintype` and `abelianizeAdj` were refused as "not
+        # identifier-shaped" on 15 of 249 calls in three dev runs (2026-10-01).
+        terms = [(identifier or "").strip()]
+    if not terms:
+        return {"success": False, "error": (
+            f"{identifier!r} is not identifier-shaped. Give a declaration name such as "
+            "`Finset.sum_comm` or `isOpen_iUnion`, not a description.")}
+
+    limit = max(1, min(int(limit or 5), MAX_HITS))
+    root = snapshot_workspace(task.data.snapshot_base_sha)
+    if root is None:
+        return {"success": False, "error": (
+            f"no complete base snapshot is available for {task.data.snapshot_base_sha}; "
+            "searching the partial attempt overlay would report absence that only means "
+            "the file was never materialized.")}
+
+    hits: List[Dict[str, Any]] = []
+    try:
+        searchable = await _snapshot_lean_files(root)
+        # The same prefilter `repository_search` uses (02eba94), for the same reason:
+        # A declaration of the name has the name's last component on its declaration line, so
+        # a file that does not contain that leaf literally cannot declare it, and a fixed-string grep for
+        # the leaves can only hand back too many files. The files are still visited in the
+        # same sorted order and the decision stays with `declares_identifier`, so the result
+        # is the one the full scan gave. `None` means grep did not answer: every file is
+        # read, as before. The whole-tree read it replaces -- ~8,500 files over NFS, run
+        # synchronously inside the shared event loop -- measured a 33.7 s mean on the
+        # contract-ceiling run and stalled every arm sharing the loop while it ran.
+        with_leaf = await grep_candidate_files_async(
+            sorted({term.rsplit(".", 1)[-1] for term in terms}), searchable,
+            use_regex=False)
+        for path in searchable:
+            if len(hits) >= limit:
+                break
+            if with_leaf is not None and str(path) not in with_leaf:
+                continue
+            try:
+                text = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            for term in terms:
+                found = find_declaration(text, term)
+                if found:
+                    # The name found, not the name asked for: reporting the query made a
+                    # root `continuous_inf` read as `Dense.continuous_inf`.
+                    hits.append({"path": str(path.relative_to(root)),
+                                 "declares": found[0], "line": found[1]})
+                    break
+    except Exception as exc:  # noqa: BLE001
+        return {"success": False, "error": f"declaration search failed: {exc}"}
+
+    # The reviewed state of the files this PR changes. Base-only search blinds a rename
+    # review to the very name under review: on 33337 the naming arm looked up the PR's new
+    # name, got "no declaration exists at the base commit", and had nothing to reason
+    # about. Only the changed files are searched -- they are the only files whose reviewed
+    # text differs from the base, and the only ones the overlay materialises as real
+    # files -- so this is a few reads, not a second tree walk. Kept apart from the base
+    # hits: "exists before this PR" and "exists because of this PR" answer opposite
+    # questions, and folding them would turn a rename into a duplicate.
+    introduced: List[Dict[str, Any]] = []
+    overlay = _reviewed_overlay_root(task)
+    if overlay is not None:
+        for rel in getattr(task.data, "changed_files", None) or []:
+            if len(introduced) >= limit:
+                break
+            path = Path(overlay) / rel
+            if path.is_symlink() or not path.is_file():
+                continue
+            try:
+                text = path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            for term in terms:
+                found = find_declaration(text, term)
+                if found:
+                    introduced.append({"path": rel, "declares": found[0], "line": found[1]})
+                    break
+
+    lines = [f"- `{item['declares']}` is declared in `{item['path']}:{item['line']}` "
+             "(before this PR)" for item in hits]
+    lines += [f"- `{item['declares']}` is declared in `{item['path']}:{item['line']}` "
+              "(IN THIS PR, as it leaves the file)" for item in introduced]
+    rendered, truncated = _truncate("\n".join(lines))
+    if trace:
+        _append_trace(task, {
+            "schema_version": "v5-context-call1",
+            "invocation_id": task.data.invocation_id,
+            "tool": "declaration_search",
+            "gate": "base_snapshot",
+            # `gate` is a closed vocabulary the leak audit enumerates, and the temporal bound
+            # here is still the base snapshot: the second corpus is the PR's own changed files,
+            # which can see nothing later than the PR itself. Overlay hits are distinguishable
+            # in `result_ids` by their `reviewed:` prefix.
+            "query": identifier,
+            "as_of": None, "exclude_pr": None,
+            "corpus_sha256": task.data.snapshot_base_sha,
+            "result_ids": [item["path"] for item in hits] + [
+                f"reviewed:{item['path']}" for item in introduced],
+            "result_count": len(hits) + len(introduced), "truncated": truncated,
+        })
+    empty = (
+        f"No declaration of {identifier!r} exists at the base commit"
+        + (" or in the files this PR changes." if overlay is not None else ".")
+        + " This is a finding, not a failed lookup. Re-querying will return the same answer."
+    )
+    return {
+        "success": True, "count": len(hits) + len(introduced),
+        "declared_before_this_pr": len(hits), "declared_in_this_pr": len(introduced),
+        "searched_terms": terms,
+        "results": rendered or empty,
+    }
+
+
 def _register_declaration(task, mcp) -> None:
     @mcp.tool(
         description=(
@@ -341,132 +477,8 @@ def _register_declaration(task, mcp) -> None:
         identifier: Annotated[str, Field(description="Declaration name, dotted or snake_cased")],
         limit: Annotated[int, Field(description=f"Max files (capped at {MAX_HITS})")] = 5,
     ) -> Dict[str, Any]:
-        # `declares_identifier` lives with v4's evidence collector and is used here
-        # deliberately rather than copied: it is the fix for a measured defect — a substring
-        # search matched prose terms like "the" in 193 of 200 sampled files and handed a
-        # `supports` verdict to every duplication claim. A second implementation would be a
-        # second chance to reintroduce that. It was `_declares_identifier` until two packages
-        # importing it made the underscore a claim that was not true.
-        from ape.toolkits.file_system.utils import grep_candidate_files_async
-        from src.mathlib_review.evidence.evidence import (
-            find_declaration, searchable_identifiers, snapshot_workspace,
-        )
+        return await lookup_declaration(task, identifier, limit)
 
-        terms = searchable_identifiers(identifier)
-        if not terms and _ONE_IDENTIFIER_RE.fullmatch((identifier or "").strip()):
-            # `searchable_identifiers` filters a candidate's *prose* (its stoplist and its
-            # dotted-or-snake-cased rule exist because "the" matched 193 of 200 files). A tool
-            # argument is not prose: one token that could name a declaration is the name asked
-            # for, and `Meromorphic`, `Fintype` and `abelianizeAdj` were refused as "not
-            # identifier-shaped" on 15 of 249 calls in three dev runs (2026-10-01).
-            terms = [(identifier or "").strip()]
-        if not terms:
-            return {"success": False, "error": (
-                f"{identifier!r} is not identifier-shaped. Give a declaration name such as "
-                "`Finset.sum_comm` or `isOpen_iUnion`, not a description.")}
-
-        limit = max(1, min(int(limit or 5), MAX_HITS))
-        root = snapshot_workspace(task.data.snapshot_base_sha)
-        if root is None:
-            return {"success": False, "error": (
-                f"no complete base snapshot is available for {task.data.snapshot_base_sha}; "
-                "searching the partial attempt overlay would report absence that only means "
-                "the file was never materialized.")}
-
-        hits: List[Dict[str, Any]] = []
-        try:
-            searchable = await _snapshot_lean_files(root)
-            # The same prefilter `repository_search` uses (02eba94), for the same reason:
-            # A declaration of the name has the name's last component on its declaration line, so
-            # a file that does not contain that leaf literally cannot declare it, and a fixed-string grep for
-            # the leaves can only hand back too many files. The files are still visited in the
-            # same sorted order and the decision stays with `declares_identifier`, so the result
-            # is the one the full scan gave. `None` means grep did not answer: every file is
-            # read, as before. The whole-tree read it replaces -- ~8,500 files over NFS, run
-            # synchronously inside the shared event loop -- measured a 33.7 s mean on the
-            # contract-ceiling run and stalled every arm sharing the loop while it ran.
-            with_leaf = await grep_candidate_files_async(
-                sorted({term.rsplit(".", 1)[-1] for term in terms}), searchable,
-                use_regex=False)
-            for path in searchable:
-                if len(hits) >= limit:
-                    break
-                if with_leaf is not None and str(path) not in with_leaf:
-                    continue
-                try:
-                    text = path.read_text(encoding="utf-8", errors="ignore")
-                except OSError:
-                    continue
-                for term in terms:
-                    found = find_declaration(text, term)
-                    if found:
-                        # The name found, not the name asked for: reporting the query made a
-                        # root `continuous_inf` read as `Dense.continuous_inf`.
-                        hits.append({"path": str(path.relative_to(root)),
-                                     "declares": found[0], "line": found[1]})
-                        break
-        except Exception as exc:  # noqa: BLE001
-            return {"success": False, "error": f"declaration search failed: {exc}"}
-
-        # The reviewed state of the files this PR changes. Base-only search blinds a rename
-        # review to the very name under review: on 33337 the naming arm looked up the PR's new
-        # name, got "no declaration exists at the base commit", and had nothing to reason
-        # about. Only the changed files are searched -- they are the only files whose reviewed
-        # text differs from the base, and the only ones the overlay materialises as real
-        # files -- so this is a few reads, not a second tree walk. Kept apart from the base
-        # hits: "exists before this PR" and "exists because of this PR" answer opposite
-        # questions, and folding them would turn a rename into a duplicate.
-        introduced: List[Dict[str, Any]] = []
-        overlay = _reviewed_overlay_root(task)
-        if overlay is not None:
-            for rel in getattr(task.data, "changed_files", None) or []:
-                if len(introduced) >= limit:
-                    break
-                path = Path(overlay) / rel
-                if path.is_symlink() or not path.is_file():
-                    continue
-                try:
-                    text = path.read_text(encoding="utf-8", errors="ignore")
-                except OSError:
-                    continue
-                for term in terms:
-                    found = find_declaration(text, term)
-                    if found:
-                        introduced.append({"path": rel, "declares": found[0], "line": found[1]})
-                        break
-
-        lines = [f"- `{item['declares']}` is declared in `{item['path']}:{item['line']}` "
-                 "(before this PR)" for item in hits]
-        lines += [f"- `{item['declares']}` is declared in `{item['path']}:{item['line']}` "
-                  "(IN THIS PR, as it leaves the file)" for item in introduced]
-        rendered, truncated = _truncate("\n".join(lines))
-        _append_trace(task, {
-            "schema_version": "v5-context-call1",
-            "invocation_id": task.data.invocation_id,
-            "tool": "declaration_search",
-            "gate": "base_snapshot",
-            # `gate` is a closed vocabulary the leak audit enumerates, and the temporal bound
-            # here is still the base snapshot: the second corpus is the PR's own changed files,
-            # which can see nothing later than the PR itself. Overlay hits are distinguishable
-            # in `result_ids` by their `reviewed:` prefix.
-            "query": identifier,
-            "as_of": None, "exclude_pr": None,
-            "corpus_sha256": task.data.snapshot_base_sha,
-            "result_ids": [item["path"] for item in hits] + [
-                f"reviewed:{item['path']}" for item in introduced],
-            "result_count": len(hits) + len(introduced), "truncated": truncated,
-        })
-        empty = (
-            f"No declaration of {identifier!r} exists at the base commit"
-            + (" or in the files this PR changes." if overlay is not None else ".")
-            + " This is a finding, not a failed lookup. Re-querying will return the same answer."
-        )
-        return {
-            "success": True, "count": len(hits) + len(introduced),
-            "declared_before_this_pr": len(hits), "declared_in_this_pr": len(introduced),
-            "searched_terms": terms,
-            "results": rendered or empty,
-        }
 
 
 #: The sorted `.lean` file list of one base snapshot, per process. A snapshot is the shared,
@@ -626,6 +638,190 @@ def _directory_population(root: Path, snapshot_sha: str, found_in: Optional[str]
     return _DIRECTORY_POPULATIONS[key].get(subject)
 
 
+async def naming_census(task, declaration: str, *, trace: bool = True) -> Dict[str, Any]:
+    """The `naming_norm` answer for a declaration this PR adds or renames. The tool below is this
+    with `trace=True`; a design consulting the census at submission calls it untraced and keeps
+    the answer in its ledger (see `lookup_declaration`)."""
+    from ape.toolkits.code.lean.lean_parser import parse_major_declarations
+    from src.mathlib_review.evidence.evidence import snapshot_workspace
+    from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
+    from src.mathlib_review.evidence.operators.naming_norm import (
+        MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix, norm_for,
+        norm_index, norm_verdict, rename_candidates, scoped_verdict,
+    )
+
+    base = task.data.snapshot_base_sha
+    root = snapshot_workspace(base)
+    if root is None:
+        return {"success": False, "error": (
+            f"no complete base snapshot for {base}; a norm read from the attempt overlay "
+            "would be a 2% sample reported as a repository measurement.")}
+    index = norm_index(Path(root), base)
+    if index is None:
+        return {"success": False, "error": f"no naming norms are available for {base}."}
+
+    # The declaration's own conclusion, from the reviewed text -- the arm is asking about a
+    # name this PR introduces, which by construction is not in the base tree.
+    signature = ""
+    found_in: Optional[str] = None
+    overlay = _reviewed_overlay_root(task)
+    wanted = declaration.rsplit(".", 1)[-1]
+    for rel in getattr(task.data, "changed_files", None) or []:
+        if not str(rel).endswith(".lean") or overlay is None:
+            continue
+        source = overlay / str(rel)
+        if not source.is_file():
+            continue
+        try:
+            parsed = parse_major_declarations(source.read_text(encoding="utf-8", errors="ignore"))
+        except Exception:  # noqa: BLE001
+            continue
+        for item in parsed:
+            name = item.fullname or item.name or ""
+            if name == declaration or name.rsplit(".", 1)[-1] == wanted:
+                signature = item.signature or ""
+                found_in = str(rel)
+                break
+        if signature:
+            break
+    if not signature:
+        return {"success": False, "error": (
+            f"{declaration!r} is not among the declarations this PR changes; this tool "
+            "answers for a name the PR adds or renames.")}
+
+    subject = conclusion_subject(declaration_conclusion(signature))
+    population = norm_for(index, subject.token)
+    # Three different things used to return one sentence, and that sentence asserted the
+    # third: "The corpus has no counted opinion about this declaration's subject ... Submit
+    # nothing on naming." Only `population is None` is a fact about the corpus. The other
+    # two are this tool failing to resolve a subject from the conclusion, and reporting a
+    # tool failure as a corpus verdict tells the arm the repository has no convention when
+    # nobody looked -- then instructs silence. 477 of 632 calls across the three held-out
+    # reps came back empty with no way to tell which cause fired.
+    unresolved = subject.token is None or subject.confidence != "high"
+    if unresolved or population is None:
+        cause = "subject_unresolved" if unresolved else "no_population"
+        if trace:
+            _append_trace(task, {
+                "schema_version": "v5-context-call1",
+                "invocation_id": task.data.invocation_id,
+                "tool": "naming_norm",
+                "gate": "base_snapshot",
+                "query": declaration,
+                "as_of": None, "exclude_pr": None, "corpus_sha256": base,
+                "result_ids": [], "result_count": 0, "truncated": False,
+                "empty_because": cause,
+            })
+        if unresolved:
+            return {
+                "success": True, "verdict": "insufficient_evidence",
+                "subject": subject.token, "empty_because": cause,
+                "results": (
+                    "This tool could not work out what this declaration is ABOUT from its "
+                    "conclusion, so it never asked the corpus anything. That is a limit of "
+                    "this tool, not a statement that the repository has no convention here "
+                    "-- treat naming for this declaration as unmeasured and judge it on the "
+                    "evidence you have.")}
+        return {"success": True, "verdict": "insufficient_evidence", "subject": subject.token,
+                "empty_because": cause,
+                "results": (
+                    "The subject resolved to `" + str(subject.token) + "`, and the corpus "
+                    "holds no counted population for it, so there is no prefix convention "
+                    "here to hold the PR to. Submit nothing about the prefix unless a "
+                    "maintainer precedent says otherwise. The rest of the name -- a suffix, "
+                    "a prime, argument order, a namespace -- is not measured here; judge it "
+                    "against the siblings you read and against precedent.")}
+
+    current = leaf_prefix(declaration.rsplit(".", 1)[-1])
+    ranked = population.prefix_counts.most_common()
+    dominant, support = ranked[0]
+    runner_up = ranked[1][1] if len(ranked) > 1 else 0
+    # `conforms` is an answer, and every `insufficient_evidence` says why (`norm_verdict`).
+    # Of 43 counted `insufficient_evidence` verdicts over six gpt runs (2026-09-30), replayed:
+    # 15 were a name already following its convention ("`dist_` is the convention for this
+    # subject (397/424)" under a verdict saying the census settled nothing), 8 had a leader
+    # too small to count (4 of 4 was reported as a plurality "under the 80% bar"), and 20
+    # had no dominant prefix.
+    verdict, empty_because = norm_verdict(population, current)
+    # The area's own population, read beside the library's. The library-wide count is one
+    # scope, and on 33337 it was the wrong one: `coe_` led the library and `toLinearMap_`
+    # the file's neighbourhood, and all three Opus reviewers asked for a `coe_` name
+    # (2026-10-01). `scoped_verdict` downgrades a verdict the area contradicts.
+    local = _directory_population(Path(root), base, found_in, subject.token)
+    verdict, empty_because, scope_lines, area_prefix = scoped_verdict(
+        population, local, verdict, empty_because, current,
+        str(Path(found_in).parent) if found_in else None)
+    candidates = (rename_candidates(declaration, dominant, subject.expression,
+                                    index.get("notation"))
+                  if verdict in ("established", "emerging") else
+                  rename_candidates(declaration, area_prefix, subject.expression,
+                                    index.get("notation"))
+                  if area_prefix else [])
+    counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
+    lines = [
+        f"Subject of the conclusion: `{subject.token}` (from {subject.kind}).",
+        f"Of {population.members} declarations in the base snapshot with that subject: {counted}.",
+        f"This declaration uses `{current}_` ({population.prefix_counts.get(current, 0)}).",
+        f"Verdict: **{verdict}**.",
+    ]
+    if verdict == "established":
+        lines.append(f"`{dominant}_` is the convention here ({support}/{population.members}, "
+                     f"over the {MIN_SUPPORT_RATIO:.0%} bar). A rename is a fair ask.")
+    elif verdict == "emerging":
+        lines.append(f"`{dominant}_` leads {support} to {runner_up} but is not dominant. "
+                     "Advisory at most -- say it is the emerging spelling, not the rule.")
+    elif verdict == "conforms":
+        lines.append(f"This name's prefix `{current}_` is the convention for this subject "
+                     f"({support}/{population.members}, over the {MIN_SUPPORT_RATIO:.0%} bar), "
+                     "and the name follows it: there is no prefix change to ask for.")
+        lines.append("This census counts only each name's LEADING token. It says nothing about "
+                     "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
+                     "judge those against the siblings you read and against precedent.")
+    else:
+        # This said "The corpus does not back a rename here. Submit nothing on naming." for every
+        # counted `insufficient_evidence`, and the census measures one thing: each name's
+        # leading token. At both naming misses on the held-out set the arm quoted that sentence
+        # as its reason: `round_eq'` (`round_` 22 of 23), where the ask was a suffix change no
+        # prefix count can see; and a coercion lemma whose `coe_` lead was 48 of 124, a
+        # plurality read as a convention. Say what was measured, and no more.
+        members = population.members
+        if empty_because == "population_too_small":
+            lines.append(f"The leading spelling `{dominant}_` has {support} of the {members} "
+                         f"declaration(s) sharing this subject: under the {MIN_SUPPORT} needed to "
+                         "call a convention, so the prefix is unmeasured here, not settled.")
+        elif dominant == current:
+            lines.append(f"`{current}_`, this name's prefix, is the most common spelling but only "
+                         f"a plurality ({support} of {members}, under the "
+                         f"{MIN_SUPPORT_RATIO:.0%} bar), so the census does not settle the "
+                         "prefix either way.")
+        else:
+            lines.append(f"The counts (`{dominant}_` {support}, the next spelling {runner_up}, of "
+                         f"{members}) do not make a prefix rename a clear ask.")
+        lines.append("This census counts only each name's LEADING token. It says nothing about "
+                     "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
+                     "judge those against the siblings you read and against precedent.")
+    lines.extend(scope_lines)
+    if candidates:
+        lines.append(("The area's spelling, as candidate names: " if area_prefix else "Candidate names: ")
+                     + ", ".join(f"`{name}`" for name in candidates))
+    rendered, truncated = _truncate("\n".join(lines))
+    _append_trace(task, {
+        "schema_version": "v5-context-call1",
+        "invocation_id": task.data.invocation_id,
+        "tool": "naming_norm",
+        "gate": "base_snapshot",
+        "query": declaration,
+        "as_of": None, "exclude_pr": None, "corpus_sha256": base,
+        "result_ids": [f"{subject.token}:{dominant}:{support}/{population.members}"],
+        "result_count": population.members, "truncated": truncated,
+        "empty_because": empty_because,
+    })
+    return {"success": True, "verdict": verdict, "subject": subject.token,
+            "empty_because": empty_because,
+            "members": population.members, "counts": dict(ranked[:8]),
+            "candidates": candidates, "results": rendered}
+
+
 def _register_naming_norm(task, mcp) -> None:
     # The description quotes the census thresholds, so they are read here, at registration --
     # not only inside the call, where the rest of the operator's names are imported.
@@ -668,183 +864,8 @@ def _register_naming_norm(task, mcp) -> None:
         declaration: Annotated[str, Field(
             description="Declaration this PR adds or renames, e.g. `Submodule.coe_starProjection_eq_x`")],
     ) -> Dict[str, Any]:
-        from ape.toolkits.code.lean.lean_parser import parse_major_declarations
-        from src.mathlib_review.evidence.evidence import snapshot_workspace
-        from src.mathlib_review.evidence.operators.naming_contrast import declaration_conclusion
-        from src.mathlib_review.evidence.operators.naming_norm import (
-            MIN_SUPPORT, MIN_SUPPORT_RATIO, conclusion_subject, leaf_prefix, norm_for,
-            norm_index, norm_verdict, rename_candidates, scoped_verdict,
-        )
+        return await naming_census(task, declaration)
 
-        base = task.data.snapshot_base_sha
-        root = snapshot_workspace(base)
-        if root is None:
-            return {"success": False, "error": (
-                f"no complete base snapshot for {base}; a norm read from the attempt overlay "
-                "would be a 2% sample reported as a repository measurement.")}
-        index = norm_index(Path(root), base)
-        if index is None:
-            return {"success": False, "error": f"no naming norms are available for {base}."}
-
-        # The declaration's own conclusion, from the reviewed text -- the arm is asking about a
-        # name this PR introduces, which by construction is not in the base tree.
-        signature = ""
-        found_in: Optional[str] = None
-        overlay = _reviewed_overlay_root(task)
-        wanted = declaration.rsplit(".", 1)[-1]
-        for rel in getattr(task.data, "changed_files", None) or []:
-            if not str(rel).endswith(".lean") or overlay is None:
-                continue
-            source = overlay / str(rel)
-            if not source.is_file():
-                continue
-            try:
-                parsed = parse_major_declarations(source.read_text(encoding="utf-8", errors="ignore"))
-            except Exception:  # noqa: BLE001
-                continue
-            for item in parsed:
-                name = item.fullname or item.name or ""
-                if name == declaration or name.rsplit(".", 1)[-1] == wanted:
-                    signature = item.signature or ""
-                    found_in = str(rel)
-                    break
-            if signature:
-                break
-        if not signature:
-            return {"success": False, "error": (
-                f"{declaration!r} is not among the declarations this PR changes; this tool "
-                "answers for a name the PR adds or renames.")}
-
-        subject = conclusion_subject(declaration_conclusion(signature))
-        population = norm_for(index, subject.token)
-        # Three different things used to return one sentence, and that sentence asserted the
-        # third: "The corpus has no counted opinion about this declaration's subject ... Submit
-        # nothing on naming." Only `population is None` is a fact about the corpus. The other
-        # two are this tool failing to resolve a subject from the conclusion, and reporting a
-        # tool failure as a corpus verdict tells the arm the repository has no convention when
-        # nobody looked -- then instructs silence. 477 of 632 calls across the three held-out
-        # reps came back empty with no way to tell which cause fired.
-        unresolved = subject.token is None or subject.confidence != "high"
-        if unresolved or population is None:
-            cause = "subject_unresolved" if unresolved else "no_population"
-            _append_trace(task, {
-                "schema_version": "v5-context-call1",
-                "invocation_id": task.data.invocation_id,
-                "tool": "naming_norm",
-                "gate": "base_snapshot",
-                "query": declaration,
-                "as_of": None, "exclude_pr": None, "corpus_sha256": base,
-                "result_ids": [], "result_count": 0, "truncated": False,
-                "empty_because": cause,
-            })
-            if unresolved:
-                return {
-                    "success": True, "verdict": "insufficient_evidence",
-                    "subject": subject.token, "empty_because": cause,
-                    "results": (
-                        "This tool could not work out what this declaration is ABOUT from its "
-                        "conclusion, so it never asked the corpus anything. That is a limit of "
-                        "this tool, not a statement that the repository has no convention here "
-                        "-- treat naming for this declaration as unmeasured and judge it on the "
-                        "evidence you have.")}
-            return {"success": True, "verdict": "insufficient_evidence", "subject": subject.token,
-                    "empty_because": cause,
-                    "results": (
-                        "The subject resolved to `" + str(subject.token) + "`, and the corpus "
-                        "holds no counted population for it, so there is no prefix convention "
-                        "here to hold the PR to. Submit nothing about the prefix unless a "
-                        "maintainer precedent says otherwise. The rest of the name -- a suffix, "
-                        "a prime, argument order, a namespace -- is not measured here; judge it "
-                        "against the siblings you read and against precedent.")}
-
-        current = leaf_prefix(declaration.rsplit(".", 1)[-1])
-        ranked = population.prefix_counts.most_common()
-        dominant, support = ranked[0]
-        runner_up = ranked[1][1] if len(ranked) > 1 else 0
-        # `conforms` is an answer, and every `insufficient_evidence` says why (`norm_verdict`).
-        # Of 43 counted `insufficient_evidence` verdicts over six gpt runs (2026-09-30), replayed:
-        # 15 were a name already following its convention ("`dist_` is the convention for this
-        # subject (397/424)" under a verdict saying the census settled nothing), 8 had a leader
-        # too small to count (4 of 4 was reported as a plurality "under the 80% bar"), and 20
-        # had no dominant prefix.
-        verdict, empty_because = norm_verdict(population, current)
-        # The area's own population, read beside the library's. The library-wide count is one
-        # scope, and on 33337 it was the wrong one: `coe_` led the library and `toLinearMap_`
-        # the file's neighbourhood, and all three Opus reviewers asked for a `coe_` name
-        # (2026-10-01). `scoped_verdict` downgrades a verdict the area contradicts.
-        local = _directory_population(Path(root), base, found_in, subject.token)
-        verdict, empty_because, scope_lines, area_prefix = scoped_verdict(
-            population, local, verdict, empty_because, current,
-            str(Path(found_in).parent) if found_in else None)
-        candidates = (rename_candidates(declaration, dominant, subject.expression,
-                                        index.get("notation"))
-                      if verdict in ("established", "emerging") else
-                      rename_candidates(declaration, area_prefix, subject.expression,
-                                        index.get("notation"))
-                      if area_prefix else [])
-        counted = ", ".join(f"`{prefix}_` {count}" for prefix, count in ranked[:6])
-        lines = [
-            f"Subject of the conclusion: `{subject.token}` (from {subject.kind}).",
-            f"Of {population.members} declarations in the base snapshot with that subject: {counted}.",
-            f"This declaration uses `{current}_` ({population.prefix_counts.get(current, 0)}).",
-            f"Verdict: **{verdict}**.",
-        ]
-        if verdict == "established":
-            lines.append(f"`{dominant}_` is the convention here ({support}/{population.members}, "
-                         f"over the {MIN_SUPPORT_RATIO:.0%} bar). A rename is a fair ask.")
-        elif verdict == "emerging":
-            lines.append(f"`{dominant}_` leads {support} to {runner_up} but is not dominant. "
-                         "Advisory at most -- say it is the emerging spelling, not the rule.")
-        elif verdict == "conforms":
-            lines.append(f"This name's prefix `{current}_` is the convention for this subject "
-                         f"({support}/{population.members}, over the {MIN_SUPPORT_RATIO:.0%} bar), "
-                         "and the name follows it: there is no prefix change to ask for.")
-            lines.append("This census counts only each name's LEADING token. It says nothing about "
-                         "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
-                         "judge those against the siblings you read and against precedent.")
-        else:
-            # This said "The corpus does not back a rename here. Submit nothing on naming." for every
-            # counted `insufficient_evidence`, and the census measures one thing: each name's
-            # leading token. At both naming misses on the held-out set the arm quoted that sentence
-            # as its reason: `round_eq'` (`round_` 22 of 23), where the ask was a suffix change no
-            # prefix count can see; and a coercion lemma whose `coe_` lead was 48 of 124, a
-            # plurality read as a convention. Say what was measured, and no more.
-            members = population.members
-            if empty_because == "population_too_small":
-                lines.append(f"The leading spelling `{dominant}_` has {support} of the {members} "
-                             f"declaration(s) sharing this subject: under the {MIN_SUPPORT} needed to "
-                             "call a convention, so the prefix is unmeasured here, not settled.")
-            elif dominant == current:
-                lines.append(f"`{current}_`, this name's prefix, is the most common spelling but only "
-                             f"a plurality ({support} of {members}, under the "
-                             f"{MIN_SUPPORT_RATIO:.0%} bar), so the census does not settle the "
-                             "prefix either way.")
-            else:
-                lines.append(f"The counts (`{dominant}_` {support}, the next spelling {runner_up}, of "
-                             f"{members}) do not make a prefix rename a clear ask.")
-            lines.append("This census counts only each name's LEADING token. It says nothing about "
-                         "the rest of the name -- a suffix, a prime, argument order, or a namespace; "
-                         "judge those against the siblings you read and against precedent.")
-        lines.extend(scope_lines)
-        if candidates:
-            lines.append(("The area's spelling, as candidate names: " if area_prefix else "Candidate names: ")
-                         + ", ".join(f"`{name}`" for name in candidates))
-        rendered, truncated = _truncate("\n".join(lines))
-        _append_trace(task, {
-            "schema_version": "v5-context-call1",
-            "invocation_id": task.data.invocation_id,
-            "tool": "naming_norm",
-            "gate": "base_snapshot",
-            "query": declaration,
-            "as_of": None, "exclude_pr": None, "corpus_sha256": base,
-            "result_ids": [f"{subject.token}:{dominant}:{support}/{population.members}"],
-            "result_count": population.members, "truncated": truncated,
-            "empty_because": empty_because,
-        })
-        return {"success": True, "verdict": verdict, "subject": subject.token,
-                "empty_because": empty_because,
-                "members": population.members, "counts": dict(ranked[:8]),
-                "candidates": candidates, "results": rendered}
 
 
 _REGISTRARS = {
