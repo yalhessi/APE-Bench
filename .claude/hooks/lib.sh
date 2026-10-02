@@ -12,9 +12,15 @@ _argv() {  # a pid from pgrep can be gone by the time it is read; then it is nob
   { tr '\0' '\n' < "/proc/$1/cmdline"; } 2>/dev/null | sed -n "${2}p"
 }
 
-_is_claude_session() {  # $1 = pid. The native binary is `claude`; an npm install is `node .../claude`.
-  local a0 a1
-  a0=$(basename "$(_argv "$1" 1)" 2>/dev/null)
+_is_claude_session() {  # $1 = pid. The native binary is `claude`; an npm install is `node .../claude`;
+  # a background session (`claude --bg`) runs the versioned binary itself, `.../claude/versions/2.1.287`.
+  # Its pty host retitles itself into one string holding that path among spaces; it is not a second
+  # session, so the version must be the whole of the last component (2026-10-02: --bg sessions were
+  # invisible here, so the tree-rewrite refusal would have let a checkout through under one).
+  local p a0 a1 v
+  p=$(_argv "$1" 1) || return 1
+  case "$p" in */claude/versions/*) v=${p##*/claude/versions/}; case "$v" in ''|*[!0-9.]*) ;; *) return 0 ;; esac ;; esac
+  a0=$(basename "$p" 2>/dev/null)
   case "$a0" in
     claude) return 0 ;;
     node) a1=$(_argv "$1" 2); case "$a1" in *claude*) return 0 ;; esac ;;
