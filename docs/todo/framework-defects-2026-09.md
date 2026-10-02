@@ -523,3 +523,30 @@ grant"), and the D1 smoke registered it. Hygiene rep 1 never called it (trace: d
 is frozen and the designs extend it, so the designs hold the same grant and the design comparison
 is at parity; the fix belongs to the next baseline, not to this one. What would close it: drop the
 tool from the dev gpt52 config's list when a new baseline is cut, or build the first option.
+
+## Every whole-file compile reports a `commandStart` warning at the end of the file (found 2026-10-02)
+
+`LeanVerifyToolsProvider.execute` (`src/ape/toolkits/execute/lean/tools.py`) compiles
+`code.strip()`, so a reviewed file loses its final newline before Lean sees it, and with Mathlib's
+standard linter set on for whole-file compiles (`WHOLE_FILE_OPTIONS`, hygiene layer, 2026-10-01)
+`linter.style.commandStart` fires on the last command: "'' starts on column 9, but all commands
+should start at the beginning of the line". Reproduced on 33337's reviewed
+`Projection/Submodule.lean`, which ends with `end Dense\n`: stripped, 1 warning; with the final
+newline, 0 (`results/pr_review_v5/probes/review-designs-2026-10-02/eof_linter_check.py`, no spend).
+
+**Motivating example.** The D1 test on gpt-5.2 (`probe_dev_structured_gpt52_Grc_contract2_smoke1`,
+2026-10-02) filed 3 findings on 33337; 2 of them are this warning, one per changed file, claimed as
+"will fail CI style linting" at the files' last lines (both unanchored, so diagnostic). Claude's
+hygiene rep 1 saw the same tool and filed none of it. An edit-mode compile is not misled -- the
+warning is in the baseline compile too, so `warnings_introduced_by_your_edit` stays empty -- but the
+as-is `lean_verify_edit` shows it to the reviewer as the file's own warning, and on a control PR it
+is a false finding waiting for a reviewer that reads warnings literally.
+
+**What would close it.** Compile the text as given, or strip only leading whitespace and keep one
+final newline, in `execute`; then re-run `eof_linter_check.py`, which must print 0 warnings for the
+stripped case too. A test beside it: a whole-file compile of a file ending in a newline reports no
+`commandStart` warning.
+
+**Risk / sequencing.** It changes what every reviewer's compile reports, the frozen solo baseline's
+included: fixed between hygiene reps 1 and 2, the reps would no longer share their tools. Fix it at a
+rep boundary, with the decision recorded beside the reps.
