@@ -156,3 +156,34 @@ judged the same way. Plan §5's D2 rule, against D1's 2 of 23 at 0.0 control emi
   above 2.0 per control PR. Three is provisional.
 - Read beside it: positions by kind (`overturn` / `concede` / `confirm` / `refute`), the critic's
   filings and their verification, and which obligations an `overturn` reached.
+
+## D2 on gpt-5.2, dev rep 1: read against the rule
+
+`probe_dev_structured_critic_gpt52_Grc_contract2_rep1`, reading D1's dev rep 1 (15 ledger rows,
+sha256 83e333352ad5, after the empty-ledger fix): 15 of 15 sessions, $49.36 billed, judged for
+$0.08 (audit `probe-dev-structured-critic-gpt52-Grc-contract2-rep1`).
+
+| | g52v2 | D1 on gpt-5.2 | D2 on gpt-5.2 |
+|---|---|---|---|
+| held-out obligations hit, of 23 | 2 | 2 | **2** (the same two) |
+| findings | 44 | 46 | 56 |
+| paired with gold | 11 | 11 | 12 |
+| control-PR findings | 0 | 0 | 0 |
+| billed | $28.68 | $35.80 | $49.36 on top of D1 |
+
+**Not, as built, on gpt-5.2** (rule: at most 2 of 23). The critic took the task seriously and
+still agreed almost everywhere: 1,652 `concede`, 38 `confirm` (every D1 change), 0 `refute`, 8
+`overturn`, which with three file-level changes gave 11 critic filings, all verified, on 33149 (4),
+33321 (3), 33098, 33285, 33362 and 33421 (1 each), by concern docstring 4, statement 4, proof 2,
+name 1. None hit an obligation; one moved a site from nothing to `loc` (33321's module doc,
+`0bb42bd2`). D1 and D2 share their change targets at Jaccard 0.79.
+
+What the two designs say together, at this altitude (one rep each, one model, the designs as
+built): on gpt-5.2 the unit of decision is not what binds. Asked separately about every
+declaration under every concern, and then asked to argue every "nothing to ask", gpt-5.2 says
+"nothing to ask" with reasons in 98% of cells and reaches the same two obligations its unstructured
+baseline reaches. That is the reviewer-model gap's reading (docs/todo/reviewer-model-gap.md) seen
+from a new side, and says nothing about Claude, whose inconsistency the designs were built against.
+
+Untried, before anything is concluded about the designs: D1 and D2 on Claude Opus 5.5 on the
+subscription (the configs are ready), D1 on gpt-5.5, reps of either, and the confirmation sets.

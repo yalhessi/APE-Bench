@@ -235,6 +235,12 @@ names as the new reference baseline.
   the same way, reading D1's smoke as its stage through the runner's `stage_rows_for`. Both designs
   `plan` clean on the 15 dev PRs; `plan` reports D1's ledger at 336 cells on 33149 and 516 on
   33294. Not run: D1 rep 1, D2 rep 1 (the user's subscription windows, after the hygiene reps).
+  Run on gpt-5.2 (the user, 2026-10-02: "Let's test with GPT models for now"; configs
+  `configs/designs/*_dev_gpt52.yaml`): two-PR tests, then one judged dev rep of each. D1 2 of 23
+  and D2 2 of 23 against the baseline's 2, at 0 control emission: not, as built, on that model
+  (one rep each; readings in `results/pr_review_v5/probes/review-designs-2026-10-02/README.md`).
+  The first test also changed D1's contract to six fixed concern cells per declaration, after the
+  multi-concern rows collapsed to one decision per object. Not run: either design on Claude.
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan
   §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
   in turns and tokens on the large PRs.
