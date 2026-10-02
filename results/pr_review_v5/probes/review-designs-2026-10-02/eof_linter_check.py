@@ -4,6 +4,7 @@ Found by the D1 gpt-5.2 test (2026-10-02): the reviewer filed "will fail CI" twi
 nothing: two local compiles of 33337's reviewed Submodule.lean, and one as-is `lean_verify_edit`.
 Measured: the file ends with a newline; stripped (what `LeanVerifyToolsProvider.execute` sends)
 -> 1 warning, `commandStart`, "starts on column 9"; with the final newline -> 0 warnings.
+After the fix (`execute` keeps one final newline) the third line, through `execute`, reports 0.
 """
 import asyncio, json, sys
 from pathlib import Path
@@ -40,11 +41,15 @@ async def main():
     # 2. the engine directly, with and without the final newline
     tool = LeanVerifyToolsProvider(task=task, config=task.config, logger=task.logger)
     src = raw.decode("utf-8")
-    for label, code in (("stripped (what execute sends)", src.strip()), ("with final newline", src.rstrip() + "\n")):
+    for label, code in (("stripped (what execute sent before the fix)", src.strip()), ("with final newline", src.rstrip() + "\n")):
         res = await tool.verification_engine.verify(code=code, working_dir=tool.target_workspace, timeout=tool.tool_config.timeout,
             max_memory_gb=tool.tool_config.max_memory_gb, allow_sorries=tool.tool_config.allow_sorries,
             accepted_axioms=tool.tool_config.accepted_axioms, nproc=tool.tool_config.nproc, options=WHOLE_FILE_OPTIONS)
         warns = [m.data for m in res.warnings if "commandStart" in m.data or "linter" in m.data]
         print(label, "-> warnings:", len(res.warnings), "| commandStart:", sum("commandStart" in w for w in warns))
         for w in warns[:2]: print("    ", w[:300].replace("\n", " "))
+    # 3. the path every review tool takes, `execute`, which since the fix keeps the final newline
+    out = await tool.execute(code=src, max_messages=20, options=WHOLE_FILE_OPTIONS)
+    warns = [w.get("data", "") for w in out.get("warnings") or []]
+    print("through execute -> warnings:", len(warns), "| commandStart:", sum("commandStart" in w for w in warns))
 asyncio.run(main())

@@ -137,3 +137,33 @@ def test_a_review_task_gets_the_snippet_probe_and_no_file_path(tmp_path):
 
     assert asyncio.run(run())["success"] is True
     assert seen["code"] == "#check Nat" and seen["options"] is None
+
+
+def test_execute_hands_lean_the_source_with_its_final_newline():
+    """`code.strip()` dropped the file's final newline, and Mathlib's `commandStart` linter then
+    warned at the last command of every whole-file compile (2026-10-02). The engine must receive
+    the source as a file holds it: no surrounding whitespace, one final newline."""
+
+    from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
+
+    provider = object.__new__(LeanVerifyToolsProvider)
+    provider.task = SimpleNamespace(target_workspace=None)
+    provider.target_workspace = None
+    provider.tool_config = SimpleNamespace(timeout=1, max_memory_gb=1, allow_sorries=False,
+                                           accepted_axioms=[], nproc=1)
+    seen = {}
+
+    class Stop(Exception):
+        pass
+
+    async def verify(code, **_kwargs):
+        seen["code"] = code
+        raise Stop
+
+    provider.verification_engine = SimpleNamespace(verify=verify)
+    for given in ("theorem x : True := trivial\n\nend Dense\n", "\n  end Dense", "end Dense"):
+        try:
+            asyncio.run(provider.execute(given))
+        except Stop:
+            pass
+        assert seen["code"] == given.strip() + "\n", repr(seen["code"])

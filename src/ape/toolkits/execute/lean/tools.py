@@ -277,6 +277,14 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
             This is internal service interface, tool layer is responsible for all input validation, file reading, etc.
             This method only responsible for core verification logic.
         """
+        # Lean source as a file holds it: surrounding whitespace dropped, one final newline kept.
+        # `code.strip()` used to drop the newline too, and with Mathlib's standard linter set on
+        # for a whole-file compile (`WHOLE_FILE_OPTIONS`) `linter.style.commandStart` then fired on
+        # the file's last command -- "'' starts on column 9" -- for every reviewed file, a warning
+        # CI never reports. A reviewer filed it as "will fail CI" twice on one PR (2026-10-02,
+        # results/pr_review_v5/probes/review-designs-2026-10-02/eof_linter_check.py).
+        code = code.strip() + "\n"
+
         # Security check: verify code doesn't depend on blocked paths
         from ape.runtime.utils import collect_blocked_paths
         from ape.toolkits.code.lean.lean_parser import check_dependencies_against_blocked_paths
@@ -297,7 +305,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
 
             # Check dependencies (async call)
             is_safe, error_message, blocked_deps = await check_dependencies_against_blocked_paths(
-                code=code.strip(),
+                code=code,
                 working_dir=self.target_workspace,
                 blocked_paths=blocked_paths_relative
             )
@@ -320,7 +328,7 @@ class LeanVerifyToolsProvider(BaseExecuteToolsProvider):
 
         # Execute verification
         result = await self.verification_engine.verify(
-            code=code.strip(),
+            code=code,
             working_dir=self.target_workspace,
             timeout=self.tool_config.timeout,
             max_memory_gb=self.tool_config.max_memory_gb,

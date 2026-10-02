@@ -550,3 +550,12 @@ stripped case too. A test beside it: a whole-file compile of a file ending in a 
 **Risk / sequencing.** It changes what every reviewer's compile reports, the frozen solo baseline's
 included: fixed between hygiene reps 1 and 2, the reps would no longer share their tools. Fix it at a
 rep boundary, with the decision recorded beside the reps.
+
+**Closed 2026-10-02 (`review-designs`), at the hygiene reps' boundary** (reps 1-3 all run and
+judged): `execute` now compiles `code.strip() + "\n"`, the source as a file holds it
+(`tests/ape/test_lean_verify_paths.py::test_execute_hands_lean_the_source_with_its_final_newline`).
+`eof_linter_check.py` re-run: the reviewer's as-is `lean_verify_edit` on 33337's
+`Projection/Submodule.lean` no longer mentions `commandStart`, and the compile through `execute`
+reports 0 warnings. Every run from here sees one warning fewer per reviewed file than hygiene reps
+1-3 and D1 rep 1 did; the decision, the user's (2026-10-02: "Let's make the fixes first"), is to
+fix before D1 reps 2 and 3, so those reps are of the fixed tools.
