@@ -207,3 +207,39 @@ Plan §5, unchanged:
 - Read beside it: hits per finding, control emission per claim and on the docs family separately,
   the end-of-file linter artifact, `unstated` cells and distinct reasons per declaration, and
   processed tokens per PR against the hygiene rep's.
+
+## D1 on Claude Opus 5.5, dev rep 1: read against the rule
+
+`probe_dev_structured_hygiene_claude_sub_rep1`: 15 of 15 sessions, containment clean and usable on
+all 15, 27.7M processed tokens on the subscription (five_hour utilization 0.15 to 0.45), judged
+for $0.43 (audit `probe-dev-structured-hygiene-claude-sub-rep1`). The hygiene reps 2 and 3 are
+read from the `hygiene-layer` worktree's audits, the four-pass union from `ensemble-union`'s.
+
+| | Hyg rep 1 | Hyg rep 2 | Hyg rep 3 | **D1** | four-pass union |
+|---|---|---|---|---|---|
+| obligations hit, of 23 | 9 | 9 | 7 | **10** | 12 |
+| findings | 93 | 103 | 102 | 128 | 375 |
+| paired with gold | 23 | 25 | 23 | 40 | 90 |
+| control findings (per control PR) | 2 (1.0) | 1 (0.5) | 4 (2.0) | 3 (1.5) | 14 (7.0) |
+| gold alignment | 0.118 | 0.126 | 0.108 | 0.188 | 0.104 |
+
+**A lever, at the threshold, provisional** (rule: at least 10 of 23 at control emission at most
+2.0). The hygiene reps' mean is 8.3, union 11, stable 6. D1 reaches two obligations no hygiene rep
+reached -- 33149's Parseval axiom replaced by the existing lemma (`61f68eed`) and one of 33145's
+duality asks (`e8e02821`) -- and loses one all three hit: `cc44bb99`, wrapping a long line on 33305,
+a PR that leaves no declaration in place and so has no ledger cells (see
+`docs/todo/review-designs-file-cells.md`). D1 together with the three hygiene reps reaches 13.
+Against the four-pass union it is 2 short, so the rule "within 1 closes the consistency gap" is
+not met. It files more and aims better: 40 findings paired at gold sites against 23-25, and gold
+alignment 0.188 against 0.108-0.126 (alignment is not precision; CLAUDE.md).
+
+The ledger: 1,698 cells, 115 `would_change` (6.8%, against gpt-5.2's 2.2%), nothing unstated or
+refuted; 169 of 283 declarations with six distinct reasons, the rest repeating a reason across
+two to three concerns. 134 filings, 93 verified by a compile or a lookup, 41 unverified. All three
+control findings are module-doc wording (33304, 33315 twice), the family no tool refutes; one
+filing is the end-of-file linter artifact.
+
+Altitude: one rep, inside a 9/9/7 baseline whose own spread is 2 and a judge whose self-agreement
+puts one to two obligations of noise on 23. Ten is the rule's threshold, met, not exceeded. It
+needs D1 reps 2 and 3 before it stands, and the confirmation sets before it means review rather
+than in-window memory (plan §5).

@@ -240,7 +240,9 @@ names as the new reference baseline.
   and D2 2 of 23 against the baseline's 2, at 0 control emission: not, as built, on that model
   (one rep each; readings in `results/pr_review_v5/probes/review-designs-2026-10-02/README.md`).
   The first test also changed D1's contract to six fixed concern cells per declaration, after the
-  multi-concern rows collapsed to one decision per object. Not run: either design on Claude.
+  multi-concern rows collapsed to one decision per object. On Claude Opus 5.5 (subscription), D1
+  dev rep 1: 10 of 23 against the hygiene reps' 9, 9, 7, control emission 1.5 per control PR --
+  plan §5's lever threshold, met at the boundary, one rep. Not run: D1 reps 2 and 3, D2 on Claude.
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan
   §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
   in turns and tokens on the large PRs.
