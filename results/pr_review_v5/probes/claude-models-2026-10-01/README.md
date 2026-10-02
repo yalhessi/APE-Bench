@@ -313,3 +313,54 @@ comprehension, H-claude rep 2's), `695ae9fd` (33362's namespace layout, Opus 5's
 not the linters: the term proof `I.cotangentEquivIdeal.symm_apply_eq.mpr rfl` and "keep the
 original layout". The linters' visible work in that session was the edit gate: a long-line
 warning on the reviewer's own proposed edit.
+
+## Hygiene, three reps: Layer 0's verdict (2026-10-02)
+
+Reps 2 and 3 ran on accounts B and C in parallel (06:40); each account's five-hour window ran out
+after about 20M tokens, and `run --resume` finished the three lost sessions (33066 on rep 2;
+33321 and 33066 on rep 3) on the main account at 10:11 after its reset. Every session completed
+and every containment audit is clean and usable; nothing billed. Judge v9 on the held-out 12.
+
+| cell (dev held-out 12) | obligations | issue recall | reachable | resolution | held-out findings | control findings (33304, 33315) | gold alignment |
+|---|---|---|---|---|---|---|---|
+| H-claude rep 1 | 7 | 0.304 | 0.500 | 0.217 | 77 | 1, 1 | 0.091 |
+| H-claude rep 2 | 7 | 0.304 | 0.417 | 0.217 | 77 | 1, 1 | 0.093 |
+| hygiene rep 1 | 9 | 0.391 | 0.500 | 0.304 | 75 | 1, 1 | 0.118 |
+| hygiene rep 2 | 9 | 0.391 | 0.500 | 0.304 | 82 | 1, 0 | 0.126 |
+| hygiene rep 3 | 7 | 0.304 | 0.500 | 0.217 | 82 | 0, 4 | 0.108 |
+
+| | per rep | mean | union | stable |
+|---|---|---|---|---|
+| H-claude (2 reps) | 7, 7 | 7.0 | 8 | 6 |
+| hygiene (3 reps) | 9, 9, 7 | **8.33** | 11 | 6 |
+| hygiene, any two reps | | | 10, 10, 10 | 8, 6, 6 |
+
+**By the rule** (plan of 2026-10-01 §5, Layer 0: no recall rule; the truncation and the
+contradiction gone, held-out findings per rep not below 77): **met.** No budget truncation and
+one named root in every first message across 48 sessions; held-out findings 75, 82, 82 (mean
+79.7). Control emission 1.0, 0.5 and 2.0 per control PR (mean 1.17, H-claude 1.0); rep 3's four
+on 33315 sit at the 2.0 bar the design rules use.
+
+**Beside it.** The mean is 1.3 obligations above H-claude's, inside the judge's noise at 23, at
+better aim (0.108-0.126 against 0.091-0.093). The stable core is unchanged at 6; what moved is the
+spread: any two hygiene reps reach 10 where H-claude's two reach 8. Four obligations only the
+hygiene reps reach (`585e5e0b`, the 33285 one-term golf, in all three; `695ae9fd`, the 33362 layout;
+`64e1164f`, the `toLinearMap_` rename; `7fef913e`, the order-dual `ciInf'`, never hit by any cell
+before), and one only H-claude's (`61f68eed`, the Parseval lemma). The family's never-hit set drops
+from ten to nine.
+
+**What is not the tools.** On 33337, `naming_norm` gave every Opus cell, before and after the
+hygiene layer, the right evidence (`emerging`, `toLinearMap_` 21 to `coe_` 7, the maintainers' name
+as a candidate); one hygiene rep of three filed it. Rep 3's new `ciInf'` hit and rep 2's rename are
+draws at the decision, with the evidence already in hand. That is the inconsistency the review
+designs (`docs/plans/2026-10-02-review-designs.md`) are built to remove.
+
+**Defects the parallel reps exposed** (`docs/todo/framework-defects-2026-09.md`): Claude Code aborts
+an MCP call after 300 s of silence, the compile tool's own timeout, which cut seven compiles off
+while eight sessions compiled at once; and one more malformed `"replacement": }` deletion. Rep 2's
+and rep 3's tool tables (16 and 17 transcripts, including the attempts the limit cut short) are in
+`hygiene_reading.py`'s output; apart from those, no tool refused a call.
+
+**The baseline, frozen.** Hygiene's 9, 9, 7 (mean 8.33, union 11, stable 6) is what every review
+design is read against from here, with the four-pass union (12 of 23, 7.0 control findings per PR;
+`../ensemble-union-2026-10-02/`) as the consistency yardstick.
