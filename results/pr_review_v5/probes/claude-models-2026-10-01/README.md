@@ -258,8 +258,14 @@ grant), `332631a4` (the tool line names `mcp__core__` and Read, Grep and Glob).
 
 `probe_dev_opus55_contract2_hygiene_claude_sub_rep1`: H-claude on the hygiene layer's tools
 (`configs/pr_review_v5_dev_medium_opus55_contract2_hygiene_claude_sub.yaml`: `Write` and `Edit`
-granted and contained to `scratch/`, solo budget 40, `proof_profile` out of the grant; the tool
-commits `01b09ce7`..`786f00a1`). 15 of 15 sessions, every containment audit clean and usable,
+granted and contained to `scratch/`, solo budget 40; the tool commits `01b09ce7`..`786f00a1`).
+*Corrected 2026-10-02:* this line said `proof_profile` was out of the grant. It is not, for this
+condition: `786f00a1` removed it from `configs/bases/v5_solo.yaml`, but
+`configs/pr_review_v5_dev_medium_gpt52.yaml` restates the dev set's tool list with it, so every
+hygiene rep holds `[zulip_search, precedent_search, declaration_search, naming_norm,
+proof_profile]`, as H-claude did. Rep 1 never called it. The frozen config is left as it is
+(`review-designs` pins it by digest); the defect register carries the correction (`928ca6b6`).
+15 of 15 sessions, every containment audit clean and usable,
 19.3M processed tokens (max session 4.2M), nothing billed; `completion_status=complete`, 93
 findings. Launched 14:23, closed 14:50.
 
