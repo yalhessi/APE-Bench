@@ -36,7 +36,7 @@ limitation rather than a surprise found while reading a result.
 
 import json
 from pathlib import Path
-from typing import List, Literal, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from pydantic import Field, model_validator
 
@@ -353,6 +353,22 @@ class SoloReviewTask(BasePRReviewTask):
     data_class = SoloReviewData
     task_config_class = SoloReviewConfig
     task_result_class = SoloReviewResult
+
+    #: The per-PR design family's two hooks (`DESIGNS`, this package's `__init__`). A design
+    #: that reads another run's per-PR output -- a chained stage -- sets `reads_stage`, and the
+    #: runner then requires `--of <run>` and hands each task its episode's row. `design_payload`
+    #: is what a design adds to the baseline's task data; the baseline adds nothing, so every
+    #: solo payload is byte-identical to one built before the hooks existed.
+    reads_stage = False
+
+    @classmethod
+    def design_payload(cls, *, episode, graph, dataset, stage) -> Dict[str, Any]:
+        return {}
+
+    @classmethod
+    def describe_design_payload(cls, payload: Dict[str, Any]) -> str:
+        """One line for `plan`: what this design's payload holds for one PR, "" for nothing."""
+        return ""
 
     def _get_prompts(self, version: str) -> Tuple[str, str]:
         config = self.config.task_config

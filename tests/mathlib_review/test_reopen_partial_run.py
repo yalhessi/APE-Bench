@@ -136,5 +136,5 @@ def test_a_dry_resume_says_what_the_resume_would_do():
 
     from src.mathlib_review.review import cli
 
-    assert "_plan(args.config, overrides, logger, resume=args.resume)" in inspect.getsource(cli._run)
+    assert "_plan(args.config, overrides, logger, resume=args.resume," in inspect.getsource(cli._run)
     assert "resume=resume" in inspect.getsource(cli._plan)

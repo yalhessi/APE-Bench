@@ -171,6 +171,9 @@ _declare("context_trace", "context_trace.jsonl", "run", append_only=True)
 _declare("execution_index", "execution_index.jsonl", "run", append_only=True)
 _declare("candidates_discovered", "candidates_discovered.jsonl", "run")
 _declare("findings", "findings.jsonl", "run")
+_declare("ledgers", "ledgers.jsonl", "run",
+          hint="written only by a per-PR design whose submission carries a verdict ledger "
+               "(dataset.design other than solo); a chained design reads its stage from it")
 _declare("issues", "issues.jsonl", "run")
 _declare("conflicts", "conflicts.jsonl", "run")
 _declare("finalization_report", "finalization_report.json", "run")
