@@ -214,3 +214,26 @@ names as the new reference baseline.
 * Built beside it: `run --resume` reopens a partial run, requeueing the sessions that failed on
   errors and keeping the successes (`ebee26c`, `9ceba2a`). Still open: a scheduler that starts no
   new session at the subscription's `allowed_warning`.
+
+## Added 2026-10-02 (on `review-designs`)
+
+* `2026-10-02-review-designs.md` is **partial**: built, not run. Built with tests: §2's
+  organization -- `dataset.design` selects a per-PR task from `DESIGNS`
+  (`src/ape/tasks/lean_tasks/formal_math/review/__init__.py`, beside the task registry), the
+  baseline frozen by digest (the two subscription configs, `brief_G2.md`, `solo.py`'s prompt
+  text), `configs/designs/` with the differs-only-in-design test, `ledgers.jsonl` as a run
+  artifact, `--of <run>` on `plan`/`run` for a chained design, and the spine
+  (`claude-models-2026-10-01/consistency.py`) taking `--runs`; §3's D1 `structured`
+  (`structured.py`: a verdict per declaration and concern, every edit compiled and every
+  duplicate or rename looked up at submission, refuted changes recorded and not filed,
+  unverifiable ones filed advisory), smoked on 33337 against the real reviewed workspace with
+  no model call (`results/pr_review_v5/probes/review-designs-2026-10-02/`); §4's D2
+  `structured_critic` (`structured_critic.py`) as the plan's **chained-stage fallback**, not
+  nested: it reads D1's `ledgers.jsonl` through `StageInput`, every cell gets a position
+  (`overturn`/`concede`, `confirm`/`refute`/`undecided`), the critic's changes go through D1's
+  verification, and the output is the union with stage and position labels. Both designs
+  `plan` clean on the 15 dev PRs; `plan` reports D1's ledger at 336 cells on 33149 and 516 on
+  33294. Not run: D1 rep 1, D2 rep 1 (the user's subscription windows, after the hygiene reps).
+  Open: whether a critic session nests inside a Claude Code session on the subscription (plan
+  §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
+  in turns and tokens on the large PRs.
