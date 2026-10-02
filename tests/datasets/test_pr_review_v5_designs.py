@@ -255,13 +255,21 @@ def test_ledger_rows_carry_only_results_with_a_ledger_and_their_design_keys():
     results = SimpleNamespace(task_results=[
         Result(task_id="a", task_type=SOLO_TASK_TYPE, global_index="a", success=True, score=1.0, pr_number=1,
                episode_id="ep:1", ledger=[{"declaration": "x"}], refuted=[], findings=[{"claim": "c"}]),
-        Result(task_id="b", task_type=SOLO_TASK_TYPE, global_index="b", success=True, score=1.0, pr_number=2,
-               episode_id="ep:2"),  # a solo-shaped result: no ledger, no row
+        SoloReviewResult(task_id="b", task_type=SOLO_TASK_TYPE, global_index="b", success=True, score=1.0,
+                         pr_number=2, episode_id="ep:2"),  # a solo result: no `ledger` field, no row
         Result(task_id="c", task_type=SOLO_TASK_TYPE, global_index="c", success=False, score=0.0, pr_number=3,
                episode_id="ep:3", ledger=[{"declaration": "y"}]),
     ])
     rows = _ledger_rows(results, "structured")
     assert [row["episode_id"] for row in rows] == ["ep:1"]
+    # A design result with an EMPTY ledger (a PR with no declaration in place) still has a row;
+    # a solo-shaped result, which has no `ledger` field, has none.
+    empty = Result(task_id="d", task_type=SOLO_TASK_TYPE, global_index="d", success=True, score=1.0,
+                   pr_number=4, episode_id="ep:4", ledger=[])
+    solo = SoloReviewResult(task_id="e", task_type=SOLO_TASK_TYPE, global_index="e", success=True,
+                            score=1.0, pr_number=5, episode_id="ep:5")
+    both = _ledger_rows(SimpleNamespace(task_results=[empty, solo]), "structured")
+    assert [row["episode_id"] for row in both] == ["ep:4"] and both[0]["ledger"] == []
     assert rows[0]["design"] == "structured" and rows[0]["ledger"] == [{"declaration": "x"}]
     assert rows[0]["findings"] == [{"claim": "c"}], "the critic stage argues against these"
     assert "review_message" not in rows[0], "the rest of the base keys are in the run's other artifacts"

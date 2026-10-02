@@ -637,7 +637,11 @@ def _ledger_rows(results, design: str) -> List[Dict[str, Any]]:
     rows = []
     for result in results.task_results:
         raw = result.model_dump(mode="json") if hasattr(result, "model_dump") else result
-        if not raw.get("success") or not raw.get("episode_id") or not raw.get("ledger"):
+        # The key, not its truthiness: a PR that leaves no declaration in place has an empty
+        # ledger, and it is still a ledger. Testing `raw.get("ledger")` dropped 33305's row from
+        # D1's first dev run, and the critic stage refused the run for the missing PR
+        # (2026-10-02). A solo result has no `ledger` key at all.
+        if not raw.get("success") or not raw.get("episode_id") or "ledger" not in raw:
             continue
         rows.append({
             "episode_id": raw["episode_id"], "pr_number": raw.get("pr_number"),
