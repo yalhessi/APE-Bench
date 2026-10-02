@@ -305,6 +305,19 @@ def build_parser() -> argparse.ArgumentParser:
         "--release", type=Path,
         help="adds attention-vs-maintainers and redundancy, which read gold concern labels")
 
+    union = report_sub.add_parser(
+        "union",
+        help="the union of several passes' findings, written as a derived run the judge scores "
+             "like any other: identical asks collapse, agreement is a label, nothing is "
+             "suppressed. Calls no model.")
+    union.add_argument("--runs", required=True, metavar="RUN[,RUN...]",
+                       help="the passes, comma-separated: two or more finished runs")
+    union.add_argument("--as", dest="derived", required=True,
+                       help="the derived run's name; results/pr_review_v5/runs/<name>")
+    union.add_argument("--control-pr", type=int, action="append", default=[],
+                       dest="control_pr_numbers",
+                       help="repeatable; a PR where maintainers asked for nothing, whose "
+                            "findings are counted per pass and in the union")
     replay_report = report_sub.add_parser(
         "replay", help="a replay against the decisions it replayed, or against another replay")
     replay_report.add_argument("--run", required=True)
@@ -548,6 +561,14 @@ def _report(args) -> int:
             # flag with the same label does the same thing, so either spelling aggregates.
             pairs.setdefault(label, []).extend(n for n in names.split(",") if n)
         print(json.dumps(conditions_report(pairs, args.release), indent=2))
+    elif args.report_command == "union":
+        # Writes a derived run rather than reading one, and is still `report`: it calls no
+        # model, and the judge then reads what it wrote like any other run.
+        from src.mathlib_review.review.merge import write_union_run
+
+        names = [name for name in args.runs.split(",") if name]
+        print(json.dumps(write_union_run(
+            names, args.derived, control_pr_numbers=args.control_pr_numbers), indent=2))
     elif args.report_command == "scope":
         # The competence question the recall number cannot answer on its own: is the reviewer
         # good, or is the set unusually local? `obligation_scope` has answered it since it was
