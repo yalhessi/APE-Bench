@@ -333,5 +333,7 @@ def test_a_design_config_loads_under_the_run_models(path):
     from src.mathlib_review.review.runner import load_run
 
     dataset, scaffold, _overrides = load_run(path, {"dataset": {"run_name": "design_test"}})
+    _base_dataset, base_scaffold, _ = load_run(_baseline_of(path), {"dataset": {"run_name": "design_test"}})
     assert dataset.design in DESIGNS and dataset.routing_mode == "solo"
-    assert scaffold.scaffold_type == "claude_code"
+    assert scaffold.scaffold_type == base_scaffold.scaffold_type
+    assert scaffold.llm_config.model_name == base_scaffold.llm_config.model_name
