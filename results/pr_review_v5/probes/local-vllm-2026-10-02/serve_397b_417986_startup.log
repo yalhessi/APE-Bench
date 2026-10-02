@@ -1,0 +1,7 @@
+(APIServer pid=1803896) INFO:     Application startup complete.
+(Worker_TP0 pid=1805239) INFO 10-02 08:18:50 [gpu_worker.py:640] Available KV cache memory: 34.97 GiB
+(Worker pid=1805241) WARNING 10-02 08:16:46 [custom_all_reduce.py:237] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(EngineCore pid=1804913) INFO 10-02 08:18:50 [kv_cache_utils.py:2395] GPU KV cache size: 2,412,975 tokens, Maximum concurrency for 262,144 tokens per request: 9.20x
+(Worker_TP0 pid=1805239) INFO 10-02 08:17:34 [default_loader.py:430] Loading weights took 46.16 seconds
+(APIServer pid=1803896) INFO 10-02 08:16:00 [api_utils.py:286] non-default args: {'model_tag': '/tmp/ya475-models/Qwen3.5-397B-A17B-FP8', 'enable_auto_tool_choice': True, 'tool_call_parser': 'qwen3_coder', 'enable_prompt_tokens_details': True, 'host': '127.0.0.1', 'port': 8012, 'model': '/tmp/ya475-models/Qwen3.5-397B-A17B-FP8', 'max_model_len': 262144, 'served_model_name': ['local-qwen', 'Qwen/Qw
+(Worker_TP0 pid=1805239) INFO 10-02 08:16:48 [fp8.py:438] Using TRITON Fp8 MoE backend out of potential backends: ['AITER', 'FLASHINFER_TRTLLM', 'FLASHINFER_CUTLASS', 'TRITON', 'MARLIN', 'HUMMING', 'BATCHED_TRITON', 'XPU', 'CPU', 'HPC'].

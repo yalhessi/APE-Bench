@@ -23,13 +23,18 @@ def usage(r):
     return u.get("prompt_tokens", 0), det.get("cached_tokens"), u.get("completion_tokens", 0)
 
 
-def logged_sessions(min_requests=3):
-    """Every logged ELM Qwen session: a list of (request_body, logged_latency, logged_usage)."""
+def logged_sessions(min_requests=3, files=None):
+    """Logged sessions as (file, [(request_body, logged_latency, logged_usage), ...]): every ELM
+    Qwen session by default, or exactly `files` whatever their model."""
     out = []
-    for f in sorted(glob.glob(f"{LOGS}/2026-09-2*/**/*.jsonl", recursive=True)
-                    + glob.glob(f"{LOGS}/2026-09-3*/**/*.jsonl", recursive=True)):
+    if files is None:
+        candidates = sorted(glob.glob(f"{LOGS}/2026-09-2*/**/*.jsonl", recursive=True)
+                            + glob.glob(f"{LOGS}/2026-09-3*/**/*.jsonl", recursive=True))
+    else:
+        candidates = files
+    for f in candidates:
         recs = [json.loads(l) for l in open(f)]
-        if not recs or "Qwen3.5" not in str(recs[0].get("data", {}).get("model", "")):
+        if not recs or (files is None and "Qwen3.5" not in str(recs[0].get("data", {}).get("model", ""))):
             continue
         calls, req = [], None
         for r in recs:

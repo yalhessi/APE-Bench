@@ -6,6 +6,9 @@ max_tokens = logged completion_tokens), so decode load matches. Tool execution t
 compare LLM time, local against ELM's logged latency for the same requests.
 
 usage: python replay_sessions.py <base_url> <model> <concurrency> <n_sessions> <out.jsonl>
+                                 [--files a.jsonl,b.jsonl] [--cap N]
+--files replays exactly those logged sessions (any model; reasoning forced off), --cap bounds the
+forced completion length (for logs whose completion counts include another model's reasoning).
 """
 import json
 import random
@@ -17,7 +20,10 @@ from concurrent.futures import ThreadPoolExecutor
 from common import chat, usage, logged_sessions
 
 BASE, MODEL, CONC, N, OUT = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5]
-sessions = logged_sessions()
+opts = dict(zip(sys.argv[6::2], sys.argv[7::2]))
+FILES = opts["--files"].split(",") if "--files" in opts else None
+CAP = int(opts.get("--cap", 10 ** 9))
+sessions = logged_sessions(files=FILES)
 random.Random(1).shuffle(sessions)
 sessions = sessions[:N]
 
@@ -27,8 +33,8 @@ def run(session):
     rows = []
     for i, (body, elm_latency, elm_usage) in enumerate(calls):
         body = dict(body)
-        n = max(1, elm_usage.get("completion_tokens", 1))
-        body.update(model=MODEL, max_completion_tokens=n, min_tokens=n)
+        n = min(CAP, max(1, elm_usage.get("completion_tokens", 1)))
+        body.update(model=MODEL, max_completion_tokens=n, min_tokens=n, reasoning_effort="none")
         dt, r = chat(BASE, body)
         p, c, comp = usage(r)
         rows.append(dict(session=f.split("/")[-1], turn=i, latency=dt, elm_latency=elm_latency,

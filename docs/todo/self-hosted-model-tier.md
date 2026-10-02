@@ -13,7 +13,23 @@ taken, prompt caching must be handled, not assumed.
 - Starting it needed `VLLM_USE_DEEP_GEMM=0 VLLM_MOE_USE_DEEP_GEMM=0` and
   `VLLM_USE_FLASHINFER_SAMPLER=0` (`serve.sbatch` there).
 - NFS reads cap near 75 MB/s, so a cold 397B load is about 90 minutes and saturates the share.
-- Stage 2, the 397B on 8 GPUs, is not run.
+
+**Stage 2, the 397B on 8 GPUs.**
+- **Weights in `/tmp`.** tmpfs, kept across jobs, cleared only after 30 days unused or on a reboot.
+  The download took 347 s, provided `HF_HOME` is in `/tmp`; on NFS the xet cache held it to
+  76 MB/s.
+- **Start-up** is 4-5 min from `sbatch` to serving.
+- **Cache.** 9 of 9 warm calls hit, at 0.21-0.26 s. The 123-session replay at concurrency 12
+  served 90.7% of prompt tokens from cache, at a median 4.41 s against ELM's 5.53 s on the same
+  requests, ELM serving the same model at concurrency 4.
+- **Long sessions.** Two logged gpt-5.2 sessions grown to 154k tokens hold a flat ~5.2-5.4 s per
+  turn, 99.1% cached above 120k.
+- **MTP** speeds a single stream ~1.75x, but a 12-session batch only ~10%.
+- **End to end.** A real solo run through the CLI on three PRs took **2 min 58 s**: 3 findings, one
+  session stopped at 40 turns.
+- **The run plan does not name the endpoint** (only `scaffold_config_sha256` changes). Keep build
+  item 1's own model name; do not ship the URL override as the interface.
+- **Not measured: review quality.** Gate 2 below is untouched.
 **Cost** — no spend for generation: GPU time on the `first` partition. Judging the calibration runs
 is the only bill.
 

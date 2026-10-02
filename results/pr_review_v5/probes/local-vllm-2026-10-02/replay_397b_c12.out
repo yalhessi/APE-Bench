@@ -1,0 +1,5 @@
+sessions 123 calls 1264 concurrency 12 wall 1089s
+prompt tokens 19758456, cached 17927712 (90.7%)
+latency local median 4.41s p90 17.55s max 244.9s | ELM logged median 5.53s p90 22.48s max 306.0s
+LLM time summed: local 10485s, ELM 12565s
+turns >= 5: cached share 94.3%, local median 4.29s

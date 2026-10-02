@@ -1,6 +1,8 @@
 #!/bin/bash
 # Serve one model with vLLM on the `first` node, bound to localhost (the harness runs on this host).
-# usage: sbatch --gres=gpu:<n> serve.sbatch <hf model id> <port> <tp size> [extra vllm args...]
+# usage: [ALIAS=<served name>] sbatch -A first --gres=gpu:<n> serve.sbatch <hf id or local path> <port> <tp size> [extra vllm args...]
+# ALIAS is the second served name (default: the model argument); set it to the HF id when serving a
+# local copy, so a client sending the HF id (ElmProvider does) reaches it.
 #SBATCH -p first
 #SBATCH --mem=400G
 #SBATCH --time=03:00:00
@@ -24,7 +26,7 @@ export VLLM_USE_DEEP_GEMM=0 VLLM_MOE_USE_DEEP_GEMM=0
 export VLLM_USE_FLASHINFER_SAMPLER=0 PATH=$ROOT/vllm-env/bin:$PATH
 echo "host $(hostname) gpus $CUDA_VISIBLE_DEVICES model $MODEL port $PORT tp $TP extra: $*"
 exec $ROOT/vllm-env/bin/vllm serve "$MODEL" --host 127.0.0.1 --port "$PORT" \
-  --served-model-name local-qwen "$MODEL" --tensor-parallel-size "$TP" \
+  --served-model-name local-qwen "${ALIAS:-$MODEL}" --tensor-parallel-size "$TP" \
   --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder \
   --language-model-only --enable-prefix-caching --enable-prompt-tokens-details \
   "$@"
