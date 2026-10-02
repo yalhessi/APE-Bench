@@ -1,0 +1,161 @@
+{
+  "pr": 33337,
+  "config": "configs/designs/structured_dev_claude_sub.yaml",
+  "steps": [
+    {
+      "submission": 1,
+      "seconds": 26.9,
+      "accepted": false,
+      "message": "2 change(s) are contradicted by the tools:\n- (Submodule.coe_starProjection_eq_isComplProjection, proof) 'Submodule.coe_starProjection_eq_isComplProjection: a proof by a lemma that does ': the edit introduces 1 error(s); the first: Unknown identifier `nonexistent_lemma_for_the_smoke`\n- (Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl, name) 'Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl: rename onto a name th': 'Submodule.starProjection' is already declared at the base commit: - `Submodule.starProjection` is declared in `Mathlib/Analysis/InnerProductSpace/Projection/Basic.lean:177` (before this PR)\nCorrect the edit or the name, resubmit the finding without it (it is then filed unverified), or drop it; keep every other row and finding. After attempt 3 the contradicted changes are recorded as refuted and not filed. (attempt 1 of 3)"
+    },
+    {
+      "submission": 2,
+      "seconds": 10.7,
+      "accepted": true,
+      "message": "Review recorded: 30 ledger cells, 4 findings filed, 1 refuted."
+    }
+  ],
+  "task_type": "lean_pr_review_v5_structured",
+  "declarations": [
+    {
+      "name": "Submodule.starProjection_le_starProjection_iff",
+      "kind": "theorem",
+      "path": "Mathlib/Analysis/InnerProductSpace/Positive.lean",
+      "change_id": "change:55a3ff7a8f5f987b57ec72ad50927a944c21313dca0d324d3f1c81cfc44846ef"
+    },
+    {
+      "name": "LinearMap.IsSymmetricProjection.le_iff_range_le_range",
+      "kind": "theorem",
+      "path": "Mathlib/Analysis/InnerProductSpace/Positive.lean",
+      "change_id": "change:bd579ca6ae0b6b2646e31ed20b494d98e0518609fc708de5817fe5c3b7fd54a5"
+    },
+    {
+      "name": "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl",
+      "kind": "theorem",
+      "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+      "change_id": "change:19b24c6c4208f8cb34c51a5837b3315551939195cfa6a5282a771b550990715a"
+    },
+    {
+      "name": "Submodule.coe_starProjection_eq_isComplProjection",
+      "kind": "theorem",
+      "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+      "change_id": "change:4da0a2970913911d2d1b58ac0eb0c7ebfd5753cc444987e5eaa69cca5b71108a"
+    },
+    {
+      "name": "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl",
+      "kind": "theorem",
+      "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+      "change_id": "change:d2466bcc941e8e5a533bde3986c55e5e12a1df0a2e7ec60ba3f90b1fa3a0d4e5"
+    }
+  ],
+  "setup_seconds": 0.0,
+  "target_workspace": {
+    "commit_hash": "a36c84ab8236a4869899268a42a44af07daa21ed+ae229ca53e6b",
+    "path": "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/review-designs/.ape/runs/review_designs_smoke_structured/tasks/0/samples/0/attempts/smoke/workspaces/target"
+  },
+  "tools": [
+    "declaration_search",
+    "lean_verify_edit",
+    "naming_norm",
+    "precedent_search",
+    "proof_profile",
+    "submit_findings",
+    "zulip_search"
+  ],
+  "prompt_chars": 23245,
+  "prompt_has_ledger_contract": true,
+  "result": {
+    "design": "structured",
+    "episode_id": "leanprover-community/mathlib4:33337:round1:e5629412a8ac58b0a622e82ec0bf1e4db1a62c1b",
+    "cells": 30,
+    "cells_by_verdict": {
+      "no_issue": 25,
+      "would_change": 5
+    },
+    "would_change_outcomes": {
+      "Submodule.starProjection_le_starProjection_iff/proof": "verified",
+      "LinearMap.IsSymmetricProjection.le_iff_range_le_range/library": "verified",
+      "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl/docstring": "unverified",
+      "Submodule.coe_starProjection_eq_isComplProjection/proof": "refuted",
+      "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl/name": "unverified"
+    },
+    "findings": [
+      {
+        "declaration": "Submodule.starProjection_le_starProjection_iff",
+        "concern": "proof",
+        "severity": "advisory",
+        "verified": true,
+        "verification": "verified",
+        "concern_label": "proof",
+        "concern_family": "other",
+        "issue_kind": "style_norm_violation",
+        "anchor": {
+          "path": "Mathlib/Analysis/InnerProductSpace/Positive.lean",
+          "line_start": 1,
+          "line_end": 1
+        },
+        "evidence": "[{\"check\": \"compile\", \"answer\": \"the reviewed file compiles with the edit applied\", \"warnings_introduced\": 0}]"
+      },
+      {
+        "declaration": "LinearMap.IsSymmetricProjection.le_iff_range_le_range",
+        "concern": "library",
+        "severity": "advisory",
+        "verified": true,
+        "verification": "verified",
+        "concern_label": "library",
+        "concern_family": "other",
+        "issue_kind": "style_norm_violation",
+        "anchor": {
+          "path": "Mathlib/Analysis/InnerProductSpace/Positive.lean",
+          "line_start": 1,
+          "line_end": 1
+        },
+        "evidence": "[{\"check\": \"duplicate_of\", \"answer\": \"- `Submodule.IsCompl.projection_range` is declared in `Mathlib/LinearAlgebra/Projection.lean:186` (before this PR)\"}]"
+      },
+      {
+        "declaration": "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl",
+        "concern": "name",
+        "severity": "advisory",
+        "verified": false,
+        "verification": "unverified",
+        "concern_label": "name",
+        "concern_family": "other",
+        "issue_kind": "style_norm_violation",
+        "anchor": {
+          "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+          "line_start": 1,
+          "line_end": 1
+        },
+        "evidence": null
+      },
+      {
+        "declaration": "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl",
+        "concern": "docstring",
+        "severity": "advisory",
+        "verified": false,
+        "verification": "unverified",
+        "concern_label": "docstring",
+        "concern_family": "other",
+        "issue_kind": "style_norm_violation",
+        "anchor": {
+          "path": "Mathlib/Analysis/InnerProductSpace/Projection/Submodule.lean",
+          "line_start": 1,
+          "line_end": 1
+        },
+        "evidence": null
+      }
+    ],
+    "refuted": [
+      {
+        "declaration": "Submodule.coe_starProjection_eq_isComplProjection",
+        "concern": "proof",
+        "evidence": [
+          {
+            "check": "compile",
+            "answer": "the edit introduces 1 error(s); the first: Unknown identifier `nonexistent_lemma_for_the_smoke`"
+          }
+        ]
+      }
+    ]
+  }
+}
