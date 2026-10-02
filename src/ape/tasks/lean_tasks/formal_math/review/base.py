@@ -523,6 +523,12 @@ class BasePRReviewTask(BaseLeanTask):
             "of that -- not evidence the PR fails to build. This PR compiles."
         )
 
+    def _edit_compiles(self) -> Dict[Tuple, Dict[str, Any]]:
+        """The edit-mode `lean_verify_edit` results of this attempt, by `edit_key`."""
+        if not hasattr(self, "_edit_compile_cache"):
+            self._edit_compile_cache = {}
+        return self._edit_compile_cache
+
     def _register_lean_verify_edit(self, mcp) -> None:
         """Register the lean_verify_edit exploration tool — available to EVERY review task (the
         holistic agent and the verified checkers), so any reviewer can test that a proposed edit
@@ -591,6 +597,11 @@ class BasePRReviewTask(BaseLeanTask):
                 result = await self._attribute_errors(path, result)
                 if isinstance(result, dict):
                     result["mode"] = "verified_edit"
+                    # Remembered, never shown: a task that verifies its submission (the
+                    # structured design) reuses this rather than compile the same edit twice --
+                    # 79 of 92 submitted edits in D1's first Claude dev rep had compiled here first.
+                    self._edit_compiles()[edit_key(path, line_start, line_end, replacement,
+                                                   declaration_name, new_declaration)] = result
                 return result
             # Two different questions, and they must not come back in the same shape.
             #
@@ -855,6 +866,17 @@ _WS_PREFIX_RE = re.compile(r"^(?:target/|reference/[^/]+/|scratch/|a/|b/|\./|/)+
 #: the long-line linter fires on a standalone compile with this option and not without it.
 #: Snippet probes (`lean_verify`) do not get it: the header linter would flag every snippet.
 WHOLE_FILE_OPTIONS = {"weak.linter.mathlibStandardSet": "true"}
+
+
+def edit_key(path, line_start=None, line_end=None, replacement=None, declaration_name=None,
+             new_declaration=None) -> Tuple:
+    """One edit to the reviewed file, as a key: the same edit spelled in either tool's arguments
+    gives the same key, so a compile of it can be found again. Whitespace around the texts is not
+    part of the edit (`execute` strips it before compiling)."""
+
+    return (_strip_ws_prefix(path), declaration_name or None,
+            (new_declaration or "").strip() or None, line_start, line_end,
+            None if replacement is None else str(replacement).strip())
 
 
 def splice_declaration(

@@ -28,7 +28,9 @@ is 516 cells on 33294, about 130,000 characters, past gpt-5.2's 32,000-token out
 `duplicate_of` and `rename_to` is looked up (`lookup_declaration`, the `declaration_search`
 answer; `naming_census`, the `naming_norm` answer). A change the tools contradict is recorded as
 refuted and not filed; a change the tools cannot check is filed as advisory and marked
-unverified. This is refutation by fact only -- an edit that does not compile, a duplicate that
+unverified. An edit the reviewer already compiled with `lean_verify_edit` in the same attempt is
+not compiled again: that result is this one (`edit_key`; 79 of 92 submitted edits in D1's first
+Claude dev rep had been). This is refutation by fact only -- an edit that does not compile, a duplicate that
 does not exist, a rename onto a name the library already has. Nothing ranks or withholds a
 change the tools do not contradict (the selection ruling of 2026-09-22 stands), and nothing here
 can touch a docstring-wording ask, since no tool contradicts a wording: the docs family's control
@@ -60,7 +62,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from ape.tasks.base import EvaluationResult, register_task
 
-from .base import WHOLE_FILE_OPTIONS
+from .base import WHOLE_FILE_OPTIONS, edit_key
 from .candidates import UNSTATED_VERDICT
 from .solo import (
     SoloReviewConfig, SoloReviewData, SoloReviewResult, SoloReviewTask, solo_context_block,
@@ -489,27 +491,38 @@ class StructuredReviewTask(SoloReviewTask):
             declaration_name=edit.declaration_name, new_declaration=edit.new_declaration)
         if code is None:
             return REFUTED, {"check": "compile", "answer": f"the edit could not be applied: {error}"}
-        from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
+        # The same edit, compiled by the reviewer's own `lean_verify_edit` in this attempt, in
+        # this workspace, with the same options: its result is this compile's result. Only a
+        # finished compile is reused; one that timed out is compiled again.
+        reused = self._edit_compiles().get(edit_key(
+            finding.path, edit.line_start, edit.line_end, edit.replacement,
+            edit.declaration_name, edit.new_declaration))
+        if reused is not None and reused.get("outcome") in ("compiled", "compile_errors"):
+            result = reused
+        else:
+            reused = None
+            from ape.toolkits.execute.lean.tools import LeanVerifyToolsProvider
 
-        lean_tool = LeanVerifyToolsProvider(task=self, config=self.config, logger=self.logger)
-        try:
-            result = await lean_tool.execute(code=code, max_messages=20, options=WHOLE_FILE_OPTIONS)
-        except Exception as exc:  # noqa: BLE001
-            return UNVERIFIED, {"check": "compile", "answer": f"the compile raised: {exc}"}
-        if not isinstance(result, dict) or result.get("outcome") not in ("compiled", "compile_errors"):
-            return UNVERIFIED, {"check": "compile", "answer": (
-                "the compile did not finish: "
-                + str((result or {}).get("message") if isinstance(result, dict) else result))}
-        result = await self._attribute_errors(finding.path, result)
+            lean_tool = LeanVerifyToolsProvider(task=self, config=self.config, logger=self.logger)
+            try:
+                result = await lean_tool.execute(code=code, max_messages=20, options=WHOLE_FILE_OPTIONS)
+            except Exception as exc:  # noqa: BLE001
+                return UNVERIFIED, {"check": "compile", "answer": f"the compile raised: {exc}"}
+            if not isinstance(result, dict) or result.get("outcome") not in ("compiled", "compile_errors"):
+                return UNVERIFIED, {"check": "compile", "answer": (
+                    "the compile did not finish: "
+                    + str((result or {}).get("message") if isinstance(result, dict) else result))}
+            result = await self._attribute_errors(finding.path, result)
         introduced = result.get("errors_introduced_by_your_edit")
         if introduced is None:
             introduced = result.get("errors") or []
+        source = {"reused": "the same edit, compiled by lean_verify_edit in this session"} if reused else {}
         if introduced:
             first = str((introduced[0] or {}).get("data") or introduced[0])[:400]
-            return REFUTED, {"check": "compile", "answer": (
+            return REFUTED, {"check": "compile", **source, "answer": (
                 f"the edit introduces {len(introduced)} error(s); the first: {first}")}
         return VERIFIED, {
-            "check": "compile", "answer": "the reviewed file compiles with the edit applied",
+            "check": "compile", **source, "answer": "the reviewed file compiles with the edit applied",
             "warnings_introduced": len(result.get("warnings_introduced_by_your_edit") or []),
         }
 

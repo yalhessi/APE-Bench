@@ -528,3 +528,97 @@ def test_the_runner_projects_the_concern_as_the_candidates_label_not_its_family(
     # And a solo finding, which carries no label, projects exactly as before.
     del finding["concern_label"]
     assert _solo_candidate(finding, unit)["concern_label"] == "other"
+
+
+# --- a submitted edit the reviewer already compiled is not compiled again ------------------------
+
+
+def test_lean_verify_edit_remembers_an_edit_compile_and_the_key_ignores_surrounding_whitespace(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.base import edit_key
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    task = _task()
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial\n", ""))
+
+    async def attribute(path, result):
+        return {**result, "errors_introduced_by_your_edit": []}
+
+    monkeypatch.setattr(task, "_attribute_errors", attribute)
+
+    class Tool:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20, options=None):
+            return {"outcome": "compiled", "success": True, "errors": []}
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Tool)
+    mcp = _CapturingMCP()
+    task._register_lean_verify_edit(mcp)
+    tool, _ = mcp.tools["lean_verify_edit"]
+    asyncio.run(tool(path="Mathlib/A.lean", declaration_name="Submodule.foo_bar",
+                     new_declaration="theorem foo_bar : True := trivial\n\n"))
+    key = edit_key("target/Mathlib/A.lean", None, None, None, "Submodule.foo_bar",
+                   "  theorem foo_bar : True := trivial")
+    assert task._edit_compiles()[key]["outcome"] == "compiled"
+    # An as-is compile (no edit) answers a different question and is not remembered.
+    asyncio.run(tool(path="Mathlib/A.lean"))
+    assert len(task._edit_compiles()) == 1
+
+
+def _no_compile(monkeypatch):
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    class Forbidden:
+        def __init__(self, **_kwargs):
+            raise AssertionError("the edit was compiled again")
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Forbidden)
+
+
+def _edit_finding():
+    return StructuredFinding(**_finding(edit={"declaration_name": "Submodule.foo_bar",
+                                              "new_declaration": "theorem foo_bar : True := trivial"}))
+
+
+def test_a_submitted_edit_compiled_in_the_session_reuses_that_result_either_way(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.base import edit_key
+
+    task = _task()
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial\n", ""))
+    _no_compile(monkeypatch)
+    key = edit_key("Mathlib/A.lean", None, None, None, "Submodule.foo_bar", "theorem foo_bar : True := trivial")
+    task._edit_compiles()[key] = {"outcome": "compiled", "errors": [], "errors_introduced_by_your_edit": []}
+    outcome, evidence = asyncio.run(task._compile_edit(_edit_finding()))
+    assert outcome == VERIFIED and "reused" in evidence
+    task._edit_compiles()[key] = {"outcome": "compile_errors",
+                                  "errors_introduced_by_your_edit": [{"data": "unknown identifier 'x'"}]}
+    outcome, evidence = asyncio.run(task._compile_edit(_edit_finding()))
+    assert outcome == REFUTED and "unknown identifier" in evidence["answer"] and "reused" in evidence
+
+
+def test_a_compile_that_did_not_finish_in_the_session_is_compiled_again(monkeypatch):
+    from ape.tasks.lean_tasks.formal_math.review.base import edit_key
+    from ape.toolkits.execute.lean import tools as lean_tools
+
+    task = _task()
+    monkeypatch.setattr(task, "_edited_file_code", lambda *a, **k: ("theorem foo_bar : True := trivial\n", ""))
+    key = edit_key("Mathlib/A.lean", None, None, None, "Submodule.foo_bar", "theorem foo_bar : True := trivial")
+    task._edit_compiles()[key] = {"outcome": "timeout", "errors": []}
+    compiled = []
+
+    class Tool:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def execute(self, code, max_messages=20, options=None):
+            compiled.append(code)
+            return {"outcome": "compiled", "errors": []}
+
+    async def attribute(path, result):
+        return {**result, "errors_introduced_by_your_edit": []}
+
+    monkeypatch.setattr(lean_tools, "LeanVerifyToolsProvider", Tool)
+    monkeypatch.setattr(task, "_attribute_errors", attribute)
+    outcome, evidence = asyncio.run(task._compile_edit(_edit_finding()))
+    assert outcome == VERIFIED and compiled and "reused" not in evidence
