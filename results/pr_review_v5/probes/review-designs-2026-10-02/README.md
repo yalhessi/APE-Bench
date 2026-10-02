@@ -243,3 +243,35 @@ Altitude: one rep, inside a 9/9/7 baseline whose own spread is 2 and a judge who
 puts one to two obligations of noise on 23. Ten is the rule's threshold, met, not exceeded. It
 needs D1 reps 2 and 3 before it stands, and the confirmation sets before it means review rather
 than in-window memory (plan §5).
+
+## Where D1 rep 1's turns and tokens went (`session_waste.py`, `prompt_parts.py`, no spend)
+
+The user, 2026-10-02: "identify if there's any waste or repetition in the work observed in d1
+rep 1 that we can cut down". Read from the 15 Claude Code transcripts of
+`probe_dev_structured_hygiene_claude_sub_rep1` (347 turns, 27.7M processed tokens).
+
+**Not waste.**
+- No identical call repeated in any session; 12 re-reads of a file in 347 turns; no TodoWrite or
+  scratch Write/Edit at all.
+- The ledger is cheap: recorded late (turn 10-39 of 12-43), its text carried in context costs
+  about 1.0% of the run's tokens.
+- 56 calls came back with an error: almost all are exploratory compiles that failed
+  (`lean_verify` used as a `#check` probe, `lean_verify_edit` trying a proof), plus one malformed
+  JSON call and one import of a module that does not exist at that commit. That is the work.
+- Every session's last call reads "The user doesn't want to proceed with this tool use": it is the
+  scaffold ending the session after `submit_findings` recorded the review, not a refusal.
+
+**Waste, and what it costs.**
+
+| | measured | share | the reviewer's information changes if cut? |
+|---|---|---|---|
+| the first message, re-read on every turn | 15.3M of 27.7M processed tokens | 55% | -- (the whole packet) |
+| ... the PR model's "before the PR" code blocks (the diff carries the same lines) | 11.4% of the prompt | ~6% of tokens | yes: the packet differs from the frozen baseline's |
+| ... relation lines restating a pair in the other direction (230 of 996) | 2.7% of the prompt | ~1.5% | yes, in bytes; no, in content |
+| tool definitions re-read every turn | 17,800 characters, ~4,400 tokens a turn | ~5% | -- ; `proof_profile`'s 1,900 are a tool that answers nothing (0 calls; the baseline's grant) |
+| submitted edits compiled again at submission after compiling in the session | 79 of 92 | Lean time, not tokens | no |
+
+The prompt splits as PR model 60% (after-blocks 20%, before-blocks 11%, relations 12%), diff 25%,
+D1's contract 9%, brief 4%. Only the last row is pure repetition the reviewer never sees: it is cut
+(the next commits). The packet-level cuts change what the frozen baseline is compared on and are
+the user's decision; the gain they could buy is about 8% of a window per run.
