@@ -512,3 +512,28 @@ task". It was written for a tool filtered out of a grant. Here the tool is grant
 **Closed by the second option** (hygiene layer, `786f00a1`, 2026-10-01): `proof_profile` is out of
 `configs/bases/v5_solo.yaml`'s grant. The Opus dev runs had added 1 refusal in 2 calls to the count.
 The first option, a `cli plan` refusal for a granted tool with no backing store, is not built.
+
+## Claude Code aborts an MCP tool call after 300 s of silence, the compile tool's own timeout (found 2026-10-02)
+
+In hygiene rep 2, seven `lean_verify` / `lean_verify_edit` calls in two sessions came back as
+`MCP server "core" tool "lean_verify_edit" sent no response or progress for 300s; aborting`, all
+between 06:56 and 06:59, when reps 2 and 3 ran in parallel (eight concurrent sessions compiling,
+machine load about 13). The CLI's idle limit for an MCP call is 300 s, and so is
+`LeanVerifyToolConfig.timeout`; `lean_verify_edit` can also need the file's baseline compile
+before the edited one. So under load the CLI cuts a compile off before the tool can return its
+own `timeout` outcome ("inconclusive, not a verdict on the code"), and the reviewer reads a bare
+MCP error instead. Rep 1, run alone, had none.
+
+**What would close it:** pass `CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT` (ms) above the longest tool call
+the task can make (two compiles, about 660 s) in the scaffold's CLI environment, beside the
+subscription route's other variables in `claude_code/scaffold.py`, or a per-server `timeout` on the
+`core` server if the SDK's server config takes one; with a test that the variable reaches the CLI.
+It changes nothing a model sees except on a slow compile, so it lands at the next run boundary
+(D1 rep 1), not inside the hygiene reps. Until then, do not run two dev runs in parallel on this
+machine.
+
+Also seen in the same rep: one `lean_verify_edit` call refused by the CLI as malformed JSON,
+`"replacement": }` again (rep 1 of the Opus runs: 7). `0a3d7d33` made an omitted `replacement`
+a deletion, but the model still writes the key with no value, which the CLI refuses before the
+tool sees it. The description says "omit it to delete the span"; a separate `delete_span: true`
+argument would be a shape the model has a value for.
