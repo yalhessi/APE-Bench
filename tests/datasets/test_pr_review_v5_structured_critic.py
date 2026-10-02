@@ -24,8 +24,8 @@ from ape.tasks.lean_tasks.formal_math.review.structured import (
     CONCERNS, LEDGER_PRESSES, REFUTED, VERIFIED, StructuredFinding,
 )
 from ape.tasks.lean_tasks.formal_math.review.structured_critic import (
-    CRITIC_TASK_TYPE, STAGE_1, STAGE_2, Rebuttal, StructuredCriticData, StructuredCriticResult,
-    StructuredCriticTask,
+    CRITIC_TASK_TYPE, STAGE_1, STAGE_2, DeclarationPositions, StructuredCriticData,
+    StructuredCriticResult, StructuredCriticTask,
 )
 from tests.datasets.test_pr_review_v5_structured import DECLARATIONS, _fake_checks, _finding
 
@@ -88,22 +88,30 @@ def _task(**data_overrides):
     return task
 
 
-def _rebuttals(positions=None):
-    """Every cell conceded or confirmed, except the (declaration, concern) pairs in `positions`."""
+def _rebuttals(positions=None, names=None):
+    """One entry per declaration, every cell conceded or confirmed except the pairs in `positions`."""
 
     positions = positions or {}
-    rows = []
-    for cell in STAGE["ledger"]:
-        key = (cell["declaration"], cell["concern"])
-        default = "confirm" if cell["verdict"] == "would_change" else "concede"
-        rows.append({"declaration": cell["declaration"], "concerns": [cell["concern"]],
-                     "reason": f"critic: {cell['concern']} re-checked", "position": positions.get(key, default)})
-    return rows
+    verdict = {(c["declaration"], c["concern"]): c["verdict"] for c in STAGE["ledger"]}
+    entries = []
+    for name in names or NAMES:
+        entry = {"declaration": name}
+        for concern in CONCERNS:
+            default = "confirm" if verdict[(name, concern)] == "would_change" else "concede"
+            entry[concern] = {"reason": f"critic: {concern} re-checked",
+                              "position": positions.get((name, concern), default)}
+        entries.append(entry)
+    return entries
 
 
-def _submit(task, rebuttals, findings=()):
-    return asyncio.run(task._submit_critique([Rebuttal(**row) for row in rebuttals],
-                                             [StructuredFinding(**item) for item in findings], None, ""))
+def _record(task, entries):
+    return task._record_entries([DeclarationPositions(**entry) for entry in entries])
+
+
+def _submit(task, entries, findings=()):
+    """`submit_findings` with the positions passed in the submission itself."""
+    return asyncio.run(task._submit_critique([StructuredFinding(**item) for item in findings],
+                                             [DeclarationPositions(**entry) for entry in entries], None, ""))
 
 
 def _captured(task):
@@ -154,7 +162,7 @@ def test_the_prompt_renders_the_first_stages_ledger_and_asks_for_disagreement():
     assert "- `Submodule.foo_bar`" in prompt and "proof: **would_change**" in prompt
     assert "filed (verified, blocking) at `Mathlib/A.lean:10`" in prompt
     assert "Refuted at the first stage's submission" in prompt and "baz duplicates X." in prompt
-    assert "removes nothing" in prompt
+    assert "removes nothing" in prompt and "record_positions" in prompt
     assert "## The ledger\n" not in prompt, "D1's contract is replaced, not appended to"
     assert "## The diff" in prompt, "the packet is still the solo's"
 
@@ -162,54 +170,58 @@ def test_the_prompt_renders_the_first_stages_ledger_and_asks_for_disagreement():
 # --- positions ---------------------------------------------------------------------------------
 
 
-def test_a_position_must_fit_the_first_stages_verdict():
+def test_an_entry_has_a_position_cell_per_concern_in_the_vocabularys_order():
+    fields = [name for name in DeclarationPositions.model_fields if name != "declaration"]
+    assert tuple(fields) == CONCERNS
+
+
+def test_a_position_must_fit_the_first_stages_verdict_and_a_bad_call_records_nothing():
     task = _task()
-    _, refusal = task._check_rebuttals(
-        [Rebuttal(**row) for row in _rebuttals({("Submodule.foo_bar", "proof"): "concede"})], [])
-    assert "one of ['confirm', 'refute', 'undecided'], not 'concede'" in refusal
-    _, refusal = task._check_rebuttals(
-        [Rebuttal(**row) for row in _rebuttals({("Submodule.baz", "name"): "refute"})], [])
-    assert "one of ['overturn', 'concede'], not 'refute'" in refusal
+    recorded, problems = _record(task, _rebuttals({("Submodule.foo_bar", "proof"): "concede"}))
+    assert recorded == [] and task._recorded() == {}
+    assert any("one of ['confirm', 'refute', 'undecided'], not 'concede'" in p for p in problems)
+    _, problems = _record(task, _rebuttals({("Submodule.baz", "name"): "refute"}))
+    assert any("one of ['overturn', 'concede'], not 'refute'" in p for p in problems)
 
 
 def test_an_overturn_needs_a_finding_and_a_finding_needs_an_overturn():
     task = _task()
-    _, refusal = task._check_rebuttals(
-        [Rebuttal(**row) for row in _rebuttals({("Submodule.baz", "name"): "overturn"})], [])
+    _record(task, _rebuttals({("Submodule.baz", "name"): "overturn"}))
+    _, refusal = task._check_rebuttals([])
     assert "`overturn` with no finding" in refusal
+    _record(task, _rebuttals())
     _, refusal = task._check_rebuttals(
-        [Rebuttal(**row) for row in _rebuttals()],
         [StructuredFinding(**_finding(declaration="Submodule.baz", concern="name", claim="baz is misnamed."))])
     assert "not `overturn`" in refusal
+    _record(task, _rebuttals({("Submodule.baz", "name"): "overturn"}))
     cells, refusal = task._check_rebuttals(
-        [Rebuttal(**row) for row in _rebuttals({("Submodule.baz", "name"): "overturn"})],
         [StructuredFinding(**_finding(declaration="Submodule.baz", concern="name", claim="baz is misnamed."))])
     assert refusal is None
     cell = next(c for c in cells if c["declaration"] == "Submodule.baz" and c["concern"] == "name")
     assert cell["verdict"] == "no_issue" and cell["position"] == "overturn"
 
 
-def test_missing_cells_are_pressed_then_recorded_unstated():
+def test_missing_declarations_are_pressed_then_recorded_unstated():
     task = _task()
-    rows = [Rebuttal(**row) for row in _rebuttals()[:-1]]
+    _record(task, _rebuttals(names=NAMES[:1]))
     for attempt in range(1, LEDGER_PRESSES + 1):
-        cells, refusal = task._check_rebuttals(rows, [])
+        cells, refusal = task._check_rebuttals([])
         assert cells is None and f"(attempt {attempt} of {LEDGER_PRESSES})" in refusal
-    cells, refusal = task._check_rebuttals(rows, [])
+        assert "record_positions" in refusal
+    cells, refusal = task._check_rebuttals([])
     assert refusal is None
-    assert cells[-1]["position"] == UNSTATED_VERDICT and cells[-1]["verdict"] == "no_issue"
+    assert [c["position"] for c in cells if c["declaration"] == "Submodule.baz"] == [UNSTATED_VERDICT] * 6
+    assert cells[-1]["verdict"] == "no_issue"
 
 
-def test_a_row_may_cover_several_cells_except_an_overturn():
-    task = _task()
-    rows = [Rebuttal(declaration=name, concerns=[c for c in CONCERNS if not (name == "Submodule.foo_bar" and c == "proof")],
-                     reason="all conceded", position="concede") for name in NAMES]
-    rows.append(Rebuttal(declaration="Submodule.foo_bar", concerns=["proof"], reason="checked", position="confirm"))
-    cells, refusal = task._check_rebuttals(rows, [])
-    assert refusal is None and len(cells) == 12
-    rows[0] = Rebuttal(declaration="Submodule.baz", concerns=["name", "docstring"], reason="r", position="overturn")
-    _, refusal = task._check_rebuttals(rows, [])
-    assert "exactly one concern" in refusal
+def test_it_registers_the_positions_tool_and_its_schemas_are_typed():
+    from tests.datasets.test_pr_review_v5_tool_schemas import _freeform_objects, _schemas
+
+    schemas = _schemas(_task())
+    assert {"record_positions", "submit_findings", "lean_verify_edit"} <= set(schemas)
+    for name in ("record_positions", "submit_findings"):
+        assert _freeform_objects(schemas[name]) == [], name
+    assert "positions" in schemas["submit_findings"]["properties"]
 
 
 # --- the union ---------------------------------------------------------------------------------

@@ -23,8 +23,8 @@ from ape.tasks.base import EvaluationResult, get_task_class
 from ape.tasks.models import WorkspaceInfo
 from ape.tasks.lean_tasks.formal_math.review import DESIGNS
 from ape.tasks.lean_tasks.formal_math.review.structured import (
-    CONCERNS, LEDGER_PRESSES, REFUTED, STRUCTURED_TASK_TYPE, UNVERIFIED, VERIFIED, LedgerRow,
-    StructuredEdit, StructuredFinding, StructuredReviewData, StructuredReviewResult,
+    CONCERNS, LEDGER_PRESSES, REFUTED, STRUCTURED_TASK_TYPE, UNVERIFIED, VERIFIED,
+    DeclarationVerdicts, StructuredFinding, StructuredReviewData, StructuredReviewResult,
     StructuredReviewTask, declarations_of, resolve_declaration,
 )
 from ape.tasks.lean_tasks.formal_math.review.candidates import UNSTATED_VERDICT
@@ -66,22 +66,30 @@ def _task(**data_overrides):
 
 
 def _submit(task, ledger, findings=(), **kwargs):
-    return asyncio.run(task._submit([LedgerRow(**row) for row in ledger],
-                                    [StructuredFinding(**item) for item in findings],
+    """`submit_findings` with the ledger passed in the submission itself."""
+    return asyncio.run(task._submit([StructuredFinding(**item) for item in findings],
+                                    [DeclarationVerdicts(**entry) for entry in ledger],
                                     kwargs.get("confidence"), kwargs.get("message", "")))
 
 
+def _entry(name, verdicts=None):
+    verdicts = verdicts or {}
+    return {"declaration": name, **{concern: {"reason": f"checked {concern}",
+                                              "verdict": verdicts.get(concern, "no_issue")}
+                                    for concern in CONCERNS}}
+
+
 def _full_ledger(verdicts=None):
-    """Every cell `no_issue`, except the (declaration, concern) pairs in `verdicts`."""
+    """One entry per declaration, every cell `no_issue` except the pairs in `verdicts`."""
 
     verdicts = verdicts or {}
-    rows = []
-    for decl in DECLARATIONS:
-        for concern in CONCERNS:
-            verdict = verdicts.get((decl["name"], concern), "no_issue")
-            rows.append({"declaration": decl["name"], "concerns": [concern],
-                         "reason": f"checked {concern}", "verdict": verdict})
-    return rows
+    return [_entry(decl["name"], {concern: verdict for (name, concern), verdict in verdicts.items()
+                                  if name == decl["name"]})
+            for decl in DECLARATIONS]
+
+
+def _record(task, ledger):
+    return task._record_entries([DeclarationVerdicts(**entry) for entry in ledger])
 
 
 def _finding(**overrides):
@@ -191,7 +199,8 @@ def test_the_prompt_is_the_solos_without_the_notes_line_plus_the_contract():
         assert f"`{decl['name']}`" in prompt
     for concern in CONCERNS:
         assert f"`{concern}`" in prompt
-    assert "submit_findings" in prompt
+    assert "submit_findings" in prompt and "record_ledger" in prompt
+    assert "Each concern is its own decision" in prompt
     assert "Nothing ranks or withholds" in prompt
     # The solo's own text is still the body: the diff, the request bar's severity line.
     assert "## The diff" in prompt and "Advisory findings count in full" in prompt
@@ -221,90 +230,116 @@ def test_it_registers_its_own_submission_beside_the_base_grant_and_not_the_bases
     task = _task(context_tools=["declaration_search", "naming_norm"])
     mcp = _CapturingMCP()
     asyncio.run(task.register_task_tools(mcp))
-    assert {"lean_verify_edit", "declaration_search", "naming_norm", "submit_findings"} \
-        <= set(mcp.tools)
-    assert "ledger" in mcp.tools["submit_findings"][1]["description"]
+    assert {"lean_verify_edit", "declaration_search", "naming_norm", "record_ledger",
+            "submit_findings"} <= set(mcp.tools)
+    assert "ledger" in mcp.tools["record_ledger"][1]["description"]
 
 
 def test_the_submission_schema_has_no_properties_less_object():
     from tests.datasets.test_pr_review_v5_tool_schemas import _freeform_objects, _schemas
 
     schemas = _schemas(_task())
-    assert "submit_findings" in schemas
-    assert _freeform_objects(schemas["submit_findings"]) == []
+    for name in ("record_ledger", "submit_findings"):
+        assert _freeform_objects(schemas[name]) == [], name
     assert "ledger" in schemas["submit_findings"]["properties"]
+    assert "entries" in schemas["record_ledger"]["required"]
 
 
-# --- the ledger check ------------------------------------------------------------------------
+# --- the ledger: entries, recording, the check ------------------------------------------------
+
+
+def test_an_entry_has_a_cell_per_concern_in_the_vocabularys_order_and_each_is_required():
+    """The schema is what keeps the decision per concern: the first contract's multi-concern
+    row let gpt-5.2 write one reason for all six (2026-10-02)."""
+
+    fields = [name for name in DeclarationVerdicts.model_fields if name != "declaration"]
+    assert tuple(fields) == CONCERNS
+    assert all(DeclarationVerdicts.model_fields[name].is_required() for name in fields)
+    with pytest.raises(Exception):
+        DeclarationVerdicts(declaration="Submodule.foo_bar",
+                            proof={"reason": "r", "verdict": "no_issue"})
 
 
 def test_a_complete_consistent_ledger_flattens_to_one_cell_per_declaration_and_concern():
     task = _task()
-    cells, refusal = task._check_ledger(
-        [LedgerRow(**row) for row in _full_ledger({("Submodule.foo_bar", "proof"): "would_change"})],
-        [StructuredFinding(**_finding())])
+    recorded, problems = _record(task, _full_ledger({("Submodule.foo_bar", "proof"): "would_change"}))
+    assert problems == [] and recorded == ["Submodule.foo_bar", "Submodule.baz"]
+    cells, refusal = task._check_ledger([StructuredFinding(**_finding())])
     assert refusal is None
     assert len(cells) == len(DECLARATIONS) * len(CONCERNS)
     assert cells[0] == {"declaration": "Submodule.foo_bar", "concern": "proof",
                         "verdict": "would_change", "reason": "checked proof"}
 
 
-def test_a_row_may_decide_several_concerns_at_once_except_a_would_change():
+def test_recording_is_all_or_nothing_and_a_later_entry_replaces_an_earlier_one():
     task = _task()
-    rows = [LedgerRow(declaration="Submodule.foo_bar", concerns=list(CONCERNS), reason="all fine",
-                      verdict="no_issue"),
-            LedgerRow(declaration="Submodule.baz", concerns=list(CONCERNS), reason="all fine",
-                      verdict="no_issue")]
-    cells, refusal = task._check_ledger(rows, [])
-    assert refusal is None and len(cells) == 12
-    rows[0] = LedgerRow(declaration="Submodule.foo_bar", concerns=["proof", "name"],
-                        reason="two things", verdict="would_change")
-    _, refusal = task._check_ledger(rows, [StructuredFinding(**_finding())])
-    assert "exactly one concern" in refusal
+    bad = [_entry("Submodule.foo_bar"), _entry("Nope")]
+    bad[0]["name"]["reason"] = "  "
+    recorded, problems = _record(task, bad)
+    assert recorded == [] and task._recorded() == {}
+    assert any("not one of this PR's listed declarations" in p for p in problems)
+    assert any("(Submodule.foo_bar, name) has an empty reason" in p for p in problems)
+    _record(task, [_entry("foo_bar")])  # a unique dotted suffix resolves
+    _record(task, [_entry("Submodule.foo_bar", {"proof": "cannot_determine"})])
+    assert task._recorded()["Submodule.foo_bar"]["proof"]["verdict"] == "cannot_determine"
+    _, problems = _record(task, [_entry("Submodule.baz"), _entry("Submodule.baz")])
+    assert any("two entries in one call" in p for p in problems)
+
+
+def test_the_record_tool_reports_what_is_still_to_record(tmp_path):
+    task = _task()
+    task.attempt_path = tmp_path
+    reply = task._record_reply([DeclarationVerdicts(**_entry("Submodule.foo_bar"))])
+    assert reply["success"] and reply["recorded"] == ["Submodule.foo_bar"]
+    assert reply["progress"] == "1 of 2 declarations recorded" and reply["remaining"] == ["Submodule.baz"]
+    saved = json.loads((tmp_path / "ledger_progress.json").read_text())
+    assert saved["Submodule.foo_bar"]["docstring"] == {"verdict": "no_issue", "reason": "checked docstring"}
+    refused = task._record_reply([DeclarationVerdicts(**_entry("Nope"))])
+    assert refused["success"] is False and refused["error"].startswith("Nothing recorded")
 
 
 def test_an_inconsistent_ledger_is_refused_by_name():
     task = _task()
+    _record(task, _full_ledger())
     # A finding at a cell whose verdict is no_issue.
-    _, refusal = task._check_ledger([LedgerRow(**row) for row in _full_ledger()],
-                                    [StructuredFinding(**_finding())])
+    _, refusal = task._check_ledger([StructuredFinding(**_finding())])
     assert "not `would_change`" in refusal
     # A would_change with no finding.
-    _, refusal = task._check_ledger(
-        [LedgerRow(**row) for row in _full_ledger({("Submodule.baz", "name"): "would_change"})], [])
-    assert "no finding" in refusal
-    # An unknown declaration, and a duplicate cell.
-    rows = _full_ledger() + [{"declaration": "Nope", "concerns": ["proof"], "reason": "r",
-                              "verdict": "no_issue"}]
-    _, refusal = task._check_ledger([LedgerRow(**row) for row in rows], [])
-    assert "not one of this PR's listed declarations" in refusal
-    rows = _full_ledger() + [{"declaration": "Submodule.baz", "concerns": ["proof"], "reason": "r",
-                              "verdict": "no_issue"}]
-    _, refusal = task._check_ledger([LedgerRow(**row) for row in rows], [])
-    assert "more than one verdict" in refusal
+    _record(task, [_entry("Submodule.baz", {"name": "would_change"})])
+    _, refusal = task._check_ledger([])
+    assert "(Submodule.baz, name) is a `would_change` with no finding" in refusal
 
 
-def test_missing_cells_are_asked_for_a_bounded_number_of_times_then_recorded_unstated():
+def test_missing_declarations_are_asked_for_a_bounded_number_of_times_then_recorded_unstated():
     task = _task()
-    rows = [LedgerRow(**row) for row in _full_ledger()[:-2]]  # two cells of baz missing
+    _record(task, _full_ledger()[:1])  # baz never recorded
     for attempt in range(1, LEDGER_PRESSES + 1):
-        cells, refusal = task._check_ledger(rows, [])
+        cells, refusal = task._check_ledger([])
         assert cells is None and f"(attempt {attempt} of {LEDGER_PRESSES})" in refusal
-        assert "(Submodule.baz, docstring)" in refusal
-    cells, refusal = task._check_ledger(rows, [])
+        assert "Not recorded: Submodule.baz" in refusal and "record_ledger" in refusal
+    cells, refusal = task._check_ledger([])
     assert refusal is None
     unstated = [cell for cell in cells if cell["verdict"] == UNSTATED_VERDICT]
-    assert [(c["declaration"], c["concern"]) for c in unstated] == [
-        ("Submodule.baz", "docstring"), ("Submodule.baz", "placement")]
+    assert [(c["declaration"], c["concern"]) for c in unstated] == [("Submodule.baz", c) for c in CONCERNS]
 
 
 def test_a_file_level_change_names_the_path_and_needs_no_cell():
     task = _task()
+    _record(task, _full_ledger())
     cells, refusal = task._check_ledger(
-        [LedgerRow(**row) for row in _full_ledger()],
         [StructuredFinding(**_finding(declaration="Mathlib/A.lean", concern="docstring",
                                       claim="The module doc names the wrong file."))])
     assert refusal is None and len(cells) == 12
+
+
+def test_entries_recorded_as_the_review_goes_and_entries_in_the_submission_combine(monkeypatch):
+    task = _task()
+    _fake_checks(task, monkeypatch)
+    captured = _captured_result(task)
+    _record(task, _full_ledger()[:1])
+    out = _submit(task, _full_ledger()[1:])
+    assert out["evaluation_result"].success
+    assert len(captured["result"].ledger) == 12
 
 
 # --- verification and recording -------------------------------------------------------------

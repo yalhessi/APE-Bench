@@ -44,19 +44,18 @@ ATTEMPT = ROOT / ".ape/runs/review_designs_smoke_structured/tasks/0/samples/0/at
 
 
 def _ledger(names, would_change):
-    rows = []
-    for name in names:
-        for concern in ("proof", "statement", "library", "name", "docstring", "placement"):
-            verdict = "would_change" if (name, concern) in would_change else "no_issue"
-            rows.append({"declaration": name, "concerns": [concern], "verdict": verdict,
-                         "reason": f"smoke: {concern} checked by hand"})
-    return rows
+    """One entry per declaration: six cells, each with its own reason."""
+    return [{"declaration": name,
+             **{concern: {"reason": f"smoke: {concern} of {name.rsplit('.', 1)[-1]} checked by hand",
+                          "verdict": "would_change" if (name, concern) in would_change else "no_issue"}
+                for concern in ("proof", "statement", "library", "name", "docstring", "placement")}}
+            for name in names]
 
 
 async def main() -> int:
     from ape.tasks.base import create_task_from_data
     from ape.tasks.lean_tasks.formal_math.review.structured import (
-        LEDGER_PRESSES, LedgerRow, StructuredFinding,
+        LEDGER_PRESSES, StructuredFinding,
     )
     from mcp.server.fastmcp import FastMCP
     from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
@@ -146,10 +145,18 @@ async def main() -> int:
         ]
         return [StructuredFinding(**item) for item in items]
 
-    ledger = [LedgerRow(**row) for row in _ledger(names, would_change)]
+    entries = _ledger(names, would_change)
+    # The first three declarations through the registered tool, as a reviewer records them as it
+    # goes; the rest in the submission itself.
+    reply = await mcp.call_tool("record_ledger", {"entries": entries[:3]})
+    record["record_ledger_reply"] = json.loads(reply[0][0].text if isinstance(reply, tuple) else reply[0].text)
+    log.info("record_ledger: %s", record["record_ledger_reply"])
+    from ape.tasks.lean_tasks.formal_math.review.structured import DeclarationVerdicts
+
+    rest = [DeclarationVerdicts(**entry) for entry in entries[3:]]
 
     started = time.monotonic()
-    first = await task._submit(ledger, findings(keep_rename=True), None, "smoke submission 1")
+    first = await task._submit(findings(keep_rename=True), rest, None, "smoke submission 1")
     record["steps"].append({
         "submission": 1, "seconds": round(time.monotonic() - started, 1),
         "accepted": bool(first["evaluation_result"].success),
@@ -162,7 +169,7 @@ async def main() -> int:
     # keep the broken edit past the press bound so it is recorded refuted, not filed.
     task._refutation_presses = LEDGER_PRESSES
     started = time.monotonic()
-    second = await task._submit(ledger, findings(keep_rename=False), None, "smoke submission 2")
+    second = await task._submit(findings(keep_rename=False), [], None, "smoke submission 2")
     record["steps"].append({
         "submission": 2, "seconds": round(time.monotonic() - started, 1),
         "accepted": bool(second["evaluation_result"].success),

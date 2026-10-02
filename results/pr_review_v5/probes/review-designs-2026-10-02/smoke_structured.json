@@ -4,13 +4,13 @@
   "steps": [
     {
       "submission": 1,
-      "seconds": 25.5,
+      "seconds": 27.2,
       "accepted": false,
-      "message": "2 change(s) are contradicted by the tools:\n- (Submodule.coe_starProjection_eq_isComplProjection, proof) 'Submodule.coe_starProjection_eq_isComplProjection: a proof by a lemma that does ': the edit introduces 1 error(s); the first: Unknown identifier `nonexistent_lemma_for_the_smoke`\n- (Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl, name) 'Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl: rename onto a name th': 'Submodule.starProjection' is already declared at the base commit: - `Submodule.starProjection` is declared in `Mathlib/Analysis/InnerProductSpace/Projection/Basic.lean:177` (before this PR)\nCorrect the edit or the name, resubmit the finding without it (it is then filed unverified), or drop it; keep every other row and finding. After attempt 3 the contradicted changes are recorded as refuted and not filed. (attempt 1 of 3)"
+      "message": "2 change(s) are contradicted by the tools:\n- (Submodule.coe_starProjection_eq_isComplProjection, proof) 'Submodule.coe_starProjection_eq_isComplProjection: a proof by a lemma that does ': the edit introduces 1 error(s); the first: Unknown identifier `nonexistent_lemma_for_the_smoke`\n- (Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl, name) 'Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl: rename onto a name th': 'Submodule.starProjection' is already declared at the base commit: - `Submodule.starProjection` is declared in `Mathlib/Analysis/InnerProductSpace/Projection/Basic.lean:177` (before this PR)\nCorrect the edit or the name, resubmit the finding without it (it is then filed unverified), or drop it; keep every other finding. After attempt 3 the contradicted changes are recorded as refuted and not filed. (attempt 1 of 3)"
     },
     {
       "submission": 2,
-      "seconds": 12.1,
+      "seconds": 12.7,
       "accepted": true,
       "message": "Review recorded: 30 ledger cells, 4 findings filed, 1 refuted."
     }
@@ -59,11 +59,25 @@
     "naming_norm",
     "precedent_search",
     "proof_profile",
+    "record_ledger",
     "submit_findings",
     "zulip_search"
   ],
-  "prompt_chars": 23245,
+  "prompt_chars": 23538,
   "prompt_has_ledger_contract": true,
+  "record_ledger_reply": {
+    "success": true,
+    "recorded": [
+      "Submodule.starProjection_le_starProjection_iff",
+      "LinearMap.IsSymmetricProjection.le_iff_range_le_range",
+      "Submodule.orthogonalProjection_apply_eq_linearProjOfIsCompl"
+    ],
+    "progress": "3 of 5 declarations recorded",
+    "remaining": [
+      "Submodule.coe_starProjection_eq_isComplProjection",
+      "Submodule.coe_orthogonalProjection_eq_linearProjOfIsCompl"
+    ]
+  },
   "result": {
     "design": "structured",
     "episode_id": "leanprover-community/mathlib4:33337:round1:e5629412a8ac58b0a622e82ec0bf1e4db1a62c1b",

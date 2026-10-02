@@ -7,6 +7,11 @@ window after the hygiene reps.
 
 ## D1 `structured` on PR 33337 (`smoke_structured.py`, `smoke_structured.json`)
 
+*Re-run 2026-10-02 after the contract change (an entry per declaration with six fixed concern
+cells, recorded through `record_ledger`; see the gpt-5.2 section below for why): the same five
+outcomes, the first three entries recorded through the registered tool and the rest in the
+submission, 27 s and 13 s.*
+
 The task was built as `cli run` builds it from `configs/designs/structured_dev_claude_sub.yaml`
 restricted to 33337, set up on the reviewed workspace `a36c84ab…+ae229ca53e6b`, its tools
 registered (`declaration_search`, `lean_verify_edit`, `naming_norm`, `precedent_search`,
@@ -70,3 +75,25 @@ What this smoke cannot settle: whether a Claude Code session argues with a ledge
 and what a critic session costs. That is D2's first paid rep, after D1's. Nesting the critic
 inside D1's session (the plan's first choice) was not built and not smoked: any test of it is a
 live Claude Code session on the subscription, and the chained form needs no nesting.
+
+## The first paid test: D1 on gpt-5.2, PRs 33315 and 33337 (2026-10-02)
+
+The user's "Let's test with GPT models for now": `configs/designs/structured_dev_gpt52.yaml`,
+run `probe_dev_structured_gpt52_Grc_contract2_smoke1`, $3.57 billed (33315 $0.99 in 24 turns,
+33337 $2.58 in 28), no retries, complete.
+
+- The contract ran: the typed ledger was filled and submitted in one call, with no refusals.
+  33315 (control): 6 cells, all `no_issue`, nothing filed, as the baseline g52v2 did. 33337: one
+  `would_change`, 3 filings, none verified, none refuted.
+- **The ledger collapsed.** Every declaration got one row over all six concerns with one shared
+  reason. The multi-concern row was this branch's compression, and it gave back one decision per
+  object. The contract now has an entry per declaration with a field per concern, each with its
+  own verdict and reason, through `record_ledger`; the second test reads whether that holds.
+- The one real filing is the baseline's own ask, renaming `coe_starProjection_eq_isComplProjection`
+  to `..._isCompl_projection`. The reviewer had called `naming_norm` on it and seen `toLinearMap_`
+  lead `coe_` 21 to 7 -- the gold direction on this PR -- and asked for the suffix change anyway.
+- The other two filings are a tool artifact: a `commandStart` linter warning at each changed
+  file's end, "will fail CI". `eof_linter_check.py` reproduces it with no spend: the Lean tool
+  strips the file's final newline before compiling. Recorded in
+  `docs/todo/framework-defects-2026-09.md`; not fixed here, since it changes the frozen
+  baseline's tools between hygiene reps.

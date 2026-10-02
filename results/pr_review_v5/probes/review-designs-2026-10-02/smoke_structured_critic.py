@@ -50,7 +50,7 @@ ATTEMPT = ROOT / ".ape/runs/review_designs_smoke_structured_critic/tasks/0/sampl
 async def main() -> int:
     from ape.tasks.base import create_task_from_data
     from ape.tasks.lean_tasks.formal_math.review.structured import LEDGER_PRESSES, StructuredFinding
-    from ape.tasks.lean_tasks.formal_math.review.structured_critic import Rebuttal
+    from ape.tasks.lean_tasks.formal_math.review.structured_critic import DeclarationPositions
     from mcp.server.fastmcp import FastMCP
     from src.mathlib_review import run_state
     from src.mathlib_review.agenda.cutoffs import cutoffs_by_episode
@@ -120,13 +120,16 @@ async def main() -> int:
         ("Submodule.coe_starProjection_eq_isComplProjection", "proof"): "refute",
     }
     overturned = {(overturn_proof, "proof"), (overturn_name, "name")}
-    rebuttals = []
+    entries = {}
     for cell in payload["stage"]["ledger"]:
         key = (cell["declaration"], cell["concern"])
         position = (positions_for_filed[key] if cell["verdict"] == "would_change"
                     else "overturn" if key in overturned else "concede")
-        rebuttals.append(Rebuttal(declaration=key[0], concerns=[key[1]], position=position,
-                                  reason=f"smoke: {position} on {key[1]}"))
+        entries.setdefault(key[0], {"declaration": key[0]})[key[1]] = {
+            "reason": f"smoke: {position} on {key[1]}", "position": position}
+    reply = await mcp.call_tool("record_positions", {"entries": list(entries.values())})
+    record["record_positions_reply"] = json.loads(reply[0][0].text if isinstance(reply, tuple) else reply[0].text)
+    log.info("record_positions: %s", record["record_positions_reply"])
 
     def findings(*, keep_rename: bool):
         return [
@@ -145,14 +148,14 @@ async def main() -> int:
 
     steps = []
     started = time.monotonic()
-    first = await task._submit_critique(rebuttals, findings(keep_rename=True), None, "critic smoke 1")
+    first = await task._submit_critique(findings(keep_rename=True), [], None, "critic smoke 1")
     steps.append({"submission": 1, "seconds": round(time.monotonic() - started, 1),
                   "accepted": bool(first["evaluation_result"].success),
                   "message": first["evaluation_result"].message})
     log.info("submission 1 (%.0fs): accepted=%s\n%s", steps[-1]["seconds"], steps[-1]["accepted"],
              steps[-1]["message"])
     started = time.monotonic()
-    second = await task._submit_critique(rebuttals, findings(keep_rename=False), None, "critic smoke 2")
+    second = await task._submit_critique(findings(keep_rename=False), [], None, "critic smoke 2")
     steps.append({"submission": 2, "seconds": round(time.monotonic() - started, 1),
                   "accepted": bool(second["evaluation_result"].success),
                   "message": second["evaluation_result"].message})
