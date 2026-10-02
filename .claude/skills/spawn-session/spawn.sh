@@ -72,7 +72,9 @@ model=${given_model:-$model} effort=${given_effort:-$effort} mode=${given_mode:-
 case "$effort" in low|medium|high|xhigh|max) ;; *) die "effort '$effort' is not one of low medium high xhigh max" ;; esac
 case "$mode" in acceptEdits|auto|bypassPermissions|manual|dontAsk|plan) ;; *) die "permission mode '$mode' is not one claude accepts" ;; esac
 # `claude --bg` refuses bypass until the disclaimer is accepted in the CLI itself (VSCode's own
-# allowDangerouslySkipPermissions does not count), and auto until it is opted into once.
+# allowDangerouslySkipPermissions does not count), and auto until it is opted into once. Accepting
+# writes skipDangerousModePermissionPrompt to ~/.claude/settings.json (2.1.287); the CLI also
+# honours bypassPermissionsModeAccepted in ~/.claude.json.
 if [ "$mode" = bypassPermissions ] \
    && [ "$(jq -r '.bypassPermissionsModeAccepted // false' "$HOME/.claude.json" 2>/dev/null)" != true ] \
    && [ "$(jq -r '.skipDangerousModePermissionPrompt // false' "$HOME/.claude/settings.json" 2>/dev/null)" != true ]; then

@@ -54,8 +54,8 @@ Done when: <close condition from the todo>. Stop there and report.
 - **The permission mode decides whether it can run alone.** `bypassPermissions` and `auto` can;
   `claude --bg` refuses each until the user has opted in once, interactively, in the CLI itself
   (`claude --dangerously-skip-permissions`, `claude --permission-mode auto`) -- VSCode's own
-  bypass setting does not count, and `spawn.sh` refuses bypass early when the CLI has no record
-  of it. `dontAsk` denies every call not on an allow list, and `manual`/`acceptEdits` stop at the
+  bypass setting does not count. Accepting bypass writes `skipDangerousModePermissionPrompt: true`
+  to `~/.claude/settings.json` (2.1.287), and `spawn.sh` refuses bypass early without it. `dontAsk` denies every call not on an allow list, and `manual`/`acceptEdits` stop at the
   first prompt with nobody to answer it.
 - `<topic>` names the branch, the worktree (`.claude/worktrees/<topic>`) and the session. A new
   topic branches from `--base` (default `develop`); an existing branch or worktree of that name is
@@ -65,9 +65,10 @@ Done when: <close condition from the todo>. Stop there and report.
 
 Right after it prints `spawned <topic> · <id>`, arrange to be woken when it finishes: run
 `.claude/skills/spawn-session/spawn.sh wait <id>` with Bash `run_in_background`; the harness
-re-invokes you when it returns. `SendMessage` with `notify_when_idle: true` is the native signal,
-but it reaches you only from a session in your own permission mode -- from a `dontAsk` child of a
-bypass parent on 2026-10-02 it was only logged -- so use it only beside the waiter, never instead.
+re-invokes you when it returns. Beside it, `SendMessage` with `to: "<topic>"`,
+`notify_when_idle: true` and no message: from a child in your own permission mode (the default)
+the notice arrives with a one-line summary of its report; from one in another mode it is only
+logged (2026-10-02: a `dontAsk` child of a bypass parent). The notice is one-shot, the waiter is not.
 
 ## While it runs, and when it is done
 
