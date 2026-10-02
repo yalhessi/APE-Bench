@@ -97,3 +97,27 @@ run `probe_dev_structured_gpt52_Grc_contract2_smoke1`, $3.57 billed (33315 $0.99
   strips the file's final newline before compiling. Recorded in
   `docs/todo/framework-defects-2026-09.md`; not fixed here, since it changes the frozen
   baseline's tools between hygiene reps.
+
+## The second D1 test and the D2 test on gpt-5.2 (2026-10-02)
+
+- D1 under the six-cell entries (`probe_dev_structured_gpt52_Grc_contract2_smoke2`, $1.79): six
+  distinct reasons for every declaration on both PRs, against one shared reason before; one
+  `record_ledger` call per session; 33315 nothing filed, 33337 the baseline's rename only.
+- D2 on that run (`probe_dev_structured_critic_gpt52_Grc_contract2_smoke2`, `--of` the D1 run,
+  $1.69): 35 cells conceded with their own evidence, the rename confirmed, nothing overturned.
+
+## D1 on gpt-5.2, dev rep 1: the reading rule, stated before the run
+
+Run `probe_dev_structured_gpt52_Grc_contract2_rep1` on the 15 dev PRs, judged with
+`configs/pr_review_v5_medium_heldout_judge.yaml` on the held-out 12 (23 obligations, judge v9).
+Read against its own baseline, gpt-5.2 contract v2 (`probe_dev_gpt52_Grc_contract2_rep1`, g52v2):
+**2 of 23**, 44 findings, control emission 0.0 per control PR.
+
+- **A lever on gpt-5.2:** at least 5 of 23 (the baseline plus 3, beyond the judge's one to two
+  obligations of noise on 23) with control emission at most 2.0 per control PR.
+- **Not, as built:** at most 3 of 23, or control emission above 2.0. Four is provisional either way.
+- Read beside it: hits per finding, control emission per claim and on the docs family separately,
+  how many findings are the end-of-file linter artifact, `unstated` cells, and whether the large
+  PRs (33149: 56 declarations, 33294: 86) recorded their ledgers.
+- One rep on dev is provisional whatever it shows, and says nothing yet about Claude: the
+  Claude rule (plan §5) is read on the subscription runs.
