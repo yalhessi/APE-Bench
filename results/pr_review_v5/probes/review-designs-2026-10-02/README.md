@@ -187,3 +187,23 @@ from a new side, and says nothing about Claude, whose inconsistency the designs 
 
 Untried, before anything is concluded about the designs: D1 and D2 on Claude Opus 5.5 on the
 subscription (the configs are ready), D1 on gpt-5.5, reps of either, and the confirmation sets.
+
+## D1 on Claude Opus 5.5 (subscription): the reading rule, stated before the run
+
+The user, 2026-10-02: "It's worth running this with claude to see if the design change pays off
+there." Config `configs/designs/structured_dev_claude_sub.yaml` (the frozen hygiene baseline plus
+`design: structured`, with the six-cell ledger of c3f24639). A two-PR shakeout first, 33145 and
+33315 (`probe_dev_structured_hygiene_claude_sub_smoke1`), then the dev rep
+`probe_dev_structured_hygiene_claude_sub_rep1`, judged as every dev run is. Started only after
+hygiene reps 2 and 3 have finished their resumes in the same five-hour window, since one window
+holds about one dev run.
+
+Plan §5, unchanged:
+- **A lever:** at least 10 of 23 with control emission at most 2.0 per control PR, against the
+  hygiene baseline (rep 1: 9 of 23; reps 2 and 3 to be read as mean / union / stable once judged).
+- **Not, as built:** at most 8 of 23, or control emission above 2.0. Nine is provisional.
+- **Against the four-pass union** (12 of 23 judged, ensemble-union reading): D1 alone within 1 of it
+  closes the consistency gap by structure.
+- Read beside it: hits per finding, control emission per claim and on the docs family separately,
+  the end-of-file linter artifact, `unstated` cells and distinct reasons per declaration, and
+  processed tokens per PR against the hygiene rep's.
