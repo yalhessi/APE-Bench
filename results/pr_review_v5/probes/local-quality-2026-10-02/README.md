@@ -67,3 +67,30 @@ processed tokens, capped sessions, and wall clock per rep.
 released in February 2026, so they may be inside its training window, as they are for the Claude
 and gpt reviewers above. A level that passes is checked on the post-cutoff set before anything is
 built on it.
+
+## Result (2026-10-02): at the floor. Early testing only, by the rule above
+
+| run | reasoning | obligations (of 23) | held-out findings | per PR | targets | judged pairs | hits / finding | resolution |
+|---|---|---|---|---|---|---|---|---|
+| `iter_local397_contract2_dev_rep1` | off | 2 | 32 | 2.7 | 29 | 3 | 0.062 | 0 |
+| `iter_local397_contract2_dev_rep2` | off | 0 | 16 | 1.3 | 16 | 2 | 0.000 | 0 |
+| `iter_local397_contract2_dev_rep3` | off | 2 | 25 | 2.1 | 23 | 11 | 0.080 | 1 |
+| `iter_local397_contract2_high_dev_rep1` | high | 0 | 17 | 1.4 | 16 | 7 | 0.000 | 0 |
+
+- **Reasoning off,** over three reps (`cli report conditions`): mean **1.33**, union 2, stable 2.
+  It is the same two obligations each time, and they are the two gpt_5.2 reaches under this prompt.
+  Both are among Opus 5.5's seven; Opus 5.5 on the same denominator is 7, 7 (union 8, stable 6).
+- **Reasoning high:** 0. The off cells are ≤ 3 and the reasoning rep is ≤ 3, so the pre-registered
+  reading applies: **at the floor, early testing only.**
+- **Beside it.**
+  - The model files about what gpt files under this prompt: 1.3-2.7 findings per PR against
+    gpt_5.2's 2.8, gpt-5.5's 2.5 and Opus 5.5's 6.4.
+  - But fewer of its findings sit at a gold site: 2-11 judged pairs a rep, against 14 and 15 for
+    the gpt cells.
+  - It filed nothing on two non-control held-out PRs in rep 1 (33305, 33337). Control emission is 0
+    in every rep.
+- **Cost and time.** Generation $0.00. Judge v9 $0.0214 + $0.0123 + $0.0621 + $0.0391. Wall per rep
+  about 11-15 min with reasoning off and 17 min with reasoning high, all four reps on one server job.
+- **What this does not settle.** One model, one harness and prompt, reasoning `high` one rep.
+  `docs/dead-ends.md` lists what is untried and what reopens it: an open model reaching ≥ 5 of 23 on
+  this same condition.

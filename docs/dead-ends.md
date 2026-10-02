@@ -230,6 +230,21 @@ the commit bodies. `docs/PROJECT-STATUS.md` §11 lists what is planned and not s
 - **`pr_shared` promotion (severing v4 tasks → v2 base → v1 core)** — the entry point transitively
   needs 17 methods / ~409 lines of workspace-overlay code in `src/ape/`, not the 86 first estimated.
   **Reopens if:** archiving the v1/v2 tasks becomes the goal.
+- **The self-hosted Qwen3.5-397B as the design-iteration reviewer** (2026-10-02).
+  - *Tried:* vLLM on `first`'s 8 GPUs. It serves well: 4-5 min from `sbatch`, 90.7% of a replayed
+    ELM workload from cache, a three-PR solo run in ~3 min, $0.
+  - *Evidence:* under contract v2 / `ape_agent` on the dev held-out 12 (judge v9) it reaches
+    **2, 0, 2 of 23** with reasoning off. That is a mean of 1.3, with union = stable = the same two
+    obligations gpt_5.2 reaches. With reasoning `high` it reaches **0**.
+  - *Why it stopped:* this is the floor, where every design the record tried moved nothing, so a
+    design change cannot register on this model. It stays as the early-testing tier: does a change
+    run, do tools parse, does the output conform. `results/pr_review_v5/probes/local-quality-2026-10-02/`.
+  - *Provisional:* one model, one harness and prompt, and one reasoning-`high` rep.
+  - *Untried:* open models too large for this node at FP8 (GLM-5.2 ~750B, Kimi K3, DeepSeek V4:
+    4-bit, or a second node); this model under Claude Code through the relay (the record says
+    harness does not move gpt); Qwen's recommended sampling (the run inherited temperature 1.0).
+  - **Reopens if:** an open model reaches ≥ 5 of 23 on this same condition. Generation is free and
+    the judge is about $0.05 a rep.
 
 ## Retracted conclusions — do not re-derive
 

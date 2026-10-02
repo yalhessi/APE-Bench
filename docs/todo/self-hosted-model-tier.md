@@ -29,7 +29,16 @@ taken, prompt caching must be handled, not assumed.
   session stopped at 40 turns.
 - **The run plan does not name the endpoint** (only `scaffold_config_sha256` changes). Keep build
   item 1's own model name; do not ship the URL override as the interface.
-- **Not measured: review quality.** Gate 2 below is untouched.
+- **Review quality: measured, gate 2 failed** (`results/pr_review_v5/probes/local-quality-2026-10-02/`,
+  pre-registered in 8558192d).
+  - Contract v2 under `ape_agent` on the dev held-out 12 reaches **2, 0, 2 of 23** with reasoning
+    off: a mean of 1.3, union = stable = the two obligations gpt_5.2 reaches.
+  - It reaches **0** with reasoning `high`.
+  - That is the floor, so this model is the **early-testing tier only**: plumbing, tool parsing,
+    output conformance. It cannot drive design iteration.
+  - The direction is closed in `docs/dead-ends.md` ("The self-hosted Qwen3.5-397B as the
+    design-iteration reviewer"), with the untried models and what reopens it.
+  - Build item 1 (the provider entry) is now worth building only for the early-testing use.
 **Cost** — no spend for generation: GPU time on the `first` partition. Judging the calibration runs
 is the only bill.
 
