@@ -39,6 +39,12 @@ RUNS = {
                   "probe-dev-opus5-contract2-claude-sub-rep1"),
     "M-4.8 opus48": ("probe_dev_opus48_contract2_claude_sub_rep1",
                      "probe-dev-opus48-contract2-claude-sub-rep1"),
+    # ../local-quality-2026-10-02/: the self-hosted Qwen3.5-397B under contract v2 (ape_agent).
+    "local397 off r1": ("iter_local397_contract2_dev_rep1", "iter-local397-contract2-dev-rep1"),
+    "local397 off r2": ("iter_local397_contract2_dev_rep2", "iter-local397-contract2-dev-rep2"),
+    "local397 off r3": ("iter_local397_contract2_dev_rep3", "iter-local397-contract2-dev-rep3"),
+    "local397 high r1": ("iter_local397_contract2_high_dev_rep1",
+                         "iter-local397-contract2-high-dev-rep1"),
 }
 BULLET = re.compile(r"^\s*[-*]\s+", re.M)
 CLAUDE_NOTES = "results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr{pr}/{who}/notes.md"
