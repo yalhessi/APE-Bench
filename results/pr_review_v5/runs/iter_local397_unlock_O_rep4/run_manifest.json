@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 48,
+  "completion_status": "complete",
+  "context_calls_total": 52,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 48,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 1605,
+  "pruned": 1605,
+  "routing_mode": "solo",
+  "run_id": "v5run:iter_local397_unlock_O_rep4",
+  "run_name": "iter_local397_unlock_O_rep4",
+  "run_plan_sha256": "661c08e98fb4ea6f363e24ef82a6731aff23ebaaee5bb0622b6c93ee2c5a44a0",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "9d762bba9ac34ba5e29087b9a87abb6b71bd7feb23f789b4a09cb7f2ca483785",
+  "succeeded": 0,
+  "total_cost": 0.0,
+  "usage": {
+    "billed": 0.0,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 0.0,
+    "self_billed": 0.0,
+    "self_nominal": 0.0,
+    "self_tokens": 17803707.0,
+    "tokens": 17803707.0
+  },
+  "wall_seconds": 2963.42306
+}
