@@ -1,0 +1,125 @@
+{"cid": "v1940", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1912", "principle_id": "P286", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0944", "principle_id": "P110", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "`elim` is the established Option name; `mapD` misdescribes, so P238 also near."}
+{"cid": "v0236", "principle_id": "P287", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "Question with three options; read as asking for the missing intermediate lemmas."}
+{"cid": "v0433", "principle_id": "P284", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "Broadened P284 from `Category*` to cover `Type*` over `Type`."}
+{"cid": "v0559", "principle_id": "P288", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v2222", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0957", "principle_id": "P289", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0570", "principle_id": "P048", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0680", "principle_id": "P213", "second_principle_id": "P048", "none_reason": "", "new": false, "confidence": "unsure", "note": "`namespace Nat` over `section Nat`; variable line for shared binders."}
+{"cid": "v0601", "principle_id": "P123", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Evidence the new simp lemma must be disabled; reads as a bad simp normal form."}
+{"cid": "v0681", "principle_id": "P001", "second_principle_id": "P037", "none_reason": "", "new": false, "confidence": "unsure", "note": "`nat_` prefix dropped inside `namespace Nat`; `protected` against the root name."}
+{"cid": "v0959", "principle_id": "P156", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2117", "principle_id": "P049", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0984", "principle_id": "P216", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1435", "principle_id": "P069", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0021", "principle_id": "P047", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1753", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "new": false, "confidence": "unsure", "note": "Empty suggestion deletes a `@[simp]` line; the lemma and reason are not visible."}
+{"cid": "v0105", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Typo: warning -> warnings."}
+{"cid": "v0661", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "unsure", "note": "Stated personal preference on hyphenating one phrase; not a library regularity."}
+{"cid": "v0569", "principle_id": "P101", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "'adapted from X' docstring is a provenance note; P029 also near."}
+{"cid": "v2055", "principle_id": "P222", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0722", "principle_id": "P014", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2118", "principle_id": "P043", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0990", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1382", "principle_id": "P290", "second_principle_id": "P018", "none_reason": "", "new": true, "confidence": "sure", "note": "Also merges rw/simp_rw/simp into one simp."}
+{"cid": "v1257", "principle_id": "P291", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1375", "principle_id": "P292", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "Reason inferred: dependent simp lemma would fire where the non-dependent one is wanted."}
+{"cid": "v2274", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Question about what the implementation note means."}
+{"cid": "v0928", "principle_id": "P293", "second_principle_id": "P074", "none_reason": "", "new": true, "confidence": "unsure", "note": "File name for its notion; migrate the IsSimple section into it."}
+{"cid": "v1514", "principle_id": "P154", "second_principle_id": "P011", "none_reason": "", "new": false, "confidence": "sure", "note": "Inline `isUnit_neg_one.pow n`; the lemma is a one-step instance of `IsUnit.pow`."}
+{"cid": "v1976", "principle_id": "P038", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1562", "principle_id": "P100", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0716", "principle_id": "P018", "second_principle_id": "P014", "none_reason": "", "new": false, "confidence": "unsure", "note": "Fold `simp_rw [mul_comm]` into the simp so it is terminal and need not be squeezed."}
+{"cid": "v2210", "principle_id": "P069", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0076", "principle_id": "P059", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "Space before the colon."}
+{"cid": "v0693", "principle_id": "P024", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1565", "principle_id": "P074", "second_principle_id": "P263", "none_reason": "", "new": false, "confidence": "unsure", "note": "Also asks the multiplicative twin and the `MonoidAlgebra.basis` name."}
+{"cid": "v1592", "principle_id": "P223", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2108", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Typo in the name: Moprhisms."}
+{"cid": "v2292", "principle_id": "P024", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1966", "principle_id": "P134", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2203", "principle_id": "P014", "second_principle_id": "P249", "none_reason": "", "new": false, "confidence": "unsure", "note": "Golf: terminal `simp` unsqueezed, `push_cast` for the cast step, one `have` fewer."}
+{"cid": "v1068", "principle_id": "P100", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2256", "principle_id": "P130", "second_principle_id": "P049", "none_reason": "", "new": false, "confidence": "unsure", "note": "Name should state the conclusion (`or_of_...`); iff version floated as an option."}
+{"cid": "v0345", "principle_id": "P125", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "Capitalised sentence start."}
+{"cid": "v0095", "principle_id": "P133", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0379", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "unsure", "note": "Question whether this formalisation needs log-depth terms; no library regularity."}
+{"cid": "v1023", "principle_id": "P294", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1274", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0914", "principle_id": "P250", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1953", "principle_id": "P072", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2079", "principle_id": "P007", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "`Discrete PUnit` is the library's terminal category; `PUnit` an ad hoc encoding."}
+{"cid": "v0952", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "`notMem` is the library spelling of `∉`; the odd hypothesis is a question."}
+{"cid": "v1986", "principle_id": "P048", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0785", "principle_id": "P165", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1217", "principle_id": "P295", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1306", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "unsure", "note": "Rewording of one docstring sentence; no rule beyond clarity."}
+{"cid": "v2096", "principle_id": "P010", "second_principle_id": "P100", "none_reason": "", "new": false, "confidence": "unsure", "note": "Drops `UniqueHom` hypothesis; also supplies the remaining unital siblings."}
+{"cid": "v0088", "principle_id": "P050", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0907", "principle_id": "P296", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1922", "principle_id": "P114", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1101", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "new": false, "confidence": "sure", "note": "Refers to earlier comments on `subsemiring` that are not shown."}
+{"cid": "v0087", "principle_id": "P284", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "`Type*` over `universe u v` with `Type u`; uses broadened P284."}
+{"cid": "v0175", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1417", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "`PrimePow`, `eq_self` are informal; name spells `self_pow_mul`."}
+{"cid": "v0715", "principle_id": "P014", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2204", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Malformed LaTeX exponent; a markup mistake."}
+{"cid": "v1162", "principle_id": "P135", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0201", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Five-lemma rw chain replaced by `simp only` of two lemmas and `rfl`."}
+{"cid": "v0838", "principle_id": "P140", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0766", "principle_id": "P235", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Broadened P235 to cover the spelling of a term, not only notation."}
+{"cid": "v1030", "principle_id": "P143", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0788", "principle_id": "P008", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1166", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Missing accents in a cited title."}
+{"cid": "v0420", "principle_id": "P158", "second_principle_id": "P001", "none_reason": "", "new": false, "confidence": "unsure", "note": "`ℂ_ℤ` notation; drop the opened namespace prefix; also `↦`."}
+{"cid": "v0898", "principle_id": "P183", "second_principle_id": "P043", "none_reason": "", "new": false, "confidence": "sure", "note": "Fix the import at source rather than override the linter; move in a separate PR."}
+{"cid": "v2008", "principle_id": "P119", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Golf: drops needless `dsimp` targets, folds rw/intro into refine."}
+{"cid": "v1905", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Use `Fin.univ_succ` in simp instead of a hand `have ... := rfl`."}
+{"cid": "v1811", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1770", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1210", "principle_id": "P295", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1224", "principle_id": "P126", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0108", "principle_id": "P040", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "constructor/intro/apply block becomes an anonymous-constructor term."}
+{"cid": "v1566", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "unsure", "note": "Asks lowerCamelCase for a type abbrev, against the usual rule; reason not stated."}
+{"cid": "v0400", "principle_id": "P059", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1300", "principle_id": "P010", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2014", "principle_id": "P063", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Generalise from PowerSeries to MvPowerSeries and other coefficient rings."}
+{"cid": "v0320", "principle_id": "P004", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0209", "principle_id": "P297", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1104", "principle_id": "P011", "second_principle_id": "P154", "none_reason": "", "new": false, "confidence": "unsure", "note": "Two-rewrite proof from existing lemmas; then questions whether the lemma is wanted."}
+{"cid": "v0323", "principle_id": "P004", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Restates the generalisation request of the same reviewer's earlier comment."}
+{"cid": "v2173", "principle_id": "P004", "second_principle_id": "P298", "none_reason": "", "new": false, "confidence": "sure", "note": "Created P298 for the benchmark request on a new early instance."}
+{"cid": "v0699", "principle_id": "P043", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0762", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1315", "principle_id": "P299", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0652", "principle_id": "P274", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1859", "principle_id": "P183", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0436", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0849", "principle_id": "P199", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1155", "principle_id": "P060", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Direct `stronglyMeasurable_condExp` rather than a congr detour through condExpL1."}
+{"cid": "v0232", "principle_id": "P105", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "Broadened P105 to letters confusable with another symbol (`O` with `0`)."}
+{"cid": "v1644", "principle_id": "P105", "second_principle_id": "P222", "none_reason": "", "new": false, "confidence": "sure", "note": "`I` reads as an ideal; 'colon ideal of a submodule' is not standard terminology."}
+{"cid": "v1935", "principle_id": "P113", "second_principle_id": "P072", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1710", "principle_id": "P300", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": "The label remark is not an ask."}
+{"cid": "v0347", "principle_id": "P119", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Deletes `w := by simp`; the auto-param discharges the field."}
+{"cid": "v1842", "principle_id": "P076", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2106", "principle_id": "P301", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "Pure golf to `·` syntax; regularity of the library is doubtful."}
+{"cid": "v1498", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "Golf: rw/cases folded into one `simpa`, obtain/simp_all into one."}
+{"cid": "v1457", "principle_id": "P302", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "Define the iterated sequence, not only the step."}
+{"cid": "v1676", "principle_id": "P084", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "Docstring lines rewrapped to fill the width."}
+{"cid": "v0664", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0405", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Question why a change was needed."}
+{"cid": "v2119", "principle_id": "P196", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1995", "principle_id": "P010", "second_principle_id": "P006", "none_reason": "", "new": false, "confidence": "sure", "note": "Drop `CommRing` by reusing the section variable; also `‹_›` for the instance."}
+{"cid": "v1560", "principle_id": "P202", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1011", "principle_id": "P023", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0655", "principle_id": "P103", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0877", "principle_id": "P045", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1183", "principle_id": "P010", "second_principle_id": "P303", "none_reason": "", "new": false, "confidence": "sure", "note": "DivisionRing -> Ring; created P303 for refactoring existing uses."}
+{"cid": "v0919", "principle_id": "P165", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0171", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "Typo: retaled."}
+{"cid": "v0293", "principle_id": "P084", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0612", "principle_id": "P304", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "Test that the instance is inferred after the import, as the docstring claims."}
+{"cid": "v0148", "principle_id": "P261", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
