@@ -350,3 +350,16 @@ per control PR against its 7.0; stable across both, 8.
 
 Altitude: one rep of `structured/3`, inside a baseline that spreads by 2. Reps 2 and 3 of
 `structured/3` decide whether 10 holds, and whether the golf ask's loss is the draw.
+
+## D2 `structured_critic/2` on Claude, reading `structured/3` rep 1: stated before the run (2026-10-03)
+
+Run `probe_dev_structured3_critic_hygiene_claude_sub_rep1`, `--of probe_dev_structured3_hygiene_claude_sub_rep1`.
+The user, 2026-10-03: "Let's start D2 on C and see how the results look like once we hit session
+limit" -- so it starts on the Pro account C and stops there; the sessions C finishes are read as an
+interim, forensic look (a partial run is not a measurement), and the rest is resumed later.
+
+The rule, when complete (plan §5): against its own first stage (10 of 23, control 1.5), **a lever**
+at 12 or more with control emission at most 2.0 per control PR; **not, as built**, at 10 or fewer,
+or if the critic's additions raise control emission above 2.0. Read beside it: obligations reached
+by critic-stage findings that the first stage did not reach (the attributable increment), positions
+by kind, overturns by concern, and control filings by concern (72 file cells sit on the controls).
