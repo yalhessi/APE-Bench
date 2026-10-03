@@ -81,11 +81,14 @@ def summarise(name, cb, labels):
     }
     return res
 
-def agreement(readers, crossmap):
+def agreement(readers, crossmap, sets=("val1000",)):
+    """The pre-registered agreement share, over the asks whose entries the cross-map covers (val1000:
+    the cross-map was read on the two val1000-complete codebooks, 781a80b2 and 61045e37)."""
     if len(readers) != 2 or not crossmap: return None
     (na, (cba, la)), (nb, (cbb, lb)) = readers
     pairs = {(p["a"], p["b"]) for p in crossmap["pairs"]}
-    A = {l["cid"]: l["principle_id"] for l in la}; B = {l["cid"]: l["principle_id"] for l in lb}
+    A = {l["cid"]: l["principle_id"] for l in la if set_of[l["cid"]] in sets}
+    B = {l["cid"]: l["principle_id"] for l in lb if set_of[l["cid"]] in sets}
     both = [c for c in A if c in B]
     def matched(c):
         a, b = A[c], B[c]
@@ -93,9 +96,10 @@ def agreement(readers, crossmap):
         return (a, b) in pairs
     agree = sum(1 for c in both if matched(c))
     none_agree = sum(1 for c in both if (A[c] == "none") == (B[c] == "none"))
-    return {"asks_in_both": len(both), "principle_matched": agree, "share": round(agree / len(both), 3) if both else None,
+    return {"sets": list(sets), "asks_in_both": len(both), "principle_matched": agree, "share": round(agree / len(both), 3) if both else None,
             "none_vs_some_agreement": round(none_agree / len(both), 3) if both else None,
-            "entries_A": len(cba), "entries_B": len(cbb), "A_matched": len({a for a, _ in pairs}), "B_matched": len({b for _, b in pairs})}
+            "pairs": len(pairs), "by_relation": dict(Counter(p["relation"] for p in crossmap["pairs"])),
+            "A_matched": len({a for a, _ in pairs}), "B_matched": len({b for _, b in pairs}), "source": crossmap.get("source")}
 
 def mapping_free_agreement(readers, sets=("val1000",)):
     """Agreement that needs no cross-map: none-vs-some per ask; for asks both readers gave a principle,
