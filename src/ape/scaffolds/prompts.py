@@ -339,6 +339,14 @@ async def with_task_system_prompt(
     return f"{preamble}\n\n{'=' * 80}\n\n{contract}"
 
 
+def first_user_prompt(system_text: Optional[str], prompt: str) -> str:
+    """The session's first user message: `prompt`, opened by the system text when the scaffold
+    delivers it in the user turn (`ApeAgentConfig.system_prompt_role: user`), with the separator
+    `with_task_system_prompt` uses."""
+
+    return prompt if not system_text else f"{system_text}\n\n{'=' * 80}\n\n{prompt}"
+
+
 # =============================================================================
 # Main System Prompt Builder
 # =============================================================================
