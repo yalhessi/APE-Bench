@@ -1,0 +1,16 @@
+file                                             lines as-is  open  base |  cold  warm policy | errs  warns(pp)
+Analysis/Normed/Operator/ContinuousAlgEquiv.lean   229     0  24.9  32.2 |  24.0 11.89  11.89 | 8/8  8/8
+athlib/Topology/MetricSpace/CoveringNumbers.lean   422     0   6.9   6.7 |   7.1  0.46   0.43 | 8/8  8/8
+ib/Algebra/Group/Irreducible/Indecomposable.lean   190     0   8.4  11.3 |   9.1  0.56   0.46 | 8/8  8/8
+Mathlib/Analysis/ODE/GalerkinRegularity.lean       469     0  29.9  47.6 |  24.0  1.98   1.98 | 7/8  8/8
+Mathlib/Analysis/Meromorphic/Basic.lean            732     0  11.7  13.5 |  10.8  0.51   0.49 | 8/8  8/8
+Mathlib/Topology/Order/IsLUB.lean                  446     0   6.4   8.8 |   7.0  1.18   0.09 | 8/8  8/8
+Mathlib/LinearAlgebra/RootSystem/BaseExists.lean   138     0  10.9   9.2 |   9.1  5.56   5.56 | 8/8  8/8
+
+edits n=56: cold median 9.6 s, total 732 s
+   server, whole file   median 1.23 s, total 195 s (3.8x)
+   server, sound policy median 0.56 s, total 179 s (4.1x); cut on 19/56 edits
+per file, baseline + edits + as-is calls: cold 862 s vs server 278 s (3.1x)
+errors identical 52/56, after =>/↦ 55/56; (warnings not recorded on the cold side); sound cuts agree on error presence 18/19
+  DIFF GalerkinRegularity.lean decl
+     errors only one side: ['Forbidden axioms used: bkm_implies_regularity']

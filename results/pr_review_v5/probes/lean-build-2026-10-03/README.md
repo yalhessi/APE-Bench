@@ -46,38 +46,63 @@ principle accept an edit Mathlib rejects or reject an instance search Mathlib ac
 
 ## 3. Replay: the same recorded edits, cold vs one persistent server per file
 
-`replay_bench.py` takes the `lean_verify_edit` calls recorded in three Claude runs
-(`probe_dev_structured_hygiene_claude_sub_rep1`, `probe_dev_opus55_contract2_hygiene_claude_sub_rep{2,3}`),
-splices each exactly as the tool does (`splice_declaration` / line span), and checks each one
-(a) through today's `VerificationEngine` and (b) through one `leanclient` server per file: the file
-opened once, each edit pushed as `didChange`. Lean re-elaborates only from the first changed
-command, with imports and the prefix kept. Mode (c), `trunc`: a declaration-mode edit sent with the
-file cut right after the new declaration. 7 files, 8 edits each (`replay.jsonl`, `replay_analysis.txt`):
+`replay_bench.py` takes the `lean_verify_edit` calls recorded in Claude runs, splices each exactly as
+the tool does (`splice_declaration` / line span), and checks each one (a) through today's
+`VerificationEngine` and (b) through one `leanclient` server per file: the file opened once, each
+edit pushed as `didChange`. Lean re-elaborates only from the first changed command, with imports and
+the prefix kept. Mode (c) cuts the file right after the new declaration. 7 files, up to 8 edits each.
 
-| | cold (today) | persistent server | server, cut after the edited declaration |
-|---|---|---|---|
-| median per edit | 9.6 s | **0.79 s** | **0.11 s** (32 edits) |
-| total | 732 s | 170 s (4.3×) | 8.7 s against 395 s cold on the same edits (45×) |
-| baseline + all edits, per file | 862 s | 286 s (3.0×) | — |
+**Correction (same day): the first numbers committed here were partly an artifact.** leanclient's
+`get_diagnostics` can return before Lean has finished the new version. Its `$/lean/fileProgress`
+handler ignores the document version, so a late "done" from the previous version marks the new one
+done, and its `publishDiagnostics` handler accepts the previous version's messages
+(`leanclient` 0.10.0, `file_manager.py`, `handle_file_progress` / `handle_publish_diagnostics` /
+`FileState.is_ready`). On a file that already has messages it returns those. Seen on
+GalerkinRegularity: 5 of 13 warnings and a missing error, at 0.0-0.1 s. The work is not skipped,
+only billed to the next edit (ContinuousAlgEquiv edits 5/6: 0.5 s / 26.8 s with the race,
+23.0 s / 2.0 s strictly), so totals barely moved and medians did. `replay_server_strict.py` redid
+the server half of both replays waiting on Lean's own `textDocument/waitForDiagnostics` for the exact
+version, then for diagnostics stamped with it: every answer stamped, none changed in the following
+second, and leanclient's answer differed on 0 of 110 edits in that pass. The race is intermittent.
+**A persistent checker must wait this way; leanclient's completion test is not usable as is.**
 
-Opening the file costs about what today's baseline compile costs (115 s against 129 s summed), and
-its diagnostics *are* the baseline. The server's per-edit time depends on position: an edit near
-the top of an elaboration-heavy file re-elaborates the rest (ContinuousAlgEquiv: 0.7–28 s).
+Strict results (cold side unchanged from the first pass). The first passes stay on disk as the record
+of the race: `replay.jsonl` / `replay_analysis.txt` and `replay_review_designs*`; read the `strict_*` files.
 
-**Error sets: 52/56 identical.** Three differ only in `=>` vs `↦` (the server applies Mathlib's
-`pp.unicode.fun`). One is `Forbidden axioms used: bkm_implies_regularity`, the engine's own
-`#print axioms` post-check, which the server path did not run and would have to keep. Truncation
-agreed with the cold path on error presence in 30/32.
 
-**When truncation is sound.** A theorem whose statement and attributes are unchanged cannot change
-anything after it, so the cut file answers the same question. Over five Claude runs' 576
-`lean_verify_edit` calls (85 as-is, 237 declaration, 254 line span), **164 of the 237 declaration
-edits are theorems with the statement kept**; 40 change the statement, 20 are `def`s, 13 `axiom`s.
-Line-span edits inside a proof qualify too and were not counted. The 85 as-is calls would cost
-nothing: the open's diagnostics answer them.
+| | first replay: three dev runs, develop's tool (`strict_first_replay*`) | review-designs `probe_dev_structured3_hygiene_claude_sub_rep1`, that branch's tool (`strict_review_designs*`) |
+|---|---|---|
+| edits | 56 on 7 files | 54 on 7 files |
+| cold median / total | 9.6 s / 732 s | 10.3 s / 751 s |
+| server, whole file: median / total | **1.23 s** / 195 s (3.8×) | **0.70 s** / 157 s (4.8×) |
+| server, cut where sound: median / total | **0.56 s** / 179 s (4.1×), cut on 19 | **0.55 s** / 147 s (5.1×), cut on 14 |
+| per file, baseline + edits + as-is calls | 862 s → 278 s (3.1×) | 1,041 s → 247 s (4.2×) |
+| errors identical after `=>`/`↦` | 55/56 | 54/54 |
+| warnings identical | not recorded cold | 54/54 |
+| sound cuts agree on error presence | 18/19 | 14/14 |
+
+The review-designs replay runs from that worktree (`replay_bench_v2.py`), so the splice, the
+`WHOLE_FILE_OPTIONS` linter set, the kept final newline and "no replacement deletes the span" are
+that branch's own. The one remaining error difference, in both runs the same GalerkinRegularity edit,
+is `Forbidden axioms used: bkm_implies_regularity`: the engine's own `#print axioms` post-check,
+which a server path must keep. `disagree_check.py` reproduced three of the racy disagreements four
+ways (cold, a fresh `lean --setup` with the server's options, server, server after 20 s) and all
+four agreed.
+
+Opening the file costs about what today's baseline compile costs, and its diagnostics *are* the
+baseline. The server's time depends on where the edit is: elaboration below the edit is redone.
+ContinuousAlgEquiv (elaboration 15-22 s of a 24 s compile) stays at 0.8-24 s, median 12 s. An edit
+in the import header restarts the file (BaseExists line 9: 9-12.5 s, about a reopen).
+
+**When the cut is sound.** A theorem whose statement and attributes are unchanged cannot change
+anything after it, so the cut file answers the same question; the replays cut only those edits.
+Over five Claude runs' 576 `lean_verify_edit` calls (85 as-is, 237 declaration, 254 line span),
+**164 of the 237 declaration edits are theorems with the statement kept**; 40 change the statement,
+20 are `def`s, 13 `axiom`s. Line-span edits inside a proof would qualify too and are not cut here.
+The 85 as-is calls cost nothing: the open's diagnostics answer them.
 
 Server footprint seen: `lake serve` 0.8 GB, `lean --server` 1.0 GB (its reference index), each
-open file's worker 1.6–1.8 GB RSS, mostly shared mmap of the same `.olean`s.
+open file's worker 1.6-1.8 GB RSS, mostly shared mmap of the same `.olean`s.
 
 ## 4. Reviewed workspaces are 99.6% copy
 
@@ -106,7 +131,10 @@ ape/bin/python results/pr_review_v5/probes/lean-build-2026-10-03/compile_times.p
 ape/bin/python results/pr_review_v5/probes/lean-build-2026-10-03/replay_bench.py \
   probe_dev_structured_hygiene_claude_sub_rep1,probe_dev_opus55_contract2_hygiene_claude_sub_rep2,probe_dev_opus55_contract2_hygiene_claude_sub_rep3 \
   7 8 /tmp/replay.jsonl                                   # ~45 min, no spend
-ape/bin/python results/pr_review_v5/probes/lean-build-2026-10-03/analyze.py /tmp/replay.jsonl
+ape/bin/python results/pr_review_v5/probes/lean-build-2026-10-03/replay_server_strict.py \
+  results/pr_review_v5/probes/lean-build-2026-10-03/replay_bench.py <same runs> /tmp/replay.jsonl /tmp/strict.jsonl
+ape/bin/python results/pr_review_v5/probes/lean-build-2026-10-03/analyze_v2.py /tmp/strict.jsonl
+# a branch's own run: the same with replay_bench_v2.py, from inside that branch's worktree
 ```
 
 Run `lean` from inside a workspace: from the repo root elan resolves a different toolchain and every

@@ -1,0 +1,14 @@
+file                                             lines as-is  open  base |  cold  warm policy | errs  warns(pp)
+athlib/Topology/MetricSpace/CoveringNumbers.lean   422     0   7.9   9.6 |   8.1  0.38   0.18 | 8/8  8/8
+Mathlib/Analysis/ODE/GalerkinRegularity.lean       469     2  29.1  38.5 |  25.0  1.65   1.20 | 8/8  8/8
+Mathlib/Analysis/Meromorphic/Basic.lean            732     1  11.6  15.2 |  11.4  0.54   0.52 | 8/8  8/8
+ib/Algebra/Group/Irreducible/Indecomposable.lean   190     0   8.9  10.1 |  10.0  3.88   2.24 | 8/8  8/8
+Analysis/Normed/Operator/ContinuousAlgEquiv.lean   229     2  24.4  27.7 |  24.0  2.95   2.95 | 8/8  8/8
+Mathlib/Analysis/Complex/Schwarz.lean              175     1   9.7  14.0 |   8.5  0.41   0.39 | 8/8  8/8
+Mathlib/LinearAlgebra/RootSystem/BaseExists.lean   138     0   8.6  12.5 |   9.2  5.60   5.60 | 6/6  6/6
+
+edits n=54: cold median 10.3 s, total 751 s
+   server, whole file   median 0.70 s, total 157 s (4.8x)
+   server, sound policy median 0.55 s, total 147 s (5.1x); cut on 14/54 edits
+per file, baseline + edits + as-is calls: cold 1041 s vs server 247 s (4.2x)
+errors identical 53/54, after =>/↦ 54/54; warnings identical 54/54, after =>/↦ 54/54; sound cuts agree on error presence 14/14
