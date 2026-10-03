@@ -54,7 +54,7 @@ sessions_sharing_tree() {  # pids of other sessions whose working tree is this o
   local top p c
   top=$(git rev-parse --show-toplevel 2>/dev/null) || return 0
   other_claude_sessions | while IFS=$'\t' read -r p c; do
-    [ "$(git -C "$c" rev-parse --show-toplevel 2>/dev/null)" = "$top" ] && echo "$p"
+    if [ "$(git -C "$c" rev-parse --show-toplevel 2>/dev/null)" = "$top" ]; then echo "$p"; fi
   done
 }
 
@@ -62,7 +62,7 @@ sessions_sharing_repo() {  # pids of other sessions in any worktree of this repo
   local common p c
   common=$(_common_dir .) || return 0
   other_claude_sessions | while IFS=$'\t' read -r p c; do
-    [ "$(_common_dir "$c")" = "$common" ] && echo "$p"
+    if [ "$(_common_dir "$c")" = "$common" ]; then echo "$p"; fi
   done
 }
 
