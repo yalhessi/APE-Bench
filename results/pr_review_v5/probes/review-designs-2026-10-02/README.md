@@ -363,3 +363,25 @@ at 12 or more with control emission at most 2.0 per control PR; **not, as built*
 or if the critic's additions raise control emission above 2.0. Read beside it: obligations reached
 by critic-stage findings that the first stage did not reach (the attributable increment), positions
 by kind, overturns by concern, and control filings by concern (72 file cells sit on the controls).
+
+## D2 on Claude: the interim look at account C's limit (forensic, 2026-10-03)
+
+`probe_dev_structured3_critic_hygiene_claude_sub_rep1` on account C (0.64 used at the start):
+the limit was spent at 04:15 after **2 of 15** critic sessions finished (33304, a control, and
+33305; 1.9M tokens); 3 sessions in flight were cut off (6.9M tokens, one of them 4.3M), the rest
+failed at once, and the run closed partial. Both producing attempts audit clean and usable.
+
+- **33304 (control):** 51 cells -- 49 `concede`, 2 `confirm` (D1's two module-doc findings);
+  nothing overturned, so the critic added no control finding. The judge counts 1 control candidate
+  (0.5 per control PR) on the union.
+- **33305:** 21 cells -- 18 `concede`, 2 `confirm` (D1's wrong-file TODO and the 101-character
+  line), 1 `overturn`: the module doc's TODO points at `GroupCohomology/LowDegree.lean`, which the
+  critic opened and found to be a `deprecated_module` stub; filed as a verified module-doc change.
+- **Forensic judge** (audit `probe-dev-structured3-critic-hygiene-claude-sub-rep1-forensic-c`,
+  $0.006): `cc44bb99` stays a hit; 33305 has no other gold ask, so the critic's addition is
+  unaligned (gold is a lower bound, not a verdict). No increment was reachable on these two PRs.
+
+What it shows: the critic argues with evidence, overturns sparingly, and did not raise control
+emission on the control it reached. What it cannot show: whether D2 reaches obligations D1 missed;
+those sit on the PRs not yet run. Starting a D2 run on a part-spent Pro window cost more in cut-off
+sessions (6.9M) than it finished (1.9M); the remaining 13 sessions are best resumed on a fresh window.
