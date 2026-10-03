@@ -97,10 +97,43 @@ def agreement(readers, crossmap):
             "none_vs_some_agreement": round(none_agree / len(both), 3) if both else None,
             "entries_A": len(cba), "entries_B": len(cbb), "A_matched": len({a for a, _ in pairs}), "B_matched": len({b for _, b in pairs})}
 
+def mapping_free_agreement(readers, sets=("val1000",)):
+    """Agreement that needs no cross-map: none-vs-some per ask; for asks both readers gave a principle,
+    whether two asks under one principle for one reader are under one principle for the other (both
+    conditionals and the adjusted Rand index); and how far each A entry's asks fall under one B entry."""
+    import itertools
+    if len(readers) != 2: return None
+    (_, (cba, la)), (_, (cbb, lb)) = readers
+    A = {l["cid"]: l["principle_id"] for l in la if set_of[l["cid"]] in sets}
+    B = {l["cid"]: l["principle_id"] for l in lb if set_of[l["cid"]] in sets}
+    both = sorted(set(A) & set(B))
+    if not both: return None
+    nn = sum(1 for c in both if (A[c] == "none") == (B[c] == "none"))
+    P = [c for c in both if A[c] != "none" and B[c] != "none"]
+    ga, gb = defaultdict(set), defaultdict(set)
+    for c in P: ga[A[c]].add(c); gb[B[c]].add(c)
+    pa = {frozenset(p) for g in ga.values() for p in itertools.combinations(sorted(g), 2)}
+    pb = {frozenset(p) for g in gb.values() for p in itertools.combinations(sorted(g), 2)}
+    inter, n = len(pa & pb), len(P); total = n * (n - 1) // 2
+    e = len(pa) * len(pb) / total if total else 0
+    ari = (inter - e) / (0.5 * (len(pa) + len(pb)) - e) if total and (0.5 * (len(pa) + len(pb)) - e) else None
+    dom = {a: Counter(B[c] for c in g).most_common(1)[0][1] / len(g) for a, g in ga.items()}
+    big = [a for a, g in ga.items() if len(g) >= 3]
+    return {"sets": list(sets), "asks_in_both": len(both), "none_vs_some_agreement": round(nn / len(both), 3),
+            "asks_principled_by_both": n, "same_pairs_A": len(pa), "same_pairs_B": len(pb), "same_pairs_shared": inter,
+            "p_B_same_given_A_same": round(inter / len(pa), 3) if pa else None,
+            "p_A_same_given_B_same": round(inter / len(pb), 3) if pb else None,
+            "adjusted_rand_index": round(ari, 3) if ari is not None else None,
+            "A_entries_used": len(ga), "A_entries_with_dominant_B_half": sum(1 for v in dom.values() if v >= 0.5),
+            "A_entries_with_dominant_B_all": sum(1 for v in dom.values() if v == 1.0),
+            "A_entries_3plus": len(big), "A_entries_3plus_dominant_B_half": sum(1 for a in big if dom[a] >= 0.5)}
+
 readers = [(d.name, load_reader(d)) for d in sorted(HERE.glob("reader_*")) if d.is_dir()]
 results = {"order_seed": order["seed"], "counts": order["counts"], "readers": {n: summarise(n, cb, lb) for n, (cb, lb) in readers}}
 cm = json.load(open(HERE / "crossmap.json")) if (HERE / "crossmap.json").exists() else None
 results["agreement"] = agreement(readers, cm)
+results["mapping_free_agreement_val1000"] = mapping_free_agreement(readers)
+results["mapping_free_agreement_all"] = mapping_free_agreement(readers, sets=("val1000", "outside_window", "outside_years"))
 for n, r in results["readers"].items():
     print(f"== {n}: {r['asks_labelled']} asks, codebook {r['codebook_size']} (val1000 {r['val1000_entries']}, outside adds {r['outside_new_entries']})")
     print("   curve:", " ".join(f"{c['batch']}:+{c['new']}={c['size']}" for c in r["curve"]))
@@ -108,5 +141,6 @@ for n, r in results["readers"].items():
     print("   concentration:", r["concentration_val1000"]); print("   families:", r["by_family_val1000"])
     print("   rationale:", r["rationale_weighted_by_asks"], "form:", r["form_weighted_by_asks"], "unsure:", r["unsure_share"])
 print("== agreement:", results["agreement"])
+print("== mapping-free agreement (val1000):", results["mapping_free_agreement_val1000"])
 if "--write" in sys.argv:
     json.dump(results, open(HERE / "results.json", "w"), indent=1); print("wrote results.json")
