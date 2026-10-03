@@ -1,0 +1,12 @@
+# Contract v2 under Claude Code (relay) on the self-hosted Qwen3.5-397B -- condition H of
+# results/pr_review_v5/probes/local-unlock-2026-10-03/. The gpt_5.2 relay config with the local
+# model: the relay serves Claude Code's /v1/messages from `elm_qwen_3.5` at the local endpoint.
+# Name runs `iter_local397_*`; the run plan names the model, not the endpoint.
+extends: pr_review_v5_dev_medium_gpt52_Grc_contract2_claude.yaml
+
+llm_config:
+  model_name: elm_qwen_3.5
+  openai_api: chat_completions
+  openai_responses_reasoning_carryover: false
+  reasoning_effort: none
+  base_url: http://127.0.0.1:8012/v1/chat/completions

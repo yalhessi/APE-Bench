@@ -59,3 +59,34 @@ Runs are named `iter_local397_unlock_<label>_rep<n>`. They are judged with
 
 Caveats carried into any reading: one model; the dev PRs may sit inside its training window, as they
 do for every reviewer on this scale; and a single rep at this level is noisy (base reps were 2, 0, 2).
+
+## Addendum (2026-10-03, before their runs): ten more settings, one hypothesis each
+
+The user asked for ten meaningfully different settings to narrow down how to steer the model.
+One question is already answered on disk: **resampling alone does not widen reach.** The base's
+three reps reach 2 obligations in union, so K passes at the base setting are not a lever.
+
+Each setting below tests a different explanation of why the model sits at the floor. Every brief
+is G2 with one delimited section added or replaced, in this directory, diffable against
+`../contract-2026-10-01/brief_G2.md`.
+
+| label | setting | hypothesis tested | how |
+|---|---|---|---|
+| E | 13 real maintainer review comments with the tail of their diff hunks, from PRs before 2025-12-01 in the precedent corpus (`examples_source.json`). Chosen by family from a filtered random draw, without reference to gold; a "rename to activate dot notation" example was excluded because dot notation is a known dev miss | it does not know what an ask looks like | `brief_G2_examples.md` |
+| B | list at least ten candidate requests before any tool call, check each, submit every survivor | it starts verifying correctness before it has candidates | `brief_G2_brainstorm.md` |
+| S | three passes on concern subsets: S1 naming + documentation, S2 proof-golf + style, S3 generalization + duplication + scope + correctness | eight families at once overload it | `brief_G2_S1/S2/S3.md`, three runs |
+| D | no PR model in the packet; the brief no longer promises one | the 56k-token packet dilutes attention | `brief_G2_diffonly.md` + `task_config.context_file=null` |
+| N | only the base grant: `lean_verify_edit` and `submit_findings`, with no read, search or context tools | the investigation loop pulls it into correctness-checking | `task_config.enabled_tools=[]`, `dataset.solo_context_tools=[]` |
+| V | evidence mandate: `naming_norm` on every added or renamed declaration, `declaration_search` on every added one, one shorter-proof attempt per proof over three lines | it does not gather evidence on its own initiative | `brief_G2_evidence.md` |
+| H | Claude Code through the relay, with contract v2 unchanged | the harness matters for this model (it did not for gpt) | `configs/pr_review_v5_dev_medium_local397_contract2_claude.yaml` |
+| R | write the review as GitHub comments in plain text first, then submit one finding per comment | the structured submission suppresses natural reviewing | `brief_G2_comments.md` |
+| Q | reasoning `high` with the best brief of the first screen | thinking helps only once the filing bar is lowered | after the screen |
+| K | five passes of the best first-screen condition, read in union | sampling widens reach once the model files | after the screen |
+
+Rules, as above:
+- One rep each. ≥ 4 of 23 advances to two more reps; a lever is a three-rep mean ≥ 3.33 with
+  union > 2; more than 3 control findings per control PR is volume without discrimination.
+- **S** is three sessions per PR, so it is read as the union of S1-S3 against the base's union over
+  three reps (2). It advances at a union ≥ 4.
+- **K** is read the same way: the union of five passes against the condition's own single-pass
+  mean.
