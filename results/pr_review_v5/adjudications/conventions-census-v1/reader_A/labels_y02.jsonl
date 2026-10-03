@@ -1,0 +1,19 @@
+{"cid": "w0285", "principle_id": "P074", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0225", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "new": false, "confidence": "sure", "note": "'Idem' repeats an earlier comment not shown; no parent, hunk alone does not say what."}
+{"cid": "w0002", "principle_id": "P298", "second_principle_id": "P140", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P298 from 'new' to 'new or changed' hook; second: tests for changed meta-code"}
+{"cid": "w0312", "principle_id": "P077", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "no reason given; read as targeted rw plus one light closer over simp-with-comm then abel"}
+{"cid": "w0046", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "unsure", "note": "docstring misnames `adjoin` as `Adjoin`; a wrong name, treated as a typo"}
+{"cid": "w0132", "principle_id": "P252", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0211", "principle_id": "P435", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "w0337", "principle_id": "P436", "second_principle_id": "P019", "none_reason": "", "new": true, "confidence": "unsure", "note": "new: `_congr` naming; second: `Ordinal.type` spelled `ordinalType` in names; no reason given"}
+{"cid": "w0258", "principle_id": "P125", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "adds terminal period matching sibling bullets; plural fix is grammar"}
+{"cid": "w0128", "principle_id": "P017", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0219", "principle_id": "P296", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0007", "principle_id": "P019", "second_principle_id": "P271", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P271 to 'definition or lemma'; primary: `equiv` not `iso` for a LinearEquiv"}
+{"cid": "w0088", "principle_id": "P047", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0074", "principle_id": "P437", "second_principle_id": "P159", "none_reason": "", "new": true, "confidence": "sure", "note": "new: `have` placed beside its use; second: binders before the colon"}
+{"cid": "w0035", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0025", "principle_id": "P010", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "w0175", "principle_id": "P081", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P081 to include modifiers such as `protected`"}
+{"cid": "w0238", "principle_id": "P438", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": "reply gives a recipe for the parent's generalisation request"}
+{"cid": "w0111", "principle_id": "P221", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
