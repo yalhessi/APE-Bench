@@ -298,3 +298,19 @@ the user's decision; the gain they could buy is about 8% of a window per run.
 
 Packet-level cuts (the PR model's "before" blocks, mirrored relation lines) are not made: they
 change what the frozen baseline is compared on (see the waste reading above).
+
+## D1 `structured/3` on Claude Opus 5.5, dev rep 1: stated before the run (2026-10-03)
+
+Run `probe_dev_structured3_hygiene_claude_sub_rep1`, the fixes of 2026-10-02 in place (file
+ledger cells, compile reuse, the end-of-file linter fix). The user, 2026-10-03: "let's start
+running in pieces to try to use B and C first before we start using our primary account". So it
+starts on the Pro account B; each time an account's five-hour limit is spent the run closes
+partial and `run --resume` continues on the next (C, then the primary), requeueing exactly the
+sessions the limit failed -- the way H-claude rep 2 was finished on 2026-10-01. Same model, CLI
+and effort on every account; which sessions ran where is read from the attempts afterwards.
+
+Read by the same rule as `structured/2` rep 1 (plan §5): a lever at 10 of 23 or more with control
+emission at most 2.0 per control PR, not at 8 or fewer; against the hygiene reps (9, 9, 7) and
+`structured/2` rep 1 (10). Read beside it: the obligations at file-level targets (`cc44bb99`,
+`0bb42bd2`, `38e72250`), control findings by concern (the control PRs gain 39 and 33 file cells),
+end-of-file linter filings (expected 0), and submission compiles reused.
