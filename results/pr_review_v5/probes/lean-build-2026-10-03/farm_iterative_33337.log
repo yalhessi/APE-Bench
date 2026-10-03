@@ -1,0 +1,14 @@
+# transcribed from farm_iterative.py's stdout (2026-10-03); 9806's changed-module list abbreviated
+changed modules: ['Mathlib.Analysis.InnerProductSpace.Positive', 'Mathlib.Analysis.InnerProductSpace.Projection.Submodule']
+closure 2183 modules; predicted rebuild 2 (the changed modules)
+farm: 12 real dirs, 958 symlinks, 0.1s
+import-graph superset would be 10 modules; starting from the 2 changed
+iteration 1: materialized ['Mathlib.Analysis.InnerProductSpace.Dual', 'Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional'] (denied=True)
+iteration 2: materialized ['Mathlib.Analysis.InnerProductSpace.PiL2'] (denied=True)
+iteration 3: materialized ['Mathlib.Analysis.InnerProductSpace.Adjoint', 'Mathlib.Analysis.InnerProductSpace.Calculus', 'Mathlib.Analysis.Matrix.Hermitian'] (denied=True)
+iteration 4: materialized ['Mathlib.Analysis.InnerProductSpace.Rayleigh'] (denied=True)
+iteration 5: materialized ['Mathlib.Analysis.InnerProductSpace.Spectrum'] (denied=True)
+iteration 6: build ok; cumulative build time 151s
+Lake wrote 140 files for 10 modules; materialized 10; real bytes 31.0 MB
+byte-identical to the copied reviewed workspace: 120/140
+lake build --no-build: 0

@@ -104,24 +104,114 @@ The 85 as-is calls cost nothing: the open's diagnostics answer them.
 Server footprint seen: `lake serve` 0.8 GB, `lean --server` 1.0 GB (its reference index), each
 open file's worker 1.6-1.8 GB RSS, mostly shared mmap of the same `.olean`s.
 
-## 4. Reviewed workspaces are 99.6% copy
+## 4. Reviewed workspaces without the copy: a symlink farm (feasible)
 
 `51192f7a…+9806fbc709c7`: of **81,821 files (2.8 GB)** in its `.lake/build`, **143 (11 MB, 13
-modules)** differ from the base. `lean --setup=<json>` takes an explicit artifact path per import
-(the JSON `lake setup-file` emits), so a reviewed environment can be the base's artifacts with only
-the rebuilt modules repointed. On 33337 (`a36c84ab…+ae229ca53e6b`, the PR whose sibling rename
-caused the `Unknown constant` transcripts), compiling `Positive.lean`:
+modules)** differ from the base (`lib/lean` only). Two ways to use that:
 
-| environment | errors |
-|---|---|
-| reviewed workspace (full 2.8 GB copy) | 0 |
-| base artifacts + the 10 rebuilt modules (overlay) | 0, every message identical |
-| base artifacts only | 3: ``Unknown constant `Submodule.coe_starProjection_eq_isComplProjection` `` and its cascade |
+**Reading.** `lean --setup=<json>` takes an explicit artifact path per import (the JSON `lake
+setup-file` emits). Base artifacts with only the rebuilt modules repointed reproduced 33337's
+reviewed compile of `Positive.lean` message for message (0 errors); base alone gives the 3
+``Unknown constant `Submodule.coe_starProjection_eq_isComplProjection` `` errors.
 
-Overlay and reviewed also agree on all 13 changed files of `+9806fbc709c7` (where base agrees too,
-so that PR does not discriminate). This shows the *read* side only; building the overlay without the
-copy (Lake over a symlinked build tree, or `lean --setup … -o` per module in import order) is not
-tested here.
+**Building, without the 2.7 GB copy** (`farm_build.py`, `farm_iterative.py`). The new root's
+sources are the existing source overlay; `.lake/build` is a *farm*: real directories only on the
+paths to modules Lake will write, every other entry a symlink into the base's build. A module Lake
+must rewrite while its files are still links fails loudly -- the write lands on the base's 444 inode
+(directories 555) -- so a wrong guess can never touch the base.
+
+| | 33337 (2 changed) | 9806 (13 changed) |
+|---|---|---|
+| import-graph superset (`farm_build.py`), one pass | 10 modules, 80 s, 31 MB | **120** modules, 170 s, 213 MB |
+| Lake's own set (`farm_iterative.py`): start with the changed modules, materialize what Lake is refused | 10 modules after 5 refusals, 151 s over 6 passes, 31 MB | 13 modules, 1 pass, **21 s, 16 MB** |
+| the copy it replaces | 10 modules; 2.8 GB copied (~10 min recorded for 33337) | 13 modules; 2.8 GB copied |
+| farm made in (tmpfs) | 0.1-0.2 s, ~950 links | 0.7-1.3 s, 3,000-6,400 links |
+
+Both PRs' farms: `lake build --no-build` reports everything up to date; every `.olean`, `.ilean`,
+`.ir` and `.c` is byte-identical to the copied workspace's (only `.trace` logs and `.setup.json`
+embed the root path); the cold path compiles `Positive.lean` with 0 errors; a Lean server opened on
+the farm reports 0 errors for `Positive.lean` and `Spectrum.lean` and maps the **base's own**
+`.olean` inodes (4,344 and 4,322 mappings) plus the farm's rebuilt ones (18, 14). The superset
+over-builds when the PR does not change a module's public interface: Lean's module system then
+rebuilds nothing downstream, and that is knowable only after the upstream module is built -- which
+is why the record said the rewrite set is "not knowable before the build runs". The refusal loop
+learns it from Lake instead. Not yet tried on NFS (the farm here is on tmpfs; symlink creation is
+the only step whose cost moves) or on a PR that adds or deletes modules.
+
+## 5. Early edits in slow files: a safe cut covers about half, the rest is genuinely sequential
+
+`classify_edits.py` re-parses each recorded edit (old and new file) and sorts it by what it changes
+(`edit_classes_*.json`):
+
+| recorded `lean_verify_edit` edits | five dev runs (501) | review-designs (130) |
+|---|---|---|
+| proof only (one theorem's text; statement, name, attributes kept; nothing else changed) | 42% | 37% |
+| comment / docstring only | 7% | 18% |
+| statement or name changed, no attributes, name not mentioned later in the file | 1% | 3% |
+| **safe to cut after the changed declaration** | **50%** | **58%** |
+| import header | 7% | 4% |
+| needs the rest: `variable`/`open`/other commands 15/14%, declarations added or removed 9/3%, `def`/`axiom`/`instance` 8/11%, several declarations 5/3%, statement used later 4/6%, attributes 3/2% | 43% | 38% |
+| …of which in the first half of the file | 18% | 12% |
+
+`replay_policy.py` re-timed both replays (strict wait) under that policy: cut where safe, import
+edits to a separate cold process (sending them to the document restarts it, and the next edit pays a
+second restart -- ContinuousAlgEquiv's edit after an import edit fell from 23.0 s to 1.4 s, BaseExists'
+from 10.4 s to 2.1 s), everything else whole-file (`policy_*.jsonl`, `policy_analysis.txt`):
+
+| | review-designs (54) | first replay (56) |
+|---|---|---|
+| cold median / p90 / total | 10.3 / 24.7 / 751 s | 9.6 / 25.1 / 732 s |
+| **policy** median / p90 / total | **0.41 / 4.3 / 111 s (6.8×)** | **0.48 / 9.6 / 147 s (5.0×)** |
+| excluding import edits | 47 s against 687 s (14.7×) | 95 s against 680 s (7.2×) |
+| non-import edits over 5 s | none | 5, all ContinuousAlgEquiv |
+| same answer as cold | 54/54 | 55/56 (the axiom post-check) |
+
+The residual is one file. Three ContinuousAlgEquiv edits rewrite a section's `variable` line and an
+`abbrev` at line 92 of 229: everything after can change meaning, and they cost 10.7-12.2 s (cold:
+24 s). Two late proof edits right after them cost 9.2 and 13.6 s: Lean diffs against the document's
+*current* text, so the first edit after a redesign pays to restore the prefix. Untried: a second warm
+document per file, each edit sent to the one sharing the longer prefix (~1.5 GB more per file); exact
+references from the server instead of the conservative text test; more worker threads (command-line
+`lean -j8 -DElab.async=true` did not speed up Mon_); a two-phase answer (the edited declaration now,
+the rest later), which changes the tool's contract.
+
+## 6. Import edits: no cheap exact answer, so keep them off the warm document
+
+All 39 recorded header edits *remove* imports. In 8 the module stays in the closure of the remaining
+imports; in 31 it leaves it, so the environment really changes and the whole file must be redone
+under the new header -- today's cost, no more. All of these files use the module system, where
+import visibility makes even the 8 not a guaranteed identity. Routing them to a separate cold process
+keeps the warm document's state for the edits that follow (section 5).
+
+## 7. Concurrency, and many builds at once
+
+`concurrency.py`: K sessions, each its own process and server, open Meromorphic/Basic (a reviewed
+file) at once and push its 8 recorded edits with the strict wait; memory is read 60 s after the last
+edit from `/proc/<pid>/smaps_rollup` over every server process (`concurrency.jsonl`):
+
+| K on one build | open (median) | per-edit median (max) | answers identical | PSS total |
+|---|---|---|---|---|
+| 1 | 11.7 s | 0.50 s (0.6) | -- | 2.9 GB |
+| 4 | 15.7 s | 0.53 s (0.6) | yes | 7.0 GB |
+| 8 | 20.1 s | 0.54 s (0.7) | yes | 12.5 GB |
+| 16 | 29.0 s | 0.74 s (0.9) | yes | 23.2 GB (1.45 GB/session, 1.2 GB of it private heap) |
+
+A build is read-only to every check, so concurrent attempts need no build of their own: 16 servers on
+one build answered identically. Three sessions on one shared build against three full copies of it,
+opening the same unchanged file: 6.9 against 7.1 s, 0.04 s per edit, 4.8 against 5.0 GB -- once warm,
+copies cost nothing extra at run time; their cost is the 2.8 GB and ~10 min each at build time, and
+a cold read per copy. Farms share the base's inodes (section 4), so many reviewed workspaces of one
+base share one page cache.
+
+**leanclient defect 2: symlinks.** leanclient resolves symlinks when it builds a document's URI.
+In a reviewed workspace an unchanged file is a symlink into the base, so it is opened in the **base's**
+environment and its diagnostics never match the opened document: every check waited out the 30 s
+stamp deadline (`concurrency_symlink_bug.jsonl`: "37.5 s open, 30.05 s per edit"). Keeping the
+workspace's own path (a 10-line subclass in `concurrency.py`) fixes it: Lean publishes under that
+path and the worker maps the reviewed copy's `.olean`s (422 mappings). The existing
+`LeanCodeToolsProvider` (`code_hover`, `code_goto`, `get_lean_goal`) resolves the path and walks up
+to the nearest `lean-toolchain`, so on an unchanged file it presumably runs against the base, not the
+reviewed workspace; not tested.
 
 ## Reproduce
 
