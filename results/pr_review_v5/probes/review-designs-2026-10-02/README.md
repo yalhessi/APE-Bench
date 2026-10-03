@@ -314,3 +314,39 @@ emission at most 2.0 per control PR, not at 8 or fewer; against the hygiene reps
 `structured/2` rep 1 (10). Read beside it: the obligations at file-level targets (`cc44bb99`,
 `0bb42bd2`, `38e72250`), control findings by concern (the control PRs gain 39 and 33 file cells),
 end-of-file linter filings (expected 0), and submission compiles reused.
+
+## D1 `structured/3` on Claude, dev rep 1: read against the rule
+
+`probe_dev_structured3_hygiene_claude_sub_rep1`, run in pieces on the two Pro accounts (11
+sessions on B until its limit, 4 resumed on C; the primary untouched), judged for $0.38 (audit
+`probe-dev-structured3-hygiene-claude-sub-rep1`).
+
+| | Hyg 1 / 2 / 3 | D1 `structured/2` | **D1 `structured/3`** | four-pass union |
+|---|---|---|---|---|
+| obligations hit, of 23 | 9 / 9 / 7 | 10 | **10** | 12 |
+| findings | 93 / 103 / 102 | 128 | 130 | 375 |
+| paired with gold | 23 / 25 / 23 | 40 | 39 | 90 |
+| control findings (per control PR) | 1.0 / 0.5 / 2.0 | 1.5 | 1.5 | 7.0 |
+
+**A lever at the threshold again** (rule: at least 10 at control emission at most 2.0). Two D1
+runs, two contract versions, both at 10 against the hygiene mean of 8.3. Together they reach
+12 -- the four-pass union's count -- with 258 findings against its 375 and 1.5 control findings
+per control PR against its 7.0; stable across both, 8.
+
+- **The file cells reached their target.** `cc44bb99` (33305's line wrap, hit by every hygiene rep
+  and missed by `structured/2`, which had no cell there) is a hit; 26 of 252 file cells were
+  `would_change`, 30 file-level filings over 13 PRs. `38e72250` moved from nothing to `loc`.
+- **What moved the other way.** `585e5e0b` (33285's one-`simp` golf, hit by all three hygiene reps
+  and by `structured/2`) and `e8e02821` (a 33145 duality ask) are misses here. Two runs of two
+  versions cannot say whether that is the contract or the draw.
+- **Control PRs.** The judge counts 3 control findings, as for `structured/2`; the ledgers hold 4
+  control filings, every one a module-doc wording ask on a file the PR edits. The file cells added
+  no other kind of control finding.
+- **The fixes, as run.** End-of-file linter filings: 0 (the one `commandStart` mention is 33149's
+  real `set_option linter.style.commandStart false`). Compile reuse: 84 of 90 compile-checked
+  filings reused the reviewer's own compile. Ledger: 1,950 cells, 7.1% `would_change`.
+- **Cost.** 33.0M processed tokens, 3.0M of them in the four attempts B's limit cut off; the
+  prompt re-read is 59% (`session_waste.py`). A Pro window held about 19-20M.
+
+Altitude: one rep of `structured/3`, inside a baseline that spreads by 2. Reps 2 and 3 of
+`structured/3` decide whether 10 holds, and whether the golf ask's loss is the draw.

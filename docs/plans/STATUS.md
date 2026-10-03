@@ -245,7 +245,10 @@ names as the new reference baseline.
   plan §5's lever threshold, met at the boundary, one rep. Then, by the user's decision, fixes
   before the reps: the end-of-file linter artifact (framework), compile reuse at submission, file
   ledger cells (`structured/3`), D2's union keeping every finding, and design versions sealed into
-  the plan. Not run: `structured/3` on Claude (three reps), D2 on Claude.
+  the plan. `structured/3` dev rep 1 on Claude (2026-10-03, on the Pro accounts B and C, the
+  primary untouched): 10 of 23 again, control emission 1.5; the file cells reached 33305's line
+  wrap; the two D1 runs together reach 12, the four-pass union's count, at a fifth of its control
+  emission. Not run: `structured/3` reps 2 and 3, D2 on Claude.
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan
   §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
   in turns and tokens on the large PRs.

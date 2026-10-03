@@ -33,3 +33,9 @@ finding D1 rep 1 made is already a module-doc wording ask.
 
 **Risk.** Control PRs are mostly module-doc edits (33304, 33315), and D1's three control findings
 are all module-doc wording; a file cell for the module doc invites more of exactly that.
+
+**First measurement (2026-10-03).** `structured/3` dev rep 1 on Claude reached `cc44bb99` (the
+33305 line wrap) and 10 of 23 overall at control emission 1.5; every control filing is a
+module-doc wording ask, 4 in the ledgers, 3 by the judge's count, as under `structured/2`. Lost
+against `structured/2`: `585e5e0b` and `e8e02821`. One rep; the close condition (the file-level
+obligations reached without losing declaration hits) waits for reps 2 and 3.
