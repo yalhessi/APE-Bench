@@ -114,29 +114,30 @@ setup-file` emits). Base artifacts with only the rebuilt modules repointed repro
 reviewed compile of `Positive.lean` message for message (0 errors); base alone gives the 3
 ``Unknown constant `Submodule.coe_starProjection_eq_isComplProjection` `` errors.
 
-**Building, without the 2.7 GB copy** (`farm_build.py`, `farm_iterative.py`). The new root's
-sources are the existing source overlay; `.lake/build` is a *farm*: real directories only on the
-paths to modules Lake will write, every other entry a symlink into the base's build. A module Lake
-must rewrite while its files are still links fails loudly -- the write lands on the base's 444 inode
-(directories 555) -- so a wrong guess can never touch the base.
+**Building, without the 2.7 GB copy.** The new root's sources are the existing source overlay;
+`.lake/build` is a *farm* of links into the base's build, with real files only where Lake may
+write. Three variants were built and checked against the copy-built workspace:
 
-| | 33337 (2 changed) | 9806 (13 changed) |
-|---|---|---|
-| import-graph superset (`farm_build.py`), one pass | 10 modules, 80 s, 31 MB | **120** modules, 170 s, 213 MB |
-| Lake's own set (`farm_iterative.py`): start with the changed modules, materialize what Lake is refused | 10 modules after 5 refusals, 151 s over 6 passes, 31 MB | 13 modules, 1 pass, **21 s, 16 MB** |
-| the copy it replaces | 10 modules; 2.8 GB copied (~10 min recorded for 33337) | 13 modules; 2.8 GB copied |
-| farm made in (tmpfs) | 0.1-0.2 s, ~950 links | 0.7-1.3 s, 3,000-6,400 links |
+| | 33337 (2 changed) | 9806 (13 changed) | 33321 (5 changed, one new; touches `Algebra/Group/Hom/Basic`) |
+|---|---|---|---|
+| import-graph superset (changed modules and every module between them and a target) | 10 | 120 | 797 |
+| modules Lake rebuilt in the copy-built workspace | 10 | 13 | 797 |
+| **copy-on-write farm** (`farm_cow.py`): real copies of the superset's files, links for the rest; one Lake pass | **10 rebuilt, 97 s, 16 MB copied** | **13 rebuilt, 28 s, 170 MB** | **797 rebuilt, 446 s, 765 MB** (13 s to lay down) |
+| refusal loop (`farm_iterative.py`): materialize a module only when Lake is refused | 10, 151 s, 6 passes | 13, 21 s, 1 pass | stopped after 25 passes, >15 min: one rebuild layer per pass |
+| superset with no files at all (`farm_build.py`) | 10, 80 s | 120 (over-built), 170 s | -- |
 
-Both PRs' farms: `lake build --no-build` reports everything up to date; every `.olean`, `.ilean`,
-`.ir` and `.c` is byte-identical to the copied workspace's (only `.trace` logs and `.setup.json`
-embed the root path); the cold path compiles `Positive.lean` with 0 errors; a Lean server opened on
-the farm reports 0 errors for `Positive.lean` and `Spectrum.lean` and maps the **base's own**
-`.olean` inodes (4,344 and 4,322 mappings) plus the farm's rebuilt ones (18, 14). The superset
-over-builds when the PR does not change a module's public interface: Lean's module system then
-rebuilds nothing downstream, and that is knowable only after the upstream module is built -- which
-is why the record said the rewrite set is "not knowable before the build runs". The refusal loop
-learns it from Lake instead. Not yet tried on NFS (the farm here is on tmpfs; symlink creation is
-the only step whose cost moves) or on a PR that adds or deletes modules.
+The copy-on-write farm is the one to build: one pass, Lake's exact rebuild set every time (it rebuilt
+13 of 120 on 9806 because copies of modules whose public interface did not change stay valid), never
+a write into the base (links point at 444 files in 555 directories, and a module Lake might rewrite
+is a real copy), and a copy bounded by the superset instead of the whole build. In every farm, `lake
+build --no-build` reports everything up to date and every `.olean`, `.ilean`, `.ir` and `.c` Lake wrote
+is byte-identical to the copied workspace's (only `.trace` logs and `.setup.json` embed the root
+path). On 33337, `Positive.lean` compiles with 0 errors through the cold path and through a Lean
+server, which maps the base's own `.olean` inodes (4,344) plus the farm's rebuilt ones (18), so a
+base's reviewed workspaces share one page cache. The import-graph prediction cannot be exact in
+advance under Lean's module system, which rebuilds downstream only when an upstream public interface
+changed -- that is what the record meant by "not knowable before the build runs"; the copies make it
+unnecessary to know. Built on tmpfs; NFS is untried (only laying down the farm should move).
 
 ## 5. Early edits in slow files: a safe cut covers about half, the rest is genuinely sequential
 
@@ -212,6 +213,39 @@ path and the worker maps the reviewed copy's `.olean`s (422 mappings). The exist
 `LeanCodeToolsProvider` (`code_hover`, `code_goto`, `get_lean_goal`) resolves the path and walks up
 to the nearest `lean-toolchain`, so on an unchanged file it presumably runs against the base, not the
 reviewed workspace; not tested.
+
+## 8. PRs that add or delete modules, and `import Mathlib`
+
+In the validation set (60 PRs, a natural-rate draw), **10 add Lean modules (17%)**, 14 new modules in
+all, 4 PRs consisting only of new files; **none delete one** (nor in the 16 dev PRs, 2 of which add one:
+33149 GalerkinRegularity, 33321 BaseExists). Deletions are rare, below ~5% on this sample.
+
+- **Checking a new file** needs nothing special: it is a real file in the reviewed workspace, and the
+  replays above already served GalerkinRegularity and BaseExists edits through the server.
+- **Building a new module**: it is a target and part of the superset with no base files to copy; the
+  copy-on-write farm built 33321's BaseExists in its single pass.
+- **Importing a new module directly** works: `import Mathlib.LinearAlgebra.RootSystem.BaseExists` then
+  `#check @RootPairing.baseOf_pairwise_pairing_le_zero` answers.
+- **`import Mathlib` does not, in today's reviewed workspaces** (`aggregator_33321.txt`): the same `#check`
+  under `import Mathlib` is ``Unknown constant `RootPairing.baseOf_pairwise_pairing_le_zero` ``. Only the
+  changed modules and those between them are rebuilt; `Mathlib.lean` (the aggregator the PR edits to
+  add the import) and everything else downstream are the base's -- Lake lists **571** modules plus the
+  aggregator as out of date. So `import Mathlib` in a reviewed workspace is the base library with the
+  rebuilt modules mixed in: it misses new modules and can load modules stale against the PR's changed
+  interfaces. 58 of 258 recorded snippets (22%) start with `import Mathlib`. This is a defect of the
+  current reviewed workspaces, independent of the server design.
+- **Making it exact** means building the PR's whole downstream cone. On the base import graph (7,437
+  modules) the validation PRs' cones are median 552 modules, p90 6,235, max 7,407; 29 of 60 reach
+  1,000 or more -- near a full Mathlib build for half the PRs, per PR, before the module system's
+  rebuild avoidance (13 of 120 on 9806, 797 of 797 on 33321). Cheaper options, untried: Mathlib's own
+  content-addressed cache (`lake exe cache get` keys files by content, and CI builds every PR, so the
+  PR's full build may already exist; the cache binary does not run in these workspaces as built);
+  adding the PR's new modules to an `import Mathlib` snippet's header (new declarations visible, stale
+  downstream modules still stale); or saying in the result that `import Mathlib` is the base library
+  plus this PR's rebuilt modules.
+- **Deleting a module**: the farm should simply not link the deleted module's files, so importing it
+  fails as it would on the PR; the copy keeps the stale files importable. Untested -- no PR in the
+  samples deletes one.
 
 ## Reproduce
 

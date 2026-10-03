@@ -1,0 +1,6 @@
+# 33321's copy-built reviewed workspace (+b156e3e2fecd): `import Mathlib` cannot see the module the PR adds
+## import Mathlib; #check @RootPairing.baseOf_pairwise_pairing_le_zero  (lake env lean, 35.8 s)
+{"caption":"","data":"Unknown constant `RootPairing.baseOf_pairwise_pairing_le_zero`","endPos":{"column":51,"line":2},"fileName":"/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/616a3821-80e9-422b-894a-d357dc512163/scratchpad/agg_probe.lean","isSilent":false,"keepFullRange":false
+## import Mathlib.LinearAlgebra.RootSystem.BaseExists; same #check
+{"caption":"","data":"@RootPairing.baseOf_pairwise_pairing_le_zero : ∀ {ι : Type u_1} {R : Type u_2} {M : Type u_3} {N : Type u_4} [Finite ι]\n  [inst : AddCommGroup M] [inst_1 : AddCommGroup N] [inst_2 : CommRing R] [inst_3 : Module R M] [inst_4 : Module R N]\n  (P : RootPairing ι R M N) {S : 
+## lake build --no-build Mathlib: exit 3; modules listed as needing a rebuild: 571

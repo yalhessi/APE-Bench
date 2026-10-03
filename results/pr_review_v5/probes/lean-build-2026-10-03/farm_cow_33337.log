@@ -1,0 +1,8 @@
+changed modules: ['Mathlib.Analysis.InnerProductSpace.Positive', 'Mathlib.Analysis.InnerProductSpace.Projection.Submodule']
+closure 2183 modules; predicted rebuild 10: ['Mathlib.Analysis.InnerProductSpace.Adjoint', 'Mathlib.Analysis.InnerProductSpace.Calculus', 'Mathlib.Analysis.InnerProductSpace.Dual', 'Mathlib.Analysis.InnerProductSpace.PiL2', 'Mathlib.Analysis.InnerProductSpace.Positive', 'Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional', 'Mathlib.Analysis.InnerProductSpace.Projection.Submodule', 'Mathlib.Analysis.InnerProductSpace.Rayleigh', 'Mathlib.Analysis.InnerProductSpace.Spectrum', 'Mathlib.Analysis.Matrix.Hermitian']
+changed 2; superset 10 modules
+farm: 943 links, 130 copied files (16 MB) in 0.2s
+lake build rc=0 in 97s
+Lake rewrote 140 files for 10 modules (superset 10)
+rewritten files byte-identical to the copied reviewed workspace: 120/140
+lake build --no-build: 0 ["warning: batteries: repository '/tmp/claude-1905243447/-research-projects-proofedit-ya475-APE-Bench/616a3821-80e9-422b-894a-d357dc512163/scratchpad/farm33337c/.lake/packages/batteries' has local changes"]
