@@ -1,6 +1,6 @@
 # Lean checks from a persistent, incremental server, not a cold process per edit
 
-**Status** — open; measured 2026-10-03 on two sets of runs (corrected the same day for a client race), with the routing policy, concurrency, and the copy-free reviewed build settled by experiment; nothing built in `src/`
+**Status** — open; measured 2026-10-03 (corrected the same day for a client race): routing, one checker for both tools, concurrency and the copy-on-write reviewed build settled by experiment; `import Mathlib` found wrong in today's reviewed workspaces; nothing built in `src/`
 **Cost** — no spend to build or to replay; one Claude-subscription dev rep to confirm (bills nothing)
 **Motivating example** — Compile is **20–51% of session wall time** on the recent dev runs (Opus
 hygiene rep2: 76 of 147 min; one session 83%) and ~20% of arm time in the lead pipeline (rel050:
@@ -22,49 +22,55 @@ one dev rep shows compile below 10% of session wall, with findings unchanged in 
 
 ## Design, in order of payoff
 
-1. **A persistent checker per attempt and reviewed workspace.** One Lean server (the official one,
-   through `leanclient` with two fixes, below); a document per reviewed file, opened on first use.
-   Its diagnostics *are* the baseline (`_baseline_errors` stops compiling), and an as-is call is
-   answered from them. Each edit is `didChange` to the spliced text, routed by what it changes
-   (`classify_edits.py`): **cut after the changed declaration** when it is proof-only, comment-only,
-   or a statement change whose name nothing later mentions (50% / 58% of recorded edits); **import
-   edits to a separate cold process** (sending one to the document restarts it, and the next edit
-   pays a second restart: 23.0 s → 1.4 s once routed away); **whole file** otherwise. Measured on
-   both replays: median **0.41 / 0.48 s** against 10.3 / 9.6 s cold, totals 6.8× / 5.0× less, and
-   the same answer as the cold path on 109 of 110 (the axiom post-check). `lean_verify(code=…)`
-   uses one scratch document per distinct header. Keep the engine's `#print axioms` / sorry checks
-   by appending the command. Same response shape. The checker kind goes into the run plan.
-   - **Completion is Lean's `textDocument/waitForDiagnostics` for the exact version just sent, then
-     diagnostics stamped with that version** -- never leanclient's `get_diagnostics`, whose progress
-     handler ignores versions (5 of 13 warnings and a missing error at 0.0-0.1 s in one replay).
-   - **Documents keep the workspace's own path.** leanclient resolves symlinks into the URI, so a
-     reviewed workspace's unchanged file (a symlink into the base) opens in the base's environment
-     and its diagnostics never match; a 10-line subclass fixes it (probe `concurrency.py`).
-   - **Concurrency needs no extra builds.** Every check is read-only: 16 servers on one build answered
-     identically, per-edit median 0.50 → 0.74 s, ~1.45 GB per session (23 GB at 16).
-   - **What stays slow, and is correct to be slow:** an edit that changes a `variable` line,
-     a `def`/`abbrev` or anything later declarations use, early in an elaboration-heavy file --
-     ContinuousAlgEquiv's line-92 redesigns cost 10.7-12.2 s (cold 24 s) -- and import edits, at
-     today's cost. Untried: a second warm document per file (the edit after a redesign paid 9-14 s
-     to restore the prefix), exact references from the server instead of the text test, a two-phase
-     answer.
-2. **Reviewed workspaces as symlink farms, not copies -- feasible.** `.lake/build` becomes real
-   directories only on the paths Lake writes, everything else symlinks into the base's build; a
-   module Lake must rewrite while still a link is refused by the base's 444 inode, and that module
-   is materialized and the build resumed (`farm_iterative.py`). On 33337 (5 refusals, 6 passes) and
-   9806 (1 pass) it converged on exactly the copy's rebuild set (10 and 13 modules), wrote 31 and
-   16 MB in 151 and 21 s, produced byte-identical `.olean`/`.ilean`/`.ir`/`.c`, left Lake reporting
-   up to date, and compiled `Positive.lean` with 0 errors through both the cold path and a server --
-   which maps the base's own `.olean` inodes, so every reviewed workspace of one base shares one page
-   cache. It replaces `_materialize_build_tree`'s 2.7 GB copy (~10 min each), which matters for the
-   validation and test sets' reviewed workspaces, still open in `eval-set-selection.md`. Not yet
-   tried on NFS or on a PR that adds or deletes modules. The import-graph superset is the one-pass
-   alternative, safe but over-building (120 modules against Lake's 13 on 9806).
-3. **No lake and no NFS on the hot path.** `lake setup-file` once per file, then `lean --setup`.
-   This also fixes a fidelity gap: the cold path never applies Mathlib's `autoImplicit false`,
-   `maxSynthPendingDepth 3`, `pp.unicode.fun` or linter options, which the setup data carries.
-   Stage the read-only closure on tmpfs or `/data/local` keyed by base commit: imports load in 2.5 s
-   against 7.5–8.7 s. This speeds up whatever stays cold: server opens, import edits, builds.
+1. **One checker for `lean_verify` and `lean_verify_edit`: a Lean server per attempt and reviewed
+   workspace, holding a few documents keyed by import header.** The reviewed file's document is
+   pinned; its open diagnostics are the baseline and answer an as-is call (`_baseline_errors` stops
+   compiling). A body edit goes to it, routed by what it changes (`classify_edits.py`): **cut after the
+   changed declaration** when proof-only, comment-only, or a statement change whose name nothing later
+   mentions (50-58% of edits), **whole file** otherwise. An **import edit goes to the cold path** (a
+   fresh document under the new header was slower than cold, 23.1 s against 16.2 s). A **snippet goes
+   to the document for its header**, at a path that need not exist (the server accepts one inside the
+   read-only reviewed workspace and elaborates it against that workspace's build). Replayed over 12
+   whole recorded sessions, 146 calls in order: **2,071 s → 994 s (2.1×)**, edits 2.3×, snippets 1.7×;
+   the same answer on 142, the other four being rendering (3) and the `autoImplicit` gap with the
+   server right (1). On edits alone, both replays: median **0.41 / 0.48 s** against 10.3 / 9.6 s.
+   - **Snippets gain only when their header is already open** (0.36 s warm against 8.5 s to open). Two
+     headers known at session start -- the reviewed module, `import Mathlib` -- cover two thirds of
+     recorded snippets; opening them in the background is estimated to take snippets from 355 s to
+     ~164 s (cold 596 s), at the memory of a full-Mathlib document per session. Not measured.
+   - **Completion is Lean's `textDocument/waitForDiagnostics` for the exact version, then
+     diagnostics stamped with it** -- never leanclient's `get_diagnostics` (it returned the previous
+     version's messages at 0.0-0.1 s). **Documents keep the workspace's own path** -- leanclient
+     resolves symlinks, so an unchanged reviewed file opens in the base. Both fixed by a ~30-line
+     subclass (probe `replay_sessions.py`).
+   - **Concurrency needs no extra builds**: 16 servers on one read-only build answered identically,
+     per-edit median 0.50 → 0.74 s, ~1.45 GB per session. Keep the engine's `#print axioms` / sorry
+     checks by appending the command. The checker kind goes into the run plan.
+   - **What stays slow, correctly:** an early edit that changes what later declarations use, in an
+     elaboration-heavy file (ContinuousAlgEquiv's line-92 redesigns, 10.7-12.2 s against 24 s), import
+     edits (today's cost), and a snippet under a header nobody opened. Untried: a second warm copy of
+     the file, exact references from the server, a two-phase answer.
+2. **Reviewed workspaces as copy-on-write farms -- feasible, one Lake pass, exact.** `.lake/build`
+   becomes links into the base's build, except real copies (mtimes kept) of every file in the
+   import-graph superset (changed modules and every module between them and a target); new modules
+   need no files. Lake rewrites exactly what its traces call stale: 10 / 13 / 797 modules on
+   33337 / 9806 / 33321, the same as the copy-built workspaces, in 97 / 28 / 446 s, copying 16 / 170 /
+   765 MB instead of 2.8 GB; byte-identical build products; nothing ever written into the base; a
+   server on the farm maps the base's own `.olean` inodes. Replaces `_materialize_build_tree`'s copy.
+   Not yet tried on NFS or with a deleted module (the farm should not link its files).
+3. **`import Mathlib` in a reviewed workspace is not the PR's library, today.** Only changed and
+   in-between modules are rebuilt, so the aggregator and the rest of the downstream cone are the
+   base's: on 33321 a `#check` of the lemma the PR adds is Unknown constant under `import Mathlib`
+   (importing the new module directly works), and Lake lists 571 modules plus the aggregator as stale.
+   22% of snippets use `import Mathlib`; 17% of validation PRs add modules. Exact means building the
+   downstream cone (median 552 modules, 29 of 60 PRs at 1,000+). Cheaper, untried: Mathlib's
+   content-addressed cache may already hold the PR's build; or add the PR's new modules to such a
+   snippet's header; at least, say what `import Mathlib` resolves to.
+4. **No lake and no NFS on the hot path.** `lake setup-file` once per file, then `lean --setup`; this
+   also fixes the fidelity gap (the cold path never applies Mathlib's `autoImplicit false`,
+   `maxSynthPendingDepth 3`, `pp.unicode.fun`, linter options -- one replayed snippet already gave a
+   different answer because of it). Stage the read-only closure on tmpfs or `/data/local`: imports
+   load in 2.5 s against 7.5-8.7 s, which is what every document open and cold call still pays.
 
 **Start here**
 - read: `results/pr_review_v5/probes/lean-build-2026-10-03/README.md` (every number above);

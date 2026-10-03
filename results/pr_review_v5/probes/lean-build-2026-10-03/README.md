@@ -247,6 +247,57 @@ all, 4 PRs consisting only of new files; **none delete one** (nor in the 16 dev 
   fails as it would on the PR; the copy keeps the stale files importable. Untested -- no PR in the
   samples deletes one.
 
+## 9. One design for `lean_verify` and `lean_verify_edit`
+
+**The recorded snippets** (258 `lean_verify` calls in 56 sessions of six Claude runs): `example` 74,
+`#check` 73, both 30, small theorems 22, other 56; median 10 lines. Their imports: **only the PR's
+own changed modules 117 (45%)** -- usually the reviewed file's module -- **`import Mathlib` 58
+(22%)**, other specific modules 68 (26%), a mix 15 (6%). 27 sessions use one header, 12 two; a
+distinct header serves 1.9 calls on average.
+
+**The design.** One Lean server per attempt and reviewed workspace, holding a pool of documents
+keyed by import header (at most 3 open; least recently used closed first):
+- the reviewed file's document, at its own path, pinned. Its open diagnostics are the baseline and
+  answer an as-is call;
+- an edit to the file's body goes to that document, cut after the changed declaration when sound,
+  whole file otherwise (sections 3, 5);
+- an import edit goes to the cold path: a fresh document under the new header was *slower* than
+  cold (median 23.1 s against 16.2 s), because opening one costs a `lake setup-file` besides the import;
+- a snippet goes to the document for its header. Hosting needs no file: the server accepts a
+  document at a path that does not exist, inside the read-only reviewed workspace or under /tmp, and
+  elaborates it against that workspace's build -- in 33337's reviewed workspace `#check
+  @Submodule.coe_starProjection_eq_isComplProjection` answers, in its base it is Unknown constant; a
+  second body under the same header took 0.01 s.
+
+**Replayed whole sessions** (`replay_sessions.py`): the 12 review-designs structured/3 sessions that
+used `lean_verify`, every call in recorded order -- 146 calls, 41 of them snippets -- through one
+server each, against the branch's cold path (`sessions_review_designs.jsonl`, `sessions_analysis.txt`):
+
+| route | calls | cold median → server median | cold total → server total | same answer |
+|---|---|---|---|---|
+| edit, cut | 54 | 9.7 → **0.47 s** | 712 → 209 s | 54/54 |
+| edit, whole file | 37 | 10.3 → **2.17 s** | 516 → 175 s | 36/37 |
+| as-is (pays the file's open) | 10 | 13.1 → 13.5 s | 180 → 171 s | 10/10 |
+| import edit, new document | 4 | 16.2 → 23.1 s | 67 → 84 s | 4/4 |
+| snippet, header already open | 17 | 22.7 → **0.36 s** | 328 → 69 s | 14/17 |
+| snippet, new header | 24 | 8.2 → 8.5 s | 267 → 286 s | 24/24 |
+| **all** | 146 | | **2,071 → 994 s (2.1×)** | 142/146 |
+
+Per session 0.8-7.2×, median 2.2×; edits 2.3×, snippets 1.7×. Opening a document costs about a cold
+compile, so a snippet gains only when its header is already open. The cold side here omits today's
+extra baseline compile per file, so it is slightly understated.
+
+**The four disagreements** (`sessions_disagreements.jsonl`, re-run with texts): three are the same
+`aesop` failure with the goal printed differently; the fourth is the option gap of section 2 with the
+server right -- a snippet using an unbound `ω` is a type mismatch under the cold path's default
+`autoImplicit true` and ``Unknown identifier `ω` `` under Mathlib's `autoImplicit false`, which the
+server applies even to a scratch document in the workspace.
+
+**Pre-warming, estimated, not measured:** opening the reviewed module's header and `import Mathlib`
+at session start would cover two thirds of recorded snippets. Re-pricing the 13 of 24 snippet opens
+whose header that would have warmed at the warm median takes snippets from 355 s to ~164 s (cold
+596 s), at the memory cost of a full-Mathlib document per session.
+
 ## Reproduce
 
 ```
