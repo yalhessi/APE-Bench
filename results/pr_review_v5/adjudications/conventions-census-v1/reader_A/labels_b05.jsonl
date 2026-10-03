@@ -1,0 +1,125 @@
+{"cid": "v0913", "principle_id": "P021", "second_principle_id": "P238", "none_reason": "", "new": false, "confidence": "unsure", "note": "P021 for def-not-instance; P238 created as second for the misleading name"}
+{"cid": "v1365", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "question whether omitting a hypothesis is a mistake in this PR"}
+{"cid": "v0365", "principle_id": "P006", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0703", "principle_id": "P239", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "linter strengthened after a boundary cleanup; borderline regularity"}
+{"cid": "v0484", "principle_id": "P004", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "derive the specific from the general; extraction already present"}
+{"cid": "v1718", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "new": false, "confidence": "sure", "note": "'Same here' with no parent shown"}
+{"cid": "v2087", "principle_id": "P240", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1591", "principle_id": "P127", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0482", "principle_id": "P125", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "docstring reworded into full sentences; otherwise prose polish"}
+{"cid": "v0147", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "grammar copy-edit of one docstring line"}
+{"cid": "v2289", "principle_id": "P208", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0870", "principle_id": "P030", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1063", "principle_id": "P010", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2080", "principle_id": "P048", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "pointed question why a shared variable was removed"}
+{"cid": "v0467", "principle_id": "P105", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1248", "principle_id": "P084", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0155", "principle_id": "P003", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1329", "principle_id": "P241", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "design stance against erw-like modes; may be one-off"}
+{"cid": "v0982", "principle_id": "P010", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2050", "principle_id": "P122", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0286", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "question about an unclear phrase in this docstring"}
+{"cid": "v0971", "principle_id": "P172", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "broadened P172 to a more useful reformulation replacing the old lemma"}
+{"cid": "v0180", "principle_id": "P065", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P065 to include closing by rfl across defeq"}
+{"cid": "v0381", "principle_id": "P086", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "def succ t := t + 1 redundant with existing notation"}
+{"cid": "v0893", "principle_id": "P083", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P083 from simp normal form to equation direction across siblings"}
+{"cid": "v1188", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0294", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "fix the build"}
+{"cid": "v0974", "principle_id": "P043", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0140", "principle_id": "P212", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "docstring asked to add the precise defining formula"}
+{"cid": "v1467", "principle_id": "P166", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P166 to filter goals handled by filter_upwards"}
+{"cid": "v0490", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1706", "principle_id": "P242", "second_principle_id": "P063", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0085", "principle_id": "P243", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "section coextensive with the file; could be about its variable line"}
+{"cid": "v2212", "principle_id": "P160", "second_principle_id": "P084", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0662", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "new": false, "confidence": "sure", "note": "'Same here' with no parent shown"}
+{"cid": "v0709", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "reviewer confused by one change; no request stated"}
+{"cid": "v0283", "principle_id": "P244", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0423", "principle_id": "P245", "second_principle_id": "P144", "none_reason": "", "new": true, "confidence": "unsure", "note": "suggestion also merges repeat into <;> (P184)"}
+{"cid": "v1788", "principle_id": "P066", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1639", "principle_id": "P013", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1276", "principle_id": "P164", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P164 to leaving instances anonymous by default"}
+{"cid": "v2000", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "question about duplication with another PR"}
+{"cid": "v0437", "principle_id": "P004", "second_principle_id": "P074", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2266", "principle_id": "P246", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0038", "principle_id": "P247", "second_principle_id": "P074", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1683", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0226", "principle_id": "P248", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0430", "principle_id": "P059", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2020", "principle_id": "P017", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1864", "principle_id": "P094", "second_principle_id": "P133", "none_reason": "", "new": false, "confidence": "unsure", "note": "broadened P133 to norm_num; mod_cast point not labelled"}
+{"cid": "v0428", "principle_id": "P249", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0056", "principle_id": "P164", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2248", "principle_id": "P078", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "asks the reason for a dsimp% workaround"}
+{"cid": "v1170", "principle_id": "P185", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "doc-polish PR changed wording without reason"}
+{"cid": "v0840", "principle_id": "P101", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "remove an unwarranted TODO comment"}
+{"cid": "v2132", "principle_id": "P156", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2052", "principle_id": "P122", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0370", "principle_id": "P038", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1450", "principle_id": "P159", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P159 to have with binders instead of intro"}
+{"cid": "v2230", "principle_id": "P206", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0994", "principle_id": "P040", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1458", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "refers to advice given elsewhere; content not in this ask"}
+{"cid": "v2072", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1185", "principle_id": "P154", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2220", "principle_id": "P052", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0156", "principle_id": "P043", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1654", "principle_id": "P250", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1772", "principle_id": "P251", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1820", "principle_id": "P252", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0961", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "new": false, "confidence": "sure", "note": "'same as above' with no parent shown"}
+{"cid": "v1539", "principle_id": "P119", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0593", "principle_id": "P209", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0158", "principle_id": "P107", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1332", "principle_id": "P140", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2183", "principle_id": "P100", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1318", "principle_id": "P022", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P022 to calling an existing simp set by name"}
+{"cid": "v1265", "principle_id": "P007", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2163", "principle_id": "P007", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0050", "principle_id": "P070", "second_principle_id": "P253", "none_reason": "", "new": false, "confidence": "sure", "note": "P253 created as second for the reassoc attribute"}
+{"cid": "v1208", "principle_id": "P078", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "reviewer hedges; asks a comment explaining the awkward proof"}
+{"cid": "v0145", "principle_id": "P028", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "IsPullback variant as a form users apply"}
+{"cid": "v1632", "principle_id": "P063", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "GCH at a cardinal generalises CH; design musing"}
+{"cid": "v0089", "principle_id": "P203", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1852", "principle_id": "P201", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1996", "principle_id": "P004", "second_principle_id": "P074", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0398", "principle_id": "P060", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0632", "principle_id": "P213", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "namespace choice between theories, not root vs namespace"}
+{"cid": "v0751", "principle_id": "P248", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1763", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "possible oversight copying string slices"}
+{"cid": "v0394", "principle_id": "P165", "second_principle_id": "P007", "none_reason": "", "new": false, "confidence": "unsure", "note": "also references an external PR"}
+{"cid": "v0110", "principle_id": "P254", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v2214", "principle_id": "P226", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "← h.symm collapses to h"}
+{"cid": "v0051", "principle_id": "P019", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0223", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "typo fix"}
+{"cid": "v0574", "principle_id": "P255", "second_principle_id": "P256", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1090", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "left/right suffix slip in one name"}
+{"cid": "v1275", "principle_id": "P100", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1629", "principle_id": "P123", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "question whether to make this the simp normal form"}
+{"cid": "v2165", "principle_id": "P130", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2265", "principle_id": "P011", "second_principle_id": "P004", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2125", "principle_id": "P089", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0954", "principle_id": "P107", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0280", "principle_id": "P257", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "unsure", "note": "vague docstring phrase; borderline copy-edit"}
+{"cid": "v0710", "principle_id": "P133", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "question whether the simp_all is still non-terminal"}
+{"cid": "v1264", "principle_id": "P010", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v2007", "principle_id": "P102", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1049", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "fix the build"}
+{"cid": "v1616", "principle_id": "P139", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "docstring claim outdated by have's new features"}
+{"cid": "v2209", "principle_id": "P074", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "broadened P074 to directory placement of a new file"}
+{"cid": "v1784", "principle_id": "P252", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": "broadened P252 to examples illustrating definitions"}
+{"cid": "v0517", "principle_id": "P036", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0091", "principle_id": "P017", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1622", "principle_id": "P028", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0537", "principle_id": "P063", "second_principle_id": "P074", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0860", "principle_id": "P258", "second_principle_id": "", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v1694", "principle_id": "P119", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v1198", "principle_id": "P120", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "sum version alongside add_apply"}
+{"cid": "v1492", "principle_id": "P004", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0878", "principle_id": "P259", "second_principle_id": "P045", "none_reason": "", "new": true, "confidence": "sure", "note": ""}
+{"cid": "v0146", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "typo fix"}
+{"cid": "v2186", "principle_id": "P185", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "doc-tidy PR changed wording without reason"}
+{"cid": "v2093", "principle_id": "P208", "second_principle_id": "", "none_reason": "", "new": false, "confidence": "unsure", "note": "two grinds replaced by direct application and term"}
+{"cid": "v2152", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "trailing space in a string literal"}
+{"cid": "v1674", "principle_id": "P089", "second_principle_id": "P001", "none_reason": "", "new": false, "confidence": "sure", "note": ""}
+{"cid": "v0346", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "new": false, "confidence": "sure", "note": "wrong arrow direction in docstring"}
