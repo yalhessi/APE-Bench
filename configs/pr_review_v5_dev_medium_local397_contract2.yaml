@@ -1,0 +1,21 @@
+# Contract v2 under ape_agent on the self-hosted Qwen3.5-397B -- the iteration tier, not for the record.
+#
+# The gpt_5.2 contract-v2 config (2 of 23 on the dev held-out 12) with only the model changed, as in
+# results/pr_review_v5/probes/local-quality-2026-10-02/ (2, 0, 2 of 23 reasoning off). The server is
+# results/pr_review_v5/probes/local-vllm-2026-10-02/serve.sbatch on `first`, port 8012, serving the
+# HF id as an alias. `run_plan.json` names `elm_qwen_3.5` and the endpoint only inside
+# `scaffold_config_sha256`, so the run name must say where it ran: name every run `iter_local397_*`.
+#
+# The unlock conditions (results/pr_review_v5/probes/local-unlock-2026-10-03/) vary one thing each
+# by --set: system_prompt_role, system_prompt_file, llm_config.temperature.
+extends: pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml
+
+llm_config:
+  model_name: elm_qwen_3.5
+  openai_api: chat_completions
+  openai_responses_reasoning_carryover: false
+  reasoning_effort: none
+  base_url: http://127.0.0.1:8012/v1/chat/completions
+
+execution:
+  max_concurrency: 12
