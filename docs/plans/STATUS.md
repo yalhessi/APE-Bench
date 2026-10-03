@@ -248,7 +248,12 @@ names as the new reference baseline.
   the plan. `structured/3` dev rep 1 on Claude (2026-10-03, on the Pro accounts B and C, the
   primary untouched): 10 of 23 again, control emission 1.5; the file cells reached 33305's line
   wrap; the two D1 runs together reach 12, the four-pass union's count, at a fifth of its control
-  emission. Not run: `structured/3` reps 2 and 3, D2 on Claude.
+  emission. D2 `structured_critic/2` dev rep 1 on Claude, reading `structured/3` rep 1 (2026-10-03,
+  2 sessions on C, 13 on the main account): 11 of 23, control emission 2.0 -- +1 against plan §5's
+  +2, so not, as built, at one rep. The +1 is the critic's verified overturn of 33285's golf, which
+  `structured/3` had lost and the three hygiene reps and `structured/2` reached; 28 overturns, 0
+  refutes of D1's 138 filings, the critic stage about as costly as D1. Not run: `structured/3`
+  reps 2 and 3, D2 reps.
   Open: whether a critic session nests inside a Claude Code session on the subscription (plan
   §2's first choice; untested, and the chained form needs no nesting), and the ledger's cost
   in turns and tokens on the large PRs.

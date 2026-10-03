@@ -385,3 +385,58 @@ What it shows: the critic argues with evidence, overturns sparingly, and did not
 emission on the control it reached. What it cannot show: whether D2 reaches obligations D1 missed;
 those sit on the PRs not yet run. Starting a D2 run on a part-spent Pro window cost more in cut-off
 sessions (6.9M) than it finished (1.9M); the remaining 13 sessions are best resumed on a fresh window.
+
+## D2 `structured_critic/2` on Claude, reading `structured/3` rep 1: read against the rule
+
+`probe_dev_structured3_critic_hygiene_claude_sub_rep1`, complete: 2 sessions on account C, the
+other 13 resumed on the main account (the user: "finish the run on the main account window"),
+none failed there. Containment clean and usable on all 15 producing attempts. Judged for $0.42
+(audit `probe-dev-structured3-critic-hygiene-claude-sub-rep1`); read with `read_critic.py`.
+
+| | D1 `structured/3` rep 1 | **D2 on it** | D1 `structured/2` ∪ `/3` |
+|---|---|---|---|
+| obligations hit, of 23 | 10 | **11** | 12 |
+| findings | 130 | 158 | 258 |
+| paired with gold | 39 | 42 | |
+| control findings (per control PR) | 1.5 | 2.0 | |
+| processed tokens | 33.0M | 37.6M (6.9M of it cut off on C) | |
+
+**Not, as built, by plan §5's rule** (a lever at +2 obligations with control emission at most
+2.0; "fewer" is not as built). The critic added **+1**. The restatement above ("not at 10 or
+fewer") left 11 between its two bars; plan §5 was written first and is stricter, and this reads
+by it. One rep, one obligation: at the altitude of the designs tried so far, not a verdict on
+critics.
+
+- **The +1 is the critic's own and is a recovery, not a new reach.** `585e5e0b` (33285's
+  one-`simp` golf) was hit by all three hygiene reps and by `structured/2`, and lost by
+  `structured/3`. The critic overturned D1's `no_issue` on that proof with a verified one-line
+  term proof (`symm_apply_eq.2 rfl`), judged an issue and resolution match. No D1 finding changed
+  status under the re-judging: the other 10 hits are D1's, and nothing was lost.
+- **Positions.** 1,950 cells: 1,784 `concede`, **28 `overturn`** (1.5% of `no_issue` cells),
+  137 `confirm`, 1 `undecided`, **0 `refute`**. The critic disagreed with none of D1's 138 filings.
+  Overturns by concern: statement 14, library 4, proof 3, organization 2, module doc 2, docstring,
+  name, placement 1 each; 25 filed verified, 3 unverified, none refuted at submission. They
+  cluster on 33421 (6), 33149 (5), 33098 (4) and 33294 (4).
+- **What the 27 unaligned overturns are.** They are concrete and evidenced. Examples: a docstring
+  that states a false result (33362), `spectralCurl` missing a 2π (33149), a 28-line proof of a
+  library lemma (33098, `Metric.IsCover.of_maximal_isSeparated`), deprecated shims whose
+  hypothesis silently changed meaning (33294), and redundant imports (33321). Gold is a lower
+  bound, so unaligned is not wrong; nothing here adjudicates them.
+- **Control PRs.** Two control findings became four (judge: 1.5 → 2.0 per control PR, at the
+  ceiling). The critic's one addition is on 33315: a module doc the PR edits still names
+  declarations that do not exist, filed verified. It is the same kind of ask as D1's four
+  module-doc control filings, and the critic refuted none of them.
+- **Cost.** The critic stage cost about as much as D1 itself (30.7M in finished sessions against
+  D1's 33.0M; where its tokens went is not measured). Against the cost-matched alternative, two
+  independent D1 passes reach 12 together. They are two contract versions, so that comparison is
+  suggestive, not clean.
+
+Untried critic designs, before anything is concluded about critics:
+
+- a critic on a different model from the first stage (here both were Opus 5.5, so they share
+  blind spots: 0 refutes may be agreement or deference);
+- a critic that sees the first stage's evidence (tool outputs, compiles) rather than its ledger
+  reasons alone;
+- a critic aimed at the concerns where the misses sit (convention and mechanism knowledge), rather
+  than at every `no_issue` cell evenly;
+- K independent first-stage passes unioned, the cost-matched rival above (plan of 2026-10-01).
