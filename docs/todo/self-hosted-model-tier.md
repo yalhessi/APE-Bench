@@ -39,6 +39,16 @@ taken, prompt caching must be handled, not assumed.
   - The direction is closed in `docs/dead-ends.md` ("The self-hosted Qwen3.5-397B as the
     design-iteration reviewer"), with the untried models and what reopens it.
   - Build item 1 (the provider entry) is now worth building only for the early-testing use.
+- **Steering screen, 2026-10-03** (`results/pr_review_v5/probes/local-unlock-2026-10-03/`, branch
+  `local-model-unlock`).
+  - 13 settings over 23 judged runs, one variable each: system role, over-file, conventions,
+    temperature, examples, brainstorm, specialists, diff-only, tool-free, evidence mandate, Claude
+    Code harness, comments-first, and over-file with reasoning.
+  - No single pass leaves the floor (best 3 of 23).
+  - Over-file is the best direction: 3, 3, 0, 1, 0, and its five passes reach 4 in union.
+  - Reach across every run is capped at 5 of 23.
+  - The branch also carries `ApeAgentConfig.system_prompt_role` and a preflight refusal of a
+    missing brief or context file.
 **Cost** — no spend for generation: GPU time on the `first` partition. Judging the calibration runs
 is the only bill.
 

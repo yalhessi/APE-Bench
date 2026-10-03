@@ -90,3 +90,59 @@ Rules, as above:
   three reps (2). It advances at a union ≥ 4.
 - **K** is read the same way: the union of five passes against the condition's own single-pass
   mean.
+
+## Result (2026-10-03): nothing lifts a single pass off the floor; over-file is the best direction
+
+23 judged runs, 13 settings, every session successful and control emission 0 throughout. The table
+is `screen.py`; unions are from `cli report conditions`.
+
+| setting | obligations per rep | union | empty real PRs | hits / finding | reading by the rule |
+|---|---|---|---|---|---|
+| base (contract v2) | 2, 0, 2 | 2 | 2-4 | 0.00-0.08 | the floor |
+| **O over-file** | **3, 3, 0, 1, 0** | **4** (five passes) | **1-2** | 0.00-0.10 | first three reps' mean 2.0 < 3.33: not a lever; **K, its five-pass union, reaches the advance bar of 4** |
+| Q over-file + reasoning high | 3 | - | 2 | 0.088 | < 4 |
+| U no system role | 2 | - | 3 | 0.087 | no effect |
+| E examples | 2 | - | 3 | 0.074 | < 4; 31 judged pairs (base 2-11) |
+| N near tool-free | 2 | - | 5 | **0.200** | < 4; best aim, least volume |
+| C conventions as directive | 1 | - | 3 | 0.023 | < 4; most volume, worst aim |
+| B brainstorm, then verify | 1 | - | 3 | 0.062 | < 4 |
+| D diff only | 1 | - | 2 | 0.040 | < 4 |
+| H Claude Code harness | 1 | - | 3 | 0.059 | < 4 |
+| S specialists (S1, S2, S3) | 1, 0, 0 | 1 | 3-5 | 0.000-0.027 | union 1 < 4 |
+| T temperature 0.6 | 0 | - | 3 | 0.000 | < 4 |
+| V evidence mandate | 0 | - | 4 | 0.000 | < 4 |
+
+- **No single pass leaves the floor.** The best single passes are 3 (O r1, O r2, Q), against
+  Opus 5.5's 7, 7 on this denominator under the project harness.
+- **Over-file is the one direction that helps.**
+  - It has the highest single-pass ceiling and the fewest empty PRs, with no control emission.
+  - Its five passes reach 4 in union, double the base's union.
+  - But the model does not carry out the instruction: it files 2.2-3.2 a PR where the brief asks
+    for at least five.
+- **The model's reach is capped at 5 of 23**, the union over all 23 runs, every one also reached by
+  a Claude cell (13).
+  - Two obligations account for most hits (9 and 8 runs).
+  - The other three appear under one or two settings each.
+  - So varying the prompt widens reach where resampling one prompt does not, but no setting
+    accumulates the extra asks.
+- **Where the model looks is not the problem.**
+  - With examples it put 31 findings at gold sites and matched 2.
+  - The judge's reasons show it asking for a surface change where the maintainer asked for a
+    substantive one: a typo fix where the maintainer asked for a finished docstring or a
+    set-comprehension definition, docstrings where they asked for `@[to_fun]` deduplication.
+  - That is the record's residual for every reviewer: judgement at attended sites that turns on
+    convention and mechanism knowledge.
+- **Process instructions are not followed.** Brainstorm, comments-first, specialists and the
+  evidence mandate each filed less than the base (1.0-1.4 a PR) and reached 0-1.
+- **Settings that do nothing:** the system role, temperature and the Claude Code harness. That
+  matches the record for gpt.
+
+**What this does and does not settle.**
+- The screen is one rep per setting except over-file, and the judge's noise is one to two
+  obligations, so a setting at 1-2 could be a 3 on another rep. But no setting's rep left the
+  floor band, and over-file, the only one replicated, regressed to a mean of 1.4.
+- Untried, and plausibly beyond prompting:
+  - a stronger open model (`docs/dead-ends.md`);
+  - supplying the knowledge rather than asking for it, i.e. deterministic candidate asks, such as
+    `naming_norm`'s rename candidates or a mechanism catalogue, that the model only vets;
+  - fine-tuning, which this project does not do.
