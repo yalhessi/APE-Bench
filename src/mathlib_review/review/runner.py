@@ -1001,6 +1001,21 @@ def assert_coverage_is_reachable(dataset, report, logger) -> None:
     )
 
 
+def assert_solo_task_config_builds(dataset, task_overrides) -> None:
+    """A solo run's task config is built here, so what it refuses is refused before any session.
+
+    The task config is otherwise built per session, after the plan seals. On 2026-10-03
+    `--set task_config.context_file=null` reached `SoloReviewConfig` as the path "null"
+    (`parse_cli_args` spells the null value `None`); the preflight sealed, and all 15 sessions of
+    iter_local397_unlock_D_rep1 failed on their first prompt.
+    """
+    if dataset.routing_mode != "solo":
+        return
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig
+
+    SoloReviewConfig(**(task_overrides or {}))
+
+
 def assert_the_judge_model_is_pinned(dataset, logger) -> None:
     """The evidence gate must be a choice, not a default nobody made.
 
@@ -1806,6 +1821,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
         logger.info("reviewed workspaces: %d of %d episode(s) prebuilt%s",
                     len(episodes) - len(missing), len(episodes),
                     "" if not missing else " — the rest would verify against base .oleans")
+        assert_solo_task_config_builds(dataset, task_overrides)
         plan = _build_plan(dataset, scaffold, agenda)
         logger.info("run plan seals (agenda %s, %d prompt hashes) — not written",
                     plan.agenda_sha256[:12], len(plan.prompt_sha256_by_invocation))
@@ -1815,6 +1831,7 @@ async def run(dataset: V5DatasetConfig, scaffold, task_overrides, logger, *, res
                    scaffold=scaffold)
     assert_coverage_is_reachable(dataset, report, logger)
     assert_the_judge_model_is_pinned(dataset, logger)
+    assert_solo_task_config_builds(dataset, task_overrides)
     guard_run_name(dataset, logger, scaffold, resume=resume)
     if resume:
         await reopen_partial_run(dataset, scaffold, logger)

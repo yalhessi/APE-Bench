@@ -196,8 +196,22 @@ def test_a_named_brief_replaces_the_system_prompt_and_a_missing_one_is_refused(t
     brief = tmp_path / "brief.md"
     brief.write_text("Act as a probe's reviewer.")
     assert solo_system_prompt(SoloReviewConfig(system_prompt_file=brief)) == "Act as a probe's reviewer."
-    with pytest.raises(FileNotFoundError):
-        solo_system_prompt(SoloReviewConfig(system_prompt_file=tmp_path / "absent.md"))
+    # Refused when the config is built, before any session (2026-10-03).
+    with pytest.raises(ValueError, match="is not a file"):
+        SoloReviewConfig(system_prompt_file=tmp_path / "absent.md")
+
+
+def test_a_named_file_that_is_not_there_is_refused_before_any_session():
+    """`--set task_config.context_file=null` arrived as the path "null" and the run sealed its plan,
+    then all 15 sessions of iter_local397_unlock_D_rep1 failed on their first prompt. The null
+    value is spelled `None`, and a path that is not a file is refused when the config is built."""
+    from ape.tasks.lean_tasks.formal_math.review.solo import SoloReviewConfig
+    from ape.utils.config_loader import parse_cli_args
+
+    with pytest.raises(ValueError, match="context_file 'null' is not a file"):
+        SoloReviewConfig(context_file="null")
+    assert parse_cli_args(["task_config.context_file=None"]) == {"task_config": {"context_file": None}}
+    assert SoloReviewConfig(context_file=None).context_file is None
 
 
 def test_the_context_file_appends_this_prs_sections_and_refuses_a_pr_it_lacks(tmp_path):
