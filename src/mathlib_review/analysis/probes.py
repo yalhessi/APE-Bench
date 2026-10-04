@@ -972,14 +972,42 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
     return {"folder": folder, "calls": calls, "flagged": flagged}
 
 
-def model_context(spec: ProbeSet, prs: List[int]) -> str:
+#: The conventions ceiling probe's section (`docs/todo/conventions-ceiling-probe.md`): census
+#: principles as sentences, with no location. The lead is the same at every level of the probe
+#: (exact, applicable, common, all) and for every reviewer; only the entries differ.
+CONVENTIONS_TITLE = "Conventions the maintainers hold"
+CONVENTIONS_LEAD = (
+    "These are conventions Mathlib's maintainers hold when they review, one sentence each: a "
+    "situation and the form preferred in it. They are stated in general, and none names a place in "
+    "this PR. Check the changed code against each one. Where it departs from a convention, request "
+    "the change that convention calls for, as a finding at the place it applies.")
+
+
+def conventions_section(principles: List[str]) -> str:
+    return CONVENTIONS_LEAD + "\n\n" + "\n".join(f"- {p}" for p in principles) + "\n"
+
+
+def model_context(spec: ProbeSet, prs: List[int],
+                  conventions: Optional[Dict[int, List[str]]] = None) -> str:
     """The solo task's `context_file`: each PR's pass-0 model as one section, JSON lines, so a
-    `gpt_5.2` session reads the same model a Claude session's `model.md` holds."""
+    `gpt_5.2` session reads the same model a Claude session's `model.md` holds.
+
+    With `conventions`, each PR's principles follow its model as a second section. Every PR must
+    then be named: a PR whose brief is empty says so with `[]`, and reads the model alone.
+    """
 
     models = render_models(spec.release, prs, spec.inventory)
-    return "".join(json.dumps({"pr_number": pr, "sections": [{"title": "The PR model (pass 0)",
-                                                              "text": models[pr]}]},
-                              ensure_ascii=False) + "\n" for pr in prs)
+    if conventions is not None and set(prs) - set(conventions):
+        raise KeyError(f"no conventions listed for PRs {sorted(set(prs) - set(conventions))}")
+
+    def sections(pr: int) -> List[Dict[str, str]]:
+        held = [{"title": "The PR model (pass 0)", "text": models[pr]}]
+        if conventions and conventions[pr]:
+            held.append({"title": CONVENTIONS_TITLE, "text": conventions_section(conventions[pr])})
+        return held
+
+    return "".join(json.dumps({"pr_number": pr, "sections": sections(pr)}, ensure_ascii=False) + "\n"
+                   for pr in prs)
 
 
 # --- A probe session as a scoreable run --------------------------------------------------------

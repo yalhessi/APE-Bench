@@ -324,6 +324,21 @@ def test_the_solo_context_file_is_the_one_test_b_used():
     assert probes.model_context(POST, [41930, 42184, 42814, 43024, 43167, 43192]) == ref
 
 
+def test_conventions_follow_the_model_as_a_second_section_and_no_pr_is_skipped():
+    ref = [json.loads(line) for line in (G52_DIR / "model_context.jsonl").read_text().splitlines()][:2]
+    prs = [41930, 42184]
+    rows = [json.loads(line) for line in probes.model_context(
+        POST, prs, conventions={41930: ["A is written as B.", "C is named D."], 42184: []}).splitlines()]
+    assert rows[0]["sections"][0] == ref[0]["sections"][0]
+    assert rows[0]["sections"][1] == {
+        "title": probes.CONVENTIONS_TITLE,
+        "text": probes.CONVENTIONS_LEAD + "\n\n- A is written as B.\n- C is named D.\n"}
+    # An empty brief is the model alone, byte for byte what the unbriefed condition reads.
+    assert rows[1] == ref[1]
+    with pytest.raises(KeyError, match="42184"):
+        probes.model_context(POST, prs, conventions={41930: ["A is written as B."]})
+
+
 def test_a_set_can_name_its_own_modification_inventory():
     dev = probes.load_probe_set(SETS / "dev_medium_0_3_0.yaml")
     assert dev.inventory != dev.release / "derived/modification_inventory.jsonl"
