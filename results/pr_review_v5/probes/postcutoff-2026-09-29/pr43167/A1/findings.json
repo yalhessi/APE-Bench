@@ -1,0 +1,72 @@
+[
+ {
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+  "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in Pointwise.lean uses it. The PR moves the only lemma involved (`normalizer_inf_normalizer_le_normalizer_sup`) *out* of Pointwise into `Subgroup/Basic.lean`, which Pointwise already imports. So the line only adds a dependency on commutators and `QuotientGroup.Defs` to a low-level file.",
+  "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Subgroup/Pointwise.lean with line 13 (the new import) removed: outcome `compiled`, no errors. Control: removing `Mathlib.GroupTheory.GroupAction.ConjAct` instead gives 11 errors (`ConjAct` unknown), so the tool does honour header changes. The file did not import Commutator.Basic before the PR, so no downstream file can depend on this import."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "`commutator_sup_left` states the distributivity only for a binary sup `⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. The same argument proves it for an arbitrary indexed supremum `⁅⨆ i, H i, N⁆ = ⨆ i, ⁅H i, N⁆` when `N` is normal, and the binary statement follows from that in one line.",
+  "requested_change": "Add `theorem commutator_iSup_left {ι : Sort*} (H : ι → Subgroup G) (N : Subgroup G) [N.Normal] : ⁅⨆ i, H i, N⁆ = ⨆ i, ⁅H i, N⁆`, proved like the current argument with `M := (⨆ i, H i) ⊔ N` and a private auxiliary lemma for the case where `⨆ i, ⁅H i, N⁆` is normal. Then derive the binary version: `theorem commutator_sup_left ... := by simpa [iSup_bool_eq] using commutator_iSup_left (fun b : Bool ↦ cond b H K) N` (and `commutator_sup_right` as now).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing lines 326-358 of Mathlib/GroupTheory/Commutator/Basic.lean with a private `commutator_iSup_left_aux`, `commutator_iSup_left` (same structure as the PR proof: `iSup_le`, `map_iSup`, `le_iSup`; the `N ≤ normalizer` step done by `rw [mem_normalizer_iff_map_conj_eq, map_iSup]; exact iSup_congr fun i ↦ mem_normalizer_iff_map_conj_eq.mp (normalizer_commutator_ge_right (H i) N hg)`), the one-line binary `commutator_sup_left` via `iSup_bool_eq`, and the unchanged `commutator_sup_right`: outcome `compiled`, no errors. declaration_search: `Subgroup.commutator_iSup_left` exists neither at the base commit nor in the PR. A side effect is that the indexed proof does not use `inf_normalizer_le_normalizer_sup`."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "Every other lemma in this section of the file is `@[to_additive]`, but `commutator_sup_left`, its private helper `commutator_sup_left'` and `commutator_sup_right` are not. So the `AddSubgroup` versions of the new distributivity results are missing, even though `to_additive` translates all three without trouble.",
+  "requested_change": "Add `@[to_additive]` to `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right`, so that `AddSubgroup.commutator_sup_left` and `AddSubgroup.commutator_sup_right` are generated.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing lines 326-358 of Mathlib/GroupTheory/Commutator/Basic.lean with the same three declarations each tagged `@[to_additive]`: outcome `compiled`, no errors. The edit also included the docstring and the dropped `Subgroup.` prefixes from the other findings. The surrounding declarations (`commutator_mono`, `commutator_le_sup`, `map_commutator`, `commutator_characteristic`, ...) all carry `@[to_additive]`."
+ },
+ {
+  "target": "Subgroup.commutator_mono_left",
+  "claim": "`commutator_mono_left` and `commutator_mono_right` only instantiate the existing `commutator_mono` with `le_rfl`. They exist so that `gcongr` and `grw` can use them, but tagging `commutator_mono` itself with `@[gcongr]` already lets `gcongr` vary either argument alone, so the two new lemmas are redundant.",
+  "requested_change": "Change `commutator_mono`'s attribute to `@[to_additive (attr := gcongr)]` and delete `commutator_mono_left` and `commutator_mono_right`. In `commutator_sup_left'`, write the lower bound as `sup_le (by gcongr; exact le_sup_left) (by gcongr; exact le_sup_right)` or `sup_le (commutator_mono le_sup_left le_rfl) (commutator_mono le_sup_right le_rfl)`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing lines 150-358 of Mathlib/GroupTheory/Commutator/Basic.lean with `commutator_mono` tagged `@[to_additive (attr := gcongr)]`, the two `_left`/`_right` lemmas deleted and the uses in `commutator_sup_left'` replaced by `by gcongr; exact le_sup_left/right`: outcome `compiled`, no errors. This includes the `grw [le_normalizer_iff_commutator_le_right, hHKN, ...]` steps in `commutator_sup_left`, which rewrite the right argument of the commutator alone. A first edit that kept the lemmas, untagged, and proved them by bare `gcongr` also compiled, so `gcongr` does use the two-argument lemma for a single varying argument."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "The proof of `commutator_sup_left` uses `[N.Normal]` only to get `⁅H, N⁆ ≤ N` and `⁅K, N⁆ ≤ N` (via `commutator_le_right`). Those follow from the weaker hypotheses `H ≤ normalizer N` and `K ≤ normalizer N`, so the lemma is stated with a stronger assumption than it needs.",
+  "requested_change": "State the main result with `(hH : H ≤ normalizer N) (hK : K ≤ normalizer N)` instead of `[N.Normal]`, proving `hHKN` as `sup_le (le_normalizer_iff_commutator_le_right.mp hH) (le_normalizer_iff_commutator_le_right.mp hK)`. Keep the `[N.Normal]` form as a corollary using `le_normalizer_of_normal`, or name the general one `commutator_sup_left_of_le_normalizer`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing lines 337-358 of Mathlib/GroupTheory/Commutator/Basic.lean with `commutator_sup_left (H K N) (hH : H ≤ normalizer N) (hK : K ≤ normalizer N)`, the PR proof with only `hHKN` changed as above, and `commutator_sup_right` derived via `commutator_sup_left _ _ _ le_normalizer_of_normal le_normalizer_of_normal`: outcome `compiled`, no errors. A precedent of the same kind: in PR #22650, Noether's second isomorphism theorem was generalised from `[N.Normal]` to `H ≤ N.normalizer`."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left'",
+  "claim": "The new proofs write names with a `Subgroup.` prefix inside `namespace Subgroup`: `Subgroup.map_eq_bot_iff` and `Subgroup.commutator_eq_bot_iff_le_centralizer` in `commutator_sup_left'`, and `Subgroup.normal_subgroupOf_of_le_normalizer` in `commutator_sup_left`. The enclosing namespace already supplies the prefix.",
+  "requested_change": "Write `map_eq_bot_iff`, `commutator_eq_bot_iff_le_centralizer` and `normal_subgroupOf_of_le_normalizer` without the `Subgroup.` prefix.",
+  "severity": "advisory",
+  "evidence": "file_read of Commutator/Basic.lean: the declarations sit between `namespace Subgroup` (line 127) and `end Subgroup` (line 392). lean_verify_edit with the three prefixes removed (lines 326-358 replaced): outcome `compiled`, no errors."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left'",
+  "claim": "`commutator_sup_left'` is a private auxiliary lemma with no docstring. It is declared with `theorem`, which signals an important result, and its prime suggests a variant of `commutator_sup_left`. In fact it is the special case where `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal in the whole group, which the main proof uses after restricting to `H ⊔ K ⊔ N`, and the reader has to work that out.",
+  "requested_change": "Declare it as `private lemma` and add a docstring, e.g. `/-- Auxiliary for `commutator_sup_left`: the distributivity holds when `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal in the whole group. -/`.",
+  "severity": "advisory",
+  "evidence": "diff.patch: the declaration is `private theorem commutator_sup_left' ... [(⁅H, N⁆ ⊔ ⁅K, N⁆).Normal]` with no doc comment. lean_verify_edit with `private lemma` plus exactly that docstring (lines 326-358 replaced): outcome `compiled`, no errors."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "`commutator_sup_left` is the headline result of the PR but has no docstring. Its 18-line proof has no comment explaining the non-obvious strategy given in the PR description: restrict to `M = H ⊔ K ⊔ N`, where `⁅H, N⁆ ⊔ ⁅K, N⁆` is normal, and apply the quotient argument of the auxiliary lemma. The two `suffices` steps and the final normalizer computation are hard to follow without it.",
+  "requested_change": "Add a docstring stating the result, e.g. `/-- If `N` is normal, the commutator with `N` distributes over `⊔`: `⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆`. -/`. Add short comments before the first `suffices` (the reduction to `M = H ⊔ K ⊔ N`, where `commutator_sup_left'` applies) and before the second (it remains to show that `M` normalizes `⁅H, N⁆ ⊔ ⁅K, N⁆`).",
+  "severity": "advisory",
+  "evidence": "diff.patch and file_read lines 337-355: there is no doc comment and no `--` comment anywhere in the proof. The strategy appears only in the PR description: 'compute `⁅H ⊔ K, N⁆` in the quotient `(H ⊔ K ⊔ N) ⧸ (⁅H, N⁆ ⊔ ⁅K, N⁆)`'."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "In `commutator_sup_left`, `hHNM : ⁅H, N⁆ ≤ M` and `hKNM : ⁅K, N⁆ ≤ M` are one-term `have`s (`commutator_le_of_le hHM hNM`). Each is used once, in the `simp` that closes the second `suffices`, but they are declared before the first `suffices`, which does not use them.",
+  "requested_change": "Delete the two `have`s and pass the terms straight to the `simp` call: `simp [← map_subtype_inj, map_sup, map_commutator, hHM, hKM, hNM, commutator_le_of_le hHM hNM, commutator_le_of_le hKM hNM]`. Alternatively, move the two `have`s to just before the second `suffices`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on `Subgroup.commutator_sup_left` with the two haves removed and inlined into the simp set: outcome `compiled`, no errors. Removing them without inlining fails (`unsolved goals ⊢ ⁅H, N⁆ ≤ M ∧ ⁅K, N⁆ ≤ M`), so these facts are needed only at that one simp call."
+ },
+ {
+  "target": "attribute in Basic.lean",
+  "claim": "The deprecated alias `normalizer_inf_normalizer_le_normalizer_sup` in `Mathlib/Algebra/Group/Subgroup/Basic.lean` puts `@[deprecated (since := \"2026-08-27\")]` inline before `alias` while the declaration spills onto a second line. The additive alias directly below puts the attribute on its own line, so the two are formatted inconsistently.",
+  "requested_change": "Put the attribute on its own line and the alias on one line: `@[deprecated (since := \"2026-08-27\")]` followed by `alias normalizer_inf_normalizer_le_normalizer_sup := inf_normalizer_le_normalizer_sup`.",
+  "severity": "advisory",
+  "evidence": "diff.patch lines adding the aliases to Subgroup/Basic.lean (file lines 530-535). lean_verify_edit replacing lines 530-531 with the two-line form: outcome `compiled`, no errors. The alias line is about 86 characters, under the 100-character limit."
+ }
+]

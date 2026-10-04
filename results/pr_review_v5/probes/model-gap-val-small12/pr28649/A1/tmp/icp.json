@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean", "line_start": 30, "line_end": 31, "replacement": "* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `\u222b z, f z \u2202((\u03b7 \u2218\u2096 \u03ba) a) = \u222b x, \u222b y, f y \u2202(\u03b7 x) \u2202(\u03ba a)`."}

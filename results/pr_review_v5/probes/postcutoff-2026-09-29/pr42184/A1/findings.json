@@ -1,0 +1,30 @@
+[
+  {
+    "target": "tprod_nonneg",
+    "claim": "`tprod_nonneg` assumes `[L.NeBot]`, which the result does not need. When `L` is `⊥`, `tprod_bot` rewrites the product to a `finprod`, and a `finprod` of nonnegative factors is nonnegative. The sibling lemmas in this file, `one_le_tprod` and `tprod_le_one` (and `tsum_nonneg`, generated from the first), handle the `¬ L.NeBot` case and hold for every summation filter. This one is strictly weaker.",
+    "requested_change": "Remove `[L.NeBot]` from the signature. In the multipliable branch, split on `L.NeBot` as `one_le_tprod` does: `· by_cases hL : L.NeBot` / `· exact le_hasProd_of_le_prod h.hasProd fun _ ↦ prod_nonneg fun i _ ↦ hf i` / `· rw [tprod_bot hL]; exact finprod_induction (0 ≤ ·) zero_le_one (fun _ _ ↦ mul_nonneg) hf`. Leave the non-multipliable branch as it is.",
+    "severity": "blocking",
+    "evidence": "I read the whole file (target/Mathlib/Topology/Algebra/InfiniteSum/Order.lean). `one_le_tprod` (l.168) and `tprod_le_one` (l.176) carry no `NeBot` and close the `¬L.NeBot` case with `tprod_bot hL` plus `one_le_finprod'` or `finprod_induction`. `tprod_bot (hL : ¬L.NeBot) (f) : ∏'[L] b, f b = ∏ᶠ b, f b` is at InfiniteSum/Defs.lean:184. `finprod_nonneg` (Finprod.lean:259) needs `[CommSemiring R] [PartialOrder R] [IsOrderedRing R]`, which is stronger than this lemma's classes, so I used `finprod_induction` with `mul_nonneg` instead. lean_verify_edit with the full replacement declaration (no `[L.NeBot]`, the split above, conclusion `0 ≤ ∏'[L] i, f i`) returned outcome `compiled`, with no errors or warnings."
+  },
+  {
+    "target": "tprod_nonneg",
+    "claim": "The multipliable branch calls `ge_of_tendsto' h.hasProd ...` directly. This file already wraps that pattern as `le_hasProd_of_le_prod` (l.36, `[ClosedIciTopology α] [L.NeBot] (hf : HasProd f a L) (h : ∀ s, c ≤ ∏ i ∈ s, f i) : c ≤ a`), which is exactly this step. The proof bypasses the file's own API.",
+    "requested_change": "Replace `exact ge_of_tendsto' h.hasProd fun s ↦ s.prod_nonneg fun i _ ↦ hf i` with `exact le_hasProd_of_le_prod h.hasProd fun _ ↦ prod_nonneg fun i _ ↦ hf i`.",
+    "severity": "advisory",
+    "evidence": "`le_hasProd_of_le_prod` is at Order.lean:36 in the `Preorder` section and needs only `[Preorder α] [CommMonoid α] [TopologicalSpace α] [ClosedIciTopology α] [L.NeBot]`, all available here. `Finset.prod_nonneg` is at Algebra/Order/BigOperators/GroupWithZero/Finset.lean:31 under `[CommMonoidWithZero R] [Preorder R] [ZeroLEOneClass R] [PosMulMono R]`, and `Finset` is open in this file. lean_verify_edit with that one-line change and the rest of the PR declaration unchanged returned outcome `compiled`."
+  },
+  {
+    "target": "tprod_nonneg",
+    "claim": "This PR adds the `tprod` form of nonnegativity without the `HasProd` form. Each bound in this file comes as a pair: `HasProd.one_le` / `one_le_tprod` and `HasProd.le_one` / `tprod_le_one`. `HasProd.nonneg` does not exist at the base commit, so a user who has `HasProd f a L` with nonnegative factors still has no lemma for `0 ≤ a`.",
+    "requested_change": "Add `theorem HasProd.nonneg [L.NeBot] (hf : ∀ i, 0 ≤ f i) (ha : HasProd f a L) : 0 ≤ a := le_hasProd_of_le_prod ha fun _ ↦ prod_nonneg fun i _ ↦ hf i` beside `tprod_nonneg`, with the same typeclass assumptions, and prove the `NeBot` multipliable case of `tprod_nonneg` as `h.hasProd.nonneg hf`.",
+    "severity": "advisory",
+    "evidence": "declaration_search `HasProd.nonneg`: not declared at the base commit or in this PR. `HasProd.one_le` (l.160) and `HasProd.le_one` (l.164) sit beside `one_le_tprod` and `tprod_le_one` in the file. lean_verify_edit (line mode, lines 237-246) with a section containing `HasProd.nonneg` and `tprod_nonneg` (the latter written as `h.hasProd.nonneg hf` plus the `tprod_bot` branch) returned outcome `compiled`."
+  },
+  {
+    "target": "section WithZero (Mathlib/Topology/Algebra/InfiniteSum/Order.lean)",
+    "claim": "The new section is named `WithZero`. That is the name of the type constructor `WithZero α`, which the section is not about. Its content is a lemma over `CommMonoidWithZero α` with `PosMulMono`/`ZeroLEOneClass`, so the name misleads. Sections in this file are named after their algebraic setting (`OrderedCommMonoid`, `OrderedCommGroup`, `CanonicallyOrderedMul`), and the analogous section in InfiniteSum/Basic.lean is `section CommMonoidWithZero`.",
+    "requested_change": "Rename the section to `section CommMonoidWithZero` / `end CommMonoidWithZero`.",
+    "severity": "advisory",
+    "evidence": "content_search over target/Mathlib/Topology for this kind of section name found `section CommMonoidWithZero` in Topology/Algebra/InfiniteSum/Basic.lean:774 (tprod lemmas over `CommMonoidWithZero`) and `section MonoidWithZero` in two other topology files. `section WithZero` appears only in this PR. The renamed-section version was compiled as part of the line-mode lean_verify_edit above (outcome `compiled`)."
+  }
+]

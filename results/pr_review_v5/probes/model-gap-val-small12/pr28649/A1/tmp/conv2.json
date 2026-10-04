@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Martingale/Convergence.lean", "line_start": 133, "line_end": 134, "replacement": "/-- A realization of a stochastic process with bounded upcrossings and whose norm has a finite\nlimit inferior is convergent."}
