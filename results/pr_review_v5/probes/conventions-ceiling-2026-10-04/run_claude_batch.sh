@@ -36,7 +36,7 @@ for item in items:
         with open(item[1:], encoding="utf-8") as handle:
             for row in map(json.loads, handle):
                 if "prompt" in row:
-                    parts.append(f"\n### Session\ndescription: Matcher {Path(row['folder']).name}\n"
+                    parts.append(f"\n### Session\ndescription: {row.get('description') or 'Matcher ' + Path(row['folder']).name}\n"
                                  f"prompt:\n<<<\n{row['prompt']}\n>>>\n")
         continue
     spec_path, pr = item.rsplit(":", 1)

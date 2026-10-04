@@ -389,6 +389,78 @@ blind matchers (`match_R_val/`, `read_stage.py R XR X`).
   `partial` where stage C's read it `reached` (agreement here 27 of 32 cells).
 - Cost: 18 points of token B for the two sessions and 8 for the two matchers. Both audits clean.
 
+## Stage F: the floor -- the same reviewer briefed without the asks (pre-registered 2026-10-04, before any selector or session)
+
+The user (2026-10-04): the exact brief is *"a sort of a ceiling"*, and it cheats by looking at the
+maintainers' asks. *"Without relying on the asks, what gives the reviewer the best shot at doing the
+reviewing using the conventions as effectively as possible?"* This is the todo's ladder, designed
+from what stage C showed. Nothing below has run.
+
+**What is already known, without a session.**
+- **A fixed common list is bounded low.** The 50 most-used census entries hold the entry behind 16
+  of the 33 in-census asks on the ten PRs, and behind 4 of the 9 asks only the briefed reviewer
+  reached (the top 25: 10 and 2; the top 100: 25 and 6). The gain was in the tail: `gcongr` for a
+  monotonicity step is rank 174 of 438, `simpa` rank 323, docstring abbreviations 126, an alias for
+  an iff 128. Unbriefed Claude already applies the head. So the todo's "common" level is not run.
+- **The record's ask-free deliveries were general text to weaker reviewers:** distilled guides
+  ("statute", null on gpt at N=115) and guide summaries as a directive (local-unlock C, 1 of 23).
+  The plan's own ask-free design is deterministic detectors keyed to a declaration
+  (`docs/plans/2026-10-03-after-structure.md` §2), which is code. A selector is the same idea with
+  a model doing the detecting.
+
+**The design: applicable.** One variable changes from stage C: who picks the entries.
+- **A blind selector a PR** (`selector_rubric.md`, `build_selector_folders.py`): a `general-purpose`
+  subagent, `claude-opus-5-5` at xhigh, whose folder holds the reviewer packet's own `pr.md`,
+  `model.md` and `diff.patch` (byte-identical to X1's), all 438 entries as `P### sentence`, and the
+  rubric. No tools on the repository, no asks. It writes at most 25 entries, each with where its
+  situation occurs.
+- **It selects on the situation, not on conformance.** "If the situation occurs, the convention
+  applies, whether the code seems to conform or not." Stage C's unbriefed misses were the reviewer
+  judging the code against its own file and passing it; a selector that filtered on "looks
+  violated" would repeat that judgement and drop the same asks.
+- **No frequency prior.** The rubric says a rare convention matters as much as a common one.
+- **The brief** is brief X plus the section, the same lead as every level, the selected sentences
+  in codebook order with no location (`briefs_applicable.json`, `cli probe packets --conventions`).
+  The selector's `where` is kept and not delivered.
+- **The reviewer** is session A1: the ten stage C PRs, one session each, the stage C route
+  (`run_claude_batch.sh`), model, effort and CLI.
+- **Matching:** one seal a set holding X1, X2, E1 and A1, so the ceiling and the unbriefed reviewer
+  are re-judged beside the floor by the same two blind matchers.
+
+**Read before any reviewer session: retrieval.** For each of the 33 in-census asks, whether an
+entry behind it is in the PR's applicable brief (`build_applicable_briefs.py`). This bounds what A
+can recover. If the briefs hold the entry of fewer than 11 of the 33, the reviewer sessions are not
+spent: the floor is bounded by retrieval, and that is the result.
+
+**Reading rule, fixed now.** The same measure as stage C: per-session reach on the 39 in-census
+asks, pooled, each of two matchers, with 26755, 36822 and 43192 imputed as before.
+
+| A − X, on both matchers | reading |
+|---|---|
+| within 0.05 of E − X | **the floor is at the ceiling**: picking conventions from the diff is enough |
+| `≥ +0.15`, more than 0.05 under E − X | **the direction survives without the asks**; the gap is decomposed below |
+| between +0.05 and +0.15 | partial |
+| `≤ +0.05` | **the gain needed the asks' own pinpointing**: the floor is the unbriefed reviewer |
+
+Asks reached per finding must be no lower than X's.
+
+**Also read, fixed now.**
+- **The decomposition.** For each in-census ask: was its entry in the brief (retrieval), and if it
+  was, did A reach it (application), beside whether E and X did. A gap to the ceiling is then
+  retrieval's or application's.
+- **Dilution:** asks A misses with the entry in its brief that E reached with the exact brief.
+- **Cost of the brief:** findings a PR against X's and E's, and out-of-census asks.
+- **Not measured:** control PRs. An ask-free brief could be given to them; these sessions are not.
+
+**Untried, in the order I would try them if A falls short:** the reviewer selecting for itself from
+all 438 in its packet, then applying (no separate stage); the selector's `where` delivered with each
+sentence; a past ask as an exemplar of each selected entry (the census holds 2,102, on other PRs);
+two selectors in union; detectors in code for the head entries.
+
+**Cost, expected:** ten selectors at about 3 points of a window each, ten reviewer sessions at
+about 10 to 12, four matcher runs at about 7. Selectors run on token B's remainder now; reviewers
+on token C from its 14:10 reset; whatever does not fit waits for B's 16:50 reset.
+
 ## What follows
 
 By the todo, a reading of `≥ +0.15` runs the ladder: the same reviewer briefed with **applicable**
