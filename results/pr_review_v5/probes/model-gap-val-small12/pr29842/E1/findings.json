@@ -1,0 +1,23 @@
+[
+ {
+  "target": "UniqueDiffWithinAt.mono",
+  "claim": "The PR moves `UniqueDiffWithinAt.mono` under `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` and proves it through `mono_nhds`, but the lemma needs neither assumption: `s ⊆ t` gives `tangentConeAt 𝕜 s x ⊆ tangentConeAt 𝕜 t x` by `tangentConeAt_mono`, which holds in a bare TVS, and `closure s ⊆ closure t` by `closure_mono`. The lemma therefore carries two unnecessary typeclass hypotheses.",
+  "requested_change": "Place `UniqueDiffWithinAt.mono` before the `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` line in the `UniqueDiff`/`TVS` section and prove it directly: `theorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) : UniqueDiffWithinAt 𝕜 t x := ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode over lines 433-443, moving `mono` above the variable line with the direct proof and keeping `mono_nhds` after it: outcome `compiled`, no errors. A `#check @UniqueDiffWithinAt.mono` in the same edit printed `[AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E] ... UniqueDiffWithinAt 𝕜 s x → s ⊆ t → UniqueDiffWithinAt 𝕜 t x`, with no ContinuousAdd or ContinuousSMul. The rest of the file, including `uniqueDiffWithinAt_Ici`/`Iic`, which call `.mono`, still compiled."
+ },
+ {
+  "target": "tangentConeAt.lim_zero",
+  "claim": "The new proof of `tangentConeAt.lim_zero` ends with three consecutive steps, `apply Tendsto.congr' this`, `rw [tendsto_norm_atTop_iff_cobounded] at hc` and `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`. The `apply` step can be folded into the final `simpa`, which can apply `congr'` itself.",
+  "requested_change": "Merge `apply Tendsto.congr' this` into the closing `simpa` so that the proof reads `have : ∀ᶠ n in l, (c n)⁻¹ • c n • d n = d n := (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)`, then `rw [tendsto_norm_atTop_iff_cobounded] at hc`, then `simpa using ((tendsto_inv₀_cobounded.comp hc).smul hd).congr' this`. Optionally inline the `rw` too: `simpa using ((tendsto_inv₀_cobounded.comp <| tendsto_norm_atTop_iff_cobounded.1 hc).smul hd |>.congr' this)`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on `tangentConeAt.lim_zero` with the three-line `have`/`rw`/`simpa ... .congr' this` proof: outcome `compiled`. The variant that also inlines the `rw` into `tendsto_norm_atTop_iff_cobounded.1 hc` (so `have` plus one `simpa`) also compiled. precedent_search: on PR #21065, which touched this same proof, ADedecker suggested the same shape, `simpa only [← tendsto_congr' this, zero_smul] using tendsto_inv₀_cobounded.comp hc |>.smul hd`, which folds the congruence into the final `simpa`. This finding applies the brief's convention that consecutive tactic calls a single call can do are merged."
+ },
+ {
+  "target": "mem_tangentConeAt_of_openSegment_subset",
+  "claim": "The PR's aim is to state the tangent-cone lemmas at TVS generality, but `mem_tangentConeAt_of_openSegment_subset` and its corollary `mem_tangentConeAt_of_segment_subset` stay in `section Normed` with `[NormedAddCommGroup G] [NormedSpace ℝ G]`. Their proofs never use a norm on `G`: they call only `mem_tangentConeAt_of_pow_smul` (already TVS), `openSegment_eq_image` and `abel`. So they need no topology-algebra hypotheses on `G` at all.",
+  "requested_change": "Move `mem_tangentConeAt_of_openSegment_subset` and `mem_tangentConeAt_of_segment_subset`, with their deprecated aliases, into the `TVS` section of the tangent-cone part. State them for `{G : Type*} [AddCommGroup G] [Module ℝ G] [TopologicalSpace G]`, for example through a `variable` line for `G` there, in place of the normed `G` variables. Drop `variable [NormedAddCommGroup G] [NormedSpace ℝ G]` from the first `section Normed` if nothing else there uses it.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode replacing lines 240-259 with both lemmas stated over `{G : Type*} [AddCommGroup G] [Module ℝ G] [TopologicalSpace G]` and unchanged proofs: outcome `compiled`. Downstream `uniqueDiffWithinAt_convex` in the same file still compiles. In an earlier single-declaration test of the open-segment lemma, `#check` printed `∀ {G} [AddCommGroup G] [Module ℝ G] [TopologicalSpace G] {s} {x y}, openSegment ℝ x y ⊆ s → y - x ∈ tangentConeAt ℝ s x`. Generalizing only the segment lemma while the open-segment one stays normed fails with an isDefEq heartbeat timeout, so the two must move together."
+ }
+]

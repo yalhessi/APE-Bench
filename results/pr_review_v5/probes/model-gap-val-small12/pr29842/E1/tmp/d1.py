@@ -1,0 +1,21 @@
+import json
+decl = '''theorem tangentConeAt_subset_zero {E : Type*} [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]
+    [ContinuousAdd E] [ContinuousSMul 𝕜 E] [T2Space E] {s : Set E} {x : E}
+    (hx : ¬AccPt x (𝓟 s)) : tangentConeAt 𝕜 s x ⊆ 0 := by
+  rintro y ⟨c, d, hds, hc, hcd⟩
+  suffices ∀ᶠ n in .atTop, d n = 0 from
+    tendsto_nhds_unique hcd <| tendsto_const_nhds.congr' <| this.mono fun n hn ↦ by simp [hn]
+  simp only [accPt_iff_frequently, not_frequently, not_and', ne_eq, not_not] at hx
+  have : Tendsto (x + d ·) atTop (𝓝 x) := by
+    simpa using tendsto_const_nhds.add (tangentConeAt.lim_zero _ hc hcd)
+  filter_upwards [this.eventually hx, hds] with n h₁ h₂
+  simpa using h₁ h₂
+
+theorem UniqueDiffWithinAt.accPt' {E : Type*} [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E]
+    [ContinuousAdd E] [ContinuousSMul 𝕜 E] [T2Space E] {s : Set E} {x : E}
+    [Nontrivial E] (h : UniqueDiffWithinAt 𝕜 s x) : AccPt x (𝓟 s) := by
+  by_contra! h'
+  have : Dense (Submodule.span 𝕜 (0 : Set E) : Set E) :=
+    h.1.mono <| by gcongr; exact tangentConeAt_subset_zero h'
+  simp [dense_iff_closure_eq] at this'''
+print(json.dumps({"path":"Mathlib/Analysis/Calculus/TangentCone.lean","declaration_name":"tangentConeAt_subset_zero","new_declaration":decl}))

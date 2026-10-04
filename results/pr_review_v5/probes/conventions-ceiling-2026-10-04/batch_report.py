@@ -15,7 +15,7 @@ from collections import Counter
 stream = sys.argv[1]
 expected = {}
 if len(sys.argv) > 2:
-    for m in re.finditer(r"description: (.+)\nprompt:\n<<<\n(.*?)\n>>>", open(sys.argv[2]).read(), flags=re.S):
+    for m in re.finditer(r"description: ([^\n]+)\nprompt:\n<<<\n(.*?)\n>>>", open(sys.argv[2]).read(), flags=re.S):
         expected[m.group(1)] = m.group(2)
 
 agents, usage, tools, models, limits, init, result = {}, {}, Counter(), {}, [], {}, {}
@@ -54,8 +54,19 @@ def processed(rows: dict) -> int:
                for k in ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens"))
 
 
+#: Processed tokens count a cached read like fresh input, and the window does not: a batch's first
+#: minutes read 0.11M processed a point, mostly cache writes. Weighted by list-price ratios (cache
+#: write 1.25, cache read 0.1, output 5, in units of one input token), the rate should hold steadier.
+WEIGHTS = {"input_tokens": 1.0, "cache_creation_input_tokens": 1.25, "cache_read_input_tokens": 0.1, "output_tokens": 5.0}
+
+
+def weighted(rows: dict) -> float:
+    return sum((u.get(k) or 0) * w for u in rows.values() for k, w in WEIGHTS.items())
+
+
 print("session:", init)
 total = processed(usage.get(None, {}))
+units = sum(weighted(rows) for rows in usage.values())
 print(f"orchestrator: {len(usage.get(None, {}))} replies, {total / 1e6:.2f}M processed")
 for tool_id, spec in agents.items():
     name = spec.get("description")
@@ -68,7 +79,8 @@ seen = [u for _, u, _ in limits if u is not None]
 if seen:
     used = seen[-1] - seen[0]
     print(f"five-hour window: {seen[0]:.2f} -> {seen[-1]:.2f} over {total / 1e6:.2f}M processed"
-          + (f" = {total / 1e6 / (used * 100):.2f}M a point" if used > 0 else "") + f" | statuses {sorted({s for s, _, _ in limits})}"
+          + (f" = {total / 1e6 / (used * 100):.2f}M a point; {units / 1e3:.0f}k weighted units = {units / 1e3 / (used * 100):.0f}k a point"
+             if used > 0 else "") + f" | statuses {sorted({s for s, _, _ in limits})}"
           f" | seven-day {limits[0][2]} -> {limits[-1][2]}")
 print("result:", result.get("subtype"), "| error", result.get("is_error"))
 print(result.get("text", "")[:1200])
