@@ -444,6 +444,10 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
     A packet that already holds findings is refused: it is a finished session, and rewriting its
     inputs would detach them from what it read. With `conventions`, each PR's brief ends with its
     conventions section; every PR must be named, and an empty list leaves the brief as it is.
+
+    A packet goes where `session_dir` will look for it, so a PR whose earlier sessions live under
+    `sessions_from` gets its new ones beside them (until 2026-10-04 they were written under
+    `probe_dir`, where neither `prompts` nor the matcher inputs would find them).
     """
 
     root = Path(root or Path.cwd())
@@ -456,7 +460,7 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
     written = []
     for pr in prs:
         for session in sessions:
-            d = spec.probe_dir / f"pr{pr}" / session
+            d = spec.session_dir(pr, session)
             if finished(d):
                 raise FileExistsError(f"{d} is a finished session")
             (d / "tmp").mkdir(parents=True, exist_ok=True)
@@ -553,7 +557,7 @@ def write_swap_packets(spec: ProbeSet, session: str, scratch: Path, source_run: 
         raise KeyError(f"{source_run} has no successful session for PR(s) {missing}")
     written = []
     for pr in prs:
-        d = spec.probe_dir / f"pr{pr}" / session
+        d = spec.session_dir(pr, session)
         if finished(d):
             raise FileExistsError(f"{d} is a finished session")
         system, user = delivered_messages(by_pr[pr])

@@ -489,3 +489,12 @@ def test_a_brief_is_its_entries_sentences_in_codebook_order(tmp_path):
     codebook.write_text(json.dumps([{"id": "P001", "principle": "first"}, {"id": "P002", "principle": "second"}]))
     briefs.write_text(json.dumps({"prs": {"7": ["P002", "P001", "P002"], "8": []}}))
     assert probes.load_conventions(briefs, codebook) == {7: ["first", "second"], 8: []}
+
+
+def test_a_new_packet_goes_where_the_prs_earlier_sessions_live(tmp_path):
+    spec = POST.model_copy(update={"probe_dir": tmp_path / "probe", "sessions_from": {43192: tmp_path / "old"}})
+    moved, plain = probes.write_packets(spec, ["E1"], tmp_path / "scratch", prs=[43192, 43024])
+    assert moved == tmp_path / "old" / "pr43192" / "E1" == spec.session_dir(43192, "E1")
+    assert plain == tmp_path / "probe" / "pr43024" / "E1"
+    assert f"OUT={tmp_path / 'old' / 'pr43192' / 'E1'}" in (moved / "ptool").read_text()
+
