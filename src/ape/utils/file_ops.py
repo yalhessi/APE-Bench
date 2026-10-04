@@ -12,7 +12,7 @@ import tempfile
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any, Tuple, Union, List
+from typing import Optional, Dict, Any, Iterable, Sequence, Tuple, Union, List
 from contextlib import contextmanager
 
 import aiofiles
@@ -23,6 +23,18 @@ import aiofiles.os
 
 from contextlib import asynccontextmanager
 import asyncio
+
+def _lock_backoff(attempt: int) -> float:
+    """The base wait before retry `attempt`: 0.05s doubling, capped at 3.0s.
+
+    The exponent is capped too. `min(0.05 * (2 ** attempt), 3.0)` raised OverflowError ("int too
+    large to convert to float") once `attempt` passed 1,024, which is about 51 minutes of waiting at
+    3s a retry. A cache fetch waiting behind a queue of builds hit exactly that (2026-09-29, a
+    ten-commit base build: 09:03 to 09:54), and the caller's retry started the count again.
+    """
+
+    return min(0.05 * (2 ** min(attempt, 6)), 3.0)
+
 
 def _sync_acquire_lock(file_path: Path, timeout: float, shared: bool, blocking: bool = True):
     """Synchronously acquire a file lock (internal helper).
@@ -78,8 +90,8 @@ def _sync_acquire_lock(file_path: Path, timeout: float, shared: bool, blocking: 
                     raise TimeoutError(f"Failed to acquire {lock_name} within {timeout}s: {file_path}")
                 
                 # Exponential backoff with random jitter to avoid thundering herd issues
-                # base: 0.05s -> 0.1s -> 0.2s -> 0.4s -> 0.8s -> 1.6s -> 3.2s
-                base_wait = min(0.05 * (2 ** attempt), 3.0)
+                # base: 0.05s -> 0.1s -> 0.2s -> 0.4s -> 0.8s -> 1.6s -> 3.0s
+                base_wait = _lock_backoff(attempt)
                 
                 # Add ±50% jitter so processes do not retry in sync
                 jitter = random.uniform(base_wait * 0.5, base_wait * 1.5)
@@ -469,3 +481,42 @@ def normalize_repo_url(repo_url: str) -> str:
         raise ValueError(f"Cannot extract repo name from URL: {repo_url}")
 
     return repo_name
+
+
+# =============================================================================
+# Where a task's workspace reaches
+# =============================================================================
+
+def provisioned_roots(workspaces_dir: Path, extra: Iterable[Path] = ()) -> List[str]:
+    """The directories a task's workspace reaches: itself, and where its links lead.
+
+    Each link directly in the workspace (`target`, `reference/<name>`) adds its resolved home,
+    and each link directly in that home adds the directory it resolves into: for a reviewed
+    workspace, the base checkout it is built on. Nothing else in the shared store is reachable.
+    One rule for both of its readers: lean_verify's path check and Claude Code's containment.
+    """
+
+    workspaces_dir = Path(os.path.abspath(workspaces_dir))
+    # The resolved spelling too: a process's working directory is resolved, so under a linked
+    # `.ape/` (every worktree) Claude Code reports workspace files by their resolved paths.
+    roots = {str(workspaces_dir), os.path.realpath(workspaces_dir)}
+    roots.update(os.path.abspath(p) for p in extra)
+    links = [p for p in workspaces_dir.iterdir() if p.is_symlink()]
+    reference = workspaces_dir / "reference"
+    if reference.is_dir() and not reference.is_symlink():
+        links.extend(p for p in reference.iterdir() if p.is_symlink())
+    for link in links:
+        home = Path(os.path.realpath(link))
+        if not home.is_dir():
+            continue
+        roots.add(str(home))
+        for entry in home.iterdir():
+            if entry.is_symlink():
+                roots.add(os.path.dirname(os.path.realpath(entry)))
+    return sorted(roots)
+
+
+def within_roots(path, roots: Sequence[str]) -> bool:
+    """Whether `path`, compared as given, sits under one of `roots`."""
+    path = str(path)
+    return any(path == root or path.startswith(root.rstrip(os.sep) + os.sep) for root in roots)

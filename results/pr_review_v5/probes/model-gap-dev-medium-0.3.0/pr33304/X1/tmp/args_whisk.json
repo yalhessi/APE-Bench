@@ -1,0 +1,1 @@
+{"path": "Mathlib/CategoryTheory/Functor/Basic.lean", "line_start": 130, "line_end": 130, "replacement": "-- The natural isomorphisms `Functor.rightUnitor` and `Functor.leftUnitor` are provided in\n-- `Mathlib/CategoryTheory/Functor/Category.lean`."}

@@ -1,0 +1,1 @@
+{"path":"Mathlib/Topology/Algebra/Order/Floor.lean","declaration_name":"continuousAt_ceil","new_declaration":"@[fun_prop]\ntheorem continuousAt_ceil {x : α} (hx : x ≠ ⌈x⌉) : ContinuousAt ceil x :=\n  (continuousOn_ceil ⌈x⌉).continuousAt <|\n    Ioc_mem_nhds (sub_lt_iff_lt_add.mpr <| ceil_lt_add_one _) ((le_ceil x).lt_of_ne hx)"}

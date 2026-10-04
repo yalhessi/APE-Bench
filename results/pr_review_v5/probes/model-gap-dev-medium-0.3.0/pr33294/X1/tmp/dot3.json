@@ -1,0 +1,1 @@
+{"path": "Mathlib/SetTheory/Ordinal/FixedPoint.lean", "line_start": 311, "line_end": 312, "replacement": "@[deprecated (since := \"2025-12-25\")]\nalias IsNormal.nfp_fp := nfp_fp\n\nexample (a b : Ordinal) : a + nfp (a + ·) b = nfp (a + ·) b := (isNormal_add_right a).nfp_fp b"}

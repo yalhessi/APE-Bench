@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean", "line_start": 42, "line_end": 42, "replacement": "section UniformSpace\nattribute [-instance] SetRel.IsRefl.comp"}

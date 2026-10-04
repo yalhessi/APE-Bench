@@ -1,0 +1,44 @@
+{
+ "source": "probe session",
+ "set": "dev_medium_0_3_0_swap",
+ "session": "S1",
+ "packets_findings_sha256": {
+  "33117": "521ac872d9c7d58a0ca2f6ea112b9673d9b75cdba396e9513c8aac1e0809dcb8",
+  "33145": "f608269e5927694d012c62620ded07381513500d5d8554cf65c14dbcb0ff8bb8",
+  "33149": "39b506850af17b071447f94dc42ac912fc9fc464ddec95175008cc6458648b3b",
+  "33285": "44b8f5714a899a544d8c0227d0692161c2c6d5e39e0a012db7aa28f55fdb2b3e",
+  "33294": "d0cb81948be069f40f20a7d718711ecab15ac4bae24a736d603e97f043932e38",
+  "33304": "66c62c15657ae75f47ca9dafa2062c408167e966279ba4ef102876addc8abf5a",
+  "33305": "6594021d96882e5305cd190cf72a431a4fa287f8d86202c552d525978cba2472",
+  "33315": "523f30f55ebf7c31660e1f5ea25667e31b734e1e9e9cacc54dac15a1ea0aedd0",
+  "33321": "6627a1333b522578f14ca41f90aa880099533b8c2b57cb437389e726d14042f8",
+  "33337": "cdbe66eb7a06d9c35533cf116b2e8f4d1c8b7054933f56281e916e6089369fa7",
+  "33362": "d97f3b23ebe0819fbf5781c22ad02959848cc71b8a3f25025560159abaf2b61d",
+  "33421": "dc3e53174c30564c7f65ecaa284d836a8cccb41b66e3011bdca49b1b4157d234"
+ },
+ "target_resolution": {
+  "path_and_line": 103
+ },
+ "findings_past_the_budget": {
+  "33149": 28
+ },
+ "anchoring": {
+  "findings_in": 103,
+  "anchored": 99,
+  "unanchored": 4,
+  "unanchored_rate": 0.0388,
+  "work_units_reached": 60,
+  "by_method": {
+   "review_line_entity": 98,
+   "review_line_range": 1,
+   "unresolved": 4
+  },
+  "by_failure": {
+   "unresolved_line": 4
+  }
+ },
+ "concern_family": "other",
+ "issue_kind_placeholder": "style_norm_violation",
+ "evidence_chain": "not run: the gate is closed, so admission and publication are not comparable to a solo run's; the judge's issue recall reads every finding",
+ "run_manifest": "not written: the judge reads this source as unchecked"
+}

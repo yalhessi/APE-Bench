@@ -1,0 +1,43 @@
+{
+ "1": {
+  "reach_all16": {
+   "L": 0.125,
+   "G": 0.125,
+   "X": 0.46875
+  },
+  "reach_L_published_only": 0.0,
+  "reach_scope": {
+   "L": 0.0,
+   "G": 0.0,
+   "X": 0.4444444444444444
+  },
+  "findings_per_pr_per_run": {
+   "L": 4.416666666666667,
+   "G": 3.8333333333333335,
+   "X": 4.083333333333333
+  },
+  "L_published_per_pr_per_run": 1.5,
+  "reading": "does not help; the model dominates"
+ },
+ "2": {
+  "reach_all16": {
+   "L": 0.125,
+   "G": 0.125,
+   "X": 0.46875
+  },
+  "reach_L_published_only": 0.0,
+  "reach_scope": {
+   "L": 0.0,
+   "G": 0.0,
+   "X": 0.4444444444444444
+  },
+  "findings_per_pr_per_run": {
+   "L": 4.416666666666667,
+   "G": 3.8333333333333335,
+   "X": 4.083333333333333
+  },
+  "L_published_per_pr_per_run": 1.5,
+  "reading": "does not help; the model dominates"
+ },
+ "arms_reading": "does not help; the model dominates"
+}

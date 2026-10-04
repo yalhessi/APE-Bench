@@ -1,0 +1,694 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/CategoryTheory/CatCommSq.lean",
+   "matches": [
+    {
+     "line_number": 13,
+     "content": "    13|Similarly as `CommSq.lean` defines the notion of commutative squares,"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Yoneda.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|`Mathlib/CategoryTheory/ShrinkYoneda.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Iso.lean",
+   "matches": [
+    {
+     "line_number": 291,
+     "content": "   291|-- but we've changed it to implicit as a `rw` in `Mathlib/CategoryTheory/Closed/Functor.lean`"
+    },
+    {
+     "line_number": 298,
+     "content": "   298|-- but we've changed it to implicit as a `rw` in `Mathlib/CategoryTheory/Closed/Functor.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Noetherian.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|Note: In the file, `Mathlib/CategoryTheory/Subobject/ArtinianObject.lean`,"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/LocallyDirected.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|gluing of the open sets. See `Mathlib/AlgebraicGeometry/Gluing.lean` for an actual application."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/CommSq.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|The structure `CommSq` is extended in `Mathlib/CategoryTheory/Limits/Shapes/Pullback/CommSq.lean`"
+    },
+    {
+     "line_number": 23,
+     "content": "    23|Refactor `LiftStruct` from `Arrow.lean` and lifting properties using `CommSq.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/PathCategory/MorphismProperty.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|`MorphismProperty`. This file is separate from `Mathlib/CategoryTheory/PathCategory/Basic.lean` in"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Enriched/HomCongr.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|`Mathlib/CategoryTheory/HomCongr.lean` and that for sorts in"
+    },
+    {
+     "line_number": 24,
+     "content": "    24|`Mathlib/Logic/Equiv/Defs.lean` (cf. `Equiv.arrowCongr`). Note, however, that"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Preadditive/Biproducts.lean",
+   "matches": [
+    {
+     "line_number": 51,
+     "content": "    51|`Mathlib/LinearAlgebra/Matrix/SchurComplement.lean`). In particular, the declarations"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Abelian/Refinements.lean",
+   "matches": [
+    {
+     "line_number": 49,
+     "content": "    49|`Mathlib/CategoryTheory/Abelian/Pseudoelements.lean`, the Freyd-Mitchell"
+    },
+    {
+     "line_number": 56,
+     "content": "    56|`Mathlib/CategoryTheory/Abelian/Pseudoelements.lean`. Some theorems can be obtained"
+    },
+    {
+     "line_number": 59,
+     "content": "    59|its action on pseudo-elements (see also `Counterexamples/Pseudoelement.lean`)."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Abelian/Pseudoelements.lean",
+   "matches": [
+    {
+     "line_number": 413,
+     "content": "   413|`Counterexamples/Pseudoelement.lean` for details. -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Abelian/EpiWithInjectiveKernel.lean",
+   "matches": [
+    {
+     "line_number": 17,
+     "content": "    17|This shall be used in the file `Mathlib/Algebra/Homology/Factorizations/Basic.lean` in"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Abelian/Basic.lean",
+   "matches": [
+    {
+     "line_number": 27,
+     "content": "    27|`NonPreadditiveAbelian.lean`. However, this fact is of little practical"
+    },
+    {
+     "line_number": 65,
+     "content": "    65|in each case just reusing the proof from `NonPreadditiveAbelian.lean`."
+    },
+    {
+     "line_number": 266,
+     "content": "   266|-- Turning it into a global instance breaks `Mathlib/Algebra/Category/ModuleCat/Sheaf/Free.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Abelian/FreydMitchell.lean",
+   "matches": [
+    {
+     "line_number": 32,
+     "content": "    32|`Mathlib/CategoryTheory/Abelian/GrothendieckCategory/Basic.lean`)."
+    },
+    {
+     "line_number": 34,
+     "content": "    34|injectives (see `Mathlib/CategoryTheory/Abelian/GrothendieckCategory/EnoughInjectives.lean`)."
+    },
+    {
+     "line_number": 36,
+     "content": "    36|cogenerator (see `Mathlib/CategoryTheory/Generator/Abelian.lean`)."
+    },
+    {
+     "line_number": 41,
+     "content": "    41|combination of the aforementioned properties, see `Mathlib/CategoryTheory/Abelian/Yoneda.lean`)."
+    },
+    {
+     "line_number": 43,
+     "content": "    43|`Mathlib/CategoryTheory/Abelian/GrothendieckCategory/ModuleEmbedding/Opposite.lean`."
+    },
+    {
+     "line_number": 56,
+     "content": "    56|  `LeftExactFunctor C Ab` (see the file `Mathlib/CategoryTheory/Preadditive/Indization.lean`)."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Abelian/Indization.lean",
+   "matches": [
+    {
+     "line_number": 17,
+     "content": "    17|In the file `Mathlib/CategoryTheory/Abelian/GrothendieckAxioms/Indization.lean`, we show that in"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/GradedObject/Braiding.lean",
+   "matches": [
+    {
+     "line_number": 177,
+     "content": "   177|This requires importing `Mathlib/CategoryTheory/Limits/Preserves/Finite.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/GradedObject/Monoidal.lean",
+   "matches": [
+    {
+     "line_number": 621,
+     "content": "   621|This requires importing `Mathlib/CategoryTheory/Limits/Preserves/Finite.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Quotient/Linear.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|the file `Mathlib/CategoryTheory/Quotient/Preadditive.lean` such that `functor r : C ⥤ Quotient r`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/EffectiveEpi/Basic.lean",
+   "matches": [
+    {
+     "line_number": 26,
+     "content": "    26|`Mathlib/CategoryTheory/EffectiveEpi/RegularEpi.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/FiberedCategory/Cocartesian.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|This file has been adapted from `Mathlib/CategoryTheory/FiberedCategory/Cartesian.lean`,"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/FiberedCategory/Cartesian.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|This file has been adapted to `Mathlib/CategoryTheory/FiberedCategory/Cocartesian.lean`,"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/FiberedCategory/HasFibers.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|(see `Mathlib/CategoryTheory/FiberedCategory/Fiber.lean`). This makes it so that any result proven"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/SmallObject/IsCardinalForSmallObjectArgument.lean",
+   "matches": [
+    {
+     "line_number": 30,
+     "content": "    30|see `Mathlib/CategoryTheory/Presentable/Basic.lean`.)"
+    },
+    {
+     "line_number": 35,
+     "content": "    35|`Mathlib/CategoryTheory/SmallObject/Basic.lean` for the definition of this typeclass"
+    },
+    {
+     "line_number": 46,
+     "content": "    46|in the file `Mathlib/CategoryTheory/SmallObject/Construction.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/SmallObject/Construction.lean",
+   "matches": [
+    {
+     "line_number": 311,
+     "content": "   311|of the file `Mathlib/CategoryTheory/SmallObject/Construction.lean` -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/SmallObject/Basic.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|`Mathlib/CategoryTheory/SmallObject/IsCardinalForSmallObjectArgument.lean`. It involves certain"
+    },
+    {
+     "line_number": 24,
+     "content": "    24|presentable object of `C`, see the file `Mathlib/CategoryTheory/Presentable/Basic.lean`)."
+    },
+    {
+     "line_number": 52,
+     "content": "    52|is done in the file `Mathlib/CategoryTheory/SmallObject/TransfiniteIteration.lean`."
+    },
+    {
+     "line_number": 55,
+     "content": "    55|is defined in the file `Mathlib/CategoryTheory/SmallObject/Construction.lean` (this definition"
+    },
+    {
+     "line_number": 57,
+     "content": "    57|in the file `Mathlib/CategoryTheory/SmallObject/IsCardinalForSmallObjectArgument.lean`"
+    },
+    {
+     "line_number": 61,
+     "content": "    61|the file `Mathlib/CategoryTheory/SmallObject/TransfiniteCompositionLifting.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Topos/Classifier.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|https://github.com/b-mehta/topos/blob/master/src/subobject_classifier.lean"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/JointlySurjective.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|See `Mathlib/CategoryTheory/Sites/Types.lean` for the Grothendieck topology of jointly surjective"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/Grothendieck.lean",
+   "matches": [
+    {
+     "line_number": 30,
+     "content": "    30|`Mathlib/CategoryTheory/Sites/Pretopology.lean`. The topology associated"
+    },
+    {
+     "line_number": 31,
+     "content": "    31|to a topological space is defined in `Mathlib/CategoryTheory/Sites/Spaces.lean`."
+    },
+    {
+     "line_number": 598,
+     "content": "   598|-- This is used extensively in `Plus.lean`, etc."
+    },
+    {
+     "line_number": 599,
+     "content": "   599|-- We place this definition here as it will be used in `Sheaf.lean` as well."
+    },
+    {
+     "line_number": 611,
+     "content": "   611|given object for the given covering sieve. See `Sheaf.lean` for an equivalent sheaf condition"
+    },
+    {
+     "line_number": 623,
+     "content": "   623|assuming such a multiequalizer exists. This will be used in `Sheaf.lean` to provide an equivalent"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/Pretopology.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|The pretopology associated to a topological space is defined in `Spaces.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/EqualizerSheafCondition.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|In `Mathlib/CategoryTheory/Sites/IsSheafFor.lean` it is defined what it means for a presheaf to be a"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/SheafOfTypes.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|In `Mathlib/CategoryTheory/Sites/IsSheafFor.lean` it is defined what it means for a presheaf to be a"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/Sheafification.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|`Mathlib/CategoryTheory/Sites/LeftExact.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/Limits.lean",
+   "matches": [
+    {
+     "line_number": 237,
+     "content": "   237|topology (see `Mathlib/CategoryTheory/Sites/Coherent/ExtensiveColimits.lean`)."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Sites/Coherent/SheafComparison.lean",
+   "matches": [
+    {
+     "line_number": 26,
+     "content": "    26|`Mathlib/Condensed/Equivalence.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/MorphismProperty/Representable.lean",
+   "matches": [
+    {
+     "line_number": 475,
+     "content": "   475|pullback. This is used in `Mathlib/AlgebraicGeometry/Sites/Representability.lean` to show that"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Galois/Action.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|See `Mathlib/CategoryTheory/Galois/Full.lean` for the proof that `H` is (faithfully) full."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Galois/Basic.lean",
+   "matches": [
+    {
+     "line_number": 33,
+     "content": "    33|This is proven in `Mathlib/CategoryTheory/Galois/Equivalence.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/ConeCategory.lean",
+   "matches": [
+    {
+     "line_number": 17,
+     "content": "    17|instance of `Cone`, please refer to `Mathlib/CategoryTheory/Limits/Cones.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Presentation.lean",
+   "matches": [
+    {
+     "line_number": 17,
+     "content": "    17|(See `Mathlib/CategoryTheory/Presentable/ColimitPresentation.lean` for the construction of a"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Cones.lean",
+   "matches": [
+    {
+     "line_number": 35,
+     "content": "    35|For more results about the category of cones, see `cone_category.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/HasLimits.lean",
+   "matches": [
+    {
+     "line_number": 447,
+     "content": "   447|-- are proved in `Mathlib/CategoryTheory/Adjunction/Limits.lean`."
+    },
+    {
+     "line_number": 530,
+     "content": "   530|the file `Mathlib/CategoryTheory/Limits/ConeCategory.lean`: see the lemma"
+    },
+    {
+     "line_number": 709,
+     "content": "   709|(see `Mathlib/Tactic/CategoryTheory/Reassoc.lean`)"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/EssentiallySmall.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|See also the file `FinallySmall.lean` for more general results."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Preserves/Yoneda.lean",
+   "matches": [
+    {
+     "line_number": 28,
+     "content": "    28|`A`, see `Mathlib/CategoryTheory/Comma/Presheaf/Colimit.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Preserves/Finite.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|  see `Mathlib/CategoryTheory/Limits/Constructions/LimitsOfProductsAndEqualizers.lean`."
+    },
+    {
+     "line_number": 22,
+     "content": "    22|  see `Mathlib/CategoryTheory/Functor/Flat.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Preserves/Over.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|See `Mathlib/CategoryTheory/Comma/Over/Pullback.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Shapes/SplitEqualizer.lean",
+   "matches": [
+    {
+     "line_number": 27,
+     "content": "    27|This file was adapted from `Mathlib/CategoryTheory/Limits/Shapes/SplitCoequalizer.lean`. Please try"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Shapes/SplitCoequalizer.lean",
+   "matches": [
+    {
+     "line_number": 27,
+     "content": "    27|This file has been adapted to `Mathlib/CategoryTheory/Limits/Shapes/SplitEqualizer.lean`. Please try"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Shapes/IsTerminal.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|objects are defined in `Terminal.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Shapes/Equalizers.lean",
+   "matches": [
+    {
+     "line_number": 1172,
+     "content": "  1172|`Mathlib/CategoryTheory/Limits/Preserves/Shapes/Equalizers.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Shapes/Kernels.lean",
+   "matches": [
+    {
+     "line_number": 1142,
+     "content": "  1142|`Mathlib/CategoryTheory/Limits/Preserves/Shapes/Kernels.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Shapes/Pullback/HasPullback.lean",
+   "matches": [
+    {
+     "line_number": 395,
+     "content": "   395|`Mathlib/CategoryTheory/Limits/Preserves/Shapes/Pullbacks.lean`"
+    },
+    {
+     "line_number": 423,
+     "content": "   423|`Mathlib/CategoryTheory/Limits/Preserves/Shapes/Pullbacks.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/FunctorCategory/Finite.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|These declarations cannot be in `Mathlib/CategoryTheory/Limits/FunctorCategory/Basic.lean` because"
+    },
+    {
+     "line_number": 17,
+     "content": "    17|that file shouldn't import `Mathlib/CategoryTheory/Limits/Shapes/FiniteProducts.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/FunctorCategory/Filtered.lean",
+   "matches": [
+    {
+     "line_number": 14,
+     "content": "    14|These declarations cannot be in `Mathlib/CategoryTheory/Limits/FunctorCategory/Basic.lean` because"
+    },
+    {
+     "line_number": 15,
+     "content": "    15|that file shouldn't import `Mathlib/CategoryTheory/Limits/Filtered.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Limits/Types/Products.lean",
+   "matches": [
+    {
+     "line_number": 32,
+     "content": "    32|-- This shortcut instance is required in `Mathlib/CategoryTheory/Closed/Types.lean`,"
+    },
+    {
+     "line_number": 38,
+     "content": "    38|-- `Mathlib/CategoryTheory/Sites/EqualizerSheafCondition.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Presentable/OrthogonalReflection.lean",
+   "matches": [
+    {
+     "line_number": 27,
+     "content": "    27|the file `Mathlib/CategoryTheory/SmallObject/Construction.lean` for the small object"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Bicategory/Adjunction/Mate.lean",
+   "matches": [
+    {
+     "line_number": 27,
+     "content": "    27|`Mathlib/CategoryTheory/Adjunction/Mates.lean`, where you can find more detailed documentation"
+    },
+    {
+     "line_number": 42,
+     "content": "    42|To be precise, the definitions in `Mathlib/CategoryTheory/Adjunction/Mates.lean` are universe"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Bicategory/Functor/Lax.lean",
+   "matches": [
+    {
+     "line_number": 34,
+     "content": "    34|since lax functors had not yet been added (e.g `FunctorBicategory.lean`). A possible project would"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Bicategory/Functor/StrictPseudofunctor.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|Once the deprecated `Mathlib/CategoryTheory/Bicategory/Functor/Strict.lean` is removed we should"
+    },
+    {
+     "line_number": 22,
+     "content": "    22|rename this file to `Mathlib/CategoryTheory/Bicategory/Functor/Strict.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Comma/Basic.lean",
+   "matches": [
+    {
+     "line_number": 36,
+     "content": "    36|* `Over X`: the over category of the object `X` (developed in `Over.lean`)."
+    },
+    {
+     "line_number": 37,
+     "content": "    37|* `Under X`: the under category of the object `X` (also developed in `Over.lean`)."
+    },
+    {
+     "line_number": 38,
+     "content": "    38|* `Arrow T`: the arrow category of the category `T` (developed in `Arrow.lean`)."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/CategoryTheory/Groupoid/Subgroupoid.lean",
+   "matches": [
+    {
+     "line_number": 43,
+     "content": "    43|The structure of this file is copied from/inspired by `Mathlib/Algebra/Group/Subgroup/Basic.lean`"
+    },
+    {
+     "line_number": 44,
+     "content": "    44|and `Mathlib/Combinatorics/SimpleGraph/Subgraph.lean`."
+    }
+   ]
+  }
+ ],
+ "files_available": 963,
+ "files_scanned": 677,
+ "files_with_matches": 60,
+ "truncated": true,
+ "note": "Stopped at the file limit (60) after scanning 677 of 963 files. These results are a SAMPLE, not a census: do not read a count or a prevalence off them. Narrow the pattern or the path, or raise `limit`, before concluding how common something is."
+}

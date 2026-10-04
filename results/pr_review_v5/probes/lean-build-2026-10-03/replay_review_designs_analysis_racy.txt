@@ -1,0 +1,25 @@
+file                                             lines as-is  open  base |  cold  warm policy | errs  warns(pp)
+athlib/Topology/MetricSpace/CoveringNumbers.lean   422     0  10.6   9.6 |   8.1  0.31   0.11 | 8/8  8/8
+Mathlib/Analysis/ODE/GalerkinRegularity.lean       469     2  35.5  38.5 |  25.0  0.58   0.09 | 7/8  4/8
+Mathlib/Analysis/Meromorphic/Basic.lean            732     1  14.7  15.2 |  11.4  0.51   0.48 | 8/8  8/8
+ib/Algebra/Group/Irreducible/Indecomposable.lean   190     0  10.7  10.1 |  10.0  3.89   2.20 | 8/8  8/8
+Analysis/Normed/Operator/ContinuousAlgEquiv.lean   229     2  26.0  27.7 |  24.0  2.20   2.20 | 8/8  7/8
+Mathlib/Analysis/Complex/Schwarz.lean              175     1  10.5  14.0 |   8.5  0.42   0.41 | 8/8  8/8
+Mathlib/LinearAlgebra/RootSystem/BaseExists.lean   138     0  10.4  12.5 |   9.2  5.87   5.87 | 6/6  6/6
+
+edits n=54: cold median 10.3 s, total 751 s
+   server, whole file   median 0.50 s, total 154 s (4.9x)
+   server, sound policy median 0.46 s, total 146 s (5.1x); cut on 14/54 edits
+per file, baseline + edits + as-is calls: cold 1041 s vs server 265 s (3.9x)
+errors identical 52/54, after =>/↦ 53/54; warnings identical 49/54, after =>/↦ 49/54; sound cuts agree on error presence 13/14
+  DIFF GalerkinRegularity.lean decl
+     warnings cold only: ['unused variable `Φ`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`']
+  DIFF GalerkinRegularity.lean decl
+     errors only one side: ["unsolved goals\nk k' : Fin 3 → ℤ\n⊢ ∏ x, ∫ (y : UnitAddCircle), ↑(k x • y).toCircle * (starRingEnd ℂ) ↑(k' x • y).toCircle =\n    if ∀ (x : Fin 3), k x ="]
+     warnings cold only: ['This simp argument is unused:\n  Finset.prod_boole\n\nHint: Omit it from the simp argument list.\n  simp [fourier_ortho_integral, F̵i̵n̵s̵e̵t̵.̵p̵r̵o̵d̵_̵', 'This simp argument is unused:\n  fourier_ortho_integral\n\nHint: Omit it from the simp argument list.\n  simp [f̵o̵u̵r̵i̵e̵r̵_̵o̵r̵t̵h̵o̵_̵i̵n̵t̵e̵g̵r̵a̵l', 'unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`']
+  DIFF GalerkinRegularity.lean decl
+     warnings cold only: ['unused variable `N`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`', 'unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`', 'unused variable `h_divfree`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`']
+  DIFF GalerkinRegularity.lean decl
+     warnings cold only: ['unused variable `N`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`', 'unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`', 'unused variable `h_divfree`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`']
+  DIFF ContinuousAlgEquiv.lean line
+     warnings cold only: ["This simp argument is unused:\n  this2.ne'\n\nHint: Omit it from the simp argument list.\n  simp [αa,̵ ̵t̵h̵i̵s̵2̵.̵n̵e̵'̵]\n\nNote: This linter can be disa"]

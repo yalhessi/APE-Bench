@@ -44,6 +44,17 @@ Default behavior: batch ALL tool calls together in each response. Tools execute 
 </PARALLEL_TOOL_CALLS>
 """
 
+#: The batch preamble without its imperatives, for a task whose own contract says how to work and
+#: when to submit. `BATCH_MODE_SYSTEM_PROMPT` tells a model that text "accomplishes NOTHING", to
+#: batch every call into each response and to submit only when "COMPLETED and VALIDATED"; the
+#: Claude reviewers this project compares gpt against ran under none of it
+#: (docs/todo/reviewer-model-gap.md, 2026-10-01). A text-only reply is still answered by the
+#: loop's no-tool-call prompt either way; only what the model is told up front differs.
+PLAIN_BATCH_SYSTEM_PROMPT = """You work through tools: they are how you read, search, compile and check anything in the workspace. The task's submission tool records your result and ends the session. Call it once, when you have finished."""
+
+#: `ApeAgentConfig.batch_preamble` -> the preamble a batch-mode session opens with.
+BATCH_PREAMBLES = {"standard": BATCH_MODE_SYSTEM_PROMPT, "plain": PLAIN_BATCH_SYSTEM_PROMPT}
+
 CLI_MODE_SYSTEM_PROMPT = """You are a helpful assistant. You must **strictly** follow the user's instructions, and you mustn't do anything the user didn't ask you to do.
 
 <TOOL_USAGE>
@@ -284,6 +295,51 @@ def build_skills_section(
 
 
 # =============================================================================
+# The task's own contract
+# =============================================================================
+
+async def task_system_prompt(task, logger: Optional['logging.LoggerAdapter'] = None) -> Optional[str]:
+    """The task's own system-level contract, when it defines one.
+
+    Optional by design: most tasks put everything in the user prompt, and `BaseTask` does
+    not declare this method at all. A task that raises or returns nothing is treated as
+    having no contract rather than failing the run — a missing prompt should degrade the
+    review, not abort it.
+
+    Shared by every scaffold because it once was not: `ape_agent` delivered it from 2026-08-25
+    (`1d32ef7`), while `claude_code` and `codex` never called it, so a task run under either
+    lost its contract — the solo reviewer its whole brief — and nothing said so.
+    """
+
+    builder = getattr(task, "create_system_prompt", None)
+    if builder is None:
+        return None
+    try:
+        text = await builder()
+    except NotImplementedError:
+        return None
+    except Exception as exc:  # noqa: BLE001
+        if logger is not None:
+            logger.warning("task system prompt unavailable: %s", exc)
+        return None
+    return (text or "").strip() or None
+
+
+async def with_task_system_prompt(
+    preamble: str, task, logger: Optional['logging.LoggerAdapter'] = None,
+) -> str:
+    """`preamble` with the task's contract appended, or unchanged when it has none.
+
+    Appended, never substituted: the workspace and tool preamble is what the harness depends on.
+    """
+
+    contract = await task_system_prompt(task, logger)
+    if not contract:
+        return preamble
+    return f"{preamble}\n\n{'=' * 80}\n\n{contract}"
+
+
+# =============================================================================
 # Main System Prompt Builder
 # =============================================================================
 
@@ -294,7 +350,9 @@ async def build_system_prompt(
     is_cli_mode: bool = False,
     use_absolute_paths: bool = False,
     managed_skills: Optional[Sequence["MaterializedSkill"]] = None,
-    logger: Optional['logging.LoggerAdapter'] = None
+    logger: Optional['logging.LoggerAdapter'] = None,
+    batch_preamble: str = "standard",
+    workspace_environment: bool = True,
 ) -> str:
     """
     Build complete system prompt for any scaffold.
@@ -306,6 +364,9 @@ async def build_system_prompt(
         is_cli_mode: Whether in CLI interactive mode
         use_absolute_paths: Whether to use absolute paths instead of relative paths
         logger: Logger for debug info
+        batch_preamble: Which `BATCH_PREAMBLES` entry opens a batch-mode prompt
+        workspace_environment: False drops the `<environment>` section unless it carries
+            blocked-path notes, which are never dropped
 
     Returns:
         Complete system prompt string
@@ -325,9 +386,15 @@ async def build_system_prompt(
         is_cli_mode,
         logger
     )
+    # The section describes scratch as "your primary development environment ... rapid iteration
+    # and experimentation" -- written for tasks that build code. A review edits nothing, and the
+    # paths section already says which tree is which. Blocked-path notes live in the same section
+    # and are the one part a task depends on, so a section carrying them is kept.
+    if not workspace_environment and "Blocked Paths" not in content_section:
+        content_section = ""
 
     # Assemble final prompt - select base prompt based on mode
-    base_prompt = CLI_MODE_SYSTEM_PROMPT if is_cli_mode else BATCH_MODE_SYSTEM_PROMPT
+    base_prompt = CLI_MODE_SYSTEM_PROMPT if is_cli_mode else BATCH_PREAMBLES[batch_preamble]
     prompt_parts = [base_prompt]
 
     if paths_section:

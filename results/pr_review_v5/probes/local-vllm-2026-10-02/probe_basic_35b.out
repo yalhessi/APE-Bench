@@ -1,0 +1,34 @@
+== 1. prefix cache: ~59.5k-token prompt, max_tokens 1
+  trial 0 cold      prompt= 59567 cached=0  latency=  2.31s
+  trial 0 same      prompt= 59567 cached=59136  latency=  0.18s
+  trial 0 extended  prompt= 59585 cached=59136  latency=  0.18s
+  trial 1 cold      prompt= 59432 cached=0  latency=  2.16s
+  trial 1 same      prompt= 59432 cached=59136  latency=  0.18s
+  trial 1 extended  prompt= 59450 cached=59136  latency=  0.18s
+  trial 2 cold      prompt= 59747 cached=0  latency=  2.51s
+  trial 2 same      prompt= 59747 cached=59136  latency=  0.19s
+  trial 2 extended  prompt= 59765 cached=59136  latency=  0.19s
+
+== 2. reasoning off: one short prompt, three ways of asking
+  nothing sent             completion_tokens=  260 reasoning_chars=   689 latency= 1.31s content='\n\n391'
+  reasoning_effort none    completion_tokens=    4 reasoning_chars=     0 latency= 0.04s content='391'
+  enable_thinking false    completion_tokens=    4 reasoning_chars=     0 latency= 0.04s content='391'
+
+== 3. tool calls under tool_choice auto: first request of 16 logged sessions, as sent to ELM
+  1790158337245_243e30cd.jsonl tool_calls=1 latency= 0.89s prompt=8145
+  1790086983032_863d5df7.jsonl tool_calls=2 latency= 1.29s prompt=6771
+  1790099214651_d059fb38.jsonl tool_calls=1 latency= 0.74s prompt=8617
+  1790158492610_bfd55539.jsonl tool_calls=1 latency= 0.47s prompt=8170
+  1790097967776_e3fd8d49.jsonl tool_calls=2 latency= 7.06s prompt=18835
+  1790072101525_0647c15b.jsonl tool_calls=3 latency= 3.68s prompt=6547
+  1790079851677_0ed60415.jsonl tool_calls=2 latency= 0.69s prompt=7480
+  1790098045268_24790e6b.jsonl tool_calls=4 latency= 2.62s prompt=8913
+  1790098018909_53938184.jsonl tool_calls=2 latency= 3.59s prompt=7601
+  1790097953143_8b9d5fc1.jsonl tool_calls=1 latency= 1.30s prompt=8628
+  1790158647352_083d57b4.jsonl tool_calls=1 latency= 0.74s prompt=8577
+  1790099319459_ffe3e2ec.jsonl tool_calls=1 latency= 1.52s prompt=7785
+  1790158208135_ff8e33f6.jsonl tool_calls=2 latency= 1.07s prompt=8544
+  1790080607116_a4019c5b.jsonl tool_calls=3 latency= 1.26s prompt=6654
+  1790098018377_20b6dbab.jsonl tool_calls=2 latency= 1.34s prompt=8640
+  1790086590926_1b8b96c0.jsonl tool_calls=1 latency= 0.45s prompt=6466
+  responses with a tool call 16/16; calls schema-valid 29/29

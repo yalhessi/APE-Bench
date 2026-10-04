@@ -78,8 +78,8 @@ class CodexCLITask(BaseTask):
     4. Support conversation tracking - through relay callback
 
     Key difference from batch mode:
-    - Batch mode: uses CodexBridge (HTTP API)
-    - CLI mode: directly calls `codex` command (no CodexBridge)
+    - Batch mode: runs `codex exec --json` per turn
+    - CLI mode: runs the interactive `codex` command
     """
 
     # class variable configuration

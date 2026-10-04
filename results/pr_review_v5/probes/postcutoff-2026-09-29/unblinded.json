@@ -1,0 +1,119 @@
+{
+ "1": {
+  "in": {
+   "reach": 0.4375,
+   "hits": 28,
+   "cells": 64,
+   "by_family": {
+    "F1": "8/28",
+    "F10": "8/8",
+    "F2": "12/20",
+    "F3": "0/8"
+   },
+   "mechanical": [
+    20,
+    56
+   ]
+  },
+  "post": {
+   "reach": 0.46875,
+   "hits": 15,
+   "cells": 32,
+   "by_family": {
+    "F10": "2/2",
+    "F12": "0/2",
+    "F2": "4/6",
+    "F4": "2/4",
+    "F6": "0/4",
+    "F7": "2/4",
+    "F8": "3/8",
+    "F9": "2/2"
+   },
+   "mechanical": [
+    4,
+    6
+   ]
+  },
+  "r": 1.0714285714285714,
+  "r_mechanical": null,
+  "post_mechanical_asks": 3,
+  "post_stability": "7 of 8 reached by either run are reached by both",
+  "control_findings_per_session": {
+   "41271": [
+    1,
+    1
+   ],
+   "41280": [
+    3,
+    4
+   ],
+   "41314": [
+    3,
+    2
+   ],
+   "42238": [
+    2,
+    0
+   ]
+  }
+ },
+ "2": {
+  "in": {
+   "reach": 0.59375,
+   "hits": 38,
+   "cells": 64,
+   "by_family": {
+    "F1": "18/28",
+    "F10": "8/8",
+    "F2": "12/20",
+    "F3": "0/8"
+   },
+   "mechanical": [
+    30,
+    56
+   ]
+  },
+  "post": {
+   "reach": 0.46875,
+   "hits": 15,
+   "cells": 32,
+   "by_family": {
+    "F10": "2/2",
+    "F12": "0/2",
+    "F2": "4/6",
+    "F4": "2/4",
+    "F6": "0/4",
+    "F7": "2/4",
+    "F8": "3/8",
+    "F9": "2/2"
+   },
+   "mechanical": [
+    4,
+    6
+   ]
+  },
+  "r": 0.7894736842105263,
+  "r_mechanical": null,
+  "post_mechanical_asks": 3,
+  "post_stability": "7 of 8 reached by either run are reached by both",
+  "control_findings_per_session": {
+   "41271": [
+    1,
+    1
+   ],
+   "41280": [
+    3,
+    4
+   ],
+   "41314": [
+    3,
+    2
+   ],
+   "42238": [
+    2,
+    0
+   ]
+  }
+ },
+ "reading": "not mainly recall"
+}

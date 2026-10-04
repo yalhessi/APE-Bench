@@ -1,0 +1,9 @@
+# transcribed from farm_iterative.py's stdout (2026-10-03); 9806's changed-module list abbreviated
+changed modules: 13 (Mathlib.CategoryTheory.Limits.HasLimits, ...Preserves.Limits, ...Preserves.Over, ...FunctorCategory.Finite, ...FunctorCategory.Filtered, ...Bicategory.Functor.StrictPseudofunctor, ...Groupoid.Subgroupoid, ...)
+closure 564 modules; predicted rebuild 13 (the changed modules)
+farm: 28 real dirs, 3008 symlinks, 0.7s
+import-graph superset would be 120 modules; starting from the 13 changed
+iteration 1: build ok; cumulative build time 21s
+Lake wrote 182 files for 13 modules; materialized 13; real bytes 16.3 MB
+byte-identical to the copied reviewed workspace: 156/182
+lake build --no-build: 0

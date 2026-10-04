@@ -1,0 +1,335 @@
+[
+ {
+  "id": "c1",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_injective` by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ mul_left_injective b⁻¹ h",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR proof of `div_left_injective` (`simp only [div_eq_mul_inv]; exact fun a a' h ↦ mul_left_injective b⁻¹ h`) compiles unchanged at the PR's `[DivInvMonoid G] [IsRightCancelMul G]`: `mul_left_injective` needs only `IsRightCancelMul`, so the PR's new proof was not needed for the generalisation."
+ },
+ {
+  "id": "c2",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_left_inj"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_inj` by:\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := by\n  rw [div_eq_mul_inv, div_eq_mul_inv]\n  exact mul_left_inj _",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR proof of `div_left_inj` (`rw [div_eq_mul_inv, div_eq_mul_inv]; exact mul_left_inj _`) compiles unchanged at the new generality; the PR's six-line constructor proof was not needed."
+ },
+ {
+  "id": "c3",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_right_inj",
+   "div_right_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_right_inj` by:\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c :=\n  div_right_injective.eq_iff",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR proof `div_right_injective.eq_iff` compiles at the new generality (replicates pass-3 c6 as a declaration replacement); the PR's `(G := G) (b := a)` are unnecessary."
+ },
+ {
+  "id": "c4",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "div_eq_inv_self",
+   "div_left_injective",
+   "div_left_inj",
+   "div_eq_self",
+   "div_right_injective",
+   "div_right_inj"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean lines 635-670 replaced by:\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]\n\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  -- FIXME this could be by `simpa`, but it fails. This is probably a bug in `simpa`.\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ mul_left_injective b⁻¹ h\n\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := by\n  rw [div_eq_mul_inv, div_eq_mul_inv]\n  exact mul_left_inj _\n\nend RightCancelDivInvMonoid\n\nsection LeftCancelDivisionMonoid\n\nvariable [DivisionMonoid G] [IsLeftCancelMul G] {a b c : G}\n\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]\n\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  -- FIXME see above\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ inv_injective (mul_right_injective b h)\n\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c :=\n  div_right_injective.eq_iff",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "All six Basic.lean proofs in their exact pre-PR text (FIXME comments included), placed under the PR's two new sections and statements, compile together: no proof in this family had to change for the generalisation."
+ },
+ {
+  "id": "c5",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_injective` by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  intro a₁ a₂ h\n  have h' : a₁ * b⁻¹ = a₂ * b⁻¹ := by simpa [div_eq_mul_inv] using h\n  exact mul_right_cancel h'",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "In the PR's own structure the closing `simpa using (mul_right_cancel (a := a₁) (b := b⁻¹) (c := a₂) h')` is a no-op: `exact mul_right_cancel h'` closes it, with none of the three named arguments."
+ },
+ {
+  "id": "c6",
+  "kind": "library_tool",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_injective` by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b :=\n  fun _ _ h ↦ mul_right_cancel (by simpa only [div_eq_mul_inv] using h)",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`mul_right_cancel` closes `div_left_injective` as a one-line term, `fun _ _ h ↦ mul_right_cancel (by simpa only [div_eq_mul_inv] using h)` (the `mul_left_injective := fun _ _ ↦ mul_right_cancel` shape of Defs.lean)."
+ },
+ {
+  "id": "c7",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_injective` by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The `simpa` proof the deleted FIXME asked for now works: `by simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹` compiles, so the FIXME can be resolved rather than deleted."
+ },
+ {
+  "id": "c8",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_injective` by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b :=\n  fun _ _ h ↦ by simpa [div_eq_mul_inv] using h",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`fun _ _ h ↦ by simpa [div_eq_mul_inv] using h` also closes it (simp's `mul_left_inj` does the cancellation); it depends on the simp set, so it is less robust than c7."
+ },
+ {
+  "id": "c9",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_injective` by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b :=\n  fun _ _ h ↦ mul_left_cancel (by simpa only [div_eq_mul_inv] using h)",
+  "compiled": false,
+  "result": "failed to synthesize IsLeftCancelMul G; type mismatch `x * b⁻¹ = x' * b⁻¹` vs `?m * x = ?m * x'`",
+  "shows": "Control: the tool does report errors; swapping in `mul_left_cancel` fails, so the right-cancel step is the only cancellation available in this section."
+ },
+ {
+  "id": "c10",
+  "kind": "derivation",
+  "objects": [
+   "div_left_inj",
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_inj` by:\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c :=\n  div_left_injective.eq_iff",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`div_left_inj := div_left_injective.eq_iff` compiles as the declaration, with its `simp` attribute: the iff is derived from the injectivity lemma as `mul_left_inj := (mul_left_injective a).eq_iff` is in Defs.lean and as the PR itself does for `div_right_inj`."
+ },
+ {
+  "id": "c11",
+  "kind": "extraction",
+  "objects": [
+   "div_left_inj",
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_left_inj` by:\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c :=\n  ⟨(div_left_injective ·), congrArg (· / a)⟩",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The fragment the PR repeats between `div_left_injective` and `div_left_inj` (`have h' : _ * _⁻¹ = _ * _⁻¹ := by simpa [div_eq_mul_inv] using h; simpa using mul_right_cancel … h'`) is exactly `div_left_injective`: `⟨(div_left_injective ·), congrArg (· / a)⟩` compiles (the `mul_right_cancel_iff` shape). No new lemma is needed; the extracted lemma already exists."
+ },
+ {
+  "id": "c12",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_right_injective` by:\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simpa only [div_eq_mul_inv, Function.comp_def] using (mul_right_injective b).comp inv_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`by simpa only [div_eq_mul_inv, Function.comp_def] using (mul_right_injective b).comp inv_injective` compiles: the FIXME workaround in `div_right_injective` is resolvable too."
+ },
+ {
+  "id": "c13",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_right_injective` by:\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The same without `Function.comp_def`, `by simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective`, compiles: the FIXME's `simpa` form is a one-liner."
+ },
+ {
+  "id": "c14",
+  "kind": "library_tool",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_right_injective` by:\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x :=\n  fun _ _ h ↦ inv_injective <| mul_left_cancel (by simpa only [div_eq_mul_inv] using h)",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`fun _ _ h ↦ inv_injective <| mul_left_cancel (by simpa only [div_eq_mul_inv] using h)` compiles; it is no shorter than the kept proof, so it changes nothing."
+ },
+ {
+  "id": "c15",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_right_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_right_injective` by:\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x :=\n  fun _ _ h ↦ by simpa [div_eq_mul_inv] using h",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`fun _ _ h ↦ by simpa [div_eq_mul_inv] using h` compiles (via simp's `mul_right_inj`, `inv_inj`); like c8, it depends on the simp set, so it changes nothing."
+ },
+ {
+  "id": "c16",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_eq_inv_self",
+   "div_left_injective",
+   "div_left_inj",
+   "div_eq_self",
+   "div_right_injective",
+   "div_right_inj"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean lines 635-670 replaced by:\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]\n\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹\n\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := div_left_injective.eq_iff\n\nend RightCancelDivInvMonoid\n\nsection LeftCancelDivisionMonoid\n\nvariable [DivisionMonoid G] [IsLeftCancelMul G] {a b c : G}\n\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]\n\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective\n\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c := div_right_injective.eq_iff",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The whole Basic.lean family in the library's idiom (one-line `rw` proofs; both injectivity lemmas by the FIXME's `simpa … using`; both iffs by `.eq_iff`) compiles together as one edit, 25 lines against the PR's 36 for the same span."
+ },
+ {
+  "id": "c17",
+  "kind": "derivation",
+  "objects": [
+   "div_eq_inv_self",
+   "div_left_inj",
+   "div_eq_self",
+   "div_right_inj"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean lines 635-670 replaced by:\n@[to_additive]\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹\n\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := div_left_injective.eq_iff\n\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [← one_div, div_left_inj]\n\nend RightCancelDivInvMonoid\n\nsection LeftCancelDivisionMonoid\n\nvariable [DivisionMonoid G] [IsLeftCancelMul G] {a b c : G}\n\n@[to_additive]\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ inv_injective (mul_right_injective b h)\n\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c := div_right_injective.eq_iff\n\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := calc\n  a / b = a ↔ a / b = a / 1 := by rw [div_one]\n  _ ↔ b = 1 := div_right_inj",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`div_eq_inv_self` can be derived from `div_left_inj` (`rw [← one_div, div_left_inj]`) and `div_eq_self` from `div_right_inj` (the `mul_eq_left` calc) when reordered. Both compile, but neither is shorter than the kept `rw [div_eq_mul_inv, mul_eq_right]` / `mul_eq_left` proofs, so this changes nothing."
+ },
+ {
+  "id": "c18",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_eq_inv_self"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_eq_inv_self` by:\n@[to_additive (attr := simp)]\ntheorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by\n  simp [div_eq_mul_inv]",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`simp [div_eq_mul_inv]` closes `div_eq_inv_self`; the kept explicit `rw` is no longer and does not depend on the simp set, so this changes nothing."
+ },
+ {
+  "id": "c19",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "div_eq_self"
+  ],
+  "lean": "Mathlib/Algebra/Group/Basic.lean :: replace declaration `div_eq_self` by:\n@[to_additive (attr := simp)]\ntheorem div_eq_self : a / b = a ↔ b = 1 := by\n  simp [div_eq_mul_inv]",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`simp [div_eq_mul_inv]` closes `div_eq_self`; as with c18, the kept `rw` proof stands."
+ },
+ {
+  "id": "c20",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Finset.card_le_card_div_left",
+   "div_right_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean :: replace declaration `Finset.card_le_card_div_left` by:\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR term proof `have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective` compiles unchanged at the PR's `[DivisionMonoid α] [IsLeftCancelMul α]` (a declaration-level replicate of pass-3 c5). It has the form of its sibling `card_le_card_mul_left` (`have ⟨_, ha⟩ := hs; …`)."
+ },
+ {
+  "id": "c21",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Finset.card_le_card_div_right",
+   "div_left_injective"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean :: replace declaration `Finset.card_le_card_div_right` by:\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR term proof of `card_le_card_div_right` compiles unchanged, with no `(b := b)`; it has the form of `card_le_card_mul_right`."
+ },
+ {
+  "id": "c22",
+  "kind": "derivation",
+  "objects": [
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_mul_left"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean :: replace declaration `Finset.card_le_card_div_left` by:\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) := by\n  rw [div_eq_mul_inv, ← card_inv t]\n  exact card_le_card_mul_left hs",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`card_le_card_div_left` follows from its mul partner (`rw [div_eq_mul_inv, ← card_inv t]; exact card_le_card_mul_left hs`), but it is not shorter and needs the same hypotheses, so this changes nothing."
+ },
+ {
+  "id": "c23",
+  "kind": "derivation",
+  "objects": [
+   "Finset.card_le_card_div_right",
+   "Finset.card_le_card_mul_right"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean :: replace declaration `Finset.card_le_card_div_right` by:\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := by\n  rw [div_eq_mul_inv]\n  exact card_le_card_mul_right ht.inv",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`card_le_card_div_right` follows from `card_le_card_mul_right ht.inv` after `rw [div_eq_mul_inv]`; this is not an improvement on the direct image₂ proof, so it changes nothing."
+ },
+ {
+  "id": "c24",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Set.finite_div"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Set/Finite.lean :: replace declaration `Set.finite_div` by:\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR `finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn` compiles unchanged (replicates pass-3 c4). It is the one-line form of the sibling `finite_mul`."
+ },
+ {
+  "id": "c25",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Set.infinite_div"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Set/Finite.lean :: replace declaration `Set.infinite_div` by:\n@[to_additive]\nlemma infinite_div : (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty :=\n  infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The pre-PR proof of `infinite_div` compiles unchanged at the new generality (pass 3 did not compile this one); `(b := b)`/`(b := a)` and the named binders are unnecessary."
+ },
+ {
+  "id": "c26",
+  "kind": "derivation",
+  "objects": [
+   "Set.finite_div",
+   "Set.finite_mul",
+   "Set.finite_inv"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Set/Finite.lean :: replace declaration `Set.finite_div` by:\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ := by\n  rw [div_eq_mul_inv, finite_mul, finite_inv, inv_eq_empty]",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`finite_div` is derivable from its mul/inv partners, `rw [div_eq_mul_inv, finite_mul, finite_inv, inv_eq_empty]`. It is no shorter, needs the same hypotheses, and departs from the file's image₂ pattern, so this changes nothing."
+ },
+ {
+  "id": "c27",
+  "kind": "derivation",
+  "objects": [
+   "Set.infinite_div",
+   "Set.infinite_mul",
+   "Set.infinite_inv"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Set/Finite.lean :: replace declaration `Set.infinite_div` by:\n@[to_additive]\nlemma infinite_div : (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty := by\n  rw [div_eq_mul_inv, infinite_mul, infinite_inv, nonempty_inv]",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "`infinite_div` is likewise derivable, `rw [div_eq_mul_inv, infinite_mul, infinite_inv, nonempty_inv]`; again this changes nothing."
+ },
+ {
+  "id": "c28",
+  "kind": "extraction",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Set/Finite.lean lines 141-149 replaced by:\n@[to_additive]\nlemma injOn_div_aux : (∀ b ∈ t, InjOn (· / b) s) ∧ ∀ a ∈ s, InjOn (a / ·) t :=\n  ⟨fun _ _ ↦ div_left_injective.injOn, fun _ _ ↦ div_right_injective.injOn⟩\n\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 injOn_div_aux.1 injOn_div_aux.2\n\n@[to_additive]\nlemma infinite_div : (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty :=\n  infinite_image2 injOn_div_aux.1 injOn_div_aux.2",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors, no warnings",
+  "shows": "The injOn pair repeated in `finite_div` and `infinite_div` can be extracted (`injOn_div_aux`, with to_additive) and both proofs then use it; this compiles. The siblings `finite_mul`/`infinite_mul` repeat the same pair inline, and the extraction adds a declaration for two uses, so it is not requested."
+ }
+]

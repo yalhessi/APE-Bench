@@ -1,0 +1,69 @@
+import json
+D = "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/model-gap-val-small12/pr28649/X2/"
+F = [
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module doc, Main statements)",
+  "claim": "The PR edits this module doc but leaves the `integral_comp` bullet wrong in two ways. It cites `ProbabilityTheory.integral_comp`, which does not exist: the theorem is declared inside `namespace Kernel`, so its name is `ProbabilityTheory.Kernel.integral_comp`. It also gives the statement with the Lebesgue integral `∫⁻`, although this file and that theorem are about the Bochner integral `∫`.",
+  "requested_change": "Change lines 30-31 to:\n* `ProbabilityTheory.Kernel.integral_comp`: the integral against the composition is\n  `∫ z, f z ∂((η ∘ₖ κ) a) = ∫ x, ∫ y, f y ∂(η x) ∂(κ a)`.",
+  "severity": "advisory",
+  "evidence": "Read the file with file_read: `theorem integral_comp` is at line 417, inside `namespace Kernel` (opened at line 359, closed at line 445), and its statement is `∫ z, f z ∂(η ∘ₖ κ) a = ∫ x, ∫ y, f y ∂η x ∂κ a`. lean_verify_edit with `#check` lines added at the end of the file: `#check @ProbabilityTheory.Kernel.integral_comp` elaborates to that Bochner statement; `#check @ProbabilityTheory.integral_comp` fails with `Unknown identifier ProbabilityTheory.integral_comp`. `#check @ProbabilityTheory.integral_compProd` succeeds, so the other bullet is correct. The proposed replacement of lines 10-31, together with the finding below, compiled cleanly (lean_verify_edit success, no warnings)."
+ },
+ {
+  "target": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean (module doc title)",
+  "claim": "This module doc is being typo-fixed, but its title still says \"the composition and the composition-products of two kernels\". Two kernels have one composition-product, and the next line of the doc says \"the composition and the composition-product of two kernels\".",
+  "requested_change": "Change line 10 to `# Bochner integral of a function against the composition and the composition-product of two kernels`. This also brings the line from 100 characters down to 99.",
+  "severity": "advisory",
+  "evidence": "file_read of lines 10 and 12. The replacement was checked with the same lean_verify_edit call as the finding above (success)."
+ },
+ {
+  "target": "Mathlib/Probability/Moments/Basic.lean (module doc, Main results)",
+  "claim": "The PR capitalises the acronyms in prose (\"mgfs\" to \"MGFs\", \"cgfs\" to \"CGFs\") in the Main results list, but two lines further down the same list still says \"the cgf exists\" (line 30). The list is now inconsistent within itself.",
+  "requested_change": "On line 30 change \"the cgf exists\" to \"the CGF exists\", matching the PR's \"MGFs\"/\"CGFs\" (the code-quoted `mgf`/`cgf` on lines 32-33 stay as they are).",
+  "severity": "advisory",
+  "evidence": "content_search over Mathlib/Probability/Moments for prose mgf/cgf: in Basic.lean, lines 25 and 27 now read MGFs/CGFs and line 30 reads `the cgf exists, ...`. lean_verify_edit on lines 15-30 with this change and the one below: success."
+ },
+ {
+  "target": "Mathlib/Probability/Moments/Basic.lean (module doc, Main definitions)",
+  "claim": "In the module doc this PR edits, the `centralMoment` bullet has no space after the colon (\"`ProbabilityTheory.centralMoment X p μ`:`p`th central moment\"). Every other bullet in the list has one.",
+  "requested_change": "On line 15 insert a space: \"* `ProbabilityTheory.centralMoment X p μ`: `p`th central moment of `X` with respect to measure `μ`,\". The line is then 99 characters.",
+  "severity": "advisory",
+  "evidence": "file_read of lines 13-20 of Basic.lean; the other bullets use `...`: text. lean_verify_edit (the same call as above): success."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Convergence.lean (header module doc)",
+  "claim": "The PR fixes wording in this file's section doc, but the file's header module doc still has typos. Three Main results bullets are missing \"of\": \"part b the L¹ martingale convergence theorem\" (line 32) and \"part c the L¹ martingale convergence theorem\" (lines 35 and 38). Line 17 writes \"an L¹ bounded submartingale\", while the rest of the file writes \"L¹-bounded\".",
+  "requested_change": "Change line 17 to \"an L¹-bounded submartingale\", and change \"part b the\" and \"part c the\" to \"part b of the\" and \"part c of the\" on lines 32, 35 and 38. With \"of\" added, line 38 is too long, so re-wrap lines 38-40 as:\n* `MeasureTheory.Integrable.tendsto_eLpNorm_condExp`: part c of the L¹ martingale convergence\n  theorem: given a `⨆ n, ℱ n`-measurable function `g` where `ℱ` is a filtration, `𝔼[g | ℱ n]`\n  converges in L¹ to `g`.",
+  "severity": "advisory",
+  "evidence": "file_read of lines 10-42 of Convergence.lean. Line 38 is 99 characters now and would be 102 with \"of\", hence the re-wrap. lean_verify_edit replacing lines 17-134 with these edits and the two docstring edits below: success, no warnings."
+ },
+ {
+  "target": "MeasureTheory.not_frequently_of_upcrossings_lt_top",
+  "claim": "The docstring says \"has bounded upcrossing from below `a` to above `b`\", with \"upcrossing\" in the singular. The hypothesis is about the count `upcrossings a b f ω ≠ ∞`, and the next two docstrings in the file say \"infinite upcrossings\" and \"bounded upcrossings\".",
+  "requested_change": "Change the first line of the docstring to \"/-- If a stochastic process has bounded upcrossings from below `a` to above `b`,\".",
+  "severity": "advisory",
+  "evidence": "file_read of Convergence.lean lines 106-131. Compiled as part of the Convergence lean_verify_edit above (success)."
+ },
+ {
+  "target": "MeasureTheory.tendsto_of_uncrossing_lt_top",
+  "claim": "The PR rewrites \"bounded liminfs\" as \"bounded limit inferiors\". The usual English plural is \"limits inferior\". The plural is also inaccurate here: the hypothesis `hf₁ : liminf (fun n => (‖f n ω‖₊ : ℝ≥0∞)) atTop < ∞` is a single limit inferior, of the norm of one realization, being finite.",
+  "requested_change": "Reword the first sentence of the docstring to: \"/-- A realization of a stochastic process with bounded upcrossings and with a finite limit inferior\\nof its norm is convergent.\" Keep the second paragraph as it is.",
+  "severity": "advisory",
+  "evidence": "file_read of Convergence.lean lines 133-140 shows the hypotheses `hf₁` (one liminf of `‖f n ω‖₊`) and `hf₂` (upcrossings). lean_verify_edit with the new docstring (inside the lines 17-134 replacement): success."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Upcrossing.lean (section doc \"Variant of the upcrossing estimate\")",
+  "claim": "The paragraph this PR edits states the target inequality as $(b - a) \\sup_N \\mathbb{E}[U_N(a, b)] \\le \\sup_N \\mathbb{E}[f_N]$. The theorem it describes, `Submartingale.mul_lintegral_upcrossings_le_lintegral_pos_part`, bounds by the positive part: `ENNReal.ofReal (b - a) * ∫⁻ ω, upcrossings a b f ω ∂μ ≤ ⨆ N, ∫⁻ ω, ENNReal.ofReal ((f N ω - a)⁺) ∂μ`. This also matches the header's Doob estimate with $\\mathbb{E}[(f_N - a)^+]$.",
+  "requested_change": "Change line 692 to `  (b - a) \\sup_N \\mathbb{E}[U_N(a, b)] \\le \\sup_N \\mathbb{E}[(f_N - a)^+].`",
+  "severity": "advisory",
+  "evidence": "file_read of Upcrossing.lean lines 15-18 (header: $(b - a) \\mathbb{E}[U_N(a, b)] \\le \\mathbb{E}[(f_N - a)^+]$), lines 689-693 (the section doc) and lines 782-785 (the theorem statement, which has `(f N ω - a)⁺`). lean_verify_edit replacing lines 685-708 with this change and the one below: success."
+ },
+ {
+  "target": "Mathlib/Probability/Martingale/Upcrossing.lean (section doc \"Variant of the upcrossing estimate\")",
+  "claim": "The measurability argument in the same edited paragraph is wrong as written. The display $U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{U_N(a, b) < N\\}}$ has a summand that does not depend on $i$. The text then says \"$U_N(a, b)$ is a stopping time\". The code (`upcrossingsBefore_eq_sum`, `Adapted.measurable_upcrossingsBefore`) actually sums the indicators of $\\{\\tau_i < N\\}$ for the upper crossing times $\\tau_i$ (`upperCrossingTime a b f N i`). Measurability comes from `isStoppingTime_upperCrossingTime`, not from $U_N$ being a stopping time.",
+  "requested_change": "Replace lines 703-706 with:\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\n$$\n$U_N(a, b)$ is measurable as each $\\{\\tau_i < N\\}$ is a measurable set since the upper crossing\ntime $\\tau_i$ is a stopping time.\nThis uses the $\\tau_n$ notation from the file's proof outline.",
+  "severity": "advisory",
+  "evidence": "file_read of Upcrossing.lean lines 711-712: `upcrossingsBefore a b f N ω = ∑ i ∈ Finset.Ico 1 (N + 1), {n | upperCrossingTime a b f N n ω < N}.indicator 1 i`. Lines 736-744: the measurability proof uses `hf.isStoppingTime_upperCrossingTime.measurableSet_lt_of_pred N`. Lines 73-79: the proof outline names the upper crossing times $\\tau_n$. lean_verify_edit (lines 685-708): success."
+ }
+]
+json.dump(F, open(D + "findings.json", "w"), ensure_ascii=False, indent=1)
+print(len(F))

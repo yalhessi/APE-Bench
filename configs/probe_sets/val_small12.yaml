@@ -1,0 +1,14 @@
+# Validation small12 (val-2025-06-2026-03-v1), less 30714, whose base fails inside lake build. Its 30
+# agreed asks are the 60-PR audit readers' (results/pr_review_v5/probes/val-small12-2026-09-25). The
+# construction demonstration's Claude sessions X1-X4 already cover 34091, 30458 and 32875.
+name: val_small12
+release: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1
+dataset_config: configs/pr_review_v5_val_2025_06_2026_03_v1_small12.yaml
+pr_numbers: [26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]
+feedback: {draw: val-2025-06-2026-03-v1}
+cid_prefix: v
+probe_dir: results/pr_review_v5/probes/model-gap-val-small12
+sessions_from:
+  30458: results/pr_review_v5/probes/construction-demo-2026-09-29
+  32875: results/pr_review_v5/probes/construction-demo-2026-09-29
+  34091: results/pr_review_v5/probes/construction-demo-2026-09-29

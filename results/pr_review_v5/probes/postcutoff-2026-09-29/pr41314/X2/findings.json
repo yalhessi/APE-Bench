@@ -1,0 +1,16 @@
+[
+ {
+  "target": "EuclideanGeometry.Sphere.angle_center_eq_zero_iff_eq",
+  "claim": "The proof of `angle_center_eq_zero_iff_eq` is longer than it needs to be. It opens with `constructor`/`intro` and converts `h` with `by simpa [angle] using h`, but `∠ p₁ s.center p₂` unfolds by definition to `InnerProductGeometry.angle (p₁ -ᵥ s.center) (p₂ -ᵥ s.center)`, so `h` can be passed to `eq_of_angle_eq_zero_of_norm_eq` as it is. The norm side goal is then just the composite of two `norm_vsub_center_eq_radius` facts.",
+  "requested_change": "Replace the tactic proof with the term-mode proof\n```lean\n    ∠ p₁ s.center p₂ = 0 ↔ p₁ = p₂ :=\n  ⟨fun h ↦ vsub_left_cancel <| eq_of_angle_eq_zero_of_norm_eq h <|\n      (norm_vsub_center_eq_radius hp₁).trans (norm_vsub_center_eq_radius hp₂).symm,\n    fun h ↦ h ▸ angle_self_of_ne fun hc ↦ hr (center_mem_iff.mp (hc ▸ hp₁))⟩\n```\nAt minimum, drop the `by simpa [angle] using h` wrapper and pass `h` directly.",
+  "severity": "advisory",
+  "evidence": "I ran lean_verify_edit on Mathlib/Geometry/Euclidean/Angle/Sphere.lean. (1) The term-mode replacement above gives success:true with no errors or warnings. (2) A tactic variant that keeps the structure but uses `eq_of_angle_eq_zero_of_norm_eq h ?_` without the `simpa [angle]` wrapper also gives success:true, which shows the `simpa` is redundant. (3) An alternative using `dist_eq_abs_sub_dist_of_angle_eq_zero h` with `simpa [mem_sphere.1 hp₁, mem_sphere.1 hp₂]` also compiles, so the forward direction has more than one short route. The as-is file compiles cleanly (compiles:true, no errors)."
+ },
+ {
+  "target": "Mathlib/Geometry/Euclidean/Angle/Sphere.lean",
+  "claim": "Both new lemmas write anonymous functions as `fun h => ...`: in `angle_center_eq_pi_iff_isDiameter` (`fun h => isDiameter_iff_mem_and_mem_and_wbtw.2 ...`, `fun h => h.sbtw hr`) and in `angle_center_eq_zero_iff_eq` (`fun h => hr (...)`). Mathlib style uses `↦`, and the neighbouring code this PR adds to already does (`fun h ↦` in `isDiameter_of_angle_eq_pi_div_two` and `IsTangentAt_iff_angle_eq_pi_div_two`).",
+  "requested_change": "Replace `fun h =>` with `fun h ↦` in both new declarations. For example, write `angle_center_eq_pi_iff_isDiameter`'s last line as `exact ⟨fun h ↦ isDiameter_iff_mem_and_mem_and_wbtw.2 ⟨hp₁, hp₂, h.wbtw⟩, fun h ↦ h.sbtw hr⟩`.",
+  "severity": "advisory",
+  "evidence": "In file_read of the PR's file, lines 118 and 181-182 (existing code in the same `namespace Sphere` section) use `fun h ↦`, while new lines 135 and 147 use `=>`. lean_verify_edit of `angle_center_eq_pi_iff_isDiameter` rewritten with `↦` gives success:true. The zero lemma's `↦` form is covered by the verified term-mode proof in the other finding. Zulip (thread 'Switch to ↦ (\\mapsto) globally', 2025-08) shows maintainers treating `↦` as the mathlib style."
+ }
+]

@@ -1,0 +1,10 @@
+(APIServer pid=1741677) INFO 10-02 07:41:44 [api_utils.py:286] non-default args: {'model_tag': 'Qwen/Qwen3.5-35B-A3B-FP8', 'enable_auto_tool_choice': True, 'tool_call_parser': 'qwen3_coder', 'enable_prompt_tokens_details': True, 'host': '127.0.0.1', 'port': 8011, 'model': 'Qwen/Qwen3.5-35B-A3B-FP8', 'max_model_len': 131072, 'served_model_name': ['local-qwen', 'Qwen/Qwen3.5-35B-A3B-FP8'], 'reasonin
+(APIServer pid=1741677) INFO 10-02 07:41:46 [config.py:625] Mamba cache mode is set to 'align' for Qwen3_5MoeForConditionalGeneration by default when prefix caching is enabled
+(APIServer pid=1741677) WARNING 10-02 07:41:46 [vllm.py:1387] Auto-disabled DeepGemm for model_type=qwen3_5_moe_text on Blackwell. DeepGemm E8M0 scale format causes accuracy degradation for this architecture. Falling back to CUTLASS. To disable DeepGemm globally, set VLLM_USE_DEEP_GEMM=0.
+(EngineCore pid=1742533) INFO 10-02 07:42:01 [fp8.py:438] Using TRITON Fp8 MoE backend out of potential backends: ['AITER', 'FLASHINFER_TRTLLM', 'FLASHINFER_CUTLASS', 'TRITON', 'MARLIN', 'HUMMING', 'BATCHED_TRITON', 'XPU', 'CPU', 'HPC'].
+(EngineCore pid=1742533) INFO 10-02 07:42:02 [cuda.py:538] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(EngineCore pid=1742533) INFO 10-02 07:42:11 [default_loader.py:430] Loading weights took 9.05 seconds
+(EngineCore pid=1742533) INFO 10-02 07:42:12 [model_runner.py:428] Model loading took 33.38 GiB memory and 11.502509 seconds
+(EngineCore pid=1742533) INFO 10-02 07:42:51 [gpu_worker.py:640] Available KV cache memory: 50.83 GiB
+(EngineCore pid=1742533) INFO 10-02 07:42:51 [kv_cache_utils.py:2395] GPU KV cache size: 2,524,386 tokens, Maximum concurrency for 131,072 tokens per request: 19.26x
+(APIServer pid=1741677) INFO:     Application startup complete.

@@ -17,14 +17,24 @@ from a probe is a result for the pipeline's tool.
 **The stand-in** is a `BasePRReviewTask` built without `__init__`, carrying only what the tools
 read:
 - `data`: the PR, the base commit, the retrieval cutoff, the changed files, and a trace path;
-- `target_workspace`: the reviewed overlay that `ReviewPRCoreTask.prepare_reviewed_sources` lays
-  over the compiled base, the same function the per-attempt overlay uses;
+- `target_workspace`: what a task's `setup_attempt` would verify against. That is the prebuilt
+  reviewed workspace (base + diff + changed modules rebuilt) when one exists for this (base,
+  diff), and otherwise the source-only overlay `ReviewPRCoreTask.prepare_reviewed_sources` lays
+  over the compiled base;
 - `config`: the scaffold of a real run config, so compile timeouts, memory and allowed axioms
   are a run's own;
 - `logger`.
 
 **The retrieval cutoff** is `episode_cutoff`, the reviewed head's commit time, so precedent and
 Zulip reads are gated exactly as a run gates them.
+
+**The reviewed workspace first, as a task does.** Until 2026-09-29 the toolbox always laid the
+overlay, so a probe compiled every changed file against the base commit's build products. On a
+multi-file PR that is the environment the rules file warns about: PR 30458 generalises
+`div_right_injective` in `Algebra/Group/Basic.lean` and uses it in `Pointwise/Finset/Basic.lean`,
+and the overlay reported `failed to synthesize Group α` in a file that builds. Every compile
+result names its environment (`environment`), so the complement probe's results say which they
+had.
 
 **Refused without a compiled base.** A `lean_verify_edit` against a missing base would report
 every import as an error. A built base is restored on first use, as a task restores it. One that
@@ -110,9 +120,6 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
             "`ape/bin/python -m ape.toolkits.execute.lean.build --input_file <rows>`.")
     workdir.mkdir(parents=True, exist_ok=True)
     overlay = workdir / "target"
-    if not overlay.exists():
-        asyncio.run(ReviewPRCoreTask.prepare_reviewed_sources(
-            overlay, base, pr_diff=episode.diff, changed_files=list(episode.changed_files)))
 
     _dataset, scaffold, _overrides = load_run(run_config)
     workspace = WorkspaceInfo(name="mathlib4", path=overlay, commit_hash=episode.base_sha)
@@ -129,13 +136,15 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
         work_unit_id=probe, change_ids=[], entity_ids_by_change={},
         primary_subjects_by_change={}, rendered_system_prompt="", rendered_user_prompt="",
         rendered_prompt_sha256="")
-    task.target_workspace = workspace
+    # Before the workspace is resolved: the restore manager logs through it, and without one it
+    # prints to stdout, which is where `cli tool` writes its JSON.
+    task.logger = create_logger(log_file=workdir / "toolbox.log", to_console=False)
+    task.target_workspace = _target_workspace(task.data, overlay, base, episode, task.logger)
     task.scratch_workspace = None
     # The file tools resolve `target/...` against the directory that holds the workspaces, as
     # an attempt directory holds `target/` in a run.
     task.workspaces_dir = workdir
     task.config = scaffold
-    task.logger = create_logger(log_file=workdir / "toolbox.log", to_console=False)
 
     mcp = _CapturingMCP()
     register_context_tools(task, mcp)
@@ -143,6 +152,39 @@ def workbench(episode: ReviewEpisodeInput, workdir: Path, run_config: Path) -> "
     FileSystemToolsProvider(task=task, config=scaffold, logger=task.logger).register_tools(
         mcp, FILE_TOOLS)
     return mcp
+
+
+def _target_workspace(data: Any, overlay: Path, base: Path,
+                      episode: ReviewEpisodeInput, logger: Any) -> Any:
+    """The reviewed workspace linked at `overlay` when one is built, else the source-only overlay.
+
+    The same call `review/base.py::setup_attempt` makes, so a probe compiles where an arm would.
+    A directory already at `overlay` is an overlay an earlier call laid down; it is kept only when
+    no reviewed workspace exists, because linking over it would mislabel base-commit build
+    products as the reviewed ones.
+    """
+
+    from ape.tasks.lean_tasks.formal_math.pr_review.core import ReviewPRCoreTask
+    from ape.toolkits.execute.lean.core.build_manager import reviewed_workspace_key
+
+    stale = overlay.exists() and not overlay.is_symlink()
+    if stale:
+        spec = data.target_workspace.model_copy(
+            update={"commit_hash": reviewed_workspace_key(episode.base_sha, episode.diff)})
+        if asyncio.run(ReviewPRCoreTask._maybe_resolve_cached_workspace(
+                spec, logger=logger)) is not None:
+            raise RuntimeError(
+                f"{overlay} is a source-only overlay from an earlier call, and a reviewed "
+                f"workspace ({spec.commit_hash}) exists for PR {episode.pr_number}. Use a new "
+                "--workdir, so the tools compile against the reviewed workspace.")
+        return data.target_workspace
+    reviewed = asyncio.run(ReviewPRCoreTask._maybe_setup_reviewed_target_workspace(
+        data, overlay, logger=logger))
+    if reviewed is not None:
+        return reviewed
+    asyncio.run(ReviewPRCoreTask.prepare_reviewed_sources(
+        overlay, base, pr_diff=episode.diff, changed_files=list(episode.changed_files)))
+    return data.target_workspace
 
 
 def _restore(commit_hash: str) -> Optional[Path]:

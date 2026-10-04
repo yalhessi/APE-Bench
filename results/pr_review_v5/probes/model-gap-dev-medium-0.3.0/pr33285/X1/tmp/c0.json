@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Normed/Operator/Banach.lean", "declaration_name": "ContinuousLinearMap.equivRange_symm_apply", "new_declaration": "@[simp]\nlemma equivRange_symm_apply (hinj : Injective f) (hclo : IsClosed (range f))\n    (x : E) : (f.equivRange hinj hclo).symm \u27e8f x, by simp\u27e9 = x :=\n  (f.equivRange hinj hclo).symm_apply_apply x"}

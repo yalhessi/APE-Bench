@@ -1,0 +1,9 @@
+# The dev set as one dataset config: the 16 PRs of dev-medium-0.3.0 (created 2025-12-18..31) less 33057, with
+# the reviewed workspace as the verification environment, as the validation and post-cutoff configs
+# have it. For the reviewer-model probe (configs/probe_sets/dev_medium_0_3_0.yaml); every v5 design
+# was tuned on these PRs.
+extends: bases/v5_generation.yaml
+
+dataset:
+  require_reviewed_workspaces: true
+  pr_numbers: [33066, 33098, 33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421, 33438]

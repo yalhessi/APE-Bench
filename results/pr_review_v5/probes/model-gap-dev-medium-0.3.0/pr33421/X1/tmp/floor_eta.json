@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/Algebra/Order/Floor.lean", "declaration_name": "continuousOn_floor", "new_declaration": "theorem continuousOn_floor (n : \u2124) :\n    ContinuousOn (floor : \u03b1 \u2192 \u2124) (Ico n (n + 1) : Set \u03b1) :=\n  (continuousOn_congr <| floor_eq_on_Ico n).mpr continuousOn_const"}

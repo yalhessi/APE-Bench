@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/ODE/GalerkinRegularity.lean", "declaration_name": "smoothInTime", "new_declaration": "def smoothInTime (f : \u211d \u2192 \u211d) : Prop :=\n  ContDiff \u211d (\u22a4 : \u2115\u221e) f\n", "max_messages": 10}

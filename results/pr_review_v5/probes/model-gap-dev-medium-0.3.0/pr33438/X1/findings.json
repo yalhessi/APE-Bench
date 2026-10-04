@@ -1,0 +1,16 @@
+[
+  {
+    "target": "Real.arctan_sqrt_three",
+    "claim": "`Real.arctan_sqrt_three` is proved by rewriting backwards with `tan_pi_div_three` and `arctan_tan` and then discharging the two bound side goals with an `all_goals` block whose bullet sits on the next line at the same indentation, running `field_simp` and `norm_num`. That tactic pair is not suited to `-(π / 2) < π / 3` and `π / 3 < π / 2`, and the layout is not Mathlib style. The lemma directly above it, `arctan_one`, proves the same kind of fact in one line with `arctan_eq_of_tan_eq`.",
+    "requested_change": "Replace the proof with the `arctan_one` pattern: `theorem arctan_sqrt_three : arctan (√3) = π / 3 :=\n  arctan_eq_of_tan_eq tan_pi_div_three <| by constructor <;> linarith [pi_pos]`.",
+    "severity": "advisory",
+    "evidence": "Read the file as the PR leaves it (lines 197-217): `arctan_eq_of_tan_eq (h : tan x = y) (hx : x ∈ Ioo (-(π / 2)) (π / 2)) : arctan y = x` sits just above, and `arctan_one` is proved as `arctan_eq_of_tan_eq tan_pi_div_four <| by constructor <;> linarith [pi_pos]`. `tan_pi_div_three : tan (π / 3) = √3` is in Trigonometric/Basic.lean:890. lean_verify_edit with declaration_name `Real.arctan_sqrt_three` and the proposed proof returned success with no errors or warnings (mode verified_edit)."
+  },
+  {
+    "target": "Real.arctan_inv_sqrt_three",
+    "claim": "`Real.arctan_inv_sqrt_three` has the same roundabout proof as its sibling. It rewrites `(√3)⁻¹` to `1 / √3` so that it can rewrite backwards with `tan_pi_div_six`, then applies `arctan_tan` and runs `field_simp; norm_num` under an `all_goals` block with an oddly placed bullet. The file's own `arctan_eq_of_tan_eq` / `arctan_one` pattern does this in one line.",
+    "requested_change": "Replace the proof with `theorem arctan_inv_sqrt_three : arctan (√3)⁻¹ = π / 6 :=\n  arctan_eq_of_tan_eq (by simp) <| by constructor <;> linarith [pi_pos]`. If an explicit term is preferred, use `(tan_pi_div_six.trans (one_div _))` in place of `(by simp)`.",
+    "severity": "advisory",
+    "evidence": "`tan_pi_div_six : tan (π / 6) = 1 / √3` is `@[simp]` (Trigonometric/Basic.lean:885). lean_verify_edit with declaration_name `Real.arctan_inv_sqrt_three` returned success, with no errors or warnings, for both `arctan_eq_of_tan_eq (by simp) <| by constructor <;> linarith [pi_pos]` and `arctan_eq_of_tan_eq (tan_pi_div_six.trans (one_div _)) <| by constructor <;> linarith [pi_pos]`."
+  }
+]

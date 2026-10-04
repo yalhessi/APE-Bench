@@ -132,3 +132,18 @@ def test_assert_repo_root_rejects_a_framework_imported_from_another_tree(monkeyp
     monkeypatch.setattr(ape, "__file__", "/elsewhere/APE-Bench/src/ape/__init__.py")
     with pytest.raises(RuntimeError, match="PYTHONPATH=src"):
         assert_repo_root()
+
+
+def test_a_config_is_not_validated_against_another_trees_framework(monkeypatch):
+    """`load_run` checks the tree before any scaffold class sees the config. Without it, the
+    first subscription smoke (2026-10-01), launched from a worktree without PYTHONPATH=src,
+    stopped on four `extra_forbidden` errors for fields this tree defines, naming no cause."""
+    import ape
+
+    from src.mathlib_review.review.runner import V5DatasetConfig
+    from src.mathlib_review.run_config import load_run
+
+    monkeypatch.setattr(ape, "__file__", "/elsewhere/APE-Bench/src/ape/__init__.py")
+    with pytest.raises(RuntimeError, match="PYTHONPATH=src"):
+        load_run(Path("configs/pr_review_v5_probe_2026_07_08_v1_opus55_G_claude_sub.yaml"),
+                 V5DatasetConfig)

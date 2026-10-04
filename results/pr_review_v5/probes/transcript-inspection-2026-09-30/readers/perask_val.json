@@ -1,0 +1,79 @@
+[
+ {
+  "set": "val_small12",
+  "pr": 29842,
+  "ask_id": "v0055",
+  "ask_summary": "themathqueen, TangentCone.lean:120, tangentConeAt.lim_zero: compact the tail -- rewrite hc to cobounded first, then fold `apply Tendsto.congr' this` into one `simpa using Tendsto.congr' this <| (tendsto_inv₀_cobounded.comp hc).smul hd`.",
+  "class": "EXAMINED_NOT_CONSTRUCTED",
+  "gr1_evidence": "Calls on the object and its proof: T1 declaration_search tendsto_inv₀_cobounded, tendsto_norm_atTop_iff_cobounded, tangentConeAt.lim_zero; inv_smul_smul₀ looked up 5 times (T2, T4, T5, T8); T10 code_hover on line 120 (`simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`) and T11 on line 119 (`rw [tendsto_norm_atTop_iff_cobounded] at hc`), the two lines the ask rewrites; T28 declaration_search tendsto_zero_smul (none), tendsto_inv_atTop_zero (twice), Filter.Tendsto.smul. It never ran lean_verify_edit on lim_zero: the session's only lean_verify_edit is the as-is compile at T1. It never called precedent_search. T30 submitted 0 findings: 'no correctness/style issues that rise to the level of a change request'. About 13 turns (T15-T27, T29) went to the UniqueDiffWithinAt.of_closure/closure alias, with UniqueDiffWithinAt.of_closure looked up 7 times, and yielded nothing. Its reasoning is discarded, so why the hovers were made is unknown.",
+  "claude_path": "X1 reached it on both matchers. precedent_search on the new lim_zero proof returned ADedecker's suggestion for this same lemma on PR #21065 (`filter_upwards [hc.eventually_ne_cobounded 0]`). X1 then ran declaration_search on Filter.Tendsto.eventually_ne_cobounded and compiled a 3-line proof that rewrites hc first (lean_verify_edit, success), and filed it. notes.md: 'I verified a shorter three-line version that rewrites `hc` to `cobounded` first ... The precedent above suggests this shape. This is finding 2 (advisory golf).' X2 did not reach it. It compiled the one-liner `simpa using ((tendsto_inv₀_cobounded.comp (tendsto_norm_atTop_iff_cobounded.1 hc)).smul hd).congr' this` (success) and chose not to file: 'The gain is one line on a proof that is already short, so I do not think a maintainer would ask for it.'",
+  "lever": "For every modified proof, compile one shorter variant (and run precedent_search on it) before submitting. Gr1 had precedent_search and used it in none of the 4 sessions. Even with the variant compiled, filing depends on the threshold for a one-line golf: Claude X2 built it and did not file it.",
+  "confidence": "medium"
+ },
+ {
+  "set": "val_small12",
+  "pr": 30641,
+  "ask_id": "v0064",
+  "ask_summary": "grunweg, PosLog.lean:103, Real.posLog_pow: `x` is more conventional than `a` for a real number; the suggestion reads `lemma posLog_pow {n : ℕ} {x : ℝ} : log⁺ (x ^ n) = n * log⁺ x`. The maintainer marks it optional because the file mixes conventions.",
+  "class": "IN_VIEW_UNTARGETED",
+  "gr1_evidence": "Evidence in view: the T2 content_search `log_pow` and the T3 file_read of Log/Basic.lean:240-310 both show `theorem log_pow (x : ℝ) (n : ℕ)`. The T1 file_read of PosLog.lean shows `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)`, but also `posLog_nat_mul {n : ℕ} {a : ℝ}`, so the file really is mixed. T2 naming_norm on posLog_pow was about the declaration name. Near miss: at T7/T8 lean_verify_edit changed the signature to `(a : ℝ) (n : ℕ)`, log_pow's explicit binder layout with `a` kept, and T8 succeeded. T19 reverted to `{n : ℕ} {a : ℝ}`, and T21 filed only the proof golf. No call was about the variable name. This is borderline EXAMINED_NOT_CONSTRUCTED if the issue is read as 'match log_pow's signature'.",
+  "claude_path": "X1 reached it on both matchers, and only as a side effect of a binder finding. It ran content_search `theorem log_pow|theorem log_zpow` in Log/Basic.lean, then compiled `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x` (lean_verify_edit, success) and filed 'Change the signature to match `Real.log_pow`'. notes.md: 'style: binders `{n} {a}` implicit vs explicit `(x : ℝ) (n : ℕ)` in `Real.log_pow`; explicit version verified to compile'. X2 filed `(a : ℝ) (n : ℕ)`, the same signature Gr1 compiled at T8, and was not credited.",
+  "lever": "A sibling comparison that copies the mirrored lemma's whole signature (binder kinds and names), and keeping the T8 result rather than reverting it. Filing T8 as it stood would not have reached the ask: X2 filed exactly that and was not credited.",
+  "confidence": "low"
+ },
+ {
+  "set": "val_small12",
+  "pr": 32875,
+  "ask_id": "v0094",
+  "ask_summary": "artie2000, Disintegration/Integral.lean:55, ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod (kernel version): collapse `simp only [this]; exact (Kernel.compProd_apply_prod hs ht).symm` into `simpa [this] using (Kernel.compProd_apply_prod hs ht).symm`.",
+  "class": "EXAMINED_NOT_CONSTRUCTED",
+  "gr1_evidence": "T1 file_read Integral.lean:1-90 (the site) and an as-is compile. T9 declaration_search Kernel.compProd_apply_prod and Measure.compProd_apply_prod, in the same batch as the Rat lookups (den_inv, num_intCast) that it did turn into a compiled, filed golf. T22 lean_verify `#check Kernel.compProd_apply_prod`: the command failed on Gr1's own `variable [CountableOrCountablyGenerated α β]` line, but the signature came back as an info message. It never came back to the file after T22 and ran no lean_verify_edit on either condKernel lemma. All 8 of its edits (T36-T45) went to the first three changed declarations in diff order (mem_map_equiv, Rat.inv_intCast_den_of_pos, pi_map_piCongrLeft). About 17 of its 51 turns (T2-T7, T11, T13, T24, T26, T28, T31, T33, T34, T41, T46, T48) chased Pseudo/Defs.lean's 12 errors that predate the PR (a private dist_nonneg' used in a structure default) and produced no finding. It submitted on its own at T51 of an 80-turn cap.",
+  "claude_path": "X1 and X2 both reached it on both matchers. X1 read the sibling lemmas at Integral.lean 44-67 (`conv_rhs => rw [← κ.disintegrate κ.condKernel]`) and compiled both that form and `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` (success). X2 compiled the one-liner (success). notes.md, X1: 'The kept `have ... := by congr; exact (_.disintegrate _).symm` plus `simp only [this]` is unnecessary ... compiles for both lemmas'. X2: 'Each collapses to one `rw [← (Kernel.)compProd_apply_prod hs ht, ….disintegrate]`, verified for both.'",
+  "lever": "List every changed proof and require one compiled attempt at a shorter variant for each before submitting (the budget did not bind). Add a rule to record errors that predate the PR and move on.",
+  "confidence": "medium"
+ },
+ {
+  "set": "val_small12",
+  "pr": 32875,
+  "ask_id": "v0095",
+  "ask_summary": "artie2000, Disintegration/Integral.lean:147, MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod (measure version): 'simpa', the same compaction as v0094.",
+  "class": "EXAMINED_NOT_CONSTRUCTED",
+  "gr1_evidence": "Same pattern as v0094. T1 file_read Integral.lean:120-175 (the site) and an as-is compile; T9 declaration_search MeasureTheory.Measure.compProd_apply_prod; T22 `#check compProd_apply_prod` inside `namespace MeasureTheory.Measure`, signature returned. No lean_verify_edit on the declaration and no finding. The two condKernel lemmas are the same decision, and Gr1 built neither.",
+  "claude_path": "X1 and X2 both reached it on both matchers. X1 compiled `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]; rw [compProd_apply_prod hs ht]` and `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. X2 compiled `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Both filed one finding per declaration, and X2 asked that the two stay parallel.",
+  "lever": "Same as v0094: a compiled attempt at a shorter variant for every changed proof, with the kernel and measure twins handled as one decision.",
+  "confidence": "medium"
+ },
+ {
+  "set": "val_small12",
+  "pr": 34091,
+  "ask_id": "v0106",
+  "ask_summary": "ocfnash, Cardinal/Pigeonhole.lean:80, exists_infinite_fiber: make the class hypothesis instance-implicit, `[Infinite β]` instead of `(hβ : Infinite β)`.",
+  "class": "IN_VIEW_UNTARGETED",
+  "gr1_evidence": "Evidence in the initial prompt: the PR model shows both call sites passing `(by infer_instance)`: `exists_infinite_fiber u' h (by infer_instance)` in le_range_of_union_finset_eq_univ and `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)` in linearIndependent_le_infinite_basis. That string appears 6 times in the prompt and 10 times in tool results (T2, T14, T17, T21). The same file's `le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β]` uses an instance binder. T6 declaration_search reported a sibling `exists_infinite_fiber` in Data/Fintype/Pigeonhole.lean, which Gr1 never opened. Its calls on this lemma looked for API breakage and names, not binder kind: caller searches (T2, T11, T14, T17, T21), deprecated-alias searches (T30, T32), and naming searches around the primed variant (T23, T29). It made no edit to exists_infinite_fiber. It filed 4 docstring findings and 2 `trans'` findings.",
+  "claude_path": "X1 and X2 both reached it on both matchers. X1: content_search exists_infinite_fiber (the callers, with `by infer_instance`); declaration_search Finite.exists_infinite_fiber plus file_read Data/Fintype/Pigeonhole.lean:80-95 (`[Infinite α] [Finite β]`); zulip_search on explicit versus instance class hypotheses; then lean_verify_edit over lines 78-122 putting `[Infinite β]`, `[Infinite α]` and `[Uncountable β]` on all three lemmas (success). It filed one finding for all three. notes.md: 'Every caller passes `(by infer_instance)`, and the sibling `Finite.exists_infinite_fiber` uses `[Infinite α] [Finite β]`. An instance-binder version of all three fiber lemmas compiled in-file -> finding 6.' X2 got there the same way (callers, a precedent_search hint on explicit versus instance-implicit, the same 78-122 compile).",
+  "lever": "A signature pass over every changed statement: flag explicit class-valued hypotheses whose callers pass `(by infer_instance)` (already in the prompt), and read the sibling the search had located (T6, never opened).",
+  "confidence": "medium-high"
+ },
+ {
+  "set": "val_small12",
+  "pr": 34091,
+  "ask_id": "v0107",
+  "ask_summary": "ocfnash, Cardinal/Pigeonhole.lean:97, exists_uncountable_fiber: `[Uncountable β]` instead of `(hβ : Uncountable β)`.",
+  "class": "IN_VIEW_UNTARGETED",
+  "gr1_evidence": "exists_uncountable_fiber has no callers, so the evidence is the same-PR pattern (the v0106 call sites) and `[Infinite β]` on le_range_of_union_finset_eq_univ, both in the prompt. Gr1 spent more calls on this lemma than on any other: about 10 searches for an existing uncountable-fiber lemma (T3, T6, T9, T20, T24), a T27 hover, a T31 get_lean_goal on its signature line (which returned `(hβ : Uncountable β)`), and a T33 lean_verify_edit that kept `(hβ : Uncountable β)` and changed only `hβ.trans'` to a forward `.trans` (success, filed). So it compiled the signature line and left the binder alone. What T31 was for is unknown.",
+  "claude_path": "The same single compiled edit and finding as v0106 in both X1 and X2: `theorem exists_uncountable_fiber {β α : Type u} [Uncountable β] ...` with `have hβ := Cardinal.aleph0_lt_mk_iff.2 ‹Uncountable β›`.",
+  "lever": "The same signature pass as v0106. Gr1 was already compiling this declaration, so trying the binder kind in that edit would have cost one variant.",
+  "confidence": "medium"
+ },
+ {
+  "set": "val_small12",
+  "pr": 34091,
+  "ask_id": "v0108",
+  "ask_summary": "ocfnash, Cardinal/Pigeonhole.lean:89, exists_infinite_fiber': `[Infinite α]` instead of `(hα : Infinite α)`.",
+  "class": "IN_VIEW_UNTARGETED",
+  "gr1_evidence": "Its only caller, `Cardinal.exists_infinite_fiber' Φ h (by infer_instance)`, is in the initial prompt and in 4 content_search results (T2, T14, T17, T21). Gr1's calls on this lemma were T3 naming_norm, T23/T29 naming searches on primed names, and its T34 docstring finding ('misleading ... weaker'). No edit, and no call about binder kind.",
+  "claude_path": "Covered by the same X1 and X2 finding and compile as v0106 (`exists_infinite_fiber' {β α : Type u} [Infinite α] ...`, with `have : Infinite β := ...`), which also asked to drop `(by infer_instance)` at StrongRankCondition.lean:250.",
+  "lever": "The same signature pass as v0106: the evidence is one call site, and it was in the prompt.",
+  "confidence": "medium-high"
+ }
+]

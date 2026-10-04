@@ -1,0 +1,15 @@
+calls 1282 sessions 133 streamed 0
+completion only                  R2=0.335 coef=[4.91651  0.021895]
+total prompt + completion        R2=0.339 coef=[ 7.120542e+00 -1.480000e-04  2.230100e-02]
+new prompt + completion          R2=0.337 coef=[4.478432e+00 2.660000e-04 2.170500e-02]
+total + new + completion         R2=0.340 coef=[ 6.554808e+00 -1.320000e-04  1.960000e-04  2.211600e-02]
+
+seconds per completion token (calls with new prompt < 3k), by total prompt:
+    0-15k  n= 456  median latency    4.2s  median s/token 0.035  median completion 94
+   15-30k  n= 468  median latency    6.1s  median s/token 0.030  median completion 148
+   30-50k  n=  43  median latency    7.2s  median s/token 0.031  median completion 154
+
+latency with small completion (<60 tokens), by total prompt (prefill-dominated):
+    0-15k  n=  58  median latency    2.2s  p90   20.5s  median new prompt 242
+   15-30k  n=  35  median latency    2.5s  p90   20.9s  median new prompt 229
+   30-50k  n=   2  median latency    7.1s  p90   10.5s  median new prompt 1334

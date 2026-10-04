@@ -1,0 +1,8 @@
+# farm_iterative.py on 33321, stopped by hand after 25 passes (the loop learns one rebuild layer per Lake pass); transcribed head and tail of stdout
+changed modules: ['Mathlib.Algebra.Group.Hom.Basic', 'Mathlib.Algebra.Group.Irreducible.Indecomposable', 'Mathlib.LinearAlgebra.RootSystem.RootPositive', 'Mathlib.LinearAlgebra.RootSystem.IsValuedIn', 'Mathlib.LinearAlgebra.RootSystem.BaseExists']
+closure 1561 modules; predicted rebuild 5: ['Mathlib.Algebra.Group.Hom.Basic', 'Mathlib.Algebra.Group.Irreducible.Indecomposable', 'Mathlib.LinearAlgebra.RootSystem.BaseExists', 'Mathlib.LinearAlgebra.RootSystem.IsValuedIn', 'Mathlib.LinearAlgebra.RootSystem.RootPositive']
+farm: 18 real dirs, 1830 symlinks, 0.5s
+import-graph superset would be 797 modules; starting from the 5 changed
+...
+iteration 24: materialized ['Mathlib.Algebra.Algebra.Subalgebra.Lattice', 'Mathlib.Algebra.CharP.Reduced', 'Mathlib.Algebra.Polynomial.Degree.TrailingDegree', 'Mathlib.Algebra.Polynomial.Degree.Units'
+iteration 25: materialized ['Mathlib.Algebra.Algebra.Subalgebra.Prod', 'Mathlib.Algebra.Algebra.Subalgebra.Tower', 'Mathlib.Algebra.DirectSum.Module', 'Mathlib.Algebra.FreeAlgebra', 'Mathlib.Algebra.M

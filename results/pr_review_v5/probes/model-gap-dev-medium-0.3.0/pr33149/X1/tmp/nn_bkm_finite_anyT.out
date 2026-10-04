@@ -1,0 +1,7 @@
+{
+ "success": true,
+ "verdict": "insufficient_evidence",
+ "subject": null,
+ "empty_because": "subject_unresolved",
+ "results": "This tool could not work out what this declaration is ABOUT from its conclusion, so it never asked the corpus anything. That is a limit of this tool, not a statement that the repository has no convention here -- treat naming for this declaration as unmeasured and judge it on the evidence you have."
+}

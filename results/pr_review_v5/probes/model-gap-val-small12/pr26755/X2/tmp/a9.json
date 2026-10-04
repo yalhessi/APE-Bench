@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/GroupWithZero/Action/Pointwise/Finset.lean", "line_start": 38, "line_end": 38, "replacement": "protected def distribMulAction [Monoid \u03b1] [AddMonoid \u03b2] [DistribMulAction \u03b1 \u03b2] :"}

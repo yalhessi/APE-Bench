@@ -1,0 +1,53 @@
+[
+ {
+  "target": "Cardinal.exists_infinite_fiber, Cardinal.exists_infinite_fiber', Cardinal.exists_uncountable_fiber",
+  "claim": "The three fiber lemmas take the type classes `Infinite β`, `Infinite α` and `Uncountable β` as explicit hypotheses (`(hβ : Infinite β)` etc.). A client with the instance in scope therefore has to pass it by hand. Both call sites in the tree do this with `(by infer_instance)`. Apart from the dot-notation `Infinite.false`, no other Mathlib declaration takes these classes explicitly, and the finite twin `Finite.exists_infinite_fiber` takes `[Infinite α] [Finite β]`.",
+  "requested_change": "Make the hypotheses instance-implicit: `theorem exists_infinite_fiber {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)`, `exists_infinite_fiber' {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β)` and `exists_uncountable_fiber {β α : Type u} [Uncountable β] (f : β → α) (h : #α < #β)`. Name them (`[hβ : Infinite β]`) where the proof uses them. Then drop `(by infer_instance)` at Pigeonhole.lean:121 and StrongRankCondition.lean:250. The statements are being changed in this PR anyway, so the break costs nothing extra.",
+  "severity": "advisory",
+  "evidence": "c2: `exists_infinite_fiber f h` with [Infinite β] in scope fails with the `Infinite β →` argument left over. c3: the instance-binder versions of all three compile with the proofs unchanged (exists_infinite_fiber' needs one `have`), and the in-file caller and three client examples close with no instance argument. c4/c5: explicit Infinite/Uncountable class hypotheses appear only in these three PR lemmas, against 165 `[Infinite …]` binders in 74 files and 20 `[Uncountable …]` in 4 files. The finite sibling uses instance binders.",
+  "construction": [
+   "c1",
+   "c2",
+   "c3",
+   "c4",
+   "c5"
+  ]
+ },
+ {
+  "target": "Cardinal.exists_infinite_fiber, Cardinal.exists_uncountable_fiber",
+  "claim": "The two fiber lemmas are the θ = ℵ₀ and θ = ℵ₁ instances of one statement: for regular θ ≤ #β, `#α < #β` gives a fiber of cardinality ≥ θ. The PR proves each separately by the same case split on `#α < ℵ₀`, and a client who needs a fiber of size ≥ some other regular cardinal (e.g. `succ κ`, `ℵ₂`) gets no lemma.",
+  "requested_change": "Add `theorem exists_le_mk_fiber_of_isRegular {β α : Type u} (f : β → α) (h : #α < #β) {θ : Cardinal} (hθ : θ.IsRegular) (hθβ : θ ≤ #β) : ∃ a : α, θ ≤ #(f ⁻¹' {a})` (4-line proof from infinite_pigeonhole_card / infinite_pigeonhole_card_lt), and derive exists_infinite_fiber and exists_uncountable_fiber from it with isRegular_aleph0 / isRegular_aleph_one.",
+  "severity": "advisory",
+  "evidence": "c11: the general lemma compiles in the file, and both PR lemmas' statements follow from it in two lines each (a simp_rw of the Infinite/Uncountable ↔ cardinal form, then one application).",
+  "construction": [
+   "c11"
+  ]
+ },
+ {
+  "target": "Cardinal.exists_uncountable_fiber",
+  "claim": "The new lemma requires domain and codomain in the same universe. Its most direct client, an uncountable β : Type v with f : β → ℕ, cannot use it unless v = 0. The file's own TODO is \"Generalize universes of results\", and this PR adds a new result that the TODO covers.",
+  "requested_change": "State exists_uncountable_fiber for `{β : Type u} {α : Type v}` with hypothesis `lift.{u} #α < lift.{v} #β`. It can be derived from the single-universe proof through ULift, as in c10. At minimum, add a universe-polymorphic countable-codomain form (`[Countable α] [Uncountable β] (f : β → α) : ∃ a, Uncountable (f ⁻¹' {a})`), which follows in three lines from Set.Countable.of_preimage_singleton.",
+  "severity": "advisory",
+  "evidence": "c6: `exists_uncountable_fiber (α := ℕ) f …` with β : Type v fails with a universe mismatch (ℕ : Type expected in Type v). c10: the lift/ULift version compiles in 8 lines, and the Type v → ℕ client closes with it by `simp`. c8: the countable-codomain form compiles across universes from a base lemma. c7: in one universe the client must also build `#α < #β` by hand. c9: the PR's proof does not itself survive independent universes, because infinite_pigeonhole_card is single-universe, so the ULift route is the one that works.",
+  "construction": [
+   "c6",
+   "c7",
+   "c8",
+   "c9",
+   "c10"
+  ]
+ },
+ {
+  "target": "Cardinal.exists_infinite_fiber', Cardinal.infinite_pigeonhole_card_lt",
+  "claim": "exists_infinite_fiber' is a one-term special case of exists_infinite_fiber that preserves the pre-PR statement under a primed name. The family applies this only to exists_infinite_fiber: infinite_pigeonhole_card_lt also changes its hypothesis from `ℵ₀ ≤ #α` to `ℵ₀ ≤ #β` under the same name, with no twin, and old callers break. exists_infinite_fiber' has a single consumer, which compiles without it.",
+  "requested_change": "Treat the family uniformly. Drop exists_infinite_fiber' and write `Cardinal.exists_infinite_fiber Φ h (Cardinal.infinite_iff.2 ((Cardinal.aleph0_le_mk _).trans h.le))` at StrongRankCondition.lean:250, as infinite_pigeonhole_card_lt's callers adapt with `(hα.trans h.le)`. If the codomain-hypothesis form is kept on purpose (for example as `[Infinite α]` once the binders are instance-implicit), add the matching `infinite_pigeonhole_card_lt'` alongside it.",
+  "severity": "advisory",
+  "evidence": "c17: StrongRankCondition.lean compiles with the unprimed lemma and the one-term argument. c15: the old form of infinite_pigeonhole_card_lt is one term from the new one, but the PR does not provide it. c16: a pre-PR caller of infinite_pigeonhole_card_lt fails with `ℵ₀ ≤ #α` given where `ℵ₀ ≤ #β` is expected. c18: exists_infinite_fiber' has exactly one consumer in the tree.",
+  "construction": [
+   "c15",
+   "c16",
+   "c17",
+   "c18"
+  ]
+ }
+]

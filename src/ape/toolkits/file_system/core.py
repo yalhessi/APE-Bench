@@ -348,9 +348,15 @@ class FileSystemProvider:
             files_to_search = await self._files_under(search_path, recursive)
 
             if not files_to_search:
+                # A bad path, not a search that matched nothing: say so, or the two negatives
+                # read alike (2026-09-30: at least 13 such calls on six gpt runs, beside 187
+                # searches that ran and matched nothing).
                 return {
                     "success": False,
-                    "error": f"No files found for path: {search_path}"
+                    "outcome": "invalid_request",
+                    "error": (f"Nothing was searched: no files under `{search_path}` in the "
+                              "workspace. Check the path; this is not a search that found no "
+                              "matches.")
                 }
             
             results = []
@@ -476,24 +482,24 @@ class FileSystemProvider:
             if not resolved_path.exists():
                 return {
                     "success": False,
-                    "error": f"Directory not found: {directory_path}"
+                    "outcome": "invalid_request",
+                    "error": f"Nothing was searched: directory not found: {directory_path}"
                 }
 
             if not resolved_path.is_dir():
                 return {
                     "success": False,
-                    "error": f"Path is not a directory: {directory_path}"
+                    "outcome": "invalid_request",
+                    "error": f"Nothing was searched: path is not a directory: {directory_path}"
                 }
             
             results = []
             count = 0
+            truncated = False
             
             # Same traversal as content_search: symlinked directories are descended and
             # hidden ones skipped, so a workspace overlay does not silently hide the corpus.
             for file_path in walk_workspace_files(resolved_path, recursive):
-                if count >= max_results:
-                    break
-                
                 if not file_path.is_file():
                     continue
                 
@@ -507,9 +513,16 @@ class FileSystemProvider:
                     # File not in workspace, skip
                     continue
 
-                # Use fnmatch for glob pattern matching
-                if not fnmatch.fnmatch(relative_str, pattern):
+                # The pattern matches the file's name or its workspace path. Matched against the
+                # path alone, `Basic.lean` found nothing anywhere, and said so as an ordinary
+                # empty result -- the same "ran and found nothing" a real absence returns.
+                if not (fnmatch.fnmatch(file_path.name, pattern)
+                        or fnmatch.fnmatch(relative_str, pattern)):
                     continue
+
+                if count >= max_results:
+                    truncated = True
+                    break
 
                 # Add to results (calculate relative path from workspaces_dir)
                 relative_path = calculate_relative_path(file_path, self.workspaces_dir)
@@ -519,14 +532,20 @@ class FileSystemProvider:
                 })
                 count += 1
             
-            return {
+            response = {
                 "success": True,
-                "results": results
+                "results": results,
+                "truncated": truncated,
             }
+            if truncated:
+                response["note"] = (f"More files match than the {max_results} listed; narrow the "
+                                    "pattern or the directory.")
+            return response
             
         except Exception as e:
             self.logger.error(f"Error searching files by pattern: {traceback.format_exc()}")
-            return {"success": False, "error": f"File pattern search error: {traceback.format_exc()}"}
+            return {"success": False, "outcome": "tool_error",
+                    "error": f"File pattern search error: {traceback.format_exc()}"}
     
     async def file_write(self,
                         file_path: Path,

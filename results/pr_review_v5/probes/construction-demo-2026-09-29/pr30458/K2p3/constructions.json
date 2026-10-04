@@ -1,0 +1,467 @@
+[
+ {
+  "id": "c1",
+  "kind": "usage",
+  "objects": [
+   "div_left_injective",
+   "div_left_inj",
+   "div_eq_inv_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\ninserted after `end LeftCancelDivisionMonoid` (Mathlib/Algebra/Group/Basic.lean, line mode):\n-- U1: right-cancel DivInvMonoid client\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y z : R} (h : x / z = y / z) : x = y :=\n  div_left_injective h\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y z : R} (h : x / z = y / z) : x = y := by\n  simpa using h\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y : R} (h : x / y = y⁻¹) : x = 1 := by\n  simpa using h\nexample [DivInvMonoid R] [IsRightCancelMul R] (x : R) : Function.Injective (· / x) :=\n  div_left_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors (compiled in one edit with the next two constructions)",
+  "shows": "A client holding only `[DivInvMonoid R] [IsRightCancelMul R]` can apply `div_left_injective` directly (also in the `(· / x)` form) and `simpa` closes `div_left_inj` / `div_eq_inv_self` goals; no argument must be supplied by name."
+ },
+ {
+  "id": "c2",
+  "kind": "usage",
+  "objects": [
+   "div_right_injective",
+   "div_right_inj",
+   "div_eq_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\nsame edit:\n-- U2: left-cancel DivisionMonoid client\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y z : R} (h : x / y = x / z) : y = z := by\n  simpa using h\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y : R} (h : x / y = x) : y = 1 := by\n  simpa using h\nexample [DivisionMonoid R] [IsLeftCancelMul R] (x : R) : Function.Injective (x / ·) :=\n  div_right_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "A client holding only `[DivisionMonoid R] [IsLeftCancelMul R]` can apply `div_right_injective` in the `(x / ·)` form and `simpa` closes `div_right_inj` / `div_eq_self` goals."
+ },
+ {
+  "id": "c3",
+  "kind": "usage",
+  "objects": [
+   "div_left_inj",
+   "div_right_inj",
+   "div_eq_self",
+   "div_eq_inv_self",
+   "sub_left_inj",
+   "sub_right_inj",
+   "sub_eq_self",
+   "sub_eq_neg_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\nsame edit:\n-- U3: group clients (instance path to the mixins) and additive versions at the new generality\nexample [Group R] {x y z : R} : x / z = y / z ↔ x = y := by simp\nexample [Group R] {x y z : R} : x / y = x / z ↔ y = z := by simp\nexample [Group R] {x y : R} : x / y = x ↔ y = 1 := by simp\nexample [Group R] {x y : R} : x / y = y⁻¹ ↔ x = 1 := by simp\nexample [AddGroup R] {x y z : R} : x - z = y - z ↔ x = y := by simp\nexample [SubNegMonoid R] [IsRightCancelAdd R] {x y z : R} : x - z = y - z ↔ x = y := sub_left_inj\nexample [SubNegMonoid R] [IsRightCancelAdd R] {x y : R} : x - y = -y ↔ x = 0 := sub_eq_neg_self\nexample [SubtractionMonoid R] [IsLeftCancelAdd R] {x y : R} : x - y = x ↔ y = 0 := sub_eq_self\nexample [SubtractionMonoid R] [IsLeftCancelAdd R] {x y z : R} : x - y = x - z ↔ y = z :=\n  sub_right_inj",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "Group and AddGroup clients still get all four simp lemmas by `simp` (the mixins are found by instance search from `Group`), and the `to_additive` versions exist at `[SubNegMonoid R] [IsRightCancelAdd R]` / `[SubtractionMonoid R] [IsLeftCancelAdd R]`."
+ },
+ {
+  "id": "c4",
+  "kind": "usage",
+  "objects": [
+   "div_left_injective",
+   "div_right_injective",
+   "Set.finite_div"
+  ],
+  "lean": "declaration_name = Set.finite_div, new_declaration:\n@[to_additive]\nlemma finite_div : (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "Under the PR's generalised statements, the pre-PR call-site spelling `div_left_injective.injOn` / `div_right_injective.injOn` (no `(b := _)`) still elaborates in `Set.finite_div`; the generalisation does not make consumers name the implicit argument."
+ },
+ {
+  "id": "c5",
+  "kind": "usage",
+  "objects": [
+   "div_left_injective",
+   "div_right_injective",
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean lines 1249-1260 replaced by:\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective\n\nend LeftCancel\n\nsection RightCancel\nvariable [DivisionMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}\n\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "The pre-PR spelling `card_le_card_image₂_left _ ha div_right_injective` / `... div_left_injective` (no named arguments) still elaborates against the generalised statements."
+ },
+ {
+  "id": "c6",
+  "kind": "usage",
+  "objects": [
+   "div_right_injective",
+   "div_right_inj"
+  ],
+  "lean": "declaration_name = div_right_inj, new_declaration:\n@[to_additive (attr := simp)]\ntheorem div_right_inj : a / b = a / c ↔ b = c :=\n  div_right_injective.eq_iff",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "`div_right_injective.eq_iff` elaborates without `(G := G) (b := a)` at the generalised statement."
+ },
+ {
+  "id": "c7",
+  "kind": "generalised_statement",
+  "objects": [
+   "div_eq_inv_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- G1: div_eq_inv_self with the cancellation hypothesis dropped\ntheorem div_eq_inv_self_nc [DivInvMonoid R] {a b : R} : a / b = b⁻¹ ↔ a = 1 := by\n  rw [div_eq_mul_inv, mul_eq_right]",
+  "compiled": false,
+  "result": "failed to synthesize IsRightCancelMul R (at `mul_eq_right`)",
+  "shows": "`div_eq_inv_self`'s proof needs `IsRightCancelMul`; `[DivInvMonoid G] [IsRightCancelMul G]` is the weakest of the tried hypothesis sets."
+ },
+ {
+  "id": "c8",
+  "kind": "generalised_statement",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- G2: div_left_injective with the cancellation hypothesis dropped\ntheorem div_left_injective_nc [DivInvMonoid R] {b : R} :\n    Function.Injective fun a : R ↦ a / b := by\n  intro a₁ a₂ h\n  have h' : a₁ * b⁻¹ = a₂ * b⁻¹ := by simpa [div_eq_mul_inv] using h\n  simpa using (mul_right_cancel (a := a₁) (b := b⁻¹) (c := a₂) h')",
+  "compiled": false,
+  "result": "failed to synthesize IsRightCancelMul R (at `mul_right_cancel`)",
+  "shows": "`div_left_injective`'s proof needs `IsRightCancelMul`; the PR's `[DivInvMonoid G] [IsRightCancelMul G]` cannot drop the mixin (`div_left_inj` uses the same `mul_right_cancel` step; it was not compiled separately)."
+ },
+ {
+  "id": "c9",
+  "kind": "generalised_statement",
+  "objects": [
+   "div_eq_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- G3: div_eq_self with DivisionMonoid weakened to DivInvMonoid\ntheorem div_eq_self_dim [DivInvMonoid R] [IsLeftCancelMul R] {a b : R} :\n    a / b = a ↔ b = 1 := by\n  rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]\n\n-- G4: div_eq_self with DivisionMonoid weakened to DivInvOneMonoid\ntheorem div_eq_self_dio [DivInvOneMonoid R] [IsLeftCancelMul R] {a b : R} :\n    a / b = a ↔ b = 1 := by\n  rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]",
+  "compiled": false,
+  "result": "both: failed to synthesize DivisionMonoid (at `inv_eq_one`); unsolved goal `b⁻¹ = 1 ↔ b = 1`",
+  "shows": "`div_eq_self` cannot be weakened from `DivisionMonoid` to `DivInvMonoid` or `DivInvOneMonoid`: the step `b⁻¹ = 1 ↔ b = 1` needs an injective inverse."
+ },
+ {
+  "id": "c10",
+  "kind": "generalised_statement",
+  "objects": [
+   "div_right_injective",
+   "div_right_inj"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- G5: div_right_injective with DivisionMonoid weakened to DivInvMonoid\ntheorem div_right_injective_dim [DivInvMonoid R] [IsLeftCancelMul R] {b : R} :\n    Function.Injective fun x : R ↦ b / x := by\n  simp only [div_eq_mul_inv]\n  exact fun a a' h ↦ inv_injective (mul_right_injective b h)",
+  "compiled": false,
+  "result": "failed to synthesize InvolutiveInv R; `mul_right_injective b h` type mismatch",
+  "shows": "`div_right_injective` needs `DivisionMonoid` (involutive inverse); `[DivInvMonoid G] [IsLeftCancelMul G]` is not enough. The asymmetry DivInvMonoid-right / DivisionMonoid-left in the PR is forced by the proofs."
+ },
+ {
+  "id": "c11",
+  "kind": "generalised_statement",
+  "objects": [
+   "div_eq_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- G6: div_eq_self with the cancellation hypothesis dropped\ntheorem div_eq_self_nc [DivisionMonoid R] {a b : R} : a / b = a ↔ b = 1 := by\n  rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]",
+  "compiled": false,
+  "result": "failed to synthesize IsLeftCancelMul R (at `mul_eq_left`)",
+  "shows": "`div_eq_self` needs the left-cancellation mixin."
+ },
+ {
+  "id": "c12",
+  "kind": "closure_check",
+  "objects": [
+   "div_eq_inv_self",
+   "div_eq_self",
+   "div_left_injective",
+   "div_right_injective",
+   "div_left_inj",
+   "div_right_inj"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\ninserted after `end LeftCancelDivisionMonoid`:\ntheorem DivisionMonoid.isRightCancelMul_of_isLeftCancelMul_check [DivisionMonoid R]\n    [IsLeftCancelMul R] : IsRightCancelMul R where\n  mul_right_cancel b x y h := by\n    have h : x * b = y * b := h\n    have h' : (x * b)⁻¹ = (y * b)⁻¹ := congrArg Inv.inv h\n    rw [mul_inv_rev, mul_inv_rev] at h'\n    exact inv_injective (mul_left_cancel h')\n\ntheorem DivisionMonoid.isLeftCancelMul_of_isRightCancelMul_check [DivisionMonoid R]\n    [IsRightCancelMul R] : IsLeftCancelMul R where\n  mul_left_cancel b x y h := by\n    have h : b * x = b * y := h\n    have h' : (b * x)⁻¹ = (b * y)⁻¹ := congrArg Inv.inv h\n    rw [mul_inv_rev, mul_inv_rev] at h'\n    exact inv_injective (mul_right_cancel h')\n\n-- X3: div_eq_inv_self for a left-cancel DivisionMonoid, derived from its partner div_eq_self\ntheorem div_eq_inv_self_of_left [DivisionMonoid R] [IsLeftCancelMul R] {a b : R} :\n    a / b = b⁻¹ ↔ a = 1 := by\n  rw [← inv_inj, inv_div, inv_inv, div_eq_self]\n\n-- X4: div_eq_self for a right-cancel DivisionMonoid, derived from its partner div_eq_inv_self\ntheorem div_eq_self_of_right [DivisionMonoid R] [IsRightCancelMul R] {a b : R} :\n    a / b = a ↔ b = 1 := by\n  rw [← inv_inj, inv_div, div_eq_inv_self]\n\n-- X5: div_right_injective for a right-cancel DivisionMonoid, derived from div_left_injective\ntheorem div_right_injective_of_right [DivisionMonoid R] [IsRightCancelMul R] {b : R} :\n    Function.Injective fun x : R ↦ b / x := fun x y h ↦\n  div_left_injective (b := b) (by simpa only [inv_div] using congrArg Inv.inv h)",
+  "compiled": true,
+  "result": "lean_verify_edit: these declarations compiled; the only error in the edit was the separate X1 example (c13)",
+  "shows": "In a `DivisionMonoid`, `IsLeftCancelMul` and `IsRightCancelMul` imply each other (via `mul_inv_rev` and `inv_injective`), and each left/right partner is derivable from the other through inversion: `div_eq_inv_self` holds under `[DivisionMonoid R] [IsLeftCancelMul R]` (from `div_eq_self`), `div_eq_self` and `div_right_injective` hold under `[DivisionMonoid R] [IsRightCancelMul R]` (from `div_eq_inv_self`, `div_left_injective`). At DivisionMonoid level the left/right split is not a real distinction."
+ },
+ {
+  "id": "c13",
+  "kind": "usage",
+  "objects": [
+   "div_left_inj"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\nsame edit:\n-- X1: a left-cancel DivisionMonoid client asks simp for div_left_inj\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y z : R} (h : x / z = y / z) : x = y := by\n  simpa using h",
+  "compiled": false,
+  "result": "Type mismatch: After simplification, term h has type x / z = y / z but is expected to have type x = y",
+  "shows": "For a `[DivisionMonoid R] [IsLeftCancelMul R]` client, the simp lemma `div_left_inj` does not fire (no `IsRightCancelMul R` instance), although the statement is true there (previous construction); nothing in the PR or at the base bridges the two mixins."
+ },
+ {
+  "id": "c14",
+  "kind": "usage",
+  "objects": [
+   "div_left_injective"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\nsame edit:\n-- X2: the same client after supplying the derived instance by hand\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y z : R} (h : x / z = y / z) : x = y :=\n  haveI := DivisionMonoid.isRightCancelMul_of_isLeftCancelMul_check (R := R)\n  div_left_injective h",
+  "compiled": true,
+  "result": "lean_verify_edit: compiled",
+  "shows": "With the bridge lemma supplied by hand (`haveI`), the same client can use `div_left_injective`; the obstacle is only the missing bridge."
+ },
+ {
+  "id": "c15",
+  "kind": "twin",
+  "objects": [
+   "div_left_inj",
+   "div_left_injective",
+   "div_right_injective",
+   "div_eq_self",
+   "div_eq_inv_self"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\ninserted after `end LeftCancelDivisionMonoid`:\n-- div_left_inj is div_left_injective.eq_iff (the mul_left_inj / mul_left_injective relation)\nexample [DivInvMonoid R] [IsRightCancelMul R] {a b c : R} : b / a = c / a ↔ b = c :=\n  div_left_injective.eq_iff\n\n-- ne-twins on the mul_ne_mul_left / mul_ne_mul_right pattern\ntheorem div_ne_div_left_check [DivInvMonoid R] [IsRightCancelMul R] {a b c : R} :\n    b / a ≠ c / a ↔ b ≠ c := div_left_injective.ne_iff\ntheorem div_ne_div_right_check [DivisionMonoid R] [IsLeftCancelMul R] {a b c : R} :\n    a / b ≠ a / c ↔ b ≠ c := div_right_injective.ne_iff\n\n-- left_eq_mul / mul_ne_left pattern for div_eq_self\ntheorem self_eq_div_check [DivisionMonoid R] [IsLeftCancelMul R] {a b : R} :\n    a = a / b ↔ b = 1 := eq_comm.trans div_eq_self\ntheorem div_ne_self_check [DivisionMonoid R] [IsLeftCancelMul R] {a b : R} :\n    a / b ≠ a ↔ b ≠ 1 := div_eq_self.not\n\n-- right_eq_mul pattern for div_eq_inv_self\ntheorem inv_eq_div_self_check [DivInvMonoid R] [IsRightCancelMul R] {a b : R} :\n    b⁻¹ = a / b ↔ a = 1 := eq_comm.trans div_eq_inv_self",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "`div_left_inj` is exactly `div_left_injective.eq_iff` (the `mul_left_inj`/`mul_left_injective` relation), and the pattern twins of `Defs.lean`/`Basic.lean` (`mul_ne_mul_left`, `left_eq_mul`, `mul_ne_left`, `right_eq_mul`) all compile for the div family at the PR's generality."
+ },
+ {
+  "id": "c16",
+  "kind": "closure_check",
+  "objects": [
+   "div_eq_self",
+   "div_eq_inv_self",
+   "div_left_inj",
+   "div_right_inj"
+  ],
+  "lean": "declaration_search: self_eq_div, div_ne_self, self_ne_div, inv_eq_div_self, div_ne_div_left, div_ne_div_right, div_left_cancel, div_right_cancel",
+  "compiled": null,
+  "result": "none of these exists at the base commit or in the PR's files",
+  "shows": "The div family lacked the `left_eq_mul` / `mul_ne_left` / `mul_ne_mul_left`-style twins before the PR and still lacks them; the gap is pre-existing, not created by the PR."
+ },
+ {
+  "id": "c17",
+  "kind": "closure_check",
+  "objects": [
+   "div_left_inj"
+  ],
+  "lean": "declaration_search div_left_inj; content_search in Mathlib/Algebra/Group/Units/Basic.lean and GroupWithZero/Units/Basic.lean",
+  "compiled": null,
+  "result": "`IsUnit.div_left_inj (h : IsUnit c)` in Group/Units/Basic.lean:400 (DivisionMonoid); `div_left_inj' (hc : c ≠ 0)` in GroupWithZero/Units/Basic.lean:287",
+  "shows": "The other generalisations of `div_left_inj` in the library assume a hypothesis on the divisor, not a cancellation mixin; they do not overlap the PR's statement."
+ },
+ {
+  "id": "c18",
+  "kind": "automation_check",
+  "objects": [
+   "div_left_inj",
+   "div_eq_inv_self",
+   "div_eq_self",
+   "div_right_inj"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\ninserted after `end LeftCancelDivisionMonoid`:\n-- A1 div_left_inj erased\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y z : R} : x / z = y / z ↔ x = y := by\n  simp [-div_left_inj]\n-- A2 div_eq_inv_self erased\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y : R} : x / y = y⁻¹ ↔ x = 1 := by\n  simp [-div_eq_inv_self]\n-- A3 div_eq_self erased\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y : R} : x / y = x ↔ y = 1 := by\n  simp [-div_eq_self]\n-- A4 div_right_inj erased\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y z : R} : x / y = x / z ↔ y = z := by\n  simp [-div_right_inj]\n-- A5 group, div_left_inj erased\nexample [Group R] {x y z : R} : x / z = y / z ↔ x = y := by\n  simp [-div_left_inj]\n-- A6 group, div_right_inj erased\nexample [Group R] {x y z : R} : x / y = x / z ↔ y = z := by\n  simp [-div_right_inj]",
+  "compiled": false,
+  "result": "all six: `simp` made no progress",
+  "shows": "With the attribute erased, `simp` closes none of the four goals, at the new generality or for a Group; with it (constructions c1-c3) `simp` closes them all. The four `simp` attributes are load-bearing at the new generality."
+ },
+ {
+  "id": "c19",
+  "kind": "automation_check",
+  "objects": [
+   "div_left_injective",
+   "div_right_injective",
+   "div_left_inj",
+   "div_right_inj",
+   "div_eq_self",
+   "div_eq_inv_self"
+  ],
+  "lean": "file_read Mathlib/Algebra/Group/Defs.lean 129-177 and Basic.lean 218-334",
+  "compiled": null,
+  "result": "`mul_right_inj`, `mul_left_inj`, `mul_eq_left`, `mul_eq_right`, `inv_inj` carry `@[to_additive (attr := simp)]`; `mul_right_injective`, `mul_left_injective`, `inv_injective` carry `@[to_additive]` only",
+  "shows": "Siblings of the same shape register the iff forms as simp and the `Function.Injective` forms without simp; the PR's registrations match this (4 simp iff lemmas, 2 non-simp injectivity lemmas)."
+ },
+ {
+  "id": "c20",
+  "kind": "binders_form_check",
+  "objects": [
+   "div_eq_inv_self",
+   "div_left_injective",
+   "div_left_inj",
+   "div_eq_self",
+   "div_right_injective",
+   "div_right_inj"
+  ],
+  "lean": "content_search `^(section|end|variable)` in Mathlib/Algebra/Group/Basic.lean; content_search `\\[(DivisionMonoid|DivInvMonoid|Monoid) \\S+\\] \\[Is\\S*CancelMul` over Mathlib",
+  "compiled": null,
+  "result": "the file's cancel sections are `section LeftCancelMonoid`/`RightCancelMonoid` with `variable [Monoid M] [IsLeftCancelMul M] {a b : M}` / `[Monoid M] [IsRightCancelMul M] {a b : M}` (lines 218-306); the PR's two new sections are the only `[DivInvMonoid _] [Is*CancelMul _]` / `[DivisionMonoid _] [Is*CancelMul _]` variable lines in Basic.lean",
+  "shows": "The PR's section names (`RightCancelDivInvMonoid`, `LeftCancelDivisionMonoid`) and variable lines (base class, then mixin, then `{a b c : G}`) follow the file's existing cancel-monoid sections."
+ },
+ {
+  "id": "c21",
+  "kind": "binders_form_check",
+  "objects": [
+   "div_left_injective",
+   "div_right_injective"
+  ],
+  "lean": "file_read Defs.lean 142, 167 (`mul_right_injective (a : G)`, `mul_left_injective (a : G)`) against the PR's `div_left_injective` / `div_right_injective` (implicit `b`), plus constructions c4-c6",
+  "compiled": null,
+  "result": "mul twins take the fixed operand explicitly; the div twins keep it implicit, as they did before the PR",
+  "shows": "The PR does not change the explicitness of any binder; the implicit `b` is pre-existing, and c4-c6 show consumers still need not name it. The bound variable differs between the twins (`fun a : G ↦ a / b` vs `fun x : G ↦ b / x`), which has no effect on elaboration."
+ },
+ {
+  "id": "c22",
+  "kind": "usage",
+  "objects": [
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_div_right",
+   "Finset.card_le_card_div_self"
+  ],
+  "lean": "inserted after `end DivisionMonoid` (Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean line 1270):\nsection UsageCheck\nvariable {R : Type*} [DecidableEq R]\n\nexample [Group R] {s t : Finset R} (hs : s.Nonempty) : #t ≤ #(s / t) := card_le_card_div_left hs\nexample [Group R] {s t : Finset R} (ht : t.Nonempty) : #s ≤ #(s / t) := card_le_card_div_right ht\nexample [Group R] {s : Finset R} : #s ≤ #(s / s) := card_le_card_div_self\nexample [AddGroup R] {s t : Finset R} (hs : s.Nonempty) : #t ≤ #(s - t) := card_le_card_sub_left hs\nexample [AddGroup R] {s : Finset R} : #s ≤ #(s - s) := card_le_card_sub_self\nexample [DivisionMonoid R] [IsCancelMul R] {s t : Finset R} (hs : s.Nonempty) (ht : t.Nonempty) :\n    max #s #t ≤ #(s / t) := max_le (card_le_card_div_right ht) (card_le_card_div_left hs)\nexample [DivisionMonoid R] [IsCancelMul R] {s : Finset R} : #s ≤ #(s / s) := card_le_card_div_self",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "Group, AddGroup (`card_le_card_sub_left`, `card_le_card_sub_self`) and `[DivisionMonoid R] [IsCancelMul R]` clients apply the three lemmas directly."
+ },
+ {
+  "id": "c23",
+  "kind": "generalised_statement",
+  "objects": [
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "line 1256 (RightCancel variable line) replaced by:\nvariable [DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors (whole file, including card_le_card_div_self)",
+  "shows": "`card_le_card_div_right` compiles with its proof unchanged under `[DivInvMonoid α] [IsRightCancelMul α]`; the PR's `DivisionMonoid` there is stronger than the proof uses, and stronger than `div_left_injective`'s own section."
+ },
+ {
+  "id": "c24",
+  "kind": "generalised_statement",
+  "objects": [
+   "Finset.card_le_card_div_left"
+  ],
+  "lean": "line 1247 (LeftCancel variable line) replaced by:\nvariable [DivInvMonoid α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α}",
+  "compiled": false,
+  "result": "failed to synthesize DivisionMonoid α (at `div_right_injective`)",
+  "shows": "`card_le_card_div_left` genuinely needs `DivisionMonoid`; only the right-cancel member over-assumes."
+ },
+ {
+  "id": "c25",
+  "kind": "twin",
+  "objects": [
+   "Finset.card_le_card_div_self",
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "lines 1256-1260 replaced by:\nvariable [DivInvMonoid α] [IsRightCancelMul α] [DecidableEq α] {s t : Finset α}\n\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) := by\n  obtain ⟨b, hb⟩ := ht\n  exact card_le_card_image₂_right _ hb (div_left_injective (b := b))\n\n/-- The size of `s / s` is at least the size of `s`, version with right-cancellative\nmultiplication. See `card_le_card_div_self` for the version with left-cancellative\nmultiplication. -/\n@[to_additive /-- The size of `s - s` is at least the size of `s`, version with\nright-cancellative addition. See `card_le_card_sub_self` for the version with left-cancellative\naddition. -/]\nlemma card_le_card_div_self' : #s ≤ #(s / s) := by\n  cases s.eq_empty_or_nonempty <;> simp [card_le_card_div_right, *]\n\nexample {R : Type*} [DecidableEq R] [SubNegMonoid R] [IsRightCancelAdd R] {s : Finset R} :\n    #s ≤ #(s - s) := card_le_card_sub_self'",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "A right-cancellative twin `card_le_card_div_self'` holds at `[DivInvMonoid α] [IsRightCancelMul α]` by the same one-line proof from `card_le_card_div_right`, and its additive version `card_le_card_sub_self'` is generated and usable for `[SubNegMonoid R] [IsRightCancelAdd R]`."
+ },
+ {
+  "id": "c26",
+  "kind": "closure_check",
+  "objects": [
+   "Finset.card_le_card_div_self",
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "file_read Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean 1147-1215; content_search `card_le_card_div_self` over Mathlib",
+  "compiled": null,
+  "result": "the mul pattern has `card_le_card_mul_left`/`card_le_card_mul_self` (IsLeftCancelMul) and `card_le_card_mul_right`/`card_le_card_mul_self'` (IsRightCancelMul) with docstrings pointing at each other; the div family has only `card_le_card_div_self` (left-cancel form)",
+  "shows": "After the PR splits the div lemmas by cancellation side, the div family mirrors the mul family except that the right-cancel `_self'` member is absent."
+ },
+ {
+  "id": "c27",
+  "kind": "usage",
+  "objects": [
+   "Finset.card_le_card_div_right"
+  ],
+  "lean": "inserted after `end DivisionMonoid`:\nsection LeftOnlyClient\nvariable {R : Type*} [DecidableEq R]\n\nexample [DivisionMonoid R] [IsLeftCancelMul R] {s t : Finset R} (ht : t.Nonempty) :\n    #s ≤ #(s / t) := card_le_card_div_right ht",
+  "compiled": false,
+  "result": "failed to synthesize IsRightCancelMul R",
+  "shows": "A `[DivisionMonoid R] [IsLeftCancelMul R]` client cannot apply `card_le_card_div_right`, although in a DivisionMonoid left cancellation implies right cancellation (c12)."
+ },
+ {
+  "id": "c28",
+  "kind": "binders_form_check",
+  "objects": [
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_div_right",
+   "Finset.card_le_card_div_self"
+  ],
+  "lean": "content_search `^(section|end|variable)` in Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean",
+  "compiled": null,
+  "result": "file uses flat `section IsLeftCancelMul` (1147, one `variable [Mul α] [IsLeftCancelMul α] [DecidableEq α] {s t : Finset α} {a : α}`) and `section IsRightCancelMul` (1184); the PR has `section DivisionMonoid` (1244) with nested `LeftCancel` (1246) and `RightCancel` (1255) subsections and a third `variable` line (1264-1265) for `card_le_card_div_self`",
+  "shows": "The PR's section structure states the same instance context three times, nests sections the file does not nest, and names them differently from the file's two cancel sections; binder order (base class, mixin, DecidableEq) matches the file."
+ },
+ {
+  "id": "c29",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.card_le_card_div_left",
+   "Finset.card_le_card_div_right",
+   "Finset.card_le_card_div_self"
+  ],
+  "lean": "file_read Finset/Basic.lean 1168-1213 (attributes of card_le_card_mul_left/right/self/self')",
+  "compiled": null,
+  "result": "all four mul siblings carry `@[to_additive]` only",
+  "shows": "The div lemmas' `@[to_additive]`-only registration matches their siblings; c22/c25 confirm the additive names are generated and usable."
+ },
+ {
+  "id": "c30",
+  "kind": "usage",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\ninserted after `end DivisionMonoid` (Mathlib/Algebra/Group/Pointwise/Set/Finite.lean line 151):\nexample [Group R] {s t : Set R} (hs : s.Finite) (ht : t.Finite) : (s / t).Finite :=\n  finite_div.2 (.inl ⟨hs, ht⟩)\nexample [Group R] {s t : Set R} (h : (s / t).Finite) (hs : s.Nonempty) : t.Finite := by\n  rcases finite_div.1 h with ⟨-, ht⟩ | rfl | rfl\n  · exact ht\n  · simp at hs\n  · exact Set.finite_empty\nexample [AddGroup R] {s t : Set R} (hs : s.Infinite) (ht : t.Nonempty) : (s - t).Infinite :=\n  infinite_sub.2 (.inl ⟨hs, ht⟩)\nexample [DivisionMonoid R] [IsCancelMul R] {s t : Set R} (hs : s.Infinite) (ht : t.Nonempty) :\n    (s / t).Infinite :=\n  infinite_div.2 (.inl ⟨hs, ht⟩)",
+  "compiled": true,
+  "result": "lean_verify_edit: these examples compiled; the only error in the edit was the next construction",
+  "shows": "Group, AddGroup (`infinite_sub`) and `[DivisionMonoid R] [IsCancelMul R]` clients use both directions of `finite_div` / `infinite_div` directly."
+ },
+ {
+  "id": "c31",
+  "kind": "usage",
+  "objects": [
+   "Set.infinite_div"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\nsame edit:\n-- a left-cancel-only DivisionMonoid client\nexample [DivisionMonoid R] [IsLeftCancelMul R] {s t : Set R} (hs : s.Infinite) (ht : t.Nonempty) :\n    (s / t).Infinite :=\n  infinite_div.2 (.inl ⟨hs, ht⟩)",
+  "compiled": false,
+  "result": "failed to synthesize IsRightCancelMul R",
+  "shows": "A `[DivisionMonoid R] [IsLeftCancelMul R]` client cannot use `infinite_div`."
+ },
+ {
+  "id": "c32",
+  "kind": "generalised_statement",
+  "objects": [
+   "Set.finite_div"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- one cancellation mixin, no bridge\nlemma finite_div_left_only [DivisionMonoid R] [IsLeftCancelMul R] {s t : Set R} :\n    (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 (fun b _ ↦ (div_left_injective (b := b)).injOn)\n    fun a _ ↦ (div_right_injective (b := a)).injOn",
+  "compiled": false,
+  "result": "failed to synthesize IsRightCancelMul R (at `div_left_injective`)",
+  "shows": "Without a bridge lemma, the existing proof needs both mixins."
+ },
+ {
+  "id": "c33",
+  "kind": "generalised_statement",
+  "objects": [
+   "Set.finite_div"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\n-- DivInvMonoid with both mixins\nlemma finite_div_dim [DivInvMonoid R] [IsCancelMul R] {s t : Set R} :\n    (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  finite_image2 (fun b _ ↦ (div_left_injective (b := b)).injOn)\n    fun a _ ↦ (div_right_injective (b := a)).injOn",
+  "compiled": false,
+  "result": "failed to synthesize DivisionMonoid R (at `div_right_injective`)",
+  "shows": "`finite_div` cannot be weakened from `DivisionMonoid` to `DivInvMonoid`, even with `IsCancelMul`."
+ },
+ {
+  "id": "c34",
+  "kind": "generalised_statement",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "-- compiled inside a section opened with `variable {R : Type*}`\ninserted after `end DivisionMonoid`:\ntheorem DivisionMonoid.isRightCancelMul_of_isLeftCancelMul_check [DivisionMonoid R]\n    [IsLeftCancelMul R] : IsRightCancelMul R where\n  mul_right_cancel b x y h := by\n    have h : x * b = y * b := h\n    have h' : (x * b)⁻¹ = (y * b)⁻¹ := congrArg Inv.inv h\n    rw [mul_inv_rev, mul_inv_rev] at h'\n    exact inv_injective (mul_left_cancel h')\n\n-- finite_div / infinite_div for a DivisionMonoid with a single cancellation mixin\nlemma finite_div_left_only [DivisionMonoid R] [IsLeftCancelMul R] {s t : Set R} :\n    (s / t).Finite ↔ s.Finite ∧ t.Finite ∨ s = ∅ ∨ t = ∅ :=\n  haveI := DivisionMonoid.isRightCancelMul_of_isLeftCancelMul_check (R := R)\n  finite_div\n\nlemma infinite_div_left_only [DivisionMonoid R] [IsLeftCancelMul R] {s t : Set R} :\n    (s / t).Infinite ↔ s.Infinite ∧ t.Nonempty ∨ t.Infinite ∧ s.Nonempty :=\n  haveI := DivisionMonoid.isRightCancelMul_of_isLeftCancelMul_check (R := R)\n  infinite_div",
+  "compiled": true,
+  "result": "lean_verify_edit: success, no errors",
+  "shows": "With a four-line bridge lemma (left cancellation implies right cancellation in a DivisionMonoid), `finite_div` and `infinite_div` hold under `[DivisionMonoid R] [IsLeftCancelMul R]` alone; the PR's second mixin is redundant."
+ },
+ {
+  "id": "c35",
+  "kind": "binders_form_check",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "content_search over Mathlib: `\\[IsLeftCancelMul \\S+\\] \\[IsRightCancelMul` and `\\[IsCancelMul \\S+\\]`",
+  "compiled": null,
+  "result": "pair spelling: 2 matches, both in Set/Finite.lean (the neighbouring `section Cancel`, line 101, and the PR's line 139); `[IsCancelMul _]`: 26 matches in 21 files",
+  "shows": "The PR copies the neighbouring `section Cancel`'s pair-of-mixins spelling; library-wide the bundled `IsCancelMul` is the common spelling. The pair is consistent with the file."
+ },
+ {
+  "id": "c36",
+  "kind": "automation_check",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "file_read Set/Finite.lean 99-123",
+  "compiled": null,
+  "result": "siblings `finite_mul`, `infinite_mul` carry `@[to_additive]` only; `finite_inv`, `infinite_inv` carry `@[to_additive (attr := simp)]`",
+  "shows": "`finite_div`/`infinite_div` are registered like their binary-operation siblings `finite_mul`/`infinite_mul` (no simp), unchanged by the PR."
+ },
+ {
+  "id": "c37",
+  "kind": "closure_check",
+  "objects": [
+   "Set.finite_div",
+   "Set.infinite_div"
+  ],
+  "lean": "file_read Mathlib/Algebra/Group/Defs.lean 231-260; declaration_search CommMagma.IsLeftCancelMul.toIsRightCancelMul, IsLeftCancelMul.toIsCancelMul",
+  "compiled": null,
+  "result": "`CommMagma.IsLeftCancelMul.toIsRightCancelMul`, `CommMagma.IsRightCancelMul.toIsLeftCancelMul`, `CommMagma.IsLeftCancelMul.toIsCancelMul`, `CommMagma.IsRightCancelMul.toIsCancelMul` exist as lemmas (not instances) with `to_additive`; no DivisionMonoid analogue exists",
+  "shows": "The library already bridges left and right cancellation where a structure makes them equivalent (commutativity), as plain lemmas; the DivisionMonoid analogue that c12 and c34 construct is absent."
+ }
+]

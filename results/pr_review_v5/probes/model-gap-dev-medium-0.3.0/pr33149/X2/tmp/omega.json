@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/ODE/GalerkinRegularity.lean","line_start":467,"line_end":469,"replacement":"open scoped ContDiff in\nexample (f : ℝ → ℝ) : smoothInTime f ↔ ContDiff ℝ ω f := Iff.rfl\n\nexample (ω : ℝ → ℝ) (T : ℝ) : BKMFinite ω T := ⟨_, le_rfl⟩","max_messages":5}

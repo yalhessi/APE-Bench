@@ -1,0 +1,32 @@
+[
+ {
+  "judge": "devmatchA m1",
+  "calls": 25,
+  "flagged": []
+ },
+ {
+  "judge": "devmatchA m2",
+  "calls": 31,
+  "flagged": []
+ },
+ {
+  "judge": "devmatchB m1",
+  "calls": 6,
+  "flagged": []
+ },
+ {
+  "judge": "devmatchB m2",
+  "calls": 6,
+  "flagged": []
+ },
+ {
+  "judge": "devreader m1",
+  "calls": 4,
+  "flagged": []
+ },
+ {
+  "judge": "devreader m2",
+  "calls": 8,
+  "flagged": []
+ }
+]

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Meromorphic/Basic.lean", "declaration_name": "Meromorphic.fun_sum", "new_declaration": "@[fun_prop]\ntheorem fun_sum (h : \u2200 \u03c3, Meromorphic (G \u03c3)) :\n    Meromorphic (fun x \u21a6 \u2211 n \u2208 s, G n x) := fun x \u21a6 MeromorphicAt.fun_sum (h \u00b7 x)"}

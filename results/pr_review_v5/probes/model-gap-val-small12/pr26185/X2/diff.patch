@@ -1,0 +1,101 @@
+diff --git a/Counterexamples.lean b/Counterexamples.lean
+--- a/Counterexamples.lean
++++ b/Counterexamples.lean
+@@ -16,6 +16,7 @@ import Counterexamples.MapFloor
+ import Counterexamples.MonicNonRegular
+ import Counterexamples.Motzkin
+ import Counterexamples.OrderedCancelAddCommMonoidWithBounds
++import Counterexamples.PeanoCurve
+ import Counterexamples.Phillips
+ import Counterexamples.PolynomialIsDomain
+ import Counterexamples.Pseudoelement
+diff --git a/Counterexamples/PeanoCurve.lean b/Counterexamples/PeanoCurve.lean
+--- /dev/null
++++ b/Counterexamples/PeanoCurve.lean
+@@ -0,0 +1,38 @@
++/-
++Copyright (c) 2025 Vasilii Nesterov. All rights reserved.
++Released under Apache 2.0 license as described in the file LICENSE.
++Authors: Vasilii Nesterov
++-/
++import Mathlib.Analysis.Complex.Tietze
++import Mathlib.Topology.MetricSpace.HausdorffAlexandroff
++
++/-!
++# Peano curve
++This file proves the existsence of a Peano curve -- continuous sujrective map from the interval
++`[0, 1]` onto the square `[0, 1] × [0, 1]`.
++-/
++
++open scoped unitInterval
++
++/-- There is a continuous function on `ℝ` that maps the Cantor set to the square. -/
++lemma exists_long_peano_curve :
++    ∃ f : C(ℝ, I × I), Set.SurjOn f cantorSet Set.univ := by
++  -- Take a continuous surjection from the Cantor set to the square
++  obtain ⟨g, hg1, hg2⟩ := exists_nat_bool_continuous_surjective_of_compact (I × I)
++  let g' : C(cantorSet, I × I) :=
++    ⟨g ∘ cantorSetHomeomorphNatToBool, Continuous.comp hg1 (Homeomorph.continuous _)⟩
++  have hg' : Function.Surjective g' := by
++    simp only [ContinuousMap.coe_mk, EquivLike.surjective_comp, g', hg2]
++  -- Extend it to whole `ℝ`
++  obtain ⟨f, hf⟩ := ContinuousMap.exists_restrict_eq isClosed_cantorSet g'
++  use f
++  simp only [Set.surjOn_iff_surjective, ← ContinuousMap.coe_restrict, hf, hg']
++
++/-- There is a continuous surjection from the interval to the square. -/
++theorem exists_peano_curve :
++    ∃ f : C(I, I × I), Function.Surjective f := by
++  obtain ⟨f, hf⟩ := exists_long_peano_curve
++  -- Restrict the map from `exists_long_peano_curve` to the interval
++  use ContinuousMap.restrict I f
++  rw [ContinuousMap.coe_restrict, ← Set.surjOn_iff_surjective]
++  exact Set.SurjOn.mono cantorSet_subset_unitInterval (by rfl) hf
+diff --git a/Mathlib/Analysis/Complex/Tietze.lean b/Mathlib/Analysis/Complex/Tietze.lean
+--- a/Mathlib/Analysis/Complex/Tietze.lean
++++ b/Mathlib/Analysis/Complex/Tietze.lean
+@@ -96,6 +96,10 @@ theorem Metric.instTietzeExtensionClosedBall (𝕜 : Type v) [RCLike 𝕜] {E :
+       RCLike.norm_ofReal, abs_of_nonneg hr.le]
+     exact (mul_le_iff_le_one_right hr).symm
+ 
++instance unitInterval.instTietzeExtension : TietzeExtension unitInterval := by
++  rw [unitInterval.eq_closedBall]
++  exact Metric.instTietzeExtensionClosedBall ℝ _ (by norm_num)
++
+ variable {X : Type u} [TopologicalSpace X] [NormalSpace X] {s : Set X} (hs : IsClosed s)
+ variable (𝕜 : Type v) [RCLike 𝕜]
+ variable {E : Type w} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [FiniteDimensional 𝕜 E]
+diff --git a/Mathlib/Topology/ContinuousMap/Basic.lean b/Mathlib/Topology/ContinuousMap/Basic.lean
+--- a/Mathlib/Topology/ContinuousMap/Basic.lean
++++ b/Mathlib/Topology/ContinuousMap/Basic.lean
+@@ -281,7 +281,7 @@ def restrict (f : C(α, β)) : C(s, β) where
+   toFun := f ∘ ((↑) : s → α)
+ 
+ @[simp]
+-theorem coe_restrict (f : C(α, β)) : ⇑(f.restrict s) = f ∘ ((↑) : s → α) :=
++theorem coe_restrict (f : C(α, β)) : ⇑(f.restrict s) = s.restrict f :=
+   rfl
+ 
+ @[simp]
+@@ -378,7 +378,7 @@ theorem liftCover_coe {i : ι} (x : S i) : liftCover S φ hφ hS x = φ i x := b
+ @[simp]
+ theorem liftCover_restrict {i : ι} : (liftCover S φ hφ hS).restrict (S i) = φ i := by
+   ext
+-  simp only [coe_restrict, Function.comp_apply, liftCover_coe]
++  simp only [restrict_apply, liftCover_coe]
+ 
+ variable (A : Set (Set α)) (F : ∀ s ∈ A, C(s, β))
+   (hF : ∀ (s) (hs : s ∈ A) (t) (ht : t ∈ A) (x : α) (hxi : x ∈ s) (hxj : x ∈ t),
+diff --git a/Mathlib/Topology/UnitInterval.lean b/Mathlib/Topology/UnitInterval.lean
+--- a/Mathlib/Topology/UnitInterval.lean
++++ b/Mathlib/Topology/UnitInterval.lean
+@@ -67,6 +67,9 @@ theorem mul_le_left {x y : I} : x * y ≤ x :=
+ theorem mul_le_right {x y : I} : x * y ≤ y :=
+   Subtype.coe_le_coe.mp <| mul_le_of_le_one_left y.2.1 x.2.2
+ 
++theorem eq_closedBall : I = Metric.closedBall 2⁻¹ 2⁻¹ := by
++  norm_num [unitInterval, Real.Icc_eq_closedBall]
++
+ /-- Unit interval central symmetry. -/
+ def symm : I → I := fun t => ⟨1 - t, Icc.mem_iff_one_sub_mem.mp t.prop⟩
+ 

@@ -121,6 +121,9 @@ class BaseRelaySession(ABC):
         # Signature cache: Map (tool_name, arguments_str) -> signature
         # Only enabled when Gemini returns signatures (thinking mode)
         self._signature_cache: Dict[Tuple[str, str], str] = {}
+        # A whole turn's opaque reasoning state (`ConversationMessage.signature`), keyed by
+        # `_turn_key` (see `_cache_turn_signatures`).
+        self._turn_signatures: Dict[str, str] = {}
         self._signature_cache_enabled: bool = False
 
     @abstractmethod
@@ -149,94 +152,44 @@ class BaseRelaySession(ABC):
 
     async def _check_limits_and_shutdown_if_needed(self) -> Optional[Response]:
         """
-        Check turn and cost limits before processing request.
+        Check turn, cost and token limits before processing request.
         If limit reached, shutdown uvicorn server and return error response.
+
+        The cost and token ceilings are read off the same usage record, and both scaffold
+        families check both, so a run cannot acquire a ceiling that binds under one scaffold
+        and is silently absent under another. What counts as reached is `limit_error`'s,
+        shared with the subscription route, which has no relay.
 
         Returns:
             None if within limits, error Response if limit exceeded
         """
-        # Check turn limit
-        if self.max_turns is not None:
-            current_turns = self.get_current_turns()
-            if current_turns >= self.max_turns:
-                self._turn_limit_reached = True
-                error_msg = f"Turn limit reached: {current_turns}/{self.max_turns}"
-                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
+        from ape.llm_clients.config import CostExhaustedError
+        from ape.scaffolds.base import MaxTurnsReachedError
+        from .base_conversation import limit_error
 
-                # Store error for propagation
-                from ape.scaffolds.base import MaxTurnsReachedError
-                self.last_error = MaxTurnsReachedError(error_msg)
+        error = limit_error(self.get_token_usage(), self.get_current_turns(),
+                            max_turns=self.max_turns, cost_limit=self.cost_limit,
+                            token_limit=self.token_limit)
+        if error is None:
+            return None
+        if isinstance(error, MaxTurnsReachedError):
+            self._turn_limit_reached = True
+            kind = "turn_limit_exceeded"
+        elif isinstance(error, CostExhaustedError):
+            self._cost_limit_reached = True
+            kind = "cost_limit_exceeded"
+        else:
+            self._token_limit_reached = True
+            kind = "token_limit_exceeded"
+        self.logger.warning(f"[BaseRelay] {error} - shutting down server")
 
-                # Trigger server shutdown
-                if self._server:
-                    self._server.should_exit = True
+        # Store error for propagation, and trigger server shutdown
+        self.last_error = error
+        if self._server:
+            self._server.should_exit = True
 
-                # Return error response before shutdown completes
-                return JSONResponse(
-                    {
-                        "error": {
-                            "type": "turn_limit_exceeded",
-                            "message": error_msg
-                        }
-                    },
-                    status_code=429
-                )
-
-        # Check cost limit
-        if self.cost_limit is not None:
-            current_cost = self.get_token_usage().total_cost
-            if current_cost >= self.cost_limit:
-                self._cost_limit_reached = True
-                error_msg = f"Cost limit exceeded: ${current_cost:.6f} >= ${self.cost_limit:.6f}"
-                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
-
-                # Store error for propagation
-                from ape.llm_clients.config import CostExhaustedError
-                self.last_error = CostExhaustedError(error_msg)
-
-                # Trigger server shutdown
-                if self._server:
-                    self._server.should_exit = True
-
-                # Return error response before shutdown completes
-                return JSONResponse(
-                    {
-                        "error": {
-                            "type": "cost_limit_exceeded",
-                            "message": error_msg
-                        }
-                    },
-                    status_code=429
-                )
-
-        # Check the token ceiling, beside the cost one and off the same usage record. Both
-        # scaffold families check both, so a run cannot acquire a ceiling that binds under one
-        # scaffold and is silently absent under another.
-        if self.token_limit is not None:
-            current_tokens = self.get_token_usage().processed_tokens
-            if current_tokens >= self.token_limit:
-                self._token_limit_reached = True
-                error_msg = (f"Token limit exceeded: {current_tokens:,} >= "
-                             f"{self.token_limit:,}")
-                self.logger.warning(f"[BaseRelay] {error_msg} - shutting down server")
-
-                from ape.llm_clients.config import TokenBudgetExhaustedError
-                self.last_error = TokenBudgetExhaustedError(error_msg)
-
-                if self._server:
-                    self._server.should_exit = True
-
-                return JSONResponse(
-                    {
-                        "error": {
-                            "type": "token_limit_exceeded",
-                            "message": error_msg
-                        }
-                    },
-                    status_code=429
-                )
-
-        return None
+        # Return error response before shutdown completes
+        return JSONResponse({"error": {"type": kind, "message": str(error)}}, status_code=429)
 
     @abstractmethod
     def _get_env_vars(self) -> Dict[str, str]:
@@ -618,6 +571,38 @@ class BaseRelaySession(ABC):
         if has_signature and not self._signature_cache_enabled:
             self._signature_cache_enabled = True
             self.logger.info("Signature cache enabled (Gemini thinking mode detected)")
+
+    @staticmethod
+    def _turn_key(blocks: List[ContentBlock]) -> Optional[str]:
+        """What identifies an assistant turn when the client sends it back: its first tool call's
+        id, or, for a turn with none, its text."""
+        for block in blocks:
+            if block.type == "tool_use" and block.id:
+                return f"tool:{block.id}"
+        text = "".join(block.text or "" for block in blocks if block.type == "text").strip()
+        return f"text:{text}" if text else None
+
+    def _cache_turn_signatures(self, nodes: List[ConversationNode]) -> None:
+        """Keep each response turn's message-level signature for when the client returns it.
+
+        The client (Claude Code) holds the conversation in its own format, which has no slot for
+        a message's opaque state, so the relay rebuilds every request without it. That is where
+        Responses carry-over keeps its encrypted reasoning items (`openai_provider`), so through
+        the relay none was ever carried: each turn reasoned from nothing.
+        """
+        for node in nodes:
+            if node.type == "assistant" and node.message.signature:
+                key = self._turn_key(node.message.content)
+                if key:
+                    self._turn_signatures[key] = node.message.signature
+
+    def _restore_turn_signature(self, node: ConversationNode) -> None:
+        """Re-attach a returned assistant turn's cached signature, if it had one."""
+        if node.message.signature:
+            return
+        key = self._turn_key(node.message.content)
+        if key and key in self._turn_signatures:
+            node.message.signature = self._turn_signatures[key]
 
     def _restore_signatures_to_blocks(self, blocks: List[ContentBlock]) -> None:
         """Restore signatures to tool_use blocks from cache (client SDK lost them)"""

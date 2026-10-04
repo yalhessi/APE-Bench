@@ -10,7 +10,7 @@ import json
 import re
 from ape.utils.logging import create_logger
 
-from ..config import LLMConfig, ProviderError, ContextLengthExceededError
+from ..config import LLMConfig, ProviderError, ContextLengthExceededError, RequestRejectedError
 from ..models import TokenUsage
 
 if TYPE_CHECKING:
@@ -122,7 +122,9 @@ class BaseProvider:
                     if self.llm_logger:
                         await self.llm_logger.log_response(response_data, "response")
 
-                    if 'error' in response_data:
+                    # Truthiness, not presence: a Responses body always carries `error`,
+                    # as null on success.
+                    if response_data.get('error'):
                         self.logger.warning(f"Response contains error field despite HTTP 200 status")
                         error_msg = self.parse_error_response(response_data)
                         raise ProviderError(f"API returned error: {error_msg}")
@@ -154,6 +156,7 @@ class BaseProvider:
                         f"status: {response.status_code}, "
                         f"error: {error_msg}"
                     )
+                    self._raise_if_rejected(response.status_code, response_data, error_msg)
                     raise ProviderError(f"API request failed: {error_msg}")
             except httpx.RequestError as e:
                 error_msg = str(e)
@@ -212,6 +215,7 @@ class BaseProvider:
                         f"status: {response.status_code}, "
                         f"error: {error_msg}"
                     )
+                    self._raise_if_rejected(response.status_code, error_data, error_msg)
                     raise ProviderError(f"Streaming request failed: {error_msg}")
             except httpx.RequestError as e:
                 error_msg = str(e)
@@ -411,6 +415,27 @@ class BaseProvider:
             raise ContextLengthExceededError(error_message)
 
         return error_message
+
+    @staticmethod
+    def _raise_if_rejected(status_code: int, response_data: Any, error_msg: str) -> None:
+        """Raise `RequestRejectedError` for a 400 whose error body names a parameter.
+
+        Keyed on OpenAI's structured `error.param`, not on the message text. Measured
+        2026-09-30, every parameter rejection carries it: `reasoning_effort` (tools with
+        reasoning on gpt-5.4 and gpt-5.5 over Chat Completions; `minimal` on gpt-5.2) and
+        `temperature` (anything but 1.0 with reasoning on over Responses). A 400 that names no
+        parameter is still retried: the only other 400 in the run logs, "Could not finish the
+        message because max_tokens or model output limit was reached", succeeded on retry
+        (`pr_review_v4_judge_r0pinned_rep1`, 2026-08-05).
+        """
+
+        if status_code != 400 or not isinstance(response_data, dict):
+            return
+        error = response_data.get("error")
+        param = error.get("param") if isinstance(error, dict) else None
+        if isinstance(param, str) and param:
+            raise RequestRejectedError(
+                f"API request rejected (HTTP 400, parameter {param!r}; not retried): {error_msg}")
 
     def postprocess_nodes(self, nodes: List):
         """

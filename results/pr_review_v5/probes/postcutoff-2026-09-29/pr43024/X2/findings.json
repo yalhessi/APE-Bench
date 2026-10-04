@@ -1,0 +1,9 @@
+[
+  {
+    "target": "isMulCommutative_mono",
+    "claim": "`isMulCommutative_mono` is misnamed: its statement `s ≤ t → IsMulCommutative t → IsMulCommutative s` is antitone in the subobject (commutativity passes DOWN to smaller subobjects), so the `_mono` suffix describes the wrong direction. It also disagrees with the PR's own title (`isMulCommutative_anti`) and with the library's name for exactly this shape of lemma, `Subgroup.isCyclic_of_le (h : H ≤ H') [IsCyclic H'] : IsCyclic H` and `LieSubmodule.isNilpotent_of_le (h₁ : M₁ ≤ M₂) [IsNilpotent L M₂] : IsNilpotent L M₁`.",
+    "requested_change": "Rename `isMulCommutative_mono` to `isMulCommutative_of_le` (its `to_additive` twin becomes `isAddCommutative_of_le`), keeping the statement and proof unchanged, and make the PR title match the final name.",
+    "severity": "advisory",
+    "evidence": "declaration_search: `isMulCommutative_mono` is declared only in this PR; a full-corpus content_search (8379 files, not truncated) for `(isMulCommutative|IsMulCommutative|isCommutative|IsCommutative)…(_of_le|_mono|_anti|.mono|.anti|.of_le)` finds only the PR's lemma, so the new name clashes with nothing. A full-corpus content_search for sibling lemmas of the form `[IsX big] : IsX small` found `Subgroup.isCyclic_of_le` (GroupTheory/SpecificGroups/Cyclic/Basic.lean:292, same binder shape `(h : H ≤ H') [IsCyclic H']`), `LieSubmodule.isNilpotent_of_le` (Algebra/Lie/Nilpotent.lean:706) and `Set.Subsingleton.anti` / `Filter.Subsingleton.anti` for the dot-notation form; none uses `_mono` for this direction. naming_norm returned `subject_unresolved` (unmeasured), so this is advisory. lean_verify_edit replacing the declaration with `lemma isMulCommutative_of_le …` (same body) plus `example … : IsAddCommutative s := isAddCommutative_of_le h` succeeded with no errors or warnings. The file as the PR leaves it compiles (lean_verify_edit with no edit: compiles=true)."
+  }
+]

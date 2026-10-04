@@ -1,0 +1,98 @@
+import json
+V = "lean_verify_edit (whole file recompiled against the reviewed workspace): success, no errors, no warnings."
+F = []
+def add(target, claim, change, sev, evidence):
+    F.append(dict(target=target, claim=claim, requested_change=change, severity=sev, evidence=evidence))
+
+add("Metric.isCover_maximalSeparatedSet",
+    "`isCover_maximalSeparatedSet` reproves by hand, in about 25 lines (by_contra, a hand-built `{x} ∪ maximalSeparatedSet ε A`, a four-way case split to show it is separated, a `classical`), the fact that a maximal ε-separated subset is an ε-cover. That fact is already in the library as `Metric.IsCover.of_maximal_isSeparated` in `Mathlib/Topology/MetricSpace/Cover.lean`, which this file imports and which carries the same Vershynin 4.2.6 reference.",
+    "Derive the lemma from `IsCover.of_maximal_isSeparated`. Show that `maximalSeparatedSet ε A` is `Maximal (fun N ↦ N ⊆ A ∧ IsSeparated ε N)` by comparing finite cardinalities:\n```lean\nlemma isCover_maximalSeparatedSet (h : packingNumber ε A ≠ ⊤) :\n    IsCover ε A (maximalSeparatedSet ε A) := by\n  refine .of_maximal_isSeparated ⟨⟨maximalSeparatedSet_subset, isSeparated_maximalSeparatedSet⟩,\n    fun N hN hsub ↦ ?_⟩\n  have hfin : (maximalSeparatedSet ε A).Finite :=\n    encard_ne_top_iff.mp (by rwa [card_maximalSeparatedSet h])\n  exact (hfin.eq_of_subset_of_encard_le hsub (card_le_of_isSeparated hN.1 hN.2 h)).ge\n```",
+    "blocking",
+    "file_read of target/Mathlib/Topology/MetricSpace/Cover.lean lines 75-80: `nonrec lemma IsCover.of_maximal_isSeparated (hN : Maximal (fun N ↦ N ⊆ s ∧ IsSeparated ε N) N) : IsCover ε s N`, docstring 'A maximal `ε`-separated subset of a set `s` is an `ε`-cover of `s`', referencing Vershynin 4.2.6. CoveringNumbers.lean imports Mathlib.Topology.MetricSpace.Cover (line 12). The replacement above, given as declaration_name=Metric.isCover_maximalSeparatedSet with the docstring kept: " + V + " It also compiled with the renamed `IsSeparated.encard_le_encard_maximalSeparatedSet` (line-mode splice of lines 324-361).")
+
+add("Metric.card_minimalCover",
+    "The lemma states `(minimalCover ε A).encard = coveringNumber ε A`, so its subject is `encard`, but it is named `card_minimalCover`. Mathlib distinguishes `card`, `ncard` and `encard` in names, and lemmas about `Set.encard` are named `encard_*`.",
+    "Rename `card_minimalCover` to `encard_minimalCover` and update its uses (none outside this section at present).",
+    "blocking",
+    "naming_norm Metric.card_minimalCover: subject `encard`; of 88 base declarations with that subject, 84 use the prefix `encard_`; this declaration's `card_` prefix has 0; verdict **established**; candidate `Metric.encard_minimalCover`.")
+
+add("Metric.card_maximalSeparatedSet",
+    "The lemma states `(maximalSeparatedSet ε A).encard = packingNumber ε A`, so its subject is `encard`, but it is named `card_maximalSeparatedSet`, against the `encard_` convention for `Set.encard` lemmas.",
+    "Rename `card_maximalSeparatedSet` to `encard_maximalSeparatedSet` and update its uses in `card_le_of_isSeparated`, `isCover_maximalSeparatedSet` and `coveringNumber_le_packingNumber`.",
+    "blocking",
+    "naming_norm Metric.card_maximalSeparatedSet: subject `encard`, 84 of 88 base declarations use `encard_`, `card_` has 0, verdict **established**, candidate `Metric.encard_maximalSeparatedSet`.")
+
+add("Metric.card_le_of_isSeparated",
+    "`Metric.card_le_of_isSeparated` concludes `C.encard ≤ (maximalSeparatedSet ε A).encard`. The name says `card` where the statement uses `encard`, and it never mentions `maximalSeparatedSet`, the object the lemma is about, so the name reads like a general fact about separated sets. Its proof also unfolds `packingNumber` by hand (`le_iSup_of_le C <| le_iSup_of_le h_subset <| le_iSup_of_le h_sep (by simp)`) instead of using the existing `IsSeparated.encard_le_packingNumber` from the same file.",
+    "Rename it to `IsSeparated.encard_le_encard_maximalSeparatedSet` so it works with dot notation on the separation hypothesis. Take `h_sep` first, and prove it from the existing lemma:\n```lean\nlemma IsSeparated.encard_le_encard_maximalSeparatedSet (h_sep : IsSeparated ε C)\n    (h_subset : C ⊆ A) (h : packingNumber ε A ≠ ⊤) :\n    C.encard ≤ (maximalSeparatedSet ε A).encard :=\n  (h_sep.encard_le_packingNumber h_subset).trans_eq (card_maximalSeparatedSet h).symm\n```",
+    "blocking",
+    "naming_norm Metric.card_le_of_isSeparated: subject `encard`, 84/88 use `encard_`, verdict **established**. The file (line 138) already has `IsSeparated.encard_le_packingNumber (h_subset : C ⊆ A) (hC : IsSeparated ε C) : C.encard ≤ packingNumber ε A`. The renamed lemma, with `isCover_maximalSeparatedSet` updated to call `hN.2.encard_le_encard_maximalSeparatedSet hN.1 h` (line-mode splice of lines 324-361): " + V)
+
+add("Metric.maximalSeparatedSet",
+    "The API for `maximalSeparatedSet` is missing a finiteness lemma. The sibling `minimalCover` gets `finite_minimalCover`, and `exists_set_encard_eq_packingNumber` proves `C.Finite`, but nothing exports `(maximalSeparatedSet ε A).Finite`. That forces users, including the natural proof of `isCover_maximalSeparatedSet`, to recover finiteness from `card_maximalSeparatedSet` and `encard_ne_top_iff`.",
+    "Add the counterpart to `finite_minimalCover` right after `maximalSeparatedSet_subset`:\n```lean\nlemma finite_maximalSeparatedSet : (maximalSeparatedSet ε A).Finite := by\n  unfold maximalSeparatedSet\n  split_ifs with h\n  exacts [(exists_set_encard_eq_packingNumber h).choose_spec.2.1, finite_empty]\n```",
+    "advisory",
+    "The diff defines `finite_minimalCover` but no `finite_maximalSeparatedSet`; declaration_search found no such name. The lemma above, inserted after line 310 (line-mode splice): " + V)
+
+add("Metric.minimalCover",
+    "`minimalCover` falls back to `∅` when `coveringNumber ε A = ⊤`, which puts the hypothesis `coveringNumber ε A ≠ ⊤` on `isCover_minimalCover` and `card_minimalCover`. The fallback is not needed. `A` itself is always an internal cover, and infima in the well-ordered `ℕ∞` are attained (`ENat.exists_eq_iInf`), so a cover in `A` of cardinality exactly `coveringNumber ε A` always exists. Only finiteness depends on `coveringNumber ε A ≠ ⊤`.",
+    "State the existence lemma unconditionally, define `minimalCover` as its `choose` with no `dite`, and drop the `≠ ⊤` hypotheses from `isCover_minimalCover` and `card_minimalCover`. Only `finite_minimalCover` keeps the hypothesis. Update the docstring and module doc to drop 'finite ... empty set if no such finite cover exists':\n```lean\nlemma exists_set_encard_eq_coveringNumber (ε : ℝ≥0) (A : Set X) :\n    ∃ C ⊆ A, IsCover ε A C ∧ C.encard = coveringNumber ε A := by\n  have : Nonempty {s : Set X // s ⊆ A ∧ IsCover ε A s} := ⟨⟨A, subset_rfl, .rfl⟩⟩\n  obtain ⟨C, hC⟩ :=\n    ENat.exists_eq_iInf fun C : {s : Set X // s ⊆ A ∧ IsCover ε A s} ↦ (C : Set X).encard\n  refine ⟨C, C.2.1, C.2.2, ?_⟩\n  rw [hC, coveringNumber]\n  simp_rw [iInf_subtype, iInf_and]\n\n/-- An internal `ε`-cover of a set `A` by closed balls with minimal cardinality. -/\nnoncomputable\ndef minimalCover (ε : ℝ≥0) (A : Set X) : Set X :=\n  (exists_set_encard_eq_coveringNumber ε A).choose\n\nlemma minimalCover_subset : minimalCover ε A ⊆ A :=\n  (exists_set_encard_eq_coveringNumber ε A).choose_spec.1\n\nlemma isCover_minimalCover : IsCover ε A (minimalCover ε A) :=\n  (exists_set_encard_eq_coveringNumber ε A).choose_spec.2.1\n\nlemma card_minimalCover : (minimalCover ε A).encard = coveringNumber ε A :=\n  (exists_set_encard_eq_coveringNumber ε A).choose_spec.2.2\n\nlemma finite_minimalCover (h : coveringNumber ε A ≠ ⊤) : (minimalCover ε A).Finite :=\n  encard_ne_top_iff.mp (card_minimalCover.trans_ne h)\n```",
+    "advisory",
+    "`ENat.exists_eq_iInf [Nonempty ι] (f : ι → ℕ∞) : ∃ a, f a = ⨅ x, f x` (Mathlib/Data/ENat/Lattice.lean:109) needs no finiteness. `IsCover.refl ε s : IsCover ε s s` (Cover.lean:57). The whole `section MinimalCover` replaced by the block above (line-mode splice of lines 231-278): " + V + " Nothing downstream in the file uses the minimalCover lemmas, so no other edit was needed.")
+
+add("Metric.minimalCover",
+    "`minimalCover` is preceded by `open Classical in`, but the `if h : coveringNumber ε A ≠ ⊤` it guards is already decidable (`ℕ∞` has decidable equality). The sibling `maximalSeparatedSet`, with the identical `if h : packingNumber ε A ≠ ⊤`, has no `open Classical`. An unneeded classical instance in a definition's body is what Mathlib asks authors to avoid, because it can cause `Decidable` instance mismatches downstream.",
+    "Delete the `open Classical in` line before the `minimalCover` docstring.",
+    "advisory",
+    "Line-mode splice of lines 248-253 with the same def minus `open Classical in`: " + V + " All the minimalCover lemmas still compile, including the `simp only [..., ↓reduceDIte]` ones.")
+
+add("Metric.coveringNumber_le_packingNumber",
+    "The proof of `coveringNumber_le_packingNumber` unfolds `coveringNumber` by hand (`iInf_le _ (maximalSeparatedSet ε A)`, then `simp [..., iInf_pos, ...]`) instead of using the file's own `IsCover.coveringNumber_le_encard`. It also splits on `packingNumber ε A ≠ ⊤` and then has to un-negate with `simp only [ne_eq, Decidable.not_not] at h_top`.",
+    "Split on `= ⊤`, handle the `⊤` case first, and close the main case with `IsCover.coveringNumber_le_encard`:\n```lean\ntheorem coveringNumber_le_packingNumber (ε : ℝ≥0) (A : Set X) :\n    coveringNumber ε A ≤ packingNumber ε A := by\n  by_cases h_top : packingNumber ε A = ⊤\n  · simp [h_top]\n  rw [← card_maximalSeparatedSet h_top]\n  exact (isCover_maximalSeparatedSet h_top).coveringNumber_le_encard maximalSeparatedSet_subset\n```",
+    "advisory",
+    "The file (line 135) has `IsCover.coveringNumber_le_encard (h_subset : C ⊆ A) (hC : IsCover ε A C) : coveringNumber ε A ≤ C.encard`. The replacement, as declaration_name=Metric.coveringNumber_le_packingNumber: " + V)
+
+add("Metric.coveringNumber_two_mul_le_externalCoveringNumber",
+    "The proof starts with `rcases Set.eq_empty_or_nonempty A with (h_empty | h_nonempty)`, but `h_nonempty` is never used and the empty case needs no special treatment. The inequality is just the composition of `coveringNumber_le_packingNumber` and `packingNumber_two_mul_le_externalCoveringNumber`.",
+    "Replace the tactic proof with the term\n```lean\ntheorem coveringNumber_two_mul_le_externalCoveringNumber (ε : ℝ≥0) (A : Set X) :\n    coveringNumber (2 * ε) A ≤ externalCoveringNumber ε A :=\n  (coveringNumber_le_packingNumber _ A).trans (packingNumber_two_mul_le_externalCoveringNumber ε A)\n```",
+    "advisory",
+    "As declaration_name=Metric.coveringNumber_two_mul_le_externalCoveringNumber: " + V)
+
+add("Metric.coveringNumber_subset_le",
+    "The name `coveringNumber_subset_le` does not follow Mathlib's conclusion-first naming (the conclusion is a `coveringNumber ≤ coveringNumber` inequality under a subset hypothesis, so `..._le_..._of_subset`). Its `ε / 2` form also clashes with the file's `2 * ε` siblings `packingNumber_two_mul_le_externalCoveringNumber` and `coveringNumber_two_mul_le_externalCoveringNumber`, and it forces a division rewrite (`ring_nf`) in the proof.",
+    "Restate and rename it to match the siblings, and update the module-doc bullet accordingly:\n```lean\nlemma coveringNumber_two_mul_le_coveringNumber_of_subset (h : A ⊆ B) :\n    coveringNumber (2 * ε) A ≤ coveringNumber ε B :=\n  (coveringNumber_two_mul_le_externalCoveringNumber ε A).trans <|\n    (externalCoveringNumber_mono_set h).trans (externalCoveringNumber_le_coveringNumber ε B)\n```",
+    "advisory",
+    "naming_norm Metric.coveringNumber_subset_le: leading `coveringNumber_` is fine (9/9), but the tool does not measure the suffix. The file's comparison lemmas are all `X_two_mul_le_Y` with `2 * ε` on the left. The restated lemma, as a replacement of Metric.coveringNumber_subset_le: " + V)
+
+add("Metric.coveringNumber_subset_le",
+    "The `calc` in `coveringNumber_subset_le` has its `_` steps at the same indentation as `calc`, unlike the other `calc` blocks in the file (lines 191-194, 385-391), which indent the steps. It also re-derives `coveringNumber ε A ≤ externalCoveringNumber (ε / 2) A` in two steps through `packingNumber` when the PR's own `coveringNumber_two_mul_le_externalCoveringNumber` states exactly that. And it uses `ring_nf` for the arithmetic identity `ε = 2 * (ε / 2)`.",
+    "If the statement is kept, indent the calc steps, use `coveringNumber_two_mul_le_externalCoveringNumber`, and replace `ring_nf` with a targeted rewrite:\n```lean\nlemma coveringNumber_subset_le (h : A ⊆ B) :\n    coveringNumber ε A ≤ coveringNumber (ε / 2) B :=\n  calc coveringNumber ε A\n    _ = coveringNumber (2 * (ε / 2)) A := by rw [mul_div_cancel₀ _ two_ne_zero]\n    _ ≤ externalCoveringNumber (ε / 2) A := coveringNumber_two_mul_le_externalCoveringNumber _ A\n    _ ≤ externalCoveringNumber (ε / 2) B := externalCoveringNumber_mono_set h\n    _ ≤ coveringNumber (ε / 2) B := externalCoveringNumber_le_coveringNumber _ B\n```",
+    "advisory",
+    "file_read lines 409-418 (PR calc, steps at column 2 like `calc`) versus lines 191-194 and 385-391 (indented steps). The replacement, as declaration_name=Metric.coveringNumber_subset_le: " + V)
+
+add("Metric.exists_set_encard_eq_packingNumber",
+    "The proof splits on `Set.eq_empty_or_nonempty A` only to get a `Nonempty` instance from a singleton. But `∅` is always a separated subset of `A`, so the split and the empty-case `simp` are unnecessary, and the chain of `simp_rw ... at h ⊢`, `specialize` and `rwa` can be collapsed. The statement also spells `∃ C, C ⊆ A ∧ ...` where the neighbouring `exists_finite_isCover_of_totallyBounded` uses the bounded binder `∃ N ⊆ s, ...`.",
+    "Use the bounded binder and the `∅` witness:\n```lean\nlemma exists_set_encard_eq_packingNumber (h : packingNumber ε A ≠ ⊤) :\n    ∃ C ⊆ A, C.Finite ∧ IsSeparated ε C ∧ C.encard = packingNumber ε A := by\n  have : Nonempty {s : Set X // s ⊆ A ∧ IsSeparated ε s} := ⟨⟨∅, empty_subset _, .empty⟩⟩\n  have hsup : packingNumber ε A =\n      ⨆ C : {s : Set X // s ⊆ A ∧ IsSeparated ε s}, (C : Set X).encard := by\n    simp_rw [packingNumber, iSup_subtype, iSup_and]\n  obtain ⟨C, hC⟩ := ENat.exists_eq_iSup_of_lt_top (hsup ▸ h.lt_top)\n  rw [← hsup] at hC\n  exact ⟨C, C.2.1, encard_ne_top_iff.mp (hC ▸ h), C.2.2, hC⟩\n```",
+    "advisory",
+    "Cover.lean:83-84 states `exists_finite_isCover_of_totallyBounded ... : ∃ N ⊆ s, N.Finite ∧ IsCover ε s N`. `IsSeparated.empty` is in MetricSeparated.lean:49. The replacement, as declaration_name=Metric.exists_set_encard_eq_packingNumber, compiled both with `∃ C, C ⊆ A ∧` and with `∃ C ⊆ A,`: " + V + " The downstream `.choose_spec.1/.2.1/...` projections are unchanged.")
+
+add("Metric.exists_set_encard_eq_coveringNumber",
+    "The proof destructures `h` with a `simp only [coveringNumber, ne_eq, iInf_eq_top, encard_eq_top_iff, not_forall, not_infinite] at h` just to find some internal cover `C'` for the `Nonempty` instance. It then proves finiteness by re-deriving `iInf_lt_top` from `C'`. But `A` itself is always an internal cover (`IsCover.rfl`), and finiteness follows from `h` once the minimiser's cardinality equals `coveringNumber ε A`.",
+    "Take `A` as the `Nonempty` witness and get finiteness from `h` directly (or adopt the unconditional version in the `minimalCover` finding):\n```lean\nlemma exists_set_encard_eq_coveringNumber (h : coveringNumber ε A ≠ ⊤) :\n    ∃ C, C ⊆ A ∧ C.Finite ∧ IsCover ε A C ∧ C.encard = coveringNumber ε A := by\n  have : Nonempty {s : Set X // s ⊆ A ∧ IsCover ε A s} := ⟨⟨A, subset_rfl, .rfl⟩⟩\n  obtain ⟨C, hC⟩ :=\n    ENat.exists_eq_iInf fun C : {s : Set X // s ⊆ A ∧ IsCover ε A s} ↦ (C : Set X).encard\n  rw [show ⨅ C : {s : Set X // s ⊆ A ∧ IsCover ε A s}, (C : Set X).encard = coveringNumber ε A by\n    simp_rw [coveringNumber, iInf_subtype, iInf_and]] at hC\n  exact ⟨C, C.2.1, encard_ne_top_iff.mp (hC ▸ h), C.2.2, hC⟩\n```",
+    "advisory",
+    "As declaration_name=Metric.exists_set_encard_eq_coveringNumber: " + V)
+
+add("Metric.card_maximalSeparatedSet",
+    "`card_maximalSeparatedSet` and its siblings (`maximalSeparatedSet_subset`, `isSeparated_maximalSeparatedSet`, and the four `minimalCover` lemmas) unfold the `dite` with `simp only [maximalSeparatedSet, ne_eq, h, not_false_eq_true, ↓reduceDIte]`. The canonical tool for this is `dif_pos h` (or `split_ifs` when both branches are needed).",
+    "Replace the `simp only [..., ↓reduceDIte]` line with `rw [maximalSeparatedSet, dif_pos h]` in `card_maximalSeparatedSet` (likewise `isCover_minimalCover` / `card_minimalCover`). In the lemmas proved by `by_cases`, use `unfold maximalSeparatedSet; split_ifs with h; exacts [..., empty_subset _]`.",
+    "advisory",
+    "`rw [maximalSeparatedSet, dif_pos h]; exact (exists_set_encard_eq_packingNumber h).choose_spec.2.2.2` as declaration_name=Metric.card_maximalSeparatedSet: " + V + " `unfold maximalSeparatedSet; split_ifs with h; exacts [(exists_set_encard_eq_packingNumber h).choose_spec.1, empty_subset _]` for Metric.maximalSeparatedSet_subset: " + V)
+
+add("Metric.coveringNumber_le_packingNumber",
+    "`coveringNumber_le_packingNumber`, `coveringNumber_two_mul_le_externalCoveringNumber` and `coveringNumber_subset_le` are listed in the module doc's 'Main statements', but none has a docstring. Their pre-existing sibling `packingNumber_two_mul_le_externalCoveringNumber` in the same `Comparisons` section does have one.",
+    "Add docstrings in the sibling's style, e.g. `/-- The covering number of a set `A` for radius `ε` is at most its packing number for radius `ε`. -/` on `coveringNumber_le_packingNumber`. Add the analogous ones on `coveringNumber_two_mul_le_externalCoveringNumber` and on `coveringNumber_subset_le`, stating that the internal covering number is not monotone but satisfies this halved-radius bound.",
+    "advisory",
+    "file_read lines 365-420: only `packingNumber_two_mul_le_externalCoveringNumber` (line 367) carries a `/-- ... -/`; the three new theorems at lines 393, 402 and 409 have none, although the module doc (lines 38-48) lists all four as main statements.")
+
+json.dump(F, open("findings.json","w"), ensure_ascii=False, indent=1)
+print(len(F))

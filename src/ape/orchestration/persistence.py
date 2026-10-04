@@ -19,7 +19,7 @@ from ape.utils.file_ops import file_lock, read_json, write_json
 from ape.tasks.base import BaseTaskResult, get_task_class
 
 from .models import (
-    Sample, OrchestratorProgress, SampleProgress,
+    Sample, SampleRequeue, OrchestratorProgress, SampleProgress,
     ExecutionStatus, OrchestratorResults, make_sample_id
 )
 
@@ -128,6 +128,48 @@ class TaskStorage:
 
         return sample
 
+
+
+async def requeue_failed_samples(tasks_dir: Path, max_retries: int, reason: str, *,
+                                 dry_run: bool = False) -> List[Dict[str, Any]]:
+    """Put back in the queue every sample that failed on system errors with its retries spent.
+
+    The samples a partial run lost to its environment -- a spent subscription limit, a dead
+    connection -- and nothing else. A requeued sample keeps its attempts and what they spent,
+    and its retry count restarts after them (`Sample.requeues`). Its task's aggregate,
+    `task_result.json` and `task_outcome.json`, is removed, because the orchestrator skips any
+    task that has one; the worker writes both again when the sample next finishes. Left alone:
+    a task already aggregated as a success, every successful sample, every model failure
+    (`Sample.is_failed_on_errors` says why), and any sample that can still run as it is.
+
+    Returns one row per sample put back (or that would be, with `dry_run`).
+    """
+
+    requeued: List[Dict[str, Any]] = []
+    if not tasks_dir.is_dir():
+        return requeued
+    for task_dir in sorted(p for p in tasks_dir.iterdir() if p.is_dir()):
+        storage = TaskStorage(task_dir, task_dir.name)
+        result = await storage.load_task_result()
+        if result and result.get("success"):
+            continue
+        failed = [sample for _, sample in sorted((await storage.load_all_samples()).items())
+                  if sample.is_failed_on_errors(max_retries)]
+        for sample in failed:
+            requeued.append({"task": task_dir.name, "sample_index": sample.sample_index,
+                             "attempts": len(sample.attempts),
+                             "errors": sample.get_error_count()})
+            if dry_run:
+                continue
+            now = datetime.now()
+            sample.requeues.append(SampleRequeue(
+                at=now, after_attempt=len(sample.attempts), reason=reason))
+            sample.updated_at = now
+            await storage.save_sample(sample)
+        if failed and not dry_run:
+            for name in ("task_result.json", "task_outcome.json"):
+                (task_dir / name).unlink(missing_ok=True)
+    return requeued
 
 # ============================================================================
 # Progress Management
@@ -397,9 +439,13 @@ async def print_summary(results: OrchestratorResults, tasks_dir: Path, logger):
         f"({colored(f'{results.pass_rate_global*100:.1f}%', 'green')} of total)",
         f"{colored('Avg Score:', bold=True)}     {colored(f'{results.average_score:.3f}', 'green')}",
         separator,
+        # An attempt's `cached_cost` is its BILLED cost (cache discount applied, what every cap
+        # binds) and `cost` its nominal cost. Printed as "Cost / Cached" until 2026-09-29, which
+        # read as "the cost, of which cached": two lead runs were reported at their nominal
+        # $5.90 and $5.88 when they billed $2.81 and $2.52.
         f"{colored('Total Cost:', bold=True)}    "
-        f"Cost: ${colored(f'{total_cost:.4f}', 'yellow')}, "
-        f"Cached: ${colored(f'{total_cached_cost:.4f}', 'green')}",
+        f"Billed: ${colored(f'{total_cached_cost:.4f}', 'yellow')} "
+        f"(nominal ${colored(f'{total_cost:.4f}', 'green')})",
         separator,
         f"{colored('Wall Time:', bold=True)}     {colored(format_time_duration(results.wall_clock_time), 'yellow')}",
         f"{colored('Workspace:', bold=True)}     {results.workspace_path}",

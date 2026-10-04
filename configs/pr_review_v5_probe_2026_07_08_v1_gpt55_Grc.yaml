@@ -1,0 +1,8 @@
+# Test (e)'s high-effort half as amended 2026-09-30 (results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/
+# README.md): pr_review_v5_probe_2026_07_08_v1_gpt55_Gr.yaml with reasoning carried across turns. The
+# carry-over coherence test (results/pr_review_v5/probes/carryover-coherence-2026-09-30/) found that
+# carrying it lets gpt_5.2 conclude where it looped, so every OpenAI reasoning model runs with it here.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt55_Gr.yaml
+
+llm_config:
+  openai_responses_reasoning_carryover: true

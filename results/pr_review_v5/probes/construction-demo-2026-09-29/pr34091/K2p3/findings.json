@@ -1,0 +1,27 @@
+[
+ {
+  "target": "Cardinal.exists_infinite_fiber, Cardinal.exists_infinite_fiber', Cardinal.exists_uncountable_fiber",
+  "claim": "The three fibre lemmas take the type-class hypotheses Infinite β, Infinite α and Uncountable β as explicit arguments. Both Mathlib call sites supply them as (by infer_instance). Apart from Infinite.false, no other Mathlib declaration takes Infinite or Uncountable explicitly. The twin Finite.exists_infinite_fiber and the same-file consumer le_range_of_union_finset_eq_univ both take [Infinite _]. The one reason for the explicit form, le_range's local `have k`, is deleted by this PR.",
+  "requested_change": "Since the PR already changes these signatures, make the hypotheses instance-implicit and place them after the type binders: `{β α : Type u} [Infinite β] (f : β → α) (h : #α < #β)` for exists_infinite_fiber, `[Infinite α]` for exists_infinite_fiber' and `[Uncountable β]` for exists_uncountable_fiber. Then drop the (by infer_instance) argument at Pigeonhole.lean:121 and StrongRankCondition.lean:250.",
+  "severity": "advisory",
+  "evidence": "c13: Pigeonhole.lean compiles with the three lemmas taking [hβ : Infinite β] / [hα : Infinite α] / [hβ : Uncountable β] with their proofs unchanged, and the caller becomes `exists_infinite_fiber u' h`. c14: [Infinite occurs 155 times in Mathlib (26 in SetTheory/Cardinal) and [Uncountable 20 times. Explicit class hypotheses occur only in these PR lemmas and in Infinite.false. c15: 2 of 2 call sites pass (by infer_instance). c1: the client has to write `inferInstance` by hand.",
+  "construction": [
+   "c13",
+   "c14",
+   "c15",
+   "c1"
+  ]
+ },
+ {
+  "target": "Cardinal.exists_infinite_fiber'",
+  "claim": "exists_infinite_fiber' is a special case of exists_infinite_fiber. It is its pre-PR statement, and it follows from the unprimed lemma by a one-term derivation of Infinite β from Infinite α and h. It has one caller in Mathlib, and that caller compiles without it.",
+  "requested_change": "Remove exists_infinite_fiber' and pass `Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp inferInstance).trans h.le)` to Cardinal.exists_infinite_fiber in linearIndependent_le_infinite_basis. If the lemma is kept on purpose, as the old signature for downstream code, keep it with the binder change of the first finding.",
+  "severity": "advisory",
+  "evidence": "c12: StrongRankCondition.lean compiles with linearIndependent_le_infinite_basis calling Cardinal.exists_infinite_fiber directly. c2: the Infinite-codomain case follows from exists_infinite_fiber in one term. c15: StrongRankCondition.lean:250 is the lemma's only use in the tree.",
+  "construction": [
+   "c12",
+   "c2",
+   "c15"
+  ]
+ }
+]

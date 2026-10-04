@@ -27,8 +27,9 @@ def test_paused_is_not_partial():
     assert RunState.PARTIAL in TRANSITIONS[RunState.RUNNING]
     # Resumable.
     assert TRANSITIONS[RunState.PAUSED] == frozenset({RunState.RUNNING})
-    # Closed.
-    assert TRANSITIONS[RunState.PARTIAL] == frozenset()
+    # Closed. Its only move is an explicit reopen back to running (`run --resume`, which
+    # requeues the sessions that failed on errors), never a step into the scored chain.
+    assert TRANSITIONS[RunState.PARTIAL] == frozenset({RunState.RUNNING})
 
 
 def test_a_partial_run_never_enters_the_successful_chain():

@@ -1,0 +1,17 @@
+# The carry-over coherence test's control (results/pr_review_v5/probes/carryover-coherence-2026-09-30/):
+# pr_review_v5_dev_medium_gpt52_Gr.yaml through the Responses API with carry-over off, the Chat-equivalent condition, on PR 33145,
+# one of the three gpt_5.2 high-effort Chat sessions that repeated most and stopped at a cap. The
+# token cap is raised past what carry-over is projected to add (up to 12.5M processed tokens on 33145),
+# the dollar cap with it at the tree's 1.2M tokens a dollar; both are the same for both conditions,
+# so only the 80-turn cap can bind.
+extends: pr_review_v5_dev_medium_gpt52_Gr.yaml
+
+llm_config:
+  openai_api: responses
+
+dataset:
+  pr_numbers: [33145]
+  solo_cost_cap: 13.40
+  solo_token_cap: 16080000
+  run_total_cost_cap: 13.50
+  run_total_token_cap: 16200000

@@ -1,0 +1,30 @@
+# CALIBRATION for Claude Code on the subscription, on the dev set: condition G under Claude Code,
+# contained, with claude-opus-5-5 on the CLI's own login, and caps it cannot reach.
+#
+# Not a cell of docs/plans/2026-10-01-claude-models-under-the-harness.md (those run contract
+# v2, whose keys live on post-carryover-replan). It measures what one Claude session uses on a
+# large dev PR when nothing stops it, so that the cells' caps can be set where they do not
+# bind. The probe harness ran Claude uncapped: the swap's sessions made 12-41 tool calls, the
+# most on 33149. A capped measurement would show only that a cap bound.
+#
+# Run it on one PR (`--set 'dataset.pr_numbers=[33149]'`). Needs CLAUDE_CODE_OAUTH_TOKEN in the
+# launching shell, no ANTHROPIC_* variable there, and PYTHONPATH=$PWD/src in a worktree.
+extends: pr_review_v5_dev_medium_gpt52_G_claude.yaml
+
+# Null starts no relay; the CLI then runs claude_model on its own login.
+llm_config:
+  model_name: null
+
+claude_model: claude-opus-5-5
+cli_version: 2.1.285
+# The probe harness never recorded its Claude effort; the Claude Code sessions that launched
+# its subagents export CLAUDE_EFFORT=xhigh.
+effort: xhigh
+
+# Caps that cannot bind a session: 40 replies and 1.8M tokens were set for gpt. These stop only
+# a runaway, and the subscription bills nothing per token. One PR, so the run's own totals
+# (27.1M tokens, $23) still hold.
+execution:
+  max_turns: 400
+dataset:
+  solo_token_cap: 20000000

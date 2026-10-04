@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Martingale/Upcrossing.lean", "line_start": 702, "line_end": 706, "replacement": "$$\n  U_N(a, b) = \\sum_{i = 1}^N \\mathbf{1}_{\\{\\tau_i < N\\}}\n$$\n$U_N(a, b)$ is measurable as each $\\{\\tau_i < N\\}$ is a measurable set since $\\tau_i$ is a\nstopping time."}

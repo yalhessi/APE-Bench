@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Complex/Tietze.lean", "declaration_name": "unitInterval.instTietzeExtension", "new_declaration": "instance unitInterval.instTietzeExtension : TietzeExtension unitInterval :=\n  .of_retract \u27e8Subtype.val, continuous_subtype_val\u27e9\n    \u27e8Set.projIcc 0 1 zero_le_one, continuous_projIcc\u27e9 <| by ext; simp"}

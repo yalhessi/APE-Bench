@@ -1,0 +1,182 @@
+{
+ "probe_postcutoff_gpt52_Gr_rep1": {
+  "42814": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/529e6d5a8e5c2f238c772962022d1cfabab5dfc3678f16fcabb615cdd7b1984d/samples/0/attempts/attempt_1_20260930013520",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/529e6d5a8e5c2f238c772962022d1cfabab5dfc3678f16fcabb615cdd7b1984d/samples/0/attempts/attempt_1_20260930013520/conversations/20260930_015504_476__turn_80__d7245aec.jsonl",
+   "turns": 80
+  },
+  "42184": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/72368bd36763492c9905130cfb417a8bf4c834a70734e5e02f6a0b8354a38872/samples/0/attempts/attempt_1_20260930013520",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/72368bd36763492c9905130cfb417a8bf4c834a70734e5e02f6a0b8354a38872/samples/0/attempts/attempt_1_20260930013520/conversations/20260930_015111_997__turn_21__3581328e.jsonl",
+   "turns": 21
+  },
+  "43024": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/e3b5662f895cef247ac14327f60c93c8dc0b2b98fdce0fbec39069e7b0ce04fe/samples/0/attempts/attempt_1_20260930013520",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/e3b5662f895cef247ac14327f60c93c8dc0b2b98fdce0fbec39069e7b0ce04fe/samples/0/attempts/attempt_1_20260930013520/conversations/20260930_022236_737__turn_60__9cbd52f9.jsonl",
+   "turns": 60
+  },
+  "43192": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/c56e238b55e713ad7c6fc6ef724d554d6bd6c29d2747cbcafcb62e63dbe8989a/samples/0/attempts/attempt_1_20260930015507",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/c56e238b55e713ad7c6fc6ef724d554d6bd6c29d2747cbcafcb62e63dbe8989a/samples/0/attempts/attempt_1_20260930015507/conversations/20260930_023820_253__turn_47__caf47210.jsonl",
+   "turns": 47
+  },
+  "41930": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/a187db708e7f365ac3405b83e5a802fe45cba3cf7f3bfb7f0eb0ba13a28473ba/samples/0/attempts/attempt_1_20260930015112",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/a187db708e7f365ac3405b83e5a802fe45cba3cf7f3bfb7f0eb0ba13a28473ba/samples/0/attempts/attempt_1_20260930015112/conversations/20260930_015840_757__turn_15__ea777a77.jsonl",
+   "turns": 15
+  },
+  "43167": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/28b22eab56e3e11984e730db1edd7f2128a5c39b32dcdd7dbda72a683a9d6e93/samples/0/attempts/attempt_1_20260930013520",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_rep1/tasks/28b22eab56e3e11984e730db1edd7f2128a5c39b32dcdd7dbda72a683a9d6e93/samples/0/attempts/attempt_1_20260930013520/conversations/20260930_022000_284__turn_61__e2fe2ed6.jsonl",
+   "turns": 61
+  }
+ },
+ "probe_val_small12_gpt52_Gr_rep1": {
+  "34935": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/0c02bcca253ab2ad8116155a72bfde71e41c2f7861caabadf7b0b4b1fda8cc56/samples/0/attempts/attempt_1_20260930020143",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/0c02bcca253ab2ad8116155a72bfde71e41c2f7861caabadf7b0b4b1fda8cc56/samples/0/attempts/attempt_1_20260930020143/conversations/20260930_023809_478__turn_80__e49b0900.jsonl",
+   "turns": 80
+  },
+  "34091": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/6bd0f687605a66a08910376e8a4c553357f87852bba2c597616580dfc00094d5/samples/0/attempts/attempt_1_20260930013615",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/6bd0f687605a66a08910376e8a4c553357f87852bba2c597616580dfc00094d5/samples/0/attempts/attempt_1_20260930013615/conversations/20260930_021316_604__turn_34__79f7a843.jsonl",
+   "turns": 34
+  },
+  "30641": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/21fc68da5e11a0962590b0a035ea2b9e47ed2758d843b6d6b6261f92ac2e468b/samples/0/attempts/attempt_1_20260930013958",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/21fc68da5e11a0962590b0a035ea2b9e47ed2758d843b6d6b6261f92ac2e468b/samples/0/attempts/attempt_1_20260930013958/conversations/20260930_015241_261__turn_21__1c4e5acf.jsonl",
+   "turns": 21
+  },
+  "32080": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/f4368738eabf32ac06a1451ffb08346c48eb9b389da2e4a12170e4ea025229f5/samples/0/attempts/attempt_1_20260930015241",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/f4368738eabf32ac06a1451ffb08346c48eb9b389da2e4a12170e4ea025229f5/samples/0/attempts/attempt_1_20260930015241/conversations/20260930_022656_148__turn_80__3c978b9e.jsonl",
+   "turns": 80
+  },
+  "29842": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/e2e23dba643bd102af16bc84a120eb10a86a368526fc94d1ea0c618cf1a2e00a/samples/0/attempts/attempt_1_20260930013615",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/e2e23dba643bd102af16bc84a120eb10a86a368526fc94d1ea0c618cf1a2e00a/samples/0/attempts/attempt_1_20260930013615/conversations/20260930_020142_934__turn_30__eadc9767.jsonl",
+   "turns": 30
+  },
+  "30458": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/b172e747421a91f14e428804cca95deb8f00ced353c8d91fd762bb0b084d23f1/samples/0/attempts/attempt_1_20260930021316",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/b172e747421a91f14e428804cca95deb8f00ced353c8d91fd762bb0b084d23f1/samples/0/attempts/attempt_1_20260930021316/conversations/20260930_025500_281__turn_73__9a39be06.jsonl",
+   "turns": 73
+  },
+  "32875": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/3b3e8b516f18cf311bcc861598f99159d28b7167ae9e1cba60554f0dd5dcbbe5/samples/0/attempts/attempt_1_20260930013615",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/3b3e8b516f18cf311bcc861598f99159d28b7167ae9e1cba60554f0dd5dcbbe5/samples/0/attempts/attempt_1_20260930013615/conversations/20260930_023415_327__turn_51__c0a263cf.jsonl",
+   "turns": 51
+  },
+  "26185": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/2e9870f9456b6b34bb6bf883cfe7c8ab11a446ec67f3d78abd8726e4c2d231be/samples/0/attempts/attempt_1_20260930022656",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/2e9870f9456b6b34bb6bf883cfe7c8ab11a446ec67f3d78abd8726e4c2d231be/samples/0/attempts/attempt_1_20260930022656/conversations/20260930_032902_689__turn_80__7062d064.jsonl",
+   "turns": 80
+  },
+  "28649": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/a4c694f20e803ed65b61b4470485077c4310613e6298e8a9599a7943100a5e19/samples/0/attempts/attempt_1_20260930013615",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/a4c694f20e803ed65b61b4470485077c4310613e6298e8a9599a7943100a5e19/samples/0/attempts/attempt_1_20260930013615/conversations/20260930_013958_869__turn_8__289ac087.jsonl",
+   "turns": 8
+  },
+  "36822": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/8f17c0c8d3ed6a0bc6ec36c27bb6f6e3eea5edf8de52f1bc7ee5b7718236b68e/samples/0/attempts/attempt_1_20260930023819",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/8f17c0c8d3ed6a0bc6ec36c27bb6f6e3eea5edf8de52f1bc7ee5b7718236b68e/samples/0/attempts/attempt_1_20260930023819/conversations/20260930_030408_615__turn_25__5d3dad0d.jsonl",
+   "turns": 25
+  },
+  "26755": {
+   "attempt": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/1ccf2274867b0c7db0483aed4d17800c42b9871178884fa972c5f19fb6cdaaeb/samples/0/attempts/attempt_1_20260930023415",
+   "last_turn_file": ".ape/runs/probe_val_small12_gpt52_Gr_rep1/tasks/1ccf2274867b0c7db0483aed4d17800c42b9871178884fa972c5f19fb6cdaaeb/samples/0/attempts/attempt_1_20260930023415/conversations/20260930_024215_032__turn_11__f5a4b906.jsonl",
+   "turns": 11
+  }
+ },
+ "probe_dev_gpt52_Gr_rep1": {
+  "33337": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/97bb96252af54b06d5ebe18bcd7b18a79aeaa04181f561da6df45cb23628dc14/samples/0/attempts/attempt_1_20260930023953",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/97bb96252af54b06d5ebe18bcd7b18a79aeaa04181f561da6df45cb23628dc14/samples/0/attempts/attempt_1_20260930023953/conversations/20260930_031058_888__turn_35__05721011.jsonl",
+   "turns": 35
+  },
+  "33145": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/394c3fd9f0677902f297525d3ade52649dd59f76ee25cbc2d676f84d5bfea4b8/samples/0/attempts/attempt_1_20260930022108",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/394c3fd9f0677902f297525d3ade52649dd59f76ee25cbc2d676f84d5bfea4b8/samples/0/attempts/attempt_1_20260930022108/conversations/20260930_030635_801__turn_76__972fbf32.jsonl",
+   "turns": 76
+  },
+  "33149": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/f29662e9f5671a78cc2412f8520d300f3d26d14cb3dc5454712fee65dfd6a274/samples/0/attempts/attempt_1_20260930022443",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/f29662e9f5671a78cc2412f8520d300f3d26d14cb3dc5454712fee65dfd6a274/samples/0/attempts/attempt_1_20260930022443/conversations/20260930_024005_874__turn_26__50b40f83.jsonl",
+   "turns": 26
+  },
+  "33294": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/d9fd60d4e35750631a8bf6cad189aca963be819c65ff24b7c71d3f6355937954/samples/0/attempts/attempt_1_20260930013641",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/d9fd60d4e35750631a8bf6cad189aca963be819c65ff24b7c71d3f6355937954/samples/0/attempts/attempt_1_20260930013641/conversations/20260930_021239_236__turn_58__ea15c14e.jsonl",
+   "turns": 58
+  },
+  "33305": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/fba198959d6f7b99dd0a752a10fd76584933dd489347ed9924829c498f1d43e5/samples/0/attempts/attempt_1_20260930013641",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/fba198959d6f7b99dd0a752a10fd76584933dd489347ed9924829c498f1d43e5/samples/0/attempts/attempt_1_20260930013641/conversations/20260930_014113_607__turn_12__ac84c564.jsonl",
+   "turns": 12
+  },
+  "33098": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/6e05ee4f93805c60b525d7a71aa9b8550e863224a2207696117a0a6b2d6c5990/samples/0/attempts/attempt_1_20260930024156",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/6e05ee4f93805c60b525d7a71aa9b8550e863224a2207696117a0a6b2d6c5990/samples/0/attempts/attempt_1_20260930024156/conversations/20260930_032523_674__turn_49__62b20bda.jsonl",
+   "turns": 49
+  },
+  "33315": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/aa664e3b78c91850a5f2008ebbea561b7c1653ccc8404d4fb9af636270e1a8f4/samples/0/attempts/attempt_1_20260930021239",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/aa664e3b78c91850a5f2008ebbea561b7c1653ccc8404d4fb9af636270e1a8f4/samples/0/attempts/attempt_1_20260930021239/conversations/20260930_022443_410__turn_24__d6fdeea8.jsonl",
+   "turns": 24
+  },
+  "33304": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/e3462fd225575621fd51438956203a148c5401d10b2765591a613ab1d0012807/samples/0/attempts/attempt_1_20260930013641",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/e3462fd225575621fd51438956203a148c5401d10b2765591a613ab1d0012807/samples/0/attempts/attempt_1_20260930013641/conversations/20260930_014052_211__turn_13__89ecc529.jsonl",
+   "turns": 13
+  },
+  "33117": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/c24941ec30b22736f9b6dc35c3baf0c47549f5895819572147b7a4b555c8a31a/samples/0/attempts/attempt_1_20260930021112",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/c24941ec30b22736f9b6dc35c3baf0c47549f5895819572147b7a4b555c8a31a/samples/0/attempts/attempt_1_20260930021112/conversations/20260930_024156_454__turn_45__456b029d.jsonl",
+   "turns": 45
+  },
+  "33285": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/cb73c03d4ab3be561a976d7e4f7ac588ab69414f45e94e74fc034538d77dc29d/samples/0/attempts/attempt_1_20260930014739",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/cb73c03d4ab3be561a976d7e4f7ac588ab69414f45e94e74fc034538d77dc29d/samples/0/attempts/attempt_1_20260930014739/conversations/20260930_022102_207__turn_80__5c601563.jsonl",
+   "turns": 80
+  },
+  "33421": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/cf141c1379831a8a9426d2c2bad71cb61095abbd22dd168ef8c682a9a79a0c95/samples/0/attempts/attempt_1_20260930013641",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/cf141c1379831a8a9426d2c2bad71cb61095abbd22dd168ef8c682a9a79a0c95/samples/0/attempts/attempt_1_20260930013641/conversations/20260930_023953_664__turn_80__4c52b8e5.jsonl",
+   "turns": 80
+  },
+  "33066": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/d343a2add6d4a7ec8dbc34df8a4525506e7321df3a1fb8db79f7ee618c37f39c/samples/0/attempts/attempt_1_20260930024006",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/d343a2add6d4a7ec8dbc34df8a4525506e7321df3a1fb8db79f7ee618c37f39c/samples/0/attempts/attempt_1_20260930024006/conversations/20260930_025807_445__turn_80__6ce581be.jsonl",
+   "turns": 80
+  },
+  "33438": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/f096d6a2adb26cee1d142514ee19c708abebe0dec240a831f44f027b916584e1/samples/0/attempts/attempt_1_20260930014052",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/f096d6a2adb26cee1d142514ee19c708abebe0dec240a831f44f027b916584e1/samples/0/attempts/attempt_1_20260930014052/conversations/20260930_014739_103__turn_10__cae1f0de.jsonl",
+   "turns": 10
+  },
+  "33362": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/c78686a3aded4a90ebda34813e2d0443fa3dc6a9c542d94c6c23c6c52b67495f/samples/0/attempts/attempt_1_20260930014113",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/c78686a3aded4a90ebda34813e2d0443fa3dc6a9c542d94c6c23c6c52b67495f/samples/0/attempts/attempt_1_20260930014113/conversations/20260930_021112_845__turn_41__928277f4.jsonl",
+   "turns": 41
+  },
+  "33321": {
+   "attempt": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/23017fca9d1af9d0ba85a89fd4a09b86b4f4809d456b6b94ac9e872d376c8258/samples/0/attempts/attempt_1_20260930025809",
+   "last_turn_file": ".ape/runs/probe_dev_gpt52_Gr_rep1/tasks/23017fca9d1af9d0ba85a89fd4a09b86b4f4809d456b6b94ac9e872d376c8258/samples/0/attempts/attempt_1_20260930025809/conversations/20260930_032805_180__turn_80__784632f3.jsonl",
+   "turns": 80
+  }
+ },
+ "probe_postcutoff_gpt52_Gr_calib2": {
+  "43192": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_calib2/tasks/14c908502b0c43dae2b87bbd67d453059291d13a43d1eaf3d3124425bf6c5646/samples/0/attempts/attempt_1_20260929142134",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_calib2/tasks/14c908502b0c43dae2b87bbd67d453059291d13a43d1eaf3d3124425bf6c5646/samples/0/attempts/attempt_1_20260929142134/conversations/20260929_152914_034__turn_43__110d6d0f.jsonl",
+   "turns": 43
+  }
+ },
+ "probe_postcutoff_gpt52_Gr_calib": {
+  "43192": {
+   "attempt": ".ape/runs/probe_postcutoff_gpt52_Gr_calib/tasks/f0efd1835067373bf6fc74d701ef3b3f93d97120caab1ceddc4182fb3bd33fa5/samples/0/attempts/attempt_1_20260929132636",
+   "last_turn_file": ".ape/runs/probe_postcutoff_gpt52_Gr_calib/tasks/f0efd1835067373bf6fc74d701ef3b3f93d97120caab1ceddc4182fb3bd33fa5/samples/0/attempts/attempt_1_20260929132636/conversations/20260929_141415_902__turn_36__ba6d62d9.jsonl",
+   "turns": 36
+  }
+ }
+}

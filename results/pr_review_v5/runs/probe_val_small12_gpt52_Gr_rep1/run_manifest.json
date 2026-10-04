@@ -1,0 +1,60 @@
+{
+  "agent_added": 0,
+  "candidates_total": 21,
+  "completion_status": "partial",
+  "context_calls_total": 166,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 59.211957,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:26185:round1:8a6c1c15ab7a704ad3da84048c31fefa5bb5ce2e",
+      "pr_number": 26185,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:32080:round1:a37c8d5a49ca613015cd93d75060e633bd3f7ef7",
+      "pr_number": 32080,
+      "reason": "the whole-PR review did not reach a submission"
+    },
+    {
+      "arm_id": "solo_agent",
+      "episode_id": "leanprover-community/mathlib4:34935:round1:5c1213433526cb0b3f847928937ed89e2edd8b00",
+      "pr_number": 34935,
+      "reason": "the whole-PR review did not reach a submission"
+    }
+  ],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 21,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 322,
+  "pruned": 322,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_val_small12_gpt52_Gr_rep1",
+  "run_name": "probe_val_small12_gpt52_Gr_rep1",
+  "run_plan_sha256": "b511d0fe43ad39e6edda54e25bac028094793c58abb2a84a54195263d0cc25f5",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "6158dc660e6455bc3cbafb346780ad57d1cf945a5f783e8da3668f0a29ae6898",
+  "succeeded": 0,
+  "total_cost": 59.211957,
+  "usage": {
+    "billed": 26.563445,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 59.211957,
+    "self_billed": 26.563445,
+    "self_nominal": 59.211957,
+    "self_tokens": 22543690.0,
+    "tokens": 22543690.0
+  },
+  "wall_seconds": 6767.117233
+}

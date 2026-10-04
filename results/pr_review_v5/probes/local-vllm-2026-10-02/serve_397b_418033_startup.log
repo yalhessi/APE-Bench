@@ -1,0 +1,11 @@
+(APIServer pid=1863755) INFO:     Application startup complete.
+(Worker_TP0 pid=1865344) INFO 10-02 08:50:48 [gpu_worker.py:640] Available KV cache memory: 32.73 GiB
+(Worker pid=1865349) WARNING 10-02 08:48:30 [custom_all_reduce.py:237] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(APIServer pid=1863755) WARNING 10-02 08:47:45 [speculative.py:1361] Enabling num_speculative_tokens > 1 will run multiple times of forward on same MTP layer,which may result in lower acceptance rate
+(EngineCore pid=1865006) INFO 10-02 08:50:48 [kv_cache_utils.py:2395] GPU KV cache size: 2,092,001 tokens, Maximum concurrency for 262,144 tokens per request: 7.98x
+(Worker_TP0 pid=1865344) INFO 10-02 08:49:24 [default_loader.py:430] Loading weights took 2.91 seconds
+(Worker_TP0 pid=1865344) INFO 10-02 08:49:20 [default_loader.py:430] Loading weights took 47.60 seconds
+(APIServer pid=1863755) WARNING 10-02 08:47:33 [speculative.py:1122] method `qwen3_next_mtp` is deprecated and replaced with mtp.
+(APIServer pid=1863755) INFO 10-02 08:47:30 [api_utils.py:286] non-default args: {'model_tag': '/tmp/ya475-models/Qwen3.5-397B-A17B-FP8', 'enable_auto_tool_choice': True, 'tool_call_parser': 'qwen3_coder', 'enable_prompt_tokens_details': True, 'host': '127.0.0.1', 'port': 8012, 'model': '/tmp/ya475-models/Qwen3.5-397B-A17B-FP8', 'max_model_len': 262144, 'served_model_name': ['local-qwen', 'Qwen/Qw
+(Worker_TP0 pid=1865344) WARNING 10-02 08:50:19 [kv_cache_utils.py:2206] Speculative decoding (method=mtp) is enabled but no KV cache group could be identified as the draft model's.
+(Worker_TP0 pid=1865344) INFO 10-02 08:48:32 [fp8.py:438] Using TRITON Fp8 MoE backend out of potential backends: ['AITER', 'FLASHINFER_TRTLLM', 'FLASHINFER_CUTLASS', 'TRITON', 'MARLIN', 'HUMMING', 'BATCHED_TRITON', 'XPU', 'CPU', 'HPC'].

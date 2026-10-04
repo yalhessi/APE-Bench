@@ -1,0 +1,55 @@
+{
+ "33145": {
+  "calls": 14,
+  "flagged": 0
+ },
+ "33117": {
+  "calls": 19,
+  "flagged": 0
+ },
+ "33294": {
+  "calls": 24,
+  "flagged": 1,
+  "adjudication": "one flag: the session ran the venv's python on its own tmp/build.py, which writes submission.json from literals and opens no other file; an interpreter, not a read outside the folder. Kept.",
+  "attempt_1": "stopped by the API's safety classifier after one ptool call (describe); its calls.jsonl moved to the scratch, the session re-run once with the same prompt."
+ },
+ "33321": {
+  "calls": 27,
+  "flagged": 0
+ },
+ "33421": {
+  "calls": 24,
+  "flagged": 0
+ },
+ "33337": {
+  "calls": 12,
+  "flagged": 0
+ },
+ "33362": {
+  "calls": 16,
+  "flagged": 5,
+  "adjudication": "five flags, all the venv's python running the session's own tmp/edit{1-4}.py and tmp/build.py, which write ptool argument files into tmp/ and submission.json; no open() outside the folder. Kept."
+ },
+ "33305": {
+  "calls": 29,
+  "flagged": 1,
+  "adjudication": "one flag: after reading its own ptool script it ran `ls` on that script's raw-output directory (.ape/probe_scratch/swap/raw/pr33305/S1), which holds only this session's own tool outputs. A read outside the folder in letter; no other reviewer's output and nothing of the PR's future. Kept."
+ },
+ "33304": {
+  "calls": 27,
+  "flagged": 0
+ },
+ "33285": {
+  "calls": 32,
+  "flagged": 0
+ },
+ "33315": {
+  "calls": 31,
+  "flagged": 2,
+  "adjudication": "two flags, the venv's python running its own tmp/args1.py (a tool argument file) and tmp/make_submission.py (writes submission.json); no open() outside the folder. Kept."
+ },
+ "33149": {
+  "calls": 41,
+  "flagged": 0
+ }
+}

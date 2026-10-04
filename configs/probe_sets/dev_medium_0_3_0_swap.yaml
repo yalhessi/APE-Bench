@@ -1,0 +1,13 @@
+# The swap (results/pr_review_v5/probes/contract-2026-10-01/README.md, "The swap"): a Claude session on
+# each held-out-12 PR, given that PR's contract-v2 messages from probe_dev_gpt52_Grc_contract2_rep1
+# verbatim (`probe packets --swap-from`). The judge's twelve (ten gold PRs and two controls), so the
+# import covers exactly what `configs/pr_review_v5_medium_heldout_judge.yaml` scores. Otherwise the dev
+# set's spec: same release, tool config and inventory.
+name: dev_medium_0_3_0_swap
+release: inputs/pr_review_v4/releases/dev-medium-0.3.0
+dataset_config: configs/pr_review_v5_dev_medium_0_3_0.yaml
+pr_numbers: [33117, 33145, 33149, 33285, 33294, 33304, 33305, 33315, 33321, 33337, 33362, 33421]
+feedback: {prs_of_release: true}
+cid_prefix: d
+probe_dir: results/pr_review_v5/probes/contract-2026-10-01/swap
+modification_inventory: inputs/pr_review_v4/treatments/systematic-opportunities-v2-medium/derived/modification_inventory.jsonl

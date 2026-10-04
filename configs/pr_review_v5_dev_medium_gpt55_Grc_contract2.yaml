@@ -1,0 +1,15 @@
+# Contract v2 on gpt-5.5 (results/pr_review_v5/probes/contract-2026-10-01/README.md, "Contract v2 on
+# gpt-5.5 and the swap"): the contract v2 condition with only the model and its caps changed, as
+# pr_review_v5_dev_medium_gpt55_Grc.yaml changes them from Grc1. gpt-5.5 verifies two to four times
+# as many edits as gpt_5.2 (../filing-bar-2026-09-30/), which is what contract v2 left unchanged.
+extends: pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml
+
+llm_config:
+  model_name: gpt_5.5
+
+dataset:
+  solo_cost_cap: 20.00
+  solo_token_cap: 24000000
+  # 15 PRs x $20.00 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 300.50
+  run_total_token_cap: 360600000

@@ -46,6 +46,7 @@ Then delete the workaround and re-run the 8-trial probe to confirm `auto` is 8/8
 | `response_format: json_schema` | **yes** | no — *suppresses* the tool call, emits JSON as content |
 | `guided_json`, `structural_tag`, `guided_decoding_backend` | no effect | no |
 | a deliberately bogus parameter (control) | 200, silently ignored | — |
+| `function.strict: true` (OpenAI's own field), measured 2026-09-30 | accepted | **no** — 0/8 under `auto`, as the 0/8 control; 0/8 with a strict-shaped schema too (all properties required, `additionalProperties: false`) |
 
 The control row is why the three vLLM extensions are read as *dropped by the proxy* rather
 than refused by vLLM. `/v1/version` returns `Unknown or unsupported endpoint`, so ELM routes

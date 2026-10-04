@@ -1,0 +1,715 @@
+[
+ {
+  "id": "c1",
+  "kind": "usage",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (a : α) (ha : a ∈ s) : e a ∈ s.map e.toEmbedding := by\n  simp [ha]",
+  "compiled": true,
+  "result": "compiled (inserted after mem_map_equiv, Mathlib/Data/Finset/Image.lean)",
+  "shows": "simp proves membership of an image point in `s.map e.toEmbedding` from `a ∈ s`, going through `mem_map_equiv`."
+ },
+ {
+  "id": "c2",
+  "kind": "usage",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (b : β) (hb : e.symm b ∈ s) : b ∈ s.map e.toEmbedding :=\n  mem_map_equiv.2 hb",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The lemma can be applied in term mode with the client's `e.symm b ∈ s`. Both binders `{f} {b}` are inferred from the goal."
+ },
+ {
+  "id": "c3",
+  "kind": "generalised_statement",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "theorem mem_map_equiv_equivLike_test {F : Type*} [EquivLike F α β] {f : F} {b : β} :\n    b ∈ s.map (EquivLike.toEquiv f).toEmbedding ↔ (EquivLike.toEquiv f).symm b ∈ s := by\n  simp only [mem_map, Equiv.coe_toEmbedding]\n  grind",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The statement has no hypothesis or typeclass argument to drop; its only data binder is `f : α ≃ β`. An `EquivLike` restatement compiles with the same proof but only through `EquivLike.toEquiv`, so it is no more general in use."
+ },
+ {
+  "id": "c4",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (b : β) : b ∈ s.map e.toEmbedding ↔ e.symm b ∈ s := by\n  simp [-mem_map_equiv]",
+  "compiled": false,
+  "result": "unsolved goals: (∃ a ∈ s, e a = b) ↔ e.symm b ∈ s",
+  "shows": "Without `mem_map_equiv`, simp cannot close the equivalence. The `simp 1100` registration is load-bearing."
+ },
+ {
+  "id": "c5",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (b : β) : b ∈ s.map e.toEmbedding ↔ e.symm b ∈ s := by\n  simp",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "With the attribute in place, simp closes the statement."
+ },
+ {
+  "id": "c6",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (b : β) : b ∈ s.map e.toEmbedding ↔ e.symm b ∈ s := by\n  grind",
+  "compiled": false,
+  "result": "grind failed: stuck on `e.toEmbedding w = b` (Equiv.coe_toEmbedding is not available to grind)",
+  "shows": "Bare grind does not prove the lemma. The PR's proof needs `simp only [mem_map, Equiv.coe_toEmbedding]` before `grind`."
+ },
+ {
+  "id": "c7",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (b : β) (hb : e.symm b ∈ s) : b ∈ s.map e.toEmbedding := by\n  grind [mem_map_equiv]",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "grind closes a client goal when the lemma is supplied."
+ },
+ {
+  "id": "c8",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (s : Finset α) (b : β) (hb : e.symm b ∈ s) : b ∈ s.map e.toEmbedding := by\n  grind",
+  "compiled": false,
+  "result": "grind failed: `∀ x ∈ s_1, ¬e.toEmbedding x = b` not refuted",
+  "shows": "grind cannot use `mem_map_equiv` unless it is supplied, because the lemma is not grind-registered."
+ },
+ {
+  "id": "c9",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv",
+   "Finset.mem_map",
+   "Finset.mem_map'",
+   "Finset.mem_map_mk"
+  ],
+  "lean": "content_search '@\\[.*grind' in Mathlib/Data/Finset/Image.lean",
+  "compiled": null,
+  "result": "4 grind registrations: mem_map, mem_image, mem_filterMap, mem_subtype (all `@[simp, grind =]`)",
+  "shows": "In this file only the four basic `mem_*` characterisations are grind-registered. The specialisations `mem_map'`, `mem_map_mk` and `mem_map_equiv` carry `simp 1100` only, so leaving `mem_map_equiv` unregistered follows the file's convention."
+ },
+ {
+  "id": "c10",
+  "kind": "closure_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "declaration_search Finset.mem_image_equiv; Set.mem_image_equiv",
+  "compiled": null,
+  "result": "both declared in Mathlib/Logic/Equiv/Set.lean at the base",
+  "shows": "The image-side twins of `mem_map_equiv` already exist."
+ },
+ {
+  "id": "c11",
+  "kind": "usage",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha : 0 < a) : ((a : ℚ)⁻¹).den = a.natAbs := by\n  have := inv_intCast_den_of_pos ha\n  omega",
+  "compiled": true,
+  "result": "compiled (inserted after den_inv_of_ne_zero, Mathlib/Data/Rat/Lemmas.lean)",
+  "shows": "A client who wants the ℕ-valued denominator has to leave the lemma's ℤ-cast form with `omega`. That costs one step."
+ },
+ {
+  "id": "c12",
+  "kind": "usage",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha : 0 < a) : ((a : ℚ)⁻¹).den = a.toNat := by\n  have := inv_intCast_den_of_pos ha\n  omega",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The `toNat` form is also one `omega` step away."
+ },
+ {
+  "id": "c13",
+  "kind": "generalised_statement",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_ne_zero_test {a : ℤ} (ha0 : a ≠ 0) :\n    ((a : ℚ)⁻¹.den : ℤ) = a.natAbs := by\n  simp only [den_inv, num_intCast]\n  grind",
+  "compiled": true,
+  "result": "compiled (a first attempt with RHS `|a|` failed only because `|·|` notation is not imported in this file)",
+  "shows": "The PR's proof also proves the `a ≠ 0` / `natAbs` generalisation. That content is already in the library as `inv_intCast_den` and `den_inv_of_ne_zero`."
+ },
+ {
+  "id": "c14",
+  "kind": "generalised_statement",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_nonneg_test {a : ℤ} (ha0 : 0 ≤ a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp only [den_inv, num_intCast]\n  grind",
+  "compiled": false,
+  "result": "grind failed with counterexample a = 0",
+  "shows": "`0 < a` is the weakest hypothesis for the RHS `a`."
+ },
+ {
+  "id": "c15",
+  "kind": "generalised_statement",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos_nohyp_test {a : ℤ} : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp only [den_inv, num_intCast]\n  grind",
+  "compiled": false,
+  "result": "grind failed with counterexample a = 0",
+  "shows": "The hypothesis cannot be dropped."
+ },
+ {
+  "id": "c16",
+  "kind": "closure_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos",
+   "Rat.inv_intCast_den"
+  ],
+  "lean": "example {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  rw [inv_intCast_den, if_neg ha0.ne']\n  omega",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "`inv_intCast_den_of_pos` is a two-step corollary of the general `inv_intCast_den` (declared 20 lines later in the same file)."
+ },
+ {
+  "id": "c17",
+  "kind": "automation_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [ha0]",
+  "compiled": false,
+  "result": "unsolved goals: (if a = 0 then 1 else ↑a.natAbs) = a",
+  "shows": "simp with the positivity hypothesis does not close the statement without help."
+ },
+ {
+  "id": "c18",
+  "kind": "automation_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [ha0.ne']\n  omega",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "simp followed by omega closes it without the lemma."
+ },
+ {
+  "id": "c19",
+  "kind": "automation_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  grind",
+  "compiled": false,
+  "result": "grind failed (no `den_inv` fact)",
+  "shows": "Bare grind does not prove it."
+ },
+ {
+  "id": "c20",
+  "kind": "automation_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  grind [den_inv, num_intCast]",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "grind proves it once given `den_inv` and `num_intCast`, which is the PR's proof with the `simp only` folded in."
+ },
+ {
+  "id": "c21",
+  "kind": "binders_form_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos",
+   "Rat.inv_intCast_num_of_pos",
+   "Rat.inv_natCast_num_of_pos",
+   "Rat.inv_natCast_den_of_pos",
+   "Rat.inv_intCast_den",
+   "Rat.inv_natCast_den"
+  ],
+  "lean": "content_search '^@\\[' in Mathlib/Data/Rat/Lemmas.lean, lines 290-330; read of lines 296-330",
+  "compiled": null,
+  "result": "no attributes on any of the 8 inverse num/den lemmas; the four `_of_pos` members all take `{a} (ha0 : 0 < a)`",
+  "shows": "The binders and the unregistered status match the family's other members."
+ },
+ {
+  "id": "c22",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "example [Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*} [∀ i, MeasurableSpace (β i)]\n    (ν : (i : ι') → Measure (β i)) [∀ i, IsProbabilityMeasure (ν i)] (s : Set ((i : ι') → β i)) :\n    (Measure.pi fun i ↦ ν (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e) s =\n      Measure.pi ν s := by\n  rw [pi_map_piCongrLeft]",
+  "compiled": true,
+  "result": "compiled (inserted after pi_map_piCongrLeft, Mathlib/MeasureTheory/Constructions/Pi.lean)",
+  "shows": "A client with probability measures can rewrite with the lemma, and SigmaFinite is inferred."
+ },
+ {
+  "id": "c23",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "example [Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*} [∀ i, MeasurableSpace (β i)]\n    (ν : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (ν i)] :\n    MeasurePreserving (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      (Measure.pi fun i ↦ ν (e i)) (Measure.pi ν) :=\n  ⟨(MeasurableEquiv.piCongrLeft (fun i ↦ β i) e).measurable, pi_map_piCongrLeft e ν⟩",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The lemma alone yields the statement of `measurePreserving_piCongrLeft` in one line."
+ },
+ {
+  "id": "c24",
+  "kind": "generalised_statement",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft_test1 [Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) :\n    ... = Measure.pi μ := by <PR's proof verbatim>",
+  "compiled": false,
+  "result": "failed to synthesize ∀ (i : ι'), SigmaFinite (μ i) at `Measure.pi_eq`",
+  "shows": "`[∀ i, SigmaFinite (μ i)]` is needed by the proof."
+ },
+ {
+  "id": "c25",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft_test2 [Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ :=\n  pi_map_piCongrLeft e μ\n\nexample : @pi_map_piCongrLeft_test2 = @pi_map_piCongrLeft := rfl",
+  "compiled": true,
+  "result": "compiled, including the rfl equality of the two constants",
+  "shows": "Naming the instance `hι'` changes nothing. The name is referenced neither in the statement nor in the PR's proof."
+ },
+ {
+  "id": "c26",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "content_search '\\[[A-Za-zι'_0-9]+ : Fintype' and '\\[Fintype ' in Mathlib/MeasureTheory/Constructions",
+  "compiled": null,
+  "result": "named Fintype binder: 1 occurrence (this lemma); anonymous `[Fintype `: 13 occurrences, including the file's own `variable [Fintype ι']` (line 701)",
+  "shows": "The directory writes Fintype binders anonymously. `[hι' : Fintype ι']` is the only named one."
+ },
+ {
+  "id": "c27",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "example {ι₁ ι₂ : Type*} [Fintype ι₁] [Fintype ι₂] (e : ι₁ ≃ ι₂) {β : ι₂ → Type*}\n    [∀ i, MeasurableSpace (β i)] (ν : (i : ι₂) → Measure (β i)) [∀ i, SigmaFinite (ν i)] :\n    (Measure.pi fun i ↦ ν (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi ν :=\n  (measurePreserving_piCongrLeft ν e).map_eq",
+  "compiled": true,
+  "result": "compiled (inserted after volume_measurePreserving_piCongrLeft, line 732)",
+  "shows": "`pi_map_piCongrLeft` is exactly the `map_eq` field of `measurePreserving_piCongrLeft` (same file, line 720), under the same hypotheses (Fintype of both index types, SigmaFinite)."
+ },
+ {
+  "id": "c28",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "theorem measurePreserving_piCongrLeft_test (f : ι' ≃ ι) :\n    MeasurePreserving (MeasurableEquiv.piCongrLeft α f)\n      (Measure.pi fun i' => μ (f i')) (Measure.pi μ) where\n  measurable := (MeasurableEquiv.piCongrLeft α f).measurable\n  map_eq := Measure.pi_map_piCongrLeft f μ",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The converse holds too: `measurePreserving_piCongrLeft`'s 3-line `map_eq` proof can be replaced by `pi_map_piCongrLeft f μ`. The two statements say the same thing, and each is proved separately."
+ },
+ {
+  "id": "c29",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  refine (pi_eq fun s _ => ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi _ _, e.prod_comp (fun i => μ i (s i))]",
+  "compiled": true,
+  "result": "compiled (declaration_name mode, replacing the PR's version at line 446)",
+  "shows": "The sibling's 3-line proof also proves `pi_map_piCongrLeft` at its own position (line 446). The duplicate can therefore be removed in either direction without reordering the file."
+ },
+ {
+  "id": "c30",
+  "kind": "automation_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "content_search '^@\\[' in Pi.lean lines 360-480; read lines 696-733",
+  "compiled": null,
+  "result": "no attributes on pi_map_eval, pi_map_pi, pi_map_piCongrLeft, pi_map_piOptionEquivProd or measurePreserving_piCongrLeft",
+  "shows": "None of the `pi_map_*` equations is simp-registered. Leaving this one unregistered matches its siblings."
+ },
+ {
+  "id": "c31",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "example {ν : ProbabilityMeasure Ω} {νs : ℕ → ProbabilityMeasure Ω}\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun n ↦ (νs n : Measure Ω).real F) atTop ≤ (ν : Measure Ω).real F) :\n    Tendsto νs atTop (𝓝 ν) :=\n  tendsto_of_forall_isClosed_limsup_real_le' h",
+  "compiled": true,
+  "result": "compiled (inserted before `end Closed`, Mathlib/MeasureTheory/Measure/Portmanteau.lean)",
+  "shows": "A client with a sequence and `Measure.real` hypotheses applies the lemma directly, and `atTop`'s countable generation is inferred."
+ },
+ {
+  "id": "c32",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "example {ν : ProbabilityMeasure Ω} {νs : ℕ → ProbabilityMeasure Ω}\n    (h : ∀ F : Set Ω, IsClosed F → limsup (fun n ↦ ((νs n F : ℝ≥0) : ℝ)) atTop ≤ (ν F : ℝ)) :\n    Tendsto νs atTop (𝓝 ν) :=\n  tendsto_of_forall_isClosed_limsup_real_le' h",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "A hypothesis written with the `ℝ≥0` coercion cast to `ℝ` is accepted by defeq, with no rewriting needed."
+ },
+ {
+  "id": "c33",
+  "kind": "generalised_statement",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "lemma tendsto_of_forall_isClosed_limsup_real_le'_test1 {L' : Filter ι}\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L' ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L' (𝓝 μ) := by\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h\n  exact tendsto_of_forall_isClosed_limsup_le h",
+  "compiled": false,
+  "result": "failed to synthesize L'.IsCountablyGenerated",
+  "shows": "`[L.IsCountablyGenerated]` is needed by the new proof, through `tendsto_of_forall_isClosed_limsup_le`."
+ },
+ {
+  "id": "c34",
+  "kind": "generalised_statement",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "omit [OpensMeasurableSpace Ω] in\nlemma tendsto_of_forall_isClosed_limsup_real_le'_test2 (h : ...) : Tendsto μs L (𝓝 μ) := by <PR's proof>",
+  "compiled": false,
+  "result": "cannot omit referenced section variable",
+  "shows": "`[OpensMeasurableSpace Ω]` is used by the proof."
+ },
+ {
+  "id": "c35",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "lemma tendsto_of_forall_isClosed_limsup_real_le'_test3\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L (𝓝 μ) := by\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h\n  exact tendsto_of_forall_isClosed_limsup_le h\n\nexample : @tendsto_of_forall_isClosed_limsup_real_le'_test3 =\n    @tendsto_of_forall_isClosed_limsup_real_le' := rfl",
+  "compiled": true,
+  "result": "compiled, including the rfl equality of the two constants",
+  "shows": "Without its own `{L : Filter ι} [L.IsCountablyGenerated]`, and using the section's `variable`s, the lemma has exactly the same type. The re-bound binders are redundant."
+ },
+ {
+  "id": "c36",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'",
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_le'",
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_le_nat",
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_le"
+  ],
+  "lean": "file_read Portmanteau.lean lines 602-652",
+  "compiled": null,
+  "result": "section Closed declares `{L : Filter ι} [L.IsCountablyGenerated]` at line 606; `_le'` and `_le` use it without re-binding, `_le_nat` uses `atTop`; only `_real_le'` re-binds `{L : Filter ι} [L.IsCountablyGenerated]`",
+  "shows": "Among the four members of section Closed, `_real_le'` is the only one that re-declares the section's filter binders."
+ },
+ {
+  "id": "c37",
+  "kind": "twin",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isOpen_le_liminf_real'"
+  ],
+  "lean": "example {ν : ProbabilityMeasure Ω} {νs : ι → ProbabilityMeasure Ω}\n    (h : ∀ G : Set Ω, IsOpen G →\n      (ν : Measure Ω).real G ≤ liminf (fun i ↦ (νs i : Measure Ω).real G) L) :\n    Tendsto νs L (𝓝 ν) :=\n  tendsto_of_forall_isOpen_le_liminf_real' h",
+  "compiled": false,
+  "result": "Unknown identifier `tendsto_of_forall_isOpen_le_liminf_real'`",
+  "shows": "No open-set/liminf `Measure.real` version exists."
+ },
+ {
+  "id": "c38",
+  "kind": "twin",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isOpen_le_liminf_real'",
+   "MeasureTheory.tendsto_of_forall_isOpen_le_liminf"
+  ],
+  "lean": "lemma tendsto_of_forall_isOpen_le_liminf_real'_test {ν : ProbabilityMeasure Ω}\n    {νs : ι → ProbabilityMeasure Ω}\n    (h : ∀ G : Set Ω, IsOpen G →\n      (ν : Measure Ω).real G ≤ liminf (fun i ↦ (νs i : Measure Ω).real G) L) :\n    Tendsto νs L (𝓝 ν) := by\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_liminf] at h\n  exact tendsto_of_forall_isOpen_le_liminf h",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The open-set twin can be derived with the PR's two-line pattern. The open side of the file (`_nat'`, `_nat`, `'`, unprimed) has no real-valued member, and neither did the base, so the pattern does not demand one."
+ },
+ {
+  "id": "c39",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "content_search 'tendsto_of_forall_isClosed_limsup_real_le' in Mathlib",
+  "compiled": null,
+  "result": "1 file; one use, Portmanteau.lean line 679 (tendsto_iff_forall_lipschitz_integral_tendsto)",
+  "shows": "The real-valued version has one in-library consumer, and it applies the lemma directly."
+ },
+ {
+  "id": "c40",
+  "kind": "automation_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "content_search '^@\\[' in Portmanteau.lean",
+  "compiled": null,
+  "result": "only `@[expose] public section` (line 85); no declaration in the file carries an attribute",
+  "shows": "No sibling is registered, and a `Tendsto` conclusion is not a simp or grind shape."
+ },
+ {
+  "id": "c41",
+  "kind": "usage",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "example {γ : Type*} [CompleteLinearOrder γ] {F : ι → α → γ} {s : Finset ι} (hs : s.Nonempty)\n    {f : Filter α} :\n    limsup (fun a ↦ s.sup' hs (fun i ↦ F i a)) f = s.sup' hs (fun i ↦ limsup (F i) f) :=\n  limsup_finset_sup' hs",
+  "compiled": true,
+  "result": "compiled (inserted after limsup_finset_sup', Mathlib/Order/LiminfLimsup.lean)",
+  "shows": "In a complete linear order both boundedness autoparams discharge themselves, so the client passes only `hs`."
+ },
+ {
+  "id": "c42",
+  "kind": "usage",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "example {F : ι → ℕ → β} [ConditionallyCompleteLinearOrder β] {s : Finset ι} (hs : s.Nonempty)\n    (hb : ∀ i ∈ s, IsBoundedUnder (· ≤ ·) atTop (F i))\n    (hc : ∀ i ∈ s, IsCoboundedUnder (· ≤ ·) atTop (F i)) :\n    limsup (fun n ↦ s.sup' hs (fun i ↦ F i n)) atTop = s.sup' hs (fun i ↦ limsup (F i) atTop) :=\n  limsup_finset_sup' hs hc hb",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "In a conditionally complete order the client supplies the per-index bounds positionally."
+ },
+ {
+  "id": "c43",
+  "kind": "generalised_statement",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "theorem limsup_finset_sup'_test ... (h₁ : ∃ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i)) (h₂ : ...) : ... := by\n  <PR's proof with h₃ := h₁; second half `(by isBoundedDefault)` in place of `h₁ i i_s`>",
+  "compiled": false,
+  "result": "Tactic `assumption` failed: ⊢ IsCoboundedUnder (· ≤ ·) f (F i) in the `≥` half",
+  "shows": "Per-index coboundedness `h₁` is needed by the `sup' ≤ limsup` half (`limsup_le_limsup`). It cannot be weakened to the existential that the other half uses."
+ },
+ {
+  "id": "c44",
+  "kind": "generalised_statement",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "theorem limsup_finset_sup'_test2 [ConditionallyCompleteLattice β] ... := by\n  have bddsup := isBoundedUnder_le_finset_sup' hs h₂\n  sorry",
+  "compiled": false,
+  "result": "Application type mismatch: `isBoundedUnder_le_finset_sup'` needs a LinearOrder",
+  "shows": "`ConditionallyCompleteLinearOrder` cannot be weakened to `ConditionallyCompleteLattice`, because the boundedness helper and `sup'_lt_iff` need linearity."
+ },
+ {
+  "id": "c45",
+  "kind": "closure_check",
+  "objects": [
+   "limsup_finset_sup'",
+   "liminf_finset_inf'",
+   "limsup_finset_sup",
+   "liminf_finset_inf",
+   "limsup_max",
+   "liminf_min"
+  ],
+  "lean": "file_read LiminfLimsup.lean lines 1111-1190; content_search finset_sup'|finset_inf' in Mathlib/Order",
+  "compiled": null,
+  "result": "limsup_max/liminf_min and limsup_finset_sup'/limsup_finset_sup/liminf_finset_inf'/liminf_finset_inf all present; liminf_finset_inf' := limsup_finset_sup' (β := βᵒᵈ) hs h₁ h₂",
+  "shows": "The dual and the non-primed (`OrderBot`) variants exist, and the dual is derived from this member. The family is closed."
+ },
+ {
+  "id": "c46",
+  "kind": "binders_form_check",
+  "objects": [
+   "limsup_finset_sup'",
+   "liminf_finset_inf'",
+   "limsup_finset_sup",
+   "liminf_finset_inf"
+  ],
+  "lean": "file_read LiminfLimsup.lean lines 1142-1188; content_search '^@\\[' lines 1110-1195",
+  "compiled": null,
+  "result": "all four finset members use `(h₁ … := by exact fun _ _ ↦ by isBoundedDefault)` and `(h₂ … := by exact fun _ _ ↦ by isBoundedDefault)`; no attributes in section MinMax",
+  "shows": "The binders, autoparams and unregistered status are uniform across the family."
+ },
+ {
+  "id": "c47",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "example {s : Set β} (hs : MeasurableSet s) : ρ (s ×ˢ Set.univ) = ρ.fst s := by\n  rw [← setLIntegral_condKernel_eq_measure_prod hs MeasurableSet.univ]\n  simp",
+  "compiled": true,
+  "result": "compiled (inserted after the Measure version, Mathlib/Probability/Kernel/Disintegration/Integral.lean)",
+  "shows": "A client computing a marginal with `t = univ` rewrites with the lemma and closes the goal with simp."
+ },
+ {
+  "id": "c48",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "example {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ρ (s ×ˢ t) ≤ ρ.fst s := by\n  rw [← setLIntegral_condKernel_eq_measure_prod hs ht]\n  calc ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst ≤ ∫⁻ _ in s, 1 ∂ρ.fst :=\n        lintegral_mono fun b ↦ prob_le_one\n    _ = ρ.fst s := by simp",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The integral form is usable for bounds."
+ },
+ {
+  "id": "c49",
+  "kind": "usage",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "example {α : Type*} {mα : MeasurableSpace α} [CountableOrCountablyGenerated α β]\n    {κ : Kernel α (β × Ω)} [IsFiniteKernel κ] (a : α) {s : Set β} (hs : MeasurableSet s) :\n    κ a (s ×ˢ Set.univ) = Kernel.fst κ a s := by\n  rw [← ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod a hs MeasurableSet.univ]\n  simp",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The Kernel version serves the same client computation."
+ },
+ {
+  "id": "c50",
+  "kind": "generalised_statement",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod_test1 {s : Set β} (hs : MeasurableSet s)\n    {t : Set Ω} : ... := by <PR's proof>",
+  "compiled": false,
+  "result": "Unknown identifier `ht`",
+  "shows": "The new proof's only step, `compProd_apply_prod`, consumes `ht`, so `ht` cannot be dropped with this proof."
+ },
+ {
+  "id": "c51",
+  "kind": "generalised_statement",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod_test2 {s : Set β} {t : Set Ω}\n    (ht : MeasurableSet t) : ... := by <PR's proof>",
+  "compiled": false,
+  "result": "Unknown identifier `hs`",
+  "shows": "`hs` likewise cannot be dropped. The lemma's hypotheses are exactly those of `compProd_apply_prod`."
+ },
+ {
+  "id": "c52",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+   "MeasureTheory.Measure.setLIntegral_condKernel"
+  ],
+  "lean": "example {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n  simpa using setLIntegral_condKernel (ρ := ρ) (f := fun _ ↦ (1 : ℝ≥0∞)) measurable_const hs ht",
+  "compiled": true,
+  "result": "compiled (inserted at the end of the Measure Lintegral section)",
+  "shows": "The Measure version is `setLIntegral_condKernel` at `f = 1`. It is kept as the named, integrand-free special case, as the file's `_univ_left/_univ_right` corollaries are."
+ },
+ {
+  "id": "c53",
+  "kind": "closure_check",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+   "ProbabilityTheory.setLIntegral_condKernel"
+  ],
+  "lean": "example ... (a : α) {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  simpa using ProbabilityTheory.setLIntegral_condKernel (κ := κ) (f := fun _ ↦ (1 : ℝ≥0∞))\n    measurable_const a hs ht",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "Likewise, the Kernel version is `setLIntegral_condKernel` at `f = 1`."
+ },
+ {
+  "id": "c54",
+  "kind": "closure_check",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "example {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n  have := ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod\n    (κ := Kernel.const Unit ρ) () hs ht\n  simpa [Measure.condKernel] using this",
+  "compiled": false,
+  "result": "Type mismatch: `(Kernel.const Unit ρ).condKernel` vs `condKernelUnitBorel`",
+  "shows": "The Measure member is not a simp-level specialisation of the Kernel member. Keeping both, each with its own two-line proof, matches how every other lemma pair in the file is written."
+ },
+ {
+  "id": "c55",
+  "kind": "binders_form_check",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+   "ProbabilityTheory.lintegral_condKernel_mem",
+   "ProbabilityTheory.setLIntegral_condKernel"
+  ],
+  "lean": "file_read Integral.lean lines 1-200; content_search '^@\\[' in the file",
+  "compiled": null,
+  "result": "Kernel member: `(a : α) {s} (hs) {t} (ht)`, as `lintegral_condKernel_mem (a : α) {s} (hs)`; Measure member mirrors it without `a`; no attributes on any declaration in the file",
+  "shows": "The two members' binders mirror each other and their siblings, and neither is registered, like every other lemma in the file."
+ },
+ {
+  "id": "c56",
+  "kind": "usage",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "example {x y : α} {ε : ℝ} (hx : x ∈ ball y ε) : ∃ r < ε, ∃ δ > 0, ∀ z, dist z x < δ → z ∈ ball y ε := by\n  obtain ⟨r, hr, hxr⟩ := exists_lt_mem_ball_of_mem_ball hx\n  refine ⟨r, hr, ε - r, sub_pos.2 hr, fun z hz => ?_⟩\n  rw [mem_ball] at hxr ⊢\n  linarith [dist_triangle z x y]",
+  "compiled": true,
+  "result": "compiled (inserted after the lemma, Mathlib/Topology/MetricSpace/Pseudo/Defs.lean; a first version citing `ball_subset_ball'` failed only because that lemma is declared later in the file)",
+  "shows": "The destructured form `⟨r, hr, hxr⟩` is what a client (e.g. CircleTransform.lean:127) uses."
+ },
+ {
+  "id": "c57",
+  "kind": "usage",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "example {x y : α} {ε : ℝ} (hx : dist x y < ε) : ∃ ε' < ε, x ∈ ball y ε' :=\n  exists_lt_mem_ball_of_mem_ball hx",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "A client holding `dist x y < ε` can pass it directly, because membership is defeq."
+ },
+ {
+  "id": "c58",
+  "kind": "generalised_statement",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "example {x y : α} {ε : ℝ} : x ∈ ball y ε ↔ ∃ ε' < ε, x ∈ ball y ε' :=\n  ⟨exists_lt_mem_ball_of_mem_ball, fun ⟨_, h', hx⟩ => lt_of_lt_of_le (mem_ball.1 hx) h'.le⟩",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The only hypothesis `h` is necessary, because the conclusion implies it. The iff form is a one-liner from the lemma."
+ },
+ {
+  "id": "c59",
+  "kind": "generalised_statement",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "theorem exists_lt_mem_ball_of_mem_ball_test {x y : α} {ε : ℝ} (h : x ∈ ball y ε) :\n    ∃ ε' < ε, 0 < ε' ∧ x ∈ ball y ε' := by\n  obtain ⟨ε', h1, h2⟩ := exists_lt_mem_ball_of_mem_ball h\n  exact ⟨ε', h1, pos_of_mem_ball h2, h2⟩",
+  "compiled": true,
+  "result": "compiled (first batch)",
+  "shows": "A stronger conclusion with `0 < ε'` follows at once through `pos_of_mem_ball`. The current statement loses nothing."
+ },
+ {
+  "id": "c60",
+  "kind": "twin",
+  "objects": [
+   "EMetric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "example {Y : Type*} [PseudoEMetricSpace Y] {x y : Y} {ε : ℝ≥0∞} (h : x ∈ EMetric.ball y ε) :\n    ∃ ε' < ε, x ∈ EMetric.ball y ε' :=\n  EMetric.exists_lt_mem_ball_of_mem_ball h\n-- plus content_search 'exists_lt_mem_ball' over Mathlib",
+  "compiled": false,
+  "result": "Unknown identifier `EMetric.exists_lt_mem_ball_of_mem_ball`; the census finds `exists_lt_mem_ball` in 2 files only (this file and CircleTransform.lean)",
+  "shows": "No EMetric twin exists at the base. Note that `declaration_search` reported one, but that was a false positive matching the Metric name."
+ },
+ {
+  "id": "c61",
+  "kind": "twin",
+  "objects": [
+   "EMetric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "theorem _root_.EMetric.exists_lt_mem_ball_of_mem_ball_test {Y : Type*} [PseudoEMetricSpace Y]\n    {x y : Y} {ε : ℝ≥0∞} (h : x ∈ EMetric.ball y ε) : ∃ ε' < ε, x ∈ EMetric.ball y ε' :=\n  exists_between' h",
+  "compiled": true,
+  "result": "compiled",
+  "shows": "The PR's new proof `exists_between' h` proves the EMetric twin verbatim. The twin was not in the base either, and the PR does not touch EMetric."
+ },
+ {
+  "id": "c62",
+  "kind": "automation_check",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "content_search '^@\\[' in Pseudo/Defs.lean lines 340-400",
+  "compiled": null,
+  "result": "simp on mem_ball, nonempty_ball, ball_eq_empty, ball_zero, iUnion_ball_nat, iUnion_ball_nat_succ; none on pos_of_mem_ball, mem_ball_self, exists_lt_mem_ball_of_mem_ball",
+  "shows": "Existential and implication lemmas in this block are not registered, and simp cannot use an `∃ ε' < ε` conclusion. Leaving it unregistered matches the area."
+ }
+]

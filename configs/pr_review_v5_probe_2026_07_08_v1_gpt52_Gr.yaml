@@ -1,0 +1,20 @@
+# Test (d) of docs/todo/reviewer-model-gap.md: condition G with reasoning on
+# (results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md, "Test (d)"). Everything else
+# is G's. The caps are set so they cannot bind: a session that reaches a cap stops with no findings,
+# which is what confounded the in-window reasoning twin (29 of 140 jobs paused). The first setting,
+# $3.00 and 40 turns, bound on the calibration session (43192: $3.06 billed at 36 turns, no
+# submission), so the headroom is doubled again.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml
+
+llm_config:
+  reasoning_effort: high
+
+execution:
+  max_turns: 80
+
+dataset:
+  solo_cost_cap: 6.00
+  solo_token_cap: 7200000
+  # 6 PRs x $6.00 = $36.00 worst case a run.
+  run_total_cost_cap: 36.50
+  run_total_token_cap: 43300000

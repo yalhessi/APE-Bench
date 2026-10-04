@@ -1,0 +1,11 @@
+# Phase 3.1 of docs/plans/2026-09-30-post-carryover-replan.md, the filing bar
+# (results/pr_review_v5/probes/filing-bar-2026-09-30/README.md): pr_review_v5_val_small12_gpt55_Grc.yaml with the task framing a
+# finding as a change the reviewer would request rather than a merge verdict -- the brief gains one
+# paragraph on the bar, the severity line no longer speaks of withholding merge, and the submit tool
+# carries no merge_ready_as_is. Everything else, model, effort, endpoint, carry-over, tools and caps,
+# is the parent's.
+extends: pr_review_v5_val_small12_gpt55_Grc.yaml
+
+task_config:
+  filing_bar: request
+  system_prompt_file: results/pr_review_v5/probes/filing-bar-2026-09-30/brief_G_bar.md

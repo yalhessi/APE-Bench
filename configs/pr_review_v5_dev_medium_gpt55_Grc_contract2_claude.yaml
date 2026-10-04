@@ -1,0 +1,20 @@
+# H-gpt (docs/plans/2026-10-01-claude-models-under-the-harness.md): contract v2 with gpt-5.5,
+# carried at high effort, unchanged, under Claude Code through the relay.
+#
+# Read against the ape_agent run of the same config (probe_dev_gpt55_Grc_contract2_rep1): within 2
+# of the 23 held-out-12 obligations means the harness is not gpt's limit under this prompt either.
+# The preamble knobs (batch_preamble plain, no <environment>) reach Claude Code's first message
+# since ea47258. Claude Code adds its own system prompt and tools, and runs CLI 2.1.139.
+extends: pr_review_v5_dev_medium_gpt55_Grc_contract2.yaml
+
+scaffold_type: claude_code
+
+# Containment. See pr_review_v5_solo_claude_heldout12.yaml for why each knob is here. No number
+# from this condition is read from an attempt whose containment_audit.json is not both `clean`
+# and `usable`.
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob, TodoWrite]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+contain_to_workspace: true

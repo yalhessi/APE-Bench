@@ -1,0 +1,30 @@
+[
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "`Bundle.Trivialization.contMDiffAt_symmL` (and therefore `contMDiffOn_symmL`) assumes `[IsManifold IB n B]`, but the proof never needs it: `contMDiffAt_totalSpace`, `contMDiffAt_id` and `contMDiffAt_coordChangeL` hold for any charted base space. The extra instance makes both lemmas harder to apply, for example at a regularity `n` for which only `ContMDiffVectorBundle n` is available. It appears to have come over from the Zulip question the statement was taken from.",
+  "requested_change": "Delete the `[IsManifold IB n B]` binder from both `Bundle.Trivialization.contMDiffAt_symmL` and `Bundle.Trivialization.contMDiffOn_symmL`, and keep the proofs as they are.",
+  "severity": "advisory",
+  "evidence": "Read `contMDiffAt_coordChangeL` (VectorBundle/Basic.lean:328) and `contMDiffAt_totalSpace` (Basic.lean:197); neither needs `IsManifold`. lean_verify_edit (declaration mode) on `contMDiffAt_symmL` with the binder removed and the proof unchanged: success, no errors or warnings. lean_verify_edit (line mode, lines 145-170) with the binder removed from both lemmas: success. An in-file `#lint only unusedArguments` reported 0 errors, but it also passed an obviously unused `(h : x = x)` in a calibration lemma, so no CI linter failure is claimed and this is filed as advisory. zulip_search shows the statement, `[IsManifold IB k B]` included, comes from Patrick Massot's 2026-06/07 thread 'Trivialization smoothness'."
+ },
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "The two new statements spell out `ContMDiffAt IB (IB.prod 𝓘(𝕜, F₁ →L[𝕜] F₁)) n ...` and `ContMDiffOn IB (IB.prod 𝓘(𝕜, F₁ →L[𝕜] F₁)) n ... e.baseSet` by hand. The file imports `Mathlib.Geometry.Manifold.Notation`, and every other statement in it uses `CMDiffAt`/`CMDiff[s]`, including the hom-bundle section in `ContMDiffWithinAt.clm_bundle_apply`, which gives the fiber family through `(E := ...)`.",
+  "requested_change": "State the conclusions with the file's notation: `CMDiffAt n (fun m ↦ TotalSpace.mk' (F₁ →L[𝕜] F₁) (E := fun b ↦ F₁ →L[𝕜] E₁ b) m (e.symmL 𝕜 m)) x` for `contMDiffAt_symmL`, and `CMDiff[e.baseSet] n (fun m ↦ TotalSpace.mk' (F₁ →L[𝕜] F₁) (E := fun b ↦ F₁ →L[𝕜] E₁ b) m (e.symmL 𝕜 m))` for `contMDiffOn_symmL`.",
+  "severity": "advisory",
+  "evidence": "Hom.lean lines 57, 74-83, 94-113, 218-221, 255-256 and 301-304 all use the `CMDiff*`/`MDiff*` notation, and line 302 uses `(E := fun (x : B) ↦ (E₁ x →L[𝕜] E₂ x))` for a hom-bundle section. lean_verify_edit (line mode, lines 145-170): without `(E := ...)` the notation fails ('Term `fun m => ⟨m, ?m⟩` is a dependent function'). With `(E := fun b ↦ F₁ →L[𝕜] E₁ b)` both lemmas compile, the unchanged proofs still go through, and an `example` stated in the PR's original `ContMDiffAt IB (IB.prod ...)` form is closed by `e.contMDiffAt_symmL hx`, so the two statements are the same. The `T% (e.symmL 𝕜 ·)` spelling does not elaborate (no `FiberBundle` instance found for `F₁ →L[𝕜] E₁ x`)."
+ },
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "The trivialization binder is written `(e : Trivialization F₁ (TotalSpace.proj : TotalSpace F₁ E₁ → B))` in both new lemmas, which repeats the Zulip draft. The file has `open scoped Bundle` and elsewhere writes this type as `Trivialization F₁ (π F₁ E₁)` (Hom.lean line 46; Basic.lean uses `Trivialization F (π F E)` throughout).",
+  "requested_change": "Write the binder as `(e : Trivialization F₁ (π F₁ E₁))` in `contMDiffAt_symmL` and `contMDiffOn_symmL`. In `contMDiffAt_symmL` this lets the binder line join `{x : B} (hx : x ∈ e.baseSet)` on one line.",
+  "severity": "advisory",
+  "evidence": "Hom.lean line 46 `{e₁ e₁' : Trivialization F₁ (π F₁ E₁)}`, line 30 `open scoped Manifold Bundle Topology`. lean_verify_edit (line mode, lines 145-170) with `(e : Trivialization F₁ (π F₁ E₁)) [MemTrivializationAtlas e] {x : B} (hx : x ∈ e.baseSet) :` in `contMDiffAt_symmL` and `(e : Trivialization F₁ (π F₁ E₁)) [MemTrivializationAtlas e] :` in `contMDiffOn_symmL`, together with findings 1 and 2: success, no errors or warnings."
+ },
+ {
+  "target": "Bundle.Trivialization.contMDiffAt_symmL",
+  "claim": "The docstrings of `contMDiffAt_symmL` and `contMDiffOn_symmL` say 'Let `e` be a trivialization of a `C^n` vector bundle `E₁`', but both lemmas need `[MemTrivializationAtlas e]`. For a trivialization outside the bundle's atlas the claimed `C^n` smoothness can fail, since only coordinate changes between atlas trivializations are `C^n`, so the docstrings state more than the lemmas prove.",
+  "requested_change": "In both docstrings, change 'Let `e` be a trivialization of a `C^n` vector bundle `E₁` over `B`' to 'Let `e` be a trivialization in the atlas of a `C^n` vector bundle `E₁` over `B`', or another wording that states `MemTrivializationAtlas e`.",
+  "severity": "advisory",
+  "evidence": "`ContMDiffVectorBundle` (Basic.lean:280-284) only asks for `C^n` coordinate changes between trivializations with `[MemTrivializationAtlas e] [MemTrivializationAtlas e']`, and the proof goes through `contMDiffAt_coordChangeL`, which needs `MemTrivializationAtlas` for both `e` and `trivializationAt F₁ E₁ x`. The docstring text is on diff lines 145-147 and 163-165."
+ }
+]

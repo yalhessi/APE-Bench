@@ -1,0 +1,16 @@
+[
+ {
+  "target": "Real.arctan_sqrt_three",
+  "claim": "`Real.arctan_sqrt_three` is proved by `rw [← tan_pi_div_three, arctan_tan]` followed by an `all_goals` block that runs `field_simp; norm_num` on the two range side goals. This proof is longer than needed and does not follow its sibling `arctan_one` two lines above, which is a one-line term proof via `arctan_eq_of_tan_eq`. The `all_goals` with a `·` bullet at the same indentation is also an unusual layout.",
+  "requested_change": "Replace the tactic block with the term proof `arctan_eq_of_tan_eq tan_pi_div_three <| by constructor <;> linarith [pi_pos]`, which matches `arctan_one`.",
+  "severity": "advisory",
+  "evidence": "file_read of target/Mathlib/Analysis/SpecialFunctions/Trigonometric/Arctan.lean: lines 201-203 are `@[simp] theorem arctan_one : arctan 1 = π / 4 := arctan_eq_of_tan_eq tan_pi_div_four <| by constructor <;> linarith [pi_pos]`, and `arctan_eq_of_tan_eq (h : tan x = y) (hx : x ∈ Ioo (-(π / 2)) (π / 2)) : arctan y = x` is at line 197. Basic.lean line 890 has `@[simp] theorem tan_pi_div_three : tan (π / 3) = √3`. lean_verify_edit with declaration_name `Real.arctan_sqrt_three` and new_declaration `@[simp]\\ntheorem arctan_sqrt_three : arctan (√3) = π / 3 :=\\n  arctan_eq_of_tan_eq tan_pi_div_three <| by constructor <;> linarith [pi_pos]` returned success, with no errors and no warnings."
+ },
+ {
+  "target": "Real.arctan_inv_sqrt_three",
+  "claim": "`Real.arctan_inv_sqrt_three` is proved by `rw [inv_eq_one_div, ← tan_pi_div_six, arctan_tan]` followed by an `all_goals · field_simp; norm_num` block. Like its sibling, it can be the one-line `arctan_eq_of_tan_eq` term proof that `arctan_one` uses. The only extra step needed is to turn `tan_pi_div_six`'s `1 / √3` into `(√3)⁻¹`.",
+  "requested_change": "Replace the tactic block with `arctan_eq_of_tan_eq (by rw [tan_pi_div_six, one_div]) <| by constructor <;> linarith [pi_pos]`. The first argument can equally be `(tan_pi_div_six.trans (one_div _))` or `(by simp)`.",
+  "severity": "advisory",
+  "evidence": "Basic.lean line 885 has `@[simp] theorem tan_pi_div_six : tan (π / 6) = 1 / √3`. lean_verify_edit replaced `Real.arctan_inv_sqrt_three` with `@[simp]\\ntheorem arctan_inv_sqrt_three : arctan (√3)⁻¹ = π / 6 :=\\n  arctan_eq_of_tan_eq (by rw [tan_pi_div_six, one_div]) <| by constructor <;> linarith [pi_pos]`: success, no errors or warnings. The variants `(tan_pi_div_six.trans (one_div _))` and `(by simp)` in place of the first argument also compiled cleanly. Deriving the lemma from `arctan_sqrt_three` through `arctan_inv_of_pos` does not work at this position: lean_verify_edit gave `Unknown identifier arctan_inv_of_pos`, because that lemma is declared later, at line 260."
+ }
+]

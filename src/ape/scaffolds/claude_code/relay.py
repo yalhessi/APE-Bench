@@ -26,6 +26,59 @@ if TYPE_CHECKING:
     import logging
 
 
+#: Claude Code's per-request attribution line ("x-anthropic-billing-header: cc_version=2.1.139.f8a;
+#: cc_entrypoint=sdk-py; cch=d726d;"), which opens its system prompt and changes on every request.
+_BILLING_HEADER = re.compile(r"^x-anthropic-billing-header:[^\n]*(\n|$)")
+
+
+def strip_billing_header(text: str) -> str:
+    """`text` without Claude Code's billing header: transport metadata for Anthropic's API, not
+    instructions, and the one thing that broke the prompt prefix between requests.
+
+    Forwarded, it put a different string at character 92 of every request, so OpenAI's prefix cache
+    never hit: 0 cached tokens over the three G-under-Claude-Code repetitions, against 79% of
+    input for the same model under APE-Agent. Billed $0.258 a session where the same tokens cached
+    would have cost about $0.089. With it removed, every one of the 110 consecutive request pairs in
+    those runs extends the previous prompt exactly.
+    """
+    return _BILLING_HEADER.sub("", text, count=1)
+
+
+def anthropic_event_stream(message: Dict[str, Any]) -> str:
+    """A complete Anthropic message as the server-sent events of a streamed one.
+
+    Claude Code asks for every turn with `stream: true`. Answered with plain JSON, it discards the
+    reply and asks again without streaming (captured against a local server, 2026-10-01), so every
+    turn reached the backend twice and was billed twice: 128 main-model requests for 64 turns over
+    the three G-under-Claude-Code repetitions. The backend call stays one non-streaming call, so
+    usage and limits are counted as before; only the reply's framing changes.
+    """
+    events: List[str] = []
+
+    def emit(name: str, data: Dict[str, Any]) -> None:
+        events.append(f"event: {name}\ndata: {json.dumps(data)}\n\n")
+
+    usage = message.get("usage") or {}
+    emit("message_start", {"type": "message_start", "message": {
+        **message, "content": [], "stop_reason": None, "stop_sequence": None,
+        "usage": {"input_tokens": usage.get("input_tokens", 0), "output_tokens": 0}}})
+    for index, block in enumerate(message.get("content") or []):
+        if block.get("type") == "tool_use":
+            start = {**{k: v for k, v in block.items() if k != "input"}, "input": {}}
+            delta = {"type": "input_json_delta", "partial_json": json.dumps(block.get("input") or {})}
+        else:
+            start = {"type": "text", "text": ""}
+            delta = {"type": "text_delta", "text": block.get("text", "")}
+        emit("content_block_start", {"type": "content_block_start", "index": index, "content_block": start})
+        emit("content_block_delta", {"type": "content_block_delta", "index": index, "delta": delta})
+        emit("content_block_stop", {"type": "content_block_stop", "index": index})
+    emit("message_delta", {"type": "message_delta",
+                           "delta": {"stop_reason": message.get("stop_reason"), "stop_sequence": None},
+                           "usage": {"output_tokens": usage.get("output_tokens", 0)}})
+    emit("message_stop", {"type": "message_stop"})
+    return "".join(events)
+
+
 class ClaudeCodeRelaySession(BaseRelaySession):
     """Claude Code relay session - Anthropic API implementation"""
 
@@ -75,8 +128,6 @@ class ClaudeCodeRelaySession(BaseRelaySession):
         self.fast_llm_config = fast_llm_config or llm_config
         # Claude Code specific: session ID extraction
         self.claude_code_session_id: Optional[str] = None
-        # Environment variable backup for restoration
-        self._env_backup: Dict[str, str] = {}
 
     def _setup_routes(self) -> None:
         """Setup Anthropic API routes"""
@@ -104,51 +155,29 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             'CLAUDE_CODE_SUBAGENT_MODEL': fast_model_with_tag,
         }
 
+    def client_environment(self) -> Dict[str, str]:
+        """What this session's Claude Code CLI needs to reach this relay, and only this one.
+
+        Handed to the CLI's own process (`ClaudeAgentOptions.env`, or the CLI-mode subprocess),
+        never written into `os.environ`. It used to be: every relay set `ANTHROPIC_BASE_URL` in
+        the process-wide environment when it started, so with tasks running as coroutines in one
+        process each CLI inherited whichever relay had started last. In
+        probe_postcutoff_gpt52_G_claude_rep1 three of six relays saw no request and one saw 39
+        from four sessions, which then shared one turn limit, one budget and one transcript
+        record. Proxies are cleared because the CLI must reach the relay on localhost directly.
+        """
+        return {
+            **self._get_env_vars(),
+            'HTTP_PROXY': '',
+            'http_proxy': '',
+            'https_proxy': '',
+            'no_proxy': 'localhost',
+        }
+
     def configure_environment(self) -> None:
-        """Configure environment variables and clear proxy settings for Claude Code SDK"""
-        # Backup original environment variables
-        env_vars_to_backup = list(self._get_env_vars().keys()) + [
-            'HTTP_PROXY', 'http_proxy', 'https_proxy', 'no_proxy'
-        ]
-
-        for var in env_vars_to_backup:
-            if var in os.environ:
-                self._env_backup[var] = os.environ[var]
-
-        # Set Anthropic environment variables
-        for key, value in self._get_env_vars().items():
-            os.environ[key] = value
-
-        # Clear proxy environment variables (Claude Code SDK needs direct localhost connection)
-        os.environ['HTTP_PROXY'] = ''
-        os.environ['http_proxy'] = ''
-        os.environ['https_proxy'] = ''
-        os.environ['no_proxy'] = 'localhost'
-
-        # Log configuration
-        env_info = '\n'.join([f'export {k}={v}' for k, v in self._get_env_vars().items()])
-        self.logger.info(
-            f'\n{env_info}\n'
-            f'export HTTP_PROXY=\'\'\n'
-            f'export http_proxy=\'\'\n'
-            f'export https_proxy=\'\'\n'
-            f'export no_proxy=localhost'
-        )
-
-    def restore_environment(self) -> None:
-        """Restore original environment variables"""
-        all_vars = list(self._get_env_vars().keys()) + [
-            'HTTP_PROXY', 'http_proxy', 'https_proxy', 'no_proxy'
-        ]
-
-        for var in all_vars:
-            if var in self._env_backup:
-                os.environ[var] = self._env_backup[var]
-            elif var in os.environ:
-                del os.environ[var]
-
-        self._env_backup.clear()
-        self.logger.info("Environment variables restored")
+        """Log how the CLI reaches this relay. Nothing is set process-wide (`client_environment`)."""
+        env_info = '\n'.join(f'export {k}={v}' for k, v in self.client_environment().items())
+        self.logger.info(f'\n{env_info}')
 
     async def _handle_request(self, request: Request) -> JSONResponse:
         """Main Anthropic API request handler"""
@@ -194,10 +223,10 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             self.logger.info(f"Received request: {client_requested_model} (turn {self.get_current_turns() + 1}/{self.max_turns or '∞'})")
 
             # Extract and save Claude Code session ID
-            user_id = anthropic_request.get('metadata', {}).get('user_id')
-            if user_id:
-                session_id = self._extract_session_id(user_id)
-                if session_id and not self.claude_code_session_id:
+            user_id = (anthropic_request.get('metadata') or {}).get('user_id')
+            session_id = self._extract_session_id(user_id, request.headers)
+            if session_id:
+                if not self.claude_code_session_id:
                     self.claude_code_session_id = session_id
                     self.logger.info(f"Extracted Claude Code session ID: {session_id}")
 
@@ -243,6 +272,7 @@ class ClaudeCodeRelaySession(BaseRelaySession):
 
             # Cache signatures from response (before SDK loses them)
             self._cache_signatures_from_nodes(response_nodes)
+            self._cache_turn_signatures(response_nodes)
 
             # Convert response to Anthropic format
             anthropic_response = self._convert_nodes_to_anthropic(
@@ -250,6 +280,9 @@ class ClaudeCodeRelaySession(BaseRelaySession):
             )
 
             self.logger.info(f"Response completed: {client_requested_model}")
+            if anthropic_request.get("stream"):
+                return Response(content=anthropic_event_stream(anthropic_response),
+                                media_type="text/event-stream")
             return JSONResponse(anthropic_response)
 
         except asyncio.CancelledError:
@@ -274,10 +307,28 @@ class ClaudeCodeRelaySession(BaseRelaySession):
                 status_code=500
             )
 
-    def _extract_session_id(self, user_id: str) -> Optional[str]:
-        """Extract Claude Code session ID from user_id"""
+    @staticmethod
+    def _extract_session_id(user_id: Optional[str], headers=None) -> Optional[str]:
+        """Claude Code's session ID, from wherever this CLI version puts it.
+
+        2.0.x put it in `metadata.user_id` as `..._account_<uuid>__session_<uuid>`. 2.1.x (2.1.139
+        is the one claude-agent-sdk 0.1.81 bundles) sends an `X-Claude-Code-Session-Id` header and
+        makes `user_id` a JSON string with a `session_id` key. Read only the old way, every request
+        under 2.1.x failed building its session, before any model call, and the CLI retried.
+        """
+        if headers is not None:
+            header = headers.get("x-claude-code-session-id")
+            if header:
+                return header
         if not user_id:
             return None
+        if user_id.lstrip().startswith("{"):
+            try:
+                session_id = json.loads(user_id).get("session_id")
+            except (ValueError, AttributeError):
+                session_id = None
+            if session_id:
+                return str(session_id)
         match = re.search(r'__session_([a-f0-9\-]+)', user_id)
         return match.group(1) if match else None
 
@@ -331,21 +382,22 @@ class ClaudeCodeRelaySession(BaseRelaySession):
         tools: Optional[List[Dict[str, Any]]] = None
     ) -> ConversationSession:
         """Convert Anthropic request to ConversationSession"""
-        session = ConversationSession(session_id=self.claude_code_session_id)
+        # Keyed by Claude Code's own session when known; a request is never refused for lacking it.
+        session = (ConversationSession(session_id=self.claude_code_session_id)
+                   if self.claude_code_session_id else ConversationSession())
         cwd = self.cwd
 
         # Handle system message
         system_content = request.get("system")
         if system_content:
             if isinstance(system_content, str):
-                content_blocks = [ContentBlock.text_block(system_content)]
+                texts = [system_content]
             elif isinstance(system_content, list):
-                content_blocks = [
-                    ContentBlock.text_block(block.get("text", ""))
-                    for block in system_content if block.get("type") == "text"
-                ]
+                texts = [block.get("text", "") for block in system_content if block.get("type") == "text"]
             else:
-                content_blocks = []
+                texts = []
+            texts = [t for t in (strip_billing_header(t) for t in texts) if t]
+            content_blocks = [ContentBlock.text_block(t) for t in texts]
 
             if content_blocks:
                 session.add_system_message(content_blocks, cwd)
@@ -391,7 +443,7 @@ class ClaudeCodeRelaySession(BaseRelaySession):
                 blocks = self._convert_content_to_blocks(message)
                 # Restore signatures that Claude SDK lost
                 self._restore_signatures_to_blocks(blocks)
-                session.add_assistant_message(blocks, cwd)
+                self._restore_turn_signature(session.add_assistant_message(blocks, cwd))
 
         return session
 

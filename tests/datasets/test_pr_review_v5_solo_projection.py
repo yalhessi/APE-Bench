@@ -18,7 +18,7 @@ from __future__ import annotations
 import pytest
 
 from src.mathlib_review.review.runner import (
-    SOLO_ARM_ID, _solo_candidate, _solo_coverage_gaps, _solo_responses,
+    SOLO_ARM_ID, _solo_candidate, _solo_coverage_gaps, solo_responses,
 )
 
 

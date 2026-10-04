@@ -1,0 +1,24 @@
+# CONDITION C on the post-cutoff set: the G condition, unchanged, under Claude Code.
+#
+# The model (gpt_5.2, through the scaffold's relay, as in the paper's scaffold comparison), the
+# brief (brief_G.md), the packet, APE's tools, the cutoff gate and the budget are all G's: only
+# the harness differs, and `test_pr_review_v5_solo_conditions` holds the rest equal. Read beside
+# G's runs and Claude's X sessions on the same six PRs, with the same matchers.
+#
+# Claude Code also sends its own housekeeping calls (titles and the like) to `fast_llm_config`,
+# gpt_5_nano by default, through the same relay and the same budget.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml
+
+scaffold_type: claude_code
+
+# Containment. See pr_review_v5_solo_claude_heldout12.yaml for why each knob is here. The grant
+# names which built-in tools exist; `contain_to_workspace` bounds where they reach, refusing any
+# path outside the attempt's workspace and writing containment_audit.json into every attempt.
+# No number from this condition is read from an attempt whose audit is not both `clean` (nothing
+# left the workspace) and `usable` (no granted call refused by the CLI's permission mode).
+permission_mode: dontAsk
+setting_sources: []
+strict_mcp_config: true
+tools: [Read, Grep, Glob, TodoWrite]
+disallowed_tools: [Bash, BashOutput, KillShell, WebFetch, WebSearch, Task, Write, Edit, MultiEdit, NotebookEdit]
+contain_to_workspace: true

@@ -1,0 +1,61 @@
+import json
+F = [
+ {
+  "target": "Complex.dist_le_dist_of_mapsTo_ball_self",
+  "claim": "The docstring of `Complex.dist_le_dist_of_mapsTo_ball_self` no longer describes the statement. It still says `f : ℂ → ℂ` sends an open disk to itself and fixes the centre `c`, and it gives the conclusion `dist (f z) c ≤ dist z c`. After the PR the lemma is for `f : ℂ → E`, has no `f c = c` hypothesis, takes `MapsTo f (ball c R) (closedBall (f c) R)`, and concludes `dist (f z) (f c) ≤ dist z c`.",
+  "requested_change": "Rewrite the docstring to: \"The **Schwarz Lemma**: if `f : ℂ → E` sends an open disk with center `c` and radius `R` to the closed ball with center `f c` and the same radius, then for any point `z` of this disk we have `dist (f z) (f c) ≤ dist z c`.\"",
+  "severity": "blocking",
+  "evidence": "Read target/Mathlib/Analysis/Complex/Schwarz.lean lines 160-165 as the PR leaves them: the docstring (lines 160-161) was not touched in the diff, but the signature (lines 162-164) dropped `hc : f c = c`, moved from the `{f : ℂ → ℂ}` section to `{f : ℂ → E}` (the `variable {f : ℂ → ℂ} ...` line was deleted), and changed the conclusion to `dist (f z) (f c)`. lean_verify_edit with the rewritten docstring (lines 134-165 spliced, together with the other docstring fixes): success, no errors or warnings."
+ },
+ {
+  "target": "Complex.norm_deriv_le_one_of_mapsTo_ball",
+  "claim": "The docstring of `Complex.norm_deriv_le_one_of_mapsTo_ball` is stale. It says `f : ℂ → ℂ` sends an open disk of positive radius to itself and sends the centre to itself. The PR changed the lemma to `f : ℂ → E` with `h_maps : MapsTo f (ball c R) (closedBall (f c) R)` and removed the fixed-point hypothesis `hc : f c = c`.",
+  "requested_change": "Rewrite the docstring to: \"The **Schwarz Lemma**: if `f : ℂ → E` sends an open disk with center `c` and positive radius `R` to the closed ball with center `f c` and the same radius, then the norm of the derivative of `f` at `c` is at most `1`.\"",
+  "severity": "blocking",
+  "evidence": "Read Schwarz.lean lines 153-158 after the PR: the docstring at 153-155 is unchanged from before the PR, while the statement at 156-157 now uses `closedBall (f c) R`, has no `hc`, and `f : ℂ → E` because the `variable {f : ℂ → ℂ}` line was removed. lean_verify_edit with the rewritten docstring: success, no errors or warnings."
+ },
+ {
+  "target": "Complex.norm_deriv_le_div_of_mapsTo_ball",
+  "claim": "The docstring of `Complex.norm_deriv_le_div_of_mapsTo_ball` still says `f` sends the disk \"to an open ball with center `f c` and radius `R₂`\". The PR weakened the hypothesis to `MapsTo f (ball c R₁) (closedBall (f c) R₂)`, so the docstring describes the old, stronger hypothesis. The sibling docstring of `dist_le_div_mul_dist_of_mapsTo_ball` and the module doc were updated to say \"closed ball\"; this one was missed.",
+  "requested_change": "In the docstring of `Complex.norm_deriv_le_div_of_mapsTo_ball`, replace \"to an open ball with center `f c` and radius `R₂`\" with \"to a closed ball with center `f c` and radius `R₂`\".",
+  "severity": "advisory",
+  "evidence": "Schwarz.lean lines 134-139 after the PR: line 135 reads \"`R₁` to an open ball with center `f c` and radius `R₂`\", and line 138 reads `(h_maps : MapsTo f (ball c R₁) (closedBall (f c) R₂))`. The diff changes the matching phrase in the module doc (line 17) and in the `dist_le_div_mul_dist_of_mapsTo_ball` docstring (line 143), but not here. lean_verify_edit with the corrected docstring: success."
+ },
+ {
+  "target": "Complex.norm_le_norm_of_mapsTo_ball_self",
+  "claim": "The PR rewrote the docstring of `Complex.norm_le_norm_of_mapsTo_ball_self` but left out the hypothesis `h₀ : f 0 = 0`. Without it the conclusion `‖f z‖ ≤ ‖z‖` is false: the constant map `f = R / 2` sends `ball 0 R` into `closedBall 0 R`. The new wording (\"to the closed ball with center `0`\") no longer implies that `f` fixes `0`, as the old \"to itself\" at least suggested.",
+  "requested_change": "Mention the fixed point in the docstring: \"The **Schwarz Lemma**: if `f : ℂ → E` satisfies `f 0 = 0` and sends an open disk with center `0` to the closed ball with center `0` of the same radius, then for any point `z` of this disk we have `‖f z‖ ≤ ‖z‖`.\"",
+  "severity": "advisory",
+  "evidence": "Schwarz.lean lines 167-173 after the PR: the docstring (167-169) is new in the diff, and the signature keeps `(h₀ : f 0 = 0)`. lean_verify_edit splicing the docstring with `f 0 = 0` added (lines 167-173): success. Every proposed line is at most 100 characters."
+ },
+ {
+  "target": "module_doc in Schwarz.lean",
+  "claim": "The module-doc bullets the PR rewrote describe statements the PR no longer has. The `abs_deriv_le_one_of_mapsTo_ball` and `dist_le_dist_of_mapsTo_ball_self` bullets say \"`f : ℂ → ℂ` sends a point `c` to itself\". But the lemmas are now for `f : ℂ → E`, have no `f c = c` hypothesis, and map to `closedBall (f c) R`. The `dist_le_dist_of_mapsTo_ball_self` bullet still gives the old conclusion `dist (f z) c ≤ dist z c`. The `norm_le_norm_of_mapsTo_ball_self` bullet still says `f : ℂ → ℂ` sends the disk \"to itself\" and uses `abs (f z) ≤ abs z`. The PR's new declaration docstring says `f : ℂ → E`, closed ball and `‖f z‖ ≤ ‖z‖`.",
+  "requested_change": "Rewrite the last three bullets of the module doc. (1) \"if `f : ℂ → E` maps an open disk with center `c` and positive radius `R` to the closed ball with center `f c` and the same radius, then the norm of the derivative of `f` at `c` is at most `1`\". (2) \"... then for any point `z` of this disk we have `dist (f z) (f c) ≤ dist z c`\". (3) For `norm_le_norm_of_mapsTo_ball_self`: \"if `f : ℂ → E` satisfies `f 0 = 0` and maps an open disk with center `0` to the closed ball with center `0` and the same radius, then ... `‖f z‖ ≤ ‖z‖`\".",
+  "severity": "blocking",
+  "evidence": "Module doc lines 25-34 after the PR, compared with the statements at lines 156-173. The diff adds lines 25-31 with the \"sends a point `c` to itself\" wording and `dist (f z) c`. lean_verify_edit splicing lines 16-34 with the corrected bullets: success, no warnings."
+ },
+ {
+  "target": "module_doc in Schwarz.lean",
+  "claim": "The module doc names `Complex.abs_deriv_le_div_of_mapsTo_ball` and `Complex.abs_deriv_le_one_of_mapsTo_ball`. Neither declaration exists; the lemma is `Complex.norm_deriv_le_one_of_mapsTo_ball`. The PR rewrote both of these bullets but kept the dead names.",
+  "requested_change": "In the first bullet, drop `, Complex.abs_deriv_le_div_of_mapsTo_ball`. In the third bullet, replace `Complex.abs_deriv_le_one_of_mapsTo_ball` with `Complex.norm_deriv_le_one_of_mapsTo_ball`.",
+  "severity": "advisory",
+  "evidence": "declaration_search `Complex.abs_deriv_le_one_of_mapsTo_ball` and `Complex.abs_deriv_le_div_of_mapsTo_ball`: 0 declarations at the base commit and 0 in this PR. The file declares `norm_deriv_le_one_of_mapsTo_ball` at line 156. The diff edits lines 17 and 25-27, which carry these names. lean_verify_edit with the renamed bullets (lines 16-34): success."
+ },
+ {
+  "target": "Mathlib/Analysis/Complex/Schwarz.lean",
+  "claim": "The PR adds `ComplexConjugate` to `open scoped Topology ComplexConjugate`, but nothing in the file uses the `conj` notation, so the new scoped open is unused.",
+  "requested_change": "Revert line 52 to `open scoped Topology`.",
+  "severity": "advisory",
+  "evidence": "content_search for `conj` in target/Mathlib/Analysis/Complex/Schwarz.lean: 0 matches. lean_verify_edit replacing line 52 with `open scoped Topology`: success, no errors or warnings."
+ },
+ {
+  "target": "Complex.schwarz_aux",
+  "claim": "To make `schwarz_aux` private, the PR moves `@[expose] public section` and `namespace Complex` below it and writes the lemma as `private theorem Complex.schwarz_aux` before the public section, at the top level. This reorders the file header and puts `open`/`variable` before `public section` and outside the namespace, for no functional reason. A `private` declaration can live inside the public section and the namespace.",
+  "requested_change": "Keep `@[expose] public section`, the `open` lines, `namespace Complex` and the `variable` line in their original order at the top of the file. Declare the helper inside the namespace as `private theorem schwarz_aux ...`, and drop the separate `@[expose] public section` / `namespace Complex` block now at lines 83-85.",
+  "severity": "advisory",
+  "evidence": "Diff hunks at lines 51-58 and 84-86 show the move. lean_verify_edit replacing lines 50-86 with `@[expose] public section`, the `open` lines, `namespace Complex`, the `variable` line and then `private theorem schwarz_aux` (body unchanged): success, no errors or warnings. `norm_dslope_le_div_of_mapsTo_ball` still resolves `schwarz_aux`. content_search for `schwarz_aux` over target/: no uses outside this file, only `cauchy_schwarz_aux`, which is unrelated."
+ }
+]
+json.dump(F, open('findings.json','w'), ensure_ascii=False, indent=1)
+print(len(F))

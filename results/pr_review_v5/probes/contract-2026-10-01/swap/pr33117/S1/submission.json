@@ -1,0 +1,82 @@
+{
+ "notes": "Review of PR #33117 (adds `Meromorphic f := ∀ x, MeromorphicAt f x` plus basic API at the end of Mathlib/Analysis/Meromorphic/Basic.lean). The file as the PR leaves it compiles with no warnings. Context checked: the Zulip thread (Gouëzel asked for the bridge lemma to be called `meromorphicOn_univ`, be `@[simp]` and have sides MeromorphicOn ↔ Meromorphic, and for the main lemmas such as `add` and friends to come from the start; Loreaux suggested migrating `MeromorphicOn f univ` uses in a later PR, so I don't ask for that migration here). Siblings used for comparison: `Differentiable` (defined without `: Prop` like this one, so I don't ask for that), `differentiableOn_univ`, `continuousOn_univ`, and the `@[fun_prop]` transition lemmas `Differentiable.differentiableAt` / `Differentiable.differentiableOn`, as well as the in-file `MeromorphicAt.*` and `MeromorphicOn.*` APIs.\n\n- `Meromorphic` (def): the definition matches the `Differentiable`/`AnalyticOnNhd` pattern and the Zulip plan. It has a docstring, and the name follows convention. `@[fun_prop]` is right, and the placement after `MeromorphicOn` is fine. The gap: no `id` or `const` rule exists, so `fun_prop` can't prove anything built from the variable or from constants. I checked this: `example : Meromorphic (fun x : 𝕜 ↦ x * x) := by fun_prop` fails with \"missing identity rule\". Finding 1.\n- `meromorphicOn_univ`: the name, the `@[simp]` attribute and the direction all match what was asked on Zulip and match `continuousOn_univ`/`differentiableOn_univ`. Problems: the proof `by tauto` is a heavy tactic for a one-line unfolding, there is a double space before `:=`, and `Set.univ` in the docstring is not in backticks. The term proof `⟨fun h x ↦ h x trivial, fun h x _ ↦ h x⟩` compiles. Also, only the `univ` iff is offered: there's no `Meromorphic.meromorphicAt` (fun_prop transition) and no `Meromorphic.meromorphicOn` (any U), unlike `Differentiable.differentiableAt`/`differentiableOn`. Both compile, and with the first one, fun_prop proves `MeromorphicAt (fun z ↦ f z + f z) x` from `hf : Meromorphic f`. Findings 2, 3 and 4.\n- `Meromorphic.neg` / `fun_neg`: the proofs are minimal and the statements match `MeromorphicAt.neg` / `MeromorphicOn.neg`. Nothing equivalent exists in the library before the PR, and the names follow the `fun_` convention. `fun_neg` has a stray space in `-f x )`. Finding 5 (style).\n- `Meromorphic.add` / `fun_add`, `sub` / `fun_sub`: the term proofs are already as short as they get, and the generality matches the `MeromorphicAt` siblings. Names and attributes are fine. Nothing to ask.\n- `Meromorphic.sum` / `prod`: the term proofs via `MeromorphicAt.sum` / `MeromorphicAt.prod` are fine. A `∀ σ ∈ s` hypothesis would be stronger, but the in-file `MeromorphicAt` / `MeromorphicOn` versions use `∀ σ`, so I don't ask for it here. The `F` / `G` variable split copies the existing `MeromorphicAt` block. Nothing to ask.\n- `Meromorphic.fun_sum` / `fun_prod`: these are proved by `simpa [← Finset.sum_apply] using (sum h)` (resp. `prod_apply`). Every other lemma in the block, and `MeromorphicOn.fun_sum` / `fun_prod`, is proved pointwise from the `MeromorphicAt.fun_*` lemma. The term proofs `fun x ↦ MeromorphicAt.fun_sum (h · x)` and `fun x ↦ MeromorphicAt.fun_prod (h · x)` compile. Findings 6 and 7.\n- `Meromorphic.mul` / `fun_mul`, `div` / `fun_div`: these are stated for `𝕜 → 𝕜`, like their `MeromorphicAt` siblings, and the proofs are minimal. Missing companions: `smul` / `fun_smul` (`MeromorphicAt.mul` is itself derived from `smul`, and `MeromorphicOn` has both), and `inv` / `fun_inv`. I checked that `fun_prop` fails on `Meromorphic (fun x : 𝕜 ↦ x⁻¹)` (\"No theorems found for `Inv.inv`\"). The added lemmas compile, and with them fun_prop proves `Meromorphic (fun x ↦ (x - 2)⁻¹ * x ^ 3)`. Findings 8 and 9.\n- `Meromorphic.pow` / `fun_pow` / `zpow` / `fun_zpow`: the proofs are fine. However, the exponent is an implicit `{n}`, while `MeromorphicAt.pow`/`zpow` and `MeromorphicOn.pow`/`zpow` take an explicit `(n)`. So `hf.pow n` works for the At/On versions but not for `Meromorphic`. The explicit-argument version compiles, and fun_prop still closes `f x ^ 3 * f x ^ (-2 : ℤ)`. Finding 10 (one decision for the family).\n- `Meromorphic.deriv` / `fun_deriv` / `iterated_deriv` / `fun_iterated_deriv`: the proofs are minimal and `CompleteSpace E` matches the At-level lemmas. The `iterated_deriv` names copy the existing `MeromorphicAt.iterated_deriv`, so I don't ask for a rename. The problem: `Meromorphic.deriv` is not `protected`, unlike `MeromorphicAt.deriv` and `MeromorphicOn.deriv`. It therefore shadows `_root_.deriv` inside `namespace Meromorphic`, and the three later lemmas must write `_root_.deriv`. Making it protected compiles, and the `_root_.` prefixes can then be dropped (also compiles). Finding 11.\n- `namespace Meromorphic` / `end Meromorphic`, the `variable` block, `end MeromorphicOn`, and the two docstring commands: these are structural. The module docstring's 'Main statements' doesn't list `MeromorphicOn` either, so I don't ask for an entry there. Nothing beyond the items above.",
+ "findings": [
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 637,
+   "severity": "advisory",
+   "claim": "`Meromorphic` is tagged `@[fun_prop]`, but the PR adds no identity or constant rule for it, so `fun_prop` cannot prove meromorphy of anything built from the variable or from constants. For example, `example : Meromorphic (fun x : 𝕜 ↦ x * x) := by fun_prop` fails with 'missing identity rule to prove `Meromorphic fun x => x`'.",
+   "suggested_fix": "Add `@[fun_prop] protected lemma Meromorphic.id : Meromorphic (id : 𝕜 → 𝕜) := MeromorphicAt.id` and `@[fun_prop] lemma Meromorphic.const (e : E) : Meromorphic (fun _ : 𝕜 ↦ e) := fun x ↦ .const e x`, mirroring `MeromorphicAt.id`/`const` and `MeromorphicOn.id`/`const`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 641,
+   "severity": "advisory",
+   "claim": "`meromorphicOn_univ` is proved by `by tauto`, which is a heavy tactic for what is only unfolding the definitions. The statement line also has a double space before `:=`.",
+   "suggested_fix": "Replace the proof with the term `⟨fun h x ↦ h x trivial, fun h x _ ↦ h x⟩`, or with `by simp [MeromorphicOn, Meromorphic]`, and write a single space before `:=`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 641,
+   "severity": "advisory",
+   "claim": "The docstring of `meromorphicOn_univ` writes the Lean name `Set.univ` without code formatting.",
+   "suggested_fix": "Write the docstring as `/-- A function is meromorphic iff it is meromorphic on `Set.univ`. -/`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 641,
+   "severity": "advisory",
+   "claim": "The only bridge from `Meromorphic` to the pointwise and set-level predicates is the `univ` iff `meromorphicOn_univ`. There is no `Meromorphic.meromorphicAt` or `Meromorphic.meromorphicOn`, unlike `Differentiable.differentiableAt` / `Differentiable.differentiableOn`. So `fun_prop` cannot use a `Meromorphic f` hypothesis to close `MeromorphicAt` goals, and getting `MeromorphicOn f U` takes a detour through `univ` and `mono_set`.",
+   "suggested_fix": "Add `@[fun_prop] lemma Meromorphic.meromorphicAt (hf : Meromorphic f) {x : 𝕜} : MeromorphicAt f x := hf x` and `lemma Meromorphic.meromorphicOn (hf : Meromorphic f) {U : Set 𝕜} : MeromorphicOn f U := fun x _ ↦ hf x`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 653,
+   "severity": "advisory",
+   "claim": "The statement of `Meromorphic.fun_neg` has a stray space before the closing parenthesis: `(fun x ↦ -f x )`.",
+   "suggested_fix": "Write `Meromorphic (fun x ↦ -f x)`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 668,
+   "severity": "advisory",
+   "claim": "`Meromorphic.fun_sum` is proved by `simpa [← Finset.sum_apply] using (sum h)`. Every other lemma in the block, and `MeromorphicOn.fun_sum`, is proved pointwise from the existing `MeromorphicAt` lemma.",
+   "suggested_fix": "Replace the proof with `fun x ↦ MeromorphicAt.fun_sum (h · x)`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 693,
+   "severity": "advisory",
+   "claim": "`Meromorphic.fun_prod` is proved by `simpa [← Finset.prod_apply] using (prod h)` instead of pointwise from `MeromorphicAt.fun_prod`, as the rest of the block and `MeromorphicOn.fun_prod` are.",
+   "suggested_fix": "Replace the proof with `fun x ↦ MeromorphicAt.fun_prod (h · x)`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 681,
+   "severity": "advisory",
+   "claim": "The block has `Meromorphic.mul` / `fun_mul` but not the more general `smul` / `fun_smul`. `MeromorphicAt` and `MeromorphicOn` both provide `smul`, and `MeromorphicAt.mul` is itself derived from `smul`. So `fun_prop` cannot handle `fun x ↦ f x • g x` for `Meromorphic`.",
+   "suggested_fix": "Add `@[fun_prop] lemma smul {f : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (f • g) := fun x ↦ (hf x).smul (hg x)` and `@[fun_prop] lemma fun_smul {f : 𝕜 → 𝕜} (hf : Meromorphic f) (hg : Meromorphic g) : Meromorphic (fun x ↦ f x • g x) := hf.smul hg`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 698,
+   "severity": "advisory",
+   "claim": "`Meromorphic.div` and `zpow` are added, but the PR has no `Meromorphic.inv` / `fun_inv`, so `fun_prop` cannot prove `Meromorphic (fun x : 𝕜 ↦ x⁻¹)`: it reports 'No theorems found for `Inv.inv`'. Both `MeromorphicAt` and `MeromorphicOn` have `inv` / `fun_inv`.",
+   "suggested_fix": "Add `@[fun_prop] lemma inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic f⁻¹ := fun x ↦ (hf x).inv` and `@[fun_prop] lemma fun_inv {f : 𝕜 → 𝕜} (hf : Meromorphic f) : Meromorphic (fun x ↦ (f x)⁻¹) := hf.inv`."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 706,
+   "severity": "advisory",
+   "claim": "`Meromorphic.pow` (and likewise `fun_pow`, `zpow`, `fun_zpow`) takes its exponent as an implicit `{n}`. The sibling lemmas `MeromorphicAt.pow`/`zpow` and `MeromorphicOn.pow`/`zpow` take an explicit `(n)`, so dot notation `hf.pow n` works at the At/On level but not for `Meromorphic`.",
+   "suggested_fix": "Make the exponent explicit and place it after `hf`, as the siblings do: `lemma pow {f : 𝕜 → 𝕜} (hf : Meromorphic f) (n : ℕ) : Meromorphic (f ^ n) := fun x ↦ (hf x).pow n`. Make the same change to `fun_pow`, `zpow` and `fun_zpow` (proofs `hf.pow n` / `hf.zpow n`)."
+  },
+  {
+   "path": "Mathlib/Analysis/Meromorphic/Basic.lean",
+   "line_start": 718,
+   "severity": "advisory",
+   "claim": "`Meromorphic.deriv` is not `protected`, unlike `MeromorphicAt.deriv` and `MeromorphicOn.deriv`. It therefore shadows `_root_.deriv` inside `namespace Meromorphic` (and wherever the namespace is opened), which is why `fun_deriv`, `iterated_deriv` and `fun_iterated_deriv` have to write `_root_.deriv`.",
+   "suggested_fix": "Declare it `protected lemma deriv [CompleteSpace E] (hf : Meromorphic f) : Meromorphic (deriv f) := fun x ↦ (hf x).deriv`, and then drop the `_root_.` prefixes in the three following lemmas (this compiles)."
+  }
+ ]
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "target": "Ordinal.mem_range_deriv",
+    "claim": "The PR renames `Ordinal.IsNormal.mem_range_deriv` to `Ordinal.mem_range_deriv` but deletes the old name outright: the hunk that removed `theorem IsNormal.mem_range_deriv` put `alias IsNormal.fp_iff_deriv := fp_iff_deriv` in its place, and no `IsNormal.mem_range_deriv` alias exists anywhere. Every sibling that was renamed (`IsNormal.deriv_fp`, `IsNormal.le_iff_deriv`, `IsNormal.nfp_fp`, `IsNormal.apply_lt_nfp`, ...) got a deprecated alias. This one did not, so downstream code breaks with no deprecation warning.",
+    "requested_change": "Directly after `theorem mem_range_deriv` in Mathlib/SetTheory/Ordinal/FixedPoint.lean, add `@[deprecated (since := \"2025-12-25\")] alias IsNormal.mem_range_deriv := mem_range_deriv`.",
+    "severity": "blocking",
+    "evidence": "diff.patch FixedPoint hunk: `-theorem IsNormal.mem_range_deriv (H : IsNormal f) {a} : a ∈ Set.range (deriv f) ↔ f a = a := H.fp_iff_deriv.symm` is replaced by `+@[deprecated mem_range_deriv (since := \"2025-10-25\")] alias IsNormal.fp_iff_deriv := fp_iff_deriv`. content_search for `IsNormal\\.mem_range_deriv` over target/Mathlib: 0 matches. lean_verify_edit with `example ... := Ordinal.IsNormal.mem_range_deriv H` appended to the file as the PR leaves it gives the error `Unknown constant Ordinal.IsNormal.mem_range_deriv`. With the alias added, the same example compiles and gives only the expected deprecation warning (`Use Ordinal.mem_range_deriv instead`)."
+  },
+  {
+    "target": "Ordinal.fp_iff_deriv",
+    "claim": "`Ordinal.fp_iff_deriv` is a new root-level declaration. Before the PR only `Ordinal.IsNormal.fp_iff_deriv` existed. The new declaration is marked `@[deprecated mem_range_deriv]` as it is introduced, so the PR adds a name nobody ever used only to deprecate it, and `IsNormal.fp_iff_deriv` becomes a deprecated alias of a deprecated theorem.",
+    "requested_change": "Delete `theorem fp_iff_deriv` and `alias IsNormal.fp_iff_deriv := fp_iff_deriv`. State the old name directly as a deprecated theorem: `@[deprecated mem_range_deriv (since := \"2025-12-25\")] theorem IsNormal.fp_iff_deriv (H : IsNormal f) {a} : f a = a ↔ ∃ o, deriv f o = a := (mem_range_deriv H).symm`.",
+    "severity": "advisory",
+    "evidence": "diff.patch shows `-theorem IsNormal.fp_iff_deriv` and `+theorem fp_iff_deriv` with the deprecated attribute. content_search `fp_iff_deriv\\b` over target/Mathlib finds only the two new lines (FixedPoint.lean 379 and 383), so nothing uses the root name. lean_verify_edit replacing lines 364-383 of FixedPoint.lean with the block above, the `IsNormal.mem_range_deriv` alias, and dates set to 2025-12-25: success, no errors."
+  },
+  {
+    "target": "Mathlib/SetTheory/Ordinal/FixedPoint.lean",
+    "claim": "Four of the deprecations this PR adds are dated `since := \"2025-10-25\"`: `IsNormal.deriv_fp`, `IsNormal.le_iff_deriv`, `fp_iff_deriv` and `IsNormal.fp_iff_deriv`. Every other deprecation in the PR uses \"2025-12-25\", which is when this code is under review. The October date looks copied from the unrelated `deriv_id_of_nfp_id` alias just above, and it would make these aliases eligible for deletion two months early.",
+    "requested_change": "Change `since := \"2025-10-25\"` to `since := \"2025-12-25\"` on the four deprecations this PR introduces (FixedPoint.lean lines 364, 372, 378 and 382 as the PR leaves the file). Leave the pre-existing `deriv_id_of_nfp_id` alias as it is.",
+    "severity": "advisory",
+    "evidence": "content_search `2025-10-25` over target/Mathlib/SetTheory: lines 358 (pre-existing `deriv_id_of_nfp_id`), 364, 372, 378 and 382 of FixedPoint.lean. The last four are `+` lines in diff.patch. All other new deprecations in the diff (Arithmetic, Family, Cofinality, Exponential, Veblen, FixedPoint nfp aliases) use 2025-12-25. zulip_search as_of = 2025-12-26 is consistent with a December review."
+  },
+  {
+    "target": "Ordinal.IsNormal.monotone",
+    "claim": "The deprecated `Ordinal.IsNormal.monotone` points users to `Order.IsNormal.strictMono`, the same target as `IsNormal.strictMono`. This PR adds the exact replacement, `Order.IsNormal.monotone` in Mathlib/Order/IsNormal.lean, so the deprecation message sends users to a lemma with a different conclusion.",
+    "requested_change": "Change the attribute to `@[deprecated Order.IsNormal.monotone (since := \"2025-12-25\")]`. Optionally, prove it as `Order.IsNormal.monotone H`.",
+    "severity": "advisory",
+    "evidence": "diff.patch adds `protected theorem monotone {f : α → β} (hf : IsNormal f) : Monotone f` in namespace `Order.IsNormal` (Order/IsNormal.lean). Arithmetic.lean line 375 as the PR leaves it has `@[deprecated Order.IsNormal.strictMono ...] theorem IsNormal.monotone`. lean_verify_edit (declaration_name Ordinal.IsNormal.monotone, with the new attribute and body `Order.IsNormal.monotone H`): success, no errors or warnings."
+  },
+  {
+    "target": "Ordinal.IsNormal.nfp_fp",
+    "claim": "The new deprecated aliases in the `Ordinal.IsNormal` namespace (`IsNormal.nfp_fp`, `IsNormal.apply_lt_nfp`, `IsNormal.nfp_le_apply`, `IsNormal.apply_le_nfp`, `IsNormal.deriv_fp`, `IsNormal.le_iff_deriv`, `IsNormal.fp_iff_deriv`, `IsNormal.cof_eq`, `IsNormal.cof_le`, `IsNormal.isFundamentalSequence`, `IsNormal.apply_omega0`, `IsNormal.veblenWith`, `IsNormal.veblenWith_zero`, and the retargeted `IsNormal.apply_of_isLimit`) take an `Order.IsNormal` hypothesis. That makes them unreachable through dot notation, which was how every old call site in this diff used them (`(isNormal_mul_right ha).nfp_fp _`, `isNormal_veblen_zero.deriv_fp o`, `hf.veblenWith o`, ...). A value of type `Order.IsNormal` looks for `Order.IsNormal.nfp_fp`, which does not exist. An `Ordinal.IsNormal` hypothesis finds the alias but is rejected. So such downstream code gets a hard error rather than a deprecation warning.",
+    "requested_change": "Declare these deprecated aliases in the namespace of the new type, e.g. `@[deprecated (since := \"2025-12-25\")] alias _root_.Order.IsNormal.nfp_fp := nfp_fp`, and likewise for the other aliases listed. Old dot-notation calls then resolve, both on `Order.IsNormal` values and on hypotheses of the deprecated `Ordinal.IsNormal`, and they warn instead of failing.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on FixedPoint.lean, PR as-is plus `example (a b : Ordinal) : ... := (isNormal_add_right a).nfp_fp b`: error `The environment does not contain Order.IsNormal.nfp_fp`. With `(H : Ordinal.IsNormal f)`, `H.nfp_fp a` gives the error `Function IsNormal.nfp_fp does not have a usable parameter of type Ordinal.IsNormal ...`. With the alias changed to `alias _root_.Order.IsNormal.nfp_fp := nfp_fp`, all three calls compile: `(isNormal_add_right a).nfp_fp b`, `H.nfp_fp a` with `H : Ordinal.IsNormal f`, and `IsNormal.nfp_fp H a` inside `namespace Ordinal`. The first and third warn `Order.IsNormal.nfp_fp has been deprecated: Use Ordinal.nfp_fp instead`. Precedent #27163 uses the same `alias _root_.<NewNamespace>.x` deprecation pattern."
+  },
+  {
+    "target": "Ordinal.IsNormal.map_sSup",
+    "claim": "Every other deprecated lemma in this block (`map_iSup_of_bddAbove`, `map_iSup`, `map_sSup_of_bddAbove`, `apply_of_isSuccLimit`) was restated with `(H : Ordinal.IsNormal f)` so old `H.map_*` calls keep resolving. `IsNormal.map_sSup` still has `(H : IsNormal f)`, which now means `Order.IsNormal f`, so `H.map_sSup hn` on an `Ordinal.IsNormal` hypothesis fails instead of warning.",
+    "requested_change": "Change the binder of the deprecated `IsNormal.map_sSup` in Family.lean to `(H : Ordinal.IsNormal f)`, matching its siblings.",
+    "severity": "advisory",
+    "evidence": "Family.lean lines 243/250/257/269 use `Ordinal.IsNormal f` and line 263 uses `IsNormal f`. lean_verify_edit with `example (H : Ordinal.IsNormal f) ... := H.map_sSup hn` after the declaration as-is gives the error `Function IsNormal.map_sSup does not have a usable parameter of type Ordinal.IsNormal ...`. With the binder changed to `Ordinal.IsNormal f`, the same example compiles (success, no errors)."
+  },
+  {
+    "target": "Ordinal.IsNormal.eq_iff_zero_and_succ",
+    "claim": "`IsNormal.eq_iff_zero_and_succ` is newly deprecated, but its hypotheses are `(hf : IsNormal f) (hg : IsNormal g)`, i.e. `Order.IsNormal`, unlike the Arithmetic.lean deprecations, which take `Ordinal.IsNormal`. The old spelling `hf.eq_iff_zero_and_succ hg`, used before this PR in `deriv_eq_id_of_nfp_eq_id`, therefore errors on an `Ordinal.IsNormal` hypothesis instead of warning.",
+    "requested_change": "Restate the deprecated lemma with `(hf : Ordinal.IsNormal f) (hg : Ordinal.IsNormal g)`, preceded by `set_option linter.deprecated false in` as for its siblings.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Family.lean lines 812-815 as-is, plus `example (hf : Ordinal.IsNormal f) (hg : Ordinal.IsNormal g) : ... := hf.eq_iff_zero_and_succ hg`: error `Function IsNormal.eq_iff_zero_and_succ does not have a usable parameter of type Ordinal.IsNormal ...`. With `Ordinal.IsNormal` binders and `set_option linter.deprecated false in`, the declaration and the example compile (success)."
+  },
+  {
+    "target": "Ordinal.IsNormal.trans",
+    "claim": "The deprecated `IsNormal.trans` takes `Ordinal.IsNormal` hypotheses but concludes `IsNormal (f ∘ g)`, which is now `Order.IsNormal`. `IsNormal.refl` concludes `Ordinal.IsNormal id`. So an old chain such as `(H₁.trans H₂).limit_le l` or `(H₁.trans H₂).le_apply`, the pattern this PR had to rewrite in `opow_add`, `opow_mul` and `add_omega0_opow`, now fails on `Order.IsNormal.le_apply` instead of hitting the deprecated `Ordinal.IsNormal.*` lemmas.",
+    "requested_change": "Change the conclusion of the deprecated `IsNormal.trans` to `Ordinal.IsNormal (f ∘ g)`, as `IsNormal.refl` does.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Arithmetic.lean lines 435-439 as-is, plus `example (H₁ : Ordinal.IsNormal f) (H₂ : Ordinal.IsNormal g) {a} : a ≤ f (g a) := (H₁.trans H₂).le_apply`: error `The environment does not contain Order.IsNormal.le_apply`. With the conclusion changed to `Ordinal.IsNormal (f ∘ g)`: success, no errors."
+  },
+  {
+    "target": "Ordinal.iSup_pow_natCast",
+    "claim": "The rename `iSup_pow` → `iSup_pow_natCast` is inaccurate. The statement `⨆ n : ℕ, o ^ n = o ^ ω` uses the monoid power `o ^ (n : ℕ)` and contains no `Nat.cast`; the proof's first step, `simp_rw [← opow_natCast]`, is what introduces the cast. By the naming convention the `natCast` suffix would describe `⨆ n : ℕ, o ^ (n : Ordinal)`. (`iSup_add_natCast` and `iSup_mul_natCast` do contain the cast, so those renames are fine.) Also, `iSup_pow` does not clash: the other `iSup_pow` lemmas are `NNReal.`/`ENNReal.`/`Real.`-namespaced.",
+    "requested_change": "Keep the name `Ordinal.iSup_pow` and drop the rename and its deprecated alias. If a rename is wanted, pick one without `natCast`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Exponential.lean: `example (ho : 0 < o) : ⨆ n : ℕ, (o ^ n : Ordinal) = o ^ ω := iSup_pow_natCast ho` and the `Monoid.npow n o` form both compile. `⨆ n : ℕ, o ^ (n : Ordinal) = o ^ ω := iSup_pow_natCast ho` fails with a type mismatch: `HPow.hPow.{u+1, 0, u+1} o n` vs `HPow.hPow.{u+1, u+1, u+1} o ↑n`. declaration_search/content_search: the other `iSup_pow` declarations are in Topology/Instances/NNReal/Lemmas.lean inside the NNReal/ENNReal/Real namespaces."
+  },
+  {
+    "target": "Ordinal.opow_add",
+    "claim": "In the rewritten zero case of `opow_add`, `have : b + c ≠ 0 := (hc.trans_le le_add_self).ne'` is dead code. The next line rewrites with a bare `zero_opow`, and the resulting side goal is closed by repeating the same term, `exact (hc.trans_le le_add_self).ne'`. Also, `opow_pos b (pos_iff_ne_zero.2 ha.ne')` round-trips `ha : 0 < a` through `≠ 0` to get back `0 < a`.",
+    "requested_change": "Replace the three lines `have : b + c ≠ 0 := ...`, `rw [zero_opow hc.ne', zero_opow, mul_zero]` and `exact (hc.trans_le le_add_self).ne'` with the single line `rw [zero_opow hc.ne', zero_opow (hc.trans_le le_add_self).ne', mul_zero]`, and write `opow_pos b ha` in the limit case.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (declaration_name Ordinal.opow_add) with both changes: success, no errors or warnings."
+  },
+  {
+    "target": "Mathlib/SetTheory/Ordinal/Arithmetic.lean",
+    "claim": "The rewritten module docstring drops the `pred o` bullet from \"Main definitions and results\". `Ordinal.pred` is still defined in this file (`def pred`, line 290, with its API `pred_succ`, `pred_le_iff_le_succ`, `pred_succ_gi`, ...) and is not deprecated, so the file's docs no longer mention one of its main definitions. This change is unrelated to `IsNormal`.",
+    "requested_change": "Restore the bullet in the \"Main definitions and results\" list, fixing its typo: \"* `pred o` is the predecessor of `o`. If `o` is not a successor, we set `pred o = o`.\"",
+    "severity": "advisory",
+    "evidence": "diff.patch Arithmetic.lean header hunk: `-* `pred o` if the predecessor of `o`. If `o` is not a successor, we set `pred o = o`.` with no replacement. content_search in Arithmetic.lean as the PR leaves it: line 290 `def pred (o : Ordinal) : Ordinal :=` with docstring, no deprecated attribute, plus the pred lemmas at lines 294-348."
+  },
+  {
+    "target": "Ordinal.IsNormal.blsub_eq",
+    "claim": "`IsNormal.bsup`, `IsNormal.bsup_eq` and `IsNormal.blsub_eq` stay in the `Ordinal.IsNormal` namespace, but after this PR their hypothesis is `Order.IsNormal`. Dot notation can no longer reach them, and the PR's own new code has to call `IsNormal.blsub_eq.{u, u} hf ha` explicitly in `isFundamentalSequence_of_isNormal`. The PR renamed the analogous `IsNormal.cof_eq`, `IsNormal.apply_omega0` and `IsNormal.nfp_fp` for exactly this reason, so these three are left inconsistent in a namespace that no longer matches their hypothesis type.",
+    "requested_change": "Rename them following the PR's own convention (e.g. `bsup_of_isNormal`, `bsup_eq_of_isNormal`, `blsub_eq_of_isNormal`), add deprecated aliases for the old names, and update the call sites in Family.lean and Cofinality.lean.",
+    "severity": "advisory",
+    "evidence": "content_search `theorem IsNormal\\.` over target/Mathlib/SetTheory: the non-deprecated remainder is Family.lean 379 (`IsNormal.bsup`), 787 (`IsNormal.bsup_eq`) and 791 (`IsNormal.blsub_eq`), all with `(H : IsNormal f)` = Order.IsNormal. lean_verify_edit with `example ... (H : IsNormal f) ... := H.blsub_eq h`: error `The environment does not contain Order.IsNormal.blsub_eq`."
+  }
+]

@@ -1,0 +1,153 @@
+diff --git a/Mathlib/Data/Array/Defs.lean b/Mathlib/Data/Array/Defs.lean
+--- a/Mathlib/Data/Array/Defs.lean
++++ b/Mathlib/Data/Array/Defs.lean
+@@ -7,10 +7,10 @@ module
+ 
+ public import Mathlib.Init
+ /-!
+-## Definitions on Arrays
++# Definitions on Arrays
+ 
+ This file contains various definitions on `Array`. It does not contain
+-proofs about these definitions, those are contained in other files in `Mathlib/Data/Array.lean`.
++proofs about these definitions.
+ -/
+ 
+ @[expose] public section
+diff --git a/Mathlib/Data/Complex/Basic.lean b/Mathlib/Data/Complex/Basic.lean
+--- a/Mathlib/Data/Complex/Basic.lean
++++ b/Mathlib/Data/Complex/Basic.lean
+@@ -291,7 +291,7 @@ namespace SMul
+ -- instance made scoped to avoid situations like instance synthesis
+ -- of `SMul ℂ ℂ` trying to proceed via `SMul ℂ ℝ`.
+ /-- Scalar multiplication by `R` on `ℝ` extends to `ℂ`. This is used here and in
+-`Mathlib/Data/Complex/Module.lean` to transfer instances from `ℝ` to `ℂ`, but is not
++`Mathlib/LinearAlgebra/Complex/Module.lean` to transfer instances from `ℝ` to `ℂ`, but is not
+ needed outside, so we make it scoped. -/
+ scoped instance instSMulRealComplex {R : Type*} [SMul R ℝ] : SMul R ℂ where
+   smul r x := ⟨r • x.re - 0 * x.im, r • x.im + 0 * x.re⟩
+diff --git a/Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean b/Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean
+--- a/Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean
++++ b/Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean
+@@ -37,8 +37,8 @@ While we could implement this by filtering `(Fintype.PiFinset fun _ ↦ range (n
+ this implementation would be much slower.
+ 
+ In the future, we could consider generalizing `Finset.Nat.antidiagonalTuple` further to
+-support finitely-supported functions, as is done with `cut` in
+-`archive/100-theorems-list/45_partition.lean`.
++support finitely-supported functions, as in `Finset.finsuppAntidiag` from
++`Mathlib/Algebra/Order/Antidiag/Finsupp.lean`.
+ -/
+ 
+ @[expose] public section
+diff --git a/Mathlib/Data/Finset/Defs.lean b/Mathlib/Data/Finset/Defs.lean
+--- a/Mathlib/Data/Finset/Defs.lean
++++ b/Mathlib/Data/Finset/Defs.lean
+@@ -31,7 +31,7 @@ Finsets give a basic foundation for defining finite sums and products over types
+   2. `∏ i ∈ (s : Finset α), f i`.
+ 
+ Lean refers to these operations as big operators.
+-More information can be found in `Mathlib/Algebra/BigOperators/Group/Finset.lean`.
++More information can be found in `Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean`.
+ 
+ Finsets are directly used to define fintypes in Lean.
+ A `Fintype α` instance for a type `α` consists of a universal `Finset α` containing every term of
+diff --git a/Mathlib/Data/Finsupp/MonomialOrder.lean b/Mathlib/Data/Finsupp/MonomialOrder.lean
+--- a/Mathlib/Data/Finsupp/MonomialOrder.lean
++++ b/Mathlib/Data/Finsupp/MonomialOrder.lean
+@@ -34,7 +34,7 @@ It is activated using `open scoped MonomialOrder`.
+ 
+ Commutative algebra defines many monomial orders, with different usefulness ranges.
+ In this file, we provide the basic example of lexicographic ordering.
+-For the graded lexicographic ordering, see `Mathlib/Data/Finsupp/DegLex.lean`
++For the graded lexicographic ordering, see `Mathlib/Data/Finsupp/MonomialOrder/DegLex.lean`
+ 
+ * `MonomialOrder.lex` : the lexicographic ordering on `σ →₀ ℕ`.
+ For this, `σ` needs to be embedded with an ordering relation which satisfies `WellFoundedGT σ`.
+diff --git a/Mathlib/Data/List/Lex.lean b/Mathlib/Data/List/Lex.lean
+--- a/Mathlib/Data/List/Lex.lean
++++ b/Mathlib/Data/List/Lex.lean
+@@ -20,9 +20,9 @@ The lexicographic order on `List α` is defined by `L < M` iff
+ ## See also
+ 
+ Related files are:
+-* `Mathlib/Data/Finset/Colex.lean`: Colexicographic order on finite sets.
++* `Mathlib/Combinatorics/Colex.lean`: Colexicographic order on finite sets.
+ * `Mathlib/Data/PSigma/Order.lean`: Lexicographic order on `Σ' i, α i`.
+-* `Mathlib/Data/Pi/Lex.lean`: Lexicographic order on `Πₗ i, α i`.
++* `Mathlib/Order/PiLex.lean`: Lexicographic order on `Πₗ i, α i`.
+ * `Mathlib/Data/Sigma/Order.lean`: Lexicographic order on `Σ i, α i`.
+ * `Mathlib/Data/Prod/Lex.lean`: Lexicographic order on `α × β`.
+ -/
+diff --git a/Mathlib/Data/Matrix/Mul.lean b/Mathlib/Data/Matrix/Mul.lean
+--- a/Mathlib/Data/Matrix/Mul.lean
++++ b/Mathlib/Data/Matrix/Mul.lean
+@@ -32,7 +32,7 @@ The scope `Matrix` gives the following notation:
+ * `*ᵥ` for `Matrix.mulVec`
+ * `ᵥ*` for `Matrix.vecMul`
+ 
+-See `Mathlib/Data/Matrix/ConjTranspose.lean` for
++See `Mathlib/LinearAlgebra/Matrix/ConjTranspose.lean` for
+ 
+ * `ᴴ` for `Matrix.conjTranspose`
+ 
+diff --git a/Mathlib/Data/Nat/Init.lean b/Mathlib/Data/Nat/Init.lean
+--- a/Mathlib/Data/Nat/Init.lean
++++ b/Mathlib/Data/Nat/Init.lean
+@@ -46,10 +46,10 @@ Less basic uses of `ℕ` and `ℤ` should however use the typeclass-mediated dev
+ The relevant files are:
+ * `Mathlib/Data/Nat/Basic.lean` for the continuation of the home-baked development on `ℕ`
+ * `Mathlib/Data/Int/Init.lean` for the continuation of the home-baked development on `ℤ`
+-* `Mathlib/Algebra/Group/Nat.lean` for the monoid instances on `ℕ`
+-* `Mathlib/Algebra/Group/Int.lean` for the group instance on `ℤ`
++* `Mathlib/Algebra/Group/Nat/Defs.lean` for the monoid instances on `ℕ`
++* `Mathlib/Algebra/Group/Int/Defs.lean` for the group instance on `ℤ`
+ * `Mathlib/Algebra/Ring/Nat.lean` for the semiring instance on `ℕ`
+-* `Mathlib/Algebra/Ring/Int.lean` for the ring instance on `ℤ`
++* `Mathlib/Algebra/Ring/Int/Defs.lean` for the ring instance on `ℤ`
+ * `Mathlib/Algebra/Order/Group/Nat.lean` for the ordered monoid instance on `ℕ`
+ * `Mathlib/Algebra/Order/Group/Int.lean` for the ordered group instance on `ℤ`
+ * `Mathlib/Algebra/Order/Ring/Nat.lean` for the ordered semiring instance on `ℕ`
+diff --git a/Mathlib/Data/Option/Defs.lean b/Mathlib/Data/Option/Defs.lean
+--- a/Mathlib/Data/Option/Defs.lean
++++ b/Mathlib/Data/Option/Defs.lean
+@@ -13,7 +13,7 @@ public import Batteries.Tactic.Alias
+ # Extra definitions on `Option`
+ 
+ This file defines more operations involving `Option α`. Lemmas about them are located in other
+-files under `Mathlib/Data/Option.lean`.
++files under `Mathlib/Data/Option/`.
+ Other basic operations on `Option` are defined in the core library.
+ -/
+ 
+diff --git a/Mathlib/Data/Set/Basic.lean b/Mathlib/Data/Set/Basic.lean
+--- a/Mathlib/Data/Set/Basic.lean
++++ b/Mathlib/Data/Set/Basic.lean
+@@ -25,7 +25,8 @@ powerset).
+ Note that a set is a term, not a type. There is a coercion from `Set α` to `Type*` sending
+ `s` to the corresponding subtype `↥s`.
+ 
+-See also the file `SetTheory/ZFC.lean`, which contains an encoding of ZFC set theory in Lean.
++See also the directory `Mathlib/SetTheory/ZFC/`, which contains an encoding of ZFC set theory in
++Lean.
+ 
+ ## Main definitions
+ 
+diff --git a/Mathlib/Data/Vector3.lean b/Mathlib/Data/Vector3.lean
+--- a/Mathlib/Data/Vector3.lean
++++ b/Mathlib/Data/Vector3.lean
+@@ -52,12 +52,12 @@ open Lean
+ 
+ scoped macro_rules | `([$l,*]) => `(expand_foldr% (h t => cons h t) nil [$(.ofElems l),*])
+ 
+--- this is copied from `src/Init/NotationExtra.lean`
++-- this is copied from `Init/NotationExtra.lean` (Lean core)
+ /-- Unexpander for `Vector3.nil` -/
+ @[app_unexpander Vector3.nil] meta def unexpandNil : Lean.PrettyPrinter.Unexpander
+   | `($(_)) => `([])
+ 
+--- this is copied from `src/Init/NotationExtra.lean`
++-- this is copied from `Init/NotationExtra.lean` (Lean core)
+ /-- Unexpander for `Vector3.cons` -/
+ @[app_unexpander Vector3.cons] meta def unexpandCons : Lean.PrettyPrinter.Unexpander
+   | `($(_) $x [])      => `([$x])

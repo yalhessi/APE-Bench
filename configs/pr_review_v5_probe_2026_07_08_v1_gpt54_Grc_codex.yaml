@@ -1,0 +1,24 @@
+# CONDITION X (Codex) on the post-cutoff set: the gpt-5.4 Grc condition, unchanged, under Codex.
+#
+# gpt_5.4 reaches Codex through the scaffold's Responses relay; everything the model is held to --
+# its settings, brief_G.md, the packet, APE's tools, the cutoff gate, the turn limit and the session
+# cap -- is Grc's, held equal by test_pr_review_v5_solo_conditions. Codex is told the model is
+# gpt-5.4, so it uses its own prompt for that model (gpt-5.4), with the MCP tools listed up front.
+extends: pr_review_v5_probe_2026_07_08_v1_gpt54_Grc.yaml
+
+scaffold_type: codex
+
+# Containment. No shell (shell_tool, unified_exec), no edits that land (a read-only sandbox), no web,
+# none of the built-ins a review has no use for, and of Codex's own tools only update_plan (Claude
+# Code's TodoWrite): its tools are APE's, the same grant as APE-Agent. Every attempt carries
+# containment_audit.json from its event log; none is read unless it is clean and usable.
+sandbox_mode: read-only
+approval_policy: never
+web_search: false
+disabled_features: [shell_tool, unified_exec, browser_use, computer_use, image_generation, apps, plugins, multi_agent, memories, goals]
+relayed_builtin_tools: [update_plan]
+# APE's own file tools (file_read, content_search), which a harness with its own file tools goes without.
+# With no shell, they are Codex's only way to read the PR; the task's tool list still governs the set,
+# so it is APE-Agent's.
+use_native_tools: true
+list_mcp_tools_upfront: true

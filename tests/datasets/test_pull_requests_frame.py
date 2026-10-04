@@ -436,3 +436,24 @@ def test_the_committed_small12_subset_is_recomputed_from_the_sealed_draw(name):
     config = "eval" if name.startswith("eval") else "val"
     small = yaml.safe_load(Path(f"configs/pr_review_v5_{config}_2025_06_2026_03_v1_small12.yaml").read_text())
     assert small["dataset"]["pr_numbers"] == record["pr_numbers"]
+
+
+def test_the_post_cutoff_probe_seal_is_intact_and_lies_after_the_reviewers_cutoff():
+    """probe-2026-07-08-v1 (sealed 2026-09-29, before any candidate's tier 2 was read) is a probe
+    set, not an evaluation set: PRs created after the June 2026 knowledge cutoff of the Claude
+    models used as probe reviewers, so a probe's reach carries no recall caveat
+    (`docs/todo/reviewer-model-gap.md`, test (a)). Its release is built outside
+    `inputs/pr_review_v4/releases/`, so it stays out of `scored_pr_numbers()`, which develop's suite
+    and artifacts count; each probe PR's own discussion is excluded from retrieval by the cutoff gate."""
+
+    spec, members, digest = f.load_sealed("probe-2026-07-08-v1")    # refuses a moved digest
+    assert digest == "9a6ebe64fc0dc316b639ceab06a38cc909b342d2570a10d9e90f264ae01af433"
+    assert (spec.created_from, spec.created_to) == ("2026-07-01", "2026-08-31")
+    assert (spec.main_size, spec.ai_size, spec.main_target_cap, spec.ai_target_cap) == (8, 2, 40, 60)
+    assert (spec.per_author_cap, spec.per_base_cap) == (1, 2)
+    assert len(members) == 1075
+    draw = f.Draw.model_validate_json((f.seal_dir("probe-2026-07-08-v1") / "draw.json").read_text())
+    assert draw.complete and draw.frame_seal_sha256 == digest and len(draw.accepted) == 10
+    from src.datasets.pull_requests.definitions import scored_pr_numbers
+
+    assert not {a.pr_number for a in draw.accepted} & scored_pr_numbers()

@@ -1,0 +1,379 @@
+[
+ {
+  "id": "c1",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "@[simp 1100]\ntheorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by\n  simp [Equiv.apply_eq_iff_eq_symm_apply]",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler (threshold 1ms): simp 5.2ms, no type-checking entry. Same run setup on the PR's proof: simp 2.8ms + grind 7.1ms + type checking 1.7ms",
+  "shows": "One terminal `simp` with the library's `Equiv.apply_eq_iff_eq_symm_apply` closes the statement; `grind` and the non-terminal `simp only` are not needed."
+ },
+ {
+  "id": "c2",
+  "kind": "library_tool",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "@[simp 1100]\ntheorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by\n  grind [Equiv.toEmbedding_apply]",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: grind 7.9ms + tactic 3.4ms + type checking 2.2ms",
+  "shows": "If `grind` is wanted, one call supplied with `Equiv.toEmbedding_apply` does the job of the PR's two steps, at no gain in time over the PR."
+ },
+ {
+  "id": "c3",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "@[simp 1100]\ntheorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by\n  rw [mem_map]\n  exact\n    ⟨by\n      rintro ⟨a, H, rfl⟩\n      simpa, fun h => ⟨_, h, by simp⟩⟩",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: simp 1.8ms + simp 1.2ms + exact 1.1ms",
+  "shows": "The pre-PR proof still compiles and, in this single profiler run, is the cheapest of the four; consistent with the PR's own trace (<10 ms before, 25 ms after)."
+ },
+ {
+  "id": "c4",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [ha0.ne', ha0.le]",
+  "compiled": false,
+  "result": "unsolved goals ⊢ ↑a.natAbs = a; linter: simp argument `ha0.le` unused",
+  "shows": "In this file simp does not turn `(a.natAbs : ℤ)` into `a` from `0 ≤ a` (no `abs` lemmas are imported here), so the sibling `simp [*]` idiom alone does not close it."
+ },
+ {
+  "id": "c5",
+  "kind": "library_tool",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [ha0.ne', abs_of_pos ha0]",
+  "compiled": false,
+  "result": "Unknown identifier `abs_of_pos`; unsolved goals ⊢ ↑a.natAbs = a",
+  "shows": "`abs` lemmas are not available in `Mathlib/Data/Rat/Lemmas.lean`; the closing lemma has to be the `Int.natAbs` one."
+ },
+ {
+  "id": "c6",
+  "kind": "library_tool",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  rw [den_inv, num_intCast, if_neg ha0.ne', Int.natCast_natAbs, abs_of_pos ha0]",
+  "compiled": false,
+  "result": "Unknown constant `Int.natCast_natAbs`",
+  "shows": "Same: the `abs` route is not importable here."
+ },
+ {
+  "id": "c7",
+  "kind": "library_tool",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: simp 2.6ms + tactic 1.4ms, no type-checking entry. PR's proof in the same setup: simp 3.2ms + grind tactic 10.8ms + type checking 8.4ms",
+  "shows": "One terminal `simp` with `Int.natAbs_of_nonneg` closes the goal, in the form of the siblings `inv_intCast_num_of_pos` (`simp [*]`) and `inv_ofNat_den` (`simp [den_inv, Int.natAbs_eq_iff]`), with no `grind` and no heavy proof term."
+ },
+ {
+  "id": "c8",
+  "kind": "library_tool",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  rw [den_inv, num_intCast, if_neg ha0.ne', Int.natAbs_of_nonneg ha0.le]",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: rewriteSeq 1.9ms",
+  "shows": "A four-lemma `rw` chain through the PR's own first two lemmas closes it too, and is the cheapest variant measured."
+ },
+ {
+  "id": "c9",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp\n  omega\n-- and, separately:\ntheorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [ha0.ne']\n  omega",
+  "compiled": true,
+  "result": "both compiled; profiler: simp 8.9ms + omega 6.4ms + type checking 10.0ms; simp 3.2ms + omega 5.1ms + type checking 7.5ms",
+  "shows": "`omega` closes the `natAbs` residue as `grind` does, with a similarly heavy proof term; it is no improvement on the PR."
+ },
+ {
+  "id": "c10",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simpa [ha0.ne'] using Int.natAbs_of_nonneg ha0.le",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: simp 4.9ms + simp 1.1ms + simpa 1.8ms",
+  "shows": "The `simpa using` form works as well; the `simp [..., Int.natAbs_of_nonneg ha0.le]` form of c7 is shorter."
+ },
+ {
+  "id": "c11",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "theorem inv_intCast_den_of_pos {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt, divInt_eq_div, Nat.cast_one]\n  apply den_div_eq_of_coprime ha0\n  rw [Int.natAbs_one]\n  exact Nat.coprime_one_left _",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: rewriteSeq 2.3ms, nothing else above 1ms",
+  "shows": "The pre-PR proof compiles and is cheaper than the PR's, consistent with the PR's own trace (<10 ms before, 17 ms after)."
+ },
+ {
+  "id": "c12",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  let e_meas : ((b : ι) → β (e b)) ≃ᵐ ((a : ι') → β a) :=\n    MeasurableEquiv.piCongrLeft (fun i ↦ β i) e\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [e_meas.measurableEmbedding.map_apply]\n  let s' : (i : ι) → Set (β (e i)) := fun i ↦ s (e i)\n  have : e_meas ⁻¹' pi univ s = pi univ s' := by\n    ext x\n    simp only [mem_preimage, Set.mem_pi, mem_univ, forall_true_left, s']\n    refine (e.forall_congr ?_).symm\n    intro i\n    rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n  simp only [pi_pi, this]\n  exact Fintype.prod_equiv e _ _ fun _ ↦ rfl",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The PR's `(congrFun rfl)` is an obscure spelling of `fun _ ↦ rfl` that also leaves the equivalence to higher-order unification; naming `e` and writing `fun _ ↦ rfl` compiles."
+ },
+ {
+  "id": "c13",
+  "kind": "library_tool",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  let e_meas : ((b : ι) → β (e b)) ≃ᵐ ((a : ι') → β a) :=\n    MeasurableEquiv.piCongrLeft (fun i ↦ β i) e\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [e_meas.measurableEmbedding.map_apply]\n  let s' : (i : ι) → Set (β (e i)) := fun i ↦ s (e i)\n  have : e_meas ⁻¹' pi univ s = pi univ s' := by\n    ext x\n    simp only [mem_preimage, Set.mem_pi, mem_univ, forall_true_left, s']\n    refine (e.forall_congr ?_).symm\n    intro i\n    rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n  simp only [pi_pi, this]\n  exact e.prod_comp fun i ↦ μ i (s i)",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The closing step is exactly `Equiv.prod_comp`, the lemma the file's other copy of this fact (l.727) uses."
+ },
+ {
+  "id": "c14",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  let e_meas : ((b : ι) → β (e b)) ≃ᵐ ((a : ι') → β a) :=\n    MeasurableEquiv.piCongrLeft (fun i ↦ β i) e\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [e_meas.measurableEmbedding.map_apply]\n  let s' : (i : ι) → Set (β (e i)) := fun i ↦ s (e i)\n  have : e_meas ⁻¹' pi univ s = pi univ s' := by\n    ext x\n    simp only [mem_preimage, Set.mem_pi, mem_univ, forall_true_left, s']\n    refine (e.forall_congr ?_).symm\n    intro i\n    rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n  rw [this, pi_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]",
+  "compiled": false,
+  "result": "rewrite failed: did not find `(Measure.pi ?μ) (univ.pi ?s)` in `∏ i, (μ (e i)) (s' i) = ∏ i, (μ i) (s i)`",
+  "shows": "Only one `pi_pi` occurs (the other side is already a product); with the `let s'` in the goal, the closing step needs `exact`, not `rw`."
+ },
+ {
+  "id": "c15",
+  "kind": "library_tool",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (declaration replaced at l.446); profiler: refine 1.5ms + rewriteSeq 7.3ms + type checking 4.4ms, versus the PR's proof with four 5-6ms CoeT inferences, two ~5ms simps and 4.6ms type checking",
+  "shows": "With `Equiv.piCongrLeft_preimage_univ_pi` and `Equiv.prod_comp` the whole proof is two steps with no `let`, `ext` or local `have`; this is the proof already in `measurePreserving_piCongrLeft.map_eq`."
+ },
+ {
+  "id": "c16",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  let e_meas : ((b : ι) → β (e b)) ≃ᵐ ((a : ι') → β a) :=\n    MeasurableEquiv.piCongrLeft (fun i ↦ β i) e\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [e_meas.measurableEmbedding.map_apply]\n  let s' : (i : ι) → Set (β (e i)) := fun i ↦ s (e i)\n  have : e_meas ⁻¹' pi univ s = pi univ s' := by\n    ext x\n    simp only [mem_preimage, Set.mem_pi, mem_univ, forall_true_left, s']\n    refine (e.forall_congr ?_).symm\n    intro i\n    rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n  rw [this, pi_pi, Finset.prod_equiv e.symm]\n  · simp only [Finset.mem_univ, implies_true]\n  intro i _\n  simp only [s']\n  congr\n  all_goals rw [e.apply_symm_apply]",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The pre-PR proof still compiles; the PR changed only its last six lines."
+ },
+ {
+  "id": "c17",
+  "kind": "derivation",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  refine (pi_eq fun s _ ↦ ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi, e.prod_comp fun i ↦ μ i (s i)]\n\n-- (l.463-719 unchanged)\n\ntheorem measurePreserving_piCongrLeft (f : ι' ≃ ι) :\n    MeasurePreserving (MeasurableEquiv.piCongrLeft α f)\n      (Measure.pi fun i' => μ (f i')) (Measure.pi μ) where\n  measurable := (MeasurableEquiv.piCongrLeft α f).measurable\n  map_eq := Measure.pi_map_piCongrLeft f μ",
+  "compiled": true,
+  "result": "Lean verification completed successfully (one edit covering l.446-727)",
+  "shows": "Together the two changes compile: the file then proves the equation once, at l.446 in two steps, and `measurePreserving_piCongrLeft` takes its `map_eq` from it, where now it re-proves it."
+ },
+ {
+  "id": "c18",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "lemma tendsto_of_forall_isClosed_limsup_real_le' {L : Filter ι} [L.IsCountablyGenerated]\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L (𝓝 μ) :=\n  tendsto_of_forall_isClosed_limsup_le (by simpa using h)",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: typeclass searches DiscreteTopology 15.5ms, T1Space 14.9ms, simp 9.2ms + 27.3ms",
+  "shows": "The bare-`simpa` term form is shorter but much slower than the PR's `simp only` (full simp set probes topology instances), so the PR's choice of `simp only` is right."
+ },
+ {
+  "id": "c19",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "lemma tendsto_of_forall_isClosed_limsup_real_le' {L : Filter ι} [L.IsCountablyGenerated]\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L (𝓝 μ) :=\n  tendsto_of_forall_isClosed_limsup_le <| by\n    simpa only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] using h",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: simp 2.7ms + simpa 1.4ms + elaboration 1.5ms, the same as the PR's (simp 2.5ms + exact 1.4ms)",
+  "shows": "The term-mode `simpa only … using h` is equivalent to the PR's `simp only … at h; exact`; nothing to ask."
+ },
+ {
+  "id": "c20",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "lemma tendsto_of_forall_isClosed_limsup_real_le' {L : Filter ι} [L.IsCountablyGenerated]\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L (𝓝 μ) := by\n by\n  refine tendsto_of_forall_isClosed_limsup_le' fun F hF ↦ ?_\n  rcases L.eq_or_neBot with rfl | hne\n  · simp\n  specialize h F hF\n  simp only [Measure.real_def] at h\n  rwa [ENNReal.limsup_toReal_eq (b := 1) (by simp) (.of_forall fun i ↦ prob_le_one),\n    ENNReal.toReal_le_toReal _ (by finiteness)] at h\n  refine ne_top_of_le_ne_top (b := 1) (by simp) ?_\n  refine limsup_le_of_le ?_ (.of_forall fun i ↦ prob_le_one)\n  exact isCoboundedUnder_le_of_le L (x := 0) (by simp)\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: aesop 272ms (from `finiteness`) among other entries",
+  "shows": "The pre-PR proof compiles; its cost is dominated by `finiteness`, which the PR's route through the NNReal lemma removes (PR trace: 268 ms to <10 ms)."
+ },
+ {
+  "id": "c21",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "theorem limsup_finset_sup' [ConditionallyCompleteLinearOrder β] {f : Filter α}\n    {F : ι → α → β} {s : Finset ι} (hs : s.Nonempty)\n    (h₁ : ∀ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault)\n    (h₂ : ∀ i ∈ s, f.IsBoundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault) :\n    limsup (fun a ↦ sup' s hs (fun i ↦ F i a)) f = sup' s hs (fun i ↦ limsup (F i) f) := by\n  have bddsup := isBoundedUnder_le_finset_sup' hs h₂\n  apply le_antisymm\n  · have h₃ : ∃ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i) := by\n      rcases hs with ⟨i, i_s⟩\n      use i, i_s\n      exact h₁ i i_s\n    have cobddsup := isCoboundedUnder_le_finset_sup' hs h₃\n    refine (limsup_le_iff cobddsup bddsup).2 (fun b hb ↦ ?_)\n    simp only [sup'_lt_iff, eventually_all_finset] at hb ⊢\n    exact fun i i_s ↦ eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)\n  · apply Finset.sup'_le hs (fun i ↦ limsup (F i) f)\n    refine fun i i_s ↦ limsup_le_limsup (Eventually.of_forall (fun a ↦ ?_)) (h₁ i i_s) bddsup\n    simp only [le_sup'_iff]\n    use i, i_s\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "`gt_iff_lt` can be dropped from the PR's `simp only`; the unusedSimpArgs linter does not flag it in the PR's form, so this is at most a nit."
+ },
+ {
+  "id": "c22",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "theorem limsup_finset_sup' [ConditionallyCompleteLinearOrder β] {f : Filter α}\n    {F : ι → α → β} {s : Finset ι} (hs : s.Nonempty)\n    (h₁ : ∀ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault)\n    (h₂ : ∀ i ∈ s, f.IsBoundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault) :\n    limsup (fun a ↦ sup' s hs (fun i ↦ F i a)) f = sup' s hs (fun i ↦ limsup (F i) f) := by\n  have bddsup := isBoundedUnder_le_finset_sup' hs h₂\n  apply le_antisymm\n  · have cobddsup := isCoboundedUnder_le_finset_sup' hs (hs.imp fun i hi ↦ ⟨hi, h₁ i hi⟩)\n    refine (limsup_le_iff cobddsup bddsup).2 fun b hb ↦ ?_\n    simp only [gt_iff_lt, sup'_lt_iff, eventually_all_finset] at hb ⊢\n    exact fun i hi ↦ eventually_lt_of_limsup_lt (hb i hi) (h₂ i hi)\n  · exact Finset.sup'_le hs _ fun i hi ↦\n      limsup_le_limsup (.of_forall fun a ↦ le_sup' (fun i ↦ F i a) hi) (h₁ i hi) bddsup\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The branches the PR left alone also go to terms (`hs.imp fun i hi ↦ ⟨hi, h₁ i hi⟩` for `h₃`, `le_sup'` for the ≥ branch); the PR's changed ≤ branch is already in this style."
+ },
+ {
+  "id": "c23",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "theorem limsup_finset_sup' [ConditionallyCompleteLinearOrder β] {f : Filter α}\n    {F : ι → α → β} {s : Finset ι} (hs : s.Nonempty)\n    (h₁ : ∀ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault)\n    (h₂ : ∀ i ∈ s, f.IsBoundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault) :\n    limsup (fun a ↦ sup' s hs (fun i ↦ F i a)) f = sup' s hs (fun i ↦ limsup (F i) f) := by\n  have bddsup := isBoundedUnder_le_finset_sup' hs h₂\n  apply le_antisymm\n  · have h₃ : ∃ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i) := by\n      rcases hs with ⟨i, i_s⟩\n      use i, i_s\n      exact h₁ i i_s\n    have cobddsup := isCoboundedUnder_le_finset_sup' hs h₃\n    refine (limsup_le_iff cobddsup bddsup).2 (fun b hb ↦ ?_)\n    rw [eventually_iff_exists_mem]\n    use ⋂ i ∈ s, {a | F i a < b}\n    split_ands\n    · rw [biInter_finset_mem]\n      suffices key : ∀ i ∈ s, ∀ᶠ a in f, F i a < b from fun i i_s ↦ eventually_iff.1 (key i i_s)\n      intro i i_s\n      apply eventually_lt_of_limsup_lt _ (h₂ i i_s)\n      exact lt_of_le_of_lt (Finset.le_sup' (f := fun i ↦ limsup (F i) f) i_s) hb\n    · simp only [mem_iInter, mem_setOf_eq, sup'_lt_iff, imp_self, implies_true]\n  · apply Finset.sup'_le hs (fun i ↦ limsup (F i) f)\n    refine fun i i_s ↦ limsup_le_limsup (Eventually.of_forall (fun a ↦ ?_)) (h₁ i i_s) bddsup\n    simp only [le_sup'_iff]\n    use i, i_s\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The pre-PR proof compiles; the PR's `eventually_all_finset` step replaces an explicit `⋂ i ∈ s` witness, the library's own way of doing it."
+ },
+ {
+  "id": "c24",
+  "kind": "derivation",
+  "objects": [
+   "limsup_finset_sup'",
+   "limsup_max"
+  ],
+  "lean": "example [ConditionallyCompleteLinearOrder β] {f : Filter α} {u v : α → β}\n    (h₁ : f.IsCoboundedUnder (· ≤ ·) u := by isBoundedDefault)\n    (h₂ : f.IsCoboundedUnder (· ≤ ·) v := by isBoundedDefault)\n    (h₃ : f.IsBoundedUnder (· ≤ ·) u := by isBoundedDefault)\n    (h₄ : f.IsBoundedUnder (· ≤ ·) v := by isBoundedDefault) :\n    limsup (fun a ↦ max (u a) (v a)) f = max (limsup u f) (limsup v f) := by\n  have := limsup_finset_sup' (f := f) (F := fun b : Bool ↦ if b then u else v)\n    (s := {true, false}) (by simp) (by simp [h₁, h₂]) (by simp [h₃, h₄])\n  simpa [Finset.sup'_insert] using this",
+  "compiled": true,
+  "result": "Lean verification completed successfully (inserted after l.1160)",
+  "shows": "In a conditionally complete linear order, with the bounds as hypotheses, `limsup_max` follows from `limsup_finset_sup'` in three lines; but `limsup_max` is not touched by this PR and precedes it, so this is no request on this PR."
+ },
+ {
+  "id": "c25",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod (a : α) {s : Set β} (hs : MeasurableSet s)\n    {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  conv_rhs => rw [← κ.disintegrate κ.condKernel]\n  rw [Kernel.compProd_apply_prod hs ht]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: conv rewrite 1.2ms + rewriteSeq 1.7ms + type checking 1.5ms",
+  "shows": "The file's own idiom (`conv_rhs => rw [← κ.disintegrate κ.condKernel]` then one `rw`, used by every sibling in the file: l.46, 59, 66, 97, 105) proves it in two lines."
+ },
+ {
+  "id": "c26",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod (a : α) {s : Set β} (hs : MeasurableSet s)\n    {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by\n    congr; exact (κ.disintegrate _).symm\n  rw [this, Kernel.compProd_apply_prod hs ht]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The PR's `simp only [this]` with a local equation can be `rw [this, …]`, as the pre-PR proof had it."
+ },
+ {
+  "id": "c27",
+  "kind": "library_tool",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod (a : α) {s : Set β} (hs : MeasurableSet s)\n    {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully; profiler: rewriteSeq 2.9ms + type checking 1.6ms",
+  "shows": "One `rw` with `Kernel.compProd_apply_prod` backwards and `κ.disintegrate` closes it; the `have … congr; exact (κ.disintegrate _).symm` scaffolding is not needed."
+ },
+ {
+  "id": "c28",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod (a : α) {s : Set β} (hs : MeasurableSet s)\n    {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by\n    congr; exact (κ.disintegrate _).symm\n  rw [this, Kernel.compProd_apply (hs.prod ht)]\n  classical\n  have : ∀ b, Kernel.condKernel κ (a, b) {c | (b, c) ∈ s ×ˢ t}\n      = s.indicator (fun b ↦ Kernel.condKernel κ (a, b) t) b := by\n    intro b\n    by_cases hb : b ∈ s <;> simp [hb]\n  simp_rw [Set.preimage, this]\n  rw [lintegral_indicator hs]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The pre-PR proof compiles; the PR's real gain is `Kernel.compProd_apply_prod`, which removes the indicator computation."
+ },
+ {
+  "id": "c29",
+  "kind": "derivation",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+   "ProbabilityTheory.setLIntegral_condKernel"
+  ],
+  "lean": "set_option profiler true in\nset_option profiler.threshold 1 in\nexample (a : α) {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  simpa using setLIntegral_condKernel (κ := κ) (f := fun _ ↦ 1) measurable_const a hs ht",
+  "compiled": true,
+  "result": "Lean verification completed successfully (inserted after l.79); profiler: Nonempty inference 18.1ms, many typeclass searches, type checking 4.4ms",
+  "shows": "Deriving the lemma as the `f = 1` case of `setLIntegral_condKernel` works but needs reordering and is heavier than the direct `rw`; not a request."
+ },
+ {
+  "id": "c30",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s) {t : Set Ω}\n    (ht : MeasurableSet t) :\n    ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n  conv_rhs => rw [← ρ.disintegrate ρ.condKernel]\n  rw [compProd_apply_prod hs ht]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The measure version takes the same two-line file idiom (`conv_rhs => rw [← ρ.disintegrate ρ.condKernel]`, as at l.137, 151, 158, 188, 195)."
+ },
+ {
+  "id": "c31",
+  "kind": "library_tool",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s) {t : Set Ω}\n    (ht : MeasurableSet t) :\n    ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n  rw [← compProd_apply_prod hs ht, ρ.disintegrate]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "One `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` closes the measure version as well."
+ },
+ {
+  "id": "c32",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "lemma setLIntegral_condKernel_eq_measure_prod {s : Set β} (hs : MeasurableSet s) {t : Set Ω}\n    (ht : MeasurableSet t) :\n    ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n  have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by\n    congr; exact (ρ.disintegrate _).symm\n  rw [this, compProd_apply (hs.prod ht)]\n  classical\n  have : ∀ b, ρ.condKernel b (Prod.mk b ⁻¹' s ×ˢ t)\n      = s.indicator (fun b ↦ ρ.condKernel b t) b := by\n    intro b\n    by_cases hb : b ∈ s <;> simp [hb]\n  simp_rw [this]\n  rw [lintegral_indicator hs]\n",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The pre-PR proof compiles."
+ },
+ {
+  "id": "c33",
+  "kind": "pre_pr_proof",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "theorem exists_lt_mem_ball_of_mem_ball (h : x ∈ ball y ε) : ∃ ε' < ε, x ∈ ball y ε' := by\n  simp only [mem_ball] at h ⊢\n  exact ⟨(dist x y + ε) / 2, by linarith, by linarith⟩",
+  "compiled": true,
+  "result": "no errors introduced by the edit (the file carries 12 errors already, from private `dist_nonneg'` at l.127, in this environment); profiler: two linarith 15.5ms + 11ms, type checking 7ms, versus the PR's ~3ms",
+  "shows": "The pre-PR proof compiles and is the slow one; the PR's `exists_between' h` is the library lemma (the `to_dual` of `exists_between`, Order/Basic.lean l.1113)."
+ },
+ {
+  "id": "c34",
+  "kind": "idiom_rewrite",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "theorem exists_lt_mem_ball_of_mem_ball (h : x ∈ ball y ε) : ∃ ε' < ε, x ∈ ball y ε' :=\n  exists_between' (mem_ball.1 h)",
+  "compiled": true,
+  "result": "no errors introduced by the edit (same 12 errors already in the file)",
+  "shows": "Spelling the unfolding with `mem_ball.1` also works, but the file's siblings use the definitional unfolding directly (`pos_of_mem_ball := dist_nonneg.trans_lt hy`, l.357), so the PR's `exists_between' h` fits; nothing to ask."
+ }
+]

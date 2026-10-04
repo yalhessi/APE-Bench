@@ -1,0 +1,239 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/RingTheory/Ideal/Maps.lean",
+   "matches": [
+    {
+     "line_number": 278,
+     "content": "   277|@[simp]\n   278|theorem coe_restrictScalars {R S : Type*} [Semiring R] [Semiring S] [Module R S]\n   279|    [IsScalarTower R S S] (I : Ideal S) : (I.restrictScalars R : Set S) = ↑I :="
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/RingTheory/Derivation/Basic.lean",
+   "matches": [
+    {
+     "line_number": 337,
+     "content": "   336|\n   337|lemma coe_restrictScalars (d : Derivation S A M) : ⇑(d.restrictScalars R) = ⇑d := rfl\n   338|"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/FieldTheory/IntermediateField/Basic.lean",
+   "matches": [
+    {
+     "line_number": 664,
+     "content": "   663|@[simp]\n   664|theorem coe_restrictScalars {E : IntermediateField L' L} :\n   665|    (restrictScalars K E : Set L) = (E : Set L) :="
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/ContinuousMap/Basic.lean",
+   "matches": [
+    {
+     "line_number": 284,
+     "content": "   283|@[simp]\n   284|theorem coe_restrict (f : C(α, β)) : ⇑(f.restrict s) = s.restrict f :=\n   285|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/ContinuousMap/Bounded/Basic.lean",
+   "matches": [
+    {
+     "line_number": 353,
+     "content": "   352|@[simp]\n   353|theorem coe_restrict (f : α →ᵇ β) (s : Set α) : ⇑(f.restrict s) = f ∘ (↑) := rfl\n   354|"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/Algebra/Algebra.lean",
+   "matches": [
+    {
+     "line_number": 544,
+     "content": "   543|@[simp]\n   544|theorem coe_restrictScalars (f : B →A[S] C) :\n   545|    (f.restrictScalars R : B →ₐ[R] C) = (f : B →ₐ[S] C).restrictScalars R :="
+    },
+    {
+     "line_number": 549,
+     "content": "   548|@[simp]\n   549|theorem coe_restrictScalars' (f : B →A[S] C) : ⇑(f.restrictScalars R) = f :=\n   550|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/Algebra/Module/LinearMap.lean",
+   "matches": [
+    {
+     "line_number": 1072,
+     "content": "  1071|@[simp]\n  1072|theorem coe_restrictScalars (f : M₁ →L[A] M₂) :\n  1073|    (f.restrictScalars R : M₁ →ₗ[R] M₂) = (f : M₁ →ₗ[A] M₂).restrictScalars R := rfl"
+    },
+    {
+     "line_number": 1076,
+     "content": "  1075|@[simp]\n  1076|theorem coe_restrictScalars' (f : M₁ →L[A] M₂) : ⇑(f.restrictScalars R) = f := rfl\n  1077|"
+    },
+    {
+     "line_number": 1106,
+     "content": "  1105|@[simp]\n  1106|theorem coe_restrictScalarsₗ : ⇑(restrictScalarsₗ A M₁ M₂ R S) = restrictScalars R := rfl\n  1107|"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/Algebra/Module/StrongTopology.lean",
+   "matches": [
+    {
+     "line_number": 638,
+     "content": "   637|@[simp]\n   638|theorem coe_restrictScalarsL : (restrictScalarsL 𝕜 E F 𝕜' 𝕜'' : (E →L[𝕜] F) →ₗ[𝕜''] E →L[𝕜'] F) =\n   639|    restrictScalarsₗ 𝕜 E F 𝕜' 𝕜'' :="
+    },
+    {
+     "line_number": 643,
+     "content": "   642|@[simp]\n   643|theorem coe_restrict_scalarsL' : ⇑(restrictScalarsL 𝕜 E F 𝕜' 𝕜'') = restrictScalars 𝕜' :=\n   644|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/Algebra/Module/Alternating/Basic.lean",
+   "matches": [
+    {
+     "line_number": 451,
+     "content": "   450|@[simp]\n   451|theorem coe_restrictScalars (f : M [⋀^ι]→L[A] N) : ⇑(f.restrictScalars R) = f :=\n   452|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Topology/Algebra/Module/Multilinear/Basic.lean",
+   "matches": [
+    {
+     "line_number": 453,
+     "content": "   452|@[simp]\n   453|theorem coe_restrictScalars (f : ContinuousMultilinearMap A M₁ M₂) : ⇑(f.restrictScalars R) = f :=\n   454|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Dynamics/Flow.lean",
+   "matches": [
+    {
+     "line_number": 152,
+     "content": "   151|@[simp]\n   152|theorem coe_restrict_apply {s : Set α} (h : IsInvariant ϕ s) (t : τ) (x : s) :\n   153|    restrict ϕ h t x = ϕ t x := rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/LinearAlgebra/Multilinear/Basic.lean",
+   "matches": [
+    {
+     "line_number": 637,
+     "content": "   636|@[simp]\n   637|theorem coe_restrictScalars (f : MultilinearMap A M₁ M₂) : ⇑(f.restrictScalars R) = f :=\n   638|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/MeasureTheory/Function/SimpleFunc.lean",
+   "matches": [
+    {
+     "line_number": 748,
+     "content": "   747|@[simp]\n   748|theorem coe_restrict (f : α →ₛ β) {s : Set α} (hs : MeasurableSet s) :\n   749|    ⇑(restrict f s) = indicator s f := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Algebra/Tower.lean",
+   "matches": [
+    {
+     "line_number": 200,
+     "content": "   199|@[simp]\n   200|theorem coe_restrictScalars (f : A →ₐ[S] B) : (f.restrictScalars R : A →+* B) = f := rfl\n   201|"
+    },
+    {
+     "line_number": 203,
+     "content": "   202|@[simp]\n   203|theorem coe_restrictScalars' (f : A →ₐ[S] B) : (restrictScalars R f : A → B) = f := rfl\n   204|"
+    },
+    {
+     "line_number": 242,
+     "content": "   241|@[simp]\n   242|theorem coe_restrictScalars (f : A ≃ₐ[S] B) : (f.restrictScalars R : A ≃+* B) = f := rfl\n   243|"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Algebra/NonUnitalHom.lean",
+   "matches": [
+    {
+     "line_number": 476,
+     "content": "   475|\n   476|lemma coe_restrictScalars (f : A →ₙₐ[S] B) : (f.restrictScalars R : A →ₙ+* B) = f := rfl\n   477|"
+    },
+    {
+     "line_number": 478,
+     "content": "   477|\n   478|lemma coe_restrictScalars' (f : A →ₙₐ[S] B) : (f.restrictScalars R : A → B) = f := rfl\n   479|"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Algebra/Subalgebra/Tower.lean",
+   "matches": [
+    {
+     "line_number": 90,
+     "content": "    89|@[simp]\n    90|theorem coe_restrictScalars {U : Subalgebra S A} : (restrictScalars R U : Set A) = (U : Set A) :=\n    91|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Ring/Subsemiring/Basic.lean",
+   "matches": [
+    {
+     "line_number": 713,
+     "content": "   712|@[simp]\n   713|theorem coe_restrict_apply (f : R →+* S) (s' : σR) (s : σS) (h : ∀ x ∈ s', f x ∈ s) (x : s') :\n   714|    (f.restrict s' s h x : S) = f x :="
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Module/LinearMap/Defs.lean",
+   "matches": [
+    {
+     "line_number": 430,
+     "content": "   429|@[simp, norm_cast]\n   430|theorem coe_restrictScalars (f : M →ₗ[S] M₂) : ((f : M →ₗ[R] M₂) : M → M₂) = f :=\n   431|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Module/Submodule/RestrictScalars.lean",
+   "matches": [
+    {
+     "line_number": 42,
+     "content": "    41|@[simp]\n    42|theorem coe_restrictScalars (V : Submodule R M) : (V.restrictScalars S : Set M) = V :=\n    43|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Algebra/Star/StarAlgHom.lean",
+   "matches": [
+    {
+     "line_number": 268,
+     "content": "   267|\n   268|lemma coe_restrictScalars (f : A →⋆ₙₐ[S] B) : (f.restrictScalars R : A →ₙ+* B) = f := rfl\n   269|"
+    },
+    {
+     "line_number": 270,
+     "content": "   269|\n   270|lemma coe_restrictScalars' (f : A →⋆ₙₐ[S] B) : (f.restrictScalars R : A → B) = f := rfl\n   271|"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Analysis/Seminorm.lean",
+   "matches": [
+    {
+     "line_number": 1025,
+     "content": "  1024|@[simp]\n  1025|theorem coe_restrictScalars (p : Seminorm 𝕜' E) : (p.restrictScalars 𝕜 : E → ℝ) = p :=\n  1026|  rfl"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Analysis/Normed/Operator/Basic.lean",
+   "matches": [
+    {
+     "line_number": 436,
+     "content": "   435|@[simp]\n   436|theorem coe_restrictScalarsIsometry :\n   437|    ⇑(restrictScalarsIsometry 𝕜 E Fₗ 𝕜' 𝕜'') = restrictScalars 𝕜' :="
+    }
+   ]
+  }
+ ],
+ "files_available": 7213,
+ "files_scanned": 7213,
+ "files_with_matches": 22,
+ "truncated": false
+}

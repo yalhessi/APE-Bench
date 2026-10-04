@@ -170,7 +170,11 @@ def test_a_cached_snapshot_resolves_to_a_complete_checkout():
     cache_dir = config.get_workspace_dir(repo_name)
     if not cache_dir.is_dir():
         pytest.skip("no Lean workspace cache on this machine")
-    cached = [item for item in sorted(cache_dir.iterdir()) if (item / "Mathlib").is_dir()]
+    # A dot-prefixed entry is a reviewed build's staging copy, mid-copy while the build runs
+    # (`.<base>+<fp>.<pid>.<rand>`), not a cached checkout: picked first by sort order, it failed
+    # this test with 81 modules on 2026-09-29.
+    cached = [item for item in sorted(cache_dir.iterdir())
+              if (item / "Mathlib").is_dir() and not item.name.startswith(".")]
     if not cached:
         pytest.skip("the workspace cache holds no complete checkout")
 

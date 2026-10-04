@@ -1,0 +1,1 @@
+{"path": "Mathlib/Data/Complex/Basic.lean", "line_start": 281, "line_end": 283, "replacement": "/- We use a nonstandard formula for the `ℕ` and `ℤ` actions to make sure there is no\ndiamond from the other actions they inherit through the `ℝ`-action on `ℂ` and action transitivity\ndefined in `Mathlib/LinearAlgebra/Complex/Module.lean`. -/"}

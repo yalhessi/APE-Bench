@@ -1,0 +1,274 @@
+{
+ "26755": {
+  "X1": {
+   "findings": 3,
+   "compiles": 14
+  },
+  "G1": {
+   "findings": 0,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  },
+  "Gr1": {
+   "findings": 4,
+   "compiles": 12,
+   "compile_split": {
+    "lean_verify_edit": 12,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 0,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 3,
+   "compiles": 15
+  }
+ },
+ "28649": {
+  "X2": {
+   "findings": 9,
+   "compiles": 5
+  },
+  "X1": {
+   "findings": 4,
+   "compiles": 4
+  },
+  "G2": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 3
+   }
+  },
+  "G1": {
+   "findings": 1,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 3
+   }
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 0
+   }
+  }
+ },
+ "29842": {
+  "X2": {
+   "findings": 1,
+   "compiles": 4
+  },
+  "X1": {
+   "findings": 3,
+   "compiles": 5
+  },
+  "Gr1": {
+   "findings": 0,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 2
+   }
+  },
+  "G1": {
+   "findings": 2,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 1,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  }
+ },
+ "30458": {
+  "X1": {
+   "findings": 12,
+   "compiles": 16
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 14
+  },
+  "G1": {
+   "findings": 4,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  },
+  "Gr1": {
+   "findings": 7,
+   "compiles": 35,
+   "compile_split": {
+    "lean_verify_edit": 22,
+    "lean_verify": 13
+   }
+  },
+  "G2": {
+   "findings": 5,
+   "compiles": 3,
+   "compile_split": {
+    "lean_verify_edit": 3,
+    "lean_verify": 0
+   }
+  }
+ },
+ "30641": {
+  "X1": {
+   "findings": 5,
+   "compiles": 7
+  },
+  "G1": {
+   "findings": 3,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 3,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 1,
+    "lean_verify": 1
+   }
+  },
+  "Gr1": {
+   "findings": 3,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 6,
+    "lean_verify": 0
+   }
+  },
+  "X2": {
+   "findings": 5,
+   "compiles": 8
+  }
+ },
+ "32875": {
+  "X1": {
+   "findings": 5,
+   "compiles": 35
+  },
+  "G1": {
+   "findings": 0,
+   "compiles": 7,
+   "compile_split": {
+    "lean_verify_edit": 7,
+    "lean_verify": 0
+   }
+  },
+  "G2": {
+   "findings": 2,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 1
+   }
+  },
+  "X2": {
+   "findings": 7,
+   "compiles": 49
+  },
+  "Gr1": {
+   "findings": 3,
+   "compiles": 40,
+   "compile_split": {
+    "lean_verify_edit": 17,
+    "lean_verify": 23
+   }
+  }
+ },
+ "34091": {
+  "X1": {
+   "findings": 6,
+   "compiles": 11
+  },
+  "G2": {
+   "findings": 4,
+   "compiles": 6,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 6
+   }
+  },
+  "Gr1": {
+   "findings": 6,
+   "compiles": 8,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 3
+   }
+  },
+  "G1": {
+   "findings": 4,
+   "compiles": 1,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 1
+   }
+  },
+  "X2": {
+   "findings": 9,
+   "compiles": 10
+  }
+ },
+ "36822": {
+  "Gr1": {
+   "findings": 2,
+   "compiles": 13,
+   "compile_split": {
+    "lean_verify_edit": 5,
+    "lean_verify": 8
+   }
+  },
+  "X2": {
+   "findings": 4,
+   "compiles": 11
+  },
+  "G2": {
+   "findings": 0,
+   "compiles": 2,
+   "compile_split": {
+    "lean_verify_edit": 2,
+    "lean_verify": 0
+   }
+  },
+  "X1": {
+   "findings": 2,
+   "compiles": 6
+  },
+  "G1": {
+   "findings": 0,
+   "compiles": 4,
+   "compile_split": {
+    "lean_verify_edit": 0,
+    "lean_verify": 4
+   }
+  }
+ }
+}

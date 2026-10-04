@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/ODE/GalerkinRegularity.lean","declaration_name":"fubini_torus3","new_declaration":"theorem fubini_torus3 (f : Fin 3 → UnitAddCircle → ℂ) :\n    ∫ x : T3, ∏ i, f i (x i) = ∏ i, ∫ y : UnitAddCircle, f i y :=\n  MeasureTheory.integral_fintype_prod_volume_eq_prod f","max_messages":3}

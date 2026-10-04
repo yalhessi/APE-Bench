@@ -1,0 +1,411 @@
+{
+  "41930": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:146e77889c7ee58f8603a8e3#api_reuse",
+        "correctness": "wu:146e77889c7ee58f8603a8e3#correctness",
+        "docs": "wu:146e77889c7ee58f8603a8e3#docs",
+        "duplication": "wu:146e77889c7ee58f8603a8e3#duplication",
+        "generality": "wu:146e77889c7ee58f8603a8e3#generality",
+        "proof_golf": "wu:146e77889c7ee58f8603a8e3#proof_golf",
+        "proof_idiom": "wu:146e77889c7ee58f8603a8e3#proof_idiom",
+        "style": "wu:146e77889c7ee58f8603a8e3#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Monoid.Coprod.induction_on",
+        "Monoid.Coprod.induction_on'"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "proof_golf",
+        "proof_idiom"
+      ],
+      "why": [
+        "shares a name family with 2 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "`Monoid.Coprod.induction_on'` is 14 lines"
+      ],
+      "work_unit_id": "wu:146e77889c7ee58f8603a8e3"
+    }
+  ],
+  "42184": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:a3efc5d697492cf06eb1c807#api_reuse",
+        "docs": "wu:a3efc5d697492cf06eb1c807#docs",
+        "family_design": "wu:a3efc5d697492cf06eb1c807#family_design",
+        "generality": "wu:a3efc5d697492cf06eb1c807#generality",
+        "naming": "wu:a3efc5d697492cf06eb1c807#naming",
+        "proof_golf": "wu:a3efc5d697492cf06eb1c807#proof_golf",
+        "proof_idiom": "wu:a3efc5d697492cf06eb1c807#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Topology/Algebra/InfiniteSum/Order.lean",
+        "tprod_nonneg"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a3efc5d697492cf06eb1c807"
+    }
+  ],
+  "42814": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:08d40487f17bf40cfc546405#api_reuse",
+        "generality": "wu:08d40487f17bf40cfc546405#generality",
+        "proof_golf": "wu:08d40487f17bf40cfc546405#proof_golf",
+        "proof_idiom": "wu:08d40487f17bf40cfc546405#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Int.IsFundamentalDiscr",
+        "Int.IsFundamentalDiscr.emod_four_eq_zero_or_one",
+        "Int.IsFundamentalDiscr.ne_zero",
+        "Int.isFundamentalDiscr_def",
+        "Int.isFundamentalDiscr_four_mul",
+        "Int.isFundamentalDiscr_four_mul_add_one",
+        "Int.isFundamentalDiscr_iff_squarefree",
+        "Mathlib/NumberTheory/FundamentalDiscriminant.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Int.isFundamentalDiscr_iff_squarefree` is a chain of 7 low-level tactic steps",
+        "shares a name family with 6 other changed declaration(s)",
+        "was changed alongside 6 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Int.isFundamentalDiscr_iff_squarefree` is 18 lines"
+      ],
+      "work_unit_id": "wu:08d40487f17bf40cfc546405"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:509b820e62fe5e0b177cab1a#api_reuse",
+        "correctness": "wu:509b820e62fe5e0b177cab1a#correctness",
+        "docs": "wu:509b820e62fe5e0b177cab1a#docs",
+        "duplication": "wu:509b820e62fe5e0b177cab1a#duplication",
+        "family_design": "wu:509b820e62fe5e0b177cab1a#family_design",
+        "generality": "wu:509b820e62fe5e0b177cab1a#generality",
+        "proof_golf": "wu:509b820e62fe5e0b177cab1a#proof_golf",
+        "proof_idiom": "wu:509b820e62fe5e0b177cab1a#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Int.squarefree_iff_prime_sq_not_dvd",
+        "Mathlib/Data/Nat/Squarefree.lean"
+      ],
+      "suggested_arms": [
+        "proof_golf",
+        "proof_idiom",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "`Int.squarefree_iff_prime_sq_not_dvd` is a chain of 4 low-level tactic steps",
+        "shares a name family with 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:509b820e62fe5e0b177cab1a"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:daca32e8e04968d40d026eff#api_reuse",
+        "correctness": "wu:daca32e8e04968d40d026eff#correctness",
+        "docs": "wu:daca32e8e04968d40d026eff#docs",
+        "duplication": "wu:daca32e8e04968d40d026eff#duplication",
+        "family_design": "wu:daca32e8e04968d40d026eff#family_design",
+        "generality": "wu:daca32e8e04968d40d026eff#generality",
+        "proof_golf": "wu:daca32e8e04968d40d026eff#proof_golf",
+        "proof_idiom": "wu:daca32e8e04968d40d026eff#proof_idiom",
+        "style": "wu:daca32e8e04968d40d026eff#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "IsCoprime.dvd_mul_left_iff",
+        "IsCoprime.dvd_mul_right_iff",
+        "Odd.isCoprime_two"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:daca32e8e04968d40d026eff"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:2e42c5bf949abdf3f0ed354d#api_reuse",
+        "correctness": "wu:2e42c5bf949abdf3f0ed354d#correctness",
+        "docs": "wu:2e42c5bf949abdf3f0ed354d#docs",
+        "duplication": "wu:2e42c5bf949abdf3f0ed354d#duplication",
+        "family_design": "wu:2e42c5bf949abdf3f0ed354d#family_design",
+        "generality": "wu:2e42c5bf949abdf3f0ed354d#generality",
+        "naming": "wu:2e42c5bf949abdf3f0ed354d#naming",
+        "proof_golf": "wu:2e42c5bf949abdf3f0ed354d#proof_golf",
+        "proof_idiom": "wu:2e42c5bf949abdf3f0ed354d#proof_idiom"
+      },
+      "rank": 4,
+      "subjects": [
+        "Mathlib/Data/Nat/Prime/Basic.lean",
+        "Nat.forall_prime_iff_two_and_odd"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:2e42c5bf949abdf3f0ed354d"
+    },
+    {
+      "available_arms": {
+        "style": "wu:96d7cd965d4c7da44389387c#style"
+      },
+      "rank": 5,
+      "subjects": [
+        "Mathlib.lean"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:96d7cd965d4c7da44389387c"
+    }
+  ],
+  "43024": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:05f55213a9781c4638b543d8#api_reuse",
+        "docs": "wu:05f55213a9781c4638b543d8#docs",
+        "family_design": "wu:05f55213a9781c4638b543d8#family_design",
+        "generality": "wu:05f55213a9781c4638b543d8#generality",
+        "naming": "wu:05f55213a9781c4638b543d8#naming",
+        "proof_golf": "wu:05f55213a9781c4638b543d8#proof_golf",
+        "proof_idiom": "wu:05f55213a9781c4638b543d8#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Algebra/Group/Subsemigroup/Defs.lean",
+        "isMulCommutative_mono",
+        "setLike_mul_comm"
+      ],
+      "suggested_arms": [
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:05f55213a9781c4638b543d8"
+    }
+  ],
+  "43167": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:a1f37f4f49e7000b29a1f384#api_reuse",
+        "correctness": "wu:a1f37f4f49e7000b29a1f384#correctness",
+        "docs": "wu:a1f37f4f49e7000b29a1f384#docs",
+        "duplication": "wu:a1f37f4f49e7000b29a1f384#duplication",
+        "family_design": "wu:a1f37f4f49e7000b29a1f384#family_design",
+        "generality": "wu:a1f37f4f49e7000b29a1f384#generality",
+        "proof_golf": "wu:a1f37f4f49e7000b29a1f384#proof_golf",
+        "proof_idiom": "wu:a1f37f4f49e7000b29a1f384#proof_idiom",
+        "style": "wu:a1f37f4f49e7000b29a1f384#style"
+      },
+      "rank": 1,
+      "subjects": [
+        "Subgroup.commutator_le_of_le",
+        "Subgroup.commutator_mono_left",
+        "Subgroup.commutator_mono_right",
+        "Subgroup.commutator_sup_left",
+        "Subgroup.commutator_sup_left'",
+        "Subgroup.commutator_sup_right"
+      ],
+      "suggested_arms": [
+        "naming",
+        "proof_golf",
+        "proof_idiom",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "`Subgroup.commutator_sup_left'` is a chain of 6 low-level tactic steps",
+        "`Subgroup.commutator_sup_left` is a chain of 9 low-level tactic steps",
+        "shares a name family with 6 other changed declaration(s)",
+        "was changed alongside 5 other changed declaration(s)",
+        "introduces a new declaration",
+        "`Subgroup.commutator_sup_left'` is 12 lines",
+        "`Subgroup.commutator_sup_left` is 21 lines"
+      ],
+      "work_unit_id": "wu:a1f37f4f49e7000b29a1f384"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:744210a9f9529e8a18fcac6f#api_reuse",
+        "correctness": "wu:744210a9f9529e8a18fcac6f#correctness",
+        "docs": "wu:744210a9f9529e8a18fcac6f#docs",
+        "duplication": "wu:744210a9f9529e8a18fcac6f#duplication",
+        "family_design": "wu:744210a9f9529e8a18fcac6f#family_design",
+        "generality": "wu:744210a9f9529e8a18fcac6f#generality",
+        "proof_golf": "wu:744210a9f9529e8a18fcac6f#proof_golf",
+        "proof_idiom": "wu:744210a9f9529e8a18fcac6f#proof_idiom"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+        "Subgroup.conj_mem_sup_of_mem_inf_normalizer_of_mem_inf",
+        "Subgroup.normalizer_inf_normalizer_le_normalizer_sup",
+        "Subgroup.normalizer_le_normalizer_sup_of_normalizer_le_left"
+      ],
+      "suggested_arms": [
+        "naming",
+        "style",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "shares a name family with 4 other changed declaration(s)",
+        "was changed alongside 2 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:744210a9f9529e8a18fcac6f"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:4f1ee059591bdabcee7e9f0e#api_reuse",
+        "docs": "wu:4f1ee059591bdabcee7e9f0e#docs",
+        "generality": "wu:4f1ee059591bdabcee7e9f0e#generality",
+        "proof_golf": "wu:4f1ee059591bdabcee7e9f0e#proof_golf",
+        "proof_idiom": "wu:4f1ee059591bdabcee7e9f0e#proof_idiom"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Algebra/Group/Subgroup/Basic.lean",
+        "Subgroup.inf_normalizer_le_normalizer_sup"
+      ],
+      "suggested_arms": [
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'rename'",
+        "shares a name family with 4 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:4f1ee059591bdabcee7e9f0e"
+    }
+  ],
+  "43192": [
+    {
+      "available_arms": {
+        "api_reuse": "wu:a8c9707a3dedf50869b983b2#api_reuse",
+        "docs": "wu:a8c9707a3dedf50869b983b2#docs",
+        "generality": "wu:a8c9707a3dedf50869b983b2#generality",
+        "proof_golf": "wu:a8c9707a3dedf50869b983b2#proof_golf",
+        "proof_idiom": "wu:a8c9707a3dedf50869b983b2#proof_idiom"
+      },
+      "rank": 1,
+      "subjects": [
+        "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+        "PresheafOfModulesOfCommRing",
+        "PresheafOfModulesOfCommRing.isoMk",
+        "PresheafOfModulesOfCommRing.map",
+        "PresheafOfModulesOfCommRing.obj",
+        "PresheafOfModulesOfCommRing.pullback",
+        "PresheafOfModulesOfCommRing.pullbackPushforwardAdjunction",
+        "PresheafOfModulesOfCommRing.pushforward",
+        "PresheafOfModulesOfCommRing.pushforward₀",
+        "PresheafOfModulesOfCommRing.restrictScalars",
+        "PresheafOfModulesOfCommRing.unit"
+      ],
+      "suggested_arms": [
+        "docs",
+        "naming",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'",
+        "shares a name family with 4 other changed declaration(s)",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:a8c9707a3dedf50869b983b2"
+    },
+    {
+      "available_arms": {
+        "style": "wu:91a86be627e65b725bb0b941#style"
+      },
+      "rank": 2,
+      "subjects": [
+        "Mathlib.lean"
+      ],
+      "suggested_arms": [
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:91a86be627e65b725bb0b941"
+    },
+    {
+      "available_arms": {
+        "api_reuse": "wu:eb13d616fc2c474330d43035#api_reuse",
+        "correctness": "wu:eb13d616fc2c474330d43035#correctness",
+        "duplication": "wu:eb13d616fc2c474330d43035#duplication",
+        "family_design": "wu:eb13d616fc2c474330d43035#family_design",
+        "generality": "wu:eb13d616fc2c474330d43035#generality",
+        "naming": "wu:eb13d616fc2c474330d43035#naming",
+        "proof_golf": "wu:eb13d616fc2c474330d43035#proof_golf",
+        "proof_idiom": "wu:eb13d616fc2c474330d43035#proof_idiom",
+        "style": "wu:eb13d616fc2c474330d43035#style"
+      },
+      "rank": 3,
+      "subjects": [
+        "Mathlib/Algebra/Category/ModuleCat/Presheaf/OfCommRing.lean",
+        "PresheafOfModulesOfCommRing.mk",
+        "PresheafOfModulesOfCommRing.mkHom"
+      ],
+      "suggested_arms": [
+        "docs",
+        "duplication",
+        "generality"
+      ],
+      "why": [
+        "the PR describes itself as 'doc'",
+        "introduces a new declaration"
+      ],
+      "work_unit_id": "wu:eb13d616fc2c474330d43035"
+    }
+  ]
+}

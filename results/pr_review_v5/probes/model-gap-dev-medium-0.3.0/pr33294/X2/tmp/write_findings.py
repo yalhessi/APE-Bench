@@ -1,0 +1,81 @@
+import json
+F = []
+F.append({
+ "target": "Ordinal.mem_range_deriv",
+ "claim": "The PR removes `Ordinal.IsNormal.mem_range_deriv` (base: `theorem IsNormal.mem_range_deriv (H : IsNormal f) {a} : a ∈ Set.range (deriv f) ↔ f a = a`) and re-adds it as `Ordinal.mem_range_deriv` without leaving a deprecated alias. Every other lemma renamed out of the `IsNormal` namespace in this PR (`IsNormal.nfp_fp`, `IsNormal.deriv_fp`, `IsNormal.le_iff_deriv`, `IsNormal.fp_iff_deriv`, `IsNormal.apply_lt_nfp`, `IsNormal.cof_eq`, ...) gets one, so downstream uses of `Ordinal.IsNormal.mem_range_deriv` break with no deprecation warning.",
+ "requested_change": "Directly after `theorem mem_range_deriv` in `Mathlib/SetTheory/Ordinal/FixedPoint.lean`, add\n```\n@[deprecated (since := \"2025-12-25\")]\nalias IsNormal.mem_range_deriv := mem_range_deriv\n```",
+ "severity": "blocking",
+ "evidence": "The diff removes `-theorem IsNormal.mem_range_deriv ...` (diff lines 738-739). The only nearby replacement is `+alias IsNormal.fp_iff_deriv := fp_iff_deriv`, which is a different name. content_search for `IsNormal\\.mem_range_deriv|\\.mem_range_deriv\\b` over all of target/Mathlib at the PR state: 0 matches in 7445 files, so no alias exists anywhere. lean_verify_edit on FixedPoint.lean (lines 364-383, adding this alias together with the date and fp_iff_deriv changes in the next two findings): success, no errors, no warnings."
+})
+F.append({
+ "target": "Mathlib/SetTheory/Ordinal/FixedPoint.lean",
+ "claim": "Four deprecations this PR adds in FixedPoint.lean are dated `since := \"2025-10-25\"`: `alias IsNormal.deriv_fp`, `alias IsNormal.le_iff_deriv`, `theorem fp_iff_deriv` and `alias IsNormal.fp_iff_deriv`. Every other deprecation in the PR is dated `\"2025-12-25\"`, including the ones in the same file (`IsNormal.apply_lt_nfp`, `IsNormal.nfp_le_apply`, `IsNormal.nfp_fp`, `IsNormal.apply_le_nfp`). The October date looks copied from the neighbouring, pre-existing `deriv_id_of_nfp_id` alias. Backdating by two months makes these aliases eligible for deletion two months early.",
+ "requested_change": "Change `since := \"2025-10-25\"` to `since := \"2025-12-25\"` on the deprecations of `IsNormal.deriv_fp`, `IsNormal.le_iff_deriv`, `fp_iff_deriv` and `IsNormal.fp_iff_deriv`. Leave the pre-existing `deriv_id_of_nfp_id` alias as it is.",
+ "severity": "advisory",
+ "evidence": "content_search for `since := \"2025-1` in target/Mathlib/SetTheory/Ordinal/FixedPoint.lean: lines 296, 302, 311 and 317 are \"2025-12-25\"; lines 364, 372, 378 and 382 (the four new ones) are \"2025-10-25\"; line 358 (`deriv_id_of_nfp_id`, a diff context line and so pre-existing) is \"2025-10-25\". zulip_search reports an as_of of 2025-12-26 for this PR's review time, which agrees with 2025-12-25. lean_verify_edit with the corrected dates (FixedPoint.lean lines 364-383): success, no warnings."
+})
+F.append({
+ "target": "Ordinal.fp_iff_deriv",
+ "claim": "`Ordinal.fp_iff_deriv` is a new declaration (the base only had `Ordinal.IsNormal.fp_iff_deriv`), and it is deprecated on arrival. Its only job is to be the target of `alias IsNormal.fp_iff_deriv := fp_iff_deriv`. That adds a name to the library that no user ever had, and deprecation is meant to preserve old names, not to create new ones.",
+ "requested_change": "Delete `theorem fp_iff_deriv` and `alias IsNormal.fp_iff_deriv := fp_iff_deriv`. Keep the old name as a deprecated theorem instead:\n```\n@[deprecated Ordinal.mem_range_deriv (since := \"2025-12-25\")]\ntheorem IsNormal.fp_iff_deriv (H : IsNormal f) {a} : f a = a ↔ ∃ o, deriv f o = a :=\n  (Ordinal.mem_range_deriv H).symm\n```\nThe `Ordinal.` qualification is needed: inside `theorem IsNormal.…`, a bare `mem_range_deriv` resolves to `Ordinal.IsNormal.mem_range_deriv` once that alias exists.",
+ "severity": "advisory",
+ "evidence": "The diff adds `+@[deprecated mem_range_deriv (since := \"2025-10-25\")] +theorem fp_iff_deriv` (diff lines 734-736) and removes `-theorem IsNormal.fp_iff_deriv` (diff line 726); there is no base `Ordinal.fp_iff_deriv`, since adding one would have been a duplicate-declaration error. lean_verify_edit replacing FixedPoint.lean lines 364-383 with the version above (and the mem_range_deriv alias): success, no errors, no warnings. A first attempt with an unqualified `(mem_range_deriv H).symm` compiled but warned \"`Ordinal.IsNormal.mem_range_deriv` has been deprecated\"; that is why the qualification is needed."
+})
+F.append({
+ "target": "Ordinal.IsNormal.monotone",
+ "claim": "`Ordinal.IsNormal.monotone : Monotone f` is deprecated in favour of `Order.IsNormal.strictMono`. That lemma concludes `StrictMono f`, so a user who follows the deprecation hint gets a type mismatch. The PR itself adds the exact replacement, `Order.IsNormal.monotone`, in Mathlib/Order/IsNormal.lean.",
+ "requested_change": "Change the attribute to `@[deprecated Order.IsNormal.monotone (since := \"2025-12-25\")]` on `theorem IsNormal.monotone` in Mathlib/SetTheory/Ordinal/Arithmetic.lean.",
+ "severity": "advisory",
+ "evidence": "Arithmetic.lean line 375-377 at the PR state: `@[deprecated Order.IsNormal.strictMono ...] theorem IsNormal.monotone {f} (H : Ordinal.IsNormal f) : Monotone f`. Order/IsNormal.lean line 53 at the PR state: `protected theorem monotone {f : α → β} (hf : IsNormal f) : Monotone f`. lean_verify_edit (declaration_name `Ordinal.IsNormal.monotone`, with the new attribute): success, no warnings."
+})
+F.append({
+ "target": "Mathlib/Order/IsNormal.lean",
+ "claim": "The module docstring of Mathlib/Order/IsNormal.lean still has the TODO `* Replace \\`Ordinal.IsNormal\\` by this more general notion.` This PR does exactly that: it deprecates `Ordinal.IsNormal` in favour of `Order.IsNormal` and moves every use over. So after the PR the TODO is stale.",
+ "requested_change": "Delete the bullet `* Replace \\`Ordinal.IsNormal\\` by this more general notion.` from the `## TODO` section of the module docstring (line 24). Keep the other TODO item.",
+ "severity": "advisory",
+ "evidence": "file_read of target/Mathlib/Order/IsNormal.lean lines 21-24 at the PR state shows the TODO. The PR edits this file (it adds `Order.IsNormal.monotone`) but leaves the docstring alone. lean_verify_edit replacing lines 23-24 with the single remaining bullet: success, no warnings."
+})
+F.append({
+ "target": "Ordinal.opow_add",
+ "claim": "The rewritten `opow_add` proof proves the same fact twice. It adds `have : b + c ≠ 0 := (hc.trans_le le_add_self).ne'`, never uses it, and then closes the side goal from `rw [..., zero_opow, ...]` with a second, identical `exact (hc.trans_le le_add_self).ne'`. Separately, in the limit case `opow_pos b (pos_iff_ne_zero.2 ha.ne')` converts `ha : 0 < a` to `a ≠ 0` and back again; it is just `opow_pos b ha`. No linter catches either: an as-is compile of Exponential.lean reports no warnings.",
+ "requested_change": "Replace the three lines `have : b + c ≠ 0 := ...` / `rw [zero_opow hc.ne', zero_opow, mul_zero]` / `exact (hc.trans_le le_add_self).ne'` with\n`rw [zero_opow hc.ne', zero_opow (hc.trans_le le_add_self).ne', mul_zero]`.\nIn the limit case, replace `opow_pos b (pos_iff_ne_zero.2 ha.ne')` with `opow_pos b ha`, so the term fits on one line:\n`(((isNormal_mul_right <| opow_pos b ha).comp (isNormal_opow ha')).le_iff_forall_le l).symm`.",
+ "severity": "advisory",
+ "evidence": "lean_verify_edit (declaration_name `Ordinal.opow_add`) with both changes: success, no errors, no warnings. The new lines are 76 and 96 characters, within the 100-character limit. An as-is lean_verify_edit of Exponential.lean compiles with an empty warnings list, which confirms the unused `have` goes unflagged."
+})
+F.append({
+ "target": "Ordinal.IsNormal.bsup",
+ "claim": "`IsNormal.bsup` calls `Order.IsNormal.map_iSup H (bddAbove_of_small _)` with the full name. Here `H : IsNormal f` is already `Order.IsNormal`, and the rest of the PR uses dot notation for the same call (`H.map_iSup (bddAbove_of_small _)` in `nfpFamily_fp` and `derivFamily_fp`, `hf.map_iSup ...` in `apply_omega0_of_isNormal`). The long form pushes the `rw` over the line limit, which is why the PR breaks it with a dangling `<;>\\n      rfl`. `enumOrd_isNormal_iff_isClosed` in Topology.lean uses the same needless full name: `rw [Order.IsNormal.map_iSup h (bddAbove_of_small _)]`.",
+ "requested_change": "In `IsNormal.bsup` use dot notation and put the `rw` back on one line:\n`rw [← iSup'_eq_bsup r, H.map_iSup (bddAbove_of_small _), ← iSup'_eq_bsup r] <;> rfl`.\nMake the same change in `enumOrd_isNormal_iff_isClosed`: `rw [h.map_iSup (bddAbove_of_small _)]`.",
+ "severity": "advisory",
+ "evidence": "lean_verify_edit (Family.lean, declaration_name `Ordinal.IsNormal.bsup`) with the one-line `rw` (87 characters): success, no warnings. lean_verify_edit (Topology.lean line 186 replaced by `    rw [h.map_iSup (bddAbove_of_small _)]`): success, no warnings."
+})
+F.append({
+ "target": "Ordinal.iSup_pow_natCast",
+ "claim": "The PR renames `iSup_pow` to `iSup_pow_natCast`, but the statement `⨆ n : ℕ, o ^ n = o ^ ω` has no `Nat.cast`. `o ^ n` with `n : ℕ` is monoid exponentiation, and the proof has to start with `simp_rw [← opow_natCast]` to introduce the cast. The `natCast` suffix is correct for the siblings `iSup_add_natCast` and `iSup_mul_natCast`, where `o + n` and `o * n` do coerce `n`, but it misdescribes this lemma. The old name `iSup_pow` was accurate.",
+ "requested_change": "Revert the rename: keep the theorem as `iSup_pow`, drop `@[deprecated] alias iSup_pow := iSup_pow_natCast`, and restore `← iSup_pow ha` in `nfp_mul_one` (FixedPoint.lean).",
+ "severity": "advisory",
+ "evidence": "Exponential.lean line 117: `theorem opow_natCast (a : Ordinal) (n : ℕ) : a ^ (n : Ordinal) = a ^ n`, whose RHS is the ℕ-power. Line 521 of `iSup_pow_natCast` is `simp_rw [← opow_natCast]`, which would fail with 'no progress' if the statement already contained the cast. `nfp_mul_one` then rewrites with the monoid lemmas `pow_zero` and `pow_add`. lean_verify_edit (Exponential.lean lines 520-530 replaced by the theorem under the name `iSup_pow`, no alias): success, no warnings. naming_norm returned subject_unresolved, so no census applies."
+})
+F.append({
+ "target": "module_doc in Arithmetic.lean",
+ "claim": "The rewritten module docstring of Mathlib/SetTheory/Ordinal/Arithmetic.lean silently drops the bullet for `pred` (`* \\`pred o\\` if the predecessor of \\`o\\`...`). `Ordinal.pred` is still defined in this file and is not deprecated, so the \"Main definitions\" list now leaves out one of the file's definitions. The removal has nothing to do with deprecating `Ordinal.IsNormal`.",
+ "requested_change": "Restore the bullet in the `## Main definitions and results` list, after the `o₁ / o₂` item, and fix the old typo while doing so: `* \\`pred o\\` is the predecessor of \\`o\\`. If \\`o\\` is not a successor, we set \\`pred o = o\\`.`",
+ "severity": "advisory",
+ "evidence": "Diff lines 116-117 remove the `pred` bullet, and no replacement appears in the new docstring (file_read lines 13-47). content_search in Arithmetic.lean at the PR state finds `def pred (o : Ordinal) : Ordinal` at line 290, under the header `/-! ### The predecessor of an ordinal -/` at line 287, with no deprecation. lean_verify_edit inserting the bullet after line 31: success, no warnings."
+})
+F.append({
+ "target": "Ordinal.IsNormal",
+ "claim": "The PR deletes the section header `/-! ### Normal ordinal functions -/` above `Ordinal.IsNormal`. The deprecated `Ordinal.IsNormal` and its roughly 16 deprecated lemmas (`limit_le` ... `isSuccLimit`, lines 350-446) therefore now sit under the preceding header, `/-! ### The predecessor of an ordinal -/`, which does not describe them.",
+ "requested_change": "Keep a section header above the deprecated block, e.g. restore `/-! ### Normal ordinal functions -/` or use `/-! ### Normal ordinal functions (deprecated) -/`, directly before the `Ordinal.IsNormal` docstring.",
+ "severity": "advisory",
+ "evidence": "Diff line 144 removes `-/-! ### Normal ordinal functions -/`. content_search for `/-! ###` in Arithmetic.lean at the PR state: line 287 is 'The predecessor of an ordinal' and the next header is line 447, 'Subtraction on ordinals'; file_read lines 336-362 shows `lift_pred` running straight into the `Ordinal.IsNormal` docstring. lean_verify_edit inserting the header at line 349: success, no warnings."
+})
+F.append({
+ "target": "Ordinal.IsNormal.map_sSup",
+ "claim": "In the deprecated Family.lean block, `IsNormal.map_iSup_of_bddAbove`, `IsNormal.map_iSup`, `IsNormal.map_sSup_of_bddAbove` and `IsNormal.apply_of_isSuccLimit` all had their hypothesis changed to `(H : Ordinal.IsNormal f)`, which keeps their old statements. `IsNormal.map_sSup` was left as `(H : IsNormal f)`, which now means `Order.IsNormal f`. Its `set_option linter.deprecated false in` also guards nothing, because the declaration refers to no deprecated constant.",
+ "requested_change": "Change the binder of `IsNormal.map_sSup` to `(H : Ordinal.IsNormal f)` to match its siblings. That also gives the `set_option linter.deprecated false in` above it a use.",
+ "severity": "advisory",
+ "evidence": "file_read of Family.lean lines 241-271 at the PR state: lines 243, 250, 257 and 269 use `Ordinal.IsNormal f`; line 263 uses `IsNormal f`. lean_verify_edit (declaration_name `Ordinal.IsNormal.map_sSup`) with `(H : Ordinal.IsNormal f)`: success, no warnings."
+})
+json.dump(F, open('/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/model-gap-dev-medium-0.3.0/pr33294/X2/findings.json', 'w'), ensure_ascii=False, indent=1)
+print(len(F))

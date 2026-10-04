@@ -1,0 +1,62 @@
+import json, pathlib
+D = pathlib.Path(__file__).resolve().parent.parent
+moddoc = (D / "tmp/moddoc.txt").read_text().rstrip("\n")
+doc_div = (D / "tmp/doc_div.txt").read_text().rstrip("\n")
+doc_one = (D / "tmp/doc_one.txt").read_text().rstrip("\n")
+doc_dist = (D / "tmp/doc_dist.txt").read_text().rstrip("\n")
+doc_norm = (D / "tmp/doc_norm.txt").read_text().rstrip("\n")
+F = "Mathlib/Analysis/Complex/Schwarz.lean"
+findings = [
+ {
+  "target": f"{F} (module docstring)",
+  "claim": "The module-docstring bullets for `Complex.norm_deriv_le_one_of_mapsTo_ball`, `Complex.dist_le_dist_of_mapsTo_ball_self` and `Complex.norm_le_norm_of_mapsTo_ball_self` (lines 25-34) do not describe the statements the PR leaves. The first two, which the PR rewrote, still say `f : ℂ → ℂ` and 'sends a point `c` to itself', but the PR removed the `hc : f c = c` hypothesis, generalized `f` to `ℂ → E` and now assumes `MapsTo f (ball c R) (closedBall (f c) R)`. The `dist_le_dist_of_mapsTo_ball_self` bullet still gives the conclusion as `dist (f z) c ≤ dist z c`, but the statement is now `dist (f z) (f c) ≤ dist z c`. The `norm_le_norm_of_mapsTo_ball_self` bullet still says `f : ℂ → ℂ`, 'to itself' (open ball) and `abs (f z) ≤ abs z`.",
+  "requested_change": "Rewrite those three bullets to match the new statements: `f : ℂ → E`; an open disk with center `c` (radius `R`) is sent to the closed ball with center `f c` and the same radius; no fixed-point hypothesis; conclusion `dist (f z) (f c) ≤ dist z c`. For `norm_le_norm_of_mapsTo_ball_self`, say that `f` sends `0` to `0` and the open disk with center `0` into the closed ball with center `0` and the same radius, with conclusion `‖f z‖ ≤ ‖z‖`. Text verified to compile (lines 16-34):\n" + moddoc,
+  "severity": "blocking",
+  "evidence": "file_read of the reviewed file: lines 25-34 as quoted, against the statements at lines 156-173 (`h_maps : MapsTo f (ball c R) (closedBall (f c) R)`, no `hc`, conclusion `dist (f z) (f c) ≤ dist z c`; the variable block gives `f : ℂ → E`). lean_verify_edit in line mode, replacing lines 16-34 with the text above: success, no errors or warnings; all lines are at most 100 characters."
+ },
+ {
+  "target": f"{F} (module docstring)",
+  "claim": "The module docstring cites `Complex.abs_deriv_le_div_of_mapsTo_ball` (line 16) and `Complex.abs_deriv_le_one_of_mapsTo_ball` (line 25), and neither declaration exists. The PR edits both bullets and keeps the dead names. The lemma at line 25 is actually `Complex.norm_deriv_le_one_of_mapsTo_ball`.",
+  "requested_change": "In the first bullet, drop `Complex.abs_deriv_le_div_of_mapsTo_ball` and leave only `Complex.norm_deriv_le_div_of_mapsTo_ball`. In the third bullet, replace `Complex.abs_deriv_le_one_of_mapsTo_ball` with `Complex.norm_deriv_le_one_of_mapsTo_ball` (included in the verified module-docstring text of the previous finding).",
+  "severity": "advisory",
+  "evidence": "declaration_search `Complex.abs_deriv_le_one_of_mapsTo_ball` and `Complex.abs_deriv_le_div_of_mapsTo_ball`: 0 declarations at the base commit and 0 in the PR's files. content_search `abs_deriv_le_(div|one)_of_mapsTo_ball` over the tree: the only hits are Schwarz.lean lines 16 and 25 (the docstring). The corrected module docstring compiles (lean_verify_edit, lines 16-34: success)."
+ },
+ {
+  "target": "Complex.norm_deriv_le_div_of_mapsTo_ball",
+  "claim": "The docstring of `Complex.norm_deriv_le_div_of_mapsTo_ball` still says `f` sends the disk 'to an open ball with center `f c` and radius `R₂`', but the PR weakened `h_maps` to `MapsTo f (ball c R₁) (closedBall (f c) R₂)`. The PR updated the module-doc bullet and the `dist_le_div_mul_dist_of_mapsTo_ball` docstring to 'closed ball', but not this one.",
+  "requested_change": "Change 'to an open ball' to 'to a closed ball' in the docstring:\n" + doc_div,
+  "severity": "blocking",
+  "evidence": "file_read lines 134-139: the docstring says 'open ball', and the hypothesis at line 138 is `closedBall (f c) R₂`. lean_verify_edit in line mode, replacing lines 134-136 with the text above: success, no errors or warnings."
+ },
+ {
+  "target": "Complex.norm_deriv_le_one_of_mapsTo_ball",
+  "claim": "The docstring of `Complex.norm_deriv_le_one_of_mapsTo_ball` describes the old statement: '`f : ℂ → ℂ` sends an open disk of positive radius to itself and the center of this disk to itself'. After the PR, `f : ℂ → E` and the only hypothesis is `MapsTo f (ball c R) (closedBall (f c) R)` with `0 < R`; `hc : f c = c` was removed.",
+  "requested_change": "Rewrite the docstring to state the new hypotheses:\n" + doc_one,
+  "severity": "blocking",
+  "evidence": "file_read lines 153-158: the docstring as quoted; the statement is `(hd : DifferentiableOn ℂ f (ball c R)) (h_maps : MapsTo f (ball c R) (closedBall (f c) R)) (h₀ : 0 < R) : ‖deriv f c‖ ≤ 1`, with `f : ℂ → E` from the file-level `variable`. lean_verify_edit in line mode, replacing lines 153-155 with the text above: success, no errors or warnings."
+ },
+ {
+  "target": "Complex.dist_le_dist_of_mapsTo_ball_self",
+  "claim": "The docstring of `Complex.dist_le_dist_of_mapsTo_ball_self` still says '`f : ℂ → ℂ` sends an open disk to itself and the center `c` of this disk to itself' and gives the conclusion as `dist (f z) c ≤ dist z c`. The PR changed the statement to `f : ℂ → E`, `h_maps : MapsTo f (ball c R) (closedBall (f c) R)` with no fixed-point hypothesis, and conclusion `dist (f z) (f c) ≤ dist z c`.",
+  "requested_change": "Rewrite the docstring to match the new statement:\n" + doc_dist,
+  "severity": "blocking",
+  "evidence": "file_read lines 160-165: the docstring as quoted, against the statement at lines 162-164. lean_verify_edit in line mode, replacing lines 160-161 with the text above: success, no errors or warnings."
+ },
+ {
+  "target": "Complex.norm_le_norm_of_mapsTo_ball_self",
+  "claim": "The docstring the PR rewrote for `Complex.norm_le_norm_of_mapsTo_ball_self` leaves out the hypothesis `h₀ : f 0 = 0`. As written it states something false: a constant map `f = w` with `0 < ‖w‖ ≤ R` sends `ball 0 R` into `closedBall 0 R`, yet `‖f z‖ = ‖w‖ > ‖z‖` for small `z`.",
+  "requested_change": "Mention the normalization `f 0 = 0` in the docstring:\n" + doc_norm,
+  "severity": "advisory",
+  "evidence": "file_read lines 167-173: the docstring says only 'sends an open disk with center `0` to the closed ball with center `0` of the same radius', while the statement keeps `(h₀ : f 0 = 0)`, and the proof uses it (`simpa [h₀] ... (by rwa [h₀])`). lean_verify_edit in line mode, replacing lines 167-169 with the text above: success, no errors or warnings."
+ },
+ {
+  "target": f"{F} (open scoped Topology ComplexConjugate)",
+  "claim": "The PR adds `ComplexConjugate` to `open scoped Topology ComplexConjugate` (line 52), but nothing in the file uses the `conj` notation, so the new scoped open is dead.",
+  "requested_change": "Revert line 52 to `open scoped Topology`.",
+  "severity": "advisory",
+  "evidence": "file_read of the whole reviewed file (175 lines): no occurrence of `conj`. lean_verify_edit in line mode, replacing line 52 with `open scoped Topology`: success, no errors or warnings. The file as the PR leaves it also compiles with no warnings (as-is check)."
+ },
+]
+out = D / "findings.json"
+out.write_text(json.dumps(findings, ensure_ascii=False, indent=1) + "\n")
+print(len(json.loads(out.read_text())))

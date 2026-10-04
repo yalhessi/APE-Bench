@@ -1,0 +1,1 @@
+{"path": "Mathlib/SetTheory/Ordinal/FixedPoint.lean", "line_start": 382, "line_end": 383, "replacement": "@[deprecated mem_range_deriv (since := \"2025-10-25\")]\nalias IsNormal.fp_iff_deriv := fp_iff_deriv\n\nexample (H : IsNormal f) {a} : a ∈ Set.range (deriv f) ↔ f a = a := Ordinal.IsNormal.mem_range_deriv H"}

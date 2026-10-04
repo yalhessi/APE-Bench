@@ -1,0 +1,37 @@
+[
+  {
+    "target": "Finset.mem_map_equiv",
+    "claim": "The new proof of `Finset.mem_map_equiv` (`simp only [mem_map, Equiv.coe_toEmbedding]` then `grind`) is a golf that makes this basic `@[simp 1100]` lemma slower: the PR's own profile reports <10 ms before and 25 ms after. It also still needs the `simp only` step, because `grind` alone fails here. A one-line `simp` proof exists that uses no `grind`.",
+    "requested_change": "Replace the proof body of `Finset.mem_map_equiv` with `by simp [Equiv.apply_eq_iff_eq_symm_apply]`, or revert this declaration to its previous proof. Do not keep a change that regresses the timing.",
+    "severity": "advisory",
+    "evidence": "PR description: `Finset.mem_map_equiv`: <10 ms before, 25 ms after. lean_verify_edit on Mathlib/Data/Finset/Image.lean: the file as the PR leaves it compiles. The replacement `simp [Equiv.apply_eq_iff_eq_symm_apply]` gives success=true with no warnings. So does `simp only [mem_map, Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply, exists_eq_right]`. Plain `grind` fails, and so do `grind [Equiv.coe_toEmbedding]` and `grind [Equiv.apply_eq_iff_eq_symm_apply]`: grind cannot close `f.toEmbedding w = b ⊢ f.symm b ∈ s`. Bare `simp` leaves `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s`."
+  },
+  {
+    "target": "Rat.inv_intCast_den_of_pos",
+    "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]` then `grind`) is slower than the proof it replaces: the PR's own profile reports <10 ms before and 17 ms after. It does not follow its sibling `inv_intCast_num_of_pos`, which is a plain `simp [*]`. A plain `simp` call with the positivity facts closes the goal.",
+    "requested_change": "Replace the proof body of `Rat.inv_intCast_den_of_pos` with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, or revert it to the previous proof. If `grind` is kept, fold the preprocessing into it as `grind [den_inv, num_intCast]` rather than `simp only [...]` followed by `grind`.",
+    "severity": "advisory",
+    "evidence": "PR description: `Rat.inv_intCast_den_of_pos`: <10 ms before, 17 ms after. lean_verify_edit on Mathlib/Data/Rat/Lemmas.lean: the file as the PR leaves it compiles. `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]` gives success=true with no warnings. `grind [den_inv, num_intCast]` gives success=true, and so does `simp only [den_inv, num_intCast]; lia`. `simp [ha0.ne', ha0.le]` leaves `↑a.natAbs = a`, with ha0.le reported unused. `abs_of_pos` is an unknown identifier in this file. The sibling at line 296-297 is `inv_intCast_num_of_pos ... := by simp [*]`."
+  },
+  {
+    "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "claim": "The new closing step of `MeasureTheory.Measure.pi_map_piCongrLeft`, `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`, leaves the reindexing equivalence to unification. It writes the pointwise hypothesis as `congrFun rfl`, a roundabout spelling of `fun _ ↦ rfl`. The preceding `simp only [pi_pi, this]` is only a rewrite with a local hypothesis and a lemma.",
+    "requested_change": "Replace the last two lines of `MeasureTheory.Measure.pi_map_piCongrLeft` with `rw [this, pi_pi]` followed by `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/MeasureTheory/Constructions/Pi.lean: the file as the PR leaves it compiles. Replacing the final `simp only [pi_pi, this]` / `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` with `rw [this, pi_pi]` / `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl` gives success=true with no warnings. `simp only [pi_pi, this]` / `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl` also gives success=true."
+  },
+  {
+    "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+    "claim": "The golfed `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` still carries the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The adjacent lemmas in the same file (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) do this step with `conv_rhs => rw [← κ.disintegrate κ.condKernel]`. With the new `Kernel.compProd_apply_prod`, the `have` is unnecessary.",
+    "requested_change": "Replace the proof body of `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]`, matching the sibling lemmas. The one-liner `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean: the file as the PR leaves it compiles. The body `conv_rhs => rw [← κ.disintegrate κ.condKernel]` / `rw [Kernel.compProd_apply_prod hs ht]` gives success=true with no warnings. `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` gives success=true with no warnings. File lines 44-67 show the sibling `conv_rhs => rw [← κ.disintegrate κ.condKernel]` pattern. `Kernel.compProd_apply_prod : (κ ⊗ₖ η) a (s ×ˢ t) = ∫⁻ b in s, η (a, b) t ∂(κ a)` (CompProd.lean:137)."
+  },
+  {
+    "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+    "claim": "The golfed `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` keeps the auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that local equation. The neighbouring lemmas in the same section (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]`. With `Measure.compProd_apply_prod`, the `have` is unnecessary.",
+    "requested_change": "Replace the proof body of `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` with `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]`. The one-liner `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` also works. Either way, drop the `have` and the `simp only [this]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean: the body `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` / `rw [compProd_apply_prod hs ht]` gives success=true with no warnings. `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` gives success=true with no warnings. File lines 135-159 show the sibling `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` pattern. `Measure.compProd_apply_prod : (μ ⊗ₘ κ) (s ×ˢ t) = ∫⁻ a in s, κ a t ∂μ` (MeasureCompProd.lean:69)."
+  }
+]

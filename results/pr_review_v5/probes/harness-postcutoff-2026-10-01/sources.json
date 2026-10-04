@@ -1,0 +1,7 @@
+{"X1": {"kind": "claude"}, "X2": {"kind": "claude"},
+ "A1": {"kind": "solo", "run": "probe_postcutoff_gpt52_G_lvfix_rep1"},
+ "A2": {"kind": "solo", "run": "probe_postcutoff_gpt52_G_lvfix_rep2"},
+ "A3": {"kind": "solo", "run": "probe_postcutoff_gpt52_G_lvfix_rep3"},
+ "C1": {"kind": "solo", "run": "probe_postcutoff_gpt52_G_claude_lvfix_rep1"},
+ "C2": {"kind": "solo", "run": "probe_postcutoff_gpt52_G_claude_lvfix_rep2"},
+ "C3": {"kind": "solo", "run": "probe_postcutoff_gpt52_G_claude_lvfix_rep3"}}

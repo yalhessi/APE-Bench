@@ -1,0 +1,569 @@
+[
+ {
+  "id": "c1",
+  "kind": "usage",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (t : Finset α) (b : β) (hb : e.symm b ∈ t) : b ∈ t.map e.toEmbedding := by\n  simpa using hb",
+  "compiled": true,
+  "result": "no error at these lines (inserted after line 76 of Mathlib/Data/Finset/Image.lean)",
+  "shows": "A client holding `e.symm b ∈ t` reaches `b ∈ t.map e.toEmbedding` with plain `simpa`; the `simp 1100` registration serves simp users."
+ },
+ {
+  "id": "c2",
+  "kind": "usage",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (t : Finset α) (a : α) (ha : a ∈ t) : e a ∈ t.map e.toEmbedding := by\n  simp [ha]",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "The forward direction `e a ∈ t.map e.toEmbedding` from `a ∈ t` is closed by `simp [ha]`."
+ },
+ {
+  "id": "c3",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (t : Finset α) (b : β) : b ∈ t.map e.toEmbedding ↔ e.symm b ∈ t := by\n  grind",
+  "compiled": false,
+  "result": "`grind` failed: e-matching instantiated `mem_map` giving `e.toEmbedding w = b`, but `e.toEmbedding w` is never identified with `e w`, so `Equiv.symm_apply_apply` never fires",
+  "shows": "`grind` alone cannot prove the statement of `mem_map_equiv`; this is why the PR's proof needs `simp only [mem_map, Equiv.coe_toEmbedding]` before `grind`."
+ },
+ {
+  "id": "c4",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (t : Finset α) (b : β) (hb : e.symm b ∈ t) : b ∈ t.map e.toEmbedding := by\n  grind",
+  "compiled": false,
+  "result": "`grind` failed with `¬e.toEmbedding (e.symm b) = b` unresolved",
+  "shows": "As the file stands, a `grind` user cannot close a client goal about membership in `t.map e.toEmbedding` even with the witness `e.symm b ∈ t` in context."
+ },
+ {
+  "id": "c5",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "section\nattribute [local grind =] mem_map_equiv\n\nexample (e : α ≃ β) (t : Finset α) (b : β) (hb : e.symm b ∈ t) : b ∈ t.map e.toEmbedding := by\n  grind\n\nexample (e : α ≃ β) (t : Finset α) (a : α) (ha : a ∈ t) : e a ∈ t.map e.toEmbedding := by\n  grind\n\nend",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "With `mem_map_equiv` registered as `grind =`, `grind` closes both client goals that failed in c4."
+ },
+ {
+  "id": "c6",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "example (e : α ≃ β) (t : Finset α) (b : β) : b ∈ t.map e.toEmbedding ↔ e.symm b ∈ t := by\n  grind [Equiv.toEmbedding_apply]",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The missing link for `grind` is `Equiv.toEmbedding_apply` (`f.toEmbedding a = f a`), which is not grind-registered; supplied by hand, `grind` proves the statement in one call."
+ },
+ {
+  "id": "c7",
+  "kind": "automation_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "content_search '@\\[[^\\]]*grind' in Mathlib/Data/Finset/Image.lean; content_search 'coe_toEmbedding|toEmbedding_apply' in Mathlib/Logic/Embedding",
+  "compiled": null,
+  "result": "4 grind registrations in the file, all `@[simp, grind =]` on the basic characterisations mem_map (l.68), mem_image (l.284), mem_filterMap (l.530), mem_subtype (l.564); `Equiv.coe_toEmbedding` is `@[simp]` only and `Equiv.toEmbedding_apply` carries no attribute",
+  "shows": "In Image.lean the specialised `@[simp 1100]` lemmas (mem_map_equiv, mem_map', mem_map_mk) carry no grind attribute; only the 4 basic `mem_*` lemmas do."
+ },
+ {
+  "id": "c8",
+  "kind": "binders_form_check",
+  "objects": [
+   "Finset.mem_map_equiv"
+  ],
+  "lean": "content_search 'f : α ≃ β' in Mathlib/Data/Finset/Image.lean; plus example (e : α ≃ β) (t : Finset α) (b : β) : b ∈ t.map (e : α ↪ β) ↔ e.symm b ∈ t := by simp",
+  "compiled": true,
+  "result": "4 hits (mem_map_equiv l.74, subset_map_symm l.144, map_symm_subset l.152, map_filter l.196), all `{f : α ≃ β}` implicit; the coercion-form example compiled",
+  "shows": "`mem_map_equiv`'s implicit `{f : α ≃ β}` (shadowing the section's `f : α ↪ β`) matches all 4 Equiv lemmas of the file, and the coercion spelling `t.map (e : α ↪ β)` used by siblings is handled by simp too. The statement has no hypothesis or instance argument to weaken."
+ },
+ {
+  "id": "c9",
+  "kind": "usage",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example (n : ℤ) (hn : 0 < n) : ((n : ℚ)⁻¹.den : ℤ) = n := inv_intCast_den_of_pos hn",
+  "compiled": true,
+  "result": "no error at these lines (inserted after line 330 of Mathlib/Data/Rat/Lemmas.lean)",
+  "shows": "A client with `0 < n` applies the lemma directly."
+ },
+ {
+  "id": "c10",
+  "kind": "usage",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "-- usage: client wants the ℕ-valued denominator\nexample (n : ℤ) (hn : 0 < n) : (n : ℚ)⁻¹.den = n.natAbs := by\n  have := inv_intCast_den_of_pos hn\n  omega",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "A client wanting the ℕ-valued `(n : ℚ)⁻¹.den = n.natAbs` gets it from the ℤ-cast form with `omega`."
+ },
+ {
+  "id": "c11",
+  "kind": "generalised_statement",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "-- generalised statement: `a ≠ 0` with `natAbs`, same proof\nexample {a : ℤ} (ha0 : a ≠ 0) : ((a : ℚ)⁻¹.den : ℤ) = a.natAbs := by\n  simp only [den_inv, num_intCast]\n  grind",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "The PR's proof (`simp only [den_inv, num_intCast]; grind`) also proves the `a ≠ 0` version with `a.natAbs` on the right."
+ },
+ {
+  "id": "c12",
+  "kind": "generalised_statement",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "-- generalised statement: weaken `0 < a` to `0 ≤ a`, same proof\nexample {a : ℤ} (ha0 : 0 ≤ a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp only [den_inv, num_intCast]\n  grind",
+  "compiled": false,
+  "result": "`grind` failed in case `a = 0`: `↑(if a = 0 then 1 else a.natAbs) = a` with a := 0",
+  "shows": "`0 < a` cannot be weakened to `0 ≤ a`: at `a = 0` the denominator of `0⁻¹ = 0` is 1."
+ },
+ {
+  "id": "c13",
+  "kind": "closure_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "-- closure: special case of `inv_intCast_den`\nexample {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  rw [inv_intCast_den, if_neg ha0.ne']\n  omega",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "`inv_intCast_den_of_pos` is a special case of the existing `inv_intCast_den` (same file, l.322), obtained with `if_neg` and `omega`; the `a ≠ 0` generalisation of c11 is likewise `inv_intCast_den` plus `if_neg`, so the family already covers it."
+ },
+ {
+  "id": "c14",
+  "kind": "automation_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "example {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp [*]",
+  "compiled": false,
+  "result": "unsolved goals ⊢ (if a = 0 then 1 else ↑a.natAbs) = a",
+  "shows": "Unlike its `num` sibling (proved by `simp [*]`), the `den` statement is not closed by simp with the hypothesis; simp stops at the `if`."
+ },
+ {
+  "id": "c15",
+  "kind": "automation_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "-- automation: `simp` then `omega`\nexample {a : ℤ} (ha0 : 0 < a) : ((a : ℚ)⁻¹.den : ℤ) = a := by\n  simp\n  omega",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "`simp; omega` closes the statement, so it is reachable by standard automation without the lemma."
+ },
+ {
+  "id": "c16",
+  "kind": "binders_form_check",
+  "objects": [
+   "Rat.inv_intCast_den_of_pos"
+  ],
+  "lean": "content_search 'theorem inv_(int|nat)Cast_(num|den)|theorem inv_ofNat' in Mathlib/Data/Rat/Lemmas.lean",
+  "compiled": null,
+  "result": "10 hits l.296-326; the four `_of_pos` lemmas all take `{a : ℤ/ℕ} (ha0 : 0 < a)`; the unconditional ones take `(a : _)`; none carries an attribute",
+  "shows": "Binders, hypothesis name and (absent) registration of `inv_intCast_den_of_pos` match its 9 siblings; the int/nat × num/den × of_pos/unconditional/ofNat grid is complete."
+ },
+ {
+  "id": "c17",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "-- closure: and conversely the `MeasurePreserving` form from `pi_map_piCongrLeft`\nexample (e : ι ≃ ι') {β : ι' → Type*} [∀ i, MeasurableSpace (β i)]\n    (ν : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (ν i)] :\n    MeasurePreserving (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      (Measure.pi fun i ↦ ν (e i)) (Measure.pi ν) :=\n  ⟨(MeasurableEquiv.piCongrLeft (fun i ↦ β i) e).measurable, Measure.pi_map_piCongrLeft e ν⟩",
+  "compiled": true,
+  "result": "Lean verification completed successfully (inserted after line 727 of Mathlib/MeasureTheory/Constructions/Pi.lean)",
+  "shows": "A client needing `MeasurePreserving` builds it from `pi_map_piCongrLeft` in one anonymous constructor."
+ },
+ {
+  "id": "c18",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "-- usage: a client rewriting a product measure over a reindexed family, as in ProductMeasure.lean\nexample (e : ι ≃ ι') {β : ι' → Type*} [∀ i, MeasurableSpace (β i)]\n    (ν : (i : ι') → Measure (β i)) [∀ i, IsProbabilityMeasure (ν i)] (S : Set ((i : ι') → β i))\n    (hS : MeasurableSet S) :\n    Measure.pi ν S = Measure.pi (fun i ↦ ν (e i)) (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e ⁻¹' S) := by\n  rw [← Measure.pi_map_piCongrLeft e, Measure.map_apply (by fun_prop) hS]",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The rewrite `← Measure.pi_map_piCongrLeft e` followed by `map_apply` works as in the three uses in Probability/ProductMeasure.lean (l.92, l.253, l.316)."
+ },
+ {
+  "id": "c19",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "-- closure: `pi_map_piCongrLeft` is the `map_eq` field of `measurePreserving_piCongrLeft`\nexample (e : ι ≃ ι') {β : ι' → Type*} [∀ i, MeasurableSpace (β i)]\n    (ν : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (ν i)] :\n    (Measure.pi fun i ↦ ν (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi ν :=\n  (measurePreserving_piCongrLeft ν e).map_eq",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The statement of `pi_map_piCongrLeft e ν` is exactly `(measurePreserving_piCongrLeft ν e).map_eq` (same file, l.720): the file states the same fact twice."
+ },
+ {
+  "id": "c20",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft",
+   "MeasureTheory.measurePreserving_piCongrLeft"
+  ],
+  "lean": "theorem measurePreserving_piCongrLeft (f : ι' ≃ ι) :\n    MeasurePreserving (MeasurableEquiv.piCongrLeft α f)\n      (Measure.pi fun i' => μ (f i')) (Measure.pi μ) where\n  measurable := (MeasurableEquiv.piCongrLeft α f).measurable\n  map_eq := Measure.pi_map_piCongrLeft f μ",
+  "compiled": true,
+  "result": "Lean verification completed successfully (declaration replaced)",
+  "shows": "`measurePreserving_piCongrLeft` can take `map_eq := Measure.pi_map_piCongrLeft f μ`, so the two proofs are redundant."
+ },
+ {
+  "id": "c21",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [hι' : Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  refine (pi_eq fun s _ => ?_).symm\n  rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_piCongrLeft e,\n    Equiv.piCongrLeft_preimage_univ_pi, pi_pi _ _, e.prod_comp (fun i => μ i (s i))]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (declaration replaced)",
+  "shows": "The two-step proof already used for `measurePreserving_piCongrLeft.map_eq` (`pi_eq` + one `rw` chain) proves `pi_map_piCongrLeft` at its current position (l.446), with no reordering."
+ },
+ {
+  "id": "c22",
+  "kind": "generalised_statement",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "lemma pi_map_piCongrLeft [Fintype ι'] (e : ι ≃ ι') {β : ι' → Type*}\n    [∀ i, MeasurableSpace (β i)] (μ : (i : ι') → Measure (β i)) [∀ i, SigmaFinite (μ i)] :\n    (Measure.pi fun i ↦ μ (e i)).map (MeasurableEquiv.piCongrLeft (fun i ↦ β i) e)\n      = Measure.pi μ := by\n  let e_meas : ((b : ι) → β (e b)) ≃ᵐ ((a : ι') → β a) :=\n    MeasurableEquiv.piCongrLeft (fun i ↦ β i) e\n  refine Measure.pi_eq (fun s _ ↦ ?_) |>.symm\n  rw [e_meas.measurableEmbedding.map_apply]\n  let s' : (i : ι) → Set (β (e i)) := fun i ↦ s (e i)\n  have : e_meas ⁻¹' pi univ s = pi univ s' := by\n    ext x\n    simp only [mem_preimage, Set.mem_pi, mem_univ, forall_true_left, s']\n    refine (e.forall_congr ?_).symm\n    intro i\n    rw [MeasurableEquiv.piCongrLeft_apply_apply e x i]\n  simp only [pi_pi, this]\n  exact Fintype.prod_equiv _ _ _ (congrFun rfl)",
+  "compiled": true,
+  "result": "Lean verification completed successfully (declaration replaced)",
+  "shows": "The instance name `hι'` in `[hι' : Fintype ι']` is unused; the anonymous binder `[Fintype ι']` compiles with the PR's proof and every use in the file. The `SigmaFinite` and `Fintype` arguments are the ones `Measure.pi_eq` needs; nothing else can be dropped."
+ },
+ {
+  "id": "c23",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "content_search '\\[h[^ :\\]]* : Fintype' in Mathlib/MeasureTheory",
+  "compiled": null,
+  "result": "1 hit: Constructions/Pi.lean l.446 (this lemma)",
+  "shows": "`pi_map_piCongrLeft` has the only named `Fintype` instance binder in Mathlib/MeasureTheory; the file's MeasurePreserving section writes `variable [Fintype ι']` (l.701)."
+ },
+ {
+  "id": "c24",
+  "kind": "automation_check",
+  "objects": [
+   "MeasureTheory.Measure.pi_map_piCongrLeft"
+  ],
+  "lean": "content_search 'lemma pi_map_|theorem pi_map_' (with preceding line) in Constructions/Pi.lean; content_search 'pi_map_piCongrLeft|measurePreserving_piCongrLeft' in Mathlib",
+  "compiled": null,
+  "result": "4 pi_map_* lemmas (pi_map_eval, pi_map_pi, pi_map_piCongrLeft, pi_map_piOptionEquivProd), none with an attribute; pi_map_piCongrLeft used 3 times as `rw [← ...]` in ProductMeasure.lean, measurePreserving_piCongrLeft 6 times",
+  "shows": "No registration is expected: the `pi_map_*` siblings are all unregistered rewrite lemmas and clients use this one by `rw`."
+ },
+ {
+  "id": "c25",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "-- usage: a client with a sequence and a real-valued limsup bound\nexample {ν : ProbabilityMeasure Ω} {νs : ℕ → ProbabilityMeasure Ω}\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun n ↦ (νs n : Measure Ω).real F) atTop ≤ (ν : Measure Ω).real F) :\n    Tendsto νs atTop (𝓝 ν) :=\n  tendsto_of_forall_isClosed_limsup_real_le' h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (inserted after line 650 of Mathlib/MeasureTheory/Measure/Portmanteau.lean)",
+  "shows": "A client with a sequence and a real-valued limsup bound applies the lemma directly with `L := atTop`."
+ },
+ {
+  "id": "c26",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "lemma tendsto_of_forall_isClosed_limsup_real_le'\n    (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L (𝓝 μ) := by\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_limsup] at h\n  exact tendsto_of_forall_isClosed_limsup_le h",
+  "compiled": true,
+  "result": "Lean verification completed successfully (declaration replaced; caller at l.679 still compiles)",
+  "shows": "The lemma's own `{L : Filter ι} [L.IsCountablyGenerated]` duplicate the `section Closed` variables (l.606) and shadow them; removing them compiles, including the use in `tendsto_iff_forall_lipschitz_integral_tendsto`."
+ },
+ {
+  "id": "c27",
+  "kind": "binders_form_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "content_search 'L : Filter' and '^section|^end|^variable' in Mathlib/MeasureTheory/Measure/Portmanteau.lean",
+  "compiled": null,
+  "result": "section Closed (l.602-652) declares `{L : Filter ι} [L.IsCountablyGenerated]` at l.606; of its 4 lemmas only l.645 rebinds them; the lemmas that bind `{L : Filter ι}` themselves (l.113-590) are all in sections without an `L` variable",
+  "shows": "Rebinding is the file's form only where no section variable exists; `tendsto_of_forall_isClosed_limsup_real_le'` is the single lemma that rebinds an existing section variable."
+ },
+ {
+  "id": "c28",
+  "kind": "twin",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "-- twin: unprimed real version (no coercion to `Measure`), same shape of proof\nexample (h : ∀ F : Set Ω, IsClosed F → limsup (fun i ↦ (μs i F : ℝ)) L ≤ (μ F : ℝ)) :\n    Tendsto μs L (𝓝 μ) := by\n  simp only [NNReal.toReal_limsup] at h\n  exact tendsto_of_forall_isClosed_limsup_le h",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The unprimed real twin (hypothesis in `(μs i F : ℝ)`, no coercion to `Measure`) is derivable the same way; it does not exist in Mathlib (c31)."
+ },
+ {
+  "id": "c29",
+  "kind": "twin",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "-- twin: the open-set / liminf real version, same shape of proof\nexample (h : ∀ G : Set Ω, IsOpen G →\n      (μ : Measure Ω).real G ≤ liminf (fun i ↦ (μs i : Measure Ω).real G) L) :\n    Tendsto μs L (𝓝 μ) := by\n  simp only [ProbabilityMeasure.measureReal_eq_coe_coeFn, NNReal.toReal_liminf] at h\n  exact tendsto_of_forall_isOpen_le_liminf h",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The open-set/liminf real twin of the primed lemma is derivable the same way from `tendsto_of_forall_isOpen_le_liminf`; it does not exist in Mathlib (c31)."
+ },
+ {
+  "id": "c30",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "-- closure: the primed real lemma is the NNReal lemma after `simpa`\nexample (h : ∀ F : Set Ω, IsClosed F →\n      limsup (fun i ↦ (μs i : Measure Ω).real F) L ≤ (μ : Measure Ω).real F) :\n    Tendsto μs L (𝓝 μ) :=\n  tendsto_of_forall_isClosed_limsup_le (by simpa using h)",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "After the PR the primed real lemma is `tendsto_of_forall_isClosed_limsup_le` composed with `simpa` (both rewriting lemmas are `@[simp]`), so clients with any real form of the hypothesis can reach the NNReal lemma directly."
+ },
+ {
+  "id": "c31",
+  "kind": "twin",
+  "objects": [
+   "MeasureTheory.tendsto_of_forall_isClosed_limsup_real_le'"
+  ],
+  "lean": "content_search 'limsup_real_le|isOpen_le_liminf_real|real_le_liminf' in Mathlib; declaration_search tendsto_of_forall_isOpen_le_liminf_real",
+  "compiled": null,
+  "result": "only Portmanteau.lean l.645 (declaration) and l.679 (its use); declaration_search: no declaration",
+  "shows": "The real-valued portmanteau family has one member: the primed closed/limsup version. The open/liminf and uncoerced versions are absent."
+ },
+ {
+  "id": "c32",
+  "kind": "usage",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "-- usage: complete linear order, all bounds discharged by the autoParam\nexample {δ : Type*} [CompleteLinearOrder δ] {f : Filter α} {F : ι → α → δ} {s : Finset ι}\n    (hs : s.Nonempty) :\n    limsup (fun a ↦ s.sup' hs (fun i ↦ F i a)) f = s.sup' hs (fun i ↦ limsup (F i) f) :=\n  limsup_finset_sup' hs",
+  "compiled": true,
+  "result": "no error at these lines (inserted after line 1188 of Mathlib/Order/LiminfLimsup.lean)",
+  "shows": "In a complete linear order the autoParams discharge both families of bounds; the client passes only `hs`."
+ },
+ {
+  "id": "c33",
+  "kind": "usage",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "-- usage: conditionally complete order, client supplies the bounds\nexample {δ : Type*} [ConditionallyCompleteLinearOrder δ] {f : Filter α} {F : ι → α → δ}\n    {s : Finset ι} (hs : s.Nonempty) (h₁ : ∀ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i))\n    (h₂ : ∀ i ∈ s, f.IsBoundedUnder (· ≤ ·) (F i)) :\n    limsup (fun a ↦ s.sup' hs (fun i ↦ F i a)) f = s.sup' hs (fun i ↦ limsup (F i) f) :=\n  limsup_finset_sup' hs h₁ h₂",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "In a conditionally complete linear order the client passes its bounds positionally."
+ },
+ {
+  "id": "c34",
+  "kind": "generalised_statement",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "theorem limsup_finset_sup' [ConditionallyCompleteLinearOrder β] {f : Filter α}\n    {F : ι → α → β} {s : Finset ι} (hs : s.Nonempty)\n    (h₁ : ∃ i ∈ s, f.IsCoboundedUnder (· ≤ ·) (F i))\n    (h₂ : ∀ i ∈ s, f.IsBoundedUnder (· ≤ ·) (F i) := by exact fun _ _ ↦ by isBoundedDefault) :\n    limsup (fun a ↦ sup' s hs (fun i ↦ F i a)) f = sup' s hs (fun i ↦ limsup (F i) f) := by\n  have bddsup := isBoundedUnder_le_finset_sup' hs h₂\n  apply le_antisymm\n  · have cobddsup := isCoboundedUnder_le_finset_sup' hs h₁\n    refine (limsup_le_iff cobddsup bddsup).2 (fun b hb ↦ ?_)\n    simp only [gt_iff_lt, sup'_lt_iff, eventually_all_finset] at hb ⊢\n    exact fun i i_s ↦ eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)\n  · apply Finset.sup'_le hs (fun i ↦ limsup (F i) f)\n    refine fun i i_s ↦ limsup_le_limsup (Eventually.of_forall (fun a ↦ ?_)) ?_ bddsup\n    · simp only [le_sup'_iff]\n      use i, i_s\n    · isBoundedDefault",
+  "compiled": false,
+  "result": "the ≤ branch compiles with `h₁ : ∃ i ∈ s, …`; the ≥ branch leaves `IsCoboundedUnder (· ≤ ·) f (F i)` for each `i ∈ s` (plus the expected breakage of the two callers)",
+  "shows": "Per-member coboundedness `h₁ : ∀ i ∈ s, …` is used by `limsup_le_limsup` in the ≥ direction; only the ≤ direction would accept the weaker `∃`."
+ },
+ {
+  "id": "c35",
+  "kind": "closure_check",
+  "objects": [
+   "limsup_finset_sup'",
+   "limsup_max"
+  ],
+  "lean": "-- closure: `limsup_max` is the two-index case of `limsup_finset_sup'`\nexample {δ : Type*} [CompleteLinearOrder δ] {f : Filter α} {u v : α → δ} :\n    limsup (fun a ↦ max (u a) (v a)) f = max (limsup u f) (limsup v f) := by\n  have := limsup_finset_sup' (f := f) (F := fun b : Bool ↦ if b then u else v)\n    (s := {true, false}) (by simp)\n  simpa [Finset.sup'_insert] using this",
+  "compiled": true,
+  "result": "Lean verification completed successfully (after one malformed attempt with nonexistent lemma names `Finset.sup'_univ_eq_ciSup`/`ciSup_bool_eq`/`sup_eq_max`, which established nothing)",
+  "shows": "In a complete linear order `limsup_max` is the two-index case of `limsup_finset_sup'`."
+ },
+ {
+  "id": "c36",
+  "kind": "closure_check",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "file_read Mathlib/Order/LiminfLimsup.lean l.1111-1190 (section MinMax)",
+  "compiled": null,
+  "result": "limsup_max / liminf_min, limsup_finset_sup' / liminf_finset_inf' (via βᵒᵈ) / limsup_finset_sup / liminf_finset_inf (via βᵒᵈ) all present",
+  "shows": "The sup/inf, primed/unprimed, and dual twins of `limsup_finset_sup'` all exist, with the duals derived from it."
+ },
+ {
+  "id": "c37",
+  "kind": "binders_form_check",
+  "objects": [
+   "limsup_finset_sup'"
+  ],
+  "lean": "file_read section MinMax (l.1111-1190)",
+  "compiled": null,
+  "result": "the 4 finset members share `(h₁ : ∀ i ∈ s, f.IsCoboundedUnder … := by exact fun _ _ ↦ by isBoundedDefault)` and the same `h₂`; none of the 6 lemmas carries an attribute",
+  "shows": "Binders, autoParam form and (absent) registration of `limsup_finset_sup'` match its family."
+ },
+ {
+  "id": "c38",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "-- usage (measure): a client computes the measure of a rectangle by the disintegration\nexample {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ρ (s ×ˢ t) = ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst := by\n  rw [setLIntegral_condKernel_eq_measure_prod hs ht]",
+  "compiled": true,
+  "result": "Lean verification completed successfully (inserted after line 171 of Mathlib/Probability/Kernel/Disintegration/Integral.lean)",
+  "shows": "A client proving `ρ (s ×ˢ t) = ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst` closes it with one `rw` by the lemma."
+ },
+ {
+  "id": "c39",
+  "kind": "usage",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "-- usage (measure): the `t = univ` corner, a client wants `ρ.fst s`\nexample {s : Set β} (hs : MeasurableSet s) :\n    ∫⁻ b in s, ρ.condKernel b Set.univ ∂ρ.fst = ρ (s ×ˢ Set.univ) :=\n  setLIntegral_condKernel_eq_measure_prod hs .univ",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The `t = univ` corner is a direct application with `.univ`."
+ },
+ {
+  "id": "c40",
+  "kind": "closure_check",
+  "objects": [
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+   "MeasureTheory.Measure.setLIntegral_condKernel"
+  ],
+  "lean": "-- closure (measure): special case `f = 1` of `setLIntegral_condKernel`\nexample {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, ρ.condKernel b t ∂ρ.fst = ρ (s ×ˢ t) := by\n  simpa using setLIntegral_condKernel (ρ := ρ) (f := fun _ ↦ 1) measurable_const hs ht",
+  "compiled": true,
+  "result": "Lean verification completed successfully",
+  "shows": "The measure version is the `f = 1` case of `setLIntegral_condKernel` after `simpa`."
+ },
+ {
+  "id": "c41",
+  "kind": "usage",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "-- usage (kernel): a client computes `κ a (s ×ˢ t)` by the disintegration\nexample (a : α) {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    κ a (s ×ˢ t) = ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) :=\n  (setLIntegral_condKernel_eq_measure_prod a hs ht).symm",
+  "compiled": true,
+  "result": "no error at these lines (inserted after line 79)",
+  "shows": "The kernel version applies directly with `a` explicit first."
+ },
+ {
+  "id": "c42",
+  "kind": "closure_check",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+   "ProbabilityTheory.setLIntegral_condKernel"
+  ],
+  "lean": "-- closure (kernel): special case `f = 1` of `setLIntegral_condKernel`\nexample (a : α) {s : Set β} (hs : MeasurableSet s) {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  simpa using setLIntegral_condKernel (κ := κ) (f := fun _ ↦ 1) measurable_const a hs ht",
+  "compiled": true,
+  "result": "no error at these lines",
+  "shows": "The kernel version is the `f = 1` case of `ProbabilityTheory.setLIntegral_condKernel` after `simpa`."
+ },
+ {
+  "id": "c43",
+  "kind": "generalised_statement",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "-- generalised statement: drop `ht`, keep the PR's proof\nexample (a : α) {s : Set β} (hs : MeasurableSet s) {t : Set Ω} :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by\n    congr; exact (κ.disintegrate _).symm\n  simp only [this]\n  exact (Kernel.compProd_apply_prod hs ?_).symm",
+  "compiled": false,
+  "result": "don't know how to synthesize placeholder for argument `ht`: ⊢ MeasurableSet t",
+  "shows": "`ht` is used by `Kernel.compProd_apply_prod`; it cannot be dropped with this proof."
+ },
+ {
+  "id": "c44",
+  "kind": "generalised_statement",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "-- generalised statement: drop `hs`, keep the PR's proof\nexample (a : α) {s : Set β} {t : Set Ω} (ht : MeasurableSet t) :\n    ∫⁻ b in s, Kernel.condKernel κ (a, b) t ∂(Kernel.fst κ a) = κ a (s ×ˢ t) := by\n  have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by\n    congr; exact (κ.disintegrate _).symm\n  simp only [this]\n  exact (Kernel.compProd_apply_prod ?_ ht).symm",
+  "compiled": false,
+  "result": "don't know how to synthesize placeholder for argument `hs`: ⊢ MeasurableSet s",
+  "shows": "`hs` is used by `Kernel.compProd_apply_prod`; it cannot be dropped with this proof."
+ },
+ {
+  "id": "c45",
+  "kind": "binders_form_check",
+  "objects": [
+   "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+   "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod"
+  ],
+  "lean": "content_search 'lemma setLIntegral_condKernel|lemma lintegral_condKernel' in Disintegration/Integral.lean",
+  "compiled": null,
+  "result": "12 Lintegral lemmas (6 kernel, 6 measure), all unregistered; both versions of the lemma take `{s} (hs) {t} (ht)` in the order of `setLIntegral_condKernel`, the kernel one with `(a : α)` first as in `lintegral_condKernel_mem`",
+  "shows": "The pair is complete (kernel and measure versions), and its binder order and registration match the file."
+ },
+ {
+  "id": "c46",
+  "kind": "usage",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "-- usage: a client shrinks the radius and keeps the point, as in CircleTransform.lean\nexample (hx : x ∈ ball y ε) : ∃ r, r < ε ∧ 0 < r ∧ x ∈ ball y r := by\n  obtain ⟨r, hr, hrx⟩ := exists_lt_mem_ball_of_mem_ball hx\n  exact ⟨r, hr, pos_of_mem_ball hrx, hrx⟩",
+  "compiled": true,
+  "result": "no errors introduced by the edit (the unedited file already reports 12 environment errors at l.127-1090, e.g. private `dist_nonneg'`; none at the inserted lines)",
+  "shows": "The CircleTransform.lean pattern `obtain ⟨r, hr, hrx⟩ := exists_lt_mem_ball_of_mem_ball hx` works and composes with `pos_of_mem_ball`."
+ },
+ {
+  "id": "c47",
+  "kind": "twin",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "-- twin: the `EMetric` version, same proof\nexample {β : Type*} [PseudoEMetricSpace β] {a b : β} {r : ℝ≥0∞} (h : a ∈ EMetric.ball b r) :\n    ∃ r' < r, a ∈ EMetric.ball b r' :=\n  exists_between' h",
+  "compiled": true,
+  "result": "no errors introduced by the edit",
+  "shows": "The EMetric twin `∃ r' < r, a ∈ EMetric.ball b r'` holds by the same term `exists_between' h`; it is not in Mathlib (c51)."
+ },
+ {
+  "id": "c48",
+  "kind": "closure_check",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "-- closure: the statement is `exists_between'` at `dist x y`\nexample (h : dist x y < ε) : ∃ ε', ε' < ε ∧ dist x y < ε' := exists_between' h",
+  "compiled": true,
+  "result": "no errors introduced by the edit",
+  "shows": "After the PR the lemma is `exists_between'` read through the definitional unfolding of `x ∈ ball y ε`."
+ },
+ {
+  "id": "c49",
+  "kind": "generalised_statement",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "-- generalised statement: a strictly smaller *positive* radius, still one line\nexample (h : x ∈ ball y ε) : ∃ ε' ∈ Set.Ioo 0 ε, x ∈ ball y ε' := by\n  obtain ⟨ε', h1, h2⟩ := exists_lt_mem_ball_of_mem_ball h\n  exact ⟨ε', ⟨dist_nonneg.trans_lt h2, h1⟩, h2⟩",
+  "compiled": true,
+  "result": "no errors introduced by the edit",
+  "shows": "The lemma has no hypothesis to drop; the strengthened positive-radius form `∃ ε' ∈ Ioo 0 ε, …` follows in two lines from it and `dist_nonneg`."
+ },
+ {
+  "id": "c50",
+  "kind": "automation_check",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "example (h : x ∈ ball y ε) : ∃ ε' ∈ Set.Ioo 0 ε, x ∈ ball y ε' := by\n  obtain ⟨ε', h1, h2⟩ := exists_between' h\n  exact ⟨ε', ⟨dist_nonneg.trans_lt h2, h1⟩, h2⟩",
+  "compiled": false,
+  "result": "Application type mismatch: `h : x ∈ ball y ε` expected `?m.26 < ?m.25` in `exists_between' h`",
+  "shows": "Without an expected type, `exists_between'` does not see through ball membership, so clients still need the named lemma; it earns its place after the golf."
+ },
+ {
+  "id": "c51",
+  "kind": "twin",
+  "objects": [
+   "Metric.exists_lt_mem_ball_of_mem_ball"
+  ],
+  "lean": "content_search 'exists_lt_mem_ball|exists_lt_mem_closedBall|exists_lt_subset_ball|exists_pos_lt_subset_ball|exists_lt_mem_eball|exists_lt_mem_emetric' in Mathlib; 'exists_lt_mem' in Mathlib/Topology",
+  "compiled": null,
+  "result": "Metric.exists_lt_mem_ball_of_mem_ball (Pseudo/Defs.lean l.377) and its use in CircleTransform.lean; exists_lt_subset_ball / exists_pos_lt_subset_ball in ProperSpace/Lemmas.lean; no EMetric analogue",
+  "shows": "There is no `EMetric.exists_lt_mem_ball_of_mem_ball`."
+ }
+]

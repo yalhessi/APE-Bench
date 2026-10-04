@@ -1,0 +1,65 @@
+[
+ {
+  "target": "LinearEquiv.symm_prodComm",
+  "claim": "The new lemma `LinearEquiv.symm_prodComm : (prodComm R M M₂).symm = prodComm R M₂ M` is named against its siblings. The same statement is `prodComm_symm` for `ContinuousLinearEquiv` (in `Topology/Algebra/Module/Equiv.lean`, a file this PR also touches), and for `Equiv`, `OrderIso`, `Homeomorph`, `UniformEquiv`, `AffineEquiv`, `ContinuousAffineEquiv` and `Diffeomorph`. In `LinearAlgebra/Prod.lean` itself the neighbouring lemmas are `prodProdProdComm_symm` and `prodCongr_symm`, and `LinearEquiv` has `refl_symm`, `trans_symm` and `zero_symm`. Only `LinearIsometryEquiv.symm_prodComm` uses the `symm_` prefix.",
+  "requested_change": "Rename `LinearEquiv.symm_prodComm` to `LinearEquiv.prodComm_symm`, keeping `@[simp]` and the `rfl` proof: `@[simp] theorem prodComm_symm : (prodComm R M M₂).symm = prodComm R M₂ M := rfl`.",
+  "severity": "advisory",
+  "evidence": "content_search `prodComm_symm` over the base tree found 8 `X.prodComm_symm : (prodComm ..).symm = prodComm ..` lemmas: Logic/Equiv/Prod.lean:97, Order/Hom/Basic.lean:892, Topology/Algebra/Module/Equiv.lean:386 (ContinuousLinearEquiv), Topology/Constructions/SumProd.lean:629, Topology/UniformSpace/Equiv.lean:257, LinearAlgebra/AffineSpace/AffineEquiv.lean:415, Topology/Algebra/ContinuousAffineEquiv.lean:392, Geometry/Manifold/Diffeomorph.lean:621. content_search `symm_prodComm` found only LinearIsometry.lean:1007, plus this PR's lemma. Same-file siblings: `prodProdProdComm_symm` (Prod.lean:733) and `prodCongr_symm` (Prod.lean:757). naming_norm returned insufficient_evidence for the bare `symm` subject (141/760 use `symm_`), which is a library-wide count and does not look at the `prodComm` sibling family. Precedent: eric-wieser on PR #27434 asked for a rename 'to match the lemmas above'."
+ },
+ {
+  "target": "Submodule.inf_comap_le_comap_add",
+  "claim": "In a golf PR, the new proof of `Submodule.inf_comap_le_comap_add` still takes four tactic lines (`rw [SetLike.le_def]; intro m h; simp only [mem_comap, mem_inf, LinearMap.add_apply] at h ⊢; exact add_mem h.1 h.2`). A one-line term proves the goal by definitional unfolding.",
+  "requested_change": "Replace the tactic block with the term proof `fun _ h ↦ q.add_mem h.1 h.2`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Module/Submodule/Map.lean, replacing `Submodule.inf_comap_le_comap_add` with `... :=\\n  fun _ h ↦ q.add_mem h.1 h.2`: success, no errors, no warnings. The variant `fun _ h ↦ add_mem h.1 h.2` (without `q.`) fails to elaborate (type mismatch `x + ?m ∈ comap f₁ q`), so the `q.` is needed."
+ },
+ {
+  "target": "Submodule.IsOrtho.map",
+  "claim": "The PR replaces the proof of `Submodule.IsOrtho.map` with a terminal `aesop (add simp [isOrtho_iff_inner_eq])`. A plain `simpa` or `simp_all` with the same lemma closes the goal, and maintainers have said they want terminal `aesop` calls replaced by `simp`/`simp_all` when those suffice.",
+  "requested_change": "Replace `aesop (add simp [isOrtho_iff_inner_eq])` with `simpa [isOrtho_iff_inner_eq] using h` (or `simp_all [isOrtho_iff_inner_eq]`).",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Analysis/InnerProductSpace/Orthogonal.lean, replacing the proof body of `Submodule.IsOrtho.map`: `simpa [isOrtho_iff_inner_eq] using h` succeeded, `simp_all [isOrtho_iff_inner_eq]` succeeded, and `rw [isOrtho_iff_inner_eq] at *; simpa using h` succeeded, all with no errors or warnings. zulip_search (maintainers only): Kim Morrison (2025-01-04): 'find all places in the library where there is a terminal `aesop` that could just be `simp` or `simp_all`'; Michael Rothgang (2025-08-18): 'aesop to simp_all is also nice'."
+ },
+ {
+  "target": "ContinuousLinearMap.equivRange_symm_apply",
+  "claim": "The new proof `simp [ContinuousLinearEquiv.symm_apply_eq, Subtype.ext_iff]` re-derives what the canonical lemma `symm_apply_apply` already gives: `f.equivRange hinj hclo x` is definitionally `⟨f x, _⟩`, so the statement is an instance of `e.symm (e x) = x`.",
+  "requested_change": "Replace the `by simp [...]` proof with the term `(f.equivRange hinj hclo).symm_apply_apply x`, keeping `@[simp]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Analysis/Normed/Operator/Banach.lean, replacing `ContinuousLinearMap.equivRange_symm_apply` with `@[simp] lemma equivRange_symm_apply (hinj : Injective f) (hclo : IsClosed (range f)) (x : E) : (f.equivRange hinj hclo).symm ⟨f x, by simp⟩ = x := (f.equivRange hinj hclo).symm_apply_apply x`: success, no errors or warnings. The whole file was recompiled, including `antilipschitz_of_injective_of_isClosed_range` and `isClosed_range_iff_antilipschitz_of_injective` downstream."
+ },
+ {
+  "target": "Ideal.cotangentEquivIdeal_symm_apply",
+  "claim": "The new three-line tactic proof (`rw [I.cotangentEquivIdeal.symm_apply_eq]; ext; simp`) reduces to a single term. After `symm_apply_eq` the remaining equality holds by `rfl`, as the pre-PR proof's final `rfl` already showed.",
+  "requested_change": "Replace the tactic proof with the term `I.cotangentEquivIdeal.symm_apply_eq.2 rfl`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/RingTheory/Ideal/Cotangent.lean, replacing `Ideal.cotangentEquivIdeal_symm_apply` with the PR's statement and `:= I.cotangentEquivIdeal.symm_apply_eq.2 rfl`: success, no errors or warnings. Also verified: `I.cotangentEquivIdeal.symm_apply_eq.2 (Subtype.ext rfl)`, and `by rw [I.cotangentEquivIdeal.symm_apply_eq]; rfl`."
+ },
+ {
+  "target": "ContinuousLinearEquiv.submoduleMap",
+  "claim": "The PR changes the type of the public def `ContinuousLinearEquiv.submoduleMap` from `p ≃SL[σ₁₂] Submodule.map e p` to `p ≃SL[σ₁₂] Submodule.map (e : M →ₛₗ[σ₁₂] M₂) p`. The golf does not need this: the new `__ := LinearEquiv.submoduleMap e.toLinearEquiv p` body elaborates against the original type. The change also leaves the def's codomain spelled differently from its own simp lemma `submoduleMap_symm_apply (x : p.map e)` and from `ofSubmodules` (`p.map (e : M →SL[σ₁₂] M₂)`).",
+  "requested_change": "Keep the original statement `p ≃SL[σ₁₂] Submodule.map e p`, and change only the body, in this golf PR.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Topology/Algebra/Module/Equiv.lean, replacing `ContinuousLinearEquiv.submoduleMap` with the original signature `p ≃SL[σ₁₂] Submodule.map e p` and the PR's exact body (`__ := LinearEquiv.submoduleMap e.toLinearEquiv p`, the PR's `continuous_toFun` and `continuous_invFun`): success, no errors or warnings. The whole file recompiled, including `submoduleMap_apply`, `submoduleMap_symm_apply` and `ofSubmodules` with its simp lemmas, which follow it. file_read lines 1291-1313 show `submoduleMap_symm_apply (x : p.map e)` and `ofSubmodules ... (h : p.map (e : M →SL[σ₁₂] M₂) = q)`."
+ },
+ {
+  "target": "ContinuousLinearEquiv.submoduleMap",
+  "claim": "The two continuity fields of `ContinuousLinearEquiv.submoduleMap` are proved in two unrelated, roundabout ways. `continuous_toFun` builds a `codRestrict` of `e.toContinuousLinearMap.comp p.subtypeL` only to take `map_continuous` of it. `continuous_invFun` uses `Continuous.restrict` with a hand-written membership proof `fun x hx ↦ ((LinearEquiv.submoduleMap e.toLinearEquiv p).symm ⟨x, hx⟩).2`. Both are the restriction of a continuous map to a subtype, and one symmetric term proves each.",
+  "requested_change": "Replace the two fields with `continuous_toFun := (e.continuous.comp continuous_subtype_val).subtype_mk _` and `continuous_invFun := (e.symm.continuous.comp continuous_subtype_val).subtype_mk _`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Topology/Algebra/Module/Equiv.lean, replacing `ContinuousLinearEquiv.submoduleMap` with the PR's signature, `__ := LinearEquiv.submoduleMap e.toLinearEquiv p`, and the two `subtype_mk` fields above: success, no errors or warnings. The same fields also compile with the original `Submodule.map e p` signature (combined edit, success). `by fun_prop` does not work for either field (fun_prop: no theorems for `AddHom.toFun` / `LinearEquiv.invFun`)."
+ },
+ {
+  "target": "IsContDiffImplicitAt.implicitFunctionData",
+  "claim": "The new `isCompl_ker` first branch goes round in a circle. It rewrites `y = 0` into `(f'.comp inr) y = (f'.comp inr) 0` with `← h.bijective.injective.eq_iff`, after a long `rw` chain, and then needs the extra simp lemma `Prod.mk_zero_zero` to fold `f' (0, 0)` back to `0`. One `simp` call with the injectivity lemma in its zero form does the branch.",
+  "requested_change": "Replace the `rw [Submodule.mem_inf, ..., Prod.ext_iff, ← h.bijective.injective.eq_iff]` and `simp +contextual [Prod.mk_zero_zero]` lines with the single line `simp +contextual [Prod.ext_iff, ← map_eq_zero_iff _ h.bijective.injective]`, after `ext ⟨x, y⟩`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Analysis/Calculus/ImplicitContDiff.lean, replacing `IsContDiffImplicitAt.implicitFunctionData` with the PR's def where the first `isCompl_ker` branch is `· ext ⟨x, y⟩\\n      simp +contextual [Prod.ext_iff, ← map_eq_zero_iff _ h.bijective.injective]`: success, no errors or warnings. Dropping `Prod.mk_zero_zero` from the PR's own final simp leaves the goal `x = 0 → (f' (0, y) = 0 ↔ f' (0, y) = f' (0, 0))`, which shows the `← eq_iff` rewrite produces the `f' (0, 0)` that then has to be undone."
+ },
+ {
+  "target": "Mathlib/Analysis/Normed/Operator/LinearIsometry.lean",
+  "claim": "The PR relies on lean4#3107 being fixed: it makes the class-generic `LinearIsometry.isComplete_image_iff` `@[simp]` and deprecates the specialised `isComplete_image_iff'`. The same file still carries the identical workaround, whose comments now contradict this change. `SemilinearIsometryClass.nnnorm_map` (line 99) says 'Should be `@[simp]` but it doesn't fire due to lean4#3107'. The specialised `@[simp]` copies `LinearIsometry.nnnorm_map` (line 200), `LinearIsometry.enorm_map` (line 204) and `LinearIsometryEquiv.nnnorm_map` (line 873) say they 'Should be replaced ... when lean4#3107 is fixed'. The class-generic lemma now fires on a `LinearIsometry` under simp.",
+  "requested_change": "Apply the same treatment to the `nnnorm_map` family in this file. Make `SemilinearIsometryClass.nnnorm_map` `@[simp]` (adding a class-level `enorm_map` if wanted), and deprecate or de-simp the specialised `LinearIsometry.nnnorm_map`, `LinearIsometry.enorm_map` and `LinearIsometryEquiv.nnnorm_map`. At minimum, delete the now-false lean4#3107 comments.",
+  "severity": "advisory",
+  "evidence": "content_search `3107` in the PR tree: LinearIsometry.lean lines 99, 200, 204 and 873 still carry the workaround comments. lean_verify_edit on LinearIsometry.lean added three examples after `LinearIsometry.isComplete_map_iff` (whole file recompiled, success): `example (g : E →ₛₗᵢ[σ₁₂] E₂) (s : Set E) : IsComplete (g '' s) ↔ IsComplete s := by simp only [LinearIsometry.isComplete_image_iff]`; `example (g : E →ₛₗᵢ[σ₁₂] E₂) (x : E) : ‖g x‖₊ = ‖x‖₊ := by simp only [SemilinearIsometryClass.nnnorm_map]`; `example (g : E →ₛₗᵢ[σ₁₂] E₂) (x : E) : ‖g x‖ₑ = ‖x‖ₑ := by simp only [SemilinearIsometryClass.nnnorm_map, enorm]`. So the class-generic lemmas fire through the simp set on a concrete `LinearIsometry`, as the PR assumes for `isComplete_image_iff`."
+ }
+]

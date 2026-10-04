@@ -1,0 +1,17 @@
+Mathlib/Algebra/Category/Grp/Adjunctions.lean
+Mathlib/Algebra/Group/Action/Hom.lean
+Mathlib/Algebra/Group/End.lean
+Mathlib/Algebra/Group/Submonoid/Pointwise.lean
+Mathlib/Algebra/Group/Submonoid/Units.lean
+Mathlib/GroupTheory/Coxeter/Basic.lean
+Mathlib/GroupTheory/Coxeter/Length.lean
+Mathlib/GroupTheory/Finiteness.lean
+Mathlib/GroupTheory/FreeGroup/GeneratorEquiv.lean
+Mathlib/GroupTheory/GroupAction/Basic.lean
+Mathlib/GroupTheory/GroupAction/Quotient.lean
+Mathlib/GroupTheory/GroupExtension/Abelian.lean
+Mathlib/GroupTheory/GroupExtension/Basic.lean
+Mathlib/GroupTheory/GroupExtension/Defs.lean
+Mathlib/GroupTheory/Perm/Finite.lean
+Mathlib/Logic/Equiv/Basic.lean
+Mathlib/RepresentationTheory/GroupCohomology/LowDegree.lean

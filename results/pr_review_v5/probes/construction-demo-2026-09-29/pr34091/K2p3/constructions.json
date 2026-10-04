@@ -1,0 +1,221 @@
+[
+ {
+  "id": "c1",
+  "kind": "usage",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_uncountable_fiber"
+  ],
+  "lean": "end LeftCancelDivisionMonoid\n\nsection UsageCheck\nvariable {R : Type*}\n\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y z : R} (h : x / z = y / z) : x = y :=\n  div_left_injective h\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y z : R} (h : x / z = y / z) : x = y := by\n  simpa using h\nexample [DivInvMonoid R] [IsRightCancelMul R] {x y : R} (h : x / y = y⁻¹) : x = 1 := by\n  simpa using h\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y z : R} (h : x / y = x / z) : y = z := by\n  simpa using h\nexample [DivisionMonoid R] [IsLeftCancelMul R] {x y : R} (h : x / y = x) : y = 1 := by\n  simpa using h\nexample [DivisionMonoid R] [IsLeftCancelMul R] (x : R) : Function.Injective (x / ·) :=\n  div_right_injective\nexample [DivInvMonoid R] [IsRightCancelMul R] (x : R) : Function.Injective (· / x) :=\n  div_left_injective\nexample [Group R] {x y z : R} : x / z = y / z ↔ x = y := by simp\nexample [Group R] {x y z : R} : x / y = x / z ↔ y = z := by simp\nexample [Group R] {x y : R} : x / y = x ↔ y = 1 := by simp\nexample [Group R] {x y : R} : x / y = y⁻¹ ↔ x = 1 := by simp\nexample [SubNegMonoid R] [IsRightCancelAdd R] {x y z : R} : x - z = y - z ↔ x = y := sub_left_inj\nexample [SubNegMonoid R] [IsRightCancelAdd R] {x y : R} : x - y = -y ↔ x = 0 := sub_eq_neg_self\nexample [SubtractionMonoid R] [IsLeftCancelAdd R] {x y : R} : x - y = x ↔ y = 0 := sub_eq_self\nexample [SubtractionMonoid R] [IsLeftCancelAdd R] {x y z : R} : x - y = x - z ↔ y = z :=\n  sub_right_inj\nexample [AddGroup R] {x y z : R} : x - z = y - z ↔ x = y := by simp\n\nend UsageCheck",
+  "compiled": true,
+  "result": "Both examples compile, inserted after exists_uncountable_fiber (Pigeonhole.lean line 106).",
+  "shows": "A client holding [Infinite β] or [Uncountable β] must pass the class hypothesis by hand (inferInstance), because the lemmas take it as an explicit argument; a countable-codomain client also supplies #α < #β as mk_le_aleph0.trans_lt aleph0_lt_mk."
+ },
+ {
+  "id": "c2",
+  "kind": "closure_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'",
+   "Finite.exists_infinite_fiber"
+  ],
+  "lean": "-- the `Finite` codomain case (`Finite.exists_infinite_fiber`'s shape), same universe\nexample {β α : Type u} [Infinite β] [Finite α] (f : β → α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber f ((lt_aleph0_of_finite α).trans_le (infinite_iff.mp ‹_›)) inferInstance\n\n-- an `Infinite α` client, without the primed lemma\nexample {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber f h (infinite_iff.mpr ((infinite_iff.mp ‹_›).trans h.le))",
+  "compiled": true,
+  "result": "Both examples compile.",
+  "shows": "With the PR's weaker hypothesis, exists_infinite_fiber covers the finite-codomain case (the shape of Finite.exists_infinite_fiber) in one universe, and covers the Infinite-codomain case (the statement of exists_infinite_fiber') with a one-term derivation of Infinite β from Infinite α and h."
+ },
+ {
+  "id": "c3",
+  "kind": "closure_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Finite.exists_infinite_fiber"
+  ],
+  "lean": "universe v in\nexample {β : Type u} {α : Type v} [Infinite β] [Finite α] (f : β → α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber (β := β) (α := α) f sorry sorry",
+  "compiled": false,
+  "result": "Application type mismatch: the argument α has type Type v but is expected to have type Type u in @exists_infinite_fiber β α.",
+  "shows": "exists_infinite_fiber (like every lemma in the file) requires domain and codomain in one universe, so it does not cover Finite.exists_infinite_fiber, whose α β : Type* are independent."
+ },
+ {
+  "id": "c4",
+  "kind": "generalised_statement",
+  "objects": [
+   "Cardinal.exists_infinite_fiber"
+  ],
+  "lean": "universe v in\ntheorem exists_infinite_fiber_lift {β : Type u} {α : Type v} (f : β → α)\n    (h : lift.{u} #α < lift.{v} #β) (hβ : Infinite β) : ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  obtain ⟨⟨a⟩, ha⟩ := exists_infinite_fiber (fun b : ULift.{v} β => ULift.up.{u} (f b.down))\n    (by simpa using h) inferInstance\n  refine ⟨a, @Infinite.of_injective _ _ ha (fun x => ⟨x.1.down, ?_⟩) ?_⟩\n  · have := x.2\n    simp only [Set.mem_preimage, Set.mem_singleton_iff] at this ⊢\n    exact congrArg ULift.down this\n  · rintro ⟨⟨x⟩, hx⟩ ⟨⟨y⟩, hy⟩ hxy\n    simp_all\n\nuniverse v in\nexample {β : Type u} {α : Type v} [Infinite β] [Finite α] (f : β → α) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  exists_infinite_fiber_lift f\n    ((lift_lt_aleph0.mpr (lt_aleph0_of_finite α)).trans_le\n      (aleph0_le_lift.mpr (infinite_iff.mp ‹Infinite β›))) inferInstance",
+  "compiled": true,
+  "result": "exists_infinite_fiber_lift and the cross-universe finite-codomain example compile.",
+  "shows": "A universe-heterogeneous version with h : lift.{u} #α < lift.{v} #β follows from the PR's lemma through ULift in 8 lines; this is the file's existing TODO (\"Generalize universes of results\"), which the PR does not touch."
+ },
+ {
+  "id": "c5",
+  "kind": "generalised_statement",
+  "objects": [
+   "Cardinal.infinite_pigeonhole_card_lt"
+  ],
+  "lean": "-- hβ dropped from `infinite_pigeonhole_card_lt`, same proof\ntheorem infinite_pigeonhole_card_lt_gen {β α : Type u} (f : β → α) (h : #α < #β) :\n    ∃ a : α, #α < #(f ⁻¹' {a}) := by\n  simp_rw [← succ_le_iff]\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card f ℵ₀ sorry le_rfl (by rwa [isRegular_aleph0.cof_eq])\n    exact ⟨a, ha.trans' (succ_le_of_lt hα)⟩\n  · exact infinite_pigeonhole_card f (succ #α) (succ_le_of_lt h) (hα.trans (le_succ _))\n      ((lt_succ _).trans_le (isRegular_succ hα).2.ge)",
+  "compiled": false,
+  "result": "Only error: 'Sorries are not allowed'; the sole sorry stands for the θ ≤ #β argument ℵ₀ ≤ #β in the #α < ℵ₀ branch; the #α ≥ ℵ₀ branch compiles without hβ.",
+  "shows": "hβ is used only when α is finite (for infinite α it follows from h); it cannot be dropped, since for finite α and β the conclusion is the strong finite pigeonhole, false e.g. for Fin 3 → Fin 2 with fibres of size 2 and 1."
+ },
+ {
+  "id": "c6",
+  "kind": "generalised_statement",
+  "objects": [
+   "Cardinal.exists_infinite_fiber"
+  ],
+  "lean": "-- `hβ` is needed in `exists_infinite_fiber`: Bool → PUnit has #PUnit < #Bool and no infinite fiber\nexample : ¬ ∀ (β α : Type) (f : β → α), #α < #β → ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  intro H\n  obtain ⟨a, ha⟩ := H Bool PUnit (fun _ => PUnit.unit) (by simp)\n  exact ha.false",
+  "compiled": true,
+  "result": "The negated statement compiles.",
+  "shows": "exists_infinite_fiber with hβ dropped is false (Bool → PUnit), so the PR's hypothesis Infinite β is the weakest of this form."
+ },
+ {
+  "id": "c7",
+  "kind": "generalised_statement",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_uncountable_fiber"
+  ],
+  "lean": "-- `h` is needed in `exists_uncountable_fiber`: on any uncountable type, `id` has no uncountable fiber\nexample {β : Type u} [Uncountable β] : ¬ ∃ a : β, Uncountable (id ⁻¹' {a} : Set β) := by\n  rintro ⟨a, ha⟩\n  exact not_countable (α := ↑(id ⁻¹' {a} : Set β)) (by simpa using (Set.countable_singleton a).to_subtype)\n\n-- `h` is needed in `exists_infinite_fiber` too: on any infinite type, `id` has no infinite fiber\nexample {β : Type u} [Infinite β] : ¬ ∃ a : β, Infinite (id ⁻¹' {a} : Set β) := by\n  rintro ⟨a, ha⟩\n  simp only [preimage_id_eq, id_eq] at ha\n  exact ha.false",
+  "compiled": true,
+  "result": "Both negations compile (one unnecessarySimpa linter warning).",
+  "shows": "The cardinality hypothesis h : #α < #β cannot be dropped from either lemma: id on any infinite (uncountable) type has no infinite (uncountable) fibre."
+ },
+ {
+  "id": "c8",
+  "kind": "usage",
+  "objects": [
+   "Cardinal.le_range_of_union_finset_eq_univ",
+   "Cardinal.le_range_of_union_finset_eq_top"
+  ],
+  "lean": "-- a client holding the old `⊤` form of the covering hypothesis, on the new name\nexample {α β : Type*} [Infinite β] (f : α → Finset β) (w : ⋃ a, (f a : Set β) = ⊤) :\n    #β ≤ #(range f) :=\n  le_range_of_union_finset_eq_univ f w\n\n-- a client holding the pointwise cover\nexample {α β : Type*} [Infinite β] (f : α → Finset β) (w : ∀ b, ∃ a, b ∈ f a) :\n    #β ≤ #(range f) :=\n  le_range_of_union_finset_eq_univ f (by ext b; simpa using w b)\n\n-- the deprecated name still serves an old client\nexample {α β : Type*} [Infinite β] (f : α → Finset β) (w : ⋃ a, (f a : Set β) = ⊤) :\n    #β ≤ #(range f) :=\n  le_range_of_union_finset_eq_top f w",
+  "compiled": true,
+  "result": "All three compile; the third gives the warning '`Cardinal.le_range_of_union_finset_eq_top` has been deprecated: Use `Cardinal.le_range_of_union_finset_eq_univ` instead'.",
+  "shows": "A client holding the old `= ⊤` hypothesis can apply the new name unchanged (⊤ and Set.univ unify), a pointwise-cover client needs one ext/simpa, and old code on the old name still compiles with a deprecation warning."
+ },
+ {
+  "id": "c9",
+  "kind": "generalised_statement",
+  "objects": [
+   "Cardinal.le_range_of_union_finset_eq_univ"
+  ],
+  "lean": "-- `[Infinite β]` is needed: Bool covered by one finset\nexample : ¬ ∀ (α β : Type) (f : α → Finset β), ⋃ a, (f a : Set β) = Set.univ →\n    #β ≤ #(range f) := by\n  intro H\n  have := (H PUnit Bool (fun _ => Finset.univ) (by simp only [Finset.coe_univ, iUnion_const])).trans mk_range_le\n  simp at this",
+  "compiled": true,
+  "result": "The negated statement compiles.",
+  "shows": "[Infinite β] cannot be dropped from le_range_of_union_finset_eq_univ (Bool covered by the single finset univ); the statement is already at its weakest in this form, with α β : Type* universe-polymorphic."
+ },
+ {
+  "id": "c10",
+  "kind": "twin",
+  "objects": [
+   "Cardinal.exists_uncountable_fiber",
+   "Set.Countable.of_preimage_singleton"
+  ],
+  "lean": "-- the countable-codomain case, from the library's `Countable.of_preimage_singleton` alone\nexample {β α : Type u} [Countable α] [Uncountable β] (f : β → α) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  by_contra! H\n  have : Countable β := Set.Countable.of_preimage_singleton (f := f) fun a =>\n    Set.countable_coe_iff.mp (H a)\n  exact not_countable (α := β) this",
+  "compiled": true,
+  "result": "Compiles; precedent_search surfaced Countable.of_preimage_singleton (Data/Set/Countable.lean:277, in the base tree).",
+  "shows": "The countable-codomain twin of exists_uncountable_fiber (the analogue of Finite.exists_infinite_fiber) is already in the library as the contrapositive of Set.Countable.of_preimage_singleton; the PR's lemma is new only for uncountable codomains."
+ },
+ {
+  "id": "c11",
+  "kind": "usage",
+  "objects": [
+   "Cardinal.infinite_pigeonhole_card_lt"
+  ],
+  "lean": "-- finite codomain, infinite domain: now in reach of `infinite_pigeonhole_card_lt`\nexample {β α : Type u} [Finite α] [Infinite β] (f : β → α) : ∃ a : α, #α < #(f ⁻¹' {a}) :=\n  infinite_pigeonhole_card_lt f ((lt_aleph0_of_finite α).trans_le (infinite_iff.mp ‹_›))\n    (infinite_iff.mp ‹_›)\n\n-- the old hypothesis form (`ℵ₀ ≤ #α`) still reaches it by one `trans`\nexample {β α : Type u} (f : β → α) (h : #α < #β) (hα : ℵ₀ ≤ #α) : ∃ a : α, #α < #(f ⁻¹' {a}) :=\n  infinite_pigeonhole_card_lt f h (hα.trans h.le)",
+  "compiled": true,
+  "result": "Both examples compile.",
+  "shows": "The new hypothesis ℵ₀ ≤ #β brings the finite-codomain case in reach, and a client holding the old hypothesis ℵ₀ ≤ #α adapts with hα.trans h.le; the statement is a strict generalisation of the old one."
+ },
+ {
+  "id": "c12",
+  "kind": "closure_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber'",
+   "Cardinal.exists_infinite_fiber",
+   "linearIndependent_le_infinite_basis"
+  ],
+  "lean": "theorem linearIndependent_le_infinite_basis {ι : Type w} (b : Basis ι R M) [Infinite ι] {κ : Type w}\n    (v : κ → M) (i : LinearIndependent R v) : #κ ≤ #ι := by\n  classical\n  by_contra h\n  rw [not_le, ← Cardinal.mk_finset_of_infinite ι] at h\n  let Φ := fun k : κ => (b.repr (v k)).support\n  obtain ⟨s, w : Infinite ↑(Φ ⁻¹' {s})⟩ := Cardinal.exists_infinite_fiber Φ h\n    (Cardinal.infinite_iff.mpr ((Cardinal.infinite_iff.mp inferInstance).trans h.le))\n  let v' := fun k : Φ ⁻¹' {s} => v k\n  have i' : LinearIndependent R v' := i.comp _ Subtype.val_injective\n  have w' : Finite (Φ ⁻¹' {s}) := by\n    apply i'.finite_of_le_span_finite v' (s.image b)\n    rintro m ⟨⟨p, ⟨rfl⟩⟩, rfl⟩\n    simp only [SetLike.mem_coe, Finset.coe_image]\n    apply Basis.mem_span_repr_support\n  exact w.false",
+  "compiled": true,
+  "result": "StrongRankCondition.lean compiles with linearIndependent_le_infinite_basis calling Cardinal.exists_infinite_fiber directly.",
+  "shows": "The only Mathlib caller of exists_infinite_fiber' does not need it: the unprimed lemma serves with a one-line Infinite κ argument; exists_infinite_fiber' is a special case of exists_infinite_fiber with no other use in the tree."
+ },
+ {
+  "id": "c13",
+  "kind": "binders_form_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'",
+   "Cardinal.exists_uncountable_fiber",
+   "Cardinal.le_range_of_union_finset_eq_univ"
+  ],
+  "lean": "/-- A function whose domain's cardinality is infinite but strictly greater than its domain's\nhas an infinite fiber. -/\ntheorem exists_infinite_fiber {β α : Type u} [hβ : Infinite β] (f : β → α) (h : #α < #β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := by\n  simp_rw [Cardinal.infinite_iff] at hβ ⊢\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₀ hβ le_rfl (by rwa [isRegular_aleph0.cof_eq])\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h hβ\n    exact ⟨a, hα.trans ha.le⟩\n\n/-- A weaker version of `exists_infinite_fiber` that requires codomain to be infinite. -/\ntheorem exists_infinite_fiber' {β α : Type u} [hα : Infinite α] (f : β → α) (h : #α < #β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) :=\n  have : Infinite β := by\n    rw [Cardinal.infinite_iff] at hα ⊢\n    exact hα.trans h.le\n  exists_infinite_fiber f h\n\n/-- A function whose domain's cardinality is uncountable but strictly greater than its domain's\nhas an uncountable fiber. -/\ntheorem exists_uncountable_fiber {β α : Type u} [hβ : Uncountable β] (f : β → α) (h : #α < #β) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) := by\n  simp_rw [← Cardinal.aleph0_lt_mk_iff, ← Order.succ_le_iff, succ_aleph0] at hβ ⊢\n  rcases lt_or_ge #α ℵ₀ with hα | hα\n  · exact infinite_pigeonhole_card f ℵ₁ hβ aleph0_lt_aleph_one.le\n      (by rw [isRegular_aleph_one.cof_eq]; exact hα.trans aleph0_lt_aleph_one)\n  · obtain ⟨a, ha⟩ := infinite_pigeonhole_card_lt f h (hβ.trans' aleph0_lt_aleph_one.le)\n    rw [← Order.succ_le_succ_iff, succ_aleph0] at hα\n    exact ⟨a, hα.trans (succ_le_of_lt ha)⟩\n\n/-- If an infinite type `β` can be expressed as a union of finite sets,\nthen the cardinality of the collection of those finite sets\nmust be at least the cardinality of `β`. -/\ntheorem le_range_of_union_finset_eq_univ {α β : Type*} [Infinite β] (f : α → Finset β)\n    (w : ⋃ a, (f a : Set β) = Set.univ) : #β ≤ #(range f) := by\n  by_contra h\n  simp only [not_le] at h\n  let u : ∀ b, ∃ a, b ∈ f a := fun b => by simpa using (w.ge :) (Set.mem_univ b)\n  let u' : β → range f := fun b => ⟨f (u b).choose, by simp⟩\n  have v' : ∀ a, u' ⁻¹' {⟨f a, by simp⟩} ≤ f a := by\n    rintro a p m\n    have m : f (u p).choose = f a := by simpa [u'] using m\n    rw [← m]\n    apply fun b => (u b).choose_spec\n  obtain ⟨⟨-, ⟨a, rfl⟩⟩, p⟩ := exists_infinite_fiber u' h\n  exact (@Infinite.of_injective _ _ p (inclusion (v' a)) (inclusion_injective _)).false\n\n-- clients, as the two callers in the PR would now write them\nexample {β α : Type u} [Infinite β] (f : β → α) (h : #α < #β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := exists_infinite_fiber f h\nexample {β α : Type u} [Infinite α] (f : β → α) (h : #α < #β) :\n    ∃ a : α, Infinite (f ⁻¹' {a}) := exists_infinite_fiber' f h\nexample {β α : Type u} [Countable α] [Uncountable β] (f : β → α) :\n    ∃ a : α, Uncountable (f ⁻¹' {a}) :=\n  exists_uncountable_fiber f (mk_le_aleph0.trans_lt aleph0_lt_mk)",
+  "compiled": true,
+  "result": "Pigeonhole.lean compiles with lines 78-122 replaced: the three lemmas take [hβ : Infinite β] / [hα : Infinite α] / [hβ : Uncountable β] with their proofs unchanged, and le_range_of_union_finset_eq_univ calls exists_infinite_fiber u' h.",
+  "shows": "The class hypotheses can be instance-implicit with no proof change; the in-file caller then drops its (by infer_instance) argument and the client examples become exists_infinite_fiber f h, exists_infinite_fiber' f h, exists_uncountable_fiber f h'."
+ },
+ {
+  "id": "c14",
+  "kind": "binders_form_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'",
+   "Cardinal.exists_uncountable_fiber"
+  ],
+  "lean": "content_search '\\[Infinite ', '\\([^():\\[]+ : Infinite ', '\\[Uncountable ', '\\([^():\\[]+ : Uncountable ' over target/Mathlib and target/Mathlib/SetTheory/Cardinal",
+  "compiled": null,
+  "result": "Mathlib: [Infinite 155 matches in 69 files vs explicit (h : Infinite _) 6 matches, of which 2 are this PR's lemmas, 1 is Infinite.false and 3 are the unrelated Hyperreal.Infinite predicate; [Uncountable 20 in 4 files vs explicit 1 (this PR). SetTheory/Cardinal: [Infinite 26 in 6 files vs explicit only this PR's 2.",
+  "shows": "Apart from Infinite.false, the only declarations in Mathlib that take the Infinite or Uncountable class as an explicit hypothesis are exists_infinite_fiber, exists_infinite_fiber' and exists_uncountable_fiber; the twin Finite.exists_infinite_fiber and the same-file consumer le_range_of_union_finset_eq_univ take [Infinite _]."
+ },
+ {
+  "id": "c15",
+  "kind": "binders_form_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'"
+  ],
+  "lean": "content_search 'exists_infinite_fiber' and 'fiber.*by infer_instance' over target/Mathlib",
+  "compiled": null,
+  "result": "Mathlib call sites of the changed fiber lemmas: Pigeonhole.lean:121 exists_infinite_fiber u' h (by infer_instance); StrongRankCondition.lean:250 exists_infinite_fiber' Φ h (by infer_instance). No other callers (KonigLemma uses Finite.exists_infinite_fiber).",
+  "shows": "Every Mathlib call site of the lemmas supplies the explicit class argument by infer_instance; the pre-PR reason for an explicit argument (le_range's local `have k : Infinite (range f)`) is deleted by this PR."
+ },
+ {
+  "id": "c16",
+  "kind": "automation_check",
+  "objects": [
+   "Cardinal.exists_infinite_fiber",
+   "Cardinal.exists_infinite_fiber'",
+   "Cardinal.exists_uncountable_fiber",
+   "Cardinal.infinite_pigeonhole_card_lt",
+   "Cardinal.le_range_of_union_finset_eq_univ"
+  ],
+  "lean": "content_search '@\\[' in target/Mathlib/SetTheory/Cardinal/Pigeonhole.lean and target/Mathlib/Data/Fintype/Pigeonhole.lean",
+  "compiled": null,
+  "result": "Pigeonhole.lean: one attribute, the @[deprecated] on the alias; none of its 9 theorems is registered. Data/Fintype/Pigeonhole.lean: one @[simp], on Function.Embedding.isEmpty_of_card_lt (an IsEmpty conclusion); Finite.exists_infinite_fiber has none.",
+  "shows": "Existential fibre lemmas in this area carry no attribute and their ∃-conclusions are not simp/ext/gcongr-shaped; the PR's statements are registered like their siblings, and no automation example was worth compiling."
+ },
+ {
+  "id": "c17",
+  "kind": "binders_form_check",
+  "objects": [
+   "Cardinal.le_range_of_union_finset_eq_univ",
+   "Cardinal.le_range_of_union_finset_eq_top"
+  ],
+  "lean": "content_search '⋃ [^=]*= (Set\\.)?univ' vs '⋃ [^=]*= ⊤' over target/Mathlib; content_search 'union_support_maximal_linearIndependent_eq_range_basis'",
+  "compiled": null,
+  "result": "⋃ … = univ/Set.univ: 104 matches in 48 files; ⋃ … = ⊤: 11 in 6 files. The one producer feeding the lemma (Basis/Cardinality.lean:73) concludes `= Set.univ`.",
+  "shows": "The PR's change from `= ⊤` to `= Set.univ` matches the library's form for covering statements and the form its caller's input lemma produces; the renamed lemma and its deprecated alias are one API (the model's hypothesis family is confirmed)."
+ },
+ {
+  "id": "c18",
+  "kind": "closure_check",
+  "objects": [
+   "infinite_basis_le_maximal_linearIndependent'",
+   "linearIndependent_le_infinite_basis"
+  ],
+  "lean": "model.md before/after statements of both declarations; diff.patch hunks for Basis/Cardinality.lean and Dimension/StrongRankCondition.lean",
+  "compiled": null,
+  "result": "Both statements are textually identical before and after; each diff hunk changes one line of proof (the lemma name it calls).",
+  "shows": "The linear-algebra family changes no statement, so this pass has nothing to construct for it beyond c12 (its caller's view of exists_infinite_fiber')."
+ }
+]

@@ -1,0 +1,544 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Counterexamples/MapFloor.lean",
+   "matches": [
+    {
+     "line_number": 39,
+     "content": "    39|namespace Counterexample"
+    },
+    {
+     "line_number": 43,
+     "content": "    43|open Function Int Polynomial"
+    },
+    {
+     "line_number": 45,
+     "content": "    45|open scoped Polynomial"
+    },
+    {
+     "line_number": 55,
+     "content": "    55|namespace IntWithEpsilon"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/SorgenfreyLine.lean",
+   "matches": [
+    {
+     "line_number": 37,
+     "content": "    37|open Set Filter TopologicalSpace"
+    },
+    {
+     "line_number": 39,
+     "content": "    39|open scoped Topology Filter Cardinal"
+    },
+    {
+     "line_number": 41,
+     "content": "    41|namespace Counterexample"
+    },
+    {
+     "line_number": 53,
+     "content": "    53|open scoped SorgenfreyLine"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/Motzkin.lean",
+   "matches": [
+    {
+     "line_number": 24,
+     "content": "    24|lemma motzkin_polynomial_nonneg (x y : K) :"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/MonicNonRegular.lean",
+   "matches": [
+    {
+     "line_number": 26,
+     "content": "    26|open Polynomial"
+    },
+    {
+     "line_number": 28,
+     "content": "    28|namespace Counterexample.NonRegular"
+    },
+    {
+     "line_number": 37,
+     "content": "    37|namespace N₃"
+    },
+    {
+     "line_number": 77,
+     "content": "    77|theorem X_add_two_mul_X_add_two : (X + C 2 : N₃[X]) * (X + C 2) = (X + C 2) * (X + C 3) := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/TopologistsSineCurve.lean",
+   "matches": [
+    {
+     "line_number": 25,
+     "content": "    25|open Topology Filter Set Real"
+    },
+    {
+     "line_number": 27,
+     "content": "    27|namespace TopologistsSineCurve"
+    },
+    {
+     "line_number": 42,
+     "content": "    42|lemma xSeq_pos (y : ℝ) (k : ℕ) : 0 < xSeq y k := by"
+    },
+    {
+     "line_number": 46,
+     "content": "    46|lemma sin_inv_xSeq {y : ℝ} (hy : y ∈ Icc (-1) 1) (k : ℕ) : sin (xSeq y k)⁻¹ = y := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/Girard.lean",
+   "matches": [
+    {
+     "line_number": 29,
+     "content": "    29|namespace Counterexample"
+    },
+    {
+     "line_number": 35,
+     "content": "    35|theorem girard.{u} (pi : (Type u → Type u) → Type u)"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/PolynomialIsDomain.lean",
+   "matches": [
+    {
+     "line_number": 24,
+     "content": "    24|open scoped Polynomial"
+    },
+    {
+     "line_number": 26,
+     "content": "    26|namespace NatMaxAdd"
+    },
+    {
+     "line_number": 33,
+     "content": "    33|open NatMaxAdd (mk)"
+    },
+    {
+     "line_number": 59,
+     "content": "    59|theorem natCast_eq_one (n : ℕ) : ∀ [NeZero n], (n : NatMaxAdd) = 1 := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/DirectSumIsInternal.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|namespace Counterexample"
+    },
+    {
+     "line_number": 25,
+     "content": "    25|theorem UnitsInt.one_ne_neg_one : (1 : ℤˣ) ≠ -1 := by decide"
+    },
+    {
+     "line_number": 42,
+     "content": "    42|theorem mem_withSign_one {x : ℤ} : x ∈ ℤ≥0 ↔ 0 ≤ x :="
+    },
+    {
+     "line_number": 45,
+     "content": "    45|theorem mem_withSign_neg_one {x : ℤ} : x ∈ ℤ≤0 ↔ x ≤ 0 :="
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/Pseudoelement.lean",
+   "matches": [
+    {
+     "line_number": 32,
+     "content": "    32|open CategoryTheory.Abelian CategoryTheory CategoryTheory.Limits ModuleCat LinearMap"
+    },
+    {
+     "line_number": 34,
+     "content": "    34|namespace Counterexample"
+    },
+    {
+     "line_number": 38,
+     "content": "    38|open CategoryTheory.Abelian.Pseudoelement"
+    },
+    {
+     "line_number": 49,
+     "content": "    49|theorem fst_x_pseudo_eq_fst_y : PseudoEqual _ (app biprod.fst x) (app biprod.fst y) := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/IrrationalPowerOfIrrational.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|open Real"
+    },
+    {
+     "line_number": 22,
+     "content": "    22|namespace Counterexample"
+    },
+    {
+     "line_number": 29,
+     "content": "    29|theorem not_irrational_rpow :"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/Cyclotomic105.lean",
+   "matches": [
+    {
+     "line_number": 13,
+     "content": "    13|theorem `not_forall_coeff_cyclotomic_neg_one_zero_one`. We prove this with the counterexample"
+    },
+    {
+     "line_number": 18,
+     "content": "    18|open Nat (properDivisors)"
+    },
+    {
+     "line_number": 20,
+     "content": "    20|open Finset"
+    },
+    {
+     "line_number": 22,
+     "content": "    22|namespace Counterexample"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/HomogeneousPrimeNotPrime.lean",
+   "matches": [
+    {
+     "line_number": 35,
+     "content": "    35|namespace Counterexample"
+    },
+    {
+     "line_number": 37,
+     "content": "    37|namespace CounterexampleNotPrimeButHomogeneousPrime"
+    },
+    {
+     "line_number": 39,
+     "content": "    39|open DirectSum"
+    },
+    {
+     "line_number": 81,
+     "content": "    81|theorem grading.one_mem : (1 : R × R) ∈ grading R 0 :="
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/DiscreteTopologyNonDiscreteUniformity.lean",
+   "matches": [
+    {
+     "line_number": 77,
+     "content": "    77|open Set Function Filter Metric"
+    },
+    {
+     "line_number": 92,
+     "content": "    92|lemma dist_def {n m : ℕ} : dist n m = |2 ^ (-n : ℤ) - 2 ^ (-m : ℤ)| := rfl"
+    },
+    {
+     "line_number": 94,
+     "content": "    94|lemma Int.eq_of_pow_sub_le {d : ℕ} {m n : ℤ} (hd1 : 1 < d)"
+    },
+    {
+     "line_number": 128,
+     "content": "   128|lemma ball_eq_singleton {n : ℕ} : Metric.ball n ((2 : ℝ) ^ (-n - 1 : ℤ)) = {n} := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/SeparableNotSecondCountable.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|open Set TopologicalSpace"
+    },
+    {
+     "line_number": 21,
+     "content": "    21|namespace RealProdLexBool"
+    },
+    {
+     "line_number": 44,
+     "content": "    44|theorem not_secondCountableTopology : ¬SecondCountableTopology (ℝ ×ₗ Bool) := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/EulerSumOfPowers.lean",
+   "matches": [
+    {
+     "line_number": 31,
+     "content": "    31|namespace Counterexample"
+    },
+    {
+     "line_number": 45,
+     "content": "    45|theorem fermatLastTheoremWith_of_sumOfPowersConjectureWith (R : Type*) [Semiring R] :"
+    },
+    {
+     "line_number": 52,
+     "content": "    52|theorem fermatLastTheorem_of_sumOfPowersConjecture : SumOfPowersConjecture → FermatLastTheorem :="
+    },
+    {
+     "line_number": 56,
+     "content": "    56|theorem sumOfPowersConjectureWith_three_iff_fermatLastTheoremWith_three (R : Type*) [Semiring R] :"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/ZeroDivisorsInAddMonoidAlgebras.lean",
+   "matches": [
+    {
+     "line_number": 45,
+     "content": "    45|open Finsupp hiding single"
+    },
+    {
+     "line_number": 46,
+     "content": "    46|open AddMonoidAlgebra"
+    },
+    {
+     "line_number": 48,
+     "content": "    48|namespace Counterexample"
+    },
+    {
+     "line_number": 58,
+     "content": "    58|theorem zero_divisors_of_periodic {R A} [Nontrivial R] [Ring R] [AddMonoid A] {n : ℕ} (a : A)"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/LinearOrderWithPosMulPosEqZero.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|namespace Counterexample"
+    },
+    {
+     "line_number": 30,
+     "content": "    30|namespace Foo"
+    },
+    {
+     "line_number": 52,
+     "content": "    52|theorem aux1_inj : Function.Injective aux1 := by boom"
+    },
+    {
+     "line_number": 80,
+     "content": "    80|theorem not_mul_pos : ¬∀ {M : Type} [LinearOrderedCommMonoidWithZero M],"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/QuadraticForm.lean",
+   "matches": [
+    {
+     "line_number": 19,
+     "content": "    19|open LinearMap"
+    },
+    {
+     "line_number": 20,
+     "content": "    20|open LinearMap.BilinForm"
+    },
+    {
+     "line_number": 21,
+     "content": "    21|open LinearMap (BilinForm)"
+    },
+    {
+     "line_number": 22,
+     "content": "    22|open LinearMap.BilinMap"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/Phillips.lean",
+   "matches": [
+    {
+     "line_number": 76,
+     "content": "    76|namespace Counterexample"
+    },
+    {
+     "line_number": 82,
+     "content": "    82|open Set BoundedContinuousFunction MeasureTheory"
+    },
+    {
+     "line_number": 84,
+     "content": "    84|open Cardinal (aleph)"
+    },
+    {
+     "line_number": 86,
+     "content": "    86|open scoped Cardinal BoundedContinuousFunction"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/CanonicallyOrderedCommSemiringTwoMul.lean",
+   "matches": [
+    {
+     "line_number": 28,
+     "content": "    28|namespace Counterexample"
+    },
+    {
+     "line_number": 30,
+     "content": "    30|theorem mem_zmod_2 (a : ZMod 2) : a = 0 ∨ a = 1 := by"
+    },
+    {
+     "line_number": 35,
+     "content": "    35|theorem add_self_zmod_2 (a : ZMod 2) : a + a = 0 := by rcases mem_zmod_2 a with (rfl | rfl) <;> rfl"
+    },
+    {
+     "line_number": 37,
+     "content": "    37|namespace Nxzmod2"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/DimensionPolynomial.lean",
+   "matches": [
+    {
+     "line_number": 25,
+     "content": "    25|namespace Counterexample"
+    },
+    {
+     "line_number": 27,
+     "content": "    27|namespace DimensionPolynomial"
+    },
+    {
+     "line_number": 29,
+     "content": "    29|open PowerSeries Polynomial"
+    },
+    {
+     "line_number": 36,
+     "content": "    36|theorem ringKrullDim_A_eq_one : ringKrullDim (A k) = 1 := by"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/CliffordAlgebraNotInjective.lean",
+   "matches": [
+    {
+     "line_number": 35,
+     "content": "    35|open LinearMap (BilinForm)"
+    },
+    {
+     "line_number": 36,
+     "content": "    36|open LinearMap (BilinMap)"
+    },
+    {
+     "line_number": 40,
+     "content": "    40|namespace Q60596"
+    },
+    {
+     "line_number": 42,
+     "content": "    42|open MvPolynomial"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/AharoniKorman.lean",
+   "matches": [
+    {
+     "line_number": 88,
+     "content": "    88|open Hollom"
+    },
+    {
+     "line_number": 98,
+     "content": "    98|namespace Hollom"
+    },
+    {
+     "line_number": 110,
+     "content": "   110|lemma induction {p : Hollom → Prop} (h : ∀ x y z, p (h(x, y, z))) : ∀ x, p x := by simpa"
+    },
+    {
+     "line_number": 131,
+     "content": "   131|lemma HollomOrder.trans :"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/PeanoCurve.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|open scoped unitInterval"
+    },
+    {
+     "line_number": 18,
+     "content": "    18|lemma exists_long_peano_curve :"
+    },
+    {
+     "line_number": 32,
+     "content": "    32|theorem exists_peano_curve :"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/SeminormLatticeNotDistrib.lean",
+   "matches": [
+    {
+     "line_number": 22,
+     "content": "    22|open Seminorm"
+    },
+    {
+     "line_number": 24,
+     "content": "    24|open scoped NNReal"
+    },
+    {
+     "line_number": 26,
+     "content": "    26|namespace Counterexample"
+    },
+    {
+     "line_number": 28,
+     "content": "    28|namespace SeminormNotDistrib"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/CharPZeroNeCharZero.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|namespace Counterexample"
+    },
+    {
+     "line_number": 26,
+     "content": "    26|theorem add_one_eq_one (x : WithZero Unit) : x + 1 = 1 :="
+    },
+    {
+     "line_number": 29,
+     "content": "    29|theorem withZero_unit_charP_zero : CharP (WithZero Unit) 0 :="
+    },
+    {
+     "line_number": 32,
+     "content": "    32|theorem withZero_unit_not_charZero : ¬CharZero (WithZero Unit) := fun ⟨h⟩ =>"
+    }
+   ]
+  },
+  {
+   "path": "target/Counterexamples/GameMultiplication.lean",
+   "matches": [
+    {
+     "line_number": 26,
+     "content": "    26|namespace Counterexample"
+    },
+    {
+     "line_number": 28,
+     "content": "    28|namespace PGame"
+    },
+    {
+     "line_number": 30,
+     "content": "    30|open SetTheory PGame"
+    },
+    {
+     "line_number": 36,
+     "content": "    36|theorem neg_star' : -star' = star' := by"
+    }
+   ]
+  }
+ ],
+ "files_available": 28,
+ "files_scanned": 28,
+ "files_with_matches": 27,
+ "truncated": false
+}

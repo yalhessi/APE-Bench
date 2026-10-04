@@ -331,3 +331,32 @@ paths:
 
   Blind matchers are not affected: they judge text they are shown.
 
+  *Measured 2026-09-29* (`results/pr_review_v5/probes/postcutoff-2026-09-29/`): on 10 PRs created
+  after the cutoff, the same Claude reviewer reached asks at 79-107% of its in-window rate. So
+  in-window reach is not mainly recall, at probe altitude and with a different ask mix. The
+  post-cutoff set `probe-2026-07-08-v1` (config `configs/pr_review_v5_probe_2026_07_08_v1.yaml`) has
+  reviewed workspaces built, and is the first option above, ready to use.
+- **Restore a built base only after its build process has exited (2026-09-29).** A restore started
+  as the build was finishing its snapshot (under a second after `build_completed_at`) failed with
+  "Restore file failed" and left the state `failed`, "need to rebuild". Recovery was a rebuild of that
+  one commit, then a restore. A restore run on commits whose builds are done is safe beside builds of
+  other commits. So is `prebuild --reviewed` on a config restricted with `dataset.pr_numbers`, and an
+  absolute `extends:` path lets that config live in scratch.
+- **Probe subagents share the session scratchpad; keep what a reviewer must not see out of it
+  (2026-09-29).** In the construction demonstration, reviewers wrote snippet files into the session
+  scratchpad, two sessions collided on a folder name, and the round-1 feedback file with the
+  maintainers' asks sat in the same scratchpad until the first collision was reported. So:
+  - generate asks, gold or unblinded indices only after every reviewer has finished;
+  - tell every reviewer to keep temporary files in a `tmp/` inside its own packet directory;
+  - log every tool call in the wrapper, not by the reviewer;
+  - audit the transcripts (tool calls and tool results) before matching;
+  - redact condition cues, such as a K reviewer's construction ids, from matcher inputs.
+
+  The probe's `audit_transcripts.py` flags reads outside the packet, foreign scratch files, the
+  study's scratch, agent transcripts and the web. It was checked against planted violations.
+- **While probe sessions run, commit packets by file, never the probe directory (2026-09-29).**
+  Sessions write `calls.jsonl`, `tmp/` and then `findings.json` into their packets as they work, so
+  `git add <probe_dir>` mid-run committed 21 half-written session files with the validation
+  packets (amended out before any push). Commit a session's outputs only after its transcript is
+  audited. The harness for all of this is `analysis/probes.py` and `cli probe`.
+

@@ -1,0 +1,44 @@
+[
+ {
+  "target": "Mathlib/Algebra/Group/Subgroup/Pointwise.lean",
+  "claim": "The PR adds `public import Mathlib.GroupTheory.Commutator.Basic` to `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`, but nothing in Pointwise.lean uses commutators. The lemma the PR touches there moved *out* of the file into `Subgroup/Basic.lean`, which Pointwise already imports. So the new import is unused, and it makes Pointwise (and everything downstream of it) depend on `Commutator.Basic` and hence `QuotientGroup.Defs`.",
+  "requested_change": "Delete the line `public import Mathlib.GroupTheory.Commutator.Basic` from the imports of `Mathlib/Algebra/Group/Subgroup/Pointwise.lean`.",
+  "severity": "blocking",
+  "evidence": "content_search for `commutator|⁅` in Pointwise.lean as the PR leaves it: 0 matches. lean_verify_edit on Pointwise.lean, replacing line 13 (the new import) with an empty line: success, no errors or warnings. Control: replacing that line with an import of a nonexistent module fails with an import error, so the verifier does rebuild the header and the success is meaningful. The base file did not have this import, so downstream files cannot depend on it."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "`commutator_sup_left` and its private helper `commutator_sup_left'` are the only new commutator lemmas in the PR without `@[to_additive]`. The file tags essentially every `Subgroup` commutator lemma with it, including the PR's own `commutator_mono_left`, `commutator_mono_right` and `commutator_le_of_le`, so `AddSubgroup` gets no version of the distributivity result.",
+  "requested_change": "Add `@[to_additive]` to `commutator_sup_left` and to the private `commutator_sup_left'` it uses. This generates `AddSubgroup.addCommutator_sup_left`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/GroupTheory/Commutator/Basic.lean, lines 326-358, with the PR's proofs unchanged but `@[to_additive]` on `commutator_sup_left'`, `commutator_sup_left` and `commutator_sup_right`, plus `example ... (H K N : AddSubgroup A) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := AddSubgroup.addCommutator_sup_left H K N`: success. The generated name is `addCommutator_sup_left`. The first attempt, spelled `AddSubgroup.commutator_sup_left`, failed with Unknown constant."
+ },
+ {
+  "target": "Subgroup.commutator_sup_right",
+  "claim": "`commutator_sup_right` lacks `@[to_additive]`, unlike its neighbours in the file, so there is no `AddSubgroup` version of `⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆`.",
+  "requested_change": "Add `@[to_additive]` to `commutator_sup_right`, together with the same attribute on `commutator_sup_left`, which it uses. This generates `AddSubgroup.addCommutator_sup_right`.",
+  "severity": "blocking",
+  "evidence": "The same lean_verify_edit as for commutator_sup_left, with `example ... : ⁅N, H ⊔ K⁆ = ⁅N, H⁆ ⊔ ⁅N, K⁆ := AddSubgroup.addCommutator_sup_right N H K`: success."
+ },
+ {
+  "target": "Subgroup.commutator_mono_left",
+  "claim": "The PR tags only the one-sided lemmas `commutator_mono_left` and `commutator_mono_right` with `gcongr`. The two-sided `commutator_mono` stays untagged, and gcongr looks lemmas up by exactly which arguments vary, so `gcongr` cannot close `⁅A, C⁆ ≤ ⁅B, D⁆` when both arguments change.",
+  "requested_change": "Also tag the existing `commutator_mono` with `@[to_additive (attr := gcongr)]`, so gcongr/grw handle the case where both arguments vary as well as the one-sided cases the PR covers.",
+  "severity": "advisory",
+  "evidence": "In the PR state, `example (A B C D : Subgroup G) (h₁ : A ≤ B) (h₂ : C ≤ D) : ⁅A, C⁆ ≤ ⁅B, D⁆ := by gcongr` fails in lean_verify_edit with 'gcongr did not make progress'. Changing `commutator_mono` to `@[to_additive (attr := gcongr)]` makes the same example compile (lean_verify_edit, lines 150-152: success)."
+ },
+ {
+  "target": "Subgroup.commutator_sup_left",
+  "claim": "The proof of `commutator_sup_left` detours through the quotient `(H ⊔ K ⊔ N) ⧸ (⁅H, N⁆ ⊔ ⁅K, N⁆)`. That needs a separate private helper `commutator_sup_left'`, five `have`s for containment in `M`, `subgroupOf` transport with `convert`, and two large `simp` calls. The key fact it establishes, that `H ⊔ K` normalises `⁅H, N⁆ ⊔ ⁅K, N⁆`, already gives the result by closure induction on `H ⊔ K`, with the existing `commutatorElement_mul_left_eq_conj_mul` and `commutatorElement_inv_left` identities.",
+  "requested_change": "Prove `commutator_sup_left` directly and delete the private `commutator_sup_left'`:\ntheorem commutator_sup_left (H K N : Subgroup G) [N.Normal] : ⁅H ⊔ K, N⁆ = ⁅H, N⁆ ⊔ ⁅K, N⁆ := by\n  refine le_antisymm ?_\n    (sup_le (commutator_mono_left le_sup_left) (commutator_mono_left le_sup_right))\n  have hX : ⁅H, N⁆ ⊔ ⁅K, N⁆ ≤ N := sup_le (commutator_le_right H N) (commutator_le_right K N)\n  have hHK : H ⊔ K ≤ normalizer (⁅H, N⁆ ⊔ ⁅K, N⁆ : Subgroup G) := sup_le\n    (by grw [le_normalizer_iff_commutator_le_right, hX, ← le_sup_left])\n    (by grw [le_normalizer_iff_commutator_le_right, hX, ← le_sup_right])\n  rw [sup_eq_closure H K] at hHK\n  rw [commutator_le]\n  intro g hg\n  rw [sup_eq_closure H K] at hg\n  induction hg using closure_induction with\n  | mem x hx =>\n    rcases hx with hx | hx\n    · exact fun n hn ↦ mem_sup_left (commutator_mem_commutator hx hn)\n    · exact fun n hn ↦ mem_sup_right (commutator_mem_commutator hx hn)\n  | one => simp\n  | mul x y hx hy ihx ihy =>\n    intro n hn\n    rw [commutatorElement_mul_left_eq_conj_mul]\n    exact mul_mem ((mem_normalizer_iff.mp (hHK hx) _).mp (ihy n hn)) (ihx n hn)\n  | inv x hx ihx =>\n    intro n hn\n    rw [commutatorElement_inv_left, ← commutatorElement_inv]\n    exact (mem_normalizer_iff''.mp (hHK hx) _).mp (inv_mem (ihx n hn))",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing `Subgroup.commutator_sup_left` with the proof above: success, no errors or warnings. The same proof with `@[to_additive]` and the helper deleted (lines 326-358 replaced) also compiles, and `AddSubgroup.addCommutator_sup_left` is generated. The direct proof uses neither `commutator_sup_left'`, `commutator_le_of_le`, `subgroupOf`, `convert` nor `inf_normalizer_le_normalizer_sup`."
+ },
+ {
+  "target": "Subgroup.inf_normalizer_le_normalizer_sup",
+  "claim": "The PR moves the binary `inf_normalizer_le_normalizer_sup` into `Subgroup/Basic.lean`, next to `inf_normalizer_le_normalizer_inf` and `iInf_normalizer_le_normalizer_iInf`. Its indexed counterpart `iInf_normalizer_le_normalizer_iSup` stays behind in `Pointwise.lean`, so the sup pair is now split across files while the inf pair sits together.",
+  "requested_change": "Move `iInf_normalizer_le_normalizer_iSup` from `Mathlib/Algebra/Group/Subgroup/Pointwise.lean` to `Mathlib/Algebra/Group/Subgroup/Basic.lean`, directly after `inf_normalizer_le_normalizer_sup`. Its proof is unchanged, and `iSup_normal` in Pointwise still finds it through the existing import.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Subgroup/Basic.lean, adding `iInf_normalizer_le_normalizer_iSup` with its current proof (`intro g hg; simp_rw [mem_iInf, mem_normalizer_iff_map_conj_eq, map_iSup, hg] at hg ⊢`) right after `inf_normalizer_le_normalizer_sup`: success, so everything it needs is available in Basic. Basic.lean lines 537-545 hold the inf/iInf pair."
+ }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "target": "Rat.inv_intCast_den_of_pos",
+    "claim": "The new proof of `Rat.inv_intCast_den_of_pos` (`simp only [den_inv, num_intCast]; grind`) is a performance regression rather than a golf: the PR's own trace shows it going from <10 ms to 17 ms, and profiling it in place gives about 24 ms of tactic time plus 7 ms of type checking, against about 3 ms for both the original proof and a one-line `simp`. The sibling `inv_intCast_num_of_pos` directly above is closed by plain `simp [*]`.",
+    "requested_change": "Replace the proof with `by simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`, which matches the sibling lemmas' `simp` style, or revert this declaration from the golf PR.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Data/Rat/Lemmas.lean, declaration Rat.inv_intCast_den_of_pos: `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]` succeeds with no errors. `simp [*]` leaves `(if a = 0 then 1 else ↑a.natAbs) = a`, and `simp [ha0.ne', ha0.le]` leaves `↑a.natAbs = a`, so the natAbs fact is needed. Profiled in place with `set_option profiler true` and threshold 1 ms: the PR proof takes simp 2.47 ms, grind 4.26 ms, and grind tactic execution 12.1 ms (plus inner grind simp and typeclass steps), and type checking 7.1 ms. The suggested simp takes 2.05 ms and 1.27 ms. The original rw proof takes 2.69 ms. file_read of lines 296-327 shows `inv_intCast_num_of_pos := by simp [*]` and `inv_intCast_den` / `inv_ofNat_den` proved by `simp`."
+  },
+  {
+    "target": "Finset.mem_map_equiv",
+    "claim": "The PR's `simp only [mem_map, Equiv.coe_toEmbedding]` followed by `grind` in `Finset.mem_map_equiv` is slower than the proof it replaces (the PR description reports <10 ms before and 25 ms after). It is also no shorter than one terminal `simp` call that closes the goal. `grind` alone and `grind [Equiv.coe_toEmbedding]` both fail here, so the two-step form exists only to prepare the goal for `grind`.",
+    "requested_change": "Replace the two-line proof with `by simp [Equiv.apply_eq_iff_eq_symm_apply]`, or keep the original proof, which was faster.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Data/Finset/Image.lean, declaration Finset.mem_map_equiv: `by simp [Equiv.apply_eq_iff_eq_symm_apply]` succeeds, and so does `by simp [mem_map, Equiv.apply_eq_iff_eq_symm_apply]`. `by grind` and `by grind [Equiv.coe_toEmbedding]` both fail with `grind failed` and the fact `f.toEmbedding w = b` left unused. Profiled in place with `profiler.threshold 1`: the PR proof takes simp 2.38 ms, grind 6.66 ms, and grind simp 1.31 ms and 1.44 ms. The one-line simp takes 4.77 ms, measured with `-mem_map_equiv` because the test copy sat after the real lemma. The original takes simp 1.39 ms and 1.28 ms."
+  },
+  {
+    "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+    "claim": "The new closing step of `MeasureTheory.Measure.pi_map_piCongrLeft` has two problems. `exact Fintype.prod_equiv _ _ _ (congrFun rfl)` hides the reindexing equivalence behind unification, and `congrFun rfl` is an obscure way to write `fun _ ↦ rfl`. The docstring of `Fintype.prod_equiv` points to `Equiv.prod_comp` for exactly this case, where no pointwise hypothesis is needed. Also, `simp only [pi_pi, this]` replaces the original `rw [this, pi_pi]` for no reason: `this` is a local equation that `rw` handles directly.",
+    "requested_change": "Replace the last two lines with `rw [this, pi_pi]` followed by `exact e.prod_comp fun i ↦ μ i (s i)`. At minimum, write `Fintype.prod_equiv e _ _ fun _ ↦ rfl` in place of `Fintype.prod_equiv _ _ _ (congrFun rfl)`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit in line mode on Mathlib/MeasureTheory/Constructions/Pi.lean, lines 461-462. `rw [this, pi_pi]` + `exact e.prod_comp fun i ↦ μ i (s i)` succeeds. `rw [this, pi_pi]` + `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl` succeeds, and so does the same closing term after `simp only [pi_pi, this]`. `exact e.prod_comp _` fails because the `CommMonoid ?m` typeclass problem is stuck, so the function must be given explicitly. content_search of Algebra/BigOperators found the `Fintype.prod_equiv` docstring (Defs.lean:712-717): 'See `Equiv.sum_comp` for a version without `h`.'"
+  },
+  {
+    "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+    "claim": "After the golf, `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod` still carries the auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t) := by congr; exact (ρ.disintegrate _).symm`. It then uses `simp only [this]` to rewrite with that one local equation and closes with a `.symm` term. Once `compProd_apply_prod` is used, the auxiliary `have` is unnecessary, and a single rewrite closes the goal.",
+    "requested_change": "Replace the whole proof with `by rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Alternatively, follow the file's sibling pattern: `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, declaration MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod: `rw [← compProd_apply_prod hs ht, ρ.disintegrate]` succeeds with no errors, and so does the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` + `rw [compProd_apply_prod hs ht]` variant. file_read of the same file shows the sibling lemmas (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`, lines 135-159) all use the `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` idiom rather than a `have`."
+  },
+  {
+    "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+    "claim": "After the golf, `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod` keeps the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`. It then uses `simp only [this]` with that single local equation and ends with `exact (Kernel.compProd_apply_prod hs ht).symm`. The whole proof is one rewrite chain.",
+    "requested_change": "Replace the whole proof with `by rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Alternatively, follow the file's sibling pattern: `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, declaration ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod: `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]` succeeds with no errors, and so does the `conv_rhs => rw [← κ.disintegrate κ.condKernel]` + `rw [Kernel.compProd_apply_prod hs ht]` variant. The sibling lemmas at lines 44-67 (`lintegral_condKernel_mem`, `lintegral_condKernel`, `setLIntegral_condKernel`) use the `conv_rhs => rw [← κ.disintegrate κ.condKernel]` idiom."
+  }
+]

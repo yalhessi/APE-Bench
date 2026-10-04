@@ -1,0 +1,85 @@
+import json
+F = []
+def add(target, claim, change, severity, evidence):
+    F.append(dict(target=target, claim=claim, requested_change=change, severity=severity, evidence=evidence))
+
+add("CompletelyRegularSpace.of_exists_uniformSpace",
+    "`CompletelyRegularSpace.of_exists_uniformSpace` assumes its own conclusion. The section line `variable [t : TopologicalSpace α] [CompletelyRegularSpace α]` pulls the instance into every theorem after it, because an instance-implicit variable is included whenever the variables it depends on are. The elaborated type is `∀ {α} [t : TopologicalSpace α] [CompletelyRegularSpace α], (∃ u, u.toTopologicalSpace = t) → CompletelyRegularSpace α`, so the lemma proves nothing.",
+    "Delete `[CompletelyRegularSpace α]` from the section `variable` line, so it reads `variable [t : TopologicalSpace α]`. Put the instance on the one theorem that needs it: `public theorem CompletelyRegularSpace.exists_uniformSpace [CompletelyRegularSpace α] : ∃ (u : UniformSpace α), u.toTopologicalSpace = t`. Leave `of_exists_uniformSpace` without it.",
+    "blocking",
+    "lean_verify_edit with `#check @CompletelyRegularSpace.of_exists_uniformSpace` added after the declarations printed `∀ {α : Type u_2} [t : TopologicalSpace α] [CompletelyRegularSpace α], (∃ u, u.toTopologicalSpace = t) → CompletelyRegularSpace α`. I replaced lines 111-125 so the variable line is `[t : TopologicalSpace α]` only and `[CompletelyRegularSpace α]` is a binder on `exists_uniformSpace`. That compiled (success: true), and `#check` then printed `∀ {α} [t : TopologicalSpace α], (∃ u, u.toTopologicalSpace = t) → CompletelyRegularSpace α`. The unchanged proof `obtain ⟨u, rfl⟩ := h; infer_instance` still works.")
+
+add("completelyRegularSpace_iff_exists_uniformSpace",
+    "`completelyRegularSpace_iff_exists_uniformSpace`, the headline result, is vacuous as elaborated. Its type is `∀ {α} [t : TopologicalSpace α] [CompletelyRegularSpace α], CompletelyRegularSpace α ↔ ∃ u, u.toTopologicalSpace = t`: it takes the left-hand side as a hypothesis, so `.mpr` can never produce complete regularity. The proof term `@CompletelyRegularSpace.exists_uniformSpace α t` only typechecks as the forward map because the instance binder has been swallowed into the statement.",
+    "After moving `[CompletelyRegularSpace α]` off the section `variable` line (see the finding on `of_exists_uniformSpace`), change the proof to `⟨fun _ ↦ CompletelyRegularSpace.exists_uniformSpace, .of_exists_uniformSpace⟩`. The statement then has no `[CompletelyRegularSpace α]` argument.",
+    "blocking",
+    "`#check @completelyRegularSpace_iff_exists_uniformSpace` on the PR as it stands printed `∀ {α : Type u_2} [t : TopologicalSpace α] [CompletelyRegularSpace α], CompletelyRegularSpace α ↔ ∃ u, u.toTopologicalSpace = t`. With the variable fix and the proof `⟨fun _ ↦ CompletelyRegularSpace.exists_uniformSpace, .of_exists_uniformSpace⟩`, lean_verify_edit succeeded and printed `∀ {α} [t : TopologicalSpace α], CompletelyRegularSpace α ↔ ∃ u, u.toTopologicalSpace = t`. The anonymous-constructor spelling `.exists_uniformSpace` does not work for the forward map: it resolves to `Exists.exists_uniformSpace`.")
+
+add("P",
+    "The auxiliary predicate `P` carries three conjuncts that no proof ever uses: `uc.IsSymm`, `uc ∈ 𝓤 α` and `IsOpen uu`. They are only threaded through. To re-establish them, `urysohns_main` needs the `hos` symmetry computation (`rw [← inv_eq_self_iff, inv_comp, ...]`), the `hucd` membership proof and the `ds.IsRefl` fact, and the instance needs `hdss` and the extra `hdsu`/`hOo` components in `P_C_U`.",
+    "Shrink `P` to `∃ (x : α) (uc uu s : SetRel α α), IsOpen uc ∧ c = closure (Prod.mk x ⁻¹' uc) ∧ u = Prod.mk x ⁻¹' uu ∧ s ○ uc ○ s ⊆ uu ∧ s ∈ 𝓤 α`. In `urysohns_main`, delete `have : ds.IsRefl`, `hucd` and `hos`. Close the last two goals with `⟨x, uc, ds ○ uc ○ ds, ds, huc, rfl, rfl, subset_rfl, hdsu⟩` and `⟨x, ds ○ uc ○ ds, uu, ds, ho, rfl, rfl, ?_, hdsu⟩` (the calc is unchanged). In the instance, use `P_C_U := ⟨x, ds, O, u3, hdso, rfl, rfl, <same inclusion proof>, hu3u⟩`, and discard the symmetry output of `comp_open_symm_mem_uniformity_sets` with `-`.",
+    "advisory",
+    "lean_verify_edit replaced lines 45-107 with the reduced `P`, the shortened `urysohns_main` (no `hos`/`hucd`/`ds.IsRefl`, and the pattern `⟨x, uc, uu, s, huc, rfl, rfl, hn, hs⟩`) and the matching `P_C_U`. The whole file compiled: success true, no warnings.")
+
+add("P",
+    "The private helper is named `P`: a single letter, no docstring, sitting in the root namespace next to a public instance. Its meaning (\"`c` is the closure of a ball `ball x uc` and `u` is a ball `ball x uu` with room `s ○ uc ○ s ⊆ uu` between them\") can only be recovered by reading the eight-conjunct body. The module doc defers the explanation to a `TODO`.",
+    "Rename `P` to a descriptive name, for example `UniformSpace.UrysohnsBallPair` or `IsBallPair`, updating `urysohns_main` and `Urysohns.CU P` to match. Add a docstring stating which pairs `(c, u)` it describes and that it is the predicate fed to `Urysohns.CU`.",
+    "advisory",
+    "`#print P` in lean_verify_edit shows `private def P.{u_1} : {α : Type u_1} → [UniformSpace α] → Set α → Set α → Prop`, with no docstring; it is private because of the module default, not an explicit `private`. The diff has no comment or docstring on it. naming_norm returned `subject_unresolved`, so no corpus convention was measured.")
+
+add("urysohns_main",
+    "`urysohns_main` does not say what it proves. It is the interpolation step for the Urysohn construction: given `P c u`, it finds an open `v` with `c ⊆ v`, `closure v ⊆ u`, `P c v` and `P (closure v) u`. The name gives no subject and no conclusion, and the lemma has no docstring.",
+    "Rename it to describe its conclusion, in the same namespace as the renamed predicate (for example `P.exists_isOpen_between` or `IsBallPair.exists_between`). Add a one-line docstring saying that it supplies the `hP` field of `Urysohns.CU`.",
+    "advisory",
+    "Read from the diff: it is used only as `hP _ Pcu _ _ := urysohns_main Pcu` in `UniformSpace.toCompletelyRegularSpace`. The `run_cmd` probe found no constant named `urysohns_main`, so it is private under the module default. naming_norm returned `subject_unresolved`.")
+
+add("UniformSpace.toCompletelyRegularSpace",
+    "The proofs spell out uniform balls by hand, as `Prod.mk x ⁻¹' V`, in `UniformSpace.toCompletelyRegularSpace`, `P` and `urysohns_main`. Library lemmas already exist for each hand-rolled step. `hOo.preimage (Continuous.prodMk_right x)` and `ho.preimage (Continuous.prodMk_right x)` are `UniformSpace.isOpen_ball`, whose proof in `Topology/UniformSpace/Basic.lean` is literally `hV.preimage <| .prodMk_right _`. `hCc.preimage (.prodMk_right x)` is `UniformSpace.isClosed_ball`, `refl_mem_uniformity hdsu` in this role is `UniformSpace.mem_ball_self`, and `Set.preimage_mono` is `UniformSpace.ball_mono`. The lemma the proof starts from, `isOpen_iff_isOpen_ball_subset`, is itself stated with `ball`.",
+    "Add `open UniformSpace (ball)` and write `ball x V` everywhere in place of `Prod.mk x ⁻¹' V`: in `P`, in `urysohns_main`'s `use`, and in the instance's `hxc`, `hyo`, `C` and `U`. Replace `hOo.preimage (Continuous.prodMk_right x)` and `ho.preimage (Continuous.prodMk_right x)` with `UniformSpace.isOpen_ball x hOo` and `UniformSpace.isOpen_ball x ho`. Replace `hCc.preimage (.prodMk_right x)` with `UniformSpace.isClosed_ball x hCc` and `refl_mem_uniformity hdsu` with `UniformSpace.mem_ball_self x hdsu`. Replace the `Set.preimage_mono` steps with `UniformSpace.ball_mono`.",
+    "advisory",
+    "declaration_search and content_search found `UniformSpace.isOpen_ball` and `UniformSpace.isClosed_ball` (Topology/UniformSpace/Basic.lean:106-110, both proved by `hV.preimage <| .prodMk_right _`) and `UniformSpace.ball_mono` (Defs.lean:619). `ball` is defined as `Prod.mk x ⁻¹' V` (Defs.lean:605). lean_verify_edit replaced lines 45-107 with the `ball` spelling and these lemmas, with `open UniformSpace (ball) in` on each declaration and fully qualified lemma names. The file compiled (success true). The line `subset := (closure_minimal (UniformSpace.ball_mono ...` needs rewrapping to stay under 100 columns.")
+
+add("UniformSpace.toCompletelyRegularSpace",
+    "`UniformSpace.toCompletelyRegularSpace` is declared at the default priority (1000). It is a blanket instance that fires for every type with a `UniformSpace`. Its direct sibling `UniformSpace.to_regularSpace` in `Topology/UniformSpace/Separation.lean` is `instance (priority := 100)`, the usual priority for structure-to-property instances.",
+    "Declare it as `public instance (priority := 100) UniformSpace.toCompletelyRegularSpace : CompletelyRegularSpace α where ...`.",
+    "advisory",
+    "content_search found `instance (priority := 100) UniformSpace.to_regularSpace : RegularSpace α` at Topology/UniformSpace/Separation.lean:115. lean_verify_edit with `(priority := 100)` added on line 82 compiled (success true).")
+
+add("SetRel.IsRefl.comp",
+    "The new instance is named `IsRefl.comp`, while every sibling instance in this block is named `isRefl_<operation>`: `isRefl_univ`, `isRefl_inter`, `isRefl_iInter`, `isRefl_preimage`, and on the symmetric side `isSymm_comp_inv` and `isSymm_comp_self`. The dotted `IsRefl.sInter` is a `protected lemma` taking explicit hypotheses, not an instance. The statement also writes `R₁.comp R₂`, where the rest of the file writes `R₁ ○ R₂`.",
+    "Rename it to `SetRel.isRefl_comp` and state it as `instance isRefl_comp [R₁.IsRefl] [R₂.IsRefl] : (R₁ ○ R₂).IsRefl where refl _ := ⟨_, R₁.rfl, R₂.rfl⟩`.",
+    "advisory",
+    "file_read of Mathlib/Data/Rel.lean lines 366-463 shows the sibling names listed. declaration_search: `SetRel.isRefl_comp` is not declared at base, so the name is free. lean_verify_edit replaced the declaration with `isRefl_comp` using `○`, plus `example [R₁.IsRefl] [R₂.IsRefl] : (R₁.comp R₂).IsRefl := inferInstance`. Rel.lean compiled (success true). With `attribute [-instance] SetRel.IsRefl.comp`, Uniformizable.lean fails with `failed to synthesize (u3 ○ u3).IsRefl`, so the instance is needed and a rename does not affect its use.")
+
+add("module_doc in Uniformizable.lean",
+    "The module docstring contains the placeholder `TODO: Explain proofs`. The construction is non-obvious: Urysohn's `CU` machinery runs on ball pairs, and Stone-Čech is pulled back for the converse. The only place it could be explained is this TODO. The section headings also deviate from the Mathlib template: `## Main Results` should be `## Main results`, and `## Implementation Details` should be `## Implementation notes`.",
+    "Remove the `TODO: Explain proofs` line. Replace it with an `## Implementation notes` section covering both proofs. First direction: to separate `x` from a closed `K`, run `Urysohns.CU` on pairs `(closure (ball x V), ball x W)` with an entourage `s` such that `s ○ V ○ s ⊆ W`; a symmetric open `d` with `d ○ d ⊆ s` gives the interpolating set `ball x (d ○ V ○ d)`. Converse: a completely regular space is induced by `stoneCechUnit`, and `uniformSpaceOfCompactR1` on `StoneCech α` is pulled back by `UniformSpace.comap`. Rename the headings to `## Main results` and `## Implementation notes`.",
+    "advisory",
+    "Read from the diff (module doc lines 13-36 of the new file). Heading style checked against the imported files: OfCompactT2.lean uses `## Main statement` and `## Implementation notes`, CompletelyRegular.lean uses `## Main results` and `## Implementation notes`.")
+
+add("module_doc in Uniformizable.lean",
+    "The module doc's implementation note says \"Urysohn's lemma is reused in the proof of `UniformSpace.completelyRegularSpace`\", but no declaration of that name exists. The instance this PR adds is `UniformSpace.toCompletelyRegularSpace`, so the reference is dangling and doc-gen will not link it.",
+    "Change `UniformSpace.completelyRegularSpace` to `UniformSpace.toCompletelyRegularSpace` in the Implementation Details paragraph.",
+    "advisory",
+    "lean_verify_edit with `#check @UniformSpace.completelyRegularSpace` inside the file returned `Unknown constant UniformSpace.completelyRegularSpace`. The PR's instance is named `UniformSpace.toCompletelyRegularSpace` (diff line 82). declaration_search gave a fuzzy hit in CompletelyRegular.lean, but content_search of that file shows only `NormalSpace.completelyRegularSpace` and `Topology.IsInducing.completelyRegularSpace`.")
+
+add("module_doc in Uniformizable.lean",
+    "The only reference is a URL to a course problem set (`https://www.math.wm.edu/~vinroot/PadicGroups/519probset1.pdf`, a p-adic groups problem sheet). That is neither a stable nor a citable source for the uniformizability theorem. Mathlib files cite bibliography entries, as in `CompletelyRegular.lean`'s `[Russell C. Walker, *The Stone-Čech Compactification*][russell1974]`.",
+    "Replace the URL with a standard textbook reference added to `docs/references.bib` and cited as `[Author, *Title*][key]`: for example Willard's *General Topology* (uniformizable iff Tychonoff) or Bourbaki, *General Topology*, Ch. IX. Drop the problem-set link.",
+    "advisory",
+    "Read from the diff (References section of the new module doc) and compared with the References section of target/Mathlib/Topology/Separation/CompletelyRegular.lean (lines 50-52), which uses a bib key.")
+
+add("Mathlib/Topology/UniformSpace/Uniformizable.lean",
+    "`import Mathlib.Topology.UrysohnsLemma` is redundant. `Mathlib.Topology.Separation.CompletelyRegular`, which this file already `public import`s, itself does `public import Mathlib.Topology.UrysohnsLemma`, so `Urysohns.CU` is available without it.",
+    "Delete the line `import Mathlib.Topology.UrysohnsLemma` and keep `public import Mathlib.Topology.Separation.CompletelyRegular` and `import Mathlib.Topology.UniformSpace.OfCompactT2`.",
+    "advisory",
+    "file_read of target/Mathlib/Topology/Separation/CompletelyRegular.lean line 8 shows `public import Mathlib.Topology.UrysohnsLemma`. lean_verify_edit replaced lines 10-11 with only `import Mathlib.Topology.UniformSpace.OfCompactT2`, and the file compiled (success true).")
+
+add("UniformSpace.toCompletelyRegularSpace",
+    "The closing `exact` of `UniformSpace.toCompletelyRegularSpace` writes lambdas as `fun x => ...` and `fun y hy => ...`. Mathlib style uses `↦` in `fun` binders. The inner `fun x` also shadows the point `x` being separated.",
+    "Write `exact ⟨fun z ↦ ⟨c.lim z, c.lim_mem_Icc z⟩, c.continuous_lim.subtype_mk c.lim_mem_Icc, Subtype.ext (c.lim_of_mem_C x hxc), fun y hy ↦ Subtype.ext (c.lim_of_notMem_U y (hyo hy))⟩`.",
+    "advisory",
+    "Read from the diff (lines 106-107). lean_verify_edit with the `↦` version of lines 106-107 compiled (success true).")
+
+json.dump(F, open('findings.json', 'w'), ensure_ascii=False, indent=1)
+print(len(F))

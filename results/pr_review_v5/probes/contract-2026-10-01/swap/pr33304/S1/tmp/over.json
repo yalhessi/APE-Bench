@@ -1,0 +1,1 @@
+{"path": "Mathlib/CategoryTheory/Limits/Preserves/Over.lean", "line_start": 14, "line_end": 15, "replacement": "Note that `Over.forget X : Over X ⥤ C` already preserves all colimits when `C` has binary products,\nbecause it is then a left adjoint (`Over.forgetAdjStar`, see\n`Mathlib/CategoryTheory/Comma/Over/Pullback.lean`)."}

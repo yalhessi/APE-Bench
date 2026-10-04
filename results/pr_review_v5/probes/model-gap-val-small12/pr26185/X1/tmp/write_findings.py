@@ -1,0 +1,55 @@
+import json
+D = "/research/projects/proofedit/ya475/APE-Bench/.claude/worktrees/pipeline-overfit-review/results/pr_review_v5/probes/model-gap-val-small12/pr26185/X1"
+findings = [
+ {
+  "target": "Counterexamples/PeanoCurve.lean (module docstring)",
+  "claim": "The module docstring has two typos (\"existsence\", \"sujrective\") and is missing an article (\"-- continuous sujrective map\"). It also has no blank line after the title and no \"Main results\" list. The comparable topology counterexample `Counterexamples/TopologistsSineCurve.lean` has both.",
+  "requested_change": "Replace the module docstring with:\n/-!\n# Peano curve\n\nThis file proves the existence of a Peano curve: a continuous surjective map from the interval\n`[0, 1]` onto the square `[0, 1] × [0, 1]`.\n\n## Main results\n\n* `exists_peano_curve`: there is a continuous surjection `I → I × I`.\n-/\n(Qualify the name if the declarations are moved into a namespace, e.g. `PeanoCurve.exists_peano_curve`.)",
+  "severity": "advisory",
+  "evidence": "file_read target/Counterexamples/PeanoCurve.lean lines 9-13 show the typos. file_read target/Counterexamples/TopologistsSineCurve.lean lines 9-23 show the sibling layout: title, blank line, prose, then '## Main results'. lean_verify_edit (line mode, lines 9-38 of Counterexamples/PeanoCurve.lean) replaced them with this docstring plus the other proposed edits: success, no errors or warnings."
+ },
+ {
+  "target": "exists_long_peano_curve",
+  "claim": "The docstring of `exists_long_peano_curve` says the function \"maps the Cantor set to the square\". That only says the image lies in the square, which is true of every `f : C(ℝ, I × I)`. The statement actually proves `Set.SurjOn f cantorSet Set.univ`, i.e. the Cantor set maps *onto* the square.",
+  "requested_change": "Change the docstring to: /-- There is a continuous function `ℝ → I × I` that maps the Cantor set onto the square. -/",
+  "severity": "advisory",
+  "evidence": "Docstring at Counterexamples/PeanoCurve.lean line 17 compared with the statement at lines 18-19 (`Set.SurjOn f cantorSet Set.univ`). The corrected docstring compiled inside the combined lean_verify_edit of lines 9-38 (success)."
+ },
+ {
+  "target": "unitInterval.instTietzeExtension",
+  "claim": "`unitInterval.instTietzeExtension` is a purely real, order-theoretic fact, but it is placed in `Mathlib/Analysis/Complex/Tietze.lean`, the file about finite-dimensional RCLike vector spaces. It is proved by rewriting along a new closed-ball lemma (`unitInterval.eq_closedBall`) and invoking the RCLike closed-ball result. Every nonempty order-connected subset of ℝ already follows from `ContinuousMap.exists_restrict_eq_forall_mem_of_closed` in `Mathlib/Topology/TietzeExtension.lean`, next to `Real.instTietzeExtension`. The unit-interval-only instance is therefore both too special and in the wrong file. It also forces the counterexample to import `Mathlib.Analysis.Complex.Tietze`.",
+  "requested_change": "Delete `unitInterval.instTietzeExtension` from `Mathlib/Analysis/Complex/Tietze.lean`. Add the general instance to `Mathlib/Topology/TietzeExtension.lean` right after `Real.instTietzeExtension`:\n\n/-- A nonempty order-connected subset of `ℝ` (e.g. an interval) is a `TietzeExtension` space. -/\ninstance Set.OrdConnected.instTietzeExtension {t : Set ℝ} [t.OrdConnected] [Nonempty t] :\n    TietzeExtension t where\n  exists_restrict_eq' s hs f := by\n    obtain ⟨g, hgt, hgf⟩ := (ContinuousMap.mk (Subtype.val ∘ f) (by fun_prop))\n      |>.exists_restrict_eq_forall_mem_of_closed (fun x ↦ (f x).2) (nonempty_coe_sort.mp ‹_›) hs\n    exact ⟨⟨fun x ↦ ⟨g x, hgt x⟩, by fun_prop⟩, by ext x; exact congr($hgf x)⟩\n\n`unitInterval.eq_closedBall` then has no user, so drop it. The counterexample can import `Mathlib.Topology.TietzeExtension` instead of `Mathlib.Analysis.Complex.Tietze`. If only the unit interval is wanted, the minimum is to prove it without the closed-ball detour, as `.of_retract ⟨Subtype.val, continuous_subtype_val⟩ ⟨Set.projIcc 0 1 zero_le_one, continuous_projIcc⟩ <| by ext; simp`.",
+  "severity": "advisory",
+  "evidence": "file_read target/Mathlib/Topology/TietzeExtension.lean lines 499-520 show `ContinuousMap.exists_restrict_eq_forall_mem_of_closed` (for an `OrdConnected` nonempty `t`), `Real.instTietzeExtension`, and `NNReal.instTietzeExtension`, which is proved by `.of_retract`. lean_verify_edit on Mathlib/Topology/TietzeExtension.lean (line mode, the general instance inserted at line 514): success. lean_verify_edit on Mathlib/Analysis/Complex/Tietze.lean with the general instance replacing `unitInterval.instTietzeExtension`, plus `example : TietzeExtension unitInterval := inferInstance` and `example : TietzeExtension (unitInterval × unitInterval) := inferInstance`: success. The `.of_retract`/`projIcc` one-liner replacing the PR's instance: success."
+ },
+ {
+  "target": "ContinuousMap.coe_restrict",
+  "claim": "The PR changes the right-hand side of the global `@[simp]` lemma `ContinuousMap.coe_restrict` from `f ∘ ((↑) : s → α)` to `s.restrict f`. That changes the simp normal form of every `⇑(f.restrict s)` in Mathlib. It also makes the lemma disagree with its sibling `BoundedContinuousFunction.coe_restrict`, which still reads `⇑(f.restrict s) = f ∘ (↑)`. The only motivation in the PR is the `← ContinuousMap.coe_restrict` rewrite in the counterexample, which does not need it: both Peano proofs go through by definitional unfolding without mentioning `coe_restrict`. A library-wide simp-normal-form change should not ride along in a Counterexamples PR.",
+  "requested_change": "Revert `ContinuousMap.coe_restrict` to `⇑(f.restrict s) = f ∘ ((↑) : s → α)`, together with the matching `liftCover_restrict` proof edit. Rewrite the two Counterexamples proofs so they do not use `coe_restrict` (see the proof-golf findings). If the `Set.restrict` form is wanted as the simp normal form, propose it in a separate PR that changes `BoundedContinuousFunction.coe_restrict` in the same way.",
+  "severity": "advisory",
+  "evidence": "content_search for `theorem coe_restrict` across target/Mathlib: `Mathlib/Topology/ContinuousMap/Bounded/Basic.lean:353` is `@[simp] theorem coe_restrict (f : α →ᵇ β) (s : Set α) : ⇑(f.restrict s) = f ∘ (↑) := rfl`. content_search in target/Mathlib/Data/Set/Restrict.lean shows `Set.restrict_eq : s.restrict f = f ∘ Subtype.val` is not simp. lean_verify_edit on Mathlib/Topology/ContinuousMap/Basic.lean restoring the old `coe_restrict` statement: success, and `liftCover_restrict` still compiles. lean_verify_edit of both Peano declarations with proofs that never mention `coe_restrict`: success. zulip_search found Eric Wieser (maintainer, 2025-02-06, thread '`Set.incl`'): '`restrict` is not the simp-normal form' when the function should stay eta-expanded."
+ },
+ {
+  "target": "exists_peano_curve",
+  "claim": "The tactic proof of `exists_peano_curve` is longer than needed. It goes `use`, `rw [ContinuousMap.coe_restrict, ← Set.surjOn_iff_surjective]`, then `exact Set.SurjOn.mono ... (by rfl) hf`. It depends on the modified simp lemma, and it proves `Set.univ ⊆ Set.univ` with `(by rfl)` instead of `subset_rfl`.",
+  "requested_change": "Replace the proof with the term\n  let ⟨f, hf⟩ := exists_long_peano_curve\n  ⟨f.restrict I, Set.surjOn_iff_surjective.mp (hf.mono cantorSet_subset_unitInterval subset_rfl)⟩",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Counterexamples/PeanoCurve.lean, declaration `exists_peano_curve`, with the term-mode proof: success, no errors or warnings. It also compiles inside the combined lines 9-38 edit."
+ },
+ {
+  "target": "exists_long_peano_curve",
+  "claim": "The proof of `exists_long_peano_curve` builds a `let g'` with an explicit `Continuous.comp hg1 (Homeomorph.continuous _)` and a separate `have hg'` proved by `simp only [ContinuousMap.coe_mk, EquivLike.surjective_comp, g', hg2]`. It then closes with a `simp only [..., ← ContinuousMap.coe_restrict, ...]` that exists only because of the changed simp lemma. The continuity side goal is a `fun_prop` goal, and surjectivity is just `hg2.comp cantorSetHomeomorphNatToBool.surjective`.",
+  "requested_change": "Shorten the proof to:\n  obtain ⟨g, hg, hg'⟩ := exists_nat_bool_continuous_surjective_of_compact (I × I)\n  obtain ⟨f, hf⟩ := ContinuousMap.exists_restrict_eq isClosed_cantorSet\n    ⟨g ∘ cantorSetHomeomorphNatToBool, by fun_prop⟩\n  refine ⟨f, Set.surjOn_iff_surjective.mpr ?_⟩\n  change Function.Surjective (f.restrict cantorSet)\n  rw [hf]\n  exact hg'.comp cantorSetHomeomorphNatToBool.surjective",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Counterexamples/PeanoCurve.lean, declaration `exists_long_peano_curve`, with this proof: success, no errors or warnings. It also compiles inside the combined lines 9-38 edit. The proof does not use `ContinuousMap.coe_restrict`, so it does not depend on the simp-lemma change."
+ },
+ {
+  "target": "Counterexamples/PeanoCurve.lean",
+  "claim": "`exists_long_peano_curve` and `exists_peano_curve` are declared in the root namespace. Most Counterexamples files put their declarations in a namespace, either `Counterexample` or a topic namespace. The closest sibling, `Counterexamples/TopologistsSineCurve.lean`, uses `namespace TopologistsSineCurve`. Root-level names like `exists_peano_curve` and the auxiliary `exists_long_peano_curve` pollute the global namespace for anything importing `Counterexamples`.",
+  "requested_change": "Wrap the declarations after `open scoped unitInterval` in `namespace PeanoCurve` ... `end PeanoCurve`, or in `namespace Counterexample`, and refer to `PeanoCurve.exists_peano_curve` in the module docstring.",
+  "severity": "advisory",
+  "evidence": "content_search for `^namespace ` over target/Counterexamples: namespaces appear in MapFloor, SorgenfreyLine, MonicNonRegular, TopologistsSineCurve, Girard, PolynomialIsDomain, DirectSumIsInternal, Pseudoelement, IrrationalPowerOfIrrational, Cyclotomic105, HomogeneousPrimeNotPrime, SeparableNotSecondCountable, EulerSumOfPowers, ZeroDivisorsInAddMonoidAlgebras, LinearOrderWithPosMulPosEqZero, Phillips, CanonicallyOrderedCommSemiringTwoMul, DimensionPolynomial, CliffordAlgebraNotInjective, AharoniKorman, SeminormLatticeNotDistrib, CharPZeroNeCharZero and GameMultiplication. Motzkin and PeanoCurve have root-level lemmas. lean_verify_edit (line mode, lines 9-38) with `namespace PeanoCurve ... end PeanoCurve`: success."
+ }
+]
+json.dump(findings, open(f"{D}/findings.json", "w"), ensure_ascii=False, indent=1)
+print(len(findings))

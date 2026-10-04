@@ -1,0 +1,5 @@
+{"X1": {"kind": "claude"}, "X2": {"kind": "claude"},
+ "G1": {"kind": "solo", "run": "probe_dev_gpt52_G_rep1"},
+ "G2": {"kind": "solo", "run": "probe_dev_gpt52_G_rep2"},
+ "L1": {"kind": "lead", "run": "pr5_A_lead_heldout12_v2_rep1"},
+ "L2": {"kind": "lead", "run": "pr5_A_lead_heldout12_v2_rep2"}}

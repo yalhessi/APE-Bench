@@ -1,0 +1,69 @@
+[
+ {
+  "target": "div_left_inj (Mathlib/Algebra/Group/Basic.lean)",
+  "claim": "The generalisation did not require a new proof of div_left_inj, and the one the PR writes is not the library's. It replaces the two-line pre-PR proof with a six-line constructor/intro/rintro proof. That proof re-derives div_left_injective inline (the same `have h' : _ * _⁻¹ = _ * _⁻¹ := by simpa [div_eq_mul_inv] using h; simpa using mul_right_cancel ...` fragment appears in both lemmas), uses an unrestricted `simpa [div_eq_mul_inv]`, and pins three named arguments (a := b) (b := a⁻¹) (c := c) to mul_right_cancel's binder names. Any of these would break or drift when Defs.lean or the simp set is refactored.",
+  "requested_change": "Derive it from the injectivity lemma directly above, as the library does for mul_left_inj and as the PR itself does for div_right_inj:\n@[to_additive (attr := simp)]\ntheorem div_left_inj : b / a = c / a ↔ b = c := div_left_injective.eq_iff\n(Or keep the pre-PR `rw [div_eq_mul_inv, div_eq_mul_inv]; exact mul_left_inj _`, which also compiles.)",
+  "severity": "blocking",
+  "evidence": "c7: `div_left_injective.eq_iff` compiles in place with @[to_additive (attr := simp)]. c6: the pre-PR proof compiles unchanged at [DivInvMonoid G] [IsRightCancelMul G], because mul_left_inj sits in Defs.lean's IsRightCancelMul section. The library pattern is Defs.lean:170 `mul_left_inj (a : G) ... := (mul_left_injective a).eq_iff` and :145 `mul_right_inj := (mul_right_injective a).eq_iff`. c9: even within the PR's structure the named arguments and the closing simpa are unnecessary. c26: the family compiles with this proof.",
+  "construction": [
+   "c6",
+   "c7",
+   "c9",
+   "c26"
+  ]
+ },
+ {
+  "target": "div_left_injective, div_right_injective (Mathlib/Algebra/Group/Basic.lean)",
+  "claim": "The PR deletes both FIXME comments ('this could be by `simpa`, but it fails. This is probably a bug in `simpa`' / 'FIXME see above') without applying the fix. The one-line simpa proofs the FIXMEs describe now compile for both lemmas. Instead, div_left_injective gets a new three-line intro/have/simpa proof with named arguments pinned to mul_right_cancel's binders, and div_right_injective keeps the two-step proof the FIXME was about. The pre-PR proofs also compile unchanged at the new generality.",
+  "requested_change": "Close the FIXMEs with the proofs they asked for:\ntheorem div_left_injective : Function.Injective fun a : G ↦ a / b := by\n  simpa only [div_eq_mul_inv] using mul_left_injective b⁻¹\ntheorem div_right_injective : Function.Injective fun x : G ↦ b / x := by\n  simpa only [div_eq_mul_inv] using (mul_right_injective b).comp inv_injective\n(or restore the pre-PR proofs together with their FIXME comments).",
+  "severity": "advisory",
+  "evidence": "c2 and c11: both simpa one-liners compile in place. c1 and c10: both pre-PR proofs compile at the PR's hypotheses (mul_left_injective is in Defs.lean's IsRightCancelMul section). c5: the PR's own div_left_injective proof needs none of its named arguments (`exact mul_right_cancel h'`). c19: the tool rejects a wrong proof in this section, so these compiles are real. c26: all six family proofs compile together this way.",
+  "construction": [
+   "c1",
+   "c2",
+   "c5",
+   "c10",
+   "c11",
+   "c19",
+   "c26"
+  ]
+ },
+ {
+  "target": "div_right_inj (Mathlib/Algebra/Group/Basic.lean)",
+  "claim": "`(div_right_injective (G := G) (b := a)).eq_iff` carries two named arguments that elaboration does not need. The pre-PR `div_right_injective.eq_iff` compiles at the new generality. `(b := a)` ties the proof to the section-variable name that div_right_injective's implicit argument happens to have.",
+  "requested_change": "theorem div_right_inj : a / b = a / c ↔ b = c := div_right_injective.eq_iff (the pre-PR proof).",
+  "severity": "advisory",
+  "evidence": "c14: the pre-PR proof compiles in place. c26: it also compiles alongside the other rewritten family members.",
+  "construction": [
+   "c14",
+   "c26"
+  ]
+ },
+ {
+  "target": "Finset.card_le_card_div_left, Finset.card_le_card_div_right (Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean)",
+  "claim": "The PR rewrites both proofs from one-line terms into obtain/exact tactic blocks with `(div_right_injective (b := a))` / `(div_left_injective (b := b))`, though the statements are unchanged and the pre-PR terms compile under the new section hypotheses. The named arguments tie this file to the name of an implicit section variable in Algebra/Group/Basic.lean. The rewrite also departs from the siblings card_le_card_mul_left/right in the same file, which keep the `have ⟨_, ha⟩ := hs; ... (mul_right_injective _)` term form.",
+  "requested_change": "Restore the pre-PR proofs:\n@[to_additive] lemma card_le_card_div_left (hs : s.Nonempty) : #t ≤ #(s / t) :=\n  have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective\n@[to_additive] lemma card_le_card_div_right (ht : t.Nonempty) : #s ≤ #(s / t) :=\n  have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective",
+  "severity": "advisory",
+  "evidence": "c20, c21: each pre-PR proof compiles in place. c28: both compile together in the PR's LeftCancel/RightCancel sections. Siblings: Finset/Basic.lean:1169-1170 and 1202-1203. c24: routing through card_le_card_mul_left also compiles but is no better.",
+  "construction": [
+   "c20",
+   "c21",
+   "c28",
+   "c24"
+  ]
+ },
+ {
+  "target": "Set.finite_div, Set.infinite_div (Mathlib/Algebra/Group/Pointwise/Set/Finite.lean)",
+  "claim": "The PR changes both proofs only to add `(b := b)` / `(b := a)` named arguments on div_left_injective/div_right_injective. The pre-PR proofs compile unchanged under the PR's section hypotheses. The named arguments couple this file to the implicit-variable name `b` in Algebra/Group/Basic.lean. The siblings finite_mul/infinite_mul in the same file use the anonymous form.",
+  "requested_change": "Restore the pre-PR proofs, leaving the proof lines of this file untouched:\n  finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn\n  infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn",
+  "severity": "advisory",
+  "evidence": "c22, c23: each pre-PR proof compiles in place (c22 replicates pass 3 c24). c27: both compile together in the PR's DivisionMonoid section. Siblings: Set/Finite.lean:103-109 (`(mul_left_injective _).injOn`). c29 (extracting the shared pair) and c25 (via finite_mul) compile but are no improvement.",
+  "construction": [
+   "c22",
+   "c23",
+   "c27",
+   "c25",
+   "c29"
+  ]
+ }
+]

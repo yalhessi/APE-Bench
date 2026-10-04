@@ -1,0 +1,68 @@
+import json
+T = lambda f: open('tmp/'+f).read().rstrip('\n')
+findings = [
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "`Dense.continuous_upperBounds` (and its dual `Dense.continuous_lowerBounds`) is named after a hypothesis (`continuous_`), not after its conclusion `upperBounds (f '' S) = upperBounds (range f)`. Every other lemma in Mathlib whose conclusion is about `upperBounds`/`lowerBounds` leads with `upperBounds_`/`lowerBounds_`.",
+  "requested_change": "Rename `Dense.continuous_upperBounds` to `Dense.upperBounds_image` and `Dense.continuous_lowerBounds` to `Dense.lowerBounds_image` (named after the LHS, like `upperBounds_closure` and `OrderIso.upperBounds_image`), and update the uses in the sup/inf lemmas.",
+  "severity": "blocking",
+  "evidence": "naming_norm Dense.continuous_upperBounds: verdict `established`, subject `upperBounds`, 27/27 base declarations use prefix `upperBounds_`, 0 use `continuous_`; candidate `Dense.upperBounds_image`. naming_norm Dense.continuous_lowerBounds: `established`, 25/25 use `lowerBounds_`; candidate `Dense.lowerBounds_image`. content_search shows only `OrderIso.upperBounds_image`/`OrderIso.lowerBounds_image` (Order/Bounds/OrderIso.lean), so the `Dense.` names are free. lean_verify_edit with every PR declaration renamed (Dense.upperBounds_image, Dense.lowerBounds_image, ...) and references updated: success, no errors."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "`Dense.continuous_sup`, `Dense.continuous_inf`, `Dense.continuous_sup'` and `Dense.continuous_inf'` use `sup`/`inf`, which in Mathlib names mean the binary `⊔`/`⊓`. The statements are about conditionally complete indexed suprema/infima `⨆ i, f i = ⨆ s : S, f s`, which the naming convention spells `ciSup`/`ciInf` (cf. `isLUB_ciSup`, `isLUB_ciSup_set`, `ciSup_of_not_bddAbove`). The leading `continuous_` also names a hypothesis, not the conclusion.",
+  "requested_change": "Rename the four lemmas to `ciSup`/`ciInf`-based names describing the conclusion, e.g. `Dense.ciSup_eq_ciSup_subtype`, `Dense.ciInf_eq_ciInf_subtype`, `Dense.ciSup_eq_ciSup_subtype'`, `Dense.ciInf_eq_ciInf_subtype'`. Update the cross-references in the `'` docstrings.",
+  "severity": "blocking",
+  "evidence": "Diff: the conclusion is `⨆ i, f i = ⨆ s : S, f s` / `⨅ i, f i = ⨅ s : S, f s` over a `ConditionallyCompleteLattice`/`ConditionallyCompleteLinearOrder`. content_search in Order/ConditionallyCompleteLattice/Indexed.lean: the neighbouring API is `isLUB_ciSup`, `isLUB_ciSup_set`, `ciSup_set_le_iff`, `IsLUB.ciSup_eq`, `ciSup_subtype`, all `ciSup`. naming_norm returned `subject_unresolved` for these (unmeasured), so this rests on the documented `sup`/`iSup`/`ciSup` convention and on those neighbours. lean_verify_edit with the renamed set (Dense.ciSup_eq_ciSup_subtype etc.): success."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "The tactic proof of `Dense.continuous_upperBounds` re-derives by hand (via `mem_closure_iff_frequently` and `isClosed_Iic`) the existing simp lemma `upperBounds_closure : upperBounds (closure s) = upperBounds s`. It also routes through `upperBounds_mono _ le_rfl` where `upperBounds_mono_set` is the lemma for this. `isLUB_iff_of_subset_of_subset_closure`, a few lines above in the same file, already packages exactly this argument.",
+  "requested_change": "Replace the proof by the term-mode argument used in `isLUB_iff_of_subset_of_subset_closure`:\n```lean\n" + T('a1.lean') + "\n```",
+  "severity": "advisory",
+  "evidence": "file_read IsLUB.lean lines 148-152: `isLUB_iff_of_subset_of_subset_closure` is proved as `isLUB_congr <| (upperBounds_closure (s := s) ▸ upperBounds_mono_set hts).antisymm <| upperBounds_mono_set hst`. content_search: `upperBounds_closure` is `@[simp]` in Topology/Order/OrderClosed.lean:135 under `ClosedIicTopology`. In the prior Zulip thread, maintainer Jireh Loreaux suggested building this on `isLUB_iff_of_subset_of_subset_closure` and `Continuous.range_subset_closure_image_dense` (zulip_search). lean_verify_edit replacing `Dense.continuous_upperBounds` with the proposed declaration: success, no errors, no warnings. All lines are under 100 characters."
+ },
+ {
+  "target": "Dense.continuous_lowerBounds",
+  "claim": "`Dense.continuous_lowerBounds` copies the proof of `Dense.continuous_upperBounds` line for line with `Ici`/`lowerBounds` swapped in. Everywhere else this file gets the GLB/lower version from the LUB/upper version through `OrderDual` (`IsGLB.frequently_mem`, `isGLB_of_mem_closure`, `isGLB_iff_of_subset_of_subset_closure`, `Dense.isGLB_inter_iff`).",
+  "requested_change": "Prove it by duality:\n```lean\n" + T('a3.lean') + "\n```",
+  "severity": "advisory",
+  "evidence": "file_read IsLUB.lean: lines 42, 60, 79, 83, 157, 167 all prove the GLB version as `... (α := αᵒᵈ) ...`. lean_verify_edit replacing `Dense.continuous_lowerBounds` with `hS.continuous_upperBounds (α := αᵒᵈ) hf`: success, no errors."
+ },
+ {
+  "target": "Dense.continuous_sup",
+  "claim": "The proof of `Dense.continuous_sup` makes a detour: it rewrites both sides to `sSup (range _)` with `rw [← sSup_range, ← sSup_range]` and restates the bound via `isLUB_csSup (range_nonempty f) h`, although `isLUB_ciSup` gives that directly. It also closes the side goal `f '' S ⊆ range f` with `by grind` where the lemma `image_subset_range f S` exists (and is already used by name in `Dense.continuous_upperBounds`).",
+  "requested_change": "Replace the proof by:\n```lean\n" + T('a2.lean') + "\n```\nThat is: drop the `sSup_range` rewrites, use `isLUB_ciSup h`, replace `by grind` with `image_subset_range f S`, and write `cases isEmpty_or_nonempty γ` rather than `obtain (_ | _) :=`.",
+  "severity": "advisory",
+  "evidence": "content_search Order/ConditionallyCompleteLattice/Indexed.lean:90: `theorem isLUB_ciSup [Nonempty ι] {f : ι → α} (H : BddAbove (range f)) : IsLUB (range f) (⨆ i, f i) := isLUB_csSup (range_nonempty f) H`, the exact glue. The first attempt with bare `simp` in the empty case failed ('simp made no progress'). With `simp [iSup_of_empty']` lean_verify_edit succeeds (no errors), and it also succeeds with `rw [iSup_of_empty', iSup_of_empty']`."
+ },
+ {
+  "target": "Dense.continuous_sup'",
+  "claim": "In `Dense.continuous_sup'` the `BddAbove (range f)` branch repeats the whole body of `Dense.continuous_sup` word for word instead of calling it. The unbounded branch proves `h2` with a long `range_comp'`/`simp_all only`/`image_closure_subset_closure_image` detour. That fact follows in one line from `Dense.continuous_upperBounds`, since `BddAbove s` is `(upperBounds s).Nonempty`, and the final `simp [csSup_of_not_bddAbove ...]` is `ciSup_of_not_bddAbove`.",
+  "requested_change": "Reuse the bounded lemma and the upper-bounds lemma:\n```lean\n" + T('a4.lean') + "\n```",
+  "severity": "advisory",
+  "evidence": "Diff: lines 228-231 of the PR file are the body of `Dense.continuous_sup` (lines 199-204) inside `by_cases`. declaration_search: `ciSup_of_not_bddAbove` exists in Order/ConditionallyCompleteLattice/Basic.lean; `Set.image_eq_range` exists in Data/Set/Image.lean. lean_verify_edit replacing `Dense.continuous_sup'` with the proposed declaration: success, no errors. It still compiles when spliced together with all the other proposed proofs (line-mode splice of lines 171-261: success)."
+ },
+ {
+  "target": "Dense.continuous_inf",
+  "claim": "`Dense.continuous_inf` duplicates the proof of `Dense.continuous_sup` with `GLB`/`csInf`/`lowerBounds` substituted, instead of deriving it through `OrderDual` as the rest of this file does.",
+  "requested_change": "Prove it by duality:\n```lean\n" + T('a5.lean') + "\n```",
+  "severity": "advisory",
+  "evidence": "file_read IsLUB.lean: the file's convention for duals is `(α := αᵒᵈ)` (lines 42, 60, 79, 83, 157, 167). lean_verify_edit replacing `Dense.continuous_inf` with `hS.continuous_sup (α := αᵒᵈ) hf h`: success, no errors."
+ },
+ {
+  "target": "Dense.continuous_inf'",
+  "claim": "`Dense.continuous_inf'` is a 16-line copy of `Dense.continuous_sup'` with `sup`/`inf` swapped, instead of the one-line `OrderDual` derivation used throughout this file.",
+  "requested_change": "Prove it by duality:\n```lean\n" + T('a6.lean') + "\n```",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing `Dense.continuous_inf'` with `hS.continuous_sup' (α := αᵒᵈ) hf`: success, no errors. It works both with the PR's `Dense.continuous_sup'` and with the golfed one (combined splice: success)."
+ },
+ {
+  "target": "Dense.continuous_upperBounds",
+  "claim": "The docstrings of `Dense.continuous_upperBounds` and `Dense.continuous_lowerBounds` are ungrammatical ('The upper bounds ... is equal') and say 'the range of the universe', which is meaningless: the RHS is the upper bounds of the range of `f` (equivalently, of the image of the universe).",
+  "requested_change": "Reword, e.g. `/-- If \\`f\\` is continuous and \\`S\\` is dense, then the upper bounds of \\`f '' S\\` are the upper bounds of \\`range f\\`. -/`, and the same with 'lower' for `Dense.continuous_lowerBounds`. While there, change 'the supremum on the universe' in the `Dense.continuous_sup`/`inf` docstrings to 'the supremum of `f` over the whole space' (and likewise for the infimum).",
+  "severity": "advisory",
+  "evidence": "Diff lines 169-170 and 181-182: '/-- The upper bounds of the image of a continuous function on a dense set is equal to the upper bounds of the range of the universe. -/' (and the lower-bounds copy). Statement: `upperBounds (f '' S) = upperBounds (range f)`."
+ },
+]
+json.dump(findings, open('findings.json','w'), indent=1, ensure_ascii=False)

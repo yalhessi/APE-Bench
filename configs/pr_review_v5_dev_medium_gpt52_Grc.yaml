@@ -1,0 +1,17 @@
+# Phase 0 of docs/plans/2026-09-30-post-carryover-replan.md: gpt_5.2 at high effort through the
+# Responses API with reasoning carried across turns, on the dev set. Only endpoint and persistence
+# differ from pr_review_v5_dev_medium_gpt52_Gr.yaml (Gr1): same brief, tools and 80 turns. Caps are the post-cutoff
+# Grc config's: carried reasoning adds processed tokens that Gr1's 7.2M cap would stop on, and the
+# dollar cap is in step at the tree's 1.2M tokens a dollar.
+extends: pr_review_v5_dev_medium_gpt52_Gr.yaml
+
+llm_config:
+  openai_api: responses
+  openai_responses_reasoning_carryover: true
+
+dataset:
+  solo_cost_cap: 13.40
+  solo_token_cap: 16080000
+  # 15 PRs x $13.40 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 201.50
+  run_total_token_cap: 241800000

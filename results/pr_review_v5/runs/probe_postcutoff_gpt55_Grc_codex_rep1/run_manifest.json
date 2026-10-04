@@ -1,0 +1,41 @@
+{
+  "agent_added": 0,
+  "candidates_total": 7,
+  "completion_status": "complete",
+  "context_calls_total": 46,
+  "cost_breakdown": {
+    "extra": 0.0,
+    "lead": 19.116235,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0
+  },
+  "coverage_gaps": [],
+  "delegated": 0,
+  "failed": 0,
+  "issues_total": 7,
+  "mandatory": 0,
+  "paused": 0,
+  "proposals_total": 136,
+  "pruned": 136,
+  "routing_mode": "solo",
+  "run_id": "v5run:probe_postcutoff_gpt55_Grc_codex_rep1",
+  "run_name": "probe_postcutoff_gpt55_Grc_codex_rep1",
+  "run_plan_sha256": "1be3ff1dc20e2c658b02cd7ee957f8216235da4293d6ea37142ab02180c40489",
+  "schema_version": "v5-run-manifest1",
+  "source_sha256": "2e1d916d4a1d52fbcbe9eb63dcf9db09aaacd42c7114ebfb846ba847f82b6a4c",
+  "succeeded": 0,
+  "total_cost": 19.116235,
+  "usage": {
+    "billed": 5.363659,
+    "budget_charged": 0.0,
+    "nested_billed": 0.0,
+    "nested_nominal": 0.0,
+    "nested_tokens": 0.0,
+    "nominal": 19.116235,
+    "self_billed": 5.363659,
+    "self_nominal": 19.116235,
+    "self_tokens": 3591707.0,
+    "tokens": 3591707.0
+  },
+  "wall_seconds": 291.653888
+}

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Algebra/Group/Irreducible/Indecomposable.lean", "line_start": 98, "line_end": 98, "replacement": "  let t : Set \u03b9 := IsMulIndecomposable.baseOf v f"}

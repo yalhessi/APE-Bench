@@ -22,8 +22,24 @@ from ape.utils.config_loader import load_yaml
 PAIRS = [("pr_review_v5_solo_ape_smoke4.yaml", "pr_review_v5_solo_claude_smoke4.yaml"),
          ("pr_review_v5_solo_ape_heldout12.yaml", "pr_review_v5_solo_claude_heldout12.yaml")]
 
+#: Pairs on sets scored by blind matchers rather than the judge, so outside the judge-scope check.
+PROBE_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_G_claude.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_claude.yaml")]
 
-@pytest.mark.parametrize("ape_name,claude_name", PAIRS)
+#: The same conditions under Codex, held to the same identity.
+CODEX_PAIRS = [("pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_G_codex.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt52_Grc_codex.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt54_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt54_Grc_codex.yaml"),
+               ("pr_review_v5_probe_2026_07_08_v1_gpt55_Grc.yaml",
+                "pr_review_v5_probe_2026_07_08_v1_gpt55_Grc_codex.yaml")]
+
+
+@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS + CODEX_PAIRS)
 def test_the_two_solo_conditions_differ_only_in_their_scaffold(ape_name, claude_name):
     ape = load_yaml(Path("configs") / ape_name)
     claude = load_yaml(Path("configs") / claude_name)
@@ -34,20 +50,23 @@ def test_the_two_solo_conditions_differ_only_in_their_scaffold(ape_name, claude_
     assert ape.get("llm_config") == claude.get("llm_config"), (
         "same model, or the contrast is a model comparison")
     assert ape["scaffold_type"] == "ape_agent"
-    assert claude["scaffold_type"] == "claude_code"
+    assert claude["scaffold_type"] == ("codex" if (ape_name, claude_name) in CODEX_PAIRS else "claude_code")
+    assert ape.get("execution") == claude.get("execution"), "the turn limit is part of the condition"
 
 
-@pytest.mark.parametrize("ape_name,claude_name", PAIRS)
+@pytest.mark.parametrize("ape_name,claude_name", PAIRS + PROBE_PAIRS + CODEX_PAIRS)
 def test_both_conditions_carry_the_same_pr_set_and_cost_cap(ape_name, claude_name):
     ape = load_yaml(Path("configs") / ape_name)["dataset"]
     claude = load_yaml(Path("configs") / claude_name)["dataset"]
 
     assert ape["pr_numbers"] == claude["pr_numbers"]
-    assert ape["solo_cost_cap"] == claude["solo_cost_cap"] == 1.50
+    assert ape["solo_cost_cap"] == claude["solo_cost_cap"]
+    if (ape_name, claude_name) in PAIRS:
+        assert ape["solo_cost_cap"] == 1.50
     assert ape["routing_mode"] == claude["routing_mode"] == "solo"
 
 
-@pytest.mark.parametrize("name", [p[1] for p in PAIRS])
+@pytest.mark.parametrize("name", [p[1] for p in PAIRS + PROBE_PAIRS])
 def test_the_external_condition_is_contained_before_it_is_ever_run(name):
     """Every channel here was verified reachable from a review workspace under the scaffold's
     defaults, which refuse exactly one tool while auto-approving the rest. A config that ships
@@ -62,6 +81,10 @@ def test_the_external_condition_is_contained_before_it_is_ever_run(name):
     assert config["strict_mcp_config"] is True
     for tool in ("Bash", "WebFetch", "WebSearch", "Task"):
         assert tool in config["disallowed_tools"], tool
+    # The grant says which tools exist, not where they reach: Read takes any absolute path.
+    assert config["tools"] == ["Read", "Grep", "Glob", "TodoWrite"]
+    assert config["contain_to_workspace"] is True, (
+        "without it nothing bounds Read to the workspace and no attempt carries an audit")
 
 
 @pytest.mark.parametrize("name", [p[0] for p in PAIRS] + [p[1] for p in PAIRS])
@@ -77,3 +100,20 @@ def test_the_solo_conditions_scope_the_prs_their_judge_config_scores(name):
 
     scored = set(judge["pr_numbers"]) | set(judge.get("control_pr_numbers") or [])
     assert scored == set(config["pr_numbers"]), sorted(scored ^ set(config["pr_numbers"]))
+
+
+@pytest.mark.parametrize("name", [p[1] for p in CODEX_PAIRS])
+def test_the_codex_condition_has_no_shell_and_only_apes_tools(name):
+    """With a shell, Codex reads anything on disk: this repository's gold, the future mathlib clone.
+    A read-only sandbox stops writes, not reads, so the shell itself is what goes."""
+
+    config = load_yaml(Path("configs") / name)
+    assert {"shell_tool", "unified_exec"} <= set(config["disabled_features"])
+    assert {"browser_use", "computer_use", "apps", "plugins", "multi_agent"} <= set(config["disabled_features"])
+    assert config["sandbox_mode"] == "read-only"
+    assert config["web_search"] is False
+    assert config["relayed_builtin_tools"] == ["update_plan"]
+    assert config["list_mcp_tools_upfront"] is True
+    # Without APE's file tools a shell-less Codex cannot read a file: the first smoke run
+    # (pr5_probe0708_gpt52_G_codex_smoke1) was offered no file_read or content_search.
+    assert config["use_native_tools"] is True

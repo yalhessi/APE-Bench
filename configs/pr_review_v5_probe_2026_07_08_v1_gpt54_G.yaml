@@ -1,0 +1,7 @@
+# Test (e) of docs/todo/reviewer-model-gap.md: condition G on the post-cutoff set with gpt-5.4 and
+# reasoning explicitly off (gpt-5.5 reasons when no effort is sent; see MODEL_MAPPINGS).
+extends: pr_review_v5_probe_2026_07_08_v1_gpt52_G.yaml
+
+llm_config:
+  model_name: gpt_5.4
+  reasoning_effort: none

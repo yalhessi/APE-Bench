@@ -1,0 +1,23 @@
+[
+ {
+  "target": "EuclideanGeometry.Sphere.angle_center_eq_zero_iff_eq",
+  "claim": "In `angle_center_eq_zero_iff_eq`, the step `(by simpa [angle] using h)` is unnecessary: `∠ p₁ s.center p₂` unfolds definitionally to `InnerProductGeometry.angle (p₁ -ᵥ s.center) (p₂ -ᵥ s.center)`, so `h` can be passed to `eq_of_angle_eq_zero_of_norm_eq` directly, and the `constructor`/`intro` scaffolding plus the `rw` for the norm equality can be collapsed into a short term.",
+  "requested_change": "Pass `h` directly instead of `(by simpa [angle] using h)`, and golf the proof to a term, e.g.\n```lean\n    ∠ p₁ s.center p₂ = 0 ↔ p₁ = p₂ :=\n  ⟨fun h ↦ vsub_left_cancel <| eq_of_angle_eq_zero_of_norm_eq h <|\n      (norm_vsub_center_eq_radius hp₁).trans (norm_vsub_center_eq_radius hp₂).symm,\n    by rintro rfl; exact angle_self_of_ne fun h ↦ hr (center_mem_iff.mp (h ▸ hp₁))⟩\n```",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Geometry/Euclidean/Angle/Sphere.lean replacing the declaration with the term proof above: success, no errors or warnings. A minimal edit that keeps the tactic structure and only replaces `(by simpa [angle] using h)` with `h` also compiled (success, no errors). `eq_of_angle_eq_zero_of_norm_eq {x y : V} (hxy : angle x y = 0) (h : ‖x‖ = ‖y‖) : x = y` (Angle/Unoriented/Basic.lean:333) and `norm_vsub_center_eq_radius (hp : p ∈ s) : ‖p -ᵥ s.center‖ = s.radius` (Sphere/Basic.lean:216) confirmed by file_read."
+ },
+ {
+  "target": "EuclideanGeometry.Sphere.angle_center_eq_pi_iff_isDiameter",
+  "claim": "The reverse direction of `angle_center_eq_pi_iff_isDiameter` holds with only `s.IsDiameter p₁ p₂` and `hr`, but the PR only offers it through the iff, which also demands `hp₁ : p₁ ∈ s` and `hp₂ : p₂ ∈ s` (both already implied by `IsDiameter`: `left_mem` / `right_mem`). Users holding an `IsDiameter` hypothesis must re-supply membership proofs, and there is no dot-notation lemma alongside the existing `IsDiameter.wbtw` / `IsDiameter.sbtw` API.",
+  "requested_change": "Add a one-directional lemma with minimal hypotheses and use it in the iff:\n```lean\n/-- The central angle subtended by a diameter of a sphere of nonzero radius is `π`. -/\ntheorem IsDiameter.angle_center_eq_pi {s : Sphere P} {p₁ p₂ : P} (h : s.IsDiameter p₁ p₂)\n    (hr : s.radius ≠ 0) : ∠ p₁ s.center p₂ = π :=\n  (h.sbtw hr).angle₁₂₃_eq_pi\n```\nand prove `angle_center_eq_pi_iff_isDiameter` as `⟨fun h ↦ isDiameter_iff_mem_and_mem_and_wbtw.2 ⟨hp₁, hp₂, (angle_eq_pi_iff_sbtw.1 h).wbtw⟩, fun h ↦ h.angle_center_eq_pi hr⟩`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit (line mode, lines 129-135 replaced by the new `IsDiameter.angle_center_eq_pi` plus the rewritten iff): success, no errors or warnings. `IsDiameter` is a structure with `left_mem` and `midpoint_eq_center`, with `IsDiameter.right_mem`, `IsDiameter.wbtw`, `IsDiameter.sbtw (hr : s.radius ≠ 0)` in Sphere/Basic.lean:259-335 (file_read). content_search for `∠ … s.center … = π` over Mathlib/Geometry/Euclidean found no existing lemma of this form, so the dot-notation lemma is new. precedent_search surfaced a prior Sphere review (PR #25934, eric-wieser) asking for the one-directional form of an iff to be exposed as its own lemma/alias."
+ },
+ {
+  "target": "Mathlib/Geometry/Euclidean/Angle/Sphere.lean",
+  "claim": "The two new lemmas write `fun h =>` (three occurrences: two in `angle_center_eq_pi_iff_isDiameter`, one in `angle_center_eq_zero_iff_eq`), while Mathlib style prefers `↦` and the surrounding lemmas in this file (`isDiameter_of_angle_eq_pi_div_two`, `IsTangentAt_iff_angle_eq_pi_div_two`) already use `fun h ↦`.",
+  "requested_change": "Replace `fun h =>` with `fun h ↦` in `angle_center_eq_pi_iff_isDiameter` and `angle_center_eq_zero_iff_eq`.",
+  "severity": "advisory",
+  "evidence": "diff.patch lines for both lemmas use `=>`; file_read of Angle/Sphere.lean shows `fun h ↦` at lines 118 and 181-182 of the same file. zulip_search returned the style-guide text quoted by Junyan Xu (2025-08-18): 'In mathlib the pretty printer displays `↦`, and we slightly prefer this in the source as well.' Both edited proofs I verified with `↦` compiled."
+ }
+]

@@ -1,0 +1,320 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  this\nhas type\n  Orthonormal ℂ (UnitAddTorus.mFourierLp 2)\nbut is expected to have type\n  False",
+   "code_line": "  exact this",
+   "pos": {
+    "column": 2,
+    "line": 478
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  this\nhas type\n  ∀ (f : ↥(MeasureTheory.Lp ℂ 2 MeasureTheory.volume)),\n    HasSum (fun i => ‖UnitAddTorus.mFourierCoeff (↑↑f) i‖ ^ 2) (∫ (t : UnitAddTorus (Fin 3)), ‖↑↑f t‖ ^ 2)\nbut is expected to have type\n  False",
+   "code_line": "  exact this",
+   "pos": {
+    "column": 2,
+    "line": 482
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  this\nhas type\n  Summable (UnitAddTorus.mFourierCoeff ⇑?m.8) →\n    HasSum (fun i => UnitAddTorus.mFourierCoeff (⇑?m.8) i • UnitAddTorus.mFourier i) ?m.8\nbut is expected to have type\n  False",
+   "code_line": "  exact this",
+   "pos": {
+    "column": 2,
+    "line": 486
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Tactic `rfl` failed: The left-hand side\n  fourierCoeff3D f k\nis not definitionally equal to the right-hand side\n  UnitAddTorus.mFourierCoeff f k\n\nf : T3 → ℂ\nk : Fin 3 → ℤ\n⊢ fourierCoeff3D f k = UnitAddTorus.mFourierCoeff f k",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 489
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown constant `ContinuousMap.inner_toLp`",
+   "code_line": "  rw [fourierLp, fourierLp, ContinuousMap.inner_toLp] at h",
+   "pos": {
+    "column": 28,
+    "line": 494
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unsolved goals\nn m : ℤ\nh :\n  ⟪(ContinuousMap.toLp 2 AddCircle.haarAddCircle ℂ) (fourier m),\n      (ContinuousMap.toLp 2 AddCircle.haarAddCircle ℂ) (fourier n)⟫_ℂ =\n    if m = n then 1 else 0\n⊢ ∫ (x : UnitAddCircle), (fourier n) x * star ((fourier m) x) = if n = m then 1 else 0",
+   "code_line": "    ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by",
+   "pos": {
+    "column": 86,
+    "line": 492
+   }
+  },
+  {
+   "severity": "error",
+   "data": "could not synthesize default value for parameter 'hc' using tactics",
+   "code_line": "      MeasureTheory.volume 0 T := intervalIntegrable_const",
+   "pos": {
+    "column": 34,
+    "line": 503
+   }
+  },
+  {
+   "severity": "error",
+   "data": "tactic 'aesop' failed, failed to prove the goal. Some goals were not explored because the maximum rule application depth (30) was reached. Set option 'maxRuleApplicationDepth' to increase the limit.\nInitial goal:\n  N : ℕ\n  u₀ : T3 → Fin 3 → ℝ\n  T : ℝ\n  ⊢ ‖?m.18‖ₑ ≠ ⊤\nRemaining goals after safe rules:\n  N : ℕ\n  u₀ : T3 → Fin 3 → ℝ\n  T : ℝ\n  ⊢ ‖?m.18‖ₑ ≠ ⊤",
+   "code_line": "      MeasureTheory.volume 0 T := intervalIntegrable_const",
+   "pos": {
+    "column": 34,
+    "line": 503
+   }
+  }
+ ],
+ "warnings": [
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 18,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 39,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 55,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `n`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 67,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `C`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def fourierDecay (u : T3 → Fin 3 → ℝ) (k : Fin 3 → ℤ) (j : Fin 3) (n : ℕ) (C : ℝ) : Prop :=",
+   "pos": {
+    "column": 75,
+    "line": 92
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ν`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 24,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `u`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 32,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 57,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `k`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 65,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `j`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def spectralNSResidual (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (t : ℝ) (k : Fin 3 → ℤ) (j : Fin 3) :",
+   "pos": {
+    "column": 81,
+    "line": 137
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `p`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "def SolvesNavierStokes (ν : ℝ) (u : T3 → ℝ → Fin 3 → ℝ) (p : T3 → ℝ → ℝ) : Prop :=",
+   "pos": {
+    "column": 57,
+    "line": 142
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `N`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "noncomputable def GalerkinProjection (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) : T3 → ℝ → Fin 3 → ℝ :=",
+   "pos": {
+    "column": 38,
+    "line": 150
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `t`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "  fun x t j => u₀ x j",
+   "pos": {
+    "column": 8,
+    "line": 151
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `ht`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma galerkin_energy_bound (N : ℕ) (u₀ : T3 → Fin 3 → ℝ) (t : ℝ) (ht : 0 ≤ t) :",
+   "pos": {
+    "column": 67,
+    "line": 306
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `h_divfree`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (h_divfree : DivergenceFree u₀) (T : ℝ) (hT : 0 < T) :",
+   "pos": {
+    "column": 5,
+    "line": 316
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `hT`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "    (T : ℝ) (hT : 0 ≤ T) (τ_T : ℝ) (hτ : L.φ τ_T = T) :",
+   "pos": {
+    "column": 13,
+    "line": 355
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `Φ`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "lemma bkm_finite_anyT (Φ : VorticityResponse) (u₀ : T3 → Fin 3 → ℝ)",
+   "pos": {
+    "column": 23,
+    "line": 407
+   }
+  },
+  {
+   "severity": "warning",
+   "data": "unused variable `h`\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`",
+   "code_line": "theorem probe_hs_finite (s : ℝ) (u₀ : T3 → Fin 3 → ℝ) (h : SmoothInitial u₀) :",
+   "pos": {
+    "column": 55,
+    "line": 505
+   }
+  }
+ ],
+ "infos": [],
+ "axioms": [],
+ "message": "Lean verification failed",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  this\nhas type\n  Orthonormal ℂ (UnitAddTorus.mFourierLp 2)\nbut is expected to have type\n  False",
+   "code_line": "  exact this",
+   "pos": {
+    "column": 2,
+    "line": 478
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  this\nhas type\n  ∀ (f : ↥(MeasureTheory.Lp ℂ 2 MeasureTheory.volume)),\n    HasSum (fun i => ‖UnitAddTorus.mFourierCoeff (↑↑f) i‖ ^ 2) (∫ (t : UnitAddTorus (Fin 3)), ‖↑↑f t‖ ^ 2)\nbut is expected to have type\n  False",
+   "code_line": "  exact this",
+   "pos": {
+    "column": 2,
+    "line": 482
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Type mismatch\n  this\nhas type\n  Summable (UnitAddTorus.mFourierCoeff ⇑?m.8) →\n    HasSum (fun i => UnitAddTorus.mFourierCoeff (⇑?m.8) i • UnitAddTorus.mFourier i) ?m.8\nbut is expected to have type\n  False",
+   "code_line": "  exact this",
+   "pos": {
+    "column": 2,
+    "line": 486
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Tactic `rfl` failed: The left-hand side\n  fourierCoeff3D f k\nis not definitionally equal to the right-hand side\n  UnitAddTorus.mFourierCoeff f k\n\nf : T3 → ℂ\nk : Fin 3 → ℤ\n⊢ fourierCoeff3D f k = UnitAddTorus.mFourierCoeff f k",
+   "code_line": "  rfl",
+   "pos": {
+    "column": 2,
+    "line": 489
+   }
+  },
+  {
+   "severity": "error",
+   "data": "Unknown constant `ContinuousMap.inner_toLp`",
+   "code_line": "  rw [fourierLp, fourierLp, ContinuousMap.inner_toLp] at h",
+   "pos": {
+    "column": 28,
+    "line": 494
+   }
+  },
+  {
+   "severity": "error",
+   "data": "unsolved goals\nn m : ℤ\nh :\n  ⟪(ContinuousMap.toLp 2 AddCircle.haarAddCircle ℂ) (fourier m),\n      (ContinuousMap.toLp 2 AddCircle.haarAddCircle ℂ) (fourier n)⟫_ℂ =\n    if m = n then 1 else 0\n⊢ ∫ (x : UnitAddCircle), (fourier n) x * star ((fourier m) x) = if n = m then 1 else 0",
+   "code_line": "    ∫ x : UnitAddCircle, fourier n x * star (fourier m x) = if n = m then 1 else 0 := by",
+   "pos": {
+    "column": 86,
+    "line": 492
+   }
+  },
+  {
+   "severity": "error",
+   "data": "could not synthesize default value for parameter 'hc' using tactics",
+   "code_line": "      MeasureTheory.volume 0 T := intervalIntegrable_const",
+   "pos": {
+    "column": 34,
+    "line": 503
+   }
+  },
+  {
+   "severity": "error",
+   "data": "tactic 'aesop' failed, failed to prove the goal. Some goals were not explored because the maximum rule application depth (30) was reached. Set option 'maxRuleApplicationDepth' to increase the limit.\nInitial goal:\n  N : ℕ\n  u₀ : T3 → Fin 3 → ℝ\n  T : ℝ\n  ⊢ ‖?m.18‖ₑ ≠ ⊤\nRemaining goals after safe rules:\n  N : ℕ\n  u₀ : T3 → Fin 3 → ℝ\n  T : ℝ\n  ⊢ ‖?m.18‖ₑ ≠ ⊤",
+   "code_line": "      MeasureTheory.volume 0 T := intervalIntegrable_const",
+   "pos": {
+    "column": 34,
+    "line": 503
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

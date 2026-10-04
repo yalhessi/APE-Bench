@@ -1,0 +1,1 @@
+{"code": "  have : \u2200\u1da0 n in l, (c n)\u207b\u00b9 \u2022 c n \u2022 d n = d n :=\n    (eventually_ne_of_tendsto_norm_atTop hc 0).mono fun n hn \u21a6 inv_smul_smul\u2080 hn (d n)\n  apply Tendsto.congr' this\n  rw [tendsto_norm_atTop_iff_cobounded] at hc\n  simpa using (tendsto_inv\u2080_cobounded.comp hc).smul hd", "limit": 8}

@@ -1,0 +1,1 @@
+{"path": "Mathlib/Order/Interval/Set/Disjoint.lean", "line_start": 140, "line_end": 148, "replacement": "@[to_dual (attr := simp)]\ntheorem iUnion_Ico_eq_Iio_self_iff {f : \u03b9 \u2192 \u03b1} {a : \u03b1} :\n    \u22c3 i, Ico (f i) a = Iio a \u2194 \u2200 x < a, \u2203 i, f i \u2264 x := by\n  simp [\u2190 Ici_inter_Iio, \u2190 iUnion_inter, subset_def]\n"}

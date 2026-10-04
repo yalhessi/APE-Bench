@@ -65,6 +65,11 @@ def load_run(config_path: Path, dataset_model: Type,
     run is the same question with the same answer.
     """
 
+    # Before the config meets the scaffold classes: from a mixed tree they are the other
+    # tree's, and the refusal would arrive as validation errors naming the wrong cause.
+    from src.mathlib_review.paths import assert_one_tree
+
+    assert_one_tree()
     raw = load_yaml(config_path)
     if overrides:
         raw = deep_merge(raw, overrides)

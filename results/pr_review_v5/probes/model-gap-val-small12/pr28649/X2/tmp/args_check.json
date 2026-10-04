@@ -1,0 +1,1 @@
+{"path": "Mathlib/Probability/Kernel/Composition/IntegralCompProd.lean", "line_start": 514, "line_end": 514, "replacement": "end MeasureTheory\n\n#check @ProbabilityTheory.Kernel.integral_comp\n#check @ProbabilityTheory.integral_compProd\n#check @ProbabilityTheory.integral_comp"}

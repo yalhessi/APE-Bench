@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/ContinuousMap/Basic.lean", "declaration_name": "ContinuousMap.coe_restrict", "new_declaration": "@[simp]\ntheorem coe_restrict (f : C(\u03b1, \u03b2)) : \u21d1(f.restrict s) = f \u2218 ((\u2191) : s \u2192 \u03b1) :=\n  rfl"}

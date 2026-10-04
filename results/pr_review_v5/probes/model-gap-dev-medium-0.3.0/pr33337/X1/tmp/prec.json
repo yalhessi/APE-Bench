@@ -1,0 +1,1 @@
+{"code":"theorem coe_starProjection_eq_isComplProjection [K.HasOrthogonalProjection] :\n    K.starProjection.toLinearMap = K.isCompl_orthogonal_of_hasOrthogonalProjection.projection := by\n  simp [starProjection, coe_orthogonalProjection_eq_linearProjOfIsCompl, IsCompl.projection]","limit":8}

@@ -1,0 +1,17 @@
+# Phase 2 of docs/plans/2026-09-30-post-carryover-replan.md: the pipeline as built -- lead mode, the
+# arms, the gate -- on validation small12, with gpt_5.2 at high effort through the Responses API and
+# reasoning carried across turns in the lead and in every arm (nested_config copies the parent's
+# llm_config). Every run in the record before 2026-09-30 ran the lead at reasoning off. The caps
+# are in the parent, split out so each file holds what it varies (test_pr_review_v5_cli).
+extends: pr_review_v5_val_small12_carried_caps.yaml
+
+llm_config:
+  reasoning_effort: high
+  openai_api: responses
+  openai_responses_reasoning_carryover: true
+
+execution:
+  max_turns: 80
+
+dataset:
+  pr_numbers: [26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]

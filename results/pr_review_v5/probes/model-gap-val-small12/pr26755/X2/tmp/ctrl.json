@@ -1,0 +1,1 @@
+{"path":"Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean","line_start":939,"line_end":939,"replacement":"def testNCControl : ℕ := Classical.choice ⟨0⟩\n\nprotected noncomputable def commMonoid : CommMonoid (Finset α) :="}

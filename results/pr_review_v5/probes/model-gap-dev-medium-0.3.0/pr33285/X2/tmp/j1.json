@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Normed/Operator/LinearIsometry.lean", "line_start": 99, "line_end": 101, "replacement": "@[simp]\ntheorem nnnorm_map [SemilinearIsometryClass \ud835\udcd5 \u03c3\u2081\u2082 E E\u2082] (f : \ud835\udcd5) (x : E) : \u2016f x\u2016\u208a = \u2016x\u2016\u208a :=\n  NNReal.eq <| norm_map f x"}

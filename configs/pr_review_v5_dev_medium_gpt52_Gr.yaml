@@ -1,0 +1,18 @@
+# Condition G with reasoning on (reasoning_effort: high) on this set: test (d) of
+# docs/todo/reviewer-model-gap.md carried to the harness's other sets. The caps are the post-cutoff
+# reasoning config's, set so they cannot bind: a capped session stops with no findings, and one
+# high-effort session on 43192 billed $3.74 over 43 turns.
+extends: pr_review_v5_dev_medium_gpt52_G.yaml
+
+llm_config:
+  reasoning_effort: high
+
+execution:
+  max_turns: 80
+
+dataset:
+  solo_cost_cap: 6.00
+  solo_token_cap: 7200000
+  # 15 PRs x $6.00 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 90.50
+  run_total_token_cap: 108100000

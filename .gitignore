@@ -2,12 +2,13 @@
 # checkout (see .claude/worktree-setup.sh), and a dir-only pattern would not match those.
 .ape
 /ape
-# Claude Code: the shared project config is tracked (settings.json, rules/, hooks/);
+# Claude Code: the shared project config is tracked (settings.json, rules/, hooks/, skills/);
 # personal overrides (settings.local.json) and worktrees are not.
 .claude/*
 !.claude/settings.json
 !.claude/rules/
 !.claude/hooks/
+!.claude/skills/
 !.claude/worktree-setup.sh
 *egg-info
 .vscode

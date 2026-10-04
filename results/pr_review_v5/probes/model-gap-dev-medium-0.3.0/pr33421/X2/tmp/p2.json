@@ -1,0 +1,1 @@
+{"code":"@[fun_prop]\ntheorem continuousAt_floor {x : α} (hx : x ≠ ⌊x⌋) : ContinuousAt floor x :=\n  (continuousOn_floor ⌊x⌋).continuousAt <|\n    Ico_mem_nhds ((floor_le x).lt_of_ne hx.symm) (lt_floor_add_one x)","limit":5}

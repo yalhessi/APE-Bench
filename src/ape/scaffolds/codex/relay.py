@@ -1,537 +1,290 @@
 """
-Codex HTTP Relay Service - OpenAI API Implementation
+Codex HTTP Relay Service - the Responses API Codex speaks, answered by APE's client.
 
-Inherits from BaseRelaySession and implements OpenAI-specific:
-1. OpenAI API format conversion
-2. Chat completions endpoint handling
+`codex-cli` 0.144 refuses Chat Completions (`wire_api = "chat"` is "no longer supported") and
+always streams, so this relay serves `/responses` and answers as a Responses event stream. Every
+request is rebuilt as a `ConversationSession` and sent through APE's own client with the run's
+`llm_config`, so the model, its reasoning settings, usage, limits and the recorded turns are the
+same as under the other scaffolds; what Codex asks for (`model`, `reasoning`) is not used.
+
+Two shapes have no Chat equivalent, and both were captured from the installed CLI against a local
+recording server (no model, 2026-10-01):
+
+- **MCP tools arrive as a `namespace`** (`{"type": "namespace", "name": "mcp__core", "tools":
+  [...]}`). They are flattened to `mcp__core__<tool>` for the backend, and a call is answered as
+  `{"name": "<tool>", "namespace": "mcp__core"}`: Codex refuses the flat name ("unsupported call").
+- **Reasoning comes back as input items.** Codex returns each turn's reasoning items, encrypted
+  content and all but without their `id`. They become the turn's message `signature`, the slot
+  `openai_provider` reads for carry-over, with the `id` restored from what this relay sent.
 """
 
 import asyncio
 import json
 import uuid
-from datetime import datetime
-from typing import Dict, List, Any, Optional, TYPE_CHECKING, AsyncIterator
+from typing import Any, Dict, List, Optional, Tuple
+
 from fastapi import Request, Response
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 
+from ape.llm_clients.adapters.streaming_processor import StreamingInterruptedError
+from ape.llm_clients.config import ContextLengthExceededError, MalformedResponseError
+from ape.llm_clients.models import ContentBlock, ConversationNode, ConversationSession, TokenUsage
 from ape.scaffolds.utils.base_relay import BaseRelaySession
-from ape.llm_clients.models import ConversationSession, ConversationNode, ContentBlock, TokenUsage
 
-if TYPE_CHECKING:
-    import logging
+#: Codex tool types with no function-call equivalent for the backend. None is offered to the
+#: model; the scaffold disables what it can, and this drops the rest.
+_UNRELAYED_TOOL_TYPES = frozenset({"custom", "web_search", "tool_search", "local_shell",
+                                   "image_generation", "computer_use_preview"})
+
+
+def _text(item: Dict[str, Any]) -> str:
+    content = item.get("content")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(part.get("text") or "" for part in content if isinstance(part, dict))
+    return ""
+
+
+def response_event_stream(response: Dict[str, Any]) -> str:
+    """A finished Responses object as the event stream of a streamed one: created, each output
+    item added and done, completed. The minimal sequence the CLI was shown to accept."""
+
+    def event(name: str, data: Dict[str, Any]) -> str:
+        return f"event: {name}\ndata: {json.dumps(data)}\n\n"
+
+    out = [event("response.created", {"type": "response.created",
+                                       "response": {**response, "status": "in_progress", "output": []}})]
+    for index, item in enumerate(response.get("output") or []):
+        out.append(event("response.output_item.added",
+                         {"type": "response.output_item.added", "output_index": index, "item": item}))
+        out.append(event("response.output_item.done",
+                         {"type": "response.output_item.done", "output_index": index, "item": item}))
+    out.append(event("response.completed", {"type": "response.completed", "response": response}))
+    return "".join(out)
 
 
 class CodexRelaySession(BaseRelaySession):
-    """Codex relay session - OpenAI API implementation"""
+    """Codex relay session - the Responses API, served from APE's client."""
+
+    def __init__(self, *args, relayed_builtin_tools: Optional[List[str]] = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Codex's own function tools that reach the model; None passes all. Namespace (MCP)
+        # tools always pass.
+        self.relayed_builtin_tools = (None if relayed_builtin_tools is None
+                                      else frozenset(relayed_builtin_tools))
+        # flat backend name -> (namespace, tool name), from the tools Codex offers
+        self._namespaced: Dict[str, Tuple[str, str]] = {}
+        # encrypted reasoning content -> the item id this relay sent with it
+        self._reasoning_ids: Dict[str, str] = {}
 
     def _setup_routes(self) -> None:
-        """Setup OpenAI API routes"""
-        self._app.add_api_route('/chat/completions', self._handle_chat_completions, methods=['POST'])
-        self._app.add_api_route('/chat/completions', self._handle_options, methods=['OPTIONS'])
+        """Codex posts to `<base_url>/responses`; both spellings of the base are served."""
+        for path in ('/responses', '/v1/responses'):
+            self._app.add_api_route(path, self._handle_responses, methods=['POST'])
+            self._app.add_api_route(path, self._handle_options, methods=['OPTIONS'])
 
     def _get_env_vars(self) -> Dict[str, str]:
-        """
-        Codex relay does NOT use environment variables for configuration.
-
-        Codex reads configuration from TOML file specified by CODEX_HOME.
-        The TOML file is created in __main__ when running relay directly.
-
-        Returns empty dict - no environment variables needed.
-        """
+        """Codex reads its provider from the scaffold's config.toml, not the environment."""
         return {}
 
-    def configure_environment(self) -> None:
-        """
-        Codex does NOT need environment configuration.
+    async def _handle_request(self, request: Request) -> Response:
+        return await self._handle_responses(request)
 
-        Unlike Claude Code which uses environment variables (ANTHROPIC_BASE_URL, etc.),
-        Codex uses TOML configuration file. The TOML file path is set via CODEX_HOME
-        in the main execution logic, not here.
-        """
-        pass
+    # --- request: Responses -> ConversationSession -------------------------------------------
 
-    def restore_environment(self) -> None:
-        """No environment variables to restore for Codex"""
-        pass
+    def _backend_tools(self, tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Codex's tools as function tools, a namespace's children flattened to `<ns>__<tool>`."""
 
-    async def _handle_request(self, request: Request) -> JSONResponse:
-        """Main OpenAI API request handler"""
-        return await self._handle_chat_completions(request)
+        def function(name: str, tool: Dict[str, Any]) -> Dict[str, Any]:
+            return {"type": "function", "function": {
+                "name": name, "description": tool.get("description") or "",
+                "parameters": tool.get("parameters") or {"type": "object", "properties": {}}}}
 
-    async def _handle_streaming_response(self, _request: Request, openai_request: Dict[str, Any], client_requested_model: str) -> StreamingResponse:
-        """Handle streaming chat completions (SSE format)"""
-        # Note: Turn limit and cost limit already checked in _handle_chat_completions before calling this
-        # _request parameter kept for consistency with handler signature but not used
+        out = []
+        for tool in tools:
+            kind = tool.get("type")
+            if kind == "function":
+                if self.relayed_builtin_tools is None or tool["name"] in self.relayed_builtin_tools:
+                    out.append(function(tool["name"], tool))
+            elif kind == "namespace":
+                for child in tool.get("tools") or []:
+                    if child.get("type") == "function":
+                        flat = f"{tool['name']}__{child['name']}"
+                        self._namespaced[flat] = (tool["name"], child["name"])
+                        out.append(function(flat, child))
+            elif kind not in _UNRELAYED_TOOL_TYPES:
+                self.logger.warning(f"Codex offered a tool of unknown type {kind!r}; not relayed")
+        return out
 
-        # Use main llm_config (fast model removed)
-        backend_config = self.llm_config
+    def _flat_name(self, call: Dict[str, Any]) -> str:
+        namespace = call.get("namespace")
+        return f"{namespace}__{call.get('name')}" if namespace else call.get("name") or ""
 
-        # Get tools
-        openai_tools = openai_request.get("tools")
+    def _assistant_turn(self, session: ConversationSession, items: List[Dict[str, Any]],
+                        cwd: Optional[str]) -> None:
+        """One run of model-output items as an assistant node, its reasoning as the signature."""
+        blocks: List[ContentBlock] = []
+        order: List[Dict[str, Any]] = []
+        for item in items:
+            kind = item.get("type")
+            if kind == "reasoning":
+                encrypted = item.get("encrypted_content")
+                if not encrypted:
+                    continue  # a summary alone carries nothing the backend accepts back
+                entry = {"type": "reasoning", "encrypted_content": encrypted,
+                         "summary": item.get("summary") or []}
+                rid = item.get("id") or self._reasoning_ids.get(encrypted)
+                if rid:
+                    entry["id"] = rid
+                order.append(entry)
+            elif kind == "function_call":
+                try:
+                    arguments = json.loads(item.get("arguments") or "{}")
+                except (TypeError, ValueError):
+                    arguments = {"_raw": item.get("arguments")}
+                blocks.append(ContentBlock.tool_use_block(item.get("call_id") or "",
+                                                          self._flat_name(item), arguments))
+                order.append({"type": "function_call", "call_id": item.get("call_id") or ""})
+            else:
+                text = _text(item)
+                if text:
+                    blocks.append(ContentBlock.text_block(text))
+                    order.append({"type": "message"})
+        if not blocks:
+            return  # reasoning with nothing after it: the API rejects such an item
+        node = session.add_assistant_message(blocks, cwd)
+        if any(e["type"] == "reasoning" for e in order):
+            node.message.signature = json.dumps({"responses_output": order})
 
-        # Convert request to ConversationSession
-        request_session = self._convert_openai_to_session(openai_request, openai_tools)
+    def _responses_to_session(self, body: Dict[str, Any],
+                              tools: List[Dict[str, Any]]) -> ConversationSession:
+        session = ConversationSession()
+        cwd = self.cwd
+        items = list(body.get("input") or [])
+        # A session holds one system message, at the front, and a second replaces the first. So
+        # the instructions and the developer messages that open the input (Codex's permissions
+        # text) are one system message; a developer message later on becomes a user message,
+        # which keeps its place.
+        system = [body["instructions"]] if body.get("instructions") else []
+        while items and (items[0].get("type") or "message") == "message" and items[0].get("role") in ("system", "developer"):
+            system.append(_text(items.pop(0)))
+        if system:
+            session.add_system_message([ContentBlock.text_block("\n\n".join(system))], cwd)
+        if tools:
+            session.add_tool_definitions(tools, cwd)
+        pending: List[Dict[str, Any]] = []
+        for item in items:
+            kind = item.get("type") or "message"
+            role = item.get("role")
+            if kind in ("reasoning", "function_call") or (kind == "message" and role == "assistant"):
+                pending.append(item)
+                continue
+            if pending:
+                self._assistant_turn(session, pending, cwd)
+                pending = []
+            if kind == "function_call_output":
+                output = item.get("output")
+                if not isinstance(output, str):
+                    output = json.dumps(output)
+                session.add_tool_result(tool_use_id=item.get("call_id") or "", content=output, cwd=cwd)
+            elif kind == "message":
+                session.add_user_message([ContentBlock.text_block(_text(item))], cwd)
+            else:
+                self.logger.warning(f"Codex input item of type {kind!r} not relayed")
+        if pending:
+            self._assistant_turn(session, pending, cwd)
+        return session
 
-        # Call backend (non-streaming)
-        response_nodes, usage, raw_response = await self._call_backend(
-            request_session,
-            openai_tools,
-            openai_request.get("max_tokens"),
-            openai_request.get("temperature"),
-            backend_config
-        )
+    # --- response: ConversationNode -> Responses ---------------------------------------------
 
-        # Record conversation
-        if self.conversations_dir:
-            await self.record_turn(
-                request_session, response_nodes, usage, client_requested_model, raw_response
-            )
+    def _nodes_to_response(self, nodes: List[ConversationNode], usage: TokenUsage,
+                           model: str) -> Dict[str, Any]:
+        output: List[Dict[str, Any]] = []
 
-        # Cache signatures from response (before client loses them)
-        self._cache_signatures_from_nodes(response_nodes)
+        def message(text: str) -> Dict[str, Any]:
+            return {"type": "message", "id": f"msg_{uuid.uuid4().hex[:24]}", "role": "assistant",
+                    "status": "completed",
+                    "content": [{"type": "output_text", "text": text, "annotations": []}]}
 
-        # Convert to OpenAI format
-        openai_response = self._convert_nodes_to_openai(
-            response_nodes, usage, client_requested_model
-        )
+        def call(block: ContentBlock) -> Dict[str, Any]:
+            namespace, name = self._namespaced.get(block.name, (None, block.name))
+            item = {"type": "function_call", "id": f"fc_{uuid.uuid4().hex[:24]}",
+                    "call_id": block.id, "name": name,
+                    "arguments": json.dumps(block.input or {}), "status": "completed"}
+            if namespace:
+                item["namespace"] = namespace
+            return item
 
-        # Create async generator for streaming
-        async def generate() -> AsyncIterator[str]:
+        for node in nodes:
+            if node.type != "assistant":
+                continue
+            texts = [b.text for b in node.message.content if b.type == "text" and b.text]
+            calls = {b.id: b for b in node.message.content if b.type == "tool_use"}
             try:
-                # Send the complete response as SSE chunks
-                message = openai_response['choices'][0]['message']
-                content = message.get('content', '')
-                tool_calls = message.get('tool_calls', [])
+                carried = json.loads(node.message.signature or "{}").get("responses_output") or []
+            except (TypeError, ValueError, AttributeError):
+                carried = []
+            for entry in carried:
+                if entry.get("type") == "reasoning" and entry.get("encrypted_content"):
+                    rid = entry.get("id") or f"rs_{uuid.uuid4().hex[:24]}"
+                    self._reasoning_ids[entry["encrypted_content"]] = rid
+                    output.append({"type": "reasoning", "id": rid, "summary": entry.get("summary") or [],
+                                   "encrypted_content": entry["encrypted_content"]})
+                elif entry.get("type") == "message" and texts:
+                    output.append(message("\n\n".join(texts)))
+                    texts = []
+                elif entry.get("type") == "function_call" and entry.get("call_id") in calls:
+                    output.append(call(calls.pop(entry["call_id"])))
+            if texts:
+                output.append(message("\n\n".join(texts)))
+            output.extend(call(b) for b in calls.values())
 
-                chunk_id = openai_response['id']
-                created = openai_response['created']
+        return {"id": f"resp_{uuid.uuid4().hex[:24]}", "object": "response", "status": "completed",
+                "model": model, "output": output,
+                "usage": {"input_tokens": usage.input_tokens or 0,
+                          "output_tokens": usage.output_tokens or 0,
+                          "total_tokens": (usage.input_tokens or 0) + (usage.output_tokens or 0),
+                          "input_tokens_details": {"cached_tokens": usage.cache_read_input_tokens or 0},
+                          "output_tokens_details": {"reasoning_tokens": usage.reasoning_tokens or 0}}}
 
-                # If there's text content, stream it
-                if content:
-                    # Send content as a single delta
-                    chunk = {
-                        "id": chunk_id,
-                        "object": "chat.completion.chunk",
-                        "created": created,
-                        "model": client_requested_model,
-                        "choices": [{
-                            "index": 0,
-                            "delta": {
-                                "role": "assistant",
-                                "content": content
-                            },
-                            "finish_reason": None
-                        }]
-                    }
-                    yield f"data: {json.dumps(chunk)}\n\n"
+    # --- the route ---------------------------------------------------------------------------
 
-                # If there are tool calls, stream them
-                if tool_calls:
-                    for tool_call in tool_calls:
-                        # Note: signature is already included in tool_call from _convert_nodes_to_openai
-                        chunk = {
-                            "id": chunk_id,
-                            "object": "chat.completion.chunk",
-                            "created": created,
-                            "model": client_requested_model,
-                            "choices": [{
-                                "index": 0,
-                                "delta": {
-                                    "tool_calls": [tool_call]
-                                },
-                                "finish_reason": None
-                            }]
-                        }
-                        yield f"data: {json.dumps(chunk)}\n\n"
-
-                # Send final chunk with finish_reason
-                finish_reason = "tool_calls" if tool_calls else "stop"
-                final_chunk = {
-                    "id": chunk_id,
-                    "object": "chat.completion.chunk",
-                    "created": created,
-                    "model": client_requested_model,
-                    "choices": [{
-                        "index": 0,
-                        "delta": {},
-                        "finish_reason": finish_reason
-                    }]
-                }
-                yield f"data: {json.dumps(final_chunk)}\n\n"
-
-                # Send [DONE]
-                yield "data: [DONE]\n\n"
-
-                self.logger.info(f"Streaming response completed: {client_requested_model}")
-
-            except asyncio.CancelledError:
-                # Normal shutdown - streaming cancelled during relay shutdown
-                self.logger.debug("Streaming cancelled during relay shutdown")
-                raise
-            except Exception as e:
-                self.logger.error(f"Streaming error: {e}")
-
-        return StreamingResponse(
-            generate(),
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive"
-            }
-        )
-
-    async def _handle_chat_completions(self, request: Request) -> JSONResponse:
-        """Handle OpenAI chat completions endpoint"""
+    async def _handle_responses(self, request: Request) -> Response:
         try:
-            # Check limits BEFORE processing request (unified base implementation)
             limit_response = await self._check_limits_and_shutdown_if_needed()
             if limit_response is not None:
                 return limit_response
 
-            openai_request = await request.json()
-            client_requested_model = openai_request.get('model')
+            body = await request.json()
+            model = body.get("model") or ""
+            self.logger.info(f"Received request: {model} "
+                             f"(turn {self.get_current_turns() + 1}/{self.max_turns or '∞'})")
 
-            if not client_requested_model:
-                raise ValueError("Missing 'model' field in request")
-
-            self.logger.info(f"Received request: {client_requested_model} (turn {self.get_current_turns() + 1}/{self.max_turns or '∞'})")
-
-            # Check if streaming is requested
-            is_streaming = openai_request.get('stream', False)
-            self.logger.debug(f"Request stream={is_streaming}")
-
-            if is_streaming:
-                return await self._handle_streaming_response(request, openai_request, client_requested_model)
-
-            # Use main llm_config (fast model removed)
-            backend_config = self.llm_config
-
-            # Get tools (already in OpenAI format)
-            openai_tools = openai_request.get("tools")
-
-            # Convert request to ConversationSession
-            request_session = self._convert_openai_to_session(openai_request, openai_tools)
-
-            # Call backend
+            tools = self._backend_tools(body.get("tools") or [])
+            session = self._responses_to_session(body, tools)
             response_nodes, usage, raw_response = await self._call_backend(
-                request_session,
-                openai_tools,
-                openai_request.get("max_tokens"),
-                openai_request.get("temperature"),
-                backend_config
-            )
+                session, tools or None, body.get("max_output_tokens"), None, self.llm_config)
 
-            # Record conversation
             if self.conversations_dir:
-                await self.record_turn(
-                    request_session, response_nodes, usage, client_requested_model, raw_response
-                )
+                await self.record_turn(session, response_nodes, usage, model, raw_response)
 
-            # Cache signatures from response (before client loses them)
-            self._cache_signatures_from_nodes(response_nodes)
-
-            # Convert response to OpenAI format
-            openai_response = self._convert_nodes_to_openai(
-                response_nodes, usage, client_requested_model
-            )
-
-            self.logger.info(f"Response completed: {client_requested_model}")
-            return JSONResponse(openai_response)
+            response = self._nodes_to_response(response_nodes, usage, model)
+            self.logger.info(f"Response completed: {model}")
+            return Response(content=response_event_stream(response), media_type="text/event-stream")
 
         except asyncio.CancelledError:
-            # Normal shutdown - request cancelled during relay shutdown
             self.logger.debug("Request cancelled during relay shutdown")
             return Response(status_code=499)
-        except Exception as e:
+        except (ContextLengthExceededError, MalformedResponseError, StreamingInterruptedError) as e:
+            self.last_error = e
+            if self._server:
+                self._server.should_exit = True
+            status_code = 400 if isinstance(e, ContextLengthExceededError) else 500
+            return JSONResponse({"error": {"type": type(e).__name__, "message": str(e)}},
+                                status_code=status_code)
+        except Exception as e:  # noqa: BLE001
             import traceback
             self.logger.error(f"Request failed: {traceback.format_exc()}")
-            return JSONResponse(
-                {"error": {"type": "internal_error", "message": str(e)}},
-                status_code=500
-            )
-
-    def _convert_openai_to_session(
-        self,
-        request: Dict[str, Any],
-        tools: Optional[List[Dict[str, Any]]] = None
-    ) -> ConversationSession:
-        """Convert OpenAI request to ConversationSession"""
-        # Don't pass session_id, let it auto-generate via default_factory
-        session = ConversationSession()
-        cwd = self.cwd
-        messages = request.get("messages", [])
-
-        # Extract system message if present (first message with role="system")
-        if messages and messages[0].get("role") == "system":
-            system_message = messages[0]
-            system_content = system_message.get("content", "")
-            if system_content:
-                session.add_system_message(
-                    [ContentBlock.text_block(system_content)],
-                    cwd
-                )
-            messages = messages[1:]
-
-        # Record tool definitions
-        if tools:
-            session.add_tool_definitions(tools, cwd)
-
-        # Handle regular messages
-        for message in messages:
-            role = message.get("role")
-            content = message.get("content", "")
-
-            if role == "user":
-                if isinstance(content, str):
-                    session.add_user_message(
-                        [ContentBlock.text_block(content)],
-                        cwd
-                    )
-                elif isinstance(content, list):
-                    blocks = self._convert_openai_content_to_blocks(content)
-                    session.add_user_message(blocks, cwd)
-
-            elif role == "assistant":
-                blocks = []
-                # Text content
-                if content:
-                    blocks.append(ContentBlock.text_block(content))
-
-                # Tool calls
-                tool_calls = message.get("tool_calls", [])
-                for tool_call in tool_calls:
-                    if tool_call.get("type") == "function":
-                        func = tool_call.get("function", {})
-
-                        # Use safe argument parsing (extracts first valid JSON object)
-                        from ape.llm_clients.adapters.response_processor import _parse_tool_arguments
-                        arguments_str = func.get("arguments", "{}")
-                        if isinstance(arguments_str, str):
-                            parsed_input = _parse_tool_arguments(arguments_str, func.get("name", "unknown"), self.logger)
-                        else:
-                            parsed_input = arguments_str
-
-                        blocks.append(ContentBlock.tool_use_block(
-                            id=tool_call.get("id", ""),
-                            name=func.get("name", ""),
-                            input=parsed_input,
-                            signature=tool_call.get("signature")  # Extract signature for Gemini thinking support
-                        ))
-
-                # Restore signatures that client lost
-                self._restore_signatures_to_blocks(blocks)
-
-                if blocks:
-                    session.add_assistant_message(blocks, cwd)
-
-            elif role == "tool":
-                # Tool result
-                tool_call_id = message.get("tool_call_id", "")
-                tool_content = message.get("content", "")
-                session.add_tool_result(
-                    tool_use_id=tool_call_id,
-                    content=tool_content,
-                    cwd=cwd,
-                    tool_name=message.get("name")
-                )
-
-        return session
-
-    def _convert_openai_content_to_blocks(
-        self, content: List[Dict[str, Any]]
-    ) -> List[ContentBlock]:
-        """Convert OpenAI content array to ContentBlock list"""
-        blocks = []
-        for item in content:
-            content_type = item.get("type")
-            if content_type == "text":
-                blocks.append(ContentBlock.text_block(item.get("text", "")))
-            # Add other content types if needed
-        return blocks
-
-    def _convert_nodes_to_openai(
-        self,
-        nodes: List[ConversationNode],
-        usage: TokenUsage,
-        model_name: str
-    ) -> Dict[str, Any]:
-        """Convert ConversationNode list to OpenAI format"""
-        response = {
-            "id": f"chatcmpl-{uuid.uuid4().hex[:24]}",
-            "object": "chat.completion",
-            "created": int(datetime.now().timestamp()),
-            "model": model_name,
-            "choices": [{
-                "index": 0,
-                "message": {
-                    "role": "assistant",
-                    "content": "",
-                    "tool_calls": []
-                },
-                "finish_reason": "stop"
-            }],
-            "usage": {
-                "prompt_tokens": usage.input_tokens,
-                "completion_tokens": usage.output_tokens,
-                "total_tokens": usage.total_tokens
-            }
-        }
-
-        message = response["choices"][0]["message"]
-        text_parts = []
-        tool_calls = []
-
-        # Extract content from assistant nodes
-        for node in nodes:
-            if node.type == "assistant":
-                for block in node.message.content:
-                    if block.type == "text" and block.text:
-                        text_parts.append(block.text)
-                    elif block.type == "thinking" and block.reasoning_content:
-                        text_parts.append(block.reasoning_content)
-                    elif block.type == "tool_use":
-                        tool_call = {
-                            "id": block.id,
-                            "type": "function",
-                            "function": {
-                                "name": block.name,
-                                "arguments": json.dumps(block.input or {})
-                            }
-                        }
-                        # Include signature if present (for Gemini thinking support)
-                        if block.signature:
-                            tool_call["signature"] = block.signature
-                        tool_calls.append(tool_call)
-
-        # Set content and tool_calls
-        message["content"] = "\n".join(text_parts) if text_parts else None
-
-        if tool_calls:
-            message["tool_calls"] = tool_calls
-            response["choices"][0]["finish_reason"] = "tool_calls"
-
-        return response
-
-
-if __name__ == "__main__":
-    import argparse
-    import asyncio
-    import os
-    import sys
-    import tempfile
-    import shutil
-    from pathlib import Path
-    from datetime import datetime
-    from ape.utils.logging import create_logger
-    from ape.llm_clients.config import LLMConfig
-    from ape.scaffolds.utils.common import allocate_port
-
-    async def main():
-        parser = argparse.ArgumentParser(description="Codex relay service")
-        parser.add_argument('--model', required=True,
-                            help='Canonical model name from MODEL_MAPPINGS. Required: the old\n'
-                                 'default named a model that is not in the table, so this\n'
-                                 'entry point failed on its own default.')
-        parser.add_argument('--host', default='localhost', help='Listening address')
-        parser.add_argument('--retry_max_attempts', type=int, default=1, help='Max retry attempts')
-        parser.add_argument('--conversations_dir', default="data/relay_conversations", help='Conversation directory')
-
-        args = parser.parse_args()
-
-        base_dir = Path(args.conversations_dir)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        conversations_dir = base_dir / f"session_{timestamp}"
-        log_dir = base_dir / "logs"
-        log_dir.mkdir(parents=True, exist_ok=True)
-        log_file = log_dir / f"relay_{timestamp}.log"
-
-        logger = create_logger(log_file=log_file, to_console=True)
-
-        llm_config = LLMConfig(
-            model_name=args.model,
-            retry_max_attempts=args.retry_max_attempts,
-            relay_mode=True
-        )
-
-        port = allocate_port()
-        session = CodexRelaySession(
-            port=port,
-            llm_config=llm_config,
-            conversations_dir=conversations_dir,
-            cwd=str(Path.cwd()),
-            listen_host=args.host,
-            logger=logger
-        )
-
-        # Create temporary CODEX_HOME directory with config.toml
-        temp_codex_home = None
-        original_codex_home = os.environ.get('CODEX_HOME')
-
-        try:
-            # Create temporary directory for CODEX_HOME
-            temp_codex_home = Path(tempfile.mkdtemp(prefix="codex_relay_"))
-            logger.info(f"Created temporary CODEX_HOME: {temp_codex_home}")
-
-            # Build TOML config
-            import tomli_w
-
-            relay_base_url = f"http://{args.host}:{port}"
-            config = {
-                "model_provider": "relay",
-                "model": args.model,
-                "model_providers": {
-                    "relay": {
-                        "name": "Relay",
-                        "base_url": relay_base_url
-                    }
-                }
-            }
-
-            # Write config.toml
-            config_path = temp_codex_home / "config.toml"
-            with open(config_path, 'wb') as f:
-                tomli_w.dump(config, f)
-
-            logger.info(f"Created TOML config: {config_path}")
-            logger.info(f"  - Model provider: relay @ {relay_base_url}")
-            logger.info(f"  - Model: {args.model}")
-
-            # Set CODEX_HOME environment variable
-            os.environ['CODEX_HOME'] = str(temp_codex_home)
-
-            # Start relay server
-            await session.start()
-            logger.info(f"Relay started: {session.base_url}")
-            logger.info(f"Model: {llm_config.model_name}")
-            logger.info("")
-            logger.info("=" * 60)
-            logger.info(f"To use this relay, run codex with:\n  export CODEX_HOME={temp_codex_home}\n  codex")
-            logger.info("=" * 60)
-            logger.info("")
-            logger.info("Press Ctrl+C to stop")
-
-            while True:
-                await asyncio.sleep(1)
-
-        except KeyboardInterrupt:
-            logger.info("\nStopping...")
-        except Exception as e:
-            logger.error(f"Failed: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            sys.exit(1)
-        finally:
-            await session.stop()
-
-            # Restore original CODEX_HOME
-            if original_codex_home:
-                os.environ['CODEX_HOME'] = original_codex_home
-            elif 'CODEX_HOME' in os.environ:
-                del os.environ['CODEX_HOME']
-
-            # Clean up temporary directory
-            if temp_codex_home and temp_codex_home.exists():
-                shutil.rmtree(temp_codex_home)
-                logger.info(f"Cleaned up temporary CODEX_HOME: {temp_codex_home}")
-
-    asyncio.run(main())
+            return JSONResponse({"error": {"type": "internal_error", "message": str(e)}},
+                                status_code=500)

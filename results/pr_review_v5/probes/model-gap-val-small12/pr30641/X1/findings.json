@@ -1,0 +1,37 @@
+[
+  {
+    "target": "Real.posLog_pow",
+    "claim": "`Real.posLog_pow` is proved by a seven-line argument with two case splits (`n = 0`, `|a| ≤ 1`), `simp_all`, and an auxiliary `1 < |a ^ n|` fact, although the statement follows directly from the definition: `log⁺ (a ^ n) = max 0 (log (a ^ n)) = max 0 (n * log a) = n * max 0 (log a)`, since `Real.log_pow` holds for every real `a` and `n` is nonnegative.",
+    "requested_change": "Replace the proof of `Real.posLog_pow` with the one-liner `by simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]` (or, as a non-flexible alternative, `by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`).",
+    "severity": "advisory",
+    "evidence": "Read `target/Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean` lines 101-110 (the PR's proof). Looked up `Real.log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x` (Log/Basic.lean:267, no hypotheses on x) and `mul_max_of_nonneg (b c : R) (ha : 0 ≤ a) : a * max b c = max (a * b) (a * c)` (Algebra/Order/Ring/Unbundled/Basic.lean:525). `lean_verify_edit` replacing `Real.posLog_pow` with the unchanged signature and proof `by simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]`: success, no errors or warnings. The `rw` variant also compiled (success)."
+  },
+  {
+    "target": "Real.posLog_pow",
+    "claim": "`Real.posLog_pow` takes its variables as implicit binders `{n : ℕ} {a : ℝ}`, although they occur only in the conclusion of an unconditional rewrite lemma; the lemma it mirrors, `Real.log_pow (x : ℝ) (n : ℕ)`, and the file's own `posLog_neg (x : ℝ)` / `posLog_abs (x : ℝ)` take them explicitly, so `rw [posLog_pow x n]` cannot be written.",
+    "requested_change": "Change the signature to match `Real.log_pow`: `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x`.",
+    "severity": "advisory",
+    "evidence": "`content_search` in `target/Mathlib/Analysis/SpecialFunctions/Log/Basic.lean`: `theorem log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x` and `theorem log_zpow (x : ℝ) (n : ℤ)`, both explicit. In PosLog.lean, `posLog_neg (x : ℝ)` and `posLog_abs (x : ℝ)` are explicit. `lean_verify_edit` with `@[simp] lemma posLog_pow (x : ℝ) (n : ℕ) : log⁺ (x ^ n) = n * log⁺ x := by rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]`: success for the whole file (no other declaration uses `posLog_pow`)."
+  },
+  {
+    "target": "Real.posLog_pow",
+    "claim": "The docstring of `Real.posLog_pow`, \"The function `log⁺` commutes with taking powers.\", misdescribes the statement: commuting with powers would mean `log⁺ (a ^ n) = (log⁺ a) ^ n`, whereas the lemma says `log⁺` turns an `n`-th power into multiplication by `n`.",
+    "requested_change": "Reword the docstring to state what is proved, e.g. \"The positive part of the logarithm of `x ^ n` is `n * log⁺ x`.\"",
+    "severity": "advisory",
+    "evidence": "Read the docstring (PosLog.lean line 101) against the statement `log⁺ (a ^ n) = n * log⁺ a` (lines 102-103)."
+  },
+  {
+    "target": "Real.posLog_norm_sum_le",
+    "claim": "`Real.posLog_norm_sum_le` assumes `[NormedAddCommGroup E]`, but its proof uses only `norm_sum_le` and `norm_nonneg`, which hold for seminormed groups; the lemma is stated with a stronger hypothesis than needed.",
+    "requested_change": "Weaken the instance to `[SeminormedAddCommGroup E]` in `Real.posLog_norm_sum_le` (and, for consistency, in its sibling `Real.posLog_norm_add_le`).",
+    "severity": "advisory",
+    "evidence": "`lean_verify_edit` replacing `Real.posLog_norm_sum_le` with the PR's own proof but `[SeminormedAddCommGroup E]`: success, no errors or warnings. The sibling `posLog_norm_add_le` (PosLog.lean line 206, pre-existing) uses the same `NormedAddCommGroup` assumption and only `norm_add_le`/`norm_nonneg`."
+  },
+  {
+    "target": "Real.posLog_norm_sum_le",
+    "claim": "The proof of `Real.posLog_norm_sum_le` is a two-step `calc` whose first step uses `apply ... _ ...` followed by a `simp` to discharge the `Set.Ici 0` membership, although both steps are direct term applications: the membership goals are `norm_nonneg _` and `Finset.sum_nonneg`, and the second step is `posLog_sum`.",
+    "requested_change": "Replace the `calc` block with the term proof `(monotoneOn_posLog (norm_nonneg _) (Finset.sum_nonneg fun _ _ ↦ norm_nonneg _) (norm_sum_le s f)).trans (posLog_sum s _)`.",
+    "severity": "advisory",
+    "evidence": "Read PosLog.lean lines 186-194. `lean_verify_edit` replacing `Real.posLog_norm_sum_le` (original `NormedAddCommGroup` signature) with the term proof above: success, no errors or warnings; the same term proof also compiles under `[SeminormedAddCommGroup E]`."
+  }
+]

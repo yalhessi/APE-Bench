@@ -1,0 +1,1 @@
+{"path": "Mathlib/Topology/UniformSpace/Uniformizable.lean", "line_start": 109, "line_end": 109, "replacement": "public instance (priority := 100) UniformSpace.toT35Space [T0Space \u03b1] : T35Space \u03b1 where\n\nend UniformSpace\n\nexample {\u03b2 : Type*} [UniformSpace \u03b2] [T0Space \u03b2] : T35Space \u03b2 := inferInstance\n"}

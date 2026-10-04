@@ -5,6 +5,7 @@ Inherits from BaseScaffold and uses shared MCP management.
 """
 
 import asyncio
+import json
 import os
 import shutil
 import sys
@@ -71,9 +72,7 @@ class CodexScaffold(BaseScaffold):
             token_limit=self.token_limit
         )
 
-        # 2. Initialize conversation (start relay and CodexBridge only if model_name is not None)
-        # Note: CodexBridge must be installed at src/ape/scaffolds/codex/codexbridge/
-        # Install from: https://github.com/begonia599/CodexBridge
+        # 2. Initialize conversation (starts the relay)
         await self.conversation_manager.initialize()
 
         # 3. Start MCP server using MCPManager (HTTP mode)
@@ -93,97 +92,53 @@ class CodexScaffold(BaseScaffold):
         await self._configure_codex_toml(mcp_url)
 
     async def _configure_codex_toml(self, mcp_url: str) -> None:
+        """Write the attempt's `workspaces/.codex/config.toml` (and model catalog), which the CLI
+        reads with `CODEX_HOME` pointed there. A failure raises: without this file the CLI would
+        not reach the relay."""
+        import tomli_w
+
+        config = self.task.config
+        if config.llm_config.model_name is None:
+            raise RuntimeError("Codex scaffold requires llm_config.model_name: it runs through the relay")
+        relay = self.conversation_manager._relay_session
+        if relay is None:
+            raise RuntimeError("Relay session not initialized")
+        codex_home = self.task.workspaces_dir / ".codex"
+        codex_home.mkdir(parents=True, exist_ok=True)
+        model = codex_model_name(config)
+        catalog = (await write_model_catalog(codex_home, model, self.logger)
+                   if config.list_mcp_tools_upfront else None)
+        settings = codex_config(config, model, relay.base_url, mcp_url, catalog)
+        (codex_home / "config.toml").write_bytes(tomli_w.dumps(settings).encode())
+        self.logger.info(
+            f"[CodexScaffold] {codex_home / 'config.toml'}: model {model} via relay {relay.base_url}, "
+            f"MCP core @ {mcp_url}, disabled features {config.disabled_features}, "
+            f"catalog {'upfront MCP tools' if catalog else 'bundled'}")
+
+    async def _initial_prompt(self, cwd) -> str:
+        """The first message: the workspace preamble, the task's own contract, then the task.
+
+        Codex keeps its own system prompt, so APE's preamble goes in the first user message with
+        the task's contract after it, as in `claude_code`. Batch and CLI modes send the same text.
         """
-        Write Codex config.toml to scratch workspace
+        from ape.scaffolds.prompts import build_system_prompt, with_task_system_prompt
 
-        This creates workspaces/.codex/config.toml with MCP configuration.
-        If model_name is not None, also configure relay for custom model routing.
-        """
-        try:
-            import tomli_w
-
-            # Get scratch workspace path
-            if not self.task.scratch_workspace:
-                raise RuntimeError("Scratch workspace not initialized for Codex scaffold")
-
-            # Build config with MCP server
-            config = {
-                "mcp_servers": {
-                    "lean-research": {
-                        "url": mcp_url,
-                        "enabled": True,
-                        "startup_timeout_sec": 3600,
-                        "tool_timeout_sec": 3600
-                    }
-                }
-            }
-
-            # Add relay configuration only if model_name is not None
-            if self.task.config.llm_config.model_name is not None:
-                if not self.conversation_manager._relay_session:
-                    raise RuntimeError("Relay session not initialized but model_name is not None")
-
-                relay_base_url = self.conversation_manager._relay_session.base_url
-                relay_model = self.task.config.llm_config.model_name
-
-                config["model_provider"] = "relay"
-                config["model"] = relay_model
-                config["model_providers"] = {
-                    "relay": {
-                        "name": "Relay",
-                        "base_url": relay_base_url
-                    }
-                }
-
-            # Write to workspaces/.codex/config.toml
-            # So that when HOME=workspaces/, Codex finds ~/.codex/config.toml
-            workspaces_dir = self.task.workspaces_dir
-            config_path = workspaces_dir / ".codex" / "config.toml"
-            config_path.parent.mkdir(parents=True, exist_ok=True)
-
-            with open(config_path, 'wb') as f:
-                tomli_w.dump(config, f)
-
-            if self.task.config.llm_config.model_name is not None:
-                relay_base_url = self.conversation_manager._relay_session.base_url
-                relay_model = self.task.config.llm_config.model_name
-                self.logger.info(
-                    f"[CodexScaffold] Configured {config_path}:\n"
-                    f"  - Model provider: relay @ {relay_base_url} (model={relay_model})\n"
-                    f"  - MCP server: lean-research @ {mcp_url}"
-                )
-            else:
-                self.logger.info(
-                    f"[CodexScaffold] Configured {config_path}:\n"
-                    f"  - Model provider: official Codex models (no relay)\n"
-                    f"  - MCP server: lean-research @ {mcp_url}"
-                )
-
-        except Exception as e:
-            self.logger.warning(f"[CodexScaffold] Failed to configure Codex TOML: {e}")
-
-    async def _run_batch_mode(self) -> None:
-        """Run batch mode using subprocess"""
-        # Use workspaces directory directly (like ape_agent)
-        if not self.task.scratch_workspace:
-            raise RuntimeError("Scratch workspace not initialized for Codex scaffold")
-
-        # Use workspaces directory directly
-        cwd = str(self.task.workspaces_dir)
-        task_user_prompt = await self.task.create_user_prompt()
-
-        # Build system prompt with absolute paths and merge into first user prompt (Claude Code style)
-        from ape.scaffolds.prompts import build_system_prompt
         system_prompt = await build_system_prompt(
             scratch_workspace=self.task.scratch_workspace,
             target_workspace=self.task.target_workspace,
             reference_workspaces=self.task.reference_workspaces,
             use_absolute_paths=True,
+            batch_preamble=self.task.config.batch_preamble,
+            workspace_environment=self.task.config.workspace_environment,
             logger=self.logger
         )
         system_prompt += (
             f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
             f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
+        )
+        # About shell commands, so only where Codex has a shell: a review condition disables it.
+        if "shell_tool" not in self.task.config.disabled_features:
+            system_prompt += (
             f"\n"
             f"CRITICAL - Shell Command Requirements:\n"
             f"When using shell/bash tools, you MUST use absolute paths for ALL commands:\n"
@@ -193,8 +148,20 @@ class CodexScaffold(BaseScaffold):
             f"  - /bin/ls, /bin/cat, /bin/grep, /bin/sed, /bin/awk, /bin/rm, /bin/cp, /bin/mv\n"
             f"  - /bin/bash, /bin/sh, /usr/bin/find, /usr/bin/git, /usr/bin/python\n"
             f"This is required because PATH environment variable is not available in the shell environment.\n"
-        )
-        initial_prompt = f"{system_prompt}\n\n{'='*80}\n\n{task_user_prompt}"
+            )
+        system_prompt = await with_task_system_prompt(system_prompt, self.task, self.logger)
+        task_user_prompt = await self.task.create_user_prompt()
+        return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+
+    async def _run_batch_mode(self) -> None:
+        """Run batch mode using subprocess"""
+        # Use workspaces directory directly (like ape_agent)
+        if not self.task.scratch_workspace:
+            raise RuntimeError("Scratch workspace not initialized for Codex scaffold")
+
+        # Use workspaces directory directly
+        cwd = str(self.task.workspaces_dir)
+        initial_prompt = await self._initial_prompt(cwd)
 
         self.logger.info(f"[CodexScaffold] Starting batch conversation (cwd: {cwd})")
 
@@ -276,7 +243,7 @@ class CodexScaffold(BaseScaffold):
         CLI mode execution - using codex command line tool
 
         Key differences from batch mode:
-        - No CodexBridge (direct codex command)
+        - Direct codex command, interactive
         - TOML already configured (relay + MCP)
         - All UI handled by codex CLI
 
@@ -304,32 +271,7 @@ class CodexScaffold(BaseScaffold):
                     raise RuntimeError("Task workspaces are not initialized for Codex CLI mode")
 
                 cwd_path = self.task.workspaces_dir
-                cwd = str(cwd_path)
-
-                from ape.scaffolds.prompts import build_system_prompt
-
-                system_prompt = await build_system_prompt(
-                    scratch_workspace=self.task.scratch_workspace,
-                    target_workspace=self.task.target_workspace,
-                    reference_workspaces=self.task.reference_workspaces,
-                    use_absolute_paths=True,
-                    logger=self.logger
-                )
-                system_prompt += (
-                    f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
-                    f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
-                    f"\n"
-                    f"CRITICAL - Shell Command Requirements:\n"
-                    f"When using shell/bash tools, you MUST use absolute paths for ALL commands:\n"
-                    f"  - Correct: /bin/ls, /bin/cat, /bin/grep, /usr/bin/git, /bin/sh\n"
-                    f"  - Wrong: ls, cat, grep, git, sh\n"
-                    f"Common command paths:\n"
-                    f"  - /bin/ls, /bin/cat, /bin/grep, /bin/sed, /bin/awk, /bin/rm, /bin/cp, /bin/mv\n"
-                    f"  - /bin/bash, /bin/sh, /usr/bin/find, /usr/bin/git, /usr/bin/python\n"
-                    f"This is required because PATH environment variable is not available in the shell environment.\n"
-                )
-                task_user_prompt = await self.task.create_user_prompt()
-                task_prompt = f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+                task_prompt = await self._initial_prompt(cwd_path)
                 initial_prompt = merge_task_prompt(task_prompt, prompt)
 
             cwd = str(cwd_path)
@@ -396,6 +338,18 @@ class CodexScaffold(BaseScaffold):
 
     async def _cleanup_components(self) -> None:
         """Cleanup components"""
+        # The audit first, so every attempt carries one whatever happens after.
+        if self.task.attempt_path and not self.is_cli_mode:
+            try:
+                events = self.task.attempt_path / "codex_events.jsonl"
+                report = audit_events(events, self.task.config)
+                (self.task.attempt_path / "containment_audit.json").write_text(json.dumps(report, indent=2))
+                log = self.logger.info if report["clean"] and report["usable"] else self.logger.error
+                log(f"[CodexScaffold] containment audit: clean={report['clean']} usable={report['usable']} "
+                    f"{report['by_kind']}")
+            except Exception:
+                self.logger.error(f"containment audit failed:\n{traceback.format_exc()}")
+
         # 1. Cleanup conversation
         if self.conversation_manager:
             await self.conversation_manager.cleanup()
@@ -445,6 +399,104 @@ class CodexScaffold(BaseScaffold):
         return {
             "PATH": "/root/lean_research/data/resources/node-v18.20.1-linux-x64/bin:/root/lean_research/data/resources:$PATH"
         }
+
+
+#: Event items that show the CLI acting outside APE's tools. With the shell, edits and the web
+#: disabled none should appear; one that does is a leak, whatever it did.
+_OUTSIDE_APE = frozenset({"command_execution", "file_change", "web_search"})
+
+
+def audit_events(events: Path, config) -> dict:
+    """Every item a `codex exec` session reported, checked against its grant.
+
+    `leaks`: an item that ran outside APE's tools (a shell command, a file change, a web search),
+    or an MCP call to a server other than `core`. `refused`: an MCP call the CLI cancelled, which
+    leaks nothing but means the grant was not usable ("user cancelled MCP tool call" is what the
+    approval prompt does in exec mode). A missing log is unauditable, recorded as such.
+    """
+    by_kind: Dict[str, int] = {}
+    leaks, refused = [], []
+    if not events.exists():
+        return {"events": str(events), "by_kind": {}, "leaks": [], "refused": [], "clean": False,
+                "usable": False, "error": "no codex_events.jsonl; nothing was audited"}
+    for line in events.read_text(encoding="utf-8").splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if event.get("type") != "item.completed":
+            continue
+        item = event.get("item") or {}
+        kind = item.get("type") or "?"
+        by_kind[kind] = by_kind.get(kind, 0) + 1
+        if kind in _OUTSIDE_APE:
+            leaks.append({"kind": kind, "item": {k: item.get(k) for k in ("command", "changes", "query")}})
+        elif kind == "mcp_tool_call":
+            if item.get("server") != "core":
+                leaks.append({"kind": kind, "server": item.get("server"), "tool": item.get("tool")})
+            elif "cancelled" in str((item.get("error") or {}).get("message", "")):
+                refused.append({"tool": item.get("tool"), "error": item["error"]["message"]})
+    return {"events": str(events), "by_kind": by_kind, "leaks": leaks, "refused": refused,
+            "clean": not leaks, "usable": not refused}
+
+
+def codex_model_name(config) -> str:
+    """The model name Codex is told: `codex_model`, or `llm_config.model_name` as OpenAI spells it."""
+    return config.codex_model or config.llm_config.model_name.replace("_", "-")
+
+
+def codex_config(config, model: str, relay_base_url: str, mcp_url: str,
+                 catalog: Optional[Path]) -> dict:
+    """The attempt's config.toml as a dict: the relay as the only provider, the MCP server as
+    `core` with its tools pre-approved, and the configured sandbox, features and web search.
+
+    `default_tools_approval_mode = "approve"`: in `codex exec`, a call that would ask for approval
+    is cancelled ("user cancelled MCP tool call"), so without it no APE tool runs. Captured
+    2026-10-01 against a local server. `project_doc_max_bytes = 0`: the workspace sits inside
+    this repository, and an AGENTS.md above it would reach the reviewer as CLAUDE.md once did.
+    """
+    settings = {
+        "model": model,
+        "model_provider": "relay",
+        "approval_policy": config.approval_policy,
+        "sandbox_mode": config.sandbox_mode,
+        "web_search": "live" if config.web_search else "disabled",
+        "project_doc_max_bytes": 0,
+        "model_providers": {"relay": {"name": "relay", "base_url": relay_base_url,
+                                      "wire_api": "responses"}},
+        "mcp_servers": {"core": {"url": mcp_url, "enabled": True,
+                                 "default_tools_approval_mode": "approve",
+                                 "startup_timeout_sec": 3600, "tool_timeout_sec": 3600}},
+    }
+    if config.disabled_features:
+        settings["features"] = {name: False for name in config.disabled_features}
+    if config.sandbox_mode == "workspace-write":
+        settings["sandbox_workspace_write"] = {"network_access": config.network_access}
+    if catalog is not None:
+        settings["model_catalog_json"] = str(catalog)
+    return settings
+
+
+async def write_model_catalog(codex_home: Path, model: str, logger) -> Optional[Path]:
+    """Codex's own catalog entry for `model`, with `supports_search_tool` off, so the MCP tools
+    are listed in each request rather than found through `tool_search`. `None`, leaving Codex's
+    bundled catalog, if this CLI has no entry for the model."""
+    proc = await asyncio.create_subprocess_exec(
+        "codex", "debug", "models", "--bundled",
+        env={**os.environ, "HOME": str(codex_home.parent), "CODEX_HOME": str(codex_home)},
+        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
+    out, _ = await proc.communicate()
+    try:
+        models = json.loads(out)["models"]
+    except (ValueError, KeyError, TypeError):
+        raise RuntimeError("`codex debug models --bundled` gave no catalog")
+    entry = next((m for m in models if m.get("slug") == model), None)
+    if entry is None:
+        logger.warning(f"[CodexScaffold] no catalog entry for {model}; Codex uses its fallback metadata")
+        return None
+    path = codex_home / "model_catalog.json"
+    path.write_text(json.dumps({"models": [{**entry, "supports_search_tool": False}]}))
+    return path
 
 
 # Automatic registration

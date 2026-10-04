@@ -1,0 +1,70 @@
+[
+ {
+  "target": "Cardinal.infinite_pigeonhole_card_lt",
+  "claim": "The new proof splits on #α < ℵ₀ and sends each branch through infinite_pigeonhole_card with a regular θ (ℵ₀ via isRegular_aleph0, succ #α via isRegular_succ). Under the new hypothesis ℵ₀ ≤ #β the statement follows in one step from the fibre-sum bound: if every fibre has at most #α elements then #β ≤ #α * #α < #β. That proof has no case split and uses no cofinality lemma. The PR's finite branch is also a textual copy of exists_infinite_fiber's finite branch.",
+  "requested_change": "Replace the body with\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f H).not_gt (mul_lt_of_lt hβ h h)",
+  "severity": "advisory",
+  "evidence": "c1 compiles, and the file's callers still compile. c2: the pre-PR proof cannot be kept, because it uses ℵ₀ ≤ #α twice, so the PR must rewrite this proof anyway and the question is only which rewrite. c26: the same route gives the universe-heterogeneous version directly from the library's lift_mk_le_lift_mk_mul_of_lift_mk_preimage_le (the file's TODO 'Generalize universes of results'). The regularity route goes through infinite_pigeonhole_card, which is one-universe only. c27/c28: compatible with the rest of the family's rewrites. Zulip context: the cofinality API has had repeated refactors (Violeta Hernández, 2025-03-02: 'a pending refactor #19698 which entirely rewrites' the cofinality file), so a proof that does not depend on it is cheaper to maintain. The proof_profile tool was unavailable (no declaration table for the base commit), so there is no ranked-tactic census behind this.",
+  "construction": [
+   "c1",
+   "c2",
+   "c26",
+   "c27",
+   "c28"
+  ]
+ },
+ {
+  "target": "Cardinal.exists_uncountable_fiber",
+  "claim": "The 7-line proof rewrites Uncountable into ℵ₁ ≤ # through succ_aleph0 and Order.succ_le_iff, then splits on #α < ℵ₀, using isRegular_aleph_one in one branch and Order.succ_le_succ_iff in the other. The fibre-sum bound closes it uniformly in three lines: if every fibre is countable then #β ≤ #α * ℵ₀ < #β, since both factors are below #β.",
+  "requested_change": "Replace the body with\n  rw [← aleph0_lt_mk_iff] at hβ\n  by_contra! H\n  exact (mk_le_mk_mul_of_mk_preimage_le f fun a => mk_le_aleph0).not_gt (mul_lt_of_lt hβ.le h hβ)",
+  "severity": "advisory",
+  "evidence": "c4 compiles with no warnings (c3 shows that by_contra! already turns ¬Uncountable into Countable). c6: the alternative through pass 3's countable twin (Set.Countable.of_preimage_singleton) plus infinite_pigeonhole_card_lt also compiles, but takes 7 lines. c25: a shared c-general lemma would make this a two-liner, but c4 already removes the repetition without a new declaration. c26: the lift form of the same proof compiles for domain and codomain in different universes.",
+  "construction": [
+   "c3",
+   "c4",
+   "c6",
+   "c25",
+   "c26",
+   "c28"
+  ]
+ },
+ {
+  "target": "Cardinal.exists_infinite_fiber'",
+  "claim": "The argument `(by rw [Cardinal.infinite_iff] at hα ⊢; exact hα.trans h.le)` is a single term. Inside `namespace Cardinal` the `Cardinal.` qualifier is also redundant.",
+  "requested_change": "exists_infinite_fiber f h (infinite_iff.2 ((infinite_iff.1 hα).trans h.le))",
+  "severity": "advisory",
+  "evidence": "c14 compiles. c15: the embedding route (Infinite.of_injective with le_def) also compiles but is no shorter, and no dedicated lemma was found. c11, c13: deriving the primed lemma from the unprimed one, as the PR does, is the right direction; the reverse is no shorter.",
+  "construction": [
+   "c14",
+   "c15",
+   "c11",
+   "c13"
+  ]
+ },
+ {
+  "target": "Cardinal.le_range_of_union_finset_eq_univ",
+  "claim": "Dropping `have k` is the right simplification: c17 shows the old proof survives only on the primed lemma. Around that change the proof keeps `by_contra h; simp only [not_le] at h`, a Prop-valued `let u`, a hand-built u'/v' via Exists.choose, and a closing `@Infinite.of_injective … inclusion` step. The PR also writes the new call as `(by infer_instance)`. Now that the hypothesis is literally `= Set.univ`, `Set.iUnion_eq_univ_iff.mp w` is the cover, and `choose` plus `Set.Infinite.mono` against `Finset.finite_toSet` finish the proof.",
+  "requested_change": "Either the minimal idiom pass (c18: `by_contra! h`, `have u`, `inferInstance`), or the 7-line proof:\n  by_contra! h\n  choose g hg using iUnion_eq_univ_iff.mp w\n  obtain ⟨⟨-, a, rfl⟩, p⟩ :=\n    exists_infinite_fiber (fun b ↦ (⟨f (g b), mem_range_self _⟩ : range f)) h inferInstance\n  refine (infinite_coe_iff.mp p |>.mono fun b hb ↦ ?_) (f a).finite_toSet\n  simp only [mem_preimage, mem_singleton_iff, Subtype.mk.injEq] at hb\n  exact hb ▸ hg b",
+  "severity": "advisory",
+  "evidence": "c16/c17: the pre-PR proof fails only at the call, and deleting `have k` is what the generalisation pays for. c18, c19 and c20 all compile. c28: the full-file version with c20 compiles. Most of the steps rewritten here predate the PR, so this is a 'while you are here' request on a proof the PR already edits.",
+  "construction": [
+   "c16",
+   "c17",
+   "c18",
+   "c19",
+   "c20",
+   "c28"
+  ]
+ },
+ {
+  "target": "linearIndependent_le_infinite_basis",
+  "claim": "The PR's edited line passes the explicit class argument as `(by infer_instance)`, where a term `inferInstance` does the job.",
+  "requested_change": "Cardinal.exists_infinite_fiber' Φ h inferInstance. This is moot if the class arguments become instance-implicit, as pass 3's c13 compiled.",
+  "severity": "advisory",
+  "evidence": "c22 compiles. c21: the pre-PR line fails ('failed to synthesize Infinite κ'), so the switch to the primed lemma is the necessary minimal fix. Census over Mathlib at the base commit: `(by infer_instance)` has 34 matches in 27 files, against 133 matches in 97 files for ` inferInstance)`. That is a preference, not an established rule.",
+  "construction": [
+   "c21",
+   "c22"
+  ]
+ }
+]

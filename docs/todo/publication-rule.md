@@ -83,3 +83,11 @@ that measures the gate again should find the ruling rather than the proposal.
   recorded there as an arm property, and it is also 38% of total output with zero hits),
   [selection-signal.md](selection-signal.md) (what may and may not be ranked on),
   [adjudication-rubric.md](adjudication-rubric.md) (the blocker on the volume cost).
+
+**Seen since, recorded for when the ruling is revisited (2026-09-29, no change proposed).** On the
+post-cutoff probe's lead runs, the gate published neither of the two asks the run reached
+(`results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md`, the arms condition). One was
+the title fix, found twice in one run. The two requested changes differ only in their quote marks,
+backticks in one and curly quotes in the other. `canonical_action` normalises case and whitespace
+only, so `merge.py` read one fix as two conflicting transformations and demoted both. That is a
+different loss from the collector axis above: identical asks cancelling each other.

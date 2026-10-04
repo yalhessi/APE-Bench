@@ -95,3 +95,24 @@ reasoning tokens per call an arm's 10-20 calls add ~$0.15-0.30. Chat Completions
 between turns, so a null there does not settle reasoning in general. Retire `thinking_budget_tokens`
 from the 37 configs (28 at 8000, 7 at 30000, 2 at 3000) in the same commit that makes the effort
 explicit, so no config reads as thinking when it does not.
+
+## Measured on a whole-PR session, 2026-09-29: high effort costs about twenty times, and the reasoning-off caps bind
+
+One `gpt_5.2` solo session at `reasoning_effort=high` on post-cutoff PR 43192
+(`results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md`, test (d)'s calibration):
+- It billed $3.06, $5.72 nominal, against the reasoning-off session's $0.28 nominal on the same PR.
+- It ran 36 turns in 48 minutes, at a median of 65 seconds a call.
+- It stopped at the $3.00 cap without submitting.
+
+Reasoning tokens per call grew from about 500 to 8,500 as the session went on. So every cap and
+wall-clock figure calibrated at reasoning off binds at high effort. A reasoning run needs its caps set
+from a reasoning session, not scaled from the old ones. The same session looked up the comparison
+objects that the reasoning-off sessions never did.
+
+**Finished, and at medium too (2026-09-29).** Resumed with room, the high-effort session on 43192
+submitted after 43 turns, billing $3.74 ($6.77 nominal). A medium-effort session on the same PR billed
+$1.58 in 33 turns. Both looked up the comparison objects as often as Claude does. Only high reached the
+maintainers' asks the reasoning-off sessions missed: 0.75 of four against 0.25
+(`results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md`). So the effort level matters, not
+only whether reasoning is on. A caps recalibration for reasoning runs should start from these two
+sessions.

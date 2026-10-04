@@ -82,22 +82,47 @@ MODEL_MAPPINGS = {
         "cache_creation_per_1M_usd": 0.03
     },
     "gpt_5.4": {
-        # Bare alias resolves to the latest gpt-5.4 snapshot; swap to a dated id
-        # (e.g. "gpt-5.4-YYYY-MM-DD") if the endpoint requires a pinned snapshot.
+        # The bare alias, which elm_gpt_5.4 shares (test_elm_provider); on 2026-09-30 the
+        # account listed one gpt-5.4 snapshot, gpt-5.4-2026-03-05, so the alias resolves to it.
+        # Prices are OpenAI's standard tier, short context (<= 272K), read from
+        # developers.openai.com/api/docs/pricing on 2026-09-30; they replace a placeholder copied
+        # from gpt-5.2. Reasoning is OFF when no reasoning_effort is sent (0 reasoning tokens,
+        # measured 2026-09-30).
         "model_name": "gpt-5.4",
         "provider": LLMProvider.OPENAI,
-        # PLACEHOLDER pricing copied from gpt-5.2 — update with real gpt-5.4 rates;
-        # only affects cost_usd reporting, not model behavior.
-        "input_per_1M": 1.75,
-        "output_per_1M": 14.00,
-        "cached_input_per_1M_usd": 0.125,
-        "cache_creation_per_1M_usd": 1.25
+        "input_per_1M": 2.50,
+        "output_per_1M": 15.00,
+        "cached_input_per_1M_usd": 0.25,
+        # OpenAI reports no cache-write tokens, so this rate is never applied.
+        "cache_creation_per_1M_usd": None,
+        #: HTTP 400 on /v1/chat/completions for tools with any reasoning_effort but "none",
+        #: measured 2026-09-30; gpt-5.2 accepts the combination. Absent means accepted.
+        #: `chat_completions_refusal` reads it; `openai_api: responses` is the way round.
+        "chat_completions_tools_with_reasoning": False,
+    },
+    "gpt_5.5": {
+        # Standard tier, short context (<= 272K), same source and date as gpt_5.4.
+        # Unlike gpt-5.2 and gpt-5.4, gpt-5.5 REASONS when no reasoning_effort is sent
+        # (13 reasoning tokens on a one-line arithmetic prompt, 0 with "none", measured
+        # 2026-09-30), so a reasoning-off condition must send reasoning_effort: none.
+        "model_name": "gpt-5.5-2026-04-23",
+        "provider": LLMProvider.OPENAI,
+        "input_per_1M": 5.00,
+        "output_per_1M": 30.00,
+        "cached_input_per_1M_usd": 0.50,
+        "cache_creation_per_1M_usd": None,
+        # Same 400 as gpt_5.4, measured the same day.
+        "chat_completions_tools_with_reasoning": False,
     },
     "gpt_5.2": {
         "model_name": "gpt-5.2-2025-12-11",
         "provider": LLMProvider.OPENAI,
         "input_per_1M": 1.75,
         "output_per_1M": 14.00,
+        # OpenAI's pricing page gives 0.175 (2026-09-30); 0.125 is gpt-5's rate. Kept, because
+        # tests/datasets/test_cost_model.py reproduces the record's billed figures at 0.125:
+        # every gpt_5.2 billed figure understates cached input by $0.05 per 1M. Tracked in
+        # docs/todo/framework-defects-2026-09.md.
         "cached_input_per_1M_usd": 0.125,
         "cache_creation_per_1M_usd": 1.25
     },
@@ -164,6 +189,8 @@ MODEL_MAPPINGS = {
         "cached_input_per_1M_usd": 0.125,
         "cache_creation_per_1M_usd": 1.25,
         "supports_tools": True,
+        # The gateway forwards OpenAI's 400 for this combination (2026-09-30).
+        "chat_completions_tools_with_reasoning": False,
     },
     "elm_gpt_5_mini": {
         "model_name": "gpt-5-mini",
@@ -365,6 +392,18 @@ class LLMConfig(BaseModel):
     #: against the measured row rather than letting either outcome happen at runtime.
     reasoning_effort: Optional[str] = None
 
+    #: Which OpenAI API a direct OpenAI model is called through. `chat_completions` is what
+    #: every run before this field used. `responses` exists because gpt-5.4 and gpt-5.5
+    #: reject tools with a reasoning effort on Chat Completions (HTTP 400, 2026-09-30), and
+    #: every review task sends tools; see `OpenAIResponsesProvider`. A field rather than an
+    #: inference from the model, so the run's config says which endpoint produced it.
+    openai_api: Literal["chat_completions", "responses"] = "chat_completions"
+
+    #: Responses only: carry each turn's encrypted reasoning items into the next request.
+    #: Off drops them, as Chat Completions does, which keeps a run comparable with the Chat
+    #: Completions runs; on is what OpenAI recommends for tool use, and a separate condition.
+    openai_responses_reasoning_carryover: bool = False
+
     def model_post_init(self, __context: Any) -> None:
         """Auto-configure immediately after initialization."""
         # If model_name is None, skip auto-configuration (use official models)
@@ -379,6 +418,16 @@ class LLMConfig(BaseModel):
         self.provider_type = self.detect_provider_type(self.model_name)
         if not self.api_key:
             self.api_key = self._resolve_api_key_from_environment(self.provider_type)
+        # Refused rather than ignored: a knob the run records and nothing honours.
+        if self.openai_api == "responses" and self.provider_type is not LLMProvider.OPENAI:
+            raise ConfigurationError(
+                f"openai_api: responses is for direct OpenAI models, and {self.model_name} is "
+                f"{self.provider_type.value}. The ELM gateway answers on /v1/responses too, "
+                "but it is untested here.")
+        if self.openai_responses_reasoning_carryover and self.openai_api != "responses":
+            raise ConfigurationError(
+                "openai_responses_reasoning_carryover needs openai_api: responses; Chat "
+                "Completions returns no reasoning items to carry.")
     
     @staticmethod
     def detect_provider_type(model_name: str) -> LLMProvider:
@@ -435,6 +484,18 @@ class ConfigurationError(LLMError):
 
 class ProviderError(LLMError):
     """Provider error."""
+    pass
+
+
+class RequestRejectedError(ProviderError):
+    """A request that cannot succeed as sent, so it is never retried.
+
+    Raised when the provider answers HTTP 400 naming a parameter, or when a provider refuses
+    a request before sending it. The same payload is rebuilt on every retry, so a retry can
+    only repeat the rejection: `gpt-5.4` and `gpt-5.5` at `reasoning_effort: high` were
+    rejected 27 and 25 times in ten minutes (`probe_postcutoff_gpt5{4,5}_Gr_rep1`,
+    2026-09-30), billing nothing, until the runs were stopped by hand.
+    """
     pass
 
 

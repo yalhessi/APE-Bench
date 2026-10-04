@@ -1,0 +1,27 @@
+file                                                    lines  open base_cold | cold med warm med trunc med | err-agree
+athlib/Analysis/Normed/Operator/ContinuousAlgEquiv.lean   229  26.2      32.2 |     24.0    11.72       nan | 8/8  base cold/lsp errs 0/0
+Mathlib/Topology/MetricSpace/CoveringNumbers.lean         422  10.9       6.7 |      7.1     0.44      0.12 | 8/8  base cold/lsp errs 0/0
+Mathlib/Algebra/Group/Irreducible/Indecomposable.lean     190   9.7      11.3 |      9.1     0.53      0.20 | 8/8  base cold/lsp errs 0/0
+Mathlib/Analysis/ODE/GalerkinRegularity.lean              469  34.5      47.6 |     24.0     0.89      0.08 | 6/8  base cold/lsp errs 0/0
+Mathlib/Analysis/Meromorphic/Basic.lean                   732  13.5      13.5 |     10.8     0.50      0.19 | 8/8  base cold/lsp errs 0/0
+Mathlib/Topology/Order/IsLUB.lean                         446   8.8       8.8 |      7.0     0.98      0.08 | 8/8  base cold/lsp errs 0/0
+Mathlib/LinearAlgebra/RootSystem/BaseExists.lean          138  11.7       9.2 |      9.1     2.03      1.02 | 6/8  base cold/lsp errs 0/0
+
+edits n=56  cold total 732s mean 13.1 median 9.6
+           warm total 170s mean 3.04 median 0.79  ratio of totals 4.3x
+trunc n=32 total 8.7s median 0.11; cold on the same edits 395s -> 45x
+file opens total 115s vs cold baseline compiles 129s
+session-shaped (baseline + all edits): cold 862s vs warm 286s -> 3.0x
+error-set agreement cold vs warm: 52/56; trunc presence agreement 30/32
+  DISAGREE Mathlib/Analysis/ODE/GalerkinRegularity.lean decl
+     cold: ['Tactic `rewrite` failed: motive is not type correct:\n  fun _a => ∫ (x : UnitAddCircle), (fourier n) x * star ((fourier m) x) ∂AddCircle.haar']
+     warm: ['Tactic `rewrite` failed: motive is not type correct:\n  fun _a ↦ ∫ (x : UnitAddCircle), (fourier n) x * star ((fourier m) x) ∂AddCircle.haarA']
+  DISAGREE Mathlib/Analysis/ODE/GalerkinRegularity.lean decl
+     cold: ['Forbidden axioms used: bkm_implies_regularity']
+     warm: []
+  DISAGREE Mathlib/LinearAlgebra/RootSystem/BaseExists.lean line
+     cold: ['Unknown identifier `linearIndependent_iff_card_eq_finrank_span`', 'unsolved goals\nι : Type u_1\nR : Type u_2\nM : Type u_3\nN : Type u_4\ninst✝¹⁰ : Finite ι\ninst✝⁹ : AddCommGroup M\ninst✝⁸ : AddCommGroup N\ninst✝⁷']
+     warm: ['Unknown identifier `linearIndependent_iff_card_eq_finrank_span`', 'unsolved goals\nι : Type u_1\nR : Type u_2\nM : Type u_3\nN : Type u_4\ninst✝¹⁰ : Finite ι\ninst✝⁹ : AddCommGroup M\ninst✝⁸ : AddCommGroup N\ninst✝⁷']
+  DISAGREE Mathlib/LinearAlgebra/RootSystem/BaseExists.lean line
+     cold: ['Unknown identifier `linearIndependent_iff_card_eq_finrank_span`', 'unsolved goals\nι : Type u_1\nR : Type u_2\nM : Type u_3\nN : Type u_4\ninst✝¹⁰ : Finite ι\ninst✝⁹ : AddCommGroup M\ninst✝⁸ : AddCommGroup N\ninst✝⁷']
+     warm: ['Unknown identifier `linearIndependent_iff_card_eq_finrank_span`', 'unsolved goals\nι : Type u_1\nR : Type u_2\nM : Type u_3\nN : Type u_4\ninst✝¹⁰ : Finite ι\ninst✝⁹ : AddCommGroup M\ninst✝⁸ : AddCommGroup N\ninst✝⁷']

@@ -1,0 +1,309 @@
+[
+ {
+  "pr": 33066,
+  "session": "X1",
+  "calls": 48,
+  "findings": 12,
+  "flagged": []
+ },
+ {
+  "pr": 33098,
+  "session": "X1",
+  "calls": 37,
+  "findings": 15,
+  "flagged": []
+ },
+ {
+  "pr": 33117,
+  "session": "X1",
+  "calls": 26,
+  "findings": 11,
+  "flagged": []
+ },
+ {
+  "pr": 33145,
+  "session": "X1",
+  "calls": 34,
+  "findings": 9,
+  "flagged": []
+ },
+ {
+  "pr": 33149,
+  "session": "X1",
+  "calls": 42,
+  "findings": 30,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside dit/ya475/APE-Bench/.ape/probe_scratch/dev_medium_0_3_0/raw/pr33149/X1"
+    ],
+    "input": "D=<dir>; ls -t /research/projects/proofedit/ya475/APE-Bench/.ape/probe_scratch/dev_medium_0_3_0/raw/pr33149/X1/ 2>/dev/null | head -3; echo; tail -1 $D/calls.js"
+   }
+  ]
+ },
+ {
+  "pr": 33285,
+  "session": "X1",
+  "calls": 40,
+  "findings": 9,
+  "flagged": []
+ },
+ {
+  "pr": 33294,
+  "session": "X1",
+  "calls": 45,
+  "findings": 12,
+  "flagged": []
+ },
+ {
+  "pr": 33304,
+  "session": "X1",
+  "calls": 37,
+  "findings": 1,
+  "flagged": []
+ },
+ {
+  "pr": 33305,
+  "session": "X1",
+  "calls": 37,
+  "findings": 4,
+  "flagged": []
+ },
+ {
+  "pr": 33315,
+  "session": "X1",
+  "calls": 39,
+  "findings": 4,
+  "flagged": []
+ },
+ {
+  "pr": 33321,
+  "session": "X1",
+  "calls": 45,
+  "findings": 11,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside -Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/bsg39wjcn.txt"
+    ],
+    "input": "sed -n 1,400p /common/home/ya475/.claude/projects/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/bsg39wjcn.txt |"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside -Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/bsg39wjcn.txt"
+    ],
+    "input": "sed -n 400,800p /common/home/ya475/.claude/projects/-research-projects-proofedit-ya475-APE-Bench/029323d7-a6e4-45de-bea4-7052b7e4f379/tool-results/bsg39wjcn.txt"
+   }
+  ]
+ },
+ {
+  "pr": 33337,
+  "session": "X1",
+  "calls": 22,
+  "findings": 2,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/tmp/edit1.py <<'EOF'\nimport json\nrep = '''theorem coe_starProjection_eq_isCompl_projection [K.HasOrthogonalProjection] :\n    K.starProjection."
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/tmp/edit2.py <<'EOF'\nimport json, sys\nname = sys.argv[1]\nrep = f'''open Submodule in\ntheorem {name} [K.HasOrthogonalProjection] :\n    K.starPr"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; /research/projects/proofedit/ya475/APE-Bench/ape/bin/python $D/tmp/edit2.py toLinearMap_starProjection_eq_isCompl_projection > $D/tmp/edit3.json; $D/pt"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/findings.json <<'EOF'\n[\n  {\n    \"target\": \"Submodule.coe_starProjection_eq_isComplProjection\",\n    \"claim\": \"The rename writes `IsCompl.projec"
+   }
+  ]
+ },
+ {
+  "pr": 33362,
+  "session": "X1",
+  "calls": 21,
+  "findings": 7,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/tmp/mk.py <<'PYEOF'\nimport json, pathlib\nD = pathlib.Path(__file__).resolve().parent.parent\nmoddoc = (D / \"tmp/moddoc.txt\").read_text().rstrip"
+   }
+  ]
+ },
+ {
+  "pr": 33421,
+  "session": "X1",
+  "calls": 36,
+  "findings": 10,
+  "flagged": []
+ },
+ {
+  "pr": 33438,
+  "session": "X1",
+  "calls": 22,
+  "findings": 2,
+  "flagged": []
+ },
+ {
+  "pr": 33098,
+  "session": "X2",
+  "calls": 40,
+  "findings": 19,
+  "flagged": []
+ },
+ {
+  "pr": 33117,
+  "session": "X2",
+  "calls": 32,
+  "findings": 10,
+  "flagged": []
+ },
+ {
+  "pr": 33145,
+  "session": "X2",
+  "calls": 30,
+  "findings": 10,
+  "flagged": []
+ },
+ {
+  "pr": 33285,
+  "session": "X2",
+  "calls": 43,
+  "findings": 8,
+  "flagged": []
+ },
+ {
+  "pr": 33294,
+  "session": "X2",
+  "calls": 45,
+  "findings": 11,
+  "flagged": []
+ },
+ {
+  "pr": 33304,
+  "session": "X2",
+  "calls": 36,
+  "findings": 1,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "P=<dir>/ptool; T=<dir>/tmp\n$P content_search '{\"content_pattern\":\"`[A-Za-z_/]*[a-z_]\\\\.lean`\",\"path\":\"target/Mathlib/CategoryTheory\",\"limit\":500,\"max_matches_pe"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "cd <dir> && /research/projects/proofedit/ya475/APE-Bench/ape/bin/python -c \"import json; d=json.load(open('findings.json')); print(len(d))\" Validate findings.js"
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "cd <dir> && /research/projects/proofedit/ya475/APE-Bench/ape/bin/python -c \"import json; d=json.load(open('findings.json')); print(d[0]['requested_change'])\" Ch"
+   }
+  ]
+ },
+ {
+  "pr": 33305,
+  "session": "X2",
+  "calls": 33,
+  "findings": 3,
+  "flagged": []
+ },
+ {
+  "pr": 33066,
+  "session": "X2",
+  "calls": 68,
+  "findings": 12,
+  "flagged": []
+ },
+ {
+  "pr": 33337,
+  "session": "X2",
+  "calls": 28,
+  "findings": 1,
+  "flagged": [
+   {
+    "tool": "Bash",
+    "why": [
+     "outside dit/ya475/APE-Bench/.ape/probe_scratch/dev_medium_0_3_0/raw/pr33337/X2"
+    ],
+    "input": "D=<dir>; cat /research/projects/proofedit/ya475/APE-Bench/.ape/probe_scratch/dev_medium_0_3_0/raw/pr33337/X2/*.err 2>/dev/null | tail -20; $D/ptool file_search "
+   },
+   {
+    "tool": "Bash",
+    "why": [
+     "outside /research/projects/proofedit/ya475/APE-Bench/ape/bin/python"
+    ],
+    "input": "D=<dir>; cat > $D/findings.json <<'EOF'\n[\n  {\n    \"target\": \"Submodule.coe_starProjection_eq_isComplProjection\",\n    \"claim\": \"The new name `Submodule.coe_starP"
+   }
+  ]
+ },
+ {
+  "pr": 33149,
+  "session": "X2",
+  "calls": 50,
+  "findings": 33,
+  "flagged": []
+ },
+ {
+  "pr": 33315,
+  "session": "X2",
+  "calls": 46,
+  "findings": 5,
+  "flagged": []
+ },
+ {
+  "pr": 33321,
+  "session": "X2",
+  "calls": 72,
+  "findings": 18,
+  "flagged": []
+ },
+ {
+  "pr": 33362,
+  "session": "X2",
+  "calls": 21,
+  "findings": 8,
+  "flagged": []
+ },
+ {
+  "pr": 33421,
+  "session": "X2",
+  "calls": 35,
+  "findings": 10,
+  "flagged": []
+ },
+ {
+  "pr": 33438,
+  "session": "X2",
+  "calls": 22,
+  "findings": 2,
+  "flagged": []
+ }
+]

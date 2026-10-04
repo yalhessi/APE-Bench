@@ -1,0 +1,13 @@
+12 sessions, 146 calls (41 snippets)
+route               n  cold med  server med  cold tot  server tot   agree
+as_is:baseline     10      13.1       13.47       180         171   10/10
+cut                54       9.7        0.47       712         209   54/54
+header:open         4      16.2       23.11        67          84    4/4
+snippet:open       24       8.2        8.53       267         286   24/24
+snippet:warm       17      22.7        0.36       328          69   14/17
+whole              37      10.3        2.17       516         175   36/37
+snippet: cold median 10.5 s, total 596 s | server median 7.17 s, total 355 s (1.7x) | agree 38/41
+edit   : cold median 10.3 s, total 1475 s | server median 1.65 s, total 639 s (2.3x) | agree 104/105
+all calls: cold 2071 s, one server per session 994 s (2.1x)
+per-session speedup (min / median / max): 0.8 2.2 7.2
+disagreements: [('e9a7156e27edd5f1801f', 'whole', 2, 2), ('e9a7156e27edd5f1801f', 'snippet:warm', 3, 3), ('e9a7156e27edd5f1801f', 'snippet:warm', 4, 4), ('78ce48549f1a43acb7fb', 'snippet:warm', 1, 1)]

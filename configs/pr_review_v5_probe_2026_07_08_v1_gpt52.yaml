@@ -1,0 +1,19 @@
+# Test (b) of docs/todo/reviewer-model-gap.md: the pipeline's model on the post-cutoff probe set
+# (results/pr_review_v5/probes/gpt52-postcutoff-2026-09-29/README.md). The solo task (whole PR,
+# ape_agent) on the 6 probe-2026-07-08-v1 PRs with round-1 asks. Its two conditions,
+# ..._gpt52_G.yaml and ..._gpt52_K.yaml, differ only in the brief. A solo config cannot extend the
+# probe's dataset config, since it needs bases/v5_solo.yaml's routing and caps, so this restates it.
+extends: bases/v5_solo.yaml
+
+scaffold_type: ape_agent
+
+dataset:
+  release: inputs/probes/probe-2026-07-08-v1
+  modification_inventory: inputs/probes/probe-2026-07-08-v1/derived/modification_inventory.jsonl
+  require_reviewed_workspaces: true
+  pr_numbers: [41930, 42184, 42814, 43024, 43167, 43192]
+  # The five context tools the Claude sessions held through `cli tool` (toolbox.CONTEXT_TOOLS).
+  solo_context_tools: [zulip_search, precedent_search, declaration_search, naming_norm, proof_profile]
+  # 6 PRs x solo_cost_cap $1.50 = $9.00 worst case a run.
+  run_total_cost_cap: 9.50
+  run_total_token_cap: 11400000

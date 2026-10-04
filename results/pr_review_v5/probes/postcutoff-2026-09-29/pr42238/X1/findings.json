@@ -1,0 +1,16 @@
+[
+  {
+    "target": "LinearIsometry.comp_assoc",
+    "claim": "The fourth-ring variables for `LinearIsometry.comp_assoc` are scoped with a named `section assoc` ... `end assoc` wrapper whose only content is one `variable` block and one theorem; the four lines of section boilerplate add nothing over the `variable ... in` idiom, which this file already uses (`variable (R) in` at lines 995 and 1109).",
+    "requested_change": "Delete `section assoc` / `end assoc` around `LinearIsometry.comp_assoc` (lines 333-343) and attach the variable block to the theorem with `in`: `variable {R₄ E₄ : Type*} [Semiring R₄] [SeminormedAddCommGroup E₄] [Module R₄ E₄] {σ₁₄ : R →+* R₄} {σ₂₄ : R₂ →+* R₄} {σ₃₄ : R₃ →+* R₄} [RingHomCompTriple σ₁₂ σ₂₄ σ₁₄] [RingHomCompTriple σ₂₃ σ₃₄ σ₂₄] [RingHomCompTriple σ₁₃ σ₃₄ σ₁₄] in` directly before `theorem comp_assoc ...`.",
+    "severity": "advisory",
+    "evidence": "file_read of target/Mathlib/Analysis/Normed/Operator/LinearIsometry.lean lines 333-343 shows the section contains only the variable block and `comp_assoc`; content_search for `^variable` shows `variable (R) in` (l.995) and `variable (R H) in` (l.1109) already in this file, and a sample of Mathlib/Analysis/Normed shows `variable [...] in` for single declarations in lpSpace.lean, Ceva.lean, Fredholm/Basic.lean, Group/Basic.lean. lean_verify_edit (line mode, lines 333-343 replaced by the `variable ... in` form): success, no errors, no warnings. The PR's performance effect is unchanged because the variables remain in scope only for `comp_assoc`."
+  },
+  {
+    "target": "LinearIsometryEquiv.trans_assoc",
+    "claim": "The fourth-ring variables for `LinearIsometryEquiv.trans_assoc` are scoped with a second named `section assoc` ... `end assoc` wrapper that holds only one `variable` block and one theorem, where the file's own `variable ... in` idiom scopes them to that single declaration without the section boilerplate.",
+    "requested_change": "Delete `section assoc` / `end assoc` around `LinearIsometryEquiv.trans_assoc` (lines 777-791), append ` in` to the last line of the variable block (`... [RingHomCompTriple σ₄₃ σ₃₁ σ₄₁] in`), and place it directly before `theorem trans_assoc ...`, consistently with the same change for `LinearIsometry.comp_assoc`.",
+    "severity": "advisory",
+    "evidence": "file_read of lines 777-791 shows the section contains only the variable block and `trans_assoc`; all six RingHomInvPair and six RingHomCompTriple binders are needed by the statement (each of `eE₂E₃.trans eE₃E₄`, `eEE₂.trans (...)`, `(eEE₂.trans eE₂E₃).trans eE₃E₄` consumes one CompTriple pair and one InvPair pair), so the block itself is minimal. lean_verify_edit (line mode, lines 777-791 replaced by the `variable ... in` form): success, no errors, no warnings. The only use in Mathlib is `rw [LinearIsometryEquiv.trans_assoc]` in Analysis/InnerProductSpace/PiL2.lean (content_search over all 8315 files), which is unaffected."
+  }
+]

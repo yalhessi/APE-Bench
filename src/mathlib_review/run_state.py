@@ -7,9 +7,10 @@ guarantee had to be assembled by reading three files and hoping they agreed. The
 reason to write it down is that the next change has somewhere to be checked against.
 
     planned ──▶ running ◀──▶ paused
-                   │
+                   │  ▲
+                   │  └── reopen (--resume: requeue the sessions that failed on errors)
                    ├──▶ generated ──▶ finalized ──▶ judged
-                   └──▶ partial
+                   ├──▶ partial ─┘
                    └──▶ failed
 
 **`paused` is not `partial`.** `paused` is a run state: work stopped on a budget or turn limit
@@ -67,8 +68,10 @@ TRANSITIONS: Dict[RunState, FrozenSet[RunState]] = {
     RunState.FINALIZED: frozenset({RunState.JUDGED}),
     # `partial` and `failed` are terminal for the successful chain. Forensic reading of either
     # is allowed and is not a transition -- it produces a separately labelled artifact rather
-    # than moving the run forward.
-    RunState.PARTIAL: frozenset(),
+    # than moving the run forward. A partial run may be reopened (`run --resume`), which
+    # requeues the sessions that failed on errors and goes back to running; it is then closed
+    # by reconciliation like any run, never straight into the successful chain.
+    RunState.PARTIAL: frozenset({RunState.RUNNING}),
     RunState.FAILED: frozenset(),
     RunState.JUDGED: frozenset(),
 }

@@ -1,0 +1,22 @@
+# The contract condition (results/pr_review_v5/probes/contract-2026-10-01/README.md): gpt_5.2 at
+# high effort, reasoning carried (Grc1), under the contract the Claude reviewers held, on the dev
+# set. Hits per finding match Claude's and gpt says a third as much about a third as many objects;
+# these are the differences between the two contracts (docs/todo/reviewer-model-gap.md, 2026-10-01):
+# - review_notes: brief X's object-by-object `notes.md`, as a required field of the submission;
+# - filing_bar: request, so neither the tool nor the mandate asks for a merge verdict, as
+#   Claude's findings.json never did (the brief stays G, which is X without its output section);
+# - batch_preamble: plain, without "TEXT ALONE ... accomplishes NOTHING", batching and
+#   "COMPLETED and VALIDATED";
+# - file_search, which the 30 dev Claude sessions called 396 times through `cli tool`.
+# 160 turns, so a longer per-object pass cannot be cut off (Grc1: median 18, max 45).
+extends: pr_review_v5_dev_medium_gpt52_Grc.yaml
+
+batch_preamble: plain
+
+execution:
+  max_turns: 160
+
+task_config:
+  filing_bar: request
+  review_notes: true
+  enabled_tools: [file_read, content_search, file_search, lean_verify, get_lean_goal, code_hover, code_goto]

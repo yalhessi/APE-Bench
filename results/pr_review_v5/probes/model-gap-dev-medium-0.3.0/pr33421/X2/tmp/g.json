@@ -1,0 +1,1 @@
+{"path":"Mathlib/Topology/Algebra/Order/Floor.lean","declaration_name":"continuousOn_floor_compl_range","new_declaration":"@[fun_prop]\ntheorem continuousOn_floor_compl_range : ContinuousOn (floor : α → ℤ) (range Int.cast)ᶜ :=\n  fun _x hx ↦ (continuousAt_floor fun h ↦ hx ⟨_, h.symm⟩).continuousWithinAt"}

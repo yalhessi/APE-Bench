@@ -14,7 +14,7 @@ import warnings
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING, List, Dict, Any
 
-from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, HookMatcher
 from ape.cli.task_session import is_internal_cli_task, merge_task_prompt
 from ape.scaffolds.base import BaseScaffold
 from ape.scaffolds.skills import (
@@ -43,6 +43,9 @@ class ClaudeCodeScaffold(BaseScaffold):
         self.mcp_manager: Optional[MCPManager] = None
         self.managed_skills = None
         self.skill_overlay_root: Optional[Path] = None
+        # Set when batch mode runs contained: what the session may touch, and what it was refused.
+        self.containment_roots: Optional[List[str]] = None
+        self.containment_refusals: List[Dict[str, Any]] = []
 
     def _setup_asyncio_exception_handler(self) -> None:
         """Configure asyncio exception handler"""
@@ -126,6 +129,107 @@ class ClaudeCodeScaffold(BaseScaffold):
             self.task.attempt_path
         )
 
+    async def _initial_prompt(self, cwd) -> str:
+        """The first message: the workspace preamble, the task's own contract, then the task.
+
+        Claude Code keeps its own system prompt, so this scaffold has always sent APE's preamble
+        in the first user message; the task's contract travels with it, in the order `ape_agent`
+        gives the two in its system message. Batch and CLI modes send the same text.
+        """
+        from ape.scaffolds.prompts import build_system_prompt, with_task_system_prompt
+
+        system_prompt = await build_system_prompt(
+            scratch_workspace=self.task.scratch_workspace,
+            target_workspace=self.task.target_workspace,
+            reference_workspaces=self.task.reference_workspaces,
+            use_absolute_paths=True,
+            batch_preamble=self.task.config.batch_preamble,
+            workspace_environment=self.task.config.workspace_environment,
+            logger=self.logger
+        )
+        system_prompt += (
+            f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
+            f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
+        )
+        system_prompt = await with_task_system_prompt(system_prompt, self.task, self.logger)
+        task_user_prompt = await self.task.create_user_prompt()
+        return f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+
+    def _relay_environment(self) -> Dict[str, str]:
+        """This task's relay address for its own CLI process; empty when no relay runs."""
+        relay = self.conversation_manager._relay_session if self.conversation_manager else None
+        return relay.client_environment() if relay is not None else {}
+
+    #: The launching shell's Claude variables the subscription route passes on: the login, and
+    #: the two the SDK sets itself.
+    SUBSCRIPTION_ENV_KEPT = frozenset(
+        {"CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_AGENT_SDK_VERSION"})
+
+    def _subscription_environment(self) -> Dict[str, str]:
+        """The CLI's environment on the subscription route: the login, and nothing else of
+        the shell that launched the run.
+
+        The SDK passes the parent environment through, and `options.env` can override a
+        variable but not remove one. A run launched from a Claude Code session inherits its
+        `CLAUDE_EFFORT`, session id and messaging socket, so each is blanked. `HOME` is the
+        attempt's `workspaces/`, so `~/.claude/.credentials.json` is never found and the
+        login travels as `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`). An inherited
+        `ANTHROPIC_*` variable is refused rather than blanked: an API key or base URL there
+        would bill or route the session somewhere the run plan does not say.
+        """
+        if not self.task.config.subscription_route:
+            return {}
+        token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")
+        if not token:
+            raise RuntimeError(
+                "claude_model is set (the subscription route) but CLAUDE_CODE_OAUTH_TOKEN is "
+                "not: the CLI runs with HOME at the attempt's workspaces/, so it cannot read "
+                "the login from ~/.claude/. Create a token with `claude setup-token` and "
+                "export it in the launching shell.")
+        routed = sorted(key for key in os.environ if key.startswith("ANTHROPIC_"))
+        if routed:
+            raise RuntimeError(
+                f"the subscription route refuses an inherited {routed}: the CLI would bill an "
+                "API key or reach another endpoint instead of the login. Unset them for the run.")
+        env = {key: "" for key in os.environ
+               if key.startswith("CLAUDE") and key not in self.SUBSCRIPTION_ENV_KEPT}
+        env.update({
+            "CLAUDE_CODE_OAUTH_TOKEN": token,
+            # The login's claude.ai connectors (Gmail, Drive, Slack, ...): without
+            # strict_mcp_config, a probe session was told about them mid-conversation.
+            "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+            # No memory directory: nothing a session writes reaches the next PR's.
+            "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+        })
+        return env
+
+    def _pinned_cli_path(self) -> Optional[str]:
+        """The configured CLI binary, refused if absent rather than replaced by the bundled one."""
+        path = self.task.config.resolved_cli_path()
+        if path is None:
+            return None
+        if not path.is_file():
+            raise RuntimeError(
+                f"cli_version {self.task.config.cli_version!r} names {path}, which does not "
+                "exist. Place that release there (the session refuses a CLI whose reported "
+                "version differs).")
+        return str(path)
+
+    def _pre_approved_tools(self) -> List[str]:
+        """APE's own MCP server, and the configured grant, approved without asking.
+
+        `dontAsk` refuses every tool not pre-approved, APE's own included: in the first contained
+        smoke run (pr5_probe0708_gpt52_G_claude_smoke2) it refused 7 of 8 calls -- Read,
+        lean_verify, declaration_search and all three submit_findings -- so the reviewer read
+        nothing and could not submit. The grant says which tools exist and `contain_to_workspace`
+        bounds where they reach; approval is the third, separate thing, and without it the first
+        two describe a session that cannot act.
+        """
+        config = self.task.config
+        approved = [config.mcp_server_name.rstrip("_")]  # "mcp__core": every tool on APE's server
+        approved.extend(config.tools or [])
+        return approved
+
     async def _run_batch_mode(self) -> None:
         """Run batch mode using Claude SDK"""
         config = self.task.config
@@ -178,18 +282,7 @@ class ClaudeCodeScaffold(BaseScaffold):
         # Get resume session ID
         resume_session_id = self.conversation_manager.resume_session_id
 
-        # Build system prompt with absolute paths for Claude Code
-        from ape.scaffolds.prompts import build_system_prompt
-        system_prompt = await build_system_prompt(
-            scratch_workspace=self.task.scratch_workspace,
-            target_workspace=self.task.target_workspace,
-            reference_workspaces=self.task.reference_workspaces,
-            use_absolute_paths=True,
-            logger=self.logger
-        )
-
-        # Add cwd information to system prompt
-        system_prompt += f"\n\nIMPORTANT: Your current working directory is `{cwd}`. Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
+        initial_prompt = await self._initial_prompt(cwd)
 
         # Configure HOME environment variable for SDK
         # Set HOME to workspaces/ directory so SDK creates session files there
@@ -208,22 +301,39 @@ class ClaudeCodeScaffold(BaseScaffold):
             optional_containment["setting_sources"] = list(config.setting_sources)
         if config.strict_mcp_config:
             optional_containment["strict_mcp_config"] = True
+        if config.contain_to_workspace:
+            from .containment import pre_tool_use_hook, provisioned_roots
+
+            self.containment_roots = provisioned_roots(
+                cwd, extra=[Path(d) for d in add_dirs])
+            optional_containment["hooks"] = {"PreToolUse": [HookMatcher(
+                matcher=None,
+                hooks=[pre_tool_use_hook(self.containment_roots, os.path.abspath(cwd),
+                                         self.containment_refusals, self.logger)])]}
+            self.logger.info("[ClaudeCodeScaffold] contained to %s", self.containment_roots)
 
         options = ClaudeAgentOptions(
-            model=config.llm_config.model_name,
+            # The relay serves llm_config's model whatever name the CLI sends; without one,
+            # the CLI runs the pinned Claude model on its own login.
+            model=config.claude_model or config.llm_config.model_name,
+            cli_path=self._pinned_cli_path(),
+            effort=config.effort,
             max_turns=config.execution.max_turns,
             mcp_servers=mcp_servers,
             cwd=cwd,
             add_dirs=add_dirs,
             permission_mode=config.permission_mode,
+            allowed_tools=self._pre_approved_tools(),
             disallowed_tools=disallowed_tools,
             **optional_containment,
             include_partial_messages=True,
             resume=resume_session_id,
             fork_session=True if resume_session_id else False,
             env={
+                **self._subscription_environment(),
                 'HOME': str(claude_home.resolve()),
-                'CLAUDE_CODE_DISABLE_COMMAND_INJECTION_CHECK': '1'
+                'CLAUDE_CODE_DISABLE_COMMAND_INJECTION_CHECK': '1',
+                **self._relay_environment(),
             }
         )
 
@@ -231,13 +341,6 @@ class ClaudeCodeScaffold(BaseScaffold):
 
         # Create SDK client and run conversation
         async with ClaudeSDKClient(options) as client:
-            # Get task user prompt
-            task_user_prompt = await self.task.create_user_prompt()
-
-            # Merge system prompt and user prompt
-            # For Claude Code, we put system prompt as part of user prompt
-            initial_prompt = f"{system_prompt}\n\n{'='*80}\n\n{task_user_prompt}"
-
             await self.conversation_manager.run_conversation(
                 claude_client=client,
                 initial_prompt=initial_prompt
@@ -266,24 +369,7 @@ class ClaudeCodeScaffold(BaseScaffold):
                     raise RuntimeError("Task workspaces are not initialized for Claude Code CLI mode")
 
                 cwd_path = self.task.workspaces_dir
-                cwd = str(cwd_path)
-
-                from ape.scaffolds.prompts import build_system_prompt
-
-                system_prompt = await build_system_prompt(
-                    scratch_workspace=self.task.scratch_workspace,
-                    target_workspace=self.task.target_workspace,
-                    reference_workspaces=self.task.reference_workspaces,
-                    use_absolute_paths=True,
-                    logger=self.logger
-                )
-                system_prompt += (
-                    f"\n\nIMPORTANT: Your current working directory is `{cwd}`. "
-                    f"Use absolute paths like `{cwd}/scratch/`, `{cwd}/target/`. Never use relative paths.\n"
-                )
-
-                task_user_prompt = await self.task.create_user_prompt()
-                task_prompt = f"{system_prompt}\n\n{'=' * 80}\n\n{task_user_prompt}"
+                task_prompt = await self._initial_prompt(cwd_path)
                 initial_prompt = merge_task_prompt(task_prompt, prompt)
 
             cwd = str(cwd_path)
@@ -304,9 +390,8 @@ class ClaudeCodeScaffold(BaseScaffold):
             if extra_args:
                 claude_args.extend(extra_args)
 
-            # Reuse conversation_manager's internal relay (started in _setup_components)
-            # relay has been set environment variables through configure_environment()
-            # external claude command will automatically use these environment variables
+            # Reuse conversation_manager's internal relay (started in _setup_components), whose
+            # address goes to this subprocess alone (`_relay_environment`).
 
             # Run claude command
             # Note: In CLI mode, we don't set HOME
@@ -317,6 +402,7 @@ class ClaudeCodeScaffold(BaseScaffold):
             proc = await asyncio.create_subprocess_exec(
                 *claude_args,
                 cwd=str(cwd),
+                env={**os.environ, **self._relay_environment()},
                 stdin=sys.stdin,
                 stdout=sys.stdout,
                 stderr=sys.stderr
@@ -387,8 +473,71 @@ class ClaudeCodeScaffold(BaseScaffold):
         await self.conversation_manager.request_stop()
         self.logger.info("[ClaudeCodeScaffold] Interrupt signal sent")
 
+    def _write_containment_audit(self) -> None:
+        """Audit the session transcript against the containment, into the attempt directory.
+
+        Written whatever happened, so a reader finds a verdict beside every contained attempt:
+        a missing transcript is recorded as unauditable, not skipped.
+        """
+        import json
+
+        from .containment import audit_transcript
+
+        attempt_path = self.task.attempt_path
+        transcripts = sorted(attempt_path.glob("claude_code_conversation_*__*.jsonl"))
+        cwd = os.path.abspath(self.task.workspaces_dir)
+        audits = [audit_transcript(t, self.containment_roots, cwd) for t in transcripts]
+        report = {
+            "roots": self.containment_roots,
+            "refused_by_hook": self.containment_refusals,
+            "transcripts": audits,
+            "clean": bool(audits) and all(a["clean"] for a in audits),
+            # The grant actually usable: no call turned down by Claude Code's permission mode.
+            "usable": bool(audits) and not any(a["refused_by_cli"] for a in audits),
+        }
+        if not audits:
+            report["error"] = "no session transcript in the attempt directory; nothing was audited"
+        (attempt_path / "containment_audit.json").write_text(json.dumps(report, indent=2))
+        leaks = sum(len(a["leaks"]) for a in audits)
+        cli_refused = sum(len(a["refused_by_cli"]) for a in audits)
+        log = self.logger.info if report["clean"] and report["usable"] else self.logger.error
+        log("[ClaudeCodeScaffold] containment audit: clean=%s usable=%s, %d tool calls, "
+            "%d refused by containment, %d leaked, %d refused by the CLI's permission mode%s",
+            report["clean"], report["usable"], sum(a["tool_calls"] for a in audits),
+            len(self.containment_refusals), leaks, cli_refused,
+            "" if audits else " (no transcript)")
+
+    def _write_session_record(self) -> None:
+        """On the subscription route, what the CLI said the session was and what it used:
+        its identity at start, every rate-limit state, and each result's model usage and
+        notional API cost. The relay's logs hold the same for the relay route."""
+        import json
+
+        record = {
+            "claude_model": self.task.config.claude_model,
+            "cli_version": self.task.config.cli_version,
+            "effort": self.task.config.effort,
+            "usage": self.conversation_manager.get_token_usage().model_dump(),
+            "turns": self.conversation_manager.get_current_turns(),
+            **self.conversation_manager.session_record,
+        }
+        (self.task.attempt_path / "claude_code_session.json").write_text(
+            json.dumps(record, indent=2, default=str))
+
     async def _cleanup_components(self) -> None:
         """Cleanup components"""
+        if self.containment_roots is not None and self.task.attempt_path:
+            try:
+                self._write_containment_audit()
+            except Exception:
+                self.logger.error(f"containment audit failed:\n{traceback.format_exc()}")
+        if (self.conversation_manager and self.task.attempt_path
+                and self.task.config.subscription_route):
+            try:
+                self._write_session_record()
+            except Exception:
+                self.logger.error(f"session record failed:\n{traceback.format_exc()}")
+
         # 1. Cleanup conversation
         if self.conversation_manager:
             await self.conversation_manager.cleanup()

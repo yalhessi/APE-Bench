@@ -27,5 +27,43 @@ regularity, a reading of the whole PR, or none. Two readers, pre-registered voca
 family. The result decides which perspectives in `review-coordination-design.md` are worth
 constructing and which conventions in `conventions-nature.md` they need.
 
+**A starting point (2026-09-29).** One reader's pass and construction labels for the 38 misses and
+the 31 sibling asks are in `results/pr_review_v5/adjudications/coordination-design-check-2026-09-29/`
+(vocabulary: the constructions of `review-coordination-design-2026-09.md` §4). Planning labels, no
+kappa; the two-reader study below supersedes them.
+
 **What would close it.** The labelled table, and for the largest artifact class a demonstration on
 three misses that constructing the artifact by hand exposes the ask, before any pipeline change.
+
+**Contradicted in part (2026-09-29).** The hypothesis says these asks are absent from the model's
+output distribution until the input or the task changes. For a Claude reviewer with the plain
+generalist brief, that is false for 5 or 6 of the 11 misses on three validation PRs. The asks were
+reached in every replicate, with no construction at all
+(`results/pr_review_v5/probes/construction-demo-2026-09-29/`). They are absent from `gpt_5.2`'s
+output distribution in both the lead and solo configurations, or present in Claude's by recall;
+`reviewer-model-gap.md` separates the two. The constructions reached nothing the plain brief did
+not. What remains unreached by any condition is 4-5 asks: a one-liner from a sibling lemma, section
+layout (two asks) and `grind` tagging (two asks). That residue is where this hypothesis can still
+be tested.
+
+**Corrected, second reading (2026-09-29): model-dependent, not contradicted.** The hypothesis holds
+for `gpt_5.2`. Its arms held compile at these sites and did not construct. It fails for Claude, which
+constructs unprompted: the plain-brief sessions compiled the pre-PR proofs and the instance-binder
+versions on their own. So "absent from the output distribution" is a property of the reviewer. The
+test of this hypothesis is the construction briefs on `gpt_5.2`. Claude with the brief shows nothing,
+since Claude does not need it.
+
+The residue is not construction-shaped:
+- two asks are a scope conflict. `variable … in` is in 1,129 of 6,947 Mathlib files at base, 1 of 13
+  in the directory, and 0 in the file;
+- two are an emerging `grind` migration: 18 uses in one file, 0 in the other, 137 files
+  library-wide;
+- one, the sibling one-liner, may be unsatisfiable as stated.
+
+The first two belong to `conventions-nature.md`.
+
+**Test (b) (2026-09-29).** For `gpt_5.2` the hypothesis fails in the other direction too. Changing the
+task (a construction brief) made it construct three times as often and reach no more asks. So these
+asks are absent from `gpt_5.2`'s output under both the plain and the constructing task. They are
+present in Claude's under the plain task. What remains is a property of the reviewer, not of the
+task (`reviewer-model-gap.md`).

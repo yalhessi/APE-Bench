@@ -1,0 +1,775 @@
+{
+ "success": true,
+ "results": [
+  {
+   "path": "target/Mathlib/Data/Subtype.lean",
+   "matches": [
+    {
+     "line_number": 41,
+     "content": "    41|  instead of `x.1`. A similar result is `Subtype.mem` in `Mathlib/Data/Set/Basic.lean`. -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Part.lean",
+   "matches": [
+    {
+     "line_number": 584,
+     "content": "   584|`Mathlib/Algebra/Notation/Defs.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/TypeVec.lean",
+   "matches": [
+    {
+     "line_number": 263,
+     "content": "   263|-- See `Mathlib/Tactic/Attr/Register.lean` for `register_simp_attr typevec`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Num/ZNum.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|This file was split from `Mathlib/Data/Num/Lemmas.lean` to keep the former under 1500 lines."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/WSeq/Defs.lean",
+   "matches": [
+    {
+     "line_number": 14,
+     "content": "    14|These definitions, as well as those in `Mathlib/Data/WSeq/Productive.lean`, are not needed for the"
+    },
+    {
+     "line_number": 15,
+     "content": "    15|development of `Mathlib/Data/Seq/Parallel.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/DFinsupp/Defs.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|For a non-dependent version see `Mathlib/Data/Finsupp/Defs.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/DFinsupp/BigOperators.lean",
+   "matches": [
+    {
+     "line_number": 14,
+     "content": "    14|For a non-dependent version see `Mathlib/Data/Finsupp/Defs.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/PFunctor/Univariate/Basic.lean",
+   "matches": [
+    {
+     "line_number": 14,
+     "content": "    14|(For the M-type construction, see `Mathlib/Data/PFunctor/Univariate/M.lean`.)"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/NNReal/Defs.lean",
+   "matches": [
+    {
+     "line_number": 35,
+     "content": "    35|  appropriate ordered field/ring/group/monoid `α`, see `Mathlib/Algebra/Order/Nonneg/Ring.lean`."
+    },
+    {
+     "line_number": 734,
+     "content": "   734|`Mathlib/Algebra/Order/Sub/Basic.lean`. See also `mul_tsub` and `tsub_mul`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/NNReal/Basic.lean",
+   "matches": [
+    {
+     "line_number": 108,
+     "content": "   108|`Mathlib/Algebra/Order/Sub/Basic.lean`. See also `mul_tsub` and `tsub_mul`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finsupp/Option.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|We prove a variety of API lemmas, see `Mathlib/Data/Finsupp/Fin.lean` for comparison."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finsupp/MonomialOrder.lean",
+   "matches": [
+    {
+     "line_number": 37,
+     "content": "    37|For the graded lexicographic ordering, see `Mathlib/Data/Finsupp/MonomialOrder/DegLex.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finsupp/Defs.lean",
+   "matches": [
+    {
+     "line_number": 37,
+     "content": "    37|`Mathlib/Algebra/BigOperators/Finsupp/Basic.lean`."
+    },
+    {
+     "line_number": 306,
+     "content": "   306|bundled (defined in `Mathlib/Data/Finsupp/Basic.lean`):"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finsupp/Notation.lean",
+   "matches": [
+    {
+     "line_number": 100,
+     "content": "   100|-- This cannot be put in `Mathlib/Data/DFinsupp/Notation.lean` where it belongs, since doc-strings"
+    },
+    {
+     "line_number": 104,
+     "content": "   104|  and `Mathlib/Data/DFinsupp/Notation.lean` is imported,"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Complex/Basic.lean",
+   "matches": [
+    {
+     "line_number": 294,
+     "content": "   294|`Mathlib/LinearAlgebra/Complex/Module.lean` to transfer instances from `ℝ` to `ℂ`, but is not"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Int/CardIntervalMod.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|`Mathlib/Data/Nat/Factorization/Basic.lean` to all integer intervals and any fixed residue (not just"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Int/Init.lean",
+   "matches": [
+    {
+     "line_number": 330,
+     "content": "   330|/-- For use in `Mathlib/Tactic/NormNum/Pow.lean` -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Int/Order/Lemmas.lean",
+   "matches": [
+    {
+     "line_number": 13,
+     "content": "    13|The distinction between this file and `Mathlib/Data/Int/Order/Basic.lean` is not particularly clear."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Fintype/BigOperators.lean",
+   "matches": [
+    {
+     "line_number": 198,
+     "content": "   198|-- and ideally could be moved to `Mathlib/Data/Fintype/Card.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/ENNReal/Operations.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|definitions and properties of which can be found in `Mathlib/Data/ENNReal/Inv.lean`."
+    },
+    {
+     "line_number": 19,
+     "content": "    19|`Mathlib/Data/ENNReal/Basic.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/EReal/Operations.lean",
+   "matches": [
+    {
+     "line_number": 24,
+     "content": "    24|There is also a `CommMonoidWithZero` structure on `EReal`, but `Mathlib/Data/EReal/Basic.lean` only"
+    },
+    {
+     "line_number": 26,
+     "content": "    26|The `CommMonoidWithZero` instance is instead delivered in `Mathlib/Data/EReal/Inv.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Lattice.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|Notation for the complete lattice operations can be found in `Mathlib/Order/SetNotation.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Subset.lean",
+   "matches": [
+    {
+     "line_number": 29,
+     "content": "    29|is defined in `Mathlib/Data/Set/Notation.lean` and is scoped to the `Set.Notation` namespace."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Basic.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|be decidable. The definition is in the module `Mathlib/Data/Set/Defs.lean`."
+    },
+    {
+     "line_number": 22,
+     "content": "    22|`Mathlib/Data/Set/Operations.lean` (empty set, univ, union, intersection, insert, singleton and"
+    },
+    {
+     "line_number": 28,
+     "content": "    28|See also the directory `Mathlib/SetTheory/ZFC/`, which contains an encoding of ZFC set theory in"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/NAry.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|This file is very similar to `Mathlib/Data/Finset/NAry.lean`, `Mathlib/Order/Filter/NAry.lean`, and"
+    },
+    {
+     "line_number": 19,
+     "content": "    19|`Mathlib/Data/Option/NAry.lean`. Please keep them in sync."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Operations.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|More advanced theorems about these definitions are located in other files in `Mathlib/Data/Set`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/BooleanAlgebra.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|`Mathlib/Data/Set/Lattice.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Card.lean",
+   "matches": [
+    {
+     "line_number": 43,
+     "content": "    43|The theorems in this file are very similar to those in `Mathlib/Data/Finset/Card.lean`, but with"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/CoeSort.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|More advanced theorems about these definitions are located in other files in `Mathlib/Data/Set`."
+    },
+    {
+     "line_number": 35,
+     "content": "    35|See e.g. `Mathlib/Data/Set/Order.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Card/Arithmetic.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|It has been separated out to not burden `Mathlib/Data/Set/Card.lean` with extra imports."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Set/Finite/Basic.lean",
+   "matches": [
+    {
+     "line_number": 339,
+     "content": "   339|in `Mathlib/Order/Interval/Finset/Defs.lean`. -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Setoid/Basic.lean",
+   "matches": [
+    {
+     "line_number": 25,
+     "content": "    25|`Mathlib/Order/Filter/Basic.lean`). This does not save space, however, and is less clear."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Real/Basic.lean",
+   "matches": [
+    {
+     "line_number": 21,
+     "content": "    21|have been deferred to the file `Mathlib/Data/Real/Archimedean.lean`,"
+    },
+    {
+     "line_number": 25,
+     "content": "    25|`Mathlib/Data/Real/Star.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Real/StarOrdered.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|`Mathlib/Analysis/RCLike/Basic.lean`. -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Ordmap/Ordset.lean",
+   "matches": [
+    {
+     "line_number": 13,
+     "content": "    13|This file uses the invariants defined in `Mathlib/Data/Ordmap/Invariants.lean` to construct"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Ordmap/Invariants.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|An `Ordnode`, defined in `Mathlib/Data/Ordmap/Ordnode.lean`, is an inductive type which describes a"
+    },
+    {
+     "line_number": 35,
+     "content": "    35|The actual `Ordset` operations are in `Mathlib/Data/Ordmap/Ordset.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/FinEnum/Option.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|* recreate rest of `Mathlib/Data/Fintype/Option.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finset/NAry.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|This file is very similar to `Mathlib/Data/Set/NAry.lean`, `Mathlib/Order/Filter/NAry.lean` and"
+    },
+    {
+     "line_number": 21,
+     "content": "    21|`Mathlib/Data/Option/NAry.lean`. Please keep them in sync."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finset/Basic.lean",
+   "matches": [
+    {
+     "line_number": 25,
+     "content": "    25|For an explanation of `Finset` design decisions, please see `Mathlib/Data/Finset/Defs.lean`."
+    },
+    {
+     "line_number": 36,
+     "content": "    36|* The `Mathlib/Logic/Equiv/Defs.lean` file describes a general type of equivalence, so look in there"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finset/Defs.lean",
+   "matches": [
+    {
+     "line_number": 34,
+     "content": "    34|More information can be found in `Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean`."
+    },
+    {
+     "line_number": 38,
+     "content": "    38|`α`, called `univ`. See `Mathlib/Data/Fintype/Basic.lean`."
+    },
+    {
+     "line_number": 40,
+     "content": "    40|`Finset.card`, the size of a finset is defined in `Mathlib/Data/Finset/Card.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finset/Lattice/Fold.lean",
+   "matches": [
+    {
+     "line_number": 22,
+     "content": "    22|See also `Mathlib/Order/CompleteLattice/Finset.lean`, which is instead concerned with how big"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Finset/Lattice/Basic.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|For `Finset α`, where `α` is a lattice, see also `Mathlib/Data/Finset/Lattice/Fold.lean`."
+    },
+    {
+     "line_number": 22,
+     "content": "    22|`Mathlib/Order/Lattice.lean`. For the lattice structure on finsets, `⊥` is called `bot` with"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Rat/Defs.lean",
+   "matches": [
+    {
+     "line_number": 20,
+     "content": "    20|The definition of the field structure on `ℚ` will be done in `Mathlib/Algebra/Field/Rat.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Rat/Denumerable.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|The fact that ℚ has cardinality ℵ₀ is proved in `Mathlib/Data/Rat/Cardinal.lean`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Rat/Cast/Lemmas.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|These lemmas have been removed from `Mathlib/Data/Rat/Cast/Defs.lean`"
+    },
+    {
+     "line_number": 16,
+     "content": "    16|to avoiding needing to import `Mathlib/Algebra/Field/Basic.lean` there."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Matrix/Invertible.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|in `Mathlib/LinearAlgebra/Matrix/NonsingularInverse.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Matrix/Auto.lean",
+   "matches": [
+    {
+     "line_number": 25,
+     "content": "    25|`Mathlib/Data/Matrix/Reflection.lean` are still available."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Matrix/Mul.lean",
+   "matches": [
+    {
+     "line_number": 35,
+     "content": "    35|See `Mathlib/LinearAlgebra/Matrix/ConjTranspose.lean` for"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/ZMod/QuotientRing.lean",
+   "matches": [
+    {
+     "line_number": 74,
+     "content": "    74|`Mathlib/Data/ZMod/Basic.lean` for versions involving only two numbers. -/"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/ZMod/Units.lean",
+   "matches": [
+    {
+     "line_number": 73,
+     "content": "    73|-- This needs `Nat.primeFactors`, so cannot go into `Mathlib/Data/ZMod/Basic.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/ZMod/Basic.lean",
+   "matches": [
+    {
+     "line_number": 417,
+     "content": "   417|  -- `Mathlib/Algebra/CharP/CharAndCard.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Multiset/MapFold.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|Many lemmas about `Multiset.map` are proven in `Mathlib/Data/Multiset/Filter.lean`:"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Multiset/Pairwise.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|`Mathlib/Data/Multiset/Defs.lean`)."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Fin/Tuple/NatAntidiagonal.lean",
+   "matches": [
+    {
+     "line_number": 41,
+     "content": "    41|`Mathlib/Algebra/Order/Antidiag/Finsupp.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/Init.lean",
+   "matches": [
+    {
+     "line_number": 47,
+     "content": "    47|* `Mathlib/Data/Nat/Basic.lean` for the continuation of the home-baked development on `ℕ`"
+    },
+    {
+     "line_number": 48,
+     "content": "    48|* `Mathlib/Data/Int/Init.lean` for the continuation of the home-baked development on `ℤ`"
+    },
+    {
+     "line_number": 49,
+     "content": "    49|* `Mathlib/Algebra/Group/Nat/Defs.lean` for the monoid instances on `ℕ`"
+    },
+    {
+     "line_number": 50,
+     "content": "    50|* `Mathlib/Algebra/Group/Int/Defs.lean` for the group instance on `ℤ`"
+    },
+    {
+     "line_number": 51,
+     "content": "    51|* `Mathlib/Algebra/Ring/Nat.lean` for the semiring instance on `ℕ`"
+    },
+    {
+     "line_number": 52,
+     "content": "    52|* `Mathlib/Algebra/Ring/Int/Defs.lean` for the ring instance on `ℤ`"
+    },
+    {
+     "line_number": 53,
+     "content": "    53|* `Mathlib/Algebra/Order/Group/Nat.lean` for the ordered monoid instance on `ℕ`"
+    },
+    {
+     "line_number": 54,
+     "content": "    54|* `Mathlib/Algebra/Order/Group/Int.lean` for the ordered group instance on `ℤ`"
+    },
+    {
+     "line_number": 55,
+     "content": "    55|* `Mathlib/Algebra/Order/Ring/Nat.lean` for the ordered semiring instance on `ℕ`"
+    },
+    {
+     "line_number": 56,
+     "content": "    56|* `Mathlib/Algebra/Order/Ring/Int.lean` for the ordered ring instance on `ℤ`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/Basic.lean",
+   "matches": [
+    {
+     "line_number": 18,
+     "content": "    18|This file builds on `Mathlib/Data/Nat/Init.lean` by adding basic lemmas on natural numbers"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/Choose/Basic.lean",
+   "matches": [
+    {
+     "line_number": 17,
+     "content": "    17|see `Fintype.card_powersetCard` in `Mathlib/Data/Finset/Powerset.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/Prime/Int.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|TODO: This file can probably be merged with `Mathlib/Data/Int/NatPrime.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/Order/Lemmas.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|The distinction between this file and `Mathlib/Algebra/Order/Ring/Nat.lean` is not particularly"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/GCD/Prime.lean",
+   "matches": [
+    {
+     "line_number": 15,
+     "content": "    15|These lemmas are kept separate from `Mathlib/Data/Nat/GCD/Basic.lean` in order to minimize imports."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Nat/Factorization/Defs.lean",
+   "matches": [
+    {
+     "line_number": 35,
+     "content": "    35|  `Mathlib/RingTheory/UniqueFactorizationDomain/`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/NNRat/Defs.lean",
+   "matches": [
+    {
+     "line_number": 22,
+     "content": "    22|Note that `NNRat` is not declared as a `Semifield` here. See `Mathlib/Algebra/Field/Rat.lean` for"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/List/Shortlex.lean",
+   "matches": [
+    {
+     "line_number": 26,
+     "content": "    26|* `Mathlib/Data/List/Lex.lean`: Lexicographic order on `List α`."
+    },
+    {
+     "line_number": 27,
+     "content": "    27|* `Mathlib/Data/DFinsupp/WellFounded.lean`: Well-foundedness of lexicographic orders on `DFinsupp`"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/List/Lex.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|* `Mathlib/Combinatorics/Colex.lean`: Colexicographic order on finite sets."
+    },
+    {
+     "line_number": 24,
+     "content": "    24|* `Mathlib/Data/PSigma/Order.lean`: Lexicographic order on `Σ' i, α i`."
+    },
+    {
+     "line_number": 25,
+     "content": "    25|* `Mathlib/Order/PiLex.lean`: Lexicographic order on `Πₗ i, α i`."
+    },
+    {
+     "line_number": 26,
+     "content": "    26|* `Mathlib/Data/Sigma/Order.lean`: Lexicographic order on `Σ i, α i`."
+    },
+    {
+     "line_number": 27,
+     "content": "    27|* `Mathlib/Data/Prod/Lex.lean`: Lexicographic order on `α × β`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/List/TFAE.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|`Mathlib/Tactic/Tfae.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/List/InsertNth.lean",
+   "matches": [
+    {
+     "line_number": 11,
+     "content": "    11|This is a stub file for importing `Mathlib/Data/List/InsertNth.lean`,"
+    },
+    {
+     "line_number": 12,
+     "content": "    12|which has been renamed to `Mathlib/Data/List/InsertIdx.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/List/Infix.lean",
+   "matches": [
+    {
+     "line_number": 24,
+     "content": "    24|All those (except `insert`) are defined in `Mathlib/Data/List/Defs.lean`."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/List/Intervals.lean",
+   "matches": [
+    {
+     "line_number": 36,
+     "content": "    36|See also `Mathlib/Order/Interval/Basic.lean` for modelling intervals in general preorders, as well"
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Option/NAry.lean",
+   "matches": [
+    {
+     "line_number": 23,
+     "content": "    23|This file is very similar to the n-ary section of `Mathlib/Data/Set/Basic.lean`, to"
+    },
+    {
+     "line_number": 24,
+     "content": "    24|`Mathlib/Data/Finset/NAry.lean` and to `Mathlib/Order/Filter/NAry.lean`. Please keep them in sync."
+    }
+   ]
+  },
+  {
+   "path": "target/Mathlib/Data/Option/Defs.lean",
+   "matches": [
+    {
+     "line_number": 16,
+     "content": "    16|files under `Mathlib/Data/Option/`."
+    }
+   ]
+  }
+ ],
+ "files_available": 648,
+ "files_scanned": 648,
+ "files_with_matches": 70,
+ "truncated": false
+}

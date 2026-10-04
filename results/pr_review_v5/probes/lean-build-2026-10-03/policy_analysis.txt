@@ -1,0 +1,18 @@
+== policy_review_designs.jsonl: 54 edits, routes {'cut': 30, 'whole': 20, 'cold': 4}
+   cold   median  10.3  p90  24.7  total   751 s
+   policy median  0.41  p90   4.3  total   111 s  (6.8x)
+   excluding import edits: median 0.39, total 47 s vs cold 687 s (14.7x)
+   cut   n=30 median  0.27 max   3.6
+   whole n=20 median  0.99 max   4.9
+   cold  n= 4 median 15.25 max  24.7
+   >5 s, not import edits: []
+   answers agree with cold: 54 / 54 []
+== policy_first_replay.jsonl: 56 edits, routes {'cut': 28, 'cold': 4, 'whole': 24}
+   cold   median   9.6  p90  25.1  total   732 s
+   policy median  0.48  p90   9.6  total   147 s  (5.0x)
+   excluding import edits: median 0.42, total 95 s vs cold 680 s (7.2x)
+   cut   n=28 median  0.19 max  13.6
+   whole n=24 median  1.77 max  12.2
+   cold  n= 4 median  9.30 max  24.9
+   >5 s, not import edits: [('ContinuousAlgEquiv.lean', 'whole', 'needs_suffix:other_command', 11.2), ('ContinuousAlgEquiv.lean', 'whole', 'needs_suffix:other_command', 10.7), ('ContinuousAlgEquiv.lean', 'cut', 'proof_only', 13.6), ('ContinuousAlgEquiv.lean', 'cut', 'proof_only', 9.2), ('ContinuousAlgEquiv.lean', 'whole', 'needs_suffix:other_command', 12.2)]
+   answers agree with cold: 55 / 56 [('GalerkinRegularity.lean', 'proof_only')]

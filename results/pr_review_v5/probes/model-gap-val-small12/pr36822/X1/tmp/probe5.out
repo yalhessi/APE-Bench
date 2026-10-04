@@ -1,0 +1,41 @@
+{
+ "success": false,
+ "errors": [
+  {
+   "severity": "error",
+   "data": "@[to_dual] failed to add declaration `Set.Ioc_disjoint_Ioc`.\n  The translated value is not type correct.\n  For help, see the docstring of `to_additive`, section `Troubleshooting`.\nApplication type mismatch: The argument\n  Ico_inter_Ico\nhas type\n  Ico a₁ a₂ ∩ Ico b₁ b₂ = Ico (max a₁ b₁) (min a₂ b₂)\nbut is expected to have type\n  Ioc a₂ a₁ ∩ Ioc b₂ b₁ = Ioc (max a₂ b₂) (min a₁ b₁)\nin the application\n  congrArg Eq Ico_inter_Ico",
+   "code_line": "@[to_dual (attr := simp) Ioc_disjoint_Ioc]",
+   "pos": {
+    "column": 2,
+    "line": 118
+   }
+  }
+ ],
+ "warnings": [],
+ "infos": [
+  {
+   "severity": "information",
+   "data": "@Ioc_disjoint_Ioc : ∀ {α : Type u_1} [inst : LinearOrder α] {a₁ a₂ b₁ b₂ : α},\n  Disjoint (Ioc a₂ a₁) (Ioc b₂ b₁) ↔ min a₁ b₁ ≤ max a₂ b₂",
+   "code_line": "#check @Ioc_disjoint_Ioc",
+   "pos": {
+    "column": 0,
+    "line": 122
+   }
+  }
+ ],
+ "axioms": [],
+ "message": "Lean verification failed",
+ "errors_introduced_by_your_edit": [
+  {
+   "severity": "error",
+   "data": "@[to_dual] failed to add declaration `Set.Ioc_disjoint_Ioc`.\n  The translated value is not type correct.\n  For help, see the docstring of `to_additive`, section `Troubleshooting`.\nApplication type mismatch: The argument\n  Ico_inter_Ico\nhas type\n  Ico a₁ a₂ ∩ Ico b₁ b₂ = Ico (max a₁ b₁) (min a₂ b₂)\nbut is expected to have type\n  Ioc a₂ a₁ ∩ Ioc b₂ b₁ = Ioc (max a₂ b₂) (min a₁ b₁)\nin the application\n  congrArg Eq Ico_inter_Ico",
+   "code_line": "@[to_dual (attr := simp) Ioc_disjoint_Ioc]",
+   "pos": {
+    "column": 2,
+    "line": 118
+   }
+  }
+ ],
+ "errors_already_in_the_file": [],
+ "mode": "verified_edit"
+}

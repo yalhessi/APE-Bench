@@ -1,0 +1,28 @@
+{
+  "ai_members": 183,
+  "by_month": {
+    "2026-07": {
+      "bot_author": 40,
+      "no_reviewer_decision": 64,
+      "pass": 591,
+      "still_open": 394
+    },
+    "2026-08": {
+      "bot_author": 48,
+      "no_reviewer_decision": 37,
+      "pass": 484,
+      "still_open": 383
+    }
+  },
+  "by_reason": {
+    "bot_author": 88,
+    "no_reviewer_decision": 101,
+    "pass": 1075,
+    "still_open": 777
+  },
+  "main_quotas": {
+    "2026-07": 4,
+    "2026-08": 4
+  },
+  "members": 1075
+}

@@ -1,0 +1,14 @@
+# The post-cutoff PROBE set probe-2026-07-08-v1: 10 PRs created 2026-07..08, after the June 2026
+# knowledge cutoff of the Claude models used as probe reviewers (sealed 1f429f1; draw and release ea3f7d3).
+# A probe set, not an evaluation set: its release lives outside inputs/pr_review_v4/releases/, so it is
+# not frozen and not in scored_pr_numbers(). Record: results/pr_review_v5/probes/postcutoff-2026-09-29/.
+#
+# Dataset only, like the evaluation configs. Build the reviewed workspaces (no model spend):
+#   ape/bin/python -m src.mathlib_review.release.prebuild --reviewed --execute --config configs/pr_review_v5_probe_2026_07_08_v1.yaml
+
+extends: bases/v5_generation.yaml
+
+dataset:
+  release: inputs/probes/probe-2026-07-08-v1
+  modification_inventory: inputs/probes/probe-2026-07-08-v1/derived/modification_inventory.jsonl
+  require_reviewed_workspaces: true
