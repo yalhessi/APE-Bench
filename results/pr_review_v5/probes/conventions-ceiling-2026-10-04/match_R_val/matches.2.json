@@ -1,0 +1,40 @@
+{
+  "asks": [
+    {"pr": 29842, "ask_id": "v0053",
+     "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null,
+     "R3": "no", "R3_finding": null, "R4": "no", "R4_finding": null,
+     "note": "Asks to explain the interaction with #24163 in the PR description; no finding concerns the description or the related PRs."},
+    {"pr": 29842, "ask_id": "v0055",
+     "R1": "reached", "R1_finding": 1, "R2": "no", "R2_finding": null,
+     "R3": "reached", "R3_finding": 2, "R4": "reached", "R4_finding": 1,
+     "note": "Optional compaction of lim_zero. R4 gives the maintainer's exact fold of congr' into simpa; R1, R3 give other equally compact rewrites."},
+    {"pr": 29842, "ask_id": "v0056",
+     "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null,
+     "R3": "no", "R3_finding": null, "R4": "no", "R4_finding": null,
+     "note": "Asks for a PR-description note about the plan to generalize the definition later; nothing similar in any finding."},
+    {"pr": 30641, "ask_id": "v0064",
+     "R1": "no", "R1_finding": null, "R2": "reached", "R2_finding": 1,
+     "R3": "reached", "R3_finding": 1, "R4": "no", "R4_finding": null,
+     "note": "Rename a to x. R2, R3 rewrite the signature with x (and make it explicit). R1, R4 make the binders explicit but keep a."},
+    {"pr": 30641, "ask_id": "v0065",
+     "R1": "reached", "R1_finding": 2, "R2": "reached", "R2_finding": 0,
+     "R3": "reached", "R3_finding": 0, "R4": "reached", "R4_finding": 0,
+     "note": "Subsumption only: each one-line proof removes h₂a entirely, so the rename is moot. No finding mentions hypothesis naming."},
+    {"pr": 30641, "ask_id": "v0066",
+     "R1": "reached", "R1_finding": 2, "R2": "reached", "R2_finding": 0,
+     "R3": "reached", "R3_finding": 0, "R4": "reached", "R4_finding": 0,
+     "note": "Subsumption: the one-line proof via mul_max_of_nonneg drops the auxiliary 1 < |a^n| fact the maintainer wanted simplified."},
+    {"pr": 30641, "ask_id": "v0067",
+     "R1": "partial", "R1_finding": 4, "R2": "partial", "R2_finding": 4,
+     "R3": "partial", "R3_finding": 4, "R4": "partial", "R4_finding": 4,
+     "note": "Same side goal (sum nonneg). All replace the simp call with an explicit Finset.sum_nonneg term, not positivity."},
+    {"pr": 30641, "ask_id": "v0068",
+     "R1": "partial", "R1_finding": 4, "R2": "reached", "R2_finding": 3,
+     "R3": "partial", "R3_finding": 4, "R4": "partial", "R4_finding": 4,
+     "note": "R2 adds a @[gcongr] lemma for log⁺ and uses gcongr for this step. Others prove the same step by a term, not gcongr."}
+  ],
+  "unmatched": {
+    "29842": {"R1": 2, "R2": 1, "R3": 2, "R4": 2},
+    "30641": {"R1": 4, "R2": 3, "R3": 3, "R4": 4}
+  }
+}

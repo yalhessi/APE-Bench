@@ -1,0 +1,23 @@
+[
+  {
+    "target": "UniqueDiffWithinAt.mono",
+    "claim": "After the PR moves it into the TVS section, `UniqueDiffWithinAt.mono` sits below `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]`. Because its proof goes through `h.mono_nhds`, it now requires both instances. Monotonicity in the set needs neither: it follows from `tangentConeAt_mono`, which has no assumptions, and from `closure_mono`. The PR's purpose is to state these lemmas under minimal assumptions, and this one keeps two hypotheses it does not need.",
+    "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` (just after `UniqueDiffWithinAt.congr_pt`) and prove it directly: `theorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) : UniqueDiffWithinAt 𝕜 t x := ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`.",
+    "severity": "advisory",
+    "evidence": "I read the file as the PR leaves it (`target/Mathlib/Analysis/Calculus/TangentCone.lean`, lines 433-443): `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` comes before `UniqueDiffWithinAt.mono := h.mono_nhds <| nhdsWithin_mono _ st`. With lean_verify_edit in line mode I replaced lines 430-443, putting the direct proof above the variable line and leaving `mono_nhds` below it. Outcome `compiled`, with no errors and no warnings, so the whole file, including the `.mono` callers `UniqueDiffWithinAt.mono_closure`, `uniqueDiffWithinAt_Ici` and `uniqueDiffWithinAt_Iic`, still elaborates."
+  },
+  {
+    "target": "tangentConeAt_subset_zero",
+    "claim": "`tangentConeAt_subset_zero` and its consumer `UniqueDiffWithinAt.accPt` remain in the `Normed` section. Their proofs use only `tangentConeAt.lim_zero`, which this PR moves to TVS, `tendsto_const_nhds.add` (`ContinuousAdd`) and `tendsto_nhds_unique` (`T2Space`). This is the same argument as `tangentConeAt_mono_nhds`, which the PR does generalize, so the normed-space hypotheses are stronger than needed.",
+    "requested_change": "Move `tangentConeAt_subset_zero` into the TVS section after `tangentConeAt_inter_nhds`, with the extra binder `[T2Space E]`, and move `UniqueDiffWithinAt.accPt` with it (`[T2Space E] [Nontrivial E]`). Keep the proofs unchanged.",
+    "severity": "advisory",
+    "evidence": "With lean_verify_edit in line mode I spliced copies (`tangentConeAt_subset_zero'` with `[T2Space E]`, and `UniqueDiffWithinAt.accPt'` with `[T2Space E] [Nontrivial E]`) into the TangentCone TVS section just before `end TVS` (lines 145-147). The proofs are verbatim from the PR's Normed section. Outcome `compiled`, with no errors and no warnings."
+  },
+  {
+    "target": "tangentConeAt.lim_zero",
+    "claim": "The new proof of `tangentConeAt.lim_zero` uses the norm-based `eventually_ne_of_tendsto_norm_atTop` to build a named `have`, applies `Tendsto.congr'`, and only then rewrites `hc` to `cobounded`. Rewriting `hc` first lets the eventual-equality come from `hc.eventually_ne_cobounded 0` inline, and drops the `have` and the `apply`.",
+    "requested_change": "Replace the proof body with: `rw [tendsto_norm_atTop_iff_cobounded] at hc` / `refine .congr' ((hc.eventually_ne_cobounded 0).mono fun n hn ↦ inv_smul_smul₀ hn (d n)) ?_` / `simpa using (tendsto_inv₀_cobounded.comp hc).smul hd`.",
+    "severity": "advisory",
+    "evidence": "With lean_verify_edit (declaration_name `tangentConeAt.lim_zero`) I tried the three-line body above. Outcome `compiled`, with no errors and no warnings. declaration_search confirms `Filter.Tendsto.eventually_ne_cobounded` exists at the base commit (Mathlib/Topology/Bornology/Basic.lean:256). precedent_search turned up an earlier attempt at this generalization, PR #21065, where ADedecker suggested the same shape for this lemma: rewrite `hc` to `cobounded` first, then `hc.eventually_ne_cobounded 0` and `tendsto_inv₀_cobounded.comp hc |>.smul hd`."
+  }
+]

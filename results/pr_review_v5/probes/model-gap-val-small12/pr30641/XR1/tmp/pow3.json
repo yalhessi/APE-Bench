@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean","declaration_name":"Real.posLog_pow","new_declaration":"lemma posLog_pow (a : ℝ) (n : ℕ) : log⁺ (a ^ n) = n * log⁺ a := by\n  rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]"}

@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean","line_start":101,"line_end":110,"replacement":"/-- The positive part of the logarithm turns natural powers into multiples:\n`log⁺ (a ^ n) = n * log⁺ a`. -/\n@[simp] lemma posLog_pow (a : ℝ) (n : ℕ) : log⁺ (a ^ n) = n * log⁺ a := by\n  rw [posLog_def, posLog_def, log_pow, mul_max_of_nonneg _ _ n.cast_nonneg, mul_zero]"}

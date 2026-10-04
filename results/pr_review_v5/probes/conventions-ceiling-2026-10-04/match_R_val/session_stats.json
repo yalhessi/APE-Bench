@@ -1,0 +1,38 @@
+{
+ "30641": {
+  "X2": {
+   "findings": 5,
+   "compiles": 8
+  },
+  "E1": {
+   "findings": 7,
+   "compiles": 13
+  },
+  "X1": {
+   "findings": 5,
+   "compiles": 7
+  },
+  "XR1": {
+   "findings": 5,
+   "compiles": 10
+  }
+ },
+ "29842": {
+  "X1": {
+   "findings": 3,
+   "compiles": 5
+  },
+  "X2": {
+   "findings": 1,
+   "compiles": 4
+  },
+  "XR1": {
+   "findings": 3,
+   "compiles": 6
+  },
+  "E1": {
+   "findings": 3,
+   "compiles": 8
+  }
+ }
+}

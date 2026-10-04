@@ -1,0 +1,40 @@
+{
+  "asks": [
+    {"pr": 29842, "ask_id": "v0053",
+     "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null,
+     "R3": "no", "R3_finding": null, "R4": "no", "R4_finding": null,
+     "note": "Asks to explain the interaction with #24163/#21065 in the PR description; no finding addresses the description or prior PRs."},
+    {"pr": 29842, "ask_id": "v0055",
+     "R1": "reached", "R1_finding": 1, "R2": "no", "R2_finding": null,
+     "R3": "reached", "R3_finding": 2, "R4": "reached", "R4_finding": 1,
+     "note": "Compact lim_zero by folding congr' into simpa; R4 gives exactly this, R1/R3 an equivalent compaction; R2 has no lim_zero finding."},
+    {"pr": 29842, "ask_id": "v0056",
+     "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null,
+     "R3": "no", "R3_finding": null, "R4": "no", "R4_finding": null,
+     "note": "Asks to state the plan (generalize lemmas before the definition) in the PR description; no finding touches the description."},
+    {"pr": 30641, "ask_id": "v0064",
+     "R1": "no", "R1_finding": null, "R2": "reached", "R2_finding": 1,
+     "R3": "reached", "R3_finding": 1, "R4": "no", "R4_finding": null,
+     "note": "Rename a to x. R2/R3 signature changes use x (matching log_pow); R1/R4 make binders explicit but keep a."},
+    {"pr": 30641, "ask_id": "v0065",
+     "R1": "no", "R1_finding": null, "R2": "no", "R2_finding": null,
+     "R3": "no", "R3_finding": null, "R4": "no", "R4_finding": null,
+     "note": "Rename h₂a to ha. No naming finding; one-line proof rewrites would delete the hypothesis, but do not address naming."},
+    {"pr": 30641, "ask_id": "v0066",
+     "R1": "reached", "R1_finding": 2, "R2": "reached", "R2_finding": 0,
+     "R3": "reached", "R3_finding": 0, "R4": "reached", "R4_finding": 0,
+     "note": "Prove posLog_pow's case more directly; every reviewer replaces the case-split proof with a one-liner, which satisfies the ask."},
+    {"pr": 30641, "ask_id": "v0067",
+     "R1": "partial", "R1_finding": 4, "R2": "reached", "R2_finding": 3,
+     "R3": "partial", "R3_finding": 4, "R4": "partial", "R4_finding": 4,
+     "note": "Automate the nonnegativity side goal (positivity). R2's gcongr lemma removes it (gcongr discharges via positivity); others spell it out as terms."},
+    {"pr": 30641, "ask_id": "v0068",
+     "R1": "partial", "R1_finding": 4, "R2": "reached", "R2_finding": 3,
+     "R3": "partial", "R3_finding": 4, "R4": "partial", "R4_finding": 4,
+     "note": "Use gcongr for the monotoneOn_posLog step. R2 adds a @[gcongr] lemma and uses gcongr; others rewrite the step as a term."}
+  ],
+  "unmatched": {
+    "29842": {"R1": 2, "R2": 1, "R3": 2, "R4": 2},
+    "30641": {"R1": 4, "R2": 4, "R3": 3, "R4": 4}
+  }
+}
