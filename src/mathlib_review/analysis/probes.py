@@ -405,6 +405,30 @@ def render_models(release: Path, prs: List[int], inventory_path: Optional[Path] 
     return out
 
 
+#: The conventions ceiling probe's section (`docs/todo/conventions-ceiling-probe.md`): census
+#: principles as sentences, with no location. The lead is the same at every level of the probe
+#: (exact, applicable, common, all) and for every reviewer; only the entries differ.
+CONVENTIONS_TITLE = "Conventions the maintainers hold"
+CONVENTIONS_LEAD = (
+    "These are conventions Mathlib's maintainers hold when they review, one sentence each: a "
+    "situation and the form preferred in it. They are stated in general, and none names a place in "
+    "this PR. Check the changed code against each one. Where it departs from a convention, request "
+    "the change that convention calls for, as a finding at the place it applies.")
+
+
+def conventions_section(principles: List[str]) -> str:
+    return CONVENTIONS_LEAD + "\n\n" + "\n".join(f"- {p}" for p in principles) + "\n"
+
+
+def load_conventions(briefs: Path, codebook: Path) -> Dict[int, List[str]]:
+    """A level's briefs as sentences: `briefs` is `{"prs": {pr: [entry ids]}}`, `codebook` a census
+    codebook. Sentences come in codebook order whatever order the brief lists its ids in."""
+
+    principle = {entry["id"]: entry["principle"] for entry in json.loads(Path(codebook).read_text())}
+    return {int(pr): [principle[i] for i in sorted(set(ids))]
+            for pr, ids in json.loads(Path(briefs).read_text())["prs"].items()}
+
+
 def pr_markdown(episode: Dict[str, Any]) -> str:
     title = episode["title"]["text"] if isinstance(episode["title"], dict) else episode["title"]
     desc = (episode.get("description") or {}).get("text") or "(not recoverable at review start)"
@@ -413,15 +437,19 @@ def pr_markdown(episode: Dict[str, Any]) -> str:
 
 
 def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optional[List[int]] = None,
-                  brief: Path = BRIEF_X, root: Optional[Path] = None) -> List[Path]:
+                  brief: Path = BRIEF_X, root: Optional[Path] = None,
+                  conventions: Optional[Dict[int, List[str]]] = None) -> List[Path]:
     """One packet per (PR, session): brief, PR text, diff, pass-0 model and the logging `ptool`.
 
     A packet that already holds findings is refused: it is a finished session, and rewriting its
-    inputs would detach them from what it read.
+    inputs would detach them from what it read. With `conventions`, each PR's brief ends with its
+    conventions section; every PR must be named, and an empty list leaves the brief as it is.
     """
 
     root = Path(root or Path.cwd())
     prs = list(prs or spec.pr_numbers)
+    if conventions is not None and set(prs) - set(conventions):
+        raise KeyError(f"no conventions listed for PRs {sorted(set(prs) - set(conventions))}")
     models = render_models(spec.release, prs, spec.inventory)
     episodes = {json.loads(l)["pr_number"]: json.loads(l)
                 for l in (spec.release / "input/episodes.jsonl").read_text().splitlines()}
@@ -432,7 +460,9 @@ def write_packets(spec: ProbeSet, sessions: List[str], scratch: Path, prs: Optio
             if finished(d):
                 raise FileExistsError(f"{d} is a finished session")
             (d / "tmp").mkdir(parents=True, exist_ok=True)
-            (d / "brief.md").write_bytes(brief.read_bytes())
+            held = conventions[pr] if conventions else []
+            (d / "brief.md").write_bytes(brief.read_bytes() + (
+                f"\n## {CONVENTIONS_TITLE}\n\n{conventions_section(held)}".encode() if held else b""))
             (d / "model.md").write_text(models[pr])
             (d / "pr.md").write_text(pr_markdown(episodes[pr]))
             (d / "diff.patch").write_text(episodes[pr]["diff"])
@@ -970,21 +1000,6 @@ def audit_transcript(folder: Path, transcript: Path) -> Dict[str, Any]:
                 flagged.append({"tool": b.get("name"), "why": sorted(set(why)),
                                 "input": text.replace(folder, "<dir>")[:160]})
     return {"folder": folder, "calls": calls, "flagged": flagged}
-
-
-#: The conventions ceiling probe's section (`docs/todo/conventions-ceiling-probe.md`): census
-#: principles as sentences, with no location. The lead is the same at every level of the probe
-#: (exact, applicable, common, all) and for every reviewer; only the entries differ.
-CONVENTIONS_TITLE = "Conventions the maintainers hold"
-CONVENTIONS_LEAD = (
-    "These are conventions Mathlib's maintainers hold when they review, one sentence each: a "
-    "situation and the form preferred in it. They are stated in general, and none names a place in "
-    "this PR. Check the changed code against each one. Where it departs from a convention, request "
-    "the change that convention calls for, as a finding at the place it applies.")
-
-
-def conventions_section(principles: List[str]) -> str:
-    return CONVENTIONS_LEAD + "\n\n" + "\n".join(f"- {p}" for p in principles) + "\n"
 
 
 def model_context(spec: ProbeSet, prs: List[int],

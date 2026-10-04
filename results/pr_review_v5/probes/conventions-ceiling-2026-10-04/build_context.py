@@ -7,7 +7,6 @@ order whatever order the brief lists them in.
 
 usage (repo root, PYTHONPATH=$PWD/src): ape/bin/python <this file> <base|exact|common|all>
 """
-import json
 import sys
 from pathlib import Path
 
@@ -18,13 +17,11 @@ CODEBOOK = Path("results/pr_review_v5/adjudications/conventions-census-v1/reader
 SETS = {"val": "configs/probe_sets/val_small12.yaml", "post": "configs/probe_sets/postcutoff_2026_07_08_v1.yaml"}
 
 level = sys.argv[1]
-codebook = {entry["id"]: entry["principle"] for entry in json.loads(CODEBOOK.read_text())}
-briefs = None if level == "base" else {int(pr): ids for pr, ids in
-                                       json.loads((HERE / f"briefs_{level}.json").read_text())["prs"].items()}
+briefs = None if level == "base" else probes.load_conventions(HERE / f"briefs_{level}.json", CODEBOOK)
 for tag, path in SETS.items():
     spec = probes.load_probe_set(Path(path))
     prs = [pr for pr in spec.pr_numbers if briefs is None or pr in briefs]
-    conventions = None if briefs is None else {pr: [codebook[i] for i in sorted(set(briefs[pr]))] for pr in prs}
+    conventions = None if briefs is None else {pr: briefs[pr] for pr in prs}
     out = HERE / f"context_{tag}_{level}.jsonl"
     out.write_text(probes.model_context(spec, prs, conventions))
     held = "" if conventions is None else f", {sum(map(len, conventions.values()))} sentences"

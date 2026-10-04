@@ -325,10 +325,12 @@ def test_the_solo_context_file_is_the_one_test_b_used():
 
 
 def test_conventions_follow_the_model_as_a_second_section_and_no_pr_is_skipped():
-    ref = [json.loads(line) for line in (G52_DIR / "model_context.jsonl").read_text().splitlines()][:2]
+    from src.mathlib_review.io import jsonl_rows
+
+    ref = jsonl_rows(G52_DIR / "model_context.jsonl")[:2]
     prs = [41930, 42184]
     rows = [json.loads(line) for line in probes.model_context(
-        POST, prs, conventions={41930: ["A is written as B.", "C is named D."], 42184: []}).splitlines()]
+        POST, prs, conventions={41930: ["A is written as B.", "C is named D."], 42184: []}).split("\n") if line]
     assert rows[0]["sections"][0] == ref[0]["sections"][0]
     assert rows[0]["sections"][1] == {
         "title": probes.CONVENTIONS_TITLE,
@@ -467,3 +469,23 @@ def test_a_swap_submission_imports_located_by_path_and_line(tmp_path):
     assert provenance["findings_past_the_budget"] == {"33337": 2}
     rows = [json.loads(l) for l in (tmp_path / "run" / "findings.jsonl").read_text().splitlines() if l]
     assert any(r["requested_change"] == "Rename it." for r in rows)
+
+
+def test_a_packet_brief_ends_with_its_conventions_and_an_empty_brief_is_brief_x(tmp_path):
+    spec = POST.model_copy(update={"probe_dir": tmp_path / "probe"})
+    briefed, bare = probes.write_packets(spec, ["E1"], tmp_path / "scratch", prs=[43192, 43024],
+                                         conventions={43192: ["A is written as B."], 43024: []})
+    brief_x = probes.BRIEF_X.read_text()
+    assert (briefed / "brief.md").read_text() == (
+        brief_x + f"\n## {probes.CONVENTIONS_TITLE}\n\n{probes.CONVENTIONS_LEAD}\n\n- A is written as B.\n")
+    assert (bare / "brief.md").read_text() == brief_x
+    with pytest.raises(KeyError, match="43024"):
+        probes.write_packets(spec, ["E2"], tmp_path / "scratch", prs=[43192, 43024],
+                             conventions={43192: ["A is written as B."]})
+
+
+def test_a_brief_is_its_entries_sentences_in_codebook_order(tmp_path):
+    codebook, briefs = tmp_path / "codebook.json", tmp_path / "briefs.json"
+    codebook.write_text(json.dumps([{"id": "P001", "principle": "first"}, {"id": "P002", "principle": "second"}]))
+    briefs.write_text(json.dumps({"prs": {"7": ["P002", "P001", "P002"], "8": []}}))
+    assert probes.load_conventions(briefs, codebook) == {7: ["first", "second"], 8: []}

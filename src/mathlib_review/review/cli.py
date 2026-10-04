@@ -158,6 +158,10 @@ def build_parser() -> argparse.ArgumentParser:
     parsers["packets"].add_argument("--swap-from", metavar="RUN",
                                     help="swap packets: each PR's delivered messages from this solo run, "
                                          "for one session (write_swap_packets)")
+    parsers["packets"].add_argument("--conventions", type=Path, metavar="BRIEFS",
+                                    help='end each brief with its PR\'s conventions section: a JSON '
+                                         '{"prs": {pr: [entry ids]}}, with --codebook (needs --prs)')
+    parsers["packets"].add_argument("--codebook", type=Path, help="the census codebook --conventions names entries of")
     parsers["feedback"].add_argument("--write", action="store_true")
     for name in ("readers", "match-inputs"):
         parsers[name].add_argument("--out", required=True, type=Path)
@@ -584,7 +588,11 @@ def _probe(args, logger) -> int:
                                             args.swap_from, prs=args.prs)
         print(json.dumps([str(d) for d in written], indent=1))
     elif args.probe_command == "packets":
-        written = probes.write_packets(spec, args.sessions, args.scratch.resolve(), prs=args.prs)
+        if bool(args.conventions) != bool(args.codebook):
+            raise SystemExit("--conventions and --codebook go together")
+        written = probes.write_packets(
+            spec, args.sessions, args.scratch.resolve(), prs=args.prs,
+            conventions=probes.load_conventions(args.conventions, args.codebook) if args.conventions else None)
         print(json.dumps([str(d) for d in written], indent=1))
     elif args.probe_command == "prompts":
         for pr in args.prs or spec.pr_numbers:

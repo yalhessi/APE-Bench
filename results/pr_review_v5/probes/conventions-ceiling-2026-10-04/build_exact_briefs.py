@@ -30,7 +30,8 @@ for tag, path in SETS.items():
 
 
 def load(n: int) -> dict:
-    rows = [json.loads(line) for line in (HERE / f"readers/labels_{n}.jsonl").read_text().splitlines() if line.strip()]
+    with (HERE / f"readers/labels_{n}.jsonl").open(encoding="utf-8") as handle:
+        rows = [json.loads(line) for line in handle if line.strip()]
     assert [r["cid"] for r in rows] == [cid for cid, _ in order], f"reader {n}: cids are not the batch, in order"
     for r in rows:
         ids = [i for i in (r["principle_id"], r["second_principle_id"]) if i and i != "none"]
