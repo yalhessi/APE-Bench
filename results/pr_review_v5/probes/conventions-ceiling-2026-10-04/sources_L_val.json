@@ -1,0 +1,32 @@
+{
+ "X1": {
+  "kind": "claude"
+ },
+ "X2": {
+  "kind": "claude"
+ },
+ "LB1": {
+  "kind": "solo",
+  "run": "iter_local397_conv_val_base_rep1"
+ },
+ "LB2": {
+  "kind": "solo",
+  "run": "iter_local397_conv_val_base_rep2"
+ },
+ "LB3": {
+  "kind": "solo",
+  "run": "iter_local397_conv_val_base_rep3"
+ },
+ "LE1": {
+  "kind": "solo",
+  "run": "iter_local397_conv_val_exact_rep1"
+ },
+ "LE2": {
+  "kind": "solo",
+  "run": "iter_local397_conv_val_exact_rep2"
+ },
+ "LE3": {
+  "kind": "solo",
+  "run": "iter_local397_conv_val_exact_rep3"
+ }
+}
