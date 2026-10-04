@@ -5,6 +5,20 @@ direction ("testing the local model first before any paid API runs"): stage L, t
 Qwen3.5-397B under contract v2 with and without the exact section, is pre-registered in
 `results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`. It tests the machinery and
 one untried local-unlock design; it is not Claude's ceiling, and the Claude step below is unchanged.
+
+**Done so far (2026-10-04).**
+- **The first step is done: 39 of the 46 asks are in census (85%)**, 25 of 30 on validation and 14
+  of 16 post-cutoff; the two readers chose the same entry on all 38 they both assigned. The exact
+  briefs hold 28 distinct entries, 0 to 5 a PR (`briefs_exact.json` there). Census coverage does not
+  bound the ceiling.
+- **Stage L read +0.051 on both matchers** (LB 4/117, LE 10/117 on in-census asks, three reps a
+  condition): the bottom edge of its "inconclusive" band, far from its +0.15. The section makes the
+  local model's reach repeatable (36822's attribute asks go from 1 of 3 reps to 3 of 3) and opens
+  one new ask of 39. Where it missed, its notes show the convention checked and the code passed, or
+  never raised. Nothing follows for Claude.
+- **The Claude exact step has not run and waits for the user.** Its delivery is built
+  (`cli probe packets --conventions … --codebook …`), and the path from labels to reading has run
+  end to end. 28 reviewer sessions and four matcher runs.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 

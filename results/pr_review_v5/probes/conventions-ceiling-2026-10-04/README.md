@@ -126,6 +126,100 @@ folder). Labels are `readers/labels_{1,2}.jsonl`, the briefs `briefs_exact.json`
   hold an entry only reader 1 gave: P100 on 26755 and on 43192, P401 on 32875 and P086 on 42814.
 - **Cost:** 134,923 and 136,802 subagent tokens, 5.3 and 5.6 minutes.
 
+## Result 2 (2026-10-04): +0.051 on both matchers, at the lower edge of the rule; the brief steadies what the model already reaches and opens one new ask
+
+Twelve local runs (105 sessions, every one completed, no retry, 98.6M processed tokens, $0.00), one
+seal a set, two blind matchers a set, all four transcripts audited clean. The matchers agree on
+236 of 240 cells on validation and 127 of 128 post-cutoff. `read_stage.py L LE LB` prints the tables.
+
+| per-session reach, in-census asks | LB (unbriefed) | LE (exact section) | LE − LB | Claude X, same seal |
+|---|---|---|---|---|
+| validation, 25 asks | 2/75 = 0.03 | 7/75 = 0.09 | | 0.36 / 0.44 |
+| post-cutoff, 14 asks | 2/42 = 0.05 | 3/42 = 0.07 | | 0.43 / 0.43 |
+| **pooled, 39 asks** | **4/117 = 0.034** | **10/117 = 0.085** | **+0.051** | 0.38 / 0.44 |
+
+The local model's cells are identical on the two matchers; only Claude's differ.
+
+**By the rule: +0.0513 is six cells of 117, where the `≤ +0.05` line is 5.85 cells. So the letter
+says "between: inconclusive at this size", at the very bottom of that band.** It is far from the
++0.15 that would make knowledge supply a lever for this model. Provisional: one model, three reps,
+39 asks.
+
+**What the six cells are.**
+- Four are one PR. 36822's two asks (a moved declaration keeps its attributes, P098: `to_dual`
+  dropped `simp`) go from 1 of 3 reps to 3 of 3.
+- One is 43167's unused import (P030), from 2 of 3 to 3 of 3.
+- One is new: 28649's docstring abbreviation ask (P278), reached once.
+- So the asks reached in any rep go from 3 to 4 of 39, where Claude's X1 and X2 together reach 16
+  (matcher 1) and 18 (matcher 2). **The section makes this model's reach repeatable; it does not
+  widen it.**
+
+**Also read.**
+- **Near misses appear only under the section:** `partial` cells on in-census asks are 0 for LB and
+  4 for LE, on both matchers. Each is the right convention at a neighbouring place or in another
+  form: three sibling `noncomputable`s removed but not the one the maintainer named (26755); a
+  `grind =` tag asked for on the lemma itself, not the two it rewrites with (32875); two golfs of
+  the right lines with another tactic (30641). Reached or partial: 4 against 14 of 117.
+- **Asks per finding did not fall:** 13 of 29 findings for LB, 21 of 42 for LE (0.45, 0.50). The
+  section adds findings on the ask PRs (29 to 42 submissions over three reps) at the same aim.
+- **The out-of-census asks moved too, 9/21 to 11/21, and for a reason.** Both cells are 28649's
+  doubt about "variance" against "variances", which sits in the docstring hunk the brief's two
+  documentation entries sent the model to. An out-of-census ask that shares a hunk with an
+  in-census one is not a control; the other six such asks did not move.
+- **No finding hands the brief back.** All 42 LE findings name a file and a line; none restates an
+  entry without a place.
+- **Where it missed, the notes show the convention checked and the code passed, or the convention
+  never raised.** Read on four validation PRs, three reps each, by the brief's own terms:
+  - 30641: `gcongr` is named in 2 of 3 briefed sessions' notes and in no unbriefed one. One wrote
+    "`gcongr` doesn't apply here as verified", at the step the maintainer asked `gcongr` for.
+  - 32875: the brief's terms appear in 2 of 3 briefed sessions. One quoted "A short tactic block
+    that a single term proves is written as that term" as something the PR already follows.
+  - 29842 and 34091: none of the six briefed sessions' notes names its brief's entries (motivation
+    for a new concept; a class hypothesis taken instance-implicit). 29842 draws no finding, and
+    34091 the three docstring findings it draws unbriefed.
+- **Empty reviews persist with the conventions in hand.** 29842 draws no finding in six sessions
+  and 41930 none from any of the eight reviewers, Claude included.
+- **Controls, LB only:** 32080 draws 5 findings in each rep and 26185 and 34935 between 0 and 3;
+  the four post-cutoff controls draw none.
+
+**The anchor.** Claude's X on all asks reads 0.37 / 0.43 on validation, under the 0.48 / 0.50 its
+own matching gave, and 0.50 / 0.47 post-cutoff against 0.47. Validation's matchers here are
+stricter, mostly on whether a different golf of the same lines reaches the ask. LE − LB is within
+one seal, so it does not depend on that; a comparison with the published X figures would.
+
+**What it means, at this altitude.**
+- For this model, on 35 of 39 in-census asks, being told the convention that applies is not what
+  was missing. The step it fails is seeing where the code departs from the convention.
+- That is the local-unlock screen's reading again ("judgement at attended sites"), now with the
+  knowledge supplied rather than asked for.
+- It says nothing about Claude's ceiling, as stated before the runs.
+
+**Untried on this model:** the section with the over-file brief (the one setting that raised its
+single-pass reach); the conventions with their places, as candidate asks the model only vets;
+reasoning `high`; a stronger open model.
+
+**Caveat.** Whether Qwen3.5's training data holds the validation PRs is not known. Only the
+between-brief difference is read, where both conditions share the same memory.
+
+**Cost.** Generation: 12 runs of 7 to 14 minutes, two queues side by side on one server. Subagents:
+773,270 tokens over six runs (readers 134,923 and 136,802; matchers 136,359, 185,433, 92,199 and
+87,554). No Claude reviewer session ran.
+
+**What ran, in order.** `build_reader_folders.py`, two readers, `build_exact_briefs.py`,
+`build_context.py base|exact`, `run_local.sh <val|post> <base|exact> <1-3>`, then per set
+`cli probe seal`, `cli probe match-inputs` with `sources_L_<set>.json`, two matchers,
+`cli probe audit`, `cli probe unblind` into `match_L_<set>/unblinded.json`, and `read_stage.py`.
+`session_stats.json` counts a session's submission; a run directory's `findings.jsonl` is after
+anchoring and can be shorter.
+
+## The Claude stage is ready and has not started
+
+`cli probe packets --set <set> --sessions E1 E2 --prs <ask PRs> --scratch <dir> --conventions
+briefs_exact.json --codebook <reader A's codebook>` writes brief X with the section at its end;
+`briefs_exact.json` is the same file stage L read. The machinery from labels to reading has now run
+end to end. The step is 28 reviewer sessions and four matcher runs, the todo's 1.5 subscription
+windows, and it waits for the user.
+
 ## What closes it
 
 The table above, per matcher and per set, here and in the todo. The Claude exact step then runs or

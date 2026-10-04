@@ -1,0 +1,760 @@
+{
+ "asks": 30,
+ "1": {
+  "reach": {
+   "LB1": 0.13333333333333333,
+   "LB2": 0.06666666666666667,
+   "LB3": 0.06666666666666667,
+   "LE1": 0.2,
+   "LE2": 0.16666666666666666,
+   "LE3": 0.13333333333333333,
+   "X1": 0.4,
+   "X2": 0.3333333333333333
+  },
+  "condition_reach": {
+   "LB": 0.08888888888888889,
+   "LE": 0.16666666666666666,
+   "X": 0.3666666666666667
+  },
+  "stable": {
+   "LB": [
+    "v0109",
+    "v0110"
+   ],
+   "LE": [
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0062",
+    "v0063",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "union": {
+   "LB": [
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "LE": [
+    "v0030",
+    "v0031",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0055",
+    "v0062",
+    "v0063",
+    "v0064",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "v0016": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "partial",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0029": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0030": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0031": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0053": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0055": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0056": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0060": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0061": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0062": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0063": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0064": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0065": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0066": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0067": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "partial",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0068": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "partial",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0090": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "partial",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0091": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "no"
+   },
+   "v0092": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0093": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0094": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0095": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0105": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0106": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0107": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0108": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0109": {
+    "LB1": "reached",
+    "LB2": "reached",
+    "LB3": "reached",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0110": {
+    "LB1": "reached",
+    "LB2": "reached",
+    "LB3": "reached",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0131": {
+    "LB1": "reached",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0132": {
+    "LB1": "reached",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "2": {
+  "reach": {
+   "LB1": 0.13333333333333333,
+   "LB2": 0.06666666666666667,
+   "LB3": 0.06666666666666667,
+   "LE1": 0.2,
+   "LE2": 0.16666666666666666,
+   "LE3": 0.13333333333333333,
+   "X1": 0.4666666666666667,
+   "X2": 0.4
+  },
+  "condition_reach": {
+   "LB": 0.08888888888888889,
+   "LE": 0.16666666666666666,
+   "X": 0.43333333333333335
+  },
+  "stable": {
+   "LB": [
+    "v0109",
+    "v0110"
+   ],
+   "LE": [
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0062",
+    "v0063",
+    "v0094",
+    "v0095",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "union": {
+   "LB": [
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "LE": [
+    "v0030",
+    "v0031",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ],
+   "X": [
+    "v0016",
+    "v0055",
+    "v0062",
+    "v0063",
+    "v0064",
+    "v0094",
+    "v0095",
+    "v0106",
+    "v0107",
+    "v0108",
+    "v0109",
+    "v0110",
+    "v0131",
+    "v0132"
+   ]
+  },
+  "published_reach": {},
+  "table": {
+   "v0016": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "partial",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0029": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0030": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0031": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0053": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0055": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0056": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0060": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0061": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "no"
+   },
+   "v0062": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0063": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0064": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "no"
+   },
+   "v0065": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0066": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0067": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "partial",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0068": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "partial",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0090": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "partial",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0091": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "no"
+   },
+   "v0092": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "partial",
+    "X2": "partial"
+   },
+   "v0093": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0094": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0095": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0105": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "no",
+    "X2": "no"
+   },
+   "v0106": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0107": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0108": {
+    "LB1": "no",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "no",
+    "LE2": "no",
+    "LE3": "no",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0109": {
+    "LB1": "reached",
+    "LB2": "reached",
+    "LB3": "reached",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0110": {
+    "LB1": "reached",
+    "LB2": "reached",
+    "LB3": "reached",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0131": {
+    "LB1": "reached",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   },
+   "v0132": {
+    "LB1": "reached",
+    "LB2": "no",
+    "LB3": "no",
+    "LE1": "reached",
+    "LE2": "reached",
+    "LE3": "reached",
+    "X1": "reached",
+    "X2": "reached"
+   }
+  }
+ },
+ "agreement": {
+  "cells": 240,
+  "three_valued": 235,
+  "reached_or_not": 236
+ }
+}

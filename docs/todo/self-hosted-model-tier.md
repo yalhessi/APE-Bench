@@ -39,6 +39,11 @@ taken, prompt caching must be handled, not assumed.
   - The direction is closed in `docs/dead-ends.md` ("The self-hosted Qwen3.5-397B as the
     design-iteration reviewer"), with the untried models and what reopens it.
   - Build item 1 (the provider entry) is now worth building only for the early-testing use.
+  - **Used as that tier, 2026-10-04** (`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/`):
+    twelve runs on the two probe sets shook out the conventions ceiling probe before any
+    subscription window. Given the conventions behind each PR's asks, the model's per-session reach
+    on those asks went from 0.034 to 0.085 on both matchers: steadier on what it already reached,
+    one new ask of 39. Supplying the knowledge did not lift it either.
 **Cost** — no spend for generation: GPU time on the `first` partition. Judging the calibration runs
 is the only bill.
 
