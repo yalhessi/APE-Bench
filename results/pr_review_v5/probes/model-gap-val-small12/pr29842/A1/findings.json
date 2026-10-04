@@ -1,0 +1,16 @@
+[
+ {
+  "target": "UniqueDiffWithinAt.mono",
+  "claim": "`UniqueDiffWithinAt.mono` now sits after `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]` in the UniqueDiff TVS section and is proved through `mono_nhds`, so it picks up `[ContinuousAdd E] [ContinuousSMul 𝕜 E]`. Monotonicity under `s ⊆ t` needs neither: `tangentConeAt_mono` and `closure_mono` hold with no continuity assumptions. In a PR whose purpose is to state these lemmas in TVS generality, this one is left at less than the generality it holds in.",
+  "requested_change": "Move `UniqueDiffWithinAt.mono` above `variable [ContinuousAdd E] [ContinuousSMul 𝕜 E]`, next to `UniqueDiffWithinAt.congr_pt`, and prove it directly: `theorem UniqueDiffWithinAt.mono (h : UniqueDiffWithinAt 𝕜 s x) (st : s ⊆ t) : UniqueDiffWithinAt 𝕜 t x := ⟨h.1.mono <| Submodule.span_mono <| tangentConeAt_mono st, closure_mono st h.2⟩`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on the PR file, inserting `#check @UniqueDiffWithinAt.mono` after the declaration, showed the PR's signature `∀ {𝕜} [NontriviallyNormedField 𝕜] {E} [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E] {x} {s t} [ContinuousAdd E] [ContinuousSMul 𝕜 E], ...`. lean_verify_edit in line mode on lines 433-443 put the direct proof above the `variable` line and kept `mono_nhds` below it. The result was outcome `compiled` with no errors, and the whole rest of the file, which uses `.mono` (e.g. `mono_closure`, `uniqueDiffWithinAt_Ici`), still compiled. `#check` then gave a signature with no `ContinuousAdd`/`ContinuousSMul`. content_search for `@UniqueDiffWithinAt.mono` over Mathlib found no explicit-argument uses that dropping the instance arguments could break."
+ },
+ {
+  "target": "Mathlib/Analysis/Calculus/TangentCone.lean",
+  "claim": "The two `section Normed` blocks this PR writes (after `end TVS` following `tangentConeAt_inter_nhds`, and after `IsOpen.uniqueDiffOn`) put `section Normed` directly against the first `variable` command, with no blank line between the commands.",
+  "requested_change": "Insert a blank line between `section Normed` and the following `variable [...]` line in both relocated blocks.",
+  "severity": "advisory",
+  "evidence": "diff.patch hunks @@ -171,6 +144,31 @@ and @@ -494,6 +474,26 @@ add `+section Normed` immediately followed by `+variable [NormedAddCommGroup E] [NormedSpace 𝕜 E]` and `+variable {𝕜' : Type*} ...`. The file read at lines 149-150 and 479-480 confirms this. The removed originals had the same layout, so this is carried-over style, not something the PR introduced. Formatting only, so no compile check."
+ }
+]

@@ -1,0 +1,1 @@
+{"path":"Mathlib/Analysis/SpecialFunctions/Log/PosLog.lean","declaration_name":"Real.posLog_pow","new_declaration":"/-- The positive part of the logarithm of a power `a ^ n` is `n` times `log⁺ a`. -/\n@[simp] lemma posLog_pow (n : ℕ) (a : ℝ) : log⁺ (a ^ n) = n * log⁺ a := by\n  simp [posLog_def, mul_max_of_nonneg _ _ n.cast_nonneg]"}

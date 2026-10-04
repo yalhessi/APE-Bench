@@ -1,0 +1,1 @@
+{"path": "Mathlib/Analysis/Calculus/TangentCone.lean", "line_start": 443, "line_end": 443, "replacement": "  h.mono_nhds <| nhdsWithin_mono _ st\n\n#check @UniqueDiffWithinAt.mono\n#check @tangentConeAt.lim_zero\n#check @tangentConeAt_mono_nhds"}

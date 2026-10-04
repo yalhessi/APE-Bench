@@ -1,0 +1,30 @@
+[
+ {
+  "target": "PR #41930 description (Mathlib/GroupTheory/Coprod/Basic.lean)",
+  "claim": "The PR description says the PR will \"name the minor premises according to their contents\", but the diff renames no minor premise. `one`, `inl_mul`, `inr_mul` (in `Monoid.Coprod.induction_on'`) and `inl`, `inr`, `mul` (in `Monoid.Coprod.induction_on`) have the same names before and after. The only change is the motive `C` becoming `motive`. The vague title (\"fix recursor argument name\") does not say what is renamed to what either.",
+  "requested_change": "Rewrite the title and description so they state exactly what changes, e.g. title `chore(GroupTheory/Coprod): rename the motive of Monoid.Coprod.induction_on(') to motive` and description \"Rename the motive argument `C` to `motive` in `Monoid.Coprod.induction_on'` and `Monoid.Coprod.induction_on` (and their `AddMonoid.Coprod` versions); the minor premises already carry descriptive names and are unchanged.\" Remove the sentence about renaming the minor premises.",
+  "severity": "advisory",
+  "evidence": "Compared diff.patch with model.md's before/after blocks. In both declarations the only change is `C` -> `motive` (plus one line break added in `induction_on`). Minor premise names are identical before and after: `one`/`inl_mul`/`inr_mul` and `inl`/`inr`/`mul`. Rule checked: \"The PR title and description say precisely what the change is\"."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "`Monoid.Coprod.induction_on'` is a `theorem`, a user-facing `@[elab_as_elim]` induction principle that the PR edits, and it has no docstring. Neither does its `to_additive` image `AddMonoid.Coprod.induction_on'`. Nothing tells the reader that it builds an element by left multiplication by generators, which is what separates it from the unprimed `induction_on`. The sibling principles `FreeMonoid.inductionOn` and `FreeMonoid.inductionOn'`, which this proof uses, carry docstrings on both the multiplicative and additive versions.",
+  "requested_change": "Add a docstring and a `to_additive` docstring: `/-- Induction principle for `M ∗ N` that builds an element from the left, one generator at a time: if `motive` holds for `1` and is preserved by multiplying on the left by `inl m` or `inr n`, then it holds everywhere. -/` followed by `@[to_additive (attr := elab_as_elim) /-- Induction principle for `AddMonoid.Coprod M N` that builds an element from the left, one generator at a time: if `motive` holds for `0` and is preserved by adding `inl m` or `inr n` on the left, then it holds everywhere. -/]`.",
+  "severity": "advisory",
+  "evidence": "Read target/Mathlib/GroupTheory/Coprod/Basic.lean lines 195-212: neither recursor has a docstring. content_search on target/Mathlib/Algebra/FreeMonoid/Basic.lean shows `FreeMonoid.inductionOn` and `FreeMonoid.inductionOn'` each with a docstring and a `to_additive` docstring. lean_verify_edit (line mode, lines 195-212) with this docstring and to_additive docstring: outcome `compiled`, no errors. Rules checked: `theorem` is reserved for results important enough to carry a docstring, and a `to_additive` pair has docstrings on both."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on",
+  "claim": "`Monoid.Coprod.induction_on` is a `theorem`, an `@[elab_as_elim]` induction principle (used as `induction x using Coprod.induction_on` in `Mathlib/GroupTheory/PushoutI.lean`) that the PR edits, and it has no docstring. Neither does its `to_additive` image `AddMonoid.Coprod.induction_on`.",
+  "requested_change": "Add `/-- Induction principle for `M ∗ N` with cases for `inl`, `inr` and `*`. -/` above it and pass the additive docstring through the attribute: `@[to_additive (attr := elab_as_elim) /-- Induction principle for `AddMonoid.Coprod M N` with cases for `inl`, `inr` and `+`. -/]`.",
+  "severity": "advisory",
+  "evidence": "Read Basic.lean lines 208-212: no docstring. content_search found the only downstream use at target/Mathlib/GroupTheory/PushoutI.lean:179 (`induction x using Coprod.induction_on with | inl g => ... | inr h => ... | mul x y ihx ihy => ...`). The FreeMonoid analogue's docstring (\"An induction principle on free monoids, with cases for `1`, `FreeMonoid.of` and `*`\") gives the pattern. lean_verify_edit (line mode, lines 195-212, together with the induction_on' docstring): outcome `compiled`."
+ },
+ {
+  "target": "Monoid.Coprod.induction_on'",
+  "claim": "In `inl_mul : ∀ m x, motive x → motive (inl m * x)` and `inr_mul : ∀ n x, ...` the bound variables have no types, so elaboration infers them from use (`m : M` through the coercion of `inl`, `x : M ∗ N` through `motive`). The inner `m : M` also shadows the major premise `(m : M ∗ N)` of the same declaration, so one name means two types in the signature with nothing to tell them apart. The PR rewrites exactly these lines.",
+  "requested_change": "Give the minor premises' bound variables explicit types: `(inl_mul : ∀ (m : M) (x : M ∗ N), motive x → motive (inl m * x))` and `(inr_mul : ∀ (n : N) (x : M ∗ N), motive x → motive (inr n * x))`. Do the same for the sibling `induction_on` (`∀ m : M`, `∀ n : N`), which has the same shadowing of its major premise `m`.",
+  "severity": "advisory",
+  "evidence": "Read Basic.lean lines 196-199 (major premise `(m : M ∗ N)`; minor premise `∀ m x` with `m : M`). lean_verify_edit (line mode, lines 195-212) with `∀ (m : M) (x : M ∗ N)`, `∀ (n : N) (x : M ∗ N)` in induction_on' and `∀ m : M`, `∀ n : N`, `∀ x y : M ∗ N` in induction_on: outcome `compiled`, no errors. The proof bodies are unchanged. Rule checked: a variable bound in a declaration's signature gets an explicit type rather than one left for elaboration to infer from its uses."
+ }
+]
