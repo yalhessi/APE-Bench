@@ -1,0 +1,44 @@
+[
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "The new proof of `Finset.mem_map_equiv` is two consecutive calls, `simp only [mem_map, Equiv.coe_toEmbedding]` and then `grind`, where a single `simp` call proves the statement. The PR's own profile shows this declaration getting slower (<10 ms before, 25 ms after), so the golf costs time, and a `simp only` + `grind` pair is fragile when the `simp only` output changes.",
+  "requested_change": "Replace the two-line proof with the single call `simp [Equiv.apply_eq_iff_eq_symm_apply]`, i.e. `theorem mem_map_equiv {f : α ≃ β} {b : β} : b ∈ s.map f.toEmbedding ↔ f.symm b ∈ s := by simp [Equiv.apply_eq_iff_eq_symm_apply]`. If that is not at least as fast as the original proof, revert this declaration.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Finset/Image.lean, replacing Finset.mem_map_equiv with the body `simp [Equiv.apply_eq_iff_eq_symm_apply]`: outcome `compiled`, no warnings. A single `grind [Equiv.coe_toEmbedding]` fails: grind keeps `⇑f.toEmbedding w = b` and never instantiates `Equiv.symm_apply_apply`. The PR description reports `Finset.mem_map_equiv`: <10 ms before, 25 ms after. A maintainers-only zulip_search finds a Dec 2025 #mathlib4 thread, '`simp only` + `grind` failure' (Kim Morrison, Jireh Loreaux), on `simp only` output changes breaking a following `grind`."
+ },
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "`Finset.mem_map_equiv` is an `iff` characterisation of membership, but it is tagged only `@[simp 1100]`, not `@[grind =]`, even though its sibling `Finset.mem_map` directly above is `@[simp, grind =]`. `grind` cannot derive it from `mem_map`: this PR itself needs a `simp only` before `grind`, and `grind [Equiv.coe_toEmbedding]` alone fails.",
+  "requested_change": "Tag the lemma `@[simp 1100, grind =]` so that `grind` can rewrite `b ∈ s.map f.toEmbedding` to `f.symm b ∈ s`.",
+  "severity": "advisory",
+  "evidence": "file_read of target/Mathlib/Data/Finset/Image.lean lines 68-76: `mem_map` is `@[simp, grind =]` and `mem_map_equiv` is `@[simp 1100]` only. lean_verify_edit with `@[simp 1100, grind =]` plus the `simp [Equiv.apply_eq_iff_eq_symm_apply]` proof: outcome `compiled`, no warnings. lean_verify_edit with the body `grind [Equiv.coe_toEmbedding]`: `grind` failed, with the E-matching diagnostics showing it stuck at `f.toEmbedding w = b`, `f.symm b ∉ s`."
+ },
+ {
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "The new proof of `Rat.inv_intCast_den_of_pos` is two consecutive calls, `simp only [den_inv, num_intCast]` and then `grind`, which a single `grind` call with those lemmas performs. The PR's profile also shows this declaration getting slower (<10 ms before, 17 ms after).",
+  "requested_change": "Merge the two lines into `grind [den_inv, num_intCast]`. Alternatively, write it as one `simp` call in the style of the sibling `inv_intCast_num_of_pos` (`simp [*]`): `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`. Keep the old proof if neither is faster than it.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Rat/Lemmas.lean, Rat.inv_intCast_den_of_pos with the body `grind [den_inv, num_intCast]`: `compiled`, no warnings. With `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`: `compiled`, no warnings. With `grind [den_inv]` alone: fails. With `simp [ha0.ne', ha0.le]`: leaves `↑a.natAbs = a`. The sibling at line 296 is `theorem inv_intCast_num_of_pos ... := by simp [*]`. The PR description reports <10 ms before and 17 ms after."
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "The new ending of `pi_map_piCongrLeft` takes two calls, `simp only [pi_pi, this]` and `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`. The first rewrites with a local equation through `simp only`. The second leaves the equivalence `e` implicit and passes `congrFun rfl` for the pointwise hypothesis, which is just an obscured `fun _ ↦ rfl`. `Fintype.prod_equiv`'s own docstring points to `Equiv.prod_comp` as the version without that hypothesis, which is exactly the case here.",
+  "requested_change": "Replace the last two lines with the single rewrite `rw [this, pi_pi, e.prod_comp fun i ↦ μ i (s i)]`. The minimal alternative is `rw [this, pi_pi]` then `exact e.prod_comp fun i ↦ μ i (s i)`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/MeasureTheory/Constructions/Pi.lean, MeasureTheory.Measure.pi_map_piCongrLeft with its ending replaced by `rw [this, pi_pi, e.prod_comp fun i ↦ μ i (s i)]`: `compiled`, no warnings. `rw [this, pi_pi]` + `exact e.prod_comp fun i ↦ μ i (s i)`: `compiled`. `rw [this, pi_pi]` + `exact Fintype.prod_equiv e _ _ fun _ ↦ rfl`: `compiled`. content_search finds the `Fintype.prod_equiv` docstring at Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean:715: 'See `Equiv.sum_comp` for a version without `h`.'"
+ },
+ {
+  "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "The new proof takes three steps: a `have` rewriting `ρ` to `ρ.fst ⊗ₘ ρ.condKernel`, then `simp only [this]` to rewrite the goal with that local equation, then `exact (compProd_apply_prod hs ht).symm`. A single `rw` performs all three. `simp only [this]` is also a nonstandard way to rewrite with a hypothesis.",
+  "requested_change": "Replace the whole proof body with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`. Alternatively, to match the siblings `lintegral_condKernel` and `setLIntegral_condKernel` in the same section, use `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` followed by `rw [compProd_apply_prod hs ht]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod with the body `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`: `compiled`, no warnings. The `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` + `rw [compProd_apply_prod hs ht]` form: `compiled`. `simpa [ρ.disintegrate ρ.condKernel] using (compProd_apply_prod (μ := ρ.fst) (κ := ρ.condKernel) hs ht).symm`: `compiled`. A plain `simpa using` fails, because `disintegrate` is not simp. Lines 149-159 of the file show the sibling pattern `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]; rw [...]`."
+ },
+ {
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "The kernel version repeats the same three steps: a `have` rewriting `κ a` to `(Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a`, then `simp only [this]`, then `exact (Kernel.compProd_apply_prod hs ht).symm`. A single `rw` performs all three.",
+  "requested_change": "Replace the whole proof body with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`. Alternatively, to match `lintegral_condKernel` and `setLIntegral_condKernel` just below, use `conv_rhs => rw [← κ.disintegrate κ.condKernel]` followed by `rw [Kernel.compProd_apply_prod hs ht]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Probability/Kernel/Disintegration/Integral.lean, ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod with the body `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`: `compiled`, no warnings. The `conv_rhs => rw [← κ.disintegrate κ.condKernel]` + `rw [Kernel.compProd_apply_prod hs ht]` form: `compiled`. Lines 57-67 of the file show the sibling pattern."
+ }
+]

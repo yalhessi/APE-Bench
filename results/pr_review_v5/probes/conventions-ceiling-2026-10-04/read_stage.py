@@ -5,7 +5,12 @@ matcher) and `match_<stage>_<set>/session_stats.json` (findings per session), an
 `briefs_exact.json` (which asks are in census). Per-session reach of a condition is its `reached`
 cells over (asks x its sessions); a condition is a session label less its digits (LB1 -> LB).
 
-usage (repo root): python3 <this file> <stage, e.g. L> <treated condition> <control condition>
+A stage matched in rounds names them together (`C1,C2`): a set's tables are merged per matcher
+number, each PR judged in the one round that held it. `--impute <pr> ...` adds the in-census asks of
+PRs that were not run as reached by every session of both conditions (stage C: the PRs where both
+unbriefed sessions already reach every in-census ask, on both of stage L's matchers).
+
+usage (repo root): python3 <this file> <stage[,stage]> <treated> <control> [--impute <pr> ...]
 """
 import json
 import sys
@@ -13,6 +18,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 stage, treated, control = sys.argv[1:4]
+imputed_prs = {int(pr) for pr in sys.argv[5:]} if sys.argv[4:5] == ["--impute"] else set()
 asks = json.loads((HERE / "briefs_exact.json").read_text())["asks"]
 
 
@@ -36,9 +42,33 @@ def rate(pair: tuple) -> str:
     return f"{pair[0]:3}/{pair[1]:3} = {pair[0] / pair[1]:.2f}" if pair[1] else "  -"
 
 
-sets = {tag: (json.loads((HERE / f"match_{stage}_{tag}/unblinded.json").read_text()),
-              json.loads((HERE / f"match_{stage}_{tag}/session_stats.json").read_text()))
-        for tag in ("val", "post") if (HERE / f"match_{stage}_{tag}/unblinded.json").exists()}
+def merged(tag: str):
+    """One set's unblinded tables and session stats over the stage's rounds."""
+    tables, stats, agreement = {}, {}, {"cells": 0, "three_valued": 0, "reached_or_not": 0}
+    for name in stage.split(","):
+        folder = HERE / f"match_{name}_{tag}"
+        if not (folder / "unblinded.json").exists():
+            continue
+        u = json.loads((folder / "unblinded.json").read_text())
+        for m in ("1", "2"):
+            tables.setdefault(m, {"table": {}})["table"].update(u[m]["table"])
+        for k in agreement:
+            agreement[k] += (u.get("agreement") or {}).get(k, 0)
+        stats.update(json.loads((folder / "session_stats.json").read_text()))
+    return ({**tables, "agreement": agreement}, stats) if tables else None
+
+
+sets = {tag: got for tag in ("val", "post") if (got := merged(tag))}
+if imputed_prs:
+    sessions = sorted({s for u, _ in sets.values() for row in u["1"]["table"].values() for s in row})
+    for cid, a in asks.items():
+        if a["pr"] in imputed_prs and a["in_census"]:
+            for m in ("1", "2"):
+                sets[a["set"]][0][m]["table"][cid] = {s: "reached" for s in sessions}
+    print(f"imputed as reached by every session: {sum(a['pr'] in imputed_prs and a['in_census'] for a in asks.values())} "
+          f"in-census asks on PRs {sorted(imputed_prs)}")
+judged = {cid for u, _ in sets.values() for cid in u["1"]["table"]}
+print(f"in-census asks in the tables: {sum(asks[c]['in_census'] for c in judged)} of {sum(a['in_census'] for a in asks.values())}")
 matchers = sorted(k for k in next(iter(sets.values()))[0] if isinstance(next(iter(sets.values()))[0][k], dict) and "table" in next(iter(sets.values()))[0][k])
 conds = sorted({condition(s) for u, _ in sets.values() for row in u[matchers[0]]["table"].values() for s in row})
 for scope, keep in (("in-census asks", lambda a: a["in_census"]), ("out-of-census asks", lambda a: not a["in_census"]),

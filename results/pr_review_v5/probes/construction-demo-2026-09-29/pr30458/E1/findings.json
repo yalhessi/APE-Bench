@@ -1,0 +1,72 @@
+[
+ {
+  "target": "div_left_inj",
+  "claim": "The PR replaces the two-line proof of `div_left_inj` (`rw [div_eq_mul_inv, div_eq_mul_inv]; exact mul_left_inj _`) with a six-line manual `constructor`/`have`/`simpa using mul_right_cancel (a := b) (b := a⁻¹) (c := c) h'`/`rintro rfl; rfl` proof. The generalisation does not need it: the original proof still compiles under the new `[DivInvMonoid G] [IsRightCancelMul G]` hypotheses, because `mul_left_inj` only needs `IsRightCancelMul`.",
+  "requested_change": "Restore the original proof: `by\n  rw [div_eq_mul_inv, div_eq_mul_inv]\n  exact mul_left_inj _`. Or, to match `div_right_inj`, use the term `div_left_injective.eq_iff`. Change only the typeclass assumptions.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Basic.lean, replacing `div_left_inj` with the pre-PR proof `rw [div_eq_mul_inv, div_eq_mul_inv]; exact mul_left_inj _` inside the PR's `RightCancelDivInvMonoid` section: outcome `compiled`, no errors. The alternative `div_left_injective.eq_iff` also gave `compiled`."
+ },
+ {
+  "target": "div_left_injective",
+  "claim": "`div_left_injective` is rewritten from the pre-PR `simp only [div_eq_mul_inv]; exact fun a a' h ↦ mul_left_injective b⁻¹ h` to a longer `intro`/`have h'`/`simpa using (mul_right_cancel (a := a₁) (b := b⁻¹) (c := a₂) h')` proof. The binder also gains a `: G` ascription, and the FIXME comment is dropped. None of this is needed for the generalisation. The pre-PR declaration compiles verbatim under `[DivInvMonoid G] [IsRightCancelMul G]`, since `mul_left_injective` only needs `IsRightCancelMul`.",
+  "requested_change": "Move the pre-PR declaration into the `RightCancelDivInvMonoid` section unchanged: statement `Function.Injective fun a ↦ a / b`, proof `simp only [div_eq_mul_inv]; exact fun a a' h ↦ mul_left_injective b⁻¹ h`, FIXME comment included. That makes the diff a pure move plus the new assumptions.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Basic.lean, replacing `div_left_injective` with the verbatim pre-PR declaration (FIXME comment, `fun a ↦ a / b`, original proof): outcome `compiled`, no errors and no warnings. All downstream uses compile with it as well."
+ },
+ {
+  "target": "div_right_inj",
+  "claim": "`div_right_inj` changes its proof from `div_right_injective.eq_iff` to `(div_right_injective (G := G) (b := a)).eq_iff`. The named arguments are redundant: the original term still elaborates under `[DivisionMonoid G] [IsLeftCancelMul G]`.",
+  "requested_change": "Revert the proof to `div_right_injective.eq_iff`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Basic.lean, replacing `div_right_inj` with proof `div_right_injective.eq_iff`: outcome `compiled`, no errors."
+ },
+ {
+  "target": "Finset.card_le_card_div_left",
+  "claim": "The PR rewrites the term-mode proof `have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective` into a tactic block with `obtain` and an explicit `(div_right_injective (b := a))`. The generalisation does not need this. The original proof compiles unchanged under the new `[DivisionMonoid α] [IsLeftCancelMul α]` assumptions.",
+  "requested_change": "Restore the original one-line term proof `have ⟨_, ha⟩ := hs; card_le_card_image₂_left _ ha div_right_injective` and change only the typeclass assumptions.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, replacing `Finset.card_le_card_div_left` with the pre-PR proof in the PR's `LeftCancel` section: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "Finset.card_le_card_div_right",
+  "claim": "The PR rewrites the term-mode proof `have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective` into a tactic block with `obtain` and `(div_left_injective (b := b))`. The rewrite is not required. The original proof compiles under the new `[DivisionMonoid α] [IsRightCancelMul α]` assumptions.",
+  "requested_change": "Restore the original term proof `have ⟨_, ha⟩ := ht; card_le_card_image₂_right _ ha div_left_injective` and change only the typeclass assumptions.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, replacing `Finset.card_le_card_div_right` with the pre-PR proof: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "Set.finite_div",
+  "claim": "The PR rewrites `finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn` into a two-line version with named binders and explicit `(b := b)` / `(b := a)` arguments. This is an incidental proof change: the one-line original compiles under the new `[DivisionMonoid α] [IsLeftCancelMul α] [IsRightCancelMul α]` section variables.",
+  "requested_change": "Restore the original proof `finite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn`. Change only the section's `variable` line.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, replacing `Set.finite_div` with the pre-PR proof: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "Set.infinite_div",
+  "claim": "As with `finite_div`, the proof of `infinite_div` is rewritten to add named binders and explicit `(b := …)` arguments over two lines. That is not needed: the original `infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn` compiles under the generalised assumptions.",
+  "requested_change": "Restore the original one-line proof `infinite_image2 (fun _ _ ↦ div_left_injective.injOn) fun _ _ ↦ div_right_injective.injOn`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Set/Finite.lean, replacing `Set.infinite_div` with the pre-PR proof: outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean (section DivisionMonoid: nested sections LeftCancel / RightCancel and the trailing variable line)",
+  "claim": "The new `section DivisionMonoid` declares the class context three times, through two nested sections (`LeftCancel`, `RightCancel`) and a third `variable` line. Each `variable` serves exactly one lemma (`card_le_card_div_left`, `card_le_card_div_right`, `card_le_card_div_self`), and each repeats `[DivisionMonoid α] … [DecidableEq α] {s t : Finset α}`. The third one is also wrapped over two lines although it fits in 100 columns. Single-use cancellation assumptions belong in the lemma signatures, not in their own `variable`/section.",
+  "requested_change": "Drop the nested `LeftCancel`/`RightCancel` sections and the trailing `variable`. Keep one `variable [DivisionMonoid α] [DecidableEq α] {s t : Finset α}` at the top of `section DivisionMonoid`. Bind `[IsLeftCancelMul α]` in the signatures of `card_le_card_div_left` and `card_le_card_div_self`, and `[IsRightCancelMul α]` in the signature of `card_le_card_div_right`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Algebra/Group/Pointwise/Finset/Basic.lean, line mode, lines 1244-1270 replaced by a single `section DivisionMonoid` with `variable [DivisionMonoid α] [DecidableEq α] {s t : Finset α}` and the three lemmas taking `[IsLeftCancelMul α]` / `[IsRightCancelMul α]` / `[IsLeftCancelMul α]` in their signatures (original term proofs): outcome `compiled`, no errors, no warnings."
+ },
+ {
+  "target": "div_eq_inv_self",
+  "claim": "`div_eq_inv_self` keeps its statement and proof, but the PR breaks its one-line `:= by rw [div_eq_mul_inv, mul_eq_right]` across two lines. The one-line form fits in 100 columns. The reformat is the only reason this declaration shows in the diff besides its new section header.",
+  "requested_change": "Keep the original single line `theorem div_eq_inv_self : a / b = b⁻¹ ↔ a = 1 := by rw [div_eq_mul_inv, mul_eq_right]`.",
+  "severity": "advisory",
+  "evidence": "Diff hunk at Mathlib/Algebra/Group/Basic.lean:636: same statement, same `rw` proof, only the line break added. declaration_search reports the pre-PR and post-PR declaration at the same line 636. The original line is about 87 characters."
+ },
+ {
+  "target": "div_eq_self",
+  "claim": "When `div_eq_self` is moved into `LeftCancelDivisionMonoid`, its one-line `:= by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]` is split over two lines. This is an incidental reformat that stops the hunk reading as a pure move. The original line fits in 100 columns.",
+  "requested_change": "Move the declaration as it was, on one line: `theorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_eq_left, inv_eq_one]`.",
+  "severity": "advisory",
+  "evidence": "Diff: the removed pre-PR line 783 and the added lines 660-661 have an identical statement and identical rw list; only the line break differs. The original line is about 90 characters."
+ }
+]

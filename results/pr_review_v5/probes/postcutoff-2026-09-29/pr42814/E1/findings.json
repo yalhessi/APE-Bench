@@ -1,0 +1,51 @@
+[
+  {
+    "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+    "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but the definition `Int.IsFundamentalDiscr` admits `D = 1` (1 % 4 = 1, `1 = 4 * x` has no solution, and no odd prime square divides 1). `1` is not the discriminant of any quadratic field, so the sentence is false for the definition as written.",
+    "requested_change": "Correct the module docstring sentence to \"Apart from `1`, these are exactly the discriminants of quadratic fields.\" and state in the docstring of `Int.IsFundamentalDiscr` that `1` is included by this definition.",
+    "severity": "blocking",
+    "evidence": "lean_verify_edit on Mathlib/NumberTheory/FundamentalDiscriminant.lean, appending `example : IsFundamentalDiscr 1 := by simp [isFundamentalDiscr_iff_squarefree]` and `example : IsFundamentalDiscr 1 := isFundamentalDiscr_four_mul_add_one (m := 0) |>.mpr (by simp)` before `end Int`: outcome `compiled`, no errors. So the predicate holds at 1, while quadratic-field discriminants have absolute value at least 3."
+  },
+  {
+    "target": "Int.isFundamentalDiscr_def",
+    "claim": "`Int.isFundamentalDiscr_def` restates the three-conjunct body of `Int.IsFundamentalDiscr` by hand, and `Int.IsFundamentalDiscr.emod_four_eq_zero_or_one` is a hand-written projection `h.1`. Both are what `mk_iff` and structure fields generate if the predicate is a structure. The anonymous conjuncts also force `h.1`/`h.2.2`-style access.",
+    "requested_change": "Turn `Int.IsFundamentalDiscr` into a `@[mk_iff] structure IsFundamentalDiscr (D : ℤ) : Prop` with named fields (`emod_four_eq_zero_or_one`, the `∀ x, D = 4 * x → ...` clause, and the odd-prime-square clause). Delete `isFundamentalDiscr_def` and `IsFundamentalDiscr.emod_four_eq_zero_or_one`, and use the generated `isFundamentalDiscr_iff` in the `grind` calls.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (line mode, lines 37-79 of Mathlib/NumberTheory/FundamentalDiscriminant.lean) replacing the def by `@[mk_iff] structure IsFundamentalDiscr (D : ℤ) : Prop where emod_four_eq_zero_or_one : D % 4 = 0 ∨ D % 4 = 1; forall_eq_four_mul : ∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1; forall_odd_prime : ∀ p : ℕ, p.Prime → Odd p → ¬ (p : ℤ) ^ 2 ∣ D`, removing `isFundamentalDiscr_def` and `emod_four_eq_zero_or_one`, and using `grind [isFundamentalDiscr_iff]` in `ne_zero` and `isFundamentalDiscr_iff_squarefree`: outcome `compiled`, no errors. `isFundamentalDiscr_four_mul_add_one` and `isFundamentalDiscr_four_mul` were unchanged."
+  },
+  {
+    "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+    "claim": "The binder `{D : ℤ}` is repeated in each of the four consecutive declarations `isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero`, `IsFundamentalDiscr.emod_four_eq_zero_or_one` and `isFundamentalDiscr_iff_squarefree`. `{m : ℤ}` is repeated in `isFundamentalDiscr_four_mul_add_one` and `isFundamentalDiscr_four_mul`.",
+    "requested_change": "Add `variable {D : ℤ}` after the definition of `IsFundamentalDiscr` and `variable {m : ℤ}` before `isFundamentalDiscr_four_mul_add_one`. Drop the per-declaration `{D : ℤ}` and `{m : ℤ}` binders.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit (line mode, lines 39-79) with the original definition kept, `variable {D : ℤ}` inserted after it, `variable {m : ℤ}` before the last two theorems, and the per-declaration binders removed: outcome `compiled`, no errors."
+  },
+  {
+    "target": "IsCoprime.dvd_mul_right_iff",
+    "claim": "The new iff lemmas `IsCoprime.dvd_mul_right_iff` / `IsCoprime.dvd_mul_left_iff` carry an `_iff` suffix that their library siblings do not have. Same-shaped iff lemmas are `Nat.Coprime.dvd_mul_right (H : Coprime k n) : k ∣ m * n ↔ k ∣ m`, `Nat.Coprime.dvd_mul_left`, `IsUnit.dvd_mul_right (hu : IsUnit u) : a ∣ b * u ↔ a ∣ b` and `IsUnit.dvd_mul_left`. The names `IsCoprime.dvd_mul_right` / `IsCoprime.dvd_mul_left` are free, so the suffix does not disambiguate anything.",
+    "requested_change": "Rename `IsCoprime.dvd_mul_right_iff` to `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left_iff` to `IsCoprime.dvd_mul_left`, matching `Nat.Coprime.dvd_mul_right/left`. Update the use in `Int.isFundamentalDiscr_iff_squarefree`.",
+    "severity": "advisory",
+    "evidence": "content_search: `Mathlib/Data/Nat/GCD/Basic.lean:101` `theorem Coprime.dvd_mul_right {m n k : ℕ} (H : Coprime k n) : k ∣ m * n ↔ k ∣ m` and `:104` `Coprime.dvd_mul_left`; `Mathlib/Algebra/Divisibility/Units.lean:82,104` `IsUnit.dvd_mul_right/left` (iff, no suffix). declaration_search: `IsCoprime.dvd_mul_right` and `IsCoprime.dvd_mul_left` are not declared at base or in the PR. Search for `.dvd_mul_(left|right)_iff` finds only the two new PR lemmas."
+  },
+  {
+    "target": "Odd.isCoprime_two",
+    "claim": "`Odd.isCoprime_two : Odd x → IsCoprime x 2` omits the side suffix that the library uses for this family. Nat has `Odd.coprime_two_left` / `Odd.coprime_two_right` (aliases of `Nat.coprime_two_left/right`), and Int has `Int.isCoprime_two_left : IsCoprime 2 m ↔ Odd m` / `Int.isCoprime_two_right : IsCoprime m 2 ↔ Odd m`. The `IsCoprime 2 x` twin is missing.",
+    "requested_change": "Rename `Odd.isCoprime_two` to `Odd.isCoprime_two_right` and add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`. Update the call in `Int.isFundamentalDiscr_iff_squarefree`.",
+    "severity": "advisory",
+    "evidence": "content_search: `Mathlib/Data/Nat/Prime/Basic.lean:158-159` `protected alias ⟨Coprime.odd_of_left, _root_.Odd.coprime_two_left⟩` / `⟨Coprime.odd_of_right, _root_.Odd.coprime_two_right⟩`; `Mathlib/RingTheory/Int/Basic.lean:119,123` `Int.isCoprime_two_left/right`. lean_verify_edit on Mathlib/RingTheory/Coprime/Basic.lean replacing the declaration with `Odd.isCoprime_two_right` (same proof) plus `Odd.isCoprime_two_left := h.isCoprime_two_right.symm`: outcome `compiled`. (Using `Int.isCoprime_two_right` directly in the new file fails with an unknown constant because `Mathlib.RingTheory.Int.Basic` is not imported, so the general lemma itself is justified.)"
+  },
+  {
+    "target": "Int.squarefree_iff_prime_sq_not_dvd",
+    "claim": "The proof builds an ad hoc `bridge` iff and threads it through both directions by hand, which is longer than needed. Inside `namespace Int` it also spells `Int.squarefree_natAbs` / `Int.natCast_dvd` with redundant prefixes and uses `=>`.",
+    "requested_change": "Replace the proof with `simp_rw [← squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Nat.cast_mul, natCast_dvd]`.",
+    "severity": "advisory",
+    "evidence": "lean_verify_edit on Mathlib/Data/Nat/Squarefree.lean, declaration `Int.squarefree_iff_prime_sq_not_dvd`, same statement with the proof `by simp_rw [← squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Nat.cast_mul, natCast_dvd]`: outcome `compiled`, no errors."
+  },
+  {
+    "target": "Nat.forall_prime_iff_two_and_odd",
+    "claim": "The reverse direction re-derives the case split `p = 2 ∨ Odd p` with `eq_or_ne` and `Prime.odd_of_ne_two` in a tactic block. The existing `Nat.Prime.eq_two_or_odd'` already gives this split.",
+    "requested_change": "Write the proof as the term `⟨fun h ↦ ⟨h 2 prime_two, fun p hp _ ↦ h p hp⟩, fun h p hp ↦ hp.eq_two_or_odd'.elim (· ▸ h.1) (h.2 p hp)⟩`.",
+    "severity": "advisory",
+    "evidence": "`Nat.Prime.eq_two_or_odd' {p : ℕ} (hp : Prime p) : p = 2 ∨ Odd p` is declared at Mathlib/Data/Nat/Prime/Basic.lean:45 (file_read). lean_verify_edit on Mathlib/Data/Nat/Prime/Basic.lean replacing `Nat.forall_prime_iff_two_and_odd` with that term proof: outcome `compiled`, no errors."
+  }
+]
