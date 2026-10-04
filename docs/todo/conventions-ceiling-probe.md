@@ -1,6 +1,10 @@
 # The conventions ceiling probe: does a reviewer briefed on the conventions reach more asks?
 
-**Status** — open, drafted 2026-10-04, **for a fresh session**; nothing has run.
+**Status** — open, drafted 2026-10-04. **Picked up the same day, local model first** at the user's
+direction ("testing the local model first before any paid API runs"): stage L, the self-hosted
+Qwen3.5-397B under contract v2 with and without the exact section, is pre-registered in
+`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`. It tests the machinery and
+one untried local-unlock design; it is not Claude's ceiling, and the Claude step below is unchanged.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 
