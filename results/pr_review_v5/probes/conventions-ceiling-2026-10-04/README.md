@@ -212,13 +212,73 @@ between-brief difference is read, where both conditions share the same memory.
 `session_stats.json` counts a session's submission; a run directory's `findings.jsonl` is after
 anchoring and can be shorter.
 
-## The Claude stage is ready and has not started
+## Stage C: the Claude exact step, sized to the window (pre-registered 2026-10-04, before any session)
 
-`cli probe packets --set <set> --sessions E1 E2 --prs <ask PRs> --scratch <dir> --conventions
-briefs_exact.json --codebook <reader A's codebook>` writes brief X with the section at its end;
-`briefs_exact.json` is the same file stage L read. The machinery from labels to reading has now run
-end to end. The step is 28 reviewer sessions and four matcher runs, the todo's 1.5 subscription
-windows, and it waits for the user.
+The user (2026-10-04): run Claude, *"but let's try to think about how we can get a result
+efficiently. We have less than the estimated subscription window (we can use tokens B and C, but one
+of them has used 80% of the session already)."* The step as the todo wrote it is two briefed
+sessions on each of 14 PRs. This section fixes a smaller step that reads the same rule, and what
+was measured to justify each cut. Nothing below has run.
+
+**Measured before designing.**
+- **The todo's estimate was low.** X's sessions on disk (session `029323d7`: `general-purpose`
+  subagents, `claude-opus-5-5`, effort xhigh, CLI 2.1.284) processed a median 2.26M tokens on
+  validation and 1.74M post-cutoff. 28 sessions on these PRs is about 62M, near three five-hour
+  windows at the record's 20-24M a window, not 1.5.
+- **The windows, read at 09:10:** token C at 0% (resets 14:10); token B at 81-83% and rising
+  (resets 11:50).
+- **Unbriefed Claude is close to deterministic per ask.** X1 and X2 give the same outcome on 37 of
+  the 39 in-census asks, on both of stage L's matchers. On the construction demonstration's 16 asks,
+  which have four unbriefed sessions, an ask X1 and X2 both missed was reached by X3 or X4 in 0 of
+  18 cells (matcher 1) and 0 of 12 (matcher 2), and an ask both reached was missed in 0 of 14 and 0
+  of 18.
+- **The headroom is on ten PRs.** Neither X session reaches 23 (matcher 1) or 21 (matcher 2) of the
+  39 in-census asks, and every one of those is on ten PRs. On 26755, 36822 and 43192 both sessions
+  reach all six in-census asks on both matchers; 43024 has no in-census ask.
+
+**The step.**
+
+| | the todo | stage C |
+|---|---|---|
+| briefed sessions a PR | 2 (E1, E2) | **1 (E1)**: a second session repeats the first on 37 of 39 asks |
+| PRs | 14 | **10**, those with an in-census ask no X session reached |
+| the other PRs | run | 26755, 36822, 43192 enter as E = X (6 of 6 asks, from stage L's matching); 43024 has no in-census ask |
+| expected processed tokens | about 62M | **about 23M** (X's own cost on the ten) |
+
+- **Order:** missed asks per expected token, so a spent window leaves the most informative prefix:
+  30641, 29842, 41930 (batch 1, about 3.6M, which also meters the window), then 32875, 42814, 30458
+  (about 9.4M), then 28649, 42184, 43167, 34091 (about 10M).
+- **Metering:** each batch's stream reports the window's utilisation (`batch_report.py`). A batch
+  starts only if its expected tokens fit what the window has left; the rest waits for token B's
+  reset.
+- **Route:** `run_claude_batch.sh` starts a headless Claude Code session on the token and has it
+  spawn each reviewer as a `general-purpose` subagent with `probes.SESSION_PROMPT`, as X1 and X2
+  were spawned. `claude-opus-5-5`, effort xhigh, real `HOME`. It differs from X's route in three
+  ways: CLI 2.1.285 for 2.1.284 (the nearest binary on disk), a headless parent, and foreground
+  subagents. Model, effort and version are read back from the first batch's stream.
+- **Packets** (`cli probe packets --conventions briefs_exact.json --codebook …`): `pr.md`,
+  `model.md` and `diff.patch` are byte-identical to X1's, and `brief.md` is brief X followed by the
+  section. `briefs_exact.json` is the file stage L read.
+- **What sits beside the packets now.** When X ran, no feedback had been extracted. Now `asks.json`,
+  `feedback.json`, X's findings and this README are in the tree. The session prompt's rule (read
+  only your own directory) is the same; every E transcript is audited before matching, and a session
+  that read outside its packet is dropped and rerun.
+
+**Reading rule: the todo's, unchanged.** Per-session reach on the 39 in-census asks, pooled, on each
+of two blind matchers: E − X, with `≥ +0.15` conventions are a good direction, `≤ +0.05` low
+ceiling, between inconclusive. With the six imputed asks equal on both sides, that is a net gain of
+**at least 5.85 asks** on the ten PRs' 33, or **at most 1.95**. Asks reached per finding must be no
+lower than X's. One seal a set holds X1, X2 and E1 on that set's run PRs, so X is re-judged beside E.
+
+**Steps that run only if the reading calls for them, fixed now:**
+- **E2 on the ten PRs:** only if E1's difference lies strictly between +0.05 and +0.15 on either
+  matcher.
+- **The three PRs not run:** only if the difference is within 0.03 of a threshold. One lost ask is
+  0.026, and a brief can only lose there.
+- **A route control** (a fresh unbriefed session on 30641 and 29842 through this route, about 2.6M):
+  only if E1 reads `≥ +0.15`, before the ladder is built on it.
+
+**Provisional by construction:** one briefed session a PR, one model, 39 asks.
 
 ## What closes it
 
