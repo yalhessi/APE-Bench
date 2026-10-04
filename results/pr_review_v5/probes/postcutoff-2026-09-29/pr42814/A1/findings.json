@@ -1,0 +1,86 @@
+[
+ {
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+  "claim": "The module docstring says fundamental discriminants \"are exactly the discriminants of quadratic fields\", but under `Int.IsFundamentalDiscr` the integer `1` is a fundamental discriminant, and no quadratic field has discriminant 1. The statement is false as written.",
+  "requested_change": "Correct the sentence in the module docstring to \"Apart from `1`, these are exactly the discriminants of quadratic fields.\" (or otherwise exclude `D = 1` explicitly).",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit on FundamentalDiscriminant.lean, adding `example : IsFundamentalDiscr 1 := isFundamentalDiscr_iff_squarefree.mpr (Or.inl ⟨rfl, squarefree_one⟩)` after `isFundamentalDiscr_four_mul`: outcome `compiled`. So `IsFundamentalDiscr 1` holds, while ℚ(√1) = ℚ is not a quadratic field."
+ },
+ {
+  "target": "Int.IsFundamentalDiscr",
+  "claim": "`IsFundamentalDiscr` uses an ad hoc hybrid as its definition: a `D % 4` disjunction, a `∀ x, D = 4 * x → ¬ 4 ∣ x ∧ x % 4 ≠ 1` clause that mixes `∣` and `%`, and an odd-prime-square clause. This is neither the textbook definition, which is the squarefree characterisation, nor the literal \"not a square multiple of a smaller discriminant\" given in the module doc. The standard form only appears later, as the lemma `isFundamentalDiscr_iff_squarefree`.",
+  "requested_change": "Make the standard characterisation the definition: `def IsFundamentalDiscr (D : ℤ) : Prop := (D % 4 = 1 ∧ Squarefree D) ∨ (D % 4 = 0 ∧ Squarefree (D / 4) ∧ (D / 4 % 4 = 2 ∨ D / 4 % 4 = 3))`. Make `isFundamentalDiscr_def` its `Iff.rfl` unfolding. Keep the current primitive-style condition as a characterisation lemma (e.g. `isFundamentalDiscr_iff_primitive`), proved by the existing proof with `simp [isFundamentalDiscr_def]; grind` in the `4 ∣ D` branch. `ne_zero` becomes `rintro rfl; simp [isFundamentalDiscr_def] at h`, and `four_mul`/`four_mul_add_one` become `simp [isFundamentalDiscr_def]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode replacing lines 37-79 of FundamentalDiscriminant.lean with the flipped definition, `isFundamentalDiscr_def` (Iff.rfl), `isFundamentalDiscr_iff_primitive` (the old form, by the same two `have`s, then `by_cases h : 4 ∣ D; · obtain ⟨d, rfl⟩ := h; simp [isFundamentalDiscr_def]; grind; · grind [isFundamentalDiscr_def]`) and the reproved ne_zero / emod_four_eq_zero_or_one / four_mul_add_one / four_mul: outcome `compiled`. Convention applied: of several equivalent formulations, the one easiest to use is the definition and the others are characterisation lemmas."
+ },
+ {
+  "target": "Int.IsFundamentalDiscr",
+  "claim": "The docstring of `IsFundamentalDiscr` formalises a named notion, \"fundamental discriminant\", but gives no background reference. Neither the docstring nor the module doc has a `## References` entry.",
+  "requested_change": "Add a pointer to background reading in the docstring of `IsFundamentalDiscr`, or in a `## References` section of the module doc: for example the Wikipedia article \"Fundamental discriminant\" (https://en.wikipedia.org/wiki/Fundamental_discriminant), or H. Cohen, *A Course in Computational Algebraic Number Theory*, §5.1.",
+  "severity": "advisory",
+  "evidence": "Read the def docstring (lines 37-38) and the module doc (lines 9-31) of FundamentalDiscriminant.lean: neither has a reference or link. Convention: the docstring of a definition formalising a named notion points to background reading."
+ },
+ {
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+  "claim": "The file opens `@[expose] public section`, which exposes every body in the file. The only body downstream might need is `IsFundamentalDiscr`, and the file already gives `isFundamentalDiscr_def` as the unfolding API.",
+  "requested_change": "Replace `@[expose] public section` with `public section`. If downstream files really must unfold `IsFundamentalDiscr`, put `@[expose]` on that `def` alone.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line 33 replaced by `public section`: outcome `compiled`. In-file uses such as `IsFundamentalDiscr.emod_four_eq_zero_or_one := h.1` still elaborate. Convention: in a `module` file, `@[expose]` goes on the individual definitions whose bodies must be unfolded, not on the whole public section."
+ },
+ {
+  "target": "Int.isFundamentalDiscr_iff_squarefree",
+  "claim": "The proof states two general facts as anonymous `have`s, and the `grind` calls use them only implicitly from the local context (as the comment explains). The facts are an Int squarefree characterisation `Squarefree m ↔ ¬ 4 ∣ m ∧ ∀ odd prime p, ¬ p ^ 2 ∣ m` and `Odd p → (p ^ 2 ∣ 4 * m ↔ p ^ 2 ∣ m)`. Neither is about `D`.",
+  "requested_change": "Extract the two `have`s as their own (possibly `private`) lemmas before the theorem, e.g. `squarefree_iff_not_four_dvd_and_odd_prime` and `sq_dvd_four_mul_iff_of_odd`. Pass them to `grind` explicitly: `grind [isFundamentalDiscr_def, squarefree_iff_not_four_dvd_and_odd_prime, sq_dvd_four_mul_iff_of_odd]`. Drop the explanatory comment.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit, line mode replacing lines 51-71 with the two private lemmas followed by the theorem, whose proof is `by_cases h : 4 ∣ D; · obtain ⟨d, rfl⟩ := h; simp; grind [isFundamentalDiscr_def, <both lemmas>]; · grind [isFundamentalDiscr_def, <both lemmas>]`: outcome `compiled`. Convention: a fact established inside a proof that is not about the proof's specific objects is extracted as its own (possibly private) lemma."
+ },
+ {
+  "target": "Int.isFundamentalDiscr_iff_squarefree",
+  "claim": "In the `4 ∣ D` branch, `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` is a squeezed one-lemma simp, its `+contextual` does nothing, and its output feeds only `grind`. The `Int.` prefix is also redundant inside `namespace Int`.",
+  "requested_change": "Replace `simp +contextual only [Int.mul_ediv_cancel_left d four_ne_zero]` with plain `simp`, since its output feeds only a flexible finishing tactic. If a targeted step is preferred, use `rw [mul_ediv_cancel_left d four_ne_zero]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on `Int.isFundamentalDiscr_iff_squarefree`: with the line replaced by `simp`, outcome `compiled`. Replaced by `rw [Int.mul_ediv_cancel_left d four_ne_zero]`: `compiled`. Replaced by `simp +contextual [Int.mul_ediv_cancel_left d four_ne_zero]`: `compiled`. With the line deleted, the call ended in `environment_failure` (grind did not finish), so the simplification step is needed but need not be squeezed. Convention: a simp whose output feeds only a flexible finishing tactic is not squeezed to `simp only`."
+ },
+ {
+  "target": "Int.isFundamentalDiscr_four_mul_add_one",
+  "claim": "`isFundamentalDiscr_four_mul_add_one` asks the caller to present `D` syntactically as `4 * m + 1`. Its real content is that for `D % 4 = 1`, being fundamental is the same as being squarefree, and in that form it applies to any `D` with a known residue.",
+  "requested_change": "Add (or replace it with) `theorem isFundamentalDiscr_iff_squarefree_of_emod_four_eq_one {D : ℤ} (hD : D % 4 = 1) : IsFundamentalDiscr D ↔ Squarefree D := by simp [isFundamentalDiscr_iff_squarefree, hD]`. If the `4 * m + 1` form is kept, derive it as `isFundamentalDiscr_iff_squarefree_of_emod_four_eq_one (by lia)`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit replacing `Int.isFundamentalDiscr_four_mul_add_one` with the general lemma plus the specialised one derived from it via `(by lia)`: outcome `compiled`."
+ },
+ {
+  "target": "Int.isFundamentalDiscr_four_mul_add_one",
+  "claim": "The module doc lists `isFundamentalDiscr_four_mul_add_one` under \"Main results\", but it is a bare `theorem` with no docstring.",
+  "requested_change": "Add a docstring, e.g. /-- `4 * m + 1` is a fundamental discriminant if and only if it is squarefree. -/",
+  "severity": "advisory",
+  "evidence": "Read FundamentalDiscriminant.lean lines 25-28 (module doc lists it as a main result) and lines 73-75 (no docstring on the declaration)."
+ },
+ {
+  "target": "Int.isFundamentalDiscr_four_mul",
+  "claim": "The module doc lists `isFundamentalDiscr_four_mul` under \"Main results\", but it is a bare `theorem` with no docstring.",
+  "requested_change": "Add a docstring, e.g. /-- `4 * m` is a fundamental discriminant if and only if `m` is squarefree and `m ≡ 2, 3 mod 4`. -/",
+  "severity": "advisory",
+  "evidence": "Read FundamentalDiscriminant.lean lines 29-30 (module doc lists it as a main result) and lines 77-79 (no docstring on the declaration)."
+ },
+ {
+  "target": "Mathlib/NumberTheory/FundamentalDiscriminant.lean",
+  "claim": "The undocumented auxiliary results `isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero` and `IsFundamentalDiscr.emod_four_eq_zero_or_one` are stated with `theorem`.",
+  "requested_change": "State `isFundamentalDiscr_def`, `IsFundamentalDiscr.ne_zero` and `IsFundamentalDiscr.emod_four_eq_zero_or_one` with `lemma`, reserving `theorem` for the documented main results.",
+  "severity": "advisory",
+  "evidence": "Read FundamentalDiscriminant.lean lines 43-52: all three are `theorem` with no docstring. Convention: `theorem` is for declarations important enough to carry a docstring, not undocumented auxiliary results."
+ },
+ {
+  "target": "Int.squarefree_iff_prime_sq_not_dvd",
+  "claim": "The proof of `Int.squarefree_iff_prime_sq_not_dvd` is longer than it needs to be. It builds an auxiliary `bridge` iff with a `show … by push_cast; ring` cast rewrite and then repackages both directions by hand. It also writes lambdas with `=>` and uses fully qualified `Int.` names inside `namespace Int`.",
+  "requested_change": "Replace the proof by `simp_rw [← squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Nat.cast_mul, natCast_dvd]`. This removes `bridge`, the `=>` lambdas and the redundant `Int.` prefixes.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit on Mathlib/Data/Nat/Squarefree.lean, declaration `Int.squarefree_iff_prime_sq_not_dvd` with the proof `simp_rw [← squarefree_natAbs, Nat.squarefree_iff_prime_squarefree, sq, ← Nat.cast_mul, natCast_dvd]`: outcome `compiled`. Convention: lambdas are written with `fun … ↦`, not `=>`."
+ },
+ {
+  "target": "Odd.isCoprime_two",
+  "claim": "`Odd.isCoprime_two` concludes `IsCoprime x 2`, with `2` on the right. Its analogues name that side: `Odd.coprime_two_right` / `Odd.coprime_two_left` for `Nat.Coprime` (Data/Nat/Prime/Basic.lean:158-159) and `Int.isCoprime_two_right` / `Int.isCoprime_two_left` (RingTheory/Int/Basic.lean:119-124). The `_left` counterpart is missing.",
+  "requested_change": "Rename `Odd.isCoprime_two` to `Odd.isCoprime_two_right` and update its use in `isFundamentalDiscr_iff_squarefree` (`hp.isCoprime_two_right`). Add `theorem _root_.Odd.isCoprime_two_left {x : R} (h : Odd x) : IsCoprime 2 x := h.isCoprime_two_right.symm`.",
+  "severity": "advisory",
+  "evidence": "content_search for `isCoprime_two|coprime_two_(left|right)` found `Int.isCoprime_two_left/right` (RingTheory/Int/Basic.lean:119,123) and the aliases `_root_.Odd.coprime_two_left/right` (Data/Nat/Prime/Basic.lean:158-159). Int.isCoprime_two_right cannot be used directly in the new file: lean_verify_edit reports `Unknown constant Int.isCoprime_two_right`, so the general lemma is justified and only the name is at issue. lean_verify_edit on RingTheory/Coprime/Basic.lean replacing `Odd.isCoprime_two` with `Odd.isCoprime_two_right` plus `Odd.isCoprime_two_left`: outcome `compiled`."
+ }
+]

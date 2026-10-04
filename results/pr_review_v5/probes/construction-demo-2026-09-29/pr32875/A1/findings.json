@@ -1,0 +1,51 @@
+[
+ {
+  "target": "Rat.inv_intCast_den_of_pos",
+  "claim": "In `Rat.inv_intCast_den_of_pos`, the new proof `simp only [den_inv, num_intCast]; grind` is slower than the proof it replaces. The PR's own trace puts it at <10 ms before and 17 ms after. A single `simp` call closes the goal at about the old cost, so heavy automation here makes the proof slower and buys nothing.",
+  "requested_change": "Replace the two-line proof with the single call `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`.",
+  "severity": "blocking",
+  "evidence": "lean_verify_edit (declaration `Rat.inv_intCast_den_of_pos`, body `simp [ha0.ne', Int.natAbs_of_nonneg ha0.le]`): outcome `compiled`, no warnings. Using `simp [ha0.ne', ha0.le]` alone leaves the goal `↑a.natAbs = a`, which is why `Int.natAbs_of_nonneg ha0.le` is needed. Profiler (same build, side by side): PR version spent 2.4 ms in simp, about 7.6 ms in grind and 7.1 ms type-checking the grind term, with a first-run grind tactic time of 50 ms. The original rw chain spent 2.9 ms. The proposed `simp` took 2.2 ms. `simpa [ha0.ne'] using Int.natAbs_of_nonneg ha0.le` also compiles at about 3 ms. The PR description itself reports `Rat.inv_intCast_den_of_pos: <10 ms before, 17 ms after`."
+ },
+ {
+  "target": "Finset.mem_map_equiv",
+  "claim": "In `Finset.mem_map_equiv`, the new proof `simp only [mem_map, Equiv.coe_toEmbedding]; grind` is two calls plus `grind`, and it is slower than the proof it replaces (PR trace: <10 ms before, 25 ms after). A single flexible `simp` with one `Equiv` lemma closes the same goal without `grind`.",
+  "requested_change": "Replace the body with the single terminal call `simp [Equiv.apply_eq_iff_eq_symm_apply]`. If a non-`grind` golf is not wanted, revert this hunk instead.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit in place (declaration `Finset.mem_map_equiv`, body `simp [Equiv.apply_eq_iff_eq_symm_apply]`): outcome `compiled`, no warnings. Plain `simp` fails with `(∃ a ∈ s, f a = b) ↔ f.symm b ∈ s` unsolved. `grind [Equiv.coe_toEmbedding, Equiv.apply_eq_iff_eq_symm_apply]` fails. Profiler on variants placed before the declaration, so that simp cannot use the lemma itself: PR version about 2.4 ms simp + 8.9 ms grind + 1.8 ms type checking; original rw/exact about 6 ms; proposed simp about 5.6 ms simp + 2.4 ms instance search + 1.1 ms type checking. The PR description reports `Finset.mem_map_equiv: <10 ms before, 25 ms after`."
+ },
+ {
+  "target": "MeasureTheory.Measure.pi_map_piCongrLeft",
+  "claim": "In `MeasureTheory.Measure.pi_map_piCongrLeft`, the PR ends with `exact Fintype.prod_equiv _ _ _ (congrFun rfl)`. This rebuilds `Equiv.prod_comp` by hand. It leaves the equivalence `e` to unification, and it writes the pointwise `rfl` indirectly as `congrFun rfl`. It also turns the original `rw [this, pi_pi]` into `simp only [pi_pi, this]`, which only performs that rewrite.",
+  "requested_change": "Replace the last two lines with `rw [this, pi_pi]` followed by `exact e.prod_comp fun i ↦ μ i (s i)`. The single line `rw [this, pi_pi, e.prod_comp fun i ↦ μ i (s i)]` also works.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit in place (declaration `MeasureTheory.Measure.pi_map_piCongrLeft` ending in `rw [this, pi_pi]` / `exact e.prod_comp fun i ↦ μ i (s i)`): outcome `compiled`. Variants `rw [this, pi_pi, e.prod_comp fun i ↦ μ i (s i)]` and `rw [this, pi_pi]; exact Fintype.prod_equiv e _ _ fun _ ↦ rfl` also compiled. `exact e.prod_comp _` fails with a stuck `CommMonoid ?m` instance, so the function must be given. `Equiv.prod_comp` is declared at Mathlib/Algebra/BigOperators/Group/Finset/Defs.lean:724 (declaration_search). `Fintype.prod_equiv (e) (f) (g) (h : ∀ x, f x = g (e x))` is at Defs.lean:716."
+ },
+ {
+  "target": "ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "In `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, the PR keeps the auxiliary `have : κ a (s ×ˢ t) = (Kernel.fst κ ⊗ₖ Kernel.condKernel κ) a (s ×ˢ t) := by congr; exact (κ.disintegrate _).symm`. It then rewrites with it through `simp only [this]` and closes with `exact (Kernel.compProd_apply_prod hs ht).symm`. The `have` and the `simp only` are unnecessary: the statement is `Kernel.compProd_apply_prod` rewritten backwards, followed by `κ.disintegrate`.",
+  "requested_change": "Replace the whole proof with `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`, dropping the `have`. Alternatively, follow the sibling lemmas in the file: `conv_rhs => rw [← κ.disintegrate κ.condKernel]` then `rw [Kernel.compProd_apply_prod hs ht]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit in place (declaration `ProbabilityTheory.setLIntegral_condKernel_eq_measure_prod`, body `rw [← Kernel.compProd_apply_prod hs ht, κ.disintegrate]`): outcome `compiled`. The `conv_rhs` variant also compiled. Siblings in Mathlib/Probability/Kernel/Disintegration/Integral.lean already use the `conv_rhs => rw [← κ.disintegrate κ.condKernel]` pattern: `lintegral_condKernel_mem` (l.46), `lintegral_condKernel` (l.59), `setLIntegral_condKernel` (l.66). `Kernel.compProd_apply_prod` is at Mathlib/Probability/Kernel/Composition/CompProd.lean:137."
+ },
+ {
+  "target": "MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod",
+  "claim": "In `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod`, the measure twin of the kernel lemma has the same leftover: an auxiliary `have : ρ (s ×ˢ t) = (ρ.fst ⊗ₘ ρ.condKernel) (s ×ˢ t)`, used once through `simp only [this]`, then `exact (compProd_apply_prod hs ht).symm`. The `have` is redundant once `compProd_apply_prod` is used.",
+  "requested_change": "Replace the whole proof with `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`, dropping the `have`. Alternatively, follow the file's siblings: `conv_rhs => rw [← ρ.disintegrate ρ.condKernel]` then `rw [compProd_apply_prod hs ht]`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit in place (declaration `MeasureTheory.Measure.setLIntegral_condKernel_eq_measure_prod`, body `rw [← compProd_apply_prod hs ht, ρ.disintegrate]`): outcome `compiled`. The `conv_rhs` variant also compiled. `Measure.compProd_apply_prod` is at Mathlib/Probability/Kernel/Composition/MeasureCompProd.lean:69 and `Measure.disintegrate` at Mathlib/Probability/Kernel/Disintegration/Basic.lean:63. Siblings `lintegral_condKernel` (l.151) and `setLIntegral_condKernel` (l.158) use the `conv_rhs` pattern."
+ },
+ {
+  "target": "limsup_finset_sup'",
+  "claim": "In `limsup_finset_sup'`, the new `simp only [gt_iff_lt, sup'_lt_iff, eventually_all_finset] at hb ⊢` passes `gt_iff_lt`, which the proof does not need. `sup'_lt_iff` already matches `hb : b > sup' …`, because `>` unfolds reducibly.",
+  "requested_change": "Drop `gt_iff_lt` from the list: `simp only [sup'_lt_iff, eventually_all_finset] at hb ⊢`.",
+  "severity": "advisory",
+  "evidence": "lean_verify_edit in place (line 1155 replaced by `    simp only [sup'_lt_iff, eventually_all_finset] at hb ⊢`): outcome `compiled`. The rest of the proof is unchanged, and the following `exact fun i i_s ↦ eventually_lt_of_limsup_lt (hb i i_s) (h₂ i i_s)` still closes the goal."
+ },
+ {
+  "target": "PR #32875 description",
+  "claim": "The PR description ends with a boilerplate section ('This golfing PR is batched under the following guidelines: Up to ~5 changed files … ~25 declarations … ~100 lines'). This section says nothing about this change, and the PR does not even meet it: it touches 7 files.",
+  "requested_change": "Delete the batching-guidelines section. Keep the description to what changes and the profiling table.",
+  "severity": "advisory",
+  "evidence": "pr.md lists 7 changed files: Image.lean, Rat/Lemmas.lean, Constructions/Pi.lean, Portmanteau.lean, LiminfLimsup.lean, Disintegration/Integral.lean, Pseudo/Defs.lean. The boilerplate says 'Up to ~5 changed files per PR'."
+ }
+]
