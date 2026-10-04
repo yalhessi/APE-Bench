@@ -280,6 +280,123 @@ lower than X's. One seal a set holds X1, X2 and E1 on that set's run PRs, so X i
 
 **Provisional by construction:** one briefed session a PR, one model, 39 asks.
 
+## Result 3 (2026-10-04): with the exact conventions Claude reaches 74% of the in-census asks against 46-49% without; +0.26 and +0.28, a good direction by the rule
+
+Stage C as pre-registered above: one briefed session (E1) on each of the ten PRs, matched blind
+beside X1 and X2. `read_stage.py C1,C2 E X --impute 26755 36822 43192` prints the tables.
+
+| per-session reach (issue recall) | X, unbriefed | E, exact section | E − X |
+|---|---|---|---|
+| **in-census asks, pooled (39), the rule's measure** | 0.49 / 0.46 | **0.74** / 0.74 | **+0.256 / +0.282** |
+| validation (25) | 0.52 / 0.48 | 0.76 | +0.24 / +0.28 |
+| post-cutoff (14) | 0.43 | 0.71 | +0.29 |
+| all asks in the tables (44 of 46) | 0.48 | 0.70 / 0.73 | +0.23 / +0.25 |
+| out-of-census asks on the run PRs (5) | 4/10, 6/10 | 2/5, 3/5 | 0.00 |
+
+Two figures in a cell are matcher 1 and matcher 2.
+
+**By the rule (`≥ +0.15` on both matchers, pooled): conventions are a good direction.** On the ten
+run PRs' 33 in-census asks the briefed session reaches 23, where an unbriefed session reaches 13
+(matcher 1) or 12 (matcher 2): a net gain of 10 to 11 asks against the 5.85 the rule needs.
+Provisional: one briefed session a PR, one model, and a ceiling by construction.
+
+**Beside the rule.**
+- **Nothing was lost.** On both matchers, every ask an unbriefed session reached, the briefed one
+  reached too. Twelve asks differ, all toward E. Nine of them no X session reached on either
+  matcher: `gcongr` for a monotonicity step (30641), `simpa` for a two-step close (32875), two
+  section and `variable` layout asks (30458), a docstring abbreviation (28649), `mk_iff` and a
+  shared `variable` (42814), a prime replaced by a named variant (43167) and a `HasProd` sibling
+  (42184).
+- **It is not volume.** E filed 59 findings on the ten PRs, X 52.5 a session. Asks reached per
+  finding rise from 0.29 to 0.42 / 0.44.
+- **The within-session control held.** The five out-of-census asks on the run PRs did not move on
+  either matcher.
+- **Near misses became hits.** `partial` cells on in-census asks: 11 / 13 for X's two sessions, 1
+  for E.
+- **By family** (in-census, ten PRs; X per session, then E): proof 6.5 / 5.5 to 9 of 11; interface 3
+  to 6 of 6; naming 0.5 to 2 of 3; derive 1 to 2 of 2; statement design 0 to 1 of 2; documentation 0
+  to 1 of 2; generality 1 and 1 of 2; registration 0 and 0 of 1; **PR level 0 and 0 of 3**.
+- **Both sides of the cutoff.** The gain is +0.29 on PRs created after Claude's training data and
+  +0.24 / +0.28 on those inside it.
+- **Against the local model.** The same sections took the local 397B from 0.034 to 0.085. The
+  knowledge is usable by a reviewer that can already find where it applies.
+
+**What the briefed reviewer still missed: 10 of 39.** Read from its `notes.md`, by me and not blind.
+- **Convention weighed, condition judged unmet (6).** "No iff here has its directions used
+  separately" where the maintainer asked for an alias (42814); "the Int- and Nat-specific lemmas
+  are inherently specific" where the maintainer asked whether it holds in any UFD (42814); "also
+  compiles as a term. That is a matter of taste, not an ask" (32875); and the three PR-level asks
+  for motivation, set aside as "does not apply, since this is a generalization rather than a new
+  concept" (29842, twice) and "too minor to be an ask" (41930). These are design and judgement
+  calls a one-sentence convention does not carry, and brief X itself tells the reviewer not to
+  file questions.
+- **Right convention, neighbouring place (2).** The `grind` tag put on the lemma itself, not the
+  two it rewrites with (32875, `partial`); the author's-taste convention applied to one rewording
+  and not to the one the maintainer objected to (28649).
+- **Convention too general to pick the comparison (1).** `left`/`right` swapped against the
+  library's orientation (43167): the brief said "follow siblings' and analogues' names", and the
+  session compared with local siblings.
+- **Never attended (1).** "Surely this is a one-liner using `infinite_pigeonhole_card_lt`" (34091).
+
+**And why unbriefed Claude missed what the brief recovered.** On the post-cutoff asks its notes show
+local precedent used as the standard ("the name matches local siblings… the file's own convention
+wins"; "same pattern as `discr_def` by the same author"), an ask seen and withheld ("Considered and
+not filed: a companion `HasProd.nonneg`"), and a repeated binder never mentioned. It was looking at
+the right declaration and judging it against the file, not the library.
+
+**How it ran.**
+- Ten sessions: nine on token C (09:20-10:01), 34091 on token B after its reset (11:52). Every
+  assistant entry reads `claude-opus-5-5`, effort xhigh, CLI 2.1.285; every prompt was handed over
+  verbatim. Audits: one flag in ten transcripts, benign (41930's session ran the project's Python by
+  its absolute path to check its own JSON).
+- **Cost.** A five-hour window is about 3M tokens weighted by list-price ratios (29-31k a point),
+  not the 20-24M processed the record gave. The ten sessions took 97 points, one window; a briefed
+  session cost 52-70% of an unbriefed one on the same PR. `batch_report.py` meters it.
+- **Matching, as it ran, not as first stated.** Post-cutoff (four PRs) was matched by subagents of
+  the orchestrating session, which that login's limit stopped after both had written complete files
+  (33 cells each, checked by `check_matches.py`, transcripts clean; agreement 33 of 33). Validation
+  (six PRs, one seal) was matched headless on token B (agreement 76 of 81). Both deviations were
+  committed before the cells they touch were judged (`a53e264b`).
+- **Imputed:** 26755, 36822 and 43192 enter as reached by X and by E (6 asks), from stage L's
+  matching. Two out-of-census asks on PRs not run (43024, 43192) are in no table.
+
+**Limits, stated.**
+- **A ceiling, not a reviewer.** Each section was built from the PR's own maintainer asks. Its
+  length hints at how many asks there are, and it tells the reviewer which conventions are in play,
+  which is the hard part of the task. What a reviewer can do without that is the ladder's question.
+- **Selected PRs.** The ten were chosen because X missed asks there. Four unbriefed sessions on
+  three of them recovered none of the asks two had missed (0 of 18, 0 of 12), so regression to the
+  mean is small, but it is not zero by proof.
+- **The route differs from X's** (a headless parent, CLI 2.1.285 for 2.1.284). The out-of-census
+  asks and the finding volume say the route did not change the reviewer; the route control below
+  tests it directly.
+
+**The route control: the route is X's** (`route_control.sh`; its rule was committed in `dbcec290`
+before the run). An unbriefed session, XR1, with brief X byte for byte, ran on 30641 and 29842
+through the briefed sessions' route on token B and was matched beside X1, X2 and E1 by two new
+blind matchers (`match_R_val/`, `read_stage.py R XR X`).
+
+| in-census asks on the two PRs (7) | X1, X2 | XR1 | E1 |
+|---|---|---|---|
+| per-session reach, matcher 1 / 2 | 4/14 = 0.29 / 0.29 | 2/7 = 0.29 / 0.29 | 5/7 / 4/7 |
+
+- XR − X is 0.000 on both matchers, and XR reaches no ask that both X sessions missed. It differs
+  from X on two asks, both ones X1 and X2 themselves split on.
+- It files as X does: 8 findings on the two PRs against X's 7 a session (E: 10).
+- By the rule fixed before it ran there is no route effect, and stage C's difference stands
+  against X. Its power is small, as stated: two PRs, 7 asks.
+- A cell moves between matcher instances: this seal's matcher 2 reads one of E's golfs on 30641 as
+  `partial` where stage C's read it `reached` (agreement here 27 of 32 cells).
+- Cost: 18 points of token B for the two sessions and 8 for the two matchers. Both audits clean.
+
+## What follows
+
+By the todo, a reading of `≥ +0.15` runs the ladder: the same reviewer briefed with **applicable**
+conventions (picked from the diff by a selector that never sees the asks), **common** (the 50
+most-used) and **all** (438). That is the step that says whether the gain survives without the
+asks. At the measured cost, one level on the ten PRs at one session each is about one five-hour
+window. Nothing of it has run; it waits for the user.
+
 ## What closes it
 
 The table above, per matcher and per set, here and in the todo. The Claude exact step then runs or

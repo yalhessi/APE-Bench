@@ -16,9 +16,17 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   local model's reach repeatable (36822's attribute asks go from 1 of 3 reps to 3 of 3) and opens
   one new ask of 39. Where it missed, its notes show the convention checked and the code passed, or
   never raised. Nothing follows for Claude.
-- **The Claude exact step has not run and waits for the user.** Its delivery is built
-  (`cli probe packets --conventions … --codebook …`), and the path from labels to reading has run
-  end to end. 28 reviewer sessions and four matcher runs.
+- **The Claude exact step read +0.256 and +0.282: a good direction, by the rule below.** Run at the
+  user's direction as one briefed session on the ten PRs where unbriefed Claude missed an in-census
+  ask (stage C in the same README, pre-registered before its sessions; about one window, not the
+  todo's 28 sessions). Per-session reach on the 39 in-census asks: 0.49 / 0.46 unbriefed, 0.74
+  briefed; on all asks 0.48 against 0.70 / 0.73. Nothing an unbriefed session reached was lost,
+  out-of-census asks did not move, and an unbriefed control through the briefed sessions' route
+  read exactly as X (0.29 against 0.29 on two PRs). Ten in-census asks stay missed: six are design or judgement calls
+  the convention does not carry (three of them PR-level asks for motivation), two the right
+  convention at a neighbouring place.
+- **The ladder is next and has not run.** Applicable, common, all: whether the gain survives when
+  the conventions are not picked from the asks. About one window a level at one session a PR.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 

@@ -219,6 +219,15 @@ run follows `reader_instructions.md` and is validated with `provenance/check_bat
   not a regularity in the library or the asks is a wish. Nothing here measures prevalence in the
   library.
 
+**Does knowing the conventions change a review? (2026-10-04,
+`results/pr_review_v5/probes/conventions-ceiling-2026-10-04/README.md`.)** Reader A's codebook was
+used as a brief on 14 PRs it never read. Two readers assigned an entry to 39 of their 46 maintainer
+asks (85%), the same entry on all 38 both assigned. A Claude reviewer given, for each PR, the entries
+behind that PR's asks reached 0.74 of those asks per session against 0.46-0.49 unbriefed (+0.26 and
++0.28 on two blind matchers; a ceiling, since the entries were chosen from the asks). The local
+397B given the same went from 0.034 to 0.085. So the census holds knowledge a strong reviewer lacks
+at the moment of review and can use; whether it can be delivered without the asks is untested.
+
 ## Caveats
 
 - Readers are language models of one family, on merged PRs, reading the comment and hunk only;
