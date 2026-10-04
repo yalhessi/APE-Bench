@@ -1,0 +1,17 @@
+# Contract v2 (configs/pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml) on validation small12 less
+# 30714: the dev config with this set's release, PRs, caps and pass-0 models, nothing else. The
+# resolved config equals pr_review_v5_val_small12_gpt52_Grc.yaml plus the contract's keys. Written
+# for the conventions ceiling probe (results/pr_review_v5/probes/conventions-ceiling-2026-10-04/),
+# whose conditions each set their own context file.
+extends: pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml
+
+dataset:
+  release: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1
+  modification_inventory: inputs/pr_review_v4/releases/val-2025-06-2026-03-v1/derived/modification_inventory.jsonl
+  pr_numbers: [26185, 26755, 28649, 29842, 30458, 30641, 32080, 32875, 34091, 34935, 36822]
+  # 11 PRs x $13.40 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 147.90
+  run_total_token_cap: 177480000
+
+task_config:
+  context_file: results/pr_review_v5/probes/model-gap-val-small12/model_context.jsonl

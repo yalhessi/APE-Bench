@@ -1,0 +1,17 @@
+# Contract v2 (configs/pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml) on the post-cutoff set: the
+# dev config with this set's release, PRs, caps and pass-0 models, nothing else. All ten PRs, the four
+# controls included, where pr_review_v5_probe_2026_07_08_v1_gpt52_Grc.yaml holds the six with asks.
+# Written for the conventions ceiling probe (results/pr_review_v5/probes/conventions-ceiling-2026-10-04/),
+# whose conditions each set their own context file and, when briefed, the six ask PRs.
+extends: pr_review_v5_dev_medium_gpt52_Grc_contract2.yaml
+
+dataset:
+  release: inputs/probes/probe-2026-07-08-v1
+  modification_inventory: inputs/probes/probe-2026-07-08-v1/derived/modification_inventory.jsonl
+  pr_numbers: [41271, 41280, 41314, 41930, 42184, 42238, 42814, 43024, 43167, 43192]
+  # 10 PRs x $13.40 worst case a run; a ceiling, not a forecast.
+  run_total_cost_cap: 134.50
+  run_total_token_cap: 161000000
+
+task_config:
+  context_file: results/pr_review_v5/probes/conventions-ceiling-2026-10-04/context_post_base.jsonl
