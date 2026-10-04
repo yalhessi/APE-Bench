@@ -25,8 +25,17 @@ one untried local-unlock design; it is not Claude's ceiling, and the Claude step
   read exactly as X (0.29 against 0.29 on two PRs). Ten in-census asks stay missed: six are design or judgement calls
   the convention does not carry (three of them PR-level asks for motivation), two the right
   convention at a neighbouring place.
-- **The ladder is next and has not run.** Applicable, common, all: whether the gain survives when
-  the conventions are not picked from the asks. About one window a level at one session a PR.
+- **The floor (the ladder's "applicable" level) read +0.026: the gain needed the asks' pinpointing.**
+  A blind selector picked 25 census entries a PR from the diff alone (stage F, same README); they
+  hold the entry behind 22 of the 33 in-census asks. The same reviewer briefed with them reaches
+  0.49 / 0.46 of in-census asks against 0.46 / 0.44 unbriefed and 0.74 / 0.72 with the exact brief,
+  all under one seal. With the right sentence in the brief it reaches 12 of 22 asks where the exact
+  brief reaches 18 and no brief 10.5; it files 82 findings against 52.5 and aims worse. "Common" was
+  not run (the top 50 hold the entry of 16 of 33); "all" was not run.
+- **So: only exact moves.** By this todo's own reading, the work is in pinpointing which convention
+  the code departs from at the reviewing point, not in supplying the conventions. Untried: a
+  pinpointing pass with tools that outputs candidate departures at named places for the reviewer to
+  vet; the selector's `where` delivered; exemplars; a second session a PR.
 **Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
 more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
 

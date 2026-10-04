@@ -461,13 +461,91 @@ two selectors in union; detectors in code for the head entries.
 about 10 to 12, four matcher runs at about 7. Selectors run on token B's remainder now; reviewers
 on token C from its 14:10 reset; whatever does not fit waits for B's 16:50 reset.
 
+## Result 4 (2026-10-04): the floor is the unbriefed reviewer -- conventions picked from the diff move issue recall by +0.03, where the exact ones move it by +0.28
+
+Stage F as pre-registered above. Ten blind selections, ten briefed sessions (A1), and one seal a set
+holding X1, X2, E1 and A1, so the three conditions are judged together by the same two matchers.
+`read_stage.py F A X --impute 26755 36822 43192` and `decompose_floor.py` print the tables.
+
+| per-session reach (issue recall), matcher 1 / 2 | X, unbriefed | A, 25 picked from the diff | E, exact |
+|---|---|---|---|
+| all asks in the tables (44) | 0.45 / 0.43 | 0.48 / 0.45 | 0.70 / 0.68 |
+| **in-census asks, pooled (39), the rule's measure** | 0.46 / 0.44 | **0.49 / 0.46** | 0.74 / 0.72 |
+| difference from X | | **+0.026 / +0.026** | +0.282 / +0.282 |
+| validation, in-census (25) | 0.48 / 0.44 | 0.48 / 0.44 | 0.76 / 0.72 |
+| post-cutoff, in-census (14) | 0.43 | 0.50 | 0.71 |
+| out-of-census (5) | 0.40 | 0.40 | 0.40 |
+
+**By the rule (`≤ +0.05` on both matchers): the gain needed the asks' own pinpointing.** With this
+delivery the floor is the unbriefed reviewer. The ceiling replicates under new matchers: E − X is
++0.282 on both (stage C read +0.256 and +0.282). Provisional: one selector design, one session a PR.
+
+**Where the gain went: retrieval against application** (the 33 in-census asks on the ten PRs).
+
+| | asks | X, a session | A | E |
+|---|---|---|---|---|
+| an entry behind the ask is in A's brief | 22 | 10.5 | 12 | 18 |
+| it is not | 11 | 1.5 / 0.5 | 1 / 0 | 5 / 4 |
+
+- **Retrieval kept two thirds.** The selector's 25 hold the entry of 22 of the 33 asks, and of 7 of
+  the 10 asks only the exact brief reached.
+- **Application lost more than retrieval did.** Of those 10 asks A reaches 2: three were lost because
+  the entry was not selected, five with the entry in the brief. The same sentence is in both briefs
+  for 22 asks; among one to five sentences it yields 18 of them, among 25 it yields 12, where no
+  brief yields 10.5.
+- **What the notes say at the five.** `gcongr` "does not apply, because `posLog` is only
+  `MonotoneOn` and has no `gcongr` tag. No request", where the maintainer asked whether `gcongr`
+  can do it and the exact-briefed session filed it. A merge of two steps "compiled … but every
+  variant either runs past 100 columns or reads no better". Two section-layout asks and the "spell
+  out `mgf`" ask were reached only as `partial`: a different change at the same place. The shared
+  `variable` binder is never mentioned; its entry was 18th of 25.
+- **More findings, worse aim.** A filed 82 findings on the ten PRs, against E's 59 and X's 52.5 a
+  session. Asks reached per finding fell to 0.18 / 0.17, from X's 0.27 / 0.25 (E: 0.42 / 0.41), so
+  the pre-registered side condition fails. On 41930, where X and E file nothing, A files four.
+- **Near misses, as for X.** `partial` cells on in-census asks: A 8 / 10, X 6 to 7 a session, E 1 / 2.
+- **A is not X with noise.** It reaches two asks no X session does (32875's `simpa`, 42184's
+  `HasProd` sibling) and misses two that one of the two X sessions reached.
+- **A shorter brief from the selector's own order would not help.** Its first 5 entries hold the
+  entry of 6 asks, its first 10 of 15, all 25 of 22. The entries behind asks sit at ranks 7 to 22.
+
+**What it means, at this altitude.**
+- The exact brief delivered two things: each convention's text, and the fact that it is in play on
+  this PR (a list of one to five is itself a claim that these are departed from). Stage F delivers
+  the first without the second, and the gain goes with it. So most of what the ceiling measured is
+  the value of knowing *which* convention the code departs from, not of having the convention
+  written down.
+- A reviewer handed 25 true and relevant conventions treats them as a checklist: it weighs each,
+  passes the code on most, and files more elsewhere. That is the judgement unbriefed Claude already
+  makes, and the selector was built not to make it for the reviewer.
+- This is the todo's reading of "only exact moving": the work is in pinpointing which conventions
+  apply at the reviewing point.
+
+**Untried, and not concluded against.**
+- A pinpointing pass: a stage with the reviewer's tools that outputs candidate departures, each a
+  convention at a named place with its check run, which the reviewer vets. The plan's convention
+  detectors (`docs/plans/2026-10-03-after-structure.md` §2), with a model doing the detecting.
+- The selector's `where` delivered with each sentence (it was recorded and withheld).
+- A better ranking with a far shorter brief; a past ask as an exemplar of each entry; the reviewer
+  selecting for itself from all 438; a second session a PR.
+- The "all" level (438 sentences) was not run: on this evidence it dilutes further.
+
+**How it ran.**
+- Selectors: token B, 43 points for ten (four each, not the three estimated), which ended B's
+  window; six were cut after writing `selected.json`, and each file was checked as written.
+- Sessions: six on token C (62 points), four on token B after its reset (38): 100 points, as E's 97.
+  Every assistant entry reads `claude-opus-5-5`, xhigh, CLI 2.1.285.
+- Matchers: headless on token B, 25 points. Agreement 102 of 108 cells on validation, 44 of 44
+  post-cutoff. In all about 1.7 five-hour windows.
+- Audits: one flag in ten reviewer transcripts, benign (28649's session wrote a helper in its own
+  `tmp/` and ran it with the project's Python by its absolute path; nothing outside the packet was
+  read). `run_stage_f.sh` held back that batch's commit and the matching's until the flag was read.
+
 ## What follows
 
-By the todo, a reading of `≥ +0.15` runs the ladder: the same reviewer briefed with **applicable**
-conventions (picked from the diff by a selector that never sees the asks), **common** (the 50
-most-used) and **all** (438). That is the step that says whether the gain survives without the
-asks. At the measured cost, one level on the ten PRs at one session each is about one five-hour
-window. Nothing of it has run; it waits for the user.
+The ladder's question is answered for the one ask-free delivery tried: conventions as sentences
+picked from the diff do not move the reviewer, and the ceiling's gain was in the pinpointing. The
+design the two results point to is a pinpointing pass (above), which is code and a prompt, not a
+brief. Nothing of it is built; it waits for the user.
 
 ## What closes it
 
