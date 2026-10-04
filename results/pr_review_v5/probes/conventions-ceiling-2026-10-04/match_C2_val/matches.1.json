@@ -1,0 +1,333 @@
+{
+ "asks": [
+  {
+   "pr": 28649,
+   "ask_id": "v0029",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "Revert of 'left-hand side' hyphenation; no finding asks to revert it (R3#0 reverts a different hunk)."
+  },
+  {
+   "pr": 28649,
+   "ask_id": "v0030",
+   "R1": "partial",
+   "R1_finding": 2,
+   "R2": "partial",
+   "R2_finding": 2,
+   "R3": "reached",
+   "R3_finding": 1,
+   "note": "R3 spells out moment generating functions; R1/R2 address the same MGF/CGF spelling but extend the capitalisation."
+  },
+  {
+   "pr": 28649,
+   "ask_id": "v0031",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "No finding on the Popoviciu 'variances' wording."
+  },
+  {
+   "pr": 29842,
+   "ask_id": "v0053",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "PR-description question about #24163/#21065; no finding."
+  },
+  {
+   "pr": 29842,
+   "ask_id": "v0055",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "reached",
+   "R3_finding": 1,
+   "note": "R3 folds congr' into the simpa; R1 compacts the same tail via refine .congr' plus filter_upwards."
+  },
+  {
+   "pr": 29842,
+   "ask_id": "v0056",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "PR-description request; no finding."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0060",
+   "R1": "partial",
+   "R1_finding": 9,
+   "R2": "reached",
+   "R2_finding": 7,
+   "R3": "partial",
+   "R3_finding": 6,
+   "note": "R2: one DivisionMonoid variable, cancel classes per lemma. R1/R3 trim the duplication but keep the nested sections."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0061",
+   "R1": "partial",
+   "R1_finding": 9,
+   "R2": "reached",
+   "R2_finding": 7,
+   "R3": "partial",
+   "R3_finding": 6,
+   "note": "Same as v0060 for the right-cancel lemma; R2 binds IsRightCancelMul in its signature."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0062",
+   "R1": "reached",
+   "R1_finding": 6,
+   "R2": "reached",
+   "R2_finding": 3,
+   "R3": "reached",
+   "R3_finding": 4,
+   "note": "All restore the original term proof of card_le_card_div_left."
+  },
+  {
+   "pr": 30458,
+   "ask_id": "v0063",
+   "R1": "reached",
+   "R1_finding": 7,
+   "R2": "reached",
+   "R2_finding": 4,
+   "R3": "reached",
+   "R3_finding": 4,
+   "note": "All restore the original term proof of card_le_card_div_right."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0064",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 1,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "R1/R2 signature uses x as in log_pow; R3 keeps a and only changes binder explicitness."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0065",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "Naming h2a->ha; proof rewrites would delete it, but none addresses the naming."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0066",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "R3": "reached",
+   "R3_finding": 2,
+   "note": "All replace the case-split proof with a direct mul_max_of_nonneg one-liner, subsuming the request."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0067",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 4,
+   "R3": "reached",
+   "R3_finding": 4,
+   "note": "All remove the simp [sum_nonneg ...] side-goal discharge via a term proof supplying it directly."
+  },
+  {
+   "pr": 30641,
+   "ask_id": "v0068",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "partial",
+   "R2_finding": 4,
+   "R3": "partial",
+   "R3_finding": 4,
+   "note": "R1 adds a gcongr lemma and uses gcongr; R2/R3 keep the manual monotoneOn_posLog application in term mode."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0090",
+   "R1": "partial",
+   "R1_finding": 1,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "Ask: grind-tag the simp-only lemmas. R1 grind-tags mem_map_equiv itself instead."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0091",
+   "R1": "partial",
+   "R1_finding": 2,
+   "R2": "partial",
+   "R2_finding": 1,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "R1/R2 suggest grind [den_inv, num_intCast] rather than tagging them; R3 goes to an rw chain."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0092",
+   "R1": "reached",
+   "R1_finding": 3,
+   "R2": "partial",
+   "R2_finding": 2,
+   "R3": "partial",
+   "R3_finding": 2,
+   "note": "R1 collapses the tail to one rw; R2/R3 keep rw then exact, not merging the steps."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0093",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "partial",
+   "R3_finding": 6,
+   "note": "R3 fixes the same simp-only-at-h/exact pair by adding coe_le_coe, not by simpa."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0094",
+   "R1": "reached",
+   "R1_finding": 5,
+   "R2": "reached",
+   "R2_finding": 3,
+   "R3": "reached",
+   "R3_finding": 5,
+   "note": "All drop simp only [this]/exact for a shorter rw-based proof."
+  },
+  {
+   "pr": 32875,
+   "ask_id": "v0095",
+   "R1": "reached",
+   "R1_finding": 4,
+   "R2": "reached",
+   "R2_finding": 4,
+   "R3": "reached",
+   "R3_finding": 4,
+   "note": "All drop simp only [this]/exact for a shorter rw-based proof."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0105",
+   "R1": "no",
+   "R1_finding": null,
+   "R2": "no",
+   "R2_finding": null,
+   "R3": "no",
+   "R3_finding": null,
+   "note": "No finding shortens exists_infinite_fiber's proof; R1/R3 golf infinite_pigeonhole_card_lt instead."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0106",
+   "R1": "reached",
+   "R1_finding": 5,
+   "R2": "reached",
+   "R2_finding": 3,
+   "R3": "reached",
+   "R3_finding": 5,
+   "note": "All make Infinite beta an instance binder."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0107",
+   "R1": "reached",
+   "R1_finding": 5,
+   "R2": "reached",
+   "R2_finding": 5,
+   "R3": "reached",
+   "R3_finding": 5,
+   "note": "All make Uncountable beta an instance binder."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0108",
+   "R1": "reached",
+   "R1_finding": 5,
+   "R2": "reached",
+   "R2_finding": 4,
+   "R3": "reached",
+   "R3_finding": 5,
+   "note": "All make Infinite alpha an instance binder in exists_infinite_fiber'."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0109",
+   "R1": "reached",
+   "R1_finding": 0,
+   "R2": "reached",
+   "R2_finding": 0,
+   "R3": "reached",
+   "R3_finding": 0,
+   "note": "All give the maintainer's docstring wording for infinite_pigeonhole_card_lt."
+  },
+  {
+   "pr": 34091,
+   "ask_id": "v0110",
+   "R1": "reached",
+   "R1_finding": 1,
+   "R2": "reached",
+   "R2_finding": 1,
+   "R3": "reached",
+   "R3_finding": 1,
+   "note": "All fix the following docstrings too (#1 and #2 each)."
+  }
+ ],
+ "unmatched": {
+  "28649": {
+   "R1": 9,
+   "R2": 4,
+   "R3": 5
+  },
+  "29842": {
+   "R1": 2,
+   "R2": 1,
+   "R3": 2
+  },
+  "30458": {
+   "R1": 10,
+   "R2": 7,
+   "R3": 8
+  },
+  "30641": {
+   "R1": 3,
+   "R2": 2,
+   "R3": 3
+  },
+  "32875": {
+   "R1": 3,
+   "R2": 3,
+   "R3": 5
+  },
+  "34091": {
+   "R1": 5,
+   "R2": 1,
+   "R3": 2
+  }
+ }
+}
