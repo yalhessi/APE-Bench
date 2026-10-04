@@ -1,0 +1,110 @@
+# The conventions ceiling probe: does a reviewer briefed on the conventions reach more asks?
+
+**Status** — open, drafted 2026-10-04, **for a fresh session**; nothing has run.
+**Cost** — the exact-conventions step is about 1.5 subscription windows; the full ladder about 6
+more; two small reader runs to label the asks; optionally about $15 of `gpt_5.2`.
+
+**The user (2026-10-04).** *"If conventions are a good direction to explore, we would expect that
+being briefed on the conventions (exact conventions at a given reviewing point, applicable
+conventions, common conventions, all conventions) should have a positive effect on the models
+judgements. We have many baselines without conventions and without sufficiently specific
+conventions. At this point, we need to assess a ceiling/best case scenario of the conventions work
+now that we have a solid summaries of Mathlib conventions."*
+
+**Motivating measurements.**
+- **The census is built** (`results/pr_review_v5/adjudications/conventions-census-v1/results.md`).
+  Reader A's codebook holds 438 principles, written from 2,102 asks on PRs disjoint from every
+  evaluation set. The top 50 cover 55% of principled asks.
+- **The residual wall is largely convention knowledge.** 25 of the 67 asks no reviewer reaches on
+  three sets are convention or mechanism knowledge (`develop`, `docs/plans/2026-10-03-after-structure.md`).
+- **The record's briefs never held specific conventions.** The "statute" injection (null at N=115)
+  and precedent priming (13 against 11) delivered written guidance or past comments, never the
+  conventions that apply to the PR under review (`docs/dead-ends.md`). None of them is a ceiling.
+
+**The question.** At best, how much does knowing the conventions move a reviewer toward the
+maintainers? The probe briefs the strongest reviewer with conventions at four levels of
+specificity and compares it with the unbriefed sessions already on disk. If even the exact
+conventions move nothing, briefing has a low ceiling and the conventions work should be pointed
+elsewhere. If they move reach, the ladder says how specific a delivery must be.
+
+## Sets and baseline (no new baseline sessions)
+
+| set | asks | PRs with asks | controls | Claude's window |
+|---|---|---|---|---|
+| validation small12 (`configs/probe_sets/val_small12.yaml`) | 30 | 8 | 3 | inside |
+| post-cutoff (`configs/probe_sets/postcutoff_2026_07_08_v1.yaml`) | 16 | 6 | 4 | after |
+
+Both are PR-disjoint from every PR the census read (checked 2026-10-04). The baseline is each
+set's Claude X1 and X2: `claude-opus-5-5`, the X brief, the pass-0 model and the arms' tools, at
+per-session reach 0.48 / 0.50 (validation) and 0.47 (post-cutoff). Where a carried `gpt_5.2` run
+(Grc) exists on a set, it is the second family's baseline.
+
+## The four briefs
+
+Each is the X brief plus one section, "Conventions the maintainers hold". Nothing else in the
+packet changes. Every section is drawn from reader A's codebook (`reader_A/codebook.json`, 438
+entries at `2bb3063a`), as sentences only, with no location.
+
+| brief | the section holds | who builds it |
+|---|---|---|
+| **exact** (the ceiling) | the entries behind this PR's maintainer asks | two readers label the 46 asks against the codebook, assign-only (an ask with no entry is marked out of census); the brief is the union of their entries |
+| **applicable** | entries that apply to this PR's changed code, at most 25 | a Claude selector reading the diff, `pr.md` and the codebook, never the asks |
+| **common** | the 50 most-used entries | fixed, the same for every PR |
+| **all** | all 438 entries (about 16k tokens) | fixed |
+
+The exact brief is built from the asks. It deliberately breaks the harness rule that nothing a
+reviewer reads is written by a step that has seen feedback, and that is what makes it a ceiling.
+Two leaks come with it, and both are stated as limits rather than fixed: the number of entries
+hints at the number of asks, and controls get no exact brief, so exact runs on the 14 ask PRs only.
+The other three briefs keep the rule.
+
+## Running it
+
+- **Reviewers:** Claude Opus 5.5 subagents through the probe harness (`cli probe packets` with the
+  brief variant; `cli probe prompts`), two sessions per PR per brief, under the harness's packet,
+  scratch and audit rules. Optionally `gpt_5.2` carried on the exact brief, one rep per set, where
+  a Grc baseline exists.
+- **Order:** exact first, on both sets. It is the ceiling: the other briefs hold the exact entries
+  diluted among others, or not at all. So the ladder runs only if exact clears the bar below, on the
+  ask PRs, in one batch.
+- **Matching:** one seal per step and set, holding the new sessions together with X1 and X2. Two
+  blind matchers use the set's existing rubric (`construction-demo-2026-09-29/matcher_rubric.md`,
+  generalised), with labels shuffled and condition cues redacted, followed by the usual audit.
+
+## Reading rule, fixed before any session runs
+
+The measure is per-session reach on the **in-census asks** (asks with at least one codebook entry),
+on each matcher, pooled over the two sets and reported per set. Asks reached per finding must be no
+lower than X's, so that filing more is not read as reaching more.
+
+| exact − X, on both matchers, pooled | reading |
+|---|---|
+| **≥ +0.15** | **conventions are a good direction**: knowing the right ones moves the reviewer. Run the ladder. |
+| **≤ +0.05** | **low ceiling**: even the exact conventions do not change what the reviewer asks. Briefing is not where the conventions work pays off; record it in `docs/dead-ends.md` with the untried deliveries (facts about the PR, detectors, exemplars of each principle's asks). |
+| between | inconclusive at this size: read the per-ask transcripts before deciding |
+
+**The ladder, if run.** Applicable within 0.05 of exact means retrieval from the diff is enough.
+Only exact moving means the work is in pinpointing which conventions apply at the reviewing point
+(point (a) of the census's purpose). Common or all moving as much as exact means the conventions
+were simply missing from the brief.
+
+**Also read, not in the rule:**
+- out-of-census asks, the within-session control (they should not move);
+- for every in-census ask still missed under exact, whether the session's `notes.md` shows it
+  considered the convention: known but not filed (the 33337 filing discount), or never connected;
+- the applicable selector's recall of the exact entries, a free measurement of retrieval.
+
+## What would close it
+
+The exact step's reading on both sets. Then either the ladder's table, or a dead-ends entry. The
+result is recorded here and in the census's `results.md` §7.
+
+## Start here
+
+- **Read:** `results/pr_review_v5/probes/model-gap-val-small12/README.md` and
+  `postcutoff-2026-09-29/README.md` (the baselines, packets and matcher setup); `asks.json` and
+  `feedback.json` in each (the asks to label); the census `reader_rubric_census_v1.md` (what an entry
+  is) and `reader_A/codebook.json`; `src/mathlib_review/analysis/probes.py` on `develop` (the harness).
+- **First step (no model spend):** label the 46 asks against the codebook, two readers, assign-only,
+  and print each PR's exact brief. If most asks come out of census, the ceiling is bounded before any
+  session runs, and that is itself a reading.

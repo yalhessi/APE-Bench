@@ -2,8 +2,8 @@
 
 **Status** — study 1 read on val1000 2026-10-03; its held-out reading **paused 2026-10-04** (A read
 the other-years sample, 269 of 1,070 asks; B none; about 17 reader runs left). Studies 2-4 open,
-**for a fresh session**. The test of whether the census helps a reviewer is
-[`conventions-knowledge-test.md`](conventions-knowledge-test.md).
+**for a fresh session**. Whether the census helps a reviewer, at best: the ceiling probe,
+[`conventions-ceiling-probe.md`](conventions-ceiling-probe.md).
 **Cost** — no spend beyond reader labelling; a 125-ask reader run is about 200k subagent tokens.
 
 **The user (2026-09-29).** *"The conventions problem is very much the heart of this project. I suspect
