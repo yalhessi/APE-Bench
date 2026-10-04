@@ -95,6 +95,37 @@ under LE than under LB.
 - **Subagent runs on the subscription:** 2 readers (46 asks and a 16k-token codebook each) and 4
   matchers (2 a set). No Claude reviewer session. Measured tokens are recorded below as they run.
 
+## Result 1 (2026-10-04): 39 of the 46 asks are in census, and the two readers agree on every one
+
+The todo's first step. Two blind readers, each in a folder holding the rubric, the codebook and the
+batch (`build_reader_folders.py`); both transcripts audit clean (6 and 8 tool calls, none outside the
+folder). Labels are `readers/labels_{1,2}.jsonl`, the briefs `briefs_exact.json`
+(`build_exact_briefs.py --print-briefs` prints each PR's).
+
+| | asks | reader 1 assigned | reader 2 | in census (either) | both | same primary entry |
+|---|---|---|---|---|---|---|
+| validation small12 | 30 | 25 | 24 | **25** | 24 | 24 |
+| post-cutoff | 16 | 14 | 14 | **14** | 14 | 14 |
+| both | 46 | 39 | 38 | **39 (85%)** | 38 | **38 of 38** |
+
+- **Census coverage does not bound the ceiling.** 85% of the asks have an entry behind them, on PRs
+  the census never read, and 14 of 16 on PRs created after it was written from.
+- **The seven outside** are, on both readers: four `specific` (three docstring slips or typos and a
+  doubt about one wording), two `out_of_census` (no index on a hypothesis name when the plain name is
+  free; `_anti`, not `_mono`, for passing to smaller objects) and one `unreadable` (a bare "Same
+  here."). The one ask the readers split on, 26755's file-wide `noncomputable` clean-up, reader 1
+  put under P100 (a change made for one sibling is made for the others) and reader 2 left out with
+  P100 as the nearest.
+- **By family:** proof 11 of 11, interface 8 of 8, PR level 4 of 4, derive 2 of 2, statement design
+  2 of 2, generality 2 of 2, formatting 1 of 1, registration 3 of 4, naming 4 of 6, documentation 2
+  of 6. The asks outside the census are mostly documentation slips, which have no principle.
+- **The briefs are short and general:** 28 distinct entries, 0 to 5 a PR (18 sentences on the 8
+  validation PRs, 15 on the 6 post-cutoff). One PR, 43024, has an empty brief: its only ask is out of
+  census, so its briefed session reads the model alone.
+- **Where the union matters:** reader 1 gave a second entry on 7 asks and reader 2 on 1. Four briefs
+  hold an entry only reader 1 gave: P100 on 26755 and on 43192, P401 on 32875 and P086 on 42814.
+- **Cost:** 134,923 and 136,802 subagent tokens, 5.3 and 5.6 minutes.
+
 ## What closes it
 
 The table above, per matcher and per set, here and in the todo. The Claude exact step then runs or

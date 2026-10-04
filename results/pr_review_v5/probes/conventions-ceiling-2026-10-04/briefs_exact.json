@@ -1,0 +1,688 @@
+{
+ "prs": {
+  "26755": [
+   "P100"
+  ],
+  "28649": [
+   "P185",
+   "P278"
+  ],
+  "29842": [
+   "P018",
+   "P041"
+  ],
+  "30458": [
+   "P329",
+   "P369"
+  ],
+  "30641": [
+   "P005",
+   "P060",
+   "P094",
+   "P105"
+  ],
+  "32875": [
+   "P018",
+   "P040",
+   "P315",
+   "P401"
+  ],
+  "34091": [
+   "P011",
+   "P392"
+  ],
+  "36822": [
+   "P098"
+  ],
+  "41930": [
+   "P041"
+  ],
+  "42184": [
+   "P010",
+   "P100"
+  ],
+  "42814": [
+   "P048",
+   "P063",
+   "P086",
+   "P153",
+   "P201"
+  ],
+  "43024": [],
+  "43167": [
+   "P030",
+   "P113",
+   "P254",
+   "P263"
+  ],
+  "43192": [
+   "P100",
+   "P254",
+   "P276"
+  ]
+ },
+ "asks": {
+  "v0066": {
+   "pr": 30641,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P060"
+   ],
+   "r2": [
+    "P060"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0004": {
+   "pr": 42814,
+   "set": "post",
+   "family": "F6",
+   "r1": [
+    "P153"
+   ],
+   "r2": [
+    "P153"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0067": {
+   "pr": 30641,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P005"
+   ],
+   "r2": [
+    "P005"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0016": {
+   "pr": 26755,
+   "set": "val",
+   "family": "F12",
+   "r1": [
+    "P100"
+   ],
+   "r2": [],
+   "r1_none": "",
+   "r2_none": "out_of_census",
+   "in_census": true
+  },
+  "p0005": {
+   "pr": 42814,
+   "set": "post",
+   "family": "F7",
+   "r1": [
+    "P063",
+    "P086"
+   ],
+   "r2": [
+    "P063"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0105": {
+   "pr": 34091,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P011"
+   ],
+   "r2": [
+    "P011"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0016": {
+   "pr": 43192,
+   "set": "post",
+   "family": "F8",
+   "r1": [
+    "P254"
+   ],
+   "r2": [
+    "P254"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0007": {
+   "pr": 42814,
+   "set": "post",
+   "family": "F2",
+   "r1": [
+    "P048"
+   ],
+   "r2": [
+    "P048"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0013": {
+   "pr": 43192,
+   "set": "post",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "r1_none": "specific",
+   "r2_none": "specific",
+   "in_census": false
+  },
+  "v0109": {
+   "pr": 34091,
+   "set": "val",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "r1_none": "specific",
+   "r2_none": "specific",
+   "in_census": false
+  },
+  "v0063": {
+   "pr": 30458,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P329"
+   ],
+   "r2": [
+    "P329"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0012": {
+   "pr": 43167,
+   "set": "post",
+   "family": "F8",
+   "r1": [
+    "P113"
+   ],
+   "r2": [
+    "P113"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0015": {
+   "pr": 43192,
+   "set": "post",
+   "family": "F2",
+   "r1": [
+    "P276",
+    "P100"
+   ],
+   "r2": [
+    "P276"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0065": {
+   "pr": 30641,
+   "set": "val",
+   "family": "F8",
+   "r1": [],
+   "r2": [],
+   "r1_none": "out_of_census",
+   "r2_none": "out_of_census",
+   "in_census": false
+  },
+  "v0093": {
+   "pr": 32875,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P018",
+    "P040"
+   ],
+   "r2": [
+    "P018",
+    "P040"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0061": {
+   "pr": 30458,
+   "set": "val",
+   "family": "F2",
+   "r1": [
+    "P369"
+   ],
+   "r2": [
+    "P369"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0068": {
+   "pr": 30641,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P094"
+   ],
+   "r2": [
+    "P094"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0110": {
+   "pr": 34091,
+   "set": "val",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "r1_none": "specific",
+   "r2_none": "specific",
+   "in_census": false
+  },
+  "p0006": {
+   "pr": 42814,
+   "set": "post",
+   "family": "F4",
+   "r1": [
+    "P201"
+   ],
+   "r2": [
+    "P201"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0132": {
+   "pr": 36822,
+   "set": "val",
+   "family": "F3",
+   "r1": [
+    "P098"
+   ],
+   "r2": [
+    "P098"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0108": {
+   "pr": 34091,
+   "set": "val",
+   "family": "F2",
+   "r1": [
+    "P392"
+   ],
+   "r2": [
+    "P392"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0008": {
+   "pr": 43024,
+   "set": "post",
+   "family": "F8",
+   "r1": [],
+   "r2": [],
+   "r1_none": "out_of_census",
+   "r2_none": "out_of_census",
+   "in_census": false
+  },
+  "v0031": {
+   "pr": 28649,
+   "set": "val",
+   "family": "F10",
+   "r1": [],
+   "r2": [],
+   "r1_none": "specific",
+   "r2_none": "specific",
+   "in_census": false
+  },
+  "v0107": {
+   "pr": 34091,
+   "set": "val",
+   "family": "F2",
+   "r1": [
+    "P392"
+   ],
+   "r2": [
+    "P392"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0056": {
+   "pr": 29842,
+   "set": "val",
+   "family": "F12",
+   "r1": [
+    "P041"
+   ],
+   "r2": [
+    "P041"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0106": {
+   "pr": 34091,
+   "set": "val",
+   "family": "F2",
+   "r1": [
+    "P392"
+   ],
+   "r2": [
+    "P392"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0131": {
+   "pr": 36822,
+   "set": "val",
+   "family": "F3",
+   "r1": [
+    "P098"
+   ],
+   "r2": [
+    "P098"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0030": {
+   "pr": 28649,
+   "set": "val",
+   "family": "F10",
+   "r1": [
+    "P278"
+   ],
+   "r2": [
+    "P278"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0091": {
+   "pr": 32875,
+   "set": "val",
+   "family": "F3",
+   "r1": [],
+   "r2": [],
+   "r1_none": "unreadable",
+   "r2_none": "unreadable",
+   "in_census": false
+  },
+  "p0002": {
+   "pr": 42184,
+   "set": "post",
+   "family": "F7",
+   "r1": [
+    "P010"
+   ],
+   "r2": [
+    "P010"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0014": {
+   "pr": 43192,
+   "set": "post",
+   "family": "F2",
+   "r1": [
+    "P276"
+   ],
+   "r2": [
+    "P276"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0000": {
+   "pr": 41930,
+   "set": "post",
+   "family": "F12",
+   "r1": [
+    "P041"
+   ],
+   "r2": [
+    "P041"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0055": {
+   "pr": 29842,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P018"
+   ],
+   "r2": [
+    "P018"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0011": {
+   "pr": 43167,
+   "set": "post",
+   "family": "F4",
+   "r1": [
+    "P263"
+   ],
+   "r2": [
+    "P263"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0064": {
+   "pr": 30641,
+   "set": "val",
+   "family": "F8",
+   "r1": [
+    "P105"
+   ],
+   "r2": [
+    "P105"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0009": {
+   "pr": 43167,
+   "set": "post",
+   "family": "F9",
+   "r1": [
+    "P030"
+   ],
+   "r2": [
+    "P030"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0060": {
+   "pr": 30458,
+   "set": "val",
+   "family": "F2",
+   "r1": [
+    "P369",
+    "P329"
+   ],
+   "r2": [
+    "P369"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0010": {
+   "pr": 43167,
+   "set": "post",
+   "family": "F8",
+   "r1": [
+    "P254"
+   ],
+   "r2": [
+    "P254"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0029": {
+   "pr": 28649,
+   "set": "val",
+   "family": "F10",
+   "r1": [
+    "P185"
+   ],
+   "r2": [
+    "P185"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0053": {
+   "pr": 29842,
+   "set": "val",
+   "family": "F12",
+   "r1": [
+    "P041"
+   ],
+   "r2": [
+    "P041"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0094": {
+   "pr": 32875,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P018",
+    "P401"
+   ],
+   "r2": [
+    "P018"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0090": {
+   "pr": 32875,
+   "set": "val",
+   "family": "F3",
+   "r1": [
+    "P315"
+   ],
+   "r2": [
+    "P315"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0092": {
+   "pr": 32875,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P018",
+    "P401"
+   ],
+   "r2": [
+    "P018"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0095": {
+   "pr": 32875,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P018",
+    "P401"
+   ],
+   "r2": [
+    "P018"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "p0003": {
+   "pr": 42184,
+   "set": "post",
+   "family": "F6",
+   "r1": [
+    "P100"
+   ],
+   "r2": [
+    "P100"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  },
+  "v0062": {
+   "pr": 30458,
+   "set": "val",
+   "family": "F1",
+   "r1": [
+    "P329"
+   ],
+   "r2": [
+    "P329"
+   ],
+   "r1_none": "",
+   "r2_none": "",
+   "in_census": true
+  }
+ }
+}

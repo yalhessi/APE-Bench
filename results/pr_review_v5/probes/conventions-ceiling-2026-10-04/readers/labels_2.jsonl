@@ -1,0 +1,46 @@
+{"cid": "v0066", "principle_id": "P060", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Wants the ≤ fact proved directly instead of a < fact later weakened; P060 is about lemma choice, applied here to a `have`."}
+{"cid": "p0004", "principle_id": "P153", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "The alternative offered (drop the other direction) has no entry."}
+{"cid": "v0067", "principle_id": "P005", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0016", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "unsure", "note": "Principle: `noncomputable` only where necessary, and the cleanup extended file-wide. Nearest P100 (sibling extension); P272 is about section vs marker."}
+{"cid": "p0005", "principle_id": "P063", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0105", "principle_id": "P011", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0016", "principle_id": "P254", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0007", "principle_id": "P048", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0013", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "sure", "note": "Typo fix: missing word 'of' in the module title."}
+{"cid": "v0109", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "sure", "note": "Corrects a garbled docstring ('domain's' twice, 'but'); a slip, not a design choice. Nearest P139."}
+{"cid": "v0063", "principle_id": "P329", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0012", "principle_id": "P113", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0015", "principle_id": "P276", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "Reply extending the parent's auto-param request to the other definitions."}
+{"cid": "v0065", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "unsure", "note": "Principle: no index on a hypothesis name when the plain name is free. Nearest P211 (primes on declaration names) and P371."}
+{"cid": "v0093", "principle_id": "P018", "second_principle_id": "P040", "none_reason": "", "confidence": "unsure", "note": "Merges `simp only at h; exact` into `by simpa using h` (P018) and turns the block into a term (P040); either could lead."}
+{"cid": "v0061", "principle_id": "P369", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "Entry binds in the signature; the ask uses `variable … in`, to the same effect."}
+{"cid": "v0068", "principle_id": "P094", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0110", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "sure", "note": "Extends the parent's docstring wording correction to the comments below; same reason as the parent."}
+{"cid": "p0006", "principle_id": "P201", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0132", "principle_id": "P098", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "The `@[simp]` was dropped when `to_dual` was added."}
+{"cid": "v0108", "principle_id": "P392", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0008", "principle_id": "none", "second_principle_id": "", "none_reason": "out_of_census", "confidence": "sure", "note": "Principle: a lemma passing a property to smaller objects is `_anti`, not `_mono`. Nearest P260, which is about `_mono` versus the iff."}
+{"cid": "v0031", "principle_id": "none", "second_principle_id": "", "none_reason": "specific", "confidence": "unsure", "note": "Doubt whether this one wording change (variance/variances) is right; a fact about this hunk. Nearest P185."}
+{"cid": "v0107", "principle_id": "P392", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0056", "principle_id": "P041", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0106", "principle_id": "P392", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0131", "principle_id": "P098", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "The `@[simp]` was dropped when `to_dual` was added."}
+{"cid": "v0030", "principle_id": "P278", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0091", "principle_id": "none", "second_principle_id": "", "none_reason": "unreadable", "confidence": "unsure", "note": "Bare 'Same here.' with no parent; the referent is not in body or hunk. Probably the grind-tag request of v0090 (P315)."}
+{"cid": "p0002", "principle_id": "P010", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0014", "principle_id": "P276", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0000", "principle_id": "P041", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Asks for the motivation of a rename; P041 names new concepts and design changes, so a naming fix is at its edge."}
+{"cid": "v0055", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0011", "principle_id": "P263", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0064", "principle_id": "P105", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "The suggestion also reflows the header, unremarked; not counted as a second request."}
+{"cid": "p0009", "principle_id": "P030", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Empty suggestion deleting the added import; no reason given, so unneeded-import is inferred. P071/P074 possible if the lemma should move."}
+{"cid": "v0060", "principle_id": "P369", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "Entry binds in the signature; the ask uses `variable … in`, to the same effect."}
+{"cid": "p0010", "principle_id": "P254", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0029", "principle_id": "P185", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Revert of a hyphenation change in a third-party typo PR; reason unstated, could instead be a specific disagreement on correctness."}
+{"cid": "v0053", "principle_id": "P041", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0094", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": "`simp only; exact` merged into one `simpa … using`. P401 near but its avoided form differs."}
+{"cid": "v0090", "principle_id": "P315", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0092", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "v0095", "principle_id": "P018", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
+{"cid": "p0003", "principle_id": "P100", "second_principle_id": "", "none_reason": "", "confidence": "unsure", "note": "Asks for the HasProd variant the file's sibling lemmas have; P100 is the reverse direction (one member's variant extended to others). P004 near."}
+{"cid": "v0062", "principle_id": "P329", "second_principle_id": "", "none_reason": "", "confidence": "sure", "note": ""}
